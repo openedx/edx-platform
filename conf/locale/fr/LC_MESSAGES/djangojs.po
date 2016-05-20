@@ -101,7 +101,7 @@
 # Philippe Chiu <philippe.chiu@gmail.com>, 2013
 # Pierre-Emmanuel Colas <pecolas44@gmail.com>, 2015
 # Pierre Roland Bonvin <pierre@bonvin.name>, 2016
-# rafcha <raphael.chay@gmail.com>, 2014-2015
+# rafcha <raphael.chay@gmail.com>, 2014-2016
 # Richard Moch <richard.moch@gmail.com>, 2015
 # samuel <samuelecin@gmail.com>, 2014
 # Sarina Canelake <sarina@edx.org>, 2014
@@ -153,7 +153,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-05-06 14:29+0000\n"
+"POT-Creation-Date: 2016-05-12 14:50+0000\n"
 "PO-Revision-Date: 2016-05-09 11:26+0000\n"
 "Last-Translator: Ned Batchelder <ned@edx.org>\n"
 "Language-Team: French (http://www.transifex.com/open-edx/edx-platform/language/fr/)\n"
@@ -5032,26 +5032,6 @@ msgstr "Tous les groupes doivent avoir un nom."
 #: cms/static/js/models/group_configuration.js
 msgid "All groups must have a unique name."
 msgstr "Tous les groupes doivent avoir un nom unique."
-
-#: cms/static/js/models/settings/course_details.js
-msgid "The title field must be limited to 50 characters."
-msgstr ""
-
-#: cms/static/js/models/settings/course_details.js
-msgid "The subtitle field must be limited to 150 characters."
-msgstr ""
-
-#: cms/static/js/models/settings/course_details.js
-msgid "The duration field must be limited to 50 characters."
-msgstr ""
-
-#: cms/static/js/models/settings/course_details.js
-msgid "The short description field must be limited to 150 characters."
-msgstr ""
-
-#: cms/static/js/models/settings/course_details.js
-msgid "The description field must be limited to 1000 characters."
-msgstr ""
 
 #: cms/static/js/models/settings/course_details.js
 msgid "The course must have an assigned start date."

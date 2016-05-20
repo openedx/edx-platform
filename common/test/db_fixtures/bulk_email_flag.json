@@ -1,0 +1,11 @@
+[
+    {
+        "pk": 1,
+        "model": "bulk_email.bulkemailflag",
+        "fields": {
+            "enabled": true,
+            "require_course_email_auth": false,
+            "change_date": "2016-05-01"
+        }
+    }
+]

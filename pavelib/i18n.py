@@ -1,10 +1,14 @@
 """
 Internationalization tasks
 """
+
+import re
 import sys
 import subprocess
+
 from path import Path as path
 from paver.easy import task, cmdopts, needs, sh
+
 from .utils.cmd import django_cmd
 
 try:
@@ -228,3 +232,68 @@ def i18n_robot_push():
     Extract new strings, and push to transifex
     """
     pass
+
+
+@task
+@needs(
+    "pavelib.i18n.i18n_validate_transifex_config",
+    "pavelib.i18n.i18n_generate",
+)
+def i18n_release_push():
+    """
+    Push release-specific resources to Transifex.
+    """
+    resources = find_release_resources()
+    sh("i18n_tool transifex push " + " ".join(resources))
+
+
+@task
+@needs(
+    "pavelib.i18n.i18n_validate_transifex_config",
+)
+def i18n_release_pull():
+    """
+    Pull release-specific translations from Transifex.
+    """
+    resources = find_release_resources()
+    sh("i18n_tool transifex pull " + " ".join(resources))
+
+
+def find_release_resources():
+    """
+    Validate the .tx/config file for release files, returning the resource names.
+
+    For working with release files, the .tx/config file should have exactly
+    two resources defined named "release-*".  Check that this is true.  If
+    there's a problem, print messages about it.
+
+    Returns a list of resource names, or raises ValueError if .tx/config
+    doesn't have two resources.
+
+    """
+    # An entry in .tx/config for a release will look like this:
+    #
+    #    [edx-platform.release-dogwood]
+    #    file_filter = conf/locale/<lang>/LC_MESSAGES/django.po
+    #    source_file = conf/locale/en/LC_MESSAGES/django.po
+    #    source_lang = en
+    #    type = PO
+    #
+    #    [edx-platform.release-dogwood-js]
+    #    file_filter = conf/locale/<lang>/LC_MESSAGES/djangojs.po
+    #    source_file = conf/locale/en/LC_MESSAGES/djangojs.po
+    #    source_lang = en
+    #    type = PO
+
+    rx_release = r"^\[([\w-]+\.release-[\w-]+)\]$"
+    with open(".tx/config") as tx_config:
+        resources = re.findall(rx_release, tx_config.read(), re.MULTILINE)
+
+    if len(resources) == 2:
+        return resources
+
+    if len(resources) == 0:
+        raise ValueError("You need two release-* resources defined to use this command.")
+    else:
+        msg = "Strange Transifex config! Found these release-* resources:\n" + "\n".join(resources)
+        raise ValueError(msg)

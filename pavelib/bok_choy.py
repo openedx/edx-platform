@@ -19,6 +19,7 @@ __test__ = False  # do not collect
 BOKCHOY_OPTS = [
     ('test_spec=', 't', 'Specific test to run'),
     ('fasttest', 'a', 'Skip some setup'),
+    ('skip_clean', 'C', 'Skip cleaning repository before running tests'),
     ('serversonly', 'r', 'Prepare suite and leave servers running'),
     ('testsonly', 'o', 'Assume servers are running and execute tests only'),
     ('extra_args=', 'e', 'adds as extra args to the test command'),

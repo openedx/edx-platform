@@ -22,7 +22,7 @@ data: |
   <p>
   To create these problems, you use MathJax to change your plain text into
   "beautiful math." For more information about how to use MathJax in Studio,
-  see <a href="http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/exercises_tools/mathjax.html" target="_blank">
+  see <a href="http://edx.readthedocs.io/projects/edx-partner-course-staff/en/latest/exercises_tools/mathjax.html" target="_blank">
   A Brief Introduction to MathJax in Studio</a> in <i>Building and Running an edx
   Course</i>.
   </p>

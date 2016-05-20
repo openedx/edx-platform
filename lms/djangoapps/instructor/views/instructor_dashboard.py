@@ -46,10 +46,11 @@ from certificates.models import (
     CertificateInvalidation,
 )
 from certificates import api as certs_api
+from bulk_email.models import BulkEmailFlag
 from util.date_utils import get_default_time_display
 
 from class_dashboard.dashboard_data import get_section_display_name, get_array_section_has_problem
-from .tools import get_units_with_due_date, title_or_url, bulk_email_is_enabled_for_course
+from .tools import get_units_with_due_date, title_or_url
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from openedx.core.djangolib.markup import Text, HTML
@@ -140,7 +141,7 @@ def instructor_dashboard_2(request, course_id):
         sections.insert(3, _section_extensions(course))
 
     # Gate access to course email by feature flag & by course-specific authorization
-    if bulk_email_is_enabled_for_course(course_key):
+    if BulkEmailFlag.feature_enabled(course_key):
         sections.append(_section_send_email(course, access))
 
     # Gate access to Metrics tab by featue flag and staff authorization

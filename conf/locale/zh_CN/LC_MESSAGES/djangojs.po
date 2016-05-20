@@ -203,7 +203,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-05-06 14:29+0000\n"
+"POT-Creation-Date: 2016-05-12 14:50+0000\n"
 "PO-Revision-Date: 2016-05-09 11:26+0000\n"
 "Last-Translator: Ned Batchelder <ned@edx.org>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/open-edx/edx-platform/language/zh_CN/)\n"
@@ -409,14 +409,14 @@ msgstr "回复批注"
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "(%(earned)s/%(possible)s point)"
 msgid_plural "(%(earned)s/%(possible)s points)"
-msgstr[0] "(%(earned)s/%(possible)s 分)"
+msgstr[0] "（%(earned)s/%(possible)s 分）"
 
 #. Translators: %(num_points)s is the number of points possible (examples: 1,
 #. 3, 10). There will always be at least 1 point possible.;
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "(%(num_points)s point possible)"
 msgid_plural "(%(num_points)s points possible)"
-msgstr[0] "(本题共有%(num_points)s分)"
+msgstr[0] "（可能为 %(num_points)s 分）"
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "The grading process is still running. Refresh the page to see updates."
@@ -1802,7 +1802,7 @@ msgstr "请试着更换一个浏览器，如谷歌的 Chrome 浏览器。"
 
 #: common/lib/xmodule/xmodule/js/src/video/05_video_quality_control.js
 msgid "High Definition"
-msgstr "高清晰"
+msgstr "高级定义"
 
 #: common/lib/xmodule/xmodule/js/src/video/05_video_quality_control.js
 msgid "off"
@@ -1833,7 +1833,7 @@ msgstr[0] "%(value)s 分钟"
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
 msgid "%(value)s second"
 msgid_plural "%(value)s seconds"
-msgstr[0] "%(value)s 秒"
+msgstr[0] "%(value)s 秒钟"
 
 #: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js
 msgid ""
@@ -1845,7 +1845,7 @@ msgid ""
 "Speed: Press UP to enter the speed menu then use the UP and DOWN arrow keys "
 "to navigate the different speeds, then press ENTER to change to the selected"
 " speed."
-msgstr "速度：按向上键打开速度菜单，按上下方向键来调整速度，然后按回车键切换到选定速度。"
+msgstr "速度：按“UP”进入速度菜单，然后按“UP”和“DOWN”方向的按钮来调整速度，然后按“ENTER”键来改变选定速度。"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_play_skip_control.js
 msgid "Skip"
@@ -1857,11 +1857,11 @@ msgstr "播放视频"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_skip_control.js
 msgid "Do not show again"
-msgstr "不再显示"
+msgstr "不在显示"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "Transcript will be displayed when you start playing the video."
-msgstr "当你开始播放视频后将会显示字幕。"
+msgstr "当你开始播放视频时将显示成绩单。"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid ""
@@ -1871,7 +1871,7 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "Video transcript"
-msgstr "视频字幕"
+msgstr "视频成绩单"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "Start of transcript. Skip to the end."
@@ -1886,7 +1886,7 @@ msgid ""
 "Language: Press the UP arrow key to enter the language menu then use UP and "
 "DOWN arrow keys to navigate language options. Press ENTER to change to the "
 "selected language."
-msgstr "语言：按向上键打开语言菜单，然后使用上下方向键来选择语言选项，按回车键切换到所选择的语言。"
+msgstr "语言：按下向上箭头按键以进入语言菜单，随后使用向上和向下箭头按键来导航语言选项。按下“输入”来更改已选择的语言。"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "Open language menu."
@@ -1898,7 +1898,7 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "(Caption will be displayed when you start playing the video.)"
-msgstr "(当视频开始播放时将会显示标题。)"
+msgstr "(当视频开始拨放时标题将会显示)"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "Turn on closed captioning"
@@ -1966,7 +1966,7 @@ msgstr[0] ""
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
 msgid "%(numVotes)s Vote"
 msgid_plural "%(numVotes)s Votes"
-msgstr[0] "%(numVotes)s票"
+msgstr[0] "%(numVotes)s 张选票"
 
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
 msgid "We had some trouble subscribing you to this thread. Please try again."
@@ -2086,12 +2086,12 @@ msgstr "载入回复时遇到麻烦，请重试。"
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
 msgid "%(numResponses)s other response"
 msgid_plural "%(numResponses)s other responses"
-msgstr[0] "其他回复数%(numResponses)s"
+msgstr[0] "%(numResponses)s 条其他回复"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
 msgid "%(numResponses)s response"
 msgid_plural "%(numResponses)s responses"
-msgstr[0] "%(numResponses)s条回复"
+msgstr[0] "%(numResponses)s 条回复"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
 msgid "Showing all responses"
@@ -2100,7 +2100,7 @@ msgstr "显示所有的回复"
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
 msgid "Showing first response"
 msgid_plural "Showing first %(numResponses)s responses"
-msgstr[0] "显示开始的%(numResponses)s条回复"
+msgstr[0] "显示前 %(numResponses)s 条回复"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
 msgid "Load all responses"
@@ -2159,7 +2159,7 @@ msgstr "分页"
 msgid ""
 "Your request could not be completed. Reload the page and try again. If the "
 "issue persists, click the Help tab to report the problem."
-msgstr "无法完成你的请求，请重新加载页面后重试。如果问题仍然存在，请点击帮助选项卡以报告问题。"
+msgstr "你的请求无法完成。重新加载页面并重试。如果问题仍然存在，则单击“帮助”选项卡报告问题。"
 
 #: common/static/common/js/components/views/paging_header.js
 msgid "Showing %(first_index)s out of %(num_items)s total"
@@ -2259,7 +2259,7 @@ msgstr "大约一个月"
 #, c-format
 msgid "%d month"
 msgid_plural "%d months"
-msgstr[0] "%d 个月"
+msgstr[0] "%d 月"
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "about a year"
@@ -2374,14 +2374,14 @@ msgstr "查看信息栏以移除所有标记"
 #: common/static/js/vendor/ova/flagging-annotator.js
 msgid "Check the box to remove %(totalFlags)s flag."
 msgid_plural "Check the box to remove %(totalFlags)s flags."
-msgstr[0] "查看信息栏以移除%(totalFlags)s条标记"
+msgstr[0] "选中复选框以去除 %(totalFlags)s 个标记。"
 
 #. Translators: 'count' is the number of flags solely for that annotation that
 #. will be removed
 #: common/static/js/vendor/ova/flagging-annotator.js
 msgid "Check the box to remove %(count)s flag."
 msgid_plural "Check the box to remove %(count)s flags."
-msgstr[0] "查看信息栏以移除%(count)s的标记"
+msgstr[0] "选中复选框以去除 %(count)s 个标记。"
 
 #: common/static/js/vendor/ova/flagging-annotator.js
 msgid "All flags have been removed. To undo, uncheck the box."
@@ -2399,7 +2399,7 @@ msgstr "报告不恰当的或具有攻击性的批注。"
 #: common/static/js/vendor/ova/flagging-annotator.js
 msgid "This annotation has %(count)s flag."
 msgid_plural "This annotation has %(count)s flags."
-msgstr[0] "该批注包含 %(count)s 个标记。"
+msgstr[0] "此注释带有 %(count)s 个标记。"
 
 #: lms/djangoapps/support/static/support/js/views/certificates.js
 msgid "An unexpected error occurred.  Please try again."
@@ -2573,7 +2573,7 @@ msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/instructor_tools.js
 msgid "Team \"{team}\" successfully deleted."
-msgstr "已成功删除团队“{team}”。"
+msgstr "团队 \"{team}\" 已成功删除。"
 
 #: lms/djangoapps/teams/static/teams/js/views/my_teams.js
 msgid "You are not currently a member of any team."
@@ -3338,23 +3338,23 @@ msgstr "插入超链接"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "e.g. 'http://google.com/'"
-msgstr "例如“http://google.com/”"
+msgstr "例如'http://google.com/'"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Link Description"
-msgstr "链接描述"
+msgstr "链接的描述"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "e.g. 'google'"
-msgstr "例如“google”"
+msgstr "例如'google'"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Please provide a description of the link destination."
-msgstr "请提供链接目标的描述。"
+msgstr "请提供链接的描述。"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Insert Image (upload file or type URL)"
-msgstr "插入图片 (上传文件或输入图片链接的URL)"
+msgstr "插入图片 (上传文件或输入图片URL)"
 
 #: lms/static/js/Markdown.Editor.js
 msgid ""
@@ -3404,7 +3404,7 @@ msgstr ""
 #: lms/static/js/Markdown.Editor.js
 msgid "%(errorCount)s error found in form."
 msgid_plural "%(errorCount)s errors found in form."
-msgstr[0] "该表单中发现了%(errorCount)s个错误。"
+msgstr[0] "表格中发现 %(errorCount)s 个错误。"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Bold (Ctrl+B)"
@@ -3768,17 +3768,17 @@ msgstr "输入用户名或电子邮件地址。"
 #: lms/static/js/groups/views/cohort_editor.js
 msgid "{numUsersAdded} student has been added to this cohort"
 msgid_plural "{numUsersAdded} students have been added to this cohort"
-msgstr[0] "{numUsersAdded} 名学生已被添加到该群组中"
+msgstr[0] "{numUsersAdded} 个学生已添加至此队列"
 
 #: lms/static/js/groups/views/cohort_editor.js
 msgid "{numMoved} student was removed from {oldCohort}"
 msgid_plural "{numMoved} students were removed from {oldCohort}"
-msgstr[0] "{numMoved} 名学生已从{oldCohort}中移除"
+msgstr[0] "{numMoved} 学生已被移出 {oldCohort}"
 
 #: lms/static/js/groups/views/cohort_editor.js
 msgid "{numPresent} student was already in the cohort"
 msgid_plural "{numPresent} students were already in the cohort"
-msgstr[0] "{numPresent} 名学生已在该群组中"
+msgstr[0] "{numPresent} 个学生已在此队列"
 
 #: lms/static/js/groups/views/cohort_editor.js
 msgid "Unknown user: {user}"
@@ -3787,7 +3787,7 @@ msgstr "未知用户： {user}"
 #: lms/static/js/groups/views/cohort_editor.js
 msgid "There was an error when trying to add students:"
 msgid_plural "There were {numErrors} errors when trying to add students:"
-msgstr[0] "添加学生时出现 {numErrors} 个错误："
+msgstr[0] "尝试添加学生时出现 {numErrors} 个错误："
 
 #: lms/static/js/groups/views/cohort_editor.js
 msgid "View all errors"
@@ -3928,7 +3928,7 @@ msgstr ""
 #, c-format
 msgid "%s result"
 msgid_plural "%s results"
-msgstr[0] "%s个结果"
+msgstr[0] "%s 个结果"
 
 #: lms/static/js/staff_debug_actions.js
 msgid "Unknown Error Occurred."
@@ -4393,7 +4393,7 @@ msgstr "无法读取数据，请稍后再试试。"
 #: lms/templates/class_dashboard/d3_stacked_bar_graph.js
 msgid "%(num_students)s student opened Subsection"
 msgid_plural "%(num_students)s students opened Subsection"
-msgstr[0] "%(num_students)s 名学生打开了小节"
+msgstr[0] "%(num_students)s 个学生已打开分项"
 
 #: lms/templates/class_dashboard/d3_stacked_bar_graph.js
 msgid "%(num_students)s student"
@@ -4403,7 +4403,7 @@ msgstr[0] "%(num_students)s 个学生"
 #: lms/templates/class_dashboard/d3_stacked_bar_graph.js
 msgid "%(num_questions)s question"
 msgid_plural "%(num_questions)s questions"
-msgstr[0] "%(num_questions)s个问题"
+msgstr[0] "%(num_questions)s 个问题"
 
 #: lms/templates/class_dashboard/d3_stacked_bar_graph.js
 msgid "Number of Students"
@@ -4715,26 +4715,6 @@ msgstr "所有组都必须有名称。"
 #: cms/static/js/models/group_configuration.js
 msgid "All groups must have a unique name."
 msgstr "所有的组的名字必须是唯一的。"
-
-#: cms/static/js/models/settings/course_details.js
-msgid "The title field must be limited to 50 characters."
-msgstr ""
-
-#: cms/static/js/models/settings/course_details.js
-msgid "The subtitle field must be limited to 150 characters."
-msgstr ""
-
-#: cms/static/js/models/settings/course_details.js
-msgid "The duration field must be limited to 50 characters."
-msgstr ""
-
-#: cms/static/js/models/settings/course_details.js
-msgid "The short description field must be limited to 150 characters."
-msgstr ""
-
-#: cms/static/js/models/settings/course_details.js
-msgid "The description field must be limited to 1000 characters."
-msgstr ""
 
 #: cms/static/js/models/settings/course_details.js
 msgid "The course must have an assigned start date."
@@ -6677,7 +6657,7 @@ msgstr "创建一个内容组"
 #, python-format
 msgid "(contains %(student_count)s student)"
 msgid_plural "(contains %(student_count)s students)"
-msgstr[0] "(包含 %(student_count)s名学生)"
+msgstr[0] "（包括 %(student_count)s 个学生）"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-group-header.underscore
 msgid ""
@@ -6779,7 +6759,7 @@ msgstr ""
 #, python-format
 msgid "Load next %(num_items)s result"
 msgid_plural "Load next %(num_items)s results"
-msgstr[0] "加载下%(num_items)s项结果"
+msgstr[0] "加载随后 %(num_items)s 个结果"
 
 #: lms/templates/search/course_search_results.underscore
 #: lms/templates/search/dashboard_search_results.underscore

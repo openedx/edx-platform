@@ -661,10 +661,6 @@ class CcxDetailTest(CcxRestApiTest):
     """
     Test for the CCX REST APIs
     """
-    @classmethod
-    def setUpClass(cls):
-        super(CcxDetailTest, cls).setUpClass()
-
     def setUp(self):
         """
         Set up tests

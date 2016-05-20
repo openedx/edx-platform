@@ -1,6 +1,7 @@
+<%page expression_filter="h"/>
 <%inherit file="base.html" />
 <%def name="online_help_token()"><% return "schedule" %></%def>
-<%block name="title">${_("Schedule &amp; Details Settings")}</%block>
+<%block name="title">${_("Schedule & Details Settings")}</%block>
 <%block name="bodyclass">is-signedin course schedule view-settings feature-upload</%block>
 
 <%namespace name='static' file='static_content.html'/>
@@ -11,6 +12,7 @@
   from openedx.core.djangolib.js_utils import (
       dump_js_escaped_json, js_escaped_string
   )
+  from openedx.core.djangolib.markup import HTML, Text
 %>
 
 <%block name="header_extras">
@@ -27,7 +29,7 @@
   <script type="text/javascript">
 window.CMS = window.CMS || {};
 CMS.URL = CMS.URL || {};
-CMS.URL.UPLOAD_ASSET = '${upload_asset_url}'
+CMS.URL.UPLOAD_ASSET = '${upload_asset_url | n, js_escaped_string}'
   </script>
 </%block>
 
@@ -94,10 +96,10 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url}'
               <li class="action-item">
                 <%
                   email_subject = urllib.quote(_("Enroll in {course_display_name}").format(
-                      course_display_name = context_course.display_name_with_default_escaped
+                      course_display_name = context_course.display_name_with_default
                   ).encode("utf-8"))
                   email_body = urllib.quote(_('The course "{course_display_name}", provided by {platform_name}, is open for enrollment. Please navigate to this course at {link_for_about_page} to enroll.').format(
-                      course_display_name = context_course.display_name_with_default_escaped,
+                      course_display_name = context_course.display_name_with_default,
                       platform_name = settings.PLATFORM_NAME,
                       link_for_about_page = link_for_about_page
                   ).encode("utf-8"))
@@ -226,7 +228,7 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url}'
               </div>
             </li>
             <%
-              enrollment_end_readonly = "readonly aria-readonly=\"true\"" if not enrollment_end_editable else ""
+              enrollment_end_readonly = HTML("readonly aria-readonly=\"true\"") if not enrollment_end_editable else ""
               enrollment_end_editable_class = "is-not-editable" if not enrollment_end_editable else ""
             %>
             <li class="field-group field-group-enrollment-end" id="enrollment-end">
@@ -253,11 +255,14 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url}'
           <div class="notice notice-incontext notice-workflow">
             <h3 class="title">${_("These Dates Are Not Used When Promoting Your Course")}</h3>
             <div class="copy">
-              <p>${_(
-                'These dates impact <strong>when your courseware can be viewed</strong>, '
-                'but they are <strong>not the dates shown on your course summary page</strong>. '
+              <p>${Text(_(
+                'These dates impact {strong_start}when your courseware can be viewed{strong_end}, '
+                'but they are {strong_start}not the dates shown on your course summary page{strong_end}. '
                 'To provide the course start and registration dates as shown on your course '
                 'summary page, follow the instructions provided by your Program Manager.'
+                )).format(
+                  strong_start=HTML('<strong>'),
+                  strong_end=HTML('</strong>')
               )}</p>
             </div>
           </div>
@@ -328,13 +333,11 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url}'
                 <li class="field text" id="field-course-overview">
                   <label for="course-overview">${_("Course Overview")}</label>
                   <textarea class="tinymce text-editor" id="course-overview"></textarea>
-                  <%def name='overview_text()'><%
-                    a_link_start = '<a class="link-courseURL" rel="external" href="'
-                    a_link_end = '">' + _("your course summary page") + '</a>'
-                    a_link = a_link_start + lms_link_for_about_page + a_link_end
-                    text = _("Introductions, prerequisites, FAQs that are used on %s (formatted in HTML)") % a_link
-                    %>${text}</%def>
-                  <span class="tip tip-stacked">${overview_text()}</span>
+                  <span class="tip tip-stacked">${
+                    Text(_("Introductions, prerequisites, FAQs that are used on {a_link_start}your course summary page{a_link_end} (formatted in HTML)")).format(
+                      a_link_start=HTML("<a class='link-courseURL' rel='external' href='{lms_link_for_about_page}'>").format(lms_link_for_about_page=lms_link_for_about_page),
+                      a_link_end=HTML("</a>")
+                    )}</span>
                 </li>
                 % endif
 
@@ -347,7 +350,10 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url}'
                     </span>
 
                     <span class="msg msg-help">
-                    ${_("You can manage this image along with all of your other <a href='{}'>files &amp; uploads</a>").format(upload_asset_url)}
+                    ${Text(_("You can manage this image along with all of your other {a_link_start}files and uploads{a_link_end}")).format(
+                      a_link_start=HTML("<a href='{upload_asset_url}'>").format(upload_asset_url=upload_asset_url),
+                      a_link_end=HTML("</a>")
+                      )}
                     </span>
 
                     % else:
@@ -378,7 +384,10 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url}'
                     </span>
 
                     <span class="msg msg-help">
-                    ${_("You can manage this image along with all of your other <a href='{}'>files &amp; uploads</a>").format(upload_asset_url)}
+                    ${Text(_("You can manage this image along with all of your other {a_link_start}files and uploads{a_link_end}")).format(
+                      a_link_start=HTML("<a href='{upload_asset_url}'>").format(upload_asset_url=upload_asset_url),
+                      a_link_end=HTML("</a>")
+                      )}
                     </span>
 
                     % else:
@@ -408,7 +417,10 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url}'
                     </span>
 
                     <span class="msg msg-help">
-                    ${_("You can manage this image along with all of your other <a href='{}'>files &amp; uploads</a>").format(upload_asset_url)}
+                    ${Text(_("You can manage this image along with all of your other {a_link_start}files and uploads{a_link_end}")).format(
+                      a_link_start=HTML("<a href='{upload_asset_url}'>").format(upload_asset_url=upload_asset_url),
+                      a_link_end=HTML("</a>")
+                      )}
                     </span>
 
                     % else:
@@ -525,7 +537,11 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url}'
                             <label for="entrance-exam-enabled">${_("Require students to pass an exam before beginning the course.")}</label>
                         </div>
                          <div class="div-grade-requirements" hidden="hidden">
-                          <p><span class="tip tip-inline">${_("You can now view and author your course entrance exam from the {link_start}Course Outline{link_end}.").format(link_start="<a href='{}'>".format(course_handler_url), link_end="</a>")}</span></p>
+                          <p><span class="tip tip-inline">
+                            ${Text(_("You can now view and author your course entrance exam from the {link_start}Course Outline{link_end}.")).format(
+                              link_start=HTML("<a href='{course_handler_url}'>").format(course_handler_url=course_handler_url),
+                              link_end=HTML("</a>")
+                            )}</span></p>
                           <p><h3>${_("Grade Requirements")}</h3></p>
                           <p><div><input type="text" id="entrance-exam-minimum-score-pct" aria-describedby="min-score-format"><span id="min-score-format" class="tip tip-inline">${_(" %")}</span></div></p>
                           <p><span class="tip tip-inline">${_("The score student must meet in order to successfully complete the entrance exam. ")}</span></p>

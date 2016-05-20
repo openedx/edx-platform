@@ -49,6 +49,12 @@ class CapaModule(CapaMixin, XModule):
         """
         super(CapaModule, self).__init__(*args, **kwargs)
 
+    def author_view(self, context):
+        """
+        Renders the Studio preview view.
+        """
+        return self.student_view(context)
+
     def handle_ajax(self, dispatch, data):
         """
         This is called by courseware.module_render, to handle an AJAX call.
@@ -139,6 +145,7 @@ class CapaDescriptor(CapaFields, RawDescriptor):
     mako_template = "widgets/problem-edit.html"
     js = {'coffee': [resource_string(__name__, 'js/src/problem/edit.coffee')]}
     js_module_name = "MarkdownEditingDescriptor"
+    has_author_view = True
     css = {
         'scss': [
             resource_string(__name__, 'css/editor/edit.scss'),

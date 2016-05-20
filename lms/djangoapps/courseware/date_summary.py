@@ -8,6 +8,7 @@ from datetime import datetime
 from babel.dates import format_timedelta
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext_lazy
 from django.utils.translation import to_locale, get_language
 from edxmako.shortcuts import render_to_string
 from lazy import lazy
@@ -51,7 +52,7 @@ class DateSummary(object):
         The format to display this date in. By default, displays like Jan
         01, 2015.
         """
-        return '%b %d, %Y'
+        return u'%b %d, %Y'
 
     @property
     def link(self):
@@ -107,7 +108,7 @@ class DateSummary(object):
         # 'absolute'. For example, 'absolute' might be "Jan 01, 2020",
         # and if today were December 5th, 2020, 'relative' would be "1
         # month".
-        date_format = _("{relative} ago - {absolute}") if date_has_passed else _("in {relative} - {absolute}")
+        date_format = _(u"{relative} ago - {absolute}") if date_has_passed else _(u"in {relative} - {absolute}")
         return date_format.format(
             relative=relative_date,
             absolute=self.date.strftime(self.date_format),
@@ -126,7 +127,7 @@ class DateSummary(object):
         return False
 
     def __repr__(self):
-        return 'DateSummary: "{title}" {date} is_enabled={is_enabled}'.format(
+        return u'DateSummary: "{title}" {date} is_enabled={is_enabled}'.format(
             title=self.title,
             date=self.date,
             is_enabled=self.is_enabled
@@ -139,7 +140,10 @@ class TodaysDate(DateSummary):
     """
     css_class = 'todays-date'
     is_enabled = True
-    date_format = '%b %d, %Y (%H:%M {utc})'.format(utc=_('UTC'))
+
+    @property
+    def date_format(self):
+        return u'%b %d, %Y (%H:%M {utc})'.format(utc=_('UTC'))
 
     # The date is shown in the title, no need to display it again.
     def get_context(self):
@@ -153,7 +157,7 @@ class TodaysDate(DateSummary):
 
     @property
     def title(self):
-        return _('Today is {date}').format(date=datetime.now(pytz.UTC).strftime(self.date_format))
+        return _(u'Today is {date}').format(date=datetime.now(pytz.UTC).strftime(self.date_format))
 
 
 class CourseStartDate(DateSummary):
@@ -161,7 +165,7 @@ class CourseStartDate(DateSummary):
     Displays the start date of the course.
     """
     css_class = 'start-date'
-    title = _('Course Starts')
+    title = ugettext_lazy('Course Starts')
 
     @property
     def date(self):
@@ -173,7 +177,7 @@ class CourseEndDate(DateSummary):
     Displays the end date of the course.
     """
     css_class = 'end-date'
-    title = _('Course End')
+    title = ugettext_lazy('Course End')
 
     @property
     def is_enabled(self):
@@ -200,12 +204,12 @@ class VerifiedUpgradeDeadlineDate(DateSummary):
     Verified track.
     """
     css_class = 'verified-upgrade-deadline'
-    title = _('Verification Upgrade Deadline')
-    description = _(
+    title = ugettext_lazy('Verification Upgrade Deadline')
+    description = ugettext_lazy(
         'You are still eligible to upgrade to a Verified Certificate! '
         'Pursue it to highlight the knowledge and skills you gain in this course.'
     )
-    link_text = _('Upgrade to Verified Certificate')
+    link_text = ugettext_lazy('Upgrade to Verified Certificate')
 
     @property
     def link(self):

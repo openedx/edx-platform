@@ -40,6 +40,7 @@ from django.core.cache import cache
 from django_countries.fields import CountryField
 import dogstats_wrapper as dog_stats_api
 from eventtracking import tracker
+from model_utils.models import TimeStampedModel
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from simple_history.models import HistoricalRecords
@@ -2154,3 +2155,46 @@ class EnrollmentRefundConfiguration(ConfigurationModel):
     def refund_window(self, refund_window):
         """Set the current refund window to the given timedelta."""
         self.refund_window_microseconds = int(refund_window.total_seconds() * 1000000)
+
+
+class UserAttribute(TimeStampedModel):
+    """
+    Record additional metadata about a user, stored as key/value pairs of text.
+    """
+
+    class Meta(object):
+        # Ensure that at most one value exists for a given user/name.
+        unique_together = (('user', 'name'))
+
+    user = models.ForeignKey(User, related_name='attributes')
+    name = models.CharField(max_length=255, help_text=_("Name of this user attribute."))
+    value = models.CharField(max_length=255, help_text=_("Value of this user attribute."))
+
+    def __unicode__(self):
+        """Unicode representation of this attribute. """
+        return u"[{username}] {name}: {value}".format(
+            name=self.name,
+            value=self.value,
+            username=self.user.username,
+        )
+
+    @classmethod
+    def set_user_attribute(cls, user, name, value):
+        """
+        Add an name/value pair as an attribute for the given
+        user. Overwrites any previous value for that name, if it
+        exists.
+        """
+        cls.objects.filter(user=user, name=name).delete()
+        cls.objects.create(user=user, name=name, value=value)
+
+    @classmethod
+    def get_user_attribute(cls, user, name):
+        """
+        Return the attribute value for the given user and name. If no such
+        value exists, returns None.
+        """
+        try:
+            return cls.objects.get(user=user, name=name).value
+        except cls.DoesNotExist:
+            return None

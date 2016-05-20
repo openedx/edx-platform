@@ -22,25 +22,25 @@
     "#Replies": "\u56de\u590d", 
     "%(display_name)s Settings": "%(display_name)s\u8bbe\u7f6e", 
     "%(errorCount)s error found in form.": [
-      "\u8be5\u8868\u5355\u4e2d\u53d1\u73b0\u4e86%(errorCount)s\u4e2a\u9519\u8bef\u3002"
+      "\u8868\u683c\u4e2d\u53d1\u73b0 %(errorCount)s \u4e2a\u9519\u8bef\u3002"
     ], 
     "%(numResponses)s other response": [
-      "\u5176\u4ed6\u56de\u590d\u6570%(numResponses)s"
+      "%(numResponses)s \u6761\u5176\u4ed6\u56de\u590d"
     ], 
     "%(numResponses)s response": [
-      "%(numResponses)s\u6761\u56de\u590d"
+      "%(numResponses)s \u6761\u56de\u590d"
     ], 
     "%(numVotes)s Vote": [
-      "%(numVotes)s\u7968"
+      "%(numVotes)s \u5f20\u9009\u7968"
     ], 
     "%(num_questions)s question": [
-      "%(num_questions)s\u4e2a\u95ee\u9898"
+      "%(num_questions)s \u4e2a\u95ee\u9898"
     ], 
     "%(num_students)s student": [
       "%(num_students)s \u4e2a\u5b66\u751f"
     ], 
     "%(num_students)s student opened Subsection": [
-      "%(num_students)s \u540d\u5b66\u751f\u6253\u5f00\u4e86\u5c0f\u8282"
+      "%(num_students)s \u4e2a\u5b66\u751f\u5df2\u6253\u5f00\u5206\u9879"
     ], 
     "%(unread_count)s new comment": [
       "%(unread_count)s \u6761\u65b0\u8bc4\u8bba"
@@ -52,7 +52,7 @@
       "%(value)s \u5206\u949f"
     ], 
     "%(value)s second": [
-      "%(value)s \u79d2"
+      "%(value)s \u79d2\u949f"
     ], 
     "%d day": [
       "%d \u5929"
@@ -61,7 +61,7 @@
       "%d \u5206\u949f"
     ], 
     "%d month": [
-      "%d \u4e2a\u6708"
+      "%d \u6708"
     ], 
     "%d year": [
       "%d \u5e74"
@@ -69,18 +69,18 @@
     "%s ago": "%s \u4ee5\u524d", 
     "%s from now": "\u8ddd\u73b0\u5728:%s", 
     "%s result": [
-      "%s\u4e2a\u7ed3\u679c"
+      "%s \u4e2a\u7ed3\u679c"
     ], 
     "(%(earned)s/%(possible)s point)": [
-      "(%(earned)s/%(possible)s \u5206)"
+      "\uff08%(earned)s/%(possible)s \u5206\uff09"
     ], 
     "(%(num_points)s point possible)": [
-      "(\u672c\u9898\u5171\u6709%(num_points)s\u5206)"
+      "\uff08\u53ef\u80fd\u4e3a %(num_points)s \u5206\uff09"
     ], 
-    "(Caption will be displayed when you start playing the video.)": "(\u5f53\u89c6\u9891\u5f00\u59cb\u64ad\u653e\u65f6\u5c06\u4f1a\u663e\u793a\u6807\u9898\u3002)", 
+    "(Caption will be displayed when you start playing the video.)": "(\u5f53\u89c6\u9891\u5f00\u59cb\u62e8\u653e\u65f6\u6807\u9898\u5c06\u4f1a\u663e\u793a)", 
     "(Required Field)": "(\u5fc5\u586b\u5b57\u6bb5)", 
     "(contains %(student_count)s student)": [
-      "(\u5305\u542b %(student_count)s\u540d\u5b66\u751f)"
+      "\uff08\u5305\u62ec %(student_count)s \u4e2a\u5b66\u751f\uff09"
     ], 
     "A driver's license, passport, or government-issued ID with your name and photo.": "\u9a7e\u7167\u3001\u62a4\u7167\u6216\u8005\u7531\u653f\u5e9c\u7b7e\u53d1\u7684\u5e26\u6709\u4f60\u59d3\u540d\u548c\u7167\u7247\u7684\u8eab\u4efd\u8bc1\u4ef6\u3002", 
     "A driver's license, passport, or other government-issued ID with your name and photo": "\u9a7e\u7167\u3001\u62a4\u7167\u6216\u8005\u5176\u4ed6\u7531\u653f\u5e9c\u7b7e\u53d1\u7684\u5e26\u6709\u4f60\u59d3\u540d\u548c\u7167\u7247\u7684\u8eab\u4efd\u8bc1\u4ef6", 
@@ -175,10 +175,10 @@
     "Change the settings for %(display_name)s": "\u4fee\u6539%(display_name)s\u7684\u8bbe\u7f6e", 
     "Check Your Email": "\u68c0\u67e5\u4f60\u7684\u7535\u5b50\u90ae\u4ef6", 
     "Check the box to remove %(count)s flag.": [
-      "\u67e5\u770b\u4fe1\u606f\u680f\u4ee5\u79fb\u9664%(count)s\u7684\u6807\u8bb0"
+      "\u9009\u4e2d\u590d\u9009\u6846\u4ee5\u53bb\u9664 %(count)s \u4e2a\u6807\u8bb0\u3002"
     ], 
     "Check the box to remove %(totalFlags)s flag.": [
-      "\u67e5\u770b\u4fe1\u606f\u680f\u4ee5\u79fb\u9664%(totalFlags)s\u6761\u6807\u8bb0"
+      "\u9009\u4e2d\u590d\u9009\u6846\u4ee5\u53bb\u9664 %(totalFlags)s \u4e2a\u6807\u8bb0\u3002"
     ], 
     "Check the box to remove all flags.": "\u67e5\u770b\u4fe1\u606f\u680f\u4ee5\u79fb\u9664\u6240\u6709\u6807\u8bb0", 
     "Check your email": "\u67e5\u6536\u4f60\u7684\u90ae\u4ef6", 
@@ -274,7 +274,7 @@
     "Discussion": "\u8ba8\u8bba", 
     "Discussion admins, moderators, and TAs can make their posts visible to all students or specify a single cohort.": "\u8ba8\u8bba\u533a\u7ba1\u7406\u5458\u3001\u7248\u4e3b\u4ee5\u53ca\u52a9\u6559\u53ef\u4ee5\u5c06\u5b83\u4eec\u7684\u5e16\u5b50\u8bbe\u7f6e\u4e3a\u5bf9\u6240\u6709\u5b66\u751f\u53ef\u89c1\u6216\u8005\u4ec5\u5bf9\u67d0\u4e2a\u7fa4\u7ec4\u53ef\u89c1\u3002", 
     "Div": "Div \u6807\u7b7e", 
-    "Do not show again": "\u4e0d\u518d\u663e\u793a", 
+    "Do not show again": "\u4e0d\u5728\u663e\u793a", 
     "Do you want to allow this student ('{student_id}') to skip the entrance exam?": "\u60a8\u662f\u5426\u5141\u8bb8\u8be5\u5b66\u751f(\u201c{student_id}\u201d)\u8df3\u8fc7\u5165\u5b66\u8003\u8bd5\uff1f", 
     "Document properties": "\u6587\u6863\u5c5e\u6027", 
     "Does the name on your ID match your account name: %(fullName)s?": "\u4f60\u8eab\u4efd\u8bc1\u4ef6\u4e0a\u7684\u59d3\u540d\u548c\u4f60\u5728\u8d26\u6237\u4e2d\u586b\u5199\u7684\u59d3\u540d\u201c%(fullName)s\u201d\u76f8\u7b26\u5417\uff1f", 
@@ -407,7 +407,7 @@
     "Hide Previews": "\u9690\u85cf\u9884\u89c8", 
     "Hide notes": "\u9690\u85cf\u6ce8\u91ca", 
     "Hiding from Students": "\u5bf9\u5b66\u751f\u9690\u85cf", 
-    "High Definition": "\u9ad8\u6e05\u6670", 
+    "High Definition": "\u9ad8\u7ea7\u5b9a\u4e49", 
     "Highlighted text": "\u9ad8\u4eae\u6587\u672c", 
     "Horizontal Rule (Ctrl+R)": "\u6c34\u5e73\u7ebf(Ctrl+R)", 
     "Horizontal line": "\u6c34\u5e73\u7ebf", 
@@ -430,7 +430,7 @@
     "Inline": "\u5185\u8054", 
     "Insert": "\u63d2\u5165", 
     "Insert Hyperlink": "\u63d2\u5165\u8d85\u94fe\u63a5", 
-    "Insert Image (upload file or type URL)": "\u63d2\u5165\u56fe\u7247 (\u4e0a\u4f20\u6587\u4ef6\u6216\u8f93\u5165\u56fe\u7247\u94fe\u63a5\u7684URL)", 
+    "Insert Image (upload file or type URL)": "\u63d2\u5165\u56fe\u7247 (\u4e0a\u4f20\u6587\u4ef6\u6216\u8f93\u5165\u56fe\u7247URL)", 
     "Insert column after": "\u5728\u53f3\u4fa7\u63d2\u5165\u5217", 
     "Insert column before": "\u5728\u5de6\u4fa7\u63d2\u5165\u5217", 
     "Insert date/time": "\u63d2\u5165\u65e5\u671f\uff0f\u65f6\u95f4", 
@@ -451,12 +451,12 @@
     "Justify": "\u4e24\u7aef\u5bf9\u9f50", 
     "Key should only contain letters, numbers, _, or -": "\u5173\u952e\u5b57\u53ea\u80fd\u5305\u542b\u5b57\u6bcd\u3001\u6570\u5b57\u3001\u4e0b\u5212\u7ebf\u548c\u8fde\u5b57\u7b26\u3002", 
     "Keywords": "\u5173\u952e\u5b57", 
-    "Language: Press the UP arrow key to enter the language menu then use UP and DOWN arrow keys to navigate language options. Press ENTER to change to the selected language.": "\u8bed\u8a00\uff1a\u6309\u5411\u4e0a\u952e\u6253\u5f00\u8bed\u8a00\u83dc\u5355\uff0c\u7136\u540e\u4f7f\u7528\u4e0a\u4e0b\u65b9\u5411\u952e\u6765\u9009\u62e9\u8bed\u8a00\u9009\u9879\uff0c\u6309\u56de\u8f66\u952e\u5207\u6362\u5230\u6240\u9009\u62e9\u7684\u8bed\u8a00\u3002", 
+    "Language: Press the UP arrow key to enter the language menu then use UP and DOWN arrow keys to navigate language options. Press ENTER to change to the selected language.": "\u8bed\u8a00\uff1a\u6309\u4e0b\u5411\u4e0a\u7bad\u5934\u6309\u952e\u4ee5\u8fdb\u5165\u8bed\u8a00\u83dc\u5355\uff0c\u968f\u540e\u4f7f\u7528\u5411\u4e0a\u548c\u5411\u4e0b\u7bad\u5934\u6309\u952e\u6765\u5bfc\u822a\u8bed\u8a00\u9009\u9879\u3002\u6309\u4e0b\u201c\u8f93\u5165\u201d\u6765\u66f4\u6539\u5df2\u9009\u62e9\u7684\u8bed\u8a00\u3002", 
     "Last Edited:": "\u6700\u540e\u4fee\u6539\uff1a", 
     "Left": "\u5de6\u5bf9\u9f50", 
     "Left to right": "\u4ece\u5de6\u5411\u53f3", 
     "Library User": "\u77e5\u8bc6\u5e93\u7528\u6237", 
-    "Link Description": "\u94fe\u63a5\u63cf\u8ff0", 
+    "Link Description": "\u94fe\u63a5\u7684\u63cf\u8ff0", 
     "Link types should be unique.": "\u94fe\u63a5\u7c7b\u578b\u5e94\u5f53\u552f\u4e00\u3002", 
     "Links are generated on demand and expire within 5 minutes due to the sensitive nature of student information.": "\u7531\u4e8e\u6d89\u53ca\u5b66\u751f\u7684\u654f\u611f\u4fe1\u606f\uff0c\u751f\u6210\u7684\u94fe\u63a5\u5c06\u57285\u5206\u949f\u540e\u5931\u6548\u3002", 
     "Links should be unique.": "\u94fe\u63a5\u5e94\u5f53\u552f\u4e00\u3002", 
@@ -467,7 +467,7 @@
     "Load more": "\u8f7d\u5165\u66f4\u591a", 
     "Load next %(numResponses)s responses": "\u52a0\u8f7d\u4e0b\u9762\u7684%(numResponses)s\u6761\u56de\u590d", 
     "Load next %(num_items)s result": [
-      "\u52a0\u8f7d\u4e0b%(num_items)s\u9879\u7ed3\u679c"
+      "\u52a0\u8f7d\u968f\u540e %(num_items)s \u4e2a\u7ed3\u679c"
     ], 
     "Loading": "\u6b63\u5728\u52a0\u8f7d", 
     "Loading content": "\u6b63\u5728\u52a0\u8f7d\u5185\u5bb9", 
@@ -577,7 +577,7 @@
     "Please enter your email address below and we will send you instructions for setting a new password.": "\u8bf7\u5728\u4e0b\u9762\u8f93\u5165\u4f60\u7684\u7535\u5b50\u90ae\u4ef6\u5730\u5740\u4ee5\u4fbf\u6211\u4eec\u7ed9\u4f60\u53d1\u9001\u5982\u4f55\u8bbe\u7f6e\u65b0\u5bc6\u7801\u7684\u8bf4\u660e\u3002", 
     "Please follow the instructions here to upload a file elsewhere and link to it: {maxFileSizeRedirectUrl}": "\u8bf7\u6309\u7167\u8fd9\u91cc\uff08{maxFileSizeRedirectUrl}\uff09\u7684\u8bf4\u660e\u4e0a\u4f20\u6587\u4ef6\u5230\u522b\u5904\u540e\u94fe\u63a5\u5230\u8be5\u6587\u4ef6\u3002", 
     "Please print this page for your records; it serves as your receipt. You will also receive an email with the same information.": "\u8bf7\u6253\u5370\u6b64\u9875\u7559\u4f5c\u7eaa\u5f55\uff0c\u8fd9\u5c31\u662f\u4f60\u7684\u6536\u636e\uff1b\u4f60\u4e5f\u4f1a\u6536\u5230\u4e00\u5c01\u6709\u76f8\u540c\u4fe1\u606f\u7684\u7535\u5b50\u90ae\u4ef6\u3002", 
-    "Please provide a description of the link destination.": "\u8bf7\u63d0\u4f9b\u94fe\u63a5\u76ee\u6807\u7684\u63cf\u8ff0\u3002", 
+    "Please provide a description of the link destination.": "\u8bf7\u63d0\u4f9b\u94fe\u63a5\u7684\u63cf\u8ff0\u3002", 
     "Please select a PDF file to upload.": "\u8bf7\u9009\u62e9\u4e0a\u4f20\u4e00\u4e2aPDF\u6587\u4ef6\u3002", 
     "Please select a file in .srt format.": "\u8bf7\u9009\u62e9\u4e00\u4e2a .srt \u683c\u5f0f\u7684\u6587\u4ef6\u3002", 
     "Please verify that you have uploaded a valid image (PNG and JPEG).": "\u8bf7\u9a8c\u8bc1\u4f60\u5df2\u4e0a\u4f20\u4e86\u4e00\u5f20\u6709\u6548\u7684\u56fe\u7247(PNG\u6216JPEG\u683c\u5f0f)\u3002", 
@@ -666,7 +666,7 @@
     "Show posts by %(username)s.": "\u6309 %(username)s \u663e\u793a\u5e16\u5b50", 
     "Showing all responses": "\u663e\u793a\u6240\u6709\u7684\u56de\u590d", 
     "Showing first response": [
-      "\u663e\u793a\u5f00\u59cb\u7684%(numResponses)s\u6761\u56de\u590d"
+      "\u663e\u793a\u524d %(numResponses)s \u6761\u56de\u590d"
     ], 
     "Sign in": "\u767b\u5f55", 
     "Skip": "\u8df3\u8fc7", 
@@ -679,7 +679,7 @@
     "Specify whether content-specific discussion topics are divided by cohort.": "\u6307\u5b9a\u662f\u5426\u8981\u7531\u7fa4\u7ec4\u5bf9\u7279\u5b9a\u4e8e\u5185\u5bb9\u7684\u8ba8\u8bba\u4e3b\u9898\u8fdb\u884c\u5212\u5206\u3002", 
     "Specify whether discussion topics are divided by cohort": "\u6307\u5b9a\u662f\u5426\u7531\u7fa4\u7ec4\u5bf9\u8ba8\u8bba\u4e3b\u9898\u8fdb\u884c\u5212\u5206\u3002", 
     "Speed": "\u901f\u5ea6", 
-    "Speed: Press UP to enter the speed menu then use the UP and DOWN arrow keys to navigate the different speeds, then press ENTER to change to the selected speed.": "\u901f\u5ea6\uff1a\u6309\u5411\u4e0a\u952e\u6253\u5f00\u901f\u5ea6\u83dc\u5355\uff0c\u6309\u4e0a\u4e0b\u65b9\u5411\u952e\u6765\u8c03\u6574\u901f\u5ea6\uff0c\u7136\u540e\u6309\u56de\u8f66\u952e\u5207\u6362\u5230\u9009\u5b9a\u901f\u5ea6\u3002", 
+    "Speed: Press UP to enter the speed menu then use the UP and DOWN arrow keys to navigate the different speeds, then press ENTER to change to the selected speed.": "\u901f\u5ea6\uff1a\u6309\u201cUP\u201d\u8fdb\u5165\u901f\u5ea6\u83dc\u5355\uff0c\u7136\u540e\u6309\u201cUP\u201d\u548c\u201cDOWN\u201d\u65b9\u5411\u7684\u6309\u94ae\u6765\u8c03\u6574\u901f\u5ea6\uff0c\u7136\u540e\u6309\u201cENTER\u201d\u952e\u6765\u6539\u53d8\u9009\u5b9a\u901f\u5ea6\u3002", 
     "Spellcheck": "\u62fc\u5199\u68c0\u67e5", 
     "Split cell": "\u62c6\u5206\u5355\u5143\u683c", 
     "Square": "\u6b63\u65b9\u5f62", 
@@ -728,7 +728,7 @@
     "Task Status": "\u4efb\u52a1\u72b6\u6001", 
     "Task Type": "\u4efb\u52a1\u7c7b\u578b", 
     "Task inputs": "\u4efb\u52a1\u8f93\u5165", 
-    "Team \"{team}\" successfully deleted.": "\u5df2\u6210\u529f\u5220\u9664\u56e2\u961f\u201c{team}\u201d\u3002", 
+    "Team \"{team}\" successfully deleted.": "\u56e2\u961f \"{team}\" \u5df2\u6210\u529f\u5220\u9664\u3002", 
     "Templates": "\u6a21\u677f", 
     "Text": "\u6587\u672c", 
     "Text color": "\u6587\u672c\u989c\u8272", 
@@ -766,7 +766,7 @@
     "There was an error obtaining email content history for this course.": "\u5b58\u5728\u80fd\u83b7\u53d6\u8be5\u8bfe\u7a0b\u90ae\u4ef6\u5386\u53f2\u5185\u5bb9\u7684\u9519\u8bef", 
     "There was an error obtaining email task history for this course.": "\u83b7\u53d6\u8be5\u8bfe\u7a0b\u7684\u90ae\u4ef6\u4efb\u52a1\u5386\u53f2\u65f6\u53d1\u751f\u9519\u8bef\u3002", 
     "There was an error when trying to add students:": [
-      "\u6dfb\u52a0\u5b66\u751f\u65f6\u51fa\u73b0 {numErrors} \u4e2a\u9519\u8bef\uff1a"
+      "\u5c1d\u8bd5\u6dfb\u52a0\u5b66\u751f\u65f6\u51fa\u73b0 {numErrors} \u4e2a\u9519\u8bef\uff1a"
     ], 
     "There was an error while importing the new course to our database.": "\u5728\u5bfc\u5165\u65b0\u8bfe\u7a0b\u5230\u6570\u636e\u5e93\u65f6\u53d1\u751f\u9519\u8bef\u3002", 
     "There was an error while importing the new library to our database.": "\u5728\u5bfc\u5165\u65b0\u77e5\u8bc6\u5e93\u5230\u6570\u636e\u5e93\u65f6\u53d1\u751f\u9519\u8bef\u3002", 
@@ -785,7 +785,7 @@
     "These users will be enrolled once they register:": "\u8fd9\u4e9b\u7528\u6237\u6ce8\u518c\u540e\u5373\u5df2\u9009\u8bfe\uff1a", 
     "This action cannot be undone.": "\u8fd9\u4e2a\u52a8\u4f5c\u65e0\u6cd5\u53d6\u6d88\u3002", 
     "This annotation has %(count)s flag.": [
-      "\u8be5\u6279\u6ce8\u5305\u542b %(count)s \u4e2a\u6807\u8bb0\u3002"
+      "\u6b64\u6ce8\u91ca\u5e26\u6709 %(count)s \u4e2a\u6807\u8bb0\u3002"
     ], 
     "This browser cannot play .mp4, .ogg, or .webm files.": "\u5f53\u524d\u6d4f\u89c8\u5668\u4e0d\u652f\u6301\u64ad\u653e MP4\u3001OGG \u6216 WEBM \u683c\u5f0f\u7684\u6587\u4ef6\u3002", 
     "This component has validation issues.": "\u8be5\u7ec4\u4ef6\u5b58\u5728\u9a8c\u8bc1\u95ee\u9898\u3002", 
@@ -798,7 +798,7 @@
     "Tools": "\u5de5\u5177", 
     "Top": "\u9876\u7aef\u5bf9\u9f50", 
     "Total": "\u603b\u8ba1", 
-    "Transcript will be displayed when you start playing the video.": "\u5f53\u4f60\u5f00\u59cb\u64ad\u653e\u89c6\u9891\u540e\u5c06\u4f1a\u663e\u793a\u5b57\u5e55\u3002", 
+    "Transcript will be displayed when you start playing the video.": "\u5f53\u4f60\u5f00\u59cb\u64ad\u653e\u89c6\u9891\u65f6\u5c06\u663e\u793a\u6210\u7ee9\u5355\u3002", 
     "Try using a different browser, such as Google Chrome.": "\u8bf7\u8bd5\u7740\u66f4\u6362\u4e00\u4e2a\u6d4f\u89c8\u5668\uff0c\u5982\u8c37\u6b4c\u7684 Chrome \u6d4f\u89c8\u5668\u3002", 
     "Turn off transcripts": "\u5173\u95ed\u5b57\u5e55", 
     "Turn on transcripts": "\u6253\u5f00\u5b57\u5e55", 
@@ -846,7 +846,7 @@
     "Video Capture Error": "\u89c6\u9891\u6355\u83b7\u5931\u8d25", 
     "Video ended": "\u89c6\u9891\u7ed3\u675f", 
     "Video position": "\u89c6\u9891\u4f4d\u7f6e", 
-    "Video transcript": "\u89c6\u9891\u5b57\u5e55", 
+    "Video transcript": "\u89c6\u9891\u6210\u7ee9\u5355", 
     "VideoPlayer: Element corresponding to the given selector was not found.": "\u89c6\u9891\u64ad\u653e\u5668\uff1a\u672a\u627e\u5230\u4e0e\u7ed9\u5b9a\u9009\u62e9\u5b50\u5bf9\u5e94\u7684\u5143\u7d20\u3002", 
     "View": "\u89c6\u56fe", 
     "View Cohort": "\u67e5\u770b\u7fa4\u7ec4", 
@@ -941,7 +941,7 @@
     "Your policy changes have been saved.": "\u60a8\u7684\u7b56\u7565\u53d8\u66f4\u5df2\u4fdd\u5b58\u3002", 
     "Your post will be discarded.": "\u60a8\u7684\u5e16\u5b50\u5c06\u88ab\u64a4\u9500\u3002", 
     "Your request could not be completed due to a server problem. Reload the page": "\u7531\u4e8e\u670d\u52a1\u5668\u7684\u95ee\u9898\uff0c\u65e0\u6cd5\u5b8c\u6210\u4f60\u7684\u8bf7\u6c42\uff0c\u8bf7\u91cd\u65b0\u52a0\u8f7d\u9875\u9762\u3002", 
-    "Your request could not be completed. Reload the page and try again. If the issue persists, click the Help tab to report the problem.": "\u65e0\u6cd5\u5b8c\u6210\u4f60\u7684\u8bf7\u6c42\uff0c\u8bf7\u91cd\u65b0\u52a0\u8f7d\u9875\u9762\u540e\u91cd\u8bd5\u3002\u5982\u679c\u95ee\u9898\u4ecd\u7136\u5b58\u5728\uff0c\u8bf7\u70b9\u51fb\u5e2e\u52a9\u9009\u9879\u5361\u4ee5\u62a5\u544a\u95ee\u9898\u3002", 
+    "Your request could not be completed. Reload the page and try again. If the issue persists, click the Help tab to report the problem.": "\u4f60\u7684\u8bf7\u6c42\u65e0\u6cd5\u5b8c\u6210\u3002\u91cd\u65b0\u52a0\u8f7d\u9875\u9762\u5e76\u91cd\u8bd5\u3002\u5982\u679c\u95ee\u9898\u4ecd\u7136\u5b58\u5728\uff0c\u5219\u5355\u51fb\u201c\u5e2e\u52a9\u201d\u9009\u9879\u5361\u62a5\u544a\u95ee\u9898\u3002", 
     "Your upload of '{file}' failed.": "\u4f60\u7684\u6587\u4ef6\u201c{file}\u201d\u4e0a\u4f20\u5931\u8d25\u3002", 
     "Your upload of '{file}' succeeded.": "\u4f60\u7684\u6587\u4ef6\u201c{file}\u201d\u4e0a\u4f20\u6210\u529f\u3002", 
     "a day": "\u4e00\u5929", 
@@ -961,8 +961,8 @@
     "dragging out of slider": "\u62d6\u62fd\u51fa\u6ed1\u5757\u533a\u57df", 
     "dropped in slider": "\u5728\u6ed1\u5757\u4e2d\u653e\u4e0b", 
     "dropped on target": "\u5728\u76ee\u6807\u4e0a\u653e\u4e0b", 
-    "e.g. 'google'": "\u4f8b\u5982\u201cgoogle\u201d", 
-    "e.g. 'http://google.com/'": "\u4f8b\u5982\u201chttp://google.com/\u201d", 
+    "e.g. 'google'": "\u4f8b\u5982'google'", 
+    "e.g. 'http://google.com/'": "\u4f8b\u5982'http://google.com/'", 
     "e.g. johndoe@example.com, JaneDoe, joeydoe@example.com": "\u4f8b\u5982\uff1ajohndoe@example.com, JaneDoe, joeydoe@example.com", 
     "emphasized text": "\u5f3a\u8c03\u6587\u5b57", 
     "enter code here": "\u6b64\u5904\u8f93\u5165\u4ee3\u7801", 
@@ -982,13 +982,13 @@
     "unit": "\u5355\u5143", 
     "{email} is already on the {container} team. Recheck the email address if you want to add a new member.": "{email}\u5df2\u5728{container}\u56e2\u961f\u4e2d\u3002\u5982\u679c\u60a8\u60f3\u6dfb\u52a0\u65b0\u6210\u5458\uff0c\u8bf7\u518d\u6b21\u68c0\u67e5\u7535\u5b50\u90ae\u4ef6\u5730\u5740\u3002", 
     "{numMoved} student was removed from {oldCohort}": [
-      "{numMoved} \u540d\u5b66\u751f\u5df2\u4ece{oldCohort}\u4e2d\u79fb\u9664"
+      "{numMoved} \u5b66\u751f\u5df2\u88ab\u79fb\u51fa {oldCohort}"
     ], 
     "{numPresent} student was already in the cohort": [
-      "{numPresent} \u540d\u5b66\u751f\u5df2\u5728\u8be5\u7fa4\u7ec4\u4e2d"
+      "{numPresent} \u4e2a\u5b66\u751f\u5df2\u5728\u6b64\u961f\u5217"
     ], 
     "{numUsersAdded} student has been added to this cohort": [
-      "{numUsersAdded} \u540d\u5b66\u751f\u5df2\u88ab\u6dfb\u52a0\u5230\u8be5\u7fa4\u7ec4\u4e2d"
+      "{numUsersAdded} \u4e2a\u5b66\u751f\u5df2\u6dfb\u52a0\u81f3\u6b64\u961f\u5217"
     ], 
     "\u2026": "\u2026"
   };

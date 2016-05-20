@@ -12,7 +12,7 @@
     @extend %inner-wrapper;
   }
 
-  ol.course-tabs {
+  .course-tabs {
     @include border-top-radius(4px);
     @include clearfix();
     padding: ($baseline*0.75) 0 ($baseline*0.75) 0;
@@ -32,31 +32,30 @@
         @include border-left(1px solid $gray-d3);
       }
 
-      a {
+      a,
+      a:visited {
         @include padding(($baseline/2), ($baseline*0.75), 13px, ($baseline*0.75));
         @extend %t-title7;
         @extend %t-regular;
-        border-bottom: 3px solid transparent;
         color: $gray-d1;
         display: block;
         text-align: center;
         text-decoration: none;
-        // text-shadow: 0 1px 0 rgba(0, 0, 0, .4);
 
         &:hover,
         &:focus {
           color: $blue;
-          border-bottom: 3px solid $blue;
+          border-bottom: 4px solid $blue;
         }
 
         &.active {
-          border-bottom: 3px solid $gray-d4;
+          border-bottom: 4px solid $blue;
           background-color: transparent;
-          color: $gray-d4;
+          color: $blue;
 
           &:hover,
           &:focus {
-            color: $gray-d4;
+            color: $blue;
           }
         }
       }

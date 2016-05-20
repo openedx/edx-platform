@@ -3,12 +3,12 @@
 This module contains celery task functions for handling the sending of bulk email
 to a course.
 """
-import re
-import random
-import json
-from time import sleep
 from collections import Counter
+import json
 import logging
+import random
+import re
+from time import sleep
 
 import dogstats_wrapper as dog_stats_api
 from smtplib import SMTPServerDisconnected, SMTPDataError, SMTPConnectError, SMTPException
@@ -24,6 +24,7 @@ from boto.ses.exceptions import (
     SESIllegalAddressError,
 )
 from boto.exception import AWSConnectionError
+from markupsafe import escape
 
 from celery import task, current_task  # pylint: disable=no-name-in-module
 from celery.states import SUCCESS, FAILURE, RETRY  # pylint: disable=no-name-in-module, import-error
@@ -430,7 +431,11 @@ def _get_source_address(course_id, course_title, truncate=True):
     # but with the course name rather than course title.
     # Amazon SES's from address field appears to have a maximum length of 320.
     __, encoded_from_addr = forbid_multi_line_headers('from', from_addr, 'utf-8')
-    if len(encoded_from_addr) >= 320 and truncate:
+
+    # It seems that this value is also escaped when set out to amazon, judging
+    # from our logs
+    escaped_encoded_from_addr = escape(encoded_from_addr)
+    if len(escaped_encoded_from_addr) >= 320 and truncate:
         from_addr = format_address(course_name)
 
     return from_addr

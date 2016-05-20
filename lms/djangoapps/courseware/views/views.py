@@ -14,15 +14,18 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User, AnonymousUser
 from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
+from django.core.context_processors import csrf
 from django.db import transaction
 from django.db.models import Q
 from django.http import Http404, HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
 from django.shortcuts import redirect
+from django.utils.decorators import method_decorator
 from django.utils.timezone import UTC
 from django.utils.translation import ugettext as _
 from django.views.decorators.cache import cache_control
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_GET, require_POST, require_http_methods
+from django.views.generic import View
 from eventtracking import tracker
 from ipware.ip import get_ip
 from markupsafe import escape
@@ -30,6 +33,7 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from rest_framework import status
+from instructor.views.api import require_global_staff
 
 import shoppingcart
 import survey.utils
@@ -37,6 +41,7 @@ import survey.views
 from certificates import api as certs_api
 from openedx.core.djangoapps.models.course_details import CourseDetails
 from commerce.utils import EcommerceService
+from enrollment.api import add_enrollment
 from course_modes.models import CourseMode
 from courseware import grades
 from courseware.access import has_access, has_ccx_coach_role, _adjust_start_date_for_beta_testers
@@ -57,7 +62,7 @@ from courseware.courses import (
 from courseware.masquerade import setup_masquerade
 from courseware.model_data import FieldDataCache, ScoresClient
 from courseware.models import StudentModule, BaseStudentModuleHistory
-from courseware.url_helpers import get_redirect_url
+from courseware.url_helpers import get_redirect_url, get_redirect_url_for_global_staff
 from courseware.user_state_client import DjangoXBlockUserStateClient
 from edxmako.shortcuts import render_to_response, render_to_string, marketing_link
 from instructor.enrollment import uses_shib
@@ -72,6 +77,7 @@ from openedx.core.djangoapps.theming import helpers as theming_helpers
 from shoppingcart.utils import is_shopping_cart_enabled
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from student.models import UserTestGroup, CourseEnrollment
+from student.roles import GlobalStaff
 from util.cache import cache, cache_if_anonymous
 from util.date_utils import strftime_localized
 from util.db import outer_atomic
@@ -239,6 +245,11 @@ def jump_to(_request, course_id, location):
         raise Http404(u"Invalid course_key or usage_key")
     try:
         redirect_url = get_redirect_url(course_key, usage_key)
+        user = _request.user
+        user_is_global_staff = GlobalStaff().has_user(user)
+        user_is_enrolled = CourseEnrollment.is_enrolled(user, course_key)
+        if user_is_global_staff and not user_is_enrolled:
+            redirect_url = get_redirect_url_for_global_staff(course_key, _next=redirect_url)
     except ItemNotFoundError:
         raise Http404(u"No data at this location: {0}".format(usage_key))
     except NoPathToItem:
@@ -444,6 +455,63 @@ def get_cosmetic_display_price(course, registration_price):
         return _('Free')
 
 
+class EnrollStaffView(View):
+    """
+    Displays view for registering in the course to a global staff user.
+
+    User can either choose to 'Enroll' or 'Don't Enroll' in the course.
+      Enroll: Enrolls user in course and redirects to the courseware.
+      Don't Enroll: Redirects user to course about page.
+
+    Arguments:
+     - request    : HTTP request
+     - course_id  : course id
+
+    Returns:
+     - RedirectResponse
+    """
+    template_name = 'enroll_staff.html'
+
+    @method_decorator(require_global_staff)
+    @method_decorator(ensure_valid_course_key)
+    def get(self, request, course_id):
+        """
+        Display enroll staff view to global staff user with `Enroll` and `Don't Enroll` options.
+        """
+        user = request.user
+        course_key = CourseKey.from_string(course_id)
+        with modulestore().bulk_operations(course_key):
+            course = get_course_with_access(user, 'load', course_key)
+            if not registered_for_course(course, user):
+                context = {
+                    'course': course,
+                    'csrftoken': csrf(request)["csrf_token"]
+                }
+                return render_to_response(self.template_name, context)
+
+    @method_decorator(require_global_staff)
+    @method_decorator(ensure_valid_course_key)
+    def post(self, request, course_id):
+        """
+        Either enrolls the user in course or redirects user to course about page
+        depending upon the option (Enroll, Don't Enroll) chosen by the user.
+        """
+        _next = urllib.quote_plus(request.GET.get('next', 'info'), safe='/:?=')
+        course_key = CourseKey.from_string(course_id)
+        enroll = 'enroll' in request.POST
+        if enroll:
+            add_enrollment(request.user.username, course_id)
+            log.info(
+                u"User %s enrolled in %s via `enroll_staff` view",
+                request.user.username,
+                course_id
+            )
+            return redirect(_next)
+
+        # In any other case redirect to the course about page.
+        return redirect(reverse('about_course', args=[unicode(course_key)]))
+
+
 @ensure_csrf_cookie
 @cache_if_anonymous()
 def course_about(request, course_id):
@@ -510,9 +578,8 @@ def course_about(request, course_id):
         ecommerce_bulk_checkout_link = ''
         professional_mode = None
         ecomm_service = EcommerceService()
-        if ecomm_service.is_enabled(request.user) and (
-                CourseMode.PROFESSIONAL in modes or CourseMode.NO_ID_PROFESSIONAL_MODE in modes
-        ):
+        is_professional_mode = CourseMode.PROFESSIONAL in modes or CourseMode.NO_ID_PROFESSIONAL_MODE in modes
+        if ecomm_service.is_enabled(request.user) and (is_professional_mode):
             professional_mode = modes.get(CourseMode.PROFESSIONAL, '') or \
                 modes.get(CourseMode.NO_ID_PROFESSIONAL_MODE, '')
             ecommerce_checkout_link = ecomm_service.checkout_page_url(professional_mode.sku)

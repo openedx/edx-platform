@@ -16,6 +16,7 @@ from xmodule.x_module import PREVIEW_VIEWS, STUDENT_VIEW, AUTHOR_VIEW
 from xmodule.contentstore.django import contentstore
 from xmodule.error_module import ErrorDescriptor
 from xmodule.exceptions import NotFoundError, ProcessingError
+from xmodule.studio_editable import has_author_view
 from xmodule.services import SettingsService
 from xmodule.modulestore.django import modulestore, ModuleI18nService
 from xmodule.mixin import wrap_with_license
@@ -122,6 +123,9 @@ class PreviewModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
         """
         if not StudioConfig.asides_enabled(block.scope_ids.block_type):
             return []
+
+        # TODO: aside_type != 'acid_aside' check should be removed once AcidBlock is only installed during tests
+        # (see https://openedx.atlassian.net/browse/TE-811)
         return [
             aside_type
             for aside_type in super(PreviewModuleSystem, self).applicable_aside_types(block)
@@ -140,10 +144,13 @@ class PreviewModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
         result.add_frag_resources(frag)
 
         for aside, aside_fn in aside_frag_fns:
-            aside_frag = self.wrap_aside(block, aside, view_name, aside_fn(block, context), context)
-            aside.save()
-            result.add_frag_resources(aside_frag)
-            frag.content = frag.content.replace(position_for_asides, position_for_asides + aside_frag.content)
+            aside_frag = aside_fn(block, context)
+            if aside_frag.content != u'':
+                aside_frag_wrapped = self.wrap_aside(block, aside, view_name, aside_frag, context)
+                aside.save()
+                result.add_frag_resources(aside_frag_wrapped)
+                replacement = position_for_asides + aside_frag_wrapped.content
+                frag.content = frag.content.replace(position_for_asides, replacement)
 
         result.add_content(frag.content)
         return result
@@ -231,7 +238,7 @@ def _load_preview_module(request, descriptor):
     descriptor: An XModuleDescriptor
     """
     student_data = KvsFieldData(SessionKeyValueStore(request))
-    if _has_author_view(descriptor):
+    if has_author_view(descriptor):
         wrapper = partial(CmsFieldData, student_data=student_data)
     else:
         wrapper = partial(LmsFieldData, student_data=student_data)
@@ -288,7 +295,7 @@ def get_preview_fragment(request, descriptor, context):
     """
     module = _load_preview_module(request, descriptor)
 
-    preview_view = AUTHOR_VIEW if _has_author_view(module) else STUDENT_VIEW
+    preview_view = AUTHOR_VIEW if has_author_view(module) else STUDENT_VIEW
 
     try:
         fragment = module.render(preview_view, context)
@@ -296,12 +303,3 @@ def get_preview_fragment(request, descriptor, context):
         log.warning("Unable to render %s for %r", preview_view, module, exc_info=True)
         fragment = Fragment(render_to_string('html_error.html', {'message': str(exc)}))
     return fragment
-
-
-def _has_author_view(descriptor):
-    """
-    Returns True if the xmodule linked to the descriptor supports "author_view".
-
-    If False, "student_view" and LmsFieldData should be used.
-    """
-    return getattr(descriptor, 'has_author_view', False)

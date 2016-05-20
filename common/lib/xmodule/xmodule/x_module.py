@@ -411,7 +411,15 @@ class XModuleMixin(XModuleFields, XBlock):
         result = {}
         for field in self.fields.values():
             if field.scope == scope and field.is_set_on(self):
-                result[field.name] = field.read_json(self)
+                try:
+                    result[field.name] = field.read_json(self)
+                except TypeError as exception:
+                    exception_message = "{message}, Block-location:{location}, Field-name:{field_name}".format(
+                        message=exception.message,
+                        location=unicode(self.location),
+                        field_name=field.name
+                    )
+                    raise TypeError(exception_message)
         return result
 
     def has_children_at_depth(self, depth):

@@ -22,11 +22,6 @@
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # EdX Team <info@edx.org>, 2016.
 # 
-# #-#-#-#-#  messages.po (EdX Studio)  #-#-#-#-#
-# edX translation file
-# Copyright (C) 2013 edX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
 # #-#-#-#-#  wiki.po (0.1a)  #-#-#-#-#
 # edX translation file
 # Copyright (C) 2016 edX
@@ -37,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-05-12 14:46+0000\n"
-"PO-Revision-Date: 2016-05-12 14:46:23.622723\n"
+"POT-Creation-Date: 2016-05-19 14:56+0000\n"
+"PO-Revision-Date: 2016-05-19 14:56:28.638377\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -464,6 +459,10 @@ msgstr ""
 "Ýöü hävé älréädý çréätéd än äççöünt üsïng än éxtérnäl lögïn lïké WéßÀüth ör "
 "Shïßßöléth. Pléäsé çöntäçt {tech_support_email} för süppört. Ⱡ'σяєм ιρѕυм#"
 
+#: common/djangoapps/student/admin.py
+msgid "User profile"
+msgstr "Ûsér pröfïlé Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
+
 #: common/djangoapps/student/forms.py
 msgid ""
 "That e-mail address doesn't have an associated user account. Are you sure "
@@ -595,6 +594,113 @@ msgid ""
 msgstr ""
 "Ìt lööks lïké {email} ßélöngs tö än éxïstïng äççöünt. Trý ägäïn wïth ä "
 "dïfférént émäïl äddréss. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
+
+#: common/djangoapps/student/management/commands/manage_group.py
+msgid "Removed group: \"{}\""
+msgstr "Rémövéd gröüp: \"{}\" Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
+
+#: common/djangoapps/student/management/commands/manage_group.py
+msgid "Did not find a group with name \"{}\" - skipping."
+msgstr ""
+"Dïd nöt fïnd ä gröüp wïth nämé \"{}\" - skïppïng. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢тєтυя α#"
+
+#: common/djangoapps/student/management/commands/manage_group.py
+msgid "Invalid group name: \"{group_name}\". {messages}"
+msgstr ""
+"Ìnvälïd gröüp nämé: \"{group_name}\". {messages} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢т#"
+
+#: common/djangoapps/student/management/commands/manage_group.py
+msgid "Created new group: \"{}\""
+msgstr "Çréätéd néw gröüp: \"{}\" Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
+
+#: common/djangoapps/student/management/commands/manage_group.py
+msgid "Found existing group: \"{}\""
+msgstr "Föünd éxïstïng gröüp: \"{}\" Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
+
+#: common/djangoapps/student/management/commands/manage_group.py
+msgid "Adding {codenames} permissions to group \"{group}\""
+msgstr ""
+"Àddïng {codenames} pérmïssïöns tö gröüp \"{group}\" Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢тєтυ#"
+
+#: common/djangoapps/student/management/commands/manage_group.py
+msgid "Removing {codenames} permissions from group \"{group}\""
+msgstr ""
+"Rémövïng {codenames} pérmïssïöns fröm gröüp \"{group}\" Ⱡ'σяєм ιρѕυм ∂σłσя "
+"ѕιт αмєт, ¢σηѕє¢тєтυя #"
+
+#: common/djangoapps/student/management/commands/manage_group.py
+msgid ""
+"Invalid permission option: \"{}\". Please specify permissions using the "
+"format: app_label:model_name:permission_codename."
+msgstr ""
+"Ìnvälïd pérmïssïön öptïön: \"{}\". Pléäsé spéçïfý pérmïssïöns üsïng thé "
+"förmät: äpp_läßél:mödél_nämé:pérmïssïön_çödénämé. Ⱡ'σяєм ιρѕυм#"
+
+#: common/djangoapps/student/management/commands/manage_group.py
+msgid ""
+"Invalid permission codename: \"{codename}\".  No such permission exists for "
+"the model {module}.{model_name}."
+msgstr ""
+"Ìnvälïd pérmïssïön çödénämé: \"{codename}\".  Nö süçh pérmïssïön éxïsts för "
+"thé mödél {module}.{model_name}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
+
+#: common/djangoapps/student/management/commands/manage_user.py
+msgid "Setting {attribute} for user \"{username}\" to \"{new_value}\""
+msgstr ""
+"Séttïng {attribute} för üsér \"{username}\" tö \"{new_value}\" Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
+
+#: common/djangoapps/student/management/commands/manage_user.py
+msgid ""
+"Skipping user \"{}\" because the specified and existing email addresses do "
+"not match."
+msgstr ""
+"Skïppïng üsér \"{}\" ßéçäüsé thé spéçïfïéd änd éxïstïng émäïl äddréssés dö "
+"nöt mätçh. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
+
+#: common/djangoapps/student/management/commands/manage_user.py
+msgid "Did not find a user with username \"{}\" - skipping."
+msgstr ""
+"Dïd nöt fïnd ä üsér wïth üsérnämé \"{}\" - skïppïng. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢тєтυя α#"
+
+#: common/djangoapps/student/management/commands/manage_user.py
+msgid "Removing user: \"{}\""
+msgstr "Rémövïng üsér: \"{}\" Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
+
+#: common/djangoapps/student/management/commands/manage_user.py
+msgid "Created new user: \"{}\""
+msgstr "Çréätéd néw üsér: \"{}\" Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
+
+#: common/djangoapps/student/management/commands/manage_user.py
+msgid "Found existing user: \"{}\""
+msgstr "Föünd éxïstïng üsér: \"{}\" Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
+
+#: common/djangoapps/student/management/commands/manage_user.py
+msgid "Created new profile for user: \"{}\""
+msgstr ""
+"Çréätéd néw pröfïlé för üsér: \"{}\" Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
+
+#: common/djangoapps/student/management/commands/manage_user.py
+msgid "Could not find a group named \"{}\" - skipping."
+msgstr ""
+"Çöüld nöt fïnd ä gröüp näméd \"{}\" - skïppïng. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,"
+" ¢σηѕє¢тєтυя #"
+
+#: common/djangoapps/student/management/commands/manage_user.py
+msgid "Adding user \"{username}\" to groups {group_names}"
+msgstr ""
+"Àddïng üsér \"{username}\" tö gröüps {group_names} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢т#"
+
+#: common/djangoapps/student/management/commands/manage_user.py
+msgid "Removing user \"{username}\" from groups {group_names}"
+msgstr ""
+"Rémövïng üsér \"{username}\" fröm gröüps {group_names} Ⱡ'σяєм ιρѕυм ∂σłσя "
+"ѕιт αмєт, ¢σηѕє¢тєт#"
 
 #: common/djangoapps/student/middleware.py
 msgid ""
@@ -736,6 +842,14 @@ msgid ""
 msgstr ""
 "Thé wïndöw öf tïmé äftér énröllïng dürïng whïçh üsérs çän ßé gräntéd ä "
 "réfünd, répréséntéd ïn mïçröséçönds. Thé défäült ïs 14 däýs. Ⱡ#"
+
+#: common/djangoapps/student/models.py
+msgid "Name of this user attribute."
+msgstr "Nämé öf thïs üsér ättrïßüté. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
+
+#: common/djangoapps/student/models.py
+msgid "Value of this user attribute."
+msgstr "Välüé öf thïs üsér ättrïßüté. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
 
 #: common/djangoapps/student/views.py
 msgid "The course you are looking for does not start until {date}."
@@ -6736,6 +6850,14 @@ msgstr "Mäïlïng Àddréss Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 msgid "Goals"
 msgstr "Göäls Ⱡ'σяєм ιρѕ#"
 
+#: lms/djangoapps/instructor/views/api.py
+msgid "Cohort"
+msgstr "Çöhört Ⱡ'σяєм ιρѕυ#"
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "Team"
+msgstr "Téäm Ⱡ'σяєм ι#"
+
 #. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
 #. Translators: This label appears above a field on the registration form
 #. which allows the user to input the city in which they live.
@@ -6759,14 +6881,6 @@ msgstr "Çïtý Ⱡ'σяєм ι#"
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "Country"
 msgstr "Çöüntrý Ⱡ'σяєм ιρѕυм #"
-
-#: lms/djangoapps/instructor/views/api.py
-msgid "Cohort"
-msgstr "Çöhört Ⱡ'σяєм ιρѕυ#"
-
-#: lms/djangoapps/instructor/views/api.py
-msgid "Team"
-msgstr "Téäm Ⱡ'σяєм ι#"
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
@@ -10136,6 +10250,14 @@ msgstr ""
 "Réstörïng tö thïs révïsïön wïll märk thé ärtïçlé äs délétéd. Ⱡ'σяєм ιρѕυм "
 "∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
+#: openedx/core/djangoapps/api_admin/admin.py
+msgid ""
+"Once you have approved this request, go to {catalog_admin_url} to set up a "
+"catalog for this user."
+msgstr ""
+"Önçé ýöü hävé äpprövéd thïs réqüést, gö tö {catalog_admin_url} tö sét üp ä "
+"çätälög för thïs üsér. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
+
 #: openedx/core/djangoapps/api_admin/forms.py
 msgid "Company Address"
 msgstr "Çömpäný Àddréss Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
@@ -10508,6 +10630,10 @@ msgstr ""
 "¢σηѕє¢тєтυя #"
 
 #: openedx/core/djangoapps/credit/models.py
+msgid "Credit requirement statuses"
+msgstr "Çrédït réqüïrémént stätüsés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
+
+#: openedx/core/djangoapps/credit/models.py
 msgid "Deadline for purchasing and requesting credit."
 msgstr ""
 "Déädlïné för pürçhäsïng änd réqüéstïng çrédït. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
@@ -10621,6 +10747,12 @@ msgstr ""
 msgid "Do we want to show program listing page"
 msgstr ""
 "Dö wé wänt tö shöw prögräm lïstïng pägé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя#"
+
+#: openedx/core/djangoapps/programs/models.py
+msgid "Do we want to show program details pages"
+msgstr ""
+"Dö wé wänt tö shöw prögräm détäïls pägés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя#"
 
 #: openedx/core/djangoapps/self_paced/models.py
@@ -11801,6 +11933,22 @@ msgid "An account with the new e-mail address already exists."
 msgstr ""
 "Àn äççöünt wïth thé néw é-mäïl äddréss älréädý éxïsts. Ⱡ'σяєм ιρѕυм ∂σłσя "
 "ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: lms/templates/enroll_staff.html
+msgid "You should Register before trying to access the Unit"
+msgstr ""
+"Ýöü shöüld Régïstér ßéföré trýïng tö äççéss thé Ûnït Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢тєтυя α#"
+
+#: lms/templates/enroll_staff.html lms/templates/ccx/enrollment.html
+#: lms/templates/courseware/course_about.html
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid "Enroll"
+msgstr "Énröll Ⱡ'σяєм ιρѕυ#"
+
+#: lms/templates/enroll_staff.html
+msgid "Don't enroll"
+msgstr "Dön't énröll Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
 #: lms/templates/enroll_students.html
 msgid "Student Enrollment Form"
@@ -14394,12 +14542,6 @@ msgstr ""
 "nötïfïçätïön. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυ#"
 
 #: lms/templates/ccx/enrollment.html
-#: lms/templates/courseware/course_about.html
-#: lms/templates/instructor/instructor_dashboard_2/membership.html
-msgid "Enroll"
-msgstr "Énröll Ⱡ'σяєм ιρѕυ#"
-
-#: lms/templates/ccx/enrollment.html
 msgid "Student List Management"
 msgstr "Stüdént Lïst Mänägémént Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
 
@@ -14710,9 +14852,10 @@ msgstr ""
 
 #: lms/templates/course_modes/choose.html
 #: themes/edx.org/lms/templates/course_modes/choose.html
-msgid "Enroll In {} | Choose Your Track"
+msgid "Enroll In {course_name} | Choose Your Track"
 msgstr ""
-"Énröll Ìn {} | Çhöösé Ýöür Träçk Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
+"Énröll Ìn {course_name} | Çhöösé Ýöür Träçk Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тє#"
 
 #: lms/templates/course_modes/choose.html
 #: themes/edx.org/lms/templates/course_modes/choose.html
@@ -15080,7 +15223,6 @@ msgstr ""
 "réléäsé däté. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
 
 #: lms/templates/courseware/course_updates.html
-#: lms/templates/discussion/_similar_posts.html
 msgid "Hide"
 msgstr "Hïdé Ⱡ'σяєм ι#"
 
@@ -16018,20 +16160,6 @@ msgstr "Vïéw {category} Détäïls Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт 
 msgid "Results:"
 msgstr "Résülts: Ⱡ'σяєм ιρѕυм ∂#"
 
-#: lms/templates/discussion/_blank_slate.html
-msgid ""
-"Sorry! We can't find anything matching your search. Please try another "
-"search."
-msgstr ""
-"Sörrý! Wé çän't fïnd änýthïng mätçhïng ýöür séärçh. Pléäsé trý änöthér "
-"séärçh. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
-
-#: lms/templates/discussion/_blank_slate.html
-msgid "There are no posts here yet. Be the first one to post!"
-msgstr ""
-"Théré äré nö pösts héré ýét. Bé thé fïrst öné tö pöst! Ⱡ'σяєм ιρѕυм ∂σłσя "
-"ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
 #: lms/templates/discussion/_discussion_course_navigation.html
 #: lms/templates/discussion/_discussion_module.html
 msgid "New Post"
@@ -16067,14 +16195,6 @@ msgstr "Àll Dïsçüssïöns Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 #: lms/templates/discussion/_filter_dropdown.html
 msgid "Posts I'm Following"
 msgstr "Pösts Ì'm Föllöwïng Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
-
-#: lms/templates/discussion/_recent_active_posts.html
-msgid "Following"
-msgstr "Föllöwïng Ⱡ'σяєм ιρѕυм ∂σł#"
-
-#: lms/templates/discussion/_search_bar.html
-msgid "Search posts"
-msgstr "Séärçh pösts Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
 #: lms/templates/discussion/_thread_list_template.html
 msgid "Discussion topics; currently listing: "
@@ -19152,6 +19272,10 @@ msgid "Show Background Task History for Problem"
 msgstr ""
 "Shöw Bäçkgröünd Täsk Hïstörý för Prößlém Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя#"
+
+#: lms/templates/learner_dashboard/program_details.html
+msgid "Program Details"
+msgstr "Prögräm Détäïls Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 
 #: lms/templates/learner_dashboard/programs.html
 msgid "Your Programs"
@@ -23596,8 +23720,8 @@ msgstr ""
 "νєłιт єѕѕє ¢ιłłυм#"
 
 #: cms/templates/settings.html
-msgid "Schedule &amp; Details Settings"
-msgstr "Sçhédülé &amp; Détäïls Séttïngs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
+msgid "Schedule & Details Settings"
+msgstr "Sçhédülé & Détäïls Séttïngs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
 
 #: cms/templates/settings.html cms/templates/widgets/header.html
 msgid "Schedule & Details"
@@ -23770,18 +23894,20 @@ msgstr ""
 
 #: cms/templates/settings.html
 msgid ""
-"These dates impact <strong>when your courseware can be viewed</strong>, but "
-"they are <strong>not the dates shown on your course summary page</strong>. "
-"To provide the course start and registration dates as shown on your course "
-"summary page, follow the instructions provided by your Program Manager."
+"These dates impact {strong_start}when your courseware can be "
+"viewed{strong_end}, but they are {strong_start}not the dates shown on your "
+"course summary page{strong_end}. To provide the course start and "
+"registration dates as shown on your course summary page, follow the "
+"instructions provided by your Program Manager."
 msgstr ""
-"Thésé dätés ïmpäçt <strong>whén ýöür çöürséwäré çän ßé vïéwéd</strong>, ßüt "
-"théý äré <strong>nöt thé dätés shöwn ön ýöür çöürsé sümmärý pägé</strong>. "
-"Tö prövïdé thé çöürsé stärt änd régïsträtïön dätés äs shöwn ön ýöür çöürsé "
-"sümmärý pägé, föllöw thé ïnstrüçtïöns prövïdéd ßý ýöür Prögräm Mänägér. "
-"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ "
-"тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм,"
-" qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σ#"
+"Thésé dätés ïmpäçt {strong_start}whén ýöür çöürséwäré çän ßé "
+"vïéwéd{strong_end}, ßüt théý äré {strong_start}nöt thé dätés shöwn ön ýöür "
+"çöürsé sümmärý pägé{strong_end}. Tö prövïdé thé çöürsé stärt änd "
+"régïsträtïön dätés äs shöwn ön ýöür çöürsé sümmärý pägé, föllöw thé "
+"ïnstrüçtïöns prövïdéd ßý ýöür Prögräm Mänägér. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт "
+"∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση "
+"υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σ#"
 
 #: cms/templates/settings.html
 msgid "Course Details"
@@ -23869,16 +23995,13 @@ msgid "Course Overview"
 msgstr "Çöürsé Övérvïéw Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 
 #: cms/templates/settings.html
-msgid "your course summary page"
-msgstr "ýöür çöürsé sümmärý pägé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
-
-#: cms/templates/settings.html
-#, python-format
 msgid ""
-"Introductions, prerequisites, FAQs that are used on %s (formatted in HTML)"
+"Introductions, prerequisites, FAQs that are used on {a_link_start}your "
+"course summary page{a_link_end} (formatted in HTML)"
 msgstr ""
-"Ìntrödüçtïöns, préréqüïsïtés, FÀQs thät äré üséd ön %s (förmättéd ïn HTML) "
-"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυ#"
+"Ìntrödüçtïöns, préréqüïsïtés, FÀQs thät äré üséd ön {a_link_start}ýöür "
+"çöürsé sümmärý pägé{a_link_end} (förmättéd ïn HTML) Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αм#"
 
 #: cms/templates/settings.html
 msgid "Course Card Image"
@@ -23886,11 +24009,11 @@ msgstr "Çöürsé Çärd Ìmägé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α
 
 #: cms/templates/settings.html
 msgid ""
-"You can manage this image along with all of your other <a href='{}'>files "
-"&amp; uploads</a>"
+"You can manage this image along with all of your other {a_link_start}files "
+"and uploads{a_link_end}"
 msgstr ""
-"Ýöü çän mänägé thïs ïmägé älöng wïth äll öf ýöür öthér <a href='{}'>fïlés "
-"&amp; üplöäds</a> Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
+"Ýöü çän mänägé thïs ïmägé älöng wïth äll öf ýöür öthér {a_link_start}fïlés "
+"änd üplöäds{a_link_end} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
 
 #: cms/templates/settings.html
 msgid ""
@@ -24892,10 +25015,6 @@ msgstr "Öpén édX Pörtäl Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 #: cms/templates/widgets/tabs-aggregator.html
 msgid "name"
 msgstr "nämé Ⱡ'σяєм ι#"
-
-# empty
-msgid "This is a key string."
-msgstr "Thïs ïs ä kéý strïng. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
 #: wiki/forms.py
 msgid "Only localhost... muahahaha"

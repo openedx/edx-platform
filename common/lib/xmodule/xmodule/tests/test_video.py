@@ -750,6 +750,14 @@ class VideoExportTestCase(VideoDescriptorTestBase):
         expected = '<video url_name="SampleProblem" download_video="false"/>\n'
         self.assertEquals(expected, etree.tostring(xml, pretty_print=True))
 
+    def test_export_to_xml_invalid_characters_in_attributes(self):
+        """
+        Test XML export will raise TypeError by lxml library if contains illegal characters.
+        """
+        self.descriptor.display_name = '\x1e'
+        with self.assertRaises(ValueError):
+            self.descriptor.definition_to_xml(None)
+
 
 class VideoDescriptorIndexingTestCase(unittest.TestCase):
     """

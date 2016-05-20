@@ -130,14 +130,6 @@ FEATURES = {
     # Enables ability to restrict enrollment in specific courses by the user account login method
     'RESTRICT_ENROLL_BY_REG_METHOD': False,
 
-    # Enables the LMS bulk email feature for course staff
-    'ENABLE_INSTRUCTOR_EMAIL': True,
-    # If True and ENABLE_INSTRUCTOR_EMAIL: Forces email to be explicitly turned on
-    #   for each course via django-admin interface.
-    # If False and ENABLE_INSTRUCTOR_EMAIL: Email will be turned on by default
-    #   for all Mongo-backed courses.
-    'REQUIRE_COURSE_EMAIL_AUTH': True,
-
     # enable analytics server.
     # WARNING: THIS SHOULD ALWAYS BE SET TO FALSE UNDER NORMAL
     # LMS OPERATION. See analytics.py for details about what
@@ -1106,6 +1098,9 @@ MIDDLEWARE_CLASSES = (
     # Instead of AuthenticationMiddleware, we use a cached backed version
     #'django.contrib.auth.middleware.AuthenticationMiddleware',
     'cache_toolbox.middleware.CacheBackedAuthenticationMiddleware',
+    # Enable SessionAuthenticationMiddleware in order to invalidate
+    # user sessions after a password change.
+    'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
 
     'student.middleware.UserStandingMiddleware',
     'contentserver.middleware.StaticContentServer',
@@ -1677,10 +1672,11 @@ REQUIRE_JS_PATH_OVERRIDES = {
     'jquery.url': 'js/vendor/url.min.js',
     'js/courseware/course_home_events': 'js/courseware/course_home_events.js',
     'js/courseware/accordion_events': 'js/courseware/accordion_events.js',
+    'js/courseware/link_clicked_events': 'js/courseware/link_clicked_events.js',
     'js/courseware/toggle_element_visibility': 'js/courseware/toggle_element_visibility.js',
     'js/student_account/logistration_factory': 'js/student_account/logistration_factory.js',
     'js/student_profile/views/learner_profile_factory': 'js/student_profile/views/learner_profile_factory.js',
-    'js/bookmarks/bookmarks_factory': 'js/bookmarks/bookmarks_factory.js',
+    'js/courseware/courseware_factory': 'js/courseware/courseware_factory.js',
     'js/groups/views/cohorts_dashboard_factory': 'js/groups/views/cohorts_dashboard_factory.js',
     'afontgarde': 'edx-pattern-library/js/afontgarde.js',
     'edxicons': 'edx-pattern-library/js/edx-icons.js',
@@ -2039,9 +2035,6 @@ INSTALLED_APPS = (
 
     # API access administration
     'openedx.core.djangoapps.api_admin',
-
-    # Management commands used for configuration automation
-    'edx_management_commands.management_commands',
 
     # Verified Track Content Cohorting
     'verified_track_content',
@@ -2897,3 +2890,6 @@ API_ACCESS_MANAGER_EMAIL = 'api-access@example.com'
 API_ACCESS_FROM_EMAIL = 'api-requests@example.com'
 API_DOCUMENTATION_URL = 'http://edx.readthedocs.org/projects/edx-platform-api/en/latest/overview.html'
 AUTH_DOCUMENTATION_URL = 'http://edx.readthedocs.org/projects/edx-platform-api/en/latest/authentication.html'
+
+# Affiliate cookie tracking
+AFFILIATE_COOKIE_NAME = 'affiliate_id'

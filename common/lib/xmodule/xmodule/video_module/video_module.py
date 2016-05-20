@@ -561,7 +561,16 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
             # is set to its default value, we don't write it out.
             if value:
                 if key in self.fields and self.fields[key].is_set_on(self):
-                    xml.set(key, unicode(value))
+                    try:
+                        xml.set(key, unicode(value))
+                    except ValueError as exception:
+                        exception_message = "{message}, Block-location:{location}, Key:{key}, Value:{value}".format(
+                            message=exception.message,
+                            location=unicode(self.location),
+                            key=key,
+                            value=unicode(value)
+                        )
+                        raise ValueError(exception_message)
 
         for source in self.html5_sources:
             ele = etree.Element('source')

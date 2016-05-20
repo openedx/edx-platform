@@ -255,10 +255,10 @@ class BookmarkModelTests(BookmarksTestsBase):
 
     @ddt.data(
         (ModuleStoreEnum.Type.mongo, 'course', [], 3),
-        (ModuleStoreEnum.Type.mongo, 'chapter_1', [], 3),
-        (ModuleStoreEnum.Type.mongo, 'sequential_1', ['chapter_1'], 4),
-        (ModuleStoreEnum.Type.mongo, 'vertical_1', ['chapter_1', 'sequential_1'], 5),
-        (ModuleStoreEnum.Type.mongo, 'html_1', ['chapter_1', 'sequential_2', 'vertical_2'], 6),
+        (ModuleStoreEnum.Type.mongo, 'chapter_1', [], 4),
+        (ModuleStoreEnum.Type.mongo, 'sequential_1', ['chapter_1'], 6),
+        (ModuleStoreEnum.Type.mongo, 'vertical_1', ['chapter_1', 'sequential_1'], 8),
+        (ModuleStoreEnum.Type.mongo, 'html_1', ['chapter_1', 'sequential_2', 'vertical_2'], 10),
         (ModuleStoreEnum.Type.split, 'course', [], 3),
         (ModuleStoreEnum.Type.split, 'chapter_1', [], 2),
         (ModuleStoreEnum.Type.split, 'sequential_1', ['chapter_1'], 2),
@@ -268,8 +268,9 @@ class BookmarkModelTests(BookmarksTestsBase):
     @ddt.unpack
     def test_path_and_queries_on_create(self, store_type, block_to_bookmark, ancestors_attrs, expected_mongo_calls):
         """
-        In case of mongo, 1 query is used to fetch the block, and 2 by path_to_location(), and then
-        1 query per parent in path is needed to fetch the parent blocks.
+        In case of mongo, 1 query is used to fetch the block, and 2
+        by path_to_location(), and then 1 query per parent in path
+        is needed to fetch the parent blocks.
         """
 
         self.setup_test_data(store_type)
