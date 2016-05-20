@@ -497,6 +497,7 @@ class OrganizationUser(models.Model):
     """
     user_id = models.OneToOneField(User, unique=True, db_index=True)
     organization = models.ForeignKey(Organization, db_index=True)
+    is_instructor = models.BooleanField(default=False)
     active = models.BooleanField(default=True)
 
     class Meta:
