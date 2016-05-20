@@ -1079,7 +1079,17 @@ class TestJavaScriptLinter(TestLinter):
     @data(
         {'template': 'var m = "Plain text " + message + "plain text"', 'rule': None},
         {'template': 'var m = "檌檒濦 " + message + "plain text"', 'rule': None},
+        {
+            'template':
+                ("""$email_header.append($('<input>', type: "button", name: "copy-email-body-text","""
+                 """ value: gettext("Copy Email To Editor"), id: 'copy_email_' + email_id))"""),
+            'rule': None
+        },
         {'template': 'var m = "<p>" + message + "</p>"', 'rule': Rules.javascript_concat_html},
+        {
+            'template': r'var m = "<p>\"escaped quote\"" + message + "\"escaped quote\"</p>"',
+            'rule': Rules.javascript_concat_html
+        },
         {'template': '  // var m = "<p>" + commentedOutMessage + "</p>"', 'rule': None},
         {'template': 'var m = " <p> " + message + " </p> "', 'rule': Rules.javascript_concat_html},
         {'template': 'var m = " <p> " + message + " broken string', 'rule': Rules.javascript_concat_html},
