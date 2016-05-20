@@ -2,7 +2,9 @@
 'use strict';
 define('video/04_video_full_screen.js', [], function () {
     var template = [
-        '<button class="control add-fullscreen" aria-disabled="false">',
+        '<button class="control add-fullscreen" aria-disabled="false" title="',
+            gettext('Fill browser'),
+        '">',
             '<span class="icon-fallback-img">',
                 '<span class="icon fa fa-arrows-alt" aria-hidden="true"></span>',
                 '<span class="sr control-text">',

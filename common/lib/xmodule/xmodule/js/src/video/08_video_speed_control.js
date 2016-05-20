@@ -30,10 +30,13 @@ function (Iterator) {
     SpeedControl.prototype = {
         template: [
             '<div class="speeds menu-container" role="application">',
-                '<button class="control speed-button" aria-label="',
-                    /* jshint maxlen:200 */
-                    gettext('Speed: Press UP to enter the speed menu then use the UP and DOWN arrow keys to navigate the different speeds, then press ENTER to change to the selected speed.'),
-                    '" aria-disabled="false" aria-expanded="false">',
+                '<p class="sr instructions" id="speed-instructions">',
+                    gettext('Press UP to enter the speed menu then use the UP and DOWN arrow keys to navigate the different speeds, then press ENTER to change to the selected speed.'), // jshint ignore: line
+                '</p>',
+                '<button class="control speed-button" aria-disabled="false" aria-expanded="false"',
+                    'title="',
+                        gettext('Adjust video speed'),
+                    '" aria-describedby="speed-instructions">',
                     '<span class="icon-fallback-img">',
                         '<span class="icon fa fa-caret-right" aria-hidden="true"></span>',
                         '<span class="sr control-text">',

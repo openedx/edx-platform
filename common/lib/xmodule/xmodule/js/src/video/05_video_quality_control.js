@@ -7,7 +7,9 @@ define(
 [],
 function () {
     var template = [
-        '<button class="control quality-control is-hidden" aria-disabled="false">',
+        '<button class="control quality-control is-hidden" aria-disabled="false" title="',
+            gettext('High Definition'),
+        '">',
             '<span class="icon-fallback-img">',
                 '<span class="icon icon-hd" aria-hidden="true">HD</span>', // "HD" is treated as a proper noun
                 // Translator note:
