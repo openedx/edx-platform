@@ -1645,19 +1645,15 @@ def _get_course_creator_status(user):
 
     user_org_link = OrganizationUser.objects.filter(
         active=True,
-        user_id_id=user.id).values()
+        user_id_id=user.id).values().first()
 
-
-    # User is linked to an ORG so get instructor status
-    # else default to not an instructor.
-    is_instructor = user_org_link[0]['is_instructor'] if not len(user_org_link) == 0 else False
-
-
-    if user.is_staff:
+    # Rather keep the original logic if the user is not linked to an ORG
+    if user_org_link:
+        course_creator_status = 'granted' if user_org_link[0]['is_instructor'] else 'disallowed_for_this_site'
+    elif user.is_staff:
         course_creator_status = 'granted'
-    elif settings.FEATURES.get('DISABLE_COURSE_CREATION', False) or not is_instructor:
+    elif settings.FEATURES.get('DISABLE_COURSE_CREATION', False):
         course_creator_status = 'disallowed_for_this_site'
-    # going ot need to add something here is the above is false
     elif settings.FEATURES.get('ENABLE_CREATOR_GROUP', False):
         course_creator_status = get_course_creator_status(user)
         if course_creator_status is None:
