@@ -105,7 +105,7 @@ class OrganizationUserAdmin(admin.ModelAdmin):
     """
     Admin for the UserOrganization table.
     """
-    list_display = ('id', 'user_id', 'organization', 'active')
+    list_display = ('user_id', 'organization', 'active')
 
     raw_id_fields = ('user_id',)
     search_fields = ('user__username',)

@@ -495,13 +495,13 @@ class OrganizationUser(models.Model):
     (in the Django/ORM sense) the modeling and integrity is limited to that
     of specifying course identifier strings in this model.
     """
-    user_id = models.ForeignKey(User)
+    user_id = models.OneToOneField(User, unique=True, db_index=True)
     organization = models.ForeignKey(Organization, db_index=True)
     active = models.BooleanField(default=True)
 
     class Meta:
         """ Meta class for this Django model """
-        unique_together = (("user_id", "organization"),)
+        unique_together = (('user_id', 'organization'),)
         verbose_name = _('Link Organization')
         verbose_name_plural = _('Link Organizations')
 
