@@ -95,4 +95,3 @@ class DiscussionXBlock(XBlock, StudioEditableXBlockMixin):
             {'discussion_id': self.discussion_id}
         ))
         return fragment
-
