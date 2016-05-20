@@ -4,8 +4,12 @@ Test the behavior of the GradesTransformer
 
 import datetime
 import pytz
+import random
 
 from student.tests.factories import UserFactory
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+from xmodule.modulestore.tests.factories import check_mongo_calls
+
 from lms.djangoapps.course_blocks.api import get_course_blocks
 from lms.djangoapps.course_blocks.transformers.tests.helpers import CourseStructureTestCase
 from ..transformers.grades import GradesTransformer
@@ -189,3 +193,50 @@ class GradesTransformerTestCase(CourseStructureTestCase):
             self.TRANSFORMER_CLASS_TO_TEST,
             max_score=2,
         )
+
+
+class MultiProblemModulestoreAccessTestCase(CourseStructureTestCase, SharedModuleStoreTestCase):
+
+    TRANSFORMER_CLASS_TO_TEST = GradesTransformer
+
+    def setUp(self):
+        super(MultiProblemModulestoreAccessTestCase, self).setUp()
+        password = u'test'
+        self.student = UserFactory.create(is_staff=False, username=u'test_student', password=password)
+        self.client.login(username=self.student.username, password=password)
+
+    def test_modulestore_performance(self):
+        course = [
+            {
+                u'org': u'GradesTestOrg',
+                u'course': u'GB101',
+                u'run': u'cannonball',
+                u'metadata': {u'format': u'homework'},
+                u'#type': u'course',
+                u'#ref': u'course',
+                u'#children': [],
+            },
+        ]
+        for problem_number in xrange(random.randrange(10, 20)):
+            course[0][u'#children'].append(
+                {
+                    u'metadata': {
+                        u'graded': True,
+                        u'weight': 1,
+                        u'due': datetime.datetime(2099, 3, 15, 12, 30, 0, tzinfo=pytz.utc),
+                    },
+                    u'#type': u'problem',
+                    u'#ref': u'problem_{}'.format(problem_number),
+                    u'data': u'''
+                        <problem>
+                            <numericalresponse answer="{number}">
+                                <textline label="1*{number}" />
+                            </numericalresponse>
+                        </problem>'''.format(number=problem_number),
+                }
+            )
+        blocks = self.build_course(course)
+        from lms.djangoapps.course_blocks.api import _get_cache
+        _get_cache().clear()
+        with check_mongo_calls(2):
+            get_course_blocks(self.student, blocks[u'course'].location, self.transformers)
