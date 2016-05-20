@@ -17,7 +17,7 @@ log = logging.getLogger(__name__)
 DEFAULT_DATA_API = 'enrollment.data'
 
 
-def get_enrollments(user_id):
+def get_enrollments(user_id, support_user=False):
     """Retrieves all the courses a user is enrolled in.
 
     Takes a user and retrieves all relative enrollments. Includes information regarding how the user is enrolled
@@ -89,7 +89,7 @@ def get_enrollments(user_id):
         ]
 
     """
-    return _data_api().get_course_enrollments(user_id)
+    return _data_api().get_course_enrollments(user_id, support_user)
 
 
 def get_enrollment(user_id, course_id):
@@ -192,7 +192,7 @@ def add_enrollment(user_id, course_id, mode=None, is_active=True):
     return _data_api().create_course_enrollment(user_id, course_id, mode, is_active)
 
 
-def update_enrollment(user_id, course_id, mode=None, is_active=None, enrollment_attributes=None):
+def update_enrollment(user_id, course_id, mode=None, is_active=None, enrollment_attributes=None, support_user=False):
     """Updates the course mode for the enrolled user.
 
     Update a course enrollment for the given user and course.
@@ -241,7 +241,7 @@ def update_enrollment(user_id, course_id, mode=None, is_active=None, enrollment_
 
     """
     if mode is not None:
-        _validate_course_mode(course_id, mode, is_active=is_active)
+        _validate_course_mode(course_id, mode, is_active=is_active, support_user=support_user)
     enrollment = _data_api().update_course_enrollment(user_id, course_id, mode=mode, is_active=is_active)
     if enrollment is None:
         msg = u"Course Enrollment not found for user {user} in course {course}".format(user=user_id, course=course_id)
@@ -393,7 +393,7 @@ def _default_course_mode(course_id):
     return CourseMode.DEFAULT_MODE_SLUG
 
 
-def _validate_course_mode(course_id, mode, is_active=None):
+def _validate_course_mode(course_id, mode, is_active=None, support_user=False):
     """Checks to see if the specified course mode is valid for the course.
 
     If the requested course mode is not available for the course, raise an error with corresponding
@@ -415,6 +415,8 @@ def _validate_course_mode(course_id, mode, is_active=None):
     # If the client has requested an enrollment deactivation, we want to include expired modes
     # in the set of available modes. This allows us to unenroll users from expired modes.
     include_expired = not is_active if is_active is not None else False
+    if support_user:
+        include_expired = True
 
     course_enrollment_info = _data_api().get_course_enrollment_info(course_id, include_expired=include_expired)
     course_modes = course_enrollment_info["course_modes"]
