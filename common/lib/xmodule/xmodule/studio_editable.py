@@ -43,7 +43,7 @@ class StudioEditableBlock(object):
         """
         Helper method for getting preview view name (student_view or author_view) for a given module.
         """
-        return AUTHOR_VIEW if hasattr(block, AUTHOR_VIEW) else STUDENT_VIEW
+        return AUTHOR_VIEW if has_author_view(block) else STUDENT_VIEW
 
 
 StudioEditableModule = StudioEditableBlock
@@ -58,3 +58,10 @@ class StudioEditableDescriptor(object):
     """
     author_view = module_attr(AUTHOR_VIEW)
     has_author_view = True
+
+
+def has_author_view(descriptor):
+    """
+    Returns True if the xmodule linked to the descriptor supports "author_view".
+    """
+    return getattr(descriptor, 'has_author_view', False)

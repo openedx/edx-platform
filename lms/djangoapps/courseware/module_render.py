@@ -554,7 +554,14 @@ def get_module_system_for_user(user, student_data,  # TODO  # pylint: disable=to
         if event_type == 'grade' and not is_masquerading_as_specific_student(user, course_id):
             handle_grade_event(block, event_type, event)
         else:
-            track_function(event_type, event)
+            aside_context = {}
+            for aside in block.runtime.get_asides(block):
+                if hasattr(aside, 'get_event_context'):
+                    aside_event_info = aside.get_event_context(event_type, event)
+                    if aside_event_info is not None:
+                        aside_context[aside.scope_ids.block_type] = aside_event_info
+            with tracker.get_tracker().context('asides', {'asides': aside_context}):
+                track_function(event_type, event)
 
     def rebind_noauth_module_to_user(module, real_user):
         """
