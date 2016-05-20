@@ -6,6 +6,7 @@ from django.test.client import RequestFactory
 from openedx.core.lib.block_structure.transformer import BlockStructureTransformer
 from openedx.core.djangoapps.util.user_utils import SystemUser
 from .. import module_render
+from courseware.model_data import FieldDataCache
 
 
 class GradesTransformer(BlockStructureTransformer):
@@ -29,7 +30,7 @@ class GradesTransformer(BlockStructureTransformer):
         max_score: (numeric)
     """
     VERSION = 1
-    FIELDS_TO_COLLECT = [u'due', u'graded', u'has_score', u'format', u'weight']
+    FIELDS_TO_COLLECT = [u'due', u'format', u'graded', u'has_score', u'weight']
 
     @classmethod
     def name(cls):
@@ -82,12 +83,19 @@ class GradesTransformer(BlockStructureTransformer):
         data to a SystemUser.
         """
         request = RequestFactory().get('/dummy-collect-max-grades')
-        request.user = SystemUser()
+        user = SystemUser()
+        request.user = user
         request.session = {}
+        root_block = block_structure.get_xblock(block_structure.root_block_usage_key)
+        course_key = block_structure.root_block_usage_key.course_key
+        cache = FieldDataCache.cache_for_descriptor_descendents(
+            course_id=course_key,
+            user=request.user,
+            descriptor=root_block,
+            descriptor_filter=lambda descriptor: descriptor.has_score,
+        )
         for block_locator in block_structure.post_order_traversal():
-            course_id = unicode(block_locator.course_key)
-            usage_id = unicode(block_locator)
             block = block_structure.get_xblock(block_locator)
             if getattr(block, 'has_score', False):
-                module, __ = module_render.get_module_by_usage_id(request, course_id, usage_id)
+                module = module_render.get_module_for_descriptor(user, request, block, cache, course_key)
                 yield module
