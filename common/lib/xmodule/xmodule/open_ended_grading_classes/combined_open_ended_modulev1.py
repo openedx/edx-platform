@@ -42,8 +42,8 @@ _ = lambda text: text
 
 HUMAN_TASK_TYPE = {
     # Translators: "Self" is used to denote an openended response that is self-graded
-    'selfassessment': _("Self Assessment"),
-    'openended': "Reviewed Assessment",
+    'selfassessment': _("Self"),
+    'openended': "edX",
     # Translators: "AI" is used to denote an openended response that is machine-graded
     'ml_grading.conf': _("AI"),
     # Translators: "Peer" is used to denote an openended response that is peer-graded

@@ -220,10 +220,8 @@ class PeerGradingModule(PeerGradingFields, XModule):
 
         return json.dumps(data_dict, cls=ComplexEncoder)
 
-    def query_data_for_location(self, location=None):
+    def query_data_for_location(self, location):
         student_id = self.system.anonymous_student_id
-        if not location:
-            location = self.link_to_location
         success = False
         response = {}
 

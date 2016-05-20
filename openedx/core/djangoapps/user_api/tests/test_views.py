@@ -1420,10 +1420,10 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, ApiTestCase):
         self.assertEqual(len(mail.outbox), 1)
         sent_email = mail.outbox[0]
         self.assertEqual(sent_email.to, [self.EMAIL])
-        self.assertEqual(sent_email.subject, "Activate Your {account_name} Account".format(account_name=settings.ACCOUNT_NAME))
+        self.assertEqual(sent_email.subject, "Activate Your {platform} Account".format(platform=settings.PLATFORM_NAME))
         self.assertIn(
-            u"activating your {account_name} account".format(
-                account_name=settings.ACCOUNT_NAME,
+            u"activating your {platform} account".format(
+                platform=settings.PLATFORM_NAME,
             ),
             sent_email.body
         )
