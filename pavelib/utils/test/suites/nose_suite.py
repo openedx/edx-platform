@@ -128,12 +128,12 @@ class SystemTestSuite(NoseTestSuite):
         if self.processes is None:
             # Use one process per core for LMS tests, and no multiprocessing
             # otherwise.
-            self.processes = -1 if self.root == 'lms' else 0
+            self.processes = 0
 
         self.processes = int(self.processes)
 
         if self.randomize is None:
-            self.randomize = self.root == 'lms'
+            self.randomize = False
 
         if self.processes != 0 and self.verbosity > 1:
             print colorize(
