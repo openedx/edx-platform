@@ -106,7 +106,7 @@ class DemandhintRenderer(object):
     """
     tags = ['demandhint']
 
-    def __init__(self, system, xml):  # pylint: disable=unused-variable
+    def __init__(self, system, xml):  # pylint: disable=unused-argument
         self.system = system
 
     def get_html(self):
