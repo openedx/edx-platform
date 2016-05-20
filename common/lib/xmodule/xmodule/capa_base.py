@@ -209,12 +209,6 @@ class CapaMixin(CapaFields):
     def __init__(self, *args, **kwargs):
         super(CapaMixin, self).__init__(*args, **kwargs)
 
-        # For Blank Advanced Problem, there is no template so `<problem></problem>` is generated,
-        # It should be converted to <problem><question></question></problem> to make the things consistent
-        # TODO! Find a better way to do this
-        if self.data == '<problem></problem>':
-            self.data = '<problem><question></question></problem>'
-
         due_date = self.due
 
         if self.graceperiod is not None and due_date:

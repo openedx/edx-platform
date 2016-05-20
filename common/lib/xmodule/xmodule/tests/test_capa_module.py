@@ -1366,7 +1366,7 @@ class CapaModuleTest(unittest.TestCase):
             mock_track_function.assert_called_with(
                 module, 'edx.problem.hint.demandhint_displayed',
                 {'hint_index': 0, 'module_id': u'i4x://edX/capa_test/problem/meh',
-                 'hint_text': 'Demand 1', 'hint_len': 2}
+                 'hint_text': 'question 1 hint 1', 'hint_len': 2}
             )
 
     def test_input_state_consistency(self):

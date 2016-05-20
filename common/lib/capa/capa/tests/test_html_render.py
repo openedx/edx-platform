@@ -49,8 +49,11 @@ class CapaHtmlRenderTest(unittest.TestCase):
         # Render the HTML
         rendered_html = etree.XML(problem.get_html())
 
+        # get question
+        question = rendered_html.find(".//div[@class='question']")
+
         # Expect that the include file was embedded in the problem
-        test_element = rendered_html.find("test")
+        test_element = question.find("test")
         self.assertEqual(test_element.tag, "test")
         self.assertEqual(test_element.text, "Test include")
 
@@ -68,9 +71,12 @@ class CapaHtmlRenderTest(unittest.TestCase):
         # Render the HTML
         rendered_html = etree.XML(problem.get_html())
 
+        # get question
+        question = rendered_html.find(".//div[@class='question']")
+
         # Expect that the <startouttext /> and <endouttext />
         # were converted to <span></span> tags
-        span_element = rendered_html.find('span')
+        span_element = question.find('span')
         self.assertEqual(span_element.text, 'Test text')
 
     def test_anonymous_student_id(self):
@@ -87,8 +93,11 @@ class CapaHtmlRenderTest(unittest.TestCase):
         # Render the HTML
         rendered_html = etree.XML(problem.get_html())
 
+        # get question
+        question = rendered_html.find(".//div[@class='question']")
+
         # Expect that the anonymous_student_id was converted to "student"
-        span_element = rendered_html.find('span')
+        span_element = question.find('span')
         self.assertEqual(span_element.text, 'Welcome student')
 
     def test_render_script(self):
@@ -151,12 +160,15 @@ class CapaHtmlRenderTest(unittest.TestCase):
         # Expect problem has been turned into a <div>
         self.assertEqual(rendered_html.tag, "div")
 
+        # get question
+        question = rendered_html.find(".//div[@class='question']")
+
         # Expect question text is in a <p> child
-        question_element = rendered_html.find("p")
+        question_element = question.find("p")
         self.assertEqual(question_element.text, "Test question")
 
         # Expect that the response has been turned into a <span>
-        response_element = rendered_html.find("span")
+        response_element = question.find("span")
         self.assertEqual(response_element.tag, "span")
 
         # Expect that the response <span>
@@ -166,7 +178,7 @@ class CapaHtmlRenderTest(unittest.TestCase):
 
         # Expect a child <div> for the solution
         # with the rendered template
-        solution_element = rendered_html.find("div")
+        solution_element = question.find("div")
         self.assertEqual(solution_element.text, 'Input Template Render')
 
         # Expect that the template renderer was called with the correct
@@ -251,8 +263,11 @@ class CapaHtmlRenderTest(unittest.TestCase):
         problem = new_loncapa_problem(xml_str)
         rendered_html = etree.XML(problem.get_html())
 
+        # get question
+        question = rendered_html.find(".//div[@class='question']")
+
         # Expect that the variable $test has been replaced with its value
-        span_element = rendered_html.find('span')
+        span_element = question.find('span')
         self.assertEqual(span_element.get('attr'), "TEST")
 
     def test_xml_comments_and_other_odd_things(self):
@@ -307,5 +322,5 @@ class CapaHtmlRenderTest(unittest.TestCase):
 
         # Create the problem
         problem = new_loncapa_problem(xml_str)
-        childs = [child.tag for child in problem.tree.getchildren()] # pylint: disable=no-member
+        childs = [child.tag for child in problem.tree.getchildren()]  # pylint: disable=no-member
         self.assertEqual(set(childs), set(['question']))
