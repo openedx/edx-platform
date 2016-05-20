@@ -386,13 +386,13 @@ def _user_in_same_org(user, course_id):
     """
     Checks if user ORG matches course ORG
     """
-    user_id = user.id
-    u_org = Organization.objects.filter(organizationuser__active=True, organizationuser__user_id_id=user_id)
-    c_org = Organization.objects.filter(organizationcourse__course_id=course_id)
+    u_org = Organization.objects.filter(organizationuser__active=True, organizationuser__user_id_id=user.id).values()
+    c_org = Organization.objects.filter(organizationcourse__course_id=course_id).values()
 
-    print(u_org.values())
+    if len(u_org) * len(c_org) == 0:
+        return True
 
-    if u_org == c_org:
+    if u_org[0]['id'] == c_org[0]['id']:
         return True
     else:
         return False
