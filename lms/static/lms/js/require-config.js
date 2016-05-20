@@ -71,6 +71,7 @@
             // libraries.
             "jquery": "common/js/vendor/jquery",
             "jquery-migrate": "common/js/vendor/jquery-migrate",
+            "jquery.scrollTo": "common/js/vendor/jquery.scrollTo",
             "jquery.cookie": "js/vendor/jquery.cookie",
             'jquery.timeago': 'js/vendor/jquery.timeago',
             "jquery.url": "js/vendor/url.min",

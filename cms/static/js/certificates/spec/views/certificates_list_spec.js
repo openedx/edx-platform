@@ -31,19 +31,6 @@ function(_, Course, CertificatesCollection, CertificateModel, CertificateDetails
         var emptyMessage = 'You have not created any certificates yet.';
 
         beforeEach(function() {
-            window.course = new Course({
-                id: '5',
-                name: 'Course Name',
-                url_name: 'course_name',
-                org: 'course_org',
-                num: 'course_num',
-                revision: 'course_rev'
-            });
-            window.certWebPreview = new CertificatePreview({
-                course_modes: ['honor', 'test'],
-                certificate_web_view_url: '/users/1/courses/orgX/009/2016'
-            });
-
             TemplateHelpers.installTemplates(
                 ['certificate-editor', 'list']
             );
@@ -81,10 +68,6 @@ function(_, Course, CertificatesCollection, CertificateModel, CertificateDetails
             delete window.course;
             delete window.certWebPreview;
             delete window.CMS.User;
-        });
-
-        afterEach(function() {
-            delete window.course;
         });
 
         describe('empty template', function () {

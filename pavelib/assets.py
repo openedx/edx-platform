@@ -47,6 +47,7 @@ SASS_LOAD_PATHS = [
 NPM_INSTALLED_LIBRARIES = [
     'jquery/dist/jquery.js',
     'jquery-migrate/dist/jquery-migrate.js',
+    'jquery.scrollto/jquery.scrollTo.js',
     'underscore/underscore.js',
     'underscore.string/dist/underscore.string.js',
     'picturefill/dist/picturefill.js',

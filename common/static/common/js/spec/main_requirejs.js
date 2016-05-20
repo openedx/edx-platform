@@ -14,7 +14,7 @@
             'jquery.leanModal': 'js/vendor/jquery.leanModal',
             'jquery.ajaxQueue': 'js/vendor/jquery.ajaxQueue',
             'jquery.smoothScroll': 'js/vendor/jquery.smooth-scroll.min',
-            'jquery.scrollTo': 'js/vendor/jquery.scrollTo.min',
+            'jquery.scrollTo': 'common/js/vendor/jquery.scrollTo',
             'jquery.timepicker': 'js/vendor/timepicker/jquery.timepicker',
             'jquery.cookie': 'js/vendor/jquery.cookie',
             'jquery.qtip': 'js/vendor/jquery.qtip.min',
