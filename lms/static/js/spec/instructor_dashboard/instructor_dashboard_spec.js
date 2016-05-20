@@ -2,77 +2,167 @@ define(['jquery', 'coffee/src/instructor_dashboard/instructor_dashboard'],
     function($) {
         'use strict';
         
-        describe("LMS Instructor Dashboard markup", function() {
+        describe("LMS Instructor Dashboard", function() {
+            var KEY = $.ui.keyCode,
+            
+            keyPressEvent = function(key) {
+                return $.Event('keydown', { keyCode: key });
+            };
             
             beforeEach(function() {
                 loadFixtures('js/fixtures/instructor_dashboard/instructor_dashboard.html');
             });
             
-            it("has proper markup for tab navigation widget", function() {
-                expect($('.instructor-nav')).toHaveAttrs('role', 'tablist');
-                expect($('.instructor-nav .nav-item')).toHaveAttrs({
-                    'role': 'tab',
-                    'aria-selected': 'false',
-                    'aria-controls': true,
-                    'tabindex': '-1'
-                });
-                expect($('.idash-section')).toHaveAttrs({
-                    'role': 'tabpanel',
-                    'aria-hidden': 'true',
-                    'tabindex': '-1'
+            it("has proper markup for tablist", function() {
+                expect($('.instructor-nav')).toHaveAttr('role', 'tablist');
+            });
+            
+            it("has proper markup for tabs", function() {
+                var tab_items = $('.instructor-nav .nav-item');
+                
+                $(tab_items).each(function(index, el) {
+                    expect($(el)).toHaveAttr('role', 'tab');
+                    expect($(el)).toHaveAttr('aria-selected', 'false');
+                    expect($(el)).toHaveAttr('aria-controls');
+                    expect($(el)).toHaveAttr('tabindex', '-1');
                 });
             });
             
-            describe("Ensures mouse functionality and correct ARIA", function() {
-                var first_tab = $('.instructor-nav .nav-item')[0],
-                    first_section = $(first_tab).data('section'),
-                    second_tab = $('.instructor-nav .nav-item')[1],
-                    second_section = $(second_tab).data('section');
+            it("has proper markup for tabpanels", function() {
+                var tab_sections = $('.idash-section');
                 
-                it("clicking a tab works as expected", function() {
+                $(tab_sections).each(function(index, el) {
+                    expect($(el)).toHaveAttr('role', 'tabpanel');
+                    expect($(el)).toHaveAttr('aria-hidden', 'true');
+                    expect($(el)).toHaveAttr('tabindex', '-1');
+                });
+            });
+            
+            describe("ensures mouse functionality and proper ARIA", function() {
+                
+                it("by clicking a tab works as expected", function() {
+                    var first_tab = $('.instructor-nav .nav-item')[0],
+                        first_section = $(first_tab).data('section'),
+                        second_tab = $('.instructor-nav .nav-item')[1],
+                        second_section = $(second_tab).data('section');
+                        
                     $(first_tab).click();
                     $(second_tab).click();
                     
-                    expect($(first_tab)).toHaveAttrs({
-                        'aria-selected': 'true',
-                        'tabindex': '-1'
-                    });
+                    console.log(first_tab, second_tab);
                     
-                    expect($(second_tab)).toHaveAttrs({
-                        'aria-selected': 'false',
-                        'tabindex': '0'
-                    });
+                    expect($(first_tab)).toHaveAttr('aria-selected', 'false');
+                    expect($(first_tab)).toHaveAttr('tabindex', '-1');
                     
-                    expect($(first_section)).toHaveAttrs({
-                        'tabindex': '-1',
-                        'aria-hidden': 'true'
-                    });
+                    expect($(second_tab)).toHaveAttr('aria-selected', 'true');
+                    expect($(second_tab)).toHaveAttr('tabindex', '0');
                     
-                    expect($(second_section)).toHaveAttrs({
-                        'tabindex': '0',
-                        'aria-hidden': 'false'
-                    });
+                    expect($(first_section)).toHaveAttr('aria-hidden', 'true');
+                    expect($(first_section)).toHaveAttr('tabindex', '-1');
+                    
+                    expect($(second_section)).toHaveAttr('aria-hidden', 'false');
+                    expect($(second_section)).toHaveAttr('tabindex', '0');
                 });
             });
             
             describe("Ensures keyboard functionality and correct ARIA", function() {
-            
-                it("has tabs that work with a keyboard", function() {
+                
+                it("by pressing RIGHT and moving to the next tab", function() {
+                    var first_tab = $('.instructor-nav .nav-item')[0],
+                        first_section = $(first_tab).data('section'),
+                        second_tab = $('.instructor-nav .nav-item')[1],
+                        second_section = $(second_tab).data('section');
+
+                    first_tab.focus();
+                    first_tab.trigger(keyPressEvent(KEY.RIGHT));
                     
-                    // press right
-                    // press down
-                    // press up
-                    // press left
+                    expect(first_tab).toHaveAttr('aria-selected', 'false');
+                    expect(first_tab).toHaveAttr('tabindex', '-1');
+                    
+                    expect(second_tab).toHaveAttr('aria-selected', 'true');
+                    expect(second_tab).toHaveAttr('tabindex', '0');
+                    
+                    expect(first_section).toHaveAttr('aria-hidden', 'true');
+                    expect(first_section).toHaveAttr('tabindex', '-1');
+                    
+                    expect(second_section).toHaveAttr('aria-hidden', 'false');
+                    expect(second_section).toHaveAttr('tabindex', '0');
+                });
+                
+                it("by pressing DOWN and moving to the next tab", function() {
+                    var second_tab = $('.instructor-nav .nav-item')[1],
+                        second_section = $(second_tab).data('section'),
+                        third_tab = $('.instructor-nav .nav-item')[2],
+                        third_section = $(second_tab).data('section');
+                        
+                    second_tab.focus();
+                    second_tab.trigger(keyPressEvent(KEY.DOWN));
+                    
+                    expect(second_tab).toHaveAttr('aria-selected', 'false');
+                    expect(second_tab).toHaveAttr('tabindex', '-1');
+                    
+                    expect(third_tab).toHaveAttr('aria-selected', 'true');
+                    expect(third_tab).toHaveAttr('tabindex', '0');
+                    
+                    expect(second_section).toHaveAttr('aria-hidden', 'true');
+                    expect(second_section).toHaveAttr('tabindex', '-1');
+                    
+                    expect(third_section).toHaveAttr('aria-hidden', 'false');
+                    expect(third_section).toHaveAttr('tabindex', '0');
+                });
+                
+                it("by pressing LEFT and moving to the previous tab", function() {
+                    var second_tab = $('.instructor-nav .nav-item')[1],
+                        second_section = $(second_tab).data('section'),
+                        third_tab = $('.instructor-nav .nav-item')[2],
+                        third_section = $(second_tab).data('section');
+
+                    third_tab.focus();
+                    third_tab.trigger(keyPressEvent(KEY.LEFT));
+                    
+                    expect(second_tab).toHaveAttr('aria-selected', 'true');
+                    expect(second_tab).toHaveAttr('tabindex', '0');
+                    
+                    expect(third_tab).toHaveAttr('aria-selected', 'false');
+                    expect(third_tab).toHaveAttr('tabindex', '-1');
+                    
+                    expect(second_section).toHaveAttr('aria-hidden', 'false');
+                    expect(second_section).toHaveAttr('tabindex', '0');
+                    
+                    expect(third_section).toHaveAttr('aria-hidden', 'true');
+                    expect(third_section).toHaveAttr('tabindex', '-1');
+                });
+                
+                it("by pressing UP and moving to the previous tab", function() {
+                    var first_tab = $('.instructor-nav .nav-item')[0],
+                        first_section = $(first_tab).data('section'),
+                        second_tab = $('.instructor-nav .nav-item')[1],
+                        second_section = $(second_tab).data('section');
+
+                    second_tab.focus();
+                    second_tab.trigger(keyPressEvent(KEY.UP));
+                    
+                    expect(first_tab).toHaveAttr('aria-selected', 'true');
+                    expect(first_tab).toHaveAttr('tabindex', '0');
+                    
+                    expect(second_tab).toHaveAttr('aria-selected', 'false');
+                    expect(second_tab).toHaveAttr('tabindex', '-1');
+                    
+                    expect(first_section).toHaveAttr('aria-hidden', 'false');
+                    expect(first_section).toHaveAttr('tabindex', '0');
+                    
+                    expect(second_section).toHaveAttr('aria-hidden', 'true');
+                    expect(second_section).toHaveAttr('tabindex', '-1');
                 });
             });
             
             describe("Verifies location.hash sets and reads properly", function() {
                 
-                it("sets the location.hash", function() {
+                it("by setting the location.hash", function() {
                     
                 });
                 
-                it("reads the location.hash", function() {
+                it("by reading the location.hash", function() {
                     
                 });
             });
