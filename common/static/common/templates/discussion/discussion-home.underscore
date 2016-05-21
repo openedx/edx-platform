@@ -1,6 +1,6 @@
 <div class="discussion-article view-discussion-home">
   <section class="home-header">
-    <span class="label"><%- gettext("DISCUSSION HOME:") %></span>
+    <span class="label"><%- gettext("Discussion Home") %></span>
     <% if (window.courseName) { %>
       <h1 class="home-title"><%- window.courseName %></h1>
     <% } %>
