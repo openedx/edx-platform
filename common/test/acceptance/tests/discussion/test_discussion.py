@@ -403,15 +403,15 @@ class DiscussionOpenClosedThreadTest(BaseDiscussionTestCase):
 
     def test_originally_open_thread_vote_display(self):
         page = self.setup_openclosed_thread_page()
-        self.assertFalse(page._is_element_visible('.forum-thread-main-wrapper .action-vote'))
-        self.assertTrue(page._is_element_visible('.forum-thread-main-wrapper .display-vote'))
+        self.assertFalse(page._is_element_visible('.thread-main-wrapper .action-vote'))
+        self.assertTrue(page._is_element_visible('.thread-main-wrapper .display-vote'))
         self.assertFalse(page._is_element_visible('.response_response1 .action-vote'))
         self.assertTrue(page._is_element_visible('.response_response1 .display-vote'))
 
     def test_originally_closed_thread_vote_display(self):
         page = self.setup_openclosed_thread_page(True)
-        self.assertTrue(page._is_element_visible('.forum-thread-main-wrapper .action-vote'))
-        self.assertFalse(page._is_element_visible('.forum-thread-main-wrapper .display-vote'))
+        self.assertTrue(page._is_element_visible('.thread-main-wrapper .action-vote'))
+        self.assertFalse(page._is_element_visible('.thread-main-wrapper .display-vote'))
         self.assertTrue(page._is_element_visible('.response_response1 .action-vote'))
         self.assertFalse(page._is_element_visible('.response_response1 .display-vote'))
 
