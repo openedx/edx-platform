@@ -1,4 +1,5 @@
 ## mako
+<%page expression_filter="h"/>
 <%namespace name='static' file='/static_content.html'/>
 <%!
 from django.utils.translation import ugettext as _
@@ -88,7 +89,7 @@ include_special_exams = settings.FEATURES.get('ENABLE_SPECIAL_EXAMS', False) and
             tab_list = get_course_tab_list(request, course)
             tabs_tmpl = static.get_template_path('/courseware/tabs.html')
             %>
-            <ol class="course-tabs">
+            <ol class="tabs course-tabs">
                 <%include file="${tabs_tmpl}" args="tab_list=tab_list,active_page=active_page,default_tab=default_tab,tab_image=tab_image" />
                 <%block name="extratabs" />
             </ol>

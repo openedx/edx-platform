@@ -396,8 +396,8 @@ class DiscussionTabSingleThreadPage(CoursePage):
         return getattr(self.thread_page, name)
 
     def close_open_thread(self):
-        with self.thread_page._secondary_action_menu_open(".forum-thread-main-wrapper"):
-            self._find_within(".forum-thread-main-wrapper .action-close").first.click()
+        with self.thread_page._secondary_action_menu_open(".thread-main-wrapper"):
+            self._find_within(".thread-main-wrapper .action-close").first.click()
 
     def is_focused_on_element(self, selector):
         """

@@ -5,7 +5,7 @@
     display: table-cell; // needed to extend the sidebar the full height of the area
 
     // provides sufficient contrast for all screen reader-only elements
-    .sr {
+    .sr, .sr-only {
         color: $black;
         background: $white;
     }
