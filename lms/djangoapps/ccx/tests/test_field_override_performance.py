@@ -21,7 +21,6 @@ from request_cache.middleware import RequestCache
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
 from xblock.core import XBlock
-from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, \
     TEST_DATA_SPLIT_MODULESTORE, TEST_DATA_MONGO_MODULESTORE
 from xmodule.modulestore.tests.factories import check_mongo_calls_range, CourseFactory, check_sum_of_calls
@@ -267,9 +266,9 @@ class TestFieldOverrideSplitPerformance(FieldOverridePerformanceTestCase):
         ('ccx', 1, True, False): (34, 0, 4, 1),
         ('ccx', 2, True, False): (40, 0, 19, 1),
         ('ccx', 3, True, False): (50, 0, 84, 1),
-        ('ccx', 1, True, True): (35, 0, 5, 5),
-        ('ccx', 2, True, True): (41, 0, 20, 31),
-        ('ccx', 3, True, True): (51, 0, 85, 121),
+        ('ccx', 1, True, True): (35, 0, 5, 6),
+        ('ccx', 2, True, True): (41, 0, 20, 47),
+        ('ccx', 3, True, True): (51, 0, 85, 202),
         ('no_overrides', 1, False, False): (34, 0, 4, 1),
         ('no_overrides', 2, False, False): (40, 0, 19, 1),
         ('no_overrides', 3, False, False): (50, 0, 84, 1),

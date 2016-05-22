@@ -132,7 +132,7 @@ class ResubmitErrorCertificatesTest(CertificateManagementTest):
         self._create_cert(self.courses[0].id, UserFactory.create(), CertificateStatuses.error)
         self._create_cert(self.courses[0].id, UserFactory.create(), CertificateStatuses.error)
 
-        # Verify that we make only two Mongo queries
+        # Verify that we make only one Mongo query
         # because the course is cached.
         with check_mongo_calls(1):
             self._run_command()
