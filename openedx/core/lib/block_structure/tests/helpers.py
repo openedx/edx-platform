@@ -68,6 +68,13 @@ class MockModulestore(object):
             raise ItemNotFoundError
         return item
 
+    @contextmanager
+    def bulk_operations(self, ignore):  # pylint: disable=unused-argument
+        """
+        A context manager for notifying the store of bulk operations.
+        """
+        yield
+
 
 class MockCache(object):
     """

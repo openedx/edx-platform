@@ -2,6 +2,8 @@
 Top-level module for the Block Structure framework with a class for managing
 BlockStructures.
 """
+from contextlib import contextmanager
+
 from .cache import BlockStructureCache
 from .factory import BlockStructureFactory
 from .exceptions import UsageKeyNotInBlockStructure
@@ -87,12 +89,13 @@ class BlockStructureManager(object):
         )
         cache_miss = block_structure is None
         if cache_miss or BlockStructureTransformers.is_collected_outdated(block_structure):
-            block_structure = BlockStructureFactory.create_from_modulestore(
-                self.root_block_usage_key,
-                self.modulestore
-            )
-            BlockStructureTransformers.collect(block_structure)
-            self.block_structure_cache.add(block_structure)
+            with self._bulk_operations():
+                block_structure = BlockStructureFactory.create_from_modulestore(
+                    self.root_block_usage_key,
+                    self.modulestore
+                )
+                BlockStructureTransformers.collect(block_structure)
+                self.block_structure_cache.add(block_structure)
         return block_structure
 
     def update_collected(self):
@@ -111,3 +114,15 @@ class BlockStructureManager(object):
         root block key.
         """
         self.block_structure_cache.delete(self.root_block_usage_key)
+
+    @contextmanager
+    def _bulk_operations(self):
+        """
+        A context manager for notifying the store of bulk operations.
+        """
+        try:
+            course_key = self.root_block_usage_key.course_key
+        except AttributeError:
+            course_key = None
+        with self.modulestore.bulk_operations(course_key):
+            yield
