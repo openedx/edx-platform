@@ -2,11 +2,15 @@
 Grades Transformer
 """
 from django.test.client import RequestFactory
+from logging import getLogger
 
 from openedx.core.lib.block_structure.transformer import BlockStructureTransformer
 from openedx.core.djangoapps.util.user_utils import SystemUser
 from .. import module_render
 from courseware.model_data import FieldDataCache
+
+
+logger = getLogger(__name__)  # pylint: disable=invalid-name
 
 
 class GradesTransformer(BlockStructureTransformer):
@@ -69,6 +73,10 @@ class GradesTransformer(BlockStructureTransformer):
         Collect the `max_score` from the given module, storing it as a
         `transformer_block_field` associated with the `GradesTransformer`.
         """
+        logger.info(
+            "Collecting max_score for: %s",
+            unicode(module.location),
+        )
         score = module.max_score()
         block_structure.set_transformer_block_field(module.location, cls, 'max_score', score)
 
