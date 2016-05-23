@@ -58,7 +58,7 @@ class BulkEmailTest(BaseInstructorDashboardTest):
         instructor_dashboard_page = self.visit_instructor_dashboard()
         self.send_email_page = instructor_dashboard_page.select_bulk_email()
 
-    @ddt.data("Myself", "Staff and admins", "All (students, staff, and admins)")
+    @ddt.data(["myself"], ["staff"], ["learners"], ["myself", "staff", "learners"])
     def test_email_queued_for_sending(self, recipient):
         self.assertTrue(self.send_email_page.is_browser_on_page())
         self.send_email_page.send_message(recipient)

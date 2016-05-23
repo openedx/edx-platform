@@ -84,6 +84,7 @@ import instructor_analytics.distributions
 import instructor_analytics.csvs
 import csv
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preference, set_user_preference
+from openedx.core.djangolib.markup import HTML, Text
 from instructor.views import INVOICE_KEY
 
 from submissions import api as sub_api  # installed from the edx-submissions repository
@@ -2312,7 +2313,7 @@ def list_report_downloads(_request, course_id):
 
     response_payload = {
         'downloads': [
-            dict(name=name, url=url, link='<a href="{}">{}</a>'.format(url, name))
+            dict(name=name, url=url, link=HTML('<a href="{}">{}</a>').format(HTML(url), Text(name)))
             for name, url in report_store.links_for(course_id)
         ]
     }
@@ -2332,7 +2333,7 @@ def list_financial_report_downloads(_request, course_id):
 
     response_payload = {
         'downloads': [
-            dict(name=name, url=url, link='<a href="{}">{}</a>'.format(url, name))
+            dict(name=name, url=url, link=HTML('<a href="{}">{}</a>').format(HTML(url), Text(name)))
             for name, url in report_store.links_for(course_id)
         ]
     }
@@ -2494,7 +2495,7 @@ def send_email(request, course_id):
     if not BulkEmailFlag.feature_enabled(course_id):
         return HttpResponseForbidden("Email is not enabled for this course.")
 
-    send_to = request.POST.get("send_to")
+    targets = json.loads(request.POST.get("send_to"))
     subject = request.POST.get("subject")
     message = request.POST.get("message")
 
@@ -2509,14 +2510,17 @@ def send_email(request, course_id):
     # Create the CourseEmail object.  This is saved immediately, so that
     # any transaction that has been pending up to this point will also be
     # committed.
-    email = CourseEmail.create(
-        course_id,
-        request.user,
-        send_to,
-        subject, message,
-        template_name=template_name,
-        from_addr=from_addr
-    )
+    try:
+        email = CourseEmail.create(
+            course_id,
+            request.user,
+            targets,
+            subject, message,
+            template_name=template_name,
+            from_addr=from_addr
+        )
+    except ValueError as err:
+        return HttpResponseBadRequest(repr(err))
 
     # Submit the task, so that the correct InstructorTask object gets created (for monitoring purposes)
     instructor_task.api.submit_bulk_course_email(request, course_id, email.id)
