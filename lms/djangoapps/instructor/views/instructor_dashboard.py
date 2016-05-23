@@ -53,7 +53,7 @@ from class_dashboard.dashboard_data import get_section_display_name, get_array_s
 from .tools import get_units_with_due_date, title_or_url
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
-from openedx.core.djangolib.markup import Text, HTML
+from openedx.core.djangolib.markup import HTML, Text
 
 log = logging.getLogger(__name__)
 
