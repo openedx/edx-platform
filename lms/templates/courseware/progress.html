@@ -80,6 +80,13 @@ from django.utils.http import urlquote_plus
                     <p class="copy">${_("We're creating your certificate. You can keep working in your courses and a link to it will appear here and on your Dashboard when it is ready.")}</p>
                   </div>
                   <div class="msg-actions"></div>
+                  %elif not is_id_verified or is_unverified:
+                  <div class="msg-content">
+                    ## Translators: This message appears to users when the users have not completed identity verification.
+                    <h2 class="title">${_("Certificate unavailable")}</h2>
+                    <p class="copy">${_("You have not received a certificate because you do not have a current {platform_name} verified identity. ").format(platform_name=settings.PLATFORM_NAME)} <a href="${reverse('verify_student_reverify')}"> ${_("Verify your identity now.")}</a></p>
+                  </div>
+                  <div class="msg-actions"></div>
                   %else:
                   <div class="msg-content">
                     <h2 class="title">${_("Congratulations, you qualified for a certificate!")}</h2>
