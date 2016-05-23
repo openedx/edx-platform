@@ -32,12 +32,14 @@ from openedx.core.djangolib.js_utils import dump_js_escaped_json, js_escaped_str
 
 <%block name="js_extra">
 <%static:require_module module_name="js/student_account/views/account_settings_factory" class_name="AccountSettingsFactory">
-    var fieldsData = ${ fields | n, dump_js_escaped_json };
-    var authData = ${ auth | n, dump_js_escaped_json };
-    var platformName = '${ static.get_platform_name() | n, js_escaped_string }';
+    var fieldsData = ${ fields | n, dump_js_escaped_json },
+    ordersHistoryData = ${ order_history | n, dump_js_escaped_json },
+    authData = ${ auth | n, dump_js_escaped_json },
+    platformName = '${ static.get_platform_name() | n, js_escaped_string }';
 
     AccountSettingsFactory(
         fieldsData,
+        ordersHistoryData,
         authData,
         '${ user_accounts_api_url | n, js_escaped_string }',
         '${ user_preferences_api_url | n, js_escaped_string }',
