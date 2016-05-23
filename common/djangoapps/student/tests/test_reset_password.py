@@ -26,6 +26,7 @@ from student.tests.test_email import mock_render_to_string
 from util.testing import EventTestMixin
 
 from .test_microsite import fake_microsite_get_value
+from openedx.core.djangoapps.theming import helpers as theming_helpers
 
 
 @ddt.ddt
@@ -124,7 +125,7 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
         (subject, msg, from_addr, to_addrs) = send_email.call_args[0]
         self.assertIn("Password reset", subject)
         self.assertIn("You're receiving this e-mail because you requested a password reset", msg)
-        self.assertEquals(from_addr, settings.DEFAULT_FROM_EMAIL)
+        self.assertEquals(from_addr, theming_helpers.get_value('default_from_email', settings.DEFAULT_FROM_EMAIL))
         self.assertEquals(len(to_addrs), 1)
         self.assertIn(self.user.email, to_addrs)
 

@@ -25,6 +25,7 @@ from openedx.core.djangoapps.user_api.models import UserPreference
 from microsite_configuration import microsite
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
+from openedx.core.djangoapps.theming import helpers as theming_helpers
 
 
 log = logging.getLogger(__name__)
@@ -426,7 +427,7 @@ def send_mail_to_student(student, param_dict, language=None):
 
         # Email subject *must not* contain newlines
         subject = ''.join(subject.splitlines())
-        from_address = microsite.get_value(
+        from_address = theming_helpers.get_value(
             'email_from_address',
             settings.DEFAULT_FROM_EMAIL
         )

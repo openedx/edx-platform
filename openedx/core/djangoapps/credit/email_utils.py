@@ -27,6 +27,7 @@ from microsite_configuration import microsite
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
 from openedx.core.djangoapps.credit.models import CreditConfig, CreditProvider
 from xmodule.modulestore.django import modulestore
+from openedx.core.djangoapps.theming import helpers as theming_helpers
 
 
 log = logging.getLogger(__name__)
@@ -124,7 +125,7 @@ def send_credit_notifications(username, course_key):
         notification_msg.attach(logo_image)
 
     # add email addresses of sender and receiver
-    from_address = microsite.get_value('default_from_email', settings.DEFAULT_FROM_EMAIL)
+    from_address = theming_helpers.get_value('default_from_email', settings.DEFAULT_FROM_EMAIL)
     to_address = user.email
 
     # send the root email message

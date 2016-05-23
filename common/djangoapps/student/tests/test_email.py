@@ -22,6 +22,7 @@ from edxmako.tests import mako_middleware_process_request
 from util.request import safe_get_host
 from util.testing import EventTestMixin
 from openedx.core.djangoapps.theming.test_util import with_is_edx_domain
+from openedx.core.djangoapps.theming import helpers as theming_helpers
 
 
 class TestException(Exception):
@@ -57,7 +58,7 @@ class EmailTestMixin(object):
         email_user.assert_called_with(
             mock_render_to_string(subject_template, subject_context),
             mock_render_to_string(body_template, body_context),
-            settings.DEFAULT_FROM_EMAIL
+            theming_helpers.get_value('default_from_email', settings.DEFAULT_FROM_EMAIL)
         )
 
     def append_allowed_hosts(self, hostname):
@@ -298,7 +299,7 @@ class EmailChangeRequestTests(EventTestMixin, TestCase):
         send_mail.assert_called_with(
             mock_render_to_string('emails/email_change_subject.txt', context),
             mock_render_to_string('emails/email_change.txt', context),
-            settings.DEFAULT_FROM_EMAIL,
+            theming_helpers.get_value('default_from_email', settings.DEFAULT_FROM_EMAIL),
             [new_email]
         )
         self.assert_event_emitted(

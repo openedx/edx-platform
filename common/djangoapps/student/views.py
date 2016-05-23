@@ -128,6 +128,7 @@ from openedx.core.djangoapps.credit.email_utils import get_credit_provider_displ
 from openedx.core.djangoapps.user_api.preferences import api as preferences_api
 from openedx.core.djangoapps.programs.utils import get_programs_for_dashboard, get_display_category
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
+from openedx.core.djangoapps.theming import helpers as theming_helpers
 
 
 log = logging.getLogger("edx.student")
@@ -1789,7 +1790,7 @@ def create_account_with_params(request, params):
         subject = ''.join(subject.splitlines())
         message = render_to_string('emails/activation_email.txt', context)
 
-        from_address = microsite.get_value(
+        from_address = theming_helpers.get_value(
             'email_from_address',
             settings.DEFAULT_FROM_EMAIL
         )
@@ -2098,7 +2099,7 @@ def password_reset(request):
     form = PasswordResetFormNoActive(request.POST)
     if form.is_valid():
         form.save(use_https=request.is_secure(),
-                  from_email=microsite.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL),
+                  from_email=theming_helpers.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL),
                   request=request,
                   domain_override=request.get_host())
         # When password change is complete, a "edx.user.settings.changed" event will be emitted.
@@ -2244,9 +2245,13 @@ def reactivation_email_for_user(user):
     message = render_to_string('emails/activation_email.txt', context)
 
     try:
-        user.email_user(subject, message, settings.DEFAULT_FROM_EMAIL)
+        user.email_user(subject, message, theming_helpers.get_value('default_from_email', settings.DEFAULT_FROM_EMAIL))
     except Exception:  # pylint: disable=broad-except
-        log.error(u'Unable to send reactivation email from "%s"', settings.DEFAULT_FROM_EMAIL, exc_info=True)
+        log.error(
+            u'Unable to send reactivation email from "%s"',
+            theming_helpers.get_value('default_from_email', settings.DEFAULT_FROM_EMAIL),
+            exc_info=True
+        )
         return JsonResponse({
             "success": False,
             "error": _('Unable to send reactivation email')
@@ -2304,7 +2309,7 @@ def do_email_change_request(user, new_email, activation_key=None):
 
     message = render_to_string('emails/email_change.txt', context)
 
-    from_address = microsite.get_value(
+    from_address = theming_helpers.get_value(
         'email_from_address',
         settings.DEFAULT_FROM_EMAIL
     )
@@ -2365,7 +2370,11 @@ def confirm_email_change(request, key):  # pylint: disable=unused-argument
         u_prof.save()
         # Send it to the old email...
         try:
-            user.email_user(subject, message, settings.DEFAULT_FROM_EMAIL)
+            user.email_user(
+                subject,
+                message,
+                theming_helpers.get_value('default_from_email', settings.DEFAULT_FROM_EMAIL)
+            )
         except Exception:    # pylint: disable=broad-except
             log.warning('Unable to send confirmation email to old address', exc_info=True)
             response = render_to_response("email_change_failed.html", {'email': user.email})
@@ -2377,7 +2386,11 @@ def confirm_email_change(request, key):  # pylint: disable=unused-argument
         pec.delete()
         # And send it to the new email...
         try:
-            user.email_user(subject, message, settings.DEFAULT_FROM_EMAIL)
+            user.email_user(
+                subject,
+                message,
+                theming_helpers.get_value('default_from_email', settings.DEFAULT_FROM_EMAIL)
+            )
         except Exception:  # pylint: disable=broad-except
             log.warning('Unable to send confirmation email to new address', exc_info=True)
             response = render_to_response("email_change_failed.html", {'email': pec.new_email})
