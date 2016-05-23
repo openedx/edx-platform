@@ -10,6 +10,7 @@ from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import check_mongo_calls
 
+from lms.djangoapps.course_blocks.api import _get_cache
 from lms.djangoapps.course_blocks.api import get_course_blocks
 from lms.djangoapps.course_blocks.transformers.tests.helpers import CourseStructureTestCase
 from ..transformers.grades import GradesTransformer
@@ -76,7 +77,8 @@ class GradesTransformerTestCase(CourseStructureTestCase):
         metadata = metadata or self.problem_metadata
 
         # Special structure-related keys start with '#'.  The rest get passed as
-        # kwargs to Factory.create.  See docstring at super().build_course for details.
+        # kwargs to Factory.create.  See docstring at
+        # `CourseStructureTestCase.build_course` for details.
         return self.build_course([
             {
                 u'org': u'GradesTestOrg',
@@ -122,7 +124,7 @@ class GradesTransformerTestCase(CourseStructureTestCase):
 
         self.assert_collected_xblock_fields(
             block_structure,
-            blocks['problem'].location,
+            blocks[u'problem'].location,
             weight=self.problem_metadata[u'weight'],
             graded=self.problem_metadata[u'graded'],
             has_score=True,
@@ -145,7 +147,7 @@ class GradesTransformerTestCase(CourseStructureTestCase):
 
         self.assert_collected_xblock_fields(
             block_structure,
-            blocks['problem'].location,
+            blocks[u'problem'].location,
             weight=problem_metadata[u'weight'],
             graded=problem_metadata[u'graded'],
             has_score=True,
@@ -243,7 +245,6 @@ class MultiProblemModulestoreAccessTestCase(CourseStructureTestCase, SharedModul
                 }
             )
         blocks = self.build_course(course)
-        from lms.djangoapps.course_blocks.api import _get_cache
         _get_cache().clear()
         with check_mongo_calls(2):
             get_course_blocks(self.student, blocks[u'course'].location, self.transformers)
