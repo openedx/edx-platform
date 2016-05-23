@@ -189,6 +189,10 @@ INSTALLED_APPS += ('coursewarehistoryextended',)
 
 BADGING_BACKEND = 'lms.djangoapps.badges.backends.tests.dummy_backend.DummyBackend'
 
+# Configure the LMS to use our stub eCommerce implementation
+ECOMMERCE_API_URL = 'http://localhost:8043/api/v2/'
+ECOMMERCE_API_SIGNING_KEY = 'ecommerce-key'
+
 #####################################################################
 # Lastly, see if the developer has any local overrides.
 try:

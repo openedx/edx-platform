@@ -444,6 +444,28 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, WebAppTest):
             self.assertEqual(self.account_settings_page.title_for_field(field_id), title)
             self.assertEqual(self.account_settings_page.link_title_for_link_field(field_id), link_title)
 
+    def test_order_history(self):
+        """
+        Test that we can see orders on Order History tab.
+        """
+        # switch to "Order History" tab
+        self.account_settings_page.switch_account_settings_tabs('orders-tab')
+        # verify that we are on correct tab
+        self.assertTrue(self.account_settings_page.is_order_history_tab_visible)
+
+        expected_order_data = {
+            'title': 'Test Course',
+            'date': 'Date Placed:\nApr 21, 2016',
+            'price': 'Cost:\n$100.0',
+            'number': 'Order Number:\nEdx-123'
+        }
+        for field_name, value in expected_order_data.iteritems():
+            self.assertEqual(
+                self.account_settings_page.get_value_of_order_history_row_item('order-Edx-123', field_name), value
+            )
+
+        self.assertTrue(self.account_settings_page.order_button_is_visible('order-Edx-123'))
+
 
 @attr('a11y')
 class AccountSettingsA11yTest(AccountSettingsTestMixin, WebAppTest):
