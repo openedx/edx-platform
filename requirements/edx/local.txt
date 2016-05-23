@@ -9,4 +9,4 @@
 -e common/lib/symmath
 -e common/lib/xmodule
 
--e common/lib/local_xblock/xblock_discussion
+-e common/lib/xblock/xblock_discussion
