@@ -73,7 +73,6 @@ class DiscussionModule(DiscussionFields, XModule):
     js_module_name = "InlineDiscussion"
 
     def get_html(self):
-        course = self.get_course()
         user = None
         user_service = self.runtime.service(self, 'user')
         if user_service:
@@ -90,7 +89,6 @@ class DiscussionModule(DiscussionFields, XModule):
             can_create_thread = False
         context = {
             'discussion_id': self.discussion_id,
-            'course': course,
             'can_create_comment': json.dumps(can_create_comment),
             'can_create_subcomment': json.dumps(can_create_subcomment),
             'can_create_thread': can_create_thread,
@@ -110,10 +108,14 @@ class DiscussionModule(DiscussionFields, XModule):
         cache_key = (user, course_id, permission)
         cached_answer = cache.get(cache_key)
         if cached_answer is not None:
+            print "Cache hit: {}, {}".format(cache_key, cached_answer)
             return cached_answer
 
         has_perm = any(role.has_permission(permission) for role in user.roles.filter(course_id=course_id))
-        cache.set(cache_key, has_perm, 0)
+
+        # Only cache for the duration of this single request
+        cache.set(cache_key, has_perm, timeout=0)
+        print "Cache set {}, {}".format(cache_key, has_perm)
 
         return has_perm
 

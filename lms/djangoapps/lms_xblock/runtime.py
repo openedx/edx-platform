@@ -201,41 +201,11 @@ class CacheService(object):
     """
 
     """
-    def __init__(self, req_cache_root, django_cache=None):
+    def __init__(self, django_cache):
         """
         Create a CacheService that can generate named Caches for XBlocks.
-
-        `req_cache_root` should be a `dict`-like object, and will be where we
-        store the in-memory cached version of various objects during a single
-        request. Each named cache that is returned by `get_cache()` will create
-        a new entry here. So for example, if you did the following from inside
-        an XBlock:
-
-        cache_service = self.runtime.service(self, 'cache')
-        perm_cache = cache_service.get_cache("discussion.permissions")
-        tmpl_cache = cache_service.get_cache("discussion.templates")
-
-        Then `req_cache_root` would look like:
-
-          {
-              "discussion.permissions": {},
-              "discussion.templates": {}
-          }
-
-        `django_cache` is the explicit Django low level cache object we want to
-        use, in case there's a specific named cache that is preferred. By
-        default, it'll just use django.core.cache.cache.
         """
-
-        # Create an entry in the request_cache where we will put all
-        # CacheService generated cache data. We'll further namespace with our
-        # own get_cache() method. So:
-        #
-        # request_cache = {
-        #
-        # }
-        self._local_cache_root = local_cache_root
-        self._django_cache = django_cache or caches['request']
+        self._django_cache = django_cache
 
     def get_cache(self, name):
         """
@@ -245,10 +215,7 @@ class CacheService(object):
         malicious behavior. The `name` parameter should include your XBlock's
         tag as a prefix parameter.
         """
-        if name not in self._request_cache:
-            self._request_cache[name] = {}
-
-        return Cache(name, self._request_cache, self._django_cache)
+        return Cache(name, self._django_cache)
 
 
 class Cache(object):
@@ -263,28 +230,41 @@ class Cache(object):
         cache.set(key, value, timeout)
 
     """
-
-    def __init__(self, name, cache_dict, django_cache):
-        self._cache_dict = cache_dict
+    def __init__(self, name, django_cache):
+        self._name = name
         self._django_cache = django_cache
 
-    def get(self, key):
-        pass
+    def _namespaced_key(self, key):
+        return (self._name, key)
 
-    def get_many(self, keys):
-        pass
+    def get(self, key, default=None, version=None):
+        return self._django_cache.get(
+            self._namespaced_key(key), default=default, version=version
+        )
 
-    def set(self, key, value, timeout, version=1):
-        """
-        Set key -> value mapping in cache.
+    def get_many(self, keys, version=None):
+        namespaced_keys = [self._namespaced_key(key) for key in keys]
+        return self._django_cache.get_many(namespaced_keys, version=version)
 
-        `key` should be hashable
+    def set(self, key, value, timeout=0, version=None):
+        self._django_cache.set(
+            self._namespaced_key(key), value, timeout=timeout, version=version
+        )
 
-        """
-        self._cache_dict[key] = value
+    def set_many(self, kv_dict, timeout=0, version=None):
+        namedspaced_dict = {
+            self._namespaced_key(key): val for key, val in kv_dict.items()
+        }
+        self._django_cache.set_many(
+            namedspaced_dict, timeout=timeout, version=version
+        )
 
-    def set_many(self, kv_dict, timeout):
-        pass
+    def delete(self, key, version=None):
+        self._django_cache.delete(self._namespaced_key(key), version=version)
+
+    def delete_many(self, keys, version=None):
+        namespaced_keys = [self._namespaced_key(key) for key in keys]
+        self._django_cache.delete_many(namespaced_keys, version=version)
 
 
 class LmsModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
@@ -308,8 +288,7 @@ class LmsModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
         services['user_tags'] = UserTagsService(self)
         if badges_enabled():
             services['badging'] = BadgingService(course_id=kwargs.get('course_id'), modulestore=store)
-        services['cache'] = CacheService(request_cache.get_cache("xblock_cache_service"))
-
+        services['cache'] = CacheService(caches['request'])
 
         self.request_token = kwargs.pop('request_token', None)
         super(LmsModuleSystem, self).__init__(**kwargs)

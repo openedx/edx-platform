@@ -77,8 +77,9 @@ class RequestPlusRemoteCache(BaseCache):
     """
     This Django cache backend implements two layers of caching.
 
-    Layer 1 is a threadlocal dictionary that is tied to the life of a given
-    request.
+    The first layer is a threadlocal dictionary that is tied to the life of a
+    given request. The second layer is another named Django cache -- e.g. the
+    "default" entry in settings.CACHES, typically backed by memcached.
 
     Some baseline rules:
 
@@ -90,8 +91,12 @@ class RequestPlusRemoteCache(BaseCache):
     2. Timeouts are ignored for the purposes of the in-memory request cache, but
        do apply to the backing remote cache. One consequence of this is that
        sending an explicit timeout of 0 in `set` or `add` will cause that item
-       to only be cached across the duration of the request and never make it
-       out to the backing remote cache.
+       to only be cached across the duration of the request and will not cause
+       a write to the remote cache.
+
+    3. If you're in a situation where key generation performance is actually a
+       concern (many thousands of lookups), then just use the request cache
+       directly instead of this hybrid.
     """
     def __init__(self, name, params):
         try:
