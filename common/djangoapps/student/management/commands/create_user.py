@@ -116,8 +116,8 @@ class Command(TrackedCommand):
             reg.activate()
             reg.save()
             create_comments_service_user(user)
-        except (AccountValidationError, ValidationError) as e:
-            self.stderr.write(e.message)
+        except (AccountValidationError, ValidationError) as exception:
+            self.stderr.write(exception.message)
             user = User.objects.get(email=options['email'])
         if options['course']:
             CourseEnrollment.enroll(user, course, mode=options['mode'])
