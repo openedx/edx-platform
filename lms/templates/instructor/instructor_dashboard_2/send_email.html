@@ -43,7 +43,7 @@ from openedx.core.djangolib.markup import HTML
             %else:
                 <input type="text" id="id_subject" name="subject" maxlength="128" size="75">
             %endif
-            <span class="tip">${_("(Max 128 characters)")}</span>
+            <span class="tip">${_("(Maximum 128 characters)")}</span>
         </label>
     </li>
     <li>
@@ -57,15 +57,11 @@ from openedx.core.djangolib.markup import HTML
     </li>
   </ul>
  <div class="submit-email-action">
-  <p class="copy">${_("Please try not to email students more than once per week. Before sending your email, consider:")}</p>
-  <ul class="list-advice">
-   <li class="item">${_("Have you read over the email to make sure it says everything you want to say?")}</li>
-   <li class="item">${_("Have you sent the email to yourself first to make sure you're happy with how it's displayed, and that embedded links and images work properly?")}</li>
-  </ul>
+  <p class="copy">${_("We recommend sending learners no more than one email message per week. Before you send your email, review the text carefully and send it to yourself first, so that you can preview the formatting and make sure embedded images and links work correctly.")}</p>
  </div>
  <div class="submit-email-warning">
    <p class="copy"><span style="color: red;"><b>${_("CAUTION!")}</b></span>
-     ${_("Once the 'Send Email' button is clicked, your email will be queued for sending.")}
+     ${_("When you select Send Email, your email message is added to the queue for sending, and cannot be cancelled.")}
    <b>${_("A queued email CANNOT be cancelled.")}</b></p>
 </div>
  <br />
@@ -91,20 +87,20 @@ from openedx.core.djangolib.markup import HTML
 <div class="vert-left email-background" id="section-task-history">
   <h2> ${_("Email Task History")} </h2>
   <div>
-    <p>${_("To see the content of all previously sent emails, click this button:")}</p>
+    <p>${_("To see the content of previously sent emails, click this button:")}</p>
     <br/>
     <input type="button" name="task-history-email-content" value="${_("Sent Email History")}" data-endpoint="${ section_data['email_content_history_url'] }" >
     <div class="content-request-response-error msg msg-warning copy"></div>
     <p>
     <div class="content-history-email-table">
-      <p><em>${_("To read an email, click its subject.")}</em></p>
+      <p><em>${_("To read a sent email message, click its subject.")}</em></p>
       <br/>
       <div class="content-history-table-inner"></div>
     </div>
     <div class="email-messages-wrapper"></div>
   </div>
   <div>
-    <p>${_("To see the status for all bulk email tasks ever submitted for this course, click on this button:")}</p>
+    <p>${_("To see the status for all email tasks submitted for this course, click this button:")}</p>
     <br/>
     <input type="button" name="task-history-email" value="${_("Show Email Task History")}" data-endpoint="${ section_data['email_background_tasks_url'] }" >
     <div class="history-request-response-error msg msg-warning copy"></div>

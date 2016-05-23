@@ -55,7 +55,7 @@ describe "Bulk Email Queueing", ->
           params.success()
         )
         @send_email.$btn_send.click()
-        expect($('.msg-confirm').text()).toEqual('Your email was successfully queued for sending. Please note that for large classes, it may take up to an hour (or more, if other courses are simultaneously sending email) to send all emails.')
+        expect($('.msg-confirm').text()).toEqual('Your email message was successfully queued for sending. In courses with a large number of learners, email messages to learners might take up to an hour to be sent.')
         expect($.ajax).toHaveBeenCalledWith(@ajax_params)
 
     it 'can send a simple message to a multiple targets', ->
@@ -66,7 +66,7 @@ describe "Bulk Email Queueing", ->
         for target in @send_email.$send_to
             target.checked = true
         @send_email.$btn_send.click()
-        expect($('.msg-confirm').text()).toEqual('Your email was successfully queued for sending. Please note that for large classes, it may take up to an hour (or more, if other courses are simultaneously sending email) to send all emails.')
+        expect($('.msg-confirm').text()).toEqual('Your email message was successfully queued for sending. In courses with a large number of learners, email messages to learners might take up to an hour to be sent.')
         expect($.ajax).toHaveBeenCalledWith(@ajax_params)
 
     it 'can handle an error result from the bulk email api', ->

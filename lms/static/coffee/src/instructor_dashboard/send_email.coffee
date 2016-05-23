@@ -55,18 +55,18 @@ class @SendEmail
                 # Validation for keyword substitution
                 validation = KeywordValidator().validate_string body
                 if not validation.is_valid
-                    message = gettext("There are invalid keywords in your email. Please check the following keywords and try again:")
+                    message = gettext("There are invalid keywords in your email. Check the following keywords and try again.")
                     message += "\n" + validation.invalid_keywords.join('\n')
                     alert message
                     return
 
                 target_map = {
                         "myself": gettext("Yourself"),
-                        "staff": gettext("Everyone who is staff or instructor on this course"),
-                        "learners": gettext("All learners enrolled in this course"),
+                        "staff": gettext("Everyone who has staff privileges in this course"),
+                        "learners": gettext("All learners who are enrolled in this course"),
                 }
-                success_message = gettext("Your email was successfully queued for sending. Please note that for large classes, it may take up to an hour (or more, if other courses are simultaneously sending email) to send all emails.")
-                confirm_message = gettext("You are about to send an email titled '<%= subject %>' to the following targets. Is this OK?")
+                success_message = gettext("Your email message was successfully queued for sending. In courses with a large number of learners, email messages to learners might take up to an hour to be sent.")
+                confirm_message = gettext("You are sending an email message with the subject <%-subject %> to the following recipients. Is this OK?")
                 for target in targets
                         confirm_message += "\n\t-" + target_map[target]
                 full_confirm_message = _.template(confirm_message)({subject: subject})
