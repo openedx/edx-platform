@@ -18,7 +18,7 @@ ProgramListFactory({
     certificatesData: ${credentials | n, dump_js_escaped_json},
     userProgress: ${progress | n, dump_js_escaped_json},
     xseriesUrl: '${xseries_url | n, js_escaped_string}',
-    xseriesImage: '${static.url('images/xseries-certificate-visual.png')}'
+    xseriesImage: '${static.url('images/xseries-certificate-visual.png') | n, js_escaped_string}'
 });
 </%static:require_module>
 </%block>
@@ -27,7 +27,6 @@ ProgramListFactory({
 
 <main id="main" aria-label="Content" tabindex="-1">
     <div class="program-list-wrapper grid-container">
-        <h2 class="sr-only">${_("Your Programs")}</h2>
         <div class="program-cards-container col"></div>
         <div class="sidebar col col-last"></div>
     </div>
