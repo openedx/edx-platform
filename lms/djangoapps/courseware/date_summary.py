@@ -111,7 +111,7 @@ class DateSummary(object):
         date_format = _(u"{relative} ago - {absolute}") if date_has_passed else _(u"in {relative} - {absolute}")
         return date_format.format(
             relative=relative_date,
-            absolute=self.date.strftime(self.date_format),
+            absolute=self.date.strftime(self.date_format.encode('utf-8')).decode('utf-8'),
         )
 
     @property
@@ -157,7 +157,9 @@ class TodaysDate(DateSummary):
 
     @property
     def title(self):
-        return _(u'Today is {date}').format(date=datetime.now(pytz.UTC).strftime(self.date_format))
+        return _(u'Today is {date}').format(
+            date=datetime.now(pytz.UTC).strftime(self.date_format.encode('utf-8')).decode('utf-8')
+        )
 
 
 class CourseStartDate(DateSummary):
