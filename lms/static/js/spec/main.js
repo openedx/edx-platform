@@ -714,6 +714,7 @@
         'js/spec/learner_dashboard/collection_list_view_spec.js',
         'js/spec/learner_dashboard/program_card_view_spec.js',
         'js/spec/learner_dashboard/sidebar_view_spec.js',
+        'js/spec/learner_dashboard/program_details_header_spec.js',
         'js/spec/markdown_editor_spec.js',
         'js/spec/navigation_spec.js',
         'js/spec/search/search_spec.js',
