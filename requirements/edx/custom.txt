@@ -16,7 +16,7 @@
 -e git+https://github.com/OfficeDev/xblock-officemix.git@86238f5968a08db005717dbddc346808f1ed3716#egg=xblock-officemix
 -e git+https://github.com/edx-solutions/xblock.git@d25a661454da9e6b149d6c559de50ddcd0770857#egg=xblock
 git+https://github.com/edx-solutions/progress-edx-platform-extensions.git@1.0.0#egg=progress-edx-platform-extensions==1.0.0
-git+https://github.com/edx-solutions/organizations-edx-platform-extensions.git@v1.0.0#egg=organizations-edx-platform-extensions==1.0.0
+git+https://github.com/edx-solutions/organizations-edx-platform-extensions.git@v1.0.1#egg=organizations-edx-platform-extensions==1.0.1
 git+https://github.com/edx-solutions/gradebook-edx-platform-extensions.git@1.0.0#egg=gradebook-edx-platform-extensions==1.0.0
-git+https://github.com/edx-solutions/projects-edx-platform-extensions.git@v1.0.0#egg=projects-edx-platform-extensions==1.0.0
+git+https://github.com/edx-solutions/projects-edx-platform-extensions.git@v1.0.1#egg=projects-edx-platform-extensions==1.0.1
 git+https://github.com/mckinseyacademy/xblock-diagnosticfeedback.git@v0.2.1#egg=xblock-diagnostic-feedback==0.2.1

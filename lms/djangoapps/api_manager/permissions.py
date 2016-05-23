@@ -171,9 +171,16 @@ class SecureListAPIView(PermissionMixin,
             return super(SecureListAPIView, self).get_paginate_by()
 
 
-class APIModelViewSet(PaginationMixin, viewsets.ModelViewSet):
+class SecureModelViewSet(PermissionMixin, viewsets.ModelViewSet):
     """
-    ModelViewSet used for pagination
+    ModelViewSet used for protecting access to specific workflows
+    """
+    pass
+
+
+class SecurePaginatedModelViewSet(PaginationMixin, SecureModelViewSet):
+    """
+    ModelViewSet used for pagination and protecting access to specific workflows
     """
     def get_paginate_by(self):  # pylint: disable=W0221
         """
@@ -183,4 +190,4 @@ class APIModelViewSet(PaginationMixin, viewsets.ModelViewSet):
         if page_size and int(page_size) == 0:
             return None
         else:
-            return super(APIModelViewSet, self).get_paginate_by()
+            return super(SecurePaginatedModelViewSet, self).get_paginate_by()
