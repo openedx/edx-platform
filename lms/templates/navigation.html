@@ -49,13 +49,21 @@ site_status_msg = get_site_status_msg(course_id)
 </%block>
   <header id="global-navigation" class="header-global ${"slim" if course else ""}" >
     <nav class="wrapper-header" aria-label="${_('Global')}">
-    <h1 class="logo">
-      <a href="${marketing_link('ROOT')}">
-        <%block name="navigation_logo">
-            <img src="${static.url(branding_api.get_logo_url())}" alt="${_("{platform_name} Home Page").format(platform_name=static.get_platform_name())}"/>
-        </%block>
-      </a>
-    </h1>
+      <h1 class="logo">
+
+      <%block name="navigation_logo">
+        % if user.is_authenticated():
+          <a href="${reverse('dashboard')}">
+            <img src="${static.url(branding_api.get_logo_url())}" alt=${_("Your Dashboard")}/>
+          </a>
+        % else:
+          <a href="${marketing_link('ROOT')}">
+            <img src="${static.url(branding_api.get_logo_url())}"
+                 alt="${_("{platform_name} Home Page").format(platform_name=static.get_platform_name())}"/>
+          </a>
+        % endif
+      </%block>
+      </h1>
 
     % if course:
       <h2 class="course-header"><span class="provider">${course.display_org_with_default}:</span>

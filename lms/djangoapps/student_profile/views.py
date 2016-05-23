@@ -12,6 +12,7 @@ from django.contrib.staticfiles.storage import staticfiles_storage
 from badges.utils import badges_enabled
 from edxmako.shortcuts import render_to_response, marketing_link
 from microsite_configuration import microsite
+from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.user_api.accounts.api import get_account_settings
 from openedx.core.djangoapps.user_api.errors import UserNotFound, UserNotAuthorized
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preferences
@@ -95,6 +96,7 @@ def learner_profile_context(request, profile_username, user_is_staff):
             'platform_name': microsite.get_value('platform_name', settings.PLATFORM_NAME),
         },
         'disable_courseware_js': True,
+        'show_program_listing': ProgramsApiConfig.current().show_program_listing,
     }
 
     if badges_enabled():

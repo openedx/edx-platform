@@ -19,6 +19,7 @@ from django.test.utils import override_settings
 from django.http import HttpRequest
 
 from course_modes.models import CourseMode
+from openedx.core.djangoapps.programs.tests.mixins import ProgramsApiConfigMixin
 from openedx.core.djangoapps.user_api.accounts.api import activate_account, create_account
 from openedx.core.djangoapps.user_api.accounts import EMAIL_MAX_LENGTH
 from openedx.core.djangolib.js_utils import dump_js_escaped_json
@@ -442,7 +443,7 @@ class StudentAccountLoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMi
         })
 
 
-class AccountSettingsViewTest(ThirdPartyAuthTestMixin, TestCase):
+class AccountSettingsViewTest(ThirdPartyAuthTestMixin, TestCase, ProgramsApiConfigMixin):
     """ Tests for the account settings view. """
 
     USERNAME = 'student'
@@ -456,6 +457,7 @@ class AccountSettingsViewTest(ThirdPartyAuthTestMixin, TestCase):
         'year_of_birth',
         'preferred_language',
     ]
+    view_path = reverse('account_settings')
 
     @mock.patch("django.conf.settings.MESSAGE_STORAGE", 'django.contrib.messages.storage.cookie.CookieStorage')
     def setUp(self):
@@ -502,11 +504,28 @@ class AccountSettingsViewTest(ThirdPartyAuthTestMixin, TestCase):
 
     def test_view(self):
 
-        view_path = reverse('account_settings')
-        response = self.client.get(path=view_path)
+        response = self.client.get(path=self.view_path)
 
         for attribute in self.FIELDS:
             self.assertIn(attribute, response.content)
+
+    def test_header_with_programs_listing_enabled(self):
+        """
+        Verify that tabs header will be shown while program listing is enabled.
+        """
+        self.create_programs_config(program_listing_enabled=True)
+        response = self.client.get(path=self.view_path)
+
+        self.assertContains(response, '<li class="tab-nav-item">')
+
+    def test_header_with_programs_listing_disabled(self):
+        """
+        Verify that nav header will be shown while program listing is disabled.
+        """
+        self.create_programs_config(program_listing_enabled=False)
+        response = self.client.get(path=self.view_path)
+
+        self.assertContains(response, '<li class="item nav-global-01">')
 
 
 @override_settings(SITE_NAME=settings.MICROSITE_LOGISTRATION_HOSTNAME)
