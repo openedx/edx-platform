@@ -188,7 +188,7 @@ class InstructorTaskCourseSubmitTest(TestReportMixin, InstructorTaskCourseTestCa
 
     def _define_course_email(self):
         """Create CourseEmail object for testing."""
-        course_email = CourseEmail.create(self.course.id, self.instructor, SEND_TO_ALL, "Test Subject", "<p>This is a test message</p>")
+        course_email = CourseEmail.create(self.course.id, self.instructor, [SEND_TO_ALL], "Test Subject", "<p>This is a test message</p>")
         return course_email.id
 
     def _test_resubmission(self, api_call):

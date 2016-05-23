@@ -140,7 +140,7 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
         BulkEmailFlag.objects.create(enabled=True, require_course_email_auth=True)
         test_email = {
             'action': 'Send email',
-            'send_to': 'myself',
+            'send_to': '["myself"]',
             'subject': 'test subject for myself',
             'message': 'test message for myself'
         }
@@ -157,7 +157,7 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
         # (in the setUp method), we can test sending an email.
         test_email = {
             'action': 'send',
-            'send_to': 'myself',
+            'send_to': '["myself"]',
             'subject': 'test subject for myself',
             'message': 'test message for myself'
         }
@@ -186,7 +186,7 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
         # (in the setUp method), we can test sending an email.
         test_email = {
             'action': 'Send email',
-            'send_to': 'staff',
+            'send_to': '["staff"]',
             'subject': 'test subject for staff',
             'message': 'test message for subject'
         }
@@ -210,7 +210,7 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
 
         test_email = {
             'action': 'Send email',
-            'send_to': 'all',
+            'send_to': '["all"]',
             'subject': 'test subject for all',
             'message': 'test message for all'
         }
@@ -271,7 +271,7 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
         uni_subject = u'téśt śúbjéćt főŕ áĺĺ'
         test_email = {
             'action': 'Send email',
-            'send_to': 'all',
+            'send_to': '["all"]',
             'subject': uni_subject,
             'message': 'test message for all'
         }
@@ -300,7 +300,7 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
 
         test_email = {
             'action': 'Send email',
-            'send_to': 'all',
+            'send_to': '["all"]',
             'subject': 'test subject for all',
             'message': 'test message for all'
         }
@@ -324,7 +324,7 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
         """
         test_email = {
             'action': 'Send email',
-            'send_to': 'myself',
+            'send_to': '["myself"]',
             'subject': 'test subject for self',
             'message': 'test message for self'
         }
@@ -397,7 +397,7 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
 
         test_email = {
             'action': 'Send email',
-            'send_to': 'all',
+            'send_to': '["all"]',
             'subject': 'test subject for all',
             'message': 'test message for all'
         }
@@ -435,7 +435,7 @@ class TestEmailSendFromDashboard(EmailSendFromDashboardTestCase):
         uni_message = u'ẗëṡẗ ṁëṡṡäġë ḟöṛ äḷḷ ｲ乇丂ｲ ﾶ乇丂丂ﾑg乇 ｷo尺 ﾑﾚﾚ тэѕт мэѕѕаБэ fоѓ аll'
         test_email = {
             'action': 'Send email',
-            'send_to': 'all',
+            'send_to': '["all"]',
             'subject': 'test subject for all',
             'message': uni_message
         }
