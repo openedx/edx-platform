@@ -196,6 +196,9 @@ class GradesTransformerTestCase(CourseStructureTestCase):
 
 
 class MultiProblemModulestoreAccessTestCase(CourseStructureTestCase, SharedModuleStoreTestCase):
+    """
+    Test mongo usage in GradesTransformer.
+    """
 
     TRANSFORMER_CLASS_TO_TEST = GradesTransformer
 
@@ -206,6 +209,10 @@ class MultiProblemModulestoreAccessTestCase(CourseStructureTestCase, SharedModul
         self.client.login(username=self.student.username, password=password)
 
     def test_modulestore_performance(self):
+        """
+        Test that a constant number of mongo calls are made regardless of how
+        many grade-related blocks are in the course.
+        """
         course = [
             {
                 u'org': u'GradesTestOrg',
