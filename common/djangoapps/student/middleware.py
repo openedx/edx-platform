@@ -49,7 +49,6 @@ class UserCourseFilteringMiddleware(object):
     """
     Checks that a user does in fact belong to the course ORG they are requesting
     to view/edit. Returns a 403 if the user does not belong to the same ORG.
-    NB THIS WILL LIKELY ONLY BE USED IN STUDIO WE DO NOT WANT THIS APPLIED TO LMS
     """
     def process_request(self, request):
         user = request.user
@@ -82,7 +81,7 @@ class UserCourseFilteringMiddleware(object):
 	    except InvalidKeyError:
 		return None
 
-        course_key = course_id_from_url(request.path)
+        course_id = course_id_from_url(request.path)
         course_org = Organization.objects.filter(
             organizationcourse__course_id=course_id).values().first()
 
@@ -100,5 +99,3 @@ class UserCourseFilteringMiddleware(object):
                 ),
               )
               return HttpResponseForbidden(msg)
-        else:
-          print("User or Course is not affiliated so who cares.")
