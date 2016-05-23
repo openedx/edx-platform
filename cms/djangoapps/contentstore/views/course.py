@@ -383,13 +383,20 @@ def _accessible_courses_summary_list(request):
     return courses_summary, in_process_course_actions
 
 
-def _user_in_same_org(user, course_id):
+def _get_user_org(user):
     """
-    Checks if user ORG matches course ORG
+    Gets the organization associated with this user.
     """
     user_org = Organization.objects.filter(
         organizationuser__active=True, 
         organizationuser__user_id_id=user.id).values().first()
+    return user_org
+
+def _user_in_same_org(user, course_id):
+    """
+    Checks if user ORG matches course ORG
+    """
+    user_org = _get_user_org(user)
 
     course_org = Organization.objects.filter(
         organizationcourse__course_id=course_id).values().first()
@@ -539,6 +546,7 @@ def course_listing(request):
         'libraries': [format_library_for_view(lib) for lib in libraries],
         'show_new_library_button': LIBRARIES_ENABLED and request.user.is_active,
         'user': request.user,
+        'user_organization': _get_user_org(request.user),
         'request_course_creator_url': reverse('contentstore.views.request_course_creator'),
         'course_creator_status': _get_course_creator_status(request.user),
         'rerun_creator_status': GlobalStaff().has_user(request.user),
