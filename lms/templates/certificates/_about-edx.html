@@ -1,9 +1,22 @@
 <%! from django.utils.translation import ugettext as _ %>
-<section class="about-item about-edx">
+
+## FUN 2930-fix-certificate-template (overload width, CSS and company_about_description)
+<%
+    company_about_description = "The Public Interest Group (GIP) FUN-MOOC is the operator of the platform FUN.<br>" \
+    "Its missions are:" \
+    "<ul>" \
+    "<li>Supporting the development of training, taking full advantage of the digital leverage, and accessible to all</li>" \
+    "<li>Encouraging to place digital learning at the heart of student backgrounds, professions of higher education and research</li>" \
+    "<li>Provide shared facilities and services supporting institutions' digital initiatives</li>" \
+    "<li>Promote the visibility of the French service offering in training and digital resources</li>" \
+    "</ul>"""
+%>
+
+<section class="about-item about-edx" style="width: 100% !important;">
     <h2 class="about-edx-title hd-4">${company_about_title}</h2>
 
     <div class="about-edx-copy copy copy-meta">
-        <p>${company_about_description}</p>
+        <p>${_(company_about_description)}</p>
 
         <a class="action" href="${company_about_url}">${company_about_urltext}</a>
     </div>
