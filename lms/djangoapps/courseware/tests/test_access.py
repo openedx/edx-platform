@@ -30,7 +30,6 @@ from courseware.tests.factories import (
 )
 import courseware.views.views as views
 from courseware.tests.helpers import LoginEnrollmentTestCase
-from edxmako.tests import mako_middleware_process_request
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from student.models import CourseEnrollment
 from student.roles import CourseCcxCoachRole
@@ -137,21 +136,13 @@ class CoachAccessTestCaseCCX(SharedModuleStoreTestCase, LoginEnrollmentTestCase)
         CourseEnrollment.enroll(student, ccx_locator)
 
         # Test for access of a coach
-        request = self.request_factory.get(reverse('about_course', args=[unicode(ccx_locator)]))
-        request.user = self.coach
-        mako_middleware_process_request(request)
-        resp = views.progress(request, course_id=unicode(ccx_locator), student_id=student.id)
+        resp = self.client.get(reverse('student_progress', args=[unicode(ccx_locator), student.id]))
         self.assertEqual(resp.status_code, 200)
 
         # Assert access of a student
-        request = self.request_factory.get(reverse('about_course', args=[unicode(ccx_locator)]))
-        request.user = student
-        mako_middleware_process_request(request)
-
-        with self.assertRaises(Http404) as context:
-            views.progress(request, course_id=unicode(ccx_locator), student_id=self.coach.id)
-
-        self.assertIsNotNone(context.exception)
+        self.client.login(username=student.username, password='test')
+        resp = self.client.get(reverse('student_progress', args=[unicode(ccx_locator), self.coach.id]))
+        self.assertEqual(resp.status_code, 404)
 
 
 @attr('shard_1')
