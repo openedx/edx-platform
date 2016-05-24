@@ -1001,6 +1001,7 @@ class @HTMLEditingDescriptor
   _validateString = (string) ->
     regexp = /%%[^%\s]+%%/g
     keywordsSupported = [
+      '%%USERNAME%%',
       '%%USER_ID%%',
       '%%USER_FULLNAME%%',
       '%%COURSE_DISPLAY_NAME%%',

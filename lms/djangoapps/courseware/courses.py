@@ -316,6 +316,7 @@ def get_course_info_section(request, course, section_key):
         try:
             html = info_module.render(STUDENT_VIEW).content
             context = {
+                'username': request.user.username,
                 'user_id': request.user.id,
                 'name': request.user.profile.name,
                 'course_title': course.display_name,
