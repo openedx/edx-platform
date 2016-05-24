@@ -104,7 +104,7 @@ else:
 
   % if cert_status['show_download_url'] and enrollment.mode == 'verified' and cert_status['mode'] == 'honor':
   <div class="certificate-explanation">
-      ${_('Since we did not have a valid set of verification photos from you when your {cert_name_long} was generated, we could not grant you a verified {cert_name_short}. An honor code {cert_name_short} has been granted instead.').format(cert_name_short=cert_name_short, cert_name_long=cert_name_long)}
+      ${_('Your verified certificate is waiting to be generated or you have not met the conditions to obtain a certificate. <br>However, you can download the attestation of achievement.')}
   </div>
   % endif
 % endif
