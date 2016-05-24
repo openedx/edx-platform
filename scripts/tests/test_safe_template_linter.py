@@ -9,7 +9,7 @@ from StringIO import StringIO
 import textwrap
 from unittest import TestCase
 
-from ..safe_template_linter import (
+from scripts.safe_template_linter import (
     _lint, FileResults, JavaScriptLinter, MakoTemplateLinter, ParseString,
     StringLines, PythonLinter, SummaryResults, UnderscoreTemplateLinter, Rules
 )
@@ -72,8 +72,14 @@ class TestLinter(TestCase):
             rules = data['rule']
         elif data['rule'] is not None:
             rules.append(data['rule'])
-        self.assertEqual(len(results.violations), len(rules))
         results.violations.sort(key=lambda violation: violation.sort_key())
+
+        # Print violations if the lengths are different.
+        if len(results.violations) != len(rules):
+            for violation in results.violations:
+                print("Found violation: {}".format(violation.rule))
+
+        self.assertEqual(len(results.violations), len(rules))
         for violation, rule in zip(results.violations, rules):
             self.assertEqual(violation.rule, rule)
 
@@ -91,6 +97,10 @@ class TestSafeTemplateLinter(TestCase):
         self.patch_is_valid_directory(JavaScriptLinter)
         self.patch_is_valid_directory(UnderscoreTemplateLinter)
         self.patch_is_valid_directory(PythonLinter)
+
+        patcher = mock.patch('scripts.safe_template_linter.is_skip_dir', return_value=False)
+        patcher.start()
+        self.addCleanup(patcher.stop)
 
     def patch_is_valid_directory(self, linter_class):
         """
@@ -358,6 +368,22 @@ class TestMakoTemplateLinter(TestLinter):
         self.assertEqual(results.violations[0].rule, Rules.python_deprecated_display_name)
 
     @data(
+        {
+            # Python blocks between <% ... %> use the same Python linting as
+            # Mako expressions between ${ ... }. This single test verifies
+            # that these blocks are linted. The individual linting rules are
+            # tested in the Mako expression tests that follow.
+            'expression':
+                textwrap.dedent("""
+                    <%
+                        a_link_start = '<a class="link-courseURL" rel="external" href="'
+                        a_link_end = '">' + _("your course summary page") + '</a>'
+                        a_link = a_link_start + lms_link_for_about_page + a_link_end
+                        text = _("Introductions, prerequisites, FAQs that are used on %s (formatted in HTML)") % a_link
+                    %>
+                """),
+            'rule': [Rules.python_wrap_html, Rules.python_concat_html, Rules.python_wrap_html]
+        },
         {
             'expression':
                 textwrap.dedent("""

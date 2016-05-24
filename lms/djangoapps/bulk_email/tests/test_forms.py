@@ -3,10 +3,9 @@
 Unit tests for bulk-email-related forms.
 """
 from django.conf import settings
-from mock import patch
 from nose.plugins.attrib import attr
 
-from bulk_email.models import CourseAuthorization, CourseEmailTemplate
+from bulk_email.models import CourseEmailTemplate, BulkEmailFlag
 from bulk_email.forms import CourseAuthorizationAdminForm, CourseEmailTemplateForm
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -23,11 +22,15 @@ class CourseAuthorizationFormTest(ModuleStoreTestCase):
         super(CourseAuthorizationFormTest, self).setUp()
         course_title = u"ẗëṡẗ title ｲ乇丂ｲ ﾶ乇丂丂ﾑg乇 ｷo尺 ﾑﾚﾚ тэѕт мэѕѕаБэ"
         self.course = CourseFactory.create(display_name=course_title)
+        BulkEmailFlag.objects.create(enabled=True, require_course_email_auth=True)
 
-    @patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': True})
+    def tearDown(self):
+        super(CourseAuthorizationFormTest, self).tearDown()
+        BulkEmailFlag.objects.all().delete()
+
     def test_authorize_mongo_course(self):
         # Initially course shouldn't be authorized
-        self.assertFalse(CourseAuthorization.instructor_email_enabled(self.course.id))
+        self.assertFalse(BulkEmailFlag.feature_enabled(self.course.id))
         # Test authorizing the course, which should totally work
         form_data = {'course_id': self.course.id.to_deprecated_string(), 'email_enabled': True}
         form = CourseAuthorizationAdminForm(data=form_data)
@@ -35,12 +38,11 @@ class CourseAuthorizationFormTest(ModuleStoreTestCase):
         self.assertTrue(form.is_valid())
         form.save()
         # Check that this course is authorized
-        self.assertTrue(CourseAuthorization.instructor_email_enabled(self.course.id))
+        self.assertTrue(BulkEmailFlag.feature_enabled(self.course.id))
 
-    @patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': True})
     def test_repeat_course(self):
         # Initially course shouldn't be authorized
-        self.assertFalse(CourseAuthorization.instructor_email_enabled(self.course.id))
+        self.assertFalse(BulkEmailFlag.feature_enabled(self.course.id))
         # Test authorizing the course, which should totally work
         form_data = {'course_id': self.course.id.to_deprecated_string(), 'email_enabled': True}
         form = CourseAuthorizationAdminForm(data=form_data)
@@ -48,7 +50,7 @@ class CourseAuthorizationFormTest(ModuleStoreTestCase):
         self.assertTrue(form.is_valid())
         form.save()
         # Check that this course is authorized
-        self.assertTrue(CourseAuthorization.instructor_email_enabled(self.course.id))
+        self.assertTrue(BulkEmailFlag.feature_enabled(self.course.id))
 
         # Now make a new course authorization with the same course id that tries to turn email off
         form_data = {'course_id': self.course.id.to_deprecated_string(), 'email_enabled': False}
@@ -66,9 +68,8 @@ class CourseAuthorizationFormTest(ModuleStoreTestCase):
             form.save()
 
         # Course should still be authorized (invalid attempt had no effect)
-        self.assertTrue(CourseAuthorization.instructor_email_enabled(self.course.id))
+        self.assertTrue(BulkEmailFlag.feature_enabled(self.course.id))
 
-    @patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': True})
     def test_form_typo(self):
         # Munge course id
         bad_id = SlashSeparatedCourseKey(u'Broken{}'.format(self.course.id.org), 'hello', self.course.id.run + '_typo')
@@ -89,7 +90,6 @@ class CourseAuthorizationFormTest(ModuleStoreTestCase):
         ):
             form.save()
 
-    @patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': True})
     def test_form_invalid_key(self):
         form_data = {'course_id': "asd::**!@#$%^&*())//foobar!!", 'email_enabled': True}
         form = CourseAuthorizationAdminForm(data=form_data)
@@ -107,7 +107,6 @@ class CourseAuthorizationFormTest(ModuleStoreTestCase):
         ):
             form.save()
 
-    @patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': True})
     def test_course_name_only(self):
         # Munge course id - common
         form_data = {'course_id': self.course.id.run, 'email_enabled': True}

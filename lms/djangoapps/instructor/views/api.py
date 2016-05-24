@@ -91,7 +91,7 @@ from submissions import api as sub_api  # installed from the edx-submissions rep
 from certificates import api as certs_api
 from certificates.models import CertificateWhitelist, GeneratedCertificate, CertificateStatuses, CertificateInvalidation
 
-from bulk_email.models import CourseEmail
+from bulk_email.models import CourseEmail, BulkEmailFlag
 from student.models import get_user_by_username_or_email
 
 from .tools import (
@@ -104,7 +104,6 @@ from .tools import (
     parse_datetime,
     set_due_date_extension,
     strip_if_string,
-    bulk_email_is_enabled_for_course,
 )
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
@@ -1113,7 +1112,7 @@ def get_sale_order_records(request, course_id):  # pylint: disable=unused-argume
     db_columns = [x[0] for x in query_features]
     csv_columns = [x[1] for x in query_features]
     sale_data = instructor_analytics.basic.sale_order_record_features(course_id, db_columns)
-    header, datarows = instructor_analytics.csvs.format_dictlist(sale_data, db_columns)  # pylint: disable=unused-variable
+    __, datarows = instructor_analytics.csvs.format_dictlist(sale_data, db_columns)
     return instructor_analytics.csvs.create_csv_response("e-commerce_sale_order_records.csv", csv_columns, datarows)
 
 
@@ -2491,7 +2490,7 @@ def send_email(request, course_id):
     """
     course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
 
-    if not bulk_email_is_enabled_for_course(course_id):
+    if not BulkEmailFlag.feature_enabled(course_id):
         return HttpResponseForbidden("Email is not enabled for this course.")
 
     send_to = request.POST.get("send_to")

@@ -6,6 +6,11 @@ from pavelib.utils.test import utils as test_utils
 from pavelib.utils.test.suites.suite import TestSuite
 from pavelib.utils.envs import Env
 
+try:
+    from pygments.console import colorize
+except ImportError:
+    colorize = lambda color, text: text
+
 __test__ = False  # do not collect
 
 
@@ -33,6 +38,7 @@ class NoseTestSuite(TestSuite):
         self.test_ids = self.test_id_dir / 'noseids'
         self.extra_args = kwargs.get('extra_args', '')
         self.cov_args = kwargs.get('cov_args', '')
+        self.use_ids = True
 
     def __enter__(self):
         super(NoseTestSuite, self).__enter__()
@@ -101,6 +107,9 @@ class NoseTestSuite(TestSuite):
         if self.pdb:
             opts += " --pdb"
 
+        if self.use_ids:
+            opts += " --with-id"
+
         return opts
 
 
@@ -113,25 +122,49 @@ class SystemTestSuite(NoseTestSuite):
         self.test_id = kwargs.get('test_id', self._default_test_id)
         self.fasttest = kwargs.get('fasttest', False)
 
+        self.processes = kwargs.get('processes', None)
+        self.randomize = kwargs.get('randomize', None)
+
+        if self.processes is None:
+            # Use one process per core for LMS tests, and no multiprocessing
+            # otherwise.
+            self.processes = 0
+
+        self.processes = int(self.processes)
+
+        if self.randomize is None:
+            self.randomize = False
+
+        if self.processes != 0 and self.verbosity > 1:
+            print colorize(
+                'red',
+                "The TestId module and multiprocessing module can't be run "
+                "together in verbose mode. Disabling TestId for {} tests.".format(self.root)
+            )
+            self.use_ids = False
+
     def __enter__(self):
         super(SystemTestSuite, self).__enter__()
 
     @property
     def cmd(self):
-        cmd = (
-            './manage.py {system} test --verbosity={verbosity} '
-            '{test_id} {test_opts} --settings=test {extra} '
-            '--with-xunit --xunit-file={xunit_report}'.format(
-                system=self.root,
-                verbosity=self.verbosity,
-                test_id=self.test_id,
-                test_opts=self.test_options_flags,
-                extra=self.extra_args,
-                xunit_report=self.report_dir / "nosetests.xml",
-            )
-        )
 
-        return self._under_coverage_cmd(cmd)
+        cmd = [
+            './manage.py', self.root, 'test',
+            '--verbosity={}'.format(self.verbosity),
+            self.test_id,
+            self.test_options_flags,
+            '--settings=test',
+            self.extra_args,
+            '--with-xunitmp',
+            '--xunitmp-file={}'.format(self.report_dir / "nosetests.xml"),
+            '--processes={}'.format(self.processes),
+            '--with-database-isolation',
+        ]
+        if self.randomize:
+            cmd.append('--with-randomly')
+
+        return self._under_coverage_cmd(" ".join(cmd))
 
     @property
     def _default_test_id(self):

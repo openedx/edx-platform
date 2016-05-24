@@ -11,6 +11,7 @@ import unittest
 from datetime import datetime, timedelta
 from HTMLParser import HTMLParser
 from nose.plugins.attrib import attr
+from freezegun import freeze_time
 
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
@@ -18,6 +19,7 @@ from django.core.urlresolvers import reverse
 from django.http import Http404, HttpResponseBadRequest
 from django.test import TestCase
 from django.test.client import RequestFactory
+from django.test.client import Client
 from django.test.utils import override_settings
 from mock import MagicMock, patch, create_autospec, Mock
 from opaque_keys.edx.locations import Location, SlashSeparatedCourseKey
@@ -37,7 +39,7 @@ from course_modes.tests.factories import CourseModeFactory
 from courseware.model_data import set_score
 from courseware.module_render import toc_for_course
 from courseware.testutils import RenderXBlockTestMixin
-from courseware.tests.factories import StudentModuleFactory
+from courseware.tests.factories import StudentModuleFactory, GlobalStaffFactory
 from courseware.url_helpers import get_redirect_url
 from courseware.user_state_client import DjangoXBlockUserStateClient
 from courseware.views.index import render_accordion, CoursewareIndex
@@ -194,7 +196,7 @@ class ViewsTestCase(ModuleStoreTestCase):
 
     def setUp(self):
         super(ViewsTestCase, self).setUp()
-        self.course = CourseFactory.create(display_name=u'teꜱᴛ course')
+        self.course = CourseFactory.create(display_name=u'teꜱᴛ course', run="Testing_course")
         self.chapter = ItemFactory.create(
             category='chapter',
             parent_location=self.course.location,
@@ -321,6 +323,105 @@ class ViewsTestCase(ModuleStoreTestCase):
         self.assertNotIn('Problem 1', response.content)
         self.assertNotIn('Problem 2', response.content)
 
+    def _create_global_staff_user(self):
+        """
+        Create global staff user and log them in
+        """
+        self.global_staff = GlobalStaffFactory.create()  # pylint: disable=attribute-defined-outside-init
+        self.client.login(username=self.global_staff.username, password='test')
+
+    def _create_url_for_enroll_staff(self):
+        """
+        creates the courseware url and enroll staff url
+        """
+        # create the _next parameter
+        courseware_url = reverse(
+            'courseware_section',
+            kwargs={
+                'course_id': unicode(self.course_key),
+                'chapter': unicode(self.chapter.location.name),
+                'section': unicode(self.section.location.name),
+            }
+        )
+        # create the url for enroll_staff view
+        enroll_url = "{enroll_url}?next={courseware_url}".format(
+            enroll_url=reverse('enroll_staff', kwargs={'course_id': unicode(self.course.id)}),
+            courseware_url=courseware_url
+        )
+        return courseware_url, enroll_url
+
+    @ddt.data(
+        ({'enroll': "Enroll"}, True),
+        ({'dont_enroll': "Don't enroll"}, False))
+    @ddt.unpack
+    def test_enroll_staff_redirection(self, data, enrollment):
+        """
+        Verify unenrolled staff is redirected to correct url.
+        """
+        self._create_global_staff_user()
+        courseware_url, enroll_url = self._create_url_for_enroll_staff()
+        response = self.client.post(enroll_url, data=data, follow=True)
+        self.assertEqual(response.status_code, 200)
+
+        # we were redirected to our current location
+        self.assertIn(302, response.redirect_chain[0])
+        self.assertEqual(len(response.redirect_chain), 1)
+        if enrollment:
+            self.assertRedirects(response, courseware_url)
+        else:
+            self.assertRedirects(response, '/courses/{}/about'.format(unicode(self.course_key)))
+
+    def test_enroll_staff_with_invalid_data(self):
+        """
+        If we try to post with an invalid data pattern, then we'll redirected to
+        course about page.
+        """
+        self._create_global_staff_user()
+        __, enroll_url = self._create_url_for_enroll_staff()
+        response = self.client.post(enroll_url, data={'test': "test"})
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, '/courses/{}/about'.format(unicode(self.course_key)))
+
+    def test_courseware_redirection(self):
+        """
+        Tests that a global staff member is redirected to the staff enrollment page.
+
+        Un-enrolled Staff user should be redirected to the staff enrollment page accessing courseware,
+        user chooses to enroll in the course. User is enrolled and redirected to the requested url.
+
+        Scenario:
+            1. Un-enrolled staff tries to access any course vertical (courseware url).
+            2. User is redirected to the staff enrollment page.
+            3. User chooses to enroll in the course.
+            4. User is enrolled in the course and redirected to the requested courseware url.
+        """
+        self._create_global_staff_user()
+        courseware_url, enroll_url = self._create_url_for_enroll_staff()
+
+        # Accessing the courseware url in which not enrolled & redirected to staff enrollment page
+        response = self.client.get(courseware_url, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(302, response.redirect_chain[0])
+        self.assertEqual(len(response.redirect_chain), 1)
+        self.assertRedirects(response, enroll_url)
+
+        # Accessing the enroll staff url and verify the correct url
+        response = self.client.get(enroll_url)
+        self.assertEqual(response.status_code, 200)
+        response_content = response.content
+        self.assertIn('Enroll', response_content)
+        self.assertIn("dont_enroll", response_content)
+
+        # Post the valid data to enroll the staff in the course
+        response = self.client.post(enroll_url, data={'enroll': "Enroll"}, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(302, response.redirect_chain[0])
+        self.assertEqual(len(response.redirect_chain), 1)
+        self.assertRedirects(response, courseware_url)
+
+        # Verify staff has been enrolled to the given course
+        self.assertTrue(CourseEnrollment.is_enrolled(self.global_staff, self.course.id))
+
     @unittest.skipUnless(settings.FEATURES.get('ENABLE_SHOPPING_CART'), "Shopping Cart not enabled in settings")
     @patch.dict(settings.FEATURES, {'ENABLE_PAID_COURSE_REGISTRATION': True})
     def test_course_about_in_cart(self):
@@ -329,6 +430,8 @@ class ViewsTestCase(ModuleStoreTestCase):
         course = CourseFactory.create(org="new", number="unenrolled", display_name="course")
         request = self.request_factory.get(reverse('about_course', args=[unicode(course.id)]))
         request.user = AnonymousUser()
+
+        # Set up the edxmako middleware for this request to create the RequestContext
         mako_middleware_process_request(request)
         response = views.course_about(request, unicode(course.id))
         self.assertEqual(response.status_code, 200)
@@ -367,6 +470,8 @@ class ViewsTestCase(ModuleStoreTestCase):
 
         request = self.request_factory.get(reverse('about_course', args=[unicode(course.id)]))
         request.user = AnonymousUser() if is_anonymous else self.user
+
+        # Set up the edxmako middleware for this request to create the RequestContext
         mako_middleware_process_request(request)
 
         # Construct the link for each of the four possibilities:
@@ -614,6 +719,39 @@ class ViewsTestCase(ModuleStoreTestCase):
         self.assertIn("Score: 3.0 / 3.0", response_content)
         self.assertIn('#4', response_content)
 
+    @ddt.data(('America/New_York', -5),  # UTC - 5
+              ('Asia/Pyongyang', 9),  # UTC + 9
+              ('Europe/London', 0),  # UTC
+              ('Canada/Yukon', -8),  # UTC - 8
+              ('Europe/Moscow', 4))  # UTC + 3 + 1 for daylight savings
+    @ddt.unpack
+    @freeze_time('2012-01-01')
+    def test_submission_history_timezone(self, timezone, hour_diff):
+        with (override_settings(TIME_ZONE=timezone)):
+            course = CourseFactory.create()
+            course_key = course.id
+            client = Client()
+            admin = AdminFactory.create()
+            client.login(username=admin.username, password='test')
+            state_client = DjangoXBlockUserStateClient(admin)
+            usage_key = course_key.make_usage_key('problem', 'test-history')
+            state_client.set(
+                username=admin.username,
+                block_key=usage_key,
+                state={'field_a': 'x', 'field_b': 'y'}
+            )
+            url = reverse('submission_history', kwargs={
+                'course_id': unicode(course_key),
+                'student_username': admin.username,
+                'location': unicode(usage_key),
+            })
+            response = client.get(url)
+            response_content = HTMLParser().unescape(response.content)
+            expected_time = datetime.now() + timedelta(hours=hour_diff)
+            expected_tz = expected_time.strftime('%Z')
+            self.assertIn(expected_tz, response_content)
+            self.assertIn(str(expected_time), response_content)
+
     def _email_opt_in_checkbox(self, response, org_name_string=None):
         """Check if the email opt-in checkbox appears in the response content."""
         checkbox_html = '<input id="email-opt-in" type="checkbox" name="opt-in" class="email-opt-in" value="true" checked>'
@@ -771,6 +909,8 @@ class ViewsTestCase(ModuleStoreTestCase):
         # Middleware is not supported by the request factory. Simulate a
         # logged-in user by setting request.user manually.
         request.user = self.user
+
+        # Set up the edxmako middleware for this request to create the RequestContext
         mako_middleware_process_request(request)
 
         self.assertFalse(self.course.bypass_home)
@@ -933,6 +1073,7 @@ class TestProgressDueDate(BaseDueDateTests):
     def get_text(self, course):
         """ Returns the HTML for the progress page """
 
+        # Set up the edxmako middleware for this request to create the RequestContext
         mako_middleware_process_request(self.request)
         return views.progress(self.request, course_id=unicode(course.id), student_id=self.user.id).content
 
@@ -963,6 +1104,9 @@ class StartDateTests(ModuleStoreTestCase):
         self.request_factory = RequestFactory()
         self.user = UserFactory.create()
         self.request = self.request_factory.get("foo")
+
+        # Set up the edxmako middleware for this request to create the RequestContext
+        mako_middleware_process_request(self.request)
         self.request.user = self.user
 
     def set_up_course(self):
@@ -1023,6 +1167,7 @@ class ProgressPageTests(ModuleStoreTestCase):
         self.request = self.request_factory.get("foo")
         self.request.user = self.user
 
+        # Set up the edxmako middleware for this request to create the RequestContext
         mako_middleware_process_request(self.request)
 
         self.setup_course()
@@ -1522,6 +1667,8 @@ class TestIndexView(ModuleStoreTestCase):
             )
         )
         request.user = user
+
+        # Set up the edxmako middleware for this request to create the RequestContext
         mako_middleware_process_request(request)
 
         # Trigger the assertions embedded in the ViewCheckerBlocks
@@ -1553,6 +1700,8 @@ class TestIndexView(ModuleStoreTestCase):
             ) + '?activate_block_id=test_block_id'
         )
         request.user = user
+
+        # Set up the edxmako middleware for this request to create the RequestContext
         mako_middleware_process_request(request)
 
         response = CoursewareIndex.as_view()(
@@ -1602,6 +1751,8 @@ class TestIndexViewWithGating(ModuleStoreTestCase, MilestonesTestCaseMixin):
             )
         )
         request.user = self.user
+
+        # Set up the edxmako middleware for this request to create the RequestContext
         mako_middleware_process_request(request)
 
         with self.assertRaises(Http404):

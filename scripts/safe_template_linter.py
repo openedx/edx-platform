@@ -752,41 +752,6 @@ class BaseLinter(object):
 
     LINE_COMMENT_DELIM = None
 
-    def __init__(self):
-        """
-        Init method.
-        """
-        self._skip_dirs = (
-            '.git',
-            '.pycharm_helpers',
-            'common/static/xmodule/modules',
-            'perf_tests',
-            'node_modules',
-            'reports/diff_quality',
-            'scripts/tests/templates',
-            'spec',
-            'test_root',
-            'vendor',
-        )
-
-    def _is_skip_dir(self, skip_dirs, directory):
-        """
-        Determines whether a directory should be skipped or linted.
-
-        Arguments:
-            skip_dirs: The configured directories to be skipped.
-            directory: The current directory to be tested.
-
-        Returns:
-             True if the directory should be skipped, and False otherwise.
-
-        """
-        for skip_dir in skip_dirs:
-            skip_dir_regex = re.compile("(.*/)*{}(/.*)*".format(skip_dir))
-            if skip_dir_regex.match(directory) is not None:
-                return True
-        return False
-
     def _is_valid_directory(self, skip_dirs, directory):
         """
         Determines if the provided directory is a directory that could contain
@@ -800,7 +765,7 @@ class BaseLinter(object):
             True if this directory should be linted for violations and False
             otherwise.
         """
-        if self._is_skip_dir(skip_dirs, directory):
+        if is_skip_dir(skip_dirs, directory):
             return False
 
         return True
@@ -966,7 +931,7 @@ class UnderscoreTemplateLinter(BaseLinter):
         Init method.
         """
         super(UnderscoreTemplateLinter, self).__init__()
-        self._skip_underscore_dirs = self._skip_dirs + ('test',)
+        self._skip_underscore_dirs = SKIP_DIRS + ('test',)
 
     def process_file(self, directory, file_name):
         """
@@ -1081,8 +1046,8 @@ class JavaScriptLinter(BaseLinter):
         Init method.
         """
         super(JavaScriptLinter, self).__init__()
-        self._skip_javascript_dirs = self._skip_dirs + ('i18n', 'static/coffee')
-        self._skip_coffeescript_dirs = self._skip_dirs
+        self._skip_javascript_dirs = SKIP_DIRS + ('i18n', 'static/coffee')
+        self._skip_coffeescript_dirs = SKIP_DIRS
         self.underscore_linter = UnderscoreTemplateLinter()
 
     def process_file(self, directory, file_name):
@@ -1770,7 +1735,7 @@ class PythonLinter(BaseLinter):
         Init method.
         """
         super(PythonLinter, self).__init__()
-        self._skip_python_dirs = self._skip_dirs + ('tests', 'test/acceptance')
+        self._skip_python_dirs = SKIP_DIRS + ('tests', 'test/acceptance')
 
     def process_file(self, directory, file_name):
         """
@@ -1977,7 +1942,7 @@ class MakoTemplateLinter(BaseLinter):
             True if this directory should be linted for Mako template violations
             and False otherwise.
         """
-        if self._is_skip_dir(self._skip_dirs, directory):
+        if is_skip_dir(SKIP_DIRS, directory):
             return False
 
         # TODO: This is an imperfect guess concerning the Mako template
@@ -2001,6 +1966,7 @@ class MakoTemplateLinter(BaseLinter):
             return
         has_page_default = self._has_page_default(mako_template, results)
         self._check_mako_expressions(mako_template, has_page_default, results)
+        self._check_mako_python_blocks(mako_template, has_page_default, results)
         results.prepare_results(mako_template, line_comment_delim=self.LINE_COMMENT_DELIM)
 
     def _is_django_template(self, mako_template):
@@ -2138,6 +2104,30 @@ class MakoTemplateLinter(BaseLinter):
         javascript_results = FileResults("")
         self.javascript_linter.check_javascript_file_is_safe(javascript_code, javascript_results)
         self._shift_and_add_violations(javascript_results, start_offset, results)
+
+    def _check_mako_python_blocks(self, mako_template, has_page_default, results):
+        """
+        Searches for Mako python blocks and checks if they contain
+        violations.
+
+        Arguments:
+            mako_template: The contents of the Mako template.
+            has_page_default: True if the page is marked as default, False
+                otherwise.
+            results: A list of results into which violations will be added.
+
+        """
+        # Finds Python blocks such as <% ... %>, skipping other Mako start tags
+        # such as <%def> and <%page>.
+        python_block_regex = re.compile(r'<%\s(?P<code>.*?)%>', re.DOTALL)
+
+        for python_block_match in python_block_regex.finditer(mako_template):
+            self._check_expression_python(
+                python_code=python_block_match.group('code'),
+                start_offset=(python_block_match.start() + len('<% ')),
+                has_page_default=has_page_default,
+                results=results
+            )
 
     def _check_expression_python(self, python_code, start_offset, has_page_default, results):
         """
@@ -2474,6 +2464,40 @@ class MakoTemplateLinter(BaseLinter):
         return expressions
 
 
+SKIP_DIRS = (
+    '.git',
+    '.pycharm_helpers',
+    'common/static/xmodule/modules',
+    'perf_tests',
+    'node_modules',
+    'reports/diff_quality',
+    'scripts/tests/templates',
+    'spec',
+    'test_root',
+    'vendor',
+)
+
+
+def is_skip_dir(skip_dirs, directory):
+    """
+    Determines whether a directory should be skipped or linted.
+
+    Arguments:
+        skip_dirs: The configured directories to be skipped.
+        directory: The current directory to be tested.
+
+    Returns:
+         True if the directory should be skipped, and False otherwise.
+
+    """
+    for skip_dir in skip_dirs:
+        skip_dir_regex = re.compile(
+            "(.*/)*{}(/.*)*".format(re.escape(skip_dir)))
+        if skip_dir_regex.match(directory) is not None:
+            return True
+    return False
+
+
 def _process_file(full_path, template_linters, options, summary_results, out):
     """
     For each linter, lints the provided file.  This means finding and printing
@@ -2495,28 +2519,25 @@ def _process_file(full_path, template_linters, options, summary_results, out):
         results.print_results(options, summary_results, out)
 
 
-def _process_current_walk(current_walk, template_linters, options, summary_results, out):
+def _process_os_dir(directory, files, template_linters, options, summary_results, out):
     """
-    For each linter, lints all the files in the current os walk.  This means
-    finding and printing violations.
+    Calls out to lint each file in the passed list of files.
 
     Arguments:
-        current_walk: A walk returned by os.walk().
+        directory: Directory being linted.
+        files: All files in the directory to be linted.
         template_linters: A list of linting objects.
         options: A list of the options.
         summary_results: A SummaryResults with a summary of the violations.
         out: output file
 
     """
-    num_violations = 0
-    walk_directory = os.path.normpath(current_walk[0])
-    walk_files = current_walk[2]
-    for walk_file in walk_files:
-        full_path = os.path.join(walk_directory, walk_file)
+    for current_file in sorted(files, key=lambda s: s.lower()):
+        full_path = os.path.join(directory, current_file)
         _process_file(full_path, template_linters, options, summary_results, out)
 
 
-def _process_os_walk(starting_dir, template_linters, options, summary_results, out):
+def _process_os_dirs(starting_dir, template_linters, options, summary_results, out):
     """
     For each linter, lints all the directories in the starting directory.
 
@@ -2528,9 +2549,12 @@ def _process_os_walk(starting_dir, template_linters, options, summary_results, o
         out: output file
 
     """
-    num_violations = 0
-    for current_walk in os.walk(starting_dir):
-        _process_current_walk(current_walk, template_linters, options, summary_results, out)
+    for root, dirs, files in os.walk(starting_dir):
+        if is_skip_dir(SKIP_DIRS, root):
+            del dirs
+            continue
+        dirs.sort(key=lambda s: s.lower())
+        _process_os_dir(root, files, template_linters, options, summary_results, out)
 
 
 def _lint(file_or_dir, template_linters, options, summary_results, out):
@@ -2555,7 +2579,7 @@ def _lint(file_or_dir, template_linters, options, summary_results, out):
                 directory = file_or_dir
             else:
                 raise ValueError("Path [{}] is not a valid file or directory.".format(file_or_dir))
-        _process_os_walk(directory, template_linters, options, summary_results, out)
+        _process_os_dirs(directory, template_linters, options, summary_results, out)
 
     summary_results.print_results(options, out)
 

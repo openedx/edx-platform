@@ -48,7 +48,10 @@ def add_a_multi_step_component(step, is_advanced, category):
 def see_a_multi_step_component(step, category):
 
     # Wait for all components to finish rendering
-    selector = 'li.studio-xblock-wrapper div.xblock-student_view'
+    if category == 'HTML':
+        selector = 'li.studio-xblock-wrapper div.xblock-student_view'
+    else:
+        selector = 'li.studio-xblock-wrapper div.xblock-author_view'
     world.wait_for(lambda _: len(world.css_find(selector)) == len(step.hashes))
 
     for idx, step_hash in enumerate(step.hashes):

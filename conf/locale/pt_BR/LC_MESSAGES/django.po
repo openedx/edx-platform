@@ -226,14 +226,6 @@
 # wesleyide <wesley36@gmail.com>, 2014
 # William Bellinazo Roca <williambr_1331@hotmail.com>, 2016
 # William Bellinazo Roca <williambr_1331@hotmail.com>, 2016
-# #-#-#-#-#  messages.po (edx-platform)  #-#-#-#-#
-# edX translation file
-# Copyright (C) 2013 edX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# Translators:
-# Andrei Bosco Bezerra Torres <andreibosco@gmail.com>, 2013
-# Andrei Bosco Bezerra Torres <andreibosco@gmail.com>, 2013
 # #-#-#-#-#  wiki.po (edx-platform)  #-#-#-#-#
 # edX translation file
 # Copyright (C) 2016 edX
@@ -253,7 +245,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-05-06 14:30+0000\n"
+"POT-Creation-Date: 2016-05-12 14:51+0000\n"
 "PO-Revision-Date: 2016-05-09 11:27+0000\n"
 "Last-Translator: Monica Farias <monifar.tp@gmail.com>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/open-edx/edx-platform/language/pt_BR/)\n"
@@ -329,10 +321,14 @@ msgstr "ID do Vídeo"
 msgid "Status"
 msgstr "Status"
 
-#: cms/templates/index.html
-#: lms/templates/dashboard/_dashboard_status_verification.html
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: This is listed as the duration for a video that has not
+#. yet reached the point in its processing by the servers where its
+#. duration is determined.
+#: cms/djangoapps/contentstore/views/videos.py
+#: openedx/core/djangoapps/api_admin/models.py cms/templates/index.html
 msgid "Pending"
-msgstr "Pendente"
+msgstr ""
 
 #: common/djangoapps/config_models/admin.py
 msgid "Revert to the selected configuration"
@@ -497,6 +493,12 @@ msgstr ""
 "OPCIONAL: Esta é a UAE (Unidade de Armazenamento de Estoque)  deste modo no "
 "serviço de e-commerce externo. Deixe em branco se o curso ainda não foi "
 "migrado para o serviço e-commerce."
+
+#: common/djangoapps/course_modes/models.py
+msgid ""
+"This is the bulk SKU (stock keeping unit) of this mode in the external "
+"ecommerce service."
+msgstr ""
 
 #: common/djangoapps/course_modes/models.py
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
@@ -6079,6 +6081,30 @@ msgstr "Endereço para correspondência"
 msgid "Goals"
 msgstr "Objetivos"
 
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: This label appears above a field on the registration form
+#. which allows the user to input the city in which they live.
+#: lms/djangoapps/instructor/views/api.py
+#: lms/djangoapps/instructor_task/tasks_helper.py
+#: openedx/core/djangoapps/user_api/views.py lms/templates/register-form.html
+#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
+#: lms/templates/shoppingcart/receipt.html
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "City"
+msgstr "Cidade"
+
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: This label appears above a dropdown menu on the registration
+#. form used to select the country in which the user lives.
+#: lms/djangoapps/instructor/views/api.py
+#: lms/djangoapps/instructor_task/tasks_helper.py
+#: openedx/core/djangoapps/user_api/views.py lms/templates/register-form.html
+#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
+#: lms/templates/shoppingcart/receipt.html
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "Country"
+msgstr "País"
+
 #: lms/djangoapps/instructor/views/api.py
 msgid "Cohort"
 msgstr "Grupo"
@@ -6785,28 +6811,6 @@ msgstr "Título"
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "Year of Birth"
 msgstr "Ano de Nascimento"
-
-#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
-#. Translators: This label appears above a field on the registration form
-#. which allows the user to input the city in which they live.
-#: lms/djangoapps/instructor_task/tasks_helper.py
-#: openedx/core/djangoapps/user_api/views.py lms/templates/register-form.html
-#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
-#: lms/templates/shoppingcart/receipt.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "City"
-msgstr "Cidade"
-
-#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
-#. Translators: This label appears above a dropdown menu on the registration
-#. form used to select the country in which the user lives.
-#: lms/djangoapps/instructor_task/tasks_helper.py
-#: openedx/core/djangoapps/user_api/views.py lms/templates/register-form.html
-#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
-#: lms/templates/shoppingcart/receipt.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "Country"
-msgstr "País"
 
 #: lms/djangoapps/instructor_task/tasks_helper.py
 msgid "Enrollment Date"
@@ -11034,7 +11038,7 @@ msgstr "Registre-se"
 msgid "Sign in"
 msgstr "Entrar"
 
-#: lms/templates/navigation.html
+#: lms/templates/navigation.html themes/edx.org/lms/templates/header.html
 msgid ""
 "{begin_strong}Warning:{end_strong} Your browser is not fully supported. We "
 "strongly recommend using {chrome_link} or {ff_link}."
@@ -13943,38 +13947,39 @@ msgstr ""
 "contato com {support_email}."
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
-msgid "ID Verification Status"
-msgstr "Verificação do Status do ID."
-
-#: lms/templates/dashboard/_dashboard_status_verification.html
-msgid "Reviewed and Verified"
-msgstr "Revisado e verificado"
-
-#: lms/templates/dashboard/_dashboard_status_verification.html
-msgid "Your verification status is good for one year after submission."
-msgstr "O seu status de verificação é válido por um ano após o envio."
+msgid "Verification Status: Approved"
+msgstr ""
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
 msgid ""
-"Your verification photos have been submitted and will be reviewed shortly."
+"Your edX Verification is reviewed and approved. Your verification status is "
+"good for one year after submission."
 msgstr ""
-"As suas fotos de verificação foram submetidas e serão revisadas em breve."
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
-msgid "{platform_name} Verification Status"
-msgstr "{platform_name} Status de Verificação"
+msgid "Verification Status: Pending"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_status_verification.html
+msgid ""
+"Your edX Verification is pending. Your verification photos have been "
+"submitted and will be reviewed shortly."
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_status_verification.html
+msgid "Verification Status: Expired"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_status_verification.html
+msgid ""
+"Your edX Verification has expired. To receive a verified certificate, you "
+"have to submit a new photo of yourself and your government-issued photo ID "
+"before the course ends."
+msgstr ""
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
 msgid "Resubmit Verification"
 msgstr "Submeter Verificação Novamente"
-
-#: lms/templates/dashboard/_dashboard_status_verification.html
-msgid ""
-"To receive a verified certificate, you have to submit a new photo of "
-"yourself and your government-issued photo ID before the course ends."
-msgstr ""
-"Para receber um Certificado verificado, você deve enviar uma nova foto sua e"
-" um documento de identidade válido com foto, antes que o Curso termine."
 
 #: lms/templates/dashboard/_dashboard_third_party_error.html
 msgid "Could Not Link Accounts"
@@ -17934,15 +17939,6 @@ msgstr "Localizar cursos"
 msgid "Schools & Partners"
 msgstr "Faculdades e Parceiros"
 
-#: themes/edx.org/lms/templates/header.html
-#: themes/red-theme/lms/templates/header.html
-msgid ""
-"<strong>Warning:</strong> Your browser is not fully supported. We strongly "
-"recommend using {chrome_link} or {ff_link}."
-msgstr ""
-"<strong>Aviso:</strong> Seu navegador não é totalmente suportado. "
-"Recomendamos o uso do {chrome_link} ou {ff_link}."
-
 #: themes/edx.org/lms/templates/course_modes/choose.html
 msgid ""
 "{b_start}Support our Mission: {b_end} EdX, a non-profit, relies on verified "
@@ -17977,6 +17973,14 @@ msgstr "Meu perfil"
 #: themes/red-theme/lms/templates/header.html
 msgid "Register Now"
 msgstr "Registre-se agora"
+
+#: themes/red-theme/lms/templates/header.html
+msgid ""
+"<strong>Warning:</strong> Your browser is not fully supported. We strongly "
+"recommend using {chrome_link} or {ff_link}."
+msgstr ""
+"<strong>Aviso:</strong> Seu navegador não é totalmente suportado. "
+"Recomendamos o uso do {chrome_link} ou {ff_link}."
 
 #: themes/stanford-style/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/static_templates/tos.html
@@ -18122,7 +18126,7 @@ msgstr ""
 "{platform_name}. Durante esse tempo, você também pode retornar à "
 "{link_start}página inicial do {studio_name} .{link_end}"
 
-#: cms/templates/asset_index.html
+#: cms/templates/asset_index.html cms/templates/widgets/header.html
 msgid "Files & Uploads"
 msgstr ""
 
@@ -18322,8 +18326,8 @@ msgstr "Saiba mais sobre os certificados"
 msgid "Other Course Settings"
 msgstr "Outras configurações do Curso"
 
-#: cms/templates/certificates.html cms/templates/group_configurations.html
-#: cms/templates/settings_advanced.html cms/templates/settings_graders.html
+#: cms/templates/certificates.html cms/templates/settings_advanced.html
+#: cms/templates/settings_graders.html
 msgid "Details &amp; Schedule"
 msgstr "Detalhes &amp; Horário"
 
@@ -19295,6 +19299,10 @@ msgstr ""
 "configuração de grupo apenas se ela não estiver sendo usada em um "
 "experimento. Para excluir uma configuração, vá com o mouse sobre sua caixa e"
 " clique no ícone de exclusão."
+
+#: cms/templates/group_configurations.html
+msgid "Details & Schedule"
+msgstr ""
 
 #: cms/templates/howitworks.html
 msgid "Welcome"
@@ -20554,7 +20562,7 @@ msgstr ""
 msgid "Schedule &amp; Details Settings"
 msgstr "Configurações de horários e detalhes"
 
-#: cms/templates/settings.html
+#: cms/templates/settings.html cms/templates/widgets/header.html
 msgid "Schedule & Details"
 msgstr "Programação e Detalhes"
 
@@ -21567,14 +21575,6 @@ msgid "Updates"
 msgstr "Atualizações"
 
 #: cms/templates/widgets/header.html
-msgid "Files &amp; Uploads"
-msgstr "Arquivos &amp; Carregamentos"
-
-#: cms/templates/widgets/header.html
-msgid "Schedule &amp; Details"
-msgstr "Horário e Detalhes"
-
-#: cms/templates/widgets/header.html
 msgid "Import"
 msgstr "Importar"
 
@@ -21661,10 +21661,6 @@ msgstr "Abrir Portal Edx "
 #: cms/templates/widgets/tabs-aggregator.html
 msgid "name"
 msgstr "nome"
-
-# empty
-msgid "This is a key string."
-msgstr "Esta é uma sequência chave."
 
 #: wiki/forms.py
 msgid "Only localhost... muahahaha"

@@ -25,25 +25,24 @@ class Badge(PageObject):
     url = None
 
     def __init__(self, element, browser):
-        self.full_view = browser
-        # Element API is similar to browser API, should allow subqueries.
-        super(Badge, self).__init__(element)
+        self.element = element
+        super(Badge, self).__init__(browser)
 
     def is_browser_on_page(self):
-        return self.q(css=".badge-details").visible
+        return BrowserQuery(self.element, css=".badge-details").visible
 
     def modal_displayed(self):
         """
         Verifies that the share modal is diplayed.
         """
         # The modal is on the page at large, and not a subelement of the badge div.
-        return BrowserQuery(self.full_view, css=".badges-modal").visible
+        return self.q(css=".badges-modal").visible
 
     def display_modal(self):
         """
         Click the share button to display the sharing modal for the badge.
         """
-        self.q(css=".share-button").click()
+        BrowserQuery(self.element, css=".share-button").click()
         EmptyPromise(self.modal_displayed, "Share modal displayed").fulfill()
         EmptyPromise(self.modal_focused, "Focus handed to modal").fulfill()
 
@@ -51,7 +50,7 @@ class Badge(PageObject):
         """
         Return True if the badges model has focus, False otherwise.
         """
-        return BrowserQuery(self.full_view, css=".badges-modal").is_focused()
+        return self.q(css=".badges-modal").is_focused()
 
     def bring_model_inside_window(self):
         """
@@ -59,7 +58,7 @@ class Badge(PageObject):
         """
         script_to_execute = ("var popup = document.querySelectorAll('.badges-modal')[0];;"
                              "popup.style.left = '20%';")
-        self.full_view.execute_script(script_to_execute)
+        self.browser.execute_script(script_to_execute)
 
     def close_modal(self):
         """
@@ -69,7 +68,7 @@ class Badge(PageObject):
         # which causes click failures. To avoid this, just change
         # the position of the popup
         self.bring_model_inside_window()
-        BrowserQuery(self.full_view, css=".badges-modal .close").click()
+        self.q(css=".badges-modal .close").click()
         EmptyPromise(lambda: not self.modal_displayed(), "Share modal dismissed").fulfill()
 
 

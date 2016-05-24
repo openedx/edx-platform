@@ -25,6 +25,7 @@
 
                 initialize: function(options){
                     this.certificateWhiteListEditorView = options.certificateWhiteListEditorView;
+                    this.active_certificate = options.active_certificate;
                     // Re-render the view when an item is added to the collection
                     this.listenTo(this.collection, 'change add remove', this.render);
                 },
@@ -32,7 +33,7 @@
                 render: function(){
                     var template = this.loadTemplate('certificate-white-list');
                     this.$el.html(template({certificates: this.collection.models}));
-                    if (this.collection.isEmpty()) {
+                    if (!this.active_certificate || this.collection.isEmpty()){
                         this.$("#generate-exception-certificates").addClass("is-disabled");
                     }
                     else {

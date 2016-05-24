@@ -1270,7 +1270,6 @@ class LMSVideoModuleA11yTest(VideoBaseTest):
 
         # limit the scope of the audit to the video player only.
         self.video.a11y_audit.config.set_scope(
-            include=["div.video"],
-            exclude=["a.ui-slider-handle"]
+            include=["div.video"]
         )
         self.video.a11y_audit.check_for_accessibility_errors()

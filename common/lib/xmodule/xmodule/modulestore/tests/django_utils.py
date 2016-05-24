@@ -4,6 +4,7 @@ Modulestore configuration for test cases.
 """
 import copy
 import functools
+import os
 from uuid import uuid4
 from contextlib import contextmanager
 
@@ -93,8 +94,8 @@ def draft_mongo_store_config(data_dir):
             'DOC_STORE_CONFIG': {
                 'host': MONGO_HOST,
                 'port': MONGO_PORT_NUM,
-                'db': 'test_xmodule',
-                'collection': 'modulestore_{0}'.format(uuid4().hex[:5]),
+                'db': 'test_xmodule_{}'.format(os.getpid()),
+                'collection': 'modulestore',
             },
             'OPTIONS': modulestore_options
         }
@@ -120,14 +121,35 @@ def split_mongo_store_config(data_dir):
             'DOC_STORE_CONFIG': {
                 'host': MONGO_HOST,
                 'port': MONGO_PORT_NUM,
-                'db': 'test_xmodule',
-                'collection': 'modulestore_{0}'.format(uuid4().hex[:5]),
+                'db': 'test_xmodule_{}'.format(os.getpid()),
+                'collection': 'modulestore',
             },
             'OPTIONS': modulestore_options
         }
     }
 
     return store
+
+
+def contentstore_config():
+    """
+    Return a new configuration for the contentstore that is isolated
+    from other such configurations.
+    """
+    return {
+        'ENGINE': 'xmodule.contentstore.mongo.MongoContentStore',
+        'DOC_STORE_CONFIG': {
+            'host': MONGO_HOST,
+            'db': 'test_xcontent_{}'.format(os.getpid()),
+            'port': MONGO_PORT_NUM,
+        },
+        # allow for additional options that can be keyed on a name, e.g. 'trashcan'
+        'ADDITIONAL_OPTIONS': {
+            'trashcan': {
+                'bucket': 'trash_fs'
+            }
+        }
+    }
 
 
 @patch('xmodule.modulestore.django.create_modulestore_instance', autospec=True)
@@ -140,7 +162,7 @@ def drop_mongo_collections(mock_create):
 
     module_store = modulestore()
     if hasattr(module_store, '_drop_database'):
-        module_store._drop_database()  # pylint: disable=protected-access
+        module_store._drop_database(database=False)  # pylint: disable=protected-access
     _CONTENTSTORE.clear()
     if hasattr(module_store, 'close_connections'):
         module_store.close_connections()
@@ -154,17 +176,20 @@ TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
 #   test course into this modulestore.
 # If your test needs a graded course to test against, import the common/test/data/graded
 #   test course into this modulestore.
-TEST_DATA_MIXED_MODULESTORE = mixed_store_config(
-    TEST_DATA_DIR, {}
+TEST_DATA_MIXED_MODULESTORE = functools.partial(
+    mixed_store_config,
+    TEST_DATA_DIR,
+    {}
 )
 
 # All store requests now go through mixed
 # Use this modulestore if you specifically want to test mongo and not a mocked modulestore.
-TEST_DATA_MONGO_MODULESTORE = mixed_store_config(mkdtemp_clean(), {})
+TEST_DATA_MONGO_MODULESTORE = functools.partial(mixed_store_config, mkdtemp_clean(), {})
 
 # All store requests now go through mixed
 # Use this modulestore if you specifically want to test split-mongo and not a mocked modulestore.
-TEST_DATA_SPLIT_MODULESTORE = mixed_store_config(
+TEST_DATA_SPLIT_MODULESTORE = functools.partial(
+    mixed_store_config,
     mkdtemp_clean(),
     {},
     store_order=[StoreConstructors.split, StoreConstructors.draft]
@@ -191,10 +216,12 @@ class ModuleStoreIsolationMixin(CacheIsolationMixin):
 
     """
 
-    MODULESTORE = mixed_store_config(mkdtemp_clean(), {})
+    MODULESTORE = functools.partial(mixed_store_config, mkdtemp_clean(), {})
+    CONTENTSTORE = functools.partial(contentstore_config)
     ENABLED_CACHES = ['mongo_metadata_inheritance', 'loc_cache']
     __settings_overrides = []
     __old_modulestores = []
+    __old_contentstores = []
 
     @classmethod
     def start_modulestore_isolation(cls):
@@ -205,10 +232,12 @@ class ModuleStoreIsolationMixin(CacheIsolationMixin):
         """
         cls.start_cache_isolation()
         override = override_settings(
-            MODULESTORE=cls.MODULESTORE,
+            MODULESTORE=cls.MODULESTORE(),
+            CONTENTSTORE=cls.CONTENTSTORE(),
         )
 
         cls.__old_modulestores.append(copy.deepcopy(settings.MODULESTORE))
+        cls.__old_contentstores.append(copy.deepcopy(settings.CONTENTSTORE))
         override.__enter__()
         cls.__settings_overrides.append(override)
         XMODULE_FACTORY_LOCK.enable()
@@ -227,6 +256,7 @@ class ModuleStoreIsolationMixin(CacheIsolationMixin):
         cls.__settings_overrides.pop().__exit__(None, None, None)
 
         assert settings.MODULESTORE == cls.__old_modulestores.pop()
+        assert settings.CONTENTSTORE == cls.__old_contentstores.pop()
         cls.end_cache_isolation()
 
 

@@ -99,21 +99,22 @@ case "$TEST_SUITE" in
         ;;
 
     "lms-unit")
+        LMS_ARGS="--with-flaky"
         case "$SHARD" in
             "all")
-                paver test_system -s lms --extra_args="--with-flaky" --cov_args="-p"
+                paver test_system -s lms --extra_args="$LMS_ARGS" --cov_args="-p" -v
                 ;;
             "1")
-                paver test_system -s lms --extra_args="--attr='shard_1' --with-flaky" --cov_args="-p" -v
+                paver test_system -s lms --extra_args="--attr='shard_1' $LMS_ARGS" --cov_args="-p" -v
                 ;;
             "2")
-                paver test_system -s lms --extra_args="--attr='shard_2' --with-flaky" --cov_args="-p" -v
+                paver test_system -s lms --extra_args="--attr='shard_2' $LMS_ARGS" --cov_args="-p" -v
                 ;;
             "3")
-                paver test_system -s lms --extra_args="--attr='shard_3' --with-flaky" --cov_args="-p" -v
+                paver test_system -s lms --extra_args="--attr='shard_3' $LMS_ARGS" --cov_args="-p" -v
                 ;;
             "4")
-                paver test_system -s lms --extra_args="--attr='shard_1=False,shard_2=False,shard_3=False' --with-flaky" --cov_args="-p" -v
+                paver test_system -s lms --extra_args="--attr='shard_1=False,shard_2=False,shard_3=False' $LMS_ARGS" --cov_args="-p" -v
                 ;;
             *)
                 # If no shard is specified, rather than running all tests, create an empty xunit file. This is a

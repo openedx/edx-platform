@@ -75,6 +75,9 @@ var DetailsView = ValidatingView.extend({
     },
 
     render: function() {
+        // Clear any image preview timeouts set in this.updateImagePreview
+        clearTimeout(this.imageTimer);
+
         DateUtils.setupDatePicker('start_date', this);
         DateUtils.setupDatePicker('end_date', this);
         DateUtils.setupDatePicker('enrollment_start', this);
@@ -236,6 +239,13 @@ var DetailsView = ValidatingView.extend({
             this.model.set('instructor_info', {instructors: instructors});
             this.showNotificationBar();
             break;
+        case 'course-instructor-image-' + index:
+            instructors = this.model.get('instructor_info').instructors.slice(0);
+            instructors[index].image = $(event.currentTarget).val();
+            this.model.set('instructor_info', {instructors: instructors});
+            this.showNotificationBar();
+            this.updateImagePreview(event.currentTarget, '#course-instructor-image-preview-' + index);
+            break;
         case 'course-image-url':
             this.updateImageField(event, 'course_image_name', '#course-image');
             break;
@@ -305,11 +315,16 @@ var DetailsView = ValidatingView.extend({
         this.setField(event);
         var url = $(event.currentTarget).val();
         var image_name = _.last(url.split('/'));
+        // If image path is entered directly, we need to strip the asset prefix
+        image_name = _.last(image_name.split('block@'));
         this.model.set(image_field, image_name);
+        this.updateImagePreview(event.currentTarget, selector);
+    },
+    updateImagePreview: function(imagePathInputElement, previewSelector) {
         // Wait to set the image src until the user stops typing
         clearTimeout(this.imageTimer);
         this.imageTimer = setTimeout(function() {
-            $(selector).attr('src', $(event.currentTarget).val());
+            $(previewSelector).attr('src', $(imagePathInputElement).val());
         }, 1000);
     },
     removeVideo: function(event) {

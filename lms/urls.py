@@ -10,7 +10,7 @@ from django.conf.urls.static import static
 
 from microsite_configuration import microsite
 import auth_exchange.views
-
+from courseware.views.views import EnrollStaffView
 from config_models.views import ConfigurationModelCurrentAPIView
 from courseware.views.index import CoursewareIndex
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
@@ -364,6 +364,14 @@ urlpatterns += (
         ),
         'courseware.views.views.course_about',
         name='about_course',
+    ),
+
+    url(
+        r'^courses/{}/enroll_staff$'.format(
+            settings.COURSE_ID_PATTERN,
+        ),
+        EnrollStaffView.as_view(),
+        name='enroll_staff',
     ),
 
     #Inside the course

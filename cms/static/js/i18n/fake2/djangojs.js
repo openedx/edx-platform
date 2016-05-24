@@ -131,6 +131,7 @@
       "(\u0254\u00f8n\u0287\u0250\u1d09ns %(student_count)s s\u0287nd\u01ddn\u0287s)"
     ], 
     "- Sortable": "- S\u00f8\u0279\u0287\u0250bl\u01dd", 
+    "/verify_student/verify-now/{courseKey}/": "/\u028c\u01dd\u0279\u1d09\u025f\u028e_s\u0287nd\u01ddn\u0287/\u028c\u01dd\u0279\u1d09\u025f\u028e-n\u00f8\u028d/{courseKey}/", 
     "<%= user %> already in exception list.": "<%= user %> \u0250l\u0279\u01dd\u0250d\u028e \u1d09n \u01ddx\u0254\u01ddd\u0287\u1d09\u00f8n l\u1d09s\u0287.", 
     "<%= user %> has been successfully added to the exception list. Click Generate Exception Certificate below to send the certificate.": "<%= user %> \u0265\u0250s b\u01dd\u01ddn sn\u0254\u0254\u01ddss\u025fnll\u028e \u0250dd\u01ddd \u0287\u00f8 \u0287\u0265\u01dd \u01ddx\u0254\u01ddd\u0287\u1d09\u00f8n l\u1d09s\u0287. \u023bl\u1d09\u0254\u029e \u01e4\u01ddn\u01dd\u0279\u0250\u0287\u01dd \u0246x\u0254\u01ddd\u0287\u1d09\u00f8n \u023b\u01dd\u0279\u0287\u1d09\u025f\u1d09\u0254\u0250\u0287\u01dd b\u01ddl\u00f8\u028d \u0287\u00f8 s\u01ddnd \u0287\u0265\u01dd \u0254\u01dd\u0279\u0287\u1d09\u025f\u1d09\u0254\u0250\u0287\u01dd.", 
     "<button data-provider=\"%s\" data-course-key=\"%s\" data-username=\"%s\" class=\"complete-course\" onClick=completeOrder(this)>%s</button>": "<button data-provider=\"%s\" data-course-key=\"%s\" data-username=\"%s\" class=\"complete-course\" onClick=completeOrder(this)>%s</button>", 

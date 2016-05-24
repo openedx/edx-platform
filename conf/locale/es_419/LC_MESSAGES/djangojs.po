@@ -139,9 +139,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-05-06 14:29+0000\n"
-"PO-Revision-Date: 2016-05-09 19:09+0000\n"
-"Last-Translator: Ned Batchelder <ned@edx.org>\n"
+"POT-Creation-Date: 2016-05-12 14:50+0000\n"
+"PO-Revision-Date: 2016-05-17 20:06+0000\n"
+"Last-Translator: Laura Silva <lingison@edx.org>\n"
 "Language-Team: Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -4755,7 +4755,7 @@ msgid ""
 "connection. Try refreshing the page or making sure you are online."
 msgstr ""
 "Esto puede estar sucediendo debido a un error con nuestros servidores o con "
-"su conexión a Internet. Intente refrescar la página o verificar su acceso a "
+"tu conexión a Internet. Intenta refrescar la página o verifica tu acceso a "
 "Internet."
 
 #: cms/static/coffee/src/main.js
@@ -5081,26 +5081,6 @@ msgid "All groups must have a unique name."
 msgstr "Todos los equipos deben tener un nombre único."
 
 #: cms/static/js/models/settings/course_details.js
-msgid "The title field must be limited to 50 characters."
-msgstr ""
-
-#: cms/static/js/models/settings/course_details.js
-msgid "The subtitle field must be limited to 150 characters."
-msgstr ""
-
-#: cms/static/js/models/settings/course_details.js
-msgid "The duration field must be limited to 50 characters."
-msgstr ""
-
-#: cms/static/js/models/settings/course_details.js
-msgid "The short description field must be limited to 150 characters."
-msgstr ""
-
-#: cms/static/js/models/settings/course_details.js
-msgid "The description field must be limited to 1000 characters."
-msgstr ""
-
-#: cms/static/js/models/settings/course_details.js
 msgid "The course must have an assigned start date."
 msgstr "El curso debe tener asignada una fecha de inicio."
 
@@ -5275,8 +5255,8 @@ msgstr "No esta en uso"
 #: cms/static/js/views/group_configuration_details.js
 msgid "Used in {count} unit"
 msgid_plural "Used in {count} units"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Usado en {count} unidades"
+msgstr[1] "Usado en {count} unidades"
 
 #. Translators: This refers to a content group that can be linked to a student
 #. cohort.
@@ -5318,8 +5298,8 @@ msgstr "Por favor seleccione un archivo PDF para subir."
 #: cms/static/js/views/group_configuration_details.js
 msgid "Contains {count} group"
 msgid_plural "Contains {count} groups"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Contiene {count} grupo"
+msgstr[1] "Contiene {count} grupos"
 
 #. Translators: this refers to a collection of groups.
 #: cms/static/js/views/group_configuration_item.js
@@ -5350,7 +5330,7 @@ msgstr "Hubo un error con la subida del archivo"
 
 #: cms/static/js/views/instructor_info.js
 msgid "Upload instructor image."
-msgstr ""
+msgstr "Subir imagen del instructor."
 
 #: cms/static/js/views/instructor_info.js cms/static/js/views/settings/main.js
 msgid "Files must be in JPEG or PNG format."
@@ -5704,11 +5684,15 @@ msgid ""
 "No validation is performed on policy keys or value pairs. If you are having "
 "difficulties, check your formatting."
 msgstr ""
+"No se realiza validación de pares clave/valor de política. Si tiene "
+"dificultades, por favor revisa tu formato."
 
 #: cms/static/js/views/settings/grader.js
 msgid ""
 "For grading to work, you must change all {oldName} subsections to {newName}."
 msgstr ""
+"Para que el proceso de calificación funcione, debes cambiar todas las "
+"subsecciones {oldName} a {newName}."
 
 #: cms/static/js/views/settings/main.js
 msgid "Course Credit Requirements"
@@ -5727,7 +5711,7 @@ msgstr ""
 
 #: cms/static/js/views/settings/main.js
 msgid "{hours}:{minutes} (current UTC time)"
-msgstr ""
+msgstr "{hours}:{minutes} (hora UTC actual)"
 
 #: cms/static/js/views/settings/main.js
 msgid "Upload your course image."
@@ -5735,11 +5719,11 @@ msgstr "Cargar la imagen para su curso"
 
 #: cms/static/js/views/settings/main.js
 msgid "Upload your banner image."
-msgstr ""
+msgstr "Subir tu imagen banner"
 
 #: cms/static/js/views/settings/main.js
 msgid "Upload your video thumbnail image."
-msgstr ""
+msgstr "Subir tu miniatura de la imagen del video"
 
 #: cms/static/js/views/show_textbook.js
 msgid "Delete “<%= name %>”?"
@@ -5965,7 +5949,7 @@ msgstr "Alejar"
 #: common/static/common/templates/components/paging-footer.underscore
 #, python-format
 msgid "Page number out of %(total_pages)s"
-msgstr ""
+msgstr "Número de página de un total de %(total_pages)s"
 
 #: common/static/common/templates/components/paging-footer.underscore
 msgid "Enter the page number you'd like to quickly navigate to."
@@ -6594,10 +6578,13 @@ msgid ""
 "There was an error retrieving preview results for this catalog. Please check"
 " that your query is correct and try again."
 msgstr ""
+"Ocurrió un error recuperando los resultados de vista previa para este "
+"catálogo. Por favor asegúrate de que tu consulta es correcta e intente "
+"nuevamente."
 
 #: lms/templates/api_admin/catalog-results.underscore
 msgid "This catalog's courses:"
-msgstr ""
+msgstr "Los cursos de este catálogo:"
 
 #: lms/templates/bookmarks/bookmarks-list.underscore
 msgid "My Bookmarks"
@@ -6997,6 +6984,8 @@ msgid ""
 "Generate certificates for all users on the Exception list who do not yet "
 "have a certificate"
 msgstr ""
+"Producir certificados para todos los usuarios en la lista de excepciones que"
+" aún no tienen un certificado"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
 msgid "Generate a Certificate for all users on the Exception list"
@@ -7258,29 +7247,31 @@ msgstr "Certificados de programas de XSeries"
 
 #: lms/templates/learner_dashboard/certificate.underscore
 msgid "certificate.credential_url"
-msgstr ""
+msgstr "credencial.certificado_url"
 
 #: lms/templates/learner_dashboard/certificate.underscore
 msgid "certificate.display_name"
-msgstr ""
+msgstr "certificado.nombre_mostrado"
 
 #: lms/templates/learner_dashboard/empty_programs_list.underscore
 msgid "You are not enrolled in any XSeries Programs yet."
-msgstr ""
+msgstr "No se encuentra inscrito en ningún Programa de XSeries aún."
 
 #: lms/templates/learner_dashboard/empty_programs_list.underscore
 msgid "Explore XSeries Programs"
-msgstr ""
+msgstr "Explora Programas de XSeries nuevos"
 
 #: lms/templates/learner_dashboard/explore_new_programs.underscore
 msgid ""
 "Browse recently launched courses and see what\\'s new in your favorite "
 "subjects"
 msgstr ""
+"Echa un vistazo a nuestros cursos lanzados recientemente y qué hay de nuevo "
+"en tus temas favoritos."
 
 #: lms/templates/learner_dashboard/explore_new_programs.underscore
 msgid "Explore New XSeries"
-msgstr ""
+msgstr "Explora XSeries nuevos"
 
 #: lms/templates/learner_dashboard/program_card.underscore
 msgid "type"
@@ -7292,6 +7283,8 @@ msgid ""
 "You have earned certificates in %(completed_courses)s of the "
 "%(total_courses)s courses so far."
 msgstr ""
+"Has obtenido certificados en %(completed_courses)s de los %(total_courses)s "
+"cursos hasta el momento."
 
 #: lms/templates/search/course_search_results.underscore
 #: lms/templates/search/dashboard_search_results.underscore
@@ -7531,32 +7524,32 @@ msgstr "¿Ya está registrado?"
 #: lms/templates/student_profile/badge.underscore
 #, python-format
 msgid "Share your \"%(display_name)s\" award"
-msgstr ""
+msgstr "Comparte tu insignia de \"%(display_name)s\" "
 
 #: lms/templates/student_profile/badge.underscore
 msgid "Share"
-msgstr ""
+msgstr "Compartir"
 
 #: lms/templates/student_profile/badge.underscore
 #, python-format
 msgid "Earned %(created)s."
-msgstr ""
+msgstr "Obtenido %(created)s."
 
 #: lms/templates/student_profile/badge_placeholder.underscore
 msgid "What's Your Next Accomplishment?"
-msgstr ""
+msgstr "¿Qué será tu próximo logro?"
 
 #: lms/templates/student_profile/badge_placeholder.underscore
 msgid "Start working toward your next learning goal."
-msgstr ""
+msgstr "Empieza a trabajar hacia tu próxima meta de aprendizaje."
 
 #: lms/templates/student_profile/badge_placeholder.underscore
 msgid "Find a course"
-msgstr ""
+msgstr "Busca un curso"
 
 #: lms/templates/student_profile/learner_profile.underscore
 msgid "An error occurred. Try loading the page again."
-msgstr ""
+msgstr "Ocurrió un error. Intenta cargar la página nuevamente."
 
 #: lms/templates/student_profile/section_two.underscore
 msgid "You are currently sharing a limited profile."
@@ -7564,11 +7557,11 @@ msgstr "Actualmente está compartiendo un perfil limitado."
 
 #: lms/templates/student_profile/section_two.underscore
 msgid "This learner is currently sharing a limited profile."
-msgstr ""
+msgstr "Este usuario está compartiendo un perfil limitado."
 
 #: lms/templates/student_profile/share_modal.underscore
 msgid "Share on Mozilla Backpack"
-msgstr ""
+msgstr "Compartir en Mozilla Backpack"
 
 #: lms/templates/student_profile/share_modal.underscore
 msgid ""
@@ -7576,6 +7569,9 @@ msgid ""
 "Backpack account. Complete the following steps to add your certificate to "
 "Backpack."
 msgstr ""
+"Para compartir tu certificado en Mozilla Backpack, debes tener una cuenta de"
+" Backpack primero. Completa los siguientes pasos para agregar tu certificado"
+" a Backpack."
 
 #: lms/templates/student_profile/share_modal.underscore
 #, python-format
@@ -7583,6 +7579,8 @@ msgid ""
 "Create a %(link_start)sMozilla Backpack%(link_end)s account, or log in to "
 "your existing account"
 msgstr ""
+"Crea una cuenta de %(link_start)sMozilla Backpack%(link_end)s, o inicia "
+"sesión usando una cuenta existente"
 
 #: lms/templates/student_profile/share_modal.underscore
 #, python-format
@@ -7591,6 +7589,9 @@ msgid ""
 "save as)%(link_end)s and then %(upload_link_start)supload%(link_end)s it to "
 "your backpack.</li>"
 msgstr ""
+"%(download_link_start)sDescarga esta imagen (haz clic derecho o pulsa "
+"opción, guardar como)%(link_end)s y después "
+"%(upload_link_start)ssubirla%(link_end)s a tu mochila.</li>"
 
 #: lms/templates/verify_student/enrollment_confirmation_step.underscore
 #, python-format
@@ -7685,6 +7686,8 @@ msgid ""
 "When your face is in position, use the camera button {icon} below to take "
 "your photo."
 msgstr ""
+"Luego de colocar tu rostro en posición, haz clic en el siguiente ícono "
+"{icon} para tomar la foto."
 
 #: lms/templates/verify_student/face_photo_step.underscore
 msgid "To take a successful photo, make sure that:"
@@ -7707,6 +7710,8 @@ msgid ""
 "To use the current photo, select the camera button {icon}. To take another "
 "photo, select the retake button {icon}."
 msgstr ""
+"Para usar la foto actual, selecciona el botón de cámara {icon}. Para tomar "
+"una nueva foto, selecciona el botón de nueva toma {icon}."
 
 #: lms/templates/verify_student/face_photo_step.underscore
 #: lms/templates/verify_student/id_photo_step.underscore
@@ -7804,6 +7809,8 @@ msgstr "Asegurese que su documento está bien iluminado"
 #: lms/templates/verify_student/id_photo_step.underscore
 msgid "Once in position, use the camera button {icon} to capture your ID"
 msgstr ""
+"Una vez en posición, haz clic en el siguiente ícono {icon} para capturar tu "
+"ID"
 
 #: lms/templates/verify_student/id_photo_step.underscore
 #: lms/templates/verify_student/incourse_reverify.underscore
@@ -7837,6 +7844,7 @@ msgstr "Verifique que su cara está completamente dentro del marco de la foto"
 #: lms/templates/verify_student/incourse_reverify.underscore
 msgid "Once in position, use the camera button {icon} to capture your photo"
 msgstr ""
+"Una vez en posición, usa el siguiente ícono {icon} para capturar tu foto"
 
 #: lms/templates/verify_student/incourse_reverify.underscore
 msgid "Can we match the photo you took with the one on your ID?"
@@ -7846,7 +7854,7 @@ msgstr ""
 
 #: lms/templates/verify_student/intro_step.underscore
 msgid "Thanks for returning to verify your ID in: {courseName}"
-msgstr ""
+msgstr "Gracias por regresar a verificar tu ID en: {courseName}"
 
 #: lms/templates/verify_student/intro_step.underscore
 #: lms/templates/verify_student/make_payment_step.underscore
@@ -7888,11 +7896,11 @@ msgstr ""
 #: lms/templates/verify_student/make_payment_step.underscore
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
 msgid "You are enrolling in: {courseName}"
-msgstr ""
+msgstr "Te estás inscribiendo en: {courseName}"
 
 #: lms/templates/verify_student/make_payment_step.underscore
 msgid "You are upgrading your enrollment for: {courseName}"
-msgstr ""
+msgstr "Estás cambiando a la modalidad verificada para: {courseName}"
 
 #: lms/templates/verify_student/make_payment_step.underscore
 msgid ""
@@ -7944,7 +7952,7 @@ msgstr "Usted ha verificado su ID!"
 
 #: lms/templates/verify_student/make_payment_step.underscore
 msgid "Your verification status is good until {verificationGoodUntil}."
-msgstr ""
+msgstr "Tu estado de verificación es válido hasta {verificationGoodUntil}."
 
 #: lms/templates/verify_student/make_payment_step.underscore
 msgid "price"
@@ -7956,7 +7964,7 @@ msgstr "Cuenta no activada"
 
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
 msgid "Upgrade to a Verified Certificate for {courseName}"
-msgstr ""
+msgstr "Optar por el Certificado Verificado para {courseName}"
 
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
 msgid ""
@@ -7971,11 +7979,11 @@ msgstr "Revise sus correos electrónicos para un mensaje de activación."
 
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
 msgid "Professional Certificate for {courseName}"
-msgstr ""
+msgstr "Certificado Profesional para {courseName}"
 
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
 msgid "Verified Certificate for {courseName}"
-msgstr ""
+msgstr "Certificado Verificado para {courseName}"
 
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
 #, python-format
@@ -8014,7 +8022,7 @@ msgstr ""
 
 #: lms/templates/verify_student/payment_confirmation_step.underscore
 msgid "Thank you! We have received your payment for {courseName}."
-msgstr ""
+msgstr "¡Gracias! Hemos recibido tu pago para {courseName}."
 
 #: lms/templates/verify_student/payment_confirmation_step.underscore
 msgid "Next Step: Confirm your identity"
@@ -8448,7 +8456,7 @@ msgstr "Organización"
 
 #: cms/templates/js/course-instructor-details.underscore
 msgid "Organization Name"
-msgstr ""
+msgstr "Nombre de la organización"
 
 #: cms/templates/js/course-instructor-details.underscore
 msgid "Please add the institute where the instructor is associated"
@@ -8523,7 +8531,7 @@ msgstr "Examen supervisado"
 
 #: cms/templates/js/course-outline.underscore
 msgid "Timed Exam"
-msgstr ""
+msgstr "Examen cronometrado"
 
 #: cms/templates/js/course-outline.underscore
 #: cms/templates/js/xblock-outline.underscore

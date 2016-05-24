@@ -356,7 +356,6 @@ class CMSVideoA11yTest(CMSVideoBaseTest):
 
         # limit the scope of the audit to the video player only.
         self.outline.a11y_audit.config.set_scope(
-            include=["div.video"],
-            exclude=["a.ui-slider-handle"]
+            include=["div.video"]
         )
         self.outline.a11y_audit.check_for_accessibility_errors()

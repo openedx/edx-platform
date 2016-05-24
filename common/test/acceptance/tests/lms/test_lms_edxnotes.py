@@ -13,6 +13,7 @@ from ...pages.lms.course_nav import CourseNavPage
 from ...pages.lms.courseware import CoursewarePage
 from ...pages.lms.edxnotes import EdxNotesUnitPage, EdxNotesPage, EdxNotesPageNoContent
 from ...fixtures.edxnotes import EdxNotesFixture, Note, Range
+from flaky import flaky
 
 
 class EdxNotesTestMixin(UniqueCourseTest):
@@ -841,6 +842,7 @@ class EdxNotesPageTest(EventsTestMixin, EdxNotesTestMixin):
 
         self.assert_viewed_event('Tags')
 
+    @flaky  # TNL-4590
     def test_easy_access_from_notes_page(self):
         """
         Scenario: Ensure that the link to the Unit works correctly.

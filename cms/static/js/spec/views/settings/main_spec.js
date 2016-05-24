@@ -333,7 +333,7 @@ define([
                             "name": "test_name",
                             "title": "test_title",
                             "organization": "test_org",
-                            "image": "",
+                            "image": "test_image",
                             "bio": "test_bio"
                         }]
                     }
@@ -344,6 +344,7 @@ define([
             this.view.$("#course-instructor-title-0").val('test_title').trigger('change');
             this.view.$("#course-instructor-organization-0").val('test_org').trigger('change');
             this.view.$("#course-instructor-bio-0").val('test_bio').trigger('change');
+            this.view.$("#course-instructor-image-0").val('test_image').trigger('change');
 
             this.view.saveView();
             AjaxHelpers.expectJsonRequest(

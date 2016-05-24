@@ -1,4 +1,8 @@
 # #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
+# #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
+# #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
+# #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
+# #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
 # edX translation file.
 # Copyright (C) 2016 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
@@ -22,12 +26,578 @@
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # EdX Team <info@edx.org>, 2016.
 # 
+# #-#-#-#-#  djangojs-studio.po (0.1a)  #-#-#-#-#
+# #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
+# edX translation file.
+# Copyright (C) 2016 EdX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2016.
+# 
+# #-#-#-#-#  djangojs-studio.po (0.1a)  #-#-#-#-#
+# edX translation file.
+# Copyright (C) 2016 EdX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2016.
+# 
+# #-#-#-#-#  underscore.po (0.1a)  #-#-#-#-#
+# edX translation file
+# Copyright (C) 2016 edX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2016.
+# 
+# #-#-#-#-#  underscore-studio.po (0.1a)  #-#-#-#-#
+# edX translation file
+# Copyright (C) 2016 edX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2016.
+# 
+# #-#-#-#-#  underscore.po (0.1a)  #-#-#-#-#
+# edX translation file
+# Copyright (C) 2016 edX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2016.
+# 
+# #-#-#-#-#  underscore-studio.po (0.1a)  #-#-#-#-#
+# edX translation file
+# Copyright (C) 2016 edX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2016.
+# 
+# #-#-#-#-#  djangojs-studio.po (0.1a)  #-#-#-#-#
+# #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
+# #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
+# edX translation file.
+# Copyright (C) 2016 EdX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2016.
+# 
+# #-#-#-#-#  djangojs-studio.po (0.1a)  #-#-#-#-#
+# edX translation file.
+# Copyright (C) 2016 EdX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2016.
+# 
+# #-#-#-#-#  underscore.po (0.1a)  #-#-#-#-#
+# edX translation file
+# Copyright (C) 2016 edX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2016.
+# 
+# #-#-#-#-#  underscore-studio.po (0.1a)  #-#-#-#-#
+# edX translation file
+# Copyright (C) 2016 edX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2016.
+# 
+# #-#-#-#-#  djangojs-studio.po (0.1a)  #-#-#-#-#
+# #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
+# edX translation file.
+# Copyright (C) 2016 EdX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2016.
+# 
+# #-#-#-#-#  djangojs-studio.po (0.1a)  #-#-#-#-#
+# edX translation file.
+# Copyright (C) 2016 EdX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2016.
+# 
+# #-#-#-#-#  underscore.po (0.1a)  #-#-#-#-#
+# edX translation file
+# Copyright (C) 2016 edX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2016.
+# 
+# #-#-#-#-#  underscore-studio.po (0.1a)  #-#-#-#-#
+# edX translation file
+# Copyright (C) 2016 edX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2016.
+# 
+# #-#-#-#-#  underscore.po (0.1a)  #-#-#-#-#
+# edX translation file
+# Copyright (C) 2016 edX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2016.
+# 
+# #-#-#-#-#  underscore-studio.po (0.1a)  #-#-#-#-#
+# edX translation file
+# Copyright (C) 2016 edX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2016.
+# 
+# #-#-#-#-#  underscore.po (0.1a)  #-#-#-#-#
+# edX translation file
+# Copyright (C) 2016 edX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2016.
+# 
+# #-#-#-#-#  underscore-studio.po (0.1a)  #-#-#-#-#
+# edX translation file
+# Copyright (C) 2016 edX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2016.
+# 
+# #-#-#-#-#  djangojs-studio.po (0.1a)  #-#-#-#-#
+# #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
+# #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
+# #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
+# edX translation file.
+# Copyright (C) 2016 EdX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2016.
+# 
+# #-#-#-#-#  djangojs-studio.po (0.1a)  #-#-#-#-#
+# edX translation file.
+# Copyright (C) 2016 EdX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2016.
+# 
+# #-#-#-#-#  underscore.po (0.1a)  #-#-#-#-#
+# edX translation file
+# Copyright (C) 2016 edX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2016.
+# 
+# #-#-#-#-#  underscore-studio.po (0.1a)  #-#-#-#-#
+# edX translation file
+# Copyright (C) 2016 edX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2016.
+# 
+# #-#-#-#-#  djangojs-studio.po (0.1a)  #-#-#-#-#
+# #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
+# edX translation file.
+# Copyright (C) 2016 EdX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2016.
+# 
+# #-#-#-#-#  djangojs-studio.po (0.1a)  #-#-#-#-#
+# edX translation file.
+# Copyright (C) 2016 EdX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2016.
+# 
+# #-#-#-#-#  underscore.po (0.1a)  #-#-#-#-#
+# edX translation file
+# Copyright (C) 2016 edX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2016.
+# 
+# #-#-#-#-#  underscore-studio.po (0.1a)  #-#-#-#-#
+# edX translation file
+# Copyright (C) 2016 edX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2016.
+# 
+# #-#-#-#-#  underscore.po (0.1a)  #-#-#-#-#
+# edX translation file
+# Copyright (C) 2016 edX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2016.
+# 
+# #-#-#-#-#  underscore-studio.po (0.1a)  #-#-#-#-#
+# edX translation file
+# Copyright (C) 2016 edX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2016.
+# 
+# #-#-#-#-#  djangojs-studio.po (0.1a)  #-#-#-#-#
+# #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
+# #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
+# edX translation file.
+# Copyright (C) 2016 EdX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2016.
+# 
+# #-#-#-#-#  djangojs-studio.po (0.1a)  #-#-#-#-#
+# edX translation file.
+# Copyright (C) 2016 EdX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2016.
+# 
+# #-#-#-#-#  underscore.po (0.1a)  #-#-#-#-#
+# edX translation file
+# Copyright (C) 2016 edX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2016.
+# 
+# #-#-#-#-#  underscore-studio.po (0.1a)  #-#-#-#-#
+# edX translation file
+# Copyright (C) 2016 edX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2016.
+# 
+# #-#-#-#-#  djangojs-studio.po (0.1a)  #-#-#-#-#
+# #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
+# edX translation file.
+# Copyright (C) 2016 EdX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2016.
+# 
+# #-#-#-#-#  djangojs-studio.po (0.1a)  #-#-#-#-#
+# edX translation file.
+# Copyright (C) 2016 EdX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2016.
+# 
+# #-#-#-#-#  underscore.po (0.1a)  #-#-#-#-#
+# edX translation file
+# Copyright (C) 2016 edX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2016.
+# 
+# #-#-#-#-#  underscore-studio.po (0.1a)  #-#-#-#-#
+# edX translation file
+# Copyright (C) 2016 edX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2016.
+# 
+# #-#-#-#-#  underscore.po (0.1a)  #-#-#-#-#
+# edX translation file
+# Copyright (C) 2016 edX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2016.
+# 
+# #-#-#-#-#  underscore-studio.po (0.1a)  #-#-#-#-#
+# edX translation file
+# Copyright (C) 2016 edX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2016.
+# 
+# #-#-#-#-#  underscore.po (0.1a)  #-#-#-#-#
+# edX translation file
+# Copyright (C) 2016 edX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2016.
+# 
+# #-#-#-#-#  underscore-studio.po (0.1a)  #-#-#-#-#
+# edX translation file
+# Copyright (C) 2016 edX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2016.
+# 
+# #-#-#-#-#  underscore.po (0.1a)  #-#-#-#-#
+# edX translation file
+# Copyright (C) 2016 edX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2016.
+# 
+# #-#-#-#-#  underscore-studio.po (0.1a)  #-#-#-#-#
+# edX translation file
+# Copyright (C) 2016 edX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2016.
+# 
+# #-#-#-#-#  djangojs-studio.po (0.1a)  #-#-#-#-#
+# #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
+# #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
+# #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
+# #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
+# edX translation file.
+# Copyright (C) 2016 EdX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2016.
+# 
+# #-#-#-#-#  djangojs-studio.po (0.1a)  #-#-#-#-#
+# edX translation file.
+# Copyright (C) 2016 EdX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2016.
+# 
+# #-#-#-#-#  underscore.po (0.1a)  #-#-#-#-#
+# edX translation file
+# Copyright (C) 2016 edX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2016.
+# 
+# #-#-#-#-#  underscore-studio.po (0.1a)  #-#-#-#-#
+# edX translation file
+# Copyright (C) 2016 edX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2016.
+# 
+# #-#-#-#-#  djangojs-studio.po (0.1a)  #-#-#-#-#
+# #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
+# edX translation file.
+# Copyright (C) 2016 EdX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2016.
+# 
+# #-#-#-#-#  djangojs-studio.po (0.1a)  #-#-#-#-#
+# edX translation file.
+# Copyright (C) 2016 EdX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2016.
+# 
+# #-#-#-#-#  underscore.po (0.1a)  #-#-#-#-#
+# edX translation file
+# Copyright (C) 2016 edX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2016.
+# 
+# #-#-#-#-#  underscore-studio.po (0.1a)  #-#-#-#-#
+# edX translation file
+# Copyright (C) 2016 edX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2016.
+# 
+# #-#-#-#-#  underscore.po (0.1a)  #-#-#-#-#
+# edX translation file
+# Copyright (C) 2016 edX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2016.
+# 
+# #-#-#-#-#  underscore-studio.po (0.1a)  #-#-#-#-#
+# edX translation file
+# Copyright (C) 2016 edX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2016.
+# 
+# #-#-#-#-#  djangojs-studio.po (0.1a)  #-#-#-#-#
+# #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
+# #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
+# edX translation file.
+# Copyright (C) 2016 EdX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2016.
+# 
+# #-#-#-#-#  djangojs-studio.po (0.1a)  #-#-#-#-#
+# edX translation file.
+# Copyright (C) 2016 EdX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2016.
+# 
+# #-#-#-#-#  underscore.po (0.1a)  #-#-#-#-#
+# edX translation file
+# Copyright (C) 2016 edX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2016.
+# 
+# #-#-#-#-#  underscore-studio.po (0.1a)  #-#-#-#-#
+# edX translation file
+# Copyright (C) 2016 edX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2016.
+# 
+# #-#-#-#-#  djangojs-studio.po (0.1a)  #-#-#-#-#
+# #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
+# edX translation file.
+# Copyright (C) 2016 EdX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2016.
+# 
+# #-#-#-#-#  djangojs-studio.po (0.1a)  #-#-#-#-#
+# edX translation file.
+# Copyright (C) 2016 EdX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2016.
+# 
+# #-#-#-#-#  underscore.po (0.1a)  #-#-#-#-#
+# edX translation file
+# Copyright (C) 2016 edX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2016.
+# 
+# #-#-#-#-#  underscore-studio.po (0.1a)  #-#-#-#-#
+# edX translation file
+# Copyright (C) 2016 edX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2016.
+# 
+# #-#-#-#-#  underscore.po (0.1a)  #-#-#-#-#
+# edX translation file
+# Copyright (C) 2016 edX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2016.
+# 
+# #-#-#-#-#  underscore-studio.po (0.1a)  #-#-#-#-#
+# edX translation file
+# Copyright (C) 2016 edX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2016.
+# 
+# #-#-#-#-#  underscore.po (0.1a)  #-#-#-#-#
+# edX translation file
+# Copyright (C) 2016 edX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2016.
+# 
+# #-#-#-#-#  underscore-studio.po (0.1a)  #-#-#-#-#
+# edX translation file
+# Copyright (C) 2016 edX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2016.
+# 
+# #-#-#-#-#  djangojs-studio.po (0.1a)  #-#-#-#-#
+# #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
+# #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
+# #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
+# edX translation file.
+# Copyright (C) 2016 EdX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2016.
+# 
+# #-#-#-#-#  djangojs-studio.po (0.1a)  #-#-#-#-#
+# edX translation file.
+# Copyright (C) 2016 EdX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2016.
+# 
+# #-#-#-#-#  underscore.po (0.1a)  #-#-#-#-#
+# edX translation file
+# Copyright (C) 2016 edX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2016.
+# 
+# #-#-#-#-#  underscore-studio.po (0.1a)  #-#-#-#-#
+# edX translation file
+# Copyright (C) 2016 edX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2016.
+# 
+# #-#-#-#-#  djangojs-studio.po (0.1a)  #-#-#-#-#
+# #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
+# edX translation file.
+# Copyright (C) 2016 EdX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2016.
+# 
+# #-#-#-#-#  djangojs-studio.po (0.1a)  #-#-#-#-#
+# edX translation file.
+# Copyright (C) 2016 EdX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2016.
+# 
+# #-#-#-#-#  underscore.po (0.1a)  #-#-#-#-#
+# edX translation file
+# Copyright (C) 2016 edX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2016.
+# 
+# #-#-#-#-#  underscore-studio.po (0.1a)  #-#-#-#-#
+# edX translation file
+# Copyright (C) 2016 edX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2016.
+# 
+# #-#-#-#-#  underscore.po (0.1a)  #-#-#-#-#
+# edX translation file
+# Copyright (C) 2016 edX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2016.
+# 
+# #-#-#-#-#  underscore-studio.po (0.1a)  #-#-#-#-#
+# edX translation file
+# Copyright (C) 2016 edX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2016.
+# 
+# #-#-#-#-#  djangojs-studio.po (0.1a)  #-#-#-#-#
+# #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
+# #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
+# edX translation file.
+# Copyright (C) 2016 EdX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2016.
+# 
+# #-#-#-#-#  djangojs-studio.po (0.1a)  #-#-#-#-#
+# edX translation file.
+# Copyright (C) 2016 EdX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2016.
+# 
+# #-#-#-#-#  underscore.po (0.1a)  #-#-#-#-#
+# edX translation file
+# Copyright (C) 2016 edX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2016.
+# 
+# #-#-#-#-#  underscore-studio.po (0.1a)  #-#-#-#-#
+# edX translation file
+# Copyright (C) 2016 edX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2016.
+# 
+# #-#-#-#-#  djangojs-studio.po (0.1a)  #-#-#-#-#
+# #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
+# edX translation file.
+# Copyright (C) 2016 EdX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2016.
+# 
+# #-#-#-#-#  djangojs-studio.po (0.1a)  #-#-#-#-#
+# edX translation file.
+# Copyright (C) 2016 EdX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2016.
+# 
+# #-#-#-#-#  underscore.po (0.1a)  #-#-#-#-#
+# edX translation file
+# Copyright (C) 2016 edX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2016.
+# 
+# #-#-#-#-#  underscore-studio.po (0.1a)  #-#-#-#-#
+# edX translation file
+# Copyright (C) 2016 edX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2016.
+# 
+# #-#-#-#-#  underscore.po (0.1a)  #-#-#-#-#
+# edX translation file
+# Copyright (C) 2016 edX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2016.
+# 
+# #-#-#-#-#  underscore-studio.po (0.1a)  #-#-#-#-#
+# edX translation file
+# Copyright (C) 2016 edX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2016.
+# 
+# #-#-#-#-#  underscore.po (0.1a)  #-#-#-#-#
+# edX translation file
+# Copyright (C) 2016 edX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2016.
+# 
+# #-#-#-#-#  underscore-studio.po (0.1a)  #-#-#-#-#
+# edX translation file
+# Copyright (C) 2016 edX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2016.
+# 
+# #-#-#-#-#  underscore.po (0.1a)  #-#-#-#-#
+# edX translation file
+# Copyright (C) 2016 edX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2016.
+# 
+# #-#-#-#-#  underscore-studio.po (0.1a)  #-#-#-#-#
+# edX translation file
+# Copyright (C) 2016 edX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2016.
+# 
+# #-#-#-#-#  underscore.po (0.1a)  #-#-#-#-#
+# edX translation file
+# Copyright (C) 2016 edX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2016.
+# 
+# #-#-#-#-#  underscore-studio.po (0.1a)  #-#-#-#-#
+# edX translation file
+# Copyright (C) 2016 edX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2016.
+# 
 msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-05-12 14:45+0000\n"
-"PO-Revision-Date: 2016-05-12 14:46:24.034520\n"
+"POT-Creation-Date: 2016-05-19 14:55+0000\n"
+"PO-Revision-Date: 2016-05-19 14:56:29.060552\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -5677,6 +6247,7 @@ msgstr "يشفث"
 
 #: cms/templates/js/edit-chapter.underscore
 #: lms/templates/ccx/schedule.underscore
+#: lms/templates/commerce/receipt.underscore
 #: lms/templates/learner_dashboard/program_card.underscore
 msgid "gettext("
 msgstr "لثففثطف("
@@ -6510,20 +7081,12 @@ msgstr "لخ فخ يشسازخشقي"
 
 #: lms/templates/commerce/receipt.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
-#, python-format
-msgid ""
-"If you don't verify your identity now, you can still explore your course "
-"from your dashboard. You will receive periodic reminders from "
-"%(platformName)s to verify your identity."
-msgstr ""
-"هب غخع يخر'ف دثقهبغ غخعق هيثرفهفغ رخص, غخع ذشر سفهمم ثطحمخقث غخعق ذخعقسث "
-"بقخو غخعق يشسازخشقي. غخع صهمم قثذثهدث حثقهخيهذ قثوهريثقس بقخو "
-"%(platformName)s فخ دثقهبغ غخعق هيثرفهفغ."
-
-#: lms/templates/commerce/receipt.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
 msgid "Want to confirm your identity later?"
 msgstr "صشرف فخ ذخربهقو غخعق هيثرفهفغ مشفثق?"
+
+#: lms/templates/commerce/receipt.underscore
+msgid "/verify_student/verify-now/{courseKey}/"
+msgstr "/دثقهبغ_سفعيثرف/دثقهبغ-رخص/{courseKey}/"
 
 #: lms/templates/commerce/receipt.underscore
 msgid "Verify Now"
@@ -7772,6 +8335,17 @@ msgid ""
 msgstr ""
 "ش يقهدثق'س مهذثرسث, حشسسحخقف, خق لخدثقروثرف-هسسعثي هي صهفا غخعق رشوث شري "
 "حاخفخ."
+
+#: lms/templates/verify_student/payment_confirmation_step.underscore
+#, python-format
+msgid ""
+"If you don't verify your identity now, you can still explore your course "
+"from your dashboard. You will receive periodic reminders from "
+"%(platformName)s to verify your identity."
+msgstr ""
+"هب غخع يخر'ف دثقهبغ غخعق هيثرفهفغ رخص, غخع ذشر سفهمم ثطحمخقث غخعق ذخعقسث "
+"بقخو غخعق يشسازخشقي. غخع صهمم قثذثهدث حثقهخيهذ قثوهريثقس بقخو "
+"%(platformName)s فخ دثقهبغ غخعق هيثرفهفغ."
 
 #: lms/templates/verify_student/reverify_success_step.underscore
 msgid "Identity Verification In Progress"

@@ -57,14 +57,6 @@
 # gvidushiin <gvidushiin@gmail.com>, 2014
 # Ned Batchelder <ned@edx.org>, 2015
 # CHANDRA SHEKHAR SHARMA <shekharsharma041@gmail.com>, 2014
-# #-#-#-#-#  messages.po (edx-platform)  #-#-#-#-#
-# edX translation file
-# Copyright (C) 2013 edX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# Translators:
-# anant agarwal <agarwal@cag.csail.mit.edu>, 2013
-# anant agarwal <agarwal@cag.csail.mit.edu>, 2013
 # #-#-#-#-#  wiki.po (edx-platform)  #-#-#-#-#
 # edX translation file
 # Copyright (C) 2016 edX
@@ -78,7 +70,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-05-06 14:30+0000\n"
+"POT-Creation-Date: 2016-05-12 14:51+0000\n"
 "PO-Revision-Date: 2016-05-09 11:27+0000\n"
 "Last-Translator: plankton rules <planktonrules0@gmail.com>\n"
 "Language-Team: Hindi (http://www.transifex.com/open-edx/edx-platform/language/hi/)\n"
@@ -149,10 +141,14 @@ msgstr ""
 msgid "Status"
 msgstr "स्थिति:"
 
-#: cms/templates/index.html
-#: lms/templates/dashboard/_dashboard_status_verification.html
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: This is listed as the duration for a video that has not
+#. yet reached the point in its processing by the servers where its
+#. duration is determined.
+#: cms/djangoapps/contentstore/views/videos.py
+#: openedx/core/djangoapps/api_admin/models.py cms/templates/index.html
 msgid "Pending"
-msgstr "बाकी है"
+msgstr ""
 
 #: common/djangoapps/config_models/admin.py
 msgid "Revert to the selected configuration"
@@ -303,6 +299,12 @@ msgid ""
 "OPTIONAL: This is the SKU (stock keeping unit) of this mode in the external "
 "ecommerce service.  Leave this blank if the course has not yet been migrated"
 " to the ecommerce service."
+msgstr ""
+
+#: common/djangoapps/course_modes/models.py
+msgid ""
+"This is the bulk SKU (stock keeping unit) of this mode in the external "
+"ecommerce service."
 msgstr ""
 
 #: common/djangoapps/course_modes/models.py
@@ -5240,6 +5242,20 @@ msgstr "डाक - पता"
 msgid "Goals"
 msgstr ""
 
+#: lms/templates/register-form.html
+#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
+#: lms/templates/shoppingcart/receipt.html
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "City"
+msgstr "शहर"
+
+#: lms/templates/register-form.html
+#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
+#: lms/templates/shoppingcart/receipt.html
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "Country"
+msgstr "देश"
+
 #: lms/djangoapps/instructor/views/api.py
 msgid "Cohort"
 msgstr ""
@@ -5884,20 +5900,6 @@ msgstr "शीर्षक"
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "Year of Birth"
 msgstr "जन्म का वर्ष"
-
-#: lms/templates/register-form.html
-#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
-#: lms/templates/shoppingcart/receipt.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "City"
-msgstr "शहर"
-
-#: lms/templates/register-form.html
-#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
-#: lms/templates/shoppingcart/receipt.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "Country"
-msgstr "देश"
 
 #: lms/djangoapps/instructor_task/tasks_helper.py
 msgid "Enrollment Date"
@@ -9750,7 +9752,7 @@ msgstr "रजिस्टर करें"
 msgid "Sign in"
 msgstr ""
 
-#: lms/templates/navigation.html
+#: lms/templates/navigation.html themes/edx.org/lms/templates/header.html
 msgid ""
 "{begin_strong}Warning:{end_strong} Your browser is not fully supported. We "
 "strongly recommend using {chrome_link} or {ff_link}."
@@ -12498,36 +12500,38 @@ msgid ""
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
-msgid "ID Verification Status"
+msgid "Verification Status: Approved"
 msgstr ""
-
-#: lms/templates/dashboard/_dashboard_status_verification.html
-msgid "Reviewed and Verified"
-msgstr "जांच और वैरिफ़ाई कर लिया गया"
-
-#: lms/templates/dashboard/_dashboard_status_verification.html
-msgid "Your verification status is good for one year after submission."
-msgstr ""
-"एक बार जमा हो जाने के बाद आपकी वैरीफीकेशन स्थिति एक साल के लिए जारी रहेगी।"
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
 msgid ""
-"Your verification photos have been submitted and will be reviewed shortly."
+"Your edX Verification is reviewed and approved. Your verification status is "
+"good for one year after submission."
 msgstr ""
-"आपकी वैरीफीकेशन तस्वीरें जमा कर ली गई है और उनकी समीक्षा जल्दी ही की जाएगी।"
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
-msgid "{platform_name} Verification Status"
+msgid "Verification Status: Pending"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_status_verification.html
+msgid ""
+"Your edX Verification is pending. Your verification photos have been "
+"submitted and will be reviewed shortly."
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_status_verification.html
+msgid "Verification Status: Expired"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_status_verification.html
+msgid ""
+"Your edX Verification has expired. To receive a verified certificate, you "
+"have to submit a new photo of yourself and your government-issued photo ID "
+"before the course ends."
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
 msgid "Resubmit Verification"
-msgstr ""
-
-#: lms/templates/dashboard/_dashboard_status_verification.html
-msgid ""
-"To receive a verified certificate, you have to submit a new photo of "
-"yourself and your government-issued photo ID before the course ends."
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_third_party_error.html
@@ -16102,13 +16106,6 @@ msgstr "पाठ्यक्रम ढूंढें"
 msgid "Schools & Partners"
 msgstr ""
 
-#: themes/edx.org/lms/templates/header.html
-#: themes/red-theme/lms/templates/header.html
-msgid ""
-"<strong>Warning:</strong> Your browser is not fully supported. We strongly "
-"recommend using {chrome_link} or {ff_link}."
-msgstr ""
-
 #: themes/edx.org/lms/templates/course_modes/choose.html
 msgid ""
 "{b_start}Support our Mission: {b_end} EdX, a non-profit, relies on verified "
@@ -16135,6 +16132,12 @@ msgstr ""
 
 #: themes/red-theme/lms/templates/header.html
 msgid "Register Now"
+msgstr ""
+
+#: themes/red-theme/lms/templates/header.html
+msgid ""
+"<strong>Warning:</strong> Your browser is not fully supported. We strongly "
+"recommend using {chrome_link} or {ff_link}."
 msgstr ""
 
 #: themes/stanford-style/lms/templates/footer.html
@@ -16262,7 +16265,7 @@ msgid ""
 "you can also return to {link_start}the {studio_name} homepage.{link_end}"
 msgstr ""
 
-#: cms/templates/asset_index.html
+#: cms/templates/asset_index.html cms/templates/widgets/header.html
 msgid "Files & Uploads"
 msgstr ""
 
@@ -16429,8 +16432,8 @@ msgstr ""
 msgid "Other Course Settings"
 msgstr ""
 
-#: cms/templates/certificates.html cms/templates/group_configurations.html
-#: cms/templates/settings_advanced.html cms/templates/settings_graders.html
+#: cms/templates/certificates.html cms/templates/settings_advanced.html
+#: cms/templates/settings_graders.html
 msgid "Details &amp; Schedule"
 msgstr ""
 
@@ -17258,6 +17261,10 @@ msgid ""
 "{em_start}Edit{em_end}. You can delete a group configuration only if it is "
 "not in use in an experiment. To delete a configuration, hover over its box "
 "and click the delete icon."
+msgstr ""
+
+#: cms/templates/group_configurations.html
+msgid "Details & Schedule"
 msgstr ""
 
 #: cms/templates/howitworks.html
@@ -18314,7 +18321,7 @@ msgstr ""
 msgid "Schedule &amp; Details Settings"
 msgstr ""
 
-#: cms/templates/settings.html
+#: cms/templates/settings.html cms/templates/widgets/header.html
 msgid "Schedule & Details"
 msgstr ""
 
@@ -19199,14 +19206,6 @@ msgid "Updates"
 msgstr ""
 
 #: cms/templates/widgets/header.html
-msgid "Files &amp; Uploads"
-msgstr ""
-
-#: cms/templates/widgets/header.html
-msgid "Schedule &amp; Details"
-msgstr ""
-
-#: cms/templates/widgets/header.html
 msgid "Import"
 msgstr ""
 
@@ -19293,10 +19292,6 @@ msgstr ""
 #: cms/templates/widgets/tabs-aggregator.html
 msgid "name"
 msgstr ""
-
-# empty
-msgid "This is a key string."
-msgstr "यह एक प्रमुख स्ट्रिंग है"
 
 #: wiki/forms.py
 msgid "Only localhost... muahahaha"

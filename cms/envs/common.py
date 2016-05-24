@@ -326,6 +326,10 @@ MIDDLEWARE_CLASSES = (
 
     # Instead of AuthenticationMiddleware, we use a cache-backed version
     'cache_toolbox.middleware.CacheBackedAuthenticationMiddleware',
+    # Enable SessionAuthenticationMiddleware in order to invalidate
+    # user sessions after a password change.
+    'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
+
     'student.middleware.UserStandingMiddleware',
     'contentserver.middleware.StaticContentServer',
     'crum.CurrentRequestUserMiddleware',
@@ -906,9 +910,6 @@ INSTALLED_APPS = (
     # Static i18n support
     'statici18n',
 
-    # Management commands used for configuration automation
-    'edx_management_commands.management_commands',
-
     # Tagging
     'cms.lib.xblock.tagging',
 )
@@ -1189,3 +1190,6 @@ USERNAME_PATTERN = r'(?P<username>[\w.@+-]+)'
 
 # Partner support link for CMS footer
 PARTNER_SUPPORT_EMAIL = ''
+
+# Affiliate cookie tracking
+AFFILIATE_COOKIE_NAME = 'affiliate_id'

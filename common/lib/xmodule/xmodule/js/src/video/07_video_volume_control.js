@@ -39,10 +39,13 @@ function() {
 
         template: [
             '<div class="volume" role="application">',
-                '<button class="control" aria-disabled="false" aria-label="',
-                    gettext('Volume: Click on this button to mute or unmute this video or press UP or ' +
-                        'DOWN buttons to increase or decrease volume level.'),
-                    '" aria-expanded="false">',
+                '<p class="sr instructions" id="volume-instructions">',
+                    gettext('Click on this button to mute or unmute this video or press UP or DOWN buttons to increase or decrease volume level.'), // jshint ignore: line
+                '</p>',
+                '<button class="control" aria-disabled="false" aria-describedby="volume-instructions"',
+                    '" aria-expanded="false" title="',
+                        gettext('Adjust video volume'),
+                    '">',
                     '<span class="icon-fallback-img">',
                         '<span class="icon fa fa-volume-up" aria-hidden="true"></span>',
                         '<span class="sr control-text">',
@@ -50,13 +53,16 @@ function() {
                         '</span>',
                     '</span>',
                 '</button>',
-                '<div class="volume-slider-container" aria-hidden="true">',
+                '<div class="volume-slider-container" aria-hidden="true" title="',
+                    gettext('Adjust video volume'),
+                    '">',
                     '<div class="volume-slider" ',
                         'role="slider"',
                         'aria-orientation="vertical" ',
                         'aria-valuemin="0" ',
                         'aria-valuemax="100" ',
-                        'aria-valuenow=""></div>',
+                        'aria-valuenow="" ',
+                        'aria-label="' + gettext('Adjust video volume')  + '"></div>',
                 '</div>',
             '</div>'
         ].join(''),
@@ -121,6 +127,9 @@ function() {
          */
         render: function() {
             var container = this.el.find('.volume-slider');
+            
+            container
+                .append('<div class="ui-slider-handle volume-handle"></div>');
 
             this.volumeSlider = container.slider({
                 orientation: 'vertical',
@@ -133,7 +142,7 @@ function() {
             // We provide an independent behavior to adjust volume level.
             // Therefore, we do not need redundant focusing on slider in TAB
             // order.
-            container.find('a').attr('tabindex', -1);
+            container.find('.volume-handle').attr('tabindex', -1);
             this.state.el.find('.secondary-controls').append(this.el);
         },
 
