@@ -810,6 +810,10 @@ def _create_new_course(request, org, number, run, fields):
     Returns the URL for the course overview page.
     Raises DuplicateCourseError if the course already exists
     """
+    store_for_new_course = modulestore().default_modulestore.get_modulestore_type()
+    new_course = create_new_course_in_store(store_for_new_course, request.user, org, number, run, fields)
+
+    # Rearrange here to make sure 
     org_data = get_organization_by_short_name(org)
     if not org_data and organizations_enabled():
         return JsonResponse(
@@ -818,8 +822,7 @@ def _create_new_course(request, org, number, run, fields):
                         'you will need to add it to the system')},
             status=400
         )
-    store_for_new_course = modulestore().default_modulestore.get_modulestore_type()
-    new_course = create_new_course_in_store(store_for_new_course, request.user, org, number, run, fields)
+
     add_organization_course(org_data, new_course.id)
     return JsonResponse({
         'url': reverse_course_url('course_handler', new_course.id),

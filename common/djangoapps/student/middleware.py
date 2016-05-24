@@ -89,6 +89,9 @@ class UserCourseFilteringMiddleware(object):
         c_org_id = course_org['id'] if course_org else None
 
         if u_org_id and c_org_id:
+          print("0000000000000000000000000000000000000000000")
+          print c_org_id
+          print u_org_id
           if not c_org_id == u_org_id:
               msg = _('You do not belong to this organization. '
                 'If you believe this is an error, please '

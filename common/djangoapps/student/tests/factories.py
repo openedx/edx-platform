@@ -64,6 +64,7 @@ class CourseModeFactory(DjangoModelFactory):
 class OrganizationFactory(DjangoModelFactory):
     class Meta(object):
         model = Organization
+
     name = "MIT Test"
     active = 1
     created = datetime(2012, 1, 1, tzinfo=UTC)

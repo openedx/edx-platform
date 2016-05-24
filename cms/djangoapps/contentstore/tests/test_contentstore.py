@@ -1135,7 +1135,7 @@ class ContentStoreTest(ContentStoreTestCase, XssTestMixin):
 
     def setUp(self):
         super(ContentStoreTest, self).setUp()
-
+        # TODO look at passing in user details to these constructors
         self.test_org = OrganizationFactory()
         self.test_organizationuser = OrganizationUser()
         self.course_data = {
@@ -1154,8 +1154,6 @@ class ContentStoreTest(ContentStoreTestCase, XssTestMixin):
         if number_suffix:
             test_course_data['number'] = '{0}_{1}'.format(test_course_data['number'], number_suffix)
         course_key = _get_course_id(self.store, test_course_data)
-        print("---------------------------------")
-        print(self.user.id)
         _create_course(self, course_key, test_course_data)
         # Verify that the creator is now registered in the course.
         self.assertTrue(CourseEnrollment.is_enrolled(self.user, course_key))
@@ -1187,6 +1185,8 @@ class ContentStoreTest(ContentStoreTestCase, XssTestMixin):
         self.course_data['org'] = 'org.foo.bar'
         self.course_data['number'] = 'course.number'
         self.course_data['run'] = 'run.name'
+        # Create a new ORG
+        self.new_test_org = OrganizationFactory(short_name='org.foo.bar')
         self.assert_created_course()
 
     def test_create_course_check_forum_seeding(self):
@@ -1329,9 +1329,19 @@ class ContentStoreTest(ContentStoreTestCase, XssTestMixin):
         self.course_data['number'] = '{}a'.format(self.course_data['number'])
         resp = self.client.ajax_post('/course/', self.course_data)
         self.assertEqual(resp.status_code, 200)
+        
         self.course_data['number'] = cache_current
         self.course_data['org'] = 'a{}'.format(self.course_data['org'])
+        # Create a new ORG
+        self.new_test_org = OrganizationFactory(short_name = self.course_data['org'])
+        # change user ORG
+        #self.test_organizationuser.organization_id = self.new_test_org.id
+        self.test_organizationuser.organization_id = self.new_test_org.id
+        self.test_organizationuser.save()
+        print('----------------------------------------------------------------------------------------------------------------------')
+        print self.test_organizationuser
         resp = self.client.ajax_post('/course/', self.course_data)
+        print(resp)
         self.assertEqual(resp.status_code, 200)
 
     def test_create_course_with_bad_organization(self):
@@ -1580,6 +1590,8 @@ class ContentStoreTest(ContentStoreTestCase, XssTestMixin):
             'display_name': 'Robot Super Course',
             'run': target_id.run
         }
+        # Create a new ORG
+        self.new_test_org = OrganizationFactory(short_name='edX')
         _create_course(self, target_id, course_data)
         course_module = self.store.get_course(target_id)
         course_module.wiki_slug = 'toy'
@@ -2162,6 +2174,8 @@ def _create_course(test, course_key, course_data):
     """
     course_url = get_url('course_handler', course_key, 'course_key_string')
     response = test.client.ajax_post(course_url, course_data)
+    print("||||||||||||||||||||||")
+    print(response)
     test.assertEqual(response.status_code, 200)
     data = parse_json(response)
     test.assertNotIn('ErrMsg', data)
