@@ -163,7 +163,7 @@ from openedx.core.djangolib.markup import Text, HTML
                   ${_("Browse recently launched courses and see what's new in your favorite subjects.")}
               </div>
               <div class="ad-link">
-                  <a class="btn-find-courses" href="${marketing_link('COURSES')}">
+                  <a class="btn-neutral" href="${marketing_link('COURSES')}">
                       <span class="icon fa fa-search" aria-hidden="true"></span>
                       ${_("Explore New Courses")}
                   </a>
@@ -193,19 +193,6 @@ from openedx.core.djangolib.markup import Text, HTML
       </ul>
     </section>
   </section>
-  % if xseries_credentials:
-    <div class="wrapper-xseries-certificates">
-      <p class="title">${_("XSeries Program Certificates")}</p>
-      <p class="copy">${_("You have received a certificate for the following XSeries programs:")}</p>
-      <ul>
-      % for xseries_credential in xseries_credentials:
-        <li>
-          <a class="copy" href="${xseries_credential['credential_url']}">${xseries_credential['display_name']}</a>
-        </li>
-      % endfor
-      </ul>
-    </div>
-  % endif
 </section>
 
 <section id="email-settings-modal" class="modal" aria-hidden="true">
