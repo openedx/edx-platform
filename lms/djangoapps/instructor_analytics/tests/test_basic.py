@@ -32,9 +32,10 @@ from shoppingcart.models import (
 )
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_GRADED_MODULESTORE
-from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from edx_proctoring.api import create_exam
 from edx_proctoring.models import ProctoredExamStudentAttempt
+from xmodule.modulestore.django import modulestore
 
 
 class TestAnalyticsBasic(ModuleStoreTestCase):
@@ -573,39 +574,87 @@ class TestStudentResponsesAnalyticsBasic(ModuleStoreTestCase):
         self.assertEqual(len(datarows), 0)
 
     def test_problem_with_student_answer_and_answers(self):
-        self.course = get_course(CourseKey.from_string('edX/graded/2012_Fall'))
-        problem_location = Location('edX', 'graded', '2012_Fall', 'problem', 'H1P2')
+        self.course = CourseFactory.create(
+            display_name=u'test course',
+        )
+        section = ItemFactory.create(
+            parent_location=self.course.location,
+            category='chapter',
+            display_name=u'test section',
+        )
+        sub_section = ItemFactory.create(
+            parent_location=section.location,
+            category='sequential',
+            display_name=u'test subsection',
+        )
+        unit = ItemFactory.create(
+            parent_location=sub_section.location,
+            category="vertical",
+            metadata={'graded': True, 'format': 'Homework'},
+            display_name=u'test unit',
+        )
+        problem = ItemFactory.create(
+            parent_location=unit.location,
+            category='problem',
+            display_name=u'test problem',
+        )
+        submit_and_compare_valid_state = ItemFactory.create(
+            parent_location=unit.location,
+            category='submit-and-compare',
+            display_name=u'test submit_and_compare1',
+        )
+        submit_and_compare_invalid_state = ItemFactory.create(
+            parent_location=unit.location,
+            category='submit-and-compare',
+            display_name=u'test submit_and_compare2',
+        )
+        content_library = ItemFactory.create(
+            parent_location=unit.location,
+            category='library_content',
+            display_name=u'test content_library',
+        )
+        library_problem = ItemFactory.create(
+            parent_location=content_library.location,
+            category='problem',
+        )
 
         self.create_student()
+
         StudentModuleFactory.create(
             course_id=self.course.id,
-            module_state_key=problem_location,
+            module_state_key=problem.location,
             student=self.student,
             grade=0,
             state=u'{"student_answers":{"problem_id":"student response1"}}',
         )
-
-        submit_and_compare_location = Location('edX', 'graded', '2012_Fall', 'problem', 'H1P3')
         StudentModuleFactory.create(
             course_id=self.course.id,
-            module_state_key=submit_and_compare_location,
+            module_state_key=submit_and_compare_valid_state.location,
             student=self.student,
-            grade=0,
+            grade=1,
             state=u'{"student_answer": "student response2"}',
         )
-
-        submit_and_compare_location = Location("edX", "graded", "2012_Fall", "problem", 'H1P0')
         StudentModuleFactory.create(
             course_id=self.course.id,
-            module_state_key=submit_and_compare_location,
+            module_state_key=submit_and_compare_invalid_state.location,
             student=self.student,
-            grade=0,
+            grade=1,
             state=u'{"answer": {"problem_id": "123"}}',
         )
+        StudentModuleFactory.create(
+            course_id=self.course.id,
+            module_state_key=library_problem.location,
+            student=self.student,
+            grade=0,
+            state=u'{"student_answers":{"problem_id":"content library response1"}}',
+        )
 
-        datarows = list(student_responses(self.course))
+        course_with_children = modulestore().get_course(self.course.id, depth=4)
+        datarows = list(student_responses(course_with_children))
         self.assertEqual(datarows[0][-1], u'problem_id=student response1')
         self.assertEqual(datarows[1][-1], u'student response2')
+        self.assertEqual(datarows[2][-1], None)
+        self.assertEqual(datarows[3][-1], u'problem_id=content library response1')
 
     def test_problem_with_no_answer(self):
         self.course = get_course(CourseKey.from_string('edX/graded/2012_Fall'))

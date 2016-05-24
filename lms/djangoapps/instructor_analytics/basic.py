@@ -524,6 +524,10 @@ def iterate_problem_components(course):
                 for component in unit.get_children():
                     if component.category in settings.STUDENT_RESPONSES_REPORT_SUPPORTED_TYPES:
                         yield component, parent_metadata
+                    elif component.category in settings.TYPES_WITH_CHILD_PROBLEMS_LIST:
+                        for library_problem in component.get_children():
+                            if library_problem.category in settings.STUDENT_RESPONSES_REPORT_SUPPORTED_TYPES:
+                                yield library_problem, parent_metadata
 
 
 def student_responses(course):
