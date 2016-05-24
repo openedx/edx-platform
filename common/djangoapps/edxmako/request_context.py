@@ -26,7 +26,7 @@ from django.utils.module_loading import import_string
 from util.request import safe_get_host
 from crum import get_current_request
 
-from request_cache import get_request_cache
+import request_cache
 
 
 def get_template_context_processors():
@@ -44,7 +44,7 @@ def get_template_request_context():
     or returns None if there is not a current request.
     """
 
-    request_cache_dict = get_request_cache('edxmako')
+    request_cache_dict = request_cache.get_cache('edxmako')
     cache_key = "request_context"
     if cache_key in request_cache_dict:
         return request_cache_dict[cache_key]
