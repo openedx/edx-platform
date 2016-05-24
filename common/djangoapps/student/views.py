@@ -319,6 +319,7 @@ def _cert_info(user, course_overview, cert_status, course_mode):  # pylint: disa
         CertificateStatuses.auditing: 'auditing',
         CertificateStatuses.audit_passing: 'auditing',
         CertificateStatuses.audit_notpassing: 'auditing',
+        CertificateStatuses.unverified: 'unverified',
     }
 
     default_status = 'processing'
@@ -350,7 +351,7 @@ def _cert_info(user, course_overview, cert_status, course_mode):  # pylint: disa
         'can_unenroll': status not in DISABLE_UNENROLL_CERT_STATES,
     }
 
-    if (status in ('generating', 'ready', 'notpassing', 'restricted', 'auditing') and
+    if (status in ('generating', 'ready', 'notpassing', 'restricted', 'auditing', 'unverified') and
             course_overview.end_of_course_survey_url is not None):
         status_dict.update({
             'show_survey_button': True,
@@ -394,7 +395,7 @@ def _cert_info(user, course_overview, cert_status, course_mode):  # pylint: disa
                     cert_status['download_url']
                 )
 
-    if status in ('generating', 'ready', 'notpassing', 'restricted', 'auditing'):
+    if status in ('generating', 'ready', 'notpassing', 'restricted', 'auditing', 'unverified'):
         if 'grade' not in cert_status:
             # Note: as of 11/20/2012, we know there are students in this state-- cs169.1x,
             # who need to be regraded (we weren't tracking 'notpassing' at first).

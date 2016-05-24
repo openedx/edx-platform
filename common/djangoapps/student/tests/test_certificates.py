@@ -15,6 +15,7 @@ from xmodule.modulestore.tests.factories import CourseFactory
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from certificates.tests.factories import GeneratedCertificateFactory  # pylint: disable=import-error
 from certificates.api import get_certificate_url  # pylint: disable=import-error
+from certificates.models import CertificateStatuses  # pylint: disable=import-error
 from course_modes.models import CourseMode
 
 from student.models import LinkedInAddToProfileConfiguration
@@ -110,6 +111,17 @@ class CertificateDisplayTest(SharedModuleStoreTestCase):
 
         self.assertContains(response, u'View Test_Certificate')
         self.assertContains(response, test_url)
+
+    @ddt.data('verified', 'honor', 'professional')
+    def test_unverified_certificate_message(self, enrollment_mode):
+        cert = self._create_certificate(enrollment_mode)
+        cert.status = CertificateStatuses.unverified
+        cert.save()
+        response = self.client.get(reverse('dashboard'))
+        self.assertContains(
+            response,
+            u'do not have a current verified identity with {platform_name}'
+            .format(platform_name=settings.PLATFORM_NAME))
 
     def test_post_to_linkedin_invisibility(self):
         """

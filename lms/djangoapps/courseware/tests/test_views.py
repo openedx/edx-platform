@@ -1367,7 +1367,7 @@ class ProgressPageTests(ModuleStoreTestCase):
         self.assertContains(resp, u"Download Your Certificate")
 
     @ddt.data(
-        *itertools.product(((41, 4, True), (41, 4, False)), (True, False))
+        *itertools.product(((42, 4, True), (42, 4, False)), (True, False))
     )
     @ddt.unpack
     def test_query_counts(self, (sql_calls, mongo_calls, self_paced), self_paced_enabled):
@@ -1382,22 +1382,32 @@ class ProgressPageTests(ModuleStoreTestCase):
         'grade': 'Pass', 'percent': 0.75, 'section_breakdown': [], 'grade_breakdown': []
     }))
     @ddt.data(
-        (CourseMode.AUDIT, False),
-        (CourseMode.HONOR, True),
-        (CourseMode.VERIFIED, True),
-        (CourseMode.PROFESSIONAL, True),
-        (CourseMode.NO_ID_PROFESSIONAL_MODE, True),
-        (CourseMode.CREDIT_MODE, True),
+        *itertools.product(
+            (
+                CourseMode.AUDIT,
+                CourseMode.HONOR,
+                CourseMode.VERIFIED,
+                CourseMode.PROFESSIONAL,
+                CourseMode.NO_ID_PROFESSIONAL_MODE,
+                CourseMode.CREDIT_MODE
+            ),
+            (True, False)
+        )
     )
     @ddt.unpack
-    def test_show_certificate_request_button(self, course_mode, show_button):
+    def test_show_certificate_request_button(self, course_mode, user_verified):
         """Verify that the Request Certificate is not displayed in audit mode."""
         CertificateGenerationConfiguration(enabled=True).save()
         certs_api.set_cert_generation_enabled(self.course.id, True)
         CourseEnrollment.enroll(self.user, self.course.id, mode=course_mode)
-
-        resp = views.progress(self.request, course_id=unicode(self.course.id))
-        self.assertEqual(show_button, 'Request Certificate' in resp.content)
+        with patch(
+            'lms.djangoapps.verify_student.models.SoftwareSecurePhotoVerification.user_is_verified'
+        ) as user_verify:
+            user_verify.return_value = user_verified
+            resp = views.progress(self.request, course_id=unicode(self.course.id))
+            self.assertEqual(
+                course_mode is not CourseMode.AUDIT and user_verified,
+                'Request Certificate' in resp.content)
 
 
 @attr('shard_1')
