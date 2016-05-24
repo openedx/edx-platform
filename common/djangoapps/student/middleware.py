@@ -52,51 +52,53 @@ class UserCourseFilteringMiddleware(object):
     NB this should not affect ADMIN OR LMS!!!!!!!!!!!!!!
     """
     def process_request(self, request):
-        user = request.user
+        org_is_enabled = settings.FEATURES.get('ORGANIZATIONS_APP', False)
+        if org_is_enabled:
+	    user = request.user
 
-        user_org = Organization.objects.filter(
-            organizationuser__active=True,
-            organizationuser__user_id_id=user.id).values().first()
+            user_org = Organization.objects.filter(
+                organizationuser__active=True,
+                organizationuser__user_id_id=user.id).values().first()
 
-        u_org_id = user_org['id'] if user_org else None
+            u_org_id = user_org['id'] if user_org else None
 
-	def course_id_from_url(url):
-	    """
-	    Extracts the course_id from the given `url`.
-	    """
-	    if not url:
-		return None
+	    def course_id_from_url(url):
+	        """
+	        Extracts the course_id from the given `url`.
+	        """
+	        if not url:
+		    return None
 
-	    match = COURSE_REGEX.match(url)
+	        match = COURSE_REGEX.match(url)
 
-	    if match is None:
-		return None
+	        if match is None:
+		    return None
 
-	    course_id = match.group('course_id')
+	        course_id = match.group('course_id')
 
-	    if course_id is None:
-		return None
+	        if course_id is None:
+		    return None
 
-	    try:
-		return SlashSeparatedCourseKey.from_deprecated_string(course_id)
-	    except InvalidKeyError:
-		return None
+	        try:
+		    return SlashSeparatedCourseKey.from_deprecated_string(course_id)
+	        except InvalidKeyError:
+		    return None
 
-        course_id = course_id_from_url(request.path)
-        course_org = Organization.objects.filter(
-            organizationcourse__course_id=course_id).values().first()
+            course_id = course_id_from_url(request.path)
+            course_org = Organization.objects.filter(
+                organizationcourse__course_id=course_id).values().first()
 
-        c_org_id = course_org['id'] if course_org else None
+            c_org_id = course_org['id'] if course_org else None
 
-        if u_org_id and c_org_id:
-          if not c_org_id == u_org_id:
-              msg = _('You do not belong to this organization. '
-                'If you believe this is an error, please '
-                'contact us at {support_email}'
-              ).format(
-                support_email=u'<a href="mailto:{address}?subject={subject_line}">{address}</a>'.format(
-                    address=settings.DEFAULT_FEEDBACK_EMAIL,
-                    subject_line=_('User Organization Incorrect'),
-                ),
-              )
-              return HttpResponseForbidden(msg)
+            if u_org_id and c_org_id:
+              if not c_org_id == u_org_id:
+                  msg = _('You do not belong to this organization. '
+                    'If you believe this is an error, please '
+                    'contact us at {support_email}'
+                  ).format(
+                    support_email=u'<a href="mailto:{address}?subject={subject_line}">{address}</a>'.format(
+                        address=settings.DEFAULT_FEEDBACK_EMAIL,
+                        subject_line=_('User Organization Incorrect'),
+                    ),
+                  )
+                  return HttpResponseForbidden(msg)
