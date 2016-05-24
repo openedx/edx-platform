@@ -5,6 +5,7 @@ describe 'MarkdownEditingDescriptor', ->
           return {
             compare: (actual, expected) ->
               {
+                  # compare the actual and expected XMLs by removing all the whitespace characters.
                   pass: actual.replace(/\s+/g, '') == expected.replace(/\s+/g, '')
               }
           }
@@ -108,6 +109,9 @@ describe 'MarkdownEditingDescriptor', ->
       expect(revisedSelection).toEqual('[explanation]\nmy text\n[explanation]')
 
   describe 'markdownToXml', ->
+    it 'converts blank common problem to correct XML', ->
+      data = MarkdownEditingDescriptor.markdownToXml('')
+      expect(data).toXMLEqual('<problem><question></question></problem>')
     it 'converts raw text to paragraph', ->
       data = MarkdownEditingDescriptor.markdownToXml('foo')
       expect(data).toEqual('<problem>\n<question>\n<p>foo</p>\n</question>\n</problem>')

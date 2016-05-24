@@ -15,19 +15,30 @@ class CapaHtmlRenderTest(unittest.TestCase):
         super(CapaHtmlRenderTest, self).setUp()
         self.capa_system = test_capa_system()
 
+    def problem_question(self, xml_str, capa_system=None):
+        """
+        Create CAPA problem from `xml_str`.
+
+        Return question element and rendered HTML.
+        """
+        # Create the problem
+        problem = new_loncapa_problem(xml_str, capa_system=capa_system or self.capa_system)
+
+        # Render the HTML
+        rendered_html = etree.XML(problem.get_html())
+
+        # get question
+        question = rendered_html.find(".//div[@class='question']")
+
+        return question, rendered_html
+
     def test_blank_problem(self):
         """
         It's important that blank problems don't break, since that's
         what you start with in studio.
         """
-        xml_str = "<problem> </problem>"
-
-        # Create the problem
-        problem = new_loncapa_problem(xml_str)
-
-        # Render the HTML
-        etree.XML(problem.get_html())
-        # TODO: This test should inspect the rendered html and assert one or more things about it
+        xml_str = "<problem><question></question></problem>"
+        self.assertIsNotNone(self.problem_question(xml_str)[0])
 
     def test_include_html(self):
         # Create a test file to include
@@ -43,14 +54,7 @@ class CapaHtmlRenderTest(unittest.TestCase):
             </problem>
         """)
 
-        # Create the problem
-        problem = new_loncapa_problem(xml_str, capa_system=self.capa_system)
-
-        # Render the HTML
-        rendered_html = etree.XML(problem.get_html())
-
-        # get question
-        question = rendered_html.find(".//div[@class='question']")
+        question, _ = self.problem_question(xml_str)
 
         # Expect that the include file was embedded in the problem
         test_element = question.find("test")
@@ -65,14 +69,7 @@ class CapaHtmlRenderTest(unittest.TestCase):
             </problem>
         """)
 
-        # Create the problem
-        problem = new_loncapa_problem(xml_str)
-
-        # Render the HTML
-        rendered_html = etree.XML(problem.get_html())
-
-        # get question
-        question = rendered_html.find(".//div[@class='question']")
+        question, _ = self.problem_question(xml_str)
 
         # Expect that the <startouttext /> and <endouttext />
         # were converted to <span></span> tags
@@ -87,14 +84,7 @@ class CapaHtmlRenderTest(unittest.TestCase):
             </problem>
         """)
 
-        # Create the problem
-        problem = new_loncapa_problem(xml_str)
-
-        # Render the HTML
-        rendered_html = etree.XML(problem.get_html())
-
-        # get question
-        question = rendered_html.find(".//div[@class='question']")
+        question, _ = self.problem_question(xml_str)
 
         # Expect that the anonymous_student_id was converted to "student"
         span_element = question.find('span')
@@ -108,14 +98,10 @@ class CapaHtmlRenderTest(unittest.TestCase):
             </problem>
         """)
 
-        # Create the problem
-        problem = new_loncapa_problem(xml_str)
-
-        # Render the HTML
-        rendered_html = etree.XML(problem.get_html())
+        question, _ = self.problem_question(xml_str)
 
         # Expect that the script element has been removed from the rendered HTML
-        script_element = rendered_html.find('script')
+        script_element = question.find('script')
         self.assertEqual(None, script_element)
 
     def test_render_javascript(self):
@@ -126,11 +112,7 @@ class CapaHtmlRenderTest(unittest.TestCase):
             </problem>
         """)
 
-        # Create the problem
-        problem = new_loncapa_problem(xml_str)
-
-        # Render the HTML
-        rendered_html = etree.XML(problem.get_html())
+        _, rendered_html = self.problem_question(xml_str)
 
         # expect the javascript is still present in the rendered html
         self.assertIn(
@@ -153,15 +135,10 @@ class CapaHtmlRenderTest(unittest.TestCase):
         the_system.render_template = mock.Mock()
         the_system.render_template.return_value = "<div>Input Template Render</div>"
 
-        # Create the problem and render the HTML
-        problem = new_loncapa_problem(xml_str, capa_system=the_system)
-        rendered_html = etree.XML(problem.get_html())
+        question, rendered_html = self.problem_question(xml_str, capa_system=the_system)
 
         # Expect problem has been turned into a <div>
         self.assertEqual(rendered_html.tag, "div")
-
-        # get question
-        question = rendered_html.find(".//div[@class='question']")
 
         # Expect question text is in a <p> child
         question_element = question.find("p")
@@ -259,12 +236,7 @@ class CapaHtmlRenderTest(unittest.TestCase):
             </problem>
         """)
 
-        # Create the problem and render the HTML
-        problem = new_loncapa_problem(xml_str)
-        rendered_html = etree.XML(problem.get_html())
-
-        # get question
-        question = rendered_html.find(".//div[@class='question']")
+        question, _ = self.problem_question(xml_str)
 
         # Expect that the variable $test has been replaced with its value
         span_element = question.find('span')
@@ -288,7 +260,10 @@ class CapaHtmlRenderTest(unittest.TestCase):
 
         # Render the HTML
         the_html = problem.get_html()
-        self.assertRegexpMatches(the_html, r"<div class=\"question\" id=\"question-0\">\s+</div>")
+        self.assertRegexpMatches(
+            the_html,
+            r"<div class=\"question\" id=\"1_question_0\" question_index=\"0\">\s+</div>"
+        )
 
     def _create_test_file(self, path, content_str):
         test_fp = self.capa_system.filestore.open(path, "w")

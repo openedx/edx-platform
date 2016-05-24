@@ -12,7 +12,7 @@ class ProblemPage(PageObject):
     url = None
     CSS_PROBLEM_HEADER = '.problem-header'
 
-    # There can be multiple questions in a problem, so we need to make query selector specific to question
+    # Used to make question specific css selector
     question_id = 0
 
     def is_browser_on_page(self):
@@ -28,7 +28,7 @@ class ProblemPage(PageObject):
         Returns:
             str: Element selector specific to a question.
         """
-        return 'div.problem #question-{}.question {}'.format(self.question_id, selector)
+        return 'div.problem [question_index="{}"] {}'.format(self.question_id, selector)
 
     @property
     def problem_name(self):

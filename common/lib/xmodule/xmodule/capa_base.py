@@ -155,7 +155,11 @@ class CapaFields(object):
             {"display_name": _("Per Student"), "value": RANDOMIZATION.PER_STUDENT}
         ]
     )
-    data = String(help=_("XML data for the problem"), scope=Scope.content, default="<problem></problem>")
+    data = String(
+        help=_("XML data for the problem"),
+        scope=Scope.content,
+        default="<problem><question></question></problem>"
+    )
     correct_map = Dict(help=_("Dictionary with the correctness of current student answers"),
                        scope=Scope.user_state, default={})
     input_state = Dict(help=_("Dictionary for maintaining the state of inputtypes"), scope=Scope.user_state)
@@ -659,9 +663,9 @@ class CapaMixin(CapaFields):
         else:
             check_button = False
             check_button_checking = False
-
+        
         content = {
-            'name': self.display_name_with_default_escaped,
+            'name': self.display_name,
             'html': html,
             'weight': self.weight,
         }

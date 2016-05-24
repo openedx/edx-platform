@@ -2,4 +2,8 @@
 metadata:
     display_name: Blank Common Problem
     markdown: ""
-data: "<problem><question></question></problem>"
+data: |
+      <problem>
+        <question>
+        </question>
+      </problem>

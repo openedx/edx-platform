@@ -25,8 +25,6 @@ class @Problem
 
     window.update_schematics()
 
-    debugger
-
     problem_prefix = @element_id.replace(/problem_/,'')
     @inputs = @$("[id^='input_#{problem_prefix}_']")
     @$('div.action button').click @refreshAnswers
@@ -228,7 +226,6 @@ class @Problem
   ###
   check_fd: =>
     # If there are no file inputs in the problem, we can fall back on @check
-    debugger
     if @el.find('input:file').length == 0
       @check()
       return
@@ -809,7 +806,7 @@ class @Problem
   hint_button: (event)=>
     # Store the index of the currently shown hint as an attribute.
     # Use that to compute the next hint number when the button is clicked.
-    debugger
+    
     question = $(event.target).closest('div.question')
     hint_container = question.find('.problem-hint')
     hint_index = hint_container.attr('hint_index')
@@ -819,7 +816,7 @@ class @Problem
       next_index = parseInt(hint_index) + 1
 
     data =
-      question_id: question.attr('id').split('-')[1]
+      question_id: question.attr('question_index')
       hint_index: next_index
       input_id: @id
 

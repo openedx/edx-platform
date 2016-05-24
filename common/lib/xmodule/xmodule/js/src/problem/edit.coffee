@@ -580,11 +580,16 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
     }`
 
     questionsXML = []
-    # TODO! Should we change it to markdown.split('\n---\n'). What is the right choice?
-    questionsMarkdown = markdown.split('---')
+    questionsMarkdown = markdown.split('\n---\n')
     _.each questionsMarkdown, (questionMarkdown, index) ->
       if questionMarkdown.trim().length > 0
         questionsXML.push toXml(questionMarkdown)
-
+        
+    # add <question></question> when markdown is an empty string
+    # this is needed to handle blank_common.yaml where OLX is not
+    # in correct format after conversion
+    if markdown.trim().length == 0
+      questionsXML.push('<question></question>')
+    
     # make all questions descendants of a single problem element
     return '<problem>\n' + questionsXML.join('\n\n') + '\n</problem>'

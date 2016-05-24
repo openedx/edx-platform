@@ -38,9 +38,12 @@ class ProblemsTest(UniqueCourseTest):
         )
 
         problem = self.get_problem()
+        problems = (problem,) * self.get_num_problems()
         course_fixture.add_children(
             XBlockFixtureDesc('chapter', 'Test Section').add_children(
-                XBlockFixtureDesc('sequential', 'Test Subsection').add_children(problem)
+                XBlockFixtureDesc('sequential', 'Test Subsection').add_children(
+                    XBlockFixtureDesc('vertical', 'Test Unit').add_children(*problems)
+                )
             )
         ).install()
 
@@ -57,6 +60,12 @@ class ProblemsTest(UniqueCourseTest):
     def get_problem(self):
         """ Subclasses should override this to complete the fixture """
         raise NotImplementedError()
+
+    def get_num_problems(self):
+        """
+        Tells how many problems to create. Defaults to 1.
+        """
+        return 1
 
 
 class ProblemClarificationTest(ProblemsTest):
@@ -470,3 +479,72 @@ class LogoutDuringAnswering(ProblemsTest):
 
         self.assertTrue(problem_page.is_browser_on_page())
         self.assertEqual(problem_page.problem_name, 'TEST PROBLEM')
+
+
+# @attr('a11y')
+class CAPAProblemQuestionA11yTest(ProblemsTest):
+    """
+    TestCase Class for CAPA problem questions
+    """
+    def get_problem(self):
+        """
+        Problem structure.
+        """
+        xml = dedent("""
+            <problem>
+                <question>
+                    <p>question text</p>
+                    <stringresponse answer="A">
+                        <stringequalhint answer="C"><a href="#">aa bb</a> cc</stringequalhint>
+                        <textline size="20"/>
+                    </stringresponse>
+                    <demandhint>
+                      <hint>question 1 hint 1</hint>
+                      <hint>question 1 hint 2</hint>
+                    </demandhint>
+                </question>
+                <question>
+                    <p>That is the question</p>
+                    <multiplechoiceresponse>
+                      <choicegroup type="MultipleChoice">
+                        <choice correct="false">Alpha <choicehint>A hint</choicehint></choice>
+                        <choice correct="true">Beta</choice>
+                      </choicegroup>
+                    </multiplechoiceresponse>
+                    <demandhint>
+                      <hint>question 2 hint 1</hint>
+                      <hint>question 2 hint 2</hint>
+                    </demandhint>
+                </question>
+            </problem>
+        """)
+        return XBlockFixtureDesc('problem', 'Problem Question TEST', data=xml)
+
+    def get_num_problems(self):
+        """
+        Create two problems.
+        """
+        return 2
+
+    def test_questions_have_unique_ids(self):
+        """
+        Scenario: Verifies that each question has a unique id.
+        Given I am enrolled in a course.
+        And I visit a unit page with two CAPA problems where each problem has 2 questions
+        Then I check if questions have unique IDs
+        """
+        self.courseware_page.visit()
+        problem_page = ProblemPage(self.browser)
+
+        # Set the scope to the problem question
+        problem_page.a11y_audit.config.set_scope(
+            include=['div.question']
+        )
+
+        # Check only for duplicate ids
+        problem_page.a11y_audit.config.set_rules({
+            "apply": ['duplicate-id'],
+        })
+
+        # Run the accessibility audit.
+        problem_page.a11y_audit.check_for_accessibility_errors()

@@ -65,7 +65,7 @@ var options = {
 
     specFiles: [
         {pattern: 'spec/helper.js', included: true, ignoreCoverage: true}, // Helper which depends on source files.
-        {pattern: 'spec/problem/*.js', included: true}
+        {pattern: 'spec/**/*.js', included: true}
     ],
 
     fixtureFiles: [

@@ -737,7 +737,7 @@ class LoncapaProblem(object):
         context['extra_files'] = extra_files or None
         return context
 
-    def _extract_html(self, problemtree, question_id=0):  # private
+    def _extract_html(self, problemtree):  # private
         """
         Main (private) function which converts Problem XML tree to HTML.
         Calls itself recursively.
@@ -822,22 +822,17 @@ class LoncapaProblem(object):
         # otherwise, render children recursively, and copy over attributes
         tree = etree.Element(problemtree.tag)
         for item in problemtree:
-            item_xhtml = self._extract_html(item, question_id)
-
-            if item.tag == 'question':
-                item_xhtml.set('class', 'question')
-                item_xhtml.set('id', 'question-{}'.format(question_id))
-                question_id += 1
+            item_xhtml = self._extract_html(item)
 
             if item_xhtml is not None:
                 tree.append(item_xhtml)
 
         if tree.tag in html_transforms:
             tree.tag = html_transforms[problemtree.tag]['tag']
-        else:
-            # copy attributes over if not innocufying
-            for (key, value) in problemtree.items():
-                tree.set(key, value)
+
+        # copy attributes over if not innocufying
+        for (key, value) in problemtree.items():
+            tree.set(key, value)
 
         tree.text = problemtree.text
         tree.tail = problemtree.tail
@@ -901,3 +896,11 @@ class LoncapaProblem(object):
         for solution in tree.findall('.//solution'):
             solution.attrib['id'] = "%s_solution_%i" % (self.problem_id, solution_id)
             solution_id += 1
+
+        # Assign unique ids to <question>...</question>
+        question_index = 0
+        for question in tree.findall('.//question'):
+            question.attrib['class'] = "question"
+            question.attrib['id'] = "%s_question_%i" % (self.problem_id, question_index)
+            question.attrib['question_index'] = str(question_index)
+            question_index += 1

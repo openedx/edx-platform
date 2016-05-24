@@ -57,7 +57,6 @@ h2 {
 
   &.problem-header {
     display: inline-block;
-    margin-bottom: 0;
     section.staff {
       margin-top: ($baseline*1.5);
       font-size: 80%;
@@ -153,6 +152,10 @@ div.problem {
 
   div.question:not(:last-child) {
     margin-bottom: $baseline;
+  }
+  
+  h3.problem-header {
+    margin-bottom: 0 !important; // needed to overrided the %hd-2 margin-bottom
   }
 }
 

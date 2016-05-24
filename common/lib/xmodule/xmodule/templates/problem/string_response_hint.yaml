@@ -25,30 +25,30 @@ metadata:
 
 hinted: true
 data: |
-  <problem>
-    <question>
-    <p>You can provide feedback for the correct answer in text input problems, as well as for specific incorrect answers.</p>
+      <problem>
+        <question>
+          <p>You can provide feedback for the correct answer in text input problems, as well as for specific incorrect answers.</p>
 
-    <p>Use feedback on expected incorrect answers to address common misconceptions and to provide guidance on how to arrive at the correct answer.</p>
+          <p>Use feedback on expected incorrect answers to address common misconceptions and to provide guidance on how to arrive at the correct answer.</p>
 
-    <p>Use the following example problem as a model.</p>
- 
-    <p>Which U.S. state has the largest land area?</p>
+          <p>Use the following example problem as a model.</p>
 
-    <stringresponse answer="Alaska" type="ci" >
+          <p>Which U.S. state has the largest land area?</p>
 
-    <correcthint>Alaska is 576,400 square miles, more than double the land area of the second largest state, Texas.</correcthint>
+          <stringresponse answer="Alaska" type="ci" >
 
-    <stringequalhint answer="Texas">While many people think Texas is the largest state, it is actually the second largest, with 261,797 square miles.</stringequalhint>
+            <correcthint>Alaska is 576,400 square miles, more than double the land area of the second largest state, Texas.</correcthint>
 
-    <stringequalhint answer="California">California is the third largest state, with 155,959 square miles.</stringequalhint>
+            <stringequalhint answer="Texas">While many people think Texas is the largest state, it is actually the second largest, with 261,797 square miles.</stringequalhint>
 
-    <textline label="Which U.S. state has the largest land area?" size="20"/>
-    </stringresponse>
+            <stringequalhint answer="California">California is the third largest state, with 155,959 square miles.</stringequalhint>
 
-    <demandhint>
-      <hint>Consider the square miles, not population.</hint>
-      <hint>Consider all 50 states, not just the continental United States.</hint>
-    </demandhint>
-    </question>
-  </problem>
+            <textline label="Which U.S. state has the largest land area?" size="20"/>
+          </stringresponse>
+
+          <demandhint>
+            <hint>Consider the square miles, not population.</hint>
+            <hint>Consider all 50 states, not just the continental United States.</hint>
+          </demandhint>
+        </question>
+      </problem>
