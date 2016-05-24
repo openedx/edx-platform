@@ -11,6 +11,8 @@ from factory.django import DjangoModelFactory
 from uuid import uuid4
 from pytz import UTC
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from organizations.models import Organization
+from student.models import OrganizationUser
 
 # Factories are self documenting
 # pylint: disable=missing-docstring
@@ -59,6 +61,23 @@ class CourseModeFactory(DjangoModelFactory):
     currency = 'usd'
     expiration_datetime = None
 
+class OrganizationFactory(DjangoModelFactory):
+    class Meta(object):
+        model = Organization
+    name = "MIT Test"
+    active = 1
+    created = datetime(2012, 1, 1, tzinfo=UTC)
+    modified = datetime(2012, 1, 1, tzinfo=UTC)
+    short_name = 'MITx'
+    description = "MIT Test Description"
+
+class OrganizationUser(DjangoModelFactory):
+    class Meta(object):
+        model = OrganizationUser
+    active = 1
+    user_id_id = 1
+    is_instructor = 1
+    organization_id = 1
 
 class RegistrationFactory(DjangoModelFactory):
     class Meta(object):
