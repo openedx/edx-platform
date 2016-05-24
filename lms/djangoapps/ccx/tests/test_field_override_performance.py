@@ -14,7 +14,6 @@ from django.conf import settings
 from django.core.cache import caches
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
-from edxmako.middleware import MakoMiddleware
 from nose.plugins.attrib import attr
 from pytz import UTC
 from request_cache.middleware import RequestCache
@@ -64,10 +63,12 @@ class FieldOverridePerformanceTestCase(ProceduralCourseTestMixin,
         self.student = UserFactory.create()
         self.request = self.request_factory.get("foo")
         self.request.user = self.student
+
+        patcher = mock.patch('edxmako.request_context.get_current_request', return_value=self.request)
+        patcher.start()
+        self.addCleanup(patcher.stop)
         self.course = None
         self.ccx = None
-
-        MakoMiddleware().process_request(self.request)
 
     def setup_course(self, size, enable_ccx, view_as_ccx):
         """

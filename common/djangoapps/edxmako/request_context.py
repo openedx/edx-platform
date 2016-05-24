@@ -11,29 +11,22 @@
 #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
+#
+# This file has been modified by edX.org
 
-import threading
+"""
+Methods for creating RequestContext for using with Mako templates.
+"""
+
+
 from django.conf import settings
 from django.template import RequestContext
 from django.template.context import _builtin_context_processors
 from django.utils.module_loading import import_string
 from util.request import safe_get_host
+from crum import get_current_request
 
-from request_cache.middleware import RequestCache
-
-REQUEST_CONTEXT = threading.local()
-
-
-class MakoMiddleware(object):
-
-    def process_request(self, request):
-        """ Process the middleware request. """
-        REQUEST_CONTEXT.request = request
-
-    def process_response(self, __, response):
-        """ Process the middleware response. """
-        REQUEST_CONTEXT.request = None
-        return response
+from request_cache import get_request_cache
 
 
 def get_template_context_processors():
@@ -50,14 +43,16 @@ def get_template_request_context():
     Returns the template processing context to use for the current request,
     or returns None if there is not a current request.
     """
-    request = getattr(REQUEST_CONTEXT, "request", None)
-    if not request:
-        return None
 
-    request_cache_dict = RequestCache.get_request_cache().data
-    cache_key = "edxmako_request_context"
+    request_cache_dict = get_request_cache('edxmako')
+    cache_key = "request_context"
     if cache_key in request_cache_dict:
         return request_cache_dict[cache_key]
+
+    request = get_current_request()
+
+    if request is None:
+        return None
 
     context = RequestContext(request)
     context['is_secure'] = request.is_secure()
