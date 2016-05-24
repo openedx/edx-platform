@@ -49,9 +49,9 @@ except ImportError:
     HAS_USER_SERVICE = False
 
 try:
-    from xblock_django.models import XBlockDisableConfig
+    from xblock_django.models import XBlockConfigFlag, XBlockConfig
 except ImportError:
-    XBlockDisableConfig = None
+    XBlockConfigFlag = None
 
 log = logging.getLogger(__name__)
 ASSET_IGNORE_REGEX = getattr(settings, "ASSET_IGNORE_REGEX", r"(^\._.*$)|(^\.DS_Store$)|(^.*~$)")
@@ -188,8 +188,8 @@ def create_modulestore_instance(
     if 'read_preference' in doc_store_config:
         doc_store_config['read_preference'] = getattr(ReadPreference, doc_store_config['read_preference'])
 
-    if XBlockDisableConfig and settings.FEATURES.get('ENABLE_DISABLING_XBLOCK_TYPES', False):
-        disabled_xblock_types = XBlockDisableConfig.disabled_block_types()
+    if XBlockConfigFlag and XBlockConfigFlag.is_enabled():
+        disabled_xblock_types = [block.name for block in XBlockConfig.disabled_xblocks()]
     else:
         disabled_xblock_types = ()
 

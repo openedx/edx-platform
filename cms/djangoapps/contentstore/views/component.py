@@ -27,7 +27,7 @@ from opaque_keys.edx.keys import UsageKey
 
 from student.auth import has_course_author_access
 from django.utils.translation import ugettext as _
-from xblock_django.models import XBlockDisableConfig
+from xblock_django.models import XBlockConfig, XBlockConfigFlag
 
 __all__ = [
     'container_handler',
@@ -52,12 +52,15 @@ CONTAINER_TEMPLATES = [
 ]
 
 
-def _advanced_component_types():
+def _advanced_component_types(show_unsupported):
     """
     Return advanced component types which can be created.
     """
-    disabled_create_block_types = XBlockDisableConfig.disabled_create_block_types()
-    return [c_type for c_type in ADVANCED_COMPONENT_TYPES if c_type not in disabled_create_block_types]
+    if XBlockConfigFlag.is_enabled():
+        authorable_xblock_types = [block.name for block in XBlockConfig.authorable_xblocks(show_unsupported)]
+        return [c_type for c_type in ADVANCED_COMPONENT_TYPES if c_type in authorable_xblock_types]
+    else:
+        return [c_type for c_type in ADVANCED_COMPONENT_TYPES]
 
 
 def _load_mixed_class(category):
@@ -221,9 +224,10 @@ def get_component_templates(courselike, library=False):
                         )
                     )
 
-        # Add any advanced problem types
+        # Add any advanced problem types. Note that this are different xblocks being stored as Advanced Problems.
         if category == 'problem':
             for advanced_problem_type in ADVANCED_PROBLEM_TYPES:
+                # TODO: check the state of these also, since they are actually xblocks?
                 component = advanced_problem_type['component']
                 boilerplate_name = advanced_problem_type['boilerplate_name']
                 try:
@@ -252,7 +256,8 @@ def get_component_templates(courselike, library=False):
     # enabled for the course.
     course_advanced_keys = courselike.advanced_modules
     advanced_component_templates = {"type": "advanced", "templates": [], "display_name": _("Advanced")}
-    advanced_component_types = _advanced_component_types()
+    # TODO: pass in the value for this course of whether or not unsupported xblocks can be displayed.
+    advanced_component_types = _advanced_component_types(False)
     # Set component types according to course policy file
     if isinstance(course_advanced_keys, list):
         for category in course_advanced_keys:
