@@ -1132,7 +1132,6 @@ class ContentStoreTest(ContentStoreTestCase, XssTestMixin):
     """
     Tests for the CMS ContentStore application.
     """
-
     def setUp(self):
         super(ContentStoreTest, self).setUp()
         self.test_org = OrganizationFactory()
@@ -1249,7 +1248,7 @@ class ContentStoreTest(ContentStoreTestCase, XssTestMixin):
 
         auth.add_users(self.user, instructor_role, self.user)
 
-        #self.assertTrue(len(instructor_role.users_with_role()) > 0)
+        self.assertTrue(len(instructor_role.users_with_role()) > 0)
 
         # Now delete course and check that user not in instructor groups of this course
         delete_course_and_groups(course_id, self.user.id)
