@@ -38,23 +38,25 @@ def get_template_context_processors():
     return tuple(import_string(path) for path in context_processors)
 
 
-def get_template_request_context():
+def get_template_request_context(request=None):
     """
     Returns the template processing context to use for the current request,
     or returns None if there is not a current request.
     """
+
+    if request is None:
+        request = get_current_request()
+
+    if request is None:
+        return None
 
     request_cache_dict = request_cache.get_cache('edxmako')
     cache_key = "request_context"
     if cache_key in request_cache_dict:
         return request_cache_dict[cache_key]
 
-    request = get_current_request()
-
-    if request is None:
-        return None
-
     context = RequestContext(request)
+
     context['is_secure'] = request.is_secure()
     context['site'] = safe_get_host(request)
 
