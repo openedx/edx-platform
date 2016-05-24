@@ -813,7 +813,12 @@ def _create_new_course(request, org, number, run, fields):
     store_for_new_course = modulestore().default_modulestore.get_modulestore_type()
     new_course = create_new_course_in_store(store_for_new_course, request.user, org, number, run, fields)
 
-    # Rearrange here to make sure 
+    """
+    Putting this here so that the order is:
+    Create Course --> then --> Link to Org
+    This will ensure we catch invalid short_name
+    on course creation.
+    """
     org_data = get_organization_by_short_name(org)
     if not org_data and organizations_enabled():
         return JsonResponse(

@@ -1135,7 +1135,6 @@ class ContentStoreTest(ContentStoreTestCase, XssTestMixin):
 
     def setUp(self):
         super(ContentStoreTest, self).setUp()
-        # TODO look at passing in user details to these constructors
         self.test_org = OrganizationFactory()
         self.test_organizationuser = OrganizationUser()
         self.course_data = {
@@ -1335,13 +1334,9 @@ class ContentStoreTest(ContentStoreTestCase, XssTestMixin):
         # Create a new ORG
         self.new_test_org = OrganizationFactory(short_name = self.course_data['org'])
         # change user ORG
-        #self.test_organizationuser.organization_id = self.new_test_org.id
         self.test_organizationuser.organization_id = self.new_test_org.id
         self.test_organizationuser.save()
-        print('----------------------------------------------------------------------------------------------------------------------')
-        print self.test_organizationuser
         resp = self.client.ajax_post('/course/', self.course_data)
-        print(resp)
         self.assertEqual(resp.status_code, 200)
 
     def test_create_course_with_bad_organization(self):
@@ -2174,8 +2169,6 @@ def _create_course(test, course_key, course_data):
     """
     course_url = get_url('course_handler', course_key, 'course_key_string')
     response = test.client.ajax_post(course_url, course_data)
-    print("||||||||||||||||||||||")
-    print(response)
     test.assertEqual(response.status_code, 200)
     data = parse_json(response)
     test.assertNotIn('ErrMsg', data)
