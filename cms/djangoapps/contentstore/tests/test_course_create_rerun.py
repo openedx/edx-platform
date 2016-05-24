@@ -14,6 +14,8 @@ from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from student.roles import CourseInstructorRole, CourseStaffRole
 from student.tests.factories import UserFactory
+from student.tests.factories import OrganizationFactory
+from student.tests.factories import OrganizationUser
 from contentstore.tests.utils import AjaxEnabledTestClient, parse_json
 from datetime import datetime
 from xmodule.course_module import CourseFields
@@ -48,6 +50,9 @@ class TestCourseListing(ModuleStoreTestCase):
             start=datetime.utcnow()
         )
         self.source_course_key = source_course.id
+
+        self.test_org = OrganizationFactory(short_name='orgX')
+        self.test_organizationuser = OrganizationUser()
 
         for role in [CourseInstructorRole, CourseStaffRole]:
             role(self.source_course_key).add_users(self.user)
@@ -123,7 +128,7 @@ class TestCourseListing(ModuleStoreTestCase):
         """
         with modulestore().default_store(store):
             response = self.client.ajax_post(self.course_create_rerun_url, {
-                'org': 'orgX',
+                'org': 'orgXNotExist',
                 'number': 'CS101',
                 'display_name': 'Course with web certs enabled',
                 'run': '2015_T2'

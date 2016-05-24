@@ -8,6 +8,8 @@ from courseware.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 from student.models import CourseEnrollment
+from student.tests.factories import OrganizationFactory
+from student.tests.factories import OrganizationUser
 
 
 class TestUsersDefaultRole(ModuleStoreTestCase):
@@ -27,6 +29,9 @@ class TestUsersDefaultRole(ModuleStoreTestCase):
         # create a course via the view handler to create course
         self.course_key = self.store.make_course_key('Org_1', 'Course_1', 'Run_1')
         self._create_course_with_given_location(self.course_key)
+
+        self.test_org = OrganizationFactory(short_name=self.course_key.org)
+        self.test_organizationuser = OrganizationUser()
 
     def _create_course_with_given_location(self, course_key):
         """

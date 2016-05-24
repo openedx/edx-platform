@@ -1257,8 +1257,8 @@ class ContentStoreTest(ContentStoreTestCase, XssTestMixin):
         # Update our cached user since its roles have changed
         self.user = User.objects.get_by_natural_key(self.user.natural_key()[0])
 
-        #self.assertFalse(instructor_role.has_user(self.user))
-        #self.assertEqual(len(instructor_role.users_with_role()), 0)
+        self.assertFalse(instructor_role.has_user(self.user))
+        self.assertEqual(len(instructor_role.users_with_role()), 0)
 
     def test_create_course_after_delete(self):
         """
