@@ -1826,6 +1826,10 @@ class RerunCourseTest(ContentStoreTestCase):
     """
     def setUp(self):
         super(RerunCourseTest, self).setUp()
+
+        self.test_org = OrganizationFactory()
+        self.test_organizationuser = OrganizationUser()
+
         self.destination_course_data = {
             'org': 'MITx',
             'number': '111',
@@ -2038,7 +2042,7 @@ class RerunCourseTest(ContentStoreTestCase):
         Test that unique wiki_slug is assigned to rerun course.
         """
         course_data = {
-            'org': 'edX',
+            'org': 'MITx',
             'number': '123',
             'display_name': 'Rerun Course',
             'run': '2013'
