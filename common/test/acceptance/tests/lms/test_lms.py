@@ -222,19 +222,29 @@ class LoginFromCombinedPageTest(UniqueCourseTest):
     def _link_dummy_account(self):
         """ Go to Account Settings page and link the user's account to the Dummy provider """
         account_settings = AccountSettingsPage(self.browser).visit()
+        # switch to "Linked Accounts" tab
+        account_settings.switch_account_settings_tabs('accounts-tab')
+
         field_id = "auth-oa2-dummy"
         account_settings.wait_for_field(field_id)
-        self.assertEqual("Link", account_settings.link_title_for_link_field(field_id))
+        self.assertEqual("Link Your Account", account_settings.link_title_for_link_field(field_id))
         account_settings.click_on_link_in_link_field(field_id)
-        account_settings.wait_for_link_title_for_link_field(field_id, "Unlink")
+
+        # make sure we are on "Linked Accounts" tab after the account settings
+        # page is reloaded
+        account_settings.switch_account_settings_tabs('accounts-tab')
+        account_settings.wait_for_link_title_for_link_field(field_id, "Unlink This Account")
 
     def _unlink_dummy_account(self):
         """ Verify that the 'Dummy' third party auth provider is linked, then unlink it """
         # This must be done after linking the account, or we'll get cross-test side effects
         account_settings = AccountSettingsPage(self.browser).visit()
+        # switch to "Linked Accounts" tab
+        account_settings.switch_account_settings_tabs('accounts-tab')
+
         field_id = "auth-oa2-dummy"
         account_settings.wait_for_field(field_id)
-        self.assertEqual("Unlink", account_settings.link_title_for_link_field(field_id))
+        self.assertEqual("Unlink This Account", account_settings.link_title_for_link_field(field_id))
         account_settings.click_on_link_in_link_field(field_id)
         account_settings.wait_for_message(field_id, "Successfully unlinked")
 
@@ -372,9 +382,12 @@ class RegisterFromCombinedPageTest(UniqueCourseTest):
 
         # Now unlink the account (To test the account settings view and also to prevent cross-test side effects)
         account_settings = AccountSettingsPage(self.browser).visit()
+        # switch to "Linked Accounts" tab
+        account_settings.switch_account_settings_tabs('accounts-tab')
+
         field_id = "auth-oa2-dummy"
         account_settings.wait_for_field(field_id)
-        self.assertEqual("Unlink", account_settings.link_title_for_link_field(field_id))
+        self.assertEqual("Unlink This Account", account_settings.link_title_for_link_field(field_id))
         account_settings.click_on_link_in_link_field(field_id)
         account_settings.wait_for_message(field_id, "Successfully unlinked")
 
