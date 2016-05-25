@@ -86,7 +86,7 @@ class UserCourseFilteringMiddleware(object):
 
             course_id = course_id_from_url(request.path)
             course_org = Organization.objects.filter(
-                organizationcourse__course_id=course_id).values().first()
+                organizationcourse__course_id=course_id).values().first() if course_id else None
 
             c_org_id = course_org['id'] if course_org else None
 
