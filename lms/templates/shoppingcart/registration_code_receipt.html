@@ -80,12 +80,12 @@ from openedx.core.lib.courses import course_image_url
       % if not reg_code_already_redeemed:
         %if redemption_success:
           <% course_url = reverse('info', args=[course.id.to_deprecated_string()]) %>
-          <a href="${course_url}" class="link-button course-link-bg-color">${_("View Course")} <i class="icon fa fa-caret-right" aria-hidden="true"></i></a>
+          <a href="${course_url}" class="link-button course-link-bg-color">${_("View Course")} <span class="icon fa fa-caret-right" aria-hidden="true"></span></a>
         %elif not registered_for_course:
           <form method="post">
             <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
             <button type="submit" id="id_active_course_enrollment"
-               name="active_course_enrollment">${_("Activate Course Enrollment")} <i class="icon fa fa-caret-right" aria-hidden="true"></i></button>
+               name="active_course_enrollment">${_("Activate Course Enrollment")} <span class="icon fa fa-caret-right" aria-hidden="true"></span></button>
           </form>
         %endif
       %endif

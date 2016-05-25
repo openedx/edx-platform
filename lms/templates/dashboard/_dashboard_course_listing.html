@@ -54,7 +54,7 @@ from student.helpers import (
 <div class="course-container">
  % if course_program_info and course_program_info.get('category')=='xseries':
   <div class="label-xseries-association">
-    <i class="xseries-icon"></i>
+    <span class="xseries-icon" aria-hidden="true"></span>
     <p class="message-copy">${_("{category} Program Course").format(category=course_program_info['display_category'])}</p>
   </div>
  % endif
@@ -157,7 +157,7 @@ from student.helpers import (
                       title="${_('Share on Facebook')}"
                       onclick="window.open('${facebook_url}', '${share_window_name}', '${share_window_config}'); return false;">
                       <span class="sr">${_('Facebook')}</span>
-                      <i class="fa fa-facebook" aria-hidden="true"></i>
+                      <span class="fa fa-facebook" aria-hidden="true"></span>
                     </a>
                 % endif
                 % if share_url and share_settings.get('DASHBOARD_TWITTER', False):
@@ -174,7 +174,7 @@ from student.helpers import (
                       title="${_('Share on Twitter')}"
                       onclick="window.open('${twitter_url}', '${share_window_name}', '${share_window_config}'); return false;">
                       <span class="sr">${_('Twitter')}</span>
-                      <i class="fa fa-twitter" aria-hidden="true"></i>
+                      <span class="fa fa-twitter" aria-hidden="true"></span>
                     </a>
                 % endif
               % endif
@@ -185,7 +185,7 @@ from student.helpers import (
                 <span class="sr">&nbsp;
                   ${course_overview.display_name_with_default}
                 </span>
-                <i class="fa fa-cog" aria-hidden="true"></i>
+                <span class="fa fa-cog" aria-hidden="true"></span>
               </button>
               <div class="actions-dropdown" id="actions-dropdown-${dashboard_index}" tabindex="-1">
                 <ul class="actions-dropdown-list" id="actions-dropdown-list-${dashboard_index}" aria-label="${_('Available Actions')}" role="menu">
@@ -356,7 +356,7 @@ from student.helpers import (
                   % else:
                     <a class="action action-upgrade" href="${reverse('verify_student_upgrade_and_verify', kwargs={'course_id': unicode(course_overview.id)})}" data-course-id="${course_overview.id}" data-user="${user.username}">
                   % endif
-                      <i class="action-upgrade-icon"></i>
+                      <span class="action-upgrade-icon" aria-hidden="true"></span>
                     <span class="wrapper-copy">
                       <span class="copy" id="upgrade-to-verified">${_("Upgrade to Verified")}</span>
                         <span class="sr">&nbsp;${_(course_overview.display_name_with_default)}</span>

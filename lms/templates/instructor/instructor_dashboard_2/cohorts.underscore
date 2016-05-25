@@ -18,7 +18,7 @@
         </form>
 
         <button class="button action-primary action-create">
-            <i class="icon fa fa-plus" aria-hidden="true"></i>
+            <span class="icon fa fa-plus" aria-hidden="true"></span>
             <%- gettext('Add Cohort') %>
         </button>
     </div>
@@ -39,7 +39,7 @@
 
         <div class="cohort-management-supplemental">
             <p class="">
-                <i class="icon fa fa-info-circle" aria-hidden="true"></i>
+                <span class="icon fa fa-info-circle" aria-hidden="true"></span>
                 <%= HtmlUtils.interpolateHtml(
                     gettext('To review student cohort assignments or see the results of uploading a CSV file, download course profile information or cohort results on {link_start} the Data Download page. {link_end}'),
                     {

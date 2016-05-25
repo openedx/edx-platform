@@ -4,7 +4,7 @@
     var fmts = ngettext("Show Comment (%(num_comments)s)", "Show Comments (%(num_comments)s)", comments.length);
     print(interpolate(fmts, {num_comments: comments.length}, true));
     %>
-    <i class="icon fa fa-caret-down"></i>
+    <span class="icon fa fa-caret-down" aria-hidden="true"></span>
 </a>
 <ol class="comments">
     <li class="new-comment">
