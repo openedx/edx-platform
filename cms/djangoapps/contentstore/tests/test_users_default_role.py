@@ -9,7 +9,7 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 from student.models import CourseEnrollment
 from student.tests.factories import OrganizationFactory
-from student.tests.factories import OrganizationUser
+from student.tests.factories import OrganizationUserFactory
 
 
 class TestUsersDefaultRole(ModuleStoreTestCase):
@@ -31,7 +31,7 @@ class TestUsersDefaultRole(ModuleStoreTestCase):
         self._create_course_with_given_location(self.course_key)
 
         self.test_org = OrganizationFactory(short_name=self.course_key.org)
-        self.test_organizationuser = OrganizationUser()
+        self.test_organizationuser = OrganizationUserFactory()
 
     def _create_course_with_given_location(self, course_key):
         """

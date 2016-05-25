@@ -12,9 +12,7 @@ from student.models import (
     PendingNameChange, CourseAccessRole, LinkedInAddToProfileConfiguration, OrganizationUser
 )
 from student.roles import REGISTERED_ACCESS_ROLES
-
 from organizations.models import Organization
-
 
 class CourseAccessRoleForm(forms.ModelForm):
     """Form for adding new Course Access Roles view the Django Admin Panel."""

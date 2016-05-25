@@ -410,7 +410,6 @@ def _user_in_same_org(user, course_id):
     else:
         return False
 
-
 def _accessible_courses_list(request):
     """
     List all courses available to the logged in user by iterating through all the courses
@@ -427,8 +426,6 @@ def _accessible_courses_list(request):
         if course.location.course == 'templates':
             return False
 
-        # If the course ORG does not match user ORG - this
-        # will likely override groups and break tests
         if not _user_in_same_org(request.user, course.id):
             return False;
 
@@ -816,8 +813,7 @@ def _create_new_course(request, org, number, run, fields):
     """
     Putting this here so that the order is:
     Create Course --> then --> Link to Org
-    This will ensure we catch invalid short_name
-    on course creation.
+    This will ensure we catch invalid short_name on course creation.
     """
     org_data = get_organization_by_short_name(org)
     if not org_data and organizations_enabled():

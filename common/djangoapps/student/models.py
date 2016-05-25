@@ -55,7 +55,6 @@ from openedx.core.djangoapps.content.course_overviews.models import CourseOvervi
 from util.model_utils import emit_field_changed_events, get_changed_fields_dict
 from util.query import use_read_replica_if_available
 from util.milestones_helpers import is_entrance_exams_enabled
-
 from organizations.models import Organization
 
 UNENROLL_DONE = Signal(providing_args=["course_enrollment", "skip_refund"])
@@ -488,12 +487,11 @@ def unique_id_for_user(user, save=True):
     # and thus produce the old per-student anonymous id
     return anonymous_id_for_user(user, None, save=save)
 
+
 class OrganizationUser(models.Model):
     """
-    An OrganizationCourse represents the link between an Organization and a
-    Course (via course key). Because Courses are not true Open edX entities
-    (in the Django/ORM sense) the modeling and integrity is limited to that
-    of specifying course identifier strings in this model.
+    An OrganizationUser represents the link between an Organization and a
+    User (via user id).
     """
     user_id = models.OneToOneField(User, unique=True, db_index=True)
     organization = models.ForeignKey(Organization, db_index=True)
@@ -505,6 +503,7 @@ class OrganizationUser(models.Model):
         unique_together = (('user_id', 'organization'),)
         verbose_name = _('Link Organization')
         verbose_name_plural = _('Link Organizations')
+
 
 # TODO: Should be renamed to generic UserGroup, and possibly
 # Given an optional field for type of group

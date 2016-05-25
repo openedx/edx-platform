@@ -15,7 +15,7 @@ from xmodule.modulestore.django import modulestore
 from student.roles import CourseInstructorRole, CourseStaffRole
 from student.tests.factories import UserFactory
 from student.tests.factories import OrganizationFactory
-from student.tests.factories import OrganizationUser
+from student.tests.factories import OrganizationUserFactory
 from contentstore.tests.utils import AjaxEnabledTestClient, parse_json
 from datetime import datetime
 from xmodule.course_module import CourseFields
@@ -52,7 +52,7 @@ class TestCourseListing(ModuleStoreTestCase):
         self.source_course_key = source_course.id
 
         self.test_org = OrganizationFactory(short_name='orgX')
-        self.test_organizationuser = OrganizationUser()
+        self.test_organizationuser = OrganizationUserFactory()
 
         for role in [CourseInstructorRole, CourseStaffRole]:
             role(self.source_course_key).add_users(self.user)

@@ -60,7 +60,7 @@ from xmodule.contentstore.content import StaticContent
 from xmodule.modulestore.django import modulestore
 
 from student.tests.factories import OrganizationFactory
-from student.tests.factories import OrganizationUser
+from student.tests.factories import OrganizationUserFactory
 
 TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)
 TEST_DATA_CONTENTSTORE['DOC_STORE_CONFIG']['db'] = 'test_xcontent_%s' % uuid4().hex
@@ -1134,8 +1134,9 @@ class ContentStoreTest(ContentStoreTestCase, XssTestMixin):
     """
     def setUp(self):
         super(ContentStoreTest, self).setUp()
+
         self.test_org = OrganizationFactory()
-        self.test_organizationuser = OrganizationUser()
+        self.test_organizationuser = OrganizationUserFactory()
         self.course_data = {
             'org': 'MITx',
             'number': '111',
@@ -1827,7 +1828,7 @@ class RerunCourseTest(ContentStoreTestCase):
         super(RerunCourseTest, self).setUp()
 
         self.test_org = OrganizationFactory()
-        self.test_organizationuser = OrganizationUser()
+        self.test_organizationuser = OrganizationUserFactory()
 
         self.destination_course_data = {
             'org': 'MITx',

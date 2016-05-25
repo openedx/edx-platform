@@ -72,7 +72,7 @@ class OrganizationFactory(DjangoModelFactory):
     short_name = 'MITx'
     description = "MIT Test Description"
 
-class OrganizationUser(DjangoModelFactory):
+class OrganizationUserFactory(DjangoModelFactory):
     class Meta(object):
         model = OrganizationUser
     active = 1

@@ -49,7 +49,7 @@ class UserCourseFilteringMiddleware(object):
     """
     Checks that a user does in fact belong to the course ORG they are requesting
     to view/edit. Returns a 403 if the user does not belong to the same ORG.
-    NB this should not affect ADMIN OR LMS!!!!!!!!!!!!!!
+    NB this should not affect ADMIN OR LMS. Do not add this Middleware to LMS.
     """
     def process_request(self, request):
         org_is_enabled = settings.FEATURES.get('ORGANIZATIONS_APP', False)
