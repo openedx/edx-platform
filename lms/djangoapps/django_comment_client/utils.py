@@ -124,9 +124,9 @@ def has_required_keys(module):
     return True
 
 
-def get_accessible_discussion_modules(course, user, include_all=False):  # pylint: disable=invalid-name
+def get_accessible_discussion_xblocks(course, user, include_all=False):  # pylint: disable=invalid-name
     """
-    Return a list of all valid discussion modules in this course that
+    Return a list of all valid discussion xblocks in this course that
     are accessible to the given user.
     """
     all_modules = modulestore().get_items(course.id, qualifiers={'category': 'discussion'}, include_orphans=False)
@@ -195,7 +195,7 @@ def get_discussion_id_map(course, user):
     Transform the list of this course's discussion modules (visible to a given user) into a dictionary of metadata keyed
     by discussion_id.
     """
-    return dict(map(get_discussion_id_map_entry, get_accessible_discussion_modules(course, user)))
+    return dict(map(get_discussion_id_map_entry, get_accessible_discussion_xblocks(course, user)))
 
 
 def _filter_unstarted_categories(category_map, course):
@@ -301,7 +301,7 @@ def get_discussion_category_map(course, user, cohorted_if_in_list=False, exclude
     """
     unexpanded_category_map = defaultdict(list)
 
-    modules = get_accessible_discussion_modules(course, user)
+    modules = get_accessible_discussion_xblocks(course, user)
 
     course_cohort_settings = get_course_cohort_settings(course.id)
 
@@ -417,7 +417,7 @@ def get_discussion_categories_ids(course, user, include_all=False):
 
     """
     accessible_discussion_ids = [
-        module.discussion_id for module in get_accessible_discussion_modules(course, user, include_all=include_all)
+        module.discussion_id for module in get_accessible_discussion_xblocks(course, user, include_all=include_all)
     ]
     return course.top_level_discussion_topic_ids + accessible_discussion_ids
 

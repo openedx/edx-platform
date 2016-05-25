@@ -177,7 +177,7 @@ class CoursewareContextTestCase(ModuleStoreTestCase):
 
     @ddt.data((ModuleStoreEnum.Type.mongo, 2), (ModuleStoreEnum.Type.split, 1))
     @ddt.unpack
-    def test_get_accessible_discussion_modules(self, modulestore_type, expected_discussion_modules):
+    def test_get_accessible_discussion_xblocks(self, modulestore_type, expected_discussion_xblocks):
         """
         Tests that the accessible discussion modules having no parents do not get fetched for split modulestore.
         """
@@ -190,7 +190,7 @@ class CoursewareContextTestCase(ModuleStoreTestCase):
         self.assertNotIn(test_discussion.location, self.store.get_orphans(course.id))
 
         # Assert that there is only one discussion module in the course at the moment.
-        self.assertEqual(len(utils.get_accessible_discussion_modules(course, self.user)), 1)
+        self.assertEqual(len(utils.get_accessible_discussion_xblocks(course, self.user)), 1)
 
         # Add an orphan discussion module to that course
         orphan = course.id.make_usage_key('discussion', 'orphan_discussion')
@@ -199,7 +199,7 @@ class CoursewareContextTestCase(ModuleStoreTestCase):
         # Assert that the discussion module is an orphan.
         self.assertIn(orphan, self.store.get_orphans(course.id))
 
-        self.assertEqual(len(utils.get_accessible_discussion_modules(course, self.user)), expected_discussion_modules)
+        self.assertEqual(len(utils.get_accessible_discussion_xblocks(course, self.user)), expected_discussion_xblocks)
 
 
 @attr('shard_3')
@@ -505,7 +505,7 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
             cohorted_if_in_list=True
         )
 
-    def test_get_unstarted_discussion_modules(self):
+    def test_get_unstarted_discussion_xblocks(self):
         later = datetime.datetime(datetime.MAXYEAR, 1, 1, tzinfo=django_utc())
 
         self.create_discussion("Chapter 1", "Discussion 1", start=later)
