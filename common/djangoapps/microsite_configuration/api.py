@@ -17,8 +17,9 @@ class FileUploadView(views.APIView):
 
     def post(self, request, microsite_id, format=None):
         file_obj = request.data['file']
+        field_name = request.data['field_name']
         microsite = Microsite.objects.get(id=microsite_id)
-        microsite.values['logo_path'] = self.handle_uploaded_file(file_obj, request.GET.get('filename'))
+        microsite.values[field_name] = self.handle_uploaded_file(file_obj, request.GET.get('filename'))
         microsite.save()
         return Response(status=204)
 
