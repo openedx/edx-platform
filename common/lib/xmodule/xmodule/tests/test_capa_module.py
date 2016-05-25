@@ -1344,7 +1344,7 @@ class CapaModuleTest(unittest.TestCase):
 
         # Check the AJAX call that gets the hint by question     id and hint index
         for question_id in range(num_questions):
-            for hint_index in (0, 1, 2):
+            for hint_index in range(3):
                 result = module.get_demand_hint(question_id, hint_index)
                 hint_num = hint_index % 2
                 self.assertEqual(

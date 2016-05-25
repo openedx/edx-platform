@@ -129,6 +129,10 @@ div.problem-progress {
   font-size: em(16);
 }
 
+h3.problem-header {
+  margin-bottom: 0 !important; // needed to overrided the %hd-2 margin-bottom
+}
+
 // +Problem - Base
 // ====================
 div.problem {
@@ -152,10 +156,6 @@ div.problem {
 
   div.question:not(:last-child) {
     margin-bottom: $baseline;
-  }
-  
-  h3.problem-header {
-    margin-bottom: 0 !important; // needed to overrided the %hd-2 margin-bottom
   }
 }
 

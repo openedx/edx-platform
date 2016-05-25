@@ -663,7 +663,7 @@ class CapaMixin(CapaFields):
         else:
             check_button = False
             check_button_checking = False
-        
+
         content = {
             'name': self.display_name,
             'html': html,
