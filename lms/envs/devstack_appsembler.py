@@ -22,6 +22,19 @@ MICROSITE_BACKEND = 'microsite_configuration.backends.database.DatabaseMicrosite
 
 INSTALLED_APPS += ('appsembler_lms',)
 
+CORS_ORIGIN_ALLOW_ALL = True
+
+CORS_ALLOW_HEADERS = (
+    'x-requested-with',
+    'content-type',
+    'accept',
+    'origin',
+    'authorization',
+    'x-csrftoken',
+    'cache-control'
+)
+DEBUG_TOOLBAR_PATCH_SETTINGS = False
+
 # MIDDLEWARE_CLASSES = (
 #     'db_multitenant.middleware.MultiTenantMiddleware',
 #     ) + MIDDLEWARE_CLASSES
