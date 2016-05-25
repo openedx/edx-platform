@@ -202,6 +202,7 @@
         var keywordValidator = (function () {
             var regexp = /%%[^%\s]+%%/g;
             var keywordsSupported = [
+                '%%USERNAME%%',
                 '%%USER_ID%%',
                 '%%USER_FULLNAME%%',
                 '%%COURSE_DISPLAY_NAME%%',

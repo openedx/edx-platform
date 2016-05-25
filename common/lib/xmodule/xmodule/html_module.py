@@ -111,6 +111,7 @@ class HtmlModuleMixin(HtmlBlock, XModule):
             course = self.descriptor.runtime.modulestore.get_course(self.course_id)
             user = self.system.get_real_user(self.system.anonymous_student_id)
             context = {
+                'username': user.username if user else '',
                 'user_id': user.id if user else None,
                 'name': user.profile.name if user else '',
                 'course_title': course.display_name,

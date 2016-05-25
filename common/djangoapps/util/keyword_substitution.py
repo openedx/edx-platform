@@ -6,6 +6,7 @@ the appropriate user / course data.
 
 Supported:
     LMS and CMS (email on enrollment):
+        - %%USERNAME%% => username
         - %%USER_ID%% => anonymous user id
         - %%USER_FULLNAME%% => User's full name
         - %%COURSE_DISPLAY_NAME%% => display name of the course
@@ -35,6 +36,10 @@ Keyword = namedtuple('Keyword', 'func desc')
 
 # do this lazily to avoid unneeded database hits
 KEYWORD_FUNCTION_MAP = {
+    '%%USERNAME%%': Keyword(
+        lambda context: context.get('username') or get_username(context.get('user_id')),
+        _('username')
+    ),
     '%%USER_ID%%': Keyword(
         lambda context: anonymous_id_from_user_id(context.get('user_id')),
         _('anonymous_user_id (for use in survey links)')
@@ -81,6 +86,12 @@ def anonymous_id_from_user_id(user_id):
     """
     user = User.objects.get(id=user_id)
     return anonymous_id_for_user(user, None)
+
+
+def get_username(user_id):
+    """Get a user's username given user_id"""
+    user = User.objects.get(id=user_id)
+    return user.username
 
 
 def substitute_keywords(string, context):
