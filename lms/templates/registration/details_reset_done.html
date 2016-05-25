@@ -2,7 +2,11 @@
 {% load i18n %}
 
 {% block title %}
-<title>{% trans "Your Account information email has been sent" %}</title>
+  <title>
+    {% blocktrans with platform_name=platform_name %}
+        Update Details Email Sent - {{ platform_name }}
+    {% endblocktrans %}
+  </title>
 {% endblock %}
 
 {% block bodyclass %}view-passwordreset{% endblock %}

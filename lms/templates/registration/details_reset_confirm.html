@@ -2,11 +2,11 @@
 {% load i18n %}
 
 {% block title %}
-<title>
-  {% blocktrans with platform_name=platform_name %}
-    Update Your {{ platform_name }} Details
-  {% endblocktrans %}
-</title>
+  <title>
+    {% blocktrans with platform_name=platform_name %}
+      Update Details - {{ platform_name }}
+    {% endblocktrans %}
+  </title>
 {% endblock %}
 
 {% block bodyextra %}
