@@ -1,0 +1,17 @@
+<%inherit file="base.html" />
+<%namespace name='static' file='../static_content.html'/>
+<%!
+from django.utils.translation import ugettext as _
+from django.core.urlresolvers import reverse
+%>
+<%block name="title">${command['name']}</%block>
+<%block name="commandtitle">
+<h3 class="info-course">
+  <span>${command['name']}</span>
+</h3>
+</%block>
+<%block name="subcontent">
+    <section class="container command-list">
+        <%include file="_${command['slug']}.html" />
+    </section>
+</%block>

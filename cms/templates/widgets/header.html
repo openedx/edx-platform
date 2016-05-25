@@ -5,6 +5,7 @@
   from django.core.urlresolvers import reverse
   from django.utils.translation import ugettext as _
   from contentstore.context_processors import doc_url
+  from student.roles import GlobalStaff
 %>
 <div class="wrapper-header wrapper" id="view-top">
   <header class="primary" role="banner">
@@ -229,6 +230,11 @@
                   <li class="nav-item nav-account-dashboard">
                     <a href="/">${_("{studio_name} Home").format(studio_name=settings.STUDIO_SHORT_NAME)}</a>
                   </li>
+                  % if GlobalStaff().has_user(user):
+                  <li class="nav-item">
+                    <a href="${reverse('maintenance:maintenance')}">${_("Maintenance")}</a>
+                  </li>
+                  % endif
                   <li class="nav-item nav-account-signout">
                     <a class="action action-signout" href="${reverse('logout')}">${_("Sign Out")}</a>
                   </li>
