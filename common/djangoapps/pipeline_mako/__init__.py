@@ -93,12 +93,12 @@ def render_require_js_path_overrides(path_overrides):  # pylint: disable=invalid
 
     For example:
 
-        "js/vendor/jquery.min.js" --> "js/vendor/jquery.min.abcd1234"
+        "js/vendor/jquery.js" --> "js/vendor/jquery.abcd1234"
 
     To achive this we will add overrided paths in requirejs config at runtime.
 
     So that any reference to 'jquery' in a JavaScript module
-    will cause RequireJS to load '/static/js/vendor/jquery.min.abcd1234.js'
+    will cause RequireJS to load '/static/js/vendor/jquery.abcd1234.js'
 
     If running in DEBUG mode (as in devstack), the resolved JavaScript URLs
     won't contain hashes, so the new paths will match the original paths.

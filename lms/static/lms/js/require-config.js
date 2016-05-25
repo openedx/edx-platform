@@ -28,6 +28,7 @@
             }
         };
         defineDependency("jQuery", "jquery");
+        defineDependency("jQuery", "jquery-migrate");
         defineDependency("_", "underscore");
         defineDependency("s", "underscore.string");
         // Underscore.string no longer installs itself directly on "_". For compatibility with existing
@@ -64,7 +65,13 @@
             "backbone.paginator": "js/vendor/backbone.paginator.min",
             "underscore": "common/js/vendor/underscore",
             "underscore.string": "common/js/vendor/underscore.string",
-            "jquery": "js/vendor/jquery.min",
+            // The jquery-migrate library was added in upgrading from
+            // jQuery 1.7.x to 2.2.x.  This config allows developers
+            // to depend on "jquery" which opaquely requires both
+            // libraries.
+            "jquery": "common/js/vendor/jquery",
+            "jquery-migrate": "common/js/vendor/jquery-migrate",
+            "jquery.scrollTo": "common/js/vendor/jquery.scrollTo",
             "jquery.cookie": "js/vendor/jquery.cookie",
             'jquery.timeago': 'js/vendor/jquery.timeago',
             "jquery.url": "js/vendor/url.min",
@@ -111,6 +118,10 @@
             "date": {
                 exports: "Date"
             },
+            "jquery": {
+                exports: "jQuery"
+            },
+            "jquery-migrate": ['jquery'],
             "jquery.cookie": {
                 deps: ["jquery"],
                 exports: "jQuery.fn.cookie"

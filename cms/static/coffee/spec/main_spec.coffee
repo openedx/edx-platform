@@ -33,7 +33,7 @@ require ["jquery", "backbone", "coffee/src/main", "common/js/spec_helpers/ajax_h
             server && server.restore()
 
         it "successful AJAX request does not pop an error notification", ->
-            server = AjaxHelpers.server([200, {}, ''])
+            server = AjaxHelpers.server([200, {"Content-Type": "application/json"}, "{}"])
 
             expect($("#page-notification")).toBeEmpty()
             $.ajax("/test")
@@ -42,7 +42,7 @@ require ["jquery", "backbone", "coffee/src/main", "common/js/spec_helpers/ajax_h
             expect($("#page-notification")).toBeEmpty()
 
         it "AJAX request with error should pop an error notification", ->
-            server = AjaxHelpers.server([500, {}, ''])
+            server = AjaxHelpers.server([500, {"Content-Type": "application/json"}, "{}"])
 
             $.ajax("/test")
             server.respond()
@@ -50,7 +50,7 @@ require ["jquery", "backbone", "coffee/src/main", "common/js/spec_helpers/ajax_h
             expect($("#page-notification")).toContainElement('div.wrapper-notification-error')
 
         it "can override AJAX request with error so it does not pop an error notification", ->
-            server = AjaxHelpers.server([500, {}, ''])
+            server = AjaxHelpers.server([500, {"Content-Type": "application/json"}, "{}"])
 
             $.ajax
                 url: "/test"

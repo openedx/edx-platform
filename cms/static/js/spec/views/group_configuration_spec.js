@@ -491,21 +491,6 @@ define([
             AjaxHelpers.expectNoRequests(requests);
         });
 
-        it('should have appropriate class names on focus/blur', function (done) {
-            var groupInput = this.view.$(SELECTORS.inputGroupName).first(),
-                groupFields = this.view.$(SELECTORS.groupFields);
-
-            groupInput.focus();
-            jasmine.waitUntil(function() {
-                return groupFields.hasClass('is-focused');
-            }).then(function () {
-                groupInput.blur();
-                jasmine.waitUntil(function() {
-                    return !groupFields.hasClass('is-focused');
-                }).then(done);
-            });
-        });
-
         describe('removes all newly created groups on cancel', function () {
             it('if the model has a non-empty groups', function() {
                 var groups = this.model.get('groups');
