@@ -14,7 +14,6 @@ from django.test.utils import override_settings
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import AnonymousUser, User
 from importlib import import_module
-from edxmako.tests import mako_middleware_process_request
 from external_auth.models import ExternalAuthMap
 from external_auth.views import (
     shib_login, course_specific_login, course_specific_register, _flatten_to_ascii
@@ -97,18 +96,11 @@ class ShibSPTest(CacheIsolationTestCase):
         Tests that we get the error page when there is no REMOTE_USER
         or Shib-Identity-Provider in request.META
         """
-        no_remote_user_request = self.request_factory.get('/shib-login')
-        no_remote_user_request.META.update({'Shib-Identity-Provider': IDP})
-        no_remote_user_request.user = AnonymousUser()
-
-        mako_middleware_process_request(no_remote_user_request)
-        no_remote_user_response = shib_login(no_remote_user_request)
+        no_remote_user_response = self.client.get(reverse('shib-login'), HTTP_SHIB_IDENTITY_PROVIDER=IDP)
         self.assertEqual(no_remote_user_response.status_code, 403)
         self.assertIn("identity server did not return your ID information", no_remote_user_response.content)
 
-        no_idp_request = self.request_factory.get('/shib-login')
-        no_idp_request.META.update({'REMOTE_USER': REMOTE_USER})
-        no_idp_response = shib_login(no_idp_request)
+        no_idp_response = self.client.get(reverse('shib-login'), HTTP_REMOTE_USER=REMOTE_USER)
         self.assertEqual(no_idp_response.status_code, 403)
         self.assertIn("identity server did not return your ID information", no_idp_response.content)
 
@@ -161,22 +153,22 @@ class ShibSPTest(CacheIsolationTestCase):
 
         for idp in idps:
             for remote_user in remote_users:
-                request = self.request_factory.get('/shib-login')
-                request.session = import_module(settings.SESSION_ENGINE).SessionStore()  # empty session
-                request.META.update({'Shib-Identity-Provider': idp,
-                                     'REMOTE_USER': remote_user,
-                                     'mail': remote_user})
-                request.user = AnonymousUser()
 
-                mako_middleware_process_request(request)
+                self.client.logout()
                 with patch('external_auth.views.AUDIT_LOG') as mock_audit_log:
-                    response = shib_login(request)
+                    response = self.client.get(
+                        reverse('shib-login'),
+                        **{
+                            'Shib-Identity-Provider': idp,
+                            'mail': remote_user,
+                            'REMOTE_USER': remote_user,
+                        }
+                    )
                 audit_log_calls = mock_audit_log.method_calls
 
                 if idp == "https://idp.stanford.edu/" and remote_user == 'withmap@stanford.edu':
-                    self.assertIsInstance(response, HttpResponseRedirect)
-                    self.assertEqual(request.user, user_w_map)
-                    self.assertEqual(response['Location'], '/dashboard')
+                    self.assertRedirects(response, '/dashboard')
+                    self.assertEquals(int(self.client.session['_auth_user_id']), user_w_map.id)
                     # verify logging:
                     self.assertEquals(len(audit_log_calls), 2)
                     self._assert_shib_login_is_logged(audit_log_calls[0], remote_user)
@@ -198,9 +190,8 @@ class ShibSPTest(CacheIsolationTestCase):
                     # self.assertEquals(remote_user, args[1])
                 elif idp == "https://idp.stanford.edu/" and remote_user == 'womap@stanford.edu':
                     self.assertIsNotNone(ExternalAuthMap.objects.get(user=user_wo_map))
-                    self.assertIsInstance(response, HttpResponseRedirect)
-                    self.assertEqual(request.user, user_wo_map)
-                    self.assertEqual(response['Location'], '/dashboard')
+                    self.assertRedirects(response, '/dashboard')
+                    self.assertEquals(int(self.client.session['_auth_user_id']), user_wo_map.id)
                     # verify logging:
                     self.assertEquals(len(audit_log_calls), 2)
                     self._assert_shib_login_is_logged(audit_log_calls[0], remote_user)
@@ -313,8 +304,7 @@ class ShibSPTest(CacheIsolationTestCase):
         Uses django test client for its session support
         """
         # First we pop the registration form
-        client = DjangoTestClient()
-        response1 = client.get(path='/shib-login/', data={}, follow=False, **identity)
+        self.client.get(path='/shib-login/', data={}, follow=False, **identity)
         # Then we have the user answer the registration form
         # These are unicode because request.POST returns unicode
         postvars = {'email': u'post_email@stanford.edu',
@@ -323,16 +313,10 @@ class ShibSPTest(CacheIsolationTestCase):
                     'name': u'post_náme',
                     'terms_of_service': u'true',
                     'honor_code': u'true'}
-        # use RequestFactory instead of TestClient here because we want access to request.user
-        request2 = self.request_factory.post('/create_account', data=postvars)
-        request2.session = client.session
-        request2.user = AnonymousUser()
 
-        mako_middleware_process_request(request2)
         with patch('student.views.AUDIT_LOG') as mock_audit_log:
-            _response2 = create_account(request2)
+            self.client.post('/create_account', data=postvars)
 
-        user = request2.user
         mail = identity.get('mail')
 
         # verify logging of login happening during account creation:
@@ -355,6 +339,8 @@ class ShibSPTest(CacheIsolationTestCase):
         self.assertEquals(u'post_username', args[1])
         self.assertEquals(u'test_user@stanford.edu', args[2].external_id)
 
+        user = User.objects.get(id=self.client.session['_auth_user_id'])
+
         # check that the created user has the right email, either taken from shib or user input
         if mail:
             self.assertEqual(user.email, mail)
@@ -375,10 +361,10 @@ class ShibSPTest(CacheIsolationTestCase):
             if sn_empty and given_name_empty:
                 self.assertEqual(profile.name, postvars['name'])
             else:
-                self.assertEqual(profile.name, request2.session['ExternalAuthMap'].external_name)
+                self.assertEqual(profile.name, self.client.session['ExternalAuthMap'].external_name)
                 self.assertNotIn(u';', profile.name)
         else:
-            self.assertEqual(profile.name, request2.session['ExternalAuthMap'].external_name)
+            self.assertEqual(profile.name, self.client.session['ExternalAuthMap'].external_name)
             self.assertEqual(profile.name, identity.get('displayName').decode('utf-8'))
 
 
