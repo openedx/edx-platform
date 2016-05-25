@@ -290,7 +290,7 @@ def course_rerun_handler(request, course_key_string):
         html: return html page with form to rerun a course for the given course id
     """
     # Only global staff (PMs) are able to rerun courses during the soft launch
-    if not GlobalStaff().has_user(request.user):
+    if not GlobalStaff().has_user(request.user) or not _is_org_course_creator(request.user):
         raise PermissionDenied()
     course_key = CourseKey.from_string(course_key_string)
     with modulestore().bulk_operations(course_key):
@@ -894,6 +894,17 @@ def _rerun_course(request, org, number, run, fields):
     # Rerun the course as a new celery task
     json_fields = json.dumps(fields, cls=EdxJSONEncoder)
     rerun_course.delay(unicode(source_course_key), unicode(destination_course_key), request.user.id, json_fields)
+
+    org_data = get_organization_by_short_name(org)
+    if not org_data and organizations_enabled():
+        return JsonResponse(
+            {'error': _('You must link this course to an organization in order to continue. '
+                        'Organization you selected does not exist in the system, '
+                        'you will need to add it to the system')},
+            status=400
+        )
+
+    add_organization_course(org_data, destination_course_key)
 
     # Return course listing page
     return JsonResponse({
