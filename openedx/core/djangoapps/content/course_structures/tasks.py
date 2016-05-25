@@ -97,7 +97,7 @@ def update_course_structure(course_key):
         structure_model.discussion_id_map_json = discussion_id_map_json
         structure_model.save()
 
-    # TODO (TNL-4630) For temporary hotfix to update the block_structure cache.
+    # TODO (TNL-4630) For temporary hotfix to delete the block_structure cache.
     # Should be moved to proper location.
     from django.core.cache import cache
     from openedx.core.lib.block_structure.manager import BlockStructureManager
@@ -105,4 +105,4 @@ def update_course_structure(course_key):
     store = modulestore()
     course_usage_key = store.make_course_usage_key(course_key)
     block_structure_manager = BlockStructureManager(course_usage_key, store, cache)
-    block_structure_manager.update_collected()
+    block_structure_manager.clear()
