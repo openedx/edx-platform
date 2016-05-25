@@ -39,7 +39,7 @@ from .helpers import LoginEnrollmentTestCase
 
 # HTML for registration button
 REG_STR = "<form id=\"class_enroll_form\" method=\"post\" data-remote=\"true\" action=\"/change_enrollment\">"
-SHIB_ERROR_STR = "The currently logged-in user account does not have permission to enroll in this course."
+SHIB_ERROR_STR = "The currently logged\\u002Din user account does not have permission to enroll in this course."
 
 
 @attr('shard_1')
