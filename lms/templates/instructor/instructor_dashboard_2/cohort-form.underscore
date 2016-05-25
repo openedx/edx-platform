@@ -51,7 +51,7 @@
                 </div>
                 <% if (isDefaultCohort) { %>
                     <p class="copy-error">
-                        <i class="icon fa fa-exclamation-triangle" aria-hidden="true"></i>
+                        <span class="icon fa fa-exclamation-triangle" aria-hidden="true"></span>
                         <%- gettext("There must be one cohort to which students can automatically be assigned.") %>
                     </p>
                 <% } %>
@@ -96,7 +96,7 @@
                                 <% if (hasSelectedContentGroup && !foundSelected) { %>
                                     <div class="msg-inline">
                                         <p class="copy-error">
-                                            <i class="icon fa fa-exclamation-triangle" aria-hidden="true"></i>
+                                            <span class="icon fa fa-exclamation-triangle" aria-hidden="true"></span>
                                             <%=
                                             HtmlUtils.interpolateHtml(
                                                 // Translators: Any text between {screen_reader_start} and {screen_reader_end} is only read by screen readers and never shown in the browser.
@@ -115,7 +115,7 @@
                             <div class="input-group-other">
                                 <div class="msg-inline">
                                     <p class="copy-error">
-                                        <i class="icon fa fa-exclamation-triangle" aria-hidden="true"></i>
+                                        <span class="icon fa fa-exclamation-triangle" aria-hidden="true"></span>
                                         <%=
                                         HtmlUtils.interpolateHtml(
                                             // Translators: Any text between {screen_reader_start} and {screen_reader_end} is only read by screen readers and never shown in the browser.
