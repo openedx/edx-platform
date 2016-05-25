@@ -289,7 +289,8 @@ def course_rerun_handler(request, course_key_string):
     GET
         html: return html page with form to rerun a course for the given course id
     """
-    org_course_creator = _is_org_course_creator(request.user) 
+    org_course_creator = _is_org_course_creator(request.user)
+    is_global_admin = GlobalStaff().has_user(request.user)
     # Only global staff (PMs) are able to rerun courses during the soft launch
     if not GlobalStaff().has_user(request.user):
         raise PermissionDenied()
@@ -303,6 +304,7 @@ def course_rerun_handler(request, course_key_string):
                 'source_course_key': course_key,
                 'display_name': course_module.display_name,
                 'user': request.user,
+                'is_global_admin': is_global_admin,
                 'course_creator_status': _get_course_creator_status(request.user),
                 'allow_unicode_course_id': settings.FEATURES.get('ALLOW_UNICODE_COURSE_ID', False)
             })
