@@ -153,6 +153,7 @@ class AccessTokenView(_DispatchingView):
             'family_name': user.last_name,
             'name': user.get_full_name(),
             'given_name': user.first_name,
+            'administrator': user.is_staff,
         })
 
 
