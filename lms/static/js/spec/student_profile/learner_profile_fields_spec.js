@@ -82,14 +82,14 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
                 var verifyImageUploadButtonMessage = function (view, inProgress) {
                     var iconName = inProgress ? 'fa-spinner' : 'fa-camera';
                     var message = inProgress ? view.titleUploading : view.uploadButtonTitle();
-                    expect(view.$('.upload-button-icon i').attr('class')).toContain(iconName);
+                    expect(view.$('.upload-button-icon span').attr('class')).toContain(iconName);
                     expect(view.$('.upload-button-title').text().trim()).toBe(message);
                 };
 
                 var verifyImageRemoveButtonMessage = function (view, inProgress) {
                     var iconName = inProgress ? 'fa-spinner' : 'fa-remove';
                     var message = inProgress ? view.titleRemoving : view.removeButtonTitle();
-                    expect(view.$('.remove-button-icon i').attr('class')).toContain(iconName);
+                    expect(view.$('.remove-button-icon span').attr('class')).toContain(iconName);
                     expect(view.$('.remove-button-title').text().trim()).toBe(message);
                 };
 
