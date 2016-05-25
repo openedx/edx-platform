@@ -1,3 +1,0 @@
-"""
-All management commands
-"""
