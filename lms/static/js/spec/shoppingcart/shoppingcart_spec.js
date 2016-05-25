@@ -7,7 +7,7 @@ define(['common/js/spec_helpers/ajax_helpers', 'js/shoppingcart/shoppingcart'],
             var requests = null;
 
             beforeEach(function() {
-                setFixtures('<section class="wrapper confirm-enrollment shopping-cart cart-view"><form action="" method="post"><input type="hidden" name="" value="" /><i class="icon fa fa-caret-right"></i><input type="submit" value="Payment"/></form></section>');
+                setFixtures('<section class="wrapper confirm-enrollment shopping-cart cart-view"><form action="" method="post"><input type="hidden" name="" value="" /><span class="icon fa fa-caret-right" aria-hidden="true"></span><input type="submit" value="Payment"/></form></section>');
 
                 view = new edx.shoppingcart.showcart.CartView({
                     el: $('.confirm-enrollment.cart-view form')

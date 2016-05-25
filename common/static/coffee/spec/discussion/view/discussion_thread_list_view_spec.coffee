@@ -32,7 +32,7 @@ describe "DiscussionThreadListView", ->
                         <a href="#" class="forum-nav-browse-title">All Discussions</a>
                     </li>
                     <li class="forum-nav-browse-menu-item forum-nav-browse-menu-following">
-                        <a href="#" class="forum-nav-browse-title"><i class="icon fa fa-star"></i>Posts I'm Following</a>
+                        <a href="#" class="forum-nav-browse-title"><span class="icon fa fa-star" aria-hidden="true"></span>Posts I'm Following</a>
                     </li>
                     <li class="forum-nav-browse-menu-item">
                         <a href="#" class="forum-nav-browse-title">Parent</a>
