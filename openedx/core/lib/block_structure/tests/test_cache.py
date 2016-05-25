@@ -36,7 +36,7 @@ class TestBlockStructureCache(ChildrenMapTestMixin, TestCase):
 
         self.add_transformers()
         self.block_structure_cache.add(self.block_structure)
-        self.assertEquals(self.mock_cache.timeout_from_last_call, None)
+        self.assertEquals(self.mock_cache.timeout_from_last_call, 60 * 60 * 24)
 
         cached_value = self.block_structure_cache.get(self.block_structure.root_block_usage_key)
         self.assertIsNotNone(cached_value)

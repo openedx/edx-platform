@@ -28,8 +28,6 @@ function(_, $, Course, CertificatePreview, TemplateHelpers, ViewHelpers, AjaxHel
         };
 
         beforeEach(function() {
-            appendSetFixtures('<div class="preview-certificate nav-actions"></div>');
-
             window.course = new Course({
                 id: '5',
                 name: 'Course Name',
@@ -40,6 +38,8 @@ function(_, $, Course, CertificatePreview, TemplateHelpers, ViewHelpers, AjaxHel
             });
             window.CMS.User = {isGlobalStaff: true};
 
+            TemplateHelpers.installTemplate('certificate-web-preview', true);
+            appendSetFixtures('<div class="preview-certificate nav-actions"></div>');
             this.view = new CertificatePreview({
                 el: $('.preview-certificate'),
                 course_modes: ['test1', 'test2', 'test3'],

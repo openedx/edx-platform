@@ -10,13 +10,13 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
             spyOn(view, 'redirect_to');
 
             FieldViewsSpecHelpers.expectTitleAndMessageToContain(view, data.title, data.helpMessage);
-            expect(view.$(selector).text().trim()).toBe('Unlink');
+            expect(view.$(selector).text().trim()).toBe('Unlink This Account');
             view.$(selector).click();
             FieldViewsSpecHelpers.expectMessageContains(view, 'Unlinking');
             AjaxHelpers.expectRequest(requests, 'POST', data.disconnectUrl);
             AjaxHelpers.respondWithNoContent(requests);
 
-            expect(view.$(selector).text().trim()).toBe('Link');
+            expect(view.$(selector).text().trim()).toBe('Link Your Account');
             FieldViewsSpecHelpers.expectMessageContains(view, 'Successfully unlinked.');
 
             view.$(selector).click();

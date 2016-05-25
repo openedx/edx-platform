@@ -230,8 +230,15 @@
             },
 
             finishEditing: function() {
+                var modelValue;
                 if (this.persistChanges === false || this.mode !== 'edit') {return;}
-                if (this.fieldValue() !== this.modelValue()) {
+
+                modelValue = this.modelValue();
+                if (!(_.isUndefined(modelValue) || _.isNull(modelValue))) {
+                    modelValue = modelValue.toString();
+                }
+
+                if (this.fieldValue() !== modelValue) {
                     this.saveValue();
                 } else {
                     if (this.editable === 'always') {

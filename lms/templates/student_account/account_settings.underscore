@@ -2,7 +2,13 @@
 <div class="account-settings-container">
     <div class="wrapper-header">
         <h2 class="header-title"><%- gettext("Account Settings") %></h2>
-        <small class="account-settings-header-subtitle"><%- gettext("These settings include basic information about your account. You can also specify additional information and see your linked social accounts on this page.") %></small>
+        <ul class="left list-inline account-nav">
+            <% _.each(accountSettingsTabs, function(tab) { %>
+            <li class="account-nav-item">
+                <button id="<%- tab.id %>" data-name="<%- tab.name %>" <% if (tab.class) { %> aria-describedby="header-subtitle-<%- tab.name %>" <% } %> class="account-nav-link <%- tab.class %>" ><%- tab.label %></button>
+            </li>
+            <% }); %>
+        </ul>
     </div>
 
     <div class="account-settings-sections">

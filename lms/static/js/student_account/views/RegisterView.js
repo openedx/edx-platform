@@ -78,7 +78,8 @@
                 $(this.el).show(); // Show in case the form was hidden for auto-submission
                 this.errors = _.flatten(
                     _.map(
-                        JSON.parse(error.responseText),
+                        // Something is passing this 'undefined'. Protect against this.
+                        JSON.parse(error.responseText || "[]"),
                         function(error_list) {
                             return _.map(
                                 error_list,

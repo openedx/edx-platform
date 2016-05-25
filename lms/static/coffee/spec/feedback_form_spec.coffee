@@ -8,9 +8,6 @@ describe 'FeedbackForm', ->
       spyOn($, 'postWithPrefix').and.callFake (url, data, callback, format) ->
         callback()
 
-    it 'binds to the #feedback_button', ->
-      expect($('#feedback_button')).toHandle 'click'
-
     it 'post data to /send_feedback on click', ->
       $('#feedback_subject').val 'Awesome!'
       $('#feedback_message').val 'This site is really good.'
