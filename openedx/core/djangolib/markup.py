@@ -23,7 +23,7 @@ def HTML(html):                                 # pylint: disable=invalid-name
         <%!
         from django.utils.translation import ugettext as _
 
-        from openedx.core.djangolib.markup import Text, HTML
+        from openedx.core.djangolib.markup import HTML, Text
         %>
         ${Text(_("Write & send {start}email{end}")).format(
             start=HTML("<a href='mailto:{}'>").format(user.email),
