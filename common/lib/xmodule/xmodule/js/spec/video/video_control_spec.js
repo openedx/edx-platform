@@ -245,7 +245,8 @@
                         isFinite(state.videoPlayer.startTime);
                 }).then(function () {
                     expectedValue = $('.video-controls').find('.vidtime');
-                    expect(expectedValue).toHaveText('0:15 / 0:20');
+                    expect(expectedValue.length).toBe(1);
+                    expect(expectedValue.text()).toBe('0:15 / 0:20');
 
                     expectedValue = sliderEl.slider('option', 'value');
                     expect(expectedValue).toBe(15);
