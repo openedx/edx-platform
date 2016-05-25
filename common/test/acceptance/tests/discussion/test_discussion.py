@@ -203,6 +203,7 @@ class DiscussionHomePageTest(UniqueCourseTest):
         self.page.click_new_post_button()
         self.assertIsNotNone(self.page.new_post_form)
 
+    @attr('a11y')
     def test_page_accessibility(self):
         self.page.a11y_audit.config.set_rules({
             "ignore": [
@@ -341,6 +342,7 @@ class DiscussionTabMultipleThreadTest(BaseDiscussionTestCase):
         # Verify that the focus is changed
         self.thread_page_2.check_focus_is_set(selector=".discussion-article")
 
+    @attr('a11y')
     def test_page_accessibility(self):
         self.thread_page_1.a11y_audit.config.set_rules({
             "ignore": [
@@ -413,6 +415,7 @@ class DiscussionOpenClosedThreadTest(BaseDiscussionTestCase):
         self.assertTrue(page._is_element_visible('.response_response1 .action-vote'))
         self.assertFalse(page._is_element_visible('.response_response1 .display-vote'))
 
+    @attr('a11y')
     def test_page_accessibility(self):
         page = self.setup_openclosed_thread_page()
         page.a11y_audit.config.set_rules({
@@ -709,6 +712,7 @@ class DiscussionResponseEditTest(BaseDiscussionTestCase):
         page.endorse_response('response_self_author')
         page.endorse_response('response_other_author')
 
+    @attr('a11y')
     def test_page_accessibility(self):
         self.setup_user()
         self.setup_view()
@@ -808,6 +812,7 @@ class DiscussionCommentEditTest(BaseDiscussionTestCase):
         self.assertFalse(page.is_comment_editor_visible("comment_self_author"))
         self.assertTrue(page.is_add_comment_visible("response1"))
 
+    @attr('a11y')
     def test_page_accessibility(self):
         self.setup_user()
         self.setup_view()
@@ -1185,6 +1190,7 @@ class DiscussionSearchAlertTest(UniqueCourseTest):
             self.SEARCHED_USERNAME
         ).wait_for_page()
 
+    @attr('a11y')
     def test_page_accessibility(self):
         self.page.a11y_audit.config.set_rules({
             'ignore': [
