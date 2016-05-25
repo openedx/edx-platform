@@ -392,7 +392,7 @@ msgstr "Курс"
 #: common/djangoapps/course_modes/models.py
 #: common/lib/xmodule/xmodule/annotatable_module.py
 #: common/lib/xmodule/xmodule/capa_base.py
-#: common/lib/xmodule/xmodule/discussion_module.py
+#: common/lib/xblock/xblock_discussion/xblock_discussion.py
 #: common/lib/xmodule/xmodule/html_module.py
 #: common/lib/xmodule/xmodule/imageannotation_module.py
 #: common/lib/xmodule/xmodule/library_content_module.py
@@ -1989,7 +1989,7 @@ msgid "XML data for the annotation"
 msgstr "Содержание пояснения в формате XML"
 
 #: common/lib/xmodule/xmodule/annotatable_module.py
-#: common/lib/xmodule/xmodule/discussion_module.py
+#: common/lib/xblock/xblock_discussion/xblock_discussion.py
 #: common/lib/xmodule/xmodule/html_module.py
 #: common/lib/xmodule/xmodule/imageannotation_module.py
 #: common/lib/xmodule/xmodule/library_content_module.py
@@ -2127,7 +2127,7 @@ msgid "Per Student"
 msgstr "Для каждого слушателя"
 
 #: common/lib/xmodule/xmodule/capa_base.py
-#: common/lib/xmodule/xmodule/discussion_module.py
+#: common/lib/xblock/xblock_discussion/xblock_discussion.py
 msgid "XML data for the problem"
 msgstr "Данные, связанные с заданием, в формате XML"
 
@@ -3271,20 +3271,20 @@ msgstr ""
 msgid "General"
 msgstr "Общее"
 
-#: common/lib/xmodule/xmodule/discussion_module.py
+#: common/lib/xblock/xblock_discussion/xblock_discussion.py
 msgid "Discussion Id"
 msgstr "Идентификатор обсуждения"
 
-#: common/lib/xmodule/xmodule/discussion_module.py
+#: common/lib/xblock/xblock_discussion/xblock_discussion.py
 msgid "The id is a unique identifier for the discussion. It is non editable."
 msgstr ""
 "Это уникальный идентификатор обсуждения.  Он не подлежит редактированию."
 
-#: common/lib/xmodule/xmodule/discussion_module.py
+#: common/lib/xblock/xblock_discussion/xblock_discussion.py
 msgid "Category"
 msgstr "Тема"
 
-#: common/lib/xmodule/xmodule/discussion_module.py
+#: common/lib/xblock/xblock_discussion/xblock_discussion.py
 msgid ""
 "A category name for the discussion. This name appears in the left pane of "
 "the discussion forum for the course."
@@ -3292,11 +3292,11 @@ msgstr ""
 "Название темы обсуждения.  Это название отображается в левой навигационной "
 "панели форума курса."
 
-#: common/lib/xmodule/xmodule/discussion_module.py
+#: common/lib/xblock/xblock_discussion/xblock_discussion.py
 msgid "Subcategory"
 msgstr "Подтема"
 
-#: common/lib/xmodule/xmodule/discussion_module.py
+#: common/lib/xblock/xblock_discussion/xblock_discussion.py
 msgid ""
 "A subcategory name for the discussion. This name appears in the left pane of"
 " the discussion forum for the course."
@@ -14224,21 +14224,21 @@ msgid "Results:"
 msgstr "Результаты:"
 
 #: lms/templates/discussion/_discussion_course_navigation.html
-#: lms/templates/discussion/_discussion_module.html
+#: lms/templates/discussion/_discussion_inline.html
 msgid "New Post"
 msgstr "Новая тема"
 
-#: lms/templates/discussion/_discussion_module.html
+#: lms/templates/discussion/_discussion_inline.html
 msgid "Show Discussion"
 msgstr "Показать обсуждение"
 
-#: lms/templates/discussion/_discussion_module_studio.html
+#: lms/templates/discussion/_discussion_inline_studio.html
 msgid "To view live discussions, click Preview or View Live in Unit Settings."
 msgstr ""
 "Чтобы просмотреть активные темы обсуждения, нажмите «Предварительный "
 "просмотр» или «Просмотр курса» в настройках блока."
 
-#: lms/templates/discussion/_discussion_module_studio.html
+#: lms/templates/discussion/_discussion_inline_studio.html
 msgid "Discussion ID: {discussion_id}"
 msgstr "Идентификатор обсуждения: {discussion_id}"
 

@@ -384,7 +384,7 @@ msgstr "Curso"
 #: common/djangoapps/course_modes/models.py
 #: common/lib/xmodule/xmodule/annotatable_module.py
 #: common/lib/xmodule/xmodule/capa_base.py
-#: common/lib/xmodule/xmodule/discussion_module.py
+#: common/lib/xblock/xblock_discussion/xblock_discussion.py
 #: common/lib/xmodule/xmodule/html_module.py
 #: common/lib/xmodule/xmodule/imageannotation_module.py
 #: common/lib/xmodule/xmodule/library_content_module.py
@@ -1991,7 +1991,7 @@ msgid "XML data for the annotation"
 msgstr "Datos XML para la anotación"
 
 #: common/lib/xmodule/xmodule/annotatable_module.py
-#: common/lib/xmodule/xmodule/discussion_module.py
+#: common/lib/xblock/xblock_discussion/xblock_discussion.py
 #: common/lib/xmodule/xmodule/html_module.py
 #: common/lib/xmodule/xmodule/imageannotation_module.py
 #: common/lib/xmodule/xmodule/library_content_module.py
@@ -2129,7 +2129,7 @@ msgid "Per Student"
 msgstr "Por estudiante"
 
 #: common/lib/xmodule/xmodule/capa_base.py
-#: common/lib/xmodule/xmodule/discussion_module.py
+#: common/lib/xblock/xblock_discussion/xblock_discussion.py
 msgid "XML data for the problem"
 msgstr "Datos XML para el problema"
 
@@ -3286,19 +3286,19 @@ msgstr "Introduzca los detalles para Instructor del Curso"
 msgid "General"
 msgstr "General"
 
-#: common/lib/xmodule/xmodule/discussion_module.py
+#: common/lib/xblock/xblock_discussion/xblock_discussion.py
 msgid "Discussion Id"
 msgstr "ID de Discusión"
 
-#: common/lib/xmodule/xmodule/discussion_module.py
+#: common/lib/xblock/xblock_discussion/xblock_discussion.py
 msgid "The id is a unique identifier for the discussion. It is non editable."
 msgstr "El ID es un identificador único para el debate. No es editable."
 
-#: common/lib/xmodule/xmodule/discussion_module.py
+#: common/lib/xblock/xblock_discussion/xblock_discussion.py
 msgid "Category"
 msgstr "Categoría"
 
-#: common/lib/xmodule/xmodule/discussion_module.py
+#: common/lib/xblock/xblock_discussion/xblock_discussion.py
 msgid ""
 "A category name for the discussion. This name appears in the left pane of "
 "the discussion forum for the course."
@@ -3306,11 +3306,11 @@ msgstr ""
 "Un nombre de categoría para la discusión. Este nombre aparece en el panel "
 "izquierdo de la discusión para el curso."
 
-#: common/lib/xmodule/xmodule/discussion_module.py
+#: common/lib/xblock/xblock_discussion/xblock_discussion.py
 msgid "Subcategory"
 msgstr "Subcategoría"
 
-#: common/lib/xmodule/xmodule/discussion_module.py
+#: common/lib/xblock/xblock_discussion/xblock_discussion.py
 msgid ""
 "A subcategory name for the discussion. This name appears in the left pane of"
 " the discussion forum for the course."
@@ -14288,21 +14288,21 @@ msgid "Results:"
 msgstr "Resultados:"
 
 #: lms/templates/discussion/_discussion_course_navigation.html
-#: lms/templates/discussion/_discussion_module.html
+#: lms/templates/discussion/_discussion_inline.html
 msgid "New Post"
 msgstr " Nueva Entrada"
 
-#: lms/templates/discussion/_discussion_module.html
+#: lms/templates/discussion/_discussion_inline.html
 msgid "Show Discussion"
 msgstr "Mostrar Discusión"
 
-#: lms/templates/discussion/_discussion_module_studio.html
+#: lms/templates/discussion/_discussion_inline_studio.html
 msgid "To view live discussions, click Preview or View Live in Unit Settings."
 msgstr ""
 "Para ver las discusiones en vivo, haga clic en Vista previa o Ver en vivo en"
 " las opciones de la unidad."
 
-#: lms/templates/discussion/_discussion_module_studio.html
+#: lms/templates/discussion/_discussion_inline_studio.html
 msgid "Discussion ID: {discussion_id}"
 msgstr "ID de discusión: {discussion_id}"
 
