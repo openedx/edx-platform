@@ -289,9 +289,12 @@ def course_rerun_handler(request, course_key_string):
     GET
         html: return html page with form to rerun a course for the given course id
     """
+    org_course_creator = _is_org_course_creator(request.user) 
     # Only global staff (PMs) are able to rerun courses during the soft launch
-    if not GlobalStaff().has_user(request.user) or not _is_org_course_creator(request.user):
+    if not GlobalStaff().has_user(request.user):
         raise PermissionDenied()
+    if not org_course_creator is None and not org_course_creator:
+      raise PermissionDenied()
     course_key = CourseKey.from_string(course_key_string)
     with modulestore().bulk_operations(course_key):
         course_module = get_course_and_check_access(course_key, request.user, depth=3)

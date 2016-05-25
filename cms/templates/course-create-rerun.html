@@ -81,7 +81,7 @@ from django.template.defaultfilters import escapejs
                     </li>
                     <li class="field text required" id="field-organization">
                       <label for="rerun-course-org">${_("Organization")}</label>
-                      <input class="rerun-course-org" id="rerun-course-org" type="text" name="rerun-course-org" aria-required="true" value="${source_course_key.org | h}" placeholder="${_('e.g. UniversityX or OrganizationX')}" />
+                      <input disabled="true" class="rerun-course-org" id="rerun-course-org" type="text" name="rerun-course-org" aria-required="true" value="${source_course_key.org | h}" placeholder="${_('e.g. UniversityX or OrganizationX')}" />
                       <span class="tip">
                         ${_("The name of the organization sponsoring the new course. (This name is often the same as the original organization name.)")}
                         <strong class="tip-note" class="tip-note">${_("Note: No spaces or special characters are allowed.")}</strong>
