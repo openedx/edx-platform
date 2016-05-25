@@ -76,7 +76,7 @@ for log_name, log_level in LOG_OVERRIDES:
 FEATURES['AUTOMATIC_AUTH_FOR_TESTING'] = True
 
 # Enable milestones app
-FEATURES['MILESTONES_APP'] = True
+FEATURES['MILESTONES_APP'] = False
 
 # Enable pre-requisite course
 FEATURES['ENABLE_PREREQUISITE_COURSES'] = True
@@ -113,7 +113,7 @@ YOUTUBE['TEXT_API']['url'] = "127.0.0.1:{0}/test_transcripts_youtube/".format(YO
 FEATURES['ENABLE_COURSEWARE_INDEX'] = True
 FEATURES['ENABLE_LIBRARY_INDEX'] = True
 
-FEATURES['ORGANIZATIONS_APP'] = True
+FEATURES['ORGANIZATIONS_APP'] = False
 SEARCH_ENGINE = "search.tests.mock_search_engine.MockSearchEngine"
 # Path at which to store the mock index
 MOCK_SEARCH_BACKING_FILE = (

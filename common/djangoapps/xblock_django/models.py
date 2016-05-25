@@ -100,12 +100,21 @@ class XBlockConfig(models.Model):
         (DISABLED, _('Disabled')),
     )
 
-    name = models.CharField(max_length=255, primary_key=True)
+    name = models.CharField(max_length=255, null=False)
+    template = models.CharField(max_length=255, blank=True, default='')
     support_level = models.CharField(max_length=2, choices=SUPPORT_CHOICES, default=UNSUPPORTED_NO_OPT_IN)
-    deprecated = models.BooleanField(default=False, verbose_name=_('show deprecation messaging in Studio'))
+    deprecated = models.BooleanField(
+        default=False,
+        verbose_name=_('show deprecation messaging in Studio'),
+        help_text=_("Only xblocks listed in a course's Advanced Module List can be flagged as deprecated. Note that deprecation is by xblock name, and is not specific to template.")
+    )
+
+    # TODO: error if deprecated is set on core xblock types?
+    # TODO: error if disabled is set on core xblock types (or something with a template)?
 
     class Meta(object):
         app_label = "xblock_django"
+        unique_together = ("name", "template")
 
     @classmethod
     def deprecated_xblocks(cls):
@@ -120,12 +129,16 @@ class XBlockConfig(models.Model):
         return cls.objects.filter(support_level=cls.DISABLED)
 
     @classmethod
-    def authorable_xblocks(cls, limited_support_opt_in=False):
+    def authorable_xblocks(cls, limited_support_opt_in=False, name=None):
         """ Return list of xblocks that can be created in Studio """
 
         blocks = cls.objects.exclude(support_level=cls.DISABLED).exclude(support_level=cls.UNSUPPORTED_NO_OPT_IN)
         if not limited_support_opt_in:
-            blocks.exclude(support_level=cls.UNSUPPORTED_OPT_IN)
+            blocks = blocks.exclude(support_level=cls.UNSUPPORTED_OPT_IN)
+
+        if name:
+            blocks = blocks.filter(name=name)
+
         return blocks
 
 

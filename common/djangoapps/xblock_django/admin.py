@@ -9,7 +9,7 @@ from xblock_django.models import XBlockDisableConfig, XBlockConfig, XBlockConfig
 
 class XBlockConfigAdmin(admin.ModelAdmin):
     """Admin for XBlock Configuration"""
-    list_display = ('name', 'support_level', 'deprecated')
+    list_display = ('name', 'template', 'support_level', 'deprecated')
 
 admin.site.register(XBlockDisableConfig, ConfigurationModelAdmin)
 admin.site.register(XBlockConfigFlag, ConfigurationModelAdmin)

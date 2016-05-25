@@ -12,6 +12,9 @@
                 <li class="editor-md empty">
                     <button type="button" class="button-component" data-category="<%= templates[i].category %>">
                         <span class="name"><%= templates[i].display_name %></span>
+                        <% if (templates[i].support_level !== true){ %>
+                            <span class="support">(<%-templates[i].support_level%>)</span>
+                        <% } %>
                     </button>
                 </li>
                 <% } else { %>
@@ -19,6 +22,9 @@
                     <button type="button" class="button-component" data-category="<%= templates[i].category %>"
                        data-boilerplate="<%= templates[i].boilerplate_name %>">
                         <span class="name"><%= templates[i].display_name %></span>
+                        <% if (templates[i].support_level !== true){ %>
+                            <span class="support">(<%- templates[i].support_level %>)</span>
+                        <% } %>
                     </button>
                 </li>
                 <% } %>
