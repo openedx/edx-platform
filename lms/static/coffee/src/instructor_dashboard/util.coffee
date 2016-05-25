@@ -304,6 +304,7 @@ class KeywordValidator
 
     @keyword_regex = /%%+[^%]+%%/g
     @keywords = [
+      '%%USERNAME%%',
       '%%USER_ID%%',
       '%%USER_FULLNAME%%',
       '%%COURSE_DISPLAY_NAME%%',

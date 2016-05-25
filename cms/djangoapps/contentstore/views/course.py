@@ -907,6 +907,7 @@ def send_test_enrollment_email(request, course_key_string):
     subject = ''.join(subject.splitlines())
     message = request.POST.get('message')
     context = {
+        'username': user.username,
         'user_id': user.id,
         'name': user.profile.name,
         'course_title': course.display_name,
