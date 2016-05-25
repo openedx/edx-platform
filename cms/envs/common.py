@@ -189,6 +189,7 @@ FEATURES = {
     # Special Exams, aka Timed and Proctored Exams
     'ENABLE_SPECIAL_EXAMS': False,
 
+    # enable organization course linking
     'ORGANIZATIONS_APP': True,
 
     # Show Language selector

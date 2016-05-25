@@ -51,7 +51,8 @@ class TestCourseListing(ModuleStoreTestCase):
         )
         self.source_course_key = source_course.id
 
-        self.test_org = OrganizationFactory(short_name='orgX')
+        self.org_x = OrganizationFactory(short_name='orgX')
+        self.org_origin = OrganizationFactory(short_name='origin')
         self.test_organizationuser = OrganizationUserFactory()
 
         for role in [CourseInstructorRole, CourseStaffRole]:
