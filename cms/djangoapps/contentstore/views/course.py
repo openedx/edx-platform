@@ -289,23 +289,26 @@ def course_rerun_handler(request, course_key_string):
     GET
         html: return html page with form to rerun a course for the given course id
     """
-    org_course_creator = _is_org_course_creator(request.user)
-    is_global_admin = GlobalStaff().has_user(request.user)
+    user = request.user
+    org_course_creator = _is_org_course_creator(user)
+    is_global_staff = GlobalStaff().has_user(user)
+
+    # this is_staff is different, it is the Django User Model staff status
+    edit_org = 'disabled' if not (user.is_superuser or user.is_staff) else ''
+
     # Only global staff (PMs) are able to rerun courses during the soft launch
-    if not GlobalStaff().has_user(request.user):
+    if not is_global_staff and not org_course_creator is None and not org_course_creator:
         raise PermissionDenied()
-    if not org_course_creator is None and not org_course_creator:
-      raise PermissionDenied()
     course_key = CourseKey.from_string(course_key_string)
     with modulestore().bulk_operations(course_key):
-        course_module = get_course_and_check_access(course_key, request.user, depth=3)
+        course_module = get_course_and_check_access(course_key, user, depth=3)
         if request.method == 'GET':
             return render_to_response('course-create-rerun.html', {
                 'source_course_key': course_key,
                 'display_name': course_module.display_name,
-                'user': request.user,
-                'is_global_admin': is_global_admin,
-                'course_creator_status': _get_course_creator_status(request.user),
+                'user': user,
+                'edit_org': edit_org,
+                'course_creator_status': _get_course_creator_status(user),
                 'allow_unicode_course_id': settings.FEATURES.get('ALLOW_UNICODE_COURSE_ID', False)
             })
 
