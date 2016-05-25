@@ -6,13 +6,13 @@ from django.utils.translation import ugettext as _
 from openedx.core.djangolib.js_utils import dump_js_escaped_json, js_escaped_string
 %>
 
-<%static:require_module module_name="js/certificates/factories/certificate_whitelist_factory" class_name="CertificateWhitelistFactory">
+<%static:require_module_async module_name="js/certificates/factories/certificate_whitelist_factory" class_name="CertificateWhitelistFactory">
         CertificateWhitelistFactory(${certificate_white_list | n, dump_js_escaped_json}, '${generate_certificate_exceptions_url | n, js_escaped_string}', '${certificate_exception_view_url | n, js_escaped_string}', '${generate_bulk_certificate_exceptions_url | n, js_escaped_string}', ${bool(section_data['active_certificate']) | n, dump_js_escaped_json});
-</%static:require_module>
+</%static:require_module_async>
 
-<%static:require_module module_name="js/certificates/factories/certificate_invalidation_factory" class_name="CertificateInvalidationFactory">
+<%static:require_module_async module_name="js/certificates/factories/certificate_invalidation_factory" class_name="CertificateInvalidationFactory">
         CertificateInvalidationFactory('${certificate_invalidations | n, dump_js_escaped_json}', '${certificate_invalidation_view_url | n, js_escaped_string}');
-</%static:require_module>
+</%static:require_module_async>
 
 <div class="certificates-wrapper">
 

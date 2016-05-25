@@ -84,7 +84,7 @@ else:
 
 
 % if toc:
-    <%static:require_module module_name="js/courseware/accordion_events" class_name="AccordionEvents">
+    <%static:require_module_async module_name="js/courseware/accordion_events" class_name="AccordionEvents">
         AccordionEvents();
-    </%static:require_module>
+    </%static:require_module_async>
 % endif
