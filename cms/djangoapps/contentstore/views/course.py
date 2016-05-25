@@ -546,7 +546,7 @@ def course_listing(request):
         'user_organization': _get_user_org(request.user),
         'request_course_creator_url': reverse('contentstore.views.request_course_creator'),
         'course_creator_status': _get_course_creator_status(request.user),
-        'rerun_creator_status': GlobalStaff().has_user(request.user),
+        'rerun_creator_status': GlobalStaff().has_user(request.user) or _is_org_course_creator(request.user),
         'allow_unicode_course_id': settings.FEATURES.get('ALLOW_UNICODE_COURSE_ID', False),
         'allow_course_reruns': settings.FEATURES.get('ALLOW_COURSE_RERUNS', True),
         'is_programs_enabled': programs_config.is_studio_tab_enabled and request.user.is_staff,
@@ -1645,6 +1645,14 @@ def are_content_experiments_enabled(course):
         'split_test' in course.advanced_modules
     )
 
+def _is_org_course_creator(user):
+    """
+    Helper to determine if user is an organizational instructor and course creator
+    """
+    user_org_link = OrganizationUser.objects.filter(
+        active=True,
+        user_id_id=user.id).values().first()
+    return user_org_link['is_instructor'] if user_org_link else None
 
 def _get_course_creator_status(user):
     """
@@ -1654,14 +1662,10 @@ def _get_course_creator_status(user):
     If the user passed in has not previously visited the index page, it will be
     added with status 'unrequested' if the course creator group is in use.
     """
-
-    user_org_link = OrganizationUser.objects.filter(
-        active=True,
-        user_id_id=user.id).values().first()
-
+    org_course_creator = _is_org_course_creator(user)
     # Rather keep the original logic if the user is not linked to an ORG
-    if user_org_link:
-        course_creator_status = 'granted' if user_org_link['is_instructor'] else 'disallowed_for_this_site'
+    if org_course_creator is not None:
+        course_creator_status = 'granted' if org_course_creator else 'disallowed_for_this_site' 
     elif user.is_staff:
         course_creator_status = 'granted'
     elif settings.FEATURES.get('DISABLE_COURSE_CREATION', False):
