@@ -249,6 +249,71 @@ def get_problem_set_grade_distrib(course_id, problem_set, enrollment):
     return prob_grade_distrib
 
 
+def construct_problem_data(prob_grade_distrib, total_student_count, c_subsection, c_unit, c_problem, component):
+    """
+    Returns dict of problem with student grade data.
+
+    `prob_grade_distrib` Dict of grade distribution for all problems in the course.
+    `total_student_count` Dict of number of students attempting each problem.
+    `c_subsection` Incremental subsection count.
+    `c_unit` Incremental unit count.
+    `c_problem` Incremental problem count.
+    `component` The component for which data is being returned.
+
+    Returns a dict of problem label and data for use in d3 rendering.
+    """
+    c_problem += 1
+    stack_data = []
+
+    # Construct label to display for this problem
+    label = "P{0}.{1}.{2}".format(c_subsection, c_unit, c_problem)
+
+    if component.location in prob_grade_distrib:
+        problem_info = prob_grade_distrib[component.location]
+
+        # Get problem_name for tooltip
+        problem_name = own_metadata(component).get('display_name', '')
+
+        # Compute percent of this grade over max_grade
+        max_grade = float(problem_info['max_grade'])
+        for (grade, count_grade) in problem_info['grade_distrib']:
+            percent = 0.0
+            if max_grade > 0:
+                percent = round((grade * 100.0) / max_grade, 1)
+
+            # Compute percent of students with this grade
+            student_count_percent = 0
+
+            if total_student_count[component.location] > 0:
+                student_count_percent = count_grade * 100 / total_student_count[component.location]
+
+            # Tooltip parameters for problem in grade distribution view
+            tooltip = {
+                'type': 'problem',
+                'label': label,
+                'problem_name': problem_name,
+                'count_grade': count_grade,
+                'percent': percent,
+                'grade': grade,
+                'max_grade': max_grade,
+                'student_count_percent': student_count_percent,
+            }
+
+            # Construct data to be sent to d3
+            stack_data.append({
+                'color': percent,
+                'value': count_grade,
+                'tooltip': tooltip,
+                'module_url': component.location.to_deprecated_string(),
+            })
+
+    problem = {
+        'xValue': label,
+        'stackData': stack_data,
+    }
+    return problem
+
+
 def get_d3_problem_grade_distrib(course_id, enrollment):
     """
     Returns problem grade distribution information for each section, data already in format for d3 function.
@@ -285,56 +350,26 @@ def get_d3_problem_grade_distrib(course_id, enrollment):
 
                     # Student data is at the problem level
                     if child.location.category in PROB_TYPE_LIST:
-                        c_problem += 1
-                        stack_data = []
-
-                        # Construct label to display for this problem
-                        label = "P{0}.{1}.{2}".format(c_subsection, c_unit, c_problem)
-
-                        if child.location in prob_grade_distrib:
-                            problem_info = prob_grade_distrib[child.location]
-
-                            # Get problem_name for tooltip
-                            problem_name = own_metadata(child).get('display_name', '')
-
-                            # Compute percent of this grade over max_grade
-                            max_grade = float(problem_info['max_grade'])
-                            for (grade, count_grade) in problem_info['grade_distrib']:
-                                percent = 0.0
-                                if max_grade > 0:
-                                    percent = round((grade * 100.0) / max_grade, 1)
-
-                                # Compute percent of students with this grade
-                                student_count_percent = 0
-
-                                if total_student_count[child.location] > 0:
-                                    student_count_percent = count_grade * 100 / total_student_count[child.location]
-
-                                # Tooltip parameters for problem in grade distribution view
-                                tooltip = {
-                                    'type': 'problem',
-                                    'label': label,
-                                    'problem_name': problem_name,
-                                    'count_grade': count_grade,
-                                    'percent': percent,
-                                    'grade': grade,
-                                    'max_grade': max_grade,
-                                    'student_count_percent': student_count_percent,
-                                }
-
-                                # Construct data to be sent to d3
-                                stack_data.append({
-                                    'color': percent,
-                                    'value': count_grade,
-                                    'tooltip': tooltip,
-                                    'module_url': child.location.to_deprecated_string(),
-                                })
-
-                        problem = {
-                            'xValue': label,
-                            'stackData': stack_data,
-                        }
+                        problem = construct_problem_data(
+                            prob_grade_distrib,
+                            total_student_count,
+                            c_subsection,
+                            c_unit,
+                            c_problem,
+                            child
+                        )
                         data.append(problem)
+                    elif child.location.category in settings.TYPES_WITH_CHILD_PROBLEMS_LIST:
+                        for library_problem in child.get_children():
+                            problem = construct_problem_data(
+                                prob_grade_distrib,
+                                total_student_count,
+                                c_subsection,
+                                c_unit,
+                                c_problem,
+                                library_problem
+                            )
+                            data.append(problem)
         curr_section['data'] = data
 
         d3_data.append(curr_section)
@@ -386,7 +421,7 @@ def get_d3_sequential_open_distrib(course_id, enrollment):
                 'type': 'subsection',
                 'num_students': open_count,
                 'subsection_num': c_subsection,
-                'subsection_name': subsection_name
+                'subsection_name': subsection_name,
             }
 
             stack_data.append({
@@ -452,6 +487,15 @@ def get_d3_section_grade_distrib(course_id, section, enrollment):
                         'x_value': "P{0}.{1}.{2}".format(c_subsection, c_unit, c_problem),
                         'display_name': own_metadata(child).get('display_name', ''),
                     }
+                elif child.location.category in settings.TYPES_WITH_CHILD_PROBLEMS_LIST:
+                    for library_problem in child.get_children():
+                        c_problem += 1
+                        problem_set.append(library_problem.location)
+                        problem_info[library_problem.location] = {
+                            'id': library_problem.location.to_deprecated_string(),
+                            'x_value': "P{0}.{1}.{2}".format(c_subsection, c_unit, c_problem),
+                            'display_name': own_metadata(library_problem).get('display_name', ''),
+                        }
 
     grade_distrib = get_problem_set_grade_distrib(course_id, problem_set, enrollment)
 
@@ -530,9 +574,14 @@ def get_array_section_has_problem(course_id):
         for subsection in section.get_children():
             for unit in subsection.get_children():
                 for child in unit.get_children():
-                    if child.location.category == 'problem':
+                    if child.location.category in PROB_TYPE_LIST:
                         b_section_has_problem[i] = True
                         break  # out of child loop
+                    elif child.location.category in settings.TYPES_WITH_CHILD_PROBLEMS_LIST:
+                        for library_problem in child.get_children():
+                            if library_problem.location.category in PROB_TYPE_LIST:
+                                b_section_has_problem[i] = True
+                                break  # out of child loop
                 if b_section_has_problem[i]:
                     break  # out of unit loop
             if b_section_has_problem[i]:
