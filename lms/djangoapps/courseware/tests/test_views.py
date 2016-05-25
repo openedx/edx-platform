@@ -611,7 +611,7 @@ class ViewsTestCase(ModuleStoreTestCase):
         If `expected_end_text` is None, verifies that the about page *does not* contain the text
         "Classes End".
         """
-        result = self.client.get(reverse('about_course', args=[unicode(course.id)]))
+        result = self.client.get(reverse('about_course', args=[unicode(course_id)]))
         if expected_end_text is not None:
             self.assertContains(result, "Classes End")
             self.assertContains(result, expected_end_text)
