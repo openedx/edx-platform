@@ -977,7 +977,7 @@ class MiscCourseTests(ContentStoreTestCase):
           3) computing thumbnail location of asset
           4) deleting the asset from the course
         """
-        asset_key = self.course.id.make_asset_key('asset', 'sample_static.txt')
+        asset_key = self.course.id.make_asset_key('asset', 'sample_static.html')
         content = StaticContent(
             asset_key, "Fake asset", "application/text", "test",
         )
@@ -1049,7 +1049,7 @@ class MiscCourseTests(ContentStoreTestCase):
         draft content is also deleted
         """
         # add an asset
-        asset_key = self.course.id.make_asset_key('asset', 'sample_static.txt')
+        asset_key = self.course.id.make_asset_key('asset', 'sample_static.html')
         content = StaticContent(
             asset_key, "Fake asset", "application/text", "test",
         )
