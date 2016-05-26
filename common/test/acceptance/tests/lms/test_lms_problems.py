@@ -5,6 +5,7 @@ Bok choy acceptance tests for problems in the LMS
 See also old lettuce tests in lms/djangoapps/courseware/features/problems.feature
 """
 from textwrap import dedent
+from nose.plugins.attrib import attr
 
 from ..helpers import UniqueCourseTest
 from ...pages.studio.auto_auth import AutoAuthPage
@@ -256,6 +257,15 @@ class ProblemHintWithHtmlTest(ProblemsTest, EventsTestMixin):
             event_filter={'event_type': 'edx.problem.hint.feedback_displayed'},
             number_of_matches=2
         )
+
+        # During in-order match only the expected key values are matched with in actual event data
+        # But in case of out-of-order match, all the keys in actual event data should be present in expected
+        # event data which is not possible always. That's why here we are deleting all those keys which are not
+        # present in expected event data.
+        for actual_event in actual_events:
+            del actual_event['event']['module_id']
+            del actual_event['event']['problem_part_id']
+
         self.assert_events_match(
             [
                 {
@@ -266,7 +276,8 @@ class ProblemHintWithHtmlTest(ProblemsTest, EventsTestMixin):
                         'student_answer': [u'choice_0'],
                         'correctness': False,
                         'question_type': u'multiplechoiceresponse',
-                        'hints': [{u'text': u'A hint'}]}
+                        'hints': [{u'text': u'A hint'}]
+                    }
                 },
                 {
                     'event':
@@ -280,7 +291,8 @@ class ProblemHintWithHtmlTest(ProblemsTest, EventsTestMixin):
                     }
                 }
             ],
-            actual_events)
+            actual_events, in_order=False
+        )
 
     def test_demand_hint(self):
         """
@@ -481,10 +493,10 @@ class LogoutDuringAnswering(ProblemsTest):
         self.assertEqual(problem_page.problem_name, 'TEST PROBLEM')
 
 
-# @attr('a11y')
+@attr('a11y')
 class CAPAProblemQuestionA11yTest(ProblemsTest):
     """
-    TestCase Class for CAPA problem questions
+    TestCase Class to verify CAPA problem questions accessibility.
     """
     def get_problem(self):
         """
@@ -541,9 +553,12 @@ class CAPAProblemQuestionA11yTest(ProblemsTest):
             include=['div.question']
         )
 
-        # Check only for duplicate ids
         problem_page.a11y_audit.config.set_rules({
-            "apply": ['duplicate-id'],
+            "ignore": [
+                'aria-valid-attr',  # TODO: AC-251,
+                'label',  # TODO: AC-290
+                'radiogroup',  # TODO: AC-251
+            ]
         })
 
         # Run the accessibility audit.

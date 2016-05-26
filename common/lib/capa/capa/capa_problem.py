@@ -830,7 +830,6 @@ class LoncapaProblem(object):
         if tree.tag in html_transforms:
             tree.tag = html_transforms[problemtree.tag]['tag']
 
-        # copy attributes over if not innocufying
         for (key, value) in problemtree.items():
             tree.set(key, value)
 
