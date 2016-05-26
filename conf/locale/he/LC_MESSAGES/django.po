@@ -1,6 +1,32 @@
 # #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+# #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
 # edX translation file.
 # Copyright (C) 2016 EdX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# 
+# #-#-#-#-#  django-studio.po (0.1a)  #-#-#-#-#
+# edX translation file.
+# Copyright (C) 2016 EdX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# 
+# #-#-#-#-#  mako.po (0.1a)  #-#-#-#-#
+# edX translation file
+# Copyright (C) 2016 edX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# 
+# #-#-#-#-#  mako-studio.po (0.1a)  #-#-#-#-#
+# edX translation file
+# Copyright (C) 2016 edX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# 
+# #-#-#-#-#  messages.po (EdX Studio)  #-#-#-#-#
+# edX translation file
+# Copyright (C) 2013 edX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# 
+# #-#-#-#-#  wiki.po (0.1a)  #-#-#-#-#
+# edX translation file
+# Copyright (C) 2016 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
@@ -11,8 +37,34 @@
 # Yaron Shahrabani <sh.yaron@gmail.com>, 2015
 # yuval zana, 2015
 # #-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#
+# #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
 # edX translation file.
 # Copyright (C) 2016 EdX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# 
+# #-#-#-#-#  django-studio.po (0.1a)  #-#-#-#-#
+# edX translation file.
+# Copyright (C) 2016 EdX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# 
+# #-#-#-#-#  mako.po (0.1a)  #-#-#-#-#
+# edX translation file
+# Copyright (C) 2016 edX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# 
+# #-#-#-#-#  mako-studio.po (0.1a)  #-#-#-#-#
+# edX translation file
+# Copyright (C) 2016 edX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# 
+# #-#-#-#-#  messages.po (EdX Studio)  #-#-#-#-#
+# edX translation file
+# Copyright (C) 2013 edX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# 
+# #-#-#-#-#  wiki.po (0.1a)  #-#-#-#-#
+# edX translation file
+# Copyright (C) 2016 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
@@ -20,6 +72,7 @@
 # Naaman nov <naaman.nov@gmail.com>, 2015
 # Nadav Stark <nadav@yeda.org.il>, 2015
 # Ron Rozen <Ronrozen@gmail.com>, 2016
+# Yoav Caspin <yoavc@pmo.gov.il>, 2016
 # #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
 # edX translation file
 # Copyright (C) 2016 edX
@@ -52,15 +105,17 @@
 # 
 # Translators:
 # Bentsi Magidovich <magidovich@gmail.com>, 2015
+# ERAN RAVIV <eran.raviv.israelx@gmail.com>, 2016
 # Ido, 2014
 # Nadav Stark <nadav@yeda.org.il>, 2015
+# Ned Batchelder <ned@edx.org>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-05-12 14:51+0000\n"
-"PO-Revision-Date: 2016-05-18 13:47+0000\n"
-"Last-Translator: Natalia Berdnikov <nberdnikov@edx.org>\n"
+"POT-Creation-Date: 2016-05-19 17:10+0000\n"
+"PO-Revision-Date: 2016-05-26 15:41+0000\n"
+"Last-Translator: Ned Batchelder <ned@edx.org>\n"
 "Language-Team: Hebrew (http://www.transifex.com/open-edx/edx-platform/language/he/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -418,6 +473,10 @@ msgid ""
 "Shibboleth. Please contact {tech_support_email} for support."
 msgstr ""
 
+#: common/djangoapps/student/admin.py
+msgid "User profile"
+msgstr ""
+
 #: common/djangoapps/student/forms.py
 msgid ""
 "That e-mail address doesn't have an associated user account. Are you sure "
@@ -518,6 +577,88 @@ msgstr ""
 msgid ""
 "It looks like {email} belongs to an existing account. Try again with a "
 "different email address."
+msgstr ""
+
+#: common/djangoapps/student/management/commands/manage_group.py
+msgid "Removed group: \"{}\""
+msgstr ""
+
+#: common/djangoapps/student/management/commands/manage_group.py
+msgid "Did not find a group with name \"{}\" - skipping."
+msgstr ""
+
+#: common/djangoapps/student/management/commands/manage_group.py
+msgid "Invalid group name: \"{group_name}\". {messages}"
+msgstr ""
+
+#: common/djangoapps/student/management/commands/manage_group.py
+msgid "Created new group: \"{}\""
+msgstr ""
+
+#: common/djangoapps/student/management/commands/manage_group.py
+msgid "Found existing group: \"{}\""
+msgstr ""
+
+#: common/djangoapps/student/management/commands/manage_group.py
+msgid "Adding {codenames} permissions to group \"{group}\""
+msgstr ""
+
+#: common/djangoapps/student/management/commands/manage_group.py
+msgid "Removing {codenames} permissions from group \"{group}\""
+msgstr ""
+
+#: common/djangoapps/student/management/commands/manage_group.py
+msgid ""
+"Invalid permission option: \"{}\". Please specify permissions using the "
+"format: app_label:model_name:permission_codename."
+msgstr ""
+
+#: common/djangoapps/student/management/commands/manage_group.py
+msgid ""
+"Invalid permission codename: \"{codename}\".  No such permission exists for "
+"the model {module}.{model_name}."
+msgstr ""
+
+#: common/djangoapps/student/management/commands/manage_user.py
+msgid "Setting {attribute} for user \"{username}\" to \"{new_value}\""
+msgstr ""
+
+#: common/djangoapps/student/management/commands/manage_user.py
+msgid ""
+"Skipping user \"{}\" because the specified and existing email addresses do "
+"not match."
+msgstr ""
+
+#: common/djangoapps/student/management/commands/manage_user.py
+msgid "Did not find a user with username \"{}\" - skipping."
+msgstr ""
+
+#: common/djangoapps/student/management/commands/manage_user.py
+msgid "Removing user: \"{}\""
+msgstr ""
+
+#: common/djangoapps/student/management/commands/manage_user.py
+msgid "Created new user: \"{}\""
+msgstr ""
+
+#: common/djangoapps/student/management/commands/manage_user.py
+msgid "Found existing user: \"{}\""
+msgstr ""
+
+#: common/djangoapps/student/management/commands/manage_user.py
+msgid "Created new profile for user: \"{}\""
+msgstr ""
+
+#: common/djangoapps/student/management/commands/manage_user.py
+msgid "Could not find a group named \"{}\" - skipping."
+msgstr ""
+
+#: common/djangoapps/student/management/commands/manage_user.py
+msgid "Adding user \"{username}\" to groups {group_names}"
+msgstr ""
+
+#: common/djangoapps/student/management/commands/manage_user.py
+msgid "Removing user \"{username}\" from groups {group_names}"
 msgstr ""
 
 #: common/djangoapps/student/middleware.py
@@ -630,6 +771,14 @@ msgstr ""
 msgid ""
 "The window of time after enrolling during which users can be granted a "
 "refund, represented in microseconds. The default is 14 days."
+msgstr ""
+
+#: common/djangoapps/student/models.py
+msgid "Name of this user attribute."
+msgstr ""
+
+#: common/djangoapps/student/models.py
+msgid "Value of this user attribute."
 msgstr ""
 
 #: common/djangoapps/student/views.py
@@ -4075,9 +4224,9 @@ msgid ""
 " rerun of this course in the studio to allow this action."
 msgstr ""
 
-#: lms/djangoapps/certificates/models.py wiki/admin.py wiki/models/article.py
+#: wiki/admin.py wiki/models/article.py
 msgid "created"
-msgstr ""
+msgstr "נוצר"
 
 #. Translators: This is a past-tense verb that is used for task action
 #. messages.
@@ -5275,6 +5424,14 @@ msgstr ""
 msgid "Goals"
 msgstr ""
 
+#: lms/djangoapps/instructor/views/api.py
+msgid "Cohort"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "Team"
+msgstr ""
+
 #. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: This label appears above a field on the registration form
 #. which allows the user to input the city in which they live.
@@ -5297,14 +5454,6 @@ msgstr ""
 #: lms/templates/shoppingcart/receipt.html
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "Country"
-msgstr ""
-
-#: lms/djangoapps/instructor/views/api.py
-msgid "Cohort"
-msgstr ""
-
-#: lms/djangoapps/instructor/views/api.py
-msgid "Team"
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
@@ -5350,14 +5499,9 @@ msgstr ""
 msgid "% Discount"
 msgstr ""
 
-#: lms/djangoapps/instructor/views/api.py lms/djangoapps/shoppingcart/pdf.py
-#: lms/djangoapps/shoppingcart/reports.py
-#: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
-#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
-#: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
 #: wiki/plugins/attachments/forms.py
 msgid "Description"
-msgstr ""
+msgstr "תיאור"
 
 #: lms/djangoapps/instructor/views/api.py
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
@@ -5879,13 +6023,9 @@ msgstr ""
 msgid "reset"
 msgstr ""
 
-#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
-#. Translators: This is a past-tense verb that is inserted into task progress
-#. messages as {action}.
-#: lms/djangoapps/instructor_task/tasks.py
-#: lms/templates/wiki/plugins/attachments/index.html wiki/models/article.py
+#: wiki/models/article.py
 msgid "deleted"
-msgstr ""
+msgstr "נמחק"
 
 #. Translators: This is a past-tense verb that is inserted into task progress
 #. messages as {action}.
@@ -5939,9 +6079,9 @@ msgstr ""
 msgid "Company Name"
 msgstr ""
 
-#: lms/djangoapps/instructor_task/tasks_helper.py wiki/forms.py
+#: wiki/forms.py
 msgid "Title"
-msgstr ""
+msgstr "כותרת"
 
 #: lms/djangoapps/instructor_task/tasks_helper.py
 #: lms/templates/register-form.html
@@ -7789,10 +7929,9 @@ msgid ""
 "    "
 msgstr ""
 
-#: lms/templates/wiki/plugins/attachments/index.html
 #: wiki/plugins/attachments/wiki_plugin.py
 msgid "Attachments"
-msgstr ""
+msgstr "קבצים מצורפים"
 
 #: lms/templates/wiki/plugins/attachments/index.html
 msgid "Upload new file"
@@ -7893,6 +8032,12 @@ msgstr ""
 
 #: lms/templates/wiki/preview_inline.html
 msgid "Restoring to this revision will mark the article as deleted."
+msgstr ""
+
+#: openedx/core/djangoapps/api_admin/admin.py
+msgid ""
+"Once you have approved this request, go to {catalog_admin_url} to set up a "
+"catalog for this user."
 msgstr ""
 
 #: openedx/core/djangoapps/api_admin/forms.py
@@ -8149,6 +8294,10 @@ msgid "Thumbnail image url of the credit provider."
 msgstr ""
 
 #: openedx/core/djangoapps/credit/models.py
+msgid "Credit requirement statuses"
+msgstr ""
+
+#: openedx/core/djangoapps/credit/models.py
 msgid "Deadline for purchasing and requesting credit."
 msgstr ""
 
@@ -8237,6 +8386,10 @@ msgstr ""
 
 #: openedx/core/djangoapps/programs/models.py
 msgid "Do we want to show program listing page"
+msgstr ""
+
+#: openedx/core/djangoapps/programs/models.py
+msgid "Do we want to show program details pages"
 msgstr ""
 
 #: openedx/core/djangoapps/self_paced/models.py
@@ -8446,99 +8599,108 @@ msgstr ""
 #: cms/djangoapps/contentstore/course_group_config.py
 #: cms/djangoapps/contentstore/views/certificates.py
 msgid "invalid JSON"
-msgstr ""
+msgstr "JSON לא חוקי"
 
 #: cms/djangoapps/contentstore/course_group_config.py
 msgid "must have name of the configuration"
-msgstr ""
+msgstr "חייב להיות שם עבור הגדרה"
 
 #: cms/djangoapps/contentstore/course_group_config.py
 msgid "must have at least one group"
-msgstr ""
+msgstr "חייבת להיות לפחות קבוצה אחת"
 
 #: cms/djangoapps/contentstore/course_info_model.py
 msgid "Invalid course update id."
-msgstr ""
+msgstr "מספר  זיהוי עדכון קורס לא תקף"
 
 #: cms/djangoapps/contentstore/course_info_model.py
 msgid "Course update not found."
-msgstr ""
+msgstr "עדכון קורס לא נמצא"
 
 #: cms/djangoapps/contentstore/courseware_index.py
 msgid "Could not index item: {}"
-msgstr ""
+msgstr "לא ניתן לאנדקס פריט: {}"
 
 #: cms/djangoapps/contentstore/courseware_index.py
 msgid "General indexing error occurred"
-msgstr ""
+msgstr "קרתה שגיאת אינדוקס כללית"
 
 #: cms/djangoapps/contentstore/courseware_index.py
 msgid "(Unnamed)"
-msgstr ""
+msgstr "(ללא שם)"
 
 #: cms/djangoapps/contentstore/git_export_utils.py
 msgid ""
 "GIT_REPO_EXPORT_DIR not set or path {0} doesn't exist, please create it, or "
 "configure a different path with GIT_REPO_EXPORT_DIR"
 msgstr ""
+"GIT_REPO_EXPORT_DIR אינו מוגדר או שהנתיב {0} אינו קיים, אנא צור אותו או הגדר"
+" תצורה של נתיב אחר באמצעות GIT_REPO_EXPORT_DIR"
 
 #: cms/djangoapps/contentstore/git_export_utils.py
 msgid ""
 "Non writable git url provided. Expecting something like: "
 "git@github.com:mitocw/edx4edx_lite.git"
 msgstr ""
+"סופק git url שלא ניתן לכתיבה. אנו מצפים לכתובת אתר של git כזו: "
+"git@github.com:mitocw/edx4edx_lite.git"
 
 #: cms/djangoapps/contentstore/git_export_utils.py
 msgid ""
 "If using http urls, you must provide the username and password in the url. "
 "Similar to https://user:pass@github.com/user/course."
 msgstr ""
+"אם נעשה שימוש בכתובות URL של HTTP, חובה לספק שם משתמש וסיסמא בתוך כתובת הURL. בדומה ל:\n"
+"https://user:pass@github.com/user/course. "
 
 #: cms/djangoapps/contentstore/git_export_utils.py
 msgid "Unable to determine branch, repo in detached HEAD mode"
-msgstr ""
+msgstr "לא ניתן לקבוע ענף, מאגר במצב HEAD נפרד"
 
 #: cms/djangoapps/contentstore/git_export_utils.py
 msgid "Unable to update or clone git repository."
-msgstr ""
+msgstr "לא ניתן לעדכן או לשכפל מאגר git."
 
 #: cms/djangoapps/contentstore/git_export_utils.py
 msgid "Unable to export course to xml."
-msgstr ""
+msgstr "לא ניתן ליצא קורס לXML"
 
 #: cms/djangoapps/contentstore/git_export_utils.py
 msgid "Unable to configure git username and password"
-msgstr ""
+msgstr "לא ניתן להגדיר תצורה של שם משתמש וסיסמה של git"
 
 #: cms/djangoapps/contentstore/git_export_utils.py
 msgid ""
 "Unable to commit changes. This is usually because there are no changes to be"
 " committed"
-msgstr ""
+msgstr "לא ניתן לבצע שינויים. לרוב, זה משום שלא בוצעו שינויים."
 
 #: cms/djangoapps/contentstore/git_export_utils.py
 msgid ""
 "Unable to push changes.  This is usually because the remote repository "
 "cannot be contacted"
 msgstr ""
+"לא ניתן לדחוף שינויים.  הסיבה לרוב היא משום שלא ניתן להתחבר למאגר המרוחק"
 
 #: cms/djangoapps/contentstore/git_export_utils.py
 msgid "Bad course location provided"
-msgstr ""
+msgstr "ניתן מיקום קורס שגוי"
 
 #: cms/djangoapps/contentstore/git_export_utils.py
 msgid "Missing branch on fresh clone"
-msgstr ""
+msgstr "ענף חסר בשכפול חדש"
 
 #: cms/djangoapps/contentstore/management/commands/git_export.py
 msgid ""
 "Take the specified course and attempt to export it to a git repository\n"
 ". Course directory must already be a git repository. Usage:  git_export <course_loc> <git_url>"
 msgstr ""
+"עבור את הקורס שצוין ונסה לייצא אותו למאגר git\n"
+". ספריית הקורס כבר חייבת להיות מאגר git. שימוש: git_export <course_loc> <git_url>"
 
 #: cms/djangoapps/contentstore/utils.py
 msgid "Deleted group"
-msgstr ""
+msgstr "קבוצה מחוקה"
 
 #: cms/djangoapps/contentstore/views/assets.py
 msgid ""
@@ -8546,59 +8708,63 @@ msgid ""
 "instructions here to upload a file elsewhere and link to it instead: "
 "{faq_url}"
 msgstr ""
+"קובץ {filename} חרג מהגודל המקסימלי של  {size_mb} MB. אנא עקוב אחר ההנחיות "
+"כאן בכדי להעלות את הקובץ במקום אחר ולקשר אותו כאן: {faq_url}  "
 
 #: cms/djangoapps/contentstore/views/assets.py
 msgid "Upload completed"
-msgstr ""
+msgstr "העלאה הושלמה"
 
 #: cms/djangoapps/contentstore/views/certificates.py
 msgid "must have name of the certificate"
-msgstr ""
+msgstr "חובה לרשום את שם התעודה"
 
 #: cms/djangoapps/contentstore/views/certificates.py
 msgid "Certificate dict {0} missing value key '{1}'"
-msgstr ""
+msgstr "במילון התעודה  {0} חסר מפתח ערך '{1}'"
 
 #: cms/djangoapps/contentstore/views/certificates.py
 msgid "PermissionDenied: Failed in authenticating {user}"
-msgstr ""
+msgstr "גישה נדחתה: האימות נכשל {user}"
 
 #: cms/djangoapps/contentstore/views/component.py
 msgid "HTML"
-msgstr ""
+msgstr "HTML"
 
 #: cms/djangoapps/contentstore/views/component.py
 msgid "Video"
-msgstr ""
+msgstr "וידאו"
 
 #: cms/djangoapps/contentstore/views/component.py
 msgid "Blank"
-msgstr ""
+msgstr "ריק"
 
 #: cms/djangoapps/contentstore/views/course.py
 msgid "Course has been successfully reindexed."
-msgstr ""
+msgstr "קורס אונדקס מחדש בהצלחה."
 
 #: cms/djangoapps/contentstore/views/course.py
 msgid "Unscheduled"
-msgstr ""
+msgstr "לא נקבע"
 
 #: cms/djangoapps/contentstore/views/course.py
 msgid ""
 "Special characters not allowed in organization, course number, and course "
 "run."
-msgstr ""
+msgstr "לא ניתן להשתמש בתווים מיוחדים בשם הארגון, מספר קורס, ומחזור הרצה. "
 
 #: cms/djangoapps/contentstore/views/course.py
 msgid ""
 "There is already a course defined with the same organization and course "
 "number. Please change either organization or course number to be unique."
 msgstr ""
+"יש כבר קורס מוגדר עם אותו ארגון ומספר קורס. אנא שנה את הארגון או את מספר "
+"הקורס בכדי שיהיה יחודי."
 
 #: cms/djangoapps/contentstore/views/course.py
 msgid ""
 "Please change either the organization or course number so that it is unique."
-msgstr ""
+msgstr "אנא שנה את הארגון או את מספר הקורס כך שיהיה יחודי."
 
 #: cms/djangoapps/contentstore/views/course.py
 msgid ""
@@ -8606,6 +8772,9 @@ msgid ""
 "\n"
 "{err}"
 msgstr ""
+"לא ניתן ליצור קורס '{name}'.\n"
+"\n"
+"{err}"
 
 #: cms/djangoapps/contentstore/views/course.py
 msgid ""
@@ -8613,74 +8782,76 @@ msgid ""
 "Organization you selected does not exist in the system, you will need to add"
 " it to the system"
 msgstr ""
+"עליך לקשר קורס זה לארגון על מנת להמשיך. הארגון שבחרת אינו קיים במערכת, עליך "
+"להוסיף אותו למערכת"
 
 #: cms/djangoapps/contentstore/views/course.py
 msgid "Invalid prerequisite course key"
-msgstr ""
+msgstr "מפתח דרישות קדם לא חוקי"
 
 #: cms/djangoapps/contentstore/views/course.py
 msgid "An error occurred while trying to save your tabs"
-msgstr ""
+msgstr "אירעה שגיאה בעת ניסיון לשמור על הלשוניות"
 
 #: cms/djangoapps/contentstore/views/course.py
 msgid "Tabs Exception"
-msgstr ""
+msgstr "חריגה בלשוניות"
 
 #: cms/djangoapps/contentstore/views/course.py
 msgid "This group configuration is in use and cannot be deleted."
-msgstr ""
+msgstr "הגדרת קבוצה זו נמצאת בשימוש ולא ניתנת למחיקה."
 
 #: cms/djangoapps/contentstore/views/course.py
 msgid "This content group is in use and cannot be deleted."
-msgstr ""
+msgstr "קבוצת תוכן זו נמצאת בשימוש ולא ניתנת למחיקה."
 
 #: cms/djangoapps/contentstore/views/entrance_exam.py
 msgid "Entrance Exam - Subsection"
-msgstr ""
+msgstr "מבחן כניסה - תת מקטע "
 
 #: cms/djangoapps/contentstore/views/entrance_exam.py
 msgid "Completed Course Entrance Exam"
-msgstr ""
+msgstr "מבחן כניסה לקורס הושלם"
 
 #: cms/djangoapps/contentstore/views/export_git.py
 msgid "Course successfully exported to git repository"
-msgstr ""
+msgstr "הקורס יוצא בהצלחה למאגר git"
 
 #: cms/djangoapps/contentstore/views/helpers.py
 msgid "Vertical"
-msgstr ""
+msgstr "אנכי"
 
 #: cms/djangoapps/contentstore/views/helpers.py
 msgid "Empty"
-msgstr ""
+msgstr "ריק"
 
 #: cms/djangoapps/contentstore/views/import_export.py
 msgid "We only support uploading a .tar.gz file."
-msgstr ""
+msgstr "אנחנו תומכים בהעלאת קובץ .tar.gz בלבד."
 
 #: cms/djangoapps/contentstore/views/import_export.py
 msgid "File upload corrupted. Please try again"
-msgstr ""
+msgstr "העלאת הקובץ נפגמה. נסה שוב"
 
 #: cms/djangoapps/contentstore/views/import_export.py
 msgid "Could not find the {0} file in the package."
-msgstr ""
+msgstr "לא ניתן למצוא את הקובץ {0} בחבילה."
 
 #: cms/djangoapps/contentstore/views/item.py
 msgid "Invalid data"
-msgstr ""
+msgstr "מידע לא חוקי"
 
 #: cms/djangoapps/contentstore/views/item.py
 msgid "Invalid data ({details})"
-msgstr ""
+msgstr "נתונים לא חוקיים ({details})"
 
 #: cms/djangoapps/contentstore/views/item.py
 msgid "Duplicate of {0}"
-msgstr ""
+msgstr "שכפול של {0}"
 
 #: cms/djangoapps/contentstore/views/item.py
 msgid "Duplicate of '{0}'"
-msgstr ""
+msgstr "שכפול של '{0}'"
 
 #. Translators: The {pct_sign} here represents the percent sign, i.e., '%'
 #. in many languages. This is used to avoid Transifex's misinterpreting of
@@ -8689,20 +8860,21 @@ msgstr ""
 msgid ""
 "Students must score {score}{pct_sign} or higher to access course materials."
 msgstr ""
+"סטודנט צריך לקבל ציון {score}{pct_sign} או יותר בכדי לגשת לחומרי הקורס."
 
 #. Translators: This is the percent sign. It will be used to represent
 #. a percent value out of 100, e.g. "58%" means "58/100".
 #: cms/djangoapps/contentstore/views/item.py
 msgid "%"
-msgstr ""
+msgstr "%"
 
 #: cms/djangoapps/contentstore/views/item.py
 msgid "{section_or_subsection} \"{display_name}\""
-msgstr ""
+msgstr "{section_or_subsection} \"{display_name}\""
 
 #: cms/djangoapps/contentstore/views/library.py
 msgid "Unable to create library - missing required field '{field}'"
-msgstr ""
+msgstr "לא ניתן ליצור ספריה - חסרים שדות דרושים '{field}'"
 
 #: cms/djangoapps/contentstore/views/library.py
 msgid ""
@@ -8710,6 +8882,9 @@ msgid ""
 "\n"
 "{err}"
 msgstr ""
+"לא ניתן ליצור ספריה '{name}'.\n"
+"\n"
+" {err}"
 
 #: cms/djangoapps/contentstore/views/library.py
 msgid ""
@@ -8717,146 +8892,148 @@ msgid ""
 "code. Please change your library code so that it is unique within your "
 "organization."
 msgstr ""
+"כבר הוגדרה ספרייה עם אותו קוד ארגון וספרייה. אנא שנה את קוד הספריה כדי שיהיה"
+" ייחודי בארגון שלך."
 
 #: cms/djangoapps/contentstore/views/transcripts_ajax.py
 msgid "Incoming video data is empty."
-msgstr ""
+msgstr "מידע ריק מוידאו נכנס."
 
 #: cms/djangoapps/contentstore/views/transcripts_ajax.py
 msgid "Can't find item by locator."
-msgstr ""
+msgstr "לא ניתן לאתר פריט עם מאתר."
 
 #: cms/djangoapps/contentstore/views/transcripts_ajax.py
 msgid "Transcripts are supported only for \"video\" modules."
-msgstr ""
+msgstr "תמלילים נתמכים רק ברכיבים מסוג \"וידאו\". "
 
 #: cms/djangoapps/contentstore/views/user.py
 msgid "Insufficient permissions"
-msgstr ""
+msgstr "הרשאות לא מספיקות"
 
 #: cms/djangoapps/contentstore/views/user.py
 msgid "Could not find user by email address '{email}'."
-msgstr ""
+msgstr "לא ניתן לאתר משתמש לפי כתובת דוא\"ל '{email}'."
 
 #: cms/djangoapps/contentstore/views/user.py
 msgid "User {email} has registered but has not yet activated his/her account."
-msgstr ""
+msgstr "משתמש {email} נרשם אבל טרם הפעיל/ה את החשבון."
 
 #: cms/djangoapps/contentstore/views/user.py
 msgid "No `role` specified."
-msgstr ""
+msgstr "לא נבחר 'תפקיד'."
 
 #: cms/djangoapps/contentstore/views/user.py
 msgid "Invalid `role` specified."
-msgstr ""
+msgstr "נבחר 'תפקיד' לא חוקי"
 
 #: cms/djangoapps/contentstore/views/user.py
 msgid "You may not remove the last Admin. Add another Admin first."
-msgstr ""
+msgstr "לא ניתן להסיר את המנהל האחרון. הוסף מנהל אחר לפני כן."
 
-#. #-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#
 #. Translators: This is the status of an active video upload
-#: cms/djangoapps/contentstore/views/videos.py cms/templates/import.html
+#: cms/djangoapps/contentstore/views/videos.py
 msgid "Uploading"
-msgstr ""
+msgstr "מעלה"
 
 #. Translators: This is the status for a video that the servers are currently
 #. processing
 #: cms/djangoapps/contentstore/views/videos.py
 msgid "In Progress"
-msgstr ""
+msgstr "בביצוע"
 
 #. Translators: This is the status for a video that the servers have
 #. successfully processed
 #: cms/djangoapps/contentstore/views/videos.py
 msgid "Ready"
-msgstr ""
+msgstr "מוכן"
 
 #. Translators: This is the status for a video that the servers have failed to
 #. process
 #: cms/djangoapps/contentstore/views/videos.py
 msgid "Failed"
-msgstr ""
+msgstr "נכשל"
 
 #. Translators: This is the status for a video for which an invalid
 #. processing token was provided in the course settings
 #: cms/djangoapps/contentstore/views/videos.py
 msgid "Invalid Token"
-msgstr ""
+msgstr "Token לא תקף"
 
 #. Translators: This is the status for a video that was included in a course
 #. import
 #: cms/djangoapps/contentstore/views/videos.py
 msgid "Imported"
-msgstr ""
+msgstr "מיובא"
 
 #. Translators: This is the status for a video that is in an unknown state
 #: cms/djangoapps/contentstore/views/videos.py
 msgid "Unknown"
-msgstr ""
+msgstr "לא ידוע"
 
 #. Translators: This is the header for a CSV file column
 #. containing URLs for video encodings for the named profile
 #. (e.g. desktop, mobile high quality, mobile low quality)
 #: cms/djangoapps/contentstore/views/videos.py
 msgid "{profile_name} URL"
-msgstr ""
+msgstr "{profile_name} כתובת URL "
 
 #: cms/djangoapps/contentstore/views/videos.py
 msgid "Duration"
-msgstr ""
+msgstr "משך זמן"
 
 #: cms/djangoapps/contentstore/views/videos.py
 msgid "Date Added"
-msgstr ""
+msgstr "תאריך ההוספה"
 
 #. Translators: This is the suggested filename when downloading the URL
 #. listing for videos uploaded through Studio
 #: cms/djangoapps/contentstore/views/videos.py
 msgid "{course}_video_urls"
-msgstr ""
+msgstr "{course}_video_urls"
 
 #: cms/djangoapps/course_creators/models.py
 msgid "unrequested"
-msgstr ""
+msgstr "לא נדרש"
 
 #: cms/djangoapps/course_creators/models.py
 msgid "pending"
-msgstr ""
+msgstr "ממתין לאישור"
 
 #: cms/djangoapps/course_creators/models.py
 msgid "granted"
-msgstr ""
+msgstr "אושר"
 
 #: cms/djangoapps/course_creators/models.py
 msgid "denied"
-msgstr ""
+msgstr "נשללה"
 
 #: cms/djangoapps/course_creators/models.py
 msgid "Studio user"
-msgstr ""
+msgstr "משתמש סטודיו"
 
 #: cms/djangoapps/course_creators/models.py
 msgid "The date when state was last updated"
-msgstr ""
+msgstr "התאריך שבו המצב עודכן לאחרונה"
 
 #: cms/djangoapps/course_creators/models.py
 msgid "Current course creator state"
-msgstr ""
+msgstr "מצב נוכחי של יוצר הקורס"
 
 #: cms/djangoapps/course_creators/models.py
 msgid ""
 "Optional notes about this user (for example, why course creation access was "
 "denied)"
 msgstr ""
+"הערות אופציונליות אודות משתמש זה (לדוגמא, מדוע נשללה גישת ליצירת קורס)"
 
 #: cms/djangoapps/models/settings/course_metadata.py
 msgid "Incorrect format for field '{name}'. {detailed_message}"
-msgstr ""
+msgstr "פורמט לא נכון עבור שדה  '{name}'. {detailed_message}"
 
 #: cms/lib/xblock/tagging/tagging.py
 msgid "Dictionary with the available tags"
-msgstr ""
+msgstr "מילון עם התגים הזמינים"
 
 #: cms/templates/404.html cms/templates/error.html
 #: lms/templates/static_templates/404.html
@@ -9022,10 +9199,9 @@ msgstr ""
 msgid "Account"
 msgstr ""
 
-#: cms/templates/widgets/header.html lms/templates/help_modal.html
-#: lms/templates/static_templates/help.html wiki/plugins/help/wiki_plugin.py
+#: wiki/plugins/help/wiki_plugin.py
 msgid "Help"
-msgstr ""
+msgstr "עזרה"
 
 #: cms/templates/widgets/header.html lms/templates/user_dropdown.html
 #: themes/red-theme/lms/templates/header.html
@@ -9258,6 +9434,20 @@ msgstr ""
 
 #: lms/templates/email_exists.html
 msgid "An account with the new e-mail address already exists."
+msgstr ""
+
+#: lms/templates/enroll_staff.html
+msgid "You should Register before trying to access the Unit"
+msgstr ""
+
+#: lms/templates/enroll_staff.html lms/templates/ccx/enrollment.html
+#: lms/templates/courseware/course_about.html
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid "Enroll"
+msgstr ""
+
+#: lms/templates/enroll_staff.html
+msgid "Don't enroll"
 msgstr ""
 
 #: lms/templates/enroll_students.html
@@ -11269,12 +11459,6 @@ msgid ""
 msgstr ""
 
 #: lms/templates/ccx/enrollment.html
-#: lms/templates/courseware/course_about.html
-#: lms/templates/instructor/instructor_dashboard_2/membership.html
-msgid "Enroll"
-msgstr ""
-
-#: lms/templates/ccx/enrollment.html
 msgid "Student List Management"
 msgstr ""
 
@@ -11522,7 +11706,7 @@ msgstr ""
 
 #: lms/templates/course_modes/choose.html
 #: themes/edx.org/lms/templates/course_modes/choose.html
-msgid "Enroll In {} | Choose Your Track"
+msgid "Enroll In {course_name} | Choose Your Track"
 msgstr ""
 
 #: lms/templates/course_modes/choose.html
@@ -11809,7 +11993,6 @@ msgid ""
 msgstr ""
 
 #: lms/templates/courseware/course_updates.html
-#: lms/templates/discussion/_similar_posts.html
 msgid "Hide"
 msgstr ""
 
@@ -12536,16 +12719,6 @@ msgstr ""
 msgid "Results:"
 msgstr ""
 
-#: lms/templates/discussion/_blank_slate.html
-msgid ""
-"Sorry! We can't find anything matching your search. Please try another "
-"search."
-msgstr ""
-
-#: lms/templates/discussion/_blank_slate.html
-msgid "There are no posts here yet. Be the first one to post!"
-msgstr ""
-
 #: lms/templates/discussion/_discussion_course_navigation.html
 #: lms/templates/discussion/_discussion_module.html
 msgid "New Post"
@@ -12578,14 +12751,6 @@ msgstr ""
 
 #: lms/templates/discussion/_filter_dropdown.html
 msgid "Posts I'm Following"
-msgstr ""
-
-#: lms/templates/discussion/_recent_active_posts.html
-msgid "Following"
-msgstr ""
-
-#: lms/templates/discussion/_search_bar.html
-msgid "Search posts"
 msgstr ""
 
 #: lms/templates/discussion/_thread_list_template.html
@@ -14899,6 +15064,10 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Show Background Task History for Problem"
+msgstr ""
+
+#: lms/templates/learner_dashboard/program_details.html
+msgid "Program Details"
 msgstr ""
 
 #: lms/templates/learner_dashboard/programs.html
@@ -18210,7 +18379,7 @@ msgid ""
 msgstr ""
 
 #: cms/templates/settings.html
-msgid "Schedule &amp; Details Settings"
+msgid "Schedule & Details Settings"
 msgstr ""
 
 #: cms/templates/settings.html cms/templates/widgets/header.html
@@ -18357,10 +18526,11 @@ msgstr ""
 
 #: cms/templates/settings.html
 msgid ""
-"These dates impact <strong>when your courseware can be viewed</strong>, but "
-"they are <strong>not the dates shown on your course summary page</strong>. "
-"To provide the course start and registration dates as shown on your course "
-"summary page, follow the instructions provided by your Program Manager."
+"These dates impact {strong_start}when your courseware can be "
+"viewed{strong_end}, but they are {strong_start}not the dates shown on your "
+"course summary page{strong_end}. To provide the course start and "
+"registration dates as shown on your course summary page, follow the "
+"instructions provided by your Program Manager."
 msgstr ""
 
 #: cms/templates/settings.html
@@ -18433,13 +18603,9 @@ msgid "Course Overview"
 msgstr ""
 
 #: cms/templates/settings.html
-msgid "your course summary page"
-msgstr ""
-
-#: cms/templates/settings.html
-#, python-format
 msgid ""
-"Introductions, prerequisites, FAQs that are used on %s (formatted in HTML)"
+"Introductions, prerequisites, FAQs that are used on {a_link_start}your "
+"course summary page{a_link_end} (formatted in HTML)"
 msgstr ""
 
 #: cms/templates/settings.html
@@ -18448,8 +18614,8 @@ msgstr ""
 
 #: cms/templates/settings.html
 msgid ""
-"You can manage this image along with all of your other <a href='{}'>files "
-"&amp; uploads</a>"
+"You can manage this image along with all of your other {a_link_start}files "
+"and uploads{a_link_end}"
 msgstr ""
 
 #: cms/templates/settings.html
@@ -19187,15 +19353,15 @@ msgstr ""
 
 #: wiki/forms.py
 msgid "Only localhost... muahahaha"
-msgstr ""
+msgstr "רק localhost... מוהאהאהא... "
 
 #: wiki/forms.py
 msgid "Initial title of the article. May be overridden with revision titles."
-msgstr ""
+msgstr "כותרת ראשונית למאמר. ניתנת לשכתוב באמצעות כותרות של גירסאות אחרות."
 
 #: wiki/forms.py
 msgid "Type in some contents"
-msgstr ""
+msgstr "הקלד תוכן כלשהו"
 
 #: wiki/forms.py
 msgid ""
@@ -19203,10 +19369,12 @@ msgid ""
 "can use more complex features like adding plugins, meta data, related "
 "articles etc..."
 msgstr ""
+"זהו רק תוכן התחלתי למאמר שלך. לאחר היצירה שלו, תוכל לעשות שימוש באפשרויות "
+"מורכבות יותר כדוגמת הוספת תוספים, מטה דאטה, מאמרים קשורים ועוד..."
 
 #: wiki/forms.py
 msgid "Contents"
-msgstr "תוכן"
+msgstr "תכנים"
 
 #: wiki/forms.py
 msgid "Summary"
@@ -19215,7 +19383,7 @@ msgstr "סיכום"
 #: wiki/forms.py
 msgid ""
 "Give a short reason for your edit, which will be stated in the revision log."
-msgstr ""
+msgstr "אנא רשום הסבר קצר לשינויים שעשית. ההסבר יופיע ביומן הגירסאות."
 
 #: wiki/forms.py
 msgid ""
@@ -19223,18 +19391,20 @@ msgid ""
 "have been automatically merged with the new contents. Please review the text"
 " below."
 msgstr ""
+"בזמן שערכת, מישהו אחר ביצע שינוי באותו ערך. התכנים שלכם מוזגו באופן אוטומאטי"
+" עם התכנים החדשים. לצורך בקרה אנא עבור על הטקסט שמתחת. "
 
 #: wiki/forms.py
 msgid "No changes made. Nothing to save."
-msgstr ""
+msgstr "לא נעשו שינויים. אין מה לשמור."
 
 #: wiki/forms.py
 msgid "Select an option"
-msgstr ""
+msgstr "בחר אפשרות"
 
 #: wiki/forms.py
 msgid "Slug"
-msgstr ""
+msgstr "שם קצר למאמר"
 
 #: wiki/forms.py
 msgid ""
@@ -19242,32 +19412,34 @@ msgid ""
 "alphanumeric characters and - or _. Note that you cannot change the slug "
 "after creating the article."
 msgstr ""
+"כתובת בה יהיה ניתן למצוא את המאמר. השתמש רק בתווים שהם אלפאנומריים, ז.א. אותיות ומספרים, - או _. \n"
+"שים לב: אינך יכול לשנות את שמו הקצר של המאמר לאחר יצירתו. "
 
 #: wiki/forms.py
 msgid "Write a brief message for the article's history log."
-msgstr ""
+msgstr "כתוב הודעה קצרה ליומן ההיסטוריה של מאמר."
 
 #: wiki/forms.py
 msgid "A slug may not begin with an underscore."
-msgstr ""
+msgstr "שם קצר למאמר לא יכול להתחיל בקו תחתון"
 
 #: wiki/forms.py
 #, python-format
 msgid "A deleted article with slug \"%s\" already exists."
-msgstr ""
+msgstr "מאמר שנמחק ששמו הקצר \"%s\" כבר קיים. "
 
 #: wiki/forms.py
 #, python-format
 msgid "A slug named \"%s\" already exists."
-msgstr ""
+msgstr "שם מקוצר \"%s\" של המאמר כבר קיים במערכת."
 
 #: wiki/forms.py
 msgid "Yes, I am sure"
-msgstr ""
+msgstr "כן, אני בטוח"
 
 #: wiki/forms.py
 msgid "Purge"
-msgstr ""
+msgstr "מחיקה לצמיתות"
 
 #: wiki/forms.py
 msgid ""
@@ -19275,238 +19447,250 @@ msgid ""
 " Purging is a good idea if you want to free the slug such that users can "
 "create new articles in its place."
 msgstr ""
+"מחיקה לצמיתות של המאמר: מחיקב מוחלטת של המאמר(וכל תכולתו) ללא אפשרות לבטל את"
+" הפעולה. מחיקה לצמיתות היא רעיון טוב במידה ותרצה לפנות את השם המקוצר של "
+"המאמר כך שמשתמשים אחרים יוכלו ליצור מאמרים חדשים במקומו."
 
 #: wiki/forms.py wiki/plugins/attachments/forms.py
 #: wiki/plugins/images/forms.py
 msgid "You are not sure enough!"
-msgstr ""
+msgstr "אתה לא מספיק בטוח!"
 
 #: wiki/forms.py
 msgid "While you tried to delete this article, it was modified. TAKE CARE!"
-msgstr ""
+msgstr "המאמר עבר עריכה בזמן נסיון מחיקתו. אנא בדוק ונסה שוב!"
 
 #: wiki/forms.py
 msgid "Lock article"
-msgstr ""
+msgstr "נעל מאמר"
 
 #: wiki/forms.py
 msgid "Deny all users access to edit this article."
-msgstr ""
+msgstr "חסום גישת עריכה עבור מאמר זה לכלל המשתמשים."
 
 #: wiki/forms.py
 msgid "Permissions"
-msgstr ""
+msgstr "הרשאות"
 
 #: wiki/forms.py
 msgid "Owner"
-msgstr ""
+msgstr "בעלים"
 
 #: wiki/forms.py
 msgid "Enter the username of the owner."
-msgstr ""
+msgstr "הכנס שם משתמש של הבעלים."
 
 #: wiki/forms.py
 msgid "(none)"
-msgstr ""
+msgstr "(ריק)"
 
 #: wiki/forms.py
 msgid "Inherit permissions"
-msgstr ""
+msgstr "לרשת הרשאות"
 
 #: wiki/forms.py
 msgid ""
 "Check here to apply the above permissions recursively to articles under this"
 " one."
 msgstr ""
+"סמן כאן כדי להחיל באופן רקורסיבי את הרשאות לכל המאמרים שנמצאים מתחת למאמר "
+"זה."
 
 #: wiki/forms.py
 msgid "Permission settings for the article were updated."
-msgstr ""
+msgstr "הרשאות עבור מאמר זה עודכנו."
 
 #: wiki/forms.py
 msgid "Your permission settings were unchanged, so nothing saved."
-msgstr ""
+msgstr "לא היו שינויים בהרשאות, לכן שום דבר לא נשמר."
 
 #: wiki/forms.py
 msgid "No user with that username"
-msgstr ""
+msgstr "לא קיים משתמש עם שם משתמש זה"
 
 #: wiki/forms.py
 msgid "Article locked for editing"
-msgstr ""
+msgstr "מאמר חסום לעריכה"
 
 #: wiki/forms.py
 msgid "Article unlocked for editing"
-msgstr ""
+msgstr "מאמר פתוח לעריכה"
 
 #: wiki/forms.py
 msgid "Filter..."
-msgstr ""
+msgstr "מסנן..."
 
 #: wiki/core/plugins/base.py
 msgid "Settings for plugin"
-msgstr ""
+msgstr "הגדרות עבור plug-in"
 
 #: wiki/models/article.py wiki/models/pluginbase.py
 #: wiki/plugins/attachments/models.py
 msgid "current revision"
-msgstr ""
+msgstr "גירסה נוכחית"
 
 #: wiki/models/article.py
 msgid ""
 "The revision being displayed for this article. If you need to do a roll-"
 "back, simply change the value of this field."
 msgstr ""
+"גירסה המוצגת למאמר זה. במידה ויש צורך בשיחזור לגירסה קודמת, אנא שנו את הערך "
+"בשדה זה."
 
 #: wiki/models/article.py
 msgid "modified"
-msgstr ""
+msgstr "עבר שינויים"
 
 #: wiki/models/article.py
 msgid "Article properties last modified"
-msgstr ""
+msgstr "מאפייני מאמר עודכנו לאחרונה"
 
 #: wiki/models/article.py
 msgid "owner"
-msgstr ""
+msgstr "בעלים"
 
 #: wiki/models/article.py
 msgid ""
 "The owner of the article, usually the creator. The owner always has both "
 "read and write access."
 msgstr ""
+"בעלים של המאמר, בדרך כלל יוצר המאמר. לבעלים תמיד יש הרשאות קריאה וכתיבה."
 
 #: wiki/models/article.py
 msgid "group"
-msgstr ""
+msgstr "קבוצה"
 
 #: wiki/models/article.py
 msgid ""
 "Like in a UNIX file system, permissions can be given to a user according to "
 "group membership. Groups are handled through the Django auth system."
 msgstr ""
+"בדומה למערכת הפעלה UNIX, ניתן לתת הרשאות למשתמש לפי שיוך שלו לקבוצת משתמשים."
+" קבוצות משתמשים מנוהלות על ידי מערכת הרשאות של Django."
 
 #: wiki/models/article.py
 msgid "group read access"
-msgstr ""
+msgstr "גישת קריאה לקבוצה"
 
 #: wiki/models/article.py
 msgid "group write access"
-msgstr ""
+msgstr "גישת כתיבה לקבוצה"
 
 #: wiki/models/article.py
 msgid "others read access"
-msgstr ""
+msgstr "גישת קריאה לאחרים"
 
 #: wiki/models/article.py
 msgid "others write access"
-msgstr ""
+msgstr "גישת כתיבה לאחרים"
 
 #: wiki/models/article.py
 #, python-format
 msgid "Article without content (%(id)d)"
-msgstr ""
+msgstr "מאמר ללא תוכן (%(id)d)"
 
 #: wiki/models/article.py
 msgid "content type"
-msgstr ""
+msgstr "סוג התוכן"
 
 #: wiki/models/article.py
 msgid "object ID"
-msgstr ""
+msgstr "זהות האוביקט"
 
 #: wiki/models/article.py
 msgid "Article for object"
-msgstr ""
+msgstr "מאמר לאוביקט"
 
 #: wiki/models/article.py
 msgid "Articles for object"
-msgstr ""
+msgstr "מאמרים לאוביקט"
 
 #: wiki/models/article.py
 msgid "revision number"
-msgstr ""
+msgstr "מספר גירסה"
 
 #: wiki/models/article.py
 msgid "IP address"
-msgstr ""
+msgstr "כתובת IP"
 
 #: wiki/models/article.py
 msgid "user"
-msgstr ""
+msgstr "משתמש"
 
 #: wiki/models/article.py
 msgid "locked"
-msgstr ""
+msgstr "נעול"
 
 #: wiki/models/article.py wiki/models/pluginbase.py
 msgid "article"
-msgstr ""
+msgstr "מאמר"
 
 #: wiki/models/article.py
 msgid "article contents"
-msgstr ""
+msgstr "תוכן המאמר"
 
 #: wiki/models/article.py
 msgid "article title"
-msgstr ""
+msgstr "כותרת המאמר"
 
 #: wiki/models/article.py
 msgid ""
 "Each revision contains a title field that must be filled out, even if the "
 "title has not changed"
-msgstr ""
+msgstr "כל עדכון מכיל שדה כותרת שחייב להיות ממולא, גם אם הכותרת לא שונתה. "
 
 #: wiki/models/pluginbase.py
 msgid "original article"
-msgstr ""
+msgstr "מאמר מקורי"
 
 #: wiki/models/pluginbase.py
 msgid "Permissions are inherited from this article"
-msgstr ""
+msgstr "אישורים ניתנים בירושה ממאמר זה."
 
 #: wiki/models/pluginbase.py
 msgid "A plugin was changed"
-msgstr ""
+msgstr "תוסף שונה."
 
 #: wiki/models/pluginbase.py
 msgid ""
 "The revision being displayed for this plugin.If you need to do a roll-back, "
 "simply change the value of this field."
 msgstr ""
+"עדכון לתוסף זה מוצג כעת. במידה ואתה צריך לבצע שחזור לגרסא קודמת, שנה את הערך"
+" של שדה זה.   "
 
 #: wiki/models/urlpath.py
 msgid "Cache lookup value for articles"
-msgstr ""
+msgstr "חיפוש של ערכים מזיכרון מטמון למאמרים. "
 
 #: wiki/models/urlpath.py
 msgid "slug"
-msgstr ""
+msgstr "שם קצר למאמר"
 
 #: wiki/models/urlpath.py
 msgid "(root)"
-msgstr ""
+msgstr "(שורש)"
 
 #: wiki/models/urlpath.py
 msgid "URL path"
-msgstr ""
+msgstr "נתיב URL"
 
 #: wiki/models/urlpath.py
 msgid "URL paths"
-msgstr ""
+msgstr "נתיבי URL"
 
 #: wiki/models/urlpath.py
 msgid "Sorry but you cannot have a root article with a slug."
-msgstr ""
+msgstr "מצטערים אבל אתה לא יכול ליצור מאמר בסיס עם שם קצר למאמר. "
 
 #: wiki/models/urlpath.py
 msgid "A non-root note must always have a slug."
-msgstr ""
+msgstr "עבור הערה שאינה ראשית תמיד חייב להיות קיים שם קצר למאמר. "
 
 #: wiki/models/urlpath.py
 #, python-format
 msgid "There is already a root node on %s"
-msgstr ""
+msgstr "קיים צומת ראשי עבור %s "
 
 #: wiki/models/urlpath.py
 msgid ""
@@ -19515,22 +19699,26 @@ msgid ""
 "\n"
 "The children of this article have had their parents deleted. You should probably find a new home for them."
 msgstr ""
+"מאמרים שאיבדו את ההורים\n"
+"===============================\n"
+"\n"
+" מאמר אב  עבור ילדים של מאמר זה נמחקו. עלייך למצוא בית חדש עבורם."
 
 #: wiki/models/urlpath.py
 msgid "Lost and found"
-msgstr ""
+msgstr "מחלקת אבדות"
 
 #: wiki/plugins/attachments/forms.py
 msgid "A short summary of what the file contains"
-msgstr ""
+msgstr "סיכום קצר על מה שהקובץ מכיל"
 
 #: wiki/plugins/attachments/forms.py
 msgid "Yes I am sure..."
-msgstr ""
+msgstr "כן, אני בטוח..."
 
 #: wiki/plugins/attachments/markdown_extensions.py
 msgid "Click to download file"
-msgstr ""
+msgstr "לחץ כדי להוריד את הקובץ"
 
 #: wiki/plugins/attachments/models.py
 msgid ""
@@ -19542,84 +19730,86 @@ msgstr ""
 
 #: wiki/plugins/attachments/models.py
 msgid "original filename"
-msgstr ""
+msgstr "שם קובץ מקורי"
 
 #: wiki/plugins/attachments/models.py
 msgid "attachment"
-msgstr ""
+msgstr "קובץ מצורף"
 
 #: wiki/plugins/attachments/models.py
 msgid "attachments"
-msgstr ""
+msgstr "קבצים מצורפים"
 
 #: wiki/plugins/attachments/models.py
 msgid "file"
-msgstr ""
+msgstr "קובץ"
 
 #: wiki/plugins/attachments/models.py
 msgid "attachment revision"
-msgstr ""
+msgstr "עדכון קובץ מצורף"
 
 #: wiki/plugins/attachments/models.py
 msgid "attachment revisions"
-msgstr ""
+msgstr "עדכוני קבצים מצורפים"
 
 #: wiki/plugins/attachments/views.py
 #, python-format
 msgid "%s was successfully added."
-msgstr ""
+msgstr "%s נוסף בהצלחה."
 
 #: wiki/plugins/attachments/views.py
 #, python-format
 msgid "Your file could not be saved: %s"
-msgstr ""
+msgstr "קובץ לא נשמר: %s"
 
 #: wiki/plugins/attachments/views.py
 msgid ""
 "Your file could not be saved, probably because of a permission error on the "
 "web server."
-msgstr ""
+msgstr "הקובץ לא יכול להישמר, ככל הנראה בשל שגיאות בהרשאות של שרת האינטרנט."
 
 #: wiki/plugins/attachments/views.py
 #, python-format
 msgid "%s uploaded and replaces old attachment."
-msgstr ""
+msgstr "%s הועלה ויחליף את הקובץ המצורף הישן."
 
 #: wiki/plugins/attachments/views.py
 msgid ""
 "Your new file will automatically be renamed to match the file already "
 "present. Files with different extensions are not allowed."
 msgstr ""
+"הקובץ החדש יקבל שם חדש באופן אוטומאטי כך שיתאים לשם הקובץ הקיים כעת. קבצים "
+"בעלי סיומות שונות לא יאושרו."
 
 #: wiki/plugins/attachments/views.py
 #, python-format
 msgid "Current revision changed for %s."
-msgstr ""
+msgstr "גרסה נוכחית שונתה עבור %s."
 
 #: wiki/plugins/attachments/views.py
 #, python-format
 msgid "Added a reference to \"%(att)s\" from \"%(art)s\"."
-msgstr ""
+msgstr "נוספה הפנייה \"%(att)s\" מתוך \"%(art)s\"."
 
 #: wiki/plugins/attachments/views.py
 #, python-format
 msgid "The file %s was deleted."
-msgstr ""
+msgstr "קובץ %s נמחק."
 
 #: wiki/plugins/attachments/views.py
 #, python-format
 msgid "This article is no longer related to the file %s."
-msgstr ""
+msgstr "מאמר זה איננו קשור יותר לקובץ %s."
 
 #: wiki/plugins/attachments/wiki_plugin.py
 #, python-format
 msgid "A file was changed: %s"
-msgstr ""
+msgstr "קובץ שונה: %s "
 
 #: wiki/plugins/attachments/wiki_plugin.py
 #, python-format
 msgid "A file was deleted: %s"
-msgstr ""
+msgstr "קובץ נמחק: %s"
 
 #: wiki/plugins/images/forms.py
 #, python-format
@@ -19627,98 +19817,100 @@ msgid ""
 "New image %s was successfully uploaded. You can use it by selecting it from "
 "the list of available images."
 msgstr ""
+"תמונה חדשה %s הועלתה בהצלחה. תוכל להשתמש בה על ידי בחירתה מרשימת תמונות "
+"זמינות."
 
 #: wiki/plugins/images/forms.py
 msgid "Are you sure?"
-msgstr ""
+msgstr "האם אתה בטוח?"
 
 #: wiki/plugins/images/models.py
 msgid "image"
-msgstr ""
+msgstr "תמונה"
 
 #: wiki/plugins/images/models.py
 msgid "images"
-msgstr ""
+msgstr "תמונות"
 
 #: wiki/plugins/images/models.py
 #, python-format
 msgid "Image: %s"
-msgstr ""
+msgstr "תמונה: %s"
 
 #: wiki/plugins/images/models.py
 msgid "Current revision not set!!"
-msgstr ""
+msgstr "לא נקבעה גירסה נוכחית!!"
 
 #: wiki/plugins/images/models.py
 msgid "image revision"
-msgstr ""
+msgstr "גירסת תמונה"
 
 #: wiki/plugins/images/models.py
 msgid "image revisions"
-msgstr ""
+msgstr "גירסאות תמונה"
 
 #: wiki/plugins/images/models.py
 #, python-format
 msgid "Image Revsion: %d"
-msgstr ""
+msgstr "גירסת תמונה: %d"
 
 #: wiki/plugins/images/views.py
 #, python-format
 msgid "%s has been restored"
-msgstr ""
+msgstr "%s שוחזר"
 
 #: wiki/plugins/images/views.py
 #, python-format
 msgid "%s has been marked as deleted"
-msgstr ""
+msgstr "%s סומן כמחוק"
 
 #: wiki/plugins/images/views.py
 #, python-format
 msgid "%(file)s has been changed to revision #%(revision)d"
-msgstr ""
+msgstr "%(file)s שונה לגירסה #%(revision)d"
 
 #: wiki/plugins/images/views.py
 #, python-format
 msgid "%(file)s has been saved."
-msgstr ""
+msgstr "%(file)s נשמר."
 
 #: wiki/plugins/images/wiki_plugin.py
 msgid "Images"
-msgstr ""
+msgstr "תמונות"
 
 #: wiki/plugins/images/wiki_plugin.py
 #, python-format
 msgid "An image was added: %s"
-msgstr ""
+msgstr "נוספה תמונה: %s"
 
 #: wiki/plugins/links/wiki_plugin.py
 msgid "Links"
-msgstr ""
+msgstr "קישורים"
 
 #: wiki/plugins/notifications/forms.py
 msgid "Notifications"
-msgstr ""
+msgstr "התראות"
 
 #: wiki/plugins/notifications/forms.py
 msgid "When this article is edited"
-msgstr ""
+msgstr "כאשר המאמר במצב עריכה"
 
 #: wiki/plugins/notifications/forms.py
 msgid "Also receive emails about article edits"
-msgstr ""
+msgstr "לקבל דואר אלקטרוני לגבי שינויים שהיו במאמר זה"
 
 #: wiki/plugins/notifications/forms.py
 msgid "Your notification settings were updated."
-msgstr ""
+msgstr "הגדרות ההודעות שלך עודכנו"
 
 #: wiki/plugins/notifications/forms.py
 msgid "Your notification settings were unchanged, so nothing saved."
-msgstr ""
+msgstr "הגדרות ההודעות שלך לא שונו, כך ששום דבר לא נשמר. "
 
 #: wiki/plugins/notifications/models.py
 #, python-format
 msgid "%(user)s subscribing to %(article)s (%(type)s)"
-msgstr ""
+msgstr "%(user)s נרשם ל-%(article)s (%(type)s)"
 
 #: wiki/plugins/notifications/models.py
 #, python-format
@@ -19728,63 +19920,65 @@ msgstr "מאמר נמחק: %s"
 #: wiki/plugins/notifications/models.py
 #, python-format
 msgid "Article modified: %s"
-msgstr ""
+msgstr "מאמר שונה: %s"
 
 #: wiki/plugins/notifications/models.py
 #, python-format
 msgid "New article created: %s"
-msgstr ""
+msgstr "נוצר מאמר חדש: %s"
 
 #: wiki/views/accounts.py
 msgid "You are now sign up... and now you can sign in!"
-msgstr ""
+msgstr "אתה עכשיו רשום למערכת ויכול להיכנס."
 
 #: wiki/views/accounts.py
 msgid "You are no longer logged in. Bye bye!"
 msgstr ""
+"אתה כבר לא מחובר למערכת.\n"
+"להתראות!"
 
 #: wiki/views/accounts.py
 msgid "You are now logged in! Have fun!"
-msgstr ""
+msgstr "הינך מחובר כעת! תהנה!"
 
 #: wiki/views/article.py
 #, python-format
 msgid "New article '%s' created."
-msgstr ""
+msgstr "מאמר חדש '%s' נוצר."
 
 #: wiki/views/article.py
 #, python-format
 msgid "There was an error creating this article: %s"
-msgstr ""
+msgstr "קרתה שגיאה בזמן יצירת המאמר: %s"
 
 #: wiki/views/article.py
 msgid "There was an error creating this article."
-msgstr ""
+msgstr "היתה שגיאה ביצירה של מאמר זה."
 
 #: wiki/views/article.py
 msgid ""
 "This article cannot be deleted because it has children or is a root article."
-msgstr ""
+msgstr "מאמר זה לא יכול להימחק מכיוון שיש לו מאמרי משנה או שהוא מאמר יסוד. "
 
 #: wiki/views/article.py
 msgid ""
 "This article together with all its contents are now completely gone! Thanks!"
-msgstr ""
+msgstr "המאמר עם כל התוכן המקושר נמחק לחלוטין! תודה!"
 
 #: wiki/views/article.py
 #, python-format
 msgid ""
 "The article \"%s\" is now marked as deleted! Thanks for keeping the site "
 "free from unwanted material!"
-msgstr ""
+msgstr "מאמר\"%s\" סומן כמחוק! תודה על שמירת האתר נקי מתוכן לא רצוי!"
 
 #: wiki/views/article.py
 msgid "Your changes were saved."
-msgstr ""
+msgstr "השינויים שביצעת נשמרו."
 
 #: wiki/views/article.py
 msgid "A new revision of the article was succesfully added."
-msgstr ""
+msgstr "עדכון חדש למאמר זה הוסף בהצלחה.  "
 
 #: wiki/views/article.py
 msgid "Restoring article"
@@ -19793,26 +19987,26 @@ msgstr "משחזר מאמר"
 #: wiki/views/article.py
 #, python-format
 msgid "The article \"%s\" and its children are now restored."
-msgstr ""
+msgstr "מאמר \"%s\" והבנים שלו שוחזרו."
 
 #: wiki/views/article.py
 #, python-format
 msgid ""
 "The article %(title)s is now set to display revision #%(revision_number)d"
-msgstr ""
+msgstr "המאמר %(title)s מוגדר כרגע להציג עדכון מספר%(revision_number)d"
 
 #: wiki/views/article.py
 msgid "New title"
-msgstr ""
+msgstr "כותרת חדשה"
 
 #: wiki/views/article.py
 #, python-format
 msgid "Merge between Revision #%(r1)d and Revision #%(r2)d"
-msgstr ""
+msgstr "האם למזג בין גירסה #%(r1)d וגירסה #%(r2)d"
 
 #: wiki/views/article.py
 #, python-format
 msgid ""
 "A new revision was created: Merge between Revision #%(r1)d and Revision "
 "#%(r2)d"
-msgstr ""
+msgstr "גרסה חדשה נוצרה: מיזוג בין גירסה #%(r1)d וגירסה #%(r2)d"
