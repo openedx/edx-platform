@@ -260,6 +260,18 @@ class CommentsServiceMockMixin(object):
                 status=200
             )
 
+    def register_read_response(self, user, content_type, content_id):
+        """
+        Register a mock response for POST on the CS 'read' endpoint
+        """
+        httpretty.register_uri(
+            httpretty.POST,
+            "http://localhost:4567/api/v1/users/{id}/read".format(id=user.id),
+            params={'source_type': content_type, 'source_id': content_id},
+            body=json.dumps({}),  # body is unused
+            status=200
+        )
+
     def register_thread_flag_response(self, thread_id):
         """Register a mock response for PUT on the CS thread flag endpoints"""
         self.register_flag_response("thread", thread_id)

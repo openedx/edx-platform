@@ -514,6 +514,8 @@ def _do_extra_actions(api_content, cc_content, request_fields, actions_form, con
                 _handle_abuse_flagged_field(form_value, context["cc_requester"], cc_content)
             elif field == "voted":
                 _handle_voted_field(form_value, cc_content, api_content, request, context)
+            elif field == "read":
+                _handle_read_field(api_content, form_value, context["cc_requester"], cc_content)
             else:
                 raise ValidationError({field: ["Invalid Key"]})
 
@@ -547,6 +549,15 @@ def _handle_voted_field(form_value, cc_content, api_content, request, context):
     track_voted_event(
         request, context["course"], cc_content, vote_value="up", undo_vote=False if form_value else True
     )
+
+
+def _handle_read_field(api_content, form_value, user, cc_content):
+    """
+    Marks thread as read for the user
+    """
+    if form_value and not cc_content['read']:
+        user.read(cc_content)
+        api_content["unread_comment_count"] -= 1
 
 
 def create_thread(request, thread_data):

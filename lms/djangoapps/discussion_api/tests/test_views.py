@@ -730,7 +730,6 @@ class ThreadViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTest
                 "closed": ["False"],
                 "pinned": ["False"],
                 "read": ["False"],
-                "requested_user_id": [str(self.user.id)],
             }
         )
 
@@ -787,7 +786,9 @@ class ThreadViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTest
     def test_patch_read_owner_user(self):
         self.register_get_user_response(self.user)
         self.register_thread()
+        self.register_read_response(self.user, "thread", "test_thread")
         request_data = {"read": True}
+
         response = self.request_patch(request_data)
         self.assertEqual(response.status_code, 200)
         response_data = json.loads(response.content)
@@ -802,30 +803,13 @@ class ThreadViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTest
             })
         )
 
-        self.assertEqual(
-            httpretty.last_request().parsed_body,
-            {
-                "course_id": [unicode(self.course.id)],
-                "commentable_id": ["original_topic"],
-                "thread_type": ["discussion"],
-                "title": ["Original Title"],
-                "body": ["Original body"],
-                "user_id": [str(self.user.id)],
-                "anonymous": ["False"],
-                "anonymous_to_peers": ["False"],
-                "closed": ["False"],
-                "pinned": ["False"],
-                "read": ["True"],
-                "requested_user_id": [str(self.user.id)],
-            }
-        )
-
     def test_patch_read_non_owner_user(self):
         self.register_get_user_response(self.user)
         thread_owner_user = UserFactory.create(password=self.password)
         CourseEnrollmentFactory.create(user=thread_owner_user, course_id=self.course.id)
         self.register_get_user_response(thread_owner_user)
         self.register_thread({"username": thread_owner_user.username, "user_id": str(thread_owner_user.id)})
+        self.register_read_response(self.user, "thread", "test_thread")
 
         request_data = {"read": True}
         response = self.request_patch(request_data)
@@ -841,24 +825,6 @@ class ThreadViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTest
                     "abuse_flagged", "following", "read", "voted"
                 ],
             })
-        )
-
-        self.assertEqual(
-            httpretty.last_request().parsed_body,
-            {
-                "course_id": [unicode(self.course.id)],
-                "commentable_id": ["original_topic"],
-                "thread_type": ["discussion"],
-                "title": ["Original Title"],
-                "body": ["Original body"],
-                "user_id": [str(thread_owner_user.id)],
-                "anonymous": ["False"],
-                "anonymous_to_peers": ["False"],
-                "closed": ["False"],
-                "pinned": ["False"],
-                "read": ["True"],
-                "requested_user_id": [str(self.user.id)],
-            }
         )
 
 
