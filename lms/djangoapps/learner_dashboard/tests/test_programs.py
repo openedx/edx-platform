@@ -1,8 +1,7 @@
 """
-Tests for viewing the programs enrolled by a learner.
+Unit tests covering the program listing and detail pages.
 """
 import datetime
-import httpretty
 import unittest
 from urlparse import urljoin
 
@@ -10,6 +9,7 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test import override_settings, TestCase
 from edx_oauth2_provider.tests.factories import ClientFactory
+import httpretty
 from opaque_keys.edx import locator
 from provider.constants import CONFIDENTIAL
 
@@ -234,14 +234,20 @@ class TestProgramDetails(ProgramsApiConfigMixin, TestCase):
     """
     def setUp(self):
         super(TestProgramDetails, self).setUp()
+
         self.user = UserFactory()
         self.details_page = reverse('program_details_view', args=['123'])
+
+        self.client.login(username=self.user.username, password='test')
 
     def test_login_required(self):
         """
         Verify that login is required to access the page.
         """
         self.create_programs_config()
+
+        self.client.logout()
+
         response = self.client.get(self.details_page)
         self.assertRedirects(
             response,
@@ -249,6 +255,7 @@ class TestProgramDetails(ProgramsApiConfigMixin, TestCase):
         )
 
         self.client.login(username=self.user.username, password='test')
+
         response = self.client.get(self.details_page)
         self.assertEquals(response.status_code, 200)
 
@@ -257,6 +264,19 @@ class TestProgramDetails(ProgramsApiConfigMixin, TestCase):
         Verify that the page 404s if disabled.
         """
         self.create_programs_config(program_details_enabled=False)
-        self.client.login(username=self.user.username, password='test')
+
         response = self.client.get(self.details_page)
+        self.assertEquals(response.status_code, 404)
+
+    def test_page_routing(self):
+        """Verify that the page can be hit with or without a program name in the URL."""
+        self.create_programs_config()
+
+        response = self.client.get(self.details_page)
+        self.assertEquals(response.status_code, 200)
+
+        response = self.client.get(self.details_page + 'program_name/')
+        self.assertEquals(response.status_code, 200)
+
+        response = self.client.get(self.details_page + 'program_name/invalid/')
         self.assertEquals(response.status_code, 404)

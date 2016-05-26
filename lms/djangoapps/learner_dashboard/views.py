@@ -1,4 +1,4 @@
-"""New learner dashboard views."""
+"""Learner dashboard views"""
 from urlparse import urljoin
 
 from django.conf import settings
@@ -50,8 +50,8 @@ def view_programs(request):
 
 @login_required
 @require_GET
-def program_details(request, program_uuid):  # pylint: disable=unused-argument
-    """View programs in which the user is engaged."""
+def program_details(request, program_id):  # pylint: disable=unused-argument
+    """View details about a specific program."""
     show_program_details = ProgramsApiConfig.current().show_program_details
     if not show_program_details:
         raise Http404
