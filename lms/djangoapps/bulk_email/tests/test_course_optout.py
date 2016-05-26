@@ -75,15 +75,16 @@ class TestOptoutCourseEmails(ModuleStoreTestCase):
 
         test_email = {
             'action': 'Send email',
-            'send_to': 'all',
+            'send_to': '["myself", "staff", "learners"]',
             'subject': 'test subject for all',
             'message': 'test message for all'
         }
         response = self.client.post(self.send_mail_url, test_email)
         self.assertEquals(json.loads(response.content), self.success_content)
 
-        # Assert that self.student.email not in mail.to, outbox should be empty
-        self.assertEqual(len(mail.outbox), 0)
+        # Assert that self.student.email not in mail.to, outbox should only contain "myself" target
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(mail.outbox[0].to[0], self.instructor.email)
 
     def test_optin_course(self):
         """
@@ -102,14 +103,15 @@ class TestOptoutCourseEmails(ModuleStoreTestCase):
 
         test_email = {
             'action': 'Send email',
-            'send_to': 'all',
+            'send_to': '["myself", "staff", "learners"]',
             'subject': 'test subject for all',
             'message': 'test message for all'
         }
         response = self.client.post(self.send_mail_url, test_email)
         self.assertEquals(json.loads(response.content), self.success_content)
 
-        # Assert that self.student.email in mail.to
-        self.assertEqual(len(mail.outbox), 1)
-        self.assertEqual(len(mail.outbox[0].to), 1)
-        self.assertEquals(mail.outbox[0].to[0], self.student.email)
+        # Assert that self.student.email in mail.to, along with "myself" target
+        self.assertEqual(len(mail.outbox), 2)
+        sent_addresses = [message.to[0] for message in mail.outbox]
+        self.assertIn(self.student.email, sent_addresses)
+        self.assertIn(self.instructor.email, sent_addresses)

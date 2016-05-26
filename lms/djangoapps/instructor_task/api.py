@@ -276,19 +276,15 @@ def submit_bulk_course_email(request, course_key, email_id):
     """
     # Assume that the course is defined, and that the user has already been verified to have
     # appropriate access to the course. But make sure that the email exists.
-    # We also pull out the To argument here, so that is displayed in
+    # We also pull out the targets argument here, so that is displayed in
     # the InstructorTask status.
     email_obj = CourseEmail.objects.get(id=email_id)
-    to_option = email_obj.to_option
+    targets = [target.target_type for target in email_obj.targets.all()]
 
     task_type = 'bulk_course_email'
     task_class = send_bulk_course_email
-    # Pass in the to_option as a separate argument, even though it's (currently)
-    # in the CourseEmail.  That way it's visible in the progress status.
-    # (At some point in the future, we might take the recipient out of the CourseEmail,
-    # so that the same saved email can be sent to different recipients, as it is tested.)
-    task_input = {'email_id': email_id, 'to_option': to_option}
-    task_key_stub = "{email_id}_{to_option}".format(email_id=email_id, to_option=to_option)
+    task_input = {'email_id': email_id, 'to_option': targets}
+    task_key_stub = "{email_id}".format(email_id=email_id)
     # create the key value by using MD5 hash:
     task_key = hashlib.md5(task_key_stub).hexdigest()
     return submit_task(request, task_type, task_class, course_key, task_input, task_key)

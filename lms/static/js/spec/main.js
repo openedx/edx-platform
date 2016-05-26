@@ -287,6 +287,21 @@
                 exports: 'AjaxPrefix',
                 deps: ['coffee/src/ajax_prefix']
             },
+            'coffee/src/instructor_dashboard/util': {
+                exports: 'coffee/src/instructor_dashboard/util',
+                deps: ['jquery', 'gettext'],
+                init: function() {
+                    // Set global variables that the util code is expecting to be defined
+                    require([
+                        'edx-ui-toolkit/js/utils/html-utils',
+                        'edx-ui-toolkit/js/utils/string-utils'
+                    ], function (HtmlUtils, StringUtils) {
+                        window.edx = edx || {};
+                        window.edx.HtmlUtils = HtmlUtils;
+                        window.edx.StringUtils = StringUtils;
+                    });
+                }
+            },
             'coffee/src/instructor_dashboard/student_admin': {
                 exports: 'coffee/src/instructor_dashboard/student_admin',
                 deps: ['jquery', 'underscore', 'coffee/src/instructor_dashboard/util', 'string_utils']

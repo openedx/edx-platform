@@ -127,12 +127,10 @@ class BulkEmailPage(PageObject):
         """
         Selects the specified recipient from the selector. Assumes that recipient is not None.
         """
-        recipient_selector_css = "select[name='send_to']"
-        select_option_by_text(
-            self.q(css=self._bounded_selector(recipient_selector_css)), recipient
-        )
+        recipient_selector_css = "input[name='send_to'][value='{}']".format(recipient)
+        self.q(css=self._bounded_selector(recipient_selector_css))[0].click()
 
-    def send_message(self, recipient):
+    def send_message(self, recipients):
         """
         Send a test message to the specified recipient.
         """
@@ -140,7 +138,8 @@ class BulkEmailPage(PageObject):
         test_subject = "Hello"
         test_body = "This is a test email"
 
-        self._select_recipient(recipient)
+        for recipient in recipients:
+            self._select_recipient(recipient)
         self.q(css=self._bounded_selector("input[name='subject']")).fill(test_subject)
         self.q(css=self._bounded_selector("iframe#mce_0_ifr"))[0].click()
         self.q(css=self._bounded_selector("iframe#mce_0_ifr"))[0].send_keys(test_body)
@@ -156,7 +155,7 @@ class BulkEmailPage(PageObject):
         is covered by the bulk_email unit tests.
         """
         confirmation_selector = self._bounded_selector(".msg-confirm")
-        expected_text = u"Your email was successfully queued for sending."
+        expected_text = u"Your email message was successfully queued for sending."
         EmptyPromise(
             lambda: expected_text in self.q(css=confirmation_selector)[0].text,
             "Message Queued Confirmation"
