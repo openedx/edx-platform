@@ -1148,6 +1148,7 @@ def notify_enrollment_by_email(course, user, request):
 
             subject = ''.join(subject.splitlines())
             context = {
+                'username': user.username,
                 'user_id': user.id,
                 'name': user.profile.name,
                 'course_title': course.display_name,

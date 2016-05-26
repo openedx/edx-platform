@@ -2822,3 +2822,8 @@ STUDENT_RESPONSES_REPORT_SUPPORTED_TYPES = set([
     'submit-and-compare',
     'freetextresponse',
 ])
+
+# These types are children of children of units.
+TYPES_WITH_CHILD_PROBLEMS_LIST = [
+    'library_content',
+]

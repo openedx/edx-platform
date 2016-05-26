@@ -14,7 +14,6 @@ from xmodule.x_module import PREVIEW_VIEWS, STUDENT_VIEW, AUTHOR_VIEW
 from xmodule.contentstore.django import contentstore
 from xmodule.error_module import ErrorDescriptor
 from xmodule.exceptions import NotFoundError, ProcessingError
-from xmodule.library_tools import LibraryToolsService
 from xmodule.services import SettingsService
 from xmodule.modulestore.django import modulestore, ModuleI18nService
 from xmodule.mixin import wrap_with_license
@@ -120,28 +119,6 @@ class PreviewModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
         return self.wrap_xblock(block, view_name, Fragment(), context)
 
 
-class StudioPermissionsService(object):
-    """
-    Service that can provide information about a user's permissions.
-
-    Deprecated. To be replaced by a more general authorization service.
-
-    Only used by LibraryContentDescriptor (and library_tools.py).
-    """
-
-    def __init__(self, request):
-        super(StudioPermissionsService, self).__init__()
-        self._request = request
-
-    def can_read(self, course_key):
-        """ Does the user have read access to the given course/library? """
-        return has_studio_read_access(self._request.user, course_key)
-
-    def can_write(self, course_key):
-        """ Does the user have read access to the given course/library? """
-        return has_studio_write_access(self._request.user, course_key)
-
-
 def _preview_module_system(request, descriptor, field_data):
     """
     Returns a ModuleSystem for the specified descriptor that is specialized for
@@ -174,8 +151,6 @@ def _preview_module_system(request, descriptor, field_data):
         # stick the license wrapper in front
         wrappers.insert(0, wrap_with_license)
 
-    descriptor.runtime._services['studio_user_permissions'] = StudioPermissionsService(request)  # pylint: disable=protected-access
-
     return PreviewModuleSystem(
         static_url=settings.STATIC_URL,
         # TODO (cpennington): Do we want to track how instructors are using the preview problems?
@@ -201,7 +176,6 @@ def _preview_module_system(request, descriptor, field_data):
         services={
             "i18n": ModuleI18nService(),
             "field-data": field_data,
-            "library_tools": LibraryToolsService(modulestore()),
             "settings": SettingsService(),
             "user": DjangoXBlockUserService(request.user),
         },

@@ -72,6 +72,19 @@ class TestGetProblemGradeDistribution(SharedModuleStoreTestCase):
                 cls.items.append(item)
                 cls.item = item
 
+            # Create embedded content library and problem
+            cls.content_library = ItemFactory.create(
+                parent_location=cls.unit.location,
+                category="library_content",
+            )
+            library_problem = ItemFactory.create(
+                parent_location=cls.content_library.location,
+                category="problem",
+                data=StringResponseXMLFactory().build_xml(answer='foo'),
+                display_name=u'test library problem',
+            )
+            cls.items.append(library_problem)
+
     def setUp(self):
         super(TestGetProblemGradeDistribution, self).setUp()
 
@@ -98,7 +111,7 @@ class TestGetProblemGradeDistribution(SharedModuleStoreTestCase):
             for j, user in enumerate(self.users):
                 StudentModuleFactory.create(
                     grade=1 if i < j else 0,
-                    max_grade=1 if i < j else 0.5,
+                    max_grade=1,
                     student=user,
                     course_id=self.course.id,
                     module_state_key=item.location,
