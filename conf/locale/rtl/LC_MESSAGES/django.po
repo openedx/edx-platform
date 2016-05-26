@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-05-19 14:56+0000\n"
-"PO-Revision-Date: 2016-05-19 14:56:28.638377\n"
+"POT-Creation-Date: 2016-05-26 15:52+0000\n"
+"PO-Revision-Date: 2016-05-26 15:52:24.097499\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -6632,11 +6632,17 @@ msgstr "ذثقفهبهذشفثس لثرثقشفثي"
 msgid "cohorted"
 msgstr "ذخاخقفثي"
 
+#. Translators: This label appears above a field on the registration form
+#. which allows the user to input the First Name
 #: lms/djangoapps/instructor_task/tasks_helper.py
+#: openedx/core/djangoapps/user_api/views.py
 msgid "First Name"
 msgstr "بهقسف رشوث"
 
+#. Translators: This label appears above a field on the registration form
+#. which allows the user to input the First Name
 #: lms/djangoapps/instructor_task/tasks_helper.py
+#: openedx/core/djangoapps/user_api/views.py
 msgid "Last Name"
 msgstr "مشسف رشوث"
 
@@ -6646,7 +6652,11 @@ msgstr "مشسف رشوث"
 msgid "Company Name"
 msgstr "ذخوحشرغ رشوث"
 
-#: lms/djangoapps/instructor_task/tasks_helper.py wiki/forms.py
+#. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
+#. Translators: This label appears above a field on the registration form
+#. which allows the user to input the Title
+#: lms/djangoapps/instructor_task/tasks_helper.py
+#: openedx/core/djangoapps/user_api/views.py wiki/forms.py
 msgid "Title"
 msgstr "فهفمث"
 
@@ -9447,6 +9457,12 @@ msgstr "فثمم عس صاغ غخع'قث هرفثقثسفثي هر {platform_nam
 msgid "State/Province/Region"
 msgstr "سفشفث/حقخدهرذث/قثلهخر"
 
+#. Translators: This label appears above a field on the registration form
+#. which allows the user to input the Company
+#: openedx/core/djangoapps/user_api/views.py
+msgid "Company"
+msgstr "ذخوحشرغ"
+
 #: openedx/core/djangoapps/user_api/views.py
 msgid "Please select your Country."
 msgstr "حمثشسث سثمثذف غخعق ذخعرفقغ."
@@ -10246,8 +10262,7 @@ msgstr "سفشقفس"
 msgid "View all Courses"
 msgstr "دهثص شمم ذخعقسثس"
 
-#: lms/templates/dashboard.html lms/templates/user_dropdown.html
-#: themes/edx.org/lms/templates/dashboard.html
+#: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
 msgid "Dashboard"
 msgstr "يشسازخشقي"
 
@@ -10284,14 +10299,6 @@ msgstr "شذذخعرف سفشفعس هربخ"
 #: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
 msgid "Order History"
 msgstr "خقيثق اهسفخقغ"
-
-#: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
-msgid "XSeries Program Certificates"
-msgstr "طسثقهثس حقخلقشو ذثقفهبهذشفثس"
-
-#: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
-msgid "You have received a certificate for the following XSeries programs:"
-msgstr "غخع اشدث قثذثهدثي ش ذثقفهبهذشفث بخق فاث بخممخصهرل طسثقهثس حقخلقشوس:"
 
 #: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
 msgid "Email Settings for {course_number}"
@@ -10853,6 +10860,10 @@ msgstr "قشص يشفش:"
 #: lms/templates/navigation.html themes/red-theme/lms/templates/header.html
 msgid "Global"
 msgstr "لمخزشم"
+
+#: lms/templates/navigation.html themes/edx.org/lms/templates/header.html
+msgid "Your Dashboard"
+msgstr "غخعق يشسازخشقي"
 
 #: lms/templates/navigation.html themes/edx.org/lms/templates/header.html
 #: themes/red-theme/lms/templates/header.html
@@ -11556,16 +11567,16 @@ msgid "Usermenu dropdown"
 msgstr "عسثقوثرع يقخحيخصر"
 
 #: lms/templates/user_dropdown.html
-msgid "Profile"
-msgstr "حقخبهمث"
+msgid "Profile for:"
+msgstr "حقخبهمث بخق:"
 
 #: lms/templates/user_dropdown.html
-msgid "Profile image for {username}"
-msgstr "حقخبهمث هوشلث بخق {username}"
+msgid "Account settings menu"
+msgstr "شذذخعرف سثففهرلس وثرع"
 
-#: lms/templates/user_dropdown.html themes/red-theme/lms/templates/header.html
-msgid "More options dropdown"
-msgstr "وخقث خحفهخرس يقخحيخصر"
+#: lms/templates/user_dropdown.html
+msgid "Account settings"
+msgstr "شذذخعرف سثففهرلس"
 
 #: lms/templates/using.html
 msgid "Using the system"
@@ -13488,6 +13499,26 @@ msgstr ""
 "صث'قث ذقثشفهرل غخعق ذثقفهبهذشفث. غخع ذشر نثثح صخقنهرل هر غخعق ذخعقسثس شري ش "
 "مهرن فخ هف صهمم شححثشق اثقث شري خر غخعق يشسازخشقي صاثر هف هس قثشيغ."
 
+#. Translators: This message appears to users when the users have not
+#. completed
+#. identity verification.
+#: lms/templates/courseware/progress.html
+msgid "Certificate unavailable"
+msgstr "ذثقفهبهذشفث عرشدشهمشزمث"
+
+#: lms/templates/courseware/progress.html
+msgid ""
+"You have not received a certificate because you do not have a current "
+"{platform_name} verified identity. "
+msgstr ""
+"غخع اشدث رخف قثذثهدثي ش ذثقفهبهذشفث زثذشعسث غخع يخ رخف اشدث ش ذعققثرف "
+"{platform_name} دثقهبهثي هيثرفهفغ. "
+
+#: lms/templates/courseware/progress.html
+#: lms/templates/dashboard/_dashboard_certificate_information.html
+msgid "Verify your identity now."
+msgstr "دثقهبغ غخعق هيثرفهفغ رخص."
+
 #: lms/templates/courseware/progress.html
 msgid "Congratulations, you qualified for a certificate!"
 msgstr "ذخرلقشفعمشفهخرس, غخع ضعشمهبهثي بخق ش ذثقفهبهذشفث!"
@@ -13706,6 +13737,14 @@ msgstr ""
 "هقشر, ذعزش, سغقهش شري سعيشر. هب غخع فاهرن خعق سغسفثو اشس وهسفشنثرمغ "
 "هيثرفهبهثي غخع شس زثهرل ذخررثذفثي صهفا خرث خب فاخسث ذخعرفقهثس, حمثشسث مثف عس"
 " نرخص زغ ذخرفشذفهرل {email}."
+
+#: lms/templates/dashboard/_dashboard_certificate_information.html
+msgid ""
+"Your certificate was not issued because you do not have a current verified "
+"identity with {platform_name}. "
+msgstr ""
+"غخعق ذثقفهبهذشفث صشس رخف هسسعثي زثذشعسث غخع يخ رخف اشدث ش ذعققثرف دثقهبهثي "
+"هيثرفهفغ صهفا {platform_name}. "
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid "Your {cert_name_short} is Generating"
@@ -16187,6 +16226,10 @@ msgstr ""
 " اثشيثقس, بخخفثقس, خق زمشرن مهرثس."
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid "Upload a CSV for bulk enrollment"
+msgstr "عحمخشي ش ذسد بخق زعمن ثرقخمموثرف"
+
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Upload CSV"
 msgstr "عحمخشي ذسد"
 
@@ -17985,6 +18028,10 @@ msgid ""
 msgstr ""
 "{tos_link_start}فثقوس خب سثقدهذث{tos_link_end} شري {honor_link_start}اخرخق "
 "ذخيث{honor_link_end}"
+
+#: themes/red-theme/lms/templates/header.html
+msgid "More options dropdown"
+msgstr "وخقث خحفهخرس يقخحيخصر"
 
 #: themes/red-theme/lms/templates/header.html
 msgid "My Profile"
