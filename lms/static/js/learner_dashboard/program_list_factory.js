@@ -21,7 +21,11 @@
                 el: '.program-cards-container',
                 childView: ProgramCardView,
                 collection: new ProgramCollection(options.programsData),
-                context: options
+                context: options,
+                titleContext: {
+                    el: 'h2',
+                    title: 'Your Programs'
+                }
             }).render();
 
             new SidebarView({

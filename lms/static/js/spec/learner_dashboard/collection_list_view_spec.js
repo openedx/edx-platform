@@ -124,6 +124,31 @@ define([
                 $cards = view.$el.find('.program-card');
                 expect($cards.length).toBe(0);
             });
+            it('should have no title when title not provided', function(){
+                var $title;
+                setFixtures('<div class="test-container"><div class="program-cards-container"></div></div>');
+                view.remove();
+                view.render();
+                expect(view).toBeDefined();
+                $title = view.$el.parent().find('.collection-title');
+                expect($title.html()).not.toBeDefined();
+            });
+            it('should display screen reader header when provided', function(){
+                var $title, titleContext = {el:'h2', title:'list start'};
+                view.remove();
+                setFixtures('<div class="test-container"><div class="program-cards-container"></div></div>');
+                programCollection = new ProgramCollection(context.programsData);
+                view = new CollectionListView({
+                    el: '.program-cards-container',
+                    childView: ProgramCardView,
+                    context: {'xseriesUrl': '/programs'},
+                    collection: programCollection,
+                    titleContext: titleContext
+                });
+                view.render();
+                $title = view.$el.parent().find('.collection-title');
+                expect($title.html()).toBe(titleContext.title);
+            });
         });
     }
 );
