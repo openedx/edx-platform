@@ -543,6 +543,8 @@ def course_listing(request):
 
     courses = _remove_in_process_courses(courses, in_process_course_actions)
     in_process_course_actions = [format_in_process_course_view(uca) for uca in in_process_course_actions]
+    edit_org = 'disabled' if not (request.user.is_superuser or request.user.is_staff) else ''
+    org_short_name =  _get_user_org(request.user)['short_name'] if _get_user_org(request.user) else 'e.g. UniversityX or OrganizationX'
 
     return render_to_response('index.html', {
         'courses': courses,
@@ -551,7 +553,8 @@ def course_listing(request):
         'libraries': [format_library_for_view(lib) for lib in libraries],
         'show_new_library_button': LIBRARIES_ENABLED and request.user.is_active,
         'user': request.user,
-        'user_organization': _get_user_org(request.user),
+        'user_organization': org_short_name,
+        'edit_org': edit_org,
         'request_course_creator_url': reverse('contentstore.views.request_course_creator'),
         'course_creator_status': _get_course_creator_status(request.user),
         'rerun_creator_status': GlobalStaff().has_user(request.user) or _is_org_course_creator(request.user),
