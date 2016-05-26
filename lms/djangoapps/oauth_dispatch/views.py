@@ -130,6 +130,7 @@ class AccessTokenView(_DispatchingView):
             'exp': now + expires_in,
             'iat': now,
             'preferred_username': user.username,
+            'scopes': scopes,
         }
 
         for scope in scopes:
