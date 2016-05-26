@@ -310,6 +310,18 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
                     course_summaries[course_id] = course_summary
         return course_summaries.values()
 
+    @property
+    def disabled_xblock_types(self):
+        return self._disabled_xblock_types
+
+    @disabled_xblock_types.setter
+    def disabled_xblock_types(self, value):
+        self._disabled_xblock_types = value
+
+        if hasattr(self, 'modulestores'):
+            for store in self.modulestores:
+                store.disabled_xblock_types = value
+
     @strip_key
     def get_courses(self, **kwargs):
         '''
