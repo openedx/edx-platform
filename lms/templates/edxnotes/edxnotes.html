@@ -5,7 +5,7 @@
 <%!
 from django.utils.translation import ugettext as _
 from edxnotes.helpers import NoteJSONEncoder
-from openedx.core.djangolib.markup import Text, HTML
+from openedx.core.djangolib.markup import HTML, Text
 from openedx.core.djangolib.js_utils import dump_js_escaped_json, js_escaped_string
 %>
 
@@ -113,7 +113,7 @@ from openedx.core.djangolib.js_utils import dump_js_escaped_json, js_escaped_str
     <%static:require_module module_name="js/edxnotes/views/page_factory" class_name="NotesPageFactory">
         NotesPageFactory({
             disabledTabs: ${disabled_tabs | n, dump_js_escaped_json},
-            notes: ${dump_js_escaped_json(notes, NoteJSONEncoder) | n},
+            notes: ${dump_js_escaped_json(notes, NoteJSONEncoder) | n, decode.utf8},
             notesEndpoint: ${notes_endpoint | n, dump_js_escaped_json},
             pageSize: ${page_size | n, dump_js_escaped_json},
             debugMode: ${debug | n, dump_js_escaped_json}

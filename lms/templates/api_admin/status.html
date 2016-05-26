@@ -5,7 +5,7 @@
 from django.utils.translation import ugettext as _
 
 from openedx.core.djangoapps.api_admin.models import ApiAccessRequest
-from openedx.core.djangolib.markup import Text, HTML
+from openedx.core.djangolib.markup import HTML, Text
 %>
 
 <div id="api-access-wrapper">
@@ -45,7 +45,7 @@ from openedx.core.djangolib.markup import Text, HTML
         <div class="api-form-container">
           <form id="api-form-fields" method="post" class="api-form">
             <input type="hidden" id="csrf_token" name="csrfmiddlewaretoken" value="${csrf_token}">
-            ${form.as_p() | n}
+            ${form.as_p() | n, decode.utf8}
             <input id="api-access-submit" type="submit" value="${_('Generate API client credentials')}"/>
           </form>
         </div>
