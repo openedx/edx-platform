@@ -10,7 +10,7 @@ from openedx.core.lib.edx_api_utils import get_edx_api_data
 log = logging.getLogger(__name__)
 
 
-def get_programs(user):
+def get_programs(user, program_id=None):
     """Given a user, get programs from the Programs service.
     Returned value is cached depending on user permissions. Staff users making requests
     against Programs will receive unpublished programs, while regular users will only receive
@@ -18,6 +18,9 @@ def get_programs(user):
 
     Arguments:
         user (User): The user to authenticate as when requesting programs.
+
+    Keyword Arguments:
+        program_id (int): Identifies a specific program for which to retrieve data.
 
     Returns:
         list of dict, representing programs returned by the Programs service.
@@ -27,7 +30,7 @@ def get_programs(user):
     # Bypass caching for staff users, who may be creating Programs and want
     # to see them displayed immediately.
     cache_key = programs_config.CACHE_KEY if programs_config.is_cache_enabled and not user.is_staff else None
-    return get_edx_api_data(programs_config, user, 'programs', cache_key=cache_key)
+    return get_edx_api_data(programs_config, user, 'programs', resource_id=program_id, cache_key=cache_key)
 
 
 def flatten_programs(programs, course_ids):

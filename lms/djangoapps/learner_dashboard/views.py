@@ -9,7 +9,7 @@ from django.http import Http404
 from edxmako.shortcuts import render_to_response
 from openedx.core.djangoapps.credentials.utils import get_programs_credentials
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
-from openedx.core.djangoapps.programs.utils import ProgramProgressMeter, get_display_category
+from openedx.core.djangoapps.programs.utils import ProgramProgressMeter, get_programs, get_display_category
 from student.views import get_course_enrollments
 
 
@@ -50,13 +50,16 @@ def view_programs(request):
 
 @login_required
 @require_GET
-def program_details(request, program_id):  # pylint: disable=unused-argument
+def program_details(request, program_id):
     """View details about a specific program."""
     show_program_details = ProgramsApiConfig.current().show_program_details
     if not show_program_details:
         raise Http404
 
+    program_data = get_programs(request.user, program_id=program_id)
+
     context = {
+        'program_data': program_data,
         'nav_hidden': True,
         'disable_courseware_js': True,
         'uses_pattern_library': True
