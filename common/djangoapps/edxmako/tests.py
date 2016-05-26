@@ -154,12 +154,3 @@ class MakoRequestContextTest(TestCase):
         the threadlocal REQUEST_CONTEXT.context. This is meant to run in CMS.
         """
         self.assertIn("We're having trouble rendering your component", render_to_string("html_error.html", None))
-
-
-def mako_middleware_process_request(request):
-    """
-    Initialize the global RequestContext variable
-    edxmako.middleware.requestcontext using the request object.
-    """
-    mako_middleware = edxmako.middleware.MakoMiddleware()
-    mako_middleware.process_request(request)
