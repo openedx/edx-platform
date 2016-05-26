@@ -1,8 +1,9 @@
 define([
         'backbone',
         'jquery',
+        'js/learner_dashboard/models/course_card_model',
         'js/learner_dashboard/views/course_card_view'
-    ], function (Backbone, $, CourseCardView) {
+    ], function (Backbone, $, CourseCardModel, CourseCardView) {
         
         'use strict';
         
@@ -11,33 +12,32 @@ define([
                 courseCardModel,
                 setupView,
                 context = {      
-                    certificate_url: '',
-                    course_end: 'Jun 13, 2016',
                     course_modes: [],
-                    course_key: 'course-v1:ANUx+ANU-ASTRO1x+3T2015',
-                    courseware_url: 'http://localhost:8000/courses/course-v1:edX+DemoX+Demo_Course/info',
-                    course_start: 'Apr 25, 2016',
-                    course_started: true,
                     display_name: 'Astrophysics: Exploring Exoplanets',
-                    image_url: 'https://testimage.com/image',
                     key: 'ANU-ASTRO1x',
-                    marketing_url: 'https://www.edx.org/course/astrophysics-exploring-exoplanets-anux-anu-astro2x-1',
                     organization: {
                         display_name: 'Australian National University',
                         key: 'ANUx'
                     },
                     run_modes: [{
-                        course_key: '12313',
+                        start_date: 'Apr 25, 2016',
+                        end_date: 'Jun 13, 2016',
+                        course_key: 'course-v1:ANUx+ANU-ASTRO1x+3T2015',
+                        course_url: 'http://localhost:8000/courses/course-v1:edX+DemoX+Demo_Course/info',
+                        marketing_url: 'https://www.edx.org/course/astrophysics-exploring',
+                        course_image_url: 'http://test.com/image1',
                         mode_slug: 'verified',
                         run_key: '2T2016',
-                        start_date: ''
+                        course_started: true,
+                        is_enrolled: 'enrolled',
+                        certificate_url: '',
                     }]
                 };
 
-            setupView = function(enrollment_status){
-                context.enrollment_status = enrollment_status;
+            setupView = function(is_enrolled){
+                context.run_modes[0].is_enrolled = is_enrolled;
                 setFixtures('<div class="course-card card"></div>');
-                courseCardModel = new Backbone.Model(context);
+                courseCardModel = new CourseCardModel(context);
                 view = new CourseCardView({
                     model: courseCardModel
                 });
@@ -57,21 +57,27 @@ define([
 
             it('should render the course card based on the data enrolled', function() {
                 view.remove();
-                setupView('enrolled');
-                expect(view.$('.header-img').attr('src')).toEqual(context.image_url);
-                expect(view.$('.course-details .course-title').html()).toEqual(context.display_name);
-                expect(view.$('.course-details .course-key').html()).toEqual(context.key);
-                expect(view.$('.course-details .enrollment-info').html())
-                    .toEqual(context.course_start + ' - ' + context.course_end);
-                expect(view.$('.course-details .course-link').attr('href')).toEqual(context.courseware_url);
+                setupView(true);
+                expect(view.$('.header-img').attr('src')).toEqual(context.run_modes[0].course_image_url);
+                expect(view.$('.course-details .course-title-link').text().trim()).toEqual(context.display_name);
+                expect(view.$('.course-details .course-title-link').attr('href')).toEqual(
+                    context.run_modes[0].marketing_url);
+                expect(view.$('.course-details .course-text .course-key').html()).toEqual(context.key);
+                expect(view.$('.course-details .course-text .run-period').html())
+                    .toEqual(context.run_modes[0].start_date + ' - ' + context.run_modes[0].end_date);
+                expect(view.$('.course-actions .enrollment-info').html().trim()).toEqual('enrolled');
+                expect(view.$('.course-actions .view-course-link').attr('href')).toEqual(
+                    context.run_modes[0].course_url);
+                expect(view.$('.course-actions .view-course-link').text().trim()).toEqual('View Course');
             });
 
             it('should render the course card based on the data not enrolled', function() {
-                expect(view.$('.header-img').attr('src')).toEqual(context.image_url);
-                expect(view.$('.course-details .course-title').html()).toEqual(context.display_name);
-                expect(view.$('.course-details .course-key').html()).toEqual(context.key);
-                expect(view.$('.course-details .enrollment-info').html()).toEqual('Not Yet Enrolled');
-                expect(view.$('.course-details .course-link').attr('href')).toEqual(context.marketing_url);
+                expect(view.$('.header-img').attr('src')).toEqual(context.run_modes[0].course_image_url);
+                expect(view.$('.course-details .course-title-link').text().trim()).toEqual(context.display_name);
+                expect(view.$('.course-details .course-title-link').attr('href')).toEqual(
+                    context.run_modes[0].marketing_url);
+                expect(view.$('.course-details .course-text .course-key').html()).toEqual(context.key);
+                expect(view.$('.course-details .course-text .run-period').html()).not.toBeDefined();
             });
         });
     }

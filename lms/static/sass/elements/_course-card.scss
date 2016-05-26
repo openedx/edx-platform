@@ -1,8 +1,46 @@
-.header-img{
-  @include float(left);
-  margin-right:20px;
-}
+$course-enroll-green: rgba(15, 124, 57, 1) !default;
+$course-enroll-green-light: rgba(13, 181, 83, 1) !default;
+
 .course-card{
-  height: 250px;
-  margin-top:20px;
+  @include span(10);
+  margin-left: $baseline*2 + px;
+  margin-bottom: $baseline + px;
+  .course-image-link{
+    .header-img{
+      max-width: 191px;
+    }
+  }
+  .course-title{
+    font-size: font-size(x-large);
+    font-weight: font-weight(normal);
+    margin-bottom: $baseline/4 + px;
+  }
+  .course-text{
+    color: $gray-d1;
+  }
+  .enrollment-info{
+    width: $baseline*10 + px;
+    text-align: center;
+    margin-bottom: $baseline/2 + px;
+    text-transform: uppercase;
+  }
+  .enroll-button{
+    width: $baseline*10 + px;
+    text-align: center;
+    background-color: $course-enroll-green;
+    border-color: $course-enroll-green;
+    &:hover{
+      background-color: $course-enroll-green-light;
+      border-color: $course-enroll-green-light;
+    }
+  }
+
+  .view-course-link{
+    width: $baseline*10 + px;
+    text-align: center;
+  }
+
+  .action-msg-view{
+    clear: both;
+  }
 }

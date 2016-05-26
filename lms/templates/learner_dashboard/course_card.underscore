@@ -1,13 +1,32 @@
-<img class="header-img" src="<%- image_url %>" alt="<%- display_name %>"/>
-<div class="course-details">
-    <h3 class="course-title"><%- display_name %></h3>
-    <p class="course-key"><%- key %></p>
-    <% if(enrollment_status){ %>
-        <span class="enrollment-info"><%- course_start %> - <%-course_end %></span>
-        <a href="<%- courseware_url %>" class="course-link cta"><%- gettext('View Course') %></a>
-    <% }else{ %>
-        <span class="enrollment-info"><%- gettext('Not Yet Enrolled') %></span>
-        <a href="<%- marketing_url %>" class="course-link cta"><%- gettext('Learn More') %></a>
-    <% } %>
+<div class="grid-container grid-manual">
+    <a href="<%- marketing_url %>" class="course-image-link col-12 xl-col-3 lg-col-3 md-col-3 sm-col-12">
+        <img
+            class="header-img"
+            src="<%- course_image_url %>"
+            alt="<%= interpolate(gettext('%(courseName)s Home Page.'), {courseName: display_name}, true)%>"/>
+    </a>
+    <div class="course-details col-12 xl-col-5 lg-col-5 md-col-5 sm-col-12">
+        <h3 class="course-title">
+            <a href="<%- marketing_url %>" class="course-title-link">
+                <%- display_name %>
+            </a>
+        </h3>
+        <div class="course-text">
+            <% if(is_enrolled){ %>
+                <span class="run-period"><%- start_date %> - <%-end_date %></span>
+            <% } %>
+            <span class="course-key"><%- key %></span>
+        </div>
+    </div>
+    <div class="course-actions col-12 xl-col-4 lg-col-4 md-col-4 sm-col-12">
+        <% if(is_enrolled){ %>
+            <div class="enrollment-info"><%- gettext('enrolled') %></div>
+            <a href="<%- course_url %>" class="btn-neutral btn view-course-link">
+                <%- gettext('View Course') %>
+            </a>
+        <% }else{ %>
+            <div class="enrollment-container"></div>
+        <% } %>
+    </div>
 </div>
 <div class="action-msg-view"></div>

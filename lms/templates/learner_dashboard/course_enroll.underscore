@@ -1,0 +1,4 @@
+<div class="enrollment-info"><%- gettext('not enrolled') %></div>
+<button type="button" class="btn-brand btn enroll-button">
+    <%- gettext('Enroll Now') %>
+</button>
