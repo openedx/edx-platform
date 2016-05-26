@@ -6,6 +6,7 @@
             'underscore',
             'gettext',
             'edx-ui-toolkit/js/utils/html-utils',
+            'js/learner_dashboard/models/course_enroll_model',
             'js/learner_dashboard/views/course_enroll_view',
             'text!../../../templates/learner_dashboard/course_card.underscore'
            ],
@@ -15,6 +16,7 @@
              _,
              gettext,
              HtmlUtils,
+             EnrollModel,
              CourseEnrollView,
              pageTpl
          ) {
@@ -23,8 +25,14 @@
 
                 tpl: HtmlUtils.template(pageTpl),
 
-                initialize: function() {
+                initialize: function(options) {
+                    this.enrollModel = new EnrollModel();
+                    if(options.context && options.context.urls){
+                        this.urlModel = new Backbone.Model(options.context.urls);
+                        this.enrollModel.urlRoot = this.urlModel.get('commerce_api_url'); 
+                    }
                     this.render();
+                    this.listenTo(this.model, 'change', this.render);
                 },
 
                 render: function() {
@@ -35,9 +43,10 @@
 
                 postRender: function(){
                     this.enrollView = new CourseEnrollView({
-                        $el: this.$('.course-actions'),
+                        $parentEl: this.$('.course-actions'),
                         model: this.model,
-                        context: this.context
+                        urlModel: this.urlModel,
+                        enrollModel: this.enrollModel
                     });
                 }
             });
