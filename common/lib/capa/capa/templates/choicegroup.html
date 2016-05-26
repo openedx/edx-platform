@@ -1,3 +1,4 @@
+<%page expression_filter="h"/>
 <form class="choicegroup capa_inputtype" id="inputtype_${id}">
     <fieldset role="${input_type}group" aria-label="${label}">
         % for choice_id, choice_description in choices:
@@ -34,7 +35,7 @@
 
             % if input_type == 'radio' and ( (isinstance(value, basestring) and (choice_id == value))  or  (not isinstance(value, basestring) and choice_id in value) ):
             % if status in ('correct', 'partially-correct', 'incorrect') and not show_correctness=='never':
-            <span class="sr status">${choice_description|h} - ${status.display_name}</span>
+            <span class="sr status">${choice_description} - ${status.display_name}</span>
             % endif
             % endif
         </label>
@@ -60,6 +61,6 @@
     <div class="capa_alert">${submitted_message}</div>
     %endif
     % if msg:
-    <span class="message">${msg|n}</span>
+    <span class="message">${msg}</span>
     % endif
 </form>

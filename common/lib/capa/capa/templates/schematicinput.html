@@ -1,3 +1,4 @@
+<%page expression_filter="h"/>
 <div>
   <div class="script_placeholder" data-src="${setup_script}"/>
   <input type="hidden"
@@ -10,9 +11,9 @@
     id="input_${id}"
     aria-label="${label}"
     aria-describedby="answer_${id}"
-    value="${value|h}"
-    initial_value="${initial_value|h}"
-    submit_analyses="${submit_analyses|h}"
+    value="${value}"
+    initial_value="${initial_value}"
+    submit_analyses="${submit_analyses}"
     />
 
   <span id="answer_${id}"></span>

@@ -1,8 +1,9 @@
+<%page expression_filter="h"/>
 <section class="math-string">
  % if isinline:
    <span>[mathjaxinline]${mathstr}[/mathjaxinline]</span>
  % else:
     <span>[mathjax]${mathstr}[/mathjax]</span>
  % endif
-    <span>${tail}</span>
+    <span>${tail | n, unicode}</span>
 </section>

@@ -1,3 +1,4 @@
+<%page expression_filter="h"/>
 <section id="inputtype_${id}" class="jsinput"
     data="${gradefn}"
     % if saved_state:
@@ -35,7 +36,7 @@
       />
   <input type="hidden" name="input_${id}" id="input_${id}"
     waitfor=""
-    value="${value|h}"/>
+    value="${value}"/>
 
   <br/>
     <p id="answer_${id}" class="answer"></p>
@@ -52,6 +53,6 @@
   % endif
 
   % if msg:
-      <span class="message">${msg|n}</span>
+      <span class="message">${msg}</span>
   % endif
 </section>

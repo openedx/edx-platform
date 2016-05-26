@@ -1,3 +1,4 @@
+<%page expression_filter="h"/>
 <section id="jstextline_${id}" class="jstextline">
   <input type="text" name="input_${id}" id="input_${id}" value="${value}"
    % if size:
@@ -23,6 +24,6 @@
   </span>
   % if msg:
     <br/>
-    <span class="debug">${msg|n}</span>
+    <span class="debug">${msg}</span>
   % endif
 </section>

@@ -1,9 +1,10 @@
+<%page expression_filter="h"/>
 <%! from django.utils.translation import ugettext as _ %>
 <section id="textbox_${id}" class="capa_inputtype textbox cminput">
-  <textarea rows="${rows}" cols="${cols}" name="input_${id}" 
-            aria-label="${_("{programming_language} editor").format(programming_language=mode)}" 
-            aria-describedby="answer_${id}" 
-            id="input_${id}" 
+  <textarea rows="${rows}" cols="${cols}" name="input_${id}"
+            aria-label="${_("{programming_language} editor").format(programming_language=mode)}"
+            aria-describedby="answer_${id}"
+            id="input_${id}"
             tabindex="0"
             data-mode="${mode}"
             data-tabsize="${tabsize}"
@@ -13,7 +14,7 @@
             % if hidden:
       	    style="display:none;"
             % endif
-  >${value|h}</textarea>
+  >${value}</textarea>
 
   <div class="grader-status" tabindex="-1">
       <span id="status_${id}"
@@ -36,6 +37,6 @@
   <span id="answer_${id}"></span>
 
   <div class="external-grader-message" aria-live="polite">
-    ${msg|n}
+    ${msg}
   </div>
 </section>

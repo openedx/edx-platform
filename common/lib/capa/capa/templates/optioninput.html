@@ -1,3 +1,4 @@
+<%page expression_filter="h"/>
 <% doinline = "inline" if inline else "" %>
 
 <form class="inputtype option-input ${doinline}">
@@ -8,7 +9,7 @@
           % if (option_id==value or option_id==answervariable):
         	selected="true"
           % endif
-          > ${option_description}</option>
+          > ${option_description | n, unicode}</option>
       % endfor
     </select>
 
@@ -16,12 +17,12 @@
     <span class="status ${status.classname}"
         id="status_${id}"
         aria-describedby="input_${id}" data-tooltip="${status.display_tooltip}">
-      <span class="sr">${value|h} - ${status.display_tooltip}</span>
+      <span class="sr">${value} - ${status.display_tooltip}</span>
     </span>
   </div>
   <p class="answer" id="answer_${id}"></p>
   % if msg:
-      <span class="message">${msg|n}</span>
+      <span class="message">${msg}</span>
   % endif
 
 </form>

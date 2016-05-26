@@ -1,3 +1,4 @@
+<%page expression_filter="h"/>
 <section id="inputtype_${id}" class="capa_inputtype" >
     <div class="crystalography_problem" style="width:${width};height:${height}"></div>
 
@@ -13,7 +14,7 @@
         <div class="status ${status.classname}" id="status_${id}">
     % endif
 
-    <input type="text" name="input_${id}" aria-describedby="answer_${id}" id="input_${id}" value="${value|h}" style="display:none;"/>
+    <input type="text" name="input_${id}" aria-describedby="answer_${id}" id="input_${id}" value="${value}" style="display:none;"/>
 
     <p class="status" aria-describedby="input_${id}">
         ${status.display_name}
@@ -22,7 +23,7 @@
     <p id="answer_${id}" class="answer"></p>
 
     % if msg:
-        <span class="message">${msg|n}</span>
+        <span class="message">${msg}</span>
     % endif
 
     % if status in ['unsubmitted', 'correct', 'incorrect', 'partially-correct', 'incomplete']:

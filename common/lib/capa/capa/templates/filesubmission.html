@@ -1,3 +1,4 @@
+<%page expression_filter="h"/>
 <section id="filesubmission_${id}" class="filesubmission">
   <div class="grader-status file">
 
@@ -7,7 +8,7 @@
     % endif
     <p class="debug">${status}</p>
 
-    <input type="file" name="input_${id}" id="input_${id}" value="${value}" multiple="multiple" data-required_files="${required_files|h}" data-allowed_files="${allowed_files|h}" aria-label="${label}" />
+    <input type="file" name="input_${id}" id="input_${id}" value="${value}" multiple="multiple" data-required_files="${required_files}" data-allowed_files="${allowed_files}" aria-label="${label}" />
   </div>
-    <div class="message">${msg|n}</div>
+    <div class="message">${msg}</div>
 </section>

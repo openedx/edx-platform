@@ -1,3 +1,4 @@
+<%page expression_filter="h"/>
 <form class="annotation-input">
 <div class="script_placeholder" data-src="${STATIC_URL}js/capa/annotationinput.js"/>
 
@@ -10,13 +11,13 @@
 </div>
 <div class="annotation-body">
 
-    <div class="block block-highlight">${text}</div>
-    <div class="block block-comment">${comment}</div>
+    <div class="block block-highlight">${text | n, unicode}</div>
+    <div class="block block-comment">${comment | n, unicode}</div>
 
-    <div class="block">${comment_prompt}</div>
-    <textarea class="comment" id="input_${id}_comment" name="input_${id}_comment" aria-describedby="answer_${id}">${comment_value|h}</textarea>
+    <div class="block">${comment_prompt | n, unicode}</div>
+    <textarea class="comment" id="input_${id}_comment" name="input_${id}_comment" aria-describedby="answer_${id}">${comment_value}</textarea>
 
-    <div class="block">${tag_prompt}</div>
+    <div class="block">${tag_prompt | n, unicode}</div>
     <ul class="tags">
     % for option in options:
         <li>
@@ -35,7 +36,7 @@
                 selected
             % endif
             " data-id="${option['id']}">
-                ${option['description']}
+                ${option['description'] | n, unicode}
             </span>
         </li>
     % endfor
@@ -44,12 +45,12 @@
     % if debug:
     <div class="debug-value">
         Rendered with value:<br/>
-        <pre>${value|h}</pre>
+        <pre>${value}</pre>
         Current input value:<br/>
-        <input type="text" class="value" name="input_${id}" id="input_${id}" value="${value|h}" />
+        <input type="text" class="value" name="input_${id}" id="input_${id}" value="${value}" />
     </div>
     % else:
-        <input type="hidden" class="value" name="input_${id}" id="input_${id}" value="${value|h}" />
+        <input type="hidden" class="value" name="input_${id}" id="input_${id}" value="${value}" />
     % endif
 
     <span class="status ${status.classname}" id="status_${id}" aria-describedby="input_${id}"><span class="sr">${status.display_name}</span></span>
@@ -59,6 +60,6 @@
 </form>
 
 % if msg:
-<span class="message">${msg|n}</span>
+<span class="message">${msg}</span>
 % endif
 
