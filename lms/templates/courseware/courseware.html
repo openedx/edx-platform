@@ -1,6 +1,7 @@
 <%page expression_filter="h"/>
 <%inherit file="/main.html" />
 <%namespace name='static' file='/static_content.html'/>
+<%def name="online_help_token()"><% return "courseware" %></%def>
 <%!
 from django.utils.translation import ugettext as _
 from django.conf import settings
