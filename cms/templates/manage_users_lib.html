@@ -32,7 +32,7 @@ from openedx.core.djangolib.js_utils import (
       <ul>
         %if allow_actions:
         <li class="nav-item">
-          <a href="#" class="button new-button create-user-button"><i class="icon fa fa-plus"></i> ${_("New Team Member")}</a>
+          <a href="#" class="button new-button create-user-button"><span class="icon fa fa-plus" aria-hidden="true"></span> ${_("New Team Member")}</a>
         </li>
         %endif
       </ul>
@@ -72,7 +72,7 @@ from openedx.core.djangolib.js_utils import (
 
       <ol class="user-list" id="user-list">
         <div class="ui-loading">
-          <p><span class="spin"><i class="icon fa fa-refresh"></i></span> <span class="copy">Loading</span></p>
+          <p><span class="spin"><span class="icon fa fa-refresh" aria-hidden="true"></span></span> <span class="copy">${_("Loading")}</span></p>
         </div>
       </ol>
 
@@ -87,7 +87,7 @@ from openedx.core.djangolib.js_utils import (
 
         <ul class="list-actions">
           <li class="action-item">
-            <a href="#" class="action action-primary button new-button create-user-button"><i class="icon fa fa-plus icon-inline"></i> ${_('Add a New User')}</a>
+            <a href="#" class="action action-primary button new-button create-user-button"><span class="icon fa fa-plus icon-inline" aria-hidden="true"></span> ${_('Add a New User')}</a>
           </li>
         </ul>
       </div>

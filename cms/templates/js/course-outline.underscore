@@ -70,7 +70,7 @@ if (is_proctored_exam) {
 <li class="outline-item outline-<%- xblockType %> <%- visibilityClass %> is-draggable <%- includesChildren ? 'is-collapsible' : '' %> <%- isCollapsed ? 'is-collapsed' : '' %>"
     data-parent="<%- parentInfo.get('id') %>" data-locator="<%- xblockInfo.get('id') %>">
 
-    <span class="draggable-drop-indicator draggable-drop-indicator-before"><i class="icon fa fa-caret-right"></i></span>
+    <span class="draggable-drop-indicator draggable-drop-indicator-before"><span class="icon fa fa-caret-right" aria-hidden="true"></span></span>
     <% if (xblockInfo.isHeaderVisible()) { %>
     <div class="<%- xblockType %>-header">
         <% if (includesChildren) { %>
@@ -79,7 +79,7 @@ if (is_proctored_exam) {
                       gettext('Collapse/Expand this %(xblock_type)s'), { xblock_type: xblockTypeDisplayName }, true
                 ) %>"
             >
-                <i class="icon fa fa-caret-down"></i>
+                <span class="icon fa fa-caret-down" aria-hidden="true"></span>
         <% } else { %>
             <h3 class="<%- xblockType %>-header-details">
         <% } %>
@@ -99,7 +99,7 @@ if (is_proctored_exam) {
                 <% if (xblockInfo.isPublishable()) { %>
                     <li class="action-item action-publish">
                         <a href="#" data-tooltip="<%- gettext('Publish') %>" class="publish-button action-button">
-                            <i class="icon fa fa-upload"></i>
+                            <span class="icon fa fa-upload" aria-hidden="true"></span>
                             <span class="sr action-button-text"><%- gettext('Publish') %></span>
                         </a>
                     </li>
@@ -107,7 +107,7 @@ if (is_proctored_exam) {
                 <% if (xblockInfo.isEditableOnCourseOutline()) { %>
                     <li class="action-item action-configure">
                         <a href="#" data-tooltip="<%- gettext('Configure') %>" class="configure-button action-button">
-                            <i class="icon fa fa-gear"></i>
+                            <span class="icon fa fa-gear" aria-hidden="true"></span>
                             <span class="sr action-button-text"><%- gettext('Configure') %></span>
                         </a>
                     </li>
@@ -115,7 +115,7 @@ if (is_proctored_exam) {
                 <% if (xblockInfo.isDeletable()) { %>
                     <li class="action-item action-delete">
                         <a href="#" data-tooltip="<%- gettext('Delete') %>" class="delete-button action-button">
-                            <i class="icon fa fa-trash-o" aria-hidden="true"></i>
+                            <span class="icon fa fa-trash-o" aria-hidden="true"></span>
                             <span class="sr action-button-text"><%- gettext('Delete') %></span>
                         </a>
                     </li>
@@ -146,13 +146,13 @@ if (is_proctored_exam) {
                     <span class="status-release-value">
                         <% if (!course.get('self_paced')) { %>
                             <% if (xblockInfo.get('released_to_students')) { %>
-                                <i class="icon fa fa-check"></i>
+                                <span class="icon fa fa-check" aria-hidden="true"></span>
                                 <%- gettext('Released:') %>
                             <% } else if (xblockInfo.get('release_date')) { %>
-                                <i class="icon fa fa-clock-o"></i>
+                                <span class="icon fa fa-clock-o" aria-hidden="true"></span>
                                 <%- gettext('Scheduled:') %>
                             <% } else { %>
-                                <i class="icon fa fa-clock-o"></i>
+                                <span class="icon fa fa-clock-o" aria-hidden="true"></span>
                                 <%- gettext('Unscheduled') %>
                             <% } %>
                             <% if (xblockInfo.get('release_date')) { %>
@@ -167,7 +167,7 @@ if (is_proctored_exam) {
                 <div class="status-timed-proctored-exam">
                     <p>
                         <span class="sr status-grading-label"> <%- gettext('Graded as:') %> </span>
-                        <i class="icon fa fa-check"></i>
+                        <span class="icon fa fa-check" aria-hidden="true"></span>
                         <span class="status-grading-value"> <%- gradingType %> </span>
                          -
                         <span class="sr status-proctored-exam-label"> <%- exam_value %> </span>
@@ -180,10 +180,10 @@ if (is_proctored_exam) {
                 <div class="status-hide-after-due">
                     <p>
                         <% if (!is_proctored_exam && xblockInfo.get('hide_after_due')) { %>
-                            <i class="icon fa fa-eye-slash"></i>
+                            <span class="icon fa fa-eye-slash" aria-hidden="true"></span>
                             <span class="status-hide-after-due-value"> <%- gettext("Exam will remain hidden after due date") %> </span>
                         <% } else { %>
-                            <i class="icon fa fa-eye"></i>
+                            <span class="icon fa fa-eye" aria-hidden="true"></span>
                             <span class="status-hide-after-due-value"> <%- gettext("Exam will be visible after due date") %> </span>
                         <% } %>
                     </p>
@@ -192,7 +192,7 @@ if (is_proctored_exam) {
                 <div class="status-grading">
                     <p>
                         <span class="sr status-grading-label"> <%- gettext('Graded as:') %> </span>
-                        <i class="icon fa fa-check"></i>
+                        <span class="icon fa fa-check" aria-hidden="true"></span>
                         <span class="status-grading-value"> <%- gradingType %> </span>
                         <% if (xblockInfo.get('due_date') && !course.get('self_paced')) { %>
                             <span class="status-grading-date"> <%- gettext('Due:') %> <%- xblockInfo.get('due_date') %> </span>
@@ -203,7 +203,7 @@ if (is_proctored_exam) {
         <% } %>
         <% if (statusMessage) { %>
         <div class="status-message">
-            <i class="icon fa <%- statusIconClass %>"></i>
+            <span class="icon fa <%- statusIconClass %>" aria-hidden="true"></span>
             <p class="status-message-copy"><%- statusMessage %></p>
         </div>
         <% } %>
@@ -220,7 +220,7 @@ if (is_proctored_exam) {
                          gettext('Click to add a new %(xblock_type)s'), { xblock_type: defaultNewChildName }, true
                    ) %>"
                 >
-                    <i class="icon fa fa-plus"></i><%- addChildLabel %>
+                    <span class="icon fa fa-plus" aria-hidden="true"></span><%- addChildLabel %>
                 </a>
             </p>
         </div>
@@ -228,7 +228,7 @@ if (is_proctored_exam) {
         <div class="outline-content <%- xblockType %>-content">
             <ol class="<%- typeListClass %> is-sortable">
                 <li class="ui-splint ui-splint-indicator">
-                    <span class="draggable-drop-indicator draggable-drop-indicator-initial"><i class="icon fa fa-caret-right"></i></span>
+                    <span class="draggable-drop-indicator draggable-drop-indicator-initial"><span class="icon fa fa-caret-right" aria-hidden="true"></span></span>
                 </li>
             </ol>
 
@@ -241,7 +241,7 @@ if (is_proctored_exam) {
                              gettext('Click to add a new %(xblock_type)s'), { xblock_type: defaultNewChildName }, true
                        ) %>"
                     >
-                        <i class="icon fa fa-plus"></i><%- addChildLabel %>
+                        <span class="icon fa fa-plus" aria-hidden="true"></span><%- addChildLabel %>
                     </a>
                 </div>
                 <% } %>
@@ -250,6 +250,6 @@ if (is_proctored_exam) {
     <% } %>
 
 <% if (parentInfo) { %>
-    <span class="draggable-drop-indicator draggable-drop-indicator-after"><i class="icon fa fa-caret-right"></i></span>
+    <span class="draggable-drop-indicator draggable-drop-indicator-after"><span class="icon fa fa-caret-right" aria-hidden="true"></span></span>
 </li>
 <% } %>

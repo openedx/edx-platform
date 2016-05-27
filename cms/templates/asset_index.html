@@ -44,7 +44,7 @@
             <h3 class="sr">${_("Page Actions")}</h3>
             <ul>
                 <li class="nav-item">
-                    <a href="#" class="button upload-button new-button"><i class="icon fa fa-plus"></i> ${_("Upload New File")}</a>
+                    <a href="#" class="button upload-button new-button"><span class="icon fa fa-plus" aria-hidden="true"></span> ${_("Upload New File")}</a>
                 </li>
             </ul>
         </nav>
@@ -56,7 +56,7 @@
         <article class="content-primary" role="main">
             <div class="wrapper-assets" />
             <div class="ui-loading">
-                <p><span class="spin"><i class="icon fa fa-refresh"></i></span> <span class="copy">${_("Loading")}</span></p>
+                <p><span class="spin"><span class="icon fa fa-refresh" aria-hidden="true"></span></span> <span class="copy">${_("Loading")}</span></p>
             </div>
         </article>
 
@@ -88,7 +88,7 @@
 </div>
 
 <div class="upload-modal modal">
-    <a href="#" class="close-button"><i class="icon fa fa-times-circle"></i> <span class="sr">${_('close')}</span></a>
+    <a href="#" class="close-button"><span class="icon fa fa-times-circle" aria-hidden="true"></span> <span class="sr">${_('close')}</span></a>
     <div class="modal-body">
         <h1 class="title">${_("Upload New File")}</h1>
         <h2>${_("Max per-file size: {max_filesize}MB").format(max_filesize=max_file_size_in_mbs)}</h2>
@@ -115,14 +115,14 @@
 <!-- alert: save confirmed with close -->
 <div class="wrapper wrapper-alert wrapper-alert-confirmation" role="status">
     <div class="alert confirmation">
-        <i class="icon fa fa-check"></i>
+        <span class="icon fa fa-check" aria-hidden="true"></span>
 
         <div class="copy">
             <h2 class="title title-3">${_('Your file has been deleted.')}</h2>
         </div>
 
         <a href="" rel="view" class="action action-alert-close">
-            <i class="icon fa fa-times-circle"></i>
+            <span class="icon fa fa-times-circle" aria-hidden="true"></span>
             <span class="label">${_('close alert')}</span>
         </a>
     </div>

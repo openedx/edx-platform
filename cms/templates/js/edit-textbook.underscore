@@ -18,7 +18,7 @@
     <legend class="sr"><%- gettext("Chapter information") %></legend>
       <ol class="chapters list-input enum"></ol>
 
-    <button class="action action-add-chapter"><i class="icon fa fa-plus"></i> <%- gettext("Add a Chapter") %></button>
+    <button class="action action-add-chapter"><span class="icon fa fa-plus" aria-hidden="true"></span> <%- gettext("Add a Chapter") %></button>
   </fieldset>
   </div>
   <div class="actions">

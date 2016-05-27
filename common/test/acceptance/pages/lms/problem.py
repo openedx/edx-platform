@@ -190,7 +190,7 @@ class ProblemPage(PageObject):
 
         Problem <clarification>clarification text hidden by an icon in rendering</clarification> Text
         """
-        self.q(css='div.problem .clarification:nth-child({index}) i[data-tooltip]'.format(index=index + 1)).click()
+        self.q(css='div.problem .clarification:nth-child({index}) span[data-tooltip]'.format(index=index + 1)).click()
 
     @property
     def visible_tooltip_text(self):

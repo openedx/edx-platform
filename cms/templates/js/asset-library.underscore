@@ -26,7 +26,7 @@
                         <span class="type-filter" data-alllabel='<%- gettext("Type") %>'><%- gettext("Type") %></span>
                         <span class="label-prefix sr">Filter</span>
                         <span class="filter-link"></span>
-                        <i class="fa fa-caret-down ui-toggle-dd" aria-hidden="true"></i>
+                        <span class="fa fa-caret-down ui-toggle-dd" aria-hidden="true"></span>
                     </span>
                     <div class="wrapper-nav-sub">
                         <div class="nav-sub">
@@ -64,5 +64,5 @@
 </div>
 
 <div class="no-asset-content">
-    <p><%- gettext("You haven't added any assets to this course yet.") %> <a href="#" class="button new-button upload-button"><i class="icon fa fa-plus" aria-hidden="true"></i><%- gettext("Upload your first asset") %></a></p>
+    <p><%- gettext("You haven't added any assets to this course yet.") %> <a href="#" class="button new-button upload-button"><span class="icon fa fa-plus" aria-hidden="true"></span><%- gettext("Upload your first asset") %></a></p>
 </div>

@@ -91,7 +91,7 @@ site_status_msg = get_site_status_msg(course_id)
     <ol class="user">
       <li class="primary">
         <a href="${reverse('dashboard')}" class="user-link">
-          <i class="icon fa fa-home" aria-hidden="true"></i>
+          <span class="icon fa fa-home" aria-hidden="true"></span>
           <span class="sr">${_("Dashboard for:")}</span>
           <div>
           ${user.username}
@@ -99,7 +99,7 @@ site_status_msg = get_site_status_msg(course_id)
         </a>
       </li>
       <li class="primary">
-        <a href="#" class="dropdown" aria-haspopup="true" aria-expanded="false"><span class="sr">${_("More options dropdown")}</span><i class="fa fa-sort-desc" aria-hidden="true"></i></a>
+        <a href="#" class="dropdown" aria-haspopup="true" aria-expanded="false"><span class="sr">${_("More options dropdown")}</span><span class="fa fa-sort-desc" aria-hidden="true"></span></a>
         <ul class="dropdown-menu" aria-label="More Options" role="menu">
           <%block name="navigation_dropdown_menu_links" >
             <li><a href="${reverse('account_settings')}">${_("Account Settings")}</a></li>
@@ -113,7 +113,7 @@ site_status_msg = get_site_status_msg(course_id)
         <ol class="user">
           <li class="primary">
             <a class="shopping-cart" href="${reverse('shoppingcart.views.show_cart')}">
-              <i class="icon fa fa-shopping-cart"></i> ${_("Shopping Cart")}
+              <span class="icon fa fa-shopping-cart" aria-hidden="true"></span> ${_("Shopping Cart")}
             </a>
           </li>
         </ol>

@@ -8,7 +8,7 @@
 <% if(chapters.length > 1) {%>
     <p><a href="#" class="chapter-toggle
         <% if(showChapters){ print('hide'); } else { print('show'); } %>-chapters">
-        <i class="ui-toggle-expansion icon fa fa-caret-<% if(showChapters){ print('down'); } else { print('right'); } %>"></i>
+        <span class="ui-toggle-expansion icon fa fa-caret-<% if(showChapters){ print('down'); } else { print('right'); } %>" aria-hidden="true"></span>
         <%- chapters.length %> PDF Chapters
     </a></p>
 <% } else if(chapters.length === 1) { %>
@@ -40,7 +40,7 @@
         <button class="edit"><%- gettext("Edit") %></button>
     </li>
     <li class="action action-delete">
-        <button class="delete action-icon"><i class="icon fa fa-trash-o"></i><span><%- gettext("Delete") %></span></button>
+        <button class="delete action-icon"><span class="icon fa fa-trash-o" aria-hidden="true"></span><span><%- gettext("Delete") %></span></button>
     </li>
 </ul>
 
