@@ -54,6 +54,7 @@ from openedx.core.djangoapps.bookmarks.services import BookmarksService
 from lms.djangoapps.lms_xblock.runtime import LmsModuleSystem, unquote_slashes, quote_slashes
 from lms.djangoapps.verify_student.services import ReverificationService
 from openedx.core.djangoapps.credit.services import CreditService
+from openedx.core.djangoapps.util.user_utils import SystemUser
 from openedx.core.lib.xblock_utils import (
     replace_course_urls,
     replace_jump_to_id_urls,
@@ -836,10 +837,10 @@ def get_module_for_descriptor_internal(user, descriptor, student_data, course_id
     # Not that the access check needs to happen after the descriptor is bound
     # for the student, since there may be field override data for the student
     # that affects xblock visibility.
-    if getattr(user, 'known', True):
+    user_needs_access_check = getattr(user, 'known', True) and not isinstance(user, SystemUser)
+    if user_needs_access_check:
         if not has_access(user, 'load', descriptor, course_id):
             return None
-
     return descriptor
 
 
