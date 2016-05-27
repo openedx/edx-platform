@@ -12,8 +12,7 @@
                 breakpoints: {
                     min: {
                         'medium': '768px',
-                        'large': '1180px',
-                        'x-large': '1440px'
+                        'large': '1180px'
                     }
                 },
 
