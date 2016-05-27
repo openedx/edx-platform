@@ -1,10 +1,19 @@
 # -*- coding: utf-8 -*-
 """Helper functions for working with Programs."""
+import datetime
 import logging
 
+from django.core.urlresolvers import reverse
+from django.utils import timezone
+from opaque_keys.edx.keys import CourseKey
+import pytz
+
 from lms.djangoapps.certificates.api import get_certificates_for_user, is_passing_status
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.lib.edx_api_utils import get_edx_api_data
+from student.models import CourseEnrollment
+from xmodule.course_metadata_utils import DEFAULT_START_DATE
 
 
 log = logging.getLogger(__name__)
@@ -275,3 +284,37 @@ class ProgramProgressMeter(object):
         }
 
         return parsed
+
+
+def supplement_program_data(program_data, user):
+    """Supplement program course codes with CourseOverview and CourseEnrollment data.
+
+    Arguments:
+        program_data (dict): Representation of a program.
+        user (User): The user whose enrollments to inspect.
+    """
+    for course_code in program_data['course_codes']:
+        for run_mode in course_code['run_modes']:
+            course_key = CourseKey.from_string(run_mode['course_key'])
+            course_overview = CourseOverview.get_from_id(course_key)
+
+            run_mode['course_url'] = reverse('course_root', args=[course_key])
+            run_mode['course_image_url'] = course_overview.course_image_url
+
+            human_friendly_format = '%x'
+            start_date = course_overview.start or DEFAULT_START_DATE
+            end_date = course_overview.end or datetime.datetime.max.replace(tzinfo=pytz.UTC)
+            run_mode['start_date'] = start_date.strftime(human_friendly_format)
+            run_mode['end_date'] = end_date.strftime(human_friendly_format)
+
+            run_mode['is_enrolled'] = CourseEnrollment.is_enrolled(user, course_key)
+
+            enrollment_start = course_overview.enrollment_start or datetime.datetime.min.replace(tzinfo=pytz.UTC)
+            enrollment_end = course_overview.enrollment_end or datetime.datetime.max.replace(tzinfo=pytz.UTC)
+            is_enrollment_open = enrollment_start <= timezone.now() < enrollment_end
+            run_mode['is_enrollment_open'] = is_enrollment_open
+
+            # TODO: Currently unavailable on LMS.
+            run_mode['marketing_url'] = ''
+
+    return program_data

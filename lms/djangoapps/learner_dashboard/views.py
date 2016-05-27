@@ -3,13 +3,13 @@ from urlparse import urljoin
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
-from django.views.decorators.http import require_GET
 from django.http import Http404
+from django.views.decorators.http import require_GET
 
 from edxmako.shortcuts import render_to_response
 from openedx.core.djangoapps.credentials.utils import get_programs_credentials
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
-from openedx.core.djangoapps.programs.utils import ProgramProgressMeter, get_programs, get_display_category
+from openedx.core.djangoapps.programs import utils
 from student.views import get_course_enrollments
 
 
@@ -22,13 +22,13 @@ def view_programs(request):
         raise Http404
 
     enrollments = list(get_course_enrollments(request.user, None, []))
-    meter = ProgramProgressMeter(request.user, enrollments)
+    meter = utils.ProgramProgressMeter(request.user, enrollments)
     programs = meter.engaged_programs
 
     # TODO: Pull 'xseries' string from configuration model.
     marketing_root = urljoin(settings.MKTG_URLS.get('ROOT'), 'xseries').strip('/')
     for program in programs:
-        program['display_category'] = get_display_category(program)
+        program['display_category'] = utils.get_display_category(program)
         program['marketing_url'] = '{root}/{slug}'.format(
             root=marketing_root,
             slug=program['marketing_slug']
@@ -56,7 +56,8 @@ def program_details(request, program_id):
     if not show_program_details:
         raise Http404
 
-    program_data = get_programs(request.user, program_id=program_id)
+    program_data = utils.get_programs(request.user, program_id=program_id)
+    program_data = utils.supplement_program_data(program_data, request.user)
 
     context = {
         'program_data': program_data,

@@ -1,11 +1,12 @@
 """Acceptance tests for LMS-hosted Programs pages"""
 from nose.plugins.attrib import attr
 
-from ...fixtures.programs import FakeProgram, ProgramsFixture, ProgramsConfigMixin
+from ...fixtures.programs import ProgramsFixture, ProgramsConfigMixin
 from ...fixtures.course import CourseFixture
 from ..helpers import UniqueCourseTest
 from ...pages.lms.auto_auth import AutoAuthPage
 from ...pages.lms.programs import ProgramListingPage, ProgramDetailsPage
+from openedx.core.djangoapps.programs.tests import factories
 
 
 class ProgramPageBase(ProgramsConfigMixin, UniqueCourseTest):
@@ -15,16 +16,33 @@ class ProgramPageBase(ProgramsConfigMixin, UniqueCourseTest):
 
         self.set_programs_api_configuration(is_enabled=True)
 
-    def stub_api(self, course_id=None):
-        """Stub out the programs API with fake data."""
-        name = 'Fake Program'
-        status = 'active'
-        org_key = self.course_info['org']
+    def create_program(self, program_id=None, course_id=None):
+        """DRY helper for creating test program data."""
         course_id = course_id if course_id else self.course_id
 
-        ProgramsFixture().install_programs([
-            FakeProgram(name=name, status=status, org_key=org_key, course_id=course_id),
-        ])
+        run_mode = factories.RunMode(course_key=course_id)
+        course_code = factories.CourseCode(run_modes=[run_mode])
+        org = factories.Organization(key=self.course_info['org'])
+
+        if program_id:
+            program = factories.Program(
+                id=program_id,
+                status='active',
+                organizations=[org],
+                course_codes=[course_code]
+            )
+        else:
+            program = factories.Program(
+                status='active',
+                organizations=[org],
+                course_codes=[course_code]
+            )
+
+        return program
+
+    def stub_api(self, programs, is_list=True):
+        """Stub out the programs API with fake data."""
+        ProgramsFixture().install_programs(programs, is_list=is_list)
 
     def auth(self, enroll=True):
         """Authenticate, enrolling the user in the configured course if requested."""
@@ -43,8 +61,10 @@ class ProgramListingPageTest(ProgramPageBase):
 
     def test_no_enrollments(self):
         """Verify that no cards appear when the user has no enrollments."""
-        self.stub_api()
+        program = self.create_program()
+        self.stub_api([program])
         self.auth(enroll=False)
+
         self.listing_page.visit()
 
         self.assertTrue(self.listing_page.is_sidebar_present)
@@ -59,8 +79,11 @@ class ProgramListingPageTest(ProgramPageBase):
             self.course_info['run'],
             'other_run'
         )
-        self.stub_api(course_id=course_id)
+
+        program = self.create_program(course_id=course_id)
+        self.stub_api([program])
         self.auth()
+
         self.listing_page.visit()
 
         self.assertTrue(self.listing_page.is_sidebar_present)
@@ -71,8 +94,10 @@ class ProgramListingPageTest(ProgramPageBase):
         Verify that cards appear when the user has enrollments
         which are included in at least one active program.
         """
-        self.stub_api()
+        program = self.create_program()
+        self.stub_api([program])
         self.auth()
+
         self.listing_page.visit()
 
         self.assertTrue(self.listing_page.is_sidebar_present)
@@ -87,9 +112,11 @@ class ProgramListingPageA11yTest(ProgramPageBase):
 
         self.listing_page = ProgramListingPage(self.browser)
 
+        program = self.create_program()
+        self.stub_api([program])
+
     def test_empty_a11y(self):
         """Test a11y of the page's empty state."""
-        self.stub_api()
         self.auth(enroll=False)
         self.listing_page.visit()
 
@@ -100,7 +127,6 @@ class ProgramListingPageA11yTest(ProgramPageBase):
 
     def test_cards_a11y(self):
         """Test a11y when program cards are present."""
-        self.stub_api()
         self.auth()
         self.listing_page.visit()
 
@@ -118,9 +144,12 @@ class ProgramDetailsPageA11yTest(ProgramPageBase):
 
         self.details_page = ProgramDetailsPage(self.browser)
 
+        program = self.create_program(program_id=self.details_page.program_id)
+        self.stub_api([program], is_list=False)
+
     def test_a11y(self):
-        """Test a11y of the page's state."""
-        self.auth(enroll=False)
+        """Test the page's a11y compliance."""
+        self.auth()
         self.details_page.visit()
 
         self.details_page.a11y_audit.check_for_accessibility_errors()
