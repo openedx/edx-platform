@@ -190,7 +190,7 @@ FEATURES = {
     'ENABLE_SPECIAL_EXAMS': False,
 
     # enable organization course linking
-    'ORGANIZATIONS_APP': True,
+    'ORGANIZATIONS_APP': False,
 
     # Show Language selector
     'SHOW_LANGUAGE_SELECTOR': False,
