@@ -544,7 +544,7 @@ def course_listing(request):
     courses = _remove_in_process_courses(courses, in_process_course_actions)
     in_process_course_actions = [format_in_process_course_view(uca) for uca in in_process_course_actions]
     edit_org = 'disabled' if not (request.user.is_superuser or request.user.is_staff) else ''
-    org_short_name =  _get_user_org(request.user)['short_name'] if _get_user_org(request.user) else 'e.g. UniversityX or OrganizationX'
+    org_short_name =  _get_user_org(request.user)['short_name'] if _get_user_org(request.user) else ''
 
     return render_to_response('index.html', {
         'courses': courses,
