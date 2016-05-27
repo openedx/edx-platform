@@ -59,7 +59,7 @@ body.discussion {
 
   .thread-title {
     display: block;
-    margin-bottom: ($baseline);
+    margin-bottom: $baseline;
     color: $gray-d3;
     font-weight: 700;
     font-size: 21px;
@@ -158,7 +158,6 @@ body.discussion {
     width: 20px;
     height: 20px;
     background-image: url('#{$static-path}/images/wmd-buttons-transparent.png');
-    background-position: 0 0;
     background-repeat: no-repeat;
   }
 
@@ -235,13 +234,11 @@ body.discussion {
     max-width: 800px;
     min-height: 500px;
     border-radius: 3px;
-    background-color: $forum-color-background;
   }
 
   .discussion-article {
     position: relative;
     min-height: 500px;
-    background-image: url('#{$static-path}/images/bg-texture.png');
 
     a {
       word-wrap: break-word;

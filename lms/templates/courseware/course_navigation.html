@@ -1,5 +1,5 @@
 ## mako
-<%page expression_filter="h"/>
+<%page args="active_page=None" expression_filter="h" />
 <%namespace name='static' file='/static_content.html'/>
 <%!
 from django.utils.translation import ugettext as _
@@ -11,7 +11,6 @@ from openedx.core.djangolib.js_utils import dump_js_escaped_json
 from openedx.core.djangolib.markup import HTML, Text
 from student.models import CourseEnrollment
 %>
-<%page args="active_page=None" expression_filter="h" />
 
 <%
 if active_page is None and active_page_context is not UNDEFINED:

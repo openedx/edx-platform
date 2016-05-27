@@ -15,7 +15,6 @@ body.discussion, .discussion-module {
   // post layout
   .discussion-post {
     padding: 0 ($baseline/2);
-    background-color: $forum-color-background;
 
     .wrapper-post-header {
       padding-bottom: 0;
@@ -65,7 +64,7 @@ body.discussion, .discussion-module {
       @include float(right);
       @include right($baseline);
       position: absolute;
-      top: ($baseline);
+      top: $baseline;
     }
   }
 
@@ -91,8 +90,6 @@ body.discussion, .discussion-module {
 
 // +thread - wrapper styling
 .thread-wrapper {
-  background-color: $forum-color-background;
-
   .thread-main-wrapper {
     padding-bottom: $baseline;
   }
