@@ -85,7 +85,7 @@
                 </p>
                 <% if ( requirements['photo-id-required'] ) { %>
                     <div class="photo-requirement user_icon">
-                        <i class="fa fa-user fa-2x" aria-hidden="true"></i>
+                        <span class="fa fa-user fa-2x" aria-hidden="true"></span>
                         <h6>
                             <%- gettext("Photo ID") %>
                         </h6>
@@ -97,7 +97,7 @@
 
                 <% if ( requirements['webcam-required'] ) { %>
                     <div class="photo-requirement cam_icon">
-                        <i class="fa fa-video-camera fa-2x" aria-hidden="true"></i>
+                        <span class="fa fa-video-camera fa-2x" aria-hidden="true"></span>
                         <h6>
                             <%- gettext("Webcam") %>
                         </h6>

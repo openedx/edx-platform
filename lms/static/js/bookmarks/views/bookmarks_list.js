@@ -15,8 +15,8 @@
             coursewareContentEl: '#course-content',
             coursewareResultsWrapperEl: '.courseware-results-wrapper',
 
-            errorIcon: '<i class="fa fa-fw fa-exclamation-triangle message-error" aria-hidden="true"></i>',
-            loadingIcon: '<i class="fa fa-fw fa-spinner fa-pulse message-in-progress" aria-hidden="true"></i>',
+            errorIcon: '<span class="fa fa-fw fa-exclamation-triangle message-error" aria-hidden="true"></span>',
+            loadingIcon: '<span class="fa fa-fw fa-spinner fa-pulse message-in-progress" aria-hidden="true"></span>',
 
             errorMessage: gettext('An error has occurred. Please try again.'),
             loadingMessage: gettext('Loading'),
