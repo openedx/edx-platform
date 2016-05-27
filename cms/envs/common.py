@@ -189,6 +189,7 @@ FEATURES = {
     # Special Exams, aka Timed and Proctored Exams
     'ENABLE_SPECIAL_EXAMS': False,
 
+    # enable organization course linking
     'ORGANIZATIONS_APP': False,
 
     # Show Language selector
@@ -325,6 +326,7 @@ MIDDLEWARE_CLASSES = (
     # Instead of AuthenticationMiddleware, we use a cache-backed version
     'cache_toolbox.middleware.CacheBackedAuthenticationMiddleware',
     'student.middleware.UserStandingMiddleware',
+    'student.middleware.UserCourseFilteringMiddleware',
     'contentserver.middleware.StaticContentServer',
     'crum.CurrentRequestUserMiddleware',
 

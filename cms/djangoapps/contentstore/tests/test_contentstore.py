@@ -59,6 +59,8 @@ from course_action_state.managers import CourseActionStateItemNotFoundError
 from xmodule.contentstore.content import StaticContent
 from xmodule.modulestore.django import modulestore
 
+from student.tests.factories import OrganizationFactory
+from student.tests.factories import OrganizationUserFactory
 
 TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)
 TEST_DATA_CONTENTSTORE['DOC_STORE_CONFIG']['db'] = 'test_xcontent_%s' % uuid4().hex
@@ -1133,6 +1135,8 @@ class ContentStoreTest(ContentStoreTestCase, XssTestMixin):
     def setUp(self):
         super(ContentStoreTest, self).setUp()
 
+        self.test_org = OrganizationFactory()
+        self.test_organizationuser = OrganizationUserFactory()
         self.course_data = {
             'org': 'MITx',
             'number': '111',
@@ -1180,6 +1184,8 @@ class ContentStoreTest(ContentStoreTestCase, XssTestMixin):
         self.course_data['org'] = 'org.foo.bar'
         self.course_data['number'] = 'course.number'
         self.course_data['run'] = 'run.name'
+        # Create a new ORG
+        self.new_test_org = OrganizationFactory(short_name='org.foo.bar')
         self.assert_created_course()
 
     def test_create_course_check_forum_seeding(self):
@@ -1322,8 +1328,14 @@ class ContentStoreTest(ContentStoreTestCase, XssTestMixin):
         self.course_data['number'] = '{}a'.format(self.course_data['number'])
         resp = self.client.ajax_post('/course/', self.course_data)
         self.assertEqual(resp.status_code, 200)
+        
         self.course_data['number'] = cache_current
         self.course_data['org'] = 'a{}'.format(self.course_data['org'])
+        # Create a new ORG
+        self.new_test_org = OrganizationFactory(short_name = self.course_data['org'])
+        # change user ORG
+        self.test_organizationuser.organization_id = self.new_test_org.id
+        self.test_organizationuser.save()
         resp = self.client.ajax_post('/course/', self.course_data)
         self.assertEqual(resp.status_code, 200)
 
@@ -1573,6 +1585,8 @@ class ContentStoreTest(ContentStoreTestCase, XssTestMixin):
             'display_name': 'Robot Super Course',
             'run': target_id.run
         }
+        # Create a new ORG
+        self.new_test_org = OrganizationFactory(short_name='edX')
         _create_course(self, target_id, course_data)
         course_module = self.store.get_course(target_id)
         course_module.wiki_slug = 'toy'
@@ -1812,6 +1826,10 @@ class RerunCourseTest(ContentStoreTestCase):
     """
     def setUp(self):
         super(RerunCourseTest, self).setUp()
+
+        self.test_org = OrganizationFactory()
+        self.test_organizationuser = OrganizationUserFactory()
+
         self.destination_course_data = {
             'org': 'MITx',
             'number': '111',
@@ -2024,7 +2042,7 @@ class RerunCourseTest(ContentStoreTestCase):
         Test that unique wiki_slug is assigned to rerun course.
         """
         course_data = {
-            'org': 'edX',
+            'org': 'MITx',
             'number': '123',
             'display_name': 'Rerun Course',
             'run': '2013'
