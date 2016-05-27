@@ -396,7 +396,7 @@ def _get_user_org(user):
     Gets the organization associated with this user.
     """
     user_org = Organization.objects.filter(
-        organizationuser__active=True, 
+        organizationuser__active=True,
         organizationuser__user_id_id=user.id).values().first()
     return user_org
 
@@ -756,7 +756,7 @@ def _create_or_rerun_course(request):
     Returns the destination course_key and overriding fields for the new course.
     Raises DuplicateCourseError and InvalidKeyError
     """
-    if not auth.user_has_role(request.user, CourseCreatorRole()):
+    if _get_course_creator_status(request.user) != 'granted':
         raise PermissionDenied()
 
     try:
@@ -1687,7 +1687,7 @@ def _get_course_creator_status(user):
     org_course_creator = _is_org_course_creator(user)
     # Rather keep the original logic if the user is not linked to an ORG
     if org_course_creator is not None:
-        course_creator_status = 'granted' if org_course_creator else 'disallowed_for_this_site' 
+        course_creator_status = 'granted' if org_course_creator else 'disallowed_for_this_site'
     elif user.is_staff:
         course_creator_status = 'granted'
     elif settings.FEATURES.get('DISABLE_COURSE_CREATION', False):
