@@ -59,7 +59,7 @@ class FieldsMixin(object):
         """
         self.wait_for_field(field_id)
 
-        query = self.q(css='.u-field-{} .u-field-icon'.format(field_id))
+        query = self.q(css='.u-field-{} .u-field-icon .fa'.format(field_id))
         return query.present and icon_id in query.attrs('class')[0].split()
 
     def title_for_field(self, field_id):
