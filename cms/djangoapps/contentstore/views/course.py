@@ -758,7 +758,7 @@ def _create_or_rerun_course(request):
     """
     if _get_course_creator_status(request.user) != 'granted':
         raise PermissionDenied()
-
+    
     try:
         org = request.json.get('org')
         course = request.json.get('number', request.json.get('course'))
@@ -818,14 +818,6 @@ def _create_new_course(request, org, number, run, fields):
     Returns the URL for the course overview page.
     Raises DuplicateCourseError if the course already exists
     """
-    store_for_new_course = modulestore().default_modulestore.get_modulestore_type()
-    new_course = create_new_course_in_store(store_for_new_course, request.user, org, number, run, fields)
-
-    """
-    Putting this here so that the order is:
-    Create Course --> then --> Link to Org
-    This will ensure we catch invalid short_name on course creation.
-    """
     org_data = get_organization_by_short_name(org)
     if not org_data and organizations_enabled():
         return JsonResponse(
@@ -835,6 +827,8 @@ def _create_new_course(request, org, number, run, fields):
             status=400
         )
 
+    store_for_new_course = modulestore().default_modulestore.get_modulestore_type()
+    new_course = create_new_course_in_store(store_for_new_course, request.user, org, number, run, fields)
     add_organization_course(org_data, new_course.id)
     return JsonResponse({
         'url': reverse_course_url('course_handler', new_course.id),
