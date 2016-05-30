@@ -6,7 +6,9 @@
                 constructor: function (models, options) {
                     this.options = options;
                     this.url = options.url;
-                    this.state.perPage = options.per_page;
+                    if (options.perPage) {
+                        this.state.pageSize = options.perPage;
+                    }
 
                     this.course_id = options.course_id;
                     this.teamEvents = options.teamEvents;
@@ -33,6 +35,8 @@
                     this.isStale = true;
                 },
 
+                // TODO: These changes has been added to backbone.paginator
+                // remove when backbone.paginator gets a new release
                 sync: function (method, model, options) {
                     // do not send total pages and total records in request
                     if (method === 'read') {

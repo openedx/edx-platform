@@ -103,7 +103,7 @@
                             teamEvents: this.teamEvents,
                             course_id: this.context.courseID,
                             username: this.context.userInfo.username,
-                            per_page: 2,
+                            perPage: 2,
                             parse: true,
                             url: this.context.myTeamsUrl
                         }
@@ -337,7 +337,7 @@
                                     course_id: view.context.courseID,
                                     topic_id: topicID,
                                     url: view.context.teamsUrl,
-                                    per_page: 10
+                                    perPage: 10
                                 });
                                 view.teamsCollection = collection;
                                 collection.getPage(1).then(function () {
@@ -346,7 +346,7 @@
                                         collection: collection,
                                         breadcrumbs: view.createBreadcrumbs(),
                                         showSortControls: true
-                                        });
+                                    });
                                     deferred.resolve(teamsView);
                                 });
                             });
