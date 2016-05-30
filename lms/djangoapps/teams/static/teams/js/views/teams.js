@@ -11,7 +11,7 @@
             type: 'teams',
 
             srInfo: {
-                id: "heading-browse-teams",
+                id: 'heading-browse-teams',
                 text: gettext('All teams')
             },
 

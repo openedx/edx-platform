@@ -1,30 +1,31 @@
 define([
     'underscore',
+    'URI',
+    'edx-ui-toolkit/js/pagination/paging-collection',
     'common/js/components/views/search_field',
-    'common/js/components/collections/paging_collection',
     'common/js/spec_helpers/ajax_helpers'
-], function (_, SearchFieldView, PagingCollection, AjaxHelpers) {
+], function (_, URI, PagingCollection, SearchFieldView, AjaxHelpers) {
     'use strict';
     describe('SearchFieldView', function () {
         var searchFieldView,
             mockUrl = '/api/mock_collection';
 
         var newCollection = function (size, perPage) {
-            var pageSize = 5,
-                results = _.map(_.range(size), function (i) { return {foo: i}; });
-            var collection = new PagingCollection(
-                [],
-                {
-                    url: mockUrl,
-                    count: results.length,
-                    num_pages: results.length / pageSize,
-                    current_page: 1,
-                    start: 0,
-                    results: _.first(results, perPage)
+            var results = _.map(_.range(size), function (i) { return {foo: i}; });
+            var TestPagingCollection = PagingCollection.extend({
+                state: {
+                    pageSize: 5
                 }
-            );
-            collection.start = 0;
-            collection.totalCount = results.length;
+            });
+
+            var collection = new TestPagingCollection({
+                count: results.length,
+                num_pages: Math.ceil(results.length / perPage),
+                page: 1,
+                results: _.first(results, perPage)
+            }, {parse: true});
+
+            collection.url = mockUrl;
             return collection;
         };
 
@@ -38,6 +39,18 @@ define([
                 options || {}
             );
             return new SearchFieldView(options);
+        };
+
+        var assertQueryParams = function (request, expectedParameters) {
+            var urlParams = new URI(request.url).query(true);
+            _.each(expectedParameters, function (value, key) {
+                expect(urlParams[key]).toBe(value);
+            });
+        };
+
+        var assertNotInQueryParams = function (request, param) {
+            var urlParams = new URI(request.url).query(true);
+            return !urlParams.hasOwnProperty(param);
         };
 
         beforeEach(function() {
@@ -62,17 +75,16 @@ define([
             searchFieldView = createSearchFieldView().render();
             searchFieldView.$('.search-field').val('foo');
             searchFieldView.$('.action-search').click();
-            AjaxHelpers.expectRequestURL(requests, mockUrl, {
+            assertQueryParams(requests[0], {
                 page: '1',
-                page_size: '10',
-                sort_order: '',
+                page_size: '5',
                 text_search: 'foo'
             });
+            
             AjaxHelpers.respondWithJson(requests, {
                 count: 10,
-                current_page: 1,
+                page: 1,
                 num_pages: 1,
-                start: 0,
                 results: []
             });
             expect(searchFieldView.$('.search-field').val(), 'foo');
@@ -84,17 +96,12 @@ define([
                 searchString: 'foo'
             }).render();
             searchFieldView.$('.action-clear').click();
-            AjaxHelpers.expectRequestURL(requests, mockUrl, {
-                page: '1',
-                page_size: '10',
-                sort_order: '',
-                text_search: ''
-            });
+            assertNotInQueryParams('text_search');
+
             AjaxHelpers.respondWithJson(requests, {
                 count: 10,
-                current_page: 1,
+                page: 1,
                 num_pages: 1,
-                start: 0,
                 results: []
             });
             expect(searchFieldView.$('.search-field').val(), '');

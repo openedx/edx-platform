@@ -186,7 +186,12 @@ define(['backbone',
 
             it("calls bookmarks list render on page_changed event", function () {
                 var renderSpy = spyOn(BookmarksListView.prototype, 'render');
-                var listView = new BookmarksListView({collection: new BookmarksCollection({course_id: 'abc'})});
+                var listView = new BookmarksListView({
+                    collection: new BookmarksCollection([], {
+                        course_id: 'abc',
+                        url: '/test-bookmarks/url/'
+                    })
+                });
                 listView.collection.trigger('page_changed');
                 expect(renderSpy).toHaveBeenCalled();
             });

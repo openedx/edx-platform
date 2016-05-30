@@ -1,10 +1,10 @@
 <div class="team-profile">
     <div class="page-content-main">
-        <div class="discussion-module" data-course-id="<%= courseID %>" data-discussion-id="<%= discussionTopicID %>"
-                data-read-only="<%= readOnly %>"
-                data-user-create-comment="<%= !readOnly %>"
-                data-user-create-subcomment="<%= !readOnly %>">
-            <% if ( !readOnly) { %>
+        <div class="discussion-module" data-course-id="<%- courseID %>" data-discussion-id="<%- discussionTopicID %>"
+                data-read-only="<%- readOnly %>"
+                data-user-create-comment="<%- !readOnly %>"
+                data-user-create-subcomment="<%- !readOnly %>">
+            <% if (!readOnly) { %>
                 <button type="button" class="btn new-post-btn"><i class="icon fa fa-edit new-post-icon" aria-hidden="true"></i><%- gettext("New Post") %></button>
             <% } %>
         </div>

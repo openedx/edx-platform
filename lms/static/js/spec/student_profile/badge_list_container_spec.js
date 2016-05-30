@@ -1,33 +1,43 @@
-define(['backbone', 'jquery', 'underscore', 'URI', 'common/js/spec_helpers/ajax_helpers',
+define([
+        'backbone',
+        'jquery',
+        'underscore',
+        'URI',
+        'edx-ui-toolkit/js/pagination/paging-collection',
+        'common/js/spec_helpers/ajax_helpers',
         'js/spec/student_profile/helpers',
-        'js/student_profile/views/badge_list_container',
-        'common/js/components/collections/paging_collection'
+        'js/student_profile/views/badge_list_container'
     ],
-    function (Backbone, $, _, URI, AjaxHelpers, LearnerProfileHelpers, BadgeListContainer, PagingCollection) {
+    function (Backbone, $, _, URI, PagingCollection, AjaxHelpers, LearnerProfileHelpers, BadgeListContainer) {
         'use strict';
         describe('edx.user.BadgeListContainer', function () {
 
             var view, requests;
 
-            var createView = function (requests, badge_list_object) {
-                var badgeCollection = new PagingCollection();
+            var createView = function (requests, pageNum, badge_list_object) {
+                var BadgeCollection = PagingCollection.extend({
+                    queryParams: {
+                        currentPage: 'current_page'
+                    }
+                });
+                var badgeCollection = new BadgeCollection();
                 badgeCollection.url = '/api/badges/v1/assertions/user/staff/';
                 var models = [];
                 _.each(_.range(badge_list_object.count), function (idx) {
                     models.push(LearnerProfileHelpers.makeBadge(idx));
                 });
                 badge_list_object.results = models;
-                badgeCollection.fetch();
+                badgeCollection.setPage(pageNum);
                 var request = AjaxHelpers.currentRequest(requests);
                 var path = new URI(request.url).path();
                 expect(path).toBe('/api/badges/v1/assertions/user/staff/');
                 AjaxHelpers.respondWithJson(requests, badge_list_object);
-                var badge_list_container = new BadgeListContainer({
+                var badgeListContainer = new BadgeListContainer({
                     'collection': badgeCollection
 
                 });
-                badge_list_container.render();
-                return badge_list_container;
+                badgeListContainer.render();
+                return badgeListContainer;
             };
 
             afterEach(function () {
@@ -36,7 +46,7 @@ define(['backbone', 'jquery', 'underscore', 'URI', 'common/js/spec_helpers/ajax_
 
             it('displays all badges', function () {
                 requests = AjaxHelpers.requests(this);
-                view = createView(requests, {
+                view = createView(requests, 1, {
                     count: 30,
                     previous: '/arbitrary/url',
                     num_pages: 3,
@@ -51,7 +61,7 @@ define(['backbone', 'jquery', 'underscore', 'URI', 'common/js/spec_helpers/ajax_
 
             it('displays placeholder on last page', function () {
                 requests = AjaxHelpers.requests(this);
-                view = createView(requests, {
+                view = createView(requests, 3, {
                     count: 30,
                     previous: '/arbitrary/url',
                     num_pages: 3,
@@ -66,7 +76,7 @@ define(['backbone', 'jquery', 'underscore', 'URI', 'common/js/spec_helpers/ajax_
 
             it('does not display placeholder on first page', function () {
                 requests = AjaxHelpers.requests(this);
-                view = createView(requests, {
+                view = createView(requests, 1, {
                     count: 30,
                     previous: '/arbitrary/url',
                     num_pages: 3,
