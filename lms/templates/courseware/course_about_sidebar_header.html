@@ -1,3 +1,4 @@
+<%page expression_filter="h"/>
 <%namespace name='static' file='../static_content.html'/>
 <%!
 from django.utils.translation import ugettext as _
@@ -20,7 +21,7 @@ from django.conf import settings
         ## Twitter account. {url} should appear at the end of the text.
         tweet_text = _("I just enrolled in {number} {title} through {account}: {url}").format(
             number=course.number,
-            title=course.display_name_with_default_escaped,
+            title=course.display_name_with_default,
             account=static.get_value('course_about_twitter_account', settings.PLATFORM_TWITTER_ACCOUNT),
             url=u"http://{domain}{path}".format(
                 domain=site_domain,
@@ -35,7 +36,7 @@ from django.conf import settings
             subject=_("Take a course with {platform} online").format(platform=platform_name),
             body=_("I just enrolled in {number} {title} through {platform} {url}").format(
                 number=course.number,
-                title=course.display_name_with_default_escaped,
+                title=course.display_name_with_default,
                 platform=platform_name,
                 url=u"http://{domain}{path}".format(
                     domain=site_domain,
