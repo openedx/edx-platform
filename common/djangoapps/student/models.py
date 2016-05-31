@@ -2164,10 +2164,10 @@ class UserAttribute(TimeStampedModel):
 
     class Meta(object):
         # Ensure that at most one value exists for a given user/name.
-        unique_together = (('user', 'name'))
+        unique_together = (('user', 'name',), )
 
     user = models.ForeignKey(User, related_name='attributes')
-    name = models.CharField(max_length=255, help_text=_("Name of this user attribute."))
+    name = models.CharField(max_length=255, help_text=_("Name of this user attribute."), db_index=True)
     value = models.CharField(max_length=255, help_text=_("Value of this user attribute."))
 
     def __unicode__(self):
