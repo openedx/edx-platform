@@ -20,6 +20,7 @@ from edxmako.tests import mako_middleware_process_request
 from external_auth.models import ExternalAuthMap
 import student
 from student.models import UserAttribute
+from student.views import REGISTRATION_AFFILIATE_ID
 
 TEST_CS_URL = 'https://comments.service.test:123/'
 
@@ -288,14 +289,14 @@ class TestCreateAccount(TestCase):
         affiliate_id = 'test-partner'
         self.client.cookies[settings.AFFILIATE_COOKIE_NAME] = affiliate_id
         user = self.create_account_and_fetch_profile().user
-        self.assertEqual(UserAttribute.get_user_attribute(user, settings.AFFILIATE_COOKIE_NAME), affiliate_id)
+        self.assertEqual(UserAttribute.get_user_attribute(user, REGISTRATION_AFFILIATE_ID), affiliate_id)
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_no_referral(self):
         """Verify that no referral is recorded when a cookie is not present."""
         self.assertIsNone(self.client.cookies.get(settings.AFFILIATE_COOKIE_NAME))  # pylint: disable=no-member
         user = self.create_account_and_fetch_profile().user
-        self.assertIsNone(UserAttribute.get_user_attribute(user, settings.AFFILIATE_COOKIE_NAME))
+        self.assertIsNone(UserAttribute.get_user_attribute(user, REGISTRATION_AFFILIATE_ID))
 
 
 @ddt.ddt
