@@ -36,7 +36,6 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, mixed_store_config
 from xmodule.modulestore import ModuleStoreEnum
 from api_manager.courseware_access import get_course_key
-from api_manager.models import GroupProfile
 
 from .content import TEST_COURSE_OVERVIEW_CONTENT, TEST_COURSE_UPDATES_CONTENT, TEST_COURSE_UPDATES_CONTENT_LEGACY
 from .content import TEST_STATIC_TAB1_CONTENT, TEST_STATIC_TAB2_CONTENT
@@ -1299,9 +1298,9 @@ class CoursesApiTests(ModuleStoreTestCase):
         response = self.do_post(self.base_organizations_uri, data)
         self.assertEqual(response.status_code, 201)
 
-        group = GroupFactory.create()
-        GroupProfile.objects.create(group=group, name='role1', group_type='permission')
-        user.groups.add(group)
+        allow_access(course, user, 'instructor')
+        allow_access(course, user, 'observer')
+        allow_access(self.course, user, 'staff')
 
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 200)
@@ -1318,9 +1317,9 @@ class CoursesApiTests(ModuleStoreTestCase):
         self.assertIn('created', response.data['enrollments'][0]['organizations'][0])
         self.assertIn('display_name', response.data['enrollments'][0]['organizations'][0])
         self.assertIn('logo_url', response.data['enrollments'][0]['organizations'][0])
-        self.assertIsNotNone(response.data['enrollments'][0]['roles'])
-        self.assertIn('id', response.data['enrollments'][0]['roles'][0])
-        self.assertIn('name', response.data['enrollments'][0]['roles'][0])
+        roles = response.data['enrollments'][0]['roles']
+        self.assertIsNotNone(roles)
+        self.assertEqual(['instructor', 'observer'], roles)
 
     def test_courses_users_list_get_filter_by_orgs(self):
         # create 5 users

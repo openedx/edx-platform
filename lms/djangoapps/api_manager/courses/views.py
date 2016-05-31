@@ -1111,7 +1111,7 @@ class CoursesUsersList(SecureAPIView):
             .select_related('courseenrollment_set', 'profile')\
             .annotate(courses_enrolled=Count('courseenrollment'))
 
-        serializer = UserSerializer(users, many=True)
+        serializer = UserSerializer(users, many=True, context={'course_id': course_key})
         response_data['enrollments'] = serializer.data
 
         # Then list all enrollments which are pending. These are enrollments for students that have not yet
