@@ -280,7 +280,7 @@ class UserProfile(models.Model):
     goals = models.TextField(blank=True, null=True)
     allow_certificate = models.BooleanField(default=1)
     bio = models.CharField(blank=True, null=True, max_length=3000, db_index=False)
-    profile_image_uploaded_at = models.DateTimeField(null=True)
+    profile_image_uploaded_at = models.DateTimeField(null=True, blank=True)
 
     @property
     def has_profile_image(self):
