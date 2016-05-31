@@ -26,12 +26,12 @@ class TestUsersDefaultRole(ModuleStoreTestCase):
         self.client = AjaxEnabledTestClient()
         self.client.login(username=self.user.username, password='test')
 
+        self.test_org = OrganizationFactory(short_name='Org_1')
+        self.test_organizationuser = OrganizationUserFactory()
+
         # create a course via the view handler to create course
         self.course_key = self.store.make_course_key('Org_1', 'Course_1', 'Run_1')
         self._create_course_with_given_location(self.course_key)
-
-        self.test_org = OrganizationFactory(short_name=self.course_key.org)
-        self.test_organizationuser = OrganizationUserFactory()
 
     def _create_course_with_given_location(self, course_key):
         """
