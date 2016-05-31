@@ -77,3 +77,16 @@ describe "Bulk Email Queueing", ->
         @send_email.$btn_send.click()
         expect($('.request-response-error').text()).toEqual('Error sending email.')
         expect(console.warn).toHaveBeenCalled()
+
+    it 'selecting all learners disables cohort selections', ->
+        @send_email.$send_to.filter("[value='learners']").click
+        @send_email.$cohort_targets.each ->
+            expect(this.disabled).toBe(true)
+        @send_email.$send_to.filter("[value='learners']").click
+        @send_email.$cohort_targets.each ->
+            expect(this.disabled).toBe(false)
+
+    it 'selected targets are listed after "send to:"', ->
+        @send_email.$send_to.click
+        $('input[name="send_to"]:checked+label').each ->
+            expect($('.send_to_list'.text())).toContain(this.innerText.replace(/\s*\n.*/g,''))
