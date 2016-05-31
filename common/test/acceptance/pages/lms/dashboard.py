@@ -174,12 +174,6 @@ class DashboardPage(PageObject):
         """
         self.q(css='.dropdown').first.click()
 
-    def click_username(self):
-        """
-        Click username.
-        """
-        self.q(css='.label-username').first.click()
-
     @property
     def username_dropdown_link_text(self):
         """

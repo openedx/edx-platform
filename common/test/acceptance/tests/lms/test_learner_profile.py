@@ -266,17 +266,21 @@ class OwnLearnerProfilePageTest(LearnerProfileTestMixin, WebAppTest):
 
     def test_dashboard_learner_profile_link(self):
         """
-        Scenario: Verify that when user click on username it will leads to profile page.
+        Scenario: Verify that my profile link is present on dashboard page and we can navigate to correct page.
 
         Given that I am a registered user.
         When I go to Dashboard page.
-        And I click on username.
+        And I click on username dropdown.
+        Then I see Profile link in the dropdown menu.
+        When I click on Profile link.
         Then I will be navigated to Profile page.
         """
         username, user_id = self.log_in_as_unique_user()
         dashboard_page = DashboardPage(self.browser)
         dashboard_page.visit()
-        dashboard_page.click_username()
+        dashboard_page.click_username_dropdown()
+        self.assertIn('Profile', dashboard_page.username_dropdown_link_text)
+        dashboard_page.click_my_profile_link()
         my_profile_page = LearnerProfilePage(self.browser, username)
         my_profile_page.wait_for_page()
 
