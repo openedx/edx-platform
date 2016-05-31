@@ -29,12 +29,14 @@ var options = {
     sourceFiles: [
         {pattern: 'coffee/src/**/!(*spec).js'},
         {pattern: 'js/**/!(*spec|djangojs).js'},
+        {pattern: 'lms/js/**/!(*spec).js'},
         {pattern: 'support/js/**/!(*spec).js'},
         {pattern: 'teams/js/**/!(*spec).js'}
     ],
 
     specFiles: [
         {pattern: 'js/spec/**/*spec.js'},
+        {pattern: 'lms/js/spec/**/*spec.js'},
         {pattern: 'support/js/spec/**/*spec.js'},
         {pattern: 'teams/js/spec/**/*spec.js'},
         {pattern: 'xmodule_js/common_static/coffee/spec/**/*.js'}
@@ -42,13 +44,14 @@ var options = {
 
     fixtureFiles: [
         {pattern: 'js/fixtures/**/*.html'},
+        {pattern: 'lms/fixtures/**/*.html'},
         {pattern: 'support/templates/**/*.*'},
         {pattern: 'teams/templates/**/*.*'},
         {pattern: 'templates/**/*.*'}
     ],
 
     runFiles: [
-        {pattern: 'js/spec/main.js', included: true}
+        {pattern: 'lms/js/spec/main.js', included: true}
     ]
 };
 

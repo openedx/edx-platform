@@ -1,4 +1,4 @@
-(function(requirejs, define) {
+(function(requirejs) {
     'use strict';
 
     // TODO: how can we share the vast majority of this config that is in common with CMS?
@@ -120,7 +120,7 @@
             'date': {
                 exports: 'Date'
             },
-            "jquery-migrate": ['jquery'],
+            'jquery-migrate': ['jquery'],
             'jquery.ui': {
                 deps: ['jquery'],
                 exports: 'jQuery.ui'
@@ -204,8 +204,8 @@
                 deps: ['backbone'],
                 exports: 'Backbone.PageableCollection'
             },
-            "backbone-super": {
-                deps: ["backbone"]
+            'backbone-super': {
+                deps: ['backbone']
             },
             'paging-collection': {
                 deps: ['jquery', 'underscore', 'backbone.paginator']
@@ -292,13 +292,13 @@
             },
             'coffee/src/instructor_dashboard/util': {
                 exports: 'coffee/src/instructor_dashboard/util',
-                deps: ['jquery', 'gettext'],
+                deps: ['jquery', 'underscore', 'slick.core', 'slick.grid'],
                 init: function() {
                     // Set global variables that the util code is expecting to be defined
                     require([
                         'edx-ui-toolkit/js/utils/html-utils',
                         'edx-ui-toolkit/js/utils/string-utils'
-                    ], function (HtmlUtils, StringUtils) {
+                    ], function(HtmlUtils, StringUtils) {
                         window.edx = edx || {};
                         window.edx.HtmlUtils = HtmlUtils;
                         window.edx.StringUtils = StringUtils;
@@ -308,10 +308,6 @@
             'coffee/src/instructor_dashboard/student_admin': {
                 exports: 'coffee/src/instructor_dashboard/student_admin',
                 deps: ['jquery', 'underscore', 'coffee/src/instructor_dashboard/util', 'string_utils']
-            },
-            'coffee/src/instructor_dashboard/util': {
-                exports: 'coffee/src/instructor_dashboard/util',
-                deps: ['jquery', 'underscore', 'slick.core', 'slick.grid']
             },
             'js/instructor_dashboard/certificates': {
                 exports: 'js/instructor_dashboard/certificates',
@@ -369,11 +365,11 @@
             },
             'js/verify_student/models/verification_model': {
                 exports: 'edx.verify_student.VerificationModel',
-                deps: [ 'jquery', 'underscore', 'backbone', 'jquery.cookie' ]
+                deps: ['jquery', 'underscore', 'backbone', 'jquery.cookie']
             },
             'js/verify_student/views/error_view': {
                 exports: 'edx.verify_student.ErrorView',
-                deps: [ 'jquery', 'underscore', 'backbone' ]
+                deps: ['jquery', 'underscore', 'backbone']
             },
             'js/verify_student/views/webcam_photo_view': {
                 exports: 'edx.verify_student.WebcamPhotoView',
@@ -387,11 +383,11 @@
             },
             'js/verify_student/views/image_input_view': {
                 exports: 'edx.verify_student.ImageInputView',
-                deps: [ 'jquery', 'underscore', 'backbone', 'gettext' ]
+                deps: ['jquery', 'underscore', 'backbone', 'gettext']
             },
             'js/verify_student/views/step_view': {
                 exports: 'edx.verify_student.StepView',
-                deps: [ 'jquery', 'underscore', 'underscore.string', 'backbone', 'gettext' ],
+                deps: ['jquery', 'underscore', 'underscore.string', 'backbone', 'gettext'],
                 init: function() {
                     // Set global variables that the payment code is expecting to be defined
                     require([
@@ -538,7 +534,7 @@
                 exports: 'DiscussionUtil',
                 init: function() {
                     // Set global variables that the discussion code is expecting to be defined
-                    require(['backbone', 'URI'], function (Backbone, URI) {
+                    require(['backbone', 'URI'], function(Backbone, URI) {
                         window.Backbone = Backbone;
                         window.URI = URI;
                     });
@@ -686,6 +682,7 @@
     });
 
     var testFiles = [
+        'lms/js/spec/preview/preview_factory_spec.js',
         'js/spec/api_admin/catalog_preview_spec.js',
         'js/spec/courseware/bookmark_button_view_spec.js',
         'js/spec/courseware/bookmarks_list_view_spec.js',
@@ -821,8 +818,8 @@
 
     // Jasmine has a global stack for creating a tree of specs. We need to load
     // spec files one by one, otherwise some end up getting nested under others.
-    window.requireSerial(specHelpers.concat(testFiles), function () {
+    window.requireSerial(specHelpers.concat(testFiles), function() {
         // start test run, once Require.js is done
         window.__karma__.start();
     });
-}).call(this, requirejs, define);
+}).call(this, requirejs);
