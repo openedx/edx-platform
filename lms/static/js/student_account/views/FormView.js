@@ -4,9 +4,10 @@
             'jquery',
             'underscore',
             'backbone',
-            'common/js/utils/edx.utils.validate'
+            'common/js/utils/edx.utils.validate',
+            'edx-ui-toolkit/js/utils/html-utils'
         ],
-        function($, _, Backbone, EdxUtilsValidate) {
+        function($, _, Backbone, EdxUtilsValidate, HtmlUtils) {
 
         return Backbone.View.extend({
             tagName: 'form',
@@ -200,7 +201,7 @@
                     html.push( errors[i] );
                 }
 
-                $msg.html( html.join('') );
+                $msg.html(HtmlUtils.ensureHtml(html.join('')).text);
 
                 this.element.show( this.$errors );
 
@@ -214,7 +215,7 @@
             },
 
             /* Allows extended views to add non-form attributes
-             * to the data before saving it to model 
+             * to the data before saving it to model
              */
             setExtraData: function( data ) {
                 return data;
