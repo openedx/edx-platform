@@ -26,6 +26,7 @@ from external_auth.login_and_register import (
     register as external_auth_register
 )
 from lang_pref.api import released_languages, all_languages
+from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.theming.helpers import is_request_in_themed_site, get_value as get_themed_value
 from openedx.core.djangoapps.user_api.accounts.api import request_password_change
@@ -322,8 +323,9 @@ def get_user_orders(user):
 
     use_cache = commerce_configuration.is_cache_enabled
     cache_key = commerce_configuration.CACHE_KEY + '.' + str(user.id) if use_cache else None
+    api = ecommerce_api_client(user)
     commerce_user_orders = get_edx_api_data(
-        commerce_configuration, user, 'orders', api_client_name='commerce', querystring=None, cache_key=cache_key
+        commerce_configuration, user, 'orders', api=api, querystring=None, cache_key=cache_key
     )
 
     for order in commerce_user_orders:
