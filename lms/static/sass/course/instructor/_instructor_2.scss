@@ -178,12 +178,21 @@
     }
   }
 
+  .ccx-grade-book-download {
+    text-align: right;
+  }
+
   h1 {
     @extend .top-header;
     display: inline-block;
     margin-bottom: ($baseline*.75);
     padding-bottom: 0;
     border-bottom: 0;
+  }
+
+  .heading-grade-book {
+    @extend h1;
+    display: block;
   }
 
   input[type="button"] {

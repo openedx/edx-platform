@@ -27,8 +27,18 @@ def calculate_page_info(offset, total_students):
     Takes care of sanitizing the offset of current page also calculates offsets for next and previous page
     and information like total number of pages and current page number.
 
-    :param offset: offset for database query
-    :return: tuple consist of page number, query offset for next and previous pages and valid offset
+    Arguments:
+        offset (int): Offset for database query.
+        total_students (int): Total students enrolled in course.
+
+    Returns:
+        (dict): dict containing:
+            previous_offset (int): Previous page offset.
+            next_offset (int): Next page offset
+            page_num (int): Current page number.
+            offset (int): Current offset.
+            total_pages (int): Total number of pages in the grade book of given course.
+
     """
 
     # validate offset.
@@ -64,10 +74,43 @@ def calculate_page_info(offset, total_students):
     }
 
 
-def get_grade_book_page(request, course, course_key):
+def get_grade_book_page(course_key, current_offset):
+    """
+    Returns grade book page information dict.
+
+    Arguments:
+        course_key (CourseLocator):  The course key.
+        current_offset (int): Current offset.
+
+    Returns:
+        page (dict): A dict containing grade book page related info.
+
+    """
+    enrolled_students = User.objects.filter(
+        courseenrollment__course_id=course_key,
+        courseenrollment__is_active=1
+    ).order_by('username').select_related("profile")
+
+    total_students = enrolled_students.count()
+    page = calculate_page_info(current_offset, total_students)
+
+    return page
+
+
+def get_grade_book(request, course, course_key):
     """
     Get student records per page along with page information i.e current page, total pages and
     offset information.
+
+    Arguments:
+        request (Request):  Django request object.
+        course (CourseDescriptorWithMixins): edX course.
+
+    Returns:
+        (tuple): tuple containing:
+            student_info (list): List of students and their grade summery.
+            page (dict): A dict containing grade book page related info.
+
     """
     # Unsanitized offset
     current_offset = request.GET.get('offset', 0)
@@ -76,8 +119,7 @@ def get_grade_book_page(request, course, course_key):
         courseenrollment__is_active=1
     ).order_by('username').select_related("profile")
 
-    total_students = enrolled_students.count()
-    page = calculate_page_info(current_offset, total_students)
+    page = get_grade_book_page(course_key, current_offset)
     offset = page["offset"]
     total_pages = page["total_pages"]
 
@@ -106,10 +148,18 @@ def spoc_gradebook(request, course_id):
     Show the gradebook for this course:
     - Only shown for courses with enrollment < settings.FEATURES.get("MAX_ENROLLMENT_INSTR_BUTTONS")
     - Only displayed to course staff
+
+    Arguments:
+        request (Request):  Django request object.
+        course_id (CourseLocator):  The course key.
+
+    Returns:
+        Rendered grade book page.
+
     """
     course_key = CourseKey.from_string(course_id)
     course = get_course_with_access(request.user, 'staff', course_key, depth=None)
-    student_info, page = get_grade_book_page(request, course, course_key)
+    student_info, page = get_grade_book(request, course, course_key)
 
     return render_to_response('courseware/gradebook.html', {
         'page': page,
