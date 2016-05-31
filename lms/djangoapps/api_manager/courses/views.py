@@ -39,7 +39,7 @@ from student.models import CourseEnrollment, CourseEnrollmentAllowed
 from student.roles import CourseRole, CourseAccessRole, CourseInstructorRole, CourseStaffRole, CourseObserverRole, CourseAssistantRole, UserBasedRole, get_aggregate_exclusion_user_ids
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.search import path_to_location
-from openedx.core.djangoapps.content.course_metadata.models import CourseAggregatedMetaData
+from course_metadata.models import CourseAggregatedMetaData
 
 from api_manager.courseware_access import get_course, get_course_child, get_course_key, \
     course_exists, get_modulestore, get_course_descriptor
