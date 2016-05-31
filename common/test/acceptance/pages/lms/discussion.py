@@ -38,12 +38,22 @@ class DiscussionThreadPage(PageObject, DiscussionPageMixin):
         text_list = self._find_within(selector).text
         return text_list[0] if text_list else None
 
-    def _is_element_visible(self, selector):
+    def is_element_visible(self, selector):
+        """
+        Returns true if the element matching the specified selector is visible.
+
+        Args:
+            selector (str): The CSS selector that matches the desired element.
+
+        Returns:
+            bool: True if the element is visible.
+
+        """
         query = self._find_within(selector)
         return query.present and query.visible
 
     @contextmanager
-    def _secondary_action_menu_open(self, ancestor_selector):
+    def secondary_action_menu_open(self, ancestor_selector):
         """
         Given the selector for an ancestor of a secondary menu, return a context
         manager that will open and close the menu
@@ -51,14 +61,14 @@ class DiscussionThreadPage(PageObject, DiscussionPageMixin):
         self.wait_for_ajax()
         self._find_within(ancestor_selector + " .action-more").click()
         EmptyPromise(
-            lambda: self._is_element_visible(ancestor_selector + " .actions-dropdown"),
+            lambda: self.is_element_visible(ancestor_selector + " .actions-dropdown"),
             "Secondary action menu opened"
         ).fulfill()
         yield
-        if self._is_element_visible(ancestor_selector + " .actions-dropdown"):
+        if self.is_element_visible(ancestor_selector + " .actions-dropdown"):
             self._find_within(ancestor_selector + " .action-more").click()
             EmptyPromise(
-                lambda: not self._is_element_visible(ancestor_selector + " .actions-dropdown"),
+                lambda: not self.is_element_visible(ancestor_selector + " .actions-dropdown"),
                 "Secondary action menu closed"
             ).fulfill()
 
@@ -96,7 +106,7 @@ class DiscussionThreadPage(PageObject, DiscussionPageMixin):
 
     def has_add_response_button(self):
         """Returns true if the add response button is visible, false otherwise"""
-        return self._is_element_visible(".add-response-btn")
+        return self.is_element_visible(".add-response-btn")
 
     def click_add_response_button(self):
         """
@@ -112,11 +122,11 @@ class DiscussionThreadPage(PageObject, DiscussionPageMixin):
     @wait_for_js
     def is_response_editor_visible(self, response_id):
         """Returns true if the response editor is present, false otherwise"""
-        return self._is_element_visible(".response_{} .edit-post-body".format(response_id))
+        return self.is_element_visible(".response_{} .edit-post-body".format(response_id))
 
     @wait_for_js
     def is_discussion_body_visible(self):
-        return self._is_element_visible(".post-body")
+        return self.is_element_visible(".post-body")
 
     def verify_mathjax_preview_available(self):
         """ Checks that MathJax Preview css class is present """
@@ -128,26 +138,26 @@ class DiscussionThreadPage(PageObject, DiscussionPageMixin):
     def verify_mathjax_rendered(self):
         """ Checks that MathJax css class is present """
         self.wait_for(
-            lambda: self._is_element_visible(".MathJax_SVG"),
+            lambda: self.is_element_visible(".MathJax_SVG"),
             description="MathJax Preview is rendered"
         )
 
     def is_response_visible(self, comment_id):
         """Returns true if the response is viewable onscreen"""
         self.wait_for_ajax()
-        return self._is_element_visible(".response_{} .response-body".format(comment_id))
+        return self.is_element_visible(".response_{} .response-body".format(comment_id))
 
     def is_response_editable(self, response_id):
         """Returns true if the edit response button is present, false otherwise"""
-        with self._secondary_action_menu_open(".response_{} .discussion-response".format(response_id)):
-            return self._is_element_visible(".response_{} .discussion-response .action-edit".format(response_id))
+        with self.secondary_action_menu_open(".response_{} .discussion-response".format(response_id)):
+            return self.is_element_visible(".response_{} .discussion-response .action-edit".format(response_id))
 
     def get_response_body(self, response_id):
         return self._get_element_text(".response_{} .response-body".format(response_id))
 
     def start_response_edit(self, response_id):
         """Click the edit button for the response, loading the editing view"""
-        with self._secondary_action_menu_open(".response_{} .discussion-response".format(response_id)):
+        with self.secondary_action_menu_open(".response_{} .discussion-response".format(response_id)):
             self._find_within(".response_{} .discussion-response .action-edit".format(response_id)).first.click()
             EmptyPromise(
                 lambda: self.is_response_editor_visible(response_id),
@@ -172,10 +182,10 @@ class DiscussionThreadPage(PageObject, DiscussionPageMixin):
         ).fulfill()
 
     def is_response_reported(self, response_id):
-        return self._is_element_visible(".response_{} .discussion-response .post-label-reported".format(response_id))
+        return self.is_element_visible(".response_{} .discussion-response .post-label-reported".format(response_id))
 
     def report_response(self, response_id):
-        with self._secondary_action_menu_open(".response_{} .discussion-response".format(response_id)):
+        with self.secondary_action_menu_open(".response_{} .discussion-response".format(response_id)):
             self._find_within(".response_{} .discussion-response .action-report".format(response_id)).first.click()
             self.wait_for_ajax()
             EmptyPromise(
@@ -253,35 +263,35 @@ class DiscussionThreadPage(PageObject, DiscussionPageMixin):
 
     def is_show_comments_visible(self, response_id):
         """Returns true if the "show comments" link is visible for a response"""
-        return self._is_element_visible(".response_{} .action-show-comments".format(response_id))
+        return self.is_element_visible(".response_{} .action-show-comments".format(response_id))
 
     def show_comments(self, response_id):
         """Click the "show comments" link for a response"""
         self._find_within(".response_{} .action-show-comments".format(response_id)).first.click()
         EmptyPromise(
-            lambda: self._is_element_visible(".response_{} .comments".format(response_id)),
+            lambda: self.is_element_visible(".response_{} .comments".format(response_id)),
             "Comments shown"
         ).fulfill()
 
     def is_add_comment_visible(self, response_id):
         """Returns true if the "add comment" form is visible for a response"""
-        return self._is_element_visible("#wmd-input-comment-body-{}".format(response_id))
+        return self.is_element_visible("#wmd-input-comment-body-{}".format(response_id))
 
     def is_comment_visible(self, comment_id):
         """Returns true if the comment is viewable onscreen"""
-        return self._is_element_visible("#comment_{} .response-body".format(comment_id))
+        return self.is_element_visible("#comment_{} .response-body".format(comment_id))
 
     def get_comment_body(self, comment_id):
         return self._get_element_text("#comment_{} .response-body".format(comment_id))
 
     def is_comment_deletable(self, comment_id):
         """Returns true if the delete comment button is present, false otherwise"""
-        with self._secondary_action_menu_open("#comment_{}".format(comment_id)):
-            return self._is_element_visible("#comment_{} .action-delete".format(comment_id))
+        with self.secondary_action_menu_open("#comment_{}".format(comment_id)):
+            return self.is_element_visible("#comment_{} .action-delete".format(comment_id))
 
     def delete_comment(self, comment_id):
         with self.handle_alert():
-            with self._secondary_action_menu_open("#comment_{}".format(comment_id)):
+            with self.secondary_action_menu_open("#comment_{}".format(comment_id)):
                 self._find_within("#comment_{} .action-delete".format(comment_id)).first.click()
         EmptyPromise(
             lambda: not self.is_comment_visible(comment_id),
@@ -290,12 +300,12 @@ class DiscussionThreadPage(PageObject, DiscussionPageMixin):
 
     def is_comment_editable(self, comment_id):
         """Returns true if the edit comment button is present, false otherwise"""
-        with self._secondary_action_menu_open("#comment_{}".format(comment_id)):
-            return self._is_element_visible("#comment_{} .action-edit".format(comment_id))
+        with self.secondary_action_menu_open("#comment_{}".format(comment_id)):
+            return self.is_element_visible("#comment_{} .action-edit".format(comment_id))
 
     def is_comment_editor_visible(self, comment_id):
         """Returns true if the comment editor is present, false otherwise"""
-        return self._is_element_visible(".edit-comment-body[data-id='{}']".format(comment_id))
+        return self.is_element_visible(".edit-comment-body[data-id='{}']".format(comment_id))
 
     def _get_comment_editor_value(self, comment_id):
         return self._find_within("#wmd-input-edit-comment-body-{}".format(comment_id)).text[0]
@@ -303,7 +313,7 @@ class DiscussionThreadPage(PageObject, DiscussionPageMixin):
     def start_comment_edit(self, comment_id):
         """Click the edit button for the comment, loading the editing view"""
         old_body = self.get_comment_body(comment_id)
-        with self._secondary_action_menu_open("#comment_{}".format(comment_id)):
+        with self.secondary_action_menu_open("#comment_{}".format(comment_id)):
             self._find_within("#comment_{} .action-edit".format(comment_id)).first.click()
             EmptyPromise(
                 lambda: (
@@ -396,7 +406,7 @@ class DiscussionTabSingleThreadPage(CoursePage):
         return getattr(self.thread_page, name)
 
     def close_open_thread(self):
-        with self.thread_page._secondary_action_menu_open(".thread-main-wrapper"):
+        with self.thread_page.secondary_action_menu_open(".thread-main-wrapper"):
             self._find_within(".thread-main-wrapper .action-close").first.click()
 
     def is_focused_on_element(self, selector):
