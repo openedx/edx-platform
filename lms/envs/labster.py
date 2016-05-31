@@ -36,3 +36,8 @@ for endpoint, value in ENV_LABSTER_ENDPOINTS.items():
     LABSTER_ENDPOINTS[endpoint] = value
 
 LABSTER_DEFAULT_LTI_ID = LABSTER_SETTINGS.get('LABSTER_DEFAULT_LTI_ID', 'MC')
+
+# Sentry integration config
+RAVEN_CONFIG = AUTH_TOKENS.get('RAVEN_CONFIG', {})
+if RAVEN_CONFIG.get('dsn'):
+    INSTALLED_APPS += ('raven.contrib.django.raven_compat',)
