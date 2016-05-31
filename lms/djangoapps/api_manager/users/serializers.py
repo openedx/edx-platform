@@ -2,9 +2,9 @@
 
 from rest_framework import serializers
 
-from api_manager.models import APIUser, GroupProfile
+from api_manager.models import APIUser
 from organizations.serializers import BasicOrganizationSerializer
-from student.models import UserProfile
+from student.roles import CourseAccessRole
 
 
 class DynamicFieldsModelSerializer(serializers.ModelSerializer):
@@ -27,15 +27,6 @@ class DynamicFieldsModelSerializer(serializers.ModelSerializer):
                 self.fields.pop(field_name)
 
 
-class GroupProfileSerializer(serializers.ModelSerializer):
-    """ Serializer for GroupProfile model interactions """
-
-    class Meta(object):
-        """ Serializer/field specification """
-        model = GroupProfile
-        fields = ('id', 'name', )
-
-
 class UserSerializer(DynamicFieldsModelSerializer):
 
     """ Serializer for User model interactions """
@@ -47,7 +38,7 @@ class UserSerializer(DynamicFieldsModelSerializer):
     country = serializers.CharField(source='profile.country')
     full_name = serializers.CharField(source='profile.name')
     courses_enrolled = serializers.SerializerMethodField('get_courses_enrolled')
-    roles = serializers.SerializerMethodField('get_permission_group_type_roles')
+    roles = serializers.SerializerMethodField('get_user_roles')
 
     def get_courses_enrolled(self, user):
         """ Serialize user enrolled courses """
@@ -56,12 +47,14 @@ class UserSerializer(DynamicFieldsModelSerializer):
 
         return user.courseenrollment_set.count
 
-    def get_permission_group_type_roles(self, user):
-        """ Serialize GroupProfile for permission group type """
-        queryset = GroupProfile.objects.filter(group__user=user, group_type='permission')
-        serializer = GroupProfileSerializer(queryset, many=True)
+    def get_user_roles(self, user):
+        """ returns list of user roles """
+        queryset = CourseAccessRole.objects.filter(user=user)
+        if 'course_id' in self.context:
+            course_id = self.context['course_id']
+            queryset = queryset.filter(course_id=course_id)
 
-        return serializer.data
+        return queryset.values_list('role', flat=True).distinct()
 
     class Meta(object):
         """ Serializer/field specification """
