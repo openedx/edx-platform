@@ -662,11 +662,10 @@
 
                 $.each(languages, function(code, label) {
                     var li = $('<li data-lang-code="' + code + '" />'),
-                        link = $('<button class="control control-lang" aria-pressed="false">' + label + '</button>');
+                        link = $('<button class="control control-lang">' + label + '</button>');
 
                     if (currentLang === code) {
                         li.addClass('is-active');
-                        link.attr('aria-pressed', 'true');
                     }
 
                     li.append(link);
@@ -684,11 +683,7 @@
                         state.lang = langCode;
                         el  .addClass('is-active')
                             .siblings('li')
-                            .removeClass('is-active')
-                            .find('.control-lang')
-                            .attr('aria-pressed', 'false');
-                            
-                        $(e.currentTarget).attr('aria-pressed', 'true');
+                            .removeClass('is-active');
 
                         state.el.trigger('language_menu:change', [langCode]);
                         self.fetchCaption();
@@ -698,7 +693,6 @@
                         
                         // update the transcript lang attribute
                         self.subtitlesMenuEl.attr('lang', langCode);
-                        self.closeLanguageMenu(e);
                     }
                 });
             },
@@ -721,7 +715,7 @@
                             'data-index': index,
                             'data-start': start[index],
                             'tabindex': 0
-                        }).text(text);
+                        }).html(text);
 
                         return liEl[0];
                     };

@@ -203,18 +203,16 @@
         describe('onSpeedChange', function () {
             beforeEach(function () {
                 state = jasmine.initializePlayer();
-                $('li[data-speed="1.0"]').addClass('is-active').attr('aria-pressed', 'true');
+                $('li[data-speed="1.0"]').addClass('is-active');
                 state.videoSpeedControl.setSpeed(0.75);
             });
 
             it('set the new speed as active', function () {
-                expect($('li[data-speed="1.0"]')).not.toHaveClass('is-active');
-                expect($('li[data-speed="1.0"] .speed-option').attr('aria-pressed')).not.toEqual('true');
-
-                expect($('li[data-speed="0.75"]')).toHaveClass('is-active');
-                expect($('li[data-speed="0.75"] .speed-option').attr('aria-pressed')).toEqual('true');
-
-                expect($('.speeds .speed-button .value')).toHaveHtml('0.75x');
+                expect($('.video-speeds li[data-speed="1.0"]'))
+                    .not.toHaveClass('is-active');
+                expect($('.video-speeds li[data-speed="0.75"]'))
+                    .toHaveClass('is-active');
+                expect($('.speeds .value')).toHaveHtml('0.75x');
             });
         });
 
