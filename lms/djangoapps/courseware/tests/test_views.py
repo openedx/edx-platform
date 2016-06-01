@@ -450,7 +450,7 @@ class ViewsTestCase(ModuleStoreTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn(in_cart_span, response.content)
 
-    def assert_enrollment_link_present(self, is_anonymous, _id=False):
+    def assert_enrollment_link_present(self, is_anonymous):
         """
         Prepare ecommerce checkout data and assert if the ecommerce link is contained in the response.
 
@@ -474,17 +474,13 @@ class ViewsTestCase(ModuleStoreTestCase):
         # Set up the edxmako middleware for this request to create the RequestContext
         mako_middleware_process_request(request)
 
-        # Construct the link for each of the four possibilities:
-        #      (1) shopping cart is disabled and the user is not logged in
-        #      (2) shopping cart is disabled and the user is logged in
-        #      (3) shopping cart is enabled and the user is not logged in
-        #      (4) shopping cart is enabled and the user is logged in
-        href = '<a href="{}?{}" class="add-to-cart"{}'.format(
-            checkout_page,
-            'sku=TEST123',
-            ' id="">' if _id else ">"
-        )
+        # Generate the course about page content
         response = views.course_about(request, unicode(course.id))
+
+        # Construct the link according the following scenarios and verify its presence in the response:
+        #      (1) shopping cart is enabled and the user is not logged in
+        #      (2) shopping cart is enabled and the user is logged in
+        href = '<a href="{uri_stem}?sku={sku}" class="add-to-cart">'.format(uri_stem=checkout_page, sku=sku)
         self.assertEqual(response.status_code, 200)
         self.assertIn(href, response.content)
 
@@ -500,8 +496,13 @@ class ViewsTestCase(ModuleStoreTestCase):
     @unittest.skipUnless(settings.FEATURES.get('ENABLE_SHOPPING_CART'), 'Shopping Cart not enabled in settings')
     @patch.dict(settings.FEATURES, {'ENABLE_PAID_COURSE_REGISTRATION': True})
     def test_ecommerce_checkout_shopping_cart_enabled(self, is_anonymous):
+        """
+        Two scenarios are being validated here -- authenticated/known user and unauthenticated/anonymous user
+        For a known user we expect the checkout link to point to Otto in a scenario where the CommerceConfiguration
+        is active and the course mode is PROFESSIONAL.
+        """
         if not is_anonymous:
-            self.assert_enrollment_link_present(is_anonymous=is_anonymous, _id=True)
+            self.assert_enrollment_link_present(is_anonymous=is_anonymous)
         else:
             request = self.request_factory.get("foo")
             self.assertEqual(EcommerceService().is_enabled(AnonymousUser()), False)
@@ -1367,7 +1368,7 @@ class ProgressPageTests(ModuleStoreTestCase):
         self.assertContains(resp, u"Download Your Certificate")
 
     @ddt.data(
-        *itertools.product(((41, 4, True), (41, 4, False)), (True, False))
+        *itertools.product(((42, 4, True), (42, 4, False)), (True, False))
     )
     @ddt.unpack
     def test_query_counts(self, (sql_calls, mongo_calls, self_paced), self_paced_enabled):
@@ -1382,22 +1383,32 @@ class ProgressPageTests(ModuleStoreTestCase):
         'grade': 'Pass', 'percent': 0.75, 'section_breakdown': [], 'grade_breakdown': []
     }))
     @ddt.data(
-        (CourseMode.AUDIT, False),
-        (CourseMode.HONOR, True),
-        (CourseMode.VERIFIED, True),
-        (CourseMode.PROFESSIONAL, True),
-        (CourseMode.NO_ID_PROFESSIONAL_MODE, True),
-        (CourseMode.CREDIT_MODE, True),
+        *itertools.product(
+            (
+                CourseMode.AUDIT,
+                CourseMode.HONOR,
+                CourseMode.VERIFIED,
+                CourseMode.PROFESSIONAL,
+                CourseMode.NO_ID_PROFESSIONAL_MODE,
+                CourseMode.CREDIT_MODE
+            ),
+            (True, False)
+        )
     )
     @ddt.unpack
-    def test_show_certificate_request_button(self, course_mode, show_button):
+    def test_show_certificate_request_button(self, course_mode, user_verified):
         """Verify that the Request Certificate is not displayed in audit mode."""
         CertificateGenerationConfiguration(enabled=True).save()
         certs_api.set_cert_generation_enabled(self.course.id, True)
         CourseEnrollment.enroll(self.user, self.course.id, mode=course_mode)
-
-        resp = views.progress(self.request, course_id=unicode(self.course.id))
-        self.assertEqual(show_button, 'Request Certificate' in resp.content)
+        with patch(
+            'lms.djangoapps.verify_student.models.SoftwareSecurePhotoVerification.user_is_verified'
+        ) as user_verify:
+            user_verify.return_value = user_verified
+            resp = views.progress(self.request, course_id=unicode(self.course.id))
+            self.assertEqual(
+                course_mode is not CourseMode.AUDIT and user_verified,
+                'Request Certificate' in resp.content)
 
 
 @attr('shard_1')

@@ -215,7 +215,6 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
         }
     });
 
-
     AbstractEditor = BaseView.extend({
         tagName: 'section',
         templateName: null,
@@ -328,6 +327,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             };
         }
     });
+
     TimedExaminationPreferenceEditor = AbstractEditor.extend({
         templateName: 'timed-examination-preference-editor',
         className: 'edit-settings-timed-examination',
@@ -496,6 +496,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             };
         }
     });
+
     AccessEditor = AbstractEditor.extend({
         templateName: 'access-editor',
         className: 'edit-settings-access',
@@ -548,13 +549,14 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             };
         }
     });
+    
     GradingEditor = AbstractEditor.extend({
         templateName: 'grading-editor',
         className: 'edit-settings-grading',
 
         afterRender: function () {
             AbstractEditor.prototype.afterRender.call(this);
-            this.setValue(this.model.get('format'));
+            this.setValue(this.model.get('format') || 'notgraded');
         },
 
         setValue: function (value) {

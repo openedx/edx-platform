@@ -8,7 +8,8 @@
         paths: {
             'gettext': 'xmodule_js/common_static/js/test/i18n',
             'codemirror': 'xmodule_js/common_static/js/vendor/CodeMirror/codemirror',
-            'jquery': 'xmodule_js/common_static/js/vendor/jquery.min',
+            'jquery': 'xmodule_js/common_static/common/js/vendor/jquery',
+            'jquery-migrate': 'xmodule_js/common_static/common/js/vendor/jquery-migrate',
             'jquery.ui': 'xmodule_js/common_static/js/vendor/jquery-ui.min',
             'jquery.eventDrag': 'xmodule_js/common_static/js/vendor/jquery.event.drag-2.2',
             'jquery.flot': 'xmodule_js/common_static/js/vendor/flot/jquery.flot.min',
@@ -18,7 +19,7 @@
             'jquery.ajaxQueue': 'xmodule_js/common_static/js/vendor/jquery.ajaxQueue',
             'jquery.ajax-retry': 'js/vendor/jquery.ajax-retry',
             'jquery.smoothScroll': 'xmodule_js/common_static/js/vendor/jquery.smooth-scroll.min',
-            'jquery.scrollTo': 'xmodule_js/common_static/js/vendor/jquery.scrollTo-1.4.2-min',
+            'jquery.scrollTo': 'common/js/vendor/jquery.scrollTo',
             'jquery.timepicker': 'xmodule_js/common_static/js/vendor/timepicker/jquery.timepicker',
             'jquery.cookie': 'xmodule_js/common_static/js/vendor/jquery.cookie',
             'jquery.qtip': 'xmodule_js/common_static/js/vendor/jquery.qtip.min',
@@ -92,7 +93,7 @@
 
             // Discussion classes loaded explicitly until they are converted to use RequireJS
             'DiscussionModuleView': 'xmodule_js/common_static/coffee/src/discussion/discussion_module_view',
-            
+
             'js/bookmarks/collections/bookmarks': 'js/bookmarks/collections/bookmarks',
             'js/bookmarks/models/bookmark': 'js/bookmarks/models/bookmark',
             'js/bookmarks/views/bookmarks_list_button': 'js/bookmarks/views/bookmarks_list_button',
@@ -119,6 +120,7 @@
             'date': {
                 exports: 'Date'
             },
+            "jquery-migrate": ['jquery'],
             'jquery.ui': {
                 deps: ['jquery'],
                 exports: 'jQuery.ui'
@@ -285,9 +287,28 @@
                 exports: 'AjaxPrefix',
                 deps: ['coffee/src/ajax_prefix']
             },
+            'coffee/src/instructor_dashboard/util': {
+                exports: 'coffee/src/instructor_dashboard/util',
+                deps: ['jquery', 'gettext'],
+                init: function() {
+                    // Set global variables that the util code is expecting to be defined
+                    require([
+                        'edx-ui-toolkit/js/utils/html-utils',
+                        'edx-ui-toolkit/js/utils/string-utils'
+                    ], function (HtmlUtils, StringUtils) {
+                        window.edx = edx || {};
+                        window.edx.HtmlUtils = HtmlUtils;
+                        window.edx.StringUtils = StringUtils;
+                    });
+                }
+            },
             'coffee/src/instructor_dashboard/student_admin': {
                 exports: 'coffee/src/instructor_dashboard/student_admin',
                 deps: ['jquery', 'underscore', 'coffee/src/instructor_dashboard/util', 'string_utils']
+            },
+            'coffee/src/instructor_dashboard/util': {
+                exports: 'coffee/src/instructor_dashboard/util',
+                deps: ['jquery', 'underscore', 'slick.core', 'slick.grid']
             },
             'js/instructor_dashboard/certificates': {
                 exports: 'js/instructor_dashboard/certificates',
@@ -491,6 +512,14 @@
             'annotator_1.2.9': {
                 exports: 'Annotator',
                 deps: ['jquery']
+            },
+            'slick.core': {
+                deps: ['jquery'],
+                exports: 'Slick'
+            },
+            'slick.grid': {
+                deps: ['jquery', 'jquery.eventDrag', 'slick.core'],
+                exports: 'Slick'
             },
             // Discussions
             'xmodule_js/common_static/coffee/src/discussion/utils': {
@@ -714,6 +743,8 @@
         'js/spec/learner_dashboard/collection_list_view_spec.js',
         'js/spec/learner_dashboard/program_card_view_spec.js',
         'js/spec/learner_dashboard/sidebar_view_spec.js',
+        'js/spec/learner_dashboard/program_details_header_spec.js',
+        'js/spec/learner_dashboard/course_card_view_spec.js',
         'js/spec/markdown_editor_spec.js',
         'js/spec/navigation_spec.js',
         'js/spec/search/search_spec.js',

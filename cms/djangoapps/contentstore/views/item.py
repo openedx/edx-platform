@@ -987,6 +987,7 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
         if xblock.category == 'course':
             xblock_info.update({
                 "enable_proctored_exams": xblock.enable_proctored_exams,
+                "create_zendesk_tickets": xblock.create_zendesk_tickets,
                 "enable_timed_exams": xblock.enable_timed_exams
             })
         elif xblock.category == 'sequential':

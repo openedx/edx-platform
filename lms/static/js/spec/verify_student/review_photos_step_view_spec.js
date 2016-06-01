@@ -42,7 +42,7 @@ define([
 
                 // Simulate the server response
                 if ( succeeds ) {
-                    AjaxHelpers.respondWithJson( requests, {} );
+                    AjaxHelpers.respondWithJson( requests, {url: '/arbitrary-url/'} );
                 } else {
                     AjaxHelpers.respondWithTextError( requests, 400, SERVER_ERROR_MSG );
                 }

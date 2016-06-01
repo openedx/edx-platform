@@ -263,7 +263,7 @@ class XQueueCertInterface(object):
         user_is_verified = SoftwareSecurePhotoVerification.user_is_verified(student)
         cert_mode = enrollment_mode
         is_eligible_for_certificate = is_whitelisted or CourseMode.is_eligible_for_certificate(enrollment_mode)
-
+        unverified = False
         # For credit mode generate verified certificate
         if cert_mode == CourseMode.CREDIT_MODE:
             cert_mode = CourseMode.VERIFIED
@@ -274,7 +274,10 @@ class XQueueCertInterface(object):
             template_pdf = "certificate-template-{id.org}-{id.course}-verified.pdf".format(id=course_id)
         elif mode_is_verified and not user_is_verified:
             template_pdf = "certificate-template-{id.org}-{id.course}.pdf".format(id=course_id)
-            cert_mode = GeneratedCertificate.MODES.honor
+            if CourseMode.mode_for_course(course_id, CourseMode.HONOR):
+                cert_mode = GeneratedCertificate.MODES.honor
+            else:
+                unverified = True
         else:
             # honor code and audit students
             template_pdf = "certificate-template-{id.org}-{id.course}.pdf".format(id=course_id)
@@ -385,6 +388,20 @@ class XQueueCertInterface(object):
                 student.id,
                 cert.status,
                 unicode(course_id)
+            )
+            return cert
+
+        if unverified:
+            cert.status = status.unverified
+            cert.save()
+            LOGGER.info(
+                (
+                    u"User %s has a verified enrollment in course %s "
+                    u"but is missing ID verification. "
+                    u"Certificate status has been set to unverified"
+                ),
+                student.id,
+                unicode(course_id),
             )
             return cert
 

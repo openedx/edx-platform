@@ -57,3 +57,9 @@ class AccountSettingsPage(FieldsMixin, PageObject):
         Wait for loading indicator to become visible.
         """
         EmptyPromise(self._is_loading_in_progress, "Loading is in progress.").fulfill()
+
+    def switch_account_settings_tabs(self, tab_id):
+        """
+        Switch between the different account settings tabs.
+        """
+        self.q(css='#{}'.format(tab_id)).click()

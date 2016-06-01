@@ -742,6 +742,15 @@ class CourseFields(object):
         scope=Scope.settings
     )
 
+    create_zendesk_tickets = Boolean(
+        display_name=_("Create Zendesk Tickets For Suspicious Proctored Exam Attempts"),
+        help=_(
+            "Enter true or false. If this value is true, a Zendesk ticket will be created for suspicious attempts."
+        ),
+        default=True,
+        scope=Scope.settings
+    )
+
     enable_timed_exams = Boolean(
         display_name=_("Enable Timed Exams"),
         help=_(

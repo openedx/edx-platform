@@ -228,13 +228,13 @@ class FieldsMixin(object):
             "Link field with link title \"{0}\" is visible.".format(expected_title)
         ).fulfill()
 
-    def click_on_link_in_link_field(self, field_id):
+    def click_on_link_in_link_field(self, field_id, field_type='a'):
         """
         Click the link in a link field.
         """
         self.wait_for_field(field_id)
 
-        query = self.q(css='.u-field-{} a'.format(field_id))
+        query = self.q(css='.u-field-{} {}'.format(field_id, field_type))
         if query.present:
             query.first.click()
 

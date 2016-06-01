@@ -56,7 +56,7 @@ class TestNewInstructorDashboardEmailViewMongoBacked(SharedModuleStoreTestCase):
         response = self.client.get(self.url)
         self.assertIn(self.email_link, response.content)
 
-        send_to_label = '<label for="id_to">Send to:</label>'
+        send_to_label = '<ul role="group" aria-label="Send to:">'
         self.assertTrue(send_to_label in response.content)
         self.assertEqual(response.status_code, 200)
 

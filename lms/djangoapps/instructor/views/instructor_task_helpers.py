@@ -57,7 +57,7 @@ def extract_email_features(email_task):
     email = CourseEmail.objects.get(id=task_input_information['email_id'])
     email_feature_dict = {
         'created': get_default_time_display(email.created),
-        'sent_to': task_input_information['to_option'],
+        'sent_to': [target.get_target_type_display() for target in email.targets.all()],
         'requester': str(email_task.requester),
     }
     features = ['subject', 'html_message', 'id']

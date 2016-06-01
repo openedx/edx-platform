@@ -1,0 +1,8 @@
+.header-img{
+  @include float(left);
+  margin-right:20px;
+}
+.course-card{
+  height: 250px;
+  margin-top:20px;
+}

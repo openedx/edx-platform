@@ -46,9 +46,14 @@ class EcommerceService(object):
 
     def is_enabled(self, user):
         """
-        Determines the availability of the Ecommerce service based on user activation and service configuration.
+        Determines the availability of the EcommerceService based on user activation and service configuration.
+        Note: If the user is anonymous we bypass the user activation gate and only look at the service config.
+
+        Returns:
+            Boolean
         """
-        return user.is_active and self.config.checkout_on_ecommerce_service
+        allow_user = user.is_active or user.is_anonymous()
+        return allow_user and self.config.checkout_on_ecommerce_service
 
     def payment_page_url(self):
         """ Return the URL for the checkout page.
