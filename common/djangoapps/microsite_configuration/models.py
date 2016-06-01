@@ -19,7 +19,7 @@ import sass
 from jsonfield.fields import JSONField
 from model_utils.models import TimeStampedModel
 from simple_history.models import HistoricalRecords
-from .utils import get_initial_sass_variables
+from .utils import get_initial_sass_variables, get_initial_page_contents
 
 
 class Microsite(models.Model):
@@ -39,6 +39,7 @@ class Microsite(models.Model):
     key = models.CharField(max_length=63, db_index=True, unique=True)
     values = JSONField(null=False, blank=True, load_kwargs={'object_pairs_hook': collections.OrderedDict})
     sass_variables = models.TextField(blank=True, default=get_initial_sass_variables)
+    page_elements = JSONField(blank=True, default=get_initial_page_contents)
 
     def __unicode__(self):
         return self.key
