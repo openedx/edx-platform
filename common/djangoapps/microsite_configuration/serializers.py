@@ -15,10 +15,11 @@ class MicrositeSerializer(serializers.ModelSerializer):
     site = serializers.StringRelatedField()
     values = serializers.DictField()
     sass_variables = SASSDictField()
+    page_elements = serializers.DictField()
 
     class Meta:
         model = Microsite
-        fields = ('id', 'key', 'site', 'values', 'sass_variables')
+        fields = ('id', 'key', 'site', 'values', 'sass_variables', 'page_elements')
 
 
 class MicrositeListSerializer(MicrositeSerializer):
