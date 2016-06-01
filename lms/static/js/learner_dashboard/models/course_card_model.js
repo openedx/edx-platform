@@ -27,10 +27,10 @@
                     start_date: runMode.start_date,
                     end_date: runMode.end_date,
                     is_enrolled: runMode.is_enrolled,
+                    is_enrollment_open: runMode.is_enrollment_open,
                     course_url: runMode.course_url || '',
                     course_image_url: runMode.course_image_url || '',
-                    mode_slug: runMode.mode_slug,
-                    is_enrollment_open: runMode.is_enrollment_open
+                    mode_slug: runMode.mode_slug
                 });
             }
         });

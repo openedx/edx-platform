@@ -1,6 +1,3 @@
-$course-enroll-green: rgba(15, 124, 57, 1) !default;
-$course-enroll-green-light: rgba(13, 181, 83, 1) !default;
-
 .course-card{
   @include span(10);
   margin-left: $baseline*2 + px;
