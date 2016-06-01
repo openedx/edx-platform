@@ -12,9 +12,6 @@
     @include float(right);
     width: 100%;
     @include susy-media($bp-screen-sm) { width: calc(100% - 191px); }
-    @include susy-media($bp-screen-md) { width: calc(100% - 191px); }
-    @include susy-media($bp-screen-lg) { width: calc(100% - 191px); }
-    @include susy-media($bp-screen-xl) { width: calc(100% - 191px); }
     padding-left: $baseline*1.5 + px;
     .course-title{
       font-size: font-size(x-large);
