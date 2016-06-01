@@ -9,13 +9,13 @@ from .serializers import MicrositeSerializer, MicrositeListSerializer
 
 class MicrositeViewSet(viewsets.ModelViewSet):
     queryset = Microsite.objects.all()
-    serializer_class = MicrositeListSerializer
-    detail_serializer_class = MicrositeSerializer
+    serializer_class = MicrositeSerializer
+    list_serializer_class = MicrositeListSerializer
 
     def get_serializer_class(self):
-        if self.action == 'retrieve':
-            if hasattr(self, 'detail_serializer_class'):
-                return self.detail_serializer_class
+        if self.action == 'list':
+            if hasattr(self, 'list_serializer_class'):
+                return self.list_serializer_class
 
         return super(MicrositeViewSet, self).get_serializer_class()
 
