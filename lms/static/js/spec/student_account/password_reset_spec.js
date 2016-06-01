@@ -142,6 +142,23 @@
                 // Expect that the error is hidden
                 expect(view.$errors).toHaveClass('hidden');
             });
+
+            it('escapes HTML returned by a server 500', function() {
+                var errorString = "<b>unexpected error</b><script>alert('escape me');</script>";
+                createPasswordResetView(this);
+                submitEmail(true);
+
+                // Simulate a non-JSON error from the LMS servers
+                AjaxHelpers.respondWithTextError(
+                    requests,
+                    500,
+                    errorString
+                );
+
+                // Expect that an error is displayed and escaped
+                expect(view.$errors).not.toHaveClass('hidden');
+                expect($(".message-copy", view.$errors).text()).toEqual("<li>" + errorString + "</li>");
+            });
         });
     });
 }).call(this, define || RequireJS.define);
