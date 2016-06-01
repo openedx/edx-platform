@@ -126,6 +126,7 @@ class DatabaseMicrositeBackend(BaseMicrositeBackend):
         config['subdomain'] = strip_port_from_host(subdomain)
         config['site_domain'] = strip_port_from_host(domain)
         config['microsite_config_key'] = microsite_object.key
+        config['page_elements'] = microsite_object.page_elements
 
         # we take the list of ORGs associated with this microsite from the database mapping
         # tables. NOTE, for now, we assume one ORG per microsite
