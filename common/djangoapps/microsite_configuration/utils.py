@@ -17,24 +17,26 @@ def get_initial_sass_variables():
         return f.read()
 
 
-def get_initial_page_contents():
-    return [
-        [
-            "hero-element",
-            "static-blocks/_hero-section-01.html",
-            {
-                "hero_title": "Welcome to this test site, buddy!", #leave value empty if you don't want it displayed.
-                "hero_subtitle": "Bringing you mobile optimized courses about Open edX. We're Appsembler. Awesome!", # leave value empty if you don't want it displayed.
-                "cta_link": "http://www.appsembler.com",  ## leave value empty if you don't want a CTA button displayed.
-                "cta_link_text": "Awesome link!",  ## leave value empty if you don't want a CTA button displayed.
-                "popup_video_url": "MZrctLnsF4M", ## YouTube video ID - leave value empty if you don't want a video button and modal displayed.
-                "popup_video_text": "Watch our video", ## leave value empty if you don't want a video button and modal displayed.
-                "popup_video_id": "HeroVideo", ## leave value empty if you don't want a video button and modal displayed.
-                "bg_image_url": "/static/themes/amc-beta/images/hero-image.jpg", ## leave empty if you want just a full color background
-                "extra_css": ""  ## add custom css to be added inline to the wrapper element
-            }
-       ]
-    ]
+def get_initial_page_elements():
+    return {
+        'index': [
+            [
+                "hero-element",
+                "static-blocks/_hero-section-01.html",
+                {
+                    "hero_title": "Welcome to this test site, buddy!", #leave value empty if you don't want it displayed.
+                    "hero_subtitle": "Bringing you mobile optimized courses about Open edX. We're Appsembler. Awesome!", # leave value empty if you don't want it displayed.
+                    "cta_link": "http://www.appsembler.com",  ## leave value empty if you don't want a CTA button displayed.
+                    "cta_link_text": "Awesome link!",  ## leave value empty if you don't want a CTA button displayed.
+                    "popup_video_url": "MZrctLnsF4M", ## YouTube video ID - leave value empty if you don't want a video button and modal displayed.
+                    "popup_video_text": "Watch our video", ## leave value empty if you don't want a video button and modal displayed.
+                    "popup_video_id": "HeroVideo", ## leave value empty if you don't want a video button and modal displayed.
+                    "bg_image_url": "/static/themes/amc-beta/images/hero-image.jpg", ## leave empty if you want just a full color background
+                    "extra_css": ""  ## add custom css to be added inline to the wrapper element
+                }
+           ]
+        ]
+    }
 
 
 def sass_to_dict(sass_input):
