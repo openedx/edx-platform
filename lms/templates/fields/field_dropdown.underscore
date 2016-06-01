@@ -11,7 +11,7 @@
 <% } %>
 
 <% if (iconName) { %>
-    <i class="u-field-icon icon fa <%- iconName %> fa-fw" aria-hidden="true"></i>
+    <span class="u-field-icon icon fa <%- iconName %> fa-fw" aria-hidden="true"></span>
 <% } %>
 
 <span class="u-field-value">

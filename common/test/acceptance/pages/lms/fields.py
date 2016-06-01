@@ -104,7 +104,7 @@ class FieldsMixin(object):
         """
         self.wait_for_field(field_id)
 
-        query = self.q(css='.u-field-{} .u-field-message i'.format(field_id))
+        query = self.q(css='.u-field-{} .u-field-message .fa'.format(field_id))
         return [
             class_name for class_name
             in query.attrs('class')[0].split(' ')

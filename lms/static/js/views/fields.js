@@ -30,12 +30,12 @@
             tagName: 'div',
 
             indicators: {
-                'canEdit': '<i class="icon fa fa-pencil message-can-edit" aria-hidden="true"></i><span class="sr">' + gettext("Editable") + '</span>',
-                'error': '<i class="fa fa-exclamation-triangle message-error" aria-hidden="true"></i><span class="sr">' + gettext("Error") + '</span>',
-                'validationError': '<i class="fa fa-exclamation-triangle message-validation-error" aria-hidden="true"></i><span class="sr">' + gettext("Validation Error") + '</span>',
-                'inProgress': '<i class="fa fa-spinner fa-pulse message-in-progress" aria-hidden="true"></i><span class="sr">' + gettext("In Progress") + '</span>',
-                'success': '<i class="fa fa-check message-success" aria-hidden="true"></i><span class="sr">' + gettext("Success") + '</span>',
-                'plus': '<i class="fa fa-plus placeholder" aria-hidden="true"></i><span class="sr">' + gettext("Placeholder")+ '</span>'
+                'canEdit': '<span class="icon fa fa-pencil message-can-edit" aria-hidden="true"></span><span class="sr">' + gettext("Editable") + '</span>', // jshint ignore:line
+                'error': '<span class="fa fa-exclamation-triangle message-error" aria-hidden="true"></span><span class="sr">' + gettext("Error") + '</span>', // jshint ignore:line
+                'validationError': '<span class="fa fa-exclamation-triangle message-validation-error" aria-hidden="true"></span><span class="sr">' + gettext("Validation Error") + '</span>', // jshint ignore:line
+                'inProgress': '<span class="fa fa-spinner fa-pulse message-in-progress" aria-hidden="true"></span><span class="sr">' + gettext("In Progress") + '</span>', // jshint ignore:line
+                'success': '<span class="fa fa-check message-success" aria-hidden="true"></span><span class="sr">' + gettext("Success") + '</span>', // jshint ignore:line
+                'plus': '<span class="fa fa-plus placeholder" aria-hidden="true"></span><span class="sr">' + gettext("Placeholder")+ '</span>' // jshint ignore:line
             },
 
             messages: {

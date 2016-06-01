@@ -83,7 +83,7 @@ define(['backbone',
             var breadcrumbTrail = function (path, unitDisplayName) {
                 return _.pluck(path, 'display_name').
                     concat([unitDisplayName]).
-                    join(' <i class="icon fa fa-caret-right" aria-hidden="true"></i><span class="sr">-</span> ');
+                    join(' <span class="icon fa fa-caret-right" aria-hidden="true"></span><span class="sr">-</span> ');
             };
 
             var verifyBookmarkedData = function (view, expectedData) {

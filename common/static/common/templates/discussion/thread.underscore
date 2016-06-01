@@ -11,7 +11,7 @@
             <% if (!readOnly) { %>
                 <div class="add-response">
                     <button class="button add-response-btn">
-                        <i class="icon fa fa-reply"></i>
+                        <span class="icon fa fa-reply" aria-hidden="true"></span>
                         <span class="add-response-btn-text"><%- gettext("Add a Response") %></span>
                     </button>
                 </div>
