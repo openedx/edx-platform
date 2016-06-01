@@ -95,15 +95,14 @@ function (Iterator) {
          * Creates any necessary DOM elements, attach them, and set their,
          * initial configuration.
          * @param {array} speeds List of speeds available for the player.
-         * @param {string} currentSpeed The current speed set to the player.
          */
-        render: function (speeds, currentSpeed) {
+        render: function (speeds) {
             var speedsContainer = this.speedsContainer,
                 reversedSpeeds = speeds.concat().reverse(),
                 speedsList = $.map(reversedSpeeds, function (speed) {
                     return [
                         '<li data-speed="', speed, '">',
-                            '<button class="control speed-option" tabindex="-1" aria-pressed="false">',
+                            '<button class="control speed-option" tabindex="-1">',
                                 speed, 'x',
                             '</button>',
                         '</li>'
@@ -113,7 +112,6 @@ function (Iterator) {
             speedsContainer.html(speedsList.join(''));
             this.speedLinks = new Iterator(speedsContainer.find('.speed-option'));
             this.state.el.find('.secondary-controls').prepend(this.el);
-            this.setActiveSpeed(currentSpeed);
         },
 
         /**
@@ -218,38 +216,17 @@ function (Iterator) {
             if (speed !== this.currentSpeed || forceUpdate) {
                 this.speedsContainer
                     .find('li')
-                    .siblings("li[data-speed='" + speed + "']");
+                    .removeClass('is-active')
+                    .siblings("li[data-speed='" + speed + "']")
+                    .addClass('is-active');
 
-                this.speedButton.find('.value').text(speed + 'x');
+                this.speedButton.find('.value').html(speed + 'x');
                 this.currentSpeed = speed;
 
                 if (!silent) {
                     this.el.trigger('speedchange', [speed, this.state.speed]);
                 }
             }
-
-            this.resetActiveSpeed();
-            this.setActiveSpeed(speed);
-        },
-        
-        resetActiveSpeed: function() {
-            var speedOptions = this.speedsContainer.find('li');
-            
-            $(speedOptions).each(function(index, el) {
-                $(el).removeClass('is-active')
-                    .find('.speed-option')
-                    .attr('aria-pressed', 'false');
-            });
-        },
-        
-        setActiveSpeed: function(speed) {
-            var speedOption = this.speedsContainer.find('li[data-speed="' + speed + '"]');
-            
-            speedOption.addClass('is-active')
-                .find('.speed-option')
-                .attr('aria-pressed', 'true');
-
-            this.speedButton.attr('title', gettext('Video speed: ') + speed + 'x');
         },
 
         /**
@@ -267,13 +244,10 @@ function (Iterator) {
          * @param {jquery Event} event
          */
         clickLinkHandler: function (event) {
-            var el = $(event.currentTarget).parent(),
-                speed = $(el).data('speed');
-                
-            this.resetActiveSpeed();
-            this.setActiveSpeed(speed);
+            var speed = $(event.currentTarget).parent().data('speed');
+
+            this.closeMenu();
             this.state.videoCommands.execute('speed', speed);
-            this.closeMenu(true);
 
             return false;
         },

@@ -450,7 +450,7 @@ class ViewsTestCase(ModuleStoreTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn(in_cart_span, response.content)
 
-    def assert_enrollment_link_present(self, is_anonymous, _id=False):
+    def assert_enrollment_link_present(self, is_anonymous):
         """
         Prepare ecommerce checkout data and assert if the ecommerce link is contained in the response.
 
@@ -474,17 +474,13 @@ class ViewsTestCase(ModuleStoreTestCase):
         # Set up the edxmako middleware for this request to create the RequestContext
         mako_middleware_process_request(request)
 
-        # Construct the link for each of the four possibilities:
-        #      (1) shopping cart is disabled and the user is not logged in
-        #      (2) shopping cart is disabled and the user is logged in
-        #      (3) shopping cart is enabled and the user is not logged in
-        #      (4) shopping cart is enabled and the user is logged in
-        href = '<a href="{}?{}" class="add-to-cart"{}'.format(
-            checkout_page,
-            'sku=TEST123',
-            ' id="">' if _id else ">"
-        )
+        # Generate the course about page content
         response = views.course_about(request, unicode(course.id))
+
+        # Construct the link according the following scenarios and verify its presence in the response:
+        #      (1) shopping cart is enabled and the user is not logged in
+        #      (2) shopping cart is enabled and the user is logged in
+        href = '<a href="{uri_stem}?sku={sku}" class="add-to-cart">'.format(uri_stem=checkout_page, sku=sku)
         self.assertEqual(response.status_code, 200)
         self.assertIn(href, response.content)
 
@@ -500,8 +496,13 @@ class ViewsTestCase(ModuleStoreTestCase):
     @unittest.skipUnless(settings.FEATURES.get('ENABLE_SHOPPING_CART'), 'Shopping Cart not enabled in settings')
     @patch.dict(settings.FEATURES, {'ENABLE_PAID_COURSE_REGISTRATION': True})
     def test_ecommerce_checkout_shopping_cart_enabled(self, is_anonymous):
+        """
+        Two scenarios are being validated here -- authenticated/known user and unauthenticated/anonymous user
+        For a known user we expect the checkout link to point to Otto in a scenario where the CommerceConfiguration
+        is active and the course mode is PROFESSIONAL.
+        """
         if not is_anonymous:
-            self.assert_enrollment_link_present(is_anonymous=is_anonymous, _id=True)
+            self.assert_enrollment_link_present(is_anonymous=is_anonymous)
         else:
             request = self.request_factory.get("foo")
             self.assertEqual(EcommerceService().is_enabled(AnonymousUser()), False)
