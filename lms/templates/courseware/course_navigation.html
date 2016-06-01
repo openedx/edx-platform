@@ -106,7 +106,7 @@ include_special_exams = settings.FEATURES.get('ENABLE_SPECIAL_EXAMS', False) and
         "masqueradeUsername" : masquerade_user_name if masquerade_user_name is not UNDEFINED else None,
     }
     %>
-    <%static:require_module module_name="lms/js/preview/preview_factory" class_name="PreviewFactory">
+    <%static:require_module_async module_name="lms/js/preview/preview_factory" class_name="PreviewFactory">
         PreviewFactory(${preview_options | n, dump_js_escaped_json});
-    </%static:require_module>
+    </%static:require_module_async>
 % endif
