@@ -1,4 +1,4 @@
-<% if(is_enrolled){ %>
+<% if (is_enrolled){ %>
     <div class="enrollment-info"><%- gettext('enrolled') %></div>
     <a href="<%- course_url %>" class="btn-neutral btn view-course-link">
         <%- gettext('View Course') %>

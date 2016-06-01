@@ -19,7 +19,7 @@
       margin-bottom: $baseline/4 + px;
     }
     .course-text{
-      color: $gray-d1;
+      color: palette(grayscale, dark);
     }
   }
   .course-actions{
