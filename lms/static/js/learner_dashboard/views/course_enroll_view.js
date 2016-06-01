@@ -26,8 +26,8 @@
                 initialize: function(options) {
                     if (options.$el){
                         this.$el = options.$el;
+                        this.render();
                     }
-                    this.render();
                 },
 
                 render: function() {

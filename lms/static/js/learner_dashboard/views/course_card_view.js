@@ -34,8 +34,8 @@
                 },
 
                 postRender: function(){
-                    new CourseEnrollView({        /*jshint -W031 */
-                        $el: this.$('.enrollment-container'),
+                    this.enrollView = new CourseEnrollView({
+                        $el: this.$('.course-actions'),
                         model: this.model,
                         context: this.context
                     });

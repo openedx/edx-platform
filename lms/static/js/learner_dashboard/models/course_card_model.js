@@ -29,7 +29,8 @@
                     is_enrolled: runMode.is_enrolled,
                     course_url: runMode.course_url || '',
                     course_image_url: runMode.course_image_url || '',
-                    mode_slug: runMode.mode_slug
+                    mode_slug: runMode.mode_slug,
+                    is_enrollment_open: runMode.is_enrollment_open
                 });
             }
         });

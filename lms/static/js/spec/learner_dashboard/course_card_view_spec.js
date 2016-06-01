@@ -29,13 +29,13 @@ define([
                         mode_slug: 'verified',
                         run_key: '2T2016',
                         course_started: true,
-                        is_enrolled: 'enrolled',
+                        is_enrolled: true,
                         certificate_url: '',
                     }]
                 };
 
-            setupView = function(is_enrolled){
-                context.run_modes[0].is_enrolled = is_enrolled;
+            setupView = function(isEnrolled){
+                context.run_modes[0].is_enrolled = isEnrolled;
                 setFixtures('<div class="course-card card"></div>');
                 courseCardModel = new CourseCardModel(context);
                 view = new CourseCardView({
@@ -44,7 +44,7 @@ define([
             };
 
             beforeEach(function() {
-                setupView(null);
+                setupView(false);
             });
 
             afterEach(function() {
@@ -65,10 +65,6 @@ define([
                 expect(view.$('.course-details .course-text .course-key').html()).toEqual(context.key);
                 expect(view.$('.course-details .course-text .run-period').html())
                     .toEqual(context.run_modes[0].start_date + ' - ' + context.run_modes[0].end_date);
-                expect(view.$('.course-actions .enrollment-info').html().trim()).toEqual('enrolled');
-                expect(view.$('.course-actions .view-course-link').attr('href')).toEqual(
-                    context.run_modes[0].course_url);
-                expect(view.$('.course-actions .view-course-link').text().trim()).toEqual('View Course');
             });
 
             it('should render the course card based on the data not enrolled', function() {
