@@ -23,7 +23,7 @@ def get_edx_api_data(api_config, user, resource,
         resource (str): Name of the API resource being requested.
 
     Keyword Arguments:
-        api_client_name (str): API client name that will use for requesting data.
+        api (APIClient): API client that will use for requesting data.
         resource_id (int or str): Identifies a specific resource to be retrieved.
         querystring (dict): Optional query string parameters.
         cache_key (str): Where to cache retrieved data. The cache will be ignored if this is omitted
