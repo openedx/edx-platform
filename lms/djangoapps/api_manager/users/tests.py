@@ -339,31 +339,23 @@ class UsersApiTests(ModuleStoreTestCase):
     def test_user_list_get_roles(self):
         test_uri = self.users_base_uri
         # create a 3 new users
-        users = UserFactory.create_batch(3)
-        groups = GroupFactory.create_batch(3)
-
-        group_profile1 = GroupProfile.objects.create(group=groups[0], name='role1', group_type='permission')
-        group_profile2 = GroupProfile.objects.create(group=groups[1], name='role2', group_type='permission')
-        GroupProfile.objects.create(group=groups[2], name='role3', group_type='test')
-
-        users[0].groups.add(*groups)
-        users[1].groups.add(groups[0])
-        users[2].groups.add(groups[2])
+        users = UserFactory.create_batch(2)
+        for idx, user in enumerate(users):
+            if idx > 0:
+                allow_access(self.course, user, 'staff')
+            else:
+                allow_access(self.course, user, 'instructor')
+                allow_access(self.course, user, 'observer')
 
         # fetch users
         user_ids = ','.join([str(user.id) for user in users])
         response = self.do_get('{}?ids={}'.format(test_uri, user_ids))
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data['results']), 3)
+        self.assertEqual(len(response.data['results']), 2)
         self.assertEqual(len(response.data['results'][0]['roles']), 2)
-        self.assertEqual(response.data['results'][0]['roles'][0]['id'], group_profile1.id)
-        self.assertEqual(response.data['results'][0]['roles'][0]['name'], 'role1')
-        self.assertEqual(response.data['results'][0]['roles'][1]['id'], group_profile2.id)
-        self.assertEqual(response.data['results'][0]['roles'][1]['name'], 'role2')
+        self.assertEqual(response.data['results'][0]['roles'], ['instructor', 'observer'])
         self.assertEqual(len(response.data['results'][1]['roles']), 1)
-        self.assertEqual(response.data['results'][1]['roles'][0]['id'], group_profile1.id)
-        self.assertEqual(response.data['results'][1]['roles'][0]['name'], 'role1')
-        self.assertEqual(len(response.data['results'][2]['roles']), 0)
+        self.assertEqual(response.data['results'][1]['roles'], ['staff'])
 
     def test_user_list_get_with_has_organization_filter(self):
         test_uri = self.users_base_uri
