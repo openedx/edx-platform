@@ -34,6 +34,7 @@ class AccessTokenMixin(object):
             'aud': audience,
             'iss': issuer,
             'preferred_username': user.username,
+            'scopes': scopes,
         }
 
         if 'email' in scopes:

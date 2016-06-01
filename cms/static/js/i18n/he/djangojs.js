@@ -20,11 +20,11 @@
 
   django.catalog = {
     "%d month": [
-      "%d \u05d7\u05d5\u05d3\u05e9", 
+      "\u05d7\u05d5\u05d3\u05e9 %d", 
       "%d \u05d7\u05d5\u05d3\u05e9\u05d9\u05dd"
     ], 
     "%d year": [
-      "%d \u05e9\u05e0\u05d4", 
+      "\u05e9\u05e0\u05d4 %d", 
       "%d \u05e9\u05e0\u05d9\u05dd"
     ], 
     "Answer:": "\u05ea\u05e9\u05d5\u05d1\u05d4:", 

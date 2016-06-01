@@ -123,12 +123,11 @@ from eventtracking import tracker
 # Note that this lives in LMS, so this dependency should be refactored.
 from notification_prefs.views import enable_notifications
 
-# Note that this lives in openedx, so this dependency should be refactored.
-from openedx.core.djangoapps.credentials.utils import get_user_program_credentials
 from openedx.core.djangoapps.credit.email_utils import get_credit_provider_display_names, make_providers_strings
 from openedx.core.djangoapps.user_api.preferences import api as preferences_api
 from openedx.core.djangoapps.programs.utils import get_programs_for_dashboard, get_display_category
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
+from openedx.core.djangoapps.theming import helpers as theming_helpers
 
 
 log = logging.getLogger("edx.student")
@@ -319,6 +318,7 @@ def _cert_info(user, course_overview, cert_status, course_mode):  # pylint: disa
         CertificateStatuses.auditing: 'auditing',
         CertificateStatuses.audit_passing: 'auditing',
         CertificateStatuses.audit_notpassing: 'auditing',
+        CertificateStatuses.unverified: 'unverified',
     }
 
     default_status = 'processing'
@@ -350,7 +350,7 @@ def _cert_info(user, course_overview, cert_status, course_mode):  # pylint: disa
         'can_unenroll': status not in DISABLE_UNENROLL_CERT_STATES,
     }
 
-    if (status in ('generating', 'ready', 'notpassing', 'restricted', 'auditing') and
+    if (status in ('generating', 'ready', 'notpassing', 'restricted', 'auditing', 'unverified') and
             course_overview.end_of_course_survey_url is not None):
         status_dict.update({
             'show_survey_button': True,
@@ -394,7 +394,7 @@ def _cert_info(user, course_overview, cert_status, course_mode):  # pylint: disa
                     cert_status['download_url']
                 )
 
-    if status in ('generating', 'ready', 'notpassing', 'restricted', 'auditing'):
+    if status in ('generating', 'ready', 'notpassing', 'restricted', 'auditing', 'unverified'):
         if 'grade' not in cert_status:
             # Note: as of 11/20/2012, we know there are students in this state-- cs169.1x,
             # who need to be regraded (we weren't tracking 'notpassing' at first).
@@ -614,7 +614,6 @@ def dashboard(request):
     # This is passed along in the template context to allow rendering of
     # program-related information on the dashboard.
     course_programs = _get_course_programs(user, [enrollment.course_id for enrollment in course_enrollments])
-    xseries_credentials = _get_xseries_credentials(user)
 
     # Construct a dictionary of course mode information
     # used to render the course list.  We re-use the course modes dict
@@ -740,7 +739,6 @@ def dashboard(request):
         'nav_hidden': True,
         'course_programs': course_programs,
         'disable_courseware_js': True,
-        'xseries_credentials': xseries_credentials,
         'show_program_listing': ProgramsApiConfig.current().show_program_listing,
     }
 
@@ -1793,7 +1791,7 @@ def create_account_with_params(request, params):
         subject = ''.join(subject.splitlines())
         message = render_to_string('emails/activation_email.txt', context)
 
-        from_address = microsite.get_value(
+        from_address = theming_helpers.get_value(
             'email_from_address',
             settings.DEFAULT_FROM_EMAIL
         )
@@ -2102,7 +2100,7 @@ def password_reset(request):
     form = PasswordResetFormNoActive(request.POST)
     if form.is_valid():
         form.save(use_https=request.is_secure(),
-                  from_email=microsite.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL),
+                  from_email=theming_helpers.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL),
                   request=request,
                   domain_override=request.get_host())
         # When password change is complete, a "edx.user.settings.changed" event will be emitted.
@@ -2248,9 +2246,13 @@ def reactivation_email_for_user(user):
     message = render_to_string('emails/activation_email.txt', context)
 
     try:
-        user.email_user(subject, message, settings.DEFAULT_FROM_EMAIL)
+        user.email_user(subject, message, theming_helpers.get_value('default_from_email', settings.DEFAULT_FROM_EMAIL))
     except Exception:  # pylint: disable=broad-except
-        log.error(u'Unable to send reactivation email from "%s"', settings.DEFAULT_FROM_EMAIL, exc_info=True)
+        log.error(
+            u'Unable to send reactivation email from "%s"',
+            theming_helpers.get_value('default_from_email', settings.DEFAULT_FROM_EMAIL),
+            exc_info=True
+        )
         return JsonResponse({
             "success": False,
             "error": _('Unable to send reactivation email')
@@ -2308,7 +2310,7 @@ def do_email_change_request(user, new_email, activation_key=None):
 
     message = render_to_string('emails/email_change.txt', context)
 
-    from_address = microsite.get_value(
+    from_address = theming_helpers.get_value(
         'email_from_address',
         settings.DEFAULT_FROM_EMAIL
     )
@@ -2369,7 +2371,11 @@ def confirm_email_change(request, key):  # pylint: disable=unused-argument
         u_prof.save()
         # Send it to the old email...
         try:
-            user.email_user(subject, message, settings.DEFAULT_FROM_EMAIL)
+            user.email_user(
+                subject,
+                message,
+                theming_helpers.get_value('default_from_email', settings.DEFAULT_FROM_EMAIL)
+            )
         except Exception:    # pylint: disable=broad-except
             log.warning('Unable to send confirmation email to old address', exc_info=True)
             response = render_to_response("email_change_failed.html", {'email': user.email})
@@ -2381,7 +2387,11 @@ def confirm_email_change(request, key):  # pylint: disable=unused-argument
         pec.delete()
         # And send it to the new email...
         try:
-            user.email_user(subject, message, settings.DEFAULT_FROM_EMAIL)
+            user.email_user(
+                subject,
+                message,
+                theming_helpers.get_value('default_from_email', settings.DEFAULT_FROM_EMAIL)
+            )
         except Exception:  # pylint: disable=broad-except
             log.warning('Unable to send confirmation email to new address', exc_info=True)
             response = render_to_response("email_change_failed.html", {'email': pec.new_email})
@@ -2473,34 +2483,3 @@ def _get_course_programs(user, user_enrolled_courses):  # pylint: disable=invali
                     log.warning('Program structure is invalid, skipping display: %r', program)
 
     return programs_data
-
-
-def _get_xseries_credentials(user):
-    """Return program credentials data required for display on
-    the learner dashboard.
-
-    Given a user, find all programs for which certificates have been earned
-    and return list of dictionaries of required program data.
-
-    Arguments:
-        user (User): user object for getting programs credentials.
-
-    Returns:
-        list of dict, containing data corresponding to the programs for which
-        the user has been awarded a credential.
-    """
-    programs_credentials = get_user_program_credentials(user)
-    credentials_data = []
-    for program in programs_credentials:
-        if program.get('category') == 'xseries':
-            try:
-                program_data = {
-                    'display_name': program['name'],
-                    'subtitle': program['subtitle'],
-                    'credential_url': program['credential_url'],
-                }
-                credentials_data.append(program_data)
-            except KeyError:
-                log.warning('Program structure is invalid: %r', program)
-
-    return credentials_data

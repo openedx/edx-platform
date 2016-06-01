@@ -430,6 +430,8 @@ class ViewsTestCase(ModuleStoreTestCase):
         course = CourseFactory.create(org="new", number="unenrolled", display_name="course")
         request = self.request_factory.get(reverse('about_course', args=[unicode(course.id)]))
         request.user = AnonymousUser()
+
+        # Set up the edxmako middleware for this request to create the RequestContext
         mako_middleware_process_request(request)
         response = views.course_about(request, unicode(course.id))
         self.assertEqual(response.status_code, 200)
@@ -468,6 +470,8 @@ class ViewsTestCase(ModuleStoreTestCase):
 
         request = self.request_factory.get(reverse('about_course', args=[unicode(course.id)]))
         request.user = AnonymousUser() if is_anonymous else self.user
+
+        # Set up the edxmako middleware for this request to create the RequestContext
         mako_middleware_process_request(request)
 
         # Construct the link for each of the four possibilities:
@@ -905,6 +909,8 @@ class ViewsTestCase(ModuleStoreTestCase):
         # Middleware is not supported by the request factory. Simulate a
         # logged-in user by setting request.user manually.
         request.user = self.user
+
+        # Set up the edxmako middleware for this request to create the RequestContext
         mako_middleware_process_request(request)
 
         self.assertFalse(self.course.bypass_home)
@@ -1067,6 +1073,7 @@ class TestProgressDueDate(BaseDueDateTests):
     def get_text(self, course):
         """ Returns the HTML for the progress page """
 
+        # Set up the edxmako middleware for this request to create the RequestContext
         mako_middleware_process_request(self.request)
         return views.progress(self.request, course_id=unicode(course.id), student_id=self.user.id).content
 
@@ -1097,6 +1104,9 @@ class StartDateTests(ModuleStoreTestCase):
         self.request_factory = RequestFactory()
         self.user = UserFactory.create()
         self.request = self.request_factory.get("foo")
+
+        # Set up the edxmako middleware for this request to create the RequestContext
+        mako_middleware_process_request(self.request)
         self.request.user = self.user
 
     def set_up_course(self):
@@ -1157,6 +1167,7 @@ class ProgressPageTests(ModuleStoreTestCase):
         self.request = self.request_factory.get("foo")
         self.request.user = self.user
 
+        # Set up the edxmako middleware for this request to create the RequestContext
         mako_middleware_process_request(self.request)
 
         self.setup_course()
@@ -1356,7 +1367,7 @@ class ProgressPageTests(ModuleStoreTestCase):
         self.assertContains(resp, u"Download Your Certificate")
 
     @ddt.data(
-        *itertools.product(((41, 4, True), (41, 4, False)), (True, False))
+        *itertools.product(((42, 4, True), (42, 4, False)), (True, False))
     )
     @ddt.unpack
     def test_query_counts(self, (sql_calls, mongo_calls, self_paced), self_paced_enabled):
@@ -1371,22 +1382,32 @@ class ProgressPageTests(ModuleStoreTestCase):
         'grade': 'Pass', 'percent': 0.75, 'section_breakdown': [], 'grade_breakdown': []
     }))
     @ddt.data(
-        (CourseMode.AUDIT, False),
-        (CourseMode.HONOR, True),
-        (CourseMode.VERIFIED, True),
-        (CourseMode.PROFESSIONAL, True),
-        (CourseMode.NO_ID_PROFESSIONAL_MODE, True),
-        (CourseMode.CREDIT_MODE, True),
+        *itertools.product(
+            (
+                CourseMode.AUDIT,
+                CourseMode.HONOR,
+                CourseMode.VERIFIED,
+                CourseMode.PROFESSIONAL,
+                CourseMode.NO_ID_PROFESSIONAL_MODE,
+                CourseMode.CREDIT_MODE
+            ),
+            (True, False)
+        )
     )
     @ddt.unpack
-    def test_show_certificate_request_button(self, course_mode, show_button):
+    def test_show_certificate_request_button(self, course_mode, user_verified):
         """Verify that the Request Certificate is not displayed in audit mode."""
         CertificateGenerationConfiguration(enabled=True).save()
         certs_api.set_cert_generation_enabled(self.course.id, True)
         CourseEnrollment.enroll(self.user, self.course.id, mode=course_mode)
-
-        resp = views.progress(self.request, course_id=unicode(self.course.id))
-        self.assertEqual(show_button, 'Request Certificate' in resp.content)
+        with patch(
+            'lms.djangoapps.verify_student.models.SoftwareSecurePhotoVerification.user_is_verified'
+        ) as user_verify:
+            user_verify.return_value = user_verified
+            resp = views.progress(self.request, course_id=unicode(self.course.id))
+            self.assertEqual(
+                course_mode is not CourseMode.AUDIT and user_verified,
+                'Request Certificate' in resp.content)
 
 
 @attr('shard_1')
@@ -1656,6 +1677,8 @@ class TestIndexView(ModuleStoreTestCase):
             )
         )
         request.user = user
+
+        # Set up the edxmako middleware for this request to create the RequestContext
         mako_middleware_process_request(request)
 
         # Trigger the assertions embedded in the ViewCheckerBlocks
@@ -1687,6 +1710,8 @@ class TestIndexView(ModuleStoreTestCase):
             ) + '?activate_block_id=test_block_id'
         )
         request.user = user
+
+        # Set up the edxmako middleware for this request to create the RequestContext
         mako_middleware_process_request(request)
 
         response = CoursewareIndex.as_view()(
@@ -1736,6 +1761,8 @@ class TestIndexViewWithGating(ModuleStoreTestCase, MilestonesTestCaseMixin):
             )
         )
         request.user = self.user
+
+        # Set up the edxmako middleware for this request to create the RequestContext
         mako_middleware_process_request(request)
 
         with self.assertRaises(Http404):

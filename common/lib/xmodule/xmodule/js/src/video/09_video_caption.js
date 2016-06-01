@@ -95,7 +95,12 @@
                             '</span>',
                         '</button>',
                         '<div class="lang menu-container" role="application">',
-                            '<button class="control language-menu" aria-label="" aria-disabled="false">',
+                            '<p class="sr instructions" id="lang-instructions"></p>',
+                            '<button class="control language-menu" aria-disabled="false"',
+                                'aria-describedby="lang-instructions" ',
+                                'title="',
+                                    gettext('Open language menu'),
+                                '">',
                                 '<span class="icon-fallback-img">',
                                     '<span class="icon fa fa-caret-left" aria-hidden="true"></span>',
                                     '<span class="sr control-text"></span>',
@@ -108,7 +113,7 @@
                 var template = [
                     '<div class="subtitles" role="region" id="transcript-' + this.state.id + '">',
                         '<h3 id="transcript-label-' + this.state.id + '" class="transcript-title sr"></h3>',
-                        '<ol id="transcript-captions" class="subtitles-menu"></ol>',
+                        '<ol id="transcript-captions" class="subtitles-menu" lang="' + this.state.lang + '"></ol>',
                     '</div>'
                 ].join('');
 
@@ -657,10 +662,11 @@
 
                 $.each(languages, function(code, label) {
                     var li = $('<li data-lang-code="' + code + '" />'),
-                        link = $('<button class="control control-lang">' + label + '</button>');
+                        link = $('<button class="control control-lang" aria-pressed="false">' + label + '</button>');
 
                     if (currentLang === code) {
                         li.addClass('is-active');
+                        link.attr('aria-pressed', 'true');
                     }
 
                     li.append(link);
@@ -678,10 +684,21 @@
                         state.lang = langCode;
                         el  .addClass('is-active')
                             .siblings('li')
-                            .removeClass('is-active');
+                            .removeClass('is-active')
+                            .find('.control-lang')
+                            .attr('aria-pressed', 'false');
+                            
+                        $(e.currentTarget).attr('aria-pressed', 'true');
 
                         state.el.trigger('language_menu:change', [langCode]);
                         self.fetchCaption();
+                        
+                        // update the closed-captions lang attribute
+                        self.captionDisplayEl.attr('lang', langCode);
+                        
+                        // update the transcript lang attribute
+                        self.subtitlesMenuEl.attr('lang', langCode);
+                        self.closeLanguageMenu(e);
                     }
                 });
             },
@@ -704,7 +721,7 @@
                             'data-index': index,
                             'data-start': start[index],
                             'tabindex': 0
-                        }).html(text);
+                        }).text(text);
 
                         return liEl[0];
                     };
@@ -754,13 +771,15 @@
                         .text(gettext('Video transcript'));
 
                     self.subtitlesEl.find('.transcript-start')
-                        .text(gettext('Start of transcript. Skip to the end.'));
+                        .text(gettext('Start of transcript. Skip to the end.'))
+                        .attr('lang', $('html').attr('lang'));
 
                     self.subtitlesEl.find('.transcript-end')
-                        .text(gettext('End of transcript. Skip to the start.'));
+                        .text(gettext('End of transcript. Skip to the start.'))
+                        .attr('lang', $('html').attr('lang'));
 
-                    self.container.find('.menu-container .language-menu')
-                        .attr('aria-label', gettext('Language: Press the UP arrow key to enter the language menu then use UP and DOWN arrow keys to navigate language options. Press ENTER to change to the selected language.')); // jshint ignore:line
+                    self.container.find('.menu-container .instructions')
+                        .text(gettext('Press the UP arrow key to enter the language menu then use UP and DOWN arrow keys to navigate language options. Press ENTER to change to the selected language.')); // jshint ignore:line
 
                     self.container.find('.menu-container .control .control-text')
                         .text(gettext('Open language menu.'));
@@ -1111,10 +1130,12 @@
 
                 this.captionDisplayEl
                     .show()
-                    .addClass('is-visible');
+                    .addClass('is-visible')
+                    .attr('lang', this.state.lang);
 
                 this.captionControlEl
                     .addClass('is-active')
+                    .attr('title', gettext('Hide closed captions'))
                     .find('.control-text')
                         .text(gettext('Hide closed captions'));
 
@@ -1138,6 +1159,7 @@
 
                 this.captionControlEl
                     .removeClass('is-active')
+                    .attr('title', gettext('Turn on closed captioning'))
                     .find('.control-text')
                         .text(gettext('Turn on closed captioning'));
 
@@ -1194,6 +1216,7 @@
 
                     transcriptControlEl
                         .removeClass('is-active')
+                        .attr('title', gettext(text))
                         .find('.control-text')
                             .text(gettext(text));
                 } else {
@@ -1207,6 +1230,7 @@
 
                     transcriptControlEl
                         .addClass('is-active')
+                        .attr('title', gettext(text))
                         .find('.control-text')
                             .text(gettext(text));
                 }

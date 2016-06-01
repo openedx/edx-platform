@@ -33,10 +33,9 @@ from django.utils.http import urlquote_plus
 
 <%include file="/courseware/course_navigation.html" args="active_page='progress'" />
 
-<div class="container">
-  <div class="profile-wrapper">
-
-    <main id="main" aria-label="Content" tabindex="-1">
+<main id="main" aria-label="Content" tabindex="-1">
+    <div class="container">
+      <div class="profile-wrapper">
         <div class="course-info" id="course-info-progress" aria-label="${_('Course Progress')}">
           % if staff_access and studio_url is not None:
             <div class="wrap-instructor-info">
@@ -78,6 +77,13 @@ from django.utils.http import urlquote_plus
                     ## Translators: This message appears to users when the system is processessing course certificates, which can take a few hours.
                     <h2 class="title">${_("We're working on it...")}</h2>
                     <p class="copy">${_("We're creating your certificate. You can keep working in your courses and a link to it will appear here and on your Dashboard when it is ready.")}</p>
+                  </div>
+                  <div class="msg-actions"></div>
+                  %elif not is_id_verified or is_unverified:
+                  <div class="msg-content">
+                    ## Translators: This message appears to users when the users have not completed identity verification.
+                    <h2 class="title">${_("Certificate unavailable")}</h2>
+                    <p class="copy">${_("You have not received a certificate because you do not have a current {platform_name} verified identity. ").format(platform_name=settings.PLATFORM_NAME)} <a href="${reverse('verify_student_reverify')}"> ${_("Verify your identity now.")}</a></p>
                   </div>
                   <div class="msg-actions"></div>
                   %else:
@@ -219,6 +225,6 @@ from django.utils.http import urlquote_plus
           </div> <!--End chapters-->
 
         </div>
-    </main>
-  </div>
-</div>
+      </div>
+    </div>
+</main>

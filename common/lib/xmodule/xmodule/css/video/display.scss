@@ -417,6 +417,7 @@
           margin-left: -($baseline / 8); // center-center causes the control to be beyond the end of the sider
           border: 0;
           border-radius: ($baseline / 5);
+          padding: 0;
           background: rgb(203, 89, 141); // UXPL secondary base
           box-shadow: none;
 
@@ -534,6 +535,8 @@
 
                 .speed-option,
                 .control-lang {
+                  @include border-left($baseline/10 solid rgb(14, 166, 236));
+                  font-weight: $font-bold;
                   color: rgb(14, 166, 236); // UXPL primary accent
                 }
               }
@@ -680,9 +683,11 @@
                 @include left(-5px);
                 height: 15px;
                 width: 15px;
-                background: rgb(203, 89, 141); // UXPL secondary base
                 border: 0;
                 border-radius: ($baseline / 5);
+                padding: 0;
+                background: rgb(203, 89, 141); // UXPL secondary base
+                box-shadow: none;
 
                 &:hover,
                 &:focus {

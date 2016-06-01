@@ -61,6 +61,7 @@ from util.date_utils import get_default_time_display
 from util.db import outer_atomic
 from xmodule.modulestore.django import modulestore
 from django.contrib.staticfiles.storage import staticfiles_storage
+from openedx.core.djangoapps.theming import helpers as theming_helpers
 
 
 log = logging.getLogger(__name__)
@@ -1100,7 +1101,7 @@ class SubmitPhotosView(View):
 
         subject = _("Verification photos received")
         message = render_to_string('emails/photo_submission_confirmation.txt', context)
-        from_address = microsite.get_value('default_from_email', settings.DEFAULT_FROM_EMAIL)
+        from_address = theming_helpers.get_value('default_from_email', settings.DEFAULT_FROM_EMAIL)
         to_address = user.email
 
         try:
@@ -1219,7 +1220,7 @@ def _send_email(user_id, subject, message):
     Returns:
         None
     """
-    from_address = microsite.get_value(
+    from_address = theming_helpers.get_value(
         'email_from_address',
         settings.DEFAULT_FROM_EMAIL
     )

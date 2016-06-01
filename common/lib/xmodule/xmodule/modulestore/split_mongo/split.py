@@ -663,7 +663,6 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         super(SplitMongoModuleStore, self).__init__(contentstore, **kwargs)
 
         self.db_connection = MongoConnection(**doc_store_config)
-        self.db = self.db_connection.database
 
         if default_class is not None:
             module_path, __, class_name = default_class.rpartition('.')
@@ -693,25 +692,30 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         """
         Closes any open connections to the underlying databases
         """
-        self.db.connection.close()
+        self.db_connection.close_connections()
 
     def mongo_wire_version(self):
         """
         Returns the wire version for mongo. Only used to unit tests which instrument the connection.
         """
-        return self.db.connection.max_wire_version
+        return self.db_connection.mongo_wire_version
 
-    def _drop_database(self):
+    def _drop_database(self, database=True, collections=True, connections=True):
         """
         A destructive operation to drop the underlying database and close all connections.
         Intended to be used by test code for cleanup.
+
+        If database is True, then this should drop the entire database.
+        Otherwise, if collections is True, then this should drop all of the collections used
+        by this modulestore.
+        Otherwise, the modulestore should remove all data from the collections.
+
+        If connections is True, then close the connection to the database as well.
         """
         # drop the assets
-        super(SplitMongoModuleStore, self)._drop_database()
+        super(SplitMongoModuleStore, self)._drop_database(database, collections, connections)
 
-        connection = self.db.connection
-        connection.drop_database(self.db.name)
-        connection.close()
+        self.db_connection._drop_database(database, collections, connections)  # pylint: disable=protected-access
 
     def cache_items(self, system, base_block_ids, course_key, depth=0, lazy=True):
         """

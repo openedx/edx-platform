@@ -1,4 +1,6 @@
 """ Tests for OAuth 2.0 client credentials support. """
+from __future__ import unicode_literals
+
 import json
 
 from django.core.urlresolvers import reverse
@@ -52,7 +54,7 @@ class ClientCredentialsTest(mixins.AccessTokenMixin, TestCase):
             redirect_uri=DUMMY_REDIRECT_URL,
             client_id='dot-app-client-id',
         )
-        scopes = ('read', 'write', 'email')
+        scopes = ['read', 'write', 'email']
         data = {
             'grant_type': 'client_credentials',
             'client_id': application.client_id,

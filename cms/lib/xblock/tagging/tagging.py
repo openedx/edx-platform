@@ -6,7 +6,7 @@ Structured Tagging based on XBlockAsides
 from xblock.core import XBlockAside, XBlock
 from xblock.fragment import Fragment
 from xblock.fields import Scope, Dict
-from xmodule.x_module import STUDENT_VIEW
+from xmodule.x_module import AUTHOR_VIEW
 from xmodule.capa_module import CapaModule
 from edxmako.shortcuts import render_to_string
 from django.conf import settings
@@ -37,7 +37,7 @@ class StructuredTagsAside(XBlockAside):
         """
         return settings.STATIC_URL + relative_url
 
-    @XBlockAside.aside_for(STUDENT_VIEW)
+    @XBlockAside.aside_for(AUTHOR_VIEW)
     def student_view_aside(self, block, context):  # pylint: disable=unused-argument
         """
         Display the tag selector with specific categories and allowed values,
@@ -90,3 +90,12 @@ class StructuredTagsAside(XBlockAside):
             return Response("Invalid 'tag' parameter", status=400)
 
         return Response()
+
+    def get_event_context(self, event_type, event):  # pylint: disable=unused-argument
+        """
+        This method return data that should be associated with the "check_problem" event
+        """
+        if self.saved_tags and event_type == "problem_check":
+            return {'saved_tags': self.saved_tags}
+        else:
+            return None

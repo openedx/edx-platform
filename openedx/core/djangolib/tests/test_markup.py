@@ -10,7 +10,7 @@ import ddt
 from django.utils.translation import ugettext as _, ungettext
 from mako.template import Template
 
-from openedx.core.djangolib.markup import Text, HTML
+from openedx.core.djangolib.markup import HTML, Text
 
 
 @attr('shard_2')
@@ -60,7 +60,7 @@ class FormatHtmlTest(unittest.TestCase):
                 <%!
                 from django.utils.translation import ugettext as _
 
-                from openedx.core.djangolib.markup import Text, HTML
+                from openedx.core.djangolib.markup import HTML, Text
                 %>
                 ${Text(_(u"A & {BC}")).format(BC=HTML("B & C"))}
             """,

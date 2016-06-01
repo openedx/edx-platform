@@ -24,6 +24,7 @@ from util.password_policy_validators import (
     validate_password_complexity,
     validate_password_dictionary,
 )
+from openedx.core.djangoapps.theming import helpers as theming_helpers
 
 
 class PasswordResetFormNoActive(PasswordResetForm):
@@ -57,7 +58,7 @@ class PasswordResetFormNoActive(PasswordResetForm):
             email_template_name='registration/password_reset_email.html',
             use_https=False,
             token_generator=default_token_generator,
-            from_email=settings.DEFAULT_FROM_EMAIL,
+            from_email=theming_helpers.get_value('default_from_email', settings.DEFAULT_FROM_EMAIL),
             request=None
     ):
         """

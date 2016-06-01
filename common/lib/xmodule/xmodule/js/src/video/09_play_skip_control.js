@@ -25,7 +25,9 @@ define('video/09_play_skip_control.js', [], function() {
 
     PlaySkipControl.prototype = {
         template: [
-            '<button class="control video_control play play-skip-control">',
+            '<button class="control video_control play play-skip-control" title="',
+                gettext('Play'),
+            '">',
                 '<span class="icon-fallback-img">',
                     '<span class="icon fa fa-play" aria-hidden="true"></span>',
                     '<span class="text control-text">',
@@ -78,6 +80,7 @@ define('video/09_play_skip_control.js', [], function() {
             this.el
                 .removeClass('play')
                 .addClass('skip')
+                .attr('title', gettext('Skip'))
                 .find('.icon')
                     .removeClass('fa-play')
                     .addClass('fa-step-forward')

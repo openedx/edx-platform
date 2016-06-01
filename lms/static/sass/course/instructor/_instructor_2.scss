@@ -160,9 +160,13 @@
     color: $error-color;
   }
 
+  .submit-email-warning {
+    margin-top: ($baseline);
+  }
+
   .slickgrid {
     @include margin-left(1px);
-    @include font-size(12px);
+    @include font-size(14);
     font-family: verdana,arial,sans-serif;
     color: #333333;
 
@@ -412,6 +416,14 @@
       margin-bottom: $baseline;
       padding: 0;
 
+      .label {
+        display: block;
+      }
+
+      ul {
+        list-style-type: none;
+      }
+
       &:last-child {
         margin-bottom: 0;
       }
@@ -419,7 +431,7 @@
         display: block;
         margin-top: ($baseline/4);
         @include font-size(12);
-        color: tint(rgb(127,127,127),50%);
+        color: $gray-d1;
       }
     }
   }
@@ -434,6 +446,12 @@
 
     &:last-child {
       margin-bottom: 0;
+    }
+        
+    legend {
+        // use the same styles as H3s
+        font-size: 1.2em;
+        margin-bottom: 15px;
     }
   }
 
@@ -478,19 +496,15 @@
     margin: ($baseline/2) 0;
     position: relative;
 
-      label {
-        border-bottom: 1px dotted $base-font-color;
-      }
-
     .hint {
       @extend %t-copy-sub2;
-      display: none;
+      display: block;
       position: absolute;
-      top: 15px;
-      @include left($baseline*10);
+      top: ($baseline/2);
+      left: -9999em;
       padding: ($baseline/2);
       width: 50%;
-      background-color: $light-gray;
+      background-color: $light-gray3;
       box-shadow: 2px 2px 3px $shadow;
 
       .hint-caret {
@@ -498,30 +512,24 @@
         position: absolute;
         top: 0;
         @include left(-15px);
-        @include border-right(8px solid $light-gray);
+        @include border-right(8px solid $light-gray3);
         @include border-left(8px solid transparent);
-        border-top: 8px solid $light-gray;
+        border-top: 8px solid $light-gray3;
         border-bottom: 8px solid transparent;
       }
     }
-  }
-
-  label[for="auto-enroll"]:hover + .auto-enroll-hint {
-    display: block;
-  }
-
-  label[for="auto-enroll-beta"]:hover + .auto-enroll-beta-hint {
-    width: 30%;
-    display: block;
-  }
-
-  label[for="email-students"]:hover + .email-students-hint {
-    display: block;
-  }
-
-  label[for="email-students-beta"]:hover + .email-students-beta-hint {
-    width: 30%;
-    display: block;
+    
+    /* ***
+     * Ideally we want to handle functionality with JS.
+     * This functionality should eventually be moved into CS/JS, and out of here. */ 
+    .has-hint:hover > .hint {    
+        @include left($baseline*10);
+    }
+    
+    .has-hint input:focus ~ .hint {
+        @include left($baseline*10);
+    }
+    /* *** */
   }
 
   .enroll-actions {
@@ -595,6 +603,7 @@
             border-bottom: 1px solid $light-gray;
           }
 
+          th,
           td {
             @extend %t-copy-sub1;
             vertical-align: middle;

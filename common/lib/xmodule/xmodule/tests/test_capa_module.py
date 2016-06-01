@@ -1318,13 +1318,15 @@ class CapaModuleTest(unittest.TestCase):
         # Re-mock the module_id to a fixed string, so we can check the logging
         module.location = Mock(module.location)
         module.location.to_deprecated_string.return_value = 'i4x://edX/capa_test/problem/meh'
-        module.get_problem_html()
-        module.get_demand_hint(0)
-        module.runtime.track_function.assert_called_with(
-            'edx.problem.hint.demandhint_displayed',
-            {'hint_index': 0, 'module_id': u'i4x://edX/capa_test/problem/meh',
-             'hint_text': 'Demand 1', 'hint_len': 2}
-        )
+
+        with patch.object(module.runtime, 'publish') as mock_track_function:
+            module.get_problem_html()
+            module.get_demand_hint(0)
+            mock_track_function.assert_called_with(
+                module, 'edx.problem.hint.demandhint_displayed',
+                {'hint_index': 0, 'module_id': u'i4x://edX/capa_test/problem/meh',
+                 'hint_text': 'Demand 1', 'hint_len': 2}
+            )
 
     def test_input_state_consistency(self):
         module1 = CapaFactory.create()
@@ -1638,11 +1640,11 @@ class CapaModuleTest(unittest.TestCase):
         unmasked names should appear in the track_function event_info.
         """
         module = CapaFactory.create(xml=self.common_shuffle_xml)
-        with patch.object(module.runtime, 'track_function') as mock_track_function:
+        with patch.object(module.runtime, 'publish') as mock_track_function:
             get_request_dict = {CapaFactory.input_key(): 'choice_3'}  # the correct choice
             module.check_problem(get_request_dict)
-            mock_call = mock_track_function.mock_calls[0]
-            event_info = mock_call[1][1]
+            mock_call = mock_track_function.mock_calls[1]
+            event_info = mock_call[1][2]
             self.assertEqual(event_info['answers'][CapaFactory.answer_key()], 'choice_3')
             # 'permutation' key added to record how problem was shown
             self.assertEquals(event_info['permutation'][CapaFactory.answer_key()],
@@ -1706,11 +1708,11 @@ class CapaModuleTest(unittest.TestCase):
             </problem>
         """)
         module = CapaFactory.create(xml=xml)
-        with patch.object(module.runtime, 'track_function') as mock_track_function:
+        with patch.object(module.runtime, 'publish') as mock_track_function:
             get_request_dict = {CapaFactory.input_key(): 'choice_2'}  # mask_X form when masking enabled
             module.check_problem(get_request_dict)
-            mock_call = mock_track_function.mock_calls[0]
-            event_info = mock_call[1][1]
+            mock_call = mock_track_function.mock_calls[1]
+            event_info = mock_call[1][2]
             self.assertEqual(event_info['answers'][CapaFactory.answer_key()], 'choice_2')
             # 'permutation' key added to record how problem was shown
             self.assertEquals(event_info['permutation'][CapaFactory.answer_key()],
@@ -2585,13 +2587,13 @@ class TestProblemCheckTracking(unittest.TestCase):
         return CustomCapaFactory
 
     def get_event_for_answers(self, module, answer_input_dict):
-        with patch.object(module.runtime, 'track_function') as mock_track_function:
+        with patch.object(module.runtime, 'publish') as mock_track_function:
             module.check_problem(answer_input_dict)
 
-            self.assertGreaterEqual(len(mock_track_function.mock_calls), 1)
+            self.assertGreaterEqual(len(mock_track_function.mock_calls), 2)
             # There are potentially 2 track logs: answers and hint. [-1]=answers.
             mock_call = mock_track_function.mock_calls[-1]
-            event = mock_call[1][1]
+            event = mock_call[1][2]
 
             return event
 

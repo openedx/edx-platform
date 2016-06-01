@@ -6,7 +6,7 @@
     ],
     function(ProgramDetailsView) {
         return function (options) {
-            var ProgramDetails = new ProgramDetailsView(options);
+            var ProgramDetails = new ProgramDetailsView(options.programData);
             return ProgramDetails;
         };
     });

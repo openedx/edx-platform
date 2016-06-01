@@ -10,10 +10,13 @@ Utility classes for testing django applications.
 
 import copy
 
+from django import db
 from django.core.cache import caches
 from django.test import TestCase, override_settings
 from django.conf import settings
 from django.contrib import sites
+
+from nose.plugins import Plugin
 
 from request_cache.middleware import RequestCache
 
@@ -138,3 +141,20 @@ class CacheIsolationTestCase(CacheIsolationMixin, TestCase):
 
         self.clear_caches()
         self.addCleanup(self.clear_caches)
+
+
+class NoseDatabaseIsolation(Plugin):
+    """
+    nosetest plugin that resets django databases before any tests begin.
+
+    Used to make sure that tests running in multi processes aren't sharing
+    a database connection.
+    """
+    name = "database-isolation"
+
+    def begin(self):
+        """
+        Before any tests start, reset all django database connections.
+        """
+        for db_ in db.connections.all():
+            db_.close()

@@ -8,7 +8,7 @@ from django.template import RequestContext
 import third_party_auth
 from third_party_auth import pipeline
 from openedx.core.djangolib.js_utils import dump_js_escaped_json, js_escaped_string
-from openedx.core.djangolib.markup import Text, HTML
+from openedx.core.djangolib.markup import HTML, Text
 %>
 
 <%
@@ -63,13 +63,13 @@ from openedx.core.djangolib.markup import Text, HTML
 <div class="dashboard-notifications" tabindex="-1">
     %if message:
         <section class="dashboard-banner">
-            ${message | n, unicode}
+            ${message | n, decode.utf8}
         </section>
     %endif
 
     %if enrollment_message:
         <section class="dashboard-banner">
-            ${enrollment_message | n, unicode}
+            ${enrollment_message | n,  decode.utf8}
         </section>
     %endif
 </div>
@@ -175,19 +175,6 @@ from openedx.core.djangolib.markup import Text, HTML
           </ul>
         </section>
       </section>
-      % if xseries_credentials:
-        <div class="wrapper-xseries-certificates">
-          <p class="title">${_("XSeries Program Certificates")}</p>
-          <p class="copy">${_("You have received a certificate for the following XSeries programs:")}</p>
-          <ul>
-          % for xseries_credential in xseries_credentials:
-            <li>
-              <a class="copy" href="${xseries_credential['credential_url']}">${xseries_credential['display_name']}</a>
-            </li>
-          % endfor
-          </ul>
-        </div>
-      % endif
     </section>
 </main>
 

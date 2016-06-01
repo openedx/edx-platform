@@ -1,8 +1,7 @@
 """
-Tests for viewing the programs enrolled by a learner.
+Unit tests covering the program listing and detail pages.
 """
 import datetime
-import httpretty
 import unittest
 from urlparse import urljoin
 
@@ -10,10 +9,12 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test import override_settings, TestCase
 from edx_oauth2_provider.tests.factories import ClientFactory
+import httpretty
 from opaque_keys.edx import locator
 from provider.constants import CONFIDENTIAL
 
 from openedx.core.djangoapps.credentials.models import CredentialsApiConfig
+from openedx.core.djangoapps.credentials.tests import factories as credentials_factories
 from openedx.core.djangoapps.credentials.tests.mixins import CredentialsDataMixin, CredentialsApiConfigMixin
 from openedx.core.djangoapps.programs.tests.mixins import (
     ProgramsApiConfigMixin,
@@ -155,18 +156,36 @@ class TestProgramListing(
             '{}?next={}'.format(reverse('signin_user'), self.url)
         )
 
-    # TODO: Use a factory to generate this data.
+    def _expected_progam_credentials_data(self):
+        """
+        Dry method for getting expected program credentials response data.
+        """
+        return [
+            credentials_factories.UserCredential(
+                id=1,
+                username='test',
+                credential=credentials_factories.ProgramCredential()
+            ),
+            credentials_factories.UserCredential(
+                id=2,
+                username='test',
+                credential=credentials_factories.ProgramCredential()
+            )
+        ]
+
     def _expected_credentials_data(self):
         """ Dry method for getting expected credentials."""
-
+        program_credentials_data = self._expected_progam_credentials_data()
         return [
             {
-                "display_name": "Test Program A",
-                "credential_url": "http://credentials.edx.org/credentials/dummy-uuid-1/"
+                'display_name': self.PROGRAMS_API_RESPONSE['results'][0]['name'],
+                'subtitle': self.PROGRAMS_API_RESPONSE['results'][0]['subtitle'],
+                'credential_url':program_credentials_data[0]['certificate_url']
             },
             {
-                "display_name": "Test Program B",
-                "credential_url": "http://credentials.edx.org/credentials/dummy-uuid-2/"
+                'display_name': self.PROGRAMS_API_RESPONSE['results'][1]['name'],
+                'subtitle':self.PROGRAMS_API_RESPONSE['results'][1]['subtitle'],
+                'credential_url':program_credentials_data[1]['certificate_url']
             }
         ]
 
@@ -215,14 +234,20 @@ class TestProgramDetails(ProgramsApiConfigMixin, TestCase):
     """
     def setUp(self):
         super(TestProgramDetails, self).setUp()
+
         self.user = UserFactory()
         self.details_page = reverse('program_details_view', args=['123'])
+
+        self.client.login(username=self.user.username, password='test')
 
     def test_login_required(self):
         """
         Verify that login is required to access the page.
         """
         self.create_programs_config()
+
+        self.client.logout()
+
         response = self.client.get(self.details_page)
         self.assertRedirects(
             response,
@@ -230,6 +255,7 @@ class TestProgramDetails(ProgramsApiConfigMixin, TestCase):
         )
 
         self.client.login(username=self.user.username, password='test')
+
         response = self.client.get(self.details_page)
         self.assertEquals(response.status_code, 200)
 
@@ -238,6 +264,19 @@ class TestProgramDetails(ProgramsApiConfigMixin, TestCase):
         Verify that the page 404s if disabled.
         """
         self.create_programs_config(program_details_enabled=False)
-        self.client.login(username=self.user.username, password='test')
+
         response = self.client.get(self.details_page)
+        self.assertEquals(response.status_code, 404)
+
+    def test_page_routing(self):
+        """Verify that the page can be hit with or without a program name in the URL."""
+        self.create_programs_config()
+
+        response = self.client.get(self.details_page)
+        self.assertEquals(response.status_code, 200)
+
+        response = self.client.get(self.details_page + 'program_name/')
+        self.assertEquals(response.status_code, 200)
+
+        response = self.client.get(self.details_page + 'program_name/invalid/')
         self.assertEquals(response.status_code, 404)

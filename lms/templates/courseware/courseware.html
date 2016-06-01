@@ -65,7 +65,7 @@ ${static.get_page_title_breadcrumbs(course_name())}
 </%block>
 
 <%block name="js_extra">
-  <script type="text/javascript" src="${static.url('js/vendor/jquery.scrollTo-1.4.2-min.js')}"></script>
+  <script type="text/javascript" src="${static.url('common/js/vendor/jquery.scrollTo.js')}"></script>
   <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.js')}"></script>
 
   ## codemirror
@@ -80,8 +80,8 @@ ${static.get_page_title_breadcrumbs(course_name())}
     </%static:require_module>
   % endif
 
-  <%static:require_module module_name="js/bookmarks/bookmarks_factory" class_name="BookmarksFactory">
-    BookmarksFactory();
+  <%static:require_module module_name="js/courseware/courseware_factory" class_name="CoursewareFactory">
+    CoursewareFactory();
   </%static:require_module>
 
   <%include file="../discussion/_js_body_dependencies.html" />

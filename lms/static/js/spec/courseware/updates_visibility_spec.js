@@ -1,5 +1,5 @@
-define(['jquery', 'logger', 'js/courseware/toggle_element_visibility'],
-    function ($, Logger, ToggleElementVisibility) {
+define(['jquery', 'logger', 'js/courseware/toggle_element_visibility', 'moment'],
+    function ($, Logger, ToggleElementVisibility, moment) {
         'use strict';
 
         describe('show/hide with mouse click', function () {
@@ -43,7 +43,7 @@ define(['jquery', 'logger', 'js/courseware/toggle_element_visibility'],
                 $update.siblings('.toggle-visibility-button').trigger('click');
                 expect(Logger.log).toHaveBeenCalledWith('edx.course.home.course_update.toggled', {
                     action: 'hide',
-                    publish_date: '2015-12-01T00:00:00+00:00'
+                    publish_date: moment('December 1, 2015', 'MMM DD, YYYY').format()
                 });
             });
         });

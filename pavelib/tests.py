@@ -31,6 +31,9 @@ __test__ = False  # do not collect
     ('extra_args=', 'e', 'adds as extra args to the test command'),
     ('cov_args=', 'c', 'adds as args to coverage for the test run'),
     ('skip_clean', 'C', 'skip cleaning repository before running tests'),
+    ('processes=', 'p', 'number of processes to use running tests'),
+    make_option('-r', '--randomize', action='store_true', dest='randomize', help='run the tests in a random order'),
+    make_option('--no-randomize', action='store_false', dest='randomize', help="don't run the tests in a random order"),
     make_option("--verbose", action="store_const", const=2, dest="verbosity"),
     make_option("-q", "--quiet", action="store_const", const=0, dest="verbosity"),
     make_option("-v", "--verbosity", action="count", dest="verbosity", default=1),
@@ -59,6 +62,8 @@ def test_system(options):
         'skip_clean': getattr(options, 'skip_clean', False),
         'pdb': getattr(options, 'pdb', False),
         'disable_migrations': getattr(options, 'disable_migrations', False),
+        'processes': getattr(options, 'processes', None),
+        'randomize': getattr(options, 'randomize', None),
     }
 
     if test_id:

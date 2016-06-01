@@ -203,6 +203,17 @@ class DiscussionHomePageTest(UniqueCourseTest):
         self.page.click_new_post_button()
         self.assertIsNotNone(self.page.new_post_form)
 
+    @attr('a11y')
+    def test_page_accessibility(self):
+        self.page.a11y_audit.config.set_rules({
+            "ignore": [
+                'color-contrast',  # TNL-4635
+                'link-href',  # TNL-4636
+                'icon-aria-hidden',  # TNL-4637
+            ]
+        })
+        self.page.a11y_audit.check_for_accessibility_errors()
+
 
 @attr('shard_2')
 class DiscussionTabSingleThreadTest(BaseDiscussionTestCase, DiscussionResponsePaginationTestMixin):
@@ -331,6 +342,30 @@ class DiscussionTabMultipleThreadTest(BaseDiscussionTestCase):
         # Verify that the focus is changed
         self.thread_page_2.check_focus_is_set(selector=".discussion-article")
 
+    @attr('a11y')
+    def test_page_accessibility(self):
+        self.thread_page_1.a11y_audit.config.set_rules({
+            "ignore": [
+                'aria-valid-attr-value',  # TNL-4638
+                'color-contrast',  # TNL-4639
+                'link-href',  # TNL-4640
+                'icon-aria-hidden',  # TNL-4641
+            ]
+        })
+
+        self.thread_page_1.a11y_audit.check_for_accessibility_errors()
+
+        self.thread_page_2.a11y_audit.config.set_rules({
+            "ignore": [
+                'aria-valid-attr-value',  # TNL-4638
+                'color-contrast',  # TNL-4639
+                'link-href',  # TNL-4640
+                'icon-aria-hidden',  # TNL-4641
+            ]
+        })
+
+        self.thread_page_2.a11y_audit.check_for_accessibility_errors()
+
 
 @attr('shard_2')
 class DiscussionOpenClosedThreadTest(BaseDiscussionTestCase):
@@ -379,6 +414,30 @@ class DiscussionOpenClosedThreadTest(BaseDiscussionTestCase):
         self.assertFalse(page._is_element_visible('.forum-thread-main-wrapper .display-vote'))
         self.assertTrue(page._is_element_visible('.response_response1 .action-vote'))
         self.assertFalse(page._is_element_visible('.response_response1 .display-vote'))
+
+    @attr('a11y')
+    def test_page_accessibility(self):
+        page = self.setup_openclosed_thread_page()
+        page.a11y_audit.config.set_rules({
+            'ignore': [
+                'aria-valid-attr-value',  # TNL-4643
+                'color-contrast',  # TNL-4644
+                'link-href',  # TNL-4640
+                'icon-aria-hidden',  # TNL-4645
+            ]
+        })
+        page.a11y_audit.check_for_accessibility_errors()
+
+        page = self.setup_openclosed_thread_page(True)
+        page.a11y_audit.config.set_rules({
+            'ignore': [
+                'aria-valid-attr-value',  # TNL-4643
+                'color-contrast',  # TNL-4644
+                'link-href',  # TNL-4640
+                'icon-aria-hidden',  # TNL-4645
+            ]
+        })
+        page.a11y_audit.check_for_accessibility_errors()
 
 
 @attr('shard_2')
@@ -653,6 +712,23 @@ class DiscussionResponseEditTest(BaseDiscussionTestCase):
         page.endorse_response('response_self_author')
         page.endorse_response('response_other_author')
 
+    @attr('a11y')
+    def test_page_accessibility(self):
+        self.setup_user()
+        self.setup_view()
+        page = self.create_single_thread_page("response_edit_test_thread")
+        page.a11y_audit.config.set_rules({
+            'ignore': [
+                'aria-valid-attr-value',  # TNL-4638
+                'color-contrast',  # TNL-4644
+                'link-href',  # TNL-4640
+                'icon-aria-hidden',  # TNL-4645
+                'duplicate-id',  # TNL-4647
+            ]
+        })
+        page.visit()
+        page.a11y_audit.check_for_accessibility_errors()
+
 
 @attr('shard_2')
 class DiscussionCommentEditTest(BaseDiscussionTestCase):
@@ -735,6 +811,22 @@ class DiscussionCommentEditTest(BaseDiscussionTestCase):
         page.cancel_comment_edit("comment_self_author", original_body)
         self.assertFalse(page.is_comment_editor_visible("comment_self_author"))
         self.assertTrue(page.is_add_comment_visible("response1"))
+
+    @attr('a11y')
+    def test_page_accessibility(self):
+        self.setup_user()
+        self.setup_view()
+        page = self.create_single_thread_page("comment_edit_test_thread")
+        page.visit()
+        page.a11y_audit.config.set_rules({
+            'ignore': [
+                'aria-valid-attr-value',  # TNL-4643
+                'color-contrast',  # TNL-4644
+                'link-href',  # TNL-4640
+                'icon-aria-hidden',  # TNL-4645
+            ]
+        })
+        page.a11y_audit.check_for_accessibility_errors()
 
 
 @attr('shard_2')
@@ -1097,6 +1189,17 @@ class DiscussionSearchAlertTest(UniqueCourseTest):
             self.searched_user_id,
             self.SEARCHED_USERNAME
         ).wait_for_page()
+
+    @attr('a11y')
+    def test_page_accessibility(self):
+        self.page.a11y_audit.config.set_rules({
+            'ignore': [
+                'color-contrast',  # TNL-4639
+                'link-href',  # TNL-4640
+                'icon-aria-hidden',  # TNL-4641
+            ]
+        })
+        self.page.a11y_audit.check_for_accessibility_errors()
 
 
 @attr('shard_2')
