@@ -1,3 +1,4 @@
+/* global _ */
 define(
     [
         'jquery',
@@ -174,76 +175,104 @@ define(
                             // 2.0, the latest version of jasmine-ajax (mock-ajax.js) does have the
                             // necessary support.
 
-                            _.each(
-                                [
-                                    {
-                                        desc: 'completion',
-                                        responseStatus: 204,
-                                        statusText: ActiveVideoUpload.STATUS_COMPLETED,
-                                        progressValue: 1,
-                                        presentClass: 'success',
-                                        absentClass: 'error'
-                                    },
-                                    {
-                                        desc: 'failure',
-                                        responseStatus: 500,
-                                        statusText: ActiveVideoUpload.STATUS_FAILED,
-                                        progressValue: 0,
-                                        presentClass: 'error',
-                                        absentClass: 'success'
-                                    }
-                                ],
-                                function(subCaseInfo) {
-                                    describe('and upload ' + subCaseInfo.desc, function() {
-                                        beforeEach(function() {
-                                            getSentRequests()[0].respondWith({status: subCaseInfo.responseStatus});
-                                        });
+                            _.each([true, false],
+                                function(isViewRefresh) {
+                                    var refreshDescription = isViewRefresh ? ' (refreshed)' : ' (not refreshed)';
+                                    var subCases = [
+                                        {
+                                            desc: 'completion' + refreshDescription,
+                                            responseStatus: 204,
+                                            statusText: ActiveVideoUpload.STATUS_COMPLETED,
+                                            progressValue: 1,
+                                            presentClass: 'success',
+                                            absentClass: 'error',
+                                            isViewRefresh: isViewRefresh
+                                        },
+                                        {
+                                            desc: 'failure' + refreshDescription,
+                                            responseStatus: 500,
+                                            statusText: ActiveVideoUpload.STATUS_FAILED,
+                                            progressValue: 0,
+                                            presentClass: 'error',
+                                            absentClass: 'success',
+                                            isViewRefresh: isViewRefresh
+                                        }
+                                    ];
 
-                                        it('should update status and progress', function() {
-                                            var $uploadElem = this.view.$('.active-video-upload:first');
-                                            expect($uploadElem.length).toEqual(1);
-                                            expect($.trim($uploadElem.find('.video-detail-status').text())).toEqual(
-                                                subCaseInfo.statusText
-                                            );
-                                            expect(
-                                                $uploadElem.find('.video-detail-progress').val()
-                                            ).toEqual(subCaseInfo.progressValue);
-                                            expect($uploadElem).toHaveClass(subCaseInfo.presentClass);
-                                            expect($uploadElem).not.toHaveClass(subCaseInfo.absentClass);
-                                        });
+                                    _.each(subCases,
+                                        function(subCaseInfo) {
+                                            describe('and upload ' + subCaseInfo.desc, function() {
+                                                var refreshSpy = null;
 
-                                        it('should not trigger the global AJAX error handler', function() {
-                                            expect(this.globalAjaxError).not.toHaveBeenCalled();
-                                        });
+                                                beforeEach(function() {
+                                                    refreshSpy = subCaseInfo.isViewRefresh ? jasmine.createSpy() : null;
+                                                    this.view.onFileUploadDone = refreshSpy;
+                                                    getSentRequests()[0].respondWith(
+                                                        {status: subCaseInfo.responseStatus}
+                                                    );
+                                                });
 
-                                        if (caseInfo.numFiles > concurrentUploadLimit) {
-                                            it('should start a new upload', function() {
-                                                expect(getSentRequests().length).toEqual(
-                                                    concurrentUploadLimit + 1
-                                                );
-                                                var $uploadElem = $(this.$uploadElems[concurrentUploadLimit]);
-                                                expect($.trim($uploadElem.find('.video-detail-status').text())).toEqual(
-                                                    ActiveVideoUpload.STATUS_UPLOADING
-                                                );
-                                                expect($uploadElem).not.toHaveClass('queued');
+                                                it('should update status and progress', function() {
+                                                    var $uploadElem = this.view.$('.active-video-upload:first');
+                                                    if (subCaseInfo.isViewRefresh &&
+                                                        subCaseInfo.responseStatus === 204) {
+                                                        expect(refreshSpy).toHaveBeenCalled();
+                                                        if ($uploadElem.length > 0) {
+                                                            expect(
+                                                                $.trim($uploadElem.find('.video-detail-status').text())
+                                                            ).not.toEqual(ActiveVideoUpload.STATUS_COMPLETED);
+                                                            expect(
+                                                                $uploadElem.find('.video-detail-progress').val()
+                                                            ).not.toEqual(1);
+                                                            expect($uploadElem).not.toHaveClass('success');
+                                                        }
+                                                    } else {
+                                                        expect($uploadElem.length).toEqual(1);
+                                                        expect(
+                                                            $.trim($uploadElem.find('.video-detail-status').text())
+                                                        ).toEqual(subCaseInfo.statusText);
+                                                        expect(
+                                                            $uploadElem.find('.video-detail-progress').val()
+                                                        ).toEqual(subCaseInfo.progressValue);
+                                                        expect($uploadElem).toHaveClass(subCaseInfo.presentClass);
+                                                        expect($uploadElem).not.toHaveClass(subCaseInfo.absentClass);
+                                                    }
+                                                });
+
+                                                it('should not trigger the global AJAX error handler', function() {
+                                                    expect(this.globalAjaxError).not.toHaveBeenCalled();
+                                                });
+
+                                                if (caseInfo.numFiles > concurrentUploadLimit) {
+                                                    it('should start a new upload', function() {
+                                                        var $uploadElem = $(this.$uploadElems[concurrentUploadLimit]);
+                                                        expect(getSentRequests().length).toEqual(
+                                                            concurrentUploadLimit + 1
+                                                        );
+                                                        expect(
+                                                            $.trim($uploadElem.find('.video-detail-status').text())
+                                                        ).toEqual(ActiveVideoUpload.STATUS_UPLOADING);
+                                                        expect($uploadElem).not.toHaveClass('queued');
+                                                    });
+                                                }
+
+                                                // If we're uploading more files than the one we've closed above,
+                                                // the unload warning should still be shown
+                                                if (caseInfo.numFiles > 1) {
+                                                    it('should show notification when videos are still uploading',
+                                                        function() {
+                                                            expect(this.view.onBeforeUnload()).toBe(
+                                                                'Your video uploads are not complete.');
+                                                        });
+                                                } else {
+                                                    it('should not show notification once video uploads are complete',
+                                                        function() {
+                                                            expect(this.view.onBeforeUnload()).toBeUndefined();
+                                                        });
+                                                }
                                             });
                                         }
-
-                                        // If we're uploading more files than the one we've closed above,
-                                        // the unload warning should still be shown
-                                        if (caseInfo.numFiles > 1) {
-                                            it('should show notification when videos are still uploading',
-                                                function() {
-                                                    expect(this.view.onBeforeUnload()).toBe(
-                                                        'Your video uploads are not complete.');
-                                                });
-                                        } else {
-                                            it('should not show notification once video uploads are complete',
-                                                function() {
-                                                    expect(this.view.onBeforeUnload()).toBeUndefined();
-                                                });
-                                        }
-                                    });
+                                    );
                                 }
                             );
                         });

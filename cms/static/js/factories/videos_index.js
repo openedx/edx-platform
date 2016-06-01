@@ -1,29 +1,49 @@
-define(
-    ['jquery', 'backbone', 'js/views/active_video_upload_list', 'js/views/previous_video_upload_list'],
-    function($, Backbone, ActiveVideoUploadListView, PreviousVideoUploadListView) {
-        'use strict';
-        var VideosIndexFactory = function(
-            $contentWrapper,
-            postUrl,
-            encodingsDownloadUrl,
-            concurrentUploadLimit,
-            uploadButton,
-            previousUploads
-        ) {
-            var activeView = new ActiveVideoUploadListView({
+define([
+    'jquery', 'backbone', 'js/views/active_video_upload_list',
+    'js/views/previous_video_upload_list', 'js/views/active_video_upload'
+], function($, Backbone, ActiveVideoUploadListView, PreviousVideoUploadListView, ActiveVideoUpload) {
+    'use strict';
+    var VideosIndexFactory = function(
+        $contentWrapper,
+        postUrl,
+        encodingsDownloadUrl,
+        concurrentUploadLimit,
+        uploadButton,
+        previousUploads
+    ) {
+        var activeView = new ActiveVideoUploadListView({
                 postUrl: postUrl,
                 concurrentUploadLimit: concurrentUploadLimit,
-                uploadButton: uploadButton
-            });
-            $contentWrapper.append(activeView.render().$el);
-            var previousCollection = new Backbone.Collection(previousUploads);
-            var previousView = new PreviousVideoUploadListView({
-                collection: previousCollection,
+                uploadButton: uploadButton,
+                onFileUploadDone: function(activeVideos) {
+                    $.ajax({
+                        url: postUrl,
+                        contentType: 'application/json',
+                        dataType: 'json',
+                        type: 'GET'
+                    }).done(function(responseData) {
+                        var updatedCollection = new Backbone.Collection(responseData.videos).filter(function(video) {
+                                // Include videos that are not in the active video upload list,
+                                // or that are marked as Upload Complete
+                                var isActive = activeVideos.where({videoId: video.get('edx_video_id')});
+                                return isActive.length === 0 ||
+                                       isActive[0].get('status') === ActiveVideoUpload.STATUS_COMPLETE;
+                            }),
+                            updatedView = new PreviousVideoUploadListView({
+                                collection: updatedCollection,
+                                encodingsDownloadUrl: encodingsDownloadUrl
+                            });
+                        $contentWrapper.find('.wrapper-assets').replaceWith(updatedView.render().$el);
+                    });
+                }
+            }),
+            previousView = new PreviousVideoUploadListView({
+                collection: new Backbone.Collection(previousUploads),
                 encodingsDownloadUrl: encodingsDownloadUrl
             });
-            $contentWrapper.append(previousView.render().$el);
-        };
+        $contentWrapper.append(activeView.render().$el);
+        $contentWrapper.append(previousView.render().$el);
+    };
 
-        return VideosIndexFactory;
-    }
-);
+    return VideosIndexFactory;
+});
