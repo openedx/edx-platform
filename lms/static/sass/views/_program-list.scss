@@ -1,5 +1,5 @@
 .program-list-wrapper {
-  padding: $baseline + px;
+  padding: $baseline;
 }
 
 .program-cards-container {
@@ -13,15 +13,15 @@
 .sidebar {
   @include span(12);
   @include float(right);
-  margin-bottom: $baseline + px;
+  margin-bottom: $baseline;
 
   @include susy-media($bp-screen-md) {
     @include span(3);
   }
 
   .aside {
-    padding: $baseline + px;
-    margin-bottom: $baseline + px;
+    padding: $baseline;
+    margin-bottom: $baseline;
     background-color: $body-bg;
     box-sizing: border-box;
     border: 1px solid $border-color-l3;
@@ -40,7 +40,7 @@
     .advertise-message {
       font-size: font-size(x-small);
       color: palette(grayscale, black);
-      margin-bottom: $baseline + px;
+      margin-bottom: $baseline;
     }
   }
 
@@ -48,11 +48,11 @@
     .hd-6 {
       color: palette(grayscale, dark);
       font-weight: font-weight(normal);
-      margin-bottom: $baseline + px;
+      margin-bottom: $baseline;
     }
 
     .certificate-link {
-      padding-top: $baseline + px;
+      padding-top: $baseline;
       color: palette(primary, base);
       display: block;
 
@@ -69,13 +69,13 @@
 .empty-programs-message {
   border: 3px solid $gray-l4;
   background: $gray-l6;
-  padding: ($baseline*2) + px 0;
+  padding: ($baseline*2) 0;
   text-align: center;
   margin-bottom: 20px;
 
   .hd-3 {
     color: $black;
-    margin-bottom: $baseline + px;
+    margin-bottom: $baseline;
   }
 
   .find-xseries-programs {
@@ -85,13 +85,13 @@
 
     .action-xseries-icon {
       @include float(left);
-      @include margin-right($baseline*0.4 + px);
+      @include margin-right($baseline*0.4);
 
       display: inline;
       background: url('#{$static-path}/images/icon-sm-xseries-white.png') no-repeat;
       background-color: transparent;
-      width: ($baseline*1.1) + px;
-      height: ($baseline*1.1) + px;
+      width: ($baseline*1.1);
+      height: ($baseline*1.1);
     }
 
     &:active,

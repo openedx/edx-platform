@@ -9,9 +9,12 @@
 @import 'base-v2/extends';
 
 // Extensions
+@import 'shared-v2/variables';
 @import 'shared-v2/base';
 @import 'shared-v2/navigation';
 @import 'shared-v2/header';
 @import 'shared-v2/footer';
+@import 'shared-v2/layouts';
+@import 'shared-v2/components';
 @import 'shared-v2/modal';
 @import 'shared-v2/help-tab';
