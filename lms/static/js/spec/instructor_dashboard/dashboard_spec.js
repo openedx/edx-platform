@@ -1,5 +1,5 @@
 define(['jquery', 'coffee/src/instructor_dashboard/instructor_dashboard'],
-    function($, InstructorDashboard) {
+    function($) {
         'use strict';
         
         describe("LMS Instructor Dashboard", function() {

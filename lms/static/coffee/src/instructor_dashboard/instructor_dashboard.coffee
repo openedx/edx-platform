@@ -97,6 +97,7 @@ $ =>
 
 # proper tabpanel handling for the dashboard
 tabs = () ->
+    console.log "tabs loaded"
     startTab = $('.' + CSS_INSTRUCTOR_NAV).children('.nav-item').first()
     startPanel = $(startTab).attr('aria-controls')
     
@@ -106,6 +107,7 @@ tabs = () ->
     clickListener()
     
 resetTabs = () ->
+    console.log "resettabs"
     $('.'+ CSS_INSTRUCTOR_NAV).children('.nav-item').each (index, element) ->
         tab = $(element)
         $(tab).attr({ 'aria-selected': 'false', 'tabindex': '-1' }).removeClass CSS_ACTIVE_SECTION
@@ -113,11 +115,13 @@ resetTabs = () ->
     resetTabPanels()
     
 resetTabPanels = () ->
+    console.log "resettabpanels"
     $('.' + CSS_IDASH_SECTION).each (index, element) =>
         panel = $(element)
         $(panel).attr({ 'aria-hidden': 'true', 'tabindex': '-1' }).hide().removeClass CSS_ACTIVE_SECTION
 
 keyListener = () ->
+    console.log "listening for keys"
     $('.' + CSS_INSTRUCTOR_NAV).on 'keydown', '.nav-item', (event) =>
         key = event.which
         focused = $(event.currentTarget)
@@ -131,6 +135,7 @@ keyListener = () ->
             else return
     
 clickListener = () ->
+    console.log "listening for mouse"
     $('.' + CSS_INSTRUCTOR_NAV).on 'click', '.nav-item', (event) ->
         tab = $(event.currentTarget)
         panel = $(tab).attr('aria-controls')
@@ -139,6 +144,7 @@ clickListener = () ->
         activateTab(tab, panel)
         
 previousTab = (focused, index, total, event) ->
+    console.log "previous tab"
     if (event.altKey || event.shiftKey)
         true
     if (index == 0)
@@ -153,6 +159,7 @@ previousTab = (focused, index, total, event) ->
     false
     
 nextTab = (focused, index, total, event) ->
+    console.log "next tab"
     if (event.altKey || event.shiftKey)
         true
     if (index == total)
@@ -167,6 +174,7 @@ nextTab = (focused, index, total, event) ->
     false
 
 activateTab = (tab, panel) ->
+    console.log "activating tab"
     resetTabs()
     activateTabPanel(panel)
     
@@ -178,15 +186,18 @@ activateTab = (tab, panel) ->
     updateLocationHash(section_name)
     
 activateTabPanel = (panel) ->
+    console.log "activating tab panel"
     resetTabPanels()
     
     $('#' + panel).attr({ 'aria-hidden': 'false', 'tabindex': '0' }).show().addClass CSS_ACTIVE_SECTION
       
 updateLocationHash = (section_name) ->
+    console.log "updating hash"
     # deep linking, writing url
     location.hash = "#{HASH_LINK_PREFIX}#{section_name}"
     
 checkForLocationHash = (startTab, startPanel) ->
+    console.log "checking for hash"
     # if sent a deep link, activate appropriate page section
     if (location.hash)
         if (new RegExp "^#{HASH_LINK_PREFIX}").test location.hash

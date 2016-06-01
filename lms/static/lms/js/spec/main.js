@@ -312,7 +312,7 @@
             },
             'coffee/src/instructor_dashboard/instructor_dashboard': {
                 exports: 'coffee/src/instructor_dashboard/instructor_dashboard',
-                deps: ['jquery', 'underscore', 'coffee/src/instructor_dashboard/util', 'string_utils']
+                deps: ['jquery']
             },
             'js/instructor_dashboard/certificates': {
                 exports: 'js/instructor_dashboard/certificates',
