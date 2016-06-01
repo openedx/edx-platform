@@ -5,6 +5,8 @@ Utility functions for setting "logged in" cookies used by subdomains.
 import time
 import json
 
+from email_marketing.signals import add_email_marketing_cookies
+
 from django.utils.http import cookie_date
 from django.conf import settings
 from django.core.urlresolvers import reverse, NoReverseMatch
@@ -118,7 +120,7 @@ def set_logged_in_cookies(request, response, user):
         **cookie_settings
     )
 
-    return response
+    return add_email_marketing_cookies(response, user)
 
 
 def delete_logged_in_cookies(response):

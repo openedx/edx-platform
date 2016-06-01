@@ -179,3 +179,6 @@ jsonfield==1.0.3
 
 # Inlines CSS styles into HTML for email notifications.
 pynliner==0.5.2
+
+# for sailthru integration
+sailthru-client==2.2.3

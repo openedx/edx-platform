@@ -113,6 +113,7 @@ from student.helpers import (
 from student.cookies import set_logged_in_cookies, delete_logged_in_cookies
 from student.models import anonymous_id_for_user, UserAttribute
 from shoppingcart.models import DonationConfiguration, CourseRegistrationCode
+from email_marketing.signals import REGISTER_USER
 
 from embargo import api as embargo_api
 
@@ -1753,6 +1754,9 @@ def create_account_with_params(request, params):
                 }
             }
         )
+
+    # Announce registration
+    REGISTER_USER.send(sender=None, user=user, profile=profile)
 
     create_comments_service_user(user)
 

@@ -2043,6 +2043,9 @@ INSTALLED_APPS = (
 
     # Needed whether or not enabled, due to migrations
     'badges',
+
+    # Email marketing integration
+    'email_marketing',
 )
 
 # Migrations which are not in the standard module "migrations"
