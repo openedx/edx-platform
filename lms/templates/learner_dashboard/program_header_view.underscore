@@ -5,7 +5,7 @@
 </picture>
 <h2 class="hd-2 title"><%- name %></h2>
 <p class="subtitle"><%- subtitle %></p>
-<a href="<%- program_details_url %>" class="breadcrumb"><%- gettext('Programs') %></a>
+<a href="" class="breadcrumb"><%- gettext('Programs') %></a>
 <span><%- StringUtils.interpolate(
     gettext('{category}\'s program'),
     {category: category}
