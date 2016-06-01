@@ -4,12 +4,20 @@ from rest_framework.parsers import MultiPartParser
 from rest_framework.response import Response
 
 from .models import Microsite
-from .serializers import MicrositeSerializer
+from .serializers import MicrositeSerializer, MicrositeListSerializer
 
 
 class MicrositeViewSet(viewsets.ModelViewSet):
     queryset = Microsite.objects.all()
-    serializer_class = MicrositeSerializer
+    serializer_class = MicrositeListSerializer
+    detail_serializer_class = MicrositeSerializer
+
+    def get_serializer_class(self):
+        if self.action == 'retrieve':
+            if hasattr(self, 'detail_serializer_class'):
+                return self.detail_serializer_class
+
+        return super(MicrositeViewSet, self).get_serializer_class()
 
 
 class FileUploadView(views.APIView):

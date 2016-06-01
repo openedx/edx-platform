@@ -19,3 +19,8 @@ class MicrositeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Microsite
         fields = ('id', 'key', 'site', 'values', 'sass_variables')
+
+
+class MicrositeListSerializer(MicrositeSerializer):
+    class Meta(MicrositeSerializer.Meta):
+        fields = ('id', 'key', 'site')
