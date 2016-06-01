@@ -3,14 +3,16 @@ import logging
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
+from django.core.cache import cache
+from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import csrf_exempt
 
+from commerce.models import CommerceConfiguration
 from edxmako.shortcuts import render_to_response
 from microsite_configuration import microsite
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
-from shoppingcart.processors.CyberSource2 import is_user_payment_error
-from django.utils.translation import ugettext as _
 from openedx.core.djangoapps.theming.helpers import is_request_in_themed_site
+from shoppingcart.processors.CyberSource2 import is_user_payment_error
 
 
 log = logging.getLogger(__name__)
@@ -64,6 +66,13 @@ def checkout_receipt(request):
         for_help_text = _(
             "If your course does not appear on your dashboard, contact {payment_support_link}."
         ).format(payment_support_link=payment_support_link)
+
+    commerce_configuration = CommerceConfiguration.current()
+    # user order cache should be cleared when a new order is placed
+    # so user can see new order in their order history.
+    if is_payment_complete and commerce_configuration.enabled and commerce_configuration.is_cache_enabled:
+        cache_key = commerce_configuration.CACHE_KEY + '.' + str(request.user.id)
+        cache.delete(cache_key)
 
     context = {
         'page_title': page_title,
