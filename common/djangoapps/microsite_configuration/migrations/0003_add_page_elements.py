@@ -16,7 +16,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='microsite',
             name='page_elements',
-            field=jsonfield.fields.JSONField(default=microsite_configuration.utils.get_initial_page_contents, blank=True),
+            field=jsonfield.fields.JSONField(default=microsite_configuration.utils.get_initial_page_elements, blank=True),
         ),
         migrations.AlterField(
             model_name='microsite',
