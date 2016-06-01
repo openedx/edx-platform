@@ -9,7 +9,7 @@
     top: -($baseline*30);
     overflow: hidden;
     background: $white;
-    border-bottom: 1px solid palette(grayscale, white);
+    border-bottom: 1px solid $lms-border-color;
     padding: ($baseline*0.75) ($baseline/2);
 
     &:focus,

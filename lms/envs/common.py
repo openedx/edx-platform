@@ -1441,6 +1441,18 @@ PIPELINE_CSS = {
         ],
         'output_filename': 'css/lms-style-student-notes.css',
     },
+    'style-discussion-main': {
+        'source_filenames': [
+            'css/discussion/lms-discussion-main.css',
+        ],
+        'output_filename': 'css/discussion/lms-discussion-main.css',
+    },
+    'style-discussion-main-rtl': {
+        'source_filenames': [
+            'css/discussion/lms-discussion-main-rtl.css',
+        ],
+        'output_filename': 'css/discussion/lms-discussion-main-rtl.css',
+    },
     'style-xmodule-annotations': {
         'source_filenames': [
             'css/vendor/ova/annotator.css',

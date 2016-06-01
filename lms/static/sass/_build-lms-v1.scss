@@ -62,7 +62,7 @@
 @import 'views/api-access';
 
 // app - discussion
-@import "discussion/utilities/variables";
+@import "discussion/utilities/variables-v1";
 @import "discussion/mixins";
 @import 'discussion/discussion'; // Process old file after definitions but before everything else, partial is deprecated.
 @import "discussion/elements/actions";

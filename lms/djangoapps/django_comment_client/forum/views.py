@@ -287,7 +287,9 @@ def forum_form_discussion(request, course_key):
             'is_course_cohorted': is_course_cohorted(course_key),  # still needed to render _thread_list_template
             'sort_preference': user.default_sort_key,
             'category_map': course_settings["category_map"],
-            'course_settings': json.dumps(course_settings)
+            'course_settings': json.dumps(course_settings),
+            'disable_courseware_js': True,
+            'uses_pattern_library': True,
         }
         # print "start rendering.."
         return render_to_response('discussion/index.html', context)
@@ -402,7 +404,9 @@ def single_thread(request, course_key, discussion_id, thread_id):
             'user_cohort': user_cohort,
             'sort_preference': cc_user.default_sort_key,
             'category_map': course_settings["category_map"],
-            'course_settings': json.dumps(course_settings)
+            'course_settings': json.dumps(course_settings),
+            'disable_courseware_js': True,
+            'uses_pattern_library': True,
         }
         return render_to_response('discussion/index.html', context)
 

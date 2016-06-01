@@ -9,9 +9,9 @@
   a:link,
   a:visited {
     cursor: pointer;
-    border: 1px solid palette(grayscale, light);
+    border: 1px solid $lms-border-color;
     border-top-style: none;
-    border-radius: 0 0 ($baseline/2) + px ($baseline/2) + px;
+    border-radius: 0 0 ($baseline/2) ($baseline/2);
     background: transparentize(palette(grayscale, white-t), 0.25);
     color: transparentize(palette(grayscale-cool, x-dark), 0.25);
     font-weight: bold;
@@ -28,25 +28,25 @@
 }
 
 .help-buttons {
-  padding: ($baseline/2) + px ($baseline*2.5) + px;
+  padding: ($baseline/2) ($baseline*2.5);
 
   a:link, a:visited {
-    padding: ($baseline*0.75) + px 0;
+    padding: ($baseline*0.75) 0;
     text-align: center;
     cursor: pointer;
     background: palette(grayscale, white-t);
     text-decoration: none;
     display: block;
-    border: 1px solid palette(grayscale, light);
+    border: 1px solid $lms-border-color;
 
     &#feedback_link_problem {
       border-bottom-style: none;
-      border-radius: ($baseline/2) + px ($baseline/2) + px 0 0;
+      border-radius: ($baseline/2) ($baseline/2) 0 0;
     }
 
     &#feedback_link_question {
       border-top-style: none;
-      border-radius: 0 0 ($baseline/2) + px ($baseline/2) + px;
+      border-radius: 0 0 ($baseline/2) ($baseline/2);
     }
 
     &:hover, &:focus {
@@ -72,6 +72,6 @@
 
 #feedback_success_wrapper {
   p {
-    padding: 0 $baseline + px $baseline + px $baseline + px;
+    padding: 0 $baseline $baseline $baseline;
   }
 }
