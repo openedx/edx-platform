@@ -337,7 +337,7 @@ def submit_calculate_students_features_csv(request, course_key, features):
     """
     task_type = 'profile_info_csv'
     task_class = calculate_students_features_csv
-    task_input = {'features': features}
+    task_input = features
     task_key = ""
 
     return submit_task(request, task_type, task_class, course_key, task_input, task_key)
