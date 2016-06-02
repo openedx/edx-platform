@@ -97,7 +97,7 @@ def email_marketing_register_user(sender, user=None, profile=None,
         return
 
     # perform update asynchronously
-    update_user.delay(user.username)
+    update_user.delay(user.username, new_user=True)
 
 
 @receiver(USER_FIELD_CHANGED)
@@ -130,7 +130,7 @@ def email_marketing_user_field_changed(sender, user=None, table=None, setting=No
     # ignore anything not in list of fields to handle
     if setting in CHANGED_FIELDNAMES:
         # perform update asynchronously
-        update_user.delay(user.username)
+        update_user.delay(user.username, new_user=False)
 
     elif setting == 'email':
         # email update is special case

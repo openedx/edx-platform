@@ -20,14 +20,15 @@ from sailthru.sailthru_error import SailthruClientError
 log = logging.getLogger(__name__)
 
 
-def update_email_marketing_config(enabled=False, key='badkey', secret='badsecret'):
+def update_email_marketing_config(enabled=False, key='badkey', secret='badsecret', new_user_list='new list'):
     """
     Enable / Disable Sailthru integration
     """
     EmailMarketingConfiguration.objects.create(
         sailthru_enabled=enabled,
         sailthru_key=key,
-        sailthru_secret=secret
+        sailthru_secret=secret,
+        sailthru_new_user_list=new_user_list
     )
 
 
@@ -102,7 +103,7 @@ class EmailMarketingTests(TestCase):
         mock_user_get.return_value = self.user
         mock_profile_get.return_value = self.profile
         mock_sailthru.return_value = SailthruResponse(JsonResponse({'ok': True}))
-        update_user.delay(self.user.username)
+        update_user.delay(self.user.username, new_user=True)
         self.assertEquals(mock_sailthru.call_args[0][0], "user")
         userparms = mock_sailthru.call_args[0][1]
         self.assertEquals(userparms['key'], "email")
@@ -110,6 +111,7 @@ class EmailMarketingTests(TestCase):
         self.assertEquals(userparms['vars']['gender'], "m")
         self.assertEquals(userparms['vars']['username'], "test")
         self.assertEquals(userparms['vars']['activated'], 1)
+        self.assertEquals(userparms['lists']['new list'], 1)
 
     @patch('email_marketing.tasks.log.error')
     @patch('email_marketing.tasks.SailthruClient.api_post')

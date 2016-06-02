@@ -21,7 +21,7 @@ log = logging.getLogger(__name__)
 
 # pylint: disable=not-callable
 @task(bind=True, default_retry_delay=3600, max_retries=24)
-def update_user(self, username):
+def update_user(self, username, new_user=False):
     """
     Adds/updates Sailthru profile information for a user.
      Args:
@@ -51,7 +51,7 @@ def update_user(self, username):
 
     try:
         sailthru_client = SailthruClient(email_config.sailthru_key, email_config.sailthru_secret)
-        sailthru_response = sailthru_client.api_post("user", _create_sailthru_user_parm(user, profile))
+        sailthru_response = sailthru_client.api_post("user", _create_sailthru_user_parm(user, profile, new_user, email_config))
     except SailthruClientError as exc:
         log.error("Exception attempting to add/update user %s in Sailthru - %s", username, unicode(exc))
         raise self.retry(exc=exc,
@@ -113,7 +113,7 @@ def update_user_email(self, username, old_email):
                          max_retries=email_config.sailthru_max_retries)
 
 
-def _create_sailthru_user_parm(user, profile):
+def _create_sailthru_user_parm(user, profile, new_user, email_config):
     """
     Create sailthru user create/update parms from user + profile.
     """
@@ -131,5 +131,9 @@ def _create_sailthru_user_parm(user, profile):
         sailthru_vars['age'] = profile.age or -1
         sailthru_vars['year_of_birth'] = profile.year_of_birth or datetime.datetime.now(UTC).year
         sailthru_vars['country'] = unicode(profile.country.name)
+
+    # if new user add to list
+    if new_user and email_config.sailthru_new_user_list:
+        sailthru_user['lists'] = {"All edX Users": 1}
 
     return sailthru_user

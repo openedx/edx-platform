@@ -32,6 +32,13 @@ class EmailMarketingConfiguration(ConfigurationModel):
         )
     )
 
+    sailthru_new_user_list = models.fields.CharField(
+        max_length=32,
+        help_text=_(
+            "Sailthru list name to add new users to. "
+        )
+    )
+
     sailthru_retry_interval = models.fields.IntegerField(
         default=3600,
         help_text=_(

@@ -22,6 +22,7 @@ class Migration(migrations.Migration):
                 ('sailthru_enabled', models.BooleanField(default=False, help_text='Enable Sailthru integration.')),
                 ('sailthru_key', models.CharField(help_text='Sailthru api key.', max_length=32, null=True, blank=True)),
                 ('sailthru_secret', models.CharField(help_text='Sailthru secret.', max_length=32, null=True, blank=True)),
+                ('sailthru_new_user_list', models.CharField(help_text='Sailthru new user list.', max_length=32, null=True, blank=True)),
                 ('sailthru_retry_interval', models.IntegerField(default=3600, help_text='Sailthru connection retry interval (secs).')),
                 ('sailthru_max_retries', models.IntegerField(default=24, help_text='Sailthru maximum retries.')),
                 ('changed_by', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, editable=False, to=settings.AUTH_USER_MODEL, null=True, verbose_name='Changed by')),
