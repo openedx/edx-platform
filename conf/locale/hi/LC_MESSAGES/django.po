@@ -1,32 +1,6 @@
 # #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
-# #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
 # edX translation file.
 # Copyright (C) 2016 EdX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# #-#-#-#-#  django-studio.po (0.1a)  #-#-#-#-#
-# edX translation file.
-# Copyright (C) 2016 EdX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# #-#-#-#-#  mako.po (0.1a)  #-#-#-#-#
-# edX translation file
-# Copyright (C) 2016 edX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# #-#-#-#-#  mako-studio.po (0.1a)  #-#-#-#-#
-# edX translation file
-# Copyright (C) 2016 edX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# #-#-#-#-#  messages.po (EdX Studio)  #-#-#-#-#
-# edX translation file
-# Copyright (C) 2013 edX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# #-#-#-#-#  wiki.po (0.1a)  #-#-#-#-#
-# edX translation file
-# Copyright (C) 2016 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
@@ -42,34 +16,8 @@
 # Sarina Canelake <sarina@edx.org>, 2014
 # CHANDRA SHEKHAR SHARMA <shekharsharma041@gmail.com>, 2014
 # #-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#
-# #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
 # edX translation file.
 # Copyright (C) 2016 EdX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# #-#-#-#-#  django-studio.po (0.1a)  #-#-#-#-#
-# edX translation file.
-# Copyright (C) 2016 EdX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# #-#-#-#-#  mako.po (0.1a)  #-#-#-#-#
-# edX translation file
-# Copyright (C) 2016 edX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# #-#-#-#-#  mako-studio.po (0.1a)  #-#-#-#-#
-# edX translation file
-# Copyright (C) 2016 edX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# #-#-#-#-#  messages.po (EdX Studio)  #-#-#-#-#
-# edX translation file
-# Copyright (C) 2013 edX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# #-#-#-#-#  wiki.po (0.1a)  #-#-#-#-#
-# edX translation file
-# Copyright (C) 2016 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
@@ -122,7 +70,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-05-19 17:10+0000\n"
+"POT-Creation-Date: 2016-05-26 16:39+0000\n"
 "PO-Revision-Date: 2016-05-09 11:27+0000\n"
 "Last-Translator: plankton rules <planktonrules0@gmail.com>\n"
 "Language-Team: Hindi (http://www.transifex.com/open-edx/edx-platform/language/hi/)\n"
@@ -6024,11 +5972,17 @@ msgstr ""
 msgid "cohorted"
 msgstr ""
 
+#. Translators: This label appears above a field on the registration form
+#. which allows the user to input the First Name
 #: lms/djangoapps/instructor_task/tasks_helper.py
+#: openedx/core/djangoapps/user_api/views.py
 msgid "First Name"
 msgstr ""
 
+#. Translators: This label appears above a field on the registration form
+#. which allows the user to input the First Name
 #: lms/djangoapps/instructor_task/tasks_helper.py
+#: openedx/core/djangoapps/user_api/views.py
 msgid "Last Name"
 msgstr ""
 
@@ -8525,6 +8479,12 @@ msgstr ""
 msgid "State/Province/Region"
 msgstr ""
 
+#. Translators: This label appears above a field on the registration form
+#. which allows the user to input the Company
+#: openedx/core/djangoapps/user_api/views.py
+msgid "Company"
+msgstr ""
+
 #: openedx/core/djangoapps/user_api/views.py
 msgid "Please select your Country."
 msgstr ""
@@ -9291,8 +9251,7 @@ msgstr ""
 msgid "View all Courses"
 msgstr ""
 
-#: lms/templates/dashboard.html lms/templates/user_dropdown.html
-#: themes/edx.org/lms/templates/dashboard.html
+#: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
 msgid "Dashboard"
 msgstr "डैशबोर्ड"
 
@@ -9328,14 +9287,6 @@ msgstr ""
 
 #: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
 msgid "Order History"
-msgstr ""
-
-#: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
-msgid "XSeries Program Certificates"
-msgstr ""
-
-#: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
-msgid "You have received a certificate for the following XSeries programs:"
 msgstr ""
 
 #: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
@@ -9884,6 +9835,10 @@ msgstr "रौ डेटा:"
 
 #: lms/templates/navigation.html themes/red-theme/lms/templates/header.html
 msgid "Global"
+msgstr ""
+
+#: lms/templates/navigation.html themes/edx.org/lms/templates/header.html
+msgid "Your Dashboard"
 msgstr ""
 
 #: lms/templates/navigation.html themes/edx.org/lms/templates/header.html
@@ -10574,16 +10529,16 @@ msgid "Usermenu dropdown"
 msgstr ""
 
 #: lms/templates/user_dropdown.html
-msgid "Profile"
+msgid "Profile for:"
 msgstr ""
 
 #: lms/templates/user_dropdown.html
-msgid "Profile image for {username}"
+msgid "Account settings menu"
 msgstr ""
 
-#: lms/templates/user_dropdown.html themes/red-theme/lms/templates/header.html
-msgid "More options dropdown"
-msgstr "और विकल्पों के लिए ड्रॉपडाउन करें"
+#: lms/templates/user_dropdown.html
+msgid "Account settings"
+msgstr ""
 
 #: lms/templates/using.html
 msgid "Using the system"
@@ -12178,6 +12133,24 @@ msgid ""
 "link to it will appear here and on your Dashboard when it is ready."
 msgstr ""
 
+#. Translators: This message appears to users when the users have not
+#. completed
+#. identity verification.
+#: lms/templates/courseware/progress.html
+msgid "Certificate unavailable"
+msgstr ""
+
+#: lms/templates/courseware/progress.html
+msgid ""
+"You have not received a certificate because you do not have a current "
+"{platform_name} verified identity. "
+msgstr ""
+
+#: lms/templates/courseware/progress.html
+#: lms/templates/dashboard/_dashboard_certificate_information.html
+msgid "Verify your identity now."
+msgstr ""
+
 #: lms/templates/courseware/progress.html
 msgid "Congratulations, you qualified for a certificate!"
 msgstr ""
@@ -12379,6 +12352,12 @@ msgstr ""
 "इरान, कूबा, सीरीया और सुदान पर व्यापार संबंघी प्रतिरोध लगाएं हुए हैं, उनका "
 "उल्लंघन करना नहीं होगा। अगर आपको लगता है कि सिस्टम की किसी गड़बड़ से आपको इन"
 " किसी देशों से जोड़ा गया है, तो हमें इस ई-मेल{email} पर संपर्क करें।"
+
+#: lms/templates/dashboard/_dashboard_certificate_information.html
+msgid ""
+"Your certificate was not issued because you do not have a current verified "
+"identity with {platform_name}. "
+msgstr ""
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid "Your {cert_name_short} is Generating"
@@ -14616,6 +14595,10 @@ msgid ""
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid "Upload a CSV for bulk enrollment"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Upload CSV"
 msgstr ""
 
@@ -16276,6 +16259,10 @@ msgid ""
 "{tos_link_start}Terms of Service{tos_link_end} and {honor_link_start}Honor "
 "Code{honor_link_end}"
 msgstr ""
+
+#: themes/red-theme/lms/templates/header.html
+msgid "More options dropdown"
+msgstr "और विकल्पों के लिए ड्रॉपडाउन करें"
 
 #: themes/red-theme/lms/templates/header.html
 msgid "My Profile"

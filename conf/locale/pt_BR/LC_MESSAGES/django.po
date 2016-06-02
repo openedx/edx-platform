@@ -1,32 +1,6 @@
 # #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
-# #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
 # edX translation file.
 # Copyright (C) 2016 EdX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# #-#-#-#-#  django-studio.po (0.1a)  #-#-#-#-#
-# edX translation file.
-# Copyright (C) 2016 EdX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# #-#-#-#-#  mako.po (0.1a)  #-#-#-#-#
-# edX translation file
-# Copyright (C) 2016 edX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# #-#-#-#-#  mako-studio.po (0.1a)  #-#-#-#-#
-# edX translation file
-# Copyright (C) 2016 edX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# #-#-#-#-#  messages.po (EdX Studio)  #-#-#-#-#
-# edX translation file
-# Copyright (C) 2013 edX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# #-#-#-#-#  wiki.po (0.1a)  #-#-#-#-#
-# edX translation file
-# Copyright (C) 2016 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
@@ -96,34 +70,8 @@
 # William Bellinazo Roca <williambr_1331@hotmail.com>, 2016
 # William Bellinazo Roca <williambr_1331@hotmail.com>, 2016
 # #-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#
-# #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
 # edX translation file.
 # Copyright (C) 2016 EdX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# #-#-#-#-#  django-studio.po (0.1a)  #-#-#-#-#
-# edX translation file.
-# Copyright (C) 2016 EdX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# #-#-#-#-#  mako.po (0.1a)  #-#-#-#-#
-# edX translation file
-# Copyright (C) 2016 edX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# #-#-#-#-#  mako-studio.po (0.1a)  #-#-#-#-#
-# edX translation file
-# Copyright (C) 2016 edX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# #-#-#-#-#  messages.po (EdX Studio)  #-#-#-#-#
-# edX translation file
-# Copyright (C) 2013 edX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# #-#-#-#-#  wiki.po (0.1a)  #-#-#-#-#
-# edX translation file
-# Copyright (C) 2016 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
@@ -163,6 +111,7 @@
 # Álex Filipe <alexfilipe@outlook.com>, 2014
 # Alex M. Becker <becker.alex@alunos.unipampa.edu.br>, 2013
 # Alex M. Becker <becker.alex@alunos.unipampa.edu.br>, 2013
+# Anderson Franca <anderson.frca@gmail.com>, 2016
 # André Geraldo <andreufpel@yahoo.com.br>, 2015
 # Andrei Bosco Bezerra Torres <andreibosco@gmail.com>, 2014
 # Angela Amaro <angelasimei@gmail.com>, 2016
@@ -297,7 +246,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-05-19 17:10+0000\n"
+"POT-Creation-Date: 2016-05-26 16:39+0000\n"
 "PO-Revision-Date: 2016-05-09 11:27+0000\n"
 "Last-Translator: Monica Farias <monifar.tp@gmail.com>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/open-edx/edx-platform/language/pt_BR/)\n"
@@ -6934,11 +6883,17 @@ msgstr "Certificados gerados."
 msgid "cohorted"
 msgstr "agrupado"
 
+#. Translators: This label appears above a field on the registration form
+#. which allows the user to input the First Name
 #: lms/djangoapps/instructor_task/tasks_helper.py
+#: openedx/core/djangoapps/user_api/views.py
 msgid "First Name"
 msgstr "Nome:"
 
+#. Translators: This label appears above a field on the registration form
+#. which allows the user to input the First Name
 #: lms/djangoapps/instructor_task/tasks_helper.py
+#: openedx/core/djangoapps/user_api/views.py
 msgid "Last Name"
 msgstr "Sobrenome"
 
@@ -6948,7 +6903,11 @@ msgstr "Sobrenome"
 msgid "Company Name"
 msgstr "Nome da Empresa"
 
-#: lms/djangoapps/instructor_task/tasks_helper.py wiki/forms.py
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: This label appears above a field on the registration form
+#. which allows the user to input the Title
+#: lms/djangoapps/instructor_task/tasks_helper.py
+#: openedx/core/djangoapps/user_api/views.py wiki/forms.py
 msgid "Title"
 msgstr "Título"
 
@@ -9759,6 +9718,12 @@ msgstr "Diga-nos por que está interessado em {platform_name}"
 msgid "State/Province/Region"
 msgstr ""
 
+#. Translators: This label appears above a field on the registration form
+#. which allows the user to input the Company
+#: openedx/core/djangoapps/user_api/views.py
+msgid "Company"
+msgstr ""
+
 #: openedx/core/djangoapps/user_api/views.py
 msgid "Please select your Country."
 msgstr "Por favor, selecione seu País."
@@ -10565,8 +10530,7 @@ msgstr "Inicia"
 msgid "View all Courses"
 msgstr "Ver todos os cursos"
 
-#: lms/templates/dashboard.html lms/templates/user_dropdown.html
-#: themes/edx.org/lms/templates/dashboard.html
+#: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
 msgid "Dashboard"
 msgstr "Painel de controle"
 
@@ -10603,14 +10567,6 @@ msgstr "Informações sobre sua conta"
 #: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
 msgid "Order History"
 msgstr "Histórico de pedidos"
-
-#: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
-msgid "XSeries Program Certificates"
-msgstr ""
-
-#: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
-msgid "You have received a certificate for the following XSeries programs:"
-msgstr ""
 
 #: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
 msgid "Email Settings for {course_number}"
@@ -11171,6 +11127,10 @@ msgstr "Dados brutos:"
 #: lms/templates/navigation.html themes/red-theme/lms/templates/header.html
 msgid "Global"
 msgstr "Global"
+
+#: lms/templates/navigation.html themes/edx.org/lms/templates/header.html
+msgid "Your Dashboard"
+msgstr ""
 
 #: lms/templates/navigation.html themes/edx.org/lms/templates/header.html
 #: themes/red-theme/lms/templates/header.html
@@ -11877,16 +11837,16 @@ msgid "Usermenu dropdown"
 msgstr ""
 
 #: lms/templates/user_dropdown.html
-msgid "Profile"
-msgstr "Perfil"
-
-#: lms/templates/user_dropdown.html
-msgid "Profile image for {username}"
+msgid "Profile for:"
 msgstr ""
 
-#: lms/templates/user_dropdown.html themes/red-theme/lms/templates/header.html
-msgid "More options dropdown"
-msgstr "Mais opções no menu suspenso"
+#: lms/templates/user_dropdown.html
+msgid "Account settings menu"
+msgstr ""
+
+#: lms/templates/user_dropdown.html
+msgid "Account settings"
+msgstr ""
 
 #: lms/templates/using.html
 msgid "Using the system"
@@ -13573,6 +13533,24 @@ msgstr ""
 "cursos. Quando o certificado estiver pronto, um link para ele aparecerá aqui"
 " e no seu painel de controle."
 
+#. Translators: This message appears to users when the users have not
+#. completed
+#. identity verification.
+#: lms/templates/courseware/progress.html
+msgid "Certificate unavailable"
+msgstr ""
+
+#: lms/templates/courseware/progress.html
+msgid ""
+"You have not received a certificate because you do not have a current "
+"{platform_name} verified identity. "
+msgstr ""
+
+#: lms/templates/courseware/progress.html
+#: lms/templates/dashboard/_dashboard_certificate_information.html
+msgid "Verify your identity now."
+msgstr ""
+
 #: lms/templates/courseware/progress.html
 msgid "Congratulations, you qualified for a certificate!"
 msgstr "Parabéns! Você está qualificado para um certificado!"
@@ -13791,6 +13769,12 @@ msgstr ""
 " esteja em conformidade com os embargos dos EUA ao Irã, Cuba, Síria e Sudão."
 " Caso considere que o nosso sistema o identificou erroneamente como estando "
 "ligado a um desses países, por favor, avise-nos escrevendo para {email}."
+
+#: lms/templates/dashboard/_dashboard_certificate_information.html
+msgid ""
+"Your certificate was not issued because you do not have a current verified "
+"identity with {platform_name}. "
+msgstr ""
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid "Your {cert_name_short} is Generating"
@@ -16312,6 +16296,10 @@ msgstr ""
 "inclua nenhum cabeçalho, rodapé ou linha em branco. "
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid "Upload a CSV for bulk enrollment"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Upload CSV"
 msgstr "Enviar arquivo CSV"
 
@@ -18116,6 +18104,10 @@ msgid ""
 msgstr ""
 "{tos_link_start}Termos de Serviço{tos_link_end} e {honor_link_start}Código "
 "de Honra{honor_link_end}"
+
+#: themes/red-theme/lms/templates/header.html
+msgid "More options dropdown"
+msgstr "Mais opções no menu suspenso"
 
 #: themes/red-theme/lms/templates/header.html
 msgid "My Profile"
