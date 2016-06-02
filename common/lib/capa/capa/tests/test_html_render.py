@@ -295,7 +295,24 @@ class CapaHtmlRenderTest(unittest.TestCase):
             </problem>
         """)
 
+        expected = textwrap.dedent("""\
+            <problem><question class="question" id="1_question_0" question_index="0">
+            <p>That is the question</p>
+            <multiplechoiceresponse id="1_1">
+              <choicegroup type="MultipleChoice" response_id="2" answer_id="1" id="1_2_1">
+                <choice correct="false" name="choice_0">Alpha <choicehint>A hint</choicehint>
+                </choice>
+                <choice correct="true" name="choice_1">Beta</choice>
+              </choicegroup>
+            </multiplechoiceresponse>
+            <demandhint>
+              <hint>question 1 hint 1</hint>
+              <hint>question 1 hint 2</hint>
+            </demandhint>
+            </question></problem>""")
+
         # Create the problem
         problem = new_loncapa_problem(xml_str)
         childs = [child.tag for child in problem.tree.getchildren()]  # pylint: disable=no-member
         self.assertEqual(set(childs), set(['question']))
+        self.assertEqual(etree.tostring(problem.tree), expected)
