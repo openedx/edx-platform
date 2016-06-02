@@ -38,6 +38,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.utils.translation import ugettext_noop
 from django.core.cache import cache
 from django_countries.fields import CountryField
+from openedx.core.lib.timezone import TimeZoneField
 import dogstats_wrapper as dog_stats_api
 from eventtracking import tracker
 from model_utils.models import TimeStampedModel
@@ -277,6 +278,7 @@ class UserProfile(models.Model):
     mailing_address = models.TextField(blank=True, null=True)
     city = models.TextField(blank=True, null=True)
     country = CountryField(blank=True, null=True)
+    time_zone = TimeZoneField(blank=True, null=True, max_length=255, choices=TimeZoneField.TIME_ZONE_CHOICES)
     goals = models.TextField(blank=True, null=True)
     allow_certificate = models.BooleanField(default=1)
     bio = models.CharField(blank=True, null=True, max_length=3000, db_index=False)

@@ -39,6 +39,7 @@ from util.bad_request_rate_limiter import BadRequestRateLimiter
 from openedx.core.djangoapps.theming.helpers import is_request_in_themed_site, get_value as get_themed_value
 from openedx.core.djangoapps.user_api.accounts.api import request_password_change
 from openedx.core.djangoapps.user_api.errors import UserNotFound
+from openedx.core.lib.timezone import TimeZoneField
 
 
 AUDIT_LOG = logging.getLogger("audit")
@@ -388,6 +389,8 @@ def account_settings_context(request):
                 'options': year_of_birth_options,
             }, 'preferred_language': {
                 'options': all_languages(),
+            }, 'time_zone': {
+                'options': TimeZoneField.TIME_ZONE_CHOICES,
             }
         },
         'platform_name': get_themed_value('PLATFORM_NAME', settings.PLATFORM_NAME),

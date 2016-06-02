@@ -102,6 +102,7 @@ class UserAPITestCase(APITestCase):
         """
         legacy_profile = UserProfile.objects.get(id=user.id)
         legacy_profile.country = "US"
+        legacy_profile.time_zone = "Africa/Juba"
         legacy_profile.level_of_education = "m"
         legacy_profile.year_of_birth = 2000
         legacy_profile.goals = "world peace"
@@ -168,8 +169,8 @@ class TestAccountAPI(CacheIsolationTestCase, UserAPITestCase):
         self.assertEqual(8, len(data))
         self.assertEqual(self.user.username, data["username"])
         self.assertEqual("US", data["country"])
+        self.assertEqual("Africa/Juba", data["time_zone"])
         self._verify_profile_image_data(data, True)
-        self.assertIsNone(data["time_zone"])
         self.assertEqual([{"code": "en"}], data["language_proficiencies"])
         self.assertEqual("Tired mother of twins", data["bio"])
         self.assertEqual(account_privacy, data["account_privacy"])
@@ -190,10 +191,11 @@ class TestAccountAPI(CacheIsolationTestCase, UserAPITestCase):
         Verify that all account fields are returned (even those that are not shareable).
         """
         data = response.data
-        self.assertEqual(17, len(data))
+        self.assertEqual(18, len(data))
         self.assertEqual(self.user.username, data["username"])
         self.assertEqual(self.user.first_name + " " + self.user.last_name, data["name"])
         self.assertEqual("US", data["country"])
+        self.assertEqual("Africa/Juba", data["time_zone"])
         self.assertEqual("f", data["gender"])
         self.assertEqual(2000, data["year_of_birth"])
         self.assertEqual("m", data["level_of_education"])
@@ -318,10 +320,10 @@ class TestAccountAPI(CacheIsolationTestCase, UserAPITestCase):
             with self.assertNumQueries(queries):
                 response = self.send_get(self.client)
             data = response.data
-            self.assertEqual(17, len(data))
+            self.assertEqual(18, len(data))
             self.assertEqual(self.user.username, data["username"])
             self.assertEqual(self.user.first_name + " " + self.user.last_name, data["name"])
-            for empty_field in ("year_of_birth", "level_of_education", "mailing_address", "bio"):
+            for empty_field in ("year_of_birth", "level_of_education", "mailing_address", "bio", "time_zone"):
                 self.assertIsNone(data[empty_field])
             self.assertIsNone(data["country"])
             self.assertEqual("m", data["gender"])
@@ -350,6 +352,7 @@ class TestAccountAPI(CacheIsolationTestCase, UserAPITestCase):
         """
         legacy_profile = UserProfile.objects.get(id=self.user.id)
         legacy_profile.country = ""
+        legacy_profile.time_zone = ""
         legacy_profile.level_of_education = ""
         legacy_profile.gender = ""
         legacy_profile.bio = ""
@@ -358,7 +361,7 @@ class TestAccountAPI(CacheIsolationTestCase, UserAPITestCase):
         self.client.login(username=self.user.username, password=self.test_password)
         with self.assertNumQueries(15):
             response = self.send_get(self.client)
-        for empty_field in ("level_of_education", "gender", "country", "bio"):
+        for empty_field in ("level_of_education", "gender", "country", "bio", "time_zone"):
             self.assertIsNone(response.data[empty_field])
 
     @ddt.data(
@@ -394,6 +397,7 @@ class TestAccountAPI(CacheIsolationTestCase, UserAPITestCase):
         ("gender", "f", "not a gender", u'"not a gender" is not a valid choice.'),
         ("level_of_education", "none", u"ȻħȺɍłɇs", u'"ȻħȺɍłɇs" is not a valid choice.'),
         ("country", "GB", "XY", u'"XY" is not a valid choice.'),
+        ("time_zone", "Asia/Macau", "Africa/Asia", u'"Africa/Asia" is not a valid choice.'),
         ("year_of_birth", 2009, "not_an_int", u"A valid integer is required."),
         ("name", "bob", "z" * 256, u"Ensure this value has at most 255 characters (it has 256)."),
         ("name", u"ȻħȺɍłɇs", "z   ", "The name field must be at least 2 characters long."),
@@ -498,7 +502,7 @@ class TestAccountAPI(CacheIsolationTestCase, UserAPITestCase):
         Also verifies the behaviour when setting to None.
         """
         self.client.login(username=self.user.username, password=self.test_password)
-        for field_name in ["gender", "level_of_education", "country"]:
+        for field_name in ["gender", "level_of_education", "country", "time_zone"]:
             response = self.send_patch(self.client, {field_name: ""})
             # Although throwing a 400 might be reasonable, the default DRF behavior with ModelSerializer
             # is to convert to None, which also seems acceptable (and is difficult to override).
@@ -702,12 +706,12 @@ class TestAccountAPI(CacheIsolationTestCase, UserAPITestCase):
         response = self.send_get(client)
         if has_full_access:
             data = response.data
-            self.assertEqual(17, len(data))
+            self.assertEqual(18, len(data))
             self.assertEqual(self.user.username, data["username"])
             self.assertEqual(self.user.first_name + " " + self.user.last_name, data["name"])
             self.assertEqual(self.user.email, data["email"])
             self.assertEqual(current_year - 10, data["year_of_birth"])
-            for empty_field in ("country", "level_of_education", "mailing_address", "bio"):
+            for empty_field in ("country", "level_of_education", "mailing_address", "bio", "time_zone"):
                 self.assertIsNone(data[empty_field])
             self.assertEqual("m", data["gender"])
             self.assertEqual("Learn a lot", data["goals"])

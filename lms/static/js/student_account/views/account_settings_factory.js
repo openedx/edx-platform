@@ -107,7 +107,8 @@
                                 title: gettext('Time Zone'),
                                 valueAttribute: 'time_zone',
                                 required: true,
-                                helpMessage: gettext('The time zone you currently reside in. This is used to calculate course start/end times.'),
+                                helpMessage: gettext('The time zone you currently reside in. ' +
+                                    'This is used to calculate course start/end times.'),
                                 options: fieldsData.time_zone.options,
                                 persistChanges: true
                             })
