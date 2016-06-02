@@ -35,7 +35,7 @@ from django.utils.translation import ugettext as _
             % endif
             <p class="lti-link external"><a target="_blank" class="link_lti_new_window" href="${form_url}">
                 ${button_text or _('View resource in a new window')}
-                 <i class="icon fa fa-external-link"></i>
+                 <span class="icon fa fa-external-link" aria-hidden="true"></span>
             </a></p>
         </div>
     % else:

@@ -1,6 +1,6 @@
 <div class="meta-wrap">
     <div class="meta">
-        <%= messageHtml %>
+        <p><%= HtmlUtils.ensureHtml(messageHtml) %></p>
     </div>
     <nav class="pagination pagination-compact top" aria-label="Compact Pagination">
         <ol>

@@ -263,9 +263,9 @@ define([
                 // Clear the search and submit it again
                 teamsTabView.$('.search-field').val('');
                 teamsTabView.$('.action-search').click();
+                
                 verifyTeamsRequest({
-                    order_by: 'last_activity_at',
-                    text_search: ''
+                    order_by: 'last_activity_at'
                 });
                 AjaxHelpers.respondWithJson(requests, {});
                 expect(teamsTabView.$('.page-title').text()).toBe('Test Topic 1');

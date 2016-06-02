@@ -16,7 +16,7 @@ var options = {
     // Avoid adding files to this list. Use RequireJS.
     libraryFilesToInclude: [
         {pattern: 'xmodule_js/common_static/js/vendor/requirejs/require.js', included: true},
-        {pattern: 'js/spec/main_requirejs_coffee.js', included: true},
+        {pattern: 'lms/js/spec/main_requirejs_coffee.js', included: true},
 
         {pattern: 'js/RequireJS-namespace-undefine.js', included: true},
         {pattern: 'xmodule_js/common_static/coffee/src/ajax_prefix.js', included: true},

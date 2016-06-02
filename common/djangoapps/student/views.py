@@ -134,6 +134,8 @@ log = logging.getLogger("edx.student")
 AUDIT_LOG = logging.getLogger("audit")
 ReverifyInfo = namedtuple('ReverifyInfo', 'course_id course_name course_number date status display')  # pylint: disable=invalid-name
 SETTING_CHANGE_INITIATED = 'edx.user.settings.change_initiated'
+# Used as the name of the user attribute for tracking affiliate registrations
+REGISTRATION_AFFILIATE_ID = 'registration_affiliate_id'
 
 # Disable this warning because it doesn't make sense to completely refactor tests to appease Pylint
 # pylint: disable=logging-format-interpolation
@@ -1865,7 +1867,7 @@ def _record_registration_attribution(request, user):
     """
     affiliate_id = request.COOKIES.get(settings.AFFILIATE_COOKIE_NAME)
     if user is not None and affiliate_id is not None:
-        UserAttribute.set_user_attribute(user, settings.AFFILIATE_COOKIE_NAME, affiliate_id)
+        UserAttribute.set_user_attribute(user, REGISTRATION_AFFILIATE_ID, affiliate_id)
 
 
 @csrf_exempt

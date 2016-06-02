@@ -18,7 +18,7 @@
       }
       %>
       <span class="sr"><%= sr_text %></span>
-      <i class="icon fa <%= icon_class %>"></i>
+      <span class="icon fa <%= icon_class %>" aria-hidden="true"></span>
     </div><div class="forum-nav-thread-wrapper-1">
       <span class="forum-nav-thread-title"><%- title %></span>
       <% if(typeof(subscribed) === "undefined") { var subscribed = null; } %>
@@ -26,28 +26,28 @@
         <ul class="forum-nav-thread-labels">
         <% if (pinned) { %>
           <li class="post-label-pinned">
-            <i class="icon fa fa-thumb-tack"></i>
+            <span class="icon fa fa-thumb-tack" aria-hidden="true"></span>
             <% // Translators: This is a label for a forum thread that has been pinned %>
             <%- gettext("Pinned") %>
           </li>
         <% } %>
         <% if (subscribed) { %>
           <li class="post-label-following">
-            <i class="icon fa fa-star"></i>
+            <span class="icon fa fa-star" aria-hidden="true"></span>
             <% // Translators: This is a label for a forum thread that the user is subscribed to %>
             <%- gettext("Following") %>
           </li>
         <% } %>
         <% if (staff_authored) { %>
           <li class="post-label-by-staff">
-            <i class="icon fa fa-user"></i>
+            <span class="icon fa fa-user" aria-hidden="true"></span>
             <% // Translators: This is a label for a forum thread that was authored by a member of the course staff %>
             <%- gettext("By: Staff") %>
           </li>
         <% } %>
         <% if (community_ta_authored) { %>
           <li class="post-label-by-community-ta">
-            <i class="icon fa fa-user"></i>
+            <span class="icon fa fa-user" aria-hidden="true"></span>
             <% // Translators: This is a label for a forum thread that was authored by a community TA %>
             <%- gettext("By: Community TA") %>
           </li>

@@ -1,8 +1,12 @@
 ;(function (define, undefined) {
 'use strict';
 define([
-    'jquery', 'underscore', 'backbone', 'js/edxnotes/models/tab'
-], function ($, _, Backbone, TabModel) {
+    'jquery',
+    'underscore',
+    'backbone',
+    'edx-ui-toolkit/js/utils/html-utils',
+    'js/edxnotes/models/tab'
+], function ($, _, Backbone, HtmlUtils, TabModel) {
     var TabView = Backbone.View.extend({
         PanelConstructor: null,
 
@@ -121,11 +125,11 @@ define([
         /**
          * Shows error message.
          */
-        showErrorMessage: function (message) {
-            this.$('.wrapper-msg')
-                .removeClass('is-hidden')
-                .find('.msg-content .copy').html(message);
+        showErrorMessageHtml: function (htmlMessage) {
+            var $wrapper = this.$('.wrapper-msg');
+            $wrapper.removeClass('is-hidden');
 
+            HtmlUtils.setHtml($wrapper.find('.msg-content .copy'), htmlMessage);
             return this;
         },
 

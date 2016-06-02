@@ -575,15 +575,17 @@ def course_about(request, course_id):
         # If the ecommerce checkout flow is enabled and the mode of the course is
         # professional or no id professional, we construct links for the enrollment
         # button to add the course to the ecommerce basket.
+        ecomm_service = EcommerceService()
+        ecommerce_checkout = ecomm_service.is_enabled(request.user)
         ecommerce_checkout_link = ''
         ecommerce_bulk_checkout_link = ''
         professional_mode = None
-        ecomm_service = EcommerceService()
         is_professional_mode = CourseMode.PROFESSIONAL in modes or CourseMode.NO_ID_PROFESSIONAL_MODE in modes
-        if ecomm_service.is_enabled(request.user) and (is_professional_mode):
+        if ecommerce_checkout and is_professional_mode:
             professional_mode = modes.get(CourseMode.PROFESSIONAL, '') or \
                 modes.get(CourseMode.NO_ID_PROFESSIONAL_MODE, '')
-            ecommerce_checkout_link = ecomm_service.checkout_page_url(professional_mode.sku)
+            if professional_mode.sku:
+                ecommerce_checkout_link = ecomm_service.checkout_page_url(professional_mode.sku)
             if professional_mode.bulk_sku:
                 ecommerce_bulk_checkout_link = ecomm_service.checkout_page_url(professional_mode.bulk_sku)
 
@@ -593,7 +595,9 @@ def course_about(request, course_id):
             settings.PAID_COURSE_REGISTRATION_CURRENCY[0]
         )
         course_price = get_cosmetic_display_price(course, registration_price)
-        can_add_course_to_cart = _is_shopping_cart_enabled and registration_price
+
+        # Determine which checkout workflow to use -- LMS shoppingcart or Otto basket
+        can_add_course_to_cart = _is_shopping_cart_enabled and registration_price and not ecommerce_checkout_link
 
         # Used to provide context to message to student if enrollment not allowed
         can_enroll = bool(has_access(request.user, 'enroll', course))
@@ -624,7 +628,7 @@ def course_about(request, course_id):
             'is_cosmetic_price_enabled': settings.FEATURES.get('ENABLE_COSMETIC_DISPLAY_PRICE'),
             'course_price': course_price,
             'in_cart': in_cart,
-            'ecommerce_checkout': ecomm_service.is_enabled(request.user),
+            'ecommerce_checkout': ecommerce_checkout,
             'ecommerce_checkout_link': ecommerce_checkout_link,
             'ecommerce_bulk_checkout_link': ecommerce_bulk_checkout_link,
             'professional_mode': professional_mode,

@@ -86,12 +86,14 @@ define(["jquery", "underscore", "gettext", "common/js/components/utils/view_util
                         }
                     );
                 },
-                messageBody = interpolate(
+                messageBody;
+            xblockType = xblockType || 'component';
+            messageBody = interpolate(
                     gettext('Deleting this %(xblock_type)s is permanent and cannot be undone.'),
                     { xblock_type: xblockType },
                     true
                 );
-            xblockType = xblockType || 'component';
+
             if (xblockInfo.get('is_prereq')) {
                 messageBody += ' ' + gettext('Any content that has listed this content as a prerequisite will also have access limitations removed.'); // jshint ignore:line
                 ViewUtils.confirmThenRunOperation(

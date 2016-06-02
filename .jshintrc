@@ -16,7 +16,7 @@
     "immed"           : true,      // Prohibits the use of immediate function invocations without wrapping them in parentheses.
     // "indent"       : 4,         // Enforces specific tab width for your code. Has no effect when "white" option is not used.
     "latedef"         : "nofunc",  // Prohibits the use of a variable before it was defined. Setting this option to "nofunc" will allow function declarations to be ignored.
-    "newcap"          : true,      // Requires you to capitalize names of constructor functions.
+    "newcap"          : false,     // Requires you to capitalize names of constructor functions.
     "noarg"           : true,      // Prohibits the use of arguments.caller and arguments.callee.
     "noempty"         : true,      // Warns when you have an empty block in your code.
     "nonbsp"          : true,      // Warns about "non-breaking whitespace" characters.

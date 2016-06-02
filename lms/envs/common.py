@@ -514,6 +514,9 @@ TEMPLATES = [
 
                 # Allows the open edX footer to be leveraged in Django Templates.
                 'edxmako.shortcuts.microsite_footer_context_processor',
+
+                # Online contextual help
+                'context_processors.doc_url',
             ],
             # Change 'debug' in your environment settings files - not here.
             'debug': False
@@ -1090,6 +1093,10 @@ MIDDLEWARE_CLASSES = (
     'microsite_configuration.middleware.MicrositeMiddleware',
     'django_comment_client.middleware.AjaxExceptionMiddleware',
     'django.middleware.common.CommonMiddleware',
+    'django.contrib.sites.middleware.CurrentSiteMiddleware',
+
+    # Allows us to define redirects via Django admin
+    'django_sites_extensions.middleware.RedirectMiddleware',
 
     # Instead of SessionMiddleware, we use a more secure version
     # 'django.contrib.sessions.middleware.SessionMiddleware',
@@ -1820,6 +1827,7 @@ INSTALLED_APPS = (
     'django.contrib.contenttypes',
     'django.contrib.humanize',
     'django.contrib.messages',
+    'django.contrib.redirects',
     'django.contrib.sessions',
     'django.contrib.sites',
     'django.contrib.staticfiles',
@@ -2048,8 +2056,8 @@ INSTALLED_APPS = (
     # Needed whether or not enabled, due to migrations
     'badges',
 
-    # Email marketing integration
-    'email_marketing',
+    # Enables default site and redirects
+    'django_sites_extensions',
 )
 
 # Migrations which are not in the standard module "migrations"
@@ -2888,9 +2896,6 @@ CREDENTIALS_GENERATION_ROUTING_KEY = HIGH_PRIORITY_QUEUE
 
 WIKI_REQUEST_CACHE_MIDDLEWARE_CLASS = "request_cache.middleware.RequestCache"
 
-# Dafault site id to use in case there is no site that matches with the request headers.
-DEFAULT_SITE_ID = 1
-
 # API access management
 API_ACCESS_MANAGER_EMAIL = 'api-access@example.com'
 API_ACCESS_FROM_EMAIL = 'api-requests@example.com'
@@ -2899,3 +2904,10 @@ AUTH_DOCUMENTATION_URL = 'http://edx.readthedocs.org/projects/edx-platform-api/e
 
 # Affiliate cookie tracking
 AFFILIATE_COOKIE_NAME = 'affiliate_id'
+
+############## Settings for RedirectMiddleware ###############
+
+# Setting this to None causes Redirect data to never expire
+# The cache is cleared when Redirect models are saved/deleted
+REDIRECT_CACHE_TIMEOUT = None  # The length of time we cache Redirect model data
+REDIRECT_CACHE_KEY_PREFIX = 'redirects'

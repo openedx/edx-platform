@@ -1,8 +1,8 @@
 define([
     'underscore',
-    'common/js/components/views/paging_header',
-    'common/js/components/collections/paging_collection'
-], function (_, PagingHeader, PagingCollection) {
+    'edx-ui-toolkit/js/pagination/paging-collection',
+    'common/js/components/views/paging_header'
+], function (_, PagingCollection, PagingHeader) {
         'use strict';
         describe('PagingHeader', function () {
             var pagingHeader,
