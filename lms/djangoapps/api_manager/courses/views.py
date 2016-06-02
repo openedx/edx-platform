@@ -1107,9 +1107,7 @@ class CoursesUsersList(SecureAPIView):
         if exclude_groups:
             users = users.exclude(groups__in=exclude_groups)
 
-        users = users.prefetch_related('organizations')\
-            .select_related('courseenrollment_set', 'profile')\
-            .annotate(courses_enrolled=Count('courseenrollment'))
+        users = users.prefetch_related('organizations').select_related('profile')
 
         serializer = UserSerializer(users, many=True, context={'course_id': course_key})
         response_data['enrollments'] = serializer.data
