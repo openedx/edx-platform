@@ -8,6 +8,8 @@ from django.db.models import TextField
 from config_models.models import ConfigurationModel
 from django.db import models
 
+from simple_history.models import HistoricalRecords
+
 
 class XBlockDisableConfig(ConfigurationModel):
     """
@@ -73,6 +75,7 @@ class XBlockDisableConfig(ConfigurationModel):
     #     )
 
 
+
 class XBlockConfigFlag(ConfigurationModel):
     """
     Enables site-wide configuration for xblock support state.
@@ -100,6 +103,9 @@ class XBlockConfig(models.Model):
         (DISABLED, _('Disabled')),
     )
 
+    # for archiving
+    # history = HistoricalRecords()
+
     name = models.CharField(max_length=255, null=False)
     template = models.CharField(max_length=255, blank=True, default='')
     support_level = models.CharField(max_length=2, choices=SUPPORT_CHOICES, default=UNSUPPORTED_NO_OPT_IN)
@@ -109,37 +115,46 @@ class XBlockConfig(models.Model):
         help_text=_("Only xblocks listed in a course's Advanced Module List can be flagged as deprecated. Note that deprecation is by xblock name, and is not specific to template.")
     )
 
-    # TODO: error if deprecated is set on core xblock types?
-    # TODO: error if disabled is set on core xblock types (or something with a template)?
-
     class Meta(object):
         app_label = "xblock_django"
         unique_together = ("name", "template")
 
     @classmethod
     def deprecated_xblocks(cls):
-        """ Return list of deprecated XBlock types. """
-
+        """ Return the QuerySet of deprecated XBlock types. """
         return cls.objects.filter(deprecated=True)
 
     @classmethod
     def disabled_xblocks(cls):
-        """ Return list of xblocks that should not render. """
-
+        """ Return the QuerySet of XBlocks that are disabled. """
         return cls.objects.filter(support_level=cls.DISABLED)
 
     @classmethod
     def authorable_xblocks(cls, limited_support_opt_in=False, name=None):
-        """ Return list of xblocks that can be created in Studio """
+        """
+        Return the QuerySet of XBlocks that can be created in Studio. Note that this method
+        looks only at `support_level` and does not take into account `deprecated`.
 
+        Arguments:
+            limited_support_opt_in (bool): If `True`, XBlocks with limited support will be included.
+                Default value is `False`.
+            name (str): If provided, filters the returned XBlocks to those with the provided name. This is
+                useful for XBlocks with lots of template types.
+
+        Returns:
+            QuerySet: Authorable XBlocks, taking into account `support_level` and `name` (if specified).
+
+        """
         blocks = cls.objects.exclude(support_level=cls.DISABLED).exclude(support_level=cls.UNSUPPORTED_NO_OPT_IN)
         if not limited_support_opt_in:
-            blocks = blocks.exclude(support_level=cls.UNSUPPORTED_OPT_IN)
+            blocks = blocks.exclude(support_level=cls.UNSUPPORTED_OPT_IN).exclude(support_level=cls.PROVISIONAL_SUPPORT)
 
         if name:
             blocks = blocks.filter(name=name)
 
         return blocks
 
-
-    # TODO: should there be a unicode method?
+    def __unicode__(self):
+        return (
+            "[XBlockConfig] '{}': template='{}', support level='{}', deprecated={}"
+        ).format(self.name, self.template, self.support_level, self.deprecated)
