@@ -190,7 +190,7 @@
             },
 
             passwordEmailSent: function() {
-                var $loginAnchorElement = $('#login-anchor');
+                var $loginAnchorElement = $('#login-form');
                 this.element.hide( $(this.el).find('#password-reset-anchor') );
                 this.element.show( $loginAnchorElement );
                 this.element.scrollTop( $loginAnchorElement );
@@ -201,7 +201,7 @@
                     category: 'user-engagement'
                 });
 
-                this.element.hide( $(this.el).find('#login-anchor') );
+                this.element.hide( $(this.el).find('#login-form') );
                 this.loadForm('reset');
                 this.element.scrollTop( $('#password-reset-anchor') );
             },
@@ -279,9 +279,17 @@
                 },
 
                 scrollTop: function( $el ) {
+                    var $header = $('header');
+                    var headerOffset = 0;
+
+                    // if the header is fixed, we must offset it as well
+                    if ($header && $header.css('position') === 'fixed') {
+                      headerOffset = $header.innerHeight();
+                    }
+
                     // Scroll to top of selected element
                     $('html,body').animate({
-                        scrollTop: $el.offset().top
+                        scrollTop: $el.offset().top - headerOffset
                     },'slow');
                 },
 

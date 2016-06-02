@@ -28,6 +28,7 @@ from external_auth.login_and_register import (
 )
 from student.models import UserProfile
 from student.views import (
+    login_user,
     signin_user as old_login_view,
     register_user as old_register_view
 )
@@ -57,6 +58,11 @@ def login_and_registration_form(request, initial_mode="login"):
         initial_mode (string): Either "login" or "register".
 
     """
+
+    third_party_auth_requested = third_party_auth.is_enabled() and pipeline.running(request)
+    if third_party_auth_requested:
+        login_user(request)
+
     # Determine the URL to redirect to following login/registration/third_party_auth
     redirect_to = get_next_url_for_login_page(request)
 

@@ -4,7 +4,8 @@
 {% block title %}
 <title>
   {% blocktrans with platform_name=platform_name %}
-    Update Your {{ platform_name }} Details
+      Access your Beta {{ platform_name }}
+
   {% endblocktrans %}
 </title>
 {% endblock %}
@@ -12,14 +13,17 @@
 {% block bodyextra %}
   <script type="text/javascript">
     $(function() {
+
       // adding js class for styling with accessibility in mind
       $('body').addClass('js');
+
       // new window/tab opening
       $('a[rel="external"], a[class="new-vp"]')
       .click( function() {
       window.open( $(this).attr('href') );
       return false;
       });
+
       // form field label styling on focus
       $("form :input").focus(function() {
         $("label[for='" + this.id + "']").parent().addClass("is-focused");
@@ -35,25 +39,21 @@
 {% block body %}
 <div class="reset-details-content-wrapper">
   <section class="introduction details-reset-introduction">
-    <header>
-      <h1 class="title title-info-update">
+    <header class="details-reset-header">
+      <h1 class="title details-reset-title">
         <span class="title-super">
           {% blocktrans with platform_name=platform_name %}
-            BETA {{ platform_name }}
+          Access Your Beta {{ platform_name }} Account
           {% endblocktrans %}
-        </span>
-        <span class="title-super">
-          {% trans "ACCOUNT INFORMATION AND UPDATE" %}
         </span>
       </h1>
     </header>
   </section>
 
-  <section class="passwordreset container details-reset-container">
-    <section role="main" class="content">
-      {% if validlink %}
+  <section class="passwordreset container details-reset-container reset-form-container">
+    <section role="main" class="content reset-form-content">
       <header>
-        <h2 class="sr">{% trans "Details Update Form" %}</h2>
+      <h2 class="sr">{% trans "Details Reset Form" %}</h2>
       </header>
 
       <form role="form" id="passwordreset-form" method="post" action="">{% csrf_token %}
@@ -61,7 +61,7 @@
         <div role="alert" class="status message">
           <h3 class="message-title">
             {% blocktrans %}
-              We're sorry, but this version of your browser is not supported. Try again using a different browser or a newer version of your browser.
+                We're sorry, but this version of your browser is not supported. Try again using a different browser or a newer version of your browser.
             {% endblocktrans %}
           </h3>
         </div>
@@ -86,46 +86,31 @@
           <h3 class="message-title">{% trans "We're sorry, our systems seem to be having trouble processing your password reset" %}</h3>
           <p class="message-copy">
             {% blocktrans with start_link='<a href="{{MKTG_URL_CONTACT}}">' end_link='</a>' %}
-              Someone has been made aware of this issue. Please try again shortly. Please {{ start_link }}contact us{{ end_link }} about any concerns you have.
+                Someone has been made aware of this issue. Please try again shortly. Please {{ start_link }}contact us{{ end_link }} about any concerns you have.
             {% endblocktrans %}
           </p>
         </div>
 
-        <p class="instructions">
-          {% blocktrans with platform_name=platform_name %}
-            Complete the information below to update your Beta {{ platform_name }} account.
-          {% endblocktrans %}
-          <br>
-          {% trans 'All fields are required.' %}
-          <br><br>
-          {% trans 'Once the information has been updated, you can use it to' %}
-          <a href="/login">{% trans 'log in' %}</a>
-        </p>
+         <p class="instructions">
+             <p class="reset-instruction first-reset-instruction">
+               {% blocktrans %}
+                  A new Beta {{ platform_name }} account has been created based on your existing {{ platform_name }} (BDU) account.  Soon after the beta period is over, this account will display the history of courses completed, badges earned, and completion certificates obtained.
+               {% endblocktrans %}
+               <p>
+               {% blocktrans %}
+                  To access your new account, enter the email address associated to your {{ platform_name }}. If you were using a Social Media button to log in to BDU, use the email associated with that social media account.
+               {% endblocktrans %}
+               </p>
+             <p>{% trans 'An email will be sent to you with a password to access your account.' %} </p>
+          </p>
+
 
         <fieldset class="group group-form group-form-requiredinformation">
           <legend class="sr">{% trans "Required Information" %}</legend>
-
           <ol class="list-input">
-            <li class="field password" id="field-new_password1">
+            <li class="field password" id="field-new_password2">
               <label for="email">{% trans "Email" %}</label>
-              <input id="email" type="email" name="email" placeholder="email" value="{{ user.email }}" disabled>
-            </li>
-            <li class="field required password" id="field-new_password1">
-              <label for="new_username">{% trans "Username" %}</label>
-              <input id="new_username" type="text" name="username" placeholder="New Username" value="{{ user.username}}" />
-              <span class="tip-input">
-                {% trans "Feel free to edit. This is the public name that will identify you in your courses -" %}
-                <strong>{% trans "(cannot be changed later)" %}</strong>
-              </span>
-            </li>
-            <li class="field required password" id="field-new_password1">
-              <label for="new_password1">{% trans "Password" %}</label>
-              <input id="new_password1" type="password" name="new_password1" placeholder="*****" />
-              <span class="tip-input">{% trans "Password must be at least 2 characters" %}</span>
-            </li>
-            <li class="field required password" id="field-new_password2">
-              <label for="new_password2">{% trans "Retype Password" %}</label>
-              <input id="new_password2" type="password" name="new_password2" placeholder="******" />
+              <input id="email" type="email" name="email" placeholder="Email Address" />
             </li>
           </ol>
         </fieldset>
@@ -136,23 +121,9 @@
       </form>
 
 
-
-      {% else %}
-
-      <header>
-        <h2 class="sr">{% trans "Your Password Reset Was Unsuccessful" %}</h2>
-      </header>
-      <p>
-        {% blocktrans with start_link='<a href="/login">' end_link='</a>' %}
-          The details reset link was invalid, possibly because the link has already been used.  Please contact admin@bigdatauniversity.com to resend your details.
-        {% endblocktrans %}
-      </p>
-
-      {% endif %}
-
-
-
     </section>
+
   </section>
+
 </div>
 {% endblock %}

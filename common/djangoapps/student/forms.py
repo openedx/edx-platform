@@ -277,8 +277,9 @@ class DetailsResetFormNoActive(PasswordResetForm):
     def save(
             self,
             domain_override=None,
-            subject_template_name='registration/details_reset_subject.txt', # figure out how to fix this
-            email_template_name='registration/details_reset_email.html',
+            text_template='registration/details_reset_email.txt',
+            html_template='registration/details_reset_email.html',
+            email_subject='registration/details_reset_subject.txt',
             use_https=False,
             token_generator=default_token_generator,
             from_email=settings.DEFAULT_FROM_EMAIL,
@@ -290,7 +291,7 @@ class DetailsResetFormNoActive(PasswordResetForm):
         """
         # This import is here because we are copying and modifying the .save from Django 1.4.5's
         # django.contrib.auth.forms.PasswordResetForm directly, which has this import in this place.
-        from django.core.mail import send_mail
+        from django.core.mail import send_mail, EmailMultiAlternatives
         for user in self.users_cache:
             if not domain_override:
                 site_name = microsite.get_value(
@@ -308,11 +309,16 @@ class DetailsResetFormNoActive(PasswordResetForm):
                 'protocol': 'https' if use_https else 'http',
                 'platform_name': microsite.get_value('platform_name', settings.PLATFORM_NAME)
             }
-            subject = loader.render_to_string(subject_template_name, context)
+            # subject = "Beta Big Data University Account Information"
+            subject = loader.render_to_string(email_subject, context)
             # Email subject *must not* contain newlines
             subject = subject.replace('\n', '')
-            email = loader.render_to_string(email_template_name, context)
-            send_mail(subject, email, from_email, [user.email])
+            text_content = loader.render_to_string(text_template, context)
+            html_content = loader.get_template(html_template).render(context)
+            msg = EmailMultiAlternatives(subject, text_content, from_email, [user.email])
+            msg.attach_alternative(html_content, "text/html")
+            msg.send()
+
             # update, well this user should exist already,
             try:
                 user_to_mail = MdlToEdx.objects.get(user_id=user.id)

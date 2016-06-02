@@ -65,7 +65,7 @@ class LoginSessionView(APIView):
 
         # Translators: This label appears above a field on the login form
         # meant to hold the user's email address.
-        email_label = _(u"")
+        email_label = _(u"Email")
 
         # Translators: This example email address is used as a placeholder in
         # a field on the login form meant to hold the user's email address.
@@ -73,7 +73,7 @@ class LoginSessionView(APIView):
 
         # Translators: These instructions appear on the login form, immediately
         # below a field meant to hold the user's email address.
-        email_instructions = _("The email address you used to register with {platform_name}").format(
+        email_instructions = _("The email address used when you registered with {platform_name}").format(
             platform_name=settings.PLATFORM_NAME
         )
 
@@ -155,7 +155,7 @@ class LoginSessionView(APIView):
 class RegistrationView(APIView):
     """HTTP end-points for creating a new user. """
 
-    DEFAULT_FIELDS = ["email", "name", "username", "password"]
+    DEFAULT_FIELDS = ["email", "username", "name", "password", "show_password"]
 
     EXTRA_FIELDS = [
         "city",
@@ -624,7 +624,7 @@ class RegistrationView(APIView):
             terms_text = _(u"Terms of Service and Honor Code")
 
         terms_link = u"<a href=\"{url}\">{terms_text}</a>".format(
-            url=marketing_link("HONOR"),
+            url=marketing_link("LEGAL"),
             terms_text=terms_text
         )
 
@@ -743,6 +743,35 @@ class RegistrationView(APIView):
                         instructions="",
                         restrictions={}
                     )
+
+                    form_desc.override_field_properties(
+                        "show_password",
+                        default=False,
+                        field_type="hidden",
+                        required=False,
+                        label="",
+                        instructions="",
+                        restrictions={}
+                    )
+
+    def _add_show_password_field(self, form_desc, required=True):
+        """Add a show password field to a form description.
+
+          Arguments:
+              form_desc: A form description
+
+          Keyword Arguments:
+              required (bool): Whether this field is required; defaults to True
+        """
+
+        label = _(u"Show password")
+        form_desc.add_field(
+            "show_password",
+            label=label,
+            field_type="checkbox",
+            default=False,
+            required=False
+        )
 
 
 class PasswordResetView(APIView):

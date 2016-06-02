@@ -559,6 +559,9 @@ TIME_ZONE_DISPLAYED_FOR_DEADLINES = ENV_TOKENS.get("TIME_ZONE_DISPLAYED_FOR_DEAD
 ##### X-Frame-Options response header settings #####
 X_FRAME_OPTIONS = ENV_TOKENS.get('X_FRAME_OPTIONS', X_FRAME_OPTIONS)
 
+##### Set HTTPS for third-party auth redirect #####
+THIRD_PARTY_AUTH_REDIRECT_IS_HTTPS = ENV_TOKENS.get('THIRD_PARTY_AUTH_REDIRECT_IS_HTTPS', False)
+
 ##### Third-party auth options ################################################
 if FEATURES.get('ENABLE_THIRD_PARTY_AUTH'):
     AUTHENTICATION_BACKENDS = (

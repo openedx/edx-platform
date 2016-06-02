@@ -26,7 +26,7 @@ from django.core.urlresolvers import reverse, NoReverseMatch
 from django.core.validators import validate_email, ValidationError
 from django.db import IntegrityError, transaction
 from django.http import (HttpResponse, HttpResponseBadRequest, HttpResponseForbidden,
-                         HttpResponseServerError, Http404)
+                         HttpResponseServerError, Http404, HttpResponseRedirect)
 from django.shortcuts import redirect
 from django.utils.encoding import force_bytes, force_text
 from django.utils.translation import ungettext
@@ -1044,7 +1044,6 @@ def change_enrollment(request, check_access=True):
     else:
         return HttpResponseBadRequest(_("Enrollment action is invalid"))
 
-
 # Need different levels of logging
 @ensure_csrf_cookie
 def login_user(request, error=""):  # pylint: disable=too-many-statements,unused-argument
@@ -1074,7 +1073,7 @@ def login_user(request, error=""):  # pylint: disable=too-many-statements,unused
         requested_provider = provider.Registry.get_from_pipeline(running_pipeline)
 
         try:
-            user = pipeline.get_authenticated_user(requested_provider, username, third_party_uid)
+            user = pipeline.get_authenticated_user_helper(requested_provider, running_pipeline)
             third_party_auth_successful = True
         except User.DoesNotExist:
             AUDIT_LOG.warning(
@@ -1700,7 +1699,8 @@ def create_account_with_params(request, params):
         subject = render_to_string('emails/activation_email_subject.txt', context)
         # Email subject *must not* contain newlines
         subject = ''.join(subject.splitlines())
-        message = render_to_string('emails/activation_email.txt', context)
+        message_txt = render_to_string('emails/activation_email.txt', context)
+        message_html = render_to_string('emails/activation_email.html', context)
 
         from_address = microsite.get_value(
             'email_from_address',
@@ -1713,7 +1713,10 @@ def create_account_with_params(request, params):
                            '-' * 80 + '\n\n' + message)
                 mail.send_mail(subject, message, from_address, [dest_addr], fail_silently=False)
             else:
-                user.email_user(subject, message, from_address)
+                # add alternative message
+                activation_email = mail.EmailMultiAlternatives(subject, message_txt, from_address, [user.email])
+                activation_email.attach_alternative(message_html, "text/html")
+                activation_email.send()
         except Exception:  # pylint: disable=broad-except
             log.error(u'Unable to send activation email to user from "%s"', from_address, exc_info=True)
     else:
@@ -2381,7 +2384,6 @@ def details_reset_confirm_wrapper(request, uidb36=None, token=None,):
         validlink = True
         title = _('Update your details')
         update_user(user.id)
-
     else:
         validlink = False
         form = None
@@ -2391,6 +2393,7 @@ def details_reset_confirm_wrapper(request, uidb36=None, token=None,):
         'title': title,
         'validlink': validlink,
         'user': user,
+        'platform_name': microsite.get_value('platform_name', settings.PLATFORM_NAME),
     }
 
     err_msg = None
@@ -2440,7 +2443,6 @@ def details_reset_confirm_wrapper(request, uidb36=None, token=None,):
                 validate_password_length(password)
                 validate_password_complexity(password)
                 validate_password_dictionary(password)
-
             except ValidationError, err:
                 err_msg = _('Password: ') + '; '.join(err.messages)
 
@@ -2457,15 +2459,10 @@ def details_reset_confirm_wrapper(request, uidb36=None, token=None,):
         return TemplateResponse(request, 'registration/details_reset_confirm.html', context)
 
     else:
-        # we also want to pass settings.PLATFORM_NAME in as extra_context
-        extra_context = {"platform_name": microsite.get_value('platform_name', settings.PLATFORM_NAME)}
-
         # Support old password reset URLs that used base36 encoded user IDs.
         # https://github.com/django/django/commit/1184d077893ff1bc947e45b00a4d565f3df81776#diff-c571286052438b2e3190f8db8331a92bR231
         try:
-
             uidb64 = force_text(urlsafe_base64_encode(force_bytes(base36_to_int(uidb36))))
-
         except ValueError:
             uidb64 = '1'    # dummy invalid ID (incorrect padding for base64)
 
@@ -2478,13 +2475,17 @@ def details_reset_confirm_wrapper(request, uidb36=None, token=None,):
             user.save()
 
             return TemplateResponse(request, 'registration/details_reset_complete.html', context)
-
         else:
             return TemplateResponse(request, 'registration/details_reset_confirm.html', context)
 
 def details_reset_confirm(request):
     form_class = DetailsResetFormNoActive
     template_name = 'registration/details_reset.html'
+
+    context = {
+                'platform_name': microsite.get_value('platform_name', settings.PLATFORM_NAME),
+                'contact_email': microsite.get_value('contact_email', settings.CONTACT_EMAIL)
+             }
 
     if request.method == 'POST':
         form = DetailsResetFormNoActive(request.POST)
@@ -2494,10 +2495,19 @@ def details_reset_confirm(request):
                   request=request,
                   domain_override=request.get_host())
 
-            return TemplateResponse(request, 'registration/details_reset_done.html')
+            context = {
+                'platform_name': microsite.get_value('platform_name', settings.PLATFORM_NAME),
+                'contact_email': microsite.get_value('contact_email', settings.CONTACT_EMAIL)
+            }
+            return TemplateResponse(request, 'registration/details_reset_done.html', context)
         else:
             err_msg = "No user with the provided email address exists"
             context = {'err_msg': err_msg}
             return TemplateResponse(request, 'registration/details_reset.html', context)
 
-    return TemplateResponse(request, 'registration/details_reset.html')
+    return TemplateResponse(request, 'registration/details_reset.html', context)
+
+
+def reload_login(request):
+    logout(request)
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
