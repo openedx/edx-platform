@@ -1,14 +1,17 @@
 <%
 var summaryMessage = validation.get("summary");
 var aggregateMessageType = summaryMessage.type;
-var aggregateValidationClass = aggregateMessageType === "error"? "has-errors" : "has-warnings";
+var aggregateValidationClass = aggregateMessageType === "error" ? "has-errors" : "has-warnings";
 %>
     <div class="xblock-message validation <%= aggregateValidationClass %> <%= additionalClasses %>">
         <p class="<%= aggregateMessageType %>"><i class="icon fa <%= getIcon(aggregateMessageType) %>"></i>
         <%- summaryMessage.text %>
         <% if (summaryMessage.action_class) { %>
-            <a href="#" class="button action-button <%- summaryMessage.action_class %>">
+            <a href="<%= summaryMessage.action_link ? summaryMessage.action_link : '#' %>" class="button action-button <%- summaryMessage.action_class %>">
                 <span class="action-button-text"><%- summaryMessage.action_label %></span>
+                <% if (summaryMessage.action_class === 'external-link') { %>
+                  <i class="fa fa-external-link-square" aria-hidden="true"></i>
+                <% } %>
             </a>
         <% } else if (summaryMessage.action_runtime_event) {%>
             <a href="#" class="button action-button notification-action-button" data-notification-action="<%- summaryMessage.action_runtime_event %>">

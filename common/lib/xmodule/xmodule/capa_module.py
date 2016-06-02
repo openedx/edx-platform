@@ -8,6 +8,8 @@ from lxml import etree
 from pkg_resources import resource_string
 
 import dogstats_wrapper as dog_stats_api
+
+from xmodule.validation import StudioValidation, StudioValidationMessage
 from .capa_base import CapaMixin, CapaFields, ComplexEncoder
 from capa import responsetypes
 from .progress import Progress
@@ -127,6 +129,15 @@ class CapaModule(CapaMixin, XModule):
         })
 
         return json.dumps(result, cls=ComplexEncoder)
+
+    def validate(self):
+        """
+        Message for either error or warning validation message/s.
+
+        Returns message and type. Priority given to error type message.
+        """
+        return self.descriptor.validate()
+
 
 
 class CapaDescriptor(CapaFields, RawDescriptor):
@@ -255,6 +266,48 @@ class CapaDescriptor(CapaFields, RawDescriptor):
                 for tag in self.problem_types
             )
         return False
+
+    def validate(self):
+        """
+        Validates the xml for correct question separation. There must be only one inputtype in every <question>.
+        This is the override of the general XBlock method.
+        """
+
+        validation = super(CapaDescriptor, self).validate()
+        validation = StudioValidation.copy(validation)
+
+        # validate xml to check questions are correctly separated
+        is_valid = self.validate_xml()
+
+        if not is_valid:
+            validation.set_summary(
+                StudioValidationMessage(
+                    StudioValidationMessage.WARNING,
+                    u'Incorrect problem format detected!',
+                    action_label=u"Please see docs.",
+                    action_class=u"external-link",
+                    action_link=u"http://docs.edx.org/"
+                )
+            )
+
+        return validation
+
+    def validate_xml(self):
+        input_tags = ['choiceresponse', 'optionresponse', 'multiplechoiceresponse', 'stringresponse',
+                      'numericalresponse', 'schematicresponse', 'imageresponse', 'formularesponse']
+
+        xmltree = etree.fromstring(self.data)
+        questions = xmltree.findall(".//question")
+
+        for question in questions:
+            for tag in input_tags:
+                tag_elements = question.findall(".//" + tag)
+                if len(tag_elements) > 1:
+                    print("more choices")
+                    return False
+
+        return True
+
 
     # Proxy to CapaModule for access to any of its attributes
     answer_available = module_attr('answer_available')

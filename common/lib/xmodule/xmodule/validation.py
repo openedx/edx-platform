@@ -15,12 +15,13 @@ class StudioValidationMessage(ValidationMessage):
 
     TYPES = [ValidationMessage.WARNING, ValidationMessage.ERROR, NOT_CONFIGURED]
 
-    def __init__(self, message_type, message_text, action_label=None, action_class=None, action_runtime_event=None):
+    def __init__(self, message_type, message_text, action_label=None, action_class=None, action_runtime_event=None,
+                 action_link=None):
         """
         Create a new message.
 
         Args:
-            message_type (str): The type associated with this message. Most be `WARNING` or `ERROR`.
+            message_type (str): The type associated with this message. Must be `WARNING` or `ERROR`.
             message_text (unicode): The textual message.
             action_label (unicode): Text to show on a "fix-up" action (optional). If present, either `action_class`
                 or `action_runtime_event` should be specified.
@@ -43,6 +44,10 @@ class StudioValidationMessage(ValidationMessage):
             if not isinstance(action_runtime_event, basestring):
                 raise TypeError("Action runtime event must be a string.")
             self.action_runtime_event = action_runtime_event
+        if action_link is not None:
+            if not isinstance(action_link, basestring):
+                raise TypeError("Action link must be a string.")
+            self.action_link = action_link
 
     def to_json(self):
         """
@@ -58,6 +63,8 @@ class StudioValidationMessage(ValidationMessage):
             serialized["action_class"] = self.action_class
         if hasattr(self, "action_runtime_event"):
             serialized["action_runtime_event"] = self.action_runtime_event
+        if hasattr(self, "action_link"):
+            serialized["action_link"] = self.action_link
         return serialized
 
 
