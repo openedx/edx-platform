@@ -631,6 +631,10 @@
   // ELEM: new user form
   .wrapper-create-course {
 
+    input.disabled {
+      color: darkgray;
+    }
+
     // CASE: when form is animating
     &.animate {
 

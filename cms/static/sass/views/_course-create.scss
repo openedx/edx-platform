@@ -19,6 +19,10 @@
     width: flex-grid(3, 12);
   }
 
+  input.disabled {
+    color: darkgray;
+  }
+
   //
 
   // header/masthead
