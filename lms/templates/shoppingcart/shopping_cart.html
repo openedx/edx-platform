@@ -372,14 +372,14 @@ from openedx.core.lib.courses import course_image_url
       var newQty    = parseInt(newQty);
       var unit_cost = parseFloat(unit_cost);
 
-      return (( newQty - prevQty ) * unit_cost + prevTotal)
+      return (( newQty - prevQty ) * unit_cost + parseFloat(prevTotal));
   }
 
   function update_user_cart(ItemId, newQty, prevQty, unit_cost, wasbusinessType, isbusinessType){
 
       var post_url = "${reverse('shoppingcart.views.update_user_cart')}";
       var typeChanged = false;
-      var prevTotal = $('#total-amount').data('amount')
+      var prevTotal = $('#total-amount').data('amount');
       var newTotal = getNewTotal(prevQty, newQty, unit_cost, prevTotal);
       $('#total-amount').html('$'+newTotal.toFixed(2)+' USD');
       $('#total-amount').data('amount', newTotal);
