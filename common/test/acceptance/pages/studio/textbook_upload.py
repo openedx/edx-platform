@@ -8,7 +8,7 @@ from ..common.utils import click_css
 from .course_page import CoursePage
 
 
-class TextbooksPage(CoursePage):
+class TextbookUploadPage(CoursePage):
     """
     Course Textbooks page.
     """
@@ -41,7 +41,7 @@ class TextbooksPage(CoursePage):
         Uploads a pdf textbook.
         """
         # If the pdf upload section has not yet been toggled on, click on the upload pdf button
-        test_dir = path(__file__).abspath().dirname().dirname().dirname()
+        test_dir = path(__file__).abspath().dirname().dirname().dirname().dirname()  # pylint:disable=no-value-for-parameter
         file_path = test_dir + '/data/uploads/' + file_name
 
         click_css(self, ".edit-textbook .action-upload", require_notification=False)
@@ -70,3 +70,13 @@ class TextbooksPage(CoursePage):
             return False
 
         return response.status_code == 200
+
+    def upload_new_textbook(self):
+        """
+        Fills out form to upload a new textbook
+        """
+        self.open_add_textbook_form()
+        self.upload_pdf_file('textbook.pdf')
+        self.set_input_field_value('.edit-textbook #textbook-name-input', 'book_1')
+        self.set_input_field_value('.edit-textbook #chapter1-name', 'chap_1')
+        self.click_textbook_submit_button()

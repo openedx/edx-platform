@@ -29,7 +29,7 @@ $(function(){
 <div class="book-wrapper">
     %if 'chapters' in textbook:
     <section class="book-sidebar" aria-label="${_('Textbook Navigation')}">
-        <ul id="booknav" tabindex="0">
+        <ul id="booknav">
           % for (index, entry) in enumerate(textbook['chapters']):
           <li>
             <a class="chapter" rel="${entry['url']}" href="#">${entry.get('title')}</a>
@@ -47,8 +47,6 @@ $(function(){
   width="856"
   height="1108"
   frameborder="0"
-  seamless
-  tabindex="1"
-  aria-live="polite"></iframe>
+  seamless></iframe>
 </div>
 </div>
