@@ -2,6 +2,7 @@
 """
 Discussion XBlock
 """
+import json
 import logging
 
 from xblockutils.resources import ResourceLoader
@@ -79,9 +80,11 @@ class DiscussionXBlock(XBlock, StudioEditableXBlockMixin):
             'discussion_id': self.discussion_id,
             'user': user,
             'course': course,
+            # used as template condition: must be boolean
             'can_create_thread': has_permission(user, "create_thread", self.course_key),
-            'can_create_comment': has_permission(user, "create_comment", self.course_key),
-            'can_create_subcomment': has_permission(user, "create_subcomment", self.course_key),
+            # used as html data: must be JSON
+            'can_create_comment': json.dumps(has_permission(user, "create_comment", self.course_key)),
+            'can_create_subcomment': json.dumps(has_permission(user, "create_subcomment", self.course_key)),
         }
 
         fragment.add_content(self.runtime.render_template('discussion/_discussion_inline.html', context))

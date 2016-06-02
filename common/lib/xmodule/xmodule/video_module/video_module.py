@@ -112,6 +112,7 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
     #TODO: For each of the following, ensure that any generated html is properly escaped.
     js = {
         'js': [
+            resource_string(module, 'js/src/time.js'),
             resource_string(module, 'js/src/video/00_component.js'),
             resource_string(module, 'js/src/video/00_video_storage.js'),
             resource_string(module, 'js/src/video/00_resizer.js'),

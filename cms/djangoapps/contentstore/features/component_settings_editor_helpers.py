@@ -201,7 +201,7 @@ def verify_all_setting_entries(expected_entries):
 
 @world.absorb
 def save_component():
-    world.css_click("a.action-save")
+    world.css_click("a.action-save,a.save-button")
     world.wait_for_ajax_complete()
 
 
