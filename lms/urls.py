@@ -980,8 +980,7 @@ if settings.DEBUG:
         document_root=settings.PROFILE_IMAGE_BACKEND['options']['location']
     )
 
-    # in debug mode, allow any template to be rendered (most useful for UX reference templates)
-    urlpatterns += url(r'^template/(?P<template>.+)$', 'openedx.core.djangoapps.debug.views.show_reference_template'),
+urlpatterns += url(r'^template/(?P<template>.+)$', 'openedx.core.djangoapps.debug.views.show_reference_template'),
 
 if 'debug_toolbar' in settings.INSTALLED_APPS:
     import debug_toolbar
