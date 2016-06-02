@@ -133,8 +133,8 @@ describe "DiscussionThreadView", ->
 
         checkVoteDisplay = (originallyClosed, mode) ->
             view = createDiscussionThreadView(originallyClosed, mode)
-            expect(view.$('.forum-thread-main-wrapper .action-vote').is(":visible")).toBe(not originallyClosed)
-            expect(view.$('.forum-thread-main-wrapper .display-vote').is(":visible")).toBe(originallyClosed)
+            expect(view.$('.thread-main-wrapper .action-vote').is(":visible")).toBe(not originallyClosed)
+            expect(view.$('.thread-main-wrapper .display-vote').is(":visible")).toBe(originallyClosed)
             view.$(".action-close").click()
             expect(view.$('.action-vote').is(":visible")).toBe(originallyClosed)
             expect(view.$('.display-vote').is(":visible")).toBe(not originallyClosed)

@@ -26,7 +26,7 @@ class RenderXBlockTestMixin(object):
     # DOM elements that appear in the LMS Courseware,
     # but are excluded from the xBlock-only rendering.
     COURSEWARE_CHROME_HTML_ELEMENTS = [
-        '<ol class="course-tabs"',
+        '<ol class="tabs course-tabs"',
         '<footer id="footer-openedx"',
         '<div class="window-wrap"',
         '<div class="preview-menu"',
