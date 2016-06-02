@@ -20,7 +20,7 @@ REGISTER_USER = Signal(providing_args=["user", "profile"])
 # list of changed fields to pass to Sailthru
 CHANGED_FIELDNAMES = ['username', 'is_active', 'name', 'gender', 'education',
                       'age', 'level_of_education', 'year_of_birth',
-                      'mailing_address', 'country']
+                      'country']
 
 
 @receiver(UNENROLL_DONE)
@@ -62,8 +62,6 @@ def add_email_marketing_cookies(response, user):
     if sailthru_response.is_ok():
         if 'keys' in sailthru_response.json and 'cookie' in sailthru_response.json['keys']:
             cookie = sailthru_response.json['keys']['cookie']
-
-            log.info("Cookie obtained: %s", cookie)
 
             response.set_cookie(
                 'sailthru_hid',

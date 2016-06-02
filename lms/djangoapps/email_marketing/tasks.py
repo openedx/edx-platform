@@ -3,6 +3,7 @@ This file contains celery tasks for email marketing signal handler.
 """
 import logging
 import datetime
+import time
 
 from pytz import UTC
 
@@ -121,14 +122,14 @@ def _create_sailthru_user_parm(user, profile):
                      'activated': int(user.is_active),
                      'joined_date': user.date_joined.strftime("%Y-%m-%d")}
     sailthru_user['vars'] = sailthru_vars
+    sailthru_vars['last_changed_time'] = int(time.time())
 
     if profile:
         sailthru_vars['fullname'] = profile.name
         sailthru_vars['gender'] = profile.gender
         sailthru_vars['education'] = profile.level_of_education
         sailthru_vars['age'] = profile.age or -1
-        sailthru_vars['yearOfBirth'] = profile.year_of_birth or datetime.datetime.now(UTC).year
-        sailthru_vars['address'] = profile.mailing_address
-        sailthru_vars['country'] = unicode(profile.country)
+        sailthru_vars['year_of_birth'] = profile.year_of_birth or datetime.datetime.now(UTC).year
+        sailthru_vars['country'] = unicode(profile.country.name)
 
     return sailthru_user
