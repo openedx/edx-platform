@@ -24,7 +24,7 @@ from discussion_api.permissions import (
     get_initializable_comment_fields,
     get_initializable_thread_fields,
 )
-from discussion_api.serializers import CommentSerializer, ThreadSerializer, get_context
+from discussion_api.serializers import CommentSerializer, ThreadSerializer, get_context, DiscussionTopicSerializer
 from django_comment_client.base.views import (
     track_comment_created_event,
     track_thread_created_event,
@@ -46,7 +46,19 @@ from lms.lib.comment_client.comment import Comment
 from lms.lib.comment_client.thread import Thread
 from lms.lib.comment_client.utils import CommentClientRequestError
 from openedx.core.djangoapps.course_groups.cohorts import get_cohort_id
-from openedx.core.lib.exceptions import CourseNotFoundError, PageNotFoundError
+from openedx.core.lib.exceptions import CourseNotFoundError, PageNotFoundError, DiscussionNotFoundError
+
+
+class DiscussionTopic(object):
+    """
+    Class for discussion topic structure
+    """
+
+    def __init__(self, topic_id, name, thread_list_url, children=None):
+        self.id = topic_id  # pylint: disable=invalid-name
+        self.name = name
+        self.thread_list_url = thread_list_url
+        self.children = children or []  # children are of same type i.e. DiscussionTopic
 
 
 def _get_course(course_key, user):
@@ -173,70 +185,132 @@ def get_course(request, course_key):
     }
 
 
-def get_course_topics(request, course_key):
+def get_courseware_topics(request, course_key, course, topic_ids):
     """
-    Return the course topic listing for the given course and user.
+    Returns a list of topic trees for courseware-linked topics.
 
     Parameters:
 
-    course_key: The key of the course to get topics for
-    user: The requesting user, for access control
+        request: The django request objects used for build_absolute_uri.
+        course_key: The key of the course to get discussion threads for.
+        course: The course for which topics are requested.
+        topic_ids: A list of topic IDs for which details are requested.
+            This is optional. If None then all course topics are returned.
 
     Returns:
+        A list of courseware topics and a set of existing topics among
+        topic_ids.
 
-    A course topic listing dictionary; see discussion_api.views.CourseTopicViews
-    for more detail.
     """
+    courseware_topics = []
+    existing_topic_ids = set()
+
     def get_module_sort_key(module):
         """
         Get the sort key for the module (falling back to the discussion_target
         setting if absent)
         """
         return module.sort_key or module.discussion_target
-    course = _get_course(course_key, request.user)
-    discussion_modules = get_accessible_discussion_modules(course, request.user)
-    modules_by_category = defaultdict(list)
-    for module in discussion_modules:
-        modules_by_category[module.discussion_category].append(module)
 
     def get_sorted_modules(category):
         """Returns key sorted modules by category"""
         return sorted(modules_by_category[category], key=get_module_sort_key)
 
-    courseware_topics = [
-        {
-            "id": None,
-            "name": category,
-            "thread_list_url": get_thread_list_url(
-                request,
-                course_key,
-                [item.discussion_id for item in get_sorted_modules(category)]
-            ),
-            "children": [
-                {
-                    "id": module.discussion_id,
-                    "name": module.discussion_target,
-                    "thread_list_url": get_thread_list_url(request, course_key, [module.discussion_id]),
-                    "children": [],
-                }
-                for module in get_sorted_modules(category)
-            ],
-        }
-        for category in sorted(modules_by_category.keys())
-    ]
+    discussion_modules = get_accessible_discussion_modules(course, request.user)
+    modules_by_category = defaultdict(list)
+    for module in discussion_modules:
+        modules_by_category[module.discussion_category].append(module)
 
-    non_courseware_topics = [
-        {
-            "id": entry["id"],
-            "name": name,
-            "thread_list_url": get_thread_list_url(request, course_key, [entry["id"]]),
-            "children": [],
-        }
-        for name, entry in sorted(
-            course.discussion_topics.items(),
-            key=lambda item: item[1].get("sort_key", item[0])
-        )
-    ]
+    for category in sorted(modules_by_category.keys()):
+        children = []
+        for module in get_sorted_modules(category):
+            if not topic_ids or module.discussion_id in topic_ids:
+                discussion_topic = DiscussionTopic(
+                    module.discussion_id,
+                    module.discussion_target,
+                    get_thread_list_url(request, course_key, [module.discussion_id]),
+                )
+                children.append(discussion_topic)
+
+                if topic_ids and module.discussion_id in topic_ids:
+                    existing_topic_ids.add(module.discussion_id)
+
+        if not topic_ids or children:
+            discussion_topic = DiscussionTopic(
+                None,
+                category,
+                get_thread_list_url(request, course_key, [item.discussion_id for item in get_sorted_modules(category)]),
+                children,
+            )
+            courseware_topics.append(DiscussionTopicSerializer(discussion_topic).data)
+
+    return courseware_topics, existing_topic_ids
+
+
+def get_non_courseware_topics(request, course_key, course, topic_ids):
+    """
+    Returns a list of topic trees that are not linked to courseware.
+
+    Parameters:
+
+        request: The django request objects used for build_absolute_uri.
+        course_key: The key of the course to get discussion threads for.
+        course: The course for which topics are requested.
+        topic_ids: A list of topic IDs for which details are requested.
+            This is optional. If None then all course topics are returned.
+
+    Returns:
+        A list of non-courseware topics and a set of existing topics among
+        topic_ids.
+
+    """
+    non_courseware_topics = []
+    existing_topic_ids = set()
+    for name, entry in sorted(course.discussion_topics.items(), key=lambda item: item[1].get("sort_key", item[0])):
+        if not topic_ids or entry['id'] in topic_ids:
+            discussion_topic = DiscussionTopic(
+                entry["id"], name, get_thread_list_url(request, course_key, [entry["id"]])
+            )
+            non_courseware_topics.append(DiscussionTopicSerializer(discussion_topic).data)
+
+            if topic_ids and entry["id"] in topic_ids:
+                existing_topic_ids.add(entry["id"])
+
+    return non_courseware_topics, existing_topic_ids
+
+
+def get_course_topics(request, course_key, topic_ids=None):
+    """
+    Returns the course topic listing for the given course and user; filtered
+    by 'topic_ids' list if given.
+
+    Parameters:
+
+        course_key: The key of the course to get topics for
+        user: The requesting user, for access control
+        topic_ids: A list of topic IDs for which topic details are requested
+
+    Returns:
+
+        A course topic listing dictionary; see discussion_api.views.CourseTopicViews
+        for more detail.
+
+    Raises:
+        DiscussionNotFoundError: If topic/s not found for given topic_ids.
+    """
+    course = _get_course(course_key, request.user)
+
+    courseware_topics, existing_courseware_topic_ids = get_courseware_topics(request, course_key, course, topic_ids)
+    non_courseware_topics, existing_non_courseware_topic_ids = get_non_courseware_topics(
+        request, course_key, course, topic_ids
+    )
+
+    if topic_ids:
+        not_found_topic_ids = topic_ids - (existing_courseware_topic_ids | existing_non_courseware_topic_ids)
+        if not_found_topic_ids:
+            raise DiscussionNotFoundError(
+                "Discussion not found for '{}'.".format(", ".join(str(id) for id in not_found_topic_ids))
+            )
 
     return {
         "courseware_topics": courseware_topics,
