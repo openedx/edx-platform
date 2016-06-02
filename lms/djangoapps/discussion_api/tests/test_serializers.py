@@ -568,7 +568,6 @@ class ThreadSerializerDeserializationTest(CommentsServiceMockMixin, UrlResetMixi
                 "pinned": ["False"],
                 "user_id": [str(self.user.id)],
                 "read": ["False"],
-                "requested_user_id": [str(self.user.id)],
             }
         )
 
@@ -597,7 +596,6 @@ class ThreadSerializerDeserializationTest(CommentsServiceMockMixin, UrlResetMixi
                 "pinned": ["False"],
                 "user_id": [str(self.user.id)],
                 "read": [str(read)],
-                "requested_user_id": [str(self.user.id)],
             }
         )
         for key in data:

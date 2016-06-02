@@ -99,6 +99,7 @@ class ThreadActionsForm(Form):
     following = BooleanField(required=False)
     voted = BooleanField(required=False)
     abuse_flagged = BooleanField(required=False)
+    read = BooleanField(required=False)
 
 
 class CommentListGetForm(_PaginationForm):
