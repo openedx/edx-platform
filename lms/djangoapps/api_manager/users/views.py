@@ -277,14 +277,15 @@ class UsersList(SecureListAPIView):
         if course_ids is not None:
             course_ids = map(CourseKey.from_string, course_ids.split(','))
             queryset = queryset.filter(courseenrollment__course_id__in=course_ids).distinct()
+        else:
+            queryset = queryset.select_related('courseenrollment_set')\
+                .annotate(courses_enrolled=Count('courseenrollment'))
 
         name = self.request.QUERY_PARAMS.get('name', None)
         if name is not None:
             queryset = queryset.filter(profile__name=name)
 
-        queryset = queryset.prefetch_related('organizations')\
-            .select_related('courseenrollment_set', 'profile')\
-            .annotate(courses_enrolled=Count('courseenrollment'))
+        queryset = queryset.prefetch_related('organizations').select_related('profile')
 
         return queryset
 
