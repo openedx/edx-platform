@@ -11,7 +11,7 @@ import dogstats_wrapper as dog_stats_api
 
 from xmodule.validation import StudioValidation, StudioValidationMessage
 from .capa_base import CapaMixin, CapaFields, ComplexEncoder
-from capa import responsetypes
+from capa import responsetypes, inputtypes
 from .progress import Progress
 from xmodule.util.misc import escape_html_characters
 from xmodule.x_module import XModule, module_attr, DEPRECATION_VSCOMPAT_EVENT
@@ -277,9 +277,9 @@ class CapaDescriptor(CapaFields, RawDescriptor):
         validation = StudioValidation.copy(validation)
 
         # validate xml to check questions are correctly separated
-        is_valid = self.validate_xml()
+        is_valid_xml = self.validate_xml_for_inputtypes()
 
-        if not is_valid:
+        if not is_valid_xml:
             validation.set_summary(
                 StudioValidationMessage(
                     StudioValidationMessage.WARNING,
@@ -292,18 +292,21 @@ class CapaDescriptor(CapaFields, RawDescriptor):
 
         return validation
 
-    def validate_xml(self):
-        input_tags = ['choiceresponse', 'optionresponse', 'multiplechoiceresponse', 'stringresponse',
-                      'numericalresponse', 'schematicresponse', 'imageresponse', 'formularesponse']
+    def validate_xml_for_inputtypes(self):
+        """
+        Looks for more than one occurrences of inputtypes inside each <question>
+        if found returns False
+        """
+        input_types = inputtypes.registry.registered_tags()
+        from nose.tools import set_trace; set_trace()
 
         xmltree = etree.fromstring(self.data)
         questions = xmltree.findall(".//question")
 
         for question in questions:
-            for tag in input_tags:
+            for tag in input_types:
                 tag_elements = question.findall(".//" + tag)
                 if len(tag_elements) > 1:
-                    print("more choices")
                     return False
 
         return True
