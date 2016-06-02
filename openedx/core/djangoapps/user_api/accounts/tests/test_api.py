@@ -273,6 +273,7 @@ class AccountSettingsOnCreationTest(TestCase):
             'mailing_address': None,
             'year_of_birth': None,
             'country': None,
+            'time_zone': None,
             'bio': None,
             'profile_image': {
                 'has_image': False,
