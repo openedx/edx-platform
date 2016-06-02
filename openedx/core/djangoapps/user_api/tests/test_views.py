@@ -1366,7 +1366,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
         user = User.objects.get(username=self.USERNAME)
         request = RequestFactory().get('/url')
         request.user = user
-        account_settings = get_account_settings(request)
+        account_settings = get_account_settings(request)[0]
 
         self.assertEqual(self.USERNAME, account_settings["username"])
         self.assertEqual(self.EMAIL, account_settings["email"])
@@ -1406,7 +1406,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
         user = User.objects.get(username=self.USERNAME)
         request = RequestFactory().get('/url')
         request.user = user
-        account_settings = get_account_settings(request)
+        account_settings = get_account_settings(request)[0]
 
         self.assertEqual(account_settings["level_of_education"], self.EDUCATION)
         self.assertEqual(account_settings["mailing_address"], self.ADDRESS)
@@ -1440,7 +1440,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
         user = User.objects.get(username=self.USERNAME)
         request = RequestFactory().get('/url')
         request.user = user
-        account_settings = get_account_settings(request)
+        account_settings = get_account_settings(request)[0]
 
         self.assertEqual(self.USERNAME, account_settings["username"])
         self.assertEqual(self.EMAIL, account_settings["email"])

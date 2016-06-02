@@ -41,7 +41,7 @@ visible_fields = _visible_fields
 
 
 @intercept_errors(UserAPIInternalError, ignore_errors=[UserAPIRequestError])
-def get_account_settings(request, username=None, configuration=None, view=None):
+def get_account_settings(request, usernames=None, configuration=None, view=None):
     """Returns account information for a user serialized as JSON.
 
     Note:
@@ -52,8 +52,8 @@ def get_account_settings(request, username=None, configuration=None, view=None):
         request (Request): The request object with account information about the requesting user.
             Only the user with username `username` or users with "is_staff" privileges can get full
             account information. Other users will get the account fields that the user has elected to share.
-        username (str): Optional username for the desired account information. If not specified,
-            `request.user.username` is assumed.
+        usernames (list): Optional list of usernames for the desired account information. If not
+            specified, `request.user.username` is assumed.
         configuration (dict): an optional configuration specifying which fields in the account
             can be shared, and the default visibility settings. If not present, the setting value with
             key ACCOUNT_VISIBILITY_CONFIGURATION is used.
@@ -62,7 +62,7 @@ def get_account_settings(request, username=None, configuration=None, view=None):
             "shared", only shared account information will be returned, regardless of `request.user`.
 
     Returns:
-         A dict containing account fields.
+         A list of users account details.
 
     Raises:
          UserNotFound: no user with username `username` exists (or `request.user.username` if
@@ -70,27 +70,27 @@ def get_account_settings(request, username=None, configuration=None, view=None):
          UserAPIInternalError: the operation failed due to an unexpected error.
     """
     requesting_user = request.user
+    usernames = usernames or [requesting_user.username]
 
-    if username is None:
-        username = requesting_user.username
-
-    try:
-        existing_user = User.objects.select_related('profile').get(username=username)
-    except ObjectDoesNotExist:
+    requested_users = User.objects.select_related('profile').filter(username__in=usernames)
+    if not requested_users:
         raise UserNotFound()
 
-    has_full_access = requesting_user.username == username or requesting_user.is_staff
-    if has_full_access and view != 'shared':
-        admin_fields = settings.ACCOUNT_VISIBILITY_CONFIGURATION.get('admin_fields')
-    else:
-        admin_fields = None
+    serialized_users = []
+    for user in requested_users:
+        has_full_access = requesting_user.is_staff or requesting_user.username == user.username
+        if has_full_access and view != 'shared':
+            admin_fields = settings.ACCOUNT_VISIBILITY_CONFIGURATION.get('admin_fields')
+        else:
+            admin_fields = None
+        serialized_users.append(UserReadOnlySerializer(
+            user,
+            configuration=configuration,
+            custom_fields=admin_fields,
+            context={'request': request}
+        ).data)
 
-    return UserReadOnlySerializer(
-        existing_user,
-        configuration=configuration,
-        custom_fields=admin_fields,
-        context={'request': request}
-    ).data
+    return serialized_users
 
 
 @intercept_errors(UserAPIInternalError, ignore_errors=[UserAPIRequestError])

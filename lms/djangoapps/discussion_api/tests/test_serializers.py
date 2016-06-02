@@ -16,6 +16,7 @@ from discussion_api.tests.utils import (
     CommentsServiceMockMixin,
     make_minimal_cs_thread,
     make_minimal_cs_comment,
+    ProfileImageTestMixin,
 )
 from django_comment_common.models import (
     FORUM_ROLE_ADMINISTRATOR,
@@ -237,7 +238,7 @@ class ThreadSerializerSerializationTest(SerializerTestMixin, SharedModuleStoreTe
         thread_data = self.make_cs_content({})
         del thread_data["pinned"]
         self.register_get_thread_response(thread_data)
-        serialized = self.serialize(Thread(id=thread_data["id"]))
+        serialized = self.serialize(thread_data)
         self.assertEqual(serialized["pinned"], False)
 
     def test_group(self):
@@ -255,14 +256,14 @@ class ThreadSerializerSerializationTest(SerializerTestMixin, SharedModuleStoreTe
     def test_response_count(self):
         thread_data = self.make_cs_content({"resp_total": 2})
         self.register_get_thread_response(thread_data)
-        serialized = self.serialize(Thread(id=thread_data["id"]))
+        serialized = self.serialize(thread_data)
         self.assertEqual(serialized["response_count"], 2)
 
     def test_response_count_missing(self):
         thread_data = self.make_cs_content({})
         del thread_data["resp_total"]
         self.register_get_thread_response(thread_data)
-        serialized = self.serialize(Thread(id=thread_data["id"]))
+        serialized = self.serialize(thread_data)
         self.assertNotIn("response_count", serialized)
 
 
@@ -459,6 +460,7 @@ class ThreadSerializerDeserializationTest(CommentsServiceMockMixin, UrlResetMixi
             "title": "Original Title",
             "body": "Original body",
             "user_id": str(self.user.id),
+            "username": self.user.username,
             "read": "False",
             "endorsed": "False"
         }))
@@ -480,7 +482,7 @@ class ThreadSerializerDeserializationTest(CommentsServiceMockMixin, UrlResetMixi
         return serializer.data
 
     def test_create_minimal(self):
-        self.register_post_thread_response({"id": "test_id"})
+        self.register_post_thread_response({"id": "test_id", "username": self.user.username})
         saved = self.save_and_reserialize(self.minimal_data)
         self.assertEqual(
             urlparse(httpretty.last_request().path).path,
@@ -500,7 +502,7 @@ class ThreadSerializerDeserializationTest(CommentsServiceMockMixin, UrlResetMixi
         self.assertEqual(saved["id"], "test_id")
 
     def test_create_all_fields(self):
-        self.register_post_thread_response({"id": "test_id"})
+        self.register_post_thread_response({"id": "test_id", "username": self.user.username})
         data = self.minimal_data.copy()
         data["group_id"] = 42
         self.save_and_reserialize(data)
@@ -540,7 +542,7 @@ class ThreadSerializerDeserializationTest(CommentsServiceMockMixin, UrlResetMixi
         )
 
     def test_create_type(self):
-        self.register_post_thread_response({"id": "test_id"})
+        self.register_post_thread_response({"id": "test_id", "username": self.user.username})
         data = self.minimal_data.copy()
         data["type"] = "question"
         self.save_and_reserialize(data)
@@ -655,6 +657,7 @@ class CommentSerializerDeserializationTest(CommentsServiceMockMixin, SharedModul
             "thread_id": "existing_thread",
             "body": "Original body",
             "user_id": str(self.user.id),
+            "username": self.user.username,
             "course_id": unicode(self.course.id),
         }))
 
@@ -685,7 +688,7 @@ class CommentSerializerDeserializationTest(CommentsServiceMockMixin, SharedModul
             data["parent_id"] = parent_id
             self.register_get_comment_response({"thread_id": "test_thread", "id": parent_id})
         self.register_post_comment_response(
-            {"id": "test_comment"},
+            {"id": "test_comment", "username": self.user.username},
             thread_id="test_thread",
             parent_id=parent_id
         )
@@ -712,7 +715,7 @@ class CommentSerializerDeserializationTest(CommentsServiceMockMixin, SharedModul
         data["endorsed"] = True
         self.register_get_comment_response({"thread_id": "test_thread", "id": "test_parent"})
         self.register_post_comment_response(
-            {"id": "test_comment"},
+            {"id": "test_comment", "username": self.user.username},
             thread_id="test_thread",
             parent_id="test_parent"
         )
@@ -807,7 +810,7 @@ class CommentSerializerDeserializationTest(CommentsServiceMockMixin, SharedModul
     def test_create_endorsed(self):
         # TODO: The comments service doesn't populate the endorsement field on
         # comment creation, so this is sadly realistic
-        self.register_post_comment_response({}, thread_id="test_thread")
+        self.register_post_comment_response({"username": self.user.username}, thread_id="test_thread")
         data = self.minimal_data.copy()
         data["endorsed"] = True
         saved = self.save_and_reserialize(data)
