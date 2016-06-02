@@ -61,7 +61,7 @@ urlpatterns = (
     url(r'^password_reset_confirm/(?P<uidb36>[0-9A-Za-z]+)-(?P<token>.+)/$',
         'student.views.password_reset_confirm_wrapper',
         name='password_reset_confirm'),
-    url(r'^password_reset_complete/$', 'django.contrib.auth.views.password_reset_complete',
+    url(r'^password_reset_complete/$', 'student.views.password_reset_complete_wrapper',
         name='password_reset_complete'),
     url(r'^password_reset_done/$', 'django.contrib.auth.views.password_reset_done',
         name='password_reset_done'),
