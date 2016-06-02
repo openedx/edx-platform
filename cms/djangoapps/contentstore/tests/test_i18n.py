@@ -66,7 +66,7 @@ class TestModuleI18nService(ModuleStoreTestCase):
             self.descriptor,
             self.field_data,
         )
-        self.addCleanup(translation.activate, settings.LANGUAGE_CODE)
+        self.addCleanup(translation.deactivate)
 
     def get_module_i18n_service(self, descriptor):
         """
