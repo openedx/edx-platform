@@ -99,8 +99,8 @@ class UserReadOnlySerializer(serializers.Serializer):
         }
 
         filtered_data = self._filter_fields(
-        self._visible_fields(profile, user),
-        data
+            self._visible_fields(profile, user),
+            data
         )
 
         filtered_data['certificates'] = get_certificates_for_user_basic(user.username)
