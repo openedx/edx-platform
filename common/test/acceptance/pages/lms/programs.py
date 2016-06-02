@@ -24,8 +24,7 @@ class ProgramListingPage(PageObject):
 
 class ProgramDetailsPage(PageObject):
     """Program details page."""
-    program_id = 123
-    url = BASE_URL + '/dashboard/programs/{}/program-name/'.format(program_id)
+    url = BASE_URL + '/dashboard/programs/123/program-name/'
 
     def is_browser_on_page(self):
         return self.q(css='.js-program-details-wrapper').present

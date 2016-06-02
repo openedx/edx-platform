@@ -1,15 +1,10 @@
 """Tests covering Programs utilities."""
-import copy
-import datetime
 import json
 from unittest import skipUnless
 
-import ddt
 from django.conf import settings
 from django.core.cache import cache
-from django.core.urlresolvers import reverse
 from django.test import TestCase
-from django.utils import timezone
 import httpretty
 import mock
 from nose.plugins.attrib import attr
@@ -17,7 +12,6 @@ from edx_oauth2_provider.tests.factories import ClientFactory
 from provider.constants import CONFIDENTIAL
 
 from lms.djangoapps.certificates.api import MODES
-from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.credentials.tests import factories as credentials_factories
 from openedx.core.djangoapps.credentials.tests.mixins import CredentialsApiConfigMixin, CredentialsDataMixin
 from openedx.core.djangoapps.programs import utils
@@ -26,8 +20,6 @@ from openedx.core.djangoapps.programs.tests import factories
 from openedx.core.djangoapps.programs.tests.mixins import ProgramsApiConfigMixin, ProgramsDataMixin
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
 
 
 UTILS_MODULE = 'openedx.core.djangoapps.programs.utils'
@@ -605,78 +597,3 @@ class TestProgramProgressMeter(ProgramsApiConfigMixin, TestCase):
             meter,
             factories.Progress(id=program['id'], completed=self._extract_names(program, 0))
         )
-
-
-@ddt.ddt
-@skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
-class TestSupplementProgramData(ProgramsApiConfigMixin, ModuleStoreTestCase):
-    """Tests of the utility function used to supplement program data."""
-    password = 'test'
-    human_friendly_format = '%x'
-    maxDiff = None
-
-    def setUp(self):
-        super(TestSupplementProgramData, self).setUp()
-
-        self.user = UserFactory()
-        self.client.login(username=self.user.username, password=self.password)
-
-        ClientFactory(name=ProgramsApiConfig.OAUTH2_CLIENT_NAME, client_type=CONFIDENTIAL)
-
-        self.course = CourseFactory()
-        self.course.start = timezone.now() - datetime.timedelta(days=1)
-        self.course.end = timezone.now() + datetime.timedelta(days=1)
-        self.course = self.update_course(self.course, self.user.id)  # pylint: disable=no-member
-
-        self.organization = factories.Organization()
-        self.run_mode = factories.RunMode(course_key=unicode(self.course.id))  # pylint: disable=no-member
-        self.course_code = factories.CourseCode(run_modes=[self.run_mode])
-        self.program = factories.Program(
-            organizations=[self.organization],
-            course_codes=[self.course_code]
-        )
-
-    def _assert_supplemented(self, actual, is_enrolled=False, is_enrollment_open=True):
-        """DRY helper used to verify that program data is extended correctly."""
-        course_overview = CourseOverview.get_from_id(self.course.id)  # pylint: disable=no-member
-
-        run_mode = factories.RunMode(
-            course_key=unicode(self.course.id),  # pylint: disable=no-member
-            course_url=reverse('course_root', args=[self.course.id]),  # pylint: disable=no-member
-            course_image_url=course_overview.course_image_url,
-            start_date=self.course.start.strftime(self.human_friendly_format),
-            end_date=self.course.end.strftime(self.human_friendly_format),
-            is_enrolled=is_enrolled,
-            is_enrollment_open=is_enrollment_open,
-            marketing_url='',
-        )
-        course_code = factories.CourseCode(display_name=self.course_code['display_name'], run_modes=[run_mode])
-        expected = copy.deepcopy(self.program)
-        expected['course_codes'] = [course_code]
-
-        self.assertEqual(actual, expected)
-
-    @ddt.data(True, False)
-    def test_student_enrollment_status(self, is_enrolled):
-        """Verify that program data is supplemented correctly."""
-        if is_enrolled:
-            CourseEnrollmentFactory(user=self.user, course_id=self.course.id)  # pylint: disable=no-member
-
-        data = utils.supplement_program_data(self.program, self.user)
-
-        self._assert_supplemented(data, is_enrolled=is_enrolled)
-
-    @ddt.data(
-        [1, 1, False],
-        [1, -1, True],
-    )
-    @ddt.unpack
-    def test_course_enrollment_status(self, start_offset, end_offset, is_enrollment_open):
-        """Verify that course enrollment status is reflected correctly."""
-        self.course.enrollment_start = timezone.now() - datetime.timedelta(days=start_offset)
-        self.course.enrollment_end = timezone.now() - datetime.timedelta(days=end_offset)
-        self.course = self.update_course(self.course, self.user.id)  # pylint: disable=no-member
-
-        data = utils.supplement_program_data(self.program, self.user)
-
-        self._assert_supplemented(data, is_enrollment_open=is_enrollment_open)
