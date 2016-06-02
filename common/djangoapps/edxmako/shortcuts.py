@@ -45,10 +45,7 @@ def marketing_link(name):
         'ENABLE_MKTG_SITE',
         settings.FEATURES.get('ENABLE_MKTG_SITE', False)
     )
-    mktg_urls = microsite.get_value(
-        'MKTG_URLS',
-        settings.get('MKTG_URLS', {})
-    )
+    mktg_urls = microsite.get_value('MKTG_URLS', (settings.MKTG_URLS or {}))
 
     if name in mktg_urls:
         if enable_mktg_site:
