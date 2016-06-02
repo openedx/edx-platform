@@ -215,13 +215,21 @@ def set_license(request, course, ccx):
     store = modulestore()
     with store.bulk_operations(course_key):
         simulations = store.get_items(course_key, qualifiers={'category': 'lti'})
-        course_info, chapters, invalid_simulations = course_tree_info(
+        course_info, chapters, invalid_simulation_ids = course_tree_info(
             store, simulations, licensed_simulations
         )
-        if invalid_simulations:
+        if invalid_simulation_ids:
             messages.error(
                 request,
-                _('Validation error. Please check urls for following simulations {}.'.format(str(invalid_simulations)))
+                _((
+                    'Please verify LTI URLs  are correct for the following simulations: \n {}'
+                ).format(
+                    '\n'.join(
+                        'name: "{}", simulation Id: "{}"'.format(
+                            sim_name, sim_id
+                        ) for sim_name, sim_id in invalid_simulation_ids
+                    )
+                ))
             )
             return redirect(url)
         update_course(ccx, course_info, chapters)
