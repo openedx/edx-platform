@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-05-26 15:52+0000\n"
-"PO-Revision-Date: 2016-05-26 15:52:24.097499\n"
+"POT-Creation-Date: 2016-06-02 14:34+0000\n"
+"PO-Revision-Date: 2016-06-02 14:34:15.032270\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -2974,6 +2974,18 @@ msgstr ""
 "ثطشوس."
 
 #: common/lib/xmodule/xmodule/course_module.py
+msgid "Create Zendesk Tickets For Suspicious Proctored Exam Attempts"
+msgstr "ذقثشفث ظثريثسن فهذنثفس بخق سعسحهذهخعس حقخذفخقثي ثطشو شففثوحفس"
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Enter true or false. If this value is true, a Zendesk ticket will be created"
+" for suspicious attempts."
+msgstr ""
+"ثرفثق فقعث خق بشمسث. هب فاهس دشمعث هس فقعث, ش ظثريثسن فهذنثف صهمم زث ذقثشفثي"
+" بخق سعسحهذهخعس شففثوحفس."
+
+#: common/lib/xmodule/xmodule/course_module.py
 msgid "Enable Timed Exams"
 msgstr "ثرشزمث فهوثي ثطشوس"
 
@@ -5729,6 +5741,20 @@ msgstr "وشرعشممغ ثرقخممثي"
 #: lms/djangoapps/instructor/paidcourse_enrollment_report.py
 msgid "Data Integrity Error"
 msgstr "يشفش هرفثلقهفغ ثققخق"
+
+#: lms/djangoapps/instructor/services.py
+msgid "Proctored Exam Review: {review_status}"
+msgstr "حقخذفخقثي ثطشو قثدهثص: {review_status}"
+
+#: lms/djangoapps/instructor/services.py
+msgid ""
+"A proctored exam attempt for {exam_name} in {course_name} by username: "
+"{student_username} was reviewed as {review_status} by the proctored exam "
+"review provider."
+msgstr ""
+"ش حقخذفخقثي ثطشو شففثوحف بخق {exam_name} هر {course_name} زغ عسثقرشوث: "
+"{student_username} صشس قثدهثصثي شس {review_status} زغ فاث حقخذفخقثي ثطشو "
+"قثدهثص حقخدهيثق."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "User does not exist."
@@ -10262,7 +10288,8 @@ msgstr "سفشقفس"
 msgid "View all Courses"
 msgstr "دهثص شمم ذخعقسثس"
 
-#: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
+#: lms/templates/dashboard.html lms/templates/user_dropdown.html
+#: themes/edx.org/lms/templates/dashboard.html
 msgid "Dashboard"
 msgstr "يشسازخشقي"
 
@@ -10860,10 +10887,6 @@ msgstr "قشص يشفش:"
 #: lms/templates/navigation.html themes/red-theme/lms/templates/header.html
 msgid "Global"
 msgstr "لمخزشم"
-
-#: lms/templates/navigation.html themes/edx.org/lms/templates/header.html
-msgid "Your Dashboard"
-msgstr "غخعق يشسازخشقي"
 
 #: lms/templates/navigation.html themes/edx.org/lms/templates/header.html
 #: themes/red-theme/lms/templates/header.html
@@ -11567,16 +11590,16 @@ msgid "Usermenu dropdown"
 msgstr "عسثقوثرع يقخحيخصر"
 
 #: lms/templates/user_dropdown.html
-msgid "Profile for:"
-msgstr "حقخبهمث بخق:"
+msgid "Profile"
+msgstr "حقخبهمث"
 
 #: lms/templates/user_dropdown.html
-msgid "Account settings menu"
-msgstr "شذذخعرف سثففهرلس وثرع"
+msgid "Profile image for {username}"
+msgstr "حقخبهمث هوشلث بخق {username}"
 
-#: lms/templates/user_dropdown.html
-msgid "Account settings"
-msgstr "شذذخعرف سثففهرلس"
+#: lms/templates/user_dropdown.html themes/red-theme/lms/templates/header.html
+msgid "More options dropdown"
+msgstr "وخقث خحفهخرس يقخحيخصر"
 
 #: lms/templates/using.html
 msgid "Using the system"
@@ -11655,6 +11678,10 @@ msgstr "{platform_name} شحه شذذثسس قثضعثسف"
 msgid "Request API Access"
 msgstr "قثضعثسف شحه شذذثسس"
 
+#: lms/templates/api_admin/status.html
+msgid "API Access Request Status"
+msgstr "شحه شذذثسس قثضعثسف سفشفعس"
+
 #. Translators: "platform_name" is the name of this Open edX installation.
 #: lms/templates/api_admin/status.html
 msgid ""
@@ -11729,6 +11756,10 @@ msgstr ""
 "فخ مثشقر وخقث شزخعف فاث {platform_name} ذخعقسث ذشفشمخل شحه, دهسهف "
 "{link_start}خعق شحه يخذعوثرفشفهخر حشلث{link_end}. بخق ضعثسفهخرس شزخعف عسهرل "
 "فاهس شحه, ذخرفشذف {api_support_email_link}."
+
+#: lms/templates/api_admin/terms_of_service.html
+msgid "API Terms of Service"
+msgstr "شحه فثقوس خب سثقدهذث"
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid "Terms of Service for {platform_name} APIs"
@@ -13283,24 +13314,12 @@ msgid "Set preview mode"
 msgstr "سثف حقثدهثص وخيث"
 
 #: lms/templates/courseware/course_navigation.html
-msgid "You are now viewing the course as <i>{user_name}</i>."
-msgstr "غخع شقث رخص دهثصهرل فاث ذخعقسث شس <i>{user_name}</i>."
+msgid "You are now viewing the course as {i_start}{user_name}{i_end}."
+msgstr "غخع شقث رخص دهثصهرل فاث ذخعقسث شس {i_start}{user_name}{i_end}."
 
 #: lms/templates/courseware/course_navigation.html
 msgid "Course Material"
 msgstr "ذخعقسث وشفثقهشم"
-
-#: lms/templates/courseware/course_navigation.html
-msgid "Course is not yet visible to students."
-msgstr "ذخعقسث هس رخف غثف دهسهزمث فخ سفعيثرفس."
-
-#: lms/templates/courseware/course_navigation.html
-msgid ""
-"You cannot view the course as a student or beta tester before the course "
-"release date."
-msgstr ""
-"غخع ذشررخف دهثص فاث ذخعقسث شس ش سفعيثرف خق زثفش فثسفثق زثبخقث فاث ذخعقسث "
-"قثمثشسث يشفث."
 
 #: lms/templates/courseware/course_updates.html
 msgid "Hide"
@@ -16521,20 +16540,20 @@ msgid "Myself"
 msgstr "وغسثمب"
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
-msgid "Staff and admins"
-msgstr "سفشبب شري شيوهرس"
+msgid "Staff and Admin"
+msgstr "سفشبب شري شيوهر"
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
-msgid "All (students, staff, and admins)"
-msgstr "شمم (سفعيثرفس, سفشبب, شري شيوهرس)"
+msgid "All Learners"
+msgstr "شمم مثشقرثقس"
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid "Subject: "
 msgstr "سعزتثذف: "
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
-msgid "(Max 128 characters)"
-msgstr "(وشط 128 ذاشقشذفثقس)"
+msgid "(Maximum 128 characters)"
+msgstr "(وشطهوعو 128 ذاشقشذفثقس)"
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid "Message:"
@@ -16542,27 +16561,15 @@ msgstr "وثسسشلث:"
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid ""
-"Please try not to email students more than once per week. Before sending "
-"your email, consider:"
+"We recommend sending learners no more than one email message per week. "
+"Before you send your email, review the text carefully and send it to "
+"yourself first, so that you can preview the formatting and make sure "
+"embedded images and links work correctly."
 msgstr ""
-"حمثشسث فقغ رخف فخ ثوشهم سفعيثرفس وخقث فاشر خرذث حثق صثثن. زثبخقث سثريهرل "
-"غخعق ثوشهم, ذخرسهيثق:"
-
-#: lms/templates/instructor/instructor_dashboard_2/send_email.html
-msgid ""
-"Have you read over the email to make sure it says everything you want to "
-"say?"
-msgstr ""
-"اشدث غخع قثشي خدثق فاث ثوشهم فخ وشنث سعقث هف سشغس ثدثقغفاهرل غخع صشرف فخ "
-"سشغ?"
-
-#: lms/templates/instructor/instructor_dashboard_2/send_email.html
-msgid ""
-"Have you sent the email to yourself first to make sure you're happy with how"
-" it's displayed, and that embedded links and images work properly?"
-msgstr ""
-"اشدث غخع سثرف فاث ثوشهم فخ غخعقسثمب بهقسف فخ وشنث سعقث غخع'قث اشححغ صهفا اخص"
-" هف'س يهسحمشغثي, شري فاشف ثوزثييثي مهرنس شري هوشلثس صخقن حقخحثقمغ?"
+"صث قثذخووثري سثريهرل مثشقرثقس رخ وخقث فاشر خرث ثوشهم وثسسشلث حثق صثثن. "
+"زثبخقث غخع سثري غخعق ثوشهم, قثدهثص فاث فثطف ذشقثبعممغ شري سثري هف فخ "
+"غخعقسثمب بهقسف, سخ فاشف غخع ذشر حقثدهثص فاث بخقوشففهرل شري وشنث سعقث "
+"ثوزثييثي هوشلثس شري مهرنس صخقن ذخققثذفمغ."
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid "CAUTION!"
@@ -16570,15 +16577,11 @@ msgstr "ذشعفهخر!"
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid ""
-"Once the 'Send Email' button is clicked, your email will be queued for "
-"sending."
+"When you select Send Email, your email message is added to the queue for "
+"sending, and cannot be cancelled."
 msgstr ""
-"خرذث فاث 'سثري ثوشهم' زعففخر هس ذمهذنثي, غخعق ثوشهم صهمم زث ضعثعثي بخق "
-"سثريهرل."
-
-#: lms/templates/instructor/instructor_dashboard_2/send_email.html
-msgid "A queued email CANNOT be cancelled."
-msgstr "ش ضعثعثي ثوشهم ذشررخف زث ذشرذثممثي."
+"صاثر غخع سثمثذف سثري ثوشهم, غخعق ثوشهم وثسسشلث هس شييثي فخ فاث ضعثعث بخق "
+"سثريهرل, شري ذشررخف زث ذشرذثممثي."
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid ""
@@ -16593,24 +16596,24 @@ msgid "Email Task History"
 msgstr "ثوشهم فشسن اهسفخقغ"
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
-msgid "To see the content of all previously sent emails, click this button:"
-msgstr "فخ سثث فاث ذخرفثرف خب شمم حقثدهخعسمغ سثرف ثوشهمس, ذمهذن فاهس زعففخر:"
+msgid "To see the content of previously sent emails, click this button:"
+msgstr "فخ سثث فاث ذخرفثرف خب حقثدهخعسمغ سثرف ثوشهمس, ذمهذن فاهس زعففخر:"
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid "Sent Email History"
 msgstr "سثرف ثوشهم اهسفخقغ"
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
-msgid "To read an email, click its subject."
-msgstr "فخ قثشي شر ثوشهم, ذمهذن هفس سعزتثذف."
+msgid "To read a sent email message, click its subject."
+msgstr "فخ قثشي ش سثرف ثوشهم وثسسشلث, ذمهذن هفس سعزتثذف."
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid ""
-"To see the status for all bulk email tasks ever submitted for this course, "
-"click on this button:"
+"To see the status for all email tasks submitted for this course, click this "
+"button:"
 msgstr ""
-"فخ سثث فاث سفشفعس بخق شمم زعمن ثوشهم فشسنس ثدثق سعزوهففثي بخق فاهس ذخعقسث, "
-"ذمهذن خر فاهس زعففخر:"
+"فخ سثث فاث سفشفعس بخق شمم ثوشهم فشسنس سعزوهففثي بخق فاهس ذخعقسث, ذمهذن فاهس "
+"زعففخر:"
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid "Show Email Task History"
@@ -16790,10 +16793,6 @@ msgstr "ساخص زشذنلقخعري فشسن اهسفخقغ بخق حقخزم�
 #: lms/templates/learner_dashboard/program_details.html
 msgid "Program Details"
 msgstr "حقخلقشو يثفشهمس"
-
-#: lms/templates/learner_dashboard/programs.html
-msgid "Your Programs"
-msgstr "غخعق حقخلقشوس"
 
 #: lms/templates/modal/_modal-settings-language.html
 msgid "Change Preferred Language"
@@ -18030,10 +18029,6 @@ msgstr ""
 "ذخيث{honor_link_end}"
 
 #: themes/red-theme/lms/templates/header.html
-msgid "More options dropdown"
-msgstr "وخقث خحفهخرس يقخحيخصر"
-
-#: themes/red-theme/lms/templates/header.html
 msgid "My Profile"
 msgstr "وغ حقخبهمث"
 
@@ -18385,8 +18380,7 @@ msgstr "مثشقر وخقث شزخعف ذثقفهبهذشفثس"
 msgid "Other Course Settings"
 msgstr "خفاثق ذخعقسث سثففهرلس"
 
-#: cms/templates/certificates.html cms/templates/settings_advanced.html
-#: cms/templates/settings_graders.html
+#: cms/templates/certificates.html cms/templates/settings_graders.html
 msgid "Details &amp; Schedule"
 msgstr "يثفشهمس &amp; سذاثيعمث"
 
@@ -19350,6 +19344,7 @@ msgstr ""
 "شري ذمهذن فاث يثمثفث هذخر."
 
 #: cms/templates/group_configurations.html
+#: cms/templates/settings_advanced.html
 msgid "Details & Schedule"
 msgstr "يثفشهمس & سذاثيعمث"
 
@@ -19384,12 +19379,12 @@ msgstr "نثثحهرل غخعق ذخعقسث خقلشرهظثي"
 #: cms/templates/howitworks.html
 msgid ""
 "The backbone of your course is how it is organized. {studio_name} offers an "
-"<strong>Outline</strong> editor, providing a simple hierarchy and easy drag "
-"and drop to help you and your students stay organized."
+"{strong_start}Outline{strong_end} editor, providing a simple hierarchy and "
+"easy drag and drop to help you and your students stay organized."
 msgstr ""
 "فاث زشذنزخرث خب غخعق ذخعقسث هس اخص هف هس خقلشرهظثي. {studio_name} خببثقس شر "
-"<strong>خعفمهرث</strong> ثيهفخق, حقخدهيهرل ش سهوحمث اهثقشقذاغ شري ثشسغ يقشل "
-"شري يقخح فخ اثمح غخع شري غخعق سفعيثرفس سفشغ خقلشرهظثي."
+"{strong_start}خعفمهرث{strong_end} ثيهفخق, حقخدهيهرل ش سهوحمث اهثقشقذاغ شري "
+"ثشسغ يقشل شري يقخح فخ اثمح غخع شري غخعق سفعيثرفس سفشغ خقلشرهظثي."
 
 #: cms/templates/howitworks.html
 msgid "Simple Organization For Content"
@@ -19397,11 +19392,11 @@ msgstr "سهوحمث خقلشرهظشفهخر بخق ذخرفثرف"
 
 #: cms/templates/howitworks.html
 msgid ""
-"{studio_name} uses a simple hierarchy of <strong>sections</strong> and "
-"<strong>subsections</strong> to organize your content."
+"{studio_name} uses a simple hierarchy of {strong_start}sections{strong_end} "
+"and {strong_start}subsections{strong_end} to organize your content."
 msgstr ""
-"{studio_name} عسثس ش سهوحمث اهثقشقذاغ خب <strong>سثذفهخرس</strong> شري "
-"<strong>سعزسثذفهخرس</strong> فخ خقلشرهظث غخعق ذخرفثرف."
+"{studio_name} عسثس ش سهوحمث اهثقشقذاغ خب {strong_start}سثذفهخرس{strong_end} "
+"شري {strong_start}سعزسثذفهخرس{strong_end} فخ خقلشرهظث غخعق ذخرفثرف."
 
 #: cms/templates/howitworks.html
 msgid "Change Your Mind Anytime"
@@ -19421,11 +19416,11 @@ msgstr "لخ ش صثثن خق ش سثوثسفثق شف ش فهوث"
 
 #: cms/templates/howitworks.html
 msgid ""
-"Build and release <strong>sections</strong> to your students incrementally. "
-"You don't have to have it all done at once."
+"Build and release {strong_start}sections{strong_end} to your students "
+"incrementally. You don't have to have it all done at once."
 msgstr ""
-"زعهمي شري قثمثشسث <strong>سثذفهخرس</strong> فخ غخعق سفعيثرفس هرذقثوثرفشممغ. "
-"غخع يخر'ف اشدث فخ اشدث هف شمم يخرث شف خرذث."
+"زعهمي شري قثمثشسث {strong_start}سثذفهخرس{strong_end} فخ غخعق سفعيثرفس "
+"هرذقثوثرفشممغ. غخع يخر'ف اشدث فخ اشدث هف شمم يخرث شف خرذث."
 
 #: cms/templates/howitworks.html
 msgid "Learning is More than Just Lectures"
@@ -19519,12 +19514,12 @@ msgstr "قثمثشسث-خر يشفث حعزمهساهرل"
 
 #: cms/templates/howitworks.html
 msgid ""
-"When you've finished a <strong>section</strong>, pick when you want it to go"
-" live and {studio_name} takes care of the rest. Build your course "
+"When you've finished a {strong_start}section{strong_end}, pick when you want"
+" it to go live and {studio_name} takes care of the rest. Build your course "
 "incrementally."
 msgstr ""
-"صاثر غخع'دث بهرهساثي ش <strong>سثذفهخر</strong>, حهذن صاثر غخع صشرف هف فخ لخ"
-" مهدث شري {studio_name} فشنثس ذشقث خب فاث قثسف. زعهمي غخعق ذخعقسث "
+"صاثر غخع'دث بهرهساثي ش {strong_start}سثذفهخر{strong_end}, حهذن صاثر غخع صشرف"
+" هف فخ لخ مهدث شري {studio_name} فشنثس ذشقث خب فاث قثسف. زعهمي غخعق ذخعقسث "
 "هرذقثوثرفشممغ."
 
 #: cms/templates/howitworks.html
@@ -19544,8 +19539,8 @@ msgid "Sign Up for {studio_name} Today!"
 msgstr "سهلر عح بخق {studio_name} فخيشغ!"
 
 #: cms/templates/howitworks.html
-msgid "Sign Up &amp; Start Making an {platform_name} Course"
-msgstr "سهلر عح &amp; سفشقف وشنهرل شر {platform_name} ذخعقسث"
+msgid "Sign Up & Start Making Your {platform_name} Course"
+msgstr "سهلر عح & سفشقف وشنهرل غخعق {platform_name} ذخعقسث"
 
 #: cms/templates/howitworks.html
 msgid "Already have a {studio_name} Account? Sign In"
@@ -19557,11 +19552,11 @@ msgstr "خعفمهرهرل غخعق ذخعقسث"
 
 #: cms/templates/howitworks.html
 msgid ""
-"Simple two-level outline to organize your couse. Drag and drop, and see your"
-" course at a glance."
+"Simple two-level outline to organize your course. Drag and drop, and see "
+"your course at a glance."
 msgstr ""
-"سهوحمث فصخ-مثدثم خعفمهرث فخ خقلشرهظث غخعق ذخعسث. يقشل شري يقخح, شري سثث غخعق"
-" ذخعقسث شف ش لمشرذث."
+"سهوحمث فصخ-مثدثم خعفمهرث فخ خقلشرهظث غخعق ذخعقسث. يقشل شري يقخح, شري سثث "
+"غخعق ذخعقسث شف ش لمشرذث."
 
 #: cms/templates/howitworks.html
 msgid "More than Just Lectures"
@@ -21122,11 +21117,11 @@ msgstr "وشرعشم حخمهذغ يثبهرهفهخر"
 
 #: cms/templates/settings_advanced.html
 msgid ""
-"<strong>Warning</strong>: Do not modify these policies unless you are "
-"familiar with their purpose."
+"{strong_start}Warning{strong_end}: Do not modify these policies unless you "
+"are familiar with their purpose."
 msgstr ""
-"<strong>صشقرهرل</strong>: يخ رخف وخيهبغ فاثسث حخمهذهثس عرمثسس غخع شقث "
-"بشوهمهشق صهفا فاثهق حعقحخسث."
+"{strong_start}صشقرهرل{strong_end}: يخ رخف وخيهبغ فاثسث حخمهذهثس عرمثسس غخع "
+"شقث بشوهمهشق صهفا فاثهق حعقحخسث."
 
 #: cms/templates/settings_advanced.html
 msgid "Show Deprecated Settings"
@@ -21159,12 +21154,12 @@ msgstr ""
 #: cms/templates/settings_advanced.html
 msgid ""
 "{em_start}Note:{em_end} When you enter strings as policy values, ensure that"
-" you use double quotation marks (&quot;) around the string. Do not use "
-"single quotation marks (&apos;)."
+" you use double quotation marks (\") around the string. Do not use single "
+"quotation marks (')."
 msgstr ""
 "{em_start}رخفث:{em_end} صاثر غخع ثرفثق سفقهرلس شس حخمهذغ دشمعثس, ثرسعقث فاشف"
-" غخع عسث يخعزمث ضعخفشفهخر وشقنس (&quot;) شقخعري فاث سفقهرل. يخ رخف عسث "
-"سهرلمث ضعخفشفهخر وشقنس (&apos;)."
+" غخع عسث يخعزمث ضعخفشفهخر وشقنس (\") شقخعري فاث سفقهرل. يخ رخف عسث سهرلمث "
+"ضعخفشفهخر وشقنس (')."
 
 #: cms/templates/settings_graders.html
 msgid "Grading Settings"
