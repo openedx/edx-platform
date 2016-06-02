@@ -19,11 +19,12 @@
     define([
         'backbone',
         'underscore',
+        'edx-ui-toolkit/js/utils/html-utils',
         'common/js/components/views/paging_header',
         'common/js/components/views/paging_footer',
         'common/js/components/views/list',
         'text!common/templates/components/paginated-view.underscore'
-    ], function (Backbone, _, PagingHeader, PagingFooter, ListView, paginatedViewTemplate) {
+    ], function (Backbone, _, HtmlUtils, PagingHeader, PagingFooter, ListView, paginatedViewTemplate) {
         var PaginatedView = Backbone.View.extend({
             initialize: function () {
                 var ItemListView = this.listViewClass.extend({
@@ -51,13 +52,14 @@
 
             createFooterView: function() {
                 return new PagingFooter({
-                    collection: this.collection, hideWhenOnePage: true,
+                    collection: this.collection,
+                    hideWhenOnePage: true,
                     paginationLabel: this.paginationLabel
                 });
             },
 
             render: function () {
-                this.$el.html(_.template(this.viewTemplate)({type: this.type}));
+                HtmlUtils.setHtml(this.$el, HtmlUtils.template(this.viewTemplate)({type: this.type}));
                 this.assign(this.listView, '.' + this.type + '-list');
                 if (this.headerView) {
                     this.assign(this.headerView, '.' + this.type + '-paging-header');

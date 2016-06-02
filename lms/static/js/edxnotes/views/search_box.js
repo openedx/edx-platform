@@ -1,22 +1,28 @@
 ;(function (define, undefined) {
 'use strict';
 define([
-    'jquery', 'underscore', 'backbone', 'gettext', 'js/edxnotes/utils/logger',
+    'jquery',
+    'underscore',
+    'backbone',
+    'gettext',
+    'edx-ui-toolkit/js/utils/html-utils',
+    'js/edxnotes/utils/logger',
     'js/edxnotes/collections/notes'
-], function ($, _, Backbone, gettext, NotesLogger, NotesCollection) {
+], function ($, _, Backbone, gettext, HtmlUtils, NotesLogger, NotesCollection) {
     var SearchBoxView = Backbone.View.extend({
         events: {
             'submit': 'submitHandler'
         },
 
         errorMessage: gettext('An error has occurred. Make sure that you are connected to the Internet, and then try refreshing the page.'),
-        emptyFieldMessage: (function () {
-            var message = gettext('Please enter a term in the %(anchor_start)s search field%(anchor_end)s.');
-            return interpolate(message, {
-                'anchor_start': '<a href="#search-notes-input">',
-                'anchor_end': '</a>'
-            }, true);
-        } ()),
+
+        emptyFieldMessageHtml: (function () {
+            var message = gettext('Please enter a term in the {anchorStart} search field{anchorEnd}.');
+            return HtmlUtils.interpolateHtml(message, {
+                anchorStart: HtmlUtils.HTML('<a href="#search-notes-input">'),
+                anchorEnd: HtmlUtils.HTML('</a>')
+            });
+        }()),
 
         initialize: function (options) {
             _.bindAll(this, 'onSuccess', 'onError', 'onComplete');
@@ -91,7 +97,7 @@ define([
 
         validateField: function (searchQuery) {
             if (!($.trim(searchQuery))) {
-                this.options.error(this.emptyFieldMessage, searchQuery);
+                this.options.error(this.emptyFieldMessageHtml, searchQuery);
                 return false;
             }
             return true;
@@ -102,7 +108,7 @@ define([
             if (args) {
                 this.options.search.apply(this, args);
                 this.logger.emit('edx.course.student_notes.searched', {
-                    'number_of_results': args[0].totalCount,
+                    'number_of_results': args[0].getTotalRecords(),
                     'search_string': args[1]
                 });
             } else {
@@ -147,15 +153,13 @@ define([
          * @return {jQuery.Deferred}
          */
         sendRequest: function (text) {
-            this.collection = new NotesCollection(
-                [],
-                {
-                    text: text,
-                    perPage: this.options.perPage,
-                    url: this.el.action
-                }
-            );
-            return this.collection.goTo(1);
+            this.collection = new NotesCollection([], {
+                text: text,
+                perPage: this.options.perPage,
+                url: this.el.action
+            });
+
+            return this.collection.getPage(1);
         }
     });
 

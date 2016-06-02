@@ -1,20 +1,26 @@
 ;(function (define) {
 'use strict';
 define([
-    'underscore', 'common/js/components/collections/paging_collection', 'js/edxnotes/models/note'
+    'underscore', 'edx-ui-toolkit/js/pagination/paging-collection', 'js/edxnotes/models/note'
 ], function (_, PagingCollection, NoteModel) {
     return PagingCollection.extend({
         model: NoteModel,
 
-        initialize: function(models, options) {
-            PagingCollection.prototype.initialize.call(this);
+        state: {
+            pageSize: 10
+        },
 
+        queryParams: {},
+
+        constructor: function (models, options) {
             this.url = options.url;
-            this.perPage = options.perPage;
-            this.server_api = _.pick(this.server_api, "page", "page_size");
+            this.state.pageSize = options.perPage;
+
             if (options.text) {
-                this.server_api.text = options.text;
+                this.queryParams.text = options.text;
             }
+
+            PagingCollection.prototype.constructor.call(this, models, options);
         },
 
         /**

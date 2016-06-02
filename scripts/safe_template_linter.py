@@ -1365,10 +1365,31 @@ class JavaScriptLinter(BaseLinter):
         """
         lines = StringLines(file_contents)
         last_expression = None
-        # attempt to match a string that starts with '<' or ends with '>'
-        regex_string_with_html = r"""["'](?:\s*<.*|.*>\s*)["']"""
-        regex_concat_with_html = r"(\+\s*{}|{}\s*\+)".format(regex_string_with_html, regex_string_with_html)
-        for match in re.finditer(regex_concat_with_html, file_contents):
+        # Match quoted strings that starts with '<' or ends with '>'.
+        regex_string_with_html = r"""
+            {quote}                             # Opening quote.
+                (
+                   \s*<                         # Starts with '<' (ignoring spaces)
+                   ([^{quote}]|[\\]{quote})*    # followed by anything but a closing quote.
+                |                               # Or,
+                   ([^{quote}]|[\\]{quote})*    # Anything but a closing quote
+                   >\s*                         # ending with '>' (ignoring spaces)
+                )
+            {quote}                             # Closing quote.
+        """
+        # Match single or double quote.
+        regex_string_with_html = "({}|{})".format(
+            regex_string_with_html.format(quote="'"),
+            regex_string_with_html.format(quote='"'),
+        )
+        # Match quoted HTML strings next to a '+'.
+        regex_concat_with_html = re.compile(
+            r"(\+\s*{string_with_html}|{string_with_html}\s*\+)".format(
+                string_with_html=regex_string_with_html,
+            ),
+            re.VERBOSE
+        )
+        for match in regex_concat_with_html.finditer(file_contents):
             found_new_violation = False
             if last_expression is not None:
                 last_line = lines.index_to_line_number(last_expression.start_index)

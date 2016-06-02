@@ -3,7 +3,7 @@
 </div>
 <div class="ad-link">
     <a href="<%- xseriesUrl %>" class="btn-neutral">
-        <i class="icon fa fa-search" aria-hidden="true"></i> 
+        <span class="icon fa fa-search" aria-hidden="true"></span>
         <span><%- gettext('Explore New XSeries') %></span>
     </a>
 </div>

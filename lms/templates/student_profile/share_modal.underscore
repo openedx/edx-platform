@@ -1,6 +1,6 @@
 <div class="focusguard focusguard-start" tabindex="0"></div>
 <div class="badges-modal" tabindex="0">
-        <button class="close"><i class="fa fa-close" aria-hidden="true"></i><span class="sr"><%- gettext("Close") %></span></button>
+        <button class="close"><span class="fa fa-close" aria-hidden="true"></span><span class="sr"><%- gettext("Close") %></span></button>
     <h1 class="modal-header"><%- gettext("Share on Mozilla Backpack") %></h1>
     <p class="explanation"><%- gettext("To share your certificate on Mozilla Backpack, you must first have a Backpack account. Complete the following steps to add your certificate to Backpack.") %>
     </p>

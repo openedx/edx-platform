@@ -1,11 +1,12 @@
 ## mako
-<%page expression_filter="h"/>
+<%page expression_filter="h" args="online_help_token"/>
 <%namespace name='static' file='static_content.html'/>
 <%namespace file='main.html' import="login_query"/>
 <%!
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
 
+from context_processors import doc_url
 from lms.djangoapps.ccx.overrides import get_current_ccx
 from microsite_configuration import microsite
 from microsite_configuration.templatetags.microsite import platform_name
@@ -105,7 +106,7 @@ site_status_msg = get_site_status_msg(course_id)
         <ol class="user">
           <li class="primary">
             <a class="shopping-cart" href="${reverse('shoppingcart.views.show_cart')}">
-              <i class="icon fa fa-shopping-cart"></i> ${_("Shopping Cart")}
+              <span class="icon fa fa-shopping-cart" aria-hidden="true"></span> ${_("Shopping Cart")}
             </a>
           </li>
         </ol>

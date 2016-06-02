@@ -49,7 +49,6 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
             };
 
             it("renders the full profile for a user", function() {
-
                 requests = AjaxHelpers.requests(this);
 
                 var context = createProfilePage(true),

@@ -29,7 +29,7 @@ requirejs.config({
         "underscore.string": "common/js/vendor/underscore.string",
         "backbone": "common/js/vendor/backbone",
         "backbone.associations": "xmodule_js/common_static/js/vendor/backbone-associations-min",
-        "backbone.paginator": "xmodule_js/common_static/js/vendor/backbone.paginator.min",
+        "backbone.paginator": "common/js/vendor/backbone.paginator",
         "tinymce": "xmodule_js/common_static/js/vendor/tinymce/js/tinymce/tinymce.full.min",
         "jquery.tinymce": "xmodule_js/common_static/js/vendor/tinymce/js/tinymce/jquery.tinymce",
         "xmodule": "xmodule_js/src/xmodule",
@@ -124,7 +124,7 @@ requirejs.config({
         },
         "backbone.paginator": {
             deps: ["backbone"],
-            exports: "Backbone.Paginator"
+            exports: "Backbone.PageableCollection"
         },
         "youtube": {
             exports: "YT"

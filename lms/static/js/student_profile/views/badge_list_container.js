@@ -6,18 +6,24 @@
         'text!templates/student_profile/badge_list.underscore'],
         function (gettext, $, _, PaginatedView, BadgeView, BadgeListView, BadgeListTemplate) {
             var BadgeListContainer = PaginatedView.extend({
+                type: 'badge',
+
+                itemViewClass: BadgeView,
+
+                listViewClass: BadgeListView,
+
+                viewTemplate: BadgeListTemplate,
+
+                isZeroIndexed: true,
+
+                paginationLabel: gettext('Accomplishments Pagination'),
+
                 initialize: function (options) {
                     BadgeListContainer.__super__.initialize.call(this, options);
                     this.listView.find_courses_url = options.find_courses_url;
                     this.listView.badgeMeta = options.badgeMeta;
                     this.listView.ownProfile = options.ownProfile;
-                },
-                type: 'badge',
-                itemViewClass: BadgeView,
-                listViewClass: BadgeListView,
-                viewTemplate: BadgeListTemplate,
-                isZeroIndexed: true,
-                paginationLabel: gettext("Accomplishments Pagination")
+                }
             });
 
             return BadgeListContainer;

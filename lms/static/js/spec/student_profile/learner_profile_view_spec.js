@@ -1,4 +1,9 @@
-define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers', 'common/js/spec_helpers/template_helpers',
+define(['backbone',
+        'jquery',
+        'underscore',
+        'edx-ui-toolkit/js/pagination/paging-collection',
+        'common/js/spec_helpers/ajax_helpers',
+        'common/js/spec_helpers/template_helpers',
         'js/spec/student_account/helpers',
         'js/spec/student_profile/helpers',
         'js/views/fields',
@@ -8,12 +13,11 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
         'js/student_profile/views/learner_profile_view',
         'js/student_profile/views/badge_list_container',
         'js/student_account/views/account_settings_fields',
-        'common/js/components/collections/paging_collection',
         'js/views/message_banner'
-       ],
-    function (Backbone, $, _, AjaxHelpers, TemplateHelpers, Helpers, LearnerProfileHelpers, FieldViews,
-              UserAccountModel, AccountPreferencesModel, LearnerProfileFields, LearnerProfileView,
-              BadgeListContainer, AccountSettingsFieldViews, PagingCollection, MessageBannerView) {
+    ],
+    function (Backbone, $, _, PagingCollection, AjaxHelpers, TemplateHelpers, Helpers, LearnerProfileHelpers,
+              FieldViews, UserAccountModel, AccountPreferencesModel, LearnerProfileFields, LearnerProfileView,
+              BadgeListContainer, AccountSettingsFieldViews, MessageBannerView) {
         'use strict';
 
         describe("edx.user.LearnerProfileView", function () {

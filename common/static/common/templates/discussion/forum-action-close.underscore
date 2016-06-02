@@ -6,7 +6,7 @@
             <span class="label-checked"><%- gettext("Open") %></span>
         </span>
         <span class="action-icon">
-          <i class="icon fa fa-lock"></i>
+          <span class="icon fa fa-lock" aria-hidden="true"></span>
         </span>
     </a>
 </li>

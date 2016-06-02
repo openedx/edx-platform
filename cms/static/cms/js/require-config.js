@@ -56,7 +56,7 @@
             "backbone": "common/js/vendor/backbone",
             "backbone-relational" : "js/vendor/backbone-relational.min",
             "backbone.associations": "js/vendor/backbone-associations-min",
-            "backbone.paginator": "js/vendor/backbone.paginator.min",
+            "backbone.paginator": "common/js/vendor/backbone.paginator",
             "tinymce": "js/vendor/tinymce/js/tinymce/tinymce.full.min",
             "jquery.tinymce": "js/vendor/tinymce/js/tinymce/jquery.tinymce.min",
             "xmodule": "/xmodule/xmodule",
@@ -188,7 +188,7 @@
             },
             "backbone.paginator": {
                 deps: ["backbone"],
-                exports: "Backbone.Paginator"
+                exports: "Backbone.PageableCollection"
             },
             "youtube": {
                 exports: "YT"

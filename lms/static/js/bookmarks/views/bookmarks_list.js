@@ -1,10 +1,10 @@
 ;(function (define, undefined) {
     'use strict';
-    define(['gettext', 'jquery', 'underscore', 'backbone', 'logger', 'moment',
+    define(['gettext', 'jquery', 'underscore', 'backbone', 'logger', 'moment', 'edx-ui-toolkit/js/utils/html-utils',
             'common/js/components/views/paging_header', 'common/js/components/views/paging_footer',
             'text!templates/bookmarks/bookmarks-list.underscore'
         ],
-        function (gettext, $, _, Backbone, Logger, _moment,
+        function (gettext, $, _, Backbone, Logger, _moment, HtmlUtils,
                   PagingHeaderView, PagingFooterView, BookmarksListTemplate) {
 
         var moment = _moment || window.moment;
@@ -15,8 +15,8 @@
             coursewareContentEl: '#course-content',
             coursewareResultsWrapperEl: '.courseware-results-wrapper',
 
-            errorIcon: '<i class="fa fa-fw fa-exclamation-triangle message-error" aria-hidden="true"></i>',
-            loadingIcon: '<i class="fa fa-fw fa-spinner fa-pulse message-in-progress" aria-hidden="true"></i>',
+            errorIcon: '<span class="fa fa-fw fa-exclamation-triangle message-error" aria-hidden="true"></span>',
+            loadingIcon: '<span class="fa fa-fw fa-spinner fa-pulse message-in-progress" aria-hidden="true"></span>',
 
             errorMessage: gettext('An error has occurred. Please try again.'),
             loadingMessage: gettext('Loading'),
@@ -28,7 +28,7 @@
             },
 
             initialize: function (options) {
-                this.template = _.template(BookmarksListTemplate);
+                this.template = HtmlUtils.template(BookmarksListTemplate);
                 this.loadingMessageView = options.loadingMessageView;
                 this.errorMessageView = options.errorMessageView;
                 this.langCode = $(this.el).data('langCode');
@@ -43,7 +43,8 @@
                     bookmarksCollection: this.collection,
                     humanFriendlyDate: this.humanFriendlyDate
                 };
-                this.$el.html(this.template(data));
+
+                HtmlUtils.setHtml(this.$el, this.template(data));
                 this.pagingHeaderView.setElement(this.$('.paging-header')).render();
                 this.pagingFooterView.setElement(this.$('.paging-footer')).render();
                 this.delegateEvents();
@@ -56,7 +57,7 @@
                 this.hideErrorMessage();
                 this.showBookmarksContainer();
 
-                this.collection.goTo(this.defaultPage).done(function () {
+                this.collection.getPage(this.defaultPage).done(function () {
                     view.render();
                     view.focusBookmarksElement();
                 }).fail(function () {
