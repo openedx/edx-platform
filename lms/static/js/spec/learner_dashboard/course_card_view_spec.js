@@ -61,7 +61,7 @@ define([
                 expect(view.$('.header-img').attr('src')).toEqual(context.run_modes[0].course_image_url);
                 expect(view.$('.course-details .course-title-link').text().trim()).toEqual(context.display_name);
                 expect(view.$('.course-details .course-title-link').attr('href')).toEqual(
-                    context.run_modes[0].marketing_url);
+                    context.run_modes[0].course_url);
                 expect(view.$('.course-details .course-text .course-key').html()).toEqual(context.key);
                 expect(view.$('.course-details .course-text .run-period').html())
                     .toEqual(context.run_modes[0].start_date + ' - ' + context.run_modes[0].end_date);
@@ -71,7 +71,7 @@ define([
                 expect(view.$('.header-img').attr('src')).toEqual(context.run_modes[0].course_image_url);
                 expect(view.$('.course-details .course-title-link').text().trim()).toEqual(context.display_name);
                 expect(view.$('.course-details .course-title-link').attr('href')).toEqual(
-                    context.run_modes[0].marketing_url);
+                    context.run_modes[0].course_url);
                 expect(view.$('.course-details .course-text .course-key').html()).toEqual(context.key);
                 expect(view.$('.course-details .course-text .run-period').html()).not.toBeDefined();
             });
