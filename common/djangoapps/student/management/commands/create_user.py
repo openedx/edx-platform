@@ -54,6 +54,12 @@ class Command(TrackedCommand):
                     default=False,
                     action='store_true',
                     help='Indicate that the provided password is a password hash'),
+        make_option('--disabled-password',
+                    dest='disabled_password',
+                    default=False,
+                    action='store_true',
+                    help='Create account without valid password, so the user needs to use the '
+                    'password recovery to be able to log in'),
         make_option('-e', '--email',
                     metavar='EMAIL',
                     dest='email',
@@ -74,7 +80,12 @@ class Command(TrackedCommand):
     def handle(self, *args, **options):
         username = options['username']
         name = options['name']
-        password = options['password']
+        if options['disabled_password']:
+            # If a disabled password is requested, we first generate a random password,
+            # since AccountCreationForm requires one.
+            password = User.objects.make_random_password(length=32)
+        else:
+            password = options['password']
         if not username:
             username = options['email'].split('@')[0]
         if not name:
@@ -112,6 +123,8 @@ class Command(TrackedCommand):
                 user.is_staff = True
             if options['password_hash']:
                 user.password = password
+            if options['disabled_password']:
+                user.set_password(None)
             user.save()
             reg.activate()
             reg.save()
