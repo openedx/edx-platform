@@ -1,0 +1,70 @@
+## Override the default styles_version to the Pattern Library version (version 2)
+<%! main_css = "style-main-v2" %>
+
+<%page expression_filter="h"/>
+<%inherit file="/main.html" />
+
+<%block name="pagetitle">Course Skeleton</%block>
+
+<%block name="bodyclass">pattern-library</%block>
+
+<%block name="content">
+<nav class="wrapper-course-material">
+    <div class="course-material">
+        <ol class="tabs course-tabs">
+            <li class="tab">
+                <a href="index.html" class="">
+                    Home
+                </a>
+            </li>
+
+            <li class="tab">
+                <a href="#" class="">
+                    Course
+                </a>
+            </li>
+
+            <li class="tab">
+                <a href="/courses/course-v1:AndyA+AA101+1/discussion/forum" class="active">
+                    Skeleton
+                    <span class="sr-only">, current location</span>
+                </a>
+            </li>
+        </ol>
+    </div>
+</nav>
+<section class="container">
+    <header class="page-header has-secondary">
+        <div class="page-header-main">
+            <div class="sr-is-focusable" tabindex="-1"></div>
+            <h2 class="hd hd-2 page-title">Skeleton Page</h2>
+            <p class="page-description">This demonstrates the pieces available to a courseware page.</p>
+        </div>
+        <div class="page-header-secondary">
+            <div class="form-actions">
+                <button class="btn-neutral btn-small">Click Me!</button>
+                <div class="page-header-search">
+                    <form class="search-form">
+                        <div class="search-input">
+                            <label for="search-skeleton" class="search-label sr-only">Search</label>
+                            <input id="search-skeleton" class="search-field" type="text" value="" placeholder="Search">
+                            <button type="button" class="btn action action-clear" aria-label="Clear search">
+                                <span class="fa fa-times-circle" aria-hidden="true"></span>
+                                <span class="sr-only">Search</span>
+                            </button>
+                        </div>
+                        <button type="submit" class="btn-brand action action-search">
+                            <span class="fa fa-search" aria-hidden="true"></span>
+                            <span class="sr-only">Search</span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </header>
+    <div class="page-content">
+        <h3>This is where the page content belongs</h3>
+        <p>Useful stuff goes here</p>
+    </div>
+</section>
+</%block>
