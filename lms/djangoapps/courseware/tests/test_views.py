@@ -1721,6 +1721,69 @@ class TestIndexView(ModuleStoreTestCase):
         self.assertIn("Activate Block ID: test_block_id", response.content)
 
 
+@ddt.ddt
+class TestIndewViewWithVerticalPositions(ModuleStoreTestCase):
+    """
+    Test the index view to handle vertical positions. Confirms that first position is loaded
+    if input position is non-positive or greater than number of positions available.
+    """
+
+    def setUp(self):
+        """
+        Set up initial test data
+        """
+        super(TestIndewViewWithVerticalPositions, self).setUp()
+
+        self.user = UserFactory()
+
+        # create course with 3 positions
+        self.course = CourseFactory.create()
+        self.chapter = ItemFactory.create(parent=self.course, category='chapter')
+        self.section = ItemFactory.create(parent=self.chapter, category='sequential', display_name="Sequence")
+        ItemFactory.create(parent=self.section, category='vertical', display_name="Vertical1")
+        ItemFactory.create(parent=self.section, category='vertical', display_name="Vertical2")
+        ItemFactory.create(parent=self.section, category='vertical', display_name="Vertical3")
+
+        self.client.login(username=self.user, password='test')
+        CourseEnrollmentFactory(user=self.user, course_id=self.course.id)
+
+    def _get_course_vertical_by_position(self, input_position):
+        """
+        Returns client response to input position.
+        """
+        return self.client.get(
+            reverse(
+                'courseware_position',
+                kwargs={
+                    'course_id': unicode(self.course.id),
+                    'chapter': self.chapter.url_name,
+                    'section': self.section.url_name,
+                    'position': input_position,
+                }
+            )
+        )
+
+    def _assert_correct_position(self, response, expected_position):
+        """
+        Asserts that the expected position and the position in the response are the same
+        """
+        self.assertIn('data-position="{}"'.format(expected_position), response.content)
+
+    @ddt.data(("-1", 1), ("0", 1), ("-0", 1), ("2", 2), ("5", 1))
+    @ddt.unpack
+    def test_vertical_positions(self, input_position, expected_position):
+        """
+        Tests the following cases:
+
+        * Load first position when negative position inputted.
+        * Load first position when 0/-0 position inputted.
+        * Load given position when 0 < input_position <= num_positions_available.
+        * Load first position when positive position > num_positions_available.
+        """
+        resp = self._get_course_vertical_by_position(input_position)
+        self._assert_correct_position(resp, expected_position)
+
+
 class TestIndexViewWithGating(ModuleStoreTestCase, MilestonesTestCaseMixin):
     """
     Test the index view for a course with gated content
