@@ -5,7 +5,7 @@ import ddt
 
 from mock import patch
 from django.test import TestCase
-from xblock_django.models import XBlockDisableConfig
+from xblock_django.models import XBlockDisableConfig, XBlockConfig
 
 
 @ddt.ddt
@@ -56,3 +56,137 @@ class XBlockDisableConfigTestCase(TestCase):
         )
 
         self.assertEqual(XBlockDisableConfig.disabled_create_block_types(), ['annotatable', 'poll', 'survey'])
+
+
+class XBlockConfigTestCase(TestCase):
+    """
+    Tests for XBlockConfig.
+    """
+
+    def tearDown(self):
+        super(XBlockConfigTestCase, self).tearDown()
+        XBlockConfig.objects.all().delete()
+
+    def test_deprecated_blocks(self):
+        """ Tests the deprecated_xblocks method """
+
+        XBlockConfig.objects.create(
+            name="poll",
+            support_level=XBlockConfig.UNSUPPORTED_NO_OPT_IN,
+            deprecated=True
+        )
+
+        XBlockConfig.objects.create(
+            name="survey",
+            support_level=XBlockConfig.DISABLED,
+            deprecated=True
+        )
+
+        XBlockConfig.objects.create(
+            name="done",
+            support_level=XBlockConfig.FULL_SUPPORT
+        )
+
+        deprecated_xblock_names = [block.name for block in XBlockConfig.deprecated_xblocks()]
+        self.assertEqual(["poll", "survey"], deprecated_xblock_names)
+
+    def test_disabled_blocks(self):
+        """ Tests the disabled_xblocks method """
+
+        XBlockConfig.objects.create(
+            name="poll",
+            support_level=XBlockConfig.UNSUPPORTED_NO_OPT_IN,
+            deprecated=True
+        )
+
+        XBlockConfig.objects.create(
+            name="survey",
+            support_level=XBlockConfig.DISABLED,
+            deprecated=True
+        )
+
+        XBlockConfig.objects.create(
+            name="annotatable",
+            support_level=XBlockConfig.DISABLED,
+            deprecated=False
+        )
+
+        XBlockConfig.objects.create(
+            name="done",
+            support_level=XBlockConfig.FULL_SUPPORT
+        )
+
+        disabled_xblock_names = [block.name for block in XBlockConfig.disabled_xblocks()]
+        self.assertEqual(["survey", "annotatable"], disabled_xblock_names)
+
+    def test_authorable_blocks(self):
+        """ Tests the authorable_xblocks method """
+
+        XBlockConfig.objects.create(
+            name="problem",
+            support_level=XBlockConfig.FULL_SUPPORT
+        )
+
+        XBlockConfig.objects.create(
+            name="problem",
+            support_level=XBlockConfig.FULL_SUPPORT,
+            template="multiple_choice"
+        )
+
+        XBlockConfig.objects.create(
+            name="problem",
+            support_level=XBlockConfig.UNSUPPORTED_OPT_IN,
+            template="circuit_simulator"
+        )
+
+        XBlockConfig.objects.create(
+            name="html",
+            support_level=XBlockConfig.PROVISIONAL_SUPPORT,
+            template="zoom"
+        )
+
+        XBlockConfig.objects.create(
+            name="split_module",
+            support_level=XBlockConfig.UNSUPPORTED_OPT_IN,
+            deprecated=True
+        )
+
+        XBlockConfig.objects.create(
+            name="poll",
+            support_level=XBlockConfig.UNSUPPORTED_NO_OPT_IN,
+            deprecated=True
+        )
+
+        XBlockConfig.objects.create(
+            name="survey",
+            support_level=XBlockConfig.DISABLED,
+        )
+
+        authorable_xblock_names = [block.name for block in XBlockConfig.authorable_xblocks()]
+        self.assertEqual(["problem", "problem", "html"], authorable_xblock_names)
+
+        authorable_xblock_names = [block.name for block in XBlockConfig.authorable_xblocks(allow_unsupported=True)]
+        self.assertEqual(["problem", "problem", "problem", "html", "split_module"], authorable_xblock_names)
+
+        authorable_xblocks = XBlockConfig.authorable_xblocks(name="problem", allow_unsupported=True)
+        self.assertEqual(3, len(authorable_xblocks))
+
+        self.assertEqual("problem", authorable_xblocks[0].name)
+        self.assertEqual("", authorable_xblocks[0].template)
+        self.assertEqual(XBlockConfig.FULL_SUPPORT, authorable_xblocks[0].support_level)
+
+        self.assertEqual("problem", authorable_xblocks[1].name)
+        self.assertEqual("circuit_simulator", authorable_xblocks[1].template)
+        self.assertEqual(XBlockConfig.UNSUPPORTED_OPT_IN, authorable_xblocks[1].support_level)
+
+        self.assertEqual("problem", authorable_xblocks[2].name)
+        self.assertEqual("multiple_choice", authorable_xblocks[2].template)
+        self.assertEqual(XBlockConfig.FULL_SUPPORT, authorable_xblocks[2].support_level)
+
+        authorable_xblocks = XBlockConfig.authorable_xblocks(name="html")
+        self.assertEqual(1, len(authorable_xblocks))
+        self.assertEqual("html", authorable_xblocks[0].name)
+        self.assertEqual("zoom", authorable_xblocks[0].template)
+
+        authorable_xblocks = XBlockConfig.authorable_xblocks(name="video")
+        self.assertEqual(0, len(authorable_xblocks))
