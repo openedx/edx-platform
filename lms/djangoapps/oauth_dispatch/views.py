@@ -74,7 +74,10 @@ class _DispatchingView(View):
         """
         Return the client_id from the provided request
         """
-        return request.POST.get('client_id')
+        if request.method == u'GET':
+            return request.GET.get('client_id')
+        else:
+            return request.POST.get('client_id')
 
 
 class AccessTokenView(_DispatchingView):
