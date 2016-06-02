@@ -19,3 +19,8 @@ INSTALLED_APPS += (
 )
 
 LABSTER_WIKI_LINK = LABSTER_SETTINGS.get('LABSTER_WIKI_LINK', 'https://theory.labster.com/')
+
+# Sentry integration config
+RAVEN_CONFIG = AUTH_TOKENS.get('RAVEN_CONFIG', {})
+if RAVEN_CONFIG.get('dsn'):
+    INSTALLED_APPS += ('raven.contrib.django.raven_compat',)
