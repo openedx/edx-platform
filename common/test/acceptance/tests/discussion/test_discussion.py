@@ -5,6 +5,7 @@ Tests for discussion pages
 import datetime
 from uuid import uuid4
 
+from flaky import flaky
 from nose.plugins.attrib import attr
 from pytz import UTC
 
@@ -1219,6 +1220,7 @@ class DiscussionSortPreferenceTest(UniqueCourseTest):
         self.sort_page = DiscussionSortPreferencePage(self.browser, self.course_id)
         self.sort_page.visit()
 
+    @flaky  # TODO fix this, see TNL-4682
     def test_default_sort_preference(self):
         """
         Test to check the default sorting preference of user. (Default = date )
@@ -1237,6 +1239,7 @@ class DiscussionSortPreferenceTest(UniqueCourseTest):
             selected_sort = self.sort_page.get_selected_sort_preference()
             self.assertEqual(selected_sort, sort_type)
 
+    @flaky  # TODO fix this, see TNL-4682
     def test_last_preference_saved(self):
         """
         Test that user last preference is saved.
