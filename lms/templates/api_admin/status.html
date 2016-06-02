@@ -1,12 +1,16 @@
 ## mako
 <%page expression_filter="h"/>
 <%inherit file="../main.html"/>
-<%
+<%!
 from django.utils.translation import ugettext as _
 
 from openedx.core.djangoapps.api_admin.models import ApiAccessRequest
 from openedx.core.djangolib.markup import HTML, Text
 %>
+
+<%block name="pagetitle">
+${_("API Access Request Status")}
+</%block>
 
 <div id="api-access-wrapper">
   <h1 id="api-header">${_("{platform_name} API Access Request").format(platform_name=settings.PLATFORM_NAME)}</h1>

@@ -66,7 +66,7 @@ def learner_profile_context(request, profile_username, user_is_staff):
 
     own_profile = (logged_in_user.username == profile_username)
 
-    account_settings_data = get_account_settings(request, profile_username)
+    account_settings_data = get_account_settings(request, [profile_username])[0]
 
     preferences_data = get_user_preferences(profile_user, profile_username)
 
