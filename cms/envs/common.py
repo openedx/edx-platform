@@ -787,6 +787,7 @@ INSTALLED_APPS = (
     # Standard apps
     'django.contrib.auth',
     'django.contrib.contenttypes',
+    'django.contrib.redirects',
     'django.contrib.sessions',
     'django.contrib.sites',
     'django.contrib.messages',
@@ -912,6 +913,9 @@ INSTALLED_APPS = (
 
     # Tagging
     'cms.lib.xblock.tagging',
+
+    # Enables default site and redirects
+    'django_sites_extensions',
 )
 
 
