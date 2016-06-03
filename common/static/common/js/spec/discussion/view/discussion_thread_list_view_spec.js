@@ -562,13 +562,13 @@
                 return expect($('.forum-nav-thread-list-wrapper:visible').length).toEqual(isVisible ? 0 : 1);
             };
 
-            it('should not be visible by default', function() {
-                return expectBrowseMenuVisible(false);
+            it('should be visible by default', function() {
+                expectBrowseMenuVisible(true);
             });
 
-            it('should show when header button is clicked', function() {
+            it('should disappear when header button is clicked', function() {
                 $('.forum-nav-browse').click();
-                return expectBrowseMenuVisible(true);
+                return expectBrowseMenuVisible(false);
             });
 
             describe('when shown', function() {
