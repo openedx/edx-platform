@@ -2,7 +2,7 @@
   <article class="content-main">
     <h3 class="title">
       <%= interpolate(
-            gettext( "Thank you %(full_name)! We have received your payment for %(course_name)s."),
+            gettext( "Thank you! We have received your payment for %(course_name)s."),
             { course_name: "<span class='course_name_placeholder'></span>" }, true
           ) %>
     </h3>

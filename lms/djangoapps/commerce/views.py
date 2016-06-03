@@ -65,7 +65,6 @@ def checkout_receipt(request):
             "If your course does not appear on your dashboard, contact {payment_support_link}."
         ).format(payment_support_link=payment_support_link)
 
-    user = request.user
     context = {
         'page_title': page_title,
         'is_payment_complete': is_payment_complete,
@@ -75,8 +74,7 @@ def checkout_receipt(request):
         'error_text': error_text,
         'for_help_text': for_help_text,
         'payment_support_email': payment_support_email,
-        'username': user.username,
-        'full_name': user.get_full_name(),
+        'username': request.user.username,
         'nav_hidden': True,
         'is_request_in_themed_site': is_request_in_themed_site()
     }
