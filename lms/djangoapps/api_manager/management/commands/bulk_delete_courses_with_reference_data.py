@@ -14,7 +14,7 @@ from xmodule.modulestore.django import modulestore
 
 from api_manager.models import CourseGroupRelationship, CourseContentGroupRelationship
 from openedx.core.djangoapps.course_groups.models import CourseCohortsSettings, CourseUserGroup
-from openedx.core.djangoapps.content.course_metadata.models import CourseAggregatedMetaData
+from course_metadata.models import CourseAggregatedMetaData
 from openedx.core.djangoapps.content.course_structures.models import CourseStructure
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from courseware.models import StudentModule
