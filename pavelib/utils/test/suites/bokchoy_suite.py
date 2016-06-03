@@ -343,7 +343,9 @@ class Pa11yCrawler(BokChoyTestSuite):
         Runs pa11ycrawler json-to-html
         """
         #first, backup files
-        with tarfile.open("pa11yreports.tar.gz", "w:gz") as tar:
+        with tarfile.open(
+                "{report_dir}/pa11yreports.tar.gz".format(report_dir=self.pa11y_report_dir),
+                "w:gz") as tar:
             tar.add(self.pa11y_report_dir, "pa11yreports")
         cmd_str = (
             'pa11ycrawler json-to-html --pa11ycrawler-reports-dir={report_dir}'
