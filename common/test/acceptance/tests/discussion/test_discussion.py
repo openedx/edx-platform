@@ -315,6 +315,7 @@ class DiscussionTabMultipleThreadTest(BaseDiscussionTestCase):
             self.thread_ids[1]
         )
         self.thread_page_1.visit()
+        self.thread_page_1.show_all_discussions()
 
     def setup_multiple_threads(self, thread_count):
         threads = []
@@ -1261,6 +1262,7 @@ class DiscussionSortPreferenceTest(UniqueCourseTest):
 
         self.sort_page = DiscussionSortPreferencePage(self.browser, self.course_id)
         self.sort_page.visit()
+        self.sort_page.show_all_discussions()
 
     def test_default_sort_preference(self):
         """
@@ -1293,5 +1295,6 @@ class DiscussionSortPreferenceTest(UniqueCourseTest):
             selected_sort = self.sort_page.get_selected_sort_preference()
             self.assertEqual(selected_sort, sort_type)
             self.sort_page.refresh_page()
+            self.sort_page.show_all_discussions()
             selected_sort = self.sort_page.get_selected_sort_preference()
             self.assertEqual(selected_sort, sort_type)

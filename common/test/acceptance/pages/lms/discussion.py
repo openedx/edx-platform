@@ -376,6 +376,10 @@ class DiscussionSortPreferencePage(CoursePage):
         """
         return self.q(css="body.discussion .forum-nav-sort-control").present
 
+    def show_all_discussions(self):
+        """ Show the list of all discussions. """
+        self.q(css=".forum-nav-browse").click()
+
     def get_selected_sort_preference(self):
         """
         Return the text of option that is selected for sorting.
@@ -416,6 +420,10 @@ class DiscussionTabSingleThreadPage(CoursePage):
 
     def __getattr__(self, name):
         return getattr(self.thread_page, name)
+
+    def show_all_discussions(self):
+        """ Show the list of all discussions. """
+        self.q(css=".forum-nav-browse").click()
 
     def close_open_thread(self):
         with self.thread_page.secondary_action_menu_open(".thread-main-wrapper"):
