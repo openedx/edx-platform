@@ -1,24 +1,24 @@
 <picture>
-    <source srcset="<%- banner_image_urls.w1440h480 %>" media="(min-width: <%- breakpoints.min['x-large'] %>)">
-    <source srcset="<%- banner_image_urls.w726h242 %>" media="(min-width: <%- breakpoints.min.medium %>)">
-    <img class="banner-image" srcset="<%- banner_image_urls.w348h116 %>" alt="">
+    <source srcset="<%- programData.banner_image_urls.w1440h480 %>" media="(min-width: <%- breakpoints.min['x-large'] %>)">
+    <source srcset="<%- programData.banner_image_urls.w726h242 %>" media="(min-width: <%- breakpoints.min.medium %>)">
+    <img class="banner-image" srcset="<%- programData.banner_image_urls.w348h116 %>" alt="">
 </picture>
-<h2 class="hd-2 title"><%- name %></h2>
-<p class="subtitle"><%- subtitle %></p>
-<a href="/dashboard/programs" class="breadcrumb"><%- gettext('Programs') %></a>
+<h2 class="hd-2 title"><%- programData.name %></h2>
+<p class="subtitle"><%- programData.subtitle %></p>
+<a href="<%- programListingUrl %>" class="breadcrumb"><%- gettext('Programs') %></a>
 <span><%- StringUtils.interpolate(
-    gettext('{category}\'s program'),
-    {category: category}
+    gettext('{category} program'),
+    {category: programData.category}
 ) %></span>
-<% _.each(organizations, function(org) { %>
+<% _.each(programData.organizations, function(org) { %>
 	<img src="<%- org.img %>" class="org-logo" alt="<%- StringUtils.interpolate(
 	    gettext('{organization}\'s logo'),
 	    {organization: org.display_name}
 	) %>">
 <% }) %>
-<% if (category === 'xseries') { %>
+<% if (programData.category === 'xseries') { %>
 	<p><%- StringUtils.interpolate(
         gettext('To complete the {program} XSeries and earn an XSeries Certificate you must successfully earn a Verified Certificate in all courses shown below.'),
-        {program: name}
+        {program: programData.name}
     ) %></p>
 <% } %>

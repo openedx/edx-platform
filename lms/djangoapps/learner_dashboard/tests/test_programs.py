@@ -277,6 +277,7 @@ class TestProgramDetails(ProgramsApiConfigMixin, SharedModuleStoreTestCase):
         """Verify that program data is present."""
         self.assertContains(response, 'programData')
         self.assertContains(response, self.data['name'])
+        self.assertContains(response, reverse('program_listing_view'))
 
     def test_login_required(self):
         """

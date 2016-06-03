@@ -30,7 +30,8 @@
                 tpl: HtmlUtils.template(pageTpl),
 
                 initialize: function(options) {
-                    this.programModel = new Backbone.Model(options);
+                    this.options = options;
+                    this.programModel = new Backbone.Model(this.options.programData);
                     this.courseCardCollection = new CourseCardCollection(
                         this.programModel.get('course_codes')
                     );
@@ -44,7 +45,7 @@
 
                 postRender: function() {
                     this.headerView = new HeaderView({
-                        model: this.programModel
+                        model: new Backbone.Model(this.options)
                     });
                     new CollectionListView({
                         el: '.js-course-list',
