@@ -315,6 +315,29 @@ class UsersApiTests(ModuleStoreTestCase):
         if 'id' in response.data['results'][0]:
             self.fail("Dynamic field filtering error in UserSerializer")
 
+    def test_user_list_get_courses_enrolled_per_course(self):
+        test_uri = self.users_base_uri
+        # create a 2 new users
+        users = UserFactory.create_batch(2)
+
+        # create course enrollments
+        CourseEnrollmentFactory.create(user=users[0], course_id=self.course.id)
+        CourseEnrollmentFactory.create(user=users[1], course_id=self.course.id)
+        CourseEnrollmentFactory.create(user=users[1], course_id=self.course2.id)
+
+        # fetch enrollments for first course
+        response = self.do_get('{}?courses={}'.format(test_uri, unicode(self.course.id)))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data['results']), 2)
+        self.assertEqual(response.data['results'][0]['courses_enrolled'], 1)
+        self.assertEqual(response.data['results'][1]['courses_enrolled'], 2)
+
+        # fetch enrollments for second course
+        response = self.do_get('{}?courses={}'.format(test_uri, unicode(self.course2.id)))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data['results']), 1)
+        self.assertEqual(response.data['results'][0]['courses_enrolled'], 2)
+
     def test_user_list_get_courses_enrolled(self):
         test_uri = self.users_base_uri
         # create a 2 new users

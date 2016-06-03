@@ -1278,6 +1278,32 @@ class CoursesApiTests(ModuleStoreTestCase):
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 200)
 
+    def test_courses_users_list_courses_enrolled(self):
+        """ Test courses_enrolled value returned by courses users list api """
+        course = CourseFactory.create()
+        course2 = CourseFactory.create()
+        test_uri = self.base_courses_uri + '/' + unicode(course.id) + '/users'
+        # create a 2 new users
+        users = UserFactory.create_batch(2)
+
+        # create course enrollments
+        CourseEnrollmentFactory.create(user=users[0], course_id=course.id)
+        CourseEnrollmentFactory.create(user=users[1], course_id=course.id)
+        CourseEnrollmentFactory.create(user=users[1], course_id=course2.id)
+
+        # fetch course 1 users
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data['enrollments']), 2)
+        self.assertEqual(response.data['enrollments'][0]['courses_enrolled'], 1)
+
+        # fetch user 2
+        test_uri = self.base_courses_uri + '/' + unicode(course2.id) + '/users'
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data['enrollments']), 1)
+        self.assertEqual(response.data['enrollments'][0]['courses_enrolled'], 2)
+
     def test_courses_users_list_get_attributes(self):
         """ Test presence of newly added attributes to courses users list api """
         course = CourseFactory.create(
