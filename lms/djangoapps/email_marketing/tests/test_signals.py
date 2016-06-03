@@ -186,4 +186,3 @@ class EmailMarketingTests(TestCase):
         """
         email_marketing_user_field_changed(None, self.user, table='auth_userprofile', setting='shoe_size', new_value=1)
         self.assertFalse(mock_update_user.called)
-

@@ -51,7 +51,8 @@ def update_user(self, username, new_user=False):
 
     try:
         sailthru_client = SailthruClient(email_config.sailthru_key, email_config.sailthru_secret)
-        sailthru_response = sailthru_client.api_post("user", _create_sailthru_user_parm(user, profile, new_user, email_config))
+        sailthru_response = sailthru_client.api_post("user",
+                                                     _create_sailthru_user_parm(user, profile, new_user, email_config))
     except SailthruClientError as exc:
         log.error("Exception attempting to add/update user %s in Sailthru - %s", username, unicode(exc))
         raise self.retry(exc=exc,
