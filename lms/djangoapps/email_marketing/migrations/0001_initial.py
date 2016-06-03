@@ -19,7 +19,6 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('change_date', models.DateTimeField(auto_now_add=True, verbose_name='Change date')),
                 ('enabled', models.BooleanField(default=False, verbose_name='Enabled')),
-                ('sailthru_enabled', models.BooleanField(default=False, help_text='Enable Sailthru integration.')),
                 ('sailthru_key', models.CharField(help_text='Sailthru api key.', max_length=32, null=True, blank=True)),
                 ('sailthru_secret', models.CharField(help_text='Sailthru secret.', max_length=32, null=True, blank=True)),
                 ('sailthru_new_user_list', models.CharField(help_text='Sailthru new user list.', max_length=32, null=True, blank=True)),

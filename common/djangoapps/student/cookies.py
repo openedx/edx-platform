@@ -5,7 +5,7 @@ Utility functions for setting "logged in" cookies used by subdomains.
 import time
 import json
 
-from email_marketing.signals import add_email_marketing_cookies
+from email_marketing.cookies import add_email_marketing_cookies
 
 from django.utils.http import cookie_date
 from django.conf import settings

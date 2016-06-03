@@ -34,7 +34,7 @@ from django.utils.translation import ugettext as _, get_language
 from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
 from django.views.decorators.http import require_POST, require_GET
 from django.db.models.signals import post_save
-from django.dispatch import receiver
+from django.dispatch import receiver, Signal
 from django.template.response import TemplateResponse
 
 from ratelimitbackend.exceptions import RateLimitException
@@ -113,7 +113,6 @@ from student.helpers import (
 from student.cookies import set_logged_in_cookies, delete_logged_in_cookies
 from student.models import anonymous_id_for_user, UserAttribute
 from shoppingcart.models import DonationConfiguration, CourseRegistrationCode
-from email_marketing.signals import REGISTER_USER
 
 from embargo import api as embargo_api
 
@@ -136,6 +135,8 @@ ReverifyInfo = namedtuple('ReverifyInfo', 'course_id course_name course_number d
 SETTING_CHANGE_INITIATED = 'edx.user.settings.change_initiated'
 # Used as the name of the user attribute for tracking affiliate registrations
 REGISTRATION_AFFILIATE_ID = 'registration_affiliate_id'
+# used to announce a registration
+REGISTER_USER = Signal(providing_args=["user", "profile"])
 
 # Disable this warning because it doesn't make sense to completely refactor tests to appease Pylint
 # pylint: disable=logging-format-interpolation

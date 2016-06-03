@@ -30,11 +30,11 @@ def update_user(self, username, new_user=False):
         None
     """
     email_config = EmailMarketingConfiguration.current()
-    if not email_config.sailthru_enabled:
+    if not email_config.enabled:
         return
 
     # get user
-    user = User.objects.get(username=username)
+    user = User.objects.select_related('profile').get(username=username)
     if not user:
         log.error("User not found duing Sailthru update %s", username)
         return
@@ -44,7 +44,7 @@ def update_user(self, username, new_user=False):
         return
 
     # get profile
-    profile = UserProfile.objects.get(user=user)
+    profile = user.profile
     if not profile:
         log.error("User profile not found duing Sailthru update %s", username)
         return
@@ -79,7 +79,7 @@ def update_user_email(self, username, old_email):
         None
     """
     email_config = EmailMarketingConfiguration.current()
-    if not email_config.sailthru_enabled:
+    if not email_config.enabled:
         return
 
     # get user
@@ -129,8 +129,10 @@ def _create_sailthru_user_parm(user, profile, new_user, email_config):
         sailthru_vars['fullname'] = profile.name
         sailthru_vars['gender'] = profile.gender
         sailthru_vars['education'] = profile.level_of_education
-        sailthru_vars['age'] = profile.age or -1
-        sailthru_vars['year_of_birth'] = profile.year_of_birth or datetime.datetime.now(UTC).year
+        # age is not useful since it is not automatically updated
+        #sailthru_vars['age'] = profile.age or -1
+        if profile.year_of_birth:
+            sailthru_vars['year_of_birth'] = profile.year_of_birth
         sailthru_vars['country'] = unicode(profile.country.name)
 
     # if new user add to list

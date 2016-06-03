@@ -6,8 +6,9 @@ from django.test.utils import override_settings
 from mock import patch
 from util.json_request import JsonResponse
 
-from email_marketing.signals import handle_unenroll_done, add_email_marketing_cookies, \
-    email_marketing_register_user, email_marketing_user_field_changed
+from email_marketing.signals import handle_unenroll_done, \
+    email_marketing_register_user, \
+    email_marketing_user_field_changed
 from email_marketing.tasks import update_user, update_user_email
 from email_marketing.models import EmailMarketingConfiguration
 from django.test.client import RequestFactory
@@ -25,7 +26,7 @@ def update_email_marketing_config(enabled=False, key='badkey', secret='badsecret
     Enable / Disable Sailthru integration
     """
     EmailMarketingConfiguration.objects.create(
-        sailthru_enabled=enabled,
+        enabled=enabled,
         sailthru_key=key,
         sailthru_secret=secret,
         sailthru_new_user_list=new_user_list
@@ -49,49 +50,14 @@ class EmailMarketingTests(TestCase):
         """
         Verify that is_enabled() returns True when sailthru integration is enabled.
         """
-        is_enabled = EmailMarketingConfiguration.current().sailthru_enabled
+        is_enabled = EmailMarketingConfiguration.current().enabled
         self.assertTrue(is_enabled)
 
         config = EmailMarketingConfiguration.current()
-        config.sailthru_enabled = False
+        config.enabled = False
         config.save()
-        is_not_enabled = EmailMarketingConfiguration.current().sailthru_enabled
+        is_not_enabled = EmailMarketingConfiguration.current().enabled
         self.assertFalse(is_not_enabled)
-
-    @patch('email_marketing.signals.SailthruClient.api_post')
-    def test_drop_cookie(self, mock_sailthru):
-        """
-        Test add_email_marketing_cookies
-        """
-        response = JsonResponse({
-            "success": True,
-            "redirect_url": 'test.com/test',
-        })
-        mock_sailthru.return_value = SailthruResponse(JsonResponse({'keys': {'cookie': 'test_cookie'}}))
-        response = add_email_marketing_cookies(response, self.user)
-        mock_sailthru.assert_called_with('user', {'fields': {'keys': 1}, 'id': 'test@edx.org'})
-        self.assertEquals(response.cookies['sailthru_hid'].value, "test_cookie")
-
-    @patch('email_marketing.signals.SailthruClient.api_post')
-    def test_drop_cookie_error_path(self, mock_sailthru):
-        """
-        test that error paths return no cookie
-        """
-        response = JsonResponse({
-            "success": True,
-            "redirect_url": 'test.com/test',
-        })
-        mock_sailthru.return_value = SailthruResponse(JsonResponse({'keys': {'cookiexx': 'test_cookie'}}))
-        response = add_email_marketing_cookies(response, self.user)
-        self.assertFalse('sailthru_hid' in response.cookies)
-
-        mock_sailthru.return_value = SailthruResponse(JsonResponse({'error': "error", "errormsg": "errormsg"}))
-        response = add_email_marketing_cookies(response, self.user)
-        self.assertFalse('sailthru_hid' in response.cookies)
-
-        mock_sailthru.side_effect = SailthruClientError
-        response = add_email_marketing_cookies(response, self.user)
-        self.assertFalse('sailthru_hid' in response.cookies)
 
     @patch('email_marketing.tasks.SailthruClient.api_post')
     @patch('email_marketing.tasks.User.objects.get')

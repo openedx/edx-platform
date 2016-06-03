@@ -13,11 +13,6 @@ class EmailMarketingConfiguration(ConfigurationModel):
     class Meta(object):
         app_label = "email_marketing"
 
-    sailthru_enabled = models.BooleanField(
-        default=False,
-        help_text=_('Enable Sailthru email marketing support.')
-    )
-
     sailthru_key = models.fields.CharField(
         max_length=32,
         help_text=_(
@@ -52,6 +47,3 @@ class EmailMarketingConfiguration(ConfigurationModel):
             "Sailthru maximum retries."
         )
     )
-
-    def __unicode__(self):
-        return "Email marketing configuration"
