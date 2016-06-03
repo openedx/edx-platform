@@ -758,6 +758,14 @@ class VideoExportTestCase(VideoDescriptorTestBase):
         with self.assertRaises(ValueError):
             self.descriptor.definition_to_xml(None)
 
+    def test_export_to_xml_unicode_characters(self):
+        """
+        Test XML export handles the unicode characters.
+        """
+        self.descriptor.display_name = '这是文'
+        xml = self.descriptor.definition_to_xml(None)
+        self.assertEqual(xml.get('display_name'), u'\u8fd9\u662f\u6587')
+
 
 class VideoDescriptorIndexingTestCase(unittest.TestCase):
     """
