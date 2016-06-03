@@ -2,11 +2,13 @@
 
 .content-wrapper {
     max-width: 1180px;
-    padding-top: ($baseline/2);
-    padding-bottom: ($baseline*2);
+    padding: {
+        top: $baseline/2;
+        bottom: $baseline*2;
+    }
 
     .container {
-        border: 1px solid #c8c8c8;
+        border: 1px solid $lms-border-color;
         background-color: $lms-container-background-color;
         padding: $baseline;
     }
@@ -44,20 +46,20 @@
                 }
 
                 .form-actions > * {
-                    margin-left: ($baseline/2);
+                    @include margin-left($baseline/2);
                     vertical-align: middle;
                     min-width: 200px;
                     height: 34px;
                 }
 
                 .form-actions > button {
-                    @include padding($baseline/5, $baseline/5, $baseline/5, $baseline/5);
+                    padding: $baseline/5;
                     min-width: 200px;
                     height: 34px;
                 }
 
                 .form-actions > *:first-child {
-                    margin-left: 0;
+                    @include margin-left(0);
                 }
             }
         }

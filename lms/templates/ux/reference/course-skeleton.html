@@ -13,19 +13,19 @@
     <div class="course-material">
         <ol class="tabs course-tabs">
             <li class="tab">
-                <a href="index.html" class="">
+                <a href="index.html">
                     Home
                 </a>
             </li>
 
             <li class="tab">
-                <a href="#" class="">
+                <a href="#">
                     Course
                 </a>
             </li>
 
             <li class="tab">
-                <a href="/courses/course-v1:AndyA+AA101+1/discussion/forum" class="active">
+                <a href="course-skeleton.html" class="active">
                     Skeleton
                     <span class="sr-only">, current location</span>
                 </a>
@@ -43,19 +43,20 @@
         <div class="page-header-secondary">
             <div class="form-actions">
                 <button class="btn-neutral btn-small">Click Me!</button>
+                ## TODO: note that this search component markup is provisional
+                ##  - update to use Chris's placeholder recommendation: http://codepen.io/clrux/pen/YqMpRO
+                ##  - update the Pattern Library's markup to match
                 <div class="page-header-search">
-                    <form class="search-form">
-                        <div class="search-input">
-                            <label for="search-skeleton" class="search-label sr-only">Search</label>
-                            <input id="search-skeleton" class="search-field" type="text" value="" placeholder="Search">
+                    <form class="search-form" role="search">
+                        <div class="search-box">
+                            <input class="search-field" type="text" value=""
+                                   aria-label="Search all the things" placeholder="Search all the things">
                             <button type="button" class="btn action action-clear" aria-label="Clear search">
                                 <span class="fa fa-times-circle" aria-hidden="true"></span>
-                                <span class="sr-only">Search</span>
                             </button>
                         </div>
-                        <button type="submit" class="btn-brand action action-search">
+                        <button type="submit" class="btn-brand action action-search" aria-label="Search items">
                             <span class="fa fa-search" aria-hidden="true"></span>
-                            <span class="sr-only">Search</span>
                         </button>
                     </form>
                 </div>
