@@ -26,9 +26,3 @@ def i_see_only_the_settings_and_values(step):
 @step('I edit the component$')
 def i_edit_and_select_settings(_step):
     world.edit_component()
-
-
-'''Discussion (XBlock) components use a different save button'''
-def save_component(step):
-    world.css_click('a.save-button')
-    world.wait_for_ajax_complete()
