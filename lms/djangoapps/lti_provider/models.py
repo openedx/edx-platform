@@ -13,6 +13,7 @@ from django.db import models
 import logging
 
 from openedx.core.djangoapps.xmodule_django.models import CourseKeyField, UsageKeyField
+from openedx.core.djangolib.fields import CharNullField
 
 from provider.utils import short_token
 
@@ -28,7 +29,7 @@ class LtiConsumer(models.Model):
     consumer_name = models.CharField(max_length=255, unique=True)
     consumer_key = models.CharField(max_length=32, unique=True, db_index=True, default=short_token)
     consumer_secret = models.CharField(max_length=32, unique=True, default=short_token)
-    instance_guid = models.CharField(max_length=255, blank=True, null=True, unique=True)
+    instance_guid = CharNullField(max_length=255, blank=True, null=True, unique=True)
 
     @staticmethod
     def get_or_supplement(instance_guid, consumer_key):
