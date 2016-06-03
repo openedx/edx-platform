@@ -1,0 +1,88 @@
+<div class="container">
+    <div class="instructor-dashboard-wrapper-2">
+        <main id="main" aria-label="Content" tabindex="-1">
+            <section class="instructor-dashboard-content-2" id="instructor-dashboard-content">
+                <h1 class="hd hd-1">Instructor Dashboard</h1>
+                <ul class="instructor-nav" role="tablist">
+                    <li class="nav-item" role="tab" data-section="course_info" aria-selected="false" aria-controls="course_info" tabindex="-1">Course Info</li>
+                    <li class="nav-item" role="tab" data-section="membership" aria-selected="false" aria-controls="membership" tabindex="-1">Membership</li>
+                    <li class="nav-item" role="tab" data-section="cohort_management" aria-selected="false" aria-controls="cohort_management" tabindex="-1">Cohorts</li>
+                    <li class="nav-item" role="tab" data-section="student_admin" aria-selected="false" aria-controls="student_admin" tabindex="-1">Student Admin</li>
+                    <li class="nav-item" role="tab" data-section="data_download" aria-selected="false" aria-controls="data_download" tabindex="-1">Data Download</li>
+                </ul>
+                
+                <section id="course_info" class="idash-section" role="tabpanel" tabindex="-1" aria-hidden="true" aria-labelledby="header-course_info">
+                    <h2 id="header-course_info" class="hd hd-2">Enrollment Information</h2>
+                    <div class="enrollment-wrapper"></div>
+                    <div class="basic-wrapper">
+                        <h3 class="hd hd-3">Basic Course Information</h3>
+                    </div>
+                    <div class="running-tasks-container action-type-container">
+                        <h3 class="hd hd-3">Pending Tasks</h3>
+                        <div class="running-tasks-section">
+                            <div class="running-tasks-table" data-endpoint="/courses/course-v1:edX+a11y+2016_T3/instructor/api/list_instructor_tasks"></div>
+                        </div>
+                        <div class="no-pending-tasks-message"></div>
+                    </div>
+                </section>
+
+                <section id="membership" class="idash-section" role="tabpanel" tabindex="-1" aria-hidden="true" aria-labelledby="header-membership">
+                    <h2 id="header-membership" class="hd hd-2">Membership</h2>
+                    <div class="member-list-widget"></div>
+                    <div class="batch-enrollment membership-section">
+                        <h3 class="hd hd-3">Batch Enrollment</h3>
+                    </div>
+                    <div class="batch-beta-testers membership-section">
+                        <h3 class="hd hd-3">Batch Beta Tester Addition</h3>
+                    </div>
+                    <div class="member-lists-management membership-section" aria-live="polite">
+                        <h3 class="hd hd-3">Course Team Management</h3>
+                    </div>
+                </section>
+
+                <section id="cohort_management" class="idash-section" role="tabpanel" tabindex="-1" aria-hidden="true" aria-labelledby="header-cohort_management">
+                    <h2 id="header-cohort_management" class="hd hd-2">Cohort Management</h2>
+                </section>
+
+                <section id="student_admin" class="idash-section" role="tabpanel" tabindex="-1" aria-hidden="true" aria-labelledby="header-student_admin">
+                    <h2 id="header-student_admin" class="hd hd-2">Student Admin</h2>
+                    <div>
+                        <h3 class="hd hd-3">Student Gradebook</h3>
+                    </div>
+                    <div class="student-specific-container action-type-container">
+                        <h3 class="hd hd-3">Student-specific grade inspection</h3>
+                    </div>
+                    <div class="student-grade-container action-type-container">
+                        <h3 class="hd hd-3">Student-specific grade adjustment</h3>
+                    </div>
+                    <div class="course-specific-container action-type-container">
+                        <h3 class="hd hd-3">Course-specific grade adjustment</h3>
+                    </div>
+                    <div class="running-tasks-container action-type-container">
+                        <h3 class="hd hd-3">Pending Tasks</h3>
+                    </div>
+                </section>
+
+                <section id="data_download" class="idash-section" role="tabpanel" tabindex="-1" aria-hidden="true" aria-labelledby="header-data_download">
+                    <h2 id="header-data_download" class="hd hd-2">Data Download</h2>
+                    <div class="reports-download-container action-type-container">
+                        <h3 class="hd hd-3">Reports</h3>
+                    </div>
+                    <div class="running-tasks-container action-type-container">
+                        <h3 class="hd hd-3">Pending Tasks</h3>
+                    </div>
+                </section>
+
+                <section id="send_email" class="idash-section" role="tabpanel" tabindex="-1" aria-hidden="true" aria-labelledby="header-send_email">
+                    <h2 id="header-send_email" class="hd hd-2">Send Email</h2>
+                    <div class="running-tasks-container action-type-container">
+                        <h3 class="hd hd-3">Pending Tasks</h3>
+                    </div>
+                    <div class="vert-left email-background" id="section-task-history">
+                        <h3 class="hd hd-3">Email Task History</h3>
+                    </div>
+                </section>
+            </section>
+        </main>
+    </div>
+</div>

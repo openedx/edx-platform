@@ -12,7 +12,7 @@ def i_click_on_view_courseware(step):
 
 @step('I click on the "([^"]*)" tab$')
 def i_click_on_the_tab(step, tab_text):
-    world.click_link(tab_text)
+    world.css_click(tab_text)
 
 
 @step('I click on the "([^"]*)" link$')

@@ -47,11 +47,11 @@ Feature: LMS.LTI component
   | open_in_a_new_page | weight | graded    | has_score |
   | False              | 10     | True      | True      |
   And I submit answer to LTI 1 question
-  And I click on the "Progress" tab
+  And I click on the "Progress" link
   Then I see text "Problem Scores: 5/10"
   And I see graph with total progress "5%"
-  Then I click on the "Instructor" tab
-  And I click on the "Student Admin" tab
+  Then I click on the "Instructor" link
+  And I click on the "[data-section='student_admin']" tab
   And I click on the "View Gradebook" link
   And I see in the gradebook table that "HW" is "50"
   And I see in the gradebook table that "Total" is "5"

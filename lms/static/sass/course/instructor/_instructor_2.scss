@@ -206,14 +206,12 @@
       @extend %t-copy-base;
       display: inline-block;
       margin: ($baseline/2) $baseline;
+      text-transform: uppercase;
+      color: $blue;
+      cursor: pointer;
 
-      a {
-        display: block;
-        text-transform: uppercase;
-
-        &.active-section {
-          color: $black;
-        }
+      &.active-section {
+        color: $black;
       }
     }
   }
