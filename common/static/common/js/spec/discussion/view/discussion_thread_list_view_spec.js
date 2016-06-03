@@ -564,21 +564,17 @@
                 return expect($(".forum-nav-thread-list-wrapper:visible").length).toEqual(isVisible ? 0 : 1);
             };
 
-            it("should not be visible by default", function() {
+            it("should be visible by default", function() {
+                expectBrowseMenuVisible(true);
+            });
+
+            it("should disappear when header button is clicked", function() {
+                $(".forum-nav-browse").click();
                 return expectBrowseMenuVisible(false);
             });
 
-            it("should show when header button is clicked", function() {
-                $(".forum-nav-browse").click();
-                return expectBrowseMenuVisible(true);
-            });
-
             describe("when shown", function() {
-                beforeEach(function() {
-                    return $(".forum-nav-browse").click();
-                });
-
-                it("should hide when header button is clicked", function() {
+                it("should show again when header button is clicked", function() {
                     $(".forum-nav-browse").click();
                     return expectBrowseMenuVisible(false);
                 });

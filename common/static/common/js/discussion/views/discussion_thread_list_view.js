@@ -266,6 +266,7 @@
                     }
                 });
                 this.renderThreads();
+                this.showBrowseMenu();
                 return this;
             };
 
