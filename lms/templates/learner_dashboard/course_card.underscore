@@ -1,6 +1,6 @@
 <div class="grid-container grid-manual">
     <div class="course-meta-container col-12 md-col-8 sm-col-12">
-        <a href="<%- marketing_url %>" class="course-image-link">
+        <a href="<%- course_url %>" class="course-image-link">
             <img
                 class="header-img"
                 src="<%- course_image_url %>"
@@ -8,7 +8,7 @@
         </a>
         <div class="course-details">
             <h3 class="course-title">
-                <a href="<%- marketing_url %>" class="course-title-link">
+                <a href="<%- course_url %>" class="course-title-link">
                     <%- display_name %>
                 </a>
             </h3>
