@@ -139,6 +139,7 @@ if Backbone?
       @displayedCollection.on "change:commentable_id", (model, commentable_id) =>
         @retrieveDiscussions @discussionIds.split(",") if @mode is "commentables"
       @renderThreads()
+      @showBrowseMenu()
       @
 
     renderThreads: =>

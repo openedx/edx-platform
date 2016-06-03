@@ -474,18 +474,16 @@ describe "DiscussionThreadListView", ->
         expect($(".forum-nav-browse-menu:visible").length).toEqual(if isVisible then 1 else 0)
         expect($(".forum-nav-thread-list-wrapper:visible").length).toEqual(if isVisible then 0 else 1)
 
-      it "should not be visible by default", ->
-        expectBrowseMenuVisible(false)
-
-      it "should show when header button is clicked", ->
-        $(".forum-nav-browse").click()
+      it "should be visible by default", ->
         expectBrowseMenuVisible(true)
 
-      describe "when shown", ->
-        beforeEach ->
-          $(".forum-nav-browse").click()
+      it "should disappear when header button is clicked", ->
+        $(".forum-nav-browse").click()
+        expectBrowseMenuVisible(false)
 
-        it "should hide when header button is clicked", ->
+      describe "when shown", ->
+
+        it "should show again when header button is clicked", ->
           $(".forum-nav-browse").click()
           expectBrowseMenuVisible(false)
 
