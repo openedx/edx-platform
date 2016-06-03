@@ -490,8 +490,8 @@ class GetCourseTopicsTest(UrlResetMixin, ModuleStoreTestCase):
         """
         topic_id_1 = "topic_id_1"
         topic_id_2 = "topic_id_2"
-        self.make_discussion_module(topic_id_1, "test_category_1", "test_target_1")
-        self.make_discussion_module(topic_id_2, "test_category_2", "test_target_2")
+        self.make_discussion_xblock(topic_id_1, "test_category_1", "test_target_1")
+        self.make_discussion_xblock(topic_id_2, "test_category_2", "test_target_2")
         actual = get_course_topics(self.request, self.course.id, {"topic_id_1", "topic_id_2"})
         self.assertEqual(
             actual,
