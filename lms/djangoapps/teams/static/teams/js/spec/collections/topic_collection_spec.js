@@ -20,8 +20,9 @@ define(['backbone', 'URI', 'underscore', 'common/js/spec_helpers/ajax_helpers',
                 expect(params[param]).toBe(value);
             };
 
-            it('sets its perPage based on initial page size', function () {
+            it('sets its page size based on initial page size', function () {
                 expect(topicCollection.getPageSize()).toBe(5);
+                expect(topicCollection.getTotalPages()).toBe(2);
             });
 
             it('sorts by name', function () {

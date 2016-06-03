@@ -6,7 +6,6 @@
                 model: TopicModel,
 
                 state: {
-                    perPage: null,
                     sortKey: 'name'
                 },
 
@@ -16,12 +15,13 @@
                 },
 
                 constructor: function(topics, options) {
-                    BaseCollection.prototype.constructor.call(this, topics, options);
-
-                    this.state.pageSize = topics.results.length;
                     if (topics.sort_order) {
                         this.state.sortKey = topics.sort_order;
                     }
+
+                    options.perPage = topics.results.length;
+                    BaseCollection.prototype.constructor.call(this, topics, options);
+
                     this.registerSortableField('name', gettext('name'));
                     // Translators: This refers to the number of teams (a count of how many teams there are)
                     this.registerSortableField('team_count', gettext('team count'));

@@ -521,6 +521,23 @@ class BrowseTopicsTest(TeamsTabBase):
         self.assertEqual(len(self.topics_page.topic_cards), TOPICS_PER_PAGE)
         self.assertTrue(self.topics_page.get_pagination_header_text().startswith('Showing 1-12 out of 13 total'))
 
+    def test_topic_pagination_one_page(self):
+        """
+        Scenario: Browsing topics when there are fewer topics than the page size i.e. 12
+            all topics should show on one page
+        Given I am enrolled in a course with team configuration and topics
+        When I visit the Teams page
+        And I browse topics
+        And I should see corrected number of topic cards
+        And I should see the correct page header
+        And I should not see a pagination footer
+        """
+        self.set_team_configuration({u"max_team_size": 10, u"topics": self.create_topics(10)})
+        self.topics_page.visit()
+        self.assertEqual(len(self.topics_page.topic_cards), 10)
+        self.assertTrue(self.topics_page.get_pagination_header_text().startswith('Showing 1-10 out of 10 total'))
+        self.assertFalse(self.topics_page.pagination_controls_visible())
+
     def test_topic_description_truncation(self):
         """
         Scenario: excessively long topic descriptions should be truncated so
