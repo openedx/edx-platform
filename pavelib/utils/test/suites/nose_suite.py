@@ -158,9 +158,12 @@ class SystemTestSuite(NoseTestSuite):
             self.extra_args,
             '--with-xunitmp',
             '--xunitmp-file={}'.format(self.report_dir / "nosetests.xml"),
-            '--processes={}'.format(self.processes),
             '--with-database-isolation',
         ]
+
+        if self.processes != 0:
+            cmd.append('--processes={}'.format(self.processes))
+
         if self.randomize:
             cmd.append('--with-randomly')
 
