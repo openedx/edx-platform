@@ -9,6 +9,6 @@ router.register(r'microsites', MicrositeViewSet)
 # The API URLs are now determined automatically by the router.
 # Additionally, we include the login URLs for the browsable API.
 urlpatterns = [
-    url(r'^microsites/upload_file/(?P<microsite_id>\d+)', FileUploadView.as_view()),
+    url(r'^microsites/upload_file/', FileUploadView.as_view()),
     url(r'^', include(router.urls)),
 ]
