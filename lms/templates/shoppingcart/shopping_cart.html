@@ -101,6 +101,7 @@ from openedx.core.lib.courses import course_image_url
                   % endif
               </div>
               <div class="col-2">
+                % if enable_bulk_purchase:
                 <div class="numbers-row" aria-live="polite">
                   <label for="field_${item.id}">${_('Students:')}</label>
                   <div class="counter">
@@ -116,8 +117,9 @@ from openedx.core.lib.courses import course_image_url
                   </button>
                       <!--<a name="updateBtn" class="updateBtn hidden" id="updateBtn-${item.id}" href="#">update</a>-->
                   <span class="error-text hidden" id="students-${item.id}"></span>
-              </div>
                 </div>
+                % endif
+              </div>
 
               <div class="col-3">
                  <button href="#" class="btn-remove" data-item-id="${item.id}">
