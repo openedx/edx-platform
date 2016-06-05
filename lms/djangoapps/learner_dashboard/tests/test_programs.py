@@ -261,7 +261,7 @@ class TestProgramDetails(ProgramsApiConfigMixin, SharedModuleStoreTestCase):
             course_codes=[self.course_code]
         )
 
-    def _mock_programs_api(self):
+    def _mock_programs_api(self, data, status=200):
         """Helper for mocking out Programs API URLs."""
         self.assertTrue(httpretty.is_enabled(), msg='httpretty must be enabled to mock Programs API calls.')
 
@@ -269,9 +269,16 @@ class TestProgramDetails(ProgramsApiConfigMixin, SharedModuleStoreTestCase):
             api_root=ProgramsApiConfig.current().internal_api_url.strip('/'),
             id=self.program_id
         )
-        body = json.dumps(self.data)
 
-        httpretty.register_uri(httpretty.GET, url, body=body, content_type='application/json')
+        body = json.dumps(data)
+
+        httpretty.register_uri(
+            httpretty.GET,
+            url,
+            body=body,
+            status=status,
+            content_type='application/json',
+        )
 
     def _assert_program_data_present(self, response):
         """Verify that program data is present."""
@@ -283,7 +290,7 @@ class TestProgramDetails(ProgramsApiConfigMixin, SharedModuleStoreTestCase):
         Verify that login is required to access the page.
         """
         self.create_programs_config()
-        self._mock_programs_api()
+        self._mock_programs_api(self.data)
 
         self.client.logout()
 
@@ -310,7 +317,7 @@ class TestProgramDetails(ProgramsApiConfigMixin, SharedModuleStoreTestCase):
     def test_page_routing(self):
         """Verify that the page can be hit with or without a program name in the URL."""
         self.create_programs_config()
-        self._mock_programs_api()
+        self._mock_programs_api(self.data)
 
         response = self.client.get(self.details_page)
         self._assert_program_data_present(response)
@@ -319,4 +326,18 @@ class TestProgramDetails(ProgramsApiConfigMixin, SharedModuleStoreTestCase):
         self._assert_program_data_present(response)
 
         response = self.client.get(self.details_page + 'program_name/invalid/')
+        self.assertEquals(response.status_code, 404)
+
+    def test_404_if_no_data(self):
+        """Verify that the page 404s if no program data is found."""
+        self.create_programs_config()
+
+        self._mock_programs_api(self.data, status=404)
+        response = self.client.get(self.details_page)
+        self.assertEquals(response.status_code, 404)
+
+        httpretty.reset()
+
+        self._mock_programs_api({})
+        response = self.client.get(self.details_page)
         self.assertEquals(response.status_code, 404)
