@@ -2,12 +2,11 @@
 {% load i18n %}
 
 {% block title %}
-<title>
-  {% blocktrans with platform_name=platform_name %}
-      Access your Beta {{ platform_name }}
-
-  {% endblocktrans %}
-</title>
+  <title>
+    {% blocktrans with platform_name=platform_name %}
+        Access Account - {{ platform_name }}
+    {% endblocktrans %}
+  </title>
 {% endblock %}
 
 {% block bodyextra %}

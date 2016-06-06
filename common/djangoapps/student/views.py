@@ -18,7 +18,7 @@ from django.conf import settings
 from django.contrib.auth import logout, authenticate, login
 from django.contrib.auth.models import User, AnonymousUser
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.views import password_reset_confirm
+from django.contrib.auth.views import password_reset_confirm, password_reset_complete
 from django.contrib import messages
 from django.core.context_processors import csrf
 from django.core import mail
@@ -2112,6 +2112,18 @@ def password_reset_confirm_wrapper(
             return password_reset_confirm(
                 request, uidb64=uidb64, token=token, extra_context=extra_context
             )
+
+
+def password_reset_complete_wrapper(request,
+                            template_name='registration/password_reset_complete.html',
+                            extra_context=None):
+    extra_context = {
+        'platform_name': microsite.get_value('platform_name', settings.PLATFORM_NAME),
+    }
+
+    return password_reset_complete(request,
+                            template_name='registration/password_reset_complete.html',
+                            extra_context=extra_context)
 
 
 def reactivation_email_for_user(user):
