@@ -47,6 +47,7 @@ from openedx.core.djangoapps.user_api.accounts.api import request_password_chang
 from openedx.core.djangoapps.user_api.errors import UserNotFound
 from util.date_utils import strftime_localized
 
+from pytz import  common_timezones
 
 AUDIT_LOG = logging.getLogger("audit")
 log = logging.getLogger(__name__)
@@ -440,6 +441,8 @@ def account_settings_context(request):
                 'options': year_of_birth_options,
             }, 'preferred_language': {
                 'options': all_languages(),
+            }, 'time_zone': {
+                'options': [(tz, tz) for tz in common_timezones]
             }
         },
         'platform_name': get_themed_value('PLATFORM_NAME', settings.PLATFORM_NAME),

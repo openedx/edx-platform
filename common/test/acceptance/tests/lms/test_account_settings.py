@@ -166,6 +166,7 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, WebAppTest):
                     'Password',
                     'Language',
                     'Country or Region'
+                    'Time Zone'
                 ]
             },
             {
