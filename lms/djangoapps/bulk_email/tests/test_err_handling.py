@@ -192,12 +192,27 @@ class TestEmailErrors(ModuleStoreTestCase):
         """
         Tests exception when the to_option in the email doesn't exist
         """
-        email = CourseEmail(course_id=self.course.id, to_option="IDONTEXIST")
-        email.save()
-        entry = InstructorTask.create(self.course.id, "task_type", "task_key", "task_input", self.instructor)
-        task_input = {"email_id": email.id}
-        with self.assertRaisesRegexp(Exception, 'Unexpected bulk email TO_OPTION found: IDONTEXIST'):
-            perform_delegate_email_batches(entry.id, self.course.id, task_input, "action_name")
+        with self.assertRaisesRegexp(ValueError, 'Course email being sent to unrecognized target: "IDONTEXIST" *'):
+            email = CourseEmail.create(  # pylint: disable=unused-variable
+                self.course.id,
+                self.instructor,
+                ["IDONTEXIST"],
+                "re: subject",
+                "dummy body goes here"
+            )
+
+    def test_nonexistent_cohort(self):
+        """
+        Tests exception when the cohort doesn't exist
+        """
+        with self.assertRaisesRegexp(ValueError, 'Cohort IDONTEXIST does not exist *'):
+            email = CourseEmail.create(  # pylint: disable=unused-variable
+                self.course.id,
+                self.instructor,
+                ["cohort:IDONTEXIST"],
+                "re: subject",
+                "dummy body goes here"
+            )
 
     def test_wrong_course_id_in_task(self):
         """

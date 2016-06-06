@@ -239,6 +239,13 @@ def perform_delegate_email_batches(entry_id, course_id, task_input, action_name)
     if total_recipients <= settings.BULK_EMAIL_JOB_SIZE_THRESHOLD:
         routing_key = settings.BULK_EMAIL_ROUTING_KEY_SMALL_JOBS
 
+    # Weird things happen if we allow empty querysets as input to emailing subtasks
+    # The task appears to hang at "0 out of 0 completed" and never finishes.
+    if total_recipients == 0:
+        msg = u"Bulk Email Task: Empty recipient set"
+        log.warning(msg)
+        raise ValueError(msg)
+
     def _create_send_email_subtask(to_list, initial_subtask_status):
         """Creates a subtask to send email to a given recipient list."""
         subtask_id = initial_subtask_status.task_id

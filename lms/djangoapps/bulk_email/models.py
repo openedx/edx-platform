@@ -1,21 +1,13 @@
 """
 Models for bulk email
-
-WE'RE USING MIGRATIONS!
-
-If you make changes to this model, be sure to create an appropriate migration
-file and check it in at the same time as your model changes. To do that,
-
-1. Go to the edx-platform dir
-2. ./manage.py lms schemamigration bulk_email --auto description_of_your_change
-3. Add the migration file created in edx-platform/lms/djangoapps/bulk_email/migrations/
-
 """
 import logging
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import models, transaction
 
+from openedx.core.djangoapps.course_groups.models import CourseUserGroup
+from openedx.core.djangoapps.course_groups.cohorts import get_cohort_by_name
 from openedx.core.lib.html_to_text import html_to_text
 from openedx.core.lib.mail_utils import wrap_message
 
@@ -47,6 +39,125 @@ class Email(models.Model):
     class Meta(object):
         app_label = "bulk_email"
         abstract = True
+
+
+# Bulk email targets - the send to options that users can select from when they send email.
+SEND_TO_MYSELF = 'myself'
+SEND_TO_STAFF = 'staff'
+SEND_TO_LEARNERS = 'learners'
+SEND_TO_COHORT = 'cohort'
+EMAIL_TARGET_CHOICES = zip(
+    [SEND_TO_MYSELF, SEND_TO_STAFF, SEND_TO_LEARNERS, SEND_TO_COHORT],
+    ['Myself', 'Staff and instructors', 'All students', 'Specific cohort']
+)
+EMAIL_TARGETS = {target[0] for target in EMAIL_TARGET_CHOICES}
+
+
+class Target(models.Model):
+    """
+    A way to refer to a particular group (within a course) as a "Send to:" target.
+
+    Django hackery in this class - polymorphism does not work well in django, for reasons relating to how
+    each class is represented by its own database table. Due to this, we can't just override
+    methods of Target in CohortTarget and get the child method, as one would expect. The
+    workaround is to check to see that a given target is a CohortTarget (self.target_type ==
+    SEND_TO_COHORT), then explicitly call the method on self.cohorttarget, which is created
+    by django as part of this inheritance setup. These calls require pylint disable no-member in
+    several locations in this class.
+    """
+    target_type = models.CharField(max_length=64, choices=EMAIL_TARGET_CHOICES)
+
+    class Meta(object):
+        app_label = "bulk_email"
+
+    def __unicode__(self):
+        return "CourseEmail Target: {}".format(self.short_display())
+
+    def short_display(self):
+        """
+        Returns a short display name
+        """
+        if self.target_type == SEND_TO_COHORT:
+            return self.cohorttarget.short_display()  # pylint: disable=no-member
+        else:
+            return self.target_type
+
+    def long_display(self):
+        """
+        Returns a long display name
+        """
+        if self.target_type == SEND_TO_COHORT:
+            return self.cohorttarget.long_display()  # pylint: disable=no-member
+        else:
+            return self.get_target_type_display()
+
+    def get_users(self, course_id, user_id=None):
+        """
+        Gets the users for a given target.
+
+        Result is returned in the form of a queryset, and may contain duplicates.
+        """
+        staff_qset = CourseStaffRole(course_id).users_with_role()
+        instructor_qset = CourseInstructorRole(course_id).users_with_role()
+        staff_instructor_qset = (staff_qset | instructor_qset)
+        enrollment_qset = User.objects.filter(
+            is_active=True,
+            courseenrollment__course_id=course_id,
+            courseenrollment__is_active=True
+        )
+        if self.target_type == SEND_TO_MYSELF:
+            if user_id is None:
+                raise ValueError("Must define self user to send email to self.")
+            user = User.objects.filter(id=user_id)
+            return use_read_replica_if_available(user)
+        elif self.target_type == SEND_TO_STAFF:
+            return use_read_replica_if_available(staff_instructor_qset)
+        elif self.target_type == SEND_TO_LEARNERS:
+            return use_read_replica_if_available(enrollment_qset.exclude(id__in=staff_instructor_qset))
+        elif self.target_type == SEND_TO_COHORT:
+            return self.cohorttarget.cohort.users.filter(id__in=enrollment_qset)  # pylint: disable=no-member
+        else:
+            raise ValueError("Unrecognized target type {}".format(self.target_type))
+
+
+class CohortTarget(Target):
+    """
+    Subclass of Target, specifically referring to a cohort.
+    """
+    cohort = models.ForeignKey('course_groups.CourseUserGroup')
+
+    class Meta:
+        app_label = "bulk_email"
+
+    def __init__(self, *args, **kwargs):
+        kwargs['target_type'] = SEND_TO_COHORT
+        super(CohortTarget, self).__init__(*args, **kwargs)
+
+    def short_display(self):
+        return "{}-{}".format(self.target_type, self.cohort.name)
+
+    def long_display(self):
+        return "Cohort: {}".format(self.cohort.name)
+
+    @classmethod
+    def ensure_valid_cohort(cls, cohort_name, course_id):
+        """
+        Ensures cohort_name is a valid cohort for course_id.
+
+        Returns the cohort if valid, raises an error otherwise.
+        """
+        if cohort_name is None:
+            raise ValueError("Cannot create a CohortTarget without specifying a cohort_name.")
+        try:
+            cohort = get_cohort_by_name(name=cohort_name, course_key=course_id)
+        except CourseUserGroup.DoesNotExist:
+            raise ValueError(
+                "Cohort {cohort} does not exist in course {course_id}".format(
+                    cohort=cohort_name,
+                    course_id=course_id
+                )
+            )
+        return cohort
 
 
 class CourseEmail(Email):
@@ -89,11 +200,22 @@ class CourseEmail(Email):
         if text_message is None:
             text_message = html_to_text(html_message)
 
-        # perform some validation here:
-        if to_option not in TO_OPTIONS:
-            fmt = 'Course email being sent to unrecognized to_option: "{to_option}" for "{course}", subject "{subject}"'
-            msg = fmt.format(to_option=to_option, course=course_id, subject=subject)
-            raise ValueError(msg)
+        new_targets = []
+        for target in targets:
+            # split target, to handle cohort:cohort_name
+            target_split = target.split(':', 1)
+            # Ensure our desired target exists
+            if target_split[0] not in EMAIL_TARGETS:
+                fmt = 'Course email being sent to unrecognized target: "{target}" for "{course}", subject "{subject}"'
+                msg = fmt.format(target=target, course=course_id, subject=subject)
+                raise ValueError(msg)
+            elif target_split[0] == SEND_TO_COHORT:
+                # target_split[1] will contain the cohort name
+                cohort = CohortTarget.ensure_valid_cohort(target_split[1], course_id)
+                new_target, _ = CohortTarget.objects.get_or_create(target_type=target_split[0], cohort=cohort)
+            else:
+                new_target, _ = Target.objects.get_or_create(target_type=target_split[0])
+            new_targets.append(new_target)
 
         # create the task, then save it immediately:
         course_email = cls(

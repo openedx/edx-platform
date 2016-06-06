@@ -401,6 +401,11 @@
 // view - bulk email
 // --------------------
 .instructor-dashboard-wrapper-2 section.idash-section#send_email {
+  h2 {
+    // override forced uppercase
+    text-transform: none;
+  }
+
   // form fields
   .list-fields {
     list-style: none;
@@ -410,6 +415,60 @@
     .field {
       margin-bottom: $baseline;
       padding: 0;
+
+      ul {
+        list-style-type: none;
+      }
+
+      .send_to_list {
+        line-height: 1.3em;
+      }
+
+      input[name="send_to"] {
+        float: left;
+        margin-top: .3em;
+        margin-left: .1em;
+      }
+
+      input[name="send_to"]+label {
+        display: block;
+        padding-left: 1.3em;
+        margin-bottom: 0;
+      }
+
+      input[name="send_to"]:checked+label {
+        // "bolds" the text without causing a width recalculation
+        text-shadow: 1px 0px 0px;
+      }
+
+      input[name="send_to"]:focus+label, input[name="send_to"]:hover:not([disabled])+label {
+        background-color: #EFEFEF;
+
+        * {
+          background-color: #EFEFEF;
+        }
+      }
+
+      input[name="send_to"]:disabled+label {
+        font-weight: lighter;
+        background-color: $light-gray3
+      }
+
+      .email-targets-primary {
+        display: table-cell;
+        margin: 0;
+        width: 20%;
+      }
+
+      .email-targets-secondary {
+        display: table-cell;
+        margin: 0;
+        @include columns(2);
+
+        .subheading {
+          font-size: .9em;
+        }
+      }
 
       &:last-child {
         margin-bottom: 0;

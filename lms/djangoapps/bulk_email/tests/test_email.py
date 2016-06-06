@@ -14,7 +14,10 @@ from django.core.urlresolvers import reverse
 from django.core.management import call_command
 from django.test.utils import override_settings
 
-from bulk_email.models import Optout
+from bulk_email.models import Optout, BulkEmailFlag
+from bulk_email.tasks import _get_source_address
+from openedx.core.djangoapps.course_groups.models import CourseCohort
+from openedx.core.djangoapps.course_groups.cohorts import add_user_to_cohort
 from courseware.tests.factories import StaffFactory, InstructorFactory
 from instructor_task.subtasks import update_subtask_status
 from student.roles import CourseStaffRole
@@ -71,15 +74,11 @@ class EmailSendFromDashboardTestCase(ModuleStoreTestCase):
 
         self.client.login(username=self.instructor.username, password="test")
 
-        # Pull up email view on instructor dashboard
-        self.url = reverse('instructor_dashboard', kwargs={'course_id': self.course.id.to_deprecated_string()})
-        # Response loads the whole instructor dashboard, so no need to explicitly
-        # navigate to a particular email section
-        response = self.client.get(self.url)
-        email_section = '<div class="vert-left send-email" id="section-send-email">'
-        # If this fails, it is likely because ENABLE_INSTRUCTOR_EMAIL is set to False
-        self.assertTrue(email_section in response.content)
-        self.send_mail_url = reverse('send_email', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        # Pulling up the instructor dash email view here allows us to test sending emails in tests
+        self.goto_instructor_dash_email_view()
+        self.send_mail_url = reverse(
+            'send_email', kwargs={'course_id': unicode(self.course.id)}
+        )
         self.success_content = {
             'course_id': self.course.id.to_deprecated_string(),
             'success': True,
@@ -113,15 +112,12 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
         """
         Make sure email send to myself goes to myself.
         """
-        # Now we know we have pulled up the instructor dash's email view
-        # (in the setUp method), we can test sending an email.
         test_email = {
             'action': 'send',
             'send_to': 'myself',
             'subject': 'test subject for myself',
             'message': 'test message for myself'
         }
-        # Post the email to the instructor dashboard API
         response = self.client.post(self.send_mail_url, test_email)
         self.assertEquals(json.loads(response.content), self.success_content)
 
@@ -135,15 +131,12 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
         """
         Make sure email send to staff and instructors goes there.
         """
-        # Now we know we have pulled up the instructor dash's email view
-        # (in the setUp method), we can test sending an email.
         test_email = {
             'action': 'Send email',
             'send_to': 'staff',
             'subject': 'test subject for staff',
             'message': 'test message for subject'
         }
-        # Post the email to the instructor dashboard API
         response = self.client.post(self.send_mail_url, test_email)
         self.assertEquals(json.loads(response.content), self.success_content)
 
@@ -154,12 +147,51 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
             [self.instructor.email] + [s.email for s in self.staff]
         )
 
+    def test_send_to_cohort(self):
+        """
+        Make sure email sent to a cohort goes there.
+        """
+        cohort = CourseCohort.create(cohort_name='test cohort', course_id=self.course.id)
+        for student in self.students:
+            add_user_to_cohort(cohort.course_user_group, student.username)
+        test_email = {
+            'action': 'Send email',
+            'send_to': '["cohort:{}"]'.format(cohort.course_user_group.name),
+            'subject': 'test subject for cohort',
+            'message': 'test message for cohort'
+        }
+        response = self.client.post(self.send_mail_url, test_email)
+        self.assertEquals(json.loads(response.content), self.success_content)
+
+        self.assertItemsEqual(
+            [e.to[0] for e in mail.outbox],
+            [s.email for s in self.students]
+        )
+
+    def test_send_to_cohort_unenrolled(self):
+        """
+        Make sure email sent to a cohort does not go to unenrolled members of the cohort.
+        """
+        self.students.append(UserFactory())  # user will be added to cohort, but not enrolled in course
+        cohort = CourseCohort.create(cohort_name='test cohort', course_id=self.course.id)
+        for student in self.students:
+            add_user_to_cohort(cohort.course_user_group, student.username)
+        test_email = {
+            'action': 'Send email',
+            'send_to': '["cohort:{}"]'.format(cohort.course_user_group.name),
+            'subject': 'test subject for cohort',
+            'message': 'test message for cohort'
+        }
+        response = self.client.post(self.send_mail_url, test_email)
+        self.assertEquals(json.loads(response.content), self.success_content)
+
+        self.assertEquals(len(mail.outbox), len(self.students) - 1)
+        self.assertNotIn(self.students[-1].email, [e.to[0] for e in mail.outbox])
+
     def test_send_to_all(self):
         """
         Make sure email send to all goes there.
         """
-        # Now we know we have pulled up the instructor dash's email view
-        # (in the setUp method), we can test sending an email.
 
         test_email = {
             'action': 'Send email',
@@ -167,7 +199,6 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
             'subject': 'test subject for all',
             'message': 'test message for all'
         }
-        # Post the email to the instructor dashboard API
         response = self.client.post(self.send_mail_url, test_email)
         self.assertEquals(json.loads(response.content), self.success_content)
 
@@ -218,8 +249,6 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
         """
         Make sure email (with Unicode characters) send to all goes there.
         """
-        # Now we know we have pulled up the instructor dash's email view
-        # (in the setUp method), we can test sending an email.
 
         uni_subject = u'téśt śúbjéćt főŕ áĺĺ'
         test_email = {
@@ -228,7 +257,6 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
             'subject': uni_subject,
             'message': 'test message for all'
         }
-        # Post the email to the instructor dashboard API
         response = self.client.post(self.send_mail_url, test_email)
         self.assertEquals(json.loads(response.content), self.success_content)
 
@@ -243,8 +271,6 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
         """
         Make sure email (with Unicode characters) send to all goes there.
         """
-        # Now we know we have pulled up the instructor dash's email view
-        # (in the setUp method), we can test sending an email.
 
         # Create a student with Unicode in their first & last names
         unicode_user = UserFactory(first_name=u'Ⓡⓞⓑⓞⓣ', last_name=u'ՇﻉรՇ')
@@ -257,7 +283,6 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
             'subject': 'test subject for all',
             'message': 'test message for all'
         }
-        # Post the email to the instructor dashboard API
         response = self.client.post(self.send_mail_url, test_email)
         self.assertEquals(json.loads(response.content), self.success_content)
 
@@ -295,7 +320,6 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
             'subject': 'test subject for all',
             'message': 'test message for all'
         }
-        # Post the email to the instructor dashboard API
         response = self.client.post(self.send_mail_url, test_email)
         self.assertEquals(json.loads(response.content), self.success_content)
 
@@ -324,8 +348,6 @@ class TestEmailSendFromDashboard(EmailSendFromDashboardTestCase):
         """
         Make sure email (with Unicode characters) send to all goes there.
         """
-        # Now we know we have pulled up the instructor dash's email view
-        # (in the setUp method), we can test sending an email.
 
         uni_message = u'ẗëṡẗ ṁëṡṡäġë ḟöṛ äḷḷ ｲ乇丂ｲ ﾶ乇丂丂ﾑg乇 ｷo尺 ﾑﾚﾚ тэѕт мэѕѕаБэ fоѓ аll'
         test_email = {
@@ -334,7 +356,6 @@ class TestEmailSendFromDashboard(EmailSendFromDashboardTestCase):
             'subject': 'test subject for all',
             'message': uni_message
         }
-        # Post the email to the instructor dashboard API
         response = self.client.post(self.send_mail_url, test_email)
         self.assertEquals(json.loads(response.content), self.success_content)
 

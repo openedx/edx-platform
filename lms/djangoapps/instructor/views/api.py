@@ -2447,7 +2447,7 @@ def list_forum_members(request, course_id):
 @require_post_params(send_to="sending to whom", subject="subject line", message="message text")
 def send_email(request, course_id):
     """
-    Send an email to self, staff, or everyone involved in a course.
+    Send an email to self, staff, cohorts, or everyone involved in a course.
     Query Parameters:
     - 'send_to' specifies what group the email should be sent to
        Options are defined by the CourseEmail model in
