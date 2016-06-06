@@ -90,12 +90,13 @@ class TestPreferencesAPI(UserAPITestCase):
         # Create some test preferences values.
         set_user_preference(self.user, "dict_pref", {"int_key": 10})
         set_user_preference(self.user, "string_pref", "value")
-        set_user_preference(self.user, "time_zone", "Africa/Juba")
+        set_user_preference(self.user, "time_zone", "Asia/Tokyo")
 
         # Log in the client and do the GET.
         client = self.login_client(api_client, user)
         response = self.send_get(client)
-        self.assertEqual({"dict_pref": "{'int_key': 10}", "string_pref": "value", "time_zone": "Africa/Juba"}, response.data)
+        self.assertEqual({"dict_pref": "{'int_key': 10}", "string_pref": "value", "time_zone": "Asia/Tokyo"},
+                         response.data)
 
     @ddt.data(
         ("client", "user"),
