@@ -32,7 +32,7 @@ class TestProfEdVerification(ModuleStoreTestCase):
             min_price=self.MIN_PRICE,
             suggested_prices=''
         )
-
+        purchase_workflow = "?purchase_workflow=single"
         self.urls = {
             'course_modes_choose': reverse(
                 'course_modes_choose',
@@ -42,7 +42,7 @@ class TestProfEdVerification(ModuleStoreTestCase):
             'verify_student_start_flow': reverse(
                 'verify_student_start_flow',
                 args=[unicode(self.course_key)]
-            ),
+            ) + purchase_workflow,
         }
 
     def test_start_flow(self):
