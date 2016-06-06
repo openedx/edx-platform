@@ -23,10 +23,6 @@
             this.roleIds = roles;
         };
 
-        DiscussionUtil.loadRolesFromContainer = function() {
-            return this.loadRoles($('#discussion-container').data('roles'));
-        };
-
         DiscussionUtil.isStaff = function(userId) {
             var staff;
             if (_.isUndefined(userId)) {
