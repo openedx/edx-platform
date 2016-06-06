@@ -717,7 +717,7 @@ class DiscussionTabHomePage(CoursePage, DiscussionPageMixin):
         """
         Returns the new post button.
         """
-        elements = self.q(css="ol.course-tabs .new-post-btn")
+        elements = self.q(css=".new-post-btn")
         return elements.first if elements.visible and len(elements) == 1 else None
 
     @property

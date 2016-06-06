@@ -17,6 +17,7 @@
     .page-header {
         @include clearfix();
         border-bottom: 1px solid $lms-border-color;
+        padding-bottom: $baseline/2;
 
         .page-title {
             @extend %t-title4;
