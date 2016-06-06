@@ -1,11 +1,12 @@
 define(['backbone',
         'jquery',
         'underscore',
+        'edx-ui-toolkit/js/utils/html-utils', 
         'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
         'common/js/spec_helpers/template_helpers',
         'js/views/fields',
         'string_utils'],
-    function (Backbone, $, _, AjaxHelpers, TemplateHelpers, FieldViews) {
+    function (Backbone, $, _, HtmlUtils, AjaxHelpers, TemplateHelpers, FieldViews) {
         'use strict';
 
         var API_URL = '/api/end_point/v1';

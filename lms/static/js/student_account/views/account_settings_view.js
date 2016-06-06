@@ -5,9 +5,10 @@
         'jquery',
         'underscore',
         'backbone',
+        'edx-ui-toolkit/js/utils/html-utils',
         'js/student_account/views/account_section_view',
         'text!templates/student_account/account_settings.underscore'
-    ], function (gettext, $, _, Backbone, AccountSectionView, accountSettingsTemplate) {
+    ], function (gettext, $, _, Backbone, HtmlUtils, AccountSectionView, accountSettingsTemplate) {
 
         var AccountSettingsView = Backbone.View.extend({
 
@@ -28,7 +29,7 @@
             },
 
             render: function () {
-                this.$el.html(_.template(accountSettingsTemplate)({
+                HtmlUtils.setHtml(this.$el, HtmlUtils.template(accountSettingsTemplate)({
                     accountSettingsTabs: this.accountSettingsTabs
                 }));
                 this.renderSection(this.options.tabSections[this.activeTab]);
@@ -67,7 +68,9 @@
 
                 _.each(view.$('.account-settings-section-body'), function (sectionEl, index) {
                     _.each(view.options.tabSections[view.activeTab][index].fields, function (field) {
-                        $(sectionEl).append(field.view.render().el);
+                        if (field.view.enabled) {
+                            $(sectionEl).append(field.view.render().el);
+                        }
                     });
                 });
                 return this;
