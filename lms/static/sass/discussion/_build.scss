@@ -21,8 +21,8 @@ $static-path: '../..' !default;
 @import '../shared-v2/help-tab';
 
 // Compatibility support for non-Pattern Library mixins and extensions
-@import 'utilities/v1-compatibility';
 @import 'utilities/variables-v2';
+@import 'utilities/v1-compatibility';
 
 // Discussion styling
 @import 'mixins';

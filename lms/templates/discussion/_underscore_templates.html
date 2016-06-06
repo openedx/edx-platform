@@ -1,9 +1,14 @@
 <%namespace name='static' file='../static_content.html'/>
-<%! import json %>
+<%!
+import json
+from openedx.core.djangolib.js_utils import (
+    dump_js_escaped_json, js_escaped_string
+)
+%>
 
 <script type="text/javascript">
-window.PLATFORM_NAME = ${json.dumps(settings.PLATFORM_NAME)};
-window.ENABLE_DISCUSSION_HOME_PANEL = ${json.dumps(settings.FEATURES.get('ENABLE_DISCUSSION_HOME_PANEL', False))};
+window.PLATFORM_NAME = '${settings.PLATFORM_NAME | n, js_escaped_string}';
+window.ENABLE_DISCUSSION_HOME_PANEL = ${settings.FEATURES.get('ENABLE_DISCUSSION_HOME_PANEL', False) | n, dump_js_escaped_json};
 </script>
 
 <%
@@ -11,7 +16,7 @@ template_names = [
     'thread', 'thread-show', 'thread-edit', 'thread-response', 'thread-response-show', 'thread-response-edit',
     'response-comment-show', 'response-comment-edit', 'thread-list-item', 'discussion-home', 'search-alert',
     'new-post', 'thread-type', 'new-post-menu-entry', 'new-post-menu-category', 'topic', 'post-user-display',
-    'inline-discussion', 'pagination', 'user-profile', 'profile-thread', 'customwmd-prompt'
+    'inline-discussion', 'pagination', 'profile-thread', 'customwmd-prompt'
 ]
 %>
 

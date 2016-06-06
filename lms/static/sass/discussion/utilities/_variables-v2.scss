@@ -19,3 +19,12 @@ $forum-color-error: palette(error, base) !default;
 $post-image-dimension: ($baseline*3) !default;  // image size  + margin
 $response-image-dimension: ($baseline*2.5) !default; // image size  + margin
 $comment-image-dimension: ($baseline*2) !default; // image size  + margin
+
+// font sizes
+$forum-base-font-size: font-size(small);
+$forum-x-large-font-size: font-size(x-large);
+$forum-large-font-size: font-size(base);
+$forum-small-font-size: font-size(x-small);
+
+// borders
+$forum-border-radius: $component-border-radius;

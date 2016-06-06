@@ -127,7 +127,7 @@ body.discussion {
             }
 
             img {
-                border-radius: 3px;
+                border-radius: $forum-border-radius;
             }
         }
     }
@@ -138,21 +138,17 @@ body.discussion {
 }
 
 // +post - individual element styling
-body.discussion .discussion-post,
-body.discussion .discussion-article,
-body.view-in-course .discussion-post,
-body.view-in-course .discussion-article {
-    // NOTE: discussion-article is used for inline discussion modules.
+// NOTE: discussion-article is used for inline discussion modules.
+.discussion-post,
+.discussion-article {
     @include clearfix();
 
     .post-header-content {
 
         // post title
         .post-title {
-            @extend %t-title4;
-            @extend %t-ultrastrong;
+            font-size: $forum-x-large-font-size;
             margin-bottom: ($baseline/4);
-            letter-spacing: 0;
         }
     }
 
@@ -211,14 +207,14 @@ body.view-in-course .discussion-article {
     .discussion-article {
         @include transition(all .2s linear 0s);
         border: 1px solid $forum-color-border;
-        border-radius: 3px;
+        border-radius: $forum-border-radius;
         min-height: 0;
         background: $forum-color-background;
         box-shadow: 0 1px 0 $shadow;
         @include transition(all .2s linear 0s);
 
         .thread-wrapper {
-            @include border-radius(3px, 3px, 0, 0);
+            @include border-radius($forum-border-radius, $forum-border-radius, 0, 0);
             position: relative;
             overflow-x: hidden;
             overflow-y: auto;
@@ -228,16 +224,16 @@ body.view-in-course .discussion-article {
             .discussion-post {
 
                 .inline-comment-count {
+                    @include margin-right($baseline/2);
                     @extend %ui-depth2;
+                    @include float(right);
                     position: relative;
-                    float: right;
                     display: block;
                     height: 27px;
                     margin-top: 6px;
-                    margin-right: 8px;
                     padding: 0 8px;
-                    border-radius: ($baseline/4);
-                    font-size: 12px;
+                    border-radius: $forum-border-radius;
+                    font-size: $forum-small-font-size;
                     font-weight: 400;
                     line-height: 25px;
                     color: #888;
@@ -250,15 +246,15 @@ body.view-in-course .discussion-article {
                     margin-bottom: ($baseline*0.75);
 
                     .posted-by {
-                        float: left;
-                        margin-right: ($baseline/4);
-                        font-size: 16px;
+                        @include margin-right($baseline/4);
+                        @include float(left);
+                        font-size: $forum-large-font-size;
                     }
                 }
 
                 .response-body {
                     margin-bottom: 0.2em;
-                    font-size: 14px;
+                    font-size: $forum-base-font-size;
                 }
             }
 
@@ -289,12 +285,12 @@ body.view-in-course .discussion-article {
             a {
                 display: block;
                 padding: ($baseline*0.25) $baseline;
-                font-size: 12px;
+                font-size: $forum-small-font-size;
                 line-height: 30px;
 
                 .icon {
+                    @include margin-right($baseline*0.25);
                     color: $link-color;
-                    margin-right: ($baseline*0.25);
                 }
             }
         }
