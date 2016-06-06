@@ -1,6 +1,4 @@
 """Acceptance tests for LMS-hosted Programs pages"""
-from unittest import skip
-
 from nose.plugins.attrib import attr
 
 from ...fixtures.programs import ProgramsFixture, ProgramsConfigMixin
@@ -139,7 +137,6 @@ class ProgramListingPageA11yTest(ProgramPageBase):
 
 
 @attr('a11y')
-@skip('The tested page is currently disabled. This test will be re-enabled once a11y failures are resolved.')
 class ProgramDetailsPageA11yTest(ProgramPageBase):
     """Test program details page accessibility."""
     def setUp(self):

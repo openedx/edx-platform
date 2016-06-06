@@ -51,7 +51,8 @@
                     enrollmentAction: $.url( '?enrollment_action' ),
                     courseId: $.url( '?course_id' ),
                     courseMode: $.url( '?course_mode' ),
-                    emailOptIn: $.url( '?email_opt_in' )
+                    emailOptIn: $.url( '?email_opt_in' ),
+                    purchaseWorkflow: $.url( '?purchase_workflow' )
                 };
                 for (var key in queryParams) {
                     if (queryParams[key]) {
@@ -63,6 +64,7 @@
                 this.courseMode = queryParams.courseMode;
                 this.emailOptIn = queryParams.emailOptIn;
                 this.nextUrl = this.urls.defaultNextUrl;
+                this.purchaseWorkflow = queryParams.purchaseWorkflow;
                 if (queryParams.next) {
                     // Ensure that the next URL is internal for security reasons
                     if ( ! window.isExternal( queryParams.next ) ) {

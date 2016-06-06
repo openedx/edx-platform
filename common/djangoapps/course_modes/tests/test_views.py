@@ -94,7 +94,8 @@ class CourseModeViewTest(UrlResetMixin, ModuleStoreTestCase):
         url = reverse('course_modes_choose', args=[unicode(self.course.id)])
         response = self.client.get(url)
         # Check whether we were correctly redirected
-        start_flow_url = reverse('verify_student_start_flow', args=[unicode(self.course.id)])
+        purchase_workflow = "?purchase_workflow=single"
+        start_flow_url = reverse('verify_student_start_flow', args=[unicode(self.course.id)]) + purchase_workflow
         self.assertRedirects(response, start_flow_url)
 
     def test_no_id_redirect_otto(self):
@@ -194,7 +195,8 @@ class CourseModeViewTest(UrlResetMixin, ModuleStoreTestCase):
 
         # Since the only available track is professional ed, expect that
         # we're redirected immediately to the start of the payment flow.
-        start_flow_url = reverse('verify_student_start_flow', args=[unicode(self.course.id)])
+        purchase_workflow = "?purchase_workflow=single"
+        start_flow_url = reverse('verify_student_start_flow', args=[unicode(self.course.id)]) + purchase_workflow
         self.assertRedirects(response, start_flow_url)
 
         # Now enroll in the course

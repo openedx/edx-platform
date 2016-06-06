@@ -98,6 +98,19 @@ def get_poster(video):
     return poster
 
 
+def format_xml_exception_message(location, key, value):
+    """
+    Generate exception message for VideoDescriptor class which will use for ValueError and UnicodeDecodeError
+    when setting xml attributes.
+    """
+    exception_message = "Block-location:{location}, Key:{key}, Value:{value}".format(
+        location=unicode(location),
+        key=key,
+        value=value
+    )
+    return exception_message
+
+
 def set_query_parameter(url, param_name, param_value):
     """
     Given a URL, set or replace a query parameter and return the

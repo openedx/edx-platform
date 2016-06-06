@@ -57,6 +57,10 @@ def program_details(request, program_id):
         raise Http404
 
     program_data = utils.get_programs(request.user, program_id=program_id)
+
+    if not program_data:
+        raise Http404
+
     program_data = utils.supplement_program_data(program_data, request.user)
 
     context = {
