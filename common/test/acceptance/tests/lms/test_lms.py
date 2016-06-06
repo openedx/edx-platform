@@ -1347,4 +1347,9 @@ class CourseInfoA11yTest(UniqueCourseTest):
 
     def test_course_home_a11y(self):
         self.course_info_page.visit()
+        self.course_info_page.a11y_audit.config.set_rules({
+            "ignore": [
+                'section',  # TODO: wcag2aa
+            ]
+        })
         self.course_info_page.a11y_audit.check_for_accessibility_errors()
