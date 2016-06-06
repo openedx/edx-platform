@@ -16,7 +16,7 @@
     "underscore.string": "~3.3.4"
   },
   "devDependencies": {
-    "edx-custom-a11y-rules": "git+https://github.com/edx/edx-custom-a11y-rules.git#12d2cae4ffdbb45c5643819211e06c17d6200210",
+    "edx-custom-a11y-rules": "0.1.0",
     "pa11y": "3.6.0",
     "pa11y-reporter-1.0-json": "1.0.2",
     "jasmine-core": "^2.4.1",
