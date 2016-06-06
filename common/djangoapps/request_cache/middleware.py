@@ -51,3 +51,10 @@ class RequestCache(object):
     def process_response(self, request, response):
         self.clear_request_cache()
         return response
+
+    def process_exception(self, request, exception):  # pylint: disable=unused-argument
+        """
+        Clear the RequestCache after a failed request.
+        """
+        self.clear_request_cache()
+        return None
