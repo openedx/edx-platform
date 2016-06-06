@@ -27,6 +27,7 @@ $static-path: '../..' !default;
 // Discussion styling
 @import 'mixins';
 @import 'discussion'; // Process old file after definitions but before everything else, partial is deprecated.
+@import 'layouts';
 @import 'elements/actions';
 @import 'elements/editor';
 @import 'elements/labels';
