@@ -2706,6 +2706,7 @@ ACCOUNT_VISIBILITY_CONFIGURATION = {
         "is_active",
         "bio",
         "country",
+        "time_zone",
         "profile_image",
         "language_proficiencies",
         "name",
