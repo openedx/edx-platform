@@ -67,7 +67,7 @@ class DiscussionXBlock(XBlock, StudioEditableXBlockMixin):
         fragment = Fragment()
 
         # normal import causes the xmodule_assets command to fail due to circular import - hence importing locally
-        from django_comment_client.permissions import has_permission
+        from django_comment_client.permissions import has_permission # pylint: disable=import-error
 
         user = None
         user_service = self.runtime.service(self, 'user')
