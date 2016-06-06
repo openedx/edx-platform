@@ -115,9 +115,9 @@
     .row-item-full {
 
       .notification-checkbox {
+        @include margin-right($baseline/2);
         display: inline-block;
         @include padding($baseline/4, 0, $baseline/2, 0);
-        @include margin-right($baseline/2);
         border-radius: 5px;
         border: 1px solid gray;
 
