@@ -44,7 +44,7 @@ body.discussion {
 
       // alert copy
       .message {
-        @include font-size(12);
+        font-size: $forum-small-font-size;
         color: $white;
 
         em {
@@ -66,11 +66,11 @@ body.discussion {
       text-align: right;
 
       .control {
-        @include font-size(14);
         @include transition(none);
         @extend %t-weight5;
         padding: ($baseline/4) ($baseline/2);
         color: $white;
+        font-size: $forum-base-font-size;
 
         // reseting poorly globally scoped hover/focus state for this control
         &:hover, &:focus {

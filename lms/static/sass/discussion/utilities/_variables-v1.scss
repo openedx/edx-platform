@@ -21,3 +21,12 @@ $forum-color-reading-thread: $gray-d3 !default;
 $post-image-dimension: ($baseline*3) !default;  // image size  + margin
 $response-image-dimension: ($baseline*2.5) !default; // image size  + margin
 $comment-image-dimension: ($baseline*2) !default; // image size  + margin
+
+// font sizes
+$forum-base-font-size: 14px;
+$forum-x-large-font-size: 21px;
+$forum-large-font-size: 16px;
+$forum-small-font-size: 12px;
+
+// borders
+$forum-border-radius: 3px;

@@ -3,7 +3,7 @@
  */
 (function(define) {
     'use strict';
-    define(['backbone', 'underscore', 'gettext', 'DiscussionModuleView'],
+    define(['backbone', 'underscore', 'gettext', 'common/js/discussion/discussion_module_view'],
         function(Backbone, _, gettext, DiscussionModuleView) {
             var TeamDiscussionView = Backbone.View.extend({
                 initialize: function() {

@@ -70,7 +70,7 @@
       box-shadow: 0 1px 1px $shadow-l1;
       position: relative;
       width: 100%;
-      border-radius: 3px;
+      border-radius: $forum-border-radius;
       margin: ($baseline/4) 0 0 0;
       border: 1px solid $gray-l3;
       padding: ($baseline/2) ($baseline*0.75);
@@ -121,16 +121,16 @@
     box-sizing: border-box;
     display: inline-block;
     border: 1px solid transparent;
-    border-radius: ($baseline/4);
+    border-radius: $forum-border-radius;
     color: $gray-l1;
 
     .action-icon {
-      @extend %t-icon7;
       display: inline-block;
+      font-size: $forum-small-font-size;
       height: $baseline;
       width: $baseline;
-      border: 1px solid $gray-l3;
-      border-radius: 3px;
+      border: 1px solid $forum-color-border;
+      border-radius: $forum-border-radius;
       text-align: center;
       color: $gray-l1;
 
@@ -156,7 +156,7 @@
       }
 
       .action-icon {
-        border-radius: 0 3px 3px 0;
+        border-radius: 0 $forum-border-radius $forum-border-radius 0;
       }
     }
 
@@ -287,9 +287,9 @@
       }
 
       .action-icon {
+        @include margin-left($baseline/4);
         display: inline-block;
         width: ($baseline/2);
-        margin-left: ($baseline/4);
         color: inherit;
       }
 

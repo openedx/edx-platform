@@ -2,12 +2,8 @@
 // ====================
 
 .forum-nav {
-  box-sizing: border-box;
-  @include float(left);
-  position: relative;
-  width: 31%;
   border: 1px solid #aaa;
-  border-radius: 3px;
+  border-radius: $forum-border-radius;
 }
 
 // ------
@@ -45,13 +41,13 @@
     }
 
   .icon {
-    @include font-size(14);
     @include margin-right($baseline/4);
+    font-size: $forum-base-font-size;
   }
 }
 
 .forum-nav-browse-current {
-  @include font-size(12);
+  font-size: $forum-small-font-size;
 }
 
 .forum-nav-browse-drop-arrow {
@@ -69,7 +65,7 @@
 }
 
 .forum-nav-search .icon {
-  @include font-size(12);
+  font-size: $forum-small-font-size;
   position: absolute;
   margin-top: -6px;
   top: 50%;
@@ -95,7 +91,7 @@
 }
 
 .forum-nav-browse-filter .icon {
-  @include font-size(12);
+  font-size: $forum-small-font-size;
   position: absolute;
   margin-top: -6px;
   top: 50%;
@@ -134,7 +130,7 @@
 }
 
 .forum-nav-browse-menu {
-  @include font-size(14);
+  font-size: $forum-base-font-size;
   overflow-y: scroll;
   list-style: none;
 }
@@ -156,7 +152,7 @@
 // -------------------
 .forum-nav-refine-bar {
   @include clearfix();
-  @include font-size(11);
+  font-size: $forum-small-font-size;
   border-bottom: 1px solid $forum-color-border;
   background-color: $gray-l5;
   padding: ($baseline/4) ($baseline/2);
@@ -284,7 +280,7 @@
   width: 7%;
 
   .icon {
-    @include font-size(14);
+    font-size: $forum-base-font-size;
 
     &:before {
 
@@ -319,19 +315,19 @@
 }
 
 .forum-nav-thread-title {
-  @extend %t-title7;
+  font-size: $forum-base-font-size;
   display: block;
 }
 
 %forum-nav-thread-wrapper-2-content {
-  @include font-size(11);
+  @include margin-right($baseline/4);
+  font-size: $forum-small-font-size;
   display: inline-block;
-  margin-right: ($baseline/4);
   text-align: center;
   color: $black;
 
   &:last-child {
-    margin-right: 0;
+    @include margin-right(0);
   }
 }
 
@@ -345,7 +341,7 @@
   position: relative;
   @include margin-left($baseline/4);
   margin-bottom: ($baseline/4); // Because tail is position: absolute
-  border-radius: 2px;
+  border-radius: $forum-border-radius;
   padding: ($baseline/10) ($baseline/5);
   min-width: 2em; // Fit most comment counts but allow expansion if necessary
   background-color: $gray-l4;
