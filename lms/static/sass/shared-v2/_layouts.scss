@@ -11,12 +11,12 @@
         @include clearfix();
         border: 1px solid $lms-border-color;
         background-color: $lms-container-background-color;
-        padding: $baseline;
     }
 
     .page-header {
         @include clearfix();
         border-bottom: 1px solid $lms-border-color;
+        padding: $baseline;
 
         .page-title {
             @extend %t-title4;
@@ -67,6 +67,6 @@
     }
 
     .page-content {
-        padding-top: $baseline;
+        padding: $baseline;
     }
 }

@@ -8,8 +8,8 @@
         paths: {
             'gettext': 'xmodule_js/common_static/js/test/i18n',
             'codemirror': 'xmodule_js/common_static/js/vendor/CodeMirror/codemirror',
-            'jquery': 'xmodule_js/common_static/common/js/vendor/jquery',
-            'jquery-migrate': 'xmodule_js/common_static/common/js/vendor/jquery-migrate',
+            'jquery': 'common/js/vendor/jquery',
+            'jquery-migrate': 'common/js/vendor/jquery-migrate',
             'jquery.ui': 'xmodule_js/common_static/js/vendor/jquery-ui.min',
             'jquery.eventDrag': 'xmodule_js/common_static/js/vendor/jquery.event.drag-2.2',
             'jquery.flot': 'xmodule_js/common_static/js/vendor/flot/jquery.flot.min',
@@ -89,9 +89,6 @@
             'js/student_profile/views/learner_profile_factory': 'js/student_profile/views/learner_profile_factory',
             'js/student_profile/views/learner_profile_view': 'js/student_profile/views/learner_profile_view',
             'js/ccx/schedule': 'js/ccx/schedule',
-
-            // Discussion classes loaded explicitly until they are converted to use RequireJS
-            'DiscussionModuleView': 'xmodule_js/common_static/common/js/discussion/discussion_module_view',
 
             'js/bookmarks/collections/bookmarks': 'js/bookmarks/collections/bookmarks',
             'js/bookmarks/models/bookmark': 'js/bookmarks/models/bookmark',
@@ -394,7 +391,7 @@
                         'underscore.string',
                         'edx-ui-toolkit/js/utils/html-utils',
                         'edx-ui-toolkit/js/utils/string-utils'
-                    ], function (_, str, HtmlUtils, StringUtils) {
+                    ], function(_, str, HtmlUtils, StringUtils) {
                         window._ = _;
                         window._.str = str;
                         window.edx = edx || {};
@@ -520,7 +517,7 @@
                 exports: 'Slick'
             },
             // Discussions
-            'xmodule_js/common_static/common/js/discussion/utils': {
+            'common/js/discussion/utils': {
                 deps: [
                     'jquery',
                     'jquery.timeago',
@@ -539,135 +536,128 @@
                     });
                 }
             },
-            'xmodule_js/common_static/common/js/discussion/content': {
+            'common/js/discussion/content': {
                 deps: [
-                    'xmodule_js/common_static/common/js/discussion/utils'
+                    'common/js/discussion/utils'
                 ],
                 exports: 'Content'
             },
-            'xmodule_js/common_static/common/js/discussion/discussion': {
+            'common/js/discussion/discussion': {
                 deps: [
-                    'xmodule_js/common_static/common/js/discussion/utils',
+                    'common/js/discussion/utils',
                     'xmodule_js/common_static/common/js/discussion/content'
                 ],
                 exports: 'Discussion'
             },
-            'xmodule_js/common_static/common/js/discussion/models/discussion_course_settings': {
+            'common/js/discussion/discussion_course_settings': {
                 deps: [
-                    'xmodule_js/common_static/common/js/discussion/utils'
+                    'common/js/discussion/utils'
                 ],
                 exports: 'DiscussionCourseSettings'
             },
-            'xmodule_js/common_static/common/js/discussion/models/discussion_user': {
+            'common/js/discussion/models/discussion_user': {
                 deps: [
-                    'xmodule_js/common_static/common/js/discussion/utils'
+                    'common/js/discussion/utils'
                 ],
                 exports: 'DiscussionUser'
             },
-            'xmodule_js/common_static/common/js/discussion/views/discussion_content_view': {
+            'common/js/discussion/views/discussion_content_view': {
                 deps: [
-                    'xmodule_js/common_static/common/js/discussion/utils'
+                    'common/js/discussion/utils'
                 ],
                 exports: 'DiscussionContentView'
             },
-            'xmodule_js/common_static/common/js/discussion/views/discussion_thread_edit_view': {
+            'common/js/discussion/views/discussion_thread_edit_view': {
                 deps: [
-                    'xmodule_js/common_static/common/js/discussion/utils'
+                    'common/js/discussion/utils'
                 ],
                 exports: 'DiscussionThreadEditView'
             },
-            'xmodule_js/common_static/common/js/discussion/views/discussion_thread_list_view': {
+            'common/js/discussion/views/discussion_thread_list_view': {
                 deps: [
-                    'xmodule_js/common_static/common/js/discussion/utils'
+                    'common/js/discussion/utils'
                 ],
                 exports: 'DiscussionThreadListView'
             },
-            'xmodule_js/common_static/common/js/discussion/views/discussion_thread_profile_view': {
+            'common/js/discussion/views/discussion_thread_profile_view': {
                 deps: [
-                    'xmodule_js/common_static/common/js/discussion/utils'
+                    'common/js/discussion/utils'
                 ],
                 exports: 'DiscussionThreadProfileView'
             },
             'xmodule_js/common_static/common/js/discussion/views/discussion_thread_show_view': {
                 deps: [
-                    'xmodule_js/common_static/common/js/discussion/utils',
-                    'xmodule_js/common_static/common/js/discussion/views/discussion_content_view'
+                    'common/js/discussion/utils',
+                    'common/js/discussion/views/discussion_content_view'
                 ],
                 exports: 'DiscussionThreadShowView'
             },
-            'xmodule_js/common_static/common/js/discussion/views/discussion_thread_view': {
+            'common/js/discussion/views/discussion_thread_view': {
                 deps: [
-                    'xmodule_js/common_static/common/js/discussion/utils',
-                    'xmodule_js/common_static/common/js/discussion/views/discussion_content_view'
+                    'common/js/discussion/utils',
+                    'common/js/discussion/views/discussion_content_view'
                 ],
                 exports: 'DiscussionThreadView'
             },
-            'xmodule_js/common_static/common/js/discussion/views/discussion_topic_menu_view': {
+            'common/js/discussion/views/discussion_topic_menu_view': {
                 deps: [
-                    'xmodule_js/common_static/common/js/discussion/utils'
+                    'common/js/discussion/utils'
                 ],
                 exports: 'DiscussionTopicMenuView'
             },
-            'xmodule_js/common_static/common/js/discussion/views/discussion_user_profile_view': {
+            'common/js/discussion/views/new_post_view': {
                 deps: [
-                    'xmodule_js/common_static/common/js/discussion/utils'
-                ],
-                exports: 'DiscussionUserProfileView'
-            },
-            'xmodule_js/common_static/common/js/discussion/views/new_post_view': {
-                deps: [
-                    'xmodule_js/common_static/common/js/discussion/utils'
+                    'common/js/discussion/utils'
                 ],
                 exports: 'NewPostView'
             },
-            'xmodule_js/common_static/common/js/discussion/views/thread_response_edit_view': {
+            'common/js/discussion/views/thread_response_edit_view': {
                 deps: [
-                    'xmodule_js/common_static/common/js/discussion/utils'
+                    'common/js/discussion/utils'
                 ],
                 exports: 'ThreadResponseEditView'
             },
-            'xmodule_js/common_static/common/js/discussion/views/thread_response_show_view': {
+            'common/js/discussion/views/thread_response_show_view': {
                 deps: [
-                    'xmodule_js/common_static/common/js/discussion/utils'
+                    'common/js/discussion/utils'
                 ],
                 exports: 'ThreadResponseShowView'
             },
-            'xmodule_js/common_static/common/js/discussion/views/thread_response_view': {
+            'common/js/discussion/views/thread_response_view': {
                 deps: [
-                    'xmodule_js/common_static/common/js/discussion/utils'
+                    'common/js/discussion/utils'
                 ],
                 exports: 'ThreadResponseView'
             },
-            'DiscussionModuleView': {
+            'common/js/discussion/discussion_module_view': {
                 deps: [
                     'jquery',
                     'underscore',
                     'backbone',
                     'gettext',
                     'URI',
-                    'xmodule_js/common_static/common/js/discussion/content',
-                    'xmodule_js/common_static/common/js/discussion/discussion',
-                    'xmodule_js/common_static/common/js/discussion/utils',
-                    'xmodule_js/common_static/common/js/discussion/models/discussion_course_settings',
-                    'xmodule_js/common_static/common/js/discussion/models/discussion_user',
-                    'xmodule_js/common_static/common/js/discussion/views/discussion_content_view',
-                    'xmodule_js/common_static/common/js/discussion/views/discussion_thread_edit_view',
-                    'xmodule_js/common_static/common/js/discussion/views/discussion_thread_list_view',
-                    'xmodule_js/common_static/common/js/discussion/views/discussion_thread_profile_view',
-                    'xmodule_js/common_static/common/js/discussion/views/discussion_thread_show_view',
-                    'xmodule_js/common_static/common/js/discussion/views/discussion_thread_view',
-                    'xmodule_js/common_static/common/js/discussion/views/discussion_topic_menu_view',
-                    'xmodule_js/common_static/common/js/discussion/views/discussion_user_profile_view',
-                    'xmodule_js/common_static/common/js/discussion/views/new_post_view',
-                    'xmodule_js/common_static/common/js/discussion/views/thread_response_edit_view',
-                    'xmodule_js/common_static/common/js/discussion/views/thread_response_show_view',
-                    'xmodule_js/common_static/common/js/discussion/views/thread_response_view'
+                    'common/js/discussion/content',
+                    'common/js/discussion/discussion',
+                    'common/js/discussion/models/discussion_course_settings',
+                    'common/js/discussion/models/discussion_user',
+                    'common/js/discussion/utils',
+                    'common/js/discussion/views/discussion_content_view',
+                    'common/js/discussion/views/discussion_thread_edit_view',
+                    'common/js/discussion/views/discussion_thread_list_view',
+                    'common/js/discussion/views/discussion_thread_profile_view',
+                    'common/js/discussion/views/discussion_thread_show_view',
+                    'common/js/discussion/views/discussion_thread_view',
+                    'common/js/discussion/views/discussion_topic_menu_view',
+                    'common/js/discussion/views/new_post_view',
+                    'common/js/discussion/views/thread_response_edit_view',
+                    'common/js/discussion/views/thread_response_show_view',
+                    'common/js/discussion/views/thread_response_view'
                 ],
                 exports: 'DiscussionModuleView'
             },
-            'xmodule_js/common_static/common/js/spec_helpers/discussion_spec_helper': {
+            'common/js/spec_helpers/discussion_spec_helper': {
                 deps: [
-                    'xmodule_js/common_static/common/js/discussion/utils'
+                    'common/js/discussion/utils'
                 ],
                 exports: 'DiscussionSpecHelper'
             },
@@ -681,6 +671,9 @@
     });
 
     var testFiles = [
+        'discussion/js/spec/discussion_board_factory_spec.js',
+        'discussion/js/spec/discussion_profile_page_factory_spec.js',
+        'discussion/js/spec/views/discussion_user_profile_view_spec.js',
         'lms/js/spec/preview/preview_factory_spec.js',
         'js/spec/api_admin/catalog_preview_spec.js',
         'js/spec/courseware/bookmark_button_view_spec.js',

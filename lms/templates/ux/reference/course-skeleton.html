@@ -64,8 +64,30 @@
         </div>
     </header>
     <div class="page-content">
-        <h3>This is where the page content belongs</h3>
-        <p>Useful stuff goes here</p>
+        <div class="layout layout-1t2t">
+            <aside class="layout-col layout-col-a" role="complementary" aria-label="Navigation">
+                <h3>Sidebar</h3>
+                <ul>
+                    <li>Item one</li>
+                    <li>Item two</li>
+                    <li>Item three</li>
+                </ul>
+            </aside>
+
+            <main id="main" aria-label="Content" tabindex="-1" class="layout-col layout-col-b">
+                <article tabindex="-1" aria-label="Main Content">
+                    <h3>Main content goes here.</h3>
+                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis molestie, orci at viverra ornare,
+                        augue urna fermentum ex, vitae dignissim magna est sit amet diam. Nunc sodales dolor finibus
+                        pulvinar placerat. Suspendisse vitae tellus auctor, sodales erat ac, venenatis quam. Etiam
+                        purus est, consequat nec erat vel, bibendum volutpat ex. Fusce vitae consectetur ante.
+                        Suspendisse elit mauris, iaculis sed diam eu, efficitur tempor dui. Praesent tristique nunc
+                        quam, in tincidunt ligula accumsan et. Etiam augue sem, commodo ac ipsum vel, fringilla dapibus
+                        lacus. Sed facilisis euismod felis, non malesuada massa scelerisque sed. Etiam et placerat
+                        lorem. Nullam quis tincidunt sapien.</p>
+                </article>
+            </main>
+        </div>
     </div>
 </section>
 </%block>

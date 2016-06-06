@@ -24,7 +24,7 @@
   }
 
   .home-title {
-    @extend %t-title5;
+    font-size: $forum-large-font-size;
     color: $black;
     margin-bottom: ($baseline/4);
   }
@@ -58,7 +58,7 @@
         vertical-align: middle;
 
         .count {
-          @extend %t-title4;
+          font-size: $forum-x-large-font-size;
           display: inline-block;
           padding: 0 ($baseline/2);
           vertical-align: middle;
@@ -73,7 +73,7 @@
 
   .home-helpgrid {
     border-bottom: none;
-    border-radius: 3px;
+    border-radius: $forum-border-radius;
     border: 1px solid $forum-color-border;
     box-shadow: 0 1px 3px rgba(0, 0, 0, .15);
   }
@@ -84,11 +84,11 @@
     .row-title {
       padding: ($baseline*1.5) $baseline;
       background-color: #dedede;
-      font-size: 12px;
+      font-size: $forum-small-font-size;
     }
 
     .row-item-full, .row-item {
-      font-size: 12px;
+      font-size: $forum-small-font-size;
       padding: 0 ($baseline/2);
       width: 26%;
       vertical-align: middle;
@@ -118,7 +118,7 @@
         @include margin-right($baseline/2);
         display: inline-block;
         @include padding($baseline/4, 0, $baseline/2, 0);
-        border-radius: 5px;
+        border-radius: $forum-border-radius;
         border: 1px solid gray;
 
         .email-setting {

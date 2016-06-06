@@ -573,11 +573,11 @@ class DiscussionUserProfilePage(CoursePage):
 
     def is_browser_on_page(self):
         return (
-            self.q(css='section.discussion-user-threads[data-course-id="{}"]'.format(self.course_id)).present
+            self.q(css='.discussion-user-threads[data-course-id="{}"]'.format(self.course_id)).present
             and
-            self.q(css='section.user-profile a.learner-profile-link').present
+            self.q(css='.user-profile .learner-profile-link').present
             and
-            self.q(css='section.user-profile a.learner-profile-link').text[0] == self.username
+            self.q(css='.user-profile .learner-profile-link').text[0] == self.username
         )
 
     @wait_for_js
@@ -717,7 +717,7 @@ class DiscussionTabHomePage(CoursePage, DiscussionPageMixin):
         """
         Returns the new post button.
         """
-        elements = self.q(css="ol.course-tabs .new-post-btn")
+        elements = self.q(css=".new-post-btn")
         return elements.first if elements.visible and len(elements) == 1 else None
 
     @property
