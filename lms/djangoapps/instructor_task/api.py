@@ -6,6 +6,7 @@ already been submitted, filtered either by running state or input
 arguments.
 
 """
+from collections import Counter
 import hashlib
 
 from celery.states import READY_STATES
@@ -279,12 +280,18 @@ def submit_bulk_course_email(request, course_key, email_id):
     # We also pull out the targets argument here, so that is displayed in
     # the InstructorTask status.
     email_obj = CourseEmail.objects.get(id=email_id)
-    targets = [target.target_type for target in email_obj.targets.all()]
+    # task_input has a limit to the size it can store, so any target_type with count > 1 is combined and counted
+    targets = Counter([target.target_type for target in email_obj.targets.all()])
+    targets = [
+        target if count <= 1 else
+        "{} {}".format(count, target)
+        for target, count in targets.iteritems()
+    ]
 
     task_type = 'bulk_course_email'
     task_class = send_bulk_course_email
     task_input = {'email_id': email_id, 'to_option': targets}
-    task_key_stub = "{email_id}".format(email_id=email_id)
+    task_key_stub = str(email_id)
     # create the key value by using MD5 hash:
     task_key = hashlib.md5(task_key_stub).hexdigest()
     return submit_task(request, task_type, task_class, course_key, task_input, task_key)

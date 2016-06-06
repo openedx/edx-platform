@@ -20,6 +20,7 @@ class @SendEmail
         # gather elements
         @$emailEditor = XBlock.initializeBlock($('.xblock-studio_view'));
         @$send_to = @$container.find("input[name='send_to']")
+        @$cohort_targets = @$send_to.filter('[value^="cohort:"]')
         @$subject = @$container.find("input[name='subject']")
         @$btn_send = @$container.find("input[name='send']")
         @$task_response = @$container.find(".request-response")
@@ -60,15 +61,19 @@ class @SendEmail
                     alert message
                     return
 
-                target_map = {
-                    "myself": gettext("Yourself"),
-                    "staff": gettext("Everyone who has staff privileges in this course"),
-                    "learners": gettext("All learners who are enrolled in this course"),
-                }
+                display_target = (value) ->
+                    if value == "myself"
+                        gettext("Yourself")
+                    else if value == "staff"
+                        gettext("Everyone who has staff privileges in this course")
+                    else if value == "learners"
+                        gettext("All learners who are enrolled in this course")
+                    else
+                        gettext("All learners in the {cohort_name} cohort").replace('{cohort_name}', value.slice(value.indexOf(':')+1))
                 success_message = gettext("Your email message was successfully queued for sending. In courses with a large number of learners, email messages to learners might take up to an hour to be sent.")
                 confirm_message = gettext("You are sending an email message with the subject {subject} to the following recipients.")
                 for target in targets
-                    confirm_message += "\n-" + target_map[target]
+                    confirm_message += "\n-" + display_target(target)
                 confirm_message += "\n\n" + gettext("Is this OK?")
                 full_confirm_message = confirm_message.replace('{subject}', subject)
 
@@ -126,6 +131,27 @@ class @SendEmail
                         @$content_request_response_error.css({"display":"block"})
                 error: std_ajax_err =>
                     @$content_request_response_error.text gettext("There was an error obtaining email content history for this course.")
+
+        @$send_to.change =>
+            # Ensure invalid combinations are disabled
+            if $('input#target_learners:checked').length
+                # If all is selected, cohorts can't be
+                @$cohort_targets.each ->
+                    this.checked = false
+                    this.disabled = true
+                    true
+            else
+                @$cohort_targets.each ->
+                    this.disabled = false
+                    true
+
+            # Also, keep the sent_to_list div updated
+            targets = []
+            $('input[name="send_to"]:checked+label').each ->
+                # Only use the first line, even if a subheading is present
+                targets.push(this.innerText.replace(/\s*\n.*/g,''))
+            $(".send_to_list").text(gettext("Send to:") + " " + targets.join(", "))
+
 
     fail_with_error: (msg) ->
         console.warn msg
