@@ -1,8 +1,11 @@
 define([
-    'underscore', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'teams/js/models/team',
-    'teams/js/views/team_profile', 'teams/js/spec_helpers/team_spec_helpers',
-    'xmodule_js/common_static/common/js/spec_helpers/discussion_spec_helper'
-], function(_, AjaxHelpers, TeamModel, TeamProfileView, TeamSpecHelpers, DiscussionSpecHelper) {
+    'underscore',
+    'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
+    'common/js/spec_helpers/discussion_spec_helper',
+    'teams/js/spec_helpers/team_spec_helpers',
+    'teams/js/models/team',
+    'teams/js/views/team_profile'
+], function(_, AjaxHelpers, DiscussionSpecHelper, TeamSpecHelpers, TeamModel, TeamProfileView) {
     'use strict';
     describe('TeamProfileView', function() {
         var profileView, createTeamProfileView, createTeamModelData, clickLeaveTeam,
@@ -10,11 +13,11 @@ define([
             leaveTeamLinkSelector = '.leave-team-link',
             DEFAULT_MEMBERSHIP = [
                 {
-                    'user': {
-                        'username': TeamSpecHelpers.testUser,
-                        'profile_image': {
-                            'has_image': true,
-                            'image_url_medium': '/image-url'
+                    user: {
+                        username: TeamSpecHelpers.testUser,
+                        profile_image: {
+                            has_image: true,
+                            image_url_medium: '/image-url'
                         }
                     }
                 }
@@ -198,7 +201,7 @@ define([
                 it('shows correct error messages', function() {
                     var requests = AjaxHelpers.requests(this);
 
-                    var verifyErrorMessage = function(requests, errorMessage, expectedMessage) {
+                    var verifyErrorMessage = function(errorMessage, expectedMessage) {
                         var view = createTeamProfileView(
                             requests, {country: 'US', language: 'en', membership: DEFAULT_MEMBERSHIP}
                         );
@@ -212,22 +215,19 @@ define([
 
                     // verify user_message
                     verifyErrorMessage(
-                        requests,
-                        JSON.stringify({'user_message': "can't remove user from team"}),
+                        JSON.stringify({user_message: "can't remove user from team"}),
                         "can't remove user from team"
                     );
 
                     // verify generic error message
                     verifyErrorMessage(
-                        requests,
                         '',
                         'An error occurred. Try again.'
                     );
 
                     // verify error message when json parsing succeeded but error message format is incorrect
                     verifyErrorMessage(
-                        requests,
-                        JSON.stringify({'blah': "can't remove user from team"}),
+                        JSON.stringify({blah: "can't remove user from team"}),
                         'An error occurred. Try again.'
                     );
                 });

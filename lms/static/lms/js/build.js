@@ -19,6 +19,7 @@
          */
         modules: getModulesList([
             'discussion/js/discussion_board_factory',
+            'discussion/js/discussion_profile_page_factory',
             'js/api_admin/catalog_preview_factory',
             'js/courseware/courseware_factory',
             'js/discovery/discovery_factory',
@@ -77,7 +78,7 @@
             'logger': 'empty:',
             'utility': 'empty:',
             'URI': 'empty:',
-            'DiscussionModuleView': 'empty:',
+            'common/js/discussion/discussion_module_view': 'empty:',
             'modernizr': 'empty',
 
             // Don't bundle UI Toolkit helpers as they are loaded into the "edx" namespace

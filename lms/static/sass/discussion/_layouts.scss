@@ -1,26 +1,26 @@
 // Layouts for discussion pages
 
-section.user-profile {
+.user-profile {
     background-color: $sidebar-color;
 
     .user-profile {
-        padding: 32px 36px;
+        padding: $baseline;
         min-height: 500px;
     }
 
     .sidebar-username {
         font-weight: 700;
-        font-size: 18px;
+        font-size: $forum-large-font-size;
     }
 
     .sidebar-user-roles {
-        margin-top: 6px;
+        margin-top: $baseline/2;
         font-style: italic;
-        font-size: 13px;
+        font-size: $forum-base-font-size;
     }
 
     .sidebar-threads-count {
-        margin-top: 14px;
+        margin-top: $baseline/2;
     }
 
     .sidebar-threads-count span,
@@ -30,11 +30,5 @@ section.user-profile {
 }
 
 .discussion-column {
-    @include float(right);
-    box-sizing: border-box;
-    padding-left: ($baseline/2);
-    width: 68%;
-    max-width: 800px;
     min-height: 500px;
-    border-radius: 3px;
 }
