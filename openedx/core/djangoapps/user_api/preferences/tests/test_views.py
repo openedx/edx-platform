@@ -90,11 +90,12 @@ class TestPreferencesAPI(UserAPITestCase):
         # Create some test preferences values.
         set_user_preference(self.user, "dict_pref", {"int_key": 10})
         set_user_preference(self.user, "string_pref", "value")
+        set_user_preference(self.user, "time_zone", "Africa/Juba")
 
         # Log in the client and do the GET.
         client = self.login_client(api_client, user)
         response = self.send_get(client)
-        self.assertEqual({"dict_pref": "{'int_key': 10}", "string_pref": "value"}, response.data)
+        self.assertEqual({"dict_pref": "{'int_key': 10}", "string_pref": "value", "time_zone": "Africa/Juba"}, response.data)
 
     @ddt.data(
         ("client", "user"),
@@ -178,6 +179,7 @@ class TestPreferencesAPI(UserAPITestCase):
         set_user_preference(self.user, "dict_pref", {"int_key": 10})
         set_user_preference(self.user, "string_pref", "value")
         set_user_preference(self.user, "extra_pref", "extra_value")
+        set_user_preference(self.user, "time_zone", "Asia/Macau")
 
         # Send the patch request
         self.client.login(username=self.user.username, password=self.test_password)
@@ -187,6 +189,7 @@ class TestPreferencesAPI(UserAPITestCase):
                 "string_pref": "updated_value",
                 "new_pref": "new_value",
                 "extra_pref": None,
+                "time_zone": "Europe/London",
             },
             expected_status=204
         )
@@ -197,6 +200,7 @@ class TestPreferencesAPI(UserAPITestCase):
             "dict_pref": "{'int_key': 10}",
             "string_pref": "updated_value",
             "new_pref": "new_value",
+            "time_zone": "Europe/London",
         }
         self.assertEqual(expected_preferences, response.data)
 

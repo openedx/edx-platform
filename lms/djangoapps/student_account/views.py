@@ -40,6 +40,7 @@ from openedx.core.djangoapps.theming.helpers import is_request_in_themed_site, g
 from openedx.core.djangoapps.user_api.accounts.api import request_password_change
 from openedx.core.djangoapps.user_api.errors import UserNotFound
 
+from pytz import  common_timezones
 
 AUDIT_LOG = logging.getLogger("audit")
 
@@ -388,6 +389,8 @@ def account_settings_context(request):
                 'options': year_of_birth_options,
             }, 'preferred_language': {
                 'options': all_languages(),
+            }, 'time_zone': {
+                'options': [(tz, tz) for tz in common_timezones]
             }
         },
         'platform_name': get_themed_value('PLATFORM_NAME', settings.PLATFORM_NAME),
