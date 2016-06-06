@@ -13,6 +13,7 @@ class MicrositeContextProcessorTests(TestCase):
     """ Tests for the microsite context processor. """
 
     def setUp(self):
+        super(MicrositeContextProcessorTests, self).setUp()
         request = RequestFactory().get('/')
         self.context = microsite_context(request)
 

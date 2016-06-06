@@ -1,0 +1,23 @@
+{% extends "main_django.html" %}
+{% load i18n staticfiles %}
+
+{% block title %}{% trans "Signed Out" %} | {{ block.super }}{% endblock %}
+
+{% block body %}
+    <h1>{% trans "You have signed out." %}</h1>
+
+    <p style="text-align: center; margin-bottom: 20px;">
+        {% blocktrans %}
+          If you are not redirected within 5 seconds, <a href="{{ target }}">click here to go to the home page</a>.
+        {% endblocktrans %}
+    </p>
+
+    <div id="iframeContainer" style="visibility: hidden" data-redirect-url="{{ target }}">
+        {% for uri in logout_uris %}
+            <iframe src="{{ uri }}"></iframe>
+        {% endfor %}
+    </div>
+
+    <script type="text/javascript" src="{% static 'js/jquery.allLoaded.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/logout.js' %}"></script>
+{% endblock body %}

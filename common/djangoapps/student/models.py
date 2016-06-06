@@ -2198,3 +2198,11 @@ class UserAttribute(TimeStampedModel):
             return cls.objects.get(user=user, name=name).value
         except cls.DoesNotExist:
             return None
+
+
+class LogoutViewConfiguration(ConfigurationModel):
+    """ Configuration for the logout view. """
+
+    def __unicode__(self):
+        """Unicode representation of the instance. """
+        return u'Logout view configuration: {enabled}'.format(enabled=self.enabled)
