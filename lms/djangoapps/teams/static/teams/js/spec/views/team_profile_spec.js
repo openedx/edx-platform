@@ -1,8 +1,11 @@
 define([
-    'underscore', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'teams/js/models/team',
-    'teams/js/views/team_profile', 'teams/js/spec_helpers/team_spec_helpers',
-    'xmodule_js/common_static/common/js/spec_helpers/discussion_spec_helper'
-], function (_, AjaxHelpers, TeamModel, TeamProfileView, TeamSpecHelpers, DiscussionSpecHelper) {
+    'underscore',
+    'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
+    'common/js/spec_helpers/discussion_spec_helper',
+    'teams/js/spec_helpers/team_spec_helpers',
+    'teams/js/models/team',
+    'teams/js/views/team_profile'
+], function (_, AjaxHelpers, DiscussionSpecHelper, TeamSpecHelpers, TeamModel, TeamProfileView) {
     'use strict';
     describe('TeamProfileView', function () {
         var profileView, createTeamProfileView, createTeamModelData, clickLeaveTeam,
@@ -216,7 +219,7 @@ define([
                     // verify user_message
                     verifyErrorMessage(
                         requests,
-                        JSON.stringify({'user_message': "can't remove user from team"}),
+                        JSON.stringify({user_message: "can't remove user from team"}),
                         "can't remove user from team"
                     );
 
