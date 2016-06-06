@@ -778,7 +778,7 @@ class LearnerProfileA11yTest(LearnerProfileTestMixin, WebAppTest):
 
         profile_page.a11y_audit.config.set_rules({
             "ignore": [
-                'skip-link',  # TODO: AC-179
+                'section',  # TODO: wcag2aa
                 'link-href',  # TODO: AC-231
             ],
         })
@@ -806,6 +806,7 @@ class LearnerProfileA11yTest(LearnerProfileTestMixin, WebAppTest):
 
         profile_page.a11y_audit.config.set_rules({
             "ignore": [
+                'section',  # TODO: wcag2aa
                 'link-href',  # TODO: AC-231
             ],
         })
@@ -822,7 +823,7 @@ class LearnerProfileA11yTest(LearnerProfileTestMixin, WebAppTest):
 
         profile_page.a11y_audit.config.set_rules({
             "ignore": [
-                'skip-link',  # TODO: AC-179
+                'section',  # TODO: wcag2aa
                 'link-href',  # TODO: AC-231
             ],
         })
