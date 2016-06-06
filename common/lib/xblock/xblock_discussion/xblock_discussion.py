@@ -13,7 +13,7 @@ from xblock.fields import Scope, String, UNIQUE_ID
 from xblock.fragment import Fragment
 
 log = logging.getLogger(__name__)
-LOADER = ResourceLoader(__name__)
+loader = ResourceLoader(__name__)  # pylint: disable=invalid-name
 
 
 @XBlock.needs('user')
@@ -88,7 +88,7 @@ class DiscussionXBlock(XBlock, StudioEditableXBlockMixin):
         }
 
         fragment.add_content(self.runtime.render_template('discussion/_discussion_inline.html', context))
-        fragment.add_javascript(LOADER.render_template('static/discussion_inline.js', {'course_id': self.course_key}))
+        fragment.add_javascript(loader.render_template('static/discussion_inline.js', {'course_id': self.course_key}))
 
         fragment.initialize_js('DiscussionInlineBlock')
 
