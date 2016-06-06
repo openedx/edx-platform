@@ -172,7 +172,7 @@ def verify_setting_entry(setting, display_name, value, explicitly_set):
     """
     label_element = setting.find_by_css('.setting-label')[0]
     assert_equal(display_name, label_element.html.strip())
-    label_for = label_element._element.get_attribute('for')
+    label_for = label_element['for']
 
     # Check if the web object is a list type
     # If so, we use a slightly different mechanism for determining its value
