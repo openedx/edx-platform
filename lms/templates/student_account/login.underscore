@@ -3,7 +3,7 @@
         <p class="message-copy">
            <%- _.sprintf( gettext("The %(currentProvider)s account you used is not associated to any %(platformName)s account."), context ) %>
            <a href="/reload_login"><%- _.sprintf( gettext("Try again")) %></a>
-           <%- _.sprintf( gettext("with another %(currentProvider)s account or another social login button."), context ) %>))
+           <%- _.sprintf( gettext("with another %(currentProvider)s account or another social login button."), context ) %>
         </p>
         <p class="message-copy">
            <%- _.sprintf( gettext("If the above does not work, and this is your first time logging in to this new system, access your account"), context) %>
