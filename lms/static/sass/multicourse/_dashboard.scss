@@ -39,7 +39,7 @@
         }
         a {
           @include font-size(16);
-          @include line-height(1.2);
+          @include line-height(17);
           padding: $baseline * 0.5;
           border: 1px solid $blue;
           color: $blue;
@@ -281,6 +281,7 @@
   .my-courses {
     @include float(left);
     margin: 0;
+    margin-bottom: $baseline * 2;
     width: flex-grid(9);
 
 
