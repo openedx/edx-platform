@@ -747,10 +747,17 @@ def _progress(request, course_key, student_id):
         'passed': is_course_passed(course, grade_summary),
         'show_generate_cert_btn': show_generate_cert_btn,
         'credit_course_requirements': _credit_course_requirements(course_key, student),
-        'missing_required_verification': missing_required_verification
+        'missing_required_verification': missing_required_verification,
+        'certificate_invalidated': False,
     }
 
     if show_generate_cert_btn:
+        # If current certificate is invalidated by instructor
+        # then don't show the generate button.
+        context.update({
+            'certificate_invalidated': certs_api.is_certificate_invalid(student, course_key)
+        })
+
         cert_status = certs_api.certificate_downloadable_status(student, course_key)
         context.update(cert_status)
         # showing the certificate web view button if feature flags are enabled.
