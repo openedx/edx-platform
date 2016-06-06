@@ -44,13 +44,17 @@ class StaticContent(object):
         return self.location.category == 'thumbnail'
 
     @staticmethod
-    def generate_thumbnail_name(original_name, dimensions=None):
+    def generate_thumbnail_name(original_name, dimensions=None, extension=None):
         """
         - original_name: Name of the asset (typically its location.name)
         - dimensions: `None` or a tuple of (width, height) in pixels
+        - extension: `None` or desired filename extension of the thumbnail
         """
+        if extension is None:
+            extension = XASSET_THUMBNAIL_TAIL_NAME
+
         name_root, ext = os.path.splitext(original_name)
-        if not ext == XASSET_THUMBNAIL_TAIL_NAME:
+        if not ext == extension:
             name_root = name_root + ext.replace(u'.', u'-')
 
         if dimensions:
@@ -59,7 +63,7 @@ class StaticContent(object):
 
         return u"{name_root}{extension}".format(
             name_root=name_root,
-            extension=XASSET_THUMBNAIL_TAIL_NAME,
+            extension=extension,
         )
 
     @staticmethod
@@ -330,9 +334,10 @@ class ContentStore(object):
         pixels. It defaults to None.
         """
         thumbnail_content = None
+        is_svg = content.content_type == 'image/svg+xml'
         # use a naming convention to associate originals with the thumbnail
         thumbnail_name = StaticContent.generate_thumbnail_name(
-            content.location.name, dimensions=dimensions
+            content.location.name, dimensions=dimensions, extension='.svg' if is_svg else None
         )
         thumbnail_file_location = StaticContent.compute_location(
             content.location.course_key, thumbnail_name, is_thumbnail=True
@@ -340,28 +345,42 @@ class ContentStore(object):
 
         # if we're uploading an image, then let's generate a thumbnail so that we can
         # serve it up when needed without having to rescale on the fly
-        if content.content_type is not None and content.content_type.split('/')[0] == 'image':
-            try:
+        try:
+            if is_svg:
+                # for svg simply store the provided svg file, since vector graphics should be good enough
+                # for downscaling client-side
+                if tempfile_path is None:
+                    thumbnail_file = StringIO.StringIO(content.data)
+                else:
+                    with open(tempfile_path) as f:
+                        thumbnail_file = StringIO.StringIO(f.read())
+                thumbnail_content = StaticContent(thumbnail_file_location, thumbnail_name,
+                                                  'image/svg+xml', thumbnail_file)
+                self.save(thumbnail_content)
+            elif content.content_type is not None and content.content_type.split('/')[0] == 'image':
                 # use PIL to do the thumbnail generation (http://www.pythonware.com/products/pil/)
                 # My understanding is that PIL will maintain aspect ratios while restricting
                 # the max-height/width to be whatever you pass in as 'size'
                 # @todo: move the thumbnail size to a configuration setting?!?
                 if tempfile_path is None:
-                    im = Image.open(StringIO.StringIO(content.data))
+                    source = StringIO.StringIO(content.data)
                 else:
-                    im = Image.open(tempfile_path)
+                    source = tempfile_path
 
-                # I've seen some exceptions from the PIL library when trying to save palletted
-                # PNG files to JPEG. Per the google-universe, they suggest converting to RGB first.
-                im = im.convert('RGB')
-
-                if not dimensions:
-                    dimensions = (128, 128)
-
-                im.thumbnail(dimensions, Image.ANTIALIAS)
+                # We use the context manager here to avoid leaking the inner file descriptor
+                # of the Image object -- this way it gets closed after we're done with using it.
                 thumbnail_file = StringIO.StringIO()
-                im.save(thumbnail_file, 'JPEG')
-                thumbnail_file.seek(0)
+                with Image.open(source) as image:
+                    # I've seen some exceptions from the PIL library when trying to save palletted
+                    # PNG files to JPEG. Per the google-universe, they suggest converting to RGB first.
+                    thumbnail_image = image.convert('RGB')
+
+                    if not dimensions:
+                        dimensions = (128, 128)
+
+                    thumbnail_image.thumbnail(dimensions, Image.ANTIALIAS)
+                    thumbnail_image.save(thumbnail_file, 'JPEG')
+                    thumbnail_file.seek(0)
 
                 # store this thumbnail as any other piece of content
                 thumbnail_content = StaticContent(thumbnail_file_location, thumbnail_name,
@@ -369,9 +388,11 @@ class ContentStore(object):
 
                 self.save(thumbnail_content)
 
-            except Exception, e:
-                # log and continue as thumbnails are generally considered as optional
-                logging.exception(u"Failed to generate thumbnail for {0}. Exception: {1}".format(content.location, str(e)))
+        except Exception, exc:  # pylint: disable=broad-except
+            # log and continue as thumbnails are generally considered as optional
+            logging.exception(
+                u"Failed to generate thumbnail for {0}. Exception: {1}".format(content.location, str(exc))
+            )
 
         return thumbnail_content, thumbnail_file_location
 
