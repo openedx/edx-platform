@@ -40,7 +40,7 @@ from openedx.core.djangoapps.theming.helpers import is_request_in_themed_site, g
 from openedx.core.djangoapps.user_api.accounts.api import request_password_change
 from openedx.core.djangoapps.user_api.errors import UserNotFound
 
-from pytz import  common_timezones
+from pytz import common_timezones
 
 AUDIT_LOG = logging.getLogger("audit")
 

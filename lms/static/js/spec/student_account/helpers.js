@@ -22,7 +22,6 @@ define(['underscore'], function(_) {
         year_of_birth: '3',    // Note: test birth year range is a string from 0-3
         requires_parental_consent: false,
         country: '1',
-        time_zone: null,
         language: null,
         bio: "About the student",
         language_proficiencies: [{code: '1'}],
@@ -35,7 +34,8 @@ define(['underscore'], function(_) {
     };
 
     var DEFAULT_USER_PREFERENCES_DATA = {
-        'pref-lang': '2'
+        'pref-lang': '2',
+        'time_zone': 'US/Alaska'
     };
 
     var createUserPreferencesData = function(options) {
