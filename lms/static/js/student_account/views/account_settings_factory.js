@@ -117,8 +117,9 @@
                                 title: gettext('Time Zone'),
                                 valueAttribute: 'time_zone',
                                 helpMessage: gettext(
-                                    'The time zone you currently reside in. ' +
-                                    'This is used to calculate course start/end times.'
+                                    'Select the time zone for displaying course dates. If you do not specify a ' +
+                                    'time zone here, course dates, including assignment deadlines, are displayed in ' +
+                                    'Coordinated Universal Time (UTC).'
                                 ),
                                 options: fieldsData.time_zone.options,
                                 persistChanges: true
