@@ -2501,6 +2501,7 @@ def details_reset_confirm(request):
 
     if request.method == 'POST':
         form = DetailsResetFormNoActive(request.POST)
+        platform_name = microsite.get_value('platform_name', settings.PLATFORM_NAME)
         if form.is_valid():
             form.save(use_https=request.is_secure(),
                   from_email=microsite.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL),
@@ -2508,13 +2509,13 @@ def details_reset_confirm(request):
                   domain_override=request.get_host())
 
             context = {
-                'platform_name': microsite.get_value('platform_name', settings.PLATFORM_NAME),
+                'platform_name': platform_name,
                 'contact_email': microsite.get_value('contact_email', settings.CONTACT_EMAIL)
             }
             return TemplateResponse(request, 'registration/details_reset_done.html', context)
         else:
             err_msg = "No user with the provided email address exists"
-            context = {'err_msg': err_msg}
+            context = {'err_msg': err_msg, 'platform_name': platform_name}
             return TemplateResponse(request, 'registration/details_reset.html', context)
 
     return TemplateResponse(request, 'registration/details_reset.html', context)
