@@ -21,7 +21,8 @@ from sailthru.sailthru_error import SailthruClientError
 log = logging.getLogger(__name__)
 
 
-def update_email_marketing_config(enabled=False, key='badkey', secret='badsecret', new_user_list='new list'):
+def update_email_marketing_config(enabled=False, key='badkey', secret='badsecret', new_user_list='new list',
+                                  template='Activation'):
     """
     Enable / Disable Sailthru integration
     """
@@ -29,7 +30,8 @@ def update_email_marketing_config(enabled=False, key='badkey', secret='badsecret
         enabled=enabled,
         sailthru_key=key,
         sailthru_secret=secret,
-        sailthru_new_user_list=new_user_list
+        sailthru_new_user_list=new_user_list,
+        sailthru_activation_template=template
     )
 
 
@@ -59,17 +61,17 @@ class EmailMarketingTests(TestCase):
         is_not_enabled = EmailMarketingConfiguration.current().enabled
         self.assertFalse(is_not_enabled)
 
+    @patch('email_marketing.tasks.log.error')
     @patch('email_marketing.tasks.SailthruClient.api_post')
-    @patch('email_marketing.tasks.User.objects.get')
-    @patch('email_marketing.tasks.UserProfile.objects.get')
-    def test_add_user(self, mock_profile_get, mock_user_get, mock_sailthru):
+    @patch('email_marketing.tasks.getUserAndProfile')
+    def test_add_user(self, mock_user_get, mock_sailthru, mock_log_error):
         """
         test async method in tasks that actually updates Sailthru
         """
         mock_user_get.return_value = self.user
-        mock_profile_get.return_value = self.profile
         mock_sailthru.return_value = SailthruResponse(JsonResponse({'ok': True}))
         update_user.delay(self.user.username, new_user=True)
+        self.assertFalse(mock_log_error.called)
         self.assertEquals(mock_sailthru.call_args[0][0], "user")
         userparms = mock_sailthru.call_args[0][1]
         self.assertEquals(userparms['key'], "email")
@@ -79,23 +81,36 @@ class EmailMarketingTests(TestCase):
         self.assertEquals(userparms['vars']['activated'], 1)
         self.assertEquals(userparms['lists']['new list'], 1)
 
+    @patch('email_marketing.tasks.SailthruClient.api_post')
+    @patch('email_marketing.tasks.getUserAndProfile')
+    def test_activation(self, mock_user_get, mock_sailthru):
+        """
+        test send of activation template
+        """
+        mock_user_get.return_value = self.user
+        mock_sailthru.return_value = SailthruResponse(JsonResponse({'ok': True}))
+        update_user.delay(self.user.username, new_user=True, activation=True)
+        # look for call args for 2nd call
+        self.assertEquals(mock_sailthru.call_args[0][0], "send")
+        userparms = mock_sailthru.call_args[0][1]
+        self.assertEquals(userparms['email'], "test@edx.org")
+        self.assertEquals(userparms['template'], "Activation")
+
     @patch('email_marketing.tasks.log.error')
     @patch('email_marketing.tasks.SailthruClient.api_post')
-    @patch('email_marketing.tasks.User.objects.get')
-    @patch('email_marketing.tasks.UserProfile.objects.get')
-    def test_error_logging(self, mock_profile_get, mock_user_get, mock_sailthru, mock_log_error):
+    @patch('email_marketing.tasks.getUserAndProfile')
+    def test_error_logging(self, mock_user_get, mock_sailthru, mock_log_error):
         """
         Ensure that error returned from Sailthru api is logged
         """
         mock_user_get.return_value = self.user
-        mock_profile_get.return_value = self.profile
         mock_sailthru.return_value = SailthruResponse(JsonResponse({'error': 100, 'errormsg': 'Got an error'}))
         update_user.delay(self.user.username)
         self.assertTrue(mock_log_error.called)
 
     @patch('email_marketing.tasks.SailthruClient.api_post')
     @patch('email_marketing.tasks.User.objects.get')
-    def test_add_user(self, mock_user_get, mock_sailthru):
+    def test_change_email(self, mock_user_get, mock_sailthru):
         """
         test async method in tasks that changes email in Sailthru
         """
@@ -112,7 +127,7 @@ class EmailMarketingTests(TestCase):
     @patch('email_marketing.tasks.log.error')
     @patch('email_marketing.tasks.SailthruClient.api_post')
     @patch('email_marketing.tasks.User.objects.get')
-    def test_error_logging(self, mock_user_get, mock_sailthru, mock_log_error):
+    def test_error_logging1(self, mock_user_get, mock_sailthru, mock_log_error):
         """
         Ensure that error returned from Sailthru api is logged
         """
@@ -121,7 +136,7 @@ class EmailMarketingTests(TestCase):
         update_user_email.delay(self.user.username, "newemail2@test.com")
         self.assertTrue(mock_log_error.called)
 
-    @patch('email_marketing.tasks.update_user.delay')
+    @patch('lms.djangoapps.email_marketing.tasks.update_user.delay')
     def test_modify_field1(self, mock_update_user):
         """
         try updating user field
@@ -130,7 +145,7 @@ class EmailMarketingTests(TestCase):
         self.assertTrue(mock_update_user.called)
 
     @patch('lms.djangoapps.email_marketing.tasks.update_user.delay')
-    def test_modify_field1(self, mock_update_user):
+    def test_modify_field2(self, mock_update_user):
         """
         try updating user field
         """
@@ -138,7 +153,7 @@ class EmailMarketingTests(TestCase):
         self.assertTrue(mock_update_user.called)
 
     @patch('lms.djangoapps.email_marketing.tasks.update_user.delay')
-    def test_modify_field2(self, mock_update_user):
+    def test_modify_field3(self, mock_update_user):
         """
         try updating profile field
         """
@@ -146,7 +161,7 @@ class EmailMarketingTests(TestCase):
         self.assertTrue(mock_update_user.called)
 
     @patch('lms.djangoapps.email_marketing.tasks.update_user.delay')
-    def test_modify_field3(self, mock_update_user):
+    def test_modify_field4(self, mock_update_user):
         """
         try updating unsupported field
         """

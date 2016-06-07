@@ -33,9 +33,9 @@ def update_user(self, username, new_user=False, activation=False):
         return
 
     # get user
-    user = User.objects.select_related('profile').get(username=username)
+    user = getUserAndProfile(username)
     if not user:
-        log.error("User not found duing Sailthru update %s", username)
+        log.error("User not found during Sailthru update %s", username)
         return
 
     # ignore anonymous users
@@ -45,7 +45,7 @@ def update_user(self, username, new_user=False, activation=False):
     # get profile
     profile = user.profile
     if not profile:
-        log.error("User profile not found duing Sailthru update %s", username)
+        log.error("User profile not found during Sailthru update %s", username)
         return
 
     sailthru_client = SailthruClient(email_config.sailthru_key, email_config.sailthru_secret)
@@ -79,10 +79,9 @@ def update_user(self, username, new_user=False, activation=False):
 
         if not sailthru_response.is_ok():
             error = sailthru_response.get_error()
-            # put out error and schedule retry
+            # probably an invalid template name, just put out error
             log.error("Error attempting to send welcome email to user in Sailthru: %s", error.get_message())
-            raise self.retry(countdown=email_config.sailthru_retry_interval,
-                             max_retries=email_config.sailthru_max_retries)
+
 
 # pylint: disable=not-callable
 @task(bind=True, default_retry_delay=3600, max_retries=24)
@@ -150,10 +149,15 @@ def _create_sailthru_user_parm(user, profile, new_user, email_config):
         #sailthru_vars['age'] = profile.age or -1
         if profile.year_of_birth:
             sailthru_vars['year_of_birth'] = profile.year_of_birth
-        sailthru_vars['country'] = unicode(profile.country.name)
+        sailthru_vars['country'] = unicode(profile.country.code)
 
     # if new user add to list
     if new_user and email_config.sailthru_new_user_list:
-        sailthru_user['lists'] = {"All edX Users": 1}
+        sailthru_user['lists'] = {email_config.sailthru_new_user_list: 1}
 
     return sailthru_user
+
+
+def getUserAndProfile(username):
+    # fetch a user + profile efficiently
+    return User.objects.select_related('profile').get(username=username)

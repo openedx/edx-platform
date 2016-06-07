@@ -89,8 +89,9 @@ def email_marketing_user_field_changed(sender, user=None, table=None, setting=No
 
     # ignore anything not in list of fields to handle
     if setting in CHANGED_FIELDNAMES:
-        # perform update asynchronously
-        update_user.delay(user.username, new_user=False)
+        # perform update asynchronously, flag if activation
+        update_user.delay(user.username, new_user=False,
+                          activation=(setting == 'is_active') and new_value is True)
 
     elif setting == 'email':
         # email update is special case
