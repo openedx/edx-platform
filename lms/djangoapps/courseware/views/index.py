@@ -97,7 +97,7 @@ class CoursewareIndex(View):
 
         try:
             self._init_new_relic()
-            self._verify_position()
+            self._clean_position()
             with modulestore().bulk_operations(self.course_key):
                 self.course = get_course_with_access(request.user, 'load', self.course_key, depth=CONTENT_DEPTH)
                 self.is_staff = has_access(request.user, 'staff', self.course)
@@ -177,13 +177,13 @@ class CoursewareIndex(View):
         newrelic.agent.add_custom_parameter('course_id', unicode(self.course_key))
         newrelic.agent.add_custom_parameter('org', unicode(self.course_key.org))
 
-    def _verify_position(self):
+    def _clean_position(self):
         """
-        Verify that the given position is in fact an int.
+        Verify that the given position is an integer. If it is not positive, set it to 1.
         """
         if self.position is not None:
             try:
-                int(self.position)
+                self.position = max(int(self.position), 1)
             except ValueError:
                 raise Http404(u"Position {} is not an integer!".format(self.position))
 

@@ -280,7 +280,7 @@ class UserProfile(models.Model):
     goals = models.TextField(blank=True, null=True)
     allow_certificate = models.BooleanField(default=1)
     bio = models.CharField(blank=True, null=True, max_length=3000, db_index=False)
-    profile_image_uploaded_at = models.DateTimeField(null=True)
+    profile_image_uploaded_at = models.DateTimeField(null=True, blank=True)
 
     @property
     def has_profile_image(self):
@@ -2164,10 +2164,10 @@ class UserAttribute(TimeStampedModel):
 
     class Meta(object):
         # Ensure that at most one value exists for a given user/name.
-        unique_together = (('user', 'name'))
+        unique_together = (('user', 'name',), )
 
     user = models.ForeignKey(User, related_name='attributes')
-    name = models.CharField(max_length=255, help_text=_("Name of this user attribute."))
+    name = models.CharField(max_length=255, help_text=_("Name of this user attribute."), db_index=True)
     value = models.CharField(max_length=255, help_text=_("Value of this user attribute."))
 
     def __unicode__(self):

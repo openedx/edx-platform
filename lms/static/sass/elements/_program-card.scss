@@ -10,7 +10,7 @@
   @include span(12);  
   border: 1px solid $border-color-l3;
   border-bottom: none;
-  margin-bottom: $baseline + px;
+  margin-bottom: $baseline;
   position: relative;
 
   @include susy-media($bp-screen-md) {
@@ -58,7 +58,7 @@
   }
 
   .text-section{
-    padding: 40px $baseline + px $baseline + px;
+    padding: 40px $baseline $baseline;
     position: relative;
     margin-top: 156px;
 
@@ -71,7 +71,7 @@
     font-size: font-size(x-small);
     color: palette(grayscale, dark);
     position: absolute;
-    top: $baseline + px;
+    top: $baseline;
     width: calc(100% - 40px);
   }
 
@@ -91,18 +91,18 @@
 
     .xseries-icon{
       @include float(right);
-      @include margin-right($baseline*0.25 + px);
+      @include margin-right($baseline*0.25);
       background: url('#{$static-path}/images/icon-sm-xseries-black.png') no-repeat;
       background-color: transparent;
       background-size: 100%;
-      width: ($baseline*0.7 + px);
-      height: ($baseline*0.7 + px);
+      width: ($baseline*0.7);
+      height: ($baseline*0.7);
     }
   }
   
   .hd-3 {
     color: palette(grayscale, x-dark);
-    min-height: ($baseline*3) + px;
+    min-height: ($baseline*3);
     line-height: 1;
   }
 

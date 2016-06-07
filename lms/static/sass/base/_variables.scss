@@ -138,7 +138,7 @@ $yellow-u1: desaturate($yellow,15%);
 $yellow-u2: desaturate($yellow,30%);
 $yellow-u3: desaturate($yellow,45%);
 
-$blue: rgb(0, 120, 176);
+$blue: rgb(0, 121, 188);
 $blue-l1: tint($blue,20%);
 $blue-l2: tint($blue,40%);
 $blue-l3: tint($blue,60%);
@@ -489,7 +489,6 @@ $dashboard-course-cover-border: rgb(221, 221, 221) !default;
 // course elements
 $content-wrapper-bg: $white !default;
 $course-bg-color: #f2f2f2 !default;
-$course-bg-image: url('#{$static-path}/images/bg-texture.png') !default;
 $account-content-wrapper-bg: shade($body-bg, 2%) !default;
 $course-profile-bg: rgb(245,245,245) !default;
 $course-header-bg: rgba(255,255,255, 0.93) !default;

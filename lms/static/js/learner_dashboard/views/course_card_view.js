@@ -6,6 +6,7 @@
             'underscore',
             'gettext',
             'edx-ui-toolkit/js/utils/html-utils',
+            'js/learner_dashboard/views/course_enroll_view',
             'text!../../../templates/learner_dashboard/course_card.underscore'
            ],
          function(
@@ -14,6 +15,7 @@
              _,
              gettext,
              HtmlUtils,
+             CourseEnrollView,
              pageTpl
          ) {
             return Backbone.View.extend({
@@ -28,6 +30,15 @@
                 render: function() {
                     var filledTemplate = this.tpl(this.model.toJSON());
                     HtmlUtils.setHtml(this.$el, filledTemplate);
+                    this.postRender();
+                },
+
+                postRender: function(){
+                    this.enrollView = new CourseEnrollView({
+                        $el: this.$('.course-actions'),
+                        model: this.model,
+                        context: this.context
+                    });
                 }
             });
         }

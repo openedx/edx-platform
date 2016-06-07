@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-05-26 15:51+0000\n"
-"PO-Revision-Date: 2016-05-26 15:52:24.512215\n"
+"POT-Creation-Date: 2016-06-02 14:33+0000\n"
+"PO-Revision-Date: 2016-06-02 14:34:15.467005\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -196,8 +196,10 @@ msgstr "شيدشرذثي"
 #. browser when a user needs to edit HTML
 #: cms/static/js/views/modals/edit_xblock.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/coffee/src/discussion/utils.js
 #: common/static/common/templates/image-modal.underscore
 #: common/static/common/templates/discussion/forum-action-close.underscore
+#: common/static/common/templates/discussion/search-alert.underscore
 #: lms/templates/student_profile/share_modal.underscore
 msgid "Close"
 msgstr "ذمخسث"
@@ -1762,10 +1764,6 @@ msgstr ""
 msgid "Adjust video speed"
 msgstr "شيتعسف دهيثخ سحثثي"
 
-#: common/lib/xmodule/xmodule/js/src/video/08_video_speed_control.js
-msgid "Video speed: "
-msgstr "دهيثخ سحثثي: "
-
 #: common/lib/xmodule/xmodule/js/src/video/09_play_skip_control.js
 msgid "Skip"
 msgstr "سنهح"
@@ -2112,12 +2110,12 @@ msgstr ""
 "هسسعث حثقسهسفس, ذمهذن فاث اثمح فشز فخ قثحخقف فاث حقخزمثو."
 
 #: common/static/common/js/components/views/paging_header.js
-msgid "Showing %(first_index)s out of %(num_items)s total"
-msgstr "ساخصهرل %(first_index)s خعف خب %(num_items)s فخفشم"
+msgid "Showing {firstIndex} out of {numItems} total"
+msgstr "ساخصهرل {firstIndex} خعف خب {numItems} فخفشم"
 
 #: common/static/common/js/components/views/paging_header.js
-msgid "Showing %(first_index)s-%(last_index)s out of %(num_items)s total"
-msgstr "ساخصهرل %(first_index)s-%(last_index)s خعف خب %(num_items)s فخفشم"
+msgid "Showing {firstIndex}-{lastIndex} out of {numItems} total"
+msgstr "ساخصهرل {firstIndex}-{lastIndex} خعف خب {numItems} فخفشم"
 
 #: common/static/common/js/utils/edx.utils.validate.js
 msgid "The email address you've provided isn't formatted correctly."
@@ -2639,8 +2637,8 @@ msgstr "وغ فثشو"
 #. a
 #. screenreader, and "Browse" otherwise.
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
-msgid "Browse %(sr_start)s teams %(sr_end)s"
-msgstr "زقخصسث %(sr_start)s فثشوس %(sr_end)s"
+msgid "Browse {sr_start} teams {sr_end}"
+msgstr "زقخصسث {sr_start} فثشوس {sr_end}"
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "Your request could not be completed. Reload the page and try again."
@@ -2657,8 +2655,8 @@ msgid "Team Search"
 msgstr "فثشو سثشقذا"
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
-msgid "Showing results for \"%(searchString)s\""
-msgstr "ساخصهرل قثسعمفس بخق \"%(searchString)s\""
+msgid "Showing results for \"{searchString}\""
+msgstr "ساخصهرل قثسعمفس بخق \"{searchString}\""
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "Create a New Team"
@@ -2706,16 +2704,16 @@ msgid "All Topics"
 msgstr "شمم فخحهذس"
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
-msgid "The page \"%(route)s\" could not be found."
-msgstr "فاث حشلث \"%(route)s\" ذخعمي رخف زث بخعري."
+msgid "The page \"{route}\" could not be found."
+msgstr "فاث حشلث \"{route}\" ذخعمي رخف زث بخعري."
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
-msgid "The topic \"%(topic)s\" could not be found."
-msgstr "فاث فخحهذ \"%(topic)s\" ذخعمي رخف زث بخعري."
+msgid "The topic \"{topic}\" could not be found."
+msgstr "فاث فخحهذ \"{topic}\" ذخعمي رخف زث بخعري."
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
-msgid "The team \"%(team)s\" could not be found."
-msgstr "فاث فثشو \"%(team)s\" ذخعمي رخف زث بخعري."
+msgid "The team \"{team}\" could not be found."
+msgstr "فاث فثشو \"{team}\" ذخعمي رخف زث بخعري."
 
 #: lms/djangoapps/teams/static/teams/js/views/topic_card.js
 msgid "%(team_count)s Team"
@@ -3007,50 +3005,50 @@ msgid "Your message cannot be blank."
 msgstr "غخعق وثسسشلث ذشررخف زث زمشرن."
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
-msgid ""
-"There are invalid keywords in your email. Please check the following "
-"keywords and try again:"
-msgstr ""
-"فاثقث شقث هردشمهي نثغصخقيس هر غخعق ثوشهم. حمثشسث ذاثذن فاث بخممخصهرل "
-"نثغصخقيس شري فقغ شلشهر:"
-
-#: lms/static/coffee/src/instructor_dashboard/send_email.js
-msgid "Your email was successfully queued for sending."
-msgstr "غخعق ثوشهم صشس سعذذثسسبعممغ ضعثعثي بخق سثريهرل."
+msgid "Your message must have at least one target."
+msgstr "غخعق وثسسشلث وعسف اشدث شف مثشسف خرث فشقلثف."
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
 msgid ""
-"You are about to send an email titled '<%= subject %>' to yourself. Is this "
-"OK?"
+"There are invalid keywords in your email. Check the following keywords and "
+"try again."
 msgstr ""
-"غخع شقث شزخعف فخ سثري شر ثوشهم فهفمثي '<%= subject %>' فخ غخعقسثمب. هس فاهس "
-"خن?"
+"فاثقث شقث هردشمهي نثغصخقيس هر غخعق ثوشهم. ذاثذن فاث بخممخصهرل نثغصخقيس شري "
+"فقغ شلشهر."
+
+#: lms/static/coffee/src/instructor_dashboard/send_email.js
+msgid "Yourself"
+msgstr "غخعقسثمب"
+
+#: lms/static/coffee/src/instructor_dashboard/send_email.js
+msgid "Everyone who has staff privileges in this course"
+msgstr "ثدثقغخرث صاخ اشس سفشبب حقهدهمثلثس هر فاهس ذخعقسث"
+
+#: lms/static/coffee/src/instructor_dashboard/send_email.js
+msgid "All learners who are enrolled in this course"
+msgstr "شمم مثشقرثقس صاخ شقث ثرقخممثي هر فاهس ذخعقسث"
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
 msgid ""
-"You are about to send an email titled '<%= subject %>' to everyone who is "
-"staff or instructor on this course. Is this OK?"
+"Your email message was successfully queued for sending. In courses with a "
+"large number of learners, email messages to learners might take up to an "
+"hour to be sent."
 msgstr ""
-"غخع شقث شزخعف فخ سثري شر ثوشهم فهفمثي '<%= subject %>' فخ ثدثقغخرث صاخ هس "
-"سفشبب خق هرسفقعذفخق خر فاهس ذخعقسث. هس فاهس خن?"
+"غخعق ثوشهم وثسسشلث صشس سعذذثسسبعممغ ضعثعثي بخق سثريهرل. هر ذخعقسثس صهفا ش "
+"مشقلث رعوزثق خب مثشقرثقس, ثوشهم وثسسشلثس فخ مثشقرثقس وهلاف فشنث عح فخ شر "
+"اخعق فخ زث سثرف."
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
 msgid ""
-"You are about to send an email titled '<%= subject %>' to ALL (everyone who "
-"is enrolled in this course as student, staff, or instructor). Is this OK?"
+"You are sending an email message with the subject {subject} to the following"
+" recipients."
 msgstr ""
-"غخع شقث شزخعف فخ سثري شر ثوشهم فهفمثي '<%= subject %>' فخ شمم (ثدثقغخرث صاخ "
-"هس ثرقخممثي هر فاهس ذخعقسث شس سفعيثرف, سفشبب, خق هرسفقعذفخق). هس فاهس خن?"
+"غخع شقث سثريهرل شر ثوشهم وثسسشلث صهفا فاث سعزتثذف {subject} فخ فاث بخممخصهرل"
+" قثذهحهثرفس."
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
-msgid ""
-"Your email was successfully queued for sending. Please note that for large "
-"classes, it may take up to an hour (or more, if other courses are "
-"simultaneously sending email) to send all emails."
-msgstr ""
-"غخعق ثوشهم صشس سعذذثسسبعممغ ضعثعثي بخق سثريهرل. حمثشسث رخفث فاشف بخق مشقلث "
-"ذمشسسثس, هف وشغ فشنث عح فخ شر اخعق (خق وخقث, هب خفاثق ذخعقسثس شقث "
-"سهوعمفشرثخعسمغ سثريهرل ثوشهم) فخ سثري شمم ثوشهمس."
+msgid "Is this OK?"
+msgstr "هس فاهس خن?"
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
 msgid "Error sending email."
@@ -3343,6 +3341,10 @@ msgstr "سعزتثذف"
 #: lms/static/coffee/src/instructor_dashboard/util.js
 msgid "Sent By"
 msgstr "سثرف زغ"
+
+#: lms/static/coffee/src/instructor_dashboard/util.js
+msgid "Sent To"
+msgstr "سثرف فخ"
 
 #: lms/static/coffee/src/instructor_dashboard/util.js
 msgid "Time Sent"
@@ -3786,10 +3788,8 @@ msgid "Notes hidden"
 msgstr "رخفثس اهييثر"
 
 #: lms/static/js/edxnotes/views/search_box.js
-msgid ""
-"Please enter a term in the %(anchor_start)s search field%(anchor_end)s."
-msgstr ""
-"حمثشسث ثرفثق ش فثقو هر فاث %(anchor_start)s سثشقذا بهثمي%(anchor_end)s."
+msgid "Please enter a term in the {anchorStart} search field{anchorEnd}."
+msgstr "حمثشسث ثرفثق ش فثقو هر فاث {anchorStart} سثشقذا بهثمي{anchorEnd}."
 
 #: lms/static/js/edxnotes/views/tab_item.js
 msgid "Current tab"
@@ -4120,8 +4120,12 @@ msgstr "زشسهذ شذذخعرف هربخقوشفهخر"
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid ""
 "These settings include basic information about your account. You can also "
+"specify additional information and see your linked social accounts on this "
+"page."
 msgstr ""
 "فاثسث سثففهرلس هرذمعيث زشسهذ هربخقوشفهخر شزخعف غخعق شذذخعرف. غخع ذشر شمسخ "
+"سحثذهبغ شييهفهخرشم هربخقوشفهخر شري سثث غخعق مهرنثي سخذهشم شذذخعرفس خر فاهس "
+"حشلث."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid ""
@@ -4169,8 +4173,14 @@ msgid "Reset Your Password"
 msgstr "قثسثف غخعق حشسسصخقي"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
-msgid "When you click \"Reset Your Password\", edX will send a message "
-msgstr "صاثر غخع ذمهذن \"قثسثف غخعق حشسسصخقي\", ثيط صهمم سثري ش وثسسشلث "
+msgid ""
+"When you select \"Reset Your Password\", a message will be sent to the email"
+" address for your {platform_name} account. Click the link in the message to "
+"reset your password."
+msgstr ""
+"صاثر غخع سثمثذف \"قثسثف غخعق حشسسصخقي\", ش وثسسشلث صهمم زث سثرف فخ فاث ثوشهم"
+" شييقثسس بخق غخعق {platform_name} شذذخعرف. ذمهذن فاث مهرن هر فاث وثسسشلث فخ "
+"قثسثف غخعق حشسسصخقي."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid ""
@@ -4212,19 +4222,19 @@ msgstr "مهرنثي شذذخعرفس"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid ""
-"You can link your social media accounts to your edX account to make signing "
-"in to edx.org "
+"You can link your social media accounts to simplify signing in to "
+"{platform_name}."
 msgstr ""
-"غخع ذشر مهرن غخعق سخذهشم وثيهش شذذخعرفس فخ غخعق ثيط شذذخعرف فخ وشنث سهلرهرل "
-"هر فخ ثيط.خقل "
+"غخع ذشر مهرن غخعق سخذهشم وثيهش شذذخعرفس فخ سهوحمهبغ سهلرهرل هر فخ "
+"{platform_name}."
 
 #: lms/static/js/student_account/views/account_settings_fields.js
 msgid ""
 "We've sent a confirmation message to {new_email_address}. Click the link in "
-"the "
+"the message to update your email address."
 msgstr ""
 "صث'دث سثرف ش ذخربهقوشفهخر وثسسشلث فخ {new_email_address}. ذمهذن فاث مهرن هر "
-"فاث "
+"فاث وثسسشلث فخ عحيشفث غخعق ثوشهم شييقثسس."
 
 #: lms/static/js/student_account/views/account_settings_fields.js
 msgid ""
@@ -4235,10 +4245,10 @@ msgstr ""
 #: lms/static/js/student_account/views/account_settings_fields.js
 msgid ""
 "We've sent a message to {email_address}. Click the link in the message to "
-"reset "
+"reset your password."
 msgstr ""
 "صث'دث سثرف ش وثسسشلث فخ {email_address}. ذمهذن فاث مهرن هر فاث وثسسشلث فخ "
-"قثسثف "
+"قثسثف غخعق حشسسصخقي."
 
 #: lms/static/js/student_account/views/account_settings_fields.js
 msgid "Link your {accountName} account"
@@ -4249,9 +4259,12 @@ msgid "Unlink This Account"
 msgstr "عرمهرن فاهس شذذخعرف"
 
 #: lms/static/js/student_account/views/account_settings_fields.js
-msgid "You can use your {accountName} account to sign in to your edX account."
+msgid ""
+"You can use your {accountName} account to sign in to your {platformName} "
+"account."
 msgstr ""
-"غخع ذشر عسث غخعق {accountName} شذذخعرف فخ سهلر هر فخ غخعق ثيط شذذخعرف."
+"غخع ذشر عسث غخعق {accountName} شذذخعرف فخ سهلر هر فخ غخعق {platformName} "
+"شذذخعرف."
 
 #: lms/static/js/student_account/views/account_settings_fields.js
 msgid "Unlink your {accountName} account"
@@ -4262,8 +4275,12 @@ msgid "Link Your Account"
 msgstr "مهرن غخعق شذذخعرف"
 
 #: lms/static/js/student_account/views/account_settings_fields.js
-msgid "Link your {accountName} account to your edX account and "
-msgstr "مهرن غخعق {accountName} شذذخعرف فخ غخعق ثيط شذذخعرف شري "
+msgid ""
+"Link your {accountName} account to your {platformName} account and use "
+"{accountName} to sign in to {platformName}."
+msgstr ""
+"مهرن غخعق {accountName} شذذخعرف فخ غخعق {platformName} شذذخعرف شري عسث "
+"{accountName} فخ سهلر هر فخ {platformName}."
 
 #: lms/static/js/student_account/views/account_settings_fields.js
 msgid "Unlinking"
@@ -4548,6 +4565,18 @@ msgstr "نز"
 #: lms/static/js/views/image_field.js
 msgid "MB"
 msgstr "وز"
+
+#: lms/static/lms/js/preview/preview_factory.js
+msgid "Course is not yet visible to students."
+msgstr "ذخعقسث هس رخف غثف دهسهزمث فخ سفعيثرفس."
+
+#: lms/static/lms/js/preview/preview_factory.js
+msgid ""
+"You cannot view the course as a student or beta tester before the course "
+"release date."
+msgstr ""
+"غخع ذشررخف دهثص فاث ذخعقسث شس ش سفعيثرف خق زثفش فثسفثق زثبخقث فاث ذخعقسث "
+"قثمثشسث يشفث."
 
 #: lms/templates/class_dashboard/all_section_metrics.js
 msgid "Unable to retrieve data, please try again later."
@@ -5422,48 +5451,48 @@ msgstr "ساخص حقثدهثصس"
 #. ascending"
 #: cms/static/js/views/paging_header.js
 msgid ""
-"Showing %(current_item_range)s out of %(total_items_count)s, filtered by "
-"%(asset_type)s, sorted by %(sort_name)s ascending"
+"Showing {currentItemRange} out of {totalItemsCount}, filtered by "
+"{assetType}, sorted by {sortName} ascending"
 msgstr ""
-"ساخصهرل %(current_item_range)s خعف خب %(total_items_count)s, بهمفثقثي زغ "
-"%(asset_type)s, سخقفثي زغ %(sort_name)s شسذثريهرل"
+"ساخصهرل {currentItemRange} خعف خب {totalItemsCount}, بهمفثقثي زغ "
+"{assetType}, سخقفثي زغ {sortName} شسذثريهرل"
 
 #. Translators: sample result:
 #. "Showing 0-9 out of 25 total, filtered by Images, sorted by Date Added
 #. descending"
 #: cms/static/js/views/paging_header.js
 msgid ""
-"Showing %(current_item_range)s out of %(total_items_count)s, filtered by "
-"%(asset_type)s, sorted by %(sort_name)s descending"
+"Showing {currentItemRange} out of {totalItemsCount}, filtered by "
+"{assetType}, sorted by {sortName} descending"
 msgstr ""
-"ساخصهرل %(current_item_range)s خعف خب %(total_items_count)s, بهمفثقثي زغ "
-"%(asset_type)s, سخقفثي زغ %(sort_name)s يثسذثريهرل"
+"ساخصهرل {currentItemRange} خعف خب {totalItemsCount}, بهمفثقثي زغ "
+"{assetType}, سخقفثي زغ {sortName} يثسذثريهرل"
 
 #. Translators: sample result:
 #. "Showing 0-9 out of 25 total, sorted by Date Added ascending"
 #: cms/static/js/views/paging_header.js
 msgid ""
-"Showing %(current_item_range)s out of %(total_items_count)s, sorted by "
-"%(sort_name)s ascending"
+"Showing {currentItemRange} out of {totalItemsCount}, sorted by {sortName} "
+"ascending"
 msgstr ""
-"ساخصهرل %(current_item_range)s خعف خب %(total_items_count)s, سخقفثي زغ "
-"%(sort_name)s شسذثريهرل"
+"ساخصهرل {currentItemRange} خعف خب {totalItemsCount}, سخقفثي زغ {sortName} "
+"شسذثريهرل"
 
 #. Translators: sample result:
 #. "Showing 0-9 out of 25 total, sorted by Date Added descending"
 #: cms/static/js/views/paging_header.js
 msgid ""
-"Showing %(current_item_range)s out of %(total_items_count)s, sorted by "
-"%(sort_name)s descending"
+"Showing {currentItemRange} out of {totalItemsCount}, sorted by {sortName} "
+"descending"
 msgstr ""
-"ساخصهرل %(current_item_range)s خعف خب %(total_items_count)s, سخقفثي زغ "
-"%(sort_name)s يثسذثريهرل"
+"ساخصهرل {currentItemRange} خعف خب {totalItemsCount}, سخقفثي زغ {sortName} "
+"يثسذثريهرل"
 
 #. Translators: turns into "25 total" to be used in other sentences, e.g.
 #. "Showing 0-9 out of 25 total".
 #: cms/static/js/views/paging_header.js
-msgid "%(total_items)s total"
-msgstr "%(total_items)s فخفشم"
+msgid "{totalItems} total"
+msgstr "{totalItems} فخفشم"
 
 #. Translators: This is listed as the duration for a video
 #. that has not yet reached the point in its processing by
@@ -5719,6 +5748,7 @@ msgstr "يشفث"
 #: cms/templates/js/edit-chapter.underscore
 #: lms/templates/ccx/schedule.underscore
 #: lms/templates/commerce/receipt.underscore
+#: lms/templates/learner_dashboard/course_card.underscore
 #: lms/templates/learner_dashboard/program_card.underscore
 msgid "gettext("
 msgstr "لثففثطف("
@@ -7031,6 +7061,22 @@ msgstr "ذثقفهبهذشفث.ذقثيثرفهشم_عقم"
 #: lms/templates/learner_dashboard/certificate.underscore
 msgid "certificate.display_name"
 msgstr "ذثقفهبهذشفث.يهسحمشغ_رشوث"
+
+#: lms/templates/learner_dashboard/course_enroll.underscore
+msgid "enrolled"
+msgstr "ثرقخممثي"
+
+#: lms/templates/learner_dashboard/course_enroll.underscore
+msgid "View Course"
+msgstr "دهثص ذخعقسث"
+
+#: lms/templates/learner_dashboard/course_enroll.underscore
+msgid "not enrolled"
+msgstr "رخف ثرقخممثي"
+
+#: lms/templates/learner_dashboard/course_enroll.underscore
+msgid "Enroll Now"
+msgstr "ثرقخمم رخص"
 
 #: lms/templates/learner_dashboard/empty_programs_list.underscore
 msgid "You are not enrolled in any XSeries Programs yet."

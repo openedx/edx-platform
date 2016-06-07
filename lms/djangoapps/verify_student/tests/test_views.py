@@ -1627,7 +1627,7 @@ class TestSubmitPhotosForVerification(TestCase):
         """
         request = RequestFactory().get('/url')
         request.user = self.user
-        account_settings = get_account_settings(request)
+        account_settings = get_account_settings(request)[0]
         self.assertEqual(account_settings['name'], full_name)
 
     def _get_post_data(self):

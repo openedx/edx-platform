@@ -81,7 +81,7 @@ define(["jquery", "underscore", "common/js/spec_helpers/ajax_helpers", "URI", "j
             });
 
             describe("Container", function () {
-                describe("rendering", function(){
+                describe("rendering", function() {
 
                     it('should set show_previews', function() {
                        var requests = AjaxHelpers.requests(this);

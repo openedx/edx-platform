@@ -1,9 +1,12 @@
-define(['backbone', 'jquery', 'underscore',
+define([
+        'backbone',
+        'jquery',
+        'underscore',
+        'edx-ui-toolkit/js/pagination/paging-collection',
         'js/spec/student_profile/helpers',
-        'js/student_profile/views/badge_list_view',
-        'common/js/components/collections/paging_collection'
+        'js/student_profile/views/badge_list_view'
     ],
-    function (Backbone, $, _,  LearnerProfileHelpers, BadgeListView, PagingCollection) {
+    function (Backbone, $, _, PagingCollection, LearnerProfileHelpers, BadgeListView) {
         "use strict";
         describe("edx.user.BadgeListView", function () {
 

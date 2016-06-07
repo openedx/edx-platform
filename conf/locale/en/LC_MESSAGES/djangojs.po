@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-05-26 15:51+0000\n"
-"PO-Revision-Date: 2016-05-26 15:52:24.512215\n"
+"POT-Creation-Date: 2016-06-02 14:33+0000\n"
+"PO-Revision-Date: 2016-06-02 14:34:15.467005\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -195,8 +195,10 @@ msgstr ""
 #. browser when a user needs to edit HTML
 #: cms/static/js/views/modals/edit_xblock.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/coffee/src/discussion/utils.js
 #: common/static/common/templates/image-modal.underscore
 #: common/static/common/templates/discussion/forum-action-close.underscore
+#: common/static/common/templates/discussion/search-alert.underscore
 #: lms/templates/student_profile/share_modal.underscore
 msgid "Close"
 msgstr ""
@@ -1730,10 +1732,6 @@ msgstr ""
 msgid "Adjust video speed"
 msgstr ""
 
-#: common/lib/xmodule/xmodule/js/src/video/08_video_speed_control.js
-msgid "Video speed: "
-msgstr ""
-
 #: common/lib/xmodule/xmodule/js/src/video/09_play_skip_control.js
 msgid "Skip"
 msgstr ""
@@ -2062,11 +2060,11 @@ msgid ""
 msgstr ""
 
 #: common/static/common/js/components/views/paging_header.js
-msgid "Showing %(first_index)s out of %(num_items)s total"
+msgid "Showing {firstIndex} out of {numItems} total"
 msgstr ""
 
 #: common/static/common/js/components/views/paging_header.js
-msgid "Showing %(first_index)s-%(last_index)s out of %(num_items)s total"
+msgid "Showing {firstIndex}-{lastIndex} out of {numItems} total"
 msgstr ""
 
 #: common/static/common/js/utils/edx.utils.validate.js
@@ -2578,7 +2576,7 @@ msgstr ""
 #. a
 #. screenreader, and "Browse" otherwise.
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
-msgid "Browse %(sr_start)s teams %(sr_end)s"
+msgid "Browse {sr_start} teams {sr_end}"
 msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
@@ -2595,7 +2593,7 @@ msgid "Team Search"
 msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
-msgid "Showing results for \"%(searchString)s\""
+msgid "Showing results for \"{searchString}\""
 msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
@@ -2638,15 +2636,15 @@ msgid "All Topics"
 msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
-msgid "The page \"%(route)s\" could not be found."
+msgid "The page \"{route}\" could not be found."
 msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
-msgid "The topic \"%(topic)s\" could not be found."
+msgid "The topic \"{topic}\" could not be found."
 msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
-msgid "The team \"%(team)s\" could not be found."
+msgid "The team \"{team}\" could not be found."
 msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/topic_card.js
@@ -2923,38 +2921,42 @@ msgid "Your message cannot be blank."
 msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
-msgid ""
-"There are invalid keywords in your email. Please check the following "
-"keywords and try again:"
-msgstr ""
-
-#: lms/static/coffee/src/instructor_dashboard/send_email.js
-msgid "Your email was successfully queued for sending."
+msgid "Your message must have at least one target."
 msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
 msgid ""
-"You are about to send an email titled '<%= subject %>' to yourself. Is this "
-"OK?"
+"There are invalid keywords in your email. Check the following keywords and "
+"try again."
+msgstr ""
+
+#: lms/static/coffee/src/instructor_dashboard/send_email.js
+msgid "Yourself"
+msgstr ""
+
+#: lms/static/coffee/src/instructor_dashboard/send_email.js
+msgid "Everyone who has staff privileges in this course"
+msgstr ""
+
+#: lms/static/coffee/src/instructor_dashboard/send_email.js
+msgid "All learners who are enrolled in this course"
 msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
 msgid ""
-"You are about to send an email titled '<%= subject %>' to everyone who is "
-"staff or instructor on this course. Is this OK?"
+"Your email message was successfully queued for sending. In courses with a "
+"large number of learners, email messages to learners might take up to an "
+"hour to be sent."
 msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
 msgid ""
-"You are about to send an email titled '<%= subject %>' to ALL (everyone who "
-"is enrolled in this course as student, staff, or instructor). Is this OK?"
+"You are sending an email message with the subject {subject} to the following"
+" recipients."
 msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
-msgid ""
-"Your email was successfully queued for sending. Please note that for large "
-"classes, it may take up to an hour (or more, if other courses are "
-"simultaneously sending email) to send all emails."
+msgid "Is this OK?"
 msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
@@ -3198,6 +3200,10 @@ msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/util.js
 msgid "Sent By"
+msgstr ""
+
+#: lms/static/coffee/src/instructor_dashboard/util.js
+msgid "Sent To"
 msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/util.js
@@ -3620,8 +3626,7 @@ msgid "Notes hidden"
 msgstr ""
 
 #: lms/static/js/edxnotes/views/search_box.js
-msgid ""
-"Please enter a term in the %(anchor_start)s search field%(anchor_end)s."
+msgid "Please enter a term in the {anchorStart} search field{anchorEnd}."
 msgstr ""
 
 #: lms/static/js/edxnotes/views/tab_item.js
@@ -3935,6 +3940,8 @@ msgstr ""
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid ""
 "These settings include basic information about your account. You can also "
+"specify additional information and see your linked social accounts on this "
+"page."
 msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
@@ -3975,7 +3982,10 @@ msgid "Reset Your Password"
 msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
-msgid "When you click \"Reset Your Password\", edX will send a message "
+msgid ""
+"When you select \"Reset Your Password\", a message will be sent to the email"
+" address for your {platform_name} account. Click the link in the message to "
+"reset your password."
 msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
@@ -4016,14 +4026,14 @@ msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid ""
-"You can link your social media accounts to your edX account to make signing "
-"in to edx.org "
+"You can link your social media accounts to simplify signing in to "
+"{platform_name}."
 msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_fields.js
 msgid ""
 "We've sent a confirmation message to {new_email_address}. Click the link in "
-"the "
+"the message to update your email address."
 msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_fields.js
@@ -4034,7 +4044,7 @@ msgstr ""
 #: lms/static/js/student_account/views/account_settings_fields.js
 msgid ""
 "We've sent a message to {email_address}. Click the link in the message to "
-"reset "
+"reset your password."
 msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_fields.js
@@ -4046,7 +4056,9 @@ msgid "Unlink This Account"
 msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_fields.js
-msgid "You can use your {accountName} account to sign in to your edX account."
+msgid ""
+"You can use your {accountName} account to sign in to your {platformName} "
+"account."
 msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_fields.js
@@ -4058,7 +4070,9 @@ msgid "Link Your Account"
 msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_fields.js
-msgid "Link your {accountName} account to your edX account and "
+msgid ""
+"Link your {accountName} account to your {platformName} account and use "
+"{accountName} to sign in to {platformName}."
 msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_fields.js
@@ -4329,6 +4343,16 @@ msgstr ""
 
 #: lms/static/js/views/image_field.js
 msgid "MB"
+msgstr ""
+
+#: lms/static/lms/js/preview/preview_factory.js
+msgid "Course is not yet visible to students."
+msgstr ""
+
+#: lms/static/lms/js/preview/preview_factory.js
+msgid ""
+"You cannot view the course as a student or beta tester before the course "
+"release date."
 msgstr ""
 
 #: lms/templates/class_dashboard/all_section_metrics.js
@@ -5157,8 +5181,8 @@ msgstr ""
 #. ascending"
 #: cms/static/js/views/paging_header.js
 msgid ""
-"Showing %(current_item_range)s out of %(total_items_count)s, filtered by "
-"%(asset_type)s, sorted by %(sort_name)s ascending"
+"Showing {currentItemRange} out of {totalItemsCount}, filtered by "
+"{assetType}, sorted by {sortName} ascending"
 msgstr ""
 
 #. Translators: sample result:
@@ -5166,30 +5190,30 @@ msgstr ""
 #. descending"
 #: cms/static/js/views/paging_header.js
 msgid ""
-"Showing %(current_item_range)s out of %(total_items_count)s, filtered by "
-"%(asset_type)s, sorted by %(sort_name)s descending"
+"Showing {currentItemRange} out of {totalItemsCount}, filtered by "
+"{assetType}, sorted by {sortName} descending"
 msgstr ""
 
 #. Translators: sample result:
 #. "Showing 0-9 out of 25 total, sorted by Date Added ascending"
 #: cms/static/js/views/paging_header.js
 msgid ""
-"Showing %(current_item_range)s out of %(total_items_count)s, sorted by "
-"%(sort_name)s ascending"
+"Showing {currentItemRange} out of {totalItemsCount}, sorted by {sortName} "
+"ascending"
 msgstr ""
 
 #. Translators: sample result:
 #. "Showing 0-9 out of 25 total, sorted by Date Added descending"
 #: cms/static/js/views/paging_header.js
 msgid ""
-"Showing %(current_item_range)s out of %(total_items_count)s, sorted by "
-"%(sort_name)s descending"
+"Showing {currentItemRange} out of {totalItemsCount}, sorted by {sortName} "
+"descending"
 msgstr ""
 
 #. Translators: turns into "25 total" to be used in other sentences, e.g.
 #. "Showing 0-9 out of 25 total".
 #: cms/static/js/views/paging_header.js
-msgid "%(total_items)s total"
+msgid "{totalItems} total"
 msgstr ""
 
 #. Translators: This is listed as the duration for a video
@@ -5430,6 +5454,7 @@ msgstr ""
 #: cms/templates/js/edit-chapter.underscore
 #: lms/templates/ccx/schedule.underscore
 #: lms/templates/commerce/receipt.underscore
+#: lms/templates/learner_dashboard/course_card.underscore
 #: lms/templates/learner_dashboard/program_card.underscore
 msgid "gettext("
 msgstr ""
@@ -6680,6 +6705,22 @@ msgstr ""
 
 #: lms/templates/learner_dashboard/certificate.underscore
 msgid "certificate.display_name"
+msgstr ""
+
+#: lms/templates/learner_dashboard/course_enroll.underscore
+msgid "enrolled"
+msgstr ""
+
+#: lms/templates/learner_dashboard/course_enroll.underscore
+msgid "View Course"
+msgstr ""
+
+#: lms/templates/learner_dashboard/course_enroll.underscore
+msgid "not enrolled"
+msgstr ""
+
+#: lms/templates/learner_dashboard/course_enroll.underscore
+msgid "Enroll Now"
 msgstr ""
 
 #: lms/templates/learner_dashboard/empty_programs_list.underscore

@@ -11,8 +11,8 @@
             type: 'topics',
 
             srInfo: {
-                id: "heading-browse-topics",
-                text: gettext("All topics")
+                id: 'heading-browse-topics',
+                text: gettext('All topics')
             },
 
             initialize: function (options) {

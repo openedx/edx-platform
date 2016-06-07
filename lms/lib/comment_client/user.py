@@ -30,6 +30,19 @@ class User(models.Model):
                    external_id=str(user.id),
                    username=user.username)
 
+    def read(self, source):
+        """
+        Calls cs_comments_service to mark thread as read for the user
+        """
+        params = {'source_type': source.type, 'source_id': source.id}
+        perform_request(
+            'post',
+            _url_for_read(self.id),
+            params,
+            metric_action='user.read',
+            metric_tags=self._metric_tags + ['target.type:{}'.format(source.type)],
+        )
+
     def follow(self, source):
         params = {'source_type': source.type, 'source_id': source.id}
         response = perform_request(
@@ -172,3 +185,10 @@ def _url_for_user_active_threads(user_id):
 
 def _url_for_user_subscribed_threads(user_id):
     return "{prefix}/users/{user_id}/subscribed_threads".format(prefix=settings.PREFIX, user_id=user_id)
+
+
+def _url_for_read(user_id):
+    """
+    Returns cs_comments_service url endpoint to mark thread as read for given user_id
+    """
+    return "{prefix}/users/{user_id}/read".format(prefix=settings.PREFIX, user_id=user_id)

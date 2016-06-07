@@ -19,7 +19,7 @@
     color: inherit;
   }
 
-// layout
+  // layout
   .page-header {
     @include clearfix();
     border-bottom: 1px solid $gray-l3;
@@ -54,7 +54,7 @@
     }
   }
 
-// ui bits
+  // ui bits
   .breadcrumbs {
     @extend %t-copy-sub1;
 
@@ -83,16 +83,16 @@
     }
 
     .search-label {
-        @extend %text-sr;
+      @extend %text-sr;
     }
 
     .search-field {
-        transition: all $tmg-f2 ease-in-out;
-        border: 1px solid $gray-l4;
-        border-radius: 3px;
-        padding: ($baseline/4) ($baseline/2);
-        font-family: inherit;
-        color: $gray;
+      transition: all $tmg-f2 ease-in-out;
+      border: 1px solid $gray-l4;
+      border-radius: 3px;
+      padding: ($baseline/4) ($baseline/2);
+      font-family: inherit;
+      color: $gray;
     }
 
     .action-search {
@@ -103,7 +103,7 @@
       vertical-align: middle;
 
       .icon {
-          color: $white;
+        color: $white;
       }
 
       // STATE: hover and focus
@@ -130,7 +130,7 @@
     }
   }
 
-// main content bits
+  // main content bits
   .page-content {
     padding: $baseline;
   }
@@ -337,6 +337,11 @@
 
   .team-profile {
 
+    .new-post-btn {
+      @include float(right);
+      @include blue-button;
+    }
+
     .page-content-main {
       display: inline-block;
       width: flex-grid(8, 12);
@@ -389,88 +394,88 @@
         display: inline-block;
 
         @include tooltip-hover-style(-($baseline*2));
-        }
       }
+    }
   }
 
   .create-team {
 
     legend {
-        @extend %t-title6;
-        @extend %t-weight4;
-        margin-bottom: ($baseline/4);
+      @extend %t-title6;
+      @extend %t-weight4;
+      margin-bottom: ($baseline/4);
     }
 
     .description {
-        @extend %t-copy-sub1;
-        margin-bottom: ($baseline/2);
-        color: $gray-l1;
+      @extend %t-copy-sub1;
+      margin-bottom: ($baseline/2);
+      color: $gray-l1;
     }
 
     .form-field {
-        margin: 0 0 ($baseline*0.75) 0;
+      margin: 0 0 ($baseline*0.75) 0;
 
-        .label {
-            display: block;
-            margin-bottom: ($baseline/4);
+      .label {
+        display: block;
+        margin-bottom: ($baseline/4);
+      }
+
+      &.is-required {
+        @extend %t-weight4;
+
+        .label:after {
+          @include margin-left($baseline/4);
+          content: "*";
         }
+      }
 
-        &.is-required {
-            @extend %t-weight4;
+      .input-text {
+        @extend %t-copy-base;
+        transition: all $tmg-f2 ease-in-out 0s;
+        display: block;
+        width: 90%;
+        height: 100%;
+        margin-bottom: ($baseline/4);
+        border: 1px solid $gray-l2;
+        padding: ($baseline/2);
+      }
 
-            .label:after {
-              @include margin-left($baseline/4);
-              content: "*";
-            }
+      .input-select {
+        @extend %t-copy-base;
+        width: 90%;
+        margin-bottom: ($baseline/4);
+        border: 1px solid $gray-l2;
+      }
+
+      .input-text,
+      .input-select {
+
+        &:focus {
+          border: 1px solid $blue;
+
+          + .tip {
+            color: $blue;
+          }
         }
+      }
 
-        .input-text {
-            @extend %t-copy-base;
-            transition: all $tmg-f2 ease-in-out 0s;
-            display: block;
-            width: 90%;
-            height: 100%;
-            margin-bottom: ($baseline/4);
-            border: 1px solid $gray-l2;
-            padding: ($baseline/2);
-        }
-
-        .input-select {
-            @extend %t-copy-base;
-            width: 90%;
-            margin-bottom: ($baseline/4);
-            border: 1px solid $gray-l2;
-        }
+      &.has-errors {
 
         .input-text,
         .input-select {
+          border: 1px solid $alert-color;
 
-            &:focus {
-                border: 1px solid $blue;
-
-                + .tip {
-                    color: $blue;
-                }
-            }
+          + .tip {
+            color: $alert-color;
+          }
         }
+      }
 
-        &.has-errors {
-
-            .input-text,
-            .input-select {
-                border: 1px solid $alert-color;
-
-                + .tip {
-                    color: $alert-color;
-                }
-            }
-        }
-
-        .tip {
-            @extend %t-copy-sub1;
-            display: block;
-            color: $gray-l1;
-        }
+      .tip {
+        @extend %t-copy-sub1;
+        display: block;
+        color: $gray-l1;
+      }
     }
 
     .required-wrapper {
@@ -490,33 +495,33 @@
   }
 
   .form-actions {
-        margin-top: $baseline;
-    }
+    margin-top: $baseline;
+  }
 
-    .action {
-      @extend %t-copy;
-      @extend %t-action2;
-      @include margin-right ($baseline/2);
-      padding: ($baseline/2) $baseline;
-    }
+  .action {
+    @extend %t-copy;
+    @extend %t-action2;
+    @include margin-right ($baseline/2);
+    padding: ($baseline/2) $baseline;
+  }
 
-    .action-primary {
-      @extend %btn-primary-blue;
-      display: inline-block;
-      text-shadow: none;
-    }
+  .action-primary {
+    @extend %btn-primary-blue;
+    display: inline-block;
+    text-shadow: none;
+  }
 
-    .action-cancel {
-      @extend %button-reset;
-      display: inline-block;
-      border: 1px solid transparent;
-      color: $gray;
+  .action-cancel {
+    @extend %button-reset;
+    display: inline-block;
+    border: 1px solid transparent;
+    color: $gray;
 
-      // STATE: hover and focus
-      &:hover,
-      &:focus {
-          border: 1px solid $link-color;
-          color: $link-color;
+    // STATE: hover and focus
+    &:hover,
+    &:focus {
+      border: 1px solid $link-color;
+      color: $link-color;
     }
   }
 
@@ -569,106 +574,106 @@
       width: 100%;
       @include clearfix();
 
-    .team-required-fields {
-      @include float(left);
-      width: 55%;
+      .team-required-fields {
+        @include float(left);
+        width: 55%;
 
-      .u-field {
-        @include margin-right($baseline*2);
+        .u-field {
+          @include margin-right($baseline*2);
+        }
+
+        .u-field.u-field-name {
+          padding-bottom: $baseline;
+
+          .u-field-value {
+            width: 100%;
+
+            input {
+              border-radius: ($baseline/5);
+              height: ($baseline*2);
+            }
+          }
+
+          .u-field-message {
+            @include padding-left(0);
+            padding-top: ($baseline/4);
+            width: 100%;
+          }
+        }
+
+        .u-field.u-field-description {
+
+          .u-field-value {
+            width: 100%;
+
+            textarea {
+              width: 100%;
+              height: ($baseline*5);
+              border-radius: ($baseline/5)
+            }
+          }
+
+          .u-field-footer {
+
+            .u-field-message {
+              display: block;
+              @extend %t-copy-sub1;
+              @include padding-left(0);
+              margin-top: ($baseline/4);
+              color: $gray-l1;
+              width: 100%;
+            }
+          }
+        }
+
+        .u-field-title {
+          padding-bottom: ($baseline/4);
+          color: $base-font-color;
+          width: 100%;
+        }
       }
 
-      .u-field.u-field-name {
-        padding-bottom: $baseline;
+      .team-optional-fields {
+        @include float(left);
+        @include margin-left($baseline*2);
+        width: 40%;
 
-        .u-field-value {
-          width: 100%;
+        .u-field.u-field-optional_description {
+          margin-bottom: ($baseline/2);
 
-          input {
-            border-radius: ($baseline/5);
-            height: ($baseline*2);
+          .u-field-title {
+            color: $base-font-color;
+            font-weight: $font-semibold;
+            margin-bottom: ($baseline/5);
           }
+
+          .u-field-value {
+            display: none;
+          }
+        }
+
+        .u-field.u-field-language {
+          margin-bottom: ($baseline/5);
+        }
+
+        .u-field-value-display {
+          display: none;
+        }
+
+        .u-field-title {
+          color: $base-font-color;
         }
 
         .u-field-message {
           @include padding-left(0);
-          padding-top: ($baseline/4);
+        }
+
+        .u-field-title, .u-field-value, .u-field-message {
           width: 100%;
         }
       }
 
-      .u-field.u-field-description {
-
-        .u-field-value {
-          width: 100%;
-
-          textarea {
-            width: 100%;
-            height: ($baseline*5);
-            border-radius: ($baseline/5)
-          }
-        }
-
-        .u-field-footer {
-
-          .u-field-message {
-            display: block;
-            @extend %t-copy-sub1;
-            @include padding-left(0);
-            margin-top: ($baseline/4);
-            color: $gray-l1;
-            width: 100%;
-          }
-        }
-      }
-
-      .u-field-title {
-        padding-bottom: ($baseline/4);
-        color: $base-font-color;
-        width: 100%;
-      }
     }
-
-    .team-optional-fields {
-      @include float(left);
-      @include margin-left($baseline*2);
-      width: 40%;
-
-      .u-field.u-field-optional_description {
-        margin-bottom: ($baseline/2);
-
-        .u-field-title {
-          color: $base-font-color;
-          font-weight: $font-semibold;
-          margin-bottom: ($baseline/5);
-        }
-
-        .u-field-value {
-          display: none;
-        }
-      }
-
-      .u-field.u-field-language {
-        margin-bottom: ($baseline/5);
-      }
-
-      .u-field-value-display {
-        display: none;
-      }
-
-      .u-field-title {
-        color: $base-font-color;
-      }
-
-      .u-field-message {
-        @include padding-left(0);
-      }
-
-      .u-field-title, .u-field-value, .u-field-message {
-        width: 100%;
-      }
-    }
-
-  }
 
     .u-field {
       padding: 0;
@@ -692,10 +697,10 @@
 
 // vertical line between required and optional fields
 .vertical-line:after {
-    height: 100%;
-    border-left: 2px solid $gray-l4;
-    content: "";
-    position: absolute;
+  height: 100%;
+  border-left: 2px solid $gray-l4;
+  content: "";
+  position: absolute;
 }
 
 .form-instructions {

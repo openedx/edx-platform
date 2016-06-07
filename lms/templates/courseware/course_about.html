@@ -221,15 +221,15 @@ from openedx.core.lib.courses import course_image_url
         <%include file="course_about_sidebar_header.html" />
 
         <ol class="important-dates">
-          <li class="important-dates-item"><i class="icon fa fa-info-circle"></i><p class="important-dates-item-title">${_("Course Number")}</p><span class="important-dates-item-text course-number">${course.display_number_with_default | h}</span></li>
+          <li class="important-dates-item"><span class="icon fa fa-info-circle" aria-hidden="true"></span><p class="important-dates-item-title">${_("Course Number")}</p><span class="important-dates-item-text course-number">${course.display_number_with_default | h}</span></li>
           % if not course.start_date_is_still_default:
-            <li class="important-dates-item"><i class="icon fa fa-calendar"></i><p class="important-dates-item-title">${_("Classes Start")}</p><span class="important-dates-item-text start-date">${course.start_datetime_text()}</span></li>
+            <li class="important-dates-item"><span class="icon fa fa-calendar" aria-hidden="true"></span><p class="important-dates-item-title">${_("Classes Start")}</p><span class="important-dates-item-text start-date">${course.start_datetime_text()}</span></li>
           % endif
             ## We plan to ditch end_date (which is not stored in course metadata),
             ## but for backwards compatibility, show about/end_date blob if it exists.
             % if get_course_about_section(request, course, "end_date") or course.end:
             <li class="important-dates-item">
-                <i class="icon fa fa-calendar"></i>
+                <span class="icon fa fa-calendar" aria-hidden="true"></span>
                 <p class="important-dates-item-title">${_("Classes End")}</p>
                 <span class="important-dates-item-text final-date">
                     % if get_course_about_section(request, course, "end_date"):
@@ -242,14 +242,14 @@ from openedx.core.lib.courses import course_image_url
             % endif
 
           % if get_course_about_section(request, course, "effort"):
-            <li class="important-dates-item"><i class="icon fa fa-pencil"></i><p class="important-dates-item-title">${_("Estimated Effort")}</p><span class="important-dates-item-text effort">${get_course_about_section(request, course, "effort")}</span></li>
+            <li class="important-dates-item"><span class="icon fa fa-pencil" aria-hidden="true"></span><p class="important-dates-item-title">${_("Estimated Effort")}</p><span class="important-dates-item-text effort">${get_course_about_section(request, course, "effort")}</span></li>
           % endif
 
-          ##<li class="important-dates-item"><i class="icon fa fa-clock-o"></i><p class="important-dates-item-title">${_('Course Length')}</p><span class="important-dates-item-text course-length">${_('{number} weeks').format(number=15)}</span></li>
+          ##<li class="important-dates-item"><span class="icon fa fa-clock-o" aria-hidden="true"></span><p class="important-dates-item-title">${_('Course Length')}</p><span class="important-dates-item-text course-length">${_('{number} weeks').format(number=15)}</span></li>
 
           %if course_price and (can_add_course_to_cart or is_cosmetic_price_enabled):
             <li class="important-dates-item">
-              <i class="icon fa fa-money"></i>
+              <span class="icon fa fa-money" aria-hidden="true"></span>
               <p class="important-dates-item-title">${_("Price")}</p>
               <span class="important-dates-item-text">${course_price}</span>
             </li>
@@ -258,7 +258,7 @@ from openedx.core.lib.courses import course_image_url
           % if pre_requisite_courses:
           <% prc_target = reverse('about_course', args=[unicode(pre_requisite_courses[0]['key'])]) %>
           <li class="prerequisite-course important-dates-item">
-            <i class="icon fa fa-list-ul"></i>
+            <span class="icon fa fa-list-ul" aria-hidden="true"></span>
             <p class="important-dates-item-title">${_("Prerequisites")}</p>
             ## Multiple pre-requisite courses are not supported on frontend that's why we are pulling first element
             <span class="important-dates-item-text pre-requisite"><a href="${prc_target}">${pre_requisite_courses[0]['display']}</a></span>
@@ -272,7 +272,7 @@ from openedx.core.lib.courses import course_image_url
           </li>
           % endif
           % if get_course_about_section(request, course, "prerequisites"):
-            <li class="important-dates-item"><i class="icon fa fa-book"></i><p class="important-dates-item-title">${_("Requirements")}</p><span class="important-dates-item-text prerequisites">${get_course_about_section(request, course, "prerequisites")}</span></li>
+            <li class="important-dates-item"><span class="icon fa fa-book" aria-hidden="true"></span><p class="important-dates-item-title">${_("Requirements")}</p><span class="important-dates-item-text prerequisites">${get_course_about_section(request, course, "prerequisites")}</span></li>
           % endif
         </ol>
       </section>

@@ -186,38 +186,44 @@ class LoginFromCombinedPageTest(UniqueCourseTest):
         course_names = self.dashboard_page.wait_for_page().available_courses
         self.assertIn(self.course_info["display_name"], course_names)
 
-        # Now logout and check that we can log back in instantly (because the account is linked):
-        LogoutPage(self.browser).visit()
+        try:
+            # Now logout and check that we can log back in instantly (because the account is linked):
+            LogoutPage(self.browser).visit()
 
-        self.login_page.visit()
-        self.login_page.click_third_party_dummy_provider()
+            self.login_page.visit()
+            self.login_page.click_third_party_dummy_provider()
 
-        self.dashboard_page.wait_for_page()
-
-        self._unlink_dummy_account()
+            self.dashboard_page.wait_for_page()
+        finally:
+            self._unlink_dummy_account()
 
     def test_hinted_login(self):
         """ Test the login page when coming from course URL that specified which third party provider to use """
         # Create a user account and link it to third party auth with the dummy provider:
         AutoAuthPage(self.browser, course_id=self.course_id).visit()
         self._link_dummy_account()
-        LogoutPage(self.browser).visit()
+        try:
+            LogoutPage(self.browser).visit()
 
-        # When not logged in, try to load a course URL that includes the provider hint ?tpa_hint=...
-        course_page = CoursewarePage(self.browser, self.course_id)
-        self.browser.get(course_page.url + '?tpa_hint=oa2-dummy')
+            # When not logged in, try to load a course URL that includes the provider hint ?tpa_hint=...
+            course_page = CoursewarePage(self.browser, self.course_id)
+            self.browser.get(course_page.url + '?tpa_hint=oa2-dummy')
 
-        # We should now be redirected to the login page
-        self.login_page.wait_for_page()
-        self.assertIn("Would you like to sign in using your Dummy credentials?", self.login_page.hinted_login_prompt)
-        # Baseline screen-shots are different for chrome and firefox.
-        self.assertScreenshot('#hinted-login-form', 'hinted-login-{}'.format(self.browser.name))
-        self.login_page.click_third_party_dummy_provider()
+            # We should now be redirected to the login page
+            self.login_page.wait_for_page()
+            self.assertIn(
+                "Would you like to sign in using your Dummy credentials?",
+                self.login_page.hinted_login_prompt
+            )
 
-        # We should now be redirected to the course page
-        course_page.wait_for_page()
+            # Baseline screen-shots are different for chrome and firefox.
+            self.assertScreenshot('#hinted-login-form', 'hinted-login-{}'.format(self.browser.name))
+            self.login_page.click_third_party_dummy_provider()
 
-        self._unlink_dummy_account()
+            # We should now be redirected to the course page
+            course_page.wait_for_page()
+        finally:
+            self._unlink_dummy_account()
 
     def _link_dummy_account(self):
         """ Go to Account Settings page and link the user's account to the Dummy provider """

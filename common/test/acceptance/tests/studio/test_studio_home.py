@@ -8,7 +8,7 @@ from uuid import uuid4
 
 from ...fixtures import PROGRAMS_STUB_URL
 from ...fixtures.config import ConfigModelFixture
-from ...fixtures.programs import FakeProgram, ProgramsFixture, ProgramsConfigMixin
+from ...fixtures.programs import ProgramsFixture, ProgramsConfigMixin
 from ...pages.studio.auto_auth import AutoAuthPage
 from ...pages.studio.library import LibraryEditPage
 from ...pages.studio.index import DashboardPage, DashboardPageWithPrograms
@@ -17,6 +17,7 @@ from ..helpers import (
     select_option_by_text,
     get_selected_option_text
 )
+from openedx.core.djangoapps.programs.tests import factories
 
 
 class CreateLibraryTest(WebAppTest):
@@ -111,11 +112,24 @@ class DashboardProgramsTabTest(ProgramsConfigMixin, WebAppTest):
         via config, and the results of the program list should display when
         the list is nonempty.
         """
-        test_program_values = [
-            FakeProgram(name='first program', status='unpublished', org_key='org1', course_id='foo/bar/baz'),
-            FakeProgram(name='second program', status='unpublished', org_key='org2', course_id='qux/quux/corge'),
+        test_program_values = [('first program', 'org1'), ('second program', 'org2')]
+
+        programs = [
+            factories.Program(
+                name=name,
+                organizations=[
+                    factories.Organization(key=org),
+                ],
+                course_codes=[
+                    factories.CourseCode(run_modes=[
+                        factories.RunMode(),
+                    ]),
+                ]
+            )
+            for name, org in test_program_values
         ]
-        ProgramsFixture().install_programs(test_program_values)
+
+        ProgramsFixture().install_programs(programs)
 
         self.set_programs_api_configuration(True)
 
@@ -126,8 +140,7 @@ class DashboardProgramsTabTest(ProgramsConfigMixin, WebAppTest):
         self.assertFalse(self.dashboard_page.is_empty_list_create_button_present())
 
         results = self.dashboard_page.get_program_list()
-        expected = [(p.name, p.org_key) for p in test_program_values]
-        self.assertEqual(results, expected)
+        self.assertEqual(results, test_program_values)
 
     def test_tab_requires_staff(self):
         """

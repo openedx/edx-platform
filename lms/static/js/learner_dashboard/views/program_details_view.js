@@ -6,6 +6,7 @@
             'underscore',
             'gettext',
             'edx-ui-toolkit/js/utils/html-utils',
+            'js/learner_dashboard/collections/course_card_collection',
             'js/learner_dashboard/views/program_header_view',
             'js/learner_dashboard/views/collection_list_view',
             'js/learner_dashboard/views/course_card_view',
@@ -17,6 +18,7 @@
              _,
              gettext,
              HtmlUtils,
+             CourseCardCollection,
              HeaderView,
              CollectionListView,
              CourseCardView,
@@ -29,7 +31,7 @@
 
                 initialize: function(options) {
                     this.programModel = new Backbone.Model(options);
-                    this.courseCardsCollection = new Backbone.Collection(
+                    this.courseCardCollection = new CourseCardCollection(
                         this.programModel.get('course_codes')
                     );
                     this.render();
@@ -47,7 +49,7 @@
                     new CollectionListView({
                         el: '.js-course-list',
                         childView: CourseCardView,
-                        collection: this.courseCardsCollection,
+                        collection: this.courseCardCollection,
                         context: this.programModel.toJSON(),
                         titleContext: {
                             el: 'h2',

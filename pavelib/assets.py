@@ -52,6 +52,7 @@ NPM_INSTALLED_LIBRARIES = [
     'underscore.string/dist/underscore.string.js',
     'picturefill/dist/picturefill.js',
     'backbone/backbone.js',
+    'edx-ui-toolkit/node_modules/backbone.paginator/lib/backbone.paginator.js',
 ]
 
 # Directory to install static vendor files

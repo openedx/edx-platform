@@ -87,13 +87,13 @@ from openedx.core.lib.courses import course_image_url
       </div>
       % if not reg_code_already_redeemed:
         %if redemption_success:
-          <a href="${reverse('dashboard')}" class="link-button course-link-bg-color">${_("View Dashboard")} <i class="icon fa fa-caret-right" aria-hidden="true"></i></a>
+          <a href="${reverse('dashboard')}" class="link-button course-link-bg-color">${_("View Dashboard")} <span class="icon fa fa-caret-right" aria-hidden="true"></span></a>
         %elif not registered_for_course:
           <form method="post">
             <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }" aria-hidden="true">
             <button type="submit"
                id="id_active_course_enrollment"
-               name="active_course_enrollment">${_("Activate Course Enrollment")} <i class="icon fa fa-caret-right" aria-hidden="true"></i></button>
+               name="active_course_enrollment">${_("Activate Course Enrollment")} <span class="icon fa fa-caret-right" aria-hidden="true"></span></button>
           </form>
         %endif
       %endif

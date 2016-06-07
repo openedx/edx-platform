@@ -1,246 +1,6 @@
 # #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
-# #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
-# #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
-# #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
-# #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
 # edX translation file.
 # Copyright (C) 2016 EdX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# #-#-#-#-#  djangojs-studio.po (0.1a)  #-#-#-#-#
-# edX translation file.
-# Copyright (C) 2016 EdX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# #-#-#-#-#  underscore.po (0.1a)  #-#-#-#-#
-# edX translation file
-# Copyright (C) 2016 edX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# #-#-#-#-#  underscore-studio.po (0.1a)  #-#-#-#-#
-# edX translation file
-# Copyright (C) 2016 edX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# #-#-#-#-#  djangojs-studio.po (0.1a)  #-#-#-#-#
-# #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
-# edX translation file.
-# Copyright (C) 2016 EdX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# #-#-#-#-#  djangojs-studio.po (0.1a)  #-#-#-#-#
-# edX translation file.
-# Copyright (C) 2016 EdX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# #-#-#-#-#  underscore.po (0.1a)  #-#-#-#-#
-# edX translation file
-# Copyright (C) 2016 edX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# #-#-#-#-#  underscore-studio.po (0.1a)  #-#-#-#-#
-# edX translation file
-# Copyright (C) 2016 edX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# #-#-#-#-#  underscore.po (0.1a)  #-#-#-#-#
-# edX translation file
-# Copyright (C) 2016 edX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# #-#-#-#-#  underscore-studio.po (0.1a)  #-#-#-#-#
-# edX translation file
-# Copyright (C) 2016 edX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# #-#-#-#-#  djangojs-studio.po (0.1a)  #-#-#-#-#
-# #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
-# #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
-# edX translation file.
-# Copyright (C) 2016 EdX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# #-#-#-#-#  djangojs-studio.po (0.1a)  #-#-#-#-#
-# edX translation file.
-# Copyright (C) 2016 EdX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# #-#-#-#-#  underscore.po (0.1a)  #-#-#-#-#
-# edX translation file
-# Copyright (C) 2016 edX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# #-#-#-#-#  underscore-studio.po (0.1a)  #-#-#-#-#
-# edX translation file
-# Copyright (C) 2016 edX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# #-#-#-#-#  djangojs-studio.po (0.1a)  #-#-#-#-#
-# #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
-# edX translation file.
-# Copyright (C) 2016 EdX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# #-#-#-#-#  djangojs-studio.po (0.1a)  #-#-#-#-#
-# edX translation file.
-# Copyright (C) 2016 EdX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# #-#-#-#-#  underscore.po (0.1a)  #-#-#-#-#
-# edX translation file
-# Copyright (C) 2016 edX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# #-#-#-#-#  underscore-studio.po (0.1a)  #-#-#-#-#
-# edX translation file
-# Copyright (C) 2016 edX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# #-#-#-#-#  underscore.po (0.1a)  #-#-#-#-#
-# edX translation file
-# Copyright (C) 2016 edX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# #-#-#-#-#  underscore-studio.po (0.1a)  #-#-#-#-#
-# edX translation file
-# Copyright (C) 2016 edX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# #-#-#-#-#  underscore.po (0.1a)  #-#-#-#-#
-# edX translation file
-# Copyright (C) 2016 edX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# #-#-#-#-#  underscore-studio.po (0.1a)  #-#-#-#-#
-# edX translation file
-# Copyright (C) 2016 edX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# #-#-#-#-#  djangojs-studio.po (0.1a)  #-#-#-#-#
-# #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
-# #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
-# #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
-# edX translation file.
-# Copyright (C) 2016 EdX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# #-#-#-#-#  djangojs-studio.po (0.1a)  #-#-#-#-#
-# edX translation file.
-# Copyright (C) 2016 EdX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# #-#-#-#-#  underscore.po (0.1a)  #-#-#-#-#
-# edX translation file
-# Copyright (C) 2016 edX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# #-#-#-#-#  underscore-studio.po (0.1a)  #-#-#-#-#
-# edX translation file
-# Copyright (C) 2016 edX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# #-#-#-#-#  djangojs-studio.po (0.1a)  #-#-#-#-#
-# #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
-# edX translation file.
-# Copyright (C) 2016 EdX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# #-#-#-#-#  djangojs-studio.po (0.1a)  #-#-#-#-#
-# edX translation file.
-# Copyright (C) 2016 EdX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# #-#-#-#-#  underscore.po (0.1a)  #-#-#-#-#
-# edX translation file
-# Copyright (C) 2016 edX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# #-#-#-#-#  underscore-studio.po (0.1a)  #-#-#-#-#
-# edX translation file
-# Copyright (C) 2016 edX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# #-#-#-#-#  underscore.po (0.1a)  #-#-#-#-#
-# edX translation file
-# Copyright (C) 2016 edX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# #-#-#-#-#  underscore-studio.po (0.1a)  #-#-#-#-#
-# edX translation file
-# Copyright (C) 2016 edX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# #-#-#-#-#  djangojs-studio.po (0.1a)  #-#-#-#-#
-# #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
-# #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
-# edX translation file.
-# Copyright (C) 2016 EdX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# #-#-#-#-#  djangojs-studio.po (0.1a)  #-#-#-#-#
-# edX translation file.
-# Copyright (C) 2016 EdX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# #-#-#-#-#  underscore.po (0.1a)  #-#-#-#-#
-# edX translation file
-# Copyright (C) 2016 edX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# #-#-#-#-#  underscore-studio.po (0.1a)  #-#-#-#-#
-# edX translation file
-# Copyright (C) 2016 edX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# #-#-#-#-#  djangojs-studio.po (0.1a)  #-#-#-#-#
-# #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
-# edX translation file.
-# Copyright (C) 2016 EdX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# #-#-#-#-#  djangojs-studio.po (0.1a)  #-#-#-#-#
-# edX translation file.
-# Copyright (C) 2016 EdX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# #-#-#-#-#  underscore.po (0.1a)  #-#-#-#-#
-# edX translation file
-# Copyright (C) 2016 edX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# #-#-#-#-#  underscore-studio.po (0.1a)  #-#-#-#-#
-# edX translation file
-# Copyright (C) 2016 edX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# #-#-#-#-#  underscore.po (0.1a)  #-#-#-#-#
-# edX translation file
-# Copyright (C) 2016 edX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# #-#-#-#-#  underscore-studio.po (0.1a)  #-#-#-#-#
-# edX translation file
-# Copyright (C) 2016 edX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# #-#-#-#-#  underscore.po (0.1a)  #-#-#-#-#
-# edX translation file
-# Copyright (C) 2016 edX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# #-#-#-#-#  underscore-studio.po (0.1a)  #-#-#-#-#
-# edX translation file
-# Copyright (C) 2016 edX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# #-#-#-#-#  underscore.po (0.1a)  #-#-#-#-#
-# edX translation file
-# Copyright (C) 2016 edX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# #-#-#-#-#  underscore-studio.po (0.1a)  #-#-#-#-#
-# edX translation file
-# Copyright (C) 2016 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
@@ -276,248 +36,8 @@
 # UAbierta Universidad de Chile <uabierta@u.uchile.cl>, 2015
 # Valeria Freire <valtodopds@hotmail.com>, 2014-2015
 # #-#-#-#-#  djangojs-studio.po (edx-platform)  #-#-#-#-#
-# #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
-# #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
-# #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
-# #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
 # edX translation file.
 # Copyright (C) 2016 EdX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# #-#-#-#-#  djangojs-studio.po (0.1a)  #-#-#-#-#
-# edX translation file.
-# Copyright (C) 2016 EdX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# #-#-#-#-#  underscore.po (0.1a)  #-#-#-#-#
-# edX translation file
-# Copyright (C) 2016 edX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# #-#-#-#-#  underscore-studio.po (0.1a)  #-#-#-#-#
-# edX translation file
-# Copyright (C) 2016 edX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# #-#-#-#-#  djangojs-studio.po (0.1a)  #-#-#-#-#
-# #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
-# edX translation file.
-# Copyright (C) 2016 EdX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# #-#-#-#-#  djangojs-studio.po (0.1a)  #-#-#-#-#
-# edX translation file.
-# Copyright (C) 2016 EdX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# #-#-#-#-#  underscore.po (0.1a)  #-#-#-#-#
-# edX translation file
-# Copyright (C) 2016 edX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# #-#-#-#-#  underscore-studio.po (0.1a)  #-#-#-#-#
-# edX translation file
-# Copyright (C) 2016 edX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# #-#-#-#-#  underscore.po (0.1a)  #-#-#-#-#
-# edX translation file
-# Copyright (C) 2016 edX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# #-#-#-#-#  underscore-studio.po (0.1a)  #-#-#-#-#
-# edX translation file
-# Copyright (C) 2016 edX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# #-#-#-#-#  djangojs-studio.po (0.1a)  #-#-#-#-#
-# #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
-# #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
-# edX translation file.
-# Copyright (C) 2016 EdX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# #-#-#-#-#  djangojs-studio.po (0.1a)  #-#-#-#-#
-# edX translation file.
-# Copyright (C) 2016 EdX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# #-#-#-#-#  underscore.po (0.1a)  #-#-#-#-#
-# edX translation file
-# Copyright (C) 2016 edX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# #-#-#-#-#  underscore-studio.po (0.1a)  #-#-#-#-#
-# edX translation file
-# Copyright (C) 2016 edX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# #-#-#-#-#  djangojs-studio.po (0.1a)  #-#-#-#-#
-# #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
-# edX translation file.
-# Copyright (C) 2016 EdX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# #-#-#-#-#  djangojs-studio.po (0.1a)  #-#-#-#-#
-# edX translation file.
-# Copyright (C) 2016 EdX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# #-#-#-#-#  underscore.po (0.1a)  #-#-#-#-#
-# edX translation file
-# Copyright (C) 2016 edX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# #-#-#-#-#  underscore-studio.po (0.1a)  #-#-#-#-#
-# edX translation file
-# Copyright (C) 2016 edX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# #-#-#-#-#  underscore.po (0.1a)  #-#-#-#-#
-# edX translation file
-# Copyright (C) 2016 edX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# #-#-#-#-#  underscore-studio.po (0.1a)  #-#-#-#-#
-# edX translation file
-# Copyright (C) 2016 edX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# #-#-#-#-#  underscore.po (0.1a)  #-#-#-#-#
-# edX translation file
-# Copyright (C) 2016 edX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# #-#-#-#-#  underscore-studio.po (0.1a)  #-#-#-#-#
-# edX translation file
-# Copyright (C) 2016 edX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# #-#-#-#-#  djangojs-studio.po (0.1a)  #-#-#-#-#
-# #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
-# #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
-# #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
-# edX translation file.
-# Copyright (C) 2016 EdX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# #-#-#-#-#  djangojs-studio.po (0.1a)  #-#-#-#-#
-# edX translation file.
-# Copyright (C) 2016 EdX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# #-#-#-#-#  underscore.po (0.1a)  #-#-#-#-#
-# edX translation file
-# Copyright (C) 2016 edX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# #-#-#-#-#  underscore-studio.po (0.1a)  #-#-#-#-#
-# edX translation file
-# Copyright (C) 2016 edX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# #-#-#-#-#  djangojs-studio.po (0.1a)  #-#-#-#-#
-# #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
-# edX translation file.
-# Copyright (C) 2016 EdX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# #-#-#-#-#  djangojs-studio.po (0.1a)  #-#-#-#-#
-# edX translation file.
-# Copyright (C) 2016 EdX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# #-#-#-#-#  underscore.po (0.1a)  #-#-#-#-#
-# edX translation file
-# Copyright (C) 2016 edX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# #-#-#-#-#  underscore-studio.po (0.1a)  #-#-#-#-#
-# edX translation file
-# Copyright (C) 2016 edX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# #-#-#-#-#  underscore.po (0.1a)  #-#-#-#-#
-# edX translation file
-# Copyright (C) 2016 edX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# #-#-#-#-#  underscore-studio.po (0.1a)  #-#-#-#-#
-# edX translation file
-# Copyright (C) 2016 edX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# #-#-#-#-#  djangojs-studio.po (0.1a)  #-#-#-#-#
-# #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
-# #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
-# edX translation file.
-# Copyright (C) 2016 EdX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# #-#-#-#-#  djangojs-studio.po (0.1a)  #-#-#-#-#
-# edX translation file.
-# Copyright (C) 2016 EdX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# #-#-#-#-#  underscore.po (0.1a)  #-#-#-#-#
-# edX translation file
-# Copyright (C) 2016 edX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# #-#-#-#-#  underscore-studio.po (0.1a)  #-#-#-#-#
-# edX translation file
-# Copyright (C) 2016 edX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# #-#-#-#-#  djangojs-studio.po (0.1a)  #-#-#-#-#
-# #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
-# edX translation file.
-# Copyright (C) 2016 EdX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# #-#-#-#-#  djangojs-studio.po (0.1a)  #-#-#-#-#
-# edX translation file.
-# Copyright (C) 2016 EdX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# #-#-#-#-#  underscore.po (0.1a)  #-#-#-#-#
-# edX translation file
-# Copyright (C) 2016 edX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# #-#-#-#-#  underscore-studio.po (0.1a)  #-#-#-#-#
-# edX translation file
-# Copyright (C) 2016 edX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# #-#-#-#-#  underscore.po (0.1a)  #-#-#-#-#
-# edX translation file
-# Copyright (C) 2016 edX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# #-#-#-#-#  underscore-studio.po (0.1a)  #-#-#-#-#
-# edX translation file
-# Copyright (C) 2016 edX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# #-#-#-#-#  underscore.po (0.1a)  #-#-#-#-#
-# edX translation file
-# Copyright (C) 2016 edX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# #-#-#-#-#  underscore-studio.po (0.1a)  #-#-#-#-#
-# edX translation file
-# Copyright (C) 2016 edX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# #-#-#-#-#  underscore.po (0.1a)  #-#-#-#-#
-# edX translation file
-# Copyright (C) 2016 edX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# #-#-#-#-#  underscore-studio.po (0.1a)  #-#-#-#-#
-# edX translation file
-# Copyright (C) 2016 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
@@ -587,7 +107,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-05-19 17:09+0000\n"
+"POT-Creation-Date: 2016-05-26 16:38+0000\n"
 "PO-Revision-Date: 2016-05-25 00:06+0000\n"
 "Last-Translator: Juan Camilo Montoya Franco <juan.montoya@edunext.co>\n"
 "Language-Team: Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/)\n"
@@ -2302,20 +1822,28 @@ msgstr[1] "%(value)s segundos"
 
 #: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js
 msgid ""
-"Volume: Click on this button to mute or unmute this video or press UP or "
+"Click on this button to mute or unmute this video or press UP or DOWN "
+"buttons to increase or decrease volume level."
 msgstr ""
-"Clic en este botón para silenciar o anular silenciar para este video o "
-"presiona ARRIBA o"
+
+#: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js
+msgid "Adjust video volume"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/08_video_speed_control.js
 msgid ""
-"Speed: Press UP to enter the speed menu then use the UP and DOWN arrow keys "
-"to navigate the different speeds, then press ENTER to change to the selected"
-" speed."
+"Press UP to enter the speed menu then use the UP and DOWN arrow keys to "
+"navigate the different speeds, then press ENTER to change to the selected "
+"speed."
 msgstr ""
-"Velocidad: Presione ARRIBA para acceder al menú luego use las teclas de "
-"ARRIBA y ABAJO para cambiar a diferentes velocidades, entonces presionas "
-"ENTER para cambiar a la velocidad seleccionada."
+
+#: common/lib/xmodule/xmodule/js/src/video/08_video_speed_control.js
+msgid "Adjust video speed"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/js/src/video/08_video_speed_control.js
+msgid "Video speed: "
+msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/09_play_skip_control.js
 msgid "Skip"
@@ -2328,6 +1856,10 @@ msgstr "Reproducir video"
 #: common/lib/xmodule/xmodule/js/src/video/09_skip_control.js
 msgid "Do not show again"
 msgstr "No mostrar nuevamente"
+
+#: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
+msgid "Open language menu"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "Transcript will be displayed when you start playing the video."
@@ -2355,13 +1887,10 @@ msgstr "Fin de la transcripción. Saltar al inicio."
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid ""
-"Language: Press the UP arrow key to enter the language menu then use UP and "
-"DOWN arrow keys to navigate language options. Press ENTER to change to the "
-"selected language."
+"Press the UP arrow key to enter the language menu then use UP and DOWN arrow"
+" keys to navigate language options. Press ENTER to change to the selected "
+"language."
 msgstr ""
-"Idioma: Presione la flecha ARRIBA para entrar al menú de idioma, luego use "
-"las flechas ARRIBA y ABAJO para navegar las opciones de idioma. Presione "
-"ENTRAR para cambiar al idioma seleccionado."
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "Open language menu."
@@ -3375,7 +2904,7 @@ msgstr ""
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
 #: lms/static/js/bookmarks/views/bookmarks_list.js
 #: lms/templates/search/search_loading.underscore
-#: lms/templates/student_account/account_settings.underscore
+#: lms/templates/student_account/account_settings_section.underscore
 msgid "Loading"
 msgstr "Cargando"
 
@@ -4751,8 +4280,13 @@ msgstr ""
 "Internet."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
-msgid "Basic Account Information (required)"
-msgstr "Información básica de la cuenta (requerida)"
+msgid "Basic Account Information"
+msgstr ""
+
+#: lms/static/js/student_account/views/account_settings_factory.js
+msgid ""
+"These settings include basic information about your account. You can also "
+msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid ""
@@ -4797,22 +4331,12 @@ msgid "Password"
 msgstr "Contraseña"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
-msgid "Reset your Password"
-msgstr "Restablecer su contraseña"
-
-#: lms/static/js/student_account/views/account_settings_factory.js
-#: lms/templates/student_account/account.underscore
-msgid "Reset Password"
-msgstr "Restablecer contraseña"
-
-#: lms/static/js/student_account/views/account_settings_factory.js
-msgid ""
-"When you click \"Reset Password\", a message will be sent to your email "
-"address. Click the link in the message to reset your password."
+msgid "Reset Your Password"
 msgstr ""
-"Cuando realice clic en \"Restablecer Contraseña\", se enviará un mensaje a "
-"su dirección de correo. Haga clic en el vínculo que encontrará en el mensaje"
-" para restablecer su contraseña."
+
+#: lms/static/js/student_account/views/account_settings_factory.js
+msgid "When you click \"Reset Your Password\", edX will send a message "
+msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid ""
@@ -4827,8 +4351,8 @@ msgid "Country or Region"
 msgstr "País o Región"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
-msgid "Additional Information (optional)"
-msgstr "Información adicional (opcional)"
+msgid "Additional Information"
+msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "Education Completed"
@@ -4848,20 +4372,21 @@ msgid "Preferred Language"
 msgstr "Preferencia de idioma"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
-msgid "Connected Accounts"
-msgstr "Cuentas conectadas"
+#: lms/static/js/student_account/views/account_settings_view.js
+msgid "Linked Accounts"
+msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
-msgid "Connect your {accountName} account"
-msgstr "Conecte su cuenta {accountName}"
+msgid ""
+"You can link your social media accounts to your edX account to make signing "
+"in to edx.org "
+msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_fields.js
 msgid ""
 "We've sent a confirmation message to {new_email_address}. Click the link in "
-"the message to update your email address."
+"the "
 msgstr ""
-"Hemos enviado un mensaje de confirmación a {new_email_address}. Haga clic en"
-" el vínculo del mensaje para actualizar su correo electrónico."
 
 #: lms/static/js/student_account/views/account_settings_fields.js
 msgid ""
@@ -4873,18 +4398,32 @@ msgstr ""
 #: lms/static/js/student_account/views/account_settings_fields.js
 msgid ""
 "We've sent a message to {email_address}. Click the link in the message to "
-"reset your password."
+"reset "
 msgstr ""
-"Hemos enviado un mensaje a {email_address}. Haga clic en el mensaje para "
-"restablecer su contraseña."
 
 #: lms/static/js/student_account/views/account_settings_fields.js
-msgid "Unlink"
-msgstr "Desvincular"
+msgid "Link your {accountName} account"
+msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_fields.js
-msgid "Link"
-msgstr "Vincular"
+msgid "Unlink This Account"
+msgstr ""
+
+#: lms/static/js/student_account/views/account_settings_fields.js
+msgid "You can use your {accountName} account to sign in to your edX account."
+msgstr ""
+
+#: lms/static/js/student_account/views/account_settings_fields.js
+msgid "Unlink your {accountName} account"
+msgstr ""
+
+#: lms/static/js/student_account/views/account_settings_fields.js
+msgid "Link Your Account"
+msgstr ""
+
+#: lms/static/js/student_account/views/account_settings_fields.js
+msgid "Link your {accountName} account to your edX account and "
+msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_fields.js
 msgid "Unlinking"
@@ -4897,6 +4436,10 @@ msgstr "Vinculando"
 #: lms/static/js/student_account/views/account_settings_fields.js
 msgid "Successfully unlinked."
 msgstr "Se desvinculó con éxito."
+
+#: lms/static/js/student_account/views/account_settings_view.js
+msgid "Account Information"
+msgstr ""
 
 #: lms/static/js/student_profile/views/badge_list_container.js
 msgid "Accomplishments Pagination"
@@ -7278,6 +6821,7 @@ msgid "Clear search results"
 msgstr "Borrar resultados de búsqueda"
 
 #: lms/templates/fields/field_dropdown.underscore
+#: lms/templates/fields/field_dropdown_account.underscore
 #: lms/templates/fields/field_textarea.underscore
 msgid "Click to edit"
 msgstr "Haga clic para editar"
@@ -7727,6 +7271,24 @@ msgstr ""
 "Has obtenido certificados en %(completed_courses)s de los %(total_courses)s "
 "cursos hasta el momento."
 
+#: lms/templates/learner_dashboard/program_header_view.underscore
+msgid "Programs"
+msgstr ""
+
+#: lms/templates/learner_dashboard/program_header_view.underscore
+msgid "{category}\\'s program"
+msgstr ""
+
+#: lms/templates/learner_dashboard/program_header_view.underscore
+msgid "{organization}\\'s logo"
+msgstr ""
+
+#: lms/templates/learner_dashboard/program_header_view.underscore
+msgid ""
+"To complete the {program} XSeries and earn an XSeries Certificate you must "
+"successfully earn a Verified Certificate in all courses shown below."
+msgstr ""
+
 #: lms/templates/search/course_search_results.underscore
 #: lms/templates/search/dashboard_search_results.underscore
 #, python-format
@@ -7752,25 +7314,23 @@ msgstr "Nueva dirección "
 msgid "Change My Email Address"
 msgstr "Cambiar mi dirección de correo electrónico"
 
+#: lms/templates/student_account/account.underscore
+msgid "Reset Password"
+msgstr "Restablecer Contraseña"
+
 #: lms/templates/student_account/account_settings.underscore
 msgid "Account Settings"
 msgstr "Configuración de cuenta"
 
-#: lms/templates/student_account/account_settings.underscore
-msgid ""
-"These settings include basic information about your account. You can also "
-"specify additional information and see your linked social accounts on this "
-"page."
+#: lms/templates/student_account/account_settings_section.underscore
+msgid "section.subtitle"
 msgstr ""
-"Esta configuración incluye información básica de su cuenta. También puede "
-"añadir información adicional y ver los perfiles de redes sociales asociados "
-"a su cuenta."
 
-#: lms/templates/student_account/account_settings.underscore
+#: lms/templates/student_account/account_settings_section.underscore
 msgid "section.title"
 msgstr "section.title"
 
-#: lms/templates/student_account/account_settings.underscore
+#: lms/templates/student_account/account_settings_section.underscore
 msgid "An error occurred. Please reload the page."
 msgstr "Ocurrió un error. Por favor recargue la página."
 

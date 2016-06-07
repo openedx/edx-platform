@@ -92,8 +92,8 @@ else
 
         # Dump the schema and data to the cache
         echo "Using the dumpdata command to save the $db fixture data to the filesystem."
-        ./manage.py lms --settings bok_choy dumpdata --database $db > $DB_CACHE_DIR/bok_choy_data_$db.json
-        echo "Saving the schema of the $dh bok_choy DB to the filesystem."
+        ./manage.py lms --settings bok_choy dumpdata --database $db > $DB_CACHE_DIR/bok_choy_data_$db.json --exclude=api_admin.Catalog
+        echo "Saving the schema of the $db bok_choy DB to the filesystem."
         mysqldump -u root --no-data --skip-comments --skip-dump-date "${databases[$db]}" > $DB_CACHE_DIR/bok_choy_schema_$db.sql
 
         # dump_data does not dump the django_migrations table so we do it separately.

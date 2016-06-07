@@ -5,6 +5,7 @@ Tests for discussion pages
 import datetime
 from uuid import uuid4
 
+from flaky import flaky
 from nose.plugins.attrib import attr
 from pytz import UTC
 
@@ -403,17 +404,17 @@ class DiscussionOpenClosedThreadTest(BaseDiscussionTestCase):
 
     def test_originally_open_thread_vote_display(self):
         page = self.setup_openclosed_thread_page()
-        self.assertFalse(page._is_element_visible('.forum-thread-main-wrapper .action-vote'))
-        self.assertTrue(page._is_element_visible('.forum-thread-main-wrapper .display-vote'))
-        self.assertFalse(page._is_element_visible('.response_response1 .action-vote'))
-        self.assertTrue(page._is_element_visible('.response_response1 .display-vote'))
+        self.assertFalse(page.is_element_visible('.thread-main-wrapper .action-vote'))
+        self.assertTrue(page.is_element_visible('.thread-main-wrapper .display-vote'))
+        self.assertFalse(page.is_element_visible('.response_response1 .action-vote'))
+        self.assertTrue(page.is_element_visible('.response_response1 .display-vote'))
 
     def test_originally_closed_thread_vote_display(self):
         page = self.setup_openclosed_thread_page(True)
-        self.assertTrue(page._is_element_visible('.forum-thread-main-wrapper .action-vote'))
-        self.assertFalse(page._is_element_visible('.forum-thread-main-wrapper .display-vote'))
-        self.assertTrue(page._is_element_visible('.response_response1 .action-vote'))
-        self.assertFalse(page._is_element_visible('.response_response1 .display-vote'))
+        self.assertTrue(page.is_element_visible('.thread-main-wrapper .action-vote'))
+        self.assertFalse(page.is_element_visible('.thread-main-wrapper .display-vote'))
+        self.assertTrue(page.is_element_visible('.response_response1 .action-vote'))
+        self.assertFalse(page.is_element_visible('.response_response1 .display-vote'))
 
     @attr('a11y')
     def test_page_accessibility(self):
@@ -1219,6 +1220,7 @@ class DiscussionSortPreferenceTest(UniqueCourseTest):
         self.sort_page = DiscussionSortPreferencePage(self.browser, self.course_id)
         self.sort_page.visit()
 
+    @flaky  # TODO fix this, see TNL-4682
     def test_default_sort_preference(self):
         """
         Test to check the default sorting preference of user. (Default = date )
@@ -1237,6 +1239,7 @@ class DiscussionSortPreferenceTest(UniqueCourseTest):
             selected_sort = self.sort_page.get_selected_sort_preference()
             self.assertEqual(selected_sort, sort_type)
 
+    @flaky  # TODO fix this, see TNL-4682
     def test_last_preference_saved(self):
         """
         Test that user last preference is saved.

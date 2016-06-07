@@ -1,5 +1,6 @@
 <%inherit file="/main.html" />
 <%namespace name='static' file='/static_content.html'/>
+<%def name="online_help_token()"><% return "progress" %></%def>
 <%!
 from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse
@@ -123,7 +124,7 @@ from django.utils.http import urlquote_plus
                     %elif credit_course_requirements['eligibility_status'] == 'partial_eligible':
                         <span>${_("{student_name}, you have not yet met the requirements for credit.").format(student_name=student.profile.name) | h}</span>
                     %endif
-                    <a href="${settings.CREDIT_HELP_LINK_URL | h}" class="credit-help"><i class="fa fa-question"></i><span class="sr">${_("Information about course credit requirements")}</span></a><br>
+                    <a href="${settings.CREDIT_HELP_LINK_URL | h}" class="credit-help"><span class="fa fa-question" aria-hidden="true"></span><span class="sr">${_("Information about course credit requirements")}</span></a><br>
                     <div class="requirement-container" data-eligible="${credit_course_requirements['eligibility_status'] | h}">
                     %for requirement in credit_course_requirements['requirements']:
                         <div class="requirement">
@@ -138,13 +139,13 @@ from django.utils.http import urlquote_plus
                                     %if requirement['status'] == 'submitted':
                                         <span class="requirement-submitted">${_("Verification Submitted")}</span>
                                     %elif requirement['status'] == 'failed':
-                                        <i class="fa fa-times" aria-hidden="true"></i>
+                                        <span class="fa fa-times" aria-hidden="true"></span>
                                         <span>${_("Verification Failed" )}</span>
                                     %elif requirement['status'] == 'declined':
-                                        <i class="fa fa-times" aria-hidden="true"></i>
+                                        <span class="fa fa-times" aria-hidden="true"></span>
                                         <span>${_("Verification Declined" )}</span>
                                     %elif requirement['status'] == 'satisfied':
-                                        <i class="fa fa-check" aria-hidden="true"></i>
+                                        <span class="fa fa-check" aria-hidden="true"></span>
                                         <span>${_("Completed by")} ${get_time_display(requirement['status_date'], DEFAULT_SHORT_DATE_FORMAT, settings.TIME_ZONE)}</span>
                                     %endif
                                 %else:
@@ -154,7 +155,7 @@ from django.utils.http import urlquote_plus
                         </div>
                     %endfor
                      </div>
-                    <button class="detail-collapse" aria-live="polite"><i class="fa fa-caret-up" aria-hidden="true"></i>
+                    <button class="detail-collapse" aria-live="polite"><span class="fa fa-caret-up" aria-hidden="true"></span>
                         <span class="requirement-detail">${_("Less")}</span>
                     </button>
                 </div>

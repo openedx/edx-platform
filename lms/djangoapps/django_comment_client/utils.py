@@ -385,7 +385,7 @@ def get_discussion_category_map(course, user, cohorted_if_in_list=False, exclude
     return _filter_unstarted_categories(category_map, course) if exclude_unstarted else category_map
 
 
-def discussion_category_id_access(course, user, discussion_id):
+def discussion_category_id_access(course, user, discussion_id, module=None):
     """
     Returns True iff the given discussion_id is accessible for user in course.
     Assumes that the commentable identified by discussion_id has a null or 'course' context.
@@ -395,10 +395,11 @@ def discussion_category_id_access(course, user, discussion_id):
     if discussion_id in course.top_level_discussion_topic_ids:
         return True
     try:
-        key = get_cached_discussion_key(course, discussion_id)
-        if not key:
-            return False
-        module = modulestore().get_item(key)
+        if not module:
+            key = get_cached_discussion_key(course, discussion_id)
+            if not key:
+                return False
+            module = modulestore().get_item(key)
         return has_required_keys(module) and has_access(user, 'load', module, course.id)
     except DiscussionIdMapIsNotCached:
         return discussion_id in get_discussion_categories_ids(course, user)

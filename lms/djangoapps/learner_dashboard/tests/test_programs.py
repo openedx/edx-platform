@@ -24,7 +24,7 @@ from openedx.core.djangoapps.programs.tests.mixins import (
     ProgramsDataMixin)
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
@@ -231,12 +231,17 @@ class TestProgramListing(
 @httpretty.activate
 @override_settings(MKTG_URLS={'ROOT': 'http://edx.org'})
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
-class TestProgramDetails(ProgramsApiConfigMixin, TestCase):
+class TestProgramDetails(ProgramsApiConfigMixin, SharedModuleStoreTestCase):
     """
     Unit tests for the program details page
     """
     program_id = 123
     password = 'test'
+
+    @classmethod
+    def setUpClass(cls):
+        super(TestProgramDetails, cls).setUpClass()
+        cls.course = CourseFactory()
 
     def setUp(self):
         super(TestProgramDetails, self).setUp()
@@ -248,11 +253,12 @@ class TestProgramDetails(ProgramsApiConfigMixin, TestCase):
 
         ClientFactory(name=ProgramsApiConfig.OAUTH2_CLIENT_NAME, client_type=CONFIDENTIAL)
 
+        self.organization = factories.Organization()
+        self.run_mode = factories.RunMode(course_key=unicode(self.course.id))  # pylint: disable=no-member
+        self.course_code = factories.CourseCode(run_modes=[self.run_mode])
         self.data = factories.Program(
-            organizations=[factories.Organization()],
-            course_codes=[
-                factories.CourseCode(run_modes=[factories.RunMode()]),
-            ]
+            organizations=[self.organization],
+            course_codes=[self.course_code]
         )
 
     def _mock_programs_api(self):

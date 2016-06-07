@@ -327,7 +327,7 @@ mark {
 }
 
 // UI - semantically hide text
-.sr {
+.sr, .sr-only {
   @extend %text-sr;
   @extend %a11y-ensure-contrast;
 }
