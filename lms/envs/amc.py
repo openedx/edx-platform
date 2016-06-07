@@ -17,6 +17,7 @@ INSTALLED_APPS += ('appsembler_lms',)
 
 MICROSITE_BACKEND = 'microsite_configuration.backends.database.DatabaseMicrositeBackend'
 
+STATICFILES_STORAGE = 'openedx.core.storage.DevelopmentStorage'
 
 CORS_ORIGIN_ALLOW_ALL = True
 

@@ -54,7 +54,7 @@ class Microsite(models.Model):
             self.values = self._get_initial_microsite_values()
         # recompile SASS on every save
         self.compile_microsite_sass()
-        self.collect_css_file()
+        #self.collect_css_file()
         return super(Microsite, self).save(**kwargs)
 
     def get_organizations(self):
