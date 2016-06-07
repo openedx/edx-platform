@@ -31,8 +31,14 @@ class UrlResetMixin(object):
 
     URLCONF_MODULES = None
 
-    def _reset_urls(self, urlconf_modules):
+    def reset_urls(self, urlconf_modules=None):
         """Reset `urls.py` for a set of Django apps."""
+
+        if urlconf_modules is None:
+            urlconf_modules = [settings.ROOT_URLCONF]
+            if self.URLCONF_MODULES is not None:
+                urlconf_modules.extend(self.URLCONF_MODULES)
+
         for urlconf in urlconf_modules:
             if urlconf in sys.modules:
                 reload(sys.modules[urlconf])
@@ -61,12 +67,8 @@ class UrlResetMixin(object):
         """
         super(UrlResetMixin, self).setUp()
 
-        urlconf_modules = [settings.ROOT_URLCONF]
-        if self.URLCONF_MODULES is not None:
-            urlconf_modules.extend(self.URLCONF_MODULES)
-
-        self._reset_urls(urlconf_modules)
-        self.addCleanup(lambda: self._reset_urls(urlconf_modules))
+        self.reset_urls()
+        self.addCleanup(self.reset_urls)
 
 
 class EventTestMixin(object):
