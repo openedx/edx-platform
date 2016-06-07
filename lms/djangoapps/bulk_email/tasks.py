@@ -35,6 +35,7 @@ from django.contrib.auth.models import User
 from django.core.mail import EmailMultiAlternatives, get_connection
 from django.core.mail.message import forbid_multi_line_headers
 from django.core.urlresolvers import reverse
+from django.utils.translation import override as override_language, ugettext as _
 
 from bulk_email.models import CourseEmail, Optout
 from courseware.courses import get_course
@@ -373,7 +374,12 @@ def _get_source_address(course_id, course_title, truncate=True):
     # character appears.
     course_name = re.sub(r"[^\w.-]", '_', course_id.course)
 
-    from_addr_format = u'"{course_title}" Course Staff <{course_name}-{from_email}>'
+    with override_language(settings.LANGUAGE_CODE):
+        from_addr_format = u'{name} {email}'.format(
+            # Translators: Bulk email from address e.g. ("Physics 101" Course Staff)
+            name=_('"{course_title}" Course Staff'),
+            email=u'<{course_name}-{from_email}>',
+        )
 
     def format_address(course_title_no_quotes):
         """
