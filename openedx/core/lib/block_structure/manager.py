@@ -81,6 +81,7 @@ class BlockStructureManager(object):
                 starting at root_block_usage_key, with collected data
                 from each registered transformer.
         """
+        print "get_collected() in manager.py ***************"
         block_structure = BlockStructureFactory.create_from_cache(
             self.root_block_usage_key,
             self.block_structure_cache
@@ -110,4 +111,5 @@ class BlockStructureManager(object):
         Removes cached data for the block structure associated with the given
         root block key.
         """
+        print "clear() in manager.py ***************"
         self.block_structure_cache.delete(self.root_block_usage_key)
