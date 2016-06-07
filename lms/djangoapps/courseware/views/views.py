@@ -726,6 +726,12 @@ def _progress(request, course_key, student_id):
 
     # checking certificate generation configuration
     enrollment_mode, is_active = CourseEnrollment.enrollment_mode_for_user(student, course_key)
+
+    # If the learner is in verified modes and the student did not have
+    # their ID verified, we need to show message to ask learner to verify their ID first
+    missing_required_verification = enrollment_mode in CourseMode.VERIFIED_MODES and \
+        not SoftwareSecurePhotoVerification.user_is_verified(student)
+
     show_generate_cert_btn = (
         is_active and CourseMode.is_eligible_for_certificate(enrollment_mode)
         and certs_api.cert_generation_enabled(course_key)
@@ -741,7 +747,7 @@ def _progress(request, course_key, student_id):
         'passed': is_course_passed(course, grade_summary),
         'show_generate_cert_btn': show_generate_cert_btn,
         'credit_course_requirements': _credit_course_requirements(course_key, student),
-        'is_id_verified': SoftwareSecurePhotoVerification.user_is_verified(student)
+        'missing_required_verification': missing_required_verification
     }
 
     if show_generate_cert_btn:
