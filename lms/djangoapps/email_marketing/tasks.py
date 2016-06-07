@@ -2,7 +2,6 @@
 This file contains celery tasks for email marketing signal handler.
 """
 import logging
-import datetime
 import time
 
 from pytz import UTC
@@ -21,7 +20,7 @@ log = logging.getLogger(__name__)
 
 # pylint: disable=not-callable
 @task(bind=True, default_retry_delay=3600, max_retries=24)
-def update_user(self, username, new_user=False):
+def update_user(self, username, new_user=False, activation=False):
     """
     Adds/updates Sailthru profile information for a user.
      Args:
@@ -49,8 +48,8 @@ def update_user(self, username, new_user=False):
         log.error("User profile not found duing Sailthru update %s", username)
         return
 
+    sailthru_client = SailthruClient(email_config.sailthru_key, email_config.sailthru_secret)
     try:
-        sailthru_client = SailthruClient(email_config.sailthru_key, email_config.sailthru_secret)
         sailthru_response = sailthru_client.api_post("user",
                                                      _create_sailthru_user_parm(user, profile, new_user, email_config))
     except SailthruClientError as exc:
@@ -66,6 +65,24 @@ def update_user(self, username, new_user=False):
         raise self.retry(countdown=email_config.sailthru_retry_interval,
                          max_retries=email_config.sailthru_max_retries)
 
+    # if activating user, send welcome email
+    if activation and email_config.sailthru_activation_template:
+        try:
+            sailthru_response = sailthru_client.api_post("send",
+                                                         {"email": user.email,
+                                                          "template": email_config.sailthru_activation_template})
+        except SailthruClientError as exc:
+            log.error("Exception attempting to send welcome email to user %s in Sailthru - %s", username, unicode(exc))
+            raise self.retry(exc=exc,
+                             countdown=email_config.sailthru_retry_interval,
+                             max_retries=email_config.sailthru_max_retries)
+
+        if not sailthru_response.is_ok():
+            error = sailthru_response.get_error()
+            # put out error and schedule retry
+            log.error("Error attempting to send welcome email to user in Sailthru: %s", error.get_message())
+            raise self.retry(countdown=email_config.sailthru_retry_interval,
+                             max_retries=email_config.sailthru_max_retries)
 
 # pylint: disable=not-callable
 @task(bind=True, default_retry_delay=3600, max_retries=24)
