@@ -111,11 +111,12 @@
                             })
                         },
                         {
-                            view: new  AccountSettingsFieldViews.DropdownFieldView({
+                            view: new AccountSettingsFieldViews.DropdownFieldView({
                                 model: userPreferencesModel,
                                 required: true,
                                 title: gettext('Time Zone'),
                                 valueAttribute: 'time_zone',
+                                enabled: fieldsData.time_zone.enabled,
                                 helpMessage: gettext(
                                     'Select the time zone for displaying course dates. If you do not specify a ' +
                                     'time zone here, course dates, including assignment deadlines, are displayed in ' +

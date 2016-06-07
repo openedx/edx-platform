@@ -27,7 +27,8 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
                 }, 'preferred_language': {
                     'options': Helpers.FIELD_OPTIONS
                 }, 'time_zone': {
-                    'options': Helpers.FIELD_OPTIONS
+                    'options': Helpers.FIELD_OPTIONS,
+                    'enabled': false
                 }
             };
 
