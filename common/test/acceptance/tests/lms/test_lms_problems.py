@@ -5,6 +5,7 @@ Bok choy acceptance tests for problems in the LMS
 See also old lettuce tests in lms/djangoapps/courseware/features/problems.feature
 """
 from textwrap import dedent
+from nose.plugins.attrib import attr
 
 from ..helpers import UniqueCourseTest
 from ...pages.studio.auto_auth import AutoAuthPage
@@ -38,9 +39,12 @@ class ProblemsTest(UniqueCourseTest):
         )
 
         problem = self.get_problem()
+        problems = (problem,) * self.get_num_problems()
         course_fixture.add_children(
             XBlockFixtureDesc('chapter', 'Test Section').add_children(
-                XBlockFixtureDesc('sequential', 'Test Subsection').add_children(problem)
+                XBlockFixtureDesc('sequential', 'Test Subsection').add_children(
+                    XBlockFixtureDesc('vertical', 'Test Unit').add_children(*problems)
+                )
             )
         ).install()
 
@@ -57,6 +61,12 @@ class ProblemsTest(UniqueCourseTest):
     def get_problem(self):
         """ Subclasses should override this to complete the fixture """
         raise NotImplementedError()
+
+    def get_num_problems(self):
+        """
+        Tells how many problems to create. Defaults to 1.
+        """
+        return 1
 
 
 class ProblemClarificationTest(ProblemsTest):
@@ -186,68 +196,137 @@ class ProblemHintWithHtmlTest(ProblemsTest, EventsTestMixin):
         """
         xml = dedent("""
             <problem>
-            <p>question text</p>
-            <stringresponse answer="A">
-                <stringequalhint answer="C"><a href="#">aa bb</a> cc</stringequalhint>
-                <textline size="20"/>
-            </stringresponse>
-            <demandhint>
-              <hint>aa <a href="#">bb</a> cc</hint>
-              <hint><a href="#">dd  ee</a> ff</hint>
-            </demandhint>
+                <question>
+                    <p>question text</p>
+                    <stringresponse answer="A">
+                        <stringequalhint answer="C"><a href="#">aa bb</a> cc</stringequalhint>
+                        <textline size="20"/>
+                    </stringresponse>
+                    <demandhint>
+                      <hint>question 1 hint 1</hint>
+                      <hint>question 1 hint 2</hint>
+                    </demandhint>
+                </question>
+                <question>
+                    <p>That is the question</p>
+                    <multiplechoiceresponse>
+                      <choicegroup type="MultipleChoice">
+                        <choice correct="false">Alpha <choicehint>A hint</choicehint></choice>
+                        <choice correct="true">Beta</choice>
+                      </choicegroup>
+                    </multiplechoiceresponse>
+                    <demandhint>
+                      <hint>question 2 hint 1</hint>
+                      <hint>question 2 hint 2</hint>
+                    </demandhint>
+                </question>
             </problem>
         """)
         return XBlockFixtureDesc('problem', 'PROBLEM HTML HINT TEST', data=xml)
 
     def test_check_hint(self):
         """
-        Test clicking Check shows the extended hint in the problem message.
+        Scenario: Test clicking Check shows the extended hint in the problem message.
+        Given I am enrolled in a course.
+        And I visit a unit page with two CAPA question
+        Then I gave incorrect answers for both questions
+        When I click the check button
+        Then I should see 2 hint messages
+        And expected events are emitted
         """
         self.courseware_page.visit()
         problem_page = ProblemPage(self.browser)
+
+        # first question
         self.assertEqual(problem_page.problem_text[0], u'question text')
         problem_page.fill_answer('C')
+
+        # second question
+        problem_page.question_id = 1
+        self.assertEqual(problem_page.problem_text[0], u'That is the question')
+        problem_page.click_choice('choice_0')
+
         problem_page.click_check()
+
+        self.assertEqual(problem_page.message_text, u'Incorrect: A hint')
+        problem_page.question_id = 0
         self.assertEqual(problem_page.message_text, u'Incorrect: aa bb cc')
+
         # Check for corresponding tracking event
         actual_events = self.wait_for_events(
             event_filter={'event_type': 'edx.problem.hint.feedback_displayed'},
-            number_of_matches=1
+            number_of_matches=2
         )
+
+        # During in-order match only the expected key values are matched with in actual event data
+        # But in case of out-of-order match, all the keys in actual event data should be present in expected
+        # event data which is not possible always. That's why here we are deleting all those keys which are not
+        # present in expected event data.
+        for actual_event in actual_events:
+            del actual_event['event']['module_id']
+            del actual_event['event']['problem_part_id']
+
         self.assert_events_match(
-            [{'event': {'hint_label': u'Incorrect',
+            [
+                {
+                    'event':
+                    {
+                        'hint_label': u'Incorrect',
+                        'trigger_type': u'single',
+                        'student_answer': [u'choice_0'],
+                        'correctness': False,
+                        'question_type': u'multiplechoiceresponse',
+                        'hints': [{u'text': u'A hint'}]
+                    }
+                },
+                {
+                    'event':
+                    {
+                        'hint_label': u'Incorrect',
                         'trigger_type': 'single',
                         'student_answer': [u'C'],
                         'correctness': False,
                         'question_type': 'stringresponse',
-                        'hints': [{'text': '<a href="#">aa bb</a> cc'}]}}],
-            actual_events)
+                        'hints': [{'text': '<a href="#">aa bb</a> cc'}]
+                    }
+                }
+            ],
+            actual_events, in_order=False
+        )
 
     def test_demand_hint(self):
         """
-        Test clicking hint button shows the demand hint in its div.
+        Scenario: Verify that demandhint works as expected.
+        Given I am enrolled in a course.
+        And I visit a unit page with two CAPA question
+        When I click on Hint button for each question
+        Then I should see correct hint message for each question
+        And expected events are emitted
         """
         self.courseware_page.visit()
         problem_page = ProblemPage(self.browser)
-        # The hint button rotates through multiple hints
-        problem_page.click_hint()
-        self.assertEqual(problem_page.hint_text, u'Hint (1 of 2): aa bb cc')
-        problem_page.click_hint()
-        self.assertEqual(problem_page.hint_text, u'Hint (2 of 2): dd ee ff')
-        problem_page.click_hint()
-        self.assertEqual(problem_page.hint_text, u'Hint (1 of 2): aa bb cc')
-        # Check corresponding tracking events
-        actual_events = self.wait_for_events(
-            event_filter={'event_type': 'edx.problem.hint.demandhint_displayed'},
-            number_of_matches=3
-        )
-        self.assert_events_match(
-            [
-                {'event': {u'hint_index': 0, u'hint_len': 2, u'hint_text': u'aa <a href="#">bb</a> cc'}},
-                {'event': {u'hint_index': 1, u'hint_len': 2, u'hint_text': u'<a href="#">dd  ee</a> ff'}},
-                {'event': {u'hint_index': 0, u'hint_len': 2, u'hint_text': u'aa <a href="#">bb</a> cc'}}
-            ],
-            actual_events)
+
+        for question in (0, 1):
+            problem_page.question_id = question
+            for hint in (0, 1, 2):
+                problem_page.click_hint()
+                hint_num = hint % 2
+                prefix = u'Hint ({} of 2): '.format(hint_num + 1)
+                hint_text = 'question {} hint {}'.format(question + 1, hint_num + 1)
+                self.assertEqual(problem_page.hint_text, prefix + hint_text)
+
+                # Check corresponding tracking events
+                actual_events = self.wait_for_events(
+                    event_filter={'event_type': 'edx.problem.hint.demandhint_displayed'},
+                    number_of_matches=1
+                )
+                self.assert_events_match(
+                    [
+                        {'event': {u'hint_index': hint_num, u'hint_len': 2, u'hint_text': hint_text}}
+                    ],
+                    actual_events
+                )
+                self.reset_event_tracking()
 
 
 class ProblemWithMathjax(ProblemsTest):
@@ -412,3 +491,75 @@ class LogoutDuringAnswering(ProblemsTest):
 
         self.assertTrue(problem_page.is_browser_on_page())
         self.assertEqual(problem_page.problem_name, 'TEST PROBLEM')
+
+
+@attr('a11y')
+class CAPAProblemQuestionA11yTest(ProblemsTest):
+    """
+    TestCase Class to verify CAPA problem questions accessibility.
+    """
+    def get_problem(self):
+        """
+        Problem structure.
+        """
+        xml = dedent("""
+            <problem>
+                <question>
+                    <p>question text</p>
+                    <stringresponse answer="A">
+                        <stringequalhint answer="C"><a href="#">aa bb</a> cc</stringequalhint>
+                        <textline size="20"/>
+                    </stringresponse>
+                    <demandhint>
+                      <hint>question 1 hint 1</hint>
+                      <hint>question 1 hint 2</hint>
+                    </demandhint>
+                </question>
+                <question>
+                    <p>That is the question</p>
+                    <multiplechoiceresponse>
+                      <choicegroup type="MultipleChoice">
+                        <choice correct="false">Alpha <choicehint>A hint</choicehint></choice>
+                        <choice correct="true">Beta</choice>
+                      </choicegroup>
+                    </multiplechoiceresponse>
+                    <demandhint>
+                      <hint>question 2 hint 1</hint>
+                      <hint>question 2 hint 2</hint>
+                    </demandhint>
+                </question>
+            </problem>
+        """)
+        return XBlockFixtureDesc('problem', 'Problem Question TEST', data=xml)
+
+    def get_num_problems(self):
+        """
+        Create two problems.
+        """
+        return 2
+
+    def test_questions_have_unique_ids(self):
+        """
+        Scenario: Verifies that each question has a unique id.
+        Given I am enrolled in a course.
+        And I visit a unit page with two CAPA problems where each problem has 2 questions
+        Then I check if questions have unique IDs
+        """
+        self.courseware_page.visit()
+        problem_page = ProblemPage(self.browser)
+
+        # Set the scope to the problem question
+        problem_page.a11y_audit.config.set_scope(
+            include=['div.question']
+        )
+
+        problem_page.a11y_audit.config.set_rules({
+            "ignore": [
+                'aria-valid-attr',  # TODO: AC-251,
+                'label',  # TODO: AC-290
+                'radiogroup',  # TODO: AC-251
+            ]
+        })
+
+        # Run the accessibility audit.
+        problem_page.a11y_audit.check_for_accessibility_errors()

@@ -123,9 +123,14 @@ div.problem-progress {
   @include padding-left($baseline/4);
   @extend %t-ultralight;
   display: inline-block;
+  margin-bottom: $baseline;
   color: $gray-d1;
   font-weight: 100;
   font-size: em(16);
+}
+
+h3.problem-header {
+  margin-bottom: 0 !important; // needed to overrided the %hd-2 margin-bottom
 }
 
 // +Problem - Base
@@ -147,6 +152,10 @@ div.problem {
     + p {
       margin-top: $baseline;
     }
+  }
+
+  div.question:not(:last-child) {
+    margin-bottom: $baseline;
   }
 }
 

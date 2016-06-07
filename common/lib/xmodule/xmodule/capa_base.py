@@ -155,7 +155,11 @@ class CapaFields(object):
             {"display_name": _("Per Student"), "value": RANDOMIZATION.PER_STUDENT}
         ]
     )
-    data = String(help=_("XML data for the problem"), scope=Scope.content, default="<problem></problem>")
+    data = String(
+        help=_("XML data for the problem"),
+        scope=Scope.content,
+        default="<problem><question></question></problem>"
+    )
     correct_map = Dict(help=_("Dictionary with the correctness of current student answers"),
                        scope=Scope.user_state, default={})
     input_state = Dict(help=_("Dictionary for maintaining the state of inputtypes"), scope=Scope.user_state)
@@ -591,17 +595,19 @@ class CapaMixin(CapaFields):
 
         return html
 
-    def get_demand_hint(self, hint_index):
+    def get_demand_hint(self, question_id, hint_index):
         """
         Return html for the problem.
 
         Adds check, reset, save, and hint buttons as necessary based on the problem config
         and state.
         encapsulate: if True (the default) embed the html in a problem <div>
+        question_id: question id for which hint is requested
         hint_index: (None is the default) if not None, this is the index of the next demand
         hint to show.
         """
-        demand_hints = self.lcp.tree.xpath("//problem/demandhint/hint")
+        # indexing in XPath starts with 1
+        demand_hints = self.lcp.tree.xpath("//problem/question[{}]/demandhint/hint".format(question_id + 1))
         hint_index = hint_index % len(demand_hints)
 
         _ = self.runtime.service(self, "i18n").ugettext
@@ -659,14 +665,10 @@ class CapaMixin(CapaFields):
             check_button_checking = False
 
         content = {
-            'name': self.display_name_with_default_escaped,
+            'name': self.display_name,
             'html': html,
             'weight': self.weight,
         }
-
-        # If demand hints are available, emit hint button and div.
-        demand_hints = self.lcp.tree.xpath("//problem/demandhint/hint")
-        demand_hint_possible = len(demand_hints) > 0
 
         context = {
             'problem': content,
@@ -678,7 +680,6 @@ class CapaMixin(CapaFields):
             'answer_available': self.answer_available(),
             'attempts_used': self.attempts,
             'attempts_allowed': self.max_attempts,
-            'demand_hint_possible': demand_hint_possible
         }
 
         html = self.runtime.render_template('problem.html', context)
@@ -718,8 +719,10 @@ class CapaMixin(CapaFields):
         """
         Hint button handler, returns new html using hint_index from the client.
         """
+        question_id = int(data['question_id'])
         hint_index = int(data['hint_index'])
-        return self.get_demand_hint(hint_index)
+
+        return self.get_demand_hint(question_id, hint_index)
 
     def is_past_due(self):
         """

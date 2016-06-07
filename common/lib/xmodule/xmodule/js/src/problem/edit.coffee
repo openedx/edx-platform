@@ -573,9 +573,23 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
           demandhints = '\n<demandhint>\n' + demandhints + '</demandhint>';
       }
 
-      // make all elements descendants of a single problem element
-      xml = '<problem>\n' + xml + demandhints + '\n</problem>';
+      // treat this as a single question
+      xml = '<question>\n' + xml + demandhints + '\n</question>';
 
       return xml;
     }`
-    return toXml markdown
+
+    questionsXML = []
+    questionsMarkdown = markdown.split('\n---\n')
+    _.each questionsMarkdown, (questionMarkdown, index) ->
+      if questionMarkdown.trim().length > 0
+        questionsXML.push toXml(questionMarkdown)
+        
+    # add <question></question> when markdown is an empty string
+    # this is needed to handle blank_common.yaml where OLX is not
+    # in correct format after conversion
+    if markdown.trim().length == 0
+      questionsXML.push('<question></question>')
+    
+    # make all questions descendants of a single problem element
+    return '<problem>\n' + questionsXML.join('\n\n') + '\n</problem>'

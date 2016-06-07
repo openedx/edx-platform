@@ -4,13 +4,14 @@ metadata:
     markdown: !!null
 data: |
     <problem>
-      <text>
-        <p>
-          <h4>Problem With Adaptive Hint</h4>
-        </p>
-        <p>
-    This problem demonstrates a question with hints, based on using the <tt class="tt">hintfn</tt> method. </p>
-        <script type="text/python" system_path="python_lib">
+      <question>
+        <text>
+          <p>
+            <h4>Problem With Adaptive Hint</h4>
+          </p>
+          <p>
+          This problem demonstrates a question with hints, based on using the <tt class="tt">hintfn</tt> method. </p>
+          <script type="text/python" system_path="python_lib">
     def test_str(expect, ans):
       print expect, ans
       ans = ans.strip("'")
@@ -35,13 +36,14 @@ data: |
       if hint:
         hint = "&lt;font color='blue'&gt;Hint: {0}&lt;/font&gt;".format(hint)
         new_cmap.set_hint_and_mode(aid,hint,'always')
-    </script>
-        <label>
-    What is the best programming language that exists today? You may enter your answer in upper or lower case, with or without quotes.
-          <customresponse cfn="test_str" expect="python">
-            <textline correct_answer="python"/>
-            <hintgroup hintfn="hint_fn"/>
-          </customresponse>
-        </label>
-      </text>
+          </script>
+          <label>
+            What is the best programming language that exists today? You may enter your answer in upper or lower case, with or without quotes.
+            <customresponse cfn="test_str" expect="python">
+              <textline correct_answer="python"/>
+              <hintgroup hintfn="hint_fn"/>
+            </customresponse>
+          </label>
+        </text>
+      </question>
     </problem>

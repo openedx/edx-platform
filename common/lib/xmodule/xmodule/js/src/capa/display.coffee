@@ -803,16 +803,24 @@ class @Problem
         @enableCheckButton true
     window.setTimeout(enableCheckButton, 750)
 
-  hint_button: =>
+  hint_button: (event)=>
     # Store the index of the currently shown hint as an attribute.
     # Use that to compute the next hint number when the button is clicked.
-    hint_index = @$('.problem-hint').attr('hint_index')
+    
+    question = $(event.target).closest('div.question')
+    hint_container = question.find('.problem-hint')
+    hint_index = hint_container.attr('hint_index')
     if hint_index == undefined
       next_index = 0
     else
       next_index = parseInt(hint_index) + 1
-    $.postWithPrefix "#{@url}/hint_button", hint_index: next_index, input_id: @id, (response) =>
-      hint_container = @.$('.problem-hint')
+
+    data =
+      question_id: question.attr('question_index')
+      hint_index: next_index
+      input_id: @id
+
+    $.postWithPrefix "#{@url}/hint_button", data, (response) =>
       hint_container.html(response.contents)
       MathJax.Hub.Queue [
         'Typeset'
@@ -820,5 +828,4 @@ class @Problem
         hint_container[0]
       ]
       hint_container.attr('hint_index', response.hint_index)
-      @$('.hint-button').focus()  # a11y focus on click, like the Check button
-
+      event.target.focus()  # a11y focus on click, like the Check button
