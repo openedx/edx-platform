@@ -394,17 +394,16 @@ def validate_user_preference_serializer(serializer, preference_key, preference_v
                 "user_message": user_message,
             }
         })
-    if preference_key=="time_zone" and preference_value not in common_timezones_set:
+    if preference_key == "time_zone" and preference_value not in common_timezones_set:
+        developer_message = ugettext_noop(u"Value '{preference_value}' not valid for preference '{preference_key}': "
+                                          u"Not in timezone set.")
+        user_message = ugettext_noop(u"Value '{preference_value}' is not valid for user preference '{preference_key}'.")
         raise PreferenceValidationError({
             preference_key: {
-                "developer_message": u"Value '{preference_value}' not valid for preference '{preference_key}': "
-                                     u"Not in timezone set.".format(
+                "developer_message": developer_message.format(
                     preference_key=preference_key, preference_value=preference_value
                 ),
-                "user_message": _(u"Value '{preference_value}' is not valid for user preference "
-                                  u"'{preference_key}'.").format(
-                    preference_key=preference_key, preference_value=preference_value
-                )
+                "user_message": user_message.format(preference_key=preference_key, preference_value=preference_value)
             }
         })
 
