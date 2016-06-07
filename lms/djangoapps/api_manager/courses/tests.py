@@ -1173,9 +1173,8 @@ class CoursesApiTests(ModuleStoreTestCase):
         self.assertGreater(len(response.data), 0)
 
         # assert that there is no enrolled students
-        enrollments = response.data['enrollments']
+        enrollments = response.data['results']
         self.assertEqual(len(enrollments), 0)
-        self.assertNotIn('pending_enrollments', response.data)
 
     def test_courses_users_list_invalid_course(self):
         test_uri = self.base_courses_uri + '/' + self.test_bogus_course_id + '/users'
@@ -1206,7 +1205,7 @@ class CoursesApiTests(ModuleStoreTestCase):
         self.assertEqual(response.status_code, 201)
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data['enrollments']), 0)
+        self.assertEqual(len(response.data['results']), 0)
 
     def test_courses_users_list_post_existing_user(self):
         # create a new user (note, this calls into the /users/ subsystem)
@@ -1294,15 +1293,15 @@ class CoursesApiTests(ModuleStoreTestCase):
         # fetch course 1 users
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data['enrollments']), 2)
-        self.assertEqual(response.data['enrollments'][0]['courses_enrolled'], 1)
+        self.assertEqual(len(response.data['results']), 2)
+        self.assertEqual(response.data['results'][0]['courses_enrolled'], 1)
 
         # fetch user 2
         test_uri = self.base_courses_uri + '/' + unicode(course2.id) + '/users'
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data['enrollments']), 1)
-        self.assertEqual(response.data['enrollments'][0]['courses_enrolled'], 2)
+        self.assertEqual(len(response.data['results']), 1)
+        self.assertEqual(response.data['results'][0]['courses_enrolled'], 2)
 
     def test_courses_users_list_get_attributes(self):
         """ Test presence of newly added attributes to courses users list api """
@@ -1315,6 +1314,9 @@ class CoursesApiTests(ModuleStoreTestCase):
         test_uri = self.base_courses_uri + '/' + unicode(course.id) + '/users'
         user = UserFactory.create(username="testuserattributes", profile='test')
         CourseEnrollmentFactory.create(user=user, course_id=course.id)
+        user_grade, user_proforma_grade = 0.9, 0.91
+        StudentGradebook.objects.create(user=user, course_id=course.id,
+                                        grade=user_grade, proforma_grade=user_proforma_grade)
 
         data = {
             'name': 'Test Organization Attributes',
@@ -1330,22 +1332,58 @@ class CoursesApiTests(ModuleStoreTestCase):
 
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 200)
-        self.assertIn('id', response.data['enrollments'][0])
-        self.assertIn('email', response.data['enrollments'][0])
-        self.assertIn('username', response.data['enrollments'][0])
-        self.assertIn('last_login', response.data['enrollments'][0])
-        self.assertIn('full_name', response.data['enrollments'][0])
-        self.assertIn('is_active', response.data['enrollments'][0])
-        self.assertIsNotNone(response.data['enrollments'][0]['organizations'])
-        self.assertIn('url', response.data['enrollments'][0]['organizations'][0])
-        self.assertIn('id', response.data['enrollments'][0]['organizations'][0])
-        self.assertIn('name', response.data['enrollments'][0]['organizations'][0])
-        self.assertIn('created', response.data['enrollments'][0]['organizations'][0])
-        self.assertIn('display_name', response.data['enrollments'][0]['organizations'][0])
-        self.assertIn('logo_url', response.data['enrollments'][0]['organizations'][0])
-        roles = response.data['enrollments'][0]['roles']
+        self.assertIn('id', response.data['results'][0])
+        self.assertIn('email', response.data['results'][0])
+        self.assertIn('username', response.data['results'][0])
+        self.assertIn('last_login', response.data['results'][0])
+        self.assertIn('full_name', response.data['results'][0])
+        self.assertIn('is_active', response.data['results'][0])
+        self.assertIsNotNone(response.data['results'][0]['organizations'])
+        self.assertIn('url', response.data['results'][0]['organizations'][0])
+        self.assertIn('id', response.data['results'][0]['organizations'][0])
+        self.assertIn('name', response.data['results'][0]['organizations'][0])
+        self.assertIn('created', response.data['results'][0]['organizations'][0])
+        self.assertIn('display_name', response.data['results'][0]['organizations'][0])
+        self.assertIn('logo_url', response.data['results'][0]['organizations'][0])
+        roles = response.data['results'][0]['roles']
         self.assertIsNotNone(roles)
         self.assertEqual(['instructor', 'observer'], roles)
+        self.assertIn('grades', response.data['results'][0])
+        self.assertEqual(
+            response.data['results'][0]['grades'], {'grade': user_grade, 'proforma_grade': user_proforma_grade}
+        )
+
+    def test_courses_users_list_with_fields(self):
+        """ Tests when fields param is given it should return only those fields """
+        course = CourseFactory.create()
+        users = UserFactory.create_batch(3)
+        for user in users:
+            CourseEnrollmentFactory.create(user=user, course_id=course.id)
+            user_grade, user_proforma_grade = 0.9, 0.91
+            StudentGradebook.objects.create(user=user, course_id=course.id,
+                                            grade=user_grade, proforma_grade=user_proforma_grade)
+            allow_access(course, user, 'instructor')
+
+        test_uri = self.base_courses_uri + '/' + unicode(course.id) + '/users?fields=first_name,last_name'
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data['results']), 3)
+        self.assertItemsEqual(['first_name', 'last_name'], response.data['results'][0].keys())
+
+    def test_courses_users_list_pagination(self):
+        """ Tests users list API has pagination enabled """
+        course = CourseFactory.create()
+        users = UserFactory.create_batch(3)
+        for user in users:
+            CourseEnrollmentFactory.create(user=user, course_id=course.id)
+
+        test_uri = self.base_courses_uri + '/' + unicode(course.id) + '/users'
+        response = self.do_get(test_uri)
+        self.assertIn('count', response.data)
+        self.assertIn('next', response.data)
+        self.assertIn('previous', response.data)
+        self.assertIn('num_pages', response.data)
+        self.assertEqual(response.data['count'], 3)
 
     def test_courses_users_list_get_filter_by_orgs(self):
         # create 5 users
@@ -1385,17 +1423,17 @@ class CoursesApiTests(ModuleStoreTestCase):
         # retrieve all users enrolled in the course
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 200)
-        self.assertGreaterEqual(len(response.data['enrollments']), 5)
+        self.assertGreaterEqual(len(response.data['results']), 5)
 
         # retrieve users by organization
         response = self.do_get('{}?organizations={}'.format(test_uri, org_ids[0]))
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data['enrollments']), 1)
+        self.assertEqual(len(response.data['results']), 1)
 
         # retrieve all users enrolled in the course
         response = self.do_get('{}?organizations={},{},{}'.format(test_uri, org_ids[0], org_ids[1], org_ids[2]))
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data['enrollments']), 3)
+        self.assertEqual(len(response.data['results']), 3)
 
     def test_courses_users_list_get_filter_by_groups(self):
         # create 2 groups
@@ -1434,17 +1472,17 @@ class CoursesApiTests(ModuleStoreTestCase):
         # retrieve all users enrolled in the course and member of group 1
         response = self.do_get('{}?groups={}'.format(test_uri, group_ids[0]))
         self.assertEqual(response.status_code, 200)
-        self.assertGreaterEqual(len(response.data['enrollments']), 1)
+        self.assertGreaterEqual(len(response.data['results']), 1)
 
         # retrieve all users enrolled in the course and member of group 1 and group 2
         response = self.do_get('{}?groups={},{}'.format(test_uri, group_ids[0], group_ids[1]))
         self.assertEqual(response.status_code, 200)
-        self.assertGreaterEqual(len(response.data['enrollments']), 2)
+        self.assertGreaterEqual(len(response.data['results']), 2)
 
         # retrieve all users enrolled in the course and not member of group 1
         response = self.do_get('{}?exclude_groups={}'.format(test_uri, group_ids[0]))
         self.assertEqual(response.status_code, 200)
-        self.assertGreaterEqual(len(response.data['enrollments']), 4)
+        self.assertGreaterEqual(len(response.data['results']), 4)
 
     def test_courses_users_list_get_filter_by_workgroups(self):
         """ Test courses users list workgroup filter """
@@ -1475,12 +1513,12 @@ class CoursesApiTests(ModuleStoreTestCase):
         # retrieve all users enrolled in the course and member of workgroup 1
         response = self.do_get('{}?workgroups={}'.format(test_uri, workgroups[0].id))
         self.assertEqual(response.status_code, 200)
-        self.assertGreaterEqual(len(response.data['enrollments']), 3)
+        self.assertGreaterEqual(len(response.data['results']), 3)
 
         # retrieve all users enrolled in the course and member of workgroup 1 and workgroup 2
         response = self.do_get('{}?workgroups={}'.format(test_uri, workgroup_ids))
         self.assertEqual(response.status_code, 200)
-        self.assertGreaterEqual(len(response.data['enrollments']), 5)
+        self.assertGreaterEqual(len(response.data['results']), 5)
 
     def test_courses_users_detail_get(self):
         test_uri = self.base_courses_uri + '/' + self.test_course_id + '/users'
