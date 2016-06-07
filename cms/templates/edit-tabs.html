@@ -38,7 +38,7 @@
       <h3 class="sr">${_("Page Actions")}</h3>
       <ul>
         <li class="nav-item">
-          <a href="#" class="button new-button new-tab"><i class="icon fa fa-plus"></i> ${_("New Page")}</a>
+          <a href="#" class="button new-button new-tab"><span class="icon fa fa-plus" aria-hidden="true"></span> ${_("New Page")}</a>
         </li>
         <li class="nav-item">
           <a href="${lms_link}" rel="external" class="button view-button view-live-button">${_("View Live")}</a>
@@ -106,7 +106,7 @@
                             % else:
                               <input type="checkbox" class="toggle-checkbox" data-tooltip="${_('Show/hide page')}" />
                             % endif
-                            <div class="action-button"><i class="icon fa fa-eye"></i><i class="icon fa fa-eye-slash"></i></div>
+                            <div class="action-button"><span class="icon fa fa-eye" aria-hidden="true"></span><span class="icon fa fa-eye-slash"></span></div>
                           </li>
                         % endif
 
@@ -132,7 +132,7 @@
           </div>
 
           <div class="add-pages">
-              <p>${_("You can add additional custom pages to your course.")} <a href="#" class="button new-button new-tab"><i class="icon fa fa-plus"></i>${_("Add a New Page")}</a></p>
+              <p>${_("You can add additional custom pages to your course.")} <a href="#" class="button new-button new-tab"><span class="icon fa fa-plus" aria-hidden="true"></span>${_("Add a New Page")}</a></p>
           </div>
         </article>
       </div>
@@ -164,7 +164,7 @@
   </figure>
 
   <a href="#" rel="view" class="action action-modal-close">
-    <i class="icon fa fa-times-circle"></i>
+    <span class="icon fa fa-times-circle" aria-hidden="true"></span>
     <span class="label">${_("close modal")}</span>
   </a>
 </div>

@@ -14,8 +14,8 @@
             aria-describedby="verification-help-text"
           >
           <label class="label" for="verification-access-checkbox">
-            <i class="icon fa fa-check-square-o input-checkbox-checked" aria-hidden="true"></i>
-            <i class="icon fa fa-square-o input-checkbox-unchecked" aria-hidden="true"></i>
+            <span class="icon fa fa-check-square-o input-checkbox-checked" aria-hidden="true"></span>
+            <span class="icon fa fa-square-o input-checkbox-unchecked" aria-hidden="true"></span>
             <span class="sr"><%- gettext("Must complete verification checkpoint") %></span>
           </label>
 

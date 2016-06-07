@@ -2,7 +2,7 @@
   <% if (CMS.User.isGlobalStaff || !certificate.get('is_active')) { %>
   <div class="actions certificate-actions signatory-panel-edit">
     <span class="action action-edit-signatory">
-      <a href="javascript:void(0);" class="edit-signatory"><i class="icon fa fa-pencil" aria-hidden="true"></i> <%- gettext("Edit") %></a>
+      <a href="javascript:void(0);" class="edit-signatory"><span class="icon fa fa-pencil" aria-hidden="true"></span> <%- gettext("Edit") %></a>
     </span>
   </div>
   <% } %>

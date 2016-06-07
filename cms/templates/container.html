@@ -90,7 +90,7 @@ from openedx.core.djangolib.markup import HTML, Text
                 % else:
                     <li class="action-item action-edit nav-item">
                         <a href="#" class="button button-edit action-button edit-button">
-                            <i class="icon fa fa-pencil"></i>
+                            <span class="icon fa fa-pencil" aria-hidden="true"></span>
                             <span class="action-button-text">${_("Edit")}</span>
                         </a>
                     </li>
@@ -109,7 +109,7 @@ from openedx.core.djangolib.markup import HTML, Text
                 <section class="wrapper-xblock level-page is-hidden studio-xblock-wrapper" data-locator="${xblock_locator}" data-course-key="${xblock_locator.course_key}">
                 </section>
                 <div class="ui-loading">
-                    <p><span class="spin"><i class="icon fa fa-refresh"></i></span> <span class="copy">${_("Loading")}</span></p>
+                    <p><span class="spin"><span class="icon fa fa-refresh" aria-hidden="true"></span></span> <span class="copy">${_("Loading")}</span></p>
                 </div>
             </article>
             <aside class="content-supplementary" role="complementary">

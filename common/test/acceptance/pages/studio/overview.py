@@ -264,7 +264,7 @@ class CourseOutlineContainer(CourseOutlineItem):
         currently_expanded = subsection_expanded()
 
         # Need to click slightly off-center in order for the click to be recognized.
-        ele = self.browser.find_element_by_css_selector(self._bounded_selector('.ui-toggle-expansion i'))
+        ele = self.browser.find_element_by_css_selector(self._bounded_selector('.ui-toggle-expansion .fa'))
         ActionChains(self.browser).move_to_element_with_offset(ele, 4, 4).click().perform()
         self.wait_for_element_presence(self._bounded_selector(self.ADD_BUTTON_SELECTOR), 'Subsection is expanded')
 

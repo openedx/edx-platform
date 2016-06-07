@@ -207,7 +207,7 @@
     </ol>
     <div class="actions">
       <button type="button" class="action action-primary button new-button add-course-learning-info">
-        <i class="icon fa fa-plus icon-inline"></i>Add Learning Outcome
+        <span class="icon fa fa-plus icon-inline" aria-hidden="true"></span>Add Learning Outcome
       </button>
     </div>
 </section>
@@ -222,7 +222,7 @@
   </ol>
   <div class="actions">
     <button type="button" class="action action-primary button new-button add-course-instructor-info">
-      <i class="icon fa fa-plus icon-inline"></i>Add Instructor
+      <span class="icon fa fa-plus icon-inline" aria-hidden="true"></span>Add Instructor
     </button>
   </div>
 </section>

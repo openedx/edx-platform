@@ -1,7 +1,7 @@
      <div class="signatory-panel-default">
        <% if (is_editing_all_collections && signatories_count > 1 && (total_saved_signatories > 1 || isNew) ) { %>
        <a class="signatory-panel-delete" href="#" data-tooltip="Delete">
-          <i class="icon fa fa-trash-o" aria-hidden="true"></i>
+          <span class="icon fa fa-trash-o" aria-hidden="true"></span>
           <span class="sr action-button-text"><%- gettext("Delete") %></span>
        </a>
        <% } %>

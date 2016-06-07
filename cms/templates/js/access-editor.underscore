@@ -35,8 +35,8 @@
             <li class="field field-checkbox checkbox-cosmetic">
                 <input type="checkbox" id="is_prereq" name="is_prereq" class="input input-checkbox" />
                 <label for="is_prereq" class="label">
-                    <i class="icon fa fa-check-square-o input-checkbox-checked"></i>
-                    <i class="icon fa fa-square-o input-checkbox-unchecked"></i>
+                    <span class="icon fa fa-check-square-o input-checkbox-checked" aria-hidden="true"></span>
+                    <span class="icon fa fa-square-o input-checkbox-unchecked" aria-hidden="true"></span>
                     <%- gettext('Make this subsection available as a prerequisite to other content') %>
                 </label>
             </li>

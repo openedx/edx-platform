@@ -37,7 +37,7 @@ from openedx.core.djangolib.markup import HTML, Text
   %if notification_dismiss_url is not None:
   <div class="wrapper wrapper-alert wrapper-alert-announcement is-shown">
     <div class="alert announcement has-actions">
-      <i class="feedback-symbol fa fa-bullhorn"></i>
+      <span class="feedback-symbol fa fa-bullhorn" aria-hidden="true"></span>
 
       <div class="copy">
         <h2 class="title title-3">${_("This course was created as a re-run. Some manual configuration is needed.")}</h2>
@@ -48,7 +48,7 @@ from openedx.core.djangolib.markup import HTML, Text
       <ul class="nav-actions">
         <li class="action action-dismiss">
           <a href="#" class="button dismiss-button" data-dismiss-link='${notification_dismiss_url}'>
-            <i class="icon fa fa-times-circle"></i>
+            <span class="icon fa fa-times-circle" aria-hidden="true"></span>
             <span class="button-copy">${_("Dismiss")}</span>
           </a>
         </li>
@@ -60,7 +60,7 @@ from openedx.core.djangolib.markup import HTML, Text
     %if deprecated_blocks_info.get('blocks') or deprecated_blocks_info.get('block_types_enabled'):
       <div class="wrapper wrapper-alert wrapper-alert-error is-shown">
         <div class="alert announcement">
-          <i class="feedback-symbol fa fa-warning" aria-hidden="true"></i><span class="sr">${_("Warning")}</span>
+          <span class="feedback-symbol fa fa-warning" aria-hidden="true"></span><span class="sr">${_("Warning")}</span>
 
           <div class="copy">
             <h2 class="title title-3 warning-heading-text">${_("This course uses features that are no longer supported.")}</h2>
@@ -122,20 +122,20 @@ from openedx.core.djangolib.markup import HTML, Text
             <ul>
                 <li class="nav-item">
                     <a href="#" class="button button-new" data-category="chapter" data-parent="${context_course.location}" data-default-name="${_('Section')}" title="${_('Click to add a new section')}">
-                        <i class="icon fa fa-plus"></i>${_('New Section')}
+                        <span class="icon fa fa-plus" aria-hidden="true"></span>${_('New Section')}
                     </a>
                 </li>
                 %if reindex_link:
                     <li class="nav-item">
                         <a href="${reindex_link}" class="button button-reindex" data-category="reindex" title="${_('Reindex current course')}">
-                            <i class="icon-arrow-right"></i>${_('Reindex')}
+                            <span class="icon-arrow-right" aria-hidden="true"></span>${_('Reindex')}
                         </a>
                     </li>
                 %endif
                 <li class="nav-item">
                     <a href="#" class="button button-toggle button-toggle-expand-collapse collapse-all is-hidden">
-                        <span class="collapse-all"><i class="icon fa fa-arrow-up"></i> <span class="label">${_("Collapse All Sections")}</span></span>
-                        <span class="expand-all"><i class="icon fa fa-arrow-down"></i> <span class="label">${_("Expand All Sections")}</span></span>
+                        <span class="collapse-all"><span class="icon fa fa-arrow-up" aria-hidden="true"></span> <span class="label">${_("Collapse All Sections")}</span></span>
+                        <span class="expand-all"><span class="icon fa fa-arrow-down" aria-hidden="true"></span> <span class="label">${_("Expand All Sections")}</span></span>
                     </a>
                 </li>
                 <li class="nav-item">
@@ -158,7 +158,7 @@ from openedx.core.djangolib.markup import HTML, Text
                     <ul class="status-actions">
                       <li class="action-item action-edit">
                         <a href="${settings_url}" class="edit-button action-button" data-tooltip="${_("Edit Start Date")}">
-                            <i class="icon fa fa-pencil"></i>
+                            <span class="icon fa fa-pencil" aria-hidden="true"></span>
                             <span class="action-button-text sr">${_("Edit Start Date")}</span>
                         </a>
                       </li>
@@ -185,7 +185,7 @@ from openedx.core.djangolib.markup import HTML, Text
                 </article>
             </div>
             <div class="ui-loading">
-                <p><span class="spin"><i class="icon fa fa-refresh"></i></span> <span class="copy">${_("Loading")}</span></p>
+                <p><span class="spin"><span class="icon fa fa-refresh" aria-hidden="true"></span></span> <span class="copy">${_("Loading")}</span></p>
             </div>
         </article>
         <aside class="content-supplementary" role="complementary">
