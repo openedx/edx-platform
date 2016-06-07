@@ -1,0 +1,46 @@
+$full-width-banner-img-height: 260px !default;
+$full-width-banner-img-width: 1140px !default;
+$full-width-banner-margin: 20px;
+
+.full-width-banner {
+    position: relative;
+
+    .banner-background-wrapper {
+        height: $full-width-banner-img-height;
+        width: 100%;
+        overflow: hidden;
+        position: relative;
+        background: palette(grayscale, black-t);
+
+        &:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            background: palette(grayscale, black-t);
+            opacity: 0.65;
+
+            @include susy-media($bp-screen-md) {
+                opacity: 0.4;
+            }
+        }
+    }
+
+    .banner-background-image {
+        height: $full-width-banner-img-height;
+
+        @include susy-media($full-width-banner-img-width) {
+            height: auto;
+            width: 100%;
+        }
+    }
+
+    .banner-content {
+        position: absolute;
+        top: 0;
+        left: $full-width-banner-margin;
+        right: $full-width-banner-margin;
+    }
+}
