@@ -54,6 +54,10 @@ class DiscussionXBlock(XBlock, StudioEditableXBlockMixin):
 
     @property
     def django_user(self):
+        """
+        Returns django user associated with user currently interacting
+        with the XBlock.
+        """
         user_service = self.runtime.service(self, 'user')
         if not user_service:
             return None
@@ -78,11 +82,11 @@ class DiscussionXBlock(XBlock, StudioEditableXBlockMixin):
         """ Renders student view for LMS and Studio """
         # pylint: disable=no-member
         if hasattr(self, 'xmodule_runtime') and getattr(self.xmodule_runtime, 'is_author_mode', False):
-            return self._student_view_studio()
+            return self.student_view_studio()
         else:
-            return self._student_view_lms()
+            return self.student_view_lms()
 
-    def _student_view_lms(self):
+    def student_view_lms(self):
         """ Renders student view for LMS """
 
         fragment = Fragment()
@@ -107,7 +111,7 @@ class DiscussionXBlock(XBlock, StudioEditableXBlockMixin):
 
         return fragment
 
-    def _student_view_studio(self):
+    def student_view_studio(self):
         """ Renders student view for Studio """
         fragment = Fragment()
         fragment.add_content(self.runtime.render_template(
