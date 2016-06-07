@@ -29,9 +29,10 @@ def add_email_marketing_cookies(response, user):
 
     try:
         sailthru_client = SailthruClient(email_config.sailthru_key, email_config.sailthru_secret)
-        sailthru_response = sailthru_client.api_post("user", {'id': user.email,
-                                                              'fields': {'keys': 1},
-                                                              'vars': datetime.datetime.now().strftime("%Y-%m-%d")})
+        sailthru_response = \
+            sailthru_client.api_post("user", {'id': user.email, 'fields': {'keys': 1},
+                                              'vars': {'last_login_date':
+                                                       datetime.datetime.now().strftime("%Y-%m-%d")}})
     except SailthruClientError as exc:
         log.error("Exception attempting to obtain cookie from Sailthru: %s", unicode(exc))
         return response
