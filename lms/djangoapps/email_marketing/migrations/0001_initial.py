@@ -32,7 +32,7 @@ class Migration(migrations.Migration):
                  models.CharField(help_text='Sailthru secret.', max_length=32, null=True, blank=True)),
 
                 ('sailthru_new_user_list',
-                 models.CharField(help_text='Sailthru new user list.', max_length=32, null=True, blank=True)),
+                 models.CharField(help_text='Sailthru new user list.', max_length=48, null=True, blank=True)),
 
                 ('sailthru_retry_interval',
                  models.IntegerField(default=3600, help_text='Sailthru connection retry interval (secs).')),
