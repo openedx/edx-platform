@@ -999,7 +999,7 @@ class CoursesStaticTabsDetail(SecureAPIView):
         return Response({}, status=status.HTTP_404_NOT_FOUND)
 
 
-class CoursesUsersList(SecureAPIView):
+class CoursesUsersList(SecureListAPIView):
     """
     **Use Case**
 
@@ -1016,15 +1016,11 @@ class CoursesUsersList(SecureAPIView):
 
     **GET Response Values**
 
-        * enrollments: The collection of users in the course. Each object in the
-          collection conains the following keys:
-
-          * id: The ID of the user.
-
-          * email: The email address of the user.
-
-          * username: The username of the user.
-
+        * results: The collection of users in the course. Each object in the
+          collection has set of user related field.
+        * GET supports dynamic fields which means we can pass list of fields we want.
+        for example if we want to get only user's first_name and last_name
+        ```/api/courses/{course_id}/users?fields=first_name,last_name```
         * GET supports filtering of user by organization(s), groups
          * To get users enrolled in a course and are also member of organization
          ```/api/courses/{course_id}/users?organizations={organization_id}```
@@ -1042,6 +1038,8 @@ class CoursesUsersList(SecureAPIView):
         To create a new user through POST /api/courses/{course_id}/users, you
         must include either a user_id or email key in the JSON object.
     """
+    serializer_class = UserSerializer
+    course_key = None
 
     def post(self, request, course_id):
         """
@@ -1081,15 +1079,25 @@ class CoursesUsersList(SecureAPIView):
         """
         GET /api/courses/{course_id}/users
         """
-        exclude_groups = request.QUERY_PARAMS.get('exclude_groups', None)
-        response_data = OrderedDict()
-        base_uri = generate_base_uri(request)
-        response_data['uri'] = base_uri
         if not course_exists(request, request.user, course_id):
             return Response({}, status=status.HTTP_404_NOT_FOUND)
-        course_key = get_course_key(course_id)
+        self.course_key = get_course_key(course_id)
+        return super(CoursesUsersList, self).list(request)
+
+    def get_serializer_context(self):
+        """
+        Extra context provided to the serializer class.
+        """
+        serializer_context = super(CoursesUsersList, self).get_serializer_context()
+        serializer_context.update({'course_id': self.course_key})
+        return serializer_context
+
+    def get_queryset(self):
+        """
+        :return: queryset for course users list.
+        """
         # Get a list of all enrolled students
-        users = CourseEnrollment.objects.users_enrolled_in(course_key)
+        users = CourseEnrollment.objects.users_enrolled_in(self.course_key)
 
         orgs = get_ids_from_list_param(self.request, 'organizations')
         if orgs:
@@ -1108,18 +1116,7 @@ class CoursesUsersList(SecureAPIView):
             users = users.exclude(groups__in=exclude_groups)
 
         users = users.prefetch_related('organizations').select_related('profile')
-
-        serializer = UserSerializer(users, many=True, context={'course_id': course_key})
-        response_data['enrollments'] = serializer.data
-
-        # Then list all enrollments which are pending. These are enrollments for students that have not yet
-        # created an account
-        pending_enrollments = CourseEnrollmentAllowed.objects.filter(course_id=course_key)
-        if pending_enrollments:
-            response_data['pending_enrollments'] = []
-            for cea in pending_enrollments:
-                response_data['pending_enrollments'].append(cea.email)
-        return Response(response_data)
+        return users
 
 
 class CoursesUsersDetail(SecureAPIView):

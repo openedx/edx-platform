@@ -1,10 +1,12 @@
 """ Django REST Framework Serializers """
 
 from rest_framework import serializers
+from django.core.exceptions import ObjectDoesNotExist
 
 from api_manager.models import APIUser
 from organizations.serializers import BasicOrganizationSerializer
 from student.roles import CourseAccessRole
+from gradebook.models import StudentGradebook
 
 
 class DynamicFieldsModelSerializer(serializers.ModelSerializer):
@@ -39,6 +41,7 @@ class UserSerializer(DynamicFieldsModelSerializer):
     full_name = serializers.CharField(source='profile.name')
     courses_enrolled = serializers.SerializerMethodField('get_courses_enrolled')
     roles = serializers.SerializerMethodField('get_user_roles')
+    grades = serializers.SerializerMethodField('get_user_grades')
 
     def get_courses_enrolled(self, user):
         """ Serialize user enrolled courses """
@@ -55,6 +58,20 @@ class UserSerializer(DynamicFieldsModelSerializer):
             queryset = queryset.filter(course_id=course_id)
 
         return queryset.values_list('role', flat=True).distinct()
+
+    def get_user_grades(self, user):
+        """ returns user proforma_grade and grade """
+        grade, proforma_grade = None, None
+        if 'course_id' in self.context:
+            course_id = self.context['course_id']
+            try:
+                gradebook = StudentGradebook.objects.get(user=user, course_id=course_id)
+                grade = gradebook.grade
+                proforma_grade = gradebook.proforma_grade
+            except ObjectDoesNotExist:
+                pass
+
+        return {'grade': grade, 'proforma_grade': proforma_grade}
 
     class Meta(object):
         """ Serializer/field specification """
@@ -76,7 +93,8 @@ class UserSerializer(DynamicFieldsModelSerializer):
             "is_staff",
             "last_login",
             "courses_enrolled",
-            "roles"
+            "roles",
+            "grades",
         )
         read_only_fields = ("id", "email", "username")
 
