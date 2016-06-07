@@ -133,7 +133,9 @@ class FieldsMixin(object):
 
         if 'mode-placeholder' in field_classes or 'mode-display' in field_classes:
             if field_id == 'bio':
-                self.q(css='.u-field-bio > .wrapper-u-field').first.click()
+                bio_field_selector = '.u-field-bio > .wrapper-u-field'
+                self.wait_for_element_visibility(bio_field_selector, 'Bio field is visible')
+                self.browser.execute_script("$('" + bio_field_selector + "').click();")
             else:
                 self.q(css='.u-field-{}'.format(field_id)).first.click()
 

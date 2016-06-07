@@ -49,6 +49,8 @@ class LearnerProfileTestMixin(EventsTestMixin):
         profile_page.value_for_dropdown_field('language_proficiencies', 'English')
         profile_page.value_for_dropdown_field('country', 'United Arab Emirates')
         profile_page.set_value_for_textarea_field('bio', 'Nothing Special')
+        # Waits here for text to appear/save on bio field
+        profile_page.wait_for_ajax()
 
     def visit_profile_page(self, username, privacy=None):
         """
