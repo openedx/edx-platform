@@ -85,7 +85,6 @@ def _discussion_disabled_course_for(user):
 
 
 @attr('shard_2')
-@ddt.ddt
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
 class GetCourseTest(UrlResetMixin, SharedModuleStoreTestCase):
     """Test for get_course"""
@@ -130,6 +129,24 @@ class GetCourseTest(UrlResetMixin, SharedModuleStoreTestCase):
                 "topics_url": "http://testserver/api/discussion/v1/course_topics/x/y/z",
             }
         )
+
+
+@attr('shard_2')
+@ddt.ddt
+@mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+class GetCourseTestBlackouts(UrlResetMixin, ModuleStoreTestCase):
+    """
+    Tests of get_course for courses that have blackout dates.
+    """
+
+    @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+    def setUp(self):
+        super(GetCourseTestBlackouts, self).setUp()
+        self.course = CourseFactory.create(org="x", course="y", run="z")
+        self.user = UserFactory.create()
+        CourseEnrollmentFactory.create(user=self.user, course_id=self.course.id)
+        self.request = RequestFactory().get("/dummy")
+        self.request.user = self.user
 
     def test_blackout(self):
         # A variety of formats is accepted
