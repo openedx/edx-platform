@@ -1,0 +1,31 @@
+<section id="inputtype_${id}" class="capa_inputtype" >
+    <div class="crystalography_problem" style="width:${width};height:${height}"></div>
+
+    <div class="input_lattice">
+        Lattice: <select></select>
+    </div>
+
+    <div class="script_placeholder" data-src="/static/js/raphael.js"></div>
+    <div class="script_placeholder" data-src="/static/js/sylvester.js"></div>
+    <div class="script_placeholder" data-src="/static/js/crystallography.js"></div>
+
+    % if status in ['unsubmitted', 'correct', 'incorrect', 'partially-correct', 'incomplete']:
+        <div class="status ${status.classname}" id="status_${id}">
+    % endif
+
+    <input type="text" name="input_${id}" aria-describedby="answer_${id}" id="input_${id}" value="${value|h}" style="display:none;"/>
+
+    <p class="status" aria-describedby="input_${id}">
+        ${status.display_name}
+    </p>
+
+    <p id="answer_${id}" class="answer"></p>
+
+    % if msg:
+        <span class="message">${msg|n}</span>
+    % endif
+
+    % if status in ['unsubmitted', 'correct', 'incorrect', 'partially-correct', 'incomplete']:
+        </div>
+    % endif
+</section>

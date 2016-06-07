@@ -1,0 +1,19 @@
+<%! from django.utils.translation import ugettext as _ %>
+<%namespace name='static' file='/static_content.html'/>
+<%inherit file="/main.html" />
+
+<%block name="pagetitle">${_("Please Wait")}</%block>
+
+<%block name="headextra">
+<%static:require_module module_name="js/student_account/views/finish_auth_factory" class_name="FinishAuthFactory">
+    FinishAuthFactory();
+</%static:require_module>
+</%block>
+
+<div class="finish-auth">
+    <div class="finish-auth-inner">
+        <h1>${_('Please wait')}</h1>
+
+        <div class="loading-animation"></div>
+    </div>
+</div>

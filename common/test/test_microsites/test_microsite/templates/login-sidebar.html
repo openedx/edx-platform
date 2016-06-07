@@ -1,0 +1,18 @@
+<%! 
+from django.utils.translation import ugettext as _ 
+from django.core.urlresolvers import reverse
+%>
+
+<header>
+  <h2 class="sr">${_("Helpful Information")}</h2>
+</header>
+
+<div class="cta cta-help">
+  <h3>${_("Not Enrolled?")}</h3>
+  <p><a href="${reverse('register_user')}">${_("Sign up for {platform_name} today!").format(platform_name=platform_name)}</a></p>
+
+  <h3>${_("Need Help?")}</h3>
+  <p>
+    Custom text
+  </p>
+</div>

@@ -1,0 +1,219 @@
+// lms - utilities - mixins and extends
+// ====================
+
+// mixins - font sizing
+@mixin font-size($sizeValue: 16){
+  font-size: $sizeValue + px;
+ // font-size: ($sizeValue/10) + rem;
+}
+
+// mixins - line height
+@mixin line-height($fontSize: auto){
+  line-height: ($fontSize*1.48) + px;
+ // line-height: (($fontSize/10)*1.48) + rem;
+}
+
+// image-replacement hidden text
+@mixin text-hide() {
+  text-indent: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+@mixin vertically-and-horizontally-centered ( $height, $width ) {
+  left: 50%;
+  margin-left: -$width / 2;
+  //margin-top: -$height / 2;
+  min-height: $height;
+  min-width: $width;
+  position: absolute;
+  top: 150px;
+}
+
+// sunsetted, but still used mixins
+@mixin hide-text(){
+  text-indent: -9999px;
+  overflow: hidden;
+  display: block;
+}
+
+@mixin show-hover-state() {
+    opacity: 1;
+}
+
+@function em($pxval, $base: 16) {
+  @return #{$pxval / $base}em;
+}
+
+// line-height
+@function lh($amount: 1) {
+  @return $body-line-height * $amount;
+}
+
+// ====================
+
+// theme mixin styles
+@mixin login_register_h1_style {}
+@mixin footer_references_style {}
+
+// ====================
+
+// extends - UI - used for page/view-level wrappers (for centering/grids)
+%ui-wrapper {
+  @include clearfix();
+  @include box-sizing(border-box);
+  width: 100%;
+}
+
+// extends - UI - window
+%ui-window {
+  @include clearfix();
+  border-radius: 3px;
+  box-shadow: 0 1px 2px 1px $shadow-l1;
+  margin-bottom: $baseline;
+  border: 1px solid $light-gray;
+  background: $white;
+}
+
+// extends - UI archetypes - well
+%ui-well {
+  box-shadow: inset 0 1px 2px 1px $shadow-l1;
+  padding: ($baseline*0.75) $baseline;
+}
+
+// extends - UI - visual link
+%ui-fake-link {
+  cursor: pointer;
+}
+
+// extends - UI - functional disable
+%ui-disabled {
+  pointer-events: none;
+  outline: none;
+  cursor: default;
+}
+
+// extends - UI - depth levels
+%ui-depth0 { z-index: 0; }
+%ui-depth1 { z-index: 10; }
+%ui-depth2 { z-index: 100; }
+%ui-depth3 { z-index: 1000; }
+%ui-depth4 { z-index: 10000; }
+%ui-depth5 { z-index: 100000; }
+
+// extends - UI - utility - nth-type style clearing
+%wipe-first-child {
+
+  &:first-child {
+    margin-top: 0;
+    border-top: none;
+    padding-top: 0;
+  }
+}
+
+// extends - UI - utility - nth-type style clearing
+%wipe-last-child {
+
+  &:last-child {
+    margin-bottom: 0;
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+}
+
+// extends -hidden elems - screenreaders
+%text-sr {
+    // clip has been deprecated but is still supported
+    clip: rect(1px 1px 1px 1px);
+    clip: rect(1px, 1px, 1px, 1px);
+    position: absolute;
+    margin: -1px;
+    height: 1px;
+    width: 1px;
+    border: 0;
+    padding: 0;
+    overflow: hidden;
+    // ensure there are spaces in sr text
+    word-wrap: normal;
+}
+
+// extends - ensures proper contrast for automated checkers
+%a11y-ensure-contrast {
+  background: $white;
+  color: $black;
+}
+
+// extends - UI - removes list styling/spacing when using uls, ols for navigation and less content-centric cases
+%ui-no-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  text-indent: 0;
+
+  li, dt, dd {
+    margin: 0;
+    padding: 0;
+  }
+}
+
+// extends - text - image-replacement hidden text
+%text-hide {
+  text-indent: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+// extends - text - wrapping
+%text-wrap {
+  text-wrap: wrap;
+  white-space: pre-wrap;
+  white-space: -moz-pre-wrap;
+  word-wrap: break-word;
+}
+
+// extends - text - text overflow by ellipsis
+%text-truncated {
+  @include box-sizing(border-box);
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+// border control
+%no-border-top {
+  border-top: none;
+}
+
+%no-border-bottom {
+  border-bottom: none;
+}
+
+%no-border-left {
+  border-left: none;
+}
+
+%no-border-right {
+  border-right: none;
+}
+
+// outline
+%no-outline {
+  outline: none;
+}
+
+// shame-based mixins to centrally override poor styling
+%shame-link-base {
+  color: $link-color;
+
+  &:hover, &:focus {
+    color: saturate($link-color, 50%);
+  }
+}
+
+%shame-link-text {
+  @extend %shame-link-base;
+
+  &:hover, &:focus {
+    text-decoration: underline !important;
+  }
+}

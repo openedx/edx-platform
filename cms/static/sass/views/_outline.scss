@@ -1,0 +1,760 @@
+// studio - views - course outline
+// ====================
+
+// view-specific utilities
+// --------------------
+%outline-item-header {
+  @include clearfix();
+  line-height: 0;
+
+  // CASE: is-editable
+  // TODO: abstract out
+  .is-editable {
+
+    .incontext-editor-value, .incontext-editor-action-wrapper {
+      vertical-align: top;
+    }
+
+    .incontext-editor-action-wrapper {
+      position: relative;
+    }
+
+    .incontext-editor-open-action {
+      @include transition(opacity $tmg-f1 ease-in-out 0);
+      opacity: 0.0;
+    }
+
+    .incontext-editor-form {
+      width: 100%;
+      position: relative;
+      top: -($baseline/4);
+    }
+
+    // TOOD: abstract this out into a Sass placeholder
+    .incontext-editor-input {
+      @include transition(box-shadow $tmg-f1 ease-in-out 0, color $tmg-f1 ease-in-out 0);
+      width: 100%;
+      background: none repeat scroll 0 0 $white;
+      border: 0;
+      box-shadow: 0 0 2px 2px $shadow inset;
+
+      // STATE: focus
+      &:focus {
+        box-shadow: 0 0 2px 2px rgba($ui-action-primary-color-focus, 0.50) inset;
+        color: $ui-action-primary-color-focus;
+      }
+    }
+
+    // STATE: hover/focus
+    &:hover, &:focus {
+
+      .incontext-editor-open-action {
+        opacity: 1.0;
+      }
+    }
+  }
+}
+
+%outline-item-content-hidden {
+  display: none;
+}
+
+%outline-item-content-shown {
+  display: block;
+}
+
+.view-outline {
+
+  // page structure
+  // --------------------
+  .content-primary,
+  .content-supplementary {
+    @include box-sizing(border-box);
+  }
+
+  .content-primary {
+    @extend .ui-col-wide;
+
+    .no-content {
+      @extend %no-content;
+    }
+  }
+
+  .content-supplementary {
+    @extend .ui-col-narrow;
+  }
+
+
+  // page header
+  // --------------------
+  .button-toggle-expand-collapse {
+
+    // STATE: action will collapse all
+    &.collapse-all {
+
+      .expand-all {
+        display: none;
+      }
+
+      .collapse-all {
+        display: block;
+      }
+    }
+
+    // STATE: action will expand all
+    &.expand-all {
+
+      .collapse-all {
+        display: none;
+      }
+
+      .expand-all {
+        display: block;
+      }
+    }
+  }
+
+  // adding outline elements
+  // --------------------
+
+  // forms
+  .new-section-name,
+  .new-subsection-name-input {
+    @extend %t-copy-base;
+    display: inline-block;
+    width: 515px;
+    padding: ($baseline/4);
+    vertical-align: top;
+  }
+
+  .new-subsection-name-input {
+    @extend %t-copy-sub1;
+  }
+  .new-section-name-save,
+  .new-subsection-name-save {
+    @include blue-button();
+    margin: 0 5px;
+    padding: 4px 20px 7px;
+    color: $white;
+  }
+
+  .new-section-name-cancel,
+  .new-subsection-name-cancel {
+    @include white-button();
+    padding: 4px 20px 7px;
+    color: $gray-l1;
+  }
+
+  // buttons
+  .new-subsection-item,
+  .new-unit-item {
+    @extend %ui-btn-flat-outline;
+    width: 100%;
+    margin: 0 0 ($baseline/2) 0;
+    border: 1px solid $gray-l3;
+    padding: ($baseline/2) 0;
+    color: $gray-l2;
+
+
+    &:hover {
+      box-shadow: none;
+      background-image: none;
+    }
+  }
+
+  .courseware-unit-new {
+    margin-right: ($baseline*1.5);
+  }
+
+
+  // UI: general action list styles (section and subsection)
+  // --------------------
+  .expand-collapse {
+    @extend %expand-collapse;
+  }
+
+  // course status
+  // --------------------
+  .course-status {
+    margin-bottom: $baseline;
+
+    .status-release,
+    .status-pacing {
+      @extend %t-copy-base;
+      display: inline-block;
+      color: $color-copy-base;
+
+      // STATE: hover
+      &:hover {
+        .status-actions {
+          opacity: 1.0;
+        }
+      }
+    }
+
+    .status-release-label,
+    .status-release-value,
+    .status-pacing-label,
+    .status-pacing-value,
+    .status-actions {
+      display: inline-block;
+      vertical-align: middle;
+      margin-bottom: 0;
+    }
+
+    .status-release-label,
+    .status-pacing-label {
+      margin-right: ($baseline/4);
+    }
+
+    .status-release-value,
+    .status-pacing-value {
+      @extend %t-strong;
+    }
+
+    .status-actions {
+      @extend %actions-list;
+      @include transition(opacity $tmg-f1 ease-in-out 0);
+      margin-left: ($baseline/4);
+      opacity: 0.0;
+    }
+  }
+
+  // outline
+  // --------------------
+
+  // UI: simple version of the outline
+  .outline-simple {
+
+  }
+
+  // UI: complex version of the outline
+  .outline-complex {
+
+    .outline-content {
+      margin-top: 0;
+    }
+
+    // outline: items
+    .outline-item {
+
+      // CASE: expand/collapse-able
+      &.is-collapsible {
+
+        // only select the current item's toggle expansion controls
+        &:nth-child(1) .ui-toggle-expansion, &:nth-child(1) .item-title {
+
+          // STATE: hover/active
+          &:hover, &:active {
+            color: $blue;
+          }
+        }
+
+        &.is-dragging {
+          @include transition-property(none);
+        }
+      }
+
+      // item: title
+      .item-title {
+
+        // STATE: is-editable
+        &.is-editable {
+
+          // editor
+          + .editor {
+            display: block;
+
+            .item-edit-title {
+              width: 100%;
+            }
+          }
+        }
+      }
+
+      // STATE: drag and drop
+      .drop-target-prepend .draggable-drop-indicator-initial {
+        opacity: 1.0;
+      }
+
+      // STATE: was dropped
+      &.was-dropped {
+        border-color: $blue;
+      }
+    }
+
+    // outline: sections
+    // --------------------
+    .outline-section {
+      padding: ($baseline*0.75) $baseline ($baseline*0.75) ($baseline + 4);
+
+      // header
+      .section-header {
+        @extend %outline-item-header;
+
+        .incontext-editor-input {
+          @extend %t-strong;
+          @extend %t-title5;
+        }
+      }
+
+      .section-header-details {
+        @include float(left);
+        width: flex-grid(6, 9);
+
+        .icon, .wrapper-section-title {
+          display: inline-block;
+          vertical-align: top;
+        }
+
+        .icon {
+          @include margin-right($baseline/4);
+        }
+
+        .wrapper-section-title {
+          width: flex-grid(5, 6);
+          line-height: 0;
+        }
+
+        .action-edit.action-inline {
+
+          .icon {
+            @include margin-right(0);
+            @include transform(none);
+            vertical-align: middle;
+          }
+        }
+      }
+
+      .section-header-actions {
+        @include float(right);
+        width: flex-grid(3, 9);
+        margin-top: -($baseline/4);
+        @include text-align(right);
+
+        .actions-list {
+          @extend %actions-list;
+          @extend %t-action2;
+        }
+      }
+
+      // in-context actions
+      .incontext-editor-action-wrapper {
+        top: -($baseline/20);
+      }
+
+      // status
+      .section-status {
+        margin: 0 0 0 ($outline-indent-width*1.25);
+      }
+
+      // content
+      .section-content {
+        @extend %outline-item-content-shown;
+      }
+
+      // CASE: is-collapsible
+      &.is-collapsible {
+        @extend %ui-expand-collapse;
+
+        .ui-toggle-expansion {
+          @extend %t-icon3;
+          color: $gray-l3;
+        }
+      }
+
+      // STATE: is-collapsed
+      &.is-collapsed {
+
+        .section-content {
+          @extend %outline-item-content-hidden;
+        }
+      }
+
+      // STATE: drag and drop - was dropped
+      &.was-dropped {
+        border-left-color: $ui-action-primary-color-focus;
+      }
+    }
+
+    // outline: subsections
+    // --------------------
+    .list-subsections {
+      margin: $baseline 0 0 0;
+    }
+
+    .outline-subsection {
+      padding: ($baseline*0.75);
+
+      // header
+      .subsection-header {
+        @extend %outline-item-header;
+
+        .incontext-editor-input {
+          @extend %t-title6;
+        }
+      }
+
+      .subsection-header-details {
+        @include float(left);
+        width: flex-grid(6, 9);
+
+        .icon, .wrapper-subsection-title {
+          display: inline-block;
+          vertical-align: top;
+        }
+
+        .icon {
+          @include margin-right($baseline/4);
+        }
+
+        .wrapper-subsection-title {
+          width: flex-grid(5, 6);
+          margin-top: -($baseline/10);
+          line-height: 0;
+        }
+
+        .action-edit.action-inline {
+
+          .icon {
+            @include transform(none);
+            margin-right: 0;
+            vertical-align: middle;
+          }
+        }
+      }
+
+      .subsection-header-actions {
+        @include float(right);
+        width: flex-grid(3, 9);
+        margin-top: -($baseline/4);
+        @include text-align(right);
+
+        .actions-list {
+          @extend %actions-list;
+          @extend %t-action2;
+          margin-right: ($baseline/2);
+        }
+      }
+
+      // in-context actions
+      .incontext-editor-action-wrapper {
+        top: -($baseline/10);
+      }
+
+      // status
+      .subsection-status {
+        @include margin(0, 0, 0, $outline-indent-width);
+      }
+
+      // content
+      .subsection-content {
+        @extend %outline-item-content-shown;
+      }
+
+      // CASE: is-collapsible
+      &.is-collapsible {
+        @extend %ui-expand-collapse;
+
+        .ui-toggle-expansion {
+          @extend %t-icon4;
+          color: $gray-l3;
+        }
+      }
+
+      // STATE: is-collapsed
+      &.is-collapsed {
+
+        .subsection-content {
+          @extend %outline-item-content-hidden;
+        }
+      }
+    }
+
+    // outline: units
+    // --------------------
+    .list-units {
+      margin: $baseline 0 0 0;
+    }
+
+    .outline-unit {
+      @include transition(margin $tmg-f2 linear 0s); // needed for drag and drop transitions
+      margin-left: $outline-indent-width;
+
+      // header
+      .unit-header {
+        @extend %outline-item-header;
+      }
+
+      .unit-header-details {
+        @include float(left);
+        width: flex-grid(6, 9);
+        margin-top: ($baseline/4);
+      }
+
+      .unit-header-actions {
+        @include float(right);
+        width: flex-grid(3, 9);
+        margin-top: -($baseline/10);
+        @include text-align(right);
+
+        .actions-list {
+          @extend %actions-list;
+          @extend %t-action2;
+        }
+      }
+    }
+
+    // add/new items
+    .add-item {
+      margin-top: ($baseline*0.75);
+
+      .button-new {
+        @extend %ui-btn-flat-outline;
+        padding: ($baseline/2) $baseline;
+        display: block;
+
+        .icon {
+          display: inline-block;
+          vertical-align: middle;
+          @include margin-right($baseline/2);
+        }
+      }
+    }
+
+    .add-section {
+      margin-bottom: $baseline;
+    }
+
+    .add-subsection {
+
+    }
+
+    .add-unit {
+      margin-left: $outline-indent-width;
+    }
+  }
+
+
+  // UI: drag and drop: section
+  // --------------------
+  .outline-section {
+
+    .ui-splint-indicator {
+      height: ($baseline/10);
+      margin-left: ($baseline/4);
+    }
+
+    .draggable-drop-indicator-before {
+      top: -($baseline*0.75);
+      left: 0;
+    }
+
+    .draggable-drop-indicator-after {
+      bottom: -($baseline*0.75);
+      left: 0;
+    }
+  }
+
+  // UI: drag and drop: subsection
+  .outline-subsection {
+
+    .ui-splint-indicator {
+      height: ($baseline/10);
+      margin-left: ($baseline*1.25);
+    }
+
+    .draggable-drop-indicator-before {
+      top: -($baseline*0.75);
+    }
+
+    .draggable-drop-indicator-after {
+      bottom: -($baseline*0.75);
+    }
+  }
+
+  // // UI: drag and drop: unit
+  .outline-unit {
+
+    .draggable-drop-indicator-before {
+      top: -($baseline*0.75);
+    }
+
+    .draggable-drop-indicator-after {
+      bottom: -($baseline*0.75);
+    }
+  }
+
+  // UI: drag and drop: splints
+  .ui-splint-indicator {
+    position: relative;
+
+    .draggable-drop-indicator {
+      @extend %ui-depth3;
+      @include transition(opacity $tmg-f2 linear 0s);
+      @include size(100%, auto);
+      position: absolute;
+      border-top: 1px solid $blue-l1;
+      opacity: 0.0;
+
+      .fa-caret-right {
+        @extend %t-icon5;
+        position: absolute;
+        top: -12px;
+        left: -($baseline/4);
+        color: $blue-s1;
+      }
+    }
+
+    .draggable-drop-indicator-before {
+      top: -($baseline/2);
+    }
+
+    .draggable-drop-indicator-after {
+      bottom: -($baseline/2);
+    }
+  }
+
+  // outline: edit item settings
+  .wrapper-modal-window-bulkpublish-section,
+  .wrapper-modal-window-bulkpublish-subsection,
+  .wrapper-modal-window-bulkpublish-unit,
+  .course-outline-modal {
+
+    .list-fields {
+
+      .field {
+        display: inline-block;
+        vertical-align: top;
+        margin-right: ($baseline/2);
+        margin-bottom: ($baseline/4);
+
+
+        // TODO: refactor the _forms.scss partial to allow for this area to inherit from it
+        label, input, textarea {
+          display: block;
+        }
+
+        label {
+          @extend %t-copy-sub1;
+          @include transition(color $tmg-f3 ease-in-out 0s);
+          margin: 0 0 ($baseline/4) 0;
+          font-weight: 600;
+
+          &.is-focused {
+            color: $blue;
+          }
+        }
+
+
+        input, textarea {
+          @extend %t-copy-base;
+          @include transition(all $tmg-f2 ease-in-out 0s);
+          height: 100%;
+          width: 100%;
+          padding: ($baseline/2);
+
+          // CASE: long length
+          &.long {
+            width: 100%;
+          }
+
+          // CASE: short length
+          &.short {
+            width: 25%;
+          }
+        }
+
+        // CASE: specific release + due times/dates
+        .start-date,
+        .start-time,
+        .due-date,
+        .due-time {
+          width: ($baseline*7);
+        }
+      }
+
+      // CASE: select input
+      .field-select {
+
+        .label, .input {
+          display: inline-block;
+          vertical-align: middle;
+        }
+
+        .label {
+          margin-right: ($baseline/2);
+        }
+
+        .input {
+          width: 100%;
+        }
+      }
+    }
+
+    .edit-settings-grading {
+
+      .grading-type {
+        margin-bottom: $baseline;
+      }
+    }
+  }
+
+  // outline: bulk publishing items
+  .bulkpublish-section-modal,
+  .bulkpublish-subsection-modal,
+  .bulkpublish-unit-modal {
+
+    .modal-introduction {
+      color: $gray-d2;
+    }
+
+    .modal-section .outline-bulkpublish {
+      max-height: ($baseline*20);
+      overflow-y: auto;
+    }
+
+    .outline-section,
+    .outline-subsection {
+      border: none;
+      padding: 0;
+    }
+
+    .outline-subsection {
+      margin-bottom: $baseline;
+      padding-right: ($baseline/4);
+    }
+
+    .outline-subsection .subsection-title {
+      @extend %t-title8;
+      margin-bottom: ($baseline/4);
+      font-weight: 600;
+      color: $gray-l2;
+      text-transform: uppercase;
+    }
+
+    .outline-unit .unit-title, .outline-unit .unit-status {
+      display: inline-block;
+      vertical-align: middle;
+    }
+
+    .outline-unit .unit-title {
+      @extend %t-title7;
+      color: $color-heading-base;
+    }
+
+    .outline-unit .unit-status {
+      @extend %t-copy-sub2;
+      text-align: right;
+    }
+
+  }
+
+  // it is the only element there
+  .bulkpublish-unit-modal {
+    .modal-introduction {
+      margin-bottom: 0;
+    }
+  }
+
+}

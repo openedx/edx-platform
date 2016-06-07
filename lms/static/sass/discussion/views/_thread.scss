@@ -1,0 +1,205 @@
+// discussion - thread layout
+// ====================
+// NOTE: thread = (post + (responses and comments))
+
+// Table of Contents
+// * +general thread layout
+// * +thread - wrapper styling
+// * +thread - elements - shared styles
+// * +post - individual element styling
+// * +post - answered question - collapsed comment area
+
+// +general thread layout
+body.discussion, .discussion-module {
+
+  // post layout
+  .discussion-post {
+    padding: 0 ($baseline/2);
+
+    .wrapper-post-header {
+      padding-bottom: 0;
+      margin-bottom: ($baseline*0.75);
+    }
+
+    .post-header-content {
+      display: inline-block;
+      width: flex-grid(9,12);
+    }
+
+    .post-header-actions {
+      @include float(right);
+    }
+
+    .post-body {
+      width: flex-grid(10,12);
+    }
+  }
+
+  .posted-details {
+    @extend %t-copy-sub2;
+    margin-top: ($baseline/5);
+    color: $gray-d1;
+
+    .username {
+      @extend %t-strong;
+      display: inline;
+    }
+
+    .timeago, .top-post-status {
+      color: inherit;
+    }
+  }
+
+  // response layout
+  .discussion-response {
+    min-height: ($baseline*5);
+
+    .response-header-content {
+      display: inline-block;
+      vertical-align: top;
+      width: flex-grid(11,12);
+    }
+
+    .response-header-actions {
+      @include float(right);
+      @include right($baseline);
+      position: absolute;
+      top: $baseline;
+    }
+  }
+
+  // comments layout
+  .discussion-comment {
+
+    .response-body {
+      @extend %t-copy-sub2;
+      display: inline-block;
+      margin-bottom: ($baseline/2);
+      width: flex-grid(10,12);
+
+      p + p {
+        margin-top: 12px;
+      }
+    }
+
+    .comment-actions-list {
+      @include float(right);
+    }
+  }
+}
+
+// +thread - wrapper styling
+.thread-wrapper {
+  .thread-main-wrapper {
+    padding-bottom: $baseline;
+  }
+}
+
+// +thread - elements - shared styles
+body.discussion {
+
+  .discussion-post, .discussion-response, .discussion-comment {
+    @include clearfix();
+
+    // thread - images
+    .author-image {
+      @include margin-right($baseline/2);
+      display: inline-block;
+      vertical-align: top;
+
+      // STATE: No profile image
+      &:empty {
+        display: none;
+      }
+
+      // CASE: post image
+      &.level-post {
+        height: $post-image-dimension;
+        width: $post-image-dimension;
+      }
+
+      // CASE: response image
+      &.level-response {
+        height: $response-image-dimension;
+        width: $response-image-dimension;
+      }
+
+      // CASE: comment image
+      &.level-comment {
+        height: $comment-image-dimension;
+        width: $comment-image-dimension;
+      }
+
+      img {
+        border-radius: 3px;
+      }
+    }
+  }
+
+  .discussion-response .response-body {
+    @include padding-right($baseline); //ensures content doesn't overlap on post or response actions.
+  }
+}
+
+// +post - individual element styling
+body.discussion .discussion-post,
+body.discussion .discussion-article,
+body.view-in-course .discussion-post,
+body.view-in-course .discussion-article {
+  // NOTE: discussion-article is used for inline discussion modules.
+  @include clearfix();
+
+  .post-header-content {
+
+    // post title
+    .post-title {
+      @extend %t-title4;
+      @extend %t-ultrastrong;
+      margin-bottom: ($baseline/4);
+      letter-spacing: 0;
+    }
+  }
+
+  // post body
+  .post-body {
+    @extend %t-copy-sub1;
+    // clear: both; //TO-DO: confirm that removing this is ok for all cases of discussion posts.
+  }
+
+  // post context
+  .post-context {
+    @extend %t-copy-sub2;
+    margin-top: $baseline;
+    color: $gray-d1;
+
+    // CASE: no courseware context or cohort visibility rules
+    &:empty {
+      display: none;
+    }
+
+    // post visibility - cohorts
+    .group-visibility-label {
+      margin-top: ($baseline/4);
+    }
+  }
+}
+
+// Layout control for discussion modules that does not apply to the discussion board
+.discussion-module {
+  .discussion-thread {
+    .thread-main-wrapper, .thread-responses-wrapper {
+      padding: $baseline;
+    }
+  }
+
+  .btn-brand {
+    @include blue-button;
+    display: inline-block;
+    padding-bottom: ($baseline/10);
+    height: 37px;
+
+    &:hover, &:focus {
+      border-color: #222;
+    }
+  }
+}

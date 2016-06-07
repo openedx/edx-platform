@@ -1,0 +1,144 @@
+<%! from django.utils.translation import ugettext as _ %>
+<%page args="section_data"/>
+
+%if settings.FEATURES.get('DISPLAY_ANALYTICS_ENROLLMENTS') or section_data.get('enrollment_message'):
+  <div class="enrollment-wrapper">
+    <h2>${_("Enrollment Information")}</h2>
+
+    %if settings.FEATURES.get('DISPLAY_ANALYTICS_ENROLLMENTS'):
+      ## Translators: 'track' refers to the enrollment type ('honor', 'verified', or 'audit')
+      <span class="tip">${_("Number of enrollees (admins, staff, and students) by track")}</span>
+      <br/><br/>
+      <% modes = section_data['enrollment_count'] %>
+      <table>
+        <tr>
+          <td>${_("Verified")}</td><td>${modes['verified']}</td>
+        </tr>
+        <tr>
+          <td>${_("Audit")}</td><td>${modes['audit']}</td>
+        </tr>
+        <tr>
+          <td>${_("Honor")}</td><td>${modes['honor']}</td>
+        </tr>
+        <tr>
+          <td>${_("Professional")}</td><td>${modes['professional'] + modes['no-id-professional']}</td>
+        </tr>
+        <tr style="color:green;border-top:1px solid #000">
+          <td style="padding-top:10px;"><b>${_("Total")}</b></td><td style="padding-top:10px;"><b>${modes['total']}</b></td>
+        </tr>
+      </table>
+      %elif section_data.get('enrollment_message'):
+        <p>${section_data['enrollment_message']}</p>
+      %endif
+  </div>
+  <hr>
+%endif
+
+<div class="basic-wrapper">
+  <h2>${_("Basic Course Information")}</h2>
+
+  <ul class="list-input">
+    <li class="field text is-not-editable" id="field-course-organization">
+      <label for="course-organization">${_("Organization:")}</label>
+      <b>${ section_data['course_id'].org | h}</b>
+    </li>
+
+    <li class="field text is-not-editable" id="field-course-number">
+      <label for="course-number">${_("Course Number:")}</label>
+      <b>${ section_data['course_id'].course | h}</b>
+    </li>
+
+    <li class="field text is-not-editable" id="field-course-name">
+      <label for="course-name">${_("Course Name:")}</label>
+      <b>${ section_data['course_id'].run | h}</b>
+    </li>
+
+    <li class="field text is-not-editable" id="field-course-display-name">
+      <label for="course-display-name">${_("Course Display Name:")}</label>
+      <b>${ section_data['course_display_name'] | h}</b>
+    </li>
+
+    <li class="field text is-not-editable" id="field-course-start-date">
+      <label for="course-start-date">${_("Course Start Date:")}</label>
+      <b>${ section_data['start_date'] }</b>
+    </li>
+
+    <li class="field text is-not-editable" id="field-course-end-date">
+      <label for="course-end-date">${_("Course End Date:")}</label>
+      <b>${ section_data['end_date'] }</b>
+    </li>
+
+    <li class="field text is-not-editable" id="field-course-started">
+      <label for="start-date">${_("Has the course started?")}</label>
+
+      <b>${_("Yes") if section_data['has_started'] else _("No")}</b>
+
+    </li>
+
+    <li class="field text is-not-editable" id="field-course-ended">
+      <label for="start-date">${_("Has the course ended?")}</label>
+      %if section_data['has_ended']:
+      <b>${_("Yes")}</b>
+      %else:
+      <b>${_("No")}</b>
+      %endif
+    </li>
+
+    <li class="field text is-not-editable" id="field-course-num-sections">
+      <label for="course-num-sections">${_("Number of sections:")}</label>
+      <b>${ section_data['num_sections'] }</b>
+    </li>
+
+    <li class="field text is-not-editable" id="field-grade-cutoffs">
+      <label for="start-date">${_("Grade Cutoffs:")}</label>
+      <b>${ section_data['grade_cutoffs'] }</b>
+    </li>
+  </ul>
+
+  %if settings.FEATURES.get('ENABLE_SYSADMIN_DASHBOARD', ''):
+      <p>
+        ## Translators: git is a version-control system; see http://git-scm.com/about
+        ${_("View detailed Git import logs for this course {link_start}by clicking here{link_end}.").format(
+            link_start='<a href="{}">'.format(section_data['detailed_gitlogs_url']),
+            link_end='</a>'
+        )}
+      </p>
+  %endif
+</div>
+
+
+%if settings.FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS'):
+  <div class="running-tasks-container action-type-container">
+    <hr>
+    <h2> ${_("Pending Tasks")} </h2>
+    <div class="running-tasks-section">
+      <p>${_("The status for any active tasks appears in a table below.")} </p>
+      <br />
+
+      <div class="running-tasks-table" data-endpoint="${ section_data['list_instructor_tasks_url'] }"></div>
+    </div>
+    <div class="no-pending-tasks-message"></div>
+  </div>
+
+%endif
+
+%if len(section_data['course_errors']):
+  <div class="course-errors-wrapper">
+    <hr>
+    <p>
+    <div class="toggle-wrapper">
+      <h2 class="title">${_("Course Warnings")}:</h2>
+      <div class="triangle"></div>
+    </div>
+    <div class="course-errors-visibility-wrapper">
+      %for error in section_data['course_errors']:
+        <div class="course-error">
+          <code class=course-error-first>  ${ error[0] } </code><br>
+          <code class=course-error-second> ${ error[1] } </code>
+        </div>
+      %endfor
+    </div>
+    <p>
+  </div>
+<br>
+%endif

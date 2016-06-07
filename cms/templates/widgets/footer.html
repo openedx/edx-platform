@@ -1,0 +1,52 @@
+<%!
+from django.utils.translation import ugettext as _
+from django.core.urlresolvers import reverse
+%>
+
+<div class="wrapper-footer wrapper">
+  <footer class="primary" role="contentinfo">
+
+    <div class="footer-content-primary">
+      <div class="colophon">
+        <p>&copy; ${settings.COPYRIGHT_YEAR} <a data-rel="edx.org" href="${marketing_link('ROOT')}" rel="external">${settings.PLATFORM_NAME}</a>.</p>
+      </div>
+
+      % if is_any_marketing_link_set(['TOS', 'PRIVACY']):
+        <nav class="nav-peripheral">
+          <ol>
+            % if is_marketing_link_set('TOS'):
+              <li class="nav-item nav-peripheral-tos">
+                <a data-rel="edx.org" href="${marketing_link('TOS')}">${_("Terms of Service")}</a>
+              </li>
+            % endif
+            % if is_marketing_link_set('PRIVACY'):
+              <li class="nav-item nav-peripheral-pp">
+                <a data-rel="edx.org" href="${marketing_link('PRIVACY')}">${_("Privacy Policy")}</a>
+              </li>
+            % endif
+          </ol>
+        </nav>
+      % endif
+    </div>
+
+    <div class="footer-content-secondary" aria-label="{_('Legal')}">
+      <div class="footer-about-copyright">
+        ## Site operators: Please do not remove this paragraph! This attributes back to edX and makes your acknowledgement of edX's trademarks clear.
+        <p>
+          ## Translators: 'EdX', 'edX', 'Studio', and 'Open edX' are trademarks of 'edX Inc.'. Please do not translate any of these trademarks and company names.
+          ${_("EdX, Open edX, Studio, and the edX and Open edX logos are registered trademarks or trademarks of {link_start}edX Inc.{link_end}").format(
+            link_start=u"<a data-rel='edx.org' href='https://www.edx.org/'>",
+            link_end=u"</a>"
+          )}
+        </p>
+      </div>
+
+      <div class="footer-about-openedx">
+        <a href="http://open.edx.org" title="${_("Powered by Open edX")}">
+          <img alt="${_("Powered by Open edX")}" src="https://files.edx.org/openedx-logos/edx-openedx-logo-tag.png">
+        </a>
+      </div>
+    </div>
+  </footer>
+</div>
+

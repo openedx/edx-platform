@@ -1,0 +1,29 @@
+<%namespace name='static' file='../static_content.html'/>
+<%! import json %>
+
+<script type="text/javascript">
+window.PLATFORM_NAME = ${json.dumps(settings.PLATFORM_NAME)};
+window.ENABLE_DISCUSSION_HOME_PANEL = ${json.dumps(settings.FEATURES.get('ENABLE_DISCUSSION_HOME_PANEL', False))};
+</script>
+
+<%
+template_names = [
+    'thread', 'thread-show', 'thread-edit', 'thread-response', 'thread-response-show', 'thread-response-edit',
+    'response-comment-show', 'response-comment-edit', 'thread-list-item', 'discussion-home', 'search-alert',
+    'new-post', 'thread-type', 'new-post-menu-entry', 'new-post-menu-category', 'topic', 'post-user-display',
+    'inline-discussion', 'pagination', 'user-profile', 'profile-thread', 'customwmd-prompt'
+]
+%>
+
+% for template_name in template_names:
+<script aria-hidden="true" type="text/template" id="${template_name}-template">
+    <%static:include path="common/templates/discussion/${template_name}.underscore" />
+</script>
+% endfor
+
+## same, but without trailing "-template" in script ID
+% for template_name in ['forum-action-endorse', 'forum-action-answer', 'forum-action-follow', 'forum-action-vote', 'forum-action-report', 'forum-action-pin', 'forum-action-close', 'forum-action-edit', 'forum-action-delete', 'forum-actions']:
+<script aria-hidden="true" type="text/template" id="${template_name}">
+    <%static:include path="common/templates/discussion/${template_name}.underscore" />
+</script>
+% endfor

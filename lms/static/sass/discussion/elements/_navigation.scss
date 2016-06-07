@@ -1,0 +1,373 @@
+// discussion - elements - navigation
+// ====================
+
+.forum-nav {
+  box-sizing: border-box;
+  @include float(left);
+  position: relative;
+  width: 31%;
+  border: 1px solid #aaa;
+  border-radius: 3px;
+}
+
+// ------
+// Header
+// ------
+.forum-nav-header {
+  box-sizing: border-box;
+  // TODO: don't use table for layout purposes as it switches the screenreader mode
+  display: table;
+  border-bottom: 1px solid $forum-color-border;
+  width: 100%;
+  background-color: $gray-l3;
+}
+
+.forum-nav-browse {
+    box-sizing: border-box;
+    // TODO: don't use table-cell for layout purposes as it switches the screenreader mode
+    display: table-cell;
+    vertical-align: middle;
+    width: auto;
+    padding: 11px;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+
+    &:hover,
+    &:focus,
+    &.is-active {
+        // converted to button from a;
+        // need importants to overwrite later button styles
+        box-shadow: none !important;
+        background-image: none !important;
+        background-color: $gray-l5 !important;
+    }
+
+  .icon {
+    @include font-size(14);
+    @include margin-right($baseline/4);
+  }
+}
+
+.forum-nav-browse-current {
+  @include font-size(12);
+}
+
+.forum-nav-browse-drop-arrow {
+  @include margin-left($baseline/4);
+}
+
+.forum-nav-search {
+  box-sizing: border-box;
+  // TODO: don't use table-cell for layout purposes as it switches the screenreader mode
+  display: table-cell;
+  position: relative;
+  vertical-align: middle;
+  width: 50%;
+  padding: ($baseline/4);
+}
+
+.forum-nav-search .icon {
+  @include font-size(12);
+  position: absolute;
+  margin-top: -6px;
+  top: 50%;
+  @include right($baseline/4 + 1px + $baseline / 4); // Wrapper padding + border + input padding
+}
+
+.forum-nav-search-input {
+  width: 100%;
+}
+
+// -----------
+// Browse menu
+// -----------
+.forum-nav-browse-menu-wrapper {
+  border-bottom: 1px solid $forum-color-border;
+  background: $gray-l5;
+}
+
+.forum-nav-browse-filter {
+  position: relative;
+  border-bottom: 1px solid $forum-color-border;
+  padding: ($baseline/4);
+}
+
+.forum-nav-browse-filter .icon {
+  @include font-size(12);
+  position: absolute;
+  margin-top: -6px;
+  top: 50%;
+  right: ($baseline/4 + 1px + $baseline / 4); // Wrapper padding + border + input padding
+}
+
+.forum-nav-browse-filter-input {
+  width: 100%;
+}
+
+.forum-nav-browse-title {
+    display: block;
+    width: 100%;
+    border: 0;
+    border-radius: 0;
+    border-bottom: 1px solid $forum-color-border;
+    padding: ($baseline/2);
+    background: transparent;
+    box-shadow: none;
+    background-image: none;
+    color: $link-color;
+    text-align: left;
+
+    &:hover,
+    &:focus {
+        // switched from a to button;
+        // need to override button styles
+        background-image: none !important;
+        box-shadow: none !important;
+        background: $forum-color-background !important;
+    }
+}
+
+.forum-nav-browse-title .icon {
+  @include margin-right($baseline/2);
+}
+
+.forum-nav-browse-menu {
+  @include font-size(14);
+  overflow-y: scroll;
+  list-style: none;
+}
+
+.forum-nav-browse-submenu {
+    list-style: none;
+    padding: 0;
+
+    li {
+
+        .forum-nav-browse-title {
+            padding-left: $baseline;
+        }
+    }
+}
+
+// -------------------
+// Sort and filter bar
+// -------------------
+.forum-nav-refine-bar {
+  @include clearfix();
+  @include font-size(11);
+  border-bottom: 1px solid $forum-color-border;
+  background-color: $gray-l5;
+  padding: ($baseline/4) ($baseline/2);
+  color: $black;
+  text-align: right;
+}
+
+.forum-nav-filter-main {
+  box-sizing: border-box;
+  display: inline-block;
+  width: 50%;
+  @include text-align(left);
+}
+
+.forum-nav-filter-cohort, .forum-nav-sort {
+  box-sizing: border-box;
+  display: inline-block;
+  width: 50%;
+  @include text-align(right);
+}
+
+%forum-nav-select {
+  border: none;
+  max-width: 100%;
+  background-color: transparent;
+}
+
+.forum-nav-filter-main-control {
+  @extend %forum-nav-select;
+}
+
+.forum-nav-filter-cohort-control {
+  @extend %forum-nav-select;
+}
+
+.forum-nav-sort-control {
+  @extend %forum-nav-select;
+}
+
+// -----------
+// Thread list
+// -----------
+.forum-nav-thread-list {
+  overflow-y: scroll;
+  list-style: none;
+}
+
+.forum-nav-thread {
+  border-bottom: 1px solid $forum-color-border;
+  background-color: $forum-color-background;
+
+  &.is-unread {
+    background: $forum-color-background;
+    color: $blue-d1;
+
+    .forum-nav-thread-comments-count {
+      background-color: tint($blue-d1, 90%);;
+      color: $blue-d1;
+
+      &:after {
+        border-right-color: tint($blue-d1, 90%);;
+      }
+    }
+  }
+}
+
+.forum-nav-thread-link {
+  display: block;
+  padding: ($baseline/4) ($baseline/2);
+
+  &.is-active {
+    background-color: $forum-color-background;
+    color: $base-font-color;
+
+    .forum-nav-thread-comments-count {
+      background-color: $gray-l4;
+      color: $base-font-color;
+
+      &:after {
+        border-right-color: $gray-l4;
+      }
+    }
+  }
+
+  .forum-nav-thread-comments-count {
+
+    // topic read, but has unread comments
+    &.is-unread {
+      background-color: $blue-d1;
+      color: $white;
+
+      &:after {
+        border-right-color: $blue-d1;
+      }
+    }
+  }
+}
+
+%forum-nav-thread-wrapper {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.forum-nav-thread-wrapper-0 {
+  @extend %forum-nav-thread-wrapper;
+  width: 7%;
+
+  .icon {
+    @include font-size(14);
+
+    &:before {
+
+      @include rtl {
+        @include transform(scale(-1, 1)); // RTL for font awesome question mark
+      }
+    }
+  }
+
+  .fa-comments {
+    color: $gray-l2;
+  }
+
+  .fa-check-square-o {
+    color: $forum-color-marked-answer;
+  }
+
+  .fa-question {
+    color: $pink;
+  }
+}
+
+.forum-nav-thread-wrapper-1 {
+  @extend %forum-nav-thread-wrapper;
+  width: 80%;
+}
+
+.forum-nav-thread-wrapper-2 {
+  @extend %forum-nav-thread-wrapper;
+  width: 13%;
+  @include text-align(right);
+}
+
+.forum-nav-thread-title {
+  @extend %t-title7;
+  display: block;
+}
+
+%forum-nav-thread-wrapper-2-content {
+  @include font-size(11);
+  display: inline-block;
+  margin-right: ($baseline/4);
+  text-align: center;
+  color: $black;
+
+  &:last-child {
+    margin-right: 0;
+  }
+}
+
+.forum-nav-thread-votes-count {
+  @extend %forum-nav-thread-wrapper-2-content;
+}
+
+.forum-nav-thread-comments-count {
+  @extend %forum-nav-thread-wrapper-2-content;
+  @extend %t-weight4;
+  position: relative;
+  @include margin-left($baseline/4);
+  margin-bottom: ($baseline/4); // Because tail is position: absolute
+  border-radius: 2px;
+  padding: ($baseline/10) ($baseline/5);
+  min-width: 2em; // Fit most comment counts but allow expansion if necessary
+  background-color: $gray-l4;
+
+  // Speech bubble tail
+  &:after {
+    content: '';
+    display: block;
+    position: absolute;
+    bottom: (-$baseline/4);
+    @include right($baseline/4);
+    width: 0;
+    height: 0;
+    border-style: solid;
+    @include border-width(0, ($baseline/4), ($baseline/4), 0);
+    @include border-color(transparent, $gray-l4, transparent, transparent);
+  }
+}
+
+.forum-nav-load-more {
+  border-bottom: 1px solid $forum-color-border;
+  background-color: $gray-l5;
+}
+
+%forum-nav-load-more-content {
+  display: block;
+  padding: $baseline 0;
+  text-align: center;
+}
+
+.forum-nav-load-more-link {
+  @extend %forum-nav-load-more-content;
+  color: $link-color;
+
+  &:hover,
+  &:focus {
+    color: $link-color;
+    background-color: $forum-color-active-thread;
+  }
+}
+
+.forum-nav-loading {
+  @extend %forum-nav-load-more-content;
+}

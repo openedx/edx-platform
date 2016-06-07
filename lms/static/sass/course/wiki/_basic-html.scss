@@ -1,0 +1,137 @@
+section.wiki-body {
+   h1 {
+    font-weight: bold;
+    font-size: 2em;
+    margin-bottom: 25px;
+   }
+
+  div#wiki_article {
+    html, address, blockquote, body, dd, div, dl, dt, fieldset, form, frame, frameset, h1, h2, h3, h4, h5, h6, noframes, ol, p, ul, center, dir, hr, menu, pre   {
+      display: block;
+      unicode-bidi: embed
+    }
+
+    li {
+      display: list-item
+    }
+
+    head {
+      display: none
+    }
+
+    table {
+      display: table
+    }
+
+    tr {
+      display: table-row
+    }
+
+    thead {
+      display: table-header-group
+    }
+
+    tbody {
+      display: table-row-group
+    }
+
+    tfoot {
+      display: table-footer-group
+    }
+
+    col { display: table-column }
+
+    colgroup { display: table-column-group }
+
+    td, th { display: table-cell }
+
+    caption {
+      display: table-caption
+    }
+
+    th {
+      font-weight: bolder;
+      text-align: center
+    }
+
+    caption {
+      text-align: center
+    }
+
+    h1 {
+      font-size: 1.6em;
+      margin: .67em 0;
+      letter-spacing: 0px;
+    }
+
+    h2 {
+      text-transform: none;
+      font-size: 1.4em;
+      margin: .75em 0;
+      letter-spacing: 0px;
+    }
+
+    h3 {
+      font-size: 1.2em;
+      margin: .83em 0;
+    }
+
+    h4 {
+      font-size: 1.1em;
+    }
+
+    h4, p, blockquote, ul, fieldset, form, ol, dl, dir, menu  { margin: 1.12em 0 }
+
+    h5 { font-size: 1em; margin: 1.5em 0 }
+
+    h6 { font-size: 0.5em; margin: 1.67em 0 }
+
+    b, strong { font-weight: bolder }
+
+    blockquote      {
+      padding: ($baseline/2) $baseline;
+      background: #e3e3e3;
+      border-left: 4px solid;
+    }
+
+    i, cite, em, var, address  { font-style: italic }
+
+    pre, tt, code, kbd, samp  {
+      font-family: monospace;
+    }
+
+    pre { white-space: pre }
+
+    button, textarea, input, select   { display: inline-block }
+
+    big { font-size: 1.17em }
+
+    small, sub, sup { font-size: .83em }
+
+    sub { vertical-align: sub }
+
+    sup { vertical-align: super }
+
+    table { border-spacing: 2px; }
+
+    thead, tbody, tfoot { vertical-align: middle }
+
+    td, th, tr { vertical-align: inherit }
+
+    s, strike, del  { text-decoration: line-through }
+
+    hr { height: 1px; background: #999; border: none;}
+
+    ol, ul, dir, menu, dd { margin-left: 40px }
+
+    ol { list-style-type: decimal }
+
+    ol ul, ul ol, ul ul, ol ol    { margin-top: 0; margin-bottom: 0 }
+
+    u, ins { text-decoration: underline }
+
+    br:before { content: "\A"; white-space: pre-line }
+
+    center { text-align: center }
+  }
+}

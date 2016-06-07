@@ -1,0 +1,186 @@
+/*Range Slider Bar Time*/
+.vjs-default-skin .vjs-timebar-RS{
+	color: red;
+	top: -1em;
+	height: 100%;
+	position: relative;
+	background: rgba(100,100,100,.5);/*Quitar*/
+}
+
+
+
+/*Selection Range Slider Bar Selected*/
+.vjs-default-skin .vjs-rangeslider-holder{height: 100%;}
+
+.vjs-default-skin .vjs-selectionbar-RS{
+	height: 100%;
+	float: left;
+	width: 100%;
+	left: 0em;
+	right: 0em;
+	position:absolute;
+	background-color: #FFE800;
+	background: #FFE800;
+	background: -moz-linear-gradient(top, #FFE800, #A69700);
+	background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#FFE800), to(#A69700));
+	background: -webkit-linear-gradient(top, #FFE800, #A69700);
+	background: -o-linear-gradient(top, #FFE800, #A69700);
+	background: -ms-linear-gradient(top, #FFE800, #A69700);
+	background: linear-gradient(top, #FFE800, #A69700);
+	opacity: 0.8;
+}
+
+.vjs-default-skin div.vjs-rangeslider-holder.locked > div.vjs-selectionbar-RS {
+	background-color: #FF6565;
+	background: #FF6565;
+	background: -moz-linear-gradient(top, #FF6565, #300000);
+	background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#FF6565), to(#300000));
+	background: -webkit-linear-gradient(top, #FF6565, #300000);
+	background: -o-linear-gradient(top, #FF6565, #300000);
+	background: -ms-linear-gradient(top, #FF6565, #300000);
+	background: linear-gradient(top, #FF6565, #300000);
+}
+
+
+/*Arrow and Handle*/
+.vjs-default-skin div.vjs-rangeslider-handle {
+	position: absolute;
+	margin-top: 0;
+	cursor: pointer !important;
+	background-color: transparent;
+}
+
+.vjs-default-skin .vjs-selectionbar-left-RS{height: 100%;left: 0;z-index:10}
+.vjs-default-skin .vjs-selectionbar-right-RS{height: 100%;left: 100%;z-index:20}
+
+.vjs-default-skin div.vjs-selectionbar-left-RS,
+.vjs-default-skin div.vjs-selectionbar-right-RS {
+	top: 0em;
+	position: absolute;
+	width:0em;
+}
+
+.vjs-default-skin div.vjs-selectionbar-arrow-RS {
+	width: 0;
+	height: 0;
+	border-left: 1em solid transparent;
+	border-right: 1em solid transparent;
+	border-top: 1em solid #FFF273;
+	margin-left: -1em;	
+	opacity: 0.8;
+	
+	position: absolute;
+	top: -1em;
+}
+.vjs-default-skin div.vjs-rangeslider-handle.active > div.vjs-selectionbar-arrow-RS {
+	border-top-color: #5F5FB3;
+}
+
+.vjs-default-skin div.vjs-rangeslider-holder.locked .vjs-rangeslider-handle > div.vjs-selectionbar-arrow-RS {
+	border-top-color: #FF6565;
+}
+
+.vjs-default-skin div.vjs-selectionbar-line-RS {
+	width: 1px;
+	height: 1em;
+	background-color: #FFF273;
+	
+	position:absolute;
+	top: 0em;
+}
+.vjs-default-skin div.vjs-rangeslider-handle.active > div.vjs-selectionbar-line-RS {
+	background-color: #5F5FB3;
+}
+
+.vjs-default-skin div.vjs-rangeslider-holder.locked .vjs-rangeslider-handle > div.vjs-selectionbar-line-RS {
+	background-color: #FF6565;
+}
+
+
+/* Time Panel */
+.vjs-default-skin .vjs-timepanel-RS{
+	width: 100%;
+	height: 1em;
+	font-weight: bold;
+	font-size: 15px;
+	top: -2em;
+	position: absolute;
+	visibility:visible;
+	opacity:1;
+	transition-delay:0s;
+}
+.vjs-default-skin .vjs-timepanel-RS.disable{
+  visibility:hidden;
+  opacity:0;
+	-webkit-transition: visibility 1s linear 1s,opacity 1s linear;
+	-moz-transition: visibility 1s linear 1s,opacity 1s linear;
+	-o-transition: visibility 1s linear 1s,opacity 1s linear;
+	transition:visibility 1s linear 1s,opacity 1s linear;
+}
+
+.vjs-default-skin .vjs-timepanel-left-RS,
+.vjs-default-skin .vjs-timepanel-right-RS{
+	font-weight: normal;
+	font-size: 1em;
+	color: #666666;
+	border: 1px solid #666666;
+	background-color: white;
+	border-radius: 5px;
+	position: absolute;
+	height:116%;
+	padding-right: 0.3em;
+	padding-left: 0.3em;
+}
+.vjs-default-skin .vjs-timepanel-left-RS{
+	left:0.5%
+}
+.vjs-default-skin .vjs-timepanel-right-RS{
+	left:92%
+}
+
+
+
+
+/* Control Time Panel */
+.vjs-default-skin .vjs-controltimepanel-RS{
+	width: 18em;
+	font-size: 1em;
+	line-height: 3em;
+}
+
+.vjs-default-skin .vjs-controltimepanel-RS input{
+	width: 1.5em;
+	background: rgba(102, 168, 204, 0.16);
+	border: 1px solid transparent;
+	color: black;
+	font-size: 1em;
+	margin-left: 2px;
+	text-align: center;
+	color: white;
+}
+
+.vjs-default-skin .vjs-controltimepanel-left-RS{
+	width: 50%;
+	float: left;
+}
+.vjs-default-skin .vjs-controltimepanel-right-RS{
+	float:right;
+	width: 48%;
+}
+.vjs-default-skin .vjs-controltimepanel-RS input{
+	margin: 0;
+	padding: 0;
+	display: table-cell;
+}
+
+
+/* ---------------- Video-js plugin ---------------- */
+
+.vjs-default-skin *, .vjs-default-skin *:before, .vjs-default-skin *:after {
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+}
+

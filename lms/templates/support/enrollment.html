@@ -1,0 +1,29 @@
+<%!
+from django.utils.translation import ugettext as _
+from openedx.core.djangolib.js_utils import js_escaped_string
+%>
+
+<%namespace name='static' file='../static_content.html'/>
+
+<%inherit file="../main.html" />
+
+<%block name="js_extra">
+<%static:require_module module_name="support/js/enrollment_factory" class_name="EnrollmentFactory">
+    new EnrollmentFactory({
+        user: '${username | n, js_escaped_string}',
+        enrollmentsUrl: '${enrollmentsUrl | n, js_escaped_string}',
+        enrollmentSupportUrl: '${enrollmentSupportUrl | n, js_escaped_string}',
+    });
+</%static:require_module>
+</%block>
+
+<%block name="pagetitle">
+${_("Enrollment")}
+</%block>
+
+<%block name="content">
+<section class="container outside-app">
+  <h1>${_("Student Support: Enrollment")}</h1>
+  <div class="enrollment-content"></div>
+</section>
+</%block>

@@ -1,0 +1,16 @@
+<div class="xblock-render" class="studio-xblock-wrapper">
+    % for tag in tags:
+    <label for="tags_${tag['key']}_${block_location}">${tag['title']}</label>:
+    <select id="tags_${tag['key']}_${block_location}" name="${tag['key']}">
+        <option value="" ${'' if tag['current_value'] else 'selected=""'}>Not selected</option>
+        % for v in tag['values']:
+            <%
+                selected = ''
+                if v == tag['current_value']:
+                    selected = 'selected'
+            %>
+            <option value="${v}" ${selected}>${v}</option>
+        % endfor
+    </select>
+    % endfor
+</div>

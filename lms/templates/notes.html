@@ -1,0 +1,232 @@
+<%inherit file="main.html" />
+<%namespace name='static' file='static_content.html'/>
+${static.css(group='style-vendor-tinymce-content', raw=True)}
+${static.css(group='style-vendor-tinymce-skin', raw=True)}
+${static.css(group='style-xmodule-annotations', raw=True)}
+<%!
+from django.utils.translation import ugettext as _
+from django.core.urlresolvers import reverse
+%>
+
+<%block name="headextra">
+<%static:css group='style-course-vendor'/>
+<%static:css group='style-course'/>
+<%static:js group='courseware'/>
+
+<style type="text/css">
+    blockquote {
+        background:#f9f9f9;
+        border-left:10px solid #ccc;
+        margin:1.5em 10px;
+        padding:.5em 10px;
+    }
+    blockquote:before {
+        color:#ccc;
+        content:'“';
+        font-size:4em;
+        line-height:.1em;
+        margin-right:.25em;
+        vertical-align:-.4em;
+    }
+    blockquote p {
+        display:inline;
+    }
+    .notes-wrapper {
+        padding: 32px 40px;
+    }
+    .note {
+        border-bottom: 1px solid #ccc;
+        padding: 0 0 1em 0;
+    }
+    .note .text {
+        margin-bottom: 1em;
+    }
+    .note ul.meta {
+        margin: .5em 0;
+    }
+    .note ul.meta li {
+        font-size: .9em;
+        margin-bottom: .5em;
+    }
+</style>
+
+</%block>
+
+<%block name="js_extra">
+  <script type="text/javascript">
+  </script>
+</%block>
+
+<%include file="/courseware/course_navigation.html" args="active_page='notes'" />
+
+<section class="container">
+    <div class="notes-wrapper">
+        <h1>${_('My Notes')}</h1>
+        <div id="notesHolder"></div>
+        <section id="catchDIV">
+            <div class="annotationListContainer">${_('You do not have any notes.')}</div>
+        </section>
+        <script>
+    // TODO: Fix indentation in the following block
+    (function (require) {
+        var init = function() {
+        //Grab uri of the course
+        var parts = window.location.href.split("/"),
+            uri = '';
+        for (var index = 0; index <= 6; index += 1) uri += parts[index]+"/"; //Get the unit url
+        var pagination = 100,
+            is_staff = false,
+            options = {
+                optionsAnnotator: {
+                    permissions:{
+                        user: {
+                            id:"${student.email}",
+                            name:"${student.username}"
+                        },
+                        userString: function (user) {
+                            if (user && user.name)
+                                return user.name;
+                            return user;
+                        },
+                        userId: function (user) {
+                            if (user && user.id)
+                                return user.id;
+                            return user;
+                        },
+                        permissions: {
+                                'read':   [],
+                                'update': ["${student.email}"],
+                                'delete': ["${student.email}"],
+                                'admin':  ["${student.email}"]
+                        },
+                        showViewPermissionsCheckbox: true,
+                        showEditPermissionsCheckbox: false,
+                        userAuthorize: function(action, annotation, user) {
+                            var token, tokens, _i, _len;
+                            if (annotation.permissions) {
+                              tokens = annotation.permissions[action] || [];
+                              if (is_staff){
+                                  return true;
+                              }
+                              if (tokens.length === 0) {
+                                return true;
+                              }
+                              for (_i = 0, _len = tokens.length; _i < _len; _i++) {
+                                token = tokens[_i];
+
+                                if (this.userId(user) === token) {
+
+                                  return true;
+                                }
+                              }
+
+                              return false;
+                            } else if (annotation.user) {
+                              if (user) {
+                                return this.userId(user) === this.userId(annotation.user);
+                              } else {
+                                return false;
+                              }
+                            }
+                            return true;
+                          },
+                    },
+                    auth: {
+                        token: "${token}"
+                    },
+                    store: {
+                        // The endpoint of the store on your server.
+                        prefix: "${storage}",
+
+                        annotationData: {},
+
+                        urls: {
+                            // These are the default URLs.
+                            create:  '/create',
+                            read:    '/read/:id',
+                            update:  '/update/:id',
+                            destroy: '/delete/:id',
+                            search:  '/search'
+                        },
+
+                        loadFromSearch:{
+                            limit:pagination,
+                            offset:0,
+                            uri:uri
+                        }
+                    },
+                },
+                optionsVideoJS: {techOrder: ["html5","flash","youtube"]},
+                optionsRS: {},
+                optionsOVA: {posBigNew:'none'},
+                optionsRichText: {
+                    tinymce:{
+                        selector: "li.annotator-item textarea",
+                        plugins: "media image codemirror",
+                        menubar: false,
+                        toolbar_items_size: 'small',
+                        extended_valid_elements : "iframe[src|frameborder|style|scrolling|class|width|height|name|align|id]",
+                        toolbar: "insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | image rubric | code ",
+                    }
+                },
+                auth: {
+                    token: "${token}"
+                },
+                store: {
+                    // The endpoint of the store on your server.
+                    prefix: "${storage}",
+
+                    annotationData: {},
+
+                    urls: {
+                        // These are the default URLs.
+                        create:  '/create',
+                        read:    '/read/:id',
+                        update:  '/update/:id',
+                        destroy: '/delete/:id',
+                        search:  '/search'
+                    },
+                }
+            };
+
+        var imgURLRoot = "${settings.STATIC_URL}" + "js/vendor/ova/catch/img/";
+        //remove old instances
+        if (Annotator._instances.length !== 0) {
+            $('#notesHolder').annotator("destroy");
+        }
+        delete ova;
+        //Load the plugin Video/Text Annotation
+        var ova = new OpenVideoAnnotation.Annotator($('#notesHolder'),options);
+
+        // TODO: Fix to avoid using global scope!
+        window.options = options;
+        window.ova = ova;
+        // END TODO
+
+        //Catch
+        var annotator = ova.annotator,
+            catchOptions = {
+                media:'text',
+                externalLink:true,
+                imageUrlRoot:imgURLRoot,
+                showMediaSelector: true,
+                showPublicPrivate: true,
+                pagination:pagination,//Number of Annotations per load in the pagination,
+                flags:is_staff,
+                default_tab: "${default_tab}",
+            },
+            Catch = new CatchAnnotation($('#catchDIV'),catchOptions);
+            // TODO: Fix to avoid using global scope!
+            window.Catch = Catch;
+            // END TODO
+        };
+        try {
+            require(["ova"], init);
+        } catch(error) {
+            console.log("Error: " + error.message + " - Annotator not loaded in LMS.");
+        }
+    }).call(this, require || RequireJS.require);
+        </script>
+    </div>
+</section>
+

@@ -1,0 +1,162 @@
+<problem title="Embedded Code Box" markdown="null">
+  <text>
+    <p> We are searching for
+      the smallest monthly payment such that we can pay off the
+      entire balance of a loan within a year.</p>
+    <p> The following values might be useful when writing your solution</p>
+    <blockquote>
+      <p><strong>Monthly interest rate</strong>
+= (Annual interest rate) / 12<br/>
+<strong>Monthly payment lower bound</strong>
+= Balance / 12<br/>
+
+<strong>Monthly payment upper bound</strong> = (Balance x
+        (1 + Monthly interest rate)<sup>12</sup>) / 12
+</p>
+    </blockquote>
+    <p>The following variables contain values as described below:</p>
+    <ol>
+      <li>
+        <p><code>balance</code> - the outstanding balance on the credit card</p>
+      </li>
+      <li>
+        <p><code>annualInterestRate</code> - annual interest rate as a decimal</p>
+      </li>
+    </ol>
+    <p>Write a program that uses these bounds and bisection
+        search (for more info check out <a href="http://en.wikipedia.org/wiki/Bisection_method" target="_blank">the Wikipedia page
+        on bisection search</a>)
+        to find the smallest monthly payment <em>to the cent</em>
+        such that we can pay off the
+        debt within a year.</p>
+    <p>Note that if you do not use bisection search, your code will not run - your code only has
+      30 seconds to run on our servers. If you get a message that states "Your submission could not be graded. Please recheck your 
+      submission and try again. If the problem persists, please notify the course staff.", check to be 
+      sure your code doesn't take too long to run.</p>
+    <p>The code you paste into the following box should not specify the values for the variables <code>balance</code> 
+      or <code>annualInterestRate</code> - our test code will define those values 
+      before testing your submission. </p>
+  </text>
+  <coderesponse>
+    <textbox rows="10" cols="70" mode="python" tabsize="4"/>
+    <codeparam>
+      <initial_display/>
+      <answer_display>
+monthlyInterestRate = annualInterestRate/12
+lowerBound = balance/12
+upperBound = (balance * (1+annualInterestRate/12)**12)/12
+originalBalance = balance
+
+# Keep testing new payment values 
+#  until the balance is +/- $0.02
+while abs(balance) &gt; .02:
+    # Reset the value of balance to its original value
+    balance = originalBalance
+    # Calculate a new monthly payment value from the bounds
+    payment = (upperBound - lowerBound)/2 + lowerBound
+
+    # Test if this payment value is sufficient to pay off the 
+    #  entire balance in 12 months
+    for month in range(12):
+        balance -= payment
+        balance *= 1+monthlyInterestRate
+
+    # Reset bounds based on the final value of balance
+    if balance &gt; 0: 
+        # If the balance is too big, need higher payment
+    #  so we increase the lower bound
+        lowerBound = payment
+    else:
+        # If the balance is too small, we need a lower
+    #  payment, so we decrease the upper bound
+        upperBound = payment
+
+# When the while loop terminates, we know we have 
+#  our answer!
+print "Lowest Payment:", round(payment, 2)
+</answer_display>
+      <grader_payload>
+{"grader": "ps02/bisect/grade_bisect.py"}
+</grader_payload>
+    </codeparam>
+  </coderesponse>
+  <text>
+    <div>
+      <b>Note:</b>
+      <p>Depending on where, and how frequently, you round during
+        this function, your answers may be off a few cents in
+        either direction. Try rounding as few times as possible
+        in order to increase the accuracy of your result. </p>
+    </div>
+    <section class="hints">
+      <h3>Hints</h3>
+      <div class="collapsible">
+        <header>
+          <a href="#" id="ht3l">Test Cases to test your code with. Be sure to test these on your own machine - 
+    and that you get the same output! - before running your code on this webpage! </a>
+        </header>
+        <section id="ht3">
+          <p><b>Note:</b> The automated tests are lenient - if your answers are off by a few cents 
+    in either direction, your code is OK. </p>
+          <p>Test Cases:</p>
+          <p>
+            <pre>
+              <code>
+      Test Case 1:
+      balance = 320000
+      annualInterestRate = 0.2
+
+      Result Your Code Should Generate:
+      -------------------
+      Lowest Payment: 29157.09
+</code>
+            </pre>
+          </p>
+          <p>
+            <pre>
+              <code>
+      Test Case 2:
+      balance = 999999
+      annualInterestRate = 0.18
+
+      Result Your Code Should Generate:
+      -------------------
+      Lowest Payment: 90325.07
+</code>
+            </pre>
+          </p>
+        </section>
+      </div>
+      <div class="collapsible">
+        <header>
+          <a href="#" id="ht4">The autograder says, "Your submission could not be graded." Help!</a>
+        </header>
+        <section id="ht4">
+          <p> If the autograder gives you the following message:</p>
+          <pre>
+Your submission could not be graded.
+Please recheck your submission and try again. If the problem persists, please notify the course staff.
+      </pre>
+          <p>Don't panic! There are a few things that might be wrong with your code that you should 
+        check out. The number one reason this message appears is because your code timed out.
+        You only get 30 seconds of computation time on our servers. If your code times out,
+        you probably have an infinite loop. What to do?</p>
+          <p>The number 1 thing to do is that you need to run this code in your own local 
+        environment. Your code should print one line at the end of the loop. If your code never prints anything
+        out - you have an infinite loop!</p>
+          <p>To debug your infinite loop - check your loop conditional. When will it stop? 
+        Try inserting print statements inside your loop that prints out information (like variables) - are you
+        incrementing or decrementing your loop counter correctly?
+        Search the forum for people with similar issues. If your search turns up nothing, 
+        make a new post and paste in your loop conditional for others to help you out with.</p>
+          <p>Please don't email the course staff unless your code legitimately works and prints out the
+        correct answers in your local environment. In that case, please email your code file,
+        a screenshot of the code printing out the correct answers in your local environment,
+        and a screenshot of the exact same code not working on the tutor. The course staff is
+        otherwise unable to help debug your problem set via email - we can only address platform issues.</p>
+        </section>
+      </div>
+    </section>
+    <br/>
+  </text>
+</problem>

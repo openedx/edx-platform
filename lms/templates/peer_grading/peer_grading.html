@@ -1,0 +1,75 @@
+<%! from django.utils.translation import ugettext as _ %>
+<%
+nothing_to_grade_message = _(
+"""
+{p_tag}You currently do not have any peer grading to do.  In order to have peer grading to do:
+{ul_tag}
+{li_tag}You need to have submitted a response to a peer grading problem.{end_li_tag}
+{li_tag}The course team needs to score the essays that are used to help you better understand the grading
+criteria.{end_li_tag}
+{li_tag}There must be submissions that are waiting for grading.{end_li_tag}
+{end_ul_tag}
+{end_p_tag}
+""").format(p_tag="<p>", end_p_tag="</p>", ul_tag="<ul>", end_ul_tag="</ul>", li_tag="<li>", end_li_tag="</li>")
+%>
+<section class="container peer-grading-container">
+    <div class="peer-grading" data-ajax-url="${ajax_url}" data-use-single-location="${use_single_location}">
+        <div class="error-container">${error_text}</div>
+        <div class="peer-grading-tools">
+            <h1 class="peer-grading-title">${_("Peer Grading")}</h1>
+            <h2 class="peer-grading-instructions">${_("Instructions")}</h2>
+            <p>${_("Here is a list of problems that need to be peer graded for this course.")}</p>
+            % if success:
+                % if len(problem_list) == 0:
+                <div class="message-container">
+                  ${nothing_to_grade_message}
+                </div>
+                %else:
+                <div class="problem-list-container">
+                    <table class="problem-list">
+                        <tr>
+                            <th>${_("Problem Name")}</th>
+                            <th>${_("Due date")}</th>
+                            <th>${_("Graded")}</th>
+                            <th>${_("Available")}</th>
+                            <th>${_("Required")}</th>
+                            <th>${_("Progress")}</th>
+                        </tr>
+                    %for problem in problem_list:
+                    <tr data-graded="${problem['num_graded']}" data-required="${problem['num_required']}">
+                        <td class="problem-name">
+                            %if problem['closed']:
+                                ${problem['problem_name']}
+                            %else:
+                                <a href="#problem" data-location="${problem['location'] | h}" class="problem-button">${problem['problem_name']}</a>
+                            %endif
+                        </td>
+                        <td>
+                            % if problem['due']:
+                                ${problem['due']}
+                            % else:
+                                ${_("No due date")}
+                            % endif
+                        </td>
+                        <td>
+                            ${problem['num_graded']}
+                        </td>
+                        <td>
+                            ${problem['num_pending']}
+                        </td>
+                        <td>
+                            ${problem['num_required']}
+                        </td>
+                        <td>
+                            <div class="progress-bar">
+                            </div>
+                        </td>
+                    </tr>
+                    %endfor
+                    </table>
+                </div>
+                %endif
+            %endif
+        </div>
+    </div>
+</section>

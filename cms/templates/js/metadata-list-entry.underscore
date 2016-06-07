@@ -1,0 +1,17 @@
+<div class="wrapper-comp-setting metadata-list-enum">
+  <label class="label setting-label" for="<%= uniqueId %>"><%= model.get('display_name')%></label>
+  <div id="<%= uniqueId %>" class="wrapper-list-settings">
+    <ol class="list-settings">
+
+    </ol>
+
+    <a href="#" class="create-action create-setting">
+      <i class="icon fa fa-plus"></i><%= gettext("Add") %> <span class="sr"><%= model.get('display_name')%></span>
+    </a>
+  </div>
+  <button class="action setting-clear inactive" type="button" name="setting-clear" value="<%= gettext("Clear") %>" data-tooltip="<%= gettext("Clear") %>">
+    <i class="icon fa fa-undo"></i>
+    <span class="sr">"<%= gettext("Clear Value") %>"</span>
+  </button>
+</div>
+<span class="tip setting-help"><%= model.get('help') %></span>

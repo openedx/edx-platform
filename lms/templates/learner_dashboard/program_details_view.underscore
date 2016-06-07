@@ -1,0 +1,4 @@
+<header class="js-program-header program-header"></header>
+<div class="js-program-progress-view"></div>
+<div class="js-course-list"></div>
+<aside class="js-course-sidebar"></aside>

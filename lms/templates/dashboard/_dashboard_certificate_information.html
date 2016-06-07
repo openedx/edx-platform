@@ -1,0 +1,118 @@
+<%page expression_filter="h" args="cert_status, course_overview, enrollment, reverify_link" />
+
+<%!
+from django.utils.translation import ugettext as _
+from openedx.core.djangolib.markup import HTML, Text
+from course_modes.models import CourseMode
+%>
+<%namespace name='static' file='../static_content.html'/>
+
+<%
+  cert_name_short = course_overview.cert_name_short
+  if cert_name_short == "":
+    cert_name_short = settings.CERT_NAME_SHORT
+
+  cert_name_long = course_overview.cert_name_long
+  if cert_name_long == "":
+    cert_name_long = settings.CERT_NAME_LONG
+%>
+
+<%
+if cert_status['status'] == 'generating':
+    status_css_class = 'course-status-certrendering'
+elif cert_status['status'] == 'ready':
+    status_css_class = 'course-status-certavailable'
+elif cert_status['status'] == 'notpassing':
+    status_css_class = 'course-status-certnotavailable'
+else:
+    status_css_class = 'course-status-processing'
+%>
+<div class="message message-status ${status_css_class} is-shown">
+% if cert_status['status'] == 'processing':
+  <p class="message-copy">${_("Final course details are being wrapped up at this time. Your final standing will be available shortly.")}</p>
+% elif cert_status['status'] in ('generating', 'ready', 'notpassing', 'restricted', 'auditing', 'unverified'):
+  <p class="message-copy">${_("Your final grade:")}
+  <span class="grade-value">${"{0:.0f}%".format(float(cert_status['grade'])*100)}</span>.
+    % if cert_status['status'] == 'notpassing':
+      % if enrollment.mode != 'audit':
+        ${_("Grade required for a {cert_name_short}:").format(cert_name_short=cert_name_short)} <span class="grade-value">
+      % else:
+        ${_("Grade required to pass this course:")} <span class="grade-value">
+      % endif
+      ${"{0:.0f}%".format(float(course_overview.lowest_passing_grade)*100)}</span>.
+    % elif cert_status['status'] == 'restricted' and enrollment.mode == 'verified':
+    <p class="message-copy">
+      ${Text(_("Your verified {cert_name_long} is being held pending confirmation that the issuance of your {cert_name_short} is in compliance with strict U.S. embargoes on Iran, Cuba, Syria and Sudan. If you think our system has mistakenly identified you as being connected with one of those countries, please let us know by contacting {email}. If you would like a refund on your {cert_name_long}, please contact our billing address {billing_email}")).format(email=HTML('<a class="contact-link" href="mailto:{email}">{email}</a>.').format(email=settings.CONTACT_EMAIL), billing_email=HTML('<a class="contact-link" href="mailto:{email}">{email}</a>').format(email=settings.PAYMENT_SUPPORT_EMAIL), cert_name_short=cert_name_short, cert_name_long=cert_name_long)}
+    </p>
+    % elif cert_status['status'] == 'restricted':
+    <p class="message-copy">
+      ${Text(_("Your {cert_name_long} is being held pending confirmation that the issuance of your {cert_name_short} is in compliance with strict U.S. embargoes on Iran, Cuba, Syria and Sudan. If you think our system has mistakenly identified you as being connected with one of those countries, please let us know by contacting {email}.")).format(email=HTML('<a class="contact-link" href="mailto:{email}">{email}</a>.').format(email=settings.CONTACT_EMAIL), cert_name_short=cert_name_short, cert_name_long=cert_name_long)}
+    </p>
+    % elif cert_status['status'] == 'unverified':
+    <p class="message-copy">
+      ${Text(_("Your certificate was not issued because you do not have a current verified identity with {platform_name}. ")).format(platform_name=settings.PLATFORM_NAME)}
+      <a href="${reverify_link}"> ${Text(_("Verify your identity now."))}</a>
+    </p>
+    % endif
+  </p>
+% endif
+
+% if cert_status['show_disabled_download_button'] or cert_status['show_download_url'] or cert_status['show_survey_button']:
+  <div class="wrapper-message-primary">
+    <ul class="actions actions-primary">
+      % if cert_status['show_disabled_download_button']:
+        <li class="action"><span class="disabled">
+            ${_("Your {cert_name_short} is Generating").format(cert_name_short=cert_name_short)}</span></li>
+      % elif cert_status['show_download_url'] and cert_status.get('show_cert_web_view', False):
+        <li class="action action-certificate">
+        <a class="btn" href="${cert_status['cert_web_view_url']}" target="_blank"
+           title="${_('This link will open the certificate web view')}">
+           ${_("View {cert_name_short}").format(cert_name_short=cert_name_short,)}</a></li>
+      % elif cert_status['show_download_url'] and enrollment.mode in CourseMode.NON_VERIFIED_MODES:
+        <li class="action action-certificate">
+        <a class="btn" href="${cert_status['download_url']}"
+           title="${_('This link will open/download a PDF document')}">
+           ${_("Download {cert_name_short} (PDF)").format(cert_name_short=cert_name_short,)}</a></li>
+      % elif cert_status['show_download_url'] and enrollment.mode == 'verified' and cert_status['mode'] == 'honor':
+        <li class="action">
+        <a class="btn" href="${cert_status['download_url']}"
+           title="${_('This link will open/download a PDF document')}">
+           ${_("Download Your {cert_name_short} (PDF)").format(cert_name_short=cert_name_short)}</a></li>
+      % elif cert_status['show_download_url'] and enrollment.mode in CourseMode.VERIFIED_MODES:
+        <li class="action">
+        <a class="btn" href="${cert_status['download_url']}"
+           title="${_('This link will open/download a PDF document of your verified {cert_name_long}.').format(cert_name_long=cert_name_long)}">
+           ${_("Download Your ID Verified {cert_name_short} (PDF)").format(cert_name_short=cert_name_short)}</a></li>
+      % endif
+
+      % if cert_status['show_survey_button']:
+        <li class="action"><a class="cta" href="${cert_status['survey_url']}">
+               ${_("Complete our course feedback survey")}</a></li>
+      % endif
+    </ul>
+  </div>
+
+  % if cert_status['show_download_url'] and cert_status['linked_in_url']:
+  <ul class="actions actions-secondary">
+      <li class="action action-share">
+        <a class="action-linkedin-profile" target="_blank" href="${cert_status['linked_in_url']}"
+         title="${_('Add Certificate to LinkedIn Profile')}"
+         data-course-id="${course_overview.id}"
+         data-certificate-mode="${cert_status['mode']}"
+        >
+          <img class="action-linkedin-profile-img"
+               src="${static.url('images/linkedin_add_to_profile.png')}"
+               alt="${_('Share on LinkedIn')}">
+        </a>
+    </li>
+  </ul>
+  % endif
+
+  % if cert_status['show_download_url'] and enrollment.mode == 'verified' and cert_status['mode'] == 'honor':
+  <div class="certificate-explanation">
+      ${_('Since we did not have a valid set of verification photos from you when your {cert_name_long} was generated, we could not grant you a verified {cert_name_short}. An honor code {cert_name_short} has been granted instead.').format(cert_name_short=cert_name_short, cert_name_long=cert_name_long)}
+  </div>
+  % endif
+% endif
+</div>
+

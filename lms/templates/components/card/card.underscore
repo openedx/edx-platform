@@ -1,0 +1,45 @@
+<% if (configuration === 'square_card') { %>
+<div class="wrapper-card-core">
+    <div class="card-core">
+        <% if (pennant) { %>
+            <small class="card-type"><%- pennant %></small>
+        <% } %>
+        <h3 class="card-title"
+            <% if (!_.isUndefined(srInfo)) { %>
+                aria-describedby="<%= srInfo.id %>"
+            <% } %>
+            ><%- title %>
+        </h3>
+        <p class="card-description"><%- description %></p>
+    </div>
+</div>
+<div class="wrapper-card-meta has-actions">
+    <div class="card-meta">
+    </div>
+    <div class="card-actions">
+        <a class="action <%= action_class %>" href="<%= action_url %>"><%= action_content %></a>
+    </div>
+</div>
+<% } else { %>
+<div class="wrapper-card-core">
+    <div class="card-core">
+        <% if (pennant) { %>
+            <small class="card-type"><%- pennant %></small>
+        <% } %>
+        <h3 class="card-title"
+            <% if (!_.isUndefined(srInfo)) { %>
+                aria-describedby="<%= srInfo.id %>"
+            <% } %>
+            ><%- title %>
+        </h3>
+        <p class="card-description"><%- description %></p>
+    </div>
+    <div class="card-actions">
+        <a class="action <%= action_class %>" href="<%= action_url %>"><%= action_content %></a>
+    </div>
+</div>
+<div class="wrapper-card-meta">
+    <div class="card-meta">
+    </div>
+</div>
+<% } %>

@@ -1,0 +1,39 @@
+<div class="transcripts-message-status status-error">
+    <i class="icon fa fa-remove"></i>
+    <%= gettext("Confirm Timed Transcript") %>
+</div>
+
+<p class="transcripts-message">
+    <%= gettext("You changed a video URL, but did not change the timed transcript file. Do you want to use the current timed transcript or upload a new .srt transcript file?") %>
+</p>
+
+<div class="transcripts-file-uploader"></div>
+
+<p class="transcripts-error-message is-invisible">
+    <%= gettext("Error.") %>
+</p>
+
+<div class="wrapper-transcripts-buttons">
+    <button
+        class="action setting-use-existing"
+        type="button"
+        name="setting-use-existing"
+        value="<%= gettext("Use Current Transcript") %>"
+        data-tooltip="<%= gettext("Use Current Transcript") %>"
+    >
+        <span>
+            <%= gettext("Use Current Transcript") %>
+        </span>
+    </button>
+    <button
+        class="action setting-upload"
+        type="button"
+        name="setting-upload"
+        value="<%= gettext("Upload New Transcript") %>"
+        data-tooltip="<%= gettext("Upload New Transcript") %>"
+    >
+        <span>
+            <%= gettext("Upload New Transcript") %>
+        </span>
+    </button>
+</div>

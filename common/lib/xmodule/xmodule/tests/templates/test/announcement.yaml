@@ -1,0 +1,24 @@
+---
+metadata:
+    display_name: Announcement
+data: |
+      <ol>
+      <li>
+      <h2> September 21 </h2>
+      <section class='update-description'>
+      	       <section class='primary'>
+      	       		<p> Words of encouragement! This is a short note that most students will read. </p>
+      	       		<p class='author'>Anant  Agarwal (6.002x Principal Instructor)</p>
+      	       </section>
+      	       <h3>Primary versus Secondary Updates:</h3>
+                   <p>Unfortunately, the internet throws a lot of text at students, and they
+      	       do not read everything that they are given. However, many students <em>do</em> read all that they are
+      	       given, and so detailed explainations in this section will benefit the most concientious.
+      	       Any essential information should be extremely quickly summarized in the primary section for skimmers.</p>
+      	       <h3>Star Forum Poster</h3><p>
+      	       Students appreciate knowing that the course staff is reading what they post, and one of several ways
+      	       that you can do this is by acknowledging the star posters in your announcements.
+      	       </p>
+      </section>
+      </li>
+      </ol>

@@ -1,0 +1,30 @@
+<%! from django.utils.translation import ugettext as _ %>
+
+<section
+    id="word_cloud_${element_id}"
+    class="${element_class}"
+    data-ajax-url="${ajax_url}"
+>
+
+    <section class="input_cloud_section">
+        % for row in range(num_inputs):
+            <input
+                class="input-cloud"
+                ${'style="display: none;"' if submitted else ''}
+                type="text"
+                size="40"
+            />
+        % endfor
+
+        <section class="action">
+            <input class="save" type="button" value="${_('Save')}" />
+        </section>
+    </section>
+
+    <section id="result_cloud_section_${element_id}" class="result_cloud_section">
+        <h3>${_('Your words:')} <span class="your_words"></span></h3>
+        <h3>${_('Total number of words:')} <span class="total_num_words"></span></h3>
+        <div class="word_cloud"></div>
+    </section>
+
+</section>

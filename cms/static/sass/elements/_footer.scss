@@ -1,0 +1,102 @@
+// studio - elements - global footer
+// ====================
+
+.wrapper-footer {
+  position: relative;
+  width: 100%;
+  margin: 0 0 $baseline 0;
+  padding: $baseline;
+
+  footer.primary {
+    @extend %t-copy-sub2;
+    @include clearfix();
+    max-width: $fg-max-width;
+    min-width: $fg-min-width;
+    width: flex-grid(12);
+    margin: 0 auto;
+    color: $gray-l1;
+
+    .footer-content-primary {
+      @include clearfix();
+    }
+
+    .colophon {
+      width: flex-grid(4, 12);
+      @include float(left);
+      @include margin-right(flex-gutter(2));
+    }
+
+    a {
+      color: $ui-link-color;
+
+      &:hover, &:active {
+        color: $ui-link-color-focus;
+      }
+    }
+
+    .nav-peripheral {
+      width: flex-grid(6, 12);
+      @include float(right);
+      @include text-align(right);
+
+      .nav-item {
+        display: inline-block;
+        @include margin-right($baseline/4);
+
+        &:last-child {
+          @include margin-right(0);
+        }
+
+        a {
+          border-radius: 2px;
+          padding: ($baseline/2) ($baseline/2);
+          background: transparent;
+
+          .icon {
+            @include transition(top $tmg-f2 ease-in-out $tmg-f2);
+            @extend %t-action3;
+            display: inline-block;
+            vertical-align: middle;
+            @include margin-right($baseline/4);
+          }
+        }
+      }
+    }
+
+    .footer-content-secondary {
+      @include clearfix();
+      margin-top: $baseline;
+    }
+
+    .footer-about-copyright, .footer-about-openedx {
+      display: inline-block;
+      vertical-align: middle;
+    }
+
+    // platform trademarks
+    .footer-about-copyright {
+      width: flex-grid(4, 12);
+      @include float(left);
+      @include margin-right(flex-gutter(2));
+    }
+
+    // platform Open edX logo and link
+    .footer-about-openedx {
+      @include float(right);
+      @include text-align(right);
+
+      a {
+        display: inline-block;
+
+        img {
+          display: block;
+          width: ($baseline* 6);
+        }
+
+        &:hover {
+          border-bottom: none;
+        }
+      }
+    }
+  }
+}

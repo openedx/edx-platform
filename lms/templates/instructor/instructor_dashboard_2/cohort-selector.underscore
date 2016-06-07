@@ -1,0 +1,14 @@
+<% if (!selectedCohort) { %>
+    <option value=""><%- gettext('Select a cohort') %></option>
+<% } %>
+<% _.each(cohorts, function(cohort) { %>
+    <%
+    var label = interpolate(
+    gettext('%(cohort_name)s (%(user_count)s)'),
+    { cohort_name: cohort.get('name'), user_count: cohort.get('user_count') },
+    true
+    );
+    var isSelected = selectedCohort && selectedCohort.get('id') === cohort.get('id')
+    %>
+    <option value="<%- cohort.get('id') %>" <%- isSelected ? 'selected' : '' %>><%- label %></option>
+<% }); %>

@@ -1,0 +1,11 @@
+<%! from django.utils.translation import ugettext as _ %>
+
+<div class="discussion-module" data-discussion-id="${discussion_id | h}">
+    <p>
+        <span class="discussion-preview">
+            <span class="icon fa fa-comment"/>
+            ${_("To view live discussions, click Preview or View Live in Unit Settings.")}<br />
+            ${_("Discussion ID: {discussion_id}").format(discussion_id=discussion_id)}
+        </span>
+    </p>
+</div>

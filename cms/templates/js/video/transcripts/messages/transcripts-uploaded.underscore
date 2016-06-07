@@ -1,0 +1,16 @@
+<div class="transcripts-message-status"><i class="icon fa fa-check"></i><%= gettext("Timed Transcript Uploaded Successfully") %></div>
+<p class="transcripts-message">
+<%= gettext("EdX has a timed transcript for this video. If you want to replace this transcript, upload a new .srt transcript file. If you want to edit this transcript, you can download, edit, and re-upload the existing transcript.") %>
+</p>
+<div class="transcripts-file-uploader"></div>
+<p class="transcripts-error-message is-invisible">
+<%= gettext("Error.") %>
+</p>
+<div class="wrapper-transcripts-buttons">
+    <button class="action setting-upload" type="button" name="setting-upload" value="<%= gettext("Upload New Transcript") %>" data-tooltip="<%= gettext("Upload New Transcript") %>">
+        <span><%= gettext("Upload New Transcript") %></span>
+    </button>
+    <a class="action setting-download" href="/transcripts/download?locator=<%= component_locator %>&subs_id=<%= subs_id %>" data-tooltip="<%= gettext("Download Transcript for Editing") %>">
+        <span><%= gettext("Download Transcript for Editing") %></span>
+    </a>
+</div>

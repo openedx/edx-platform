@@ -1,0 +1,121 @@
+// studio - elements - pagination
+// ==========================
+
+%pagination {
+  @include clearfix();
+  display: inline-block;
+  width: flex-grid(3, 12);
+
+  &.pagination-compact {
+    @include text-align(right);
+  }
+
+  &.pagination-full {
+    display: block;
+    width: flex-grid(4, 12);
+    margin: $baseline auto;
+  }
+
+  .nav-item {
+    position: relative;
+    display: inline-block;
+    vertical-align: middle;
+  }
+
+  .nav-link {
+    @include transition(all $tmg-f2 ease-in-out 0s);
+    display: block;
+    border: 0;
+    padding: ($baseline/4) ($baseline*0.75);
+
+    &.previous {
+      margin-right: ($baseline/2);
+    }
+
+    &.next {
+      margin-left: ($baseline/2);
+    }
+
+    &:hover {
+      background-color: $blue;
+      border-radius: 3px;
+      color: $white;
+    }
+
+    &.is-disabled {
+      background-color: transparent;
+      color: $gray-l2;
+      pointer-events: none;
+    }
+  }
+
+  .nav-label {
+    @extend %cont-text-sr;
+  }
+
+  .pagination-form,
+  .current-page,
+  .page-divider,
+  .total-pages {
+    display: inline-block;
+  }
+
+  .current-page,
+  .page-number-input,
+  .total-pages {
+    @extend %t-copy-base;
+    @extend %t-strong;
+    width: ($baseline*2.5);
+    margin: 0 ($baseline*0.75);
+    padding: ($baseline/4);
+    text-align: center;
+    color: $gray;
+  }
+
+  .current-page {
+    @extend %ui-depth1;
+    position: absolute;
+    @include left(-($baseline/4));
+  }
+
+  .page-divider {
+    @extend %t-title4;
+    @extend %t-regular;
+    vertical-align: middle;
+    color: $gray-l2;
+  }
+
+  .pagination-form {
+    @extend %ui-depth2;
+    position: relative;
+
+    .page-number-label,
+    .submit-pagination-form {
+      @extend %cont-text-sr;
+    }
+
+    .page-number-input {
+      @include transition(all $tmg-f2 ease-in-out 0s);
+      border: 1px solid transparent;
+      border-bottom: 1px dotted $gray-l2;
+      border-radius: 0;
+      box-shadow: none;
+      background: none;
+
+      &:hover {
+        background-color: $white;
+        opacity: 0.6;
+      }
+
+      &:focus {
+        // borrowing the base input focus styles to match overall app
+        @include linear-gradient($paleYellow, tint($paleYellow, 90%));
+        opacity: 1.0;
+        box-shadow: 0 0 3px $shadow-d1 inset;
+        background-color: $white;
+        border: 1px solid transparent;
+        border-radius: 3px;
+      }
+    }
+  }
+}

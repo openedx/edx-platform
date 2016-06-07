@@ -1,0 +1,37 @@
+// discussion - elements - labels
+// ====================
+
+body.discussion, .discussion-module {
+  .post-label-pinned {
+    @include forum-post-label($forum-color-pinned);
+  }
+
+  .post-label-following {
+    @include forum-post-label($forum-color-following);
+  }
+
+  .post-label-reported {
+    @include forum-post-label($forum-color-reported);
+  }
+
+  .post-label-closed {
+    @include forum-post-label($forum-color-closed);
+  }
+
+  .post-label-by-staff {
+    @include forum-post-label($forum-color-staff);
+  }
+
+  .post-label-by-community-ta {
+    @include forum-post-label($forum-color-community-ta);
+  }
+
+  .user-label-staff {
+    @include forum-user-label($forum-color-staff);
+  }
+
+  .user-label-community-ta {
+    @include forum-user-label($forum-color-community-ta);
+  }
+
+}

@@ -1,0 +1,21 @@
+@mixin news-font {
+  font-family: inherit;
+}
+
+.notifications {
+  @include news-font;
+  font-size: 0.9em;
+  padding-left: $baseline;
+  padding-top: $baseline;
+  padding-bottom: $baseline;
+
+  .notification {
+    @include news-font;
+    margin-top: ($baseline*0.75);
+    margin-bottom: ($baseline*0.75);
+
+    a {
+      @include news-font;
+    }
+  }
+}

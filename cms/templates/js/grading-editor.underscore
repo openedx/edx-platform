@@ -1,0 +1,14 @@
+<h3 class="modal-section-title"><%= gettext('Grading') %></h3>
+<div class="modal-section-content grading-type">
+    <ul class="list-fields list-input">
+        <li class="field field-grading-type field-select">
+            <label for="grading_type" class="label"><%= gettext('Grade as:') %></label>
+            <select class="input" id="grading_type">
+                <option value="notgraded"><%= gettext('Not Graded') %></option>
+                <% _.each(graderTypes, function(grader) { %>
+                  <option value="<%= grader %>"><%= grader %></option>
+                <% }); %>
+            </select>
+        </li>
+    </ul>
+</div>

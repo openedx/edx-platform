@@ -1,0 +1,60 @@
+<%inherit file="../main.html" />
+<%!
+from django.utils.translation import ugettext as _
+from django.core.urlresolvers import reverse
+from django.conf import settings
+%>
+
+<%block name="pagetitle">${_("Download CSV Reports")}</%block>
+
+
+<section class="container">
+  <h2>${_("Download CSV Data")}</h2>
+  % if date_fmt_error:
+    <section class="error_msg">
+      ${_("There was an error in your date input.  It should be formatted as YYYY-MM-DD")}
+    </section>
+  % endif
+  <form method="post">
+  %if ("itemized_purchase_report" or "refund_report") in settings.FEATURES['ENABLED_PAYMENT_REPORTS']:
+    <p>${_("These reports are delimited by start and end dates.")}</p>
+    <label for="start_date">${_("Start Date: ")}</label>
+    <input id="start_date" type="text" value="${start_date}" name="start_date"/>
+    <label for="end_date">${_("End Date: ")}</label>
+    <input id="end_date" type="text" value="${end_date}" name="end_date"/>
+    <br/>
+
+    %if "itemized_purchase_report" in settings.FEATURES['ENABLED_PAYMENT_REPORTS']:
+      <button type = "submit" name="requested_report" value="itemized_purchase_report">Itemized Purchase Report</button>
+      <br/>
+    %endif
+
+    %if "refund_report" in settings.FEATURES['ENABLED_PAYMENT_REPORTS']:
+      <button type = "submit" name="requested_report" value="refund_report">Refund Report</button>
+      <br/>
+    %endif
+
+    <br/>
+  %endif
+
+  %if ("certificate_status" or "university_revenue_share") in settings.FEATURES['ENABLED_PAYMENT_REPORTS']:
+    <p>${_("These reports are delimited alphabetically by university name.  i.e., generating a report with 'Start Letter' A and 'End Letter' C will generate reports for all universities starting with A, B, and C.")}</p>
+    <label for="start_letter">${_("Start Letter: ")}</label>
+    <input id="start_letter" type="text" value="${start_letter}" name="start_letter"/>
+    <label for="end_letter">${_("End Letter: ")}</label>
+    <input id="end_letter" type="text" value="${end_letter}" name="end_letter"/>
+    <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}" />
+    <br/>
+
+    %if "university_revenue_share" in settings.FEATURES['ENABLED_PAYMENT_REPORTS']:
+      <button type = "submit" name="requested_report" value="university_revenue_share">University Revenue Share</button>
+      <br/>
+    %endif
+
+    %if "certificate_status" in settings.FEATURES['ENABLED_PAYMENT_REPORTS']:
+      <button type="submit" name="requested_report" value="certificate_status">Certiciate Status</button>
+      <br/>
+    %endif
+  %endif
+  </form>
+</section>

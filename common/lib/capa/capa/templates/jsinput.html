@@ -1,0 +1,57 @@
+<section id="inputtype_${id}" class="jsinput"
+    data="${gradefn}"
+    % if saved_state:
+    data-stored="${saved_state|x}"
+    % endif
+    % if initial_state:
+    data-initial-state="${initial_state|x}"
+    % endif
+    % if get_statefn:
+    data-getstate="${get_statefn}"
+    % endif
+    % if set_statefn:
+    data-setstate="${set_statefn}"
+    % endif
+    % if sop:
+    data-sop="${sop}"
+    % endif
+    data-processed="false"
+    >
+
+  <div class="script_placeholder" data-src="${jschannel_loader}"/>
+  <div class="script_placeholder" data-src="${jsinput_loader}"/>
+  % if status in ['unsubmitted', 'correct', 'incorrect', 'partially-correct', 'incomplete']:
+  <div class="${status.classname}" id="status_${id}">
+  % endif
+
+  <iframe name="iframe_${id}"
+      id="iframe_${id}"
+      sandbox="allow-scripts allow-popups allow-same-origin allow-forms allow-pointer-lock"
+      seamless="seamless"
+      frameborder="0"
+      src="${html_file}"
+      height="${height}"
+      width="${width}"
+      />
+  <input type="hidden" name="input_${id}" id="input_${id}"
+    waitfor=""
+    value="${value|h}"/>
+
+  <br/>
+    <p id="answer_${id}" class="answer"></p>
+
+    <p class="status">
+    ${status.display_name}
+    </p>
+    <br/> <br/>
+
+    <div class="error_message" style="padding: 5px 5px 5px 5px; background-color:#FA6666; height:60px;width:400px; display: none"></div>
+
+  % if status in ['unsubmitted', 'correct', 'incorrect', 'partially-correct', 'incomplete']:
+  </div>
+  % endif
+
+  % if msg:
+      <span class="message">${msg|n}</span>
+  % endif
+</section>

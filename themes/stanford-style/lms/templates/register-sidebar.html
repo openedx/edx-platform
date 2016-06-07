@@ -1,0 +1,39 @@
+<%!
+from django.utils.translation import ugettext as _
+from django.core.urlresolvers import reverse
+%>
+<%namespace file='main.html' import="login_query"/>
+
+
+<header>
+  <h3 class="sr">${_("Registration Help")}</h3>
+</header>
+
+% if has_extauth_info is UNDEFINED:
+
+<div class="btn-brand btn-login">
+  <h3 class="title">${_("Already registered?")}</h3>
+  <p class="instructions">
+    <a class="btn-login-action" href="${reverse('signin_user')}${login_query()}">
+      ${_("Log in")}
+    </a>
+  </p>
+</div>
+
+% endif
+
+<div class="cta cta-nextsteps">
+  <h3>${_("Next Steps")}</h3>
+    <p>${_("You will receive an activation email.  You must click on the activation link to complete the process.  Don't see the email?  Check your spam folder and mark emails from class.stanford.edu as 'not spam', since you'll want to be able to receive email from your courses.")}</p>
+</div>
+
+% if settings.MKTG_URL_LINK_MAP.get('FAQ'):
+  <div class="cta cta-help">
+    <h3>${_("Need Help?")}</h3>
+    <p>${_("Need help in registering with {platform_name}?").format(platform_name=platform_name)}
+      <a href="${marketing_link('FAQ')}">
+          ${_("View our FAQs for answers to commonly asked questions.")}
+      </a>
+      ${_("Once registered, most questions can be answered in the course specific discussion forums or through the FAQs.")}</p>
+  </div>
+% endif

@@ -1,0 +1,148 @@
+.view-video-uploads {
+
+  .content-primary, .content-supplementary {
+    @include box-sizing(border-box);
+  }
+
+  .content-primary {
+    @extend .ui-col-wide;
+  }
+
+  .content-supplementary {
+    @extend .ui-col-narrow;
+  }
+
+  .nav-actions {
+
+    .fa-cloud-upload {
+      @extend %t-copy;
+      vertical-align: bottom;
+      margin-right: ($baseline/5);
+    }
+  }
+
+  .file-upload-form {
+    @include clearfix();
+    margin-bottom: ($baseline*1.5);
+    width: 100%;
+
+    .file-drop-area {
+      border: 2px dashed $gray-l3;
+      border-radius: ($baseline/5);
+      padding: ($baseline*3);
+      background: $white;
+      text-align: center;
+
+      &:hover,
+      &.is-dragged {
+        background: $blue-l5;
+        border-style: solid;
+        border-color: $blue-l4;
+      }
+    }
+  }
+
+  .active-video-upload-container {
+    margin-bottom: ($baseline*2);
+
+    .active-video-upload-list {
+      @extend %cont-no-list;
+
+      .active-video-upload {
+        display: inline-block;
+        min-height: ($baseline*4);
+        width: (flex-grid(4) - 1.85);
+        margin: (flex-gutter() - 1.85);
+        border: 1px solid $gray-l3;
+        border-radius: ($baseline/5);
+        padding: ($baseline/2);
+        vertical-align: top;
+
+        .video-detail-name {
+          @extend %cont-truncated;
+          @extend %t-strong;
+          margin-bottom: ($baseline/2);
+          font-size: 90%;
+        }
+
+        .video-detail-status {
+          @include font-size(12);
+          @include line-height(12);
+        }
+
+        .video-detail-progress {
+          -webkit-appearance: none;
+          -moz-appearance: none;
+          appearance: none;
+          margin-bottom: ($baseline/2);
+          border: none;
+          width: 100%;
+          height: ($baseline/4);
+        }
+
+        .video-detail-progress::-webkit-progress-bar {
+          background-color: $white;
+        }
+
+        // Sadly, these rules must be separate or both Chrome and Firefox break
+        .video-detail-progress::-webkit-progress-value {
+          background-color: $color-ready;
+        }
+
+        .video-detail-progress::-moz-progress-bar {
+          background-color: $color-ready;
+        }
+
+        &:hover {
+          @include transition(all $tmg-f3);
+          background: $white;
+        }
+
+        &.queued {
+          .video-detail-progress {
+            visibility: hidden;
+          }
+        }
+
+        &.error {
+          .video-detail-status {
+            color: $color-error;
+          }
+
+          // Sadly, these rules must be separate or both Chrome and Firefox break
+          .video-detail-progress::-webkit-progress-value {
+            background-color: $color-error;
+          }
+
+          .video-detail-progress::-moz-progress-bar {
+            background-color: $color-error;
+          }
+        }
+
+        &.success {
+          .video-detail-status {
+            color: $color-ready;
+          }
+        }
+      }
+    }
+  }
+
+  .button {
+    @extend %ui-btn-non;
+  }
+
+  .assets-library {
+    .assets-title {
+      display: inline-block;
+      width: flex-grid(5, 9);
+      @include margin-right(flex-gutter());
+    }
+
+    .wrapper-encodings-download {
+      display: inline-block;
+      width: flex-grid(4, 9);
+      text-align: right;
+    }
+  }
+}

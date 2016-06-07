@@ -1,0 +1,63 @@
+.ui-tooltip.qtip .ui-tooltip-content {
+  background: rgba($pink, .8);
+  border: 0;
+  color: $white;
+  font: bold 12px $body-font-family;
+  margin-bottom: 6px;
+  margin-right: 0;
+  overflow: visible;
+  padding: 4px;
+  text-align: center;
+  -webkit-font-smoothing: antialiased;
+}
+
+
+// custom tool tip style.
+@mixin tooltip-hover-style ($margin-top) {
+  p {
+    @extend %ui-depth2;
+      background: $dark-gray;
+      border-radius: ($baseline/5);
+      color: $white;
+      font-family: $sans-serif;
+      line-height: lh();
+      opacity: 0.0;
+      padding: 6px;
+      position: absolute;
+      text-shadow: 0 -1px 0 $black;
+      @include transition(all .1s $ease-in-out-quart 0s);
+      white-space: pre;
+      visibility: hidden;
+      pointer-events: none;
+      right: 0;
+
+      &:empty {
+        background: none;
+
+        &::after {
+          display: none;
+        }
+      }
+
+      &::after {
+        background: $dark-gray;
+        content: " ";
+        display: block;
+        height: ($baseline/2);
+        right: 18px;
+        position: absolute;
+        top: ($baseline + ($baseline/4));
+        @include transform(rotate(45deg));
+        width: ($baseline/2);
+      }
+  }
+
+  &:hover, &:focus {
+    p {
+      display: block;
+      margin-top: $margin-top;
+      opacity: 1.0;
+      visibility: visible;
+    }
+  }
+}

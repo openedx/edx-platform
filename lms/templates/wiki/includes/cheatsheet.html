@@ -1,0 +1,63 @@
+{% load i18n %}
+<section id="cheatsheetModal" class="modal" aria-hidden="true">
+  <div class="inner-wrapper" role="dialog" aria-labelledby="cheatsheet-title">
+    <button class="close-modal"><span class="icon fa fa-remove" aria-hidden="true"></span> <span class="sr">{% trans 'Close' %}</span></button>
+
+    <header>
+      <h2 id="cheatsheet-title">{% trans "Wiki Cheatsheet" %}<span class="sr">, {% trans "window open" %}</span></h2>
+      <hr/>
+    </header>
+    <div id="cheatsheet-body" class="modal-body">
+      <div class="left-column">
+        <section>
+          <h2>{% trans "Wiki Syntax Help" %}</h2>
+          <p>{% trans "This wiki uses <strong>Markdown</strong> for styling. There are several useful guides online. See any of the links below for in-depth details:" %}</p>
+          <ul>
+              <li><a href="http://daringfireball.net/projects/markdown/basics" target="_blank">{% trans 'Markdown: Basics' %}</a></li>
+              <li><a href="http://greg.vario.us/doc/markdown.txt" target="_blank">{% trans 'Quick Markdown Syntax Guide' %}</a></li>
+              <li><a href="http://www.lowendtalk.com/discussion/6/miniature-markdown-guide" target="_blank">{% trans 'Miniature Markdown Guide' %}</a></li>
+          </ul>
+          <p>{% trans "To create a new wiki article, create a link to it. Clicking the link gives you the creation page." %}</p>
+          <pre>{% trans "[Article Name](wiki:ArticleName)" %}</pre>
+        </section>
+        <section>
+          <h3>{% blocktrans with platform_name=settings.PLATFORM_NAME %}{{ platform_name }} Additions:{% endblocktrans %}</h3>
+          <pre>$LaTeX {% trans "Math Expression" %}$</pre>
+        </section>
+      </div>
+
+      <div class="right-column">
+          <section>
+              <h3>{% trans "Useful examples:" %}</h3>
+              <pre>
+http://wikipedia.org
+[{% trans "Wikipedia" %}](http://wikipedia.org)
+[{% blocktrans with platform_name=settings.PLATFORM_NAME %}{{ platform_name }} Wiki{% endblocktrans %}](wiki:/edx/)
+              </pre>
+              <pre>
+{% trans "Huge Header" %}
+===========</pre>
+              <pre>
+{% trans "Smaller Header" %}
+--------------</pre>
+              <pre>
+{# Translators: Leave the punctuation, but translate "emphasis" #}
+{% trans "*emphasis* or _emphasis_" %}</pre>
+              <pre>
+{# Translators: Leave the punctuation, but translate "strong" #}
+{% trans "**strong** or __strong__" %}</pre>
+              <pre>
+- {% trans "Unordered List" %}
+  - {% trans "Sub Item 1" %}
+      - {% trans "Sub Item 2" %}</pre>
+              <pre>
+1. {% trans "Ordered" %}
+2. {% trans "List" %}</pre>
+              <pre>
+&gt; {% trans "Quotes" %}</pre>
+          </section>
+      </div>
+
+    </div>
+  </div>
+</section>

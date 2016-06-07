@@ -1,0 +1,12 @@
+<li class="list-settings-item"
+  ><a href="#" class="remove-action remove-setting" data-lang="<%= lang %>" data-value="<%= value %>"><i class="icon fa fa-times-circle"></i><span class="sr"><%= gettext("Remove") %></span></a>
+  <input type="hidden" class="input" value="<%= value %>">
+  <div class="list-settings-buttons"><% if (lang) {
+    %><a href="#" class="upload-action upload-setting" data-lang="<%= lang %>" data-value="<%= value %>"><%= value ? gettext("Replace") : gettext("Upload") %>
+    </a><%
+     } %><% if (value) {
+     %><a href="<%= url %>?filename=<%= value %>" class="download-action download-setting"><%= gettext("Download") %>
+    </a><%
+     }
+   %><div>
+</li>

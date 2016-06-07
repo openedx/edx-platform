@@ -1,0 +1,3 @@
+<h4 class="video-detail-name"><%- fileName %></h4>
+<progress class="video-detail-progress" value="<%= progress %>"></progress>
+<p class="video-detail-status"><%- gettext(status) %></p>

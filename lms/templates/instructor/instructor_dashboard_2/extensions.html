@@ -1,0 +1,112 @@
+<%! from django.utils.translation import ugettext as _ %>
+<%page args="section_data"/>
+
+<div id="set-extension">
+  <h2>${_("Individual due date extensions")}</h2>
+  <p>
+    ${_("In this section, you have the ability to grant extensions on specific "
+        "units to individual students. Please note that the latest date is always "
+        "taken; you cannot use this tool to make an assignment due earlier for a "
+        "particular student.")}
+  </p>
+  <p>
+    ${_("Specify the {platform_name} email address or username of a student "
+        "here:").format(platform_name=settings.PLATFORM_NAME)}
+    <input type="text" name="student" placeholder="${_("Student Email or Username")}">
+  </p>
+  <p>
+    ${_("Choose the graded unit:")}
+    <select name="url">
+      <option value="">Choose one</option>
+      %for title, url in section_data['units_with_due_dates']:
+      <option value="${url}">${title}</option>
+      %endfor
+    </select>
+  </p>
+  <% format_string="MM/DD/YYYY HH:MM" %>
+  <p>
+    ## Translators: "format_string" is the string MM/DD/YYYY HH:MM, as that is the format the system requires.
+    ${_("Specify the extension due date and time (in UTC; please specify {format_string}).").format(format_string=format_string)}</p>
+  <p><input type="text" name="due_datetime" 
+           placeholder="${format_string}"/>
+  </p>
+  <p class="request-response"></p>
+  <p class="request-response-error"></p>
+  <p>
+    <input type="button" name="change-due-date" 
+           value="${_("Change due date for student")}"
+           data-endpoint="${section_data['change_due_date_url']}">
+  </p>
+</div>
+<hr/>
+<div id="view-granted-extensions">
+  <h2>${_("Viewing granted extensions")}</h2>
+  <p>
+    ${_("Here you can see what extensions have been granted on particular "
+        "units or for a particular student.")}
+  </p>
+  <p>
+    ${_("Choose a graded unit and click the button to obtain a list of all "
+        "students who have extensions for the given unit.")}
+  </p>
+  <p>
+    ${_("Choose the graded unit:")}
+    <select name="url">
+      <option value="">Choose one</option>
+      %for title, url in section_data['units_with_due_dates']:
+      <option value="${url}">${title}</option>
+      %endfor
+    </select>
+    <input type="button" name="show-unit-extensions" 
+           value="${_("List all students with due date extensions")}"
+           data-endpoint="${section_data['show_unit_extensions_url']}">
+  </p>
+  <p>
+    ${_("Specify a student to see all of that student's extensions.")}
+  </p>
+  <p>
+    ${_("Specify the {platform_name} email address or username of a student "
+        "here:").format(platform_name=settings.PLATFORM_NAME)}
+    <input type="text" name="student" placeholder="${_("Student Email or Username")}">
+    <input type="button" name="show-student-extensions" 
+           value="${_("List date extensions for student")}"
+           data-endpoint="${section_data['show_student_extensions_url']}">
+  </p>
+  <p class="request-response"></p>
+  <p class="request-response-error"></p>
+  <div class="data-display">
+    <p class="data-display-text"></p>
+    <p class="data-display-table"></p>
+  </div>
+</div>
+<hr/>
+<div id="reset-extension">
+  <h2>${_("Resetting extensions")}</h2>
+  <p>
+    ${_("Resetting a problem's due date rescinds a due date extension for a "
+        "student on a particular unit. This will revert the due date for the "
+        "student back to the problem's original due date.")}
+  </p>
+  <p>
+    ${_("Specify the {platform_name} email address or username of a student "
+        "here:").format(platform_name=settings.PLATFORM_NAME)}
+    <input type="text" name="student" placeholder="${_("Student Email or Username")}">
+  </p>
+  <p>
+    ${_("Choose the graded unit:")}
+    <select name="url">
+      <option value="">Choose one</option>
+      %for title, url in section_data['units_with_due_dates']:
+      <option value="${url}">${title}</option>
+      %endfor
+    </select>
+  </p>
+  <p class="request-response"></p>
+  <p class="request-response-error"></p>
+  <p>
+    <input type="button" name="reset-due-date" 
+           value="${_("Reset due date for student")}"
+           data-endpoint="${section_data['reset_due_date_url']}">
+  </p>
+</div>
+

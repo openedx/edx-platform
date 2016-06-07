@@ -1,0 +1,24 @@
+---
+metadata:
+    display_name: Full Screen Image Tool
+data: |
+        <h3 class="hd hd-2">Full Screen Image Tool</h3>
+        <p>Use the Full Screen Image tool to allow learners to open and zoom in on a larger version of an image in your course.</p>
+        <p>With the Full Screen Image tool, learners can see the image's details as well as its context within the unit.</p>
+        <p>To enable users to view the larger image, you wrap the smaller image in a link to the larger version of the image.</p>
+        <p>The following HTML code shows the format required to use the Full Screen Image tool. For the example in this template, you must replace the values in <i>italics</i>.</p>
+        <pre>
+        &lt;a href="<i>Path to full screen image</i>" class="modal-content"&gt;
+          &lt;img alt="<i>Text for screen readers</i>"
+          src="<i>Path to image to include in unit page</i>"/&gt;
+        &lt;/a&gt;
+        </pre>
+        <p>You can modify the example below for your own use.</p>
+        <ol>
+        <li>Replace the value of the link's <strong>href</strong> attribute with the path to the full size image. Do not change the value of the class attribute.</li>
+        <li>Replace the value of the image's <strong>src</strong> attribute with the path to the image that will appear in the unit before a learner opens it in full screen mode.</li>
+        <li>Replace the value of the image's <strong>alt</strong> attribute with text that both describes the image and the action or destination of clicking on the image. You <strong>must</strong> include alt text to provide an accessible label.</li>
+        </ol>
+        <p><strong>Note</strong>: Test viewing the image in full screen mode in the LMS; you cannot view it in full screen from within Studio.</p>
+
+        <a href="http://static.class.stanford.edu/stanford-hills-big.jpg" class="modal-content"><img alt="An image of the Stanford Hills. Select the image to open it in full screen mode." src="http://static.class.stanford.edu/stanford-hills-small.jpg" /></a>

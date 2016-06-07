@@ -1,0 +1,17 @@
+<%!
+import json
+from django.utils.translation import ugettext as _
+from student.models import anonymous_id_for_user
+%>
+<%namespace name='static' file='/static_content.html'/>
+<%
+    if user:
+        params.update({'user': anonymous_id_for_user(user, None)})
+%>
+<div id="edx-notes-wrapper-${uid}" class="edx-notes-wrapper">
+    <div class="edx-notes-wrapper-content">${content}</div>
+</div>
+<%static:require_module module_name="js/edxnotes/views/notes_visibility_factory" class_name="NotesVisibilityFactory">
+    var element = document.getElementById('edx-notes-wrapper-${uid}');
+    NotesVisibilityFactory.VisibilityDecorator.factory(element, ${json.dumps(params)}, ${edxnotes_visibility});
+</%static:require_module>

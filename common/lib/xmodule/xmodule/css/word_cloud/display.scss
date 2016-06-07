@@ -1,0 +1,21 @@
+.input-cloud {
+    margin: ($baseline/4);
+}
+
+.result_cloud_section {
+    display: none;
+    width: 0px;
+    height: 0px;
+}
+
+.result_cloud_section.active {
+    display: block;
+    width: 635px;
+    height: auto;
+    margin-left: auto;
+    margin-right: auto;
+}
+.your_words{
+    font-size: 0.85em;
+    display: block;
+}

@@ -1,0 +1,464 @@
+[
+  {
+    "category": "chapter",
+    "display_name": "Introduction",
+    "due": null,
+    "start": null,
+    "location": "i4x:\/\/edX\/DemoX\/chapter\/d8a6192ade314473a78242dfeedfbf5b",
+    "hidden": true,
+    "children": [
+      {
+        "category": "sequential",
+        "display_name": "Demo Course Overview",
+        "due": null,
+        "start": null,
+        "location": "i4x:\/\/edX\/DemoX\/sequential\/edx_introduction",
+        "hidden": true,
+        "children": [
+          {
+            "category": "vertical",
+            "display_name": "Introduction: Video and Sequences",
+            "due": null,
+            "start": null,
+            "location": "i4x:\/\/edX\/DemoX\/vertical\/vertical_0270f6de40fc",
+            "hidden": true
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "category": "chapter",
+    "display_name": "Example Week 1: Getting Started",
+    "due": null,
+    "start": null,
+    "location": "i4x:\/\/edX\/DemoX\/chapter\/interactive_demonstrations",
+    "hidden": false,
+    "children": [
+      {
+        "category": "sequential",
+        "display_name": "Lesson 1 - Getting Started",
+        "due": null,
+        "start": null,
+        "location": "i4x:\/\/edX\/DemoX\/sequential\/19a30717eff543078a5d94ae9d6c18a5",
+        "hidden": false,
+        "children": [
+          {
+            "category": "vertical",
+            "display_name": "Getting Started",
+            "due": null,
+            "start": null,
+            "location": "i4x:\/\/edX\/DemoX\/vertical\/867dddb6f55d410caaa9c1eb9c6743ec",
+            "hidden": false
+          },
+          {
+            "category": "vertical",
+            "display_name": "Working with Videos",
+            "due": null,
+            "start": null,
+            "location": "i4x:\/\/edX\/DemoX\/vertical\/4f6c1b4e316a419ab5b6bf30e6c708e9",
+            "hidden": false
+          },
+          {
+            "category": "vertical",
+            "display_name": "Videos on edX",
+            "due": null,
+            "start": null,
+            "location": "i4x:\/\/edX\/DemoX\/vertical\/3dc16db8d14842e38324e95d4030b8a0",
+            "hidden": false
+          },
+          {
+            "category": "vertical",
+            "display_name": "Video Demonstrations",
+            "due": null,
+            "start": null,
+            "location": "i4x:\/\/edX\/DemoX\/vertical\/4a1bba2a403f40bca5ec245e945b0d76",
+            "hidden": false
+          },
+          {
+            "category": "vertical",
+            "display_name": "Video Presentation Styles",
+            "due": null,
+            "start": null,
+            "location": "i4x:\/\/edX\/DemoX\/vertical\/256f17a44983429fb1a60802203ee4e0",
+            "hidden": false
+          },
+          {
+            "category": "vertical",
+            "display_name": "Interactive Questions",
+            "due": null,
+            "start": null,
+            "location": "i4x:\/\/edX\/DemoX\/vertical\/e3601c0abee6427d8c17e6d6f8fdddd1",
+            "hidden": false
+          },
+          {
+            "category": "vertical",
+            "display_name": "Reading Assignments",
+            "due": null,
+            "start": null,
+            "location": "i4x:\/\/edX\/DemoX\/vertical\/134df56c516a4a0dbb24dd5facef746e",
+            "hidden": false
+          }
+        ]
+      },
+      {
+        "category": "sequential",
+        "display_name": "Homework - Question Styles",
+        "due": null,
+        "start": null,
+        "location": "i4x:\/\/edX\/DemoX\/sequential\/basic_questions",
+        "hidden": false,
+        "children": [
+          {
+            "category": "vertical",
+            "display_name": "Pointing on a Picture",
+            "due": null,
+            "start": null,
+            "location": "i4x:\/\/edX\/DemoX\/vertical\/2152d4a4aadc4cb0af5256394a3d1fc7",
+            "hidden": false
+          },
+          {
+            "category": "vertical",
+            "display_name": "Drag and Drop",
+            "due": null,
+            "start": null,
+            "location": "i4x:\/\/edX\/DemoX\/vertical\/47dbd5f836544e61877a483c0b75606c",
+            "hidden": true
+          },
+          {
+            "category": "vertical",
+            "display_name": "Multiple Choice Questions",
+            "due": null,
+            "start": null,
+            "location": "i4x:\/\/edX\/DemoX\/vertical\/54bb9b142c6c4c22afc62bcb628f0e68",
+            "hidden": false
+          },
+          {
+            "category": "vertical",
+            "display_name": "Mathematical Expressions",
+            "due": null,
+            "start": null,
+            "location": "i4x:\/\/edX\/DemoX\/vertical\/vertical_0c92347a5c00",
+            "hidden": true
+          },
+          {
+            "category": "vertical",
+            "display_name": "Chemical Equations",
+            "due": null,
+            "start": null,
+            "location": "i4x:\/\/edX\/DemoX\/vertical\/vertical_1fef54c2b23b",
+            "hidden": true
+          },
+          {
+            "category": "vertical",
+            "display_name": "Numerical Input",
+            "due": null,
+            "start": null,
+            "location": "i4x:\/\/edX\/DemoX\/vertical\/2889db1677a549abb15eb4d886f95d1c",
+            "hidden": true
+          },
+          {
+            "category": "vertical",
+            "display_name": "Text input",
+            "due": null,
+            "start": null,
+            "location": "i4x:\/\/edX\/DemoX\/vertical\/e8a5cc2aed424838853defab7be45e42",
+            "hidden": true
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "category": "chapter",
+    "display_name": "Example Week 2: Get Interactive",
+    "due": null,
+    "start": null,
+    "location": "i4x:\/\/edX\/DemoX\/chapter\/graded_interactions",
+    "hidden": false,
+    "children": [
+      {
+        "category": "sequential",
+        "display_name": "Lesson 2 - Let's Get Interactive!",
+        "due": null,
+        "start": null,
+        "location": "i4x:\/\/edX\/DemoX\/sequential\/simulations",
+        "hidden": false,
+        "children": [
+          {
+            "category": "vertical",
+            "display_name": "Lesson 2 - Let's Get Interactive! ",
+            "due": null,
+            "start": null,
+            "location": "i4x:\/\/edX\/DemoX\/vertical\/d0d804e8863c4a95a659c04d8a2b2bc0",
+            "hidden": false
+          },
+          {
+            "category": "vertical",
+            "display_name": "An Interactive Reference Table",
+            "due": null,
+            "start": null,
+            "location": "i4x:\/\/edX\/DemoX\/vertical\/vertical_2dbb0072785e",
+            "hidden": false
+          },
+          {
+            "category": "vertical",
+            "display_name": "Zooming Diagrams",
+            "due": null,
+            "start": null,
+            "location": "i4x:\/\/edX\/DemoX\/vertical\/vertical_98cf62510471",
+            "hidden": false
+          },
+          {
+            "category": "vertical",
+            "display_name": "Electronic Sound Experiment",
+            "due": null,
+            "start": null,
+            "location": "i4x:\/\/edX\/DemoX\/vertical\/vertical_d32bf9b2242c",
+            "hidden": false
+          }
+        ]
+      },
+      {
+        "category": "sequential",
+        "display_name": "Homework - Labs and Demos",
+        "due": null,
+        "start": null,
+        "location": "i4x:\/\/edX\/DemoX\/sequential\/graded_simulations",
+        "hidden": false,
+        "children": [
+          {
+            "category": "vertical",
+            "display_name": "Labs and Demos",
+            "due": null,
+            "start": null,
+            "location": "i4x:\/\/edX\/DemoX\/vertical\/d6cee45205a449369d7ef8f159b22bdf",
+            "hidden": false
+          },
+          {
+            "category": "vertical",
+            "display_name": "Molecule Editor",
+            "due": null,
+            "start": null,
+            "location": "i4x:\/\/edX\/DemoX\/vertical\/vertical_0fab6aa52165",
+            "hidden": false
+          },
+          {
+            "category": "vertical",
+            "display_name": "Code Grader",
+            "due": null,
+            "start": null,
+            "location": "i4x:\/\/edX\/DemoX\/vertical\/vertical_aae927868e55",
+            "hidden": false
+          },
+          {
+            "category": "vertical",
+            "display_name": "Electric Circuit Simulator",
+            "due": null,
+            "start": null,
+            "location": "i4x:\/\/edX\/DemoX\/vertical\/vertical_c037f3757df1",
+            "hidden": false
+          },
+          {
+            "category": "vertical",
+            "display_name": "Protein Creator",
+            "due": null,
+            "start": null,
+            "location": "i4x:\/\/edX\/DemoX\/vertical\/vertical_bc69a47c6fae",
+            "hidden": false
+          }
+        ]
+      },
+      {
+        "category": "sequential",
+        "display_name": "Homework - Essays",
+        "due": null,
+        "start": null,
+        "location": "i4x:\/\/edX\/DemoX\/sequential\/175e76c4951144a29d46211361266e0e",
+        "hidden": false,
+        "children": [
+          {
+            "category": "vertical",
+            "display_name": "Peer Assessed Essays",
+            "due": null,
+            "start": null,
+            "location": "i4x:\/\/edX\/DemoX\/vertical\/fb79dcbad35b466a8c6364f8ffee9050",
+            "hidden": true
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "category": "chapter",
+    "display_name": "Example Week 3: Be Social",
+    "due": null,
+    "start": null,
+    "location": "i4x:\/\/edX\/DemoX\/chapter\/social_integration",
+    "hidden": false,
+    "children": [
+      {
+        "category": "sequential",
+        "display_name": "Lesson 3 - Be Social",
+        "due": null,
+        "start": null,
+        "location": "i4x:\/\/edX\/DemoX\/sequential\/48ecb924d7fe4b66a230137626bfa93e",
+        "hidden": false,
+        "children": [
+          {
+            "category": "vertical",
+            "display_name": "Be Social",
+            "due": null,
+            "start": null,
+            "location": "i4x:\/\/edX\/DemoX\/vertical\/3c4b575924bf4b75a2f3542df5c354fc",
+            "hidden": false
+          },
+          {
+            "category": "vertical",
+            "display_name": "Discussion Forums",
+            "due": null,
+            "start": null,
+            "location": "i4x:\/\/edX\/DemoX\/vertical\/vertical_3888db0bc286",
+            "hidden": false
+          },
+          {
+            "category": "vertical",
+            "display_name": "Getting Help",
+            "due": null,
+            "start": null,
+            "location": "i4x:\/\/edX\/DemoX\/vertical\/312cb4faed17420e82ab3178fc3e251a",
+            "hidden": false
+          }
+        ]
+      },
+      {
+        "category": "sequential",
+        "display_name": "Homework - Find Your Study Buddy",
+        "due": null,
+        "start": null,
+        "location": "i4x:\/\/edX\/DemoX\/sequential\/dbe8fc027bcb4fe9afb744d2e8415855",
+        "hidden": false,
+        "children": [
+          {
+            "category": "vertical",
+            "display_name": "Homework - Find Your Study Buddy",
+            "due": null,
+            "start": null,
+            "location": "i4x:\/\/edX\/DemoX\/vertical\/26d89b08f75d48829a63520ed8b0037d",
+            "hidden": false
+          }
+        ]
+      },
+      {
+        "category": "sequential",
+        "display_name": "More Ways to Connect",
+        "due": null,
+        "start": null,
+        "location": "i4x:\/\/edX\/DemoX\/sequential\/6ab9c442501d472c8ed200e367b4edfa",
+        "hidden": false,
+        "children": [
+          {
+            "category": "vertical",
+            "display_name": "Google Hangout",
+            "due": null,
+            "start": null,
+            "location": "i4x:\/\/edX\/DemoX\/vertical\/3f2c11aba9434e459676a7d7acc4d960",
+            "hidden": false
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "category": "chapter",
+    "display_name": "About Exams and Certificates",
+    "due": null,
+    "start": null,
+    "location": "i4x:\/\/edX\/DemoX\/chapter\/1414ffd5143b4b508f739b563ab468b7",
+    "hidden": true,
+    "children": [
+      {
+        "category": "sequential",
+        "display_name": "edX Exams",
+        "due": null,
+        "start": null,
+        "location": "i4x:\/\/edX\/DemoX\/sequential\/workflow",
+        "hidden": true,
+        "children": [
+          {
+            "category": "vertical",
+            "display_name": "EdX Exams",
+            "due": null,
+            "start": null,
+            "location": "i4x:\/\/edX\/DemoX\/vertical\/934cc32c177d41b580c8413e561346b3",
+            "hidden": true
+          },
+          {
+            "category": "vertical",
+            "display_name": "Immediate Feedback",
+            "due": null,
+            "start": null,
+            "location": "i4x:\/\/edX\/DemoX\/vertical\/vertical_f04afeac0131",
+            "hidden": true
+          },
+          {
+            "category": "vertical",
+            "display_name": "Getting Answers",
+            "due": null,
+            "start": null,
+            "location": "i4x:\/\/edX\/DemoX\/vertical\/b6662b497c094bcc9b870d8270c90c93",
+            "hidden": true
+          },
+          {
+            "category": "vertical",
+            "display_name": "Answering More Than Once",
+            "due": null,
+            "start": null,
+            "location": "i4x:\/\/edX\/DemoX\/vertical\/f91d8d31f7cf48ce990f8d8745ae4cfa",
+            "hidden": true
+          },
+          {
+            "category": "vertical",
+            "display_name": "Limited Checks",
+            "due": null,
+            "start": null,
+            "location": "i4x:\/\/edX\/DemoX\/vertical\/vertical_ac391cde8a91",
+            "hidden": true
+          },
+          {
+            "category": "vertical",
+            "display_name": "Randomized Questions",
+            "due": null,
+            "start": null,
+            "location": "i4x:\/\/edX\/DemoX\/vertical\/vertical_36e0beb03f0a",
+            "hidden": true
+          },
+          {
+            "category": "vertical",
+            "display_name": "Overall Grade Performance",
+            "due": null,
+            "start": null,
+            "location": "i4x:\/\/edX\/DemoX\/vertical\/1b0e2c2c84884b95b1c99fb678cc964c",
+            "hidden": true
+          },
+          {
+            "category": "vertical",
+            "display_name": "Passing a Course",
+            "due": null,
+            "start": null,
+            "location": "i4x:\/\/edX\/DemoX\/vertical\/c7e98fd39a6944edb6b286c32e1150ff",
+            "hidden": true
+          },
+          {
+            "category": "vertical",
+            "display_name": "Getting Your edX Certificate",
+            "due": null,
+            "start": null,
+            "location": "i4x:\/\/edX\/DemoX\/vertical\/d6eaa391d2be41dea20b8b1bfbcb1c45",
+            "hidden": true
+          }
+        ]
+      }
+    ]
+  }
+]

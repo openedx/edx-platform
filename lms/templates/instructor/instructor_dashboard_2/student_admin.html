@@ -1,0 +1,174 @@
+<%page args="section_data" expression_filter="h"/>
+<%! from django.utils.translation import ugettext as _ %>
+
+<div>
+  %if section_data['is_small_course']:
+  ## Show the gradebook for small courses
+    <h2>${_("Student Gradebook")}</h2>
+      <p>
+	${_("Click here to view the gradebook for enrolled students. This feature is only visible to courses with a small number of total enrolled students.")}
+      </p>
+      <br>
+      <p>
+	<a href="${ section_data['spoc_gradebook_url'] }" class="gradebook-link"> ${_("View Gradebook")} </a>
+      </p>
+    <hr>
+  %endif
+</div>
+
+<div class="student-specific-container action-type-container">
+  <h2>${_("Student-specific grade inspection")}</h2>
+  <div class="request-response-error"></div>
+  <br />
+  <label>
+  ${_("Specify the {platform_name} email address or username of a student here:").format(platform_name=settings.PLATFORM_NAME)}
+  <input type="text" name="student-select-progress" placeholder="${_("Student Email or Username")}" >
+  </label>
+  <br>
+
+  <div class="progress-link-wrapper">
+  <p>
+    ${_("Click this link to view the student's progress page:")}
+
+    <a href="" class="progress-link" data-endpoint="${ section_data['get_student_progress_url_url'] }"> ${_("Student Progress Page")} </a>
+  </p>
+  </div>
+
+  <hr>
+</div>
+
+<div class="student-grade-container action-type-container">
+  <h2>${_("Student-specific grade adjustment")}</h2>
+  <div class="request-response-error"></div>
+  <p>
+  <label>
+  ${_("Specify the {platform_name} email address or username of a student here:").format(platform_name=settings.PLATFORM_NAME)}
+  <input type="text" name="student-select-grade" placeholder="${_("Student Email or Username")}">
+  </label>
+  </p>
+  <br>
+
+  <label> ${_("Specify a problem in the course here with its complete location:")}
+  <input type="text" name="problem-select-single" placeholder="${_("Problem location")}">
+  </label>
+
+  ## Translators: A location (string of text) follows this sentence.
+  <p>${_("You must provide the complete location of the problem. In the Staff Debug viewer, the location looks like this:")}<br/>
+  <code>block-v1:edX+DemoX+2015+type@problem+block@618c5933b8b544e4a4cc103d3e508378</code></p>
+
+  <p>
+  ${_("Next, select an action to perform for the given user and problem:")}
+  </p>
+
+  <p>
+  <input type="button" name="reset-attempts-single" value="${_("Reset Student Attempts")}" data-endpoint="${ section_data['reset_student_attempts_url'] }">
+
+  %if settings.FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS') and section_data['access']['instructor']:
+    <input type="button" name="rescore-problem-single" value="${_("Rescore Student Submission")}" data-endpoint="${ section_data['rescore_problem_url'] }">
+  %endif
+  </p>
+
+  <p>
+  %if section_data['access']['instructor']:
+    <label> ${_('You may also delete the entire state of a student for the specified problem:')}
+    <input type="button" class="molly-guard" name="delete-state-single" value="${_("Delete Student State for Problem")}" data-endpoint="${ section_data['reset_student_attempts_url'] }"></label>
+  %endif
+  </p>
+
+
+  %if settings.FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS') and section_data['access']['instructor']:
+    <p id="task-history-single-help">
+      ${_("Rescoring runs in the background, and status for active tasks will appear in the 'Pending Tasks' table. "
+      "To see status for all tasks submitted for this problem and student, click on this button:")}
+    </p>
+
+    <p><input type="button" name="task-history-single" value="${_("Show Background Task History for Student")}" data-endpoint="${ section_data['list_instructor_tasks_url'] }" aria-describedby="task-history-single-help"></p>
+    <div class="task-history-single-table"></div>
+  %endif
+  <hr>
+</div>
+
+% if course.entrance_exam_enabled:
+<div class="entrance-exam-grade-container action-type-container">
+  <h2>${_("Entrance Exam Adjustment")}</h2>
+  <div class="request-response-error"></div>
+  <label>
+  ${_("Student's {platform_name} email address or username:").format(platform_name=settings.PLATFORM_NAME)}
+  <input type="text" name="entrance-exam-student-select-grade" placeholder="${_('Student Email or Username')}">
+  </label>
+  <br>
+
+  <p>
+  ${_("Select an action for the student's entrance exam. This action will affect every problem in the student's exam.")}
+  </p>
+
+  <input type="button" name="reset-entrance-exam-attempts" value="${_('Reset Number of Student Attempts')}" data-endpoint="${ section_data['reset_student_attempts_for_entrance_exam_url'] }">
+
+  %if settings.FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS') and section_data['access']['instructor']:
+    <input type="button" name="rescore-entrance-exam" value="${_('Rescore All Problems')}" data-endpoint="${ section_data['rescore_entrance_exam_url'] }">
+  %endif
+  <input type="button" name="skip-entrance-exam" value="${_('Let Student Skip Entrance Exam')}" data-endpoint="${ section_data['student_can_skip_entrance_exam_url'] }">
+
+  <p>
+  %if section_data['access']['instructor']:
+    <label> ${_("You can also delete all of the student's answers and scores for the entire entrance exam.")}
+    <input type="button" class="molly-guard" name="delete-entrance-exam-state" value="${_("Delete Student's Answers and Scores")}" data-endpoint="${ section_data['reset_student_attempts_for_entrance_exam_url'] }"></label>
+  %endif
+  </p>
+
+
+  %if settings.FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS') and section_data['access']['instructor']:
+    <p id="entrance-exam-task-history-help">
+      ${_("Rescoring runs in the background, and status for active tasks will appear in the 'Pending Tasks' table. "
+      "To see status for all tasks submitted for this problem and student, click on this button:")}
+    </p>
+
+    <p><input type="button" name="entrance-exam-task-history" value="${_("Show Student's Exam Adjustment History")}" data-endpoint="${ section_data['list_entrace_exam_instructor_tasks_url'] }" aria-describedby="entrance-exam-task-history-help"></p>
+    <div class="entrance-exam-task-history-table"></div>
+  %endif
+  <hr>
+</div>
+%endif
+
+%if settings.FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS') and section_data['access']['instructor']:
+  <div class="course-specific-container action-type-container">
+    <h2>${_('Course-specific grade adjustment')}</h2>
+    <div class="request-response-error"></div>
+
+    <label>
+      ${_("Specify a problem in the course here with its complete location:")}
+      <input type="text" name="problem-select-all" size="60" placeholder="${_("Problem location")}" aria-describedby="problem-select-all-help">
+    </label>
+    ## Translators: A location (string of text) follows this sentence.
+    <p id="problem-select-all-help">${_("You must provide the complete location of the problem. In the Staff Debug viewer, the location looks like this:")}<br/>
+    <code>block-v1:edX+DemoX+2015+type@problem+block@618c5933b8b544e4a4cc103d3e508378</code></p>
+    <p>
+      ${_("Then select an action")}:
+      <input type="button" class="molly-guard" name="reset-attempts-all" value="${_("Reset ALL students' attempts")}" data-endpoint="${ section_data['reset_student_attempts_url'] }">
+      <input type="button" class="molly-guard" name="rescore-problem-all" value="${_("Rescore ALL students' problem submissions")}" data-endpoint="${ section_data['rescore_problem_url'] }">
+    </p>
+    <p>
+    <p id="task-history-all-help">
+      ${_("The above actions run in the background, and status for active tasks will appear in a table on the Course Info tab. "
+      "To see status for all tasks submitted for this problem, click on this button")}:
+    </p>
+      <p><input type="button" name="task-history-all" value="${_("Show Background Task History for Problem")}" data-endpoint="${ section_data['list_instructor_tasks_url'] }" aria-describedby="task-history-all-help"></p>
+      <div class="task-history-all-table"></div>
+    </p>
+  </div>
+%endif
+
+%if settings.FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS'):
+  <div class="running-tasks-container action-type-container">
+    <hr>
+    <h2> ${_("Pending Tasks")} </h2>
+    <div class="running-tasks-section">
+      <p>${_("The status for any active tasks appears in a table below.")} </p>
+      <br />
+
+      <div class="running-tasks-table" data-endpoint="${ section_data['list_instructor_tasks_url'] }"></div>
+    </div>
+    <div class="no-pending-tasks-message"></div>
+  </div>
+
+%endif

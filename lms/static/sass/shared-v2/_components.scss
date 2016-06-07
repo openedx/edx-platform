@@ -1,0 +1,94 @@
+// TODO: tabs should be added to the Pattern Library
+.tabs {
+    @include clearfix();
+    @extend %reset-lists;
+    @include border-top-radius(4px);
+    padding: ($baseline*0.75) 0 ($baseline*0.75) 0;
+
+    .tab {
+        @include float(left);
+        list-style: none;
+        margin-bottom: 0;
+
+        &.prominent {
+            @include margin-right(16px);
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 3px;
+        }
+
+        &.prominent + li {
+            @include border-left(1px solid $lms-border-color);
+            @include padding-left($baseline*0.75);
+        }
+
+        a,
+        a:visited {
+            @include padding($baseline/2, $baseline*0.75, 13px, $baseline*0.75);
+            display: block;
+            text-align: center;
+            text-decoration: none;
+            border-style: solid;
+            border-width: 0 0 4px 0;
+            border-bottom-color: transparent;
+            color: $lms-label-color;
+            font-size: 14px;
+
+            &:hover,
+            &:focus {
+                color: $lms-active-color;
+                border-bottom-color: $lms-active-color;
+            }
+
+            &.active {
+                color: $lms-active-color;
+                border-bottom-color: $lms-active-color;
+                background-color: transparent;
+            }
+        }
+    }
+}
+
+// TODO: search box should be in the Pattern Library
+.page-header-search {
+    display: inline-block;
+
+    .search-form {
+        display: inline-block;
+    }
+
+    .search-box {
+        display: inline-block;
+        position: relative;
+        vertical-align: middle;
+    }
+
+    .search-field {
+        transition: all $tmg-f2 ease-in-out;
+        border: 1px solid $lms-border-color;
+        border-radius: 3px;
+        padding: $baseline/4 $baseline*1.5;
+        font-family: inherit;
+    }
+
+    .action-search {
+        text-shadow: none;
+        vertical-align: middle;
+        padding: $baseline/5 $baseline/2;
+    }
+
+    .action-clear {
+        @include right(0);
+        @include margin(0, ($baseline/4), 0, 0);
+        position: absolute;
+        top: 0;
+        color: $lms-gray;
+        padding: $baseline/4;
+
+        // STATE: hover and focus
+        &:hover,
+        &:focus {
+            color: $lms-label-color;
+            border-width: 0;
+        }
+    }
+}

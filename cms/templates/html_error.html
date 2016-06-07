@@ -1,0 +1,26 @@
+<%! from django.utils.translation import ugettext as _ %>
+<%! from django.core.urlresolvers import reverse %>
+
+<%block name="content">
+  <div class="wrapper wrapper-alert wrapper-alert-error is-shown">
+    <div class="error">
+
+      <div class="copy">
+        <h2 class="title">
+          <i class="icon fa fa-warning"></i>
+          ${_("We're having trouble rendering your component")}
+        </h2>
+
+        <p>${_("Students will not be able to access this component. Re-edit your component to fix the error.")}</p>
+
+        % if message:
+        <p class="description">
+            ${_("Error:")}
+            ${message | h}
+        </p>
+        % endif
+
+
+    </div>
+  </div>
+</%block>

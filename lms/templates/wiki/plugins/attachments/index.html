@@ -1,0 +1,139 @@
+{% extends "wiki/article.html" %}
+{% load wiki_tags i18n humanize %}
+{% load url from future %}
+
+{% block pagetitle %}{% trans "Attachments" %}: {{ article.current_revision.title }}{% endblock %}
+
+{% block wiki_contents_tab %}
+<div class="row-fluid">
+
+  {% if article|can_write:user %}
+
+  <div class="attachment-options">
+    <a class="btn" href="#" id="upload-file-btn">
+      <span class="icon fa fa-arrow-circle-o-up"></span>{% trans "Upload new file" %}
+    </a>
+    <a class="btn" href="#" id="search-for-file-btn">
+      <span class="icon fa fa-plus-circle"></span>{% trans "Search and add file" %}
+    </a>
+  </div>
+
+  <div class="modal upload-modal hide fade" id="upload-modal">
+    <div class="modal-inner-wrapper">
+      <h4>{% trans "Upload File" %}</h4>
+      <form method="POST" class="form-vertical" id="attachment_form" enctype="multipart/form-data">
+        {% wiki_form form %}
+        <button type="submit" name="save" value="1" class="btn btn-primary">
+          {% trans "Upload file" %}
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal search-file-modal hide fade" id="search-file-modal">
+    <div class="modal-inner-wrapper">
+      <h4>{% trans "Search files and articles" %}</h4>
+      <p>{% trans "You can reuse files from other articles. These files are subject to updates on other articles which may or may not be a good thing." %}</p>
+      <form method="GET" action="{% url 'wiki:attachments_search' path=urlpath.path article_id=article.id %}" class="form-search">
+        {{ search_form.query }}
+        <button class="btn btn-primary">
+          {% trans "Search" %}
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <script type="text/javascript">
+    $('#upload-file-btn').bind('click', function(e) {
+      {% if anonymous_disallowed %}
+        console.log('you cannot do that!');
+      {% else %}
+        $('#upload-modal').modal('show');
+      {% endif %}
+    });
+
+    $('#search-for-file-btn').bind('click', function(e) {
+      $('#search-file-modal').modal('show');
+    });
+  </script>
+
+  {% endif %}
+
+
+
+  <div class="attachment-list">
+    <!--<p class="lead">{% trans "The following files are available for this article. Copy the markdown tag to directly refer to a file from the article text." %}</p>-->
+    <ul>
+      {% for attachment in attachments %}
+        <li>
+          <header>
+            <h3>
+              <a href="{% url 'wiki:attachments_download' path=urlpath.path article_id=article.id attachment_id=attachment.id %}">{{ attachment.current_revision.get_filename }}</a>
+              <span class="badge">{{ attachment.current_revision.created|naturaltime }}</span>
+              {% if attachment.current_revision.deleted %}
+              <span class="badge badge-important">{% trans "deleted" %}</span>
+              {% endif %}
+            </h3>
+            <p class="attachment-description">
+              {{ attachment.current_revision.description }}
+            </p>
+          </header>
+          <div class="attachment-details">
+            <table>
+            <tr>
+              <th>{% trans "Markdown tag" %}</th>
+              <th>{% trans "Uploaded by" %}</th>
+              <th>{% trans "Size" %}</th>
+              <th>{% trans "File History" %}</th>
+              <td class="attachment-actions">
+                {% if attachment|can_write:user %}
+                  {% if not attachment.current_revision.deleted %}
+                    {% if attachment.article = article %}
+                      <a href="{% url 'wiki:attachments_delete' path=urlpath.path article_id=article.id attachment_id=attachment.id %}" class="btn btn-danger">{% trans "Delete" %}</a>
+                    {% else %}
+                      <a href="{% url 'wiki:attachments_delete' path=urlpath.path article_id=article.id attachment_id=attachment.id %}" class="btn">{% trans "Detach" %}</a>
+                    {% endif %}
+
+                    <a href="{% url 'wiki:attachments_replace' path=urlpath.path article_id=article.id attachment_id=attachment.id %}" class="btn">{% trans "Replace" %}</a>
+
+                  {% else %}
+                    {% if attachment.current_revision.previous_revision.id %}
+                    <form method="POST" action="{% url 'wiki:attachments_revision_change' path=urlpath.path article_id=article.id attachment_id=attachment.id revision_id=attachment.current_revision.previous_revision.id %}">
+                      {% csrf_token %}
+                      <button class="btn">
+                        {% trans "Restore" %}
+                      </button>
+                    </form>
+                    {% endif %}
+                  {% endif %}
+                {% endif %}
+              </td>
+            </tr>
+            <tr>
+              <td><code>[attachment:{{ attachment.id }}]</code></td>
+              <td>
+              {% if attachment.current_revision.user %}{{ attachment.current_revision.user }}{% else %}{% if user|is_moderator %}{{ attachment.current_revision.ip_address|default:"anonymous (IP not logged)" }}{% else %}{% trans "anonymous (IP logged)" %}{% endif %}{% endif %}
+              </td>
+              <td>{{ attachment.current_revision.get_size|filesizeformat }}</td>
+
+              <td>
+                <a href="{% url 'wiki:attachments_history' path=urlpath.path article_id=article.id attachment_id=attachment.id %}">
+                  <span class="icon fa fa-clock-o"></span>
+                  {% trans "File history" %} ({{ attachment.attachmentrevision_set.all.count }} {% trans "revisions" %})
+                </a>
+              </td>
+            </tr>
+            </table>
+          </div>
+        </li>
+      {% empty %}
+        <p style="margin-bottom: 20px;"><em>{% trans "There are no attachments for this article." %}</em></p>
+      {% endfor %}
+    </ul>
+  </div>
+
+
+</div>
+
+{% endblock %}
+

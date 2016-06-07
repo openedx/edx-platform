@@ -1,0 +1,47 @@
+// studio - assets - graphics
+// ====================
+
+.drag-handle {
+	display: inline-block;
+	float: right;
+	width: 7px;
+	height: 22px;
+	margin-left: ($baseline/2);
+	background: url('#{$static-path}/images/drag-handles.png') no-repeat;
+	cursor: move;
+}
+
+.large-advanced-icon {
+	display: inline-block;
+	width: ($baseline*3);
+	height: ($baseline*3);
+	background: url('#{$static-path}/images/large-advanced-icon.png') center no-repeat;
+}
+
+.large-discussion-icon {
+	display: inline-block;
+	width: ($baseline*3);
+	height: ($baseline*3);
+	background: url('#{$static-path}/images/large-discussion-icon.png') center no-repeat;
+}
+
+.large-html-icon {
+	display: inline-block;
+	width: ($baseline*3);
+	height: ($baseline*3);
+	background: url('#{$static-path}/images/large-html-icon.png') center no-repeat;
+}
+
+.large-problem-icon {
+	display: inline-block;
+	width: ($baseline*3);
+	height: ($baseline*3);
+	background: url('#{$static-path}/images/large-problem-icon.png') center no-repeat;
+}
+
+.large-video-icon {
+	display: inline-block;
+	width: ($baseline*3);
+	height: ($baseline*3);
+	background: url('#{$static-path}/images/large-video-icon.png') center no-repeat;
+}

@@ -1,0 +1,15 @@
+.find-courses header.search, .university-profile header.search {
+	background-image: url("../images/background-image.jpg");
+}
+
+.course-info header.course-profile {
+	background: url("../images/background-image.jpg") repeat scroll 0 0 / cover #F5F5F5;	
+}
+
+.view-login .introduction header {
+    background-image: url("../images/login-and-register-banner.png");
+}
+
+.view-register .introduction header {
+    background-image: url("../images/login-and-register-banner.png");
+}

@@ -1,0 +1,287 @@
+// studio - elements - system help
+// ====================
+
+// view introductions - common greeting/starting points for the UI
+.content .introduction {
+  @include box-sizing(border-box);
+  margin-bottom: $baseline;
+
+  .title {
+    @extend %t-title4;
+    @extend %t-strong;
+  }
+
+  .copy {
+    @extend %t-copy-sub1;
+  }
+
+  strong {
+    @extend %t-strong;
+  }
+
+  // CASE: has links alongside
+  &.has-links {
+    @include clearfix();
+
+    .copy {
+      @include float(left);
+      width: flex-grid(8,12);
+      @include margin-right(flex-gutter());
+    }
+
+    .nav-introduction-supplementary {
+      @extend %t-copy-sub2;
+      @include float(right);
+      width: flex-grid(4,12);
+      display: block;
+      @include text-align(right);
+
+      .icon {
+        @extend %t-action3;
+        display: inline-block;
+        vertical-align: middle;
+        margin-right: ($baseline/4);
+      }
+    }
+  }
+}
+
+// notices - in-context: to be used as notices to users within the context of a form/action
+.notice-incontext {
+  @extend %ui-well;
+  border-radius: ($baseline/10);
+  position: relative;
+  overflow: hidden;
+  margin-bottom: $baseline;
+
+  .title {
+    @extend %t-title6;
+    @extend %t-strong;
+    margin-bottom: ($baseline/2);
+  }
+
+  .copy {
+    @extend %t-copy-sub1;
+    @include transition(opacity $tmg-f2 ease-in-out 0s);
+    opacity: 0.75;
+    margin-bottom: $baseline;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  strong {
+    @extend %t-strong;
+  }
+
+  &.has-status {
+
+    .status-indicator {
+      position: absolute;
+      top: 0;
+      left: 0;
+      display: block;
+      width: 100%;
+      height: ($baseline/4);
+      opacity: 0.40;
+    }
+  }
+
+  // CASE: notice has actions {
+  &.has-actions {
+
+    .list-actions {
+      margin-top: ($baseline*0.75);
+
+      .action-item {
+
+      }
+
+      .action-primary {
+        @extend %btn-primary-blue;
+        @extend %t-action3;
+      }
+    }
+  }
+
+  // list of notices all in one
+  &.list-notices {
+
+    .notice-item {
+      margin-bottom: $baseline;
+      border-bottom: 1px solid $gray-l3;
+      padding-bottom: $baseline;
+
+      &:last-child {
+        margin-bottom: 0;
+        border: none;
+        padding-bottom: 0;
+      }
+    }
+  }
+}
+
+// particular notice - warnings around a workflow for something
+.notice-workflow {
+  background: $yellow-l5;
+
+  .status-indicator {
+    background: $yellow;
+  }
+
+  title {
+    color: $gray-d1;
+  }
+
+  .copy {
+    color: $gray;
+  }
+}
+
+// particular notice - instructional
+.notice-instruction {
+  background-color: $gray-l4;
+
+  .title {
+    color: $gray-d2;
+  }
+
+  .copy {
+    color: $gray-d2;
+  }
+
+  &.has-actions {
+
+    .list-actions {
+
+      .action-item {
+
+      }
+
+      .action-primary {
+        @extend %btn-primary-blue;
+        @extend %t-action3;
+      }
+    }
+  }
+}
+
+// particular notice - create
+.notice-create {
+  background-color: $gray-l4;
+
+  .title {
+    color: $gray-d2;
+  }
+
+  .copy {
+    color: $gray-d2;
+  }
+
+  &.has-actions {
+
+    .list-actions {
+
+      .action-item {
+
+      }
+
+      .action-primary {
+        @extend %btn-primary-green;
+        @extend %t-action3;
+      }
+    }
+  }
+}
+
+// particular notice - confirmation
+.notice-confirmation {
+  background-color: $green-l5;
+
+  .status-indicator {
+    background: $green-s1;
+  }
+
+  .title {
+    color: $green;
+  }
+
+  .copy {
+    color: $gray;
+  }
+}
+
+// ====================
+
+// informational bits (rename once UI pattern is further defined)
+.bit {
+  @extend %t-copy-sub1;
+  margin: 0 0 $baseline 0;
+  border-bottom: 1px solid $gray-l4;
+  padding: 0 0 $baseline 0;
+  color: $gray-l1;
+
+  &:last-child {
+    margin-bottom: 0;
+    border: none;
+    padding-bottom: 0;
+  }
+
+  h3, .title {
+    @extend %t-title7;
+    @extend %t-strong;
+    margin: 0 0 ($baseline/4) 0;
+    color: $gray-d2;
+  }
+
+  p, .copy {
+    margin: 0 0 $baseline 0;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  // learn more (aka external help button)
+  .external-help-button {
+    @extend %ui-btn-flat-outline;
+    @extend %sizing;
+  }
+
+  // actions
+  .list-actions {
+    @extend %cont-no-list;
+
+    .action-item {
+      @extend %wipe-last-child;
+      margin-bottom: ($baseline/4);
+      border-bottom: 1px dotted $gray-l4;
+      padding-bottom: ($baseline/4);
+    }
+  }
+
+  // details
+  .list-details {
+    @extend %cont-no-list;
+
+    .item-detail {
+      @extend %wipe-last-child;
+      margin-bottom: ($baseline/4);
+      border-bottom: 1px dotted $gray-l4;
+      padding-bottom: ($baseline/4);
+    }
+  }
+
+  // navigation
+  .nav-related, .nav-page {
+    @extend %cont-no-list;
+
+    .nav-item {
+      @extend %wipe-last-child;
+      margin-bottom: ($baseline/4);
+      border-bottom: 1px dotted $gray-l4;
+      padding-bottom: ($baseline/4);
+    }
+  }
+}

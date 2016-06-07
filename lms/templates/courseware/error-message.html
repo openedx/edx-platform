@@ -1,0 +1,5 @@
+<%! from django.utils.translation import ugettext as _ %>
+<%
+    link_to_support_email='<a href=\"mailto:{tech_support_email}\">{tech_support_email}</a>'.format(tech_support_email=settings.TECH_SUPPORT_EMAIL)
+%>
+<p>${_("We're sorry, this module is temporarily unavailable. Our staff is working to fix it as soon as possible. Please email us at {link_to_support_email} to report any problems or downtime.").format(link_to_support_email=link_to_support_email)}</p>

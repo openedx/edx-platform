@@ -1,0 +1,19 @@
+<li class="studio-xblock-wrapper is-draggable">
+    <header class="xblock-header">
+        <div class="header-details">
+            <span class="xblock-display-name">Mock XBlock</span>
+        </div>
+        <div class="header-actions">
+            <ul class="actions-list">
+                <li class="sr action-item">No Actions</li>
+            </ul>
+        </div>
+    </header>
+    <article class="xblock-render">
+        <div class="xblock xblock-student_view xmodule_display xmodule_VerticalModule"
+             data-runtime-class="PreviewRuntime" data-init="XBlockToXModuleShim" data-runtime-version="1"
+             data-type="None">
+            <div class="mock-updated-content">Mock Update</div>
+        </div>
+    </article>
+</li>

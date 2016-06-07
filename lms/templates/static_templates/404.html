@@ -1,0 +1,20 @@
+<%page expression_filter="h"/>
+<%namespace name='static' file='../static_content.html'/>
+<%!
+from django.utils.translation import ugettext as _
+from openedx.core.djangolib.markup import HTML, Text
+%>
+<%inherit file="../main.html" />
+
+<%block name="pagetitle">${_("Page Not Found")}</%block>
+
+<main id="main" aria-label="Content" tabindex="-1">
+    <section class="outside-app">
+    <h1>${_("Page not found")}</h1>
+    <p>${Text(_('The page that you were looking for was not found. Go back to the {link_start}homepage{link_end} or let us know about any pages that may have been moved at {email}.')).format(
+        link_start=HTML('<a href="/">'),
+        link_end=HTML('</a>'),
+        email=HTML('<a href="mailto:{email}">{email}</a>').format(email=Text(static.get_tech_support_email_address()))
+      )}</p>
+    </section>
+</main>

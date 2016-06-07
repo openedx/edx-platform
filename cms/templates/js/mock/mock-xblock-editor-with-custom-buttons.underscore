@@ -1,0 +1,20 @@
+<div class="xblock xblock-studio_view" data-runtime-version="1" data-usage-id="i4x:;_;_edX;_mock"
+     data-init="MockXBlock" data-runtime-class="StudioRuntime" tabindex="0">
+
+    <div class="mock-xblock editor-with-buttons">
+        <h3>Mock XBlock Editor</h3>
+
+        <div class="modal-actions">
+            <h3 class="sr">Actions</h3>
+            <ul>
+                <li class="action-item">
+                    <a href="#" class="button action-primary action-save">Save</a>
+                </li>
+
+                <li class="action-item">
+                    <a href="#" class="button action-cancel">Cancel</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>

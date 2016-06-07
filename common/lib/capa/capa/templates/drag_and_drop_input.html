@@ -1,0 +1,32 @@
+<div id="inputtype_${id}" class="capa_inputtype">
+    <div class="drag_and_drop_problem_div" id="drag_and_drop_div_${id}"
+     data-plain-id="${id}">
+    </div>
+
+    <div class="drag_and_drop_problem_json" id="drag_and_drop_json_${id}"
+        style="display:none;">${drag_and_drop_json}</div>
+
+    <div class="script_placeholder" data-src="${STATIC_URL}js/capa/drag_and_drop.js"></div>
+
+    % if status in ['unsubmitted', 'correct', 'incorrect', 'partially-correct', 'incomplete']:
+        <div class="${status.classname}" id="status_${id}">
+    % endif
+
+
+    <input type="text" name="input_${id}" id="input_${id}" aria-describedby="answer_${id}" value="${value|h}"
+    style="display:none;"/>
+
+    <p class="status" aria-describedby="input_${id}">
+    ${status.display_name}
+    </p>
+
+    <p id="answer_${id}" class="answer"></p>
+
+    % if msg:
+        <span class="message">${msg|n}</span>
+    % endif
+
+    % if status in ['unsubmitted', 'correct', 'incorrect', 'partially-correct', 'incomplete']:
+        </div>
+    % endif
+</div>

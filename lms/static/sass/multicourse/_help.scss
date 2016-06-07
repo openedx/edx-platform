@@ -1,0 +1,78 @@
+.static-container.help {
+
+  section.questions {
+    @include clearfix();
+
+    nav.categories {
+      border: 1px solid rgb(220,220,220);
+      @include box-sizing(border-box);
+      @include float(left);
+      @include margin-left(flex-gutter());
+      padding: 20px;
+      width: flex-grid(3);
+
+      a {
+        display: block;
+        letter-spacing: 1px;
+        margin: 0px -20px;
+        @include padding(12px, 0px, 12px, 20px);
+        @include text-align(left);
+
+        &:hover, &:focus {
+          background: rgb(245,245,245);
+          text-decoration: none;
+        }
+      }
+    }
+
+    .responses {
+      @include float(left);
+      width: flex-grid(9);
+
+      .category {
+        padding-top: 40px;
+
+        &:first-child {
+          padding-top: 0px;
+        }
+
+        > h2 {
+          border-bottom: 1px solid rgb(220,220,220);
+          margin-bottom: ($baseline*2);
+          padding-bottom: $baseline;
+        }
+      }
+
+      .response {
+        margin-bottom: ($baseline*2);
+
+        h3 {
+          background: url('/static/images/bullet-closed.png') no-repeat left 0.25em;
+          font-family: $sans-serif;
+          font-weight: 700;
+          margin-bottom: ($baseline/2);
+          padding-left: $baseline;
+          cursor: pointer;
+        }
+
+        .answer {
+          display: none;
+          color: #3c3c3c;
+          @include padding-left(16px);
+          font-family: $serif;
+          li {
+            line-height: 1.6em;
+          }
+        }
+
+        // opened states
+        &.opened {
+
+          h3 {
+            background: url('/static/images/bullet-open.png') no-repeat left 0.25em;
+          }
+        }
+      }
+    }
+  }
+}

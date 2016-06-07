@@ -1,0 +1,351 @@
+// studio - utilities - INHERITED mixins and extends
+
+// NOTE: these are older/poorly architected mixins that we want to move away from using or refactor in the future.
+// They are still referenced when styling current interface elements and as such need to be preserved for the time being.
+// talbs: we need to slowly ween ourselves off of these
+// ====================
+
+
+// line-height (old way)
+@function lh($amount: 1) {
+  @return $body-line-height * $amount;
+}
+
+// inherited - vertical and horizontal centering
+@mixin vertically-and-horizontally-centered ($height, $width) {
+  left: 50%;
+  margin-left: -$width / 2;
+  min-height: $height;
+  min-width: $width;
+  position: absolute;
+  top: 150px;
+}
+
+// ====================
+
+// inherited - dividers
+.faded-hr-divider {
+  @include background-image(linear-gradient(180deg, rgba(200,200,200, 0) 0%,
+                                                    rgba(200,200,200, 1) 50%,
+                                                    rgba(200,200,200, 0)));
+  height: 1px;
+  width: 100%;
+}
+
+.faded-hr-divider-medium {
+  @include background-image(linear-gradient(180deg, rgba(240,240,240, 0) 0%,
+                                                    rgba(240,240,240, 1) 50%,
+                                                    rgba(240,240,240, 0)));
+  height: 1px;
+  width: 100%;
+}
+
+.faded-hr-divider-light {
+  @include background-image(linear-gradient(180deg, rgba(255,255,255, 0) 0%,
+                                                    rgba(255,255,255, 0.8) 50%,
+                                                    rgba(255,255,255, 0)));
+  height: 1px;
+  width: 100%;
+}
+
+.faded-vertical-divider {
+  @include background-image(linear-gradient(90deg, rgba(200,200,200, 0) 0%,
+                                                    rgba(200,200,200, 1) 50%,
+                                                    rgba(200,200,200, 0)));
+  height: 100%;
+  width: 1px;
+}
+
+.faded-vertical-divider-light {
+  @include background-image(linear-gradient(90deg, rgba(255,255,255, 0) 0%,
+                                                    rgba(255,255,255, 0.6) 50%,
+                                                    rgba(255,255,255, 0)));
+  height: 100%;
+  width: 1px;
+}
+
+.vertical-divider {
+  @extend .faded-vertical-divider;
+  position: relative;
+
+  &::after {
+    @extend .faded-vertical-divider-light;
+    content: "";
+    display: block;
+    position: absolute;
+    left: 1px;
+  }
+}
+
+.horizontal-divider {
+  border: none;
+  @extend .faded-hr-divider;
+  position: relative;
+
+  &::after {
+    @extend .faded-hr-divider-light;
+    content: "";
+    display: block;
+    position: absolute;
+    top: 1px;
+  }
+}
+
+.fade-right-hr-divider {
+  @include background-image(linear-gradient(180deg, rgba(200,200,200, 0) 0%,
+                                                    rgba(200,200,200, 1)));
+  border: none;
+}
+
+.fade-left-hr-divider {
+  @include background-image(linear-gradient(180deg, rgba(200,200,200, 1) 0%,
+                                                    rgba(200,200,200, 0)));
+  border: none;
+}
+
+// ====================
+
+// inherited - ui
+.window {
+  @include clearfix();
+  box-shadow: 0 1px 1px $shadow-l1;
+  border-radius: 3px;
+  margin-bottom: $baseline;
+  border: 1px solid $gray-l2;
+  background: $white;
+}
+
+// ====================
+
+// mixins - grandfathered
+@mixin button {
+  @include transition(background-color 0.15s, box-shadow 0.15s);
+  @extend %t-action3;
+  @extend %t-strong;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, .3) inset, 0 0 0 $transparent;
+  display: inline-block;
+  padding: ($baseline/5) $baseline ($baseline/4);
+
+  &.disabled, &.is-disabled {
+    border: 1px solid $gray-l1 !important;
+    border-radius: 3px !important;
+    background: $gray-l1 !important;
+    color: $gray-d1 !important;
+    pointer-events: none;
+    cursor: none;
+    &:hover, &:focus {
+      box-shadow: 0 0 0 0 !important;
+    }
+  }
+
+  &:hover, &:focus, &:active {
+    box-shadow: 0 1px 0 rgba(255, 255, 255, .3) inset, 0 1px 1px rgba(0, 0, 0, .15);
+  }
+}
+
+@mixin green-button {
+  @include button;
+  @include linear-gradient(top, rgba(255, 255, 255, .3), rgba(255, 255, 255, 0));
+  box-shadow: 0 1px 0 rgba(255, 255, 255, .3) inset;
+  border: 1px solid $green-d1;
+  border-radius: 3px;
+  background-color: $green;
+  color: $white;
+
+  &:hover, &:focus {
+    background-color: $green-s1;
+    color: $white;
+  }
+
+  &.disabled, &.is-disabled {
+    border: 1px solid $green-l3 !important;
+    background: $green-l3 !important;
+    color: $white !important;
+    box-shadow: none;
+  }
+}
+
+@mixin blue-button {
+  @include button;
+  @include linear-gradient(top, rgba(255, 255, 255, .3), rgba(255, 255, 255, 0));
+  border: 1px solid $blue-d1;
+  border-radius: 3px;
+  background-color: $blue;
+  color: $white;
+
+  &:hover, &:focus, &:active {
+    background-color: $blue-s2;
+    color: $white;
+  }
+
+  &.disabled, &.is-disabled {
+    box-shadow: none;
+    border: 1px solid $blue-l3 !important;
+    background: $blue-l3 !important;
+    color: $white !important;
+  }
+}
+
+@mixin red-button {
+  @include button;
+  @include linear-gradient(top, rgba(255, 255, 255, .3), rgba(255, 255, 255, 0));
+  border: 1px solid $red-d1;
+  border-radius: 3px;
+  background-color: $red;
+  color: $white;
+
+  &:hover, &:focus, &:active {
+    background-color: $red-s1;
+    color: $white;
+  }
+
+  &.disabled, &.is-disabled {
+    box-shadow: none;
+    border: 1px solid $red-l3 !important;
+    background: $red-l3 !important;
+    color: $white !important;
+  }
+}
+
+@mixin pink-button {
+  @include button;
+  @include linear-gradient(top, rgba(255, 255, 255, .3), rgba(255, 255, 255, 0));
+  border: 1px solid $pink-d1;
+  border-radius: 3px;
+  background-color: $pink;
+  color: $white;
+
+  &:hover, &:focus, &:active {
+    background-color: $pink-s1;
+    color: $white;
+  }
+
+  &.disabled, &.is-disabled {
+    box-shadow: none;
+    border: 1px solid $pink-l3 !important;
+    background: $pink-l3 !important;
+    color: $white !important;
+  }
+}
+
+@mixin orange-button {
+  @include button;
+  @include linear-gradient(top, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0) 60%);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, .3) inset;
+  border: 1px solid $orange-d1;
+  border-radius: 3px;
+  background-color: $orange;
+  color: $gray-d2;
+
+  &:hover, &:focus {
+    background-color: $orange-s2;
+    color: $gray-d2;
+  }
+
+  &.disabled, &.is-disabled {
+    border: 1px solid $orange-l3 !important;
+    background: $orange-l2 !important;
+    color: $gray-l1 !important;
+    box-shadow: none;
+  }
+}
+
+@mixin white-button {
+  @include button;
+  @include linear-gradient(top, rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0));
+  box-shadow: 0 1px 0 rgba(255, 255, 255, .3) inset;
+  border: 1px solid $mediumGrey;
+  border-radius: 3px;
+  background-color: #dfe5eb;
+  color: rgb(92, 103, 122);
+  text-shadow: 0 1px 0 rgba(255, 255, 255, .5);
+
+  &:hover, &:focus {
+    background-color: rgb(222, 236, 247);
+    color: rgb(92, 103, 122);
+  }
+}
+
+@mixin grey-button {
+  @include button;
+  @include linear-gradient(top, rgba(255, 255, 255, .3), rgba(255, 255, 255, 0));
+  box-shadow: 0 1px 0 rgba(255, 255, 255, .3) inset;
+  border: 1px solid $gray-d2;
+  border-radius: 3px;
+  background-color: #d1dae3;
+  color: #6d788b;
+
+  &:hover {
+    background-color: #d9e3ee;
+    color: #6d788b;
+  }
+}
+
+.gray-button {
+  @include button;
+  @include linear-gradient(top, $white-t1, rgba(255, 255, 255, 0));
+  box-shadow: 0 1px 0 $white-t1 inset;
+  border: 1px solid $gray-d1;
+  border-radius: 3px;
+  background-color: $gray-d2;
+  color: $gray-l3;
+
+  &:hover, &:focus {
+    background-color: $gray-d3;
+    color: $white;
+  }
+}
+
+// only needed for course updates
+@mixin edit-box {
+  box-shadow: 0 1px 0 rgba(255, 255, 255, .2) inset;
+  padding: 15px 20px;
+  border-radius: 3px;
+  background-color: $lightBluishGrey2;
+  color: #3c3c3c;
+
+  label {
+    color: $baseFontColor;
+  }
+
+  input,
+  textarea {
+    border: 1px solid $darkGrey;
+  }
+
+  textarea {
+    min-height: 80px;
+  }
+
+  h5 {
+    @extend %t-strong;
+    margin-bottom: 8px;
+    color: $white;
+  }
+
+  .row {
+    margin-bottom: ($baseline/2);
+    padding: 0;
+    border: none;
+  }
+
+  .save-button {
+    @include blue-button;
+    margin-top: 0;
+  }
+
+  .cancel-button {
+    @include white-button;
+    margin-top: 0;
+  }
+}
+
+// ====================
+
+// sunsetted mixins
+@mixin active {
+  @include linear-gradient(top, rgba(255, 255, 255, .4), rgba(255, 255, 255, 0));
+  box-shadow: 0 -1px 0 $shadow inset, 0 1px 0 $white inset;
+  background-color: rgba(255, 255, 255, .3);
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+}

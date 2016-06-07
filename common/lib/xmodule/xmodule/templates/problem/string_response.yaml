@@ -1,0 +1,43 @@
+---
+metadata:
+    display_name: Text Input
+    markdown: |
+        In text input problems, also known as "fill-in-the-blank" problems, learners enter text into a response field. The text can include letters and characters such as punctuation marks. The text that the learner enters must match your specified answer text exactly. You can specify more than one correct answer. Learners must enter a response that matches one of the correct answers exactly.
+        
+        When you add the problem, be sure to select Settings to specify a Display Name and other values that apply.
+
+        You can use the following example problem as a model.
+
+        >>What was the first post-secondary school in China to allow both male and female students?<<
+
+        = Nanjing Higher Normal Institute
+        or= National Central University
+        or= Nanjing University
+
+        [explanation]
+        Nanjing Higher Normal Institute first admitted female students in 1920.
+        [explanation]
+
+data: |
+    <problem>
+    <p>In text input problems, also known as "fill-in-the-blank" problems, 
+    learners enter text into a response field. The text that the learner enters 
+    must match your specified answer text exactly. You can specify more than 
+    one correct answer. Learners must enter a response that matches one of the 
+    correct answers exactly.</p>
+    <p>When you add the problem, be sure to select <strong>Settings</strong> 
+    to specify a <strong>Display Name</strong> and other values that apply.</p>
+    <p> You can use the following example problem as a model.</p>
+      <p>What was the first post-secondary school in China to allow both male and female students?</p>
+      <stringresponse answer="Nanjing Higher Normal Institute" type="ci" >
+        <additional_answer>National Central University</additional_answer>
+        <additional_answer>Nanjing University</additional_answer>
+        <textline label="What was the first post-secondary school in China to allow both male and female students?" size="40"/>
+      </stringresponse>
+    <solution>
+      <div class="detailed-solution">
+        <p>Explanation</p>
+        <p>Nanjing Higher Normal Institute first admitted female students in 1920.</p>
+      </div>
+    </solution>
+    </problem>

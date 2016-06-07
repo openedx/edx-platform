@@ -1,0 +1,28 @@
+<%! from django.utils.translation import ugettext as _ %>
+<%inherit file="/main.html" />
+<%namespace name='static' file='../static_content.html'/>
+<%block name="bodyclass">courseware</%block>
+<%block name="pagetitle">${_("Courseware")}</%block>
+
+<%block name="headextra">
+<%static:css group='style-course-vendor'/>
+<%static:css group='style-course'/>
+</%block>
+
+<%include file="/courseware/course_navigation.html" args="active_page='courseware'" />
+
+<section class="container">
+  <section class="outside-app">
+    <h1>
+      ${_('There has been an error on the {platform_name} servers').format(
+          platform_name=u'<span class="edx">{}</span>'.format(settings.PLATFORM_NAME)
+      )}
+    </h1>
+    <p>
+      ${_("We're sorry, this module is temporarily unavailable. Our staff is working to fix "
+      "it as soon as possible. Please email us at {tech_support_email} to report any problems or downtime.").format(
+      tech_support_email=u'<a href=\"mailto:{0}\">{0}</a>'.format(settings.TECH_SUPPORT_EMAIL)
+      )}
+    </p>
+  </section>
+</section>

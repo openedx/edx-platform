@@ -1,0 +1,23 @@
+<div id="chemicalequationinput_${id}" class="chemicalequationinput">
+    <div class="script_placeholder" data-src="${previewer}"/>
+
+    <div class="${status.classname}" id="status_${id}">
+
+    <input type="text" name="input_${id}" id="input_${id}" aria-label="${label}" aria-describedby="answer_${id}" data-input-id="${id}" value="${value|h}"
+   % if size:
+   size="${size}"
+   % endif
+   />
+
+      <p class="status" aria-describedby="input_${id}">
+        ${value|h} -
+        ${status.display_name}
+      </p>
+
+      <div id="input_${id}_preview" class="equation"></div>
+  <p id="answer_${id}" class="answer"></p>
+
+% if status in ['unsubmitted', 'correct', 'incorrect', 'partially-correct', 'incomplete']:
+</div>
+% endif
+</div>

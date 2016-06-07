@@ -1,0 +1,24 @@
+<div id="page-alert">
+    <div class="wrapper wrapper-alert wrapper-alert-announcement is-shown">
+        <div class="alert announcement has-actions">
+            <i class="feedback-symbol icon fa fa-bullhorn"></i>
+
+            <div class="copy">
+                <h2 class="title title-3">This course was created as a re-run. Some manual configuration is needed.</h2>
+
+                <p>No course content is currently visible, and no students are enrolled. Be sure to review and reset all
+                    dates, including the Course Start Date; set up the course team; review course updates and other
+                    assets for dated material; and seed the discussions and wiki.</p>
+            </div>
+
+            <ul class="nav-actions">
+                <li class="action action-dismiss">
+                    <a href="#" class="button dismiss-button" data-dismiss-link="dummy_dismiss_url">
+                        <i class="icon icon fa fa-times-circle"></i>
+                        <span class="button-copy">Dismiss</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>

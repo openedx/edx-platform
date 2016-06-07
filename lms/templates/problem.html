@@ -1,0 +1,40 @@
+<%! from django.utils.translation import ugettext as _ %>
+
+<%namespace name='static' file='static_content.html'/>
+<h3 class="hd hd-2 problem-header">
+  ${ problem['name'] }
+</h3>
+
+<div class="problem-progress"></div>
+
+<div class="problem">
+    <div aria-live="polite">
+        ${ problem['html'] }
+    </div>
+  <div class="action">
+    <input type="hidden" name="problem_id" value="${ problem['name'] }" />
+    % if demand_hint_possible:
+    <div class="problem-hint" aria-live="polite"></div>
+    % endif
+    % if check_button:
+    <button class="check ${ check_button }" data-checking="${ check_button_checking }" data-value="${ check_button }"><span class="check-label">${ check_button }</span><span class="sr"> ${_("your answer")}</span></button>
+    % endif
+    % if demand_hint_possible:
+    <button class="hint-button" data-value="${_('Hint')}">${_('Hint')}</button>
+    % endif
+    % if reset_button:
+    <button class="reset" data-value="${_('Reset')}">${_('Reset')}<span class="sr"> ${_("your answer")}</span></button>
+    % endif
+    % if save_button:
+    <button class="save" data-value="${_('Save')}">${_('Save')}<span class="sr"> ${_("your answer")}</span></button>
+    % endif
+    % if answer_available:
+    <button class="show"><span class='sr'>${_('Toggle Answer Visibility')}</span><span class="show-label">${_('Show Answer')}</span></button>
+    % endif
+    % if attempts_allowed :
+    <div class="submission_feedback" aria-live="polite">
+      ${_("You have used {num_used} of {num_total} submissions").format(num_used=attempts_used, num_total=attempts_allowed)}
+    </div>
+    % endif
+  </div>
+</div>

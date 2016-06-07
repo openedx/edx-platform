@@ -1,0 +1,132 @@
+.wrapper-preview-menu {
+  @include clearfix();
+  @include box-sizing(border-box);
+  margin: 0 auto 0;
+  padding: ($baseline*0.75);
+  background-color: $gray-l3;
+
+  @media print {
+    display: none;
+  }
+
+  .preview-menu {
+    @extend %inner-wrapper;
+    width: auto;
+  }
+
+  .preview-actions {
+    display: inline-block;
+
+    .action-preview {
+      display: inline-block;
+
+      .action-preview-label {
+        display: inline-block;
+        margin-right: ($baseline/2);
+        margin-bottom: 0;
+        vertical-align: middle;
+      }
+
+      .action-preview-select {
+        margin-right: $baseline;
+      }
+
+      .action-preview-username-container {
+        display: none;
+
+        .action-preview-username {
+          vertical-align: middle;
+          height: 25px;
+        }
+      }
+    }
+  }
+
+  .preview-specific-student-notice {
+    margin-top: ($baseline/2);
+    font-size: 90%;
+  }
+}
+.proctored_exam_status {
+  // STATE: Fixed to viewport (used for scrolling)
+  &.is-fixed {
+    @extend %ui-depth4;
+    box-shadow: 0 3px 3px $shadow-d1;
+    position: fixed;
+    top: 0;
+    width: 100%;
+  }
+  .exam-timer {
+    background-color: rgb(229, 234, 236);
+    padding: $baseline ($baseline*2);
+    border-left: 4px solid $m-blue-l1;
+    margin: 0 auto;
+    color: $gray-d2;
+    @include font-size(14);
+    .exam-text {
+      display: inline-block;
+      width: calc(100% - 250px);
+    }
+    a {
+      color: rgb(9, 121, 186);
+    }
+    .pull-right {
+      color: $gray-d1;
+      b {
+        color: $gray-d3;
+      }
+    }
+    .turn_in_exam {
+      margin-top: -6px;
+    }
+    &.low-time {
+      color: $gray-l3;
+      background-color: rgb(79, 88, 92);
+      a {
+        color: $white;
+        text-decoration: underline;
+      }
+      .pull-right {
+        color: $gray-l3;
+        b {
+          color: $white;
+        }
+
+        .exam-button-turn-in-exam {
+          background-color: transparent;
+          border: 1px solid $white;
+          color: $white;
+
+          &:hover {
+            border: 1px solid $white;
+            background-color: $white;
+            color: $action-primary-bg;
+          }
+        }
+      }
+    }
+    &.warning {
+      border-left-color: $warning-color;
+    }
+    &.critical {
+      border-left-color: $alert-color;
+      color: $white;
+    }
+    .exam-button-turn-in-exam {
+      @extend %btn-pl-primary-base;
+      @extend %t-action3;
+      @extend %t-weight4;
+      margin-right: $baseline;
+      border: 0;
+      background-image: none;
+      padding: ($baseline/5) ($baseline*.75);
+      box-shadow: none;
+      text-shadow: none;
+
+      &:hover,
+      &:focus {
+        border: 0;
+      }
+    }
+  }
+}

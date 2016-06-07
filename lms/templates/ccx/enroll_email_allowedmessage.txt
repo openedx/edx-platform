@@ -1,0 +1,43 @@
+<%! from django.utils.translation import ugettext as _ %>
+
+${_("Dear student,")}
+
+${_("You have been invited to join {course_name} at {site_name} by a "
+	"member of the course staff.").format(
+		course_name=course.display_name,
+		site_name=site_name
+	)}
+% if is_shib_course:
+% if auto_enroll:
+
+${_("To access the course visit {course_url} and login.").format(course_url=course_url)}
+% elif course_about_url is not None:
+
+${_("To access the course visit {course_about_url} and register for the course.").format(
+		course_about_url=course_about_url)}
+% endif
+% else:
+
+${_("To finish your registration, please visit {registration_url} and fill "
+	"out the registration form making sure to use {email_address} in the E-mail field.").format(
+		registration_url=registration_url,
+		email_address=email_address
+	)}
+% if auto_enroll:
+${_("Once you have registered and activated your account, you will see "
+	"{course_name} listed on your dashboard.").format(
+		course_name=course.display_name
+	)}
+% elif course_about_url is not None:
+${_("Once you have registered and activated your account, visit {course_about_url} "
+	"to join the course.").format(course_about_url=course_about_url)}
+% else:
+${_("You can then enroll in {course_name}.").format(course_name=course.display_name)}
+% endif
+% endif
+
+----
+${_("This email was automatically sent from {site_name} to "
+	"{email_address}").format(
+		site_name=site_name, email_address=email_address
+	)}

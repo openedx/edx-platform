@@ -1,0 +1,167 @@
+// -------------------
+// navigation - header
+// -------------------
+
+// Override global a rules
+.forum-nav-browse {
+  color: $black !important;
+}
+
+// Override global label rules
+.forum-nav-search label {
+  margin-bottom: 0;
+}
+
+// Override global input rules
+.forum-nav-search-input {
+  box-shadow: none !important;
+  border: 1px solid $forum-color-border !important;
+  border-radius: 3px !important;
+  height: auto !important;
+  @include padding-left($baseline/4 !important);
+  @include padding-right($baseline/2 + 12px !important); // Leave room for icon
+  font-size: 12px !important;
+}
+
+// Firefox does not compute the correct containing box for absolute positioning
+// of .forum-nav-search .icon, so there's an extra div to make it happy
+.forum-nav-search-ff-position-fix {
+  position: relative;
+}
+
+// ------------------------
+// navigation - browse menu
+// ------------------------
+
+// Override global a rules
+.forum-nav-browse-title {
+  color: inherit !important;
+}
+
+// Override global label rules
+.forum-nav-browse-filter label {
+  margin-bottom: 0;
+}
+
+// Override global input rules
+.forum-nav-browse-filter-input {
+  box-shadow: none !important;
+  border-radius: 3px !important;
+  height: auto !important;
+  padding-left: ($baseline/4) !important;
+  padding-right: ($baseline/2 + 12px) !important; // Leave room for icon
+  font-size: 12px !important;
+}
+
+// Override global ul rules
+.forum-nav-browse-menu, .forum-nav-browse-submenu {
+  margin: 0;
+}
+
+.forum-nav-browse-menu {
+  padding-left: 0;
+}
+
+// --------------------------------
+// navigation - sort and filter bar
+// --------------------------------
+
+// Override global label rules
+.forum-nav-filter-main, .forum-nav-filter-cohort, .forum-nav-sort {
+  font: inherit;
+  line-height: 1em;
+  margin-bottom: 0;
+}
+
+// Override global select rules
+.forum-nav-filter-main-control, .forum-nav-filter-cohort-control, .forum-nav-sort-control {
+  font: inherit;
+}
+
+// --------------------------------
+// navigation - thread list
+// --------------------------------
+
+// The following rules would be unnecessary but for broadly scoped rules defined
+// elsewhere in our CSS.
+
+// Override global ul rules
+.forum-nav-thread-list, .forum-nav-thread-labels {
+  margin: 0;
+  padding-left: 0;
+}
+
+li[class*=forum-nav-thread-label-] {
+  // Override global span rules
+  span {
+    color: inherit;
+  }
+
+  // Override clearfix stuff in .sidebar ul li rules
+  &:before, &:after {
+    display: none !important;
+  }
+}
+
+// -------------
+// new post form
+// -------------
+
+.forum-new-post-form,
+.edit-post-form {
+  // Override global label rules
+  .post-type {
+    text-shadow: none;
+  }
+
+  .post-type, .topic-filter-label {
+    margin-bottom: 0;
+  }
+
+  // Override global ul rules
+  .topic-menu {
+    padding-left: 0;
+  }
+
+  .topic-menu, .topic-submenu {
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+
+  // Override global span rules
+  .post-topic-button .drop-arrow {
+    line-height: 36px;
+  }
+
+  .topic-title {
+    line-height: 14px;
+  }
+}
+
+// -------
+// Actions
+// -------
+
+.discussion.container, .discussion-module {
+
+  // Override courseware
+  .post-actions-list, .response-actions-list, .comment-actions-list {
+    @extend %t-copy-sub2;
+    padding-left: 0 !important;
+  }
+
+  // Override global span
+  .action-label span, .action-icon span {
+    color: inherit;
+  }
+}
+
+// -------
+// Inline Discussion Module Overrides
+// -------
+.discussion-module {
+  
+  .wrapper-post-header .post-title {
+    margin-bottom: 0 !important; // overrides "#seq_content h1" styling
+  }
+}

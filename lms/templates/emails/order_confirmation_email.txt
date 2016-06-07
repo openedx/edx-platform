@@ -1,0 +1,43 @@
+<%! from django.utils.translation import ugettext as _ %>
+${_("Hi {name},").format(name=order.user.profile.name)}
+
+${_("Your payment was successful. You will see the charge below on your next credit or debit card statement under the company name {merchant_name}.").format(merchant_name=settings.CC_MERCHANT_NAME)}
+
+% if marketing_link('FAQ'):
+${_("If you have billing questions, please read the FAQ ({faq_url}) or contact {billing_email}.").format(billing_email=payment_support_email, faq_url=marketing_link('FAQ'))}
+% else:
+${_("If you have billing questions, please contact {billing_email}.").format(billing_email=payment_support_email)}
+% endif
+
+${_("Thank you,")}
+
+% if payment_email_signature:
+${payment_email_signature}
+% else:
+${_("The {platform_name} Team").format(platform_name=platform_name)}
+% endif
+
+
+${_("Your order number is: {order_number}").format(order_number=order.id)}
+
+${_("The items in your order are:")}
+
+${_("Quantity - Description - Price")}
+% for order_item in order_items:
+    ${order_item.qty} - ${order_item.line_desc} - ${currency_symbol}${order_item.line_cost}
+% endfor
+
+${_("Total billed to credit/debit card: {currency_symbol}{total_cost}").format(total_cost=order.total_cost, currency_symbol=currency_symbol)}
+
+% if has_billing_info:
+${order.bill_to_cardtype} ${_("#:")} ${order.bill_to_ccnum}
+${order.bill_to_first} ${order.bill_to_last}
+${order.bill_to_street1}
+${order.bill_to_street2}
+${order.bill_to_city}, ${order.bill_to_state} ${order.bill_to_postalcode}
+${order.bill_to_country.upper()}
+% endif
+
+% for order_item in order_items:
+${order_item.additional_instruction_text()}
+% endfor

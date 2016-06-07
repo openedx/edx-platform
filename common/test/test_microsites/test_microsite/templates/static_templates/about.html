@@ -1,0 +1,63 @@
+<%! from django.core.urlresolvers import reverse %>
+<%namespace name='static' file='../../../static_content.html'/>
+
+<%inherit file="../../../main.html" />
+
+<%block name="title"><title>About edX</title></%block>
+
+<section class="container about">
+  <nav>
+    <a href="${reverse('about_edx')}" class="active">Vision</a>
+    <a href="${reverse('faq_edx')}">Faq</a>
+    <a href="${reverse('press')}">Press</a>
+    <a href="${reverse('contact')}">Contact</a>
+  </nav>
+
+  <section class="vision">
+    ## <div class="our-mission">
+    ##   <div class="logo">
+    ##     <img src="${static.url('images/edx-theme/edx-logo-bw.png')}">
+    ##   </div>
+    ##   <h2 class="mission-quote">&ldquo;The mission of <span class="edx">edX</span> is to enhance human fulfillment worldwide through online ## learning, transforming education in quality, efficiency and scale through technology and research, for the benefit of campus-based ## students and the worldwide community of online learners.&rdquo;</h2>
+    ## </div>
+
+    <section class="message left">
+      <div class="photo">
+        <img src="${static.url('images/about_1.jpg')}">
+      </div>
+      <article>
+      <h2>About <span class="edx">edX</span></h2>
+        <p>Open edX is a not-for-profit enterprise of its founding partners Harvard University and the Massachusetts Institute of Technology that features learning designed specifically for interactive study via the web. Based on a long history of collaboration and their shared educational missions, the founders are creating a new online-learning experience with online courses that reflect their disciplinary breadth.  Along with offering online courses, the institutions will use edX to research how students learn and how technology can transform learning&ndash;both on-campus and worldwide. Anant Agarwal, former Director of MIT's Computer Science and Artificial Intelligence Laboratory, serves as the first president of edX. EdX's goals combine the desire to reach out to students of all ages, means, and nations, and to deliver these teachings from a faculty who reflect the diversity of its audience. EdX is based in Cambridge, Massachusetts and is governed by MIT and Harvard.</p>
+      </article>
+      <hr class="fade-right-hr-divider">
+    </section>
+
+    <section class="message left">
+      <div class="photo">
+        <img src="${static.url('images/university/harvard/about-harvard.jpg')}">
+      </div>
+      <article>
+        <h2>Harvard University</h2>
+        <p>Harvard University is devoted to excellence in teaching, learning, and research, and to developing leaders in many disciplines who make a difference globally. Harvard faculty are engaged with teaching and research to push the boundaries of human knowledge.  The University has twelve degree-granting Schools in addition to the Radcliffe Institute for Advanced Study.</p>
+        <p>Established in 1636, Harvard is the oldest institution of higher education in the United States. The University, which is based in Cambridge and Boston, Massachusetts, has an enrollment of over 20,000 degree candidates, including undergraduate, graduate, and professional students. Harvard has more than 360,000 alumni around the world.</p>
+      </article>
+      <hr class="fade-left-hr-divider">
+    </section>
+
+    <section class="message left">
+      <div class="photo">
+        <img src="${static.url('images/university/mit/about-mit.jpg')}">
+      </div>
+      <article>
+        <h2>Massachusetts Institute of Technology</h2>
+        <p>The Massachusetts Institute of Technology &mdash; a coeducational, privately endowed research university founded in 1861 &mdash; is dedicated to advancing knowledge and educating students in science, technology, and other areas of scholarship that will best serve the nation and the world in the 21st century. The Institute has close to 1,000 faculty and 10,000 undergraduate and graduate students. It is organized into five Schools: Architecture and Urban Planning; Engineering; Humanities, Arts, and Social Sciences; Sloan School of Management; and Science.</p>
+        <p>MIT's commitment to innovation has led to a host of scientific breakthroughs and technological advances. Achievements of the Institute's faculty and graduates have included the first chemical synthesis of penicillin and vitamin A, the development of inertial guidance systems, modern technologies for artificial limbs, and the magnetic core memory that made possible the development of digital computers. 78 alumni, faculty, researchers and staff have won Nobel Prizes.</p>
+        <p>Current areas of research and education include neuroscience and the study of the brain and mind, bioengineering, cancer, energy, the environment and sustainable development, information sciences and technology, new media, financial technology, and entrepreneurship.</p>
+      </article>
+    </section>
+
+    <section class="partners">
+    </section>
+  </section>
+</section>
+

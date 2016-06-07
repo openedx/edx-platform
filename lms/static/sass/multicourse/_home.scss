@@ -1,0 +1,584 @@
+@import '../base/grid-settings';
+@import 'neat/neat'; // lib - Neat
+
+$title-left-margin: grid-width(3);
+$button-size: ($baseline*2.75);
+$course-search-input-height: ($button-size);
+
+.home {
+  padding: 0;
+
+  > .container {
+    @include box-sizing(border-box);
+    width: flex-grid(12);
+  }
+
+  > header {
+    @include linear-gradient($homepage__header--gradient__color--alpha, $homepage__header--gradient__color--bravo);
+    @include clearfix();
+    background-size: cover;
+    background-image: $homepage-bg-image;
+    box-shadow: 0 1px 0 0 $course-header-bg, inset 0 -1px 5px 0 $shadow-l1;
+    overflow: hidden;
+    padding: 0;
+    width: flex-grid(12);
+
+    .outer-wrapper {
+      @include clearfix();
+      @extend .animation-home-header-pop-up;
+      position: relative;
+      margin: 0 auto;
+      padding: ($baseline*3);
+      max-width: ($baseline*60);
+
+      @include media($bp-tiny) {
+        padding: ($baseline/2);
+      }
+    }
+
+    .title {
+      @include span-columns(8);
+      @include shift(2);
+      @include box-sizing(border-box);
+      @include transition(all 0.2s linear 0s);
+      position: relative;
+      box-shadow: 0 4px 5px 0 rgba(0, 0, 0, 0.5);
+      background: $white;
+      padding: ($baseline) ($baseline*1.5);
+      min-height: ($baseline*6);
+      vertical-align: top;
+
+      // STATE: hover and focus
+      &:hover, &:focus {
+        .actions {
+          display: none;
+        }
+      }
+
+      // 8 column layout
+      @include media($bp-medium) {
+        @include span-columns(6);
+        @include shift(1);
+      }
+
+      // 4 column layout
+      @include media($bp-small) {
+        @include fill-parent();
+        @include shift(0);
+      }
+
+      // 4 column layout
+      @include media($bp-tiny) {
+        @include fill-parent();
+        @include shift(0);
+      }
+
+      > .heading-group {
+        @include left(0);
+        @include box-sizing(border-box);
+        @include transition(all 0.2s linear 0s);
+        @include text-align(left);
+        display: inline-block;
+        top: 0;
+        opacity: 1.0;
+        padding-bottom: ($baseline);
+
+        h1 {
+          @include text-align(left);
+          margin-bottom: 0;
+          text-shadow: 0 1px rgba(255,255,255, 0.6);
+          text-transform: none;
+        }
+
+        p {
+          @extend h2;
+          margin-bottom: 0;
+          text-transform: none;
+          font-style: italic;
+        }
+      }
+
+      .course-search {
+        padding: ($baseline) 0;
+
+        .search-input {
+          @include float(left);
+          @include padding-right($button-size);
+          @include padding-left($baseline*0.5);
+          @extend %ui-depth1;
+          @extend %t-title5;
+          border: 2px solid $gray-l3;
+          border-radius: 3px;
+          box-shadow: none;
+          width: 100%;
+          height: $course-search-input-height;
+          color: $black;
+          font-style: normal;
+          font-weight: normal;
+
+          // STATE: focus
+          &:focus {
+            @extend %no-outline;
+            border-color: $m-blue-d1;
+          }
+        }
+
+        .search-button {
+          @include right($baseline*1.5);
+          @include border-radius(1px, 3px, 3px, 1px);
+          @extend %ui-depth2;
+          @extend %t-icon3;
+          @extend %t-strong;
+          position: absolute;
+          border: 2px solid $m-blue-d1;
+          box-shadow: none;
+          background: $m-blue-d5;
+          padding: 0 ($baseline*0.7);
+          height: $course-search-input-height;
+          color: $white;
+          text-shadow: none;
+
+          // STATE: hover and focus
+          &:hover, &:focus {
+            background: $m-blue-l1;
+          }
+        }
+      }
+    }
+
+    .actions {
+      display: none;
+    }
+
+    .media {
+      background: $white;
+      background: $course-header-bg;
+      border: 1px solid $border-color-3;
+      @include border-left(0);
+      @include box-sizing(border-box);
+      // box-shadow: 0 4px 25px 0 rgba(0,0,0, 0.5);
+      height: 120px;
+      @include float(left);
+      padding: 4px;
+      position: relative;
+      vertical-align: top;
+      width: flex-grid(2) + flex-gutter();
+      z-index: 2;
+
+      &:hover, &:focus {
+        text-decoration: underline;
+      }
+
+      .hero {
+        height: 100%;
+        overflow: hidden;
+        position: relative;
+        background: url($video-thumb-url) center no-repeat;
+        background-size: cover;
+
+        .play-intro {
+          @include background-image(linear-gradient(-90deg, rgba(0,0,0, 0.65), rgba(0,0,0, 0.75)));
+          border-radius: 4px;
+          box-shadow: 0 1px 12px 0 $shadow-d1;
+          @include box-sizing(border-box);
+          border: 2px solid rgba(255,255,255, 0.8);
+          height: 60px;
+          @include left(50%);
+          margin-top: -30px;
+          @include margin-left(-($baseline*1.5));
+          position: absolute;
+          top: 50%;
+          @include transition(all 0.15s linear 0s);
+          width: 60px;
+
+          &::after {
+            color: $white;
+            color: rgba(255,255,255, 0.8);
+            content: "\25B6";
+            display: block;
+            font: normal 2em/1em $sans-serif;
+            @include left(50%);
+            @include margin-left(-11px);
+            margin-top: -16px;
+            position: absolute;
+            text-shadow: 0 -1px rgba(0,0,0, 0.8);
+            top: 50%;
+          }
+        }
+
+        img {
+          display: block;
+          width: 100%;
+        }
+      }
+
+      &:hover, &:focus {
+        .play-intro {
+          @include background-image(linear-gradient(-90deg, rgba(0,0,0, 0.75), rgba(0,0,0, 0.8)));
+          box-shadow: 0 1px 12px 0 rgba(0,0,0, 0.5);
+          border-color: rgba(255,255,255, 0.9);
+
+          &::after {
+            color: $white;
+            color: rgba(255,255,255, 1);
+          }
+        }
+      }
+    }
+  }
+
+  .highlighted-courses {
+    @include box-sizing(border-box);
+    margin-bottom: ($baseline*2);
+    position: relative;
+    width: flex-grid(12);
+    z-index: 1;
+
+    > h2 {
+      @include background-image(linear-gradient(-90deg, rgb(250,250,250), rgb(230,230,230)));
+      border: 1px solid $border-color-2;
+      border-radius: 4px;
+      border-top-color: $border-color-1;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255, 0.4), 0 0px 12px 0 $shadow;
+      color: $lighter-base-font-color;
+      letter-spacing: 1px;
+      margin-bottom: 0px;
+      margin-top: -15px;
+      padding: 10px 10px 8px;
+      text-align: center;
+      text-transform: uppercase;
+      text-shadow: 0 1px rgba(255,255,255, 0.6);
+    }
+  }
+
+  .university-partners {
+    border-bottom: 1px solid $border-color-2;
+    margin-bottom: 0px;
+    overflow: hidden;
+    position: relative;
+    width: flex-grid(12);
+
+    &::before {
+      @extend %faded-hr-divider-medium;
+      content: "";
+      display: block;
+    }
+
+    &::after {
+      @extend %faded-hr-divider-medium;
+      content: "";
+      display: block;
+    }
+
+
+    hr {
+      @extend %faded-hr-divider-light;
+      border: none;
+      margin: 0;
+      position: relative;
+      z-index: 2;
+
+      &::after {
+        @extend %faded-hr-divider;
+        bottom: 0px;
+        content: "";
+        display: block;
+        position: absolute;
+        top: -1px;
+      }
+    }
+
+    .partners {
+      margin: 0 auto;
+      padding: 20px 0px;
+      text-align: center;
+
+      li.partner {
+        display: inline-block;
+        padding: 0px 30px;
+        position: relative;
+        vertical-align: middle;
+        overflow: hidden;
+
+        &::before {
+          @extend %faded-vertical-divider;
+          content: "";
+          display: block;
+          height: 80px;
+          @include right(0);
+          position: absolute;
+          top: -5px;
+          width: 1px;
+        }
+
+        &::after {
+          @extend %faded-vertical-divider-light;
+          content: "";
+          display: block;
+          height: 80px;
+          @include right(1px);
+          position: absolute;
+          top: -5px;
+          width: 1px;
+        }
+
+        &:last-child {
+          &::before {
+            display: none;
+          }
+
+          &::after {
+            display: none;
+          }
+        }
+      }
+
+      a {
+        @include transition(all $tmg-f2 ease-in-out 0s);
+
+        &::before {
+          @include background-image(radial-gradient(50% 50%, circle closest-side, rgba(255,255,255, 1) 0%, rgba(255,255,255, 0) 100%));
+          content: "";
+          display: block;
+          height: 200px;
+          @include left(50%);
+          @include margin-left(-100px);
+          margin-top: -100px;
+          opacity: 0;
+          width: 200px;
+          position: absolute;
+          @include transition(all $tmg-f2 ease-in-out 0s);
+          top: 50%;
+          z-index: 1;
+        }
+
+        .name {
+          bottom: -60px;
+          @include left(0);
+          position: absolute;
+          text-align: center;
+          @include transition(all $tmg-f2 ease-in-out 0s);
+          width: 100%;
+          z-index: 2;
+
+          > span {
+            color: $base-font-color;
+            font: 700 italic 1.4em/1.4em $sans-serif;
+            text-shadow: 0 1px rgba(255,255,255, 0.6);
+            @include transition(all 0.15s ease-in-out 0s);
+
+            &:hover, &:focus {
+              color: $lighter-base-font-color;
+            }
+          }
+        }
+
+        img {
+          position: relative;
+          @include transition(all $tmg-f2 ease-in-out 0s);
+          vertical-align: middle;
+          z-index: 2;
+        }
+
+        &:hover, &:focus {
+          text-decoration: none;
+
+          &::before {
+            opacity: 1.0;
+          }
+
+          .name {
+            bottom: 20px;
+          }
+
+          img {
+            top: -100px;
+          }
+        }
+      }
+    }
+
+    &.university-partners2x6 {
+      @include box-sizing(border-box);
+      width: flex-grid(12, 12);
+
+      .partners {
+        @include box-sizing(border-box);
+        @include clearfix();
+        @include margin-left(60px);
+        padding: 12px 0;
+
+        .partner {
+          @include box-sizing(border-box);
+          width: flex-grid(2, 12);
+          display: block;
+          @include float(left);
+          padding: 0 12px;
+
+          a {
+
+            img {
+              width: 100%;
+              height: auto;
+            }
+
+            .name > span {
+              font-size: 1.0em;
+            }
+
+            &:hover, &:focus {
+              .name {
+                bottom: 14px;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .more-info {
+    border: 1px solid $border-color-2;
+    margin-bottom: ($baseline*4);
+    width: flex-grid(12);
+
+    header {
+      @include background-image(linear-gradient(-90deg, rgb(250,250,250), rgb(230,230,230)));
+      border-bottom: 1px solid $border-color-2;
+      @include clearfix();
+      padding: 10px 20px 8px;
+      position: relative;
+
+      h2 {
+        @include float(left);
+        margin: 0;
+        text-shadow: 0 1px rgba(255,255,255, 0.6);
+      }
+
+      .action.action-mediakit {
+        @include float(right);
+        position: relative;
+        top: 1px;
+        font-family: $sans-serif;
+        font-size: 14px;
+        text-shadow: 0 1px rgba(255,255,255, 0.6);
+
+        &:after {
+          position: relative;
+          top: -1px;
+          display: inline-block;
+          @include margin(0, 0, 0, 5px);
+          content: "➤";
+          font-size: 11px;
+        }
+
+        .org-name {
+          color: $blue;
+          font-family: $sans-serif;
+          text-transform: none;
+        }
+      }
+    }
+
+    .news {
+      @include box-sizing(border-box);
+      box-shadow: inset 0 0 3px 0 rgba(0,0,0, 0.15);
+      padding: 20px;
+      width: flex-grid(12);
+
+      .blog-posts {
+        border-bottom: 1px solid $border-color-2;
+        margin-bottom: $baseline;
+        padding-bottom: $baseline;
+        @include clearfix();
+
+        > article {
+          border: 1px dotted transparent;
+          border-color: $border-color-2;
+          @include box-sizing(border-box);
+          @include clearfix();
+          @include float(left);
+          @include margin-right(flex-gutter());
+          padding: 10px;
+          @include transition(all 0.15s linear 0s);
+          width: flex-grid(4);
+
+          &:hover, &:focus {
+            background: $body-bg;
+            border: 1px solid $border-color-2;
+            box-shadow: inset 0 0 3px 0 $shadow-l1;
+          }
+
+          &:last-child {
+            @include margin-right(0);
+          }
+
+          .post-graphics {
+            border: 1px solid $border-color-1;
+            @include box-sizing(border-box);
+            display: block;
+            @include float(left);
+            height: 84px;
+            @include margin-right(flex-gutter());
+            overflow: hidden;
+            width: flex-grid(4);
+            vertical-align: top;
+
+            img {
+              min-height: 100%;
+              max-width: 100%;
+            }
+          }
+
+          .post-name {
+            @include float(left);
+            width: flex-grid(8);
+            vertical-align: top;
+
+            a {
+              color: $base-font-color;
+              font: 700 1em/1.2em $sans-serif;
+
+              &:hover, &:focus {
+                color: $blue;
+                text-decoration: underline;
+              }
+            }
+
+            .post-date {
+              color: $lighter-base-font-color;
+              display: none;
+              letter-spacing: 1px;
+            }
+          }
+        }
+      }
+
+      .press-links {
+        h3 {
+          display: inline;
+          font-family: $sans-serif;
+          font-weight: 700;
+          line-height: 1.6em;
+        }
+
+        a {
+          line-height: 1.6em;
+          font-family: $serif;
+          font-style: italic;
+          @include margin-left($baseline/2);
+
+          &.read-more {
+            @include float(right);
+            color: lighten($base-font-color, 50%);
+
+            &:hover, &:focus {
+              color: $blue;
+              text-decoration: underline;
+            }
+          }
+        }
+      }
+    }
+  }
+}

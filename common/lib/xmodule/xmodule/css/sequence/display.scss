@@ -1,0 +1,312 @@
+$sequence--border-color: #C8C8C8;
+$link-color: rgb(26, 161, 222) !default;
+// repeated extends - needed since LMS styling was referenced
+.block-link {
+  border-left: 1px solid lighten($sequence--border-color, 10%);
+  display: block;
+
+  &:hover, &:focus {
+    background: none;
+  }
+}
+
+.topbar {
+  @include clearfix();
+  border-bottom: 1px solid $sequence--border-color;
+
+  @media print {
+    display: none;
+  }
+
+  a {
+    &.block-link {
+      border-left: 1px solid lighten($sequence--border-color, 10%);
+      display: block;
+
+      &:hover, &:focus {
+        background: none;
+      }
+    }
+  }
+}
+
+%ui-clear-button  {
+  background-color: rgba(0,0,0,0);
+  background-image: none;
+  background-position: center 14px;
+  background-repeat: no-repeat;
+  border: none;
+  border-radius: 0;
+
+  background-clip: border-box;
+  box-shadow: none;
+  box-sizing: content-box;
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+}
+
+
+// ====================
+
+.sequence-nav {
+  // TODO (cpennington): This doesn't work anymore. XModules aren't able to
+  // import from external sources.
+  @extend .topbar;
+  margin: -4px 0 $baseline;
+  position: relative;
+  border-bottom: none;
+  z-index: 0;
+
+  @media print {
+    display: none;
+  }
+
+  .left-shadow {
+    @extend %ui-depth4;
+    @include linear-gradient(left, $shadow, $transparent);
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 20px;
+    height: 46px;
+    background-color: transparent;
+    pointer-events: none;
+  }
+
+  .right-shadow {
+    @extend %ui-depth4;
+    @include linear-gradient(right, $shadow, $transparent);
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 20px;
+    height: 46px;
+    background-color: transparent;
+    pointer-events: none;
+  }
+
+  .sequence-list-wrapper {
+    @extend %ui-depth2;
+    @include linear-gradient(top, #ddd, #eee);
+    position: relative;
+    border: 1px solid $gray-l3;
+    height: 44px;
+    margin: 0 ($baseline*2);
+    box-shadow: 0 1px 3px $shadow-l1 inset;
+  }
+
+  ol {
+    position: absolute;
+    top: 0;
+    left: 0;
+    @include box-sizing(border-box);
+    display: table;
+    height: 100%;
+    margin: 0;
+    padding: 0 ($baseline/2);
+    width: 100%;
+
+    button {
+      @extend .block-link;
+    }
+
+    li {
+      display: table-cell;
+      min-width: 20px;
+
+      button {
+        @extend %ui-fake-link;
+        @extend %ui-clear-button;
+        @include transition(none);
+        width: 100%;
+        height: 42px;
+        margin: 0;
+
+        display: block;
+        padding: 0;
+        position: relative;
+        text-align: center;
+
+        .icon {
+          line-height: 42px; // This matches the height of the <a> it's within (the parent) to get vertical centering.
+          font-size: 90%;  // The icons at 100% are just a tad too big.
+          color: rgb(90, 90, 90);
+          -webkit-font-smoothing: antialiased; // Clear up the lines on the icons
+        }
+
+        i.fa-bookmark {
+          color: $link-color;
+        }
+
+        &.inactive {
+
+          .icon {
+            color: rgb(90, 90, 90);
+          }
+        }
+
+        &.active {
+          @extend %ui-depth1;
+          background-color: $white;
+
+          .icon {
+            color: rgb(10, 10, 10);
+          }
+
+          &:hover, &:focus {
+            background-color: $white;
+            background-repeat: no-repeat;
+            background-position: center 14px;
+
+            .icon {
+              color: rgb(10, 10, 10);
+            }
+
+            i.fa-bookmark {
+              color: $link-color;
+            }
+          }
+        }
+
+        &:hover, &:focus {
+          background-color: $white;
+          background-repeat: no-repeat;
+          background-position: center 14px;
+        }
+
+        //video
+        &.seq_video {
+
+          .icon:before {
+            content: "\f008"; // .fa-film
+          }
+        }
+
+        //other
+        &.seq_other {
+
+          .icon:before {
+            content: "\f016"; // .fa-file-o
+          }
+        }
+
+        //vertical & problems
+        &.seq_vertical, &.seq_problem {
+
+          .icon:before {
+            content: "\f00b";  // .fa-tasks
+          }
+
+          &.progress-none {
+
+          }
+
+          &.progress-some, &.progress-in_progress {
+
+          }
+
+          &.progress-done {
+
+          }
+        }
+
+        .sequence-tooltip {
+          @extend %ui-depth2;
+          margin-top: ($baseline/5);
+          background: #333;
+          color: $white;
+          font-family: $sans-serif;
+          line-height: lh();
+          right: 0;
+          padding: 6px;
+          position: absolute;
+          top: 48px;
+          text-shadow: 0 -1px 0 $black;
+          @include text-align(left);
+          white-space: pre;
+          pointer-events: none;
+
+          &:empty {
+            background: none;
+
+            &::after {
+              display: none;
+            }
+          }
+
+          &::after {
+            background: #333;
+            content: " ";
+            display: block;
+            height: 10px;
+            right: 18px;
+            position: absolute;
+            top: -5px;
+            @include transform(rotate(45deg));
+            width: 10px;
+          }
+        }
+      }
+    }
+  }
+
+  body.touch-based-device & ol li button:hover p {
+    display: none;
+  }
+}
+
+.sequence-nav-button {
+  @extend %ui-depth3;
+  @include transition(all .2s $ease-in-out-quad 0s);
+  position: absolute;
+  display: block;
+  top: 0;
+  width: ($baseline*2);
+  height: 46px;
+  padding: 0;
+
+  &.button-previous {
+    @include border-radius(35px, 0, 0, 35px);
+    @include left(0);
+  }
+
+  &.button-next {
+    @include border-radius(0, 35px, 35px, 0);
+    @include right(0);
+  }
+
+  &:hover,
+  &:active {
+
+  }
+
+  &.disabled {
+    cursor: normal;
+  }
+}
+
+.seq_contents {
+  display: none;
+}
+
+nav.sequence-bottom {
+  position: relative;
+  width: 79px;
+  height: 1px;
+  margin: lh(2) auto;
+  text-align: center;
+
+  @media print {
+    display: none;
+  }
+}
+
+#seq_content {
+
+  &:focus,
+  &:active {
+    outline: none;
+  }
+}
+

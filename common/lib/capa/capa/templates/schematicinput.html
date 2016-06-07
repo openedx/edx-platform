@@ -1,0 +1,23 @@
+<div>
+  <div class="script_placeholder" data-src="${setup_script}"/>
+  <input type="hidden"
+    class="schematic"
+    height="${height}"
+    width="${width}"
+    parts="${parts}"
+    analyses="${analyses}"
+    name="input_${id}"
+    id="input_${id}"
+    aria-label="${label}"
+    aria-describedby="answer_${id}"
+    value="${value|h}"
+    initial_value="${initial_value|h}"
+    submit_analyses="${submit_analyses|h}"
+    />
+
+  <span id="answer_${id}"></span>
+  <div class="indicator-container">
+    <span class="status ${status.classname}" id="status_${id}" aria-describedby="input_${id}"></span>
+    <span class="sr">${status.display_tooltip}</span>
+  </div>
+</div>

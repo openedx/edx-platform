@@ -1,0 +1,13 @@
+<course course_image="just_a_test.jpg">
+  <chapter url_name="Overview">
+    <sequential>
+        <vertical filename="vertical_test" slug="vertical_test" />
+    </sequential>
+    <sequential>
+        <vertical url_name="zeta">
+            <html url_name="toyhtml"/>
+            <discussion id="duplicate_def" slug="duplicate_def" discussion_category="Lectures"/>
+        </vertical>
+    </sequential>
+  </chapter>
+</course>

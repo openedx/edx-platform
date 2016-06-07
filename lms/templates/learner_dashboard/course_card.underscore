@@ -1,0 +1,26 @@
+<div class="grid-container grid-manual">
+    <div class="course-meta-container col-12 md-col-8 sm-col-12">
+        <a href="<%- course_url %>" class="course-image-link">
+            <img
+                class="header-img"
+                src="<%- course_image_url %>"
+                alt="<%= interpolate(gettext('%(courseName)s Home Page.'), {courseName: display_name}, true)%>"/>
+        </a>
+        <div class="course-details">
+            <h3 class="course-title">
+                <a href="<%- course_url %>" class="course-title-link">
+                    <%- display_name %>
+                </a>
+            </h3>
+            <div class="course-text">
+                <% if (is_enrolled){ %>
+                    <span class="run-period"><%- start_date %> - <%- end_date %></span>
+                <% } %>
+                <span class="course-key"><%- key %></span>
+            </div>
+        </div>
+    </div>
+    <div class="course-actions col-12 md-col-4 sm-col-12">        
+    </div>
+</div>
+<div class="action-msg-view"></div>

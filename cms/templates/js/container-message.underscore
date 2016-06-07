@@ -1,0 +1,8 @@
+<% if (currentlyVisibleToStudents) { %>
+    <div class="message has-warnings">
+        <p class="warning">
+            <i class="icon fa fa-warning"></i>
+            <%= gettext("Caution: The last published version of this unit is live. By publishing changes you will change the student experience.") %>
+        </p>
+    </div>
+<% } %>
