@@ -45,8 +45,9 @@ BROKER_URL = "amqp://celery:celery@localhost:5672"
 CACHES = ENV_TOKENS['CACHES']
 if 'loc_cache' not in CACHES:
     CACHES['loc_cache'] = {
-        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-        'LOCATION': 'edx_location_mem_cache',
+        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+        'LOCATION': '127.0.0.1:11211',
+        'KEY_FUNCTION': 'util.memcache.safe_key',
     }
 ## end efischer celery-on-devstack
 
