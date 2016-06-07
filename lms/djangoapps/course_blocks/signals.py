@@ -21,6 +21,8 @@ def _listen_for_course_publish(sender, course_key, **kwargs):  # pylint: disable
     # has finished all operations.
     update_course_in_cache.apply_async([unicode(course_key)], countdown=0)
 
+    print "******* course_published signal received in course_blocks/signals.py!"
+
 
 @receiver(SignalHandler.course_deleted)
 def _listen_for_course_delete(sender, course_key, **kwargs):  # pylint: disable=unused-argument
