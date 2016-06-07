@@ -14,6 +14,9 @@ from django.dispatch import receiver
 from django.db.models.signals import pre_save, pre_delete
 from django.db.models.base import ObjectDoesNotExist
 from django.contrib.sites.models import Site
+from django.contrib.staticfiles.storage import staticfiles_storage
+from django.core.files.storage import FileSystemStorage
+
 import sass
 
 from jsonfield.fields import JSONField
@@ -51,6 +54,7 @@ class Microsite(models.Model):
             self.values = self._get_initial_microsite_values()
         # recompile SASS on every save
         self.compile_microsite_sass()
+        self.collect_css_file()
         return super(Microsite, self).save(**kwargs)
 
     def get_organizations(self):
@@ -65,6 +69,25 @@ class Microsite(models.Model):
         with open(output_path, 'w') as f:
             sass_output = sass.compile(filename=theme_sass_file, importers=[(0, self._sass_var_override)])
             f.write(sass_output)
+
+    def collect_css_file(self):
+        path = self.values.get('css_overrides_file')
+        storage = staticfiles_storage
+        file_storage = FileSystemStorage(settings.MICROSITE_ROOT_DIR)
+        if getattr(file_storage, 'prefix', None):
+            prefixed_path = os.path.join(file_storage.prefix, path)
+        else:
+            prefixed_path = path
+        found_files = collections.OrderedDict()
+        found_files[prefixed_path] = (file_storage, path)
+
+        with file_storage.open(path) as source_file:
+            storage.save(prefixed_path, source_file)
+        if hasattr(storage, 'post_process'):
+            processor = storage.post_process(found_files)
+            for original_path, processed_path, processed in processor:
+                if isinstance(processed, Exception):
+                    raise processed
 
     def _sass_var_override(self, path):
         if 'branding-basics' in path:
