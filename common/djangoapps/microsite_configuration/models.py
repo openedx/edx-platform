@@ -66,8 +66,11 @@ class Microsite(models.Model):
     def compile_microsite_sass(self):
         theme_sass_file = os.path.join(settings.ENV_ROOT, "themes", settings.THEME_NAME, 'src', 'main.scss')
         output_path = os.path.join(settings.MICROSITE_ROOT_DIR, 'customer_themes', '{}.css'.format(self.key))
+        collected_ouput_path = os.path.join(settings.STATIC_ROOT, 'customer_themes', '{}.css'.format(self.key))
+        sass_output = sass.compile(filename=theme_sass_file, importers=[(0, self._sass_var_override)])
         with open(output_path, 'w') as f:
-            sass_output = sass.compile(filename=theme_sass_file, importers=[(0, self._sass_var_override)])
+            f.write(sass_output)
+        with open(collected_ouput_path, 'w') as f:
             f.write(sass_output)
 
     def collect_css_file(self):
