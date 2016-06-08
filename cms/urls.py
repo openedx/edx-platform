@@ -35,16 +35,10 @@ urlpatterns = patterns(
     url(r'^xblock/resource/(?P<block_type>[^/]*)/(?P<uri>.*)$',
         'openedx.core.djangoapps.common_views.xblock.xblock_resource', name='xblock_resource_url'),
 
-    # temporary landing page for a course
-    url(r'^edge/(?P<org>[^/]+)/(?P<course>[^/]+)/course/(?P<coursename>[^/]+)$',
-        'contentstore.views.landing', name='landing'),
-
     url(r'^not_found$', 'contentstore.views.not_found', name='not_found'),
     url(r'^server_error$', 'contentstore.views.server_error', name='server_error'),
     url(r'^organizations$', OrganizationListView.as_view(), name='organizations'),
 
-    # temporary landing page for edge
-    url(r'^edge$', 'contentstore.views.edge', name='edge'),
     # noop to squelch ajax errors
     url(r'^event$', 'contentstore.views.event', name='event'),
 
