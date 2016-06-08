@@ -199,14 +199,18 @@ class UsersList(SecureListAPIView):
     ### The UsersList view allows clients to retrieve/append a list of User entities
     - URI: ```/api/users/```
     - GET: Provides paginated list of users, it supports email, username, name, organizations, courses enrolled,
-           has_organizations and id filters
+           has_organizations, organization_display_name and id filters
         Possible use cases
         GET /api/users?ids=23
         GET /api/users?ids=11,12,13&page=2
         GET /api/users?organizations=1,2,3
         GET /api/users?courses={course_id},{course_id2}
+        GET /api/users?courses={rse_id}&match=partial
         GET /api/users?email={john@example.com}
+        GET /api/users?email={john@example}&match=partial
         GET /api/users?name={john doe}
+        GET /api/users?name={joh}&match=partial
+        GET /api/users?organization_display_name={xyz}&match=partial
         GET /api/users?username={john}
             * email: string, filters user set by email address
             * username: string, filters user set by username
@@ -261,30 +265,51 @@ class UsersList(SecureListAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     filter_backends = (filters.DjangoFilterBackend, IdsInFilterBackend, HasOrgsFilterBackend)
-    filter_fields = ('email', 'username', )
+    filter_fields = ('username', )
 
     def get_queryset(self):
         """
         Optionally filter users by organizations and course enrollments
         """
         queryset = self.queryset
+
+        name = self.request.QUERY_PARAMS.get('name', None)
+        match = self.request.QUERY_PARAMS.get('match', None)
+        email = self.request.QUERY_PARAMS.get('email', None)
         org_ids = self.request.QUERY_PARAMS.get('organizations', None)
+        courses = self.request.QUERY_PARAMS.get('courses', None)
+        organization_display_name = self.request.QUERY_PARAMS.get('organization_display_name', None)
+
         if org_ids is not None:
             org_ids = map(int, org_ids.split(','))
             queryset = queryset.filter(organizations__id__in=org_ids).distinct()
 
-        course_ids = self.request.QUERY_PARAMS.get('courses', None)
-        if course_ids is not None:
-            course_ids = map(CourseKey.from_string, course_ids.split(','))
-            queryset = queryset.filter(courseenrollment__course_id__in=course_ids).distinct()
+        if match is not None and match == 'partial':
+            if name is not None:
+                queryset = queryset.filter(profile__name__icontains=name)
+
+            if email is not None:
+                queryset = queryset.filter(email__icontains=email)
+
+            if organization_display_name is not None:
+                queryset = queryset.filter(organizations__display_name__icontains=organization_display_name)
+
+            if courses is not None:
+                queryset = queryset.filter(courseenrollment__course_id__icontains=courses)
         else:
+            if name is not None:
+                queryset = queryset.filter(profile__name=name)
+
+            if email is not None:
+                queryset = queryset.filter(email=email)
+
+            if courses is not None:
+                course_ids = map(CourseKey.from_string, courses.split(','))
+                queryset = queryset.filter(courseenrollment__course_id__in=course_ids).distinct()
+
+        if courses is None:
             queryset = queryset.select_related('courseenrollment_set')\
                 .annotate(courses_enrolled=Count('courseenrollment'))
-
-        name = self.request.QUERY_PARAMS.get('name', None)
-        if name is not None:
-            queryset = queryset.filter(profile__name=name)
-
         queryset = queryset.prefetch_related('organizations').select_related('profile')
 
         return queryset
