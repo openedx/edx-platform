@@ -5,6 +5,7 @@ import json
 import logging
 
 from celery.task import task
+from django.conf import settings
 from opaque_keys.edx.keys import CourseKey
 from xmodule.modulestore.django import modulestore
 
@@ -60,7 +61,21 @@ def _generate_course_structure(course_key):
         }
 
 
-@task(name=u'openedx.core.djangoapps.content.course_structures.tasks.update_course_structure')
+def ensure_lms_queue():
+    """
+    Ensure the worker associated with the chosen queue is loaded with lms params, if applicable.
+    """
+    queue = getattr(settings, 'CELERY_DEFAULT_QUEUE', None)
+    variant = getattr(settings, 'SERVICE_VARIANT', None)
+    lms_prefix = getattr(settings, 'LMS_PREFIX', None)
+    if queue and variant and lms_prefix:
+        queue = queue.replace(variant, lms_prefix)
+    return queue
+
+@task(
+    name=u'openedx.core.djangoapps.content.course_structures.tasks.update_course_structure',
+    queue=ensure_lms_queue(),
+)
 def update_course_structure(course_key):
     """
     Regenerates and updates the course structure (in the database) for the specified course.
@@ -100,9 +115,9 @@ def update_course_structure(course_key):
     # TODO (TNL-4630) For temporary hotfix to delete the block_structure cache.
     # Should be moved to proper location.
     from django.core.cache import cache
-    from openedx.core.lib.block_structure.manager import BlockStructureManager
+    from openedx.core.djangoapps.content.block_structure.manager import BlockStructureManager
 
     store = modulestore()
     course_usage_key = store.make_course_usage_key(course_key)
     block_structure_manager = BlockStructureManager(course_usage_key, store, cache)
-    block_structure_manager.clear()
+    block_structure_manager.update_collected()

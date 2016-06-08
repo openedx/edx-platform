@@ -2,8 +2,8 @@
 Helpers for Course Blocks tests.
 """
 
-from openedx.core.lib.block_structure.cache import BlockStructureCache
-from openedx.core.lib.block_structure.transformer_registry import TransformerRegistry
+from openedx.core.djangoapps.content.block_structure.cache import BlockStructureCache
+from openedx.core.djangoapps.content.block_structure.transformer_registry import TransformerRegistry
 from ..api import _get_cache
 
 

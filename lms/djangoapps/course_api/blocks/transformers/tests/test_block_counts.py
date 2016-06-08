@@ -3,7 +3,7 @@ Tests for BlockCountsTransformer.
 """
 
 # pylint: disable=protected-access
-from openedx.core.lib.block_structure.factory import BlockStructureFactory
+from openedx.core.djangoapps.content.block_structure.factory import BlockStructureFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import SampleCourseFactory
 

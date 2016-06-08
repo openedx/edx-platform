@@ -57,8 +57,43 @@ DJFS = {
 
 ################################# CELERY ######################################
 
-# By default don't use a worker, execute tasks as if they were local functions
-CELERY_ALWAYS_EAGER = True
+
+## efischer celery-on-devstack
+LMS_PREFIX = 'lms'
+
+# Run celery tasks asynchronously
+CELERY_ALWAYS_EAGER = False
+
+# Copy-paste some celery relevant settings from aws.py
+CELERY_RESULT_BACKEND = 'djcelery.backends.cache:CacheBackend'
+QUEUE_VARIANT = CONFIG_PREFIX.lower()
+CELERY_DEFAULT_EXCHANGE = 'edx.{0}core'.format(QUEUE_VARIANT)
+HIGH_PRIORITY_QUEUE = 'edx.{0}core.high'.format(QUEUE_VARIANT)
+DEFAULT_PRIORITY_QUEUE = 'edx.{0}core.default'.format(QUEUE_VARIANT)
+LOW_PRIORITY_QUEUE = 'edx.{0}core.low'.format(QUEUE_VARIANT)
+HIGH_MEM_QUEUE = 'edx.{0}core.high_mem'.format(QUEUE_VARIANT)
+CELERY_DEFAULT_QUEUE = DEFAULT_PRIORITY_QUEUE
+CELERY_DEFAULT_ROUTING_KEY = DEFAULT_PRIORITY_QUEUE
+CELERY_QUEUES = {
+    HIGH_PRIORITY_QUEUE: {},
+    LOW_PRIORITY_QUEUE: {},
+    DEFAULT_PRIORITY_QUEUE: {},
+    HIGH_MEM_QUEUE: {},
+}
+
+# Let `./manage.py lms celery worker --settings=devstack` talk to Rabbit
+    # I have yet to test this with cms
+BROKER_URL = "amqp://celery:celery@localhost:5672"
+
+# Setup memcached (also copied from aws.py)
+CACHES = ENV_TOKENS['CACHES']
+if 'loc_cache' not in CACHES:
+    CACHES['loc_cache'] = {
+        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+        'LOCATION': '127.0.0.1:11211',
+        'KEY_FUNCTION': 'util.memcache.safe_key',
+    }
+## end efischer celery-on-devstack
 
 ################################ DEBUG TOOLBAR ################################
 INSTALLED_APPS += ('debug_toolbar', 'debug_toolbar_mongo')

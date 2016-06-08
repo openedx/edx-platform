@@ -2008,6 +2008,7 @@ INSTALLED_APPS = (
     # Course data caching
     'openedx.core.djangoapps.content.course_overviews',
     'openedx.core.djangoapps.content.course_structures',
+    'openedx.core.djangoapps.content.block_structure',
     'lms.djangoapps.course_blocks',
 
     # Old course structure API

@@ -49,7 +49,7 @@ class TestBlockStructureTransformers(ChildrenMapTestMixin, TestCase):
     def test_collect(self):
         with mock_registered_transformers(self.registered_transformers):
             with patch(
-                'openedx.core.lib.block_structure.tests.helpers.MockTransformer.collect'
+                'openedx.core.djangoapps.content.block_structure.tests.helpers.MockTransformer.collect'
             ) as mock_collect_call:
                 self.transformers.collect(block_structure=MagicMock())
                 self.assertTrue(mock_collect_call.called)
@@ -58,7 +58,7 @@ class TestBlockStructureTransformers(ChildrenMapTestMixin, TestCase):
         self.add_mock_transformer()
 
         with patch(
-            'openedx.core.lib.block_structure.tests.helpers.MockTransformer.transform'
+            'openedx.core.djangoapps.content.block_structure.tests.helpers.MockTransformer.transform'
         ) as mock_transform_call:
             self.transformers.transform(block_structure=MagicMock())
             self.assertTrue(mock_transform_call.called)

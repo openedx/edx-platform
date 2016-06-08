@@ -45,7 +45,7 @@ class TestGenerateCourseBlocks(ModuleStoreTestCase):
         self.command.handle(all=True)
         self._assert_courses_in_block_cache(self.course_1.id, self.course_2.id)
         with patch(
-            'openedx.core.lib.block_structure.factory.BlockStructureFactory.create_from_modulestore'
+            'openedx.core.djangoapps.content.block_structure.factory.BlockStructureFactory.create_from_modulestore'
         ) as mock_update_from_store:
             self.command.handle(all=True)
             mock_update_from_store.assert_not_called()
@@ -55,7 +55,7 @@ class TestGenerateCourseBlocks(ModuleStoreTestCase):
         self.command.handle(all=True)
         self._assert_courses_in_block_cache(self.course_1.id, self.course_2.id)
         with patch(
-            'openedx.core.lib.block_structure.factory.BlockStructureFactory.create_from_modulestore'
+            'openedx.core.djangoapps.content.block_structure.factory.BlockStructureFactory.create_from_modulestore'
         ) as mock_update_from_store:
             self.command.handle(all=True, force=True)
             mock_update_from_store.assert_called()
