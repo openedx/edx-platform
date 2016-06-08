@@ -25,7 +25,7 @@ class Command(BaseCommand):
     Example:
 
     Change enrollment for all audit users to honor in the given course.
-        $ ... bulk_change_enrollment -c course-v1:SomeCourse+SomethingX+2016 --from audit --to honor --commit
+        $ ... bulk_change_enrollment -c course-v1:SomeCourse+SomethingX+2016 --from_mode audit --to_mode honor --commit
 
     Without the --commit option, the command will have no effect.
     """
