@@ -735,6 +735,29 @@ class MiscCourseTests(ContentStoreTestCase):
         # Remove tempdir
         shutil.rmtree(root_dir)
 
+    @mock.patch(
+        'lms.djangoapps.ccx.modulestore.CCXModulestoreWrapper.get_item',
+        mock.Mock(return_value=mock.Mock(children=[]))
+    )
+    def test_export_with_orphan_vertical(self):
+        """
+        Tests that, export does not fail when a parent xblock does not have draft child xblock
+        information but the draft child xblock has parent information.
+        """
+        # Make an existing unit a draft
+        self.store.convert_to_draft(self.problem.location, self.user.id)
+        root_dir = path(mkdtemp_clean())
+        export_course_to_xml(self.store, None, self.course.id, root_dir, 'test_export')
+
+        # Verify that problem is exported in the drafts. This is expected because we are
+        # mocking get_item to for drafts. Expect no draft is exported.
+        # Specifically get_item is used in `xmodule.modulestore.xml_exporter._export_drafts`
+        export_draft_dir = OSFS(root_dir / 'test_export/drafts')
+        self.assertEqual(len(export_draft_dir.listdir()), 0)
+
+        # Remove tempdir
+        shutil.rmtree(root_dir)
+
     def test_assets_overwrite(self):
         """ Tests that assets will similar 'displayname' will be overwritten during export """
         content_store = contentstore()
