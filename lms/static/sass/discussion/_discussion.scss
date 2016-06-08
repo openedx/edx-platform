@@ -354,11 +354,8 @@ body.discussion {
   }
 
   section.discussion {
-    clear: both;
+    @include clearfix();
     padding-top: $baseline;
-
-    .threads {
-    }
   }
 
   .new-post-article {
@@ -412,9 +409,9 @@ body.discussion {
   }
 
   .edit-post-form {
+    @include clearfix();
     width: 100%;
     margin-bottom: $baseline;
-    @include clearfix();
     box-sizing: border-box;
 
     .form-row {
