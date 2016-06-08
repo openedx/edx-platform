@@ -303,7 +303,6 @@ class OwnLearnerProfilePageTest(LearnerProfileTestMixin, WebAppTest):
         self.verify_profile_page_is_private(profile_page)
         self.verify_profile_page_view_event(username, user_id, visibility=self.PRIVACY_PRIVATE)
 
-    @flaky  # TODO fix this, see TNL-4683
     def test_fields_on_my_public_profile(self):
         """
         Scenario: Verify that desired fields are shown when looking at her own public profile.
