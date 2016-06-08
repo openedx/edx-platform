@@ -152,6 +152,13 @@ div.problem {
       margin-top: $baseline;
     }
   }
+
+  span > label {
+    display: block;
+    margin-bottom: $baseline;
+    font: inherit;
+    color: inherit;
+  }
 }
 
 // Choice Group - silent class
