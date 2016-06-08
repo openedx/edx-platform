@@ -15,6 +15,12 @@ MAILGUN_SERVER_NAME = AUTH_TOKENS.get("MAILGUN_SERVER_NAME")
 
 INSTALLED_APPS += ('appsembler_lms',)
 
+# disable caching in dev environment
+for cache_key in CACHES.keys():
+    CACHES[cache_key]['BACKEND'] = 'django.core.cache.backends.dummy.DummyCache'
+
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'
+
 MICROSITE_BACKEND = 'microsite_configuration.backends.database.DatabaseMicrositeBackend'
 
 STATICFILES_STORAGE = 'openedx.core.storage.DevelopmentStorage'
