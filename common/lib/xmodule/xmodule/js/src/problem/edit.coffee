@@ -196,7 +196,7 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
   @markdownToXml: (markdown)->
     toXml = `function (markdown) {  
       var xml = markdown,
-          i, splits, scriptFlag, label;
+          i, splits, scriptFlag, pTag;
       var responseTypes = [
         'formularesponse', 'javascriptresponse', 'schematicresponse', 'customresponse', 'coderesponse',
         'optionresponse', 'symbolicresponse', 'multiplechoiceresponse', 'imageresponse', 'stringresponse',
@@ -516,35 +516,35 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
           return selectString;
       });
 
-      xml = xml.replace(/>>\s*([^]+?)\s*<</g, "<label>$1</label>");
+      //xml = xml.replace(/>>\s*([^]+?)\s*<</g, "<label>$1</label>");
 
       // replace labels
       // looks for >>arbitrary text<< and inserts it into the label attribute of the input type directly below the text.
-      //var split = xml.split('\n');
-      //var new_xml = [];
-      //var line, i, curlabel, prevlabel = '';
-      //var didinput = false;
-      //for (i = 0; i < split.length; i++) {
-      //  line = split[i];
-      //  if (match = line.match(/>>(.*)<</)) {
-      //    curlabel = match[1].replace(/&/g, '&amp;')
-      //      .replace(/</g, '&lt;')
-      //      .replace(/>/g, '&gt;')
-      //      .replace(/"/g, '&quot;')
-      //      .replace(/'/g, '&apos;');
-      //    line = line.replace(/>>|<</g, '');
-      //  } else if (line.match(/<\w+response/) && didinput && curlabel == prevlabel) {
-      //    // reset label to prevent gobbling up previous one (if multiple questions)
-      //    curlabel = '';
-      //    didinput = false;
-      //  } else if (line.match(/<(textline|optioninput|formulaequationinput|choicegroup|checkboxgroup)/) && curlabel != '' && curlabel != undefined) {
-      //    line = line.replace(/<(textline|optioninput|formulaequationinput|choicegroup|checkboxgroup)/, '<$1 label="' + curlabel + '"');
-      //    didinput = true;
-      //    prevlabel = curlabel;
-      //  }
-      //  new_xml.push(line);
-      //}
-      //xml = new_xml.join('\n');
+      var split = xml.split('\n');
+      var new_xml = [];
+      var line, i, curlabel, prevlabel = '';
+      var didinput = false;
+      for (i = 0; i < split.length; i++) {
+        line = split[i];
+        if (match = line.match(/>>(.*)<</)) {
+          curlabel = match[1].replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&apos;');
+          line = line.replace(/>>\s*([^]+?)\s*<</g, "<p class='qtitle'>$1</p>");
+        } else if (line.match(/<\w+response/) && didinput && curlabel == prevlabel) {
+          // reset label to prevent gobbling up previous one (if multiple questions)
+          curlabel = '';
+          didinput = false;
+        } else if (line.match(/<(textline|optioninput|formulaequationinput|choicegroup|checkboxgroup)/) && curlabel != '' && curlabel != undefined) {
+          line = line.replace(/<(textline|optioninput|formulaequationinput|choicegroup|checkboxgroup)/, '<$1 label="' + curlabel + '"');
+          didinput = true;
+          prevlabel = curlabel;
+        }
+        new_xml.push(line);
+      }
+      xml = new_xml.join('\n');
 
       // replace code blocks
       xml = xml.replace(/\[code\]\n?([^\]]*)\[\/?code\]/gmi, function(match, p1) {
@@ -554,25 +554,25 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
       });
 
       // split scripts and preformatted sections, and wrap paragraphs
-      splits = xml.split(/(\<\/?(?:script|pre|label).*?\>)/g);
+      splits = xml.split(/(\<\/?(?:script|pre|p).*?\>)/g);
       scriptFlag = false;
-      label = false;
+      pTag = false;
 
       for (i = 0; i < splits.length; i += 1) {
           if(/\<(script|pre)/.test(splits[i])) {
               scriptFlag = true;
-          } else if (/\<(label)/.test(splits[i])) {
-              label = true;
+          } else if (/\<(p)/.test(splits[i])) {
+              pTag = true;
           }
 
-          if(!scriptFlag && !label) {
+          if(!scriptFlag && !pTag) {
               splits[i] = splits[i].replace(/(^(?!\s*\<|$).*$)/gm, '<p>$1</p>');
           }
 
           if(/\<\/(script|pre)/.test(splits[i])) {
               scriptFlag = false;
-          } else if (/\<\/(label)/.test(splits[i])) {
-              label = false;
+          } else if (/\<\/(p)/.test(splits[i])) {
+              pTag = false;
           }
       }
 
@@ -612,6 +612,12 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
                 return;
             }
 
+            if (child.hasAttribute('class') && child.getAttribute('class') === 'qtitle') {
+                var label = document.createElement("label");
+                label.appendChild(document.createTextNode(child.textContent));
+                child = label;
+            }
+
             if (_.contains(independentTagNames, child.nodeName)) {
                 independentTagNodes.push(child)
                 return;
@@ -630,15 +636,21 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
             return serializer.serializeToString(node)
         }).join('\n\n');
 
+        // remove xmlns attribute added by the serializer
+        xml = xml.replace(/xmlns=['"].*?['"]/gi, "");
+
         // add newline with each ending tag to make the xml looks better
         // TODO! Fix xml indentation -- XMLSerializer messes the indentation of XML
         xml = xml.replace(/(\<\/.*?\>)(\<.*?\>)/gi, "$1\n$2");
 
       }
 
+      // remove class attribute added on question text p tag
+      xml = xml.replace(/class=\'qtitle\'/gi, "");
       return xml;
     }`
     
+    debugger
     responseTypesXML = []
     responseTypesMarkdown = markdown.split('\n---\n')
     _.each responseTypesMarkdown, (responseTypeMarkdown, index) ->
