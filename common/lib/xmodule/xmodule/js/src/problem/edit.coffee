@@ -192,11 +192,15 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
     else
       return template
 
-
   @markdownToXml: (markdown)->
+    # it will contain <hint>...</hint> tags
+    demandHintTags = [];
     toXml = `function (markdown) {
       var xml = markdown,
           i, splits, scriptFlag;
+      var responseTypes = [
+        'optionresponse', 'multiplechoiceresponse', 'stringresponse', 'numericalresponse', 'choiceresponse'
+      ];
 
       // fix DOS \r\n line endings to look like \n
       xml = xml.replace(/\r\n/g, '\n');
@@ -212,6 +216,7 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
           for (i = 0; i < options.length; i += 1) {
               var inner = /\s*\|\|(.*?)\|\|/.exec(options[i]);
               if (inner) {
+                  //safe-lint: disable=javascript-concat-html
                   demandhints += '  <hint>' + inner[1].trim() + '</hint>\n';
               }
            }
@@ -524,7 +529,8 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
             .replace(/>/g, '&gt;')
             .replace(/"/g, '&quot;')
             .replace(/'/g, '&apos;');
-          line = line.replace(/>>|<</g, '');
+          // extract the question text and convert it to a <p> tag
+          line = line.replace(/>>(.*?)<</, "<p class='qtitle'>$1</p>");
         } else if (line.match(/<\w+response/) && didinput && curlabel == prevlabel) {
           // reset label to prevent gobbling up previous one (if multiple questions)
           curlabel = '';
@@ -570,12 +576,71 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
 
       // if we've come across demand hints, wrap in <demandhint> at the end
       if (demandhints) {
-          demandhints = '\n<demandhint>\n' + demandhints + '</demandhint>';
+          demandHintTags.push(demandhints);
       }
 
-      // make all elements descendants of a single problem element
-      xml = '<problem>\n' + xml + demandhints + '\n</problem>';
+      // make selector to search responsetypes in xml
+      var responseTypesSelector = responseTypes.join(', ');
 
+      // make temporary xml
+      // safe-lint: disable=javascript-concat-html
+      var $xml = $($.parseXML('<prob>' + xml + '</prob>'));
+      responseType = $xml.find(responseTypesSelector);
+
+      // convert if there is only one responsetype
+      if (responseType.length === 1) {
+        var inputtype = responseType[0].firstElementChild
+        // used to decide whether an element should be placed before or after an inputtype
+        var beforeInputtype = true;
+
+        _.each($xml.find('prob').children(), function(child, index){
+            // we don't want to add the responsetype again into new xml
+            if (responseType[0].nodeName === child.nodeName) {
+                beforeInputtype = false;
+                return;
+            }
+
+            // replace <p> tag for question title with <label> tag
+            if (child.hasAttribute('class') && child.getAttribute('class') === 'qtitle') {
+                child = $('<label>' + child.textContent + '</label>')[0];
+            }
+
+            if (beforeInputtype) {
+                // safe-lint: disable=javascript-jquery-insert-into-target
+                responseType[0].insertBefore(child, inputtype);
+            } else {
+                responseType[0].appendChild(child);
+            }
+        })
+        var serializer = new XMLSerializer();
+
+        xml = serializer.serializeToString(responseType[0]);
+
+        // remove xmlns attribute added by the serializer
+        xml = xml.replace(/\sxmlns=['"].*?['"]/gi, '');
+
+        // XMLSerializer messes the indentation of XML so add newline
+        // at the end of each ending tag to make the xml looks better
+        xml = xml.replace(/(\<\/.*?\>)(\<.*?\>)/gi, '$1\n$2');
+      }
+
+      // remove class attribute added on <p> tag for question title
+      xml = xml.replace(/\sclass=\'qtitle\'/gi, '');
       return xml;
     }`
-    return toXml markdown
+
+    responseTypesXML = []
+    responseTypesMarkdown = markdown.split(/\n\s*---\s*\n/g)
+    _.each responseTypesMarkdown, (responseTypeMarkdown, index) ->
+      if responseTypeMarkdown.trim().length > 0
+        responseTypesXML.push toXml(responseTypeMarkdown)
+
+    # combine demandhints
+    demandHints = ''
+    if demandHintTags.length
+        ## safe-lint: disable=javascript-concat-html
+        demandHints = '\n<demandhint>\n' + demandHintTags.join('') + '</demandhint>'
+
+    # make all responsetypes descendants of a single problem element
+    ## safe-lint: disable=javascript-concat-html
+    return '<problem>\n' + responseTypesXML.join('\n\n') + demandHints + '\n</problem>'
