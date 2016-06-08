@@ -27,10 +27,5 @@ def listen_for_course_publish(sender, course_key, **kwargs):  # pylint: disable=
 
     # Note: The countdown=0 kwarg is set to to ensure the method below does not attempt to access the course
     # before the signal emitter has finished all operations. This is also necessary to ensure all tests pass.
-    update_course_structure.apply_async(
-        args=[unicode(course_key)],
-        countdown=0,
-        queue=settings.DEFAULT_PRIORITY_QUEUE.replace('cms', 'lms'),
-        routing_key=settings.DEFAULT_PRIORITY_QUEUE.replace('cms', 'lms'),
-    )
+    update_course_structure.apply_async(args=[unicode(course_key)], countdown=0)
     print "******* course_published signal received in course_structures/signals.py!"

@@ -59,6 +59,7 @@ DJFS = {
 
 
 ## efischer celery-on-devstack
+LMS_PREFIX = 'lms'
 
 # Run celery tasks asynchronously
 CELERY_ALWAYS_EAGER = False
