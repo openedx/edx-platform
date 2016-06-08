@@ -232,10 +232,14 @@ class OAuth2ProviderConfig(ProviderConfig):
                 return self.secret
             # To allow instances to avoid storing secrets in the DB, the secret can also be set via Django:
             return getattr(settings, 'SOCIAL_AUTH_OAUTH_SECRETS', {}).get(self.backend_name, '')
-        if self.other_settings:
+        if self.other_settings and self.other_settings != '{}':
             other_settings = json.loads(self.other_settings)
             assert isinstance(other_settings, dict), "other_settings should be a JSON object (dictionary)"
             return other_settings[name]
+        else:
+            if name == 'SOCIAL_AUTH_ISC_SERVER_CERT':
+                return str(getattr(settings, 'SOCIAL_AUTH_OAUTH_EXTRA_SETTINGS', {}).get(self.backend_name, '')[name])
+            return getattr(settings, 'SOCIAL_AUTH_OAUTH_EXTRA_SETTINGS', {}).get(self.backend_name, '')[name]
         raise KeyError
 
 
