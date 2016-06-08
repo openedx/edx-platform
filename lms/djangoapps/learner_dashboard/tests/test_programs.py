@@ -56,8 +56,6 @@ class TestProgramListing(
     def _create_course_and_enroll(self, student, org, course, run):
         """
         Creates a course and associated enrollment.
-
-        TODO: Use CourseEnrollmentFactory to avoid course creation.
         """
         course_location = locator.CourseLocator(org, course, run)
         course = CourseFactory.create(

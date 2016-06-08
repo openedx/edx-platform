@@ -5,6 +5,7 @@ import logging
 
 from django.core.urlresolvers import reverse
 from django.utils import timezone
+from django.utils.functional import cached_property
 from opaque_keys.edx.keys import CourseKey
 import pytz
 
@@ -170,29 +171,27 @@ class ProgramProgressMeter(object):
 
     Arguments:
         user (User): The user for which to find programs.
-        enrollments (list): The user's active enrollments.
     """
-    def __init__(self, user, enrollments):
+    def __init__(self, user):
         self.user = user
+        self.course_ids = None
 
-        enrollments = sorted(enrollments, key=lambda e: e.created, reverse=True)
-        # enrollment.course_id is really a course key ಠ_ಠ
-        self.course_ids = [unicode(e.course_id) for e in enrollments]
+        self.programs = get_programs(self.user)
+        self.course_certs = get_completed_courses(self.user)
 
-        self.engaged_programs = self._find_engaged_programs(self.user)
-        self.course_certs = None
-
-    def _find_engaged_programs(self, user):
+    @cached_property
+    def engaged_programs(self):
         """Derive a list of programs in which the given user is engaged.
-
-        Arguments:
-            user (User): The user for which to find engaged programs.
 
         Returns:
             list of program dicts, ordered by most recent enrollment.
         """
-        programs = get_programs(user)
-        flattened = flatten_programs(programs, self.course_ids)
+        enrollments = CourseEnrollment.enrollments_for_user(self.user)
+        enrollments = sorted(enrollments, key=lambda e: e.created, reverse=True)
+        # enrollment.course_id is really a course key ಠ_ಠ
+        self.course_ids = [unicode(e.course_id) for e in enrollments]
+
+        flattened = flatten_programs(self.programs, self.course_ids)
 
         engaged_programs = []
         for course_id in self.course_ids:
@@ -210,8 +209,6 @@ class ProgramProgressMeter(object):
             list of dict, each containing information about a user's progress
                 towards completing a program.
         """
-        self.course_certs = get_completed_courses(self.user)
-
         progress = []
         for program in self.engaged_programs:
             completed, in_progress, not_started = [], [], []
@@ -219,9 +216,9 @@ class ProgramProgressMeter(object):
             for course_code in program['course_codes']:
                 name = course_code['display_name']
 
-                if self._is_complete(course_code):
+                if self._is_course_code_complete(course_code):
                     completed.append(name)
-                elif self._is_in_progress(course_code):
+                elif self._is_course_code_in_progress(course_code):
                     in_progress.append(name)
                 else:
                     not_started.append(name)
@@ -235,11 +232,33 @@ class ProgramProgressMeter(object):
 
         return progress
 
-    def _is_complete(self, course_code):
+    @property
+    def completed_programs(self):
+        """Identify programs completed by the student.
+
+        Returns:
+            list of int, each the ID of a completed program.
+        """
+        return [program['id'] for program in self.programs if self._is_program_complete(program)]
+
+    def _is_program_complete(self, program):
+        """Check if a user has completed a program.
+
+        A program is completed if the user has completed all nested course codes.
+
+        Arguments:
+            program (dict): Representing the program whose completion to assess.
+
+        Returns:
+            bool, whether the program is complete.
+        """
+        return all(self._is_course_code_complete(course_code) for course_code in program['course_codes'])
+
+    def _is_course_code_complete(self, course_code):
         """Check if a user has completed a course code.
 
-        A course code qualifies as completed if the user has earned a
-        certificate in the right mode for any nested run.
+        A course code is completed if the user has earned a certificate
+        in the right mode for any nested run.
 
         Arguments:
             course_code (dict): Containing nested run modes.
@@ -247,12 +266,9 @@ class ProgramProgressMeter(object):
         Returns:
             bool, whether the course code is complete.
         """
-        return any([
-            self._parse(run_mode) in self.course_certs
-            for run_mode in course_code['run_modes']
-        ])
+        return any(self._parse(run_mode) in self.course_certs for run_mode in course_code['run_modes'])
 
-    def _is_in_progress(self, course_code):
+    def _is_course_code_in_progress(self, course_code):
         """Check if a user is in the process of completing a course code.
 
         A user is in the process of completing a course code if they're
@@ -264,10 +280,7 @@ class ProgramProgressMeter(object):
         Returns:
             bool, whether the course code is in progress.
         """
-        return any([
-            run_mode['course_key'] in self.course_ids
-            for run_mode in course_code['run_modes']
-        ])
+        return any(run_mode['course_key'] in self.course_ids for run_mode in course_code['run_modes'])
 
     def _parse(self, run_mode):
         """Modify the structure of a run mode dict.

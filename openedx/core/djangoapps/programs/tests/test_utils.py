@@ -284,8 +284,9 @@ class GetCompletedCoursesTestCase(TestCase):
         ])
 
 
-@skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 @attr('shard_2')
+@httpretty.activate
+@skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class TestProgramProgressMeter(ProgramsApiConfigMixin, TestCase):
     """Tests of the program progress utility class."""
     def setUp(self):
@@ -307,7 +308,8 @@ class TestProgramProgressMeter(ProgramsApiConfigMixin, TestCase):
 
     def _create_enrollments(self, *course_ids):
         """Variadic helper used to create course enrollments."""
-        return [CourseEnrollmentFactory(user=self.user, course_id=c) for c in course_ids]
+        for course_id in course_ids:
+            CourseEnrollmentFactory(user=self.user, course_id=course_id)
 
     def _assert_progress(self, meter, *progresses):
         """Variadic helper used to verify progress calculations."""
@@ -317,7 +319,6 @@ class TestProgramProgressMeter(ProgramsApiConfigMixin, TestCase):
         """Construct a list containing the display names of the indicated course codes."""
         return [program['course_codes'][cc]['display_name'] for cc in course_codes]
 
-    @httpretty.activate
     def test_no_enrollments(self):
         """Verify behavior when programs exist, but no relevant enrollments do."""
         data = [
@@ -330,23 +331,23 @@ class TestProgramProgressMeter(ProgramsApiConfigMixin, TestCase):
         ]
         self._mock_programs_api(data)
 
-        meter = utils.ProgramProgressMeter(self.user, [])
+        meter = utils.ProgramProgressMeter(self.user)
 
         self.assertEqual(meter.engaged_programs, [])
         self._assert_progress(meter)
+        self.assertEqual(meter.completed_programs, [])
 
-    @httpretty.activate
     def test_no_programs(self):
         """Verify behavior when enrollments exist, but no matching programs do."""
         self._mock_programs_api([])
 
-        enrollments = self._create_enrollments('org/course/run')
-        meter = utils.ProgramProgressMeter(self.user, enrollments)
+        self._create_enrollments('org/course/run')
+        meter = utils.ProgramProgressMeter(self.user)
 
         self.assertEqual(meter.engaged_programs, [])
         self._assert_progress(meter)
+        self.assertEqual(meter.completed_programs, [])
 
-    @httpretty.activate
     def test_single_program_engagement(self):
         """
         Verify that correct program is returned when the user has a single enrollment
@@ -371,8 +372,8 @@ class TestProgramProgressMeter(ProgramsApiConfigMixin, TestCase):
         ]
         self._mock_programs_api(data)
 
-        enrollments = self._create_enrollments(course_id)
-        meter = utils.ProgramProgressMeter(self.user, enrollments)
+        self._create_enrollments(course_id)
+        meter = utils.ProgramProgressMeter(self.user)
 
         program = data[0]
         self.assertEqual(meter.engaged_programs, [program])
@@ -383,8 +384,8 @@ class TestProgramProgressMeter(ProgramsApiConfigMixin, TestCase):
                 in_progress=self._extract_names(program, 0)
             )
         )
+        self.assertEqual(meter.completed_programs, [])
 
-    @httpretty.activate
     def test_mutiple_program_engagement(self):
         """
         Verify that correct programs are returned in the correct order when the user
@@ -417,8 +418,8 @@ class TestProgramProgressMeter(ProgramsApiConfigMixin, TestCase):
         ]
         self._mock_programs_api(data)
 
-        enrollments = self._create_enrollments(second_course_id, first_course_id)
-        meter = utils.ProgramProgressMeter(self.user, enrollments)
+        self._create_enrollments(second_course_id, first_course_id)
+        meter = utils.ProgramProgressMeter(self.user)
 
         programs = data[:2]
         self.assertEqual(meter.engaged_programs, programs)
@@ -427,8 +428,8 @@ class TestProgramProgressMeter(ProgramsApiConfigMixin, TestCase):
             factories.Progress(id=programs[0]['id'], in_progress=self._extract_names(programs[0], 0)),
             factories.Progress(id=programs[1]['id'], in_progress=self._extract_names(programs[1], 0))
         )
+        self.assertEqual(meter.completed_programs, [])
 
-    @httpretty.activate
     def test_shared_enrollment_engagement(self):
         """
         Verify that correct programs are returned when the user has a single enrollment
@@ -470,8 +471,8 @@ class TestProgramProgressMeter(ProgramsApiConfigMixin, TestCase):
         self._mock_programs_api(data)
 
         # Enrollment for the shared course ID created last (most recently).
-        enrollments = self._create_enrollments(solo_course_id, shared_course_id)
-        meter = utils.ProgramProgressMeter(self.user, enrollments)
+        self._create_enrollments(solo_course_id, shared_course_id)
+        meter = utils.ProgramProgressMeter(self.user)
 
         programs = data[:3]
         self.assertEqual(meter.engaged_programs, programs)
@@ -481,8 +482,8 @@ class TestProgramProgressMeter(ProgramsApiConfigMixin, TestCase):
             factories.Progress(id=programs[1]['id'], in_progress=self._extract_names(programs[1], 0)),
             factories.Progress(id=programs[2]['id'], in_progress=self._extract_names(programs[2], 0))
         )
+        self.assertEqual(meter.completed_programs, [])
 
-    @httpretty.activate
     @mock.patch(UTILS_MODULE + '.get_completed_courses')
     def test_simulate_progress(self, mock_get_completed_courses):
         """Simulate the entirety of a user's progress through a program."""
@@ -499,16 +500,23 @@ class TestProgramProgressMeter(ProgramsApiConfigMixin, TestCase):
                     ]),
                 ]
             ),
+            factories.Program(
+                organizations=[factories.Organization()],
+                course_codes=[
+                    factories.CourseCode(run_modes=[factories.RunMode()]),
+                ]
+            ),
         ]
         self._mock_programs_api(data)
 
         # No enrollments, no program engaged.
-        meter = utils.ProgramProgressMeter(self.user, [])
+        meter = utils.ProgramProgressMeter(self.user)
         self._assert_progress(meter)
+        self.assertEqual(meter.completed_programs, [])
 
         # One enrollment, program engaged.
-        enrollments = self._create_enrollments(first_course_id)
-        meter = utils.ProgramProgressMeter(self.user, enrollments)
+        self._create_enrollments(first_course_id)
+        meter = utils.ProgramProgressMeter(self.user)
         program, program_id = data[0], data[0]['id']
         self._assert_progress(
             meter,
@@ -518,10 +526,11 @@ class TestProgramProgressMeter(ProgramsApiConfigMixin, TestCase):
                 not_started=self._extract_names(program, 1)
             )
         )
+        self.assertEqual(meter.completed_programs, [])
 
         # Two enrollments, program in progress.
-        enrollments += self._create_enrollments(second_course_id)
-        meter = utils.ProgramProgressMeter(self.user, enrollments)
+        self._create_enrollments(second_course_id)
+        meter = utils.ProgramProgressMeter(self.user)
         self._assert_progress(
             meter,
             factories.Progress(
@@ -529,11 +538,13 @@ class TestProgramProgressMeter(ProgramsApiConfigMixin, TestCase):
                 in_progress=self._extract_names(program, 0, 1)
             )
         )
+        self.assertEqual(meter.completed_programs, [])
 
         # One valid certificate earned, one course code complete.
         mock_get_completed_courses.return_value = [
             {'course_id': first_course_id, 'mode': MODES.verified},
         ]
+        meter = utils.ProgramProgressMeter(self.user)
         self._assert_progress(
             meter,
             factories.Progress(
@@ -542,12 +553,14 @@ class TestProgramProgressMeter(ProgramsApiConfigMixin, TestCase):
                 in_progress=self._extract_names(program, 1)
             )
         )
+        self.assertEqual(meter.completed_programs, [])
 
         # Invalid certificate earned, still one course code to complete.
         mock_get_completed_courses.return_value = [
             {'course_id': first_course_id, 'mode': MODES.verified},
             {'course_id': second_course_id, 'mode': MODES.honor},
         ]
+        meter = utils.ProgramProgressMeter(self.user)
         self._assert_progress(
             meter,
             factories.Progress(
@@ -556,12 +569,14 @@ class TestProgramProgressMeter(ProgramsApiConfigMixin, TestCase):
                 in_progress=self._extract_names(program, 1)
             )
         )
+        self.assertEqual(meter.completed_programs, [])
 
         # Second valid certificate obtained, all course codes complete.
         mock_get_completed_courses.return_value = [
             {'course_id': first_course_id, 'mode': MODES.verified},
             {'course_id': second_course_id, 'mode': MODES.verified},
         ]
+        meter = utils.ProgramProgressMeter(self.user)
         self._assert_progress(
             meter,
             factories.Progress(
@@ -569,12 +584,12 @@ class TestProgramProgressMeter(ProgramsApiConfigMixin, TestCase):
                 completed=self._extract_names(program, 0, 1)
             )
         )
+        self.assertEqual(meter.completed_programs, [program_id])
 
-    @httpretty.activate
     @mock.patch(UTILS_MODULE + '.get_completed_courses')
     def test_nonstandard_run_mode_completion(self, mock_get_completed_courses):
         """
-        A valid run mode isn't necessarily verified. Verify that the program can
+        A valid run mode isn't necessarily verified. Verify that a program can
         still be completed when this is the case.
         """
         course_id = 'org/course/run'
@@ -587,24 +602,70 @@ class TestProgramProgressMeter(ProgramsApiConfigMixin, TestCase):
                             course_key=course_id,
                             mode_slug=MODES.honor
                         ),
+                        factories.RunMode(),
                     ]),
+                ]
+            ),
+            factories.Program(
+                organizations=[factories.Organization()],
+                course_codes=[
+                    factories.CourseCode(run_modes=[factories.RunMode()]),
                 ]
             ),
         ]
         self._mock_programs_api(data)
 
-        enrollments = self._create_enrollments(course_id)
-        meter = utils.ProgramProgressMeter(self.user, enrollments)
-
+        self._create_enrollments(course_id)
         mock_get_completed_courses.return_value = [
             {'course_id': course_id, 'mode': MODES.honor},
         ]
+        meter = utils.ProgramProgressMeter(self.user)
 
-        program = data[0]
+        program, program_id = data[0], data[0]['id']
         self._assert_progress(
             meter,
-            factories.Progress(id=program['id'], completed=self._extract_names(program, 0))
+            factories.Progress(id=program_id, completed=self._extract_names(program, 0))
         )
+        self.assertEqual(meter.completed_programs, [program_id])
+
+    @mock.patch(UTILS_MODULE + '.get_completed_courses')
+    def test_completed_programs(self, mock_get_completed_courses):
+        """Verify that completed programs are correctly identified."""
+        program_count, course_code_count, run_mode_count = 3, 2, 2
+        data = [
+            factories.Program(
+                organizations=[factories.Organization()],
+                course_codes=[
+                    factories.CourseCode(run_modes=[factories.RunMode() for _ in range(run_mode_count)])
+                    for _ in range(course_code_count)
+                ]
+            )
+            for _ in range(program_count)
+        ]
+        self._mock_programs_api(data)
+
+        program_ids = []
+        course_ids = []
+        for program in data:
+            program_ids.append(program['id'])
+
+            for course_code in program['course_codes']:
+                for run_mode in course_code['run_modes']:
+                    course_ids.append(run_mode['course_key'])
+
+        # Verify that no programs are complete.
+        meter = utils.ProgramProgressMeter(self.user)
+        self.assertEqual(meter.completed_programs, [])
+
+        # "Complete" all programs.
+        self._create_enrollments(*course_ids)
+        mock_get_completed_courses.return_value = [
+            {'course_id': course_id, 'mode': MODES.verified} for course_id in course_ids
+        ]
+
+        # Verify that all programs are complete.
+        meter = utils.ProgramProgressMeter(self.user)
+        self.assertEqual(meter.completed_programs, program_ids)
 
 
 @ddt.ddt
