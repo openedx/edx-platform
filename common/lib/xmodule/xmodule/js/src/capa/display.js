@@ -962,7 +962,6 @@
                     $status = $('#status_' + id);
                     if ($status[0]) {
                         $status.removeClass().addClass('unanswered');
-                        $status.empty().css('display', 'inline-block');
                     } else {
                         $('<span>', {
                             class: 'unanswered',
@@ -979,8 +978,8 @@
                 id = ($select.attr('id').match(/^input_(.*)$/))[1];
                 return $select.on('change', function() {
                     return $('#status_' + id).removeClass().addClass('unanswered')
-                        .find('span')
-                        .text(gettext('Status: unsubmitted'));
+                        .find('.sr')
+                        .text(gettext('unsubmitted'));
                 });
             },
             textline: function(element) {

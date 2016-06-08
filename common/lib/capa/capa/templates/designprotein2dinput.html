@@ -10,9 +10,7 @@
     <input type="hidden" name="target_shape" id="target_shape" value ="${target_shape}"></input>
     <input type="hidden" name="input_${id}" id="input_${id}" aria-describedby="answer_${id}" value="${value|h}"/>
 
-    <p class="status" aria-describedby="input_${id}">
-        <span class="sr">${status.display_name}</span>
-    </p>
+    <%include file="status_span.html" args="status=status, status_id=id"/>
 
     <p id="answer_${id}" class="answer"></p>
   % if status in ['unsubmitted', 'correct', 'incorrect', 'partially-correct', 'incomplete']:
