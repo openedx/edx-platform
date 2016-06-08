@@ -1368,7 +1368,7 @@ class ProgressPageTests(ModuleStoreTestCase):
         self.assertContains(resp, u"Download Your Certificate")
 
     @ddt.data(
-        *itertools.product(((42, 4, True), (42, 4, False)), (True, False))
+        *itertools.product(((41, 4, True), (41, 4, False)), (True, False))
     )
     @ddt.unpack
     def test_query_counts(self, (sql_calls, mongo_calls, self_paced), self_paced_enabled):
@@ -1406,9 +1406,13 @@ class ProgressPageTests(ModuleStoreTestCase):
         ) as user_verify:
             user_verify.return_value = user_verified
             resp = views.progress(self.request, course_id=unicode(self.course.id))
+
+            cert_button_hidden = course_mode is CourseMode.AUDIT or \
+                course_mode in CourseMode.VERIFIED_MODES and not user_verified
+
             self.assertEqual(
-                course_mode is not CourseMode.AUDIT and user_verified,
-                'Request Certificate' in resp.content)
+                cert_button_hidden,
+                'Request Certificate' not in resp.content)
 
 
 @attr('shard_1')
