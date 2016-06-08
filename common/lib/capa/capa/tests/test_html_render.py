@@ -151,10 +151,6 @@ class CapaHtmlRenderTest(unittest.TestCase):
         # Expect problem has been turned into a <div>
         self.assertEqual(rendered_html.tag, "div")
 
-        # Expect question text is in a <p> child
-        question_element = rendered_html.find("p")
-        self.assertEqual(question_element.text, "Test question")
-
         # Expect that the response has been turned into a <section> with correct attributes
         response_element = rendered_html.find("section")
         self.assertEqual(response_element.tag, "section")
@@ -185,7 +181,7 @@ class CapaHtmlRenderTest(unittest.TestCase):
             'id': '1_2_1',
             'trailing_text': '',
             'size': None,
-            'response_data': {'label': '', 'descriptions': {}},
+            'response_data': {'label': 'Test question', 'descriptions': {}},
             'describedby_html': ''
         }
 

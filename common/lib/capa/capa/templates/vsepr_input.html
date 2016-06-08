@@ -20,14 +20,14 @@
       style="display:none;"
    />
 
-      <p class="status" aria-describedby="input_${id}">
-      ${status.display_name}
+      <p class="status">
+         <span class="sr">${status.display_name}</span>
       </p>
 
   <p id="answer_${id}" class="answer"></p>
 
   % if msg:
-      <span class="message">${HTML(msg)}</span>
+      <span class="message" tabindex="-1">${HTML(msg)}</span>
   % endif
 % if status in ['unsubmitted', 'correct', 'incorrect', 'partially-correct', 'incomplete']:
 </div>

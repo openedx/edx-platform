@@ -1,0 +1,222 @@
+// COLORS
+$light-gray1: rgb(221, 221, 221);
+
+
+// Font Sizes in em
+$small-font-size: 0.85em !default;
+$medium-font-size: 0.9em !default;
+$base-font-size: 1em !default;
+
+// Line height
+$base-line-height: 1.5em !default;
+
+
+$component-border-radius:                   3px !default;
+
+// grid - breakpoints
+$bp-screen-sm:                  480px !default;
+$bp-screen-md:                  768px !default;
+$bp-screen-lg:                  1024px !default;
+$bp-screen-xl:                  1280px !default;
+
+
+// #SPACING
+// ----------------------------
+// spacing - baseline
+$baseline:                  20px !default;
+
+// vertical spacing
+$baseline-vertical:         ($baseline*2) !default;
+
+$spacing-vertical:          (
+  base:                   $baseline-vertical,
+  mid-small:              ($baseline-vertical*0.75),
+  small:                  ($baseline-vertical/2),
+  x-small:                ($baseline-vertical/4),
+  xx-small:               ($baseline-vertical/8),
+  xxx-small:              ($baseline-vertical/10),
+  mid-large:              ($baseline-vertical*1.5),
+  large:                  ($baseline-vertical*2),
+  x-large:                ($baseline-vertical*4)
+);
+
+// horizontal spacing
+$baseline-horizontal:       $baseline !default;
+
+$spacing-horizontal:        (
+  base:                   $baseline-horizontal,
+  mid-small:              ($baseline-horizontal*0.75),
+  small:                  ($baseline-horizontal/2),
+  x-small:                ($baseline-horizontal/4),
+  xx-small:               ($baseline-horizontal/8),
+  mid-large:              ($baseline-horizontal*1.5),
+  large:                  ($baseline-horizontal*2),
+  x-large:                ($baseline-horizontal*4)
+);
+
+// get vertical spacings from defined map values
+@function spacing-vertical($key) {
+  @if map-has-key($spacing-vertical, $key) {
+    @return rem(map-get($spacing-vertical, $key));
+  }
+
+  @warn "Unknown `#{$key}` in $spacing-vertical.";
+  @return null;
+}
+
+// get horizontal spacings from defined map values
+@function spacing-horizontal($key) {
+  @if map-has-key($spacing-horizontal, $key) {
+    @return rem(map-get($spacing-horizontal, $key));
+  }
+
+  @warn "Unknown `#{$key}` in $spacing-horizontal.";
+  @return null;
+}
+
+// typography: weights
+$font-weights: (
+  normal:         400,
+  light:          300,
+  x-light:        200,
+  semi-bold:      600,
+  bold:           700
+);
+
+// typography: sizes
+$font-sizes: (
+  xxxx-large:     38,
+  xxx-large:      28,
+  xx-large:       24,
+  x-large:        21,
+  large:          18,
+  base:           16,
+  small:          14,
+  x-small:        12,
+  xx-small:       11,
+  xxx-small:      10,
+);
+
+// get font sizes from defined map values
+@function font-size($key) {
+  @if map-has-key($font-sizes, $key) {
+    @return rem(map-get($font-sizes, $key));
+  }
+
+  @warn "Unknown `#{$key}` in $font-sizes.";
+  @return null;
+}
+
+// get font weight from defined map values
+@function font-weight($key) {
+  @if map-has-key($font-weights, $key) {
+    @return map-get($font-weights, $key);
+  }
+
+  @warn "Unknown `#{$key}` in $font-weights.";
+  @return null;
+}
+
+
+// visual disabled
+%state-disabled {
+  pointer-events: none;
+  outline: none;
+  cursor: not-allowed;
+}
+
+// +Colors - UXPL new pattern library colors
+// ====================
+$uxpl-blue-base: rgba(0, 116, 180, 1); // wcag2a compliant
+$uxpl-blue-hover-active: darken($uxpl-blue-base, 7%); // wcag2a compliant
+
+$uxpl-green-base: rgba(0, 129, 0, 1); // wcag2a compliant
+$uxpl-green-hover-active: lighten($uxpl-green-base, 7%); // wcag2a compliant
+
+$uxpl-gray-dark: rgb(17, 17, 17);
+$uxpl-gray-base: rgb(65, 65, 65);
+$uxpl-gray-background: rgb(217, 217, 217);
+
+
+// Alert styles
+$error-color: rgb(203, 7, 18) !default;
+$success-color: rgb(0, 155, 0) !default;
+$warning-color: rgb(255, 192, 31) !default;
+$warning-color-accent: rgb(255, 252, 221) !default;
+
+// BUTTONS
+
+// disabled button
+$btn-disabled-border-color:                 #d2d0d0 !default;
+$btn-disabled-color:                        #6b6969 !default;
+
+// base button
+$btn-default-border-color:                transparent !default;
+$btn-default-background:                  transparent !default;
+$btn-default-color:                       $uxpl-blue-base !default;
+$btn-default-focus-border-color:          $uxpl-blue-base !default;
+$btn-default-focus-color:                 $uxpl-blue-base !default;
+$btn-default-active-border-color:         $uxpl-blue-base !default;
+$btn-default-active-color:                $uxpl-blue-base !default;
+
+// brand button
+$btn-brand-border-color:                  $uxpl-blue-base !default;
+$btn-brand-background:                    $uxpl-blue-base !default;
+$btn-brand-color:                         #fcfcfc !default;
+$btn-brand-focus-color:                   $btn-brand-color !default;
+$btn-brand-focus-border-color:            $uxpl-blue-hover-active !default;
+$btn-brand-focus-background:              $uxpl-blue-hover-active !default;
+$btn-brand-active-border-color:           $uxpl-blue-base !default;
+$btn-brand-active-background:             $uxpl-blue-base !default;
+$btn-brand-disabled-background:           #f2f3f3 !default;
+$btn-brand-disabled-color:                #676666 !default;
+
+// ----------------------------
+// #SETTINGS
+// ----------------------------
+$btn-border-style:                          solid !default;
+$btn-border-size:                           1px !default;
+$btn-shadow:                                3px !default;
+$btn-font-weight:                           font-weight(semi-bold) !default;
+$btn-border-radius:                         $component-border-radius !default;
+
+// sizes
+$btn-large-padding-vertical: spacing-vertical(small);
+$btn-large-padding-horizontal: spacing-horizontal(mid-large);
+
+
+$btn-base-padding-vertical: spacing-vertical(x-small);
+$btn-base-padding-horizontal: spacing-horizontal(base);
+$btn-base-font-size: font-size(base);
+
+$btn-small-padding-vertical: spacing-vertical(x-small);
+$btn-small-padding-horizontal: spacing-horizontal(small);
+
+
+// ----------------------------
+// #SIZES
+// ----------------------------
+// large
+%btn-large {
+  padding: 1.25rem 1.875rem;
+  font-size: font-size(large);
+}
+
+// small
+%btn-small {
+  padding: 0.625rem 0.625rem;
+  font-size: 14px;
+}
+
+// ----------------------------
+// Problem Notifications
+// ----------------------------
+
+@mixin notification-by-type($color) {
+  border-top: 3px solid $color;
+  .icon {
+    @include margin-right(3 * $baseline/ 4);
+    color: $color;
+  }
+}
+

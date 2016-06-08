@@ -85,37 +85,33 @@ Feature: LMS.Answer problems
 
     Scenario: I can answer a problem with multiple attempts correctly and still reset the problem
         Given I am viewing a "multiple choice" problem with "3" attempts
-        Then I should see "You have used 0 of 3 submissions" somewhere in the page
+        Then I should see "You have used 0 of 3 attempts" somewhere in the page
         When I answer a "multiple choice" problem "correctly"
         Then The "Reset" button does appear
 
     Scenario: I can answer a problem with multiple attempts correctly but cannot reset because randomization is off
         Given I am viewing a randomization "never" "multiple choice" problem with "3" attempts with reset
-        Then I should see "You have used 0 of 3 submissions" somewhere in the page
+        Then I should see "You have used 0 of 3 attempts" somewhere in the page
         When I answer a "multiple choice" problem "correctly"
         Then The "Reset" button does not appear
 
     Scenario: I can view how many attempts I have left on a problem
         Given I am viewing a "multiple choice" problem with "3" attempts
-        Then I should see "You have used 0 of 3 submissions" somewhere in the page
+        Then I should see "You have used 0 of 3 attempts" somewhere in the page
         When I answer a "multiple choice" problem "incorrectly"
         And I reset the problem
-        Then I should see "You have used 1 of 3 submissions" somewhere in the page
+        Then I should see "You have used 1 of 3 attempts" somewhere in the page
         When I answer a "multiple choice" problem "incorrectly"
         And I reset the problem
-        Then I should see "You have used 2 of 3 submissions" somewhere in the page
-        And The "Final Check" button does appear
+        Then I should see "You have used 2 of 3 attempts" somewhere in the page
+        And The "Submit" button does appear
         When I answer a "multiple choice" problem "correctly"
         Then The "Reset" button does not appear
 
-    Scenario: I can view and hide the answer if the problem has it:
+    Scenario: I can view the answer if the problem has it:
         Given I am viewing a "numerical" that shows the answer "always"
-        When I press the button with the label "SHOW ANSWER"
-        Then the Show/Hide button label is "HIDE ANSWER"
+        When I press the button with the label "Show Answer"
         And I should see "4.14159" somewhere in the page
-        When I press the button with the label "HIDE ANSWER"
-        Then the Show/Hide button label is "SHOW ANSWER"
-        And I should not see "4.14159" anywhere on the page
 
     Scenario: I can see my score on a problem when I answer it and after I reset it
         Given I am viewing a "<ProblemType>" problem
@@ -125,25 +121,23 @@ Feature: LMS.Answer problems
         Then I should see a score of "<Points Possible>"
 
         Examples:
-        | ProblemType       | Correctness   | Score               | Points Possible    |
-        | drop down         | correct       | 1/1 point           | 1 point possible   |
-        | drop down         | incorrect     | 1 point possible    | 1 point possible   |
-        | multiple choice   | correct       | 1/1 point           | 1 point possible   |
-        | multiple choice   | incorrect     | 1 point possible    | 1 point possible   |
-        | checkbox          | correct       | 1/1 point           | 1 point possible   |
-        | checkbox          | incorrect     | 1 point possible    | 1 point possible   |
-        | radio             | correct       | 1/1 point           | 1 point possible   |
-        | radio             | incorrect     | 1 point possible    | 1 point possible   |
-        #| string            | correct       | 1/1 point           | 1 point possible   |
-        #| string            | incorrect     | 1 point possible    | 1 point possible   |
-        | numerical         | correct       | 1/1 point           | 1 point possible   |
-        | numerical         | incorrect     | 1 point possible    | 1 point possible   |
-        | formula           | correct       | 1/1 point           | 1 point possible   |
-        | formula           | incorrect     | 1 point possible    | 1 point possible   |
-        | script            | correct       | 2/2 points          | 2 points possible  |
-        | script            | incorrect     | 2 points possible   | 2 points possible  |
-        | image             | correct       | 1/1 point           | 1 point possible   |
-        | image             | incorrect     | 1 point possible    | 1 point possible   |
+        | ProblemType       | Correctness   | Score                        | Points Possible               |
+        | drop down         | correct       | 1/1 point (ungraded)  | 1 point possible (ungraded)   |
+        | drop down         | incorrect     | 1 point possible (ungraded)  | 1 point possible (ungraded)   |
+        | multiple choice   | correct       | 1/1 point (ungraded)  | 1 point possible (ungraded)   |
+        | multiple choice   | incorrect     | 1 point possible (ungraded)  | 1 point possible (ungraded)   |
+        | checkbox          | correct       | 1/1 point (ungraded)  | 1 point possible (ungraded)   |
+        | checkbox          | incorrect     | 1 point possible (ungraded)  | 1 point possible (ungraded)   |
+        | radio             | correct       | 1/1 point (ungraded)  | 1 point possible (ungraded)   |
+        | radio             | incorrect     | 1 point possible (ungraded)  | 1 point possible (ungraded)   |
+        | numerical         | correct       | 1/1 point (ungraded)  | 1 point possible (ungraded)   |
+        | numerical         | incorrect     | 1 point possible (ungraded)  | 1 point possible (ungraded)   |
+        | formula           | correct       | 1/1 point (ungraded)  | 1 point possible (ungraded)   |
+        | formula           | incorrect     | 1 point possible (ungraded)  | 1 point possible (ungraded)   |
+        | script            | correct       | 2/2 points (ungraded) | 2 points possible (ungraded)  |
+        | script            | incorrect     | 2 points possible (ungraded) | 2 points possible (ungraded)  |
+        | image             | correct       | 1/1 point (ungraded)  | 1 point possible (ungraded)   |
+        | image             | incorrect     | 1 point possible (ungraded)  | 1 point possible (ungraded)   |
 
     Scenario: I can see my score on a problem when I answer it and after I reset it
         Given I am viewing a "<ProblemType>" problem with randomization "<Randomization>" with reset button on
@@ -153,49 +147,32 @@ Feature: LMS.Answer problems
         Then I should see a score of "<Points Possible>"
 
         Examples:
-        | ProblemType       | Correctness   | Score               | Points Possible    | Randomization |
-        | drop down         | correct       | 1/1 point           | 1 point possible   | never         |
-        | drop down         | incorrect     | 1 point possible    | 1 point possible   | never         |
-        | multiple choice   | correct       | 1/1 point           | 1 point possible   | never         |
-        | multiple choice   | incorrect     | 1 point possible    | 1 point possible   | never         |
-        | checkbox          | correct       | 1/1 point           | 1 point possible   | never         |
-        | checkbox          | incorrect     | 1 point possible    | 1 point possible   | never         |
-        | radio             | correct       | 1/1 point           | 1 point possible   | never         |
-        | radio             | incorrect     | 1 point possible    | 1 point possible   | never         |
-        #| string            | correct       | 1/1 point           | 1 point possible   | never         |
-        #| string            | incorrect     | 1 point possible    | 1 point possible   | never         |
-        | numerical         | correct       | 1/1 point           | 1 point possible   | never         |
-        | numerical         | incorrect     | 1 point possible    | 1 point possible   | never         |
-        | formula           | correct       | 1/1 point           | 1 point possible   | never         |
-        | formula           | incorrect     | 1 point possible    | 1 point possible   | never         |
-        | script            | correct       | 2/2 points          | 2 points possible  | never         |
-        | script            | incorrect     | 2 points possible   | 2 points possible  | never         |
-        | image             | correct       | 1/1 point           | 1 point possible   | never         |
-        | image             | incorrect     | 1 point possible    | 1 point possible   | never         |
+        | ProblemType       | Correctness   | Score                         | Points Possible               | Randomization |
+        | drop down         | correct       | 1/1 point (ungraded)   | 1 point possible (ungraded)   | never         |
+        | drop down         | incorrect     | 1 point possible (ungraded)   | 1 point possible (ungraded)   | never         |
+        | multiple choice   | correct       | 1/1 point (ungraded)   | 1 point possible (ungraded)   | never         |
+        | multiple choice   | incorrect     | 1 point possible (ungraded)   | 1 point possible (ungraded)   | never         |
+        | checkbox          | correct       | 1/1 point (ungraded)   | 1 point possible (ungraded)   | never         |
+        | checkbox          | incorrect     | 1 point possible (ungraded)   | 1 point possible (ungraded)   | never         |
+        | radio             | correct       | 1/1 point (ungraded)   | 1 point possible (ungraded)   | never         |
+        | radio             | incorrect     | 1 point possible (ungraded)   | 1 point possible (ungraded)   | never         |
+        | numerical         | correct       | 1/1 point (ungraded)   | 1 point possible (ungraded)   | never         |
+        | numerical         | incorrect     | 1 point possible (ungraded)   | 1 point possible (ungraded)   | never         |
+        | formula           | correct       | 1/1 point (ungraded)   | 1 point possible (ungraded)   | never         |
+        | formula           | incorrect     | 1 point possible (ungraded)   | 1 point possible (ungraded)   | never         |
+        | script            | correct       | 2/2 points (ungraded)  | 2 points possible (ungraded)  | never         |
+        | script            | incorrect     | 2 points possible (ungraded)  | 2 points possible (ungraded)  | never         |
+        | image             | correct       | 1/1 point (ungraded)   | 1 point possible (ungraded)   | never         |
+        | image             | incorrect     | 1 point possible (ungraded)   | 1 point possible (ungraded)   | never         |
 
     Scenario: I can see my score on a problem to which I submit a blank answer
         Given I am viewing a "<ProblemType>" problem
-        When I check a problem
+        When I submit a problem
         Then I should see a score of "<Points Possible>"
 
         Examples:
-        | ProblemType       | Points Possible    |
-        | image             | 1 point possible   |
-
-    Scenario: I can't submit a blank answer
-        Given I am viewing a "<ProblemType>" problem
-        Then I can't check a problem
-
-        Examples:
-        | ProblemType       |
-        | drop down         |
-        | multiple choice   |
-        | checkbox          |
-        | radio             |
-        | string            |
-        | numerical         |
-        | formula           |
-        | script            |
+        | ProblemType       | Points Possible               |
+        | image             | 1 point possible (ungraded)   |
 
     Scenario: I can reset the correctness of a problem after changing my answer
         Given I am viewing a "<ProblemType>" problem
