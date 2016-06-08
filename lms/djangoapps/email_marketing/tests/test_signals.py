@@ -1,5 +1,6 @@
 """Tests of email marketing signal handlers."""
 import logging
+import ddt
 
 from django.test import TestCase
 from django.test.utils import override_settings
@@ -37,7 +38,7 @@ def update_email_marketing_config(enabled=False, key='badkey', secret='badsecret
         sailthru_activation_template=template
     )
 
-
+@ddt.ddt
 class EmailMarketingTests(TestCase):
     """
     Tests for the EmailMarketing signals and tasks classes.
@@ -156,33 +157,21 @@ class EmailMarketingTests(TestCase):
         self.assertTrue(mock_log_error.called)
 
     @patch('lms.djangoapps.email_marketing.tasks.update_user.delay')
-    def test_modify_field1(self, mock_update_user):
+    def test_register_user(self, mock_update_user):
         """
-        try updating user field
+        make sure register user call invokes update_user
         """
         email_marketing_register_user(None, user=self.user, profile=self.profile)
         self.assertTrue(mock_update_user.called)
 
     @patch('lms.djangoapps.email_marketing.tasks.update_user.delay')
-    def test_modify_field2(self, mock_update_user):
+    @ddt.data(('auth_userprofile', 'gender', 'f', True),
+              ('auth_user', 'is_active', 1, True),
+              ('auth_userprofile', 'shoe_size', 1, False))
+    @ddt.unpack
+    def test_modify_field(self, table, setting, value, result, mock_update_user):
         """
-        try updating user field
+        Test that correct fields call update_user
         """
-        email_marketing_user_field_changed(None, self.user, table='auth_userprofile', setting='gender', new_value='f')
-        self.assertTrue(mock_update_user.called)
-
-    @patch('lms.djangoapps.email_marketing.tasks.update_user.delay')
-    def test_modify_field3(self, mock_update_user):
-        """
-        try updating profile field
-        """
-        email_marketing_user_field_changed(None, self.user, table='auth_user', setting='is_active', new_value=1)
-        self.assertTrue(mock_update_user.called)
-
-    @patch('lms.djangoapps.email_marketing.tasks.update_user.delay')
-    def test_modify_field4(self, mock_update_user):
-        """
-        try updating unsupported field
-        """
-        email_marketing_user_field_changed(None, self.user, table='auth_userprofile', setting='shoe_size', new_value=1)
-        self.assertFalse(mock_update_user.called)
+        email_marketing_user_field_changed(None, self.user, table=table, setting=setting, new_value=value)
+        self.assertEqual(mock_update_user.called, result)
