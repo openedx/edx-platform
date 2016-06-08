@@ -105,4 +105,4 @@ def update_course_structure(course_key):
     store = modulestore()
     course_usage_key = store.make_course_usage_key(course_key)
     block_structure_manager = BlockStructureManager(course_usage_key, store, cache)
-    block_structure_manager.clear()
+    block_structure_manager.update_collected()
