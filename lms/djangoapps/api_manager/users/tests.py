@@ -315,6 +315,140 @@ class UsersApiTests(ModuleStoreTestCase):
         if 'id' in response.data['results'][0]:
             self.fail("Dynamic field filtering error in UserSerializer")
 
+    def test_user_list_get_filters(self):
+        test_uri = self.users_base_uri
+
+        organizations = []
+        organizations.append(Organization.objects.create(display_name='ABC Organization'))
+        organizations.append(Organization.objects.create(display_name='XYZ Organization'))
+
+        course1 = CourseFactory.create(org='edX', number='CS101', run='2016_Q1')
+        course2 = CourseFactory.create(org='mit', number='CS101', run='2016_Q2')
+
+        users = []
+        users.append(UserFactory.create(first_name='John', last_name='Doe', email='john.doe@example.com'))
+        users.append(UserFactory.create(first_name='Micheal', last_name='Mcdonald', email='mic.mcdonald@example.com'))
+        users.append(UserFactory.create(first_name='Steve', last_name='Jobs', email='steve.jobs@edx.org'))
+
+        for user in users[:2]:
+            user.organizations.add(organizations[0])
+            CourseEnrollmentFactory.create(user=user, course_id=course1.id)
+
+        users[2].organizations.add(organizations[1])
+        CourseEnrollmentFactory.create(user=users[2], course_id=course2.id)
+
+        # fetch user data by exact name match
+        response = self.do_get('{}?name={}'.format(test_uri, 'John Doe'))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data['results']), 1)
+        self.assertEqual(response.data['results'][0]['full_name'], 'John Doe')
+
+        # fetch user data by partial name match
+        response = self.do_get('{}?name={}&match=partial'.format(test_uri, 'Jo'))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data['results']), 2)
+        self.assertEqual(response.data['results'][0]['full_name'], 'John Doe')
+        self.assertEqual(response.data['results'][1]['full_name'], 'Steve Jobs')
+
+        # fetch user data by exact email match
+        response = self.do_get('{}?email={}'.format(test_uri, 'steve.jobs@edx.org'))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data['results']), 1)
+        self.assertEqual(response.data['results'][0]['full_name'], 'Steve Jobs')
+        self.assertEqual(response.data['results'][0]['email'], 'steve.jobs@edx.org')
+
+        # fetch user data by partial email match
+        response = self.do_get('{}?email={}&match=partial'.format(test_uri, 'example.com'))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data['results']), 2)
+        self.assertEqual(response.data['results'][0]['full_name'], 'John Doe')
+        self.assertEqual(response.data['results'][1]['full_name'], 'Micheal Mcdonald')
+
+        # fetch user data by partial organization display_name match
+        response = self.do_get('{}?organization_display_name={}&match=partial'.format(test_uri, 'ABC'))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data['results']), 2)
+        self.assertEqual(response.data['results'][0]['full_name'], 'John Doe')
+        self.assertEqual(response.data['results'][1]['full_name'], 'Micheal Mcdonald')
+
+        # fetch user data by exact course id match
+        response = self.do_get('{}?courses={}'.format(test_uri, 'mit/CS101/2016_Q2'))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data['results']), 1)
+        self.assertEqual(response.data['results'][0]['full_name'], 'Steve Jobs')
+
+        # fetch user data by partial course id match
+        response = self.do_get('{}?courses={}&match=partial'.format(test_uri, 'edx'))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data['results']), 2)
+        self.assertEqual(response.data['results'][0]['full_name'], 'John Doe')
+        self.assertEqual(response.data['results'][1]['full_name'], 'Micheal Mcdonald')
+
+    def test_user_list_get_multiple_filters(self):
+        test_uri = self.users_base_uri
+
+        organizations = []
+        organizations.append(Organization.objects.create(display_name='ABC Organization'))
+        organizations.append(Organization.objects.create(display_name='XYZ Organization'))
+
+        course1 = CourseFactory.create(org='edX', number='CS101', run='2016_Q1')
+        course2 = CourseFactory.create(org='mit', number='CS101', run='2016_Q2')
+
+        users = []
+        users.append(UserFactory.create(first_name='John', last_name='Doe', email='john.doe@example.com'))
+        users.append(UserFactory.create(first_name='Micheal', last_name='Mcdonald', email='mic.mcdonald@example.com'))
+        users.append(UserFactory.create(first_name='Steve', last_name='Jobs', email='steve.jobs@edx.org'))
+        users.append(UserFactory.create(first_name='Jonathan', last_name='Fay', email='jonathan.fay@example.com'))
+
+        for user in users[:2]:
+            user.organizations.add(organizations[0])
+            CourseEnrollmentFactory.create(user=user, course_id=course1.id)
+
+        users[2].organizations.add(organizations[1])
+        CourseEnrollmentFactory.create(user=users[2], course_id=course2.id)
+        CourseEnrollmentFactory.create(user=users[3], course_id=course2.id)
+
+        # fetch user data by partial name and email match
+        response = self.do_get('{}?name={}&email={}&match=partial'.format(test_uri, 'Mcd', 'example.com'))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data['results']), 1)
+        self.assertEqual(response.data['results'][0]['full_name'], 'Micheal Mcdonald')
+        self.assertEqual(response.data['results'][0]['email'], 'mic.mcdonald@example.com')
+
+        # fetch user data by partial name, email and course_id match
+        response = self.do_get(
+            '{}?name={}&email={}&courses={}&match=partial'.format(test_uri, 'Jo', 'example.com', 'mit')
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data['results']), 1)
+        self.assertEqual(response.data['results'][0]['full_name'], 'Jonathan Fay')
+        self.assertEqual(response.data['results'][0]['email'], 'jonathan.fay@example.com')
+
+        # fetch user data by partial organization display_name and course id match
+        response = self.do_get(
+            '{}?organization_display_name={}&courses={}&match=partial'.format(test_uri, 'XYZ', 'edx')
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data['results']), 0)
+
+        # fetch user data by partial name, email, organization display_name and course id match
+        response = self.do_get(
+            '{}?name={}&email={}&organization_display_name={}&courses={}&match=partial'.format(
+                test_uri, 'Mic', 'example.com', 'Organization', 'edx'
+            )
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data['results']), 1)
+        self.assertEqual(response.data['results'][0]['full_name'], 'Micheal Mcdonald')
+        self.assertEqual(response.data['results'][0]['email'], 'mic.mcdonald@example.com')
+        self.assertEqual(len(response.data['results'][0]['organizations']), 1)
+        self.assertEqual(response.data['results'][0]['organizations'][0]['display_name'], 'ABC Organization')
+        self.assertEqual(response.data['results'][0]['courses_enrolled'], 1)
+
+        response = self.do_get('{}/{}/courses'.format(test_uri, response.data['results'][0]['id']))
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]['id'], 'edX/CS101/2016_Q1')
+
     def test_user_list_get_courses_enrolled_per_course(self):
         test_uri = self.users_base_uri
         # create a 2 new users
