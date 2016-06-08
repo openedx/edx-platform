@@ -196,7 +196,7 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
   @markdownToXml: (markdown)->
     toXml = `function (markdown) {  
       var xml = markdown,
-          i, splits, scriptFlag;
+          i, splits, scriptFlag, label;
       var responseTypes = [
         'formularesponse', 'javascriptresponse', 'schematicresponse', 'customresponse', 'coderesponse',
         'optionresponse', 'symbolicresponse', 'multiplechoiceresponse', 'imageresponse', 'stringresponse',
@@ -516,33 +516,35 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
           return selectString;
       });
 
+      xml = xml.replace(/>>\s*([^]+?)\s*<</g, "<label>$1</label>");
+
       // replace labels
       // looks for >>arbitrary text<< and inserts it into the label attribute of the input type directly below the text.
-      var split = xml.split('\n');
-      var new_xml = [];
-      var line, i, curlabel, prevlabel = '';
-      var didinput = false;
-      for (i = 0; i < split.length; i++) {
-        line = split[i];
-        if (match = line.match(/>>(.*)<</)) {
-          curlabel = match[1].replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-            .replace(/"/g, '&quot;')
-            .replace(/'/g, '&apos;');
-          line = line.replace(/>>|<</g, '');
-        } else if (line.match(/<\w+response/) && didinput && curlabel == prevlabel) {
-          // reset label to prevent gobbling up previous one (if multiple questions)
-          curlabel = '';
-          didinput = false;
-        } else if (line.match(/<(textline|optioninput|formulaequationinput|choicegroup|checkboxgroup)/) && curlabel != '' && curlabel != undefined) {
-          line = line.replace(/<(textline|optioninput|formulaequationinput|choicegroup|checkboxgroup)/, '<$1 label="' + curlabel + '"');
-          didinput = true;
-          prevlabel = curlabel;
-        }
-        new_xml.push(line);
-      }
-      xml = new_xml.join('\n');
+      //var split = xml.split('\n');
+      //var new_xml = [];
+      //var line, i, curlabel, prevlabel = '';
+      //var didinput = false;
+      //for (i = 0; i < split.length; i++) {
+      //  line = split[i];
+      //  if (match = line.match(/>>(.*)<</)) {
+      //    curlabel = match[1].replace(/&/g, '&amp;')
+      //      .replace(/</g, '&lt;')
+      //      .replace(/>/g, '&gt;')
+      //      .replace(/"/g, '&quot;')
+      //      .replace(/'/g, '&apos;');
+      //    line = line.replace(/>>|<</g, '');
+      //  } else if (line.match(/<\w+response/) && didinput && curlabel == prevlabel) {
+      //    // reset label to prevent gobbling up previous one (if multiple questions)
+      //    curlabel = '';
+      //    didinput = false;
+      //  } else if (line.match(/<(textline|optioninput|formulaequationinput|choicegroup|checkboxgroup)/) && curlabel != '' && curlabel != undefined) {
+      //    line = line.replace(/<(textline|optioninput|formulaequationinput|choicegroup|checkboxgroup)/, '<$1 label="' + curlabel + '"');
+      //    didinput = true;
+      //    prevlabel = curlabel;
+      //  }
+      //  new_xml.push(line);
+      //}
+      //xml = new_xml.join('\n');
 
       // replace code blocks
       xml = xml.replace(/\[code\]\n?([^\]]*)\[\/?code\]/gmi, function(match, p1) {
@@ -552,20 +554,25 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
       });
 
       // split scripts and preformatted sections, and wrap paragraphs
-      splits = xml.split(/(\<\/?(?:script|pre).*?\>)/g);
+      splits = xml.split(/(\<\/?(?:script|pre|label).*?\>)/g);
       scriptFlag = false;
+      label = false;
 
       for (i = 0; i < splits.length; i += 1) {
           if(/\<(script|pre)/.test(splits[i])) {
               scriptFlag = true;
+          } else if (/\<(label)/.test(splits[i])) {
+              label = true;
           }
 
-          if(!scriptFlag) {
+          if(!scriptFlag && !label) {
               splits[i] = splits[i].replace(/(^(?!\s*\<|$).*$)/gm, '<p>$1</p>');
           }
 
           if(/\<\/(script|pre)/.test(splits[i])) {
               scriptFlag = false;
+          } else if (/\<\/(label)/.test(splits[i])) {
+              label = false;
           }
       }
 
@@ -585,16 +592,20 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
       debugger
       // move everything under responsetype
       var responseTypesSelector = responseTypes.join(", ");
-      // make temporary xml
-      var xmlDoc = $.parseXML('<prob>' + xml + '</prob>');
-      var $xml = $(xmlDoc);
-      responseType = $xml.find(responseTypesSelector);
-      var inputtype = responseType[0].firstElementChild
-      var before = true;
+
       // these will be placed at the end
-      var independentTagNames = ['solution'];
+      var independentTagNames = ['solution', 'demandhint'];
       var independentTagNodes = [];
+
+      // make temporary xml
+      var $xml = $($.parseXML('<prob>' + xml + '</prob>'));
+      responseType = $xml.find(responseTypesSelector);
+
+      // convert if there is only one responsetype
       if (responseType.length === 1) {
+        var inputtype = responseType[0].firstElementChild
+        var before = true;
+
         _.each($xml.find('prob').children(), function(child, index){
             if (responseType[0].nodeName === child.nodeName) {
                 before = false;
@@ -615,9 +626,14 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
         var serializer = new XMLSerializer();
 
         // combine responsetype and independent tags
-        xml = serializer.serializeToString(responseType[0]) + _.map(independentTagNodes, function(node){
+        xml = serializer.serializeToString(responseType[0]) + '\n\n' + _.map(independentTagNodes, function(node){
             return serializer.serializeToString(node)
         }).join('\n\n');
+
+        // add newline with each ending tag to make the xml looks better
+        // TODO! Fix xml indentation -- XMLSerializer messes the indentation of XML
+        xml = xml.replace(/(\<\/.*?\>)(\<.*?\>)/gi, "$1\n$2");
+
       }
 
       return xml;
