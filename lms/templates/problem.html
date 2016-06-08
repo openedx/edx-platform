@@ -26,7 +26,10 @@ from openedx.core.djangolib.markup import HTML
     % endif
     % if save_button:
     <span class="problem-action-button-wrapper">
-        <button class="save problem-action-btn btn-default btn-small" data-value="${_('Save')}"><span class="icon fa fa-floppy-o" aria-hidden="true"></span>${_('Save')}<span class="sr"> ${_("your answer")}</span></button>
+        <button class="save problem-action-btn btn-default btn-small" data-value="${_('Save')}"><span class="icon fa fa-floppy-o" aria-hidden="true"></span>
+            <span class="save-label">${_('Save')}</span>
+            <span class="sr"> ${_("your answer")}</span>
+        </button>
     </span>
     % endif
     % if reset_button:
@@ -47,11 +50,20 @@ from openedx.core.djangolib.markup import HTML
         <span class="check-label">${ check_button }</span><span class="sr"> ${_("your answer")}</span>
     </button>
     % endif
-    % if attempts_allowed :
+    % if attempts_allowed:
     <div class="submission_feedback" aria-live="polite">
         ${_("You have used {num_used} of {num_total} attempts").format(num_used=attempts_used, num_total=attempts_allowed)}
     </div>
     % endif
-    ## <%include file="problem_notifications.html" args="notification_type=notification_type,notification_icon=notification_icon,notification_message=notification_message,hint_notification=hint_notification"/>
+
+    % if save_notification_present:
+      <%include file="problem_notifications.html" args="
+        notification_name='save',
+        notification_type=save_notification_type,
+        notification_icon=save_notification_icon,
+        notification_message=notification_message"
+      />
+    % endif
+
   </div>
 </div>
