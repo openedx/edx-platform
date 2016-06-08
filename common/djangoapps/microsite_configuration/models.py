@@ -100,7 +100,8 @@ class Microsite(models.Model):
     def _get_initial_microsite_values(self):
         return {
             'platform_name': self.site.name,
-            'css_overrides_file': "customer_themes/{}.css".format(self.key)
+            'css_overrides_file': "customer_themes/{}.css".format(self.key),
+            'ENABLE_COMBINED_LOGIN_REGISTRATION': True,
         }
 
     @classmethod
