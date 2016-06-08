@@ -33,7 +33,7 @@ def update_user(self, username, new_user=False, activation=False):
         return
 
     # get user
-    user = getUserAndProfile(username)
+    user = User.objects.select_related('profile').get(username=username)
     if not user:
         log.error("User not found during Sailthru update %s", username)
         return
@@ -156,8 +156,3 @@ def _create_sailthru_user_parm(user, profile, new_user, email_config):
         sailthru_user['lists'] = {email_config.sailthru_new_user_list: 1}
 
     return sailthru_user
-
-
-def getUserAndProfile(username):
-    # fetch a user + profile efficiently
-    return User.objects.select_related('profile').get(username=username)

@@ -38,6 +38,7 @@ def update_email_marketing_config(enabled=False, key='badkey', secret='badsecret
         sailthru_activation_template=template
     )
 
+
 @ddt.ddt
 class EmailMarketingTests(TestCase):
     """
