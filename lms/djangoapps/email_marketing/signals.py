@@ -41,7 +41,7 @@ def handle_unenroll_done(sender, course_enrollment=None, skip_refund=False,
 def add_email_marketing_cookies(sender, response=None, user=None,
                                 **kwargs):  # pylint: disable=unused-argument):
     """
-    Directly called (non-signal) function for adding any cookies needed for email marketing
+    Signal function for adding any cookies needed for email marketing
 
     Args:
         response: http response object
