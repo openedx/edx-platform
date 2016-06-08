@@ -78,25 +78,46 @@ source, template_path = Loader(engine).load_template_source(path)
 %>${source | n, decode.utf8}</%def>
 
 <%def name="require_module(module_name, class_name)">
+    <%doc>
+      Loads Javascript onto your page synchronously.
+      Uses RequireJS in development and a plain script tag in production.
+      Use this form of require_module for all new code.
+    </%doc>
+    % if not settings.REQUIRE_DEBUG:
+      <script type="text/javascript" src="${staticfiles_storage.url(module_name + '.js') + '?raw'}"></script>
+    % endif
     <script type="text/javascript">
         (function (require) {
-            % if settings.REQUIRE_DEBUG:
-                require(['${module_name | n, js_escaped_string}'], function (${class_name | n, decode.utf8}) {
-                    ${caller.body() | n, decode.utf8}
-                });
-            % else:
-                ## The "raw" parameter is specified to avoid the URL from being further maninpulated by
-                ## static_replace calls (as woudl happen if require_module is used within courseware).
-                ## Without specifying "raw", a call to static_replace would result in the MD5 hash being
-                ## being appended more than once, causing the import to fail in production environments.
-                require(['${staticfiles_storage.url(module_name + ".js") + "?raw" | n, js_escaped_string}'], function () {
-                    require(['${module_name | n, js_escaped_string}'], function (${class_name | n, decode.utf8}) {
-                        ${caller.body() | n, decode.utf8}
-                    });
-                });
-            % endif
+            require(['${module_name | n, js_escaped_string}'], function (${class_name | n, decode.utf8}) {
+                ${caller.body() | n, decode.utf8}
+            });
         }).call(this, require || RequireJS.require);
     </script>
+</%def>
+
+<%def name="require_module_async(module_name, class_name)">
+  <%doc>
+    Legacy mode of require_module that operates asynchronously, required for certain edge cases
+    (notably where Javascript is required outside of a <%block name="js_extra" or "headextra").
+    Do not use for any new code; instead create a factory and use require_module above.
+  </%doc>
+  <script type="text/javascript">
+    (function (require) {
+      % if settings.REQUIRE_DEBUG:
+        require_module(module_name, class_name);
+      % else:
+        ## The "raw" parameter is specified to avoid the URL from being further maninpulated by
+        ## static_replace calls (as woudl happen if require_module is used within courseware).
+        ## Without specifying "raw", a call to static_replace would result in the MD5 hash being
+        ## being appended more than once, causing the import to fail in production environments.
+        require(['${staticfiles_storage.url(module_name + ".js") + "?raw" | n, js_escaped_string}'], function () {
+          require(['${module_name | n, js_escaped_string}'], function (${class_name | n, decode.utf8}) {
+            ${caller.body() | n, decode.utf8}
+          });
+        });
+      % endif
+    }).call(this, require || RequireJS.require);
+  </script>
 </%def>
 
 <%def name="optional_include_mako(file, is_theming_enabled=False)"><%

@@ -38,12 +38,12 @@ from openedx.core.djangolib.markup import HTML, Text
 
 <%include file="/courseware/course_navigation.html" args="active_page='info'" />
 
-<%static:require_module module_name="js/courseware/toggle_element_visibility" class_name="ToggleElementVisibility">
+<%static:require_module_async module_name="js/courseware/toggle_element_visibility" class_name="ToggleElementVisibility">
         ToggleElementVisibility();
-</%static:require_module>
-<%static:require_module module_name="js/courseware/course_home_events" class_name="CourseHomeEvents">
+</%static:require_module_async>
+<%static:require_module_async module_name="js/courseware/course_home_events" class_name="CourseHomeEvents">
         CourseHomeEvents();
-</%static:require_module>
+</%static:require_module_async>
 
 <%block name="js_extra">
   ## CourseTalk widget js script
