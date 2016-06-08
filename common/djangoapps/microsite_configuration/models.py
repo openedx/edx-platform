@@ -52,6 +52,10 @@ class Microsite(models.Model):
         # because it depends on other fields that should be already filled.
         if not self.id:
             self.values = self._get_initial_microsite_values()
+
+        # fix for a bug with some pages requiring uppercase platform_name variable
+        self.values['PLATFORM_NAME'] = self.values.get('platform_name', '')
+
         # recompile SASS on every save
         self.compile_microsite_sass()
         #self.collect_css_file()
