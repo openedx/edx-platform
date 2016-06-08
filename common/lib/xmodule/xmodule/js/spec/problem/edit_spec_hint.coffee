@@ -14,11 +14,11 @@ describe 'Markdown to xml extended hint dropdown', ->
 
 
       Clowns have funny _________ to make people laugh.
-      
+
       [[
         dogs		{{ NOPE::Not dogs, not cats, not toads }}
         (FACES)	{{ With lots of makeup, doncha know?}}
-            
+
         money       {{ Clowns don't have any money, of course }}
         donkeys     {{don't be an ass.}}
         -no hint-
@@ -46,7 +46,7 @@ describe 'Markdown to xml extended hint dropdown', ->
         <option correct="False">-no hint-</option>
       </optioninput>
     </optionresponse>
-    
+
     </problem>
     """)
 
@@ -64,14 +64,17 @@ describe 'Markdown to xml extended hint dropdown', ->
       || 1) one ||
       || 2) two ||
     """)
-    expect(data).toEqual("""
+    expect(data).toXMLEqual("""
     <problem>
-    <p>Translation between Dropdown and ________ is straightforward.</p>
     <optionresponse>
-      <optioninput>
-        <option correct="True">Right <optionhint label="Good Job">yes</optionhint></option>
-        <option correct="False">Wrong 1 <optionhint>no</optionhint></option>
-        <option correct="False">Wrong 2 <optionhint label="Label">no</optionhint></option>
+      <p>Translation between Dropdown and ________ is straightforward.</p>
+    <optioninput>
+        <option correct="True">Right <optionhint label="Good Job">yes</optionhint>
+    </option>
+        <option correct="False">Wrong 1 <optionhint>no</optionhint>
+    </option>
+        <option correct="False">Wrong 2 <optionhint label="Label">no</optionhint>
+    </option>
       </optioninput>
     </optionresponse>
 
@@ -91,11 +94,11 @@ describe 'Markdown to xml extended hint dropdown', ->
       || 0) zero ||
       || 1) one ||
     """)
-    expect(data).toEqual("""
+    expect(data).toXMLEqual("""
     <problem>
-    <p>A Question ________ is answered.</p>
     <optionresponse>
-      <optioninput options="('Right','Wrong 1','Wrong 2')" correct="Right"></optioninput>
+      <p>A Question ________ is answered.</p>
+    <optioninput options="('Right','Wrong 1','Wrong 2')" correct="Right"/>
     </optionresponse>
 
     <demandhint>
@@ -112,19 +115,20 @@ describe 'Markdown to xml extended hint dropdown', ->
          bb
          cc	 {{ hint2 }} ]]
     """)
-    expect(data).toEqual("""
+    expect(data).toXMLEqual("""
     <problem>
-    <p>q1</p>
-    
     <optionresponse>
-      <optioninput label="q1">
-        <option correct="True">aa <optionhint>hint1</optionhint></option>
+      <label>q1</label>
+    <optioninput label="q1">
+        <option correct="True">aa <optionhint>hint1</optionhint>
+    </option>
         <option correct="False">bb</option>
-        <option correct="False">cc <optionhint>hint2</optionhint></option>
+        <option correct="False">cc <optionhint>hint2</optionhint>
+    </option>
       </optioninput>
     </optionresponse>
-    
-    
+
+
     </problem>
     """)
 
@@ -132,28 +136,29 @@ describe 'Markdown to xml extended hint dropdown', ->
     data = MarkdownEditingDescriptor.markdownToXml("""
       >>q1<<
       [[
-      
-            
+
+
           aa   {{ hint1 }}
-        
+
               bb   {{ hint2 }}
        (cc)
-         
+
               ]]
     """)
-    expect(data).toEqual("""
+    expect(data).toXMLEqual("""
     <problem>
-    <p>q1</p>
-    
     <optionresponse>
-      <optioninput label="q1">
-        <option correct="False">aa <optionhint>hint1</optionhint></option>
-        <option correct="False">bb <optionhint>hint2</optionhint></option>
+      <label>q1</label>
+    <optioninput label="q1">
+        <option correct="False">aa <optionhint>hint1</optionhint>
+    </option>
+        <option correct="False">bb <optionhint>hint2</optionhint>
+    </option>
         <option correct="True">cc</option>
       </optioninput>
     </optionresponse>
-    
-    
+
+
     </problem>
     """)
 
@@ -161,20 +166,20 @@ describe 'Markdown to xml extended hint checkbox', ->
   it 'produces xml', ->
     data = MarkdownEditingDescriptor.markdownToXml("""
       >>Select all the fruits from the list<<
-            
+
       [x] Apple     	 	 {{ selected: You're right that apple is a fruit. }, {unselected: Remember that apple is also a fruit.}}
       [ ] Mushroom	   	 {{U: You're right that mushrooms aren't fruit}, { selected: Mushroom is a fungus, not a fruit.}}
       [x] Grape		     {{ selected: You're right that grape is a fruit }, {unselected: Remember that grape is also a fruit.}}
       [ ] Mustang
       [ ] Camero            {{S:I don't know what a Camero is but it isn't a fruit.},{U:What is a camero anyway?}}
 
-                
+
       {{ ((A*B)) You're right that apple is a fruit, but there's one you're missing. Also, mushroom is not a fruit.}}
       {{ ((B*C)) You're right that grape is a fruit, but there's one you're missing. Also, mushroom is not a fruit.    }}
 
 
       >>Select all the vegetables from the list<<
-             
+
       [ ] Banana     	 	 {{ selected: No, sorry, a banana is a fruit. }, {unselected: poor banana.}}
       [ ] Ice Cream
       [ ] Mushroom	   	 {{U: You're right that mushrooms aren't vegetables.}, { selected: Mushroom is a fungus, not a vegetable.}}
@@ -184,7 +189,7 @@ describe 'Markdown to xml extended hint checkbox', ->
       {{ ((A*B)) Making a banana split? }}
       {{ ((B*D)) That will make a horrible dessert: a brussel sprout split? }}
     """)
-    expect(data).toEqual("""
+    expect(data).toXMLEqual("""
     <problem>
     <p>Select all the fruits from the list</p>
     <choiceresponse>
@@ -262,7 +267,7 @@ describe 'Markdown to xml extended hint checkbox', ->
       || Hint two. ||
       || Hint three. ||
     """)
-    expect(data).toEqual("""
+    expect(data).toXMLEqual("""
     <problem>
     <p>Select all the fruits from the list</p>
     <choiceresponse>
@@ -317,7 +322,7 @@ describe 'Markdown to xml extended hint multiple choice', ->
   it 'produces xml', ->
     data = MarkdownEditingDescriptor.markdownToXml("""
       >>Select the fruit from the list<<
-                     
+
             () Mushroom	  	 {{ Mushroom is a fungus, not a fruit.}}
             () Potato
            (x) Apple     	 	 {{ OUTSTANDING::Apple is indeed a fruit.}}
@@ -328,7 +333,7 @@ describe 'Markdown to xml extended hint multiple choice', ->
             (x) Potato	                 {{ Potato is a root vegetable. }}
             () Apple     	 	 {{ OOPS::Apple is a fruit.}}
     """)
-    expect(data).toEqual("""
+    expect(data).toXMLEqual("""
     <problem>
     <p>Select the fruit from the list</p>
     <multiplechoiceresponse>
@@ -338,7 +343,7 @@ describe 'Markdown to xml extended hint multiple choice', ->
         <choice correct="true">Apple <choicehint label="OUTSTANDING">Apple is indeed a fruit.</choicehint></choice>
       </choicegroup>
     </multiplechoiceresponse>
-    
+
     <p>Select the vegetables from the list</p>
     <multiplechoiceresponse>
       <choicegroup label="Select the vegetables from the list" type="MultipleChoice">
@@ -347,8 +352,8 @@ describe 'Markdown to xml extended hint multiple choice', ->
         <choice correct="false">Apple <choicehint label="OOPS">Apple is a fruit.</choicehint></choice>
       </choicegroup>
     </multiplechoiceresponse>
-    
-    
+
+
     </problem>
     """)
 
@@ -359,24 +364,24 @@ describe 'Markdown to xml extended hint multiple choice', ->
                                 () Mushroom	  	 {{ Mushroom is a fungus, not a fruit.}}
                                 () Potato
                                (x) Apple     	 	 {{ OUTSTANDING::Apple is indeed a fruit.}}
-                         
-                         
+
+
                      || 0) spaces on previous line. ||
                      || 1) roses are red. ||
                      >>Select the vegetables from the list<<
 
                                 () Mushroom	  	 {{ Mushroom is a fungus, not a vegetable.}}
-                                                      
+
                                 (x) Potato	                 {{ Potato is a root vegetable. }}
                                 () Apple     	 	 {{ OOPS::Apple is a fruit.}}
-                       
-                       
+
+
                      || 2) where are the lions? ||
 
 
 
       """)
-      expect(data).toEqual("""
+      expect(data).toXMLEqual("""
     <problem>
     <p>Select the fruit from the list</p>
     <multiplechoiceresponse>
@@ -412,13 +417,14 @@ describe 'Markdown to xml extended hint text input', ->
                     = France		{{ BRAVO::Viva la France! }}
 
     """)
-    expect(data).toEqual("""
+    expect(data).toXMLEqual("""
     <problem>
-    <p>In which country would you find the city of Paris?</p>
-    <stringresponse answer="France" type="ci" >
-      <correcthint label="BRAVO">Viva la France!</correcthint>
+    <stringresponse answer="France" type="ci">
+      <label>In which country would you find the city of Paris?</label>
+    <correcthint label="BRAVO">Viva la France!</correcthint>
       <textline label="In which country would you find the city of Paris?" size="20"/>
     </stringresponse>
+
 
     </problem>
     """)
@@ -429,15 +435,17 @@ describe 'Markdown to xml extended hint text input', ->
       or= USA			{{   meh::hint2  }}
 
     """)
-    expect(data).toEqual("""
+    expect(data).toXMLEqual("""
     <problem>
-    <p>Where Paris?</p>
-    <stringresponse answer="France" type="ci" >
-      <correcthint label="BRAVO">hint1</correcthint>
-      <additional_answer answer="USA"><correcthint label="meh">hint2</correcthint></additional_answer>
+    <stringresponse answer="France" type="ci">
+      <label>Where Paris?</label>
+    <correcthint label="BRAVO">hint1</correcthint>
+      <additional_answer answer="USA"><correcthint label="meh">hint2</correcthint>
+    </additional_answer>
       <textline label="Where Paris?" size="20"/>
     </stringresponse>
-    
+
+
     </problem>
     """)
 
@@ -447,14 +455,15 @@ describe 'Markdown to xml extended hint text input', ->
       not= warm {{feedback2}}
 
     """)
-    expect(data).toEqual("""
+    expect(data).toXMLEqual("""
     <problem>
-    <p>Revenge is a dish best served</p>
-    <stringresponse answer="cold" type="ci" >
-      <correcthint>khaaaaaan!</correcthint>
+    <stringresponse answer="cold" type="ci">
+      <label>Revenge is a dish best served</label>
+    <correcthint>khaaaaaan!</correcthint>
       <stringequalhint answer="warm">feedback2</stringequalhint>
       <textline label="Revenge is a dish best served" size="20"/>
     </stringresponse>
+
 
     </problem>
     """)
@@ -464,14 +473,15 @@ describe 'Markdown to xml extended hint text input', ->
       s= 2 {{feedback1}}
 
     """)
-    expect(data).toEqual("""
+    expect(data).toXMLEqual("""
     <problem>
-    <p>q</p>
-    <stringresponse answer="2" type="ci" >
-      <correcthint>feedback1</correcthint>
+    <stringresponse answer="2" type="ci">
+      <label>q</label>
+    <correcthint>feedback1</correcthint>
       <textline label="q" size="20"/>
     </stringresponse>
-    
+
+
     </problem>
     """)
 
@@ -483,15 +493,17 @@ describe 'Markdown to xml extended hint text input', ->
       or= ccc
 
     """)
-    expect(data).toEqual("""
+    expect(data).toXMLEqual("""
     <problem>
-    <p>q</p>
-    <stringresponse answer="aaa" type="ci" >
-      <additional_answer answer="bbb"><correcthint>feedback1</correcthint></additional_answer>
+    <stringresponse answer="aaa" type="ci">
+      <label>q</label>
+    <additional_answer answer="bbb"><correcthint>feedback1</correcthint>
+    </additional_answer>
       <stringequalhint answer="no">feedback2</stringequalhint>
-      <additional_answer answer="ccc"></additional_answer>
+      <additional_answer answer="ccc"/>
       <textline label="q" size="20"/>
     </stringresponse>
+
 
     </problem>
     """)
@@ -503,15 +515,17 @@ describe 'Markdown to xml extended hint text input', ->
       or= ccc
 
     """)
-    expect(data).toEqual("""
+    expect(data).toXMLEqual("""
     <problem>
-    <p>q</p>
-    <stringresponse answer="2" type="ci" >
-      <correcthint>feedback1</correcthint>
-      <additional_answer answer="bbb"><correcthint>feedback2</correcthint></additional_answer>
-      <additional_answer answer="ccc"></additional_answer>
+    <stringresponse answer="2" type="ci">
+      <label>q</label>
+    <correcthint>feedback1</correcthint>
+      <additional_answer answer="bbb"><correcthint>feedback2</correcthint>
+    </additional_answer>
+      <additional_answer answer="ccc"/>
       <textline label="q" size="20"/>
     </stringresponse>
+
 
     </problem>
     """)
@@ -523,7 +537,7 @@ describe 'Markdown to xml extended hint text input', ->
       s= ccc
 
     """)
-    expect(data).toEqual("""
+    expect(data).toXMLEqual("""
     <problem>
     <p>q</p>
     <stringresponse answer="aaa" type="ci" >
@@ -549,7 +563,7 @@ describe 'Markdown to xml extended hint text input', ->
       paragraph 2
 
     """)
-    expect(data).toEqual("""
+    expect(data).toXMLEqual("""
     <problem>
     <p>paragraph</p>
     <p>q</p>
@@ -574,7 +588,7 @@ describe 'Markdown to xml extended hint text input', ->
       paragraph 2
 
     """)
-    expect(data).toEqual("""
+    expect(data).toXMLEqual("""
     <problem>
     <p>paragraph</p>
     <p>q</p>
@@ -591,7 +605,7 @@ describe 'Markdown to xml extended hint text input', ->
       = ccc {{feedback2}}
 
     """)
-    expect(data).toEqual("""
+    expect(data).toXMLEqual("""
     <problem>
     <p>q</p>
     <stringresponse answer="aaa" type="ci" >
@@ -614,11 +628,11 @@ describe 'Markdown to xml extended hint text input', ->
           || Paris is the capital of one of those countries. ||
 
     """)
-    expect(data).toEqual("""
+    expect(data).toXMLEqual("""
     <problem>
-    <p>Where Paris?</p>
-    <stringresponse answer="France" type="ci" >
-      <correcthint label="BRAVO">hint1</correcthint>
+    <stringresponse answer="France" type="ci">
+      <label>Where Paris?</label>
+    <correcthint label="BRAVO">hint1</correcthint>
       <textline label="Where Paris?" size="20"/>
     </stringresponse>
 
@@ -640,10 +654,10 @@ describe 'Markdown to xml extended hint numeric input', ->
 
         >>Enter the number of fingers on a human hand<<
         = 5
-        
+
 
     """)
-    expect(data).toEqual("""
+    expect(data).toXMLEqual("""
     <problem>
     <p>Enter the numerical value of Pi:</p>
     <numericalresponse answer="3.14159">
@@ -681,7 +695,7 @@ describe 'Markdown to xml extended hint numeric input', ->
         || hintB ||
 
     """)
-    expect(data).toEqual("""
+    expect(data).toXMLEqual("""
     <problem>
     <p>text1</p>
     <numericalresponse answer="1">
@@ -707,10 +721,10 @@ describe 'Markdown to xml extended hint with multiline hints', ->
     data = MarkdownEditingDescriptor.markdownToXml("""
         >>Checkboxes<<
 
-        [x] A {{ 
+        [x] A {{
         selected:  aaa  },
         {unselected:bbb}}
-        [ ] B {{U: c}, { 
+        [ ] B {{U: c}, {
         selected: d.}}
 
         {{ ((A*B)) A*B hint}}
@@ -725,7 +739,7 @@ describe 'Markdown to xml extended hint with multiline hints', ->
         hello
         hint
         }}
-        
+
         >>multiple choice<<
         (x) AA{{hint1}}
         () BB    {{
@@ -733,11 +747,11 @@ describe 'Markdown to xml extended hint with multiline hints', ->
         }}
         ( )  CC  {{ hint3
         }}
-        
+
         >>dropdown<<
         [[
-           W1  {{ 
-          	no }}
+           W1  {{
+            no }}
            W2	                  {{
            nope}}
            (C1)	 {{ yes
@@ -749,7 +763,7 @@ describe 'Markdown to xml extended hint with multiline hints', ->
         ||       ccc      ||
 
     """)
-    expect(data).toEqual("""
+    expect(data).toXMLEqual("""
     <problem>
     <p>Checkboxes</p>
     <choiceresponse>
@@ -816,23 +830,23 @@ describe 'Markdown to xml extended hint with tricky syntax cases', ->
         || Ø ||
 
     """)
-    expect(data).toEqual("""
+    expect(data).toXMLEqual("""
     <problem>
-    <p>á and Ø</p>
     <multiplechoiceresponse>
-      <choicegroup label="á and Ø" type="MultipleChoice">
-        <choice correct="true">Ø <choicehint>Ø</choicehint></choice>
+      <label>á and Ø</label>
+    <choicegroup label="á and Ø" type="MultipleChoice">
+        <choice correct="true">Ø <choicehint>Ø</choicehint>
+    </choice>
         <choice correct="false">BB</choice>
       </choicegroup>
     </multiplechoiceresponse>
-    
-    
+
     <demandhint>
       <hint>Ø</hint>
     </demandhint>
     </problem>
     """)
-    
+
   it 'produces xml with quote-type characters', ->
     data = MarkdownEditingDescriptor.markdownToXml("""
         >>"quotes" aren't `fun`<<
@@ -840,13 +854,15 @@ describe 'Markdown to xml extended hint with tricky syntax cases', ->
         (x) "isn't"  {{ "hello" }}
 
     """)
-    expect(data).toEqual("""
+    expect(data).toXMLEqual("""
     <problem>
-    <p>"quotes" aren't `fun`</p>
     <multiplechoiceresponse>
-      <choicegroup label="&quot;quotes&quot; aren&apos;t `fun`" type="MultipleChoice">
-        <choice correct="false">"hello" <choicehint>isn't</choicehint></choice>
-        <choice correct="true">"isn't" <choicehint>"hello"</choicehint></choice>
+      <label>"quotes" aren't `fun`</label>
+    <choicegroup label="&quot;quotes&quot; aren't `fun`" type="MultipleChoice">
+        <choice correct="false">"hello" <choicehint>isn't</choicehint>
+    </choice>
+        <choice correct="true">"isn't" <choicehint>"hello"</choicehint>
+    </choice>
       </choicegroup>
     </multiplechoiceresponse>
 
@@ -862,18 +878,20 @@ describe 'Markdown to xml extended hint with tricky syntax cases', ->
         (x) b
         that (y)
     """)
-    expect(data).toEqual("""
+    expect(data).toXMLEqual("""
     <problem>
-    <p>q1</p>
-    <p>this (x)</p>
     <multiplechoiceresponse>
-      <choicegroup label="q1" type="MultipleChoice">
-        <choice correct="false">a <choicehint>(hint)</choicehint></choice>
+      <label>q1</label>
+    <p>this (x)</p>
+    <choicegroup label="q1" type="MultipleChoice">
+        <choice correct="false">a <choicehint>(hint)</choicehint>
+    </choice>
         <choice correct="true">b</choice>
       </choicegroup>
+    <p>that (y)</p>
     </multiplechoiceresponse>
 
-    <p>that (y)</p>
+
     </problem>
     """)
 
@@ -886,18 +904,19 @@ describe 'Markdown to xml extended hint with tricky syntax cases', ->
         [x] b {{ this hint passes through }}
         that []
     """)
-    expect(data).toEqual("""
+    expect(data).toXMLEqual("""
     <problem>
-    <p>q1</p>
-    <p>this [x]</p>
     <choiceresponse>
-      <checkboxgroup label="q1">
+      <label>q1</label>
+    <p>this [x]</p>
+    <checkboxgroup label="q1">
         <choice correct="false">a [square]</choice>
         <choice correct="true">b {{ this hint passes through }}</choice>
       </checkboxgroup>
+    <p>that []</p>
     </choiceresponse>
 
-    <p>that []</p>
+
     </problem>
     """)
 
@@ -907,7 +926,7 @@ describe 'Markdown to xml extended hint with tricky syntax cases', ->
     markdown = """
            >>q22<<
 
-           [[  
+           [[
               (x) {{ hintx
                   these
                   span
@@ -919,18 +938,20 @@ describe 'Markdown to xml extended hint with tricky syntax cases', ->
       """
     markdown = markdown.replace(/\n/g, '\r\n')  # make DOS line endings
     data = MarkdownEditingDescriptor.markdownToXml(markdown)
-    expect(data).toEqual("""
+    expect(data).toXMLEqual("""
     <problem>
-    <p>q22</p>
     <optionresponse>
-      <optioninput label="q22">
-        <option correct="True">x <optionhint>hintx these span</optionhint></option>
-        <option correct="False">yy <optionhint label="meh">hinty</optionhint></option>
-        <option correct="False">zzz <optionhint>hintz</optionhint></option>
+      <label>q22</label>
+    <optioninput label="q22">
+        <option correct="True">x <optionhint>hintx these span</optionhint>
+    </option>
+        <option correct="False">yy <optionhint label="meh">hinty</optionhint>
+    </option>
+        <option correct="False">zzz <optionhint>hintz</optionhint>
+    </option>
       </optioninput>
     </optionresponse>
-    
-    
+
+
     </problem>
     """)
-
