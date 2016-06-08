@@ -324,7 +324,7 @@ class UserProfile(models.Model):
 
     @classmethod
     def get_random_anon_username(cls):
-        candidate = "anon__{}".format(get_random_string(24))      # django 1.4 has 30 char usernames
+        candidate = "anon__{}".format(get_random_string(24))      # django 1.8 has 30 char usernames
         while User.objects.filter(username=candidate).exists():
             candidate = "anon__{}".format(get_random_string(24))  # get_random_string output is alphanumeric
         return candidate
