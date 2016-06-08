@@ -194,9 +194,15 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
 
 
   @markdownToXml: (markdown)->
-    toXml = `function (markdown) {
+    toXml = `function (markdown) {  
       var xml = markdown,
           i, splits, scriptFlag;
+      var responseTypes = [
+        'formularesponse', 'javascriptresponse', 'schematicresponse', 'customresponse', 'coderesponse',
+        'optionresponse', 'symbolicresponse', 'multiplechoiceresponse', 'imageresponse', 'stringresponse',
+        'numericalresponse', 'jsmeresponse', 'choiceresponse', 'annotationresponse', 'truefalseresponse',
+        'choicetextresponse', 'externalresponse'
+      ];
 
       // fix DOS \r\n line endings to look like \n
       xml = xml.replace(/\r\n/g, '\n');
@@ -574,8 +580,54 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
       }
 
       // make all elements descendants of a single problem element
-      xml = '<problem>\n' + xml + demandhints + '\n</problem>';
+      xml = xml + demandhints;
+
+      debugger
+      // move everything under responsetype
+      var responseTypesSelector = responseTypes.join(", ");
+      // make temporary xml
+      var xmlDoc = $.parseXML('<prob>' + xml + '</prob>');
+      var $xml = $(xmlDoc);
+      responseType = $xml.find(responseTypesSelector);
+      var inputtype = responseType[0].firstElementChild
+      var before = true;
+      // these will be placed at the end
+      var independentTagNames = ['solution'];
+      var independentTagNodes = [];
+      if (responseType.length === 1) {
+        _.each($xml.find('prob').children(), function(child, index){
+            if (responseType[0].nodeName === child.nodeName) {
+                before = false;
+                return;
+            }
+
+            if (_.contains(independentTagNames, child.nodeName)) {
+                independentTagNodes.push(child)
+                return;
+            }
+
+            if (before) {
+                responseType[0].insertBefore(child, inputtype);
+            } else {
+                responseType[0].appendChild(child);
+            }
+        })
+        var serializer = new XMLSerializer();
+
+        // combine responsetype and independent tags
+        xml = serializer.serializeToString(responseType[0]) + _.map(independentTagNodes, function(node){
+            return serializer.serializeToString(node)
+        }).join('\n\n');
+      }
 
       return xml;
     }`
-    return toXml markdown
+    
+    responseTypesXML = []
+    responseTypesMarkdown = markdown.split('\n---\n')
+    _.each responseTypesMarkdown, (responseTypeMarkdown, index) ->
+      if responseTypeMarkdown.trim().length > 0
+        responseTypesXML.push toXml(responseTypeMarkdown)
+    
+    # make all responsetypes descendants of a single problem element
+    return '<problem>\n' + responseTypesXML.join('\n\n') + '\n</problem>'
