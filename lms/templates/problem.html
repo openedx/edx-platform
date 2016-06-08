@@ -50,6 +50,35 @@ from openedx.core.djangolib.markup import HTML
         ${_("You have used {num_used} of {num_total} attempts").format(num_used=attempts_used, num_total=attempts_allowed)}
     </div>
     % endif
-    <%include file="problem_notifications.html" args="notification_type=notification_type,notification_icon=notification_icon,notification_message=notification_message,hint_notification=hint_notification"/>
+
+    % if answer_notifications:
+      % for notification in answer_notifications:
+        % if 'correct' in notification:
+            <%include file="problem_notifications.html" args="
+                notification_type='success',
+                notification_icon='check',
+                notification_message=_(notification['correct']),
+                hint_notification=hint_notification"
+            />
+        % endif
+        % if 'incorrect' in notification:
+            <%include file="problem_notifications.html" args="
+                notification_type='error',
+                notification_icon='close',
+                notification_message=_(notification['incorrect']),
+                hint_notification=hint_notification"
+            />
+        % endif
+        % if 'partially-correct' in notification:
+            <%include file="problem_notifications.html" args="
+                notification_type='success',
+                notification_icon='asterisk',
+                notification_message=_(notification['partially-correct']),
+                hint_notification=hint_notification"
+            />
+        % endif
+      % endfor
+    % endif
+
   </div>
 </div>

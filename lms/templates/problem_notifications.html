@@ -3,12 +3,16 @@
 from django.utils.translation import ugettext as _
 from openedx.core.djangolib.markup import HTML
 %>
-
-<%
-notification_type = 'success'
-notification_icon = 'check'
-notification_message = 'Correct'
-%>
+<!--
+TYPE
+notification type, icon
+Correct:
+success, check
+Incorrect:
+error, close
+Partially correct:
+success, asterisk
+-->
 
 <div class="notification ${notification_type} ${'notification-hint' if hint_notification else 'notification-response'}" tabindex="-1">
     <span class="icon fa fa-${notification_icon}" aria-hidden="true"></span>

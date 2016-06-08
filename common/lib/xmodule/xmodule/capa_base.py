@@ -637,6 +637,20 @@ class CapaMixin(CapaFields):
         demand_hints = self.lcp.tree.xpath("//problem/demandhint/hint")
         demand_hint_possible = len(demand_hints) > 0
 
+        # Get the current problem status and generate the answer notification list.
+        answer_notifications = []
+        for answer_id, cm in self.correct_map.iteritems():
+            answer_notification_message = ''
+            correctness = self.correct_map.get(answer_id).get('correctness', None)
+            if correctness == 'incorrect':
+                answer_notification_message = 'Incorrect (%s points earned)' % self.get_progress()
+                self.get_progress()
+            elif correctness == 'correct':
+                answer_notification_message = 'Correct (%s points earned)' % self.get_progress()
+            elif correctness == 'partially-correct':
+                answer_notification_message = 'Partially correct (%s points earned)' % self.get_progress()
+            answer_notifications.append({correctness: answer_notification_message})
+
         context = {
             'problem': content,
             'id': self.location.to_deprecated_string(),
@@ -648,7 +662,10 @@ class CapaMixin(CapaFields):
             'answer_available': self.answer_available(),
             'attempts_used': self.attempts,
             'attempts_allowed': self.max_attempts,
-            'demand_hint_possible': demand_hint_possible
+            'demand_hint_possible': demand_hint_possible,
+            # 'answer_notification_type': answer_notification_type,
+            # 'answer_notification_message': answer_notification_message,
+            'answer_notifications': answer_notifications,
         }
 
         html = self.runtime.render_template('problem.html', context)
