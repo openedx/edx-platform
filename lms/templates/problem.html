@@ -5,38 +5,101 @@ from openedx.core.djangolib.markup import HTML
 %>
 
 <%namespace name='static' file='static_content.html'/>
-<h3 class="hd hd-2 problem-header">
+<h3 class="hd hd-2 problem-header" id="${ id }-problem-title" aria-describedby="${ id }-problem-progress" tabindex="-1">
   ${ problem['name'] }
 </h3>
 
-<div class="problem-progress"></div>
+<div class="problem-progress" id="${ id }-problem-progress"></div>
 
-<div class="problem">
+<div class="problem" aria-labelledby="${ id }-problem-title">
   ${ HTML(problem['html']) }
   <div class="action">
     <input type="hidden" name="problem_id" value="${ problem['name'] }" />
     % if demand_hint_possible:
-    <div class="problem-hint" aria-live="polite"></div>
+      <div class="problem-hint">
+        <%include file="problem_notifications.html" args="
+         notification_name='hint',
+         notification_type='problem-hint',
+         notification_icon='fa-question',
+         notification_message=''"
+       />
+      </div>
     % endif
-    % if check_button:
-    <button class="check ${ check_button }" data-checking="${ check_button_checking }" data-value="${ check_button }"><span class="check-label">${ check_button }</span><span class="sr"> ${_("your answer")}</span></button>
-    % endif
+    <div class="problem-action-buttons-wrapper">
     % if demand_hint_possible:
-    <button class="hint-button" data-value="${_('Hint')}">${_('Hint')}</button>
-    % endif
-    % if reset_button:
-    <button class="reset" data-value="${_('Reset')}">${_('Reset')}<span class="sr"> ${_("your answer")}</span></button>
+    <span class="problem-action-button-wrapper">
+        <button class="hint-button problem-action-btn btn-default btn-small" data-value="${_('Hint')}" ${'' if should_enable_next_hint else 'disabled'}><span class="icon fa fa-question" aria-hidden="true"></span>${_('Hint')}</button>
+    </span>
     % endif
     % if save_button:
-    <button class="save" data-value="${_('Save')}">${_('Save')}<span class="sr"> ${_("your answer")}</span></button>
+    <span class="problem-action-button-wrapper">
+        <button class="save problem-action-btn btn-default btn-small" data-value="${_('Save')}">
+            <span class="icon fa fa-floppy-o" aria-hidden="true"></span>
+            <span aria-hidden="true">${_('Save')}</span>
+            <span class="sr">${_("Save your answer")}</span>
+        </button>
+    </span>
+    % endif
+    % if reset_button:
+    <span class="problem-action-button-wrapper">
+        <button class="reset problem-action-btn btn-default btn-small" data-value="${_('Reset')}"><span class="icon fa fa-refresh" aria-hidden="true"></span><span aria-hidden="true">${_('Reset')}</span><span class="sr">${_("Reset your answer")}</span></button>
+    </span>
     % endif
     % if answer_available:
-    <button class="show"><span class='sr'>${_('Toggle Answer Visibility')}</span><span class="show-label">${_('Show Answer')}</span></button>
+    <span class="problem-action-button-wrapper">
+        <button class="show problem-action-btn btn-default btn-small" aria-describedby="${ id }-problem-title"><span class="icon fa fa-info-circle" aria-hidden="true"></span><span class="show-label">${_('Show Answer')}</span></button>
+    </span>
     % endif
-    % if attempts_allowed :
-    <div class="submission_feedback" aria-live="polite">
-      ${_("You have used {num_used} of {num_total} submissions").format(num_used=attempts_used, num_total=attempts_allowed)}
     </div>
+    <button type="button" class="submit btn-brand" data-submitting="${ submit_button_submitting }" data-value="${ submit_button }" aria-describedby="submission_feedback_${short_id}" ${'' if should_enable_submit_button else 'disabled'}
+        % if attempts_allowed:
+            data-attempts-remaining="${attempts_allowed - attempts_used}"
+        % endif
+    >
+        <span class="submit-label" aria-hidden="true">${ submit_button }</span><span class="sr">${_("Submit your answer")}</span>
+    </button>
+    <div class="submission_feedback" id="submission_feedback_${short_id}">
+    % if attempts_allowed:
+        ${_("You have used {num_used} of {num_total} attempts").format(num_used=attempts_used, num_total=attempts_allowed)}
     % endif
+    </div>
   </div>
+    <%include file="problem_notifications.html" args="
+      notification_type='warning',
+      notification_icon='fa-exclamation-circle',
+      notification_name='gentle-alert',
+      notification_message=''"
+    />
+    % if answer_notification_type:
+        % if 'correct' == answer_notification_type:
+            <%include file="problem_notifications.html" args="
+                notification_type='success',
+                notification_icon='fa-check',
+                notification_name='submit',
+                notification_message=answer_notification_message"
+            />
+        % endif
+        % if 'incorrect' == answer_notification_type:
+            <%include file="problem_notifications.html" args="
+                notification_type='error',
+                notification_icon='fa-close',
+                notification_name='submit',
+                notification_message=answer_notification_message"
+            />
+        % endif
+        % if 'partially-correct' == answer_notification_type:
+            <%include file="problem_notifications.html" args="
+                notification_type='success',
+                notification_icon='fa-asterisk',
+                notification_name='submit',
+                notification_message=answer_notification_message"
+            />
+        % endif
+    % endif
+    <%include file="problem_notifications.html" args="
+      notification_type='warning',
+      notification_icon='fa-save',
+      notification_name='save',
+      notification_message=''"
+    />
 </div>

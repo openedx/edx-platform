@@ -75,7 +75,7 @@ class ProgressPageBaseTest(UniqueCourseTest):
         """
         self.courseware_page.go_to_sequential_position(1)
         self.problem_page.click_choice('choice_choice_2')
-        self.problem_page.click_check()
+        self.problem_page.click_submit()
 
     def _get_section_score(self):
         """

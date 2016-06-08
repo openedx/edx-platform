@@ -43,7 +43,7 @@ data: |
         par is a dictionary that contains two keys, "answer" and "state".
         The value of "answer" is the JSON string that "getGrade" returns.
         The value of "state" is the JSON string that "getState" returns.
-        Clicking either "Check" or "Save" registers the current state.
+        Clicking either "Submit" or "Save" registers the current state.
 
         '''
         par = json.loads(ans)

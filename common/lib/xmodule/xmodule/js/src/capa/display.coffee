@@ -8,7 +8,7 @@ class @Problem
     @content = @el.data('content')
 
     # has_timed_out and has_response are used to ensure that are used to
-    # ensure that we wait a minimum of ~ 1s before transitioning the check
+    # ensure that we wait a minimum of ~ 1s before transitioning the submit
     # button from disabled to enabled
     @has_timed_out = false
     @has_response = false
@@ -28,19 +28,25 @@ class @Problem
     problem_prefix = @element_id.replace(/problem_/,'')
     @inputs = @$("[id^='input_#{problem_prefix}_']")
     @$('div.action button').click @refreshAnswers
-    @checkButton = @$('div.action button.check')
-    @checkButtonLabel = @$('div.action button.check span.check-label')
-    @checkButtonCheckText = @checkButtonLabel.text()
-    @checkButtonCheckingText = @checkButton.data('checking')
-    @checkButton.click @check_fd
-    @hintButton = @$('div.action button.hint-button')
+    @reviewButton = @$('.notification-btn.review-btn')
+    @reviewButton.click @scroll_to_problem_meta
+    @submitButton = @$('.action .submit')
+    @submitButtonLabel = @$('.action .submit .submit-label')
+    @submitButtonSubmitText = @submitButtonLabel.text()
+    @submitButtonSubmittingText = @submitButton.data('submitting')
+    @submitButton.click @submit_fd
+    @hintButton = @$('.action .hint-button')
     @hintButton.click @hint_button
-    @resetButton = @$('div.action button.reset')
+    @resetButton = @$('.action .reset')
     @resetButton.click @reset
-    @showButton = @$('div.action button.show')
+    @showButton = @$('.action .show')
     @showButton.click @show
-    @saveButton = @$('div.action button.save')
+    @saveButton = @$('.action .save')
+    @saveNotification = @$('.notification-save')
+    @saveButtonLabel = @$('.action .save .save-label')
     @saveButton.click @save
+    @gentleAlertNotification = @$('.notification-gentle-alert')
+    @submitNotification = @$('.notification-submit')
 
     # Accessibility helper for sighted keyboard users to show <clarification> tooltips on focus:
     @$('.clarification').focus (ev) =>
@@ -49,9 +55,15 @@ class @Problem
     @$('.clarification').blur (ev) =>
       window.globalTooltipManager.hide()
 
+    @$('.review-btn').focus (ev) =>
+      $(ev.target).removeClass('sr');
+
+    @$('.review-btn').blur (ev) =>
+      $(ev.target).addClass('sr');
+
     @bindResetCorrectness()
-    if @checkButton.length
-      @checkAnswersAndCheckButton true
+    if @submitButton.length
+      @submitAnswersAndSubmitButton true
 
     # Collapsibles
     Collapsible.setCollapsibles(@el)
@@ -65,26 +77,42 @@ class @Problem
   renderProgressState: =>
     detail = @el.data('progress_detail')
     status = @el.data('progress_status')
+    graded = @el.data('graded')
 
     # Render 'x/y point(s)' if student has attempted question
     if status != 'none' and detail? and (jQuery.type(detail) == "string") and detail.indexOf('/') > 0
         a = detail.split('/')
         earned = parseFloat(a[0])
         possible = parseFloat(a[1])
-        # This comment needs to be on one line to be properly scraped for the translators. Sry for length.
-        `// Translators: %(earned)s is the number of points earned. %(total)s is the total number of points (examples: 0/1, 1/1, 2/3, 5/10). The total number of points will always be at least 1. We pluralize based on the total number of points (example: 0/1 point; 1/2 points)`
-        progress_template = ngettext('(%(earned)s/%(possible)s point)', '(%(earned)s/%(possible)s points)', possible)
+
+        if graded == "True" and possible != 0
+            # This comment needs to be on one line to be properly scraped for the translators. Sry for length.
+            `// Translators: %(earned)s is the number of points earned. %(possible)s is the total number of points (examples: 0/1, 1/1, 2/3, 5/10). The total number of points will always be at least 1. We pluralize based on the total number of points (example: 0/1 point; 1/2 points)`
+            progress_template = ngettext('%(earned)s/%(possible)s point (graded)', '%(earned)s/%(possible)s points (graded)', possible)
+        else
+            # This comment needs to be on one line to be properly scraped for the translators. Sry for length.
+            `// Translators: %(earned)s is the number of points earned. %(possible)s is the total number of points (examples: 0/1, 1/1, 2/3, 5/10). The total number of points will always be at least 1. We pluralize based on the total number of points (example: 0/1 point; 1/2 points)`
+            progress_template = ngettext('%(earned)s/%(possible)s point (ungraded)', '%(earned)s/%(possible)s points (ungraded)', possible)
         progress = interpolate(progress_template, {'earned': earned, 'possible': possible}, true)
 
     # Render 'x point(s) possible' if student has not yet attempted question
-    if status == 'none' and detail? and (jQuery.type(detail) == "string") and detail.indexOf('/') > 0
-        a = detail.split('/')
-        possible = parseFloat(a[1])
-        `// Translators: %(num_points)s is the number of points possible (examples: 1, 3, 10). There will always be at least 1 point possible.`
-        progress_template = ngettext("(%(num_points)s point possible)", "(%(num_points)s points possible)", possible)
+    # Status is set to none when a user has a score of 0, and 0 when the problem has a weight of 0.
+    if status == 'none' or status == 0
+        if detail? and (jQuery.type(detail) == "string") and detail.indexOf('/') > 0
+            a = detail.split('/')
+            possible = parseFloat(a[1])
+        else
+            possible = 0
+
+        if graded == "True" and possible != 0
+            `// Translators: %(num_points)s is the number of points possible (examples: 1, 3, 10).`
+            progress_template = ngettext("%(num_points)s point possible (graded)", "%(num_points)s points possible (graded)", possible)
+        else
+            `// Translators: %(num_points)s is the number of points possible (examples: 1, 3, 10).`
+            progress_template = ngettext("%(num_points)s point possible (ungraded)", "%(num_points)s points possible (ungraded)", possible)
         progress = interpolate(progress_template, {'num_points': possible}, true)
 
-    @$('.problem-progress').html(progress)
+    @$('.problem-progress').text(progress)
 
   updateProgress: (response) =>
     if response.progress_changed
@@ -99,22 +127,23 @@ class @Problem
     @el.trigger('progressChanged')
     @renderProgressState()
 
-  queueing: =>
+  queueing: (focus_callback) =>
     @queued_items = @$(".xqueue")
     @num_queued_items = @queued_items.length
     if @num_queued_items > 0
       if window.queuePollerID # Only one poller 'thread' per Problem
         window.clearTimeout(window.queuePollerID)
       window.queuePollerID = window.setTimeout(
-        => @poll(1000),
+        => @poll(1000, focus_callback),
         1000)
 
-  poll: (prev_timeout) =>
+  poll: (prev_timeout, focus_callback) =>
     $.postWithPrefix "#{@url}/problem_get", (response) =>
       # If queueing status changed, then render
       @new_queued_items = $(response.html).find(".xqueue")
       if @new_queued_items.length isnt @num_queued_items
-        @el.html(response.html)
+        edx.HtmlUtils.setHtml(@el, edx.HtmlUtils.HTML(response.html)).promise().done =>
+          focus_callback?()
         JavascriptLoader.executeModuleScripts @el, () =>
           @setupInputTypes()
           @bind()
@@ -131,7 +160,7 @@ class @Problem
           @gentle_alert gettext("The grading process is still running. Refresh the page to see updates.")
         else
           window.queuePollerID = window.setTimeout(
-            => @poll(new_timeout),
+            => @poll(new_timeout, focus_callback),
             new_timeout
           )
 
@@ -153,16 +182,15 @@ class @Problem
     $.postWithPrefix "#{url}/input_ajax", data, callback
 
 
-  render: (content) ->
+  render: (content, focus_callback) ->
     if content
-      @el.attr({'aria-busy': 'true', 'aria-live': 'off', 'aria-atomic': 'false'})
       @el.html(content)
       JavascriptLoader.executeModuleScripts @el, () =>
         @setupInputTypes()
         @bind()
-        @queueing()
+        @queueing(focus_callback)
         @renderProgressState()
-      @el.attr('aria-busy', 'false')
+        focus_callback?()
     else
       $.postWithPrefix "#{@url}/problem_get", (response) =>
         @el.html(response.html)
@@ -188,15 +216,15 @@ class @Problem
   # If some function wants to be called before sending the answer to the
   # server, give it a chance to do so.
   #
-  # check_save_waitfor allows the callee to send alerts if the user's input is
+  # submit_save_waitfor allows the callee to send alerts if the user's input is
   # invalid. To do so, the callee must throw an exception named "Waitfor
   # Exception". This and any other errors or exceptions that arise from the
   # callee are rethrown and abort the submission.
   #
   # In order to use this feature, add a 'data-waitfor' attribute to the input,
-  # and specify the function to be called by the check button before sending
+  # and specify the function to be called by the submit button before sending
   # off @answers
-  check_save_waitfor: (callback) =>
+  submit_save_waitfor: (callback) =>
     flag = false
     for inp in @inputs
       if ($(inp).is("input[waitfor]"))
@@ -216,28 +244,50 @@ class @Problem
         flag = false
     return flag
 
+  # Scroll to problem metadata and next focus is problem input
+  scroll_to_problem_meta: =>
+    questionTitle = @$(".problem-header")
+    if questionTitle.length > 0
+      $('html, body').animate({
+        scrollTop: questionTitle.offset().top
+      }, 500);
+      questionTitle.focus()
+
+  focus_on_notification: (type) =>
+    notification = @$('.notification-'+type)
+    if notification.length > 0
+      notification.focus()
+
+  focus_on_submit_notification: =>
+    @focus_on_notification('submit')
+
+  focus_on_hint_notification: =>
+    @focus_on_notification('hint')
+
+  focus_on_save_notification: =>
+    @focus_on_notification('save')
 
   ###
-  # 'check_fd' uses FormData to allow file submissions in the 'problem_check' dispatch,
+  # 'submit_fd' uses FormData to allow file submissions in the 'problem_check' dispatch,
   #      in addition to simple querystring-based answers
   #
   # NOTE: The dispatch 'problem_check' is being singled out for the use of FormData;
   #       maybe preferable to consolidate all dispatches to use FormData
   ###
-  check_fd: =>
-    # If there are no file inputs in the problem, we can fall back on @check
+  submit_fd: =>
+    # If there are no file inputs in the problem, we can fall back on @submit
     if @el.find('input:file').length == 0
-      @check()
+      @submit()
       return
 
-    @enableCheckButton false
+    @enableSubmitButton false
 
     if not window.FormData
       alert "Submission aborted! Sorry, your browser does not support file uploads. If you can, please use Chrome or Safari which have been verified to support file uploads."
-      @enableCheckButton true
+      @enableSubmitButton true
       return
 
-    timeout_id = @enableCheckButtonAfterTimeout()
+    timeout_id = @enableSubmitButtonAfterTimeout()
 
     fd = new FormData()
 
@@ -287,7 +337,7 @@ class @Problem
     abort_submission = file_too_large or file_not_selected or unallowed_file_submitted or required_files_not_submitted
     if abort_submission
       window.clearTimeout(timeout_id)
-      @enableCheckButton true
+      @enableSubmitButton true
       return
 
     settings =
@@ -295,7 +345,7 @@ class @Problem
       data: fd
       processData: false
       contentType: false
-      complete: @enableCheckButtonAfterResponse
+      complete: @enableSubmitButtonAfterResponse
       success: (response) =>
         switch response.success
           when 'incorrect', 'correct'
@@ -307,115 +357,121 @@ class @Problem
 
     $.ajaxWithPrefix("#{@url}/problem_check", settings)
 
-  check: =>
-    if not @check_save_waitfor(@check_internal)
-      @disableAllButtonsWhileRunning @check_internal, true
+  submit: =>
+    if not @submit_save_waitfor(@submit_internal)
+      @disableAllButtonsWhileRunning @submit_internal, true
 
-  check_internal: =>
+  submit_internal: =>
     Logger.log 'problem_check', @answers
     $.postWithPrefix "#{@url}/problem_check", @answers, (response) =>
       switch response.success
         when 'incorrect', 'correct'
-          window.SR.readElts($(response.contents).find('.status'))
+          window.SR.readTexts(@get_sr_status(response.contents))
           @el.trigger('contentChanged', [@id, response.contents])
-          @render(response.contents)
+          @render(response.contents, @focus_on_submit_notification)
           @updateProgress response
-          if @el.hasClass 'showed'
-            @el.removeClass 'showed'
-          @$('div.action button.check').focus()
         else
+          @saveNotification.hide()
           @gentle_alert response.success
       Logger.log 'problem_graded', [@answers, response.contents], @id
 
+  get_sr_status: (contents) =>
+    # This method builds up an array of strings to send to the page screen-reader span.
+    # It first gets all elements with class "status", and then looks to see if they are contained
+    # in sections with aria-labels. If so, labels are prepended to the status element text.
+    # If not, just the text of the status elements are returned.
+    status_elements = $(contents).find('.status')
+    labeled_status = []
+    for element in status_elements
+      parent_section = $(element).closest('section')
+      added_status = false
+      if parent_section
+        aria_label = parent_section.attr('aria-label')
+        if aria_label
+          `// Translators: This is only translated to allow for reording of label and associated status.`
+          template = gettext("{label}: {status}")
+          labeled_status.push(edx.StringUtils.interpolate(template, {label: aria_label, status: $(element).text()}))
+          added_status = true
+
+      if not added_status
+        labeled_status.push($(element).text())
+
+    return labeled_status
+  
   reset: =>
     @disableAllButtonsWhileRunning @reset_internal, false
 
   reset_internal: =>
     Logger.log 'problem_reset', @answers
     $.postWithPrefix "#{@url}/problem_reset", id: @id, (response) =>
+      if response.success
         @el.trigger('contentChanged', [@id, response.html])
-        @render(response.html)
+        @render(response.html, @scroll_to_problem_meta)
         @updateProgress response
+        window.SR.readText(gettext('This problem has been reset.'))
+      else
+        @gentle_alert response.msg
 
   # TODO this needs modification to deal with javascript responses; perhaps we
   # need something where responsetypes can define their own behavior when show
   # is called.
   show: =>
-    if !@el.hasClass 'showed'
-      Logger.log 'problem_show', problem: @id
-      answer_text = []
-      $.postWithPrefix "#{@url}/problem_show", (response) =>
-        answers = response.answers
-        $.each answers, (key, value) =>
-          if $.isArray(value)
-            for choice in value
-              @$("label[for='input_#{key}_#{choice}']").attr correct_answer: 'true'
-              answer_text.push('<p>' + gettext('Answer:') + ' ' + value + '</p>')
-          else
-            answer = @$("#answer_#{key}, #solution_#{key}")
-            answer.html(value)
-            Collapsible.setCollapsibles(answer)
+    Logger.log 'problem_show', problem: @id
+    $.postWithPrefix "#{@url}/problem_show", (response) =>
+      answers = response.answers
+      $.each answers, (key, value) =>
+        if $.isArray(value)
+          for choice in value
+            @$("label[for='input_#{key}_#{choice}']").attr correct_answer: 'true'
+        else
+          answer = @$("#answer_#{key}, #solution_#{key}")
+          edx.HtmlUtils.setHtml(answer, edx.HtmlUtils.HTML(value))
+          Collapsible.setCollapsibles(answer)
 
-            # Sometimes, `value` is just a string containing a MathJax formula.
-            # If this is the case, jQuery will throw an error in some corner cases
-            # because of an incorrect selector. We setup a try..catch so that
-            # the script doesn't break in such cases.
-            #
-            # We will fallback to the second `if statement` below, if an
-            # error is thrown by jQuery.
-            try
-                solution = $(value).find('.detailed-solution')
-            catch e
-                solution = {}
-            if solution.length
-              answer_text.push(solution)
-            else
-              answer_text.push('<p>' + gettext('Answer:') + ' ' + value + '</p>')
+          # Sometimes, `value` is just a string containing a MathJax formula.
+          # If this is the case, jQuery will throw an error in some corner cases
+          # because of an incorrect selector. We setup a try..catch so that
+          # the script doesn't break in such cases.
+          #
+          # We will fallback to the second `if statement` below, if an
+          # error is thrown by jQuery.
+          try
+              solution = $(value).find('.detailed-solution')
+          catch e
+              solution = {}
 
-        # TODO remove the above once everything is extracted into its own
-        # inputtype functions.
-
-        @el.find(".capa_inputtype").each (index, inputtype) =>
-          classes = $(inputtype).attr('class').split(' ')
-          for cls in classes
-            display = @inputtypeDisplays[$(inputtype).attr('id')]
-            showMethod = @inputtypeShowAnswerMethods[cls]
-            showMethod(inputtype, display, answers) if showMethod?
-
-        if MathJax?
-          @el.find('.problem > div').each (index, element) =>
-            MathJax.Hub.Queue ["Typeset", MathJax.Hub, element]
-
-        `// Translators: the word Answer here refers to the answer to a problem the student must solve.`
-        @$('.show-label').text gettext('Hide Answer')
-        @el.addClass 'showed'
-        @updateProgress response
-        window.SR.readElts(answer_text)
-    else
-      @$('[id^=answer_], [id^=solution_]').text ''
-      @$('[correct_answer]').attr correct_answer: null
-      @el.removeClass 'showed'
-      `// Translators: the word Answer here refers to the answer to a problem the student must solve.`
-      @$('.show-label').text gettext('Show Answer')
-      window.SR.readText(gettext('Answer hidden'))
+      # TODO remove the above once everything is extracted into its own
+      # inputtype functions.
 
       @el.find(".capa_inputtype").each (index, inputtype) =>
-        display = @inputtypeDisplays[$(inputtype).attr('id')]
         classes = $(inputtype).attr('class').split(' ')
         for cls in classes
-          hideMethod = @inputtypeHideAnswerMethods[cls]
-          hideMethod(inputtype, display) if hideMethod?
+          display = @inputtypeDisplays[$(inputtype).attr('id')]
+          showMethod = @inputtypeShowAnswerMethods[cls]
+          showMethod(inputtype, display, answers) if showMethod?
+
+      if MathJax?
+        @el.find('.problem > div').each (index, element) =>
+          MathJax.Hub.Queue ["Typeset", MathJax.Hub, element]
+
+      @el.find('.show').attr('disabled', 'disabled')
+      @updateProgress response
+      window.SR.readText(gettext('Answers to this problem are now shown. Navigate through the problem to review it with answers inline.'))
+      @scroll_to_problem_meta()
+
+  clear_all_notifications: =>
+    @submitNotification.remove()
+    @gentleAlertNotification.hide()
+    @saveNotification.hide()
 
   gentle_alert: (msg) =>
-    if @el.find('.capa_alert').length
-      @el.find('.capa_alert').remove()
-    alert_elem = "<div class='capa_alert'>" + msg + "</div>"
-    @el.find('.action').after(alert_elem)
-    @el.find('.capa_alert').css(opacity: 0).animate(opacity: 1, 700)
-    window.SR.readElts @el.find('.capa_alert')
+    edx.HtmlUtils.setHtml(@el.find('.notification-gentle-alert .notification-message'), edx.HtmlUtils.HTML(msg))
+    @clear_all_notifications()
+    @gentleAlertNotification.show()
+    @gentleAlertNotification.focus()
 
   save: =>
-    if not @check_save_waitfor(@save_internal)
+    if not @submit_save_waitfor(@save_internal)
       @disableAllButtonsWhileRunning @save_internal, false
 
   save_internal: =>
@@ -424,8 +480,12 @@ class @Problem
       saveMessage = response.msg
       if response.success
         @el.trigger('contentChanged', [@id, response.html])
-      @gentle_alert saveMessage
-      @updateProgress response
+        edx.HtmlUtils.setHtml(@el.find('.notification-save .notification-message'), edx.HtmlUtils.HTML(saveMessage))
+        @clear_all_notifications()
+        @saveNotification.show()
+        @focus_on_save_notification()
+      else
+        @gentle_alert saveMessage
 
   refreshMath: (event, element) =>
     element = event.target unless element
@@ -459,12 +519,15 @@ class @Problem
       element.CodeMirror.save() if element.CodeMirror.save
     @answers = @inputs.serialize()
 
-  checkAnswersAndCheckButton: (bind=false) =>
-    # Used to check available answers and if something is checked (or the answer is set in some textbox)
-    # "Check"/"Final check" button becomes enabled. Otherwise it is disabled by default.
-    # params:
-    #   'bind' used on the first check to attach event handlers to input fields
-    #     to change "Check"/"Final check" enable status in case of some manipulations with answers
+  submitAnswersAndSubmitButton: (bind=false) =>
+    """
+    Used to check available answers and if something is checked (or the answer is set in some textbox)
+    "Submit" button becomes enabled. Otherwise it is disabled by default.
+
+    Arguments:
+      bind (bool): used on the first check to attach event handlers to input fields
+       to change "Submit" enable status in case of some manipulations with answers
+    """
     answered = true
 
     at_least_one_text_input_found = false
@@ -476,7 +539,8 @@ class @Problem
           one_text_input_filled = true
         if bind
           $(text_field).on 'input', (e) =>
-            @checkAnswersAndCheckButton()
+            @saveNotification.hide()
+            @submitAnswersAndSubmitButton()
             return
           return
     if at_least_one_text_input_found and not one_text_input_filled
@@ -489,7 +553,8 @@ class @Problem
           checked = true
         if bind
           $(checkbox_or_radio).on 'click', (e) =>
-            @checkAnswersAndCheckButton()
+            @saveNotification.hide()
+            @submitAnswersAndSubmitButton()
             return
           return
       if not checked
@@ -502,14 +567,15 @@ class @Problem
         answered = false
       if bind
         $(select_field).on 'change', (e) =>
-          @checkAnswersAndCheckButton()
+          @saveNotification.hide()
+          @submitAnswersAndSubmitButton()
           return
         return
 
     if answered
-      @enableCheckButton true
+      @enableSubmitButton true
     else
-      @enableCheckButton false, false
+      @enableSubmitButton false, false
 
   bindResetCorrectness: ->
     # Loop through all input types
@@ -740,84 +806,101 @@ class @Problem
     # params:
     #   'operationCallback' is an operation to be run.
     #   'isFromCheckOperation' is a boolean to keep track if 'operationCallback' was
-    #    @check, if so then text of check button will be changed as well.
+    #    @submit, if so then text of submit button will be changed as well.
     @enableAllButtons false, isFromCheckOperation
     operationCallback().always =>
       @enableAllButtons true, isFromCheckOperation
 
+  # Called by disableAllButtonsWhileRunning to automatically disable all buttons while check,reset, or
+  # save internal are running. Then enable all the buttons again after it is done.
   enableAllButtons: (enable, isFromCheckOperation) =>
     # Used to enable/disable all buttons in problem.
     # params:
     #   'enable' is a boolean to determine enabling/disabling of buttons.
     #   'isFromCheckOperation' is a boolean to keep track if operation was initiated
-    #    from @check so that text of check button will also be changed while disabling/enabling
-    #    the check button.
+    #    from @submit so that text of submit button will also be changed while disabling/enabling
+    #    the submit button.
     if enable
       @resetButton
         .add(@saveButton)
         .add(@hintButton)
         .add(@showButton)
-        .removeClass('is-disabled')
-        .attr({'aria-disabled': 'false'})
+        .removeAttr 'disabled'
     else
       @resetButton
         .add(@saveButton)
         .add(@hintButton)
         .add(@showButton)
-        .addClass('is-disabled')
-        .attr({'aria-disabled': 'true'})
+        .attr({'disabled': 'disabled'})
 
-    @enableCheckButton enable, isFromCheckOperation
+    @enableSubmitButton enable, isFromCheckOperation
 
-  enableCheckButton: (enable, changeText = true) =>
-    # Used to disable check button to reduce chance of accidental double-submissions.
+  enableSubmitButton: (enable, changeText = true) =>
+    # Used to disable submit button to reduce chance of accidental double-submissions.
     # params:
-    #   'enable' is a boolean to determine enabling/disabling of check button.
+    #   'enable' is a boolean to determine enabling/disabling of submit button.
     #   'changeText' is a boolean to determine if there is need to change the
-    #    text of check button as well.
+    #    text of submit button as well.
+    attempts_remaining = @submitButton.data('attempts-remaining')
     if enable
-      @checkButton.removeClass 'is-disabled'
-      @checkButton.attr({'aria-disabled': 'false'})
+      if attempts_remaining != 0
+        @submitButton.removeAttr 'disabled'
+        # the is-disabled is needed for Lettuce test below
+        # lms/djangoapps/courseware/features/problems.py submit_problem(step)
+        @submitButton.removeClass 'is-disabled'
       if changeText
-        @checkButtonLabel.text(@checkButtonCheckText)
+        @submitButtonLabel.text(@submitButtonSubmitText)
     else
-      @checkButton.addClass 'is-disabled'
-      @checkButton.attr({'aria-disabled': 'true'})
+      @submitButton.attr({'disabled': 'disabled'})
+      # the is-disabled is needed for Lettuce test below
+      # lms/djangoapps/courseware/features/problems.py submit_problem(step)
+      @submitButton.addClass 'is-disabled'
       if changeText
-        @checkButtonLabel.text(@checkButtonCheckingText)
+        @submitButtonLabel.text(@submitButtonSubmittingText)
 
-  enableCheckButtonAfterResponse: =>
+  enableSubmitButtonAfterResponse: =>
     @has_response = true
     if not @has_timed_out
       # Server has returned response before our timeout
-      @enableCheckButton false
+      @enableSubmitButton false
     else
-      @enableCheckButton true
+      @enableSubmitButton true
 
-  enableCheckButtonAfterTimeout: =>
+  enableSubmitButtonAfterTimeout: =>
     @has_timed_out = false
     @has_response = false
-    enableCheckButton = () =>
+    enableSubmitButton = () =>
       @has_timed_out = true
       if @has_response
-        @enableCheckButton true
-    window.setTimeout(enableCheckButton, 750)
+        @enableSubmitButton true
+    window.setTimeout(enableSubmitButton, 750)
 
   hint_button: =>
     # Store the index of the currently shown hint as an attribute.
     # Use that to compute the next hint number when the button is clicked.
-    hint_index = @$('.problem-hint').attr('hint_index')
+    hint_container = @.$('.problem-hint')
+    hint_index = hint_container.attr('hint_index')
     if hint_index == undefined
       next_index = 0
     else
       next_index = parseInt(hint_index) + 1
     $.postWithPrefix "#{@url}/hint_button", hint_index: next_index, input_id: @id, (response) =>
-      hint_container = @.$('.problem-hint')
-      hint_container.html(response.contents)
-      MathJax.Hub.Queue [
-        'Typeset'
-        MathJax.Hub
-        hint_container[0]
-      ]
-      hint_container.attr('hint_index', response.hint_index)
-      @$('.hint-button').focus()  # a11y focus on click, like the Check button
+      if response.success
+        hint_msg_container = @.$('.problem-hint .notification-message')
+        hint_container.attr('hint_index', response.hint_index)
+        edx.HtmlUtils.setHtml(hint_msg_container, edx.HtmlUtils.HTML(response.msg))
+        # Update any Mathjax entries
+        MathJax.Hub.Queue [
+          'Typeset'
+          MathJax.Hub
+          hint_container[0]
+        ]
+        # Enable/Disable the next hint button
+        if response.should_enable_next_hint
+          @hintButton.removeAttr 'disabled'
+        else
+          @hintButton.attr({'disabled': 'disabled'})
+        @el.find('.notification-hint').show()
+        @focus_on_hint_notification()
+      else
+        @gentle_alert response.msg

@@ -108,7 +108,7 @@ class ProblemTypeTestBase(ProblemsTest, EventsTestMixin):
             'problem',
             self.problem_name,
             data=self.factory.build_xml(**self.factory_kwargs),
-            metadata={'rerandomize': 'always'}
+            metadata={'rerandomize': 'always', 'show_reset_button': True}
         )
 
     def wait_for_status(self, status):
@@ -123,7 +123,7 @@ class ProblemTypeTestBase(ProblemsTest, EventsTestMixin):
         self.problem_page.wait_for_element_visibility(selector, msg)
 
     @abstractmethod
-    def answer_problem(self, correct):
+    def answer_problem(self, correctness):
         """
         Args:
             `correct` (bool): Inputs correct answer if True, else inputs
@@ -137,6 +137,7 @@ class ProblemTypeTestMixin(object):
     Test cases shared amongst problem types.
     """
     can_submit_blank = False
+    can_update_save_notification = True
 
     @attr(shard=7)
     def test_answer_correctly(self):
@@ -147,16 +148,25 @@ class ProblemTypeTestMixin(object):
         When I answer a "<ProblemType>" problem "correctly"
         Then my "<ProblemType>" answer is marked "correct"
         And The "<ProblemType>" problem displays a "correct" answer
+        And a success notification is shown
+        And clicking on "Review" moves focus to the problem meta area
         And a "problem_check" server event is emitted
         And a "problem_check" browser event is emitted
         """
         # Make sure we're looking at the right problem
-        self.assertEqual(self.problem_page.problem_name, self.problem_name)
+        self.problem_page.wait_for(
+            lambda: self.problem_page.problem_name == self.problem_name,
+            "Make sure the correct problem is on the page"
+        )
 
         # Answer the problem correctly
-        self.answer_problem(correct=True)
-        self.problem_page.click_check()
+        self.answer_problem(correctness='correct')
+        self.problem_page.click_submit()
         self.wait_for_status('correct')
+        self.problem_page.wait_success_notification()
+        # Check that clicking on "Review" goes to the problem meta location
+        self.problem_page.click_review_in_notification()
+        self.assertTrue(self.problem_page.is_focus_on_problem_meta())
 
         # Check for corresponding tracking event
         expected_events = [
@@ -190,16 +200,17 @@ class ProblemTypeTestMixin(object):
         )
 
         # Answer the problem incorrectly
-        self.answer_problem(correct=False)
-        self.problem_page.click_check()
+        self.answer_problem(correctness='incorrect')
+        self.problem_page.click_submit()
         self.wait_for_status('incorrect')
+        self.problem_page.wait_incorrect_notification()
 
     @attr(shard=7)
     def test_submit_blank_answer(self):
         """
         Scenario: I can submit a blank answer
         Given I am viewing a "<ProblemType>" problem
-        When I check a problem
+        When I submit a problem
         Then my "<ProblemType>" answer is marked "incorrect"
         And The "<ProblemType>" problem displays a "blank" answer
         """
@@ -210,9 +221,10 @@ class ProblemTypeTestMixin(object):
             lambda: self.problem_page.problem_name == self.problem_name,
             "Make sure the correct problem is on the page"
         )
-        # Leave the problem unchanged and click check.
-        self.assertNotIn('is-disabled', self.problem_page.q(css='div.problem button.check').attrs('class')[0])
-        self.problem_page.click_check()
+        # Leave the problem unchanged and assure submit is disabled.
+        self.wait_for_status('unanswered')
+        self.assertFalse(self.problem_page.is_submit_disabled())
+        self.problem_page.click_submit()
         self.wait_for_status('incorrect')
 
     @attr(shard=7)
@@ -220,7 +232,7 @@ class ProblemTypeTestMixin(object):
         """
         Scenario: I can't submit a blank answer
         When I try to submit blank answer
-        Then I can't check a problem
+        Then I can't submit a problem
         """
         if self.can_submit_blank:
             raise SkipTest("Test incompatible with the current problem type")
@@ -229,7 +241,121 @@ class ProblemTypeTestMixin(object):
             lambda: self.problem_page.problem_name == self.problem_name,
             "Make sure the correct problem is on the page"
         )
-        self.assertIn('is-disabled', self.problem_page.q(css='div.problem button.check').attrs('class')[0])
+        self.assertTrue(self.problem_page.is_submit_disabled())
+
+    @attr(shard=7)
+    def test_can_show_answer(self):
+        """
+        Scenario: Verifies that show answer button is working as expected.
+
+        Given that I am on courseware page
+        And I can see a CAPA problem with show answer button
+        When I click "Show Answer" button
+        And I should see question's solution
+        And I should see the problem title is focused
+        """
+        self.problem_page.click_show()
+        self.assertTrue(self.problem_page.is_focus_on_problem_meta())
+
+    @attr(shard=7)
+    def test_save_reaction(self):
+        """
+        Scenario: Verify that the save button performs as expected with problem types
+
+        Given that I am on a problem page
+        And I can see a CAPA problem with the Save button present
+        When I select and answer and click the "Save" button
+        Then I should see the Save notification
+        And the Save button should not be disabled
+        And clicking on "Review" moves focus to the problem meta area
+        And if I change the answer selected
+        Then the Save notification should be removed
+        """
+        self.problem_page.wait_for(
+            lambda: self.problem_page.problem_name == self.problem_name,
+            "Make sure the correct problem is on the page"
+        )
+        self.problem_page.wait_for_page()
+        self.answer_problem(correctness='correct')
+        self.assertTrue(self.problem_page.is_save_button_enabled())
+        self.problem_page.click_save()
+        # Ensure "Save" button is enabled after save is complete.
+        self.assertTrue(self.problem_page.is_save_button_enabled())
+        self.problem_page.wait_for_save_notification()
+        # Check that clicking on "Review" goes to the problem meta location
+        self.problem_page.click_review_in_notification()
+        self.assertTrue(self.problem_page.is_focus_on_problem_meta())
+
+        # Not all problems will detect the change and remove the save notification
+        if self.can_update_save_notification:
+            self.answer_problem(correctness='incorrect')
+            self.assertFalse(self.problem_page.is_save_notification_visible())
+
+    @attr(shard=7)
+    def test_reset_clears_answer_and_focus(self):
+        """
+        Scenario: Reset will clear answers and focus on problem meta
+        If I select an answer
+        and then reset the problem
+        There should be no answer selected
+        And the focus should shift appropriately
+        """
+        self.problem_page.wait_for(
+            lambda: self.problem_page.problem_name == self.problem_name,
+            "Make sure the correct problem is on the page"
+        )
+        self.wait_for_status('unanswered')
+        # Set an answer
+        self.answer_problem(correctness='correct')
+        self.problem_page.click_submit()
+        self.wait_for_status('correct')
+        # clear the answers
+        self.problem_page.click_reset()
+        # Focus should change to meta
+        self.assertTrue(self.problem_page.is_focus_on_problem_meta())
+        # Answer should be reset
+        self.wait_for_status('unanswered')
+
+    @attr(shard=7)
+    def test_reset_shows_errors(self):
+        """
+        Scenario: Reset will show server errors
+        If I reset a problem without first answering it
+        Then a "gentle notification" is shown
+        And the focus moves to the "gentle notification"
+        """
+        self.problem_page.wait_for(
+            lambda: self.problem_page.problem_name == self.problem_name,
+            "Make sure the correct problem is on the page"
+        )
+        self.wait_for_status('unanswered')
+        self.assertFalse(self.problem_page.is_gentle_alert_notification_visible())
+        # Click reset without first answering the problem (possible because show_reset_button is set to True)
+        self.problem_page.click_reset()
+        self.problem_page.wait_for_gentle_alert_notification()
+
+    @attr(shard=7)
+    def test_partially_complete_notifications(self):
+        """
+        Scenario: If a partially correct problem is submitted the correct notification is shown
+        If I submit an answer that is partially correct
+        Then the partially correct notification should be shown
+        """
+
+        # Not all problems have partially correct solutions configured
+        if not self.partially_correct:
+            raise SkipTest("Test incompatible with the current problem type")
+
+        self.problem_page.wait_for(
+            lambda: self.problem_page.problem_name == self.problem_name,
+            "Make sure the correct problem is on the page"
+        )
+
+        self.wait_for_status('unanswered')
+        # Set an answer
+        self.answer_problem(correctness='partially-correct')
+        self.problem_page.click_submit()
+        self.problem_page.wait_partial_notification()
 
     @attr('a11y')
     def test_problem_type_a11y(self):
@@ -247,9 +373,6 @@ class ProblemTypeTestMixin(object):
 
         self.problem_page.a11y_audit.config.set_rules({
             "ignore": [
-                'aria-allowed-attr',  # TODO: AC-491
-                'aria-valid-attr',  # TODO: AC-491
-                'aria-roles',  # TODO: AC-491
                 'checkboxgroup',  # TODO: AC-491
                 'radiogroup',  # TODO: AC-491
                 'section',  # TODO: AC-491
@@ -269,9 +392,10 @@ class AnnotationProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
     problem_type = 'annotationresponse'
 
     factory = AnnotationResponseXMLFactory()
+    partially_correct = True
 
     can_submit_blank = True
-
+    can_update_save_notification = False
     factory_kwargs = {
         'title': 'Annotation Problem',
         'text': 'The text being annotated',
@@ -298,11 +422,16 @@ class AnnotationProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         """
         super(AnnotationProblemTypeTest, self).setUp(*args, **kwargs)
 
-    def answer_problem(self, correct):
+    def answer_problem(self, correctness):
         """
         Answer annotation problem.
         """
-        choice = 0 if correct else 1
+        if correctness == 'correct':
+            choice = 0
+        elif correctness == 'partially-correct':
+            choice = 2
+        else:
+            choice = 1
         answer = 'Student comment'
 
         self.problem_page.q(css='div.problem textarea.comment').fill(answer)
@@ -317,12 +446,14 @@ class CheckboxProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
     """
     problem_name = 'CHECKBOX TEST PROBLEM'
     problem_type = 'checkbox'
+    partially_correct = True
 
     factory = ChoiceResponseXMLFactory()
 
     factory_kwargs = {
-        'question_text': 'The correct answer is Choice 0 and Choice 2',
+        'question_text': 'The correct answer is Choice 0 and Choice 2, Choice 1 and Choice 3 together are incorrect.',
         'choice_type': 'checkbox',
+        'credit_type': 'edc',
         'choices': [True, False, True, False],
         'choice_names': ['Choice 0', 'Choice 1', 'Choice 2', 'Choice 3'],
         'explanation_text': 'This is explanation text'
@@ -334,39 +465,34 @@ class CheckboxProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         """
         super(CheckboxProblemTypeTest, self).setUp(*args, **kwargs)
 
-    def answer_problem(self, correct):
+    def answer_problem(self, correctness):
         """
         Answer checkbox problem.
         """
-        if correct:
+        if correctness == 'correct':
             self.problem_page.click_choice("choice_0")
+            self.problem_page.click_choice("choice_2")
+        elif correctness == 'partially-correct':
             self.problem_page.click_choice("choice_2")
         else:
             self.problem_page.click_choice("choice_1")
+            self.problem_page.click_choice("choice_3")
 
-    @attr('shard_7')
-    def test_can_show_hide_answer(self):
+    @attr(shard=7)
+    def test_can_show_answer(self):
         """
-        Scenario: Verifies that show/hide answer button is working as expected.
+        Scenario: Verifies that show answer button is working as expected.
 
         Given that I am on courseware page
         And I can see a CAPA problem with show answer button
         When I click "Show Answer" button
-        Then I should see "Hide Answer" text on button
         And I should see question's solution
         And I should see correct choices highlighted
-        When I click "Hide Answer" button
-        Then I should see "Show Answer" text on button
-        And I should not see question's solution
-        And I should not see correct choices highlighted
         """
-        self.problem_page.click_show_hide_button()
+        self.problem_page.click_show()
         self.assertTrue(self.problem_page.is_solution_tag_present())
         self.assertTrue(self.problem_page.is_correct_choice_highlighted(correct_choices=[1, 3]))
-
-        self.problem_page.click_show_hide_button()
-        self.assertFalse(self.problem_page.is_solution_tag_present())
-        self.assertFalse(self.problem_page.is_correct_choice_highlighted(correct_choices=[1, 3]))
+        self.assertTrue(self.problem_page.is_focus_on_problem_meta())
 
 
 class MultipleChoiceProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
@@ -377,6 +503,8 @@ class MultipleChoiceProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
     problem_type = 'multiple choice'
 
     factory = MultipleChoiceResponseXMLFactory()
+
+    partially_correct = False
 
     factory_kwargs = {
         'question_text': 'The correct answer is Choice 2',
@@ -395,14 +523,14 @@ class MultipleChoiceProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         """
         super(MultipleChoiceProblemTypeTest, self).setUp(*args, **kwargs)
 
-    def answer_problem(self, correct):
+    def answer_problem(self, correctness):
         """
         Answer multiple choice problem.
         """
-        if correct:
-            self.problem_page.click_choice("choice_choice_2")
-        else:
+        if correctness == 'incorrect':
             self.problem_page.click_choice("choice_choice_1")
+        else:
+            self.problem_page.click_choice("choice_choice_2")
 
 
 class RadioProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
@@ -411,6 +539,8 @@ class RadioProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
     """
     problem_name = 'RADIO TEST PROBLEM'
     problem_type = 'radio'
+
+    partially_correct = False
 
     factory = ChoiceResponseXMLFactory()
 
@@ -432,11 +562,11 @@ class RadioProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         """
         super(RadioProblemTypeTest, self).setUp(*args, **kwargs)
 
-    def answer_problem(self, correct):
+    def answer_problem(self, correctness):
         """
         Answer radio problem.
         """
-        if correct:
+        if correctness == 'correct':
             self.problem_page.click_choice("choice_2")
         else:
             self.problem_page.click_choice("choice_1")
@@ -448,6 +578,8 @@ class DropDownProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
     """
     problem_name = 'DROP DOWN TEST PROBLEM'
     problem_type = 'drop down'
+
+    partially_correct = False
 
     factory = OptionResponseXMLFactory()
 
@@ -463,11 +595,11 @@ class DropDownProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         """
         super(DropDownProblemTypeTest, self).setUp(*args, **kwargs)
 
-    def answer_problem(self, correct):
+    def answer_problem(self, correctness):
         """
         Answer drop down problem.
         """
-        answer = 'Option 2' if correct else 'Option 3'
+        answer = 'Option 2' if correctness == 'correct' else 'Option 3'
         selector_element = self.problem_page.q(
             css='.problem .option-input select')
         select_option_by_text(selector_element, answer)
@@ -479,6 +611,8 @@ class StringProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
     """
     problem_name = 'STRING TEST PROBLEM'
     problem_type = 'string'
+
+    partially_correct = False
 
     factory = StringResponseXMLFactory()
 
@@ -500,11 +634,11 @@ class StringProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         """
         super(StringProblemTypeTest, self).setUp(*args, **kwargs)
 
-    def answer_problem(self, correct):
+    def answer_problem(self, correctness):
         """
         Answer string problem.
         """
-        textvalue = 'correct string' if correct else 'incorrect string'
+        textvalue = 'correct string' if correctness == 'correct' else 'incorrect string'
         self.problem_page.fill_answer(textvalue)
 
 
@@ -514,6 +648,7 @@ class NumericalProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
     """
     problem_name = 'NUMERICAL TEST PROBLEM'
     problem_type = 'numerical'
+    partially_correct = False
 
     factory = NumericalResponseXMLFactory()
 
@@ -536,12 +671,42 @@ class NumericalProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         """
         super(NumericalProblemTypeTest, self).setUp(*args, **kwargs)
 
-    def answer_problem(self, correct):
+    def answer_problem(self, correctness):
         """
         Answer numerical problem.
         """
-        textvalue = "pi + 1" if correct else str(random.randint(-2, 2))
+        textvalue = ''
+        if correctness == 'correct':
+            textvalue = "pi + 1"
+        elif correctness == 'error':
+            textvalue = 'notNum'
+        else:
+            textvalue = str(random.randint(-2, 2))
         self.problem_page.fill_answer(textvalue)
+
+    def test_error_input_gentle_alert(self):
+        """
+        Scenario: I can answer a problem with erroneous input and will see a gentle alert
+        Given a Numerical Problem type
+        I can input a string answer
+        Then I will see a Gentle alert notification
+        And focus will shift to that notification
+        And clicking on "Review" moves focus to the problem meta area
+        """
+        # Make sure we're looking at the right problem
+        self.problem_page.wait_for(
+            lambda: self.problem_page.problem_name == self.problem_name,
+            "Make sure the correct problem is on the page"
+        )
+
+        # Answer the problem with an erroneous input to cause a gentle alert
+        self.assertFalse(self.problem_page.is_gentle_alert_notification_visible())
+        self.answer_problem(correctness='error')
+        self.problem_page.click_submit()
+        self.problem_page.wait_for_gentle_alert_notification()
+        # Check that clicking on "Review" goes to the problem meta location
+        self.problem_page.click_review_in_notification()
+        self.assertTrue(self.problem_page.is_focus_on_problem_meta())
 
 
 class FormulaProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
@@ -550,6 +715,7 @@ class FormulaProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
     """
     problem_name = 'FORMULA TEST PROBLEM'
     problem_type = 'formula'
+    partially_correct = False
 
     factory = FormulaResponseXMLFactory()
 
@@ -574,11 +740,11 @@ class FormulaProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         """
         super(FormulaProblemTypeTest, self).setUp(*args, **kwargs)
 
-    def answer_problem(self, correct):
+    def answer_problem(self, correctness):
         """
         Answer formula problem.
         """
-        textvalue = "x^2+2*x+y" if correct else 'x^2'
+        textvalue = "x^2+2*x+y" if correctness == 'correct' else 'x^2'
         self.problem_page.fill_answer(textvalue)
 
 
@@ -588,6 +754,7 @@ class ScriptProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
     """
     problem_name = 'SCRIPT TEST PROBLEM'
     problem_type = 'script'
+    partially_correct = False
 
     factory = CustomResponseXMLFactory()
 
@@ -595,7 +762,8 @@ class ScriptProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         'cfn': 'test_add_to_ten',
         'expect': '10',
         'num_inputs': 2,
-        'group_label': 'Enter two integers that sum to 10.',
+        'question_text': 'Enter two integers that sum to 10.',
+        'input_element_label': 'Enter an integer',
         'script': textwrap.dedent("""
             def test_add_to_ten(expect,ans):
                 try:
@@ -619,7 +787,7 @@ class ScriptProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         """
         super(ScriptProblemTypeTest, self).setUp(*args, **kwargs)
 
-    def answer_problem(self, correct):
+    def answer_problem(self, correctness):
         """
         Answer script problem.
         """
@@ -629,7 +797,7 @@ class ScriptProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
 
         # If we want an incorrect answer, then change
         # the second addend so they no longer sum to 10
-        if not correct:
+        if not correctness == 'correct':
             second_addend += random.randint(1, 10)
 
         self.problem_page.fill_answer(first_addend, input_num=0)
@@ -642,7 +810,8 @@ class CodeProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
     """
     problem_name = 'CODE TEST PROBLEM'
     problem_type = 'code'
-
+    partially_correct = False
+    can_update_save_notification = False
     factory = CodeResponseXMLFactory()
 
     factory_kwargs = {
@@ -657,19 +826,7 @@ class CodeProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         'unanswered': ['.grader-status .unanswered ~ .debug'],
     }
 
-    def setUp(self, *args, **kwargs):
-        """
-        Additional setup for CodeProblemTypeTest
-        """
-        super(CodeProblemTypeTest, self).setUp(*args, **kwargs)
-        self.problem_page.a11y_audit.config.set_rules({
-            'ignore': [
-                'section',  # TODO: AC-491
-                'label',  # TODO: AC-286
-            ]
-        })
-
-    def answer_problem(self, correct):
+    def answer_problem(self, correctness):
         """
         Answer code problem.
         """
@@ -704,6 +861,13 @@ class CodeProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         """
         pass
 
+    def wait_for_status(self, status):
+        """
+        Overridden for script test because the testing grader always responds
+        with "correct"
+        """
+        pass
+
 
 class ChoiceTextProbelmTypeTestBase(ProblemTypeTestBase):
     """
@@ -711,6 +875,8 @@ class ChoiceTextProbelmTypeTestBase(ProblemTypeTestBase):
     (e.g. RadioText, CheckboxText)
     """
     choice_type = None
+    partially_correct = False
+    can_update_save_notification = False
 
     def _select_choice(self, input_num):
         """
@@ -729,12 +895,12 @@ class ChoiceTextProbelmTypeTestBase(ProblemTypeTestBase):
             css='div.problem input.ctinput[type="text"]'
         ).nth(input_num).fill(value)
 
-    def answer_problem(self, correct):
+    def answer_problem(self, correctness):
         """
         Answer radio text problem.
         """
-        choice = 0 if correct else 1
-        input_value = "8" if correct else "5"
+        choice = 0 if correctness == 'correct' else 1
+        input_value = "8" if correctness == 'correct' else "5"
 
         self._select_choice(choice)
         self._fill_input_text(input_value, choice)
@@ -747,6 +913,8 @@ class RadioTextProblemTypeTest(ChoiceTextProbelmTypeTestBase, ProblemTypeTestMix
     problem_name = 'RADIO TEXT TEST PROBLEM'
     problem_type = 'radio_text'
     choice_type = 'radio'
+    partially_correct = False
+    can_update_save_notification = False
 
     factory = ChoiceTextResponseXMLFactory()
 
@@ -779,8 +947,9 @@ class CheckboxTextProblemTypeTest(ChoiceTextProbelmTypeTestBase, ProblemTypeTest
     problem_name = 'CHECKBOX TEXT TEST PROBLEM'
     problem_type = 'checkbox_text'
     choice_type = 'checkbox'
-
     factory = ChoiceTextResponseXMLFactory()
+    partially_correct = False
+    can_update_save_notification = False
 
     factory_kwargs = {
         'question_text': 'The correct answer is Choice 0 and input 8',
@@ -804,21 +973,23 @@ class ImageProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
     """
     problem_name = 'IMAGE TEST PROBLEM'
     problem_type = 'image'
+    partially_correct = False
 
     factory = ImageResponseXMLFactory()
 
     can_submit_blank = True
+    can_update_save_notification = False
 
     factory_kwargs = {
         'src': '/static/images/placeholder-image.png',
         'rectangle': '(0,0)-(50,50)',
     }
 
-    def answer_problem(self, correct):
+    def answer_problem(self, correctness):
         """
         Answer image problem.
         """
-        offset = 25 if correct else -25
+        offset = 25 if correctness == 'correct' else -25
         input_selector = ".imageinput [id^='imageinput_'] img"
         input_element = self.problem_page.q(css=input_selector)[0]
 
@@ -835,11 +1006,13 @@ class SymbolicProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
     """
     problem_name = 'SYMBOLIC TEST PROBLEM'
     problem_type = 'symbolicresponse'
+    partially_correct = False
 
     factory = SymbolicResponseXMLFactory()
 
     factory_kwargs = {
         'expect': '2*x+3*y',
+        'question_text': 'Enter a value'
     }
 
     status_indicators = {
@@ -848,21 +1021,9 @@ class SymbolicProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         'unanswered': ['div.capa_inputtype div.unanswered'],
     }
 
-    def setUp(self, *args, **kwargs):
-        """
-        Additional setup for SymbolicProblemTypeTest
-        """
-        super(SymbolicProblemTypeTest, self).setUp(*args, **kwargs)
-        self.problem_page.a11y_audit.config.set_rules({
-            'ignore': [
-                'section',  # TODO: AC-491
-                'label',  # TODO: AC-294
-            ]
-        })
-
-    def answer_problem(self, correct):
+    def answer_problem(self, correctness):
         """
         Answer symbolic problem.
         """
-        choice = "2*x+3*y" if correct else "3*a+4*b"
+        choice = "2*x+3*y" if correctness == 'correct' else "3*a+4*b"
         self.problem_page.fill_answer(choice)
