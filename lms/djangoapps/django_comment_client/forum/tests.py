@@ -6,6 +6,7 @@ from django.core.urlresolvers import reverse
 from django.http import Http404
 from django.test.client import Client, RequestFactory
 from django.test.utils import override_settings
+from django.utils import translation
 from lms.lib.comment_client.utils import CommentClientPaginatedResult
 from edxmako.tests import mako_middleware_process_request
 
@@ -1244,6 +1245,8 @@ class CommentsServiceRequestHeadersTestCase(UrlResetMixin, ModuleStoreTestCase):
         self.assertTrue(
             self.client.login(username=username, password=password)
         )
+
+        self.addCleanup(translation.deactivate)
 
     def assert_all_calls_have_header(self, mock_request, key, value):
         expected = call(
