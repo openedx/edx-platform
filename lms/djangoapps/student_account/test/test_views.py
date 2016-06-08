@@ -17,14 +17,19 @@ from django.contrib.messages.middleware import MessageMiddleware
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.http import HttpRequest
+from edx_rest_api_client import exceptions
 
 from course_modes.models import CourseMode
+from commerce.models import CommerceConfiguration
+from commerce.tests import TEST_API_URL, TEST_API_SIGNING_KEY, factories
+from commerce.tests.mocks import mock_get_orders
+from openedx.core.djangoapps.programs.tests.mixins import ProgramsApiConfigMixin
 from openedx.core.djangoapps.user_api.accounts.api import activate_account, create_account
 from openedx.core.djangoapps.user_api.accounts import EMAIL_MAX_LENGTH
 from openedx.core.djangolib.js_utils import dump_js_escaped_json
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from student.tests.factories import UserFactory
-from student_account.views import account_settings_context
+from student_account.views import account_settings_context, get_user_orders
 from third_party_auth.tests.testutil import simulate_running_pipeline, ThirdPartyAuthTestMixin
 from util.testing import UrlResetMixin
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -442,7 +447,8 @@ class StudentAccountLoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMi
         })
 
 
-class AccountSettingsViewTest(ThirdPartyAuthTestMixin, TestCase):
+@override_settings(ECOMMERCE_API_URL=TEST_API_URL, ECOMMERCE_API_SIGNING_KEY=TEST_API_SIGNING_KEY)
+class AccountSettingsViewTest(ThirdPartyAuthTestMixin, TestCase, ProgramsApiConfigMixin):
     """ Tests for the account settings view. """
 
     USERNAME = 'student'
@@ -461,6 +467,7 @@ class AccountSettingsViewTest(ThirdPartyAuthTestMixin, TestCase):
     def setUp(self):
         super(AccountSettingsViewTest, self).setUp()
         self.user = UserFactory.create(username=self.USERNAME, password=self.PASSWORD)
+        CommerceConfiguration.objects.create(cache_ttl=10, enabled=True)
         self.client.login(username=self.USERNAME, password=self.PASSWORD)
 
         self.request = HttpRequest()
@@ -507,6 +514,86 @@ class AccountSettingsViewTest(ThirdPartyAuthTestMixin, TestCase):
 
         for attribute in self.FIELDS:
             self.assertIn(attribute, response.content)
+
+    def test_header_with_programs_listing_enabled(self):
+        """
+        Verify that tabs header will be shown while program listing is enabled.
+        """
+        self.create_programs_config(program_listing_enabled=True)
+        view_path = reverse('account_settings')
+        response = self.client.get(path=view_path)
+
+        self.assertContains(response, '<li class="tab-nav-item">')
+
+    def test_header_with_programs_listing_disabled(self):
+        """
+        Verify that nav header will be shown while program listing is disabled.
+        """
+        self.create_programs_config(program_listing_enabled=False)
+        view_path = reverse('account_settings')
+        response = self.client.get(path=view_path)
+
+        self.assertContains(response, '<li class="item nav-global-01">')
+
+    def test_commerce_order_detail(self):
+        with mock_get_orders():
+            order_detail = get_user_orders(self.user)
+
+        user_order = mock_get_orders.default_response['results'][0]
+        expected = [
+            {
+                'number': user_order['number'],
+                'price': user_order['total_excl_tax'],
+                'title': user_order['lines'][0]['title'],
+                'order_date': 'Jan 01, 2016',
+                'receipt_url': '/commerce/checkout/receipt/?orderNum=' + user_order['number']
+            }
+        ]
+        self.assertEqual(order_detail, expected)
+
+    def test_commerce_order_detail_exception(self):
+        with mock_get_orders(exception=exceptions.HttpNotFoundError):
+            order_detail = get_user_orders(self.user)
+
+        self.assertEqual(order_detail, [])
+
+    def test_incomplete_order_detail(self):
+        response = {
+            'results': [
+                factories.OrderFactory(
+                    status='Incomplete',
+                    lines=[
+                        factories.OrderLineFactory(
+                            product=factories.ProductFactory(attribute_values=[factories.ProductAttributeFactory()])
+                        )
+                    ]
+                )
+            ]
+        }
+        with mock_get_orders(response=response):
+            order_detail = get_user_orders(self.user)
+
+        self.assertEqual(order_detail, [])
+
+    def test_honor_course_order_detail(self):
+        response = {
+            'results': [
+                factories.OrderFactory(
+                    lines=[
+                        factories.OrderLineFactory(
+                            product=factories.ProductFactory(attribute_values=[factories.ProductAttributeFactory(
+                                name='certificate_type',
+                                value='honor'
+                            )])
+                        )
+                    ]
+                )
+            ]
+        }
+        with mock_get_orders(response=response):
+            order_detail = get_user_orders(self.user)
+
+        self.assertEqual(order_detail, [])
 
 
 @override_settings(SITE_NAME=settings.MICROSITE_LOGISTRATION_HOSTNAME)
