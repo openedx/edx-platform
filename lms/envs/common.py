@@ -2070,6 +2070,9 @@ INSTALLED_APPS = (
 
     # Enables default site and redirects
     'django_sites_extensions',
+
+    # Email marketing integration
+    'email_marketing',
 )
 
 # Migrations which are not in the standard module "migrations"

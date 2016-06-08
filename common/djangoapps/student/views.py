@@ -34,7 +34,7 @@ from django.utils.translation import ugettext as _, get_language
 from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
 from django.views.decorators.http import require_POST, require_GET
 from django.db.models.signals import post_save
-from django.dispatch import receiver
+from django.dispatch import receiver, Signal
 from django.template.response import TemplateResponse
 
 from ratelimitbackend.exceptions import RateLimitException
@@ -135,6 +135,8 @@ ReverifyInfo = namedtuple('ReverifyInfo', 'course_id course_name course_number d
 SETTING_CHANGE_INITIATED = 'edx.user.settings.change_initiated'
 # Used as the name of the user attribute for tracking affiliate registrations
 REGISTRATION_AFFILIATE_ID = 'registration_affiliate_id'
+# used to announce a registration
+REGISTER_USER = Signal(providing_args=["user", "profile"])
 
 # Disable this warning because it doesn't make sense to completely refactor tests to appease Pylint
 # pylint: disable=logging-format-interpolation
@@ -1753,6 +1755,9 @@ def create_account_with_params(request, params):
                 }
             }
         )
+
+    # Announce registration
+    REGISTER_USER.send(sender=None, user=user, profile=profile)
 
     create_comments_service_user(user)
 
