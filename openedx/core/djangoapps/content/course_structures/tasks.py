@@ -5,6 +5,7 @@ import json
 import logging
 
 from celery.task import task
+from django.conf import settings
 from opaque_keys.edx.keys import CourseKey
 from xmodule.modulestore.django import modulestore
 
@@ -60,7 +61,21 @@ def _generate_course_structure(course_key):
         }
 
 
-@task(name=u'openedx.core.djangoapps.content.course_structures.tasks.update_course_structure')
+def ensure_lms_queue():
+    """
+    Ensure the worker associated with the chosen queue is loaded with lms params, if applicable.
+    """
+    queue = getattr(settings, 'CELERY_DEFAULT_QUEUE', None)
+    variant = getattr(settings, 'SERVICE_VARIANT', None)
+    lms_prefix = getattr(settings, 'LMS_PREFIX', None)
+    if queue and variant and lms_prefix:
+        queue = queue.replace(variant, lms_prefix)
+    return queue
+
+@task(
+    name=u'openedx.core.djangoapps.content.course_structures.tasks.update_course_structure',
+    queue=ensure_lms_queue(),
+)
 def update_course_structure(course_key):
     """
     Regenerates and updates the course structure (in the database) for the specified course.
