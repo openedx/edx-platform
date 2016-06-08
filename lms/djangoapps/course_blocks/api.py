@@ -3,8 +3,8 @@ API entry point to the course_blocks app with top-level
 get_course_blocks and clear_course_from_cache functions.
 """
 from django.core.cache import cache
-from openedx.core.lib.block_structure.manager import BlockStructureManager
-from openedx.core.lib.block_structure.transformers import BlockStructureTransformers
+from openedx.core.djangoapps.content.block_structure.manager import BlockStructureManager
+from openedx.core.djangoapps.content.block_structure.transformers import BlockStructureTransformers
 from xmodule.modulestore.django import modulestore
 
 from .transformers import (

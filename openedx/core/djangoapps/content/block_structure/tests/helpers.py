@@ -146,7 +146,7 @@ def mock_registered_transformers(transformers):
     Context manager for mocking the transformer registry to return the given transformers.
     """
     with patch(
-        'openedx.core.lib.block_structure.transformer_registry.TransformerRegistry.get_registered_transformers'
+        'openedx.core.djangoapps.content.block_structure.transformer_registry.TransformerRegistry.get_registered_transformers'
     ) as mock_available_transforms:
         mock_available_transforms.return_value = {transformer for transformer in transformers}
         yield

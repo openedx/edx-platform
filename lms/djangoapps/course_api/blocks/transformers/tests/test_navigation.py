@@ -7,9 +7,9 @@ from unittest import TestCase
 
 from lms.djangoapps.course_api.blocks.transformers.block_depth import BlockDepthTransformer
 from lms.djangoapps.course_api.blocks.transformers.navigation import BlockNavigationTransformer
-from openedx.core.lib.block_structure.tests.helpers import ChildrenMapTestMixin
-from openedx.core.lib.block_structure.block_structure import BlockStructureModulestoreData
-from openedx.core.lib.block_structure.factory import BlockStructureFactory
+from openedx.core.djangoapps.content.block_structure.tests.helpers import ChildrenMapTestMixin
+from openedx.core.djangoapps.content.block_structure.block_structure import BlockStructureModulestoreData
+from openedx.core.djangoapps.content.block_structure.factory import BlockStructureFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import SampleCourseFactory
 from xmodule.modulestore import ModuleStoreEnum
