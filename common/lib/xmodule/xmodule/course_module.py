@@ -413,6 +413,11 @@ class CourseFields(object):
         help=_("Enter the names of the advanced components to use in your course."),
         scope=Scope.settings
     )
+    enforce_supported_xblocks = Boolean(
+        display_name=_("Only allow the creation of fully supported components"),
+        help=_("Only allow the creation of fully supported and accessible components in Studio. Scary legal text..."),
+        scope=Scope.settings, default=True
+    )
     has_children = True
     info_sidebar_name = String(
         display_name=_("Course Home Sidebar Name"),

@@ -48,10 +48,13 @@ try:
 except ImportError:
     HAS_USER_SERVICE = False
 
+from django.dispatch import receiver
+from django.db.models.signals import post_save
+
 try:
-    from xblock_django.models import XBlockDisableConfig
+    from xblock_django.models import XBlockConfigFlag, XBlockConfig
 except ImportError:
-    XBlockDisableConfig = None
+    XBlockConfigFlag = None
 
 log = logging.getLogger(__name__)
 ASSET_IGNORE_REGEX = getattr(settings, "ASSET_IGNORE_REGEX", r"(^\._.*$)|(^\.DS_Store$)|(^.*~$)")
@@ -188,8 +191,8 @@ def create_modulestore_instance(
     if 'read_preference' in doc_store_config:
         doc_store_config['read_preference'] = getattr(ReadPreference, doc_store_config['read_preference'])
 
-    if XBlockDisableConfig and settings.FEATURES.get('ENABLE_DISABLING_XBLOCK_TYPES', False):
-        disabled_xblock_types = XBlockDisableConfig.disabled_block_types()
+    if XBlockConfigFlag and XBlockConfigFlag.is_enabled():
+        disabled_xblock_types = [block.name for block in XBlockConfig.disabled_xblocks()]
     else:
         disabled_xblock_types = ()
 
@@ -250,6 +253,15 @@ def clear_existing_modulestores():
     """
     global _MIXED_MODULESTORE  # pylint: disable=global-statement
     _MIXED_MODULESTORE = None
+
+
+@receiver(post_save, sender=XBlockConfig)
+def reset_disabled_xblocks(sender, instance, **kwargs):  # pylint: disable=unused-argument, invalid-name
+    if XBlockConfigFlag and XBlockConfigFlag.is_enabled():
+        # TODO make this method smarter so we only reset the list if the modified
+        # xblock either was in disabled_xblock_types or is now disabled.
+        disabled_xblock_types = [block.name for block in XBlockConfig.disabled_xblocks()]
+        modulestore().disabled_xblock_types = disabled_xblock_types
 
 
 class ModuleI18nService(object):

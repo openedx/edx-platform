@@ -955,6 +955,14 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
 
         return system.load_item(location, for_parent=for_parent)
 
+    @property
+    def disabled_xblock_types(self):
+        return self._disabled_xblock_types
+
+    @disabled_xblock_types.setter
+    def disabled_xblock_types(self, value):
+        self._disabled_xblock_types = value
+
     def _load_items(self, course_key, items, depth=0, using_descriptor_system=None, for_parent=None):
         """
         Load a list of xmodules from the data in items, with children cached up

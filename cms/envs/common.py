@@ -1122,6 +1122,7 @@ XBLOCK_SETTINGS = {
 # 2. List all instances of that XBlock on the top of the course outline page asking
 #    course authors to delete or replace the instances.
 DEPRECATED_BLOCK_TYPES = [
+    'done',
     'peergrading',
     'combinedopenended',
     'graphical_slider_tool',
