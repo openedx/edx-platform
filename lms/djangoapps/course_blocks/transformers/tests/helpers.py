@@ -22,7 +22,7 @@ class TransformerRegistryTestMixin(object):
     def setUp(self):
         super(TransformerRegistryTestMixin, self).setUp()
         self.patcher = patch(
-            'openedx.core.djangoapps.content.block_structure.transformer_registry.TransformerRegistry.get_registered_transformers'
+            'openedx.core.djangoapps.content.block_structure.transformer_registry.TransformerRegistry.get_registered_transformers'  # pylint: disable=line-too-long
         )
         mock_registry = self.patcher.start()
         mock_registry.return_value = {self.TRANSFORMER_CLASS_TO_TEST}
