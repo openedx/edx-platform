@@ -579,7 +579,7 @@ JWT_AUTH.update({
 
 # Disable the use of the plugin manager in the transformer registry for
 # better performant unit tests.
-from openedx.core.lib.block_structure.transformer_registry import TransformerRegistry
+from openedx.core.djangoapps.content.block_structure.transformer_registry import TransformerRegistry
 TransformerRegistry.USE_PLUGIN_MANAGER = False
 
 # Set the default Oauth2 Provider Model so that migrations can run in

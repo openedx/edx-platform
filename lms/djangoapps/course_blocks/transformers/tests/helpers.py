@@ -3,7 +3,7 @@ Test helpers for testing course block transformers.
 """
 from mock import patch
 from course_modes.models import CourseMode
-from openedx.core.lib.block_structure.transformers import BlockStructureTransformers
+from openedx.core.djangoapps.content.block_structure.transformers import BlockStructureTransformers
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
@@ -22,7 +22,7 @@ class TransformerRegistryTestMixin(object):
     def setUp(self):
         super(TransformerRegistryTestMixin, self).setUp()
         self.patcher = patch(
-            'openedx.core.lib.block_structure.transformer_registry.TransformerRegistry.get_registered_transformers'
+            'openedx.core.djangoapps.content.block_structure.transformer_registry.TransformerRegistry.get_registered_transformers'  # pylint: disable=line-too-long
         )
         mock_registry = self.patcher.start()
         mock_registry.return_value = {self.TRANSFORMER_CLASS_TO_TEST}

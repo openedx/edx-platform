@@ -4,7 +4,7 @@ Tests for Course Blocks serializers
 from mock import MagicMock
 
 from course_blocks.tests.helpers import EnableTransformerRegistryMixin
-from openedx.core.lib.block_structure.transformers import BlockStructureTransformers
+from openedx.core.djangoapps.content.block_structure.transformers import BlockStructureTransformers
 from student.tests.factories import UserFactory
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase

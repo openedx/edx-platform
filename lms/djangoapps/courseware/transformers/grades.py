@@ -3,7 +3,7 @@ Grades Transformer
 """
 from django.test.client import RequestFactory
 
-from openedx.core.lib.block_structure.transformer import BlockStructureTransformer
+from openedx.core.djangoapps.content.block_structure.transformer import BlockStructureTransformer
 from openedx.core.djangoapps.util.user_utils import SystemUser
 from .. import module_render
 from courseware.model_data import FieldDataCache
