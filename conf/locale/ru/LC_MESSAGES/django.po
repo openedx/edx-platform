@@ -46,7 +46,7 @@
 # Weyedide <weyedide@gmail.com>, 2014
 # Yana Malinovskaya <y.malinovskaya@itransition.com>, 2014
 # Yermek Alimzhanov <aermek81@gmail.com>, 2015
-# YummyTranslations EDX <yummytranslations.edx@gmail.com>, 2015
+# YummyTranslations Edx <yummytranslations.edx@gmail.com>, 2015
 # tonybond <zippo2021@gmail.com>, 2014
 # Андрей Сандлер <inactive+asandler@transifex.com>, 2013
 # Яна Ловягина <yana.lovyagina@raccoongang.com>, 2016
@@ -127,7 +127,7 @@
 # Weyedide <weyedide@gmail.com>, 2014
 # Yana Malinovskaya <y.malinovskaya@itransition.com>, 2014
 # Yermek Alimzhanov <aermek81@gmail.com>, 2015
-# YummyTranslations EDX <yummytranslations.edx@gmail.com>, 2015
+# YummyTranslations Edx <yummytranslations.edx@gmail.com>, 2015
 # Pavel Zamyshliaev, 2014
 # tonybond <zippo2021@gmail.com>, 2014
 # Андрей Сандлер <inactive+asandler@transifex.com>, 2013

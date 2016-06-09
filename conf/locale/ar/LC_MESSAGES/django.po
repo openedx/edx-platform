@@ -5337,7 +5337,7 @@ msgstr "في {relative} - {absolute}"
 
 #: lms/djangoapps/courseware/date_summary.py
 msgid "UTC"
-msgstr "التوقيت العالمي المنسّق"
+msgstr ""
 
 #: lms/djangoapps/courseware/date_summary.py
 msgid "Today is {date}"
