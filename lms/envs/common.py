@@ -363,6 +363,11 @@ FEATURES = {
     # lives in the Extended table, saving the frontend from
     # making multiple queries.
     'ENABLE_READING_FROM_MULTIPLE_HISTORY_TABLES': True,
+
+    # Enable "requested_fields" additional optional parameter for GET endpoints in discussion mobile APIs.
+    # TODO: This is temporary feature flag and should be removed once we are comfotable with the performance of APIs
+    # with the addition of 'requested_fields=profile_image'.
+    'DISCUSSION_API_REQUESTED_FIELDS_PARAM': False,
 }
 
 # Ignore static asset files on import which match this pattern
