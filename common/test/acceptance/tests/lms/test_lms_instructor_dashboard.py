@@ -831,6 +831,34 @@ class CertificatesTest(BaseInstructorDashboardTest):
         self.assertIn(self.user_name, self.certificates_section.last_certificate_exception.text)
         self.assertIn(notes, self.certificates_section.last_certificate_exception.text)
 
+    def test_remove_certificate_exception_on_page_reload(self):
+        """
+        Scenario: On the Certificates tab of the Instructor Dashboard, Instructor can remove added certificate
+        exceptions from the list.
+
+            Given that I am on the Certificates tab on the Instructor Dashboard
+            When I fill in student username and notes fields and click 'Add Exception' button
+            Then new certificate exception should be visible in certificate exceptions list
+
+            Revisit the page to make sure exceptions are synced.
+
+            Remove the user from the exception list should remove the user from the list.
+        """
+        notes = 'Test Notes'
+        # Add a student to Certificate exception list
+        self.certificates_section.add_certificate_exception(self.user_name, notes)
+        self.assertIn(self.user_name, self.certificates_section.last_certificate_exception.text)
+        self.assertIn(notes, self.certificates_section.last_certificate_exception.text)
+
+        # Verify that added exceptions are also synced with backend
+        # Revisit Page
+        self.certificates_section.refresh()
+
+        # Remove Certificate Exception
+        self.certificates_section.remove_first_certificate_exception()
+        self.assertNotIn(self.user_name, self.certificates_section.last_certificate_exception.text)
+        self.assertNotIn(notes, self.certificates_section.last_certificate_exception.text)
+
     def test_instructor_can_remove_certificate_exception(self):
         """
         Scenario: On the Certificates tab of the Instructor Dashboard, Instructor can remove  added certificate
