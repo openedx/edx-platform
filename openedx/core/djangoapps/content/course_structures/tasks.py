@@ -72,6 +72,7 @@ def ensure_lms_queue():
         queue = queue.replace(variant, lms_prefix)
     return queue
 
+
 @task(
     name=u'openedx.core.djangoapps.content.course_structures.tasks.update_course_structure',
     queue=ensure_lms_queue(),

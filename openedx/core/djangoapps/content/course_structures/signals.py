@@ -7,7 +7,6 @@ from xmodule.modulestore.django import SignalHandler
 
 from .models import CourseStructure
 
-from django.conf import settings
 
 @receiver(SignalHandler.course_published)
 def listen_for_course_publish(sender, course_key, **kwargs):  # pylint: disable=unused-argument

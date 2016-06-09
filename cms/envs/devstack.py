@@ -82,7 +82,6 @@ CELERY_QUEUES = {
 }
 
 # Let `./manage.py lms celery worker --settings=devstack` talk to Rabbit
-    # I have yet to test this with cms
 BROKER_URL = "amqp://celery:celery@localhost:5672"
 
 # Setup memcached (also copied from aws.py)
