@@ -8,7 +8,6 @@ from django.test.client import Client, RequestFactory
 from django.test.utils import override_settings
 from django.utils import translation
 from lms.lib.comment_client.utils import CommentClientPaginatedResult
-from edxmako.tests import mako_middleware_process_request
 
 from django_comment_common.utils import ThreadContext
 from django_comment_client.forum import views
@@ -441,14 +440,13 @@ class SingleCohortedThreadTestCase(CohortedTestCase):
     def test_html(self, mock_request):
         self._create_mock_cohorted_thread(mock_request)
 
-        request = RequestFactory().get("dummy_url")
-        request.user = self.student
-        mako_middleware_process_request(request)
-        response = views.single_thread(
-            request,
-            self.course.id.to_deprecated_string(),
-            "cohorted_topic",
-            self.mock_thread_id
+        self.client.login(username=self.student.username, password='test')
+        response = self.client.get(
+            reverse('single_thread', kwargs={
+                'course_id': unicode(self.course.id),
+                'discussion_id': "cohorted_topic",
+                'thread_id': self.mock_thread_id,
+            })
         )
 
         self.assertEquals(response.status_code, 200)
@@ -561,18 +559,13 @@ class SingleThreadGroupIdTestCase(CohortedTestCase, CohortedTopicGroupIdTestMixi
         headers = {}
         if is_ajax:
             headers['HTTP_X_REQUESTED_WITH'] = "XMLHttpRequest"
-        request = RequestFactory().get(
-            "dummy_url",
+
+        self.client.login(username=user.username, password='test')
+
+        return self.client.get(
+            reverse('single_thread', args=[unicode(self.course.id), commentable_id, "dummy_thread_id"]),
             data=request_data,
             **headers
-        )
-        request.user = user
-        mako_middleware_process_request(request)
-        return views.single_thread(
-            request,
-            self.course.id.to_deprecated_string(),
-            commentable_id,
-            "dummy_thread_id"
         )
 
     def test_group_info_in_html_response(self, mock_request):
@@ -599,30 +592,28 @@ class SingleThreadGroupIdTestCase(CohortedTestCase, CohortedTopicGroupIdTestMixi
 
 
 @patch('requests.request', autospec=True)
-class SingleThreadContentGroupTestCase(ContentGroupTestCase):
+class SingleThreadContentGroupTestCase(UrlResetMixin, ContentGroupTestCase):
+
+    @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+    def setUp(self):
+        super(SingleThreadContentGroupTestCase, self).setUp()
+
     def assert_can_access(self, user, discussion_id, thread_id, should_have_access):
         """
         Verify that a user has access to a thread within a given
         discussion_id when should_have_access is True, otherwise
         verify that the user does not have access to that thread.
         """
-        request = RequestFactory().get("dummy_url")
-        request.user = user
-        mako_middleware_process_request(request)
-
         def call_single_thread():
-            return views.single_thread(
-                request,
-                unicode(self.course.id),
-                discussion_id,
-                thread_id
+            self.client.login(username=user.username, password='test')
+            return self.client.get(
+                reverse('single_thread', args=[unicode(self.course.id), discussion_id, thread_id])
             )
 
         if should_have_access:
             self.assertEqual(call_single_thread().status_code, 200)
         else:
-            with self.assertRaises(Http404):
-                call_single_thread()
+            self.assertEqual(call_single_thread().status_code, 404)
 
     def test_staff_user(self, mock_request):
         """
@@ -813,16 +804,12 @@ class ForumFormDiscussionGroupIdTestCase(CohortedTestCase, CohortedTopicGroupIdT
         headers = {}
         if is_ajax:
             headers['HTTP_X_REQUESTED_WITH'] = "XMLHttpRequest"
-        request = RequestFactory().get(
-            "dummy_url",
+
+        self.client.login(username=user.username, password='test')
+        return self.client.get(
+            reverse(views.forum_form_discussion, args=[unicode(self.course.id)]),
             data=request_data,
             **headers
-        )
-        request.user = user
-        mako_middleware_process_request(request)
-        return views.forum_form_discussion(
-            request,
-            self.course.id.to_deprecated_string()
         )
 
     def test_group_info_in_html_response(self, mock_request):
@@ -869,17 +856,12 @@ class UserProfileDiscussionGroupIdTestCase(CohortedTestCase, CohortedTopicGroupI
         headers = {}
         if is_ajax:
             headers['HTTP_X_REQUESTED_WITH'] = "XMLHttpRequest"
-        request = RequestFactory().get(
-            "dummy_url",
+
+        self.client.login(username=requesting_user.username, password='test')
+        return self.client.get(
+            reverse('user_profile', args=[unicode(self.course.id), profiled_user.id]),
             data=request_data,
             **headers
-        )
-        request.user = requesting_user
-        mako_middleware_process_request(request)
-        return views.user_profile(
-            request,
-            self.course.id.to_deprecated_string(),
-            profiled_user.id
         )
 
     def call_view(self, mock_request, _commentable_id, user, group_id, pass_group_id=True, is_ajax=False):
@@ -1109,11 +1091,12 @@ class InlineDiscussionTestCase(ModuleStoreTestCase):
 
 
 @patch('requests.request', autospec=True)
-class UserProfileTestCase(ModuleStoreTestCase):
+class UserProfileTestCase(UrlResetMixin, ModuleStoreTestCase):
 
     TEST_THREAD_TEXT = 'userprofile-test-text'
     TEST_THREAD_ID = 'userprofile-test-thread-id'
 
+    @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
         super(UserProfileTestCase, self).setUp()
 
@@ -1126,14 +1109,15 @@ class UserProfileTestCase(ModuleStoreTestCase):
         mock_request.side_effect = make_mock_request_impl(
             course=self.course, text=self.TEST_THREAD_TEXT, thread_id=self.TEST_THREAD_ID
         )
-        request = RequestFactory().get("dummy_url", data=params, **headers)
-        request.user = self.student
+        self.client.login(username=self.student.username, password='test')
 
-        mako_middleware_process_request(request)
-        response = views.user_profile(
-            request,
-            self.course.id.to_deprecated_string(),
-            self.profiled_user.id
+        response = self.client.get(
+            reverse('user_profile', kwargs={
+                'course_id': unicode(self.course.id),
+                'user_id': self.profiled_user.id,
+            }),
+            data=params,
+            **headers
         )
         mock_request.assert_any_call(
             "get",

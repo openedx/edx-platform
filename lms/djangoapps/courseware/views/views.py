@@ -658,7 +658,6 @@ def course_about(request, course_id):
 @ensure_valid_course_key
 def progress(request, course_id, student_id=None):
     """ Display the progress page. """
-
     course_key = CourseKey.from_string(course_id)
 
     with modulestore().bulk_operations(course_key):
@@ -673,6 +672,14 @@ def _progress(request, course_key, student_id):
 
     Course staff are allowed to see the progress of students in their class.
     """
+
+    if student_id is not None:
+        try:
+            student_id = int(student_id)
+        # Check for ValueError if 'student_id' cannot be converted to integer.
+        except ValueError:
+            raise Http404
+
     course = get_course_with_access(request.user, 'load', course_key, depth=None, check_if_enrolled=True)
 
     # check to see if there is a required survey that must be taken before
@@ -697,8 +704,7 @@ def _progress(request, course_key, student_id):
             raise Http404
         try:
             student = User.objects.get(id=student_id)
-        # Check for ValueError if 'student_id' cannot be converted to integer.
-        except (ValueError, User.DoesNotExist):
+        except User.DoesNotExist:
             raise Http404
 
     # NOTE: To make sure impersonation by instructor works, use
