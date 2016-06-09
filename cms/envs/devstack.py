@@ -3,6 +3,7 @@ Specific overrides to the base prod settings to make development easier.
 """
 
 from os.path import abspath, dirname, join
+from os import environ
 
 from .aws import *  # pylint: disable=wildcard-import, unused-wildcard-import
 
@@ -59,7 +60,7 @@ DJFS = {
 
 
 ## efischer celery-on-devstack
-LMS_PREFIX = 'lms'
+ALTERNATE_QUEUE_ENVS = environ.get('ALTERNATE_SERVICE_VARIANTS', '').split()
 
 # Run celery tasks asynchronously
 CELERY_ALWAYS_EAGER = False
@@ -80,6 +81,17 @@ CELERY_QUEUES = {
     DEFAULT_PRIORITY_QUEUE: {},
     HIGH_MEM_QUEUE: {},
 }
+ALTERNATE_QUEUES = [
+    DEFAULT_PRIORITY_QUEUE.replace(QUEUE_VARIANT, alternate + '.')
+    for alternate in ALTERNATE_QUEUE_ENVS
+]
+CELERY_QUEUES.update(
+    {
+        alternate: {}
+        for alternate in ALTERNATE_QUEUES
+        if alternate not in CELERY_QUEUES.keys()
+    }
+)
 
 # Let `./manage.py lms celery worker --settings=devstack` talk to Rabbit
 BROKER_URL = "amqp://celery:celery@localhost:5672"

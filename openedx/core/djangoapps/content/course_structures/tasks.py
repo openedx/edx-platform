@@ -65,12 +65,10 @@ def ensure_lms_queue():
     """
     Ensure the worker associated with the chosen queue is loaded with lms params, if applicable.
     """
-    queue = getattr(settings, 'CELERY_DEFAULT_QUEUE', None)
-    variant = getattr(settings, 'SERVICE_VARIANT', None)
-    lms_prefix = getattr(settings, 'LMS_PREFIX', None)
-    if queue and variant and lms_prefix:
-        queue = queue.replace(variant, lms_prefix)
-    return queue
+    queues = getattr(settings, 'CELERY_QUEUES', None)
+    print queues
+    lms_queue = next((queue for queue in queues if '.lms.' in queue), None)
+    return lms_queue
 
 
 @task(
