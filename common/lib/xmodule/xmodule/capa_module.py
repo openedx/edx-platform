@@ -128,6 +128,19 @@ class CapaModule(CapaMixin, XModule):
 
         return json.dumps(result, cls=ComplexEncoder)
 
+    @property
+    def display_name_with_default(self):
+        """
+        Constructs the display name for a CAPA problem.
+
+        Default to the display_name if it isn't None or not an empty string,
+        else fall back to problem category.
+        """
+        if self.display_name is None or not self.display_name.strip():
+            return self.location.block_type
+
+        return self.display_name
+
 
 class CapaDescriptor(CapaFields, RawDescriptor):
     """
