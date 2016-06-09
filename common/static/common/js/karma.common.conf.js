@@ -84,7 +84,7 @@ function junitNameFormatter(browser, result) {
  * @return {String}
  */
 function junitClassNameFormatter(browser) {
-    return "Javascript." + browser.name.split(" ")[0];
+    return 'Javascript.' + browser.name.split(' ')[0];
 }
 
 
@@ -227,6 +227,7 @@ var getBaseConfig = function (config, useRequireJs) {
         var files = [
             'node_modules/jquery/dist/jquery.js',
             'node_modules/jasmine-core/lib/jasmine-core/jasmine.js',
+            'common/static/common/js/jasmine_stack_trace.js',
             'node_modules/karma-jasmine/lib/boot.js',
             'node_modules/karma-jasmine/lib/adapter.js',
             'node_modules/jasmine-jquery/lib/jasmine-jquery.js'
@@ -292,6 +293,12 @@ var getBaseConfig = function (config, useRequireJs) {
         // karma-reporter
         reporters: reporters(config),
 
+        // Spec Reporter configuration
+        specReporter: {
+            maxLogLines: 5,
+            showSpecTiming: true
+        },
+
 
         coverageReporter: coverageSettings(config),
 
@@ -330,7 +337,11 @@ var getBaseConfig = function (config, useRequireJs) {
         // how many browser should be started simultaneous
         concurrency: Infinity,
 
-        browserNoActivityTimeout: 50000
+        browserNoActivityTimeout: 50000,
+
+        client: {
+            captureConsole: false
+        }
     };
 };
 
