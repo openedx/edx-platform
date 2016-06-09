@@ -81,9 +81,15 @@ else
             paver test_system -s cms --with-flaky --cov-args="-p" --with-xunitmp
             ;;
 
-        3)  # run the commonlib unit tests
-            paver test_lib --with-flaky --cov-args="-p" --with-xunitmp
-            ;;
+    3)  # run the commonlib and solutions apps unit tests
+        paver test_lib --extra_args="--with-flaky" --cov_args="-p" --with-xunitmp
+        paver test_system -s lms -t organizations
+        paver test_system -s lms -t gradebook
+        paver test_system -s lms -t progress
+        paver test_system -s lms -t projects
+        paver test_system -s lms -t course_metadata
+        paver test_system -s lms -t social_engagement
+        ;;
 
         *)
             echo "No tests were executed in this container."
