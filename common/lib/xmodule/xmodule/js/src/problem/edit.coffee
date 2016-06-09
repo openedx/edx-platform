@@ -516,8 +516,6 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
           return selectString;
       });
 
-      //xml = xml.replace(/>>\s*([^]+?)\s*<</g, "<label>$1</label>");
-
       // replace labels
       // looks for >>arbitrary text<< and inserts it into the label attribute of the input type directly below the text.
       var split = xml.split('\n');
@@ -554,25 +552,20 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
       });
 
       // split scripts and preformatted sections, and wrap paragraphs
-      splits = xml.split(/(\<\/?(?:script|pre|p).*?\>)/g);
+      splits = xml.split(/(\<\/?(?:script|pre).*?\>)/g);
       scriptFlag = false;
-      pTag = false;
 
       for (i = 0; i < splits.length; i += 1) {
           if(/\<(script|pre)/.test(splits[i])) {
               scriptFlag = true;
-          } else if (/\<(p)/.test(splits[i])) {
-              pTag = true;
           }
 
-          if(!scriptFlag && !pTag) {
+          if(!scriptFlag) {
               splits[i] = splits[i].replace(/(^(?!\s*\<|$).*$)/gm, '<p>$1</p>');
           }
 
           if(/\<\/(script|pre)/.test(splits[i])) {
               scriptFlag = false;
-          } else if (/\<\/(p)/.test(splits[i])) {
-              pTag = false;
           }
       }
 
@@ -590,10 +583,10 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
       xml = xml + demandhints;
 
       debugger
-      // move everything under responsetype
+      // make selector to search responsetypes in xml
       var responseTypesSelector = responseTypes.join(", ");
 
-      // these will be placed at the end
+      // these will be placed at outside the end of responsetype
       var independentTagNames = ['solution', 'demandhint'];
       var independentTagNodes = [];
 
@@ -607,11 +600,13 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
         var before = true;
 
         _.each($xml.find('prob').children(), function(child, index){
+            // we don't want to add the responsetype again into new xml
             if (responseType[0].nodeName === child.nodeName) {
                 before = false;
                 return;
             }
 
+            // replace <p> tag for question title with <label> tag
             if (child.hasAttribute('class') && child.getAttribute('class') === 'qtitle') {
                 var label = document.createElement("label");
                 label.appendChild(document.createTextNode(child.textContent));
@@ -639,18 +634,16 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
         // remove xmlns attribute added by the serializer
         xml = xml.replace(/xmlns=['"].*?['"]/gi, "");
 
-        // add newline with each ending tag to make the xml looks better
         // TODO! Fix xml indentation -- XMLSerializer messes the indentation of XML
+        // add newline at end of each ending tag to make the xml looks better
         xml = xml.replace(/(\<\/.*?\>)(\<.*?\>)/gi, "$1\n$2");
-
       }
 
-      // remove class attribute added on question text p tag
+      // remove class attribute added on <p> tag for question title
       xml = xml.replace(/class=\'qtitle\'/gi, "");
       return xml;
     }`
     
-    debugger
     responseTypesXML = []
     responseTypesMarkdown = markdown.split('\n---\n')
     _.each responseTypesMarkdown, (responseTypeMarkdown, index) ->
