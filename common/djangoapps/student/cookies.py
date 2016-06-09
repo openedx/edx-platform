@@ -5,9 +5,13 @@ Utility functions for setting "logged in" cookies used by subdomains.
 import time
 import json
 
+from django.dispatch import Signal
+
 from django.utils.http import cookie_date
 from django.conf import settings
 from django.core.urlresolvers import reverse, NoReverseMatch
+
+CREATE_LOGON_COOKIE = Signal(providing_args=["user", "response"])
 
 
 def set_logged_in_cookies(request, response, user):
@@ -117,6 +121,9 @@ def set_logged_in_cookies(request, response, user):
         secure=user_info_cookie_is_secure,
         **cookie_settings
     )
+
+    # give signal receivers a chance to add cookies
+    CREATE_LOGON_COOKIE.send(sender=None, user=user, response=response)
 
     return response
 
