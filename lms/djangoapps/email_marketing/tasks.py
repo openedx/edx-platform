@@ -4,12 +4,9 @@ This file contains celery tasks for email marketing signal handler.
 import logging
 import time
 
-from pytz import UTC
-
 from celery import task
 from django.contrib.auth.models import User
 
-from student.models import UserProfile
 from email_marketing.models import EmailMarketingConfiguration
 
 from sailthru.sailthru_client import SailthruClient

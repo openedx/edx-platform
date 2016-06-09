@@ -6,7 +6,7 @@ import datetime
 
 from django.dispatch import receiver
 
-from student.models import CourseEnrollment, UNENROLL_DONE
+from student.models import UNENROLL_DONE
 from student.cookies import CREATE_LOGON_COOKIE
 from student.views import REGISTER_USER
 from email_marketing.models import EmailMarketingConfiguration
@@ -39,7 +39,7 @@ def handle_unenroll_done(sender, course_enrollment=None, skip_refund=False,
 
 @receiver(CREATE_LOGON_COOKIE)
 def add_email_marketing_cookies(sender, response=None, user=None,
-                                **kwargs):  # pylint: disable=unused-argument):
+                                **kwargs):  # pylint: disable=unused-argument
     """
     Signal function for adding any cookies needed for email marketing
 
@@ -108,7 +108,8 @@ def email_marketing_register_user(sender, user=None, profile=None,
 
 @receiver(USER_FIELD_CHANGED)
 def email_marketing_user_field_changed(sender, user=None, table=None, setting=None,
-                                       old_value=None, new_value=None, **kwargs):  # pylint: disable=unused-argument
+                                       old_value=None, new_value=None,
+                                       **kwargs):  # pylint: disable=unused-argument
     """
     Update a single user/profile field
 

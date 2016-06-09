@@ -54,3 +54,7 @@ class EmailMarketingConfiguration(ConfigurationModel):
             "Sailthru template to use on activation send. "
         )
     )
+
+    def __unicode__(self):
+        return u"Email marketing configuration: New user list %s, Activation template: %s" % \
+               (self.sailthru_new_user_list, self.created, self.sailthru_activation_template)
