@@ -15,30 +15,38 @@ from xblock.fragment import Fragment
 log = logging.getLogger(__name__)
 loader = ResourceLoader(__name__)  # pylint: disable=invalid-name
 
+# Make '_' a no-op so we can scrape strings
+def _(text):
+    return text
 
 @XBlock.needs('user')
+@XBlock.needs('i18n')
 class DiscussionXBlock(XBlock, StudioEditableXBlockMixin):
-    """ Provides functionality similar to discussion XModule in inline mode """
+    """Provides a discussion forum that is inline with other content in the courseware."""
 
     discussion_id = String(scope=Scope.settings, default=UNIQUE_ID, force_export=True)
     display_name = String(
-        display_name="Display Name",
-        help="Display name for this module",
+        display_name=_("Display Name"),
+        help=_("Display name for this module"),
         default="Discussion",
         scope=Scope.settings
     )
     discussion_category = String(
-        display_name="Category",
-        default="Week 1",
-        help="A category name for the discussion. "
-             "This name appears in the left pane of the discussion forum for the course.",
+        display_name=_("Category"),
+        default=_("Week 1"),
+        help=_(
+            "A category name for the discussion. "
+            "This name appears in the left pane of the discussion forum for the course."
+        ),
         scope=Scope.settings
     )
     discussion_target = String(
-        display_name="Subcategory",
+        display_name=_("Subcategory"),
         default="Topic-Level Student-Visible Label",
-        help="A subcategory name for the discussion. "
-             "This name appears in the left pane of the discussion forum for the course.",
+        help=_(
+            "A subcategory name for the discussion. "
+            "This name appears in the left pane of the discussion forum for the course."
+        ),
         scope=Scope.settings
     )
     sort_key = String(scope=Scope.settings)
