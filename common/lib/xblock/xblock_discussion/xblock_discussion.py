@@ -15,9 +15,11 @@ from xblock.fragment import Fragment
 log = logging.getLogger(__name__)
 loader = ResourceLoader(__name__)  # pylint: disable=invalid-name
 
-# Make '_' a no-op so we can scrape strings
+
 def _(text):
+    """A noop underscore function that marks strings for extraction."""
     return text
+
 
 @XBlock.needs('user')
 @XBlock.needs('i18n')
