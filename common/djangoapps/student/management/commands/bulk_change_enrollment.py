@@ -33,13 +33,13 @@ class Command(BaseCommand):
     option_list = BaseCommand.option_list + (
         make_option(
             '-f', '--from_mode',
-            dest='from',
+            dest='from_mode',
             default=None,
             help='move from this enrollment mode'
         ),
         make_option(
             '-t', '--to_mode',
-            dest='to',
+            dest='to_mode',
             default=None,
             help='move to this enrollment mode'
         ),
