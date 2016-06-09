@@ -10,7 +10,7 @@ from edx_rest_api_client.client import EdxRestApiClient
 from openedx.core.djangoapps.credentials.models import CredentialsApiConfig
 from openedx.core.djangoapps.credentials.utils import get_user_credentials
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
-from openedx.core.djangoapps.programs.utils import get_completed_courses
+from openedx.core.djangoapps.programs.utils import ProgramProgressMeter
 from openedx.core.lib.token_utils import get_id_token
 
 
@@ -35,21 +35,20 @@ def get_api_client(api_config, student):
     return EdxRestApiClient(api_config.internal_api_url, jwt=id_token)
 
 
-def get_completed_programs(client, course_certificates):
+def get_completed_programs(student):
     """
     Given a set of completed courses, determine which programs are completed.
 
     Args:
-        client:
-            programs API client (EdxRestApiClient)
-        course_certificates:
-            iterable of dicts with structure {'course_id': course_key, 'mode': cert_type}
+        student (User): Representing the student whose completed programs to check for.
 
     Returns:
         list of program ids
 
     """
-    return client.programs.complete.post({'completed_courses': course_certificates})['program_ids']
+    meter = ProgramProgressMeter(student)
+
+    return meter.completed_programs
 
 
 def get_awarded_certificate_programs(student):
@@ -147,29 +146,9 @@ def award_program_certificates(self, username):
             # Don't retry for this case - just conclude the task.
             return
 
-        # Fetch the set of all course runs for which the user has earned a
-        # certificate.
-        course_certs = get_completed_courses(student)
-        if not course_certs:
-            # Highly unlikely, since at present the only trigger for this task
-            # is the earning of a new course certificate.  However, it could be
-            # that the transaction in which a course certificate was awarded
-            # was subsequently rolled back, which could lead to an empty result
-            # here, so we'll at least log that this happened before exiting.
-            #
-            # If this task is ever updated to support revocation of program
-            # certs, this branch should be removed, since it could make sense
-            # in that case to call this task for a user without any (valid)
-            # course certs.
-            LOGGER.warning('Task award_program_certificates was called for user %s with no completed courses', username)
-            return
-
-        # Invoke the Programs API completion check endpoint to identify any
-        # programs that are satisfied by these course completions.
-        programs_client = get_api_client(config, student)
-        program_ids = get_completed_programs(programs_client, course_certs)
+        program_ids = get_completed_programs(student)
         if not program_ids:
-            # Again, no reason to continue beyond this point unless/until this
+            # No reason to continue beyond this point unless/until this
             # task gets updated to support revocation of program certs.
             LOGGER.info('Task award_program_certificates was called for user %s with no completed programs', username)
             return
