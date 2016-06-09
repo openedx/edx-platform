@@ -122,9 +122,6 @@ def email_marketing_user_field_changed(sender, user=None, table=None, setting=No
         new_value: New value
         kwargs: Not used
     """
-    email_config = EmailMarketingConfiguration.current()
-    if not email_config.enabled:
-        return
 
     # ignore anonymous users
     if user.is_anonymous():
@@ -136,10 +133,19 @@ def email_marketing_user_field_changed(sender, user=None, table=None, setting=No
 
     # ignore anything not in list of fields to handle
     if setting in CHANGED_FIELDNAMES:
+        # skip if not enabled
+        #  the check has to be here rather than at the start of the method to avoid
+        #  accessing the config during migration 0001_date__add_ecommerce_service_user
+        email_config = EmailMarketingConfiguration.current()
+        if not email_config.enabled:
+            return
         # perform update asynchronously, flag if activation
         update_user.delay(user.username, new_user=False,
                           activation=(setting == 'is_active') and new_value is True)
 
     elif setting == 'email':
         # email update is special case
+        email_config = EmailMarketingConfiguration.current()
+        if not email_config.enabled:
+            return
         update_user_email.delay(user.username, old_value)
