@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-06-02 14:33+0000\n"
-"PO-Revision-Date: 2016-06-02 14:34:15.467005\n"
+"POT-Creation-Date: 2016-06-09 15:20+0000\n"
+"PO-Revision-Date: 2016-06-09 15:21:36.475893\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -47,7 +47,6 @@ msgstr ""
 #: cms/static/js/views/edit_textbook.js
 #: cms/static/js/views/list_item_editor.js
 #: cms/static/js/views/modals/edit_xblock.js
-#: cms/static/js/views/overview_assignment_grader.js
 #: cms/static/js/views/utils/xblock_utils.js lms/static/js/ccx/schedule.js
 #: lms/static/js/views/fields.js
 msgid "Saving"
@@ -158,6 +157,14 @@ msgstr "Ök Ⱡ'σя#"
 #: lms/static/coffee/src/instructor_dashboard/util.js
 msgid "Unknown"
 msgstr "Ûnknöwn Ⱡ'σяєм ιρѕυм #"
+
+#: cms/static/js/views/metadata.js
+#: lms/djangoapps/teams/static/teams/js/views/edit_team_members.js
+#: lms/static/js/views/image_field.js
+#: cms/templates/js/video/metadata-translations-item.underscore
+#: lms/djangoapps/teams/static/teams/templates/edit-team-member.underscore
+msgid "Remove"
+msgstr "Rémövé Ⱡ'σяєм ιρѕυ#"
 
 #: cms/static/js/views/metadata.js lms/static/js/views/file_uploader.js
 msgid "Upload File"
@@ -2655,13 +2662,6 @@ msgstr ""
 "Thïs léärnér wïll ßé rémövéd fröm thé téäm, ällöwïng änöthér léärnér tö täké"
 " thé äväïläßlé spöt. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
-#: lms/djangoapps/teams/static/teams/js/views/edit_team_members.js
-#: lms/static/js/views/image_field.js
-#: cms/templates/js/video/metadata-translations-item.underscore
-#: lms/djangoapps/teams/static/teams/templates/edit-team-member.underscore
-msgid "Remove"
-msgstr "Rémövé Ⱡ'σяєм ιρѕυ#"
-
 #: lms/djangoapps/teams/static/teams/js/views/instructor_tools.js
 msgid "Delete this team?"
 msgstr "Délété thïs téäm? Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
@@ -3261,6 +3261,12 @@ msgstr ""
 "¢σηѕє¢тєтυя #"
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
+msgid "All learners in the {cohort_name} cohort"
+msgstr ""
+"Àll léärnérs ïn thé {cohort_name} çöhört Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢т#"
+
+#: lms/static/coffee/src/instructor_dashboard/send_email.js
 msgid ""
 "Your email message was successfully queued for sending. In courses with a "
 "large number of learners, email messages to learners might take up to an "
@@ -3308,6 +3314,10 @@ msgid "There was an error obtaining email content history for this course."
 msgstr ""
 "Théré wäs än érrör ößtäïnïng émäïl çöntént hïstörý för thïs çöürsé. Ⱡ'σяєм "
 "ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
+
+#: lms/static/coffee/src/instructor_dashboard/send_email.js
+msgid "Send to:"
+msgstr "Sénd tö: Ⱡ'σяєм ιρѕυм ∂#"
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid "Please enter a student email address or username."
@@ -4190,15 +4200,15 @@ msgid "[no tags]"
 msgstr "[nö tägs] Ⱡ'σяєм ιρѕυм ∂σł#"
 
 #: lms/static/js/financial-assistance/views/financial_assistance_form_view.js
-msgid "Choose one"
-msgstr "Çhöösé öné Ⱡ'σяєм ιρѕυм ∂σłσ#"
-
-#: lms/static/js/financial-assistance/views/financial_assistance_form_view.js
 #: lms/static/js/student_account/views/LoginView.js
 msgid "An error has occurred. Check your Internet connection and try again."
 msgstr ""
 "Àn érrör häs öççürréd. Çhéçk ýöür Ìntérnét çönnéçtïön änd trý ägäïn. Ⱡ'σяєм "
 "ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
+
+#: lms/static/js/financial-assistance/views/financial_assistance_form_view.js
+msgid "Choose one"
+msgstr "Çhöösé öné Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
 #: lms/static/js/groups/views/cohort_discussions.js
 #: lms/static/js/groups/views/cohort_discussions_course_wide.js
@@ -4691,6 +4701,34 @@ msgstr ""
 "Ýöü çän lïnk ýöür söçïäl médïä äççöünts tö sïmplïfý sïgnïng ïn tö "
 "{platform_name}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
 
+#: lms/static/js/student_account/views/account_settings_factory.js
+msgid "ORDER NAME"
+msgstr "ÖRDÉR NÀMÉ Ⱡ'σяєм ιρѕυм ∂σłσ#"
+
+#: lms/static/js/student_account/views/account_settings_factory.js
+msgid "ORDER PLACED"
+msgstr "ÖRDÉR PLÀÇÉD Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
+
+#: lms/static/js/student_account/views/account_settings_factory.js
+msgid "TOTAL"
+msgstr "TÖTÀL Ⱡ'σяєм ιρѕ#"
+
+#: lms/static/js/student_account/views/account_settings_factory.js
+msgid "ORDER NUMBER"
+msgstr "ÖRDÉR NÛMBÉR Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
+
+#: lms/static/js/student_account/views/account_settings_factory.js
+msgid "My Orders"
+msgstr "Mý Ördérs Ⱡ'σяєм ιρѕυм ∂σł#"
+
+#: lms/static/js/student_account/views/account_settings_factory.js
+msgid ""
+"This page contains information about orders that you have placed with "
+"{platform_name}."
+msgstr ""
+"Thïs pägé çöntäïns ïnförmätïön äßöüt ördérs thät ýöü hävé pläçéd wïth "
+"{platform_name}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυ#"
+
 #: lms/static/js/student_account/views/account_settings_fields.js
 msgid ""
 "We've sent a confirmation message to {new_email_address}. Click the link in "
@@ -4762,6 +4800,10 @@ msgstr "Süççéssfüllý ünlïnkéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕι
 #: lms/static/js/student_account/views/account_settings_view.js
 msgid "Account Information"
 msgstr "Àççöünt Ìnförmätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
+
+#: lms/static/js/student_account/views/account_settings_view.js
+msgid "Order History"
+msgstr "Ördér Hïstörý Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 
 #: lms/static/js/student_profile/views/badge_list_container.js
 msgid "Accomplishments Pagination"
@@ -6014,11 +6056,6 @@ msgstr "Ûndö Çhängés Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 msgid "Change Manually"
 msgstr "Çhängé Mänüällý Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 
-#: cms/static/js/views/overview_assignment_grader.js
-#: cms/templates/js/grading-editor.underscore
-msgid "Not Graded"
-msgstr "Nöt Grädéd Ⱡ'σяєм ιρѕυм ∂σłσ#"
-
 #: cms/static/js/views/paged_container.js
 msgid "Date added"
 msgstr "Däté äddéd Ⱡ'σяєм ιρѕυм ∂σłσ#"
@@ -6487,8 +6524,8 @@ msgid "Clear search"
 msgstr "Çléär séärçh Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
 #: common/static/common/templates/discussion/discussion-home.underscore
-msgid "DISCUSSION HOME:"
-msgstr "DÌSÇÛSSÌÖN HÖMÉ: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
+msgid "Discussion Home"
+msgstr "Dïsçüssïön Hömé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 
 #: common/static/common/templates/discussion/discussion-home.underscore
 #, python-format
@@ -6844,8 +6881,8 @@ msgid "Add a Response"
 msgstr "Àdd ä Réspönsé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 
 #: common/static/common/templates/discussion/thread.underscore
-msgid "Post a response:"
-msgstr "Pöst ä réspönsé: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
+msgid "Add a response:"
+msgstr "Àdd ä réspönsé: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 
 #: common/static/common/templates/discussion/thread.underscore
 msgid "Expand discussion"
@@ -7086,8 +7123,8 @@ msgid "Join Team"
 msgstr "Jöïn Téäm Ⱡ'σяєм ιρѕυм ∂σł#"
 
 #: lms/djangoapps/teams/static/teams/templates/team-profile.underscore
-msgid "New Post"
-msgstr "Néw Pöst Ⱡ'σяєм ιρѕυм ∂#"
+msgid "Add a Post"
+msgstr "Àdd ä Pöst Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
 #: lms/djangoapps/teams/static/teams/templates/team-profile.underscore
 msgid "Team Details"
@@ -7255,10 +7292,11 @@ msgstr "Gét Çrédït Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
 #: lms/templates/commerce/receipt.underscore
 #, python-format
-msgid "Thank you! We have received your payment for %(course_name)s."
+msgid ""
+"Thank you %(full_name)s! We have received your payment for %(course_name)s."
 msgstr ""
-"Thänk ýöü! Wé hävé réçéïvéd ýöür päýmént för %(course_name)s. Ⱡ'σяєм ιρѕυм "
-"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+"Thänk ýöü %(full_name)s! Wé hävé réçéïvéd ýöür päýmént för %(course_name)s. "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: lms/templates/commerce/receipt.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
@@ -7395,6 +7433,10 @@ msgstr "Çléär séärçh résülts Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт 
 #: lms/templates/fields/field_textarea.underscore
 msgid "Click to edit"
 msgstr "Çlïçk tö édït Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
+
+#: lms/templates/fields/field_order_history.underscore
+msgid "Order Details"
+msgstr "Ördér Détäïls Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 
 #: lms/templates/fields/field_text.underscore
 msgid "title"
@@ -7885,30 +7927,20 @@ msgstr ""
 "α#"
 
 #: lms/templates/learner_dashboard/program_header_view.underscore
-msgid "Programs"
-msgstr "Prögräms Ⱡ'σяєм ιρѕυм ∂#"
-
-#: lms/templates/learner_dashboard/program_header_view.underscore
-msgid "{category}\\'s program"
-msgstr "{category}\\'s prögräm Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
-
-#: lms/templates/learner_dashboard/program_header_view.underscore
 msgid "{organization}\\'s logo"
 msgstr "{organization}\\'s lögö Ⱡ'σяєм ιρѕυм ∂σłσя #"
 
 #: lms/templates/learner_dashboard/program_header_view.underscore
-msgid ""
-"To complete the {program} XSeries and earn an XSeries Certificate you must "
-"successfully earn a Verified Certificate in all courses shown below."
-msgstr ""
-"Tö çömplété thé {program} XSérïés änd éärn än XSérïés Çértïfïçäté ýöü müst "
-"süççéssfüllý éärn ä Vérïfïéd Çértïfïçäté ïn äll çöürsés shöwn ßélöw. Ⱡ'σяєм "
-"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя "
-"ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ "
-"ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ "
-"¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє "
-"¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт "
-"ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłłιт αηιм ι∂ єѕт łαвσ#"
+msgid "You are here"
+msgstr "Ýöü äré héré Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
+
+#: lms/templates/learner_dashboard/program_header_view.underscore
+msgid "Dashboard"
+msgstr "Däshßöärd Ⱡ'σяєм ιρѕυм ∂σł#"
+
+#: lms/templates/learner_dashboard/program_header_view.underscore
+msgid "Programs"
+msgstr "Prögräms Ⱡ'σяєм ιρѕυм ∂#"
 
 #: lms/templates/search/course_search_results.underscore
 #: lms/templates/search/dashboard_search_results.underscore
@@ -7942,10 +7974,6 @@ msgstr "Rését Pässwörd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 #: lms/templates/student_account/account_settings.underscore
 msgid "Account Settings"
 msgstr "Àççöünt Séttïngs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
-
-#: lms/templates/student_account/account_settings_section.underscore
-msgid "section.subtitle"
-msgstr "séçtïön.süßtïtlé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 
 #: lms/templates/student_account/account_settings_section.underscore
 msgid "section.title"
@@ -9564,6 +9592,10 @@ msgstr "Grädïng Ⱡ'σяєм ιρѕυм #"
 #: cms/templates/js/grading-editor.underscore
 msgid "Grade as:"
 msgstr "Grädé äs: Ⱡ'σяєм ιρѕυм ∂σł#"
+
+#: cms/templates/js/grading-editor.underscore
+msgid "Not Graded"
+msgstr "Nöt Grädéd Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
 #: cms/templates/js/group-configuration-details.underscore
 #: cms/templates/js/group-configuration-editor.underscore

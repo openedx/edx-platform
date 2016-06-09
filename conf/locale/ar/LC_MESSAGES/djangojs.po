@@ -29,7 +29,7 @@
 # Nabeel El-Dughailib <nabeel@qordoba.com>, 2014-2015
 # Najwan Al Rousan <najwanrousan@gmail.com>, 2013
 # Najwan Al Rousan <najwanrousan@gmail.com>, 2013
-# Ned Batchelder <ned@edx.org>, 2015
+# Ned Batchelder <ned@edx.org>, 2015-2016
 # omarithawi <oithawi@qrf.org>, 2015
 # Saramami.mami <saramami.mami@yahoo.com>, 2014
 # SiddigSami <siddigsami@live.com>, 2014-2015
@@ -75,7 +75,8 @@
 # Khaled Abdel wahab <engkhaledabdelwahab@gmail.com>, 2015
 # may <may@qordoba.com>, 2014-2015
 # Nabeel El-Dughailib <nabeel@qordoba.com>, 2014-2015
-# omarithawi <oithawi@qrf.org>, 2015
+# Ned Batchelder <ned@edx.org>, 2016
+# omarithawi <oithawi@qrf.org>, 2015-2016
 # Soha Assali <soha+transifex@qordoba.com>, 2015-2016
 # سيف المنايا <m2fahad9@gmail.com>, 2015
 # #-#-#-#-#  underscore-studio.po (edx-platform)  #-#-#-#-#
@@ -1837,10 +1838,12 @@ msgid ""
 "Click on this button to mute or unmute this video or press UP or DOWN "
 "buttons to increase or decrease volume level."
 msgstr ""
+"انقر على هذا الزر من أجل كتم أو تشغيل صوت الفيديو. لرفع مستوى الصوت أو خفضه "
+"اضغط على زر \"أعلى\" أو \"أسفل\" من على لوحة المفاتيح."
 
 #: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js
 msgid "Adjust video volume"
-msgstr ""
+msgstr "ضبط مستوى الصوت"
 
 #: common/lib/xmodule/xmodule/js/src/video/08_video_speed_control.js
 msgid ""
@@ -1848,14 +1851,17 @@ msgid ""
 "navigate the different speeds, then press ENTER to change to the selected "
 "speed."
 msgstr ""
+"اضغط زر \"أعلى\" من على لوحة المفاتيح للدخول إلى قائمة ضبط السرعة ثم استخدم "
+"زر \"الأعلى\" و\"الأسفل\" لاختيار السرعة المناسبة. لحفظ السرعة المختارة اضغط"
+" على زر الإرسال \"ENTER\""
 
 #: common/lib/xmodule/xmodule/js/src/video/08_video_speed_control.js
 msgid "Adjust video speed"
-msgstr ""
+msgstr "ضبط سرعة الفيديو"
 
 #: common/lib/xmodule/xmodule/js/src/video/08_video_speed_control.js
 msgid "Video speed: "
-msgstr ""
+msgstr "سرعة الفيديو:"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_play_skip_control.js
 msgid "Skip"
@@ -1871,7 +1877,7 @@ msgstr "يُرجى عدم إظهار هذا مرّة أخرى."
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "Open language menu"
-msgstr ""
+msgstr "فتح قائمة اللغة"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "Transcript will be displayed when you start playing the video."
@@ -1903,6 +1909,9 @@ msgid ""
 " keys to navigate language options. Press ENTER to change to the selected "
 "language."
 msgstr ""
+"اضغط زر \"أعلى\" من على لوحة المفاتيح للدخول إلى قائمة اللغة ثم استخدم زر "
+"\"الأعلى\" و\"الأسفل\" لاختيار اللغة المناسبة. لحفظ اللغة المختارة اضغط على "
+"زر الإرسال \"ENTER\""
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "Open language menu."
@@ -4308,12 +4317,12 @@ msgstr "نأسف لحدوث خطأ. يُرجى تحديث الصفحة أو تأ
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "Basic Account Information"
-msgstr ""
+msgstr "معلومات الحساب الأساسية"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid ""
 "These settings include basic information about your account. You can also "
-msgstr ""
+msgstr "هذه الإعدادات تحتوي على معلومات حسابك الأساسية. يمكنك أيضاً"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid ""
@@ -4357,11 +4366,11 @@ msgstr "كلمة السر"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "Reset Your Password"
-msgstr ""
+msgstr "غير كلمة سر حسابك"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "When you click \"Reset Your Password\", edX will send a message "
-msgstr ""
+msgstr "ستصلك رسالة على بريدك الإلكتروني  عند النقر على \"إعادة ضبط كلمة السر\""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid ""
@@ -4377,7 +4386,7 @@ msgstr "الدولة أو المنطقة"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "Additional Information"
-msgstr ""
+msgstr "معلومات إضافية"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "Education Completed"
@@ -4399,19 +4408,23 @@ msgstr "اللغة المفضّلة"
 #: lms/static/js/student_account/views/account_settings_factory.js
 #: lms/static/js/student_account/views/account_settings_view.js
 msgid "Linked Accounts"
-msgstr ""
+msgstr "الحسابات المربوطة"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid ""
 "You can link your social media accounts to your edX account to make signing "
 "in to edx.org "
 msgstr ""
+"يمكنك ربط حساباتك على شبكات التواصل الاجتماعي بهذا الحساب لتسهيل عملية تسجيل"
+" الدخول لاحقاً"
 
 #: lms/static/js/student_account/views/account_settings_fields.js
 msgid ""
 "We've sent a confirmation message to {new_email_address}. Click the link in "
 "the "
 msgstr ""
+"قمنا بإرسال رسالة تأكيد إلى {new_email_address}. قم بالنقر على الرابط "
+"الموجود في"
 
 #: lms/static/js/student_account/views/account_settings_fields.js
 msgid ""
@@ -4425,30 +4438,32 @@ msgid ""
 "We've sent a message to {email_address}. Click the link in the message to "
 "reset "
 msgstr ""
+"قمنا بإرسال رسالة إلى {email_address}. قم بالنقر على الرابط الموجود في "
+"الرسالة للتغيير"
 
 #: lms/static/js/student_account/views/account_settings_fields.js
 msgid "Link your {accountName} account"
-msgstr ""
+msgstr "اربط حسابك على {accountName}"
 
 #: lms/static/js/student_account/views/account_settings_fields.js
 msgid "Unlink This Account"
-msgstr ""
+msgstr "افصل هذا الحساب"
 
 #: lms/static/js/student_account/views/account_settings_fields.js
 msgid "You can use your {accountName} account to sign in to your edX account."
-msgstr ""
+msgstr "يمكنك استخدام حسابك على {accountName} لتسجيل الدخول إلى حسابك."
 
 #: lms/static/js/student_account/views/account_settings_fields.js
 msgid "Unlink your {accountName} account"
-msgstr ""
+msgstr "افصل حسابك على {accountName}"
 
 #: lms/static/js/student_account/views/account_settings_fields.js
 msgid "Link Your Account"
-msgstr ""
+msgstr "اربط حسابك"
 
 #: lms/static/js/student_account/views/account_settings_fields.js
 msgid "Link your {accountName} account to your edX account and "
-msgstr ""
+msgstr "اربط حسابك على {accountName} بهذا الحساب و"
 
 #: lms/static/js/student_account/views/account_settings_fields.js
 msgid "Unlinking"
@@ -4464,7 +4479,7 @@ msgstr "نجح فصل الربط"
 
 #: lms/static/js/student_account/views/account_settings_view.js
 msgid "Account Information"
-msgstr ""
+msgstr "معلومات الحساب"
 
 #: lms/static/js/student_profile/views/badge_list_container.js
 msgid "Accomplishments Pagination"
@@ -6149,7 +6164,7 @@ msgstr "تحديث التعليق"
 #: common/static/common/templates/discussion/response-comment-show.underscore
 #, python-format
 msgid "posted %(time_ago)s by %(author)s"
-msgstr "نُشِر  %(time_ago)s من قِبل %(author)s"
+msgstr "منشور %(author)s بواسطة %(time_ago)s"
 
 #: common/static/common/templates/discussion/response-comment-show.underscore
 #: common/static/common/templates/discussion/thread-response-show.underscore
@@ -7281,21 +7296,23 @@ msgstr ""
 
 #: lms/templates/learner_dashboard/program_header_view.underscore
 msgid "Programs"
-msgstr ""
+msgstr "البرامج"
 
 #: lms/templates/learner_dashboard/program_header_view.underscore
 msgid "{category}\\'s program"
-msgstr ""
+msgstr "برامج ال{category}"
 
 #: lms/templates/learner_dashboard/program_header_view.underscore
 msgid "{organization}\\'s logo"
-msgstr ""
+msgstr "شعار ال{organization}"
 
 #: lms/templates/learner_dashboard/program_header_view.underscore
 msgid ""
 "To complete the {program} XSeries and earn an XSeries Certificate you must "
 "successfully earn a Verified Certificate in all courses shown below."
 msgstr ""
+"يجب أن تحصل على شهادة موقة في جميع المساقات الموضحة في الأسفل لإكمال سلسة "
+"مساقات {program} والحصول على شهادة إتمام هذه السلسلة."
 
 #: lms/templates/search/course_search_results.underscore
 #: lms/templates/search/dashboard_search_results.underscore
@@ -7336,7 +7353,7 @@ msgstr "إعدادات الحساب"
 
 #: lms/templates/student_account/account_settings_section.underscore
 msgid "section.subtitle"
-msgstr ""
+msgstr "section.subtitle"
 
 #: lms/templates/student_account/account_settings_section.underscore
 msgid "section.title"

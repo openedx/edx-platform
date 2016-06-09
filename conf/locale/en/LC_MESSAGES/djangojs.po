@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-06-02 14:33+0000\n"
-"PO-Revision-Date: 2016-06-02 14:34:15.467005\n"
+"POT-Creation-Date: 2016-06-09 15:20+0000\n"
+"PO-Revision-Date: 2016-06-09 15:21:36.475893\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -46,7 +46,6 @@ msgstr ""
 #: cms/static/js/views/edit_textbook.js
 #: cms/static/js/views/list_item_editor.js
 #: cms/static/js/views/modals/edit_xblock.js
-#: cms/static/js/views/overview_assignment_grader.js
 #: cms/static/js/views/utils/xblock_utils.js lms/static/js/ccx/schedule.js
 #: lms/static/js/views/fields.js
 msgid "Saving"
@@ -156,6 +155,14 @@ msgstr ""
 #: cms/static/js/views/manage_users_and_roles.js
 #: lms/static/coffee/src/instructor_dashboard/util.js
 msgid "Unknown"
+msgstr ""
+
+#: cms/static/js/views/metadata.js
+#: lms/djangoapps/teams/static/teams/js/views/edit_team_members.js
+#: lms/static/js/views/image_field.js
+#: cms/templates/js/video/metadata-translations-item.underscore
+#: lms/djangoapps/teams/static/teams/templates/edit-team-member.underscore
+msgid "Remove"
 msgstr ""
 
 #: cms/static/js/views/metadata.js lms/static/js/views/file_uploader.js
@@ -2472,13 +2479,6 @@ msgid ""
 " the available spot."
 msgstr ""
 
-#: lms/djangoapps/teams/static/teams/js/views/edit_team_members.js
-#: lms/static/js/views/image_field.js
-#: cms/templates/js/video/metadata-translations-item.underscore
-#: lms/djangoapps/teams/static/teams/templates/edit-team-member.underscore
-msgid "Remove"
-msgstr ""
-
 #: lms/djangoapps/teams/static/teams/js/views/instructor_tools.js
 msgid "Delete this team?"
 msgstr ""
@@ -2943,6 +2943,10 @@ msgid "All learners who are enrolled in this course"
 msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
+msgid "All learners in the {cohort_name} cohort"
+msgstr ""
+
+#: lms/static/coffee/src/instructor_dashboard/send_email.js
 msgid ""
 "Your email message was successfully queued for sending. In courses with a "
 "large number of learners, email messages to learners might take up to an "
@@ -2973,6 +2977,10 @@ msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
 msgid "There was an error obtaining email content history for this course."
+msgstr ""
+
+#: lms/static/coffee/src/instructor_dashboard/send_email.js
+msgid "Send to:"
 msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
@@ -3654,12 +3662,12 @@ msgid "[no tags]"
 msgstr ""
 
 #: lms/static/js/financial-assistance/views/financial_assistance_form_view.js
-msgid "Choose one"
+#: lms/static/js/student_account/views/LoginView.js
+msgid "An error has occurred. Check your Internet connection and try again."
 msgstr ""
 
 #: lms/static/js/financial-assistance/views/financial_assistance_form_view.js
-#: lms/static/js/student_account/views/LoginView.js
-msgid "An error has occurred. Check your Internet connection and try again."
+msgid "Choose one"
 msgstr ""
 
 #: lms/static/js/groups/views/cohort_discussions.js
@@ -4030,6 +4038,32 @@ msgid ""
 "{platform_name}."
 msgstr ""
 
+#: lms/static/js/student_account/views/account_settings_factory.js
+msgid "ORDER NAME"
+msgstr ""
+
+#: lms/static/js/student_account/views/account_settings_factory.js
+msgid "ORDER PLACED"
+msgstr ""
+
+#: lms/static/js/student_account/views/account_settings_factory.js
+msgid "TOTAL"
+msgstr ""
+
+#: lms/static/js/student_account/views/account_settings_factory.js
+msgid "ORDER NUMBER"
+msgstr ""
+
+#: lms/static/js/student_account/views/account_settings_factory.js
+msgid "My Orders"
+msgstr ""
+
+#: lms/static/js/student_account/views/account_settings_factory.js
+msgid ""
+"This page contains information about orders that you have placed with "
+"{platform_name}."
+msgstr ""
+
 #: lms/static/js/student_account/views/account_settings_fields.js
 msgid ""
 "We've sent a confirmation message to {new_email_address}. Click the link in "
@@ -4089,6 +4123,10 @@ msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_view.js
 msgid "Account Information"
+msgstr ""
+
+#: lms/static/js/student_account/views/account_settings_view.js
+msgid "Order History"
 msgstr ""
 
 #: lms/static/js/student_profile/views/badge_list_container.js
@@ -5096,11 +5134,6 @@ msgstr ""
 msgid "Change Manually"
 msgstr ""
 
-#: cms/static/js/views/overview_assignment_grader.js
-#: cms/templates/js/grading-editor.underscore
-msgid "Not Graded"
-msgstr ""
-
 #: cms/static/js/views/paged_container.js
 msgid "Date added"
 msgstr ""
@@ -5501,7 +5534,7 @@ msgid "Clear search"
 msgstr ""
 
 #: common/static/common/templates/discussion/discussion-home.underscore
-msgid "DISCUSSION HOME:"
+msgid "Discussion Home"
 msgstr ""
 
 #: common/static/common/templates/discussion/discussion-home.underscore
@@ -5834,7 +5867,7 @@ msgid "Add a Response"
 msgstr ""
 
 #: common/static/common/templates/discussion/thread.underscore
-msgid "Post a response:"
+msgid "Add a response:"
 msgstr ""
 
 #: common/static/common/templates/discussion/thread.underscore
@@ -6059,7 +6092,7 @@ msgid "Join Team"
 msgstr ""
 
 #: lms/djangoapps/teams/static/teams/templates/team-profile.underscore
-msgid "New Post"
+msgid "Add a Post"
 msgstr ""
 
 #: lms/djangoapps/teams/static/teams/templates/team-profile.underscore
@@ -6208,7 +6241,8 @@ msgstr ""
 
 #: lms/templates/commerce/receipt.underscore
 #, python-format
-msgid "Thank you! We have received your payment for %(course_name)s."
+msgid ""
+"Thank you %(full_name)s! We have received your payment for %(course_name)s."
 msgstr ""
 
 #: lms/templates/commerce/receipt.underscore
@@ -6335,6 +6369,10 @@ msgstr ""
 #: lms/templates/fields/field_dropdown_account.underscore
 #: lms/templates/fields/field_textarea.underscore
 msgid "Click to edit"
+msgstr ""
+
+#: lms/templates/fields/field_order_history.underscore
+msgid "Order Details"
 msgstr ""
 
 #: lms/templates/fields/field_text.underscore
@@ -6753,21 +6791,19 @@ msgid ""
 msgstr ""
 
 #: lms/templates/learner_dashboard/program_header_view.underscore
-msgid "Programs"
-msgstr ""
-
-#: lms/templates/learner_dashboard/program_header_view.underscore
-msgid "{category}\\'s program"
-msgstr ""
-
-#: lms/templates/learner_dashboard/program_header_view.underscore
 msgid "{organization}\\'s logo"
 msgstr ""
 
 #: lms/templates/learner_dashboard/program_header_view.underscore
-msgid ""
-"To complete the {program} XSeries and earn an XSeries Certificate you must "
-"successfully earn a Verified Certificate in all courses shown below."
+msgid "You are here"
+msgstr ""
+
+#: lms/templates/learner_dashboard/program_header_view.underscore
+msgid "Dashboard"
+msgstr ""
+
+#: lms/templates/learner_dashboard/program_header_view.underscore
+msgid "Programs"
 msgstr ""
 
 #: lms/templates/search/course_search_results.underscore
@@ -6801,10 +6837,6 @@ msgstr ""
 
 #: lms/templates/student_account/account_settings.underscore
 msgid "Account Settings"
-msgstr ""
-
-#: lms/templates/student_account/account_settings_section.underscore
-msgid "section.subtitle"
 msgstr ""
 
 #: lms/templates/student_account/account_settings_section.underscore
@@ -8123,6 +8155,10 @@ msgstr ""
 
 #: cms/templates/js/grading-editor.underscore
 msgid "Grade as:"
+msgstr ""
+
+#: cms/templates/js/grading-editor.underscore
+msgid "Not Graded"
 msgstr ""
 
 #: cms/templates/js/group-configuration-details.underscore
