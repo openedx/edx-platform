@@ -35,10 +35,6 @@ def update_user(self, username, new_user=False, activation=False):
         log.error("User not found during Sailthru update %s", username)
         return
 
-    # ignore anonymous users
-    if user.is_anonymous():
-        return
-
     # get profile
     profile = user.profile
     if not profile:
@@ -99,10 +95,6 @@ def update_user_email(self, username, old_email):
     user = User.objects.get(username=username)
     if not user:
         log.error("User not found duing Sailthru update %s", username)
-        return
-
-    # ignore anonymous users
-    if user.is_anonymous():
         return
 
     # ignore if email not changed

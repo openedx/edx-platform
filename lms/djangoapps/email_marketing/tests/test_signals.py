@@ -133,6 +133,21 @@ class EmailMarketingTests(TestCase):
         update_user.delay(self.user.username)
         self.assertTrue(mock_log_error.called)
 
+    @patch('email_marketing.tasks.log.error')
+    @patch('email_marketing.tasks.SailthruClient.api_post')
+    def test_just_return(self, mock_sailthru, mock_log_error):
+        """
+        Ensure that disabling Sailthru just returns
+        """
+        update_email_marketing_config(enabled=False)
+        update_user.delay(self.user.username)
+        self.assertFalse(mock_log_error.called)
+        self.assertFalse(mock_sailthru.called)
+        update_user_email.delay(self.user.username, "newemail2@test.com")
+        self.assertFalse(mock_log_error.called)
+        self.assertFalse(mock_sailthru.called)
+        update_email_marketing_config(enabled=True)
+
     @patch('email_marketing.tasks.SailthruClient.api_post')
     def test_change_email(self, mock_sailthru):
         """
