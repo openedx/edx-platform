@@ -1,4 +1,5 @@
 """ Django REST Framework Serializers """
+import json
 
 from rest_framework import serializers
 from django.core.exceptions import ObjectDoesNotExist
@@ -19,14 +20,18 @@ class DynamicFieldsModelSerializer(serializers.ModelSerializer):
         # Instantiate the superclass normally
         super(DynamicFieldsModelSerializer, self).__init__(*args, **kwargs)
 
-        fields = self.context['request'].QUERY_PARAMS.get('fields', None) if 'request' in self.context else None
-        if fields:
-            fields = fields.split(',')
-            # Drop any fields that are not specified in the `fields` argument.
-            allowed = set(fields)
-            existing = set(self.fields.keys())
-            for field_name in existing - allowed:
-                self.fields.pop(field_name)
+        if 'request' in self.context:
+            fields = self.context['request'].QUERY_PARAMS.get('fields', None)
+            if not fields and 'default_fields' in self.context:
+                additional_fields = self.context['request'].QUERY_PARAMS.get('additional_fields', "")
+                fields = ','.join([self.context['default_fields'], additional_fields])
+            if fields:
+                fields = fields.split(',')
+                # Drop any fields that are not specified in the `fields` argument.
+                allowed = set(fields)
+                existing = set(self.fields.keys())
+                for field_name in existing - allowed:
+                    self.fields.pop(field_name)
 
 
 class UserSerializer(DynamicFieldsModelSerializer):
@@ -60,18 +65,19 @@ class UserSerializer(DynamicFieldsModelSerializer):
         return queryset.values_list('role', flat=True).distinct()
 
     def get_user_grades(self, user):
-        """ returns user proforma_grade and grade """
-        grade, proforma_grade = None, None
+        """ returns user proforma_grade, grade and grade_summary """
+        grade, proforma_grade, section_breakdown = None, None, None
         if 'course_id' in self.context:
             course_id = self.context['course_id']
             try:
                 gradebook = StudentGradebook.objects.get(user=user, course_id=course_id)
                 grade = gradebook.grade
                 proforma_grade = gradebook.proforma_grade
+                section_breakdown = json.loads(gradebook.grade_summary)["section_breakdown"]
             except ObjectDoesNotExist:
                 pass
 
-        return {'grade': grade, 'proforma_grade': proforma_grade}
+        return {'grade': grade, 'proforma_grade': proforma_grade, 'section_breakdown': section_breakdown}
 
     class Meta(object):
         """ Serializer/field specification """
@@ -84,7 +90,6 @@ class UserSerializer(DynamicFieldsModelSerializer):
             "last_name",
             "created",
             "is_active",
-            "organizations",
             "avatar_url",
             "city",
             "title",
@@ -93,6 +98,7 @@ class UserSerializer(DynamicFieldsModelSerializer):
             "is_staff",
             "last_login",
             "courses_enrolled",
+            "organizations",
             "roles",
             "grades",
         )
