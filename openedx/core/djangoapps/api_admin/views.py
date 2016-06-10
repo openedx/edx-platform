@@ -1,9 +1,11 @@
 """Views for API management."""
+from datetime import datetime
 import logging
 
 from django.conf import settings
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.urlresolvers import reverse_lazy, reverse
+from django.http import HttpResponse
 from django.http.response import JsonResponse
 from django.shortcuts import redirect
 from django.utils.translation import ugettext as _
@@ -232,3 +234,18 @@ class CatalogPreviewView(View):
         else:
             results = {'count': 0, 'results': [], 'next': None, 'prev': None}
         return JsonResponse(results)
+
+
+class CatalogCSVView(View):
+    """View to download a CSV of catalog courses."""
+
+    def get(self, request, catalog_id):
+        """Download a CSV of course_runs in this catalog."""
+        client = course_discovery_api_client(request.user)
+        data = client.api.v1.catalogs(catalog_id).csv.get()
+
+        response = HttpResponse(data, content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename="catalog_{id}_{date}.csv"'.format(
+            id=catalog_id, date=datetime.utcnow().strftime('%Y-%m-%d')
+        )
+        return response

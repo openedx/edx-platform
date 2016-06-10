@@ -26,6 +26,7 @@ CatalogPreviewFactory({
     % for catalog in catalogs:
     <li>
       <a href="${reverse('api_admin:catalog-edit', args=(catalog.id,))}">${catalog.name}</a>
+      <a href="${reverse('api_admin:catalog-csv', args=(catalog.id,))}">download CSV</a>
     </li>
     % endfor
   </ul>

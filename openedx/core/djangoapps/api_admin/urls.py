@@ -6,7 +6,7 @@ from django.contrib.auth.decorators import login_required
 
 from openedx.core.djangoapps.api_admin.decorators import api_access_enabled_or_404
 from openedx.core.djangoapps.api_admin.views import (
-    ApiRequestView, ApiRequestStatusView, ApiTosView, CatalogListView, CatalogEditView,
+    ApiRequestView, ApiRequestStatusView, ApiTosView, CatalogCSVView, CatalogListView, CatalogEditView,
     CatalogPreviewView, CatalogSearchView
 )
 
@@ -47,6 +47,15 @@ urlpatterns = (
             redirect_field_name=None
         ),
         name='catalog-edit',
+    ),
+    url(
+        r'^catalogs/(?P<catalog_id>\d+)/csv$',
+        staff_member_required(
+            api_access_enabled_or_404(CatalogCSVView.as_view()),
+            login_url='dashboard',
+            redirect_field_name=None
+        ),
+        name='catalog-csv',
     ),
     url(
         r'^catalogs/$',
