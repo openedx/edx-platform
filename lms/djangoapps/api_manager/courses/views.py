@@ -1089,7 +1089,23 @@ class CoursesUsersList(SecureListAPIView):
         Extra context provided to the serializer class.
         """
         serializer_context = super(CoursesUsersList, self).get_serializer_context()
-        serializer_context.update({'course_id': self.course_key})
+        default_fields = ",".join([
+            "id",
+            "email",
+            "username",
+            "first_name",
+            "last_name",
+            "created",
+            "is_active",
+            "avatar_url",
+            "city",
+            "title",
+            "country",
+            "full_name",
+            "is_staff",
+            "last_login",
+        ])
+        serializer_context.update({'course_id': self.course_key, 'default_fields': default_fields})
         return serializer_context
 
     def get_queryset(self):
