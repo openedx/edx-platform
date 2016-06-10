@@ -966,7 +966,7 @@ class InlineDiscussionTest(UniqueCourseTest, DiscussionResponsePaginationTestMix
         self.assertFalse(self.thread_page.is_comment_deletable("comment1"))
         self.assertFalse(self.thread_page.is_comment_deletable("comment2"))
 
-    def test_dual_discussion_module(self):
+    def test_dual_discussion_xblock(self):
         """
         Scenario: Two discussion module in one unit shouldn't override their actions
         Given that I'm on courseware page where there are two inline discussion

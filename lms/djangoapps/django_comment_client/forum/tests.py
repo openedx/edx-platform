@@ -623,8 +623,8 @@ class SingleThreadContentGroupTestCase(UrlResetMixin, ContentGroupTestCase):
         thread_id = "test_thread_id"
         mock_request.side_effect = make_mock_request_impl(course=self.course, text="dummy content", thread_id=thread_id)
 
-        for discussion_module in [self.alpha_module, self.beta_module, self.global_module]:
-            self.assert_can_access(self.staff_user, discussion_module.discussion_id, thread_id, True)
+        for discussion_xblock in [self.alpha_module, self.beta_module, self.global_module]:
+            self.assert_can_access(self.staff_user, discussion_xblock.discussion_id, thread_id, True)
 
     def test_alpha_user(self, mock_request):
         """
@@ -634,8 +634,8 @@ class SingleThreadContentGroupTestCase(UrlResetMixin, ContentGroupTestCase):
         thread_id = "test_thread_id"
         mock_request.side_effect = make_mock_request_impl(course=self.course, text="dummy content", thread_id=thread_id)
 
-        for discussion_module in [self.alpha_module, self.global_module]:
-            self.assert_can_access(self.alpha_user, discussion_module.discussion_id, thread_id, True)
+        for discussion_xblock in [self.alpha_module, self.global_module]:
+            self.assert_can_access(self.alpha_user, discussion_xblock.discussion_id, thread_id, True)
 
         self.assert_can_access(self.alpha_user, self.beta_module.discussion_id, thread_id, False)
 
@@ -647,8 +647,8 @@ class SingleThreadContentGroupTestCase(UrlResetMixin, ContentGroupTestCase):
         thread_id = "test_thread_id"
         mock_request.side_effect = make_mock_request_impl(course=self.course, text="dummy content", thread_id=thread_id)
 
-        for discussion_module in [self.beta_module, self.global_module]:
-            self.assert_can_access(self.beta_user, discussion_module.discussion_id, thread_id, True)
+        for discussion_xblock in [self.beta_module, self.global_module]:
+            self.assert_can_access(self.beta_user, discussion_xblock.discussion_id, thread_id, True)
 
         self.assert_can_access(self.beta_user, self.alpha_module.discussion_id, thread_id, False)
 

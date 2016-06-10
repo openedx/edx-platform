@@ -188,7 +188,7 @@ class CourseTopicsViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
             )
         return course_url
 
-    def make_discussion_module(self, topic_id, category, subcategory, **kwargs):
+    def make_discussion_xblock(self, topic_id, category, subcategory, **kwargs):
         """
         Build a discussion module in self.course
         """
@@ -249,7 +249,7 @@ class CourseTopicsViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         Tests discussion topic does not exist for the given topic id.
         """
         topic_id = "courseware-topic-id"
-        self.make_discussion_module(topic_id, "test_category", "test_target")
+        self.make_discussion_xblock(topic_id, "test_category", "test_target")
         url = "{}?topic_id=invalid_topic_id".format(self.url)
         response = self.client.get(url)
         self.assert_response_correct(
@@ -264,8 +264,8 @@ class CourseTopicsViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         """
         topic_id_1 = "topic_id_1"
         topic_id_2 = "topic_id_2"
-        self.make_discussion_module(topic_id_1, "test_category_1", "test_target_1")
-        self.make_discussion_module(topic_id_2, "test_category_2", "test_target_2")
+        self.make_discussion_xblock(topic_id_1, "test_category_1", "test_target_1")
+        self.make_discussion_xblock(topic_id_2, "test_category_2", "test_target_2")
         url = "{}?topic_id=topic_id_1,topic_id_2".format(self.url)
         response = self.client.get(url)
         self.assert_response_correct(

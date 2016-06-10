@@ -267,7 +267,7 @@ msgstr "קורס"
 #: common/djangoapps/course_modes/models.py
 #: common/lib/xmodule/xmodule/annotatable_module.py
 #: common/lib/xmodule/xmodule/capa_base.py
-#: common/lib/xmodule/xmodule/discussion_module.py
+#: common/lib/xblock/xblock_discussion/xblock_discussion.py
 #: common/lib/xmodule/xmodule/html_module.py
 #: common/lib/xmodule/xmodule/imageannotation_module.py
 #: common/lib/xmodule/xmodule/library_content_module.py
@@ -1797,7 +1797,7 @@ msgid "XML data for the annotation"
 msgstr "מידע XML עבור הסברים"
 
 #: common/lib/xmodule/xmodule/annotatable_module.py
-#: common/lib/xmodule/xmodule/discussion_module.py
+#: common/lib/xblock/xblock_discussion/xblock_discussion.py
 #: common/lib/xmodule/xmodule/html_module.py
 #: common/lib/xmodule/xmodule/imageannotation_module.py
 #: common/lib/xmodule/xmodule/library_content_module.py
@@ -1929,7 +1929,7 @@ msgid "Per Student"
 msgstr "לסטודנט"
 
 #: common/lib/xmodule/xmodule/capa_base.py
-#: common/lib/xmodule/xmodule/discussion_module.py
+#: common/lib/xblock/xblock_discussion/xblock_discussion.py
 msgid "XML data for the problem"
 msgstr "מידע XML עבור בעיה"
 
@@ -2998,19 +2998,19 @@ msgstr ""
 msgid "General"
 msgstr "כללי"
 
-#: common/lib/xmodule/xmodule/discussion_module.py
+#: common/lib/xblock/xblock_discussion/xblock_discussion.py
 msgid "Discussion Id"
 msgstr "מזהה דיון"
 
-#: common/lib/xmodule/xmodule/discussion_module.py
+#: common/lib/xblock/xblock_discussion/xblock_discussion.py
 msgid "The id is a unique identifier for the discussion. It is non editable."
 msgstr "המזהה הוא מזהה יחודי עבור הדיון לא ניתן לערוך אותו."
 
-#: common/lib/xmodule/xmodule/discussion_module.py
+#: common/lib/xblock/xblock_discussion/xblock_discussion.py
 msgid "Category"
 msgstr "קטגוריה"
 
-#: common/lib/xmodule/xmodule/discussion_module.py
+#: common/lib/xblock/xblock_discussion/xblock_discussion.py
 msgid ""
 "A category name for the discussion. This name appears in the left pane of "
 "the discussion forum for the course."
@@ -3018,11 +3018,11 @@ msgstr ""
 "שם קטגוריה עבור הדיון. השם הזה מופיע בחלונית השמאלית של פורום הדיונים של "
 "הקורס."
 
-#: common/lib/xmodule/xmodule/discussion_module.py
+#: common/lib/xblock/xblock_discussion/xblock_discussion.py
 msgid "Subcategory"
 msgstr "תת קטגוריה"
 
-#: common/lib/xmodule/xmodule/discussion_module.py
+#: common/lib/xblock/xblock_discussion/xblock_discussion.py
 msgid ""
 "A subcategory name for the discussion. This name appears in the left pane of"
 " the discussion forum for the course."
@@ -13752,20 +13752,20 @@ msgid "Results:"
 msgstr "תוצאות:"
 
 #: lms/templates/discussion/_discussion_course_navigation.html
-#: lms/templates/discussion/_discussion_module.html
+#: lms/templates/discussion/_discussion_inline.html
 msgid "New Post"
 msgstr "פוסט חדש"
 
-#: lms/templates/discussion/_discussion_module.html
+#: lms/templates/discussion/_discussion_inline.html
 msgid "Show Discussion"
 msgstr "הראה דיון"
 
-#: lms/templates/discussion/_discussion_module_studio.html
+#: lms/templates/discussion/_discussion_inline_studio.html
 msgid "To view live discussions, click Preview or View Live in Unit Settings."
 msgstr ""
 "בכדי לצפות בדיון בזמן אמת, לחץ תצוגה מקדימה או צפה בזמן אמת בהגדרות היחידה. "
 
-#: lms/templates/discussion/_discussion_module_studio.html
+#: lms/templates/discussion/_discussion_inline_studio.html
 msgid "Discussion ID: {discussion_id}"
 msgstr "מספר מזהה לדיון: {discussion_id}"
 
