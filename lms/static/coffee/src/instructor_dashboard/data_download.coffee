@@ -109,6 +109,7 @@ class DataDownload
       url = @$list_proctored_exam_results_csv_btn.data 'endpoint'
       # display html from proctored exam results config endpoint
       $.ajax
+        type: 'POST'
         dataType: 'json'
         url: url
         error: (std_ajax_err) =>
@@ -128,6 +129,7 @@ class DataDownload
       url = @$survey_results_csv_btn.data 'endpoint'
       # display html from survey results config endpoint
       $.ajax
+        type: 'POST'
         dataType: 'json'
         url: url
         error: (std_ajax_err) =>
@@ -152,6 +154,7 @@ class DataDownload
       url += '/csv'
 
       $.ajax
+        type: 'POST'
         dataType: 'json'
         url: url
         error: (std_ajax_err) =>
@@ -170,6 +173,7 @@ class DataDownload
 
       # fetch user list
       $.ajax
+        type: 'POST'
         dataType: 'json'
         url: url
         error: (std_ajax_err) =>
@@ -198,6 +202,7 @@ class DataDownload
 
       url = @$list_problem_responses_csv_btn.data 'endpoint'
       $.ajax
+        type: 'POST'
         dataType: 'json'
         url: url
         data:
@@ -214,6 +219,7 @@ class DataDownload
 
       url = @$list_may_enroll_csv_btn.data 'endpoint'
       $.ajax
+        type: 'POST'
         dataType: 'json'
         url: url
         error: (std_ajax_err) =>
@@ -227,6 +233,7 @@ class DataDownload
       url = @$grade_config_btn.data 'endpoint'
       # display html from grading config endpoint
       $.ajax
+        type: 'POST'
         dataType: 'json'
         url: url
         error: (std_ajax_err) =>
@@ -249,6 +256,7 @@ class DataDownload
       @clear_display()
       url = button.data 'endpoint'
       $.ajax
+        type: 'POST'
         dataType: 'json'
         url: url
         error: (std_ajax_err) =>

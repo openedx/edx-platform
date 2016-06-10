@@ -36,15 +36,15 @@ define(['jquery', 'coffee/src/instructor_dashboard/student_admin', 'common/js/sp
                 // Spy on AJAX requests
                 var requests = AjaxHelpers.requests(this);
 
-                studentadmin.$field_entrance_exam_student_select_grade.val(unique_student_identifier)
+                studentadmin.$field_entrance_exam_student_select_grade.val(unique_student_identifier);
                 studentadmin.$btn_reset_entrance_exam_attempts.click();
                 // Verify that the client contacts the server to start instructor task
                 var params = $.param({
                     unique_student_identifier: unique_student_identifier,
                     delete_module: false
                 });
-                var url = dashboard_api_url + '/reset_student_attempts_for_entrance_exam?' + params;
-                AjaxHelpers.expectJsonRequest(requests, 'GET', url);
+                var url = dashboard_api_url + '/reset_student_attempts_for_entrance_exam';
+                AjaxHelpers.expectPostRequest(requests, url, params);
 
                 // Simulate a success response from the server
                 AjaxHelpers.respondWithJson(requests, {
@@ -63,8 +63,8 @@ define(['jquery', 'coffee/src/instructor_dashboard/student_admin', 'common/js/sp
                     unique_student_identifier: unique_student_identifier,
                     delete_module: false
                 });
-                var url = dashboard_api_url + '/reset_student_attempts_for_entrance_exam?' + params;
-                AjaxHelpers.expectJsonRequest(requests, 'GET', url);
+                var url = dashboard_api_url + '/reset_student_attempts_for_entrance_exam';
+                AjaxHelpers.expectPostRequest(requests, url, params);
 
                 // Simulate an error response from the server
                 AjaxHelpers.respondWithError(requests, 400,{});
@@ -96,8 +96,8 @@ define(['jquery', 'coffee/src/instructor_dashboard/student_admin', 'common/js/sp
                 var params = $.param({
                     unique_student_identifier: unique_student_identifier
                 });
-                var url = dashboard_api_url + '/rescore_entrance_exam?' + params;
-                AjaxHelpers.expectJsonRequest(requests, 'GET', url);
+                var url = dashboard_api_url + '/rescore_entrance_exam';
+                AjaxHelpers.expectPostRequest(requests, url, params);
 
                 // Simulate a success response from the server
                 AjaxHelpers.respondWithJson(requests, {
@@ -115,8 +115,8 @@ define(['jquery', 'coffee/src/instructor_dashboard/student_admin', 'common/js/sp
                 var params = $.param({
                     unique_student_identifier: unique_student_identifier
                 });
-                var url = dashboard_api_url + '/rescore_entrance_exam?' + params;
-                AjaxHelpers.expectJsonRequest(requests, 'GET', url);
+                var url = dashboard_api_url + '/rescore_entrance_exam';
+                AjaxHelpers.expectPostRequest(requests, url, params);
 
                 // Simulate an error response from the server
                 AjaxHelpers.respondWithError(requests, 400,{});
@@ -195,8 +195,8 @@ define(['jquery', 'coffee/src/instructor_dashboard/student_admin', 'common/js/sp
                     unique_student_identifier: unique_student_identifier,
                     delete_module: true
                 });
-                var url = dashboard_api_url + '/reset_student_attempts_for_entrance_exam?' + params;
-                AjaxHelpers.expectJsonRequest(requests, 'GET', url);
+                var url = dashboard_api_url + '/reset_student_attempts_for_entrance_exam';
+                AjaxHelpers.expectPostRequest(requests, url, params);
 
                 // Simulate a success response from the server
                 AjaxHelpers.respondWithJson(requests, {
@@ -215,8 +215,8 @@ define(['jquery', 'coffee/src/instructor_dashboard/student_admin', 'common/js/sp
                     unique_student_identifier: unique_student_identifier,
                     delete_module: true
                 });
-                var url = dashboard_api_url + '/reset_student_attempts_for_entrance_exam?' + params;
-                AjaxHelpers.expectJsonRequest(requests, 'GET', url);
+                var url = dashboard_api_url + '/reset_student_attempts_for_entrance_exam';
+                AjaxHelpers.expectPostRequest(requests, url, params);
 
                 // Simulate an error response from the server
                 AjaxHelpers.respondWithError(requests, 400,{});
@@ -248,8 +248,8 @@ define(['jquery', 'coffee/src/instructor_dashboard/student_admin', 'common/js/sp
                 var params = $.param({
                     unique_student_identifier: unique_student_identifier
                 });
-                var url = dashboard_api_url + '/list_entrance_exam_instructor_tasks?' + params;
-                AjaxHelpers.expectJsonRequest(requests, 'GET', url);
+                var url = dashboard_api_url + '/list_entrance_exam_instructor_tasks';
+                AjaxHelpers.expectPostRequest(requests, url, params);
 
                 // Simulate a success response from the server
                 AjaxHelpers.respondWithJson(requests, {
@@ -279,8 +279,8 @@ define(['jquery', 'coffee/src/instructor_dashboard/student_admin', 'common/js/sp
                 var params = $.param({
                     unique_student_identifier: unique_student_identifier
                 });
-                var url = dashboard_api_url + '/list_entrance_exam_instructor_tasks?' + params;
-                AjaxHelpers.expectJsonRequest(requests, 'GET', url);
+                var url = dashboard_api_url + '/list_entrance_exam_instructor_tasks';
+                AjaxHelpers.expectPostRequest(requests, url, params);
 
                 // Simulate an error response from the server
                 AjaxHelpers.respondWithError(requests, 400,{});
