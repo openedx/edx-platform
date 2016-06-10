@@ -6,8 +6,7 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
-from ..api import get_course_blocks, _get_block_structure_manager
-from ..transformers.visibility import VisibilityTransformer
+from ..api import get_block_structure_manager
 from .helpers import is_course_in_block_structure_cache, EnableTransformerRegistryMixin
 
 
@@ -22,26 +21,30 @@ class CourseBlocksSignalTest(EnableTransformerRegistryMixin, ModuleStoreTestCase
         self.course = CourseFactory.create()
         self.course_usage_key = self.store.make_course_usage_key(self.course.id)
 
-    def test_course_publish(self):
-        # course is not visible to staff only
-        self.assertFalse(self.course.visible_to_staff_only)
-        orig_block_structure = get_course_blocks(self.user, self.course_usage_key)
-        self.assertFalse(
-            VisibilityTransformer.get_visible_to_staff_only(orig_block_structure, self.course_usage_key)
+    def test_course_update(self):
+        test_display_name = "Lightsabers 101"
+
+        # Course exists in cache initially
+        bs_manager = get_block_structure_manager(self.course.id)
+        orig_block_structure = bs_manager.get_collected()
+        self.assertTrue(is_course_in_block_structure_cache(self.course.id, self.store))
+        self.assertNotEqual(
+            test_display_name,
+            orig_block_structure.get_xblock_field(self.course_usage_key, 'display_name')
         )
 
-        # course becomes visible to staff only
-        self.course.visible_to_staff_only = True
+        self.course.display_name = test_display_name
         self.store.update_item(self.course, self.user.id)
 
-        updated_block_structure = get_course_blocks(self.user, self.course_usage_key)
-        self.assertTrue(
-            VisibilityTransformer.get_visible_to_staff_only(updated_block_structure, self.course_usage_key)
+        # Cached version of course has been updated
+        updated_block_structure = bs_manager.get_collected()
+        self.assertEqual(
+            test_display_name,
+            updated_block_structure.get_xblock_field(self.course_usage_key, 'display_name')
         )
 
     def test_course_delete(self):
-        get_course_blocks(self.user, self.course_usage_key)
-        bs_manager = _get_block_structure_manager(self.course.id)
+        bs_manager = get_block_structure_manager(self.course.id)
         self.assertIsNotNone(bs_manager.get_collected())
         self.assertTrue(is_course_in_block_structure_cache(self.course.id, self.store))
 

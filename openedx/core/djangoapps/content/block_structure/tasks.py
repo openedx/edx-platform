@@ -5,13 +5,12 @@ import logging
 from celery.task import task
 from opaque_keys.edx.keys import CourseKey
 
-from . import api
-
+from openedx.core.djangoapps.content.block_structure import api
 
 log = logging.getLogger('edx.celery.task')
 
 
-@task()
+@task
 def update_course_in_cache(course_key):
     """
     Updates the course blocks (in the database) for the specified course.

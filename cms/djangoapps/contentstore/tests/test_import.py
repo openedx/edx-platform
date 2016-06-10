@@ -172,8 +172,8 @@ class ContentStoreImportTest(SignalDisconnectTestMixin, ModuleStoreTestCase):
         # we try to refresh the inheritance tree for each update_item in the import
         with check_exact_number_of_calls(store, 'refresh_cached_metadata_inheritance_tree', 28):
 
-            # _get_cached_metadata_inheritance_tree should be called only once
-            with check_exact_number_of_calls(store, '_get_cached_metadata_inheritance_tree', 1):
+            # _get_cached_metadata_inheritance_tree should be called twice (once for import, once on publish)
+            with check_exact_number_of_calls(store, '_get_cached_metadata_inheritance_tree', 2):
 
                 # with bulk-edit in progress, the inheritance tree should be recomputed only at the end of the import
                 # NOTE: On Jenkins, with memcache enabled, the number of calls here is only 1.
