@@ -744,6 +744,13 @@
       }
     }
   }
+  
+  &.video-fullscreen {
+      
+      .closed-captions {
+          width: 60%;
+      }
+  }
 
   .subtitles {
     @include float(left);
