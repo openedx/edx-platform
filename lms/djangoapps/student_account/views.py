@@ -47,7 +47,7 @@ from openedx.core.djangoapps.user_api.accounts.api import request_password_chang
 from openedx.core.djangoapps.user_api.errors import UserNotFound
 from util.date_utils import strftime_localized
 
-from pytz import common_timezones
+from openedx.core.djangoapps.user_api.models import UserPreference
 
 AUDIT_LOG = logging.getLogger("audit")
 log = logging.getLogger(__name__)
@@ -442,7 +442,8 @@ def account_settings_context(request):
             }, 'preferred_language': {
                 'options': all_languages(),
             }, 'time_zone': {
-                'options': [(tz, tz) for tz in common_timezones]
+                'options': UserPreference.TIME_ZONE_CHOICES,
+                'enabled': settings.FEATURES.get('ENABLE_TIME_ZONE_PREFERENCE'),
             }
         },
         'platform_name': get_themed_value('PLATFORM_NAME', settings.PLATFORM_NAME),
