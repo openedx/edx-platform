@@ -67,7 +67,7 @@ def _advanced_component_types(show_unsupported):
         return filtered_blocks
     else:
         all_blocks = {}
-        for c_type in authorable_blocks:
+        for c_type in enabled_components:
             all_blocks[c_type] = True
         return all_blocks
 
