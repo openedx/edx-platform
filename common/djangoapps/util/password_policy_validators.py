@@ -35,6 +35,26 @@ def validate_password_strength(value):
         validator(value)
 
 
+def validate_password_strength(value):
+    """
+    This function loops through each validator defined in this file
+    and applies it to a user's proposed password
+
+    Args:
+        value: a user's proposed password
+
+    Returns: None, but raises a ValidationError if the proposed password
+        fails any one of the validators in password_validators
+    """
+    password_validators = [
+        validate_password_length,
+        validate_password_complexity,
+        validate_password_dictionary,
+    ]
+    for validator in password_validators:
+        validator(value)
+
+
 def validate_password_length(value):
     """
     Validator that enforces minimum length of a password
