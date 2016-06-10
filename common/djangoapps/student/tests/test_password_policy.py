@@ -60,7 +60,7 @@ class TestPasswordPolicy(TestCase):
         obj = json.loads(response.content)
         self.assertEqual(
             obj['value'],
-            "Password: Invalid Length (must be 12 characters or less)",
+            "Password: Invalid Length (must be 12 characters or fewer)",
         )
 
     @patch.dict("django.conf.settings.PASSWORD_COMPLEXITY", {'UPPER': 3})
