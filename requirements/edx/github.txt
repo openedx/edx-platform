@@ -67,7 +67,7 @@ git+https://github.com/edx/rfc6266.git@v0.0.5-edx#egg=rfc6266==0.0.5-edx
 
 # Used for testing
 git+https://github.com/edx/lettuce.git@0.2.20.002#egg=lettuce==0.2.20.002
-git+https://github.com/edx/pa11ycrawler.git@a963bbb7c4f861b24b5f66bfc5259d3fa207cca8#egg=pa11ycrawler
+git+https://github.com/edx/pa11ycrawler.git@a963bbb7c4f861b24b5f66bfc5259d3fa207cca8#egg=pa11ycrawler==0.1a
 
 # Our libraries:
 git+https://github.com/edx/XBlock.git@xblock-0.4.10#egg=XBlock==0.4.10
