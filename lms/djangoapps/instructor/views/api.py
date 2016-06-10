@@ -143,51 +143,14 @@ def common_exceptions_400(func):
     return wrapped
 
 
-def require_query_params(*args, **kwargs):
-    """
-    Checks for required paremters or renders a 400 error.
-    (decorator with arguments)
-
-    `args` is a *list of required GET parameter names.
-    `kwargs` is a **dict of required GET parameter names
-        to string explanations of the parameter
-    """
-    required_params = []
-    required_params += [(arg, None) for arg in args]
-    required_params += [(key, kwargs[key]) for key in kwargs]
-    # required_params = e.g. [('action', 'enroll or unenroll'), ['emails', None]]
-
-    def decorator(func):  # pylint: disable=missing-docstring
-        def wrapped(*args, **kwargs):  # pylint: disable=missing-docstring
-            request = args[0]
-
-            error_response_data = {
-                'error': 'Missing required query parameter(s)',
-                'parameters': [],
-                'info': {},
-            }
-
-            for (param, extra) in required_params:
-                default = object()
-                if request.GET.get(param, default) == default:
-                    error_response_data['parameters'].append(param)
-                    error_response_data['info'][param] = extra
-
-            if len(error_response_data['parameters']) > 0:
-                return JsonResponse(error_response_data, status=400)
-            else:
-                return func(*args, **kwargs)
-        return wrapped
-    return decorator
-
-
 def require_post_params(*args, **kwargs):
     """
     Checks for required parameters or renders a 400 error.
     (decorator with arguments)
 
-    Functions like 'require_query_params', but checks for
-    POST parameters rather than GET parameters.
+    `args` is a *list of required POST parameter names.
+    `kwargs` is a **dict of required POST parameter names
+        to string explanations of the parameter
     """
     required_params = []
     required_params += [(arg, None) for arg in args]
@@ -317,6 +280,7 @@ NAME_INDEX = 2
 COUNTRY_INDEX = 3
 
 
+@require_POST
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
@@ -517,6 +481,7 @@ def create_and_enroll_user(email, username, name, country, password, course_id):
     return CourseEnrollment.enroll(user, course_id)
 
 
+@require_POST
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
@@ -681,6 +646,7 @@ def students_update_enrollment(request, course_id):
     return JsonResponse(response_payload)
 
 
+@require_POST
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('instructor')
@@ -761,11 +727,12 @@ def bulk_beta_modify_access(request, course_id):
     return JsonResponse(response_payload)
 
 
+@require_POST
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('instructor')
 @common_exceptions_400
-@require_query_params(
+@require_post_params(
     unique_student_identifier="email or username of user to change access",
     rolename="'instructor', 'staff', 'beta', or 'ccx_coach'",
     action="'allow' or 'revoke'"
@@ -787,10 +754,10 @@ def modify_access(request, course_id):
         request.user, 'instructor', course_id, depth=None
     )
     try:
-        user = get_student_from_identifier(request.GET.get('unique_student_identifier'))
+        user = get_student_from_identifier(request.POST.get('unique_student_identifier'))
     except User.DoesNotExist:
         response_payload = {
-            'unique_student_identifier': request.GET.get('unique_student_identifier'),
+            'unique_student_identifier': request.POST.get('unique_student_identifier'),
             'userDoesNotExist': True,
         }
         return JsonResponse(response_payload)
@@ -805,8 +772,8 @@ def modify_access(request, course_id):
         }
         return JsonResponse(response_payload)
 
-    rolename = request.GET.get('rolename')
-    action = request.GET.get('action')
+    rolename = request.POST.get('rolename')
+    action = request.POST.get('action')
 
     if rolename not in ROLES:
         error = strip_tags("unknown rolename '{}'".format(rolename))
@@ -841,10 +808,11 @@ def modify_access(request, course_id):
     return JsonResponse(response_payload)
 
 
+@require_POST
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('instructor')
-@require_query_params(rolename="'instructor', 'staff', or 'beta'")
+@require_post_params(rolename="'instructor', 'staff', or 'beta'")
 def list_course_role_members(request, course_id):
     """
     List instructors and staff.
@@ -869,7 +837,7 @@ def list_course_role_members(request, course_id):
         request.user, 'instructor', course_id, depth=None
     )
 
-    rolename = request.GET.get('rolename')
+    rolename = request.POST.get('rolename')
 
     if rolename not in ROLES:
         return HttpResponseBadRequest()
@@ -893,6 +861,7 @@ def list_course_role_members(request, course_id):
 
 
 @transaction.non_atomic_requests
+@require_POST
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
@@ -909,7 +878,7 @@ def get_problem_responses(request, course_id):
     Responds with BadRequest if problem location is faulty.
     """
     course_key = CourseKey.from_string(course_id)
-    problem_location = request.GET.get('problem_location', '')
+    problem_location = request.POST.get('problem_location', '')
 
     try:
         problem_key = UsageKey.from_string(problem_location)
@@ -938,6 +907,7 @@ def get_problem_responses(request, course_id):
         return JsonResponse({"status": already_running_status})
 
 
+@require_POST
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
@@ -1136,6 +1106,7 @@ def get_issued_certificates(request, course_id):
 
 
 @transaction.non_atomic_requests
+@require_POST
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
@@ -1215,6 +1186,7 @@ def get_students_features(request, course_id, csv=False):  # pylint: disable=red
 
 
 @transaction.non_atomic_requests
+@require_POST
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
@@ -1322,6 +1294,7 @@ def get_coupon_codes(request, course_id):  # pylint: disable=unused-argument
 
 
 @transaction.non_atomic_requests
+@require_POST
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
@@ -1346,6 +1319,7 @@ def get_enrollment_report(request, course_id):
 
 
 @transaction.non_atomic_requests
+@require_POST
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
@@ -1371,6 +1345,7 @@ def get_exec_summary_report(request, course_id):
 
 
 @transaction.non_atomic_requests
+@require_POST
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
@@ -1395,6 +1370,7 @@ def get_course_survey_results(request, course_id):
 
 
 @transaction.non_atomic_requests
+@require_POST
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
@@ -1801,11 +1777,12 @@ def get_anon_ids(request, course_id):  # pylint: disable=unused-argument
     return csv_response(course_id.to_deprecated_string().replace('/', '-') + '-anon-ids.csv', header, rows)
 
 
+@require_POST
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @common_exceptions_400
 @require_level('staff')
-@require_query_params(
+@require_post_params(
     unique_student_identifier="email or username of student for whom to get progress url"
 )
 def get_student_progress_url(request, course_id):
@@ -1813,13 +1790,13 @@ def get_student_progress_url(request, course_id):
     Get the progress url of a student.
     Limited to staff access.
 
-    Takes query paremeter unique_student_identifier and if the student exists
+    Takes query parameter unique_student_identifier and if the student exists
     returns e.g. {
         'progress_url': '/../...'
     }
     """
     course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
-    user = get_student_from_identifier(request.GET.get('unique_student_identifier'))
+    user = get_student_from_identifier(request.POST.get('unique_student_identifier'))
 
     progress_url = reverse('student_progress', kwargs={'course_id': course_id.to_deprecated_string(), 'student_id': user.id})
 
@@ -1831,10 +1808,11 @@ def get_student_progress_url(request, course_id):
 
 
 @transaction.non_atomic_requests
+@require_POST
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
-@require_query_params(
+@require_post_params(
     problem_to_reset="problem urlname to reset"
 )
 @common_exceptions_400
@@ -1861,13 +1839,13 @@ def reset_student_attempts(request, course_id):
         request.user, 'staff', course_id, depth=None
     )
 
-    problem_to_reset = strip_if_string(request.GET.get('problem_to_reset'))
-    student_identifier = request.GET.get('unique_student_identifier', None)
+    problem_to_reset = strip_if_string(request.POST.get('problem_to_reset'))
+    student_identifier = request.POST.get('unique_student_identifier', None)
     student = None
     if student_identifier is not None:
         student = get_student_from_identifier(student_identifier)
-    all_students = request.GET.get('all_students', False) in ['true', 'True', True]
-    delete_module = request.GET.get('delete_module', False) in ['true', 'True', True]
+    all_students = request.POST.get('all_students', False) in ['true', 'True', True]
+    delete_module = request.POST.get('delete_module', False) in ['true', 'True', True]
 
     # parameter combinations
     if all_students and student:
@@ -1913,6 +1891,7 @@ def reset_student_attempts(request, course_id):
 
 
 @transaction.non_atomic_requests
+@require_POST
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
@@ -1943,12 +1922,12 @@ def reset_student_attempts_for_entrance_exam(request, course_id):  # pylint: dis
             _("Course has no entrance exam section.")
         )
 
-    student_identifier = request.GET.get('unique_student_identifier', None)
+    student_identifier = request.POST.get('unique_student_identifier', None)
     student = None
     if student_identifier is not None:
         student = get_student_from_identifier(student_identifier)
-    all_students = request.GET.get('all_students', False) in ['true', 'True', True]
-    delete_module = request.GET.get('delete_module', False) in ['true', 'True', True]
+    all_students = request.POST.get('all_students', False) in ['true', 'True', True]
+    delete_module = request.POST.get('delete_module', False) in ['true', 'True', True]
 
     # parameter combinations
     if all_students and student:
@@ -1979,10 +1958,11 @@ def reset_student_attempts_for_entrance_exam(request, course_id):  # pylint: dis
 
 
 @transaction.non_atomic_requests
+@require_POST
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('instructor')
-@require_query_params(problem_to_reset="problem urlname to reset")
+@require_post_params(problem_to_reset="problem urlname to reset")
 @common_exceptions_400
 def rescore_problem(request, course_id):
     """
@@ -1997,13 +1977,13 @@ def rescore_problem(request, course_id):
     all_students and unique_student_identifier cannot both be present.
     """
     course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
-    problem_to_reset = strip_if_string(request.GET.get('problem_to_reset'))
-    student_identifier = request.GET.get('unique_student_identifier', None)
+    problem_to_reset = strip_if_string(request.POST.get('problem_to_reset'))
+    student_identifier = request.POST.get('unique_student_identifier', None)
     student = None
     if student_identifier is not None:
         student = get_student_from_identifier(student_identifier)
 
-    all_students = request.GET.get('all_students') in ['true', 'True', True]
+    all_students = request.POST.get('all_students') in ['true', 'True', True]
 
     if not (problem_to_reset and (all_students or student)):
         return HttpResponseBadRequest("Missing query parameters.")
@@ -2035,6 +2015,7 @@ def rescore_problem(request, course_id):
 
 
 @transaction.non_atomic_requests
+@require_POST
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('instructor')
@@ -2055,12 +2036,12 @@ def rescore_entrance_exam(request, course_id):
         request.user, 'staff', course_id, depth=None
     )
 
-    student_identifier = request.GET.get('unique_student_identifier', None)
+    student_identifier = request.POST.get('unique_student_identifier', None)
     student = None
     if student_identifier is not None:
         student = get_student_from_identifier(student_identifier)
 
-    all_students = request.GET.get('all_students') in ['true', 'True', True]
+    all_students = request.POST.get('all_students') in ['true', 'True', True]
 
     if not course.entrance_exam_id:
         return HttpResponseBadRequest(
@@ -2087,6 +2068,7 @@ def rescore_entrance_exam(request, course_id):
     return JsonResponse(response_payload)
 
 
+@require_POST
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
@@ -2105,6 +2087,7 @@ def list_background_email_tasks(request, course_id):  # pylint: disable=unused-a
     return JsonResponse(response_payload)
 
 
+@require_POST
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
@@ -2123,6 +2106,7 @@ def list_email_content(request, course_id):  # pylint: disable=unused-argument
     return JsonResponse(response_payload)
 
 
+@require_POST
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
@@ -2137,8 +2121,8 @@ def list_instructor_tasks(request, course_id):
             history for problem AND student (intersection)
     """
     course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
-    problem_location_str = strip_if_string(request.GET.get('problem_location_str', False))
-    student = request.GET.get('unique_student_identifier', None)
+    problem_location_str = strip_if_string(request.POST.get('problem_location_str', False))
+    student = request.POST.get('unique_student_identifier', None)
     if student is not None:
         student = get_student_from_identifier(student)
 
@@ -2168,6 +2152,7 @@ def list_instructor_tasks(request, course_id):
     return JsonResponse(response_payload)
 
 
+@require_POST
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
@@ -2181,7 +2166,7 @@ def list_entrance_exam_instructor_tasks(request, course_id):  # pylint: disable=
     """
     course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     course = get_course_by_id(course_id)
-    student = request.GET.get('unique_student_identifier', None)
+    student = request.POST.get('unique_student_identifier', None)
     if student is not None:
         student = get_student_from_identifier(student)
 
@@ -2202,6 +2187,7 @@ def list_entrance_exam_instructor_tasks(request, course_id):  # pylint: disable=
     return JsonResponse(response_payload)
 
 
+@require_POST
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
@@ -2221,6 +2207,7 @@ def list_report_downloads(_request, course_id):
     return JsonResponse(response_payload)
 
 
+@require_POST
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
@@ -2242,6 +2229,7 @@ def list_financial_report_downloads(_request, course_id):
 
 
 @transaction.non_atomic_requests
+@require_POST
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
@@ -2265,6 +2253,7 @@ def calculate_grades_csv(request, course_id):
 
 
 @transaction.non_atomic_requests
+@require_POST
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
@@ -2291,10 +2280,11 @@ def problem_grade_report(request, course_id):
         })
 
 
+@require_POST
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
-@require_query_params('rolename')
+@require_post_params('rolename')
 def list_forum_members(request, course_id):
     """
     Lists forum members of a certain rolename.
@@ -2313,7 +2303,7 @@ def list_forum_members(request, course_id):
         request.user, course_id, FORUM_ROLE_ADMINISTRATOR
     )
 
-    rolename = request.GET.get('rolename')
+    rolename = request.POST.get('rolename')
 
     # default roles require either (staff & forum admin) or (instructor)
     if not (has_forum_admin or has_instructor_access):
@@ -2354,6 +2344,7 @@ def list_forum_members(request, course_id):
 
 
 @transaction.non_atomic_requests
+@require_POST
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
@@ -2407,10 +2398,11 @@ def send_email(request, course_id):
     return JsonResponse(response_payload)
 
 
+@require_POST
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
-@require_query_params(
+@require_post_params(
     unique_student_identifier="email or username of user to change access",
     rolename="the forum role",
     action="'allow' or 'revoke'",
@@ -2437,9 +2429,9 @@ def update_forum_role_membership(request, course_id):
         request.user, course_id, FORUM_ROLE_ADMINISTRATOR
     )
 
-    unique_student_identifier = request.GET.get('unique_student_identifier')
-    rolename = request.GET.get('rolename')
-    action = request.GET.get('action')
+    unique_student_identifier = request.POST.get('unique_student_identifier')
+    rolename = request.POST.get('rolename')
+    action = request.POST.get('action')
 
     # default roles require either (staff & forum admin) or (instructor)
     if not (has_forum_admin or has_instructor_access):
@@ -2497,18 +2489,19 @@ def _display_unit(unit):
 
 
 @handle_dashboard_error
+@require_POST
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
-@require_query_params('student', 'url', 'due_datetime')
+@require_post_params('student', 'url', 'due_datetime')
 def change_due_date(request, course_id):
     """
     Grants a due date extension to a student for a particular unit.
     """
     course = get_course_by_id(SlashSeparatedCourseKey.from_deprecated_string(course_id))
-    student = require_student_from_identifier(request.GET.get('student'))
-    unit = find_unit(course, request.GET.get('url'))
-    due_date = parse_datetime(request.GET.get('due_datetime'))
+    student = require_student_from_identifier(request.POST.get('student'))
+    unit = find_unit(course, request.POST.get('url'))
+    due_date = parse_datetime(request.POST.get('due_datetime'))
     set_due_date_extension(course, unit, student, due_date)
 
     return JsonResponse(_(
@@ -2518,17 +2511,18 @@ def change_due_date(request, course_id):
 
 
 @handle_dashboard_error
+@require_POST
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
-@require_query_params('student', 'url')
+@require_post_params('student', 'url')
 def reset_due_date(request, course_id):
     """
     Rescinds a due date extension for a student on a particular unit.
     """
     course = get_course_by_id(SlashSeparatedCourseKey.from_deprecated_string(course_id))
-    student = require_student_from_identifier(request.GET.get('student'))
-    unit = find_unit(course, request.GET.get('url'))
+    student = require_student_from_identifier(request.POST.get('student'))
+    unit = find_unit(course, request.POST.get('url'))
     set_due_date_extension(course, unit, student, None)
     if not getattr(unit, "due", None):
         # It's possible the normal due date was deleted after an extension was granted:
@@ -2544,30 +2538,32 @@ def reset_due_date(request, course_id):
 
 
 @handle_dashboard_error
+@require_POST
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
-@require_query_params('url')
+@require_post_params('url')
 def show_unit_extensions(request, course_id):
     """
     Shows all of the students which have due date extensions for the given unit.
     """
     course = get_course_by_id(SlashSeparatedCourseKey.from_deprecated_string(course_id))
-    unit = find_unit(course, request.GET.get('url'))
+    unit = find_unit(course, request.POST.get('url'))
     return JsonResponse(dump_module_extensions(course, unit))
 
 
 @handle_dashboard_error
+@require_POST
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
-@require_query_params('student')
+@require_post_params('student')
 def show_student_extensions(request, course_id):
     """
     Shows all of the due date extensions granted to a particular student in a
     particular course.
     """
-    student = require_student_from_identifier(request.GET.get('student'))
+    student = require_student_from_identifier(request.POST.get('student'))
     course = get_course_by_id(SlashSeparatedCourseKey.from_deprecated_string(course_id))
     return JsonResponse(dump_student_extensions(course, student))
 
@@ -2922,7 +2918,6 @@ def generate_certificate_exceptions(request, course_id, generate_for=None):
     return JsonResponse(response_payload)
 
 
-@csrf_exempt
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_global_staff
 @require_POST
