@@ -97,6 +97,21 @@ CELERY_QUEUES = {
     HIGH_MEM_QUEUE: {},
 }
 
+# Setup alternate queues, to allow access to cross-process workers
+ALTERNATE_QUEUE_ENVS = os.environ.get('ALTERNATE_WORKER_QUEUES', '').split()
+ALTERNATE_QUEUES = [
+    DEFAULT_PRIORITY_QUEUE.replace(QUEUE_VARIANT, alternate + '.')
+    for alternate in ALTERNATE_QUEUE_ENVS
+]
+CELERY_QUEUES.update(
+    {
+        alternate: {}
+        for alternate in ALTERNATE_QUEUES
+        if alternate not in CELERY_QUEUES.keys()
+    }
+)
+
+
 # If we're a worker on the high_mem queue, set ourselves to die after processing
 # one request to avoid having memory leaks take down the worker server. This env
 # var is set in /etc/init/edx-workers.conf -- this should probably be replaced

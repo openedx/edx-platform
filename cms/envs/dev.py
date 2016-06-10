@@ -170,6 +170,10 @@ FEATURES['ENABLE_SERVICE_STATUS'] = True
 import os
 CMS_SEGMENT_KEY = os.environ.get('SEGMENT_KEY')
 
+########################## Search #######################
+FEATURES['ENABLE_COURSEWARE_INDEX'] = True
+FEATURES['ENABLE_LIBRARY_INDEX'] = True
+SEARCH_ENGINE = "search.elastic.ElasticSearchEngine"
 
 #####################################################################
 # Lastly, see if the developer has any local overrides.

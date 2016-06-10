@@ -6,6 +6,7 @@ sessions. Assumes structure:
         /db   # This is where it'll write the database file
         /edx-platform  # The location of this repo
         /log  # Where we're going to write log files
+        /uploads  # Where uploaded files are stored
 """
 
 # We intentionally define lots of variables that aren't used, and
@@ -266,6 +267,11 @@ FEATURES['CLASS_DASHBOARD'] = True
 
 ### This settings is for the course registration code length ############
 REGISTRATION_CODE_LENGTH = 8
+
+########################## Search #######################
+FEATURES['ENABLE_COURSEWARE_SEARCH'] = True
+FEATURES['ENABLE_DASHBOARD_SEARCH'] = True
+SEARCH_ENGINE = "search.elastic.ElasticSearchEngine"
 
 #####################################################################
 # Lastly, see if the developer has any local overrides.
