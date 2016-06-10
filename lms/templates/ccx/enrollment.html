@@ -1,7 +1,7 @@
 <%page expression_filter="h"/>
 <%!
 from django.utils.translation import ugettext as _
-from openedx.core.djangolib.markup import Text, HTML
+from openedx.core.djangolib.markup import HTML, Text
 %>
 
 <div class="batch-enrollment" style="float:left;width:50%">
@@ -89,7 +89,7 @@ from openedx.core.djangolib.markup import Text, HTML
             <tr>
               <td>${member.user}</td>
               <td>${member.user.email}</td>
-              <td><a class="revoke"><i class="fa fa-times-circle" aria-hidden="true"></i> ${_("Revoke access")}</a></td>
+              <td><a class="revoke"><span class="fa fa-times-circle" aria-hidden="true"></span> ${_("Revoke access")}</a></td>
             </tr>
             %endfor
           </tbody>

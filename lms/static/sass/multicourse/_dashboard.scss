@@ -19,9 +19,6 @@
     @include float(right);
     @include margin-left(flex-gutter());
     width: flex-grid(3);
-    margin-top: ($baseline*2);
-    border-top: 3px solid $blue;
-    padding: $baseline 0;
 
     .course-advertise {
       @include clearfix();
@@ -36,13 +33,13 @@
       }
       .ad-link {
         @include text-align(center);
-        .btn-find-courses {
+        .btn-neutral {
           padding-bottom: 12px;
           padding-top: 12px;
         }
         a {
           @include font-size(16);
-          @include line-height(1.2);
+          @include line-height(17);
           padding: $baseline * 0.5;
           border: 1px solid $blue;
           color: $blue;
@@ -56,6 +53,9 @@
           }
           span {
             @include margin-left($baseline*0.25);
+          }
+          .icon {
+            @include margin-right($baseline*0.25);
           }
         }
       }
@@ -94,8 +94,6 @@
     @include margin-left(flex-gutter());
     width: flex-grid(3);
     margin-top: ($baseline*2);
-    border-top: 3px solid $blue;
-    padding: $baseline 0;
 
     .user-info {
       @include clearfix();
@@ -283,6 +281,7 @@
   .my-courses {
     @include float(left);
     margin: 0;
+    margin-bottom: $baseline * 2;
     width: flex-grid(9);
 
 

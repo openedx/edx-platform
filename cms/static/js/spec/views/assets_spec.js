@@ -18,7 +18,13 @@ define([ "jquery", "common/js/spec_helpers/ajax_helpers", "URI", "js/views/asset
 
                 spyOn($.fn, "fileupload").and.returnValue("");
 
-                var collection = new AssetCollection();
+                var TestAssetsCollection = AssetCollection.extend({
+                    state: {
+                        firstPage: 0,
+                        pageSize: 2
+                    }
+                });
+                var collection = new TestAssetsCollection();
                 collection.url = "assets-url";
                 assetsView = new AssetsView({
                     collection: collection,
@@ -43,7 +49,7 @@ define([ "jquery", "common/js/spec_helpers/ajax_helpers", "URI", "js/views/asset
                 start: 0,
                 end: 0,
                 page: 0,
-                pageSize: 5,
+                pageSize: 2,
                 totalCount: 0
             };
 
@@ -134,11 +140,10 @@ define([ "jquery", "common/js/spec_helpers/ajax_helpers", "URI", "js/views/asset
                 var setup;
                 setup = function(responseData) {
                     var requests = AjaxHelpers.requests(this);
-                    assetsView.pagingView.setPage(0);
+                    assetsView.pagingView.setPage(1);
                     if (!responseData){
                         AjaxHelpers.respondWithJson(requests, mockEmptyAssetsResponse);
-                    }
-                    else{
+                    } else {
                         AjaxHelpers.respondWithJson(requests, responseData);
                     }
                     return requests;
@@ -184,7 +189,7 @@ define([ "jquery", "common/js/spec_helpers/ajax_helpers", "URI", "js/views/asset
                     spyOn(assetsView, "addAsset").and.callFake(function () {
                         assetsView.collection.add(mockAssetUploadResponse.asset);
                         assetsView.pagingView.renderPageItems();
-                        assetsView.pagingView.setPage(0);
+                        assetsView.pagingView.setPage(1);
                     });
 
                     $('a:contains("Upload your first asset")').click();
@@ -269,7 +274,7 @@ define([ "jquery", "common/js/spec_helpers/ajax_helpers", "URI", "js/views/asset
                     var requests = AjaxHelpers.requests(this);
                     $.each(assetsView.pagingView.filterableColumns, function(columnID, columnData){
                         var $typeColumn = $('#' + columnID);
-                        assetsView.pagingView.setPage(0);
+                        assetsView.pagingView.setPage(1);
                         respondWithMockAssets(requests);
                         var assetsNumber = assetsView.collection.length;
                         assetsView._toggleFilterColumn('Images', 'Images');
@@ -302,7 +307,7 @@ define([ "jquery", "common/js/spec_helpers/ajax_helpers", "URI", "js/views/asset
                     assetsView.pagingView.registerSortableColumn('name-col', 'Name Column', 'nameField', 'asc');
                     assetsView.pagingView.registerFilterableColumn('js-asset-type-col', gettext('Type'), 'asset_type');
                     assetsView.pagingView.setInitialSortColumn('name-col');
-                    assetsView.pagingView.setPage(0);
+                    assetsView.pagingView.setPage(1);
                     respondWithMockAssets(requests);
                     var sortInfo = assetsView.pagingView.sortableColumnInfo('name-col');
                     expect(sortInfo.defaultSortDirection).toBe('asc');
@@ -318,7 +323,7 @@ define([ "jquery", "common/js/spec_helpers/ajax_helpers", "URI", "js/views/asset
                     expect(assetsView).toBeDefined();
                     var requests = AjaxHelpers.requests(this);
                     $.each(assetsView.pagingView.filterableColumns, function(columnID, columnData) {
-                        assetsView.pagingView.setPage(0);
+                        assetsView.pagingView.setPage(1);
                         respondWithMockAssets(requests);
                         var $typeColumn = $('#' + columnID);
                         expect($typeColumn).toBeVisible();
@@ -410,7 +415,7 @@ define([ "jquery", "common/js/spec_helpers/ajax_helpers", "URI", "js/views/asset
 
                     it('can move forward a page using the next page button', function () {
                         var requests = AjaxHelpers.requests(this);
-                        assetsView.pagingView.setPage(0);
+                        assetsView.pagingView.setPage(1);
                         AjaxHelpers.respondWithJson(requests, firstPageAssets);
                         expect(assetsView.pagingView.pagingFooter).toBeDefined();
                         expect(assetsView.pagingView.pagingFooter.$('button.next-page-link'))
@@ -423,7 +428,7 @@ define([ "jquery", "common/js/spec_helpers/ajax_helpers", "URI", "js/views/asset
 
                     it('can move back a page using the previous page button', function () {
                         var requests = AjaxHelpers.requests(this);
-                        assetsView.pagingView.setPage(1);
+                        assetsView.pagingView.setPage(2);
                         AjaxHelpers.respondWithJson(requests, secondPageAssets);
                         expect(assetsView.pagingView.pagingFooter).toBeDefined();
                         expect(assetsView.pagingView.pagingFooter.$('button.previous-page-link'))
@@ -436,12 +441,12 @@ define([ "jquery", "common/js/spec_helpers/ajax_helpers", "URI", "js/views/asset
 
                     it('can set the current page using the page number input', function () {
                         var requests = AjaxHelpers.requests(this);
-                        assetsView.pagingView.setPage(0);
+                        assetsView.pagingView.setPage(1);
                         AjaxHelpers.respondWithJson(requests, firstPageAssets);
                         assetsView.pagingView.pagingFooter.$('#page-number-input').val('2');
                         assetsView.pagingView.pagingFooter.$('#page-number-input').trigger('change');
                         AjaxHelpers.respondWithJson(requests, secondPageAssets);
-                        expect(assetsView.collection.currentPage).toBe(1);
+                        expect(assetsView.collection.getPageNumber()).toBe(2);
                         expect(assetsView.pagingView.pagingFooter.$('button.previous-page-link'))
                             .not.toHaveClass('is-disabled');
                     });

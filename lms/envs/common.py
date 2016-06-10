@@ -514,6 +514,9 @@ TEMPLATES = [
 
                 # Allows the open edX footer to be leveraged in Django Templates.
                 'edxmako.shortcuts.microsite_footer_context_processor',
+
+                # Online contextual help
+                'context_processors.doc_url',
             ],
             # Change 'debug' in your environment settings files - not here.
             'debug': False
@@ -1084,12 +1087,19 @@ simplefilter('ignore')
 ################################# Middleware ###################################
 
 MIDDLEWARE_CLASSES = (
+    'crum.CurrentRequestUserMiddleware',
+
     'request_cache.middleware.RequestCache',
+
     'mobile_api.middleware.AppVersionUpgrade',
     'header_control.middleware.HeaderControlMiddleware',
     'microsite_configuration.middleware.MicrositeMiddleware',
     'django_comment_client.middleware.AjaxExceptionMiddleware',
     'django.middleware.common.CommonMiddleware',
+    'django.contrib.sites.middleware.CurrentSiteMiddleware',
+
+    # Allows us to define redirects via Django admin
+    'django_sites_extensions.middleware.RedirectMiddleware',
 
     # Instead of SessionMiddleware, we use a more secure version
     # 'django.contrib.sessions.middleware.SessionMiddleware',
@@ -1104,7 +1114,6 @@ MIDDLEWARE_CLASSES = (
 
     'student.middleware.UserStandingMiddleware',
     'contentserver.middleware.StaticContentServer',
-    'crum.CurrentRequestUserMiddleware',
 
     # Adds user tags to tracking events
     # Must go before TrackMiddleware, to get the context set up
@@ -1144,8 +1153,6 @@ MIDDLEWARE_CLASSES = (
 
     # catches any uncaught RateLimitExceptions and returns a 403 instead of a 500
     'ratelimitbackend.middleware.RateLimitMiddleware',
-    # needs to run after locale middleware (or anything that modifies the request context)
-    'edxmako.middleware.MakoMiddleware',
 
     # for expiring inactive sessions
     'session_inactivity_timeout.middleware.SessionInactivityTimeout',
@@ -1240,7 +1247,8 @@ proctoring_js = (
 # In the future, we will likely refactor this to use
 # RequireJS and an optimizer.
 base_vendor_js = [
-    'js/vendor/jquery.min.js',
+    'common/js/vendor/jquery.js',
+    'common/js/vendor/jquery-migrate.js',
     'js/vendor/jquery.cookie.js',
     'js/vendor/url.min.js',
     'common/js/vendor/underscore.js',
@@ -1352,14 +1360,16 @@ incourse_reverify_js = [
 ccx_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'js/ccx/**/*.js'))
 
 certificates_web_view_js = [
-    'js/vendor/jquery.min.js',
+    'common/js/vendor/jquery.js',
+    'common/js/vendor/jquery-migrate.js',
     'js/vendor/jquery.cookie.js',
     'js/src/logger.js',
     'js/utils/facebook.js',
 ]
 
 credit_web_view_js = [
-    'js/vendor/jquery.min.js',
+    'common/js/vendor/jquery.js',
+    'common/js/vendor/jquery-migrate.js',
     'js/vendor/jquery.cookie.js',
     'js/src/logger.js',
 ]
@@ -1434,6 +1444,18 @@ PIPELINE_CSS = {
             'css/vendor/edxnotes/annotator.min.css',
         ],
         'output_filename': 'css/lms-style-student-notes.css',
+    },
+    'style-discussion-main': {
+        'source_filenames': [
+            'css/discussion/lms-discussion-main.css',
+        ],
+        'output_filename': 'css/discussion/lms-discussion-main.css',
+    },
+    'style-discussion-main-rtl': {
+        'source_filenames': [
+            'css/discussion/lms-discussion-main-rtl.css',
+        ],
+        'output_filename': 'css/discussion/lms-discussion-main-rtl.css',
     },
     'style-xmodule-annotations': {
         'source_filenames': [
@@ -1817,6 +1839,7 @@ INSTALLED_APPS = (
     'django.contrib.contenttypes',
     'django.contrib.humanize',
     'django.contrib.messages',
+    'django.contrib.redirects',
     'django.contrib.sessions',
     'django.contrib.sites',
     'django.contrib.staticfiles',
@@ -2044,6 +2067,12 @@ INSTALLED_APPS = (
 
     # Needed whether or not enabled, due to migrations
     'badges',
+
+    # Enables default site and redirects
+    'django_sites_extensions',
+
+    # Email marketing integration
+    'email_marketing',
 )
 
 # Migrations which are not in the standard module "migrations"
@@ -2882,9 +2911,6 @@ CREDENTIALS_GENERATION_ROUTING_KEY = HIGH_PRIORITY_QUEUE
 
 WIKI_REQUEST_CACHE_MIDDLEWARE_CLASS = "request_cache.middleware.RequestCache"
 
-# Dafault site id to use in case there is no site that matches with the request headers.
-DEFAULT_SITE_ID = 1
-
 # API access management
 API_ACCESS_MANAGER_EMAIL = 'api-access@example.com'
 API_ACCESS_FROM_EMAIL = 'api-requests@example.com'
@@ -2893,3 +2919,10 @@ AUTH_DOCUMENTATION_URL = 'http://edx.readthedocs.org/projects/edx-platform-api/e
 
 # Affiliate cookie tracking
 AFFILIATE_COOKIE_NAME = 'affiliate_id'
+
+############## Settings for RedirectMiddleware ###############
+
+# Setting this to None causes Redirect data to never expire
+# The cache is cleared when Redirect models are saved/deleted
+REDIRECT_CACHE_TIMEOUT = None  # The length of time we cache Redirect model data
+REDIRECT_CACHE_KEY_PREFIX = 'redirects'

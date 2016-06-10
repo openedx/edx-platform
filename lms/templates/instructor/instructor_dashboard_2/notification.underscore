@@ -22,7 +22,7 @@
         <div class="message-actions">
             <button class="action-primary <%- actionClass %>">
                 <% if (actionIconClass) { %>
-                    <i class="icon fa <%- actionIconClass %>"></i>
+                    <span class="icon fa <%- actionIconClass %>" aria-hidden="true"></span>
                 <% } %>
                 <%- actionText %>
             </button>

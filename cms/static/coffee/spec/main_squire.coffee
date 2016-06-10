@@ -5,13 +5,14 @@ requirejs.config({
         "gettext": "xmodule_js/common_static/js/test/i18n",
         "mustache": "xmodule_js/common_static/js/vendor/mustache",
         "codemirror": "xmodule_js/common_static/js/vendor/CodeMirror/codemirror",
-        "jquery": "xmodule_js/common_static/js/vendor/jquery.min",
+        "jquery": "common/js/vendor/jquery",
+        "jquery-migrate": "common/js/vendor/jquery-migrate",
         "jquery.ui": "xmodule_js/common_static/js/vendor/jquery-ui.min",
         "jquery.form": "xmodule_js/common_static/js/vendor/jquery.form",
         "jquery.markitup": "xmodule_js/common_static/js/vendor/markitup/jquery.markitup",
         "jquery.leanModal": "xmodule_js/common_static/js/vendor/jquery.leanModal",
         "jquery.smoothScroll": "xmodule_js/common_static/js/vendor/jquery.smooth-scroll.min",
-        "jquery.scrollTo": "xmodule_js/common_static/js/vendor/jquery.scrollTo-1.4.2-min",
+        "jquery.scrollTo": "common/js/vendor/jquery.scrollTo",
         "jquery.timepicker": "xmodule_js/common_static/js/vendor/timepicker/jquery.timepicker",
         "jquery.cookie": "xmodule_js/common_static/js/vendor/jquery.cookie",
         "jquery.qtip": "xmodule_js/common_static/js/vendor/jquery.qtip.min",
@@ -28,7 +29,7 @@ requirejs.config({
         "underscore.string": "common/js/vendor/underscore.string",
         "backbone": "common/js/vendor/backbone",
         "backbone.associations": "xmodule_js/common_static/js/vendor/backbone-associations-min",
-        "backbone.paginator": "xmodule_js/common_static/js/vendor/backbone.paginator.min",
+        "backbone.paginator": "common/js/vendor/backbone.paginator",
         "tinymce": "xmodule_js/common_static/js/vendor/tinymce/js/tinymce/tinymce.full.min",
         "jquery.tinymce": "xmodule_js/common_static/js/vendor/tinymce/js/tinymce/jquery.tinymce",
         "xmodule": "xmodule_js/src/xmodule",
@@ -123,7 +124,7 @@ requirejs.config({
         },
         "backbone.paginator": {
             deps: ["backbone"],
-            exports: "Backbone.Paginator"
+            exports: "Backbone.PageableCollection"
         },
         "youtube": {
             exports: "YT"

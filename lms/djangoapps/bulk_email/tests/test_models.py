@@ -10,8 +10,16 @@ from student.tests.factories import UserFactory
 from mock import patch, Mock
 from nose.plugins.attrib import attr
 
-from bulk_email.models import CourseEmail, SEND_TO_STAFF, CourseEmailTemplate, CourseAuthorization, BulkEmailFlag
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from bulk_email.models import (
+    CourseEmail,
+    SEND_TO_COHORT,
+    SEND_TO_STAFF,
+    CourseEmailTemplate,
+    CourseAuthorization,
+    BulkEmailFlag
+)
+from openedx.core.djangoapps.course_groups.models import CourseCohort
+from opaque_keys.edx.keys import CourseKey
 
 
 @attr('shard_1')
@@ -20,20 +28,20 @@ class CourseEmailTest(TestCase):
     """Test the CourseEmail model."""
 
     def test_creation(self):
-        course_id = SlashSeparatedCourseKey('abc', '123', 'doremi')
+        course_id = CourseKey.from_string('abc/123/doremi')
         sender = UserFactory.create()
         to_option = SEND_TO_STAFF
         subject = "dummy subject"
         html_message = "<html>dummy message</html>"
-        email = CourseEmail.create(course_id, sender, to_option, subject, html_message)
-        self.assertEquals(email.course_id, course_id)
-        self.assertEquals(email.to_option, SEND_TO_STAFF)
-        self.assertEquals(email.subject, subject)
-        self.assertEquals(email.html_message, html_message)
-        self.assertEquals(email.sender, sender)
+        email = CourseEmail.create(course_id, sender, [to_option], subject, html_message)
+        self.assertEqual(email.course_id, course_id)
+        self.assertIn(SEND_TO_STAFF, [target.target_type for target in email.targets.all()])
+        self.assertEqual(email.subject, subject)
+        self.assertEqual(email.html_message, html_message)
+        self.assertEqual(email.sender, sender)
 
     def test_creation_with_optional_attributes(self):
-        course_id = SlashSeparatedCourseKey('abc', '123', 'doremi')
+        course_id = CourseKey.from_string('abc/123/doremi')
         sender = UserFactory.create()
         to_option = SEND_TO_STAFF
         subject = "dummy subject"
@@ -41,24 +49,38 @@ class CourseEmailTest(TestCase):
         template_name = "branded_template"
         from_addr = "branded@branding.com"
         email = CourseEmail.create(
-            course_id, sender, to_option, subject, html_message, template_name=template_name, from_addr=from_addr
+            course_id, sender, [to_option], subject, html_message, template_name=template_name, from_addr=from_addr
         )
-        self.assertEquals(email.course_id, course_id)
-        self.assertEquals(email.to_option, SEND_TO_STAFF)
-        self.assertEquals(email.subject, subject)
-        self.assertEquals(email.html_message, html_message)
-        self.assertEquals(email.sender, sender)
-        self.assertEquals(email.template_name, template_name)
-        self.assertEquals(email.from_addr, from_addr)
+        self.assertEqual(email.course_id, course_id)
+        self.assertEqual(email.targets.all()[0].target_type, SEND_TO_STAFF)
+        self.assertEqual(email.subject, subject)
+        self.assertEqual(email.html_message, html_message)
+        self.assertEqual(email.sender, sender)
+        self.assertEqual(email.template_name, template_name)
+        self.assertEqual(email.from_addr, from_addr)
 
     def test_bad_to_option(self):
-        course_id = SlashSeparatedCourseKey('abc', '123', 'doremi')
+        course_id = CourseKey.from_string('abc/123/doremi')
         sender = UserFactory.create()
         to_option = "fake"
         subject = "dummy subject"
         html_message = "<html>dummy message</html>"
         with self.assertRaises(ValueError):
             CourseEmail.create(course_id, sender, to_option, subject, html_message)
+
+    def test_cohort_target(self):
+        course_id = CourseKey.from_string('abc/123/doremi')
+        sender = UserFactory.create()
+        to_option = 'cohort:test cohort'
+        subject = "dummy subject"
+        html_message = "<html>dummy message</html>"
+        CourseCohort.create(cohort_name='test cohort', course_id=course_id)
+        email = CourseEmail.create(course_id, sender, [to_option], subject, html_message)
+        self.assertEqual(len(email.targets.all()), 1)
+        target = email.targets.all()[0]
+        self.assertEqual(target.target_type, SEND_TO_COHORT)
+        self.assertEqual(target.short_display(), 'cohort-test cohort')
+        self.assertEqual(target.long_display(), 'Cohort: test cohort')
 
 
 @attr('shard_1')
@@ -179,7 +201,7 @@ class CourseAuthorizationTest(TestCase):
 
     def test_creation_auth_on(self):
         BulkEmailFlag.objects.create(enabled=True, require_course_email_auth=True)
-        course_id = SlashSeparatedCourseKey('abc', '123', 'doremi')
+        course_id = CourseKey.from_string('abc/123/doremi')
         # Test that course is not authorized by default
         self.assertFalse(BulkEmailFlag.feature_enabled(course_id))
 
@@ -188,7 +210,7 @@ class CourseAuthorizationTest(TestCase):
         cauth.save()
         # Now, course should be authorized
         self.assertTrue(BulkEmailFlag.feature_enabled(course_id))
-        self.assertEquals(
+        self.assertEqual(
             cauth.__unicode__(),
             "Course 'abc/123/doremi': Instructor Email Enabled"
         )
@@ -198,14 +220,14 @@ class CourseAuthorizationTest(TestCase):
         cauth.save()
         # Test that course is now unauthorized
         self.assertFalse(BulkEmailFlag.feature_enabled(course_id))
-        self.assertEquals(
+        self.assertEqual(
             cauth.__unicode__(),
             "Course 'abc/123/doremi': Instructor Email Not Enabled"
         )
 
     def test_creation_auth_off(self):
         BulkEmailFlag.objects.create(enabled=True, require_course_email_auth=False)
-        course_id = SlashSeparatedCourseKey('blahx', 'blah101', 'ehhhhhhh')
+        course_id = CourseKey.from_string('blahx/blah101/ehhhhhhh')
         # Test that course is authorized by default, since auth is turned off
         self.assertTrue(BulkEmailFlag.feature_enabled(course_id))
 

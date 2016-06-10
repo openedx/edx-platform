@@ -34,7 +34,7 @@ from django.utils.translation import ugettext as _, get_language
 from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
 from django.views.decorators.http import require_POST, require_GET
 from django.db.models.signals import post_save
-from django.dispatch import receiver
+from django.dispatch import receiver, Signal
 from django.template.response import TemplateResponse
 
 from ratelimitbackend.exceptions import RateLimitException
@@ -122,8 +122,6 @@ from eventtracking import tracker
 # Note that this lives in LMS, so this dependency should be refactored.
 from notification_prefs.views import enable_notifications
 
-# Note that this lives in openedx, so this dependency should be refactored.
-from openedx.core.djangoapps.credentials.utils import get_user_program_credentials
 from openedx.core.djangoapps.credit.email_utils import get_credit_provider_display_names, make_providers_strings
 from openedx.core.djangoapps.user_api.preferences import api as preferences_api
 from openedx.core.djangoapps.programs.utils import get_programs_for_dashboard, get_display_category
@@ -135,6 +133,10 @@ log = logging.getLogger("edx.student")
 AUDIT_LOG = logging.getLogger("audit")
 ReverifyInfo = namedtuple('ReverifyInfo', 'course_id course_name course_number date status display')  # pylint: disable=invalid-name
 SETTING_CHANGE_INITIATED = 'edx.user.settings.change_initiated'
+# Used as the name of the user attribute for tracking affiliate registrations
+REGISTRATION_AFFILIATE_ID = 'registration_affiliate_id'
+# used to announce a registration
+REGISTER_USER = Signal(providing_args=["user", "profile"])
 
 # Disable this warning because it doesn't make sense to completely refactor tests to appease Pylint
 # pylint: disable=logging-format-interpolation
@@ -615,7 +617,6 @@ def dashboard(request):
     # This is passed along in the template context to allow rendering of
     # program-related information on the dashboard.
     course_programs = _get_course_programs(user, [enrollment.course_id for enrollment in course_enrollments])
-    xseries_credentials = _get_xseries_credentials(user)
 
     # Construct a dictionary of course mode information
     # used to render the course list.  We re-use the course modes dict
@@ -741,7 +742,6 @@ def dashboard(request):
         'nav_hidden': True,
         'course_programs': course_programs,
         'disable_courseware_js': True,
-        'xseries_credentials': xseries_credentials,
         'show_program_listing': ProgramsApiConfig.current().show_program_listing,
     }
 
@@ -1756,6 +1756,9 @@ def create_account_with_params(request, params):
             }
         )
 
+    # Announce registration
+    REGISTER_USER.send(sender=None, user=user, profile=profile)
+
     create_comments_service_user(user)
 
     # Don't send email if we are:
@@ -1865,7 +1868,7 @@ def _record_registration_attribution(request, user):
     """
     affiliate_id = request.COOKIES.get(settings.AFFILIATE_COOKIE_NAME)
     if user is not None and affiliate_id is not None:
-        UserAttribute.set_user_attribute(user, settings.AFFILIATE_COOKIE_NAME, affiliate_id)
+        UserAttribute.set_user_attribute(user, REGISTRATION_AFFILIATE_ID, affiliate_id)
 
 
 @csrf_exempt
@@ -2483,34 +2486,3 @@ def _get_course_programs(user, user_enrolled_courses):  # pylint: disable=invali
                     log.warning('Program structure is invalid, skipping display: %r', program)
 
     return programs_data
-
-
-def _get_xseries_credentials(user):
-    """Return program credentials data required for display on
-    the learner dashboard.
-
-    Given a user, find all programs for which certificates have been earned
-    and return list of dictionaries of required program data.
-
-    Arguments:
-        user (User): user object for getting programs credentials.
-
-    Returns:
-        list of dict, containing data corresponding to the programs for which
-        the user has been awarded a credential.
-    """
-    programs_credentials = get_user_program_credentials(user)
-    credentials_data = []
-    for program in programs_credentials:
-        if program.get('category') == 'xseries':
-            try:
-                program_data = {
-                    'display_name': program['name'],
-                    'subtitle': program['subtitle'],
-                    'credential_url': program['credential_url'],
-                }
-                credentials_data.append(program_data)
-            except KeyError:
-                log.warning('Program structure is invalid: %r', program)
-
-    return credentials_data

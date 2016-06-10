@@ -51,18 +51,11 @@ site_status_msg = get_site_status_msg(course_id)
 % endif
   <div class="${"rwd" if responsive else ""} wrapper-header nav-container">
     <h1 class="logo" itemscope="" itemtype="http://schema.org/Organization">
-      <%block name="navigation_logo">
-        % if user.is_authenticated():
-          <a href="${reverse('dashboard')}">
-            <img src="${static.url("images/logo.png")}" alt=${_("Your Dashboard")}/>
-          </a>
-        % else:
-          <a href="${marketing_link('ROOT')}" itemprop="url">
-            <img src="${static.url("images/logo.png")}" itemprop="logo"
-                 alt="${_("{platform_name} Home Page").format(platform_name=static.get_platform_name())}"/>
-          </a>
-        % endif
-      </%block>
+      <a href="${marketing_link('ROOT')}" itemprop="url">
+        <%block name="navigation_logo">
+            <img src="${static.url("images/logo.png")}" alt="${_("{platform_name} Home Page").format(platform_name=static.get_platform_name())}" itemprop="logo" />
+        </%block>
+      </a>
     </h1>
 
     % if course and not disable_courseware_header:
@@ -76,20 +69,10 @@ site_status_msg = get_site_status_msg(course_id)
 
     % if user.is_authenticated():
       % if not course or disable_courseware_header:
+        % if not nav_hidden or show_program_listing:
           <nav aria-label="Main" class="nav-main">
             <ul class="left list-inline nav-global authenticated">
-              % if show_program_listing:
-                <li class="tab-nav-item">
-                  <a class="${'active ' if reverse('dashboard') == request.path else ''}tab-nav-link" href="${reverse('dashboard')}">
-                    ${_("Courses")}
-                  </a>
-                </li>
-                <li class="tab-nav-item">
-                  <a class="${'active ' if reverse('program_listing_view') in request.path else ''}tab-nav-link" href="${reverse('program_listing_view')}">
-                    ${_("Programs")}
-                  </a>
-                </li>
-              % elif not nav_hidden:
+              % if not nav_hidden:
                 <%block name="navigation_global_links_authenticated">
                   <li class="item nav-global-01">
                     <a href="${marketing_link('HOW_IT_WORKS')}">${_("How it Works")}</a>
@@ -102,8 +85,21 @@ site_status_msg = get_site_status_msg(course_id)
                   </li>
                 </%block>
               % endif
+              % if show_program_listing:
+                <li class="tab-nav-item">
+                  <a class="${'active ' if reverse('dashboard') == request.path else ''}tab-nav-link" href="${reverse('dashboard')}">
+                    ${_("Courses")}
+                  </a>
+                </li>
+                <li class="tab-nav-item">
+                  <a class="${'active ' if reverse('program_listing_view') in request.path else ''}tab-nav-link" href="${reverse('program_listing_view')}">
+                    ${_("Programs")}
+                  </a>
+                </li>
+              % endif
             </ul>
           </nav>
+        % endif
       % endif
 
       <%include file="user_dropdown.html"/>
@@ -112,7 +108,7 @@ site_status_msg = get_site_status_msg(course_id)
         <ul class="user">
           <li class="primary">
             <a class="shopping-cart" href="${reverse('shoppingcart.views.show_cart')}">
-              <i class="icon fa fa-shopping-cart" aria-hidden="true"></i> ${_("Shopping Cart")}
+              <span class="icon fa fa-shopping-cart" aria-hidden="true"></span> ${_("Shopping Cart")}
             </a>
           </li>
         </ul>

@@ -4,6 +4,7 @@
     </div>
 
     <div class="search-alert-controls">
-      <a href="#" class="dismiss control control-dismiss"><i class="icon fa fa-remove"></i></a>
+      <a href="#" class="dismiss control control-dismiss"><span class="icon fa fa-remove" aria-hidden="true"></span>
+      <span class="sr"><%- gettext("Close") %></span></a>
     </div>
 </div>

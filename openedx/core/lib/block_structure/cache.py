@@ -45,13 +45,13 @@ class BlockStructureCache(object):
         )
         zp_data_to_cache = zpickle(data_to_cache)
 
-        # Set the timeout value for the cache to None. This caches the
-        # value forever. The expectation is that the caller will delete
-        # the cached value once it is outdated.
+        # Set the timeout value for the cache to 1 day as a fail-safe
+        # in case the signal to invalidate the cache doesn't come through.
+        timeout_in_seconds = 60 * 60 * 24
         self._cache.set(
             self._encode_root_cache_key(block_structure.root_block_usage_key),
             zp_data_to_cache,
-            timeout=None,
+            timeout=timeout_in_seconds,
         )
 
         logger.info(

@@ -34,10 +34,10 @@ define([
         usageUnit: '.group-configuration-usage-unit',
         usageUnitAnchor: '.group-configuration-usage-unit a',
         usageUnitMessage: '.group-configuration-validation-message',
-        usageUnitWarningIcon: '.group-configuration-usage-unit i.fa-warning',
-        usageUnitErrorIcon: '.group-configuration-usage-unit i.fa-exclamation-circle',
+        usageUnitWarningIcon: '.group-configuration-usage-unit .fa-warning',
+        usageUnitErrorIcon: '.group-configuration-usage-unit .fa-exclamation-circle',
         warningMessage: '.group-configuration-validation-text',
-        warningIcon: '.wrapper-group-configuration-validation > i',
+        warningIcon: '.wrapper-group-configuration-validation > .fa-warning',
         note: '.wrapper-delete-button'
     };
 
@@ -489,21 +489,6 @@ define([
             // Error message disappear
             expect(this.view.$(SELECTORS.errorMessage)).not.toBeInDOM();
             AjaxHelpers.expectNoRequests(requests);
-        });
-
-        it('should have appropriate class names on focus/blur', function (done) {
-            var groupInput = this.view.$(SELECTORS.inputGroupName).first(),
-                groupFields = this.view.$(SELECTORS.groupFields);
-
-            groupInput.focus();
-            jasmine.waitUntil(function() {
-                return groupFields.hasClass('is-focused');
-            }).then(function () {
-                groupInput.blur();
-                jasmine.waitUntil(function() {
-                    return !groupFields.hasClass('is-focused');
-                }).then(done);
-            });
         });
 
         describe('removes all newly created groups on cancel', function () {

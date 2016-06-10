@@ -37,6 +37,19 @@
                     state = jasmine.initializePlayer();
                     expect($('.video')).toContainElement('.subtitles');
                 });
+                
+                it('has appropriate lang attributes', function() {
+                    state = jasmine.initializePlayer();
+                    
+                    $('.video .toggle-captions').trigger('click');
+
+                    expect($('.video .subtitles-menu')).toHaveAttrs({
+                        'lang': 'en'
+                    });
+                    expect($('.video .closed-captions')).toHaveAttrs({
+                        'lang': 'en'
+                    });
+                });
 
                 it('add transcript control to video player', function () {
                     state = jasmine.initializePlayer();
@@ -247,6 +260,12 @@
                         expect(state.storage.setItem)
                             .toHaveBeenCalledWith('language', 'de');
                         expect($('.langs-list li.is-active').length).toBe(1);
+                        expect($('.subtitles .subtitles-menu')).toHaveAttrs({
+                            'lang': 'de'
+                        });
+                        expect($('.closed-captions')).toHaveAttrs({
+                            'lang': 'de'
+                        });
                     });
 
                     it('when clicking on link with current language', function () {
@@ -324,7 +343,7 @@
 
                         expect(parseIntAttribute(item, 'data-index')).toEqual(index);
                         expect(parseIntAttribute(item, 'data-start')).toEqual(captionsData.start[index]);
-                        expect(item.attr('tabindex')).toEqual(0);
+                        expect(item.attr('tabindex')).toEqual('0');
                         expect(item.text().trim()).toEqual(captionsData.text[index]);
                     });
                 });
@@ -413,7 +432,7 @@
 
                             expect(parseIntAttribute(item, 'data-index')).toEqual(index);
                             expect(parseIntAttribute(item, 'data-start')).toEqual(captionsData.start[index]);
-                            expect(item.attr('tabindex')).toEqual(0);
+                            expect(item.attr('tabindex')).toEqual('0');
                             expect(item.text().trim()).toEqual(text);
                         });
                     }).always(done);
@@ -823,7 +842,7 @@
                         function (index, item) {
                         expect(parseIntAttribute($(item), 'data-index')).toEqual(index);
                         expect(parseIntAttribute($(item), 'data-start')).toEqual(captionsData.start[index]);
-                        expect($(item).attr('tabindex')).toEqual(0);
+                        expect($(item).attr('tabindex')).toEqual('0');
                         expect($(item).text().trim()).toEqual(captionsData.text[index]);
                     });
                 });

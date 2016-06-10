@@ -11,7 +11,6 @@ from importlib import import_module
 from django.test.utils import override_settings
 from django.conf import settings
 from mock import patch
-from edxmako.tests import mako_middleware_process_request
 from external_auth.models import ExternalAuthMap
 from student.views import create_account
 
@@ -262,8 +261,8 @@ class TestPasswordPolicy(TestCase):
         request.session['ExternalAuthMap'] = extauth
         request.user = AnonymousUser()
 
-        mako_middleware_process_request(request)
-        response = create_account(request)
+        with patch('edxmako.request_context.get_current_request', return_value=request):
+            response = create_account(request)
         self.assertEqual(response.status_code, 200)
         obj = json.loads(response.content)
         self.assertTrue(obj['success'])

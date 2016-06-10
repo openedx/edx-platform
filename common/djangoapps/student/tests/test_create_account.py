@@ -16,10 +16,10 @@ import mock
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
 from lang_pref import LANGUAGE_KEY
 from notification_prefs import NOTIFICATION_PREF_KEY
-from edxmako.tests import mako_middleware_process_request
 from external_auth.models import ExternalAuthMap
 import student
 from student.models import UserAttribute
+from student.views import REGISTRATION_AFFILIATE_ID
 
 TEST_CS_URL = 'https://comments.service.test:123/'
 
@@ -230,9 +230,9 @@ class TestCreateAccount(TestCase):
         request.session['ExternalAuthMap'] = extauth
         request.user = AnonymousUser()
 
-        mako_middleware_process_request(request)
-        with mock.patch('django.contrib.auth.models.User.email_user') as mock_send_mail:
-            student.views.create_account(request)
+        with mock.patch('edxmako.request_context.get_current_request', return_value=request):
+            with mock.patch('django.contrib.auth.models.User.email_user') as mock_send_mail:
+                student.views.create_account(request)
 
         # check that send_mail is called
         if bypass_activation_email:
@@ -288,14 +288,14 @@ class TestCreateAccount(TestCase):
         affiliate_id = 'test-partner'
         self.client.cookies[settings.AFFILIATE_COOKIE_NAME] = affiliate_id
         user = self.create_account_and_fetch_profile().user
-        self.assertEqual(UserAttribute.get_user_attribute(user, settings.AFFILIATE_COOKIE_NAME), affiliate_id)
+        self.assertEqual(UserAttribute.get_user_attribute(user, REGISTRATION_AFFILIATE_ID), affiliate_id)
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_no_referral(self):
         """Verify that no referral is recorded when a cookie is not present."""
         self.assertIsNone(self.client.cookies.get(settings.AFFILIATE_COOKIE_NAME))  # pylint: disable=no-member
         user = self.create_account_and_fetch_profile().user
-        self.assertIsNone(UserAttribute.get_user_attribute(user, settings.AFFILIATE_COOKIE_NAME))
+        self.assertIsNone(UserAttribute.get_user_attribute(user, REGISTRATION_AFFILIATE_ID))
 
 
 @ddt.ddt
@@ -387,8 +387,19 @@ class TestCreateAccountValidation(TestCase):
             assert_email_error("A properly formatted e-mail is required")
 
         # Too long
-        params["email"] = "this_email_address_has_76_characters_in_it_so_it_is_unacceptable@example.com"
-        assert_email_error("Email cannot be more than 75 characters long")
+        params["email"] = '{email}@example.com'.format(
+            email='this_email_address_has_254_characters_in_it_so_it_is_unacceptable' * 4
+        )
+
+        # Assert that we get error when email has more than 254 characters.
+        self.assertGreater(len(params['email']), 254)
+        assert_email_error("Email cannot be more than 254 characters long")
+
+        # Valid Email
+        params["email"] = "student@edx.com"
+        # Assert success on valid email
+        self.assertLess(len(params["email"]), 254)
+        self.assert_success(params)
 
         # Invalid
         params["email"] = "not_an_email_address"

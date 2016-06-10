@@ -626,7 +626,7 @@ hr.divide {
 // ====================
 
 // UI - semantically hide text
-.sr {
+.sr, .sr-only {
   @extend %cont-text-sr;
 }
 

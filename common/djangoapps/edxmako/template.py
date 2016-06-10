@@ -15,7 +15,7 @@
 import edxmako
 
 from django.conf import settings
-from edxmako.middleware import get_template_request_context
+from edxmako.request_context import get_template_request_context
 from edxmako.shortcuts import marketing_link
 from mako.template import Template as MakoTemplate
 

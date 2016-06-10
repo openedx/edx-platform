@@ -129,7 +129,8 @@ if Backbone?
           isPrivilegedUser: DiscussionUtil.isPrivilegedUser()
         })
       )
-      @$(".forum-nav-sort-control").val(@collection.sort_preference)
+      @$(".forum-nav-sort-control option").removeProp("selected")
+      @$(".forum-nav-sort-control option[value=#{@collection.sort_preference}]").prop("selected", true)
 
       $(window).bind "load scroll resize", @updateSidebar
 
@@ -524,5 +525,3 @@ if Backbone?
           type: "POST"
           error: () =>
             $('input.email-setting').attr('checked','checked')
-
-

@@ -4,8 +4,9 @@ End-to-end tests for Student's Profile Page.
 """
 from contextlib import contextmanager
 
-from datetime import datetime
 from bok_choy.web_app_test import WebAppTest
+from datetime import datetime
+from flaky import flaky
 from nose.plugins.attrib import attr
 
 from ...pages.common.logout import LogoutPage
@@ -48,6 +49,8 @@ class LearnerProfileTestMixin(EventsTestMixin):
         profile_page.value_for_dropdown_field('language_proficiencies', 'English')
         profile_page.value_for_dropdown_field('country', 'United Arab Emirates')
         profile_page.set_value_for_textarea_field('bio', 'Nothing Special')
+        # Waits here for text to appear/save on bio field
+        profile_page.wait_for_ajax()
 
     def visit_profile_page(self, username, privacy=None):
         """
@@ -266,17 +269,21 @@ class OwnLearnerProfilePageTest(LearnerProfileTestMixin, WebAppTest):
 
     def test_dashboard_learner_profile_link(self):
         """
-        Scenario: Verify that when user click on username it will leads to profile page.
+        Scenario: Verify that my profile link is present on dashboard page and we can navigate to correct page.
 
         Given that I am a registered user.
         When I go to Dashboard page.
-        And I click on username.
+        And I click on username dropdown.
+        Then I see Profile link in the dropdown menu.
+        When I click on Profile link.
         Then I will be navigated to Profile page.
         """
         username, user_id = self.log_in_as_unique_user()
         dashboard_page = DashboardPage(self.browser)
         dashboard_page.visit()
-        dashboard_page.click_username()
+        dashboard_page.click_username_dropdown()
+        self.assertIn('Profile', dashboard_page.username_dropdown_link_text)
+        dashboard_page.click_my_profile_link()
         my_profile_page = LearnerProfilePage(self.browser, username)
         my_profile_page.wait_for_page()
 
@@ -772,7 +779,7 @@ class LearnerProfileA11yTest(LearnerProfileTestMixin, WebAppTest):
 
         profile_page.a11y_audit.config.set_rules({
             "ignore": [
-                'skip-link',  # TODO: AC-179
+                'section',  # TODO: wcag2aa
                 'link-href',  # TODO: AC-231
             ],
         })
@@ -800,6 +807,7 @@ class LearnerProfileA11yTest(LearnerProfileTestMixin, WebAppTest):
 
         profile_page.a11y_audit.config.set_rules({
             "ignore": [
+                'section',  # TODO: wcag2aa
                 'link-href',  # TODO: AC-231
             ],
         })
@@ -816,7 +824,7 @@ class LearnerProfileA11yTest(LearnerProfileTestMixin, WebAppTest):
 
         profile_page.a11y_audit.config.set_rules({
             "ignore": [
-                'skip-link',  # TODO: AC-179
+                'section',  # TODO: wcag2aa
                 'link-href',  # TODO: AC-231
             ],
         })

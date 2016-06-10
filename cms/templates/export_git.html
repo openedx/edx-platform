@@ -1,3 +1,4 @@
+<%page expression_filter="h"/>
 <%inherit file="base.html" />
 <%namespace name='static' file='static_content.html'/>
 
@@ -38,8 +39,8 @@
         % else:
         <ul class="list-actions">
           <li class="item-action">
-            <a class="action action-export-git"" action-primary" href="${reverse('export_git', kwargs=dict(course_key_string=unicode(context_course.id)))}?action=push">
-              <i class="icon fa fa-arrow-circle-o-down"></i>
+            <a class="action action-export-git action-primary" href="${reverse('export_git', kwargs=dict(course_key_string=unicode(context_course.id)))}?action=push">
+              <span class="icon fa fa-arrow-circle-o-down" aria-hidden="true"></span>
               <span class="copy">${_("Export to Git")}</span>
             </a>
           </li>
@@ -53,14 +54,14 @@
           % else:
           <h3>${_('Export Succeeded')}:</h3>
           % endif
-        <pre>${msg|h}</pre>
+        <pre>${msg}</pre>
         % endif
       </div>
     </article>
     <aside class="content-supplementary" role="complementary">
       <dl class="export-git-info-block">
         <dt>${_("Your course:")}</dt>
-        <dd class="course_text">${context_course.id | h}</dd>
+        <dd class="course_text">${context_course.id}</dd>
         <dt>${_("Course git url:")}</dt>
         <dd class="giturl_text">${context_course.giturl}</dd>
       </dl>

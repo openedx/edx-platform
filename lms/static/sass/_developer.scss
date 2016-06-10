@@ -181,8 +181,8 @@
 
   //efischer TNL-3226
   .search-field::-ms-clear {
-    width: 0px;
-    height: 0px;
+    width: 0;
+    height: 0;
   }
 }
 
@@ -202,7 +202,7 @@
 
   &:focus {
     box-shadow: none;
-    border: 0px;
+    border: 0;
   }
 }
 
@@ -222,7 +222,7 @@
 
   &:focus {
     box-shadow: none;
-    border: 0px;
+    border: 0;
   }
 }
 

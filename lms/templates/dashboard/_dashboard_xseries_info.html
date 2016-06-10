@@ -1,7 +1,7 @@
 <%page expression_filter="h" args="program_data, enrollment_mode, display_category" />
 <%!
     from django.utils.translation import ugettext as _
-    from openedx.core.djangolib.markup import Text, HTML
+    from openedx.core.djangolib.markup import HTML, Text
 %>
 <%namespace name='static' file='../static_content.html'/>
     <div class="message message-status is-shown credit-message">
@@ -29,7 +29,7 @@
             <a class="btn ${xseries_btn_class}" href="${program_data['program_marketing_url']}" target="_blank"
                data-program-id="${program_data['program_id']}" >
                 <span class="sr">${program_data['display_name']}</span>
-                <i class="action-xseries-icon" aria-hidden="true"></i>
+                <span class="action-xseries-icon" aria-hidden="true"></span>
                 ${_("View {category} Details").format(category=display_category)}
             </a>
         </div>

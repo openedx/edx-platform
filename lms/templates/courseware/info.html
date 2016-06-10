@@ -1,5 +1,6 @@
 <%page expression_filter="h"/>
 <%inherit file="../main.html" />
+<%def name="online_help_token()"><% return "courseinfo" %></%def>
 <%namespace name='static' file='../static_content.html'/>
 <%!
 from django.utils.translation import ugettext as _
@@ -7,7 +8,7 @@ from django.utils.translation import ugettext as _
 from courseware.courses import get_course_info_section, get_course_date_summary
 
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
-from openedx.core.djangolib.markup import Text, HTML
+from openedx.core.djangolib.markup import HTML, Text
 %>
 
 <%block name="pagetitle">${_("{course_number} Course Info").format(course_number=course.display_number_with_default)}</%block>
@@ -37,12 +38,12 @@ from openedx.core.djangolib.markup import Text, HTML
 
 <%include file="/courseware/course_navigation.html" args="active_page='info'" />
 
-<%static:require_module module_name="js/courseware/toggle_element_visibility" class_name="ToggleElementVisibility">
+<%static:require_module_async module_name="js/courseware/toggle_element_visibility" class_name="ToggleElementVisibility">
         ToggleElementVisibility();
-</%static:require_module>
-<%static:require_module module_name="js/courseware/course_home_events" class_name="CourseHomeEvents">
+</%static:require_module_async>
+<%static:require_module_async module_name="js/courseware/course_home_events" class_name="CourseHomeEvents">
         CourseHomeEvents();
-</%static:require_module>
+</%static:require_module_async>
 
 <%block name="js_extra">
   ## CourseTalk widget js script

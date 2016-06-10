@@ -46,9 +46,6 @@ class CourseInfoTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase):
             data="OOGIE BLOOGIE", display_name="updates"
         )
 
-    def setUp(self):
-        super(CourseInfoTestCase, self).setUp()
-
     def test_logged_in_unenrolled(self):
         self.setup_user()
         url = reverse('info', args=[self.course.id.to_deprecated_string()])
@@ -101,6 +98,21 @@ class CourseInfoTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 404)
 
+
+@attr('shard_1')
+class CourseInfoLastAccessedTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
+    """
+    Tests of the CourseInfo last accessed link.
+    """
+
+    def setUp(self):
+        super(CourseInfoLastAccessedTestCase, self).setUp()
+        self.course = CourseFactory.create()
+        self.page = ItemFactory.create(
+            category="course_info", parent_location=self.course.location,
+            data="OOGIE BLOOGIE", display_name="updates"
+        )
+
     def test_last_accessed_courseware_not_shown(self):
         """
         Test that the last accessed courseware link is not shown if there
@@ -133,6 +145,21 @@ class CourseInfoTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase):
         info_page_response = self.client.get(info_url)
         content = pq(info_page_response.content)
         self.assertEqual(content('.page-header-secondary .last-accessed-link').attr('href'), section_url)
+
+
+@attr('shard_1')
+class CourseInfoTitleTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
+    """
+    Tests of the CourseInfo page title.
+    """
+
+    def setUp(self):
+        super(CourseInfoTitleTestCase, self).setUp()
+        self.course = CourseFactory.create()
+        self.page = ItemFactory.create(
+            category="course_info", parent_location=self.course.location,
+            data="OOGIE BLOOGIE", display_name="updates"
+        )
 
     def test_info_title(self):
         """
@@ -289,7 +316,7 @@ class SelfPacedCourseInfoTestCase(LoginEnrollmentTestCase, SharedModuleStoreTest
         self.assertEqual(resp.status_code, 200)
 
     def test_num_queries_instructor_paced(self):
-        self.fetch_course_info_with_queries(self.instructor_paced_course, 20, 4)
+        self.fetch_course_info_with_queries(self.instructor_paced_course, 21, 4)
 
     def test_num_queries_self_paced(self):
-        self.fetch_course_info_with_queries(self.self_paced_course, 20, 4)
+        self.fetch_course_info_with_queries(self.self_paced_course, 21, 4)

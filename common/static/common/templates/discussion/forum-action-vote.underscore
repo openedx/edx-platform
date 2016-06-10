@@ -12,7 +12,7 @@
         </span>
 
         <span class="action-icon" aria-hidden="true">
-            <i class="icon fa fa-plus"></i>
+            <span class="icon fa fa-plus" aria-hidden="true"></span>
         </span>
     </a>
 </li>

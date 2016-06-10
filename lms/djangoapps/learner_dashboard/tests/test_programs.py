@@ -1,27 +1,31 @@
 """
-Tests for viewing the programs enrolled by a learner.
+Unit tests covering the program listing and detail pages.
 """
 import datetime
-import httpretty
+import json
 import unittest
 from urlparse import urljoin
 
+from bs4 import BeautifulSoup
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test import override_settings, TestCase
 from edx_oauth2_provider.tests.factories import ClientFactory
+import httpretty
 from opaque_keys.edx import locator
 from provider.constants import CONFIDENTIAL
 
 from openedx.core.djangoapps.credentials.models import CredentialsApiConfig
+from openedx.core.djangoapps.credentials.tests import factories as credentials_factories
 from openedx.core.djangoapps.credentials.tests.mixins import CredentialsDataMixin, CredentialsApiConfigMixin
+from openedx.core.djangoapps.programs.models import ProgramsApiConfig
+from openedx.core.djangoapps.programs.tests import factories
 from openedx.core.djangoapps.programs.tests.mixins import (
     ProgramsApiConfigMixin,
     ProgramsDataMixin)
-from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
@@ -48,13 +52,10 @@ class TestProgramListing(
         ClientFactory(name=CredentialsApiConfig.OAUTH2_CLIENT_NAME, client_type=CONFIDENTIAL)
         ClientFactory(name=ProgramsApiConfig.OAUTH2_CLIENT_NAME, client_type=CONFIDENTIAL)
         self.student = UserFactory()
-        self.create_programs_config(xseries_ad_enabled=True, program_listing_enabled=True)
 
     def _create_course_and_enroll(self, student, org, course, run):
         """
         Creates a course and associated enrollment.
-
-        TODO: Use CourseEnrollmentFactory to avoid course creation.
         """
         course_location = locator.CourseLocator(org, course, run)
         course = CourseFactory.create(
@@ -104,6 +105,7 @@ class TestProgramListing(
 
     @httpretty.activate
     def test_get_program_with_no_enrollment(self):
+        self.create_programs_config()
         response = self._setup_and_get_program()
         for program_element in self._get_program_checklist(0):
             self.assertNotContains(response, program_element)
@@ -112,6 +114,7 @@ class TestProgramListing(
 
     @httpretty.activate
     def test_get_one_program(self):
+        self.create_programs_config()
         self._create_course_and_enroll(self.student, *self.COURSE_KEYS[0].split('/'))
         response = self._setup_and_get_program()
         for program_element in self._get_program_checklist(0):
@@ -123,6 +126,7 @@ class TestProgramListing(
 
     @httpretty.activate
     def test_get_both_program(self):
+        self.create_programs_config()
         self._create_course_and_enroll(self.student, *self.COURSE_KEYS[0].split('/'))
         self._create_course_and_enroll(self.student, *self.COURSE_KEYS[5].split('/'))
         response = self._setup_and_get_program()
@@ -140,7 +144,7 @@ class TestProgramListing(
         self.assertEqual(response.status_code, 404)
 
     def test_xseries_advertise_disabled(self):
-        self.create_programs_config(program_listing_enabled=True, xseries_ad_enabled=False)
+        self.create_programs_config(xseries_ad_enabled=False)
         self.client.login(username=self.student.username, password=self.PASSWORD)
         response = self.client.get(self.url)
         x_series_url = urljoin(settings.MKTG_URLS.get('ROOT'), 'xseries')
@@ -155,25 +159,43 @@ class TestProgramListing(
             '{}?next={}'.format(reverse('signin_user'), self.url)
         )
 
-    # TODO: Use a factory to generate this data.
+    def _expected_progam_credentials_data(self):
+        """
+        Dry method for getting expected program credentials response data.
+        """
+        return [
+            credentials_factories.UserCredential(
+                id=1,
+                username='test',
+                credential=credentials_factories.ProgramCredential()
+            ),
+            credentials_factories.UserCredential(
+                id=2,
+                username='test',
+                credential=credentials_factories.ProgramCredential()
+            )
+        ]
+
     def _expected_credentials_data(self):
         """ Dry method for getting expected credentials."""
-
+        program_credentials_data = self._expected_progam_credentials_data()
         return [
             {
-                "display_name": "Test Program A",
-                "credential_url": "http://credentials.edx.org/credentials/dummy-uuid-1/"
+                'display_name': self.PROGRAMS_API_RESPONSE['results'][0]['name'],
+                'subtitle': self.PROGRAMS_API_RESPONSE['results'][0]['subtitle'],
+                'credential_url':program_credentials_data[0]['certificate_url']
             },
             {
-                "display_name": "Test Program B",
-                "credential_url": "http://credentials.edx.org/credentials/dummy-uuid-2/"
+                'display_name': self.PROGRAMS_API_RESPONSE['results'][1]['name'],
+                'subtitle':self.PROGRAMS_API_RESPONSE['results'][1]['subtitle'],
+                'credential_url':program_credentials_data[1]['certificate_url']
             }
         ]
 
     @httpretty.activate
     def test_get_xseries_certificates_with_data(self):
 
-        self.create_programs_config(program_listing_enabled=True)
+        self.create_programs_config()
         self.create_credentials_config(is_learner_issuance_enabled=True)
 
         self.client.login(username=self.student.username, password=self.PASSWORD)
@@ -192,7 +214,7 @@ class TestProgramListing(
     @httpretty.activate
     def test_get_xseries_certificates_without_data(self):
 
-        self.create_programs_config(program_listing_enabled=True)
+        self.create_programs_config()
         self.create_credentials_config(is_learner_issuance_enabled=True)
 
         self.client.login(username=self.student.username, password=self.PASSWORD)
@@ -207,37 +229,125 @@ class TestProgramListing(
             self.assertNotContains(response, certificate['credential_url'])
 
 
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@httpretty.activate
 @override_settings(MKTG_URLS={'ROOT': 'http://edx.org'})
-class TestProgramDetails(ProgramsApiConfigMixin, TestCase):
+@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+class TestProgramDetails(ProgramsApiConfigMixin, SharedModuleStoreTestCase):
     """
     Unit tests for the program details page
     """
+    program_id = 123
+    password = 'test'
+
+    @classmethod
+    def setUpClass(cls):
+        super(TestProgramDetails, cls).setUpClass()
+        cls.course = CourseFactory()
+
     def setUp(self):
         super(TestProgramDetails, self).setUp()
+
+        self.details_page = reverse('program_details_view', args=[self.program_id])
+
         self.user = UserFactory()
-        self.details_page = reverse('program_details_view', args=['123'])
+        self.client.login(username=self.user.username, password=self.password)
+
+        ClientFactory(name=ProgramsApiConfig.OAUTH2_CLIENT_NAME, client_type=CONFIDENTIAL)
+
+        self.organization = factories.Organization()
+        self.run_mode = factories.RunMode(course_key=unicode(self.course.id))  # pylint: disable=no-member
+        self.course_code = factories.CourseCode(run_modes=[self.run_mode])
+        self.data = factories.Program(
+            organizations=[self.organization],
+            course_codes=[self.course_code]
+        )
+
+    def _mock_programs_api(self, data, status=200):
+        """Helper for mocking out Programs API URLs."""
+        self.assertTrue(httpretty.is_enabled(), msg='httpretty must be enabled to mock Programs API calls.')
+
+        url = '{api_root}/programs/{id}/'.format(
+            api_root=ProgramsApiConfig.current().internal_api_url.strip('/'),
+            id=self.program_id
+        )
+
+        body = json.dumps(data)
+
+        httpretty.register_uri(
+            httpretty.GET,
+            url,
+            body=body,
+            status=status,
+            content_type='application/json',
+        )
+
+    def _assert_program_data_present(self, response):
+        """Verify that program data is present."""
+        self.assertContains(response, 'programData')
+        self.assertContains(response, 'programListingUrl')
+        self.assertContains(response, self.data['name'])
+        self._assert_programs_tab_present(response)
+
+    def _assert_programs_tab_present(self, response):
+        """Verify that the programs tab is present in the nav."""
+        soup = BeautifulSoup(response.content, 'html.parser')
+        self.assertTrue(
+            any(soup.find_all('a', class_='tab-nav-link', href=reverse('program_listing_view')))
+        )
 
     def test_login_required(self):
         """
         Verify that login is required to access the page.
         """
         self.create_programs_config()
+        self._mock_programs_api(self.data)
+
+        self.client.logout()
+
         response = self.client.get(self.details_page)
         self.assertRedirects(
             response,
             '{}?next={}'.format(reverse('signin_user'), self.details_page)
         )
 
-        self.client.login(username=self.user.username, password='test')
+        self.client.login(username=self.user.username, password=self.password)
+
         response = self.client.get(self.details_page)
-        self.assertEquals(response.status_code, 200)
+        self._assert_program_data_present(response)
 
     def test_404_if_disabled(self):
         """
         Verify that the page 404s if disabled.
         """
         self.create_programs_config(program_details_enabled=False)
-        self.client.login(username=self.user.username, password='test')
+
+        response = self.client.get(self.details_page)
+        self.assertEquals(response.status_code, 404)
+
+    def test_page_routing(self):
+        """Verify that the page can be hit with or without a program name in the URL."""
+        self.create_programs_config()
+        self._mock_programs_api(self.data)
+
+        response = self.client.get(self.details_page)
+        self._assert_program_data_present(response)
+
+        response = self.client.get(self.details_page + 'program_name/')
+        self._assert_program_data_present(response)
+
+        response = self.client.get(self.details_page + 'program_name/invalid/')
+        self.assertEquals(response.status_code, 404)
+
+    def test_404_if_no_data(self):
+        """Verify that the page 404s if no program data is found."""
+        self.create_programs_config()
+
+        self._mock_programs_api(self.data, status=404)
+        response = self.client.get(self.details_page)
+        self.assertEquals(response.status_code, 404)
+
+        httpretty.reset()
+
+        self._mock_programs_api({})
         response = self.client.get(self.details_page)
         self.assertEquals(response.status_code, 404)

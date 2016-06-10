@@ -10,7 +10,7 @@ from microsite_configuration import microsite
 from django.core.urlresolvers import reverse
 import json
 from openedx.core.djangolib.js_utils import dump_js_escaped_json, js_escaped_string
-from openedx.core.djangolib.markup import Text, HTML
+from openedx.core.djangolib.markup import HTML, Text
 %>
 
 <%
@@ -65,13 +65,13 @@ from openedx.core.djangolib.markup import Text, HTML
 <div class="dashboard-notifications" tabindex="-1">
     %if message:
         <section class="dashboard-banner">
-            ${message | n, unicode}
+            ${message | n, decode.utf8}
         </section>
     %endif
 
     %if enrollment_message:
         <section class="dashboard-banner">
-            ${enrollment_message | n, unicode}
+            ${enrollment_message | n, decode.utf8}
         </section>
     %endif
 </div>
@@ -141,11 +141,11 @@ from openedx.core.djangolib.markup import Text, HTML
         <label for="dashboard-search-input">${_('Search Your Courses')}</label>
         <div class="search-field-wrapper">
           <input id="dashboard-search-input" type="text" class="search-field"/>
-          <button type="submit" class="search-button" aria-label="${_('Search')}">
-            <i class="icon fa fa-search" aria-hidden="true"></i>
+          <button type="submit" class="search-button" title="${_('Search')}">
+            <span class="icon fa fa-search" aria-hidden="true"></span>
           </button>
-          <button type="button" class="cancel-button" aria-label="${_('Clear search')}">
-            <i class="icon fa fa-remove" aria-hidden="true"></i>
+          <button type="button" class="cancel-button" title="${_('Clear search')}">
+            <span class="icon fa fa-remove" aria-hidden="true"></span>
           </button>
         </div>
       </form>
@@ -163,7 +163,7 @@ from openedx.core.djangolib.markup import Text, HTML
                   ${_("Browse recently launched courses and see what's new in your favorite subjects.")}
               </div>
               <div class="ad-link">
-                  <a class="btn-find-courses" href="${marketing_link('COURSES')}">
+                  <a class="btn-neutral" href="${marketing_link('COURSES')}">
                       <span class="icon fa fa-search" aria-hidden="true"></span>
                       ${_("Explore New Courses")}
                   </a>
@@ -193,25 +193,12 @@ from openedx.core.djangolib.markup import Text, HTML
       </ul>
     </section>
   </section>
-  % if xseries_credentials:
-    <div class="wrapper-xseries-certificates">
-      <p class="title">${_("XSeries Program Certificates")}</p>
-      <p class="copy">${_("You have received a certificate for the following XSeries programs:")}</p>
-      <ul>
-      % for xseries_credential in xseries_credentials:
-        <li>
-          <a class="copy" href="${xseries_credential['credential_url']}">${xseries_credential['display_name']}</a>
-        </li>
-      % endfor
-      </ul>
-    </div>
-  % endif
 </section>
 
 <section id="email-settings-modal" class="modal" aria-hidden="true">
   <div class="inner-wrapper" role="dialog" aria-labelledby="email-settings-title">
     <button class="close-modal">
-      <i class="icon fa fa-remove"></i>
+      <span class="icon fa fa-remove" aria-hidden="true"></span>
       <span class="sr">
         ## Translators: this is a control to allow users to exit out of this modal interface (a menu or piece of UI that takes the full focus of the screen)
         ${_("Close")}
@@ -242,7 +229,7 @@ from openedx.core.djangolib.markup import Text, HTML
 <section id="unenroll-modal" class="modal unenroll-modal" aria-hidden="true">
   <div class="inner-wrapper" role="dialog" aria-labelledby="unenrollment-modal-title">
     <button class="close-modal">
-      <i class="icon fa fa-remove"></i>
+      <span class="icon fa fa-remove" aria-hidden="true"></span>
       <span class="sr">
         ## Translators: this is a control to allow users to exit out of this modal interface (a menu or piece of UI that takes the full focus of the screen)
         ${_("Close")}

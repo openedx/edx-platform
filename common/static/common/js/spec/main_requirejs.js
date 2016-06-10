@@ -1,9 +1,12 @@
 (function(requirejs, define) {
+    'use strict';
+
     requirejs.config({
         baseUrl: '/base/',
         paths: {
             'gettext': 'js/test/i18n',
-            'jquery': 'js/vendor/jquery.min',
+            'jquery': 'common/js/vendor/jquery',
+            'jquery-migrate': 'common/js/vendor/jquery-migrate',
             'jquery.ui': 'js/vendor/jquery-ui.min',
             'jquery.flot': 'js/vendor/flot/jquery.flot.min',
             'jquery.form': 'js/vendor/jquery.form',
@@ -11,7 +14,7 @@
             'jquery.leanModal': 'js/vendor/jquery.leanModal',
             'jquery.ajaxQueue': 'js/vendor/jquery.ajaxQueue',
             'jquery.smoothScroll': 'js/vendor/jquery.smooth-scroll.min',
-            'jquery.scrollTo': 'js/vendor/jquery.scrollTo-1.4.2-min',
+            'jquery.scrollTo': 'common/js/vendor/jquery.scrollTo',
             'jquery.timepicker': 'js/vendor/timepicker/jquery.timepicker',
             'jquery.cookie': 'js/vendor/jquery.cookie',
             'jquery.qtip': 'js/vendor/jquery.qtip.min',
@@ -27,7 +30,7 @@
             'underscore.string': 'common/js/vendor/underscore.string',
             'backbone': 'common/js/vendor/backbone',
             'backbone.associations': 'js/vendor/backbone-associations-min',
-            'backbone.paginator': 'js/vendor/backbone.paginator.min',
+            'backbone.paginator': 'common/js/vendor/backbone.paginator',
             'backbone-super': 'js/vendor/backbone-super',
             'jasmine-imagediff': 'js/vendor/jasmine-imagediff',
             'URI': 'js/vendor/URI.min',
@@ -128,7 +131,7 @@
             },
             'backbone.paginator': {
                 deps: ['backbone'],
-                exports: 'Backbone.Paginator'
+                exports: 'Backbone.PageableCollection'
             },
             "backbone-super": {
                 deps: ["backbone"]
@@ -163,7 +166,6 @@
         'common/js/spec/components/feedback_spec.js',
         'common/js/spec/components/list_spec.js',
         'common/js/spec/components/paginated_view_spec.js',
-        'common/js/spec/components/paging_collection_spec.js',
         'common/js/spec/components/paging_header_spec.js',
         'common/js/spec/components/paging_footer_spec.js',
         'common/js/spec/components/search_field_spec.js',

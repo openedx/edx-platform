@@ -1,5 +1,6 @@
 <%inherit file="/main.html" />
 <%namespace name='static' file='/static_content.html'/>
+<%def name="online_help_token()"><% return "progress" %></%def>
 <%!
 from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse
@@ -33,10 +34,9 @@ from django.utils.http import urlquote_plus
 
 <%include file="/courseware/course_navigation.html" args="active_page='progress'" />
 
-<div class="container">
-  <div class="profile-wrapper">
-
-    <main id="main" aria-label="Content" tabindex="-1">
+<main id="main" aria-label="Content" tabindex="-1">
+    <div class="container">
+      <div class="profile-wrapper">
         <div class="course-info" id="course-info-progress" aria-label="${_('Course Progress')}">
           % if staff_access and studio_url is not None:
             <div class="wrap-instructor-info">
@@ -80,7 +80,10 @@ from django.utils.http import urlquote_plus
                     <p class="copy">${_("We're creating your certificate. You can keep working in your courses and a link to it will appear here and on your Dashboard when it is ready.")}</p>
                   </div>
                   <div class="msg-actions"></div>
-                  %elif not is_id_verified or is_unverified:
+                  %elif missing_required_verification or is_unverified:
+                  ## The is_unverified variable comes from certificate status.
+                  ## At the moment, the assumption is we should not show generate certificate button
+                  ## if the certificate previously generated is in unverified status
                   <div class="msg-content">
                     ## Translators: This message appears to users when the users have not completed identity verification.
                     <h2 class="title">${_("Certificate unavailable")}</h2>
@@ -124,7 +127,7 @@ from django.utils.http import urlquote_plus
                     %elif credit_course_requirements['eligibility_status'] == 'partial_eligible':
                         <span>${_("{student_name}, you have not yet met the requirements for credit.").format(student_name=student.profile.name) | h}</span>
                     %endif
-                    <a href="${settings.CREDIT_HELP_LINK_URL | h}" class="credit-help"><i class="fa fa-question"></i><span class="sr">${_("Information about course credit requirements")}</span></a><br>
+                    <a href="${settings.CREDIT_HELP_LINK_URL | h}" class="credit-help"><span class="fa fa-question" aria-hidden="true"></span><span class="sr">${_("Information about course credit requirements")}</span></a><br>
                     <div class="requirement-container" data-eligible="${credit_course_requirements['eligibility_status'] | h}">
                     %for requirement in credit_course_requirements['requirements']:
                         <div class="requirement">
@@ -139,13 +142,13 @@ from django.utils.http import urlquote_plus
                                     %if requirement['status'] == 'submitted':
                                         <span class="requirement-submitted">${_("Verification Submitted")}</span>
                                     %elif requirement['status'] == 'failed':
-                                        <i class="fa fa-times" aria-hidden="true"></i>
+                                        <span class="fa fa-times" aria-hidden="true"></span>
                                         <span>${_("Verification Failed" )}</span>
                                     %elif requirement['status'] == 'declined':
-                                        <i class="fa fa-times" aria-hidden="true"></i>
+                                        <span class="fa fa-times" aria-hidden="true"></span>
                                         <span>${_("Verification Declined" )}</span>
                                     %elif requirement['status'] == 'satisfied':
-                                        <i class="fa fa-check" aria-hidden="true"></i>
+                                        <span class="fa fa-check" aria-hidden="true"></span>
                                         <span>${_("Completed by")} ${get_time_display(requirement['status_date'], DEFAULT_SHORT_DATE_FORMAT, settings.TIME_ZONE)}</span>
                                     %endif
                                 %else:
@@ -155,7 +158,7 @@ from django.utils.http import urlquote_plus
                         </div>
                     %endfor
                      </div>
-                    <button class="detail-collapse" aria-live="polite"><i class="fa fa-caret-up" aria-hidden="true"></i>
+                    <button class="detail-collapse" aria-live="polite"><span class="fa fa-caret-up" aria-hidden="true"></span>
                         <span class="requirement-detail">${_("Less")}</span>
                     </button>
                 </div>
@@ -226,6 +229,6 @@ from django.utils.http import urlquote_plus
           </div> <!--End chapters-->
 
         </div>
-    </main>
-  </div>
-</div>
+      </div>
+    </div>
+</main>

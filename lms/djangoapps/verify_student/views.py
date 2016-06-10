@@ -334,6 +334,10 @@ class PayAndVerifyView(View):
         # Redirect the user to a more appropriate page if the
         # messaging won't make sense based on the user's
         # enrollment / payment / verification status.
+        sku_to_use = relevant_course_mode.sku
+        purchase_workflow = request.GET.get('purchase_workflow', 'single')
+        if purchase_workflow == 'bulk' and relevant_course_mode.bulk_sku:
+            sku_to_use = relevant_course_mode.bulk_sku
         redirect_response = self._redirect_if_necessary(
             message,
             already_verified,
@@ -342,7 +346,7 @@ class PayAndVerifyView(View):
             course_key,
             user_is_trying_to_pay,
             request.user,
-            relevant_course_mode.sku
+            sku_to_use
         )
         if redirect_response is not None:
             return redirect_response

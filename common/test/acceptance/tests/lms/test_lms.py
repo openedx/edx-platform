@@ -186,55 +186,71 @@ class LoginFromCombinedPageTest(UniqueCourseTest):
         course_names = self.dashboard_page.wait_for_page().available_courses
         self.assertIn(self.course_info["display_name"], course_names)
 
-        # Now logout and check that we can log back in instantly (because the account is linked):
-        LogoutPage(self.browser).visit()
+        try:
+            # Now logout and check that we can log back in instantly (because the account is linked):
+            LogoutPage(self.browser).visit()
 
-        self.login_page.visit()
-        self.login_page.click_third_party_dummy_provider()
+            self.login_page.visit()
+            self.login_page.click_third_party_dummy_provider()
 
-        self.dashboard_page.wait_for_page()
-
-        self._unlink_dummy_account()
+            self.dashboard_page.wait_for_page()
+        finally:
+            self._unlink_dummy_account()
 
     def test_hinted_login(self):
         """ Test the login page when coming from course URL that specified which third party provider to use """
         # Create a user account and link it to third party auth with the dummy provider:
         AutoAuthPage(self.browser, course_id=self.course_id).visit()
         self._link_dummy_account()
-        LogoutPage(self.browser).visit()
+        try:
+            LogoutPage(self.browser).visit()
 
-        # When not logged in, try to load a course URL that includes the provider hint ?tpa_hint=...
-        course_page = CoursewarePage(self.browser, self.course_id)
-        self.browser.get(course_page.url + '?tpa_hint=oa2-dummy')
+            # When not logged in, try to load a course URL that includes the provider hint ?tpa_hint=...
+            course_page = CoursewarePage(self.browser, self.course_id)
+            self.browser.get(course_page.url + '?tpa_hint=oa2-dummy')
 
-        # We should now be redirected to the login page
-        self.login_page.wait_for_page()
-        self.assertIn("Would you like to sign in using your Dummy credentials?", self.login_page.hinted_login_prompt)
-        # Baseline screen-shots are different for chrome and firefox.
-        self.assertScreenshot('#hinted-login-form', 'hinted-login-{}'.format(self.browser.name))
-        self.login_page.click_third_party_dummy_provider()
+            # We should now be redirected to the login page
+            self.login_page.wait_for_page()
+            self.assertIn(
+                "Would you like to sign in using your Dummy credentials?",
+                self.login_page.hinted_login_prompt
+            )
 
-        # We should now be redirected to the course page
-        course_page.wait_for_page()
+            # Baseline screen-shots are different for chrome and firefox.
+            self.assertScreenshot('#hinted-login-form', 'hinted-login-{}'.format(self.browser.name))
+            self.login_page.click_third_party_dummy_provider()
 
-        self._unlink_dummy_account()
+            # We should now be redirected to the course page
+            course_page.wait_for_page()
+        finally:
+            self._unlink_dummy_account()
 
     def _link_dummy_account(self):
         """ Go to Account Settings page and link the user's account to the Dummy provider """
         account_settings = AccountSettingsPage(self.browser).visit()
+        # switch to "Linked Accounts" tab
+        account_settings.switch_account_settings_tabs('accounts-tab')
+
         field_id = "auth-oa2-dummy"
         account_settings.wait_for_field(field_id)
-        self.assertEqual("Link", account_settings.link_title_for_link_field(field_id))
+        self.assertEqual("Link Your Account", account_settings.link_title_for_link_field(field_id))
         account_settings.click_on_link_in_link_field(field_id)
-        account_settings.wait_for_link_title_for_link_field(field_id, "Unlink")
+
+        # make sure we are on "Linked Accounts" tab after the account settings
+        # page is reloaded
+        account_settings.switch_account_settings_tabs('accounts-tab')
+        account_settings.wait_for_link_title_for_link_field(field_id, "Unlink This Account")
 
     def _unlink_dummy_account(self):
         """ Verify that the 'Dummy' third party auth provider is linked, then unlink it """
         # This must be done after linking the account, or we'll get cross-test side effects
         account_settings = AccountSettingsPage(self.browser).visit()
+        # switch to "Linked Accounts" tab
+        account_settings.switch_account_settings_tabs('accounts-tab')
+
         field_id = "auth-oa2-dummy"
         account_settings.wait_for_field(field_id)
-        self.assertEqual("Unlink", account_settings.link_title_for_link_field(field_id))
+        self.assertEqual("Unlink This Account", account_settings.link_title_for_link_field(field_id))
         account_settings.click_on_link_in_link_field(field_id)
         account_settings.wait_for_message(field_id, "Successfully unlinked")
 
@@ -372,9 +388,12 @@ class RegisterFromCombinedPageTest(UniqueCourseTest):
 
         # Now unlink the account (To test the account settings view and also to prevent cross-test side effects)
         account_settings = AccountSettingsPage(self.browser).visit()
+        # switch to "Linked Accounts" tab
+        account_settings.switch_account_settings_tabs('accounts-tab')
+
         field_id = "auth-oa2-dummy"
         account_settings.wait_for_field(field_id)
-        self.assertEqual("Unlink", account_settings.link_title_for_link_field(field_id))
+        self.assertEqual("Unlink This Account", account_settings.link_title_for_link_field(field_id))
         account_settings.click_on_link_in_link_field(field_id)
         account_settings.wait_for_message(field_id, "Successfully unlinked")
 
@@ -1328,4 +1347,9 @@ class CourseInfoA11yTest(UniqueCourseTest):
 
     def test_course_home_a11y(self):
         self.course_info_page.visit()
+        self.course_info_page.a11y_audit.config.set_rules({
+            "ignore": [
+                'section',  # TODO: wcag2aa
+            ]
+        })
         self.course_info_page.a11y_audit.check_for_accessibility_errors()

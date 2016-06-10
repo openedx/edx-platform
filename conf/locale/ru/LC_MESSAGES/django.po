@@ -46,7 +46,7 @@
 # Weyedide <weyedide@gmail.com>, 2014
 # Yana Malinovskaya <y.malinovskaya@itransition.com>, 2014
 # Yermek Alimzhanov <aermek81@gmail.com>, 2015
-# YummyTranslations EDX <yummytranslations.edx@gmail.com>, 2015
+# YummyTranslations Edx <yummytranslations.edx@gmail.com>, 2015
 # tonybond <zippo2021@gmail.com>, 2014
 # Андрей Сандлер <inactive+asandler@transifex.com>, 2013
 # Яна Ловягина <yana.lovyagina@raccoongang.com>, 2016
@@ -127,7 +127,7 @@
 # Weyedide <weyedide@gmail.com>, 2014
 # Yana Malinovskaya <y.malinovskaya@itransition.com>, 2014
 # Yermek Alimzhanov <aermek81@gmail.com>, 2015
-# YummyTranslations EDX <yummytranslations.edx@gmail.com>, 2015
+# YummyTranslations Edx <yummytranslations.edx@gmail.com>, 2015
 # Pavel Zamyshliaev, 2014
 # tonybond <zippo2021@gmail.com>, 2014
 # Андрей Сандлер <inactive+asandler@transifex.com>, 2013
@@ -186,7 +186,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-05-12 14:51+0000\n"
+"POT-Creation-Date: 2016-05-26 16:39+0000\n"
 "PO-Revision-Date: 2016-05-09 11:27+0000\n"
 "Last-Translator: Liubov Fomicheva <liubov.nelapa@gmail.com>\n"
 "Language-Team: Russian (http://www.transifex.com/open-edx/edx-platform/language/ru/)\n"
@@ -567,6 +567,10 @@ msgstr ""
 "пользователя, таким как WebAuth или Shibboleth.  Если вам нужна помощь, "
 "пожалуйста, свяжитесь с нами по адресу {tech_support_email}."
 
+#: common/djangoapps/student/admin.py
+msgid "User profile"
+msgstr ""
+
 #: common/djangoapps/student/forms.py
 msgid ""
 "That e-mail address doesn't have an associated user account. Are you sure "
@@ -676,6 +680,88 @@ msgid ""
 msgstr ""
 "Похоже, {email} принадлежит существующей учетной записи. Попробуйте еще раз "
 "с другого адреса электронной почты."
+
+#: common/djangoapps/student/management/commands/manage_group.py
+msgid "Removed group: \"{}\""
+msgstr ""
+
+#: common/djangoapps/student/management/commands/manage_group.py
+msgid "Did not find a group with name \"{}\" - skipping."
+msgstr ""
+
+#: common/djangoapps/student/management/commands/manage_group.py
+msgid "Invalid group name: \"{group_name}\". {messages}"
+msgstr ""
+
+#: common/djangoapps/student/management/commands/manage_group.py
+msgid "Created new group: \"{}\""
+msgstr ""
+
+#: common/djangoapps/student/management/commands/manage_group.py
+msgid "Found existing group: \"{}\""
+msgstr ""
+
+#: common/djangoapps/student/management/commands/manage_group.py
+msgid "Adding {codenames} permissions to group \"{group}\""
+msgstr ""
+
+#: common/djangoapps/student/management/commands/manage_group.py
+msgid "Removing {codenames} permissions from group \"{group}\""
+msgstr ""
+
+#: common/djangoapps/student/management/commands/manage_group.py
+msgid ""
+"Invalid permission option: \"{}\". Please specify permissions using the "
+"format: app_label:model_name:permission_codename."
+msgstr ""
+
+#: common/djangoapps/student/management/commands/manage_group.py
+msgid ""
+"Invalid permission codename: \"{codename}\".  No such permission exists for "
+"the model {module}.{model_name}."
+msgstr ""
+
+#: common/djangoapps/student/management/commands/manage_user.py
+msgid "Setting {attribute} for user \"{username}\" to \"{new_value}\""
+msgstr ""
+
+#: common/djangoapps/student/management/commands/manage_user.py
+msgid ""
+"Skipping user \"{}\" because the specified and existing email addresses do "
+"not match."
+msgstr ""
+
+#: common/djangoapps/student/management/commands/manage_user.py
+msgid "Did not find a user with username \"{}\" - skipping."
+msgstr ""
+
+#: common/djangoapps/student/management/commands/manage_user.py
+msgid "Removing user: \"{}\""
+msgstr ""
+
+#: common/djangoapps/student/management/commands/manage_user.py
+msgid "Created new user: \"{}\""
+msgstr ""
+
+#: common/djangoapps/student/management/commands/manage_user.py
+msgid "Found existing user: \"{}\""
+msgstr ""
+
+#: common/djangoapps/student/management/commands/manage_user.py
+msgid "Created new profile for user: \"{}\""
+msgstr ""
+
+#: common/djangoapps/student/management/commands/manage_user.py
+msgid "Could not find a group named \"{}\" - skipping."
+msgstr ""
+
+#: common/djangoapps/student/management/commands/manage_user.py
+msgid "Adding user \"{username}\" to groups {group_names}"
+msgstr ""
+
+#: common/djangoapps/student/management/commands/manage_user.py
+msgid "Removing user \"{username}\" from groups {group_names}"
+msgstr ""
 
 #: common/djangoapps/student/middleware.py
 msgid ""
@@ -799,6 +885,14 @@ msgid ""
 msgstr ""
 "Период времени в микросекундах после записи на курс, в течение которого "
 "платёж может быть возвращён пользователю.  По умолчанию составляет 14 дней."
+
+#: common/djangoapps/student/models.py
+msgid "Name of this user attribute."
+msgstr ""
+
+#: common/djangoapps/student/models.py
+msgid "Value of this user attribute."
+msgstr ""
 
 #: common/djangoapps/student/views.py
 msgid "The course you are looking for does not start until {date}."
@@ -6086,6 +6180,14 @@ msgstr "Почтовый адрес"
 msgid "Goals"
 msgstr "Цели"
 
+#: lms/djangoapps/instructor/views/api.py
+msgid "Cohort"
+msgstr "Группа"
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "Team"
+msgstr "Команда"
+
 #. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: This label appears above a field on the registration form
 #. which allows the user to input the city in which they live.
@@ -6109,14 +6211,6 @@ msgstr "Город"
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "Country"
 msgstr "Страна"
-
-#: lms/djangoapps/instructor/views/api.py
-msgid "Cohort"
-msgstr "Группа"
-
-#: lms/djangoapps/instructor/views/api.py
-msgid "Team"
-msgstr "Команда"
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
@@ -6833,11 +6927,17 @@ msgstr "создано сертификатов"
 msgid "cohorted"
 msgstr "распределено по группам"
 
+#. Translators: This label appears above a field on the registration form
+#. which allows the user to input the First Name
 #: lms/djangoapps/instructor_task/tasks_helper.py
+#: openedx/core/djangoapps/user_api/views.py
 msgid "First Name"
 msgstr "Имя"
 
+#. Translators: This label appears above a field on the registration form
+#. which allows the user to input the First Name
 #: lms/djangoapps/instructor_task/tasks_helper.py
+#: openedx/core/djangoapps/user_api/views.py
 msgid "Last Name"
 msgstr "Фамилия"
 
@@ -6847,7 +6947,11 @@ msgstr "Фамилия"
 msgid "Company Name"
 msgstr "Наименование компании"
 
-#: lms/djangoapps/instructor_task/tasks_helper.py wiki/forms.py
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: This label appears above a field on the registration form
+#. which allows the user to input the Title
+#: lms/djangoapps/instructor_task/tasks_helper.py
+#: openedx/core/djangoapps/user_api/views.py wiki/forms.py
 msgid "Title"
 msgstr "Заголовок"
 
@@ -9083,6 +9187,12 @@ msgstr "Эта версия была удалена."
 msgid "Restoring to this revision will mark the article as deleted."
 msgstr "Если восстановить эту версию, статья будет помечена как удалённая."
 
+#: openedx/core/djangoapps/api_admin/admin.py
+msgid ""
+"Once you have approved this request, go to {catalog_admin_url} to set up a "
+"catalog for this user."
+msgstr ""
+
 #: openedx/core/djangoapps/api_admin/forms.py
 msgid "Company Address"
 msgstr ""
@@ -9370,6 +9480,10 @@ msgstr ""
 "Ссылка на миниатюру образовательной организации - провайдера кредитов."
 
 #: openedx/core/djangoapps/credit/models.py
+msgid "Credit requirement statuses"
+msgstr ""
+
+#: openedx/core/djangoapps/credit/models.py
 msgid "Deadline for purchasing and requesting credit."
 msgstr "Крайний срок подачи заявки и оформления кредита."
 
@@ -9466,6 +9580,10 @@ msgstr ""
 
 #: openedx/core/djangoapps/programs/models.py
 msgid "Do we want to show program listing page"
+msgstr ""
+
+#: openedx/core/djangoapps/programs/models.py
+msgid "Do we want to show program details pages"
 msgstr ""
 
 #: openedx/core/djangoapps/self_paced/models.py
@@ -9640,6 +9758,12 @@ msgstr "Расскажите нам, почему вы заинтересова�
 #: openedx/core/djangoapps/user_api/views.py
 msgid "State/Province/Region"
 msgstr "Штат/регион/область"
+
+#. Translators: This label appears above a field on the registration form
+#. which allows the user to input the Company
+#: openedx/core/djangoapps/user_api/views.py
+msgid "Company"
+msgstr ""
 
 #: openedx/core/djangoapps/user_api/views.py
 msgid "Please select your Country."
@@ -10449,8 +10573,7 @@ msgstr "Начало"
 msgid "View all Courses"
 msgstr "Посмотреть все курсы"
 
-#: lms/templates/dashboard.html lms/templates/user_dropdown.html
-#: themes/edx.org/lms/templates/dashboard.html
+#: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
 msgid "Dashboard"
 msgstr "Панель управления"
 
@@ -10487,14 +10610,6 @@ msgstr "Сведения об учётной записи"
 #: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
 msgid "Order History"
 msgstr "История заказов"
-
-#: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
-msgid "XSeries Program Certificates"
-msgstr "Сертификаты Программ XSeries"
-
-#: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
-msgid "You have received a certificate for the following XSeries programs:"
-msgstr "Вы получили сертификат по следующим программам XSeries:"
 
 #: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
 msgid "Email Settings for {course_number}"
@@ -10547,6 +10662,20 @@ msgstr ""
 #: lms/templates/email_exists.html
 msgid "An account with the new e-mail address already exists."
 msgstr "Учетная запись с таким адресом электронной почты уже существует."
+
+#: lms/templates/enroll_staff.html
+msgid "You should Register before trying to access the Unit"
+msgstr ""
+
+#: lms/templates/enroll_staff.html lms/templates/ccx/enrollment.html
+#: lms/templates/courseware/course_about.html
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid "Enroll"
+msgstr "Внести в список"
+
+#: lms/templates/enroll_staff.html
+msgid "Don't enroll"
+msgstr ""
 
 #: lms/templates/enroll_students.html
 msgid "Student Enrollment Form"
@@ -11050,6 +11179,10 @@ msgstr "Необработанные данные:"
 #: lms/templates/navigation.html themes/red-theme/lms/templates/header.html
 msgid "Global"
 msgstr "Глобально"
+
+#: lms/templates/navigation.html themes/edx.org/lms/templates/header.html
+msgid "Your Dashboard"
+msgstr ""
 
 #: lms/templates/navigation.html themes/edx.org/lms/templates/header.html
 #: themes/red-theme/lms/templates/header.html
@@ -11758,16 +11891,16 @@ msgid "Usermenu dropdown"
 msgstr ""
 
 #: lms/templates/user_dropdown.html
-msgid "Profile"
-msgstr "Профиль"
+msgid "Profile for:"
+msgstr ""
 
 #: lms/templates/user_dropdown.html
-msgid "Profile image for {username}"
-msgstr "Фото {username}"
+msgid "Account settings menu"
+msgstr ""
 
-#: lms/templates/user_dropdown.html themes/red-theme/lms/templates/header.html
-msgid "More options dropdown"
-msgstr "Меню с дополнительными опциями"
+#: lms/templates/user_dropdown.html
+msgid "Account settings"
+msgstr ""
 
 #: lms/templates/using.html
 msgid "Using the system"
@@ -12652,12 +12785,6 @@ msgid ""
 msgstr ""
 
 #: lms/templates/ccx/enrollment.html
-#: lms/templates/courseware/course_about.html
-#: lms/templates/instructor/instructor_dashboard_2/membership.html
-msgid "Enroll"
-msgstr "Внести в список"
-
-#: lms/templates/ccx/enrollment.html
 msgid "Student List Management"
 msgstr "Управлять списком слушателей"
 
@@ -12933,8 +13060,8 @@ msgstr "Пожалуйста подождите  пока мы получаем 
 
 #: lms/templates/course_modes/choose.html
 #: themes/edx.org/lms/templates/course_modes/choose.html
-msgid "Enroll In {} | Choose Your Track"
-msgstr "Записаться на курс «{}» | Выбрать форму обучения"
+msgid "Enroll In {course_name} | Choose Your Track"
+msgstr ""
 
 #: lms/templates/course_modes/choose.html
 #: themes/edx.org/lms/templates/course_modes/choose.html
@@ -13255,7 +13382,6 @@ msgstr ""
 "даты выпуска."
 
 #: lms/templates/courseware/course_updates.html
-#: lms/templates/discussion/_similar_posts.html
 msgid "Hide"
 msgstr "Скрыть"
 
@@ -13451,6 +13577,24 @@ msgid ""
 msgstr ""
 "Мы создали ваш сертификат. Продолжайте обучение, и ссылка на сертификат "
 "появится на панели управления, когда он будет готов."
+
+#. Translators: This message appears to users when the users have not
+#. completed
+#. identity verification.
+#: lms/templates/courseware/progress.html
+msgid "Certificate unavailable"
+msgstr ""
+
+#: lms/templates/courseware/progress.html
+msgid ""
+"You have not received a certificate because you do not have a current "
+"{platform_name} verified identity. "
+msgstr ""
+
+#: lms/templates/courseware/progress.html
+#: lms/templates/dashboard/_dashboard_certificate_information.html
+msgid "Verify your identity now."
+msgstr ""
 
 #: lms/templates/courseware/progress.html
 msgid "Congratulations, you qualified for a certificate!"
@@ -13675,6 +13819,12 @@ msgstr ""
 "против Ирана, Кубы, Сирии и Судана. Если вы думаете, что наша система по "
 "ошибке идентифицировала вашу связь с этими странами, пожалуйста, свяжитесь с"
 " нами по почте {email}."
+
+#: lms/templates/dashboard/_dashboard_certificate_information.html
+msgid ""
+"Your certificate was not issued because you do not have a current verified "
+"identity with {platform_name}. "
+msgstr ""
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid "Your {cert_name_short} is Generating"
@@ -14073,18 +14223,6 @@ msgstr "Подробнее о {category}"
 msgid "Results:"
 msgstr "Результаты:"
 
-#: lms/templates/discussion/_blank_slate.html
-msgid ""
-"Sorry! We can't find anything matching your search. Please try another "
-"search."
-msgstr ""
-"Извините! Мы не можем найти ничего совпадающего с тем, что вы ищете. "
-"Пожалуйста, попробуйте ввести другой запрос."
-
-#: lms/templates/discussion/_blank_slate.html
-msgid "There are no posts here yet. Be the first one to post!"
-msgstr "Здесь еще нет сообщений. Станьте первым, кто оставит сообщение!"
-
 #: lms/templates/discussion/_discussion_course_navigation.html
 #: lms/templates/discussion/_discussion_module.html
 msgid "New Post"
@@ -14120,14 +14258,6 @@ msgstr "Все обсуждения"
 #: lms/templates/discussion/_filter_dropdown.html
 msgid "Posts I'm Following"
 msgstr "Отслеживаемые сообщения"
-
-#: lms/templates/discussion/_recent_active_posts.html
-msgid "Following"
-msgstr "Отслеживаемые"
-
-#: lms/templates/discussion/_search_bar.html
-msgid "Search posts"
-msgstr "Поиск по сообщениям"
 
 #: lms/templates/discussion/_thread_list_template.html
 msgid "Discussion topics; currently listing: "
@@ -16225,6 +16355,10 @@ msgstr ""
 "строку и не включайте каких-либо колонтитулов, или пустых строк."
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid "Upload a CSV for bulk enrollment"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Upload CSV"
 msgstr "Загрузить файл в формате CSV"
 
@@ -16795,6 +16929,10 @@ msgstr ""
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Show Background Task History for Problem"
 msgstr "Показать историю фоновых задач"
+
+#: lms/templates/learner_dashboard/program_details.html
+msgid "Program Details"
+msgstr ""
 
 #: lms/templates/learner_dashboard/programs.html
 msgid "Your Programs"
@@ -18027,6 +18165,10 @@ msgid ""
 msgstr ""
 "{tos_link_start}Условия предоставления услуг{tos_link_end} и "
 "{honor_link_start}Кодекс Чести{honor_link_end}"
+
+#: themes/red-theme/lms/templates/header.html
+msgid "More options dropdown"
+msgstr "Меню с дополнительными опциями"
 
 #: themes/red-theme/lms/templates/header.html
 msgid "My Profile"
@@ -20633,8 +20775,8 @@ msgstr ""
 "курсов. Кроме того, мы всегда готовы помочь, просто напишите нам."
 
 #: cms/templates/settings.html
-msgid "Schedule &amp; Details Settings"
-msgstr "Настройки расписания и обзора курса"
+msgid "Schedule & Details Settings"
+msgstr ""
 
 #: cms/templates/settings.html cms/templates/widgets/header.html
 msgid "Schedule & Details"
@@ -20786,16 +20928,12 @@ msgstr "Эти даты не могут быть использованы для
 
 #: cms/templates/settings.html
 msgid ""
-"These dates impact <strong>when your courseware can be viewed</strong>, but "
-"they are <strong>not the dates shown on your course summary page</strong>. "
-"To provide the course start and registration dates as shown on your course "
-"summary page, follow the instructions provided by your Program Manager."
+"These dates impact {strong_start}when your courseware can be "
+"viewed{strong_end}, but they are {strong_start}not the dates shown on your "
+"course summary page{strong_end}. To provide the course start and "
+"registration dates as shown on your course summary page, follow the "
+"instructions provided by your Program Manager."
 msgstr ""
-"Эти даты определяют, <strong>когда содержание курса станет доступным для "
-"просмотра</strong>, но они <strong>не отображаются на странице «Описание "
-"курса»</strong>.  Чтобы установить даты начала курса и регистрации, "
-"отображаемые на странице «Описание курса», следуйте инструкциям своего "
-"методиста."
 
 #: cms/templates/settings.html
 msgid "Course Details"
@@ -20871,16 +21009,10 @@ msgid "Course Overview"
 msgstr "Обзор курса"
 
 #: cms/templates/settings.html
-msgid "your course summary page"
-msgstr "страница с кратким содержанием вашего курса"
-
-#: cms/templates/settings.html
-#, python-format
 msgid ""
-"Introductions, prerequisites, FAQs that are used on %s (formatted in HTML)"
+"Introductions, prerequisites, FAQs that are used on {a_link_start}your "
+"course summary page{a_link_end} (formatted in HTML)"
 msgstr ""
-"Введениe, требования, часто задаваемые вопросы, которые используются на %s "
-"(в формате HTML)"
 
 #: cms/templates/settings.html
 msgid "Course Card Image"
@@ -20888,11 +21020,9 @@ msgstr ""
 
 #: cms/templates/settings.html
 msgid ""
-"You can manage this image along with all of your other <a href='{}'>files "
-"&amp; uploads</a>"
+"You can manage this image along with all of your other {a_link_start}files "
+"and uploads{a_link_end}"
 msgstr ""
-"Вы можете распоряжаться этим изображением наряду со всеми остальными <a "
-"href='{}'>загруженными файлами</a>"
 
 #: cms/templates/settings.html
 msgid ""

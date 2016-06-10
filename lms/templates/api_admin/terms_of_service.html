@@ -1,10 +1,12 @@
 ## mako
 <%page expression_filter="h"/>
 <%inherit file="../main.html"/>
-<%
+<%!
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
 %>
+
+<%block name="pagetitle">${_("API Terms of Service")}</%block>
 
 <div id="api-access-wrapper">
   <h1 id="api-header">${_("Terms of Service for {platform_name} APIs").format(platform_name=settings.PLATFORM_NAME)}</h1>

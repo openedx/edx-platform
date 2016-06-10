@@ -22,6 +22,7 @@ class ProgramsApiConfigMixin(object):
         'enable_studio_tab': True,
         'enable_certification': True,
         'xseries_ad_enabled': True,
+        'program_listing_enabled': True,
         'program_details_enabled': True,
     }
 
@@ -99,31 +100,6 @@ class ProgramsDataMixin(object):
             ),
         ]
     }
-
-    PROGRAMS_CREDENTIALS_DATA = [
-        {
-            "id": 1,
-            "username": "test",
-            "credential": {
-                "credential_id": 1,
-                "program_id": 1
-            },
-            "status": "awarded",
-            "uuid": "dummy-uuid-1",
-            "certificate_url": "http://credentials.edx.org/credentials/dummy-uuid-1/"
-        },
-        {
-            "id": 2,
-            "username": "test",
-            "credential": {
-                "credential_id": 2,
-                "program_id": 2
-            },
-            "status": "awarded",
-            "uuid": "dummy-uuid-2",
-            "certificate_url": "http://credentials.edx.org/credentials/dummy-uuid-2/"
-        }
-    ]
 
     def mock_programs_api(self, data=None, status_code=200):
         """Utility for mocking out Programs API URLs."""

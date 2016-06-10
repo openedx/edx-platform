@@ -1,22 +1,6 @@
 # #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
-# #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
 # edX translation file.
 # Copyright (C) 2016 EdX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# #-#-#-#-#  djangojs-studio.po (0.1a)  #-#-#-#-#
-# edX translation file.
-# Copyright (C) 2016 EdX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# #-#-#-#-#  underscore.po (0.1a)  #-#-#-#-#
-# edX translation file
-# Copyright (C) 2016 edX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# #-#-#-#-#  underscore-studio.po (0.1a)  #-#-#-#-#
-# edX translation file
-# Copyright (C) 2016 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
@@ -68,6 +52,7 @@
 # yan9yu, 2014
 # yan9yu, 2014
 # youjialin <hackeris@qq.com>, 2014
+# Yue Fang <yfang@juilliard.edu>, 2016
 # 刘知远 <liuliudong@163.com>, 2013
 # 张太红 <zth@xjau.edu.cn>, 2014
 # 亚仑 <fl_meng@163.com>, 2014
@@ -83,24 +68,8 @@
 # 肖寒 <bookman@vip.163.com>, 2013
 # 顾翔 <c0710204@gmail.com>, 2014
 # #-#-#-#-#  djangojs-studio.po (edx-platform)  #-#-#-#-#
-# #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
 # edX translation file.
 # Copyright (C) 2016 EdX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# #-#-#-#-#  djangojs-studio.po (0.1a)  #-#-#-#-#
-# edX translation file.
-# Copyright (C) 2016 EdX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# #-#-#-#-#  underscore.po (0.1a)  #-#-#-#-#
-# edX translation file
-# Copyright (C) 2016 edX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# #-#-#-#-#  underscore-studio.po (0.1a)  #-#-#-#-#
-# edX translation file
-# Copyright (C) 2016 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
@@ -170,6 +139,7 @@
 # louyihua <supermouselyh@hotmail.com>, 2014-2015
 # viztor <viztor@outlook.com>, 2015
 # viztor <viztor@outlook.com>, 2015
+# Yue Fang <yfang@juilliard.edu>, 2016
 # Zihui Cheng <z7cheng@ucsd.edu>, 2015
 # 代 兴旺 <525224259@qq.com>, 2016
 # 张逸涵 <jeanzhang970128@gmail.com>, 2014
@@ -195,6 +165,7 @@
 # Rom, 2015
 # San <github@zhujunsan.net>, 2015
 # louyihua <supermouselyh@hotmail.com>, 2014-2015
+# yohann yang <heinerseiden@yahoo.com>, 2016
 # Yu <inactive+harrycaoyu@transifex.com>, 2015
 # Yu <inactive+harrycaoyu@transifex.com>, 2015
 # 大芳 刘 <liuxiaolinfk@gmail.com>, 2016
@@ -203,9 +174,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-05-12 14:50+0000\n"
-"PO-Revision-Date: 2016-05-09 11:26+0000\n"
-"Last-Translator: Ned Batchelder <ned@edx.org>\n"
+"POT-Creation-Date: 2016-05-26 16:38+0000\n"
+"PO-Revision-Date: 2016-05-30 05:09+0000\n"
+"Last-Translator: yohann yang <heinerseiden@yahoo.com>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/open-edx/edx-platform/language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -450,7 +421,7 @@ msgstr "状态：未提交"
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Paragraph"
-msgstr "段落样式"
+msgstr "段落"
 
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Preformatted"
@@ -557,7 +528,7 @@ msgstr "块"
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Body"
-msgstr "Body 标签"
+msgstr "主体"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -875,7 +846,7 @@ msgstr "字号"
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Footer"
-msgstr "表注"
+msgstr "脚注"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -984,7 +955,7 @@ msgstr "标题"
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Height"
-msgstr "高"
+msgstr "高度"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -1032,7 +1003,7 @@ msgstr "增加缩进"
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Inline"
-msgstr "内联"
+msgstr "对齐"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -1837,15 +1808,28 @@ msgstr[0] "%(value)s 秒钟"
 
 #: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js
 msgid ""
-"Volume: Click on this button to mute or unmute this video or press UP or "
+"Click on this button to mute or unmute this video or press UP or DOWN "
+"buttons to increase or decrease volume level."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js
+msgid "Adjust video volume"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/08_video_speed_control.js
 msgid ""
-"Speed: Press UP to enter the speed menu then use the UP and DOWN arrow keys "
-"to navigate the different speeds, then press ENTER to change to the selected"
-" speed."
-msgstr "速度：按“UP”进入速度菜单，然后按“UP”和“DOWN”方向的按钮来调整速度，然后按“ENTER”键来改变选定速度。"
+"Press UP to enter the speed menu then use the UP and DOWN arrow keys to "
+"navigate the different speeds, then press ENTER to change to the selected "
+"speed."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/js/src/video/08_video_speed_control.js
+msgid "Adjust video speed"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/js/src/video/08_video_speed_control.js
+msgid "Video speed: "
+msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/09_play_skip_control.js
 msgid "Skip"
@@ -1858,6 +1842,10 @@ msgstr "播放视频"
 #: common/lib/xmodule/xmodule/js/src/video/09_skip_control.js
 msgid "Do not show again"
 msgstr "不在显示"
+
+#: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
+msgid "Open language menu"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "Transcript will be displayed when you start playing the video."
@@ -1883,10 +1871,10 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid ""
-"Language: Press the UP arrow key to enter the language menu then use UP and "
-"DOWN arrow keys to navigate language options. Press ENTER to change to the "
-"selected language."
-msgstr "语言：按下向上箭头按键以进入语言菜单，随后使用向上和向下箭头按键来导航语言选项。按下“输入”来更改已选择的语言。"
+"Press the UP arrow key to enter the language menu then use UP and DOWN arrow"
+" keys to navigate language options. Press ENTER to change to the selected "
+"language."
+msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "Open language menu."
@@ -2794,7 +2782,7 @@ msgstr "生成学生档案信息时出现错误，请重试。"
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
 #: lms/static/js/bookmarks/views/bookmarks_list.js
 #: lms/templates/search/search_loading.underscore
-#: lms/templates/student_account/account_settings.underscore
+#: lms/templates/student_account/account_settings_section.underscore
 msgid "Loading"
 msgstr "正在加载"
 
@@ -4007,7 +3995,12 @@ msgid ""
 msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
-msgid "Basic Account Information (required)"
+msgid "Basic Account Information"
+msgstr ""
+
+#: lms/static/js/student_account/views/account_settings_factory.js
+msgid ""
+"These settings include basic information about your account. You can also "
 msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
@@ -4043,17 +4036,11 @@ msgid "Password"
 msgstr "密码"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
-msgid "Reset your Password"
+msgid "Reset Your Password"
 msgstr ""
 
-#: lms/templates/student_account/account.underscore
-msgid "Reset Password"
-msgstr "重设密码"
-
 #: lms/static/js/student_account/views/account_settings_factory.js
-msgid ""
-"When you click \"Reset Password\", a message will be sent to your email "
-"address. Click the link in the message to reset your password."
+msgid "When you click \"Reset Your Password\", edX will send a message "
 msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
@@ -4067,7 +4054,7 @@ msgid "Country or Region"
 msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
-msgid "Additional Information (optional)"
+msgid "Additional Information"
 msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
@@ -4088,17 +4075,20 @@ msgid "Preferred Language"
 msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
-msgid "Connected Accounts"
+#: lms/static/js/student_account/views/account_settings_view.js
+msgid "Linked Accounts"
 msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
-msgid "Connect your {accountName} account"
+msgid ""
+"You can link your social media accounts to your edX account to make signing "
+"in to edx.org "
 msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_fields.js
 msgid ""
 "We've sent a confirmation message to {new_email_address}. Click the link in "
-"the message to update your email address."
+"the "
 msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_fields.js
@@ -4109,15 +4099,31 @@ msgstr ""
 #: lms/static/js/student_account/views/account_settings_fields.js
 msgid ""
 "We've sent a message to {email_address}. Click the link in the message to "
-"reset your password."
+"reset "
 msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_fields.js
-msgid "Unlink"
+msgid "Link your {accountName} account"
 msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_fields.js
-msgid "Link"
+msgid "Unlink This Account"
+msgstr ""
+
+#: lms/static/js/student_account/views/account_settings_fields.js
+msgid "You can use your {accountName} account to sign in to your edX account."
+msgstr ""
+
+#: lms/static/js/student_account/views/account_settings_fields.js
+msgid "Unlink your {accountName} account"
+msgstr ""
+
+#: lms/static/js/student_account/views/account_settings_fields.js
+msgid "Link Your Account"
+msgstr ""
+
+#: lms/static/js/student_account/views/account_settings_fields.js
+msgid "Link your {accountName} account to your edX account and "
 msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_fields.js
@@ -4130,6 +4136,10 @@ msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_fields.js
 msgid "Successfully unlinked."
+msgstr ""
+
+#: lms/static/js/student_account/views/account_settings_view.js
+msgid "Account Information"
 msgstr ""
 
 #: lms/static/js/student_profile/views/badge_list_container.js
@@ -5471,6 +5481,7 @@ msgstr "日期"
 
 #: cms/templates/js/edit-chapter.underscore
 #: lms/templates/ccx/schedule.underscore
+#: lms/templates/commerce/receipt.underscore
 #: lms/templates/learner_dashboard/program_card.underscore
 msgid "gettext("
 msgstr ""
@@ -5842,7 +5853,7 @@ msgstr "讨论"
 msgid ""
 "Questions raise issues that need answers. Discussions share ideas and start "
 "conversations."
-msgstr "“问题”提出需要答案的议题，“讨论”分享想法并开始会话。"
+msgstr "“问题”提出需要答案的议题，“讨论”分享想法并开始交流。"
 
 #: common/static/common/templates/discussion/thread.underscore
 msgid "Add a Response"
@@ -6108,7 +6119,7 @@ msgstr ""
 #: lms/static/js/fixtures/donation.underscore
 #: lms/templates/dashboard/donation.underscore
 msgid "Donate"
-msgstr "捐助"
+msgstr "捐献"
 
 #: lms/templates/api_admin/catalog-error.underscore
 msgid ""
@@ -6267,7 +6278,7 @@ msgstr "账单寄给"
 #: lms/templates/commerce/receipt.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
 msgid "No receipt available"
-msgstr "没有可用的收据。"
+msgstr "没有可提供的收据。"
 
 #: lms/templates/commerce/receipt.underscore
 #: lms/templates/financial-assistance/financial_assessment_submitted.underscore
@@ -6276,17 +6287,12 @@ msgstr ""
 
 #: lms/templates/commerce/receipt.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
-#, python-format
-msgid ""
-"If you don't verify your identity now, you can still explore your course "
-"from your dashboard. You will receive periodic reminders from "
-"%(platformName)s to verify your identity."
-msgstr "如果你现在不验证你的身份，你仍可以通过课程面板浏览课程。但你会定期从%(platformName)s收到身份验证提醒。"
+msgid "Want to confirm your identity later?"
+msgstr "希望稍后再验证你的身份？"
 
 #: lms/templates/commerce/receipt.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Want to confirm your identity later?"
-msgstr "希望以后再验证你的身份？"
+msgid "/verify_student/verify-now/{courseKey}/"
+msgstr ""
 
 #: lms/templates/commerce/receipt.underscore
 msgid "Verify Now"
@@ -6352,6 +6358,7 @@ msgid "Clear search results"
 msgstr "清空搜索结果"
 
 #: lms/templates/fields/field_dropdown.underscore
+#: lms/templates/fields/field_dropdown_account.underscore
 #: lms/templates/fields/field_textarea.underscore
 msgid "Click to edit"
 msgstr ""
@@ -6510,41 +6517,41 @@ msgstr ""
 #: lms/templates/instructor/instructor_dashboard_2/cohort-discussions-course-wide.underscore
 #: lms/templates/instructor/instructor_dashboard_2/cohorts.underscore
 msgid "Specify whether discussion topics are divided by cohort"
-msgstr "指定是否由群组对讨论主题进行划分。"
+msgstr "指定是否按群组划分讨论话题。"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-discussions-course-wide.underscore
 msgid "Course-Wide Discussion Topics"
-msgstr "全课程范围内的讨论主题"
+msgstr "全课程范围内的讨论话题"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-discussions-course-wide.underscore
 msgid ""
 "Select the course-wide discussion topics that you want to divide by cohort."
-msgstr "选择您希望由群组划分的全课程范围内的讨论主题。"
+msgstr "选择您希望由群组划分的全课程范围内的讨论话题。"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-discussions-inline.underscore
 msgid "Content-Specific Discussion Topics"
-msgstr "特定于内容的讨论主题"
+msgstr "特定内容的讨论话题"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-discussions-inline.underscore
 msgid ""
 "Specify whether content-specific discussion topics are divided by cohort."
-msgstr "指定是否要由群组对特定于内容的讨论主题进行划分。"
+msgstr "指定是否由群组划分特定内容的讨论话题。"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-discussions-inline.underscore
 msgid "Always cohort content-specific discussion topics"
-msgstr "总是群组化特定于内容的讨论主题"
+msgstr "总是根据特定内容的讨论话题分组"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-discussions-inline.underscore
 msgid "Cohort selected content-specific discussion topics"
-msgstr "群组化所选的特定于内容的讨论主题"
+msgstr "根据选定的特定内容的讨论话题分组"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-discussions-inline.underscore
 msgid "No content-specific discussion topics exist."
-msgstr "不存在特定于内容的讨论主题。"
+msgstr "无特定内容的讨论话题"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-discussions-subcategory.underscore
 msgid "Cohorted"
-msgstr "已群组化"
+msgstr "已分组"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
 msgid "Manage Students"
@@ -6558,13 +6565,13 @@ msgstr "将学生加入到该群组中"
 msgid ""
 "Note: Students can be in only one cohort. Adding students to this group "
 "overrides any previous group assignment."
-msgstr "注意：每个学生只能加入一个群组，将学生加入该组会覆盖之前对该学生所有的群组分配。"
+msgstr "注意：每个学生只能加入一个群组，将学生加入这个组会让他们自动退出前一组。"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
 msgid ""
 "Enter email addresses and/or usernames, separated by new lines or commas, "
 "for the students you want to add. *"
-msgstr "请输入要添加的学生的电子地址和／或用户名，每行一个或用逗号隔开。*"
+msgstr "请输入要添加的学生的电子地址和／或用户名，学生之间用新行或逗号隔开。*"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
@@ -6612,11 +6619,11 @@ msgstr "手动"
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 msgid ""
 "There must be one cohort to which students can automatically be assigned."
-msgstr "必须存在一个可以将学生自动分配进去的群组。"
+msgstr "必须存在一个学生可被自动分配进去的群组。"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 msgid "Associated Content Group"
-msgstr "已关联的内容组"
+msgstr "已加入的内容组"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 msgid "No Content Group"
@@ -6754,12 +6761,30 @@ msgid ""
 "%(total_courses)s courses so far."
 msgstr ""
 
+#: lms/templates/learner_dashboard/program_header_view.underscore
+msgid "Programs"
+msgstr ""
+
+#: lms/templates/learner_dashboard/program_header_view.underscore
+msgid "{category}\\'s program"
+msgstr ""
+
+#: lms/templates/learner_dashboard/program_header_view.underscore
+msgid "{organization}\\'s logo"
+msgstr ""
+
+#: lms/templates/learner_dashboard/program_header_view.underscore
+msgid ""
+"To complete the {program} XSeries and earn an XSeries Certificate you must "
+"successfully earn a Verified Certificate in all courses shown below."
+msgstr ""
+
 #: lms/templates/search/course_search_results.underscore
 #: lms/templates/search/dashboard_search_results.underscore
 #, python-format
 msgid "Load next %(num_items)s result"
 msgid_plural "Load next %(num_items)s results"
-msgstr[0] "加载随后 %(num_items)s 个结果"
+msgstr[0] "加载后 %(num_items)s 个结果"
 
 #: lms/templates/search/course_search_results.underscore
 #: lms/templates/search/dashboard_search_results.underscore
@@ -6776,24 +6801,25 @@ msgstr "新地址"
 
 #: lms/templates/student_account/account.underscore
 msgid "Change My Email Address"
-msgstr "更改我的电子邮件地址"
+msgstr "更改我的电子邮件"
+
+#: lms/templates/student_account/account.underscore
+msgid "Reset Password"
+msgstr "重设密码"
 
 #: lms/templates/student_account/account_settings.underscore
 msgid "Account Settings"
 msgstr ""
 
-#: lms/templates/student_account/account_settings.underscore
-msgid ""
-"These settings include basic information about your account. You can also "
-"specify additional information and see your linked social accounts on this "
-"page."
+#: lms/templates/student_account/account_settings_section.underscore
+msgid "section.subtitle"
 msgstr ""
 
-#: lms/templates/student_account/account_settings.underscore
+#: lms/templates/student_account/account_settings_section.underscore
 msgid "section.title"
 msgstr ""
 
-#: lms/templates/student_account/account_settings.underscore
+#: lms/templates/student_account/account_settings_section.underscore
 msgid "An error occurred. Please reload the page."
 msgstr ""
 
@@ -6858,11 +6884,11 @@ msgstr "密码重置邮件已发送"
 msgid ""
 "We've sent instructions for resetting your password to the email address you"
 " provided."
-msgstr "我们已经向你提供的电子邮件地址发送了重置密码的说明。"
+msgstr "我们已经向您提供的电子邮件发送了重置密码的说明。"
 
 #: lms/templates/student_account/login.underscore
 msgid "We couldn't sign you in."
-msgstr "我们无法让您登录。"
+msgstr "登录失败。"
 
 #: lms/templates/student_account/login.underscore
 #, python-format
@@ -6913,13 +6939,13 @@ msgstr "发生了一个错误。"
 
 #: lms/templates/student_account/password_reset.underscore
 msgid "Password assistance"
-msgstr "密码取回帮助"
+msgstr "密码帮助"
 
 #: lms/templates/student_account/password_reset.underscore
 msgid ""
 "Please enter your email address below and we will send you instructions for "
 "setting a new password."
-msgstr "请在下面输入你的电子邮件地址以便我们给你发送如何设置新密码的说明。"
+msgstr "请在下面输入您的电子邮件以便我们给您发送如何设置新密码的说明。"
 
 #: lms/templates/student_account/password_reset.underscore
 msgid "Reset my password"
@@ -6927,7 +6953,7 @@ msgstr "重设我的密码"
 
 #: lms/templates/student_account/register.underscore
 msgid "We couldn't create your account."
-msgstr "我们无法创建你的账户。"
+msgstr "我们无法创建您的账户。"
 
 #: lms/templates/student_account/register.underscore
 #, python-format
@@ -6939,7 +6965,7 @@ msgstr "您已成功登录%(currentProvider)s。"
 msgid ""
 "We just need a little more information before you start learning with "
 "%(platformName)s."
-msgstr "你只需再多提供一点信息就可以开始在%(platformName)s学习了。"
+msgstr "您只需再多提供一点信息就可以开始在%(platformName)s学习了。"
 
 #: lms/templates/student_account/register.underscore
 msgid "Create an account using"
@@ -6960,15 +6986,15 @@ msgstr "创建新账户"
 
 #: lms/templates/student_account/register.underscore
 msgid "Create your account"
-msgstr "创建你的账户"
+msgstr "创建您的账户"
 
 #: lms/templates/student_account/register.underscore
 msgid "Required field"
-msgstr "必填字段"
+msgstr "必填项目"
 
 #: lms/templates/student_account/register.underscore
 msgid "Already have an account?"
-msgstr "已经有账户了？"
+msgstr "已有账户？"
 
 #: lms/templates/student_profile/badge.underscore
 #, python-format
@@ -7037,15 +7063,15 @@ msgstr ""
 #: lms/templates/verify_student/enrollment_confirmation_step.underscore
 #, python-format
 msgid "Congratulations! You are now verified on %(platformName)s!"
-msgstr "恭喜！你已经在%(platformName)s上认证成功！"
+msgstr "恭喜！您在%(platformName)s上认证成功！"
 
 #: lms/templates/verify_student/enrollment_confirmation_step.underscore
 msgid "You are now enrolled as a verified student for:"
-msgstr "你现在正以已认证学生的身份选修："
+msgstr "您已经已认证学生的身份选择了课程："
 
 #: lms/templates/verify_student/enrollment_confirmation_step.underscore
 msgid "A list of courses you have just enrolled in as a verified student"
-msgstr "你以已认证学生的身份选修的课程列表"
+msgstr "你以认证学生的身份选修的课程列表"
 
 #: lms/templates/verify_student/enrollment_confirmation_step.underscore
 msgid "Course"
@@ -7062,7 +7088,7 @@ msgstr "探索你的课程！"
 
 #: lms/templates/verify_student/enrollment_confirmation_step.underscore
 msgid "Go to your Dashboard"
-msgstr "前往你的课程面板"
+msgstr "前往你的控制面板"
 
 #: lms/templates/verify_student/enrollment_confirmation_step.underscore
 msgid "Verified Status"
@@ -7076,7 +7102,7 @@ msgid ""
 "certificates. Verification is good for one year. After one year, you must "
 "submit photos for verification again."
 msgstr ""
-"感谢你提交照片，我们将于稍后进行审核。你现在就可以注册%(platformName)s上任意提供认证证书的课程。认证只在一年内有效，一年后，你必须要提交照片重新认证。"
+"感谢提交您的照片，我们将于稍后进行审核。您现在就可以注册%(platformName)s上任一提供认证证书的课程。认证有效期为一年。一年后，您必须要提交照片重新认证。"
 
 #: lms/templates/verify_student/error.underscore
 msgid "Error:"
@@ -7164,14 +7190,14 @@ msgid ""
 "a government-issued photo ID. Our authorization service confirms your "
 "identity by comparing the photo you take with the photo on your ID."
 msgstr ""
-"作为认证过程中一部分，你需要拍摄两张照片：一张你的面部照片，以及一张身份证件的照片（该证件须由政府签发且有你的照片）。我们的授权服务将通过对比你拍摄的照片和你身份证件上的照片来确认你的身份。"
+"作为认证过程中一部分，您需要拍摄两张照片：您的面部以及您的身份证件（该证件须由政府签发且有您的照片）。我们的授权服务部将通过对比您的面部照片和您的证件上的照片来确认您的身份。"
 
 #: lms/templates/verify_student/face_photo_step.underscore
 #: lms/templates/verify_student/id_photo_step.underscore
 #: lms/templates/verify_student/incourse_reverify.underscore
 #, python-format
 msgid "What does %(platformName)s do with this photo?"
-msgstr "%(platformName)s用这些照片做什么？"
+msgstr "%(platformName)s用这张照片做什么？"
 
 #: lms/templates/verify_student/face_photo_step.underscore
 #: lms/templates/verify_student/id_photo_step.underscore
@@ -7195,19 +7221,19 @@ msgstr "下一步：%(nextStepTitle)s"
 
 #: lms/templates/verify_student/id_photo_step.underscore
 msgid "Take a Photo of Your ID"
-msgstr "拍摄一张你身份证件的照片"
+msgstr "拍摄您的身份证件"
 
 #: lms/templates/verify_student/id_photo_step.underscore
 msgid ""
 "Use your webcam to take a photo of your ID. We will match this photo with "
 "the photo of your face and the name on your account."
-msgstr "请用摄像头拍摄一张你身份证件的照片，我们将用该照片与你的面部照片及你在账户中填写的姓名进行匹配。"
+msgstr "请用摄像头拍摄一张您身份证件的照片，我们将查看该照片是否与您的面部照片及您在账户中填写的姓名匹配。"
 
 #: lms/templates/verify_student/id_photo_step.underscore
 msgid ""
 "You need an ID with your name and photo. A driver's license, passport, or "
 "other government-issued IDs are all acceptable."
-msgstr "你需要一份带有你姓名和照片的证件，我们可以接受驾照、护照以及其他由政府签发的身份证件。"
+msgstr "您需要一份带有您姓名和照片的身份证件，我们可以接受驾照、护照以及其他由政府签发的身份证件。"
 
 #: lms/templates/verify_student/id_photo_step.underscore
 #: lms/templates/verify_student/incourse_reverify.underscore
@@ -7216,7 +7242,7 @@ msgstr "成功拍摄的小技巧"
 
 #: lms/templates/verify_student/id_photo_step.underscore
 msgid "Ensure that you can see your photo and read your name"
-msgstr "请确保你的照片和名字清晰可见"
+msgstr "请确保您的照片和名字清晰可见"
 
 #: lms/templates/verify_student/id_photo_step.underscore
 msgid "Make sure your ID is well-lit"
@@ -7229,7 +7255,7 @@ msgstr ""
 #: lms/templates/verify_student/id_photo_step.underscore
 #: lms/templates/verify_student/incourse_reverify.underscore
 msgid "Use the retake photo button if you are not pleased with your photo"
-msgstr "如果你对照片不满意，请使用重拍按钮重新拍一张照片"
+msgstr "如果您对照片不满意，请使用重拍按钮重新拍一张照片"
 
 #: lms/templates/verify_student/image_input.underscore
 msgid "Preview of uploaded image"
@@ -7237,21 +7263,21 @@ msgstr "预览已上传的图片"
 
 #: lms/templates/verify_student/image_input.underscore
 msgid "Upload an image or capture one with your web or phone camera."
-msgstr "上传照片或通过使用你的网络／手机摄像头拍照上传。"
+msgstr "上传照片或通过使用您的网络／手机摄像头拍照上传。"
 
 #: lms/templates/verify_student/incourse_reverify.underscore
 msgid ""
 "Use your webcam to take a photo of your face. We will match this photo with "
 "the photo on your ID."
-msgstr "请用摄像头拍摄一张你的面部照片，我们将用该照片与你身份证件上的照片进行匹配。"
+msgstr "请用摄像头拍摄一张您的面部照片，我们将对比该照片与您身份证件上的照片。"
 
 #: lms/templates/verify_student/incourse_reverify.underscore
 msgid "Make sure your face is well-lit"
-msgstr "请确保你的面部光线充足"
+msgstr "请确保您的面部光线充足"
 
 #: lms/templates/verify_student/incourse_reverify.underscore
 msgid "Be sure your entire face is inside the frame"
-msgstr "请确保你的整张脸都在方框以内"
+msgstr "请确保您的整张脸都在框内"
 
 #: lms/templates/verify_student/incourse_reverify.underscore
 msgid "Once in position, use the camera button {icon} to capture your photo"
@@ -7259,7 +7285,7 @@ msgstr ""
 
 #: lms/templates/verify_student/incourse_reverify.underscore
 msgid "Can we match the photo you took with the one on your ID?"
-msgstr "我们能否将你拍的照片与你身份证件上的照片进行比对？"
+msgstr "我们能否将您拍的照片与您身份证件上的照片进行比对？"
 
 #: lms/templates/verify_student/intro_step.underscore
 msgid "Thanks for returning to verify your ID in: {courseName}"
@@ -7294,7 +7320,7 @@ msgstr "有照片的身份证件"
 msgid ""
 "A driver's license, passport, or other government-issued ID with your name "
 "and photo"
-msgstr "驾照、护照或者其他由政府签发的带有你姓名和照片的身份证件"
+msgstr "驾照、护照或者其他由政府签发的带有您姓名和照片的身份证件"
 
 #: lms/templates/verify_student/make_payment_step.underscore
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
@@ -7316,13 +7342,13 @@ msgid ""
 "You can pay now even if you don't have the following items available, but "
 "you will need to have these by %(date)s to qualify to earn a Verified "
 "Certificate."
-msgstr "即使你没有满足下面这些要求，你也可以现在就付款；但是你只有在%(date)s之前满足这些要求才有资格获得一份已认证的证书。"
+msgstr "即使你没有满足下面这些要求，你也可以现在就付款；但是你只有在%(date)s之前满足这些要求才有资格获得认证证书。"
 
 #: lms/templates/verify_student/make_payment_step.underscore
 msgid ""
 "You can pay now even if you don't have the following items available, but "
 "you will need to have these to qualify to earn a Verified Certificate."
-msgstr "即使你没有满足下面这些要求，你也可以现在就付款；但是你只有满足了这些要求才有资格获得一份已认证的证书。"
+msgstr "即使你没有满足下面这些要求，你也可以现在就付款；但是你只有满足了这些要求才有资格获得认证证书。"
 
 #: lms/templates/verify_student/make_payment_step.underscore
 msgid "Government-Issued Photo ID"
@@ -7331,7 +7357,7 @@ msgstr "政府签发的带有照片的身份证件"
 #: lms/templates/verify_student/make_payment_step.underscore
 msgid ""
 "ID-Verification is not required for this Professional Education course."
-msgstr "该专业教育课程不强制要求验证身份证件。"
+msgstr "该专业教育课程不强制要求身份认证。"
 
 #: lms/templates/verify_student/make_payment_step.underscore
 msgid ""
@@ -7427,6 +7453,14 @@ msgid ""
 "photo."
 msgstr "驾照、护照或者由政府签发的带有你姓名和照片的身份证件。"
 
+#: lms/templates/verify_student/payment_confirmation_step.underscore
+#, python-format
+msgid ""
+"If you don't verify your identity now, you can still explore your course "
+"from your dashboard. You will receive periodic reminders from "
+"%(platformName)s to verify your identity."
+msgstr "如果你现在不验证你的身份，你仍可以通过控制面板浏览课程。但你会定期从%(platformName)s收到身份验证提醒。"
+
 #: lms/templates/verify_student/reverify_success_step.underscore
 msgid "Identity Verification In Progress"
 msgstr ""
@@ -7445,7 +7479,7 @@ msgstr ""
 
 #: lms/templates/verify_student/review_photos_step.underscore
 msgid "Review Your Photos"
-msgstr "复核你的照片"
+msgstr "检查你的照片"
 
 #: lms/templates/verify_student/review_photos_step.underscore
 msgid ""
@@ -7477,7 +7511,7 @@ msgstr "这张照片和你身份证件上的照片相匹配吗？"
 
 #: lms/templates/verify_student/review_photos_step.underscore
 msgid "Is your name on your ID readable?"
-msgstr "你身份证件上的名字是清晰的吗？"
+msgstr "你身份证件上的名字是否清晰可见？"
 
 #: lms/templates/verify_student/review_photos_step.underscore
 #, python-format
@@ -7509,7 +7543,7 @@ msgstr "在进行下一步之前，请确认你提供的信息之间相符"
 msgid ""
 "Don't see your picture? Make sure to allow your browser to use your camera "
 "when it asks for permission."
-msgstr "没有看到你自己？请确认当浏览器请求使用摄像头权限的时候你允许了该请求。"
+msgstr "没有看到你自己？请确认当浏览器请求使用摄像头权限的时候你选择了允许。"
 
 #: lms/templates/verify_student/webcam_photo.underscore
 msgid "Live view of webcam"

@@ -1,7 +1,7 @@
 <% if (parentInfo) { %>
 <li class="outline-item outline-item-<%= xblockType %> <%= includesChildren ? 'is-collapsible' : '' %> is-draggable <%= isCollapsed ? 'is-collapsed' : '' %>"
     data-parent="<%= parentInfo.get('id') %>" data-locator="<%= xblockInfo.get('id') %>">
-    <span class="draggable-drop-indicator draggable-drop-indicator-before"><i class="icon fa fa-caret-right"></i></span>
+    <span class="draggable-drop-indicator draggable-drop-indicator-before"><span class="icon fa fa-caret-right" aria-hidden="true"></span></span>
 
     <div class="wrapper-xblock-header">
         <div class="wrapper-xblock-header-primary">
@@ -11,7 +11,7 @@
                           gettext('Collapse/Expand this %(xblock_type)s'), { xblock_type: xblockTypeDisplayName }, true
                     ) %>"
                 >
-                    <i class="icon fa fa-caret-down ui-toggle-expansion"></i>
+                    <span class="icon fa fa-caret-down ui-toggle-expansion" aria-hidden="true"></span>
             <% } else { %>
                 <h3 class="xblock-title">
             <% } %>
@@ -29,7 +29,7 @@
                 <ul class="actions-list">
                     <li class="action-item action-delete">
                         <a href="#" data-tooltip="<%= gettext('Delete') %>" class="delete-button action-button">
-                            <i class="icon fa fa-remove"></i>
+                            <span class="icon fa fa-remove" aria-hidden="true"></span>
                             <span class="sr"><%= gettext('Delete') %></span>
                         </a>
                     </li>
@@ -39,7 +39,7 @@
         <div class="wrapper-xblock-header-secondary">
             <% if (xblockInfo.get('release_date')) { %>
                 <div class="meta-info">
-                    <i class="icon fa fa-clock-o"></i>
+                    <span class="icon fa fa-clock-o" aria-hidden="true"></span>
                     <%= gettext('Released:') %> <%= xblockInfo.get('release_date') %>
                 </div>
             <% } %>
@@ -61,7 +61,7 @@
                          gettext('Click to add a new %(xblock_type)s'), { xblock_type: defaultNewChildName }, true
                    ) %>"
                 >
-                    <i class="icon fa fa-plus"></i><%= addChildLabel %>
+                    <span class="icon fa fa-plus" aria-hidden="true"></span><%= addChildLabel %>
                 </a>
             </p>
         </div>
@@ -77,13 +77,13 @@
                          gettext('Click to add a new %(xblock_type)s'), { xblock_type: defaultNewChildName }, true
                    ) %>"
                 >
-                    <i class="icon fa fa-plus"></i><%= addChildLabel %>
+                    <span class="icon fa fa-plus" aria-hidden="true"></span><%= addChildLabel %>
                 </a>
             </div>
         <% } %>
     <% } %>
 
 <% if (parentInfo) { %>
-    <span class="draggable-drop-indicator draggable-drop-indicator-after"><i class="icon fa fa-caret-right"></i></span>
+    <span class="draggable-drop-indicator draggable-drop-indicator-after"><span class="icon fa fa-caret-right" aria-hidden="true"></span></span>
 </li>
 <% } %>

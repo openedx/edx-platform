@@ -193,7 +193,7 @@
 # VainChan <fsszns@163.com>, 2015
 # 沈世奇 <vicapple22@gmail.com>, 2013
 # vingte <411029240@qq.com>, 2014
-# Wang Mengmeng <sara880608@qq.com>, 2016
+# wangmm <sara880608@qq.com>, 2016
 # wendiyan420 <wendiyan420@gmail.com>, 2015
 # wendiyan420 <wendiyan420@gmail.com>, 2015
 # Wentao Han <wentao.han@gmail.com>, 2013
@@ -333,7 +333,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-05-12 14:51+0000\n"
+"POT-Creation-Date: 2016-05-26 16:39+0000\n"
 "PO-Revision-Date: 2016-05-09 17:03+0000\n"
 "Last-Translator: louyihua <supermouselyh@hotmail.com>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/open-edx/edx-platform/language/zh_CN/)\n"
@@ -664,6 +664,10 @@ msgid ""
 "Shibboleth. Please contact {tech_support_email} for support."
 msgstr ""
 
+#: common/djangoapps/student/admin.py
+msgid "User profile"
+msgstr ""
+
 #: common/djangoapps/student/forms.py
 msgid ""
 "That e-mail address doesn't have an associated user account. Are you sure "
@@ -764,6 +768,88 @@ msgstr ""
 msgid ""
 "It looks like {email} belongs to an existing account. Try again with a "
 "different email address."
+msgstr ""
+
+#: common/djangoapps/student/management/commands/manage_group.py
+msgid "Removed group: \"{}\""
+msgstr ""
+
+#: common/djangoapps/student/management/commands/manage_group.py
+msgid "Did not find a group with name \"{}\" - skipping."
+msgstr ""
+
+#: common/djangoapps/student/management/commands/manage_group.py
+msgid "Invalid group name: \"{group_name}\". {messages}"
+msgstr ""
+
+#: common/djangoapps/student/management/commands/manage_group.py
+msgid "Created new group: \"{}\""
+msgstr ""
+
+#: common/djangoapps/student/management/commands/manage_group.py
+msgid "Found existing group: \"{}\""
+msgstr ""
+
+#: common/djangoapps/student/management/commands/manage_group.py
+msgid "Adding {codenames} permissions to group \"{group}\""
+msgstr ""
+
+#: common/djangoapps/student/management/commands/manage_group.py
+msgid "Removing {codenames} permissions from group \"{group}\""
+msgstr ""
+
+#: common/djangoapps/student/management/commands/manage_group.py
+msgid ""
+"Invalid permission option: \"{}\". Please specify permissions using the "
+"format: app_label:model_name:permission_codename."
+msgstr ""
+
+#: common/djangoapps/student/management/commands/manage_group.py
+msgid ""
+"Invalid permission codename: \"{codename}\".  No such permission exists for "
+"the model {module}.{model_name}."
+msgstr ""
+
+#: common/djangoapps/student/management/commands/manage_user.py
+msgid "Setting {attribute} for user \"{username}\" to \"{new_value}\""
+msgstr ""
+
+#: common/djangoapps/student/management/commands/manage_user.py
+msgid ""
+"Skipping user \"{}\" because the specified and existing email addresses do "
+"not match."
+msgstr ""
+
+#: common/djangoapps/student/management/commands/manage_user.py
+msgid "Did not find a user with username \"{}\" - skipping."
+msgstr ""
+
+#: common/djangoapps/student/management/commands/manage_user.py
+msgid "Removing user: \"{}\""
+msgstr ""
+
+#: common/djangoapps/student/management/commands/manage_user.py
+msgid "Created new user: \"{}\""
+msgstr ""
+
+#: common/djangoapps/student/management/commands/manage_user.py
+msgid "Found existing user: \"{}\""
+msgstr ""
+
+#: common/djangoapps/student/management/commands/manage_user.py
+msgid "Created new profile for user: \"{}\""
+msgstr ""
+
+#: common/djangoapps/student/management/commands/manage_user.py
+msgid "Could not find a group named \"{}\" - skipping."
+msgstr ""
+
+#: common/djangoapps/student/management/commands/manage_user.py
+msgid "Adding user \"{username}\" to groups {group_names}"
+msgstr ""
+
+#: common/djangoapps/student/management/commands/manage_user.py
+msgid "Removing user \"{username}\" from groups {group_names}"
 msgstr ""
 
 #: common/djangoapps/student/middleware.py
@@ -876,6 +962,14 @@ msgstr ""
 msgid ""
 "The window of time after enrolling during which users can be granted a "
 "refund, represented in microseconds. The default is 14 days."
+msgstr ""
+
+#: common/djangoapps/student/models.py
+msgid "Name of this user attribute."
+msgstr ""
+
+#: common/djangoapps/student/models.py
+msgid "Value of this user attribute."
 msgstr ""
 
 #: common/djangoapps/student/views.py
@@ -5460,6 +5554,14 @@ msgstr "邮寄地址"
 msgid "Goals"
 msgstr ""
 
+#: lms/djangoapps/instructor/views/api.py
+msgid "Cohort"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "Team"
+msgstr ""
+
 #: lms/templates/register-form.html
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
 #: lms/templates/shoppingcart/receipt.html
@@ -5473,14 +5575,6 @@ msgstr "城市"
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "Country"
 msgstr "国家"
-
-#: lms/djangoapps/instructor/views/api.py
-msgid "Cohort"
-msgstr ""
-
-#: lms/djangoapps/instructor/views/api.py
-msgid "Team"
-msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
@@ -6092,11 +6186,17 @@ msgstr ""
 msgid "cohorted"
 msgstr ""
 
+#. Translators: This label appears above a field on the registration form
+#. which allows the user to input the First Name
 #: lms/djangoapps/instructor_task/tasks_helper.py
+#: openedx/core/djangoapps/user_api/views.py
 msgid "First Name"
 msgstr ""
 
+#. Translators: This label appears above a field on the registration form
+#. which allows the user to input the First Name
 #: lms/djangoapps/instructor_task/tasks_helper.py
+#: openedx/core/djangoapps/user_api/views.py
 msgid "Last Name"
 msgstr ""
 
@@ -8062,6 +8162,12 @@ msgstr "该修订已被删除。"
 msgid "Restoring to this revision will mark the article as deleted."
 msgstr "恢复该修订将标记本文章为已删除状态。"
 
+#: openedx/core/djangoapps/api_admin/admin.py
+msgid ""
+"Once you have approved this request, go to {catalog_admin_url} to set up a "
+"catalog for this user."
+msgstr ""
+
 #: openedx/core/djangoapps/api_admin/forms.py
 msgid "Company Address"
 msgstr ""
@@ -8316,6 +8422,10 @@ msgid "Thumbnail image url of the credit provider."
 msgstr ""
 
 #: openedx/core/djangoapps/credit/models.py
+msgid "Credit requirement statuses"
+msgstr ""
+
+#: openedx/core/djangoapps/credit/models.py
 msgid "Deadline for purchasing and requesting credit."
 msgstr ""
 
@@ -8404,6 +8514,10 @@ msgstr ""
 
 #: openedx/core/djangoapps/programs/models.py
 msgid "Do we want to show program listing page"
+msgstr ""
+
+#: openedx/core/djangoapps/programs/models.py
+msgid "Do we want to show program details pages"
 msgstr ""
 
 #: openedx/core/djangoapps/self_paced/models.py
@@ -8553,6 +8667,12 @@ msgstr ""
 #. live.
 #: openedx/core/djangoapps/user_api/views.py
 msgid "State/Province/Region"
+msgstr ""
+
+#. Translators: This label appears above a field on the registration form
+#. which allows the user to input the Company
+#: openedx/core/djangoapps/user_api/views.py
+msgid "Company"
 msgstr ""
 
 #: openedx/core/djangoapps/user_api/views.py
@@ -9329,8 +9449,7 @@ msgstr "开始"
 msgid "View all Courses"
 msgstr "浏览所有课程"
 
-#: lms/templates/dashboard.html lms/templates/user_dropdown.html
-#: themes/edx.org/lms/templates/dashboard.html
+#: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
 msgid "Dashboard"
 msgstr "课程面板"
 
@@ -9367,14 +9486,6 @@ msgstr ""
 #: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
 msgid "Order History"
 msgstr "订单记录"
-
-#: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
-msgid "XSeries Program Certificates"
-msgstr ""
-
-#: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
-msgid "You have received a certificate for the following XSeries programs:"
-msgstr ""
 
 #: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
 msgid "Email Settings for {course_number}"
@@ -9425,6 +9536,20 @@ msgstr "您可以在{link_start}课程面板{link_end}看到您的新邮箱地�
 #: lms/templates/email_exists.html
 msgid "An account with the new e-mail address already exists."
 msgstr "该邮箱地址已被另一个账户使用。"
+
+#: lms/templates/enroll_staff.html
+msgid "You should Register before trying to access the Unit"
+msgstr ""
+
+#: lms/templates/enroll_staff.html lms/templates/ccx/enrollment.html
+#: lms/templates/courseware/course_about.html
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid "Enroll"
+msgstr "选修"
+
+#: lms/templates/enroll_staff.html
+msgid "Don't enroll"
+msgstr ""
 
 #: lms/templates/enroll_students.html
 msgid "Student Enrollment Form"
@@ -9890,6 +10015,10 @@ msgstr "原始数据："
 
 #: lms/templates/navigation.html themes/red-theme/lms/templates/header.html
 msgid "Global"
+msgstr ""
+
+#: lms/templates/navigation.html themes/edx.org/lms/templates/header.html
+msgid "Your Dashboard"
 msgstr ""
 
 #: lms/templates/navigation.html themes/edx.org/lms/templates/header.html
@@ -10569,16 +10698,16 @@ msgid "Usermenu dropdown"
 msgstr ""
 
 #: lms/templates/user_dropdown.html
-msgid "Profile"
+msgid "Profile for:"
 msgstr ""
 
 #: lms/templates/user_dropdown.html
-msgid "Profile image for {username}"
+msgid "Account settings menu"
 msgstr ""
 
-#: lms/templates/user_dropdown.html themes/red-theme/lms/templates/header.html
-msgid "More options dropdown"
-msgstr "更多选择下拉列表"
+#: lms/templates/user_dropdown.html
+msgid "Account settings"
+msgstr ""
 
 #: lms/templates/using.html
 msgid "Using the system"
@@ -11442,12 +11571,6 @@ msgid ""
 msgstr ""
 
 #: lms/templates/ccx/enrollment.html
-#: lms/templates/courseware/course_about.html
-#: lms/templates/instructor/instructor_dashboard_2/membership.html
-msgid "Enroll"
-msgstr "选修"
-
-#: lms/templates/ccx/enrollment.html
 msgid "Student List Management"
 msgstr "管理学生列表"
 
@@ -11695,8 +11818,8 @@ msgstr ""
 
 #: lms/templates/course_modes/choose.html
 #: themes/edx.org/lms/templates/course_modes/choose.html
-msgid "Enroll In {} | Choose Your Track"
-msgstr "选修{}｜选择你的学习方式"
+msgid "Enroll In {course_name} | Choose Your Track"
+msgstr ""
 
 #: lms/templates/course_modes/choose.html
 #: themes/edx.org/lms/templates/course_modes/choose.html
@@ -11982,7 +12105,6 @@ msgid ""
 msgstr ""
 
 #: lms/templates/courseware/course_updates.html
-#: lms/templates/discussion/_similar_posts.html
 msgid "Hide"
 msgstr "隐藏"
 
@@ -12169,6 +12291,24 @@ msgid ""
 "We're creating your certificate. You can keep working in your courses and a "
 "link to it will appear here and on your Dashboard when it is ready."
 msgstr "我们正在为你创建证书。你可以继续学习你的课程，一旦证书准备就绪，这里及你的课程面板中都会显示指向证书的链接。"
+
+#. Translators: This message appears to users when the users have not
+#. completed
+#. identity verification.
+#: lms/templates/courseware/progress.html
+msgid "Certificate unavailable"
+msgstr ""
+
+#: lms/templates/courseware/progress.html
+msgid ""
+"You have not received a certificate because you do not have a current "
+"{platform_name} verified identity. "
+msgstr ""
+
+#: lms/templates/courseware/progress.html
+#: lms/templates/dashboard/_dashboard_certificate_information.html
+msgid "Verify your identity now."
+msgstr ""
 
 #: lms/templates/courseware/progress.html
 msgid "Congratulations, you qualified for a certificate!"
@@ -12357,6 +12497,12 @@ msgid ""
 " know by contacting {email}."
 msgstr ""
 "由于向你颁发你的{cert_name_short}需要遵从美国对伊朗、古巴、叙利亚和苏丹的严格禁运政策，你的已认证的{cert_name_long}正处在等待确认状态。如果你认为我们的系统错误地将你与上述国家相关联，请联系{email}让我们了解相关情况。"
+
+#: lms/templates/dashboard/_dashboard_certificate_information.html
+msgid ""
+"Your certificate was not issued because you do not have a current verified "
+"identity with {platform_name}. "
+msgstr ""
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid "Your {cert_name_short} is Generating"
@@ -12710,16 +12856,6 @@ msgstr ""
 msgid "Results:"
 msgstr "结果："
 
-#: lms/templates/discussion/_blank_slate.html
-msgid ""
-"Sorry! We can't find anything matching your search. Please try another "
-"search."
-msgstr "抱歉，没有找不到您的查询内容。请尝试其他查询。"
-
-#: lms/templates/discussion/_blank_slate.html
-msgid "There are no posts here yet. Be the first one to post!"
-msgstr "现在还没有讨论帖。成为第一个发帖的人吧！"
-
 #: lms/templates/discussion/_discussion_course_navigation.html
 #: lms/templates/discussion/_discussion_module.html
 msgid "New Post"
@@ -12753,14 +12889,6 @@ msgstr ""
 #: lms/templates/discussion/_filter_dropdown.html
 msgid "Posts I'm Following"
 msgstr "我关注的讨论帖"
-
-#: lms/templates/discussion/_recent_active_posts.html
-msgid "Following"
-msgstr "关注"
-
-#: lms/templates/discussion/_search_bar.html
-msgid "Search posts"
-msgstr "搜索讨论帖"
 
 #: lms/templates/discussion/_thread_list_template.html
 msgid "Discussion topics; currently listing: "
@@ -14594,6 +14722,10 @@ msgid ""
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid "Upload a CSV for bulk enrollment"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Upload CSV"
 msgstr ""
 
@@ -15082,6 +15214,10 @@ msgstr "以上操作在后台运行，而活跃任务状态会出现在课程信
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Show Background Task History for Problem"
 msgstr "查看相关问题的历史评判标准"
+
+#: lms/templates/learner_dashboard/program_details.html
+msgid "Program Details"
+msgstr ""
 
 #: lms/templates/learner_dashboard/programs.html
 msgid "Your Programs"
@@ -16204,6 +16340,10 @@ msgid ""
 "{tos_link_start}Terms of Service{tos_link_end} and {honor_link_start}Honor "
 "Code{honor_link_end}"
 msgstr ""
+
+#: themes/red-theme/lms/templates/header.html
+msgid "More options dropdown"
+msgstr "更多选择下拉列表"
 
 #: themes/red-theme/lms/templates/header.html
 msgid "My Profile"
@@ -18446,8 +18586,8 @@ msgstr ""
 "当然。我们创建了一个在线课程：edX101，它介绍了一些创建在线课程的最佳实践：从拍摄视频，创建练习到开展在线教学的基础。另外，我们会尽力提供所需帮助，需要时请随时给我们留言。"
 
 #: cms/templates/settings.html
-msgid "Schedule &amp; Details Settings"
-msgstr "日程＆细节设置"
+msgid "Schedule & Details Settings"
+msgstr ""
 
 #: cms/templates/settings.html cms/templates/widgets/header.html
 msgid "Schedule & Details"
@@ -18594,13 +18734,12 @@ msgstr "当推广您的课程的时候这些日期将不会被使用"
 
 #: cms/templates/settings.html
 msgid ""
-"These dates impact <strong>when your courseware can be viewed</strong>, but "
-"they are <strong>not the dates shown on your course summary page</strong>. "
-"To provide the course start and registration dates as shown on your course "
-"summary page, follow the instructions provided by your Program Manager."
+"These dates impact {strong_start}when your courseware can be "
+"viewed{strong_end}, but they are {strong_start}not the dates shown on your "
+"course summary page{strong_end}. To provide the course start and "
+"registration dates as shown on your course summary page, follow the "
+"instructions provided by your Program Manager."
 msgstr ""
-"这些日期会影响<strong>您的课程在何时对外可见</strong>，但是它们<strong>并不是在您的课程概要页面中显示的日期</strong>。要在课程概要页面提供课程开始日期和课程注册日期，请遵循您的项目经理提供的指导"
-" 。"
 
 #: cms/templates/settings.html
 msgid "Course Details"
@@ -18672,14 +18811,10 @@ msgid "Course Overview"
 msgstr "课程概览"
 
 #: cms/templates/settings.html
-msgid "your course summary page"
-msgstr "您的课程概要页面"
-
-#: cms/templates/settings.html
-#, python-format
 msgid ""
-"Introductions, prerequisites, FAQs that are used on %s (formatted in HTML)"
-msgstr "介绍说明、先修条件、常见问题解答在%s (HTML格式)"
+"Introductions, prerequisites, FAQs that are used on {a_link_start}your "
+"course summary page{a_link_end} (formatted in HTML)"
+msgstr ""
 
 #: cms/templates/settings.html
 msgid "Course Card Image"
@@ -18687,9 +18822,9 @@ msgstr ""
 
 #: cms/templates/settings.html
 msgid ""
-"You can manage this image along with all of your other <a href='{}'>files "
-"&amp; uploads</a>"
-msgstr "该图片可以随您的其他<a href='{}'>文件＆上传</a>共同管理"
+"You can manage this image along with all of your other {a_link_start}files "
+"and uploads{a_link_end}"
+msgstr ""
 
 #: cms/templates/settings.html
 msgid ""

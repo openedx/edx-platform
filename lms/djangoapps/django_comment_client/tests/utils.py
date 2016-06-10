@@ -7,11 +7,12 @@ from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
 from django_comment_common.models import Role
 from django_comment_common.utils import seed_permissions_roles
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
+from util.testing import UrlResetMixin
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 
 
-class CohortedTestCase(SharedModuleStoreTestCase):
+class CohortedTestCase(UrlResetMixin, SharedModuleStoreTestCase):
     """
     Sets up a course with a student, a moderator and their cohorts.
     """

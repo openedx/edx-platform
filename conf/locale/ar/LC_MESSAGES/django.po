@@ -139,7 +139,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-05-12 14:51+0000\n"
+"POT-Creation-Date: 2016-05-26 16:39+0000\n"
 "PO-Revision-Date: 2016-05-09 11:27+0000\n"
 "Last-Translator: Soha Assali <soha+transifex@qordoba.com>\n"
 "Language-Team: Arabic (http://www.transifex.com/open-edx/edx-platform/language/ar/)\n"
@@ -520,6 +520,10 @@ msgstr ""
 "لقد قمت بإنشاء حساب في وقت سابق باستخدام تسجيل دخول خارجي مثل WebAuth أو "
 "Shibboleth . يرجى الاتصال بـ {tech_support_email} للحصول على الدعم."
 
+#: common/djangoapps/student/admin.py
+msgid "User profile"
+msgstr ""
+
 #: common/djangoapps/student/forms.py
 msgid ""
 "That e-mail address doesn't have an associated user account. Are you sure "
@@ -629,6 +633,88 @@ msgid ""
 msgstr ""
 "يبدو أنّ عنوان البريد الإلكتروني {email} يخصّ حسابًا قائمًا. يُرجى إعادة "
 "المحاولة بعنوان بريد إلكتروني مختلف."
+
+#: common/djangoapps/student/management/commands/manage_group.py
+msgid "Removed group: \"{}\""
+msgstr ""
+
+#: common/djangoapps/student/management/commands/manage_group.py
+msgid "Did not find a group with name \"{}\" - skipping."
+msgstr ""
+
+#: common/djangoapps/student/management/commands/manage_group.py
+msgid "Invalid group name: \"{group_name}\". {messages}"
+msgstr ""
+
+#: common/djangoapps/student/management/commands/manage_group.py
+msgid "Created new group: \"{}\""
+msgstr ""
+
+#: common/djangoapps/student/management/commands/manage_group.py
+msgid "Found existing group: \"{}\""
+msgstr ""
+
+#: common/djangoapps/student/management/commands/manage_group.py
+msgid "Adding {codenames} permissions to group \"{group}\""
+msgstr ""
+
+#: common/djangoapps/student/management/commands/manage_group.py
+msgid "Removing {codenames} permissions from group \"{group}\""
+msgstr ""
+
+#: common/djangoapps/student/management/commands/manage_group.py
+msgid ""
+"Invalid permission option: \"{}\". Please specify permissions using the "
+"format: app_label:model_name:permission_codename."
+msgstr ""
+
+#: common/djangoapps/student/management/commands/manage_group.py
+msgid ""
+"Invalid permission codename: \"{codename}\".  No such permission exists for "
+"the model {module}.{model_name}."
+msgstr ""
+
+#: common/djangoapps/student/management/commands/manage_user.py
+msgid "Setting {attribute} for user \"{username}\" to \"{new_value}\""
+msgstr ""
+
+#: common/djangoapps/student/management/commands/manage_user.py
+msgid ""
+"Skipping user \"{}\" because the specified and existing email addresses do "
+"not match."
+msgstr ""
+
+#: common/djangoapps/student/management/commands/manage_user.py
+msgid "Did not find a user with username \"{}\" - skipping."
+msgstr ""
+
+#: common/djangoapps/student/management/commands/manage_user.py
+msgid "Removing user: \"{}\""
+msgstr ""
+
+#: common/djangoapps/student/management/commands/manage_user.py
+msgid "Created new user: \"{}\""
+msgstr ""
+
+#: common/djangoapps/student/management/commands/manage_user.py
+msgid "Found existing user: \"{}\""
+msgstr ""
+
+#: common/djangoapps/student/management/commands/manage_user.py
+msgid "Created new profile for user: \"{}\""
+msgstr ""
+
+#: common/djangoapps/student/management/commands/manage_user.py
+msgid "Could not find a group named \"{}\" - skipping."
+msgstr ""
+
+#: common/djangoapps/student/management/commands/manage_user.py
+msgid "Adding user \"{username}\" to groups {group_names}"
+msgstr ""
+
+#: common/djangoapps/student/management/commands/manage_user.py
+msgid "Removing user \"{username}\" from groups {group_names}"
+msgstr ""
 
 #: common/djangoapps/student/middleware.py
 msgid ""
@@ -749,6 +835,14 @@ msgid ""
 msgstr ""
 "الإطار الزمني التالي للتسجيل والذي يُقبل خلاله إعادة المبلغ المدفوع "
 "للمستخدمين، ممثلًا بأجزاء الثواني. الفترة الافتراضية هي 14 يومًا."
+
+#: common/djangoapps/student/models.py
+msgid "Name of this user attribute."
+msgstr ""
+
+#: common/djangoapps/student/models.py
+msgid "Value of this user attribute."
+msgstr ""
 
 #: common/djangoapps/student/views.py
 msgid "The course you are looking for does not start until {date}."
@@ -2687,9 +2781,9 @@ msgstr ""
 "والتحميلات\". كما ويمكنك أيضًا ضبط صورة المساق على صفحة \"الإعدادات "
 "والتفاصيل\"."
 
-#: common/lib/xmodule/xmodule/course_module.py cms/templates/settings.html
+#: common/lib/xmodule/xmodule/course_module.py
 msgid "Course Banner Image"
-msgstr ""
+msgstr "صورة شعار المساق"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
@@ -2697,9 +2791,9 @@ msgid ""
 "Settings & Details page."
 msgstr ""
 
-#: common/lib/xmodule/xmodule/course_module.py cms/templates/settings.html
+#: common/lib/xmodule/xmodule/course_module.py
 msgid "Course Video Thumbnail Image"
-msgstr ""
+msgstr "صورة الفيديو المصغرة للدورة التدريبية"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
@@ -4547,7 +4641,7 @@ msgstr ""
 
 #: lms/djangoapps/badges/models.py
 msgid "Please check the syntax of your entry."
-msgstr ""
+msgstr "قم بمراجعة صياغة مدخلاتك."
 
 #. Translators: 'EdX', 'edX', and 'Open edX' are trademarks of 'edX Inc.'.
 #. Please do not translate any of these trademarks and company names.
@@ -5243,7 +5337,7 @@ msgstr "في {relative} - {absolute}"
 
 #: lms/djangoapps/courseware/date_summary.py
 msgid "UTC"
-msgstr "التوقيت العالمي المنسّق"
+msgstr ""
 
 #: lms/djangoapps/courseware/date_summary.py
 msgid "Today is {date}"
@@ -5264,7 +5358,7 @@ msgstr "لتحصل على شهادة، لابدّ من إتمام جميع ال�
 
 #: lms/djangoapps/courseware/date_summary.py
 msgid "After this date, course content will be archived."
-msgstr ""
+msgstr "سيتم أرشفة محتوى المادة بعد هذا التاريخ."
 
 #: lms/djangoapps/courseware/date_summary.py
 msgid ""
@@ -5967,6 +6061,14 @@ msgstr "العنوان البريدي"
 msgid "Goals"
 msgstr "الأهداف"
 
+#: lms/djangoapps/instructor/views/api.py
+msgid "Cohort"
+msgstr "شعبة"
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "Team"
+msgstr "الفريق"
+
 #. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: This label appears above a field on the registration form
 #. which allows the user to input the city in which they live.
@@ -5990,14 +6092,6 @@ msgstr "المدينة"
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "Country"
 msgstr "البلد"
-
-#: lms/djangoapps/instructor/views/api.py
-msgid "Cohort"
-msgstr "شعبة"
-
-#: lms/djangoapps/instructor/views/api.py
-msgid "Team"
-msgstr "الفريق"
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
@@ -6698,11 +6792,17 @@ msgstr "أُنشِئَت الشهادات"
 msgid "cohorted"
 msgstr "جرى التوزيع إلى شُعب"
 
+#. Translators: This label appears above a field on the registration form
+#. which allows the user to input the First Name
 #: lms/djangoapps/instructor_task/tasks_helper.py
+#: openedx/core/djangoapps/user_api/views.py
 msgid "First Name"
 msgstr "الاسم الأول"
 
+#. Translators: This label appears above a field on the registration form
+#. which allows the user to input the First Name
 #: lms/djangoapps/instructor_task/tasks_helper.py
+#: openedx/core/djangoapps/user_api/views.py
 msgid "Last Name"
 msgstr "الاسم الأخير"
 
@@ -6712,7 +6812,11 @@ msgstr "الاسم الأخير"
 msgid "Company Name"
 msgstr "اسم الشركة"
 
-#: lms/djangoapps/instructor_task/tasks_helper.py wiki/forms.py
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: This label appears above a field on the registration form
+#. which allows the user to input the Title
+#: lms/djangoapps/instructor_task/tasks_helper.py
+#: openedx/core/djangoapps/user_api/views.py wiki/forms.py
 msgid "Title"
 msgstr "العنوان"
 
@@ -8448,7 +8552,7 @@ msgstr "اشترك في قناة منصّة {platform_name} على موقع يو
 
 #: lms/envs/common.py
 msgid "Kosovo"
-msgstr ""
+msgstr "كوسوفو"
 
 #: lms/templates/main_django.html cms/templates/base.html
 #: lms/templates/main.html
@@ -8921,25 +9025,31 @@ msgstr "جرى حذف هذه المراجعة."
 msgid "Restoring to this revision will mark the article as deleted."
 msgstr "ستشير العودة إلى هذه المراجعة أنّ المقال قد حُذِف "
 
+#: openedx/core/djangoapps/api_admin/admin.py
+msgid ""
+"Once you have approved this request, go to {catalog_admin_url} to set up a "
+"catalog for this user."
+msgstr ""
+
 #: openedx/core/djangoapps/api_admin/forms.py
 msgid "Company Address"
-msgstr ""
+msgstr "عنوان الشركة"
 
 #: openedx/core/djangoapps/api_admin/forms.py
 msgid "Describe what your application does."
-msgstr ""
+msgstr "صف ما يفعله تطبيقك."
 
 #: openedx/core/djangoapps/api_admin/forms.py
 msgid "The URL of your company's website."
-msgstr ""
+msgstr "الرابط الإلكتروني لموقع شركتك."
 
 #: openedx/core/djangoapps/api_admin/forms.py
 msgid "The name of your company."
-msgstr ""
+msgstr "اسم شركتك."
 
 #: openedx/core/djangoapps/api_admin/forms.py
 msgid "The contact address of your company."
-msgstr ""
+msgstr "عنوان التواصل مع شركتك."
 
 #: openedx/core/djangoapps/api_admin/forms.py
 msgid "The following users do not exist: {usernames}."
@@ -9021,7 +9131,7 @@ msgstr "ضع علامة باستخدام ’usage_id‘: {usage_id}  غير مو
 
 #: openedx/core/djangoapps/course_groups/cohorts.py
 msgid "Default Group"
-msgstr ""
+msgstr "المجموعة الافتراضية"
 
 #: openedx/core/djangoapps/course_groups/cohorts.py
 msgid "You cannot create two cohorts with the same name"
@@ -9202,6 +9312,10 @@ msgid "Thumbnail image url of the credit provider."
 msgstr "رابط الصورة المصغّرة لمزوِّد الوحدات الدراسية."
 
 #: openedx/core/djangoapps/credit/models.py
+msgid "Credit requirement statuses"
+msgstr ""
+
+#: openedx/core/djangoapps/credit/models.py
 msgid "Deadline for purchasing and requesting credit."
 msgstr "الموعد النهائي لشراء الوحدات الدراسية وطلبها."
 
@@ -9294,6 +9408,10 @@ msgstr ""
 
 #: openedx/core/djangoapps/programs/models.py
 msgid "Do we want to show program listing page"
+msgstr ""
+
+#: openedx/core/djangoapps/programs/models.py
+msgid "Do we want to show program details pages"
 msgstr ""
 
 #: openedx/core/djangoapps/self_paced/models.py
@@ -9463,6 +9581,12 @@ msgstr "أخبرنا بالأسباب التي دفعتك للانضمام إل�
 #: openedx/core/djangoapps/user_api/views.py
 msgid "State/Province/Region"
 msgstr "الولاية/المقاطعة/المنطقة"
+
+#. Translators: This label appears above a field on the registration form
+#. which allows the user to input the Company
+#: openedx/core/djangoapps/user_api/views.py
+msgid "Company"
+msgstr ""
 
 #: openedx/core/djangoapps/user_api/views.py
 msgid "Please select your Country."
@@ -10259,8 +10383,7 @@ msgstr "البداية"
 msgid "View all Courses"
 msgstr "عرض جميع المساقات"
 
-#: lms/templates/dashboard.html lms/templates/user_dropdown.html
-#: themes/edx.org/lms/templates/dashboard.html
+#: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
 msgid "Dashboard"
 msgstr "لوحة المعلومات"
 
@@ -10297,14 +10420,6 @@ msgstr "معلومات وضع الحساب"
 #: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
 msgid "Order History"
 msgstr "تاريخ الطلب"
-
-#: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
-msgid "XSeries Program Certificates"
-msgstr "شهادات برنامج XSeries"
-
-#: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
-msgid "You have received a certificate for the following XSeries programs:"
-msgstr "لقد تلقيت شهادةّ لبرامج XSeries التالية:"
 
 #: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
 msgid "Email Settings for {course_number}"
@@ -10357,6 +10472,20 @@ msgstr ""
 #: lms/templates/email_exists.html
 msgid "An account with the new e-mail address already exists."
 msgstr "يوجد حساب مسبق بعنوان البريد الإلكتروني الجديد."
+
+#: lms/templates/enroll_staff.html
+msgid "You should Register before trying to access the Unit"
+msgstr ""
+
+#: lms/templates/enroll_staff.html lms/templates/ccx/enrollment.html
+#: lms/templates/courseware/course_about.html
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid "Enroll"
+msgstr "تسجيل"
+
+#: lms/templates/enroll_staff.html
+msgid "Don't enroll"
+msgstr ""
 
 #: lms/templates/enroll_students.html
 msgid "Student Enrollment Form"
@@ -10861,6 +10990,10 @@ msgid "Global"
 msgstr "عالمي"
 
 #: lms/templates/navigation.html themes/edx.org/lms/templates/header.html
+msgid "Your Dashboard"
+msgstr ""
+
+#: lms/templates/navigation.html themes/edx.org/lms/templates/header.html
 #: themes/red-theme/lms/templates/header.html
 msgid "{platform_name} Home Page"
 msgstr "الصفحة الرئيسية لمنصّة {platform_name}"
@@ -10887,7 +11020,7 @@ msgstr "المدارس"
 
 #: lms/templates/navigation.html
 msgid "Explore Courses"
-msgstr ""
+msgstr "استكشاف الدورات التدريبية"
 
 #: lms/templates/navigation.html lms/templates/register-form.html
 #: themes/edx.org/lms/templates/header.html
@@ -11564,16 +11697,16 @@ msgid "Usermenu dropdown"
 msgstr ""
 
 #: lms/templates/user_dropdown.html
-msgid "Profile"
-msgstr "الملف الشخصي"
+msgid "Profile for:"
+msgstr ""
 
 #: lms/templates/user_dropdown.html
-msgid "Profile image for {username}"
-msgstr "صورة الصفحة الشخصية للمستخدم {username}"
+msgid "Account settings menu"
+msgstr ""
 
-#: lms/templates/user_dropdown.html themes/red-theme/lms/templates/header.html
-msgid "More options dropdown"
-msgstr "قائمة منسدلة لخيارات إضافية"
+#: lms/templates/user_dropdown.html
+msgid "Account settings"
+msgstr ""
 
 #: lms/templates/using.html
 msgid "Using the system"
@@ -12456,12 +12589,6 @@ msgid ""
 msgstr ""
 
 #: lms/templates/ccx/enrollment.html
-#: lms/templates/courseware/course_about.html
-#: lms/templates/instructor/instructor_dashboard_2/membership.html
-msgid "Enroll"
-msgstr "تسجيل"
-
-#: lms/templates/ccx/enrollment.html
 msgid "Student List Management"
 msgstr "إدارة قوائم الطلاب"
 
@@ -12720,8 +12847,8 @@ msgstr "يرجى الانتظار ريثما نستعيد تفاصيل طلبي�
 
 #: lms/templates/course_modes/choose.html
 #: themes/edx.org/lms/templates/course_modes/choose.html
-msgid "Enroll In {} | Choose Your Track"
-msgstr "سجّل في {} | اختر مسارك"
+msgid "Enroll In {course_name} | Choose Your Track"
+msgstr ""
 
 #: lms/templates/course_modes/choose.html
 #: themes/edx.org/lms/templates/course_modes/choose.html
@@ -13038,7 +13165,6 @@ msgstr ""
 "إصدار المساق."
 
 #: lms/templates/courseware/course_updates.html
-#: lms/templates/discussion/_similar_posts.html
 msgid "Hide"
 msgstr "إخفاء"
 
@@ -13234,6 +13360,24 @@ msgid ""
 msgstr ""
 "جاري إنشاء شهادتك. يمكنك متابعة العمل في مساقاتك وسوف يظهر رابط لشهادتك هنا "
 "على لوح معلوماتك ما أن تصبح جاهزة."
+
+#. Translators: This message appears to users when the users have not
+#. completed
+#. identity verification.
+#: lms/templates/courseware/progress.html
+msgid "Certificate unavailable"
+msgstr ""
+
+#: lms/templates/courseware/progress.html
+msgid ""
+"You have not received a certificate because you do not have a current "
+"{platform_name} verified identity. "
+msgstr ""
+
+#: lms/templates/courseware/progress.html
+#: lms/templates/dashboard/_dashboard_certificate_information.html
+msgid "Verify your identity now."
+msgstr ""
 
 #: lms/templates/courseware/progress.html
 msgid "Congratulations, you qualified for a certificate!"
@@ -13448,6 +13592,12 @@ msgstr ""
 "المتحدة على كلٍّ من إيران وكوبا وسوريا والسودان. وإذا كنت تعتقد بأنّ نظامنا "
 "قد نسبك عن طريق الخطأ إلى أحد تلك البلدان، يُرجى إعلامنا بذلك عبر مراسلتنا "
 "على {email}."
+
+#: lms/templates/dashboard/_dashboard_certificate_information.html
+msgid ""
+"Your certificate was not issued because you do not have a current verified "
+"identity with {platform_name}. "
+msgstr ""
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid "Your {cert_name_short} is Generating"
@@ -13842,16 +13992,6 @@ msgstr "استعرض تفاصيل فئة {category}"
 msgid "Results:"
 msgstr "النتائج: "
 
-#: lms/templates/discussion/_blank_slate.html
-msgid ""
-"Sorry! We can't find anything matching your search. Please try another "
-"search."
-msgstr "عذرًا! لم يمكننا إيجاد أي شيء يُطابق بحثك. يُرجى تجربة بحث آخر. "
-
-#: lms/templates/discussion/_blank_slate.html
-msgid "There are no posts here yet. Be the first one to post!"
-msgstr "لا توجد منشورات هنا بعد. كن أوّل من ينشر!"
-
 #: lms/templates/discussion/_discussion_course_navigation.html
 #: lms/templates/discussion/_discussion_module.html
 msgid "New Post"
@@ -13887,14 +14027,6 @@ msgstr "كافّة النقاشات"
 #: lms/templates/discussion/_filter_dropdown.html
 msgid "Posts I'm Following"
 msgstr "المنشورات التي أتابعها "
-
-#: lms/templates/discussion/_recent_active_posts.html
-msgid "Following"
-msgstr "جاري المتابعة"
-
-#: lms/templates/discussion/_search_bar.html
-msgid "Search posts"
-msgstr "البحث في المنشورات"
 
 #: lms/templates/discussion/_thread_list_template.html
 msgid "Discussion topics; currently listing: "
@@ -15939,6 +16071,10 @@ msgstr ""
 "ترويسات أو حواشي أو أسطر فارغة."
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid "Upload a CSV for bulk enrollment"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Upload CSV"
 msgstr "تحميل ملف CSV"
 
@@ -16492,6 +16628,10 @@ msgstr ""
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Show Background Task History for Problem"
 msgstr "إظهار تاريخ المهام لمسألة معينة"
+
+#: lms/templates/learner_dashboard/program_details.html
+msgid "Program Details"
+msgstr ""
 
 #: lms/templates/learner_dashboard/programs.html
 msgid "Your Programs"
@@ -17714,6 +17854,10 @@ msgid ""
 msgstr ""
 "{tos_link_start}شروط الخدمة{tos_link_end} و{honor_link_start}ميثاق "
 "الشرف{honor_link_end}"
+
+#: themes/red-theme/lms/templates/header.html
+msgid "More options dropdown"
+msgstr "قائمة منسدلة لخيارات إضافية"
 
 #: themes/red-theme/lms/templates/header.html
 msgid "My Profile"
@@ -20272,8 +20416,8 @@ msgstr ""
 " أن ترسل لنا ملاحظاتك أو أسئلتك."
 
 #: cms/templates/settings.html
-msgid "Schedule &amp; Details Settings"
-msgstr "إعدادات الجدول والتفاصيل "
+msgid "Schedule & Details Settings"
+msgstr ""
 
 #: cms/templates/settings.html cms/templates/widgets/header.html
 msgid "Schedule & Details"
@@ -20424,15 +20568,12 @@ msgstr "لا تُستخدم هذه التواريخ عند الترويج لمس
 
 #: cms/templates/settings.html
 msgid ""
-"These dates impact <strong>when your courseware can be viewed</strong>, but "
-"they are <strong>not the dates shown on your course summary page</strong>. "
-"To provide the course start and registration dates as shown on your course "
-"summary page, follow the instructions provided by your Program Manager."
+"These dates impact {strong_start}when your courseware can be "
+"viewed{strong_end}, but they are {strong_start}not the dates shown on your "
+"course summary page{strong_end}. To provide the course start and "
+"registration dates as shown on your course summary page, follow the "
+"instructions provided by your Program Manager."
 msgstr ""
-"تؤثّر هذه التواريخ على <strong>الأوقات التي يمكنك فيها مشاهدة محتوى "
-"مساقك</strong>، لكنّها ليست <strong>التواريخ المبيّنة على صفحة ملخّص "
-"مساقك</strong>. لتدرج تواريخ بدء المساق والتسجيل فيه كما هي مبيّنة على صفحة "
-"ملخّص مساقك، يُرجى اتّباع التعليمات التي يوفّرها مدير برنامجك."
 
 #: cms/templates/settings.html
 msgid "Course Details"
@@ -20508,16 +20649,10 @@ msgid "Course Overview"
 msgstr "نظرة عامة عن المساق"
 
 #: cms/templates/settings.html
-msgid "your course summary page"
-msgstr "صفحة ملخّص المساق"
-
-#: cms/templates/settings.html
-#, python-format
 msgid ""
-"Introductions, prerequisites, FAQs that are used on %s (formatted in HTML)"
+"Introductions, prerequisites, FAQs that are used on {a_link_start}your "
+"course summary page{a_link_end} (formatted in HTML)"
 msgstr ""
-"المقدّمات، والمتطلّبات الأساسية، والأسئلة الشائعة التي تُستخدم في %s (منسّقة"
-" بلغة HTML)"
 
 #: cms/templates/settings.html
 msgid "Course Card Image"
@@ -20525,11 +20660,9 @@ msgstr ""
 
 #: cms/templates/settings.html
 msgid ""
-"You can manage this image along with all of your other <a href='{}'>files "
-"&amp; uploads</a>"
+"You can manage this image along with all of your other {a_link_start}files "
+"and uploads{a_link_end}"
 msgstr ""
-"يمكنك ضبط هذه الصورة إلى جانب كافّة <a href='{}'>ملفّاتك وتحميلاتك</a> "
-"الأخرى."
 
 #: cms/templates/settings.html
 msgid ""

@@ -1,27 +1,26 @@
 ;(function (define) {
     'use strict';
-    define(['backbone', 'common/js/components/collections/paging_collection', 'js/bookmarks/models/bookmark'],
-        function (Backbone, PagingCollection, BookmarkModel) {
-
+    define([
+        'backbone',
+        'edx-ui-toolkit/js/pagination/paging-collection',
+        'js/bookmarks/models/bookmark'
+    ], function (Backbone, PagingCollection, BookmarkModel) {
             return PagingCollection.extend({
-                initialize: function(options) {
-                    PagingCollection.prototype.initialize.call(this);
-
-                    this.url = options.url;
-                    this.server_api = _.extend(
-                        {
-                            course_id: function () { return encodeURIComponent(options.course_id); },
-                            fields : function () { return encodeURIComponent('display_name,path'); }
-                        },
-                        this.server_api
-                    );
-                    delete this.server_api.sort_order; // Sort order is not specified for the Bookmark API
-                },
-
                 model: BookmarkModel,
+
+                queryParams: {
+                    course_id: function () { return this.options.course_id; },
+                    fields : function () { return 'display_name,path'; }
+                },
 
                 url: function() {
                     return this.url;
+                },
+
+                constructor: function (models, options) {
+                    this.options = options;
+                    this.url = options.url;
+                    PagingCollection.prototype.constructor.call(this, models, options);
                 }
             });
     });

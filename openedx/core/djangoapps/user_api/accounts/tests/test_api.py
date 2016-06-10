@@ -57,13 +57,13 @@ class TestAccountApi(UserSettingsEventTestMixin, TestCase):
 
     def test_get_username_provided(self):
         """Test the difference in behavior when a username is supplied to get_account_settings."""
-        account_settings = get_account_settings(self.default_request)
+        account_settings = get_account_settings(self.default_request)[0]
         self.assertEqual(self.user.username, account_settings["username"])
 
-        account_settings = get_account_settings(self.default_request, username=self.user.username)
+        account_settings = get_account_settings(self.default_request, usernames=[self.user.username])[0]
         self.assertEqual(self.user.username, account_settings["username"])
 
-        account_settings = get_account_settings(self.default_request, username=self.different_user.username)
+        account_settings = get_account_settings(self.default_request, usernames=[self.different_user.username])[0]
         self.assertEqual(self.different_user.username, account_settings["username"])
 
     def test_get_configuration_provided(self):
@@ -81,20 +81,20 @@ class TestAccountApi(UserSettingsEventTestMixin, TestCase):
         }
 
         # With default configuration settings, email is not shared with other (non-staff) users.
-        account_settings = get_account_settings(self.default_request, self.different_user.username)
+        account_settings = get_account_settings(self.default_request, [self.different_user.username])[0]
         self.assertNotIn("email", account_settings)
 
         account_settings = get_account_settings(
             self.default_request,
-            self.different_user.username,
+            [self.different_user.username],
             configuration=config,
-        )
+        )[0]
         self.assertEqual(self.different_user.email, account_settings["email"])
 
     def test_get_user_not_found(self):
         """Test that UserNotFound is thrown if there is no user with username."""
         with self.assertRaises(UserNotFound):
-            get_account_settings(self.default_request, username="does_not_exist")
+            get_account_settings(self.default_request, usernames=["does_not_exist"])
 
         self.user.username = "does_not_exist"
         request = self.request_factory.get("/api/user/v1/accounts/")
@@ -105,11 +105,11 @@ class TestAccountApi(UserSettingsEventTestMixin, TestCase):
     def test_update_username_provided(self):
         """Test the difference in behavior when a username is supplied to update_account_settings."""
         update_account_settings(self.user, {"name": "Mickey Mouse"})
-        account_settings = get_account_settings(self.default_request)
+        account_settings = get_account_settings(self.default_request)[0]
         self.assertEqual("Mickey Mouse", account_settings["name"])
 
         update_account_settings(self.user, {"name": "Donald Duck"}, username=self.user.username)
-        account_settings = get_account_settings(self.default_request)
+        account_settings = get_account_settings(self.default_request)[0]
         self.assertEqual("Donald Duck", account_settings["name"])
 
         with self.assertRaises(UserNotAuthorized):
@@ -189,7 +189,7 @@ class TestAccountApi(UserSettingsEventTestMixin, TestCase):
         self.assertIn("Error thrown from do_email_change_request", context_manager.exception.developer_message)
 
         # Verify that the name change happened, even though the attempt to send the email failed.
-        account_settings = get_account_settings(self.default_request)
+        account_settings = get_account_settings(self.default_request)[0]
         self.assertEqual("Mickey Mouse", account_settings["name"])
 
     @patch('openedx.core.djangoapps.user_api.accounts.serializers.AccountUserSerializer.save')
@@ -255,7 +255,7 @@ class AccountSettingsOnCreationTest(TestCase):
         user = User.objects.get(username=self.USERNAME)
         request = RequestFactory().get("/api/user/v1/accounts/")
         request.user = user
-        account_settings = get_account_settings(request)
+        account_settings = get_account_settings(request)[0]
 
         # Expect a date joined field but remove it to simplify the following comparison
         self.assertIsNotNone(account_settings['date_joined'])
@@ -341,14 +341,14 @@ class AccountCreationActivationAndPasswordChangeTest(TestCase):
 
         request = RequestFactory().get("/api/user/v1/accounts/")
         request.user = user
-        account = get_account_settings(request)
+        account = get_account_settings(request)[0]
         self.assertEqual(self.USERNAME, account["username"])
         self.assertEqual(self.EMAIL, account["email"])
         self.assertFalse(account["is_active"])
 
         # Activate the account and verify that it is now active
         activate_account(activation_key)
-        account = get_account_settings(request)
+        account = get_account_settings(request)[0]
         self.assertTrue(account['is_active'])
 
     def test_create_account_duplicate_username(self):

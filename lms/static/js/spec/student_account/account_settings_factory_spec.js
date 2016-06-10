@@ -52,7 +52,7 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
 
             var createAccountSettingsPage = function() {
                 var context = AccountSettingsPage(
-                    FIELDS_DATA, AUTH_DATA, Helpers.USER_ACCOUNTS_API_URL, Helpers.USER_PREFERENCES_API_URL, 'edX'
+                    FIELDS_DATA, [], AUTH_DATA, Helpers.USER_ACCOUNTS_API_URL, Helpers.USER_PREFERENCES_API_URL, 'edX'
                 );
                 return context.accountSettingsView;
             };
@@ -132,6 +132,7 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
             });
 
             it("expects all fields to behave correctly", function () {
+                var i, view;
 
                 requests = AjaxHelpers.requests(this);
 
@@ -141,14 +142,13 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
                 AjaxHelpers.respondWithJson(requests, Helpers.createUserPreferencesData());
                 AjaxHelpers.respondWithJson(requests, {});  // Page viewed analytics event
 
-                var sectionsData = accountSettingsView.options.sectionsData;
+                var sectionsData = accountSettingsView.options.tabSections.aboutTabSections;
 
                 expect(sectionsData[0].fields.length).toBe(6);
 
                 var textFields = [sectionsData[0].fields[1], sectionsData[0].fields[2]];
-                for (var i = 0; i < textFields.length ; i++) {
-
-                    var view = textFields[i].view;
+                for (i = 0; i < textFields.length ; i++) {
+                    view = textFields[i].view;
                     FieldViewsSpecHelpers.verifyTextField(view, {
                         title: view.options.title,
                         valueAttribute: view.options.valueAttribute,
@@ -180,14 +180,6 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
                         defaultValue: null
                     }, requests);
                 });
-
-                var section2Fields = sectionsData[2].fields;
-                expect(section2Fields.length).toBe(2);
-                for (var i = 0; i < section2Fields.length; i++) {
-
-                    var view = section2Fields[i].view;
-                    AccountSettingsFieldViewSpecHelpers.verifyAuthField(view, view.options, requests);
-                }
             });
         });
     });

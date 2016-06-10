@@ -74,7 +74,10 @@ class _DispatchingView(View):
         """
         Return the client_id from the provided request
         """
-        return request.POST.get('client_id')
+        if request.method == u'GET':
+            return request.GET.get('client_id')
+        else:
+            return request.POST.get('client_id')
 
 
 class AccessTokenView(_DispatchingView):
@@ -130,6 +133,7 @@ class AccessTokenView(_DispatchingView):
             'exp': now + expires_in,
             'iat': now,
             'preferred_username': user.username,
+            'scopes': scopes,
         }
 
         for scope in scopes:
@@ -153,6 +157,7 @@ class AccessTokenView(_DispatchingView):
             'family_name': user.last_name,
             'name': user.get_full_name(),
             'given_name': user.first_name,
+            'administrator': user.is_staff,
         })
 
 

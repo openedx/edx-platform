@@ -193,6 +193,11 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
         else:
             user = User.objects.get(username=username)
 
+        if user.is_anonymous():
+            # Anonymous users cannot be persisted to the database, so let's just use
+            # what we have.
+            return
+
         evt_time = time()
 
         for usage_key, state in block_keys_to_state.items():

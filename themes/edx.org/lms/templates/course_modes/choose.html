@@ -56,7 +56,7 @@ from openedx.core.djangolib.markup import HTML, Text
     % if error:
         <div class="wrapper-msg wrapper-msg-error">
             <div class=" msg msg-error">
-                <i class="msg-icon icon fa fa-exclamation-triangle"></i>
+                <span class="msg-icon icon fa fa-exclamation-triangle" aria-hidden="true"></span>
                 <div class="msg-content">
                     <h3 class="title">${_("Sorry, there was an error when trying to enroll you")}</h3>
                     <div class="copy">

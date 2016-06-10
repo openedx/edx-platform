@@ -38,14 +38,10 @@
                     var context = data.context,
                         fields = context.fields;
 
-                    // Add default option to array
-                    if ( fields[0].options.length > 1 ) {
-                        fields[0].options.unshift({
-                            name: '- ' + gettext('Choose one') + ' -',
-                            value: '',
-                            default: true
-                        });
-                    }
+                    // Add default option to course array
+                    this.addDefaultOption(fields, 0);
+                    // Add default option to household income array
+                    this.addDefaultOption(fields, 1);
 
                     // Set non-form data needed to render the View
                     this.context = {
@@ -137,6 +133,16 @@
                         $errorMessageContainer.append("<li>" + msg + "</li>");
                         this.toggleDisableButton(true);
                         $submissionContainer.removeClass('hidden');
+                    }
+                },
+
+                addDefaultOption: function(array, index) {
+                    if ( array[index].options.length > 1 ) {
+                        array[index].options.unshift({
+                            name: '- ' + gettext('Choose one') + ' -',
+                            value: '',
+                            default: true
+                        });
                     }
                 }
             });

@@ -43,7 +43,6 @@ define([
                 teams = TeamSpecHelpers.createMockTeams({
                     results: []
                 }, {
-                    per_page: 2,
                     url: TeamSpecHelpers.testContext.myTeamsUrl,
                     username: TeamSpecHelpers.testContext.userInfo.username
                 }, MyTeamsCollection),
@@ -60,7 +59,7 @@ define([
                     username : TeamSpecHelpers.testContext.userInfo.username,
                     course_id : TeamSpecHelpers.testContext.courseID,
                     page : '1',
-                    page_size : '2',
+                    page_size : '5',
                     text_search: '',
                     order_by: 'last_activity_at'
                 }

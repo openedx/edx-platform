@@ -1,3 +1,8 @@
+## mako
+
+<%! main_css = "style-discussion-main" %>
+
+<%page expression_filter="h"/>
 <%inherit file="../main.html" />
 <%namespace name='static' file='../static_content.html'/>
 <%!
@@ -7,12 +12,9 @@ from django.core.urlresolvers import reverse
 %>
 
 <%block name="bodyclass">discussion</%block>
-<%block name="pagetitle">${_("Discussion - {course_number}").format(course_number=course.display_number_with_default) | h}</%block>
+<%block name="pagetitle">${_("Discussion - {course_number}").format(course_number=course.display_number_with_default)}</%block>
 
 <%block name="headextra">
-<%static:css group='style-course-vendor'/>
-<%static:css group='style-course'/>
-
 <%include file="_js_head_dependencies.html" />
 </%block>
 
@@ -24,21 +26,22 @@ from django.core.urlresolvers import reverse
 
 <%include file="_discussion_course_navigation.html" args="active_page='discussion'" />
 
+<%block name="content">
 <section class="discussion container" id="discussion-container"
-         data-roles="${roles | h}"
-         data-course-id="${course_id | h}"
-         data-course-name="${course.display_name_with_default_escaped | h}"
-         data-user-info="${user_info | h}"
-         data-user-create-comment="${can_create_comment | h}"
-         data-user-create-subcomment="${can_create_subcomment | h}"
+         data-roles="${roles}"
+         data-course-id="${course_id}"
+         data-course-name="${course.display_name_with_default}"
+         data-user-info="${user_info}"
+         data-user-create-comment="${can_create_comment}"
+         data-user-create-subcomment="${can_create_subcomment}"
          data-read-only="false"
-         data-threads="${threads | h}"
-         data-thread-pages="${thread_pages | h}"
-         data-content-info="${annotated_content_info | h}"
-         data-sort-preference="${sort_preference | h}"
-         data-flag-moderator="${flag_moderator | h}"
-         data-user-cohort-id="${user_cohort | h}"
-         data-course-settings="${course_settings | h}">
+         data-threads="${threads}"
+         data-thread-pages="${thread_pages}"
+         data-content-info="${annotated_content_info}"
+         data-sort-preference="${sort_preference}"
+         data-flag-moderator="${flag_moderator}"
+         data-user-cohort-id="${user_cohort}"
+         data-course-settings="${course_settings}">
     <div class="discussion-body">
         <div class="forum-nav" role="complementary" aria-label="${_("Discussion thread list")}"></div>
         <div class="discussion-column" id="discussion-column">
@@ -49,6 +52,7 @@ from django.core.urlresolvers import reverse
         </div>
     </div>
 </section>
+</%block>
 
 <%include file="_underscore_templates.html" />
 <%include file="_thread_list_template.html" />

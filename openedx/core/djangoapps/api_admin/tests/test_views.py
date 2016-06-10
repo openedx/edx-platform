@@ -279,6 +279,13 @@ class CatalogListViewTest(CatalogTest):
         self.assertIn(catalog.name, response.content.decode('utf-8'))
 
     @httpretty.activate
+    def test_get_no_catalogs(self):
+        """Verify that the view works when no catalogs are set up."""
+        self.mock_catalog_api('api/v1/catalogs/', {}, status_code=404)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+
+    @httpretty.activate
     def test_post(self):
         catalog_data = {
             'name': 'test-catalog',

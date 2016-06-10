@@ -14,7 +14,7 @@ from mock import patch, Mock
 from nose.plugins.attrib import attr
 from smtplib import SMTPDataError, SMTPServerDisconnected, SMTPConnectError
 
-from bulk_email.models import CourseEmail, SEND_TO_ALL, BulkEmailFlag
+from bulk_email.models import CourseEmail, SEND_TO_MYSELF, BulkEmailFlag
 from bulk_email.tasks import perform_delegate_email_batches, send_course_email
 from instructor_task.models import InstructorTask
 from instructor_task.subtasks import (
@@ -60,10 +60,15 @@ class TestEmailErrors(ModuleStoreTestCase):
             'course_id': self.course.id.to_deprecated_string(),
             'success': True,
         }
+
+    @classmethod
+    def setUpClass(cls):
+        super(TestEmailErrors, cls).setUpClass()
         BulkEmailFlag.objects.create(enabled=True, require_course_email_auth=False)
 
-    def tearDown(self):
-        super(TestEmailErrors, self).tearDown()
+    @classmethod
+    def tearDownClass(cls):
+        super(TestEmailErrors, cls).tearDownClass()
         BulkEmailFlag.objects.all().delete()
 
     @patch('bulk_email.tasks.get_connection', autospec=True)
@@ -75,7 +80,7 @@ class TestEmailErrors(ModuleStoreTestCase):
         get_conn.return_value.send_messages.side_effect = SMTPDataError(455, "Throttling: Sending rate exceeded")
         test_email = {
             'action': 'Send email',
-            'send_to': 'myself',
+            'send_to': '["myself"]',
             'subject': 'test subject for myself',
             'message': 'test message for myself'
         }
@@ -98,13 +103,14 @@ class TestEmailErrors(ModuleStoreTestCase):
         # have every fourth email fail due to blacklisting:
         get_conn.return_value.send_messages.side_effect = cycle([SMTPDataError(554, "Email address is blacklisted"),
                                                                  None, None, None])
-        students = [UserFactory() for _ in xrange(settings.BULK_EMAIL_EMAILS_PER_TASK)]
+        # Don't forget to account for the "myself" instructor user
+        students = [UserFactory() for _ in xrange(settings.BULK_EMAIL_EMAILS_PER_TASK - 1)]
         for student in students:
             CourseEnrollmentFactory.create(user=student, course_id=self.course.id)
 
         test_email = {
             'action': 'Send email',
-            'send_to': 'all',
+            'send_to': '["myself", "staff", "learners"]',
             'subject': 'test subject for all',
             'message': 'test message for all'
         }
@@ -129,7 +135,7 @@ class TestEmailErrors(ModuleStoreTestCase):
         get_conn.return_value.open.side_effect = SMTPServerDisconnected(425, "Disconnecting")
         test_email = {
             'action': 'Send email',
-            'send_to': 'myself',
+            'send_to': '["myself"]',
             'subject': 'test subject for myself',
             'message': 'test message for myself'
         }
@@ -151,7 +157,7 @@ class TestEmailErrors(ModuleStoreTestCase):
 
         test_email = {
             'action': 'Send email',
-            'send_to': 'myself',
+            'send_to': '["myself"]',
             'subject': 'test subject for myself',
             'message': 'test message for myself'
         }
@@ -198,19 +204,39 @@ class TestEmailErrors(ModuleStoreTestCase):
         """
         Tests exception when the to_option in the email doesn't exist
         """
-        email = CourseEmail(course_id=self.course.id, to_option="IDONTEXIST")
-        email.save()
-        entry = InstructorTask.create(self.course.id, "task_type", "task_key", "task_input", self.instructor)
-        task_input = {"email_id": email.id}
-        with self.assertRaisesRegexp(Exception, 'Unexpected bulk email TO_OPTION found: IDONTEXIST'):
-            perform_delegate_email_batches(entry.id, self.course.id, task_input, "action_name")
+        with self.assertRaisesRegexp(ValueError, 'Course email being sent to unrecognized target: "IDONTEXIST" *'):
+            email = CourseEmail.create(  # pylint: disable=unused-variable
+                self.course.id,
+                self.instructor,
+                ["IDONTEXIST"],
+                "re: subject",
+                "dummy body goes here"
+            )
+
+    def test_nonexistent_cohort(self):
+        """
+        Tests exception when the cohort doesn't exist
+        """
+        with self.assertRaisesRegexp(ValueError, 'Cohort IDONTEXIST does not exist *'):
+            email = CourseEmail.create(  # pylint: disable=unused-variable
+                self.course.id,
+                self.instructor,
+                ["cohort:IDONTEXIST"],
+                "re: subject",
+                "dummy body goes here"
+            )
 
     def test_wrong_course_id_in_task(self):
         """
         Tests exception when the course_id in task is not the same as one explicitly passed in.
         """
-        email = CourseEmail(course_id=self.course.id, to_option=SEND_TO_ALL)
-        email.save()
+        email = CourseEmail.create(
+            self.course.id,
+            self.instructor,
+            [SEND_TO_MYSELF],
+            "re: subject",
+            "dummy body goes here"
+        )
         entry = InstructorTask.create("bogus/task/id", "task_type", "task_key", "task_input", self.instructor)
         task_input = {"email_id": email.id}
         with self.assertRaisesRegexp(ValueError, 'does not match task value'):
@@ -220,8 +246,13 @@ class TestEmailErrors(ModuleStoreTestCase):
         """
         Tests exception when the course_id in CourseEmail is not the same as one explicitly passed in.
         """
-        email = CourseEmail(course_id=SlashSeparatedCourseKey("bogus", "course", "id"), to_option=SEND_TO_ALL)
-        email.save()
+        email = CourseEmail.create(
+            SlashSeparatedCourseKey("bogus", "course", "id"),
+            self.instructor,
+            [SEND_TO_MYSELF],
+            "re: subject",
+            "dummy body goes here"
+        )
         entry = InstructorTask.create(self.course.id, "task_type", "task_key", "task_input", self.instructor)
         task_input = {"email_id": email.id}
         with self.assertRaisesRegexp(ValueError, 'does not match email value'):

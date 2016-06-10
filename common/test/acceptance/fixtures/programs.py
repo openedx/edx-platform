@@ -1,49 +1,31 @@
 """
 Tools to create programs-related data for use in bok choy tests.
 """
-from collections import namedtuple
 import json
 
 import requests
 
 from . import PROGRAMS_STUB_URL
 from .config import ConfigModelFixture
-from openedx.core.djangoapps.programs.tests import factories
-
-
-FakeProgram = namedtuple('FakeProgram', ['name', 'status', 'org_key', 'course_id'])
 
 
 class ProgramsFixture(object):
     """
     Interface to set up mock responses from the Programs stub server.
     """
-
-    def install_programs(self, fake_programs):
-        """
-        Sets the response data for the programs list endpoint.
-
-        At present, `fake_programs` must be a iterable of FakeProgram named tuples.
-        """
-        programs = []
-        for program in fake_programs:
-            run_mode = factories.RunMode(course_key=program.course_id)
-            course_code = factories.CourseCode(run_modes=[run_mode])
-            org = factories.Organization(key=program.org_key)
-
-            program = factories.Program(
-                name=program.name,
-                status=program.status,
-                organizations=[org],
-                course_codes=[course_code]
-            )
-            programs.append(program)
-
-        api_result = {'results': programs}
+    def install_programs(self, programs, is_list=True):
+        """Sets the response data for Programs API endpoints."""
+        if is_list:
+            key = 'programs'
+            api_result = {'results': programs}
+        else:
+            program = programs[0]
+            key = 'programs.{}'.format(program['id'])
+            api_result = program
 
         requests.put(
             '{}/set_config'.format(PROGRAMS_STUB_URL),
-            data={'programs': json.dumps(api_result)},
+            data={key: json.dumps(api_result)},
         )
 
 

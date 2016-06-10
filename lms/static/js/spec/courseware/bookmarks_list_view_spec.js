@@ -83,7 +83,7 @@ define(['backbone',
             var breadcrumbTrail = function (path, unitDisplayName) {
                 return _.pluck(path, 'display_name').
                     concat([unitDisplayName]).
-                    join(' <i class="icon fa fa-caret-right" aria-hidden="true"></i><span class="sr">-</span> ');
+                    join(' <span class="icon fa fa-caret-right" aria-hidden="true"></span><span class="sr">-</span> ');
             };
 
             var verifyBookmarkedData = function (view, expectedData) {
@@ -186,7 +186,12 @@ define(['backbone',
 
             it("calls bookmarks list render on page_changed event", function () {
                 var renderSpy = spyOn(BookmarksListView.prototype, 'render');
-                var listView = new BookmarksListView({collection: new BookmarksCollection({course_id: 'abc'})});
+                var listView = new BookmarksListView({
+                    collection: new BookmarksCollection([], {
+                        course_id: 'abc',
+                        url: '/test-bookmarks/url/'
+                    })
+                });
                 listView.collection.trigger('page_changed');
                 expect(renderSpy).toHaveBeenCalled();
             });

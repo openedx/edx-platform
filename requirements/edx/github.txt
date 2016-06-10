@@ -67,7 +67,7 @@ git+https://github.com/edx/rfc6266.git@v0.0.5-edx#egg=rfc6266==0.0.5-edx
 
 # Used for testing
 git+https://github.com/edx/lettuce.git@0.2.20.002#egg=lettuce==0.2.20.002
-git+https://github.com/edx/pa11ycrawler.git@cad2c741510b432b95eaa8af0f8e920a38933f8a#egg=pa11ycrawler
+git+https://github.com/edx/pa11ycrawler.git@a963bbb7c4f861b24b5f66bfc5259d3fa207cca8#egg=pa11ycrawler
 
 # Our libraries:
 git+https://github.com/edx/XBlock.git@xblock-0.4.10#egg=XBlock==0.4.10
@@ -75,10 +75,10 @@ git+https://github.com/edx/XBlock.git@xblock-0.4.10#egg=XBlock==0.4.10
 -e git+https://github.com/edx/event-tracking.git@0.2.1#egg=event-tracking==0.2.1
 -e git+https://github.com/edx/django-splash.git@v0.2#egg=django-splash==0.2
 -e git+https://github.com/edx/acid-block.git@e46f9cda8a03e121a00c7e347084d142d22ebfb7#egg=acid-xblock
-git+https://github.com/edx/edx-ora2.git@1.1.4#egg=ora2==1.1.4
+git+https://github.com/edx/edx-ora2.git@1.1.5#egg=ora2==1.1.5
 -e git+https://github.com/edx/edx-submissions.git@1.1.0#egg=edx-submissions==1.1.0
 git+https://github.com/edx/ease.git@release-2015-07-14#egg=ease==0.1.3
-git+https://github.com/edx/i18n-tools.git@v0.3#egg=i18n-tools==v0.3
+git+https://github.com/edx/i18n-tools.git@v0.3.2#egg=i18n-tools==v0.3.2
 git+https://github.com/edx/edx-val.git@0.0.9#egg=edxval==0.0.9
 -e git+https://github.com/pmitros/RecommenderXBlock.git@518234bc354edbfc2651b9e534ddb54f96080779#egg=recommender-xblock
 git+https://github.com/solashirai/crowdsourcehinter.git@518605f0a95190949fe77bd39158450639e2e1dc#egg=crowdsourcehinter-xblock==0.1
@@ -89,10 +89,10 @@ git+https://github.com/edx/xblock-utils.git@v1.0.2#egg=xblock-utils==1.0.2
 -e git+https://github.com/edx-solutions/xblock-google-drive.git@138e6fa0bf3a2013e904a085b9fed77dab7f3f21#egg=xblock-google-drive
 -e git+https://github.com/edx/edx-reverification-block.git@0.0.5#egg=edx-reverification-block==0.0.5
 git+https://github.com/edx/edx-user-state-client.git@1.0.1#egg=edx-user-state-client==1.0.1
-git+https://github.com/edx/xblock-lti-consumer.git@v1.0.6#egg=xblock-lti-consumer==1.0.6
-git+https://github.com/edx/edx-proctoring.git@0.12.17#egg=edx-proctoring==0.12.17
+git+https://github.com/edx/xblock-lti-consumer.git@v1.0.9#egg=xblock-lti-consumer==1.0.9
+git+https://github.com/edx/edx-proctoring.git@0.12.19#egg=edx-proctoring==0.12.19
 
 # Third Party XBlocks
 -e git+https://github.com/mitodl/edx-sga@172a90fd2738f8142c10478356b2d9ed3e55334a#egg=edx-sga
--e git+https://github.com/open-craft/xblock-poll@e7a6c95c300e95c51e42bfd1eba70489c05a6527#egg=xblock-poll
+-e git+https://github.com/open-craft/xblock-poll@v1.1#egg=xblock-poll==1.1
 git+https://github.com/edx-solutions/xblock-drag-and-drop-v2@v2.0.6#egg=xblock-drag-and-drop-v2==2.0.6

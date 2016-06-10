@@ -1,5 +1,6 @@
 <%page expression_filter="h"/>
 <%inherit file="main.html" />
+<%def name="online_help_token()"><% return "learnerdashboard" %></%def>
 <%namespace name='static' file='static_content.html'/>
 <%!
 from django.core.urlresolvers import reverse
@@ -8,7 +9,7 @@ from django.template import RequestContext
 import third_party_auth
 from third_party_auth import pipeline
 from openedx.core.djangolib.js_utils import dump_js_escaped_json, js_escaped_string
-from openedx.core.djangolib.markup import Text, HTML
+from openedx.core.djangolib.markup import HTML, Text
 %>
 
 <%
@@ -63,13 +64,13 @@ from openedx.core.djangolib.markup import Text, HTML
 <div class="dashboard-notifications" tabindex="-1">
     %if message:
         <section class="dashboard-banner">
-            ${message | n, unicode}
+            ${message | n, decode.utf8}
         </section>
     %endif
 
     %if enrollment_message:
         <section class="dashboard-banner">
-            ${enrollment_message | n, unicode}
+            ${enrollment_message | n,  decode.utf8}
         </section>
     %endif
 </div>
@@ -139,11 +140,11 @@ from openedx.core.djangolib.markup import Text, HTML
             <label for="dashboard-search-input">${_('Search Your Courses')}</label>
             <div class="search-field-wrapper">
               <input id="dashboard-search-input" type="text" class="search-field"/>
-              <button type="submit" class="search-button" aria-label="${_('Search')}">
-                <i class="icon fa fa-search" aria-hidden="true"></i>
+              <button type="submit" class="search-button" title="${_('Search')}">
+                <span class="icon fa fa-search" aria-hidden="true"></span>
               </button>
-              <button type="button" class="cancel-button" aria-label="${_('Clear search')}">
-                <i class="icon fa fa-remove" aria-hidden="true"></i>
+              <button type="button" class="cancel-button" title="${_('Clear search')}">
+                <span class="icon fa fa-remove" aria-hidden="true"></span>
               </button>
             </div>
           </form>
@@ -175,26 +176,13 @@ from openedx.core.djangolib.markup import Text, HTML
           </ul>
         </section>
       </section>
-      % if xseries_credentials:
-        <div class="wrapper-xseries-certificates">
-          <p class="title">${_("XSeries Program Certificates")}</p>
-          <p class="copy">${_("You have received a certificate for the following XSeries programs:")}</p>
-          <ul>
-          % for xseries_credential in xseries_credentials:
-            <li>
-              <a class="copy" href="${xseries_credential['credential_url']}">${xseries_credential['display_name']}</a>
-            </li>
-          % endfor
-          </ul>
-        </div>
-      % endif
     </section>
 </main>
 
 <section id="email-settings-modal" class="modal" aria-hidden="true">
   <div class="inner-wrapper" role="dialog" aria-labelledby="email-settings-title">
     <button class="close-modal">
-      <i class="icon fa fa-remove"></i>
+      <span class="icon fa fa-remove" aria-hidden="true"></span>
       <span class="sr">
         ## Translators: this is a control to allow users to exit out of this modal interface (a menu or piece of UI that takes the full focus of the screen)
         ${_("Close")}
@@ -225,7 +213,7 @@ from openedx.core.djangolib.markup import Text, HTML
 <section id="unenroll-modal" class="modal unenroll-modal" aria-hidden="true">
   <div class="inner-wrapper" role="dialog" aria-labelledby="unenrollment-modal-title">
     <button class="close-modal">
-      <i class="icon fa fa-remove"></i>
+      <span class="icon fa fa-remove" aria-hidden="true"></span>
       <span class="sr">
         ## Translators: this is a control to allow users to exit out of this modal interface (a menu or piece of UI that takes the full focus of the screen)
         ${_("Close")}

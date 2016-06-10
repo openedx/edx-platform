@@ -5,7 +5,7 @@
     from util.date_utils import get_time_display
     from django.utils.translation import ugettext as _
     from django.conf import settings
-    from openedx.core.djangolib.markup import Text, HTML
+    from openedx.core.djangolib.markup import HTML, Text
 %>
 
 <%def name="make_chapter(chapter)">
@@ -84,7 +84,7 @@ else:
 
 
 % if toc:
-    <%static:require_module module_name="js/courseware/accordion_events" class_name="AccordionEvents">
+    <%static:require_module_async module_name="js/courseware/accordion_events" class_name="AccordionEvents">
         AccordionEvents();
-    </%static:require_module>
+    </%static:require_module_async>
 % endif

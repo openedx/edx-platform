@@ -575,15 +575,17 @@ def course_about(request, course_id):
         # If the ecommerce checkout flow is enabled and the mode of the course is
         # professional or no id professional, we construct links for the enrollment
         # button to add the course to the ecommerce basket.
+        ecomm_service = EcommerceService()
+        ecommerce_checkout = ecomm_service.is_enabled(request.user)
         ecommerce_checkout_link = ''
         ecommerce_bulk_checkout_link = ''
         professional_mode = None
-        ecomm_service = EcommerceService()
         is_professional_mode = CourseMode.PROFESSIONAL in modes or CourseMode.NO_ID_PROFESSIONAL_MODE in modes
-        if ecomm_service.is_enabled(request.user) and (is_professional_mode):
+        if ecommerce_checkout and is_professional_mode:
             professional_mode = modes.get(CourseMode.PROFESSIONAL, '') or \
                 modes.get(CourseMode.NO_ID_PROFESSIONAL_MODE, '')
-            ecommerce_checkout_link = ecomm_service.checkout_page_url(professional_mode.sku)
+            if professional_mode.sku:
+                ecommerce_checkout_link = ecomm_service.checkout_page_url(professional_mode.sku)
             if professional_mode.bulk_sku:
                 ecommerce_bulk_checkout_link = ecomm_service.checkout_page_url(professional_mode.bulk_sku)
 
@@ -593,7 +595,9 @@ def course_about(request, course_id):
             settings.PAID_COURSE_REGISTRATION_CURRENCY[0]
         )
         course_price = get_cosmetic_display_price(course, registration_price)
-        can_add_course_to_cart = _is_shopping_cart_enabled and registration_price
+
+        # Determine which checkout workflow to use -- LMS shoppingcart or Otto basket
+        can_add_course_to_cart = _is_shopping_cart_enabled and registration_price and not ecommerce_checkout_link
 
         # Used to provide context to message to student if enrollment not allowed
         can_enroll = bool(has_access(request.user, 'enroll', course))
@@ -624,7 +628,7 @@ def course_about(request, course_id):
             'is_cosmetic_price_enabled': settings.FEATURES.get('ENABLE_COSMETIC_DISPLAY_PRICE'),
             'course_price': course_price,
             'in_cart': in_cart,
-            'ecommerce_checkout': ecomm_service.is_enabled(request.user),
+            'ecommerce_checkout': ecommerce_checkout,
             'ecommerce_checkout_link': ecommerce_checkout_link,
             'ecommerce_bulk_checkout_link': ecommerce_bulk_checkout_link,
             'professional_mode': professional_mode,
@@ -654,7 +658,6 @@ def course_about(request, course_id):
 @ensure_valid_course_key
 def progress(request, course_id, student_id=None):
     """ Display the progress page. """
-
     course_key = CourseKey.from_string(course_id)
 
     with modulestore().bulk_operations(course_key):
@@ -669,6 +672,14 @@ def _progress(request, course_key, student_id):
 
     Course staff are allowed to see the progress of students in their class.
     """
+
+    if student_id is not None:
+        try:
+            student_id = int(student_id)
+        # Check for ValueError if 'student_id' cannot be converted to integer.
+        except ValueError:
+            raise Http404
+
     course = get_course_with_access(request.user, 'load', course_key, depth=None, check_if_enrolled=True)
 
     # check to see if there is a required survey that must be taken before
@@ -693,8 +704,7 @@ def _progress(request, course_key, student_id):
             raise Http404
         try:
             student = User.objects.get(id=student_id)
-        # Check for ValueError if 'student_id' cannot be converted to integer.
-        except (ValueError, User.DoesNotExist):
+        except User.DoesNotExist:
             raise Http404
 
     # NOTE: To make sure impersonation by instructor works, use
@@ -722,6 +732,12 @@ def _progress(request, course_key, student_id):
 
     # checking certificate generation configuration
     enrollment_mode, is_active = CourseEnrollment.enrollment_mode_for_user(student, course_key)
+
+    # If the learner is in verified modes and the student did not have
+    # their ID verified, we need to show message to ask learner to verify their ID first
+    missing_required_verification = enrollment_mode in CourseMode.VERIFIED_MODES and \
+        not SoftwareSecurePhotoVerification.user_is_verified(student)
+
     show_generate_cert_btn = (
         is_active and CourseMode.is_eligible_for_certificate(enrollment_mode)
         and certs_api.cert_generation_enabled(course_key)
@@ -737,7 +753,7 @@ def _progress(request, course_key, student_id):
         'passed': is_course_passed(course, grade_summary),
         'show_generate_cert_btn': show_generate_cert_btn,
         'credit_course_requirements': _credit_course_requirements(course_key, student),
-        'is_id_verified': SoftwareSecurePhotoVerification.user_is_verified(student)
+        'missing_required_verification': missing_required_verification
     }
 
     if show_generate_cert_btn:
@@ -1294,6 +1310,10 @@ def financial_assistance_form(request):
             mode_slug=CourseMode.VERIFIED
         ).exists()
     ]
+    incomes = ['Less than $5,000', '$5,000 - $10,000', '$10,000 - $15,000', '$15,000 - $20,000', '$20,000 - $25,000']
+    annual_incomes = [
+        {'name': _(income), 'value': income} for income in incomes  # pylint: disable=translation-of-non-string
+    ]
     return render_to_response('financial-assistance/apply.html', {
         'header_text': FINANCIAL_ASSISTANCE_HEADER,
         'student_faq_url': marketing_link('FAQ'),
@@ -1324,12 +1344,12 @@ def financial_assistance_form(request):
             },
             {
                 'name': 'income',
-                'type': 'text',
+                'type': 'select',
                 'label': FA_INCOME_LABEL,
-                'placeholder': _('income in US Dollars ($)'),
+                'placeholder': '',
                 'defaultValue': '',
                 'required': True,
-                'restrictions': {},
+                'options': annual_incomes,
                 'instructions': _('Specify your annual household income in US Dollars.')
             },
             {
