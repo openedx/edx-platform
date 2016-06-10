@@ -137,7 +137,7 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         """
         response = self.client.get(self.url)
         # no enrollment information should be visible
-        self.assertFalse('<h2>Enrollment Information</h2>' in response.content)
+        self.assertNotIn('<h3 class="hd hd-3">Enrollment Information</h3>', response.content)
 
     @patch.dict(settings.FEATURES, {'DISPLAY_ANALYTICS_ENROLLMENTS': True})
     @override_settings(ANALYTICS_DASHBOARD_URL='')
@@ -148,7 +148,7 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         response = self.client.get(self.url)
 
         # enrollment information visible
-        self.assertTrue('<h2>Enrollment Information</h2>' in response.content)
+        self.assertIn('<h3 class="hd hd-3">Enrollment Information</h3>', response.content)
         self.assertTrue('<td>Verified</td>' in response.content)
         self.assertTrue('<td>Audit</td>' in response.content)
         self.assertTrue('<td>Honor</td>' in response.content)

@@ -5,7 +5,7 @@
         <div class="form-fields">
             <div class="form-field">
                 <div class="inline-discussion-topics">
-                    <h3 class="subsection-title"><%- gettext('Content-Specific Discussion Topics') %></h3>
+                    <h4 class="hd hd-4 subsection-title"><%- gettext('Content-Specific Discussion Topics') %></h4>
                     <p><%- gettext('Specify whether content-specific discussion topics are divided by cohort.') %></p>
                     <div class="always_cohort_inline_discussions">
                         <label>

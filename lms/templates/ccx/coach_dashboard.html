@@ -23,8 +23,8 @@ from openedx.core.djangolib.js_utils import (
 <section class="container">
   <div class="instructor-dashboard-wrapper-2">
         <main id="main" aria-label="Content" tabindex="-1">
-        <section class="instructor-dashboard-content-2" id="ccx-coach-dashboard-content">
-          <h1>${_("CCX Coach Dashboard")}</h1>
+        <section class="instructor-dashboard-content-2" id="ccx-coach-dashboard-content" aria-labelledby="header-ccx-dashboard">
+          <h2 class="hd hd-2" id="header-ccx-dashboard">${_("CCX Coach Dashboard")}</h2>
 
           %if not ccx:
             % if messages:
@@ -38,7 +38,7 @@ from openedx.core.djangolib.js_utils import (
                 % endfor
               </ul>
             % endif
-            <section>
+            <div>
               <p class="request-response-error" id="ccx-create-message"></p>
               <form action="${create_ccx_url}" class="ccx-form" method="POST" onsubmit="return validateForm(this)">
                 <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}"/>
@@ -50,7 +50,7 @@ from openedx.core.djangolib.js_utils import (
                   <button id="create-ccx" type="submit">${_('Create a new Custom Course for edX')}</button>
                 </div>
               </form>
-            </section>
+          </div>
           %endif
 
           %if ccx:
@@ -68,16 +68,16 @@ from openedx.core.djangolib.js_utils import (
               <a href="#" data-section="grading_policy">${_("Grading Policy")}</a>
             </li>
           </ul>
-          <section id="membership" class="idash-section">
+          <section id="membership" class="idash-section" aria-label="${_('Batch Enrollment')}">
             <%include file="enrollment.html" args="" />
           </section>
-          <section id="schedule" class="idash-section">
+          <section id="schedule" class="idash-section" aria-label="${_('Schedule')}">
             <%include file="schedule.html" args="" />
           </section>
-          <section id="student_admin" class="idash-section">
+          <section id="student_admin" class="idash-section" aria-label="${_('Student Grades')}">
             <%include file="student_admin.html" args="" />
           </section>
-          <section id="grading_policy" class="idash-section">
+          <section id="grading_policy" class="idash-section" aria-label="${_('Grading Policy')}">
             <%include file="grading_policy.html" args="" />
           </section>
           %endif

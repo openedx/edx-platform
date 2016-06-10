@@ -3,7 +3,8 @@
 from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse
 %>
-<section id="edit-coupon-modal" class="modal" role="dialog" tabindex="-1" aria-label="${_('Edit Coupon Code')}">
+<section id="edit-coupon-modal" class="modal" role="dialog" tabindex="-1" aria-labelledby="header-edit-coupon-code">
+    <h2 id="header-edit-coupon-code" class="hd hd-2">${_("Edit Coupon Code")}</h2>
   <div class="inner-wrapper">
     <button class="close-modal">
       <span class="icon fa fa-remove" aria-hidden="true"></span>
@@ -14,10 +15,6 @@ from django.core.urlresolvers import reverse
     </button>
 
     <div id="coupon-content">
-      <header>
-        <h2>${_("Edit Coupon Code")}</h2>
-      </header>
-
       <div class="instructions">
         <p>
           ${_("Edit Coupon Code Information")}</p>

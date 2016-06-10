@@ -3,9 +3,9 @@
  * The UXPL isn't available retroactively, so this shims
  * the headings from the UXPL with what we're using in
  * the platform to better sync things up in the meantime.
- * It is scoped to #seq_content, specifically for xblock.
+ * These are available to entire LMS.
  *
- * Once the UXPl is fitted retroactively, this can be removed.
+ * Once the UXPL is fitted retroactively (if ever then), this can be removed.
  */
 
 $headings-count: 8;
@@ -88,29 +88,33 @@ $headings-base-color:                       $gray-d2;
     letter-spacing: 1px;
 }
 
+// let's make these classnames available to the entire LMS!
+
+.hd-1,
+.hd-2,
+.hd-3,
+.hd-4,
+.hd-5,
+.hd-6,
+.hd-7,
+.hd-8 {
+    @extend %reset-headings;
+}
+
+
+// ----------------------------
+// #CANNED
+// ----------------------------
+// canned heading classes
+@for $i from 1 through $headings-count {
+    .hd-#{$i} {
+        @extend %hd-#{$i};
+    }
+}
+
+// H3 was problematic in xblocks, we so we'll keep it as it was
+
 .xblock .xblock {
-
-    .hd-1,
-    .hd-2,
-    .hd-3,
-    .hd-4,
-    .hd-5,
-    .hd-6,
-    .hd-7,
-    .hd-8 {
-        @extend %reset-headings;
-    }
-
-
-    // ----------------------------
-    // #CANNED
-    // ----------------------------
-    // canned heading classes
-    @for $i from 1 through $headings-count {
-        .hd-#{$i} {
-            @extend %hd-#{$i};
-        }
-    }
 
     h3 {
         @extend %hd-2;
