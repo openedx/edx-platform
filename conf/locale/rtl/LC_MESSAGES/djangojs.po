@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-06-02 14:33+0000\n"
-"PO-Revision-Date: 2016-06-02 14:34:15.467005\n"
+"POT-Creation-Date: 2016-06-07 15:18+0000\n"
+"PO-Revision-Date: 2016-06-07 15:19:47.211325\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -5795,8 +5795,8 @@ msgid "Clear search"
 msgstr "ذمثشق سثشقذا"
 
 #: common/static/common/templates/discussion/discussion-home.underscore
-msgid "DISCUSSION HOME:"
-msgstr "يهسذعسسهخر اخوث:"
+msgid "Discussion Home"
+msgstr "يهسذعسسهخر اخوث"
 
 #: common/static/common/templates/discussion/discussion-home.underscore
 #, python-format
@@ -6136,8 +6136,8 @@ msgid "Add a Response"
 msgstr "شيي ش قثسحخرسث"
 
 #: common/static/common/templates/discussion/thread.underscore
-msgid "Post a response:"
-msgstr "حخسف ش قثسحخرسث:"
+msgid "Add a response:"
+msgstr "شيي ش قثسحخرسث:"
 
 #: common/static/common/templates/discussion/thread.underscore
 msgid "Expand discussion"
@@ -6366,8 +6366,8 @@ msgid "Join Team"
 msgstr "تخهر فثشو"
 
 #: lms/djangoapps/teams/static/teams/templates/team-profile.underscore
-msgid "New Post"
-msgstr "رثص حخسف"
+msgid "Add a Post"
+msgstr "شيي ش حخسف"
 
 #: lms/djangoapps/teams/static/teams/templates/team-profile.underscore
 msgid "Team Details"

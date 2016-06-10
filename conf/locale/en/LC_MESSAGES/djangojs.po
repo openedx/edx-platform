@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-06-02 14:33+0000\n"
-"PO-Revision-Date: 2016-06-02 14:34:15.467005\n"
+"POT-Creation-Date: 2016-06-10 11:06+0000\n"
+"PO-Revision-Date: 2016-06-10 11:07:26.349452\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -5501,7 +5501,7 @@ msgid "Clear search"
 msgstr ""
 
 #: common/static/common/templates/discussion/discussion-home.underscore
-msgid "DISCUSSION HOME:"
+msgid "Discussion Home"
 msgstr ""
 
 #: common/static/common/templates/discussion/discussion-home.underscore
@@ -5834,7 +5834,7 @@ msgid "Add a Response"
 msgstr ""
 
 #: common/static/common/templates/discussion/thread.underscore
-msgid "Post a response:"
+msgid "Add a response:"
 msgstr ""
 
 #: common/static/common/templates/discussion/thread.underscore
@@ -6059,7 +6059,7 @@ msgid "Join Team"
 msgstr ""
 
 #: lms/djangoapps/teams/static/teams/templates/team-profile.underscore
-msgid "New Post"
+msgid "Add a Post"
 msgstr ""
 
 #: lms/djangoapps/teams/static/teams/templates/team-profile.underscore

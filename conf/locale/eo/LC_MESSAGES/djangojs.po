@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-06-02 14:33+0000\n"
-"PO-Revision-Date: 2016-06-02 14:34:15.467005\n"
+"POT-Creation-Date: 2016-06-07 15:18+0000\n"
+"PO-Revision-Date: 2016-06-07 15:19:47.211325\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -6487,8 +6487,8 @@ msgid "Clear search"
 msgstr "Çléär séärçh Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
 #: common/static/common/templates/discussion/discussion-home.underscore
-msgid "DISCUSSION HOME:"
-msgstr "DÌSÇÛSSÌÖN HÖMÉ: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
+msgid "Discussion Home"
+msgstr "Dïsçüssïön Hömé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 
 #: common/static/common/templates/discussion/discussion-home.underscore
 #, python-format
@@ -6844,8 +6844,8 @@ msgid "Add a Response"
 msgstr "Àdd ä Réspönsé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 
 #: common/static/common/templates/discussion/thread.underscore
-msgid "Post a response:"
-msgstr "Pöst ä réspönsé: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
+msgid "Add a response:"
+msgstr "Àdd ä réspönsé: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 
 #: common/static/common/templates/discussion/thread.underscore
 msgid "Expand discussion"
@@ -7086,8 +7086,8 @@ msgid "Join Team"
 msgstr "Jöïn Téäm Ⱡ'σяєм ιρѕυм ∂σł#"
 
 #: lms/djangoapps/teams/static/teams/templates/team-profile.underscore
-msgid "New Post"
-msgstr "Néw Pöst Ⱡ'σяєм ιρѕυм ∂#"
+msgid "Add a Post"
+msgstr "Àdd ä Pöst Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
 #: lms/djangoapps/teams/static/teams/templates/team-profile.underscore
 msgid "Team Details"

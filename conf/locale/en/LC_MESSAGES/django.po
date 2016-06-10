@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-06-02 14:34+0000\n"
-"PO-Revision-Date: 2016-06-02 14:34:15.032270\n"
+"POT-Creation-Date: 2016-06-10 11:07+0000\n"
+"PO-Revision-Date: 2016-06-10 11:07:25.952973\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -231,9 +231,9 @@ msgid "Course"
 msgstr ""
 
 #: common/djangoapps/course_modes/models.py
+#: common/lib/xblock/xblock_discussion/xblock_discussion.py
 #: common/lib/xmodule/xmodule/annotatable_module.py
 #: common/lib/xmodule/xmodule/capa_base.py
-#: common/lib/xmodule/xmodule/discussion_module.py
 #: common/lib/xmodule/xmodule/html_module.py
 #: common/lib/xmodule/xmodule/imageannotation_module.py
 #: common/lib/xmodule/xmodule/library_content_module.py
@@ -1703,15 +1703,8 @@ msgstr ""
 msgid "Could not interpret '{given_answer}' as a number."
 msgstr ""
 
+#: common/lib/xblock/xblock_discussion/xblock_discussion.py
 #: common/lib/xmodule/xmodule/annotatable_module.py
-#: common/lib/xmodule/xmodule/imageannotation_module.py
-#: common/lib/xmodule/xmodule/textannotation_module.py
-#: common/lib/xmodule/xmodule/videoannotation_module.py
-msgid "XML data for the annotation"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/annotatable_module.py
-#: common/lib/xmodule/xmodule/discussion_module.py
 #: common/lib/xmodule/xmodule/html_module.py
 #: common/lib/xmodule/xmodule/imageannotation_module.py
 #: common/lib/xmodule/xmodule/library_content_module.py
@@ -1719,6 +1712,37 @@ msgstr ""
 #: common/lib/xmodule/xmodule/videoannotation_module.py
 #: common/lib/xmodule/xmodule/word_cloud_module.py
 msgid "Display name for this module"
+msgstr ""
+
+#: common/lib/xblock/xblock_discussion/xblock_discussion.py
+msgid "Category"
+msgstr ""
+
+#: common/lib/xblock/xblock_discussion/xblock_discussion.py
+msgid "Week 1"
+msgstr ""
+
+#: common/lib/xblock/xblock_discussion/xblock_discussion.py
+msgid ""
+"A category name for the discussion. This name appears in the left pane of "
+"the discussion forum for the course."
+msgstr ""
+
+#: common/lib/xblock/xblock_discussion/xblock_discussion.py
+msgid "Subcategory"
+msgstr ""
+
+#: common/lib/xblock/xblock_discussion/xblock_discussion.py
+msgid ""
+"A subcategory name for the discussion. This name appears in the left pane of"
+" the discussion forum for the course."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/annotatable_module.py
+#: common/lib/xmodule/xmodule/imageannotation_module.py
+#: common/lib/xmodule/xmodule/textannotation_module.py
+#: common/lib/xmodule/xmodule/videoannotation_module.py
+msgid "XML data for the annotation"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/annotatable_module.py
@@ -1835,7 +1859,6 @@ msgid "Per Student"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/capa_base.py
-#: common/lib/xmodule/xmodule/discussion_module.py
 msgid "XML data for the problem"
 msgstr ""
 
@@ -2799,34 +2822,6 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "General"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/discussion_module.py
-msgid "Discussion Id"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/discussion_module.py
-msgid "The id is a unique identifier for the discussion. It is non editable."
-msgstr ""
-
-#: common/lib/xmodule/xmodule/discussion_module.py
-msgid "Category"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/discussion_module.py
-msgid ""
-"A category name for the discussion. This name appears in the left pane of "
-"the discussion forum for the course."
-msgstr ""
-
-#: common/lib/xmodule/xmodule/discussion_module.py
-msgid "Subcategory"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/discussion_module.py
-msgid ""
-"A subcategory name for the discussion. This name appears in the left pane of"
-" the discussion forum for the course."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/html_module.py
@@ -12668,19 +12663,19 @@ msgid "Results:"
 msgstr ""
 
 #: lms/templates/discussion/_discussion_course_navigation.html
-#: lms/templates/discussion/_discussion_module.html
-msgid "New Post"
+#: lms/templates/discussion/_discussion_inline.html
+msgid "Add a Post"
 msgstr ""
 
-#: lms/templates/discussion/_discussion_module.html
+#: lms/templates/discussion/_discussion_inline.html
 msgid "Show Discussion"
 msgstr ""
 
-#: lms/templates/discussion/_discussion_module_studio.html
+#: lms/templates/discussion/_discussion_inline_studio.html
 msgid "To view live discussions, click Preview or View Live in Unit Settings."
 msgstr ""
 
-#: lms/templates/discussion/_discussion_module_studio.html
+#: lms/templates/discussion/_discussion_inline_studio.html
 msgid "Discussion ID: {discussion_id}"
 msgstr ""
 

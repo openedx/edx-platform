@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-06-02 14:34+0000\n"
-"PO-Revision-Date: 2016-06-02 14:34:15.032270\n"
+"POT-Creation-Date: 2016-06-07 15:19+0000\n"
+"PO-Revision-Date: 2016-06-07 15:19:46.687508\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -239,7 +239,6 @@ msgstr "ذخعقسث"
 #: common/djangoapps/course_modes/models.py
 #: common/lib/xmodule/xmodule/annotatable_module.py
 #: common/lib/xmodule/xmodule/capa_base.py
-#: common/lib/xmodule/xmodule/discussion_module.py
 #: common/lib/xmodule/xmodule/html_module.py
 #: common/lib/xmodule/xmodule/imageannotation_module.py
 #: common/lib/xmodule/xmodule/library_content_module.py
@@ -1802,7 +1801,6 @@ msgid "XML data for the annotation"
 msgstr "طوم يشفش بخق فاث شررخفشفهخر"
 
 #: common/lib/xmodule/xmodule/annotatable_module.py
-#: common/lib/xmodule/xmodule/discussion_module.py
 #: common/lib/xmodule/xmodule/html_module.py
 #: common/lib/xmodule/xmodule/imageannotation_module.py
 #: common/lib/xmodule/xmodule/library_content_module.py
@@ -1935,7 +1933,6 @@ msgid "Per Student"
 msgstr "حثق سفعيثرف"
 
 #: common/lib/xmodule/xmodule/capa_base.py
-#: common/lib/xmodule/xmodule/discussion_module.py
 msgid "XML data for the problem"
 msgstr "طوم يشفش بخق فاث حقخزمثو"
 
@@ -3068,38 +3065,6 @@ msgstr "ثرفثق فاث يثفشهمس بخق ذخعقسث هرسفقعذفخ�
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "General"
 msgstr "لثرثقشم"
-
-#: common/lib/xmodule/xmodule/discussion_module.py
-msgid "Discussion Id"
-msgstr "يهسذعسسهخر هي"
-
-#: common/lib/xmodule/xmodule/discussion_module.py
-msgid "The id is a unique identifier for the discussion. It is non editable."
-msgstr "فاث هي هس ش عرهضعث هيثرفهبهثق بخق فاث يهسذعسسهخر. هف هس رخر ثيهفشزمث."
-
-#: common/lib/xmodule/xmodule/discussion_module.py
-msgid "Category"
-msgstr "ذشفثلخقغ"
-
-#: common/lib/xmodule/xmodule/discussion_module.py
-msgid ""
-"A category name for the discussion. This name appears in the left pane of "
-"the discussion forum for the course."
-msgstr ""
-"ش ذشفثلخقغ رشوث بخق فاث يهسذعسسهخر. فاهس رشوث شححثشقس هر فاث مثبف حشرث خب "
-"فاث يهسذعسسهخر بخقعو بخق فاث ذخعقسث."
-
-#: common/lib/xmodule/xmodule/discussion_module.py
-msgid "Subcategory"
-msgstr "سعزذشفثلخقغ"
-
-#: common/lib/xmodule/xmodule/discussion_module.py
-msgid ""
-"A subcategory name for the discussion. This name appears in the left pane of"
-" the discussion forum for the course."
-msgstr ""
-"ش سعزذشفثلخقغ رشوث بخق فاث يهسذعسسهخر. فاهس رشوث شححثشقس هر فاث مثبف حشرث خب"
-" فاث يهسذعسسهخر بخقعو بخق فاث ذخعقسث."
 
 #: common/lib/xmodule/xmodule/html_module.py
 msgid "Text"
@@ -14165,20 +14130,20 @@ msgid "Results:"
 msgstr "قثسعمفس:"
 
 #: lms/templates/discussion/_discussion_course_navigation.html
-#: lms/templates/discussion/_discussion_module.html
-msgid "New Post"
-msgstr "رثص حخسف"
+#: lms/templates/discussion/_discussion_inline.html
+msgid "Add a Post"
+msgstr "شيي ش حخسف"
 
-#: lms/templates/discussion/_discussion_module.html
+#: lms/templates/discussion/_discussion_inline.html
 msgid "Show Discussion"
 msgstr "ساخص يهسذعسسهخر"
 
-#: lms/templates/discussion/_discussion_module_studio.html
+#: lms/templates/discussion/_discussion_inline_studio.html
 msgid "To view live discussions, click Preview or View Live in Unit Settings."
 msgstr ""
 "فخ دهثص مهدث يهسذعسسهخرس, ذمهذن حقثدهثص خق دهثص مهدث هر عرهف سثففهرلس."
 
-#: lms/templates/discussion/_discussion_module_studio.html
+#: lms/templates/discussion/_discussion_inline_studio.html
 msgid "Discussion ID: {discussion_id}"
 msgstr "يهسذعسسهخر هي: {discussion_id}"
 

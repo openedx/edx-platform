@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-06-02 14:34+0000\n"
-"PO-Revision-Date: 2016-06-02 14:34:15.032270\n"
+"POT-Creation-Date: 2016-06-07 15:19+0000\n"
+"PO-Revision-Date: 2016-06-07 15:19:46.687508\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -254,7 +254,6 @@ msgstr "Çöürsé Ⱡ'σяєм ιρѕυ#"
 #: common/djangoapps/course_modes/models.py
 #: common/lib/xmodule/xmodule/annotatable_module.py
 #: common/lib/xmodule/xmodule/capa_base.py
-#: common/lib/xmodule/xmodule/discussion_module.py
 #: common/lib/xmodule/xmodule/html_module.py
 #: common/lib/xmodule/xmodule/imageannotation_module.py
 #: common/lib/xmodule/xmodule/library_content_module.py
@@ -2052,7 +2051,6 @@ msgid "XML data for the annotation"
 msgstr "XML dätä för thé ännötätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
 
 #: common/lib/xmodule/xmodule/annotatable_module.py
-#: common/lib/xmodule/xmodule/discussion_module.py
 #: common/lib/xmodule/xmodule/html_module.py
 #: common/lib/xmodule/xmodule/imageannotation_module.py
 #: common/lib/xmodule/xmodule/library_content_module.py
@@ -2199,7 +2197,6 @@ msgid "Per Student"
 msgstr "Pér Stüdént Ⱡ'σяєм ιρѕυм ∂σłσя #"
 
 #: common/lib/xmodule/xmodule/capa_base.py
-#: common/lib/xmodule/xmodule/discussion_module.py
 msgid "XML data for the problem"
 msgstr "XML dätä för thé prößlém Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
 
@@ -3537,40 +3534,6 @@ msgstr ""
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "General"
 msgstr "Généräl Ⱡ'σяєм ιρѕυм #"
-
-#: common/lib/xmodule/xmodule/discussion_module.py
-msgid "Discussion Id"
-msgstr "Dïsçüssïön Ìd Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
-
-#: common/lib/xmodule/xmodule/discussion_module.py
-msgid "The id is a unique identifier for the discussion. It is non editable."
-msgstr ""
-"Thé ïd ïs ä ünïqüé ïdéntïfïér för thé dïsçüssïön. Ìt ïs nön édïtäßlé. Ⱡ'σяєм"
-" ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
-
-#: common/lib/xmodule/xmodule/discussion_module.py
-msgid "Category"
-msgstr "Çätégörý Ⱡ'σяєм ιρѕυм ∂#"
-
-#: common/lib/xmodule/xmodule/discussion_module.py
-msgid ""
-"A category name for the discussion. This name appears in the left pane of "
-"the discussion forum for the course."
-msgstr ""
-"À çätégörý nämé för thé dïsçüssïön. Thïs nämé äppéärs ïn thé léft päné öf "
-"thé dïsçüssïön förüm för thé çöürsé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
-
-#: common/lib/xmodule/xmodule/discussion_module.py
-msgid "Subcategory"
-msgstr "Süßçätégörý Ⱡ'σяєм ιρѕυм ∂σłσя #"
-
-#: common/lib/xmodule/xmodule/discussion_module.py
-msgid ""
-"A subcategory name for the discussion. This name appears in the left pane of"
-" the discussion forum for the course."
-msgstr ""
-"À süßçätégörý nämé för thé dïsçüssïön. Thïs nämé äppéärs ïn thé léft päné öf"
-" thé dïsçüssïön förüm för thé çöürsé. Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
 #: common/lib/xmodule/xmodule/html_module.py
 msgid "Text"
@@ -16218,21 +16181,21 @@ msgid "Results:"
 msgstr "Résülts: Ⱡ'σяєм ιρѕυм ∂#"
 
 #: lms/templates/discussion/_discussion_course_navigation.html
-#: lms/templates/discussion/_discussion_module.html
-msgid "New Post"
-msgstr "Néw Pöst Ⱡ'σяєм ιρѕυм ∂#"
+#: lms/templates/discussion/_discussion_inline.html
+msgid "Add a Post"
+msgstr "Àdd ä Pöst Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
-#: lms/templates/discussion/_discussion_module.html
+#: lms/templates/discussion/_discussion_inline.html
 msgid "Show Discussion"
 msgstr "Shöw Dïsçüssïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 
-#: lms/templates/discussion/_discussion_module_studio.html
+#: lms/templates/discussion/_discussion_inline_studio.html
 msgid "To view live discussions, click Preview or View Live in Unit Settings."
 msgstr ""
 "Tö vïéw lïvé dïsçüssïöns, çlïçk Prévïéw ör Vïéw Lïvé ïn Ûnït Séttïngs. "
 "Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
 
-#: lms/templates/discussion/_discussion_module_studio.html
+#: lms/templates/discussion/_discussion_inline_studio.html
 msgid "Discussion ID: {discussion_id}"
 msgstr "Dïsçüssïön ÌD: {discussion_id} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
 
