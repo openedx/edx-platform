@@ -154,6 +154,9 @@ MOCK_MODULES = [
     'provider',
     'provider.oauth2',
     'oauth2_provider',
+    'celery.signals',
+    'edx_rest_framework_extensions',
+    'edx_rest_framework_extensions.authentication',
 ]
 
 for mod_name in MOCK_MODULES:
