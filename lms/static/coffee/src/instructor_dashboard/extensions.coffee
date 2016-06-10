@@ -45,6 +45,7 @@ class Extensions
         due_datetime: @$due_datetime_input.val()
 
       $.ajax
+        type: 'POST'
         dataType: 'json'
         url: @$change_due_date.data 'endpoint'
         data: send_data
@@ -60,6 +61,7 @@ class Extensions
         url: @$url_input.val()
 
       $.ajax
+        type: 'POST'
         dataType: 'json'
         url: @$reset_due_date.data 'endpoint'
         data: send_data
@@ -75,6 +77,7 @@ class Extensions
       send_data =
         url: @$url_input.val()
       $.ajax
+        type: 'POST'
         dataType: 'json'
         url: url
         data: send_data
@@ -90,6 +93,7 @@ class Extensions
       send_data =
         student: @$student_input.val()
       $.ajax
+        type: 'POST'
         dataType: 'json'
         url: url
         data: send_data
