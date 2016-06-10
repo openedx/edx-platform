@@ -115,6 +115,9 @@
         "$",
         "_",
 
+        // Backbone.js globals
+        "Backbone",
+
         // RequireJS globals
         "define",
         "require",
@@ -125,8 +128,10 @@
         "describe", "xdescribe",
         "it", "xit",
         "spyOn",
+        "beforeAll",
         "beforeEach",
         "afterEach",
+        "afterAll",
         "expect",
         "waitsFor",
         "runs",
@@ -137,6 +142,7 @@
         "readFixtures",
         "setFixtures",
         "appendSetFixtures",
+        "sandbox",
         "spyOnEvent",
 
         // Django i18n catalog globals

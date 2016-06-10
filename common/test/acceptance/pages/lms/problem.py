@@ -197,5 +197,5 @@ class ProblemPage(PageObject):
         """
         Get the text seen in any tooltip currently visible on the page.
         """
-        self.wait_for_element_visibility('body > .tooltip', 'A tooltip is visible.')
-        return self.q(css='body > .tooltip').text[0]
+        self.wait_for_element_visibility('.tooltip', 'A tooltip is visible.')
+        return self.q(css='.tooltip').text[0]
