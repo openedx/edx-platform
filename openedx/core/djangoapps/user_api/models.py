@@ -8,7 +8,7 @@ from django.db.models.signals import post_delete, pre_save, post_save
 from django.dispatch import receiver
 from model_utils.models import TimeStampedModel
 
-from pytz import common_timezones, utc, timezone
+from pytz import common_timezones
 from util.date_utils import get_formatted_time_zone
 
 from util.model_utils import get_changed_fields_dict, emit_setting_changed_event
