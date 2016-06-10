@@ -40,7 +40,7 @@ from openedx.core.djangoapps.theming.helpers import is_request_in_themed_site, g
 from openedx.core.djangoapps.user_api.accounts.api import request_password_change
 from openedx.core.djangoapps.user_api.errors import UserNotFound
 
-from pytz import common_timezones
+from openedx.core.djangoapps.user_api.models import UserPreference
 
 AUDIT_LOG = logging.getLogger("audit")
 
@@ -390,7 +390,8 @@ def account_settings_context(request):
             }, 'preferred_language': {
                 'options': all_languages(),
             }, 'time_zone': {
-                'options': [(tz, tz) for tz in common_timezones]
+                'options': UserPreference.TIME_ZONE_CHOICES,
+                'enabled': settings.FEATURES.get('ENABLE_TIME_ZONE_PREFERENCE'),
             }
         },
         'platform_name': get_themed_value('PLATFORM_NAME', settings.PLATFORM_NAME),
