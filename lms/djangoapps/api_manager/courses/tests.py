@@ -1281,7 +1281,7 @@ class CoursesApiTests(ModuleStoreTestCase):
         """ Test courses_enrolled value returned by courses users list api """
         course = CourseFactory.create()
         course2 = CourseFactory.create()
-        test_uri = self.base_courses_uri + '/' + unicode(course.id) + '/users'
+        test_uri = self.base_courses_uri + '/{course_id}/users?additional_fields=courses_enrolled'
         # create a 2 new users
         users = UserFactory.create_batch(2)
 
@@ -1291,14 +1291,13 @@ class CoursesApiTests(ModuleStoreTestCase):
         CourseEnrollmentFactory.create(user=users[1], course_id=course2.id)
 
         # fetch course 1 users
-        response = self.do_get(test_uri)
+        response = self.do_get(test_uri.format(course_id=unicode(course.id)))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data['results']), 2)
         self.assertEqual(response.data['results'][0]['courses_enrolled'], 1)
 
         # fetch user 2
-        test_uri = self.base_courses_uri + '/' + unicode(course2.id) + '/users'
-        response = self.do_get(test_uri)
+        response = self.do_get(test_uri.format(course_id=unicode(course2.id)))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data['results']), 1)
         self.assertEqual(response.data['results'][0]['courses_enrolled'], 2)
@@ -1311,12 +1310,24 @@ class CoursesApiTests(ModuleStoreTestCase):
             start=self.course_start_date,
             end=self.course_end_date
         )
-        test_uri = self.base_courses_uri + '/' + unicode(course.id) + '/users'
+        test_uri = self.base_courses_uri + '/{course_id}/users?additional_fields=organizations,grades,roles'
         user = UserFactory.create(username="testuserattributes", profile='test')
         CourseEnrollmentFactory.create(user=user, course_id=course.id)
         user_grade, user_proforma_grade = 0.9, 0.91
-        StudentGradebook.objects.create(user=user, course_id=course.id,
-                                        grade=user_grade, proforma_grade=user_proforma_grade)
+        section_breakdown = [
+            {
+                "category": "Homework",
+                "percent": 1.0,
+                "detail": "Homework 1 - New Subsection - 100% (1/1)",
+                "label": "Grade 01"
+            }
+        ]
+        grade_summary = {"section_breakdown": section_breakdown}
+        StudentGradebook.objects.create(
+            user=user, course_id=course.id,
+            grade=user_grade, proforma_grade=user_proforma_grade,
+            grade_summary=json.dumps(grade_summary)
+        )
 
         data = {
             'name': 'Test Organization Attributes',
@@ -1330,7 +1341,7 @@ class CoursesApiTests(ModuleStoreTestCase):
         allow_access(course, user, 'observer')
         allow_access(self.course, user, 'staff')
 
-        response = self.do_get(test_uri)
+        response = self.do_get(test_uri.format(course_id=unicode(course.id)))
         self.assertEqual(response.status_code, 200)
         self.assertIn('id', response.data['results'][0])
         self.assertIn('email', response.data['results'][0])
@@ -1350,7 +1361,11 @@ class CoursesApiTests(ModuleStoreTestCase):
         self.assertEqual(['instructor', 'observer'], roles)
         self.assertIn('grades', response.data['results'][0])
         self.assertEqual(
-            response.data['results'][0]['grades'], {'grade': user_grade, 'proforma_grade': user_proforma_grade}
+            response.data['results'][0]['grades'], {
+                'grade': user_grade,
+                'proforma_grade': user_proforma_grade,
+                'section_breakdown': section_breakdown
+            }
         )
 
     def test_courses_users_list_with_fields(self):
