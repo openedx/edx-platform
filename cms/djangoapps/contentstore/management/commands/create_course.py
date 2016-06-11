@@ -15,45 +15,33 @@ class Command(BaseCommand):
 
     # can this query modulestore for the list of write accessible stores or does that violate command pattern?
     help = "Create a course in one of {}".format([ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split])
-    args = "modulestore user org course run"
 
-    def parse_args(self, *args):
-        """
-        Return a tuple of passed in values for (modulestore, user, org, course, run).
-        """
-        if len(args) != 5:
-            raise CommandError(
-                "create_course requires 5 arguments: "
-                "a modulestore, user, org, course, run. Modulestore is one of {}".format(
-                    [ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split]
-                )
-            )
-
-        if args[0] not in [ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split]:
-            raise CommandError(
-                "Modulestore (first arg) must be one of {}".format(
-                    [ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split]
-                )
-            )
-        storetype = args[0]
-
-        try:
-            user = user_from_str(args[1])
-        except User.DoesNotExist:
-            raise CommandError(
-                "No user {user} found: expected args are {args}".format(
-                    user=args[1],
-                    args=self.args,
-                ),
-            )
-
-        org = args[2]
-        course = args[3]
-        run = args[4]
-
-        return storetype, user, org, course, run
+    def add_arguments(self, parser):
+        parser.add_argument('modulestore')
+        parser.add_argument('user')
+        parser.add_argument('org')
+        parser.add_argument('course')
+        parser.add_argument('run')
 
     def handle(self, *args, **options):
-        storetype, user, org, course, run = self.parse_args(*args)
+        if options['modulestore'] not in [ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split]:
+            raise CommandError(
+                "modulestore must be one of {}".format(
+                    [ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split]
+                )
+            )
+        storetype = options['modulestore']
+
+        try:
+            user = user_from_str(options['user'])
+        except User.DoesNotExist:
+            raise CommandError(
+                "No user {user} found".format(user=options['user'])
+            )
+
+        org = options['org']
+        course = options['course']
+        run = options['run']
+
         new_course = create_new_course_in_store(storetype, user, org, course, run, {})
         self.stdout.write(u"Created {}".format(unicode(new_course.id)))

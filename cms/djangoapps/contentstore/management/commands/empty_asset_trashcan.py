@@ -8,17 +8,17 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 
 class Command(BaseCommand):
-    help = '''Empty the trashcan. Can pass an optional course_id to limit the damage.'''
+    help = '''Empty the trashcan. Can pass an optional --course-key to limit the damage.'''
+
+    def add_arguments(self, parser):
+        parser.add_argument('--course-key')
 
     def handle(self, *args, **options):
-        if len(args) != 1 and len(args) != 0:
-            raise CommandError("empty_asset_trashcan requires one or no arguments: |<course_id>|")
-
-        if len(args) == 1:
+        if options['course_key']:
             try:
-                course_key = CourseKey.from_string(args[0])
+                course_key = CourseKey.from_string(options['course_key'])
             except InvalidKeyError:
-                course_key = SlashSeparatedCourseKey.from_deprecated_string(args[0])
+                course_key = SlashSeparatedCourseKey.from_deprecated_string(options['course_key'])
 
             course_ids = [course_key]
         else:
