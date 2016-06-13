@@ -18,7 +18,7 @@ from ...pages.studio.settings import SettingsPage
 from ...pages.studio.settings_advanced import AdvancedSettingsPage
 from ...pages.studio.settings_graders import GradingPage
 from ...pages.studio.signup import SignupPage
-from ...pages.studio.textbooks import TextbooksPage
+from ...pages.studio.textbook_upload import TextbookUploadPage
 from ...fixtures.course import XBlockFixtureDesc
 
 from base_studio_test import StudioCourseTest
@@ -82,7 +82,7 @@ class CoursePagesTest(StudioCourseTest):
                 # AssetIndexPage, # TODO: Skip testing this page due to FEDX-88
                 CourseUpdatesPage,
                 PagesPage, ExportCoursePage, ImportCoursePage, CourseTeamPage, CourseOutlinePage, SettingsPage,
-                AdvancedSettingsPage, GradingPage, TextbooksPage
+                AdvancedSettingsPage, GradingPage, TextbookUploadPage
             ]
         ]
 
