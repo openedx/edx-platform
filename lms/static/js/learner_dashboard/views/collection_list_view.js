@@ -46,6 +46,7 @@
                         if (this.titleContext){
                             this.$el.before(HtmlUtils.ensureHtml(this.getTitleHtml()).toString());
                         }
+
                         this.$el.html(childList);
                     }
                 },
