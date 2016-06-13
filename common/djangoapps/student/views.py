@@ -1730,10 +1730,14 @@ def create_account_with_params(request, params):
     # the activation link from the email.
 
     # InterSystems: we don't log in the user automatically for InterSystems
-    # new_user = authenticate(username=user.username, password=params['password'])
-    # login(request, new_user)
-    # request.session.set_expiry(0)
-    new_user = None
+    # @maxi: added exeption for OAuth ISC users
+    if third_party_auth.is_enabled() and pipeline.running(request):
+        log.info('entro')
+        new_user = authenticate(username=user.username, password=params['password'])
+        login(request, new_user)
+        request.session.set_expiry(0)
+    else:
+        new_user = None
 
     # TODO: there is no error checking here to see that the user actually logged in successfully,
     # and is not yet an active user.
@@ -1791,7 +1795,8 @@ def create_account(request, post_override=None):
         'redirect_url': redirect_url,
     })
     # InterSystems: don't log in
-    # set_logged_in_cookies(request, response, user)
+    if third_party_auth.is_enabled() and pipeline.running(request):
+        set_logged_in_cookies(request, response, user)
     return response
 
 
