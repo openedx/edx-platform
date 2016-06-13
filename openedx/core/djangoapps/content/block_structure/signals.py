@@ -14,7 +14,7 @@ def _listen_for_course_publish(sender, course_key, **kwargs):  # pylint: disable
     Catches the signal that a course has been published in the module
     store and creates/updates the corresponding cache entry.
     """
-    update_course_in_cache.apply_async([unicode(course_key)], countdown=0)
+    update_course_in_cache.apply_async([unicode(course_key)], {'desired_queue_env': 'lms'}, countdown=0)
 
 
 @receiver(SignalHandler.course_deleted)
@@ -24,4 +24,4 @@ def _listen_for_course_delete(sender, course_key, **kwargs):  # pylint: disable=
     module store and invalidates the corresponding cache entry if one
     exists.
     """
-    clear_course_from_cache.apply_async([unicode(course_key)], countdown=0)
+    clear_course_from_cache.apply_async([unicode(course_key)], {'desired_queue_env': 'lms'}, countdown=0)

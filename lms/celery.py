@@ -21,3 +21,23 @@ APP = Celery('proj')
 # pickle the object when using Windows.
 APP.config_from_object('django.conf:settings')
 APP.autodiscover_tasks(lambda: settings.INSTALLED_APPS)
+
+
+class Router(object):
+
+    def route_for_task(self, task, args=None, kwargs=None):
+        desired_env = kwargs.pop('desired_queue_env', None)
+        if desired_env:
+            return self.ensure_queue_env(desired_env)
+        return None
+
+    def ensure_queue_env(self, desired_env):
+        queues = getattr(settings, 'CELERY_QUEUES', None)
+        return next(
+            (
+                queue
+                for queue in queues
+                if '.{}.'.format(desired_env) in queue
+            ),
+            None
+        )

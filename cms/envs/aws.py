@@ -100,6 +100,7 @@ CELERY_QUEUES.update(
         if alternate not in CELERY_QUEUES.keys()
     }
 )
+CELERY_ROUTES = "{}celery.Router".format(QUEUE_VARIANT)
 
 ############# NON-SECURE ENV CONFIG ##############################
 # Things like server locations, ports, etc.

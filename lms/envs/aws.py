@@ -110,7 +110,7 @@ CELERY_QUEUES.update(
         if alternate not in CELERY_QUEUES.keys()
     }
 )
-
+CELERY_ROUTES = "{}celery.Router".format(QUEUE_VARIANT)
 
 # If we're a worker on the high_mem queue, set ourselves to die after processing
 # one request to avoid having memory leaks take down the worker server. This env

@@ -62,6 +62,7 @@ CELERY_QUEUES.update(
         if alternate not in CELERY_QUEUES.keys()
     }
 )
+CELERY_ROUTES = "{}celery.Router".format(QUEUE_VARIANT)
 
 # Celery needs to know about how rabbit is set up
 BROKER_URL = "amqp://celery:celery@localhost:5672"
