@@ -192,16 +192,14 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
     else
       return template
 
-
   @markdownToXml: (markdown)->
+    # it will contain <hint>...</hint> tags
+    demandHintTags = [];
     toXml = `function (markdown) {  
       var xml = markdown,
-          i, splits, scriptFlag, pTag;
+          i, splits, scriptFlag;
       var responseTypes = [
-        'formularesponse', 'javascriptresponse', 'schematicresponse', 'customresponse', 'coderesponse',
-        'optionresponse', 'symbolicresponse', 'multiplechoiceresponse', 'imageresponse', 'stringresponse',
-        'numericalresponse', 'jsmeresponse', 'choiceresponse', 'annotationresponse', 'truefalseresponse',
-        'choicetextresponse', 'externalresponse'
+        'optionresponse', 'multiplechoiceresponse', 'stringresponse', 'numericalresponse', 'choiceresponse'
       ];
 
       // fix DOS \r\n line endings to look like \n
@@ -218,6 +216,7 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
           for (i = 0; i < options.length; i += 1) {
               var inner = /\s*\|\|(.*?)\|\|/.exec(options[i]);
               if (inner) {
+                  //safe-lint: disable=javascript-concat-html
                   demandhints += '  <hint>' + inner[1].trim() + '</hint>\n';
               }
            }
@@ -530,6 +529,8 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
             .replace(/>/g, '&gt;')
             .replace(/"/g, '&quot;')
             .replace(/'/g, '&apos;');
+          // extract the question text and convert it to a <p> tag
+          // regex will handle multiline question text
           line = line.replace(/>>\s*([^]+?)\s*<</g, "<p class='qtitle'>$1</p>");
         } else if (line.match(/<\w+response/) && didinput && curlabel == prevlabel) {
           // reset label to prevent gobbling up previous one (if multiple questions)
@@ -576,21 +577,18 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
 
       // if we've come across demand hints, wrap in <demandhint> at the end
       if (demandhints) {
-          demandhints = '\n<demandhint>\n' + demandhints + '</demandhint>';
+          demandHintTags.push(demandhints);
       }
 
-      // make all elements descendants of a single problem element
-      xml = xml + demandhints;
-
-      debugger
       // make selector to search responsetypes in xml
-      var responseTypesSelector = responseTypes.join(", ");
+      var responseTypesSelector = responseTypes.join(', ');
 
       // these will be placed at outside the end of responsetype
-      var independentTagNames = ['solution', 'demandhint'];
+      var independentTagNames = ['solution'];
       var independentTagNodes = [];
 
       // make temporary xml
+      // safe-lint: disable=javascript-concat-html
       var $xml = $($.parseXML('<prob>' + xml + '</prob>'));
       responseType = $xml.find(responseTypesSelector);
 
@@ -608,7 +606,7 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
 
             // replace <p> tag for question title with <label> tag
             if (child.hasAttribute('class') && child.getAttribute('class') === 'qtitle') {
-                var label = document.createElement("label");
+                var label = document.createElement('label');
                 label.appendChild(document.createTextNode(child.textContent));
                 child = label;
             }
@@ -619,6 +617,7 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
             }
 
             if (before) {
+                // safe-lint: disable=javascript-jquery-insert-into-target
                 responseType[0].insertBefore(child, inputtype);
             } else {
                 responseType[0].appendChild(child);
@@ -632,15 +631,15 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
         }).join('\n\n');
 
         // remove xmlns attribute added by the serializer
-        xml = xml.replace(/xmlns=['"].*?['"]/gi, "");
+        xml = xml.replace(/\sxmlns=['"].*?['"]/gi, '');
 
         // TODO! Fix xml indentation -- XMLSerializer messes the indentation of XML
         // add newline at end of each ending tag to make the xml looks better
-        xml = xml.replace(/(\<\/.*?\>)(\<.*?\>)/gi, "$1\n$2");
+        xml = xml.replace(/(\<\/.*?\>)(\<.*?\>)/gi, '$1\n$2');
       }
 
       // remove class attribute added on <p> tag for question title
-      xml = xml.replace(/class=\'qtitle\'/gi, "");
+      xml = xml.replace(/\sclass=\'qtitle\'/gi, '');
       return xml;
     }`
     
@@ -650,5 +649,12 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
       if responseTypeMarkdown.trim().length > 0
         responseTypesXML.push toXml(responseTypeMarkdown)
     
+    # combine demandhints
+    demandHints = ''
+    if demandHintTags.length
+        ## safe-lint: disable=javascript-concat-html
+        demandHints = '\n<demandhint>\n' + demandHintTags.join('') + '</demandhint>'
+
     # make all responsetypes descendants of a single problem element
-    return '<problem>\n' + responseTypesXML.join('\n\n') + '\n</problem>'
+    ## safe-lint: disable=javascript-concat-html
+    return '<problem>\n' + responseTypesXML.join('\n\n') + demandHints + '\n</problem>'
