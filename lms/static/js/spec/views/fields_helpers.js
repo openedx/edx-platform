@@ -1,7 +1,6 @@
-define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers', 'common/js/spec_helpers/template_helpers',
-        'js/views/fields',
-        'string_utils'],
-    function (Backbone, $, _, AjaxHelpers, TemplateHelpers, FieldViews) {
+define(['backbone', 'jquery', 'underscore', 'edx-ui-toolkit/js/utils/html-utils', 'common/js/spec_helpers/ajax_helpers',
+    'common/js/spec_helpers/template_helpers', 'js/views/fields', 'string_utils'],
+    function (Backbone, $, _, HtmlUtils, AjaxHelpers, TemplateHelpers, FieldViews) {
         'use strict';
 
         var API_URL = '/api/end_point/v1';
