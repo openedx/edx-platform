@@ -21,9 +21,11 @@ define([
                     course_url: 'http://localhost:8000/courses/course-v1:edX+DemoX+Demo_Course/info',
                     course_image_url: 'http://test.com/image1',
                     marketing_url: 'http://test.com/image2',
+                    is_course_ended: false,
                     mode_slug: 'audit',
                     run_key: '2T2016',
-                    is_enrolled: false
+                    is_enrolled: false,
+                    is_enrollment_open: true
                 }],
                 multiRunModeList = [{
                     start_date: 'May 21, 2015',
@@ -33,8 +35,10 @@ define([
                     course_image_url: 'http://test.com/run_2_image_1',
                     marketing_url: 'http://test.com/run_2_image_2',
                     mode_slug: 'verified',
+                    is_course_ended: false,
                     run_key: '1T2015',
-                    is_enrolled: false
+                    is_enrolled: false,
+                    is_enrollment_open: true,
                 },{
                     start_date: 'Sep 22, 2015',
                     end_date: 'Dec 28, 2015',
@@ -42,9 +46,11 @@ define([
                     course_url: 'http://localhost:8000/courses/course-v1:edX+DemoX+Demo_Course/info',
                     course_image_url: 'http://test.com/run_3_image_1',
                     marketing_url: 'http://test.com/run_3_image_2',
+                    is_course_ended: false,
                     mode_slug: 'verified',
                     run_key: '2T2015',
-                    is_enrolled: false
+                    is_enrolled: false,
+                    is_enrollment_open: true
                 }],
                 context = {      
                     display_name: 'Edx Demo course',
@@ -117,13 +123,14 @@ define([
             it('should render run selection drop down if mulitple run available', function(){
                 setupView(multiRunModeList);
                 expect(view.$('.run-select').length).toBe(1);
-                expect(view.$('.run-select').val()).toEqual(multiRunModeList[0].run_key);
+                expect(view.$('.run-select').val()).toEqual('');
+                expect(view.$('.run-select option').length).toBe(3);
             });
 
             it('should switch run context if dropdown selection changed', function(){
                 setupView(multiRunModeList);
                 spyOn(courseCardModel, 'updateRun').and.callThrough();
-                expect(view.$('.run-select').val()).toEqual(multiRunModeList[0].run_key);
+                expect(view.$('.run-select').val()).toEqual('');
                 view.$('.run-select').val(multiRunModeList[1].run_key);
                 view.$('.run-select').trigger("change");
                 expect(view.$('.run-select').val()).toEqual(multiRunModeList[1].run_key);

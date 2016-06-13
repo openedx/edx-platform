@@ -29,17 +29,14 @@
                     this.enrollModel = options.enrollModel;
                     this.urlModel = options.urlModel;
                     this.render();
-                    if(this.urlModel){
+                    if (this.urlModel){
                         this.trackSelectionUrl = this.urlModel.get('track_selection_url');
                     }
                 },
 
                 render: function() {
                     var filledTemplate;
-                    if (this.$parentEl &&
-                        this.enrollModel &&
-                        this.model.get('course_key')){
-
+                    if (this.$parentEl && this.enrollModel){
                         filledTemplate = this.tpl(this.model.toJSON());
                         HtmlUtils.setHtml(this.$el, filledTemplate);
                         HtmlUtils.setHtml(this.$parentEl, HtmlUtils.HTML(this.$el));
@@ -48,7 +45,9 @@
 
                 handleEnroll: function(){
                     //Enrollment click event handled here
-                    if (!this.model.get('is_enrolled')){
+                    if (!this.model.get('course_key')){
+                        this.$('.select-error').css('visibility','visible');
+                    } else if (!this.model.get('is_enrolled')){
                         // actually enroll
                         this.enrollModel.save({
                             course_id: this.model.get('course_key')
@@ -65,6 +64,9 @@
                         runKey = $(event.target).val();
                         if (runKey){
                             this.model.updateRun(runKey);
+                        } else {
+                            //Set back the unselected states
+                            this.model.setUnselected();
                         }
                     }
                 },
@@ -74,7 +76,7 @@
                     if (this.trackSelectionUrl) {
                         // Go to track selection page
                         this.redirect( this.trackSelectionUrl + courseKey );
-                    }else{
+                    } else {
                         this.model.set({
                             is_enrolled: true
                         });
