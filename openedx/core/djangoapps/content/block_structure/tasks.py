@@ -3,7 +3,6 @@ Asynchronous tasks related to the Course Blocks sub-application.
 """
 import logging
 from celery.task import task
-from django.conf import settings
 from opaque_keys.edx.keys import CourseKey
 
 from . import api

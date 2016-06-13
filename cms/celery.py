@@ -22,16 +22,36 @@ APP = Celery('proj')
 APP.config_from_object('django.conf:settings')
 APP.autodiscover_tasks(lambda: settings.INSTALLED_APPS)
 
+# Some tasks require settings defined on non-cms workers, or they will crash.
+# This dict defines those tasks, and the worker environment they should be routed towards.
+ALTERNATE_ENV_TASKS = {
+    'openedx.core.djangoapps.content.block_structure.tasks.update_course_in_cache': 'lms',
+}
+
 
 class Router(object):
+    """
+    A custom Router class for use in routing celery tasks to non-default queues.
+    For more, see http://celery.readthedocs.io/en/latest/userguide/routing.html#routers
+    """
 
-    def route_for_task(self, task, args=None, kwargs=None):
-        desired_env = kwargs.pop('desired_queue_env', None)
-        if desired_env:
-            return self.ensure_queue_env(desired_env)
+    def route_for_task(self, task, args=None, kwargs=None):  # pylint: disable=unused-argument
+        """
+        Celery-defined method allowing for custom routing logic.
+
+        If None is returned from this method, default routing logic is used.
+        """
+        alternate_env = ALTERNATE_ENV_TASKS.get(task, None)
+        if alternate_env:
+            return self.ensure_queue_env(alternate_env)
         return None
 
     def ensure_queue_env(self, desired_env):
+        """
+        Helper method to get the desired type of queue.
+
+        If no such queue is defined, default routing logic is used.
+        """
         queues = getattr(settings, 'CELERY_QUEUES', None)
         return next(
             (
