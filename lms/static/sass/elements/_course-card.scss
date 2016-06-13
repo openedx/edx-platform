@@ -1,7 +1,7 @@
 .course-card{
   @include span(10);
-  margin-left: $baseline*2 + px;
-  margin-bottom: $baseline + px;
+  margin-left: $baseline*2;
+  margin-bottom: $baseline;
   .course-image-link{
     @include float(left);
     .header-img{
@@ -12,25 +12,34 @@
     @include float(right);
     width: 100%;
     @include susy-media($bp-screen-sm) { width: calc(100% - 191px); }
-    padding-left: $baseline*1.5 + px;
+    padding-left: $baseline*1.5;
     .course-title{
       font-size: font-size(x-large);
       font-weight: font-weight(normal);
-      margin-bottom: $baseline/4 + px;
+      margin-bottom: $baseline/4;
     }
     .course-text{
       color: palette(grayscale, dark);
+      .run-period{
+        color: palette(grayscale, black);
+      }
     }
   }
   .course-actions{
     .enrollment-info{
-      width: $baseline*10 + px;
+      width: $baseline*10;
       text-align: center;
-      margin-bottom: $baseline/2 + px;
+      margin-bottom: $baseline/2;
       text-transform: uppercase;
     }
+    .run-select-container{
+      margin-bottom: $baseline;
+      .run-select{
+        width: $baseline*10;
+      }
+    }
     .enroll-button{
-      width: $baseline*10 + px;
+      width: $baseline*10;
       text-align: center;
       background-color: palette(success, dark);
       border-color: palette(success, dark);
@@ -42,7 +51,7 @@
     }
 
     .view-course-link{
-      width: $baseline*10 + px;
+      width: $baseline*10;
       text-align: center;
     }
   }
