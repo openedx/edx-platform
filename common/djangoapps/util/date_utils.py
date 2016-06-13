@@ -66,7 +66,7 @@ def get_formatted_time_zone(time_zone):
     """
     Returns a formatted time zone (e.g. 'Asia/Tokyo (JST +0900)') for user account settings time zone drop down
     """
-    offset = utc.localize(datetime.utcnow()).astimezone(timezone(time_zone)).strftime('%Z %z')
+    offset = utc.localize(datetime.utcnow()).astimezone(timezone(time_zone)).strftime('%Z%z')
     return "{name} ({offset})".format(name=time_zone, offset=offset).replace("_", " ")
 
 
