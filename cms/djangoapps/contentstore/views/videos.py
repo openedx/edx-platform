@@ -44,6 +44,9 @@ class StatusDisplayStrings(object):
     _COMPLETE = ugettext_noop("Ready")
     # Translators: This is the status for a video that the servers have failed to process
     _FAILED = ugettext_noop("Failed")
+    # Translators: This is the status for a video which has failed due to being flagged 
+    # as a duplicate by an external or internal CMS
+    _DUPLICATE = ugettext_noop("Duplicate")
     # Translators: This is the status for a video for which an invalid
     # processing token was provided in the course settings
     _INVALID_TOKEN = ugettext_noop("Invalid Token")
@@ -62,6 +65,7 @@ class StatusDisplayStrings(object):
         "file_corrupt": _FAILED,
         "pipeline_error": _FAILED,
         "invalid_token": _INVALID_TOKEN,
+        "duplicate" : _DUPLICATE,
         "imported": _IMPORTED,
     }
 
