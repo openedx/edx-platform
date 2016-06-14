@@ -44,8 +44,8 @@ class StatusDisplayStrings(object):
     _COMPLETE = ugettext_noop("Ready")
     # Translators: This is the status for a video that the servers have failed to process
     _FAILED = ugettext_noop("Failed")
-    # Translators: This is the status for a video which has failed due to being flagged 
-    # as a duplicate by an external or internal CMS
+    # Translators: This is the status for a video which has failed 
+    # due to being flagged as a duplicate by an external or internal CMS
     _DUPLICATE = ugettext_noop("Failed Duplicate")
     # Translators: This is the status for a video for which an invalid
     # processing token was provided in the course settings
