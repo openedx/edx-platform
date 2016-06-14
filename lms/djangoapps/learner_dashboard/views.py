@@ -11,6 +11,10 @@ from edxmako.shortcuts import render_to_response
 from openedx.core.djangoapps.credentials.utils import get_programs_credentials
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.programs import utils
+from lms.djangoapps.learner_dashboard.utils import (
+    FAKE_COURSE_KEY,
+    strip_course_id
+)
 
 
 @login_required
@@ -63,9 +67,16 @@ def program_details(request, program_id):
     program_data = utils.supplement_program_data(program_data, request.user)
     show_program_listing = ProgramsApiConfig.current().show_program_listing
 
+    urls = {
+        'program_listing_url': reverse('program_listing_view'),
+        'track_selection_url': strip_course_id(
+            reverse('course_modes_choose', kwargs={'course_id': FAKE_COURSE_KEY})),
+        'commerce_api_url': reverse('commerce_api:v0:baskets:create')
+    }
+
     context = {
         'program_data': program_data,
-        'program_listing_url': reverse('program_listing_view'),
+        'urls': urls,
         'show_program_listing': show_program_listing,
         'nav_hidden': True,
         'disable_courseware_js': True,

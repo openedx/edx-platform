@@ -535,6 +535,8 @@
 
                 .speed-option,
                 .control-lang {
+                  @include border-left($baseline/10 solid rgb(14, 166, 236));
+                  font-weight: $font-bold;
                   color: rgb(14, 166, 236); // UXPL primary accent
                 }
               }
