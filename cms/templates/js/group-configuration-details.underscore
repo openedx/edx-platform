@@ -46,11 +46,11 @@
         </li>
         <% if (_.isEmpty(usage)) { %>
             <li class="action action-delete wrapper-delete-button">
-                <button class="delete action-icon"><span class="icon fa fa-trash-o" aria-hidden="true"></span><span><%- gettext("Delete") %></span></button>
+                <button class="delete action-icon" title="<%- gettext('Delete') %>"><span class="icon fa fa-trash-o" aria-hidden="true"></span></button>
             </li>
         <% } else { %>
             <li class="action action-delete wrapper-delete-button" data-tooltip="<%- gettext('Cannot delete when in use by an experiment') %>">
-                <button class="delete action-icon is-disabled" aria-disabled="true" aria-hidden="true"><span class="icon fa fa-trash-o"></span><span><%- gettext("Delete") %></span></button>
+                <button class="delete action-icon is-disabled" aria-disabled="true" aria-hidden="true" title="<%- gettext('Delete') %>"><span class="icon fa fa-trash-o"></span></button>
             </li>
         <% } %>
     </ul>
