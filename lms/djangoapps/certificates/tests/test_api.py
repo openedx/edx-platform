@@ -13,6 +13,7 @@ from opaque_keys.edx.locator import CourseLocator
 from config_models.models import cache
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
+from courseware.tests.factories import GlobalStaffFactory
 from microsite_configuration import microsite
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
@@ -32,7 +33,10 @@ from certificates.models import (
     certificate_status_for_student,
 )
 from certificates.queue import XQueueCertInterface, XQueueAddToQueueError
-from certificates.tests.factories import GeneratedCertificateFactory
+from certificates.tests.factories import (
+    CertificateInvalidationFactory,
+    GeneratedCertificateFactory
+)
 
 
 FEATURES_WITH_CERTS_ENABLED = settings.FEATURES.copy()
@@ -205,6 +209,118 @@ class CertificateDownloadableStatusTests(WebCertificateTestMixin, ModuleStoreTes
                 ),
                 'uuid': cert_status['uuid']
             }
+        )
+
+
+@attr('shard_1')
+@ddt.ddt
+class CertificateisInvalid(WebCertificateTestMixin, ModuleStoreTestCase):
+    """Tests for the `is_certificate_invalid` helper function. """
+
+    def setUp(self):
+        super(CertificateisInvalid, self).setUp()
+
+        self.student = UserFactory()
+        self.course = CourseFactory.create(
+            org='edx',
+            number='verified',
+            display_name='Verified Course'
+        )
+        self.global_staff = GlobalStaffFactory()
+        self.request_factory = RequestFactory()
+
+    def test_method_with_no_certificate(self):
+        """ Test the case when there is no certificate for a user for a specific course. """
+        course = CourseFactory.create(
+            org='edx',
+            number='honor',
+            display_name='Course 1'
+        )
+        # Also check query count for 'is_certificate_invalid' method.
+        with self.assertNumQueries(1):
+            self.assertFalse(
+                certs_api.is_certificate_invalid(self.student, course.id)
+            )
+
+    @ddt.data(
+        CertificateStatuses.generating,
+        CertificateStatuses.downloadable,
+        CertificateStatuses.notpassing,
+        CertificateStatuses.error,
+        CertificateStatuses.unverified,
+        CertificateStatuses.deleted,
+        CertificateStatuses.unavailable,
+    )
+    def test_method_with_invalidated_cert(self, status):
+        """ Verify that if certificate is marked as invalid than method will return
+        True. """
+        generated_cert = self._generate_cert(status)
+        self._invalidate_certificate(generated_cert, True)
+        self.assertTrue(
+            certs_api.is_certificate_invalid(self.student, self.course.id)
+        )
+
+    @ddt.data(
+        CertificateStatuses.generating,
+        CertificateStatuses.downloadable,
+        CertificateStatuses.notpassing,
+        CertificateStatuses.error,
+        CertificateStatuses.unverified,
+        CertificateStatuses.deleted,
+        CertificateStatuses.unavailable,
+    )
+    def test_method_with_inactive_invalidated_cert(self, status):
+        """ Verify that if certificate is valid but it's invalidated status is
+        false than method will return false. """
+        generated_cert = self._generate_cert(status)
+        self._invalidate_certificate(generated_cert, False)
+        self.assertFalse(
+            certs_api.is_certificate_invalid(self.student, self.course.id)
+        )
+
+    @ddt.data(
+        CertificateStatuses.generating,
+        CertificateStatuses.downloadable,
+        CertificateStatuses.notpassing,
+        CertificateStatuses.error,
+        CertificateStatuses.unverified,
+        CertificateStatuses.deleted,
+        CertificateStatuses.unavailable,
+    )
+    def test_method_with_all_statues(self, status):
+        """ Verify method return True if certificate has valid status but it is
+        marked as invalid in CertificateInvalidation table. """
+
+        certificate = self._generate_cert(status)
+        CertificateInvalidationFactory.create(
+            generated_certificate=certificate,
+            invalidated_by=self.global_staff,
+            active=True
+        )
+        # Also check query count for 'is_certificate_invalid' method.
+        with self.assertNumQueries(2):
+            self.assertTrue(
+                certs_api.is_certificate_invalid(self.student, self.course.id)
+            )
+
+    def _invalidate_certificate(self, certificate, active):
+        """ Dry method to mark certificate as invalid. """
+        CertificateInvalidationFactory.create(
+            generated_certificate=certificate,
+            invalidated_by=self.global_staff,
+            active=active
+        )
+        # Invalidate user certificate
+        certificate.invalidate()
+        self.assertFalse(certificate.is_valid())
+
+    def _generate_cert(self, status):
+        """ Dry method to generate certificate. """
+        return GeneratedCertificateFactory.create(
+            user=self.student,
+            course_id=self.course.id,
+            status=status,
+            mode='verified'
         )
 
 

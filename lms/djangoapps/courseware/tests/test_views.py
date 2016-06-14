@@ -32,7 +32,10 @@ import courseware.views.views as views
 import shoppingcart
 from certificates import api as certs_api
 from certificates.models import CertificateStatuses, CertificateGenerationConfiguration
-from certificates.tests.factories import GeneratedCertificateFactory
+from certificates.tests.factories import (
+    CertificateInvalidationFactory,
+    GeneratedCertificateFactory
+)
 from commerce.models import CommerceConfiguration
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
@@ -1386,6 +1389,83 @@ class ProgressPageTests(ModuleStoreTestCase):
             self.assertEqual(
                 cert_button_hidden,
                 'Request Certificate' not in resp.content)
+
+    @patch.dict('django.conf.settings.FEATURES', {'CERTIFICATES_HTML_VIEW': True})
+    @patch('courseware.grades.grade', Mock(return_value={'grade': 'Pass', 'percent': 0.75, 'section_breakdown': [],
+                                                         'grade_breakdown': []}))
+    def test_page_with_invalidated_certificate_with_html_view(self):
+        """
+        Verify that for html certs if certificate is marked as invalidated than
+        re-generate button should not appear on progress page.
+        """
+        generated_certificate = self.generate_certificate(
+            "http://www.example.com/certificate.pdf", "honor"
+        )
+        CertificateGenerationConfiguration(enabled=True).save()
+        certs_api.set_cert_generation_enabled(self.course.id, True)
+
+        # Course certificate configurations
+        certificates = [
+            {
+                'id': 1,
+                'name': 'dummy',
+                'description': 'dummy description',
+                'course_title': 'dummy title',
+                'signatories': [],
+                'version': 1,
+                'is_active': True
+            }
+        ]
+        self.course.certificates = {'certificates': certificates}
+        self.course.cert_html_view_enabled = True
+        self.course.save()
+        self.store.update_item(self.course, self.user.id)
+
+        resp = views.progress(self.request, course_id=unicode(self.course.id))
+        self.assertContains(resp, u"View Certificate")
+        self.assert_invalidate_certificate(generated_certificate)
+
+    @patch('courseware.grades.grade', Mock(return_value={'grade': 'Pass', 'percent': 0.75, 'section_breakdown': [],
+                                                         'grade_breakdown': []}))
+    def test_page_with_invalidated_certificate_with_pdf(self):
+        """
+        Verify that for pdf certs if certificate is marked as invalidated than
+        re-generate button should not appear on progress page.
+        """
+        generated_certificate = self.generate_certificate(
+            "http://www.example.com/certificate.pdf", "honor"
+        )
+
+        CertificateGenerationConfiguration(enabled=True).save()
+        certs_api.set_cert_generation_enabled(self.course.id, True)
+        resp = views.progress(self.request, course_id=unicode(self.course.id))
+        self.assertContains(resp, u'Download Your Certificate')
+        self.assert_invalidate_certificate(generated_certificate)
+
+    def assert_invalidate_certificate(self, certificate):
+        """ Dry method to mark certificate as invalid. And assert the response. """
+        CertificateInvalidationFactory.create(
+            generated_certificate=certificate,
+            invalidated_by=self.user
+        )
+        # Invalidate user certificate
+        certificate.invalidate()
+        resp = views.progress(self.request, course_id=unicode(self.course.id))
+        self.assertNotContains(resp, u'Request Certificate')
+        self.assertContains(resp, u'Your certificate has been invalidated.')
+        self.assertContains(resp, u'Please contact your course team if you have any questions.')
+        self.assertNotContains(resp, u'View Your Certificate')
+        self.assertNotContains(resp, u'Download Your Certificate')
+
+    def generate_certificate(self, url, mode):
+        """ Dry method to generate certificate. """
+        return GeneratedCertificateFactory.create(
+            user=self.user,
+            course_id=self.course.id,
+            status=CertificateStatuses.downloadable,
+            download_url=url,
+            mode=mode
+        )
 
 
 @attr('shard_1')
