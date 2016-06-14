@@ -28,10 +28,6 @@ EXPECTED_LMS_SASS_COMMAND = [
 EXPECTED_CMS_SASS_COMMAND = [
     u"python manage.py cms --settings={asset_settings} compile_sass cms ",
 ]
-EXPECTED_PREPROCESS_ASSETS_COMMAND = (
-    u"python manage.py {system} --settings={asset_settings} preprocess_assets"
-    u" {system}/static/sass/*.scss {system}/static/themed_sass"
-)
 EXPECTED_COLLECT_STATIC_COMMAND = (
     u"python manage.py {system} --settings={asset_settings} collectstatic --noinput > /dev/null"
 )
@@ -233,9 +229,6 @@ class TestPaverServerTasks(PaverTestCase):
             expected_asset_settings = "test_static_optimized"
         expected_collect_static = not is_fast and expected_settings != "devstack"
         if not is_fast:
-            expected_messages.append(EXPECTED_PREPROCESS_ASSETS_COMMAND.format(
-                system=system, asset_settings=expected_asset_settings
-            ))
             expected_messages.append(u"xmodule_assets common/static/xmodule")
             expected_messages.append(u"install npm_assets")
             expected_messages.append(EXPECTED_COFFEE_COMMAND.format(platform_root=self.platform_root))
@@ -272,12 +265,6 @@ class TestPaverServerTasks(PaverTestCase):
         expected_collect_static = not is_fast and expected_settings != "devstack"
         expected_messages = []
         if not is_fast:
-            expected_messages.append(EXPECTED_PREPROCESS_ASSETS_COMMAND.format(
-                system="lms", asset_settings=expected_asset_settings
-            ))
-            expected_messages.append(EXPECTED_PREPROCESS_ASSETS_COMMAND.format(
-                system="cms", asset_settings=expected_asset_settings
-            ))
             expected_messages.append(u"xmodule_assets common/static/xmodule")
             expected_messages.append(u"install npm_assets")
             expected_messages.append(EXPECTED_COFFEE_COMMAND.format(platform_root=self.platform_root))

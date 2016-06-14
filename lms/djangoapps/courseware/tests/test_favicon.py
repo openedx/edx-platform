@@ -38,18 +38,3 @@ class FaviconTestCase(UrlResetMixin, TestCase):
             "/static/images/foo.ico",
             status_code=301, target_status_code=404  # @@@ how to avoid 404?
         )
-
-    @patch.dict("django.conf.settings.FEATURES", {"USE_CUSTOM_THEME": True})
-    @override_settings(FAVICON_PATH="images/bar_fav.ico")
-    @override_settings(THEME_NAME="bar")
-    def test_favicon_redirect_with_theme(self):
-        self.assertEqual(settings.FEATURES["USE_CUSTOM_THEME"], True)
-        self.reset_urls()
-
-        resp = self.client.get("/favicon.ico")
-        self.assertEqual(resp.status_code, 301)
-        self.assertRedirects(
-            resp,
-            "/static/images/bar_fav.ico",
-            status_code=301, target_status_code=404  # @@@ how to avoid 404?
-        )

@@ -267,9 +267,6 @@ BULK_EMAIL_ROUTING_KEY = HIGH_PRIORITY_QUEUE
 # we have to reset the value here.
 BULK_EMAIL_ROUTING_KEY_SMALL_JOBS = LOW_PRIORITY_QUEUE
 
-# Theme overrides
-THEME_NAME = ENV_TOKENS.get('THEME_NAME', None)
-
 # following setting is for backward compatibility
 if ENV_TOKENS.get('COMPREHENSIVE_THEME_DIR', None):
     COMPREHENSIVE_THEME_DIR = ENV_TOKENS.get('COMPREHENSIVE_THEME_DIR')
