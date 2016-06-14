@@ -127,7 +127,7 @@ def anonymous_id_for_user(user, course_id, save=True):
     hasher.update(settings.SECRET_KEY)
     hasher.update(unicode(user.id))
     if course_id:
-        hasher.update(course_id.to_deprecated_string().encode('utf-8'))
+        hasher.update(unicode(course_id).encode('utf-8'))
     digest = hasher.hexdigest()
 
     if not hasattr(user, '_anonymous_id'):
@@ -146,12 +146,14 @@ def anonymous_id_for_user(user, course_id, save=True):
         )
         if anonymous_user_id.anonymous_user_id != digest:
             log.error(
-                u"Stored anonymous user id %r for user %r "
-                u"in course %r doesn't match computed id %r",
-                user,
-                course_id,
-                anonymous_user_id.anonymous_user_id,
-                digest
+                u"Stored anonymous user id %(anonymous_user_id)r for "
+                u"user %(user)r in course %(course_id)r doesn't match "
+                u"computed id %(digest)r", {
+                    "anonymous_user_id": anonymous_user_id.anonymous_user_id,
+                    "user": user,
+                    "course_id": course_id,
+                    "digest": digest,
+                }
             )
     except IntegrityError:
         # Another thread has already created this entry, so
