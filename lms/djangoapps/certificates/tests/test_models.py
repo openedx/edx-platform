@@ -15,15 +15,11 @@ from certificates.models import (
     ExampleCertificateSet,
     CertificateHtmlViewConfiguration,
     CertificateTemplateAsset,
-    CertificateInvalidation,
     GeneratedCertificate,
     CertificateStatuses,
     CertificateGenerationHistory,
 )
-from certificates.tests.factories import (
-    CertificateInvalidationFactory,
-    GeneratedCertificateFactory
-)
+from certificates.tests.factories import GeneratedCertificateFactory
 from instructor_task.tests.factories import InstructorTaskFactory
 from opaque_keys.edx.locator import CourseLocator
 from student.tests.factories import AdminFactory, UserFactory
@@ -303,51 +299,4 @@ class TestCertificateGenerationHistory(TestCase):
         self.assertEqual(
             certificate_generation_history.get_task_name(),
             expected
-        )
-
-
-@attr('shard_1')
-class CertificateInvalidationTest(SharedModuleStoreTestCase):
-    """
-    Test for the Certificate Invalidation model.
-    """
-
-    def setUp(self):
-        super(CertificateInvalidationTest, self).setUp()
-        self.course = CourseFactory()
-        self.user = UserFactory()
-        self.course_id = self.course.id  # pylint: disable=no-member
-        self.certificate = GeneratedCertificateFactory.create(
-            status=CertificateStatuses.downloadable,
-            user=self.user,
-            course_id=self.course_id
-        )
-
-    def test_is_certificate_invalid_method(self):
-        """ Verify that method return false if certificate is valid. """
-
-        self.assertFalse(
-            CertificateInvalidation.has_certificate_invalidation(self.user, self.course_id)
-        )
-
-    def test_is_certificate_invalid_with_invalid_cert(self):
-        """ Verify that method return true if certificate is invalid. """
-
-        invalid_cert = CertificateInvalidationFactory.create(
-            generated_certificate=self.certificate,
-            invalidated_by=self.user
-        )
-        # Invalidate user certificate
-        self.certificate.invalidate()
-        self.assertTrue(
-            CertificateInvalidation.has_certificate_invalidation(self.user, self.course_id)
-        )
-
-        # mark the entry as in-active.
-        invalid_cert.active = False
-        invalid_cert.save()
-
-        # After making the certificate valid method will return false.
-        self.assertFalse(
-            CertificateInvalidation.has_certificate_invalidation(self.user, self.course_id)
         )

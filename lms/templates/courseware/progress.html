@@ -55,10 +55,7 @@ from django.utils.http import urlquote_plus
             <div class="auto-cert-message" id="course-success">
               <div class="has-actions">
                   <% post_url = reverse('generate_user_cert', args=[unicode(course.id)]) %>
-                  ## If current certificate is invalidated by instructor then don't show the generate button.
-                  % if certificate_invalidated:
-                  <p class="copy">${_("Your certificate has been invalidated. Please contact your course team if you have any questions.")}</p>
-                  %elif is_downloadable:
+                  % if is_downloadable:
                   <div class="msg-content">
                     <h2 class="title">${_("Your certificate is available")}</h2>
                     <p class="copy">
