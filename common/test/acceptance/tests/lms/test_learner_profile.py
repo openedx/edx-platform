@@ -826,6 +826,7 @@ class LearnerProfileA11yTest(LearnerProfileTestMixin, WebAppTest):
             "ignore": [
                 'section',  # TODO: AC-491
                 'link-href',  # TODO: AC-231
+                'color-contrast',  # TODO: AC-231
             ],
         })
         profile_page.display_accomplishments()

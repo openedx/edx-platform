@@ -71,9 +71,9 @@ define([
                 expect(teamsTabView.$('.breadcrumbs').length).toBe(0);
             });
 
-            it('does not interfere with anchor links to #content', function() {
+            it('does not interfere with anchor links to #main', function () {
                 var teamsTabView = createTeamsTabView(this);
-                teamsTabView.router.navigate('#content', {trigger: true});
+                teamsTabView.router.navigate('#main', {trigger: true});
                 expect(teamsTabView.$('.wrapper-msg')).toHaveClass('is-hidden');
             });
 
