@@ -631,6 +631,7 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pro
             }
         )
 
+    @mock.patch.dict("django.conf.settings.FEATURES", {"DISCUSSION_API_REQUESTED_FIELDS_PARAM": True})
     def test_profile_image_requested_field(self):
         """
         Tests thread has user profile image details if called in requested_fields
@@ -1288,6 +1289,7 @@ class CommentViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pr
             }
         )
 
+    @mock.patch.dict("django.conf.settings.FEATURES", {"DISCUSSION_API_REQUESTED_FIELDS_PARAM": True})
     def test_profile_image_requested_field(self):
         """
         Tests all comments retrieved have user profile image details if called in requested_fields
@@ -1328,6 +1330,7 @@ class CommentViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pr
             response_users = response_comment['users']
             self.assertEqual(expected_profile_data, response_users[response_comment['author']])
 
+    @mock.patch.dict("django.conf.settings.FEATURES", {"DISCUSSION_API_REQUESTED_FIELDS_PARAM": True})
     def test_profile_image_requested_field_endorsed_comments(self):
         """
         Tests all comments have user profile image details for both author and endorser
@@ -1685,6 +1688,7 @@ class ThreadViewSetRetrieveTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase,
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 404)
 
+    @mock.patch.dict("django.conf.settings.FEATURES", {"DISCUSSION_API_REQUESTED_FIELDS_PARAM": True})
     def test_profile_image_requested_field(self):
         """
         Tests thread has user profile image details if called in requested_fields
@@ -1802,6 +1806,7 @@ class CommentViewSetRetrieveTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase
             {"developer_message": "Page not found (No results on this page)."}
         )
 
+    @mock.patch.dict("django.conf.settings.FEATURES", {"DISCUSSION_API_REQUESTED_FIELDS_PARAM": True})
     def test_profile_image_requested_field(self):
         """
         Tests all comments retrieved have user profile image details if called in requested_fields

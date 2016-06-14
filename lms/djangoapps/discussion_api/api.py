@@ -4,6 +4,7 @@ Discussion API internal interface
 from collections import defaultdict
 from urllib import urlencode
 from urlparse import urlunparse
+from django.conf import settings
 
 from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
@@ -412,7 +413,9 @@ def _include_profile_image(requested_fields):
     """
     Returns True if requested_fields list has 'profile_image' entity else False
     """
-    return requested_fields and 'profile_image' in requested_fields
+    return (settings.FEATURES["DISCUSSION_API_REQUESTED_FIELDS_PARAM"] and
+            requested_fields and
+            'profile_image' in requested_fields)
 
 
 def _serialize_discussion_entities(request, context, discussion_entities, requested_fields, discussion_entity_type):
