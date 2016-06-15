@@ -14,13 +14,13 @@
 
 // Override global input rules
 .forum-nav-search-input {
-  box-shadow: none !important;
-  border: 1px solid $forum-color-border !important;
-  border-radius: 3px !important;
-  height: auto !important;
   @include padding-left($baseline/4 !important);
   @include padding-right($baseline/2 + 12px !important); // Leave room for icon
-  font-size: 12px !important;
+  box-shadow: none !important;
+  border: 1px solid $forum-color-border !important;
+  border-radius: $forum-border-radius !important;
+  height: auto !important;
+  font-size: $forum-small-font-size !important;
 }
 
 // Firefox does not compute the correct containing box for absolute positioning
@@ -45,12 +45,12 @@
 
 // Override global input rules
 .forum-nav-browse-filter-input {
+  @include padding-left($baseline/4);
+  @include padding-right($baseline/2 + 12px); // Leave room for icon
   box-shadow: none !important;
-  border-radius: 3px !important;
+  border-radius: $forum-border-radius !important;
   height: auto !important;
-  padding-left: ($baseline/4) !important;
-  padding-right: ($baseline/2 + 12px) !important; // Leave room for icon
-  font-size: 12px !important;
+  font-size: $forum-small-font-size !important;
 }
 
 // Override global ul rules

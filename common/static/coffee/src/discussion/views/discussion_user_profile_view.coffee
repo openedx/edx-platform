@@ -12,7 +12,7 @@ if Backbone?
       @discussion.reset(@collection, {silent: false})
 
     render: () =>
-      @$el.html(_.template($("#user-profile-template").html())({threads: @discussion.models}))
+      edx.HtmlUtils.setHtml(@$el.html, edx.HtmlUtils.template($("#user-profile-template").html())({threads: @discussion.models}))
       @discussion.map (thread) ->
         new DiscussionThreadProfileView(el: @$("article#thread_#{thread.id}"), model: thread).render()
       baseUri = URI(window.location).removeSearch("page")

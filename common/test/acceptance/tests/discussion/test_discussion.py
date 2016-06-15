@@ -315,6 +315,7 @@ class DiscussionTabMultipleThreadTest(BaseDiscussionTestCase):
             self.thread_ids[1]
         )
         self.thread_page_1.visit()
+        self.thread_page_1.show_all_discussions()
 
     def setup_multiple_threads(self, thread_count):
         threads = []
@@ -1002,7 +1003,7 @@ class DiscussionUserProfileTest(UniqueCourseTest):
     Tests for user profile page in discussion tab.
     """
 
-    PAGE_SIZE = 20  # django_comment_client.forum.views.THREADS_PER_PAGE
+    PAGE_SIZE = 20  # discussion.views.THREADS_PER_PAGE
     PROFILED_USERNAME = "profiled-user"
 
     def setUp(self):
@@ -1227,6 +1228,7 @@ class DiscussionSortPreferenceTest(UniqueCourseTest):
 
         self.sort_page = DiscussionSortPreferencePage(self.browser, self.course_id)
         self.sort_page.visit()
+        self.sort_page.show_all_discussions()
 
     @flaky  # TODO fix this, see TNL-4682
     def test_default_sort_preference(self):
@@ -1259,5 +1261,6 @@ class DiscussionSortPreferenceTest(UniqueCourseTest):
             selected_sort = self.sort_page.get_selected_sort_preference()
             self.assertEqual(selected_sort, sort_type)
             self.sort_page.refresh_page()
+            self.sort_page.show_all_discussions()
             selected_sort = self.sort_page.get_selected_sort_preference()
             self.assertEqual(selected_sort, sort_type)
