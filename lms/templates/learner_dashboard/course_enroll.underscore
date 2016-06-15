@@ -26,7 +26,7 @@
             </select>
         </div>
     <% } %>
-    <button type="button" class="btn-brand btn enroll-button">
+    <button type="button" class="btn-brand btn cta-primary enroll-button">
         <%- gettext('Enroll Now') %>
     </button>
 <% } %>

@@ -33,18 +33,19 @@
             setActiveRunMode: function(runMode){
                 if (runMode){
                     this.set({
+                        certificate_url: runMode.certificate_url,
+                        course_image_url: runMode.course_image_url || '',
+                        course_key: runMode.course_key,
+                        course_url: runMode.course_url || '',
                         display_name: this.context.display_name,
-                        key: this.context.key,
-                        marketing_url: runMode.marketing_url || '',
-                        start_date: runMode.start_date,
                         end_date: runMode.end_date,
                         is_enrolled: runMode.is_enrolled,
                         is_enrollment_open: runMode.is_enrollment_open,
-                        course_key: runMode.course_key,
-                        course_url: runMode.course_url || '',
-                        course_image_url: runMode.course_image_url || '',
+                        key: this.context.key,
+                        marketing_url: runMode.marketing_url || '',
                         mode_slug: runMode.mode_slug,
-                        run_key: runMode.run_key
+                        run_key: runMode.run_key,
+                        start_date: runMode.start_date
                     });
                 }
             },
