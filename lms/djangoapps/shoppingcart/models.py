@@ -1883,7 +1883,7 @@ class CertificateItem(OrderItem):
         try:
             target_cert = target_certs[0]
         except IndexError:
-            log.error(
+            log.warning(
                 u"Matching CertificateItem not found while trying to refund. User %s, Course %s",
                 course_enrollment.user,
                 course_enrollment.course_id,
