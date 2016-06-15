@@ -77,7 +77,7 @@ class LoginSessionView(APIView):
         # Translators: These instructions appear on the login form, immediately
         # below a field meant to hold the user's email address.
         email_instructions = _("The email address you used to register with {platform_name}").format(
-            platform_name=settings.PLATFORM_NAME
+            platform_name=get_themed_value('PLATFORM_NAME', settings.PLATFORM_NAME)
         )
 
         form_desc.add_field(
@@ -920,7 +920,7 @@ class PasswordResetView(APIView):
         # Translators: These instructions appear on the password reset form,
         # immediately below a field meant to hold the user's email address.
         email_instructions = _(u"The email address you used to register with {platform_name}").format(
-            platform_name=settings.PLATFORM_NAME
+            platform_name=get_themed_value('PLATFORM_NAME', settings.PLATFORM_NAME)
         )
 
         form_desc.add_field(
