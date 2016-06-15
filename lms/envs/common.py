@@ -1984,7 +1984,7 @@ INSTALLED_APPS = (
     'xblock_django',
 
     # EDX API application
-    'api_manager',
+    'edx_solutions_api_integration',
 
     # Social Engagement
     'social_engagement',

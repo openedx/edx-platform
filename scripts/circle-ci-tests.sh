@@ -73,6 +73,7 @@ case $CIRCLE_NODE_INDEX in
         paver test_system -s lms -t projects
         paver test_system -s lms -t course_metadata
         paver test_system -s lms -t social_engagement
+        paver test_system -s lms -t edx_solutions_api_integration
         ;;
 
     *)
