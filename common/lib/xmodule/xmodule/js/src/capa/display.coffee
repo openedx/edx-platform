@@ -345,6 +345,7 @@ class @Problem
       Logger.log 'problem_show', problem: @id
       answer_text = []
       $.postWithPrefix "#{@url}/problem_show", (response) =>
+        debugger
         answers = response.answers
         $.each answers, (key, value) =>
           if $.isArray(value)
