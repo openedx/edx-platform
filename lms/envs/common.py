@@ -499,6 +499,7 @@ TEMPLATES = [
                 'django.template.context_processors.i18n',
                 'django.contrib.auth.context_processors.auth',  # this is required for admin
                 'django.template.context_processors.csrf',
+                'microsite_configuration.context_processors.microsite_context',
 
                 # Added for django-wiki
                 'django.template.context_processors.media',
