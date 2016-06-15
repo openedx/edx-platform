@@ -16,7 +16,11 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 MODULESTORE_CONFIG = mixed_store_config(settings.COMMON_TEST_DATA_ROOT, {}, include_xml=False)
 
 if settings.FEATURES.get('API', False):
-    from api_manager.models import GroupProfile, CourseGroupRelationship, CourseContentGroupRelationship
+    from edx_solutions_api_integration.models import (
+        GroupProfile,
+        CourseGroupRelationship,
+        CourseContentGroupRelationship
+    )
 
 if settings.FEATURES.get('PROJECTS_APP', False):
     from projects import models as project_models
@@ -52,7 +56,7 @@ class DeleteCourseReferencesTests(ModuleStoreTestCase):
         )
 
     if settings.FEATURES.get('API', False):
-        def test_delete_course_references_api_manager(self):
+        def test_delete_course_references_edx_solutions_api_integration(self):
             """
             Test the workflow
             """

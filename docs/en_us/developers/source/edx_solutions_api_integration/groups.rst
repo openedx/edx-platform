@@ -2,7 +2,7 @@
 Gruops API Module
 ###############################
 
-.. module:: api_manager
+.. module:: edx_solutions_api_integration
 
 The page contains docstrings for:
 
