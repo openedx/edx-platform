@@ -213,7 +213,6 @@ sys.path.append(root / "lms/djangoapps/mobile_api")
 sys.path.append(root / "lms/djangoapps/mobile_api/course_info")
 sys.path.append(root / "lms/djangoapps/mobile_api/users")
 sys.path.append(root / "lms/djangoapps/mobile_api/video_outlines")
-sys.path.append(root / "lms/djangoapps/api_manager")
 
 sys.path.insert(
     0,

@@ -566,7 +566,7 @@ def get_module_system_for_user(user, student_data,  # TODO  # pylint: disable=to
 
     def handle_progress_event(block, event_type, event):
         """
-        tie into the CourseCompletions datamodels that are exposed in the api_manager djangoapp
+        tie into the CourseCompletions datamodels that are exposed in the edx_solutions_api_integration djangoapp
         """
 
         if not settings.FEATURES.get("ALLOW_STUDENT_STATE_UPDATES_ON_CLOSED_COURSE", True):
