@@ -530,8 +530,7 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
             .replace(/"/g, '&quot;')
             .replace(/'/g, '&apos;');
           // extract the question text and convert it to a <p> tag
-          // regex will handle multiline question text
-          line = line.replace(/>>\s*([^]+?)\s*<</g, "<p class='qtitle'>$1</p>");
+          line = line.replace(/>>(.*?)<</, "<p class='qtitle'>$1</p>");
         } else if (line.match(/<\w+response/) && didinput && curlabel == prevlabel) {
           // reset label to prevent gobbling up previous one (if multiple questions)
           curlabel = '';
@@ -633,8 +632,8 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
         // remove xmlns attribute added by the serializer
         xml = xml.replace(/\sxmlns=['"].*?['"]/gi, '');
 
-        // TODO! Fix xml indentation -- XMLSerializer messes the indentation of XML
-        // add newline at end of each ending tag to make the xml looks better
+        // XMLSerializer messes the indentation of XML so add newline
+        // at the end of each ending tag to make the xml looks better
         xml = xml.replace(/(\<\/.*?\>)(\<.*?\>)/gi, '$1\n$2');
       }
 
