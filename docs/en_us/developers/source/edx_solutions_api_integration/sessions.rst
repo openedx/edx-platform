@@ -2,7 +2,7 @@
 Sessions API Module
 ###############################
 
-.. module:: api_manager
+.. module:: edx_solutions_api_integration
 
 The page contains docstrings and example responses for:
 
@@ -38,17 +38,17 @@ Create a Session
     Allow: POST, OPTIONS
 
     {
-        "token": "938680977d04ed091b67b974b6b6be60", 
-        "expires": 604800, 
+        "token": "938680977d04ed091b67b974b6b6be60",
+        "expires": 604800,
         "user": {
-            "id": 4, 
-            "email": "staff@example.com", 
-            "username": "staff", 
-            "first_name": "", 
-            "last_name": "", 
-            "created": "2014-04-18T13:44:25Z", 
+            "id": 4,
+            "email": "staff@example.com",
+            "username": "staff",
+            "first_name": "",
+            "last_name": "",
+            "created": "2014-04-18T13:44:25Z",
             "organizations": []
-        }, 
+        },
         "uri": "http://localhost:8000/api/sessions?username=staff&password=edx/938680977d04ed091b67b974b6b6be60"
     }
 
@@ -72,9 +72,9 @@ Get Session Details
     Allow: GET, DELETE, HEAD, OPTIONS
 
     {
-        "token": "8c510db85585c64bd33bede01d645a60", 
-        "expires": 1209600, 
-        "user_id": 1, 
+        "token": "8c510db85585c64bd33bede01d645a60",
+        "expires": 1209600,
+        "user_id": 1,
         "uri": "http://localhost:8000/api/sessions//8c510db85585c64bd33bede01d645a60"
     }
 
