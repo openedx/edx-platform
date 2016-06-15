@@ -30,7 +30,7 @@ define([
 
             beforeEach(function() {
 
-                certificate_exception = new CertificateExceptionModel({user_name: 'test_user'});
+                certificate_exception = new CertificateExceptionModel({user_name: 'test_user'}, {url: 'test/url/'});
                 certificate_exception.set({
                     notes: "Test notes"
                 });
