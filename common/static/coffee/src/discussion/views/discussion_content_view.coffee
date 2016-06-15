@@ -33,6 +33,12 @@ if Backbone?
             [".action-close", ".action-pin"],
             (selector) => @$(selector).closest(".actions-item").addClass("is-hidden")
           )
+      can_report:
+        enable: -> @$(".action-report").closest(".actions-item").removeClass("is-hidden")
+        disable: -> @$(".action-report").closest(".actions-item").addClass("is-hidden")
+      can_vote:
+        enable: -> @$(".action-vote").closest(".actions-item").removeClass("is-hidden")
+        disable: -> @$(".action-vote").closest(".actions-item").addClass("is-hidden")
 
     renderPartialAttrs: ->
       for attr, value of @model.changedAttributes()
