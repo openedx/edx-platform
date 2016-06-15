@@ -16,7 +16,6 @@ import mock
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
 from lang_pref import LANGUAGE_KEY
 from notification_prefs import NOTIFICATION_PREF_KEY
-from edxmako.tests import mako_middleware_process_request
 from external_auth.models import ExternalAuthMap
 import student
 from student.models import UserAttribute
@@ -231,9 +230,9 @@ class TestCreateAccount(TestCase):
         request.session['ExternalAuthMap'] = extauth
         request.user = AnonymousUser()
 
-        mako_middleware_process_request(request)
-        with mock.patch('django.contrib.auth.models.User.email_user') as mock_send_mail:
-            student.views.create_account(request)
+        with mock.patch('edxmako.request_context.get_current_request', return_value=request):
+            with mock.patch('django.contrib.auth.models.User.email_user') as mock_send_mail:
+                student.views.create_account(request)
 
         # check that send_mail is called
         if bypass_activation_email:

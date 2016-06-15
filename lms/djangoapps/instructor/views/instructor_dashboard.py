@@ -33,6 +33,7 @@ from courseware.access import has_access
 from courseware.courses import get_course_by_id, get_studio_url
 from django_comment_client.utils import has_forum_access
 from django_comment_common.models import FORUM_ROLE_ADMINISTRATOR
+from openedx.core.djangoapps.course_groups.cohorts import get_course_cohorts, is_course_cohorted, DEFAULT_COHORT_NAME
 from student.models import CourseEnrollment
 from shoppingcart.models import Coupon, PaidCourseRegistration, CourseRegCodeItem
 from course_modes.models import CourseMode, CourseModesArchive
@@ -421,8 +422,10 @@ def _section_course_info(course, access):
         section_data['enrollment_count'] = CourseEnrollment.objects.enrollment_counts(course_key)
 
     if settings.ANALYTICS_DASHBOARD_URL:
+        #  dashboard_link is already made safe in _get_dashboard_link
         dashboard_link = _get_dashboard_link(course_key)
-        message = _("Enrollment data is now available in {dashboard_link}.").format(dashboard_link=dashboard_link)
+        #  so we can use Text() here so it's not double-escaped and rendering HTML on the front-end
+        message = Text(_("Enrollment data is now available in {dashboard_link}.")).format(dashboard_link=dashboard_link)
         section_data['enrollment_message'] = message
 
     if settings.FEATURES.get('ENABLE_SYSADMIN_DASHBOARD'):
@@ -609,6 +612,9 @@ def _section_send_email(course, access):
         # xblock rendering.
         request_token=uuid.uuid1().get_hex()
     )
+    cohorts = []
+    if is_course_cohorted(course_key):
+        cohorts = get_course_cohorts(course)
     email_editor = fragment.content
     section_data = {
         'section_key': 'send_email',
@@ -616,6 +622,8 @@ def _section_send_email(course, access):
         'access': access,
         'send_email': reverse('send_email', kwargs={'course_id': unicode(course_key)}),
         'editor': email_editor,
+        'cohorts': cohorts,
+        'default_cohort_name': DEFAULT_COHORT_NAME,
         'list_instructor_tasks_url': reverse(
             'list_instructor_tasks', kwargs={'course_id': unicode(course_key)}
         ),

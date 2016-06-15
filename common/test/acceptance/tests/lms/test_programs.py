@@ -1,6 +1,4 @@
 """Acceptance tests for LMS-hosted Programs pages"""
-from unittest import skip
-
 from nose.plugins.attrib import attr
 
 from ...fixtures.programs import ProgramsFixture, ProgramsConfigMixin
@@ -125,6 +123,11 @@ class ProgramListingPageA11yTest(ProgramPageBase):
         self.assertTrue(self.listing_page.is_sidebar_present)
         self.assertFalse(self.listing_page.are_cards_present)
 
+        self.listing_page.a11y_audit.config.set_rules({
+            "ignore": [
+                'section',  # TODO: AC-491
+            ]
+        })
         self.listing_page.a11y_audit.check_for_accessibility_errors()
 
     def test_cards_a11y(self):
@@ -135,11 +138,15 @@ class ProgramListingPageA11yTest(ProgramPageBase):
         self.assertTrue(self.listing_page.is_sidebar_present)
         self.assertTrue(self.listing_page.are_cards_present)
 
+        self.listing_page.a11y_audit.config.set_rules({
+            "ignore": [
+                'section',  # TODO: AC-491
+            ]
+        })
         self.listing_page.a11y_audit.check_for_accessibility_errors()
 
 
 @attr('a11y')
-@skip('The tested page is currently disabled. This test will be re-enabled once a11y failures are resolved.')
 class ProgramDetailsPageA11yTest(ProgramPageBase):
     """Test program details page accessibility."""
     def setUp(self):
@@ -155,4 +162,9 @@ class ProgramDetailsPageA11yTest(ProgramPageBase):
         self.auth()
         self.details_page.visit()
 
+        self.details_page.a11y_audit.config.set_rules({
+            "ignore": [
+                'section',  # TODO: AC-491
+            ]
+        })
         self.details_page.a11y_audit.check_for_accessibility_errors()

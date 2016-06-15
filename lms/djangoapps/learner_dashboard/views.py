@@ -3,6 +3,7 @@ from urlparse import urljoin
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
+from django.core.urlresolvers import reverse
 from django.http import Http404
 from django.views.decorators.http import require_GET
 
@@ -10,7 +11,6 @@ from edxmako.shortcuts import render_to_response
 from openedx.core.djangoapps.credentials.utils import get_programs_credentials
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.programs import utils
-from student.views import get_course_enrollments
 
 
 @login_required
@@ -21,8 +21,7 @@ def view_programs(request):
     if not show_program_listing:
         raise Http404
 
-    enrollments = list(get_course_enrollments(request.user, None, []))
-    meter = utils.ProgramProgressMeter(request.user, enrollments)
+    meter = utils.ProgramProgressMeter(request.user)
     programs = meter.engaged_programs
 
     # TODO: Pull 'xseries' string from configuration model.
@@ -57,10 +56,17 @@ def program_details(request, program_id):
         raise Http404
 
     program_data = utils.get_programs(request.user, program_id=program_id)
+
+    if not program_data:
+        raise Http404
+
     program_data = utils.supplement_program_data(program_data, request.user)
+    show_program_listing = ProgramsApiConfig.current().show_program_listing
 
     context = {
         'program_data': program_data,
+        'program_listing_url': reverse('program_listing_view'),
+        'show_program_listing': show_program_listing,
         'nav_hidden': True,
         'disable_courseware_js': True,
         'uses_pattern_library': True

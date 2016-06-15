@@ -7,7 +7,8 @@ define([
     function ($, AjaxRetry, ReceiptView, AjaxHelpers){
         'use strict';
         describe('edx.commerce.ReceiptView', function() {
-            var data, courseResponseData, providerResponseData, mockRequests, mockRender, createReceiptView;
+            var data, courseResponseData, providerResponseData, mockRequests, mockRender, createReceiptView,
+                userResponseData;
 
             createReceiptView = function() {
                 return new ReceiptView({el: $('#receipt-container')});
@@ -37,6 +38,10 @@ define([
 
                 mockRequests(
                     requests, 'GET', '/api/courses/v1/courses/course-v1:edx+dummy+2015_T3/', courseResponseData
+                );
+
+                mockRequests(
+                    requests, 'GET', '/api/user/v1/accounts/user-1', userResponseData
                 );
 
                 mockRequests(requests, 'GET', '/api/credit/v1/providers/edx/', providerResponseData);
@@ -141,7 +146,10 @@ define([
                     "start": "2030-01-01T00:00:00Z",
                     "end": null
                 };
-
+                userResponseData = {
+                    "username": "user-1",
+                    "name": "full name"
+                };
             });
 
             it('sends analytic event when verified receipt is rendered', function() {

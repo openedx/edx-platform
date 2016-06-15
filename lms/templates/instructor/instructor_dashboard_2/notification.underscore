@@ -1,5 +1,5 @@
-<div class="message message-<%= type %>" tabindex="-1">
-    <h3 class="message-title">
+<div class="message message-<%- type %>" tabindex="-1">
+    <h3 class="hd hd-3 message-title">
         <%- title %>
     </h3>
 

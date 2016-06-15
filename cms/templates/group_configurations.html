@@ -51,7 +51,7 @@ from openedx.core.djangolib.markup import HTML, Text
         <div class="wrapper-groups content-groups">
           <h3 class="title">${_("Content Groups")}</h3>
             <div class="ui-loading">
-                <p><span class="spin"><i class="icon fa fa-refresh"></i></span> <span class="copy">${_("Loading")}</span></p>
+                <p><span class="spin"><span class="icon fa fa-refresh" aria-hidden="true"></span></span> <span class="copy">${_("Loading")}</span></p>
             </div>
         </div>
 
@@ -66,7 +66,7 @@ from openedx.core.djangolib.markup import HTML, Text
             </div>
           % else:
             <div class="ui-loading">
-                <p><span class="spin"><i class="icon fa fa-refresh"></i></span> <span class="copy">${_("Loading")}</span></p>
+                <p><span class="spin"><span class="icon fa fa-refresh" aria-hidden="true"></span></span> <span class="copy">${_("Loading")}</span></p>
             </div>
           % endif
         </div>

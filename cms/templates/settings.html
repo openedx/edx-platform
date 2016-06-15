@@ -106,7 +106,7 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url | n, js_escaped_string}'
                 %>
                 <a title="${_('Send a note to students via email')}"
                     href="mailto:someone@domain.com?Subject=${email_subject}&body=${email_body}" class="action action-primary">
-                    <i class="icon fa fa-envelope-o icon-inline"></i>${_("Invite your students")}</a>
+                    <span class="icon fa fa-envelope-o icon-inline" aria-hidden="true"></span>${_("Invite your students")}</a>
               </li>
             </ul>
           </div>
@@ -476,7 +476,7 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url | n, js_escaped_string}'
               </ol>
               <div class="actions">
                 <button type="button" class="action action-primary button new-button add-course-learning-info">
-                  <i class="icon fa fa-plus icon-inline"></i>${_("Add Learning Outcome")}
+                  <span class="icon fa fa-plus icon-inline" aria-hidden="true"></span>${_("Add Learning Outcome")}
                 </button>
               </div>
             </section>
@@ -492,7 +492,7 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url | n, js_escaped_string}'
               </ol>
               <div class="actions">
                 <button type="button" class="action action-primary button new-button add-course-instructor-info">
-                  <i class="icon fa fa-plus icon-inline"></i>${_("Add Instructor")}
+                  <span class="icon fa fa-plus icon-inline" aria-hidden="true"></span>${_("Add Instructor")}
                 </button>
               </div>
             </section>

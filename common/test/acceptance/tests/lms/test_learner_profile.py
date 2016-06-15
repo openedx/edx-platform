@@ -49,6 +49,8 @@ class LearnerProfileTestMixin(EventsTestMixin):
         profile_page.value_for_dropdown_field('language_proficiencies', 'English')
         profile_page.value_for_dropdown_field('country', 'United Arab Emirates')
         profile_page.set_value_for_textarea_field('bio', 'Nothing Special')
+        # Waits here for text to appear/save on bio field
+        profile_page.wait_for_ajax()
 
     def visit_profile_page(self, username, privacy=None):
         """
@@ -301,7 +303,6 @@ class OwnLearnerProfilePageTest(LearnerProfileTestMixin, WebAppTest):
         self.verify_profile_page_is_private(profile_page)
         self.verify_profile_page_view_event(username, user_id, visibility=self.PRIVACY_PRIVATE)
 
-    @flaky  # TODO fix this, see TNL-4683
     def test_fields_on_my_public_profile(self):
         """
         Scenario: Verify that desired fields are shown when looking at her own public profile.
@@ -778,7 +779,7 @@ class LearnerProfileA11yTest(LearnerProfileTestMixin, WebAppTest):
 
         profile_page.a11y_audit.config.set_rules({
             "ignore": [
-                'skip-link',  # TODO: AC-179
+                'section',  # TODO: AC-491
                 'link-href',  # TODO: AC-231
             ],
         })
@@ -806,6 +807,7 @@ class LearnerProfileA11yTest(LearnerProfileTestMixin, WebAppTest):
 
         profile_page.a11y_audit.config.set_rules({
             "ignore": [
+                'section',  # TODO: AC-491
                 'link-href',  # TODO: AC-231
             ],
         })
@@ -822,7 +824,7 @@ class LearnerProfileA11yTest(LearnerProfileTestMixin, WebAppTest):
 
         profile_page.a11y_audit.config.set_rules({
             "ignore": [
-                'skip-link',  # TODO: AC-179
+                'section',  # TODO: AC-491
                 'link-href',  # TODO: AC-231
             ],
         })

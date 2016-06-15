@@ -13,6 +13,7 @@ from django.views.generic.edit import CreateView
 from oauth2_provider.generators import generate_client_secret, generate_client_id
 from oauth2_provider.models import get_application_model
 from oauth2_provider.views import ApplicationRegistration
+from slumber.exceptions import HttpNotFoundError
 
 from edxmako.shortcuts import render_to_response
 from openedx.core.djangoapps.api_admin.decorators import require_api_access
@@ -140,11 +141,18 @@ class CatalogListView(View):
 
     template = 'api_admin/catalogs/list.html'
 
+    def _get_catalogs(self, client, username):
+        """Retrieve catalogs for a user. Returns the empty list if none are found."""
+        try:
+            response = client.api.v1.catalogs.get(username=username)
+            return [Catalog(attributes=catalog) for catalog in response['results']]
+        except HttpNotFoundError:
+            return []
+
     def get(self, request, username):
         """Display a list of a user's catalogs."""
         client = course_discovery_api_client(request.user)
-        response = client.api.v1.catalogs.get(username=username)
-        catalogs = [Catalog(attributes=catalog) for catalog in response['results']]
+        catalogs = self._get_catalogs(client, username)
         return render_to_response(self.template, {
             'username': username,
             'catalogs': catalogs,
@@ -157,10 +165,8 @@ class CatalogListView(View):
         """Create a new catalog for a user."""
         form = CatalogForm(request.POST)
         client = course_discovery_api_client(request.user)
-
         if not form.is_valid():
-            response = client.api.v1.catalogs.get(username=username)
-            catalogs = [Catalog(attributes=catalog) for catalog in response['results']]
+            catalogs = self._get_catalogs(client, username)
             return render_to_response(self.template, {
                 'form': form,
                 'catalogs': catalogs,

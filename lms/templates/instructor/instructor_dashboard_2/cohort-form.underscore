@@ -2,7 +2,7 @@
 <div class="cohort-management-settings">
     <form action="" method="post" name="" id="cohort-management-settings-form" class="cohort-management-settings-form">
         <% if (isNewCohort) { %>
-            <h3 class="form-title"><%- gettext('Add a New Cohort') %></h3>
+            <h3 class="hd hd-3 form-title"><%- gettext('Add a New Cohort') %></h3>
             <div class="tab-content is-visible new-cohort-form">
         <% } %>
         <div class="form-fields">

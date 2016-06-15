@@ -28,6 +28,8 @@ class TestGenerate(TestCase):
 
     @classmethod
     def setUpClass(cls):
+        super(TestGenerate, cls).setUpClass()
+
         sys.stderr.write(
             "\nThis test tests that i18n extraction (`paver i18n_extract`) works properly. "
             "If you experience failures, please check that all instances of `gettext` and "
@@ -53,6 +55,8 @@ class TestGenerate(TestCase):
         super(TestGenerate, cls).tearDownClass()
 
     def setUp(self):
+        super(TestGenerate, self).setUp()
+
         # Subtract 1 second to help comparisons with file-modify time succeed,
         # since os.path.getmtime() is not millisecond-accurate
         self.start_time = datetime.now(UTC) - timedelta(seconds=1)
@@ -83,8 +87,9 @@ class TestGenerate(TestCase):
                 path = os.path.join(CONFIGURATION.get_messages_dir(locale), mofile)
                 exists = os.path.exists(path)
                 self.assertTrue(exists, msg='Missing file in locale %s: %s' % (locale, mofile))
-                self.assertTrue(
-                    datetime.fromtimestamp(os.path.getmtime(path), UTC) >= self.start_time,
+                self.assertGreaterEqual(
+                    datetime.fromtimestamp(os.path.getmtime(path), UTC),
+                    self.start_time,
                     msg='File not recently modified: %s' % path
                 )
             # Segmenting means that the merge headers don't work they way they

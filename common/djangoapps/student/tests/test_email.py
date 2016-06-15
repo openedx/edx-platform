@@ -18,7 +18,6 @@ from mock import Mock, patch
 from django.http import HttpResponse
 from django.conf import settings
 from edxmako.shortcuts import render_to_string
-from edxmako.tests import mako_middleware_process_request
 from util.request import safe_get_host
 from util.testing import EventTestMixin
 from openedx.core.djangoapps.theming.test_util import with_is_edx_domain
@@ -173,9 +172,9 @@ class ReactivationEmailTests(EmailTestMixin, TestCase):
         request.META['HTTP_HOST'] = "aGenericValidHostName"
         self.append_allowed_hosts("aGenericValidHostName")
 
-        mako_middleware_process_request(request)
-        body = render_to_string('emails/activation_email.txt', context)
-        host = safe_get_host(request)
+        with patch('edxmako.request_context.get_current_request', return_value=request):
+            body = render_to_string('emails/activation_email.txt', context)
+            host = safe_get_host(request)
 
         self.assertIn(host, body)
 
@@ -368,9 +367,9 @@ class EmailChangeConfirmationTests(EmailTestMixin, TransactionTestCase):
         request.META['HTTP_HOST'] = "aGenericValidHostName"
         self.append_allowed_hosts("aGenericValidHostName")
 
-        mako_middleware_process_request(request)
-        body = render_to_string('emails/confirm_email_change.txt', context)
-        url = safe_get_host(request)
+        with patch('edxmako.request_context.get_current_request', return_value=request):
+            body = render_to_string('emails/confirm_email_change.txt', context)
+            url = safe_get_host(request)
 
         self.assertIn(url, body)
 

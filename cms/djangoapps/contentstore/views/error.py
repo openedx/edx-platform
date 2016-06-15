@@ -39,9 +39,9 @@ def server_error(request):
 
 @jsonable_error(404, "Resource not found")
 def render_404(request):
-    return HttpResponseNotFound(render_to_string('404.html', {}))
+    return HttpResponseNotFound(render_to_string('404.html', {}, request=request))
 
 
 @jsonable_error(500, "The Studio servers encountered an error")
 def render_500(request):
-    return HttpResponseServerError(render_to_string('500.html', {}))
+    return HttpResponseServerError(render_to_string('500.html', {}, request=request))

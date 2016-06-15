@@ -128,12 +128,12 @@ class SystemTestSuite(NoseTestSuite):
         if self.processes is None:
             # Use one process per core for LMS tests, and no multiprocessing
             # otherwise.
-            self.processes = 0
+            self.processes = -1 if self.root == 'lms' else 0
 
         self.processes = int(self.processes)
 
         if self.randomize is None:
-            self.randomize = False
+            self.randomize = self.root == 'lms'
 
         if self.processes != 0 and self.verbosity > 1:
             print colorize(
@@ -158,9 +158,12 @@ class SystemTestSuite(NoseTestSuite):
             self.extra_args,
             '--with-xunitmp',
             '--xunitmp-file={}'.format(self.report_dir / "nosetests.xml"),
-            '--processes={}'.format(self.processes),
             '--with-database-isolation',
         ]
+
+        if self.processes != 0:
+            cmd.append('--processes={}'.format(self.processes))
+
         if self.randomize:
             cmd.append('--with-randomly')
 

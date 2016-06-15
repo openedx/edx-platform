@@ -193,6 +193,54 @@
                     }
                 }
 
+                .u-field-order {
+                    display: flex;
+                    align-items: center;
+                    font-size: em(16);
+                    color: $gray;
+                    width: 100%;
+                    padding-top: $baseline;
+                    padding-bottom: $baseline;
+                    line-height: normal;
+
+                    span {
+                        padding: $baseline;
+                    }
+
+                    .u-field-order-title {
+                        @include float(left);
+                        width: 26%;
+                        font-size: em(20);
+                        padding-left: ($baseline*2);
+                    }
+
+                    .u-field-order-value {
+                        @include float(left);
+                        width: 12%;
+                    }
+
+                    .u-field-order-date {
+                        @include float(left);
+                        width: 16%;
+                    }
+
+                    .u-field-order-link {
+                        width: 15%;
+                        padding: 0;
+
+                        .u-field-link {
+                            @extend %ui-clear-button;
+                            @extend %btn-pl-default-base;
+                            @include font-size(14);
+                            border: 1px solid $blue;
+                            color: $blue;
+                            line-height: normal;
+                            padding: 10px;
+                            width: 110px;
+                        }
+                    }
+                }
+
                 .social-field-linked {
                     background: $m-gray-l4;
                     box-shadow: 0 1px 2px 1px $shadow-l2;
@@ -264,6 +312,42 @@
                 &:last-child {
                     border-bottom: none;
                     margin-bottom: ($baseline*2);
+                }
+            }
+
+            .u-field-orderHistory {
+                border-bottom: none;
+                border: 1px solid $m-gray-l4;
+                margin-bottom: $baseline;
+                padding: 0;
+
+                &:last-child {
+                    border-bottom: 1px solid $m-gray-l4;
+                }
+
+                &:hover, &:focus {
+                    background-color: $light-gray4;
+                }
+            }
+
+            .u-field-order-orderId {
+                border: none;
+                margin-top: $baseline;
+                margin-bottom: 0;
+                padding-bottom: 0;
+
+                &:hover, &:focus {
+                    background-color: transparent;
+                }
+
+                .u-field-order {
+                    font-weight: $font-semibold;
+                    padding-top: 0;
+                    padding-bottom: 0;
+
+                    .u-field-order-title {
+                        font-size: em(16);
+                    }
                 }
             }
 

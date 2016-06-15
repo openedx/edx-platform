@@ -6,6 +6,7 @@ import json
 import unittest
 from urlparse import urljoin
 
+from bs4 import BeautifulSoup
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test import override_settings, TestCase
@@ -51,13 +52,10 @@ class TestProgramListing(
         ClientFactory(name=CredentialsApiConfig.OAUTH2_CLIENT_NAME, client_type=CONFIDENTIAL)
         ClientFactory(name=ProgramsApiConfig.OAUTH2_CLIENT_NAME, client_type=CONFIDENTIAL)
         self.student = UserFactory()
-        self.create_programs_config(xseries_ad_enabled=True, program_listing_enabled=True)
 
     def _create_course_and_enroll(self, student, org, course, run):
         """
         Creates a course and associated enrollment.
-
-        TODO: Use CourseEnrollmentFactory to avoid course creation.
         """
         course_location = locator.CourseLocator(org, course, run)
         course = CourseFactory.create(
@@ -107,6 +105,7 @@ class TestProgramListing(
 
     @httpretty.activate
     def test_get_program_with_no_enrollment(self):
+        self.create_programs_config()
         response = self._setup_and_get_program()
         for program_element in self._get_program_checklist(0):
             self.assertNotContains(response, program_element)
@@ -115,6 +114,7 @@ class TestProgramListing(
 
     @httpretty.activate
     def test_get_one_program(self):
+        self.create_programs_config()
         self._create_course_and_enroll(self.student, *self.COURSE_KEYS[0].split('/'))
         response = self._setup_and_get_program()
         for program_element in self._get_program_checklist(0):
@@ -126,6 +126,7 @@ class TestProgramListing(
 
     @httpretty.activate
     def test_get_both_program(self):
+        self.create_programs_config()
         self._create_course_and_enroll(self.student, *self.COURSE_KEYS[0].split('/'))
         self._create_course_and_enroll(self.student, *self.COURSE_KEYS[5].split('/'))
         response = self._setup_and_get_program()
@@ -143,7 +144,7 @@ class TestProgramListing(
         self.assertEqual(response.status_code, 404)
 
     def test_xseries_advertise_disabled(self):
-        self.create_programs_config(program_listing_enabled=True, xseries_ad_enabled=False)
+        self.create_programs_config(xseries_ad_enabled=False)
         self.client.login(username=self.student.username, password=self.PASSWORD)
         response = self.client.get(self.url)
         x_series_url = urljoin(settings.MKTG_URLS.get('ROOT'), 'xseries')
@@ -194,7 +195,7 @@ class TestProgramListing(
     @httpretty.activate
     def test_get_xseries_certificates_with_data(self):
 
-        self.create_programs_config(program_listing_enabled=True)
+        self.create_programs_config()
         self.create_credentials_config(is_learner_issuance_enabled=True)
 
         self.client.login(username=self.student.username, password=self.PASSWORD)
@@ -213,7 +214,7 @@ class TestProgramListing(
     @httpretty.activate
     def test_get_xseries_certificates_without_data(self):
 
-        self.create_programs_config(program_listing_enabled=True)
+        self.create_programs_config()
         self.create_credentials_config(is_learner_issuance_enabled=True)
 
         self.client.login(username=self.student.username, password=self.PASSWORD)
@@ -261,7 +262,7 @@ class TestProgramDetails(ProgramsApiConfigMixin, SharedModuleStoreTestCase):
             course_codes=[self.course_code]
         )
 
-    def _mock_programs_api(self):
+    def _mock_programs_api(self, data, status=200):
         """Helper for mocking out Programs API URLs."""
         self.assertTrue(httpretty.is_enabled(), msg='httpretty must be enabled to mock Programs API calls.')
 
@@ -269,21 +270,37 @@ class TestProgramDetails(ProgramsApiConfigMixin, SharedModuleStoreTestCase):
             api_root=ProgramsApiConfig.current().internal_api_url.strip('/'),
             id=self.program_id
         )
-        body = json.dumps(self.data)
 
-        httpretty.register_uri(httpretty.GET, url, body=body, content_type='application/json')
+        body = json.dumps(data)
+
+        httpretty.register_uri(
+            httpretty.GET,
+            url,
+            body=body,
+            status=status,
+            content_type='application/json',
+        )
 
     def _assert_program_data_present(self, response):
         """Verify that program data is present."""
         self.assertContains(response, 'programData')
+        self.assertContains(response, 'programListingUrl')
         self.assertContains(response, self.data['name'])
+        self._assert_programs_tab_present(response)
+
+    def _assert_programs_tab_present(self, response):
+        """Verify that the programs tab is present in the nav."""
+        soup = BeautifulSoup(response.content, 'html.parser')
+        self.assertTrue(
+            any(soup.find_all('a', class_='tab-nav-link', href=reverse('program_listing_view')))
+        )
 
     def test_login_required(self):
         """
         Verify that login is required to access the page.
         """
         self.create_programs_config()
-        self._mock_programs_api()
+        self._mock_programs_api(self.data)
 
         self.client.logout()
 
@@ -310,7 +327,7 @@ class TestProgramDetails(ProgramsApiConfigMixin, SharedModuleStoreTestCase):
     def test_page_routing(self):
         """Verify that the page can be hit with or without a program name in the URL."""
         self.create_programs_config()
-        self._mock_programs_api()
+        self._mock_programs_api(self.data)
 
         response = self.client.get(self.details_page)
         self._assert_program_data_present(response)
@@ -319,4 +336,18 @@ class TestProgramDetails(ProgramsApiConfigMixin, SharedModuleStoreTestCase):
         self._assert_program_data_present(response)
 
         response = self.client.get(self.details_page + 'program_name/invalid/')
+        self.assertEquals(response.status_code, 404)
+
+    def test_404_if_no_data(self):
+        """Verify that the page 404s if no program data is found."""
+        self.create_programs_config()
+
+        self._mock_programs_api(self.data, status=404)
+        response = self.client.get(self.details_page)
+        self.assertEquals(response.status_code, 404)
+
+        httpretty.reset()
+
+        self._mock_programs_api({})
+        response = self.client.get(self.details_page)
         self.assertEquals(response.status_code, 404)

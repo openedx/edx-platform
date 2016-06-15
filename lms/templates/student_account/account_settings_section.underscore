@@ -1,7 +1,7 @@
 <% _.each(sections, function(section) { %>
     <div class="section">
         <% if (section.subtitle) { %>
-            <p id="header-subtitle-<%- activeTabName %>" class="account-settings-header-subtitle"><%- gettext(section.subtitle) %></p>
+            <p id="header-subtitle-<%- activeTabName %>" class="account-settings-header-subtitle"><%- section.subtitle %></p>
         <% } %>
         <h3 class="section-header"><%- gettext(section.title) %></h3>
         <div class="account-settings-section-body">

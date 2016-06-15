@@ -40,7 +40,7 @@
         <ul class="list-actions">
           <li class="item-action">
             <a class="action action-export-git action-primary" href="${reverse('export_git', kwargs=dict(course_key_string=unicode(context_course.id)))}?action=push">
-              <i class="icon fa fa-arrow-circle-o-down"></i>
+              <span class="icon fa fa-arrow-circle-o-down" aria-hidden="true"></span>
               <span class="copy">${_("Export to Git")}</span>
             </a>
           </li>

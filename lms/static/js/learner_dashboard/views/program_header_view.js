@@ -12,8 +12,7 @@
                 breakpoints: {
                     min: {
                         'medium': '768px',
-                        'large': '1180px',
-                        'x-large': '1440px'
+                        'large': '1180px'
                     }
                 },
 
@@ -30,7 +29,7 @@
                         breakpoints: this.breakpoints
                     });
 
-                    if ( this.model.get('name') ) {
+                    if ( this.model.get('programData') ) {
                         HtmlUtils.setHtml(this.$el, this.tpl(data));
                         this.postRender();
                     }

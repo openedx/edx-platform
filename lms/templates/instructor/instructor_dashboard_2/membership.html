@@ -5,7 +5,6 @@ from django.utils.translation import ugettext as _
 from courseware.courses import get_studio_url
 from openedx.core.djangoapps.course_groups.partition_scheme import get_cohorted_user_partition
 %>
-
 <script type="text/template" id="member-list-widget-template">
   <div class="member-list-widget">
     <div class="header">
@@ -34,9 +33,8 @@ from openedx.core.djangoapps.course_groups.partition_scheme import get_cohorted_
   </div>
 </script>
 
-<h2 class="hd hd-2">Enrollment</h2>
 <fieldset class="batch-enrollment membership-section">
-    <legend id="heading-batch-enrollment" class="hd hd-2">${_("Batch Enrollment")}</legend>
+    <legend id="heading-batch-enrollment" class="hd hd-3">${_("Batch Enrollment")}</legend>
     <label>
         ${_("Enter email addresses and/or usernames separated by new lines or commas.")}
         ${_("You will not get notification for emails that bounce, so please double-check spelling.")}
@@ -45,11 +43,11 @@ from openedx.core.djangoapps.course_groups.partition_scheme import get_cohorted_
     <input type="hidden" id="is_course_white_label" value="${section_data['is_white_label']}">
     % if section_data['is_white_label']:
         <label>
-        ${_("Enter the reason why the students are to be manually enrolled or unenrolled.")}
-        ${_("This cannot be left blank and will be recorded and presented in Enrollment Reports.")}
-        ${_("Therefore, please give enough detail to account for this action.")}
-        <textarea rows="2" id="reason-field-id" name="reason-field" placeholder="${_('Reason')}" spellcheck="false"></textarea>
-    </label>
+            ${_("Enter the reason why the students are to be manually enrolled or unenrolled.")}
+            ${_("This cannot be left blank and will be recorded and presented in Enrollment Reports.")}
+            ${_("Therefore, please give enough detail to account for this action.")}
+            <textarea rows="2" id="reason-field-id" name="reason-field" placeholder="${_('Reason')}" spellcheck="false"></textarea>
+        </label>
     %endif
     <div class="enroll-option">
         <label class="has-hint">
@@ -89,8 +87,8 @@ from openedx.core.djangoapps.course_groups.partition_scheme import get_cohorted_
 %if static.get_value('ALLOW_AUTOMATED_SIGNUPS', settings.FEATURES.get('ALLOW_AUTOMATED_SIGNUPS', False)):
 <hr class="divider" />
 
-<div class="auto_enroll auto_enroll_csv">
-    <h2>${_("Register/Enroll Students")}</h2>
+  <div class="auto_enroll auto_enroll_csv">
+    <h3 class="hd hd-3">${_("Register/Enroll Students")}</h3>
     <p>${_("To register and enroll a list of users in this course, choose a CSV file that contains the following columns in this exact order: email, username, name, and country. Please include one student per row and do not include any headers, footers, or blank lines.")}</p>
     <form id="student-auto-enroll-form" method="post" action="${ section_data['upload_student_csv_button_url'] }" enctype="multipart/form-data">
       <div class="customBrowseBtn">
@@ -113,7 +111,7 @@ from openedx.core.djangoapps.course_groups.partition_scheme import get_cohorted_
 
 %if section_data['access']['instructor']:
 <fieldset class="batch-beta-testers membership-section">
-    <legend id="heading-batch-beta-testers" class="hd hd-2">${_("Batch Beta Tester Addition")}</legend>
+    <legend id="heading-batch-beta-testers" class="hd hd-3">${_("Batch Beta Tester Addition")}</legend>
     <label>
         ${_("Enter email addresses and/or usernames separated by new lines or commas.")}<br/>
         ${_("Note: Users must have an activated {platform_name} account before they can be enrolled as beta testers.").format(platform_name=settings.PLATFORM_NAME)}
@@ -158,7 +156,7 @@ from openedx.core.djangoapps.course_groups.partition_scheme import get_cohorted_
 
 <div class="member-lists-management membership-section" aria-live="polite">
   ## Translators: an "Administration List" is a list, such as Course Staff, that users can be added to.
-  <h2> ${_("Course Team Management")} </h2>
+  <h3 class="hd hd-3">${_("Course Team Management")}</h3>
 
   <div class="request-response-error"></div>
 

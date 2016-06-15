@@ -1,4 +1,4 @@
-<h3 class="group-header-title" tabindex="-1">
+<h3 class="hd hd-3 group-header-title" tabindex="-1">
     <span class="title-value"><%- cohort.get('name') %></span>
     <span class="group-count"><%-
         interpolate(

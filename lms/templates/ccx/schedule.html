@@ -30,12 +30,13 @@ from openedx.core.djangolib.js_utils import (
   </script>
 %endfor
 
+<h2 class="hd hd-2">${_('Schedule')}</h2>
 <div class="ccx-schedule-container">
   <div id="ccx-schedule"></div>
   <div id="new-ccx-schedule"></div>
 </div>
 
-<section id="enter-date-modal" class="modal"
+<div id="enter-date-modal" class="modal"
          tabindex="-1" role="dialog" aria-labelledby="ccx_schedule_set_date_heading">
   <div class="inner-wrapper">
     <button class="close-modal">
@@ -59,12 +60,12 @@ from openedx.core.djangolib.js_utils import (
       </div>
     </form>
   </div>
-</section>
+</div>
 
 <div class="ccx-schedule-sidebar">
   <div class="ccx-sidebar-panel" id="dirty-schedule" tabindex="-1" role="region"
        aria-labelledby="ccx_schedule_save_changes_heading">
-    <h2 id="ccx_schedule_save_changes_heading">${_('Save changes')}</h2>
+    <h3 class="hd hd-3" id="ccx_schedule_save_changes_heading">${_('Save changes')}</h3>
     <form>
       <p id="message_save" class="text-helper">${_("You have unsaved changes.")}</p>
       <div class="field">
@@ -74,12 +75,12 @@ from openedx.core.djangolib.js_utils import (
     </form>
   </div>
   <div class="ccx-sidebar-panel" id="ajax-error" tabindex="-1" role="region" aria-labelledby="ccx_schedule_error_message">
-    <h2>${_('Error')}</h2>
+    <h3 class="hd hd-2">${_('Error')}</h3>
     <p id="ccx_schedule_error_message" class="text-helper">${_("There was an error saving changes.")}</p>
   </div>
   <div class="ccx-sidebar-panel" aria-labelledby="ccx_schedule_unit"
        id="ccx_schedule_unit_panel" role="region">
-    <h2 id="ccx_schedule_unit">${_('Schedule a Unit')}</h2>
+    <h3 class="hd hd-3" id="ccx_schedule_unit">${_('Schedule a Unit')}</h3>
     <form role="form" id="add-unit" name="add-unit" class="ccx-form">
       <div class="field">
         <label for="ccx_chapter" class="form-label"><b>${_('Section')}</b></label>

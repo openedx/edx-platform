@@ -23,7 +23,7 @@
 
             <li class = "error-item">
                 <span class='error-item-title'>
-                    <i class="icon fa fa-warning"></i>
+                    <span class="icon fa fa-warning" aria-hidden="true"></span>
                     <strong><%= value.model.display_name %></strong>:
                 </span>
                 <textarea class = "error-item-message" disabled='disabled'><%=value.message%></textarea>

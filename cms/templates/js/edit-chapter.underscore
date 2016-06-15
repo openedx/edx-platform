@@ -11,4 +11,4 @@
   <span class="tip tip-stacked"><%- gettext("upload a PDF file or provide the path to a Studio asset file") %></span>
 <button class="action action-upload"><%- gettext("Upload PDF") %></button>
 </div>
-<a href="" class="action action-close"><i class="icon fa fa-times-circle"></i> <span class="sr"><%- gettext("delete chapter") %></span></a>
+<a href="" class="action action-close"><span class="icon fa fa-times-circle" aria-hidden="true"></span> <span class="sr"><%- gettext("delete chapter") %></span></a>

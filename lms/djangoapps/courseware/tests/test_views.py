@@ -43,7 +43,6 @@ from courseware.tests.factories import StudentModuleFactory, GlobalStaffFactory
 from courseware.url_helpers import get_redirect_url
 from courseware.user_state_client import DjangoXBlockUserStateClient
 from courseware.views.index import render_accordion, CoursewareIndex
-from edxmako.tests import mako_middleware_process_request
 from lms.djangoapps.commerce.utils import EcommerceService  # pylint: disable=import-error
 from milestones.tests.utils import MilestonesTestCaseMixin
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
@@ -242,15 +241,13 @@ class ViewsTestCase(ModuleStoreTestCase):
         self.enrollment = CourseEnrollment.enroll(self.user, self.course_key)
         self.enrollment.created = self.date
         self.enrollment.save()
-        self.request_factory = RequestFactory()
         chapter = 'Overview'
         self.chapter_url = '%s/%s/%s' % ('/courses', self.course_key, chapter)
 
         self.org = u"ꜱᴛᴀʀᴋ ɪɴᴅᴜꜱᴛʀɪᴇꜱ"
         self.org_html = "<p>'+Stark/Industries+'</p>"
 
-        self.request = self.request_factory.get("foo")
-        self.request.user = self.user
+        self.assertTrue(self.client.login(username=self.user.username, password=self.password))
 
         # refresh the course from the modulestore so that it has children
         self.course = modulestore().get_course(self.course.id)
@@ -290,7 +287,6 @@ class ViewsTestCase(ModuleStoreTestCase):
         Verifies the response when the courseware index page is accessed with
         the given chapter and section names.
         """
-        self.client.login(username=self.user.username, password=self.password)
         url = reverse(
             'courseware_section',
             kwargs={
@@ -304,7 +300,6 @@ class ViewsTestCase(ModuleStoreTestCase):
         return response
 
     def test_index_no_visible_section_in_chapter(self):
-        self.client.login(username=self.user.username, password=self.password)
 
         # reload the chapter from the store so its children information is updated
         self.chapter = self.store.get_item(self.chapter.location)
@@ -328,7 +323,7 @@ class ViewsTestCase(ModuleStoreTestCase):
         Create global staff user and log them in
         """
         self.global_staff = GlobalStaffFactory.create()  # pylint: disable=attribute-defined-outside-init
-        self.client.login(username=self.global_staff.username, password='test')
+        self.assertTrue(self.client.login(username=self.global_staff.username, password='test'))
 
     def _create_url_for_enroll_staff(self):
         """
@@ -428,25 +423,22 @@ class ViewsTestCase(ModuleStoreTestCase):
         in_cart_span = '<span class="add-to-cart">'
         # don't mock this course due to shopping cart existence checking
         course = CourseFactory.create(org="new", number="unenrolled", display_name="course")
-        request = self.request_factory.get(reverse('about_course', args=[unicode(course.id)]))
-        request.user = AnonymousUser()
 
-        # Set up the edxmako middleware for this request to create the RequestContext
-        mako_middleware_process_request(request)
-        response = views.course_about(request, unicode(course.id))
+        self.client.logout()
+        response = self.client.get(reverse('about_course', args=[unicode(course.id)]))
         self.assertEqual(response.status_code, 200)
         self.assertNotIn(in_cart_span, response.content)
 
         # authenticated user with nothing in cart
-        request.user = self.user
-        response = views.course_about(request, unicode(course.id))
+        self.assertTrue(self.client.login(username=self.user.username, password=self.password))
+        response = self.client.get(reverse('about_course', args=[unicode(course.id)]))
         self.assertEqual(response.status_code, 200)
         self.assertNotIn(in_cart_span, response.content)
 
         # now add the course to the cart
         cart = shoppingcart.models.Order.get_cart_for_user(self.user)
         shoppingcart.models.PaidCourseRegistration.add_to_order(cart, course.id)
-        response = views.course_about(request, unicode(course.id))
+        response = self.client.get(reverse('about_course', args=[unicode(course.id)]))
         self.assertEqual(response.status_code, 200)
         self.assertIn(in_cart_span, response.content)
 
@@ -468,19 +460,18 @@ class ViewsTestCase(ModuleStoreTestCase):
         course = CourseFactory.create()
         CourseModeFactory(mode_slug=CourseMode.PROFESSIONAL, course_id=course.id, sku=sku, min_price=1)
 
-        request = self.request_factory.get(reverse('about_course', args=[unicode(course.id)]))
-        request.user = AnonymousUser() if is_anonymous else self.user
-
-        # Set up the edxmako middleware for this request to create the RequestContext
-        mako_middleware_process_request(request)
-
-        # Generate the course about page content
-        response = views.course_about(request, unicode(course.id))
+        if is_anonymous:
+            self.client.logout()
+        else:
+            self.assertTrue(self.client.login(username=self.user.username, password=self.password))
 
         # Construct the link according the following scenarios and verify its presence in the response:
         #      (1) shopping cart is enabled and the user is not logged in
         #      (2) shopping cart is enabled and the user is logged in
         href = '<a href="{uri_stem}?sku={sku}" class="add-to-cart">'.format(uri_stem=checkout_page, sku=sku)
+
+        # Generate the course about page content
+        response = self.client.get(reverse('about_course', args=[unicode(course.id)]))
         self.assertEqual(response.status_code, 200)
         self.assertIn(href, response.content)
 
@@ -489,7 +480,6 @@ class ViewsTestCase(ModuleStoreTestCase):
         if not is_anonymous:
             self.assert_enrollment_link_present(is_anonymous=is_anonymous)
         else:
-            request = self.request_factory.get("foo")
             self.assertEqual(EcommerceService().is_enabled(AnonymousUser()), False)
 
     @ddt.data(True, False)
@@ -504,7 +494,6 @@ class ViewsTestCase(ModuleStoreTestCase):
         if not is_anonymous:
             self.assert_enrollment_link_present(is_anonymous=is_anonymous)
         else:
-            request = self.request_factory.get("foo")
             self.assertEqual(EcommerceService().is_enabled(AnonymousUser()), False)
 
     def test_user_groups(self):
@@ -553,7 +542,7 @@ class ViewsTestCase(ModuleStoreTestCase):
             self.section.location.name,
             'f'
         ])
-        self.client.login(username=self.user.username, password=self.password)
+        self.assertTrue(self.client.login(username=self.user.username, password=self.password))
         response = self.client.get(request_url)
         self.assertEqual(response.status_code, 404)
 
@@ -566,7 +555,7 @@ class ViewsTestCase(ModuleStoreTestCase):
             self.section.location.name,
             '1'
         ]
-        self.client.login(username=self.user.username, password=self.password)
+        self.assertTrue(self.client.login(username=self.user.username, password=self.password))
         for idx, val in enumerate(url_parts):
             url_parts_copy = url_parts[:]
             url_parts_copy[idx] = val + u'χ'
@@ -595,9 +584,8 @@ class ViewsTestCase(ModuleStoreTestCase):
     def test_jump_to_invalid(self):
         # TODO add a test for invalid location
         # TODO add a test for no data *
-        request = self.request_factory.get(self.chapter_url)
-        self.assertRaisesRegexp(Http404, 'Invalid course_key or usage_key', views.jump_to,
-                                request, 'bar', ())
+        response = self.client.get(reverse('jump_to', args=['foo/bar/baz', 'baz']))
+        self.assertEquals(response.status_code, 404)
 
     @unittest.skip
     def test_no_end_on_about_page(self):
@@ -623,13 +611,7 @@ class ViewsTestCase(ModuleStoreTestCase):
         If `expected_end_text` is None, verifies that the about page *does not* contain the text
         "Classes End".
         """
-        request = self.request_factory.get("foo")
-        request.user = self.user
-
-        # TODO: Remove the dependency on MakoMiddleware (by making the views explicitly supply a RequestContext)
-        mako_middleware_process_request(request)
-
-        result = views.course_about(request, course_id)
+        result = self.client.get(reverse('about_course', args=[unicode(course_id)]))
         if expected_end_text is not None:
             self.assertContains(result, "Classes End")
             self.assertContains(result, expected_end_text)
@@ -640,7 +622,7 @@ class ViewsTestCase(ModuleStoreTestCase):
         # log into a staff account
         admin = AdminFactory()
 
-        self.client.login(username=admin.username, password='test')
+        self.assertTrue(self.client.login(username=admin.username, password='test'))
 
         url = reverse('submission_history', kwargs={
             'course_id': unicode(self.course_key),
@@ -655,7 +637,7 @@ class ViewsTestCase(ModuleStoreTestCase):
         # log into a staff account
         admin = AdminFactory()
 
-        self.client.login(username=admin.username, password='test')
+        self.assertTrue(self.client.login(username=admin.username, password='test'))
 
         # try it with an existing user and a malicious location
         url = reverse('submission_history', kwargs={
@@ -679,7 +661,7 @@ class ViewsTestCase(ModuleStoreTestCase):
         # log into a staff account
         admin = AdminFactory.create()
 
-        self.client.login(username=admin.username, password='test')
+        self.assertTrue(self.client.login(username=admin.username, password='test'))
 
         usage_key = self.course_key.make_usage_key('problem', 'test-history')
         state_client = DjangoXBlockUserStateClient(admin)
@@ -733,7 +715,7 @@ class ViewsTestCase(ModuleStoreTestCase):
             course_key = course.id
             client = Client()
             admin = AdminFactory.create()
-            client.login(username=admin.username, password='test')
+            self.assertTrue(client.login(username=admin.username, password='test'))
             state_client = DjangoXBlockUserStateClient(admin)
             usage_key = course_key.make_usage_key('problem', 'test-history')
             state_client.set(
@@ -766,7 +748,6 @@ class ViewsTestCase(ModuleStoreTestCase):
             self.assertNotContains(response, checkbox_html, html=True)
 
     def test_financial_assistance_page(self):
-        self.client.login(username=self.user.username, password=self.password)
         url = reverse('financial_assistance')
         response = self.client.get(url)
         # This is a static page, so just assert that it is returned correctly
@@ -796,7 +777,6 @@ class ViewsTestCase(ModuleStoreTestCase):
                 )
             CourseEnrollmentFactory(course_id=course, user=self.user, mode=mode)
 
-        self.client.login(username=self.user.username, password=self.password)
         url = reverse('financial_assistance_form')
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
@@ -815,7 +795,6 @@ class ViewsTestCase(ModuleStoreTestCase):
 
     def _submit_financial_assistance_form(self, data):
         """Submit a financial assistance request."""
-        self.client.login(username=self.user.username, password=self.password)
         url = reverse('submit_financial_assistance_request')
         return self.client.post(url, json.dumps(data), content_type='application/json')
 
@@ -898,53 +877,38 @@ class ViewsTestCase(ModuleStoreTestCase):
                 reverse('financial_assistance_form'),
                 reverse('submit_financial_assistance_request')
         ):
+            self.client.logout()
             response = self.client.get(url)
             self.assertRedirects(response, reverse('signin_user') + '?next=' + url)
 
     def test_bypass_course_info(self):
         course_id = unicode(self.course_key)
-        request = self.request_factory.get(
-            reverse('info', args=[course_id])
-        )
-
-        # Middleware is not supported by the request factory. Simulate a
-        # logged-in user by setting request.user manually.
-        request.user = self.user
-
-        # Set up the edxmako middleware for this request to create the RequestContext
-        mako_middleware_process_request(request)
 
         self.assertFalse(self.course.bypass_home)
 
-        self.assertIsNone(request.META.get('HTTP_REFERER'))  # pylint: disable=no-member
-        response = views.course_info(request, course_id)
+        response = self.client.get(reverse('info', args=[course_id]))
         self.assertEqual(response.status_code, 200)
 
-        request.META['HTTP_REFERER'] = reverse('dashboard')  # pylint: disable=no-member
-        response = views.course_info(request, course_id)
+        response = self.client.get(reverse('info', args=[course_id]), HTTP_REFERER=reverse('dashboard'))
         self.assertEqual(response.status_code, 200)
 
         self.course.bypass_home = True
         self.store.update_item(self.course, self.user.id)  # pylint: disable=no-member
         self.assertTrue(self.course.bypass_home)
 
-        response = views.course_info(request, course_id)
+        response = self.client.get(reverse('info', args=[course_id]), HTTP_REFERER=reverse('dashboard'))
 
-        # assertRedirects would be great here, but it forces redirections to be absolute URLs.
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(
-            response.url,
-            reverse('courseware', args=[course_id])
-        )
+        self.assertRedirects(response, reverse('courseware', args=[course_id]), fetch_redirect_response=False)
 
-        request.META['HTTP_REFERER'] = 'foo'  # pylint: disable=no-member
-        response = views.course_info(request, course_id)
+        response = self.client.get(reverse('info', args=[course_id]), HTTP_REFERER='foo')
         self.assertEqual(response.status_code, 200)
 
     def test_accordion(self):
+        request = RequestFactory().get('foo')
+        request.user = self.user
         table_of_contents = toc_for_course(
-            self.request.user,
-            self.request,
+            request.user,
+            request,
             self.course,
             unicode(self.course.get_children()[0].scope_ids.usage_id),
             None,
@@ -952,7 +916,7 @@ class ViewsTestCase(ModuleStoreTestCase):
         )
 
         # removes newlines and whitespace from the returned view string
-        view = ''.join(render_accordion(self.request, self.course, table_of_contents['chapters']).split())
+        view = ''.join(render_accordion(request, self.course, table_of_contents['chapters']).split())
         # the course id unicode is re-encoded here because the quote function does not accept unicode
         course_id = quote(unicode(self.course.id).encode("utf-8"))
 
@@ -978,7 +942,7 @@ class BaseDueDateTests(ModuleStoreTestCase):
     """
     __test__ = False
 
-    def get_text(self, course):
+    def get_response(self, course):
         """Return the rendered text for the page to be verified"""
         raise NotImplementedError
 
@@ -1005,10 +969,8 @@ class BaseDueDateTests(ModuleStoreTestCase):
 
     def setUp(self):
         super(BaseDueDateTests, self).setUp()
-        self.request_factory = RequestFactory()
         self.user = UserFactory.create()
-        self.request = self.request_factory.get("foo")
-        self.request.user = self.user
+        self.assertTrue(self.client.login(username=self.user.username, password='test'))
 
         self.time_with_tz = "due Sep 18, 2013 at 11:30 UTC"
         self.time_without_tz = "due Sep 18, 2013 at 11:30"
@@ -1019,50 +981,50 @@ class BaseDueDateTests(ModuleStoreTestCase):
         # in course_module's init method, the date_display_format will be set accordingly to
         # remove the timezone.
         course = self.set_up_course(due_date_display_format=None, show_timezone=False)
-        text = self.get_text(course)
-        self.assertIn(self.time_without_tz, text)
-        self.assertNotIn(self.time_with_tz, text)
+        response = self.get_response(course)
+        self.assertContains(response, self.time_without_tz)
+        self.assertNotContains(response, self.time_with_tz)
         # Test that show_timezone has been cleared (which means you get the default value of True).
         self.assertTrue(course.show_timezone)
 
     def test_defaults(self):
         course = self.set_up_course()
-        text = self.get_text(course)
-        self.assertIn(self.time_with_tz, text)
+        response = self.get_response(course)
+        self.assertContains(response, self.time_with_tz)
 
     def test_format_none(self):
         # Same for setting the due date to None
         course = self.set_up_course(due_date_display_format=None)
-        text = self.get_text(course)
-        self.assertIn(self.time_with_tz, text)
+        response = self.get_response(course)
+        self.assertContains(response, self.time_with_tz)
 
     def test_format_plain_text(self):
         # plain text due date
         course = self.set_up_course(due_date_display_format="foobar")
-        text = self.get_text(course)
-        self.assertNotIn(self.time_with_tz, text)
-        self.assertIn("due foobar", text)
+        response = self.get_response(course)
+        self.assertNotContains(response, self.time_with_tz)
+        self.assertContains(response, "due foobar")
 
     def test_format_date(self):
         # due date with no time
         course = self.set_up_course(due_date_display_format=u"%b %d %y")
-        text = self.get_text(course)
-        self.assertNotIn(self.time_with_tz, text)
-        self.assertIn("due Sep 18 13", text)
+        response = self.get_response(course)
+        self.assertNotContains(response, self.time_with_tz)
+        self.assertContains(response, "due Sep 18 13")
 
     def test_format_hidden(self):
         # hide due date completely
         course = self.set_up_course(due_date_display_format=u"")
-        text = self.get_text(course)
-        self.assertNotIn("due ", text)
+        response = self.get_response(course)
+        self.assertNotContains(response, "due ")
 
     def test_format_invalid(self):
         # improperly formatted due_date_display_format falls through to default
         # (value of show_timezone does not matter-- setting to False to make that clear).
         course = self.set_up_course(due_date_display_format=u"%%%", show_timezone=False)
-        text = self.get_text(course)
-        self.assertNotIn("%%%", text)
-        self.assertIn(self.time_with_tz, text)
+        response = self.get_response(course)
+        self.assertNotContains(response, "%%%")
+        self.assertContains(response, self.time_with_tz)
 
 
 class TestProgressDueDate(BaseDueDateTests):
@@ -1071,12 +1033,9 @@ class TestProgressDueDate(BaseDueDateTests):
     """
     __test__ = True
 
-    def get_text(self, course):
+    def get_response(self, course):
         """ Returns the HTML for the progress page """
-
-        # Set up the edxmako middleware for this request to create the RequestContext
-        mako_middleware_process_request(self.request)
-        return views.progress(self.request, course_id=unicode(course.id), student_id=self.user.id).content
+        return self.client.get(reverse('progress', args=[unicode(course.id)]))
 
 
 class TestAccordionDueDate(BaseDueDateTests):
@@ -1085,12 +1044,9 @@ class TestAccordionDueDate(BaseDueDateTests):
     """
     __test__ = True
 
-    def get_text(self, course):
+    def get_response(self, course):
         """ Returns the HTML for the accordion """
-        table_of_contents = toc_for_course(
-            self.request.user, self.request, course, unicode(course.get_children()[0].scope_ids.usage_id), None, None
-        )
-        return render_accordion(self.request, course, table_of_contents['chapters'])
+        return self.client.get(reverse('courseware', args=[unicode(course.id)]), follow=True)
 
 
 @attr('shard_1')
@@ -1102,13 +1058,7 @@ class StartDateTests(ModuleStoreTestCase):
 
     def setUp(self):
         super(StartDateTests, self).setUp()
-        self.request_factory = RequestFactory()
         self.user = UserFactory.create()
-        self.request = self.request_factory.get("foo")
-
-        # Set up the edxmako middleware for this request to create the RequestContext
-        mako_middleware_process_request(self.request)
-        self.request.user = self.user
 
     def set_up_course(self):
         """
@@ -1120,12 +1070,11 @@ class StartDateTests(ModuleStoreTestCase):
         course = modulestore().get_course(course.id)
         return course
 
-    def get_about_text(self, course_key):
+    def get_about_response(self, course_key):
         """
         Get the text of the /about page for the course.
         """
-        text = views.course_about(self.request, unicode(course_key)).content
-        return text
+        return self.client.get(reverse('about_course', args=[unicode(course_key)]))
 
     @patch('util.date_utils.pgettext', fake_pgettext(translations={
         ("abbreviated month name", "Sep"): "SEPTEMBER",
@@ -1135,9 +1084,9 @@ class StartDateTests(ModuleStoreTestCase):
     }))
     def test_format_localized_in_studio_course(self):
         course = self.set_up_course()
-        text = self.get_about_text(course.id)
+        response = self.get_about_response(course.id)
         # The start date is set in the set_up_course function above.
-        self.assertIn("2013-SEPTEMBER-16", text)
+        self.assertContains(response, "2013-SEPTEMBER-16")
 
     @patch('util.date_utils.pgettext', fake_pgettext(translations={
         ("abbreviated month name", "Jul"): "JULY",
@@ -1147,9 +1096,9 @@ class StartDateTests(ModuleStoreTestCase):
     }))
     @unittest.skip
     def test_format_localized_in_xml_course(self):
-        text = self.get_about_text(SlashSeparatedCourseKey('edX', 'toy', 'TT_2012_Fall'))
+        response = self.get_about_response(SlashSeparatedCourseKey('edX', 'toy', 'TT_2012_Fall'))
         # The start date is set in common/test/data/two_toys/policies/TT_2012_Fall/policy.json
-        self.assertIn("2015-JULY-17", text)
+        self.assertContains(response, "2015-JULY-17")
 
 
 @attr('shard_1')
@@ -1163,13 +1112,8 @@ class ProgressPageTests(ModuleStoreTestCase):
 
     def setUp(self):
         super(ProgressPageTests, self).setUp()
-        self.request_factory = RequestFactory()
         self.user = UserFactory.create()
-        self.request = self.request_factory.get("foo")
-        self.request.user = self.user
-
-        # Set up the edxmako middleware for this request to create the RequestContext
-        mako_middleware_process_request(self.request)
+        self.assertTrue(self.client.login(username=self.user.username, password='test'))
 
         self.setup_course()
 
@@ -1193,7 +1137,9 @@ class ProgressPageTests(ModuleStoreTestCase):
         """
         Test that XSS attack is prevented
         """
-        resp = views.progress(self.request, course_id=unicode(self.course.id), student_id=self.user.id)
+        resp = self.client.get(
+            reverse('student_progress', args=[unicode(self.course.id), self.user.id])
+        )
         self.assertEqual(resp.status_code, 200)
         # Test that malicious code does not appear in html
         self.assertNotIn(malicious_code, resp.content)
@@ -1201,7 +1147,9 @@ class ProgressPageTests(ModuleStoreTestCase):
     def test_pure_ungraded_xblock(self):
         ItemFactory.create(category='acid', parent_location=self.vertical.location)
 
-        resp = views.progress(self.request, course_id=unicode(self.course.id))
+        resp = self.client.get(
+            reverse('progress', args=[unicode(self.course.id)])
+        )
         self.assertEqual(resp.status_code, 200)
 
     @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
@@ -1212,7 +1160,9 @@ class ProgressPageTests(ModuleStoreTestCase):
         """
 
         # Create new course with respect to 'default_store'
+        # Enroll student into course
         self.course = CourseFactory.create(default_store=default_store)
+        CourseEnrollmentFactory(user=self.user, course_id=self.course.id, mode=CourseMode.HONOR)
 
         # Invalid Student Ids (Integer and Non-int)
         invalid_student_ids = [
@@ -1220,16 +1170,15 @@ class ProgressPageTests(ModuleStoreTestCase):
             'azU3N_8$',
         ]
         for invalid_id in invalid_student_ids:
-            self.assertRaises(
-                Http404, views.progress,
-                self.request,
-                course_id=unicode(self.course.id),
-                student_id=invalid_id
-            )
 
-        # Enroll student into course
-        CourseEnrollment.enroll(self.user, self.course.id)
-        resp = views.progress(self.request, course_id=unicode(self.course.id), student_id=self.user.id)
+            resp = self.client.get(
+                reverse('student_progress', args=[unicode(self.course.id), invalid_id])
+            )
+            self.assertEquals(resp.status_code, 404)
+
+        resp = self.client.get(
+            reverse('student_progress', args=[unicode(self.course.id), self.user.id])
+        )
         # Assert that valid 'student_id' returns 200 status
         self.assertEqual(resp.status_code, 200)
 
@@ -1244,7 +1193,8 @@ class ProgressPageTests(ModuleStoreTestCase):
         # Create a new course, a user which will not be enrolled in course, admin user for staff access
         course = CourseFactory.create(default_store=default_store)
         not_enrolled_user = UserFactory.create()
-        self.request.user = AdminFactory.create()
+        admin = AdminFactory.create()
+        self.assertTrue(self.client.login(username=admin.username, password='test'))
 
         # Create and enable Credit course
         CreditCourse.objects.create(course_key=course.id, enabled=True)
@@ -1265,25 +1215,38 @@ class ProgressPageTests(ModuleStoreTestCase):
         # Add a single credit requirement (final grade)
         set_credit_requirements(course.id, requirements)
 
-        resp = views.progress(self.request, course_id=unicode(course.id), student_id=not_enrolled_user.id)
+        resp = self.client.get(
+            reverse('student_progress', args=[unicode(course.id), not_enrolled_user.id])
+        )
         self.assertEqual(resp.status_code, 200)
 
     def test_non_ascii_grade_cutoffs(self):
-        resp = views.progress(self.request, course_id=unicode(self.course.id))
+        resp = self.client.get(
+            reverse('progress', args=[unicode(self.course.id)])
+        )
         self.assertEqual(resp.status_code, 200)
 
     def test_generate_cert_config(self):
-        resp = views.progress(self.request, course_id=unicode(self.course.id))
+
+        resp = self.client.get(
+            reverse('progress', args=[unicode(self.course.id)])
+        )
         self.assertNotContains(resp, 'Request Certificate')
 
         # Enable the feature, but do not enable it for this course
         CertificateGenerationConfiguration(enabled=True).save()
-        resp = views.progress(self.request, course_id=unicode(self.course.id))
+
+        resp = self.client.get(
+            reverse('progress', args=[unicode(self.course.id)])
+        )
         self.assertNotContains(resp, 'Request Certificate')
 
         # Enable certificate generation for this course
         certs_api.set_cert_generation_enabled(self.course.id, True)
-        resp = views.progress(self.request, course_id=unicode(self.course.id))
+
+        resp = self.client.get(
+            reverse('progress', args=[unicode(self.course.id)])
+        )
         self.assertNotContains(resp, 'Request Certificate')
 
     @patch.dict('django.conf.settings.FEATURES', {'CERTIFICATES_HTML_VIEW': True})
@@ -1326,7 +1289,9 @@ class ProgressPageTests(ModuleStoreTestCase):
         self.course.save()
         self.store.update_item(self.course, self.user.id)
 
-        resp = views.progress(self.request, course_id=unicode(self.course.id))
+        resp = self.client.get(
+            reverse('progress', args=[unicode(self.course.id)])
+        )
         self.assertContains(resp, u"View Certificate")
 
         self.assertContains(resp, u"You can keep working for a higher grade")
@@ -1337,7 +1302,9 @@ class ProgressPageTests(ModuleStoreTestCase):
         certificates[0]['is_active'] = False
         self.store.update_item(self.course, self.user.id)
 
-        resp = views.progress(self.request, course_id=unicode(self.course.id))
+        resp = self.client.get(
+            reverse('progress', args=[unicode(self.course.id)])
+        )
         self.assertNotContains(resp, u"View Your Certificate")
         self.assertNotContains(resp, u"You can now view your certificate")
         self.assertContains(resp, u"We're creating your certificate.")
@@ -1364,11 +1331,13 @@ class ProgressPageTests(ModuleStoreTestCase):
         # Enable certificate generation for this course
         certs_api.set_cert_generation_enabled(self.course.id, True)
 
-        resp = views.progress(self.request, course_id=unicode(self.course.id))
+        resp = self.client.get(
+            reverse('progress', args=[unicode(self.course.id)])
+        )
         self.assertContains(resp, u"Download Your Certificate")
 
     @ddt.data(
-        *itertools.product(((42, 4, True), (42, 4, False)), (True, False))
+        *itertools.product(((55, 4, True), (55, 4, False)), (True, False))
     )
     @ddt.unpack
     def test_query_counts(self, (sql_calls, mongo_calls, self_paced), self_paced_enabled):
@@ -1376,7 +1345,9 @@ class ProgressPageTests(ModuleStoreTestCase):
         SelfPacedConfiguration(enabled=self_paced_enabled).save()
         self.setup_course(self_paced=self_paced)
         with self.assertNumQueries(sql_calls), check_mongo_calls(mongo_calls):
-            resp = views.progress(self.request, course_id=unicode(self.course.id))
+            resp = self.client.get(
+                reverse('progress', args=[unicode(self.course.id)])
+            )
         self.assertEqual(resp.status_code, 200)
 
     @patch('courseware.grades.grade', Mock(return_value={
@@ -1405,10 +1376,16 @@ class ProgressPageTests(ModuleStoreTestCase):
             'lms.djangoapps.verify_student.models.SoftwareSecurePhotoVerification.user_is_verified'
         ) as user_verify:
             user_verify.return_value = user_verified
-            resp = views.progress(self.request, course_id=unicode(self.course.id))
+            resp = self.client.get(
+                reverse('progress', args=[unicode(self.course.id)])
+            )
+
+            cert_button_hidden = course_mode is CourseMode.AUDIT or \
+                course_mode in CourseMode.VERIFIED_MODES and not user_verified
+
             self.assertEqual(
-                course_mode is not CourseMode.AUDIT and user_verified,
-                'Request Certificate' in resp.content)
+                cert_button_hidden,
+                'Request Certificate' not in resp.content)
 
 
 @attr('shard_1')
@@ -1499,8 +1476,7 @@ class GenerateUserCertTests(ModuleStoreTestCase):
             grade_cutoffs={'cutoff': 0.75, 'Pass': 0.5}
         )
         self.enrollment = CourseEnrollment.enroll(self.student, self.course.id, mode='honor')
-        self.request = RequestFactory()
-        self.client.login(username=self.student, password='123456')
+        self.assertTrue(self.client.login(username=self.student, password='123456'))
         self.url = reverse('generate_user_cert', kwargs={'course_id': unicode(self.course.id)})
 
     def test_user_with_out_passing_grades(self):
@@ -1667,7 +1643,8 @@ class TestIndexView(ModuleStoreTestCase):
 
         CourseEnrollmentFactory(user=user, course_id=course.id)
 
-        request = RequestFactory().get(
+        self.assertTrue(self.client.login(username=user.username, password='test'))
+        response = self.client.get(
             reverse(
                 'courseware_section',
                 kwargs={
@@ -1677,15 +1654,8 @@ class TestIndexView(ModuleStoreTestCase):
                 }
             )
         )
-        request.user = user
-
-        # Set up the edxmako middleware for this request to create the RequestContext
-        mako_middleware_process_request(request)
 
         # Trigger the assertions embedded in the ViewCheckerBlocks
-        response = CoursewareIndex.as_view()(
-            request, unicode(course.id), chapter=chapter.url_name, section=section.url_name
-        )
         self.assertEquals(response.content.count("ViewCheckerPassed"), 3)
 
     @XBlock.register_temp_plugin(ActivateIDCheckerBlock, 'id_checker')
@@ -1700,7 +1670,8 @@ class TestIndexView(ModuleStoreTestCase):
 
         CourseEnrollmentFactory(user=user, course_id=course.id)
 
-        request = RequestFactory().get(
+        self.assertTrue(self.client.login(username=user.username, password='test'))
+        response = self.client.get(
             reverse(
                 'courseware_section',
                 kwargs={
@@ -1709,14 +1680,6 @@ class TestIndexView(ModuleStoreTestCase):
                     'section': section.url_name,
                 }
             ) + '?activate_block_id=test_block_id'
-        )
-        request.user = user
-
-        # Set up the edxmako middleware for this request to create the RequestContext
-        mako_middleware_process_request(request)
-
-        response = CoursewareIndex.as_view()(
-            request, unicode(course.id), chapter=chapter.url_name, section=section.url_name
         )
         self.assertIn("Activate Block ID: test_block_id", response.content)
 
@@ -1814,7 +1777,8 @@ class TestIndexViewWithGating(ModuleStoreTestCase, MilestonesTestCaseMixin):
         """
         Test index view with a gated sequential raises Http404
         """
-        request = RequestFactory().get(
+        self.assertTrue(self.client.login(username=self.user.username, password='test'))
+        response = self.client.get(
             reverse(
                 'courseware_section',
                 kwargs={
@@ -1824,18 +1788,8 @@ class TestIndexViewWithGating(ModuleStoreTestCase, MilestonesTestCaseMixin):
                 }
             )
         )
-        request.user = self.user
 
-        # Set up the edxmako middleware for this request to create the RequestContext
-        mako_middleware_process_request(request)
-
-        with self.assertRaises(Http404):
-            CoursewareIndex.as_view()(
-                request,
-                unicode(self.course.id),
-                chapter=self.chapter.url_name,
-                section=self.gated_seq.url_name
-            )
+        self.assertEquals(response.status_code, 404)
 
 
 class TestRenderXBlock(RenderXBlockTestMixin, ModuleStoreTestCase):

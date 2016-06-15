@@ -1,5 +1,5 @@
 <div class="upload-modal modal" style="display: none;">
-    <a href="#" class="close-button"><i class="icon fa fa-times-circle" aria-hidden="true"></i> <span class="sr"><%= gettext('close') %></span></a>
+    <a href="#" class="close-button"><span class="icon fa fa-times-circle" aria-hidden="true"></span> <span class="sr"><%= gettext('close') %></span></a>
     <div class="modal-body">
         <h1 class="title"><%= gettext("Upload New File") %></h1>
         <p class="file-name">

@@ -25,7 +25,7 @@ class Command(BaseCommand):
     Example:
 
     Change enrollment for all audit users to honor in the given course.
-        $ ... bulk_change_enrollment -c course-v1:SomeCourse+SomethingX+2016 --from audit --to honor --commit
+        $ ... bulk_change_enrollment -c course-v1:SomeCourse+SomethingX+2016 --from_mode audit --to_mode honor --commit
 
     Without the --commit option, the command will have no effect.
     """
@@ -33,13 +33,13 @@ class Command(BaseCommand):
     option_list = BaseCommand.option_list + (
         make_option(
             '-f', '--from_mode',
-            dest='from',
+            dest='from_mode',
             default=None,
             help='move from this enrollment mode'
         ),
         make_option(
             '-t', '--to_mode',
-            dest='to',
+            dest='to_mode',
             default=None,
             help='move to this enrollment mode'
         ),
