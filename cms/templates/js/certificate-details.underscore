@@ -64,7 +64,7 @@
             <button class="edit"><span class="icon fa fa-pencil" aria-hidden="true"></span> <%- gettext("Edit") %></button>
         </li>
         <li class="action action-delete wrapper-delete-button" data-tooltip="<%- gettext('Delete') %>">
-            <button class="delete action-icon"><span class="icon fa fa-trash-o" aria-hidden="true"></span><span><%- gettext("Delete") %></span></button>
+            <button class="delete action-icon" title="<%- gettext('Delete') %>"><span class="icon fa fa-trash-o" aria-hidden="true"></span></button>
         </li>
         <% } %>
     </ul>
