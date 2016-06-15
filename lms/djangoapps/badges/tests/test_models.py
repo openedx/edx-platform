@@ -7,7 +7,6 @@ from django.core.files.storage import default_storage
 from django.db.utils import IntegrityError
 from django.test import TestCase
 from django.test.utils import override_settings
-from flaky import flaky
 from mock import patch, Mock
 from nose.plugins.attrib import attr
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -77,9 +76,10 @@ class BadgeClassTest(ModuleStoreTestCase):
         Remove all files uploaded as badges.
         """
         upload_to = BadgeClass._meta.get_field('image').upload_to  # pylint: disable=protected-access
-        (_, files) = default_storage.listdir(upload_to)
-        for uploaded_file in files:
-            default_storage.delete(upload_to + '/' + uploaded_file)
+        if default_storage.exists(upload_to):
+            (_, files) = default_storage.listdir(upload_to)
+            for uploaded_file in files:
+                default_storage.delete(upload_to + '/' + uploaded_file)
 
     # Need full path to make sure class names line up.
     @override_settings(BADGING_BACKEND='lms.djangoapps.badges.tests.test_models.DummyBackend')
@@ -216,7 +216,6 @@ class BadgeClassTest(ModuleStoreTestCase):
         self.assertTrue(mock_award.called)
         mock_award.assert_called_with(badge_class, user, evidence_url='http://example.com/evidence')
 
-    @flaky  # ECOM-4713
     def test_runs_validator(self):
         """
         Verify that the image validator is triggered when cleaning the model.
