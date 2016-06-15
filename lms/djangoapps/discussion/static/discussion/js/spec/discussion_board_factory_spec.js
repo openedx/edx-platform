@@ -17,7 +17,7 @@ define(['jquery', 'backbone', 'discussion/js/discussion_board_factory'],
                 // $(document).off('ajaxError', TeamsTabView.prototype.errorHandler);
             });
 
-            it('can render the "Teams" tab', function() {
+            it('can render itself', function() {
                 initializeDiscussionBoardFactory();
                 expect($('.teams-content').text()).toContain('See all teams in your course, organized by topic');
             });

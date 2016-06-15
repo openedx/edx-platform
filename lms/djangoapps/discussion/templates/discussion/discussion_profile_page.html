@@ -28,10 +28,17 @@ from openedx.core.djangolib.js_utils import (
 </script>
 
 <%static:require_module module_name="discussion/js/discussion_profile_page_factory" class_name="DiscussionProfilePageFactory">
-    DiscussionProfilePageFactory({
-        courseId: '${unicode(course.id) | n, js_escaped_string}',
-        el: $(".discussion-user-threads")
-    });
+    <%
+    profile_page_context = {
+        'courseId': unicode(course.id),
+        'courseName': course.display_name_with_default,
+        'userInfo': user_info,
+        'threads': threads,
+        'page': page,
+        'numPages': num_pages,
+    }
+    %>
+    DiscussionProfilePageFactory(${profile_page_context | n, dump_js_escaped_json});
 </%static:require_module>
 </%block>
 

@@ -3,21 +3,20 @@ define(['jquery', 'backbone', 'discussion/js/discussion_profile_page_factory'],
         'use strict';
 
         describe('Discussion Profile Page Factory', function() {
-            var initializeDiscussionProfilePageFactory = function(options) {
+            var testCourseId = 'test_course',
+                initializeDiscussionProfilePageFactory = function(options) {
+                options = _.extend({
+                    courseId: testCourseId,
+                    $el: $('.discussion-user-threads')
+                });
                 DiscussionProfilePageFactory(options || {});
             };
 
             beforeEach(function() {
-                // setFixtures('<section class="teams-content"></section>');
-                // PageHelpers.preventBackboneChangingUrl();
+                setFixtures('<div class="discussion-user-threads"></div>');
             });
 
-            afterEach(function() {
-                // Backbone.history.stop();
-                // $(document).off('ajaxError', TeamsTabView.prototype.errorHandler);
-            });
-
-            it('can render the "Teams" tab', function() {
+            it('can render itself', function() {
                 initializeDiscussionProfilePageFactory();
                 expect($('.teams-content').text()).toContain('See all teams in your course, organized by topic');
             });

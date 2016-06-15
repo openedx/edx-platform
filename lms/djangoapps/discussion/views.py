@@ -446,9 +446,9 @@ def user_profile(request, course_key, user_id):
                 'user': request.user,
                 'django_user': django_user,
                 'profiled_user': profiled_user.to_dict(),
-                'threads': json.dumps(threads),
-                'user_info': json.dumps(user_info, default=lambda x: None),
-                'annotated_content_info': json.dumps(annotated_content_info),
+                'threads': threads,
+                'user_info': user_info,
+                'annotated_content_info': annotated_content_info,
                 'page': query_params['page'],
                 'num_pages': query_params['num_pages'],
                 'learner_profile_page_url': reverse('learner_profile', kwargs={'username': django_user.username}),
@@ -456,7 +456,7 @@ def user_profile(request, course_key, user_id):
                 'uses_pattern_library': True,
             }
 
-            return render_to_response('discussion/user_profile.html', context)
+            return render_to_response('discussion/discussion_profile_page.html', context)
     except User.DoesNotExist:
         raise Http404
 
