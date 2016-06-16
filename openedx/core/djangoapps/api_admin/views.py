@@ -144,7 +144,7 @@ class CatalogListView(View):
     def _get_catalogs(self, client, username):
         """Retrieve catalogs for a user. Returns the empty list if none are found."""
         try:
-            response = client.api.v1.catalogs.get(username=username)
+            response = client.catalogs.get(username=username)
             return [Catalog(attributes=catalog) for catalog in response['results']]
         except HttpNotFoundError:
             return []
@@ -158,7 +158,7 @@ class CatalogListView(View):
             'catalogs': catalogs,
             'form': CatalogForm(initial={'viewers': [username]}),
             'preview_url': reverse('api_admin:catalog-preview'),
-            'catalog_api_url': client.api.v1.courses.url(),
+            'catalog_api_url': client.courses.url(),
         })
 
     def post(self, request, username):
@@ -172,11 +172,11 @@ class CatalogListView(View):
                 'catalogs': catalogs,
                 'username': username,
                 'preview_url': reverse('api_admin:catalog-preview'),
-                'catalog_api_url': client.api.v1.courses.url(),
+                'catalog_api_url': client.courses.url(),
             }, status=400)
 
         attrs = form.instance.attributes
-        catalog = client.api.v1.catalogs.post(attrs)
+        catalog = client.catalogs.post(attrs)
         return redirect(reverse('api_admin:catalog-edit', kwargs={'catalog_id': catalog['id']}))
 
 
@@ -186,33 +186,33 @@ class CatalogEditView(View):
     def get(self, request, catalog_id):
         """Display a form to edit this catalog."""
         client = course_discovery_api_client(request.user)
-        response = client.api.v1.catalogs(catalog_id).get()
+        response = client.catalogs(catalog_id).get()
         catalog = Catalog(attributes=response)
         form = CatalogForm(instance=catalog)
         return render_to_response('api_admin/catalogs/edit.html', {
             'catalog': catalog,
             'form': form,
             'preview_url': reverse('api_admin:catalog-preview'),
-            'catalog_api_url': client.api.v1.courses.url(),
+            'catalog_api_url': client.courses.url(),
         })
 
     def post(self, request, catalog_id):
         """Update or delete this catalog."""
         client = course_discovery_api_client(request.user)
         if request.POST.get('delete-catalog') == 'on':
-            client.api.v1.catalogs(catalog_id).delete()
+            client.catalogs(catalog_id).delete()
             return redirect(reverse('api_admin:catalog-search'))
         form = CatalogForm(request.POST)
         if not form.is_valid():
-            response = client.api.v1.catalogs(catalog_id).get()
+            response = client.catalogs(catalog_id).get()
             catalog = Catalog(attributes=response)
             return render_to_response('api_admin/catalogs/edit.html', {
                 'catalog': catalog,
                 'form': form,
                 'preview_url': reverse('api_admin:catalog-preview'),
-                'catalog_api_url': client.api.v1.courses.url(),
+                'catalog_api_url': client.courses.url(),
             }, status=400)
-        catalog = client.api.v1.catalogs(catalog_id).patch(form.instance.attributes)
+        catalog = client.catalogs(catalog_id).patch(form.instance.attributes)
         return redirect(reverse('api_admin:catalog-edit', kwargs={'catalog_id': catalog['id']}))
 
 
@@ -227,7 +227,7 @@ class CatalogPreviewView(View):
         client = course_discovery_api_client(request.user)
         # Just pass along the request params including limit/offset pagination
         if 'q' in request.GET:
-            results = client.api.v1.courses.get(**request.GET)
+            results = client.courses.get(**request.GET)
         # Ensure that we don't just return all the courses if no query is given
         else:
             results = {'count': 0, 'results': [], 'next': None, 'prev': None}
