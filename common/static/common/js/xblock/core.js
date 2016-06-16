@@ -1,13 +1,15 @@
 (function($, JSON) {
-
     'use strict';
 
-    function initializeBlockLikes(block_class, initializer, element, requestToken) {
-        var requestToken = requestToken || $(element).data('request-token');
+    var XBlock;
+
+    function initializeBlockLikes(blockClass, initializer, element, requestToken) {
+        var selector;
+        requestToken = requestToken || $(element).data('request-token');
         if (requestToken) {
-            var selector = '.' + block_class + '[data-request-token="' + requestToken + '"]';
+            selector = '.' + blockClass + '[data-request-token="' + requestToken + '"]';
         } else {
-            var selector = '.' + block_class;
+            selector = '.' + blockClass;
         }
         return $(element).immediateDescendents(selector).map(function(idx, elem) {
             return initializer(elem, requestToken);
@@ -15,17 +17,19 @@
     }
 
     function elementRuntime(element) {
-        var $element = $(element);
-        var runtime = $element.data('runtime-class');
-        var version = $element.data('runtime-version');
-        var initFnName = $element.data('init');
+        var $element = $(element),
+            runtime = $element.data('runtime-class'),
+            version = $element.data('runtime-version'),
+            initFnName = $element.data('init');
 
         if (runtime && version && initFnName) {
-            return new window[runtime]['v' + version];
+            return new window[runtime]['v' + version]();
         } else {
             if (runtime || version || initFnName) {
-                var elementTag = $('<div>').append($element.clone()).html();
-                console.log('Block ' + elementTag + ' is missing data-runtime, data-runtime-version or data-init, and can\'t be initialized');
+                console.log(
+                    'Block ' + $element.outerHTML + ' is missing data-runtime, data-runtime-version or data-init, ' +
+                    'and can\'t be initialized'
+                );
             } // else this XBlock doesn't have a JS init function.
             return null;
         }
@@ -42,14 +46,13 @@
      * The constructor is called with the arguments 'runtime', 'element',
      * and then all of 'block_args'.
      */
-    function constructBlock(element, block_args) {
+    function constructBlock(element, blockArgs) {
         var block;
         var $element = $(element);
         var runtime = elementRuntime(element);
 
-        block_args.unshift(element);
-        block_args.unshift(runtime);
-
+        blockArgs.unshift(element);
+        blockArgs.unshift(runtime);
 
         if (runtime) {
 
@@ -59,7 +62,7 @@
                 // This create a new constructor that can then apply() the block_args
                 // to the initFn.
                 function Block() {
-                    return initFn.apply(this, block_args);
+                    return initFn.apply(this, blockArgs);
                 }
                 Block.prototype = initFn.prototype;
 
@@ -78,7 +81,7 @@
         return block;
     }
 
-    var XBlock = {
+    XBlock = {
         Runtime: {},
 
         /**
@@ -88,11 +91,12 @@
          * the children themselves.
          */
         initializeBlock: function(element, requestToken) {
-            var $element = $(element);
+            var $element = $(element),
+                children, asides;
 
-            var requestToken = requestToken || $element.data('request-token');
-            var children = XBlock.initializeXBlocks($element, requestToken);
-            var asides = XBlock.initializeXBlockAsides($element, requestToken);
+            requestToken = requestToken || $element.data('request-token');
+            children = XBlock.initializeXBlocks($element, requestToken);
+            asides = XBlock.initializeXBlockAsides($element, requestToken);
             if (asides) {
                 children = children.concat(asides);
             }
@@ -106,7 +110,7 @@
          * If requestToken is omitted, use the data-request-token attribute from element, or use
          * the request-tokens specified on the children themselves.
          */
-        initializeAside: function(element, requestToken) {
+        initializeAside: function(element) {
             var blockUsageId = $(element).data('block-id');
             var blockElement = $(element).siblings('[data-usage-id="' + blockUsageId + '"]')[0];
             return constructBlock(element, [blockElement, initArgs(element)]);
