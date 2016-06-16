@@ -418,6 +418,7 @@ class PayAndVerifyView(View):
             'disable_courseware_js': True,
             'display_steps': display_steps,
             'is_active': json.dumps(request.user.is_active),
+            'user_email': request.user.email,
             'message_key': message,
             'platform_name': theming_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),
             'processors': processors,
