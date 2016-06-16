@@ -1,4 +1,4 @@
-(function(Backbone) {
+(function (Backbone, DiscussionUtil, DiscussionTopicMenuView) {
     'use strict';
     if (Backbone) {
         this.DiscussionThreadEditView = Backbone.View.extend({
@@ -12,7 +12,7 @@
                 'class': 'discussion-post edit-post-form'
             },
 
-            initialize: function(options) {
+            initialize: function (options) {
                 this.container = options.container || $('.thread-content-wrapper');
                 this.mode = options.mode || 'inline';
                 this.course_settings = options.course_settings;
@@ -23,7 +23,7 @@
                 return this;
             },
 
-            render: function() {
+            render: function () {
                 var threadTypeTemplate,
                     formId = _.uniqueId("form-");
                 this.template = _.template($('#thread-edit-template').html());
@@ -45,7 +45,7 @@
                 return this;
             },
 
-            addField: function(fieldView) {
+            addField: function (fieldView) {
                 this.$('.forum-edit-post-form-wrapper').append(fieldView);
                 return this;
             },
@@ -54,7 +54,7 @@
                 return this.mode === 'tab';
             },
 
-            save: function() {
+            save: function () {
                 var title = this.$('.edit-post-title').val(),
                     threadType = this.$(".post-type-input:checked").val(),
                     body = this.$('.edit-post-body textarea').val(),
@@ -75,7 +75,7 @@
                     dataType: 'json',
                     data: postData,
                     error: DiscussionUtil.formErrorHandler(this.$('.post-errors')),
-                    success: function() {
+                    success: function () {
                         this.$('.edit-post-title').val('').attr('prev-text', '');
                         this.$('.edit-post-body textarea').val('').attr('prev-text', '');
                         this.$('.wmd-preview p').html('');
@@ -85,7 +85,7 @@
                         this.model.set(postData).unset('abbreviatedBody');
                         this.trigger('thread:updated');
                         if (this.threadType !== threadType) {
-                            this.model.set("thread_type", threadType)
+                            this.model.set("thread_type", threadType);
                             this.model.trigger('thread:thread_type_updated');
                             this.trigger('comment:endorse');
                         }
@@ -93,7 +93,7 @@
                 });
             },
 
-            updateHandler: function(event) {
+            updateHandler: function (event) {
                 event.preventDefault();
                 // this event is for the moment triggered and used nowhere.
                 this.trigger('thread:update', event);
@@ -101,7 +101,7 @@
                 return this;
             },
 
-            cancelHandler: function(event) {
+            cancelHandler: function (event) {
                 event.preventDefault();
                 this.trigger("thread:cancel_edit", event);
                 this.remove();
@@ -109,4 +109,4 @@
             }
         });
     }
-}).call(this, Backbone);
+}).call(this, Backbone, DiscussionUtil, DiscussionTopicMenuView); // jshint ignore:line
