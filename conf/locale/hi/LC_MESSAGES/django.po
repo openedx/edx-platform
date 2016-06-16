@@ -35,6 +35,7 @@
 # Amol Bhave <ammubhave@gmail.com>, 2013
 # Amol Bhave <ammubhave@gmail.com>, 2013,2015
 # Anant Vima <anant.vima@anu.edu.au>, 2014
+# centaur8811 <centaur8811@gmail.com>, 2016
 # CHANDRA SHEKHAR SHARMA <shekharsharma041@gmail.com>, 2014
 # ria1234 <contactpayal@yahoo.com.au>, 2014
 # Devesh Parashar, 2015

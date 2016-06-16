@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-06-09 15:20+0000\n"
-"PO-Revision-Date: 2016-06-09 15:21:36.475893\n"
+"POT-Creation-Date: 2016-06-16 14:28+0000\n"
+"PO-Revision-Date: 2016-06-16 14:36:14.893510\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -1770,6 +1770,10 @@ msgstr ""
 #: common/lib/xmodule/xmodule/js/src/video/08_video_speed_control.js
 msgid "Adjust video speed"
 msgstr "شيتعسف دهيثخ سحثثي"
+
+#: common/lib/xmodule/xmodule/js/src/video/08_video_speed_control.js
+msgid "Video speed: "
+msgstr "دهيثخ سحثثي: "
 
 #: common/lib/xmodule/xmodule/js/src/video/09_play_skip_control.js
 msgid "Skip"
@@ -7114,6 +7118,11 @@ msgstr "دهثص ذخعقسث"
 #: lms/templates/learner_dashboard/course_enroll.underscore
 msgid "not enrolled"
 msgstr "رخف ثرقخممثي"
+
+#: lms/templates/learner_dashboard/course_enroll.underscore
+#, python-format
+msgid "Starts %(start)s"
+msgstr "سفشقفس %(start)s"
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
 msgid "Enroll Now"

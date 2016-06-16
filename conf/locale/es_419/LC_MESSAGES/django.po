@@ -107,6 +107,7 @@
 # Lalo Cabrera <laloogcabrera@yahoo.com.mx>, 2014
 # Laura Silva <lingison@edx.org>, 2016
 # camilomaiden <inactive+camilomaiden@transifex.com>, 2014
+# Luis Benites <lbenitesanchez@gmail.com>, 2016
 # Luis Ricardo Ruiz <luislicardo1307@gmail.com>, 2013
 # Luis Ricardo Ruiz <luislicardo1307@gmail.com>, 2013-2014
 # Luis Ricardo Ruiz <luislicardo1307@gmail.com>, 2013
