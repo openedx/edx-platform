@@ -1,4 +1,4 @@
-(function(Backbone) {
+(function() {
     'use strict';
     if (Backbone) {
         this.DiscussionTopicMenuView = Backbone.View.extend({
@@ -42,7 +42,9 @@
                 this.selectedTopic = this.$('.js-selected-topic');
                 this.hideTopicDropdown();
                 if (this.getCurrentTopicId()) {
-                    this.setTopic(this.$('a.topic-title').filter('[data-discussion-id="' + this.getCurrentTopicId() + '"]'));
+                    this.setTopic(this.$('a.topic-title').filter(
+                        '[data-discussion-id="' + this.getCurrentTopicId() + '"]')
+                    );
                 } else {
                     this.setTopic(this.$('a.topic-title').first());
                 }
@@ -174,7 +176,7 @@
             // TODO: this helper class duplicates functionality in DiscussionThreadListView.filterTopics
             // for use with a very similar category dropdown in the New Post form.  The two menus' implementations
             // should be merged into a single reusable view.
-            filterDrop: function (e) {
+            filterDrop: function(e) {
                 var $drop, $items, query;
                 $drop = $(e.target).parents('.topic-menu-wrapper');
                 query = $(e.target).val();
@@ -186,14 +188,14 @@
                 }
 
                 $items.addClass('hidden');
-                $items.each(function (_index, item) {
+                $items.each(function(_index, item) {
                     var path, pathText, pathTitles;
                     path = $(item).parents(".topic-menu-item").andSelf();
-                    pathTitles = path.children(".topic-title").map(function (_, elem) {
+                    pathTitles = path.children(".topic-title").map(function(_, elem) {
                         return $(elem).text();
                     }).get();
                     pathText = pathTitles.join(" / ").toLowerCase();
-                    if (query.split(" ").every(function (term) {
+                    if (query.split(" ").every(function(term) {
                             return pathText.search(term.toLowerCase()) !== -1;
                         })) {
                         $(item).removeClass('hidden');
@@ -204,4 +206,4 @@
             }
         });
     }
-}).call(this, Backbone);
+}).call(this);

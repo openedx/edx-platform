@@ -1,25 +1,64 @@
-if Backbone?
-  class @ResponseCommentEditView extends Backbone.View
+/* globals DiscussionUtil */
+(function() {
+    'use strict';
+    var __hasProp = {}.hasOwnProperty,
+        __extends = function(child, parent) {
+            for (var key in parent) {
+                if (__hasProp.call(parent, key)) {
+                    child[key] = parent[key];
+                }
+            }
+            function ctor() {
+                this.constructor = child;
+            }
 
-    events:
-      "click .post-update": "update"
-      "click .post-cancel": "cancel_edit"
+            ctor.prototype = parent.prototype;
+            child.prototype = new ctor();
+            child.__super__ = parent.prototype;
+            return child;
+        };
 
-    $: (selector) ->
-      @$el.find(selector)
+    if (typeof Backbone !== "undefined" && Backbone !== null) {
+        this.ResponseCommentEditView = (function(_super) {
 
-    initialize: ->
-      super()
+            __extends(ResponseCommentEditView, _super);
 
-    render: ->
-      @template = _.template($("#response-comment-edit-template").html())
-      @$el.html(@template(@model.toJSON()))
-      @delegateEvents()
-      DiscussionUtil.makeWmdEditor @$el, $.proxy(@$, @), "edit-comment-body"
-      @
+            function ResponseCommentEditView() {
+                return ResponseCommentEditView.__super__.constructor.apply(this, arguments);
+            }
 
-    update: (event) ->
-      @trigger "comment:update", event
+            ResponseCommentEditView.prototype.events = {
+                "click .post-update": "update",
+                "click .post-cancel": "cancel_edit"
+            };
 
-    cancel_edit: (event) ->
-      @trigger "comment:cancel_edit", event
+            ResponseCommentEditView.prototype.$ = function(selector) {
+                return this.$el.find(selector);
+            };
+
+            ResponseCommentEditView.prototype.initialize = function() {
+                return ResponseCommentEditView.__super__.initialize.call(this);
+            };
+
+            ResponseCommentEditView.prototype.render = function() {
+                this.template = _.template($("#response-comment-edit-template").html());
+                this.$el.html(this.template(this.model.toJSON()));
+                this.delegateEvents();
+                DiscussionUtil.makeWmdEditor(this.$el, $.proxy(this.$, this), "edit-comment-body");
+                return this;
+            };
+
+            ResponseCommentEditView.prototype.update = function(event) {
+                return this.trigger("comment:update", event);
+            };
+
+            ResponseCommentEditView.prototype.cancel_edit = function(event) {
+                return this.trigger("comment:cancel_edit", event);
+            };
+
+            return ResponseCommentEditView;
+
+        })(Backbone.View);
+    }
+
+}).call(window);

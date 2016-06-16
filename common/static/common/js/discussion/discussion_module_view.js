@@ -1,173 +1,266 @@
-if Backbone?
-  class @DiscussionModuleView extends Backbone.View
-    events:
-      "click .discussion-show": "toggleDiscussion"
-      "keydown .discussion-show":
-        (event) -> DiscussionUtil.activateOnSpace(event, @toggleDiscussion)
-      "click .new-post-btn": "toggleNewPost"
-      "keydown .new-post-btn":
-        (event) -> DiscussionUtil.activateOnSpace(event, @toggleNewPost)
-      "click .discussion-paginator a": "navigateToPage"
+/* globals Discussion, DiscussionUtil, DiscussionUser, DiscussionCourseSettings,  DiscussionThreadView, Content,
+NewPostView */
+(function() {
+    'use strict';
+    var __hasProp = {}.hasOwnProperty,
+        __extends = function(child, parent) {
+            for (var key in parent) {
+                if (__hasProp.call(parent, key)) {
+                    child[key] = parent[key];
+                }
+            }
+            function ctor() {
+                this.constructor = child;
+            }
 
-    page_re: /\?discussion_page=(\d+)/
-    initialize: (options) ->
-      @toggleDiscussionBtn = @$(".discussion-show")
-      # Set the page if it was set in the URL. This is used to allow deep linking to pages
-      match = @page_re.exec(window.location.href)
-      @context = options.context or "course"  # allowed values are "course" or "standalone"
-      if match
-        @page = parseInt(match[1])
-      else
-        @page = 1
+            ctor.prototype = parent.prototype;
+            child.prototype = new ctor();
+            child.__super__ = parent.prototype;
+            return child;
+        };
 
-    toggleNewPost: (event) =>
-      event.preventDefault()
-      if !@newPostForm
-        @toggleDiscussion()
-        @isWaitingOnNewPost = true;
-        return
-      if @showed
-        @newPostForm.slideDown(300)
-      else
-        @newPostForm.show().focus()
-      @toggleDiscussionBtn.addClass('shown')
-      @toggleDiscussionBtn.find('.button-text').html(gettext("Hide Discussion"))
-      @$("section.discussion").slideDown()
-      @showed = true
+    if (typeof Backbone !== "undefined" && Backbone !== null) {
+        this.DiscussionModuleView = (function(_super) {
 
-    hideNewPost: =>
-     @newPostForm.slideUp(300)
+            __extends(DiscussionModuleView, _super);
 
-    hideDiscussion: =>
-      @$("section.discussion").slideUp()
-      @toggleDiscussionBtn.removeClass('shown')
-      @toggleDiscussionBtn.find('.button-text').html(gettext("Show Discussion"))
-      @showed = false
+            function DiscussionModuleView() {
+                var self = this;
+                this.navigateToPage = function() {
+                    return DiscussionModuleView.prototype.navigateToPage.apply(self, arguments);
+                };
+                this.renderPagination = function() {
+                    return DiscussionModuleView.prototype.renderPagination.apply(self, arguments);
+                };
+                this.addThread = function() {
+                    return DiscussionModuleView.prototype.addThread.apply(self, arguments);
+                };
+                this.renderDiscussion = function() {
+                    return DiscussionModuleView.prototype.renderDiscussion.apply(self, arguments);
+                };
+                this.loadPage = function() {
+                    return DiscussionModuleView.prototype.loadPage.apply(self, arguments);
+                };
+                this.toggleDiscussion = function() {
+                    return DiscussionModuleView.prototype.toggleDiscussion.apply(self, arguments);
+                };
+                this.hideDiscussion = function() {
+                    return DiscussionModuleView.prototype.hideDiscussion.apply(self, arguments);
+                };
+                this.hideNewPost = function() {
+                    return DiscussionModuleView.prototype.hideNewPost.apply(self, arguments);
+                };
+                this.toggleNewPost = function() {
+                    return DiscussionModuleView.prototype.toggleNewPost.apply(self, arguments);
+                };
+                return DiscussionModuleView.__super__.constructor.apply(this, arguments);
+            }
 
-    toggleDiscussion: (event) =>
-      if @showed
-        @hideDiscussion()
-      else
-        @toggleDiscussionBtn.addClass('shown')
-        @toggleDiscussionBtn.find('.button-text').html(gettext("Hide Discussion"))
+            DiscussionModuleView.prototype.events = {
+                "click .discussion-show": "toggleDiscussion",
+                "keydown .discussion-show": function(event) {
+                    return DiscussionUtil.activateOnSpace(event, this.toggleDiscussion);
+                },
+                "click .new-post-btn": "toggleNewPost",
+                "keydown .new-post-btn": function(event) {
+                    return DiscussionUtil.activateOnSpace(event, this.toggleNewPost);
+                },
+                "click .discussion-paginator a": "navigateToPage"
+            };
 
-        if @retrieved
-          @$("section.discussion").slideDown()
-          @showed = true
-        else
-          $elem = @toggleDiscussionBtn
-          @loadPage(
-            $elem,
-            =>
-              @hideDiscussion()
-              DiscussionUtil.discussionAlert(
-                gettext("Sorry"),
-                gettext("We had some trouble loading the discussion. Please try again.")
-              )
-          )
+            DiscussionModuleView.prototype.page_re = /\?discussion_page=(\d+)/;
 
-    loadPage: ($elem, error) =>
-      discussionId = @$el.data("discussion-id")
-      url = DiscussionUtil.urlFor('retrieve_discussion', discussionId) + "?page=#{@page}"
-      DiscussionUtil.safeAjax
-        $elem: $elem
-        $loading: $elem
-        takeFocus: true
-        url: url
-        type: "GET"
-        dataType: 'json'
-        success: (response, textStatus, jqXHR) => @renderDiscussion($elem, response, textStatus, discussionId)
-        error: error
+            DiscussionModuleView.prototype.initialize = function(options) {
+                var match;
+                this.toggleDiscussionBtn = this.$(".discussion-show");
+                match = this.page_re.exec(window.location.href);
+                this.context = options.context || "course";
+                if (match) {
+                    this.page = parseInt(match[1]);
+                } else {
+                    this.page = 1;
+                }
+            };
 
-    renderDiscussion: ($elem, response, textStatus, discussionId) =>
-      $elem.focus()
-      user = new DiscussionUser(response.user_info)
-      window.user = user
-      DiscussionUtil.setUser(user)
-      Content.loadContentInfos(response.annotated_content_info)
-      DiscussionUtil.loadRoles(response.roles)
+            DiscussionModuleView.prototype.toggleNewPost = function(event) {
+                event.preventDefault();
+                if (!this.newPostForm) {
+                    this.toggleDiscussion();
+                    this.isWaitingOnNewPost = true;
+                    return;
+                }
+                if (this.showed) {
+                    this.newPostForm.slideDown(300);
+                } else {
+                    this.newPostForm.show().focus();
+                }
+                this.toggleDiscussionBtn.addClass('shown');
+                this.toggleDiscussionBtn.find('.button-text').html(gettext("Hide Discussion"));
+                this.$("section.discussion").slideDown();
+                this.showed = true;
+            };
 
-      @course_settings = new DiscussionCourseSettings(response.course_settings)
-      @discussion = new Discussion()
-      @discussion.reset(response.discussion_data, {silent: false})
+            DiscussionModuleView.prototype.hideNewPost = function() {
+                return this.newPostForm.slideUp(300);
+            };
 
-      $discussion = _.template($("#inline-discussion-template").html())(
-        'threads': response.discussion_data,
-        'discussionId': discussionId
-      )
-      if @$('section.discussion').length
-        @$('section.discussion').replaceWith($discussion)
-      else
-        @$el.append($discussion)
+            DiscussionModuleView.prototype.hideDiscussion = function() {
+                this.$("section.discussion").slideUp();
+                this.toggleDiscussionBtn.removeClass('shown');
+                this.toggleDiscussionBtn.find('.button-text').html(gettext("Show Discussion"));
+                this.showed = false;
+            };
 
-      @newPostForm = this.$el.find('.new-post-article')
-      @threadviews = @discussion.map (thread) =>
-        view = new DiscussionThreadView(
-          el: @$("article#thread_#{thread.id}"),
-          model: thread,
-          mode: "inline",
-          context: @context,
-          course_settings: @course_settings,
-          topicId: discussionId
-        )
-        thread.on "thread:thread_type_updated", ->
-          view.rerender()
-          view.expand()
-        return view
-      _.each @threadviews, (dtv) -> dtv.render()
-      DiscussionUtil.bulkUpdateContentInfo(window.$$annotated_content_info)
-      @newPostView = new NewPostView(
-        el: @newPostForm,
-        collection: @discussion,
-        course_settings: @course_settings,
-        topicId: discussionId,
-        is_commentable_cohorted: response.is_commentable_cohorted
-      )
-      @newPostView.render()
-      @listenTo( @newPostView, 'newPost:cancel', @hideNewPost )
-      @discussion.on "add", @addThread
+            DiscussionModuleView.prototype.toggleDiscussion = function() {
+                var $elem,
+                    self = this;
+                if (this.showed) {
+                    return this.hideDiscussion();
+                } else {
+                    this.toggleDiscussionBtn.addClass('shown');
+                    this.toggleDiscussionBtn.find('.button-text').html(gettext("Hide Discussion"));
+                    if (this.retrieved) {
+                        this.$("section.discussion").slideDown();
+                        this.showed = true;
+                    } else {
+                        $elem = this.toggleDiscussionBtn;
+                        return this.loadPage($elem, function() {
+                            self.hideDiscussion();
+                            return DiscussionUtil.discussionAlert(
+                                gettext("Sorry"),
+                                gettext("We had some trouble loading the discussion. Please try again.")
+                            );
+                        });
+                    }
+                }
+            };
 
-      @retrieved = true
-      @showed = true
-      @renderPagination(response.num_pages)
+            DiscussionModuleView.prototype.loadPage = function($elem, error) {
+                var discussionId, url,
+                    self = this;
+                discussionId = this.$el.data("discussion-id");
+                url = DiscussionUtil.urlFor('retrieve_discussion', discussionId) + ("?page=" + this.page);
+                return DiscussionUtil.safeAjax({
+                    $elem: $elem,
+                    $loading: $elem,
+                    takeFocus: true,
+                    url: url,
+                    type: "GET",
+                    dataType: 'json',
+                    success: function(response, textStatus) {
+                        return self.renderDiscussion($elem, response, textStatus, discussionId);
+                    },
+                    error: error
+                });
+            };
 
-      if @isWaitingOnNewPost
-        @newPostForm.show().focus()
+            DiscussionModuleView.prototype.renderDiscussion = function($elem, response, textStatus, discussionId) {
+                var $discussion, user,
+                    self = this;
+                $elem.focus();
+                user = new DiscussionUser(response.user_info);
+                window.user = user;
+                DiscussionUtil.setUser(user);
+                Content.loadContentInfos(response.annotated_content_info);
+                DiscussionUtil.loadRoles(response.roles);
+                this.course_settings = new DiscussionCourseSettings(response.course_settings);
+                this.discussion = new Discussion();
+                this.discussion.reset(response.discussion_data, {
+                    silent: false
+                });
+                $discussion = _.template($("#inline-discussion-template").html())({
+                    'threads': response.discussion_data,
+                    'discussionId': discussionId
+                });
+                if (this.$('section.discussion').length) {
+                    this.$('section.discussion').replaceWith($discussion);
+                } else {
+                    this.$el.append($discussion);
+                }
+                this.newPostForm = this.$el.find('.new-post-article');
+                this.threadviews = this.discussion.map(function(thread) {
+                    var view;
+                    view = new DiscussionThreadView({
+                        el: self.$("article#thread_" + thread.id),
+                        model: thread,
+                        mode: "inline",
+                        context: self.context,
+                        course_settings: self.course_settings,
+                        topicId: discussionId
+                    });
+                    thread.on("thread:thread_type_updated", function() {
+                        view.rerender();
+                        return view.expand();
+                    });
+                    return view;
+                });
+                _.each(this.threadviews, function(dtv) {
+                    return dtv.render();
+                });
+                DiscussionUtil.bulkUpdateContentInfo(window.$$annotated_content_info);
+                this.newPostView = new NewPostView({
+                    el: this.newPostForm,
+                    collection: this.discussion,
+                    course_settings: this.course_settings,
+                    topicId: discussionId,
+                    is_commentable_cohorted: response.is_commentable_cohorted
+                });
+                this.newPostView.render();
+                this.listenTo(this.newPostView, 'newPost:cancel', this.hideNewPost);
+                this.discussion.on("add", this.addThread);
+                this.retrieved = true;
+                this.showed = true;
+                this.renderPagination(response.num_pages);
+                if (this.isWaitingOnNewPost) {
+                    return this.newPostForm.show().focus();
+                }
+            };
 
-    addThread: (thread, collection, options) =>
-      # TODO: When doing pagination, this will need to repaginate. Perhaps just reload page 1?
-      article = $("<article class='discussion-thread' id='thread_#{thread.id}'></article>")
-      @$('section.discussion > .threads').prepend(article)
+            DiscussionModuleView.prototype.addThread = function(thread) {
+                var article, threadView;
+                article = $("<article class='discussion-thread' id='thread_" + thread.id + "'></article>");
+                this.$('section.discussion > .threads').prepend(article);
+                threadView = new DiscussionThreadView({
+                    el: article,
+                    model: thread,
+                    mode: "inline",
+                    context: this.context,
+                    course_settings: this.course_settings,
+                    topicId: this.$el.data("discussion-id")
+                });
+                threadView.render();
+                return this.threadviews.unshift(threadView);
+            };
 
-      threadView = new DiscussionThreadView(
-        el: article,
-        model: thread,
-        mode: "inline",
-        context: @context,
-        course_settings: @course_settings,
-        topicId: @$el.data("discussion-id")
-      )
-      threadView.render()
-      @threadviews.unshift threadView
+            DiscussionModuleView.prototype.renderPagination = function(numPages) {
+                var pageUrl, pagination, params;
+                pageUrl = function(number) {
+                    return "?discussion_page=" + number;
+                };
+                params = DiscussionUtil.getPaginationParams(this.page, numPages, pageUrl);
+                pagination = _.template($("#pagination-template").html())(params);
+                return this.$('section.discussion-pagination').html(pagination);
+            };
 
-    renderPagination: (numPages) =>
-      pageUrl = (number) ->
-        "?discussion_page=#{number}"
-      params = DiscussionUtil.getPaginationParams(@page, numPages, pageUrl)
-      pagination = _.template($("#pagination-template").html())(params)
-      @$('section.discussion-pagination').html(pagination)
+            DiscussionModuleView.prototype.navigateToPage = function(event) {
+                var currPage,
+                    self = this;
+                event.preventDefault();
+                window.history.pushState({}, window.document.title, event.target.href);
+                currPage = this.page;
+                this.page = $(event.target).data('page-number');
+                return this.loadPage($(event.target), function() {
+                    self.page = currPage;
+                    DiscussionUtil.discussionAlert(
+                        gettext("Sorry"),
+                        gettext("We had some trouble loading the threads you requested. Please try again.")
+                    );
+                });
+            };
 
-    navigateToPage: (event) =>
-      event.preventDefault()
-      window.history.pushState({}, window.document.title, event.target.href)
-      currPage = @page
-      @page = $(event.target).data('page-number')
-      @loadPage(
-        $(event.target),
-        =>
-          @page = currPage
-          DiscussionUtil.discussionAlert(
-            gettext("Sorry"),
-            gettext("We had some trouble loading the threads you requested. Please try again.")
-          )
-      )
+            return DiscussionModuleView;
+
+        })(Backbone.View);
+    }
+
+}).call(window);

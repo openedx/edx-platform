@@ -1,303 +1,520 @@
-if Backbone?
-  class @DiscussionContentView extends Backbone.View
+/* globals DiscussionContentView, DiscussionUtil */
+(function() {
+    'use strict';
+    var __hasProp = {}.hasOwnProperty,
+        __extends = function(child, parent) {
+            for (var key in parent) {
+                if (__hasProp.call(parent, key)) {
+                    child[key] = parent[key];
+                }
+            }
+            function ctor() {
+                this.constructor = child;
+            }
 
+            ctor.prototype = parent.prototype;
+            child.prototype = new ctor();
+            child.__super__ = parent.prototype;
+            return child;
+        };
 
-    events:
-      "click .discussion-flag-abuse": "toggleFlagAbuse"
-      "keydown .discussion-flag-abuse":
-        (event) -> DiscussionUtil.activateOnSpace(event, @toggleFlagAbuse)
+    if (typeof Backbone !== "undefined" && Backbone !== null) {
+        this.DiscussionContentView = (function(_super) {
 
-    attrRenderer:
-      ability: (ability) ->
-        for action, selector of @abilityRenderer
-          if not ability[action]
-            selector.disable.apply(@)
-          else
-            selector.enable.apply(@)
+            __extends(DiscussionContentView, _super);
 
-    abilityRenderer:
-      editable:
-        enable: -> @$(".action-edit").closest(".actions-item").removeClass("is-hidden")
-        disable: -> @$(".action-edit").closest(".actions-item").addClass("is-hidden")
-      can_delete:
-        enable: -> @$(".action-delete").closest(".actions-item").removeClass("is-hidden")
-        disable: -> @$(".action-delete").closest(".actions-item").addClass("is-hidden")
-      can_openclose:
-        enable: ->
-          _.each(
-            [".action-close", ".action-pin"],
-            (selector) => @$(selector).closest(".actions-item").removeClass("is-hidden")
-          )
-        disable: ->
-          _.each(
-            [".action-close", ".action-pin"],
-            (selector) => @$(selector).closest(".actions-item").addClass("is-hidden")
-          )
-      can_report:
-        enable: -> @$(".action-report").closest(".actions-item").removeClass("is-hidden")
-        disable: -> @$(".action-report").closest(".actions-item").addClass("is-hidden")
-      can_vote:
-        enable: -> @$(".action-vote").closest(".actions-item").removeClass("is-hidden")
-        disable: -> @$(".action-vote").closest(".actions-item").addClass("is-hidden")
+            function DiscussionContentView() {
+                var self = this;
+                this.setWmdContent = function() {
+                    return DiscussionContentView.prototype.setWmdContent.apply(self, arguments);
+                };
+                this.getWmdContent = function() {
+                    return DiscussionContentView.prototype.getWmdContent.apply(self, arguments);
+                };
+                this.getWmdEditor = function() {
+                    return DiscussionContentView.prototype.getWmdEditor.apply(self, arguments);
+                };
+                this.makeWmdEditor = function() {
+                    return DiscussionContentView.prototype.makeWmdEditor.apply(self, arguments);
+                };
+                return DiscussionContentView.__super__.constructor.apply(this, arguments);
+            }
 
-    renderPartialAttrs: ->
-      for attr, value of @model.changedAttributes()
-        if @attrRenderer[attr]
-          @attrRenderer[attr].apply(@, [value])
+            DiscussionContentView.prototype.events = {
+                "click .discussion-flag-abuse": "toggleFlagAbuse",
+                "keydown .discussion-flag-abuse": function(event) {
+                    return DiscussionUtil.activateOnSpace(event, this.toggleFlagAbuse);
+                }
+            };
 
-    renderAttrs: ->
-      for attr, value of @model.attributes
-        if @attrRenderer[attr]
-          @attrRenderer[attr].apply(@, [value])
+            DiscussionContentView.prototype.attrRenderer = {
+                ability: function(ability) {
+                    var action, selector, _ref, _results;
+                    _ref = this.abilityRenderer;
+                    _results = [];
+                    for (action in _ref) {
+                        if (_ref.hasOwnProperty(action)){
+                            selector = _ref[action];
+                            if (!ability[action]) {
+                                _results.push(selector.disable.apply(this));
+                            } else {
+                                _results.push(selector.enable.apply(this));
+                            }
+                        }
+                    }
+                    return _results;
+                }
+            };
 
-    makeWmdEditor: (cls_identifier) =>
-      if not @$el.find(".wmd-panel").length
-        DiscussionUtil.makeWmdEditor @$el, $.proxy(@$, @), cls_identifier
+            DiscussionContentView.prototype.abilityRenderer = {
+                editable: {
+                    enable: function() {
+                        return this.$(".action-edit").closest(".actions-item").removeClass("is-hidden");
+                    },
+                    disable: function() {
+                        return this.$(".action-edit").closest(".actions-item").addClass("is-hidden");
+                    }
+                },
+                can_delete: {
+                    enable: function() {
+                        return this.$(".action-delete").closest(".actions-item").removeClass("is-hidden");
+                    },
+                    disable: function() {
+                        return this.$(".action-delete").closest(".actions-item").addClass("is-hidden");
+                    }
+                },
+                can_openclose: {
+                    enable: function() {
+                        var self = this;
+                        return _.each([".action-close", ".action-pin"], function(selector) {
+                            return self.$(selector).closest(".actions-item").removeClass("is-hidden");
+                        });
+                    },
+                    disable: function() {
+                        var self = this;
+                        return _.each([".action-close", ".action-pin"], function(selector) {
+                            return self.$(selector).closest(".actions-item").addClass("is-hidden");
+                        });
+                    }
+                },
+                can_report: {
+                    enable: function() {
+                        return this.$(".action-report").closest(".actions-item").removeClass("is-hidden");
+                    },
+                    disable: function() {
+                        return this.$(".action-report").closest(".actions-item").addClass("is-hidden");
+                    }
+                },
+                can_vote: {
+                    enable: function() {
+                        return this.$(".action-vote").closest(".actions-item").removeClass("is-hidden");
+                    },
+                    disable: function() {
+                        return this.$(".action-vote").closest(".actions-item").addClass("is-hidden");
+                    }
+                }
+            };
 
-    getWmdEditor: (cls_identifier) =>
-      DiscussionUtil.getWmdEditor @$el, $.proxy(@$, @), cls_identifier
+            DiscussionContentView.prototype.renderPartialAttrs = function() {
+                var attr, value, _ref, _results;
+                _ref = this.model.changedAttributes();
+                _results = [];
+                for (attr in _ref) {
+                    if (_ref.hasOwnProperty(attr)) {
+                        value = _ref[attr];
+                        if (this.attrRenderer[attr]) {
+                            _results.push(this.attrRenderer[attr].apply(this, [value]));
+                        } else {
+                            _results.push(void 0);
+                        }
+                    }
+                }
+                return _results;
+            };
 
-    getWmdContent: (cls_identifier) =>
-      DiscussionUtil.getWmdContent @$el, $.proxy(@$, @), cls_identifier
+            DiscussionContentView.prototype.renderAttrs = function() {
+                var attr, value, _ref, _results;
+                _ref = this.model.attributes;
+                _results = [];
+                for (attr in _ref) {
+                    if (_ref.hasOwnProperty(attr)) {
+                        value = _ref[attr];
+                        if (this.attrRenderer[attr]) {
+                            _results.push(this.attrRenderer[attr].apply(this, [value]));
+                        } else {
+                            _results.push(void 0);
+                        }
+                    }
+                }
+                return _results;
+            };
 
-    setWmdContent: (cls_identifier, text) =>
-      DiscussionUtil.setWmdContent @$el, $.proxy(@$, @), cls_identifier, text
+            DiscussionContentView.prototype.makeWmdEditor = function(cls_identifier) {
+                if (!this.$el.find(".wmd-panel").length) {
+                    return DiscussionUtil.makeWmdEditor(this.$el, $.proxy(this.$, this), cls_identifier);
+                }
+            };
 
+            DiscussionContentView.prototype.getWmdEditor = function(cls_identifier) {
+                return DiscussionUtil.getWmdEditor(this.$el, $.proxy(this.$, this), cls_identifier);
+            };
 
-    initialize: ->
-      @model.bind('change', @renderPartialAttrs, @)
-      @listenTo(@model, "change:endorsed", =>
-        if @model instanceof Comment
-          @trigger("comment:endorse")
-      )
+            DiscussionContentView.prototype.getWmdContent = function(cls_identifier) {
+                return DiscussionUtil.getWmdContent(this.$el, $.proxy(this.$, this), cls_identifier);
+            };
 
-  class @DiscussionContentShowView extends DiscussionContentView
-    events:
-      _.reduce(
-        [
-          [".action-follow", "toggleFollow"],
-          [".action-answer", "toggleEndorse"],
-          [".action-endorse", "toggleEndorse"],
-          [".action-vote", "toggleVote"],
-          [".action-more", "toggleSecondaryActions"],
-          [".action-pin", "togglePin"],
-          [".action-edit", "edit"],
-          [".action-delete", "_delete"],
-          [".action-report", "toggleReport"],
-          [".action-close", "toggleClose"],
-        ],
-        (obj, event) =>
-          selector = event[0]
-          funcName = event[1]
-          obj["click #{selector}"] = (event) -> @[funcName](event)
-          obj["keydown #{selector}"] = (event) -> DiscussionUtil.activateOnSpace(event, @[funcName])
-          obj
-        ,
-        {}
-      )
+            DiscussionContentView.prototype.setWmdContent = function(cls_identifier, text) {
+                return DiscussionUtil.setWmdContent(this.$el, $.proxy(this.$, this), cls_identifier, text);
+            };
 
-    updateButtonState: (selector, checked) =>
-      $button = @$(selector)
-      $button.toggleClass("is-checked", checked)
-      $button.attr("aria-checked", checked)
+            DiscussionContentView.prototype.initialize = function() {
+                var self = this;
+                this.model.bind('change', this.renderPartialAttrs, this);
+                return this.listenTo(this.model, "change:endorsed", function() {
+                    if (self.model instanceof Comment) {
+                        return self.trigger("comment:endorse");
+                    }
+                });
+            };
 
-    attrRenderer: $.extend({}, DiscussionContentView.prototype.attrRenderer, {
-      subscribed: (subscribed) ->
-        @updateButtonState(".action-follow", subscribed)
+            return DiscussionContentView;
 
-      endorsed: (endorsed) ->
-        selector = if @model.get("thread").get("thread_type") == "question" then ".action-answer" else ".action-endorse"
-        @updateButtonState(selector, endorsed)
-        $button = @$(selector)
-        $button.closest(".actions-item").toggleClass("is-hidden", not @model.canBeEndorsed())
-        $button.toggleClass("is-checked", endorsed)
+        })(Backbone.View);
+        this.DiscussionContentShowView = (function(_super) {
+            __extends(DiscussionContentShowView, _super);
 
-      votes: (votes) ->
-        selector = ".action-vote"
-        @updateButtonState(selector, window.user.voted(@model))
-        button = @$el.find(selector)
-        numVotes = votes.up_count
-        button.find(".js-sr-vote-count").html(
-          interpolate(
-            ngettext("there is currently %(numVotes)s vote", "there are currently %(numVotes)s votes", numVotes),
-            {numVotes: numVotes},
-            true
-          )
-        )
-        votesHtml = interpolate(
-                      ngettext("%(numVotes)s Vote", "%(numVotes)s Votes", numVotes),
-                      {numVotes: numVotes},
-                      true
+            function DiscussionContentShowView() {
+                var self = this;
+                this.toggleClose = function() {
+                    return DiscussionContentShowView.prototype.toggleClose.apply(self, arguments);
+                };
+                this.toggleReport = function() {
+                    return DiscussionContentShowView.prototype.toggleReport.apply(self, arguments);
+                };
+                this.togglePin = function() {
+                    return DiscussionContentShowView.prototype.togglePin.apply(self, arguments);
+                };
+                this.toggleVote = function() {
+                    return DiscussionContentShowView.prototype.toggleVote.apply(self, arguments);
+                };
+                this.toggleEndorse = function() {
+                    return DiscussionContentShowView.prototype.toggleEndorse.apply(self, arguments);
+                };
+                this.toggleFollow = function() {
+                    return DiscussionContentShowView.prototype.toggleFollow.apply(self, arguments);
+                };
+                this.handleSecondaryActionBlur = function() {
+                    return DiscussionContentShowView.prototype.handleSecondaryActionBlur.apply(self, arguments);
+                };
+                this.handleSecondaryActionEscape = function() {
+                    return DiscussionContentShowView.prototype.handleSecondaryActionEscape.apply(self, arguments);
+                };
+                this.toggleSecondaryActions = function() {
+                    return DiscussionContentShowView.prototype.toggleSecondaryActions.apply(self, arguments);
+                };
+                this.updateButtonState = function() {
+                    return DiscussionContentShowView.prototype.updateButtonState.apply(self, arguments);
+                };
+                return DiscussionContentShowView.__super__.constructor.apply(this, arguments);
+            }
+
+            DiscussionContentShowView.prototype.events = _.reduce(
+                [
+                    [".action-follow", "toggleFollow"],
+                    [".action-answer", "toggleEndorse"],
+                    [".action-endorse", "toggleEndorse"],
+                    [".action-vote", "toggleVote"],
+                    [".action-more", "toggleSecondaryActions"],
+                    [".action-pin", "togglePin"],
+                    [".action-edit", "edit"],
+                    [".action-delete", "_delete"],
+                    [".action-report", "toggleReport"],
+                    [".action-close", "toggleClose"]
+                ],
+                function(obj, event) {
+                    var funcName, selector;
+                    selector = event[0];
+                    funcName = event[1];
+                    obj["click " + selector] = function(event) {
+                        return this[funcName](event);
+                    };
+                    obj["keydown " + selector] = function(event) {
+                        return DiscussionUtil.activateOnSpace(event, this[funcName]);
+                    };
+                    return obj;
+                },
+                {}
+            );
+
+            DiscussionContentShowView.prototype.updateButtonState = function(selector, checked) {
+                var $button;
+                $button = this.$(selector);
+                $button.toggleClass("is-checked", checked);
+                return $button.attr("aria-checked", checked);
+            };
+
+            DiscussionContentShowView.prototype.attrRenderer = $.extend(
+                {},
+                DiscussionContentView.prototype.attrRenderer,
+                {
+                    subscribed: function(subscribed) {
+                        return this.updateButtonState(".action-follow", subscribed);
+                    },
+                    endorsed: function(endorsed) {
+                        var $button, selector;
+                        selector = this.model.get("thread").get("thread_type") === "question" ?
+                            ".action-answer" :
+                            ".action-endorse";
+                        this.updateButtonState(selector, endorsed);
+                        $button = this.$(selector);
+                        $button.closest(".actions-item").toggleClass("is-hidden", !this.model.canBeEndorsed());
+                        return $button.toggleClass("is-checked", endorsed);
+                    },
+                    votes: function(votes) {
+                        var button, numVotes, selector, votesHtml, votesCountMsg;
+                        selector = ".action-vote";
+                        this.updateButtonState(selector, window.user.voted(this.model));
+                        button = this.$el.find(selector);
+                        numVotes = votes.up_count;
+                        votesCountMsg = ngettext(
+                            "there is currently %(numVotes)s vote", "there are currently %(numVotes)s votes", numVotes
+                        );
+                        button.find(".js-sr-vote-count").html(interpolate(votesCountMsg, {numVotes: numVotes }, true));
+                        votesHtml = interpolate(ngettext("%(numVotes)s Vote", "%(numVotes)s Votes", numVotes), {
+                            numVotes: numVotes
+                        }, true);
+                        button.find(".vote-count").html(votesHtml);
+                        return this.$el.find('.display-vote .vote-count').html(votesHtml);
+                    },
+                    pinned: function(pinned) {
+                        this.updateButtonState(".action-pin", pinned);
+                        return this.$(".post-label-pinned").toggleClass("is-hidden", !pinned);
+                    },
+                    abuse_flaggers: function() {
+                        var flagged;
+                        flagged = this.model.isFlagged();
+                        this.updateButtonState(".action-report", flagged);
+                        return this.$(".post-label-reported").toggleClass("is-hidden", !flagged);
+                    },
+                    closed: function(closed) {
+                        this.updateButtonState(".action-close", closed);
+                        this.$(".post-label-closed").toggleClass("is-hidden", !closed);
+                        return this.$(".display-vote").toggle(closed);
+                    }
+                }
+            );
+
+            DiscussionContentShowView.prototype.toggleSecondaryActions = function(event) {
+                event.preventDefault();
+                event.stopPropagation();
+                this.secondaryActionsExpanded = !this.secondaryActionsExpanded;
+                this.$(".action-more").toggleClass("is-expanded", this.secondaryActionsExpanded);
+                this.$(".actions-dropdown")
+                    .toggleClass("is-expanded", this.secondaryActionsExpanded)
+                    .attr("aria-expanded", this.secondaryActionsExpanded);
+
+                if (this.secondaryActionsExpanded) {
+                    if (event.type === "keydown") {
+                        this.$(".action-list-item:first").focus();
+                    }
+                    $("body").on("click", this.toggleSecondaryActions);
+                    $("body").on("keydown", this.handleSecondaryActionEscape);
+                    return this.$(".action-list-item").on("blur", this.handleSecondaryActionBlur);
+                } else {
+                    $("body").off("click", this.toggleSecondaryActions);
+                    $("body").off("keydown", this.handleSecondaryActionEscape);
+                    return this.$(".action-list-item").off("blur", this.handleSecondaryActionBlur);
+                }
+            };
+
+            DiscussionContentShowView.prototype.handleSecondaryActionEscape = function(event) {
+                if (event.keyCode === 27) {
+                    this.toggleSecondaryActions(event);
+                    return this.$(".action-more").focus();
+                }
+            };
+
+            DiscussionContentShowView.prototype.handleSecondaryActionBlur = function(event) {
+                var self = this;
+                return setTimeout(function() {
+                    if (self.secondaryActionsExpanded && self.$(".actions-dropdown :focus").length === 0) {
+                        return self.toggleSecondaryActions(event);
+                    }
+                }, 10);
+            };
+
+            DiscussionContentShowView.prototype.toggleFollow = function(event) {
+                var is_subscribing, msg, url;
+                event.preventDefault();
+                is_subscribing = !this.model.get("subscribed");
+                url = this.model.urlFor(is_subscribing ? "follow" : "unfollow");
+                if (is_subscribing) {
+                    msg = gettext("We had some trouble subscribing you to this thread. Please try again.");
+                } else {
+                    msg = gettext("We had some trouble unsubscribing you from this thread. Please try again.");
+                }
+                return DiscussionUtil.updateWithUndo(this.model, {
+                    "subscribed": is_subscribing
+                }, {
+                    url: url,
+                    type: "POST",
+                    $elem: $(event.currentTarget)
+                }, msg);
+            };
+
+            DiscussionContentShowView.prototype.toggleEndorse = function(event) {
+                var beforeFunc, is_endorsing, msg, updates, url,
+                    self = this;
+                event.preventDefault();
+                is_endorsing = !this.model.get("endorsed");
+                url = this.model.urlFor("endorse");
+                updates = {
+                    endorsed: is_endorsing,
+                    endorsement: is_endorsing ? {
+                        username: DiscussionUtil.getUser().get("username"),
+                        user_id: DiscussionUtil.getUser().id,
+                        time: new Date().toISOString()
+                    } : null
+                };
+                if (this.model.get('thread').get('thread_type') === 'question') {
+                    if (is_endorsing) {
+                        msg = gettext("We had some trouble marking this response as an answer.  Please try again.");
+                    } else {
+                        msg = gettext("We had some trouble removing this response as an answer.  Please try again.");
+                    }
+                } else {
+                    if (is_endorsing) {
+                        msg = gettext("We had some trouble marking this response endorsed.  Please try again.");
+                    } else {
+                        msg = gettext("We had some trouble removing this endorsement.  Please try again.");
+                    }
+                }
+                beforeFunc = function() {
+                    return self.trigger("comment:endorse");
+                };
+                return DiscussionUtil.updateWithUndo(this.model, updates, {
+                    url: url,
+                    type: "POST",
+                    data: {
+                        endorsed: is_endorsing
+                    },
+                    beforeSend: beforeFunc,
+                    $elem: $(event.currentTarget)
+                }, msg).always(this.trigger("comment:endorse"));
+            };
+
+            DiscussionContentShowView.prototype.toggleVote = function(event) {
+                var is_voting, updates, url, user,
+                    self = this;
+                event.preventDefault();
+                user = DiscussionUtil.getUser();
+                is_voting = !user.voted(this.model);
+                url = this.model.urlFor(is_voting ? "upvote" : "unvote");
+                updates = {
+                    upvoted_ids: (is_voting ? _.union : _.difference)(user.get('upvoted_ids'), [this.model.id])
+                };
+                return DiscussionUtil.updateWithUndo(user, updates, {
+                    url: url,
+                    type: "POST",
+                    $elem: $(event.currentTarget)
+                }, gettext("We had some trouble saving your vote.  Please try again.")).done(function() {
+                    if (is_voting) {
+                        return self.model.vote();
+                    } else {
+                        return self.model.unvote();
+                    }
+                });
+            };
+
+            DiscussionContentShowView.prototype.togglePin = function(event) {
+                var is_pinning, msg, url;
+                event.preventDefault();
+                is_pinning = !this.model.get("pinned");
+                url = this.model.urlFor(is_pinning ? "pinThread" : "unPinThread");
+                if (is_pinning) {
+                    msg = gettext("We had some trouble pinning this thread. Please try again.");
+                } else {
+                    msg = gettext("We had some trouble unpinning this thread. Please try again.");
+                }
+                return DiscussionUtil.updateWithUndo(this.model, {
+                    pinned: is_pinning
+                }, {
+                    url: url,
+                    type: "POST",
+                    $elem: $(event.currentTarget)
+                }, msg);
+            };
+
+            DiscussionContentShowView.prototype.toggleReport = function(event) {
+                var is_flagging, msg, updates, url;
+                event.preventDefault();
+                if (this.model.isFlagged()) {
+                    is_flagging = false;
+                    msg = gettext("We had some trouble removing your flag on this post.  Please try again.");
+                } else {
+                    is_flagging = true;
+                    msg = gettext("We had some trouble reporting this post.  Please try again.");
+                }
+                url = this.model.urlFor(is_flagging ? "flagAbuse" : "unFlagAbuse");
+                updates = {
+                    abuse_flaggers: (is_flagging ? _.union : _.difference)(
+                        this.model.get("abuse_flaggers"), [DiscussionUtil.getUser().id]
                     )
-        button.find(".vote-count").html(votesHtml)
-        @$el.find('.display-vote .vote-count').html(votesHtml)
+                };
+                return DiscussionUtil.updateWithUndo(this.model, updates, {
+                    url: url,
+                    type: "POST",
+                    $elem: $(event.currentTarget)
+                }, msg);
+            };
 
-      pinned: (pinned) ->
-        @updateButtonState(".action-pin", pinned)
-        @$(".post-label-pinned").toggleClass("is-hidden", not pinned)
+            DiscussionContentShowView.prototype.toggleClose = function(event) {
+                var is_closing, msg, updates;
+                event.preventDefault();
+                is_closing = !this.model.get('closed');
+                if (is_closing) {
+                    msg = gettext("We had some trouble closing this thread.  Please try again.");
+                } else {
+                    msg = gettext("We had some trouble reopening this thread.  Please try again.");
+                }
+                updates = {
+                    closed: is_closing
+                };
+                return DiscussionUtil.updateWithUndo(this.model, updates, {
+                    url: this.model.urlFor("close"),
+                    type: "POST",
+                    data: updates,
+                    $elem: $(event.currentTarget)
+                }, msg);
+            };
 
-      abuse_flaggers: (abuse_flaggers) ->
-        flagged = @model.isFlagged()
-        @updateButtonState(".action-report", flagged)
-        @$(".post-label-reported").toggleClass("is-hidden", not flagged)
+            DiscussionContentShowView.prototype.getAuthorDisplay = function() {
+                return _.template($("#post-user-display-template").html())({
+                    username: this.model.get('username') || null,
+                    user_url: this.model.get('user_url'),
+                    is_community_ta: this.model.get('community_ta_authored'),
+                    is_staff: this.model.get('staff_authored')
+                });
+            };
 
-      closed: (closed) ->
-        @updateButtonState(".action-close", closed)
-        @$(".post-label-closed").toggleClass("is-hidden", not closed)
-        @$(".display-vote").toggle(closed)
-    })
+            DiscussionContentShowView.prototype.getEndorserDisplay = function() {
+                var endorsement;
+                endorsement = this.model.get('endorsement');
+                if (endorsement && endorsement.username) {
+                    return _.template($("#post-user-display-template").html())({
+                        username: endorsement.username,
+                        user_url: DiscussionUtil.urlFor('user_profile', endorsement.user_id),
+                        is_community_ta: DiscussionUtil.isTA(endorsement.user_id),
+                        is_staff: DiscussionUtil.isStaff(endorsement.user_id)
+                    });
+                } else {
+                    return null;
+                }
+            };
 
-    toggleSecondaryActions: (event) =>
-      event.preventDefault()
-      event.stopPropagation()
-      @secondaryActionsExpanded = !@secondaryActionsExpanded
-      @$(".action-more").toggleClass("is-expanded", @secondaryActionsExpanded)
-      @$(".actions-dropdown").
-        toggleClass("is-expanded", @secondaryActionsExpanded).
-        attr("aria-expanded", @secondaryActionsExpanded)
-      if @secondaryActionsExpanded
-        if event.type == "keydown"
-          @$(".action-list-item:first").focus()
-        $("body").on("click", @toggleSecondaryActions)
-        $("body").on("keydown", @handleSecondaryActionEscape)
-        @$(".action-list-item").on("blur", @handleSecondaryActionBlur)
-      else
-        $("body").off("click", @toggleSecondaryActions)
-        $("body").off("keydown", @handleSecondaryActionEscape)
-        @$(".action-list-item").off("blur", @handleSecondaryActionBlur)
+            return DiscussionContentShowView;
 
-    handleSecondaryActionEscape: (event) =>
-      if event.keyCode == 27 # Esc
-        @toggleSecondaryActions(event)
-        @$(".action-more").focus()
+        }).call(this, this.DiscussionContentView);
+    }
 
-    handleSecondaryActionBlur: (event) =>
-      setTimeout(
-        =>
-          if @secondaryActionsExpanded && @$(".actions-dropdown :focus").length == 0
-            @toggleSecondaryActions(event)
-        ,
-        10
-      )
-
-    toggleFollow: (event) =>
-      event.preventDefault()
-      is_subscribing = not @model.get("subscribed")
-      url = @model.urlFor(if is_subscribing then "follow" else "unfollow")
-      if is_subscribing
-        msg = gettext("We had some trouble subscribing you to this thread. Please try again.")
-      else
-        msg = gettext("We had some trouble unsubscribing you from this thread. Please try again.")
-      DiscussionUtil.updateWithUndo(
-        @model,
-        {"subscribed": is_subscribing},
-        {url: url, type: "POST", $elem: $(event.currentTarget)},
-        msg
-      )
-
-    toggleEndorse: (event) =>
-      event.preventDefault()
-      is_endorsing = not @model.get("endorsed")
-      url = @model.urlFor("endorse")
-      updates =
-        endorsed: is_endorsing
-        endorsement: if is_endorsing then {username: DiscussionUtil.getUser().get("username"), user_id: DiscussionUtil.getUser().id, time: new Date().toISOString()} else null
-      if @model.get('thread').get('thread_type') == 'question'
-        if is_endorsing
-          msg = gettext("We had some trouble marking this response as an answer.  Please try again.")
-        else
-          msg = gettext("We had some trouble removing this response as an answer.  Please try again.")
-      else
-        if is_endorsing
-          msg = gettext("We had some trouble marking this response endorsed.  Please try again.")
-        else
-          msg = gettext("We had some trouble removing this endorsement.  Please try again.")
-      beforeFunc = () => @trigger("comment:endorse")
-      DiscussionUtil.updateWithUndo(
-        @model,
-        updates,
-        {url: url, type: "POST", data: {endorsed: is_endorsing}, beforeSend: beforeFunc, $elem: $(event.currentTarget)},
-        msg
-      ).always(@trigger("comment:endorse")) # ensures UI components get updated to the correct state when ajax completes
-
-    toggleVote: (event) =>
-      event.preventDefault()
-      user = DiscussionUtil.getUser()
-      is_voting = not user.voted(@model)
-      url = @model.urlFor(if is_voting then "upvote" else "unvote")
-      updates =
-        upvoted_ids: (if is_voting then _.union else _.difference)(user.get('upvoted_ids'), [@model.id])
-      DiscussionUtil.updateWithUndo(
-        user,
-        updates,
-        {url: url, type: "POST", $elem: $(event.currentTarget)},
-        gettext("We had some trouble saving your vote.  Please try again.")
-      ).done(() => if is_voting then @model.vote() else @model.unvote())
-
-    togglePin: (event) =>
-      event.preventDefault()
-      is_pinning = not @model.get("pinned")
-      url = @model.urlFor(if is_pinning then "pinThread" else "unPinThread")
-      if is_pinning
-        msg = gettext("We had some trouble pinning this thread. Please try again.")
-      else
-        msg = gettext("We had some trouble unpinning this thread. Please try again.")
-      DiscussionUtil.updateWithUndo(
-        @model,
-        {pinned: is_pinning},
-        {url: url, type: "POST", $elem: $(event.currentTarget)},
-        msg
-      )
-
-    toggleReport: (event) =>
-      event.preventDefault()
-      if @model.isFlagged()
-        is_flagging = false
-        msg = gettext("We had some trouble removing your flag on this post.  Please try again.")
-      else
-        is_flagging = true
-        msg = gettext("We had some trouble reporting this post.  Please try again.")
-      url = @model.urlFor(if is_flagging then "flagAbuse" else "unFlagAbuse")
-      updates =
-        abuse_flaggers: (if is_flagging then _.union else _.difference)(@model.get("abuse_flaggers"), [DiscussionUtil.getUser().id])
-      DiscussionUtil.updateWithUndo(
-        @model,
-        updates,
-        {url: url, type: "POST", $elem: $(event.currentTarget)},
-        msg
-      )
-
-    toggleClose: (event) =>
-      event.preventDefault()
-      is_closing = not @model.get('closed')
-      if is_closing
-        msg = gettext("We had some trouble closing this thread.  Please try again.")
-      else
-        msg = gettext("We had some trouble reopening this thread.  Please try again.")
-      updates = {closed: is_closing}
-      DiscussionUtil.updateWithUndo(
-        @model,
-        updates,
-        {url: @model.urlFor("close"), type: "POST", data: updates, $elem: $(event.currentTarget)},
-        msg
-      )
-
-    getAuthorDisplay: ->
-      _.template($("#post-user-display-template").html())(
-        username: @model.get('username') || null
-        user_url: @model.get('user_url')
-        is_community_ta: @model.get('community_ta_authored')
-        is_staff: @model.get('staff_authored')
-      )
-
-    getEndorserDisplay: ->
-      endorsement = @model.get('endorsement')
-      if endorsement and endorsement.username
-        _.template($("#post-user-display-template").html())(
-          username: endorsement.username
-          user_url: DiscussionUtil.urlFor('user_profile', endorsement.user_id)
-          is_community_ta: DiscussionUtil.isTA(endorsement.user_id)
-          is_staff: DiscussionUtil.isStaff(endorsement.user_id)
-        )
-      else
-        null
+}).call(window);

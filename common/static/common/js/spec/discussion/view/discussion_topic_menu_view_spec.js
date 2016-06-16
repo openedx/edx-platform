@@ -1,8 +1,9 @@
+/* globals DiscussionTopicMenuView, DiscussionSpecHelper, DiscussionCourseSettings */
 (function() {
     'use strict';
     describe('DiscussionTopicMenuView', function() {
         beforeEach(function() {
-            this.createTopicView = function (options) {
+            this.createTopicView = function(options) {
                 options = _.extend({
                     course_settings: this.course_settings,
                     topicId: void 0
@@ -12,14 +13,14 @@
                 this.defaultTextWidth = this.completeText.length;
             };
 
-            this.openMenu = function () {
+            this.openMenu = function() {
                 var menuWrapper = this.view.$('.topic-menu-wrapper');
                 expect(menuWrapper).toBeHidden();
                 this.view.$el.find('.post-topic-button').first().click();
                 expect(menuWrapper).toBeVisible();
             };
 
-            this.closeMenu = function () {
+            this.closeMenu = function() {
                 var menuWrapper = this.view.$('.topic-menu-wrapper');
                 expect(menuWrapper).toBeVisible();
                 this.view.$el.find('.post-topic-button').first().click();
@@ -76,7 +77,7 @@
             expect(dropdownText.indexOf('/ span>')).toEqual(-1);
         });
 
-        it('appropriate topic is selected if `topicId` is passed', function () {
+        it('appropriate topic is selected if `topicId` is passed', function() {
             var completeText = this.parentCategoryText + ' / Numerical Input',
                 dropdownText;
             this.createTopicView({
@@ -88,14 +89,14 @@
             expect(completeText).toEqual(dropdownText);
         });
 
-        it('click outside of the dropdown close it', function () {
+        it('click outside of the dropdown close it', function() {
             this.createTopicView();
             this.openMenu();
             $(document.body).click();
             expect(this.view.$('.topic-menu-wrapper')).toBeHidden();
         });
 
-        it('can toggle the menu', function () {
+        it('can toggle the menu', function() {
             this.createTopicView();
             this.openMenu();
             this.closeMenu();

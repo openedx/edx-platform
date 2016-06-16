@@ -1,47 +1,91 @@
-if Backbone?
-  class @DiscussionThreadShowView extends DiscussionContentShowView
-    initialize: (options) ->
-      super()
-      @mode = options.mode or "inline"  # allowed values are "tab" or "inline"
-      if @mode not in ["tab", "inline"]
-        throw new Error("invalid mode: " + @mode)
+/* globals DiscussionUtil, DiscussionContentShowView, MathJax */
+(function() {
+    'use strict';
+    var __hasProp = {}.hasOwnProperty,
+        __extends = function(child, parent) {
+            for (var key in parent) {
+                if (__hasProp.call(parent, key)) {
+                    child[key] = parent[key];
+                }
+            }
+            function ctor() {
+                this.constructor = child;
+            }
 
-    renderTemplate: ->
-      @template = _.template($("#thread-show-template").html())
-      context = $.extend(
-        {
-          mode: @mode,
-          flagged: @model.isFlagged(),
-          author_display: @getAuthorDisplay(),
-          cid: @model.cid,
-          readOnly: $('.discussion-module').data('read-only')
-        },
-        @model.attributes,
-      )
-      @template(context)
+            ctor.prototype = parent.prototype;
+            child.prototype = new ctor();
+            child.__super__ = parent.prototype;
+            return child;
+        };
 
-    render: ->
-      @$el.html(@renderTemplate())
-      @delegateEvents()
-      @renderAttrs()
-      @$("span.timeago").timeago()
-      @convertMath()
-      @highlight @$(".post-body")
-      @highlight @$("h1,h3")
-      @
+    if (typeof Backbone !== "undefined" && Backbone !== null) {
+        this.DiscussionThreadShowView = (function(_super) {
 
-    convertMath: ->
-      element = @$(".post-body")
-      element.html DiscussionUtil.postMathJaxProcessor DiscussionUtil.markdownWithHighlight element.text()
-      if MathJax?
-        MathJax.Hub.Queue ["Typeset", MathJax.Hub, element[0]]
+            __extends(DiscussionThreadShowView, _super);
 
-    edit: (event) ->
-      @trigger "thread:edit", event
+            function DiscussionThreadShowView() {
+                return DiscussionThreadShowView.__super__.constructor.apply(this, arguments);
+            }
 
-    _delete: (event) ->
-      @trigger "thread:_delete", event
+            DiscussionThreadShowView.prototype.initialize = function(options) {
+                var _ref;
+                DiscussionThreadShowView.__super__.initialize.call(this);
+                this.mode = options.mode || "inline";
+                if ((_ref = this.mode) !== "tab" && _ref !== "inline") {
+                    throw new Error("invalid mode: " + this.mode);
+                }
+            };
 
-    highlight: (el) ->
-      if el.html()
-        el.html(el.html().replace(/&lt;mark&gt;/g, "<mark>").replace(/&lt;\/mark&gt;/g, "</mark>"))
+            DiscussionThreadShowView.prototype.renderTemplate = function() {
+                var context;
+                this.template = _.template($("#thread-show-template").html());
+                context = $.extend({
+                    mode: this.mode,
+                    flagged: this.model.isFlagged(),
+                    author_display: this.getAuthorDisplay(),
+                    cid: this.model.cid,
+                    readOnly: $('.discussion-module').data('read-only')
+                }, this.model.attributes);
+                return this.template(context);
+            };
+
+            DiscussionThreadShowView.prototype.render = function() {
+                this.$el.html(this.renderTemplate());
+                this.delegateEvents();
+                this.renderAttrs();
+                this.$("span.timeago").timeago();
+                this.convertMath();
+                this.highlight(this.$(".post-body"));
+                this.highlight(this.$("h1,h3"));
+                return this;
+            };
+
+            DiscussionThreadShowView.prototype.convertMath = function() {
+                var element;
+                element = this.$(".post-body");
+                element.html(DiscussionUtil.postMathJaxProcessor(DiscussionUtil.markdownWithHighlight(element.text())));
+                if (typeof MathJax !== "undefined" && MathJax !== null) {
+                    return MathJax.Hub.Queue(["Typeset", MathJax.Hub, element[0]]);
+                }
+            };
+
+            DiscussionThreadShowView.prototype.edit = function(event) {
+                return this.trigger("thread:edit", event);
+            };
+
+            DiscussionThreadShowView.prototype._delete = function(event) {
+                return this.trigger("thread:_delete", event);
+            };
+
+            DiscussionThreadShowView.prototype.highlight = function(el) {
+                if (el.html()) {
+                    return el.html(el.html().replace(/&lt;mark&gt;/g, "<mark>").replace(/&lt;\/mark&gt;/g, "</mark>"));
+                }
+            };
+
+            return DiscussionThreadShowView;
+
+        })(DiscussionContentShowView);
+    }
+
+}).call(window);

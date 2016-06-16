@@ -1,4 +1,5 @@
-(function(Backbone) {
+/* globals DiscussionTopicMenuView, DiscussionUtil */
+(function() {
     'use strict';
     if (Backbone) {
         this.DiscussionThreadEditView = Backbone.View.extend({
@@ -50,7 +51,7 @@
                 return this;
             },
 
-            isTabMode: function () {
+            isTabMode: function() {
                 return this.mode === 'tab';
             },
 
@@ -85,7 +86,7 @@
                         this.model.set(postData).unset('abbreviatedBody');
                         this.trigger('thread:updated');
                         if (this.threadType !== threadType) {
-                            this.model.set("thread_type", threadType)
+                            this.model.set("thread_type", threadType);
                             this.model.trigger('thread:thread_type_updated');
                             this.trigger('comment:endorse');
                         }
@@ -109,4 +110,4 @@
             }
         });
     }
-}).call(this, Backbone);
+}).call(window); // jshint ignore:line

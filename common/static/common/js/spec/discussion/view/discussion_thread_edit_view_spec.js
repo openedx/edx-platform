@@ -1,3 +1,7 @@
+/* globals
+    DiscussionCourseSettings, DiscussionSpecHelper, DiscussionThreadEditView, DiscussionUtil,
+    DiscussionViewSpecHelper, Thread
+*/
 (function() {
     'use strict';
     describe('DiscussionThreadEditView', function() {
@@ -14,7 +18,7 @@
             this.thread = new Thread(this.threadData);
             this.course_settings = DiscussionSpecHelper.makeCourseSettings();
 
-            this.createEditView = function (options) {
+            this.createEditView = function(options) {
                 options = _.extend({
                     container: $('#fixture-element'),
                     model: this.thread,
@@ -33,10 +37,13 @@
                 expect(params.data.commentable_id).toBe(newTopicId);
                 expect(params.data.title).toBe('changed thread title');
                 params.success();
-                return {always: function() {}};
+                return {
+                    always: function() {
+                    }
+                };
             });
 
-            view.$el.find('a.topic-title').filter(function (idx, el) {
+            view.$el.find('a.topic-title').filter(function(idx, el) {
                 return $(el).data('discussionId') === newTopicId;
             }).click(); // set new topic
             view.$('.edit-post-title').val('changed thread title'); // set new title
@@ -76,6 +83,7 @@
             this.createEditView({"mode": "inline"});
             testCancel(this.view);
         });
+
         describe('renderComments', function() {
             beforeEach(function() {
                 this.course_settings = new DiscussionCourseSettings({
@@ -100,21 +108,21 @@
                     'is_cohorted': true
                 });
             });
-            it('can save new data correctly for current discussion id without dots', function () {
+
+            it('can save new data correctly for current discussion id without dots', function() {
                 this.createEditView({topicId: "topic"});
                 testUpdate(this.view, this.thread, "6.00.1x_General", "General");
             });
 
-            it('can save new data correctly for current discussion id with dots', function () {
+            it('can save new data correctly for current discussion id with dots', function() {
                 this.createEditView({topicId: "6.00.1x_General"});
                 testUpdate(this.view, this.thread, "6>00\'1x\"Basic_Question", "Basic Question");
             });
 
-            it('can save new data correctly for current discussion id with special characters', function () {
+            it('can save new data correctly for current discussion id with special characters', function() {
                 this.createEditView({topicId: "6>00\'1x\"Basic_Question"});
                 testUpdate(this.view, this.thread, "6.00.1x_General", "General");
             });
         });
-
     });
 }).call(this);

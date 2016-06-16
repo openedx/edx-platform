@@ -1,25 +1,64 @@
-if Backbone?
-  class @ThreadResponseEditView extends Backbone.View
+/* globals DiscussionUtil */
+(function() {
+    'use strict';
+    var __hasProp = {}.hasOwnProperty,
+        __extends = function(child, parent) {
+            for (var key in parent) {
+                if (__hasProp.call(parent, key)) {
+                    child[key] = parent[key];
+                }
+            }
+            function ctor() {
+                this.constructor = child;
+            }
 
-    events:
-      "click .post-update": "update"
-      "click .post-cancel": "cancel_edit"
+            ctor.prototype = parent.prototype;
+            child.prototype = new ctor();
+            child.__super__ = parent.prototype;
+            return child;
+        };
 
-    $: (selector) ->
-      @$el.find(selector)
+    if (typeof Backbone !== "undefined" && Backbone !== null) {
+        this.ThreadResponseEditView = (function(_super) {
 
-    initialize: ->
-      super()
+            __extends(ThreadResponseEditView, _super);
 
-    render: ->
-      @template = _.template($("#thread-response-edit-template").html())
-      @$el.html(@template(@model.toJSON()))
-      @delegateEvents()
-      DiscussionUtil.makeWmdEditor @$el, $.proxy(@$, @), "edit-post-body"
-      @
+            function ThreadResponseEditView() {
+                return ThreadResponseEditView.__super__.constructor.apply(this, arguments);
+            }
 
-    update: (event) ->
-      @trigger "response:update", event
+            ThreadResponseEditView.prototype.events = {
+                "click .post-update": "update",
+                "click .post-cancel": "cancel_edit"
+            };
 
-    cancel_edit: (event) ->
-      @trigger "response:cancel_edit", event
+            ThreadResponseEditView.prototype.$ = function(selector) {
+                return this.$el.find(selector);
+            };
+
+            ThreadResponseEditView.prototype.initialize = function() {
+                return ThreadResponseEditView.__super__.initialize.call(this);
+            };
+
+            ThreadResponseEditView.prototype.render = function() {
+                this.template = _.template($("#thread-response-edit-template").html());
+                this.$el.html(this.template(this.model.toJSON()));
+                this.delegateEvents();
+                DiscussionUtil.makeWmdEditor(this.$el, $.proxy(this.$, this), "edit-post-body");
+                return this;
+            };
+
+            ThreadResponseEditView.prototype.update = function(event) {
+                return this.trigger("response:update", event);
+            };
+
+            ThreadResponseEditView.prototype.cancel_edit = function(event) {
+                return this.trigger("response:cancel_edit", event);
+            };
+
+            return ThreadResponseEditView;
+
+        })(Backbone.View);
+    }
+
+}).call(window);

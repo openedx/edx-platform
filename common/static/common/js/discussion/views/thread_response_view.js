@@ -1,227 +1,347 @@
-if Backbone?
-  class @ThreadResponseView extends DiscussionContentView
-    tagName: "li"
-    className: "forum-response"
+/* globals
+    Comments, ResponseCommentView, DiscussionUtil, ThreadResponseEditView,
+    ThreadResponseShowView, DiscussionContentView
+*/
+(function() {
+    'use strict';
+    var __hasProp = {}.hasOwnProperty,
+        __extends = function(child, parent) {
+            for (var key in parent) {
+                if (__hasProp.call(parent, key)) {
+                    child[key] = parent[key];
+                }
+            }
+            function ctor() {
+                this.constructor = child;
+            }
 
-    events:
-        "click .discussion-submit-comment": "submitComment"
-        "focus .wmd-input": "showEditorChrome"
+            ctor.prototype = parent.prototype;
+            child.prototype = new ctor();
+            child.__super__ = parent.prototype;
+            return child;
+        };
 
-    $: (selector) ->
-      @$el.find(selector)
+    if (typeof Backbone !== "undefined" && Backbone !== null) {
+        this.ThreadResponseView = (function(_super) {
 
-    initialize: (options) ->
-      @collapseComments = options.collapseComments
-      @createShowView()
-      @readOnly = $('.discussion-module').data('read-only')
+            __extends(ThreadResponseView, _super);
 
-    renderTemplate: ->
-      @template = _.template($("#thread-response-template").html())
+            function ThreadResponseView() {
+                var self = this;
+                this.update = function() {
+                    return ThreadResponseView.prototype.update.apply(self, arguments);
+                };
+                this.edit = function() {
+                    return ThreadResponseView.prototype.edit.apply(self, arguments);
+                };
+                this.cancelEdit = function() {
+                    return ThreadResponseView.prototype.cancelEdit.apply(self, arguments);
+                };
+                this._delete = function() {
+                    return ThreadResponseView.prototype._delete.apply(self, arguments);
+                };
+                this.renderComment = function() {
+                    return ThreadResponseView.prototype.renderComment.apply(self, arguments);
+                };
+                return ThreadResponseView.__super__.constructor.apply(this, arguments);
+            }
 
-      container = $("#discussion-container")
-      if !container.length
-        # inline discussion
-        container = $(".discussion-module")
-      templateData = _.extend(
-        @model.toJSON(),
-        wmdId: @model.id ? (new Date()).getTime(),
-        create_sub_comment: container.data("user-create-subcomment"),
-        readOnly: @readOnly
-      )
-      @template(templateData)
+            ThreadResponseView.prototype.tagName = "li";
 
-    render: ->
-      @$el.addClass("response_" + @model.get("id"))
-      @$el.html(@renderTemplate())
-      @delegateEvents()
+            ThreadResponseView.prototype.className = "forum-response";
 
-      @renderShowView()
-      @renderAttrs()
-      if @model.get("thread").get("closed")
-        @hideCommentForm()
+            ThreadResponseView.prototype.events = {
+                "click .discussion-submit-comment": "submitComment",
+                "focus .wmd-input": "showEditorChrome"
+            };
 
-      @renderComments()
-      @
+            ThreadResponseView.prototype.$ = function(selector) {
+                return this.$el.find(selector);
+            };
 
-    afterInsert: ->
-      @makeWmdEditor "comment-body"
-      @hideEditorChrome()
+            ThreadResponseView.prototype.initialize = function(options) {
+                this.collapseComments = options.collapseComments;
+                this.createShowView();
+                this.readOnly = $('.discussion-module').data('read-only');
+            };
 
-    hideEditorChrome: ->
-      @$('.wmd-button-row').hide()
-      @$('.wmd-preview-container').hide()
-      @$('.wmd-input').css({
-        height: '35px',
-        padding: '5px'
-      })
-      @$('.comment-post-control').hide()
+            ThreadResponseView.prototype.renderTemplate = function() {
+                var container, templateData, _ref;
+                this.template = _.template($("#thread-response-template").html());
+                container = $("#discussion-container");
+                if (!container.length) {
+                    container = $(".discussion-module");
+                }
+                templateData = _.extend(this.model.toJSON(), {
+                    wmdId: (_ref = this.model.id) !== null ? _ref : (new Date()).getTime(),
+                    create_sub_comment: container.data("user-create-subcomment"),
+                    readOnly: this.readOnly
+                });
+                return this.template(templateData);
+            };
 
-    showEditorChrome: ->
-      @$('.wmd-button-row').show()
-      @$('.wmd-preview-container').show()
-      @$('.comment-post-control').show()
-      @$('.wmd-input').css({
-        height: '125px',
-        padding: '10px'
-      })
+            ThreadResponseView.prototype.render = function() {
+                this.$el.addClass("response_" + this.model.get("id"));
+                this.$el.html(this.renderTemplate());
+                this.delegateEvents();
+                this.renderShowView();
+                this.renderAttrs();
+                if (this.model.get("thread").get("closed")) {
+                    this.hideCommentForm();
+                }
+                this.renderComments();
+                return this;
+            };
 
-    renderComments: ->
-      comments = new Comments()
-      @commentViews = []
-      comments.comparator = (comment) ->
-        comment.get('created_at')
-      collectComments = (comment) ->
-        comments.add(comment)
-        children = new Comments(comment.get('children'))
-        children.each (child) ->
-          child.parent = comment
-          collectComments(child)
-      @model.get('comments').each collectComments
-      comments.each (comment) => @renderComment(comment, false, null)
-      if @collapseComments && comments.length
-        @$(".comments").hide()
-        @$(".action-show-comments").on("click", (event) =>
-          event.preventDefault()
-          @$(".action-show-comments").hide()
-          @$(".comments").show()
-        )
-      else
-        @$(".action-show-comments").hide()
+            ThreadResponseView.prototype.afterInsert = function() {
+                this.makeWmdEditor("comment-body");
+                return this.hideEditorChrome();
+            };
 
-    renderComment: (comment) =>
-      comment.set('thread', @model.get('thread'))
-      view = new ResponseCommentView(model: comment)
-      view.render()
-      if @readOnly
-        @$el.find('.comments').append(view.el)
-      else
-        @$el.find(".comments .new-comment").before(view.el)
-      view.bind "comment:edit", (event) =>
-        @cancelEdit(event) if @editView?
-        @cancelCommentEdits()
-        @hideCommentForm()
-      view.bind "comment:cancel_edit", () => @showCommentForm()
-      @commentViews.push(view)
-      view
+            ThreadResponseView.prototype.hideEditorChrome = function() {
+                this.$('.wmd-button-row').hide();
+                this.$('.wmd-preview-container').hide();
+                this.$('.wmd-input').css({
+                    height: '35px',
+                    padding: '5px'
+                });
+                return this.$('.comment-post-control').hide();
+            };
 
-    submitComment: (event) ->
-      event.preventDefault()
-      url = @model.urlFor('reply')
-      body = @getWmdContent("comment-body")
-      return if not body.trim().length
-      @setWmdContent("comment-body", "")
-      comment = new Comment(body: body, created_at: (new Date()).toISOString(), username: window.user.get("username"), abuse_flaggers:[], user_id: window.user.get("id"), id:"unsaved")
-      view = @renderComment(comment)
-      @hideEditorChrome()
-      @trigger "comment:add", comment
+            ThreadResponseView.prototype.showEditorChrome = function() {
+                this.$('.wmd-button-row').show();
+                this.$('.wmd-preview-container').show();
+                this.$('.comment-post-control').show();
+                return this.$('.wmd-input').css({
+                    height: '125px',
+                    padding: '10px'
+                });
+            };
 
-      DiscussionUtil.safeAjax
-        $elem: $(event.target)
-        url: url
-        type: "POST"
-        dataType: 'json'
-        data:
-          body: body
-        success: (response, textStatus) ->
-          comment.set(response.content)
-          comment.updateInfo(response.annotated_content_info)
-          view.render() # This is just to update the id for the most part, but might be useful in general
+            ThreadResponseView.prototype.renderComments = function() {
+                var collectComments, comments,
+                    self = this;
+                comments = new Comments();
+                this.commentViews = [];
+                comments.comparator = function(comment) {
+                    return comment.get('created_at');
+                };
+                collectComments = function(comment) {
+                    var children;
+                    comments.add(comment);
+                    children = new Comments(comment.get('children'));
+                    return children.each(function(child) {
+                        child.parent = comment;
+                        return collectComments(child);
+                    });
+                };
+                this.model.get('comments').each(collectComments);
+                comments.each(function(comment) {
+                    return self.renderComment(comment, false, null);
+                });
+                if (this.collapseComments && comments.length) {
+                    this.$(".comments").hide();
+                    return this.$(".action-show-comments").on("click", function(event) {
+                        event.preventDefault();
+                        self.$(".action-show-comments").hide();
+                        return self.$(".comments").show();
+                    });
+                } else {
+                    return this.$(".action-show-comments").hide();
+                }
+            };
 
-    _delete: (event) =>
-      event.preventDefault()
-      if not @model.can('can_delete')
-        return
-      if not confirm gettext("Are you sure you want to delete this response?")
-        return
-      url = @model.urlFor('_delete')
-      @model.remove()
-      @$el.remove()
-      $elem = $(event.target)
-      DiscussionUtil.safeAjax
-        $elem: $elem
-        url: url
-        type: "POST"
-        success: (response, textStatus) =>
+            ThreadResponseView.prototype.renderComment = function(comment) {
+                var view,
+                    self = this;
+                comment.set('thread', this.model.get('thread'));
+                view = new ResponseCommentView({
+                    model: comment
+                });
+                view.render();
+                if (this.readOnly) {
+                    this.$el.find('.comments').append(view.el);
+                } else {
+                    this.$el.find(".comments .new-comment").before(view.el);
+                }
+                view.bind("comment:edit", function(event) {
+                    if (self.editView) {
+                        self.cancelEdit(event);
+                    }
+                    self.cancelCommentEdits();
+                    return self.hideCommentForm();
+                });
+                view.bind("comment:cancel_edit", function() {
+                    return self.showCommentForm();
+                });
+                this.commentViews.push(view);
+                return view;
+            };
 
-    createEditView: () ->
-      if @showView?
-        @showView.$el.empty()
+            ThreadResponseView.prototype.submitComment = function(event) {
+                var body, comment, url, view;
+                event.preventDefault();
+                url = this.model.urlFor('reply');
+                body = this.getWmdContent("comment-body");
+                if (!body.trim().length) {
+                    return;
+                }
+                this.setWmdContent("comment-body", "");
+                comment = new Comment({
+                    body: body,
+                    created_at: (new Date()).toISOString(),
+                    username: window.user.get("username"),
+                    abuse_flaggers: [],
+                    user_id: window.user.get("id"),
+                    id: "unsaved"
+                });
+                view = this.renderComment(comment);
+                this.hideEditorChrome();
+                this.trigger("comment:add", comment);
+                return DiscussionUtil.safeAjax({
+                    $elem: $(event.target),
+                    url: url,
+                    type: "POST",
+                    dataType: 'json',
+                    data: {
+                        body: body
+                    },
+                    success: function(response) {
+                        comment.set(response.content);
+                        comment.updateInfo(response.annotated_content_info);
+                        return view.render();
+                    }
+                });
+            };
 
-      if @editView?
-        @editView.model = @model
-      else
-        @editView = new ThreadResponseEditView(model: @model)
-        @editView.bind "response:update", @update
-        @editView.bind "response:cancel_edit", @cancelEdit
+            ThreadResponseView.prototype._delete = function(event) {
+                var $elem, url;
+                event.preventDefault();
+                if (!this.model.can('can_delete')) {
+                    return;
+                }
+                if (!confirm(gettext("Are you sure you want to delete this response?"))) {
+                    return;
+                }
+                url = this.model.urlFor('_delete');
+                this.model.remove();
+                this.$el.remove();
+                $elem = $(event.target);
+                return DiscussionUtil.safeAjax({
+                    $elem: $elem,
+                    url: url,
+                    type: "POST"
+                });
+            };
 
-    renderSubView: (view) ->
-      view.setElement(@$('.discussion-response'))
-      view.render()
-      view.delegateEvents()
+            ThreadResponseView.prototype.createEditView = function() {
+                if (this.showView) {
+                    this.showView.$el.empty();
+                }
+                if (this.editView) {
+                    this.editView.model = this.model;
+                } else {
+                    this.editView = new ThreadResponseEditView({
+                        model: this.model
+                    });
+                    this.editView.bind("response:update", this.update);
+                    return this.editView.bind("response:cancel_edit", this.cancelEdit);
+                }
+            };
 
-    renderEditView: () ->
-      @renderSubView(@editView)
+            ThreadResponseView.prototype.renderSubView = function(view) {
+                view.setElement(this.$('.discussion-response'));
+                view.render();
+                return view.delegateEvents();
+            };
 
-    cancelCommentEdits: () ->
-      _.each(@commentViews, (view) -> view.cancelEdit())
+            ThreadResponseView.prototype.renderEditView = function() {
+                return this.renderSubView(this.editView);
+            };
 
-    hideCommentForm: () ->
-      @$('.comment-form').closest('li').hide()
+            ThreadResponseView.prototype.cancelCommentEdits = function() {
+                return _.each(this.commentViews, function(view) {
+                    return view.cancelEdit();
+                });
+            };
 
-    showCommentForm: () ->
-      @$('.comment-form').closest('li').show()
+            ThreadResponseView.prototype.hideCommentForm = function() {
+                return this.$('.comment-form').closest('li').hide();
+            };
 
-    createShowView: () ->
+            ThreadResponseView.prototype.showCommentForm = function() {
+                return this.$('.comment-form').closest('li').show();
+            };
 
-      if @editView?
-        @editView.$el.empty()
+            ThreadResponseView.prototype.createShowView = function() {
+                var self = this;
 
-      if @showView?
-        @showView.model = @model
-      else
-        @showView = new ThreadResponseShowView(model: @model)
-        @showView.bind "response:_delete", @_delete
-        @showView.bind "response:edit", @edit
-        @showView.on "comment:endorse", => @trigger("comment:endorse")
+                if (this.editView) {
+                    this.editView.$el.empty();
+                }
+                if (this.showView) {
+                    this.showView.model = this.model;
+                } else {
+                    this.showView = new ThreadResponseShowView({
+                        model: this.model
+                    });
+                    this.showView.bind("response:_delete", this._delete);
+                    this.showView.bind("response:edit", this.edit);
+                    return this.showView.on("comment:endorse", function() {
+                        return self.trigger("comment:endorse");
+                    });
+                }
+            };
 
-    renderShowView: () ->
-      @renderSubView(@showView)
+            ThreadResponseView.prototype.renderShowView = function() {
+                return this.renderSubView(this.showView);
+            };
 
-    cancelEdit: (event) =>
-      event.preventDefault()
-      @createShowView()
-      @renderShowView()
-      @showCommentForm()
+            ThreadResponseView.prototype.cancelEdit = function(event) {
+                event.preventDefault();
+                this.createShowView();
+                this.renderShowView();
+                return this.showCommentForm();
+            };
 
-    edit: (event) =>
-      @createEditView()
-      @renderEditView()
-      @cancelCommentEdits()
-      @hideCommentForm()
+            ThreadResponseView.prototype.edit = function() {
+                this.createEditView();
+                this.renderEditView();
+                this.cancelCommentEdits();
+                return this.hideCommentForm();
+            };
 
-    update: (event) =>
+            ThreadResponseView.prototype.update = function(event) {
+                var newBody, url,
+                    self = this;
+                newBody = this.editView.$(".edit-post-body textarea").val();
+                url = DiscussionUtil.urlFor('update_comment', this.model.id);
+                return DiscussionUtil.safeAjax({
+                    $elem: $(event.target),
+                    $loading: event ? $(event.target) : void 0,
+                    url: url,
+                    type: "POST",
+                    dataType: 'json',
+                    data: {
+                        body: newBody
+                    },
+                    error: DiscussionUtil.formErrorHandler(this.$(".edit-post-form-errors")),
+                    success: function() {
+                        self.editView.$(".edit-post-body textarea").val("").attr("prev-text", "");
+                        self.editView.$(".wmd-preview p").html("");
+                        self.model.set({
+                            body: newBody
+                        });
+                        self.createShowView();
+                        self.renderShowView();
+                        return self.showCommentForm();
+                    }
+                });
+            };
 
-      newBody  = @editView.$(".edit-post-body textarea").val()
+            return ThreadResponseView;
 
-      url = DiscussionUtil.urlFor('update_comment', @model.id)
+        })(DiscussionContentView);
+    }
 
-      DiscussionUtil.safeAjax
-          $elem: $(event.target)
-          $loading: $(event.target) if event
-          url: url
-          type: "POST"
-          dataType: 'json'
-          data:
-              body: newBody
-          error: DiscussionUtil.formErrorHandler(@$(".edit-post-form-errors"))
-          success: (response, textStatus) =>
-              @editView.$(".edit-post-body textarea").val("").attr("prev-text", "")
-              @editView.$(".wmd-preview p").html("")
-
-              @model.set
-                body: newBody
-
-              @createShowView()
-              @renderShowView()
-              @showCommentForm()
-
+}).call(window);
