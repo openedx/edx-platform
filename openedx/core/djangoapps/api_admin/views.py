@@ -6,7 +6,6 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.core.urlresolvers import reverse_lazy, reverse
 from django.http.response import JsonResponse
 from django.shortcuts import redirect
-from django.utils.translation import ugettext as _
 from django.views.generic import View
 from django.views.generic.base import TemplateView
 from django.views.generic.edit import CreateView
@@ -149,31 +148,30 @@ class CatalogListView(View):
         except HttpNotFoundError:
             return []
 
+    def get_context_data(self, client, username, form):
+        """ Retrieve context data for the template. """
+
+        return {
+            'username': username,
+            'catalogs': self._get_catalogs(client, username),
+            'form': form,
+            'preview_url': reverse('api_admin:catalog-preview'),
+            'catalog_api_catalog_endpoint': client.catalogs.url().rstrip('/'),
+            'catalog_api_url': client.courses.url(),
+        }
+
     def get(self, request, username):
         """Display a list of a user's catalogs."""
         client = course_discovery_api_client(request.user)
-        catalogs = self._get_catalogs(client, username)
-        return render_to_response(self.template, {
-            'username': username,
-            'catalogs': catalogs,
-            'form': CatalogForm(initial={'viewers': [username]}),
-            'preview_url': reverse('api_admin:catalog-preview'),
-            'catalog_api_url': client.courses.url(),
-        })
+        form = CatalogForm(initial={'viewers': [username]})
+        return render_to_response(self.template, self.get_context_data(client, username, form))
 
     def post(self, request, username):
         """Create a new catalog for a user."""
         form = CatalogForm(request.POST)
         client = course_discovery_api_client(request.user)
         if not form.is_valid():
-            catalogs = self._get_catalogs(client, username)
-            return render_to_response(self.template, {
-                'form': form,
-                'catalogs': catalogs,
-                'username': username,
-                'preview_url': reverse('api_admin:catalog-preview'),
-                'catalog_api_url': client.courses.url(),
-            }, status=400)
+            return render_to_response(self.template, self.get_context_data(client, username, form), status=400)
 
         attrs = form.instance.attributes
         catalog = client.catalogs.post(attrs)
@@ -183,18 +181,26 @@ class CatalogListView(View):
 class CatalogEditView(View):
     """View to edit an individual catalog."""
 
+    template_name = 'api_admin/catalogs/edit.html'
+
+    def get_context_data(self, catalog, form, client):
+        """ Retrieve context data for the template. """
+
+        return {
+            'catalog': catalog,
+            'form': form,
+            'preview_url': reverse('api_admin:catalog-preview'),
+            'catalog_api_url': client.courses.url(),
+            'catalog_api_catalog_endpoint': client.catalogs.url().rstrip('/'),
+        }
+
     def get(self, request, catalog_id):
         """Display a form to edit this catalog."""
         client = course_discovery_api_client(request.user)
         response = client.catalogs(catalog_id).get()
         catalog = Catalog(attributes=response)
         form = CatalogForm(instance=catalog)
-        return render_to_response('api_admin/catalogs/edit.html', {
-            'catalog': catalog,
-            'form': form,
-            'preview_url': reverse('api_admin:catalog-preview'),
-            'catalog_api_url': client.courses.url(),
-        })
+        return render_to_response(self.template_name, self.get_context_data(catalog, form, client))
 
     def post(self, request, catalog_id):
         """Update or delete this catalog."""
@@ -206,12 +212,7 @@ class CatalogEditView(View):
         if not form.is_valid():
             response = client.catalogs(catalog_id).get()
             catalog = Catalog(attributes=response)
-            return render_to_response('api_admin/catalogs/edit.html', {
-                'catalog': catalog,
-                'form': form,
-                'preview_url': reverse('api_admin:catalog-preview'),
-                'catalog_api_url': client.courses.url(),
-            }, status=400)
+            return render_to_response(self.template_name, self.get_context_data(catalog, form, client), status=400)
         catalog = client.catalogs(catalog_id).patch(form.instance.attributes)
         return redirect(reverse('api_admin:catalog-edit', kwargs={'catalog_id': catalog['id']}))
 
