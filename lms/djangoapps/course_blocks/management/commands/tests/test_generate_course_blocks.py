@@ -8,7 +8,7 @@ from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from .. import generate_course_blocks
-from ....tests.helpers import is_course_in_block_structure_cache
+from openedx.core.djangoapps.content.block_structure.tests.helpers import is_course_in_block_structure_cache
 
 
 class TestGenerateCourseBlocks(ModuleStoreTestCase):

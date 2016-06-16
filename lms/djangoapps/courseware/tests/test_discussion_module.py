@@ -5,8 +5,8 @@ from django.core.urlresolvers import reverse
 from mock import Mock
 from . import BaseTestXmodule
 from course_api.blocks.tests.helpers import deserialize_usage_key
-from course_blocks.tests.helpers import EnableTransformerRegistryMixin
 from courseware.module_render import get_module_for_descriptor_internal
+from openedx.core.djangoapps.content.block_structure.tests.helpers import EnableTransformerRegistryMixin
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from xmodule.discussion_module import DiscussionModule
 from xmodule.modulestore import ModuleStoreEnum

@@ -7,8 +7,8 @@ from string import join
 from urllib import urlencode
 from urlparse import urlunparse
 
-from course_blocks.tests.helpers import EnableTransformerRegistryMixin
 from opaque_keys.edx.locator import CourseLocator
+from openedx.core.djangoapps.content.block_structure.tests.helpers import EnableTransformerRegistryMixin
 from student.models import CourseEnrollment
 from student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
