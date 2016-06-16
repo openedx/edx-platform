@@ -53,6 +53,8 @@ def request_timer(request_id, method, url, tags=None):
 
 def perform_request(method, url, data_or_params=None, raw=False,
                     metric_action=None, metric_tags=None, paged_results=False):
+    # To avoid dependency conflict
+    from django_comment_common.models import ForumsConfig
 
     if metric_tags is None:
         metric_tags = []
@@ -77,13 +79,14 @@ def perform_request(method, url, data_or_params=None, raw=False,
         data = None
         params = merge_dict(data_or_params, request_id_dict)
     with request_timer(request_id, method, url, metric_tags):
+        config = ForumsConfig.current()
         response = requests.request(
             method,
             url,
             data=data,
             params=params,
             headers=headers,
-            timeout=5
+            timeout=config.connection_timeout
         )
 
     metric_tags.append(u'status_code:{}'.format(response.status_code))
