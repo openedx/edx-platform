@@ -148,6 +148,12 @@ div.problem {
       margin-top: $baseline;
     }
   }
+
+  span > label {
+    display: block;
+    margin-bottom: $baseline;
+    font: inherit;
+  }
 }
 
 // +Problem - Choice Group
