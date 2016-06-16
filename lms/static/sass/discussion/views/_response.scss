@@ -49,7 +49,7 @@
     // CASE: larger username for responses 
     .username {
       @include font-size(14);
-      @extend %t-weight5;
+      @extend %t-weight5 !optional;
     }
   }
 

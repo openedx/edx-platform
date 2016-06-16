@@ -1,7 +1,7 @@
 // LMS header styles
 
 .header-global {
-    @extend %ui-depth1;
+    @extend %ui-depth1 !optional;
     box-sizing: border-box;
     position: relative;
     width: 100%;

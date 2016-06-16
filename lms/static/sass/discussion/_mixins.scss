@@ -120,7 +120,7 @@
 }
 
 @mixin forum-post-label($color) {
-  @extend %t-weight4;
+  @extend %t-weight4 !optional;
   @include font-size(9);
   display: inline;
   margin-top: ($baseline/4);
@@ -147,7 +147,7 @@
 
 @mixin forum-user-label($color) {
   @include font-size(9);
-  @extend %t-weight5;
+  @extend %t-weight5 !optional;
   vertical-align: middle;
   margin-left: ($baseline/4);
   border-radius: 2px;

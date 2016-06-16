@@ -18,14 +18,14 @@
         border-bottom: 1px solid $lms-border-color;
 
         .page-title {
-            @extend %t-title4;
+            @extend %t-title4 !optional;
             margin-bottom: ($baseline/4);
             text-transform: none;
             color: $black;
         }
 
         .page-description {
-            @extend %t-copy-sub1;
+            @extend %t-copy-sub1 !optional;
             margin-bottom: ($baseline/4);
             color: $gray;
         }
