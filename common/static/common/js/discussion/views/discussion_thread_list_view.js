@@ -1,3 +1,4 @@
+/* globals Content, Discussion, DiscussionUtil */
 (function () {
     'use strict';
     var __hasProp = {}.hasOwnProperty,
@@ -340,7 +341,7 @@
                             options.group_id = this.group_id;
                         }
                 }
-                _ref = this.collection.last()
+                _ref = this.collection.last();
                 lastThread = _ref ? _ref.get('id') : void 0;
                 if (lastThread) {
                     this.once("threads:rendered", function () {

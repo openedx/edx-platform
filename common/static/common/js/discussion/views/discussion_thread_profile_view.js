@@ -1,3 +1,4 @@
+/* globals DiscussionUtil, MathJax */
 (function () {
     'use strict';
     var __hasProp = {}.hasOwnProperty,

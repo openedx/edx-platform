@@ -1,3 +1,4 @@
+/* globals $$course_id, Content, Markdown, URI */
 (function () {
     'use strict';
     this.DiscussionUtil = (function () {

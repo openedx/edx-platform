@@ -1,3 +1,4 @@
+/* globals DiscussionThreadListView, DiscussionThreadView, DiscussionUtil, NewPostView */
 (function () {
     'use strict';
     var __hasProp = {}.hasOwnProperty,
@@ -163,4 +164,4 @@
         })(Backbone.Router);
     }
 
-}).call(window); // jshint ignore:line
+}).call(window);

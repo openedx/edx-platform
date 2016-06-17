@@ -1,3 +1,4 @@
+/* globals DiscussionUtil */
 (function () {
     'use strict';
 

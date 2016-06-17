@@ -1,3 +1,4 @@
+/* globals DiscussionContentView, DiscussionUtil */
 (function () {
     'use strict';
     var __hasProp = {}.hasOwnProperty,

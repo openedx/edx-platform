@@ -1,3 +1,4 @@
+/* globals DiscussionTopicMenuView, DiscussionUtil */
 (function () {
     'use strict';
     if (Backbone) {

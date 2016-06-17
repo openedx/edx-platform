@@ -1,3 +1,4 @@
+/* globals Discussion, DiscussionThreadProfileView, DiscussionUtil, URI */
 (function () {
     'use strict';
     var __hasProp = {}.hasOwnProperty,

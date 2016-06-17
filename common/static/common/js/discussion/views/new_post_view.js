@@ -1,3 +1,4 @@
+/* globals DiscussionTopicMenuView, DiscussionUtil, Thread */
 (function () {
     'use strict';
     var __hasProp = {}.hasOwnProperty,

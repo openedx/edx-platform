@@ -1,3 +1,7 @@
+/* globals
+    Comments, Content, DiscussionContentView, DiscussionThreadEditView,
+    DiscussionThreadShowView, DiscussionUtil, ThreadResponseView
+*/
 (function () {
     'use strict';
     var __hasProp = {}.hasOwnProperty,
