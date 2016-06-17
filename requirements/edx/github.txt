@@ -59,6 +59,7 @@ git+https://github.com/mitocw/django-cas.git@60a5b8e5a62e63e0d5d224a87f0b489201a
 # back to master when and if this fix is merged back.
 # fs==0.4.0
 git+https://github.com/pmitros/pyfs.git@96e1922348bfe6d99201b9512a9ed946c87b7e0b
+git+https://github.com/django-debug-toolbar/django-debug-toolbar.git#egg=django-debug-toolbar
 # The officially released version of django-debug-toolbar-mongo doesn't support DJDT 1.x. This commit does.
 git+https://github.com/hmarr/django-debug-toolbar-mongo.git@b0686a76f1ce3532088c4aee6e76b9abe61cc808
 
@@ -70,7 +71,7 @@ git+https://github.com/edx/lettuce.git@0.2.20.002#egg=lettuce==0.2.20.002
 git+https://github.com/edx/pa11ycrawler.git@a963bbb7c4f861b24b5f66bfc5259d3fa207cca8#egg=pa11ycrawler==0.1a
 
 # Our libraries:
-git+https://github.com/edx/XBlock.git@xblock-0.4.10#egg=XBlock==0.4.10
+git+https://github.com/edx/XBlock.git@3760c702629e953b52231077db0ba26a8c244462#egg=XBlock==0.4.10
 -e git+https://github.com/edx/codejail.git@6b17c33a89bef0ac510926b1d7fea2748b73aadd#egg=codejail
 -e git+https://github.com/edx/event-tracking.git@0.2.1#egg=event-tracking==0.2.1
 -e git+https://github.com/edx/django-splash.git@v0.2#egg=django-splash==0.2
@@ -93,6 +94,6 @@ git+https://github.com/edx/xblock-lti-consumer.git@v1.0.9#egg=xblock-lti-consume
 git+https://github.com/edx/edx-proctoring.git@0.12.19#egg=edx-proctoring==0.12.19
 
 # Third Party XBlocks
--e git+https://github.com/mitodl/edx-sga@172a90fd2738f8142c10478356b2d9ed3e55334a#egg=edx-sga
+-e git+https://github.com/doctoryes/edx-sga@756e10bae7a731a5600d2cbe26f3710b682233d7#egg=edx-sga
 -e git+https://github.com/open-craft/xblock-poll@v1.1#egg=xblock-poll==1.1
 git+https://github.com/edx-solutions/xblock-drag-and-drop-v2@v2.0.7#egg=xblock-drag-and-drop-v2==2.0.7
