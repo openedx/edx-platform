@@ -79,7 +79,7 @@
 
 }).call(
     this,
-    $$course_id,
-    Content, Discussion, DiscussionCourseSettings, DiscussionRouter,
-    DiscussionUser, DiscussionUserProfileView, DiscussionUtil
+    this.$$course_id,
+    this.Content, this.Discussion, this.DiscussionCourseSettings, this.DiscussionRouter,
+    this.DiscussionUser, this.DiscussionUserProfileView, this.DiscussionUtil
 );

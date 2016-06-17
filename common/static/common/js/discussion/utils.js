@@ -487,4 +487,4 @@
 
     }).call(this);
 
-}).call(this, $$course_id, Content, URI, Markdown); // jshint ignore:line
+}).call(this, this.$$course_id, this.Content, URI, Markdown); // jshint ignore:line

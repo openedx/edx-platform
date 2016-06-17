@@ -87,4 +87,4 @@
         })(DiscussionContentShowView);
     }
 
-}).call(this, DiscussionContentShowView, DiscussionUtil, MathJax); // jshint ignore:line
+}).call(this, this.DiscussionContentShowView, this.DiscussionUtil, this.MathJax); // jshint ignore:line

@@ -344,6 +344,6 @@
     }
 
 }).call(this,
-    Comments, DiscussionContentView, DiscussionUtil, ResponseCommentView, // jshint ignore:line
-    ThreadResponseEditView, ThreadResponseShowView // jshint ignore:line
+    this.Comments, this.DiscussionContentView, this.DiscussionUtil, this.ResponseCommentView, // jshint ignore:line
+    this.ThreadResponseEditView, this.ThreadResponseShowView // jshint ignore:line
 );

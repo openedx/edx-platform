@@ -218,4 +218,4 @@
         })(Backbone.Collection);
     }
 
-}).call(this, Thread, DiscussionUtil, Content); // jshint ignore:line
+}).call(this, this.Thread, this.DiscussionUtil, this.Content); // jshint ignore:line

@@ -191,4 +191,4 @@
         })(Backbone.View);
     }
 
-}).call(this, DiscussionUtil, DiscussionTopicMenuView, Thread); // jshint ignore:line
+}).call(this, this.DiscussionUtil, this.DiscussionTopicMenuView, this.Thread); // jshint ignore:line

@@ -109,4 +109,4 @@
             }
         });
     }
-}).call(this, Backbone, DiscussionUtil, DiscussionTopicMenuView); // jshint ignore:line
+}).call(this, this.Backbone, this.DiscussionUtil, this.DiscussionTopicMenuView); // jshint ignore:line

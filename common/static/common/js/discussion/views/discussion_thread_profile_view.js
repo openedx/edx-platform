@@ -68,4 +68,4 @@
         })(Backbone.View);
     }
 
-}).call(this, DiscussionUtil, MathJax); // jshint ignore:line
+}).call(this, this.DiscussionUtil, this.MathJax); // jshint ignore:line

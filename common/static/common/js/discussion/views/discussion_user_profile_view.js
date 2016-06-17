@@ -102,4 +102,4 @@
         })(Backbone.View);
     }
 
-}).call(this, Discussion, DiscussionThreadProfileView, DiscussionUtil, URI); // jshint ignore:line
+}).call(this, this.Discussion, this.DiscussionThreadProfileView, this.DiscussionUtil, URI); // jshint ignore:line

@@ -158,4 +158,6 @@
         })(DiscussionContentView);
     }
 
-}).call(this, ResponseCommentEditView, DiscussionContentView, DiscussionUtil, ResponseCommentShowView); // jshint ignore:line
+}).call(this,
+    this.ResponseCommentEditView, this.DiscussionContentView, this.DiscussionUtil, this.ResponseCommentShowView
+); // jshint ignore:line

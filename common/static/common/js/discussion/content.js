@@ -432,4 +432,4 @@
         })(Backbone.Collection);
     }
 
-}).call(this, DiscussionUtil); // jshint ignore:line
+}).call(this, this.DiscussionUtil); // jshint ignore:line

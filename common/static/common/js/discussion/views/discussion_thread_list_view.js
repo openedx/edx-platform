@@ -787,4 +787,4 @@
         }).call(this, Backbone.View);
     }
 
-}).call(this, Content, Discussion, DiscussionUtil); // jshint ignore:line
+}).call(this, this.Content, this.Discussion, this.DiscussionUtil); // jshint ignore:line

@@ -486,6 +486,6 @@
     }
 
 }).call(this,
-    Content, Comments, DiscussionContentView, DiscussionThreadEditView, DiscussionThreadShowView,  // jshint ignore:line
-    DiscussionUtil, ThreadResponseView // jshint ignore:line
+    this.Content, this.Comments, this.DiscussionContentView, this.DiscussionThreadEditView, // jshint ignore:line 
+    this.DiscussionThreadShowView, this.DiscussionUtil, this.ThreadResponseView // jshint ignore:line
 );

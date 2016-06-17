@@ -163,4 +163,4 @@
         })(Backbone.Router);
     }
 
-}).call(this, DiscussionThreadListView, DiscussionThreadView, DiscussionUtil, NewPostView); // jshint ignore:line
+}).call(this, this.DiscussionThreadListView, this.DiscussionThreadView, this.DiscussionUtil, this.NewPostView); // jshint ignore:line

@@ -268,6 +268,6 @@ NewPostView */
 
 }).call(
     this,
-    Discussion, DiscussionUtil, DiscussionUser, DiscussionCourseSettings,
-    DiscussionThreadView, Content, NewPostView
+    this.Discussion, this.DiscussionUtil, this.DiscussionUser, this.DiscussionCourseSettings,
+    this.DiscussionThreadView, this.Content, this.NewPostView
 );

@@ -1,4 +1,4 @@
-(function (DiscussionContentView, DiscussionUtil) {
+(function (DiscussionUtil) {
     'use strict';
     var __hasProp = {}.hasOwnProperty,
         __extends = function (child, parent) {
@@ -513,7 +513,7 @@
 
             return DiscussionContentShowView;
 
-        }).call(this, DiscussionContentView);
+        }).call(this, this.DiscussionContentView);
     }
 
-}).call(this, DiscussionContentView, DiscussionUtil); // jshint ignore:line
+}).call(this, this.DiscussionUtil); // jshint ignore:line
