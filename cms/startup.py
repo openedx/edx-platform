@@ -9,11 +9,6 @@ settings.INSTALLED_APPS  # pylint: disable=pointless-statement
 
 from openedx.core.lib.django_startup import autostartup
 import django
-from monkey_patch import (
-    third_party_auth,
-    django_db_models_options
-)
-from openedx.core.lib.xblock_utils import xblock_local_resource_url
 
 import xmodule.x_module
 import cms.lib.xblock.runtime
@@ -25,6 +20,12 @@ def run():
     """
     Executed during django startup
     """
+    django.setup()
+
+    from monkey_patch import (
+        third_party_auth,
+        django_db_models_options
+    )
     third_party_auth.patch()
     django_db_models_options.patch()
 
@@ -32,8 +33,6 @@ def run():
     # because modifying django template paths after startup has no effect.
     if settings.COMPREHENSIVE_THEME_DIR:
         enable_comprehensive_theme(settings.COMPREHENSIVE_THEME_DIR)
-
-    django.setup()
 
     autostartup()
 
@@ -46,6 +45,7 @@ def run():
     # monkey-patch the x_module library.
     # TODO: Remove this code when Runtimes are no longer created by modulestores
     # https://openedx.atlassian.net/wiki/display/PLAT/Convert+from+Storage-centric+runtimes+to+Application-centric+runtimes
+    from openedx.core.lib.xblock_utils import xblock_local_resource_url
     xmodule.x_module.descriptor_global_handler_url = cms.lib.xblock.runtime.handler_url
     xmodule.x_module.descriptor_global_local_resource_url = xblock_local_resource_url
 
