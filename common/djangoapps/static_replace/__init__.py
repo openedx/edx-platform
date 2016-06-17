@@ -5,9 +5,6 @@ from django.contrib.staticfiles.storage import staticfiles_storage
 from django.contrib.staticfiles import finders
 from django.conf import settings
 
-from static_replace.models import AssetBaseUrlConfig, AssetExcludedExtensionsConfig
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore import ModuleStoreEnum
 from xmodule.contentstore.content import StaticContent
 
 from opaque_keys.edx.locator import AssetLocator
@@ -177,6 +174,8 @@ def replace_static_urls(text, data_directory=None, course_id=None, static_asset_
             if exists_in_staticfiles_storage:
                 url = staticfiles_storage.url(rest)
             else:
+                # Import here because models can't be imported at top of module __init__.py.
+                from static_replace.models import AssetBaseUrlConfig, AssetExcludedExtensionsConfig
                 # if not, then assume it's courseware specific content and then look in the
                 # Mongo-backed database
                 base_url = AssetBaseUrlConfig.get_base_url()

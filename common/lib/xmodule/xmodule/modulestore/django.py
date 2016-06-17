@@ -29,7 +29,6 @@ from xmodule.contentstore.django import contentstore
 from xmodule.modulestore.draft_and_published import BranchSettingMixin
 from xmodule.modulestore.mixed import MixedModuleStore
 from xmodule.util.django import get_current_request_hostname
-import xblock.reference.plugins
 
 try:
     # We may not always have the request_cache module available
@@ -38,20 +37,6 @@ try:
     HAS_REQUEST_CACHE = True
 except ImportError:
     HAS_REQUEST_CACHE = False
-
-# We also may not always have the current request user (crum) module available
-try:
-    from xblock_django.user_service import DjangoXBlockUserService
-    from crum import get_current_user
-
-    HAS_USER_SERVICE = True
-except ImportError:
-    HAS_USER_SERVICE = False
-
-try:
-    from xblock_django.models import XBlockDisableConfig
-except ImportError:
-    XBlockDisableConfig = None
 
 log = logging.getLogger(__name__)
 ASSET_IGNORE_REGEX = getattr(settings, "ASSET_IGNORE_REGEX", r"(^\._.*$)|(^\.DS_Store$)|(^.*~$)")
@@ -180,6 +165,15 @@ def create_modulestore_instance(
     if issubclass(class_, BranchSettingMixin):
         _options['branch_setting_func'] = _get_modulestore_branch_setting
 
+    # We also may not always have the current request user (crum) module available
+    try:
+        from xblock_django.user_service import DjangoXBlockUserService
+        from crum import get_current_user
+
+        HAS_USER_SERVICE = True
+    except ImportError:
+        HAS_USER_SERVICE = False
+
     if HAS_USER_SERVICE and not user_service:
         xb_user_service = DjangoXBlockUserService(get_current_user())
     else:
@@ -188,12 +182,19 @@ def create_modulestore_instance(
     if 'read_preference' in doc_store_config:
         doc_store_config['read_preference'] = getattr(ReadPreference, doc_store_config['read_preference'])
 
+    try:
+        from xblock_django.models import XBlockDisableConfig
+    except ImportError:
+        XBlockDisableConfig = None
+
     if XBlockDisableConfig and settings.FEATURES.get('ENABLE_DISABLING_XBLOCK_TYPES', False):
         disabled_xblock_types = XBlockDisableConfig.disabled_block_types()
     else:
         disabled_xblock_types = ()
 
     xblock_field_data_wrappers = [load_function(path) for path in settings.XBLOCK_FIELD_DATA_WRAPPERS]
+
+    import xblock.reference.plugins
 
     return class_(
         contentstore=content_store,
