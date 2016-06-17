@@ -10,14 +10,13 @@ from django.core.urlresolvers import reverse
 
 ## ----- Tips on adding something to the new instructor dashboard -----
 ## 1. add your input element, e.g. in instructor_dashboard2/data_download.html
-##   the input includes a reference like data-endpoint="${ section_data['get_anon_ids_url'] }"
+##    the input includes a reference like data-endpoint="${ section_data['get_anon_ids_url'] }"
 ## 2. Go to the old dashboard djangoapps/instructor/views/instructor_dashboard.py and
-##   add in a definition of 'xxx_url' in the right section_data for whatever page your
-##   feature is on.
+##    add in a definition of 'xxx_url' in the right section_data for whatever page your
+##    feature is on.
 ## 3. Add a url() entry in api_urls.py
-## 4. Over in lms/static/coffee/src/instructor_dashboard/ there there are .coffee files
-##   for each page which define the .js. Edit this to make your input do something
-##   when clicked. The .coffee files use the name=xx to pick out inputs, not id=
+## 4. Over in lms/static/js/instructor_dashboard/ there there are .js files
+##    for each page. Edit this to make your input do something when clicked.
 ## 5. Implement your standard django/python in lms/djangoapps/instructor/views/api.py
 ## 6. And tests go in lms/djangoapps/instructor/tests/
 
@@ -35,7 +34,7 @@ from django.core.urlresolvers import reverse
         window.Range.prototype = { };
     }
   </script>
-  <script type="text/javascript" src="${static.url('js/instructor_dashboard/proctoring.js')}"></script>
+  <script type="text/javascript" src="${static.url('lms/js/instructor_dashboard/proctoring.js')}"></script>
   <script type="text/javascript" src="${static.url('js/vendor/date.js')}"></script>
   <script type="text/javascript" src="${static.url('js/vendor/mustache.js')}"></script>
   <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.js')}"></script>
