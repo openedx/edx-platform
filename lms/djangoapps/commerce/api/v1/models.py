@@ -6,7 +6,7 @@ from django.db import transaction
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from course_modes.models import CourseMode
+from course_modes.models import CourseMode, CourseModeConfig
 from lms.djangoapps.verify_student.models import VerificationDeadline
 
 log = logging.getLogger(__name__)
@@ -80,7 +80,9 @@ class Course(object):
 
         for posted_mode in attrs.get('modes', []):
             merged_mode = existing_modes.get(posted_mode.mode_slug, CourseMode())
+            course_mode_config = CourseModeConfig.objects.filter(name=posted_mode.mode_slug).first()
 
+            merged_mode.course_mode_config = course_mode_config
             merged_mode.course_id = self.id
             merged_mode.mode_slug = posted_mode.mode_slug
             merged_mode.mode_display_name = posted_mode.mode_slug

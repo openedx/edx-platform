@@ -10,6 +10,7 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
+from model_utils.models import TimeStampedModel
 from xmodule_django.models import CourseKeyField
 
 Mode = namedtuple('Mode',
@@ -26,7 +27,7 @@ Mode = namedtuple('Mode',
                   ])
 
 
-class CourseMode(models.Model):
+class CourseMode(TimeStampedModel):
     """
     We would like to offer a course in a variety of modes.
 
@@ -109,12 +110,20 @@ class CourseMode(models.Model):
         )
     )
 
+    course_mode_config = models.ForeignKey(
+        'CourseModeConfig',
+        null=True,
+        blank=True,
+        default=None,
+        verbose_name=_("Course Mode Config")
+    )
+
     HONOR = 'honor'
     PROFESSIONAL = 'professional'
-    VERIFIED = "verified"
-    AUDIT = "audit"
-    NO_ID_PROFESSIONAL_MODE = "no-id-professional"
-    CREDIT_MODE = "credit"
+    VERIFIED = 'verified'
+    AUDIT = 'audit'
+    NO_ID_PROFESSIONAL_MODE = 'no-id-professional'
+    CREDIT_MODE = 'credit'
 
     DEFAULT_MODE = Mode(AUDIT, _('Audit'), 0, '', 'usd', None, None, None, None)
     DEFAULT_MODE_SLUG = AUDIT
@@ -124,6 +133,8 @@ class CourseMode(models.Model):
 
     # Modes that allow a student to pursue a non-verified certificate
     NON_VERIFIED_MODES = [HONOR, AUDIT, NO_ID_PROFESSIONAL_MODE]
+
+    CERTIFICATE_GRANTING_MODES = [VERIFIED, PROFESSIONAL, NO_ID_PROFESSIONAL_MODE]
 
     # Modes that allow a student to earn credit with a university partner
     CREDIT_MODES = [CREDIT_MODE]
@@ -167,7 +178,11 @@ class CourseMode(models.Model):
         NOTE (CCB): This is a silly hack needed because all of the class methods use tuples
         with a property named slug instead of mode_slug.
         """
-        return self.mode_slug
+        course_mode_config = self.course_mode_config
+        if course_mode_config:
+            return course_mode_config.name
+        else:
+            return self.mode_slug
 
     @property
     def expiration_datetime(self):
@@ -181,6 +196,50 @@ class CourseMode(models.Model):
         if new_datetime is not None:
             self.expiration_datetime_is_explicit = True
         self._expiration_datetime = new_datetime
+
+    @property
+    def has_id_verification(self):
+        """
+        Returns whether or not the course_mode allows id verification.
+        """
+        course_mode_config = self.course_mode_config
+        if course_mode_config:
+            return course_mode_config.id_verification
+        else:
+            return self.mode_slug in self.VERIFIED_MODES
+
+    @property
+    def has_certificate(self):
+        """
+        Returns whether or not the course_mode grants a certificate.
+        """
+        course_mode_config = self.course_mode_config
+        if course_mode_config:
+            return course_mode_config.certificate
+        else:
+            return self.mode_slug in self.CERTIFICATE_GRANTING_MODES
+
+    @property
+    def has_cohorting(self):
+        """
+        Returns whether or not the course_mode allows cohorting by mode.
+        """
+        course_mode_config = self.course_mode_config
+        if course_mode_config:
+            return course_mode_config.cohort
+        else:
+            return self.mode_slug == self.VERIFIED
+
+    @property
+    def is_credit_eligible(self):
+        """
+        Returns whether or not the course_mode is credit eligible.
+        """
+        course_mode_config = self.course_mode_config
+        if course_mode_config:
+            return course_mode_config.credit_eligible
+        else:
+            return self.mode_slug in self.CREDIT_MODES
 
     @classmethod
     def all_modes_for_courses(cls, course_id_list):
@@ -700,3 +759,36 @@ class CourseModeExpirationConfig(ConfigurationModel):
     def __unicode__(self):
         """ Returns the unicode date of the verification window. """
         return unicode(self.verification_window)
+
+
+class CourseModeConfig(TimeStampedModel):
+    """
+    Configure course mode type capabilites.
+    """
+    class Meta(object):
+        app_label = "course_modes"
+
+    name = models.CharField(max_length=100)
+
+    display_name = models.CharField(max_length=255)
+
+    certificate = models.BooleanField(default=False, verbose_name=_("Certificate"))
+
+    id_verification = models.BooleanField(default=False, verbose_name=_("ID Verification"))
+
+    upsell_course_mode = models.ForeignKey(
+        'self',
+        null=True,
+        blank=True,
+        default=None,
+        # Translators: this label indicates the course_mode config which this course_mode config can progress to:
+        verbose_name=_("Upsell Course Mode Config"),
+    )
+
+    credit_eligible = models.BooleanField(default=False, verbose_name=_("Credit Eligible"))
+
+    cohort = models.BooleanField(default=False, verbose_name=_("Cohort"))
+
+    def __unicode__(self):
+        """ Returns the unicode date of the verification window. """
+        return unicode(self.name)

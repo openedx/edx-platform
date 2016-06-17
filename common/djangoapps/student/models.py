@@ -951,7 +951,7 @@ class CourseEnrollmentManager(models.Manager):
         )
 
 
-class CourseEnrollment(models.Model):
+class CourseEnrollment(TimeStampedModel):
     """
     Represents a Student's Enrollment record for a single Course. You should
     generally not manipulate CourseEnrollment objects directly, but use the
@@ -967,7 +967,6 @@ class CourseEnrollment(models.Model):
 
     user = models.ForeignKey(User)
     course_id = CourseKeyField(max_length=255, db_index=True)
-    created = models.DateTimeField(auto_now_add=True, null=True, db_index=True)
 
     # If is_active is False, then the student is not considered to be enrolled
     # in the course (is_enrolled() will return False)
@@ -976,6 +975,13 @@ class CourseEnrollment(models.Model):
     # Represents the modes that are possible. We'll update this later with a
     # list of possible values.
     mode = models.CharField(default=CourseMode.DEFAULT_MODE_SLUG, max_length=100)
+
+    course_mode = models.ForeignKey(
+        CourseMode,
+        null=True,
+        blank=True,
+        verbose_name=_("Course Mode")
+    )
 
     objects = CourseEnrollmentManager()
 
