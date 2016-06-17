@@ -1,9 +1,9 @@
-(function() {
+(function () {
     'use strict';
-    describe('DiscussionThreadEditView', function() {
+    describe('DiscussionThreadEditView', function () {
         var testUpdate, testCancel;
 
-        beforeEach(function() {
+        beforeEach(function () {
             DiscussionSpecHelper.setUpGlobals();
             DiscussionSpecHelper.setUnderscoreFixtures();
             spyOn(DiscussionUtil, 'makeWmdEditor');
@@ -26,14 +26,17 @@
             };
         });
 
-        testUpdate = function(view, thread, newTopicId, newTopicName) {
-            spyOn($, 'ajax').and.callFake(function(params) {
+        testUpdate = function (view, thread, newTopicId, newTopicName) {
+            spyOn($, 'ajax').and.callFake(function (params) {
                 expect(params.url.path()).toEqual(DiscussionUtil.urlFor('update_thread', 'dummy_id'));
                 expect(params.data.thread_type).toBe('discussion');
                 expect(params.data.commentable_id).toBe(newTopicId);
                 expect(params.data.title).toBe('changed thread title');
                 params.success();
-                return {always: function() {}};
+                return {
+                    always: function () {
+                    }
+                };
             });
 
             view.$el.find('a.topic-title').filter(function (idx, el) {
@@ -52,32 +55,32 @@
             expect(view.$('.wmd-preview p')).toHaveText('');
         };
 
-        it('can save new data correctly in tab mode', function() {
+        it('can save new data correctly in tab mode', function () {
             this.createEditView();
             testUpdate(this.view, this.thread, 'other_topic', 'Other Topic');
         });
 
-        it('can save new data correctly in inline mode', function() {
+        it('can save new data correctly in inline mode', function () {
             this.createEditView({"mode": "inline"});
             testUpdate(this.view, this.thread, 'other_topic', 'Other Topic');
         });
 
-        testCancel = function(view) {
+        testCancel = function (view) {
             view.$('.post-cancel').click();
             expect($('.edit-post-form')).not.toExist();
         };
 
-        it('can close the view in tab mode', function() {
+        it('can close the view in tab mode', function () {
             this.createEditView();
             testCancel(this.view);
         });
 
-        it('can close the view in inline mode', function() {
+        it('can close the view in inline mode', function () {
             this.createEditView({"mode": "inline"});
             testCancel(this.view);
         });
-        describe('renderComments', function() {
-            beforeEach(function() {
+        describe('renderComments', function () {
+            beforeEach(function () {
                 this.course_settings = new DiscussionCourseSettings({
                     'category_map': {
                         'children': ['Topic', 'General', 'Basic Question'],
