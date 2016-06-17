@@ -22,11 +22,7 @@ def run():
     """
     django.setup()
 
-    from monkey_patch import (
-        third_party_auth,
-        django_db_models_options
-    )
-    third_party_auth.patch()
+    from monkey_patch import django_db_models_options
     django_db_models_options.patch()
 
     # Comprehensive theming needs to be set up before django startup,
