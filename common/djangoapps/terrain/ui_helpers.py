@@ -59,7 +59,7 @@ REQUIREJS_WAIT = {
 
     # Pages
     re.compile(r'^Pages \|'): [
-        'js/models/explicit_url', 'coffee/src/views/tabs',
+        'js/models/explicit_url', 'js/views/tabs',
         'xmodule', 'coffee/src/main', 'xblock/cms.runtime.v1'
     ],
 }
