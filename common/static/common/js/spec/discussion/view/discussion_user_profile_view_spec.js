@@ -1,5 +1,6 @@
+/* globals DiscussionSpecHelper, DiscussionThreadProfileView, DiscussionUserProfileView, URI, DiscussionUtil */
 (function () {
-
+    'use strict';
     describe("DiscussionUserProfileView", function () {
         var makeThreads, makeView;
         beforeEach(function () {
@@ -53,22 +54,21 @@
                 };
             };
             checkRender = function (params) {
-                var get_page_number, paginator, view,
-                    _this = this;
+                var get_page_number, paginator, view;
                 view = makeView([], params.page, params.numPages);
                 paginator = view.$(".discussion-paginator");
-                expect(paginator.find(".current-page").text()).toEqual(params["page"].toString());
-                expect(paginator.find(".first-page").length).toBe(params["first"] ? 1 : 0);
-                expect(paginator.find(".previous-page").length).toBe(params["previous"] ? 1 : 0);
-                expect(paginator.find(".previous-ellipses").length).toBe(params["leftdots"] ? 1 : 0);
-                expect(paginator.find(".next-page").length).toBe(params["next"] ? 1 : 0);
-                expect(paginator.find(".next-ellipses").length).toBe(params["rightdots"] ? 1 : 0);
-                expect(paginator.find(".last-page").length).toBe(params["last"] ? 1 : 0);
+                expect(paginator.find(".current-page").text()).toEqual(params.page.toString());
+                expect(paginator.find(".first-page").length).toBe(params.first ? 1 : 0);
+                expect(paginator.find(".previous-page").length).toBe(params.previous ? 1 : 0);
+                expect(paginator.find(".previous-ellipses").length).toBe(params.leftdots ? 1 : 0);
+                expect(paginator.find(".next-page").length).toBe(params.next ? 1 : 0);
+                expect(paginator.find(".next-ellipses").length).toBe(params.rightdots ? 1 : 0);
+                expect(paginator.find(".last-page").length).toBe(params.last ? 1 : 0);
                 get_page_number = function (element) {
                     return parseInt($(element).text());
                 };
-                expect(_.map(paginator.find(".lower-page a"), get_page_number)).toEqual(params["lowPages"]);
-                return expect(_.map(paginator.find(".higher-page a"), get_page_number)).toEqual(params["highPages"]);
+                expect(_.map(paginator.find(".lower-page a"), get_page_number)).toEqual(params.lowPages);
+                return expect(_.map(paginator.find(".higher-page a"), get_page_number)).toEqual(params.highPages);
             };
             it("for one page", function () {
                 return checkRender({
@@ -219,7 +219,6 @@
                 return spyOn($, "ajax").and.returnValue(deferred);
             });
             it("causes updated rendering", function () {
-                var _this = this;
                 $.ajax.and.callFake(function (params) {
                     params.success({
                         discussion_data: [
@@ -241,7 +240,6 @@
                 return expect(this.view.$(".last-page").text()).toEqual("99");
             });
             return it("handles AJAX errors", function () {
-                var _this = this;
                 spyOn(DiscussionUtil, "discussionAlert");
                 $.ajax.and.callFake(function (params) {
                     params.error();

@@ -1,5 +1,8 @@
+/* globals DiscussionSpecHelper, DiscussionUtil, ResponseCommentView, ResponseCommentShowView, user */
 (function () {
     'use strict';
+    var $$course_id = "$$course_id";
+
     describe('ResponseCommentView', function () {
         beforeEach(function () {
             DiscussionSpecHelper.setUpGlobals();
@@ -34,7 +37,6 @@
                 return spyOn(this.view.$el, "remove");
             });
             setAjaxResult = function (isSuccess) {
-                var _this = this;
                 return spyOn($, "ajax").and.callFake(function (params) {
                     (isSuccess ? params.success : params.error)({});
                     return {
@@ -62,7 +64,8 @@
                 this.view._delete(this.event);
                 expect(this.event.preventDefault).toHaveBeenCalled();
                 expect($.ajax).toHaveBeenCalled();
-                return expect($.ajax.calls.mostRecent().args[0].url._parts.path).toEqual('/courses/edX/999/test/discussion/comments/01234567/delete');
+                return expect($.ajax.calls.mostRecent().args[0].url._parts.path)
+                    .toEqual('/courses/edX/999/test/discussion/comments/01234567/delete');
             });
             it('handles ajax errors', function () {
                 spyOn(DiscussionUtil, "discussionAlert");
@@ -99,7 +102,8 @@
                 expect(this.view._delete).toHaveBeenCalled();
                 this.view.showView.trigger("comment:edit", DiscussionSpecHelper.makeEventSpy());
                 expect(this.view.edit).toHaveBeenCalled();
-                return expect(this.view.$(".edit-post-form#comment_" + this.comment.id)).not.toHaveClass("edit-post-form");
+                return expect(this.view.$(".edit-post-form#comment_" + this.comment.id))
+                    .not.toHaveClass("edit-post-form");
             });
         });
         describe('renderEditView', function () {
@@ -165,7 +169,8 @@
                     this.ajaxSucceed = true;
                     this.view.update(DiscussionSpecHelper.makeEventSpy());
                     expect($.ajax).toHaveBeenCalled();
-                    expect($.ajax.calls.mostRecent().args[0].url._parts.path).toEqual('/courses/edX/999/test/discussion/comments/01234567/update');
+                    expect($.ajax.calls.mostRecent().args[0].url._parts.path)
+                        .toEqual('/courses/edX/999/test/discussion/comments/01234567/update');
                     expect($.ajax.calls.mostRecent().args[0].data.body).toEqual(this.updatedBody);
                     expect(this.view.model.get("body")).toEqual(this.updatedBody);
                     return expect(this.view.cancelEdit).toHaveBeenCalled();
@@ -176,7 +181,8 @@
                     this.ajaxSucceed = false;
                     this.view.update(DiscussionSpecHelper.makeEventSpy());
                     expect($.ajax).toHaveBeenCalled();
-                    expect($.ajax.calls.mostRecent().args[0].url._parts.path).toEqual('/courses/edX/999/test/discussion/comments/01234567/update');
+                    expect($.ajax.calls.mostRecent().args[0].url._parts.path)
+                        .toEqual('/courses/edX/999/test/discussion/comments/01234567/update');
                     expect($.ajax.calls.mostRecent().args[0].data.body).toEqual(this.updatedBody);
                     expect(this.view.model.get("body")).toEqual(originalBody);
                     expect(this.view.cancelEdit).not.toHaveBeenCalled();

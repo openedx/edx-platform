@@ -1,3 +1,4 @@
+/* globals DiscussionSpecHelper, DiscussionUtil, DiscussionViewSpecHelper, ResponseCommentShowView */
 (function () {
     'use strict';
     describe('ResponseCommentShowView', function () {
@@ -19,8 +20,8 @@
             return spyOn(this.view, "convertMath");
         });
         it('defines the tag', function () {
-            expect($('#jasmine-fixtures')).toExist;
-            expect(this.view.tagName).toBeDefined;
+            expect($('#jasmine-fixtures')).toExist();
+            expect(this.view.tagName).toBeDefined();
             return expect(this.view.el.tagName.toLowerCase()).toBe('li');
         });
         it('is tied to the model', function () {
@@ -82,11 +83,10 @@
             });
         });
         return describe("labels", function () {
-            var expectOneElement,
-                _this = this;
+            var expectOneElement;
             expectOneElement = function (view, selector, visible) {
                 var elements;
-                if (visible == null) {
+                if (typeof visible === "undefined" || visible === null) {
                     visible = true;
                 }
                 view.render();

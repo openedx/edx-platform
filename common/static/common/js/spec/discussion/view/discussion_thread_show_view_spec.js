@@ -1,5 +1,8 @@
+/* globals DiscussionSpecHelper, DiscussionThreadShowView, DiscussionUtil, DiscussionViewSpecHelper, Thread */
 (function () {
     'use strict';
+
+    var $$course_id = "$$course_id";
     describe("DiscussionThreadShowView", function () {
         beforeEach(function () {
             DiscussionSpecHelper.setUpGlobals();
@@ -91,11 +94,10 @@
             });
         });
         describe("labels", function () {
-            var expectOneElement,
-                _this = this;
+            var expectOneElement;
             expectOneElement = function (view, selector, visible) {
                 var elements;
-                if (visible == null) {
+                if (typeof visible === "undefined" || visible === null) {
                     visible = true;
                 }
                 view.render();
@@ -173,13 +175,15 @@
         return describe("cohorting", function () {
             it("renders correctly for an uncohorted thread", function () {
                 this.view.render();
-                return expect(this.view.$('.group-visibility-label').text().trim()).toEqual('This post is visible to everyone.');
+                return expect(this.view.$('.group-visibility-label').text().trim())
+                    .toEqual('This post is visible to everyone.');
             });
             return it("renders correctly for a cohorted thread", function () {
                 this.thread.set('group_id', '1');
                 this.thread.set('group_name', 'Mock Cohort');
                 this.view.render();
-                return expect(this.view.$('.group-visibility-label').text().trim()).toEqual('This post is visible only to Mock Cohort.');
+                return expect(this.view.$('.group-visibility-label').text().trim())
+                    .toEqual('This post is visible only to Mock Cohort.');
             });
         });
     });

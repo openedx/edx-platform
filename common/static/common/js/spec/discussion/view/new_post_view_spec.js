@@ -1,8 +1,9 @@
+/* globals Discussion, DiscussionCourseSettings, DiscussionSpecHelper, DiscussionUtil, NewPostView */
 (function () {
-
+    'use strict';
+    
     describe("NewPostView", function () {
-        var checkVisibility,
-            _this = this;
+        var checkVisibility;
         beforeEach(function () {
             DiscussionSpecHelper.setUpGlobals();
             DiscussionSpecHelper.setUnderscoreFixtures();
@@ -10,7 +11,7 @@
             spyOn(DiscussionUtil, "makeWmdEditor").and.callFake(function ($content, $local, cls_identifier) {
                 return $local("." + cls_identifier).html("<textarea></textarea>");
             });
-            return this.discussion = new Discussion([], {
+            this.discussion = new Discussion([], {
                 pages: 1
             });
         });
@@ -59,7 +60,7 @@
                         }
                     ]
                 });
-                return this.view = new NewPostView({
+                this.view = new NewPostView({
                     el: $("#fixture-element"),
                     collection: this.discussion,
                     course_settings: this.course_settings,
@@ -126,7 +127,7 @@
                         }
                     ]
                 });
-                return this.view = new NewPostView({
+                this.view = new NewPostView({
                     el: $("#fixture-element"),
                     collection: this.discussion,
                     course_settings: this.course_settings,
@@ -153,10 +154,9 @@
             });
         });
         describe("cancel post resets form ", function () {
-            var checkPostCancelReset,
-                _this = this;
+            var checkPostCancelReset;
             beforeEach(function () {
-                return this.course_settings = new DiscussionCourseSettings({
+                this.course_settings = new DiscussionCourseSettings({
                     "allow_anonymous_to_peers": true,
                     "allow_anonymous": true,
                     "category_map": {

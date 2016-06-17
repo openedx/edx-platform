@@ -1,3 +1,4 @@
+/* globals DiscussionViewSpecHelper, DiscussionSpecHelper, DiscussionUtil, Thread, ThreadResponseShowView */
 (function () {
     'use strict';
     describe("ThreadResponseShowView", function () {
@@ -67,8 +68,10 @@
                 "endorsement": endorsement
             });
             this.view.render();
-            expect(this.view.$(".posted-details").text().replace(/\s+/g, " ")).toMatch("marked as answer less than a minute ago by " + endorsement.username);
-            return expect(this.view.$(".posted-details > a").attr('href')).toEqual("/courses/edX/999/test/discussion/forum/users/test_id");
+            expect(this.view.$(".posted-details").text().replace(/\s+/g, " "))
+                .toMatch("marked as answer less than a minute ago by " + endorsement.username);
+            return expect(this.view.$(".posted-details > a").attr('href'))
+                .toEqual("/courses/edX/999/test/discussion/forum/users/test_id");
         });
         it("renders anonymous endorsement correctly for a marked answer in a question thread", function () {
             var endorsement;
@@ -98,8 +101,10 @@
                 "endorsement": endorsement
             });
             this.view.render();
-            expect(this.view.$(".posted-details").text().replace(/\s+/g, " ")).toMatch("endorsed less than a minute ago by " + endorsement.username);
-            return expect(this.view.$(".posted-details > a").attr('href')).toEqual("/courses/edX/999/test/discussion/forum/users/test_id");
+            expect(this.view.$(".posted-details").text().replace(/\s+/g, " "))
+                .toMatch("endorsed less than a minute ago by " + endorsement.username);
+            return expect(this.view.$(".posted-details > a").attr('href'))
+                .toEqual("/courses/edX/999/test/discussion/forum/users/test_id");
         });
         it("renders anonymous endorsement correctly for an endorsed response in a discussion thread", function () {
             var endorsement;
@@ -183,11 +188,10 @@
             return expect(endorseButton.closest(".actions-item")).toHaveClass("is-hidden");
         });
         describe("labels", function () {
-            var expectOneElement,
-                _this = this;
+            var expectOneElement;
             expectOneElement = function (view, selector, visible) {
                 var elements;
-                if (visible == null) {
+                if (typeof visible === "undefined" || visible === null) {
                     visible = true;
                 }
                 view.render();

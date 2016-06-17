@@ -1,3 +1,7 @@
+/* globals
+    DiscussionCourseSettings, DiscussionSpecHelper, DiscussionThreadEditView, DiscussionUtil,
+    DiscussionViewSpecHelper, Thread
+*/
 (function () {
     'use strict';
     describe('DiscussionThreadEditView', function () {

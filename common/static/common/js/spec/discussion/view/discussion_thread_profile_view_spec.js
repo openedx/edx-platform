@@ -1,3 +1,4 @@
+/* globals Discussion, DiscussionSpecHelper, DiscussionThreadProfileView, Thread */
 (function () {
     'use strict';
     describe("DiscussionThreadProfileView", function () {
@@ -17,7 +18,7 @@
                 created_at: "2014-09-09T20:11:08Z"
             };
             this.imageTag = '<img src="https://www.google.com.pk/images/srpr/logo11w.png">';
-            return window.MathJax = {
+            window.MathJax = {
                 Hub: {
                     Queue: function () {
                     }
@@ -55,7 +56,12 @@
             } else {
                 testText = 'Test body';
                 expectedText = 'Test body';
-                for (i = _i = 0, _ref = numberOfImages - 1; 0 <= _ref ? _i <= _ref : _i >= _ref; i = 0 <= _ref ? ++_i : --_i) {
+                // I really have no idea what it is supposed to mean - probably just iteration, but better be safe
+                for (
+                    i = _i = 0, _ref = numberOfImages - 1;
+                    0 <= _ref ? _i <= _ref : _i >= _ref;
+                    i = 0 <= _ref ? ++_i : --_i
+                ) {
                     threadData.body = threadData.body + imageTag;
                     if (i === 0) {
                         expectedHtml = expectedHtml + imageTag;
@@ -66,7 +72,8 @@
             }
             threadData.body = threadData.body + '<em>' + testText + '</em></p>';
             if (numberOfImages > 1) {
-                expectedHtml = expectedHtml + '<em>' + expectedText + '</em></p><p><em>Some images in this post have been omitted</em></p>';
+                expectedHtml = expectedHtml + '<em>' + expectedText +
+                    '</em></p><p><em>Some images in this post have been omitted</em></p>';
             } else {
                 expectedHtml = expectedHtml + '<em>' + expectedText + '</em></p>';
             }
@@ -125,15 +132,23 @@
                 _ref1 = [true, false];
                 for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
                     truncatedText = _ref1[_j];
-                    it("body with " + numImages + " images and " + (truncatedText ? "truncated" : "untruncated") + " text", function () {
-                        return checkPostWithImages(numImages, truncatedText, this.threadData, this.imageTag);
-                    });
+                    it(
+                        "body with " + numImages + " images and " + (truncatedText ? "truncated" : "untruncated") +
+                        " text",
+                        // suppressing Don't make functions within a loop.
+                        /* jshint -W083 */
+                        function () {
+                            return checkPostWithImages(numImages, truncatedText, this.threadData, this.imageTag);
+                        }
+                        /* jshint +W083 */
+                    );
                 }
             }
             return it("check the thread retrieve url", function () {
                 var thread;
                 thread = makeThread(this.threadData);
-                return expect(thread.urlFor('retrieve')).toBe('/courses/edX/999/test/discussion/forum/dummy_discussion/threads/1');
+                return expect(thread.urlFor('retrieve'))
+                    .toBe('/courses/edX/999/test/discussion/forum/dummy_discussion/threads/1');
             });
         });
     });

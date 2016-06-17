@@ -1,7 +1,12 @@
+/* global
+    Discussion, DiscussionThreadShowView, DiscussionViewSpecHelper, DiscussionSpecHelper, DiscussionThreadView,
+    DiscussionUtil, Thread, DiscussionContentView, ThreadResponseShowView
+*/
 (function () {
     'use strict';
     describe("DiscussionThreadView", function () {
-        var assertContentVisible, assertExpandedContentVisible, assertResponseCountAndPaginationCorrect, createAjaxResponseJson, createTestResponseJson, postResponse, renderWithContent, renderWithTestResponses;
+        var assertContentVisible, assertExpandedContentVisible, assertResponseCountAndPaginationCorrect,
+            createAjaxResponseJson, createTestResponseJson, postResponse, renderWithContent, renderWithTestResponses;
         beforeEach(function () {
             var deferred;
             DiscussionSpecHelper.setUpGlobals();
@@ -23,7 +28,6 @@
             return jasmine.clock().uninstall();
         });
         renderWithContent = function (view, content) {
-            var _this = this;
             $.ajax.and.callFake(function (params) {
                 params.success(createAjaxResponseJson(content, false), 'success');
                 return {
@@ -97,8 +101,7 @@
             };
         };
         postResponse = function (view, index) {
-            var responseText, testResponseJson,
-                _this = this;
+            var responseText, testResponseJson;
             testResponseJson = createTestResponseJson(index);
             responseText = testResponseJson.body;
             spyOn(view, "getWmdContent").and.returnValue(responseText);
@@ -114,8 +117,7 @@
             return view.$(".discussion-submit-post").click();
         };
         describe("closed and open Threads", function () {
-            var checkCommentForm, checkVoteDisplay, createDiscussionThreadView,
-                _this = this;
+            var checkCommentForm, checkVoteDisplay, createDiscussionThreadView;
             createDiscussionThreadView = function (originallyClosed, mode) {
                 var discussion, thread, threadData, view;
                 threadData = DiscussionViewSpecHelper.makeThreadWithProps({
@@ -133,7 +135,7 @@
                 if (mode === "inline") {
                     view.expand();
                 }
-                spyOn(DiscussionUtil, "updateWithUndo").and.callFake(function (model, updates, safeAjaxParams, errorMsg) {
+                spyOn(DiscussionUtil, "updateWithUndo").and.callFake(function (model, updates) {
                     return model.set(updates);
                 });
                 return view;
@@ -157,23 +159,29 @@
                 return expect(view.$('.display-vote').is(":visible")).toBe(!originallyClosed);
             };
             return _.each(["tab", "inline"], function (mode) {
-                it("Test that in " + mode + " mode when a closed thread is opened the comment form is displayed", function () {
-                    return checkCommentForm(true, mode);
-                });
-                it("Test that in " + mode + " mode when a open thread is closed the comment form is hidden", function () {
-                    return checkCommentForm(false, mode);
-                });
-                it("Test that in " + mode + " mode when a closed thread is opened the vote button is displayed and vote count is hidden", function () {
-                    return checkVoteDisplay(true, mode);
-                });
-                return it("Test that in " + mode + " mode when a open thread is closed the vote button is hidden and vote count is displayed", function () {
-                    return checkVoteDisplay(false, mode);
-                });
+                it(
+                    "Test that in " + mode + " mode when a closed thread is opened the comment form is displayed",
+                    function () { return checkCommentForm(true, mode); }
+                );
+                it(
+                    "Test that in " + mode + " mode when a open thread is closed the comment form is hidden",
+                    function () { return checkCommentForm(false, mode); }
+                );
+                it(
+                    "Test that in " + mode + " mode when a closed thread is opened the vote button is displayed and " +
+                    "vote count is hidden",
+                    function () { return checkVoteDisplay(true, mode); }
+                );
+                return it(
+                    "Test that in " + mode + " mode when a open thread is closed the vote button is hidden and " +
+                    "vote count is displayed",
+                    function () { return checkVoteDisplay(false, mode); }
+                );
             });
         });
         describe("tab mode", function () {
             beforeEach(function () {
-                return this.view = new DiscussionThreadView({
+                this.view = new DiscussionThreadView({
                     model: this.thread,
                     el: $("#fixture-element"),
                     mode: "tab",
@@ -186,17 +194,20 @@
                     postResponse(this.view, 1);
                     expect(this.view.$(".forum-response").length).toBe(1);
                     expect(this.view.$(".post-actions-list").find(".action-edit").parent(".is-hidden").length).toBe(1);
-                    return expect(this.view.$(".response-actions-list").find(".action-edit").parent().not(".is-hidden").length).toBe(1);
+                    return expect(this.view.$(".response-actions-list").find(".action-edit")
+                        .parent().not(".is-hidden").length).toBe(1);
                 });
                 return it("can post a second response", function () {
                     renderWithTestResponses(this.view, 1);
                     expect(this.view.$(".forum-response").length).toBe(1);
                     expect(this.view.$(".post-actions-list").find(".action-edit").parent(".is-hidden").length).toBe(1);
-                    expect(this.view.$(".response-actions-list").find(".action-edit").parent().not(".is-hidden").length).toBe(1);
+                    expect(this.view.$(".response-actions-list").find(".action-edit").parent()
+                        .not(".is-hidden").length).toBe(1);
                     postResponse(this.view, 2);
                     expect(this.view.$(".forum-response").length).toBe(2);
                     expect(this.view.$(".post-actions-list").find(".action-edit").parent(".is-hidden").length).toBe(1);
-                    return expect(this.view.$(".response-actions-list").find(".action-edit").parent().not(".is-hidden").length).toBe(2);
+                    return expect(this.view.$(".response-actions-list").find(".action-edit").parent()
+                        .not(".is-hidden").length).toBe(2);
                 });
             });
             return describe("response count and pagination", function () {
@@ -206,54 +217,68 @@
                 });
                 it("correctly render for a thread with one response", function () {
                     renderWithTestResponses(this.view, 1);
-                    return assertResponseCountAndPaginationCorrect(this.view, "1 response", "Showing all responses", null);
+                    return assertResponseCountAndPaginationCorrect(
+                        this.view, "1 response", "Showing all responses", null
+                    );
                 });
                 it("correctly render for a thread with one additional page", function () {
                     renderWithTestResponses(this.view, 1, {
                         resp_total: 2
                     });
-                    return assertResponseCountAndPaginationCorrect(this.view, "2 responses", "Showing first response", "Load all responses");
+                    return assertResponseCountAndPaginationCorrect(
+                        this.view, "2 responses", "Showing first response", "Load all responses"
+                    );
                 });
                 it("correctly render for a thread with multiple additional pages", function () {
                     renderWithTestResponses(this.view, 2, {
                         resp_total: 111
                     });
-                    return assertResponseCountAndPaginationCorrect(this.view, "111 responses", "Showing first 2 responses", "Load next 100 responses");
+                    return assertResponseCountAndPaginationCorrect(
+                        this.view, "111 responses", "Showing first 2 responses", "Load next 100 responses"
+                    );
                 });
                 return describe("on clicking the load more button", function () {
                     beforeEach(function () {
                         renderWithTestResponses(this.view, 1, {
                             resp_total: 5
                         });
-                        return assertResponseCountAndPaginationCorrect(this.view, "5 responses", "Showing first response", "Load all responses");
+                        return assertResponseCountAndPaginationCorrect(
+                            this.view, "5 responses", "Showing first response", "Load all responses"
+                        );
                     });
                     it("correctly re-render when all threads have loaded", function () {
                         renderWithTestResponses(this.view, 5, {
                             resp_total: 5
                         });
                         this.view.$el.find(".load-response-button").click();
-                        return assertResponseCountAndPaginationCorrect(this.view, "5 responses", "Showing all responses", null);
+                        return assertResponseCountAndPaginationCorrect(
+                            this.view, "5 responses", "Showing all responses", null
+                        );
                     });
                     it("correctly re-render when one page remains", function () {
                         renderWithTestResponses(this.view, 3, {
                             resp_total: 42
                         });
                         this.view.$el.find(".load-response-button").click();
-                        return assertResponseCountAndPaginationCorrect(this.view, "42 responses", "Showing first 3 responses", "Load all responses");
+                        return assertResponseCountAndPaginationCorrect(
+                            this.view, "42 responses", "Showing first 3 responses", "Load all responses"
+                        );
                     });
                     return it("correctly re-render when multiple pages remain", function () {
                         renderWithTestResponses(this.view, 3, {
                             resp_total: 111
                         });
                         this.view.$el.find(".load-response-button").click();
-                        return assertResponseCountAndPaginationCorrect(this.view, "111 responses", "Showing first 3 responses", "Load next 100 responses");
+                        return assertResponseCountAndPaginationCorrect(
+                            this.view, "111 responses", "Showing first 3 responses", "Load next 100 responses"
+                        );
                     });
                 });
             });
         });
         describe("inline mode", function () {
             beforeEach(function () {
-                return this.view = new DiscussionThreadView({
+                this.view = new DiscussionThreadView({
                     model: this.thread,
                     el: $("#fixture-element"),
                     mode: "inline",
@@ -329,7 +354,9 @@
                         resp_total: 0,
                         children: []
                     });
-                    longMaliciousBody = new Array(100).join("<script>alert('Until they think warm days will never cease');</script>\n");
+                    longMaliciousBody = new Array(100).join(
+                        "<script>alert('Until they think warm days will never cease');</script>\n"
+                    );
                     this.thread.set("body", longMaliciousBody);
                     maliciousAbbreviation = DiscussionUtil.abbreviateString(this.thread.get('body'), 140);
                     this.view.render();
@@ -366,7 +393,7 @@
             var generateContent, renderTestCase;
             beforeEach(function () {
                 this.thread.set("thread_type", "question");
-                return this.view = new DiscussionThreadView({
+                this.view = new DiscussionThreadView({
                     model: this.thread,
                     el: $("#fixture-element"),
                     mode: "tab",
@@ -386,7 +413,11 @@
                 });
                 expect(view.$(".js-marked-answer-list .discussion-response").length).toEqual(numEndorsed);
                 expect(view.$(".js-response-list .discussion-response").length).toEqual(numNonEndorsed);
-                return assertResponseCountAndPaginationCorrect(view, "" + numNonEndorsed + " " + (numEndorsed ? "other " : "") + (numNonEndorsed === 1 ? "response" : "responses"), numNonEndorsed ? "Showing all responses" : null, null);
+                return assertResponseCountAndPaginationCorrect(
+                    view, "" + numNonEndorsed + " " + (numEndorsed ? "other " : "") +
+                    (numNonEndorsed === 1 ? "response" : "responses"),
+                    numNonEndorsed ? "Showing all responses" : null, null
+                );
             };
             _.each({
                 "no": 0,
@@ -398,9 +429,11 @@
                     "one": 1,
                     "many": 5
                 }, function (numNonEndorsed, nonEndorsedDesc) {
-                    return it("renders correctly with " + endorsedDesc + " marked answer(s) and " + nonEndorsedDesc + " response(s)", function () {
-                        return renderTestCase(this.view, numEndorsed, numNonEndorsed);
-                    });
+                    it(
+                        "renders correctly with " + endorsedDesc + " marked answer(s) and " + nonEndorsedDesc +
+                        " response(s)",
+                        function () { return renderTestCase(this.view, numEndorsed, numNonEndorsed); }
+                    );
                 });
             });
             return it("handles pagination correctly", function () {
@@ -417,7 +450,9 @@
                 this.view.$el.find(".load-response-button").click();
                 expect($(".js-marked-answer-list .discussion-response").length).toEqual(3);
                 expect($(".js-response-list .discussion-response").length).toEqual(6);
-                return assertResponseCountAndPaginationCorrect(this.view, "41 other responses", "Showing first 6 responses", "Load all responses");
+                return assertResponseCountAndPaginationCorrect(
+                    this.view, "41 other responses", "Showing first 6 responses", "Load all responses"
+                );
             });
         });
         return describe("post restrictions", function () {
@@ -426,7 +461,7 @@
                     can_report: false,
                     can_vote: false
                 });
-                return this.view = new DiscussionThreadView({
+                this.view = new DiscussionThreadView({
                     model: this.thread,
                     el: $("#fixture-element"),
                     mode: "tab",

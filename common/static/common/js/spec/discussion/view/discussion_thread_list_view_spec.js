@@ -1,3 +1,7 @@
+/* globals
+    Discussion, DiscussionCourseSettings, DiscussionViewSpecHelper, DiscussionSpecHelper,
+    DiscussionThreadListView, DiscussionUtil, Thread
+*/
 (function () {
     'use strict';
     describe("DiscussionThreadListView", function () {
@@ -6,7 +10,10 @@
             var deferred;
             DiscussionSpecHelper.setUpGlobals();
             DiscussionSpecHelper.setUnderscoreFixtures();
+            // suppressing Line is too long (4272 characters!)
+            /* jshint -W101 */
             appendSetFixtures("<script type=\"text/template\" id=\"thread-list-template\">\n    <div class=\"forum-nav-header\">\n        <button type=\"button\" class=\"forum-nav-browse\" id=\"forum-nav-browse\" aria-haspopup=\"true\">\n            <span class=\"icon fa fa-bars\" aria-hidden=\"true\"></span>\n            <span class=\"sr\">Discussion topics; currently listing: </span>\n            <span class=\"forum-nav-browse-current\">All Discussions</span>\n            ▾\n        </button>\n        <form class=\"forum-nav-search\">\n            <label>\n                <span class=\"sr\">Search all posts</span>\n                <input class=\"forum-nav-search-input\" id=\"forum-nav-search\" type=\"text\" placeholder=\"Search all posts\">\n                <span class=\"icon fa fa-search\" aria-hidden=\"true\"></span>\n            </label>\n        </form>\n    </div>\n    <div class=\"forum-nav-browse-menu-wrapper\" style=\"display: none\">\n        <form class=\"forum-nav-browse-filter\">\n            <label>\n                <span class=\"sr\">Filter Topics</span>\n                <input type=\"text\" class=\"forum-nav-browse-filter-input\" placeholder=\"filter topics\">\n            </label>\n        </form>\n        <ul class=\"forum-nav-browse-menu\">\n            <li class=\"forum-nav-browse-menu-item forum-nav-browse-menu-all\">\n                <a href=\"#\" class=\"forum-nav-browse-title\">All Discussions</a>\n            </li>\n            <li class=\"forum-nav-browse-menu-item forum-nav-browse-menu-following\">\n                <a href=\"#\" class=\"forum-nav-browse-title\"><span class=\"icon fa fa-star\" aria-hidden=\"true\"></span>Posts I'm Following</a>\n            </li>\n            <li class=\"forum-nav-browse-menu-item\">\n                <a href=\"#\" class=\"forum-nav-browse-title\">Parent</a>\n                <ul class=\"forum-nav-browse-submenu\">\n                    <li class=\"forum-nav-browse-menu-item\">\n                        <a href=\"#\" class=\"forum-nav-browse-title\">Target</a>\n                        <ul class=\"forum-nav-browse-submenu\">\n                            <li\n                                class=\"forum-nav-browse-menu-item\"\n                                data-discussion-id=\"child\"\n                                data-cohorted=\"false\"\n                            >\n                                <a href=\"#\" class=\"forum-nav-browse-title\">Child</a>\n                            </li>\n                        </ul>\n                    <li\n                        class=\"forum-nav-browse-menu-item\"\n                        data-discussion-id=\"sibling\"\n                        data-cohorted=\"false\"\n                    >\n                        <a href=\"#\" class=\"forum-nav-browse-title\">Sibling</a>\n                    </li>\n                </ul>\n            </li>\n            <li\n                class=\"forum-nav-browse-menu-item\"\n                data-discussion-id=\"other\"\n                data-cohorted=\"true\"\n            >\n                <a href=\"#\" class=\"forum-nav-browse-title\">Other Category</a>\n            </li>\n        </ul>\n    </div>\n    <div class=\"forum-nav-thread-list-wrapper\" id=\"sort-filter-wrapper\" tabindex=\"-1\">\n        <div class=\"forum-nav-refine-bar\">\n            <label class=\"forum-nav-filter-main\">\n                <select class=\"forum-nav-filter-main-control\">\n                    <option value=\"all\">Show all</option>\n                    <option value=\"unread\">Unread</option>\n                    <option value=\"unanswered\">Unanswered</option>\n                    <option value=\"flagged\">Flagged</option>\n                </select>\n            </label>\n            <% if (isCohorted && isPrivilegedUser) { %>\n            <label class=\"forum-nav-filter-cohort\">\n                <span class=\"sr\">Cohort:</span>\n                <select class=\"forum-nav-filter-cohort-control\">\n                    <option value=\"\">in all cohorts</option>\n                    <option value=\"1\">Cohort1</option>\n                    <option value=\"2\">Cohort2</option>\n                </select>\n            </label>\n            <% } %>\n            <label class=\"forum-nav-sort\">\n                <select class=\"forum-nav-sort-control\">\n                    <option value=\"activity\">by recent activity</option>\n                    <option value=\"comments\">by most activity</option>\n                    <option value=\"votes\">by most votes</option>\n                </select>\n            </label>\n        </div>\n    </div>\n    <div class=\"search-alerts\"></div>\n    <ul class=\"forum-nav-thread-list\"></ul>\n</script>");
+            /* jshint +W101 */
             this.threads = [
                 DiscussionViewSpecHelper.makeThreadWithProps({
                     id: "1",
@@ -57,7 +64,6 @@
             return this.view.render();
         });
         setupAjax = function (callback) {
-            var _this = this;
             return $.ajax.and.callFake(function (params) {
                 if (callback) {
                     callback(params);
@@ -149,10 +155,14 @@
         });
         checkThreadsOrdering = function (view, sort_order, type) {
             expect(view.$el.find(".forum-nav-thread").children().length).toEqual(4);
-            expect(view.$el.find(".forum-nav-thread:nth-child(1) .forum-nav-thread-title").text()).toEqual(sort_order[0]);
-            expect(view.$el.find(".forum-nav-thread:nth-child(2) .forum-nav-thread-title").text()).toEqual(sort_order[1]);
-            expect(view.$el.find(".forum-nav-thread:nth-child(3) .forum-nav-thread-title").text()).toEqual(sort_order[2]);
-            expect(view.$el.find(".forum-nav-thread:nth-child(4) .forum-nav-thread-title").text()).toEqual(sort_order[3]);
+            expect(view.$el.find(".forum-nav-thread:nth-child(1) .forum-nav-thread-title").text())
+                .toEqual(sort_order[0]);
+            expect(view.$el.find(".forum-nav-thread:nth-child(2) .forum-nav-thread-title").text())
+                .toEqual(sort_order[1]);
+            expect(view.$el.find(".forum-nav-thread:nth-child(3) .forum-nav-thread-title").text())
+                .toEqual(sort_order[2]);
+            expect(view.$el.find(".forum-nav-thread:nth-child(4) .forum-nav-thread-title").text())
+                .toEqual(sort_order[3]);
             return expect(view.$el.find(".forum-nav-sort-control").val()).toEqual(type);
         };
         describe("thread rendering should be correct", function () {
@@ -168,8 +178,10 @@
                 view = makeView(discussion);
                 view.render();
                 checkThreadsOrdering(view, sort_order, type);
-                expect(view.$el.find(".forum-nav-thread-comments-count:visible").length).toEqual(type === "votes" ? 0 : 4);
-                expect(view.$el.find(".forum-nav-thread-votes-count:visible").length).toEqual(type === "votes" ? 4 : 0);
+                expect(view.$el.find(".forum-nav-thread-comments-count:visible").length)
+                    .toEqual(type === "votes" ? 0 : 4);
+                expect(view.$el.find(".forum-nav-thread-votes-count:visible").length)
+                    .toEqual(type === "votes" ? 4 : 0);
                 if (type === "votes") {
                     return expect(_.map(view.$el.find(".forum-nav-thread-votes-count"), function (element) {
                         return $(element).text().trim();
@@ -189,8 +201,7 @@
         describe("Sort change should be correct", function () {
             var changeSorting;
             changeSorting = function (threads, selected_type, new_type, sort_order) {
-                var discussion, sortControl, sorted_threads, view,
-                    _this = this;
+                var discussion, sortControl, sorted_threads, view;
                 discussion = new Discussion(_.map(threads, function (thread) {
                     return new Thread(thread);
                 }), {
@@ -225,7 +236,9 @@
                 return checkThreadsOrdering(view, sort_order, new_type);
             };
             it("with sort preference activity", function () {
-                return changeSorting(this.threads, "comments", "activity", ["Thread1", "Thread4", "Thread3", "Thread2"]);
+                return changeSorting(
+                    this.threads, "comments", "activity", ["Thread1", "Thread4", "Thread3", "Thread2"]
+                );
             });
             it("with sort preference votes", function () {
                 return changeSorting(this.threads, "activity", "votes", ["Thread4", "Thread1", "Thread2", "Thread3"]);
@@ -268,7 +281,6 @@
                 return spyOn(this.view, "searchForUser");
             });
             testCorrection = function (view, correctedText) {
-                var _this = this;
                 spyOn(view, "addSearchAlert");
                 $.ajax.and.callFake(function (params) {
                     params.success({
@@ -329,7 +341,6 @@
         describe("username search", function () {
             var setAjaxResults;
             it("makes correct ajax calls", function () {
-                var _this = this;
                 $.ajax.and.callFake(function (params) {
                     expect(params.data.username).toEqual("testing-username");
                     expect(params.url.path()).toEqual(DiscussionUtil.urlFor("users"));
@@ -345,7 +356,6 @@
                 return expect($.ajax).toHaveBeenCalled();
             });
             setAjaxResults = function (threadSuccess, userResult) {
-                var _this = this;
                 return $.ajax.and.callFake(function (params) {
                     if (params.data.text && threadSuccess) {
                         params.success({
@@ -566,7 +576,8 @@
                             selector: ".forum-nav-browse-menu-following",
                             cohortVisibility: false
                         }, {
-                            selector: ".forum-nav-browse-menu-item:has(.forum-nav-browse-menu-item .forum-nav-browse-menu-item)",
+                            selector:   ".forum-nav-browse-menu-item:" +
+                                        "has(.forum-nav-browse-menu-item .forum-nav-browse-menu-item)",
                             cohortVisibility: false
                         }, {
                             selector: "[data-discussion-id=child]",
@@ -577,7 +588,8 @@
                         }
                     ], function (itemInfo) {
                         _this.view.$("" + itemInfo.selector + " > .forum-nav-browse-title").click();
-                        return expect(_this.view.$(".forum-nav-filter-cohort").is(":visible")).toEqual(itemInfo.cohortVisibility);
+                        return expect(_this.view.$(".forum-nav-filter-cohort").is(":visible"))
+                            .toEqual(itemInfo.cohortVisibility);
                     });
                 });
                 testSelectionRequest = function (callback, itemText) {
@@ -592,7 +604,8 @@
                 });
                 it("should get followed threads", function () {
                     testSelectionRequest(function (params) {
-                        return expect(params.url.path()).toEqual(DiscussionUtil.urlFor("followed_threads", window.user.id));
+                        return expect(params.url.path())
+                            .toEqual(DiscussionUtil.urlFor("followed_threads", window.user.id));
                     }, "Following");
                     return expect($.ajax.calls.mostRecent().args[0].data.group_id).toBeUndefined();
                 });

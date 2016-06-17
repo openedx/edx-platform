@@ -1,3 +1,4 @@
+/* globals DiscussionSpecHelper, DiscussionContentView, Thread */
 (function () {
     'use strict';
     describe("DiscussionContentView", function () {
@@ -25,8 +26,8 @@
             return this.view.render();
         });
         it('defines the tag', function () {
-            expect($('#jasmine-fixtures')).toExist;
-            expect(this.view.tagName).toBeDefined;
+            expect($('#jasmine-fixtures')).toExist();
+            expect(this.view.tagName).toBeDefined();
             return expect(this.view.el.tagName.toLowerCase()).toBe('div');
         });
         it("defines the class", function () {

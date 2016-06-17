@@ -1,3 +1,4 @@
+/* globals DiscussionSpecHelper, ResponseCommentView, Thread, ThreadResponseView, ThreadResponseShowView */
 (function () {
     'use strict';
     describe('ThreadResponseView', function () {
@@ -72,19 +73,22 @@
                 expect(this.view.$(".comments")).toBeVisible();
                 return expect(this.view.$(".action-show-comments")).not.toBeVisible();
             });
-            it('hides comments if collapseComments is set and shows them when "show comments" link is clicked', function () {
-                this.view = new ThreadResponseView({
-                    model: this.response,
-                    el: $("#fixture-element"),
-                    collapseComments: true
-                });
-                this.view.render();
-                expect(this.view.$(".comments")).not.toBeVisible();
-                expect(this.view.$(".action-show-comments")).toBeVisible();
-                this.view.$(".action-show-comments").click();
-                expect(this.view.$(".comments")).toBeVisible();
-                return expect(this.view.$(".action-show-comments")).not.toBeVisible();
-            });
+            it(
+                'hides comments if collapseComments is set and shows them when "show comments" link is clicked',
+                function () {
+                    this.view = new ThreadResponseView({
+                        model: this.response,
+                        el: $("#fixture-element"),
+                        collapseComments: true
+                    });
+                    this.view.render();
+                    expect(this.view.$(".comments")).not.toBeVisible();
+                    expect(this.view.$(".action-show-comments")).toBeVisible();
+                    this.view.$(".action-show-comments").click();
+                    expect(this.view.$(".comments")).toBeVisible();
+                    return expect(this.view.$(".action-show-comments")).not.toBeVisible();
+                }
+            );
             return it('populates commentViews and binds events', function () {
                 this.view.createEditView();
                 spyOn(this.view, 'cancelEdit');

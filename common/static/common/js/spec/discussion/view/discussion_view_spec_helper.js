@@ -1,8 +1,11 @@
+/* globals DiscussionUtil */
 (function () {
     'use strict';
     var __indexOf = [].indexOf || function (item) {
             for (var i = 0, l = this.length; i < l; i++) {
-                if (i in this && this[i] === item) return i;
+                if (i in this && this[i] === item) {
+                    return i;
+                }
             }
             return -1;
         };
@@ -55,7 +58,8 @@
             expect(button.hasClass("is-checked")).toBe(user.voted(model));
             expect(button.attr("aria-checked")).toEqual(user.voted(model).toString());
             expect(button.find(".vote-count").text()).toMatch("^" + (model.get('votes').up_count) + " Votes?$");
-            return expect(button.find(".sr.js-sr-vote-count").text()).toMatch("^there are currently " + (model.get('votes').up_count) + " votes?$");
+            return expect(button.find(".sr.js-sr-vote-count").text())
+                .toMatch("^there are currently " + (model.get('votes').up_count) + " votes?$");
         };
 
         DiscussionViewSpecHelper.checkRenderVote = function (view, model) {
@@ -70,8 +74,7 @@
         };
 
         triggerVoteEvent = function (view, event, expectedUrl) {
-            var deferred,
-                _this = this;
+            var deferred;
             deferred = $.Deferred();
             spyOn($, "ajax").and.callFake(function (params) {
                 expect(params.url.toString()).toEqual(expectedUrl);
@@ -97,7 +100,9 @@
             user.vote(model);
             expect((_ref = model.id, __indexOf.call(user.get('upvoted_ids'), _ref) >= 0)).toBe(true);
             initialVoteCount = model.get('votes').up_count;
-            triggerVoteEvent(view, event, DiscussionUtil.urlFor("undo_vote_for_" + (model.get('type')), model.id) + "?ajax=1");
+            triggerVoteEvent(
+                view, event, DiscussionUtil.urlFor("undo_vote_for_" + (model.get('type')), model.id) + "?ajax=1"
+            );
             expect(user.get('upvoted_ids')).toEqual([]);
             return expect(model.get('votes').up_count).toEqual(initialVoteCount - 1);
         };
@@ -125,7 +130,6 @@
         };
 
         DiscussionViewSpecHelper.setNextResponseContent = function (content) {
-            var _this = this;
             return $.ajax.and.callFake(function (params) {
                 params.success({
                     "content": content
