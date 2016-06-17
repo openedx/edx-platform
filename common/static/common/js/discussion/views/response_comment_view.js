@@ -1,4 +1,4 @@
-(function (ResponseCommentEditView, DiscussionContentView, DiscussionUtil) {
+(function (ResponseCommentEditView, DiscussionContentView, DiscussionUtil, ResponseCommentShowView) {
     'use strict';
     var __hasProp = {}.hasOwnProperty,
         __extends = function (child, parent) {
@@ -158,4 +158,4 @@
         })(DiscussionContentView);
     }
 
-}).call(this, ResponseCommentEditView, DiscussionContentView, DiscussionUtil); // jshint ignore:line
+}).call(this, ResponseCommentEditView, DiscussionContentView, DiscussionUtil, ResponseCommentShowView); // jshint ignore:line
