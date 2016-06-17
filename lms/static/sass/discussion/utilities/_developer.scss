@@ -48,7 +48,7 @@ body.discussion {
         color: $white;
 
         em {
-          @extend %t-weight5;
+          @extend %t-weight5 !optional;
           font-style: italic;
         }
       }
@@ -56,7 +56,7 @@ body.discussion {
       // links to jump to users/content in alerts
       .link-jump {
         @include transition(none);
-        @extend %t-weight5;
+        @extend %t-weight5 !optional;
       }
     }
 
@@ -68,7 +68,7 @@ body.discussion {
       .control {
         @include font-size(14);
         @include transition(none);
-        @extend %t-weight5;
+        @extend %t-weight5 !optional;
         padding: ($baseline/4) ($baseline/2);
         color: $white;
 
