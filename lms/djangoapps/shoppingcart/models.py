@@ -6,6 +6,7 @@ from datetime import datetime
 from datetime import timedelta
 from decimal import Decimal
 import json
+import traceback
 import analytics
 from io import BytesIO
 from django.db.models import Q, F
@@ -37,7 +38,11 @@ from courseware.courses import get_course_by_id
 from config_models.models import ConfigurationModel
 from course_modes.models import CourseMode
 from edxmako.shortcuts import render_to_string
-from student.models import CourseEnrollment, UNENROLL_DONE
+from student.models import CourseEnrollment, UNENROLL_DONE, \
+    ENROLL_STATUS_CHANGE_UPGRADE_COMPLETE, \
+    ENROLL_STATUS_CHANGE_UPGRADE_ADD_CART, \
+    ENROLL_STATUS_CHANGE_PAID_COURSE_ADD_CART, \
+    ENROLL_STATUS_CHANGE_PAID_COURSE_COMPLETE
 from util.query import use_read_replica_if_available
 from xmodule_django.models import CourseKeyField
 from .exceptions import (
@@ -514,6 +519,9 @@ class Order(models.Model):
         OrderItems and add them as products in the event as well.
 
         """
+        log.info("_emit_order_event")
+        log.info([item.analytics_data() for item in orderitems])
+        log.info(repr(traceback.extract_stack()))
         try:
             if settings.LMS_SEGMENT_KEY:
                 tracking_context = tracker.get_tracker().resolve_context()
@@ -1586,6 +1594,10 @@ class PaidCourseRegistration(OrderItem):
         item.save()
         log.info("User {} added course registration {} to cart: order {}"
                  .format(order.user.email, course_id, order.id))
+
+        CourseEnrollment.send_signal_full(ENROLL_STATUS_CHANGE_PAID_COURSE_ADD_CART,
+                                          user=order.user, mode=item.mode, course_id=course_id,
+                                          cost=cost, currency=currency)
         return item
 
     def purchased_callback(self):
@@ -1606,6 +1618,8 @@ class PaidCourseRegistration(OrderItem):
 
         log.info("Enrolled {0} in paid course {1}, paid ${2}"
                  .format(self.user.email, self.course_id, self.line_cost))
+        self.course_enrollment.send_signal(ENROLL_STATUS_CHANGE_PAID_COURSE_COMPLETE,
+                                           cost=self.line_cost, currency=self.currency)
 
     def generate_receipt_instructions(self):
         """
@@ -1976,6 +1990,9 @@ class CertificateItem(OrderItem):
         order.currency = currency
         order.save()
         item.save()
+
+        # signal course added to cart
+        course_enrollment.send_signal(ENROLL_STATUS_CHANGE_UPGRADE_ADD_CART, cost=cost, currency=currency)
         return item
 
     def purchased_callback(self):
@@ -1984,6 +2001,8 @@ class CertificateItem(OrderItem):
         """
         self.course_enrollment.change_mode(self.mode)
         self.course_enrollment.activate()
+        self.course_enrollment.send_signal(ENROLL_STATUS_CHANGE_UPGRADE_COMPLETE,
+                                           cost=self.unit_cost, currency=self.currency)
 
     def additional_instruction_text(self):
         verification_reminder = ""

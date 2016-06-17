@@ -3,11 +3,11 @@ import logging
 import ddt
 
 from django.test import TestCase
-from django.test.utils import override_settings
+from django.contrib.auth.models import AnonymousUser
 from mock import patch
 from util.json_request import JsonResponse
 
-from email_marketing.signals import handle_unenroll_done, \
+from email_marketing.signals import handle_enroll_status_change, \
     email_marketing_register_user, \
     email_marketing_user_field_changed, \
     add_email_marketing_cookies
@@ -15,6 +15,13 @@ from email_marketing.tasks import update_user, update_user_email
 from email_marketing.models import EmailMarketingConfiguration
 from django.test.client import RequestFactory
 from student.tests.factories import UserFactory, UserProfileFactory
+from request_cache.middleware import RequestCache
+from student.models import ENROLL_STATUS_CHANGE_ENROLL, \
+    ENROLL_STATUS_CHANGE_UNENROLL, \
+    ENROLL_STATUS_CHANGE_UPGRADE_ADD_CART, \
+    ENROLL_STATUS_CHANGE_UPGRADE_COMPLETE, \
+    ENROLL_STATUS_CHANGE_PAID_COURSE_ADD_CART, \
+    ENROLL_STATUS_CHANGE_PAID_COURSE_COMPLETE
 
 from sailthru.sailthru_client import SailthruClient
 from sailthru.sailthru_response import SailthruResponse
@@ -111,7 +118,7 @@ class EmailMarketingTests(TestCase):
         self.assertEquals(userparms['lists']['new list'], 1)
 
     @patch('email_marketing.tasks.SailthruClient.api_post')
-    def test_activation(self, mock_sailthru):
+    def test_user_activation(self, mock_sailthru):
         """
         test send of activation template
         """
@@ -125,7 +132,7 @@ class EmailMarketingTests(TestCase):
 
     @patch('email_marketing.tasks.log.error')
     @patch('email_marketing.tasks.SailthruClient.api_post')
-    def test_error_logging(self, mock_sailthru, mock_log_error):
+    def test_update_user_error_logging(self, mock_sailthru, mock_log_error):
         """
         Ensure that error returned from Sailthru api is logged
         """
@@ -135,7 +142,7 @@ class EmailMarketingTests(TestCase):
 
     @patch('email_marketing.tasks.log.error')
     @patch('email_marketing.tasks.SailthruClient.api_post')
-    def test_just_return(self, mock_sailthru, mock_log_error):
+    def test_just_return_tasks(self, mock_sailthru, mock_log_error):
         """
         Ensure that disabling Sailthru just returns
         """
@@ -147,6 +154,54 @@ class EmailMarketingTests(TestCase):
         self.assertFalse(mock_log_error.called)
         self.assertFalse(mock_sailthru.called)
         update_email_marketing_config(enabled=True)
+
+    @patch('email_marketing.signals.log.error')
+    def test_just_return_signals(self, mock_log_error):
+        """
+        Ensure that disabling Sailthru just returns
+        """
+        update_email_marketing_config(enabled=False)
+        handle_enroll_status_change(None)
+        self.assertFalse(mock_log_error.called)
+        add_email_marketing_cookies(None)
+        self.assertFalse(mock_log_error.called)
+        email_marketing_register_user(None)
+        self.assertFalse(mock_log_error.called)
+        update_email_marketing_config(enabled=True)
+
+        # test anonymous users
+        anon = AnonymousUser()
+        email_marketing_register_user(None, user=anon)
+        self.assertFalse(mock_log_error.called)
+        email_marketing_user_field_changed(None, user=anon)
+        self.assertFalse(mock_log_error.called)
+
+    @patch('email_marketing.signals.RequestCache.get_current_request')
+    @patch('lms.djangoapps.email_marketing.tasks.update_course_enrollment.delay')
+    def test_handle_enroll_status_change(self, mock_update_course_enrollment, mock_get_current_request):
+        """
+        Test that the enroll status change signal handler properly calls the task routine
+        """
+        # should just return if no current request found
+        mock_get_current_request.return_value = None
+        handle_enroll_status_change(None)
+        self.assertFalse(mock_update_course_enrollment.called)
+
+        # now test with current request
+        mock_get_current_request.return_value = self.request
+        self.request.COOKIES['sailthru_bid'] = 'cookie_bid'
+        handle_enroll_status_change(None, event=ENROLL_STATUS_CHANGE_ENROLL,
+                                    user=self.user,
+                                    mode='audit', course_id='course:12345', cost=None, currency=None)
+        self.assertTrue(mock_update_course_enrollment.called)
+        mock_update_course_enrollment.assert_called_with(TEST_EMAIL,
+                                                         'http://testserver/courses/course:12345/info',
+                                                         ENROLL_STATUS_CHANGE_ENROLL,
+                                                         'audit',
+                                                         course_id='course:12345',
+                                                         currency=None,
+                                                         message_id='cookie_bid',
+                                                         unit_cost=None)
 
     @patch('email_marketing.tasks.SailthruClient.api_post')
     def test_change_email(self, mock_sailthru):

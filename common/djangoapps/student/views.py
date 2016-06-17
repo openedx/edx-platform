@@ -111,7 +111,7 @@ from student.helpers import (
     DISABLE_UNENROLL_CERT_STATES,
 )
 from student.cookies import set_logged_in_cookies, delete_logged_in_cookies
-from student.models import anonymous_id_for_user, UserAttribute
+from student.models import anonymous_id_for_user, UserAttribute, ENROLL_STATUS_CHANGE_ENROLL
 from shoppingcart.models import DonationConfiguration, CourseRegistrationCode
 
 from embargo import api as embargo_api
@@ -1064,7 +1064,8 @@ def change_enrollment(request, check_access=True):
             try:
                 enroll_mode = CourseMode.auto_enroll_mode(course_id, available_modes)
                 if enroll_mode:
-                    CourseEnrollment.enroll(user, course_id, check_access=check_access, mode=enroll_mode)
+                    enrollment = CourseEnrollment.enroll(user, course_id, check_access=check_access, mode=enroll_mode)
+                    enrollment.send_signal(ENROLL_STATUS_CHANGE_ENROLL)
             except Exception:  # pylint: disable=broad-except
                 return HttpResponseBadRequest(_("Could not enroll"))
 

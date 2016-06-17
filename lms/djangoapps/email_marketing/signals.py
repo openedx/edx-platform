@@ -6,12 +6,14 @@ import datetime
 
 from django.dispatch import receiver
 
-from student.models import UNENROLL_DONE
+from student.models import ENROLL_STATUS_CHANGE
+from shoppingcart.views import EVENT_NAME_USER_UPGRADED
 from student.cookies import CREATE_LOGON_COOKIE
 from student.views import REGISTER_USER
 from email_marketing.models import EmailMarketingConfiguration
 from util.model_utils import USER_FIELD_CHANGED
-from lms.djangoapps.email_marketing.tasks import update_user, update_user_email
+from lms.djangoapps.email_marketing.tasks import update_user, update_user_email, update_course_enrollment
+from request_cache.middleware import RequestCache
 
 from sailthru.sailthru_client import SailthruClient
 from sailthru.sailthru_error import SailthruClientError
@@ -24,17 +26,42 @@ CHANGED_FIELDNAMES = ['username', 'is_active', 'name', 'gender', 'education',
                       'country']
 
 
-@receiver(UNENROLL_DONE)
-def handle_unenroll_done(sender, course_enrollment=None, skip_refund=False,
+@receiver(ENROLL_STATUS_CHANGE)
+def handle_enroll_status_change(sender, event=None, user=None, mode=None, course_id=None, cost=None, currency=None,
                          **kwargs):  # pylint: disable=unused-argument
     """
-    Signal receiver for unenrollments
+    Signal receiver for enroll/unenroll/purchase events
     """
     email_config = EmailMarketingConfiguration.current()
-    if not email_config.enabled:
+    if not email_config.enabled or not event or not user or not mode or not course_id:
         return
 
-    # TBD
+    request = RequestCache.get_current_request()
+    if not request:
+        return
+
+    log.info("handle_enroll_status_change: event: %s Mode: %s  course_id:  %s", event, mode, course_id)
+    log.info("cost: %s currency: %s", cost, currency)
+
+    # figure out course url
+    course_url = _build_course_url(request, course_id)
+
+    # pass event to email_marketing.tasks
+    update_course_enrollment.delay(user.email, course_url, event, mode,
+                                   unit_cost=cost, course_id=course_id, currency=currency,
+                                   message_id=request.COOKIES.get('sailthru_bid'))
+
+
+def _build_course_url(request, course_id):
+    host=request.get_host()
+    # hack for testing
+    if host.startswith('localhost'):
+        host = 'courses.edx.org'
+    return '{scheme}://{host}/courses/{course}/info'.format(
+        scheme=request.scheme,
+        host=host,
+        course=course_id
+    )
 
 
 @receiver(CREATE_LOGON_COOKIE)
@@ -93,7 +120,6 @@ def email_marketing_register_user(sender, user=None, profile=None,
         profile: The user profile for the user being changed
         kwargs: Not used
     """
-    log.info("Receiving REGISTER_USER")
     email_config = EmailMarketingConfiguration.current()
     if not email_config.enabled:
         return

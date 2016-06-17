@@ -50,8 +50,48 @@ class EmailMarketingConfiguration(ConfigurationModel):
 
     sailthru_activation_template = models.fields.CharField(
         max_length=20,
+        blank=True,
         help_text=_(
             "Sailthru template to use on activation send. "
+        )
+    )
+
+    sailthru_abandoned_cart_template = models.fields.CharField(
+        max_length=20,
+        blank=True,
+        help_text=_(
+            "Sailthru template to use on abandoned cart reminder. "
+        )
+    )
+
+    sailthru_abandoned_cart_delay = models.fields.IntegerField(
+        default=60,
+        help_text=_(
+            "Sailthru minutes to wait before sending abandoned cart message."
+        )
+    )
+
+    sailthru_enroll_template = models.fields.CharField(
+        max_length=20,
+        blank=True,
+        help_text=_(
+            "Sailthru send template to use on enrolling for audit. "
+        )
+    )
+
+    sailthru_upgrade_template = models.fields.CharField(
+        max_length=20,
+        blank=True,
+        help_text=_(
+            "Sailthru send template to use on upgrading a course. "
+        )
+    )
+
+    sailthru_purchase_template = models.fields.CharField(
+        max_length=20,
+        blank=True,
+        help_text=_(
+            "Sailthru send template to use on purchasing a course seat. "
         )
     )
 
