@@ -41,7 +41,7 @@ def get_id_token(user):
     }
     secret_key = helpers.get_value('JWT_AUTH', settings.JWT_AUTH)['JWT_SECRET_KEY']
 
-    return jwt.encode(payload, secret_key)
+    return jwt.encode(payload, secret_key).decode('utf-8')
 
 
 def course_discovery_api_client(user):
