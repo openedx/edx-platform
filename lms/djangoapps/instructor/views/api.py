@@ -215,7 +215,7 @@ def require_global_staff(func):
         else:
             return HttpResponseForbidden(
                 u"Must be {platform_name} staff to perform this action.".format(
-                    platform_name=settings.PLATFORM_NAME
+                    platform_name=theming_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME)
                 )
             )
     return wrapped

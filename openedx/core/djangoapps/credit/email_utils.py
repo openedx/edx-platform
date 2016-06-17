@@ -73,7 +73,7 @@ def send_credit_notifications(username, course_key):
     providers_string = make_providers_strings(providers_names)
     context = {
         'full_name': user.get_full_name(),
-        'platform_name': settings.PLATFORM_NAME,
+        'platform_name': theming_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),
         'course_name': course_display_name,
         'branded_logo': logo_image_id,
         'dashboard_link': dashboard_link,
