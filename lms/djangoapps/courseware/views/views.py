@@ -1090,7 +1090,7 @@ def generate_user_cert(request, course_id):
         log.info(u"Anon user trying to generate certificate for %s", course_id)
         return HttpResponseBadRequest(
             _('You must be signed in to {platform_name} to create a certificate.').format(
-                platform_name=settings.PLATFORM_NAME
+                platform_name=theming_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME)
             )
         )
 
@@ -1206,7 +1206,7 @@ FINANCIAL_ASSISTANCE_HEADER = _(
     ' financial assistance program.'
 ).format(
     percent_sign="%",
-    platform_name=settings.PLATFORM_NAME
+    platform_name=theming_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME)
 ).split('\n')
 
 
@@ -1326,7 +1326,7 @@ def financial_assistance_form(request):
         'student_faq_url': marketing_link('FAQ'),
         'dashboard_url': reverse('dashboard'),
         'account_settings_url': reverse('account_settings'),
-        'platform_name': settings.PLATFORM_NAME,
+        'platform_name': theming_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),
         'user_details': {
             'email': user.email,
             'username': user.username,
