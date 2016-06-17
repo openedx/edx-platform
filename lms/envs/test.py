@@ -585,3 +585,5 @@ TransformerRegistry.USE_PLUGIN_MANAGER = False
 # Set the default Oauth2 Provider Model so that migrations can run in
 # verbose mode
 OAUTH2_PROVIDER_APPLICATION_MODEL = 'oauth2_provider.Application'
+
+COURSE_CATALOG_API_URL = 'https://catalog.example.com/api/v1'
