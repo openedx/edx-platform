@@ -155,7 +155,7 @@ class BokChoyTestSuite(TestSuite):
         sh("{}/scripts/reset-test-db.sh".format(Env.REPO_ROOT))
 
         if not self.fasttest:
-            self.generate_optimized_static_assets()
+            self.generate_optimized_static_assets(log_dir=self.log_dir)
 
         # Clear any test data already in Mongo or MySQLand invalidate
         # the cache
