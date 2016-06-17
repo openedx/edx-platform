@@ -1,10 +1,6 @@
 /* global $$course_id, Content, Discussion, DiscussionRouter, DiscussionCourseSettings,
           DiscussionUser, DiscussionUserProfileView, DiscussionUtil */
-(function (
-    $$course_id,
-    Content, Discussion, DiscussionCourseSettings, DiscussionRouter,
-    DiscussionUser, DiscussionUserProfileView, DiscussionUtil
-) {
+(function () {
     'use strict';
     var DiscussionApp, DiscussionProfileApp;
 
@@ -77,9 +73,4 @@
         });
     }
 
-}).call(
-    this,
-    this.$$course_id,
-    this.Content, this.Discussion, this.DiscussionCourseSettings, this.DiscussionRouter,
-    this.DiscussionUser, this.DiscussionUserProfileView, this.DiscussionUtil
-);
+}).call(window);

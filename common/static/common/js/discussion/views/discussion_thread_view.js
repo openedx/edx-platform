@@ -1,7 +1,4 @@
-(function (
-    Content, Comments, DiscussionContentView, DiscussionThreadEditView, DiscussionThreadShowView, DiscussionUtil,
-    ThreadResponseView
-) {
+(function () {
     'use strict';
     var __hasProp = {}.hasOwnProperty,
         __extends = function (child, parent) {
@@ -101,7 +98,7 @@
             };
 
             DiscussionThreadView.prototype.rerender = function () {
-                if (this.showView !== null) {
+                if (this.showView) {
                     this.showView.undelegateEvents();
                 }
                 this.undelegateEvents();
@@ -209,7 +206,7 @@
             };
 
             DiscussionThreadView.prototype.cleanup = function () {
-                if (this.responsesRequest !== null) {
+                if (this.responsesRequest) {
                     return this.responsesRequest.abort();
                 }
             };
@@ -413,7 +410,7 @@
             };
 
             DiscussionThreadView.prototype.createEditView = function () {
-                if (this.showView !== null) {
+                if (this.showView) {
                     this.showView.undelegateEvents();
                     this.showView.$el.empty();
                     this.showView = null;
@@ -485,7 +482,4 @@
         })(DiscussionContentView);
     }
 
-}).call(this,
-    this.Content, this.Comments, this.DiscussionContentView, this.DiscussionThreadEditView, // jshint ignore:line 
-    this.DiscussionThreadShowView, this.DiscussionUtil, this.ThreadResponseView // jshint ignore:line
-);
+}).call(window);

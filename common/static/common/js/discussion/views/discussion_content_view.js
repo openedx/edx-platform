@@ -1,4 +1,4 @@
-(function (DiscussionUtil) {
+(function () {
     'use strict';
     var __hasProp = {}.hasOwnProperty,
         __extends = function (child, parent) {
@@ -516,4 +516,4 @@
         }).call(this, this.DiscussionContentView);
     }
 
-}).call(this, this.DiscussionUtil); // jshint ignore:line
+}).call(window);

@@ -1,4 +1,4 @@
-(function (DiscussionUtil) {
+(function () {
     'use strict';
 
     var __hasProp = {}.hasOwnProperty;
@@ -120,7 +120,7 @@
                 var userId;
                 Content.addContent(this.id, this);
                 userId = this.get('user_id');
-                if (userId !== null) {
+                if (userId) {
                     this.set('staff_authored', DiscussionUtil.isStaff(userId));
                     this.set('community_ta_authored', DiscussionUtil.isTA(userId));
                 } else {
@@ -432,4 +432,4 @@
         })(Backbone.Collection);
     }
 
-}).call(this, this.DiscussionUtil); // jshint ignore:line
+}).call(window);

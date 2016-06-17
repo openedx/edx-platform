@@ -1,7 +1,4 @@
-(function (
-    Comments, DiscussionContentView, DiscussionUtil, ResponseCommentView,
-    ThreadResponseEditView, ThreadResponseShowView
-) {
+(function () {
     'use strict';
     var __hasProp = {}.hasOwnProperty,
         __extends = function (child, parent) {
@@ -164,7 +161,7 @@
                     this.$el.find(".comments .new-comment").before(view.el);
                 }
                 view.bind("comment:edit", function (event) {
-                    if (_this.editView !== null) {
+                    if (_this.editView) {
                         _this.cancelEdit(event);
                     }
                     _this.cancelCommentEdits();
@@ -234,10 +231,10 @@
             };
 
             ThreadResponseView.prototype.createEditView = function () {
-                if (this.showView !== null) {
+                if (this.showView) {
                     this.showView.$el.empty();
                 }
-                if (this.editView !== null) {
+                if (this.editView) {
                     this.editView.model = this.model;
                 } else {
                     this.editView = new ThreadResponseEditView({
@@ -275,10 +272,10 @@
             ThreadResponseView.prototype.createShowView = function () {
                 var _this = this;
 
-                if (this.editView !== null) {
+                if (this.editView) {
                     this.editView.$el.empty();
                 }
-                if (this.showView !== null) {
+                if (this.showView) {
                     this.showView.model = this.model;
                 } else {
                     this.showView = new ThreadResponseShowView({
@@ -343,7 +340,4 @@
         })(DiscussionContentView);
     }
 
-}).call(this,
-    this.Comments, this.DiscussionContentView, this.DiscussionUtil, this.ResponseCommentView, // jshint ignore:line
-    this.ThreadResponseEditView, this.ThreadResponseShowView // jshint ignore:line
-);
+}).call(window);

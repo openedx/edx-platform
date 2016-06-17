@@ -1,4 +1,4 @@
-(function (Content, Discussion, DiscussionUtil) {
+(function () {
     'use strict';
     var __hasProp = {}.hasOwnProperty,
         __extends = function (child, parent) {
@@ -340,7 +340,8 @@
                             options.group_id = this.group_id;
                         }
                 }
-                lastThread = (_ref = this.collection.last()) !== null ? _ref.get('id') : void 0;
+                _ref = this.collection.last()
+                lastThread = _ref ? _ref.get('id') : void 0;
                 if (lastThread) {
                     this.once("threads:rendered", function () {
                         var classSelector =
@@ -350,8 +351,8 @@
                     });
                 } else {
                     this.once("threads:rendered", function () {
-                        var _ref1;
-                        return (_ref1 = $(".forum-nav-thread-link").first()) !== null ? _ref1.focus() : void 0;
+                        var _ref1 = $(".forum-nav-thread-link").first();
+                        return _ref1 ? _ref1.focus() : void 0;
                     });
                 }
                 error = function () {
@@ -606,7 +607,7 @@
                         _this.collection.reset(response.discussion_data);
                         Content.loadContentInfos(response.annotated_content_info);
                         _this.displayedCollection.reset(_this.collection.models);
-                        if (callback !== null) {
+                        if (callback) {
                             return callback();
                         }
                     }
@@ -787,4 +788,4 @@
         }).call(this, Backbone.View);
     }
 
-}).call(this, this.Content, this.Discussion, this.DiscussionUtil); // jshint ignore:line
+}).call(window);

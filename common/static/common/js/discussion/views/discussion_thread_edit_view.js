@@ -1,4 +1,4 @@
-(function (Backbone, DiscussionUtil, DiscussionTopicMenuView) {
+(function () {
     'use strict';
     if (Backbone) {
         this.DiscussionThreadEditView = Backbone.View.extend({
@@ -109,4 +109,4 @@
             }
         });
     }
-}).call(this, this.Backbone, this.DiscussionUtil, this.DiscussionTopicMenuView); // jshint ignore:line
+}).call(window); // jshint ignore:line

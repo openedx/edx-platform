@@ -1,4 +1,4 @@
-(function (ResponseCommentEditView, DiscussionContentView, DiscussionUtil, ResponseCommentShowView) {
+(function () {
     'use strict';
     var __hasProp = {}.hasOwnProperty,
         __extends = function (child, parent) {
@@ -62,7 +62,7 @@
 
             ResponseCommentView.prototype.renderShowView = function () {
                 if (this.showView === null) {
-                    if (this.editView !== null) {
+                    if (this.editView) {
                         this.editView.undelegateEvents();
                         this.editView.$el.empty();
                         this.editView = null;
@@ -78,7 +78,7 @@
 
             ResponseCommentView.prototype.renderEditView = function () {
                 if (this.editView === null) {
-                    if (this.showView !== null) {
+                    if (this.showView) {
                         this.showView.undelegateEvents();
                         this.showView.$el.empty();
                         this.showView = null;
@@ -158,6 +158,4 @@
         })(DiscussionContentView);
     }
 
-}).call(this,
-    this.ResponseCommentEditView, this.DiscussionContentView, this.DiscussionUtil, this.ResponseCommentShowView
-); // jshint ignore:line
+}).call(window);

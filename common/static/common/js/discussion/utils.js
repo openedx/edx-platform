@@ -1,4 +1,4 @@
-(function ($$course_id, Content, URI, Markdown) {
+(function () {
     'use strict';
     this.DiscussionUtil = (function () {
 
@@ -30,7 +30,7 @@
         DiscussionUtil.isStaff = function (user_id) {
             var staff;
             if (user_id === null) {
-                user_id = this.user !== null ? this.user.id : void 0;
+                user_id = this.user ? this.user.id : void 0;
             }
             staff = _.union(this.roleIds.Moderator, this.roleIds.Administrator);
             return _.include(staff, parseInt(user_id));
@@ -39,7 +39,7 @@
         DiscussionUtil.isTA = function (user_id) {
             var ta;
             if (user_id === null) {
-                user_id = this.user !== null ? this.user.id : void 0;
+                user_id = this.user ? this.user.id : void 0;
             }
             ta = _.union(this.roleIds['Community TA']);
             return _.include(ta, parseInt(user_id));
@@ -198,7 +198,7 @@
                     $elem.attr("disabled", "disabled");
                 }
                 if (params.$loading) {
-                    if (params.loadingCallback !== null) {
+                    if (params.loadingCallback) {
                         return params.loadingCallback.apply(params.$loading);
                     } else {
                         return _this.showLoadingIndicator($(params.$loading), params.takeFocus);
@@ -220,7 +220,7 @@
                     $elem.removeAttr("disabled");
                 }
                 if (params.$loading) {
-                    if (params.loadedCallback !== null) {
+                    if (params.loadedCallback) {
                         return params.loadedCallback.apply(params.$loading);
                     } else {
                         return _this.hideLoadingIndicator();
@@ -269,7 +269,7 @@
                 errorsField.empty().show();
                 if (xhr.status === 400) {
                     response = JSON.parse(xhr.responseText);
-                    if ((response.errors !== null) && response.errors.length > 0) {
+                    if (response.errors) {
                         _ref = response.errors;
                         _results = [];
                         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
@@ -323,7 +323,7 @@
             };
             editor = Markdown.makeWmdEditor(elem, appended_id, imageUploadUrl, _processor(this));
             this.wmdEditors["" + cls_identifier + "-" + id] = editor;
-            if (placeholder !== null) {
+            if (placeholder) {
                 elem.find("#wmd-input" + appended_id).attr('placeholder', placeholder);
             }
             return editor;
@@ -487,4 +487,4 @@
 
     }).call(this);
 
-}).call(this, this.$$course_id, this.Content, URI, Markdown); // jshint ignore:line
+}).call(window);

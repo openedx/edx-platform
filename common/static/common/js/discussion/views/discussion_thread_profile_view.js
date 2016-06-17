@@ -1,4 +1,4 @@
-(function (DiscussionUtil, MathJax) {
+(function () {
     'use strict';
     var __hasProp = {}.hasOwnProperty,
         __extends = function (child, parent) {
@@ -68,4 +68,4 @@
         })(Backbone.View);
     }
 
-}).call(this, this.DiscussionUtil, this.MathJax); // jshint ignore:line
+}).call(window);

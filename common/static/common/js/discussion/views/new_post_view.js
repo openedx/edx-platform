@@ -1,4 +1,4 @@
-(function (DiscussionUtil, DiscussionTopicMenuView, Thread) {
+(function () {
     'use strict';
     var __hasProp = {}.hasOwnProperty,
         __extends = function (child, parent) {
@@ -191,4 +191,4 @@
         })(Backbone.View);
     }
 
-}).call(this, this.DiscussionUtil, this.DiscussionTopicMenuView, this.Thread); // jshint ignore:line
+}).call(window);

@@ -1,9 +1,6 @@
 /* globals Discussion, DiscussionUtil, DiscussionUser, DiscussionCourseSettings,  DiscussionThreadView, Content,
 NewPostView */
-(function (
-    Discussion,
-    DiscussionUtil, DiscussionUser, DiscussionCourseSettings, DiscussionThreadView, Content, NewPostView
-) {
+(function () {
     'use strict';
     var __hasProp = {}.hasOwnProperty,
         __extends = function (child, parent) {
@@ -266,8 +263,4 @@ NewPostView */
         })(Backbone.View);
     }
 
-}).call(
-    this,
-    this.Discussion, this.DiscussionUtil, this.DiscussionUser, this.DiscussionCourseSettings,
-    this.DiscussionThreadView, this.Content, this.NewPostView
-);
+}).call(window);

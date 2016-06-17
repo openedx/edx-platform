@@ -1,4 +1,4 @@
-(function (Thread, DiscussionUtil, Content) {
+(function () {
     'use strict';
     var __hasProp = {}.hasOwnProperty,
         __extends = function (child, parent) {
@@ -30,7 +30,7 @@
 
             Discussion.prototype.initialize = function (models, options) {
                 var _this = this;
-                if (options === null) {
+                if (!options) {
                     options = {};
                 }
                 this.pages = options.pages || 1;
@@ -218,4 +218,4 @@
         })(Backbone.Collection);
     }
 
-}).call(this, this.Thread, this.DiscussionUtil, this.Content); // jshint ignore:line
+}).call(window);

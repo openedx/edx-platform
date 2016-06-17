@@ -1,4 +1,4 @@
-(function (DiscussionThreadListView, DiscussionThreadView, DiscussionUtil, NewPostView) {
+(function () {
     'use strict';
     var __hasProp = {}.hasOwnProperty,
         __extends = function (child, parent) {
@@ -163,4 +163,4 @@
         })(Backbone.Router);
     }
 
-}).call(this, this.DiscussionThreadListView, this.DiscussionThreadView, this.DiscussionUtil, this.NewPostView); // jshint ignore:line
+}).call(window); // jshint ignore:line
