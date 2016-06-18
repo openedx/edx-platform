@@ -211,7 +211,7 @@ To run a single test format the command like this.
 The ``lms`` suite of tests runs concurrently, and with randomized order, by default.
 You can override these by using ``--no-randomize`` to disable randomization,
 and ``--processes=N`` to control how many tests will run concurrently (``0`` will
-disable concurrency). For example:
+disable concurrency, and is required to break when debugging). For example:
 
 ::
     # This will run all tests in the order that they appear in their files, serially
