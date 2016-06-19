@@ -48,6 +48,24 @@ class TestManageUserCommand(TestCase):
         call_command('manage_user', TEST_USERNAME, TEST_EMAIL, '--remove')
         self.assertEqual([], list(User.objects.all()))
 
+    def test_unusable_password(self):
+        """
+        Ensures that a user's password is set to an unusable_password.
+        """
+        user = User.objects.create(username=TEST_USERNAME, email=TEST_EMAIL)
+        self.assertEqual([(TEST_USERNAME, TEST_EMAIL)], [(u.username, u.email) for u in User.objects.all()])
+        user.set_password(User.objects.make_random_password())
+        user.save()
+        self.assertTrue(user.has_usable_password())
+        call_command('manage_user', TEST_USERNAME, TEST_EMAIL, '--unusable-password')
+        user = User.objects.get(username=TEST_USERNAME, email=TEST_EMAIL)
+        self.assertFalse(user.has_usable_password())
+
+        # check idempotency
+        call_command('manage_user', TEST_USERNAME, TEST_EMAIL, '--unusable-password')
+        self.assertFalse(user.has_usable_password())
+
+
     def test_wrong_email(self):
         """
         Ensure that the operation is aborted if the username matches an
