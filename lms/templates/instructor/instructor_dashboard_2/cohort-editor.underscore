@@ -9,7 +9,7 @@
     <div class="cohort-management-group-add tab-content tab-content-manage_students" tabindex="-1">
         <form action="" method="post" id="cohort-management-group-add-form" class="cohort-management-group-add-form">
 
-            <h4 class="form-title"><%- gettext('Add students to this cohort') %></h4>
+            <h4 class="hd hd-3 form-title"><%- gettext('Add students to this cohort') %></h4>
 
             <div class="form-introduction">
                 <p><%- gettext('Note: Students can be in only one cohort. Adding students to this group overrides any previous group assignment.') %></p>

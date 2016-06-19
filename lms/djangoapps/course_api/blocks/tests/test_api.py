@@ -4,7 +4,7 @@ Tests for Blocks api.py
 
 from django.test.client import RequestFactory
 
-from course_blocks.tests.helpers import EnableTransformerRegistryMixin
+from openedx.core.djangoapps.content.block_structure.tests.helpers import EnableTransformerRegistryMixin
 from student.tests.factories import UserFactory
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase

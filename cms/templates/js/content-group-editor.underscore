@@ -20,7 +20,7 @@
         </fieldset>
         <% if (!_.isEmpty(usage)) { %>
             <div class="wrapper-group-configuration-validation usage-validation">
-                <i class="icon fa fa-warning"></i>
+                <span class="icon fa fa-warning" aria-hidden="true"></span>
                 <p class="group-configuration-validation-text">
                     <%- gettext('This content group is used in one or more units.') %>
                 </p>

@@ -13,7 +13,14 @@ from django.db import connection, IntegrityError
 from django.db.transaction import atomic, TransactionManagementError
 from django.test import TestCase, TransactionTestCase
 
-from util.db import commit_on_success, generate_int_id, outer_atomic, NoOpMigrationModules
+from util.db import (
+    commit_on_success, enable_named_outer_atomic, outer_atomic, generate_int_id, NoOpMigrationModules
+)
+
+
+def do_nothing():
+    """Just return."""
+    return
 
 
 @ddt.ddt
@@ -88,13 +95,8 @@ class TransactionManagersTestCase(TransactionTestCase):
         Test that outer_atomic raises an error if it is nested inside
         another atomic.
         """
-
         if connection.vendor != 'mysql':
             raise unittest.SkipTest('Only works on MySQL.')
-
-        def do_nothing():
-            """Just return."""
-            return
 
         outer_atomic()(do_nothing)()
 
@@ -123,10 +125,6 @@ class TransactionManagersTestCase(TransactionTestCase):
         if connection.vendor != 'mysql':
             raise unittest.SkipTest('Only works on MySQL.')
 
-        def do_nothing():
-            """Just return."""
-            return
-
         commit_on_success(read_committed=True)(do_nothing)()
 
         with self.assertRaisesRegexp(TransactionManagementError, 'Cannot change isolation level when nested.'):
@@ -136,6 +134,53 @@ class TransactionManagersTestCase(TransactionTestCase):
         with self.assertRaisesRegexp(TransactionManagementError, 'Cannot be inside an atomic block.'):
             with atomic():
                 commit_on_success(read_committed=True)(do_nothing)()
+
+    def test_named_outer_atomic_nesting(self):
+        """
+        Test that a named outer_atomic raises an error only if nested in
+        enable_named_outer_atomic and inside another atomic.
+        """
+        if connection.vendor != 'mysql':
+            raise unittest.SkipTest('Only works on MySQL.')
+
+        outer_atomic(name='abc')(do_nothing)()
+
+        with atomic():
+            outer_atomic(name='abc')(do_nothing)()
+
+        with enable_named_outer_atomic('abc'):
+
+            outer_atomic(name='abc')(do_nothing)()  # Not nested.
+
+            with atomic():
+                outer_atomic(name='pqr')(do_nothing)()  # Not enabled.
+
+            with self.assertRaisesRegexp(TransactionManagementError, 'Cannot be inside an atomic block.'):
+                with atomic():
+                    outer_atomic(name='abc')(do_nothing)()
+
+        with enable_named_outer_atomic('abc', 'def'):
+
+            outer_atomic(name='def')(do_nothing)()  # Not nested.
+
+            with atomic():
+                outer_atomic(name='pqr')(do_nothing)()  # Not enabled.
+
+            with self.assertRaisesRegexp(TransactionManagementError, 'Cannot be inside an atomic block.'):
+                with atomic():
+                    outer_atomic(name='def')(do_nothing)()
+
+            with self.assertRaisesRegexp(TransactionManagementError, 'Cannot be inside an atomic block.'):
+                with outer_atomic():
+                    outer_atomic(name='def')(do_nothing)()
+
+            with self.assertRaisesRegexp(TransactionManagementError, 'Cannot be inside an atomic block.'):
+                with atomic():
+                    outer_atomic(name='abc')(do_nothing)()
+
+            with self.assertRaisesRegexp(TransactionManagementError, 'Cannot be inside an atomic block.'):
+                with outer_atomic():
+                    outer_atomic(name='abc')(do_nothing)()
 
 
 @ddt.ddt

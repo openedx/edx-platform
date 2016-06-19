@@ -6,11 +6,11 @@
     </ol>
 
     <a href="#" class="create-action create-setting">
-      <i class="icon fa fa-plus"></i><%= gettext("Add") %> <span class="sr"><%= model.get('display_name')%></span>
+      <span class="icon fa fa-plus" aria-hidden="true"></span><%= gettext("Add") %> <span class="sr"><%= model.get('display_name')%></span>
     </a>
   </div>
   <button class="action setting-clear inactive" type="button" name="setting-clear" value="<%= gettext("Clear") %>" data-tooltip="<%= gettext("Clear") %>">
-    <i class="icon fa fa-undo"></i>
+    <span class="icon fa fa-undo" aria-hidden="true"></span>
     <span class="sr">"<%= gettext("Clear Value") %>"</span>
   </button>
 </div>

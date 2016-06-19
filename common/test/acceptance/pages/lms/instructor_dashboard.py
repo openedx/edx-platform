@@ -23,7 +23,7 @@ class InstructorDashboardPage(CoursePage):
         """
         Selects the membership tab and returns the MembershipSection
         """
-        self.q(css='a[data-section=membership]').first.click()
+        self.q(css='[data-section=membership]').first.click()
         membership_section = MembershipPage(self.browser)
         membership_section.wait_for_page()
         return membership_section
@@ -32,7 +32,7 @@ class InstructorDashboardPage(CoursePage):
         """
         Selects the cohort management tab and returns the CohortManagementSection
         """
-        self.q(css='a[data-section=cohort_management]').first.click()
+        self.q(css='[data-section=cohort_management]').first.click()
         cohort_management_section = CohortManagementSection(self.browser)
         # The first time cohort management is selected, an ajax call is made.
         cohort_management_section.wait_for_ajax()
@@ -43,7 +43,7 @@ class InstructorDashboardPage(CoursePage):
         """
         Selects the data download tab and returns a DataDownloadPage.
         """
-        self.q(css='a[data-section=data_download]').first.click()
+        self.q(css='[data-section=data_download]').first.click()
         data_download_section = DataDownloadPage(self.browser)
         data_download_section.wait_for_page()
         return data_download_section
@@ -52,7 +52,7 @@ class InstructorDashboardPage(CoursePage):
         """
         Selects the student admin tab and returns the MembershipSection
         """
-        self.q(css='a[data-section=student_admin]').first.click()
+        self.q(css='[data-section=student_admin]').first.click()
         student_admin_section = StudentAdminPage(self.browser)
         student_admin_section.wait_for_page()
         return student_admin_section
@@ -61,7 +61,7 @@ class InstructorDashboardPage(CoursePage):
         """
         Selects the certificates tab and returns the CertificatesSection
         """
-        self.q(css='a[data-section=certificates]').first.click()
+        self.q(css='[data-section=certificates]').first.click()
         certificates_section = CertificatesPage(self.browser)
         certificates_section.wait_for_page()
         return certificates_section
@@ -70,7 +70,7 @@ class InstructorDashboardPage(CoursePage):
         """
         Selects the timed exam tab and returns the Special Exams Section
         """
-        self.q(css='a[data-section=special_exams]').first.click()
+        self.q(css='[data-section=special_exams]').first.click()
         timed_exam_section = SpecialExamsPage(self.browser)
         timed_exam_section.wait_for_page()
         return timed_exam_section
@@ -79,7 +79,7 @@ class InstructorDashboardPage(CoursePage):
         """
         Selects the email tab and returns the bulk email section
         """
-        self.q(css='a[data-section=send_email]').first.click()
+        self.q(css='[data-section=send_email]').first.click()
         email_section = BulkEmailPage(self.browser)
         email_section.wait_for_page()
         return email_section
@@ -115,7 +115,7 @@ class BulkEmailPage(PageObject):
     url = None
 
     def is_browser_on_page(self):
-        return self.q(css='a[data-section=send_email].active-section').present
+        return self.q(css='[data-section=send_email].active-section').present
 
     def _bounded_selector(self, selector):
         """
@@ -169,7 +169,7 @@ class MembershipPage(PageObject):
     url = None
 
     def is_browser_on_page(self):
-        return self.q(css='a[data-section=membership].active-section').present
+        return self.q(css='[data-section=membership].active-section').present
 
     def select_auto_enroll_section(self):
         """
@@ -185,7 +185,7 @@ class SpecialExamsPage(PageObject):
     url = None
 
     def is_browser_on_page(self):
-        return self.q(css='a[data-section=special_exams].active-section').present
+        return self.q(css='[data-section=special_exams].active-section').present
 
     def select_allowance_section(self):
         """
@@ -954,7 +954,7 @@ class DataDownloadPage(PageObject):
     url = None
 
     def is_browser_on_page(self):
-        return self.q(css='a[data-section=data_download].active-section').present
+        return self.q(css='[data-section=data_download].active-section').present
 
     @property
     def generate_student_report_button(self):
@@ -1017,7 +1017,7 @@ class StudentAdminPage(PageObject):
         """
         Confirms student admin section is present
         """
-        return self.q(css='a[data-section=student_admin].active-section').present
+        return self.q(css='[data-section=student_admin].active-section').present
 
     @property
     def student_email_input(self):
@@ -1177,7 +1177,7 @@ class CertificatesPage(PageObject):
         self.wait_for_page()
 
     def is_browser_on_page(self):
-        return self.q(css='a[data-section=certificates].active-section').present
+        return self.q(css='[data-section=certificates].active-section').present
 
     def get_selector(self, css_selector):
         """

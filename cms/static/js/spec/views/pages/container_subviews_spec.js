@@ -443,9 +443,9 @@ define(["jquery", "underscore", "underscore.string", "common/js/spec_helpers/aja
 
                     verifyExplicitStaffOnly = function(isStaffOnly) {
                         if (isStaffOnly) {
-                            expect(containerPage.$('.action-staff-lock i')).toHaveClass('fa-check-square-o');
+                            expect(containerPage.$('.action-staff-lock .fa')).toHaveClass('fa-check-square-o');
                         } else {
-                            expect(containerPage.$('.action-staff-lock i')).toHaveClass('fa-square-o');
+                            expect(containerPage.$('.action-staff-lock .fa')).toHaveClass('fa-square-o');
                         }
                     };
 

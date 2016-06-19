@@ -313,10 +313,6 @@
     background-color: $gray-l1;
     color: $white;
   }
-
-  span {
-    @extend %cont-text-sr;
-  }
 }
 
 // button with no button shell until hover for understated actions

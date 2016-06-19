@@ -127,7 +127,7 @@ def anonymous_id_for_user(user, course_id, save=True):
     hasher.update(settings.SECRET_KEY)
     hasher.update(unicode(user.id))
     if course_id:
-        hasher.update(course_id.to_deprecated_string().encode('utf-8'))
+        hasher.update(unicode(course_id).encode('utf-8'))
     digest = hasher.hexdigest()
 
     if not hasattr(user, '_anonymous_id'):
@@ -146,12 +146,14 @@ def anonymous_id_for_user(user, course_id, save=True):
         )
         if anonymous_user_id.anonymous_user_id != digest:
             log.error(
-                u"Stored anonymous user id %r for user %r "
-                u"in course %r doesn't match computed id %r",
-                user,
-                course_id,
-                anonymous_user_id.anonymous_user_id,
-                digest
+                u"Stored anonymous user id %(anonymous_user_id)r for "
+                u"user %(user)r in course %(course_id)r doesn't match "
+                u"computed id %(digest)r", {
+                    "anonymous_user_id": anonymous_user_id.anonymous_user_id,
+                    "user": user,
+                    "course_id": course_id,
+                    "digest": digest,
+                }
             )
     except IntegrityError:
         # Another thread has already created this entry, so
@@ -1028,16 +1030,32 @@ class CourseEnrollment(models.Model):
         if user.id is None:
             user.save()
 
-        enrollment, created = cls.objects.get_or_create(
-            user=user,
-            course_id=course_key,
-        )
+        try:
+            enrollment, created = cls.objects.get_or_create(
+                user=user,
+                course_id=course_key,
+            )
 
-        # If we *did* just create a new enrollment, set some defaults
-        if created:
-            enrollment.mode = CourseMode.DEFAULT_MODE_SLUG
-            enrollment.is_active = False
-            enrollment.save()
+            # If we *did* just create a new enrollment, set some defaults
+            if created:
+                enrollment.mode = CourseMode.DEFAULT_MODE_SLUG
+                enrollment.is_active = False
+                enrollment.save()
+
+        except IntegrityError:
+            log.info(
+                (
+                    "An integrity error occurred while getting-or-creating the enrollment"
+                    "for course key %s and student %s. This can occur if two processes try to get-or-create "
+                    "the enrollment at the same time and the database is set to REPEATABLE READ. We will try "
+                    "committing the transaction and retrying."
+                ),
+                course_key, user
+            )
+            enrollment = cls.objects.get(
+                user=user,
+                course_id=course_key,
+            )
 
         return enrollment
 
@@ -2198,3 +2216,11 @@ class UserAttribute(TimeStampedModel):
             return cls.objects.get(user=user, name=name).value
         except cls.DoesNotExist:
             return None
+
+
+class LogoutViewConfiguration(ConfigurationModel):
+    """ Configuration for the logout view. """
+
+    def __unicode__(self):
+        """Unicode representation of the instance. """
+        return u'Logout view configuration: {enabled}'.format(enabled=self.enabled)

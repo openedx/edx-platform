@@ -8,7 +8,7 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from xmodule.modulestore.django import modulestore
 
-from ...api import get_course_in_cache, update_course_in_cache
+from openedx.core.djangoapps.content.block_structure.api import get_course_in_cache, update_course_in_cache
 
 
 log = logging.getLogger(__name__)

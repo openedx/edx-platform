@@ -519,7 +519,7 @@ define(["jquery", "underscore", "underscore.string", "common/js/spec_helpers/aja
                         var getButtonIcon, getButtonText;
 
                         getButtonIcon = function (containerPage) {
-                            return containerPage.$('.action-toggle-preview i');
+                            return containerPage.$('.action-toggle-preview .fa');
                         };
 
                         getButtonText = function (containerPage) {

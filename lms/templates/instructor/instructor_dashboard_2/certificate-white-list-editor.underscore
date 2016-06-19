@@ -1,4 +1,4 @@
-<h3><%- gettext("Individual Exceptions") %></h3>
+<h3 class="hd hd-3"><%- gettext("Individual Exceptions") %></h3>
 <p class="under-heading"> <%- gettext("Enter the username or email address of each learner that you want to add as an exception.") %></p>
 <div class='certificate-exception-inputs'>
     <div class="">

@@ -91,7 +91,7 @@ define([
                     spyOn($, 'ajax');
                     StaffDebug.reset(locationName, location);
 
-                    expect($.ajax.calls.mostRecent().args[0].type).toEqual('GET');
+                    expect($.ajax.calls.mostRecent().args[0].type).toEqual('POST');
                     expect($.ajax.calls.mostRecent().args[0].data).toEqual({
                         'problem_to_reset': location,
                         'unique_student_identifier': 'userman',
@@ -110,7 +110,7 @@ define([
                     spyOn($, 'ajax');
                     StaffDebug.sdelete(locationName, location);
 
-                    expect($.ajax.calls.mostRecent().args[0].type).toEqual('GET');
+                    expect($.ajax.calls.mostRecent().args[0].type).toEqual('POST');
                     expect($.ajax.calls.mostRecent().args[0].data).toEqual({
                         'problem_to_reset': location,
                         'unique_student_identifier': 'userman',
@@ -130,7 +130,7 @@ define([
                     spyOn($, 'ajax');
                     StaffDebug.rescore(locationName, location);
 
-                    expect($.ajax.calls.mostRecent().args[0].type).toEqual('GET');
+                    expect($.ajax.calls.mostRecent().args[0].type).toEqual('POST');
                     expect($.ajax.calls.mostRecent().args[0].data).toEqual({
                         'problem_to_reset': location,
                         'unique_student_identifier': 'userman',

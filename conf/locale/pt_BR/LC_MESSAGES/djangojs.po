@@ -79,6 +79,7 @@
 # Daniel Linhares <danielinhares@gmail.com>, 2014
 # Deusilene Sousa Matos <deusymatos@gmail.com>, 2015
 # Diego Rabatone Oliveira <diraol@diraol.eng.br>, 2015
+# Douglas Reginatto <dreginatto@yahoo.com.br>, 2016
 # Edgar Aparecido Pereira de Melo <edgarapmelo@gmail.com>, 2014
 # aivuk <e@vaz.io>, 2014
 # Fabio Eis <fabio@fabioeis.com>, 2016
@@ -86,6 +87,7 @@
 # Francisco Cantarutti <francisco.cantarutti@sisqualis.com.br>, 2014
 # Guilherme Batista Ferreira <guilherme@uft.edu.br>, 2015
 # Gustavo Henrique de Almeida Gonçalves <gustavo@faprender.org>, 2015
+# Igor Carnerio <igor.ribeiro.carneiro@gmail.com>, 2016
 # Larissa Queiroz Pontes <lariqbiotec@gmail.com>, 2015
 # Leonardo Flores Zambaldi <fzleonardo@gmail.com>, 2014
 # Leonardo Lehnemann Agostinho Martins <lehneman@gmail.com>, 2014

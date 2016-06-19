@@ -1719,6 +1719,34 @@ class CapaModuleTest(unittest.TestCase):
                               ('answerpool', ['choice_1', 'choice_3', 'choice_2', 'choice_0']))
             self.assertEquals(event_info['success'], 'incorrect')
 
+    @ddt.unpack
+    @ddt.data(
+        {'display_name': None, 'expected_display_name': 'problem'},
+        {'display_name': '', 'expected_display_name': 'problem'},
+        {'display_name': ' ', 'expected_display_name': 'problem'},
+        {'display_name': 'CAPA 101', 'expected_display_name': 'CAPA 101'}
+    )
+    def test_problem_display_name_with_default(self, display_name, expected_display_name):
+        """
+        Verify that display_name_with_default works as expected.
+        """
+        module = CapaFactory.create(display_name=display_name)
+        self.assertEqual(module.display_name_with_default, expected_display_name)
+
+    @ddt.data(
+        '',
+        '   ',
+    )
+    def test_problem_no_display_name(self, display_name):
+        """
+        Verify that if problem display name is not provided then a default name is used.
+        """
+        module = CapaFactory.create(display_name=display_name)
+        module.get_problem_html()
+        render_args, _ = module.system.render_template.call_args
+        context = render_args[1]
+        self.assertEqual(context['problem']['name'], module.location.block_type)
+
 
 @ddt.ddt
 class CapaDescriptorTest(unittest.TestCase):

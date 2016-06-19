@@ -13,6 +13,7 @@
 # brunojm <brunojm@gmail.com>, 2014
 # Cleomir Waiczyk <w.cleomir@gmail.com>, 2015
 # Daniela Dering de Lima Silva <daniela.eng11@gmail.com>, 2016
+# Douglas Reginatto <dreginatto@yahoo.com.br>, 2016
 # Edgar Aparecido Pereira de Melo <edgarapmelo@gmail.com>, 2014
 # Edgar Aparecido Pereira de Melo <edgarapmelo@gmail.com>, 2014
 # Erik Henrique <contato@erikhenrique.com.br>, 2015
@@ -196,6 +197,7 @@
 # Daniele Maila Cebin <danielecebin@hotmail.com>, 2015
 # Daniel Linhares <danielinhares@gmail.com>, 2014
 # MatosD <deusilenematosdm@hotmail.com>, 2015
+# Douglas Reginatto <dreginatto@yahoo.com.br>, 2016
 # Emili Costa <m.lee.costa@gmail.com>, 2015
 # Fernando Ursine Braga Silva <fernando_ursine@yahoo.com>, 2014
 # Filipe Oliveira <contato@fmoliveira.com.br>, 2013

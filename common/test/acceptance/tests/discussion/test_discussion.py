@@ -208,7 +208,7 @@ class DiscussionHomePageTest(UniqueCourseTest):
     def test_page_accessibility(self):
         self.page.a11y_audit.config.set_rules({
             "ignore": [
-                'section',  # TODO: wcag2aa
+                'section',  # TODO: AC-491
                 'color-contrast',  # TNL-4635
                 'link-href',  # TNL-4636
                 'icon-aria-hidden',  # TNL-4637
@@ -348,7 +348,7 @@ class DiscussionTabMultipleThreadTest(BaseDiscussionTestCase):
     def test_page_accessibility(self):
         self.thread_page_1.a11y_audit.config.set_rules({
             "ignore": [
-                'section',  # TODO: wcag2aa
+                'section',  # TODO: AC-491
                 'aria-valid-attr-value',  # TNL-4638
                 'color-contrast',  # TNL-4639
                 'link-href',  # TNL-4640
@@ -360,7 +360,7 @@ class DiscussionTabMultipleThreadTest(BaseDiscussionTestCase):
 
         self.thread_page_2.a11y_audit.config.set_rules({
             "ignore": [
-                'section',  # TODO: wcag2aa
+                'section',  # TODO: AC-491
                 'aria-valid-attr-value',  # TNL-4638
                 'color-contrast',  # TNL-4639
                 'link-href',  # TNL-4640
@@ -424,7 +424,7 @@ class DiscussionOpenClosedThreadTest(BaseDiscussionTestCase):
         page = self.setup_openclosed_thread_page()
         page.a11y_audit.config.set_rules({
             'ignore': [
-                'section',  # TODO: wcag2aa
+                'section',  # TODO: AC-491
                 'aria-valid-attr-value',  # TNL-4643
                 'color-contrast',  # TNL-4644
                 'link-href',  # TNL-4640
@@ -436,7 +436,7 @@ class DiscussionOpenClosedThreadTest(BaseDiscussionTestCase):
         page = self.setup_openclosed_thread_page(True)
         page.a11y_audit.config.set_rules({
             'ignore': [
-                'section',  # TODO: wcag2aa
+                'section',  # TODO: AC-491
                 'aria-valid-attr-value',  # TNL-4643
                 'color-contrast',  # TNL-4644
                 'link-href',  # TNL-4640
@@ -693,11 +693,11 @@ class DiscussionResponseEditTest(BaseDiscussionTestCase):
             And I try to edit the response created by other users
             Then the response should be edited and rendered successfully
             And I try to vote the response created by moderator
-            Then the response should be voted successfully
+            Then the response should not be able to be voted
             And I try to vote the response created by other users
             Then the response should be voted successfully
             And I try to report the response created by moderator
-            Then the response should be reported successfully
+            Then the response should not be able to be reported
             And I try to report the response created by other users
             Then the response should be reported successfully
             And I try to endorse the response created by moderator
@@ -711,9 +711,9 @@ class DiscussionResponseEditTest(BaseDiscussionTestCase):
         page.visit()
         self.edit_response(page, "response_self_author")
         self.edit_response(page, "response_other_author")
-        page.vote_response('response_self_author')
+        page.cannot_vote_response('response_self_author')
         page.vote_response('response_other_author')
-        page.report_response('response_self_author')
+        page.cannot_report_response('response_self_author')
         page.report_response('response_other_author')
         page.endorse_response('response_self_author')
         page.endorse_response('response_other_author')
@@ -725,7 +725,7 @@ class DiscussionResponseEditTest(BaseDiscussionTestCase):
         page = self.create_single_thread_page("response_edit_test_thread")
         page.a11y_audit.config.set_rules({
             'ignore': [
-                'section',  # TODO: wcag2aa
+                'section',  # TODO: AC-491
                 'aria-valid-attr-value',  # TNL-4638
                 'color-contrast',  # TNL-4644
                 'link-href',  # TNL-4640
@@ -827,7 +827,7 @@ class DiscussionCommentEditTest(BaseDiscussionTestCase):
         page.visit()
         page.a11y_audit.config.set_rules({
             'ignore': [
-                'section',  # TODO: wcag2aa
+                'section',  # TODO: AC-491
                 'aria-valid-attr-value',  # TNL-4643
                 'color-contrast',  # TNL-4644
                 'link-href',  # TNL-4640
@@ -1202,7 +1202,7 @@ class DiscussionSearchAlertTest(UniqueCourseTest):
     def test_page_accessibility(self):
         self.page.a11y_audit.config.set_rules({
             'ignore': [
-                'section',  # TODO: wcag2aa
+                'section',  # TODO: AC-491
                 'color-contrast',  # TNL-4639
                 'link-href',  # TNL-4640
                 'icon-aria-hidden',  # TNL-4641

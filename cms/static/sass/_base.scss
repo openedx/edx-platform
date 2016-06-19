@@ -36,6 +36,11 @@ body, input, button {
   font-family: 'Open Sans', sans-serif;
 }
 
+// we want to hide the outline on the focusable <main> element
+main {
+    outline: none;
+}
+
 a {
   @include transition(color $tmg-f2 ease-in-out 0s);
   text-decoration: none;

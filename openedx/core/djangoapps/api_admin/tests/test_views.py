@@ -1,15 +1,14 @@
-#pylint: disable=missing-docstring
-import unittest
+""" Tests for the api_admin app's views. """
+
 import json
-from urlparse import urljoin
+import unittest
 
 import ddt
+import httpretty
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test import TestCase
 from django.test.utils import override_settings
-from edx_oauth2_provider.tests.factories import ClientFactory
-import httpretty
 from oauth2_provider.models import get_application_model
 
 from openedx.core.djangoapps.api_admin.models import ApiAccessRequest, ApiAccessConfig
@@ -19,14 +18,10 @@ from openedx.core.djangoapps.api_admin.tests.factories import (
 from openedx.core.djangoapps.api_admin.tests.utils import VALID_DATA
 from student.tests.factories import UserFactory
 
-
 Application = get_application_model()  # pylint: disable=invalid-name
-
-MOCK_CATALOG_API_URL_ROOT = 'https://api.example.com/'
 
 
 class ApiAdminTest(TestCase):
-
     def setUp(self):
         super(ApiAdminTest, self).setUp()
         ApiAccessConfig(enabled=True).save()
@@ -34,7 +29,6 @@ class ApiAdminTest(TestCase):
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class ApiRequestViewTest(ApiAdminTest):
-
     def setUp(self):
         super(ApiRequestViewTest, self).setUp()
         self.url = reverse('api_admin:api-request')
@@ -103,7 +97,6 @@ class ApiRequestViewTest(ApiAdminTest):
 @override_settings(PLATFORM_NAME='edX')
 @ddt.ddt
 class ApiRequestStatusViewTest(ApiAdminTest):
-
     def setUp(self):
         super(ApiRequestStatusViewTest, self).setUp()
         password = 'abc123'
@@ -207,7 +200,6 @@ class ApiRequestStatusViewTest(ApiAdminTest):
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class ApiTosViewTest(ApiAdminTest):
-
     def test_get_api_tos(self):
         """Verify that the terms of service can be read."""
         url = reverse('api_admin:api-tos')
@@ -217,20 +209,23 @@ class ApiTosViewTest(ApiAdminTest):
 
 
 class CatalogTest(ApiAdminTest):
-
     def setUp(self):
         super(CatalogTest, self).setUp()
         password = 'abc123'
         self.user = UserFactory(password=password, is_staff=True)
         self.client.login(username=self.user.username, password=password)
-        ClientFactory(user=self.user, name='course-discovery', url=MOCK_CATALOG_API_URL_ROOT)
 
-    def mock_catalog_api(self, url, data, method=httpretty.GET, status_code=200):
+    def mock_catalog_endpoint(self, data, catalog_id=None, method=httpretty.GET, status_code=200):
+        """ Mock the Course Catalog API's catalog endpoint. """
         self.assertTrue(httpretty.is_enabled(), msg='httpretty must be enabled to mock Catalog API calls.')
-        httpretty.reset()
+
+        url = '{root}/catalogs/'.format(root=settings.COURSE_CATALOG_API_URL.rstrip('/'))
+        if catalog_id:
+            url += '{id}/'.format(id=catalog_id)
+
         httpretty.register_uri(
             method,
-            urljoin(MOCK_CATALOG_API_URL_ROOT, url),
+            url,
             body=json.dumps(data),
             content_type='application/json',
             status=status_code
@@ -239,7 +234,6 @@ class CatalogTest(ApiAdminTest):
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class CatalogSearchViewTest(CatalogTest):
-
     def setUp(self):
         super(CatalogSearchViewTest, self).setUp()
         self.url = reverse('api_admin:catalog-search')
@@ -251,7 +245,7 @@ class CatalogSearchViewTest(CatalogTest):
     @httpretty.activate
     def test_post(self):
         catalog_user = UserFactory()
-        self.mock_catalog_api('api/v1/catalogs/', {'results': []})
+        self.mock_catalog_endpoint({'results': []})
         response = self.client.post(self.url, {'username': catalog_user.username})
         self.assertRedirects(response, reverse('api_admin:catalog-list', kwargs={'username': catalog_user.username}))
 
@@ -262,7 +256,6 @@ class CatalogSearchViewTest(CatalogTest):
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class CatalogListViewTest(CatalogTest):
-
     def setUp(self):
         super(CatalogListViewTest, self).setUp()
         self.catalog_user = UserFactory()
@@ -271,12 +264,17 @@ class CatalogListViewTest(CatalogTest):
     @httpretty.activate
     def test_get(self):
         catalog = CatalogFactory(viewers=[self.catalog_user.username])
-        self.mock_catalog_api('api/v1/catalogs/', {
-            'results': [catalog.attributes]
-        })
+        self.mock_catalog_endpoint({'results': [catalog.attributes]})
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
         self.assertIn(catalog.name, response.content.decode('utf-8'))
+
+    @httpretty.activate
+    def test_get_no_catalogs(self):
+        """Verify that the view works when no catalogs are set up."""
+        self.mock_catalog_endpoint({}, status_code=404)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
 
     @httpretty.activate
     def test_post(self):
@@ -286,18 +284,16 @@ class CatalogListViewTest(CatalogTest):
             'viewers': [self.catalog_user.username]
         }
         catalog_id = 123
-        self.mock_catalog_api('api/v1/catalogs/', dict(catalog_data, id=catalog_id), method=httpretty.POST)
+        self.mock_catalog_endpoint(dict(catalog_data, id=catalog_id), method=httpretty.POST)
         response = self.client.post(self.url, catalog_data)
         self.assertEqual(httpretty.last_request().method, 'POST')
-        self.mock_catalog_api('api/v1/catalogs/{}/'.format(catalog_id), CatalogFactory().attributes)
+        self.mock_catalog_endpoint(CatalogFactory().attributes, catalog_id=catalog_id)
         self.assertRedirects(response, reverse('api_admin:catalog-edit', kwargs={'catalog_id': catalog_id}))
 
     @httpretty.activate
     def test_post_invalid(self):
         catalog = CatalogFactory(viewers=[self.catalog_user.username])
-        self.mock_catalog_api('api/v1/catalogs/', {
-            'results': [catalog.attributes]
-        })
+        self.mock_catalog_endpoint({'results': [catalog.attributes]})
         response = self.client.post(self.url, {
             'name': '',
             'query': '*',
@@ -310,7 +306,6 @@ class CatalogListViewTest(CatalogTest):
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class CatalogEditViewTest(CatalogTest):
-
     def setUp(self):
         super(CatalogEditViewTest, self).setUp()
         self.catalog_user = UserFactory()
@@ -319,17 +314,17 @@ class CatalogEditViewTest(CatalogTest):
 
     @httpretty.activate
     def test_get(self):
-        self.mock_catalog_api('api/v1/catalogs/{}/'.format(self.catalog.id), self.catalog.attributes)
+        self.mock_catalog_endpoint(self.catalog.attributes, catalog_id=self.catalog.id)
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
         self.assertIn(self.catalog.name, response.content.decode('utf-8'))
 
     @httpretty.activate
     def test_delete(self):
-        self.mock_catalog_api(
-            'api/v1/catalogs/{}/'.format(self.catalog.id),
+        self.mock_catalog_endpoint(
             self.catalog.attributes,
-            method=httpretty.DELETE
+            method=httpretty.DELETE,
+            catalog_id=self.catalog.id
         )
         response = self.client.post(self.url, {'delete-catalog': 'on'})
         self.assertRedirects(response, reverse('api_admin:catalog-search'))
@@ -342,18 +337,15 @@ class CatalogEditViewTest(CatalogTest):
 
     @httpretty.activate
     def test_edit(self):
-        self.mock_catalog_api(
-            'api/v1/catalogs/{}/'.format(self.catalog.id),
-            self.catalog.attributes, method=httpretty.PATCH
-        )
+        self.mock_catalog_endpoint(self.catalog.attributes, method=httpretty.PATCH, catalog_id=self.catalog.id)
         new_attributes = dict(self.catalog.attributes, **{'delete-catalog': 'off', 'name': 'changed'})
         response = self.client.post(self.url, new_attributes)
-        self.mock_catalog_api('api/v1/catalogs/{}/'.format(self.catalog.id), new_attributes)
+        self.mock_catalog_endpoint(new_attributes, catalog_id=self.catalog.id)
         self.assertRedirects(response, reverse('api_admin:catalog-edit', kwargs={'catalog_id': self.catalog.id}))
 
     @httpretty.activate
     def test_edit_invalid(self):
-        self.mock_catalog_api('api/v1/catalogs/{}/'.format(self.catalog.id), self.catalog.attributes)
+        self.mock_catalog_endpoint(self.catalog.attributes, catalog_id=self.catalog.id)
         new_attributes = dict(self.catalog.attributes, **{'delete-catalog': 'off', 'name': ''})
         response = self.client.post(self.url, new_attributes)
         self.assertEqual(response.status_code, 400)
@@ -363,7 +355,6 @@ class CatalogEditViewTest(CatalogTest):
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class CatalogPreviewViewTest(CatalogTest):
-
     def setUp(self):
         super(CatalogPreviewViewTest, self).setUp()
         self.url = reverse('api_admin:catalog-preview')
@@ -371,7 +362,12 @@ class CatalogPreviewViewTest(CatalogTest):
     @httpretty.activate
     def test_get(self):
         data = {'count': 1, 'results': ['test data'], 'next': None, 'prev': None}
-        self.mock_catalog_api('api/v1/courses/', data)
+        httpretty.register_uri(
+            httpretty.GET,
+            '{root}/courses/'.format(root=settings.COURSE_CATALOG_API_URL.rstrip('/')),
+            body=json.dumps(data),
+            content_type='application/json'
+        )
         response = self.client.get(self.url, {'q': '*'})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(json.loads(response.content), data)

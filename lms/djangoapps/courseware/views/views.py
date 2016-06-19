@@ -658,7 +658,6 @@ def course_about(request, course_id):
 @ensure_valid_course_key
 def progress(request, course_id, student_id=None):
     """ Display the progress page. """
-
     course_key = CourseKey.from_string(course_id)
 
     with modulestore().bulk_operations(course_key):
@@ -673,6 +672,14 @@ def _progress(request, course_key, student_id):
 
     Course staff are allowed to see the progress of students in their class.
     """
+
+    if student_id is not None:
+        try:
+            student_id = int(student_id)
+        # Check for ValueError if 'student_id' cannot be converted to integer.
+        except ValueError:
+            raise Http404
+
     course = get_course_with_access(request.user, 'load', course_key, depth=None, check_if_enrolled=True)
 
     # check to see if there is a required survey that must be taken before
@@ -697,8 +704,7 @@ def _progress(request, course_key, student_id):
             raise Http404
         try:
             student = User.objects.get(id=student_id)
-        # Check for ValueError if 'student_id' cannot be converted to integer.
-        except (ValueError, User.DoesNotExist):
+        except User.DoesNotExist:
             raise Http404
 
     # NOTE: To make sure impersonation by instructor works, use
@@ -726,6 +732,12 @@ def _progress(request, course_key, student_id):
 
     # checking certificate generation configuration
     enrollment_mode, is_active = CourseEnrollment.enrollment_mode_for_user(student, course_key)
+
+    # If the learner is in verified modes and the student did not have
+    # their ID verified, we need to show message to ask learner to verify their ID first
+    missing_required_verification = enrollment_mode in CourseMode.VERIFIED_MODES and \
+        not SoftwareSecurePhotoVerification.user_is_verified(student)
+
     show_generate_cert_btn = (
         is_active and CourseMode.is_eligible_for_certificate(enrollment_mode)
         and certs_api.cert_generation_enabled(course_key)
@@ -741,10 +753,17 @@ def _progress(request, course_key, student_id):
         'passed': is_course_passed(course, grade_summary),
         'show_generate_cert_btn': show_generate_cert_btn,
         'credit_course_requirements': _credit_course_requirements(course_key, student),
-        'is_id_verified': SoftwareSecurePhotoVerification.user_is_verified(student)
+        'missing_required_verification': missing_required_verification,
+        'certificate_invalidated': False,
     }
 
     if show_generate_cert_btn:
+        # If current certificate is invalidated by instructor
+        # then show the certificate invalidated message.
+        context.update({
+            'certificate_invalidated': certs_api.is_certificate_invalid(student, course_key)
+        })
+
         cert_status = certs_api.certificate_downloadable_status(student, course_key)
         context.update(cert_status)
         # showing the certificate web view button if feature flags are enabled.
@@ -1071,7 +1090,7 @@ def generate_user_cert(request, course_id):
         log.info(u"Anon user trying to generate certificate for %s", course_id)
         return HttpResponseBadRequest(
             _('You must be signed in to {platform_name} to create a certificate.').format(
-                platform_name=settings.PLATFORM_NAME
+                platform_name=theming_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME)
             )
         )
 
@@ -1187,7 +1206,7 @@ FINANCIAL_ASSISTANCE_HEADER = _(
     ' financial assistance program.'
 ).format(
     percent_sign="%",
-    platform_name=settings.PLATFORM_NAME
+    platform_name=theming_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME)
 ).split('\n')
 
 
@@ -1298,12 +1317,16 @@ def financial_assistance_form(request):
             mode_slug=CourseMode.VERIFIED
         ).exists()
     ]
+    incomes = ['Less than $5,000', '$5,000 - $10,000', '$10,000 - $15,000', '$15,000 - $20,000', '$20,000 - $25,000']
+    annual_incomes = [
+        {'name': _(income), 'value': income} for income in incomes  # pylint: disable=translation-of-non-string
+    ]
     return render_to_response('financial-assistance/apply.html', {
         'header_text': FINANCIAL_ASSISTANCE_HEADER,
         'student_faq_url': marketing_link('FAQ'),
         'dashboard_url': reverse('dashboard'),
         'account_settings_url': reverse('account_settings'),
-        'platform_name': settings.PLATFORM_NAME,
+        'platform_name': theming_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),
         'user_details': {
             'email': user.email,
             'username': user.username,
@@ -1328,12 +1351,12 @@ def financial_assistance_form(request):
             },
             {
                 'name': 'income',
-                'type': 'text',
+                'type': 'select',
                 'label': FA_INCOME_LABEL,
-                'placeholder': _('income in US Dollars ($)'),
+                'placeholder': '',
                 'defaultValue': '',
                 'required': True,
-                'restrictions': {},
+                'options': annual_incomes,
                 'instructions': _('Specify your annual household income in US Dollars.')
             },
             {

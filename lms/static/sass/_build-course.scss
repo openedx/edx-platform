@@ -4,6 +4,7 @@
 // About: Sass compile for the LMS Courseware Elements that are shared between LTR and RTL UI. Configuration and vendor specific imports happen before this shared set of imports are compiled in the lms-course-*.scss files.
 
 @import 'base/base';
+@import 'base/headings';
 @import 'base/extends';
 @import 'base/animations';
 @import 'shared/tooltips';
@@ -66,6 +67,3 @@
 
 // responsive
 @import 'base/layouts'; // temporary spot for responsive course
-
-// xmodule
-@import 'xmodule/headings';

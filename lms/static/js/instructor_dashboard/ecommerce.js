@@ -45,6 +45,7 @@ var edx = edx || {};
         $('input[name="user-enrollment-report"]').click(function(){
             var url = $(this).data('endpoint');
             $.ajax({
+             type: 'POST',
              dataType: "json",
              url: url,
              success: function (data) {
@@ -64,6 +65,7 @@ var edx = edx || {};
         $('input[name="exec-summary-report"]').click(function(){
             var url = $(this).data('endpoint');
             $.ajax({
+             type: 'POST',
              dataType: "json",
              url: url,
              success: function (data) {

@@ -35,6 +35,7 @@
 # Amol Bhave <ammubhave@gmail.com>, 2013
 # Amol Bhave <ammubhave@gmail.com>, 2013,2015
 # Anant Vima <anant.vima@anu.edu.au>, 2014
+# centaur8811 <centaur8811@gmail.com>, 2016
 # CHANDRA SHEKHAR SHARMA <shekharsharma041@gmail.com>, 2014
 # ria1234 <contactpayal@yahoo.com.au>, 2014
 # Devesh Parashar, 2015
@@ -87,12 +88,12 @@ msgstr ""
 #: lms/djangoapps/courseware/tabs.py
 #: lms/djangoapps/django_comment_client/forum/views.py
 msgid "Discussion"
-msgstr ""
+msgstr "चर्चा"
 
 #: cms/djangoapps/contentstore/views/component.py
 #: lms/djangoapps/class_dashboard/dashboard_data.py
 msgid "Problem"
-msgstr ""
+msgstr "समस्या"
 
 #: cms/djangoapps/contentstore/views/component.py
 #: common/lib/xmodule/xmodule/video_module/video_module.py

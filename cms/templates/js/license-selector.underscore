@@ -98,9 +98,9 @@
                     />
             <% } else { %>
 	        <% //<span> must come before <i> icon or else spacing gets messed up %>
-                <span class="sr">gettext("Creative Commons licensed content, with terms as follow:")&nbsp;</span><i aria-hidden="true" class="icon-cc"></i>
+                <span class="sr">gettext("Creative Commons licensed content, with terms as follow:")&nbsp;</span><span aria-hidden="true" class="icon-cc"></span>
                 <% _.each(enabled, function(option) { %>
-                        <span class="sr"><%- license.options[option.toUpperCase()].name %>&nbsp;</span><i aria-hidden="true" class="icon-cc-<%- option %>"></i>
+                        <span class="sr"><%- license.options[option.toUpperCase()].name %>&nbsp;</span><span aria-hidden="true" class="icon-cc-<%- option %>"></span>
                 <% }); %>
                 <span class="license-text"><%= gettext("Some Rights Reserved") %></span>
             <% } %>

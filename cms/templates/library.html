@@ -58,12 +58,12 @@ from openedx.core.djangolib.markup import HTML, Text
             <ul>
                 <li class="nav-item">
                     <a href="#" class="button new-button new-component-button">
-                        <i class="icon fa fa-plus icon-inline"></i> <span class="action-button-text">${_("Add Component")}</span>
+                        <span class="icon fa fa-plus icon-inline" aria-hidden="true"></span> <span class="action-button-text">${_("Add Component")}</span>
                     </a>
                 </li>
                 <li class="action-item action-toggle-preview nav-item">
                     <a href="#" class="button button-toggle-preview action-button toggle-preview-button is-hidden">
-                        <i class="icon fa fa-refresh"></i>
+                        <span class="icon fa fa-refresh" aria-hidden="true"></span>
                         <span class="action-button-text preview-text"></span>
                     </a>
                 </li>
@@ -81,7 +81,7 @@ from openedx.core.djangolib.markup import HTML, Text
                 <section class="wrapper-xblock level-page is-hidden studio-xblock-wrapper" data-locator="${context_library.location}" data-course-key="${context_library.location.library_key}">
                 </section>
                 <div class="ui-loading">
-                    <p><span class="spin"><i class="icon fa fa-refresh"></i></span> <span class="copy">${_("Loading")}</span></p>
+                    <p><span class="spin"><span class="icon fa fa-refresh" aria-hidden="true"></span></span><span class="copy">${_("Loading")}</span></p>
                 </div>
             </article>
             <aside class="content-supplementary" role="complementary">

@@ -33,6 +33,7 @@ from django.core.mail.message import EmailMessage
 from xmodule.modulestore.django import modulestore
 from eventtracking import tracker
 
+from openedx.core.djangoapps.theming.helpers import get_value as get_themed_value
 from courseware.courses import get_course_by_id
 from config_models.models import ConfigurationModel
 from course_modes.models import CourseMode
@@ -1883,7 +1884,7 @@ class CertificateItem(OrderItem):
         try:
             target_cert = target_certs[0]
         except IndexError:
-            log.error(
+            log.warning(
                 u"Matching CertificateItem not found while trying to refund. User %s, Course %s",
                 course_enrollment.user,
                 course_enrollment.course_id,
@@ -2185,7 +2186,7 @@ class Donation(OrderItem):
             u"We greatly appreciate this generous contribution and your support of the {platform_name} mission.  "
             u"This receipt was prepared to support charitable contributions for tax purposes.  "
             u"We confirm that neither goods nor services were provided in exchange for this gift."
-        ).format(platform_name=settings.PLATFORM_NAME)
+        ).format(platform_name=get_themed_value('PLATFORM_NAME', settings.PLATFORM_NAME))
 
     @classmethod
     def _line_item_description(cls, course_id=None):
@@ -2218,7 +2219,8 @@ class Donation(OrderItem):
 
         # The donation is for the organization as a whole, not a specific course
         else:
-            return _(u"Donation for {platform_name}").format(platform_name=settings.PLATFORM_NAME)
+            return _(u"Donation for {platform_name}").format(platform_name=get_themed_value('PLATFORM_NAME',
+                                                                                            settings.PLATFORM_NAME))
 
     @property
     def single_item_receipt_context(self):
@@ -2243,8 +2245,8 @@ class Donation(OrderItem):
             data['name'] = unicode(self.course_id)
             data['category'] = unicode(self.course_id.org)
         else:
-            data['name'] = settings.PLATFORM_NAME
-            data['category'] = settings.PLATFORM_NAME
+            data['name'] = get_themed_value('PLATFORM_NAME', settings.PLATFORM_NAME)
+            data['category'] = get_themed_value('PLATFORM_NAME', settings.PLATFORM_NAME)
         return data
 
     @property

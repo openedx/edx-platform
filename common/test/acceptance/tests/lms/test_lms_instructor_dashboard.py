@@ -46,6 +46,27 @@ class BaseInstructorDashboardTest(EventsTestMixin, UniqueCourseTest):
         return instructor_dashboard_page
 
 
+@attr('a11y')
+class LMSInstructorDashboardA11yTest(BaseInstructorDashboardTest):
+    """
+    Instructor dashboard base accessibility test.
+    """
+    def setUp(self):
+        super(LMSInstructorDashboardA11yTest, self).setUp()
+        self.course_fixture = CourseFixture(**self.course_info).install()
+        self.log_in_as_instructor()
+        self.instructor_dashboard_page = self.visit_instructor_dashboard()
+
+    def test_instructor_dashboard_a11y(self):
+        self.instructor_dashboard_page.a11y_audit.config.set_rules({
+            "ignore": [
+                'link-href',  # TODO: AC-491
+                'data-table',  # TODO: AC-491
+            ]
+        })
+        self.instructor_dashboard_page.a11y_audit.check_for_accessibility_errors()
+
+
 @ddt.ddt
 class BulkEmailTest(BaseInstructorDashboardTest):
     """
@@ -63,6 +84,23 @@ class BulkEmailTest(BaseInstructorDashboardTest):
         self.assertTrue(self.send_email_page.is_browser_on_page())
         self.send_email_page.send_message(recipient)
         self.send_email_page.verify_message_queued_successfully()
+
+    @attr('a11y')
+    def test_bulk_email_a11y(self):
+        """
+        Bulk email accessibility tests
+        """
+        self.send_email_page.a11y_audit.config.set_scope([
+            '#section-send-email'
+        ])
+        self.send_email_page.a11y_audit.config.set_rules({
+            "ignore": [
+                'button-name',  # TODO: AC-491
+                'list',  # TODO: AC-491,
+                'color-contrast',  # TODO: AC-491
+            ]
+        })
+        self.send_email_page.a11y_audit.check_for_accessibility_errors()
 
 
 @attr('shard_7')
@@ -171,6 +209,16 @@ class AutoEnrollmentWithCSVTest(BaseInstructorDashboardTest):
         self.auto_enroll_section.upload_non_csv_file()
         self.assertTrue(self.auto_enroll_section.is_notification_displayed(section_type=self.auto_enroll_section.NOTIFICATION_ERROR))
         self.assertEqual(self.auto_enroll_section.first_notification_message(section_type=self.auto_enroll_section.NOTIFICATION_ERROR), "Make sure that the file you upload is in CSV format with no extraneous characters or rows.")
+
+    @attr('a11y')
+    def test_auto_enroll_csv_a11y(self):
+        """
+        Auto-enrollment with CSV accessibility tests
+        """
+        self.auto_enroll_section.a11y_audit.config.set_scope([
+            '#member-list-widget-template'
+        ])
+        self.auto_enroll_section.a11y_audit.check_for_accessibility_errors()
 
 
 @attr('shard_7')
@@ -668,6 +716,16 @@ class DataDownloadsTest(BaseInstructorDashboardTest):
         self.data_download_section.wait_for_available_report()
         self.verify_report_download(report_name)
 
+    @attr('a11y')
+    def test_data_download_a11y(self):
+        """
+        Data download page accessibility tests
+        """
+        self.data_download_section.a11y_audit.config.set_scope([
+            '.data-download-container'
+        ])
+        self.data_download_section.a11y_audit.check_for_accessibility_errors()
+
 
 @attr('shard_7')
 @ddt.ddt
@@ -772,6 +830,34 @@ class CertificatesTest(BaseInstructorDashboardTest):
         # validate certificate exception synced with server is visible in certificate exceptions list
         self.assertIn(self.user_name, self.certificates_section.last_certificate_exception.text)
         self.assertIn(notes, self.certificates_section.last_certificate_exception.text)
+
+    def test_remove_certificate_exception_on_page_reload(self):
+        """
+        Scenario: On the Certificates tab of the Instructor Dashboard, Instructor can remove added certificate
+        exceptions from the list.
+
+            Given that I am on the Certificates tab on the Instructor Dashboard
+            When I fill in student username and notes fields and click 'Add Exception' button
+            Then new certificate exception should be visible in certificate exceptions list
+
+            Revisit the page to make sure exceptions are synced.
+
+            Remove the user from the exception list should remove the user from the list.
+        """
+        notes = 'Test Notes'
+        # Add a student to Certificate exception list
+        self.certificates_section.add_certificate_exception(self.user_name, notes)
+        self.assertIn(self.user_name, self.certificates_section.last_certificate_exception.text)
+        self.assertIn(notes, self.certificates_section.last_certificate_exception.text)
+
+        # Verify that added exceptions are also synced with backend
+        # Revisit Page
+        self.certificates_section.refresh()
+
+        # Remove Certificate Exception
+        self.certificates_section.remove_first_certificate_exception()
+        self.assertNotIn(self.user_name, self.certificates_section.last_certificate_exception.text)
+        self.assertNotIn(notes, self.certificates_section.last_certificate_exception.text)
 
     def test_instructor_can_remove_certificate_exception(self):
         """
@@ -955,6 +1041,26 @@ class CertificatesTest(BaseInstructorDashboardTest):
         # Validate certificate exception synced with server is visible in certificate exceptions list
         self.assertIn(self.user_name, self.certificates_section.last_certificate_exception.text)
         self.assertIn(expected_notes, self.certificates_section.last_certificate_exception.text)
+
+    @attr('a11y')
+    def test_certificates_a11y(self):
+        """
+        Certificates page accessibility tests
+        """
+        self.certificates_section.a11y_audit.config.set_scope([
+            '.certificates-wrapper'
+        ])
+        self.certificates_section.a11y_audit.config.set_rules({
+            "ignore": [
+                'aria-valid-attr-value',  # TODO: AC-491
+                'checkboxgroup',  # TODO: AC-491
+                'color-contrast',  # TODO: AC-491
+                'duplicate-id',  # TODO: AC-491
+                'label',  # TODO: AC-491
+                'radiogroup',  # TODO: AC-491
+            ]
+        })
+        self.certificates_section.a11y_audit.check_for_accessibility_errors()
 
 
 @attr('shard_7')
@@ -1154,3 +1260,24 @@ class CertificateInvalidationTest(BaseInstructorDashboardTest):
             u"{user} is not enrolled in this course. Please check your spelling and retry.".format(user=new_user),
             self.certificates_section.certificate_invalidation_message.text
         )
+
+    @attr('a11y')
+    def test_invalidate_certificates_a11y(self):
+        """
+        Certificate invalidation accessibility tests
+        """
+        self.certificates_section.a11y_audit.config.set_scope([
+            '.certificates-wrapper'
+        ])
+        self.certificates_section.a11y_audit.config.set_rules({
+            "ignore": [
+                'data-table',  # TODO: AC-491
+                'aria-valid-attr-value',  # TODO: AC-491
+                'checkboxgroup',  # TODO: AC-491
+                'color-contrast',  # TODO: AC-491
+                'duplicate-id',  # TODO: AC-491
+                'label',  # TODO: AC-491
+                'radiogroup',  # TODO: AC-491
+            ]
+        })
+        self.certificates_section.a11y_audit.check_for_accessibility_errors()

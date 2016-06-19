@@ -47,6 +47,8 @@ var edx = edx || {};
 
             this.renderCourseNamePlaceholder(this.courseKey);
 
+            this.renderUserFullNamePlaceholder(this.username);
+
             providerId = this.getCreditProviderId(data);
             if (providerId) {
                 this.getProviderData(providerId).then(this.renderProvider, this.renderError)
@@ -60,6 +62,18 @@ var edx = edx || {};
             this.getCourseData(courseId).then(function (responseData) {
                 $courseNamePlaceholder.text(responseData.name);
             });
+        },
+        renderUserFullNamePlaceholder: function (username) {
+            var userModel = Backbone.Model.extend({
+              urlRoot: '/api/user/v1/accounts/',
+                url: function() {
+                    return this.urlRoot + this.id;
+                }
+            });
+            this.user = new userModel({id:username});
+            this.user.fetch({success: function(userData) {
+                $(".full_name_placeholder").text(userData.get('name'));
+            }});
         },
         renderProvider: function (context) {
             var templateHtml = $("#provider-tpl").html(),

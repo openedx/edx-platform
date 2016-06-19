@@ -76,6 +76,7 @@
 # Juan Fernando Villa <elite.linux@gmail.com>, 2015
 # Juan <juan.marrero@utec.edu.uy>, 2015
 # Laura Silva <lingison@edx.org>, 2016
+# Leandro Agustín Barrientos <agustinbarrientos@outlook.com>, 2016
 # Mecabotware <mecabotware.ideas@gmail.com>, 2015
 # Nuri Plans Toral <nplans@gmail.com>, 2014
 # Patricia Colmenares <patrusca38@hotmail.com>, 2015

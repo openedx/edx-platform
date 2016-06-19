@@ -1,7 +1,8 @@
 <%page args="section_data" expression_filter="h"/>
 <%! from django.utils.translation import ugettext as _ %>
 <%! from django.core.urlresolvers import reverse %>
-<section id="invalidate_registration_code_modal" class="modal" role="dialog" tabindex="-1" aria-label="${_('Enrollment Code Status')}">
+<section id="invalidate_registration_code_modal" class="modal" role="dialog" tabindex="-1" aria-labelledby="header-enrollment-code-status">
+    <h2 id="header-enrollment-code-status" class="hd hd-2">${_("Enrollment Code Status")}</h2>
   <div class="inner-wrapper">
     <button class="close-modal">
       <span class="icon fa fa-remove" aria-hidden="true"></span>
@@ -13,7 +14,7 @@
 
     <div id="regcode-content">
       <header>
-        <h2>${_("Enrollment Code Status")}</h2>
+        <h3 class="hd hd-3">${_("Enrollment Code Status")}</h3>
       </header>
 
       <div class="instructions">

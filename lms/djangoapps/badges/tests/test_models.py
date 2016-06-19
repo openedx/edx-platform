@@ -3,6 +3,7 @@ Tests for the Badges app models.
 """
 from django.core.exceptions import ValidationError
 from django.core.files.images import ImageFile
+from django.core.files.storage import default_storage
 from django.db.utils import IntegrityError
 from django.test import TestCase
 from django.test.utils import override_settings
@@ -65,6 +66,21 @@ class BadgeClassTest(ModuleStoreTestCase):
     """
     Test BadgeClass functionality
     """
+
+    def setUp(self):
+        super(BadgeClassTest, self).setUp()
+        self.addCleanup(self.cleanup_uploads)
+
+    def cleanup_uploads(self):
+        """
+        Remove all files uploaded as badges.
+        """
+        upload_to = BadgeClass._meta.get_field('image').upload_to  # pylint: disable=protected-access
+        if default_storage.exists(upload_to):
+            (_, files) = default_storage.listdir(upload_to)
+            for uploaded_file in files:
+                default_storage.delete(upload_to + '/' + uploaded_file)
+
     # Need full path to make sure class names line up.
     @override_settings(BADGING_BACKEND='lms.djangoapps.badges.tests.test_models.DummyBackend')
     def test_backend(self):

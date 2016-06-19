@@ -125,7 +125,7 @@ class ProgramListingPageA11yTest(ProgramPageBase):
 
         self.listing_page.a11y_audit.config.set_rules({
             "ignore": [
-                'section',  # TODO: wcag2aa
+                'section',  # TODO: AC-491
             ]
         })
         self.listing_page.a11y_audit.check_for_accessibility_errors()
@@ -140,7 +140,7 @@ class ProgramListingPageA11yTest(ProgramPageBase):
 
         self.listing_page.a11y_audit.config.set_rules({
             "ignore": [
-                'section',  # TODO: wcag2aa
+                'section',  # TODO: AC-491
             ]
         })
         self.listing_page.a11y_audit.check_for_accessibility_errors()
@@ -164,7 +164,7 @@ class ProgramDetailsPageA11yTest(ProgramPageBase):
 
         self.details_page.a11y_audit.config.set_rules({
             "ignore": [
-                'section',  # TODO: wcag2aa
+                'section',  # TODO: AC-491
             ]
         })
         self.details_page.a11y_audit.check_for_accessibility_errors()

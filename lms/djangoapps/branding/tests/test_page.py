@@ -16,7 +16,6 @@ from nose.plugins.attrib import attr
 from edxmako.shortcuts import render_to_response
 
 from branding.views import index
-from edxmako.tests import mako_middleware_process_request
 import student.views
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -63,11 +62,9 @@ class AnonymousIndexPageTest(ModuleStoreTestCase):
         anonymous and start dates are being checked.  It replaces a previous
         test as it solves the issue in a different way
         """
-        request = self.factory.get('/')
-        request.user = AnonymousUser()
-
-        mako_middleware_process_request(request)
-        student.views.index(request)
+        self.client.logout()
+        response = self.client.get(reverse('root'))
+        self.assertEqual(response.status_code, 200)
 
     @override_settings(FEATURES=FEATURES_WITH_STARTDATE)
     def test_anon_user_with_startdate_index(self):

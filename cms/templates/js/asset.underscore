@@ -36,12 +36,12 @@
 <td class="actions-col">
     <ul class="actions-list">
         <li class="action-item action-delete">
-            <a href="#" data-tooltip="<%- gettext('Delete this asset') %>" class="remove-asset-button action-button"><i class="icon fa fa-times-circle" aria-hidden="true"></i> <span class="sr"><%- gettext('Delete this asset') %></span></a>
+            <a href="#" data-tooltip="<%- gettext('Delete this asset') %>" class="remove-asset-button action-button"><span class="icon fa fa-times-circle" aria-hidden="true"></span> <span class="sr"><%- gettext('Delete this asset') %></span></a>
         </li>
         <li class="action-item action-lock">
             <label for="<%- uniqueId %>"><span class="sr"><%- gettext('Lock this asset') %></span></label>
             <input type="checkbox" id="<%- uniqueId %>" class="lock-checkbox" data-tooltip="<%- gettext('Lock/unlock file') %>" />
-            <div class="action-button"><i class="icon fa fa-lock"></i><i class="icon fa fa-unlock-alt" aria-hidden="true"></i></div>
+            <div class="action-button"><span class="icon fa fa-lock" aria-hidden="true"></span><span class="icon fa fa-unlock-alt" aria-hidden="true"></span></div>
         </li>
     </ul>
 </td>

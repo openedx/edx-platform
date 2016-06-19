@@ -1,15 +1,12 @@
 """ Course Discovery API Service. """
 import datetime
 
+import jwt
 from django.conf import settings
 from edx_rest_api_client.client import EdxRestApiClient
-import jwt
 
 from openedx.core.djangoapps.theming import helpers
-from provider.oauth2.models import Client
 from student.models import UserProfile, anonymous_id_for_user
-
-CLIENT_NAME = 'course-discovery'
 
 
 def get_id_token(user):
@@ -44,10 +41,9 @@ def get_id_token(user):
     }
     secret_key = helpers.get_value('JWT_AUTH', settings.JWT_AUTH)['JWT_SECRET_KEY']
 
-    return jwt.encode(payload, secret_key)
+    return jwt.encode(payload, secret_key).decode('utf-8')
 
 
 def course_discovery_api_client(user):
     """ Returns a Course Discovery API client setup with authentication for the specified user. """
-    course_discovery_client = Client.objects.get(name=CLIENT_NAME)
-    return EdxRestApiClient(course_discovery_client.url, jwt=get_id_token(user))
+    return EdxRestApiClient(settings.COURSE_CATALOG_API_URL, jwt=get_id_token(user))

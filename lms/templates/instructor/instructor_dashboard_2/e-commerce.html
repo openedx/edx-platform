@@ -3,6 +3,7 @@
 from django.utils.translation import ugettext as _
 from datetime import datetime, timedelta
 from openedx.core.djangolib.js_utils import js_escaped_string
+from openedx.core.djangolib.markup import HTML, Text
 import pytz
 %>
 <%include file="add_coupon_modal.html" args="section_data=section_data" />
@@ -11,10 +12,10 @@ import pytz
 <%include file="generate_registarion_codes_modal.html" args="section_data=section_data" />
 <%include file="invalidate_registration_code_modal.html" args="section_data=section_data" />
 <div class="ecommerce-wrapper">
-   <h3 class="error-msgs" id="error-msg"></h3>
+   <div class="error-msgs" id="error-msg"></div>
    <div id = "accordion">
       <div class="wrap">
-         <h2>${_('Enrollment Codes')}</h2>
+         <h3 class="hd hd-3">${_('Enrollment Codes')}</h3>
          <div>
             %if section_data['sales_admin']:
             <span class="code_tip">
@@ -55,7 +56,7 @@ import pytz
       <!-- end wrap -->
       %if section_data['coupons_enabled']:
       <div class="wrap">
-         <h2>${_("Course Price")}</h2>
+         <h3 class="hd hd-3">${_("Course Price")}</h3>
          <div>
             <span class="tip">${_("Course price per seat: ")}<span>${section_data['currency_symbol']}${section_data['course_price']}</span>
             %if section_data['access']['finance_admin'] is True:
@@ -68,7 +69,7 @@ import pytz
       <!-- end wrap -->
       %if section_data['access']['finance_admin']:
       <div class="wrap">
-         <h2>${_("Course Seat Purchases")}</h2>
+         <h3 class="hd hd-3">${_("Course Seat Purchases")}</h3>
          <div>
             %if section_data['total_amount'] is not None:
               <span><strong>${_("Total Credit Card Purchases: ")}</strong></span><span>${section_data['currency_symbol']}${section_data['total_amount']}</span>
@@ -93,7 +94,7 @@ import pytz
       %endif
       %if section_data['reports_enabled']:
       <div class="reports wrap">
-        <h2>${_("Reports")}</h2>
+        <h3 class="hd hd-3">${_("Reports")}</h3>
         <div>
           <span class="csv_tip">
             <div>
@@ -118,7 +119,12 @@ import pytz
             <p>${_("The following reports are available for download. Reports are not deleted. A link to every report remains available on this page, identified by the date and time (in UTC) that the report was generated.")}</p>
 
             ## Translators: a table of URL links to report files appears after this sentence.
-            <p>${_("<b>Note</b>: To help protect learner data, links to these reports that you save outside of this page or that you send or receive in email expire after five minutes.")}</p><br>
+            <p>
+                ${Text(_("{strong_start}Note{strong_end}: To help protect learner data, links to these reports that you save outside of this page or that you send or receive in email expire after five minutes.")).format(
+                    strong_start=HTML("<strong>"),
+                    strong_end=HTML("</strong>"),
+                )}
+            </p><br>
 
             <div class="report-downloads-table" id="report-downloads-table"
                 data-endpoint="${ section_data['list_financial_report_downloads_url'] }"></div>
@@ -127,7 +133,7 @@ import pytz
           %if settings.FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS'):
           <div class="running-tasks-container action-type-container">
             <hr>
-            <h2> ${_("Pending Tasks")} </h2>
+            <h3 class="hd hd-3">${_("Pending Tasks")}</h3>
             <div class="running-tasks-section">
               <p>${_("The status for any active tasks appears in a table below.")} </p>
               <br/>
@@ -141,7 +147,7 @@ import pytz
       %endif
       %if section_data['coupons_enabled']:
       <div class="wrap">
-         <h2>${_("Coupon Code List")}</h2>
+         <h3 class="hd hd-3">${_("Coupon Code List")}</h3>
          <div>
 
             <span class="csv_tip">${_("Download a .csv file of all coupon codes for this course.")}
@@ -256,7 +262,7 @@ import pytz
          }
          if($('#invoice_number').val() == "") {
                      $('#error-msg').attr('class','error-msgs')
-                     $('#error-msg').html("${_('The Invoice Number field cannot be empty.') | n, h, js_escaped_string}").show();
+                    $('#error-msg').text("${_('The Invoice Number field cannot be empty.') | n, js_escaped_string}").show();
                      return
          }
          $.ajax({
@@ -265,12 +271,14 @@ import pytz
              url: "${section_data['sale_validation_url'] | n, js_escaped_string}",
              success: function (data) {
                  $('#error-msg').attr('class','success-msgs')
-                 $('#error-msg').html(data.message).show();
+                 edx.HtmlUtils.setHtml($('#error-msg'), data.message);
+                 $('#error-msg').show();
                  $('#invoice_number').val('');
              },
              error: function(jqXHR, textStatus, errorThrown) {
                  $('#error-msg').attr('class','error-msgs')
-                 $('#error-msg').html(jqXHR.responseText).show();
+                 edx.HtmlUtils.setHtml($('#error-msg'), jqXHR.responseText);
+                 $('#error-msg').show();
              }
          });
      });
@@ -307,7 +315,8 @@ import pytz
          error: function(jqXHR, textStatus, errorThrown) {
            var data = $.parseJSON(jqXHR.responseText);
            $('#error-msg').attr('class','error-msgs')
-           $('#error-msg').html(data.message).show();
+           edx.HtmlUtils.setHtml($('#error-msg'), data.message);
+           $('#error-msg').show();
          }
        });
      });
@@ -332,7 +341,8 @@ import pytz
          error: function(jqXHR, textStatus, errorThrown) {
            var data = $.parseJSON(jqXHR.responseText);
            $('#error-msg').attr('class','error-msgs')
-           $('#error-msg').html(data.message).show();
+           edx.HtmlUtils.setHtml($('#error-msg'), data.message);
+           $('#error-msg').show();
            anchor.removeData("disabled");
          }
        });

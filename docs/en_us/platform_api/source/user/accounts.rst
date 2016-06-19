@@ -17,7 +17,7 @@ tasks.
 Get and Update a User's Account Information
 **********************************************
 
-.. autoclass:: user_api.accounts.views.AccountView
+.. autoclass:: user_api.accounts.views.AccountViewSet
 
 **Example response showing a user's account information**
 
