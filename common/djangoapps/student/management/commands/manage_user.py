@@ -94,6 +94,7 @@ class Command(BaseCommand):
 
         # Set unusable password if specified
         if unusable_password and user.has_usable_password():
+            self.stderr.write(_('Setting unusable_password for user "{}"').format(user))
             user.set_unusable_password()
 
         # Ensure the user has a profile
