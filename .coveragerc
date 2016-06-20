@@ -26,6 +26,8 @@ omit =
     openedx/core/djangoapps/*/migrations/*
     openedx/core/djangoapps/debug/*
 
+concurrency=multiprocessing
+
 [report]
 ignore_errors = True
 

@@ -142,6 +142,11 @@ define([
                 expectPaymentSubmitted( view, {foo: 'bar'} );
             });
 
+            it ('view containing user email', function() {
+                createView({userEmail: 'test@example.com', requirements: {isVisible:true}, isActive: false});
+                expect($('p.instruction-info:contains("test@example.com")').length).toEqual(1);
+            });
+
             it( 'provides working payment buttons for a single processor', function() {
                 createView({processors: ['cybersource']});
                 checkPaymentButtons( AjaxHelpers.requests(this), {cybersource: "Checkout"});

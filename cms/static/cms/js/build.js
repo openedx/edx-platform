@@ -1,8 +1,8 @@
-(function () {
+(function() {
     'use strict';
     var commonLibrariesPath = 'common/js/common_libraries';
 
-    var getModule = function (moduleName, excludeCommonDeps) {
+    var getModule = function(moduleName, excludeCommonDeps) {
         var module = {
             name: moduleName
         };
@@ -14,7 +14,7 @@
         return module;
     };
 
-    var getModulesList = function (modules) {
+    var getModulesList = function(modules) {
         var result = [getModule(commonLibrariesPath)];
         return result.concat(modules.map(function (moduleName) {
             return getModule(moduleName, true);
@@ -92,7 +92,7 @@
         /**
          * Stub out requireJS text in the optimized file, but leave available for non-optimized development use.
          */
-        stubModules: ["text"],
+        stubModules: ['text'],
 
         /**
          * If shim config is used in the app during runtime, duplicate the config
@@ -170,4 +170,4 @@
          */
         logLevel: 1
     };
-} ())
+}())

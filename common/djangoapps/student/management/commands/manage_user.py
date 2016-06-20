@@ -23,6 +23,7 @@ class Command(BaseCommand):
         parser.add_argument('--remove', dest='is_remove', action='store_true')
         parser.add_argument('--superuser', dest='is_superuser', action='store_true')
         parser.add_argument('--staff', dest='is_staff', action='store_true')
+        parser.add_argument('--unusable-password', dest='unusable_password', action='store_true')
         parser.add_argument('-g', '--groups', nargs='*', default=[])
 
     def _maybe_update(self, user, attribute, new_value):
@@ -68,7 +69,7 @@ class Command(BaseCommand):
         user.delete()
 
     @transaction.atomic
-    def handle(self, username, email, is_remove, is_staff, is_superuser, groups, *args, **options):
+    def handle(self, username, email, is_remove, is_staff, is_superuser, groups, unusable_password, *args, **options):
 
         if is_remove:
             return self._handle_remove(username, email)
@@ -90,6 +91,11 @@ class Command(BaseCommand):
 
         self._maybe_update(user, 'is_staff', is_staff)
         self._maybe_update(user, 'is_superuser', is_superuser)
+
+        # Set unusable password if specified
+        if unusable_password and user.has_usable_password():
+            self.stderr.write(_('Setting unusable password for user "{}"').format(user))
+            user.set_unusable_password()
 
         # Ensure the user has a profile
         try:

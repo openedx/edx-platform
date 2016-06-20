@@ -29,6 +29,7 @@ var options = {
         {pattern: 'common/js/vendor/jquery.js', included: true},
         {pattern: 'common/js/vendor/jquery-migrate.js', included: true},
         {pattern: 'common/js/vendor/underscore.js', included: true},
+        {pattern: 'common/js/xblock/*.js', included: true},
         {pattern: 'xmodule_js/common_static/js/src/logger.js', included: true},
         {pattern: 'xmodule_js/common_static/js/test/i18n.js', included: true},
         {pattern: 'xmodule_js/common_static/js/vendor/CodeMirror/codemirror.js', included: true},
@@ -38,8 +39,6 @@ var options = {
         {pattern: 'xmodule_js/common_static/js/vendor/jquery-ui.min.js', included: true},
         {pattern: 'xmodule_js/common_static/js/vendor/URI.min.js', included: true},
 
-        {pattern: 'xmodule_js/common_static/js/xblock/*.js', included: true},
-        {pattern: 'xmodule_js/common_static/coffee/src/xblock/*.js', included: true},
         {pattern: 'xmodule_js/src/capa/*.js', included: true},
         {pattern: 'xmodule_js/src/video/*.js', included: true},
         {pattern: 'xmodule_js/src/xmodule.js', included: true},

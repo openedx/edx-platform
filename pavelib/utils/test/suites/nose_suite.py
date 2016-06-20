@@ -126,8 +126,7 @@ class SystemTestSuite(NoseTestSuite):
         self.randomize = kwargs.get('randomize', None)
 
         if self.processes is None:
-            # Use one process per core for LMS tests, and no multiprocessing
-            # otherwise.
+            # Don't use multiprocessing by default
             self.processes = 0
 
         self.processes = int(self.processes)
