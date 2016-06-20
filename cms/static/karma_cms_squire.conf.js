@@ -36,7 +36,7 @@ var options = {
     ],
 
     runFiles: [
-        {pattern: 'coffee/spec/main_squire.js', included: true}
+        {pattern: 'cms/js/spec/main_squire.js', included: true}
     ]
 };
 

@@ -54,8 +54,7 @@ var commonFiles = {
     ],
 
     sourceFiles: [
-        {pattern: 'common/js/components/**/*.js'},
-        {pattern: 'common/js/utils/**/*.js'}
+        {pattern: 'common/js/!(spec_helpers)/**/!(*spec).js'}
     ],
 
     specFiles: [

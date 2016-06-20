@@ -1,10 +1,11 @@
-define(["js/spec_helpers/edit_helpers", "js/views/modals/base_modal", "xblock/cms.runtime.v1"],
-    function (EditHelpers, BaseModal) {
+define(['js/spec_helpers/edit_helpers', 'js/views/modals/base_modal', 'xblock/cms.runtime.v1'],
+    function(EditHelpers, BaseModal) {
+        'use strict';
 
-        describe("Studio Runtime v1", function() {
+        describe('Studio Runtime v1', function() {
             var runtime;
 
-            beforeEach(function () {
+            beforeEach(function() {
                 EditHelpers.installEditTemplates();
                 runtime = new window.StudioRuntime.v1();
             });
@@ -20,7 +21,7 @@ define(["js/spec_helpers/edit_helpers", "js/views/modals/base_modal", "xblock/cm
             });
 
             it('shows save notifications', function() {
-                var title = "Mock saving...",
+                var title = 'Mock saving...',
                     notificationSpy = EditHelpers.createNotificationSpy();
                 runtime.notify('save', {
                     state: 'start',
@@ -34,9 +35,9 @@ define(["js/spec_helpers/edit_helpers", "js/views/modals/base_modal", "xblock/cm
             });
 
             it('shows error messages', function() {
-                var title = "Mock Error",
-                    message = "This is a mock error.",
-                    notificationSpy = EditHelpers.createNotificationSpy("Error");
+                var title = 'Mock Error',
+                    message = 'This is a mock error.',
+                    notificationSpy = EditHelpers.createNotificationSpy('Error');
                 runtime.notify('error', {
                     title: title,
                     message: message
@@ -44,7 +45,7 @@ define(["js/spec_helpers/edit_helpers", "js/views/modals/base_modal", "xblock/cm
                 EditHelpers.verifyNotificationShowing(notificationSpy, title);
             });
 
-            describe("Modal Dialogs", function() {
+            describe('Modal Dialogs', function() {
                 var MockModal, modal, showMockModal;
 
                 MockModal = BaseModal.extend({
@@ -55,12 +56,12 @@ define(["js/spec_helpers/edit_helpers", "js/views/modals/base_modal", "xblock/cm
 
                 showMockModal = function() {
                     modal = new MockModal({
-                        title: "Mock Modal"
+                        title: 'Mock Modal'
                     });
                     modal.show();
                 };
 
-                beforeEach(function () {
+                beforeEach(function() {
                     EditHelpers.installEditTemplates();
                 });
 
@@ -68,7 +69,7 @@ define(["js/spec_helpers/edit_helpers", "js/views/modals/base_modal", "xblock/cm
                     EditHelpers.hideModalIfShowing(modal);
                 });
 
-                it('cancels a modal dialog', function () {
+                it('cancels a modal dialog', function() {
                     showMockModal();
                     runtime.notify('modal-shown', modal);
                     expect(EditHelpers.isShowingModal(modal)).toBeTruthy();

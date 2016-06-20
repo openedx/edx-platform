@@ -21,11 +21,13 @@ var options = {
     // Make sure the patterns in sourceFiles and specFiles do not match the same file.
     // Otherwise Istanbul which is used for coverage tracking will cause tests to not run.
     sourceFiles: [
+        {pattern: 'cms/**/!(*spec|djangojs).js'},
         {pattern: 'coffee/src/**/!(*spec).js'},
         {pattern: 'js/**/!(*spec|djangojs).js'}
     ],
 
     specFiles: [
+        {pattern: 'cms/**/*spec.js'},
         {pattern: 'coffee/spec/**/*spec.js'},
         {pattern: 'js/certificates/spec/**/*spec.js'},
         {pattern: 'js/spec/**/*spec.js'}
@@ -37,10 +39,10 @@ var options = {
     ],
 
     runFiles: [
-        {pattern: 'coffee/spec/main.js', included: true}
+        {pattern: 'cms/js/spec/main.js', included: true}
     ]
 };
 
-module.exports = function (config) {
+module.exports = function(config) {
     configModule.configure(config, options);
 };
