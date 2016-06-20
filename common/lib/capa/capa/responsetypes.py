@@ -262,7 +262,7 @@ class LoncapaResponse(object):
 
         for item in self.xml:
             # call provided procedure to do the rendering
-            item_xhtml = renderer(item, info={'p_tag_ids': p_tag_ids})
+            item_xhtml = renderer(item, a11y_data={'p_tag_ids': p_tag_ids})
             if item_xhtml is not None:
                 tree.append(item_xhtml)
         tree.tail = self.xml.tail

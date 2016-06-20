@@ -723,7 +723,7 @@ class LoncapaProblem(object):
         context['extra_files'] = extra_files or None
         return context
 
-    def _extract_html(self, problemtree, info=None):  # private
+    def _extract_html(self, problemtree, a11y_data=None):  # private
         """
         Main (private) function which converts Problem XML tree to HTML.
         Calls itself recursively.
@@ -735,7 +735,7 @@ class LoncapaProblem(object):
 
         Args:
             problemtree: problem xml element
-            info: dict to contain information like descripition ids etc to be used by an inputtype
+            a11y_data: dict to contain information like descripition ids etc to be used for a11y
         """
         if not isinstance(problemtree.tag, basestring):
             # Comment and ProcessingInstruction nodes are not Elements,
@@ -789,7 +789,7 @@ class LoncapaProblem(object):
                     'hint': hint,
                     'hintmode': hintmode,
                 },
-                'a11y_data': info
+                'a11y_data': a11y_data or {}
             }
 
             input_type_cls = inputtypes.registry.get_class_for_tag(problemtree.tag)
@@ -813,7 +813,7 @@ class LoncapaProblem(object):
         # otherwise, render children recursively, and copy over attributes
         tree = etree.Element(problemtree.tag)
         for item in problemtree:
-            item_xhtml = self._extract_html(item, info)
+            item_xhtml = self._extract_html(item, a11y_data)
             if item_xhtml is not None:
                 tree.append(item_xhtml)
 
@@ -847,7 +847,7 @@ class LoncapaProblem(object):
             # create and save ID for this response
             response.set('id', response_id_str)
 
-            # set unique ids on all <p> tags to be used for a11y
+            # set unique ids on all <p> tags in responsetype to be used for a11y
             for p_index, p_element in enumerate(response.findall('.//p')):
                 p_tag_id = '{}_q{}_desc{}'.format(self.problem_id, response_id, p_index)
                 p_element.attrib['id'] = p_tag_id
