@@ -1,14 +1,4 @@
 describe 'MarkdownEditingDescriptor', ->
-  beforeEach ->
-      jasmine.addMatchers
-        toXMLEqual: ->
-          return {
-            compare: (actual, expected) ->
-              {
-                  # compare the actual and expected XMLs by removing all the whitespace characters.
-                  pass: actual.replace(/\s+/g, '') == expected.replace(/\s+/g, '')
-              }
-          }
   describe 'save stores the correct data', ->
     it 'saves markdown from markdown editor', ->
       loadFixtures 'problem-with-markdown.html'
@@ -202,7 +192,7 @@ describe 'MarkdownEditingDescriptor', ->
       expect(data).toXMLEqual("""<problem>
         <numericalresponse answer="0">
           <p>Enter 0 with a tolerance:</p>
-        <responseparam type="tolerance" default=".02"/>
+          <responseparam type="tolerance" default=".02"/>
           <formulaequationinput/>
         </numericalresponse>
 

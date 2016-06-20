@@ -605,9 +605,7 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
 
             // replace <p> tag for question title with <label> tag
             if (child.hasAttribute('class') && child.getAttribute('class') === 'qtitle') {
-                var label = document.createElement('label');
-                label.appendChild(document.createTextNode(child.textContent));
-                child = label;
+                child = $('<label>' + child.textContent + '</label>')[0];
             }
 
             if (_.contains(independentTagNames, child.nodeName)) {
