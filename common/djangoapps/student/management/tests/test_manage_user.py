@@ -56,7 +56,13 @@ class TestManageUserCommand(TestCase):
         self.assertEqual([(TEST_USERNAME, TEST_EMAIL)], [(u.username, u.email) for u in User.objects.all()])
         user.set_password(User.objects.make_random_password())
         user.save()
+
+        # Run once without passing --unusable-password and make sure the password is usable
+        call_command('manage_user', TEST_USERNAME, TEST_EMAIL)
+        user = User.objects.get(username=TEST_USERNAME, email=TEST_EMAIL)
         self.assertTrue(user.has_usable_password())
+
+        # Make sure the user now has an unusable_password
         call_command('manage_user', TEST_USERNAME, TEST_EMAIL, '--unusable-password')
         user = User.objects.get(username=TEST_USERNAME, email=TEST_EMAIL)
         self.assertFalse(user.has_usable_password())
@@ -64,7 +70,6 @@ class TestManageUserCommand(TestCase):
         # check idempotency
         call_command('manage_user', TEST_USERNAME, TEST_EMAIL, '--unusable-password')
         self.assertFalse(user.has_usable_password())
-
 
     def test_wrong_email(self):
         """
