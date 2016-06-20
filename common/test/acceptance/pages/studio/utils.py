@@ -101,6 +101,18 @@ def add_component(page, item_type, specific_type, is_advanced_problem=False):
     page.wait_for_ajax()
 
 
+def add_components(page, item_type, items, is_advanced_problem=False):
+    """
+    Adds multiple components of a specific type.
+    item_type should be "advanced", "html", "problem", or "video"
+    items is a list of components of specific type to be added.
+    Please note that if you want to create an advanced problem
+    then all other items must be of advanced problem type.
+    """
+    for item in items:
+        add_component(page, item_type, item, is_advanced_problem)
+
+
 def add_html_component(page, menu_index, boilerplate=None):
     """
     Adds an instance of the HTML component with the specified name.
