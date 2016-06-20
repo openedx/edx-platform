@@ -9,7 +9,7 @@ from django.conf import settings
 from django.test import TestCase
 from django.test.utils import override_settings
 
-from openedx.core.djangoapps.theming.test_util import with_is_edx_domain
+from openedx.core.djangoapps.theming.tests.test_util import with_is_edx_domain
 
 
 @attr('shard_1')

@@ -10,7 +10,7 @@ import mock
 import ddt
 from config_models.models import cache
 from branding.models import BrandingApiConfig
-from openedx.core.djangoapps.theming.test_util import with_edx_domain_context
+from openedx.core.djangoapps.theming.tests.test_util import with_edx_domain_context
 
 
 @ddt.ddt

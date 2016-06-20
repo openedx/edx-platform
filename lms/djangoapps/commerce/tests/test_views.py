@@ -8,7 +8,7 @@ from django.test import TestCase
 import mock
 
 from student.tests.factories import UserFactory
-from openedx.core.djangoapps.theming.test_util import with_is_edx_domain
+from openedx.core.djangoapps.theming.tests.test_util import with_is_edx_domain
 
 
 class UserMixin(object):

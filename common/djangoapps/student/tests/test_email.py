@@ -20,7 +20,7 @@ from django.conf import settings
 from edxmako.shortcuts import render_to_string
 from util.request import safe_get_host
 from util.testing import EventTestMixin
-from openedx.core.djangoapps.theming.test_util import with_is_edx_domain
+from openedx.core.djangoapps.theming.tests.test_util import with_is_edx_domain
 from openedx.core.djangoapps.theming import helpers as theming_helpers
 
 
