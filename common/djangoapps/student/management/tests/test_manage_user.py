@@ -50,7 +50,7 @@ class TestManageUserCommand(TestCase):
 
     def test_unusable_password(self):
         """
-        Ensures that a user's password is set to an unusable_password.
+        Ensure that a user's password is set to an unusable_password.
         """
         user = User.objects.create(username=TEST_USERNAME, email=TEST_EMAIL)
         self.assertEqual([(TEST_USERNAME, TEST_EMAIL)], [(u.username, u.email) for u in User.objects.all()])
