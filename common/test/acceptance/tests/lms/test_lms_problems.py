@@ -51,7 +51,7 @@ class ProblemsTest(UniqueCourseTest):
             email=self.email,
             password=self.password,
             course_id=self.course_id,
-            staff=False
+            staff=True
         ).visit()
 
     def get_problem(self):

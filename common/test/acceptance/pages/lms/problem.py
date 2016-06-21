@@ -129,6 +129,11 @@ class ProblemPage(PageObject):
         self.q(css='div.problem button.reset').click()
         self.wait_for_ajax()
 
+    def click_show_hide_button(self):
+        """ Click the Show/Hide button. """
+        self.q(css='div.problem div.action .show').click()
+        self.wait_for_ajax()
+
     def wait_for_status_icon(self):
         """
         wait for status icon
@@ -199,3 +204,20 @@ class ProblemPage(PageObject):
         """
         self.wait_for_element_visibility('body > .tooltip', 'A tooltip is visible.')
         return self.q(css='body > .tooltip').text[0]
+
+    def is_solution_tag_present(self):
+        """
+        Check if solution/explanation is shown.
+        """
+        solution_selector = '.solution-span div.detailed-solution'
+        return self.q(css=solution_selector).is_present()
+
+    def is_correct_choice_highlighted(self, correct_choices):
+        """
+        Check if correct answer/choice highlighted for choice group.
+        """
+        xpath = '//fieldset/div[contains(@class, "field")][{0}]/label[contains(@class, "choicegroup_correct")]'
+        for choice in correct_choices:
+            if not self.q(xpath=xpath.format(choice)).is_present():
+                return False
+        return True
