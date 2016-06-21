@@ -7,12 +7,14 @@ import uuid
 import json
 import warnings
 from collections import defaultdict
-from urlparse import urljoin
+from urlparse import urljoin, urlsplit, parse_qs, urlunsplit
 
+from django.views.generic import TemplateView
 from pytz import UTC
 from requests import HTTPError
 from ipware.ip import get_ip
 
+import edx_oauth2_provider
 from django.conf import settings
 from django.contrib.auth import logout, authenticate, login
 from django.contrib.auth.models import User, AnonymousUser
@@ -21,22 +23,21 @@ from django.contrib.auth.views import password_reset_confirm
 from django.contrib import messages
 from django.core.context_processors import csrf
 from django.core import mail
-from django.core.urlresolvers import reverse, NoReverseMatch
+from django.core.urlresolvers import reverse, NoReverseMatch, reverse_lazy
 from django.core.validators import validate_email, ValidationError
 from django.db import IntegrityError, transaction
-from django.http import (HttpResponse, HttpResponseBadRequest, HttpResponseForbidden,
-                         HttpResponseServerError, Http404)
+from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseServerError, Http404
 from django.shortcuts import redirect
 from django.utils.encoding import force_bytes, force_text
 from django.utils.translation import ungettext
-from django.utils.http import base36_to_int, urlsafe_base64_encode
+from django.utils.http import base36_to_int, urlsafe_base64_encode, urlencode
 from django.utils.translation import ugettext as _, get_language
 from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
 from django.views.decorators.http import require_POST, require_GET
 from django.db.models.signals import post_save
 from django.dispatch import receiver, Signal
 from django.template.response import TemplateResponse
-
+from provider.oauth2.models import Client
 from ratelimitbackend.exceptions import RateLimitException
 
 from social.apps.django_app import utils as social_utils
@@ -52,7 +53,8 @@ from student.models import (
     PendingEmailChange, CourseEnrollment, CourseEnrollmentAttribute, unique_id_for_user,
     CourseEnrollmentAllowed, UserStanding, LoginFailures,
     create_comments_service_user, PasswordHistory, UserSignupSource,
-    DashboardConfiguration, LinkedInAddToProfileConfiguration, ManualEnrollmentAudit, ALLOWEDTOENROLL_TO_ENROLLED)
+    DashboardConfiguration, LinkedInAddToProfileConfiguration, ManualEnrollmentAudit, ALLOWEDTOENROLL_TO_ENROLLED,
+    LogoutViewConfiguration)
 from student.forms import AccountCreationForm, PasswordResetFormNoActive, get_registration_extension_form
 from lms.djangoapps.commerce.utils import EcommerceService  # pylint: disable=import-error
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification  # pylint: disable=import-error
@@ -68,7 +70,6 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from opaque_keys.edx.locator import CourseLocator
-from xmodule.modulestore import ModuleStoreEnum
 
 from collections import namedtuple
 
@@ -733,7 +734,7 @@ def dashboard(request):
         'denied_banner': denied_banner,
         'billing_email': settings.PAYMENT_SUPPORT_EMAIL,
         'user': user,
-        'logout_url': reverse(logout_user),
+        'logout_url': reverse('logout'),
         'platform_name': platform_name,
         'enrolled_courses_either_paid': enrolled_courses_either_paid,
         'provider_states': [],
@@ -1356,27 +1357,6 @@ def login_oauth_token(request, backend):
         else:
             return JsonResponse({"error": "invalid_request"}, status=400)
     raise Http404
-
-
-@ensure_csrf_cookie
-def logout_user(request):
-    """
-    HTTP request to log out the user. Redirects to marketing page.
-    Deletes both the CSRF and sessionid cookies so the marketing
-    site can determine the logged in state of the user
-    """
-    # We do not log here, because we have a handler registered
-    # to perform logging on successful logouts.
-    request.is_from_logout = True
-    logout(request)
-    if settings.FEATURES.get('AUTH_USE_CAS'):
-        target = reverse('cas-logout')
-    else:
-        target = '/'
-    response = redirect(target)
-
-    delete_logged_in_cookies(response)
-    return response
 
 
 @require_GET
@@ -2487,3 +2467,74 @@ def _get_course_programs(user, user_enrolled_courses):  # pylint: disable=invali
                     log.warning('Program structure is invalid, skipping display: %r', program)
 
     return programs_data
+
+
+class LogoutView(TemplateView):
+    """
+    Logs out user and redirects.
+
+    The template should load iframes to log the user out of OpenID Connect services.
+    See http://openid.net/specs/openid-connect-logout-1_0.html.
+    """
+    oauth_client_ids = []
+    template_name = 'logout.html'
+
+    # Keep track of the page to which the user should ultimately be redirected.
+    target = reverse_lazy('cas-logout') if settings.FEATURES.get('AUTH_USE_CAS') else '/'
+
+    def dispatch(self, request, *args, **kwargs):  # pylint: disable=missing-docstring
+        # We do not log here, because we have a handler registered to perform logging on successful logouts.
+        request.is_from_logout = True
+
+        # Get the list of authorized clients before we clear the session.
+        self.oauth_client_ids = request.session.get(edx_oauth2_provider.constants.AUTHORIZED_CLIENTS_SESSION_KEY, [])
+
+        logout(request)
+
+        # If we don't need to deal with OIDC logouts, just redirect the user.
+        if LogoutViewConfiguration.current().enabled and self.oauth_client_ids:
+            response = super(LogoutView, self).dispatch(request, *args, **kwargs)
+        else:
+            response = redirect(self.target)
+
+        # Clear the cookie used by the edx.org marketing site
+        delete_logged_in_cookies(response)
+
+        return response
+
+    def _build_logout_url(self, url):
+        """
+        Builds a logout URL with the `no_redirect` query string parameter.
+
+        Args:
+            url (str): IDA logout URL
+
+        Returns:
+            str
+        """
+        scheme, netloc, path, query_string, fragment = urlsplit(url)
+        query_params = parse_qs(query_string)
+        query_params['no_redirect'] = 1
+        new_query_string = urlencode(query_params, doseq=True)
+        return urlunsplit((scheme, netloc, path, new_query_string, fragment))
+
+    def get_context_data(self, **kwargs):
+        context = super(LogoutView, self).get_context_data(**kwargs)
+
+        # Create a list of URIs that must be called to log the user out of all of the IDAs.
+        uris = Client.objects.filter(client_id__in=self.oauth_client_ids,
+                                     logout_uri__isnull=False).values_list('logout_uri', flat=True)
+
+        referrer = self.request.META.get('HTTP_REFERER', '').strip('/')
+        logout_uris = []
+
+        for uri in uris:
+            if not referrer or (referrer and not uri.startswith(referrer)):
+                logout_uris.append(self._build_logout_url(uri))
+
+        context.update({
+            'target': self.target,
+            'logout_uris': logout_uris,
+        })
+
+        return context

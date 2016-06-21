@@ -1360,3 +1360,61 @@ class IsCommentableCohortedTestCase(ModuleStoreTestCase):
         # Verify that team discussions are not cohorted, but other discussions are
         self.assertFalse(utils.is_commentable_cohorted(course.id, team.discussion_topic_id))
         self.assertTrue(utils.is_commentable_cohorted(course.id, "random"))
+
+
+class PermissionsTestCase(ModuleStoreTestCase):
+    """Test utils functionality related to forums "abilities" (permissions)"""
+
+    def test_get_ability(self):
+        content = {}
+        content['user_id'] = '1'
+        content['type'] = 'thread'
+
+        user = mock.Mock()
+        user.id = 1
+
+        with mock.patch('django_comment_client.utils.check_permissions_by_view') as check_perm:
+            check_perm.return_value = True
+            self.assertEqual(utils.get_ability(None, content, user), {
+                'editable': True,
+                'can_reply': True,
+                'can_delete': True,
+                'can_openclose': True,
+                'can_vote': False,
+                'can_report': False
+            })
+
+            content['user_id'] = '2'
+            self.assertEqual(utils.get_ability(None, content, user), {
+                'editable': True,
+                'can_reply': True,
+                'can_delete': True,
+                'can_openclose': True,
+                'can_vote': True,
+                'can_report': True
+            })
+
+    def test_is_content_authored_by(self):
+        content = {}
+        user = mock.Mock()
+        user.id = 1
+
+        # strict equality checking
+        content['user_id'] = 1
+        self.assertTrue(utils.is_content_authored_by(content, user))
+
+        # cast from string to int
+        content['user_id'] = '1'
+        self.assertTrue(utils.is_content_authored_by(content, user))
+
+        # strict equality checking, fails
+        content['user_id'] = 2
+        self.assertFalse(utils.is_content_authored_by(content, user))
+
+        # cast from string to int, fails
+        content['user_id'] = 'string'
+        self.assertFalse(utils.is_content_authored_by(content, user))
+
+        # content has no known author
+        del content['user_id']
+        self.assertFalse(utils.is_content_authored_by(content, user))

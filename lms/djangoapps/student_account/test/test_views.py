@@ -595,6 +595,29 @@ class AccountSettingsViewTest(ThirdPartyAuthTestMixin, TestCase, ProgramsApiConf
 
         self.assertEqual(order_detail, [])
 
+    def test_order_history_with_no_product(self):
+        response = {
+            'results': [
+                factories.OrderFactory(
+                    lines=[
+                        factories.OrderLineFactory(
+                            product=None
+                        ),
+                        factories.OrderLineFactory(
+                            product=factories.ProductFactory(attribute_values=[factories.ProductAttributeFactory(
+                                name='certificate_type',
+                                value='verified'
+                            )])
+                        )
+                    ]
+                )
+            ]
+        }
+        with mock_get_orders(response=response):
+            order_detail = get_user_orders(self.user)
+
+        self.assertEqual(len(order_detail), 1)
+
 
 @override_settings(SITE_NAME=settings.MICROSITE_LOGISTRATION_HOSTNAME)
 class MicrositeLogistrationTests(TestCase):

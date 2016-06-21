@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-06-09 15:20+0000\n"
-"PO-Revision-Date: 2016-06-09 15:21:36.475893\n"
+"POT-Creation-Date: 2016-06-16 14:28+0000\n"
+"PO-Revision-Date: 2016-06-16 14:36:14.893510\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -1737,6 +1737,10 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/08_video_speed_control.js
 msgid "Adjust video speed"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/js/src/video/08_video_speed_control.js
+msgid "Video speed: "
 msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/09_play_skip_control.js
@@ -6758,6 +6762,11 @@ msgid "not enrolled"
 msgstr ""
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
+#, python-format
+msgid "Starts %(start)s"
+msgstr ""
+
+#: lms/templates/learner_dashboard/course_enroll.underscore
 msgid "Enroll Now"
 msgstr ""
 
@@ -8807,4 +8816,20 @@ msgstr ""
 
 #: cms/templates/js/video/transcripts/messages/transcripts-use-existing.underscore
 msgid "Use Current Transcript"
+msgstr ""
+
+#: lms/templates/verify_student/make_payment_step.underscore:47
+msgid ""
+"We ask you to activate your account to ensure it is really you creating the "
+"account and to prevent fraud."
+msgstr ""
+
+#: lms/templates/verify_student/make_payment_step.underscore:41
+msgid ""
+"An email has been sent to {userEmail} with a link for you to activate your "
+"account."
+msgstr ""
+
+#: lms/templates/verify_student/make_payment_step.underscore:45
+msgid "Why activate?"
 msgstr ""

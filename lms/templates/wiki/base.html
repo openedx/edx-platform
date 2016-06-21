@@ -2,7 +2,9 @@
 {% with online_help_token="wiki" %}
 {% load pipeline %}{% load sekizai_tags i18n microsite %}{% load url from future %}{% load staticfiles %}
 
-{% block title %}<title>{% block pagetitle %}{% endblock %} | {% trans "Wiki" %} | {% platform_name %}</title>{% endblock %}
+{% block title %}
+  {% block pagetitle %}{% endblock %} | {% trans "Wiki" %} | {% platform_name %}
+{% endblock %}
 
 {% block bodyclass %}view-in-course view-wiki{% endblock %}
 

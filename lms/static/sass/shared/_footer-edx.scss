@@ -17,7 +17,7 @@ footer#footer-edx-v3 {
   background: $edx-footer-bg-color;
   padding: 20px;
   border-top: 1px solid $courseware-button-border-color;
-  
+
   // To match the Pattern Library
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -178,7 +178,6 @@ footer#footer-edx-v3 {
     }
 
     .social-media-links {
-      width: calc();
       margin-bottom: 40px;
     }
   }

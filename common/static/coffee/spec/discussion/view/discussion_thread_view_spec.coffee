@@ -387,3 +387,24 @@ describe "DiscussionThreadView", ->
                 "Showing first 6 responses",
                 "Load all responses"
             )
+
+    describe "post restrictions", ->
+        beforeEach ->
+            @thread.attributes.ability = _.extend(@thread.attributes.ability, {
+                can_report: false
+                can_vote: false
+            })
+            @view = new DiscussionThreadView(
+                model: @thread
+                el: $("#fixture-element")
+                mode: "tab"
+                course_settings: DiscussionSpecHelper.makeCourseSettings()
+            )
+
+        it "doesn't show report option if can_report ability is disabled", ->
+            @view.render()
+            expect(@view.$el.find(".action-report").closest(".actions-item")).toHaveClass('is-hidden')
+
+        it "doesn't show voting button if can_vote ability is disabled", ->
+            @view.render()
+            expect(@view.$el.find(".action-vote").closest(".actions-item")).toHaveClass('is-hidden')

@@ -2,7 +2,7 @@ define([
         'jquery',
         'underscore',
         'backbone',
-        'common/js/spec_helpers/ajax_helpers',
+        'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
         'common/js/spec_helpers/template_helpers',
         'js/verify_student/views/make_payment_step_view'
     ],
@@ -140,6 +140,11 @@ define([
                     succeeds: true
                 });
                 expectPaymentSubmitted( view, {foo: 'bar'} );
+            });
+
+            it ('view containing user email', function() {
+                createView({userEmail: 'test@example.com', requirements: {isVisible:true}, isActive: false});
+                expect($('p.instruction-info:contains("test@example.com")').length).toEqual(1);
             });
 
             it( 'provides working payment buttons for a single processor', function() {

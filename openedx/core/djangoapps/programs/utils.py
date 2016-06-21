@@ -6,6 +6,7 @@ import logging
 from django.core.urlresolvers import reverse
 from django.utils import timezone
 from django.utils.functional import cached_property
+from django.utils.text import slugify
 from opaque_keys.edx.keys import CourseKey
 import pytz
 
@@ -126,6 +127,26 @@ def get_programs_for_credentials(user, programs_credentials):
                 certificate_programs.append(program)
 
     return certificate_programs
+
+
+def get_program_detail_url(program, marketing_root):
+    """Construct the URL to be used when linking to program details.
+
+    Arguments:
+        program (dict): Representation of a program.
+        marketing_root (str): Root URL used to build links to XSeries marketing pages.
+
+    Returns:
+        str, a link to program details
+    """
+    if ProgramsApiConfig.current().show_program_details:
+        base = reverse('program_details_view', kwargs={'program_id': program['id']}).rstrip('/')
+        slug = slugify(program['name'])
+    else:
+        base = marketing_root.rstrip('/')
+        slug = program['marketing_slug']
+
+    return '{base}/{slug}'.format(base=base, slug=slug)
 
 
 def get_display_category(program):

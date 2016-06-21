@@ -40,7 +40,7 @@
         <button class="edit"><%- gettext("Edit") %></button>
     </li>
     <li class="action action-delete">
-        <button class="delete action-icon"><span class="icon fa fa-trash-o" aria-hidden="true"></span><span><%- gettext("Delete") %></span></button>
+        <button class="delete action-icon" title="<%- gettext('Delete') %>"><span class="icon fa fa-trash-o" aria-hidden="true" ></span></button>
     </li>
 </ul>
 

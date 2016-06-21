@@ -1,7 +1,7 @@
 /*global define, sinon */
 define([
         'jquery',
-        'common/js/spec_helpers/ajax_helpers',
+        'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
         'js/certificates/models/certificate_exception',
         'js/certificates/views/certificate_whitelist',
         'js/certificates/views/certificate_whitelist_editor',
@@ -30,7 +30,7 @@ define([
 
             beforeEach(function() {
 
-                certificate_exception = new CertificateExceptionModel({user_name: 'test_user'});
+                certificate_exception = new CertificateExceptionModel({user_name: 'test_user'}, {url: 'test/url/'});
                 certificate_exception.set({
                     notes: "Test notes"
                 });

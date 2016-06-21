@@ -418,8 +418,9 @@ class PayAndVerifyView(View):
             'disable_courseware_js': True,
             'display_steps': display_steps,
             'is_active': json.dumps(request.user.is_active),
+            'user_email': request.user.email,
             'message_key': message,
-            'platform_name': settings.PLATFORM_NAME,
+            'platform_name': theming_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),
             'processors': processors,
             'requirements': requirements,
             'user_full_name': full_name,
@@ -1184,7 +1185,7 @@ def _compose_message_reverification_email(
         context["verification_open"] = verification_open
         context["due_date"] = get_default_time_display(reverification_block.due)
 
-        context['platform_name'] = settings.PLATFORM_NAME
+        context['platform_name'] = theming_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME)
         context["used_attempts"] = used_attempts
         context["allowed_attempts"] = allowed_attempts
         context["support_link"] = microsite.get_value('email_from_address', settings.CONTACT_EMAIL)
@@ -1384,7 +1385,7 @@ class ReverifyView(View):
         if status in ["none", "must_reverify", "expired", "pending"]:
             context = {
                 "user_full_name": request.user.profile.name,
-                "platform_name": settings.PLATFORM_NAME,
+                "platform_name": theming_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),
                 "capture_sound": staticfiles_storage.url("audio/camera_capture.wav"),
             }
             return render_to_response("verify_student/reverify.html", context)
@@ -1449,7 +1450,7 @@ class InCourseReverifyView(View):
             'course_key': unicode(course_key),
             'course_name': course.display_name_with_default_escaped,
             'checkpoint_name': checkpoint.checkpoint_name,
-            'platform_name': settings.PLATFORM_NAME,
+            'platform_name': theming_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),
             'usage_id': usage_id,
             'capture_sound': staticfiles_storage.url("audio/camera_capture.wav"),
         }

@@ -25,7 +25,10 @@ CatalogPreviewFactory({
   <ul>
     % for catalog in catalogs:
     <li>
-      <a href="${reverse('api_admin:catalog-edit', args=(catalog.id,))}">${catalog.name}</a>
+      <a href="${reverse('api_admin:catalog-edit', args=(catalog.id,))}">${catalog.name}</a>&nbsp;
+      (<a
+          href="${'{root}/{id}/csv/'.format(root=catalog_api_catalog_endpoint, id=catalog.id)}"
+          target="_blank">${_("Download CSV")}</a>)
     </li>
     % endfor
   </ul>

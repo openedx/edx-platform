@@ -2,7 +2,7 @@ define([
     'backbone', 
     'jquery', 
     'js/staff_debug_actions', 
-    'common/js/spec_helpers/ajax_helpers'
+    'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'
     ],
     function (Backbone, $, tmp, AjaxHelpers) {
         'use strict';

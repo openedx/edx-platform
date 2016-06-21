@@ -499,6 +499,7 @@ TEMPLATES = [
                 'django.template.context_processors.i18n',
                 'django.contrib.auth.context_processors.auth',  # this is required for admin
                 'django.template.context_processors.csrf',
+                'microsite_configuration.context_processors.microsite_context',
 
                 # Added for django-wiki
                 'django.template.context_processors.media',
@@ -1527,9 +1528,14 @@ PIPELINE_CSS = {
 }
 
 
-common_js = set(rooted_glob(COMMON_ROOT / 'static', 'coffee/src/**/*.js')) - set(courseware_js + discussion_js + notes_js + instructor_dash_js)    # pylint: disable=line-too-long
-project_js = set(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/**/*.js')) - set(courseware_js + discussion_js + notes_js + instructor_dash_js)  # pylint: disable=line-too-long
-
+separately_bundled_js = set(courseware_js + discussion_js + notes_js + instructor_dash_js)
+common_js = sorted(set(rooted_glob(COMMON_ROOT / 'static', 'coffee/src/**/*.js')) - separately_bundled_js)
+xblock_runtime_js = [
+    'common/js/xblock/core.js',
+    'common/js/xblock/runtime.v1.js',
+    'lms/js/xblock/lms.runtime.v1.js',
+]
+lms_application_js = sorted(set(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/**/*.js')) - separately_bundled_js)
 
 PIPELINE_JS = {
     'base_application': {
@@ -1538,13 +1544,14 @@ PIPELINE_JS = {
     },
 
     'application': {
-
-        # Application will contain all paths not in courseware_only_js
-        'source_filenames': ['js/xblock/core.js'] + sorted(common_js) + sorted(project_js) + base_application_js + [
-            'js/sticky_filter.js',
-            'js/query-params.js',
-            'js/vendor/moment.min.js',
-        ],
+        'source_filenames': (
+            common_js + xblock_runtime_js + base_application_js + lms_application_js +
+            [
+                'js/sticky_filter.js',
+                'js/query-params.js',
+                'js/vendor/moment.min.js',
+            ]
+        ),
         'output_filename': 'js/lms-application.js',
     },
     'proctoring': {
@@ -2729,6 +2736,8 @@ ECOMMERCE_API_URL = None
 ECOMMERCE_API_SIGNING_KEY = None
 ECOMMERCE_API_TIMEOUT = 5
 ECOMMERCE_SERVICE_WORKER_USERNAME = 'ecommerce_worker'
+
+COURSE_CATALOG_API_URL = None
 
 # Reverification checkpoint name pattern
 CHECKPOINT_PATTERN = r'(?P<checkpoint_name>[^/]+)'

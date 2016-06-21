@@ -5,4 +5,3 @@
         <span><%- gettext('Explore XSeries Programs') %></span>
     </a>
 </section>
-

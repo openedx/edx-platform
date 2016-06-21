@@ -693,11 +693,11 @@ class DiscussionResponseEditTest(BaseDiscussionTestCase):
             And I try to edit the response created by other users
             Then the response should be edited and rendered successfully
             And I try to vote the response created by moderator
-            Then the response should be voted successfully
+            Then the response should not be able to be voted
             And I try to vote the response created by other users
             Then the response should be voted successfully
             And I try to report the response created by moderator
-            Then the response should be reported successfully
+            Then the response should not be able to be reported
             And I try to report the response created by other users
             Then the response should be reported successfully
             And I try to endorse the response created by moderator
@@ -711,9 +711,9 @@ class DiscussionResponseEditTest(BaseDiscussionTestCase):
         page.visit()
         self.edit_response(page, "response_self_author")
         self.edit_response(page, "response_other_author")
-        page.vote_response('response_self_author')
+        page.cannot_vote_response('response_self_author')
         page.vote_response('response_other_author')
-        page.report_response('response_self_author')
+        page.cannot_report_response('response_self_author')
         page.report_response('response_other_author')
         page.endorse_response('response_self_author')
         page.endorse_response('response_other_author')

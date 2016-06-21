@@ -89,6 +89,15 @@
                 console.log(desc);
             },
 
+            appendPurchaseWorkflow: function(redirectUrl) {
+                if (this.purchaseWorkflow) {
+                    // Append the purchase_workflow parameter to indicate
+                    // whether this is a bulk purchase or a single seat purchase
+                    redirectUrl += '?purchase_workflow=' + this.purchaseWorkflow;
+                }
+                return redirectUrl;
+            },
+
             /**
              * Step 1:
              * Update the user's email preferences and then proceed to the next step
@@ -125,7 +134,7 @@
                         The track selection page would allow the user to select the course mode
                         ("verified", "honor", etc.) -- or, if the only course mode was "honor",
                         it would redirect the user to the dashboard. */
-                        redirectUrl = this.urls.trackSelection + courseId + '/';
+                        redirectUrl = this.appendPurchaseWorkflow(this.urls.trackSelection + courseId + '/');
                     } else if ( this.courseMode === 'honor' || this.courseMode === 'audit' ) {
                         /* The newer version of the course details page allows the user
                         to specify which course mode to enroll as.  If the student has
@@ -135,7 +144,7 @@
                     } else {
                         /* If the user selected any other kind of course mode, send them
                         to the payment/verification flow. */
-                        redirectUrl = this.urls.payment + courseId + '/';
+                        redirectUrl = this.appendPurchaseWorkflow(this.urls.payment + courseId + '/');
                     }
 
                     /* Attempt to auto-enroll the user in a free mode of the course,

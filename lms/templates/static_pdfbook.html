@@ -26,7 +26,8 @@ $(function(){
 });
 </script>
 
-<div class="book-wrapper">
+<main id="main" aria-label="${_('Content')}" tabindex="-1">
+    <div class="book-wrapper">
     %if 'chapters' in textbook:
     <section class="book-sidebar" aria-label="${_('Textbook Navigation')}">
         <ul id="booknav">
@@ -39,14 +40,15 @@ $(function(){
     </section>
     %endif
 
-<div class="book">
-<iframe
-  title="${current_chapter['title']|h}"
-  id="viewer-frame"
-  src="${request.path}?viewer=true${viewer_params}"
-  width="856"
-  height="1108"
-  frameborder="0"
-  seamless></iframe>
-</div>
-</div>
+    <div class="book">
+    <iframe
+    title="${current_chapter['title']|h}"
+    id="viewer-frame"
+    src="${request.path}?viewer=true${viewer_params}"
+    width="856"
+    height="1108"
+    frameborder="0"
+    seamless></iframe>
+    </div>
+    </div>
+</main>

@@ -27,20 +27,15 @@ div.book-wrapper {
     border-right: none;
     width: 180px;
 
-    ul#booknav {
-      font-size: em(14);
-
-      .chapter-number {
-      }
+    #booknav {
+        list-style: none;
 
       .chapter {
-        float: left;
-        width: 87%;
         line-height: 1.4em;
       }
 
       .page-number {
-        float: right;
+        @include float(right);
         width: 12%;
         font-size: .8em;
         line-height: 2.1em;
@@ -59,7 +54,6 @@ div.book-wrapper {
           @include clearfix();
           padding: 0;
           color: $link-color;
-          cursor: pointer;
 
           &:hover, &:focus {
             background-color: transparent;
@@ -231,6 +225,3 @@ div.book-wrapper {
     }
   }
 }
-
-
-

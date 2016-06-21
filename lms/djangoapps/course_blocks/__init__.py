@@ -22,6 +22,3 @@ instead (https://openedx.atlassian.net/browse/MA-1019).  We have
 introduced this redundancy in the short-term as an incremental
 implementation approach, reducing risk with initial release of this app.
 """
-
-# Importing signals is necessary to activate the course publish/delete signal handlers.
-from . import signals

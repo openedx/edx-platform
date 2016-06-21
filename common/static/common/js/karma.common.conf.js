@@ -54,8 +54,7 @@ var commonFiles = {
     ],
 
     sourceFiles: [
-        {pattern: 'common/js/components/**/*.js'},
-        {pattern: 'common/js/utils/**/*.js'}
+        {pattern: 'common/js/!(spec_helpers)/**/!(*spec).js'}
     ],
 
     specFiles: [
@@ -173,7 +172,7 @@ var defaultNormalizeFunc = function (appRoot, pattern) {
         pattern = path.join(appRoot, '/common/static/' + pattern);
     } else if (pattern.match(/^xmodule_js\/common_static/)) {
         pattern = path.join(appRoot, '/common/static/' +
-          pattern.replace(/^xmodule_js\/common_static\//, ''));
+            pattern.replace(/^xmodule_js\/common_static\//, ''));
     }
     return pattern;
 };
@@ -184,7 +183,7 @@ var normalizePathsForCoverage = function(files, normalizeFunc) {
 
     files.forEach(function (file) {
         if (!file.ignoreCoverage) {
-          filesForCoverage[normalizeFn(appRoot, file.pattern)] = ['coverage'];
+            filesForCoverage[normalizeFn(appRoot, file.pattern)] = ['coverage'];
         }
     });
 
@@ -326,8 +325,18 @@ var getBaseConfig = function (config, useRequireJs) {
 
         // start these browsers
         // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
-        browsers: ['Firefox'],
+        browsers: ['FirefoxNoUpdates'],
 
+        customLaunchers: {
+            // Firefox configuration that doesn't perform auto-updates
+            FirefoxNoUpdates: {
+                base: 'Firefox',
+                prefs: {
+                    'app.update.auto': false,
+                    'app.update.enabled': false
+                }
+            }
+        },
 
         // Continuous Integration mode
         // if true, Karma captures browsers, runs the tests and exits
@@ -367,7 +376,7 @@ var configure = function(config, options) {
     );
 
     if (useRequireJs) {
-      files.unshift({pattern: 'common/js/utils/require-serial.js', included: true});
+        files.unshift({pattern: 'common/js/utils/require-serial.js', included: true});
     }
 
     // Karma sets included=true by default.
@@ -389,9 +398,9 @@ var configure = function(config, options) {
     // If we give symlink paths to Istanbul, coverage for each path gets tracked
     // separately. So we pass absolute paths to the karma-coverage preprocessor.
     var preprocessors = _.extend(
-      {},
-      options.preprocessors,
-      normalizePathsForCoverage(filesForCoverage, options.normalizePathsForCoverageFunc)
+        {},
+        options.preprocessors,
+        normalizePathsForCoverage(filesForCoverage, options.normalizePathsForCoverageFunc)
     );
 
     config.set(_.extend(baseConfig, {

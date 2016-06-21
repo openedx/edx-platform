@@ -334,21 +334,25 @@ def get_user_orders(user):
     for order in commerce_user_orders:
         if order['status'].lower() == 'complete':
             for line in order['lines']:
-                for attribute in line['product']['attribute_values']:
-                    if attribute['name'] == 'certificate_type' and attribute['value'] in allowed_course_modes:
-                        try:
-                            date_placed = datetime.strptime(order['date_placed'], "%Y-%m-%dT%H:%M:%SZ")
-                            order_data = {
-                                'number': order['number'],
-                                'price': order['total_excl_tax'],
-                                'title': order['lines'][0]['title'],
-                                'order_date': strftime_localized(date_placed.replace(tzinfo=pytz.UTC), 'SHORT_DATE'),
-                                'receipt_url': commerce_configuration.receipt_page + order['number']
-                            }
-                            user_orders.append(order_data)
-                        except KeyError:
-                            log.exception('Invalid order structure: %r', order)
-                            return no_data
+                product = line.get('product')
+                if product:
+                    for attribute in product['attribute_values']:
+                        if attribute['name'] == 'certificate_type' and attribute['value'] in allowed_course_modes:
+                            try:
+                                date_placed = datetime.strptime(order['date_placed'], "%Y-%m-%dT%H:%M:%SZ")
+                                order_data = {
+                                    'number': order['number'],
+                                    'price': order['total_excl_tax'],
+                                    'title': order['lines'][0]['title'],
+                                    'order_date': strftime_localized(
+                                        date_placed.replace(tzinfo=pytz.UTC), 'SHORT_DATE'
+                                    ),
+                                    'receipt_url': commerce_configuration.receipt_page + order['number']
+                                }
+                                user_orders.append(order_data)
+                            except KeyError:
+                                log.exception('Invalid order structure: %r', order)
+                                return no_data
 
     return user_orders
 
@@ -421,6 +425,13 @@ def account_settings_context(request):
     user = request.user
 
     year_of_birth_options = [(unicode(year), unicode(year)) for year in UserProfile.VALID_YEARS]
+    try:
+        user_orders = get_user_orders(user)
+    except:  # pylint: disable=bare-except
+        log.exception('Error fetching order history from Otto.')
+        # Return empty order list as account settings page expect a list and
+        # it will be broken if exception raised
+        user_orders = []
 
     context = {
         'auth': {},
@@ -447,7 +458,7 @@ def account_settings_context(request):
         'user_preferences_api_url': reverse('preferences_api', kwargs={'username': user.username}),
         'disable_courseware_js': True,
         'show_program_listing': ProgramsApiConfig.current().show_program_listing,
-        'order_history': get_user_orders(user)
+        'order_history': user_orders
     }
 
     if third_party_auth.is_enabled():

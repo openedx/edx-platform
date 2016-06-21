@@ -2,7 +2,7 @@ define([
         'jquery',
         'backbone',
         'common/js/spec_helpers/template_helpers',
-        'common/js/spec_helpers/ajax_helpers',
+        'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
         'js/verify_student/views/webcam_photo_view',
         'js/verify_student/models/verification_model'
     ],

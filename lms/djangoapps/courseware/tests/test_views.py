@@ -1421,7 +1421,9 @@ class ProgressPageTests(ModuleStoreTestCase):
         self.course.save()
         self.store.update_item(self.course, self.user.id)
 
-        resp = views.progress(self.request, course_id=unicode(self.course.id))
+        resp = self.client.get(
+            reverse('progress', args=[unicode(self.course.id)])
+        )
         self.assertContains(resp, u"View Certificate")
         self.assert_invalidate_certificate(generated_certificate)
 
@@ -1438,7 +1440,9 @@ class ProgressPageTests(ModuleStoreTestCase):
 
         CertificateGenerationConfiguration(enabled=True).save()
         certs_api.set_cert_generation_enabled(self.course.id, True)
-        resp = views.progress(self.request, course_id=unicode(self.course.id))
+        resp = self.client.get(
+            reverse('progress', args=[unicode(self.course.id)])
+        )
         self.assertContains(resp, u'Download Your Certificate')
         self.assert_invalidate_certificate(generated_certificate)
 
@@ -1450,7 +1454,9 @@ class ProgressPageTests(ModuleStoreTestCase):
         )
         # Invalidate user certificate
         certificate.invalidate()
-        resp = views.progress(self.request, course_id=unicode(self.course.id))
+        resp = self.client.get(
+            reverse('progress', args=[unicode(self.course.id)])
+        )
         self.assertNotContains(resp, u'Request Certificate')
         self.assertContains(resp, u'Your certificate has been invalidated.')
         self.assertContains(resp, u'Please contact your course team if you have any questions.')

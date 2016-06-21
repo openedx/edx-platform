@@ -3,18 +3,18 @@ define([
         'jquery',
         'underscore',
         'URI',
+        'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
         'edx-ui-toolkit/js/pagination/paging-collection',
-        'common/js/spec_helpers/ajax_helpers',
         'js/spec/student_profile/helpers',
         'js/student_profile/views/badge_list_container'
     ],
-    function (Backbone, $, _, URI, PagingCollection, AjaxHelpers, LearnerProfileHelpers, BadgeListContainer) {
+    function(Backbone, $, _, URI, AjaxHelpers, PagingCollection, LearnerProfileHelpers, BadgeListContainer) {
         'use strict';
         describe('edx.user.BadgeListContainer', function () {
 
             var view, requests;
 
-            var createView = function (requests, pageNum, badge_list_object) {
+            var createView = function(requests, pageNum, badgeListObject) {
                 var BadgeCollection = PagingCollection.extend({
                     queryParams: {
                         currentPage: 'current_page'
@@ -23,15 +23,15 @@ define([
                 var badgeCollection = new BadgeCollection();
                 badgeCollection.url = '/api/badges/v1/assertions/user/staff/';
                 var models = [];
-                _.each(_.range(badge_list_object.count), function (idx) {
+                _.each(_.range(badgeListObject.count), function (idx) {
                     models.push(LearnerProfileHelpers.makeBadge(idx));
                 });
-                badge_list_object.results = models;
+                badgeListObject.results = models;
                 badgeCollection.setPage(pageNum);
                 var request = AjaxHelpers.currentRequest(requests);
                 var path = new URI(request.url).path();
                 expect(path).toBe('/api/badges/v1/assertions/user/staff/');
-                AjaxHelpers.respondWithJson(requests, badge_list_object);
+                AjaxHelpers.respondWithJson(requests, badgeListObject);
                 var badgeListContainer = new BadgeListContainer({
                     'collection': badgeCollection
 
@@ -92,4 +92,3 @@ define([
         });
     }
 );
-

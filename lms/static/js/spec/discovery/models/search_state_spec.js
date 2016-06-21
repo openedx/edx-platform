@@ -1,5 +1,5 @@
 define([
-    'common/js/spec_helpers/ajax_helpers', 'js/discovery/models/search_state'
+    'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'js/discovery/models/search_state'
 ], function(AjaxHelpers, SearchState) {
     'use strict';
 

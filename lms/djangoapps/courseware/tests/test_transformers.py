@@ -10,9 +10,9 @@ from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import check_mongo_calls
 
-from lms.djangoapps.course_blocks.api import _get_cache
 from lms.djangoapps.course_blocks.api import get_course_blocks
 from lms.djangoapps.course_blocks.transformers.tests.helpers import CourseStructureTestCase
+from openedx.core.djangoapps.content.block_structure.api import get_cache
 from ..transformers.grades import GradesTransformer
 
 
@@ -245,6 +245,6 @@ class MultiProblemModulestoreAccessTestCase(CourseStructureTestCase, SharedModul
                 }
             )
         blocks = self.build_course(course)
-        _get_cache().clear()
+        get_cache().clear()
         with check_mongo_calls(2):
             get_course_blocks(self.student, blocks[u'course'].location, self.transformers)

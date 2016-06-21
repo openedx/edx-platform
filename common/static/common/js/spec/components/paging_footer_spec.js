@@ -3,7 +3,7 @@ define([
     'URI',
     'underscore',
     'edx-ui-toolkit/js/pagination/paging-collection',
-    'common/js/spec_helpers/ajax_helpers',
+    'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
     'common/js/components/views/paging_footer'
 ], function ($, URI, _, PagingCollection, AjaxHelpers, PagingFooter) {
     'use strict';

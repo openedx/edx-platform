@@ -891,7 +891,7 @@ class AnonymousLookupTable(ModuleStoreTestCase):
         self.assertEqual(anonymous_id, anonymous_id_for_user(self.user, course2.id, save=False))
 
 
-# TODO: Clean up these tests so that they use the ProgramsDataMixin.
+# TODO: Clean up these tests so that they use program factories.
 @attr('shard_3')
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 @ddt.ddt
