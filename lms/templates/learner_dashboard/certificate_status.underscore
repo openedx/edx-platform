@@ -1,0 +1,10 @@
+<div class="message col-12 md-col-8">
+    <span class="verified-cert-icon" aria-hidden="true"></span>
+    <span class="card-msg"><%- gettext('Congratulations! You have earned a certificate for this course.') %></span>
+</div>
+<div class="action col-12 md-col-4"> 
+    <a href="<%- certificate_url %>" class="btn-brand cta-secondary">
+        <span class="verified-cert-icon" aria-hidden="true"></span>
+        <%- gettext('View/Share Certificate') %>
+    </a>
+</div>
