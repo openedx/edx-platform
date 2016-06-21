@@ -2,6 +2,7 @@
 Utils for Labster LTI Passport.
 """
 import logging
+import re
 from urlparse import urlparse
 
 from django.utils.translation import ugettext as _
@@ -105,8 +106,13 @@ def course_tree_info(store, simulations, licensed_simulations):
     Retuns information about the course's xblocks.
     """
     course_info = {}
+    invalid_simulation_ids = []
+    validation_pattern = r'^[a-zA-Z0-9]+$'
     for simulation in simulations:
         simulation_id = get_simulation_id(simulation.launch_url)
+        if not simulation_id or not re.match(validation_pattern, simulation_id):
+            invalid_simulation_ids.append((simulation.display_name, simulation_id))
+            continue
         if WILD_CARD in licensed_simulations:
             is_hidden = False
         else:
@@ -129,4 +135,4 @@ def course_tree_info(store, simulations, licensed_simulations):
         course_info[chapter] = get_xblock_info(chapter, course_info, is_hidden=is_hidden, child=subsection)
 
     chapters = filter(lambda x: getattr(x, 'category') == 'chapter', course_info.keys())
-    return (course_info, chapters)
+    return (course_info, chapters, invalid_simulation_ids)

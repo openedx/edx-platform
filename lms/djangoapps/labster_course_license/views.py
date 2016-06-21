@@ -16,7 +16,8 @@ from django.core.urlresolvers import reverse
 from django.shortcuts import redirect
 from django.views.decorators.cache import cache_control
 from django.views.decorators.csrf import ensure_csrf_cookie
-from django.http import HttpResponseBadRequest
+from django.http import HttpResponseBadRequest, Http404
+from django.utils.safestring import mark_safe
 
 from labster_course_license.utils import LtiPassport, course_tree_info
 from labster_course_license.models import CourseLicense
@@ -215,7 +216,23 @@ def set_license(request, course, ccx):
     store = modulestore()
     with store.bulk_operations(course_key):
         simulations = store.get_items(course_key, qualifiers={'category': 'lti'})
-        course_info, chapters = course_tree_info(store, simulations, licensed_simulations)
+        course_info, chapters, invalid_simulation_ids = course_tree_info(
+            store, simulations, licensed_simulations
+        )
+        if invalid_simulation_ids:
+            messages.error(
+                request,
+                mark_safe(_((
+                    'Please verify LTI URLs  are correct for the following simulations:<br> {}'
+                ).format(
+                    '<br>'.join(
+                        'name: "{}", simulation Id: "{}"'.format(
+                            sim_name, sim_id
+                        ) for sim_name, sim_id in invalid_simulation_ids
+                    )
+                )))
+            )
+            return redirect(url)
         update_course(ccx, course_info, chapters)
 
     url = reverse('labster_license_handler', kwargs={'course_id': CCXLocator.from_course_locator(course.id, ccx.id)})
