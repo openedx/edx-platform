@@ -41,10 +41,11 @@ class TestBlockSerializerBase(SharedModuleStoreTestCase):
             block_types_to_count=['video'],
             requested_student_view_data=['video'],
         )
+        self.transformers = BlockStructureTransformers(COURSE_BLOCK_ACCESS_TRANSFORMERS + [blocks_api_transformer])
         self.block_structure = get_course_blocks(
             self.user,
             self.course.location,
-            BlockStructureTransformers(COURSE_BLOCK_ACCESS_TRANSFORMERS + [blocks_api_transformer]),
+            self.transformers,
         )
         self.serializer_context = {
             'request': MagicMock(),
@@ -92,7 +93,7 @@ class TestBlockSerializerBase(SharedModuleStoreTestCase):
             {
                 'id', 'type', 'lms_web_url', 'student_view_url',
                 'display_name', 'graded',
-                'block_counts', 'student_view_multi_device',
+                'student_view_multi_device',
                 'lti_url',
                 'visible_to_staff_only',
             },
@@ -108,6 +109,13 @@ class TestBlockSerializerBase(SharedModuleStoreTestCase):
             self.assertIn('student_view_multi_device', serialized_block)
             self.assertTrue(serialized_block['student_view_multi_device'])
 
+        # chapters with video should have block_counts
+        if serialized_block['type'] == 'chapter':
+            if serialized_block['display_name'] not in ('poll_test', 'handout_container'):
+                self.assertIn('block_counts', serialized_block)
+            else:
+                self.assertNotIn('block_counts', serialized_block)
+
     def create_staff_context(self):
         """
         Create staff user and course blocks accessible by that user
@@ -119,7 +127,7 @@ class TestBlockSerializerBase(SharedModuleStoreTestCase):
         block_structure = get_course_blocks(
             staff_user,
             self.course.location,
-            BlockStructureTransformers(COURSE_BLOCK_ACCESS_TRANSFORMERS),
+            self.transformers,
         )
         return {
             'request': MagicMock(),
@@ -156,12 +164,14 @@ class TestBlockSerializer(TestBlockSerializerBase):
         serializer = self.create_serializer()
         for serialized_block in serializer.data:
             self.assert_basic_block(serialized_block['id'], serialized_block)
+        self.assertEquals(len(serializer.data), 28)
 
     def test_additional_requested_fields(self):
         self.add_additional_requested_fields()
         serializer = self.create_serializer()
         for serialized_block in serializer.data:
             self.assert_extended_block(serialized_block)
+        self.assertEquals(len(serializer.data), 28)
 
     def test_staff_fields(self):
         """
@@ -173,6 +183,7 @@ class TestBlockSerializer(TestBlockSerializerBase):
         for serialized_block in serializer.data:
             self.assert_extended_block(serialized_block)
             self.assert_staff_fields(serialized_block)
+        self.assertEquals(len(serializer.data), 29)
 
 
 class TestBlockDictSerializer(TestBlockSerializerBase):
@@ -200,12 +211,14 @@ class TestBlockDictSerializer(TestBlockSerializerBase):
         for block_key_string, serialized_block in serializer.data['blocks'].iteritems():
             self.assertEquals(serialized_block['id'], block_key_string)
             self.assert_basic_block(block_key_string, serialized_block)
+        self.assertEquals(len(serializer.data['blocks']), 28)
 
     def test_additional_requested_fields(self):
         self.add_additional_requested_fields()
         serializer = self.create_serializer()
         for serialized_block in serializer.data['blocks'].itervalues():
             self.assert_extended_block(serialized_block)
+        self.assertEquals(len(serializer.data['blocks']), 28)
 
     def test_staff_fields(self):
         """
@@ -217,3 +230,4 @@ class TestBlockDictSerializer(TestBlockSerializerBase):
         for serialized_block in serializer.data['blocks'].itervalues():
             self.assert_extended_block(serialized_block)
             self.assert_staff_fields(serialized_block)
+        self.assertEquals(len(serializer.data['blocks']), 29)

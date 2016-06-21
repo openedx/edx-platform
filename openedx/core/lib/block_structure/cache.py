@@ -40,7 +40,7 @@ class BlockStructureCache(object):
         """
         data_to_cache = (
             block_structure._block_relations,
-            block_structure._transformer_data,
+            block_structure.transformer_data,
             block_structure._block_data_map,
         )
         zp_data_to_cache = zpickle(data_to_cache)
@@ -99,7 +99,7 @@ class BlockStructureCache(object):
         block_relations, transformer_data, block_data_map = zunpickle(zp_data_from_cache)
         block_structure = BlockStructureModulestoreData(root_block_usage_key)
         block_structure._block_relations = block_relations
-        block_structure._transformer_data = transformer_data
+        block_structure.transformer_data = transformer_data
         block_structure._block_data_map = block_data_map
 
         return block_structure
