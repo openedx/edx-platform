@@ -2454,7 +2454,7 @@ OPTIONAL_APPS = (
     'gradebook',
 
     'projects',
-    'organizations',
+    'edx_solutions_organizations',
 )
 
 for app_name in OPTIONAL_APPS:

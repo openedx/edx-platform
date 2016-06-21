@@ -67,7 +67,7 @@ case $CIRCLE_NODE_INDEX in
 
     3)  # run the commonlib and solutions apps unit tests
         paver test_lib --extra_args="--with-flaky" --cov_args="-p"
-        paver test_system -s lms -t organizations
+        paver test_system -s lms -t edx_solutions_organizations
         paver test_system -s lms -t gradebook
         paver test_system -s lms -t progress
         paver test_system -s lms -t projects

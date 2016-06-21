@@ -738,8 +738,8 @@ if FEATURES.get('PROJECTS_APP') and "projects" not in INSTALLED_APPS:
     INSTALLED_APPS += ('projects',)
 
 ############# Organizations App #################
-if FEATURES.get('ORGANIZATIONS_APP') and "organizations" not in INSTALLED_APPS:
-    INSTALLED_APPS += ('organizations',)
+if FEATURES.get('ORGANIZATIONS_APP') and "edx_solutions_organizations" not in INSTALLED_APPS:
+    INSTALLED_APPS += ('edx_solutions_organizations',)
 
 ##### SET THE LIST OF ALLOWED IP ADDRESSES FOR THE API ######
 API_ALLOWED_IP_ADDRESSES = ENV_TOKENS.get('API_ALLOWED_IP_ADDRESSES')
