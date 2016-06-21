@@ -40,11 +40,8 @@ def handle_enroll_status_change(sender, event=None, user=None, mode=None, course
     if not request:
         return
 
-    log.info("handle_enroll_status_change: event: %s Mode: %s  course_id:  %s", event, mode, course_id)
-    log.info("cost: %s currency: %s", cost, currency)
-
     # figure out course url
-    course_url = _build_course_url(request, course_id)
+    course_url = _build_course_url(request, course_id.to_deprecated_string())
 
     # pass event to email_marketing.tasks
     update_course_enrollment.delay(user.email, course_url, event, mode,

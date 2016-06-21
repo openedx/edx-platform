@@ -1144,7 +1144,7 @@ class CourseEnrollment(models.Model):
         Sends a signal announcing changes in course enrollment status.
         """
         ENROLL_STATUS_CHANGE.send(sender=None, event=event, user=self.user,
-                                  mode=self.mode, course_id=self.course_id.to_deprecated_string(),
+                                  mode=self.mode, course_id=self.course_id,
                                   cost=cost, currency=currency)
 
     @classmethod
@@ -1153,7 +1153,7 @@ class CourseEnrollment(models.Model):
         Sends a signal announcing changes in course enrollment status.
         """
         ENROLL_STATUS_CHANGE.send(sender=None, event=event, user=user,
-                                  mode=mode, course_id=course_id.to_deprecated_string(),
+                                  mode=mode, course_id=course_id,
                                   cost=cost, currency=currency)
 
     def emit_event(self, event_name):

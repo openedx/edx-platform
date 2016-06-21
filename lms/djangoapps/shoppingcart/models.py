@@ -519,9 +519,6 @@ class Order(models.Model):
         OrderItems and add them as products in the event as well.
 
         """
-        log.info("_emit_order_event")
-        log.info([item.analytics_data() for item in orderitems])
-        log.info(repr(traceback.extract_stack()))
         try:
             if settings.LMS_SEGMENT_KEY:
                 tracking_context = tracker.get_tracker().resolve_context()

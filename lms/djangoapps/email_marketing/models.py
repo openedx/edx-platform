@@ -95,6 +95,16 @@ class EmailMarketingConfiguration(ConfigurationModel):
         )
     )
 
+    # Sailthru purchases can be tagged with interest tags to provide information about the types of courses
+    # users are interested in.  The easiest way to get the tags currently is the Sailthru content API which
+    # looks in the content library (the content library is populated daily with a script that pulls the data
+    # from the course discovery API)  This option should normally be on, but it does add overhead to processing
+    # purchases and enrolls.
+    sailthru_get_tags_from_sailthru = models.BooleanField(
+        default=True,
+        help_text=_('Use the Sailthru content API to fetch course tags.')
+    )
+
     def __unicode__(self):
         return u"Email marketing configuration: New user list %s, Activation template: %s" % \
                (self.sailthru_new_user_list, self.sailthru_activation_template)
