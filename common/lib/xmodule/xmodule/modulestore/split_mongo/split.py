@@ -68,6 +68,7 @@ from xblock.core import XBlock
 from xblock.fields import Scope, Reference, ReferenceList, ReferenceValueDict
 from xmodule.course_module import CourseSummary
 from xmodule.errortracker import null_error_tracker
+from xmodule.library_tools import LibraryToolsService
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import (
     BlockUsageLocator, DefinitionLocator, CourseLocator, LibraryLocator, VersionTree, LocalId,
@@ -2105,7 +2106,12 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
 
                 # fetch and return the new item--fetching is unnecessary but a good qc step
                 new_locator = course_key.make_usage_key(block_key.type, block_key.id)
-                return self.get_item(new_locator, **kwargs)
+                new_item = self.get_item(new_locator, **kwargs)
+
+                if block_key.type == 'library_content':
+                    # Update imported xblocks' 'source_library_version' to keep it up to date.
+                    LibraryToolsService(self).update_children(new_item, user_id)
+                return new_item
             else:
                 return None
 
