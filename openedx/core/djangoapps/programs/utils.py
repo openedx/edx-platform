@@ -10,7 +10,7 @@ from django.utils.text import slugify
 from opaque_keys.edx.keys import CourseKey
 import pytz
 
-from lms.djangoapps.certificates.api import get_certificates_for_user, is_passing_status
+from lms.djangoapps.certificates import api as certificate_api
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.lib.edx_api_utils import get_edx_api_data
@@ -179,11 +179,11 @@ def get_completed_courses(student):
         iterable of dicts with structure {'course_id': course_key, 'mode': cert_type}
 
     """
-    all_certs = get_certificates_for_user(student.username)
+    all_certs = certificate_api.get_certificates_for_user(student.username)
     return [
         {'course_id': unicode(cert['course_key']), 'mode': cert['type']}
         for cert in all_certs
-        if is_passing_status(cert['status'])
+        if certificate_api.is_passing_status(cert['status'])
     ]
 
 
@@ -350,5 +350,13 @@ def supplement_program_data(program_data, user):
 
             # TODO: Currently unavailable on LMS.
             run_mode['marketing_url'] = ''
+
+            certificate_data = certificate_api.certificate_downloadable_status(user, course_key)
+            certificate_uuid = certificate_data.get('uuid')
+            if certificate_uuid:
+                run_mode['certificate_url'] = certificate_api.get_certificate_url(
+                    course_id=course_key,
+                    uuid=certificate_uuid,
+                )
 
     return program_data
