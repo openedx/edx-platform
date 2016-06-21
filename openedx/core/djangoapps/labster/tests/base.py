@@ -9,7 +9,7 @@ from student.roles import CourseCcxCoachRole
 from student.tests.factories import UserFactory
 
 
-class LTITestBase(ModuleStoreTestCase):
+class CCXCourseTestBase(ModuleStoreTestCase):
 
     MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
 
@@ -17,7 +17,7 @@ class LTITestBase(ModuleStoreTestCase):
         """
         Set up the test data used in the specific tests
         """
-        super(LTITestBase, self).setUp()
+        super(CCXCourseTestBase, self).setUp()
 
         self.consumer_keys = ['123', '789']
         self.lti_passports = self.make_lti_passports(self.consumer_keys)

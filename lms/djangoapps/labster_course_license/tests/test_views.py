@@ -8,7 +8,7 @@ from django.test.client import RequestFactory
 from django.core.urlresolvers import reverse
 from django.test import Client
 from rest_framework import status
-from openedx.core.djangoapps.labster.tests.base import LTITestBase
+from openedx.core.djangoapps.labster.tests.base import CCXCourseTestBase
 from xmodule.modulestore.tests.factories import ItemFactory
 
 
@@ -34,7 +34,7 @@ def item_factory(store, valid=True):
     return simulation_id
 
 
-class TestSetLicense(LTITestBase):
+class TestSetLicense(CCXCourseTestBase):
     """
     Tests for set_license method.
     """

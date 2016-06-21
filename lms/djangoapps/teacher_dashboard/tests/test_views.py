@@ -12,7 +12,7 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.template.defaultfilters import slugify
 from rest_framework import status
-from openedx.core.djangoapps.labster.tests.base import LTITestBase
+from openedx.core.djangoapps.labster.tests.base import CCXCourseTestBase
 from ccx.overrides import override_field_for_ccx
 from student.tests.factories import UserFactory
 
@@ -21,7 +21,7 @@ TEST_DATA = json.dumps([{'display_name': 'test'}])
 
 
 @ddt
-class TeacherDashboardViewsTests(LTITestBase):
+class TeacherDashboardViewsTests(CCXCourseTestBase):
     """
     All tests for the views.py file
     """
