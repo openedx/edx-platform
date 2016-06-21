@@ -27,7 +27,7 @@ from xblock.fields import (
 
 from xblock.fragment import Fragment
 from xblock.runtime import Runtime, IdReader, IdGenerator
-from xmodule import course_metadata_utils
+from xmodule import block_metadata_utils
 from xmodule.fields import RelativeTime
 from xmodule.errortracker import exc_info_to_str
 from xmodule.modulestore.exceptions import ItemNotFoundError
@@ -340,7 +340,7 @@ class XModuleMixin(XModuleFields, XBlock):
 
     @property
     def url_name(self):
-        return course_metadata_utils.url_name_for_course_location(self.location)
+        return block_metadata_utils.url_name_for_block(self)
 
     @property
     def display_name_with_default(self):
@@ -348,7 +348,7 @@ class XModuleMixin(XModuleFields, XBlock):
         Return a display name for the module: use display_name if defined in
         metadata, otherwise convert the url name.
         """
-        return course_metadata_utils.display_name_with_default(self)
+        return block_metadata_utils.display_name_with_default(self)
 
     @property
     def display_name_with_default_escaped(self):
@@ -363,7 +363,7 @@ class XModuleMixin(XModuleFields, XBlock):
         migrate and test switching to display_name_with_default, which is no
         longer escaped.
         """
-        return course_metadata_utils.display_name_with_default_escaped(self)
+        return block_metadata_utils.display_name_with_default_escaped(self)
 
     @property
     def tooltip_title(self):
