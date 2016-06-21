@@ -283,7 +283,7 @@ class EmailMarketingTests(TestCase):
                                        unit_cost=0)
         mock_sailthru_purchase.assert_called_with(TEST_EMAIL, [{'vars': {'course_run_id': self.course_id_string, 'mode': 'audit',
                                                                          'upgrade_deadline_verified': '2020-03-12'},
-                                                                'title': 'Course ' +  self.course_id_string + ' mode: audit',
+                                                                'title': 'Course ' + self.course_id_string + ' mode: audit',
                                                                 'url': self.course_url,
                                                                 'price': 100, 'qty': 1, 'id': self.course_id_string + '-audit'}],
                                                   options={'send_template': 'enroll_template'},
@@ -300,7 +300,7 @@ class EmailMarketingTests(TestCase):
                                        unit_cost=49)
         mock_sailthru_purchase.assert_called_with(TEST_EMAIL, [{'vars': {'course_run_id': self.course_id_string, 'mode': 'verified',
                                                                          'upgrade_deadline_verified': '2020-03-12'},
-                                                                'title': 'Course ' +  self.course_id_string + ' mode: verified',
+                                                                'title': 'Course ' + self.course_id_string + ' mode: verified',
                                                                 'url': self.course_url,
                                                                 'price': 4900, 'qty': 1, 'id': self.course_id_string + '-verified'}],
                                                   options={},
@@ -317,7 +317,7 @@ class EmailMarketingTests(TestCase):
                                        unit_cost=99)
         mock_sailthru_purchase.assert_called_with(TEST_EMAIL, [{'vars': {'course_run_id': self.course_id_string, 'mode': 'honor',
                                                                          'upgrade_deadline_verified': '2020-03-12'},
-                                                                'title': 'Course ' +  self.course_id_string + ' mode: honor',
+                                                                'title': 'Course ' + self.course_id_string + ' mode: honor',
                                                                 'url': self.course_url,
                                                                 'price': 9900, 'qty': 1, 'id': self.course_id_string + '-honor'}],
                                                   options={'send_template': 'purchase_template'},
@@ -352,7 +352,7 @@ class EmailMarketingTests(TestCase):
         mock_sailthru_client.api_get.return_value = \
             SailthruResponse(JsonResponse({'vars': {'unenrolled': ['course_u1']}}))
         self.assertTrue(_update_unenrolled_list(mock_sailthru_client, TEST_EMAIL, EmailMarketingConfiguration.current(),
-                                            self.course_url, True))
+                                                self.course_url, True))
         mock_sailthru_client.api_get.assert_called_with("user", {"id": TEST_EMAIL, "fields": {"vars": 1}})
         mock_sailthru_client.api_post.assert_called_with('user',
                                                          {'vars': {'unenrolled': ['course_u1', self.course_url]},
@@ -362,7 +362,7 @@ class EmailMarketingTests(TestCase):
         mock_sailthru_client.api_get.return_value = \
             SailthruResponse(JsonResponse({'vars': {'unenrolled': [self.course_url]}}))
         self.assertTrue(_update_unenrolled_list(mock_sailthru_client, TEST_EMAIL, EmailMarketingConfiguration.current(),
-                                            self.course_url, False))
+                                                self.course_url, False))
         mock_sailthru_client.api_post.assert_called_with('user',
                                                          {'vars': {'unenrolled': []},
                                                           'id': TEST_EMAIL, 'key': 'email'})
@@ -371,7 +371,7 @@ class EmailMarketingTests(TestCase):
         mock_sailthru_client.api_get.return_value = \
             SailthruResponse(JsonResponse({'error': 100, 'errormsg': 'Got an error'}))
         self.assertFalse(_update_unenrolled_list(mock_sailthru_client, TEST_EMAIL, EmailMarketingConfiguration.current(),
-                                            self.course_url, False))
+                                                 self.course_url, False))
 
         # test post error from Sailthru
         mock_sailthru_client.api_post.return_value = \
@@ -379,12 +379,12 @@ class EmailMarketingTests(TestCase):
         mock_sailthru_client.api_get.return_value = \
             SailthruResponse(JsonResponse({'vars': {'unenrolled': [self.course_url]}}))
         self.assertFalse(_update_unenrolled_list(mock_sailthru_client, TEST_EMAIL, EmailMarketingConfiguration.current(),
-                                            self.course_url, False))
+                                                 self.course_url, False))
 
         # test exception
         mock_sailthru_client.api_get.side_effect = SailthruClientError
         self.assertFalse(_update_unenrolled_list(mock_sailthru_client, TEST_EMAIL, EmailMarketingConfiguration.current(),
-                                            self.course_url, False))
+                                                 self.course_url, False))
 
     @patch('email_marketing.tasks.log.error')
     @patch('email_marketing.tasks.SailthruClient.api_post')

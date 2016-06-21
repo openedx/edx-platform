@@ -20,7 +20,6 @@ import logging
 from pytz import UTC
 from urllib import urlencode
 import uuid
-import traceback
 
 import analytics
 
@@ -67,7 +66,7 @@ log = logging.getLogger(__name__)
 AUDIT_LOG = logging.getLogger("audit")
 SessionStore = import_module(settings.SESSION_ENGINE).SessionStore  # pylint: disable=invalid-name
 
-# enroll status changed events - signaled to email_marketing
+# enroll status changed events - signaled to email_marketing.  See email_marketing.tasks for more info
 
 # ENROLL signal used for free enrollment only
 ENROLL_STATUS_CHANGE_ENROLL = 'enroll'
@@ -1137,7 +1136,6 @@ class CourseEnrollment(models.Model):
             # Only emit mode change events when the user's enrollment
             # mode has changed from its previous setting
             self.emit_event(EVENT_NAME_ENROLLMENT_MODE_CHANGED)
-
 
     def send_signal(self, event, cost=None, currency=None):
         """

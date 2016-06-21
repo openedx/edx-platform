@@ -160,7 +160,7 @@ def _create_sailthru_user_parm(user, profile, new_user, email_config):
 @task(bind=True, default_retry_delay=3600, max_retries=24)
 def update_course_enrollment(self, email, course_url, event, mode,
                              unit_cost=None, course_id=None, currency=None,
-                             message_id=None):
+                             message_id=None):  # pylint: disable=unused-argument
     """
     Adds/updates Sailthru when a user enrolls/unenrolls/adds to cart/purchases/upgrades a course
      Args:
@@ -170,9 +170,24 @@ def update_course_enrollment(self, email, course_url, event, mode,
         mode(object): enroll mode (audit, verification, ...)
         unit_cost: cost if purchase event
         course_id(CourseKey): course id
-        currency(str): currency if purchase event
+        currency(str): currency if purchase event - currently ignored since Sailthru only supports USD
     Returns:
         None
+
+
+    The event can be one of the following:
+        ENROLL_STATUS_CHANGE_ENROLL
+            A free enroll (mode=audit)
+        ENROLL_STATUS_CHANGE_UNENROLL
+            An unenroll
+        ENROLL_STATUS_CHANGE_UPGRADE_ADD_CART
+            A paid upgrade added to cart
+        ENROLL_STATUS_CHANGE_UPGRADE_COMPLETE
+            A paid upgrade purchase complete
+        ENROLL_STATUS_CHANGE_PAID_COURSE_ADD_CART
+            A non-free course added to cart
+        ENROLL_STATUS_CHANGE_PAID_COURSE_COMPLETE
+            A non-free course purchase complete
     """
 
     email_config = EmailMarketingConfiguration.current()
@@ -297,7 +312,7 @@ def _record_purchase(sailthru_client, email, item, incomplete, message_id, optio
     :return: False it retryable error
     """
     try:
-        sailthru_response = sailthru_client.purchase(email, [ item ],
+        sailthru_response = sailthru_client.purchase(email, [item],
                                                      incomplete=incomplete, message_id=message_id,
                                                      options=options)
 
@@ -362,7 +377,7 @@ def _update_unenrolled_list(sailthru_client, email, email_config, course_url, un
         changed = False
         # if unenrolling, add course to unenroll list
         if unenroll:
-            if not course_url in unenroll_list:
+            if course_url not in unenroll_list:
                 unenroll_list.append(course_url)
                 changed = True
 

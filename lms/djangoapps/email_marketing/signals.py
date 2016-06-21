@@ -28,7 +28,7 @@ CHANGED_FIELDNAMES = ['username', 'is_active', 'name', 'gender', 'education',
 
 @receiver(ENROLL_STATUS_CHANGE)
 def handle_enroll_status_change(sender, event=None, user=None, mode=None, course_id=None, cost=None, currency=None,
-                         **kwargs):  # pylint: disable=unused-argument
+                                **kwargs):  # pylint: disable=unused-argument
     """
     Signal receiver for enroll/unenroll/purchase events
     """
@@ -50,8 +50,8 @@ def handle_enroll_status_change(sender, event=None, user=None, mode=None, course
 
 
 def _build_course_url(request, course_id):
-    host=request.get_host()
-    # hack for testing
+    host = request.get_host()
+    # hack for integration testing since Sailthru rejects urls with localhost
     if host.startswith('localhost'):
         host = 'courses.edx.org'
     return '{scheme}://{host}/courses/{course}/info'.format(
