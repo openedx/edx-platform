@@ -195,7 +195,7 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
   @markdownToXml: (markdown)->
     # it will contain <hint>...</hint> tags
     demandHintTags = [];
-    toXml = `function (markdown) {  
+    toXml = `function (markdown) {
       var xml = markdown,
           i, splits, scriptFlag;
       var responseTypes = [
@@ -639,13 +639,14 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
       xml = xml.replace(/\sclass=\'qtitle\'/gi, '');
       return xml;
     }`
-    
+
+    debugger;
     responseTypesXML = []
-    responseTypesMarkdown = markdown.split('\n---\n')
+    responseTypesMarkdown = markdown.split(/\n\s{0,}---\s{0,}\n/g)
     _.each responseTypesMarkdown, (responseTypeMarkdown, index) ->
       if responseTypeMarkdown.trim().length > 0
         responseTypesXML.push toXml(responseTypeMarkdown)
-    
+
     # combine demandhints
     demandHints = ''
     if demandHintTags.length

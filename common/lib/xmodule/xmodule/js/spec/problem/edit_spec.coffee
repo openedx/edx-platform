@@ -291,7 +291,7 @@ describe 'MarkdownEditingDescriptor', ->
         <p>Explanation</p>
 
         <p>The release of the iPod allowed consumers to carry their entire music library with them in a format that did not rely on fragile and energy-intensive spinning disks.</p>
-        
+
         </div>
         </solution>
         </problem>""")
@@ -853,7 +853,7 @@ describe 'MarkdownEditingDescriptor', ->
         <solution>
         <div class="detailed-solution">
         <p>Explanation</p>
-        
+
         <p>According to September 2014 estimates:</p>
         <p>The population of Indonesia is approximately 250 million.</p>
         <p>The population of Brazil  is approximately 200 million.</p>
@@ -864,3 +864,50 @@ describe 'MarkdownEditingDescriptor', ->
         </solution>
         </problem>
       """)
+
+    it 'can do separation if spaces are prsent around ---', ->
+      data = MarkdownEditingDescriptor.markdownToXml("""
+        >>The following languages are in the Indo-European family:<<
+        [x] Urdu
+        [ ] Finnish
+        [x] Marathi
+        [x] French
+        [ ] Hungarian
+
+                ---
+
+        >>Which of the following countries has the largest population?<<
+        ( ) Brazil {{ timely feedback -- explain why an almost correct answer is wrong }}
+        ( ) Germany
+        (x) Indonesia
+        ( ) Russia
+      """)
+      expect(data).toXMLEqual("""
+        <problem>
+        <choiceresponse>
+          <label>The following languages are in the Indo-European family:</label>
+        <checkboxgroup label="The following languages are in the Indo-European family:">
+            <choice correct="true">Urdu</choice>
+            <choice correct="false">Finnish</choice>
+            <choice correct="true">Marathi</choice>
+            <choice correct="true">French</choice>
+            <choice correct="false">Hungarian</choice>
+          </checkboxgroup>
+        </choiceresponse>
+
+
+
+        <multiplechoiceresponse>
+          <label>Which of the following countries has the largest population?</label>
+        <choicegroup label="Which of the following countries has the largest population?" type="MultipleChoice">
+            <choice correct="false">Brazil <choicehint>timely feedback -- explain why an almost correct answer is wrong</choicehint>
+        </choice>
+            <choice correct="false">Germany</choice>
+            <choice correct="true">Indonesia</choice>
+            <choice correct="false">Russia</choice>
+          </choicegroup>
+        </multiplechoiceresponse>
+
+
+        </problem>
+       """)
