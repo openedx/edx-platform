@@ -146,7 +146,7 @@ bok-choy==0.5.3
 chrono==1.0.2
 coverage==4.0.2
 ddt==0.8.0
-diff-cover==0.9.0
+diff-cover==0.9.8
 django-crum==0.5
 django_nose==1.4.1
 factory_boy==2.5.1

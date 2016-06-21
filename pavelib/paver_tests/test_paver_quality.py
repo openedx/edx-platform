@@ -61,7 +61,7 @@ class TestPaverQualityViolations(unittest.TestCase):
 class TestPaverReportViolationsCounts(unittest.TestCase):
     """
     For testing utility functions for getting counts from reports for
-    run_jshint, run_complexity, run_safelint, and run_safecommit_report.
+    run_eslint, run_complexity, run_safelint, and run_safecommit_report.
     """
 
     def setUp(self):
@@ -79,16 +79,16 @@ class TestPaverReportViolationsCounts(unittest.TestCase):
         self.addCleanup(self._mock_paver_needs.stop)
         self.addCleanup(os.remove, self.f.name)
 
-    def test_get_jshint_violations_count(self):
+    def test_get_eslint_violations_count(self):
         with open(self.f.name, 'w') as f:
             f.write("3000 violations found")
-        actual_count = pavelib.quality._get_count_from_last_line(self.f.name, "jshint")  # pylint: disable=protected-access
+        actual_count = pavelib.quality._get_count_from_last_line(self.f.name, "eslint")  # pylint: disable=protected-access
         self.assertEqual(actual_count, 3000)
 
     def test_get_violations_no_number_found(self):
         with open(self.f.name, 'w') as f:
             f.write("Not expected string regex")
-        actual_count = pavelib.quality._get_count_from_last_line(self.f.name, "jshint")  # pylint: disable=protected-access
+        actual_count = pavelib.quality._get_count_from_last_line(self.f.name, "eslint")  # pylint: disable=protected-access
         self.assertEqual(actual_count, None)
 
     def test_get_violations_count_truncated_report(self):
@@ -97,7 +97,7 @@ class TestPaverReportViolationsCounts(unittest.TestCase):
         """
         with open(self.f.name, 'w') as f:
             f.write("foo/bar/js/fizzbuzz.js: line 45, col 59, Missing semicolon.")
-        actual_count = pavelib.quality._get_count_from_last_line(self.f.name, "jshint")  # pylint: disable=protected-access
+        actual_count = pavelib.quality._get_count_from_last_line(self.f.name, "eslint")  # pylint: disable=protected-access
         self.assertEqual(actual_count, None)
 
     def test_complexity_value(self):
@@ -274,7 +274,7 @@ class TestPaverRunQuality(unittest.TestCase):
     @patch('__builtin__.open', mock_open())
     def test_failure_on_diffquality_pep8(self):
         """
-        If pep8 finds errors, pylint and jshint should still be run
+        If pep8 finds errors, pylint and eslint should still be run
         """
         # Mock _get_pep8_violations to return a violation
         _mock_pep8_violations = MagicMock(
@@ -284,8 +284,8 @@ class TestPaverRunQuality(unittest.TestCase):
             with self.assertRaises(SystemExit):
                 pavelib.quality.run_quality("")
 
-        # Test that pep8, pylint, and jshint were called by counting the calls to
-        # _get_pep8_violations (for pep8) and sh (for diff-quality pylint & jshint)
+        # Test that pep8, pylint, and eslint were called by counting the calls to
+        # _get_pep8_violations (for pep8) and sh (for diff-quality pylint & eslint)
         self.assertEqual(_mock_pep8_violations.call_count, 1)
         self.assertEqual(self._mock_paver_sh.call_count, 2)
 
@@ -305,18 +305,18 @@ class TestPaverRunQuality(unittest.TestCase):
         # Test that both pep8 and pylint were called by counting the calls
         # Assert that _get_pep8_violations (which calls "pep8") is called once
         self.assertEqual(_mock_pep8_violations.call_count, 1)
-        # And assert that sh was called twice (for the calls to pylint & jshint). This means that even in
-        # the event of a diff-quality pylint failure, jshint is still called.
+        # And assert that sh was called twice (for the calls to pylint & eslint). This means that even in
+        # the event of a diff-quality pylint failure, eslint is still called.
         self.assertEqual(self._mock_paver_sh.call_count, 2)
 
     @patch('__builtin__.open', mock_open())
-    def test_failure_on_diffquality_jshint(self):
+    def test_failure_on_diffquality_eslint(self):
         """
-        If diff-quality fails on jshint, the paver task should also fail
+        If diff-quality fails on eslint, the paver task should also fail
         """
 
-        # Underlying sh call must fail when it is running the jshint diff-quality task
-        self._mock_paver_sh.side_effect = CustomShMock().fail_on_jshint
+        # Underlying sh call must fail when it is running the eslint diff-quality task
+        self._mock_paver_sh.side_effect = CustomShMock().fail_on_eslint
         _mock_pep8_violations = MagicMock(return_value=(0, []))
         with patch('pavelib.quality._get_pep8_violations', _mock_pep8_violations):
             with self.assertRaises(SystemExit):
@@ -349,7 +349,7 @@ class TestPaverRunQuality(unittest.TestCase):
             pavelib.quality.run_quality("")
         # Assert that _get_pep8_violations (which calls "pep8") is called once
         self.assertEqual(_mock_pep8_violations.call_count, 1)
-        # And assert that sh was called twice (for the call to "pylint" & "jshint")
+        # And assert that sh was called twice (for the call to "pylint" & "eslint")
         self.assertEqual(self._mock_paver_sh.call_count, 2)
 
 
@@ -370,12 +370,12 @@ class CustomShMock(object):
         else:
             return
 
-    def fail_on_jshint(self, arg):
+    def fail_on_eslint(self, arg):
         """
         For our tests, we need the call for diff-quality running pep8 reports to fail, since that is what
         is going to fail when we pass in a percentage ("p") requirement.
         """
-        if "jshint" in arg:
+        if "eslint" in arg:
             # Essentially mock diff-quality exiting with 1
             paver.easy.sh("exit 1")
         else:
