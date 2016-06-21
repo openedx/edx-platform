@@ -3,6 +3,7 @@ from django import forms
 from django.contrib.auth import get_user_model
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.utils.translation import ugettext_lazy as _
+
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from ratelimitbackend import admin
@@ -14,6 +15,7 @@ from student.models import (
     PendingNameChange, CourseAccessRole, LinkedInAddToProfileConfiguration, UserAttribute
 )
 from student.roles import REGISTERED_ACCESS_ROLES
+
 
 User = get_user_model()  # pylint:disable=invalid-name
 
@@ -165,6 +167,14 @@ class UserAdmin(BaseUserAdmin):
     """ Admin interface for the User model. """
     inlines = (UserProfileInline,)
 
+    def get_readonly_fields(self, *args, **kwargs):
+        """
+        Allows editing the users while skipping the username check, so we can have Unicode username with no problems.
+        """
+        return super(UserAdmin, self).get_readonly_fields(*args, **kwargs) + (
+            'username',
+        )
+
 
 @admin.register(UserAttribute)
 class UserAttributeAdmin(admin.ModelAdmin):
@@ -178,11 +188,52 @@ class UserAttributeAdmin(admin.ModelAdmin):
         model = UserAttribute
 
 
+@admin.register(UserProfile)
+class UserProfileAdmin(admin.ModelAdmin):
+    """
+    Admin interface for the user profile.
+    """
+
+    search_fields = (
+        'user__email', 'user__username', 'user__pk',
+    )
+
+    list_display = (
+        'name', 'username',  'email', 'user_pk',
+    )
+
+    readonly_fields = (
+        'user',
+    )
+
+    def username(self, profile):
+        """
+        Provide the `username` for `list_display` profiles admin.
+        """
+
+        return profile.user.username
+
+    def email(self, profile):
+        """
+        Provide the `email` for `list_display` profiles admin.
+        """
+
+        return profile.user.email
+
+    def user_pk(self, profile):
+        """
+        Provide the `user_pk` for `list_display` profiles admin.
+        """
+
+        return profile.user.pk
+
+    class Meta:
+        model = UserProfile
+
+
 admin.site.register(UserTestGroup)
 admin.site.register(CourseEnrollmentAllowed)
 admin.site.register(Registration)
 admin.site.register(PendingNameChange)
 admin.site.register(DashboardConfiguration, ConfigurationModelAdmin)
-
-# We must first un-register the User model since it may also be registered by the auth app.
 admin.site.register(User, UserAdmin)

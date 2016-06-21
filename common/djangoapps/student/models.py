@@ -150,7 +150,7 @@ def anonymous_id_for_user(user, course_id, save=True):
                 u"user %(user)r in course %(course_id)r doesn't match "
                 u"computed id %(digest)r", {
                     "anonymous_user_id": anonymous_user_id.anonymous_user_id,
-                    "user": user,
+                    "user": unicode(user),
                     "course_id": course_id,
                     "digest": digest,
                 }

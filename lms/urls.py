@@ -659,7 +659,7 @@ urlpatterns += (
 
     # Student profile
     url(
-        r'^u/(?P<username>[\w.@+-]+)$',
+        r'^u/{}$'.format(settings.USERNAME_PATTERN),
         'student_profile.views.learner_profile',
         name='learner_profile',
     ),

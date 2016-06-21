@@ -588,7 +588,12 @@ USAGE_KEY_PATTERN = r'(?P<usage_key_string>(?:i4x://?[^/]+/[^/]+/[^/]+/[^@]+(?:@
 ASSET_KEY_PATTERN = r'(?P<asset_key_string>(?:/?c4x(:/)?/[^/]+/[^/]+/[^/]+/[^@]+(?:@[^/]+)?)|(?:[^/]+))'
 USAGE_ID_PATTERN = r'(?P<usage_id>(?:i4x://?[^/]+/[^/]+/[^/]+/[^@]+(?:@[^/]+)?)|(?:[^/]+))'
 
-USERNAME_PATTERN = r'(?P<username>[\w.@+-]+)'
+# This pattern allow space in username
+_USERNAME_REGEX_PART = '[\w .@_+-]+'
+USERNAME_REGEX = r'^{}$'.format(_USERNAME_REGEX_PART)
+USERNAME_PATTERN = r'(?P<username>{})'.format(_USERNAME_REGEX_PART)
+
+
 
 ############################## EVENT TRACKING #################################
 LMS_SEGMENT_KEY = None
