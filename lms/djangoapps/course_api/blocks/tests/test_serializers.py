@@ -3,7 +3,6 @@ Tests for Course Blocks serializers
 """
 from mock import MagicMock
 
-from openedx.core.djangoapps.content.block_structure.tests.helpers import EnableTransformerRegistryMixin
 from openedx.core.lib.block_structure.transformers import BlockStructureTransformers
 from student.tests.factories import UserFactory
 from xmodule.modulestore import ModuleStoreEnum
@@ -17,7 +16,7 @@ from ..serializers import BlockSerializer, BlockDictSerializer
 from .helpers import deserialize_usage_key
 
 
-class TestBlockSerializerBase(EnableTransformerRegistryMixin, SharedModuleStoreTestCase):
+class TestBlockSerializerBase(SharedModuleStoreTestCase):
     """
     Base class for testing BlockSerializer and BlockDictSerializer
     """

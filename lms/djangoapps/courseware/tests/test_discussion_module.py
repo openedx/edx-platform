@@ -6,7 +6,6 @@ from mock import Mock
 from . import BaseTestXmodule
 from course_api.blocks.tests.helpers import deserialize_usage_key
 from courseware.module_render import get_module_for_descriptor_internal
-from openedx.core.djangoapps.content.block_structure.tests.helpers import EnableTransformerRegistryMixin
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from xmodule.discussion_module import DiscussionModule
 from xmodule.modulestore import ModuleStoreEnum
@@ -16,7 +15,7 @@ from xmodule.modulestore.tests.factories import ToyCourseFactory, ItemFactory
 
 
 @ddt.ddt
-class DiscussionModuleTest(BaseTestXmodule, EnableTransformerRegistryMixin, SharedModuleStoreTestCase):
+class DiscussionModuleTest(BaseTestXmodule, SharedModuleStoreTestCase):
     """Logic tests for Discussion Xmodule."""
     CATEGORY = "discussion"
 

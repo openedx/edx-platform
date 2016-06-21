@@ -7,10 +7,10 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 from ..api import get_block_structure_manager
-from .helpers import is_course_in_block_structure_cache, EnableTransformerRegistryMixin
+from .helpers import is_course_in_block_structure_cache
 
 
-class CourseBlocksSignalTest(EnableTransformerRegistryMixin, ModuleStoreTestCase):
+class CourseBlocksSignalTest(ModuleStoreTestCase):
     """
     Tests for the Course Blocks signal
     """
