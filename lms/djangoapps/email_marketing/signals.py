@@ -7,7 +7,6 @@ import datetime
 from django.dispatch import receiver
 
 from student.models import ENROLL_STATUS_CHANGE
-from shoppingcart.views import EVENT_NAME_USER_UPGRADED
 from student.cookies import CREATE_LOGON_COOKIE
 from student.views import REGISTER_USER
 from email_marketing.models import EmailMarketingConfiguration
@@ -50,6 +49,12 @@ def handle_enroll_status_change(sender, event=None, user=None, mode=None, course
 
 
 def _build_course_url(request, course_id):
+    """
+    Build a course url from a course id and the host from the current request
+    :param request:
+    :param course_id:
+    :return:
+    """
     host = request.get_host()
     # hack for integration testing since Sailthru rejects urls with localhost
     if host.startswith('localhost'):

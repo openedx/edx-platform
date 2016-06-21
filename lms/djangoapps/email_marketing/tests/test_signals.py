@@ -351,7 +351,7 @@ class EmailMarketingTests(TestCase):
         # test a new unenroll
         mock_sailthru_client.api_get.return_value = \
             SailthruResponse(JsonResponse({'vars': {'unenrolled': ['course_u1']}}))
-        self.assertTrue(_update_unenrolled_list(mock_sailthru_client, TEST_EMAIL, EmailMarketingConfiguration.current(),
+        self.assertTrue(_update_unenrolled_list(mock_sailthru_client, TEST_EMAIL,
                                                 self.course_url, True))
         mock_sailthru_client.api_get.assert_called_with("user", {"id": TEST_EMAIL, "fields": {"vars": 1}})
         mock_sailthru_client.api_post.assert_called_with('user',
@@ -361,7 +361,7 @@ class EmailMarketingTests(TestCase):
         # test an enroll of a previously unenrolled course
         mock_sailthru_client.api_get.return_value = \
             SailthruResponse(JsonResponse({'vars': {'unenrolled': [self.course_url]}}))
-        self.assertTrue(_update_unenrolled_list(mock_sailthru_client, TEST_EMAIL, EmailMarketingConfiguration.current(),
+        self.assertTrue(_update_unenrolled_list(mock_sailthru_client, TEST_EMAIL,
                                                 self.course_url, False))
         mock_sailthru_client.api_post.assert_called_with('user',
                                                          {'vars': {'unenrolled': []},
@@ -370,7 +370,7 @@ class EmailMarketingTests(TestCase):
         # test get error from Sailthru
         mock_sailthru_client.api_get.return_value = \
             SailthruResponse(JsonResponse({'error': 100, 'errormsg': 'Got an error'}))
-        self.assertFalse(_update_unenrolled_list(mock_sailthru_client, TEST_EMAIL, EmailMarketingConfiguration.current(),
+        self.assertFalse(_update_unenrolled_list(mock_sailthru_client, TEST_EMAIL,
                                                  self.course_url, False))
 
         # test post error from Sailthru
@@ -378,12 +378,12 @@ class EmailMarketingTests(TestCase):
             SailthruResponse(JsonResponse({'error': 100, 'errormsg': 'Got an error'}))
         mock_sailthru_client.api_get.return_value = \
             SailthruResponse(JsonResponse({'vars': {'unenrolled': [self.course_url]}}))
-        self.assertFalse(_update_unenrolled_list(mock_sailthru_client, TEST_EMAIL, EmailMarketingConfiguration.current(),
+        self.assertFalse(_update_unenrolled_list(mock_sailthru_client, TEST_EMAIL,
                                                  self.course_url, False))
 
         # test exception
         mock_sailthru_client.api_get.side_effect = SailthruClientError
-        self.assertFalse(_update_unenrolled_list(mock_sailthru_client, TEST_EMAIL, EmailMarketingConfiguration.current(),
+        self.assertFalse(_update_unenrolled_list(mock_sailthru_client, TEST_EMAIL,
                                                  self.course_url, False))
 
     @patch('email_marketing.tasks.log.error')

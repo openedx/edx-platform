@@ -159,8 +159,8 @@ def _create_sailthru_user_parm(user, profile, new_user, email_config):
 # pylint: disable=not-callable
 @task(bind=True, default_retry_delay=3600, max_retries=24)
 def update_course_enrollment(self, email, course_url, event, mode,
-                             unit_cost=None, course_id=None, currency=None,
-                             message_id=None):  # pylint: disable=unused-argument
+                             unit_cost=None, course_id=None,
+                             currency=None, message_id=None):  # pylint: disable=unused-argument
     """
     Adds/updates Sailthru when a user enrolls/unenrolls/adds to cart/purchases/upgrades a course
      Args:
@@ -197,11 +197,8 @@ def update_course_enrollment(self, email, course_url, event, mode,
     course_id_string = course_id.to_deprecated_string()
 
     # Use event type to figure out processing required
-    new_enroll = False
-    unenroll = False
-    fetch_tags = False
-    incomplete = None
-    send_template = None
+    new_enroll = unenroll = fetch_tags = False
+    incomplete = send_template = None
 
     if event == ENROLL_STATUS_CHANGE_ENROLL:
         # new enroll for audit (no cost)
@@ -238,7 +235,7 @@ def update_course_enrollment(self, email, course_url, event, mode,
 
     # update the "unenrolled" course array in the user record on Sailthru if new enroll or unenroll
     if new_enroll or unenroll:
-        if not _update_unenrolled_list(sailthru_client, email, email_config, course_url, unenroll):
+        if not _update_unenrolled_list(sailthru_client, email, course_url, unenroll):
             raise self.retry(countdown=email_config.sailthru_retry_interval,
                              max_retries=email_config.sailthru_max_retries)
 
@@ -252,25 +249,7 @@ def update_course_enrollment(self, email, course_url, event, mode,
             course_data = {}
 
         # build item description
-        item = {'id': course_id_string + '-' + mode,
-                'url': course_url,
-                'price': unit_cost * 100,
-                'qty': 1,
-                }
-
-        # get title from course info if we don't already have it from Sailthru
-        if 'title' in course_data:
-            item['title'] = course_data['title']
-        else:
-            try:
-                course = get_course_by_id(course_id)
-                item['title'] = course.display_name
-            except Http404:
-                # can't find, just invent title
-                item['title'] = 'Course ' + course_id_string + ' mode: ' + mode
-
-        if 'tags' in course_data:
-            item['tags'] = course_data['tags']
+        item = _build_purchase_item(course_id_string, course_url, unit_cost, mode, course_data, course_id)
 
         # build purchase api options list
         options = {}
@@ -282,22 +261,54 @@ def update_course_enrollment(self, email, course_url, event, mode,
         if send_template:
             options['send_template'] = send_template
 
-        # add vars to item
-        vars = {}
-        if 'vars' in course_data:
-            vars = course_data['vars']
-        vars['mode'] = mode
-        vars['course_run_id'] = course_id_string
-        item['vars'] = vars
-
-        # get list of modes for course and add upgrade deadlines for verified modes
-        for mode_entry in CourseMode.modes_for_course(course_id):
-            if mode_entry.expiration_datetime is not None and CourseMode.is_verified_slug(mode_entry.slug):
-                vars['upgrade_deadline_%s' % mode_entry.slug] = mode_entry.expiration_datetime.strftime("%Y-%m-%d")
-
         if not _record_purchase(sailthru_client, email, item, incomplete, message_id, options):
             raise self.retry(countdown=email_config.sailthru_retry_interval,
                              max_retries=email_config.sailthru_max_retries)
+
+
+def _build_purchase_item(course_id_string, course_url, unit_cost, mode, course_data, course_id):
+    """
+    Build Sailthru purchase item object
+    :return: item
+    """
+
+    # build item description
+    item = {
+        'id': course_id_string + '-' + mode,
+        'url': course_url,
+        'price': unit_cost * 100,
+        'qty': 1,
+    }
+
+    # get title from course info if we don't already have it from Sailthru
+    if 'title' in course_data:
+        item['title'] = course_data['title']
+    else:
+        try:
+            course = get_course_by_id(course_id)
+            item['title'] = course.display_name
+        except Http404:
+            # can't find, just invent title
+            item['title'] = 'Course ' + course_id_string + ' mode: ' + mode
+
+    if 'tags' in course_data:
+        item['tags'] = course_data['tags']
+
+    # add vars to item
+    sailthru_vars = {}
+    if 'vars' in course_data:
+        sailthru_vars = course_data['vars']
+    sailthru_vars['mode'] = mode
+    sailthru_vars['course_run_id'] = course_id_string
+    item['vars'] = sailthru_vars
+
+    # get list of modes for course and add upgrade deadlines for verified modes
+    for mode_entry in CourseMode.modes_for_course(course_id):
+        if mode_entry.expiration_datetime is not None and CourseMode.is_verified_slug(mode_entry.slug):
+            sailthru_vars['upgrade_deadline_%s' % mode_entry.slug] = \
+                mode_entry.expiration_datetime.strftime("%Y-%m-%d")
+
+    return item
 
 
 def _record_purchase(sailthru_client, email, item, incomplete, message_id, options):
@@ -346,11 +357,11 @@ def _get_course_content(course_url, sailthru_client):
         response_json = sailthru_response.json
         return response_json
 
-    except SailthruClientError as exc:
+    except SailthruClientError:
         return {}
 
 
-def _update_unenrolled_list(sailthru_client, email, email_config, course_url, unenroll):
+def _update_unenrolled_list(sailthru_client, email, course_url, unenroll):
     """
     Maintain a list of courses the user has unenrolled from in the Sailthru user record
     :param sailthru_client:

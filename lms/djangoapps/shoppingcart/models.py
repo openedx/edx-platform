@@ -6,7 +6,6 @@ from datetime import datetime
 from datetime import timedelta
 from decimal import Decimal
 import json
-import traceback
 import analytics
 from io import BytesIO
 from django.db.models import Q, F
