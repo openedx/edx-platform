@@ -62,7 +62,7 @@ class TestSetLicense(CCXCourseTestBase):
         get_licensed_simulations.return_value = licenced_simulations
         res = self.client.post(self.url, data=self.data, follow=True)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
-        self.assertIn('value="YildVfefwmrTwNPPeapcNrugbkyb34sFoKiolPtk"', res.content)
+        self.assertIn(self.license, res.content)
         self.assertNotIn('Please verify LTI URLs  are correct for the following simulations', res.content)
 
     @mock.patch('labster_course_license.views.get_licensed_simulations')
@@ -80,7 +80,7 @@ class TestSetLicense(CCXCourseTestBase):
         get_licensed_simulations.return_value = licenced_simulations
         res = self.client.post(self.url, data=self.data, follow=True)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
-        self.assertIn('value="YildVfefwmrTwNPPeapcNrugbkyb34sFoKiolPtk"', res.content)
+        self.assertIn(self.license, res.content)
         self.assertIn('Please verify LTI URLs  are correct for the following simulations', res.content)
         self.assertIn(licenced_simulations[2], res.content)
         self.assertIn(licenced_simulations[4], res.content)
