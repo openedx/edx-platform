@@ -49,12 +49,14 @@ class TestCredentialsRetrieval(ProgramsApiConfigMixin, CredentialsApiConfigMixin
             factories.UserCredential(
                 id=1,
                 username='test',
-                credential=factories.ProgramCredential()
+                credential=factories.ProgramCredential(),
+                certificate_url=self.CREDENTIALS_API_RESPONSE['results'][0]['certificate_url'],
             ),
             factories.UserCredential(
                 id=2,
                 username='test',
-                credential=factories.ProgramCredential()
+                credential=factories.ProgramCredential(),
+                certificate_url=self.CREDENTIALS_API_RESPONSE['results'][1]['certificate_url'],
             )
         ]
 
