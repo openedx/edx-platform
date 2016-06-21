@@ -1,6 +1,6 @@
 define([
     'underscore',
-    'common/js/spec_helpers/ajax_helpers',
+    'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
     'support/js/spec_helpers/enrollment_helpers',
     'support/js/views/enrollment'
 ], function (_, AjaxHelpers, EnrollmentHelpers, EnrollmentView) {

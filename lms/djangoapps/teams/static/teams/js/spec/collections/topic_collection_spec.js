@@ -1,4 +1,4 @@
-define(['backbone', 'URI', 'underscore', 'common/js/spec_helpers/ajax_helpers',
+define(['backbone', 'URI', 'underscore', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
         'teams/js/spec_helpers/team_spec_helpers'],
     function (Backbone, URI, _, AjaxHelpers, TeamSpecHelpers) {
         'use strict';

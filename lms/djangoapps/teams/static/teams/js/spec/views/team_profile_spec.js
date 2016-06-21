@@ -1,5 +1,5 @@
 define([
-    'underscore', 'common/js/spec_helpers/ajax_helpers', 'teams/js/models/team',
+    'underscore', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'teams/js/models/team',
     'teams/js/views/team_profile', 'teams/js/spec_helpers/team_spec_helpers',
     'xmodule_js/common_static/coffee/spec/discussion/discussion_spec_helper'
 ], function (_, AjaxHelpers, TeamModel, TeamProfileView, TeamSpecHelpers, DiscussionSpecHelper) {

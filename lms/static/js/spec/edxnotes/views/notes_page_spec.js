@@ -1,6 +1,6 @@
 define([
     'jquery', 'underscore', 'common/js/spec_helpers/template_helpers',
-    'common/js/spec_helpers/ajax_helpers', 'js/spec/edxnotes/helpers',
+    'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'js/spec/edxnotes/helpers',
     'js/edxnotes/views/page_factory'
 ], function($, _, TemplateHelpers, AjaxHelpers, Helpers, NotesFactory) {
     'use strict';
@@ -14,7 +14,6 @@ define([
             ]);
             this.view = new NotesFactory({notes: notes, pageSize: 10});
         });
-
 
         it('should be displayed properly', function() {
             var requests = AjaxHelpers.requests(this),

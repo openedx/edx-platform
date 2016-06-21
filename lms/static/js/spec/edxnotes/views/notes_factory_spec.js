@@ -1,5 +1,5 @@
 define([
-    'annotator_1.2.9', 'js/edxnotes/views/notes_factory', 'common/js/spec_helpers/ajax_helpers',
+    'annotator_1.2.9', 'js/edxnotes/views/notes_factory', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
     'js/spec/edxnotes/helpers'
 ], function(Annotator, NotesFactory, AjaxHelpers, Helpers) {
     'use strict';

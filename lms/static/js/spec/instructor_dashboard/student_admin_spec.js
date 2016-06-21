@@ -1,4 +1,4 @@
-define(['jquery', 'coffee/src/instructor_dashboard/student_admin', 'common/js/spec_helpers/ajax_helpers'],
+define(['jquery', 'coffee/src/instructor_dashboard/student_admin', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'],
     function ($, StudentAdmin, AjaxHelpers) {
         //'coffee/src/instructor_dashboard/student_admin'
         'use strict';

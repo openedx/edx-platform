@@ -1,4 +1,4 @@
-define(["jquery", "underscore", "common/js/spec_helpers/ajax_helpers", "URI", "js/models/xblock_info",
+define(["jquery", "underscore", "edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers", "URI", "js/models/xblock_info",
         "js/views/paged_container", "js/views/paging_header",
         "common/js/components/views/paging_footer", "js/views/xblock"],
     function ($, _, AjaxHelpers, URI, XBlockInfo, PagedContainer, PagingHeader, PagingFooter, XBlockView) {

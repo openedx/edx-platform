@@ -1,4 +1,4 @@
-define ["jquery", "common/js/spec_helpers/ajax_helpers", "squire"],
+define ["jquery", "edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers", "squire"],
 ($, AjaxHelpers, Squire) ->
 
     assetLibraryTpl = readFixtures('asset-library.underscore')

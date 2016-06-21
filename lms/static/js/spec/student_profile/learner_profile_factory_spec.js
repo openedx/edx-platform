@@ -1,4 +1,4 @@
-define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers',
+define(['backbone', 'jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
         'common/js/spec_helpers/template_helpers',
         'js/spec/student_account/helpers',
         'js/spec/student_profile/helpers',

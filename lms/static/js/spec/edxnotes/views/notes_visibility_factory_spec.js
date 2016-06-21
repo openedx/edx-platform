@@ -1,5 +1,5 @@
 define([
-    'jquery', 'underscore', 'annotator_1.2.9', 'common/js/spec_helpers/ajax_helpers',
+    'jquery', 'underscore', 'annotator_1.2.9', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
     'js/edxnotes/views/notes_visibility_factory', 'js/spec/edxnotes/helpers'
 ], function(
     $, _, Annotator, AjaxHelpers, NotesVisibilityFactory, Helpers
@@ -9,7 +9,7 @@ define([
         var params = {
             endpoint: '/test_endpoint',
             user: 'a user',
-            usageId : 'an usage',
+            usageId: 'an usage',
             courseId: 'a course',
             token: Helpers.makeToken(),
             tokenUrl: '/test_token_url'
@@ -88,16 +88,17 @@ define([
 
         it('can handle errors', function() {
             var requests = AjaxHelpers.requests(this),
-                errorContainer = $('.annotator-notice');
+                $errorContainer = $('.annotator-notice');
 
             this.button.click();
             AjaxHelpers.respondWithError(requests);
-            expect(errorContainer).toContainText(
-                "An error has occurred. Make sure that you are connected to the Internet, and then try refreshing the page."
+            expect($errorContainer).toContainText(
+                'An error has occurred. Make sure that you are connected to the Internet, ' +
+                'and then try refreshing the page.'
             );
-            expect(errorContainer).toBeVisible();
-            expect(errorContainer).toHaveClass('annotator-notice-show');
-            expect(errorContainer).toHaveClass('annotator-notice-error');
+            expect($errorContainer).toBeVisible();
+            expect($errorContainer).toHaveClass('annotator-notice-show');
+            expect($errorContainer).toHaveClass('annotator-notice-error');
 
             this.button.click();
 
@@ -112,10 +113,10 @@ define([
             AjaxHelpers.respondWithJson(requests, {});
 
             AjaxHelpers.respondWithJson(requests, {});
-            expect(errorContainer).not.toHaveClass('annotator-notice-show');
+            expect($errorContainer).not.toHaveClass('annotator-notice-show');
         });
 
-        it('toggles notes when CTRL + SHIFT + [ keydown on document', function () {
+        it('toggles notes when CTRL + SHIFT + [ keydown on document', function() {
             // Character '[' has keyCode 219
             $(document).trigger($.Event('keydown', {keyCode: 219, ctrlKey: true, shiftKey: true}));
             expect(this.toggleNotes.toggleHandler).toHaveBeenCalled();
