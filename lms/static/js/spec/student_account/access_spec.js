@@ -5,7 +5,7 @@
             'underscore',
             'backbone',
             'common/js/spec_helpers/template_helpers',
-            'common/js/spec_helpers/ajax_helpers',
+            'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
             'js/student_account/views/AccessView',
             'js/student_account/views/FormView',
             'js/student_account/enrollment',

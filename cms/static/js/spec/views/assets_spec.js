@@ -1,4 +1,4 @@
-define([ "jquery", "common/js/spec_helpers/ajax_helpers", "URI", "js/views/assets",
+define([ "jquery", "edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers", "URI", "js/views/assets",
          "js/collections/asset", "common/js/spec_helpers/view_helpers"],
     function ($, AjaxHelpers, URI, AssetsView, AssetCollection, ViewHelpers) {
 

@@ -1,6 +1,6 @@
 define([
     'jquery', 'js/models/settings/course_details', 'js/views/settings/main',
-    'common/js/spec_helpers/ajax_helpers', 'common/js/spec_helpers/template_helpers',
+    'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'common/js/spec_helpers/template_helpers',
 ], function($, CourseDetailsModel, MainView, AjaxHelpers, TemplateHelpers) {
     'use strict';
 
@@ -125,10 +125,9 @@ define([
             //input some invalid values.
             expect(entrance_exam_min_score.val('101').trigger('input')).toHaveClass("error");
             expect(entrance_exam_min_score.val('invalidVal').trigger('input')).toHaveClass("error");
-
         });
 
-        it('should provide a default value for the minimum score percentage', function(){
+        it('should provide a default value for the minimum score percentage', function() {
 
             var entrance_exam_min_score = this.view.$(SELECTORS.entrance_exam_min_score);
 
@@ -138,7 +137,7 @@ define([
                 .toEqual(this.model.defaults.entrance_exam_minimum_score_pct);
         });
 
-        it('show and hide the grade requirement section when the check box is selected and deselected respectively', function(){
+        it('shows and hide the grade requirement section appropriately', function() {
 
             var entrance_exam_enabled_field = this.view.$(SELECTORS.entrance_exam_enabled_field);
 

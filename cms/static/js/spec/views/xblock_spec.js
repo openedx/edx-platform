@@ -1,4 +1,4 @@
-define(["jquery", "URI", "common/js/spec_helpers/ajax_helpers", "common/js/components/utils/view_utils",
+define(["jquery", "URI", "edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers", "common/js/components/utils/view_utils",
         "js/views/xblock", "js/models/xblock_info", "xmodule", "coffee/src/main", "xblock/cms.runtime.v1"],
     function ($, URI, AjaxHelpers, ViewUtils, XBlockView, XBlockInfo) {
         "use strict";

@@ -15,7 +15,7 @@
                         type: data.display_category + ' Program',
                         subtitle: data.subtitle,
                         organizations: data.organizations,
-                        marketingUrl: data.marketing_url,
+                        detailUrl: data.detail_url,
                         smallBannerUrl: data.banner_image_urls.w348h116,
                         mediumBannerUrl: data.banner_image_urls.w435h145,
                         largeBannerUrl: data.banner_image_urls.w726h242,

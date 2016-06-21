@@ -14,7 +14,7 @@ class UserCredential(factory.Factory):
     username = FuzzyText(prefix='user_')
     status = 'awarded'
     uuid = FuzzyText(prefix='uuid_')
-    certificate_url = 'http=//credentials.edx.org/credentials/dummy-uuid'
+    certificate_url = FuzzyText(prefix='https://www.example.com/credentials/')
     credential = {}
 
 

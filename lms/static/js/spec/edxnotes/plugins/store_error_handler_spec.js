@@ -1,6 +1,6 @@
 define([
   'jquery', 'underscore', 'annotator_1.2.9',
-  'common/js/spec_helpers/ajax_helpers',
+  'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
   'js/spec/edxnotes/helpers',
   'js/edxnotes/views/notes_factory'
 ], function ($, _, Annotator, AjaxHelpers, Helpers, NotesFactory) {

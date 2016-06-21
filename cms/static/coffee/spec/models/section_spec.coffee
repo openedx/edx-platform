@@ -1,4 +1,4 @@
-define ["js/models/section", "common/js/spec_helpers/ajax_helpers", "js/utils/module"], (Section, AjaxHelpers, ModuleUtils) ->
+define ["js/models/section", "edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers", "js/utils/module"], (Section, AjaxHelpers, ModuleUtils) ->
     describe "Section", ->
         describe "basic", ->
             beforeEach ->

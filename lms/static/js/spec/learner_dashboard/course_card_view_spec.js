@@ -29,14 +29,14 @@ define([
                         run_key: '2T2016',
                         course_started: true,
                         is_enrolled: true,
-                        certificate_url: '',
+                        certificate_url: ''
                     }]
                 },
 
-            setupView = function(isEnrolled){
+            setupView = function(data, isEnrolled){
                 context.run_modes[0].is_enrolled = isEnrolled;
                 setFixtures('<div class="course-card card"></div>');
-                courseCardModel = new CourseCardModel(context);
+                courseCardModel = new CourseCardModel(data);
                 view = new CourseCardView({
                     model: courseCardModel
                 });
@@ -54,7 +54,7 @@ define([
             };
 
             beforeEach(function() {
-                setupView(false);
+                setupView(context, false);
             });
 
             afterEach(function() {
@@ -67,7 +67,7 @@ define([
 
             it('should render the course card based on the data enrolled', function() {
                 view.remove();
-                setupView(true);
+                setupView(context, true);
                 validateCourseInfoDisplay();
             });
 
@@ -75,11 +75,24 @@ define([
                 validateCourseInfoDisplay();
             });
 
-            it('should update render if the course card is_enrolled updated', function(){
+            it('should update render if the course card is_enrolled updated', function() {
                 courseCardModel.set({
                     is_enrolled: true
                 });
                 validateCourseInfoDisplay();
+            });
+
+            it('should only show certificate status section if a certificate has been earned', function() {
+                var data = context,
+                    certUrl = 'sample-certificate';
+
+                setupView(context, false);
+                expect(view.$('certificate-status').length).toEqual(0);
+                view.remove();
+                data.run_modes[0].certificate_url = certUrl;
+                setupView(data, false);
+                expect(view.$('.certificate-status').length).toEqual(1);
+                expect(view.$('.certificate-status .cta-secondary').attr('href')).toEqual(certUrl);
             });
         });
     }

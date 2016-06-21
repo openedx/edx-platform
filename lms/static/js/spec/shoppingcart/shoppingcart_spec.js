@@ -1,4 +1,4 @@
-define(['common/js/spec_helpers/ajax_helpers', 'js/shoppingcart/shoppingcart'],
+define(['edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'js/shoppingcart/shoppingcart'],
     function(AjaxHelpers) {
         'use strict';
 

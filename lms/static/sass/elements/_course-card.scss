@@ -1,62 +1,117 @@
-.course-card{
+.course-card {
   @include span(10);
   margin-left: $baseline*2;
   margin-bottom: $baseline;
-  .course-image-link{
+  padding: $baseline/2 0;
+
+  .section {
+    @extend .grid-container;
+    @extend .grid-manual;
+
+    padding: $baseline/2 $baseline;
+  }
+
+  .course-image-link {
     @include float(left);
-    .header-img{
+
+    .header-img {
       max-width: 191px;
     }
   }
-  .course-details{
+
+  .course-details {
     @include float(right);
     width: 100%;
     @include susy-media($bp-screen-sm) { width: calc(100% - 191px); }
     padding-left: $baseline*1.5;
-    .course-title{
+
+    .course-title {
       font-size: font-size(x-large);
       font-weight: font-weight(normal);
       margin-bottom: $baseline/4;
     }
-    .course-text{
+
+    .course-text {
       color: palette(grayscale, dark);
-      .run-period{
+
+      .run-period {
         color: palette(grayscale, black);
       }
     }
   }
-  .course-actions{
-    .enrollment-info{
+
+  .course-actions {
+    .enrollment-info {
       width: $baseline*10;
       text-align: center;
       margin-bottom: $baseline/2;
       text-transform: uppercase;
     }
-    .run-select-container{
+
+    .run-select-container {
       margin-bottom: $baseline;
-      .run-select{
+
+      .run-select {
         width: $baseline*10;
       }
     }
-    .enroll-button{
+
+    .enroll-button {
       width: $baseline*10;
       text-align: center;
-      background-color: palette(success, dark);
-      border-color: palette(success, dark);
-      &:hover,
-      &:focus{
-        background-color: palette(success, base);
-        border-color: palette(success, base);
-      }
     }
 
-    .view-course-link{
+    .view-course-link {
       width: $baseline*10;
       text-align: center;
     }
   }
 
-  .action-msg-view{
+  .cta-primary {
+    display: inline-block;
+    background-color: palette(success, dark);
+    border-color: palette(success, dark);
+
+    &:active,
+    &:focus,
+    &:hover {
+      background-color: palette(success, base);
+      border-color: palette(success, base);
+    }
+  }
+
+  .cta-secondary {
+    display: inline-block;
+    background-color: palette(primary, dark);
+    border-color: palette(primary, dark);
+
+    &:active,
+    &:focus,
+    &:hover {
+      background-color: palette(primary, base);
+      border-color: palette(primary, base);
+    }
+  }
+
+  .action-msg-view {
     clear: both;
+  }
+
+  .message {
+    margin-bottom: $baseline;
+
+    @include susy-media($bp-screen-md) {
+      margin-bottom: 0;
+    }
+  }
+  
+  .certificate-status {
+    border-top: 1px solid palette(grayscale, x-trans);
+    padding-top: $baseline;
+
+    @include susy-media($bp-screen-md) {
+      display: flex;
+      align-items: center;
+    }
   }
 }

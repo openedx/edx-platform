@@ -1,5 +1,5 @@
 define([
-    "jquery", "common/js/spec_helpers/ajax_helpers", "common/js/spec_helpers/view_helpers",
+    "jquery", "edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers", "common/js/spec_helpers/view_helpers",
     "js/factories/manage_users_lib", "common/js/components/utils/view_utils"
 ],
 function ($, AjaxHelpers, ViewHelpers, ManageUsersFactory, ViewUtils) {
