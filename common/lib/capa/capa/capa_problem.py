@@ -176,7 +176,7 @@ class LoncapaProblem(object):
         # transformations.  This also creates the dict (self.responders) of Response
         # instances for each question in the problem. The dict has keys = xml subtree of
         # Response, values = Response instance
-        self._preprocess_problem(self.tree)
+        self.problem_data = self._preprocess_problem(self.tree)
 
         if not self.student_answers:  # True when student_answers is an empty dict
             self.set_initial_display()
@@ -752,7 +752,10 @@ class LoncapaProblem(object):
 
         if problemtree.tag in inputtypes.registry.registered_tags():
             # If this is an inputtype subtree, let it render itself.
-            status = "unsubmitted"
+            response_id = self.problem_id + '_' + problemtree.get('response_id')
+            response_data = self.problem_data[response_id]
+
+            status = 'unsubmitted'
             msg = ''
             hint = ''
             hintmode = None
@@ -766,7 +769,7 @@ class LoncapaProblem(object):
                 hintmode = self.correct_map.get_hintmode(pid)
                 answervariable = self.correct_map.get_property(pid, 'answervariable')
 
-            value = ""
+            value = ''
             if self.student_answers and problemid in self.student_answers:
                 value = self.student_answers[problemid]
 
@@ -780,6 +783,7 @@ class LoncapaProblem(object):
                 'id': input_id,
                 'input_state': self.input_state[input_id],
                 'answervariable': answervariable,
+                'response_data': response_data,
                 'feedback': {
                     'message': msg,
                     'hint': hint,
@@ -836,12 +840,12 @@ class LoncapaProblem(object):
         Obtain all responder answers and save as self.responder_answers dict (key = response)
         """
         response_id = 1
+        problem_data = {}
         self.responders = {}
         for response in tree.xpath('//' + "|//".join(responsetypes.registry.registered_tags())):
             response_id_str = self.problem_id + "_" + str(response_id)
             # create and save ID for this response
             response.set('id', response_id_str)
-            response_id += 1
 
             answer_id = 1
             input_tags = inputtypes.registry.registered_tags()
@@ -857,11 +861,25 @@ class LoncapaProblem(object):
                 entry.attrib['id'] = "%s_%i_%i" % (self.problem_id, response_id, answer_id)
                 answer_id = answer_id + 1
 
+            p_ids = []
+            for p_index, p_element in enumerate(response.findall('.//p')):
+                p_tag_id = '{}_q{}_desc{}'.format(self.problem_id, response_id, p_index)
+                p_element.attrib['id'] = p_tag_id
+                p_ids.append(p_tag_id)
+
+            # Find the label and save it for html transformation step
+            responsetype_label = response.find('label')
+            problem_data[response_id_str] = {
+                'label': responsetype_label.text if responsetype_label is not None else '',
+                'p_ids': p_ids
+            }
+
             # instantiate capa Response
             responsetype_cls = responsetypes.registry.get_class_for_tag(response.tag)
             responder = responsetype_cls(response, inputfields, self.context, self.capa_system, self.capa_module)
             # save in list in self
             self.responders[response] = responder
+            response_id += 1
 
         # get responder answers (do this only once, since there may be a performance cost,
         # eg with externalresponse)
@@ -881,3 +899,5 @@ class LoncapaProblem(object):
         for solution in tree.findall('.//solution'):
             solution.attrib['id'] = "%s_solution_%i" % (self.problem_id, solution_id)
             solution_id += 1
+
+        return problem_data
