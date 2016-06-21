@@ -17,6 +17,7 @@ from django.shortcuts import redirect
 from django.views.decorators.cache import cache_control
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.http import HttpResponseBadRequest, Http404
+from django.utils.safestring import mark_safe
 
 from labster_course_license.utils import LtiPassport, course_tree_info
 from labster_course_license.models import CourseLicense
@@ -221,15 +222,15 @@ def set_license(request, course, ccx):
         if invalid_simulation_ids:
             messages.error(
                 request,
-                _((
-                    'Please verify LTI URLs  are correct for the following simulations: \n {}'
+                mark_safe(_((
+                    'Please verify LTI URLs  are correct for the following simulations:<br> {}'
                 ).format(
-                    '\n'.join(
+                    '<br>'.join(
                         'name: "{}", simulation Id: "{}"'.format(
                             sim_name, sim_id
                         ) for sim_name, sim_id in invalid_simulation_ids
                     )
-                ))
+                )))
             )
             return redirect(url)
         update_course(ccx, course_info, chapters)

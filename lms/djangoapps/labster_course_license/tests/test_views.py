@@ -1,50 +1,86 @@
 """
 Tests labster course license views
 """
+import random
+import string
+import mock
 from django.test.client import RequestFactory
 from django.core.urlresolvers import reverse
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from xmodule.modulestore.django import modulestore
-from student.tests.factories import AdminFactory
-from ccx.tests.factories import CcxFactory
-from ccx_keys.locator import CCXLocator
-from labster_course_license.views import set_license
+from django.test import Client
+from rest_framework import status
+from openedx.core.djangoapps.labster.tests.base import LTITestBase
+from xmodule.modulestore.tests.factories import ItemFactory
 
 
-class TestSetLicense(ModuleStoreTestCase):
+def item_factory(store, valid=True):
+    """
+    Return simulation with specified parameters.
+    """
+    simulation_id = 'a0Kw000000{}'.format(
+        ''.join(random.choice(string.ascii_uppercase + string.digits) for num in range(8))
+    )
+    url = 'https://example.com/simulation/{}/'.format(simulation_id)
+    if not valid:
+        url = '	{}	'.format(url)
+    ItemFactory.create(
+        category='lti',
+        modulestore=store,
+        display_name='LTI%s' % simulation_id,
+        metadata={
+            'lti_id': 'correct_lti_id',
+            'launch_url': url
+        }
+    )
+    return simulation_id
+
+
+class TestSetLicense(LTITestBase):
     """
     Tests for set_license method.
     """
+
     def setUp(self):
         super(TestSetLicense, self).setUp()
-        self.course = CourseFactory.create()
-        self.ccx = CcxFactory.create(course_id=self.course.id)
         self.request_factory = RequestFactory()
-        self.instructor = AdminFactory.create()
         self.license = 'YildVfefwmrTwNPPeapcNrugbkyb34sFoKiolPtk'
-        self.store = modulestore()
+        self.url = reverse("labster_license_handler", kwargs={'course_id': self.ccx_key})
+        self.data = {'license': self.license, 'update': True}
+        self.client = Client()
+        self.client.login(username=self.user.username, password="test")
 
-    def create_valid_simulations(self):
+    @mock.patch('labster_course_license.views.get_licensed_simulations')
+    @mock.patch('labster_course_license.views.get_consumer_secret')
+    def test_valid_simulation_ids(self, get_consumer_secret, get_licensed_simulations):
         """
-        Return list of simulations with valid parameters.
+        Test that the licence page is returned with no invalid simulations.
         """
-        return [ItemFactory.create(
-            category='lti',
-            modulestore=self.store,
-            display_name='LTI%d' % cnt
-        ) for cnt in range(5)]
+        # create 5 lti xmodules with valid launch urls
+        licenced_simulations = []
+        for num in range(5):
+            licenced_simulations.append(item_factory(self.store))
+        get_consumer_secret.return_value = ('123', '__secret_key__')
+        get_licensed_simulations.return_value = licenced_simulations
+        res = self.client.post(self.url, data=self.data, follow=True)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertIn('value="YildVfefwmrTwNPPeapcNrugbkyb34sFoKiolPtk"', res.content)
+        self.assertNotIn('Please verify LTI URLs  are correct for the following simulations', res.content)
 
-    def test_valid_simulation_ids(self):
-        request = self.request_factory.post(
-            reverse("labster_license_handler"),
-            data={'license': self.license, 'update': True}
-        )
-        request.user = self.instructor
-        self.create_valid_simulations()
-        res = set_license(request, self.course, self.ccx)
-        messages = res.context.get('messages')[0]
-        ccx_locator = CCXLocator.from_course_locator(self.course.id, self.ccx.id)
-        url = reverse('labster_license_handler', kwargs={'course_id': ccx_locator})
-        self.assertEqual(res.status_code, 302)
-        self.assertRedirects(res, url)
+    @mock.patch('labster_course_license.views.get_licensed_simulations')
+    @mock.patch('labster_course_license.views.get_consumer_secret')
+    def test_invalid_simulation_ids(self, get_consumer_secret, get_licensed_simulations):
+        """
+        Test that license page is returned with error containing invalid simulations.
+        """
+        # create 5 lti xmodules with few invalid launch urls
+        licenced_simulations = []
+        is_valid = [True, True, False, True, False]
+        for valid in is_valid:
+            licenced_simulations.append(item_factory(self.store, valid))
+        get_consumer_secret.return_value = ('123', '__secret_key__')
+        get_licensed_simulations.return_value = licenced_simulations
+        res = self.client.post(self.url, data=self.data, follow=True)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertIn('value="YildVfefwmrTwNPPeapcNrugbkyb34sFoKiolPtk"', res.content)
+        self.assertIn('Please verify LTI URLs  are correct for the following simulations', res.content)
+        self.assertIn(licenced_simulations[2], res.content)
+        self.assertIn(licenced_simulations[4], res.content)

@@ -11,13 +11,9 @@ from django.test.client import Client
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.template.defaultfilters import slugify
-
-from xmodule.modulestore.tests.factories import CourseFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, TEST_DATA_SPLIT_MODULESTORE
-from ccx.tests.factories import CcxFactory
-from ccx_keys.locator import CCXLocator
+from rest_framework import status
+from openedx.core.djangoapps.labster.tests.base import LTITestBase
 from ccx.overrides import override_field_for_ccx
-from student.roles import CourseCcxCoachRole
 from student.tests.factories import UserFactory
 
 
@@ -25,11 +21,10 @@ TEST_DATA = json.dumps([{'display_name': 'test'}])
 
 
 @ddt
-class TeacherDashboardViewsTests(ModuleStoreTestCase):
+class TeacherDashboardViewsTests(LTITestBase):
     """
     All tests for the views.py file
     """
-    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
 
     def setUp(self):
         """
@@ -38,42 +33,8 @@ class TeacherDashboardViewsTests(ModuleStoreTestCase):
         super(TeacherDashboardViewsTests, self).setUp()
 
         self.client = Client()
-        self.consumer_keys = ['123', '789']
-        self.lti_passports = self.make_lti_passports(self.consumer_keys)
-        self.course = CourseFactory.create(
-            enable_ccx=True,
-            display_name='Test Course', lti_passports=self.lti_passports
-        )
-        # Create instructor account
-        self.user = UserFactory.create()
-        self.make_coach()
-        self.ccx = self.make_ccx()
-        self.ccx_key = CCXLocator.from_course_locator(self.course.id, self.ccx.id)
         self.view_url = reverse('teacher_dashboard.views.teacher_dahsboard_handler', args=[unicode(self.course.id)])
         self.client.login(username=self.user.username, password="test")
-
-    def make_lti_passports(self, consumer_keys):
-        """
-        Create lti passports.
-        """
-        return [
-            ':'.join(['TEST-' + str(i), k, '__secret_key__'])
-            for i, k in enumerate(consumer_keys)
-        ]
-
-    def make_coach(self):
-        """
-        Create coach user.
-        """
-        role = CourseCcxCoachRole(self.course.id)
-        role.add_users(self.user)
-
-    def make_ccx(self):
-        """
-        Create ccx.
-        """
-        ccx = CcxFactory(course_id=self.course.id, coach=self.user)
-        return ccx
 
     def test_student_cannot_see_teacher_dashboard(self):
         """
@@ -84,7 +45,7 @@ class TeacherDashboardViewsTests(ModuleStoreTestCase):
         self.client.login(username=student.username, password="test")
         url = reverse('teacher_dashboard.views.dashboard_view', args=[self.course.id])
         response = student_user.get(url)
-        self.assertEquals(response.status_code, 302)
+        self.assertEquals(response.status_code, status.HTTP_302_FOUND)
 
     def test_unauthenticated_teacher_view(self):
         """
@@ -93,7 +54,7 @@ class TeacherDashboardViewsTests(ModuleStoreTestCase):
         anon_user = Client()
         url = reverse('teacher_dashboard.views.dashboard_view', args=[self.course.id])
         response = anon_user.get(url)
-        self.assertEquals(response.status_code, 302)
+        self.assertEquals(response.status_code, status.HTTP_302_FOUND)
 
     def test_authenticated_teacher_view(self):
         """
@@ -102,7 +63,7 @@ class TeacherDashboardViewsTests(ModuleStoreTestCase):
         for course_id in (self.course.id, self.ccx_key):
             url = reverse('teacher_dashboard.views.dashboard_view', args=[self.course.id])
             response = self.client.get(url, follow=True)
-            self.assertEquals(response.status_code, 200)
+            self.assertEquals(response.status_code, status.HTTP_200_OK)
             self.assertIn('teacher-dashboard', response.content)
 
     @data(
@@ -117,7 +78,7 @@ class TeacherDashboardViewsTests(ModuleStoreTestCase):
         """
         anon_user = Client()
         response = anon_user.post(self.view_url, data=data)
-        self.assertEquals(response.status_code, 302)
+        self.assertEquals(response.status_code, status.HTTP_302_FOUND)
 
     @data(
         {'type': 'licenses'},
@@ -132,7 +93,7 @@ class TeacherDashboardViewsTests(ModuleStoreTestCase):
         mock_send_request.return_value = TEST_DATA
 
         response = self.client.post(self.view_url, data=data)
-        self.assertEquals(response.status_code, 200)
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
         self.assertEquals(response.content, TEST_DATA)
         self.assertEquals(response["Content-Type"], "application/json")
 
@@ -148,7 +109,7 @@ class TeacherDashboardViewsTests(ModuleStoreTestCase):
             'license': 'LICENSE',
             'simulation': 'SIMULATION',
         })
-        self.assertEquals(response.status_code, 200)
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
         self.assertEquals(response.content, TEST_DATA)
         self.assertEquals(response["Content-Type"], "text/csv")
         expected = 'attachment; filename="{}-summary.csv"'.format(slugify(self.course.id))
