@@ -224,7 +224,8 @@ class InputTypeBase(object):
         self.hint = feedback.get('hint', '')
         self.hintmode = feedback.get('hintmode', None)
         self.input_state = state.get('input_state', {})
-        self.answervariable = state.get("answervariable", None)
+        self.answervariable = state.get('answervariable', None)
+        self.response_data = state.get('response_data', None)
 
         # put hint above msg if it should be displayed
         if self.hintmode == 'always':
@@ -316,8 +317,10 @@ class InputTypeBase(object):
             'value': self.value,
             'status': Status(self.status, self.capa_system.i18n.ugettext),
             'msg': self.msg,
+            'response_data': self.response_data,
             'STATIC_URL': self.capa_system.STATIC_URL,
         }
+
         context.update(
             (a, v) for (a, v) in self.loaded_attributes.iteritems() if a in self.to_render
         )
