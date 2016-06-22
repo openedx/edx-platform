@@ -13,6 +13,7 @@ from xmodule.contentstore.content import StaticContent
 from opaque_keys.edx.locator import AssetLocator
 
 log = logging.getLogger(__name__)
+XBLOCK_STATIC_RESOURCE_PREFIX = '/static/xblock'
 
 
 def _url_replace_regex(prefix):
@@ -109,6 +110,13 @@ def process_static_urls(text, replacement_function, data_dir=None):
         prefix = match.group('prefix')
         quote = match.group('quote')
         rest = match.group('rest')
+
+        # Don't rewrite XBlock resource links.  Probably wasn't a good idea that /static
+        # works for actual static assets and for magical course asset URLs....
+        full_url = prefix + rest
+        if full_url.startswith(XBLOCK_STATIC_RESOURCE_PREFIX):
+            return original
+
         return replacement_function(original, prefix, quote, rest)
 
     return re.sub(
