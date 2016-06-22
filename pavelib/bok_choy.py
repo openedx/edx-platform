@@ -18,23 +18,42 @@ except ImportError:
 __test__ = False  # do not collect
 
 BOKCHOY_OPTS = [
-    ('test_spec=', 't', 'Specific test to run'),
+    ('test-spec=', 't', 'Specific test to run'),
     ('fasttest', 'a', 'Skip some setup'),
-    ('skip_clean', 'C', 'Skip cleaning repository before running tests'),
+    ('skip-clean', 'C', 'Skip cleaning repository before running tests'),
     ('serversonly', 'r', 'Prepare suite and leave servers running'),
     ('testsonly', 'o', 'Assume servers are running and execute tests only'),
-    ('default_store=', 's', 'Default modulestore'),
-    ('test_dir=', 'd', 'Directory for finding tests (relative to common/test/acceptance)'),
-    ('imports_dir=', 'i', 'Directory containing (un-archived) courses to be imported'),
-    ('num_processes=', 'n', 'Number of test threads (for multiprocessing)'),
-    ('verify_xss', 'x', 'Run XSS vulnerability tests'),
+    ('default-store=', 's', 'Default modulestore'),
+    ('test-dir=', 'd', 'Directory for finding tests (relative to common/test/acceptance)'),
+    ('imports-dir=', 'i', 'Directory containing (un-archived) courses to be imported'),
+    ('num-processes=', 'n', 'Number of test threads (for multiprocessing)'),
+    ('verify-xss', 'x', 'Run XSS vulnerability tests'),
     make_option("--verbose", action="store_const", const=2, dest="verbosity"),
     make_option("-q", "--quiet", action="store_const", const=0, dest="verbosity"),
     make_option("-v", "--verbosity", action="count", dest="verbosity"),
     make_option("--pdb", action="store_true", help="Drop into debugger on failures or errors"),
-    make_option("--skip_firefox_version_validation", action='store_false', dest="validate_firefox_version"),
-    make_option("--save_screenshots", action='store_true', dest="save_screenshots"),
+    make_option("--skip-firefox-version-validation", action='store_false', dest="validate_firefox_version"),
+    make_option("--save-screenshots", action='store_true', dest="save_screenshots"),
+    ('default_store=', None, 'deprecated in favor of default-store'),
     ('extra_args=', 'e', 'deprecated, pass extra options directly in the paver commandline'),
+    ('imports_dir=', None, 'deprecated in favor of imports-dir'),
+    ('num_processes=', None, 'deprecated in favor of num-processes'),
+    ('skip_clean', None, 'deprecated in favor of skip-clean'),
+    ('test_dir=', None, 'deprecated in favor of test-dir'),
+    ('test_spec=', None, 'Specific test to run'),
+    ('verify_xss', None, 'deprecated in favor of verify-xss'),
+    make_option(
+        "--skip_firefox_version_validation",
+        action='store_false',
+        dest="validate_firefox_version",
+        help="deprecated in favor of --skip-firefox-version-validation"
+    ),
+    make_option(
+        "--save_screenshots",
+        action='store_true',
+        dest="save_screenshots",
+        help="deprecated in favor of save-screenshots"
+    ),
 ]
 
 

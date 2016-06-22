@@ -99,7 +99,7 @@ case "$TEST_SUITE" in
         ;;
 
     "lms-unit")
-        PAVER_ARGS="--with-flaky --processes=-1 --cov_args='-p' -v"
+        PAVER_ARGS="--with-flaky --processes=-1 --cov-args='-p' -v"
         case "$SHARD" in
             "all")
                 paver test_system -s lms $PAVER_ARGS
@@ -128,11 +128,11 @@ case "$TEST_SUITE" in
         ;;
 
     "cms-unit")
-        paver test_system -s cms --with-flaky --cov_args="-p" -v
+        paver test_system -s cms --with-flaky --cov-args="-p" -v
         ;;
 
     "commonlib-unit")
-        paver test_lib --with-flaky --cov_args="-p" -v
+        paver test_lib --with-flaky --cov-args="-p" -v
         ;;
 
     "js-unit")
@@ -141,8 +141,8 @@ case "$TEST_SUITE" in
         ;;
 
     "commonlib-js-unit")
-        paver test_js --coverage --skip_clean || { EXIT=1; }
-        paver test_lib --skip_clean --with-flaky --cov_args="-p" || { EXIT=1; }
+        paver test_js --coverage --skip-clean || { EXIT=1; }
+        paver test_lib --skip-clean --with-flaky --cov-args="-p" || { EXIT=1; }
 
         # This is to ensure that the build status of the shard is properly set.
         # Because we are running two paver commands in a row, we need to capture

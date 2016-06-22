@@ -39,14 +39,15 @@ def clean_dir(directory):
 
 @task
 @cmdopts([
-    ('skip_clean', 'C', 'skip cleaning repository before running tests'),
+    ('skip-clean', 'C', 'skip cleaning repository before running tests'),
+    ('skip_clean', None, 'deprecated in favor of skip-clean'),
 ])
 def clean_reports_dir(options):
     """
     Clean coverage files, to ensure that we don't use stale data to generate reports.
     """
     if getattr(options, 'skip_clean', False):
-        print '--skip_clean is set, skipping...'
+        print '--skip-clean is set, skipping...'
         return
 
     # We delete the files but preserve the directory structure

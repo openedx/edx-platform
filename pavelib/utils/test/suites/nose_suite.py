@@ -95,7 +95,7 @@ class NoseTestSuite(TestSuite):
             opts += "--failed"
 
         # This makes it so we use nose's fail-fast feature in two cases.
-        # Case 1: --fail_fast is passed as an arg in the paver command
+        # Case 1: --fail-fast is passed as an arg in the paver command
         # Case 2: The environment variable TESTS_FAIL_FAST is set as True
         env_fail_fast_set = (
             'TESTS_FAIL_FAST' in os.environ and os.environ['TEST_FAIL_FAST']

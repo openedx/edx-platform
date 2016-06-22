@@ -1,6 +1,6 @@
 """
 Run these tests @ Devstack:
-    paver test_system -s lms --fasttest --verbose --test_id=lms/djangoapps/course_structure_api
+    paver test_system -s lms --fasttest --verbose --test-id=lms/djangoapps/course_structure_api
 """
 # pylint: disable=missing-docstring,invalid-name,maybe-no-member,attribute-defined-outside-init
 from datetime import datetime
