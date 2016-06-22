@@ -551,8 +551,8 @@ if FEATURES.get('PROJECTS_APP') and "projects" not in INSTALLED_APPS:
 
 ############# Organizations App #################
 FEATURES['ORGANIZATIONS_APP'] = True
-if FEATURES.get('ORGANIZATIONS_APP') and "organizations" not in INSTALLED_APPS:
-    INSTALLED_APPS += ('organizations',)
+if FEATURES.get('ORGANIZATIONS_APP') and "edx_solutions_organizations" not in INSTALLED_APPS:
+    INSTALLED_APPS += ('edx_solutions_organizations',)
 
 # Disable course_published signals
 # If we don't disconnect then tests take too much time to run since
