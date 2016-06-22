@@ -295,6 +295,12 @@ class CoursewareIndex(View):
         """
         return self.masquerade and self.masquerade.role == 'student'
 
+    def _is_masquerading_as_specific_student(self):
+        """
+        Returns whether the current request is masqueurading as a specific student.
+        """
+        return self._is_masquerading_as_student() and self.masquerade.user_name
+
     def _find_block(self, parent, url_name, block_type, min_depth=None):
         """
         Finds the block in the parent with the specified url_name.
@@ -464,6 +470,8 @@ class CoursewareIndex(View):
             section_context['prev_url'] = _compute_section_url(previous_of_active_section, 'last')
         if next_of_active_section:
             section_context['next_url'] = _compute_section_url(next_of_active_section, 'first')
+        # sections can hide data that masquerading staff should see when debugging issues with specific students
+        section_context['specific_masquerade'] = self._is_masquerading_as_specific_student()
         return section_context
 
     def _handle_unexpected_error(self):
