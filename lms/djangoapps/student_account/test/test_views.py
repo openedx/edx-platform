@@ -33,7 +33,7 @@ from student_account.views import account_settings_context, get_user_orders
 from third_party_auth.tests.testutil import simulate_running_pipeline, ThirdPartyAuthTestMixin
 from util.testing import UrlResetMixin
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from openedx.core.djangoapps.theming.test_util import with_edx_domain_context
+from openedx.core.djangoapps.theming.tests.test_util import with_edx_domain_context
 
 
 @ddt.ddt
