@@ -5,6 +5,7 @@ from ratelimitbackend import admin
 
 from cms.djangoapps.contentstore.views.program import ProgramAuthoringView, ProgramsIdTokenView
 from cms.djangoapps.contentstore.views.organization import OrganizationListView
+from student.views import LogoutView
 
 admin.autodiscover()
 
@@ -65,7 +66,7 @@ urlpatterns += patterns(
 
     # ajax view that actually does the work
     url(r'^login_post$', 'student.views.login_user', name='login_post'),
-    url(r'^logout$', 'student.views.logout_user', name='logout'),
+    url(r'^logout$', LogoutView.as_view(), name='logout'),
 )
 
 # restful api

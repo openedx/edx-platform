@@ -4,7 +4,7 @@
             <img
                 class="header-img"
                 src="<%- course_image_url %>"
-                alt="<%= interpolate(gettext('%(courseName)s Home Page.'), {courseName: display_name}, true)%>"/>
+                alt="<%= interpolate(gettext('%(courseName)s Home Page.'), {courseName: display_name}, true) %>"/>
         </a>
         <div class="course-details">
             <h3 class="course-title">
@@ -13,9 +13,8 @@
                 </a>
             </h3>
             <div class="course-text">
-                <% if (is_enrolled){ %>
-                    <span class="run-period"><%- start_date %> - <%- end_date %></span>
-                <% } %>
+                <span class="run-period"><%- start_date %> - <%- end_date %></span>
+                -
                 <span class="course-key"><%- key %></span>
             </div>
         </div>

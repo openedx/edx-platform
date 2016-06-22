@@ -51,7 +51,7 @@
                         el: '.js-course-list',
                         childView: CourseCardView,
                         collection: this.courseCardCollection,
-                        context: this.programModel.toJSON(),
+                        context: this.options,
                         titleContext: {
                             el: 'h2',
                             title: 'Course List'

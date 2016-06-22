@@ -76,6 +76,7 @@ $("#open_close_accordion a").click(function(){
 <%include file="/courseware/course_navigation.html" args="active_page='textbook/{0}'.format(book_index)" />
 
 <section class="container">
+    <main id="main" aria-label="${_('Content')}" tabindex="-1">
   <div class="book-wrapper">
 
     <section aria-label="${_('Textbook Navigation')}" class="book-sidebar">
@@ -130,4 +131,5 @@ $("#open_close_accordion a").click(function(){
       </section>
     </section>
   </div>
+  </main>
 </section>

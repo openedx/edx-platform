@@ -181,6 +181,10 @@ class DiscussionThreadPage(PageObject, DiscussionPageMixin):
             "Response is voted"
         ).fulfill()
 
+    def cannot_vote_response(self, response_id):
+        """Assert that the voting button is not visible on this response"""
+        return not self.is_element_visible(".response_{} .discussion-response .action-vote".format(response_id))
+
     def is_response_reported(self, response_id):
         return self.is_element_visible(".response_{} .discussion-response .post-label-reported".format(response_id))
 
@@ -192,6 +196,10 @@ class DiscussionThreadPage(PageObject, DiscussionPageMixin):
                 lambda: self.is_response_reported(response_id),
                 "Response is reported"
             ).fulfill()
+
+    def cannot_report_response(self, response_id):
+        """Assert that the reporting button is not visible on this response"""
+        return not self.is_element_visible(".response_{} .discussion-response .action-report".format(response_id))
 
     def is_response_endorsed(self, response_id):
         return "endorsed" in self._get_element_text(".response_{} .discussion-response .posted-details".format(response_id))

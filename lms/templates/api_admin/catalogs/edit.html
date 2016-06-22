@@ -23,6 +23,12 @@ from django.utils.translation import ugettext as _
 <div id="api-access-wrapper">
   <h1 id="api-header">${catalog.name}</h1>
 
+  <p>
+    <a href="${'{root}/{id}/csv/'.format(root=catalog_api_catalog_endpoint, id=catalog.id)}" target="_blank">
+      ${_("Download CSV")}
+    </a>
+  </p>
+
   <div class="catalog-body">
     <div class="api-form-container">
       <form class="api-form" id="catalog-update" action="${reverse('api_admin:catalog-edit', args=(catalog.id,))}" method="post">

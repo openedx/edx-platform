@@ -8,9 +8,10 @@ define([
         
         describe('Program Details Header View', function () {
             var view = null,
-                programModel,
                 context = {
-                    programListingUrl: '/dashboard/programs',
+                    urls: {
+                        program_listing_url: '/dashboard/programs'
+                    },
                     programData: {
                         uuid: '12-ab',
                         name: 'Astrophysics',
@@ -58,7 +59,7 @@ define([
                 expect(view.$('.org-logo').attr('alt')).toEqual(
                     context.programData.organizations[0].display_name + '\'s logo'
                 );
-                expect(programListUrl).toEqual(context.programListingUrl);
+                expect(programListUrl).toEqual(context.urls.program_listing_url);
             });
         });
     }

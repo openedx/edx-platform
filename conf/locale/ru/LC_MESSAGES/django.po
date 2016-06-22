@@ -49,6 +49,7 @@
 # YummyTranslations Edx <yummytranslations.edx@gmail.com>, 2015
 # tonybond <zippo2021@gmail.com>, 2014
 # Андрей Сандлер <inactive+asandler@transifex.com>, 2013
+# Оксана Ли <okcanochka.lee@list.ru>, 2016
 # Яна Ловягина <yana.lovyagina@raccoongang.com>, 2016
 # #-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#
 # edX translation file.
@@ -132,6 +133,7 @@
 # tonybond <zippo2021@gmail.com>, 2014
 # Андрей Сандлер <inactive+asandler@transifex.com>, 2013
 # Ничик Дмитрий Валерьевич <dmi.nichik@gmail.com>, 2013
+# Оксана Ли <okcanochka.lee@list.ru>, 2016
 # Яна Ловягина <yana.lovyagina@raccoongang.com>, 2016
 # #-#-#-#-#  mako-studio.po (edx-platform)  #-#-#-#-#
 # edX translation file
@@ -168,6 +170,7 @@
 # Weyedide <weyedide@gmail.com>, 2014-2016
 # Weyedide <weyedide@gmail.com>, 2014
 # Yana Malinovskaya <y.malinovskaya@itransition.com>, 2014
+# Оксана Ли <okcanochka.lee@list.ru>, 2016
 # #-#-#-#-#  wiki.po (edx-platform)  #-#-#-#-#
 # edX translation file
 # Copyright (C) 2016 edX

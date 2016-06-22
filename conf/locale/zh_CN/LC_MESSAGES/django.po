@@ -272,7 +272,7 @@
 # ruiruillp <gaier1993@163.com>, 2015
 # Scott Huang <sc.h@aol.com>, 2014
 # shuchuanchen <am15501@163.com>, 2014
-# louyihua <supermouselyh@hotmail.com>, 2014-2015
+# louyihua <supermouselyh@hotmail.com>, 2014-2016
 # Jianfei Wang <me@thinxer.com>, 2013
 # tucunchao <tucunchao@gmail.com>, 2013
 # VainChan <fsszns@163.com>, 2015
@@ -17503,7 +17503,7 @@ msgstr ""
 
 #: cms/templates/group_configurations.html
 msgid "Details & Schedule"
-msgstr ""
+msgstr "细节与日程"
 
 #: cms/templates/howitworks.html
 msgid "Welcome"
@@ -18587,7 +18587,7 @@ msgstr ""
 
 #: cms/templates/settings.html
 msgid "Schedule & Details Settings"
-msgstr ""
+msgstr "日程与细节设置"
 
 #: cms/templates/settings.html cms/templates/widgets/header.html
 msgid "Schedule & Details"
@@ -18895,7 +18895,7 @@ msgstr ""
 
 #: cms/templates/settings.html
 msgid "Upload Video Thumbnail Image"
-msgstr ""
+msgstr "上传视频缩略图"
 
 #: cms/templates/settings.html
 msgid "Course Introduction Video"

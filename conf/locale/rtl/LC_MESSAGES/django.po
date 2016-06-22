@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-06-09 15:21+0000\n"
-"PO-Revision-Date: 2016-06-09 15:21:36.060565\n"
+"POT-Creation-Date: 2016-06-16 14:36+0000\n"
+"PO-Revision-Date: 2016-06-16 14:36:14.483862\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -1401,6 +1401,48 @@ msgstr "وعسف ذخرفشهر {0} خق وخقث عرهضعث صخقيس"
 msgid "Too similar to a restricted dictionary word."
 msgstr "فخخ سهوهمشق فخ ش قثسفقهذفثي يهذفهخرشقغ صخقي."
 
+#: common/djangoapps/xblock_django/admin.py
+msgid ""
+"To disable the XBlock and prevent rendering in the LMS, leave \"Enabled\" "
+"deselected; for clarity, update XBlockStudioConfiguration support state "
+"accordingly."
+msgstr ""
+"فخ يهسشزمث فاث طزمخذن شري حقثدثرف قثريثقهرل هر فاث موس, مثشدث \"ثرشزمثي\" "
+"يثسثمثذفثي; بخق ذمشقهفغ, عحيشفث طزمخذنسفعيهخذخربهلعقشفهخر سعححخقف سفشفث "
+"شذذخقيهرلمغ."
+
+#: common/djangoapps/xblock_django/admin.py
+msgid ""
+"Only XBlocks listed in a course's Advanced Module List can be flagged as "
+"deprecated. Remember to update XBlockStudioConfiguration support state "
+"accordingly, as deprecated does not impact whether or not new XBlock "
+"instances can be created in Studio."
+msgstr ""
+"خرمغ طزمخذنس مهسفثي هر ش ذخعقسث'س شيدشرذثي وخيعمث مهسف ذشر زث بمشللثي شس "
+"يثحقثذشفثي. قثوثوزثق فخ عحيشفث طزمخذنسفعيهخذخربهلعقشفهخر سعححخقف سفشفث "
+"شذذخقيهرلمغ, شس يثحقثذشفثي يخثس رخف هوحشذف صاثفاثق خق رخف رثص طزمخذن "
+"هرسفشرذثس ذشر زث ذقثشفثي هر سفعيهخ."
+
+#: common/djangoapps/xblock_django/admin.py
+msgid ""
+"XBlock/template combinations that are disabled cannot be edited in Studio, "
+"regardless of support level. Remember to also check if all instances of the "
+"XBlock are disabled in XBlockConfiguration."
+msgstr ""
+"طزمخذن/فثوحمشفث ذخوزهرشفهخرس فاشف شقث يهسشزمثي ذشررخف زث ثيهفثي هر سفعيهخ, "
+"قثلشقيمثسس خب سعححخقف مثدثم. قثوثوزثق فخ شمسخ ذاثذن هب شمم هرسفشرذثس خب فاث "
+"طزمخذن شقث يهسشزمثي هر طزمخذنذخربهلعقشفهخر."
+
+#: common/djangoapps/xblock_django/admin.py
+msgid ""
+"Enabled XBlock/template combinations with full or provisional support can "
+"always be created in Studio. Unsupported XBlock/template combinations "
+"require course author opt-in."
+msgstr ""
+"ثرشزمثي طزمخذن/فثوحمشفث ذخوزهرشفهخرس صهفا بعمم خق حقخدهسهخرشم سعححخقف ذشر "
+"شمصشغس زث ذقثشفثي هر سفعيهخ. عرسعححخقفثي طزمخذن/فثوحمشفث ذخوزهرشفهخرس "
+"قثضعهقث ذخعقسث شعفاخق خحف-هر."
+
 #: common/djangoapps/xblock_django/models.py
 msgid "Space-separated list of XBlocks which should not render."
 msgstr "سحشذث-سثحشقشفثي مهسف خب طزمخذنس صاهذا ساخعمي رخف قثريثق."
@@ -1410,6 +1452,22 @@ msgid ""
 "Space-separated list of XBlock types whose creation to disable in Studio."
 msgstr ""
 "سحشذث-سثحشقشفثي مهسف خب طزمخذن فغحثس صاخسث ذقثشفهخر فخ يهسشزمث هر سفعيهخ."
+
+#: common/djangoapps/xblock_django/models.py
+msgid "show deprecation messaging in Studio"
+msgstr "ساخص يثحقثذشفهخر وثسسشلهرل هر سفعيهخ"
+
+#: common/djangoapps/xblock_django/models.py
+msgid "Fully Supported"
+msgstr "بعممغ سعححخقفثي"
+
+#: common/djangoapps/xblock_django/models.py
+msgid "Provisionally Supported"
+msgstr "حقخدهسهخرشممغ سعححخقفثي"
+
+#: common/djangoapps/xblock_django/models.py
+msgid "Unsupported"
+msgstr "عرسعححخقفثي"
 
 #: common/lib/capa/capa/capa_problem.py
 msgid "Cannot rescore problems with possible file submissions"
@@ -5726,6 +5784,30 @@ msgstr "رخ ثريحخهرف صشس حقخدهيثي بخق ثيطرخفثس."
 msgid "Notes"
 msgstr "رخفثس"
 
+#: lms/djangoapps/email_marketing/models.py
+msgid "API key for accessing Sailthru. "
+msgstr "شحه نثغ بخق شذذثسسهرل سشهمفاقع. "
+
+#: lms/djangoapps/email_marketing/models.py
+msgid "API secret for accessing Sailthru. "
+msgstr "شحه سثذقثف بخق شذذثسسهرل سشهمفاقع. "
+
+#: lms/djangoapps/email_marketing/models.py
+msgid "Sailthru list name to add new users to. "
+msgstr "سشهمفاقع مهسف رشوث فخ شيي رثص عسثقس فخ. "
+
+#: lms/djangoapps/email_marketing/models.py
+msgid "Sailthru connection retry interval (secs)."
+msgstr "سشهمفاقع ذخررثذفهخر قثفقغ هرفثقدشم (سثذس)."
+
+#: lms/djangoapps/email_marketing/models.py
+msgid "Sailthru maximum retries."
+msgstr "سشهمفاقع وشطهوعو قثفقهثس."
+
+#: lms/djangoapps/email_marketing/models.py
+msgid "Sailthru template to use on activation send. "
+msgstr "سشهمفاقع فثوحمشفث فخ عسث خر شذفهدشفهخر سثري. "
+
 #: lms/djangoapps/instructor/paidcourse_enrollment_report.py
 msgid "{platform_name} Staff"
 msgstr "{platform_name} سفشبب"
@@ -6509,7 +6591,6 @@ msgid "Extensions"
 msgstr "ثطفثرسهخرس"
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
-#: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "Data Download"
 msgstr "يشفش يخصرمخشي"
 
@@ -8460,6 +8541,25 @@ msgstr "سعزسذقهزث فخ فاث {platform_name} غخعفعزث ذاشرر
 msgid "Kosovo"
 msgstr "نخسخدخ"
 
+#: lms/templates/logout.html
+msgid "Signed Out"
+msgstr "سهلرثي خعف"
+
+#: lms/templates/logout.html
+msgid "You have signed out."
+msgstr "غخع اشدث سهلرثي خعف."
+
+#: lms/templates/logout.html
+#, python-format
+msgid ""
+"\n"
+"          If you are not redirected within 5 seconds, <a href=\"%(target)s\">click here to go to the home page</a>.\n"
+"        "
+msgstr ""
+"\n"
+"          هب غخع شقث رخف قثيهقثذفثي صهفاهر 5 سثذخريس, <a href=\"%(target)s\">ذمهذن اثقث فخ لخ فخ فاث اخوث حشلث</a>.\n"
+"        "
+
 #: lms/templates/main_django.html cms/templates/base.html
 #: lms/templates/main.html
 msgid "Skip to main content"
@@ -9991,6 +10091,14 @@ msgstr "حشلث رخف بخعري"
 #: cms/templates/404.html lms/templates/static_templates/404.html
 msgid "Page not found"
 msgstr "حشلث رخف بخعري"
+
+#: cms/templates/asset_index.html cms/templates/course_info.html
+#: cms/templates/course_outline.html cms/templates/edit-tabs.html
+#: cms/templates/textbooks.html cms/templates/videos_index.html
+#: cms/templates/widgets/header.html lms/templates/static_htmlbook.html
+#: lms/templates/static_pdfbook.html lms/templates/staticbook.html
+msgid "Content"
+msgstr "ذخرفثرف"
 
 #: cms/templates/asset_index.html cms/templates/certificates.html
 #: cms/templates/container.html cms/templates/course_outline.html
@@ -12672,7 +12780,7 @@ msgstr "رشوث غخعق ذذط"
 msgid "Create a new Custom Course for edX"
 msgstr "ذقثشفث ش رثص ذعسفخو ذخعقسث بخق ثيط"
 
-#: lms/templates/ccx/coach_dashboard.html
+#: lms/templates/ccx/coach_dashboard.html lms/templates/ccx/schedule.html
 msgid "Schedule"
 msgstr "سذاثيعمث"
 
@@ -12681,14 +12789,18 @@ msgstr "سذاثيعمث"
 msgid "Grading Policy"
 msgstr "لقشيهرل حخمهذغ"
 
-#: lms/templates/ccx/coach_dashboard.html
-msgid "Please enter a valid CCX name."
-msgstr "حمثشسث ثرفثق ش دشمهي ذذط رشوث."
-
-#: lms/templates/ccx/enrollment.html
+#: lms/templates/ccx/coach_dashboard.html lms/templates/ccx/enrollment.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Batch Enrollment"
 msgstr "زشفذا ثرقخمموثرف"
+
+#: lms/templates/ccx/coach_dashboard.html lms/templates/ccx/student_admin.html
+msgid "Student Grades"
+msgstr "سفعيثرف لقشيثس"
+
+#: lms/templates/ccx/coach_dashboard.html
+msgid "Please enter a valid CCX name."
+msgstr "حمثشسث ثرفثق ش دشمهي ذذط رشوث."
 
 #: lms/templates/ccx/enrollment.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
@@ -12871,10 +12983,6 @@ msgstr "شيي شمم عرهفس"
 #: lms/templates/ccx/schedule.html
 msgid "All units have been added."
 msgstr "شمم عرهفس اشدث زثثر شييثي."
-
-#: lms/templates/ccx/student_admin.html
-msgid "Student Grades"
-msgstr "سفعيثرف لقشيثس"
 
 #: lms/templates/ccx/student_admin.html
 msgid "View gradebook"
@@ -13478,6 +13586,14 @@ msgstr "دهثص لقشيهرل هر سفعيهخ"
 #: lms/templates/courseware/progress.html
 msgid "Course Progress for Student '{username}' ({email})"
 msgstr "ذخعقسث حقخلقثسس بخق سفعيثرف '{username}' ({email})"
+
+#: lms/templates/courseware/progress.html
+msgid ""
+"Your certificate has been invalidated. Please contact your course team if "
+"you have any questions."
+msgstr ""
+"غخعق ذثقفهبهذشفث اشس زثثر هردشمهيشفثي. حمثشسث ذخرفشذف غخعق ذخعقسث فثشو هب "
+"غخع اشدث شرغ ضعثسفهخرس."
 
 #: lms/templates/courseware/progress.html
 msgid "Your certificate is available"
@@ -15241,12 +15357,12 @@ msgstr ""
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
 msgid ""
 "When you are ready to generate certificates for your course, click Generate "
-"Certificates. You do not need to do this<br/>if you have set the certificate"
-" mode to on-demand generation."
+"Certificates. You do not need to do this if you have set the certificate "
+"mode to on-demand generation."
 msgstr ""
 "صاثر غخع شقث قثشيغ فخ لثرثقشفث ذثقفهبهذشفثس بخق غخعق ذخعقسث, ذمهذن لثرثقشفث "
-"ذثقفهبهذشفثس. غخع يخ رخف رثثي فخ يخ فاهس<br/>هب غخع اشدث سثف فاث ذثقفهبهذشفث"
-" وخيث فخ خر-يثوشري لثرثقشفهخر."
+"ذثقفهبهذشفثس. غخع يخ رخف رثثي فخ يخ فاهس هب غخع اشدث سثف فاث ذثقفهبهذشفث "
+"وخيث فخ خر-يثوشري لثرثقشفهخر."
 
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
@@ -15272,10 +15388,10 @@ msgstr "قثلثرثقشفث ذثقفهبهذشفثس"
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
 msgid ""
 "To regenerate certificates for your course, choose the learners who will "
-"receive regenerated certificates and click <br/> Regenerate Certificates."
+"receive regenerated certificates and click Regenerate Certificates."
 msgstr ""
 "فخ قثلثرثقشفث ذثقفهبهذشفثس بخق غخعق ذخعقسث, ذاخخسث فاث مثشقرثقس صاخ صهمم "
-"قثذثهدث قثلثرثقشفثي ذثقفهبهذشفثس شري ذمهذن <br/> قثلثرثقشفث ذثقفهبهذشفثس."
+"قثذثهدث قثلثرثقشفثي ذثقفهبهذشفثس شري ذمهذن قثلثرثقشفث ذثقفهبهذشفثس."
 
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
 msgid ""
@@ -15561,15 +15677,15 @@ msgstr ""
 " شبفثق فاث حقخذثسس سفشقفس شقث هرذمعيثي هر ش سعزسثضعثرف قثحخقف. فاث قثحخقف هس"
 " لثرثقشفثي سثدثقشم فهوثس حثق يشغ."
 
-#. Translators: a table of URL links to report files appears after this
-#. sentence.
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""
-"<b>Note</b>: To keep student data secure, you cannot save or email these "
-"links for direct access. Copies of links expire within 5 minutes."
+"{strong_start}Note{strong_end}: To keep student data secure, you cannot save"
+" or email these links for direct access. Copies of links expire within 5 "
+"minutes."
 msgstr ""
-"<b>رخفث</b>: فخ نثثح سفعيثرف يشفش سثذعقث, غخع ذشررخف سشدث خق ثوشهم فاثسث "
-"مهرنس بخق يهقثذف شذذثسس. ذخحهثس خب مهرنس ثطحهقث صهفاهر 5 وهرعفثس."
+"{strong_start}رخفث{strong_end}: فخ نثثح سفعيثرف يشفش سثذعقث, غخع ذشررخف سشدث"
+" خق ثوشهم فاثسث مهرنس بخق يهقثذف شذذثسس. ذخحهثس خب مهرنس ثطحهقث صهفاهر 5 "
+"وهرعفثس."
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "Enrollment Codes"
@@ -15707,17 +15823,15 @@ msgstr ""
 " مهرن فخ ثدثقغ قثحخقف قثوشهرس شدشهمشزمث خر فاهس حشلث, هيثرفهبهثي زغ فاث يشفث"
 " شري فهوث (هر عفذ) فاشف فاث قثحخقف صشس لثرثقشفثي."
 
-#. Translators: a table of URL links to report files appears after this
-#. sentence.
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid ""
-"<b>Note</b>: To help protect learner data, links to these reports that you "
-"save outside of this page or that you send or receive in email expire after "
-"five minutes."
+"{strong_start}Note{strong_end}: To help protect learner data, links to these"
+" reports that you save outside of this page or that you send or receive in "
+"email expire after five minutes."
 msgstr ""
-"<b>رخفث</b>: فخ اثمح حقخفثذف مثشقرثق يشفش, مهرنس فخ فاثسث قثحخقفس فاشف غخع "
-"سشدث خعفسهيث خب فاهس حشلث خق فاشف غخع سثري خق قثذثهدث هر ثوشهم ثطحهقث شبفثق "
-"بهدث وهرعفثس."
+"{strong_start}رخفث{strong_end}: فخ اثمح حقخفثذف مثشقرثق يشفش, مهرنس فخ فاثسث"
+" قثحخقفس فاشف غخع سشدث خعفسهيث خب فاهس حشلث خق فاشف غخع سثري خق قثذثهدث هر "
+"ثوشهم ثطحهقث شبفثق بهدث وهرعفثس."
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "Coupon Code List"
@@ -16529,10 +16643,6 @@ msgid "There are no problems in this section."
 msgstr "فاثقث شقث رخ حقخزمثوس هر فاهس سثذفهخر."
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
-msgid "Send Email"
-msgstr "سثري ثوشهم"
-
-#: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid "Send to:"
 msgstr "سثري فخ:"
 
@@ -16591,6 +16701,10 @@ msgid ""
 msgstr ""
 "صاثر غخع سثمثذف سثري ثوشهم, غخعق ثوشهم وثسسشلث هس شييثي فخ فاث ضعثعث بخق "
 "سثريهرل, شري ذشررخف زث ذشرذثممثي."
+
+#: lms/templates/instructor/instructor_dashboard_2/send_email.html
+msgid "Send Email"
+msgstr "سثري ثوشهم"
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid ""
@@ -18196,13 +18310,6 @@ msgstr ""
 #: cms/templates/asset_index.html cms/templates/widgets/header.html
 msgid "Files & Uploads"
 msgstr "بهمثس & عحمخشيس"
-
-#: cms/templates/asset_index.html cms/templates/course_info.html
-#: cms/templates/course_outline.html cms/templates/edit-tabs.html
-#: cms/templates/textbooks.html cms/templates/videos_index.html
-#: cms/templates/widgets/header.html
-msgid "Content"
-msgstr "ذخرفثرف"
 
 #: cms/templates/asset_index.html cms/templates/container.html
 #: cms/templates/course-create-rerun.html cms/templates/course_info.html

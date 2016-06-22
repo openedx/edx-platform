@@ -203,3 +203,10 @@ body.view-in-course .discussion-article {
     }
   }
 }
+
+.thread-wrapper,
+.forum-new-post-form {
+  img {
+    max-width: 100%;
+  }
+}

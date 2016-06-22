@@ -30,7 +30,7 @@ def clean_test_files():
 
 def clean_dir(directory):
     """
-    Clean coverage files, to ensure that we don't use stale data to generate reports.
+    Delete all the files from the specified directory.
     """
     # We delete the files but preserve the directory structure
     # so that coverage.py has a place to put the reports.

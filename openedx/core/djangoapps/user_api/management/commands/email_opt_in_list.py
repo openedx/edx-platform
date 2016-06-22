@@ -237,7 +237,9 @@ class Command(BaseCommand):
             email, full_name, course_id, is_opted_in, pref_set_datetime = row
             writer.writerow({
                 "email": email.encode('utf-8'),
-                "full_name": full_name.encode('utf-8'),
+                # There should not be a case where users are without full_names. We only need this safe check because
+                # of ECOM-1995.
+                "full_name": full_name.encode('utf-8') if full_name else '',
                 "course_id": course_id.encode('utf-8'),
                 "is_opted_in_for_email": is_opted_in if is_opted_in else "True",
                 "preference_set_datetime": pref_set_datetime if pref_set_datetime else self.DEFAULT_DATETIME_STR,

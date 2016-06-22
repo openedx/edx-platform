@@ -284,7 +284,8 @@ class TestProgramDetails(ProgramsApiConfigMixin, SharedModuleStoreTestCase):
     def _assert_program_data_present(self, response):
         """Verify that program data is present."""
         self.assertContains(response, 'programData')
-        self.assertContains(response, 'programListingUrl')
+        self.assertContains(response, 'urls')
+        self.assertContains(response, 'program_listing_url')
         self.assertContains(response, self.data['name'])
         self._assert_programs_tab_present(response)
 

@@ -11,6 +11,8 @@ if Backbone?
       can_reply: '.discussion-reply'
       can_delete: '.admin-delete'
       can_openclose: '.admin-openclose'
+      can_report: '.admin-report'
+      can_vote: '.admin-vote'
 
     urlMappers: {}
 
@@ -97,7 +99,7 @@ if Backbone?
       pinned = @get("pinned")
       @set("pinned",pinned)
       @trigger "change", @
-    
+
     flagAbuse: ->
       temp_array = @get("abuse_flaggers")
       temp_array.push(window.user.get('id'))
@@ -123,7 +125,7 @@ if Backbone?
 
     unvote: ->
       @incrementVote(-1)
-    
+
   class @Thread extends @Content
     urlMappers:
       'retrieve'    : -> DiscussionUtil.urlFor('retrieve_single_thread', @.get('commentable_id'), @id)
