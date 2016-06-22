@@ -16,13 +16,9 @@ from django.test.utils import override_settings
 from mock import patch
 
 from xmodule.contentstore.django import contentstore
-from xmodule.contentstore.content import StaticContent
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.xml_importer import import_course_from_xml
-from xmodule.assetstore.assetmgr import AssetManager
-from opaque_keys import InvalidKeyError
-from xmodule.modulestore.exceptions import ItemNotFoundError
 
 from contentserver.middleware import parse_range_header, HTTP_DATE_FORMAT, StaticContentServer
 from student.models import CourseEnrollment
@@ -32,23 +28,8 @@ log = logging.getLogger(__name__)
 
 TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)
 TEST_DATA_CONTENTSTORE['DOC_STORE_CONFIG']['db'] = 'test_xcontent_%s' % uuid4().hex
+
 TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
-
-FAKE_MD5_HASH = 'ffffffffffffffffffffffffffffffff'
-
-
-def get_versioned_asset_url(asset_path):
-    """
-    Creates a versioned asset URL.
-    """
-    try:
-        locator = StaticContent.get_location_from_path(asset_path)
-        content = AssetManager.find(locator, as_stream=True)
-        return StaticContent.add_version_to_asset_path(asset_path, content.content_digest)
-    except (InvalidKeyError, ItemNotFoundError):
-        pass
-
-    return asset_path
 
 
 @ddt.ddt
@@ -73,15 +54,13 @@ class ContentStoreToyCourseTest(SharedModuleStoreTestCase):
         )
 
         # A locked asset
-        cls.locked_asset = cls.course_key.make_asset_key('asset', 'sample_static.html')
+        cls.locked_asset = cls.course_key.make_asset_key('asset', 'sample_static.txt')
         cls.url_locked = unicode(cls.locked_asset)
-        cls.url_locked_versioned = get_versioned_asset_url(cls.url_locked)
         cls.contentstore.set_attr(cls.locked_asset, 'locked', True)
 
         # An unlocked asset
         cls.unlocked_asset = cls.course_key.make_asset_key('asset', 'another_static.txt')
         cls.url_unlocked = unicode(cls.unlocked_asset)
-        cls.url_unlocked_versioned = get_versioned_asset_url(cls.url_unlocked)
         cls.length_unlocked = cls.contentstore.get_attr(cls.unlocked_asset, 'length')
 
     def setUp(self):
@@ -100,37 +79,6 @@ class ContentStoreToyCourseTest(SharedModuleStoreTestCase):
         """
         self.client.logout()
         resp = self.client.get(self.url_unlocked)
-        self.assertEqual(resp.status_code, 200)
-
-    def test_unlocked_versioned_asset(self):
-        """
-        Test that unlocked assets that are versioned are being served.
-        """
-        self.client.logout()
-        resp = self.client.get(self.url_unlocked_versioned)
-        self.assertEqual(resp.status_code, 200)
-
-    def test_unlocked_versioned_asset_with_nonexistent_version(self):
-        """
-        Test that unlocked assets that are versioned, but have a nonexistent version,
-        are sent back as a 301 redirect which tells the caller the correct URL.
-        """
-        url_unlocked_versioned_old = StaticContent.add_version_to_asset_path(self.url_unlocked, FAKE_MD5_HASH)
-
-        self.client.logout()
-        resp = self.client.get(url_unlocked_versioned_old)
-        self.assertEqual(resp.status_code, 301)
-        self.assertTrue(resp.url.endswith(self.url_unlocked_versioned))  # pylint: disable=no-member
-
-    def test_locked_versioned_asset(self):
-        """
-        Test that locked assets that are versioned are being served.
-        """
-        CourseEnrollment.enroll(self.non_staff_usr, self.course_key)
-        self.assertTrue(CourseEnrollment.is_enrolled(self.non_staff_usr, self.course_key))
-
-        self.client.login(username=self.non_staff_usr, password='test')
-        resp = self.client.get(self.url_locked_versioned)
         self.assertEqual(resp.status_code, 200)
 
     def test_locked_asset_not_logged_in(self):
