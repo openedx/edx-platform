@@ -19,7 +19,7 @@
         };
 
     define(['underscore', 'jquery', 'jquery.ui', 'backbone', 'common/js/components/views/feedback_prompt',
-            'common/js/components/views/feedback_notification', 'coffee/src/views/module_edit',
+            'common/js/components/views/feedback_notification', 'js/views/module_edit',
             'js/models/module_info', 'js/utils/module'],
         function(_, $, ui, Backbone, PromptView, NotificationView, ModuleEditView, ModuleModel, ModuleUtils) {
             var TabsEdit;
