@@ -2,7 +2,7 @@
 Courses API Module
 ##############################
 
-.. module:: api_manager
+.. module:: edx_solutions_api_integration
 
 The page contains docstrings and example responses for:
 
@@ -33,20 +33,20 @@ Get a List of Courses
 
 .. code-block:: json
 
-    HTTP 200 OK  
-    Vary: Accept   
-    Content-Type: text/html; charset=utf-8   
-    Allow: GET, HEAD, OPTIONS 
+    HTTP 200 OK
+    Vary: Accept
+    Content-Type: text/html; charset=utf-8
+    Allow: GET, HEAD, OPTIONS
 
     [
         {
-            "category": "course",   
-            "name": "Computer Science 101",   
-            "uri": "http://edx-lms-server/api/courses/un/CS/cs101",   
-            "number": "CS101",   
-            "due": null,   
-            "org": "University N",   
-            "id": "un/CS/cs101"  
+            "category": "course",
+            "name": "Computer Science 101",
+            "uri": "http://edx-lms-server/api/courses/un/CS/cs101",
+            "number": "CS101",
+            "due": null,
+            "org": "University N",
+            "id": "un/CS/cs101"
         }
     ]
 
@@ -67,35 +67,35 @@ Get Course Details
 
 .. code-block:: json
 
-    HTTP 200 OK  
-    Vary: Accept   
-    Content-Type: text/html; charset=utf-8   
-    Allow: GET, HEAD, OPTIONS 
+    HTTP 200 OK
+    Vary: Accept
+    Content-Type: text/html; charset=utf-8
+    Allow: GET, HEAD, OPTIONS
 
     {
-        "category": "course", 
-        "name": "Computer Science 101",   
-        "uri": "http://edx-lms-server/api/courses/un/CS/cs101",   
-        "number": "CS101",   
-        "due": null,   
-        "org": "University N",   
-        "id": "un/CS/cs101"  
+        "category": "course",
+        "name": "Computer Science 101",
+        "uri": "http://edx-lms-server/api/courses/un/CS/cs101",
+        "number": "CS101",
+        "due": null,
+        "org": "University N",
+        "id": "un/CS/cs101"
         "resources": [
             {
                 "uri": "http://edx-lms-server/api/courses/un/CS/cs101/content/"
-            }, 
+            },
             {
                 "uri": "http://edx-lms-server/api/courses/un/CS/cs101/groups/"
-            }, 
+            },
             {
                 "uri": "http://edx-lms-server/api/courses/un/CS/cs101/overview"
-            }, 
+            },
             {
                 "uri": "http://edx-lms-server/api/courses/un/CS/cs101/updates/"
-            }, 
+            },
             {
                 "uri": "http://edx-lms-server/api/courses/un/CS/cs101/static_tabs/"
-            }, 
+            },
             {
                 "uri": "http://edx-lms-server/api/courses/un/CS/cs101/users/"
             }
@@ -106,68 +106,68 @@ Get Course Details
 
 .. code-block:: json
 
-    HTTP 200 OK  
-    Vary: Accept   
-    Content-Type: text/html; charset=utf-8   
-    Allow: GET, HEAD, OPTIONS 
+    HTTP 200 OK
+    Vary: Accept
+    Content-Type: text/html; charset=utf-8
+    Allow: GET, HEAD, OPTIONS
 
     {
-        "category": "course", 
-        "name": "Computer Science 101",   
-        "uri": "http://edx-lms-server/api/courses/un/CS/cs101",   
+        "category": "course",
+        "name": "Computer Science 101",
+        "uri": "http://edx-lms-server/api/courses/un/CS/cs101",
         "number": "CS101",
         "content": [
             {
-                "category": "chapter", 
-                "name": "Introduction", 
-                "due": null, 
-                "uri": "http://edx-lms-server/api/courses/un/CS/cs101/content/i4x://un/cs101/chapter/introduction", 
-                "id": "i4x://un/cs101/chapter/introduction", 
+                "category": "chapter",
+                "name": "Introduction",
+                "due": null,
+                "uri": "http://edx-lms-server/api/courses/un/CS/cs101/content/i4x://un/cs101/chapter/introduction",
+                "id": "i4x://un/cs101/chapter/introduction",
                 "children": [
                     {
-                        "category": "sequential", 
-                        "due": null, 
-                        "uri": "http://edx-lms-server/api/courses/un/CS/cs101/content/i4x://edX/Open_DemoX/sequential/cs_setup", 
-                        "id": "i4x://un/cs101/sequential/cs_setup", 
+                        "category": "sequential",
+                        "due": null,
+                        "uri": "http://edx-lms-server/api/courses/un/CS/cs101/content/i4x://edX/Open_DemoX/sequential/cs_setup",
+                        "id": "i4x://un/cs101/sequential/cs_setup",
                         "name": "Course Setup"
                         }
                     ]
-            }, 
+            },
             {
-                "category": "chapter", 
-                "name": "Getting Started", 
-                "due": null, 
-                "uri": "http://edx-lms-server/api/courses/un/CS/cs101/content/i4x://un/cs101/chapter/getting_started", 
-                "id": "i4x://un/cs101/chapter/getting_started", 
+                "category": "chapter",
+                "name": "Getting Started",
+                "due": null,
+                "uri": "http://edx-lms-server/api/courses/un/CS/cs101/content/i4x://un/cs101/chapter/getting_started",
+                "id": "i4x://un/cs101/chapter/getting_started",
                 "children": [
                     {
-                        "category": "sequential", 
-                        "due": null, 
-                        "uri": "http://edx-lms-server/api/courses/un/CS/cs101/content/i4x://edX/Open_DemoX/sequential/sample_problem", 
-                        "id": "i4x://un/cs101/sequential/sample_problem", 
+                        "category": "sequential",
+                        "due": null,
+                        "uri": "http://edx-lms-server/api/courses/un/CS/cs101/content/i4x://edX/Open_DemoX/sequential/sample_problem",
+                        "id": "i4x://un/cs101/sequential/sample_problem",
                             "name": "Sample Problem"
                     }
                 ]
-            }, 
-        "due": null,   
-        "org": "University N",   
-        "id": "un/CS/cs101",   
+            },
+        "due": null,
+        "org": "University N",
+        "id": "un/CS/cs101",
         "resources": [
             {
                 "uri": "http://edx-lms-server/api/courses/un/CS/cs101/content/"
-            }, 
+            },
             {
                 "uri": "http://edx-lms-server/api/courses/un/CS/cs101/groups/"
-            }, 
+            },
             {
                 "uri": "http://edx-lms-server/api/courses/un/CS/cs101/overview"
-            }, 
+            },
             {
                 "uri": "http://edx-lms-server/api/courses/un/CS/cs101/updates/"
-            }, 
+            },
             {
                 "uri": "http://edx-lms-server/api/courses/un/CS/cs101/static_tabs/"
-            }, 
+            },
             {
                 "uri": "http://edx-lms-server/api/courses/un/CS/cs101/users/"
             }
@@ -195,17 +195,17 @@ Get Course Content
 
     [
         {
-            "category": "chapter", 
-            "due": null, 
-            "uri": "http://edx-lms-server/api/courses/un/CS/cs101/content/i4x://un/cs101/chapter/introduction", 
-            "id": "i4x://un/cs101/chapter/introduction", 
+            "category": "chapter",
+            "due": null,
+            "uri": "http://edx-lms-server/api/courses/un/CS/cs101/content/i4x://un/cs101/chapter/introduction",
+            "id": "i4x://un/cs101/chapter/introduction",
             "name": "Introduction"
-        }, 
+        },
         {
-            "category": "chapter", 
-            "due": null, 
-            "uri": "http://edx-lms-server/api/courses/un/CS/cs101/content/i4x://un/cs101/chapter/getting_started", 
-            "id": "i4x://un/cs101/chapter/getting_started", 
+            "category": "chapter",
+            "due": null,
+            "uri": "http://edx-lms-server/api/courses/un/CS/cs101/content/i4x://un/cs101/chapter/getting_started",
+            "id": "i4x://un/cs101/chapter/getting_started",
             "name": "Getting Started"
         }
     ]
@@ -230,31 +230,31 @@ Get Content Details
     Allow: GET, HEAD, OPTIONS
 
     {
-        "category": "chapter", 
-        "due": null, 
-        "uri": "http://edx-lms-server/api/courses/un/CS/cs101/content/i4x://un/cs101/chapter/introduction", 
-        "id": "i4x://un/cs101/chapter/introduction", 
+        "category": "chapter",
+        "due": null,
+        "uri": "http://edx-lms-server/api/courses/un/CS/cs101/content/i4x://un/cs101/chapter/introduction",
+        "id": "i4x://un/cs101/chapter/introduction",
         "name": "Introduction"
         "children": [
             {
-                "category": "sequential", 
-                "due": null, 
-                "uri": "http://edx-lms-server/api/courses/un/CS/cs101/content/i4x://un/cs101/chapter/introduction/sequential/19a30717eff543078a5d94ae9d6c18a5", 
-                "id": "i4x://un/cs101/chapter/introduction/sequential/19a30717eff543078a5d94ae9d6c18a5", 
+                "category": "sequential",
+                "due": null,
+                "uri": "http://edx-lms-server/api/courses/un/CS/cs101/content/i4x://un/cs101/chapter/introduction/sequential/19a30717eff543078a5d94ae9d6c18a5",
+                "id": "i4x://un/cs101/chapter/introduction/sequential/19a30717eff543078a5d94ae9d6c18a5",
                 "name": "Lesson 1 - Getting Started"
-            }, 
+            },
             {
-                "category": "sequential", 
-                "due": null, 
-                "uri": "http://edx-lms-server/api/courses/un/CS/cs101/content/i4x://un/cs101/chapter/introduction/sequential/basic_questions", 
-                "id": "i4x://un/cs101/chapter/introduction/sequential/basic_questions", 
+                "category": "sequential",
+                "due": null,
+                "uri": "http://edx-lms-server/api/courses/un/CS/cs101/content/i4x://un/cs101/chapter/introduction/sequential/basic_questions",
+                "id": "i4x://un/cs101/chapter/introduction/sequential/basic_questions",
                 "name": "Homework - Basic Questions"
             }
-        ], 
+        ],
         "resources": [
             {
                 "uri": "http://edx-lms-server/api/courses/un/CS/cs101/content/i4x://un/cs101/chapter/introduction/users"
-            }, 
+            },
             {
                 "uri": "http://edx-lms-server/api/courses/un/CS/cs101/content/i4x://un/cs101/chapter/introduction/groups"
             }
@@ -297,7 +297,7 @@ Get a Course Overview
         to buy a textbook?</h3>\n       <p>No</p>\n     </article>\n\n
         <article class=\"response\">\n       <h3>Question #2</h3>\n
         <p>Answer here . . .</p>\n     </article>\n   </section>\n
-        </section>\n\n\n" 
+        </section>\n\n\n"
     }
 
 **Example response when parse is true**:
@@ -312,42 +312,42 @@ Get a Course Overview
     {
         "sections": [
             {
-                "class": "about", 
+                "class": "about",
                 "body": "<h2>About This Course</h2>\n
                 <p>This course is about . . .</p>\n "
-            }, 
+            },
             {
-                "class": "prerequisites", 
-                "body": "<h2>Prerequisites</h2>\n   
+                "class": "prerequisites",
+                "body": "<h2>Prerequisites</h2>\n
                 <p>Course prerequisites are: a, b, c</p>\n "
-            }, 
+            },
             {
-                "class": "course-staff", 
+                "class": "course-staff",
                 "articles": [
                     {
-                        "class": "teacher", 
-                        "name": "Staff Member #1", 
-                        "image_src": "/static/images/pl-faculty.png", 
+                        "class": "teacher",
+                        "name": "Staff Member #1",
+                        "image_src": "/static/images/pl-faculty.png",
                         "bio": "<p>Biography of . . .</p>\n   "
-                    }, 
+                    },
                     {
-                        "class": "teacher", 
-                        "name": "Staff Member #2", 
-                        "image_src": "/static/images/pl-faculty.png", 
+                        "class": "teacher",
+                        "name": "Staff Member #2",
+                        "image_src": "/static/images/pl-faculty.png",
                         "bio": "<p>Biography of . . .</p>\n   "
                     }
                 ]
-            }, 
+            },
             {
-                "class": "faq", 
+                "class": "faq",
                 "body": "<section class=\"responses\">
-                <h2>Frequently Asked Questions</h2>\n     
+                <h2>Frequently Asked Questions</h2>\n
                 <article class=\"response\">
-                <h3>Do I need to buy a textbook?</h3>\n       
-                <p>No</p>\n     
+                <h3>Do I need to buy a textbook?</h3>\n
+                <p>No</p>\n
                 </article>
-                <article class=\"response\"><h3>Question #2</h3>\n      
-                <p>Answer here . . .</p>\n     
+                <article class=\"response\"><h3>Question #2</h3>\n
+                <p>Answer here . . .</p>\n
                 </article>
                 </section>"
             }
@@ -394,8 +394,8 @@ Get Course Updates
     {
         "postings": [
             {
-                "date": "Welcome!", 
-                
+                "date": "Welcome!",
+
                 "content": "Hi! Welcome to the edX demonstration course. We
                 built this to help you become more familiar with taking a course
                 on edX prior to your first day of class. \n<br/><br/>\nIn a live
@@ -426,15 +426,15 @@ Get Pages
     Content-Type: text/html; charset=utf-8
     Allow: GET, HEAD, OPTIONS
 
-    { 
-        "tabs": 
+    {
+        "tabs":
             [
                 {
-                    "id": "53c13f21a99b4dd3b58a4cfa73b91b6f", 
+                    "id": "53c13f21a99b4dd3b58a4cfa73b91b6f",
                     "name": "Syllabus"
                 }
                 {
-                    "id": "63f54g25a55b4nd3c5224csa73b91c7j", 
+                    "id": "63f54g25a55b4nd3c5224csa73b91c7j",
                     "name": "Calendar"
                 }
             ]
@@ -461,16 +461,16 @@ Get Page Detail
     Content-Type: text/html; charset=utf-8
     Allow: GET, HEAD, OPTIONS
 
-    { 
-        "tabs": 
+    {
+        "tabs":
             [
                 {
-                    "id": "53c13f21a99b4dd3b58a4cfa73b91b6f", 
+                    "id": "53c13f21a99b4dd3b58a4cfa73b91b6f",
                     "name": "Syllabus"
                     "content": <p>The HTML syllabus content.</p>
                 }
                 {
-                    "id": "63f54g25a55b4nd3c5224csa73b91c7j", 
+                    "id": "63f54g25a55b4nd3c5224csa73b91c7j",
                     "name": "Calendar"
                     "content": <p>The HTML calednar content.</p>
                 }
@@ -495,19 +495,19 @@ Get Users in a Course
     Content-Type: text/html; charset=utf-8
     Allow: GET, HEAD, OPTIONS
 
-    { 
+    {
         {
-            "uri": "http://localhost:8000/api/courses/edX/Open_DemoX/edx_demo_course/users/", 
-            "enrollments": 
+            "uri": "http://localhost:8000/api/courses/edX/Open_DemoX/edx_demo_course/users/",
+            "enrollments":
                 [
                     {
-                        "id": 1, 
-                        "email": "honor@example.com", 
+                        "id": 1,
+                        "email": "honor@example.com",
                         "username": "honor"
-                    }, 
+                    },
                     {
-                        "id": 2, 
-                        "email": "audit@example.com", 
+                        "id": 2,
+                        "email": "audit@example.com",
                         "username": "audit"
                     }
                 ]
@@ -527,7 +527,7 @@ Add a User to a Course
 
 .. code-block:: json
 
-    { 
+    {
         "user_id" : 12345
     }
 
@@ -535,7 +535,7 @@ Or:
 
 .. code-block:: json
 
-    { 
+    {
         "email" : "newstudent@edx.org"
     }
 
@@ -558,10 +558,10 @@ Get Details of a User in a Course
     Content-Type: text/html; charset=utf-8
     Allow: GET, HEAD, OPTIONS
 
-    { 
-        "course_id": "UniversityX/1/1", 
-        "position": 1, 
-        "user_id": "4", 
+    {
+        "course_id": "UniversityX/1/1",
+        "position": 1,
+        "user_id": "4",
         "uri": "http://edx-lms-server/api/courses/UniversityX/1/1/users/4"
     }
 

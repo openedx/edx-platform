@@ -9,10 +9,10 @@
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
-DROP TABLE IF EXISTS `api_manager_coursecontentgrouprelationship`;
+DROP TABLE IF EXISTS `edx_solutions_api_integration_coursecontentgrouprelationship`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `api_manager_coursecontentgrouprelationship` (
+CREATE TABLE `edx_solutions_api_integration_coursecontentgrouprelationship` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `created` datetime NOT NULL,
   `modified` datetime NOT NULL,
@@ -21,18 +21,18 @@ CREATE TABLE `api_manager_coursecontentgrouprelationship` (
   `record_active` tinyint(1) NOT NULL,
   `group_profile_id` int(11) NOT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `api_manager_coursecontentgroupre_course_id_44c879ae670afc9_uniq` (`course_id`,`content_id`,`group_profile_id`),
-  KEY `api_manager_coursecontentgrouprelati_course_id_7bf540377b22727d` (`course_id`,`content_id`),
-  KEY `api_manager_coursecontentgrouprelationship_ff48d8e5` (`course_id`),
-  KEY `api_manager_coursecontentgrouprelationship_cc8ff3c` (`content_id`),
-  KEY `api_manager_coursecontentgrouprelationship_e1ffc2ea` (`group_profile_id`),
+  UNIQUE KEY `edx_solutions_api_integration_coursecontentgroupre_course_id_44c879ae670afc9_uniq` (`course_id`,`content_id`,`group_profile_id`),
+  KEY `edx_solutions_api_integration_coursecontentgrouprelati_course_id_7bf540377b22727d` (`course_id`,`content_id`),
+  KEY `edx_solutions_api_integration_coursecontentgrouprelationship_ff48d8e5` (`course_id`),
+  KEY `edx_solutions_api_integration_coursecontentgrouprelationship_cc8ff3c` (`content_id`),
+  KEY `edx_solutions_api_integration_coursecontentgrouprelationship_e1ffc2ea` (`group_profile_id`),
   CONSTRAINT `group_profile_id_refs_id_be623c7f` FOREIGN KEY (`group_profile_id`) REFERENCES `auth_groupprofile` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-DROP TABLE IF EXISTS `api_manager_coursegrouprelationship`;
+DROP TABLE IF EXISTS `edx_solutions_api_integration_coursegrouprelationship`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `api_manager_coursegrouprelationship` (
+CREATE TABLE `edx_solutions_api_integration_coursegrouprelationship` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `course_id` varchar(255) NOT NULL,
   `group_id` int(11) NOT NULL,
@@ -40,15 +40,15 @@ CREATE TABLE `api_manager_coursegrouprelationship` (
   `modified` datetime NOT NULL,
   `record_active` tinyint(1) NOT NULL,
   PRIMARY KEY (`id`),
-  KEY `api_manager_coursegrouprelationship_ff48d8e5` (`course_id`),
-  KEY `api_manager_coursegrouprelationship_bda51c3c` (`group_id`),
+  KEY `edx_solutions_api_integration_coursegrouprelationship_ff48d8e5` (`course_id`),
+  KEY `edx_solutions_api_integration_coursegrouprelationship_bda51c3c` (`group_id`),
   CONSTRAINT `group_id_refs_id_30446b7b` FOREIGN KEY (`group_id`) REFERENCES `auth_group` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-DROP TABLE IF EXISTS `api_manager_grouprelationship`;
+DROP TABLE IF EXISTS `edx_solutions_api_integration_grouprelationship`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `api_manager_grouprelationship` (
+CREATE TABLE `edx_solutions_api_integration_grouprelationship` (
   `group_id` int(11) NOT NULL,
   `name` varchar(255) NOT NULL,
   `parent_group_id` int(11) DEFAULT NULL,
@@ -56,15 +56,15 @@ CREATE TABLE `api_manager_grouprelationship` (
   `created` datetime NOT NULL,
   `modified` datetime NOT NULL,
   PRIMARY KEY (`group_id`),
-  KEY `api_manager_grouprelationship_c876d7c` (`parent_group_id`),
+  KEY `edx_solutions_api_integration_grouprelationship_c876d7c` (`parent_group_id`),
   CONSTRAINT `group_id_refs_id_7cdf7708` FOREIGN KEY (`group_id`) REFERENCES `auth_group` (`id`),
-  CONSTRAINT `parent_group_id_refs_group_id_9f37ab03` FOREIGN KEY (`parent_group_id`) REFERENCES `api_manager_grouprelationship` (`group_id`)
+  CONSTRAINT `parent_group_id_refs_group_id_9f37ab03` FOREIGN KEY (`parent_group_id`) REFERENCES `edx_solutions_api_integration_grouprelationship` (`group_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-DROP TABLE IF EXISTS `api_manager_linkedgrouprelationship`;
+DROP TABLE IF EXISTS `edx_solutions_api_integration_linkedgrouprelationship`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `api_manager_linkedgrouprelationship` (
+CREATE TABLE `edx_solutions_api_integration_linkedgrouprelationship` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `from_group_relationship_id` int(11) NOT NULL,
   `to_group_relationship_id` int(11) NOT NULL,
@@ -72,10 +72,10 @@ CREATE TABLE `api_manager_linkedgrouprelationship` (
   `created` datetime NOT NULL,
   `modified` datetime NOT NULL,
   PRIMARY KEY (`id`),
-  KEY `api_manager_linkedgrouprelationship_8c56ebfe` (`from_group_relationship_id`),
-  KEY `api_manager_linkedgrouprelationship_e710bb37` (`to_group_relationship_id`),
-  CONSTRAINT `from_group_relationship_id_refs_group_id_2c4d96f6` FOREIGN KEY (`from_group_relationship_id`) REFERENCES `api_manager_grouprelationship` (`group_id`),
-  CONSTRAINT `to_group_relationship_id_refs_group_id_2c4d96f6` FOREIGN KEY (`to_group_relationship_id`) REFERENCES `api_manager_grouprelationship` (`group_id`)
+  KEY `edx_solutions_api_integration_linkedgrouprelationship_8c56ebfe` (`from_group_relationship_id`),
+  KEY `edx_solutions_api_integration_linkedgrouprelationship_e710bb37` (`to_group_relationship_id`),
+  CONSTRAINT `from_group_relationship_id_refs_group_id_2c4d96f6` FOREIGN KEY (`from_group_relationship_id`) REFERENCES `edx_solutions_api_integration_grouprelationship` (`group_id`),
+  CONSTRAINT `to_group_relationship_id_refs_group_id_2c4d96f6` FOREIGN KEY (`to_group_relationship_id`) REFERENCES `edx_solutions_api_integration_grouprelationship` (`group_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `assessment_aiclassifier`;
@@ -2592,7 +2592,7 @@ CREATE TABLE `projects_project` (
   UNIQUE KEY `projects_project_course_id_53fbd1f5d0bef1ee_uniq` (`course_id`,`organization_id`,`content_id`),
   KEY `projects_project_97d7cd8d` (`organization_id`),
   CONSTRAINT `organization_id_refs_id_616e28c0fa4287c` FOREIGN KEY (`organization_id`) REFERENCES `organizations_organization` (`id`),
-  CONSTRAINT `organization_id_refs_id_93f232e7` FOREIGN KEY (`organization_id`) REFERENCES `api_manager_organization` (`id`)
+  CONSTRAINT `organization_id_refs_id_93f232e7` FOREIGN KEY (`organization_id`) REFERENCES `edx_solutions_api_integration_organization` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `projects_workgroup`;
