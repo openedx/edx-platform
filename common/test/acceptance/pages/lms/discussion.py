@@ -476,7 +476,7 @@ class InlineDiscussionPage(PageObject):
         return self.q(css=self._discussion_selector).present
 
     def is_discussion_expanded(self):
-        return self._find_within(".discussion").present
+        return self._find_within(".discussion-threads expanded").present
 
     def expand_discussion(self):
         """Click the link to expand the discussion"""
