@@ -36,8 +36,8 @@ body, input, button {
   font-family: 'Open Sans', sans-serif;
 }
 
-// we want to hide the outline on the focusable <main> element
-main {
+// removing the outline on any element that we make programmatically focusable
+[tabindex="-1"] {
     outline: none;
 }
 
