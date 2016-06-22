@@ -285,7 +285,7 @@ class TestInstructorGradeReport(InstructorGradeReportTestCase):
             user_b.username,
             course.id,
             cohort_name_header,
-            ''
+            u'Default Group',
         )
 
     @patch('instructor_task.tasks_helper._get_current_task')
@@ -685,7 +685,7 @@ class TestProblemReportSplitTestContent(TestReportMixin, TestConditionalContent,
 
     def test_problem_grade_report(self):
         """
-        Test that we generate the correct the correct grade report when dealing with A/B tests.
+        Test that we generate the correct grade report when dealing with A/B tests.
 
         In order to verify that the behavior of the grade report is correct, we submit answers for problems
         that the student won't have access to. A/B tests won't restrict access to the problems, but it should

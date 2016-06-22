@@ -256,13 +256,7 @@ class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase, Probl
         - grade_breakdown : A breakdown of the major components that
             make up the final grade. (For display)
         """
-
-        fake_request = self.factory.get(
-            reverse('progress', kwargs={'course_id': self.course.id.to_deprecated_string()})
-        )
-
-        fake_request.user = self.student_user
-        return grades.grade(self.student_user, fake_request, self.course)
+        return grades.grade(self.student_user, self.course)
 
     def get_progress_summary(self):
         """
@@ -275,15 +269,7 @@ class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase, Probl
         ungraded problems, and is good for displaying a course summary with due dates,
         etc.
         """
-
-        fake_request = self.factory.get(
-            reverse('progress', kwargs={'course_id': self.course.id.to_deprecated_string()})
-        )
-
-        progress_summary = grades.progress_summary(
-            self.student_user, fake_request, self.course
-        )
-        return progress_summary
+        return grades.progress_summary(self.student_user, self.course)
 
     def check_grade_percent(self, percent):
         """
