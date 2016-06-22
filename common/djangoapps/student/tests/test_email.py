@@ -57,7 +57,7 @@ class EmailTestMixin(object):
         email_user.assert_called_with(
             mock_render_to_string(subject_template, subject_context),
             mock_render_to_string(body_template, body_context),
-            theming_helpers.get_value('default_from_email', settings.DEFAULT_FROM_EMAIL)
+            theming_helpers.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL)
         )
 
     def append_allowed_hosts(self, hostname):
@@ -298,7 +298,7 @@ class EmailChangeRequestTests(EventTestMixin, TestCase):
         send_mail.assert_called_with(
             mock_render_to_string('emails/email_change_subject.txt', context),
             mock_render_to_string('emails/email_change.txt', context),
-            theming_helpers.get_value('default_from_email', settings.DEFAULT_FROM_EMAIL),
+            theming_helpers.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL),
             [new_email]
         )
         self.assert_event_emitted(
