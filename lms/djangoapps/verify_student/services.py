@@ -11,6 +11,7 @@ from django.db import IntegrityError
 from opaque_keys.edx.keys import CourseKey
 
 from student.models import User, CourseEnrollment
+from student.helpers import check_verify_status_by_course
 from lms.djangoapps.verify_student.models import VerificationCheckpoint, VerificationStatus, SkippedReverification
 
 
@@ -136,3 +137,25 @@ class ReverificationService(object):
         """
         course_key = CourseKey.from_string(course_id)
         return VerificationStatus.get_user_attempts(user_id, course_key, related_assessment_location)
+
+    def get_course_verification_status(self, user, course_id):
+        """
+        This xBlock service method will return the status of the course level verification status, which
+        is not the same as in-course reverification. This verification status is normally shown to the user
+        in his/her dashboard.
+
+        This will return None if that user is either not enrolled in the course
+        or if the user is not enrolled in the course under a course_mode that would
+        require verification
+        """
+
+        enrollment = CourseEnrollment.get_enrollment(user, course_id)
+        if not enrollment:
+            return None
+
+        status = check_verify_status_by_course(user, [enrollment])
+
+        # check_verify_status_by_course will not return an entry for
+        # the requested course_id if the user is not enrolled
+        # in the course that requires verification
+        return status.get(course_id, {}).get('status')

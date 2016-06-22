@@ -18,6 +18,8 @@ from openedx.core.djangoapps.credit.models import CreditCourse
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
+from student.helpers import VERIFY_STATUS_NEED_TO_VERIFY
+
 
 @ddt.ddt
 class TestReverificationService(ModuleStoreTestCase):
@@ -187,3 +189,29 @@ class TestReverificationService(ModuleStoreTestCase):
         service = ReverificationService()
         status = service.get_status(self.user.id, unicode(self.course_id), self.final_checkpoint_location)
         self.assertEqual(status, service.NON_VERIFIED_TRACK)
+
+    def test_get_course_verification_status(self):
+        # test that we can retrieve the course verification status via the service
+
+        service = ReverificationService()
+
+        # NEGATIVE TEST: we get back a None if we ask about a course that the user
+        # is not enrolled in
+        not_enrolled_course = CourseFactory.create(org='Robot', number='101', display_name='Second Test Course')
+        self.assertIsNone(
+            service.get_course_verification_status(
+                self.user.id,
+                not_enrolled_course.id
+            )
+        )
+
+        # NEGATIVE TEST: we get back a None if we ask about a course that the user
+        # is not enrolled as verified
+        self.enrollment.update_enrollment(mode=CourseMode.HONOR)
+        self.assertIsNone(
+            service.get_course_verification_status(self.user.id, self.course_id)
+        )
+
+        self.enrollment.update_enrollment(mode=CourseMode.VERIFIED)
+        status = service.get_course_verification_status(self.user.id, self.course_id)
+        self.assertEqual(status, VERIFY_STATUS_NEED_TO_VERIFY)
