@@ -29,7 +29,7 @@ class PassthroughOptionParser(OptionParser):
     "-s" short options.
     """
     def __init__(self, *args, **kwargs):
-        self.unknown_options = []
+        self.passthrough_options = []
 
         # N.B. OptionParser is an old-style class, which is why
         # this isn't using super()
@@ -150,4 +150,4 @@ class PassthroughTask(paver.tasks.Task):
         try:
             return super(PassthroughTask, self).__call__(*args, **kwargs)
         finally:
-            del paver.tasks.environment.unknown_options
+            del paver.tasks.environment.passthrough_options

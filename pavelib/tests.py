@@ -7,6 +7,7 @@ import sys
 from paver.easy import sh, task, cmdopts, needs, call_task
 from pavelib.utils.test import suites
 from pavelib.utils.envs import Env
+from pavelib.utils.passthrough_opts import PassthroughTask
 from optparse import make_option
 
 try:
@@ -17,7 +18,6 @@ except ImportError:
 __test__ = False  # do not collect
 
 
-@task
 @needs(
     'pavelib.prereqs.install_prereqs',
     'pavelib.utils.test.utils.clean_reports_dir',
@@ -28,7 +28,6 @@ __test__ = False  # do not collect
     ("failed", "f", "Run only failed tests"),
     ("fail_fast", "x", "Fail suite on first failed test"),
     ("fasttest", "a", "Run without collectstatic"),
-    ('extra_args=', 'e', 'adds as extra args to the test command'),
     ('cov_args=', 'c', 'adds as args to coverage for the test run'),
     ('skip_clean', 'C', 'skip cleaning repository before running tests'),
     ('processes=', 'p', 'number of processes to use running tests'),
@@ -44,8 +43,10 @@ __test__ = False  # do not collect
         dest='disable_migrations',
         help="Create tables directly from apps' models. Can also be used by exporting DISABLE_MIGRATIONS=1."
     ),
+    ('extra_args=', 'e', 'deprecated, pass extra options directly in the paver commandline'),
 ], share_with=['pavelib.utils.test.utils.clean_reports_dir'])
-def test_system(options):
+@PassthroughTask
+def test_system(options, passthrough_options):
     """
     Run tests on our djangoapps for lms and cms
     """
@@ -64,6 +65,7 @@ def test_system(options):
         'disable_migrations': getattr(options, 'disable_migrations', False),
         'processes': getattr(options, 'processes', None),
         'randomize': getattr(options, 'randomize', None),
+        'passthrough_options': passthrough_options
     }
 
     if test_id:
@@ -84,7 +86,6 @@ def test_system(options):
     test_suite.run()
 
 
-@task
 @needs(
     'pavelib.prereqs.install_prereqs',
     'pavelib.utils.test.utils.clean_reports_dir',
@@ -94,15 +95,16 @@ def test_system(options):
     ("test_id=", "t", "Test id"),
     ("failed", "f", "Run only failed tests"),
     ("fail_fast", "x", "Run only failed tests"),
-    ('extra_args=', 'e', 'adds as extra args to the test command'),
     ('cov_args=', 'c', 'adds as args to coverage for the test run'),
     ('skip_clean', 'C', 'skip cleaning repository before running tests'),
     make_option("--verbose", action="store_const", const=2, dest="verbosity"),
     make_option("-q", "--quiet", action="store_const", const=0, dest="verbosity"),
     make_option("-v", "--verbosity", action="count", dest="verbosity", default=1),
     make_option("--pdb", action="store_true", help="Drop into debugger on failures or errors"),
+    ('extra_args=', 'e', 'deprecated, pass extra options directly in the paver commandline'),
 ], share_with=['pavelib.utils.test.utils.clean_reports_dir'])
-def test_lib(options):
+@PassthroughTask
+def test_lib(options, passthrough_options):
     """
     Run tests for common/lib/ and pavelib/ (paver-tests)
     """
@@ -117,6 +119,7 @@ def test_lib(options):
         'cov_args': getattr(options, 'cov_args', ''),
         'skip_clean': getattr(options, 'skip_clean', False),
         'pdb': getattr(options, 'pdb', False),
+        'passthrough_options': passthrough_options
     }
 
     if test_id:
@@ -133,7 +136,6 @@ def test_lib(options):
     test_suite.run()
 
 
-@task
 @needs(
     'pavelib.prereqs.install_prereqs',
     'pavelib.utils.test.utils.clean_reports_dir',
@@ -141,7 +143,6 @@ def test_lib(options):
 @cmdopts([
     ("failed", "f", "Run only failed tests"),
     ("fail_fast", "x", "Run only failed tests"),
-    ('extra_args=', 'e', 'adds as extra args to the test command'),
     ('cov_args=', 'c', 'adds as args to coverage for the test run'),
     make_option("--verbose", action="store_const", const=2, dest="verbosity"),
     make_option("-q", "--quiet", action="store_const", const=0, dest="verbosity"),
@@ -153,8 +154,10 @@ def test_lib(options):
         dest='disable_migrations',
         help="Create tables directly from apps' models. Can also be used by exporting DISABLE_MIGRATIONS=1."
     ),
+    ('extra_args=', 'e', 'deprecated, pass extra options directly in the paver commandline'),
 ])
-def test_python(options):
+@PassthroughTask
+def test_python(options, passthrough_options):
     """
     Run all python tests
     """
@@ -166,27 +169,28 @@ def test_python(options):
         'cov_args': getattr(options, 'cov_args', ''),
         'pdb': getattr(options, 'pdb', False),
         'disable_migrations': getattr(options, 'disable_migrations', False),
+        'passthrough_options': passthrough_options,
     }
 
     python_suite = suites.PythonTestSuite('Python Tests', **opts)
     python_suite.run()
 
 
-@task
 @needs(
     'pavelib.prereqs.install_prereqs',
     'pavelib.utils.test.utils.clean_reports_dir',
 )
 @cmdopts([
     ("suites", "s", "List of unit test suites to run. (js, lib, cms, lms)"),
-    ('extra_args=', 'e', 'adds as extra args to the test command'),
     ('cov_args=', 'c', 'adds as args to coverage for the test run'),
     make_option("--verbose", action="store_const", const=2, dest="verbosity"),
     make_option("-q", "--quiet", action="store_const", const=0, dest="verbosity"),
     make_option("-v", "--verbosity", action="count", dest="verbosity", default=1),
     make_option("--pdb", action="store_true", help="Drop into debugger on failures or errors"),
+    ('extra_args=', 'e', 'deprecated, pass extra options directly in the paver commandline'),
 ])
-def test(options):
+@PassthroughTask
+def test(options, passthrough_options):
     """
     Run all tests
     """
@@ -195,6 +199,7 @@ def test(options):
         'extra_args': getattr(options, 'extra_args', ''),
         'cov_args': getattr(options, 'cov_args', ''),
         'pdb': getattr(options, 'pdb', False),
+        'passthrough_options': passthrough_options,
     }
     # Subsuites to be added to the main suite
     python_suite = suites.PythonTestSuite('Python Tests', **opts)

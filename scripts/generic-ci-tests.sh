@@ -99,23 +99,22 @@ case "$TEST_SUITE" in
         ;;
 
     "lms-unit")
-        EXTRA_ARGS="--with-flaky"
-        PAVER_ARGS="--processes=-1 --cov_args='-p' -v"
+        PAVER_ARGS="--with-flaky --processes=-1 --cov_args='-p' -v"
         case "$SHARD" in
             "all")
-                paver test_system -s lms --extra_args="$EXTRA_ARGS" $PAVER_ARGS
+                paver test_system -s lms $PAVER_ARGS
                 ;;
             "1")
-                paver test_system -s lms --extra_args="--attr='shard_1' $EXTRA_ARGS" $PAVER_ARGS
+                paver test_system -s lms --attr='shard_1' $PAVER_ARGS
                 ;;
             "2")
-                paver test_system -s lms --extra_args="--attr='shard_2' $EXTRA_ARGS" $PAVER_ARGS
+                paver test_system -s lms --attr='shard_2' $PAVER_ARGS
                 ;;
             "3")
-                paver test_system -s lms --extra_args="--attr='shard_3' $EXTRA_ARGS" $PAVER_ARGS
+                paver test_system -s lms --attr='shard_3' $PAVER_ARGS
                 ;;
             "4")
-                paver test_system -s lms --extra_args="--attr='shard_1=False,shard_2=False,shard_3=False' $EXTRA_ARGS" $PAVER_ARGS
+                paver test_system -s lms --attr='shard_1=False,shard_2=False,shard_3=False' $PAVER_ARGS
                 ;;
             *)
                 # If no shard is specified, rather than running all tests, create an empty xunit file. This is a
@@ -129,11 +128,11 @@ case "$TEST_SUITE" in
         ;;
 
     "cms-unit")
-        paver test_system -s cms --extra_args="--with-flaky" --cov_args="-p" -v
+        paver test_system -s cms --with-flaky --cov_args="-p" -v
         ;;
 
     "commonlib-unit")
-        paver test_lib --extra_args="--with-flaky" --cov_args="-p" -v
+        paver test_lib --with-flaky --cov_args="-p" -v
         ;;
 
     "js-unit")
@@ -143,7 +142,7 @@ case "$TEST_SUITE" in
 
     "commonlib-js-unit")
         paver test_js --coverage --skip_clean || { EXIT=1; }
-        paver test_lib --skip_clean --extra_args="--with-flaky" --cov_args="-p" || { EXIT=1; }
+        paver test_lib --skip_clean --with-flaky --cov_args="-p" || { EXIT=1; }
 
         # This is to ensure that the build status of the shard is properly set.
         # Because we are running two paver commands in a row, we need to capture
@@ -160,11 +159,11 @@ case "$TEST_SUITE" in
         ;;
 
     "lms-acceptance")
-        paver test_acceptance -s lms --extra_args="-v 3"
+        paver test_acceptance -s lms -vvv
         ;;
 
     "cms-acceptance")
-        paver test_acceptance -s cms --extra_args="-v 3"
+        paver test_acceptance -s cms -vvv
         ;;
 
     "bok-choy")
@@ -182,39 +181,39 @@ case "$TEST_SUITE" in
                 ;;
 
             "1")
-                paver test_bokchoy -n $NUMBER_OF_BOKCHOY_THREADS --extra_args="-a shard_1 --with-flaky"
+                paver test_bokchoy -n $NUMBER_OF_BOKCHOY_THREADS --attr='shard_1' --with-flaky
                 ;;
 
             "2")
-                paver test_bokchoy -n $NUMBER_OF_BOKCHOY_THREADS --extra_args="-a 'shard_2' --with-flaky"
+                paver test_bokchoy -n $NUMBER_OF_BOKCHOY_THREADS --attr='shard_2' --with-flaky
                 ;;
 
             "3")
-                paver test_bokchoy -n $NUMBER_OF_BOKCHOY_THREADS --extra_args="-a 'shard_3' --with-flaky"
+                paver test_bokchoy -n $NUMBER_OF_BOKCHOY_THREADS --attr='shard_3' --with-flaky
                 ;;
 
             "4")
-                paver test_bokchoy -n $NUMBER_OF_BOKCHOY_THREADS --extra_args="-a 'shard_4' --with-flaky"
+                paver test_bokchoy -n $NUMBER_OF_BOKCHOY_THREADS --attr='shard_4' --with-flaky
                 ;;
 
             "5")
-                paver test_bokchoy -n $NUMBER_OF_BOKCHOY_THREADS --extra_args="-a 'shard_5' --with-flaky"
+                paver test_bokchoy -n $NUMBER_OF_BOKCHOY_THREADS --attr='shard_5' --with-flaky
                 ;;
 
             "6")
-                paver test_bokchoy -n $NUMBER_OF_BOKCHOY_THREADS --extra_args="-a 'shard_6' --with-flaky"
+                paver test_bokchoy -n $NUMBER_OF_BOKCHOY_THREADS --attr='shard_6' --with-flaky
                 ;;
 
             "7")
-                paver test_bokchoy -n $NUMBER_OF_BOKCHOY_THREADS --extra_args="-a 'shard_7' --with-flaky"
+                paver test_bokchoy -n $NUMBER_OF_BOKCHOY_THREADS --attr='shard_7' --with-flaky
                 ;;
 
             "8")
-                paver test_bokchoy -n $NUMBER_OF_BOKCHOY_THREADS --extra_args="-a 'shard_8' --with-flaky"
+                paver test_bokchoy -n $NUMBER_OF_BOKCHOY_THREADS --attr='shard_8' --with-flaky
                 ;;
 
             "9")
-                paver test_bokchoy -n $NUMBER_OF_BOKCHOY_THREADS --extra_args="-a shard_1=False,shard_2=False,shard_3=False,shard_4=False,shard_5=False,shard_6=False,shard_7=False,shard_8=False,a11y=False --with-flaky"
+                paver test_bokchoy -n $NUMBER_OF_BOKCHOY_THREADS --attr='shard_1=False,shard_2=False,shard_3=False,shard_4=False,shard_5=False,shard_6=False,shard_7=False,shard_8=False,a11y=False' --with-flaky
                 ;;
 
             # Default case because if we later define another bok-choy shard on Jenkins

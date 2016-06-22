@@ -166,6 +166,8 @@ class SystemTestSuite(NoseTestSuite):
         if self.randomize:
             cmd.append('--with-randomly')
 
+        cmd.extend(self.passthrough_options)
+
         return self._under_coverage_cmd(" ".join(cmd))
 
     @property
@@ -215,13 +217,15 @@ class LibTestSuite(NoseTestSuite):
         cmd = (
             "nosetests --id-file={test_ids} {test_id} {test_opts} "
             "--with-xunit --xunit-file={xunit_report} {extra} "
-            "--verbosity={verbosity}".format(
+            "--verbosity={verbosity} "
+            "{passthrough}".format(
                 test_ids=self.test_ids,
                 test_id=self.test_id,
                 test_opts=self.test_options_flags,
                 xunit_report=self.xunit_report,
                 verbosity=self.verbosity,
                 extra=self.extra_args,
+                passthrough=self.passthrough_options
             )
         )
 

@@ -6,6 +6,7 @@ from paver.easy import task, needs, cmdopts, sh
 from pavelib.utils.test.suites.bokchoy_suite import BokChoyTestSuite, Pa11yCrawler
 from pavelib.utils.envs import Env
 from pavelib.utils.test.utils import check_firefox_version
+from pavelib.utils.passthrough_opts import PassthroughTask
 from optparse import make_option
 import os
 
@@ -22,7 +23,6 @@ BOKCHOY_OPTS = [
     ('skip_clean', 'C', 'Skip cleaning repository before running tests'),
     ('serversonly', 'r', 'Prepare suite and leave servers running'),
     ('testsonly', 'o', 'Assume servers are running and execute tests only'),
-    ('extra_args=', 'e', 'adds as extra args to the test command'),
     ('default_store=', 's', 'Default modulestore'),
     ('test_dir=', 'd', 'Directory for finding tests (relative to common/test/acceptance)'),
     ('imports_dir=', 'i', 'Directory containing (un-archived) courses to be imported'),
@@ -34,15 +34,19 @@ BOKCHOY_OPTS = [
     make_option("--pdb", action="store_true", help="Drop into debugger on failures or errors"),
     make_option("--skip_firefox_version_validation", action='store_false', dest="validate_firefox_version"),
     make_option("--save_screenshots", action='store_true', dest="save_screenshots"),
+    ('extra_args=', 'e', 'deprecated, pass extra options directly in the paver commandline'),
 ]
 
 
-def parse_bokchoy_opts(options):
+def parse_bokchoy_opts(options, passthrough_options=None):
     """
     Parses bok choy options.
 
     Returns: dict of options.
     """
+    if passthrough_options is None:
+        passthrough_options = []
+
     return {
         'test_spec': getattr(options, 'test_spec', None),
         'fasttest': getattr(options, 'fasttest', False),
@@ -57,13 +61,14 @@ def parse_bokchoy_opts(options):
         'test_dir': getattr(options, 'test_dir', 'tests'),
         'imports_dir': getattr(options, 'imports_dir', None),
         'save_screenshots': getattr(options, 'save_screenshots', False),
+        'passthrough_options': passthrough_options
     }
 
 
-@task
 @needs('pavelib.prereqs.install_prereqs')
 @cmdopts(BOKCHOY_OPTS)
-def test_bokchoy(options):
+@PassthroughTask
+def test_bokchoy(options, passthrough_options):
     """
     Run acceptance tests that use the bok-choy framework.
     Skips some static asset steps if `fasttest` is True.
@@ -86,14 +91,14 @@ def test_bokchoy(options):
     if validate_firefox:
         check_firefox_version()
 
-    opts = parse_bokchoy_opts(options)
+    opts = parse_bokchoy_opts(options, passthrough_options)
     run_bokchoy(**opts)
 
 
-@task
 @needs('pavelib.prereqs.install_prereqs')
 @cmdopts(BOKCHOY_OPTS)
-def test_a11y(options):
+@PassthroughTask
+def test_a11y(options, passthrough_options):
     """
     Run accessibility tests that use the bok-choy framework.
     Skips some static asset steps if `fasttest` is True.
@@ -109,27 +114,26 @@ def test_a11y(options):
     It can also be left blank to run all tests in the suite that are tagged
     with `@attr("a11y")`.
     """
-    opts = parse_bokchoy_opts(options)
+    opts = parse_bokchoy_opts(options, passthrough_options)
     opts['report_dir'] = Env.BOK_CHOY_A11Y_REPORT_DIR
     opts['coveragerc'] = Env.BOK_CHOY_A11Y_COVERAGERC
     opts['extra_args'] = opts['extra_args'] + ' -a "a11y" '
     run_bokchoy(**opts)
 
 
-@task
 @needs('pavelib.prereqs.install_prereqs')
 @cmdopts(BOKCHOY_OPTS)
-def perf_report_bokchoy(options):
+@PassthroughTask
+def perf_report_bokchoy(options, passthrough_options):
     """
     Generates a har file for with page performance info.
     """
-    opts = parse_bokchoy_opts(options)
+    opts = parse_bokchoy_opts(options, passthrough_options)
     opts['test_dir'] = 'performance'
 
     run_bokchoy(**opts)
 
 
-@task
 @needs('pavelib.prereqs.install_prereqs')
 @cmdopts(BOKCHOY_OPTS + [
     ('with-html', 'w', 'Include html reports'),
@@ -141,7 +145,8 @@ def perf_report_bokchoy(options):
         help='Course key for test course',
     ),
 ])
-def pa11ycrawler(options):
+@PassthroughTask
+def pa11ycrawler(options, passthrough_options):
     """
     Runs pa11ycrawler against the demo-test-course to generates accessibility
     reports. (See https://github.com/edx/demo-test-course)
@@ -150,7 +155,7 @@ def pa11ycrawler(options):
     flag to get an environment running. The setup for this is the same as
     for bok-choy tests, only test course is imported as well.
     """
-    opts = parse_bokchoy_opts(options)
+    opts = parse_bokchoy_opts(options, passthrough_options)
     opts['report_dir'] = Env.PA11YCRAWLER_REPORT_DIR
     opts['coveragerc'] = Env.PA11YCRAWLER_COVERAGERC
     opts['should_fetch_course'] = getattr(options, 'should_fetch_course', not opts['fasttest'])

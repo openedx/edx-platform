@@ -255,6 +255,7 @@ class BokChoyTestSuite(TestSuite):
         if self.save_screenshots:
             cmd.append("--with-save-baseline")
         cmd.append(self.extra_args)
+        cmd.extend(self.passthrough_options)
 
         cmd = (" ").join(cmd)
         return cmd
