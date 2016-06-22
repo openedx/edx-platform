@@ -42,7 +42,9 @@
                 this.selectedTopic = this.$('.js-selected-topic');
                 this.hideTopicDropdown();
                 if (this.getCurrentTopicId()) {
-                    this.setTopic(this.$('a.topic-title').filter('[data-discussion-id="' + this.getCurrentTopicId() + '"]'));
+                    this.setTopic(this.$('a.topic-title').filter(
+                        '[data-discussion-id="' + this.getCurrentTopicId() + '"]')
+                    );
                 } else {
                     this.setTopic(this.$('a.topic-title').first());
                 }

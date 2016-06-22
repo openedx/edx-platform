@@ -1,3 +1,4 @@
+/* globals DiscussionTopicMenuView, DiscussionSpecHelper, DiscussionCourseSettings */
 (function() {
     'use strict';
     describe('DiscussionTopicMenuView', function() {
