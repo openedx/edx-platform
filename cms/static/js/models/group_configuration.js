@@ -1,6 +1,6 @@
 define([
     'backbone', 'underscore', 'gettext', 'js/models/group', 'js/collections/group',
-    'backbone.associations', 'coffee/src/main'
+    'backbone.associations', 'js/main'
 ],
 function(Backbone, _, gettext, GroupModel, GroupCollection) {
     'use strict';

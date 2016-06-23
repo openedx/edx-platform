@@ -199,7 +199,7 @@
             'mock-ajax': {
                 deps: ['jquery']
             },
-            'coffee/src/main': {
+            'js/main': {
                 deps: ['coffee/src/ajax_prefix']
             },
             'coffee/src/ajax_prefix': {
@@ -218,7 +218,6 @@
 
     testFiles = [
         'cms/js/spec/xblock/cms.runtime.v1_spec',
-        'coffee/spec/main_spec',
         'coffee/spec/models/course_spec',
         'coffee/spec/models/metadata_spec',
         'coffee/spec/models/section_spec',
@@ -230,6 +229,7 @@
         'coffee/spec/views/metadata_edit_spec',
         'coffee/spec/views/textbook_spec',
         'coffee/spec/views/upload_spec',
+        'js/spec/main_spec',
         'js/spec/video/transcripts/utils_spec',
         'js/spec/video/transcripts/editor_spec',
         'js/spec/video/transcripts/videolist_spec',

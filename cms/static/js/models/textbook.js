@@ -1,5 +1,5 @@
 define(["backbone", "underscore", "gettext", "js/models/chapter", "js/collections/chapter",
-        "backbone.associations", "coffee/src/main"],
+        "backbone.associations", "js/main"],
     function(Backbone, _, gettext, ChapterModel, ChapterCollection) {
 
     var Textbook = Backbone.AssociatedModel.extend({
