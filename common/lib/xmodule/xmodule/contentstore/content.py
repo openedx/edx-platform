@@ -243,7 +243,7 @@ class StaticContent(object):
         try:
             content = AssetManager.find(asset_key, as_stream=True)
             serve_from_cdn = not getattr(content, "locked", True)
-            content_digest = content.content_digest
+            content_digest = getattr(content, "content_digest", None)
         except (ItemNotFoundError, NotFoundError):
             # If we can't find the item, just treat it as if it's locked.
             serve_from_cdn = False
