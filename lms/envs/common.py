@@ -1296,7 +1296,7 @@ discussion_js = (
     rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/customwmd.js') +
     rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/mathjax_accessible.js') +
     rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/mathjax_delay_renderer.js') +
-    sorted(rooted_glob(COMMON_ROOT / 'static', 'common/js/discussion/**/*.js'))
+    sorted(rooted_glob(COMMON_ROOT / 'static', 'coffee/src/discussion/**/*.js'))
 )
 
 discussion_vendor_js = [
