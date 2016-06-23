@@ -380,14 +380,18 @@ class DiscussionSortPreferencePage(CoursePage):
         """
         Return the text of option that is selected for sorting.
         """
-        options = self.q(css="body.discussion .forum-nav-sort-control option")
-        return options.filter(lambda el: el.is_selected())[0].get_attribute("value")
+        # Using this workaround (execute script) to make this test work with Chrome browser
+        selected_value = self.browser.execute_script(
+            'var selected_value = $(".forum-nav-sort-control").val(); return selected_value')
+        return selected_value
 
     def change_sort_preference(self, sort_by):
         """
         Change the option of sorting by clicking on new option.
         """
-        self.q(css="body.discussion .forum-nav-sort-control option[value='{0}']".format(sort_by)).click()
+        self.q(css=".forum-nav-sort-control option[value='{0}']".format(sort_by)).click()
+        # Click initiates an ajax call, waiting for it to complete
+        self.wait_for_ajax()
 
     def refresh_page(self):
         """
