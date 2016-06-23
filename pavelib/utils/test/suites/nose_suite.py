@@ -153,7 +153,6 @@ class SystemTestSuite(NoseTestSuite):
         ] + self.test_options_flags + [
             '--settings=test',
             self.extra_args,
-            '--with-xunitmp',
             '--xunitmp-file={}'.format(self.report_dir / "nosetests.xml"),
             '--with-database-isolation',
         ]
@@ -217,7 +216,6 @@ class LibTestSuite(NoseTestSuite):
             "--id-file={}".format(self.test_ids),
             self.test_id,
         ] + self.test_options_flags + [
-            "--with-xunit",
             "--xunit-file={}".format(self.xunit_report),
             self.extra_args,
             "--verbosity={}".format(self.verbosity),

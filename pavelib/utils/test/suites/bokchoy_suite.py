@@ -133,7 +133,6 @@ class BokChoyTestSuite(TestSuite):
         if self.num_processes != 1:
             # Construct "multiprocess" nosetest command
             command = [
-                "--with-xunitmp",
                 "--xunitmp-file={}".format(self.xunit_report),
                 "--processes={}".format(self.num_processes),
                 "--no-color",
@@ -142,7 +141,6 @@ class BokChoyTestSuite(TestSuite):
 
         else:
             command = [
-                "--with-xunit",
                 "--xunit-file={}".format(self.xunit_report),
                 "--verbosity={}".format(self.verbosity),
             ]

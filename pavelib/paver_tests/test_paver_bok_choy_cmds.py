@@ -38,7 +38,6 @@ class TestPaverBokChoyCmd(unittest.TestCase):
             "VERIFY_XSS='{}'".format(verify_xss),
             "nosetests",
             "{}/common/test/acceptance/{}".format(REPO_DIR, name),
-            "--with-xunit",
             "--xunit-file={}/reports/bok_choy{}/xunit.xml".format(REPO_DIR, shard_str),
             "--verbosity=2",
         ]
@@ -119,7 +118,6 @@ class TestPaverBokChoyCmd(unittest.TestCase):
         Using 1 process means paver should ask for the traditional xunit plugin for plugin results
         """
         expected_verbosity_command = [
-            "--with-xunit",
             "--xunit-file={repo_dir}/reports/bok_choy{shard_str}/xunit.xml".format(
                 repo_dir=REPO_DIR,
                 shard_str='/shard_' + self.shard if self.shard else ''
@@ -136,7 +134,6 @@ class TestPaverBokChoyCmd(unittest.TestCase):
         """
         process_count = 2
         expected_verbosity_command = [
-            "--with-xunitmp",
             "--xunitmp-file={repo_dir}/reports/bok_choy{shard_str}/xunit.xml".format(
                 repo_dir=REPO_DIR,
                 shard_str='/shard_' + self.shard if self.shard else '',
@@ -154,7 +151,6 @@ class TestPaverBokChoyCmd(unittest.TestCase):
         """
         process_count = 3
         expected_verbosity_command = [
-            "--with-xunitmp",
             "--xunitmp-file={repo_dir}/reports/bok_choy{shard_str}/xunit.xml".format(
                 repo_dir=REPO_DIR,
                 shard_str='/shard_' + self.shard if self.shard else '',

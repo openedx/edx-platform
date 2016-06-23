@@ -34,8 +34,7 @@ class AcceptanceTest(TestSuite):
     def cmd(self):
 
         report_file = self.report_dir / "{}.xml".format(self.system)
-        report_args = ["--with-xunit", "--xunit-file {}".format(report_file)]
-
+        report_args = ["--xunit-file {}".format(report_file)]
         return [
             "DEFAULT_STORE={}".format(self.default_store),
             "./manage.py",
