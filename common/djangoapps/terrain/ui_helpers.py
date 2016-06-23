@@ -39,7 +39,7 @@ REQUIREJS_WAIT = {
     # Unit page
     re.compile(r'^Unit \|'): [
         "jquery", "js/base", "js/models/xblock_info", "js/views/pages/container",
-        "js/collections/component_template", "xmodule", "js/main", "xblock/cms.runtime.v1"],
+        "js/collections/component_template", "xmodule", "cms/js/main", "xblock/cms.runtime.v1"],
 
     # Content - Outline
     # Note that calling your org, course number, or display name, 'course' will mess this up
@@ -49,18 +49,18 @@ REQUIREJS_WAIT = {
     # Dashboard
     re.compile(r'^Studio Home \|'): [
         "js/sock", "gettext", "js/base",
-        "jquery.ui", "js/main", "underscore"],
+        "jquery.ui", "cms/js/main", "underscore"],
 
     # Upload
     re.compile(r'^\s*Files & Uploads'): [
-        'js/base', 'jquery.ui', 'js/main', 'underscore',
+        'js/base', 'jquery.ui', 'cms/js/main', 'underscore',
         'js/views/assets', 'js/views/asset'
     ],
 
     # Pages
     re.compile(r'^Pages \|'): [
         'js/models/explicit_url', 'js/views/tabs',
-        'xmodule', 'js/main', 'xblock/cms.runtime.v1'
+        'xmodule', 'cms/js/main', 'xblock/cms.runtime.v1'
     ],
 }
 

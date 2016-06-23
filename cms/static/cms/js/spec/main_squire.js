@@ -174,7 +174,7 @@
                 exports: 'XBlock',
                 deps: ['xblock/core']
             },
-            'js/main': {
+            'cms/js/main': {
                 deps: ['coffee/src/ajax_prefix']
             },
             'coffee/src/ajax_prefix': {

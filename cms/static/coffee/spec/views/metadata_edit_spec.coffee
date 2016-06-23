@@ -1,4 +1,4 @@
-define ["js/models/metadata", "js/collections/metadata", "js/views/metadata", "js/main"],
+define ["js/models/metadata", "js/collections/metadata", "js/views/metadata", "cms/js/main"],
 (MetadataModel, MetadataCollection, MetadataView, main) ->
   verifyInputType = (input, expectedType) ->
       # Some browsers (e.g. FireFox) do not support the "number"

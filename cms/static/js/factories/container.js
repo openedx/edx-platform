@@ -1,6 +1,6 @@
 define([
     'jquery', 'underscore', 'js/models/xblock_container_info', 'js/views/pages/container',
-    'js/collections/component_template', 'xmodule', 'js/main',
+    'js/collections/component_template', 'xmodule', 'cms/js/main',
     'xblock/cms.runtime.v1'
 ],
 function($, _, XBlockContainerInfo, ContainerPage, ComponentTemplates, xmoduleLoader) {

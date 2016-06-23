@@ -1,5 +1,5 @@
 define([
-    'backbone', 'js/main', 'js/models/group_configuration',
+    'backbone', 'cms/js/main', 'js/models/group_configuration',
     'js/models/group', 'js/collections/group', 'squire'
 ], function (Backbone, main, GroupConfigurationModel, GroupModel, GroupCollection, Squire) {
     'use strict';

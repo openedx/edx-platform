@@ -1,10 +1,10 @@
 (function(sandbox) {
     'use strict';
-    require(["jquery", "backbone", "js/main", "edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers", "jquery.cookie"],
+    require(["jquery", "backbone", "cms/js/main", "edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers", "jquery.cookie"],
             function($, Backbone, main, AjaxHelpers) {
         describe("CMS", function() {
-            return it("should initialize URL", function() {
-                return expect(window.CMS.URL).toBeDefined();
+            it("should initialize URL", function() {
+                expect(window.CMS.URL).toBeDefined();
             });
         });
         describe("main helper", function() {
@@ -22,17 +22,17 @@
                 return $.ajaxSettings;
             });
             it("turn on Backbone emulateHTTP", function() {
-                return expect(Backbone.emulateHTTP).toBeTruthy();
+                expect(Backbone.emulateHTTP).toBeTruthy();
             });
-            return it("setup AJAX CSRF token", function() {
-                return expect($.ajaxSettings.headers["X-CSRFToken"]).toEqual("stubCSRFToken");
+            it("setup AJAX CSRF token", function() {
+                expect($.ajaxSettings.headers["X-CSRFToken"]).toEqual("stubCSRFToken");
             });
         });
         describe("AJAX Errors", function() {
             var server;
             server = null;
             beforeEach(function() {
-                return appendSetFixtures(sandbox({
+                appendSetFixtures(sandbox({
                     id: "page-notification"
                 }));
             });
@@ -49,7 +49,7 @@
                 $.ajax("/test");
                 expect($("#page-notification")).toBeEmpty();
                 server.respond();
-                return expect($("#page-notification")).toBeEmpty();
+                expect($("#page-notification")).toBeEmpty();
             });
             it("AJAX request with error should pop an error notification", function() {
                 server = AjaxHelpers.server([
@@ -60,7 +60,7 @@
                 $.ajax("/test");
                 server.respond();
                 expect($("#page-notification")).not.toBeEmpty();
-                return expect($("#page-notification")).toContainElement('div.wrapper-notification-error');
+                expect($("#page-notification")).toContainElement('div.wrapper-notification-error');
             });
             it("can override AJAX request with error so it does not pop an error notification", function() {
                 server = AjaxHelpers.server([
@@ -73,7 +73,7 @@
                     notifyOnError: false
                 });
                 server.respond();
-                return expect($("#page-notification")).toBeEmpty();
+                expect($("#page-notification")).toBeEmpty();
             });
         });
     });
