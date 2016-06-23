@@ -1,6 +1,6 @@
 (function(sandbox) {
     'use strict';
-    require(["jquery", "backbone", "js/main", "common/js/spec_helpers/ajax_helpers", "jquery.cookie"],
+    require(["jquery", "backbone", "js/main", "edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers", "jquery.cookie"],
             function($, Backbone, main, AjaxHelpers) {
         describe("CMS", function() {
             return it("should initialize URL", function() {
