@@ -82,10 +82,10 @@
             Discussion.prototype.retrieveAnotherPage = function(mode, options, sort_options, error) {
                 var data, url,
                     self = this;
-                if (options === null) {
+                if (!options) {
                     options = {};
                 }
-                if (sort_options === null) {
+                if (!sort_options) {
                     sort_options = {};
                 }
                 data = {
