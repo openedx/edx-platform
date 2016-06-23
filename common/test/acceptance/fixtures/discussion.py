@@ -8,7 +8,7 @@ import json
 import factory
 import requests
 
-from . import COMMENTS_STUB_URL
+from common.test.acceptance.fixtures import COMMENTS_STUB_URL
 
 
 class ContentFactory(factory.Factory):

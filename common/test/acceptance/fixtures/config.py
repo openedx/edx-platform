@@ -6,7 +6,7 @@ import re
 import json
 
 from lazy import lazy
-from . import LMS_BASE_URL
+from common.test.acceptance.fixtures import LMS_BASE_URL
 
 
 class ConfigModelFixtureError(Exception):

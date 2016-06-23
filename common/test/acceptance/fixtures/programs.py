@@ -5,8 +5,8 @@ import json
 
 import requests
 
-from . import PROGRAMS_STUB_URL
-from .config import ConfigModelFixture
+from common.test.acceptance.fixtures import PROGRAMS_STUB_URL
+from common.test.acceptance.fixtures.config import ConfigModelFixture
 
 
 class ProgramsFixture(object):
