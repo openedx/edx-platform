@@ -15,7 +15,7 @@ from django.test.utils import override_settings
 
 import edxmako
 
-from .core import comprehensive_theme_changes
+from openedx.core.djangoapps.theming.core import comprehensive_theme_changes
 
 EDX_THEME_DIR = settings.REPO_ROOT / "themes" / "edx.org"
 

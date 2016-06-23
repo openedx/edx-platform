@@ -134,10 +134,6 @@ body.discussion {
         border-radius: 3px;
       }
     }
-
-    img {
-      max-width: 100%;
-    }
   }
 
   .discussion-response .response-body {
@@ -205,5 +201,12 @@ body.view-in-course .discussion-article {
     &:hover, &:focus {
       border-color: #222;
     }
+  }
+}
+
+.thread-wrapper,
+.forum-new-post-form {
+  img {
+    max-width: 100%;
   }
 }
