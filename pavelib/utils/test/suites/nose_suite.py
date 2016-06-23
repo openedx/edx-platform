@@ -59,23 +59,21 @@ class NoseTestSuite(TestSuite):
         unaltered otherwise.
         """
         if self.run_under_coverage:
-            cmd0, cmd_rest = cmd.split(" ", 1)
             # We use "python -m coverage" so that the proper python
             # will run the importable coverage rather than the
             # coverage that OS path finds.
 
-            if not cmd0.endswith('.py'):
-                cmd0 = "`which {}`".format(cmd0)
+            if not cmd[0].endswith('.py'):
+                cmd[0] = "`which {}`".format(cmd[0])
 
-            cmd = (
-                "python -m coverage run {cov_args} --rcfile={rcfile} "
-                "{cmd0} {cmd_rest}".format(
-                    cov_args=self.cov_args,
-                    rcfile=Env.PYTHON_COVERAGERC,
-                    cmd0=cmd0,
-                    cmd_rest=cmd_rest,
-                )
-            )
+            cmd = [
+                "python",
+                "-m",
+                "coverage",
+                "run",
+                self.cov_args,
+                "--rcfile={}".format(Env.PYTHON_COVERAGERC),
+            ] + cmd
 
         return cmd
 
@@ -85,14 +83,14 @@ class NoseTestSuite(TestSuite):
         Takes the test options and returns the appropriate flags
         for the command.
         """
-        opts = " "
+        opts = []
 
         # Handle "--failed" as a special case: we want to re-run only
         # the tests that failed within our Django apps
         # This sets the --failed flag for the nosetests command, so this
         # functionality is the same as described in the nose documentation
         if self.failed_only:
-            opts += "--failed"
+            opts.append("--failed")
 
         # This makes it so we use nose's fail-fast feature in two cases.
         # Case 1: --fail-fast is passed as an arg in the paver command
@@ -102,13 +100,13 @@ class NoseTestSuite(TestSuite):
         )
 
         if self.fail_fast or env_fail_fast_set:
-            opts += " --stop"
+            opts.append("--stop")
 
         if self.pdb:
             opts += " --pdb"
 
         if self.use_ids:
-            opts += " --with-id"
+            opts.append("--with-id")
 
         return opts
 
@@ -152,7 +150,7 @@ class SystemTestSuite(NoseTestSuite):
             './manage.py', self.root, 'test',
             '--verbosity={}'.format(self.verbosity),
             self.test_id,
-            self.test_options_flags,
+        ] + self.test_options_flags + [
             '--settings=test',
             self.extra_args,
             '--with-xunitmp',
@@ -168,7 +166,7 @@ class SystemTestSuite(NoseTestSuite):
 
         cmd.extend(self.passthrough_options)
 
-        return self._under_coverage_cmd(" ".join(cmd))
+        return self._under_coverage_cmd(cmd)
 
     @property
     def _default_test_id(self):
@@ -214,19 +212,15 @@ class LibTestSuite(NoseTestSuite):
 
     @property
     def cmd(self):
-        cmd = (
-            "nosetests --id-file={test_ids} {test_id} {test_opts} "
-            "--with-xunit --xunit-file={xunit_report} {extra} "
-            "--verbosity={verbosity} "
-            "{passthrough}".format(
-                test_ids=self.test_ids,
-                test_id=self.test_id,
-                test_opts=self.test_options_flags,
-                xunit_report=self.xunit_report,
-                verbosity=self.verbosity,
-                extra=self.extra_args,
-                passthrough=self.passthrough_options
-            )
-        )
+        cmd = [
+            "nosetests",
+            "--id-file={}".format(self.test_ids),
+            self.test_id,
+        ] + self.test_options_flags + [
+            "--with-xunit",
+            "--xunit-file={}".format(self.xunit_report),
+            self.extra_args,
+            "--verbosity={}".format(self.verbosity),
+        ] + self.passthrough_options
 
         return self._under_coverage_cmd(cmd)
