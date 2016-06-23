@@ -1,0 +1,6 @@
+<svg class="certificate-body" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12.9 9.2">
+  <rect y="5.8" width="12.9" height="1.1" rx="0.5" ry="0.5"/>
+  <rect y="8.1" width="12.9" height="1.1" rx="0.5" ry="0.5"/>
+  <rect y="1.5" width="6.3" height="1.1" rx="0.5" ry="0.5"/>
+  <circle cx="10.5" cy="2" r="2"/>
+</svg>
