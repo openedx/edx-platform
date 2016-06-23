@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-06-16 14:36+0000\n"
-"PO-Revision-Date: 2016-06-16 14:36:14.483862\n"
+"POT-Creation-Date: 2016-06-23 14:32+0000\n"
+"PO-Revision-Date: 2016-06-23 14:32:31.747526\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -144,6 +144,32 @@ msgstr "Àll (Shöw Hïstörý) Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм�
 #: common/djangoapps/config_models/admin.py
 msgid "Update"
 msgstr "Ûpdäté Ⱡ'σяєм ιρѕυ#"
+
+#: common/djangoapps/config_models/management/commands/populate_model.py
+msgid "A file containing JSON must be specified."
+msgstr ""
+"À fïlé çöntäïnïng JSÖN müst ßé spéçïfïéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя #"
+
+#: common/djangoapps/config_models/management/commands/populate_model.py
+msgid "A valid username must be specified."
+msgstr ""
+"À välïd üsérnämé müst ßé spéçïfïéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
+
+#: common/djangoapps/config_models/management/commands/populate_model.py
+msgid "File {0} does not exist"
+msgstr "Fïlé {0} döés nöt éxïst Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
+
+#: common/djangoapps/config_models/management/commands/populate_model.py
+msgid "Importing JSON data from file {0}"
+msgstr ""
+"Ìmpörtïng JSÖN dätä fröm fïlé {0} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
+
+#: common/djangoapps/config_models/management/commands/populate_model.py
+msgid "Import complete, {0} new entries created"
+msgstr ""
+"Ìmpört çömplété, {0} néw éntrïés çréätéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя#"
 
 #: common/djangoapps/config_models/models.py
 msgid "Change date"
@@ -678,6 +704,12 @@ msgstr "Çréätéd néw üsér: \"{}\" Ⱡ'σяєм ιρѕυм ∂σłσя ѕι
 #: common/djangoapps/student/management/commands/manage_user.py
 msgid "Found existing user: \"{}\""
 msgstr "Föünd éxïstïng üsér: \"{}\" Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
+
+#: common/djangoapps/student/management/commands/manage_user.py
+msgid "Setting unusable password for user \"{}\""
+msgstr ""
+"Séttïng ünüsäßlé pässwörd för üsér \"{}\" Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя#"
 
 #: common/djangoapps/student/management/commands/manage_user.py
 msgid "Created new profile for user: \"{}\""
@@ -11593,6 +11625,12 @@ msgstr "Réädý Ⱡ'σяєм ιρѕ#"
 msgid "Failed"
 msgstr "Fäïléd Ⱡ'σяєм ιρѕυ#"
 
+#. Translators: This is the status for a video which has failed
+#. due to being flagged as a duplicate by an external or internal CMS
+#: cms/djangoapps/contentstore/views/videos.py
+msgid "Failed Duplicate"
+msgstr "Fäïléd Düplïçäté Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
+
 #. Translators: This is the status for a video for which an invalid
 #. processing token was provided in the course settings
 #: cms/djangoapps/contentstore/views/videos.py
@@ -14392,19 +14430,14 @@ msgstr ""
 "öthérwïsé mäý hävé tö {platform_name}, ïnçlüdïng wïthöüt lïmïtätïön äný "
 "ïndémnïfïçätïön ößlïgätïöns çöntäïnéd héréïn.#"
 
-#: lms/templates/api_admin/catalogs/detail.html
-msgid "Edit or delete this catalog."
-msgstr "Édït ör délété thïs çätälög. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
-
-#: lms/templates/api_admin/catalogs/detail.html
-msgid "See a preview of this catalog's contents."
-msgstr ""
-"Séé ä prévïéw öf thïs çätälög's çönténts. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя #"
-
 #: lms/templates/api_admin/catalogs/edit.html
 msgid "Edit {catalog_name}"
 msgstr "Édït {catalog_name} Ⱡ'σяєм ιρѕυм ∂#"
+
+#: lms/templates/api_admin/catalogs/edit.html
+#: lms/templates/api_admin/catalogs/list.html
+msgid "Download CSV"
+msgstr "Döwnlöäd ÇSV Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
 #: lms/templates/api_admin/catalogs/edit.html
 msgid "Delete this catalog"
