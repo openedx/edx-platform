@@ -247,7 +247,7 @@
                 exports: 'XBlock',
                 deps: ['xblock/core']
             },
-            'coffee/src/main': {
+            'js/main': {
                 deps: ['coffee/src/ajax_prefix']
             },
             'js/src/logger': {

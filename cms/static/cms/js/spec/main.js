@@ -199,7 +199,7 @@
             'mock-ajax': {
                 deps: ['jquery']
             },
-            'coffee/src/main': {
+            'js/main': {
                 deps: ['coffee/src/ajax_prefix']
             },
             'coffee/src/ajax_prefix': {
