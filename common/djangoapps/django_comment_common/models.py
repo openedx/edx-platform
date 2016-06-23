@@ -46,7 +46,14 @@ def assign_default_role(course_id, user):
     """
     Assign forum default role 'Student' to user
     """
-    role, __ = Role.objects.get_or_create(course_id=course_id, name=FORUM_ROLE_STUDENT)
+    assign_role(course_id, user, FORUM_ROLE_STUDENT)
+
+
+def assign_role(course_id, user, rolename):
+    """
+    Assign forum role `rolename` to user
+    """
+    role, __ = Role.objects.get_or_create(course_id=course_id, name=rolename)
     user.roles.add(role)
 
 
