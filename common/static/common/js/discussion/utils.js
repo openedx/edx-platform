@@ -30,7 +30,7 @@
 
         DiscussionUtil.isStaff = function(userId) {
             var staff;
-            if (userId === null) {
+            if (_.isUndefined(userId)) {
                 userId = this.user ? this.user.id : void 0;
             }
             staff = _.union(this.roleIds.Moderator, this.roleIds.Administrator);
@@ -39,7 +39,7 @@
 
         DiscussionUtil.isTA = function(userId) {
             var ta;
-            if (userId === null) {
+            if (_.isUndefined(userId)) {
                 userId = this.user ? this.user.id : void 0;
             }
             ta = _.union(this.roleIds['Community TA']);
