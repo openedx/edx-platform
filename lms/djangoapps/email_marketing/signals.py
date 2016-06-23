@@ -13,7 +13,6 @@ from student.views import REGISTER_USER
 from email_marketing.models import EmailMarketingConfiguration
 from util.model_utils import USER_FIELD_CHANGED
 from lms.djangoapps.email_marketing.tasks import update_user, update_user_email, update_course_enrollment
-from request_cache.middleware import RequestCache
 
 from sailthru.sailthru_client import SailthruClient
 from sailthru.sailthru_error import SailthruClientError

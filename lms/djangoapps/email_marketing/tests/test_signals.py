@@ -288,6 +288,23 @@ class EmailMarketingTests(TestCase):
                                                   options={'send_template': 'enroll_template'},
                                                   incomplete=None, message_id='cookie_bid')
 
+        # test unenroll
+        update_course_enrollment.delay(TEST_EMAIL,
+                                       self.course_url,
+                                       EnrollStatusChange.unenroll,
+                                       'audit',
+                                       course_id=self.course_id,
+                                       currency='USD',
+                                       message_id='cookie_bid',
+                                       unit_cost=0)
+        mock_sailthru_purchase.assert_called_with(TEST_EMAIL, [{'vars': {'course_run_id': self.course_id_string, 'mode': 'audit',
+                                                                         'upgrade_deadline_verified': '2020-03-12'},
+                                                                'title': 'Course ' + self.course_id_string + ' mode: audit',
+                                                                'url': self.course_url,
+                                                                'price': 100, 'qty': 1, 'id': self.course_id_string + '-audit'}],
+                                                  options={'send_template': 'enroll_template'},
+                                                  incomplete=None, message_id='cookie_bid')
+
         # test add upgrade to cart
         update_course_enrollment.delay(TEST_EMAIL,
                                        self.course_url,
@@ -302,6 +319,23 @@ class EmailMarketingTests(TestCase):
                                                                 'title': 'Course ' + self.course_id_string + ' mode: verified',
                                                                 'url': self.course_url,
                                                                 'price': 4900, 'qty': 1, 'id': self.course_id_string + '-verified'}],
+                                                  options={},
+                                                  incomplete=1, message_id='cookie_bid')
+
+        # test add purchase to cart
+        update_course_enrollment.delay(TEST_EMAIL,
+                                       self.course_url,
+                                       EnrollStatusChange.paid_start,
+                                       'honor',
+                                       course_id=self.course_id,
+                                       currency='USD',
+                                       message_id='cookie_bid',
+                                       unit_cost=49)
+        mock_sailthru_purchase.assert_called_with(TEST_EMAIL, [{'vars': {'course_run_id': self.course_id_string, 'mode': 'honor',
+                                                                         'upgrade_deadline_verified': '2020-03-12'},
+                                                                'title': 'Course ' + self.course_id_string + ' mode: honor',
+                                                                'url': self.course_url,
+                                                                'price': 4900, 'qty': 1, 'id': self.course_id_string + '-honor'}],
                                                   options={},
                                                   incomplete=1, message_id='cookie_bid')
 
@@ -320,6 +354,23 @@ class EmailMarketingTests(TestCase):
                                                                 'url': self.course_url,
                                                                 'price': 9900, 'qty': 1, 'id': self.course_id_string + '-honor'}],
                                                   options={'send_template': 'purchase_template'},
+                                                  incomplete=None, message_id='cookie_bid')
+
+        # test upgrade complete
+        update_course_enrollment.delay(TEST_EMAIL,
+                                       self.course_url,
+                                       EnrollStatusChange.upgrade_complete,
+                                       'verified',
+                                       course_id=self.course_id,
+                                       currency='USD',
+                                       message_id='cookie_bid',
+                                       unit_cost=99)
+        mock_sailthru_purchase.assert_called_with(TEST_EMAIL, [{'vars': {'course_run_id': self.course_id_string, 'mode': 'verified',
+                                                                         'upgrade_deadline_verified': '2020-03-12'},
+                                                                'title': 'Course ' + self.course_id_string + ' mode: verified',
+                                                                'url': self.course_url,
+                                                                'price': 9900, 'qty': 1, 'id': self.course_id_string + '-verified'}],
+                                                  options={'send_template': 'upgrade_template'},
                                                   incomplete=None, message_id='cookie_bid')
 
     @patch('email_marketing.tasks.SailthruClient')

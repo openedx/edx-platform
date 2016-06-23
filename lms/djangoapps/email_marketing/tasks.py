@@ -242,7 +242,7 @@ def update_course_enrollment(self, email, course_url, event, mode,
 
         # get course information if configured and appropriate event
         if fetch_tags and email_config.sailthru_get_tags_from_sailthru:
-            course_data = _get_course_content(course_url, sailthru_client)
+            course_data = _get_course_content(course_url, sailthru_client, email_config)
         else:
             course_data = {}
 
