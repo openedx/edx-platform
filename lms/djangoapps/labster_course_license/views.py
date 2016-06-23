@@ -13,13 +13,14 @@ from django.conf import settings
 from django.contrib import messages
 from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse
+from django.core.exceptions import ValidationError
 from django.shortcuts import redirect
 from django.views.decorators.cache import cache_control
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.http import HttpResponseBadRequest, Http404
 from django.utils.safestring import mark_safe
 
-from labster_course_license.utils import LtiPassport, course_tree_info
+from labster_course_license.utils import LtiPassport, course_tree_info, SimulationValidationError
 from labster_course_license.models import CourseLicense
 from ccx_keys.locator import CCXLocator
 from ccx.views import coach_dashboard, get_ccx_for_coach
@@ -215,24 +216,24 @@ def set_license(request, course, ccx):
     # Updating the course: hides unlicensed simulations.
     store = modulestore()
     with store.bulk_operations(course_key):
-        simulations = store.get_items(course_key, qualifiers={'category': 'lti'})
-        course_info, chapters, invalid_simulation_ids = course_tree_info(
-            store, simulations, licensed_simulations
-        )
-        if invalid_simulation_ids:
-            messages.error(
-                request,
-                mark_safe(_((
-                    'Please verify LTI URLs  are correct for the following simulations:<br> {}'
-                ).format(
-                    '<br>'.join(
-                        'name: "{}", simulation Id: "{}"'.format(
-                            sim_name, sim_id
-                        ) for sim_name, sim_id in invalid_simulation_ids
-                    )
-                )))
-            )
+        lti_blocks = store.get_items(course_key, qualifiers={'category': 'lti'})
+        # Filter a list of lti blocks to get only blocks with simulations.
+        simulations = (block for block in lti_blocks if '/simulation/' in block.launch_url)
+        try:
+            course_info, chapters = course_tree_info(store, simulations, licensed_simulations)
+        except SimulationValidationError as err:
+            msg = _((
+                'Please verify LTI URLs are correct for the following simulations:<br><br> {}'
+            ).format(
+                '<br><br>'.join(
+                    'Simulation name is "{}"<br>Simulation id is "{}"<br>Error message: <b>{}</b>'.format(
+                        sim_name, sim_id, err_msg
+                    ) for sim_name, sim_id, err_msg in err.message
+                )
+            ))
+            messages.error(request, mark_safe(msg))
             return redirect(url)
+
         update_course(ccx, course_info, chapters)
 
     url = reverse('labster_license_handler', kwargs={'course_id': CCXLocator.from_course_locator(course.id, ccx.id)})

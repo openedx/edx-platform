@@ -1,15 +1,24 @@
 """
 Utils for Labster LTI Passport.
 """
-import logging
 import re
+import logging
 from urlparse import urlparse
 
+from django.core.validators import URLValidator, RegexValidator
+from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext as _
 
 
 log = logging.getLogger(__name__)
 WILD_CARD = '*'
+
+
+class SimulationValidationError(Exception):
+    """
+    This exception is raised when the simulation has invalid values.
+    """
+    pass
 
 
 class LtiPassportError(Exception):
@@ -62,7 +71,7 @@ def get_simulation_id(uri):
     """
     Returns Simulation id extracted from the passed URI.
     """
-    return urlparse(uri).path.strip(' /').split('/')[-1]
+    return urlparse(uri).path.strip('/').split('/')[-1]
 
 
 def get_parent_unit(xblock):
@@ -103,16 +112,23 @@ def get_xblock_info(xblock, course_info, is_hidden=True, child=None):
 
 def course_tree_info(store, simulations, licensed_simulations):
     """
-    Retuns information about the course's xblocks.
+    Returns information about the course's xblocks.
     """
+    url_validator = URLValidator()
+    sim_id_validator = RegexValidator(re.compile(r'^[a-zA-Z0-9]+$'), message=_('Enter a valid simulation id.'))
+
     course_info = {}
-    invalid_simulation_ids = []
-    validation_pattern = r'^[a-zA-Z0-9]+$'
+    errors = []
+
     for simulation in simulations:
         simulation_id = get_simulation_id(simulation.launch_url)
-        if not simulation_id or not re.match(validation_pattern, simulation_id):
-            invalid_simulation_ids.append((simulation.display_name, simulation_id))
-            continue
+
+        for value, validator in ((simulation.launch_url, url_validator), (simulation_id, sim_id_validator)):
+            try:
+                validator(value)
+            except ValidationError as err:
+                errors.append((simulation.display_name, simulation_id, u'<br>'.join(err.messages)))
+
         if WILD_CARD in licensed_simulations:
             is_hidden = False
         else:
@@ -134,5 +150,8 @@ def course_tree_info(store, simulations, licensed_simulations):
             continue
         course_info[chapter] = get_xblock_info(chapter, course_info, is_hidden=is_hidden, child=subsection)
 
+    if errors:
+        raise SimulationValidationError(errors)
+
     chapters = filter(lambda x: getattr(x, 'category') == 'chapter', course_info.keys())
-    return (course_info, chapters, invalid_simulation_ids)
+    return (course_info, chapters)
