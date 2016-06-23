@@ -7,16 +7,12 @@ import time
 from celery import task
 from django.contrib.auth.models import User
 from django.http import Http404
+from django.core.cache import cache
 
 from email_marketing.models import EmailMarketingConfiguration
 from course_modes.models import CourseMode
 from courseware.courses import get_course_by_id
-from student.models import ENROLL_STATUS_CHANGE_ENROLL, \
-    ENROLL_STATUS_CHANGE_UNENROLL, \
-    ENROLL_STATUS_CHANGE_UPGRADE_ADD_CART, \
-    ENROLL_STATUS_CHANGE_UPGRADE_COMPLETE, \
-    ENROLL_STATUS_CHANGE_PAID_COURSE_ADD_CART, \
-    ENROLL_STATUS_CHANGE_PAID_COURSE_COMPLETE
+from student.models import EnrollStatusChange
 
 from sailthru.sailthru_client import SailthruClient
 from sailthru.sailthru_error import SailthruClientError
@@ -176,17 +172,17 @@ def update_course_enrollment(self, email, course_url, event, mode,
 
 
     The event can be one of the following:
-        ENROLL_STATUS_CHANGE_ENROLL
+        EnrollStatusChange.enroll
             A free enroll (mode=audit)
-        ENROLL_STATUS_CHANGE_UNENROLL
+        EnrollStatusChange.unenroll
             An unenroll
-        ENROLL_STATUS_CHANGE_UPGRADE_ADD_CART
+        EnrollStatusChange.upgrade_start
             A paid upgrade added to cart
-        ENROLL_STATUS_CHANGE_UPGRADE_COMPLETE
+        EnrollStatusChange.upgrade_complete
             A paid upgrade purchase complete
-        ENROLL_STATUS_CHANGE_PAID_COURSE_ADD_CART
+        EnrollStatusChange.paid_start
             A non-free course added to cart
-        ENROLL_STATUS_CHANGE_PAID_COURSE_COMPLETE
+        EnrollStatusChange.paid_complete
             A non-free course purchase complete
     """
 
@@ -199,33 +195,35 @@ def update_course_enrollment(self, email, course_url, event, mode,
     # Use event type to figure out processing required
     new_enroll = unenroll = fetch_tags = False
     incomplete = send_template = None
+    if unit_cost:
+        cost_in_cents = unit_cost * 100
 
-    if event == ENROLL_STATUS_CHANGE_ENROLL:
+    if event == EnrollStatusChange.enroll:
         # new enroll for audit (no cost)
         new_enroll = True
         fetch_tags = True
         send_template = email_config.sailthru_enroll_template
         # set cost of $1 so that Sailthru recognizes the event
-        unit_cost = 1
+        cost_in_cents = email_config.sailthru_enroll_cost
 
-    elif event == ENROLL_STATUS_CHANGE_UNENROLL:
+    elif event == EnrollStatusChange.unenroll:
         # unenroll - need to update list of unenrolled courses for user in Sailthru
         unenroll = True
 
-    elif event == ENROLL_STATUS_CHANGE_UPGRADE_ADD_CART:
+    elif event == EnrollStatusChange.upgrade_start:
         # add upgrade to cart
         incomplete = 1
 
-    elif event == ENROLL_STATUS_CHANGE_PAID_COURSE_ADD_CART:
+    elif event == EnrollStatusChange.paid_start:
         # add course purchase (probably 'honor') to cart
         incomplete = 1
 
-    elif event == ENROLL_STATUS_CHANGE_UPGRADE_COMPLETE:
+    elif event == EnrollStatusChange.upgrade_complete:
         # upgrade complete
         fetch_tags = True
         send_template = email_config.sailthru_upgrade_template
 
-    elif event == ENROLL_STATUS_CHANGE_PAID_COURSE_COMPLETE:
+    elif event == EnrollStatusChange.paid_complete:
         # paid course purchase complete
         new_enroll = True
         fetch_tags = True
@@ -240,7 +238,7 @@ def update_course_enrollment(self, email, course_url, event, mode,
                              max_retries=email_config.sailthru_max_retries)
 
     # if there is a cost, call Sailthru purchase api to record
-    if unit_cost:
+    if cost_in_cents:
 
         # get course information if configured and appropriate event
         if fetch_tags and email_config.sailthru_get_tags_from_sailthru:
@@ -249,7 +247,7 @@ def update_course_enrollment(self, email, course_url, event, mode,
             course_data = {}
 
         # build item description
-        item = _build_purchase_item(course_id_string, course_url, unit_cost, mode, course_data, course_id)
+        item = _build_purchase_item(course_id_string, course_url, cost_in_cents, mode, course_data, course_id)
 
         # build purchase api options list
         options = {}
@@ -266,7 +264,7 @@ def update_course_enrollment(self, email, course_url, event, mode,
                              max_retries=email_config.sailthru_max_retries)
 
 
-def _build_purchase_item(course_id_string, course_url, unit_cost, mode, course_data, course_id):
+def _build_purchase_item(course_id_string, course_url, cost_in_cents, mode, course_data, course_id):
     """
     Build Sailthru purchase item object
     :return: item
@@ -274,9 +272,9 @@ def _build_purchase_item(course_id_string, course_url, unit_cost, mode, course_d
 
     # build item description
     item = {
-        'id': course_id_string + '-' + mode,
+        'id': "{}-{}".format(course_id_string, mode),
         'url': course_url,
-        'price': unit_cost * 100,
+        'price': cost_in_cents,
         'qty': 1,
     }
 
@@ -289,7 +287,7 @@ def _build_purchase_item(course_id_string, course_url, unit_cost, mode, course_d
             item['title'] = course.display_name
         except Http404:
             # can't find, just invent title
-            item['title'] = 'Course ' + course_id_string + ' mode: ' + mode
+            item['title'] = 'Course {} mode: {}'.format(course_id_string, mode)
 
     if 'tags' in course_data:
         item['tags'] = course_data['tags']
@@ -305,7 +303,7 @@ def _build_purchase_item(course_id_string, course_url, unit_cost, mode, course_d
     # get list of modes for course and add upgrade deadlines for verified modes
     for mode_entry in CourseMode.modes_for_course(course_id):
         if mode_entry.expiration_datetime is not None and CourseMode.is_verified_slug(mode_entry.slug):
-            sailthru_vars['upgrade_deadline_%s' % mode_entry.slug] = \
+            sailthru_vars['upgrade_deadline_{}'.format(mode_entry.slug)] = \
                 mode_entry.expiration_datetime.strftime("%Y-%m-%d")
 
     return item
@@ -339,7 +337,7 @@ def _record_purchase(sailthru_client, email, item, incomplete, message_id, optio
     return True
 
 
-def _get_course_content(course_url, sailthru_client):
+def _get_course_content(course_url, sailthru_client, email_config):
     """
     Get course information using the Sailthru content api.
 
@@ -348,17 +346,22 @@ def _get_course_content(course_url, sailthru_client):
     :param sailthru_client:
     :return: dict with course information
     """
-    try:
-        sailthru_response = sailthru_client.api_get("content", {"id": course_url})
+    # check cache first
+    response = cache.get(course_url)
+    if not response:
+        try:
+            sailthru_response = sailthru_client.api_get("content", {"id": course_url})
 
-        if not sailthru_response.is_ok():
-            return {}
+            if not sailthru_response.is_ok():
+                return {}
 
-        response_json = sailthru_response.json
-        return response_json
+            response = sailthru_response.json
+            cache.set(course_url, response, email_config.sailthru_content_cache_age)
 
-    except SailthruClientError:
-        return {}
+        except SailthruClientError:
+            response = {}
+
+    return response
 
 
 def _update_unenrolled_list(sailthru_client, email, course_url, unenroll):

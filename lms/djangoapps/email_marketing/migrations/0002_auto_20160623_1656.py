@@ -23,6 +23,16 @@ class Migration(migrations.Migration):
         ),
         migrations.AddField(
             model_name='emailmarketingconfiguration',
+            name='sailthru_content_cache_age',
+            field=models.IntegerField(default=3600, help_text='Number of seconds to cache course content retrieved from Sailthru.'),
+        ),
+        migrations.AddField(
+            model_name='emailmarketingconfiguration',
+            name='sailthru_enroll_cost',
+            field=models.IntegerField(default=100, help_text='Cost in cents to report to Sailthru for enrolls.'),
+        ),
+        migrations.AddField(
+            model_name='emailmarketingconfiguration',
             name='sailthru_enroll_template',
             field=models.CharField(help_text='Sailthru send template to use on enrolling for audit. ', max_length=20, blank=True),
         ),

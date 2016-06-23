@@ -3,6 +3,7 @@ This module contains signals needed for email integration
 """
 import logging
 import datetime
+import crum
 
 from django.dispatch import receiver
 
@@ -35,7 +36,7 @@ def handle_enroll_status_change(sender, event=None, user=None, mode=None, course
     if not email_config.enabled or not event or not user or not mode or not course_id:
         return
 
-    request = RequestCache.get_current_request()
+    request = crum.get_current_request()
     if not request:
         return
 
@@ -83,12 +84,21 @@ def add_email_marketing_cookies(sender, response=None, user=None,
     if not email_config.enabled:
         return response
 
+    post_parms = {
+        'id': user.email,
+        'fields': {'keys': 1},
+        'vars': {'last_login_date': datetime.datetime.now().strftime("%Y-%m-%d")}
+    }
+
+    # get sailthru_content cookie to capture usage before logon
+    request = crum.get_current_request()
+    if request and request.COOKIES['sailthru_content']:
+        post_parms['cookies'] = {'sailthru_content': request.COOKIES['sailthru_content']}
+
     try:
         sailthru_client = SailthruClient(email_config.sailthru_key, email_config.sailthru_secret)
         sailthru_response = \
-            sailthru_client.api_post("user", {'id': user.email, 'fields': {'keys': 1},
-                                              'vars': {'last_login_date':
-                                                       datetime.datetime.now().strftime("%Y-%m-%d")}})
+            sailthru_client.api_post("user", post_parms)
     except SailthruClientError as exc:
         log.error("Exception attempting to obtain cookie from Sailthru: %s", unicode(exc))
         return response

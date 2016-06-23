@@ -5,7 +5,7 @@ import datetime
 
 from django.test import TestCase
 from django.contrib.auth.models import AnonymousUser
-from mock import patch
+from mock import patch, ANY
 from util.json_request import JsonResponse
 from django.http import Http404
 
@@ -19,12 +19,7 @@ from email_marketing.models import EmailMarketingConfiguration
 from django.test.client import RequestFactory
 from student.tests.factories import UserFactory, UserProfileFactory
 from request_cache.middleware import RequestCache
-from student.models import ENROLL_STATUS_CHANGE_ENROLL, \
-    ENROLL_STATUS_CHANGE_UNENROLL, \
-    ENROLL_STATUS_CHANGE_UPGRADE_ADD_CART, \
-    ENROLL_STATUS_CHANGE_UPGRADE_COMPLETE, \
-    ENROLL_STATUS_CHANGE_PAID_COURSE_ADD_CART, \
-    ENROLL_STATUS_CHANGE_PAID_COURSE_COMPLETE
+from student.models import EnrollStatusChange
 from opaque_keys.edx.keys import CourseKey
 from course_modes.models import CourseMode
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -75,8 +70,9 @@ class EmailMarketingTests(TestCase):
         self.course_url = 'http://testserver/courses/edX/toy/2012_Fall/info'
         super(EmailMarketingTests, self).setUp()
 
+    @patch('email_marketing.signals.crum.get_current_request')
     @patch('email_marketing.signals.SailthruClient.api_post')
-    def test_drop_cookie(self, mock_sailthru):
+    def test_drop_cookie(self, mock_sailthru, mock_get_current_request):
         """
         Test add_email_marketing_cookies
         """
@@ -84,13 +80,16 @@ class EmailMarketingTests(TestCase):
             "success": True,
             "redirect_url": 'test.com/test',
         })
+        self.request.COOKIES['sailthru_content'] = 'cookie_content'
+        mock_get_current_request.return_value = self.request
         mock_sailthru.return_value = SailthruResponse(JsonResponse({'keys': {'cookie': 'test_cookie'}}))
         add_email_marketing_cookies(None, response=response, user=self.user)
+        mock_sailthru.assert_called_with('user',
+                                         {'fields': {'keys': 1},
+                                          'cookies': {'sailthru_content': 'cookie_content'},
+                                          'id': TEST_EMAIL,
+                                          'vars': {'last_login_date': ANY}})
         self.assertTrue('sailthru_hid' in response.cookies)
-        self.assertEquals(mock_sailthru.call_args[0][0], "user")
-        userparms = mock_sailthru.call_args[0][1]
-        self.assertEquals(userparms['fields']['keys'], 1)
-        self.assertEquals(userparms['id'], TEST_EMAIL)
         self.assertEquals(response.cookies['sailthru_hid'].value, "test_cookie")
 
     @patch('email_marketing.signals.SailthruClient.api_post')
@@ -172,7 +171,7 @@ class EmailMarketingTests(TestCase):
         self.assertFalse(mock_sailthru.called)
 
         update_course_enrollment.delay(self.user.username, TEST_EMAIL, 'http://course',
-                                       ENROLL_STATUS_CHANGE_ENROLL, 'audit')
+                                       EnrollStatusChange.enroll, 'audit')
         self.assertFalse(mock_log_error.called)
         self.assertFalse(mock_sailthru.called)
 
@@ -204,7 +203,7 @@ class EmailMarketingTests(TestCase):
         email_marketing_user_field_changed(None, user=anon)
         self.assertFalse(mock_log_error.called)
 
-    @patch('email_marketing.signals.RequestCache.get_current_request')
+    @patch('email_marketing.signals.crum.get_current_request')
     @patch('lms.djangoapps.email_marketing.tasks.update_course_enrollment.delay')
     def test_handle_enroll_status_change(self, mock_update_course_enrollment, mock_get_current_request):
         """
@@ -218,14 +217,14 @@ class EmailMarketingTests(TestCase):
         # now test with current request
         mock_get_current_request.return_value = self.request
         self.request.COOKIES['sailthru_bid'] = 'cookie_bid'
-        handle_enroll_status_change(None, event=ENROLL_STATUS_CHANGE_ENROLL,
+        handle_enroll_status_change(None, event=EnrollStatusChange.enroll,
                                     user=self.user,
                                     mode='audit', course_id=self.course_id,
                                     cost=None, currency=None)
         self.assertTrue(mock_update_course_enrollment.called)
         mock_update_course_enrollment.assert_called_with(TEST_EMAIL,
                                                          self.course_url,
-                                                         ENROLL_STATUS_CHANGE_ENROLL,
+                                                         EnrollStatusChange.enroll,
                                                          'audit',
                                                          course_id=self.course_id,
                                                          currency=None,
@@ -275,7 +274,7 @@ class EmailMarketingTests(TestCase):
         mock_get_course.side_effect = Http404
         update_course_enrollment.delay(TEST_EMAIL,
                                        self.course_url,
-                                       ENROLL_STATUS_CHANGE_ENROLL,
+                                       EnrollStatusChange.enroll,
                                        'audit',
                                        course_id=self.course_id,
                                        currency='USD',
@@ -292,7 +291,7 @@ class EmailMarketingTests(TestCase):
         # test add upgrade to cart
         update_course_enrollment.delay(TEST_EMAIL,
                                        self.course_url,
-                                       ENROLL_STATUS_CHANGE_UPGRADE_ADD_CART,
+                                       EnrollStatusChange.upgrade_start,
                                        'verified',
                                        course_id=self.course_id,
                                        currency='USD',
@@ -309,7 +308,7 @@ class EmailMarketingTests(TestCase):
         # test purchase complete
         update_course_enrollment.delay(TEST_EMAIL,
                                        self.course_url,
-                                       ENROLL_STATUS_CHANGE_PAID_COURSE_COMPLETE,
+                                       EnrollStatusChange.paid_complete,
                                        'honor',
                                        course_id=self.course_id,
                                        currency='USD',
@@ -329,18 +328,23 @@ class EmailMarketingTests(TestCase):
         test routine which fetches data from Sailthru content api
         """
         mock_sailthru_client.api_get.return_value = SailthruResponse(JsonResponse({"title": "The title"}))
-        response_json = _get_course_content('course:123', mock_sailthru_client)
+        response_json = _get_course_content('course:123', mock_sailthru_client, EmailMarketingConfiguration.current())
         self.assertEquals(response_json, {"title": "The title"})
         mock_sailthru_client.api_get.assert_called_with('content', {'id': 'course:123'})
+
+        # test second call uses cache
+        response_json = _get_course_content('course:123', mock_sailthru_client, EmailMarketingConfiguration.current())
+        self.assertEquals(response_json, {"title": "The title"})
+        mock_sailthru_client.api_get.assert_not_called()
 
         # test error from Sailthru
         mock_sailthru_client.api_get.return_value = \
             SailthruResponse(JsonResponse({'error': 100, 'errormsg': 'Got an error'}))
-        self.assertEquals(_get_course_content('course:123', mock_sailthru_client), {})
+        self.assertEquals(_get_course_content('course:124', mock_sailthru_client, EmailMarketingConfiguration.current()), {})
 
         # test exception
         mock_sailthru_client.api_get.side_effect = SailthruClientError
-        self.assertEquals(_get_course_content('course:123', mock_sailthru_client), {})
+        self.assertEquals(_get_course_content('course:125', mock_sailthru_client, EmailMarketingConfiguration.current()), {})
 
     @patch('email_marketing.tasks.SailthruClient')
     def test_update_unenrolled_list(self, mock_sailthru_client):

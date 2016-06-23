@@ -105,6 +105,20 @@ class EmailMarketingConfiguration(ConfigurationModel):
         help_text=_('Use the Sailthru content API to fetch course tags.')
     )
 
+    sailthru_content_cache_age = models.fields.IntegerField(
+        default=3600,
+        help_text=_(
+            "Number of seconds to cache course content retrieved from Sailthru."
+        )
+    )
+
+    sailthru_enroll_cost = models.fields.IntegerField(
+        default=100,
+        help_text=_(
+            "Cost in cents to report to Sailthru for enrolls."
+        )
+    )
+
     def __unicode__(self):
         return u"Email marketing configuration: New user list %s, Activation template: %s" % \
                (self.sailthru_new_user_list, self.sailthru_activation_template)

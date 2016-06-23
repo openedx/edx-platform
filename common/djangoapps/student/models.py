@@ -68,13 +68,24 @@ SessionStore = import_module(settings.SESSION_ENGINE).SessionStore  # pylint: di
 
 # enroll status changed events - signaled to email_marketing.  See email_marketing.tasks for more info
 
+
 # ENROLL signal used for free enrollment only
-ENROLL_STATUS_CHANGE_ENROLL = 'enroll'
-ENROLL_STATUS_CHANGE_UNENROLL = 'unenroll'
-ENROLL_STATUS_CHANGE_UPGRADE_ADD_CART = 'upgrade_start'
-ENROLL_STATUS_CHANGE_UPGRADE_COMPLETE = 'upgrade_complete'
-ENROLL_STATUS_CHANGE_PAID_COURSE_ADD_CART = 'paid_start'
-ENROLL_STATUS_CHANGE_PAID_COURSE_COMPLETE = 'paid_complete'
+class EnrollStatusChange(object):
+    """
+    Possible event types for ENROLL_STATUS_CHANGE signal
+    """
+    # enroll for a course
+    enroll = 'enroll'
+    # unenroll for a course
+    unenroll = 'unenroll'
+    # add an upgrade to cart
+    upgrade_start = 'upgrade_start'
+    # complete an upgrade purchase
+    upgrade_complete = 'upgrade_complete'
+    # add a paid course to the cart
+    paid_start = 'paid_start'
+    # complete a paid course purchase
+    paid_complete = 'paid_complete'
 
 UNENROLLED_TO_ALLOWEDTOENROLL = 'from unenrolled to allowed to enroll'
 ALLOWEDTOENROLL_TO_ENROLLED = 'from allowed to enroll to enrolled'
@@ -1142,7 +1153,7 @@ class CourseEnrollment(models.Model):
                 UNENROLL_DONE.send(sender=None, course_enrollment=self, skip_refund=skip_refund)
 
                 self.emit_event(EVENT_NAME_ENROLLMENT_DEACTIVATED)
-                self.send_signal(ENROLL_STATUS_CHANGE_UNENROLL)
+                self.send_signal(EnrollStatusChange.unenroll)
 
                 dog_stats_api.increment(
                     "common.student.unenrollment",
@@ -1167,6 +1178,7 @@ class CourseEnrollment(models.Model):
     def send_signal_full(cls, event, user=user, mode=mode, course_id=course_id, cost=None, currency=None):
         """
         Sends a signal announcing changes in course enrollment status.
+        This version should be used if you don't already have a CourseEnrollment object
         """
         ENROLL_STATUS_CHANGE.send(sender=None, event=event, user=user,
                                   mode=mode, course_id=course_id,
