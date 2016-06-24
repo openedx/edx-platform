@@ -2229,11 +2229,11 @@ def reactivation_email_for_user(user):
     message = render_to_string('emails/activation_email.txt', context)
 
     try:
-        user.email_user(subject, message, theming_helpers.get_value('default_from_email', settings.DEFAULT_FROM_EMAIL))
+        user.email_user(subject, message, theming_helpers.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL))
     except Exception:  # pylint: disable=broad-except
         log.error(
             u'Unable to send reactivation email from "%s"',
-            theming_helpers.get_value('default_from_email', settings.DEFAULT_FROM_EMAIL),
+            theming_helpers.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL),
             exc_info=True
         )
         return JsonResponse({
@@ -2357,7 +2357,7 @@ def confirm_email_change(request, key):  # pylint: disable=unused-argument
             user.email_user(
                 subject,
                 message,
-                theming_helpers.get_value('default_from_email', settings.DEFAULT_FROM_EMAIL)
+                theming_helpers.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL)
             )
         except Exception:    # pylint: disable=broad-except
             log.warning('Unable to send confirmation email to old address', exc_info=True)
@@ -2373,7 +2373,7 @@ def confirm_email_change(request, key):  # pylint: disable=unused-argument
             user.email_user(
                 subject,
                 message,
-                theming_helpers.get_value('default_from_email', settings.DEFAULT_FROM_EMAIL)
+                theming_helpers.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL)
             )
         except Exception:  # pylint: disable=broad-except
             log.warning('Unable to send confirmation email to new address', exc_info=True)
