@@ -37,10 +37,7 @@ def update_user(self, username, new_user=False, activation=False):
     # get user
     try:
         user = User.objects.select_related('profile').get(username=username)
-    except:
-        user = None
-
-    if not user or not user.profile:
+    except User.DoesNotExist:
         log.error("User not found during Sailthru update %s", username)
         return
 
@@ -100,10 +97,7 @@ def update_user_email(self, username, old_email):
     # get user
     try:
         user = User.objects.get(username=username)
-    except:
-        user = None
-
-    if not user:
+    except User.DoesNotExist:
         log.error("User not found duing Sailthru update %s", username)
         return
 
