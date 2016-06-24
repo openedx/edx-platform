@@ -46,7 +46,7 @@ from certificates.tests.factories import GeneratedCertificateFactory  # pylint: 
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 import shoppingcart  # pylint: disable=import-error
 from openedx.core.djangoapps.programs.tests.mixins import ProgramsApiConfigMixin
-from openedx.core.djangoapps.theming.test_util import with_is_edx_domain
+from openedx.core.djangoapps.theming.tests.test_util import with_is_edx_domain
 
 # Explicitly import the cache from ConfigurationModel so we can reset it after each test
 from config_models.models import cache
