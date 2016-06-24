@@ -47,6 +47,7 @@ def update_email_marketing_config(enabled=False, key='badkey', secret='badsecret
         sailthru_enroll_template='enroll_template',
         sailthru_upgrade_template='upgrade_template',
         sailthru_purchase_template='purchase_template',
+        sailthru_abandoned_cart_template='abandoned_template',
         sailthru_get_tags_from_sailthru=False
     )
 
@@ -154,6 +155,38 @@ class EmailMarketingTests(TestCase):
         update_user.delay(self.user.username)
         self.assertTrue(mock_log_error.called)
 
+        # force Sailthru API exception
+        mock_sailthru.side_effect = SailthruClientError
+        update_user.delay(self.user.username)
+        self.assertTrue(mock_log_error.called)
+
+        # force Sailthru API exception on 2nd call
+        mock_sailthru.side_effect = [None, SailthruClientError]
+        mock_sailthru.return_value = SailthruResponse(JsonResponse({'ok': True}))
+        update_user.delay(self.user.username)
+        self.assertTrue(mock_log_error.called)
+
+        # force Sailthru API error return on 2nd call
+        mock_sailthru.side_effect = None
+        mock_sailthru.return_value = [SailthruResponse(JsonResponse({'ok': True})),
+                                      SailthruResponse(JsonResponse({'error': 100, 'errormsg': 'Got an error'}))]
+        update_user.delay(self.user.username)
+        self.assertTrue(mock_log_error.called)
+
+    @patch('email_marketing.tasks.log.error')
+    @patch('email_marketing.tasks.SailthruClient.api_post')
+    def test_update_user_error_logging_bad_user(self, mock_sailthru, mock_log_error):
+        """
+        Test update_user with invalid user
+        """
+        update_user.delay('baduser')
+        self.assertTrue(mock_log_error.called)
+        self.assertFalse(mock_sailthru.called)
+
+        update_user_email.delay('baduser', 'aa@bb.com')
+        self.assertTrue(mock_log_error.called)
+        self.assertFalse(mock_sailthru.called)
+
     @patch('email_marketing.tasks.log.error')
     @patch('email_marketing.tasks.SailthruClient.api_post')
     def test_just_return_tasks(self, mock_sailthru, mock_log_error):
@@ -244,11 +277,13 @@ class EmailMarketingTests(TestCase):
         self.assertEquals(userparms['id'], "old@edx.org")
         self.assertEquals(userparms['keys']['email'], TEST_EMAIL)
 
+    @patch('email_marketing.tasks.log.error')
     @patch('email_marketing.tasks.SailthruClient.purchase')
     @patch('email_marketing.tasks.SailthruClient.api_get')
     @patch('email_marketing.tasks.SailthruClient.api_post')
     @patch('email_marketing.tasks.get_course_by_id')
-    def test_update_course_enrollment(self, mock_get_course, mock_sailthru_api_post, mock_sailthru_api_get, mock_sailthru_purchase):
+    def test_update_course_enrollment(self, mock_get_course, mock_sailthru_api_post,
+                                      mock_sailthru_api_get, mock_sailthru_purchase, mock_log_error):
         """
         test async method in task posts enrolls and purchases
         """
@@ -319,7 +354,7 @@ class EmailMarketingTests(TestCase):
                                                                 'title': 'Course ' + self.course_id_string + ' mode: verified',
                                                                 'url': self.course_url,
                                                                 'price': 4900, 'qty': 1, 'id': self.course_id_string + '-verified'}],
-                                                  options={},
+                                                  options={'reminder_template': 'abandoned_template', 'reminder_time': '+60 minutes'},
                                                   incomplete=1, message_id='cookie_bid')
 
         # test add purchase to cart
@@ -336,7 +371,7 @@ class EmailMarketingTests(TestCase):
                                                                 'title': 'Course ' + self.course_id_string + ' mode: honor',
                                                                 'url': self.course_url,
                                                                 'price': 4900, 'qty': 1, 'id': self.course_id_string + '-honor'}],
-                                                  options={},
+                                                  options={'reminder_template': 'abandoned_template', 'reminder_time': '+60 minutes'},
                                                   incomplete=1, message_id='cookie_bid')
 
         # test purchase complete
@@ -372,6 +407,30 @@ class EmailMarketingTests(TestCase):
                                                                 'price': 9900, 'qty': 1, 'id': self.course_id_string + '-verified'}],
                                                   options={'send_template': 'upgrade_template'},
                                                   incomplete=None, message_id='cookie_bid')
+
+        # test purchase API error
+        mock_sailthru_purchase.return_value = SailthruResponse(JsonResponse({'error': 100, 'errormsg': 'Got an error'}))
+        update_course_enrollment.delay(TEST_EMAIL,
+                                       self.course_url,
+                                       EnrollStatusChange.upgrade_complete,
+                                       'verified',
+                                       course_id=self.course_id,
+                                       currency='USD',
+                                       message_id='cookie_bid',
+                                       unit_cost=99)
+        self.assertTrue(mock_log_error.called)
+
+        # test purchase API exception
+        mock_sailthru_purchase.side_effect = SailthruClientError
+        update_course_enrollment.delay(TEST_EMAIL,
+                                       self.course_url,
+                                       EnrollStatusChange.upgrade_complete,
+                                       'verified',
+                                       course_id=self.course_id,
+                                       currency='USD',
+                                       message_id='cookie_bid',
+                                       unit_cost=99)
+        self.assertTrue(mock_log_error.called)
 
     @patch('email_marketing.tasks.SailthruClient')
     def test_get_course_content(self, mock_sailthru_client):
@@ -448,6 +507,10 @@ class EmailMarketingTests(TestCase):
         Ensure that error returned from Sailthru api is logged
         """
         mock_sailthru.return_value = SailthruResponse(JsonResponse({'error': 100, 'errormsg': 'Got an error'}))
+        update_user_email.delay(self.user.username, "newemail2@test.com")
+        self.assertTrue(mock_log_error.called)
+
+        mock_sailthru.side_effect = SailthruClientError
         update_user_email.delay(self.user.username, "newemail2@test.com")
         self.assertTrue(mock_log_error.called)
 

@@ -35,16 +35,17 @@ def update_user(self, username, new_user=False, activation=False):
         return
 
     # get user
-    user = User.objects.select_related('profile').get(username=username)
-    if not user:
+    try:
+        user = User.objects.select_related('profile').get(username=username)
+    except:
+        user = None
+
+    if not user or not user.profile:
         log.error("User not found during Sailthru update %s", username)
         return
 
     # get profile
     profile = user.profile
-    if not profile:
-        log.error("User profile not found during Sailthru update %s", username)
-        return
 
     sailthru_client = SailthruClient(email_config.sailthru_key, email_config.sailthru_secret)
     try:
@@ -97,7 +98,11 @@ def update_user_email(self, username, old_email):
         return
 
     # get user
-    user = User.objects.get(username=username)
+    try:
+        user = User.objects.get(username=username)
+    except:
+        user = None
+
     if not user:
         log.error("User not found duing Sailthru update %s", username)
         return
