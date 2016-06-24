@@ -15,6 +15,7 @@ from openedx.core.djangoapps.content.course_overviews.models import CourseOvervi
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.lib.edx_api_utils import get_edx_api_data
 from student.models import CourseEnrollment
+from util.organizations_helpers import get_organization_by_short_name
 from xmodule.course_metadata_utils import DEFAULT_START_DATE
 
 
@@ -327,6 +328,13 @@ def supplement_program_data(program_data, user):
         program_data (dict): Representation of a program.
         user (User): The user whose enrollments to inspect.
     """
+    for organization in program_data['organizations']:
+        # TODO cache the results of the get_organization_by_short_name call
+        # so we don't have to hit database that frequently
+        org_obj = get_organization_by_short_name(organization['key'])
+        if org_obj and org_obj.get('logo'):
+            organization['img'] = org_obj['logo'].url
+
     for course_code in program_data['course_codes']:
         for run_mode in course_code['run_modes']:
             course_key = CourseKey.from_string(run_mode['course_key'])
