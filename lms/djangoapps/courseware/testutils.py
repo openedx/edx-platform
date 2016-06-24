@@ -8,6 +8,7 @@ import ddt
 from mock import patch
 from urllib import urlencode
 
+from lms.djangoapps.courseware.field_overrides import OverrideModulestoreFieldData
 from lms.djangoapps.courseware.url_helpers import get_redirect_url
 from student.tests.factories import AdminFactory, UserFactory, CourseEnrollmentFactory
 from xmodule.modulestore import ModuleStoreEnum
@@ -197,3 +198,16 @@ class RenderXBlockTestMixin(object):
         self.setup_course()
         self.setup_user(admin=False, enroll=True, login=True)
         self.verify_response(url_params={'view': 'author_view'}, expected_response_code=400)
+
+
+class FieldOverrideTestMixin(object):
+    """
+    A Mixin helper class for classes that test Field Overrides.
+    """
+    def setUp(self):
+        super(FieldOverrideTestMixin, self).setUp()
+        OverrideModulestoreFieldData.provider_classes = None
+
+    def tearDown(self):
+        super(FieldOverrideTestMixin, self).tearDown()
+        OverrideModulestoreFieldData.provider_classes = None

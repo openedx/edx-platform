@@ -38,6 +38,7 @@ from instructor.views.api import require_global_staff
 import shoppingcart
 import survey.utils
 import survey.views
+from lms.djangoapps.ccx.utils import prep_course_for_grading
 from certificates import api as certs_api
 from openedx.core.djangoapps.models.course_details import CourseDetails
 from commerce.utils import EcommerceService
@@ -681,6 +682,7 @@ def _progress(request, course_key, student_id):
             raise Http404
 
     course = get_course_with_access(request.user, 'load', course_key, depth=None, check_if_enrolled=True)
+    prep_course_for_grading(course, request)
 
     # check to see if there is a required survey that must be taken before
     # the user can access the course.
@@ -714,16 +716,8 @@ def _progress(request, course_key, student_id):
     # additional DB lookup (this kills the Progress page in particular).
     student = User.objects.prefetch_related("groups").get(id=student.id)
 
-    with outer_atomic():
-        field_data_cache = grades.field_data_cache_for_grading(course, student)
-        scores_client = ScoresClient.from_field_data_cache(field_data_cache)
-
-    courseware_summary = grades.progress_summary(
-        student, request, course, field_data_cache=field_data_cache, scores_client=scores_client
-    )
-    grade_summary = grades.grade(
-        student, request, course, field_data_cache=field_data_cache, scores_client=scores_client
-    )
+    courseware_summary = grades.progress_summary(student, course)
+    grade_summary = grades.grade(student, course)
     studio_url = get_studio_url(course, 'settings/grading')
 
     if courseware_summary is None:
@@ -1056,7 +1050,7 @@ def is_course_passed(course, grade_summary=None, student=None, request=None):
     success_cutoff = min(nonzero_cutoffs) if nonzero_cutoffs else None
 
     if grade_summary is None:
-        grade_summary = grades.grade(student, request, course)
+        grade_summary = grades.grade(student, course)
 
     return success_cutoff and grade_summary['percent'] >= success_cutoff
 

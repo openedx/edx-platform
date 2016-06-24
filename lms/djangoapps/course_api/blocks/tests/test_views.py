@@ -8,7 +8,6 @@ from urllib import urlencode
 from urlparse import urlunparse
 
 from opaque_keys.edx.locator import CourseLocator
-from openedx.core.djangoapps.content.block_structure.tests.helpers import EnableTransformerRegistryMixin
 from student.models import CourseEnrollment
 from student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
@@ -17,7 +16,7 @@ from xmodule.modulestore.tests.factories import ToyCourseFactory
 from .helpers import deserialize_usage_key
 
 
-class TestBlocksView(EnableTransformerRegistryMixin, SharedModuleStoreTestCase):
+class TestBlocksView(SharedModuleStoreTestCase):
     """
     Test class for BlocksView
     """

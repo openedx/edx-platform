@@ -218,7 +218,7 @@ class ModuleStoreIsolationMixin(CacheIsolationMixin):
 
     MODULESTORE = functools.partial(mixed_store_config, mkdtemp_clean(), {})
     CONTENTSTORE = functools.partial(contentstore_config)
-    ENABLED_CACHES = ['mongo_metadata_inheritance', 'loc_cache']
+    ENABLED_CACHES = ['default', 'mongo_metadata_inheritance', 'loc_cache']
     __settings_overrides = []
     __old_modulestores = []
     __old_contentstores = []
