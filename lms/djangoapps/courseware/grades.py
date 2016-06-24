@@ -357,13 +357,13 @@ def answer_distributions(course_key):
     return answer_counts
 
 
-def grade(student, course, keep_raw_scores=False):
+def grade(student, course, keep_raw_scores=False, course_structure=None):
     """
     Returns the grade of the student.
 
     Also sends a signal to update the minimum grade requirement status.
     """
-    grade_summary = _grade(student, course, keep_raw_scores)
+    grade_summary = _grade(student, course, keep_raw_scores, course_structure)
     responses = GRADES_UPDATED.send_robust(
         sender=None,
         username=student.username,
@@ -378,7 +378,7 @@ def grade(student, course, keep_raw_scores=False):
     return grade_summary
 
 
-def _grade(student, course, keep_raw_scores):
+def _grade(student, course, keep_raw_scores, course_structure=None):
     """
     Unwrapped version of "grade"
 
@@ -392,7 +392,8 @@ def _grade(student, course, keep_raw_scores):
 
     More information on the format is in the docstring for CourseGrader.
     """
-    course_structure = get_course_blocks(student, course.location)
+    if course_structure is None:
+        course_structure = get_course_blocks(student, course.location)
     grading_context_result = grading_context(course_structure)
     scorable_locations = [block.location for block in grading_context_result['all_graded_blocks']]
 
@@ -559,12 +560,12 @@ def grade_for_percentage(grade_cutoffs, percentage):
     return letter_grade
 
 
-def progress_summary(student, course):
+def progress_summary(student, course, course_structure=None):
     """
     Returns progress summary for all chapters in the course.
     """
 
-    progress = _progress_summary(student, course)
+    progress = _progress_summary(student, course, course_structure)
     if progress:
         return progress.chapters
     else:
@@ -579,7 +580,7 @@ def get_weighted_scores(student, course):
     return _progress_summary(student, course)
 
 
-def _progress_summary(student, course):
+def _progress_summary(student, course, course_structure=None):
     """
     Unwrapped version of "progress_summary".
 
@@ -598,7 +599,8 @@ def _progress_summary(student, course):
         course: A Descriptor containing the course to grade
 
     """
-    course_structure = get_course_blocks(student, course.location)
+    if course_structure is None:
+        course_structure = get_course_blocks(student, course.location)
     if not len(course_structure):
         return None
     scorable_locations = [block_key for block_key in course_structure if possibly_scored(block_key)]
