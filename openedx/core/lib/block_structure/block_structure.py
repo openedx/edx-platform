@@ -8,7 +8,6 @@ The following internal data structures are implemented:
     _BlockRelations - Data structure for a single block's relations.
     _BlockData - Data structure for a single block's data.
 """
-from collections import defaultdict
 from logging import getLogger
 
 from openedx.core.lib.graph_traversals import traverse_topologically, traverse_post_order
@@ -58,8 +57,8 @@ class BlockStructure(object):
         # Map of a block's usage key to its block relations. The
         # existence of a block in the structure is determined by its
         # presence in this map.
-        # defaultdict {UsageKey: _BlockRelations}
-        self._block_relations = defaultdict(_BlockRelations)
+        # dict {UsageKey: _BlockRelations}
+        self._block_relations = {}
 
         # Add the root block.
         self._add_block(self._block_relations, root_block_usage_key)
@@ -207,7 +206,7 @@ class BlockStructure(object):
 
         # Create a new block relations map to store only those blocks
         # that are still linked
-        pruned_block_relations = defaultdict(_BlockRelations)
+        pruned_block_relations = {}
         old_block_relations = self._block_relations
 
         # Build the structure from the leaves up by doing a post-order
@@ -245,7 +244,7 @@ class BlockStructure(object):
         relations map.
 
         Arguments:
-            block_relations (defaultdict({UsageKey: _BlockRelations})) -
+            block_relations (dict({UsageKey: _BlockRelations})) -
                 Internal map of a block's usage key to its
                 parents/children relations.
 
@@ -253,6 +252,9 @@ class BlockStructure(object):
 
             child_key (UsageKey) - Usage key of the child block.
         """
+        BlockStructure._add_block(block_relations, parent_key)
+        BlockStructure._add_block(block_relations, child_key)
+
         block_relations[child_key].parents.append(parent_key)
         block_relations[parent_key].children.append(child_key)
 
@@ -262,14 +264,15 @@ class BlockStructure(object):
         Adds the given usage_key to the given block_relations map.
 
         Arguments:
-            block_relations (defaultdict({UsageKey: _BlockRelations})) -
+            block_relations (dict({UsageKey: _BlockRelations})) -
                 Internal map of a block's usage key to its
                 parents/children relations.
 
             usage_key (UsageKey) - Usage key of the block that is to
                 be added to the given block_relations.
         """
-        block_relations[usage_key] = _BlockRelations()
+        if usage_key not in block_relations:
+            block_relations[usage_key] = _BlockRelations()
 
 
 class FieldData(object):
