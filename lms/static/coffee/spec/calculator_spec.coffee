@@ -105,7 +105,7 @@ describe 'Calculator', ->
 
       expect(element.focus).toHaveBeenCalled()
       expect(@calculator.activeHint).toEqual(element)
-      expect(@calculator.hintPopup).toHaveAttr('aria-activedescendant', element.attr('id'))
+      expect(@calculator.hintPopup).toHaveAttr('data-calculator-hint', element.attr('id'))
 
     it 'select the first hint if argument element is not passed', ->
           @calculator.selectHint()
