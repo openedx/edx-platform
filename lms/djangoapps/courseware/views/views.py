@@ -40,6 +40,7 @@ import survey.utils
 import survey.views
 from lms.djangoapps.ccx.utils import prep_course_for_grading
 from certificates import api as certs_api
+from course_blocks.api import get_course_blocks
 from openedx.core.djangoapps.models.course_details import CourseDetails
 from commerce.utils import EcommerceService
 from enrollment.api import add_enrollment
@@ -715,6 +716,9 @@ def _progress(request, course_key, student_id):
     # The pre-fetching of groups is done to make auth checks not require an
     # additional DB lookup (this kills the Progress page in particular).
     student = User.objects.prefetch_related("groups").get(id=student.id)
+
+    # Fetch course blocks once for performance reasons
+    course.structure = get_course_blocks(student, course.location)
 
     courseware_summary = grades.progress_summary(student, course)
     grade_summary = grades.grade(student, course)
