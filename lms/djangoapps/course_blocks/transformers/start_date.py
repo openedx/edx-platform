@@ -26,6 +26,7 @@ class StartDateTransformer(BlockStructureTransformer):
     """
     VERSION = 1
     MERGED_START_DATE = 'merged_start_date'
+    TRANSFORM_TYPE = 'simple_remove'
 
     @classmethod
     def name(cls):
@@ -91,11 +92,29 @@ class StartDateTransformer(BlockStructureTransformer):
         if usage_info.has_staff_access:
             return
 
-        block_structure.remove_block_if(
-            lambda block_key: not check_start_date(
-                usage_info.user,
-                block_structure.get_xblock_field(block_key, 'days_early_for_beta'),
-                self.get_merged_start_date(block_structure, block_key),
-                usage_info.course_key,
-            )
-        )
+        block_structure.remove_block_if(self.optimized_transform_lambda(usage_info, block_structure)['filter'])
+
+    def optimized_transform_prep(self, usage_info, block_structure):
+        """
+        No prep work to be done.
+        """
+        return {}
+
+    def optimized_transform_lambda(self, usage_info, block_structure, **kwargs):
+        """
+        Filter by check_start_date, if applicable
+        """
+        # Users with staff access bypass the Start Date check.
+        if usage_info.has_staff_access:
+            return [{}]
+
+        return [
+            {
+                'filter': lambda block_key: not check_start_date(
+                    usage_info.user,
+                    block_structure.get_xblock_field(block_key, 'days_early_for_beta'),
+                    self.get_merged_start_date(block_structure, block_key),
+                    usage_info.course_key,
+                )
+            }
+        ]

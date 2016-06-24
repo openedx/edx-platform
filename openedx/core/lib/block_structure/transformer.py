@@ -28,6 +28,9 @@ class BlockStructureTransformer(object):
     #
     VERSION = 0
 
+    # Transformers are by default complex. If not, repeated transform() calls can be optimized.
+    TRANSFORM_TYPE='complex'
+
     @classmethod
     def name(cls):
         """

@@ -20,6 +20,7 @@ class SplitTestTransformer(BlockStructureTransformer):
     'group_access' fields.
     """
     VERSION = 1
+    TRANSFORM_TYPE = 'simple_remove'
 
     @classmethod
     def name(cls):
@@ -75,7 +76,25 @@ class SplitTestTransformer(BlockStructureTransformer):
 
         # The UserPartitionTransformer will enforce group access, so
         # go ahead and remove all extraneous split_test modules.
+        remove_data = self.optimized_transform_lambda(usage_info, block_structure)
         block_structure.remove_block_if(
-            lambda block_key: block_key.block_type == 'split_test',
-            keep_descendants=True,
+            remove_data['filter'],
+            keep_descendants=remove_data['keep_descendants']
         )
+
+    def optimized_transform_prep(self, usage_info, block_structure):
+        """
+        No prep work to be done.
+        """
+        return {}
+
+    def optimized_transform_lambda(self, usage_info, block_structure, **kwargs):
+        """
+        Filter out split_test modules, and keep descendants.
+        """
+        return [
+            {
+                'filter': lambda block_key: block_key.block_type == 'split_test',
+                'keep_descendants': True
+            }
+        ]
