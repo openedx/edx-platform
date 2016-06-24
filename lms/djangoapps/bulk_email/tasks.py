@@ -389,7 +389,7 @@ def _get_source_address(course_id, course_title, truncate=True):
             course_title=course_title_no_quotes,
             course_name=course_name,
             from_email=theming_helpers.get_value(
-                'bulk_email_default_from_email',
+                'email_from_address',
                 settings.BULK_EMAIL_DEFAULT_FROM_EMAIL
             )
         )
