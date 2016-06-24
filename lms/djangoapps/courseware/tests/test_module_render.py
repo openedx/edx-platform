@@ -59,6 +59,7 @@ from openedx.core.djangoapps.credit.api import (
     set_credit_requirements,
     set_credit_requirement_status
 )
+from xblock_django.models import XBlockConfiguration
 
 from edx_proctoring.api import (
     create_exam,
@@ -2232,7 +2233,22 @@ class TestDisabledXBlockTypes(ModuleStoreTestCase):
     def test_get_item(self, default_ms):
         with self.store.default_store(default_ms):
             course = CourseFactory()
-            for block_type in ('video',):
-                item = ItemFactory(category=block_type, parent=course)
-                item = self.store.get_item(item.scope_ids.usage_id)
-                self.assertEqual(item.__class__.__name__, 'RawDescriptorWithMixins')
+            self._verify_descriptor('video', course, 'RawDescriptorWithMixins')
+
+    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    def test_dynamic_updates(self, default_ms):
+        """Tests that the list of disabled xblocks can dynamically update."""
+        with self.store.default_store(default_ms):
+            course = CourseFactory()
+            self._verify_descriptor('problem', course, 'CapaDescriptorWithMixins')
+            XBlockConfiguration(name='problem', enabled=False).save()
+            self._verify_descriptor('problem', course, 'RawDescriptorWithMixins')
+
+    def _verify_descriptor(self, category, course, descriptor):
+        """
+        Helper method that gets an item with the specified category from the
+        modulestore and verifies that it has the expected descriptor name.
+        """
+        item = ItemFactory(category=category, parent=course)
+        item = self.store.get_item(item.scope_ids.usage_id)
+        self.assertEqual(item.__class__.__name__, descriptor)
