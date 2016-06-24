@@ -12,10 +12,6 @@ from openedx.core.lib.django_startup import autostartup
 import edxmako
 import logging
 import analytics
-from monkey_patch import (
-    third_party_auth,
-    django_db_models_options
-)
 
 import xmodule.x_module
 import lms_xblock.runtime
@@ -30,7 +26,9 @@ def run():
     """
     Executed during django startup
     """
-    third_party_auth.patch()
+    django.setup()
+
+    from monkey_patch import django_db_models_options
     django_db_models_options.patch()
 
     # To override the settings before executing the autostartup() for python-social-auth
@@ -46,8 +44,6 @@ def run():
     # and one of them (django templates), requires the directories be added
     # before the django.setup().
     microsite.enable_microsites_pre_startup(log)
-
-    django.setup()
 
     autostartup()
 

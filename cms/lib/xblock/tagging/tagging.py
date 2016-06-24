@@ -11,7 +11,6 @@ from xmodule.capa_module import CapaModule
 from edxmako.shortcuts import render_to_string
 from django.conf import settings
 from webob import Response
-from .models import TagCategories
 
 
 _ = lambda text: text
@@ -29,6 +28,7 @@ class StructuredTagsAside(XBlockAside):
         """
         Return available tags
         """
+        from .models import TagCategories
         return TagCategories.objects.all()
 
     def _get_studio_resource_url(self, relative_url):

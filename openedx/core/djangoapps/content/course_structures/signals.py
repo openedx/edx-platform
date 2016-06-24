@@ -5,8 +5,6 @@ from django.dispatch.dispatcher import receiver
 
 from xmodule.modulestore.django import SignalHandler
 
-from .models import CourseStructure
-
 
 @receiver(SignalHandler.course_published)
 def listen_for_course_publish(sender, course_key, **kwargs):  # pylint: disable=unused-argument
@@ -15,6 +13,8 @@ def listen_for_course_publish(sender, course_key, **kwargs):  # pylint: disable=
     """
     # Import tasks here to avoid a circular import.
     from .tasks import update_course_structure
+
+    from .models import CourseStructure
 
     # Delete the existing discussion id map cache to avoid inconsistencies
     try:

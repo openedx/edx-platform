@@ -1,9 +1,8 @@
 """
 Support for converting a django user to an XBlock user
 """
-from django.contrib.auth.models import User
 from opaque_keys.edx.keys import CourseKey
-from xblock.reference.user_service import XBlockUser, UserService
+from xblock.reference.user_service import UserService
 from student.models import anonymous_id_for_user, get_user_by_username_or_email
 
 ATTR_KEY_IS_AUTHENTICATED = 'edx-platform.is_authenticated'
@@ -43,6 +42,7 @@ class DjangoXBlockUserService(UserService):
         if not self.get_current_user().opt_attrs.get(ATTR_KEY_USER_IS_STAFF):
             return None
 
+        from django.contrib.auth.models import User
         try:
             user = get_user_by_username_or_email(username_or_email=username)
         except User.DoesNotExist:
@@ -55,6 +55,7 @@ class DjangoXBlockUserService(UserService):
         """
         A function that returns an XBlockUser from the current Django request.user
         """
+        from xblock.reference.user_service import XBlockUser
         xblock_user = XBlockUser(is_current_user=True)
 
         if django_user is not None and django_user.is_authenticated():

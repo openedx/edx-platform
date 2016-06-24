@@ -10,12 +10,12 @@ import shutil
 import tarfile
 from path import Path as path
 from tempfile import mkdtemp
+from wsgiref.util import FileWrapper
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import SuspiciousOperation, PermissionDenied
 from django.core.files.temp import NamedTemporaryFile
-from django.core.servers.basehttp import FileWrapper
 from django.http import HttpResponse, HttpResponseNotFound, Http404
 from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import ensure_csrf_cookie
