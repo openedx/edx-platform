@@ -4,7 +4,6 @@
 ### Files private to developers
 
 requirements/private.txt
-lms/envs/private.py
 cms/envs/private.py
 
 ### Python artifacts
