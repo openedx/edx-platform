@@ -1223,7 +1223,7 @@ msgstr "当前为纯文本粘贴模式，所有内容都将以纯文本形式粘
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Paste row after"
-msgstr "在上方粘贴行"
+msgstr "在下方粘贴行"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -1498,7 +1498,7 @@ msgstr "要显示的文字"
 msgid ""
 "The URL you entered seems to be an email address. Do you want to add the "
 "required mailto: prefix?"
-msgstr "输入的URL似乎是一个电子邮件地址，需要加上“mailto:”前缀吗？"
+msgstr "输入的URL似乎是一个电子邮件地址，您想加上必要的“mailto:”前缀吗？"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -1506,7 +1506,7 @@ msgstr "输入的URL似乎是一个电子邮件地址，需要加上“mailto:�
 msgid ""
 "The URL you entered seems to be an external link. Do you want to add the "
 "required http:// prefix?"
-msgstr "输入的 URL 似乎是一个外部链接，需要加上“http://”前缀吗？"
+msgstr "输入的 URL 似乎是一个外部链接，您想加上必要的 http:// 前缀吗？"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -1524,7 +1524,7 @@ msgstr "工具"
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Top"
-msgstr "顶端对齐"
+msgstr "顶端"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -1622,7 +1622,7 @@ msgid ""
 "\n"
 "Click Cancel to return to this page without sending your information."
 msgstr ""
-"单击确定，将你的用户名和电子邮件地址发送给第三方应用程序。\n"
+"单击确定，将您的用户名和电子邮件地址发送给第三方应用程序。\n"
 "\n"
 "单击取消，取消发送信息并返回本页。"
 
@@ -1632,7 +1632,7 @@ msgid ""
 "\n"
 "Click Cancel to return to this page without sending your information."
 msgstr ""
-"单击确定，将你的用户名向第3方应用程序发送邮件。\n"
+"单击确定，将您的用户名发送给第3方应用程序。\n"
 "\n"
 "单击取消，取消发送信息并返回本页。"
 
@@ -1708,12 +1708,12 @@ msgstr "取消静音"
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 #: common/lib/xmodule/xmodule/js/src/video/04_video_full_screen.js
 msgid "Exit full browser"
-msgstr "退出全屏浏览器"
+msgstr "退出全屏"
 
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 #: common/lib/xmodule/xmodule/js/src/video/04_video_full_screen.js
 msgid "Fill browser"
-msgstr "全屏显示"
+msgstr "全屏"
 
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 #: common/lib/xmodule/xmodule/js/src/video/08_video_speed_control.js
@@ -1748,12 +1748,12 @@ msgstr "平均"
 #. Translators: Volume level in range ]60,80]%
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 msgid "Loud"
-msgstr "大声"
+msgstr "音量高"
 
 #. Translators: Volume level in range ]80,99]%
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 msgid "Very loud"
-msgstr "很大"
+msgstr "音量很高"
 
 #. Translators: Volume level equals 100%.
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
@@ -1763,7 +1763,7 @@ msgstr "最大数值"
 #: common/lib/xmodule/xmodule/js/src/video/02_html5_video.js
 msgid ""
 "VideoPlayer: Element corresponding to the given selector was not found."
-msgstr "视频播放器：未找到与给定选择子对应的元素。"
+msgstr "视频播放器：未找到与给定选择对应的元素。"
 
 #: common/lib/xmodule/xmodule/js/src/video/02_html5_video.js
 msgid "This browser cannot play .mp4, .ogg, or .webm files."
@@ -1843,7 +1843,7 @@ msgstr "播放视频"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_skip_control.js
 msgid "Do not show again"
-msgstr "不在显示"
+msgstr "不再显示"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "Open language menu"
@@ -1851,7 +1851,7 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "Transcript will be displayed when you start playing the video."
-msgstr "当你开始播放视频时将显示成绩单。"
+msgstr "当你开始播放视频时将显示字幕。"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid ""
@@ -1861,7 +1861,7 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "Video transcript"
-msgstr "视频成绩单"
+msgstr "视频字幕"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "Start of transcript. Skip to the end."
@@ -1880,7 +1880,7 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "Open language menu."
-msgstr "打开语言菜单。"
+msgstr "打开语言功能菜单。"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "Hide closed captions"
@@ -1888,7 +1888,7 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "(Caption will be displayed when you start playing the video.)"
-msgstr "(当视频开始拨放时标题将会显示)"
+msgstr "(当视频开始播放时将显示字幕)"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "Turn on closed captioning"
@@ -1917,7 +1917,7 @@ msgstr "显示讨论"
 #: common/static/coffee/src/discussion/views/discussion_user_profile_view.js
 #: common/static/coffee/src/discussion/views/response_comment_view.js
 msgid "Sorry"
-msgstr "很抱歉"
+msgstr "抱歉"
 
 #: common/static/coffee/src/discussion/discussion_module_view.js
 msgid "We had some trouble loading the discussion. Please try again."
@@ -2000,7 +2000,7 @@ msgstr "取消置顶这个帖子时出现了一些问题，请重试。"
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
 msgid ""
 "We had some trouble removing your flag on this post.  Please try again."
-msgstr "移除这个帖子的报告旗帜时出现了一些问题，请重试。"
+msgstr "移除这个帖子的标记时出现了一些问题，请重试。"
 
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
 msgid "We had some trouble reporting this post.  Please try again."
@@ -2054,7 +2054,7 @@ msgstr "未找到与 %(original_query)s 匹配的结果。显示的是查找 %(s
 
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
 msgid "No threads matched your query."
-msgstr "未找到匹配的结果"
+msgstr "未找到匹配的帖子"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
 msgid "Show posts by %(username)s."
@@ -2063,7 +2063,7 @@ msgstr "按 %(username)s 显示帖子"
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
 msgid ""
 "The thread you selected has been deleted. Please select another thread."
-msgstr "你选中的主题已被删除，请选择其他主题。"
+msgstr "您选中的主题已被删除，请选择其他主题。"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
 msgid "We had some trouble loading responses. Please reload the page."
@@ -2071,7 +2071,7 @@ msgstr "载入回复时遇到麻烦，请重试。"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
 msgid "We had some trouble loading more responses. Please try again."
-msgstr "载入回复时遇到麻烦，请重试。"
+msgstr "载入更多回复时遇到麻烦，请重试。"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
 msgid "%(numResponses)s other response"
@@ -2098,7 +2098,7 @@ msgstr "载入所有的回复"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
 msgid "Load next %(numResponses)s responses"
-msgstr "加载下面的%(numResponses)s条回复"
+msgstr "加载接下来的%(numResponses)s条回复"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
 msgid "Are you sure you want to delete this post?"
@@ -2118,7 +2118,7 @@ msgstr "匿名"
 
 #: common/static/coffee/src/discussion/views/response_comment_view.js
 msgid "Are you sure you want to delete this comment?"
-msgstr "你确定要删除这条评论吗？"
+msgstr "您确定要删除这条评论吗？"
 
 #: common/static/coffee/src/discussion/views/response_comment_view.js
 msgid "We had some trouble deleting this comment. Please try again."
@@ -2126,7 +2126,7 @@ msgstr "在删除这条评论时出错，请再试一遍。"
 
 #: common/static/coffee/src/discussion/views/thread_response_view.js
 msgid "Are you sure you want to delete this response?"
-msgstr "你确定要删除这个回复吗"
+msgstr "您确定要删除这个回复吗"
 
 #: common/static/common/js/components/utils/view_utils.js
 msgid "Required field."
@@ -2143,13 +2143,13 @@ msgstr ""
 #: common/static/common/js/components/views/paginated_view.js
 #: common/static/common/js/components/views/paging_footer.js
 msgid "Pagination"
-msgstr "分页"
+msgstr "页码"
 
 #: common/static/common/js/components/views/paginated_view.js
 msgid ""
 "Your request could not be completed. Reload the page and try again. If the "
 "issue persists, click the Help tab to report the problem."
-msgstr "你的请求无法完成。重新加载页面并重试。如果问题仍然存在，则单击“帮助”选项卡报告问题。"
+msgstr "您的请求无法完成。重新加载页面并重试。如果问题仍然存在，点击“帮助”选项报告问题。"
 
 #: common/static/common/js/components/views/paging_header.js
 msgid "Showing %(first_index)s out of %(num_items)s total"
@@ -2249,7 +2249,7 @@ msgstr "大约一个月"
 #, c-format
 msgid "%d month"
 msgid_plural "%d months"
-msgstr[0] "%d 月"
+msgstr[0] "%d 个月"
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "about a year"
@@ -2299,7 +2299,7 @@ msgstr "我的笔记"
 
 #: common/static/js/vendor/ova/catch/js/catch.js
 msgid "Instructor"
-msgstr "主讲教师"
+msgstr "教师"
 
 #: common/static/js/vendor/ova/catch/js/catch.js
 msgid "Public"
@@ -2358,32 +2358,32 @@ msgstr "标签："
 #. report
 #: common/static/js/vendor/ova/flagging-annotator.js
 msgid "Check the box to remove all flags."
-msgstr "查看信息栏以移除所有标记"
+msgstr "选中此选框以移除所有标记"
 
 #. Translators: 'totalFlags' is the number of flags solely for that annotation
 #: common/static/js/vendor/ova/flagging-annotator.js
 msgid "Check the box to remove %(totalFlags)s flag."
 msgid_plural "Check the box to remove %(totalFlags)s flags."
-msgstr[0] "选中复选框以去除 %(totalFlags)s 个标记。"
+msgstr[0] "选中此选框以移除所有 %(totalFlags)s 个标记。"
 
 #. Translators: 'count' is the number of flags solely for that annotation that
 #. will be removed
 #: common/static/js/vendor/ova/flagging-annotator.js
 msgid "Check the box to remove %(count)s flag."
 msgid_plural "Check the box to remove %(count)s flags."
-msgstr[0] "选中复选框以去除 %(count)s 个标记。"
+msgstr[0] "选中此选框以移除 %(count)s 个标记。"
 
 #: common/static/js/vendor/ova/flagging-annotator.js
 msgid "All flags have been removed. To undo, uncheck the box."
-msgstr "所有标记已移除。取消选中信息框以撤销。"
+msgstr "所有标记已移除。取消选中此选框以撤销。"
 
 #: common/static/js/vendor/ova/flagging-annotator.js
 msgid "You have already reported this annotation."
-msgstr "您已经报告过了该批注。"
+msgstr "您已经报告过了此批注。"
 
 #: common/static/js/vendor/ova/flagging-annotator.js
 msgid "Report annotation as inappropriate or offensive."
-msgstr "报告不恰当的或具有攻击性的批注。"
+msgstr "报告此批注不恰当或具有攻击性。"
 
 #. Translators: 'count' is the number of flags solely for that annotation
 #: common/static/js/vendor/ova/flagging-annotator.js
@@ -2655,7 +2655,7 @@ msgstr ""
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid ""
 "Your request could not be completed due to a server problem. Reload the page"
-msgstr "由于服务器的问题，无法完成你的请求，请重新加载页面。"
+msgstr "由于服务器的问题，无法完成您的请求，请重新加载页面。"
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "Team Search"
@@ -2779,7 +2779,7 @@ msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
 msgid "Error generating student profile information. Please try again."
-msgstr "生成学生档案信息时出现错误，请重试。"
+msgstr "生成学生档案信息时发生错误，请重试。"
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
 #: lms/static/js/bookmarks/views/bookmarks_list.js
@@ -2790,7 +2790,7 @@ msgstr "正在加载"
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
 msgid "Error getting student list."
-msgstr "无法获取学生列表"
+msgstr "获取学生列表时发生错误"
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
 msgid "Error generating list of students who may enroll. Please try again."
@@ -2802,7 +2802,7 @@ msgstr "取得评分标准时错误。"
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
 msgid "Error generating grades. Please try again."
-msgstr "生成评分结果错误，请重试。"
+msgstr "生成评分结果时发生错误，请重试。"
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
 msgid "Error generating problem grade report. Please try again."
@@ -2851,7 +2851,7 @@ msgstr "错误：用户“<%= username %>”尚未激活他的账户，用户必
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Error: You cannot remove yourself from the Instructor group!"
-msgstr "错误：您不可以将自己从主讲教师组中删除。"
+msgstr "错误：您不可以将自己从教师组中删除。"
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Errors"
@@ -2912,7 +2912,7 @@ msgstr "成为beta测试者之前，需要创建并激活账户。"
 #. usernames) appears after this sentence;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Could not find users associated with the following identifiers:"
-msgstr "未能找到与以下ID关联的用户："
+msgstr "未能找到与以下识别码关联的用户："
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Reason field should not be left blank."
@@ -2920,7 +2920,7 @@ msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Error enrolling/unenrolling users."
-msgstr "用户选修／放弃选修时出错。"
+msgstr "用户选课／放弃选课时出错。"
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "The following email addresses and/or usernames are invalid:"
@@ -2928,31 +2928,31 @@ msgstr "以下电子邮件地址／用户名无效："
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Successfully enrolled and sent email to the following users:"
-msgstr "以下用户已成功选修，并向他们发送电子邮件："
+msgstr "以下用户已成功选课，并向他们发送电子邮件："
 
 #. Translators: A list of users appears after this sentence;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Successfully enrolled the following users:"
-msgstr "以下用户已经成功选修："
+msgstr "以下用户已经成功选课："
 
 #. Translators: A list of users appears after this sentence;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid ""
 "Successfully sent enrollment emails to the following users. They will be "
 "allowed to enroll once they register:"
-msgstr "选课邮件已发送至以下用户，他们注册后即可选课："
+msgstr "选课邮件已成功发送至以下用户，他们注册后即可选课："
 
 #. Translators: A list of users appears after this sentence;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "These users will be allowed to enroll once they register:"
-msgstr "这些用户一旦注册即可选修："
+msgstr "这些用户一旦注册即可选课："
 
 #. Translators: A list of users appears after this sentence;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid ""
 "Successfully sent enrollment emails to the following users. They will be "
 "enrolled once they register:"
-msgstr "选课邮件已发送至这些用户，他们注册后即已选课："
+msgstr "选课邮件已成功发送至这些用户，他们注册后即已选课："
 
 #. Translators: A list of users appears after this sentence;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
@@ -2977,7 +2977,7 @@ msgstr "以下用户已不再选修本课程："
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid ""
 "These users were not affiliated with the course so could not be unenrolled:"
-msgstr "这些用户并不属于本课程学员，因此无法放弃选修："
+msgstr "这些用户并不属于本课程学员，因此无法使其放弃选修："
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
 msgid "Your message must have a subject."
@@ -2991,11 +2991,11 @@ msgstr "您的消息不能为空。"
 msgid ""
 "There are invalid keywords in your email. Please check the following "
 "keywords and try again:"
-msgstr "你的邮件中含有非法关键词。请检查下列关键词并重试："
+msgstr "您的邮件中含有无效关键词。请检查下列关键词并重试："
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
 msgid "Your email was successfully queued for sending."
-msgstr "你的电子邮件已成功加入发送队列。"
+msgstr "您的电子邮件已成功加入发送队列。"
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
 msgid ""
@@ -3007,13 +3007,13 @@ msgstr "你准备向自己发送一封标题为“<%= subject %>”的邮件，�
 msgid ""
 "You are about to send an email titled '<%= subject %>' to everyone who is "
 "staff or instructor on this course. Is this OK?"
-msgstr "您准备向该课程的所有教员和主讲教师发送一封标题为“<%= subject %>”的邮件，确认吗？"
+msgstr "您准备向此课程的所有工作人员和教师发送一封标题为“<%= subject %>”的邮件，确认吗？"
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
 msgid ""
 "You are about to send an email titled '<%= subject %>' to ALL (everyone who "
 "is enrolled in this course as student, staff, or instructor). Is this OK?"
-msgstr "您即将向选修该课程的所有人(选课的学生、教员和主讲教师)发送一封标题为“<%= subject %>”的邮件，确认吗？"
+msgstr "您即将向此课程中的所有人(选课的学生、工作人员和教师)发送一封标题为“<%= subject %>”的邮件，确认吗？"
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
 msgid ""
@@ -3021,11 +3021,11 @@ msgid ""
 "classes, it may take up to an hour (or more, if other courses are "
 "simultaneously sending email) to send all emails."
 msgstr ""
-"你的电子邮件已成功加入发送队列。需要注意的是，对于大型课程，可能需要花费一小时以上(甚至更多，如果其他课程也在同时发送邮件)来发送所有邮件。"
+"您的电子邮件已成功加入发送队列。需要注意的是，对于选课人数多的课程，可能需要花费至多一小时(或者如果其他课程也在同时发送邮件)来发送所有邮件。"
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
 msgid "Error sending email."
-msgstr "发送电子邮件错误。"
+msgstr "发送电子邮件时出错。"
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
 msgid "There is no email history for this course."
@@ -3033,11 +3033,11 @@ msgstr "本课程尚无发送电子邮件记录。"
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
 msgid "There was an error obtaining email task history for this course."
-msgstr "获取该课程的邮件任务历史时发生错误。"
+msgstr "获取该课程的邮件任务历史记录时发生错误。"
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
 msgid "There was an error obtaining email content history for this course."
-msgstr "存在能获取该课程邮件历史内容的错误"
+msgstr "存在能获取该课程邮件内容历史记录的错误"
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid "Please enter a student email address or username."
@@ -3047,7 +3047,7 @@ msgstr "请输入学生的邮件地址或用户名。"
 msgid ""
 "Error getting student progress url for '<%= student_id %>'. Make sure that "
 "the student identifier is spelled correctly."
-msgstr "获取学生“<%= student_id %>”的进度 URL 时出错。请确认该学生的 ID 已正确拼写。"
+msgstr "获取学生“<%= student_id %>”的进度 URL 时出错。请确认该学生的 ID 拼写正确。"
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid "Please enter a problem location."
@@ -3057,7 +3057,7 @@ msgstr "请输入问题的位置。"
 msgid ""
 "Success! Problem attempts reset for problem '<%= problem_id %>' and student "
 "'<%= student_id %>'."
-msgstr "成功！问题“<%= problem_id %>”与学生“<%= student_id %>”的问题尝试次数重置了。"
+msgstr "成功！学生'<%= student_id %>'对问题'<%= problem_id %>'的尝试次数已重置。"
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid ""
@@ -3065,13 +3065,12 @@ msgid ""
 " '<%= student_id %>'. Make sure that the problem and student identifiers are"
 " complete and correct."
 msgstr ""
-"重置学生“<%= student_id %>”对问题“<%= problem_id %>”的尝试次数时出错。请确认该问题的 ID 及学生的 ID "
-"已正确拼写。"
+"重置学生'<%= problem_id %>'对问题 '<%= student_id %>'的尝试次数时出错。请确认该问题ID及学生ID 拼写正确。"
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid ""
 "Delete student '<%= student_id %>'s state on problem '<%= problem_id %>'?"
-msgstr "确认删除学生“<%= student_id %>”在问题“<%= problem_id %>”上的状态?"
+msgstr "确认删除学生'<%= student_id %>'在问题'<%= problem_id %>'上的状态?"
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid ""
@@ -3079,7 +3078,7 @@ msgid ""
 " %>'. Make sure that the problem and student identifiers are complete and "
 "correct."
 msgstr ""
-"删除学生“<%= student_id %>”在问题“<%= problem_id %>”上的状态时出错。请确认该问题的 ID 及学生的 ID "
+"删除学生'<%= student_id %>'在问题'<%= problem_id %>'上的状态时出错。请确认该问题的 ID 及学生的 ID "
 "是完整且正确的。"
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
@@ -3092,8 +3091,8 @@ msgid ""
 "'<%= student_id %>'. Click the 'Show Background Task History for Student' "
 "button to see the status of the task."
 msgstr ""
-"已启动对问题“<%= problem_id %>”和学生“<%= student_id %>”的重新评分任务。点击 '显示学生的背景任务历史' "
-"按钮来查看任务状态。"
+"已启动对问题'<%= problem_id %>'和学生 '<%= student_id "
+"%>'的重新评分任务。点击“显示学生的背景任务历史”按钮来查看任务状态。"
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid ""
@@ -3101,8 +3100,8 @@ msgid ""
 "'<%= student_id %>'. Make sure that the the problem and student identifiers "
 "are complete and correct."
 msgstr ""
-"为学生“<%= student_id %>”启动对问题“<%= problem_id %>”的重新评分任务时出错。请确认该问题的 ID 及学生的 ID "
-"是完整且正确的。"
+"为学生 '<%= student_id %>'启动对问题'<%= problem_id %>'的重新评分任务时出错。请确认该问题的 ID 及学生的 ID"
+" 是完整且正确的。"
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid ""
@@ -3110,7 +3109,7 @@ msgid ""
 "student_id %>'. Make sure that the problem and student identifiers are "
 "complete and correct."
 msgstr ""
-"在获取学生“<%= student_id %>”对问题“<%= problem_id %>”的任务历史时出错。请确认该问题的 ID 及学生的 ID "
+"在获取学生'<%= student_id %>'和问题'<%= problem_id %>'的任务历史时出错。请确认该问题的 ID 及学生的 ID "
 "是完整且正确的。"
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
@@ -3121,21 +3120,21 @@ msgstr "正在重置学生“{student_id}”的入学考试尝试次数。"
 msgid ""
 "Error resetting entrance exam attempts for student '{student_id}'. Make sure"
 " student identifier is correct."
-msgstr "重置学生“{student_id}”的入学考试尝试次数时出错了，请确认学生编号无误。"
+msgstr "重置学生'{student_id}'的入学考试尝试次数时出错了，请确认学生编号无误。"
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid ""
 "Started entrance exam rescore task for student '{student_id}'. Click the "
 "'Show Background Task History for Student' button to see the status of the "
 "task."
-msgstr "已启动为学生“{student_id}”重新计算入学考试分数的任务，请点击“为学生显示后台任务历史”按钮查看任务状态。"
+msgstr "已启动为学生'{student_id}'重新计算入学考试分数的任务，请点击“为学生显示后台任务历史”按钮查看任务状态。"
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid ""
 "Error starting a task to rescore entrance exam for student '{student_id}'. "
 "Make sure that entrance exam has problems in it and student identifier is "
 "correct."
-msgstr "为学生“{student_id}”开始运行重新计算入学考试分数的任务时出错了，请确认该入学考试中有题目并且学生编号无误。"
+msgstr "为学生'{student_id}'开始运行重新计算入学考试分数的任务时出错了，请确认该入学考试中有题目并且学生编号无误。"
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid "Enter a student's username or email address."
@@ -3145,33 +3144,33 @@ msgstr "输入学生的用户名或电子邮件地址。"
 msgid ""
 "Do you want to allow this student ('{student_id}') to skip the entrance "
 "exam?"
-msgstr "您是否允许该学生(“{student_id}”)跳过入学考试？"
+msgstr "您是否允许该学生('{student_id}')跳过入学考试？"
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid ""
 "An error occurred. Make sure that the student's username or email address is"
 " correct and try again."
-msgstr "发生了一个错误，请确认学生用户名或电子邮件地址正确后再试一次。"
+msgstr "发生了一个错误，请确认学生用户名或电子邮件地址正确并再次尝试。"
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid "Entrance exam state is being deleted for student '{student_id}'."
-msgstr "学生“{student_id}”的入学考试的状态已被删除。"
+msgstr "学生'{student_id}'的入学考试的状态已被删除。"
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid ""
 "Error deleting entrance exam state for student '{student_id}'. Make sure "
 "student identifier is correct."
-msgstr "删除学生“{student_id}”的入学考试状态时出错了，请确认学生编号无误。"
+msgstr "删除学生'{student_id}'的入学考试状态时出错了，请确认学生编号无误。"
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid ""
 "Error getting entrance exam task history for student '{student_id}'. Make "
 "sure student identifier is correct."
-msgstr "获取学生“{student_id}”的入学考试任务历史时出错了，请确认学生编号无误。"
+msgstr "获取学生'{student_id}'的入学考试任务历史时出错了，请确认学生编号无误。"
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid "Reset attempts for all students on problem '<%= problem_id %>'?"
-msgstr "确认重置所有学生在问题“<%= problem_id %>”的尝试次数？"
+msgstr "确认重置所有学生在问题'<%= problem_id %>'的尝试次数？"
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid ""
@@ -3185,28 +3184,28 @@ msgid ""
 "Error starting a task to reset attempts for all students on problem '<%= "
 "problem_id %>'. Make sure that the problem identifier is complete and "
 "correct."
-msgstr "启动重置所有学生在问题“<%= problem_id %>”上尝试次数的任务时出错。请确认该问题的 ID 是完整且正确的。"
+msgstr "启动重置所有学生在问题'<%= problem_id %>'上尝试次数的任务时出错。请确认该问题的 ID 是完整且正确的。"
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid "Rescore problem '<%= problem_id %>' for all students?"
-msgstr "确认对所有学生回答问题“<%= problem_id %>”重新评分？"
+msgstr "确认对所有学生回答问题'<%= problem_id %>'重新评分？"
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid ""
 "Successfully started task to rescore problem '<%= problem_id %>' for all "
 "students. Click the 'Show Background Task History for Problem' button to see"
 " the status of the task."
-msgstr "成功启动所有学生回答问题 “<%= problem_id %>”重新评分的任务。点击“显示问题的背景任务历史”按钮来查看任务状态。"
+msgstr "成功启动所有学生回答问题 '<%= problem_id %>'重新评分的任务。点击“显示问题的背景任务历史”按钮来查看任务状态。"
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid ""
 "Error starting a task to rescore problem '<%= problem_id %>'. Make sure that"
 " the problem identifier is complete and correct."
-msgstr "启动对问题“<%= problem_id %>”的重新评分任务时出错。请确认该问题的 ID 是完整且正确的。"
+msgstr "启动对问题'<%= problem_id %>'的重新评分任务时出错。请确认该问题的 ID 是完整且正确的。"
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid "Error listing task history for this student and problem."
-msgstr "列表显示该名学生与问题的任务历史时发生错误。"
+msgstr "显示此学生与问题的任务历史时发生错误。"
 
 #. Translators: a "Task" is a background process such as grading students or
 #. sending email
@@ -3270,7 +3269,7 @@ msgstr "获取邮件发生错误，请稍后重试。如问题持续发生，请
 
 #: lms/static/coffee/src/instructor_dashboard/util.js
 msgid "Subject"
-msgstr "科目"
+msgstr "标题"
 
 #: lms/static/coffee/src/instructor_dashboard/util.js
 msgid "Sent By"
@@ -3290,7 +3289,7 @@ msgstr "复制邮件至编辑器"
 
 #: lms/static/coffee/src/instructor_dashboard/util.js
 msgid "Subject:"
-msgstr "科目"
+msgstr "标题"
 
 #: lms/static/coffee/src/instructor_dashboard/util.js
 msgid "Sent By:"
@@ -3320,7 +3319,7 @@ msgstr "文件名"
 msgid ""
 "Links are generated on demand and expire within 5 minutes due to the "
 "sensitive nature of student information."
-msgstr "由于涉及学生的敏感信息，生成的链接将在5分钟后失效。"
+msgstr "由于包含涉及学生的敏感信息，生成的链接将在5分钟后失效。"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Insert Hyperlink"
@@ -3344,7 +3343,7 @@ msgstr "请提供链接的描述。"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Insert Image (upload file or type URL)"
-msgstr "插入图片 (上传文件或输入图片URL)"
+msgstr "插入图片 (上传文件或输入URL)"
 
 #: lms/static/js/Markdown.Editor.js
 msgid ""
@@ -3630,7 +3629,7 @@ msgstr ""
 
 #: lms/static/js/course_survey.js
 msgid "There has been an error processing your survey."
-msgstr "在处理你的调查的时候出现了一个错误。"
+msgstr "在处理您的调查时出现了一个错误。"
 
 #: lms/static/js/courseware/credit_progress.js
 #: lms/templates/discovery/facet.underscore
@@ -3648,7 +3647,7 @@ msgstr "您的捐款无法提交。"
 
 #: lms/static/js/dashboard/legacy.js
 msgid "An error occurred. Please try again later."
-msgstr "出现了未知错误，请稍后重试。"
+msgstr "出现了一个错误，请稍后重试。"
 
 #: lms/static/js/discovery/views/search_form.js
 #, c-format
@@ -3674,7 +3673,7 @@ msgstr "焦点采集器"
 msgid ""
 "An error has occurred. Make sure that you are connected to the Internet, and"
 " then try refreshing the page."
-msgstr "出现了一个错误。请确保你已联网，然后刷新页面。"
+msgstr "出现了一个错误。请确保您已联网，然后刷新页面。"
 
 #: lms/static/js/edxnotes/views/notes_visibility_factory.js
 msgid "Hide notes"
@@ -3699,7 +3698,7 @@ msgstr "请在 %(anchor_start)s 搜索字段%(anchor_end)s输入一个关键词�
 
 #: lms/static/js/edxnotes/views/tab_item.js
 msgid "Current tab"
-msgstr "当前选项"
+msgstr "当前标签"
 
 #: lms/static/js/edxnotes/views/tabs/course_structure.js
 msgid "Location in Course"
@@ -3711,7 +3710,7 @@ msgstr "近期活动"
 
 #: lms/static/js/edxnotes/views/tabs/search_results.js
 msgid "No results found for \"%(query_string)s\". Please try searching again."
-msgstr "未找到“%(query_string)s”。请重新搜索。"
+msgstr "未找到有关\"%(query_string)s\"的任何结果。请重新搜索。"
 
 #. Translators: this is a title shown before all Notes that have no associated
 #. tags. It is put within
@@ -3736,7 +3735,7 @@ msgstr ""
 #: lms/static/js/groups/views/cohort_form.js
 #: lms/static/js/groups/views/cohorts.js
 msgid "We've encountered an error. Refresh your browser and then try again."
-msgstr "我们遇到了一个错误。请刷新你的浏览器并重试。"
+msgstr "我们遇到了一个错误。请刷新您的浏览器并重试。"
 
 #: lms/static/js/groups/views/cohort_editor.js
 #: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
@@ -3837,7 +3836,7 @@ msgstr "上传文件并为学生分组"
 #: lms/static/js/groups/views/cohorts.js
 msgid ""
 "Your file '{file}' has been uploaded. Allow a few minutes for processing."
-msgstr "你的文件“{file}”已经上传。需要几分钟时间进行处理。"
+msgstr "你的文件'{file}'已经上传。需要几分钟时间进行处理。"
 
 #: lms/static/js/groups/views/course_cohort_settings_notification.js
 msgid "Cohorts Enabled"
@@ -4220,12 +4219,12 @@ msgstr "图片上传错误"
 
 #: lms/static/js/verify_student/views/image_input_view.js
 msgid "Please verify that you have uploaded a valid image (PNG and JPEG)."
-msgstr "请验证你已上传了一张有效的图片(PNG或JPEG格式)。"
+msgstr "请验证您已上传了一张有效的图片(PNG或JPEG格式)。"
 
 #: lms/static/js/verify_student/views/incourse_reverify_view.js
 #: lms/static/js/verify_student/views/review_photos_step_view.js
 msgid "An error has occurred. Please try again later."
-msgstr "发生了一个未知错误，请稍后重试。"
+msgstr "发生了一个错误，请稍后重试。"
 
 #: lms/static/js/verify_student/views/incourse_reverify_view.js
 #: lms/static/js/verify_student/views/review_photos_step_view.js
@@ -4298,7 +4297,7 @@ msgstr "视频捕获失败"
 msgid ""
 "Please verify that your webcam is connected and that you have allowed your "
 "browser to access it."
-msgstr "请检查你的摄像头已连接并且你的浏览器可以访问。"
+msgstr "请检查您的摄像头已连接并且允许浏览器使用它。"
 
 #: lms/static/js/verify_student/views/webcam_photo_view.js
 msgid "No Webcam Detected"
@@ -4306,11 +4305,11 @@ msgstr "没有检测到摄像头"
 
 #: lms/static/js/verify_student/views/webcam_photo_view.js
 msgid "You don't seem to have a webcam connected."
-msgstr "貌似你还没有一个可使用的摄像头。"
+msgstr "您似乎没有连接一个摄像头。"
 
 #: lms/static/js/verify_student/views/webcam_photo_view.js
 msgid "Double-check that your webcam is connected and working to continue."
-msgstr "再次确认你的摄像头已经连接并且正常工作以继续。"
+msgstr "继续前请再次确认您的摄像头已经连接并且可以正常使用。"
 
 #: lms/static/js/verify_student/views/webcam_photo_view.js
 msgid "Photo Captured successfully."
@@ -4344,11 +4343,11 @@ msgstr ""
 
 #: lms/static/js/views/file_uploader.js
 msgid "Your upload of '{file}' succeeded."
-msgstr "你的文件“{file}”上传成功。"
+msgstr "您的文件'{file}'上传成功。"
 
 #: lms/static/js/views/file_uploader.js
 msgid "Your upload of '{file}' failed."
-msgstr "你的文件“{file}”上传失败。"
+msgstr "您的文件'{file}'上传失败。"
 
 #: lms/static/js/views/image_field.js
 msgid "Upload an image"
