@@ -13,7 +13,7 @@ from badges.events.course_complete import get_completion_badge
 from badges.models import BadgeAssertion
 from badges.tests.factories import BadgeAssertionFactory, CourseCompleteImageConfigurationFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls
+from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls, ItemFactory
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from certificates.management.commands import resubmit_error_certificates, regenerate_user, ungenerated_certs
 from certificates.models import GeneratedCertificate, CertificateStatuses
@@ -33,6 +33,9 @@ class CertificateManagementTest(ModuleStoreTestCase):
             CourseFactory.create()
             for __ in range(3)
         ]
+        for course in self.courses:
+            chapter = ItemFactory.create(parent_location=course.location)
+            ItemFactory.create(parent_location=chapter.location, category='sequential', graded=True)
         CourseCompleteImageConfigurationFactory.create()
 
     def _create_cert(self, course_key, user, status, mode=CourseMode.HONOR):

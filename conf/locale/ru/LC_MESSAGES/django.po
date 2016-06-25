@@ -20,6 +20,7 @@
 # Katerina <rosemaily@gmail.com>, 2014
 # Ksenia Ivanova <Kauaiz666@mail.ru>, 2016
 # Liubov Fomicheva <liubov.nelapa@gmail.com>, 2015-2016
+# Madina Kanlybaeva <madika.kanlybaeva@mail.ru>, 2016
 # Maksimenkova Olga <omaksimenkova@hse.ru>, 2014-2015
 # Pavel Yushchenko <pavelyushchenko@gmail.com>, 2013
 # Maria Artemieva <maria.m.artemieva@gmail.com>, 2015

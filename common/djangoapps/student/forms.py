@@ -58,7 +58,7 @@ class PasswordResetFormNoActive(PasswordResetForm):
             email_template_name='registration/password_reset_email.html',
             use_https=False,
             token_generator=default_token_generator,
-            from_email=theming_helpers.get_value('default_from_email', settings.DEFAULT_FROM_EMAIL),
+            from_email=theming_helpers.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL),
             request=None
     ):
         """

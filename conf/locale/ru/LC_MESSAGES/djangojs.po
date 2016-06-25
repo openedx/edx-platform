@@ -62,6 +62,7 @@
 # Evgeniya <eugenia000@gmail.com>, 2013
 # Elena Freundorfer <e_freundorfer@gmx.de>, 2014
 # Liubov Fomicheva <liubov.nelapa@gmail.com>, 2015-2016
+# Madina Kanlybaeva <madika.kanlybaeva@mail.ru>, 2016
 # Maksimenkova Olga <omaksimenkova@hse.ru>, 2014
 # Pavel Yushchenko <pavelyushchenko@gmail.com>, 2013
 # mcha121 <mcha-12-1@bk.ru>, 2014

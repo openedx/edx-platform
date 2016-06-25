@@ -4,8 +4,9 @@ API view to allow manipulation of configuration models.
 from rest_framework.generics import CreateAPIView, RetrieveAPIView
 from rest_framework.permissions import DjangoModelPermissions
 from rest_framework.authentication import SessionAuthentication
-from rest_framework.serializers import ModelSerializer
 from django.db import transaction
+
+from config_models.utils import get_serializer_class
 
 
 class ReadableOnlyByAuthors(DjangoModelPermissions):
@@ -58,13 +59,7 @@ class ConfigurationModelCurrentAPIView(AtomicMixin, CreateAPIView, RetrieveAPIVi
 
     def get_serializer_class(self):
         if self.serializer_class is None:
-            class AutoConfigModelSerializer(ModelSerializer):
-                """Serializer class for configuration models."""
-                class Meta(object):
-                    """Meta information for AutoConfigModelSerializer."""
-                    model = self.model
-
-            self.serializer_class = AutoConfigModelSerializer
+            self.serializer_class = get_serializer_class(self.model)
 
         return self.serializer_class
 

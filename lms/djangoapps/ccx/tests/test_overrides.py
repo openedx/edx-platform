@@ -7,7 +7,10 @@ import mock
 import pytz
 from nose.plugins.attrib import attr
 
+from ccx_keys.locator import CCXLocator
+from courseware.courses import get_course_by_id
 from courseware.field_overrides import OverrideFieldData
+from courseware.testutils import FieldOverrideTestMixin
 from django.test.utils import override_settings
 from lms.djangoapps.courseware.tests.test_field_overrides import inject_field_overrides
 from request_cache.middleware import RequestCache
@@ -24,9 +27,11 @@ from lms.djangoapps.ccx.tests.utils import flatten, iter_blocks
 
 
 @attr('shard_1')
-@override_settings(FIELD_OVERRIDE_PROVIDERS=(
-    'ccx.overrides.CustomCoursesForEdxOverrideProvider',))
-class TestFieldOverrides(SharedModuleStoreTestCase):
+@override_settings(
+    XBLOCK_FIELD_DATA_WRAPPERS=['lms.djangoapps.courseware.field_overrides:OverrideModulestoreFieldData.wrap'],
+    MODULESTORE_FIELD_OVERRIDE_PROVIDERS=['ccx.overrides.CustomCoursesForEdxOverrideProvider'],
+)
+class TestFieldOverrides(FieldOverrideTestMixin, SharedModuleStoreTestCase):
     """
     Make sure field overrides behave in the expected manner.
     """
@@ -77,6 +82,9 @@ class TestFieldOverrides(SharedModuleStoreTestCase):
 
         inject_field_overrides(iter_blocks(ccx.course), self.course, AdminFactory.create())
 
+        self.ccx_key = CCXLocator.from_course_locator(self.course.id, ccx.id)
+        self.ccx_course = get_course_by_id(self.ccx_key, depth=None)
+
         def cleanup_provider_classes():
             """
             After everything is done, clean up by un-doing the change to the
@@ -90,7 +98,7 @@ class TestFieldOverrides(SharedModuleStoreTestCase):
         Test that overriding start date on a chapter works.
         """
         ccx_start = datetime.datetime(2014, 12, 25, 00, 00, tzinfo=pytz.UTC)
-        chapter = self.ccx.course.get_children()[0]
+        chapter = self.ccx_course.get_children()[0]
         override_field_for_ccx(self.ccx, chapter, 'start', ccx_start)
         self.assertEquals(chapter.start, ccx_start)
 
@@ -99,7 +107,7 @@ class TestFieldOverrides(SharedModuleStoreTestCase):
         Test that for creating new field executed only create query
         """
         ccx_start = datetime.datetime(2014, 12, 25, 00, 00, tzinfo=pytz.UTC)
-        chapter = self.ccx.course.get_children()[0]
+        chapter = self.ccx_course.get_children()[0]
         # One outer SAVEPOINT/RELEASE SAVEPOINT pair around everything caused by the
         # transaction.atomic decorator wrapping override_field_for_ccx.
         # One SELECT and one INSERT.
@@ -114,7 +122,7 @@ class TestFieldOverrides(SharedModuleStoreTestCase):
         """
         ccx_start = datetime.datetime(2014, 12, 25, 00, 00, tzinfo=pytz.UTC)
         new_ccx_start = datetime.datetime(2015, 12, 25, 00, 00, tzinfo=pytz.UTC)
-        chapter = self.ccx.course.get_children()[0]
+        chapter = self.ccx_course.get_children()[0]
         override_field_for_ccx(self.ccx, chapter, 'start', ccx_start)
         with self.assertNumQueries(3):
             override_field_for_ccx(self.ccx, chapter, 'start', new_ccx_start)
@@ -124,7 +132,7 @@ class TestFieldOverrides(SharedModuleStoreTestCase):
         Test that if value of field does not changed no query execute.
         """
         ccx_start = datetime.datetime(2014, 12, 25, 00, 00, tzinfo=pytz.UTC)
-        chapter = self.ccx.course.get_children()[0]
+        chapter = self.ccx_course.get_children()[0]
         override_field_for_ccx(self.ccx, chapter, 'start', ccx_start)
         with self.assertNumQueries(2):      # 2 savepoints
             override_field_for_ccx(self.ccx, chapter, 'start', ccx_start)
@@ -134,7 +142,7 @@ class TestFieldOverrides(SharedModuleStoreTestCase):
         Test no extra queries when accessing an overriden field more than once.
         """
         ccx_start = datetime.datetime(2014, 12, 25, 00, 00, tzinfo=pytz.UTC)
-        chapter = self.ccx.course.get_children()[0]
+        chapter = self.ccx_course.get_children()[0]
         # One outer SAVEPOINT/RELEASE SAVEPOINT pair around everything caused by the
         # transaction.atomic decorator wrapping override_field_for_ccx.
         # One SELECT and one INSERT.
@@ -148,7 +156,7 @@ class TestFieldOverrides(SharedModuleStoreTestCase):
         Test that sequentials inherit overridden start date from chapter.
         """
         ccx_start = datetime.datetime(2014, 12, 25, 00, 00, tzinfo=pytz.UTC)
-        chapter = self.ccx.course.get_children()[0]
+        chapter = self.ccx_course.get_children()[0]
         override_field_for_ccx(self.ccx, chapter, 'start', ccx_start)
         self.assertEquals(chapter.get_children()[0].start, ccx_start)
         self.assertEquals(chapter.get_children()[1].start, ccx_start)
@@ -160,7 +168,7 @@ class TestFieldOverrides(SharedModuleStoreTestCase):
         the mooc.
         """
         ccx_due = datetime.datetime(2015, 1, 1, 00, 00, tzinfo=pytz.UTC)
-        chapter = self.ccx.course.get_children()[0]
+        chapter = self.ccx_course.get_children()[0]
         chapter.display_name = 'itsme!'
         override_field_for_ccx(self.ccx, chapter, 'due', ccx_due)
         vertical = chapter.get_children()[0].get_children()[0]

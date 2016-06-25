@@ -1,19 +1,19 @@
 {
     "rules": {
-        "javascript-concat-html": 205,
+        "javascript-concat-html": 213,
         "javascript-escape": 7,
-        "javascript-interpolate": 51,
-        "javascript-jquery-append": 110,
-        "javascript-jquery-html": 274,
-        "javascript-jquery-insert-into-target": 26,
-        "javascript-jquery-insertion": 28,
-        "javascript-jquery-prepend": 12,
+        "javascript-interpolate": 49,
+        "javascript-jquery-append": 111,
+        "javascript-jquery-html": 279,
+        "javascript-jquery-insert-into-target": 27,
+        "javascript-jquery-insertion": 29,
+        "javascript-jquery-prepend": 13,
         "mako-html-entities": 0,
-        "mako-invalid-html-filter": 29,
-        "mako-invalid-js-filter": 209,
+        "mako-invalid-html-filter": 27,
+        "mako-invalid-js-filter": 207,
         "mako-js-html-string": 0,
         "mako-js-missing-quotes": 0,
-        "mako-missing-default": 215,
+        "mako-missing-default": 213,
         "mako-multiple-page-tags": 0,
         "mako-unknown-context": 0,
         "mako-unparseable-expression": 0,
@@ -21,12 +21,12 @@
         "python-close-before-format": 0,
         "python-concat-html": 27,
         "python-custom-escape": 13,
-        "python-deprecated-display-name": 54,
-        "python-interpolate-html": 68,
+        "python-deprecated-display-name": 53,
+        "python-interpolate-html": 66,
         "python-parse-error": 0,
         "python-requires-html-or-text": 0,
-        "python-wrap-html": 266,
-        "underscore-not-escaped": 659
+        "python-wrap-html": 264,
+        "underscore-not-escaped": 658
     },
-    "total": 2237
+    "total": 2245
 }

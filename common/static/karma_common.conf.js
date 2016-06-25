@@ -41,7 +41,9 @@ var options = {
 
         {pattern: 'js/vendor/jasmine-imagediff.js', included: true},
         {pattern: 'common/js/spec_helpers/jasmine-extensions.js', included: true},
-        {pattern: 'common/js/spec_helpers/jasmine-waituntil.js', included: true}
+        {pattern: 'common/js/spec_helpers/jasmine-waituntil.js', included: true},
+        {pattern: 'common/js/spec_helpers/discussion_spec_helper.js', included: true},
+        {pattern: 'common/js/spec/discussion/view/discussion_view_spec_helper.js', included: true}
     ],
 
     libraryFiles: [
@@ -53,6 +55,7 @@ var options = {
         {pattern: 'coffee/src/**/*.js', included: true},
         {pattern: 'common/js/xblock/core.js', included: true},
         {pattern: 'common/js/xblock/runtime.v1.js', included: true},
+        {pattern: 'common/js/discussion/**/*.js', included: true},
         {pattern: 'js/capa/src/**/*.js', included: true},
         {pattern: 'js/src/**/*.js', included: true}
     ],
@@ -60,6 +63,7 @@ var options = {
     specFiles: [
         {pattern: 'coffee/spec/**/*.js', included: true},
         {pattern: 'common/js/spec/xblock/*.js', included: true},
+        {pattern: 'common/js/spec/discussion/**/*spec.js', included: true},
         {pattern: 'js/**/*spec.js', included: true}
     ],
 

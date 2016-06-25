@@ -125,7 +125,7 @@ def send_credit_notifications(username, course_key):
         notification_msg.attach(logo_image)
 
     # add email addresses of sender and receiver
-    from_address = theming_helpers.get_value('default_from_email', settings.DEFAULT_FROM_EMAIL)
+    from_address = theming_helpers.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL)
     to_address = user.email
 
     # send the root email message

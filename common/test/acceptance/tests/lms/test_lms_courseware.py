@@ -17,6 +17,7 @@ from ...pages.lms.courseware import CoursewarePage, CoursewareSequentialTabPage
 from ...pages.lms.course_nav import CourseNavPage
 from ...pages.lms.problem import ProblemPage
 from ...pages.common.logout import LogoutPage
+from ...pages.lms.staff_view import StaffPage
 from ...pages.lms.track_selection import TrackSelectionPage
 from ...pages.lms.pay_and_verify import PaymentAndVerificationFlow, FakePaymentPage
 from ...pages.lms.dashboard import DashboardPage
@@ -249,22 +250,10 @@ class ProctoredExamTest(UniqueCourseTest):
         self.courseware_page.visit()
         self.assertTrue(self.courseware_page.can_start_proctored_exam)
 
-    @ddt.data(True, False)
-    def test_timed_exam_flow(self, hide_after_due):
+    def _setup_and_take_timed_exam(self, hide_after_due=False):
         """
-        Given that I am a staff member on the exam settings section
-        select advanced settings tab
-        When I Make the exam timed.
-        And I login as a verified student.
-        And visit the courseware as a verified student.
-        And I start the timed exam
-        Then I am taken to the exam with a timer bar showing
-        When I finish the exam
-        Then I see the exam submitted dialog in place of the exam
-        When I log back into studio as a staff member
-        And change the problem's due date to be in the past
-        And log back in as the original verified student
-        Then I see the exam or message in accordance with the hide_after_due setting
+        Helper to perform the common action "set up a timed exam as staff,
+        then take it as student"
         """
         LogoutPage(self.browser).visit()
         self._auto_auth("STAFF_TESTER", "staff101@example.com", True)
@@ -285,6 +274,27 @@ class ProctoredExamTest(UniqueCourseTest):
         self.assertTrue(self.courseware_page.has_submitted_exam_message())
 
         LogoutPage(self.browser).visit()
+
+    @ddt.data(True, False)
+    def test_timed_exam_flow(self, hide_after_due):
+        """
+        Given that I am a staff member on the exam settings section
+        select advanced settings tab
+        When I Make the exam timed.
+        And I login as a verified student.
+        And visit the courseware as a verified student.
+        And I start the timed exam
+        Then I am taken to the exam with a timer bar showing
+        When I finish the exam
+        Then I see the exam submitted dialog in place of the exam
+        When I log back into studio as a staff member
+        And change the problem's due date to be in the past
+        And log back in as the original verified student
+        Then I see the exam or message in accordance with the hide_after_due setting
+        """
+        self._setup_and_take_timed_exam(hide_after_due)
+
+        LogoutPage(self.browser).visit()
         self._auto_auth("STAFF_TESTER", "staff101@example.com", True)
         self.course_outline.visit()
         last_week = (datetime.today() - timedelta(days=7)).strftime("%m/%d/%Y")
@@ -294,6 +304,25 @@ class ProctoredExamTest(UniqueCourseTest):
         self._auto_auth(self.USERNAME, self.EMAIL, False)
         self.courseware_page.visit()
         self.assertEqual(self.courseware_page.has_submitted_exam_message(), hide_after_due)
+
+    def test_masquerade_visibility_override(self):
+        """
+        Given that a timed exam problem exists in the course
+        And a student has taken that exam
+        And that exam is hidden to the student
+        And I am a staff user masquerading as the student
+        Then I should be able to see the exam content
+        """
+        self._setup_and_take_timed_exam()
+
+        LogoutPage(self.browser).visit()
+        self._auto_auth("STAFF_TESTER", "staff101@example.com", True)
+        self.courseware_page.visit()
+        staff_page = StaffPage(self.browser, self.course_id)
+        self.assertEqual(staff_page.staff_view_mode, 'Staff')
+
+        staff_page.set_staff_view_mode_specific_student(self.USERNAME)
+        self.assertFalse(self.courseware_page.has_submitted_exam_message())
 
     def test_field_visiblity_with_all_exam_types(self):
         """

@@ -63,6 +63,7 @@
 # Xiang Junfu <xiangjf.fnst@cn.fujitsu.com>, 2015
 # yan9yu, 2014
 # yan9yu, 2014
+# Yue Fang <yfang@juilliard.edu>, 2016
 # Yuelan Sheng <shengyl.cheryl@gmail.com>, 2015
 # Yu <inactive+harrycaoyu@transifex.com>, 2015
 # Yu <inactive+harrycaoyu@transifex.com>, 2015
@@ -204,6 +205,7 @@
 # yan9yu, 2014
 # YUAN Tian <Sweetyuantian@msn.cn>, 2014
 # YUAN Tian <Sweetyuantian@msn.cn>, 2014
+# Yue Fang <yfang@juilliard.edu>, 2016
 # Yufei Xue <cmouse@163.com>, 2013-2014
 # Yu-Hua Hsieh <beiluo.shimen@icloud.com>, 2014
 # yuki f <likemood@163.com>, 2015
@@ -7415,7 +7417,7 @@ msgstr ""
 #: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
 msgid "Course ID"
-msgstr "课程编号"
+msgstr "课程ID"
 
 #: lms/djangoapps/support/views/refund.py
 msgid "User not found"
@@ -9508,11 +9510,11 @@ msgstr "放弃选修"
 
 #: lms/templates/edit_unit_link.html
 msgid "View Unit in Studio"
-msgstr "在职员界面查看单元"
+msgstr "在 Studio 中查看单元"
 
 #: lms/templates/email_change_failed.html lms/templates/email_exists.html
 msgid "E-mail change failed"
-msgstr "邮件变更失败"
+msgstr "邮箱变更失败"
 
 #: lms/templates/email_change_failed.html
 msgid "We were unable to send a confirmation email to {email}"
@@ -9577,7 +9579,7 @@ msgstr "被拒绝的学生："
 
 #: lms/templates/enroll_students.html
 msgid "Debug: "
-msgstr "调试："
+msgstr "排除错误"
 
 #: lms/templates/extauth_failure.html
 msgid "External Authentication failed"
@@ -9680,7 +9682,7 @@ msgstr "告诉我们细节"
 
 #: lms/templates/help_modal.html
 msgid "Include error messages, steps which lead to the issue, etc"
-msgstr "附上错误消息以及导致错误的步骤等"
+msgstr "附上错误消息以及导致这个问题的步骤等"
 
 #: lms/templates/help_modal.html lms/templates/manage_user_standing.html
 #: lms/templates/register-shib.html
@@ -9791,7 +9793,7 @@ msgstr "邮件码无效。请检查："
 msgid ""
 "Was this key already used? Check whether the e-mail change has already "
 "happened."
-msgstr "如果该密钥已被使用，请检查是否已变更邮件地址。"
+msgstr "如果该编码已被使用，请检查邮箱变更是否已成功。"
 
 #: lms/templates/invalid_email_key.html
 msgid "Did your e-mail client break the URL into two lines?"
@@ -9814,7 +9816,7 @@ msgstr[0] ""
 
 #: lms/templates/login-sidebar.html
 msgid "Helpful Information"
-msgstr "帮助信息"
+msgstr "有用的信息"
 
 #: lms/templates/login-sidebar.html
 msgid "Login via OpenID"
@@ -9843,7 +9845,7 @@ msgstr "需要帮助？"
 
 #: lms/templates/login-sidebar.html
 msgid "Looking for help in logging in or with your {platform_name} account?"
-msgstr "寻找关于登录您的 {platform_name} 账户的帮助？"
+msgstr "寻找关于登录或者您的 {platform_name} 账户的帮助？"
 
 #: lms/templates/login-sidebar.html
 msgid "View our help section for answers to commonly asked questions."
@@ -9873,7 +9875,7 @@ msgstr "请登录"
 
 #: lms/templates/login.html
 msgid "to access your account and courses"
-msgstr "来访问你的账户和课程"
+msgstr "来访问您的账户和课程"
 
 #: lms/templates/login.html
 msgid "We're Sorry, {platform_name} accounts are unavailable currently"
@@ -9918,7 +9920,7 @@ msgstr "外部资源"
 #. "total_points" is the maximum number of points achievable.
 #: lms/templates/lti.html
 msgid "{points} / {total_points} points"
-msgstr "{points} / {total_points} 分"
+msgstr "{points} / 共{total_points} 分"
 
 #. Translators: "total_points" is the maximum number of points achievable on
 #. this LTI unit
@@ -9933,11 +9935,11 @@ msgstr "在新窗口中查看资源"
 #: lms/templates/lti.html
 msgid ""
 "Please provide launch_url. Click \"Edit\", and fill in the required fields."
-msgstr "请提供运行链接 launch_url，点击”编辑“，并填写需要的项。"
+msgstr "请提供运行链接 launch_url，点击\"编辑\"，并填写需要的项。"
 
 #: lms/templates/lti.html
 msgid "Feedback on your work from the grader:"
-msgstr "根据以下等级反馈您的工作："
+msgstr "评分者给您的反馈："
 
 #: lms/templates/lti_form.html
 msgid "Press to Launch"
@@ -9981,7 +9983,7 @@ msgstr "重新启用账户"
 
 #: lms/templates/manage_user_standing.html
 msgid "Remove Profile Image"
-msgstr "删除照片"
+msgstr "删除用户资料照片"
 
 #: lms/templates/manage_user_standing.html
 msgid "Students whose accounts have been disabled"
@@ -10007,7 +10009,7 @@ msgid ""
 " fix it as soon as possible. Please email us at {tech_support_email} to "
 "report any problems or downtime."
 msgstr ""
-"非常抱歉，该模块暂时无法使用，我们的教员正在努力尽修复问题。要报告您发现的任何问题或遇到网站停摆，请向{tech_support_email}发送邮件"
+"非常抱歉，该模块暂时无法使用，我们的教员正在努力尽修复问题。要报告您发现的任何问题或遇到网站非正常，请向{tech_support_email}发送邮件"
 
 #: lms/templates/module-error.html
 msgid "Raw data:"
@@ -10074,7 +10076,7 @@ msgstr "您没有任何笔记。"
 
 #: lms/templates/problem.html
 msgid "your answer"
-msgstr "你的回答"
+msgstr "您的回答"
 
 #: lms/templates/problem.html
 msgid "Hint"
@@ -10094,7 +10096,7 @@ msgstr ""
 
 #: lms/templates/problem.html
 msgid "You have used {num_used} of {num_total} submissions"
-msgstr "您已经使用了{num_total}次中的 {num_used}次提交"
+msgstr "您已经使用了最多{num_total}次中的 {num_used}次提交"
 
 #: lms/templates/provider_login.html
 msgid "Log In"
@@ -10105,7 +10107,7 @@ msgid ""
 "Your username, email, and full name will be sent to {destination}, where the"
 " collection and use of this information will be governed by their terms of "
 "service and privacy policy."
-msgstr "您的用户名、邮箱地址及全名将发送到 {destination}，并保证在服务和隐私保护条款的监管下收集和使用这些信息。"
+msgstr "您的用户名、邮箱地址及全名将发送到 {destination}，收集和使用这些信息将遵循他们的服务和隐私保护条款。"
 
 #: lms/templates/provider_login.html
 #, python-format
@@ -10124,7 +10126,7 @@ msgstr ""
 #: themes/stanford-style/lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid "The following errors occurred while processing your registration:"
-msgstr "在你注册时发生了下列错误："
+msgstr "在处理您的注册信息时发生了下列错误："
 
 #: lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-form.html
@@ -10149,7 +10151,7 @@ msgstr "必需的字段已经被<strong class=\"indicator\">粗体和星号(*)</
 #: lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "You've successfully signed in with {selected_provider}."
-msgstr "您已成功地以{selected_provider}登陆。"
+msgstr "您已成功地以{selected_provider}登录。"
 
 #: lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-form.html
@@ -10167,7 +10169,7 @@ msgstr "请将以下字段补充完整以完成账户注册。"
 #: themes/stanford-style/lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid "Will be shown in any discussions or forums you participate in"
-msgstr "将会在您参加的任何讨论或论坛上显示（之后将无法更改）"
+msgstr "将会在您参加的任何讨论或论坛上显示"
 
 #: lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-form.html
@@ -10242,12 +10244,12 @@ msgstr "{platform_name}偏好设置"
 #: lms/templates/register-shib.html
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid "Update my {platform_name} Account"
-msgstr "更新{platform_name}账户"
+msgstr "更新我的{platform_name}账户"
 
 #: lms/templates/register-shib.html
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid "Welcome {username}!  Please set your preferences below"
-msgstr "欢迎 {username}! 接下来请设置你的偏好设置"
+msgstr "欢迎 {username}! 接下来请进行您的偏好设置"
 
 #: lms/templates/register-shib.html lms/templates/signup_modal.html
 #: themes/stanford-style/lms/templates/register-shib.html
@@ -10285,7 +10287,7 @@ msgid ""
 "you on our mailing list - we will update you as courses are added."
 msgstr ""
 "在 {platform_name} 注册之后, "
-"您可以访问我们现有和将来所有的免费课程。现在还不想加入课程？注册后您将加入我们的邮件列表，您将通过邮件收到新课程的通知。"
+"您可以访问我们现有和将来所有的免费课程。现在还不想加入课程？注册后您将加入我们的收件人列表，您将通过邮件收到新课程的通知。"
 
 #: lms/templates/register-sidebar.html
 #: themes/stanford-style/lms/templates/register-sidebar.html
@@ -10334,7 +10336,7 @@ msgstr "欢迎！"
 
 #: lms/templates/register.html
 msgid "Register below to create your {platform_name} account"
-msgstr "注册以创建你在 {platform_name}的账户"
+msgstr "在下面注册来创建您在 {platform_name}的账户"
 
 #: lms/templates/resubscribe.html
 msgid "Re-subscribe Successful!"
@@ -10392,7 +10394,7 @@ msgstr "注册加入{platform_name}的目标"
 
 #: lms/templates/signup_modal.html
 msgid "Already have an account?"
-msgstr "已经有账户了？"
+msgstr "已有账户？"
 
 #: lms/templates/signup_modal.html
 msgid "Login."
@@ -10402,7 +10404,7 @@ msgstr "登录"
 msgid ""
 "This content experiment uses group configuration "
 "'{group_configuration_name}'."
-msgstr "该内容实验使用了组配置“{group_configuration_name}”。"
+msgstr "此内容实验使用了组配置“{group_configuration_name}”。"
 
 #: lms/templates/split_test_author_view.html
 msgid "Active Groups"
@@ -10438,7 +10440,7 @@ msgstr "标签"
 
 #: lms/templates/staff_problem_info.html
 msgid "Optional tag (eg \"done\" or \"broken\"):"
-msgstr "选项标志(如：“done” 或 “broken”)"
+msgstr "可选标签(如：“done” 或 “broken”)"
 
 #: lms/templates/staff_problem_info.html
 msgid "tag"
@@ -10552,7 +10554,7 @@ msgstr "创建用户"
 
 #: lms/templates/sysadmin_dashboard.html
 msgid "Download list of all users (csv file)"
-msgstr "下载所有用户列表 (csv 格式)"
+msgstr "下载所有用户列表 (csv 文件)"
 
 #: lms/templates/sysadmin_dashboard.html
 msgid "Check and repair external authentication map"
@@ -10562,15 +10564,15 @@ msgstr "检查修复外部认证映射"
 msgid ""
 "Go to each individual course's Instructor dashboard to manage course "
 "enrollment."
-msgstr "进入每个课程的教师面板来管理课程选修信息。"
+msgstr "进入每个课程的教师控制面板来管理课程选修信息。"
 
 #: lms/templates/sysadmin_dashboard.html
 msgid "Manage course staff and instructors"
-msgstr "管理课程教员与主讲教师"
+msgstr "管理课程工作人员与教师"
 
 #: lms/templates/sysadmin_dashboard.html
 msgid "Download staff and instructor list (csv file)"
-msgstr "下载教员与主讲教师列名单(csv 格式)"
+msgstr "下载教员与主讲教师列名单(csv 文件)"
 
 #: lms/templates/sysadmin_dashboard.html
 msgid "Administer Courses"
@@ -10643,12 +10645,12 @@ msgstr "Git动作"
 #. Translators: git is a version-control system; see http://git-scm.com/about
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 msgid "No git import logs have been recorded."
-msgstr "没有git导入日志被记录。"
+msgstr "无记载git导入日志。"
 
 #. Translators: git is a version-control system; see http://git-scm.com/about
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 msgid "No git import logs have been recorded for this course."
-msgstr "此课程没有git导入日志被记录。"
+msgstr "此课程无记载git导入日志。"
 
 #: lms/templates/textannotation.html
 msgid "Source:"
@@ -11527,7 +11529,7 @@ msgstr "电子邮箱地址／用户名"
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
 "Enter email addresses and/or usernames separated by new lines or commas."
-msgstr "输入电子邮箱地址 与／或 用户名，以逗号分割或重启一行。"
+msgstr "输入电子邮箱地址与／或 用户名，以逗号分割或重启一行。"
 
 #: lms/templates/ccx/enrollment.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
@@ -11557,7 +11559,7 @@ msgstr ""
 #: lms/templates/ccx/enrollment.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Checking this box has no effect if 'Unenroll' is selected."
-msgstr "如果选择了“放弃选修”，本项选择将不会生效。"
+msgstr "如果选择了'放弃选修'，本项选择将不会生效。"
 
 #: lms/templates/ccx/enrollment.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
@@ -11572,7 +11574,7 @@ msgstr ""
 
 #: lms/templates/ccx/enrollment.html
 msgid "Student List Management"
-msgstr "管理学生列表"
+msgstr "学生列表管理"
 
 #: lms/templates/ccx/enrollment.html
 msgid "CCX student list management response message"
@@ -11944,7 +11946,7 @@ msgstr ""
 #: lms/templates/courseware/accordion.html
 #: lms/templates/courseware/progress.html
 msgid "due {date}"
-msgstr "到期日{date}"
+msgstr "截止日期{date}"
 
 #: lms/templates/courseware/accordion.html
 msgid "This content is graded"

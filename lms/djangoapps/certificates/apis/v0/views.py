@@ -25,7 +25,7 @@ class CertificatesDetailView(GenericAPIView):
 
         **Example Request**
 
-            GET /api/certificates/v0/certificates/{username}/{course_id}
+            GET /api/certificates/v0/certificates/{username}/courses/{course_id}
 
         **GET Parameters**
 

@@ -20,6 +20,11 @@ body {
   background: $body-bg;
 }
 
+// removing the outline on any element that we make programmatically focusable
+[tabindex="-1"] {
+    outline: none;
+}
+
 h1, h2, h3, h4, h5, h6 {
   color: $base-font-color;
   font: normal 1.2em/1.2em $serif;

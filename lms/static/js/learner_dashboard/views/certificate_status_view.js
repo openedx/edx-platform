@@ -5,7 +5,8 @@
             'underscore',
             'gettext',
             'edx-ui-toolkit/js/utils/html-utils',
-            'text!../../../templates/learner_dashboard/certificate_status.underscore'
+            'text!../../../templates/learner_dashboard/certificate_status.underscore',
+            'text!../../../templates/learner_dashboard/certificate_icon.underscore'
            ],
          function(
              Backbone,
@@ -13,10 +14,12 @@
              _,
              gettext,
              HtmlUtils,
-             certificateStatusTpl
+             certificateStatusTpl,
+             certificateIconTpl
          ) {
             return Backbone.View.extend({
-                tpl: HtmlUtils.template(certificateStatusTpl),
+                statusTpl: HtmlUtils.template(certificateStatusTpl),
+                iconTpl: HtmlUtils.template(certificateIconTpl),
 
                 initialize: function(options) {
                     this.$el = options.$el;
@@ -24,8 +27,13 @@
                 },
 
                 render: function() {
-                    var data = this.model.toJSON();
-                    HtmlUtils.setHtml(this.$el, this.tpl(data));
+                    var data = this.model.toJSON(),
+                        $icons;
+
+                    HtmlUtils.setHtml(this.$el, this.statusTpl(data));
+
+                    $icons = this.$('.certificate-icon');
+                    HtmlUtils.setHtml($icons, this.iconTpl());
                 }
             });
         }

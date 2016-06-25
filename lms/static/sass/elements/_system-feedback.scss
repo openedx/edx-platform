@@ -722,7 +722,7 @@
 }
 
 // adopted alerts
-.alert {
+.alert:not(.pattern-library-shim) {
   @include box-sizing(border-box);
   @include clearfix();
   margin: 0 auto;

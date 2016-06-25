@@ -3,6 +3,7 @@ import copy
 import datetime
 import json
 from unittest import skipUnless
+import uuid
 
 import ddt
 from django.conf import settings
@@ -31,6 +32,7 @@ from xmodule.modulestore.tests.factories import CourseFactory
 
 
 UTILS_MODULE = 'openedx.core.djangoapps.programs.utils'
+CERTIFICATES_API_MODULE = 'lms.djangoapps.certificates.api'
 
 
 @skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
@@ -263,7 +265,7 @@ class GetCompletedCoursesTestCase(TestCase):
         result.update(**kwargs)
         return result
 
-    @mock.patch(UTILS_MODULE + '.get_certificates_for_user')
+    @mock.patch(UTILS_MODULE + '.certificate_api.get_certificates_for_user')
     def test_get_completed_courses(self, mock_get_certs_for_user):
         """
         Ensure the function correctly calls to and handles results from the
@@ -697,19 +699,22 @@ class TestSupplementProgramData(ProgramsApiConfigMixin, ModuleStoreTestCase):
             course_codes=[self.course_code]
         )
 
-    def _assert_supplemented(self, actual, is_enrolled=False, is_enrollment_open=True):
+    def _assert_supplemented(self, actual, **kwargs):
         """DRY helper used to verify that program data is extended correctly."""
         course_overview = CourseOverview.get_from_id(self.course.id)  # pylint: disable=no-member
 
-        run_mode = factories.RunMode(
-            course_key=unicode(self.course.id),  # pylint: disable=no-member
-            course_url=reverse('course_root', args=[self.course.id]),  # pylint: disable=no-member
-            course_image_url=course_overview.course_image_url,
-            start_date=self.course.start.strftime(self.human_friendly_format),
-            end_date=self.course.end.strftime(self.human_friendly_format),
-            is_enrolled=is_enrolled,
-            is_enrollment_open=is_enrollment_open,
-            marketing_url='',
+        run_mode = dict(
+            factories.RunMode(
+                course_key=unicode(self.course.id),  # pylint: disable=no-member
+                course_url=reverse('course_root', args=[self.course.id]),  # pylint: disable=no-member
+                course_image_url=course_overview.course_image_url,
+                start_date=self.course.start.strftime(self.human_friendly_format),
+                end_date=self.course.end.strftime(self.human_friendly_format),
+                is_enrolled=False,
+                is_enrollment_open=True,
+                marketing_url='',
+            ),
+            **kwargs
         )
         course_code = factories.CourseCode(display_name=self.course_code['display_name'], run_modes=[run_mode])
         expected = copy.deepcopy(self.program)
@@ -741,3 +746,20 @@ class TestSupplementProgramData(ProgramsApiConfigMixin, ModuleStoreTestCase):
         data = utils.supplement_program_data(self.program, self.user)
 
         self._assert_supplemented(data, is_enrollment_open=is_enrollment_open)
+
+    @ddt.data(True, False)
+    @mock.patch(UTILS_MODULE + '.certificate_api.certificate_downloadable_status')
+    @mock.patch(CERTIFICATES_API_MODULE + '.has_html_certificates_enabled')
+    def test_certificate_url_retrieval(self, is_uuid_available, mock_html_certs_enabled, mock_get_cert_data):
+        """Verify that the student's run mode certificate is included, when available."""
+        test_uuid = uuid.uuid4().hex
+        mock_get_cert_data.return_value = {'uuid': test_uuid} if is_uuid_available else {}
+        mock_html_certs_enabled.return_value = True
+
+        data = utils.supplement_program_data(self.program, self.user)
+
+        if is_uuid_available:
+            expected_url = reverse('certificates:render_cert_by_uuid', kwargs={'certificate_uuid': test_uuid})
+            self._assert_supplemented(data, certificate_url=expected_url)
+        else:
+            self._assert_supplemented(data)
