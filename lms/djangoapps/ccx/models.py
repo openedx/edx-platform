@@ -7,9 +7,10 @@ from datetime import datetime
 
 from django.contrib.auth.models import User
 from django.db import models
-from django.utils.timezone import UTC
+from pytz import utc
 
 from lazy import lazy
+from openedx.core.lib.time_zone_utils import get_time_zone_abbr
 from xmodule_django.models import CourseKeyField, LocationKeyField
 from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore.django import modulestore
@@ -72,43 +73,43 @@ class CustomCourseForEdX(models.Model):
 
     def has_started(self):
         """Return True if the CCX start date is in the past"""
-        return datetime.now(UTC()) > self.start
+        return datetime.now(utc) > self.start
 
     def has_ended(self):
         """Return True if the CCX due date is set and is in the past"""
         if self.due is None:
             return False
 
-        return datetime.now(UTC()) > self.due
+        return datetime.now(utc) > self.due
 
-    def start_datetime_text(self, format_string="SHORT_DATE"):
+    def start_datetime_text(self, format_string="SHORT_DATE", time_zone=utc):
         """Returns the desired text representation of the CCX start datetime
 
-        The returned value is always expressed in UTC
+        The returned value is in specified time zone, defaulted to UTC.
         """
         i18n = self.course.runtime.service(self.course, "i18n")
         strftime = i18n.strftime
-        value = strftime(self.start, format_string)
+        value = strftime(self.start.astimezone(time_zone), format_string)
         if format_string == 'DATE_TIME':
-            value += u' UTC'
+            value += ' ' + get_time_zone_abbr(time_zone, self.start)
         return value
 
-    def end_datetime_text(self, format_string="SHORT_DATE"):
+    def end_datetime_text(self, format_string="SHORT_DATE", time_zone=utc):
         """Returns the desired text representation of the CCX due datetime
 
         If the due date for the CCX is not set, the value returned is the empty
         string.
 
-        The returned value is always expressed in UTC
+        The returned value is in specified time zone, defaulted to UTC.
         """
         if self.due is None:
             return ''
 
         i18n = self.course.runtime.service(self.course, "i18n")
         strftime = i18n.strftime
-        value = strftime(self.due, format_string)
+        value = strftime(self.due.astimezone(time_zone), format_string)
         if format_string == 'DATE_TIME':
-            value += u' UTC'
+            value += ' ' + get_time_zone_abbr(time_zone, self.due)
         return value
 
     @property
