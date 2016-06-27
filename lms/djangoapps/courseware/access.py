@@ -45,6 +45,7 @@ from student.roles import (
     SupportStaffRole,
     OrgInstructorRole,
     OrgStaffRole,
+    CourseCcxCoachRole,  # Added by labster.
 )
 from util.milestones_helpers import (
     get_pre_requisite_courses_not_completed,
@@ -739,6 +740,7 @@ def _has_access_to_course(user, access_level, course_key):
 
     instructor_access = (
         CourseInstructorRole(course_key).has_user(user) or
+        CourseCcxCoachRole(course_key).has_user(user) or  # Added by labster.
         OrgInstructorRole(course_key.org).has_user(user)
     )
 
