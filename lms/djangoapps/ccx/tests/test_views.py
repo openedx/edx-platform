@@ -139,29 +139,42 @@ class TestAdminAccessCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
 
     def test_staff_access_coach_dashboard(self):
         """
-        User is staff, should access coach dashboard.
+        Staff can not access coach dashboard unless he is a coach on that dashboard.
         """
         staff = self.make_staff()
         self.client.login(username=staff.username, password="test")
         self.make_coach()
         ccx = self.make_ccx()
-        url = reverse(
-            'ccx_coach_dashboard',
-            kwargs={'course_id': CCXLocator.from_course_locator(self.course.id, ccx.id)})
+        ccx_key = CCXLocator.from_course_locator(self.course.id, ccx.id)
+
+        # Add coach role to master and ccx courses
+        role = CourseCcxCoachRole(self.course.id)
+        role.add_users(staff)
+        role = CourseCcxCoachRole(ccx_key)
+        role.add_users(staff)
+
+        url = reverse('ccx_coach_dashboard', kwargs={'course_id': ccx_key})
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
     def test_instructor_access_coach_dashboard(self):
         """
-        User is instructor, should access coach dashboard.
+        Instructor can not access coach dashboard unless he is a coach on that dashboard.
         """
         instructor = self.make_instructor()
         self.client.login(username=instructor.username, password="test")
         self.make_coach()
         ccx = self.make_ccx()
-        url = reverse(
-            'ccx_coach_dashboard',
-            kwargs={'course_id': CCXLocator.from_course_locator(self.course.id, ccx.id)})
+        ccx_key = CCXLocator.from_course_locator(self.course.id, ccx.id)
+        url = reverse('ccx_coach_dashboard', kwargs={'course_id': ccx_key})
+
+        # Now make instructor coach on ccx and master courses.
+        role = CourseCcxCoachRole(ccx_key)
+        role.add_users(instructor)
+        role = CourseCcxCoachRole(self.course.id)
+        role.add_users(instructor)
+
+        # Now access URL
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
