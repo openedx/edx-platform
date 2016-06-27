@@ -207,6 +207,7 @@
 .forum-nav-thread {
   border-bottom: 1px solid $forum-color-border;
   background-color: $forum-color-background;
+  margin-bottom: 0;
 
   &.is-unread {
     background: $forum-color-background;
@@ -226,18 +227,29 @@
 .forum-nav-thread-link {
   display: block;
   padding: ($baseline/4) ($baseline/2);
+  transition: none;
 
-  &.is-active {
-    background-color: $forum-color-background;
-    color: $base-font-color;
+  &.is-active,
+  &:hover {
+    color: $forum-color-background;
+    background-color: $forum-color-hover-thread;
+
+    .forum-nav-thread-labels > li {
+      border-color: $forum-color-background;
+      color: $forum-color-background;
+    }
 
     .forum-nav-thread-comments-count {
-      background-color: $gray-l4;
+      background-color: $forum-color-background;
       color: $base-font-color;
 
       &:after {
         border-right-color: $gray-l4;
       }
+    }
+
+    span.icon {
+      color: $forum-color-background;
     }
   }
 
