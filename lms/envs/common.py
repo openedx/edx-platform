@@ -2923,8 +2923,8 @@ WIKI_REQUEST_CACHE_MIDDLEWARE_CLASS = "request_cache.middleware.RequestCache"
 # API access management
 API_ACCESS_MANAGER_EMAIL = 'api-access@example.com'
 API_ACCESS_FROM_EMAIL = 'api-requests@example.com'
-API_DOCUMENTATION_URL = 'http://edx.readthedocs.org/projects/edx-platform-api/en/latest/overview.html'
-AUTH_DOCUMENTATION_URL = 'http://edx.readthedocs.org/projects/edx-platform-api/en/latest/authentication.html'
+API_DOCUMENTATION_URL = 'http://course-catalog-api-guide.readthedocs.io/en/latest/'
+AUTH_DOCUMENTATION_URL = 'http://course-catalog-api-guide.readthedocs.io/en/latest/authentication/index.html'
 
 # Affiliate cookie tracking
 AFFILIATE_COOKIE_NAME = 'affiliate_id'
