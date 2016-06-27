@@ -1269,15 +1269,16 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
         """Return the course_id for this course"""
         return self.location.course_key
 
-    def start_datetime_text(self, format_string="SHORT_DATE"):
+    def start_datetime_text(self, time_zone=UTC, format_string="SHORT_DATE"):
         """
-        Returns the desired text corresponding the course's start date and time in UTC.  Prefers .advertised_start,
-        then falls back to .start
+        Returns the desired text corresponding the course's start date and time in specified time zone, defaulted
+        to UTC. Prefers .advertised_start, then falls back to .start
         """
         i18n = self.runtime.service(self, "i18n")
         return course_metadata_utils.course_start_datetime_text(
             self.start,
             self.advertised_start,
+            time_zone,
             format_string,
             i18n.ugettext,
             i18n.strftime
@@ -1294,12 +1295,13 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
             self.advertised_start
         )
 
-    def end_datetime_text(self, format_string="SHORT_DATE"):
+    def end_datetime_text(self, time_zone=UTC, format_string="SHORT_DATE"):
         """
         Returns the end date or date_time for the course formatted as a string.
         """
         return course_metadata_utils.course_end_datetime_text(
             self.end,
+            time_zone,
             format_string,
             self.runtime.service(self, "i18n").strftime
         )
