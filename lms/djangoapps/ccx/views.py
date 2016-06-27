@@ -93,26 +93,27 @@ def coach_dashboard(view):
         if ccx:
             course_key = ccx.course_id
         course = get_course_by_id(course_key, depth=None)
-        is_staff = has_access(request.user, 'staff', course)
-        is_instructor = has_access(request.user, 'instructor', course)
 
         if not course.enable_ccx:
             raise Http404
-        elif is_staff or is_instructor:
-            # if user is staff or instructor then he can view ccx coach dashboard.
-            return view(request, course, ccx)
         else:
-            role = CourseCcxCoachRole(course_key)
-            if not role.has_user(request.user):
-                return HttpResponseForbidden(_('You must be a CCX Coach to access this view.'))
+            is_staff = has_access(request.user, 'staff', course)
+            is_instructor = has_access(request.user, 'instructor', course)
 
-            # if there is a ccx, we must validate that it is the ccx for this coach
-            if ccx is not None:
-                coach_ccx = get_ccx_by_ccx_id(course, request.user, ccx.id)
-                if coach_ccx is None:
-                    return HttpResponseForbidden(
-                        _('You must be the coach for this ccx to access this view')
-                    )
+            if is_staff or is_instructor:
+                # if user is staff or instructor then he can view ccx coach dashboard.
+                return view(request, course, ccx)
+            else:
+                # if there is a ccx, we must validate that it is the ccx for this coach
+                role = CourseCcxCoachRole(course_key)
+                if not role.has_user(request.user):
+                    return HttpResponseForbidden(_('You must be a CCX Coach to access this view.'))
+                elif ccx is not None:
+                    coach_ccx = get_ccx_by_ccx_id(course, request.user, ccx.id)
+                    if coach_ccx is None:
+                        return HttpResponseForbidden(
+                            _('You must be the coach for this ccx to access this view')
+                        )
 
         return view(request, course, ccx)
     return wrapper
@@ -144,8 +145,6 @@ def dashboard(request, course, ccx=None):
 
     if ccx:
         ccx_locator = CCXLocator.from_course_locator(course.id, unicode(ccx.id))
-        # At this point we are done with verification that current user is ccx coach.
-        assign_coach_role_to_ccx(ccx_locator, request.user, course.id)
 
         schedule = get_ccx_schedule(course, ccx)
         grading_policy = get_override_for_ccx(
