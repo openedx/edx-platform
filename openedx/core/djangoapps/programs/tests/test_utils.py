@@ -763,3 +763,32 @@ class TestSupplementProgramData(ProgramsApiConfigMixin, ModuleStoreTestCase):
             self._assert_supplemented(data, certificate_url=expected_url)
         else:
             self._assert_supplemented(data)
+
+    @mock.patch(UTILS_MODULE + '.get_organization_by_short_name')
+    def test_organization_logo_exists(self, mock_get_organization_by_short_name):
+        """ Verify the logo image is set from the organizations api """
+        mock_logo_url = 'edx/logo.png'
+        mock_image = mock.Mock()
+        mock_image.url = mock_logo_url
+        mock_get_organization_by_short_name.return_value = {
+            'logo': mock_image
+        }
+        data = utils.supplement_program_data(self.program, self.user)
+        self.assertEqual(data['organizations'][0].get('img'), mock_logo_url)
+
+    @mock.patch(UTILS_MODULE + '.get_organization_by_short_name')
+    def test_organization_missing(self, mock_get_organization_by_short_name):
+        """ Verify the logo image is not set if the organizations api returns None """
+        mock_get_organization_by_short_name.return_value = None
+        data = utils.supplement_program_data(self.program, self.user)
+        self.assertEqual(data['organizations'][0].get('img'), None)
+
+    @mock.patch(UTILS_MODULE + '.get_organization_by_short_name')
+    def test_organization_logo_missing(self, mock_get_organization_by_short_name):
+        """
+        Verify the logo image is not set if the organizations api returns organization,
+        but the logo is not available
+        """
+        mock_get_organization_by_short_name.return_value = {'logo': None}
+        data = utils.supplement_program_data(self.program, self.user)
+        self.assertEqual(data['organizations'][0].get('img'), None)
