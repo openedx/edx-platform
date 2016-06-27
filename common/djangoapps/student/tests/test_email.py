@@ -75,10 +75,10 @@ class ActivationEmailTests(TestCase):
     # Text fragments we expect in the body of an email
     # sent from an OpenEdX installation.
     OPENEDX_FRAGMENTS = [
-        "Thank you for signing up for {platform}.".format(platform=settings.PLATFORM_NAME),
+        "Thank you for creating an account with {platform}!".format(platform=settings.PLATFORM_NAME),
         "http://edx.org/activate/",
         (
-            "if you require assistance, check the help section of the "
+            "Check the help section of the "
             "{platform} website".format(platform=settings.PLATFORM_NAME)
         )
     ]
@@ -86,10 +86,10 @@ class ActivationEmailTests(TestCase):
     # Text fragments we expect in the body of an email
     # sent from an EdX-controlled domain.
     EDX_DOMAIN_FRAGMENTS = [
-        "Thank you for signing up for {platform}".format(platform=settings.PLATFORM_NAME),
+        "Thank you for creating an account with {platform}!".format(platform=settings.PLATFORM_NAME),
         "http://edx.org/activate/",
         "https://www.edx.org/contact-us",
-        "This email was automatically sent by edx.org"
+        "This email message was automatically sent by edx.org"
     ]
 
     def setUp(self):
