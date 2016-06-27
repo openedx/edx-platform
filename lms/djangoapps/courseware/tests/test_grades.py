@@ -13,7 +13,6 @@ from opaque_keys.edx.locator import CourseLocator, BlockUsageLocator
 from courseware.grades import (
     grade,
     iterate_grades_for,
-    MaxScoresCache,
     ProgressSummary,
     get_module_score
 )
@@ -143,54 +142,6 @@ class TestGradeIteration(SharedModuleStoreTestCase):
                 students_to_errors[student] = err_msg
 
         return students_to_gradesets, students_to_errors
-
-
-class TestMaxScoresCache(SharedModuleStoreTestCase):
-    """
-    Tests for the MaxScoresCache
-    """
-
-    ENABLED_CACHES = ['default', 'mongo_metadata_inheritance', 'loc_cache']
-
-    @classmethod
-    def setUpClass(cls):
-        super(TestMaxScoresCache, cls).setUpClass()
-        cls.course = CourseFactory.create()
-        cls.problems = []
-        for _ in xrange(3):
-            cls.problems.append(
-                ItemFactory.create(category='problem', parent=cls.course)
-            )
-
-    def setUp(self):
-        super(TestMaxScoresCache, self).setUp()
-        self.student = UserFactory.create()
-
-        CourseEnrollment.enroll(self.student, self.course.id)
-        self.request = RequestFactory().get('/')
-        self.locations = [problem.location for problem in self.problems]
-
-    def test_max_scores_cache(self):
-        """
-        Tests the behavior fo the MaxScoresCache
-        """
-        max_scores_cache = MaxScoresCache("test_max_scores_cache")
-        self.assertEqual(max_scores_cache.num_cached_from_remote(), 0)
-        self.assertEqual(max_scores_cache.num_cached_updates(), 0)
-
-        # add score to cache
-        max_scores_cache.set(self.locations[0], 1)
-        self.assertEqual(max_scores_cache.num_cached_updates(), 1)
-
-        # push to remote cache
-        max_scores_cache.push_to_remote()
-
-        # create a new cache with the same params, fetch from remote cache
-        max_scores_cache = MaxScoresCache("test_max_scores_cache")
-        max_scores_cache.fetch_from_remote(self.locations)
-
-        # see cache is populated
-        self.assertEqual(max_scores_cache.num_cached_from_remote(), 1)
 
 
 class TestFieldDataCacheScorableLocations(SharedModuleStoreTestCase):
