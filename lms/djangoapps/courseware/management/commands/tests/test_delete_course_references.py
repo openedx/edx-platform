@@ -23,7 +23,7 @@ if settings.FEATURES.get('API', False):
     )
 
 if settings.FEATURES.get('PROJECTS_APP', False):
-    from projects import models as project_models
+    from edx_solutions_projects import models as project_models
 
 if settings.FEATURES.get('STUDENT_GRADEBOOK', False):
     from gradebook import models as gradebook_models

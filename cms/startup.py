@@ -15,7 +15,7 @@ from monkey_patch import django_utils_translation
 
 from openedx.core.djangoapps.course_groups.scope_resolver import CourseGroupScopeResolver
 from student.scope_resolver import CourseEnrollmentsScopeResolver, StudentEmailScopeResolver
-from projects.scope_resolver import GroupProjectParticipantsScopeResolver
+from edx_solutions_projects.scope_resolver import GroupProjectParticipantsScopeResolver
 from edx_notifications.scopes import register_user_scope_resolver
 from edx_notifications.namespaces import register_namespace_resolver
 from util.namespace_resolver import CourseNamespaceResolver

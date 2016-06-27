@@ -2453,7 +2453,7 @@ OPTIONAL_APPS = (
     # mckinsey apps
     'gradebook',
 
-    'projects',
+    'edx_solutions_projects',
     'edx_solutions_organizations',
 )
 

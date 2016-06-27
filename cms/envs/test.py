@@ -181,9 +181,10 @@ INSTALLED_APPS += ('external_auth', )
 # Add milestones to Installed apps for testing
 INSTALLED_APPS += ('milestones', 'openedx.core.djangoapps.call_stack_manager')
 
-# Add projects, organizations,'edx_solutions_api_integration', 'progress', 'gradebook to Installed apps for testing
+# Add edx_solutions_projects, edx_solutions_organizations,'edx_solutions_api_integration', 'progress', 'gradebook'
+# to Installed apps for testing
 INSTALLED_APPS += (
-    'projects',
+    'edx_solutions_projects',
     'edx_solutions_organizations',
     'edx_solutions_api_integration',
     'progress',

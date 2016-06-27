@@ -734,8 +734,8 @@ if FEATURES.get('STUDENT_PROGRESS') and "progress" not in INSTALLED_APPS:
     INSTALLED_APPS += ('progress',)
 
 ############# Projects App #################
-if FEATURES.get('PROJECTS_APP') and "projects" not in INSTALLED_APPS:
-    INSTALLED_APPS += ('projects',)
+if FEATURES.get('PROJECTS_APP') and "edx_solutions_projects" not in INSTALLED_APPS:
+    INSTALLED_APPS += ('edx_solutions_projects',)
 
 ############# Organizations App #################
 if FEATURES.get('ORGANIZATIONS_APP') and "edx_solutions_organizations" not in INSTALLED_APPS:
