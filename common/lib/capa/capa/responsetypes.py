@@ -190,7 +190,7 @@ class LoncapaResponse(object):
 
         for prop in self.required_attributes:
             prop_value = xml.get(prop)
-            if prop_value and isinstance(prop_value, str):
+            if prop_value: # Stripping off the empty strings
                 prop_value = prop_value.strip()
             if not prop_value:
                 msg = "Error in problem specification: %s missing required attribute %s" % (
