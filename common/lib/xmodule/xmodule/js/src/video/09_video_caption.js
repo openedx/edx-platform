@@ -758,8 +758,8 @@
                             'data-start': start[index],
                             'tabindex': 0
                         });
-                        
-                        $(liEl).text(text);
+
+                        $(liEl).html(text);
 
                         return liEl[0];
                     };
