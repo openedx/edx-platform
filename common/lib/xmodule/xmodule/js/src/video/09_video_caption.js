@@ -758,8 +758,9 @@
                             'data-start': start[index],
                             'tabindex': 0
                         });
-                        
-                        $(liEl).text(text);
+
+                        // TODO: this needs to be made safe, but more discussion needs to happen
+                        $(liEl).html(text);
 
                         return liEl[0];
                     };
