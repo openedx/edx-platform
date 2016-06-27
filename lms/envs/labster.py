@@ -9,7 +9,6 @@ FEATURES['CUSTOM_COURSES_EDX'] = True
 FEATURES['SHOW_LABSTER_NOTIFICATION'] = False
 LABSTER_FEATURES = {
     "ENABLE_WIKI": True,
-    "ENABLE_TEACHER_DASHBOARD": True,
 }
 
 
@@ -19,7 +18,6 @@ for feature, value in ENV_LABSTER_FEATURES.items():
 
 INSTALLED_APPS += (
     'labster_course_license',
-    'teacher_dashboard',
 )
 
 LABSTER_WIKI_LINK = LABSTER_SETTINGS.get('LABSTER_WIKI_LINK', 'https://theory.labster.com/')
