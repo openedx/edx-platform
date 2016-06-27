@@ -440,7 +440,10 @@ class CourseInfoModule(CourseInfoFields, HtmlModuleMixin):
             return self.data
         else:
             course_updates = [item for item in self.items if item.get('status') == self.STATUS_VISIBLE]
-            course_updates.sort(key=lambda item: (CourseInfoModule.safe_parse_date(item['date']), item['id']), reverse=True)
+            course_updates.sort(
+                key=lambda item: (CourseInfoModule.safe_parse_date(item['date']), item['id']),
+                reverse=True
+            )
             context = {
                 'visible_updates': course_updates[:3],
                 'hidden_updates': course_updates[3:],
