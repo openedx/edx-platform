@@ -18,6 +18,7 @@ class VisibilityTransformer(BlockStructureTransformer):
     Staff users are exempted from visibility rules.
     """
     VERSION = 1
+    TRANSFORM_TYPE = 'simple_remove'
 
     MERGED_VISIBLE_TO_STAFF_ONLY = 'merged_visible_to_staff_only'
 
@@ -71,10 +72,27 @@ class VisibilityTransformer(BlockStructureTransformer):
         """
         Mutates block_structure based on the given usage_info.
         """
-        # Users with staff access bypass the Visibility check.
-        if usage_info.has_staff_access:
-            return
+        self.optimized_transform_prep(usage_info, block_structure)
 
         block_structure.remove_block_if(
-            lambda block_key: self.get_visible_to_staff_only(block_structure, block_key)
+            self.optimized_transform_lambda(usage_info, block_structure)['filter']
         )
+
+    def optimized_transform_prep(self, usage_info, block_structure):
+        """
+        No prep work to be done.
+        """
+        return {}
+
+    def optimized_transform_lambda(self, usage_info, block_structure, **kwargs):
+        """
+        """
+        # Users with staff access bypass the Visibility check.
+        if usage_info.has_staff_access:
+            return [{}]
+
+        return [
+            {
+                'filter': lambda block_key: self.get_visible_to_staff_only(block_structure, block_key)
+            }
+        ]

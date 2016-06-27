@@ -81,7 +81,27 @@ class BlockStructureTransformers(object):
         The given block structure is transformed by each transformer in the
         collection, in the order that the transformers were added.
         """
+        optimized_transformers = []
+        t_handlers = []
+        complex_transformers = []
         for transformer in self._transformers:
+            if transformer.TRANSFORM_TYPE == 'simple_remove':
+                params = transformer.optimized_transform_prep(self.usage_info, block_structure)
+                t_handlers.extend(transformer.optimized_transform_lambda(self.usage_info, block_structure, **params))
+            else:
+                complex_transformers.append(transformer)
+
+        def filter_func(block_key):
+            for t_handler in t_handlers:
+                if 'filter' in t_handler and t_handler['filter'](block_key):
+                    block_structure.remove_block(block_key, keep_descendants=t_handler.get('keep_descendants', False))
+                    return False
+            return True
+
+        for _ in block_structure.topological_traversal(filter_func=filter_func):
+            pass
+
+        for transformer in complex_transformers:
             transformer.transform(self.usage_info, block_structure)
 
         # Prune the block structure to remove any unreachable blocks.

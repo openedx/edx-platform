@@ -17,6 +17,7 @@ class UserPartitionTransformer(BlockStructureTransformer):
     Staff users are *not* exempted from user partition pathways.
     """
     VERSION = 1
+    TRANSFORM_TYPE = 'simple_remove'
 
     @classmethod
     def name(cls):
@@ -68,21 +69,52 @@ class UserPartitionTransformer(BlockStructureTransformer):
         """
         Mutates block_structure based on the given usage_info.
         """
-        SplitTestTransformer().transform(usage_info, block_structure)
+        params = self.optimized_transform_prep(usage_info, block_structure)
+        if params.get('skip', False):
+            return
+        lambdas = self.optimized_transform_lambda(usage_info, block_structure)
+
+        def filter_func(block_key):
+            for t_handler in lambdas:
+                if t_handler['filter'](block_key):
+                    block_structure.remove_block(block_key, keep_descendants=t_handler.get('keep_descendants', False))
+                    return False
+            return True
+
+        for _ in block_structure.topological_traversal(filter_func=filter_func):
+            pass
+
+
+    def optimized_transform_prep(self, usage_info, block_structure):
+        self.partner_transformer = SplitTestTransformer()
+        self.partner_transformer.optimized_transform_prep(usage_info, block_structure)
 
         user_partitions = block_structure.get_transformer_data(self, 'user_partitions')
 
         if not user_partitions:
-            return
+            return {'skip': True}
 
-        user_groups = _get_user_partition_groups(
-            usage_info.course_key, user_partitions, usage_info.user
+        return {
+            'user_groups': _get_user_partition_groups(
+                usage_info.course_key, user_partitions, usage_info.user
+            )
+        }
+
+    def optimized_transform_lambda(self, usage_info, block_structure, **kwargs):
+        """
+        """
+        ret_lambdas = [self.partner_transformer.optimized_transform_lambda(usage_info, block_structure)]
+        if kwargs.get('skip', False):
+            return ret_lambdas
+
+        ret_lambdas.append(
+            {
+                'filter': lambda block_key: not block_structure.get_transformer_block_field(
+                    block_key, self, 'merged_group_access'
+                ).check_group_access(kwargs['user_groups'])
+            }
         )
-        block_structure.remove_block_if(
-            lambda block_key: not block_structure.get_transformer_block_field(
-                block_key, self, 'merged_group_access'
-            ).check_group_access(user_groups)
-        )
+        return ret_lambdas
 
 
 class _MergedGroupAccess(object):

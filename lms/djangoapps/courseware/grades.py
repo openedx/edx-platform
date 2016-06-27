@@ -392,7 +392,10 @@ def _grade(student, course, keep_raw_scores):
 
     More information on the format is in the docstring for CourseGrader.
     """
-    course_structure = get_course_blocks(student, course.location)
+    # Attempting performance boost...
+    course_structure = getattr(course, 'structure', None)
+    if course_structure is None:
+        course_structure = get_course_blocks(student, course.location)
     grading_context_result = grading_context(course_structure)
     scorable_locations = [block.location for block in grading_context_result['all_graded_blocks']]
 
@@ -598,7 +601,10 @@ def _progress_summary(student, course):
         course: A Descriptor containing the course to grade
 
     """
-    course_structure = get_course_blocks(student, course.location)
+    # Attempting performance boost...
+    course_structure = getattr(course, 'structure', None)
+    if course_structure is None:
+        course_structure = get_course_blocks(student, course.location)
     if not len(course_structure):
         return None
     scorable_locations = [block_key for block_key in course_structure if possibly_scored(block_key)]
