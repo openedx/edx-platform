@@ -759,7 +759,6 @@
                             'tabindex': 0
                         });
 
-                        // TODO: this needs to be made safe, but more discussion needs to happen
                         $(liEl).html(text);
 
                         return liEl[0];
