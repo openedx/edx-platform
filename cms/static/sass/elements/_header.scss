@@ -76,7 +76,7 @@
       color: $gray-d1;
 
       &:hover {
-        color: $blue-s1;
+        color: $uxpl-blue-hover-active;
       }
     }
   }
@@ -151,7 +151,8 @@
       overflow: hidden;
       white-space: nowrap;
       text-overflow: ellipsis;
-      opacity: 0.75;
+      opacity: 1.0;
+      color: $gray-d3;
     }
 
     .course-org {
@@ -172,10 +173,10 @@
     .course-link {
       @include transition(color $tmg-f2 ease-in-out 0s);
       display: block;
-      color: $gray-d1;
+      color: $gray-d3;
 
       &:hover {
-        color: $blue-s1;
+        color: $uxpl-blue-hover-active;
       }
     }
   }
@@ -398,10 +399,10 @@ body.course.view-team .nav-library-settings .title,
 body.course.view-team .nav-library-settings-team,
 
 {
-  color: $blue;
+  color: $uxpl-blue-base;
 
   a {
-    color: $blue;
+    color: $uxpl-blue-base;
     pointer-events: none;
   }
 }
