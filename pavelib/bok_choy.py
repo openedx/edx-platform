@@ -31,7 +31,6 @@ BOKCHOY_OPTS = [
     make_option("--verbose", action="store_const", const=2, dest="verbosity"),
     make_option("-q", "--quiet", action="store_const", const=0, dest="verbosity"),
     make_option("-v", "--verbosity", action="count", dest="verbosity"),
-    make_option("--pdb", action="store_true", help="Drop into debugger on failures or errors"),
     make_option("--skip-firefox-version-validation", action='store_false', dest="validate_firefox_version"),
     make_option("--save-screenshots", action='store_true', dest="save_screenshots"),
     ('default_store=', None, 'deprecated in favor of default-store'),

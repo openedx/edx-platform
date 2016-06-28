@@ -44,7 +44,6 @@ class AcceptanceTest(TestSuite):
             "--traceback",
             "--debug-mode",
             "--verbosity={}".format(self.verbosity),
-            "--pdb" if self.pdb else "",
         ] + report_args + [
             self.extra_args
         ] + self.passthrough_options

@@ -102,9 +102,6 @@ class NoseTestSuite(TestSuite):
         if self.fail_fast or env_fail_fast_set:
             opts.append("--stop")
 
-        if self.pdb:
-            opts += " --pdb"
-
         if self.use_ids:
             opts.append("--with-id")
 

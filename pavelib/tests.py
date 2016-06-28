@@ -39,7 +39,6 @@ __test__ = False  # do not collect
     make_option("--verbose", action="store_const", const=2, dest="verbosity"),
     make_option("-q", "--quiet", action="store_const", const=0, dest="verbosity"),
     make_option("-v", "--verbosity", action="count", dest="verbosity", default=1),
-    make_option("--pdb", action="store_true", help="Drop into debugger on failures or errors"),
     make_option(
         '--disable-migrations',
         action='store_true',
@@ -111,7 +110,6 @@ def test_system(options, passthrough_options):
     make_option("--verbose", action="store_const", const=2, dest="verbosity"),
     make_option("-q", "--quiet", action="store_const", const=0, dest="verbosity"),
     make_option("-v", "--verbosity", action="count", dest="verbosity", default=1),
-    make_option("--pdb", action="store_true", help="Drop into debugger on failures or errors"),
     ('cov_args=', None, 'deprecated in favor of cov-args'),
     make_option(
         '-e', '--extra_args', default='',
@@ -172,7 +170,6 @@ def test_lib(options, passthrough_options):
     make_option("--verbose", action="store_const", const=2, dest="verbosity"),
     make_option("-q", "--quiet", action="store_const", const=0, dest="verbosity"),
     make_option("-v", "--verbosity", action="count", dest="verbosity", default=1),
-    make_option("--pdb", action="store_true", help="Drop into debugger on failures or errors"),
     make_option(
         '--disable-migrations',
         action='store_true',
@@ -212,7 +209,6 @@ def test_python(options, passthrough_options):
     make_option("--verbose", action="store_const", const=2, dest="verbosity"),
     make_option("-q", "--quiet", action="store_const", const=0, dest="verbosity"),
     make_option("-v", "--verbosity", action="count", dest="verbosity", default=1),
-    make_option("--pdb", action="store_true", help="Drop into debugger on failures or errors"),
     ('cov_args=', None, 'deprecated in favor of cov-args'),
     make_option(
         '-e', '--extra_args', default='',

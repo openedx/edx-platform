@@ -250,8 +250,6 @@ class BokChoyTestSuite(TestSuite):
             "nosetests",
             test_spec,
         ] + self.verbosity_processes_command
-        if self.pdb:
-            cmd.append("--pdb")
         if self.save_screenshots:
             cmd.append("--with-save-baseline")
         if self.extra_args:

@@ -25,7 +25,6 @@ __test__ = False  # do not collect
     make_option("--verbose", action="store_const", const=2, dest="verbosity"),
     make_option("-q", "--quiet", action="store_const", const=0, dest="verbosity"),
     make_option("-v", "--verbosity", action="count", dest="verbosity"),
-    make_option("--pdb", action="store_true", help="Launches an interactive debugger upon error"),
     ("default_store=", None, "deprecated in favor of default-store"),
     ('extra_args=', 'e', 'deprecated, pass extra options directly in the paver commandline'),
 ])
