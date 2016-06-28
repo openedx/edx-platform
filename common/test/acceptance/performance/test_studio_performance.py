@@ -2,8 +2,8 @@
 Single page performance tests for Studio.
 """
 from bok_choy.web_app_test import WebAppTest, with_cache
-from ..pages.studio.auto_auth import AutoAuthPage
-from ..pages.studio.overview import CourseOutlinePage
+from common.test.acceptance.pages.studio.auto_auth import AutoAuthPage
+from common.test.acceptance.pages.studio.overview import CourseOutlinePage
 from nose.plugins.attrib import attr
 
 
