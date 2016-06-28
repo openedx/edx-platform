@@ -139,9 +139,16 @@ class BlockStructureTransformers(object):
         if not transformers:
             return
 
+        removal_filters = []
+        for removal in [t.transform_block_filter(self.usage_info, block_structure) for t in transformers]:
+            if isinstance(removal, list):
+                removal_filters.extend(removal)
+            else:
+                removal_filters.append(removal)
+
         combined_filters = functools_reduce(
             lambda t1_filter, t2_filter: lambda block_key: t1_filter(block_key) and t2_filter(block_key),
-            [t.transform_block_filter(self.usage_info, block_structure) for t in transformers],
+            removal_filters,
             lambda block_key: True
         )
         block_structure.filter_topological_traversal(combined_filters)

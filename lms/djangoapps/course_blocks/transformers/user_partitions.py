@@ -65,7 +65,7 @@ class UserPartitionTransformer(BlockStructureTransformer):
             block_structure.set_transformer_block_field(block_key, cls, 'merged_group_access', merged_group_access)
 
     def transform_block_filter(self, usage_info, block_structure):
-        SplitTestTransformer().transform(usage_info, block_structure)
+        split_test_filter = SplitTestTransformer().transform_block_filter(usage_info, block_structure)
 
         user_partitions = block_structure.get_transformer_data(self, 'user_partitions')
         if not user_partitions:
@@ -74,11 +74,13 @@ class UserPartitionTransformer(BlockStructureTransformer):
         user_groups = _get_user_partition_groups(
             usage_info.course_key, user_partitions, usage_info.user
         )
-        return block_structure.create_removal_filter(
+        group_access_filter = block_structure.create_removal_filter(
             lambda block_key: not block_structure.get_transformer_block_field(
                 block_key, self, 'merged_group_access'
             ).check_group_access(user_groups)
         )
+
+        return [split_test_filter, group_access_filter]
 
 
 class _MergedGroupAccess(object):

@@ -68,14 +68,14 @@ class SplitTestTransformer(BlockStructureTransformer):
                 group = child_to_group.get(child_location, None)
                 child.group_access[partition_for_this_block.id] = [group] if group is not None else []
 
-    def transform(self, usage_info, block_structure):
+    def transform_block_filter(self, usage_info, block_structure):
         """
         Mutates block_structure based on the given usage_info.
         """
 
         # The UserPartitionTransformer will enforce group access, so
         # go ahead and remove all extraneous split_test modules.
-        block_structure.remove_block_traversal(
+        return block_structure.create_removal_filter(
             lambda block_key: block_key.block_type == 'split_test',
             keep_descendants=True,
         )
