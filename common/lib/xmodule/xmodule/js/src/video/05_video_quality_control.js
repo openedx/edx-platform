@@ -11,13 +11,11 @@ function (HtmlUtils) {
             '<button class="control quality-control is-hidden" aria-disabled="false" title="',
                 '{highDefinition}',
             '">',
-                '<span class="icon icon-hd" aria-hidden="true">HD</span>', // "HD" is treated as a proper noun
+                '<span class="icon icon-hd" aria-hidden="true">HD</span>',
                 '<span class="sr text-translation">',
                     '{highDefinition}',
                 '</span>&nbsp;',
                 '<span class="sr control-text">',
-                    // Translator note:
-                    // Values are 'off' or 'on' depending on the state of the HD control
                     '{off}',
                 '</span>',
             '</button>'
