@@ -108,8 +108,8 @@ define([
                 expect(view.$('.course-details .course-text .course-key').html()).toEqual(context.key);
                 expect(view.$('.course-details .course-text .run-period').length).toBe(0);
                 expect(view.$('.no-action-message').text().trim()).toBe('Coming Soon');
-                expect(view.$('.enroll-open-date').text().trim())
-                    .toBe(context.run_modes[0].enrollment_open_date);
+                expect(view.$('.enrollment-open-date').text().trim())
+                    .toEqual(context.run_modes[0].enrollment_open_date);
             });
 
             it('should render if enrollment_open_date is not provided', function(){
