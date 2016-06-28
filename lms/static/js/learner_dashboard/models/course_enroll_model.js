@@ -11,7 +11,7 @@
             return Backbone.Model.extend({
                 defaults: {
                     course_id: '',
-                    optIn: false,
+                    optIn: false
                 }
             });
         }
