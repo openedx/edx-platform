@@ -27,6 +27,7 @@ from openedx.core.djangoapps.programs.tests import factories
 from openedx.core.djangoapps.programs.tests.mixins import ProgramsApiConfigMixin, ProgramsDataMixin
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
+from util.date_utils import strftime_localized
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -675,7 +676,6 @@ class TestProgramProgressMeter(ProgramsApiConfigMixin, TestCase):
 class TestSupplementProgramData(ProgramsApiConfigMixin, ModuleStoreTestCase):
     """Tests of the utility function used to supplement program data."""
     password = 'test'
-    human_friendly_format = '%x'
     maxDiff = None
 
     def setUp(self):
@@ -707,8 +707,8 @@ class TestSupplementProgramData(ProgramsApiConfigMixin, ModuleStoreTestCase):
                 course_key=unicode(self.course.id),  # pylint: disable=no-member
                 course_url=reverse('course_root', args=[self.course.id]),  # pylint: disable=no-member
                 course_image_url=course_overview.course_image_url,
-                start_date=self.course.start.strftime(self.human_friendly_format),
-                end_date=self.course.end.strftime(self.human_friendly_format),
+                start_date=strftime_localized(self.course.start, 'SHORT_DATE'),
+                end_date=strftime_localized(self.course.end, 'SHORT_DATE'),
                 is_course_ended=self.course.end < timezone.now(),
                 is_enrolled=False,
                 is_enrollment_open=True,
@@ -746,14 +746,13 @@ class TestSupplementProgramData(ProgramsApiConfigMixin, ModuleStoreTestCase):
         data = utils.supplement_program_data(self.program, self.user)
 
         if is_enrollment_open:
-            self._assert_supplemented(
-                data,
-                is_enrollment_open=is_enrollment_open)
+            self._assert_supplemented(data, is_enrollment_open=is_enrollment_open)
         else:
             self._assert_supplemented(
                 data,
                 is_enrollment_open=is_enrollment_open,
-                enrollment_open_date=self.course.enrollment_start.strftime(self.human_friendly_format))
+                enrollment_open_date=strftime_localized(self.course.enrollment_start, 'SHORT_DATE')
+            )
 
     @ddt.data(True, False)
     @mock.patch(UTILS_MODULE + '.certificate_api.certificate_downloadable_status')
