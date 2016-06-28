@@ -148,7 +148,7 @@
             &:focus {
 
               + .tip {
-                color: $gray;
+                color: $gray-d1;
               }
             }
           }
@@ -173,7 +173,7 @@
             @include transition(color $tmg-f3 ease-in-out 0s);
             display: block;
             margin-top: ($baseline/4);
-            color: $gray-l3;
+            color: $gray-d1;
           }
         }
 
@@ -214,7 +214,7 @@
       margin: 0 0 $baseline 0;
       border-bottom: 1px solid $gray-l4;
       padding: 0 0 $baseline 0;
-      color: $gray-l1;
+      color: $gray-d1;
 
       &:last-child {
         margin-bottom: 0;

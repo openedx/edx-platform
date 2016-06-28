@@ -300,7 +300,7 @@
       margin: 0 10px;
 
       &.active {
-        border-bottom: 4px solid $blue;
+        border-bottom: 4px solid $uxpl-blue-base;
       }
 
       &.active, &:hover {
@@ -310,7 +310,7 @@
       }
 
       a {
-        color: $blue;
+        color: $uxpl-blue-base;
         cursor: pointer;
         display: inline-block;
       }
@@ -492,7 +492,6 @@
       @extend %t-copy-sub1;
       @include transition(opacity $tmg-f1 ease-in-out 0);
       color: $gray;
-      opacity: 0.75;
 
       .metadata-item {
         display: inline-block;

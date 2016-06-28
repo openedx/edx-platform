@@ -269,11 +269,11 @@
           @include transition(color, 0.15s, ease-in-out);
           display: block;
           margin-top: ($baseline/4);
-          color: $gray-l3;
+          color: $gray-d1;
         }
 
         .is-focused .tip {
-          color: $gray;
+          color: $gray-d2;
         }
 
 
@@ -352,7 +352,7 @@
 
             &:focus {
               + .tip {
-                color: $gray;
+                color: $gray-d1;
               }
             }
           }

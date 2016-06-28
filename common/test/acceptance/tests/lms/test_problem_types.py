@@ -252,7 +252,6 @@ class ProblemTypeTestMixin(object):
                 'aria-roles',  # TODO: AC-491
                 'checkboxgroup',  # TODO: AC-491
                 'radiogroup',  # TODO: AC-491
-                'color-contrast',  # TODO: AC-491
                 'section',  # TODO: AC-491
                 'label',  # TODO: AC-491
             ]
@@ -694,7 +693,6 @@ class CodeProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         self.problem_page.a11y_audit.config.set_rules({
             'ignore': [
                 'section',  # TODO: AC-491
-                'color-contrast',  # TODO: AC-286
                 'label',  # TODO: AC-286
             ]
         })

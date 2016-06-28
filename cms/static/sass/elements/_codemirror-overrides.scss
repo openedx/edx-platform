@@ -1,0 +1,11 @@
+/*
+ * CodeMirror color contrast overrides
+ * (so we don't change the vendor file)
+ */
+
+.CodeMirror {
+    
+    .CodeMirror-linenumber.CodeMirror-gutter-elt {
+        color: $gray-d3 !important;
+    }
+}

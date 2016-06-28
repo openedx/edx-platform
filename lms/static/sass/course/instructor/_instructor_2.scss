@@ -33,7 +33,7 @@
 
   .file-download-link a {
     font-size: 15px;
-    color: $link-color;
+    color: $uxpl-blue-base;
     text-decoration: underline;
     padding: ($baseline/4);
   }
@@ -674,7 +674,7 @@
         // .add-field
 
         input[type="button"].add {
-          @include idashbutton($blue);
+          @include idashbutton($uxpl-blue-base);
           position: absolute;
           @include right($baseline);
         }
@@ -756,7 +756,7 @@
     }
   }
   .form-submit {
-    @include idashbutton($blue);
+    @include idashbutton($uxpl-blue-base);
     @include font-size(14);
     @include line-height(14);
     margin-right: ($baseline/2);
@@ -778,7 +778,7 @@
     }
 
     .action-create {
-      @include idashbutton($blue);
+      @include idashbutton($uxpl-blue-base);
       @extend %t-weight4;
       @include float(right);
       @include text-align(right);
@@ -803,7 +803,7 @@
 
     // specific message actions
     .message .action-create {
-      @include idashbutton($blue);
+      @include idashbutton($uxpl-blue-base);
     }
   }
 
@@ -979,7 +979,7 @@
     }
 
     .action-submit {
-      @include idashbutton($blue);
+      @include idashbutton($uxpl-blue-base);
       // needed to override very poor specificity and base rules for blue button
       @include font-size(14);
       margin-bottom: 0;
@@ -1126,7 +1126,7 @@
     }
 
     .cohorted-text {
-      color: $link-color;
+      color: $uxpl-blue-base;
     }
 
     .discussions-wrapper {
@@ -1427,7 +1427,7 @@ input[name="subject"] {
     color: #3c3c3c;
     line-height: 30px;
     .add{
-      @include button(simple, $blue);
+      @include button(simple, $uxpl-blue-base);
       @extend .button-reset;
       font-size: em(13);
       @include float(right);
@@ -1632,7 +1632,7 @@ input[name="subject"] {
     border-radius: 2px;
     input[type="button"]#update_coupon_button, input[type="button"]#add_coupon_button,
     input[type="button"]#set_course_button, input[type="button"]#lookup_regcode {
-      @include button(simple, $blue);
+      @include button(simple, $uxpl-blue-base);
       @extend .button-reset;
       display: block;
       height: auto;
@@ -1641,7 +1641,7 @@ input[name="subject"] {
       white-space: normal;
     }
     input[name="generate-registration-codes-csv"]{
-      @include button(simple, $blue);
+      @include button(simple, $uxpl-blue-base);
       @extend .button-reset;
     }
     .modal-form-error {
@@ -1782,7 +1782,7 @@ input[name="subject"] {
         h2 {
           font-size: 24px;
           font-weight: 100;
-          color: #1580b0;
+          color: $uxpl-blue-base;
           @include text-align(left);
         }
       }
@@ -1906,7 +1906,7 @@ input[name="subject"] {
     color: #3c3c3c;
     line-height: 30px;
     .add{
-      @include button(simple, $blue);
+      @include button(simple, $uxpl-blue-base);
       @extend .button-reset;
       font-size: em(13);
       @include float(right);
@@ -1925,7 +1925,7 @@ input[name="subject"] {
     color: #3C3C3C;
     line-height: 30px;
     .add{
-      @include button(simple, $blue);
+      @include button(simple, $uxpl-blue-base);
       @extend .button-reset;
       font-size: em(13);
     }
@@ -1948,7 +1948,7 @@ input[name="subject"] {
     color: #3C3C3C;
     line-height: 30px;
     .add{
-      @include button(simple, $blue);
+      @include button(simple, $uxpl-blue-base);
       @extend .button-reset;
       font-size: em(13);
     }
@@ -2135,8 +2135,8 @@ input[name="subject"] {
         &:focus {
           z-index: 2;
           color: #fff;
-          background-color: darken(#428bca, 6.5%);
-          border-color: darken(#428bca, 6.5%);
+          background-color: $uxpl-blue-base;
+          border-color: $uxpl-blue-base;
           cursor: default;
         }
       }
@@ -2302,7 +2302,7 @@ input[name="subject"] {
             color: $gray-d1;
 
             &:hover {
-              color: $blue;
+              color: $uxpl-blue-hover-active;
             }
           }
 
@@ -2361,21 +2361,20 @@ input[name="subject"] {
     display: inline;
     @include margin-left(-5px);
     span.browse {
-      @include button(simple, $blue);
+      @include button(simple, $uxpl-blue-base);
       @include margin-right($baseline);
       padding: 6px ($baseline/2);
       font-size: 12px;
       border-radius: 0 3px 3px 0;
     }
     input.file_field {
+      @extend %cont-text-sr;
       position: absolute;
       @include right(0);
       top: 0;
       margin: 0;
       padding: 0;
       cursor: pointer;
-      opacity: 0;
-      filter: alpha(opacity=0);
     }
   }
   & > span, & input[disabled] {

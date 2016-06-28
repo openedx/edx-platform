@@ -206,7 +206,7 @@
                 chooseFile: function(event) {
                     if (event && event.preventDefault) { event.preventDefault(); }
                     if (event.currentTarget.files.length === 1) {
-                        this.$el.find(DOM_SELECTORS.upload_csv_button).removeClass('disabled');
+                        this.$el.find(DOM_SELECTORS.upload_csv_button).attr('disabled', 'false');
                         this.$el.find(DOM_SELECTORS.browse_file).val(
                             event.currentTarget.value.substring(event.currentTarget.value.lastIndexOf("\\") + 1));
                     }

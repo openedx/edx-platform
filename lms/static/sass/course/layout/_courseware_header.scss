@@ -44,18 +44,18 @@
 
         &:hover,
         &:focus {
-          color: $blue;
-          border-bottom: 4px solid $blue;
+          color: $uxpl-blue-hover-active;
+          border-bottom: 4px solid $uxpl-blue-hover-active;
         }
 
         &.active {
-          border-bottom: 4px solid $blue;
+          border-bottom: 4px solid $uxpl-blue-base;
           background-color: transparent;
-          color: $blue;
+          color: $uxpl-blue-base;
 
           &:hover,
           &:focus {
-            color: $blue;
+            color: $uxpl-blue-base;
           }
         }
       }
@@ -97,7 +97,7 @@
       display: block;
       @include background-image(linear-gradient(-90deg, lighten($link-color, 8%), lighten($link-color, 5%) 50%, $link-color 50%, darken($link-color, 10%) 100%));
       border: 1px solid transparent;
-      border-color: darken($link-color, 10%);
+      border-color: $uxpl-blue-base;
       border-radius: 3px;
       @include box-sizing(border-box);
       box-shadow: 0 1px 0 0 rgba(255,255,255, 0.6);
@@ -117,7 +117,7 @@
       vertical-align: middle;
 
       &:hover, &:active, &:focus {
-        @include background-image(linear-gradient(-90deg, $link-color, $link-color 50%, $link-color 50%, $link-color 100%));
+        @include background-image(linear-gradient(-90deg, $uxpl-blue-base, $uxpl-blue-base 50%, $uxpl-blue-base 50%, $uxpl-blue-base 100%));
       }
     }
   }

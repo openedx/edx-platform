@@ -204,7 +204,7 @@ define([
 
             it("verifies that Generate Exception Certificate button is disabled", function() {
                 expect(view.$el.find('table tbody tr').length).toBe(2);
-                expect(view.$el.find('#generate-exception-certificates').first()).not.toHaveClass('is-disabled');
+                expect(view.$el.find('#generate-exception-certificates').first()).not.toHaveAttr('disabled');
 
                 // Render the view with active_certificate set to false.
                 view = new CertificateWhiteListView({
@@ -214,7 +214,7 @@ define([
                 view.render();
 
                 // Verify that `Generate Exception Certificate` is disabled even when Collection is not empty.
-                expect(view.$el.find('#generate-exception-certificates').first()).toHaveClass('is-disabled');
+                expect(view.$el.find('#generate-exception-certificates').first()).toHaveAttr('disabled', 'disabled');
                 expect(view.$el.find('table tbody tr').length).toBe(2);
             });
 

@@ -261,14 +261,6 @@
   background: transparent;
   line-height: 1.5em;
   text-align: center;
-
-  &:hover, &:active, &:focus {
-
-  }
-
-  &.current, &.active {
-
-  }
 }
 
 %ui-btn-flat-outline {
@@ -277,14 +269,14 @@
   @extend %t-action4;
   text-align: center;
   border-radius: ($baseline/4);
-  border: 1px solid $blue-l2;
+  border: 1px solid $uxpl-blue-base;
   padding: 1px ($baseline/2) 2px ($baseline/2);
-  background-color: transparent;
-  color: $blue-l2;
+  background-color: $white;
+  color: $uxpl-blue-base;
 
   &:hover, &:focus {
-    border: 1px solid $blue;
-    background-color: $blue;
+    border: 1px solid $uxpl-blue-hover-active;
+    background-color: $uxpl-blue-hover-active;
     color: $white;
   }
 
@@ -320,7 +312,7 @@
   @extend %ui-btn-non;
 
   &:hover, &:focus {
-    background-color: $blue;
+    background-color: $uxpl-blue-base;
     color: $white;
   }
 }

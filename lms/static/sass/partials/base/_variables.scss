@@ -159,6 +159,12 @@ $blue-t1: rgba($blue, 0.25);
 $blue-t2: rgba($blue, 0.50);
 $blue-t3: rgba($blue, 0.75);
 
+$uxpl-blue-base: rgba(0, 116, 180, 1); // wcag2a compliant
+$uxpl-blue-hover-active: lighten($uxpl-blue-base, 7%); // wcag2a compliant
+
+$uxpl-green-base: rgba(0, 129, 0, 1); // wcag2a compliant
+$uxpl-green-hover-active: lighten($uxpl-green-base, 7%); // wcag2a compliant
+
 $orange: rgb(237, 189, 60);
 $orange-l1: tint($orange,20%);
 $orange-l2: tint($orange,40%);
@@ -423,11 +429,11 @@ $action-secondary-disabled-bg: $m-gray-d3 !default;
 $action-secondary-disabled-fg: $white !default;
 
 // actions - misc
-$link-color: $blue !default;
-$link-color-d1: $blue !default;
-$link-hover: $blue-l1 !default; // from our Pattern Library http://ux.edx.org/elements/colors/
+$link-color: $uxpl-blue-base !default;
+$link-color-d1: $link-color !default;
+$link-hover: $uxpl-blue-hover-active !default; // from our Pattern Library http://ux.edx.org/elements/colors/
 $site-status-color: $pink !default;
-$button-color: $blue !default;
+$button-color: $uxpl-blue-base !default;
 $button-archive-color: rgb(238,238,238) !default; // #eeeeee
 
 // larger, random elements
@@ -462,7 +468,7 @@ $courseware-footer-margin: 0px !default;
 $courseware-border-bottom-color: rgb(68,162,222) !default;
 $courseware-button-border-color: rgb(230,230,230) !default;
 $courseware-hover-color: rgb(51,52,53) !default;
-$courseware-navigation-color: $blue !default;
+$courseware-navigation-color: $uxpl-blue-base !default;
 
 // homepage, onboarding, and course discovery
 $homepage__header--gradient__color--alpha: lighten($gray, 15%) !default;

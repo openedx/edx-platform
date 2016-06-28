@@ -69,7 +69,7 @@
     margin: 0 ($baseline*0.75);
     padding: ($baseline/4);
     text-align: center;
-    color: $gray;
+    color: $gray-d2;
   }
 
   .current-page {
@@ -82,7 +82,7 @@
     @extend %t-title4;
     @extend %t-regular;
     vertical-align: middle;
-    color: $gray-l2;
+    color: $gray;
   }
 
   .pagination-form {
