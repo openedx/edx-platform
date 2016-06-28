@@ -2,6 +2,7 @@
 <%namespace name='static' file='/static_content.html'/>
 <%def name="online_help_token()"><% return "progress" %></%def>
 <%!
+from course_modes.models import CourseMode
 from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse
 from util.date_utils import get_time_display, DEFAULT_SHORT_DATE_FORMAT
@@ -47,9 +48,15 @@ from django.utils.http import urlquote_plus
           <header class="progress-certificates">
             <h1 class="progress-certificates-title">${_("Course Progress for Student '{username}' ({email})").format(username=student.username, email=student.email) | h}</h1>
           </header>
-
-          %if show_generate_cert_btn:
-          <div class="wrapper-msg wrapper-auto-cert">
+        <div class="wrapper-msg wrapper-auto-cert">
+          %if enrollment_mode == CourseMode.AUDIT:
+            <div class="auto-cert-message">
+              <div class="msg-content">
+                <h2 class="title">${_("Your enrollment: Audit track")}</h2>
+                <p class="copy">${_("You are enrolled in the audit track for this course. The audit track does not include a certificate.")}</p>
+              </div>
+            </div>
+          %elif show_generate_cert_btn:
             <div id="errors-info" class="errors-info"></div>
             %if passed:
             <div class="auto-cert-message" id="course-success">
@@ -105,8 +112,9 @@ from django.utils.http import urlquote_plus
               </div>
             </div>
             %endif
-          </div>
           %endif
+        </div>
+
 
           %if not course.disable_progress_graph:
             <div class="grade-detail-graph" id="grade-detail-graph" aria-hidden="true"></div>
