@@ -6,10 +6,10 @@ from django.conf import settings
 
 from edx_proctoring.api import get_attempt_status_summary
 from edx_proctoring.models import ProctoredExamStudentAttemptStatus
-from openedx.core.lib.block_structure.transformer import BlockStructureTransformer
+from openedx.core.lib.block_structure.transformer import OptimizedTransformer
 
 
-class ProctoredExamTransformer(BlockStructureTransformer):
+class ProctoredExamTransformer(OptimizedTransformer):
     """
     Exclude proctored exams unless the user is not a verified student or has
     declined taking the exam.

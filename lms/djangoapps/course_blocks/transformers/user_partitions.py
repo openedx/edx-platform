@@ -1,13 +1,13 @@
 """
 User Partitions Transformer
 """
-from openedx.core.lib.block_structure.transformer import BlockStructureTransformer
+from openedx.core.lib.block_structure.transformer import OptimizedTransformer
 
 from .split_test import SplitTestTransformer
 from .utils import get_field_on_block
 
 
-class UserPartitionTransformer(BlockStructureTransformer):
+class UserPartitionTransformer(OptimizedTransformer):
     """
     A transformer that enforces the group access rules on course blocks,
     by honoring their user_partitions and group_access fields, and

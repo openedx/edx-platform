@@ -1,14 +1,14 @@
 """
 Start Date Transformer implementation.
 """
-from openedx.core.lib.block_structure.transformer import BlockStructureTransformer
+from openedx.core.lib.block_structure.transformer import OptimizedTransformer
 from lms.djangoapps.courseware.access_utils import check_start_date
 from xmodule.course_metadata_utils import DEFAULT_START_DATE
 
 from .utils import get_field_on_block
 
 
-class StartDateTransformer(BlockStructureTransformer):
+class StartDateTransformer(OptimizedTransformer):
     """
     A transformer that enforces the 'start' and 'days_early_for_beta'
     fields on blocks by removing blocks from the block structure for

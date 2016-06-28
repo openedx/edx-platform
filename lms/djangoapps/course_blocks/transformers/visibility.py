@@ -1,10 +1,10 @@
 """
 Visibility Transformer implementation.
 """
-from openedx.core.lib.block_structure.transformer import BlockStructureTransformer
+from openedx.core.lib.block_structure.transformer import OptimizedTransformer
 
 
-class VisibilityTransformer(BlockStructureTransformer):
+class VisibilityTransformer(OptimizedTransformer):
     """
     A transformer that enforces the visible_to_staff_only field on
     blocks by removing blocks from the block structure for which the

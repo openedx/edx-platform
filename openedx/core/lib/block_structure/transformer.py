@@ -2,39 +2,13 @@
 This module provides the abstract base class for all Block Structure
 Transformers.
 """
-
-
-class BlockStructureTransformerMetaclass(type):
-    """
-    A metaclass which verifies subclasses of BlockStructureTransformer.
-    """
-    def __new__(mcs, name, bases, attrs):
-        new_class = super(BlockStructureTransformerMetaclass, mcs).__new__(mcs, name, bases, attrs)
-
-        def _is_method_overridden(method_name):
-            """
-            Returns whether a method of the given method_name is overriden.
-            """
-            return getattr(new_class, method_name) != getattr(BlockStructureTransformer, method_name)
-
-        if name != 'BlockStructureTransformer':
-            block_filter_overriden = _is_method_overridden('transform_block_filter')
-            transform_overriden = _is_method_overridden('transform')
-            if transform_overriden == block_filter_overriden:  # XOR
-                raise Exception(
-                    "Exactly one of the transform methods needs to be defined on the class {}".format(
-                        name,
-                    )
-                )
-        return new_class
+from abc import abstractmethod
 
 
 class BlockStructureTransformer(object):
     """
     Abstract base class for all block structure transformers.
     """
-
-    __metaclass__ = BlockStructureTransformerMetaclass
 
     # All Transformers are expected to maintain a VERSION class
     # attribute.  While the value for the base class is set to 0,
@@ -104,6 +78,7 @@ class BlockStructureTransformer(object):
         """
         pass
 
+    @abstractmethod
     def transform(self, usage_info, block_structure):
         """
         Transforms the given block_structure for the given usage_info,
@@ -153,18 +128,33 @@ class BlockStructureTransformer(object):
         """
         raise NotImplementedError
 
+
+class OptimizedTransformer(BlockStructureTransformer):
+    """
+    Transformers may optionally choose to subclass this class instead of the
+    base, if their transform logic can be broken apart into a lambda for
+    optimization of combined tree traversals.
+
+    For performance reasons, developers should try to subclass this
+    class instead of the above base class, whenever possible - since
+    with this alternative, traversal of the entire block structure happens
+    only once for all transformers that implement this form of transform.
+    """
+
+    def transform(self, usage_info, block_structure):
+        """
+        This override of the abstract base method allows OptimizedTransformers
+        to define transform_block_filter instead of transform.
+        """
+        block_structure.filter_topological_traversal(self.transform_block_filter(usage_info, block_structure))
+
+    @abstractmethod
     def transform_block_filter(self, usage_info, block_structure):
         """
-        This is an alternative transformation implementation from the above
-        transform method.
+        This is an alternative to the standard transform method.
 
         Returns a filter function to be used to filter out any unwanted blocks
         in the given block_structure.
-
-        For performance reasons, developers should try to implement this
-        method instead of the above transform method, whenever possible - since
-        with this alternative, traversal of the entire block structure happens
-        only once for all transformers that implement this form of transform.
 
         In addition to the commonly used methods listed above, the following
         methods are commonly used by implementations of transform_block_filter:

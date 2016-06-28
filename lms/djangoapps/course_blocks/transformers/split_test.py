@@ -1,10 +1,10 @@
 """
 Split Test Block Transformer
 """
-from openedx.core.lib.block_structure.transformer import BlockStructureTransformer
+from openedx.core.lib.block_structure.transformer import OptimizedTransformer
 
 
-class SplitTestTransformer(BlockStructureTransformer):
+class SplitTestTransformer(OptimizedTransformer):
     """
     A nested transformer of the UserPartitionTransformer that honors the
     block structure pathways created by split_test modules.

@@ -3,13 +3,13 @@ Content Library Transformer.
 """
 import json
 from courseware.models import StudentModule
-from openedx.core.lib.block_structure.transformer import BlockStructureTransformer
+from openedx.core.lib.block_structure.transformer import OptimizedTransformer
 from xmodule.library_content_module import LibraryContentModule
 from xmodule.modulestore.django import modulestore
 from eventtracking import tracker
 
 
-class ContentLibraryTransformer(BlockStructureTransformer):
+class ContentLibraryTransformer(OptimizedTransformer):
     """
     A transformer that manipulates the block structure by removing all
     blocks within a library_content module to which a user should not
