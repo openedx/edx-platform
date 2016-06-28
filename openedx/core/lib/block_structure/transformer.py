@@ -2,13 +2,39 @@
 This module provides the abstract base class for all Block Structure
 Transformers.
 """
-from abc import abstractmethod
+
+
+class BlockStructureTransformerMetaclass(type):
+    """
+    A metaclass which verifies subclasses of BlockStructureTransformer.
+    """
+    def __new__(mcs, name, bases, attrs):
+        new_class = super(BlockStructureTransformerMetaclass, mcs).__new__(mcs, name, bases, attrs)
+
+        def _is_method_overridden(method_name):
+            """
+            Returns whether a method of the given method_name is overriden.
+            """
+            return getattr(new_class, method_name) != getattr(BlockStructureTransformer, method_name)
+
+        if name != 'BlockStructureTransformer':
+            block_filter_overriden = _is_method_overridden('transform_block_filter')
+            transform_overriden = _is_method_overridden('transform')
+            if transform_overriden == block_filter_overriden:  # XOR
+                raise Exception(
+                    "Exactly one of the transform methods needs to be defined on the class {}".format(
+                        name,
+                    )
+                )
+        return new_class
 
 
 class BlockStructureTransformer(object):
     """
     Abstract base class for all block structure transformers.
     """
+
+    __metaclass__ = BlockStructureTransformerMetaclass
 
     # All Transformers are expected to maintain a VERSION class
     # attribute.  While the value for the base class is set to 0,
@@ -78,7 +104,6 @@ class BlockStructureTransformer(object):
         """
         pass
 
-    @abstractmethod
     def transform(self, usage_info, block_structure):
         """
         Transforms the given block_structure for the given usage_info,
@@ -101,15 +126,16 @@ class BlockStructureTransformer(object):
 
         A Transformer may choose to remove entire sub-structures during
         the transform method and may do so using the remove_block and
-        remove_block_if methods.
+        filter_with_removal methods.
 
         Amongst the many methods available for a block_structure, the
         following methods are commonly used during transforms:
             get_xblock_field
             get_transformer_data
             get_transformer_block_field
-            remove_block
-            remove_block_if
+            remove_block_traversal
+            filter_with_removal
+            filter_topological_traversal
             topological_traversal
             post_order_traversal
 
@@ -125,4 +151,40 @@ class BlockStructureTransformer(object):
                 block structure, with already collected data for the
                 transformer, that is to be transformed in place.
         """
-        pass
+        raise NotImplementedError
+
+    def transform_block_filter(self, usage_info, block_structure):
+        """
+        This is an alternative transformation implementation from the above
+        transform method.
+
+        Returns a filter function to be used to filter out any unwanted blocks
+        in the given block_structure.
+
+        For performance reasons, developers should try to implement this
+        method instead of the above transform method, whenever possible - since
+        with this alternative, traversal of the entire block structure happens
+        only once for all transformers that implement this form of transform.
+
+        In addition to the commonly used methods listed above, the following
+        methods are commonly used by implementations of transform_block_filter:
+            create_universal_filter
+            create_removal_filter
+
+        Note: Transformers that implement this alternative should be
+        independent of all other registered transformers as they may not
+        be applied in the order in which they were listed in the registry.
+
+        Arguments:
+            usage_info (any negotiated type) - A usage-specific object
+                that is passed to the block_structure and forwarded to all
+                requested Transformers in order to apply a
+                usage-specific transform. For example, an instance of
+                usage_info would contain a user object for which the
+                transform should be applied.
+
+            block_structure (BlockStructureBlockData) - A mutable
+                block structure, with already collected data for the
+                transformer, that is to be transformed in place.
+        """
+        raise NotImplementedError

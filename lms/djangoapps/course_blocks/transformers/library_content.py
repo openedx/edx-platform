@@ -59,17 +59,12 @@ class ContentLibraryTransformer(BlockStructureTransformer):
                 summary = summarize_block(child_key)
                 block_structure.set_transformer_block_field(child_key, cls, 'block_analytics_summary', summary)
 
-    def transform(self, usage_info, block_structure):
-        """
-        Mutates block_structure based on the given usage_info.
-        """
-
+    def transform_block_filter(self, usage_info, block_structure):
         all_library_children = set()
         all_selected_children = set()
-        for block_key in block_structure.topological_traversal(
-                filter_func=lambda block_key: block_key.block_type == 'library_content',
-                yield_descendants_of_unyielded=True,
-        ):
+        for block_key in block_structure:
+            if block_key.block_type != 'library_content':
+                continue
             library_children = block_structure.get_children(block_key)
             if library_children:
                 all_library_children.update(library_children)
@@ -110,11 +105,7 @@ class ContentLibraryTransformer(BlockStructureTransformer):
                 return False
             return True
 
-        # Check and remove all non-selected children from course
-        # structure.
-        block_structure.remove_block_if(
-            check_child_removal
-        )
+        return block_structure.create_removal_filter(check_child_removal)
 
     @classmethod
     def _get_student_module(cls, user, course_key, block_key):

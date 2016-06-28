@@ -1,9 +1,11 @@
 """
 Module for a collection of BlockStructureTransformers.
 """
+from functools import reduce as functools_reduce
 from logging import getLogger
 
 from .exceptions import TransformerException
+from .transformer import BlockStructureTransformer
 from .transformer_registry import TransformerRegistry
 
 
@@ -81,8 +83,9 @@ class BlockStructureTransformers(object):
         The given block structure is transformed by each transformer in the
         collection, in the order that the transformers were added.
         """
-        for transformer in self._transformers:
-            transformer.transform(self.usage_info, block_structure)
+        with_block_filters, others = self._categorize_by_type()
+        self._transform_with_block_filters(with_block_filters, block_structure)
+        self._transform_others(others, block_structure)
 
         # Prune the block structure to remove any unreachable blocks.
         block_structure._prune_unreachable()  # pylint: disable=protected-access
@@ -105,3 +108,48 @@ class BlockStructureTransformers(object):
             )
 
         return bool(outdated_transformers)
+
+    def _categorize_by_type(self):
+        """
+        Returns a tuple of
+            1. list of transformers that implement the transform_block_filter
+            method, and
+            2. list of the rest of the transformers
+        """
+        with_block_filters, other = [], []
+        for transformer in self._transformers:
+            if self._is_block_filter_implemented(transformer):
+                with_block_filters.append(transformer)
+            else:
+                other.append(transformer)
+        return with_block_filters, other
+
+    def _is_block_filter_implemented(self, transformer):
+        """
+        Returns whether the given transformer has its own implementation of
+        the transform_block_filter method.
+        """
+        return transformer.transform_block_filter.__func__ != BlockStructureTransformer.transform_block_filter.__func__
+
+    def _transform_with_block_filters(self, transformers, block_structure):
+        """
+        Transforms the given block_structure using the transform_block_filter
+        method from the given transformers.
+        """
+        if not transformers:
+            return
+
+        combined_filters = functools_reduce(
+            lambda t1_filter, t2_filter: lambda block_key: t1_filter(block_key) and t2_filter(block_key),
+            [t.transform_block_filter(self.usage_info, block_structure) for t in transformers],
+            lambda block_key: True
+        )
+        block_structure.filter_topological_traversal(combined_filters)
+
+    def _transform_others(self, transformers, block_structure):
+        """
+        Transforms the given block_structure using the transform
+        method from the given transformers.
+        """
+        for transformer in transformers:
+            transformer.transform(self.usage_info, block_structure)

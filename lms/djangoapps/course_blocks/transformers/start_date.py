@@ -83,19 +83,15 @@ class StartDateTransformer(BlockStructureTransformer):
                 merged_start_value
             )
 
-    def transform(self, usage_info, block_structure):
-        """
-        Mutates block_structure based on the given usage_info.
-        """
+    def transform_block_filter(self, usage_info, block_structure):
         # Users with staff access bypass the Start Date check.
         if usage_info.has_staff_access:
-            return
+            return block_structure.create_universal_filter()
 
-        block_structure.remove_block_if(
-            lambda block_key: not check_start_date(
-                usage_info.user,
-                block_structure.get_xblock_field(block_key, 'days_early_for_beta'),
-                self.get_merged_start_date(block_structure, block_key),
-                usage_info.course_key,
-            )
+        removal_condition = lambda block_key: not check_start_date(
+            usage_info.user,
+            block_structure.get_xblock_field(block_key, 'days_early_for_beta'),
+            self.get_merged_start_date(block_structure, block_key),
+            usage_info.course_key,
         )
+        return block_structure.create_removal_filter(removal_condition)
