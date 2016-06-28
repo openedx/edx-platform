@@ -84,7 +84,7 @@
                     // Open speed meenu. Focus is on last speed entry.
                     speedControl.trigger(keyPressEvent(KEY.ENTER));
                     speedControl.mouseenter().mouseleave();
-                    expect(speedControl).toHaveClass('is-opened');
+                    expect(speedControl).not.toHaveClass('is-opened');
                 });
 
                 it('close the speed menu on outside click', function () {
