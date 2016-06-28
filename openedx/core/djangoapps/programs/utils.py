@@ -15,6 +15,7 @@ from openedx.core.djangoapps.content.course_overviews.models import CourseOvervi
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.lib.edx_api_utils import get_edx_api_data
 from student.models import CourseEnrollment
+from util.date_utils import strftime_localized
 from util.organizations_helpers import get_organization_by_short_name
 from xmodule.course_metadata_utils import DEFAULT_START_DATE
 
@@ -343,11 +344,10 @@ def supplement_program_data(program_data, user):
             run_mode['course_url'] = reverse('course_root', args=[course_key])
             run_mode['course_image_url'] = course_overview.course_image_url
 
-            human_friendly_format = '%x'
-            start_date = course_overview.start or DEFAULT_START_DATE
+            run_mode['start_date'] = course_overview.start_datetime_text()
+            run_mode['end_date'] = course_overview.end_datetime_text()
+
             end_date = course_overview.end or datetime.datetime.max.replace(tzinfo=pytz.UTC)
-            run_mode['start_date'] = start_date.strftime(human_friendly_format)
-            run_mode['end_date'] = end_date.strftime(human_friendly_format)
             run_mode['is_course_ended'] = end_date < timezone.now()
 
             run_mode['is_enrolled'] = CourseEnrollment.is_enrolled(user, course_key)
@@ -358,7 +358,7 @@ def supplement_program_data(program_data, user):
             run_mode['is_enrollment_open'] = is_enrollment_open
             if not is_enrollment_open:
                 # Only render this enrollment open date if the enrollment open is in the future
-                run_mode['enrollment_open_date'] = enrollment_start.strftime(human_friendly_format)
+                run_mode['enrollment_open_date'] = strftime_localized(enrollment_start, 'SHORT_DATE')
 
             # TODO: Currently unavailable on LMS.
             run_mode['marketing_url'] = ''
