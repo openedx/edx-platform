@@ -363,6 +363,9 @@ FEATURES = {
     # lives in the Extended table, saving the frontend from
     # making multiple queries.
     'ENABLE_READING_FROM_MULTIPLE_HISTORY_TABLES': True,
+
+    # WIP -- will be removed in Ticket #TNL-4750.
+    'ENABLE_TIME_ZONE_PREFERENCE': False,
 }
 
 # Ignore static asset files on import which match this pattern
