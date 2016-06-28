@@ -1,5 +1,5 @@
 define([
-    'jquery', 'common/js/spec_helpers/ajax_helpers','common/js/spec_helpers/template_helpers',
+    'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers','common/js/spec_helpers/template_helpers',
     'js/discovery/discovery_factory'
 ], function($, AjaxHelpers, TemplateHelpers, DiscoveryFactory) {
     'use strict';

@@ -1,5 +1,10 @@
 // LMS base styles
 
+// removing the outline on any element that we make programmatically focusable
+[tabindex="-1"] {
+    outline: none;
+}
+
 .window-wrap {
     background-color: $lms-background-color;
 }

@@ -2,9 +2,9 @@ define([
         'jquery',
         'jquery.ajax-retry',
         'js/commerce/views/receipt_view',
-        'common/js/spec_helpers/ajax_helpers'
+        'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'
     ],
-    function ($, AjaxRetry, ReceiptView, AjaxHelpers){
+    function ($, AjaxRetry, ReceiptView, AjaxHelpers) {
         'use strict';
         describe('edx.commerce.ReceiptView', function() {
             var data, courseResponseData, providerResponseData, mockRequests, mockRender, createReceiptView,

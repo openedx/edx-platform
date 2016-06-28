@@ -6,7 +6,7 @@ from logging import getLogger
 
 from openedx.core.lib.cache_utils import zpickle, zunpickle
 
-from .block_structure import BlockStructureModulestoreData
+from .block_structure import BlockStructureModulestoreData, BlockStructureBlockData
 
 
 logger = getLogger(__name__)  # pylint: disable=C0103
@@ -40,7 +40,7 @@ class BlockStructureCache(object):
         """
         data_to_cache = (
             block_structure._block_relations,
-            block_structure._transformer_data,
+            block_structure.transformer_data,
             block_structure._block_data_map,
         )
         zp_data_to_cache = zpickle(data_to_cache)
@@ -99,7 +99,7 @@ class BlockStructureCache(object):
         block_relations, transformer_data, block_data_map = zunpickle(zp_data_from_cache)
         block_structure = BlockStructureModulestoreData(root_block_usage_key)
         block_structure._block_relations = block_relations
-        block_structure._transformer_data = transformer_data
+        block_structure.transformer_data = transformer_data
         block_structure._block_data_map = block_data_map
 
         return block_structure
@@ -126,4 +126,7 @@ class BlockStructureCache(object):
         Returns the cache key to use for storing the block structure
         for the given root_block_usage_key.
         """
-        return "root.key." + unicode(root_block_usage_key)
+        return "v{version}.root.key.{root_usage_key}".format(
+            version=unicode(BlockStructureBlockData.VERSION),
+            root_usage_key=unicode(root_block_usage_key),
+        )

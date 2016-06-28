@@ -7,11 +7,13 @@ from unittest import TestCase
 
 from django.utils.timezone import UTC
 
-from xmodule.course_metadata_utils import (
-    clean_course_key,
-    url_name_for_course_location,
+from xmodule.block_metadata_utils import (
+    url_name_for_block,
     display_name_with_default,
     display_name_with_default_escaped,
+)
+from xmodule.course_metadata_utils import (
+    clean_course_key,
     number_for_course_location,
     has_course_started,
     has_course_ended,
@@ -130,9 +132,9 @@ class CourseMetadataUtilsTestCase(TestCase):
                     "course_MNXXK4TTMUWXMMJ2KVXGS5TFOJZWS5DZLAVUGUZNGIYDGK2ZGIYDSNQ~"
                 ),
             ]),
-            FunctionTest(url_name_for_course_location, [
-                TestScenario((self.demo_course.location,), self.demo_course.location.name),
-                TestScenario((self.html_course.location,), self.html_course.location.name),
+            FunctionTest(url_name_for_block, [
+                TestScenario((self.demo_course,), self.demo_course.location.name),
+                TestScenario((self.html_course,), self.html_course.location.name),
             ]),
             FunctionTest(display_name_with_default_escaped, [
                 # Test course with no display name.

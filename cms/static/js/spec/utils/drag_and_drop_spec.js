@@ -1,4 +1,5 @@
-define(["js/utils/drag_and_drop", "common/js/components/views/feedback_notification", "common/js/spec_helpers/ajax_helpers", "jquery", "underscore"],
+define(["js/utils/drag_and_drop", "common/js/components/views/feedback_notification", 
+        "edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers", "jquery", "underscore"],
     function (ContentDragger, Notification, AjaxHelpers, $, _) {
         describe("Overview drag and drop functionality", function () {
             beforeEach(function () {

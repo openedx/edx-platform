@@ -166,7 +166,7 @@ else:
 %></%def>
 
 <%def name="show_language_selector()"><%
-    return settings.FEATURES.get('SHOW_LANGUAGE_SELECTOR', False)
+    return get_value('SHOW_LANGUAGE_SELECTOR', settings.FEATURES.get('SHOW_LANGUAGE_SELECTOR', False))
 %></%def>
 
 <%def name="get_released_languages()"><%

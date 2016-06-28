@@ -1,7 +1,7 @@
 /*global define, sinon */
 define([
         'jquery',
-        'common/js/spec_helpers/ajax_helpers',
+        'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
         'js/certificates/models/certificate_exception',
         'js/certificates/views/certificate_whitelist',
         'js/certificates/views/certificate_whitelist_editor',

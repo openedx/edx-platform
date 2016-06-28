@@ -1,4 +1,4 @@
-define(['common/js/spec_helpers/ajax_helpers', 'js/ccx/schedule'],
+define(['edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'js/ccx/schedule'],
     function(AjaxHelpers) {
         describe("edx.ccx.schedule.ScheduleView", function() {
             var view = null;

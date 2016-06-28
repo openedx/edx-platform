@@ -7,7 +7,6 @@ from urllib import urlencode
 from rest_framework.exceptions import PermissionDenied
 
 from opaque_keys.edx.locator import CourseLocator
-from openedx.core.djangoapps.content.block_structure.tests.helpers import EnableTransformerRegistryMixin
 from openedx.core.djangoapps.util.test_forms import FormTestMixin
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
@@ -18,7 +17,7 @@ from ..forms import BlockListGetForm
 
 
 @ddt.ddt
-class TestBlockListGetForm(EnableTransformerRegistryMixin, FormTestMixin, SharedModuleStoreTestCase):
+class TestBlockListGetForm(FormTestMixin, SharedModuleStoreTestCase):
     """
     Tests for BlockListGetForm
     """

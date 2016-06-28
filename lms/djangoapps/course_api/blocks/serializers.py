@@ -17,10 +17,14 @@ class BlockSerializer(serializers.Serializer):  # pylint: disable=abstract-metho
         Get the field value requested.  The field may be an XBlock field, a
         transformer block field, or an entire tranformer block data dict.
         """
+        value = None
         if transformer is None:
             value = self.context['block_structure'].get_xblock_field(block_key, field_name)
         elif field_name is None:
-            value = self.context['block_structure'].get_transformer_block_data(block_key, transformer)
+            try:
+                value = self.context['block_structure'].get_transformer_block_data(block_key, transformer).fields
+            except KeyError:
+                pass
         else:
             value = self.context['block_structure'].get_transformer_block_field(block_key, transformer, field_name)
 

@@ -3,12 +3,11 @@ Middleware to serve assets.
 """
 
 import logging
-
 import datetime
 import newrelic.agent
 from django.http import (
     HttpResponse, HttpResponseNotModified, HttpResponseForbidden,
-    HttpResponseBadRequest, HttpResponseNotFound)
+    HttpResponseBadRequest, HttpResponseNotFound, HttpResponsePermanentRedirect)
 from student.models import CourseEnrollment
 from contentserver.models import CourseAssetCacheTtlConfig, CdnUserAgentsConfig
 
@@ -30,31 +29,53 @@ HTTP_DATE_FORMAT = "%a, %d %b %Y %H:%M:%S GMT"
 
 
 class StaticContentServer(object):
+    """
+    Serves course assets to end users.  Colloquially referred to as "contentserver."
+    """
     def is_asset_request(self, request):
         """Determines whether the given request is an asset request"""
         return (
             request.path.startswith('/' + XASSET_LOCATION_TAG + '/')
             or
             request.path.startswith('/' + AssetLocator.CANONICAL_NAMESPACE)
+            or
+            StaticContent.is_versioned_asset_path(request.path)
         )
 
     def process_request(self, request):
         """Process the given request"""
+        asset_path = request.path
+
         if self.is_asset_request(request):
             # Make sure we can convert this request into a location.
-            if AssetLocator.CANONICAL_NAMESPACE in request.path:
-                request.path = request.path.replace('block/', 'block@', 1)
+            if AssetLocator.CANONICAL_NAMESPACE in asset_path:
+                asset_path = asset_path.replace('block/', 'block@', 1)
+
+            # If this is a versioned request, pull out the digest and chop off the prefix.
+            requested_digest = None
+            if StaticContent.is_versioned_asset_path(asset_path):
+                requested_digest, asset_path = StaticContent.parse_versioned_asset_path(asset_path)
+
+            # Make sure we have a valid location value for this asset.
             try:
-                loc = StaticContent.get_location_from_path(request.path)
+                loc = StaticContent.get_location_from_path(asset_path)
             except (InvalidLocationError, InvalidKeyError):
                 return HttpResponseBadRequest()
 
-            # Try and load the asset.
-            content = None
+            # Attempt to load the asset to make sure it exists, and grab the asset digest
+            # if we're able to load it.
+            actual_digest = None
             try:
                 content = self.load_asset_from_location(loc)
+                actual_digest = getattr(content, "content_digest", None)
             except (ItemNotFoundError, NotFoundError):
                 return HttpResponseNotFound()
+
+            # If this was a versioned asset, and the digest doesn't match, redirect
+            # them to the actual version.
+            if requested_digest is not None and actual_digest is not None and (actual_digest != requested_digest):
+                actual_asset_path = StaticContent.add_version_to_asset_path(asset_path, actual_digest)
+                return HttpResponsePermanentRedirect(actual_asset_path)
 
             # Set the basics for this request. Make sure that the course key for this
             # asset has a run, which old-style courses do not.  Otherwise, this will

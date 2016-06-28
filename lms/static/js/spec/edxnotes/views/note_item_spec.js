@@ -1,5 +1,5 @@
 define([
-    'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers',
+    'jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
     'common/js/spec_helpers/template_helpers', 'js/spec/edxnotes/helpers', 'logger',
     'js/edxnotes/models/note', 'js/edxnotes/views/note_item',
 ], function(

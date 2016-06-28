@@ -1,7 +1,7 @@
 /*global define */
 define([
         'jquery',
-        'common/js/spec_helpers/ajax_helpers',
+        'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
         'js/certificates/models/certificate_invalidation',
         'js/certificates/views/certificate_invalidation_view',
         'js/certificates/collections/certificate_invalidation_collection'

@@ -67,7 +67,7 @@ git+https://github.com/edx/rfc6266.git@v0.0.5-edx#egg=rfc6266==0.0.5-edx
 
 # Used for testing
 git+https://github.com/edx/lettuce.git@0.2.20.002#egg=lettuce==0.2.20.002
-git+https://github.com/edx/pa11ycrawler.git@a963bbb7c4f861b24b5f66bfc5259d3fa207cca8#egg=pa11ycrawler==0.1a
+git+https://github.com/edx/pa11ycrawler.git@0.0.4#egg=pa11ycrawler==0.0.4
 
 # Our libraries:
 git+https://github.com/edx/XBlock.git@xblock-0.4.10#egg=XBlock==0.4.10
@@ -76,7 +76,7 @@ git+https://github.com/edx/XBlock.git@xblock-0.4.10#egg=XBlock==0.4.10
 -e git+https://github.com/edx/django-splash.git@v0.2#egg=django-splash==0.2
 -e git+https://github.com/edx/acid-block.git@e46f9cda8a03e121a00c7e347084d142d22ebfb7#egg=acid-xblock
 git+https://github.com/edx/edx-ora2.git@1.1.5#egg=ora2==1.1.5
--e git+https://github.com/edx/edx-submissions.git@1.1.0#egg=edx-submissions==1.1.0
+-e git+https://github.com/edx/edx-submissions.git@1.1.1#egg=edx-submissions==1.1.1
 git+https://github.com/edx/ease.git@release-2015-07-14#egg=ease==0.1.3
 git+https://github.com/edx/i18n-tools.git@v0.3.2#egg=i18n-tools==v0.3.2
 git+https://github.com/edx/edx-val.git@0.0.9#egg=edxval==0.0.9

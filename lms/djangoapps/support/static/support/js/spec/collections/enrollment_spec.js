@@ -1,5 +1,5 @@
 define([
-    'common/js/spec_helpers/ajax_helpers',
+    'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
     'support/js/spec_helpers/enrollment_helpers',
     'support/js/collections/enrollment',
 ], function (AjaxHelpers, EnrollmentHelpers, EnrollmentCollection) {

@@ -1,5 +1,5 @@
 define([
-    'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers', 'js/spec/edxnotes/helpers',
+    'jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'js/spec/edxnotes/helpers',
     'annotator_1.2.9', 'logger', 'js/edxnotes/views/notes_factory'
 ], function($, _, AjaxHelpers, Helpers, Annotator, Logger, NotesFactory) {
     'use strict';

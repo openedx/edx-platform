@@ -11,16 +11,21 @@ from collections import OrderedDict
 
 from django.conf import settings
 from django.core.urlresolvers import reverse
-from django.test.client import Client
+from django.test.client import Client, RequestFactory
 from django.test.utils import override_settings
 
 from course_modes.models import CourseMode
-from badges.events.course_complete import get_completion_badge
-from badges.tests.factories import BadgeAssertionFactory, CourseCompleteImageConfigurationFactory, BadgeClassFactory
+from lms.djangoapps.badges.events.course_complete import get_completion_badge
+from lms.djangoapps.badges.tests.factories import (
+    BadgeAssertionFactory,
+    CourseCompleteImageConfigurationFactory,
+    BadgeClassFactory,
+)
 from openedx.core.lib.tests.assertions.events import assert_event_matches
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from student.roles import CourseStaffRole
 from track.tests import EventTrackingTestCase
+from util import organizations_helpers as organizations_api
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
@@ -39,8 +44,6 @@ from certificates.tests.factories import (
     LinkedInAddToProfileConfigurationFactory,
     GeneratedCertificateFactory,
 )
-from util import organizations_helpers as organizations_api
-from django.test.client import RequestFactory
 
 FEATURES_WITH_CERTS_ENABLED = settings.FEATURES.copy()
 FEATURES_WITH_CERTS_ENABLED['CERTIFICATES_HTML_VIEW'] = True
@@ -63,14 +66,12 @@ def _fake_is_request_in_microsite():
     return True
 
 
-@attr('shard_1')
-@ddt.ddt
-class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
+class CommonCertificatesTestCase(ModuleStoreTestCase):
     """
-    Tests for the certificates web/html views
+    Common setUp and utility methods for Certificate tests
     """
     def setUp(self):
-        super(CertificatesViewsTests, self).setUp()
+        super(CommonCertificatesTestCase, self).setUp()
         self.client = Client()
         self.course = CourseFactory.create(
             org='testorg', number='run1', display_name='refundable course'
@@ -85,7 +86,7 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
         self.user.profile.save()
         self.client.login(username=self.user.username, password='foo')
         self.request = RequestFactory().request()
-        self.linknedin_url = 'http://www.linkedin.com/profile/add?{params}'
+        self.linkedin_url = 'http://www.linkedin.com/profile/add?{params}'
 
         self.cert = GeneratedCertificateFactory.create(
             user=self.user,
@@ -168,6 +169,14 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
         )
         template.save()
 
+
+@attr('shard_1')
+@ddt.ddt
+class CertificatesViewsTests(CommonCertificatesTestCase):
+    """
+    Tests for the certificates web/html views
+    """
+
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
     def test_linkedin_share_url(self):
         """
@@ -186,7 +195,7 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
             ('pfCertificationUrl', self.request.build_absolute_uri(test_url),),
         ])
         self.assertIn(
-            self.linknedin_url.format(params=urlencode(params)),
+            self.linkedin_url.format(params=urlencode(params)),
             response.content
         )
 
@@ -209,7 +218,7 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
             ('pfCertificationUrl', 'http://' + settings.MICROSITE_TEST_HOSTNAME + test_url,),
         ])
         self.assertIn(
-            self.linknedin_url.format(params=urlencode(params)),
+            self.linkedin_url.format(params=urlencode(params)),
             response.content
         )
 
@@ -449,7 +458,6 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
             "{partner_long_name}.".format(
                 partner_short_name=short_org_name,
                 partner_long_name=long_org_name,
-                platform_name='Test Microsite'
             ),
             response.content
         )
@@ -810,73 +818,6 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
         with self.assertRaises(Exception):
             self.client.get(test_url)
 
-    @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
-    def test_certificate_evidence_event_emitted(self):
-        self.client.logout()
-        self._add_course_certificates(count=1, signatory_count=2)
-        self.recreate_tracker()
-        test_url = get_certificate_url(
-            user_id=self.user.id,
-            course_id=unicode(self.course.id)
-        )
-        response = self.client.get(test_url)
-        self.assertEqual(response.status_code, 200)
-        actual_event = self.get_event()
-        self.assertEqual(actual_event['name'], 'edx.certificate.evidence_visited')
-        assert_event_matches(
-            {
-                'user_id': self.user.id,
-                'certificate_id': unicode(self.cert.verify_uuid),
-                'enrollment_mode': self.cert.mode,
-                'certificate_url': test_url,
-                'course_id': unicode(self.course.id),
-                'social_network': CertificateSocialNetworks.linkedin
-            },
-            actual_event['data']
-        )
-
-    @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
-    def test_evidence_event_sent(self):
-        self._add_course_certificates(count=1, signatory_count=2)
-
-        cert_url = get_certificate_url(
-            user_id=self.user.id,
-            course_id=self.course_id
-        )
-        test_url = '{}?evidence_visit=1'.format(cert_url)
-        self.recreate_tracker()
-        badge_class = get_completion_badge(self.course_id, self.user)
-        assertion = BadgeAssertionFactory.create(
-            user=self.user, badge_class=badge_class,
-            backend='DummyBackend',
-            image_url='http://www.example.com/image.png',
-            assertion_url='http://www.example.com/assertion.json',
-            data={
-                'issuer': 'http://www.example.com/issuer.json',
-            }
-        )
-        response = self.client.get(test_url)
-        self.assertEqual(response.status_code, 200)
-        assert_event_matches(
-            {
-                'name': 'edx.badge.assertion.evidence_visited',
-                'data': {
-                    'course_id': 'testorg/run1/refundable_course',
-                    'assertion_id': assertion.id,
-                    'badge_generator': u'DummyBackend',
-                    'badge_name': u'refundable course',
-                    'issuing_component': u'',
-                    'badge_slug': u'testorgrun1refundable_course_honor_432f164',
-                    'assertion_json_url': 'http://www.example.com/assertion.json',
-                    'assertion_image_url': 'http://www.example.com/image.png',
-                    'user_id': self.user.id,
-                    'issuer': 'http://www.example.com/issuer.json',
-                    'enrollment_mode': 'honor',
-                },
-            },
-            self.get_event()
-        )
-
     @override_settings(FEATURES=FEATURES_WITH_CERTS_DISABLED)
     def test_request_certificate_without_passing(self):
         self.cert.status = CertificateStatuses.unavailable
@@ -1201,4 +1142,77 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
         self.assertContains(
             response,
             configuration['microsites']['testmicrosite']['company_tos_url'],
+        )
+
+
+@attr('shard_1')
+class CertificateEventTests(CommonCertificatesTestCase, EventTrackingTestCase):
+    """
+    Test events emitted by certificate handling.
+    """
+    @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
+    def test_certificate_evidence_event_emitted(self):
+        self.client.logout()
+        self._add_course_certificates(count=1, signatory_count=2)
+        self.recreate_tracker()
+        test_url = get_certificate_url(
+            user_id=self.user.id,
+            course_id=unicode(self.course.id)
+        )
+        response = self.client.get(test_url)
+        self.assertEqual(response.status_code, 200)
+        actual_event = self.get_event()
+        self.assertEqual(actual_event['name'], 'edx.certificate.evidence_visited')
+        assert_event_matches(
+            {
+                'user_id': self.user.id,
+                'certificate_id': unicode(self.cert.verify_uuid),
+                'enrollment_mode': self.cert.mode,
+                'certificate_url': test_url,
+                'course_id': unicode(self.course.id),
+                'social_network': CertificateSocialNetworks.linkedin
+            },
+            actual_event['data']
+        )
+
+    @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
+    def test_evidence_event_sent(self):
+        self._add_course_certificates(count=1, signatory_count=2)
+
+        cert_url = get_certificate_url(
+            user_id=self.user.id,
+            course_id=self.course_id
+        )
+        test_url = '{}?evidence_visit=1'.format(cert_url)
+        self.recreate_tracker()
+        badge_class = get_completion_badge(self.course_id, self.user)
+        assertion = BadgeAssertionFactory.create(
+            user=self.user, badge_class=badge_class,
+            backend='DummyBackend',
+            image_url='http://www.example.com/image.png',
+            assertion_url='http://www.example.com/assertion.json',
+            data={
+                'issuer': 'http://www.example.com/issuer.json',
+            }
+        )
+        response = self.client.get(test_url)
+        self.assertEqual(response.status_code, 200)
+        assert_event_matches(
+            {
+                'name': 'edx.badge.assertion.evidence_visited',
+                'data': {
+                    'course_id': 'testorg/run1/refundable_course',
+                    'assertion_id': assertion.id,
+                    'badge_generator': u'DummyBackend',
+                    'badge_name': u'refundable course',
+                    'issuing_component': u'',
+                    'badge_slug': u'testorgrun1refundable_course_honor_432f164',
+                    'assertion_json_url': 'http://www.example.com/assertion.json',
+                    'assertion_image_url': 'http://www.example.com/image.png',
+                    'user_id': self.user.id,
+                    'issuer': 'http://www.example.com/issuer.json',
+                    'enrollment_mode': 'honor',
+                },
+            },
+            self.get_event()
         )

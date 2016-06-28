@@ -1,7 +1,7 @@
 define([
     'jquery',
     'underscore',
-    'common/js/spec_helpers/ajax_helpers',
+    'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
     'edx-ui-toolkit/js/utils/html-utils',
     'js/edxnotes/views/search_box',
     'js/edxnotes/collections/notes',
