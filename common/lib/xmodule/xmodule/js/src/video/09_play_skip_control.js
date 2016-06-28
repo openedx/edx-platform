@@ -28,12 +28,7 @@ define('video/09_play_skip_control.js', [], function() {
             '<button class="control video_control play play-skip-control" title="',
                 gettext('Play'),
             '">',
-                '<span class="icon-fallback-img">',
-                    '<span class="icon fa fa-play" aria-hidden="true"></span>',
-                    '<span class="text control-text">',
-                        gettext('Play'),
-                    '</span>',
-                '</span>',
+                '<span class="icon fa fa-play" aria-hidden="true"></span>',
             '</button>'
         ].join(''),
 
@@ -83,9 +78,7 @@ define('video/09_play_skip_control.js', [], function() {
                 .attr('title', gettext('Skip'))
                 .find('.icon')
                     .removeClass('fa-play')
-                    .addClass('fa-step-forward')
-                .find('.control-text')
-                    .text(gettext('Skip'));
+                    .addClass('fa-step-forward');
             // Disable possibility to pause the video.
             this.state.el.find('video').off('click');
         }
