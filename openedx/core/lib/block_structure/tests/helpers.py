@@ -6,7 +6,7 @@ from mock import patch
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
 from ..block_structure import BlockStructureBlockData
-from ..transformer import BlockStructureTransformer
+from ..transformer import BlockStructureTransformer, FilteringTransformerMixin
 
 
 class MockXBlock(object):
@@ -145,6 +145,21 @@ class MockTransformer(BlockStructureTransformer):
 
     def transform(self, usage_info, block_structure):
         pass
+
+
+class MockFilteringTransformer(FilteringTransformerMixin, BlockStructureTransformer):
+    """
+    A mock FilteringTransformerMixin class.
+    """
+    VERSION = 1
+
+    @classmethod
+    def name(cls):
+        # Use the class' name for Mock transformers.
+        return cls.__name__
+
+    def transform_block_filters(self, usage_info, block_structure):
+        return [block_structure.create_universal_filter()]
 
 
 @contextmanager
