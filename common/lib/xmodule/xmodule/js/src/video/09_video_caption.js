@@ -108,7 +108,7 @@
                     
                 );
 
-                var template = [
+                var subtitlesHtml = [
                     '<div class="subtitles" role="region" id="transcript-' + this.state.id + '">',
                         '<h3 id="transcript-label-' + this.state.id + '" class="transcript-title sr"></h3>',
                         '<ol id="transcript-captions" class="subtitles-menu" lang="' + this.state.lang + '"></ol>',
