@@ -89,10 +89,10 @@ from openedx.core.djangolib.markup import HTML, Text
           % endif
         </section>
         <section aria-label="${_('Handout Navigation')}" class="handouts">
-          % if SelfPacedConfiguration.current().enable_course_home_improvements:
+          <!-- % if SelfPacedConfiguration.current().enable_course_home_improvements: -->
             <h1 class="handouts-header">${_("Important Course Dates")}</h1>
             ${HTML(get_course_date_summary(course, user))}
-          % endif
+          <!-- % endif -->
 
           <h1 class="handouts-header">${_(course.info_sidebar_name)}</h1>
           ${HTML(get_course_info_section(request, masquerade_user, course, 'handouts'))}

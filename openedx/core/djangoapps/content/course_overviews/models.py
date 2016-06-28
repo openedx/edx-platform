@@ -18,6 +18,7 @@ from opaque_keys.edx.keys import CourseKey
 from config_models.models import ConfigurationModel
 from lms.djangoapps import django_comment_client
 from openedx.core.djangoapps.models.course_details import CourseDetails
+from pytz import utc
 from static_replace.models import AssetBaseUrlConfig
 from util.date_utils import strftime_localized
 from xmodule import course_metadata_utils
@@ -359,14 +360,16 @@ class CourseOverview(TimeStampedModel):
 
         return course_metadata_utils.course_starts_within(self.start, days)
 
-    def start_datetime_text(self, format_string="SHORT_DATE"):
+    def start_datetime_text(self, time_zone=utc, format_string="SHORT_DATE"):
         """
-        Returns the desired text corresponding the course's start date and
-        time in UTC.  Prefers .advertised_start, then falls back to .start.
+        Returns the desired text corresponding to the course's start date and
+        time in the specified time zone, or utc if no time zone given.
+        Prefers .advertised_start, then falls back to .start.
         """
         return course_metadata_utils.course_start_datetime_text(
             self.start,
             self.advertised_start,
+            time_zone,
             format_string,
             ugettext,
             strftime_localized
@@ -383,12 +386,13 @@ class CourseOverview(TimeStampedModel):
             self.advertised_start,
         )
 
-    def end_datetime_text(self, format_string="SHORT_DATE"):
+    def end_datetime_text(self, time_zone=utc, format_string="SHORT_DATE"):
         """
         Returns the end date or datetime for the course formatted as a string.
         """
         return course_metadata_utils.course_end_datetime_text(
             self.end,
+            time_zone,
             format_string,
             strftime_localized
         )

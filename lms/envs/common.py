@@ -365,7 +365,7 @@ FEATURES = {
     'ENABLE_READING_FROM_MULTIPLE_HISTORY_TABLES': True,
 
     # WIP -- will be removed in Ticket #TNL-4750.
-    'ENABLE_TIME_ZONE_PREFERENCE': False,
+    'ENABLE_TIME_ZONE_PREFERENCE': True,
 }
 
 # Ignore static asset files on import which match this pattern

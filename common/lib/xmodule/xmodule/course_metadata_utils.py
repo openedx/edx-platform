@@ -11,6 +11,7 @@ import dateutil.parser
 from math import exp
 
 from django.utils.timezone import UTC
+from openedx.core.lib.time_zone_utils import get_formatted_time_zone
 
 from .fields import Date
 
@@ -167,11 +168,11 @@ def course_start_date_is_default(start, advertised_start):
     return advertised_start is None and start == DEFAULT_START_DATE
 
 
-def _datetime_to_string(date_time, format_string, strftime_localized):
+def _datetime_to_string(date_time, time_zone, format_string, strftime_localized):
     """
     Formats the given datetime with the given function and format string.
 
-    Adds UTC to the resulting string if the format is DATE_TIME or TIME.
+    Adds time zone abbreviation to the resulting string if the format is DATE_TIME or TIME.
 
     Arguments:
         date_time (datetime): the datetime to be formatted
@@ -179,18 +180,20 @@ def _datetime_to_string(date_time, format_string, strftime_localized):
         strftime_localized ((datetime, str) -> str): a nm localized string
             formatting function
     """
-    # TODO: Is manually appending UTC really the right thing to do here? What if date_time isn't UTC?
-    result = strftime_localized(date_time, format_string)
+    result = strftime_localized(date_time.astimezone(time_zone), format_string)
     return (
-        result + u" UTC" if format_string in ['DATE_TIME', 'TIME', 'DAY_AND_TIME']
+        result + ' ' + get_formatted_time_zone(time_zone, **{'abbr': True}) if format_string in ['DATE_TIME', 'TIME', 'DAY_AND_TIME']
         else result
     )
+    # TODO: Change this back to above
+    # kwargs = {'abbr': True}
+    # return result + ' ' + get_formatted_time_zone(time_zone, **kwargs)
 
 
-def course_start_datetime_text(start_date, advertised_start, format_string, ugettext, strftime_localized):
+def course_start_datetime_text(start_date, advertised_start, time_zone, format_string, ugettext, strftime_localized):
     """
     Calculates text to be shown to user regarding a course's start
-    datetime in UTC.
+    datetime in specified time zone.
 
     Prefers .advertised_start, then falls back to .start.
 
@@ -210,12 +213,12 @@ def course_start_datetime_text(start_date, advertised_start, format_string, uget
             if parsed_advertised_start is not None:
                 # In the Django implementation of strftime_localized, if
                 # the year is <1900, _datetime_to_string will raise a ValueError.
-                return _datetime_to_string(parsed_advertised_start, format_string, strftime_localized)
+                return _datetime_to_string(parsed_advertised_start, time_zone, format_string, strftime_localized)
         except ValueError:
             pass
         return advertised_start.title()
     elif start_date != DEFAULT_START_DATE:
-        return _datetime_to_string(start_date, format_string, strftime_localized)
+        return _datetime_to_string(start_date, time_zone, format_string, strftime_localized)
     else:
         _ = ugettext
         # Translators: TBD stands for 'To Be Determined' and is used when a course
@@ -223,7 +226,7 @@ def course_start_datetime_text(start_date, advertised_start, format_string, uget
         return _('TBD')
 
 
-def course_end_datetime_text(end_date, format_string, strftime_localized):
+def course_end_datetime_text(end_date, time_zone, format_string, strftime_localized):
     """
     Returns a formatted string for a course's end date or datetime.
 
@@ -236,7 +239,7 @@ def course_end_datetime_text(end_date, format_string, strftime_localized):
             formatting function
     """
     return (
-        _datetime_to_string(end_date, format_string, strftime_localized) if end_date is not None
+        _datetime_to_string(end_date, time_zone, format_string, strftime_localized) if end_date is not None
         else ''
     )
 
