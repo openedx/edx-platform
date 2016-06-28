@@ -72,7 +72,11 @@
                 )
                 %>
             <% } else { %>
-                <%- gettext('This post is visible to everyone.') %>
+                <% if (obj.private_to_peers) { %>
+                  <%- gettext('This post is only visible to staff.') %>
+                <% } else { %>
+                  <%- gettext('This post is visible to everyone.') %>
+                <% } %>
             <% } %>
         </div>
     </div>
