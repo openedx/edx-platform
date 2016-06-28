@@ -3,15 +3,16 @@ This module contains signals needed for email integration
 """
 import logging
 import datetime
+import crum
 
 from django.dispatch import receiver
 
-from student.models import UNENROLL_DONE
+from student.models import ENROLL_STATUS_CHANGE
 from student.cookies import CREATE_LOGON_COOKIE
 from student.views import REGISTER_USER
 from email_marketing.models import EmailMarketingConfiguration
 from util.model_utils import USER_FIELD_CHANGED
-from lms.djangoapps.email_marketing.tasks import update_user, update_user_email
+from lms.djangoapps.email_marketing.tasks import update_user, update_user_email, update_course_enrollment
 
 from sailthru.sailthru_client import SailthruClient
 from sailthru.sailthru_error import SailthruClientError
@@ -24,17 +25,45 @@ CHANGED_FIELDNAMES = ['username', 'is_active', 'name', 'gender', 'education',
                       'country']
 
 
-@receiver(UNENROLL_DONE)
-def handle_unenroll_done(sender, course_enrollment=None, skip_refund=False,
-                         **kwargs):  # pylint: disable=unused-argument
+@receiver(ENROLL_STATUS_CHANGE)
+def handle_enroll_status_change(sender, event=None, user=None, mode=None, course_id=None, cost=None, currency=None,
+                                **kwargs):  # pylint: disable=unused-argument
     """
-    Signal receiver for unenrollments
+    Signal receiver for enroll/unenroll/purchase events
     """
     email_config = EmailMarketingConfiguration.current()
-    if not email_config.enabled:
+    if not email_config.enabled or not event or not user or not mode or not course_id:
         return
 
-    # TBD
+    request = crum.get_current_request()
+    if not request:
+        return
+
+    # figure out course url
+    course_url = _build_course_url(request, course_id.to_deprecated_string())
+
+    # pass event to email_marketing.tasks
+    update_course_enrollment.delay(user.email, course_url, event, mode,
+                                   unit_cost=cost, course_id=course_id, currency=currency,
+                                   message_id=request.COOKIES.get('sailthru_bid'))
+
+
+def _build_course_url(request, course_id):
+    """
+    Build a course url from a course id and the host from the current request
+    :param request:
+    :param course_id:
+    :return:
+    """
+    host = request.get_host()
+    # hack for integration testing since Sailthru rejects urls with localhost
+    if host.startswith('localhost'):
+        host = 'courses.edx.org'
+    return '{scheme}://{host}/courses/{course}/info'.format(
+        scheme=request.scheme,
+        host=host,
+        course=course_id
+    )
 
 
 @receiver(CREATE_LOGON_COOKIE)
@@ -54,12 +83,23 @@ def add_email_marketing_cookies(sender, response=None, user=None,
     if not email_config.enabled:
         return response
 
+    post_parms = {
+        'id': user.email,
+        'fields': {'keys': 1},
+        'vars': {'last_login_date': datetime.datetime.now().strftime("%Y-%m-%d")}
+    }
+
+    # get sailthru_content cookie to capture usage before logon
+    request = crum.get_current_request()
+    if request:
+        sailthru_content = request.COOKIES.get('sailthru_content')
+        if sailthru_content:
+            post_parms['cookies'] = {'sailthru_content': sailthru_content}
+
     try:
         sailthru_client = SailthruClient(email_config.sailthru_key, email_config.sailthru_secret)
         sailthru_response = \
-            sailthru_client.api_post("user", {'id': user.email, 'fields': {'keys': 1},
-                                              'vars': {'last_login_date':
-                                                       datetime.datetime.now().strftime("%Y-%m-%d")}})
+            sailthru_client.api_post("user", post_parms)
     except SailthruClientError as exc:
         log.error("Exception attempting to obtain cookie from Sailthru: %s", unicode(exc))
         return response
@@ -93,7 +133,6 @@ def email_marketing_register_user(sender, user=None, profile=None,
         profile: The user profile for the user being changed
         kwargs: Not used
     """
-    log.info("Receiving REGISTER_USER")
     email_config = EmailMarketingConfiguration.current()
     if not email_config.enabled:
         return
