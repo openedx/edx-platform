@@ -10,7 +10,7 @@
                 }, options);
                 this.view = new DiscussionTopicMenuView(options);
                 this.view.render().appendTo('#fixture-element');
-                this.defaultTextWidth = this.completeText.length;
+                this.defaultTextWidth = this.view.getNameWidth(this.completeText);
             };
 
             this.openMenu = function() {
@@ -68,10 +68,31 @@
           expect(this.completeText).toEqual(dropdownText);
         });
 
+        it('completely show just sub-category', function() {
+            var dropdownText;
+            this.createTopicView();
+            this.view.maxNameWidth = this.defaultTextWidth - 10;
+            this.view.$el.find('a.topic-title').first().click();
+            dropdownText = this.view.$el.find('.js-selected-topic').text();
+            expect(dropdownText.indexOf('…')).toEqual(0);
+            expect(dropdownText).toContain(this.selectedOptionText);
+        });
+
+        it('partially show sub-category', function() {
+            this.createTopicView();
+            var parentWidth = this.view.getNameWidth(this.parentCategoryText),
+                dropdownText;
+            this.view.maxNameWidth = this.defaultTextWidth - parentWidth;
+            this.view.$el.find('a.topic-title').first().click();
+            dropdownText = this.view.$el.find('.js-selected-topic').text();
+            expect(dropdownText.indexOf('…')).toEqual(0);
+            expect(dropdownText.lastIndexOf('…')).toBeGreaterThan(0);
+        });
+
         it('broken span doesn\'t occur', function() {
             var dropdownText;
             this.createTopicView();
-            this.view.maxNameWidth = this.selectedOptionText.length + 100;
+            this.view.maxNameWidth = this.view.getNameWidth(this.selectedOptionText) + 100;
             this.view.$el.find('a.topic-title').first().click();
             dropdownText = this.view.$el.find('.js-selected-topic').text();
             expect(dropdownText.indexOf('/ span>')).toEqual(-1);
