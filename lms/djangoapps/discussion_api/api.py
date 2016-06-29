@@ -782,7 +782,9 @@ def _handle_read_field(api_content, form_value, user, cc_content):
     """
     if form_value and not cc_content['read']:
         user.read(cc_content)
-        api_content["unread_comment_count"] -= 1
+        # When a thread is marked as read, all of its responses and comments
+        # are also marked as read.
+        api_content["unread_comment_count"] = 0
 
 
 def create_thread(request, thread_data):
