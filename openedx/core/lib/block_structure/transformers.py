@@ -4,7 +4,6 @@ Module for a collection of BlockStructureTransformers.
 from logging import getLogger
 
 from .exceptions import TransformerException
-from .transformer import OptimizedTransformer
 from .transformer_registry import TransformerRegistry
 
 
@@ -40,7 +39,7 @@ class BlockStructureTransformers(object):
                 Transformer Registry.
         """
         self.usage_info = usage_info
-        self._transformers = {'optimized': [], 'nonoptimized': []}
+        self._transformers = []
         if transformers:
             self.__iadd__(transformers)
 
@@ -62,11 +61,7 @@ class BlockStructureTransformers(object):
                 "The following requested transformers are not registered: {}".format(unregistered_transformers)
             )
 
-        for transformer in transformers:
-            if isinstance(transformer, OptimizedTransformer):
-                self._transformers['optimized'].append(transformer)
-            else:
-                self._transformers['nonoptimized'].append(transformer)
+        self._transformers.extend(transformers)
         return self
 
     @classmethod
@@ -80,17 +75,6 @@ class BlockStructureTransformers(object):
 
         # Collect all fields that were requested by the transformers.
         block_structure._collect_requested_xblock_fields()  # pylint: disable=protected-access
-
-    def transform(self, block_structure):
-        """
-        The given block structure is transformed by each transformer in the
-        collection, in the order that the transformers were added.
-        """
-        self._transform_optimized(self._transformers['optimized'], block_structure)
-        self._transform_nonoptimized(self._transformers['nonoptimized'], block_structure)
-
-        # Prune the block structure to remove any unreachable blocks.
-        block_structure._prune_unreachable()  # pylint: disable=protected-access
 
     @classmethod
     def is_collected_outdated(cls, block_structure):
@@ -111,39 +95,63 @@ class BlockStructureTransformers(object):
 
         return bool(outdated_transformers)
 
-    def _transform_optimized(self, transformers, block_structure):
+    def transform(self, block_structure):
         """
-        Transforms the given block_structure using the transform_block_filter
-        method from the given transformers.
+        The given block structure is transformed by each transformer in the
+        collection, in the order that the transformers were added.
+
+        All transformers that define transform_block_filter will be combined
+        into a single course tree traversal for faster performance.
         """
-        if not transformers:
-            return
+        combined_filters, full_transformers = self._combine_filters(block_structure)
 
-        removal_filters = []
-        for removal in [t.transform_block_filter(self.usage_info, block_structure) for t in transformers]:
-            if isinstance(removal, list):
-                removal_filters.extend(removal)
-            else:
-                removal_filters.append(removal)
+        # traverse once using all combinable filters
+        if combined_filters is not None:
+            block_structure.filter_topological_traversal(combined_filters)
 
-        combined_filters = reduce(
-            lambda t1_filter, t2_filter: self._filter_chain(t1_filter, t2_filter),
-            removal_filters,
-            block_structure.create_universal_filter()
+        # then transform the remainder
+        for transformer in full_transformers:
+            transformer.transform(self.usage_info, block_structure)
+
+        # Prune the block structure to remove any unreachable blocks.
+        block_structure._prune_unreachable()  # pylint: disable=protected-access
+
+    def _combine_filters(self, block_structure):
+        """
+        Attempts to combine transform_block_filters for all transformers.
+
+        Returns a tuple of the combined filter, and a list of transformers that
+        do not support this opimization. If no transformers support filtering,
+        combined_filter will be None.
+        """
+        no_filter_transformers = []
+        combined_filter, num_filters = block_structure.create_universal_filter(), 0
+
+        for transformer in self._transformers:
+            try:
+                combined_filter = self.filter_chain(
+                    combined_filter,
+                    transformer.transform_block_filter(self.usage_info, block_structure)
+                )
+                num_filters += 1
+            except NotImplementedError:
+                no_filter_transformers.append(transformer)
+
+        return (
+            combined_filter if num_filters > 0 else None,
+            no_filter_transformers
         )
-        block_structure.filter_topological_traversal(combined_filters)
 
-    def _filter_chain(self, t1_filter, t2_filter):
+    def _filter_chain(self, accumulated, to_add):
         """
         Given two functions that take a block_key and return a boolean, yield
         a function that takes a block key, and 'ands' the functions together
-        """
-        return lambda block_key: t1_filter(block_key) and t2_filter(block_key)
 
-    def _transform_nonoptimized(self, transformers, block_structure):
+        Note that to_add is a generator, in case a transformer needs to define
+        multiple filters.
         """
-        Transforms the given block_structure using the transform
-        method from the given transformers.
-        """
-        for transformer in transformers:
-            transformer.transform(self.usage_info, block_structure)
+        while True:
+            try:
+                accumulated = lambda block_key: accumulated(block_key) and next(to_add)(block_key)
+            except StopIteration
+                break

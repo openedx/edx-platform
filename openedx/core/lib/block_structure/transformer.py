@@ -2,13 +2,14 @@
 This module provides the abstract base class for all Block Structure
 Transformers.
 """
-from abc import abstractmethod
+from abc import ABCMeta
 
 
 class BlockStructureTransformer(object):
     """
     Abstract base class for all block structure transformers.
     """
+    __metaclass__ = ABCMeta
 
     # All Transformers are expected to maintain a VERSION class
     # attribute.  While the value for the base class is set to 0,
@@ -78,7 +79,6 @@ class BlockStructureTransformer(object):
         """
         pass
 
-    @abstractmethod
     def transform(self, usage_info, block_structure):
         """
         Transforms the given block_structure for the given usage_info,
@@ -125,36 +125,24 @@ class BlockStructureTransformer(object):
             block_structure (BlockStructureBlockData) - A mutable
                 block structure, with already collected data for the
                 transformer, that is to be transformed in place.
-        """
-        raise NotImplementedError
 
-
-class OptimizedTransformer(BlockStructureTransformer):
-    """
-    Transformers may optionally choose to subclass this class instead of the
-    base, if their transform logic can be broken apart into a lambda for
-    optimization of combined tree traversals.
-
-    For performance reasons, developers should try to subclass this
-    class instead of the above base class, whenever possible - since
-    with this alternative, traversal of the entire block structure happens
-    only once for all transformers that implement this form of transform.
-    """
-
-    def transform(self, usage_info, block_structure):
-        """
-        This override of the abstract base method allows OptimizedTransformers
-        to define transform_block_filter instead of transform.
+        Note that this base implementation will raise a NotImplementedError if
+        neither transform nor transform_block_filter are overridden in the
+        concrete subclass.
         """
         block_structure.filter_topological_traversal(self.transform_block_filter(usage_info, block_structure))
 
-    @abstractmethod
     def transform_block_filter(self, usage_info, block_structure):
         """
         This is an alternative to the standard transform method.
 
         Returns a filter function to be used to filter out any unwanted blocks
         in the given block_structure.
+
+        For performance reasons, developers should try to implement this
+        method instead of the above transform method, whenever possible - since
+        with this alternative, traversal of the entire block structure happens
+        only once for all transformers that implement this form of transform.
 
         In addition to the commonly used methods listed above, the following
         methods are commonly used by implementations of transform_block_filter:
