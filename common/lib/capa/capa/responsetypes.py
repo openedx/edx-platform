@@ -254,9 +254,15 @@ class LoncapaResponse(object):
         if self.xml.get('inline', ''):
             tree.set('class', 'inline')
 
+        # construct and set question index on <span>
+        tree.attrib['id'] = '{}_response_{}'.format(*self.xml.get('id').split('_'))
+
+        # extract all <p> tags - needed to construct ids used for a11y
+        p_tag_ids = ' '.join([p_element.get('id') for p_element in self.xml.findall('.//p')])
+
         for item in self.xml:
             # call provided procedure to do the rendering
-            item_xhtml = renderer(item)
+            item_xhtml = renderer(item, a11y_data={'p_tag_ids': p_tag_ids})
             if item_xhtml is not None:
                 tree.append(item_xhtml)
         tree.tail = self.xml.tail
