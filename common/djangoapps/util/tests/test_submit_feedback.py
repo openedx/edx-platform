@@ -165,6 +165,7 @@ class SubmitFeedbackTest(TestCase):
             mock.call.create_ticket(
                 {
                     "ticket": {
+                        "recipient": "registration@example.com",
                         "requester": {"name": "Test User", "email": "test@edx.org"},
                         "subject": "a subject",
                         "comment": {"body": "some details"},
@@ -208,6 +209,7 @@ class SubmitFeedbackTest(TestCase):
             mock.call.create_ticket(
                 {
                     "ticket": {
+                        "recipient": "no-reply@fakeuniversity.com",
                         "requester": {"name": "Test User", "email": "test@edx.org"},
                         "subject": "a subject",
                         "comment": {"body": "some details"},
@@ -259,6 +261,7 @@ class SubmitFeedbackTest(TestCase):
             mock.call.create_ticket(
                 {
                     "ticket": {
+                        "recipient": "registration@example.com",
                         "requester": {"name": "Test User", "email": "test@edx.org"},
                         "subject": "a subject",
                         "comment": {"body": "some details"},
