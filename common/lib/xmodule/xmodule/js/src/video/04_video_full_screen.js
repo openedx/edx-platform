@@ -1,16 +1,11 @@
 (function (define) {
 'use strict';
-define('video/04_video_full_screen.js', [], function () {
+define('video/04_video_full_screen.js', ['edx-ui-toolkit/js/utils/html-utils'], function (HtmlUtils) {
     var template = [
         '<button class="control add-fullscreen" aria-disabled="false" title="',
             gettext('Fill browser'),
         '">',
-            '<span class="icon-fallback-img">',
-                '<span class="icon fa fa-arrows-alt" aria-hidden="true"></span>',
-                '<span class="sr control-text">',
-                    gettext('Fill browser'),
-                '</span>',
-            '</span>',
+            '<span class="icon fa fa-arrows-alt" aria-hidden="true"></span>',
         '</button>'
     ].join('');
 
@@ -73,7 +68,7 @@ define('video/04_video_full_screen.js', [], function () {
         state.videoFullScreen.fullScreenEl = $(template);
         state.videoFullScreen.sliderEl = state.el.find('.slider');
         state.videoFullScreen.fullScreenState = false;
-        state.el.find('.secondary-controls').append(state.videoFullScreen.fullScreenEl);
+        HtmlUtils.append(state.el.find('.secondary-controls'), HtmlUtils.HTML(state.videoFullScreen.fullScreenEl));
         state.videoFullScreen.updateControlsHeight();
     }
 
@@ -140,11 +135,10 @@ define('video/04_video_full_screen.js', [], function () {
         fullScreenClassNameEl.removeClass('video-fullscreen');
         $(window).scrollTop(this.scrollPos);
         this.videoFullScreen.fullScreenEl
+            .attr('title', gettext('Fill browser'))
             .find('.icon')
                 .removeClass('fa-compress')
-                .addClass('fa-arrows-alt')
-                .find('.control-text')
-                    .text(gettext('Fill browser'));
+                .addClass('fa-arrows-alt');
 
         this.el.trigger('fullscreen', [this.isFullScreen]);
 
@@ -163,11 +157,10 @@ define('video/04_video_full_screen.js', [], function () {
         this.videoFullScreen.fullScreenState = this.isFullScreen = true;
         fullScreenClassNameEl.addClass('video-fullscreen');
         this.videoFullScreen.fullScreenEl
+            .attr('title', gettext('Exit full browser'))
             .find('.icon')
                 .removeClass('fa-arrows-alt')
-                .addClass('fa-compress')
-                .find('.control-text')
-                    .text(gettext('Exit full browser'));
+                .addClass('fa-compress');
 
         this.el.trigger('fullscreen', [this.isFullScreen]);
 
