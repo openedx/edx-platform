@@ -150,18 +150,18 @@
 
             // @TODO move into utils.coffee
             getNameWidth: function(name) {
-                var test = $('<div>'),
+                var $test = $('<div>'),
                     width;
 
-                test.css({
+                $test.css({
                     'font-size': this.dropdownButton.css('font-size'),
                     'opacity': 0,
                     'position': 'absolute',
                     'left': -1000,
                     'top': -1000
                 }).html(name).appendTo(document.body);
-                width = test.width();
-                test.remove();
+                width = $test.width();
+                $test.remove();
                 return width;
             },
 
