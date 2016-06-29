@@ -752,11 +752,12 @@ class VideoExportTestCase(VideoDescriptorTestBase):
 
     def test_export_to_xml_invalid_characters_in_attributes(self):
         """
-        Test XML export will raise TypeError by lxml library if contains illegal characters.
+        Test XML export will *not* raise TypeError by lxml library if contains illegal characters.
+        The illegal characters in a String field are removed from the string instead.
         """
-        self.descriptor.display_name = '\x1e'
-        with self.assertRaises(ValueError):
-            self.descriptor.definition_to_xml(None)
+        self.descriptor.display_name = 'Display\x1eName'
+        xml = self.descriptor.definition_to_xml(None)
+        self.assertEqual(xml.get('display_name'), 'DisplayName')
 
     def test_export_to_xml_unicode_characters(self):
         """
