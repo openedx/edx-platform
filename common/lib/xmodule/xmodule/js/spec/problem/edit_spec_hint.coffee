@@ -118,7 +118,7 @@ describe 'Markdown to xml extended hint dropdown', ->
     expect(data).toXMLEqual("""
     <problem>
     <optionresponse>
-      <label >q1</label>
+      <label>q1</label>
     <optioninput label="q1">
         <option correct="True">aa <optionhint>hint1</optionhint>
     </option>
@@ -148,7 +148,7 @@ describe 'Markdown to xml extended hint dropdown', ->
     expect(data).toXMLEqual("""
     <problem>
     <optionresponse>
-      <label >q1</label>
+      <label>q1</label>
     <optioninput label="q1">
         <option correct="False">aa <optionhint>hint1</optionhint>
     </option>
@@ -420,7 +420,7 @@ describe 'Markdown to xml extended hint text input', ->
     expect(data).toXMLEqual("""
     <problem>
     <stringresponse answer="France" type="ci">
-      <label >In which country would you find the city of Paris?</label>
+      <label>In which country would you find the city of Paris?</label>
     <correcthint label="BRAVO">Viva la France!</correcthint>
       <textline label="In which country would you find the city of Paris?" size="20"/>
     </stringresponse>
@@ -438,7 +438,7 @@ describe 'Markdown to xml extended hint text input', ->
     expect(data).toXMLEqual("""
     <problem>
     <stringresponse answer="France" type="ci">
-      <label >Where Paris?</label>
+      <label>Where Paris?</label>
     <correcthint label="BRAVO">hint1</correcthint>
       <additional_answer answer="USA"><correcthint label="meh">hint2</correcthint>
     </additional_answer>
@@ -458,7 +458,7 @@ describe 'Markdown to xml extended hint text input', ->
     expect(data).toXMLEqual("""
     <problem>
     <stringresponse answer="cold" type="ci">
-      <label >Revenge is a dish best served</label>
+      <label>Revenge is a dish best served</label>
     <correcthint>khaaaaaan!</correcthint>
       <stringequalhint answer="warm">feedback2</stringequalhint>
       <textline label="Revenge is a dish best served" size="20"/>
@@ -476,7 +476,7 @@ describe 'Markdown to xml extended hint text input', ->
     expect(data).toXMLEqual("""
     <problem>
     <stringresponse answer="2" type="ci">
-      <label >q</label>
+      <label>q</label>
     <correcthint>feedback1</correcthint>
       <textline label="q" size="20"/>
     </stringresponse>
@@ -496,7 +496,7 @@ describe 'Markdown to xml extended hint text input', ->
     expect(data).toXMLEqual("""
     <problem>
     <stringresponse answer="aaa" type="ci">
-      <label >q</label>
+      <label>q</label>
     <additional_answer answer="bbb"><correcthint>feedback1</correcthint>
     </additional_answer>
       <stringequalhint answer="no">feedback2</stringequalhint>
@@ -518,7 +518,7 @@ describe 'Markdown to xml extended hint text input', ->
     expect(data).toXMLEqual("""
     <problem>
     <stringresponse answer="2" type="ci">
-      <label >q</label>
+      <label>q</label>
     <correcthint>feedback1</correcthint>
       <additional_answer answer="bbb"><correcthint>feedback2</correcthint>
     </additional_answer>
@@ -631,7 +631,7 @@ describe 'Markdown to xml extended hint text input', ->
     expect(data).toXMLEqual("""
     <problem>
     <stringresponse answer="France" type="ci">
-      <label >Where Paris?</label>
+      <label>Where Paris?</label>
     <correcthint label="BRAVO">hint1</correcthint>
       <textline label="Where Paris?" size="20"/>
     </stringresponse>
@@ -833,7 +833,7 @@ describe 'Markdown to xml extended hint with tricky syntax cases', ->
     expect(data).toXMLEqual("""
     <problem>
     <multiplechoiceresponse>
-      <label >á and Ø</label>
+      <label>á and Ø</label>
     <choicegroup label="á and Ø" type="MultipleChoice">
         <choice correct="true">Ø <choicehint>Ø</choicehint>
     </choice>
@@ -857,7 +857,7 @@ describe 'Markdown to xml extended hint with tricky syntax cases', ->
     expect(data).toXMLEqual("""
     <problem>
     <multiplechoiceresponse>
-      <label >"quotes" aren't `fun`</label>
+      <label>"quotes" aren't `fun`</label>
     <choicegroup label="&quot;quotes&quot; aren't `fun`" type="MultipleChoice">
         <choice correct="false">"hello" <choicehint>isn't</choicehint>
     </choice>
@@ -881,7 +881,7 @@ describe 'Markdown to xml extended hint with tricky syntax cases', ->
     expect(data).toXMLEqual("""
     <problem>
     <multiplechoiceresponse>
-      <label >q1</label>
+      <label>q1</label>
     <p>this (x)</p>
     <choicegroup label="q1" type="MultipleChoice">
         <choice correct="false">a <choicehint>(hint)</choicehint>
@@ -907,7 +907,7 @@ describe 'Markdown to xml extended hint with tricky syntax cases', ->
     expect(data).toXMLEqual("""
     <problem>
     <choiceresponse>
-      <label >q1</label>
+      <label>q1</label>
     <p>this [x]</p>
     <checkboxgroup label="q1">
         <choice correct="false">a [square]</choice>
@@ -941,7 +941,7 @@ describe 'Markdown to xml extended hint with tricky syntax cases', ->
     expect(data).toXMLEqual("""
     <problem>
     <optionresponse>
-      <label >q22</label>
+      <label>q22</label>
     <optioninput label="q22">
         <option correct="True">x <optionhint>hintx these span</optionhint>
     </option>
@@ -955,4 +955,3 @@ describe 'Markdown to xml extended hint with tricky syntax cases', ->
 
     </problem>
     """)
-

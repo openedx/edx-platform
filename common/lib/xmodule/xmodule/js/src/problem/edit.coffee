@@ -594,12 +594,13 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
       // convert if there is only one responsetype
       if (responseType.length === 1) {
         var inputtype = responseType[0].firstElementChild
-        var before = true;
+        // used to decide whether an element should be placed before or after an inputtype
+        var beforeInputtype = true;
 
         _.each($xml.find('prob').children(), function(child, index){
             // we don't want to add the responsetype again into new xml
             if (responseType[0].nodeName === child.nodeName) {
-                before = false;
+                beforeInputtype = false;
                 return;
             }
 
@@ -613,7 +614,7 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
                 return;
             }
 
-            if (before) {
+            if (beforeInputtype) {
                 // safe-lint: disable=javascript-jquery-insert-into-target
                 responseType[0].insertBefore(child, inputtype);
             } else {
@@ -640,9 +641,8 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
       return xml;
     }`
 
-    debugger;
     responseTypesXML = []
-    responseTypesMarkdown = markdown.split(/\n\s{0,}---\s{0,}\n/g)
+    responseTypesMarkdown = markdown.split(/\n\s*---\s*\n/g)
     _.each responseTypesMarkdown, (responseTypeMarkdown, index) ->
       if responseTypeMarkdown.trim().length > 0
         responseTypesXML.push toXml(responseTypeMarkdown)

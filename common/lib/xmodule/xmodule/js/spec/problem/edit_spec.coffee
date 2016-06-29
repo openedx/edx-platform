@@ -501,7 +501,7 @@ describe 'MarkdownEditingDescriptor', ->
         """)
       expect(data).toXMLEqual("""<problem>
         <stringresponse answer="w*.?s*Luther Kings*.*" type="ci regexp">
-          <label >Who lead the civil right movement in the United States of America?</label>
+          <label>Who lead the civil right movement in the United States of America?</label>
         <textline label="Who lead the civil right movement in the United States of America?" size="20"/>
         </stringresponse>
 
