@@ -68,6 +68,33 @@ class TestJSUtils(TestCase):
         escaped_json = dump_js_escaped_json(malicious_dict, cls=self.SampleJSONEncoder)
         self.assertEquals(expected_custom_escaped_json, escaped_json)
 
+    def test_dump_js_escaped_json_with_default_serializer_escapes_unsafe_html(self):
+        """
+        Test dump_js_escaped_json serializes all sub-objects before escaping when using `default` parameter
+
+        Here we just replace unserializable objects with None.
+
+        """
+        class Unserializable(object):
+            # pylint: disable=missing-docstring
+            pass
+
+        malicious_dict = {
+            "</script><script>alert('hello, ');</script>": "</script><script>alert('&world!');</script>",
+            "unserializable": Unserializable()
+        }
+        expected_escaped_json = (
+            r'''{"\u003c/script\u003e\u003cscript\u003ealert('hello, ');\u003c/script\u003e": '''
+            r'''"\u003c/script\u003e\u003cscript\u003ealert('\u0026world!');\u003c/script\u003e", '''
+            r'''"unserializable": null}'''
+        )
+
+        with self.assertRaisesRegexp(TypeError, "Unserializable object at 0x.* is not JSON serializable"):
+            dump_js_escaped_json(malicious_dict)
+
+        escaped_json = dump_js_escaped_json(malicious_dict, default=lambda x: None)
+        self.assertEquals(expected_escaped_json, escaped_json)
+
     def test_js_escaped_string_escapes_unsafe_html(self):
         """
         Test js_escaped_string escapes &, <, and >, as well as returns a unicode type

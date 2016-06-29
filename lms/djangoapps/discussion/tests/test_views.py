@@ -454,7 +454,7 @@ class SingleCohortedThreadTestCase(CohortedTestCase):
         html = response.content
 
         # Verify that the group name is correctly included in the HTML
-        self.assertRegexpMatches(html, r'&#34;group_name&#34;: &#34;student_cohort&#34;')
+        self.assertRegexpMatches(html, r'"group_name": "student_cohort"')
 
 
 @patch('lms.lib.comment_client.utils.requests.request', autospec=True)
@@ -807,7 +807,7 @@ class ForumFormDiscussionGroupIdTestCase(CohortedTestCase, CohortedTopicGroupIdT
 
         self.client.login(username=user.username, password='test')
         return self.client.get(
-            reverse(views.forum_form_discussion, args=[unicode(self.course.id)]),
+            reverse("discussion.views.forum_form_discussion", args=[unicode(self.course.id)]),
             data=request_data,
             **headers
         )
@@ -1142,10 +1142,10 @@ class UserProfileTestCase(UrlResetMixin, ModuleStoreTestCase):
         self.assertRegexpMatches(html, r'data-num-pages="1"')
         self.assertRegexpMatches(html, r'<span>1</span> discussion started')
         self.assertRegexpMatches(html, r'<span>2</span> comments')
-        self.assertRegexpMatches(html, r'&#34;id&#34;: &#34;{}&#34;'.format(self.TEST_THREAD_ID))
-        self.assertRegexpMatches(html, r'&#34;title&#34;: &#34;{}&#34;'.format(self.TEST_THREAD_TEXT))
-        self.assertRegexpMatches(html, r'&#34;body&#34;: &#34;{}&#34;'.format(self.TEST_THREAD_TEXT))
-        self.assertRegexpMatches(html, r'&#34;username&#34;: &#34;{}&#34;'.format(self.student.username))
+        self.assertRegexpMatches(html, r'&#39;id&#39;: &#39;{}&#39;'.format(self.TEST_THREAD_ID))
+        self.assertRegexpMatches(html, r'&#39;title&#39;: &#39;{}&#39;'.format(self.TEST_THREAD_TEXT))
+        self.assertRegexpMatches(html, r'&#39;body&#39;: &#39;{}&#39;'.format(self.TEST_THREAD_TEXT))
+        self.assertRegexpMatches(html, r'&#39;username&#39;: u&#39;{}&#39;'.format(self.student.username))
 
     def check_ajax(self, mock_request, **params):
         response = self.get_response(mock_request, params, HTTP_X_REQUESTED_WITH="XMLHttpRequest")
