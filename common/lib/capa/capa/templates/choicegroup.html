@@ -1,14 +1,16 @@
 <form class="choicegroup capa_inputtype" id="${id}-form">
-    <fieldset role="${input_type}group" aria-label="${label}">
+    <fieldset>
       % if response_data['label']:
         <legend id="${id}-legend" class="response-fieldset-legend field-group-hd">${response_data['label']}</legend>
+      % else:
+        <legend>Question</legend>
       % endif
-        % for choice_id, choice_description in choices:
+        % for choice_id, choice_label in choices:
           <div class="field" aria-live="polite" aria-atomic="true">
             <%
               label_class = 'response-label field-label label-inline'
             %>
-            <label id="${id}-{$choice_id}-label"
+            <label id="${id}-${choice_id}-label"
                 ## If the student has selected this choice...
                 % if input_type == 'radio' and ( (isinstance(value, basestring) and (choice_id == value))  or  (not isinstance(value, basestring) and choice_id in value) ):
                 <%
@@ -27,23 +29,19 @@
                 % endif
                 class="${label_class}"
                 >
-                <input type="${input_type}" name="input_${id}${name_array_suffix}" id="input_${id}_${choice_id}" class="field-input input-${input_type}" aria-role="radio" aria-describedby="answer_${id}" value="${choice_id}"
+                <input type="${input_type}" name="input_${id}${name_array_suffix}" id="input_${id}_${choice_id}" class="field-input input-${input_type}" value="${choice_id}"
                 ## If the student selected this choice...
                 % if input_type == 'radio' and ( (isinstance(value, basestring) and (choice_id == value))  or  (not isinstance(value, basestring) and choice_id in value) ):
                 checked="true"
                 % elif input_type != 'radio' and choice_id in value:
                 checked="true"
                 % endif
-                % if input_type != 'radio':
-                aria-multiselectable="true"
-                % endif
-
-                /> ${choice_description}
+                /> ${choice_label}
 
                 % if input_type == 'radio' and ( (isinstance(value, basestring) and (choice_id == value))  or  (not isinstance(value, basestring) and choice_id in value) ):
-                % if status in ('correct', 'partially-correct', 'incorrect') and not show_correctness=='never':
-                <span class="sr status" id="${id}-{$choice_id}-labeltext">${choice_description|h} - ${status.display_name}</span>
-                % endif
+                  % if status in ('correct', 'partially-correct', 'incorrect') and not show_correctness == 'never':
+                    <span class="sr status" id="${id}-${choice_id}-labeltext">${status.display_name}</span>
+                  % endif
                 % endif
             </label>
           </div>
@@ -54,9 +52,9 @@
         % if input_type == 'checkbox' or not value:
             <span class="status ${status.classname if show_correctness != 'never' else 'unanswered'}" id="status_${id}" aria-describedby="inputtype_${id}" data-tooltip="${status.display_tooltip}">
                 <span class="sr">
-                    %for choice_id, choice_description in choices:
+                    %for choice_id, choice_label in choices:
                         % if choice_id in value:
-                            ${choice_description},
+                            ${choice_label},
                         %endif
                     %endfor
                     -
