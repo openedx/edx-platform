@@ -184,9 +184,9 @@
 
         DiscussionUtil.safeAjax = function(params) {
             var $elem, deferred, request,
-                self = this;
+                self = this, deferred;
             $elem = params.$elem;
-            if ($elem && $elem.attr("disabled")) {
+            if ($elem && $elem.prop("disabled")) {
                 deferred = $.Deferred();
                 deferred.reject();
                 return deferred.promise();
@@ -194,18 +194,6 @@
             params.url = URI(params.url).addSearch({
                 ajax: 1
             });
-            params.beforeSend = function() {
-                if ($elem) {
-                    $elem.attr("disabled", "disabled");
-                }
-                if (params.$loading) {
-                    if (params.loadingCallback) {
-                        return params.loadingCallback.apply(params.$loading);
-                    } else {
-                        return self.showLoadingIndicator($(params.$loading), params.takeFocus);
-                    }
-                }
-            };
             if (!params.error) {
                 params.error = function() {
                     self.discussionAlert(
@@ -216,9 +204,21 @@
                     );
                 };
             }
+
+            if ($elem) {
+                $elem.prop("disabled", true);
+            }
+            if (params.$loading) {
+                if (params.loadingCallback) {
+                    params.loadingCallback.apply(params.$loading);
+                } else {
+                    self.showLoadingIndicator($(params.$loading), params.takeFocus);
+                }
+            }
+
             request = $.ajax(params).always(function() {
                 if ($elem) {
-                    $elem.removeAttr("disabled");
+                    $elem.prop("disabled", false);
                 }
                 if (params.$loading) {
                     if (params.loadedCallback) {
@@ -231,7 +231,7 @@
             return request;
         };
 
-        DiscussionUtil.updateWithUndo = function(model, updates, safeAjaxParams, errorMsg) {
+        DiscussionUtil.updateWithUndo = function(model, updates, safeAjaxParams, errorMsg, beforeSend) {
             var undo,
                 self = this;
             if (errorMsg) {
@@ -241,6 +241,9 @@
             }
             undo = _.pick(model.attributes, _.keys(updates));
             model.set(updates);
+            if (typeof beforeSend === 'function') {
+                beforeSend();
+            }
             return this.safeAjax(safeAjaxParams).fail(function() {
                 return model.set(undo);
             });

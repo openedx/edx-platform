@@ -261,12 +261,21 @@
             });
         });
         describe("search alerts", function() {
-            var testAlertMessages;
+            var testAlertMessages, getAlertMessagesAndClasses;
 
             testAlertMessages = function(expectedMessages) {
                 return expect($(".search-alert .message").map(function() {
                     return $(this).html();
                 }).get()).toEqual(expectedMessages);
+            };
+
+            getAlertMessagesAndClasses = function () {
+                return $(".search-alert").map(function() {
+                    return {
+                        text: $('.message', this).html(),
+                        css_class: $(this).attr('class')
+                    };
+                }).get();
             };
 
             it("renders and removes search alerts", function() {
@@ -281,6 +290,27 @@
                 this.view.removeSearchAlert(bar.cid);
                 return testAlertMessages([]);
             });
+
+            it("renders search alert with custom class", function() {
+                var foo, messages;
+                testAlertMessages([]);
+
+                this.view.addSearchAlert("foo", "custom-class");
+                messages = getAlertMessagesAndClasses();
+                expect(messages.length).toEqual(1);
+                expect(messages[0].text).toEqual("foo");
+                expect(messages[0].css_class).toEqual("search-alert custom-class");
+
+                foo = this.view.addSearchAlert("bar", "other-class");
+
+                messages = getAlertMessagesAndClasses();
+                expect(messages.length).toEqual(2);
+                expect(messages[0].text).toEqual("foo");
+                expect(messages[0].css_class).toEqual("search-alert custom-class");
+                expect(messages[1].text).toEqual("bar");
+                expect(messages[1].css_class).toEqual("search-alert other-class");
+            });
+
 
             it("clears all search alerts", function() {
                 this.view.addSearchAlert("foo");

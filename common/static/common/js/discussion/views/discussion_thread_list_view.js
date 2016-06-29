@@ -123,6 +123,7 @@
                     return self.displayedCollection.reset(discussion.models);
                 });
                 this.collection.on("add", this.addAndSelectThread);
+                this.collection.on("thread:remove", this.threadRemoved);
                 this.sidebar_padding = 10;
                 this.boardName = null;
                 this.template = _.template($("#thread-list-template").html());
@@ -135,7 +136,8 @@
                     var content;
                     content = _.template($("#search-alert-template").html())({
                         'message': searchAlert.attributes.message,
-                        'cid': searchAlert.cid
+                        'cid': searchAlert.cid,
+                        'css_class': searchAlert.attributes.css_class
                     });
                     self.$(".search-alerts").append(content);
                     return self.$("#search-alert-" + searchAlert.cid + " a.dismiss")
@@ -151,11 +153,19 @@
                 });
             };
 
-            DiscussionThreadListView.prototype.addSearchAlert = function(message) {
+            /**
+             * Creates search alert model and adds it to collection
+             * @param message - alert message
+             * @param css_class - Allows setting custom css class for a message. This can be used to style messages
+             *                    of different types differently (i.e. other background, completely hide, etc.)
+             * @returns {Backbone.Model}
+             */
+            DiscussionThreadListView.prototype.addSearchAlert = function(message, css_class) {
                 var m;
-                m = new Backbone.Model({
-                    "message": message
-                });
+                if (typeof css_class === 'undefined' || css_class === null) {
+                    css_class = "";
+                }
+                m = new Backbone.Model({"message": message, "css_class": css_class});
                 this.searchAlertCollection.add(m);
                 return m;
             };
@@ -392,8 +402,8 @@
                 return false;
             };
 
-            DiscussionThreadListView.prototype.threadRemoved = function(thread_id) {
-                return this.trigger("thread:removed", thread_id);
+            DiscussionThreadListView.prototype.threadRemoved = function(thread) {
+                this.trigger("thread:removed", thread);
             };
 
             DiscussionThreadListView.prototype.setActiveThread = function(thread_id) {
@@ -406,7 +416,7 @@
             };
 
             DiscussionThreadListView.prototype.goHome = function() {
-                var thread_id, url;
+                var url;
                 this.template = _.template($("#discussion-home-template").html());
                 $(".forum-content").html(this.template);
                 $(".forum-nav-thread-list a").removeClass("is-active").find(".sr").remove();
@@ -416,19 +426,9 @@
                     url: url,
                     type: "GET",
                     success: function(response) {
-                        if (response.status) {
-                            return $('input.email-setting').attr('checked', 'checked');
-                        } else {
-                            return $('input.email-setting').removeAttr('checked');
-                        }
+                        $('input.email-setting').prop('checked', response.status);
                     }
                 });
-                thread_id = null;
-                return this.trigger("thread:removed");
-                /*
-                 select all threads
-                 */
-
             };
 
             DiscussionThreadListView.prototype.isBrowseMenuVisible = function() {
@@ -731,8 +731,7 @@
                     url: DiscussionUtil.urlFor("users"),
                     type: "GET",
                     dataType: 'json',
-                    error: function() {
-                    },
+                    error: function() {},
                     success: function(response) {
                         var message;
                         if (response.users.length > 0) {
@@ -742,7 +741,7 @@
                                     username: response.users[0].username
                                 })
                             }, true);
-                            return self.addSearchAlert(message);
+                            return self.addSearchAlert(message, 'search-by-user');
                         }
                     }
                 });
@@ -765,23 +764,17 @@
             };
 
             DiscussionThreadListView.prototype.updateEmailNotifications = function() {
-                if ($('input.email-setting').attr('checked')) {
-                    return DiscussionUtil.safeAjax({
-                        url: DiscussionUtil.urlFor("enable_notifications"),
-                        type: "POST",
-                        error: function() {
-                            return $('input.email-setting').removeAttr('checked');
-                        }
-                    });
-                } else {
-                    return DiscussionUtil.safeAjax({
-                        url: DiscussionUtil.urlFor("disable_notifications"),
-                        type: "POST",
-                        error: function() {
-                            return $('input.email-setting').attr('checked', 'checked');
-                        }
-                    });
-                }
+                var checkbox, checked, urlName;
+                checkbox = $('input.email-setting');
+                checked = checkbox.prop('checked');
+                urlName = (checked) ? "enable_notifications" : "disable_notifications";
+                DiscussionUtil.safeAjax({
+                    url: DiscussionUtil.urlFor(urlName),
+                    type: "POST",
+                    error: function() {
+                        checkbox.prop('checked', !checked);
+                    }
+                });
             };
 
             return DiscussionThreadListView;

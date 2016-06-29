@@ -389,18 +389,18 @@
                         msg = gettext("We had some trouble removing this endorsement.  Please try again.");
                     }
                 }
-                beforeFunc = function() {
-                    return self.trigger("comment:endorse");
-                };
-                return DiscussionUtil.updateWithUndo(this.model, updates, {
-                    url: url,
-                    type: "POST",
-                    data: {
-                        endorsed: is_endorsing
+                return DiscussionUtil.updateWithUndo(
+                    this.model,
+                    updates,
+                    {
+                        url: url,
+                        type: "POST",
+                        data: { endorsed: is_endorsing },
+                        $elem: $(event.currentTarget)
                     },
-                    beforeSend: beforeFunc,
-                    $elem: $(event.currentTarget)
-                }, msg).always(this.trigger("comment:endorse"));
+                    msg,
+                    function() { return self.trigger("comment:endorse"); }
+                ).always(this.trigger("comment:endorse"));
             };
 
             DiscussionContentShowView.prototype.toggleVote = function(event) {

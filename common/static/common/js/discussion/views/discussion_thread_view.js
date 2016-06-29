@@ -91,6 +91,7 @@
                     id = self.model.get("id");
                     if (collection.get(id)) {
                         self.model = collection.get(id);
+                        self.rerender();
                     }
                 });
                 this.createShowView();
