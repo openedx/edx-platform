@@ -177,29 +177,29 @@ class CoursewareContextTestCase(ModuleStoreTestCase):
 
     @ddt.data((ModuleStoreEnum.Type.mongo, 2), (ModuleStoreEnum.Type.split, 1))
     @ddt.unpack
-    def test_get_accessible_discussion_modules(self, modulestore_type, expected_discussion_modules):
+    def test_get_accessible_discussion_xblocks(self, modulestore_type, expected_discussion_xblocks):
         """
-        Tests that the accessible discussion modules having no parents do not get fetched for split modulestore.
+        Tests that the accessible discussion xblocks having no parents do not get fetched for split modulestore.
         """
         course = CourseFactory.create(default_store=modulestore_type)
 
-        # Create a discussion module.
+        # Create a discussion xblock.
         test_discussion = self.store.create_child(self.user.id, course.location, 'discussion', 'test_discussion')
 
-        # Assert that created discussion module is not an orphan.
+        # Assert that created discussion xblock is not an orphan.
         self.assertNotIn(test_discussion.location, self.store.get_orphans(course.id))
 
-        # Assert that there is only one discussion module in the course at the moment.
-        self.assertEqual(len(utils.get_accessible_discussion_modules(course, self.user)), 1)
+        # Assert that there is only one discussion xblock in the course at the moment.
+        self.assertEqual(len(utils.get_accessible_discussion_xblocks(course, self.user)), 1)
 
-        # Add an orphan discussion module to that course
+        # Add an orphan discussion xblock to that course
         orphan = course.id.make_usage_key('discussion', 'orphan_discussion')
         self.store.create_item(self.user.id, orphan.course_key, orphan.block_type, block_id=orphan.block_id)
 
-        # Assert that the discussion module is an orphan.
+        # Assert that the discussion xblock is an orphan.
         self.assertIn(orphan, self.store.get_orphans(course.id))
 
-        self.assertEqual(len(utils.get_accessible_discussion_modules(course, self.user)), expected_discussion_modules)
+        self.assertEqual(len(utils.get_accessible_discussion_xblocks(course, self.user)), expected_discussion_xblocks)
 
 
 @attr('shard_3')
@@ -262,7 +262,7 @@ class CachedDiscussionIdMapTestCase(ModuleStoreTestCase):
         with self.assertRaises(utils.DiscussionIdMapIsNotCached):
             utils.get_cached_discussion_key(self.course, 'test_discussion_id')
 
-    def test_module_does_not_have_required_keys(self):
+    def test_xblock_does_not_have_required_keys(self):
         self.assertTrue(utils.has_required_keys(self.discussion))
         self.assertFalse(utils.has_required_keys(self.bad_discussion))
 
@@ -505,7 +505,7 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
             cohorted_if_in_list=True
         )
 
-    def test_get_unstarted_discussion_modules(self):
+    def test_get_unstarted_discussion_xblocks(self):
         later = datetime.datetime(datetime.MAXYEAR, 1, 1, tzinfo=django_utc())
 
         self.create_discussion("Chapter 1", "Discussion 1", start=later)
@@ -1026,7 +1026,7 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
 @attr('shard_1')
 class ContentGroupCategoryMapTestCase(CategoryMapTestMixin, ContentGroupTestCase):
     """
-    Tests `get_discussion_category_map` on discussion modules which are
+    Tests `get_discussion_category_map` on discussion xblocks which are
     only visible to some content groups.
     """
     def test_staff_user(self):
