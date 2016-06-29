@@ -48,7 +48,7 @@
                         return view;
                     });
                     pageUrlFunc = function(page) {
-                        baseUri.clone().addSearch('page', page);
+                        return baseUri.clone().addSearch('page', page).toString();
                     };
                     paginationParams = DiscussionUtil.getPaginationParams(this.page, this.numPages, pageUrlFunc);
                     HtmlUtils.setHtml(
