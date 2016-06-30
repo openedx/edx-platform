@@ -17,7 +17,7 @@ from xmodule.contentstore.content import StaticContent, XASSET_LOCATION_TAG
 from xmodule.modulestore import InvalidLocationError
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locator import AssetLocator
-from cache_toolbox.core import get_cached_content, set_cached_content
+from .caching import get_cached_content, set_cached_content
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.exceptions import NotFoundError
 
