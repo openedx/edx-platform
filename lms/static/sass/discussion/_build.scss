@@ -6,7 +6,7 @@ $static-path: '../..' !default;
 
 // Configuration
 @import '../config';
-@import '../base/variables';
+@import 'base/variables';
 @import '../base-v2/extends';
 
 // Common extensions

@@ -387,9 +387,6 @@ COURSES_ROOT = ENV_ROOT / "data"
 
 DATA_DIR = COURSES_ROOT
 
-# comprehensive theming system
-COMPREHENSIVE_THEME_DIR = ""
-
 # TODO: Remove the rest of the sys.path modification here and in cms/envs/common.py
 sys.path.append(REPO_ROOT)
 sys.path.append(PROJECT_ROOT / 'djangoapps')
@@ -489,6 +486,7 @@ TEMPLATES = [
             'loaders': [
                 # We have to use mako-aware template loaders to be able to include
                 # mako templates inside django templates (such as main_django.html).
+                'openedx.core.djangoapps.theming.template_loaders.ThemeTemplateLoader',
                 'edxmako.makoloader.MakoFilesystemLoader',
                 'edxmako.makoloader.MakoAppDirectoriesLoader',
             ],
@@ -784,7 +782,6 @@ SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
 CMS_BASE = 'localhost:8001'
 
 # Site info
-SITE_ID = 1
 SITE_NAME = "example.com"
 HTTPS = 'on'
 ROOT_URLCONF = 'lms.urls'
@@ -1166,6 +1163,8 @@ MIDDLEWARE_CLASSES = (
 
     'course_wiki.middleware.WikiAccessMiddleware',
 
+    'openedx.core.djangoapps.theming.middleware.CurrentSiteThemeMiddleware',
+
     # This must be last
     'microsite_configuration.middleware.MicrositeSessionCookieDomainMiddleware',
 )
@@ -1185,7 +1184,7 @@ STATICFILES_STORAGE = 'openedx.core.storage.ProductionStorage'
 # List of finder classes that know how to find static files in various locations.
 # Note: the pipeline finder is included to be able to discover optimized files
 STATICFILES_FINDERS = [
-    'openedx.core.djangoapps.theming.finders.ComprehensiveThemeFinder',
+    'openedx.core.djangoapps.theming.finders.ThemeFilesFinder',
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
     'openedx.core.lib.xblock_pipeline.finder.XBlockPipelineFinder',
@@ -2919,6 +2918,21 @@ CREDENTIALS_SERVICE_USERNAME = 'credentials_service_user'
 CREDENTIALS_GENERATION_ROUTING_KEY = HIGH_PRIORITY_QUEUE
 
 WIKI_REQUEST_CACHE_MIDDLEWARE_CLASS = "request_cache.middleware.RequestCache"
+
+# Settings for Comprehensive Theming app
+
+# See https://github.com/edx/edx-django-sites-extensions for more info
+# Default site to use if site matching request headers does not exist
+SITE_ID = 1
+
+# dir containing all themes
+COMPREHENSIVE_THEME_DIRS = [REPO_ROOT / "themes"]
+
+# Theme to use when no site or site theme is defined,
+# set to None if you want to use openedx theme
+DEFAULT_SITE_THEME = None
+
+ENABLE_COMPREHENSIVE_THEMING = True
 
 # API access management
 API_ACCESS_MANAGER_EMAIL = 'api-access@example.com'
