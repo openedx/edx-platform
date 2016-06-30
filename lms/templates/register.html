@@ -40,6 +40,9 @@ import calendar
         $("label").parent().removeClass("is-focused");
       });
 
+      if ($("#auto_submit" ).length) {
+        $('#register-form').submit();
+      }
     });
 
     (function() {
@@ -56,8 +59,8 @@ import calendar
       $('#register-form').on('ajax:success', function(event, json, xhr) {
         if (json.redirect_url) {
           location.href = json.redirect_url;
-	}	
-	else {
+	      }
+        else {
           $('.status.message.submission-error').removeClass('is-shown');
           $('.status.message.submission-success').addClass('is-shown').focus();
           $('#register-form .form-actions, #register-form .group-form, #register-form .instructions').hide();
@@ -113,6 +116,9 @@ import calendar
   <section role="main" class="content">
     <form role="form" id="register-form" method="post" data-remote="true" action="/create_account" novalidate>
       <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
+      % if auto_submit:
+        <input id="auto_submit" type="hidden" name="auto_submit" value="enabled">
+      % endif
 
       <!-- status messages -->
       <div role="alert" class="status message">
