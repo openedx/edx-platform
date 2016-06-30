@@ -690,17 +690,17 @@ def _progress(request, course_key, student_id):
         return redirect(reverse('course_survey', args=[unicode(course.id)]))
 
     staff_access = bool(has_access(request.user, 'staff', course))
-    try:
-        coach_access = has_ccx_coach_role(request.user, course_key)
-    except CCXLocatorValidationException:
-        coach_access = False
-
-    has_access_on_students_profiles = staff_access or coach_access
 
     if student_id is None or student_id == request.user.id:
         # always allowed to see your own profile
         student = request.user
     else:
+        try:
+            coach_access = has_ccx_coach_role(request.user, course_key)
+        except CCXLocatorValidationException:
+            coach_access = False
+
+        has_access_on_students_profiles = staff_access or coach_access
         # Requesting access to a different student's profile
         if not has_access_on_students_profiles:
             raise Http404
@@ -717,25 +717,15 @@ def _progress(request, course_key, student_id):
     student = User.objects.prefetch_related("groups").get(id=student.id)
 
     courseware_summary = grades.progress_summary(student, course)
+    if courseware_summary is None:
+        # This means the student didn't have access to the course (which the instructor requested)
+        raise Http404
+
     grade_summary = grades.grade(student, course)
     studio_url = get_studio_url(course, 'settings/grading')
 
-    if courseware_summary is None:
-        #This means the student didn't have access to the course (which the instructor requested)
-        raise Http404
-
     # checking certificate generation configuration
     enrollment_mode, is_active = CourseEnrollment.enrollment_mode_for_user(student, course_key)
-
-    # If the learner is in verified modes and the student did not have
-    # their ID verified, we need to show message to ask learner to verify their ID first
-    missing_required_verification = enrollment_mode in CourseMode.VERIFIED_MODES and \
-        not SoftwareSecurePhotoVerification.user_is_verified(student)
-
-    show_generate_cert_btn = (
-        is_active and CourseMode.is_eligible_for_certificate(enrollment_mode)
-        and certs_api.cert_generation_enabled(course_key)
-    )
 
     context = {
         'course': course,
@@ -745,39 +735,84 @@ def _progress(request, course_key, student_id):
         'staff_access': staff_access,
         'student': student,
         'passed': is_course_passed(course, grade_summary),
-        'show_generate_cert_btn': show_generate_cert_btn,
         'credit_course_requirements': _credit_course_requirements(course_key, student),
-        'missing_required_verification': missing_required_verification,
-        'certificate_invalidated': False,
+        'certificate_data': _get_cert_data(student, course, course_key, is_active, enrollment_mode)
     }
-
-    if show_generate_cert_btn:
-        # If current certificate is invalidated by instructor
-        # then show the certificate invalidated message.
-        context.update({
-            'certificate_invalidated': certs_api.is_certificate_invalid(student, course_key)
-        })
-
-        cert_status = certs_api.certificate_downloadable_status(student, course_key)
-        context.update(cert_status)
-        # showing the certificate web view button if feature flags are enabled.
-        if certs_api.has_html_certificates_enabled(course_key, course):
-            if certs_api.get_active_web_certificate(course) is not None:
-                context.update({
-                    'show_cert_web_view': True,
-                    'cert_web_view_url': certs_api.get_certificate_url(course_id=course_key, uuid=cert_status['uuid']),
-                })
-            else:
-                context.update({
-                    'is_downloadable': False,
-                    'is_generating': True,
-                    'download_url': None
-                })
 
     with outer_atomic():
         response = render_to_response('courseware/progress.html', context)
 
     return response
+
+
+def _get_cert_data(student, course, course_key, is_active, enrollment_mode):
+    show_generate_cert_btn = (
+            is_active and CourseMode.is_eligible_for_certificate(enrollment_mode)
+            and certs_api.cert_generation_enabled(course_key)
+    )
+    # If the learner is in verified modes and the student did not have
+    # their ID verified, we need to show message to ask learner to verify their ID first
+    missing_required_verification = enrollment_mode in CourseMode.VERIFIED_MODES and \
+        not SoftwareSecurePhotoVerification.user_is_verified(student)
+
+    show_cert_web_view = False
+    download_url = None
+    cert_web_view_url = None
+
+    if show_generate_cert_btn:
+        if certs_api.is_certificate_invalid(student, course_key):
+            cert_status = 'invalidated'
+            title = None
+            msg = _('Your certificate has been invalidated. Please contact your course team if you have any questions.')
+        else:
+            cert_downloadable_status = certs_api.certificate_downloadable_status(student, course_key)
+            if cert_downloadable_status['is_downloadable']:
+                cert_status = 'downloadable'
+                title = _('Your certificate is available')
+                msg = _('You can keep working for a higher grade, or request your certificate now.')
+                download_url = cert_downloadable_status['download_url']
+            elif cert_downloadable_status['is_generating']:
+                cert_status = 'generating'
+                title = _("We're working on it...")
+                msg = _("We're creating your certificate. You can keep working in your courses and a link to it will "
+                        "appear here and on your Dashboard when it is ready.")
+            elif missing_required_verification or cert_downloadable_status['is_unverified']:
+                platform_name = theming_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME)
+                cert_status = 'unverified'
+                title = _('Certificate unavailable')
+                msg = _('You have not received a certificate because you do not have a current {platform_name} '
+                        'verified identity.'.format(platform_name=platform_name))
+            else:
+                cert_status = 'request_cert'
+                title = _('Congratulations, you qualified for a certificate!')
+                msg = _('You can keep working for a higher grade, or request your certificate now.')
+
+            if certs_api.has_html_certificates_enabled(course_key, course):
+                if certs_api.get_active_web_certificate(course) is not None:
+                    show_cert_web_view = True
+                    cert_web_view_url = certs_api.get_certificate_url(
+                        course_id=course_key, uuid=cert_downloadable_status['uuid']
+                    )
+                else:
+                    download_url = None
+                    cert_status = 'generating'
+                    title = _("We're working on it...")
+                    msg = _("We're creating your certificate. You can keep working in your courses and a link to it "
+                            "will appear here and on your Dashboard when it is ready.")
+    else:
+        return None
+
+    response_data = {
+        'cert_status': cert_status,
+        'title': title,
+        'msg': msg,
+        'download_url': download_url,
+        'show_cert_web_view': show_cert_web_view,
+        'cert_web_view_url': cert_web_view_url
+    }
+
+    return response_data
+
 
 
 def _credit_course_requirements(course_key, student):
