@@ -41,7 +41,7 @@ import calendar
       });
 
       if ($("#auto_submit" ).length) {
-        $('#tos-yes').checked(true);
+        $('#tos-yes').prop('checked', true);
         $('#register-form').submit();
       }
     });
