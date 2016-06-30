@@ -181,7 +181,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-05-26 16:39+0000\n"
+"POT-Creation-Date: 2016-06-23 15:31+0000\n"
 "PO-Revision-Date: 2016-05-09 11:27+0000\n"
 "Last-Translator: Richard Moch <richard.moch@gmail.com>\n"
 "Language-Team: French (http://www.transifex.com/open-edx/edx-platform/language/fr/)\n"
@@ -288,6 +288,26 @@ msgstr ""
 #: common/djangoapps/config_models/admin.py
 msgid "Update"
 msgstr "Mettre à jour"
+
+#: common/djangoapps/config_models/management/commands/populate_model.py
+msgid "A file containing JSON must be specified."
+msgstr ""
+
+#: common/djangoapps/config_models/management/commands/populate_model.py
+msgid "A valid username must be specified."
+msgstr ""
+
+#: common/djangoapps/config_models/management/commands/populate_model.py
+msgid "File {0} does not exist"
+msgstr ""
+
+#: common/djangoapps/config_models/management/commands/populate_model.py
+msgid "Importing JSON data from file {0}"
+msgstr ""
+
+#: common/djangoapps/config_models/management/commands/populate_model.py
+msgid "Import complete, {0} new entries created"
+msgstr ""
 
 #: common/djangoapps/config_models/models.py
 msgid "Change date"
@@ -713,6 +733,10 @@ msgstr ""
 
 #: common/djangoapps/student/management/commands/manage_user.py
 msgid "Found existing user: \"{}\""
+msgstr ""
+
+#: common/djangoapps/student/management/commands/manage_user.py
+msgid "Setting unusable password for user \"{}\""
 msgstr ""
 
 #: common/djangoapps/student/management/commands/manage_user.py
@@ -1480,6 +1504,35 @@ msgstr ""
 msgid "Too similar to a restricted dictionary word."
 msgstr ""
 
+#: common/djangoapps/xblock_django/admin.py
+msgid ""
+"To disable the XBlock and prevent rendering in the LMS, leave \"Enabled\" "
+"deselected; for clarity, update XBlockStudioConfiguration support state "
+"accordingly."
+msgstr ""
+
+#: common/djangoapps/xblock_django/admin.py
+msgid ""
+"Only XBlocks listed in a course's Advanced Module List can be flagged as "
+"deprecated. Remember to update XBlockStudioConfiguration support state "
+"accordingly, as deprecated does not impact whether or not new XBlock "
+"instances can be created in Studio."
+msgstr ""
+
+#: common/djangoapps/xblock_django/admin.py
+msgid ""
+"XBlock/template combinations that are disabled cannot be edited in Studio, "
+"regardless of support level. Remember to also check if all instances of the "
+"XBlock are disabled in XBlockConfiguration."
+msgstr ""
+
+#: common/djangoapps/xblock_django/admin.py
+msgid ""
+"Enabled XBlock/template combinations with full or provisional support can "
+"always be created in Studio. Unsupported XBlock/template combinations "
+"require course author opt-in."
+msgstr ""
+
 #: common/djangoapps/xblock_django/models.py
 msgid "Space-separated list of XBlocks which should not render."
 msgstr ""
@@ -1487,6 +1540,22 @@ msgstr ""
 #: common/djangoapps/xblock_django/models.py
 msgid ""
 "Space-separated list of XBlock types whose creation to disable in Studio."
+msgstr ""
+
+#: common/djangoapps/xblock_django/models.py
+msgid "show deprecation messaging in Studio"
+msgstr ""
+
+#: common/djangoapps/xblock_django/models.py
+msgid "Fully Supported"
+msgstr ""
+
+#: common/djangoapps/xblock_django/models.py
+msgid "Provisionally Supported"
+msgstr ""
+
+#: common/djangoapps/xblock_django/models.py
+msgid "Unsupported"
 msgstr ""
 
 #: common/lib/capa/capa/capa_problem.py
@@ -2862,6 +2931,16 @@ msgid ""
 "Enter true or false. If this value is true, proctored exams are enabled in "
 "your course. Note that enabling proctored exams will also enable timed "
 "exams."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Create Zendesk Tickets For Suspicious Proctored Exam Attempts"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Enter true or false. If this value is true, a Zendesk ticket will be created"
+" for suspicious attempts."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
@@ -4682,6 +4761,26 @@ msgstr ""
 msgid "Path to single course checkout page hosted by the E-Commerce service."
 msgstr ""
 
+#: lms/djangoapps/commerce/models.py
+#: openedx/core/djangoapps/credentials/models.py
+#: openedx/core/djangoapps/credit/models.py
+#: openedx/core/djangoapps/programs/models.py
+msgid "Cache Time To Live"
+msgstr ""
+
+#: lms/djangoapps/commerce/models.py
+#: openedx/core/djangoapps/credentials/models.py
+#: openedx/core/djangoapps/credit/models.py
+#: openedx/core/djangoapps/programs/models.py
+msgid ""
+"Specified in seconds. Enable caching by setting this to a value greater than"
+" 0."
+msgstr ""
+
+#: lms/djangoapps/commerce/models.py
+msgid "Path to order receipt page."
+msgstr ""
+
 #: lms/djangoapps/commerce/signals.py
 msgid ""
 "A refund request has been initiated for {username} ({email}). To process "
@@ -4976,10 +5075,6 @@ msgid ""
 msgstr ""
 
 #: lms/djangoapps/courseware/views/views.py
-msgid "income in US Dollars ($)"
-msgstr ""
-
-#: lms/djangoapps/courseware/views/views.py
 msgid "Specify your annual household income in US Dollars."
 msgstr ""
 
@@ -5267,6 +5362,30 @@ msgstr ""
 msgid "Notes"
 msgstr "Notes"
 
+#: lms/djangoapps/email_marketing/models.py
+msgid "API key for accessing Sailthru. "
+msgstr ""
+
+#: lms/djangoapps/email_marketing/models.py
+msgid "API secret for accessing Sailthru. "
+msgstr ""
+
+#: lms/djangoapps/email_marketing/models.py
+msgid "Sailthru list name to add new users to. "
+msgstr ""
+
+#: lms/djangoapps/email_marketing/models.py
+msgid "Sailthru connection retry interval (secs)."
+msgstr ""
+
+#: lms/djangoapps/email_marketing/models.py
+msgid "Sailthru maximum retries."
+msgstr ""
+
+#: lms/djangoapps/email_marketing/models.py
+msgid "Sailthru template to use on activation send. "
+msgstr ""
+
 #: lms/djangoapps/instructor/paidcourse_enrollment_report.py
 msgid "{platform_name} Staff"
 msgstr ""
@@ -5298,6 +5417,17 @@ msgstr ""
 
 #: lms/djangoapps/instructor/paidcourse_enrollment_report.py
 msgid "Data Integrity Error"
+msgstr ""
+
+#: lms/djangoapps/instructor/services.py
+msgid "Proctored Exam Review: {review_status}"
+msgstr ""
+
+#: lms/djangoapps/instructor/services.py
+msgid ""
+"A proctored exam attempt for {exam_name} in {course_name} by username: "
+"{student_username} was reviewed as {review_status} by the proctored exam "
+"review provider."
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
@@ -5417,7 +5547,6 @@ msgstr ""
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 #: openedx/core/djangoapps/user_api/views.py
-#: cms/templates/temp-course-landing.html
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
 msgid "Email"
 msgstr "Email"
@@ -5948,7 +6077,6 @@ msgid "Extensions"
 msgstr "Extensions"
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
-#: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "Data Download"
 msgstr "Téléchargement des données"
 
@@ -7641,6 +7769,22 @@ msgstr ""
 msgid "Kosovo"
 msgstr ""
 
+#: lms/templates/logout.html
+msgid "Signed Out"
+msgstr ""
+
+#: lms/templates/logout.html
+msgid "You have signed out."
+msgstr ""
+
+#: lms/templates/logout.html
+#, python-format
+msgid ""
+"\n"
+"          If you are not redirected within 5 seconds, <a href=\"%(target)s\">click here to go to the home page</a>.\n"
+"        "
+msgstr ""
+
 #: lms/templates/main_django.html cms/templates/base.html
 #: lms/templates/main.html
 msgid "Skip to main content"
@@ -8268,20 +8412,6 @@ msgstr ""
 msgid "Enable authoring of Credential Service credentials in Studio."
 msgstr ""
 
-#: openedx/core/djangoapps/credentials/models.py
-#: openedx/core/djangoapps/credit/models.py
-#: openedx/core/djangoapps/programs/models.py
-msgid "Cache Time To Live"
-msgstr ""
-
-#: openedx/core/djangoapps/credentials/models.py
-#: openedx/core/djangoapps/credit/models.py
-#: openedx/core/djangoapps/programs/models.py
-msgid ""
-"Specified in seconds. Enable caching by setting this to a value greater than"
-" 0."
-msgstr ""
-
 #: openedx/core/djangoapps/credit/email_utils.py
 msgid "Course Credit Eligibility"
 msgstr ""
@@ -8533,10 +8663,9 @@ msgstr ""
 #. Translators: This label appears above a field on the registration form
 #. meant to hold the user's password.
 #: openedx/core/djangoapps/user_api/views.py cms/templates/login.html
-#: cms/templates/register.html cms/templates/temp-course-landing.html
-#: lms/templates/login.html lms/templates/provider_login.html
-#: lms/templates/register-form.html lms/templates/signup_modal.html
-#: lms/templates/sysadmin_dashboard.html
+#: cms/templates/register.html lms/templates/login.html
+#: lms/templates/provider_login.html lms/templates/register-form.html
+#: lms/templates/signup_modal.html lms/templates/sysadmin_dashboard.html
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "Password"
 msgstr "Mot de passe"
@@ -9059,6 +9188,12 @@ msgstr "Prêt"
 msgid "Failed"
 msgstr "Echec"
 
+#. Translators: This is the status for a video which has failed
+#. due to being flagged as a duplicate by an external or internal CMS
+#: cms/djangoapps/contentstore/views/videos.py
+msgid "Failed Duplicate"
+msgstr ""
+
 #. Translators: This is the status for a video for which an invalid
 #. processing token was provided in the course settings
 #: cms/djangoapps/contentstore/views/videos.py
@@ -9150,9 +9285,18 @@ msgstr "Page non trouvée"
 msgid "Page not found"
 msgstr "Page non trouvée"
 
+#: cms/templates/asset_index.html cms/templates/course_info.html
+#: cms/templates/course_outline.html cms/templates/edit-tabs.html
+#: cms/templates/textbooks.html cms/templates/videos_index.html
+#: cms/templates/widgets/header.html lms/templates/static_htmlbook.html
+#: lms/templates/static_pdfbook.html lms/templates/staticbook.html
+msgid "Content"
+msgstr ""
+
 #: cms/templates/asset_index.html cms/templates/certificates.html
 #: cms/templates/container.html cms/templates/course_outline.html
 #: cms/templates/group_configurations.html cms/templates/library.html
+#: cms/templates/manage_users.html cms/templates/manage_users_lib.html
 #: lms/templates/courseware/courses.html lms/templates/edxnotes/edxnotes.html
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
@@ -9448,7 +9592,8 @@ msgstr "Début"
 msgid "View all Courses"
 msgstr "Voir tous les cours"
 
-#: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
+#: lms/templates/dashboard.html lms/templates/user_dropdown.html
+#: themes/edx.org/lms/templates/dashboard.html
 msgid "Dashboard"
 msgstr "Tableau de bord"
 
@@ -10044,10 +10189,6 @@ msgstr "Données brutes :"
 #: lms/templates/navigation.html themes/red-theme/lms/templates/header.html
 msgid "Global"
 msgstr "Mondial"
-
-#: lms/templates/navigation.html themes/edx.org/lms/templates/header.html
-msgid "Your Dashboard"
-msgstr ""
 
 #: lms/templates/navigation.html themes/edx.org/lms/templates/header.html
 #: themes/red-theme/lms/templates/header.html
@@ -10749,16 +10890,16 @@ msgid "Usermenu dropdown"
 msgstr ""
 
 #: lms/templates/user_dropdown.html
-msgid "Profile for:"
+msgid "Profile"
 msgstr ""
 
 #: lms/templates/user_dropdown.html
-msgid "Account settings menu"
+msgid "Profile image for {username}"
 msgstr ""
 
-#: lms/templates/user_dropdown.html
-msgid "Account settings"
-msgstr ""
+#: lms/templates/user_dropdown.html themes/red-theme/lms/templates/header.html
+msgid "More options dropdown"
+msgstr "Liste déroulante d'options supplémentaires"
 
 #: lms/templates/using.html
 msgid "Using the system"
@@ -10838,6 +10979,10 @@ msgstr ""
 msgid "Request API Access"
 msgstr ""
 
+#: lms/templates/api_admin/status.html
+msgid "API Access Request Status"
+msgstr ""
+
 #. Translators: "platform_name" is the name of this Open edX installation.
 #: lms/templates/api_admin/status.html
 msgid ""
@@ -10897,6 +11042,10 @@ msgid ""
 "To learn more about the {platform_name} Course Catalog API, visit "
 "{link_start}our API documentation page{link_end}. For questions about using "
 "this API, contact {api_support_email_link}."
+msgstr ""
+
+#: lms/templates/api_admin/terms_of_service.html
+msgid "API Terms of Service"
 msgstr ""
 
 #: lms/templates/api_admin/terms_of_service.html
@@ -11341,16 +11490,13 @@ msgid ""
 "indemnification obligations contained herein."
 msgstr ""
 
-#: lms/templates/api_admin/catalogs/detail.html
-msgid "Edit or delete this catalog."
-msgstr ""
-
-#: lms/templates/api_admin/catalogs/detail.html
-msgid "See a preview of this catalog's contents."
+#: lms/templates/api_admin/catalogs/edit.html
+msgid "Edit {catalog_name}"
 msgstr ""
 
 #: lms/templates/api_admin/catalogs/edit.html
-msgid "Edit {catalog_name}"
+#: lms/templates/api_admin/catalogs/list.html
+msgid "Download CSV"
 msgstr ""
 
 #: lms/templates/api_admin/catalogs/edit.html
@@ -11565,7 +11711,7 @@ msgstr ""
 msgid "Create a new Custom Course for edX"
 msgstr ""
 
-#: lms/templates/ccx/coach_dashboard.html
+#: lms/templates/ccx/coach_dashboard.html lms/templates/ccx/schedule.html
 msgid "Schedule"
 msgstr "Planifier"
 
@@ -11574,14 +11720,18 @@ msgstr "Planifier"
 msgid "Grading Policy"
 msgstr "Règles de notation"
 
-#: lms/templates/ccx/coach_dashboard.html
-msgid "Please enter a valid CCX name."
-msgstr ""
-
-#: lms/templates/ccx/enrollment.html
+#: lms/templates/ccx/coach_dashboard.html lms/templates/ccx/enrollment.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Batch Enrollment"
 msgstr "Inscription Automatique"
+
+#: lms/templates/ccx/coach_dashboard.html lms/templates/ccx/student_admin.html
+msgid "Student Grades"
+msgstr "Notes des étudiants"
+
+#: lms/templates/ccx/coach_dashboard.html
+msgid "Please enter a valid CCX name."
+msgstr ""
 
 #: lms/templates/ccx/enrollment.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
@@ -11755,10 +11905,6 @@ msgstr "Ajouter toutes les unités"
 #: lms/templates/ccx/schedule.html
 msgid "All units have been added."
 msgstr "Toutes les unités ont été ajoutées."
-
-#: lms/templates/ccx/student_admin.html
-msgid "Student Grades"
-msgstr "Notes des étudiants"
 
 #: lms/templates/ccx/student_admin.html
 msgid "View gradebook"
@@ -12158,24 +12304,12 @@ msgid "Set preview mode"
 msgstr ""
 
 #: lms/templates/courseware/course_navigation.html
-msgid "You are now viewing the course as <i>{user_name}</i>."
-msgstr "Vous visualisez le cours en tant que <i>{user_name}</i>."
+msgid "You are now viewing the course as {i_start}{user_name}{i_end}."
+msgstr ""
 
 #: lms/templates/courseware/course_navigation.html
 msgid "Course Material"
 msgstr "Cours"
-
-#: lms/templates/courseware/course_navigation.html
-msgid "Course is not yet visible to students."
-msgstr "Ce cours n'est pas encore visible pour les étudiants."
-
-#: lms/templates/courseware/course_navigation.html
-msgid ""
-"You cannot view the course as a student or beta tester before the course "
-"release date."
-msgstr ""
-"Vous ne pouvez pas voir le cours en tant qu'étudiant ou en tant que bêta "
-"testeur avant la date de publication du cours."
 
 #: lms/templates/courseware/course_updates.html
 msgid "Hide"
@@ -12333,6 +12467,12 @@ msgstr "Voir la notation dans Studio"
 #: lms/templates/courseware/progress.html
 msgid "Course Progress for Student '{username}' ({email})"
 msgstr "Progression pour '{username}' ({email})"
+
+#: lms/templates/courseware/progress.html
+msgid ""
+"Your certificate has been invalidated. Please contact your course team if "
+"you have any questions."
+msgstr ""
 
 #: lms/templates/courseware/progress.html
 msgid "Your certificate is available"
@@ -12962,8 +13102,8 @@ msgstr "Résultats :"
 
 #: lms/templates/discussion/_discussion_course_navigation.html
 #: lms/templates/discussion/_discussion_module.html
-msgid "New Post"
-msgstr "Nouveau message"
+msgid "Add a Post"
+msgstr ""
 
 #: lms/templates/discussion/_discussion_module.html
 msgid "Show Discussion"
@@ -13999,8 +14139,8 @@ msgstr ""
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
 msgid ""
 "When you are ready to generate certificates for your course, click Generate "
-"Certificates. You do not need to do this<br/>if you have set the certificate"
-" mode to on-demand generation."
+"Certificates. You do not need to do this if you have set the certificate "
+"mode to on-demand generation."
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
@@ -14027,7 +14167,7 @@ msgstr ""
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
 msgid ""
 "To regenerate certificates for your course, choose the learners who will "
-"receive regenerated certificates and click <br/> Regenerate Certificates."
+"receive regenerated certificates and click Regenerate Certificates."
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
@@ -14306,16 +14446,12 @@ msgstr ""
 "donc les  réponses enregistrées après le démarrage du processus sont inclues"
 " dans un rapport ultérieur. Le rapport est généré plusieurs fois par jour."
 
-#. Translators: a table of URL links to report files appears after this
-#. sentence.
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""
-"<b>Note</b>: To keep student data secure, you cannot save or email these "
-"links for direct access. Copies of links expire within 5 minutes."
+"{strong_start}Note{strong_end}: To keep student data secure, you cannot save"
+" or email these links for direct access. Copies of links expire within 5 "
+"minutes."
 msgstr ""
-"<b>Note</b>: Afin de conserver les données de l'étudiant en sécurité, vous "
-"ne pouvez pas enregistrer ou envoyer ces liens par e-mail pour un accès "
-"direct. Les copies des liens expirent au bout de 5 minutes."
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "Enrollment Codes"
@@ -14444,13 +14580,11 @@ msgid ""
 " and time (in UTC) that the report was generated."
 msgstr ""
 
-#. Translators: a table of URL links to report files appears after this
-#. sentence.
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid ""
-"<b>Note</b>: To help protect learner data, links to these reports that you "
-"save outside of this page or that you send or receive in email expire after "
-"five minutes."
+"{strong_start}Note{strong_end}: To help protect learner data, links to these"
+" reports that you save outside of this page or that you send or receive in "
+"email expire after five minutes."
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
@@ -15268,10 +15402,6 @@ msgid "There are no problems in this section."
 msgstr "Cette section ne contient pas de problèmes."
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
-msgid "Send Email"
-msgstr "Envoyer l'e-mail"
-
-#: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid "Send to:"
 msgstr "Envoyez à:"
 
@@ -15280,11 +15410,19 @@ msgid "Myself"
 msgstr "Moi même"
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
-msgid "Staff and admins"
+msgid "Staff and Administrators"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
-msgid "All (students, staff, and admins)"
+msgid "All Learners"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/send_email.html
+msgid "Cohort: "
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/send_email.html
+msgid "(Learners not explicitly assigned to a cohort)"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
@@ -15292,8 +15430,8 @@ msgid "Subject: "
 msgstr "Sujet:"
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
-msgid "(Max 128 characters)"
-msgstr "(128 caractères max)"
+msgid "(Maximum 128 characters)"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid "Message:"
@@ -15301,28 +15439,11 @@ msgstr "Message :"
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid ""
-"Please try not to email students more than once per week. Before sending "
-"your email, consider:"
+"We recommend sending learners no more than one email message per week. "
+"Before you send your email, review the text carefully and send it to "
+"yourself first, so that you can preview the formatting and make sure "
+"embedded images and links work correctly."
 msgstr ""
-"Veuillez éviter d'envoyer plus d'un e-mail par semaine aux étudiants. Avant "
-"un envoi, merci de prendre en considération :"
-
-#: lms/templates/instructor/instructor_dashboard_2/send_email.html
-msgid ""
-"Have you read over the email to make sure it says everything you want to "
-"say?"
-msgstr ""
-"Avez-vous relu l'e-mail pour vous assurer qu'il dit tout ce que vous voulez "
-"dire ?"
-
-#: lms/templates/instructor/instructor_dashboard_2/send_email.html
-msgid ""
-"Have you sent the email to yourself first to make sure you're happy with how"
-" it's displayed, and that embedded links and images work properly?"
-msgstr ""
-"Vous êtes-vous d'abord envoyé l'e-mail à vous-même pour vérifier si son "
-"affichage est satisfaisant et si les liens et images fonctionnent "
-"correctement ?"
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid "CAUTION!"
@@ -15330,15 +15451,13 @@ msgstr "ATTENTION !"
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid ""
-"Once the 'Send Email' button is clicked, your email will be queued for "
-"sending."
+"When you select Send Email, your email message is added to the queue for "
+"sending, and cannot be cancelled."
 msgstr ""
-"Une fois que le bouton \"Envoyer l'e-mail\" est cliqué, votre courrier sera "
-"mis en file d'attente pour l'envoi."
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
-msgid "A queued email CANNOT be cancelled."
-msgstr "Un e-mail mis en fil d'attente NE PEUT PAS être annulé."
+msgid "Send Email"
+msgstr "Envoyer l'e-mail"
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid ""
@@ -15354,26 +15473,22 @@ msgid "Email Task History"
 msgstr "Historique des actions liées aux e-mails"
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
-msgid "To see the content of all previously sent emails, click this button:"
+msgid "To see the content of previously sent emails, click this button:"
 msgstr ""
-"Pour voir le contenu de tous les messages envoyés précédemment, cliquez sur "
-"ce bouton :"
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
-msgid "Sent Email History"
-msgstr "Historique des e-mails envoyés"
+msgid "Show Sent Email History"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
-msgid "To read an email, click its subject."
-msgstr "Pour lire un e-mail, cliquer sur son sujet"
+msgid "To read a sent email message, click its subject."
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid ""
-"To see the status for all bulk email tasks ever submitted for this course, "
-"click on this button:"
+"To see the status for all email tasks submitted for this course, click this "
+"button:"
 msgstr ""
-"Pour consulter l'état de toutes les tâches de courrier électronique "
-"réalisées pour ce cours, cliquer sur ce bouton :"
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid "Show Email Task History"
@@ -15550,10 +15665,6 @@ msgstr "Afficher Historique des tâches d'arrière plan pour l'Exercice"
 
 #: lms/templates/learner_dashboard/program_details.html
 msgid "Program Details"
-msgstr ""
-
-#: lms/templates/learner_dashboard/programs.html
-msgid "Your Programs"
 msgstr ""
 
 #: lms/templates/modal/_modal-settings-language.html
@@ -16724,10 +16835,6 @@ msgid ""
 msgstr ""
 
 #: themes/red-theme/lms/templates/header.html
-msgid "More options dropdown"
-msgstr "Liste déroulante d'options supplémentaires"
-
-#: themes/red-theme/lms/templates/header.html
 msgid "My Profile"
 msgstr "Mon profil"
 
@@ -16886,13 +16993,6 @@ msgstr ""
 #: cms/templates/asset_index.html cms/templates/widgets/header.html
 msgid "Files & Uploads"
 msgstr ""
-
-#: cms/templates/asset_index.html cms/templates/course_info.html
-#: cms/templates/course_outline.html cms/templates/edit-tabs.html
-#: cms/templates/textbooks.html cms/templates/videos_index.html
-#: cms/templates/widgets/header.html
-msgid "Content"
-msgstr "Contenu"
 
 #: cms/templates/asset_index.html cms/templates/container.html
 #: cms/templates/course-create-rerun.html cms/templates/course_info.html
@@ -17059,8 +17159,7 @@ msgstr "En savoir plus sur les certificats"
 msgid "Other Course Settings"
 msgstr "Autres paramètres de cours"
 
-#: cms/templates/certificates.html cms/templates/settings_advanced.html
-#: cms/templates/settings_graders.html
+#: cms/templates/certificates.html cms/templates/settings_graders.html
 msgid "Details &amp; Schedule"
 msgstr "Dates &amp; Détails"
 
@@ -17973,6 +18072,7 @@ msgid ""
 msgstr ""
 
 #: cms/templates/group_configurations.html
+#: cms/templates/settings_advanced.html
 msgid "Details & Schedule"
 msgstr ""
 
@@ -18001,19 +18101,19 @@ msgid "{studio_name} Helps You Keep Your Courses Organized"
 msgstr "{studio_name} vous aide à maintenir votre cours organisé"
 
 #: cms/templates/howitworks.html
+msgid "Enlarge image"
+msgstr ""
+
+#: cms/templates/howitworks.html
 msgid "Keeping Your Course Organized"
 msgstr "Structurer votre Cours"
 
 #: cms/templates/howitworks.html
 msgid ""
 "The backbone of your course is how it is organized. {studio_name} offers an "
-"<strong>Outline</strong> editor, providing a simple hierarchy and easy drag "
-"and drop to help you and your students stay organized."
+"{strong_start}Outline{strong_end} editor, providing a simple hierarchy and "
+"easy drag and drop to help you and your students stay organized."
 msgstr ""
-"La structure de votre cours constitue son fil directeur. {studio_name} offre"
-" un éditeur de <strong>progression</strong>, qui propose une hiérarchie "
-"simple et un système facile de glisser-déposer pour vous aider, vous et vos "
-"étudiants, à rester organisés."
 
 #: cms/templates/howitworks.html
 msgid "Simple Organization For Content"
@@ -18021,11 +18121,9 @@ msgstr "Organisation simple du contenu"
 
 #: cms/templates/howitworks.html
 msgid ""
-"{studio_name} uses a simple hierarchy of <strong>sections</strong> and "
-"<strong>subsections</strong> to organize your content."
+"{studio_name} uses a simple hierarchy of {strong_start}sections{strong_end} "
+"and {strong_start}subsections{strong_end} to organize your content."
 msgstr ""
-"{studio_name} utilise une hiérarchie de <strong>sections</strong> et de "
-"<strong>sous-sections</strong> pour organiser votre contenu."
 
 #: cms/templates/howitworks.html
 msgid "Change Your Mind Anytime"
@@ -18046,11 +18144,9 @@ msgstr "Progressez d'une semaine ou d'un semestre à la fois"
 
 #: cms/templates/howitworks.html
 msgid ""
-"Build and release <strong>sections</strong> to your students incrementally. "
-"You don't have to have it all done at once."
+"Build and release {strong_start}sections{strong_end} to your students "
+"incrementally. You don't have to have it all done at once."
 msgstr ""
-"Construisez et publiez les <strong>sections</strong> à vos étudiants "
-"progressivement. Vous n'avez pas l'obligation de tout préparer d'un coup."
 
 #: cms/templates/howitworks.html
 msgid "Learning is More than Just Lectures"
@@ -18143,13 +18239,10 @@ msgstr "Date de publication"
 
 #: cms/templates/howitworks.html
 msgid ""
-"When you've finished a <strong>section</strong>, pick when you want it to go"
-" live and {studio_name} takes care of the rest. Build your course "
+"When you've finished a {strong_start}section{strong_end}, pick when you want"
+" it to go live and {studio_name} takes care of the rest. Build your course "
 "incrementally."
 msgstr ""
-"Lorsque vous avez terminé une <strong>section</strong>, choisissez quand "
-"vous souhaitez qu'elle apparaisse en ligne et {studio_name} s'occupe du "
-"reste. Construisez votre cours de manière progressive."
 
 #: cms/templates/howitworks.html
 msgid "Work in Teams"
@@ -18168,8 +18261,8 @@ msgid "Sign Up for {studio_name} Today!"
 msgstr "Inscrivez vous à {studio_name} aujourd'hui !"
 
 #: cms/templates/howitworks.html
-msgid "Sign Up &amp; Start Making an {platform_name} Course"
-msgstr "Inscrivez vous & commencez à créer un Cours {platform_name} "
+msgid "Sign Up & Start Making Your {platform_name} Course"
+msgstr ""
 
 #: cms/templates/howitworks.html
 msgid "Already have a {studio_name} Account? Sign In"
@@ -18181,11 +18274,9 @@ msgstr "Structurez votre Cours"
 
 #: cms/templates/howitworks.html
 msgid ""
-"Simple two-level outline to organize your couse. Drag and drop, and see your"
-" course at a glance."
+"Simple two-level outline to organize your course. Drag and drop, and see "
+"your course at a glance."
 msgstr ""
-"Simple structure à deux niveaux pour organiser votre cours. Glissez et "
-"déposez, et visualisez votre Cours d'un coup d’œil."
 
 #: cms/templates/howitworks.html
 msgid "More than Just Lectures"
@@ -19031,8 +19122,7 @@ msgstr ""
 msgid "Program Administration"
 msgstr ""
 
-#: cms/templates/register.html cms/templates/temp-course-landing.html
-#: cms/templates/widgets/header.html
+#: cms/templates/register.html cms/templates/widgets/header.html
 msgid "Sign Up"
 msgstr "S'inscrire"
 
@@ -19611,11 +19701,9 @@ msgstr "Définition manuelle des réglages"
 
 #: cms/templates/settings_advanced.html
 msgid ""
-"<strong>Warning</strong>: Do not modify these policies unless you are "
-"familiar with their purpose."
+"{strong_start}Warning{strong_end}: Do not modify these policies unless you "
+"are familiar with their purpose."
 msgstr ""
-"<strong>Attention</strong>: Ne modifiez pas ces règles si vous n'êtes pas "
-"familier avec leur usage."
 
 #: cms/templates/settings_advanced.html
 msgid "Show Deprecated Settings"
@@ -19646,13 +19734,9 @@ msgstr ""
 #: cms/templates/settings_advanced.html
 msgid ""
 "{em_start}Note:{em_end} When you enter strings as policy values, ensure that"
-" you use double quotation marks (&quot;) around the string. Do not use "
-"single quotation marks (&apos;)."
+" you use double quotation marks (\") around the string. Do not use single "
+"quotation marks (')."
 msgstr ""
-"{em_start}Note:{em_end} Quand vous insérez des chaînes de caractère en tant "
-"que valeur pour une politique, assurez vous que vous utilisez des guillemets"
-" (&quot;) autour de la chaîne de caractère. N'utilisez pas de simples "
-"apostrophes (&apos;)."
 
 #: cms/templates/settings_graders.html
 msgid "Grading Settings"
@@ -19665,6 +19749,10 @@ msgstr "Plage d'évaluation globale"
 #: cms/templates/settings_graders.html
 msgid "Your overall grading scale for student final grades"
 msgstr "Votre échelle globale d'évaluation des notes finales des étudiants"
+
+#: cms/templates/settings_graders.html
+msgid "Add grade"
+msgstr ""
 
 #: cms/templates/settings_graders.html
 msgid "Credit Eligibility"
@@ -19759,42 +19847,6 @@ msgstr "Visibilité"
 #: cms/templates/studio_xblock_wrapper.html
 msgid "This block contains multiple components."
 msgstr "Ce block contient des composants multiples."
-
-#: cms/templates/temp-course-landing.html
-msgid "Circuits and Electronics"
-msgstr ""
-
-#: cms/templates/temp-course-landing.html
-msgid "Massachusetts Institute of Technology"
-msgstr ""
-
-#: cms/templates/temp-course-landing.html
-msgid "Forgot?"
-msgstr ""
-
-#: cms/templates/temp-course-landing.html
-msgid ""
-"Ut laoreet dolore magna aliquam erat volutpat ut wisi enim ad minim veniam "
-"quis nostrud. Est usus legentis in iis qui, facit eorum claritatem "
-"Investigationes demonstraverunt lectores. Vel illum dolore eu feugiat nulla "
-"facilisis at vero eros, et accumsan et iusto? Te feugait nulla facilisi nam "
-"liber tempor cum soluta nobis eleifend option congue nihil imperdiet doming!"
-" Et quinta decima eodem modo typi qui nunc nobis, videntur parum clari fiant"
-" sollemnes in? Diam nonummy nibh euismod tincidunt exerci tation "
-"ullamcorper, suscipit lobortis nisl ut aliquip ex? Nunc putamus parum, "
-"claram anteposuerit litterarum formas humanitatis per seacula quarta decima."
-msgstr ""
-
-#: cms/templates/temp-course-landing.html
-msgid ""
-"Gothica quam nunc putamus parum claram anteposuerit litterarum formas "
-"humanitatis per seacula. Facilisi nam liber tempor cum soluta nobis "
-"eleifend."
-msgstr ""
-
-#: cms/templates/temp-course-landing.html
-msgid "{platform_name} edge"
-msgstr ""
 
 #: cms/templates/textbooks.html
 msgid "New Textbook"
