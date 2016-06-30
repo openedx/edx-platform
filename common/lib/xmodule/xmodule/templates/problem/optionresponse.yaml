@@ -8,29 +8,26 @@ metadata:
 
          You can use the following example problem as a model.
 
-          >>Which of the following countries celebrates its independence on August 15?<<
+         >>Which of the following countries celebrates its independence on August 15?<<
 
-          [[(India), Spain, China, Bermuda]]
+         [[(India), Spain, China, Bermuda]]
 
-          [explanation]
-          India became an independent nation on August 15, 1947.
-          [explanation]
-data: |
-  <problem>
-    <p>Dropdown problems allow learners to select only one option from a list of options.</p>
-    <p>When you add the problem, be sure to select <strong>Settings</strong> 
-    to specify a <strong>Display Name</strong> and other values that apply.</p>
-    <p>You can use the following example problem as a model.</p>
-      <p>Which of the following countries celebrates its independence on August 15?</p>
-      <br/>
-      <optionresponse>
-        <optioninput options="('India','Spain','China','Bermuda')" correct="India"></optioninput>
-      </optionresponse>
-    <solution>
-      <div class="detailed-solution">
-        <p>Explanation</p>
-        <p>India became an independent nation on August 15, 1947.</p>
-      </div>
-    </solution>
-  </problem>
-
+         [explanation]
+         India became an independent nation on August 15, 1947.
+         [explanation]
+data:   |
+        <problem>
+            <optionresponse>
+                <p>Dropdown problems allow learners to select only one option from a list of options.</p>
+                <p>When you add the problem, be sure to select Settings to specify a Display Name and other values that apply.</p>
+                <p>You can use the following example problem as a model.</p>
+                <label>Which of the following countries celebrates its independence on August 15?</label>
+                <optioninput label="Which of the following countries celebrates its independence on August 15?" options="('India','Spain','China','Bermuda')" correct="India"/>
+                <solution>
+                    <div class="detailed-solution">
+                        <p>Explanation</p>
+                        <p>India became an independent nation on August 15, 1947.</p>
+                    </div>
+                </solution>
+            </optionresponse>
+        </problem>

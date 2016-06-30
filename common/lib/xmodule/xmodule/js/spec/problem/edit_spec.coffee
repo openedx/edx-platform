@@ -218,7 +218,7 @@ describe 'MarkdownEditingDescriptor', ->
 
         One of the main elements that goes into a good multiple choice question is the existence of good distractors. That is, each of the alternate responses presented to the student should be the result of a plausible mistake that a student might make.
 
-        What Apple device competed with the portable CD player?
+        >>What Apple device competed with the portable CD player?<<
         ( ) The iPad
         ( ) Napster
         (x) The iPod
@@ -231,28 +231,25 @@ describe 'MarkdownEditingDescriptor', ->
         [Explanation]
         """)
       expect(data).toXMLEqual("""<problem>
-        <multiplechoiceresponse>
-        <p>A multiple choice problem presents radio buttons for student input. Students can only select a single option presented. Multiple Choice questions have been the subject of many areas of research due to the early invention and adoption of bubble sheets.</p>
-        <p>One of the main elements that goes into a good multiple choice question is the existence of good distractors. That is, each of the alternate responses presented to the student should be the result of a plausible mistake that a student might make.</p>
-        <p>What Apple device competed with the portable CD player?</p>
-        <choicegroup type="MultipleChoice">
-            <choice correct="false">The iPad</choice>
-            <choice correct="false">Napster</choice>
-            <choice correct="true">The iPod</choice>
-            <choice correct="false">The vegetable peeler</choice>
-            <choice correct="false">Android</choice>
-            <choice correct="false">The Beatles</choice>
-        </choicegroup>
-        </multiplechoiceresponse>
-
-        <solution>
-        <div class="detailed-solution">
-        <p>Explanation</p>
-
-        <p>The release of the iPod allowed consumers to carry their entire music library with them in a format that did not rely on fragile and energy-intensive spinning disks.</p>
-
-        </div>
-        </solution>
+            <multiplechoiceresponse>
+                <p>A multiple choice problem presents radio buttons for student input. Students can only select a single option presented. Multiple Choice questions have been the subject of many areas of research due to the early invention and adoption of bubble sheets.</p>
+                <p>One of the main elements that goes into a good multiple choice question is the existence of good distractors. That is, each of the alternate responses presented to the student should be the result of a plausible mistake that a student might make.</p>
+                <label>What Apple device competed with the portable CD player?</label>
+                <choicegroup label="What Apple device competed with the portable CD player?" type="MultipleChoice">
+                    <choice correct="false">The iPad</choice>
+                    <choice correct="false">Napster</choice>
+                    <choice correct="true">The iPod</choice>
+                    <choice correct="false">The vegetable peeler</choice>
+                    <choice correct="false">Android</choice>
+                    <choice correct="false">The Beatles</choice>
+                </choicegroup>
+                <solution>
+                    <div class="detailed-solution">
+                        <p>Explanation</p>
+                        <p>The release of the iPod allowed consumers to carry their entire music library with them in a format that did not rely on fragile and energy-intensive spinning disks.</p>
+                    </div>
+                </solution>
+            </multiplechoiceresponse>
         </problem>""")
     it 'converts multiple choice shuffle to xml', ->
       data = MarkdownEditingDescriptor.markdownToXml("""A multiple choice problem presents radio buttons for student input. Students can only select a single option presented. Multiple Choice questions have been the subject of many areas of research due to the early invention and adoption of bubble sheets.
@@ -271,29 +268,27 @@ describe 'MarkdownEditingDescriptor', ->
         The release of the iPod allowed consumers to carry their entire music library with them in a format that did not rely on fragile and energy-intensive spinning disks.
         [Explanation]
         """)
-      expect(data).toXMLEqual("""<problem>
-        <multiplechoiceresponse>
-          <p>A multiple choice problem presents radio buttons for student input. Students can only select a single option presented. Multiple Choice questions have been the subject of many areas of research due to the early invention and adoption of bubble sheets.</p>
-        <p>One of the main elements that goes into a good multiple choice question is the existence of good distractors. That is, each of the alternate responses presented to the student should be the result of a plausible mistake that a student might make.</p>
-        <p>What Apple device competed with the portable CD player?</p>
-        <choicegroup type="MultipleChoice" shuffle="true">
-            <choice correct="true" fixed="true">The iPad</choice>
-            <choice correct="false" fixed="true">Napster</choice>
-            <choice correct="false">The iPod</choice>
-            <choice correct="false">The vegetable peeler</choice>
-            <choice correct="false">Android</choice>
-            <choice correct="false" fixed="true">The Beatles</choice>
-          </choicegroup>
-        </multiplechoiceresponse>
-
-        <solution>
-        <div class="detailed-solution">
-        <p>Explanation</p>
-
-        <p>The release of the iPod allowed consumers to carry their entire music library with them in a format that did not rely on fragile and energy-intensive spinning disks.</p>
-
-        </div>
-        </solution>
+      expect(data).toXMLEqual("""
+        <problem>
+            <multiplechoiceresponse>
+                <p>A multiple choice problem presents radio buttons for student input. Students can only select a single option presented. Multiple Choice questions have been the subject of many areas of research due to the early invention and adoption of bubble sheets.</p>
+                <p>One of the main elements that goes into a good multiple choice question is the existence of good distractors. That is, each of the alternate responses presented to the student should be the result of a plausible mistake that a student might make.</p>
+                <p>What Apple device competed with the portable CD player?</p>
+                <choicegroup type="MultipleChoice" shuffle="true">
+                    <choice correct="true" fixed="true">The iPad</choice>
+                    <choice correct="false" fixed="true">Napster</choice>
+                    <choice correct="false">The iPod</choice>
+                    <choice correct="false">The vegetable peeler</choice>
+                    <choice correct="false">Android</choice>
+                    <choice correct="false" fixed="true">The Beatles</choice>
+                </choicegroup>
+                <solution>
+                    <div class="detailed-solution">
+                        <p>Explanation</p>
+                        <p>The release of the iPod allowed consumers to carry their entire music library with them in a format that did not rely on fragile and energy-intensive spinning disks.</p>
+                    </div>
+                </solution>
+            </multiplechoiceresponse>
         </problem>""")
 
     it 'converts a series of multiplechoice to xml', ->
@@ -363,22 +358,20 @@ describe 'MarkdownEditingDescriptor', ->
         Multiple Choice also allows students to select from a variety of pre-written responses, although the format makes it easier for students to read very long response options. Optionresponse also differs slightly because students are more likely to think of an answer and then search for it rather than relying purely on recognition to answer the question.
         [Explanation]
         """)
-      expect(data).toXMLEqual("""<problem>
-        <optionresponse>
-          <p>OptionResponse gives a limited set of options for students to respond with, and presents those options in a format that encourages them to search for a specific answer rather than being immediately presented with options from which to recognize the correct answer.</p>
-        <p>The answer options and the identification of the correct answer is defined in the <b>optioninput</b> tag.</p>
-        <p>Translation between Option Response and __________ is extremely straightforward:</p>
-        <optioninput options="('Multiple Choice','String Response','Numerical Response','External Response','Image Response')" correct="Multiple Choice"/>
-        </optionresponse>
-
-        <solution>
-        <div class="detailed-solution">
-        <p>Explanation</p>
-
-        <p>Multiple Choice also allows students to select from a variety of pre-written responses, although the format makes it easier for students to read very long response options. Optionresponse also differs slightly because students are more likely to think of an answer and then search for it rather than relying purely on recognition to answer the question.</p>
-
-        </div>
-        </solution>
+      expect(data).toXMLEqual("""
+        <problem>
+            <optionresponse>
+                <p>OptionResponse gives a limited set of options for students to respond with, and presents those options in a format that encourages them to search for a specific answer rather than being immediately presented with options from which to recognize the correct answer.</p>
+                <p>The answer options and the identification of the correct answer is defined in the <b>optioninput</b> tag.</p>
+                <p>Translation between Option Response and __________ is extremely straightforward:</p>
+                <optioninput options="('Multiple Choice','String Response','Numerical Response','External Response','Image Response')" correct="Multiple Choice"/>
+                <solution>
+                    <div class="detailed-solution">
+                        <p>Explanation</p>
+                        <p>Multiple Choice also allows students to select from a variety of pre-written responses, although the format makes it easier for students to read very long response options. Optionresponse also differs slightly because students are more likely to think of an answer and then search for it rather than relying purely on recognition to answer the question.</p>
+                    </div>
+                </solution>
+            </optionresponse>
         </problem>""")
     it 'converts StringResponse to xml', ->
       data = MarkdownEditingDescriptor.markdownToXml("""A string response problem accepts a line of text input from the student, and evaluates the input for correctness based on an expected answer within each input box.
@@ -392,22 +385,20 @@ describe 'MarkdownEditingDescriptor', ->
         Lansing is the capital of Michigan, although it is not Michgan's largest city, or even the seat of the county in which it resides.
         [Explanation]
         """)
-      expect(data).toXMLEqual("""<problem>
-        <stringresponse answer="Michigan" type="ci">
-          <p>A string response problem accepts a line of text input from the student, and evaluates the input for correctness based on an expected answer within each input box.</p>
-        <p>The answer is correct if it matches every character of the expected answer. This can be a problem with international spelling, dates, or anything where the format of the answer is not clear.</p>
-        <p>Which US state has Lansing as its capital?</p>
-        <textline size="20"/>
-        </stringresponse>
-
-        <solution>
-        <div class="detailed-solution">
-        <p>Explanation</p>
-
-        <p>Lansing is the capital of Michigan, although it is not Michgan's largest city, or even the seat of the county in which it resides.</p>
-
-        </div>
-        </solution>
+      expect(data).toXMLEqual("""
+        <problem>
+            <stringresponse answer="Michigan" type="ci">
+                <p>A string response problem accepts a line of text input from the student, and evaluates the input for correctness based on an expected answer within each input box.</p>
+                <p>The answer is correct if it matches every character of the expected answer. This can be a problem with international spelling, dates, or anything where the format of the answer is not clear.</p>
+                <p>Which US state has Lansing as its capital?</p>
+                <textline size="20"/>
+                <solution>
+                    <div class="detailed-solution">
+                    <p>Explanation</p>
+                    <p>Lansing is the capital of Michigan, although it is not Michgan's largest city, or even the seat of the county in which it resides.</p>
+                    </div>
+                </solution>
+            </stringresponse>
         </problem>""")
     it 'converts StringResponse with regular expression to xml', ->
       data = MarkdownEditingDescriptor.markdownToXml("""Who lead the civil right movement in the United States of America?
@@ -417,20 +408,18 @@ describe 'MarkdownEditingDescriptor', ->
         Test Explanation.
         [Explanation]
         """)
-      expect(data).toXMLEqual("""<problem>
-        <stringresponse answer="w*.?s*Luther Kings*.*" type="ci regexp">
-          <p>Who lead the civil right movement in the United States of America?</p>
-        <textline size="20"/>
-        </stringresponse>
-
-        <solution>
-        <div class="detailed-solution">
-        <p>Explanation</p>
-
-        <p>Test Explanation.</p>
-
-        </div>
-        </solution>
+      expect(data).toXMLEqual("""
+        <problem>
+            <stringresponse answer="w*.?s*Luther Kings*.*" type="ci regexp">
+                <p>Who lead the civil right movement in the United States of America?</p>
+                <textline size="20"/>
+                <solution>
+                    <div class="detailed-solution">
+                    <p>Explanation</p>
+                    <p>Test Explanation.</p>
+                    </div>
+                </solution>
+            </stringresponse>
         </problem>""")
     it 'converts StringResponse with multiple answers to xml', ->
       data = MarkdownEditingDescriptor.markdownToXml("""Who lead the civil right movement in the United States of America?
@@ -443,23 +432,21 @@ describe 'MarkdownEditingDescriptor', ->
         Test Explanation.
         [Explanation]
         """)
-      expect(data).toXMLEqual("""<problem>
-        <stringresponse answer="Dr. Martin Luther King Jr." type="ci">
-          <p>Who lead the civil right movement in the United States of America?</p>
-        <additional_answer answer="Doctor Martin Luther King Junior"/>
-          <additional_answer answer="Martin Luther King"/>
-          <additional_answer answer="Martin Luther King Junior"/>
-          <textline size="20"/>
-        </stringresponse>
-
-        <solution>
-        <div class="detailed-solution">
-        <p>Explanation</p>
-
-        <p>Test Explanation.</p>
-
-        </div>
-        </solution>
+      expect(data).toXMLEqual("""
+        <problem>
+            <stringresponse answer="Dr. Martin Luther King Jr." type="ci">
+                <p>Who lead the civil right movement in the United States of America?</p>
+                <additional_answer answer="Doctor Martin Luther King Junior"/>
+                <additional_answer answer="Martin Luther King"/>
+                <additional_answer answer="Martin Luther King Junior"/>
+                <textline size="20"/>
+                <solution>
+                    <div class="detailed-solution">
+                    <p>Explanation</p>
+                    <p>Test Explanation.</p>
+                    </div>
+                </solution>
+            </stringresponse>
         </problem>""")
     it 'converts StringResponse with multiple answers and regular expressions to xml', ->
       data = MarkdownEditingDescriptor.markdownToXml("""Write a number from 1 to 4.
@@ -472,23 +459,21 @@ describe 'MarkdownEditingDescriptor', ->
         Test Explanation.
         [Explanation]
         """)
-      expect(data).toXMLEqual("""<problem>
-        <stringresponse answer="^One$" type="ci regexp">
-          <p>Write a number from 1 to 4.</p>
-        <additional_answer answer="two"/>
-          <additional_answer answer="^thre+"/>
-          <additional_answer answer="^4|Four$"/>
-          <textline size="20"/>
-        </stringresponse>
-
-        <solution>
-        <div class="detailed-solution">
-        <p>Explanation</p>
-
-        <p>Test Explanation.</p>
-
-        </div>
-        </solution>
+      expect(data).toXMLEqual("""
+        <problem>
+            <stringresponse answer="^One$" type="ci regexp">
+                <p>Write a number from 1 to 4.</p>
+                <additional_answer answer="two"/>
+                <additional_answer answer="^thre+"/>
+                <additional_answer answer="^4|Four$"/>
+                <textline size="20"/>
+                <solution>
+                    <div class="detailed-solution">
+                    <p>Explanation</p>
+                    <p>Test Explanation.</p>
+                    </div>
+                </solution>
+            </stringresponse>
         </problem>""")
     # test labels
     it 'converts markdown labels to label attributes', ->
@@ -499,20 +484,18 @@ describe 'MarkdownEditingDescriptor', ->
         Test Explanation.
         [Explanation]
         """)
-      expect(data).toXMLEqual("""<problem>
-        <stringresponse answer="w*.?s*Luther Kings*.*" type="ci regexp">
-          <label>Who lead the civil right movement in the United States of America?</label>
-        <textline label="Who lead the civil right movement in the United States of America?" size="20"/>
-        </stringresponse>
-
-        <solution>
-        <div class="detailed-solution">
-        <p>Explanation</p>
-
-        <p>Test Explanation.</p>
-
-        </div>
-        </solution>
+      expect(data).toXMLEqual("""
+        <problem>
+            <stringresponse answer="w*.?s*Luther Kings*.*" type="ci regexp">
+                <label>Who lead the civil right movement in the United States of America?</label>
+                <textline label="Who lead the civil right movement in the United States of America?" size="20"/>
+                <solution>
+                    <div class="detailed-solution">
+                    <p>Explanation</p>
+                    <p>Test Explanation.</p>
+                    </div>
+                </solution>
+            </stringresponse>
         </problem>""")
     it 'handles multiple questions with labels', ->
       data = MarkdownEditingDescriptor.markdownToXml("""
@@ -766,52 +749,46 @@ describe 'MarkdownEditingDescriptor', ->
       """)
       expect(data).toXMLEqual("""
         <problem>
-        <multiplechoiceresponse>
-          <p>Multiple choice problems allow learners to select only one option. Learners can see all the options along with the problem text.</p>
-        <label>Which of the following countries has the largest population?</label>
-        <choicegroup label="Which of the following countries has the largest population?" type="MultipleChoice">
-            <choice correct="false">Brazil <choicehint>timely feedback -- explain why an almost correct answer is wrong</choicehint>
-        </choice>
-            <choice correct="false">Germany</choice>
-            <choice correct="true">Indonesia</choice>
-            <choice correct="false">Russia</choice>
-          </choicegroup>
-        </multiplechoiceresponse>
+            <multiplechoiceresponse>
+                <p>Multiple choice problems allow learners to select only one option. Learners can see all the options along with the problem text.</p>
+                <label>Which of the following countries has the largest population?</label>
+                <choicegroup label="Which of the following countries has the largest population?" type="MultipleChoice">
+                    <choice correct="false">Brazil <choicehint>timely feedback -- explain why an almost correct answer is wrong</choicehint>
+                    </choice>
+                    <choice correct="false">Germany</choice>
+                    <choice correct="true">Indonesia</choice>
+                    <choice correct="false">Russia</choice>
+                </choicegroup>
+                <solution>
+                    <div class="detailed-solution">
+                    <p>Explanation</p>
+                    <p>According to September 2014 estimates:</p>
+                    <p>The population of Indonesia is approximately 250 million.</p>
+                    <p>The population of Brazil  is approximately 200 million.</p>
+                    <p>The population of Russia is approximately 146 million.</p>
+                    <p>The population of Germany is approximately 81 million.</p>
+                    </div>
+                </solution>
+            </multiplechoiceresponse>
 
-        <solution>
-        <div class="detailed-solution">
-        <p>Explanation</p>
-
-        <p>According to September 2014 estimates:</p>
-        <p>The population of Indonesia is approximately 250 million.</p>
-        <p>The population of Brazil  is approximately 200 million.</p>
-        <p>The population of Russia is approximately 146 million.</p>
-        <p>The population of Germany is approximately 81 million.</p>
-
-        </div>
-        </solution>
-
-        <choiceresponse>
-          <p>Checkbox problems allow learners to select multiple options. Learners can see all the options along with the problem text.</p>
-        <label>The following languages are in the Indo-European family:</label>
-        <checkboxgroup label="The following languages are in the Indo-European family:">
-            <choice correct="true">Urdu</choice>
-            <choice correct="false">Finnish</choice>
-            <choice correct="true">Marathi</choice>
-            <choice correct="true">French</choice>
-            <choice correct="false">Hungarian</choice>
-          </checkboxgroup>
-        <p>Note: Make sure you select all of the correct options—there may be more than one!</p>
-        </choiceresponse>
-
-        <solution>
-        <div class="detailed-solution">
-        <p>Explanation</p>
-
-        <p>Urdu, Marathi, and French are all Indo-European languages, while Finnish and Hungarian are in the Uralic family.</p>
-
-        </div>
-        </solution>
+            <choiceresponse>
+                <p>Checkbox problems allow learners to select multiple options. Learners can see all the options along with the problem text.</p>
+                <label>The following languages are in the Indo-European family:</label>
+                <checkboxgroup label="The following languages are in the Indo-European family:">
+                    <choice correct="true">Urdu</choice>
+                    <choice correct="false">Finnish</choice>
+                    <choice correct="true">Marathi</choice>
+                    <choice correct="true">French</choice>
+                    <choice correct="false">Hungarian</choice>
+                </checkboxgroup>
+                <p>Note: Make sure you select all of the correct options—there may be more than one!</p>
+                <solution>
+                  <div class="detailed-solution">
+                  <p>Explanation</p>
+                  <p>Urdu, Marathi, and French are all Indo-European languages, while Finnish and Hungarian are in the Uralic family.</p>
+                  </div>
+                </solution>
+            </choiceresponse>
         </problem>
       """)
 
@@ -837,31 +814,28 @@ describe 'MarkdownEditingDescriptor', ->
       """)
       expect(data).toXMLEqual("""
         <problem>
-        <p>Multiple choice problems allow learners to select only one option. Learners can see all the options along with the problem text.</p>
+            <p>Multiple choice problems allow learners to select only one option. Learners can see all the options along with the problem text.</p>
 
-        <multiplechoiceresponse>
-          <label>Which of the following countries has the largest population?</label>
-        <choicegroup label="Which of the following countries has the largest population?" type="MultipleChoice">
-            <choice correct="false">Brazil <choicehint>timely feedback -- explain why an almost correct answer is wrong</choicehint>
-        </choice>
-            <choice correct="false">Germany</choice>
-            <choice correct="true">Indonesia</choice>
-            <choice correct="false">Russia</choice>
-          </choicegroup>
-        </multiplechoiceresponse>
-
-        <solution>
-        <div class="detailed-solution">
-        <p>Explanation</p>
-
-        <p>According to September 2014 estimates:</p>
-        <p>The population of Indonesia is approximately 250 million.</p>
-        <p>The population of Brazil  is approximately 200 million.</p>
-        <p>The population of Russia is approximately 146 million.</p>
-        <p>The population of Germany is approximately 81 million.</p>
-
-        </div>
-        </solution>
+            <multiplechoiceresponse>
+                <label>Which of the following countries has the largest population?</label>
+                <choicegroup label="Which of the following countries has the largest population?" type="MultipleChoice">
+                    <choice correct="false">Brazil <choicehint>timely feedback -- explain why an almost correct answer is wrong</choicehint>
+                    </choice>
+                    <choice correct="false">Germany</choice>
+                    <choice correct="true">Indonesia</choice>
+                    <choice correct="false">Russia</choice>
+                </choicegroup>
+                <solution>
+                    <div class="detailed-solution">
+                    <p>Explanation</p>
+                    <p>According to September 2014 estimates:</p>
+                    <p>The population of Indonesia is approximately 250 million.</p>
+                    <p>The population of Brazil  is approximately 200 million.</p>
+                    <p>The population of Russia is approximately 146 million.</p>
+                    <p>The population of Germany is approximately 81 million.</p>
+                    </div>
+                </solution>
+            </multiplechoiceresponse>
         </problem>
       """)
 
