@@ -165,7 +165,7 @@ def index(request, extra_context=None, user=AnonymousUser()):
         courses = get_courses_by_university(user, domain=domain)
     else:
         courses = get_courses(user, domain=domain)
-    
+
     context = {'courses': courses}
 
     context.update(extra_context)
@@ -426,6 +426,10 @@ def register_user(request, extra_context=None):
     if external_auth_response is not None:
         return external_auth_response
 
+    if third_party_auth.is_enabled() and pipeline.running(request):
+        auto_submit = True
+        log.info('####### auto login' '#########')
+
     context = {
         'login_redirect_url': redirect_to,  # This gets added to the query string of the "Sign In" button in the header
         'email': '',
@@ -438,6 +442,7 @@ def register_user(request, extra_context=None):
         ),
         'selected_provider': '',
         'username': '',
+        'auto_submit': auto_submit,
     }
 
     if extra_context is not None:
