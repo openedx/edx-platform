@@ -53,6 +53,13 @@ def marketing_link(name):
         if link_map[name] is not None:
             if link_map[name].startswith('https://'):
                 return link_map[name]
+            elif link_map[name].startswith('tos#'):
+                # This is technical debt at Stanford.
+                # For ${LEGACY_REASONS}, we combine TOS/Honor/Privacy
+                # pages into a single page.
+                # TODO: Eventually, these should just be split out into
+                # individual pages.
+                return reverse('tos') + '#' + link_map[name][4:]
             else:
                 return reverse(link_map[name])
     else:
