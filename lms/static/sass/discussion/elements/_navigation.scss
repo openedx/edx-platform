@@ -229,11 +229,18 @@
   padding: ($baseline/4) ($baseline/2);
   transition: none;
 
-  &.is-active,
   &:hover {
     color: $forum-color-background;
     background-color: $forum-color-hover-thread;
+  }
 
+  &.is-active {
+    color: $forum-color-background;
+    background-color: $forum-color-reading-thread;
+  }
+
+  &.is-active,
+  &:hover {
     .forum-nav-thread-labels > li {
       border-color: $forum-color-background;
       color: $forum-color-background;
