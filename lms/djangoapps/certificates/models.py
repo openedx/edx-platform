@@ -89,6 +89,8 @@ class CertificateStatuses(object):
     audit_passing = 'audit_passing'
     audit_notpassing = 'audit_notpassing'
     unverified = 'unverified'
+    invalidated = 'invalidated'
+    requesting = 'requesting'
 
     readable_statuses = {
         downloadable: "already received",
