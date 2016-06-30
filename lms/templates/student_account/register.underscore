@@ -58,6 +58,8 @@
 
     <%= context.fields %>
 
+    <%= context.registrationFooter %>
+
     <button type="submit" class="action action-primary action-update js-register register-button"><%- gettext("Create your account") %></button>
     <p class="note">* <%- gettext("Required field") %></p>
 </form>

@@ -74,6 +74,7 @@
                 };
 
                 this.platformName = options.platform_name;
+                this.registrationFooter = options.registration_footer;
 
                 // The login view listens for 'sync' events from the reset model
                 this.resetModel = new PasswordResetModel({}, {
@@ -161,6 +162,7 @@
                         fields: data.fields,
                         model: model,
                         thirdPartyAuth: this.thirdPartyAuth,
+                        registrationFooter: this.registrationFooter,
                         platformName: this.platformName
                     });
 

@@ -141,6 +141,8 @@ AUDIT_LOG = logging.getLogger("audit")
 ReverifyInfo = namedtuple('ReverifyInfo', 'course_id course_name course_number date status display')  # pylint: disable=invalid-name
 SETTING_CHANGE_INITIATED = 'edx.user.settings.change_initiated'
 
+LOGIN_LOCKOUT_PERIOD_PLUS_FIVE_MINUTES = int((5 * 60 + settings.MAX_FAILED_LOGIN_ATTEMPTS_LOCKOUT_PERIOD_SECS) / 60)
+
 
 def csrf_token(context):
     """A csrf token that can be included in a form."""
@@ -1286,7 +1288,11 @@ def login_user(request, error=""):  # pylint: disable=too-many-statements,unused
         if LoginFailures.is_user_locked_out(user_found_by_email_lookup):
             return JsonResponse({
                 "success": False,
-                "value": _('This account has been temporarily locked due to excessive login failures. Try again later.'),
+                "value": _(
+                    "This account has been temporarily locked due to excessive login failures. "
+                    "Try again in {minutes} minute(s).  For security reasons, "
+                    "reseting the password will NOT lift the lockout. Please wait for {minutes} minute(s).").format(
+                        minutes=LOGIN_LOCKOUT_PERIOD_PLUS_FIVE_MINUTES,),
             })  # TODO: this should be status code 429  # pylint: disable=fixme
 
     # see if the user must reset his/her password due to any policy settings
