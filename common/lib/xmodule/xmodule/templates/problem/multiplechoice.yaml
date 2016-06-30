@@ -22,32 +22,30 @@ metadata:
        The population of Germany is approximately 81 million.
        [explanation]
 
-data: |
-   <problem>
-   <p>Multiple choice problems allow learners to select only one option.
-       Learners can see all the options along with the problem text.</p>
-   <p>When you add the problem, be sure to select <strong>Settings</strong> 
-   to specify a <strong>Display Name</strong> and other values that apply.</p>
-   <p>You can use the following example problem as a model.</p>
-      <p>Which of the following countries has the largest population?</p>
-      <multiplechoiceresponse>
-       <choicegroup type="MultipleChoice">
-          <choice correct="false" name="brazil">Brazil
-            <choicehint>timely feedback -- explain why an almost correct answer is wrong</choicehint>
-          </choice>
-          <choice correct="false" name="germany">Germany</choice>
-          <choice correct="true" name="indonesia">Indonesia</choice>
-          <choice correct="false" name="russia">Russia</choice>
-       </choicegroup>
-      </multiplechoiceresponse>
-    <solution>
-      <div class="detailed-solution">
-        <p>Explanation</p>
-        <p>According to September 2014 estimates:</p>
-        <p>The population of Indonesia is approximately 250 million.</p>
-        <p>The population of Brazil  is approximately 200 million.</p>
-        <p>The population of Russia is approximately 146 million.</p>
-        <p>The population of Germany is approximately 81 million.</p>
-      </div>
-    </solution>
-    </problem>
+data:   |
+        <problem>
+           <multiplechoiceresponse>
+               <p>Multiple choice problems allow learners to select only one option. Learners can see all the options along with the problem text.</p>
+               <p>When you add the problem, be sure to select Settings to specify a Display Name and other values that apply.</p>
+               <p>You can use the following example problem as a model.</p>
+               <label>Which of the following countries has the largest population?</label>
+               <choicegroup label="Which of the following countries has the largest population?" type="MultipleChoice">
+                   <choice correct="false">Brazil
+                       <choicehint>timely feedback -- explain why an almost correct answer is wrong</choicehint>
+                   </choice>
+                   <choice correct="false">Germany</choice>
+                   <choice correct="true">Indonesia</choice>
+                   <choice correct="false">Russia</choice>
+               </choicegroup>
+               <solution>
+                   <div class="detailed-solution">
+                       <p>Explanation</p>
+                       <p>According to September 2014 estimates:</p>
+                       <p>The population of Indonesia is approximately 250 million.</p>
+                       <p>The population of Brazil is approximately 200 million.</p>
+                       <p>The population of Russia is approximately 146 million.</p>
+                       <p>The population of Germany is approximately 81 million.</p>
+                   </div>
+               </solution>
+           </multiplechoiceresponse>
+        </problem>

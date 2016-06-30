@@ -582,10 +582,6 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
       // make selector to search responsetypes in xml
       var responseTypesSelector = responseTypes.join(', ');
 
-      // these will be placed at outside the end of responsetype
-      var independentTagNames = ['solution'];
-      var independentTagNodes = [];
-
       // make temporary xml
       // safe-lint: disable=javascript-concat-html
       var $xml = $($.parseXML('<prob>' + xml + '</prob>'));
@@ -609,11 +605,6 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
                 child = $('<label>' + child.textContent + '</label>')[0];
             }
 
-            if (_.contains(independentTagNames, child.nodeName)) {
-                independentTagNodes.push(child)
-                return;
-            }
-
             if (beforeInputtype) {
                 // safe-lint: disable=javascript-jquery-insert-into-target
                 responseType[0].insertBefore(child, inputtype);
@@ -623,10 +614,7 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
         })
         var serializer = new XMLSerializer();
 
-        // combine responsetype and independent tags
-        xml = serializer.serializeToString(responseType[0]) + '\n\n' + _.map(independentTagNodes, function(node){
-            return serializer.serializeToString(node)
-        }).join('\n\n');
+        xml = serializer.serializeToString(responseType[0]);
 
         // remove xmlns attribute added by the serializer
         xml = xml.replace(/\sxmlns=['"].*?['"]/gi, '');
