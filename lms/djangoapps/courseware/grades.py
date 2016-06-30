@@ -263,13 +263,53 @@ def answer_distributions(course_key):
     return answer_counts
 
 
-def grade(student, course, keep_raw_scores=False, course_structure=None):
+def progress_and_grade(student, course):
+    """
+    Combines the grade and progress_summary operations, to allow for
+    optimization of repeated calculations.
+    """
+    # Precompute some repeated calculations for performance reasons
+    course_structure = get_course_blocks(student, course.location)
+    grading_context_result = grading_context(course_structure)
+    with outer_atomic():
+        scores_client = ScoresClient.create_for_locations(
+                course.id,
+                student.id,
+                [block.location for block in grading_context_result['all_graded_blocks']]
+            )
+
+
+    courseware_summary = progress_summary(
+        student,
+        course,
+        course_structure=course_structure,
+        grading_context_result=grading_context_result,
+        scores_client=scores_client
+    )
+    grade_summary = grade(
+        student,
+        course,
+        course_structure=course_structure,
+        grading_context_result=grading_context_result,
+        scores_client=scores_client
+    )
+    return courseware_summary, grade_summary
+
+
+def grade(
+    student,
+    course,
+    keep_raw_scores=False,
+    course_structure=None,
+    grading_context_result=None,
+    scores_client=None
+):
     """
     Returns the grade of the student.
 
     Also sends a signal to update the minimum grade requirement status.
     """
-    grade_summary = _grade(student, course, keep_raw_scores, course_structure)
+    grade_summary = _grade(student, course, keep_raw_scores, course_structure, grading_context_result, scores_client)
     responses = GRADES_UPDATED.send_robust(
         sender=None,
         username=student.username,
@@ -284,7 +324,14 @@ def grade(student, course, keep_raw_scores=False, course_structure=None):
     return grade_summary
 
 
-def _grade(student, course, keep_raw_scores, course_structure=None):
+def _grade(
+    student,
+    course,
+    keep_raw_scores=False,
+    course_structure=None,
+    grading_context_result=None,
+    scores_client=None
+):
     """
     Unwrapped version of "grade"
 
@@ -300,11 +347,12 @@ def _grade(student, course, keep_raw_scores, course_structure=None):
     """
     if course_structure is None:
         course_structure = get_course_blocks(student, course.location)
-    grading_context_result = grading_context(course_structure)
-    scorable_locations = [block.location for block in grading_context_result['all_graded_blocks']]
-
-    with outer_atomic():
-        scores_client = ScoresClient.create_for_locations(course.id, student.id, scorable_locations)
+    if grading_context_result is None:
+        grading_context_result = grading_context(course_structure)
+    if scores_client is None:
+        scorable_locations = [block.location for block in grading_context_result['all_graded_blocks']]
+        with outer_atomic():
+            scores_client = ScoresClient.create_for_locations(course.id, student.id, scorable_locations)
 
     # Dict of item_ids -> (earned, possible) point tuples. This *only* grabs
     # scores that were registered with the submissions API, which for the moment
@@ -456,12 +504,18 @@ def grade_for_percentage(grade_cutoffs, percentage):
     return letter_grade
 
 
-def progress_summary(student, course, course_structure=None):
+def progress_summary(
+    student,
+    course,
+    course_structure=None,
+    grading_context_result=None,
+    scores_client=None
+):
     """
     Returns progress summary for all chapters in the course.
     """
 
-    progress = _progress_summary(student, course, course_structure)
+    progress = _progress_summary(student, course, course_structure, grading_context_result, scores_client)
     if progress:
         return progress.chapters
     else:
@@ -476,7 +530,13 @@ def get_weighted_scores(student, course):
     return _progress_summary(student, course)
 
 
-def _progress_summary(student, course, course_structure=None):
+def _progress_summary(
+    student,
+    course,
+    course_structure=None,
+    grading_context_result=None,
+    scores_client=None
+):
     """
     Unwrapped version of "progress_summary".
 
@@ -499,10 +559,13 @@ def _progress_summary(student, course, course_structure=None):
         course_structure = get_course_blocks(student, course.location)
     if not len(course_structure):
         return None
-    scorable_locations = [block_key for block_key in course_structure if possibly_scored(block_key)]
-
-    with outer_atomic():
-        scores_client = ScoresClient.create_for_locations(course.id, student.id, scorable_locations)
+    if scores_client is None:
+        if grading_context_result is None:
+            scorable_locations = [block_key for block_key in course_structure if possibly_scored(block_key)]
+        else:  # TODO: these two list are equivalent, yeah?
+            scorable_locations = [block.location for block in grading_context_result['all_graded_blocks']]
+        with outer_atomic():
+            scores_client = ScoresClient.create_for_locations(course.id, student.id, scorable_locations)
 
     # We need to import this here to avoid a circular dependency of the form:
     # XBlock --> submissions --> Django Rest Framework error strings -->

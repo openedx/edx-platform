@@ -717,11 +717,7 @@ def _progress(request, course_key, student_id):
     # additional DB lookup (this kills the Progress page in particular).
     student = User.objects.prefetch_related("groups").get(id=student.id)
 
-    # Fetch course blocks once for performance reasons
-    course_structure = get_course_blocks(student, course.location)
-
-    courseware_summary = grades.progress_summary(student, course, course_structure)
-    grade_summary = grades.grade(student, course, course_structure=course_structure)
+    courseware_summary, grades_summary = grades.progress_and_grade(student, course)
     studio_url = get_studio_url(course, 'settings/grading')
 
     if courseware_summary is None:
