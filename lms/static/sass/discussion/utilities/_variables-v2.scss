@@ -15,6 +15,7 @@ $forum-color-marked-answer: $green-d1 !default;
 $forum-color-border: palette(grayscale, base) !default;
 $forum-color-error: palette(error, base) !default;
 $forum-color-hover-thread: palette(grayscale, dark) !default;
+$forum-color-reading-thread: palette(grayscale, dark) !default;
 
 // post images
 $post-image-dimension: ($baseline*3) !default;  // image size  + margin
