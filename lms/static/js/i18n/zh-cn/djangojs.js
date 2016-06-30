@@ -789,7 +789,6 @@
     "Open": "\u6253\u5f00", 
     "Open Calculator": "\u6253\u5f00\u8ba1\u7b97\u5668", 
     "Open language menu": "\u5f00\u542f\u8bed\u8a00\u529f\u80fd\u83dc\u5355", 
-    "Open language menu.": "\u6253\u5f00\u8bed\u8a00\u529f\u80fd\u83dc\u5355\u3002", 
     "OpenAssessment Save Error": "\u5f00\u653e\u5f0f\u8bc4\u4f30\u4fdd\u5b58\u9519\u8bef", 
     "Optional Characteristics": "\u53ef\u9009\u7279\u70b9", 
     "Order Details": "\u8ba2\u5355\u7ec6\u8282", 

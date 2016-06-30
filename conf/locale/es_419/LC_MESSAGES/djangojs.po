@@ -108,7 +108,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-06-23 15:30+0000\n"
+"POT-Creation-Date: 2016-06-30 15:59+0000\n"
 "PO-Revision-Date: 2016-05-25 00:06+0000\n"
 "Last-Translator: Juan Camilo Montoya Franco <juan.montoya@edunext.co>\n"
 "Language-Team: Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/)\n"
@@ -141,6 +141,7 @@ msgstr "Guardando"
 #: cms/static/js/views/course_info_update.js cms/static/js/views/tabs.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: common/static/coffee/src/discussion/utils.js
+#: common/static/common/js/discussion/utils.js
 #: lms/static/js/Markdown.Editor.js
 msgid "OK"
 msgstr "Aceptar"
@@ -288,6 +289,7 @@ msgstr "Avanzado"
 #: cms/static/js/views/modals/edit_xblock.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: common/static/coffee/src/discussion/utils.js
+#: common/static/common/js/discussion/utils.js
 #: common/static/common/templates/image-modal.underscore
 #: common/static/common/templates/discussion/forum-action-close.underscore
 #: common/static/common/templates/discussion/search-alert.underscore
@@ -1905,10 +1907,6 @@ msgid ""
 msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
-msgid "Open language menu."
-msgstr "Abrir menú de idiomas."
-
-#: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "Hide closed captions"
 msgstr "Ocultar subtítulos"
 
@@ -1930,10 +1928,12 @@ msgid "Turn off transcripts"
 msgstr "Desactivar transcripción"
 
 #: common/static/coffee/src/discussion/discussion_module_view.js
+#: common/static/common/js/discussion/discussion_module_view.js
 msgid "Hide Discussion"
 msgstr "Ocultar Discusión"
 
 #: common/static/coffee/src/discussion/discussion_module_view.js
+#: common/static/common/js/discussion/discussion_module_view.js
 msgid "Show Discussion"
 msgstr "Mostrar Discusión"
 
@@ -1943,15 +1943,23 @@ msgstr "Mostrar Discusión"
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
 #: common/static/coffee/src/discussion/views/discussion_user_profile_view.js
 #: common/static/coffee/src/discussion/views/response_comment_view.js
+#: common/static/common/js/discussion/discussion_module_view.js
+#: common/static/common/js/discussion/utils.js
+#: common/static/common/js/discussion/views/discussion_thread_list_view.js
+#: common/static/common/js/discussion/views/discussion_thread_view.js
+#: common/static/common/js/discussion/views/discussion_user_profile_view.js
+#: common/static/common/js/discussion/views/response_comment_view.js
 msgid "Sorry"
 msgstr "Lo sentimos"
 
 #: common/static/coffee/src/discussion/discussion_module_view.js
+#: common/static/common/js/discussion/discussion_module_view.js
 msgid "We had some trouble loading the discussion. Please try again."
 msgstr ""
 "Ocurrió un problema al cargar la discusión. Por favor intente nuevamente."
 
 #: common/static/coffee/src/discussion/discussion_module_view.js
+#: common/static/common/js/discussion/discussion_module_view.js
 msgid ""
 "We had some trouble loading the threads you requested. Please try again."
 msgstr ""
@@ -1959,6 +1967,7 @@ msgstr ""
 "nuevamente."
 
 #: common/static/coffee/src/discussion/utils.js
+#: common/static/common/js/discussion/utils.js
 msgid "Loading content"
 msgstr "Cargando contenido"
 
@@ -1971,42 +1980,50 @@ msgstr ""
 "su trabajo y luego recargue la página."
 
 #: common/static/coffee/src/discussion/utils.js
+#: common/static/common/js/discussion/utils.js
 msgid "We had some trouble processing your request. Please try again."
 msgstr ""
 "Ocurrió un problema al procesar su solicitud. Por favor intente nuevamente."
 
 #: common/static/coffee/src/discussion/utils.js
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
-#: common/static/coffee/src/discussion/views/discussion_topic_menu_view.js
+#: common/static/common/js/discussion/utils.js
+#: common/static/common/js/discussion/views/discussion_thread_list_view.js
+#: common/static/common/js/discussion/views/discussion_topic_menu_view.js
 #: common/static/common/templates/discussion/pagination.underscore
 msgid "…"
 msgstr "..."
 
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
+#: common/static/common/js/discussion/views/discussion_content_view.js
 msgid "there is currently %(numVotes)s vote"
 msgid_plural "there are currently %(numVotes)s votes"
 msgstr[0] "actualmente tiene %(numVotes)s voto"
 msgstr[1] "actualmente tiene %(numVotes)s votos"
 
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
+#: common/static/common/js/discussion/views/discussion_content_view.js
 msgid "%(numVotes)s Vote"
 msgid_plural "%(numVotes)s Votes"
 msgstr[0] "%(numVotes)s voto"
 msgstr[1] "%(numVotes)s votos"
 
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
+#: common/static/common/js/discussion/views/discussion_content_view.js
 msgid "We had some trouble subscribing you to this thread. Please try again."
 msgstr ""
 "Tenemos problemas suscribiéndote a esta conversación. Por favor intenta de "
 "nuevo."
 
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
+#: common/static/common/js/discussion/views/discussion_content_view.js
 msgid ""
 "We had some trouble unsubscribing you from this thread. Please try again."
 msgstr ""
 "Tenemos problemas desuscribiendote de este hilo. Por favor intenta de nuevo."
 
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
+#: common/static/common/js/discussion/views/discussion_content_view.js
 msgid ""
 "We had some trouble marking this response as an answer.  Please try again."
 msgstr ""
@@ -2014,6 +2031,7 @@ msgstr ""
 "inténtalo de nuevo."
 
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
+#: common/static/common/js/discussion/views/discussion_content_view.js
 msgid ""
 "We had some trouble removing this response as an answer.  Please try again."
 msgstr ""
@@ -2021,29 +2039,35 @@ msgstr ""
 "inténtalo de nuevo."
 
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
+#: common/static/common/js/discussion/views/discussion_content_view.js
 msgid "We had some trouble marking this response endorsed.  Please try again."
 msgstr ""
 "Tenemos problemas para marcar tu respuesta como aprobada. Por favor intenta "
 "de nuevo."
 
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
+#: common/static/common/js/discussion/views/discussion_content_view.js
 msgid "We had some trouble removing this endorsement.  Please try again."
 msgstr "Tenemos problemas borrando tu respuesta. Por favor intenta de nuevo."
 
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
+#: common/static/common/js/discussion/views/discussion_content_view.js
 msgid "We had some trouble saving your vote.  Please try again."
 msgstr ""
 "Tenemos algunos problemas guardando tu voto. Por favor inténtalo nuevamente."
 
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
+#: common/static/common/js/discussion/views/discussion_content_view.js
 msgid "We had some trouble pinning this thread. Please try again."
 msgstr "Tenemos problemas fijando este hilo. Por favor intenta de nuevo."
 
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
+#: common/static/common/js/discussion/views/discussion_content_view.js
 msgid "We had some trouble unpinning this thread. Please try again."
 msgstr "Tenemos problemas desmarcando este hilo. Por favor intenta de nuevo."
 
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
+#: common/static/common/js/discussion/views/discussion_content_view.js
 msgid ""
 "We had some trouble removing your flag on this post.  Please try again."
 msgstr ""
@@ -2051,45 +2075,54 @@ msgstr ""
 " de nuevo."
 
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
+#: common/static/common/js/discussion/views/discussion_content_view.js
 msgid "We had some trouble reporting this post.  Please try again."
 msgstr ""
 "Tenemos problemas en el reporte sobre esta publicación. Por favor intenta de"
 " nuevo."
 
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
+#: common/static/common/js/discussion/views/discussion_content_view.js
 msgid "We had some trouble closing this thread.  Please try again."
 msgstr ""
 "Tenemos problemas cerrando esta discusión. Por favor intenta de nuevo."
 
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
+#: common/static/common/js/discussion/views/discussion_content_view.js
 msgid "We had some trouble reopening this thread.  Please try again."
 msgstr ""
 "Tenemos problemas reabriendo esta discusión. Por favor intenta de nuevo."
 
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
+#: common/static/common/js/discussion/views/discussion_thread_list_view.js
 msgid "Load more"
 msgstr "Cargar más"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
+#: common/static/common/js/discussion/views/discussion_thread_list_view.js
 msgid "Loading more threads"
 msgstr "Cargando más discusiones"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
+#: common/static/common/js/discussion/views/discussion_thread_list_view.js
 msgid "We had some trouble loading more threads. Please try again."
 msgstr ""
 "Tuvimos un problema al cargar más discusiones. Por favor intente nuevamente."
 
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
+#: common/static/common/js/discussion/views/discussion_thread_list_view.js
 msgid "%(unread_count)s new comment"
 msgid_plural "%(unread_count)s new comments"
 msgstr[0] "%(unread_count)s nuevo comentario"
 msgstr[1] "%(unread_count)s nuevos comentarios"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
+#: common/static/common/js/discussion/views/discussion_thread_list_view.js
 msgid "Current conversation"
 msgstr "conversación actual"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
+#: common/static/common/js/discussion/views/discussion_thread_list_view.js
 #: lms/static/js/edxnotes/views/tabs/search_results.js
 #: lms/templates/search/course_search_results.underscore
 #: lms/templates/search/dashboard_search_results.underscore
@@ -2097,6 +2130,7 @@ msgid "Search Results"
 msgstr "Resultados de búsqueda"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
+#: common/static/common/js/discussion/views/discussion_thread_list_view.js
 msgid "Loading thread list"
 msgstr "Cargando la lista de discusiones"
 
@@ -2109,14 +2143,17 @@ msgstr ""
 "para %(suggested_query)s."
 
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
+#: common/static/common/js/discussion/views/discussion_thread_list_view.js
 msgid "No threads matched your query."
 msgstr "Ninguna discusión coincide con los criterios dados."
 
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
+#: common/static/common/js/discussion/views/discussion_thread_list_view.js
 msgid "Show posts by %(username)s."
 msgstr "Mostrar las publicaciones de %(username)s."
 
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
+#: common/static/common/js/discussion/views/discussion_thread_view.js
 msgid ""
 "The thread you selected has been deleted. Please select another thread."
 msgstr ""
@@ -2124,77 +2161,92 @@ msgstr ""
 "discusión."
 
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
+#: common/static/common/js/discussion/views/discussion_thread_view.js
 msgid "We had some trouble loading responses. Please reload the page."
 msgstr ""
 "Ocurrió un problema al cargar las respuestas de la discusión. Por favor "
 "intente recargar la página."
 
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
+#: common/static/common/js/discussion/views/discussion_thread_view.js
 msgid "We had some trouble loading more responses. Please try again."
 msgstr ""
 "Ocurrió un problema al cargar más respuestas para la discusión. Por favor "
 "intente recargar la página."
 
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
+#: common/static/common/js/discussion/views/discussion_thread_view.js
 msgid "%(numResponses)s other response"
 msgid_plural "%(numResponses)s other responses"
 msgstr[0] "%(numResponses)s otra respuesta"
 msgstr[1] "%(numResponses)s otras respuestas"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
+#: common/static/common/js/discussion/views/discussion_thread_view.js
 msgid "%(numResponses)s response"
 msgid_plural "%(numResponses)s responses"
 msgstr[0] "%(numResponses)s respuesta"
 msgstr[1] "%(numResponses)s respuestas"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
+#: common/static/common/js/discussion/views/discussion_thread_view.js
 msgid "Showing all responses"
 msgstr "Mostrando todas las respuestas"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
+#: common/static/common/js/discussion/views/discussion_thread_view.js
 msgid "Showing first response"
 msgid_plural "Showing first %(numResponses)s responses"
 msgstr[0] "Mostrando la primera respuesta"
 msgstr[1] "Mostrando las %(numResponses)s primeras respuestas"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
+#: common/static/common/js/discussion/views/discussion_thread_view.js
 msgid "Load all responses"
 msgstr "Cargando todas las respuestas"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
+#: common/static/common/js/discussion/views/discussion_thread_view.js
 msgid "Load next %(numResponses)s responses"
 msgstr "Cargar las siguientes %(numResponses)s respuestas"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
+#: common/static/common/js/discussion/views/discussion_thread_view.js
 msgid "Are you sure you want to delete this post?"
 msgstr "¿Está seguro de que desea borrar esta publicación?"
 
 #: common/static/coffee/src/discussion/views/discussion_user_profile_view.js
+#: common/static/common/js/discussion/views/discussion_user_profile_view.js
 msgid "We had some trouble loading the page you requested. Please try again."
 msgstr ""
 "Ocurrió un problema al cargar la página solicitada. Por favor intente "
 "nuevamente."
 
 #: common/static/coffee/src/discussion/views/new_post_view.js
+#: common/static/common/js/discussion/views/new_post_view.js
 msgid "Your post will be discarded."
 msgstr "Su publicación será descartada."
 
 #: common/static/coffee/src/discussion/views/response_comment_show_view.js
+#: common/static/common/js/discussion/views/response_comment_show_view.js
 #: common/static/common/templates/discussion/post-user-display.underscore
 #: common/static/common/templates/discussion/profile-thread.underscore
 msgid "anonymous"
 msgstr "anónimo"
 
 #: common/static/coffee/src/discussion/views/response_comment_view.js
+#: common/static/common/js/discussion/views/response_comment_view.js
 msgid "Are you sure you want to delete this comment?"
 msgstr "¿Está seguro de que desea borrar este comentario?"
 
 #: common/static/coffee/src/discussion/views/response_comment_view.js
+#: common/static/common/js/discussion/views/response_comment_view.js
 msgid "We had some trouble deleting this comment. Please try again."
 msgstr ""
 "Ocurrió un problema al borrar el comentario. Por favor intente nuevamente."
 
 #: common/static/coffee/src/discussion/views/thread_response_view.js
+#: common/static/common/js/discussion/views/thread_response_view.js
 msgid "Are you sure you want to delete this response?"
 msgstr "¿Está seguro de que desea borrar esta respuesta?"
 
@@ -2231,6 +2283,16 @@ msgstr ""
 
 #: common/static/common/js/components/views/paging_header.js
 msgid "Showing {firstIndex}-{lastIndex} out of {numItems} total"
+msgstr ""
+
+#: common/static/common/js/discussion/utils.js
+msgid ""
+"We had some trouble processing your request. Please ensure you have copied "
+"any "
+msgstr ""
+
+#: common/static/common/js/discussion/views/discussion_thread_list_view.js
+msgid "No results found for %(original_query)s. "
 msgstr ""
 
 #: common/static/common/js/utils/edx.utils.validate.js
@@ -4360,6 +4422,15 @@ msgstr ""
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "Country or Region"
 msgstr "País o Región"
+
+#: lms/static/js/student_account/views/account_settings_factory.js
+msgid "Time Zone"
+msgstr ""
+
+#: lms/static/js/student_account/views/account_settings_factory.js
+msgid ""
+"Select the time zone for displaying course dates. If you do not specify a "
+msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "Additional Information"
@@ -7304,7 +7375,23 @@ msgid "View Course"
 msgstr ""
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
+msgid "View Archived Course"
+msgstr ""
+
+#: lms/templates/learner_dashboard/course_enroll.underscore
 msgid "not enrolled"
+msgstr ""
+
+#: lms/templates/learner_dashboard/course_enroll.underscore
+msgid "Please select a course date"
+msgstr ""
+
+#: lms/templates/learner_dashboard/course_enroll.underscore
+msgid "Select Course Run"
+msgstr ""
+
+#: lms/templates/learner_dashboard/course_enroll.underscore
+msgid "Choose Course Date"
 msgstr ""
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
@@ -7314,6 +7401,14 @@ msgstr ""
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
 msgid "Enroll Now"
+msgstr ""
+
+#: lms/templates/learner_dashboard/course_enroll.underscore
+msgid "Coming Soon"
+msgstr ""
+
+#: lms/templates/learner_dashboard/course_enroll.underscore
+msgid "Enrollment Opens"
 msgstr ""
 
 #: lms/templates/learner_dashboard/empty_programs_list.underscore

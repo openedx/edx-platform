@@ -61,7 +61,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-06-23 15:31+0000\n"
+"POT-Creation-Date: 2016-06-30 16:00+0000\n"
 "PO-Revision-Date: 2016-05-26 15:41+0000\n"
 "Last-Translator: Ned Batchelder <ned@edx.org>\n"
 "Language-Team: Hebrew (http://www.transifex.com/open-edx/edx-platform/language/he/)\n"
@@ -287,7 +287,6 @@ msgstr "קורס"
 #: common/djangoapps/course_modes/models.py
 #: common/lib/xmodule/xmodule/annotatable_module.py
 #: common/lib/xmodule/xmodule/capa_base.py
-#: common/lib/xmodule/xmodule/discussion_module.py
 #: common/lib/xmodule/xmodule/html_module.py
 #: common/lib/xmodule/xmodule/imageannotation_module.py
 #: common/lib/xmodule/xmodule/library_content_module.py
@@ -296,6 +295,7 @@ msgstr "קורס"
 #: common/lib/xmodule/xmodule/textannotation_module.py
 #: common/lib/xmodule/xmodule/videoannotation_module.py
 #: common/lib/xmodule/xmodule/word_cloud_module.py
+#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
 #: cms/templates/container.html cms/templates/library.html
 msgid "Display Name"
 msgstr "שם לתצוגה"
@@ -869,11 +869,9 @@ msgstr "דוא\"ל או סיסמה שגויים."
 
 #: common/djangoapps/student/views.py
 msgid ""
-"This account has not been activated. We have sent another activation "
-"message. Please check your email for the activation instructions."
+"Before you sign in, you need to activate your account. We have sent you an "
+"email message with instructions for activating your account."
 msgstr ""
-"חשבון זה לא אומת. שלחנו הודעת אימות נוספת. אנא בדוק את תיבת דואר האלקטרוני "
-"שלך להוראות האימות."
 
 #: common/djangoapps/student/views.py
 msgid "Please enter a username"
@@ -1866,7 +1864,6 @@ msgid "XML data for the annotation"
 msgstr "מידע XML עבור הסברים"
 
 #: common/lib/xmodule/xmodule/annotatable_module.py
-#: common/lib/xmodule/xmodule/discussion_module.py
 #: common/lib/xmodule/xmodule/html_module.py
 #: common/lib/xmodule/xmodule/imageannotation_module.py
 #: common/lib/xmodule/xmodule/library_content_module.py
@@ -1998,7 +1995,6 @@ msgid "Per Student"
 msgstr "לסטודנט"
 
 #: common/lib/xmodule/xmodule/capa_base.py
-#: common/lib/xmodule/xmodule/discussion_module.py
 msgid "XML data for the problem"
 msgstr "מידע XML עבור בעיה"
 
@@ -3076,38 +3072,6 @@ msgstr ""
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "General"
 msgstr "כללי"
-
-#: common/lib/xmodule/xmodule/discussion_module.py
-msgid "Discussion Id"
-msgstr "מזהה דיון"
-
-#: common/lib/xmodule/xmodule/discussion_module.py
-msgid "The id is a unique identifier for the discussion. It is non editable."
-msgstr "המזהה הוא מזהה יחודי עבור הדיון לא ניתן לערוך אותו."
-
-#: common/lib/xmodule/xmodule/discussion_module.py
-msgid "Category"
-msgstr "קטגוריה"
-
-#: common/lib/xmodule/xmodule/discussion_module.py
-msgid ""
-"A category name for the discussion. This name appears in the left pane of "
-"the discussion forum for the course."
-msgstr ""
-"שם קטגוריה עבור הדיון. השם הזה מופיע בחלונית השמאלית של פורום הדיונים של "
-"הקורס."
-
-#: common/lib/xmodule/xmodule/discussion_module.py
-msgid "Subcategory"
-msgstr "תת קטגוריה"
-
-#: common/lib/xmodule/xmodule/discussion_module.py
-msgid ""
-"A subcategory name for the discussion. This name appears in the left pane of"
-" the discussion forum for the course."
-msgstr ""
-"שם תת קטגוריה עבור הדיון. השם הזה מופיע בחלונית השמאלית של פורום הדיונים של "
-"הקורס. "
 
 #: common/lib/xmodule/xmodule/html_module.py
 msgid "Text"
@@ -5682,6 +5646,38 @@ msgstr ""
 
 #: lms/djangoapps/email_marketing/models.py
 msgid "Sailthru template to use on activation send. "
+msgstr ""
+
+#: lms/djangoapps/email_marketing/models.py
+msgid "Sailthru template to use on abandoned cart reminder. "
+msgstr ""
+
+#: lms/djangoapps/email_marketing/models.py
+msgid "Sailthru minutes to wait before sending abandoned cart message."
+msgstr ""
+
+#: lms/djangoapps/email_marketing/models.py
+msgid "Sailthru send template to use on enrolling for audit. "
+msgstr ""
+
+#: lms/djangoapps/email_marketing/models.py
+msgid "Sailthru send template to use on upgrading a course. "
+msgstr ""
+
+#: lms/djangoapps/email_marketing/models.py
+msgid "Sailthru send template to use on purchasing a course seat. "
+msgstr ""
+
+#: lms/djangoapps/email_marketing/models.py
+msgid "Use the Sailthru content API to fetch course tags."
+msgstr ""
+
+#: lms/djangoapps/email_marketing/models.py
+msgid "Number of seconds to cache course content retrieved from Sailthru."
+msgstr ""
+
+#: lms/djangoapps/email_marketing/models.py
+msgid "Cost in cents to report to Sailthru for enrolls."
 msgstr ""
 
 #: lms/djangoapps/instructor/paidcourse_enrollment_report.py
@@ -9194,6 +9190,12 @@ msgid ""
 msgstr "ערך '{preference_value}' לא תקף עבור העדפת משתמש '{preference_key}'."
 
 #: openedx/core/djangoapps/user_api/preferences/api.py
+msgid ""
+"Value '{preference_value}' not valid for preference '{preference_key}': Not "
+"in timezone set."
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/preferences/api.py
 msgid "Save failed for user preference '{key}' with value '{value}'."
 msgstr "שמירה נכשלה עבור העדפת משתמש '{key}' עם ערך '{value}'."
 
@@ -9228,6 +9230,7 @@ msgstr "כתובת דואר אלקטרוני שהשתמשת בזמן רישום 
 #: cms/templates/register.html lms/templates/login.html
 #: lms/templates/provider_login.html lms/templates/register-form.html
 #: lms/templates/signup_modal.html lms/templates/sysadmin_dashboard.html
+#: themes/red-theme/cms/templates/login.html
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "Password"
 msgstr "סיסמה"
@@ -9377,6 +9380,53 @@ msgstr "%(min_score)s אינו אחוז דירוג חוקי"
 #: openedx/core/lib/gating/api.py
 msgid "Gating milestone for {usage_key}"
 msgstr "קבלת אבן דרך עבור {usage_key}"
+
+#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
+msgid "Display name for this component"
+msgstr ""
+
+#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
+msgid "Category"
+msgstr "קטגוריה"
+
+#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
+msgid "Week 1"
+msgstr ""
+
+#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
+msgid ""
+"A category name for the discussion. This name appears in the left pane of "
+"the discussion forum for the course."
+msgstr ""
+"שם קטגוריה עבור הדיון. השם הזה מופיע בחלונית השמאלית של פורום הדיונים של "
+"הקורס."
+
+#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
+msgid "Subcategory"
+msgstr "תת קטגוריה"
+
+#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
+msgid ""
+"A subcategory name for the discussion. This name appears in the left pane of"
+" the discussion forum for the course."
+msgstr ""
+"שם תת קטגוריה עבור הדיון. השם הזה מופיע בחלונית השמאלית של פורום הדיונים של "
+"הקורס. "
+
+#: pavelib/utils/passthrough_opts.py
+#, python-format
+msgid "%s option requires an argument"
+msgstr ""
+
+#: pavelib/utils/passthrough_opts.py
+#, python-format
+msgid "%s option requires %d arguments"
+msgstr ""
+
+#: pavelib/utils/passthrough_opts.py
+#, python-format
+msgid "%s option does not take a value"
+msgstr ""
 
 #: cms/djangoapps/contentstore/course_group_config.py
 #: cms/djangoapps/contentstore/views/certificates.py
@@ -9906,10 +9956,28 @@ msgstr "קורסים"
 msgid "Programs"
 msgstr "תוכניות"
 
+#: cms/templates/login.html cms/templates/widgets/header.html
+#: themes/red-theme/cms/templates/login.html
+msgid "Sign In"
+msgstr ""
+
+#: cms/templates/login.html themes/red-theme/cms/templates/login.html
+msgid "Sign In to {studio_name}"
+msgstr ""
+
+#: cms/templates/login.html themes/red-theme/cms/templates/login.html
+msgid "Don't have a {studio_name} Account? Sign up!"
+msgstr ""
+
+#: cms/templates/login.html themes/red-theme/cms/templates/login.html
+msgid "Required Information to Sign In to {studio_name}"
+msgstr ""
+
 #: cms/templates/login.html cms/templates/register.html
 #: lms/templates/help_modal.html lms/templates/login.html
 #: lms/templates/provider_login.html lms/templates/register-form.html
 #: lms/templates/register-shib.html lms/templates/signup_modal.html
+#: themes/red-theme/cms/templates/login.html
 #: themes/stanford-style/lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid "E-mail"
@@ -9921,13 +9989,14 @@ msgstr "דואר אלקטרוני"
 #: cms/templates/login.html cms/templates/manage_users.html
 #: cms/templates/manage_users_lib.html cms/templates/register.html
 #: lms/templates/login.html lms/templates/register-form.html
-#: lms/templates/register-shib.html
+#: lms/templates/register-shib.html themes/red-theme/cms/templates/login.html
 #: themes/stanford-style/lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid "example: username@domain.com"
 msgstr "לדוגמה: username@domain.com"
 
 #: cms/templates/login.html lms/templates/login.html
+#: themes/red-theme/cms/templates/login.html
 msgid "Forgot password?"
 msgstr "שכחת סיסמה?"
 
@@ -9988,6 +10057,11 @@ msgstr "חשבון זה כבר הופעל"
 #: lms/templates/registration/activation_complete.html
 msgid "Visit your {link_start}dashboard{link_end} to see your courses."
 msgstr "פתח את {link_start}לוח הבקרה{link_end} בכדי לראות את הקורסים שלך."
+
+#: cms/templates/registration/activation_complete.html
+#: lms/templates/registration/activation_complete.html
+msgid "You can now {link_start}sign in{link_end}."
+msgstr ""
 
 #: cms/templates/widgets/header.html lms/templates/navigation.html
 msgid "Choose Language"
@@ -10553,8 +10627,8 @@ msgid "Need Help?"
 msgstr "זקוק לעזרה?"
 
 #: lms/templates/login-sidebar.html
-msgid "Looking for help in logging in or with your {platform_name} account?"
-msgstr "צריך עזרה בהתחברות או עם חשבונך ב{platform_name}?"
+msgid "Looking for help signing in or with your {platform_name} account?"
+msgstr ""
 
 #: lms/templates/login-sidebar.html
 msgid "View our help section for answers to commonly asked questions."
@@ -11015,20 +11089,15 @@ msgstr "הצעדים הבאים"
 
 #: lms/templates/register-sidebar.html
 msgid ""
-"As part of joining {platform_name}, you will receive an activation email.  "
-"You must click on the activation link to complete the process.  Don't see "
-"the email?  Check your spam folder and mark {platform_name} emails as 'not "
-"spam'.  At {platform_name}, we communicate mostly through email."
+"As part of joining {platform_name}, you will receive an email message with "
+"instructions for activating your account. Don't see the email? Check your "
+"spam folder and mark {platform_name} emails as 'not spam'. At "
+"{platform_name}, we communicate mostly through email."
 msgstr ""
-"כחלק מתהליך הרישום ל{platform_name}, ישלח אלייך דוא\"ל הפעלה. עלייך ללחוץ על"
-" הקישור כדי לסיים את תהליך הרישום. לא רואה את הודעת הדוא\"ל? אנא בדוק תיקיית"
-" \"דואר זבל\" -ספאם ותסמן את הדוא\"ל שמגיע מ{platform_name} כ-\"לא ספאם\". "
-"בפלטפורמת {platform_name}, לרוב אנו יוצרים קשר באמצעות דוא\"ל."
 
 #: lms/templates/register-sidebar.html
-#: themes/stanford-style/lms/templates/register-sidebar.html
-msgid "Need help in registering with {platform_name}?"
-msgstr "צריך עזרה ברישום ל{platform_name}?"
+msgid "Need help registering with {platform_name}?"
+msgstr ""
 
 #: lms/templates/register-sidebar.html
 #: themes/stanford-style/lms/templates/register-sidebar.html
@@ -11036,13 +11105,11 @@ msgid "View our FAQs for answers to commonly asked questions."
 msgstr "הצג תשובות לשאלות נפוצות."
 
 #: lms/templates/register-sidebar.html
-#: themes/stanford-style/lms/templates/register-sidebar.html
 msgid ""
-"Once registered, most questions can be answered in the course specific "
-"discussion forums or through the FAQs."
+"You can find the answers to most of your questions in our list of FAQs. "
+"After you enroll in a course, you can also find answers in the course "
+"discussions."
 msgstr ""
-"לאחר הרישום, ניתן למצוא תשובות לרוב השאלות בפורומים או דרך עמוד \"שאלות "
-"נפוצות\"."
 
 #: lms/templates/register.html
 msgid "Register for {platform_name}"
@@ -11071,6 +11138,10 @@ msgid ""
 msgstr ""
 "הפעלת מחדש את הודעות הדוא\"ל של הפורום מ-{platform_name}. באפשרותך "
 "{dashboard_link_start}לחזור למרכז השליטה{link_end}."
+
+#: lms/templates/seq_module.html
+msgid "This exam is hidden from the learner."
+msgstr ""
 
 #: lms/templates/seq_module.html
 msgid "Previous"
@@ -12270,12 +12341,16 @@ msgid "Open Calculator"
 msgstr "פתח מחשבון"
 
 #: lms/templates/calculator/toggle_calculator.html
-msgid "Calculator Input"
-msgstr "קלט מחשבון"
+msgid "Enter equation"
+msgstr ""
 
 #: lms/templates/calculator/toggle_calculator.html
 msgid "Calculator Input Field"
 msgstr " שדה קלט של המחשבון"
+
+#: lms/templates/calculator/toggle_calculator.html
+msgid "Hints"
+msgstr "רמזים"
 
 #: lms/templates/calculator/toggle_calculator.html
 msgid ""
@@ -12283,10 +12358,6 @@ msgid ""
 "calculator"
 msgstr ""
 "השתמש במקשי החיצים בכדי לנווט בעצות או השתמש במקש ה-tab כדי לחזור למחשבון"
-
-#: lms/templates/calculator/toggle_calculator.html
-msgid "Hints"
-msgstr "רמזים"
 
 #: lms/templates/calculator/toggle_calculator.html
 msgid ""
@@ -12360,7 +12431,6 @@ msgstr "שברים עשרונים"
 msgid "Operators"
 msgstr "אופרטור"
 
-#. Translators: Please do not translate mathematical symbols.
 #: lms/templates/calculator/toggle_calculator.html
 msgid "+ - * / (add, subtract, multiply, divide)"
 msgstr "+ - * / (חיבור, חיסור, הכפל, חלק)"
@@ -12429,8 +12499,8 @@ msgid "Calculate"
 msgstr "חשב"
 
 #: lms/templates/calculator/toggle_calculator.html
-msgid "Calculator Output"
-msgstr "פלט מחשבון"
+msgid "Result"
+msgstr ""
 
 #: lms/templates/ccx/coach_dashboard.html
 msgid "CCX Coach Dashboard"
@@ -13893,20 +13963,20 @@ msgid "Results:"
 msgstr "תוצאות:"
 
 #: lms/templates/discussion/_discussion_course_navigation.html
-#: lms/templates/discussion/_discussion_module.html
+#: lms/templates/discussion/_discussion_inline.html
 msgid "Add a Post"
 msgstr ""
 
-#: lms/templates/discussion/_discussion_module.html
+#: lms/templates/discussion/_discussion_inline.html
 msgid "Show Discussion"
 msgstr "הראה דיון"
 
-#: lms/templates/discussion/_discussion_module_studio.html
+#: lms/templates/discussion/_discussion_inline_studio.html
 msgid "To view live discussions, click Preview or View Live in Unit Settings."
 msgstr ""
 "בכדי לצפות בדיון בזמן אמת, לחץ תצוגה מקדימה או צפה בזמן אמת בהגדרות היחידה. "
 
-#: lms/templates/discussion/_discussion_module_studio.html
+#: lms/templates/discussion/_discussion_inline_studio.html
 msgid "Discussion ID: {discussion_id}"
 msgstr "מספר מזהה לדיון: {discussion_id}"
 
@@ -14116,27 +14186,24 @@ msgid "Sincerely yours,The {course_name} Team"
 msgstr "בברכה חמה, צוות {course_name}"
 
 #: lms/templates/emails/activation_email.txt
-msgid "Thank you for signing up for {platform_name}."
-msgstr "תודה רבה על שנרשמת ל{platform_name}."
+msgid "Thank you for creating an account with {platform_name}!"
+msgstr ""
 
 #: lms/templates/emails/activation_email.txt
 msgid ""
-"Change your life and start learning today by activating your {platform_name}"
-" account. Click on the link below or copy and paste it into your browser's "
-"address bar."
+"There's just one more step before you can enroll in a course: you need to "
+"activate your {platform_name} account. To activate your account, click the "
+"following link. If that doesn't work, copy and paste the link into your "
+"browser's address bar."
 msgstr ""
-"שנה את חייך והתחל ללמוד היום באמצעות הפעלת חשבון {platform_name} שלך. לחץ על"
-" הקישור המצורף או העתק והדבק אותו לתוך שורת הכתובת של הדפדפן שלך."
 
 #: lms/templates/emails/activation_email.txt
 msgid ""
-"If you didn't request this, you don't need to do anything; you won't receive"
-" any more email from us. Please do not reply to this e-mail; if you require "
-"assistance, check the help section of the {platform_name} website."
+"If you didn't create an account, you don't need to do anything; you won't "
+"receive any more email from us. If you need assistance, please do not reply "
+"to this email message. Check the help section of the {platform_name} "
+"website."
 msgstr ""
-"אם לא ביקשת זאת, אין צורך לעשות דבר; לא תקבל עוד הודעות מאיתנו. בבקשה אל "
-"תגיבו להודעה זו; אם אתם זקוקים לעזרה, בדקו את עמוד העזרה באתר "
-"{platform_name}."
 
 #: lms/templates/emails/activation_email_subject.txt
 msgid "Activate Your {platform_name} Account"
@@ -16678,27 +16745,24 @@ msgid "Manage your data: {permission}"
 msgstr "נהל את הנתונים שלך: {permission}"
 
 #: lms/templates/registration/activate_account_notice.html
-msgid "Thanks for Registering!"
-msgstr "תודה על הרישום!"
+msgid "You're almost there!"
+msgstr ""
 
 #: lms/templates/registration/activate_account_notice.html
 msgid ""
-"You've successfully created an account on {platform_name}. We've sent an "
-"account activation message to {email_start}{email}{email_end}. To activate "
-"your account and start enrolling in courses, click the link in the message."
+"There's just one more step: Before you enroll in a course, you need to "
+"activate your account. We've sent an email message to "
+"{email_start}{email}{email_end} with instructions for activating your "
+"account. If you don't receive this message, check your spam folder."
 msgstr ""
 
 #: lms/templates/registration/activation_complete.html
-msgid "Activation Complete!"
-msgstr "תהליך האימות הסתיים!"
+msgid "Account Activated"
+msgstr ""
 
 #: lms/templates/registration/activation_complete.html
-msgid "Account already active!"
-msgstr "החשבון זה כבר הופעל!"
-
-#: lms/templates/registration/activation_complete.html
-msgid "You can now {link_start}log in{link_end}."
-msgstr "אתה עכשיו יכול {link_start}להתחבר{link_end}."
+msgid "Account already active"
+msgstr ""
 
 #: lms/templates/registration/activation_invalid.html
 msgid "Activation Invalid"
@@ -16706,15 +16770,14 @@ msgstr "הפעלה לא תקפה"
 
 #: lms/templates/registration/activation_invalid.html
 msgid ""
-"Something went wrong. Check to make sure the URL you went to was correct -- "
-"e-mail programs will sometimes split it into two lines. If you still have "
-"issues, e-mail us to let us know what happened at "
-"{email_start}{email}{email_end}."
+"Something went wrong. Email programs sometimes split URLs into two lines, so"
+" make sure the URL you're using is formatted correctly. If you still have "
+"issues, send us an email message at {email_start}{email}{email_end}."
 msgstr ""
 
 #: lms/templates/registration/activation_invalid.html
-msgid "Or you can go back to the {link_start}home page{link_end}."
-msgstr "או שתוכל לחזור ל{link_start}דף הבית{link_end}."
+msgid "Return to the {link_start}home page{link_end}."
+msgstr ""
 
 #: lms/templates/registration/password_reset_complete.html
 msgid "Your Password Reset is Complete"
@@ -17632,14 +17695,6 @@ msgstr "הפרופיל שלי"
 msgid "Register Now"
 msgstr "הרשם עכשיו"
 
-#: themes/red-theme/lms/templates/header.html
-msgid ""
-"<strong>Warning:</strong> Your browser is not fully supported. We strongly "
-"recommend using {chrome_link} or {ff_link}."
-msgstr ""
-"<strong>אזהרה:</strong> הדפדפן שלך לא נתמך במלואו. אנחנו ממליצים בחום כי "
-"תשתמש ב-{chrome_link} או {ff_link}. "
-
 #: themes/stanford-style/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/static_templates/tos.html
 msgid "Copyright"
@@ -17648,10 +17703,6 @@ msgstr "כל הזכויות שמורות"
 #: themes/stanford-style/lms/templates/footer.html
 msgid "Copyright {year}. All rights reserved."
 msgstr "זכויות שמורות {year} . כל הזכויות שמורות."
-
-#: themes/stanford-style/lms/templates/index.html
-msgid "Free courses from <strong>{university_name}</strong>"
-msgstr "קורסי חינם ב<strong>{university_name}</strong>"
 
 #: themes/stanford-style/lms/templates/index.html
 msgid "For anyone, anywhere, anytime"
@@ -17668,6 +17719,18 @@ msgstr ""
 "החשבון. עלייך ללחוץ על הקישור כדי לסיים את תהליך ההרשמה. לא קיבלת את ההודעה?"
 " אנא בדוק את תיקיית הדואר זבל בתיבת הדוא\"ל שלך ואשר קבלת הודעות "
 "מ-class.stanford.edu, אחרת לא תוכל לקבל הודעות דואר אלקטרוני מהקורסים."
+
+#: themes/stanford-style/lms/templates/register-sidebar.html
+msgid "Need help in registering with {platform_name}?"
+msgstr "צריך עזרה ברישום ל{platform_name}?"
+
+#: themes/stanford-style/lms/templates/register-sidebar.html
+msgid ""
+"Once registered, most questions can be answered in the course specific "
+"discussion forums or through the FAQs."
+msgstr ""
+"לאחר הרישום, ניתן למצוא תשובות לרוב השאלות בפורומים או דרך עמוד \"שאלות "
+"נפוצות\"."
 
 #: themes/stanford-style/lms/templates/static_templates/tos.html
 msgid "Put your Terms of Service here!"
@@ -19818,22 +19881,6 @@ msgstr ""
 msgid "Learn more about content libraries"
 msgstr "למד עוד על ספריות תוכן"
 
-#: cms/templates/login.html cms/templates/widgets/header.html
-msgid "Sign In"
-msgstr "כניסה"
-
-#: cms/templates/login.html
-msgid "Sign In to {studio_name}"
-msgstr "התחבר ל{studio_name}"
-
-#: cms/templates/login.html
-msgid "Don't have a {studio_name} Account? Sign up!"
-msgstr "עדיין אין חשבון ב{studio_name}? הירשם עכשיו!"
-
-#: cms/templates/login.html
-msgid "Required Information to Sign In to {studio_name}"
-msgstr "מידע חובה הדרוש להתחברות ל{studio_name}"
-
 #: cms/templates/manage_users.html
 msgid "Course Team Settings"
 msgstr "הגדרות צוות הקורס"
@@ -20986,15 +21033,11 @@ msgstr ""
 msgid "Your course creator status for {studio_name}"
 msgstr "סטטוס יוצר הקורס עבור {studio_name}"
 
-#: cms/templates/registration/activation_complete.html
-msgid "You can now {link_start}login{link_end}."
-msgstr "כעת הנך יכול {link_start}להיכנס למערכת{link_end}."
-
 #: cms/templates/registration/reg_complete.html
 msgid ""
-"An activation link has been sent to {email}, along with instructions for "
-"activating your account."
-msgstr "נשלח קישור הפעלה ל-{email}, יחד עם הוראות להפעלת החשבון."
+"We've sent an email message to {email} with instructions for activating your"
+" account."
+msgstr ""
 
 #. Translators: 'EdX', 'edX', 'Studio', and 'Open edX' are trademarks of 'edX
 #. Inc.'. Please do not translate any of these trademarks and company names.

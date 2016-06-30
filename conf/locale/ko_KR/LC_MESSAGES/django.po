@@ -84,7 +84,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-06-23 15:31+0000\n"
+"POT-Creation-Date: 2016-06-30 16:00+0000\n"
 "PO-Revision-Date: 2016-05-09 11:27+0000\n"
 "Last-Translator: Sarina Canelake <sarina@edx.org>\n"
 "Language-Team: Korean (Korea) (http://www.transifex.com/open-edx/edx-platform/language/ko_KR/)\n"
@@ -826,8 +826,8 @@ msgstr "이메일 또는 비밀번호가 일치하지 않습니다. 다시 한�
 
 #: common/djangoapps/student/views.py
 msgid ""
-"This account has not been activated. We have sent another activation "
-"message. Please check your email for the activation instructions."
+"Before you sign in, you need to activate your account. We have sent you an "
+"email message with instructions for activating your account."
 msgstr ""
 
 #: common/djangoapps/student/views.py
@@ -1788,7 +1788,6 @@ msgid "XML data for the annotation"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/annotatable_module.py
-#: common/lib/xmodule/xmodule/discussion_module.py
 #: common/lib/xmodule/xmodule/html_module.py
 #: common/lib/xmodule/xmodule/imageannotation_module.py
 #: common/lib/xmodule/xmodule/library_content_module.py
@@ -1910,7 +1909,6 @@ msgid "Per Student"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/capa_base.py
-#: common/lib/xmodule/xmodule/discussion_module.py
 msgid "XML data for the problem"
 msgstr ""
 
@@ -2869,34 +2867,6 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "General"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/discussion_module.py
-msgid "Discussion Id"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/discussion_module.py
-msgid "The id is a unique identifier for the discussion. It is non editable."
-msgstr ""
-
-#: common/lib/xmodule/xmodule/discussion_module.py
-msgid "Category"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/discussion_module.py
-msgid ""
-"A category name for the discussion. This name appears in the left pane of "
-"the discussion forum for the course."
-msgstr ""
-
-#: common/lib/xmodule/xmodule/discussion_module.py
-msgid "Subcategory"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/discussion_module.py
-msgid ""
-"A subcategory name for the discussion. This name appears in the left pane of"
-" the discussion forum for the course."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/html_module.py
@@ -5232,6 +5202,38 @@ msgstr ""
 
 #: lms/djangoapps/email_marketing/models.py
 msgid "Sailthru template to use on activation send. "
+msgstr ""
+
+#: lms/djangoapps/email_marketing/models.py
+msgid "Sailthru template to use on abandoned cart reminder. "
+msgstr ""
+
+#: lms/djangoapps/email_marketing/models.py
+msgid "Sailthru minutes to wait before sending abandoned cart message."
+msgstr ""
+
+#: lms/djangoapps/email_marketing/models.py
+msgid "Sailthru send template to use on enrolling for audit. "
+msgstr ""
+
+#: lms/djangoapps/email_marketing/models.py
+msgid "Sailthru send template to use on upgrading a course. "
+msgstr ""
+
+#: lms/djangoapps/email_marketing/models.py
+msgid "Sailthru send template to use on purchasing a course seat. "
+msgstr ""
+
+#: lms/djangoapps/email_marketing/models.py
+msgid "Use the Sailthru content API to fetch course tags."
+msgstr ""
+
+#: lms/djangoapps/email_marketing/models.py
+msgid "Number of seconds to cache course content retrieved from Sailthru."
+msgstr ""
+
+#: lms/djangoapps/email_marketing/models.py
+msgid "Cost in cents to report to Sailthru for enrolls."
 msgstr ""
 
 #: lms/djangoapps/instructor/paidcourse_enrollment_report.py
@@ -8408,6 +8410,12 @@ msgid ""
 msgstr ""
 
 #: openedx/core/djangoapps/user_api/preferences/api.py
+msgid ""
+"Value '{preference_value}' not valid for preference '{preference_key}': Not "
+"in timezone set."
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/preferences/api.py
 msgid "Save failed for user preference '{key}' with value '{value}'."
 msgstr ""
 
@@ -8437,6 +8445,7 @@ msgstr ""
 #: lms/templates/login.html lms/templates/provider_login.html
 #: lms/templates/register-form.html lms/templates/signup_modal.html
 #: lms/templates/sysadmin_dashboard.html
+#: themes/red-theme/cms/templates/login.html
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "Password"
 msgstr "비밀번호"
@@ -8577,6 +8586,49 @@ msgstr ""
 
 #: openedx/core/lib/gating/api.py
 msgid "Gating milestone for {usage_key}"
+msgstr ""
+
+#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
+msgid "Display name for this component"
+msgstr ""
+
+#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
+msgid "Category"
+msgstr ""
+
+#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
+msgid "Week 1"
+msgstr ""
+
+#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
+msgid ""
+"A category name for the discussion. This name appears in the left pane of "
+"the discussion forum for the course."
+msgstr ""
+
+#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
+msgid "Subcategory"
+msgstr ""
+
+#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
+msgid ""
+"A subcategory name for the discussion. This name appears in the left pane of"
+" the discussion forum for the course."
+msgstr ""
+
+#: pavelib/utils/passthrough_opts.py
+#, python-format
+msgid "%s option requires an argument"
+msgstr ""
+
+#: pavelib/utils/passthrough_opts.py
+#, python-format
+msgid "%s option requires %d arguments"
+msgstr ""
+
+#: pavelib/utils/passthrough_opts.py
+#, python-format
+msgid "%s option does not take a value"
 msgstr ""
 
 #: cms/djangoapps/contentstore/course_group_config.py
@@ -9080,10 +9132,28 @@ msgstr "강좌"
 msgid "Programs"
 msgstr ""
 
+#: cms/templates/login.html cms/templates/widgets/header.html
+#: themes/red-theme/cms/templates/login.html
+msgid "Sign In"
+msgstr ""
+
+#: cms/templates/login.html themes/red-theme/cms/templates/login.html
+msgid "Sign In to {studio_name}"
+msgstr ""
+
+#: cms/templates/login.html themes/red-theme/cms/templates/login.html
+msgid "Don't have a {studio_name} Account? Sign up!"
+msgstr ""
+
+#: cms/templates/login.html themes/red-theme/cms/templates/login.html
+msgid "Required Information to Sign In to {studio_name}"
+msgstr ""
+
 #: cms/templates/login.html cms/templates/register.html
 #: lms/templates/help_modal.html lms/templates/login.html
 #: lms/templates/provider_login.html lms/templates/register-form.html
 #: lms/templates/register-shib.html lms/templates/signup_modal.html
+#: themes/red-theme/cms/templates/login.html
 #: themes/stanford-style/lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid "E-mail"
@@ -9095,13 +9165,14 @@ msgstr "이메일"
 #: cms/templates/login.html cms/templates/manage_users.html
 #: cms/templates/manage_users_lib.html cms/templates/register.html
 #: lms/templates/login.html lms/templates/register-form.html
-#: lms/templates/register-shib.html
+#: lms/templates/register-shib.html themes/red-theme/cms/templates/login.html
 #: themes/stanford-style/lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid "example: username@domain.com"
 msgstr "예: username@domain.com"
 
 #: cms/templates/login.html lms/templates/login.html
+#: themes/red-theme/cms/templates/login.html
 msgid "Forgot password?"
 msgstr "비밀번호를 잊어버리셨나요?"
 
@@ -9162,6 +9233,11 @@ msgstr "계정이 이미 활성화되어 있습니다."
 #: lms/templates/registration/activation_complete.html
 msgid "Visit your {link_start}dashboard{link_end} to see your courses."
 msgstr "강좌를 보기 위해  {link_start}대시보드{link_end}로 이동하세요. "
+
+#: cms/templates/registration/activation_complete.html
+#: lms/templates/registration/activation_complete.html
+msgid "You can now {link_start}sign in{link_end}."
+msgstr ""
 
 #: cms/templates/widgets/header.html lms/templates/navigation.html
 msgid "Choose Language"
@@ -9711,8 +9787,8 @@ msgid "Need Help?"
 msgstr "도움이 필요하세요?"
 
 #: lms/templates/login-sidebar.html
-msgid "Looking for help in logging in or with your {platform_name} account?"
-msgstr "{platform_name}로 로그인하는데 도움이 필요하세요?"
+msgid "Looking for help signing in or with your {platform_name} account?"
+msgstr ""
 
 #: lms/templates/login-sidebar.html
 msgid "View our help section for answers to commonly asked questions."
@@ -10162,19 +10238,15 @@ msgstr "다음 단계"
 
 #: lms/templates/register-sidebar.html
 msgid ""
-"As part of joining {platform_name}, you will receive an activation email.  "
-"You must click on the activation link to complete the process.  Don't see "
-"the email?  Check your spam folder and mark {platform_name} emails as 'not "
-"spam'.  At {platform_name}, we communicate mostly through email."
+"As part of joining {platform_name}, you will receive an email message with "
+"instructions for activating your account. Don't see the email? Check your "
+"spam folder and mark {platform_name} emails as 'not spam'. At "
+"{platform_name}, we communicate mostly through email."
 msgstr ""
-"{platform_name}에 등록하면 확인 이메일을 받을 것 입니다. 등록 과정을 완료하려면 활성화 링크를 클릭해야 합니다.이메일이 "
-"표시되지 않나요? 스팸 폴더를 확인해서 {platform_name}에서 온 이메일들을 \"스팸아님\"으로 체크하세요. "
-"{platform_name} 에서는 주로 이메일을 통해 통신을 합니다."
 
 #: lms/templates/register-sidebar.html
-#: themes/stanford-style/lms/templates/register-sidebar.html
-msgid "Need help in registering with {platform_name}?"
-msgstr "{platform_name} 에 등록하는데 도움이 필요하십니까?"
+msgid "Need help registering with {platform_name}?"
+msgstr ""
 
 #: lms/templates/register-sidebar.html
 #: themes/stanford-style/lms/templates/register-sidebar.html
@@ -10182,11 +10254,11 @@ msgid "View our FAQs for answers to commonly asked questions."
 msgstr "자주하는 질문들에 대한 답을 보려면 자주하는질문을 보세요."
 
 #: lms/templates/register-sidebar.html
-#: themes/stanford-style/lms/templates/register-sidebar.html
 msgid ""
-"Once registered, most questions can be answered in the course specific "
-"discussion forums or through the FAQs."
-msgstr "일단 등록하면 대부분의 질문에 대한 답은 강좌의 게시판이나 FAQ를 통해 제공됩니다."
+"You can find the answers to most of your questions in our list of FAQs. "
+"After you enroll in a course, you can also find answers in the course "
+"discussions."
+msgstr ""
 
 #: lms/templates/register.html
 msgid "Register for {platform_name}"
@@ -10212,6 +10284,10 @@ msgstr "재구독 성공!"
 msgid ""
 "You have re-enabled forum notification emails from {platform_name}. You may "
 "{dashboard_link_start}return to your dashboard{link_end}."
+msgstr ""
+
+#: lms/templates/seq_module.html
+msgid "This exam is hidden from the learner."
 msgstr ""
 
 #: lms/templates/seq_module.html
@@ -11209,22 +11285,22 @@ msgid "Open Calculator"
 msgstr "계산기 열기"
 
 #: lms/templates/calculator/toggle_calculator.html
-msgid "Calculator Input"
-msgstr "계산기 입력"
+msgid "Enter equation"
+msgstr ""
 
 #: lms/templates/calculator/toggle_calculator.html
 msgid "Calculator Input Field"
 msgstr "계산 입력"
 
 #: lms/templates/calculator/toggle_calculator.html
+msgid "Hints"
+msgstr "힌트"
+
+#: lms/templates/calculator/toggle_calculator.html
 msgid ""
 "Use the arrow keys to navigate the tips or use the tab key to return to the "
 "calculator"
 msgstr "방향키를 이용해 입력커서를 이동시키거나, 탭키를 이용해 계산기로 돌아가세요."
-
-#: lms/templates/calculator/toggle_calculator.html
-msgid "Hints"
-msgstr "힌트"
 
 #: lms/templates/calculator/toggle_calculator.html
 msgid ""
@@ -11296,7 +11372,6 @@ msgstr "소수"
 msgid "Operators"
 msgstr "연산자"
 
-#. Translators: Please do not translate mathematical symbols.
 #: lms/templates/calculator/toggle_calculator.html
 msgid "+ - * / (add, subtract, multiply, divide)"
 msgstr "+ - * / (더하기, 빼기, 곱하기, 나누기)"
@@ -11365,8 +11440,8 @@ msgid "Calculate"
 msgstr "계산하다"
 
 #: lms/templates/calculator/toggle_calculator.html
-msgid "Calculator Output"
-msgstr "계산기 출력"
+msgid "Result"
+msgstr ""
 
 #: lms/templates/ccx/coach_dashboard.html
 msgid "CCX Coach Dashboard"
@@ -12754,19 +12829,19 @@ msgid "Results:"
 msgstr "결과"
 
 #: lms/templates/discussion/_discussion_course_navigation.html
-#: lms/templates/discussion/_discussion_module.html
+#: lms/templates/discussion/_discussion_inline.html
 msgid "Add a Post"
 msgstr ""
 
-#: lms/templates/discussion/_discussion_module.html
+#: lms/templates/discussion/_discussion_inline.html
 msgid "Show Discussion"
 msgstr "게시물 보기"
 
-#: lms/templates/discussion/_discussion_module_studio.html
+#: lms/templates/discussion/_discussion_inline_studio.html
 msgid "To view live discussions, click Preview or View Live in Unit Settings."
 msgstr "게시판을 보려면, 학습활동 설정에서 미리 보기나 적용 결과 보기를 클릭하세요."
 
-#: lms/templates/discussion/_discussion_module_studio.html
+#: lms/templates/discussion/_discussion_inline_studio.html
 msgid "Discussion ID: {discussion_id}"
 msgstr "토의 ID: {discussion_id}"
 
@@ -12971,26 +13046,24 @@ msgid "Sincerely yours,The {course_name} Team"
 msgstr "감사합니다. {course_name} 운영팀"
 
 #: lms/templates/emails/activation_email.txt
-msgid "Thank you for signing up for {platform_name}."
-msgstr "{platform_name} 서비스 가입 신청을 환영합니다."
+msgid "Thank you for creating an account with {platform_name}!"
+msgstr ""
 
 #: lms/templates/emails/activation_email.txt
 msgid ""
-"Change your life and start learning today by activating your {platform_name}"
-" account. Click on the link below or copy and paste it into your browser's "
-"address bar."
+"There's just one more step before you can enroll in a course: you need to "
+"activate your {platform_name} account. To activate your account, click the "
+"following link. If that doesn't work, copy and paste the link into your "
+"browser's address bar."
 msgstr ""
-"{platform_name} 계정을 활성화하세요. 배움이 시작되고, 삶을 바꿉니다.  아래의 링크를 클릭하거나, 주소 창에 복사하여 "
-"붙여넣기하세요. "
 
 #: lms/templates/emails/activation_email.txt
 msgid ""
-"If you didn't request this, you don't need to do anything; you won't receive"
-" any more email from us. Please do not reply to this e-mail; if you require "
-"assistance, check the help section of the {platform_name} website."
+"If you didn't create an account, you don't need to do anything; you won't "
+"receive any more email from us. If you need assistance, please do not reply "
+"to this email message. Check the help section of the {platform_name} "
+"website."
 msgstr ""
-"만약 귀하가 한 것이 아니라면, 이러한 이메일을 더 받지 않을 것입니다. 답장하지 않으셔도 됩니다. 도움이 필요하다면,  "
-"{platform_name}  웹사이트의 도움말 섹션을 확인하세요."
 
 #: lms/templates/emails/activation_email_subject.txt
 msgid "Activate Your {platform_name} Account"
@@ -15416,27 +15489,24 @@ msgid "Manage your data: {permission}"
 msgstr ""
 
 #: lms/templates/registration/activate_account_notice.html
-msgid "Thanks for Registering!"
-msgstr "등록해주셔서 감사합니다."
+msgid "You're almost there!"
+msgstr ""
 
 #: lms/templates/registration/activate_account_notice.html
 msgid ""
-"You've successfully created an account on {platform_name}. We've sent an "
-"account activation message to {email_start}{email}{email_end}. To activate "
-"your account and start enrolling in courses, click the link in the message."
+"There's just one more step: Before you enroll in a course, you need to "
+"activate your account. We've sent an email message to "
+"{email_start}{email}{email_end} with instructions for activating your "
+"account. If you don't receive this message, check your spam folder."
 msgstr ""
 
 #: lms/templates/registration/activation_complete.html
-msgid "Activation Complete!"
-msgstr "활성화 완료!"
+msgid "Account Activated"
+msgstr ""
 
 #: lms/templates/registration/activation_complete.html
-msgid "Account already active!"
-msgstr "계정이 이미 활성화되어 있습니다."
-
-#: lms/templates/registration/activation_complete.html
-msgid "You can now {link_start}log in{link_end}."
-msgstr "지금 {link_start}로그인{link_end} 할 수 있습니다."
+msgid "Account already active"
+msgstr ""
 
 #: lms/templates/registration/activation_invalid.html
 msgid "Activation Invalid"
@@ -15444,15 +15514,14 @@ msgstr "활성화 무효함"
 
 #: lms/templates/registration/activation_invalid.html
 msgid ""
-"Something went wrong. Check to make sure the URL you went to was correct -- "
-"e-mail programs will sometimes split it into two lines. If you still have "
-"issues, e-mail us to let us know what happened at "
-"{email_start}{email}{email_end}."
+"Something went wrong. Email programs sometimes split URLs into two lines, so"
+" make sure the URL you're using is formatted correctly. If you still have "
+"issues, send us an email message at {email_start}{email}{email_end}."
 msgstr ""
 
 #: lms/templates/registration/activation_invalid.html
-msgid "Or you can go back to the {link_start}home page{link_end}."
-msgstr "혹은 {link_start}홈 페이지{link_end}로 되돌아 갈 수 있습니다."
+msgid "Return to the {link_start}home page{link_end}."
+msgstr ""
 
 #: lms/templates/registration/password_reset_complete.html
 msgid "Your Password Reset is Complete"
@@ -16333,14 +16402,6 @@ msgstr ""
 msgid "Register Now"
 msgstr ""
 
-#: themes/red-theme/lms/templates/header.html
-msgid ""
-"<strong>Warning:</strong> Your browser is not fully supported. We strongly "
-"recommend using {chrome_link} or {ff_link}."
-msgstr ""
-"<strong>경고:</strong> 사용하고 있는 브라우저로는 제대로 작동하지 않을 수 있습니다.  {chrome_link} 이나 "
-"{ff_link} 사용을 권장합니다."
-
 #: themes/stanford-style/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/static_templates/tos.html
 msgid "Copyright"
@@ -16349,10 +16410,6 @@ msgstr ""
 #: themes/stanford-style/lms/templates/footer.html
 msgid "Copyright {year}. All rights reserved."
 msgstr ""
-
-#: themes/stanford-style/lms/templates/index.html
-msgid "Free courses from <strong>{university_name}</strong>"
-msgstr "<strong>{university_name}</strong> 에서 제공하는 무료 강좌들"
 
 #: themes/stanford-style/lms/templates/index.html
 msgid "For anyone, anywhere, anytime"
@@ -16368,6 +16425,16 @@ msgstr ""
 "확인 이메일을 받을 것 입니다. 등록 과정을 완료하려면 활성화 링크를 클릭해야 합니다.이메일을 표시되지 않나요? 스팸 폴더를 확인해서  "
 "class.stanford.edu에서 온 이메일들을 \"스팸아님\"으로 체크하세요. 그래야 강좌에서 보내온 이메일을 수신 할 수 "
 "있습니다."
+
+#: themes/stanford-style/lms/templates/register-sidebar.html
+msgid "Need help in registering with {platform_name}?"
+msgstr "{platform_name} 에 등록하는데 도움이 필요하십니까?"
+
+#: themes/stanford-style/lms/templates/register-sidebar.html
+msgid ""
+"Once registered, most questions can be answered in the course specific "
+"discussion forums or through the FAQs."
+msgstr "일단 등록하면 대부분의 질문에 대한 답은 강좌의 게시판이나 FAQ를 통해 제공됩니다."
 
 #: themes/stanford-style/lms/templates/static_templates/tos.html
 msgid "Put your Terms of Service here!"
@@ -18377,22 +18444,6 @@ msgstr ""
 msgid "Learn more about content libraries"
 msgstr "콘텐츠 보관함에 대해 자세히 알아보기"
 
-#: cms/templates/login.html cms/templates/widgets/header.html
-msgid "Sign In"
-msgstr ""
-
-#: cms/templates/login.html
-msgid "Sign In to {studio_name}"
-msgstr ""
-
-#: cms/templates/login.html
-msgid "Don't have a {studio_name} Account? Sign up!"
-msgstr ""
-
-#: cms/templates/login.html
-msgid "Required Information to Sign In to {studio_name}"
-msgstr ""
-
 #: cms/templates/manage_users.html
 msgid "Course Team Settings"
 msgstr "강좌 팀 설정"
@@ -19475,15 +19526,11 @@ msgstr "{studio_name} 에서의 강좌 개설 권한이 폐지되었습니다. �
 msgid "Your course creator status for {studio_name}"
 msgstr "{studio_name} 강좌 개설 준비 상태"
 
-#: cms/templates/registration/activation_complete.html
-msgid "You can now {link_start}login{link_end}."
-msgstr "이제 {link_start}로그인{link_end} 할 수 있습니다."
-
 #: cms/templates/registration/reg_complete.html
 msgid ""
-"An activation link has been sent to {email}, along with instructions for "
-"activating your account."
-msgstr "당신 계정을 활성화 시킬수 있는 링크를 설명과 함께 {email},로 보냈습니다. "
+"We've sent an email message to {email} with instructions for activating your"
+" account."
+msgstr ""
 
 #. Translators: 'EdX', 'edX', 'Studio', and 'Open edX' are trademarks of 'edX
 #. Inc.'. Please do not translate any of these trademarks and company names.

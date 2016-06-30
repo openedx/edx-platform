@@ -965,7 +965,6 @@
     "Only properly formatted .csv files will be accepted.": "Solo archivos .csv correctamente formateados pueden ser utilizados.", 
     "Open": "Abrir", 
     "Open Calculator": "Abrir Calculadora", 
-    "Open language menu.": "Abrir men\u00fa de idiomas.", 
     "Open/download this file": "Abrir / descargar este archivo", 
     "OpenAssessment Save Error": "Error al guardar en el servidor OpenAssessment", 
     "Optional Characteristics": "Caracter\u00edsiticas Opcionales", 
