@@ -428,7 +428,8 @@ def register_user(request, extra_context=None):
 
     if third_party_auth.is_enabled() and pipeline.running(request):
         auto_submit = True
-        log.info('####### auto login' '#########')
+    else:
+        auto_submit = False
 
     context = {
         'login_redirect_url': redirect_to,  # This gets added to the query string of the "Sign In" button in the header
