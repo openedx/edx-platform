@@ -2,7 +2,7 @@
 metadata:
     display_name: Checkboxes with Hints and Feedback
     markdown: |
-      
+
       You can provide feedback for each option in a checkbox problem, with distinct feedback depending on whether or not the learner selects that option.
 
       You can also provide compound feedback for a specific combination of answers. For example, if you have three possible answers in the problem, you can configure specific feedback for when a learner selects each combination of possible answers.
@@ -28,42 +28,39 @@ metadata:
       ||A fruit contains seeds of the plant.||
 
 hinted: true
-data: |
-      <problem>
-      
-      <p>You can provide feedback for each option in a checkbox problem, with distinct feedback depending on whether or not the learner selects that option.</p>
+data:   |
+        <problem>
+            <choiceresponse>
+                <p>You can provide feedback for each option in a checkbox problem, with distinct feedback depending on whether or not the learner selects that option.</p>
+                <p>You can also provide compound feedback for a specific combination of answers. For example, if you have three possible answers in the problem, you can configure specific feedback for when a learner selects each combination of possible answers.</p>
+                <p>You can also add hints for learners.</p>
+                <p>Be sure to select Settings to specify a Display Name and other values that apply.</p>
+                <p>Use the following example problem as a model.</p>
+                <label>Which of the following is a fruit? Check all that apply.</label>
+                <checkboxgroup label="Which of the following is a fruit? Check all that apply.">
+                    <choice correct="true">apple
+                        <choicehint selected="true">You are correct that an apple is a fruit because it is the fertilized ovary that comes from an apple tree and contains seeds.</choicehint>
+                        <choicehint selected="false">Remember that an apple is also a fruit.</choicehint>
+                    </choice>
+                    <choice correct="true">pumpkin
+                        <choicehint selected="true">You are correct that a pumpkin is a fruit because it is the fertilized ovary of a squash plant and contains seeds.</choicehint>
+                        <choicehint selected="false">Remember that a pumpkin is also a fruit.</choicehint>
+                    </choice>
+                    <choice correct="false">potato
+                        <choicehint selected="true">A potato is a vegetable, not a fruit, because it does not come from a flower and does not contain seeds.</choicehint>
+                        <choicehint selected="false">You are correct that a potato is a vegetable because it is an edible part of a plant in tuber form.</choicehint>
+                    </choice>
+                    <choice correct="true">tomato
+                        <choicehint selected="true">You are correct that a tomato is a fruit because it is the fertilized ovary of a tomato plant and contains seeds.</choicehint>
+                        <choicehint selected="false">Many people mistakenly think a tomato is a vegetable. However, because a tomato is the fertilized ovary of a tomato plant and contains seeds, it is a fruit.</choicehint>
+                    </choice>
+                    <compoundhint value="A B D">An apple, pumpkin, and tomato are all fruits as they all are fertilized ovaries of a plant and contain seeds.</compoundhint>
+                    <compoundhint value="A B C D">You are correct that an apple, pumpkin, and tomato are all fruits as they all are fertilized ovaries of a plant and contain seeds. However, a potato is not a fruit as it is an edible part of a plant in tuber form and is a vegetable.</compoundhint>
+                </checkboxgroup>
+            </choiceresponse>
 
-      <p>You can also provide compound feedback for a specific combination of answers. For example, if you have three possible answers in the problem, you can configure specific feedback for when a learner selects each combination of possible answers.</p>
-
-      <p>You can also add hints for learners.</p>
-
-      <p>Use the following example problem as a model.</p>
-      
-      <p>Which of the following is a fruit? Check all that apply.</p>
-      <choiceresponse>
-        <checkboxgroup>
-          <choice correct="true">apple
-            <choicehint selected="true">You are correct that an apple is a fruit because it is the fertilized ovary that comes from an apple tree and contains seeds.</choicehint>
-            <choicehint selected="false">Remember that an apple is also a fruit.</choicehint>
-          </choice>
-          <choice correct="true">pumpkin
-            <choicehint selected="true">You are correct that a pumpkin is a fruit because it is the fertilized ovary of a squash plant and contains seeds.</choicehint>
-            <choicehint selected="false">Remember that a pumpkin is also a fruit.</choicehint>
-          </choice>
-          <choice correct="false">potato
-            <choicehint selected="true">A potato is a vegetable, not a fruit, because it does not come from a flower and does not contain seeds.</choicehint>              
-            <choicehint selected="false">You are correct that a potato is a vegetable because it is an edible part of a plant in tuber form.</choicehint>
-          </choice>
-          <choice correct="true">tomato
-            <choicehint selected="true">You are correct that a tomato is a fruit because it is the fertilized ovary of a tomato plant and contains seeds.</choicehint>
-            <choicehint selected="false">Many people mistakenly think a tomato is a vegetable. However, because a tomato is the fertilized ovary of a tomato plant and contains seeds, it a fruit.</choicehint>
-          </choice>
-          <compoundhint value="A B D">An apple, pumpkin, and tomato are all fruits as they all are fertilized ovaries of a plant and contain seeds.</compoundhint>
-          <compoundhint value="A B C D">You are correct that an apple, pumpkin, and tomato are all fruits as they all are fertilized ovaries of a plant and contain seeds. However, a potato is not a fruit as it is an edible part of a plant in tuber form and is classified as a vegetable.</compoundhint>
-        </checkboxgroup>
-      </choiceresponse>
-      <demandhint>
-        <hint>A fruit is the fertilized ovary from a flower.</hint>
-        <hint>A fruit contains seeds of the plant.</hint>
-      </demandhint>
-      </problem>
+            <demandhint>
+                <hint>A fruit is the fertilized ovary from a flower.</hint>
+                <hint>A fruit contains seeds of the plant.</hint>
+            </demandhint>
+        </problem>

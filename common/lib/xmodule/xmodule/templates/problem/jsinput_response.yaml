@@ -5,31 +5,36 @@ metadata:
     showanswer: never
 data: |
       <problem>
-      <p>
-      In these problems (also called custom JavaScript problems or JS Input
-      problems), you add a problem or tool that uses JavaScript in Studio.
-      Studio embeds the problem in an IFrame so that your students can
-      interact with it in the LMS. You can grade your students' work using
-      JavaScript and some basic Python, and the grading is integrated into the
-      edX grading system.
-      </p>
-      <p>
-      The JS Input problem that you create must use HTML, JavaScript, and
-      cascading style sheets (CSS). You can use any application creation tool,
-      such as the Google Web Toolkit (GWT), to create your JS Input problem.
-      </p>
-      <p>
-      For more information, see
-      <a href="http://edx.readthedocs.io/projects/edx-partner-course-staff/en/latest/exercises_tools/custom_javascript.html" target="_blank">
-      Custom JavaScript Problem</a> in <i>Building and Running an edX Course</i>.
-      </p>
-      <p>JavaScript developers can also see
-      <a href="http://edx.readthedocs.io/projects/edx-developer-guide/en/latest/extending_platform/javascript.html" target="_blank">
-      Custom JavaScript Applications</a> in the <i>EdX Developer's Guide</i>.</p>
-      <p>When you add the problem, be sure to select <strong>Settings</strong>
-      to specify a <strong>Display Name</strong> and other values that apply.</p>
-      <p>You can use the following example problem as a model.</p>
+          <p>
+              In these problems (also called custom JavaScript problems or JS Input
+              problems), you add a problem or tool that uses JavaScript in Studio.
+              Studio embeds the problem in an IFrame so that your students can
+              interact with it in the LMS. You can grade your students' work using
+              JavaScript and some basic Python, and the grading is integrated into the
+              edX grading system.
+          </p>
+          <p>
+              The JS Input problem that you create must use HTML, JavaScript, and
+              cascading style sheets (CSS). You can use any application creation tool,
+              such as the Google Web Toolkit (GWT), to create your JS Input problem.
+          </p>
+          <p>
+              For more information, see
+              <a href="http://edx.readthedocs.io/projects/edx-partner-course-staff/en/latest/exercises_tools/custom_javascript.html" target="_blank">
+              Custom JavaScript Problem</a> in <i>Building and Running an edX Course</i>.
+          </p>
+          <p>
+              JavaScript developers can also see
+              <a href="http://edx.readthedocs.io/projects/edx-developer-guide/en/latest/extending_platform/javascript.html" target="_blank">
+              Custom JavaScript Applications</a> in the <i>EdX Developer's Guide</i>.
+          </p>
+          <p>
+              When you add the problem, be sure to select <strong>Settings</strong>
+              to specify a <strong>Display Name</strong> and other values that apply.
+          </p>
+          <p>You can use the following example problem as a model.</p>
 
+          <customresponse cfn="vglcfn">
       <script type="loncapa/python">
       <![CDATA[
       import json
@@ -53,16 +58,14 @@ data: |
         '''
       ]]>
       </script>
-      <p>In the following image, click the objects until the cone is yellow
-      and the cube is blue.</p>
-      <customresponse cfn="vglcfn">
-        <jsinput gradefn="WebGLDemo.getGrade"
-          get_statefn="WebGLDemo.getState"
-          set_statefn="WebGLDemo.setState"
-          initial_state='{"selectedObjects":{"cube":true,"cylinder":false}}'
-          width="400"
-          height="400"
-          html_file="https://studio.edx.org/c4x/edX/DemoX/asset/webGLDemo.html"
-          sop="false"/>
-      </customresponse>
+            <label>In the following image, click the objects until the cone is yellow and the cube is blue.</label>
+            <jsinput gradefn="WebGLDemo.getGrade"
+              get_statefn="WebGLDemo.getState"
+              set_statefn="WebGLDemo.setState"
+              initial_state='{"selectedObjects":{"cube":true,"cylinder":false}}'
+              width="400"
+              height="400"
+              html_file="https://studio.edx.org/c4x/edX/DemoX/asset/webGLDemo.html"
+              sop="false"/>
+          </customresponse>
       </problem>
