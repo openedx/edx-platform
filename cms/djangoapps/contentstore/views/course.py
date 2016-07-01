@@ -91,6 +91,7 @@ from util.organizations_helpers import (
     organizations_enabled,
 )
 from util.string_utils import _has_non_ascii_characters
+from xblock_django.api import deprecated_xblocks
 from xmodule.contentstore.content import StaticContent
 from xmodule.course_module import CourseFields
 from xmodule.course_module import DEFAULT_START_DATE
@@ -599,7 +600,8 @@ def course_index(request, course_key):
         except (ItemNotFoundError, CourseActionStateItemNotFoundError):
             current_action = None
 
-        deprecated_blocks_info = _deprecated_blocks_info(course_module, settings.DEPRECATED_BLOCK_TYPES)
+        deprecated_block_names = [block.name for block in deprecated_xblocks()]
+        deprecated_blocks_info = _deprecated_blocks_info(course_module, deprecated_block_names)
 
         return render_to_response('course_outline.html', {
             'context_course': course_module,

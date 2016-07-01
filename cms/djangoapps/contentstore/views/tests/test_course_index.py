@@ -470,37 +470,24 @@ class TestCourseOutline(CourseTestCase):
         )
 
     @ddt.data(
-        {'publish': True},
-        {'publish': False},
+        [{'publish': True}, ['notes']],
+        [{'publish': False}, ['notes']],
+        [{'publish': True}, ['notes', 'lti']]
     )
     @ddt.unpack
-    def test_verify_deprecated_warning_message_with_single_feature(self, publish):
+    def test_verify_deprecated_warning_message(self, publish, block_types):
         """
-        Verify deprecated warning info for single deprecated feature.
+        Verify deprecated warning info.
         """
-        block_types = ['notes']
-        with override_settings(DEPRECATED_BLOCK_TYPES=block_types):
-            course_module = modulestore().get_item(self.course.location)
-            self._create_test_data(course_module, create_blocks=True, block_types=block_types, publish=publish)
-            info = _deprecated_blocks_info(course_module, block_types)
-            self._verify_deprecated_info(
-                course_module.id,
-                course_module.advanced_modules,
-                info,
-                block_types
-            )
-
-    def test_verify_deprecated_warning_message_with_multiple_features(self):
-        """
-        Verify deprecated warning info for multiple deprecated features.
-        """
-        block_types = ['notes', 'lti']
-        with override_settings(DEPRECATED_BLOCK_TYPES=block_types):
-            course_module = modulestore().get_item(self.course.location)
-            self._create_test_data(course_module, create_blocks=True, block_types=block_types)
-
-            info = _deprecated_blocks_info(course_module, block_types)
-            self._verify_deprecated_info(course_module.id, course_module.advanced_modules, info, block_types)
+        course_module = modulestore().get_item(self.course.location)
+        self._create_test_data(course_module, create_blocks=True, block_types=block_types, publish=publish)
+        info = _deprecated_blocks_info(course_module, block_types)
+        self._verify_deprecated_info(
+            course_module.id,
+            course_module.advanced_modules,
+            info,
+            block_types
+        )
 
     @ddt.data(
         {'delete_vertical': True},
