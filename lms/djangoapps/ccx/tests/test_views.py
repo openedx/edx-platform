@@ -182,6 +182,127 @@ class TestAdminAccessCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
 
 @attr('shard_1')
 @ddt.ddt
+class TestCCXProgressChanges(CcxTestCase, LoginEnrollmentTestCase):
+    """
+    Tests ccx schedule changes in progress page
+    """
+
+    def setUp(self):
+        """
+        Set up tests
+        """
+        super(TestCCXProgressChanges, self).setUp()
+        self.client.login(username=self.coach.username, password="test")
+        self.course = course = SampleCourseFactory.create(default_store=ModuleStoreEnum.Type.split)
+
+        start = datetime.datetime(
+            2016, 5, 12, 2, 42, tzinfo=pytz.UTC
+        )
+        due = datetime.datetime(
+            2016, 7, 7, 0, 0, tzinfo=pytz.UTC
+        )
+        chapter = ItemFactory.create(start=start, parent=course)
+        sequential = ItemFactory.create(parent=chapter, graded=True, format='Homework', start=start, due=due)
+        vertical = ItemFactory.create(parent=sequential, category=u'vertical', start=start, due=due)
+
+        # Trying to wrap the whole thing in a bulk operation fails because it
+        # doesn't find the parents. But we can at least wrap this part...
+        with self.store.bulk_operations(course.id, emit_signals=False):
+            flatten([ItemFactory.create(parent=vertical)] for _ in xrange(2))
+
+    @patch('ccx.views.render_to_response', intercept_renderer)
+    @patch('courseware.views.views.render_to_response', intercept_renderer)
+    def test_edit_schedule(self):
+        """
+        Get CCX schedule, modify it, save it.
+        """
+        self.make_coach()
+        ccx = self.make_ccx()
+        ccx_course_key = CCXLocator.from_course_locator(self.course.id, ccx.id)
+
+        url = reverse('ccx_coach_dashboard', kwargs={'course_id': ccx_course_key})
+
+        response = self.client.get(url)
+
+        schedule = json.loads(response.mako_context['schedule'])  # pylint: disable=no-member
+        self.assertEqual(len(schedule), 1)
+        self.assertEqual(schedule[0]['hidden'], False)
+
+        def unhide(unit):
+            """
+            Recursively unhide a unit and all of its children in the CCX
+            schedule.
+            """
+            unit['hidden'] = False
+            for child in unit.get('children', ()):
+                unhide(child)
+
+        unhide(schedule[0])
+
+        # edit schedule
+        yesterday = datetime.datetime.now() - datetime.timedelta(days=1)
+        start = yesterday.strftime("%Y-%m-%d %H:%M")
+        after_5_days = (yesterday + datetime.timedelta(days=10)).strftime("%Y-%m-%d %H:%M")
+
+        schedule[0]['start'] = start
+        schedule[0]['children'][0]['start'] = start
+        schedule[0]['children'][0]['due'] = after_5_days
+        schedule[0]['children'][0]['children'][0]['start'] = start
+        schedule[0]['children'][0]['children'][0]['due'] = after_5_days
+
+        url = reverse('save_ccx', kwargs={'course_id': ccx_course_key})
+        response = self.client.post(url, json.dumps(schedule), content_type='application/json')
+
+        self.assertEqual(response.status_code, 200)
+        schedule = json.loads(response.content)['schedule']
+        self.assertEqual(schedule[0]['hidden'], False)
+        self.assertEqual(schedule[0]['start'], start)
+        self.assertEqual(schedule[0]['children'][0]['start'], start)
+        self.assertEqual(schedule[0]['children'][0]['due'], after_5_days)
+        self.assertEqual(schedule[0]['children'][0]['children'][0]['due'], after_5_days)
+        self.assertEqual(schedule[0]['children'][0]['children'][0]['start'], start)
+
+        # assertFalse(schedule)
+        self.assert_progress_summery(ccx_course_key, after_5_days)
+
+
+    def assert_progress_summery(self, ccx_course_key, after_5_days):
+        """
+        assert singnal and schedule update.
+        """
+        student = UserFactory.create(is_staff=False)
+
+        # create a sudent and enrol it
+        url = reverse('ccx_manage_student', kwargs={'course_id': ccx_course_key})
+
+        # enroll the first student
+        data = {
+            'student-action': 'add',
+            'student-id': student
+        }
+        response = self.client.post(url, data=data, follow=True)
+        self.assertEqual(response.status_code, 200)
+
+        self.assertTrue(
+            CourseEnrollment.objects.filter(course_id=ccx_course_key, user=student).exists()
+        )
+
+        # login as student
+        self.client.login(username=student.username, password=student.password)
+
+        progress_page_response = self.client.get(
+            reverse('progress', kwargs={'course_id': ccx_course_key})
+        )
+        grade_summary = progress_page_response.mako_context['courseware_summary']  # pylint: disable=no-member
+
+        chapter = grade_summary[0]
+        section = chapter['sections'][0]
+        progress_page_due_date = section['due'].strftime("%Y-%m-%d %H:%M")
+        self.assertEqual(progress_page_due_date, after_5_days)
+
+
+@attr('shard_1')
+@ddt.ddt
 class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
     """
     Tests for Custom Courses views.
@@ -332,7 +453,6 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
         """
         Get CCX schedule, modify it, save it.
         """
-        today.return_value = datetime.datetime(2014, 11, 25, tzinfo=pytz.UTC)
         self.make_coach()
         ccx = self.make_ccx()
         url = reverse(

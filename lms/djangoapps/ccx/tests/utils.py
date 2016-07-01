@@ -54,7 +54,7 @@ class CcxTestCase(SharedModuleStoreTestCase):
         ]
         cls.sequentials = flatten([
             [
-                ItemFactory.create(parent=chapter) for _ in xrange(2)
+                ItemFactory.create(parent=chapter, graded=True, format='Homework', start=start, due=due) for _ in xrange(2)
             ] for chapter in cls.chapters
         ])
         cls.verticals = flatten([
