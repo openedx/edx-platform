@@ -83,15 +83,19 @@ class Command(BaseCommand):
         course_key_str = unicode(course_key)
 
         try:
+            course_enrollments = CourseEnrollment.objects.filter(course_id=course_key, mode=from_mode)
+            logger.info(
+                'Moving %d users from %s to %s in course %s.',
+                course_enrollments.count(), from_mode, to_mode, course_key_str
+            )
+            if not commit:
+                logger.info('Dry run, changes have not been saved. Run again with "commit" argument to save changes')
+                raise Exception('The --commit flag was not given; forcing rollback.')
             with transaction.atomic():
-                queryset = CourseEnrollment.objects.filter(course_id=course_key, mode=from_mode)
-                logger.info(
-                    'Moving %d users from %s to %s in course %s.', queryset.count(), from_mode, to_mode, course_key_str
-                )
-                queryset.update(mode=to_mode)
+                # call `change_mode` which will change the mode and also emit tracking event
+                for enrollment in course_enrollments:
+                    enrollment.change_mode(mode=to_mode)
 
-                if not commit:
-                    raise Exception('The --commit flag was not given; forcing rollback.')
-                logger.info('Finished moving users from %s to %s in course %s.', from_mode, to_mode, course_key_str)
+            logger.info('Finished moving users from %s to %s in course %s.', from_mode, to_mode, course_key_str)
         except Exception:  # pylint: disable=broad-except
             logger.info('No users moved.')
