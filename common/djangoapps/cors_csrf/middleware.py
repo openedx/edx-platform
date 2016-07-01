@@ -135,7 +135,7 @@ class CsrfCrossDomainCookieMiddleware(object):
                 max_age=settings.CSRF_COOKIE_AGE,
                 domain=settings.CROSS_DOMAIN_CSRF_COOKIE_DOMAIN,
                 path=settings.CSRF_COOKIE_PATH,
-                secure=True
+                secure=settings.CROSS_DOMAIN_CSRF_COOKIE_SECURE
             )
             log.debug(
                 "Set cross-domain CSRF cookie '%s' for domain '%s'",
