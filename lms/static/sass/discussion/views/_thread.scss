@@ -9,136 +9,132 @@
 // * +post - individual element styling
 // * +post - answered question - collapsed comment area
 
-// +general thread layout
-body.discussion, .discussion-module {
-
-  // post layout
-  .discussion-post {
+// post layout
+.discussion-post {
     padding: 0 ($baseline/2);
 
     .wrapper-post-header {
-      padding-bottom: 0;
-      margin-bottom: ($baseline*0.75);
+        padding-bottom: 0;
+        margin-bottom: ($baseline*0.75);
     }
 
     .post-header-content {
-      display: inline-block;
-      width: flex-grid(9,12);
+        display: inline-block;
+        width: flex-grid(9,12);
     }
 
     .post-header-actions {
-      @include float(right);
+        @include float(right);
     }
 
     .post-body {
-      width: flex-grid(10,12);
+        width: flex-grid(10,12);
     }
-  }
+}
 
-  .posted-details {
+.posted-details {
     @extend %t-copy-sub2;
     margin-top: ($baseline/5);
     color: $gray-d1;
 
     .username {
-      @extend %t-strong;
-      display: inline;
+        @extend %t-strong;
+        display: inline;
     }
 
     .timeago, .top-post-status {
-      color: inherit;
+        color: inherit;
     }
-  }
+}
 
-  // response layout
-  .discussion-response {
+// response layout
+.discussion-response {
     min-height: ($baseline*5);
 
     .response-header-content {
-      display: inline-block;
-      vertical-align: top;
-      width: flex-grid(11,12);
+        display: inline-block;
+        vertical-align: top;
+        width: flex-grid(11,12);
     }
 
     .response-header-actions {
-      @include float(right);
-      @include right($baseline);
-      position: absolute;
-      top: $baseline;
+        @include float(right);
+        @include right($baseline);
+        position: absolute;
+        top: $baseline;
     }
-  }
+}
 
-  // comments layout
-  .discussion-comment {
+// comments layout
+.discussion-comment {
 
     .response-body {
-      @extend %t-copy-sub2;
-      display: inline-block;
-      margin-bottom: ($baseline/2);
-      width: flex-grid(10,12);
+        @extend %t-copy-sub2;
+        display: inline-block;
+        margin-bottom: ($baseline/2);
+        width: flex-grid(10,12);
 
-      p + p {
-        margin-top: 12px;
-      }
+        p + p {
+            margin-top: 12px;
+        }
     }
 
     .comment-actions-list {
-      @include float(right);
+        @include float(right);
     }
-  }
 }
 
 // +thread - wrapper styling
 .thread-wrapper {
-  .thread-main-wrapper {
-    padding-bottom: $baseline;
-  }
+    .thread-main-wrapper {
+        padding-bottom: $baseline;
+    }
 }
 
 // +thread - elements - shared styles
 body.discussion {
 
-  .discussion-post, .discussion-response, .discussion-comment {
-    @include clearfix();
+    .discussion-post, .discussion-response, .discussion-comment {
+        @include clearfix();
 
-    // thread - images
-    .author-image {
-      @include margin-right($baseline/2);
-      display: inline-block;
-      vertical-align: top;
+        // thread - images
+        .author-image {
+            @include margin-right($baseline/2);
+            display: inline-block;
+            vertical-align: top;
 
-      // STATE: No profile image
-      &:empty {
-        display: none;
-      }
+            // STATE: No profile image
+            &:empty {
+                display: none;
+            }
 
-      // CASE: post image
-      &.level-post {
-        height: $post-image-dimension;
-        width: $post-image-dimension;
-      }
+            // CASE: post image
+            &.level-post {
+                height: $post-image-dimension;
+                width: $post-image-dimension;
+            }
 
-      // CASE: response image
-      &.level-response {
-        height: $response-image-dimension;
-        width: $response-image-dimension;
-      }
+            // CASE: response image
+            &.level-response {
+                height: $response-image-dimension;
+                width: $response-image-dimension;
+            }
 
-      // CASE: comment image
-      &.level-comment {
-        height: $comment-image-dimension;
-        width: $comment-image-dimension;
-      }
+            // CASE: comment image
+            &.level-comment {
+                height: $comment-image-dimension;
+                width: $comment-image-dimension;
+            }
 
-      img {
-        border-radius: 3px;
-      }
+            img {
+                border-radius: 3px;
+            }
+        }
     }
-  }
 
-  .discussion-response .response-body {
-    @include padding-right($baseline); //ensures content doesn't overlap on post or response actions.
-  }
+    .discussion-response .response-body {
+        @include padding-right($baseline); //ensures content doesn't overlap on post or response actions.
+    }
 }
 
 // +post - individual element styling
@@ -146,62 +142,170 @@ body.discussion .discussion-post,
 body.discussion .discussion-article,
 body.view-in-course .discussion-post,
 body.view-in-course .discussion-article {
-  // NOTE: discussion-article is used for inline discussion modules.
-  @include clearfix();
+    // NOTE: discussion-article is used for inline discussion modules.
+    @include clearfix();
 
-  .post-header-content {
+    .post-header-content {
 
-    // post title
-    .post-title {
-      @extend %t-title4;
-      @extend %t-ultrastrong;
-      margin-bottom: ($baseline/4);
-      letter-spacing: 0;
-    }
-  }
-
-  // post body
-  .post-body {
-    @extend %t-copy-sub1;
-    // clear: both; //TO-DO: confirm that removing this is ok for all cases of discussion posts.
-  }
-
-  // post context
-  .post-context {
-    @extend %t-copy-sub2;
-    margin-top: $baseline;
-    color: $gray-d1;
-
-    // CASE: no courseware context or cohort visibility rules
-    &:empty {
-      display: none;
+        // post title
+        .post-title {
+            @extend %t-title4;
+            @extend %t-ultrastrong;
+            margin-bottom: ($baseline/4);
+            letter-spacing: 0;
+        }
     }
 
-    // post visibility - cohorts
-    .group-visibility-label {
-      margin-top: ($baseline/4);
+    // post body
+    .post-body {
+        @extend %t-copy-sub1;
+        // clear: both; //TO-DO: confirm that removing this is ok for all cases of discussion posts.
     }
-  }
+
+    // post context
+    .post-context {
+        @extend %t-copy-sub2;
+        margin-top: $baseline;
+        color: $gray-d1;
+
+        // CASE: no courseware context or cohort visibility rules
+        &:empty {
+            display: none;
+        }
+
+        // post visibility - cohorts
+        .group-visibility-label {
+            margin-top: ($baseline/4);
+        }
+    }
 }
 
 // Layout control for discussion modules that does not apply to the discussion board
 .discussion-module {
-  .discussion-thread {
+    .btn-brand {
+        @include blue-button;
+        display: inline-block;
+        padding-bottom: ($baseline/10);
+        height: 37px;
+
+        &:hover, &:focus {
+            border-color: #222;
+        }
+    }
+}
+
+// Styling for discussion threads
+.discussion-thread {
+    padding: 0;
+    margin-bottom: $baseline;
+    @include transition(all .25s linear 0s);
+
+    p {
+        margin-bottom: 0;
+    }
+
     .thread-main-wrapper, .thread-responses-wrapper {
-      padding: $baseline;
+        padding: $baseline;
     }
-  }
 
-  .btn-brand {
-    @include blue-button;
-    display: inline-block;
-    padding-bottom: ($baseline/10);
-    height: 37px;
+    .discussion-article {
+        @include transition(all .2s linear 0s);
+        border: 1px solid $forum-color-border;
+        border-radius: 3px;
+        min-height: 0;
+        background: $forum-color-background;
+        box-shadow: 0 1px 0 $shadow;
+        @include transition(all .2s linear 0s);
 
-    &:hover, &:focus {
-      border-color: #222;
+        .thread-wrapper {
+            @include border-radius(3px, 3px, 0, 0);
+            position: relative;
+            overflow-x: hidden;
+            overflow-y: auto;
+            max-height: 600px;
+            background-color: $forum-color-background;
+
+            .discussion-post {
+
+                .inline-comment-count {
+                    @extend %ui-depth2;
+                    position: relative;
+                    float: right;
+                    display: block;
+                    height: 27px;
+                    margin-top: 6px;
+                    margin-right: 8px;
+                    padding: 0 8px;
+                    border-radius: ($baseline/4);
+                    font-size: 12px;
+                    font-weight: 400;
+                    line-height: 25px;
+                    color: #888;
+                }
+            }
+
+            .responses {
+                header {
+                    padding-bottom: 0;
+                    margin-bottom: ($baseline*0.75);
+
+                    .posted-by {
+                        float: left;
+                        margin-right: ($baseline/4);
+                        font-size: 16px;
+                    }
+                }
+
+                .response-body {
+                    margin-bottom: 0.2em;
+                    font-size: 14px;
+                }
+            }
+
+            .discussion-reply-new {
+                .wmd-input {
+                    height: 120px;
+                }
+            }
+
+            // Content that is hidden by default in the inline view
+            .post-extended-content {
+                display: none;
+            }
+        }
+
+        .post-tools {
+            box-shadow: 0 1px 1px $shadow inset;
+            background: $gray-l6;
+
+            &:hover {
+                background: #fcfcfc;
+
+                .icon {
+                    color: $link-hover;
+                }
+            }
+
+            a {
+                display: block;
+                padding: ($baseline*0.25) $baseline;
+                font-size: 12px;
+                line-height: 30px;
+
+                .icon {
+                    color: $link-color;
+                    margin-right: ($baseline*0.25);
+                }
+            }
+        }
     }
-  }
+}
+
+// Custom styling for the list of user threads
+.discussion-user-threads {
+    .discussion-post {
+        padding: $baseline/2;
+    }
 }
 
 .thread-wrapper,

@@ -8,6 +8,7 @@
     }
 
     .container {
+        @include clearfix();
         border: 1px solid $lms-border-color;
         background-color: $lms-container-background-color;
         padding: $baseline;
