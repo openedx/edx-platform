@@ -1941,8 +1941,10 @@ INSTALLED_APPS = (
     'django_comment_client',
     'django_comment_common',
     'discussion_api',
-    'notes',
+    'lms.djangoapps.discussion',
 
+    # Notes
+    'notes',
     'edxnotes',
 
     # Splash screen
