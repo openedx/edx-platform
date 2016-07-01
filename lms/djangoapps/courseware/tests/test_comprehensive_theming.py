@@ -30,10 +30,12 @@ class TestComprehensiveTheming(TestCase):
         `red-theme` has header.html and footer.html so this test
         asserts presence of the content from header.html and footer.html
         """
-        resp = self.client.get('/')
-        self.assertEqual(resp.status_code, 200)
-
+        resp = self.client.get('/', SERVER_NAME='red-theme.org')
+        logger.debug(resp.__dict__)
         logger.debug("\n\nResponse for TestComprehensiveTheming.test_red_footer:\n%s", resp.content)
+
+        # Confirm the HTTP status code (no redirects, not founds, etc.)
+        self.assertEqual(resp.status_code, 200)
 
         # This string comes from header.html
         self.assertContains(resp, "This file is only for demonstration, and is horrendous!")

@@ -1,7 +1,7 @@
 """
 Test helpers for Comprehensive Theming.
 """
-
+import logging
 from functools import wraps
 import os
 import os.path
@@ -16,6 +16,8 @@ from django.contrib.sites.models import Site
 import edxmako
 from openedx.core.djangoapps.theming.models import SiteTheme
 
+logger = logging.getLogger(__name__)
+
 
 def with_comprehensive_theme(theme_dir_name):
     """
@@ -29,8 +31,11 @@ def with_comprehensive_theme(theme_dir_name):
         def _decorated(*args, **kwargs):        # pylint: disable=missing-docstring
             # make a domain name out of directory name
             domain = "{theme_dir_name}.org".format(theme_dir_name=re.sub(r"\.org$", "", theme_dir_name))
+            logger.debug(domain)
             site, __ = Site.objects.get_or_create(domain=domain, name=domain)
+            logger.debug(site.__dict__)
             site_theme, __ = SiteTheme.objects.get_or_create(site=site, theme_dir_name=theme_dir_name)
+            logger.debug(site_theme.__dict__)
 
             with patch('openedx.core.djangoapps.theming.helpers.get_current_site_theme',
                        return_value=site_theme):
