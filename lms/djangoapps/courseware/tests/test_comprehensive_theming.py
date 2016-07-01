@@ -1,5 +1,6 @@
 """Tests of comprehensive theming."""
 # import edxmako
+import logging
 
 from django.conf import settings
 from django.test import TestCase
@@ -9,6 +10,8 @@ from django.contrib import staticfiles
 
 from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme
 # from openedx.core.lib.tempdir import mkdtemp_clean, create_symlink, delete_symlink
+
+logger = logging.getLogger(__name__)
 
 
 class TestComprehensiveTheming(TestCase):
@@ -29,6 +32,9 @@ class TestComprehensiveTheming(TestCase):
         """
         resp = self.client.get('/')
         self.assertEqual(resp.status_code, 200)
+
+        logger.debug("\n\nResponse for TestComprehensiveTheming.test_red_footer:\n%s", resp.content)
+
         # This string comes from header.html
         self.assertContains(resp, "This file is only for demonstration, and is horrendous!")
 

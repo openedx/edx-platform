@@ -1,6 +1,7 @@
 """
     Tests for comprehensive themes.
 """
+import logging
 import unittest
 
 from django.conf import settings
@@ -8,6 +9,8 @@ from django.test import TestCase, override_settings
 from django.contrib import staticfiles
 
 from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme
+
+logger = logging.getLogger(__name__)
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
@@ -32,6 +35,7 @@ class TestComprehensiveThemeLMS(TestCase):
         """
         resp = self.client.get('/')
         self.assertEqual(resp.status_code, 200)
+        logger.debug("\n\nResponse for TestComprehensiveThemeLMS.test_footer:\n%s", resp.content)
         # This string comes from header.html of test-theme
         self.assertContains(resp, "This is a footer for test-theme.")
 
