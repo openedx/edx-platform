@@ -67,7 +67,7 @@ from openedx.core.djangolib.markup import HTML, Text
   <div class="auth-list-container active">
     <div class="member-list-widget">
       <div class="member-list">
-        <h2> ${_("Student List Management")}</h2>
+        <h2 class="hd hd-2">${_("Student List Management")}</h2>
         %if messages:
           <label for="ccx_std_list_messages" class="sr">${_("CCX student list management response message")}</label>
           <div id="ccx_std_list_messages" tabindex="-1" class="request-response-error">
@@ -79,9 +79,9 @@ from openedx.core.djangolib.markup import HTML, Text
         <table>
           <thead>
             <tr>
-              <td class="label">Username</td>
-              <td class="label">Email</td>
-              <td class="label">Revoke access</td>
+              <th class="label" scope="col">Username</th>
+              <th class="label" scope="col">Email</th>
+              <th class="label" scope="col">Revoke access</th>
             </tr>
           </thead>
           <tbody>
@@ -89,7 +89,7 @@ from openedx.core.djangolib.markup import HTML, Text
             <tr>
               <td>${member.user}</td>
               <td>${member.user.email}</td>
-              <td><a class="revoke"><span class="fa fa-times-circle" aria-hidden="true"></span> ${_("Revoke access")}</a></td>
+              <td><button type="button" class="revoke"><span class="fa fa-times-circle" aria-hidden="true"></span>${_("Revoke access")}</button></td>
             </tr>
             %endfor
           </tbody>
