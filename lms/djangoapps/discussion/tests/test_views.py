@@ -10,7 +10,6 @@ from django.utils import translation
 from lms.lib.comment_client.utils import CommentClientPaginatedResult
 
 from django_comment_common.utils import ThreadContext
-from django_comment_client.forum import views
 from django_comment_client.permissions import get_team
 from django_comment_client.tests.group_id import (
     CohortedTopicGroupIdTestMixin,
@@ -19,6 +18,7 @@ from django_comment_client.tests.group_id import (
 from django_comment_client.tests.unicode import UnicodeTestMixin
 from django_comment_client.tests.utils import CohortedTestCase
 from django_comment_client.utils import strip_none
+from lms.djangoapps.discussion import views
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from util.testing import UrlResetMixin
 from openedx.core.djangoapps.util.testing import ContentGroupTestCase
@@ -87,7 +87,7 @@ class ViewsExceptionTestCase(UrlResetMixin, ModuleStoreTestCase):
         # that gets the current user's info
         mock_from_django_user.return_value = Mock()
 
-        url = reverse('django_comment_client.forum.views.user_profile',
+        url = reverse('discussion.views.user_profile',
                       kwargs={'course_id': self.course.id.to_deprecated_string(), 'user_id': '12345'})  # There is no user 12345
         self.response = self.client.get(url)
         self.assertEqual(self.response.status_code, 404)
@@ -104,7 +104,7 @@ class ViewsExceptionTestCase(UrlResetMixin, ModuleStoreTestCase):
         # that gets the current user's info
         mock_from_django_user.return_value = Mock()
 
-        url = reverse('django_comment_client.forum.views.followed_threads',
+        url = reverse('discussion.views.followed_threads',
                       kwargs={'course_id': self.course.id.to_deprecated_string(), 'user_id': '12345'})  # There is no user 12345
         self.response = self.client.get(url)
         self.assertEqual(self.response.status_code, 404)
@@ -1252,7 +1252,7 @@ class CommentsServiceRequestHeadersTestCase(UrlResetMixin, ModuleStoreTestCase):
 
         self.client.get(
             reverse(
-                "django_comment_client.forum.views.single_thread",
+                "discussion.views.single_thread",
                 kwargs={
                     "course_id": self.course.id.to_deprecated_string(),
                     "discussion_id": "dummy_discussion_id",
@@ -1269,7 +1269,7 @@ class CommentsServiceRequestHeadersTestCase(UrlResetMixin, ModuleStoreTestCase):
 
         self.client.get(
             reverse(
-                "django_comment_client.forum.views.forum_form_discussion",
+                "discussion.views.forum_form_discussion",
                 kwargs={"course_id": self.course.id.to_deprecated_string()}
             ),
         )
@@ -1356,7 +1356,7 @@ class ForumDiscussionXSSTestCase(UrlResetMixin, ModuleStoreTestCase):
         Test that XSS attack is prevented
         """
         reverse_url = "%s%s" % (reverse(
-            "django_comment_client.forum.views.forum_form_discussion",
+            "discussion.views.forum_form_discussion",
             kwargs={"course_id": unicode(self.course.id)}), '/forum_form_discussion')
         # Test that malicious code does not appear in html
         url = "%s?%s=%s" % (reverse_url, 'sort_key', malicious_code)
@@ -1375,7 +1375,7 @@ class ForumDiscussionXSSTestCase(UrlResetMixin, ModuleStoreTestCase):
         mock_from_django_user.return_value = Mock()
         mock_request.side_effect = make_mock_request_impl(course=self.course, text='dummy')
 
-        url = reverse('django_comment_client.forum.views.user_profile',
+        url = reverse('discussion.views.user_profile',
                       kwargs={'course_id': unicode(self.course.id), 'user_id': str(self.student.id)})
         # Test that malicious code does not appear in html
         url_string = "%s?%s=%s" % (url, 'page', malicious_code)

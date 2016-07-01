@@ -732,6 +732,12 @@ if settings.FEATURES.get('ENABLE_DISCUSSION_SERVICE'):
             include('django_comment_client.urls')
         ),
         url(
+            r'^courses/{}/discussion/forum/'.format(
+                settings.COURSE_ID_PATTERN,
+            ),
+            include('discussion.urls')
+        ),
+        url(
             r'^notification_prefs/enable/',
             'notification_prefs.views.ajax_enable'
         ),

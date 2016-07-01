@@ -7,23 +7,20 @@ import json
 import logging
 
 from django.contrib.auth.decorators import login_required
-from django.conf import settings
 from django.core.context_processors import csrf
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
 from django.http import Http404, HttpResponseBadRequest
-from django.utils.translation import ugettext_noop
+from django.shortcuts import render_to_response
 from django.views.decorators.http import require_GET
 import newrelic.agent
 
-from edxmako.shortcuts import render_to_response
 from courseware.courses import get_course_with_access
 from openedx.core.djangoapps.course_groups.cohorts import (
     is_course_cohorted,
     get_cohort_id,
     get_course_cohorts,
 )
-from courseware.tabs import EnrolledTab
 from courseware.access import has_access
 from xmodule.modulestore.django import modulestore
 
@@ -46,25 +43,6 @@ THREADS_PER_PAGE = 20
 INLINE_THREADS_PER_PAGE = 20
 PAGES_NEARBY_DELTA = 2
 log = logging.getLogger("edx.discussions")
-
-
-class DiscussionTab(EnrolledTab):
-    """
-    A tab for the cs_comments_service forums.
-    """
-
-    type = 'discussion'
-    title = ugettext_noop('Discussion')
-    priority = None
-    view_name = 'django_comment_client.forum.views.forum_form_discussion'
-    is_hideable = settings.FEATURES.get('ALLOW_HIDING_DISCUSSION_TAB', False)
-    is_default = False
-
-    @classmethod
-    def is_enabled(cls, course, user=None):
-        if not super(DiscussionTab, cls).is_enabled(course, user):
-            return False
-        return utils.is_discussion_enabled(course.id)
 
 
 @newrelic.agent.function_trace()
@@ -115,7 +93,8 @@ def get_threads(request, course, discussion_id=None, per_page=THREADS_PER_PAGE):
         # If the user did not select a sort key, use their last used sort key
         cc_user = cc.User.from_django_user(request.user)
         cc_user.retrieve()
-        # TODO: After the comment service is updated this can just be user.default_sort_key because the service returns the default value
+        # TODO: After the comment service is updated this can just be
+        # user.default_sort_key because the service returns the default value
         default_query_params['sort_key'] = cc_user.get('default_sort_key') or default_query_params['sort_key']
     else:
         # If the user clicked a sort key, update their default sort key
@@ -239,7 +218,10 @@ def forum_form_discussion(request, course_key):
         threads = [utils.prepare_content(thread, course_key, is_staff) for thread in unsafethreads]
     except cc.utils.CommentClientMaintenanceError:
         log.warning("Forum is in maintenance mode")
-        return render_to_response('discussion/maintenance.html', {})
+        return render_to_response('discussion/maintenance.html', {
+            'disable_courseware_js': True,
+            'uses_pattern_library': True,
+        })
     except ValueError:
         return HttpResponseBadRequest("Invalid group_id")
 
@@ -290,7 +272,7 @@ def forum_form_discussion(request, course_key):
             'uses_pattern_library': True,
         }
         # print "start rendering.."
-        return render_to_response('discussion/index.html', context)
+        return render_to_response('discussion/discussion_board.html', context)
 
 
 @require_GET
@@ -318,8 +300,8 @@ def single_thread(request, course_key, discussion_id, thread_id):
             response_skip=request.GET.get("resp_skip"),
             response_limit=request.GET.get("resp_limit")
         )
-    except cc.utils.CommentClientRequestError as e:
-        if e.status_code == 404:
+    except cc.utils.CommentClientRequestError as error:
+        if error.status_code == 404:
             raise Http404
         raise
 
@@ -404,7 +386,7 @@ def single_thread(request, course_key, discussion_id, thread_id):
             'disable_courseware_js': True,
             'uses_pattern_library': True,
         }
-        return render_to_response('discussion/index.html', context)
+        return render_to_response('discussion/discussion_board.html', context)
 
 
 @require_GET
@@ -465,7 +447,9 @@ def user_profile(request, course_key, user_id):
                 'annotated_content_info': json.dumps(annotated_content_info),
                 'page': query_params['page'],
                 'num_pages': query_params['num_pages'],
-                'learner_profile_page_url': reverse('learner_profile', kwargs={'username': django_user.username})
+                'learner_profile_page_url': reverse('learner_profile', kwargs={'username': django_user.username}),
+                'disable_courseware_js': True,
+                'uses_pattern_library': True,
             }
 
             return render_to_response('discussion/user_profile.html', context)
