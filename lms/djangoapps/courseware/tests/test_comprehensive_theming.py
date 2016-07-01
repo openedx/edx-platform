@@ -43,6 +43,14 @@ class TestComprehensiveTheming(TestCase):
         # This string comes from footer.html
         self.assertContains(resp, "super-ugly")
 
+        import os
+        logger.debug(os.listdir('themes'))
+        from openedx.core.djangoapps.theming import helpers
+        logger.debug(helpers.get_template_path_with_theme('footer.html'))
+
+        # from nose.tools import set_trace; set_trace
+        # assert 0
+
     # def test_theme_outside_repo(self):
     #     # Need to create a temporary theme, and defer decorating the function
     #     # until it is done, which leads to this strange nested-function style
