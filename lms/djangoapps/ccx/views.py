@@ -36,6 +36,7 @@ from opaque_keys.edx.keys import CourseKey
 from ccx_keys.locator import CCXLocator
 from student.roles import CourseCcxCoachRole
 from student.models import CourseEnrollment
+from xmodule.modulestore.django import SignalHandler
 
 from instructor.views.api import _split_input_list
 from instructor.views.gradebook_api import get_grade_book_page
@@ -318,6 +319,13 @@ def save_ccx(request, course, ccx=None):
             section['min_count'] = count
     if changed:
         override_field_for_ccx(ccx, course, 'grading_policy', policy)
+
+    responses = SignalHandler.course_published.send(
+        sender=ccx,
+        course_key=CCXLocator.from_course_locator(course.id, ccx.id)
+    )
+    for rec, response in responses:
+        log.info('Signal fired when course is published. Receiver: %s. Response: %s', rec, response)
 
     return HttpResponse(
         json.dumps({
