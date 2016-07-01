@@ -748,8 +748,8 @@ class MembershipPageAutoEnrollSection(PageObject):
     """
     url = None
 
-    auto_enroll_browse_button_selector = '.auto_enroll_csv .file-browse input.file_field#browseBtn'
-    auto_enroll_upload_button_selector = '.auto_enroll_csv button[name="enrollment_signup_button"]'
+    auto_enroll_browse_button_selector = '.auto_enroll_csv .file-browse input.file_field#browseBtn-auto_enroll_csv'
+    auto_enroll_upload_button_selector = '.auto_enroll_csv #submitBtn-auto_enroll_csv'
     batch_enrollment_selector = '.batch-enrollment'
     NOTIFICATION_ERROR = 'error'
     NOTIFICATION_WARNING = 'warning'

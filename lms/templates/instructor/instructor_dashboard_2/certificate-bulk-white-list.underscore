@@ -7,8 +7,8 @@
       <div class="customBrowseBtn">
         <input disabled="disabled" class="browse-file" placeholder="<%- gettext("Choose File") %>" />
         <div class="file-browse btn btn-primary">
-            <span class="browse"> <%- gettext("Browse") %> </span>
-            <input class="file_field" id="browseBtn" name="students_list" type="file" accept=".csv"/>
+            <label for="browseBtn-bulk-exc-students" class="browse"><%- gettext("Browse") %></label>
+            <input class="file_field" id="browseBtn-bulk-exc-students" name="students_list" type="file" accept=".csv"/>
         </div>
       </div>
       <div><button class="btn-blue upload-csv-button" type="submit"><%- gettext('Add to Exception List') %></button></div>

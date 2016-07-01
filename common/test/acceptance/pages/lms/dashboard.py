@@ -166,7 +166,7 @@ class DashboardPage(PageObject):
         """
         Get course date of the first course from dashboard
         """
-        return self.q(css='ul.listing-courses .course-item .info-date-block').first.text[0]
+        return self.q(css='ul.listing-courses .course-item:first-of-type .info-date-block').first.text[0]
 
     def click_username_dropdown(self):
         """
