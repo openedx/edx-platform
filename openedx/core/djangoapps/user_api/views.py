@@ -95,6 +95,7 @@ class LoginSessionView(APIView):
 
         form_desc.add_field(
             "password",
+            required=False,
             label=password_label,
             field_type="password",
             restrictions={
