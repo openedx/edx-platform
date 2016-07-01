@@ -368,6 +368,13 @@ class StaticTabFields(object):
         scope=Scope.settings,
         default="Empty",
     )
+    course_staff_only = Boolean(
+        display_name=_("Hide Page From Learners"),
+        help=_("If you select this option, only course team members with"
+               " the Staff or Admin role see this page."),
+        default=False,
+        scope=Scope.settings
+    )
     data = String(
         default=textwrap.dedent(u"""\
             <p>Add the content you want students to see on this page.</p>

@@ -476,6 +476,21 @@ class ImportTestCase(BaseCourseTestCase):
         # appropriate attribute maps -- 'graded' should be True, not 'true'
         self.assertEqual(toy.graded, True)
 
+    def test_static_tabs_import(self):
+        """Make sure that the static tabs are imported correctly"""
+
+        modulestore = XMLModuleStore(DATA_DIR, source_dirs=['toy'])
+
+        location_tab_syllabus = Location("edX", "toy", "2012_Fall", "static_tab", "syllabus", None)
+        toy_tab_syllabus = modulestore.get_item(location_tab_syllabus)
+        self.assertEqual(toy_tab_syllabus.display_name, 'Syllabus')
+        self.assertEqual(toy_tab_syllabus.course_staff_only, False)
+
+        location_tab_resources = Location("edX", "toy", "2012_Fall", "static_tab", "resources", None)
+        toy_tab_resources = modulestore.get_item(location_tab_resources)
+        self.assertEqual(toy_tab_resources.display_name, 'Resources')
+        self.assertEqual(toy_tab_resources.course_staff_only, True)
+
     def test_definition_loading(self):
         """When two courses share the same org and course name and
         both have a module with the same url_name, the definitions shouldn't clash.
