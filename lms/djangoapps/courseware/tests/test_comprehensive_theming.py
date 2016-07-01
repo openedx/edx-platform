@@ -1,4 +1,5 @@
 """Tests of comprehensive theming."""
+import edxmako
 
 from django.conf import settings
 from django.test import TestCase
@@ -28,10 +29,11 @@ class TestComprehensiveTheming(TestCase):
         """
         resp = self.client.get('/')
         self.assertEqual(resp.status_code, 200)
-        # This string comes from footer.html
-        self.assertContains(resp, "super-ugly")
         # This string comes from header.html
         self.assertContains(resp, "This file is only for demonstration, and is horrendous!")
+
+        # This string comes from footer.html
+        self.assertContains(resp, "super-ugly")
 
     def test_theme_outside_repo(self):
         # Need to create a temporary theme, and defer decorating the function
@@ -43,11 +45,14 @@ class TestComprehensiveTheming(TestCase):
         tmp_theme = "temp_theme"
         template_dir = themes_dir / tmp_theme / "lms/templates"
         template_dir.makedirs()
+
         with open(template_dir / "footer.html", "w") as footer:
             footer.write("<footer>TEMPORARY THEME</footer>")
 
         dest_path = path(settings.COMPREHENSIVE_THEME_DIRS[0]) / tmp_theme
         create_symlink(themes_dir / tmp_theme, dest_path)
+
+        edxmako.paths.add_lookup('main', themes_dir, prepend=True)
 
         @with_comprehensive_theme(tmp_theme)
         def do_the_test(self):
