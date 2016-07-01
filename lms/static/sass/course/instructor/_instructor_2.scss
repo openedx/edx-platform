@@ -134,6 +134,70 @@
       }
     }
   }
+  
+    .btn-blue {
+        @extend %btn-primary-blue;
+        margin-bottom: 0;
+        padding: ($baseline/2.5) ($baseline/2);
+        text-shadow: none;
+    }
+
+    // Custom File upload
+    .customBrowseBtn {
+        display: inline-block;
+        position: relative;
+        margin: ($baseline/2) 0 0;
+        width: 350px;
+        overflow: hidden;
+        vertical-align: bottom;
+
+        .enhanced-input-file {
+            @include border-radius(4px 0 0 4px);
+            @include padding(23px 6px 5px);
+            position: relative;
+            display: inline-block;
+            width: 250px;
+            vertical-align: middle;
+            border: 1px solid $lightGrey1;
+            background: $white;
+            cursor: not-allowed;
+            z-index: 2;
+        }
+
+        .file-browse {
+            @include margin-left(-4px);
+            display: inline-block;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            overflow: hidden;
+
+            .browse {
+                @include button(simple, $uxpl-blue-base);
+                @include margin-left(268px);
+                border-radius: 0 3px 3px 0;
+                padding: 6px ($baseline/2);
+                font-size: 12px;
+            }
+
+            .file_field {
+                @include left(-27%);
+                position: absolute;
+                z-index: 3;
+                height: 24px; // To match bull browse button
+                width: 124%;
+                margin: 0;
+                padding: 4px 0 0 0;
+                cursor: pointer;
+
+                // for visual sync, need to make button similar to firefox
+                &::-webkit-file-upload-button {
+                    width: 100px;
+                }
+            }
+        }
+    }
 }
 
 // instructor dashboard 2
@@ -2167,13 +2231,6 @@ input[name="subject"] {
 // --------------------
 .instructor-dashboard-wrapper-2 section.idash-section#certificates {
 
-  .btn-blue {
-    @extend %btn-primary-blue;
-    padding: ($baseline/2.5) ($baseline/2);
-    text-shadow: none;
-    margin-bottom: 10px;
-  }
-
   %exception-message {
         margin-top: 15px;
         background-color: $gray-l4;
@@ -2343,47 +2400,14 @@ input[name="subject"] {
         }
 
       }
-      .arrow {
-        font-weight: bold;
-      }
+        .arrow {
+            @include margin-right($baseline/2);
+            border: none;
+            background: transparent;
+            box-shadow: none;
+            color: $uxpl-blue-base;
+            font-weight: bold;
+        }
     }
-  }
-
-}
-
-// Custom File upload
-.customBrowseBtn {
-  margin: ($baseline/2) 0;
-  display: inline-block;
-  .file-browse {
-    position: relative;
-    overflow: hidden;
-    display: inline;
-    @include margin-left(-5px);
-    span.browse {
-      @include button(simple, $uxpl-blue-base);
-      @include margin-right($baseline);
-      padding: 6px ($baseline/2);
-      font-size: 12px;
-      border-radius: 0 3px 3px 0;
-    }
-    input.file_field {
-      @extend %cont-text-sr;
-      position: absolute;
-      @include right(0);
-      top: 0;
-      margin: 0;
-      padding: 0;
-      cursor: pointer;
-    }
-  }
-  & > span, & input[disabled] {
-    vertical-align: middle;
-  }
-  input[disabled] {
-    @include border-radius(4px 0 0 4px);
-    @include padding(6px 6px 5px);
-    border: 1px solid $lightGrey1;
-    cursor: not-allowed;
   }
 }

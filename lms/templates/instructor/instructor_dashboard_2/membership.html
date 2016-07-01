@@ -92,15 +92,14 @@ from openedx.core.djangoapps.course_groups.partition_scheme import get_cohorted_
     <p>${_("To register and enroll a list of users in this course, choose a CSV file that contains the following columns in this exact order: email, username, name, and country. Please include one student per row and do not include any headers, footers, or blank lines.")}</p>
     <form id="student-auto-enroll-form" method="post" action="${ section_data['upload_student_csv_button_url'] }" enctype="multipart/form-data">
       <div class="customBrowseBtn">
-        <label for="browseFile" class="sr">${_("Upload a CSV for bulk enrollment")}</label>
-        <input disabled="disabled" id="browseFile" placeholder="choose file" />
-        <div class="file-browse btn btn-primary">
-            <span class="browse"> Browse </span>
-            <label for="browseBtn-auto_enroll_csv" class="sr">${_("Upload a CSV for bulk enrollment")}</label>
-            <input class="file_field" id="browseBtn-auto_enroll_csv" name="students_list" type="file" accept=".csv"/>
+        <label for="browseBtn-auto-enroll">${_("Upload a CSV for bulk enrollment")}</label>
+        <span id="browseFile" class="enhanced-input-file"></span>
+        <div class="file-browse btn btn-primary" aria-hidden="true">
+            <span class="browse">${('Browse')}</span>
+            <input class="file_field" id="browseBtn-auto-enroll" name="students_list" type="file" accept=".csv"/>
         </div>
       </div>
-      <button type="submit" id="submitBtn-auto_enroll_csv" name="enrollment_signup_button">${_("Upload CSV")}</button>
+      <button type="submit" class="btn-blue" id="submitBtn-auto_enroll_csv" name="enrollment_signup_button">${_("Upload CSV")}</button>
       <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
     </form>
     <div class="results"></div>
