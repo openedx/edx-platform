@@ -101,15 +101,16 @@ class BlockStructureTransformer(object):
 
         A Transformer may choose to remove entire sub-structures during
         the transform method and may do so using the remove_block and
-        remove_block_if methods.
+        filter_with_removal methods.
 
         Amongst the many methods available for a block_structure, the
         following methods are commonly used during transforms:
             get_xblock_field
             get_transformer_data
             get_transformer_block_field
-            remove_block
-            remove_block_if
+            remove_block_traversal
+            filter_with_removal
+            filter_topological_traversal
             topological_traversal
             post_order_traversal
 
@@ -125,4 +126,57 @@ class BlockStructureTransformer(object):
                 block structure, with already collected data for the
                 transformer, that is to be transformed in place.
         """
-        pass
+        raise NotImplementedError
+
+
+class FilteringTransformerMixin(BlockStructureTransformer):
+    """
+    Transformers may optionally choose to implement this mixin if their
+    transform logic can be broken apart into a lambda for optimization of
+    combined tree traversals.
+
+    For performance reasons, developers should try to implement this mixin
+    whenever possible - with this alternative, traversal of the entire block
+    structure happens only once for all transformers that implement
+    FilteringTransformerMixin.
+    """
+
+    def transform(self, usage_info, block_structure):
+        """
+        By defining this method, FilteringTransformers can be run individually
+        if desired. In normal operations, the filters returned from multiple
+        transform_block_filters calls will be combined and used in a single
+        tree traversal.
+        """
+        block_structure.filter_topological_traversal(self.transform_block_filters(usage_info, block_structure))
+
+    @abstractmethod
+    def transform_block_filters(self, usage_info, block_structure):
+        """
+        This is an alternative to the standard transform method.
+
+        Returns a list of filter functions to be used for filtering out
+        any unwanted blocks in the given block_structure.
+
+        In addition to the commonly used methods listed above, the following
+        methods are commonly used by implementations of transform_block_filters:
+            create_universal_filter
+            create_removal_filter
+
+        Note: Transformers that implement this alternative should be
+        independent of all other registered transformers as they may not
+        be applied in the order in which they were listed in the registry.
+
+        Arguments:
+            usage_info (any negotiated type) - A usage-specific object
+                that is passed to the block_structure and forwarded to all
+                requested Transformers in order to apply a
+                usage-specific transform. For example, an instance of
+                usage_info would contain a user object for which the
+                transform should be applied.
+
+            block_structure (BlockStructureBlockData) - A mutable
+                block structure, with already collected data for the
+                transformer, that is to be transformed in place.
+        """
+        raise NotImplementedError
