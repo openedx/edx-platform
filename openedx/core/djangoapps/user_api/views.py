@@ -95,6 +95,7 @@ class LoginSessionView(APIView):
 
         form_desc.add_field(
             "password",
+            required=False,
             label=password_label,
             field_type="password",
             restrictions={
@@ -672,21 +673,31 @@ class RegistrationView(APIView):
             terms_text=terms_text
         )
 
+        # Translators: This is a legal document users must agree to
+        # in order to register a new account.
+        privacy_text = _(u"Privacy Policy")
+        privacy_link = u"<a href=\"{url}#privacy\">{privacy_text}</a>".format(
+            url=marketing_link("TOS"),
+            privacy_text=privacy_text,
+        )
+
         # Translators: "Terms of service" is a legal document users must agree to
         # in order to register a new account.
         label = _(
-            u"I agree to the {platform_name} {terms_of_service}."
+            u"I agree to the {platform_name} {terms_of_service} and {privacy_policy}."
         ).format(
             platform_name=settings.PLATFORM_NAME,
+            privacy_policy=privacy_link,
             terms_of_service=terms_link
         )
 
         # Translators: "Terms of service" is a legal document users must agree to
         # in order to register a new account.
         error_msg = _(
-            u"You must agree to the {platform_name} {terms_of_service}."
+            u"You must agree to the {platform_name} {terms_of_service} and {privacy_policy}."
         ).format(
             platform_name=settings.PLATFORM_NAME,
+            privacy_policy=privacy_link,
             terms_of_service=terms_link
         )
 

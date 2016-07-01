@@ -416,8 +416,16 @@ def shim_student_view(view_func, check_logged_in=False):
             msg = response_dict.get("value", u"")
             success = response_dict.get("success")
         except (ValueError, TypeError):
+            response_dict = {}
             msg = response.content
             success = True
+
+        redirect_url = response_dict.get('redirect')
+        if redirect_url == '/shib-login/':
+            # Hijack the response for Shibboleth redirects
+            response.status_code = 418
+            response.content = redirect_url
+            return response
 
         # If the user is not authenticated when we expect them to be
         # send the appropriate status code.

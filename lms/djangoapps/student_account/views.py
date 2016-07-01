@@ -97,6 +97,18 @@ def login_and_registration_form(request, initial_mode="login"):
             pass
 
     # Otherwise, render the combined login/registration page
+    disclaimer = settings.REGISTRATION_FOOTER_DISCLAIMER
+    registration_footer = disclaimer['html'].format(
+        institution_name=disclaimer['institution_name'],
+        institution_name_short=disclaimer['institution_name_short'],
+        institution_name_general=disclaimer['institution_name_general'],
+        platform_name_on_tos=disclaimer['platform_name_on_tos'],
+        pii_link_start='<a href="/tos#pii"><strong>',
+        privacy_link_start='<a href="/tos#privacy"><strong>',
+        link_end='</strong></a>',
+        paragraph_start='<p class="instructions">',
+        paragraph_end='</p>',
+    )
     context = {
         'data': {
             'login_redirect_url': redirect_to,
@@ -104,6 +116,7 @@ def login_and_registration_form(request, initial_mode="login"):
             'third_party_auth': _third_party_auth_context(request, redirect_to),
             'third_party_auth_hint': third_party_auth_hint or '',
             'platform_name': settings.PLATFORM_NAME,
+            'registration_footer': registration_footer,
 
             # Include form descriptions retrieved from the user API.
             # We could have the JS client make these requests directly,
