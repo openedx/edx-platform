@@ -1003,7 +1003,7 @@ class DiscussionUserProfileTest(UniqueCourseTest):
     Tests for user profile page in discussion tab.
     """
 
-    PAGE_SIZE = 20  # django_comment_client.forum.views.THREADS_PER_PAGE
+    PAGE_SIZE = 20  # discussion.views.THREADS_PER_PAGE
     PROFILED_USERNAME = "profiled-user"
 
     def setUp(self):
