@@ -93,20 +93,17 @@
 
             DiscussionRouter.prototype.allThreads = function() {
                 this.nav.updateSidebar();
-                return this.nav.goHome();
+                this.nav.goHome();
             };
 
             DiscussionRouter.prototype.setActiveThread = function() {
                 if (this.thread) {
-                    return this.nav.setActiveThread(this.thread.get("id"));
-                } else {
-                    return this.nav.goHome();
+                    this.nav.setActiveThread(this.thread.get("id"));
                 }
             };
 
             DiscussionRouter.prototype.showThread = function(forum_name, thread_id) {
-                var self;
-                self = this;
+                var self = this;
                 this.thread = this.discussion.get(thread_id);
 
                 if (this.thread) {
@@ -124,11 +121,13 @@
                     self.renderThreadView();
                 }).fail(function(xhr) {
                     // otherwise display error message and navigate to all threads view
-                    var errorMessage = (xhr.status === 404) ?
-                        gettext("The thread you selected has been deleted. Please select another thread.") :
-                        gettext("We had some trouble loading more responses. Please try again.");
-
-                    DiscussionUtil.discussionAlert(gettext("Sorry"), errorMessage);
+                    var errorMsg;
+                    if (xhr.status === 404) {
+                        errorMsg = gettext("The thread you selected has been deleted. Please select another thread.");
+                    } else {
+                        errorMsg = gettext("We had some trouble loading more responses. Please try again.");
+                    }
+                    DiscussionUtil.discussionAlert(gettext("Sorry"), errorMsg);
                     this.allThreads();
                 });
             };
@@ -162,23 +161,23 @@
                 this.main.on("thread:responses:rendered", function() {
                     return self.nav.updateSidebar();
                 });
-                return this.thread.on("thread:thread_type_updated", this.showMain);
+                this.thread.on("thread:thread_type_updated", this.showMain);
             };
 
             DiscussionRouter.prototype.navigateToThread = function(thread_id) {
                 var thread, targetThreadRoute;
                 thread = this.discussion.get(thread_id);
                 targetThreadRoute = getSingleThreadRoute(thread.get("commentable_id"), thread_id);
-                this.navigate(targetThreadRoute, { trigger: true});
+                this.navigate(targetThreadRoute, {trigger: true});
             };
 
             DiscussionRouter.prototype.navigateToAllThreads = function() {
-                this.navigate(allThreadsRoute, { trigger: true });
+                this.navigate(allThreadsRoute, {trigger: true});
             };
 
             DiscussionRouter.prototype.showNewPost = function() {
                 var self = this;
-                return $('.forum-content').fadeOut({
+                $('.forum-content').fadeOut({
                     duration: 200,
                     complete: function() {
                         return self.newPost.fadeIn(200).focus();
@@ -187,7 +186,7 @@
             };
 
             DiscussionRouter.prototype.hideNewPost = function() {
-                return this.newPost.fadeOut({
+                this.newPost.fadeOut({
                     duration: 200,
                     complete: function() {
                         return $('.forum-content').fadeIn(200).find('.thread-wrapper').focus();

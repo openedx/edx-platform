@@ -271,20 +271,22 @@
                         return $button.toggleClass("is-checked", endorsed);
                     },
                     votes: function(votes) {
-                        var button, numVotes, selector, votesHtml, votesCountMsg;
+                        var button, numVotes, selector, votesText, votesCountMsg;
                         selector = ".action-vote";
                         this.updateButtonState(selector, window.user.voted(this.model));
                         button = this.$el.find(selector);
                         numVotes = votes.up_count;
                         votesCountMsg = ngettext(
-                            "there is currently %(numVotes)s vote", "there are currently %(numVotes)s votes", numVotes
+                            "there is currently {numVotes} vote", "there are currently {numVotes} votes", numVotes
                         );
-                        button.find(".js-sr-vote-count").html(interpolate(votesCountMsg, {numVotes: numVotes }, true));
-                        votesHtml = interpolate(ngettext("%(numVotes)s Vote", "%(numVotes)s Votes", numVotes), {
-                            numVotes: numVotes
-                        }, true);
-                        button.find(".vote-count").html(votesHtml);
-                        return this.$el.find('.display-vote .vote-count').html(votesHtml);
+                        button.find(".js-sr-vote-count").empty().text(
+                            edx.StringUtils.interpolate(votesCountMsg, {numVotes: numVotes })
+                        );
+                        votesText = edx.StringUtils.interpolate(
+                            ngettext("{numVotes} Vote", "{numVotes} Votes", numVotes),
+                            { numVotes: numVotes });
+                        button.find(".vote-count").empty().text(votesText);
+                        this.$el.find('.display-vote .vote-count').empty().text(votesText);
                     },
                     pinned: function(pinned) {
                         this.updateButtonState(".action-pin", pinned);

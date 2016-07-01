@@ -269,7 +269,7 @@
                 }).get()).toEqual(expectedMessages);
             };
 
-            getAlertMessagesAndClasses = function () {
+            getAlertMessagesAndClasses = function() {
                 return $(".search-alert").map(function() {
                     return {
                         text: $('.message', this).html(),

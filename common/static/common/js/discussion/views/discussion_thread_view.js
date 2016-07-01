@@ -134,7 +134,9 @@
 
             DiscussionThreadView.prototype.render = function() {
                 var self = this;
-                this.$el.html(this.renderTemplate());
+                var $element = $(this.renderTemplate());
+                this.$el.empty();
+                this.$el.append($element);
                 this.delegateEvents();
                 this.renderShowView();
                 this.renderAttrs();
@@ -216,7 +218,7 @@
                 }
             };
 
-            DiscussionThreadView.prototype.loadResponses = function(responseLimit, elem, firstLoad) {
+            DiscussionThreadView.prototype.loadResponses = function(responseLimit, $elem, firstLoad) {
                 var takeFocus,
                     self = this;
                 takeFocus = this.mode === "tab" ? false : true;
@@ -228,8 +230,8 @@
                         resp_skip: this.responses.size(),
                         resp_limit: responseLimit ? responseLimit : void 0
                     },
-                    $elem: elem,
-                    $loading: elem,
+                    $elem: $elem,
+                    $loading: $elem,
                     takeFocus: takeFocus,
                     complete: function() {
                         self.responsesRequest = null;
@@ -280,20 +282,20 @@
             };
 
             DiscussionThreadView.prototype.renderResponseCountAndPagination = function(responseTotal) {
-                var buttonText, loadMoreButton, responseCountFormat, responseLimit, responsePagination,
+                var buttonText, $loadMoreButton, responseCountFormat, responseLimit, responsePagination,
                     responsesRemaining, showingResponsesText, self = this;
                 if (this.isQuestion() && this.markedAnswers.length !== 0) {
                     responseCountFormat = ngettext(
-                        "%(numResponses)s other response", "%(numResponses)s other responses", responseTotal
+                        "{numResponses} other response", "{numResponses} other responses", responseTotal
                     );
                 } else {
                     responseCountFormat = ngettext(
-                        "%(numResponses)s response", "%(numResponses)s responses", responseTotal
+                        "{numResponses} response", "{numResponses} responses", responseTotal
                     );
                 }
-                this.$el.find(".response-count").html(interpolate(responseCountFormat, {
-                    numResponses: responseTotal
-                }, true));
+                this.$el.find(".response-count").text(
+                    edx.StringUtils.interpolate(responseCountFormat, {numResponses: responseTotal}, true)
+                );
                 responsePagination = this.$el.find(".response-pagination");
                 responsePagination.empty();
                 if (responseTotal > 0) {
@@ -302,9 +304,9 @@
                         showingResponsesText = gettext("Showing all responses");
                     }
                     else {
-                        showingResponsesText = interpolate(
+                        showingResponsesText = edx.StringUtils.interpolate(
                             ngettext(
-                                "Showing first response", "Showing first %(numResponses)s responses",
+                                "Showing first response", "Showing first {numResponses} responses",
                                 this.responses.size()
                             ),
                             { numResponses: this.responses.size() },
@@ -313,22 +315,22 @@
                     }
 
                     responsePagination.append($("<span>")
-                        .addClass("response-display-count").html(_.escape(showingResponsesText)));
+                        .addClass("response-display-count").text(showingResponsesText));
                     if (responsesRemaining > 0) {
                         if (responsesRemaining < SUBSEQUENT_RESPONSE_PAGE_SIZE) {
                             responseLimit = null;
                             buttonText = gettext("Load all responses");
                         } else {
                             responseLimit = SUBSEQUENT_RESPONSE_PAGE_SIZE;
-                            buttonText = interpolate(gettext("Load next %(numResponses)s responses"), {
+                            buttonText = edx.StringUtils.interpolate(gettext("Load next {numResponses} responses"), {
                                 numResponses: responseLimit
                             }, true);
                         }
-                        loadMoreButton = $("<button>").addClass("load-response-button").html(_.escape(buttonText));
-                        loadMoreButton.click(function() {
-                            return self.loadResponses(responseLimit, loadMoreButton);
+                        $loadMoreButton = $("<button>").addClass("load-response-button").text(buttonText);
+                        $loadMoreButton.click(function() {
+                            return self.loadResponses(responseLimit, $loadMoreButton);
                         });
-                        return responsePagination.append(loadMoreButton);
+                        return responsePagination.append($loadMoreButton);
                     }
                 }
             };
