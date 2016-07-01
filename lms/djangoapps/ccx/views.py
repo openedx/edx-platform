@@ -36,6 +36,7 @@ from opaque_keys.edx.keys import CourseKey
 from ccx_keys.locator import CCXLocator
 from student.roles import CourseCcxCoachRole
 from student.models import CourseEnrollment
+from xmodule.modulestore.django import SignalHandler
 
 from instructor.views.api import _split_input_list
 from instructor.views.gradebook_api import get_grade_book_page
@@ -233,6 +234,15 @@ def create_ccx(request, course, ccx=None):
 
     assign_coach_role_to_ccx(ccx_id, request.user, course.id)
     add_master_course_staff_to_ccx(course, ccx_id, ccx.display_name)
+
+    # using CCX object as sender here.
+    responses = SignalHandler.course_published.send(
+        sender=ccx,
+        course_key=CCXLocator.from_course_locator(course.id, unicode(ccx.id))
+    )
+    for rec, response in responses:
+        log.info('Signal fired when course is published. Receiver: %s. Response: %s', rec, response)
+
     return redirect(url)
 
 
@@ -324,6 +334,14 @@ def save_ccx(request, course, ccx=None):
     if changed:
         override_field_for_ccx(ccx, course, 'grading_policy', policy)
 
+    # using CCX object as sender here.
+    responses = SignalHandler.course_published.send(
+        sender=ccx,
+        course_key=CCXLocator.from_course_locator(course.id, unicode(ccx.id))
+    )
+    for rec, response in responses:
+        log.info('Signal fired when course is published. Receiver: %s. Response: %s', rec, response)
+
     return HttpResponse(
         json.dumps({
             'schedule': get_ccx_schedule(course, ccx),
@@ -344,6 +362,14 @@ def set_grading_policy(request, course, ccx=None):
 
     override_field_for_ccx(
         ccx, course, 'grading_policy', json.loads(request.POST['policy']))
+
+    # using CCX object as sender here.
+    responses = SignalHandler.course_published.send(
+        sender=ccx,
+        course_key=CCXLocator.from_course_locator(course.id, unicode(ccx.id))
+    )
+    for rec, response in responses:
+        log.info('Signal fired when course is published. Receiver: %s. Response: %s', rec, response)
 
     url = reverse(
         'ccx_coach_dashboard',
@@ -494,7 +520,7 @@ def ccx_gradebook(request, course, ccx=None):
     if not ccx:
         raise Http404
 
-    ccx_key = CCXLocator.from_course_locator(course.id, ccx.id)
+    ccx_key = CCXLocator.from_course_locator(course.id, unicode(ccx.id))
     with ccx_course(ccx_key) as course:
         prep_course_for_grading(course, request)
         student_info, page = get_grade_book_page(request, course, course_key=ccx_key)
@@ -522,7 +548,7 @@ def ccx_grades_csv(request, course, ccx=None):
     if not ccx:
         raise Http404
 
-    ccx_key = CCXLocator.from_course_locator(course.id, ccx.id)
+    ccx_key = CCXLocator.from_course_locator(course.id, unicode(ccx.id))
     with ccx_course(ccx_key) as course:
         prep_course_for_grading(course, request)
 
