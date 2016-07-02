@@ -191,6 +191,7 @@ def get_current_site():
          (django.contrib.sites.models.Site): returns current site
     """
     request = get_current_request()
+    logger.debug("get_current_site called...\n")
     if not request:
         return None
     return getattr(request, 'site', None)
@@ -204,12 +205,15 @@ def get_current_site_theme():
          (ecommerce.theming.models.SiteTheme): site theme object for the current site.
     """
     # Return None if theming is disabled
+    logger.debug("get_current_site_theme called...\n")
     if not is_comprehensive_theming_enabled():
         return None
+    logger.debug("is_comprehensive_theming_enabled returned True...\n")
 
     request = get_current_request()
     if not request:
         return None
+    logger.debug("request.site_theme is %s ...\n", str(getattr(request, 'site_theme', None)))
     return getattr(request, 'site_theme', None)
 
 
