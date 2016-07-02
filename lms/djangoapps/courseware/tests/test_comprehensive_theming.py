@@ -34,6 +34,10 @@ class TestComprehensiveTheming(TestCase):
         logger.debug(resp.__dict__)
         logger.debug("\n\nResponse for TestComprehensiveTheming.test_red_footer:\n%s", resp.content)
 
+        from openedx.core.djangoapps.theming import helpers
+        logger.debug("\n\nHelper Logs:\nget_current_site: %s", helpers.get_current_site())
+        logger.debug("\n\nHelper Logs:\nget_current_site_theme: %s", helpers.get_current_site_theme())
+
         # Confirm the HTTP status code (no redirects, not founds, etc.)
         self.assertEqual(resp.status_code, 200)
 
