@@ -25,8 +25,7 @@ class TestComprehensiveThemeLMS(TestCase):
         # Clear the internal staticfiles caches, to get test isolation.
         staticfiles.finders.get_finder.cache_clear()
 
-    @override_settings(COMPREHENSIVE_THEME_DIRS=[settings.TEST_THEME.dirname()])
-    @with_comprehensive_theme(settings.TEST_THEME.basename())
+    @with_comprehensive_theme("test-theme")
     def test_footer(self):
         """
         Test that theme footer is used instead of default footer.
@@ -36,8 +35,7 @@ class TestComprehensiveThemeLMS(TestCase):
         # This string comes from header.html of test-theme
         self.assertContains(resp, "This is a footer for test-theme.")
 
-    @override_settings(COMPREHENSIVE_THEME_DIRS=[settings.TEST_THEME.dirname()])
-    @with_comprehensive_theme(settings.TEST_THEME.basename())
+    @with_comprehensive_theme("test-theme")
     def test_logo_image(self):
         """
         Test that theme logo is used instead of default logo.
@@ -61,8 +59,7 @@ class TestComprehensiveThemeCMS(TestCase):
         # Clear the internal staticfiles caches, to get test isolation.
         staticfiles.finders.get_finder.cache_clear()
 
-    @override_settings(COMPREHENSIVE_THEME_DIRS=[settings.TEST_THEME.dirname()])
-    @with_comprehensive_theme(settings.TEST_THEME.basename())
+    @with_comprehensive_theme("test-theme")
     def test_template_override(self):
         """
         Test that theme templates are used instead of default templates.
