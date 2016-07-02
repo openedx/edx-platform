@@ -20,6 +20,7 @@ def get_page_title_breadcrumbs(*args):
     """
     This is a proxy function to hide microsite_configuration behind comprehensive theming.
     """
+    logger.debug("********** HELPERS.GET_PAGE_TITLE_BREADCRUMBS **********")
     return page_title_breadcrumbs(*args)
 
 
@@ -29,8 +30,12 @@ def get_value(val_name, default=None, **kwargs):
     """
 
     # Retrieve the requested field/value from the microsite configuration
-    microsite_value = microsite.get_value(val_name, default=default, **kwargs)
+    logger.debug("********** HELPERS.GET_VALUE **********")
+    logger.debug("********** VAL_NAME: {0}".format(val_name))
+    logger.debug("********** DEFAULT: {0}".format(default))
 
+    microsite_value = microsite.get_value(val_name, default=default, **kwargs)
+    logger.debug("********** MICROSITE_VALUE: {0}".format(microsite_value))
     # Attempt to perform a dictionary update using the provided default
     # This will fail if either the default or the microsite value is not a dictionary
     try:
@@ -45,6 +50,7 @@ def get_value(val_name, default=None, **kwargs):
         value = microsite_value
 
     # Return the end result to the caller
+    logger.debug("********** RETURN_VALUE: {0}".format(value))
     return value
 
 
@@ -52,8 +58,11 @@ def get_template_path(relative_path, **kwargs):
     """
     This is a proxy function to hide microsite_configuration behind comprehensive theming.
     """
+    logger.debug("********** HELPERS.GET_TEMPLATE_PATH **********")
+    logger.debug("********** RELATIVE_PATH: {0}".format(relative_path))
     if microsite.is_request_in_microsite():
         relative_path = microsite.get_template_path(relative_path, **kwargs)
+    logger.debug("********** RETURN_VALUE: {0}".format(relative_path))
     return relative_path
 
 
@@ -61,6 +70,8 @@ def is_request_in_themed_site():
     """
     This is a proxy function to hide microsite_configuration behind comprehensive theming.
     """
+    logger.debug("********** HELPERS.IS_REQUEST_IN_THEMED_SITE **********")
+    logger.debug("********** RETURN_VALUE: {0}".format(microsite.is_request_in_microsite()))
     return microsite.is_request_in_microsite()
 
 
@@ -69,6 +80,8 @@ def get_template(uri):
     This is a proxy function to hide microsite_configuration behind comprehensive theming.
     :param uri: uri of the template
     """
+    logger.debug("********** HELPERS.GET_TEMPLATE **********")
+    logger.debug("********** RETURN_VALUE: {0}".format(microsite.get_template(uri)))
     return microsite.get_template(uri)
 
 
@@ -85,10 +98,14 @@ def get_themed_template_path(relative_path, default_path, **kwargs):
     :param default_path: relative path of the microsite's or lms template to use if
         theming is disabled or microsite is enabled
     """
+    logger.debug("********** HELPERS.GET_THEMED_TEMPLATE_PATH **********")
     is_stanford_theming_enabled = settings.FEATURES.get("USE_CUSTOM_THEME", False)
+    logger.debug("********** IS_STANFORD_THEMING_ENABLED: {0}".format(is_stanford_theming_enabled))
     is_microsite = microsite.is_request_in_microsite()
+    logger.debug("********** IS_MICROSITE: {0}".format(is_microsite))
     if is_stanford_theming_enabled and not is_microsite:
         return relative_path
+    logger.debug("********** MICROSITE.GET_TEMPLATE_PATH: {0}".format(microsite.get_template_path(default_path, **kwargs)))
     return microsite.get_template_path(default_path, **kwargs)
 
 
@@ -106,16 +123,23 @@ def get_template_path_with_theme(relative_path):
     Returns:
         (str): template path in current site's theme
     """
-    theme = get_current_theme()
+    relative_path = os.path.normpath(relative_path)
 
+    logger.debug("********** HELPERS.GET_TEMPLATE_PATH_WITH_THEME **********")
+    logger.debug("********** RELATIVE_PATH: {0}".format(relative_path))
+    theme = get_current_theme()
+    logger.debug("********** THEME: {0}".format(theme))
     if not theme:
         return relative_path
 
     # strip `/` if present at the start of relative_path
     template_name = re.sub(r'^/+', '', relative_path)
-
+    logger.debug("********** TEMPLATE_NAME: {0}".format(template_name))
     template_path = theme.template_path / template_name
+    logger.debug("********** TEMPLATE_PATH: {0}".format(template_path))
     absolute_path = theme.path / "templates" / template_name
+    logger.debug("********** ABSOLUTE_PATH: {0}".format(absolute_path))
+    logger.debug("********** ABSPATH_EXISTS: {0}".format(absolute_path.exists()))
     if absolute_path.exists():
         return str(template_path)
     else:
@@ -135,12 +159,14 @@ def get_all_theme_template_dirs():
     Returns:
         (list): list of directories containing theme templates.
     """
+    logger.debug("********** HELPERS.GET_ALL_THEME_TEMPLATE_DIRS **********")
     themes = get_themes()
     template_paths = list()
 
     for theme in themes:
         template_paths.extend(theme.template_dirs)
 
+    logger.debug("********** RETURN_VALUE: {0}".format(template_paths))
     return template_paths
 
 
@@ -158,6 +184,8 @@ def strip_site_theme_templates_path(uri):
     Returns:
         (str): template path with site theme path removed.
     """
+    logger.debug("********** HELPERS.STRIP_SITE_THEME_TEMPLATES_PATH **********")
+
     theme = get_current_theme()
 
     if not theme:
@@ -170,6 +198,8 @@ def strip_site_theme_templates_path(uri):
     ])
 
     uri = re.sub(r'^/*' + templates_path + '/*', '', uri)
+    logger.debug("********** RETURN_VALUE: {0}".format(uri))
+
     return uri
 
 
@@ -180,6 +210,8 @@ def get_current_request():
     Returns:
          (HttpRequest): returns cirrent request
     """
+    logger.debug("********** HELPERS.GET_CURRENT_REQUEST **********")
+    logger.debug("********** RETURN_VALUE: {0}".format(RequestCache.get_current_request()))
     return RequestCache.get_current_request()
 
 
@@ -190,9 +222,12 @@ def get_current_site():
     Returns:
          (django.contrib.sites.models.Site): returns current site
     """
+    logger.debug("********** HELPERS.GET_CURRENT_SITE **********")
     request = get_current_request()
     if not request:
+        logger.debug("********** RETURN_VALUE: Request is NOT, returning None")
         return None
+    logger.debug("********** RETURN_VALUE: {0}".format(getattr(request, 'site', None)))
     return getattr(request, 'site', None)
 
 
@@ -204,12 +239,16 @@ def get_current_site_theme():
          (ecommerce.theming.models.SiteTheme): site theme object for the current site.
     """
     # Return None if theming is disabled
+    logger.debug("********** HELPERS.GET_CURRENT_SITE_THEME **********")
     if not is_comprehensive_theming_enabled():
+        logger.debug("********** RETURN_VALUE: Comprehensive theming not enabled, returning None")
         return None
 
     request = get_current_request()
     if not request:
+        logger.debug("********** RETURN_VALUE: Request is NOT, returning None")
         return None
+    logger.debug("********** RETURN_VALUE: {0}".format(getattr(request, 'site_theme', None)))
     return getattr(request, 'site_theme', None)
 
 
@@ -221,21 +260,27 @@ def get_current_theme():
          (ecommerce.theming.models.SiteTheme): site theme object for the current site.
     """
     # Return None if theming is disabled
+    logger.debug("********** HELPERS.GET_CURRENT_THEME **********")
     if not is_comprehensive_theming_enabled():
+        logger.debug("********** RETURN_VALUE: Comprehensive theming not enabled, returning None")
         return None
 
     site_theme = get_current_site_theme()
     if not site_theme:
+        logger.debug("********** RETURN_VALUE: Site theme is NOT, returning None")
         return None
     try:
-        return Theme(
+        theme = Theme(
             name=site_theme.theme_dir_name,
             theme_dir_name=site_theme.theme_dir_name,
             themes_base_dir=get_theme_base_dir(site_theme.theme_dir_name),
         )
+        logger.debug("********** RETURN_VALUE: {0}".format(theme))
+        return theme
     except ValueError as error:
         # Log exception message and return None, so that open source theme is used instead
         logger.exception('Theme not found in any of the themes dirs. [%s]', error)
+        logger.debug("********** RETURN_VALUE: None")
         return None
 
 
@@ -249,11 +294,14 @@ def get_theme_base_dir(theme_dir_name, suppress_error=False):
     Returns:
         (str): Base directory that contains the given theme
     """
+    logger.debug("********** HELPERS.GET_THEME_BASE_DIR **********")
     for themes_dir in get_theme_base_dirs():
         if theme_dir_name in get_theme_dirs(themes_dir):
+            logger.debug("********** RETURN_VALUE: {0}".format(themes_dir))
             return themes_dir
 
     if suppress_error:
+        logger.debug("********** RETURN_VALUE: suppress_error is {0}, returning None".format(suppress_error))
         return None
 
     raise ValueError(
@@ -277,9 +325,11 @@ def get_project_root_name():
     Returns:
         (str): component name of platform e.g lms, cms
     """
+    logger.debug("********** HELPERS.GET_PROJECT_ROOT_NAME **********")
     root = Path(settings.PROJECT_ROOT)
     if root.name == "":
         root = root.parent
+    logger.debug("********** RETURN_VALUE: {0}".format(root.name))
     return root.name
 
 
@@ -302,7 +352,9 @@ def get_theme_base_dirs():
          (Path): Base theme directory path
     """
     # Return an empty list if theming is disabled
+    logger.debug("********** HELPERS.GET_THEME_BASE_DIRS **********")
     if not is_comprehensive_theming_enabled():
+        logger.debug("********** RETURN_VALUE: Comprehensive theming not enabled, returning empty set")
         return []
 
     theme_base_dirs = []
@@ -333,7 +385,7 @@ def get_theme_base_dirs():
             raise ImproperlyConfigured("COMPREHENSIVE_THEME_DIRS must contain valid paths.")
 
         theme_base_dirs.extend([Path(theme_dir) for theme_dir in theme_dirs])
-
+    logger.debug("********** RETURN_VALUE: {0}".format(theme_base_dirs))
     return theme_base_dirs
 
 
@@ -348,9 +400,11 @@ def is_comprehensive_theming_enabled():
          (bool): True if comprehensive theming is enabled else False
     """
     # Disable theming for microsites
+    logger.debug("********** HELPERS.IS_COMPREHENSIVE_THEMING_ENABLED **********")
     if microsite.is_request_in_microsite():
+        logger.debug("********** RETURN_VALUE: Request not in microsite, returning False")
         return False
-
+    logger.debug("********** RETURN_VALUE: {0}".format(settings.ENABLE_COMPREHENSIVE_THEMING))
     return settings.ENABLE_COMPREHENSIVE_THEMING
 
 
@@ -368,6 +422,9 @@ def get_static_file_url(asset):
     Returns:
         (str): static asset's url
     """
+    logger.debug("********** HELPERS.GET_STATIC_FILE_URL **********")
+
+    logger.debug("********** RETURN_VALUE: {0}".format(staticfiles_storage.url(asset)))
     return staticfiles_storage.url(asset)
 
 
@@ -380,7 +437,9 @@ def get_themes(themes_dir=None):
     Returns:
         list of themes known to the system.
     """
+    logger.debug("********** HELPERS.GET_THEMES **********")
     if not is_comprehensive_theming_enabled():
+        logger.debug("********** RETURN_VALUE: Comprehensive theming not enabled, returning empty set")
         return []
 
     themes_dirs = [Path(themes_dir)] if themes_dir else get_theme_base_dirs()
@@ -388,7 +447,7 @@ def get_themes(themes_dir=None):
     themes = []
     for themes_dir in themes_dirs:
         themes.extend([Theme(name, name, themes_dir) for name in get_theme_dirs(themes_dir)])
-
+    logger.debug("********** RETURN_VALUE: {0}".format(themes))
     return themes
 
 
@@ -398,6 +457,8 @@ def get_theme_dirs(themes_dir=None):
     Args:
         themes_dir (Path): base dir that contains themes.
     """
+    logger.debug("********** HELPERS.GET_THEME_DIRS **********")
+    logger.debug("********** RETURN_VALUE: {0}".format([_dir for _dir in os.listdir(themes_dir) if is_theme_dir(themes_dir / _dir)]))
     return [_dir for _dir in os.listdir(themes_dir) if is_theme_dir(themes_dir / _dir)]
 
 
@@ -412,7 +473,9 @@ def is_theme_dir(_dir):
     Returns:
         Returns true if given dir is a theme directory.
     """
+    logger.debug("********** HELPERS.IS_THEME_DIR **********")
     theme_sub_directories = {'lms', 'cms'}
+    logger.debug("********** RETURN_VALUE: {0}".format(bool(os.path.isdir(_dir) and theme_sub_directories.intersection(os.listdir(_dir)))))
     return bool(os.path.isdir(_dir) and theme_sub_directories.intersection(os.listdir(_dir)))
 
 
@@ -465,6 +528,8 @@ class Theme(object):
         Returns:
             Path: absolute path to current theme's contents
         """
+        logger.debug("********** HELPERS.THEME.PATH **********")
+        logger.debug("********** RETURN_VALUE: {0}".format(Path(self.themes_base_dir) / self.theme_dir_name / get_project_root_name()))
         return Path(self.themes_base_dir) / self.theme_dir_name / get_project_root_name()
 
     @property
@@ -475,6 +540,8 @@ class Theme(object):
         Returns:
             Path: absolute path to current theme's template directory
         """
+        logger.debug("********** HELPERS.THEME.TEMPLATE_PATH **********")
+        logger.debug("********** RETURN_VALUE: {0}".format(Path(self.theme_dir_name) / get_project_root_name() / 'templates'))
         return Path(self.theme_dir_name) / get_project_root_name() / 'templates'
 
     @property
@@ -485,6 +552,8 @@ class Theme(object):
         Returns:
             list: list of all template directories for current theme.
         """
+        logger.debug("********** HELPERS.THEME.TEMPLATE_DIRS **********")
+        logger.debug("********** RETURN_VALUE: {0}".format([self.path / 'templates',]))
         return [
             self.path / 'templates',
         ]

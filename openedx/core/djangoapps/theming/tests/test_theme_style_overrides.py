@@ -1,6 +1,7 @@
 """
     Tests for comprehensive themes.
 """
+import logging
 import unittest
 
 from django.conf import settings
@@ -8,6 +9,8 @@ from django.test import TestCase, override_settings
 from django.contrib import staticfiles
 
 from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme
+
+logger = logging.getLogger(__name__)
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
@@ -25,19 +28,18 @@ class TestComprehensiveThemeLMS(TestCase):
         # Clear the internal staticfiles caches, to get test isolation.
         staticfiles.finders.get_finder.cache_clear()
 
-    @override_settings(COMPREHENSIVE_THEME_DIRS=[settings.TEST_THEME.dirname()])
-    @with_comprehensive_theme(settings.TEST_THEME.basename())
+    @with_comprehensive_theme("test-theme")
     def test_footer(self):
         """
         Test that theme footer is used instead of default footer.
         """
         resp = self.client.get('/')
         self.assertEqual(resp.status_code, 200)
+        logger.debug("\n\nResponse for TestComprehensiveThemeLMS.test_footer:\n%s", resp.content)
         # This string comes from header.html of test-theme
         self.assertContains(resp, "This is a footer for test-theme.")
 
-    @override_settings(COMPREHENSIVE_THEME_DIRS=[settings.TEST_THEME.dirname()])
-    @with_comprehensive_theme(settings.TEST_THEME.basename())
+    @with_comprehensive_theme("test-theme")
     def test_logo_image(self):
         """
         Test that theme logo is used instead of default logo.
@@ -61,8 +63,7 @@ class TestComprehensiveThemeCMS(TestCase):
         # Clear the internal staticfiles caches, to get test isolation.
         staticfiles.finders.get_finder.cache_clear()
 
-    @override_settings(COMPREHENSIVE_THEME_DIRS=[settings.TEST_THEME.dirname()])
-    @with_comprehensive_theme(settings.TEST_THEME.basename())
+    @with_comprehensive_theme("test-theme")
     def test_template_override(self):
         """
         Test that theme templates are used instead of default templates.
