@@ -6,6 +6,7 @@ from django.test import TestCase
 from path import path           # pylint: disable=no-name-in-module
 from django.contrib import staticfiles
 
+import edxmako
 from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme
 from openedx.core.lib.tempdir import mkdtemp_clean, create_symlink, delete_symlink
 
@@ -48,6 +49,8 @@ class TestComprehensiveTheming(TestCase):
 
         dest_path = path(settings.COMPREHENSIVE_THEME_DIRS[0]) / tmp_theme
         create_symlink(themes_dir / tmp_theme, dest_path)
+
+        edxmako.paths.add_lookup('main', themes_dir, prepend=True)
 
         @with_comprehensive_theme(tmp_theme)
         def do_the_test(self):
