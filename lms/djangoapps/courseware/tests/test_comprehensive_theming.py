@@ -50,7 +50,9 @@ class TestComprehensiveTheming(TestCase):
         logger.debug("********** COMPREHENSIVE THEMING SETTINGS **********")
         logger.debug("********** SITE_ID: {0}".format(helpers.get_value("SITE_ID", settings.SITE_ID)))
         logger.debug("********** ENABLE_COMPREHENSIVE_THEMING: {0}".format(helpers.get_value("ENABLE_COMPREHENSIVE_THEMING", settings.ENABLE_COMPREHENSIVE_THEMING)))
-        logger.debug("********** COMPREHENSIVE_THEME_DIRS: {0}".format(helpers.get_value("COMPREHENSIVE_THEME_DIRS", settings.COMPREHENSIVE_THEME_DIRS)))
+        comprehensive_theme_dirs = helpers.get_value("COMPREHENSIVE_THEME_DIRS", settings.COMPREHENSIVE_THEME_DIRS)
+        logger.debug("********** COMPREHENSIVE_THEME_DIRS: {0}".format(comprehensive_theme_dirs))
+        logger.debug("********** EDX-PLATFORM-TEST-SUBSET-DIR: {0}".format(os.listdir(comprehensive_theme_dirs[0])))
         logger.debug("********** DEFAULT_SITE_THEME: {0}".format(helpers.get_value("DEFAULT_SITE_THEME", settings.DEFAULT_SITE_THEME)))
 
         # Confirm the HTTP status code (no redirects, not founds, etc.)
