@@ -30,13 +30,23 @@ class TestComprehensiveTheming(TestCase):
         `red-theme` has header.html and footer.html so this test
         asserts presence of the content from header.html and footer.html
         """
+        logger.debug("******************** test_red_footer ********************")
         resp = self.client.get('/', SERVER_NAME='red-theme.org')
+        logger.debug("********** RESPONSE DICTIONARY **********")
         logger.debug(resp.__dict__)
+        logger.debug("********** RESPONSE CONTENT **********")
         logger.debug("\n\nResponse for TestComprehensiveTheming.test_red_footer:\n%s", resp.content)
 
         from openedx.core.djangoapps.theming import helpers
+        logger.debug("********** HELPER LOGS **********")
         logger.debug("\n\nHelper Logs:\nget_current_site: %s", helpers.get_current_site())
         logger.debug("\n\nHelper Logs:\nget_current_site_theme: %s", helpers.get_current_site_theme())
+
+        import os
+        logger.debug("********** THEMES DIRECTORY: {0}".format(os.listdir('themes')))
+        from openedx.core.djangoapps.theming import helpers
+        logger.debug("********** TEMPLATE PATH WITH THEME: ".format(helpers.get_template_path_with_theme('footer.html')))
+
 
         # Confirm the HTTP status code (no redirects, not founds, etc.)
         self.assertEqual(resp.status_code, 200)
@@ -47,10 +57,6 @@ class TestComprehensiveTheming(TestCase):
         # This string comes from footer.html
         self.assertContains(resp, "super-ugly")
 
-        import os
-        logger.debug(os.listdir('themes'))
-        from openedx.core.djangoapps.theming import helpers
-        logger.debug(helpers.get_template_path_with_theme('footer.html'))
 
         # from nose.tools import set_trace; set_trace
         # assert 0
