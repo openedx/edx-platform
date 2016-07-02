@@ -5,7 +5,7 @@
             'underscore',
             'gettext',
             'edx-ui-toolkit/js/utils/html-utils',
-            'text!../../../templates/learner_dashboard/certificate_status.underscore',
+            'text!../../../templates/learner_dashboard/upgrade_message.underscore',
             'text!../../../templates/learner_dashboard/certificate_icon.underscore'
            ],
          function(
@@ -14,11 +14,11 @@
              _,
              gettext,
              HtmlUtils,
-             certificateStatusTpl,
+             upgradeMessageTpl,
              certificateIconTpl
          ) {
             return Backbone.View.extend({
-                statusTpl: HtmlUtils.template(certificateStatusTpl),
+                messageTpl: HtmlUtils.template(upgradeMessageTpl),
                 iconTpl: HtmlUtils.template(certificateIconTpl),
 
                 initialize: function(options) {
@@ -30,7 +30,7 @@
                     var data = this.model.toJSON();
 
                     data = $.extend(data, {certificateSvg: this.iconTpl()});
-                    HtmlUtils.setHtml(this.$el, this.statusTpl(data));
+                    HtmlUtils.setHtml(this.$el, this.messageTpl(data));
                 }
             });
         }
