@@ -1,8 +1,7 @@
 import logging
 
 from django.contrib.auth.models import User
-from django.shortcuts import redirect
-from ipware.ip import get_ip
+from django.core.urlresolvers import reverse
 from opaque_keys.edx.keys import CourseKey
 from rest_framework import status
 from rest_framework.response import Response
@@ -10,8 +9,6 @@ from rest_framework.views import APIView
 
 from course_modes.models import CourseMode
 from courseware.courses import get_course_by_id
-from edxmako.shortcuts import render_to_response
-from embargo import api as embargo_api
 from enrollment.views import EnrollmentCrossDomainSessionAuth
 from instructor.views.api import save_registration_code
 from openedx.core.lib.api.authentication import (
@@ -19,10 +16,10 @@ from openedx.core.lib.api.authentication import (
 )
 from openedx.core.lib.api.permissions import IsStaffOrOwner
 from shoppingcart.exceptions import (
-    ItemNotFoundInCartException, RedemptionCodeError
+    RedemptionCodeError
 )
 from shoppingcart.models import (
-    Order, PaidCourseRegistration, RegistrationCodeRedemption, CourseRegCodeItem
+    RegistrationCodeRedemption
 )
 from shoppingcart.views import get_reg_code_validity
 from student.models import CourseEnrollment, EnrollmentClosedError, CourseFullError, \
@@ -59,7 +56,9 @@ class GenerateRegistrationCodesView(APIView):
 
         return Response(
             data={
-                'codes': registration_codes
+                'codes': registration_codes,
+                'course_id': request.data.get('course_id'),
+                'course_url': reverse('about_course', kwargs={'course_id': request.data.get('course_id')})
             }
         )
 
