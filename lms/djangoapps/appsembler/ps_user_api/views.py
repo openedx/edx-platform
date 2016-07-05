@@ -1,20 +1,16 @@
 import logging
 
-from django.contrib.auth.models import User
 from django.core.exceptions import ImproperlyConfigured, NON_FIELD_ERRORS, ValidationError
 
-from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from util.json_request import JsonResponse
 
 from openedx.core.djangoapps.user_api.accounts.api import check_account_exists
 from student.views import create_account_with_params
-from student.cookies import set_logged_in_cookies
 
 
 from openedx.core.lib.api.authentication import (
-    SessionAuthenticationAllowInactiveUser,
     OAuth2AuthenticationAllowInactiveUser,
 )
 from openedx.core.lib.api.permissions import IsStaffOrOwner
@@ -24,7 +20,7 @@ log = logging.getLogger(__name__)
 
 
 class CreateUserAccountView(APIView):
-    authentication_classes = OAuth2AuthenticationAllowInactiveUser, #SessionAuthenticationAllowInactiveUser
+    authentication_classes = OAuth2AuthenticationAllowInactiveUser,
 
     permission_classes = IsStaffOrOwner,
 
@@ -78,5 +74,4 @@ class CreateUserAccountView(APIView):
             return JsonResponse(errors, status=400)
 
         response = JsonResponse({"success": True, 'user_id ': user_id })
-        set_logged_in_cookies(request, response, user)
         return response
