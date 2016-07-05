@@ -3,10 +3,12 @@ import logging
 from django.core.exceptions import NON_FIELD_ERRORS, ValidationError
 
 from rest_framework.views import APIView
+from rest_framework import status
 
 from util.json_request import JsonResponse
 
-from openedx.core.djangoapps.user_api.accounts.api import check_account_exists
+from openedx.core.djangoapps.user_api.accounts.api import check_account_exists, get_account_settings
+from openedx.core.djangoapps.user_api.errors import UserNotFound
 from student.views import create_account_with_params
 
 
@@ -21,7 +23,6 @@ log = logging.getLogger(__name__)
 
 class CreateUserAccountView(APIView):
     authentication_classes = OAuth2AuthenticationAllowInactiveUser,
-
     permission_classes = IsStaffOrOwner,
 
 
@@ -75,3 +76,19 @@ class CreateUserAccountView(APIView):
 
         response = JsonResponse({"success": True, 'user_id ': user_id })
         return response
+
+
+class GetUserAccountView(APIView):
+    authentication_classes = OAuth2AuthenticationAllowInactiveUser,
+    permission_classes = IsStaffOrOwner,
+
+    def get(self, request, username):
+
+        try:
+            account_settings = get_account_settings(request, username, view=request.query_params.get('view'))
+        except UserNotFound:
+            return JsonResponse(
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        return JsonResponse(account_settings['username'])
