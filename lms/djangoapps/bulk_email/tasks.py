@@ -97,25 +97,31 @@ BULK_EMAIL_FAILURE_ERRORS = (
 )
 
 
-def _get_course_email_context(course):
+def _get_course_email_context(course, is_secure):
     """
     Returns context arguments to apply to all emails, independent of recipient.
+
+    Inputs are:
+    * `course`: Course related to the current email
+    * `is_secure`: Set to True to return https URLs, False to use http.
     """
     course_id = course.id.to_deprecated_string()
     course_title = course.display_name
     course_end_date = get_default_time_display(course.end)
-    course_url = 'https://{}{}'.format(
-        settings.SITE_NAME,
+    scheme = u'https' if is_secure else u'http'
+    base_url = '{}://{}'.format(scheme, settings.SITE_NAME)
+    course_url = '{}{}'.format(
+        base_url,
         reverse('course_root', kwargs={'course_id': course_id})
     )
-    image_url = u'https://{}{}'.format(settings.SITE_NAME, course_image_url(course))
+    image_url = u'{}{}'.format(base_url, course_image_url(course))
     email_context = {
         'course_title': course_title,
         'course_url': course_url,
         'course_image_url': image_url,
         'course_end_date': course_end_date,
-        'account_settings_url': 'https://{}{}'.format(settings.SITE_NAME, reverse('account_settings')),
-        'email_settings_url': 'https://{}{}'.format(settings.SITE_NAME, reverse('dashboard')),
+        'account_settings_url': '{}{}'.format(base_url, reverse('account_settings')),
+        'email_settings_url': '{}{}'.format(base_url, reverse('dashboard')),
         'platform_name': configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),
     }
     return email_context
@@ -170,9 +176,12 @@ def perform_delegate_email_batches(entry_id, course_id, task_input, action_name)
     # Fetch the course object.
     course = get_course(course_id)
 
+    # Emails use https URLs by default, to maintain backwards compatibility.
+    is_secure = task_input.get('is_secure', True)
+
     # Get arguments that will be passed to every subtask.
     targets = email_obj.targets.all()
-    global_email_context = _get_course_email_context(course)
+    global_email_context = _get_course_email_context(course, is_secure)
 
     recipient_qsets = [
         target.get_users(course_id, user_id)

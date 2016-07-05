@@ -1,7 +1,7 @@
 """
 Test for LMS instructor background task queue management
 """
-from mock import patch, Mock, MagicMock
+from mock import patch, Mock, MagicMock, ANY
 from nose.plugins.attrib import attr
 from bulk_email.models import CourseEmail, SEND_TO_MYSELF, SEND_TO_STAFF, SEND_TO_LEARNERS
 from courseware.tests.factories import UserFactory
@@ -30,7 +30,7 @@ from instructor_task.api import (
 
 from instructor_task.api_helper import AlreadyRunningError
 from instructor_task.models import InstructorTask, PROGRESS
-from instructor_task.tasks import export_ora2_data
+from instructor_task.tasks import export_ora2_data, send_bulk_course_email
 from instructor_task.tests.test_base import (
     InstructorTaskTestCase,
     InstructorTaskCourseTestCase,
@@ -220,6 +220,23 @@ class InstructorTaskCourseSubmitTest(TestReportMixin, InstructorTaskCourseTestCa
             email_id
         )
         self._test_resubmission(api_call)
+
+    def test_submit_bulk_email_task_input(self):
+        """
+        Tests the task_input hash created by submit_bulk_course_email.
+        """
+        request = self.create_task_request(self.instructor)
+        email_id = self._define_course_email()
+        task_input = dict(email_id=email_id, 
+                          to_option=[SEND_TO_MYSELF, SEND_TO_LEARNERS, SEND_TO_STAFF],
+                          is_secure=request.is_secure())
+
+        with patch('instructor_task.api.submit_task') as mock_submit_task:
+            mock_submit_task.return_value = MagicMock()
+            submit_bulk_course_email(request, self.course.id, email_id)
+
+            mock_submit_task.assert_called_once_with(
+                request, 'bulk_course_email', send_bulk_course_email, self.course.id, task_input, ANY)
 
     def test_submit_calculate_problem_responses(self):
         api_call = lambda: submit_calculate_problem_responses_csv(
