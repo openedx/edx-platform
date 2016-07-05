@@ -23,13 +23,13 @@ define([
                         course_image_url: 'http://test.com/image1',
                         course_key: 'course-v1:ANUx+ANU-ASTRO1x+3T2015',
                         course_started: true,
-                        course_url: 'http://localhost:8000/courses/course-v1:edX+DemoX+Demo_Course/info',
+                        course_url: 'https://courses.example.com/courses/course-v1:edX+DemoX+Demo_Course',
                         end_date: 'Jun 13, 2019',
                         enrollment_open_date: 'Mar 03, 2016',
                         is_course_ended: false,
                         is_enrolled: true,
                         is_enrollment_open: true,
-                        marketing_url: 'https://www.edx.org/course/astrophysics-exploring',
+                        marketing_url: 'https://www.example.com/marketing/site',
                         mode_slug: 'verified',
                         run_key: '2T2016',
                         start_date: 'Apr 25, 2016',
@@ -53,7 +53,8 @@ define([
                 expect(view.$('.header-img').attr('src')).toEqual(context.run_modes[0].course_image_url);
                 expect(view.$('.course-details .course-title-link').text().trim()).toEqual(context.display_name);
                 expect(view.$('.course-details .course-title-link').attr('href')).toEqual(
-                    context.run_modes[0].course_url);
+                    context.run_modes[0].marketing_url
+                );
                 expect(view.$('.course-details .course-text .course-key').html()).toEqual(context.key);
                 expect(view.$('.course-details .course-text .run-period').html())
                     .toEqual(context.run_modes[0].start_date + ' - ' + context.run_modes[0].end_date);
@@ -140,7 +141,6 @@ define([
                 setupView(data, false);
                 expect(view.$('.header-img').attr('src')).toEqual(data.run_modes[0].course_image_url);
                 expect(view.$('.course-details .course-title').text().trim()).toEqual(data.display_name);
-                expect(view.$('.course-details .course-title-link').length).toBe(0);
                 expect(view.$('.course-details .course-text .course-key').html()).toEqual(data.key);
                 expect(view.$('.course-details .course-text .run-period').length).toBe(0);
                 expect(view.$('.no-action-message').text().trim()).toBe('Coming Soon');
@@ -155,6 +155,35 @@ define([
                 delete data.run_modes[0].enrollment_open_date;
                 setupView(data, false);
                 validateCourseInfoDisplay();
+            });
+
+            it('should link to the marketing site when a URL is available', function(){
+                $.each([ '.course-image-link', '.course-title-link' ], function( index, selector ) {
+                    expect(view.$(selector).attr('href')).toEqual(context.run_modes[0].marketing_url);
+                });
+            });
+
+            it('should link to the course home when no marketing URL is available', function(){
+                var data = $.extend({}, context);
+
+                data.run_modes[0].marketing_url = null;
+                setupView(data, false);
+
+                $.each([ '.course-image-link', '.course-title-link' ], function( index, selector ) {
+                    expect(view.$(selector).attr('href')).toEqual(context.run_modes[0].course_url);
+                });
+            });
+
+            it('should not link to the marketing site or the course home if neither URL is available', function(){
+                var data = $.extend({}, context);
+
+                data.run_modes[0].marketing_url = null;
+                data.run_modes[0].course_url = null;
+                setupView(data, false);
+
+                $.each([ '.course-image-link', '.course-title-link' ], function( index, selector ) {
+                    expect(view.$(selector).length).toEqual(0);
+                });
             });
         });
     }
