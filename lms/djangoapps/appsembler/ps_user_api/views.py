@@ -1,6 +1,6 @@
 import logging
 
-from django.core.exceptions import ImproperlyConfigured, NON_FIELD_ERRORS, ValidationError
+from django.core.exceptions import NON_FIELD_ERRORS, ValidationError
 
 from rest_framework.views import APIView
 
