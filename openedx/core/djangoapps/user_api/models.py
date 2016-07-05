@@ -8,9 +8,6 @@ from django.db.models.signals import post_delete, pre_save, post_save
 from django.dispatch import receiver
 from model_utils.models import TimeStampedModel
 
-from pytz import common_timezones
-from util.date_utils import get_formatted_time_zone
-
 from util.model_utils import get_changed_fields_dict, emit_setting_changed_event
 from xmodule_django.models import CourseKeyField
 
@@ -29,10 +26,6 @@ class UserPreference(models.Model):
     user = models.ForeignKey(User, db_index=True, related_name="preferences")
     key = models.CharField(max_length=255, db_index=True, validators=[RegexValidator(KEY_REGEX)])
     value = models.TextField()
-
-    TIME_ZONE_CHOICES = [
-        (tz, get_formatted_time_zone(tz)) for tz in common_timezones
-    ]
 
     class Meta(object):
         unique_together = ("user", "key")
