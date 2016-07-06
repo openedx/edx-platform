@@ -95,7 +95,7 @@ class BulkEmailTest(BaseInstructorDashboardTest):
         ])
         self.send_email_page.a11y_audit.config.set_rules({
             "ignore": [
-                'button-name',  # TODO: AC-491
+                'button-name',  # TinyMCE button is missing accessible text
                 'color-contrast',  # TODO: AC-491
             ]
         })
