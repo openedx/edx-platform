@@ -4662,8 +4662,6 @@ var PDFViewerApplication = {
       presentationModeButton:
         document.getElementById('secondaryPresentationMode'),
       openFile: document.getElementById('secondaryOpenFile'),
-      print: document.getElementById('secondaryPrint'),
-      download: document.getElementById('secondaryDownload'),
       viewBookmark: document.getElementById('secondaryViewBookmark'),
       firstPage: document.getElementById('firstPage'),
       lastPage: document.getElementById('lastPage'),
@@ -6258,11 +6256,6 @@ function webViewerInitialized() {
 
   mozL10n.setLanguage(locale);
 
-  if (!PDFViewerApplication.supportsPrinting) {
-    document.getElementById('print').classList.add('hidden');
-    document.getElementById('secondaryPrint').classList.add('hidden');
-  }
-
   if (!PDFViewerApplication.supportsFullscreen) {
     document.getElementById('presentationMode').classList.add('hidden');
     document.getElementById('secondaryPresentationMode').
@@ -6359,13 +6352,6 @@ function webViewerInitialized() {
 
   document.getElementById('openFile').addEventListener('click',
     SecondaryToolbar.openFileClick.bind(SecondaryToolbar));
-
-  document.getElementById('print').addEventListener('click',
-    SecondaryToolbar.printClick.bind(SecondaryToolbar));
-
-  document.getElementById('download').addEventListener('click',
-    SecondaryToolbar.downloadClick.bind(SecondaryToolbar));
-
 
   if (file && file.lastIndexOf('file:', 0) === 0) {
     // file:-scheme. Load the contents in the main thread because QtWebKit
@@ -6515,8 +6501,6 @@ window.addEventListener('change', function webViewerChange(evt) {
   document.getElementById('viewBookmark').setAttribute('hidden', 'true');
   document.getElementById('secondaryViewBookmark').
     setAttribute('hidden', 'true');
-  document.getElementById('download').setAttribute('hidden', 'true');
-  document.getElementById('secondaryDownload').setAttribute('hidden', 'true');
 }, true);
 
 function selectScaleOption(value) {
