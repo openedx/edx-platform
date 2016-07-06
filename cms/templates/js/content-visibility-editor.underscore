@@ -1,0 +1,33 @@
+<form>
+<h3 class="modal-section-title" id="content_visibility_label"><%- gettext('Student Visibility') %></h3>
+<div class="modal-section-content staff-lock">
+    <ul class="list-fields list-input content-visibility" role="group" aria-labelledby="content_visibility_label">
+        <li class="field-radio">
+            <label class="label">
+                <input class="input input-radio" name="content-visibility" type="radio" value="staff_only">
+                <%- gettext('Hide from students') %>
+            </label>
+        </li>
+        <li class="field-radio">
+            <label class="label">
+                <input class="input input-radio" name="content-visibility" type="radio" value="hide_after_due">
+                <%- gettext('Hide content but not grades from students after due date') %>
+            </label>
+        </li>
+        <li class="field-radio">
+            <label class="label">
+                <input class="input input-radio" name="content-visibility" type="radio" value="visible">
+                <%- gettext('Always show to students (Default)') %>
+            </label>
+        </li>
+    </ul>
+
+    <% if (hasExplicitStaffLock && !ancestorLocked) { %>
+        <p class="tip tip-warning">
+            <% var message = gettext('If you make this %(xblockType)s visible to students, students will be able to see its content after the release date has passed and you have published the unit.'); %>
+            <%- interpolate(message, { xblockType: xblockType }, true) %>
+            <%- gettext('Any units that are explicitly hidden from students will remain hidden after you clear this option for the subsection.') %>
+        </p>
+    <% } %>
+</div>
+</form>

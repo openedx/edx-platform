@@ -24,9 +24,6 @@
                   <% if (xblockInfo.isChapter()) { %>
                     <%= gettext('Any subsections or units that are explicitly hidden from students will remain hidden after you clear this option for the section.') %>
                   <% } %>
-                  <% if (xblockInfo.isSequential()) { %>
-                    <%= gettext('Any units that are explicitly hidden from students will remain hidden after you clear this option for the subsection.') %>
-                  <% } %>
                 </p>
             <% } %>
         </li>

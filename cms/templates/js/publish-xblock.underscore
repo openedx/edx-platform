@@ -101,6 +101,10 @@ var visibleToStaffOnly = visibilityState === 'staff_only';
             </a>
             </li>
         </ul>
+        <p>
+            <%- gettext("Note: Do not hide graded assignments using this feature.") %>
+            <a href="#"><%- gettext("Link to documentation.") %></a>
+        </p>
     </div>
 
     <div class="wrapper-pub-actions bar-mod-actions">
