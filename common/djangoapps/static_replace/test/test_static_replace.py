@@ -28,6 +28,7 @@ from xmodule.modulestore.xml import XMLModuleStore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.exceptions import NotFoundError
 from xmodule.assetstore.assetmgr import AssetManager
+from contentserver.url import get_asset_key_from_path, get_canonicalized_asset_path
 
 DATA_DIRECTORY = 'data_dir'
 COURSE_KEY = SlashSeparatedCourseKey('org', 'course', 'run')
@@ -112,14 +113,12 @@ def test_storage_url_not_exists(mock_storage):
     mock_storage.url.assert_called_once_with('data_dir/file.png')
 
 
-@patch('static_replace.StaticContent', autospec=True)
 @patch('static_replace.modulestore', autospec=True)
 @patch('static_replace.AssetBaseUrlConfig.get_base_url')
 @patch('static_replace.AssetExcludedExtensionsConfig.get_excluded_extensions')
-def test_mongo_filestore(mock_get_excluded_extensions, mock_get_base_url, mock_modulestore, mock_static_content):
+def test_mongo_filestore(mock_get_excluded_extensions, mock_get_base_url, mock_modulestore):
 
     mock_modulestore.return_value = Mock(MongoModuleStore)
-    mock_static_content.get_canonicalized_asset_path.return_value = "c4x://mock_url"
     mock_get_base_url.return_value = u''
     mock_get_excluded_extensions.return_value = ['foobar']
 
@@ -128,11 +127,9 @@ def test_mongo_filestore(mock_get_excluded_extensions, mock_get_base_url, mock_m
 
     # Namespace => content url
     assert_equals(
-        '"' + mock_static_content.get_canonicalized_asset_path.return_value + '"',
+        '"/c4x/org/course/asset/file.png"',
         replace_static_urls(STATIC_SOURCE, DATA_DIRECTORY, course_id=COURSE_KEY)
     )
-
-    mock_static_content.get_canonicalized_asset_path.assert_called_once_with(COURSE_KEY, 'file.png', u'', ['foobar'])
 
 
 @patch('static_replace.settings', autospec=True)
@@ -269,7 +266,7 @@ class CanonicalContentTest(SharedModuleStoreTestCase):
         # Parse the path as if it was potentially a relative URL with query parameters,
         # or an absolute URL, etc.  Only keep the path because that's all we need.
         _, _, relative_path, _, _, _ = urlparse(path)
-        asset_key = StaticContent.get_asset_key_from_path(cls.courses[prefix].id, relative_path)
+        asset_key = get_asset_key_from_path(cls.courses[prefix].id, relative_path)
 
         try:
             content = AssetManager.find(asset_key, as_stream=True)
@@ -525,9 +522,9 @@ class CanonicalContentTest(SharedModuleStoreTestCase):
         # - finally shove back in our regex patterns
         digest = CanonicalContentTest.get_content_digest_for_asset_path(prefix, start)
         if digest:
-            adjusted_asset_key = u'assets/courseware/MARK/asset-v1:a+b+{}+type@asset+block'.format(prefix)
-            adjusted_th_key = u'assets/courseware/MARK/asset-v1:a+b+{}+type@thumbnail+block'.format(prefix)
-            encoded_asset_key = u'/assets/courseware/MARK/asset-v1:a+b+{}+type@asset+block@'.format(prefix)
+            adjusted_asset_key = u'assets/courseware/VMARK/HMARK/asset-v1:a+b+{}+type@asset+block'.format(prefix)
+            adjusted_th_key = u'assets/courseware/VMARK/HMARK/asset-v1:a+b+{}+type@thumbnail+block'.format(prefix)
+            encoded_asset_key = u'/assets/courseware/VMARK/HMARK/asset-v1:a+b+{}+type@asset+block@'.format(prefix)
             encoded_asset_key = urlquote(encoded_asset_key)
 
         expected = expected.format(
@@ -544,11 +541,12 @@ class CanonicalContentTest(SharedModuleStoreTestCase):
         )
 
         expected = encode_unicode_characters_in_url(expected)
-        expected = expected.replace('MARK', '[a-f0-9]{32}')
+        expected = expected.replace('VMARK', 'v[\d]')
+        expected = expected.replace('HMARK', '[a-f0-9]{32}')
         expected = expected.replace('+', r'\+').replace('?', r'\?')
 
         with check_mongo_calls(mongo_calls):
-            asset_path = StaticContent.get_canonicalized_asset_path(self.courses[prefix].id, start, base_url, exts)
+            asset_path = get_canonicalized_asset_path(self.courses[prefix].id, start, base_url, exts)
             print expected
             print asset_path
             self.assertIsNotNone(re.match(expected, asset_path))
@@ -728,7 +726,7 @@ class CanonicalContentTest(SharedModuleStoreTestCase):
         # - finally shove back in our regex patterns
         digest = CanonicalContentTest.get_content_digest_for_asset_path(prefix, start)
         if digest:
-            adjusted_c4x_block = 'assets/courseware/MARK/c4x/a/b/asset'
+            adjusted_c4x_block = 'assets/courseware/VMARK/HMARK/c4x/a/b/asset'
             encoded_c4x_block = urlquote('/' + adjusted_c4x_block + '/')
 
         expected = expected.format(
@@ -741,11 +739,12 @@ class CanonicalContentTest(SharedModuleStoreTestCase):
         )
 
         expected = encode_unicode_characters_in_url(expected)
-        expected = expected.replace('MARK', '[a-f0-9]{32}')
+        expected = expected.replace('VMARK', 'v[\d]')
+        expected = expected.replace('HMARK', '[a-f0-9]{32}')
         expected = expected.replace('+', r'\+').replace('?', r'\?')
 
         with check_mongo_calls(mongo_calls):
-            asset_path = StaticContent.get_canonicalized_asset_path(self.courses[prefix].id, start, base_url, exts)
+            asset_path = get_canonicalized_asset_path(self.courses[prefix].id, start, base_url, exts)
             print expected
             print asset_path
             self.assertIsNotNone(re.match(expected, asset_path))

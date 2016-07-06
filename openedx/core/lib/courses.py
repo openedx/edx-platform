@@ -29,7 +29,7 @@ def course_image_url(course, image_key='course_image'):
         url = settings.STATIC_URL + settings.DEFAULT_COURSE_ABOUT_IMAGE_URL
     else:
         loc = StaticContent.compute_location(course.id, getattr(course, image_key))
-        url = StaticContent.serialize_asset_key_with_slash(loc)
+        url = unicode(loc)
 
     return url
 
@@ -44,4 +44,4 @@ def create_course_image_thumbnail(course, dimensions):
 
     _content, thumb_loc = contentstore().generate_thumbnail(course_image, dimensions=dimensions)
 
-    return StaticContent.serialize_asset_key_with_slash(thumb_loc)
+    return unicode(thumb_loc)
