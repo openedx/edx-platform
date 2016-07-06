@@ -4,7 +4,7 @@ from .devstack import *
 from .appsembler import *
 
 INSTALLED_APPS += (
-    #'appsembler',
-    'appsembler.enrollment_api',
+    'appsembler.intercom_integration',
+    'appsembler.enrollment_api'
 )
-#DEFAULT_TEMPLATE_ENGINE['OPTIONS']['context_processors'] += ('appsembler.context_processors.intercom',)
+DEFAULT_TEMPLATE_ENGINE['OPTIONS']['context_processors'] += ('appsembler.intercom_integration.context_processors.intercom',)

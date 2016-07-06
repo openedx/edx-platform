@@ -40,7 +40,7 @@
 
             urls: {
                 finishAuth: '/account/finish_auth',
-                defaultNextUrl: '/dashboard',
+                defaultNextUrl: '/courses',
                 payment: '/verify_student/start-flow/',
                 trackSelection: '/course_modes/choose/'
             },
