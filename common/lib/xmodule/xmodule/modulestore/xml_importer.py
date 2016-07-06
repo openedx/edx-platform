@@ -521,7 +521,6 @@ class CourseImportManager(ImportManager):
                     asset_key = get_location_from_path(chapter['url'])
                     chapter['url'] = get_static_path_from_location(asset_key)
 
-
         # Original wiki_slugs had value location.course. To make them unique this was changed to 'org.course.name'.
         # If we are importing into a course with a different course_id and wiki_slug is equal to either of these default
         # values then remap it so that the wiki does not point to the old wiki.

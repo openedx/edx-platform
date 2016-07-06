@@ -7,6 +7,7 @@ from mock import Mock, patch
 from path import Path as path
 
 from xmodule.contentstore.content import StaticContent, StaticContentStream
+from contentserver.url import get_location_from_path
 from xmodule.contentstore.content import ContentStore
 from opaque_keys.edx.locations import SlashSeparatedCourseKey, AssetLocation
 from xmodule.static_content import _write_js, _list_descriptors
@@ -166,7 +167,7 @@ class ContentTest(unittest.TestCase):
         )
 
     def test_get_location_from_path(self):
-        asset_location = StaticContent.get_location_from_path(u'/c4x/a/b/asset/images_course_image.jpg')
+        asset_location = get_location_from_path(u'/c4x/a/b/asset/images_course_image.jpg')
         self.assertEqual(
             AssetLocation(u'a', u'b', None, u'asset', u'images_course_image.jpg', None),
             asset_location
