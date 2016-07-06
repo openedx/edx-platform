@@ -691,7 +691,6 @@ class MiscCourseTests(ContentStoreTestCase):
         # Test that malicious code does not appear in html
         self.assertNotIn(malicious_code, resp.content)
 
-    @patch('django.conf.settings.DEPRECATED_ADVANCED_COMPONENT_TYPES', [])
     def test_advanced_components_in_edit_unit(self):
         # This could be made better, but for now let's just assert that we see the advanced modules mentioned in the page
         # response HTML

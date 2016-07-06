@@ -2905,10 +2905,6 @@ APP_UPGRADE_CACHE_TIMEOUT = 3600
 # if you want to avoid an overlap in ids while searching for history across the two tables.
 STUDENTMODULEHISTORYEXTENDED_OFFSET = 10000
 
-# Deprecated xblock types
-DEPRECATED_ADVANCED_COMPONENT_TYPES = []
-
-
 # Cutoff date for granting audit certificates
 
 AUDIT_CERT_CUTOFF_DATE = None

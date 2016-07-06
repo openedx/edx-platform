@@ -21,6 +21,7 @@ from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.djangoapps.models.course_details import CourseDetails
 from student.roles import CourseInstructorRole, CourseStaffRole
 from student.tests.factories import UserFactory
+from xblock_django.models import XBlockStudioConfigurationFlag
 from xmodule.fields import Date
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
@@ -783,6 +784,15 @@ class CourseMetadataEditingTest(CourseTestCase):
             user=self.user
         )
         self.assertNotIn('edxnotes', test_model)
+
+    def test_allow_unsupported_xblocks(self):
+        """
+        allow_unsupported_xblocks is only shown in Advanced Settings if
+        XBlockStudioConfigurationFlag is enabled.
+        """
+        self.assertNotIn('allow_unsupported_xblocks', CourseMetadata.fetch(self.fullcourse))
+        XBlockStudioConfigurationFlag(enabled=True).save()
+        self.assertIn('allow_unsupported_xblocks', CourseMetadata.fetch(self.fullcourse))
 
     def test_validate_from_json_correct_inputs(self):
         is_valid, errors, test_model = CourseMetadata.validate_and_update_from_json(

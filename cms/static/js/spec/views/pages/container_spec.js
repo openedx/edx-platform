@@ -1,7 +1,9 @@
 define(["jquery", "underscore", "underscore.string", "edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers",
         "common/js/spec_helpers/template_helpers", "js/spec_helpers/edit_helpers",
-        "js/views/pages/container", "js/views/pages/paged_container", "js/models/xblock_info", "jquery.simulate"],
-    function ($, _, str, AjaxHelpers, TemplateHelpers, EditHelpers, ContainerPage, PagedContainerPage, XBlockInfo) {
+        "js/views/pages/container", "js/views/pages/paged_container", "js/models/xblock_info",
+        "js/collections/component_template", "jquery.simulate"],
+    function ($, _, str, AjaxHelpers, TemplateHelpers, EditHelpers, ContainerPage, PagedContainerPage,
+              XBlockInfo, ComponentTemplates) {
         'use strict';
 
         function parameterized_suite(label, globalPageOptions) {
@@ -55,18 +57,19 @@ define(["jquery", "underscore", "underscore.string", "edx-ui-toolkit/js/utils/sp
                     );
                 };
 
-                getContainerPage = function (options) {
+                getContainerPage = function (options, componentTemplates) {
                     var default_options = {
                         model: model,
-                        templates: EditHelpers.mockComponentTemplates,
+                        templates: componentTemplates === undefined ?
+                            EditHelpers.mockComponentTemplates : componentTemplates,
                         el: $('#content')
                     };
                     return new PageClass(_.extend(options || {}, globalPageOptions, default_options));
                 };
 
-                renderContainerPage = function (test, html, options) {
+                renderContainerPage = function (test, html, options, componentTemplates) {
                     requests = AjaxHelpers.requests(test);
-                    containerPage = getContainerPage(options);
+                    containerPage = getContainerPage(options, componentTemplates);
                     containerPage.render();
                     respondWithHtml(html);
                     AjaxHelpers.expectJsonRequest(requests, 'GET', '/xblock/locator-container');
@@ -651,6 +654,138 @@ define(["jquery", "underscore", "underscore.string", "edx-ui-toolkit/js/utils/sp
                                     "boilerplate": "announcement.yaml",
                                     "parent_locator": "locator-group-A"
                                 });
+                            });
+
+                            it('does not show the support legend if show_legend is false', function () {
+                                // By default, show_legend is false in the mock component Templates.
+                                renderContainerPage(this, mockContainerXBlockHtml);
+                                showTemplatePicker();
+                                expect(containerPage.$('.support-documentation').length).toBe(0);
+                            });
+
+                            it('does show the support legend if show_legend is true', function () {
+                                var templates = new ComponentTemplates([
+                                 {
+                                    "templates": [
+                                        {
+                                            "category": "html",
+                                            "boilerplate_name": null,
+                                            "display_name": "Text"
+                                        }, {
+                                            "category": "html",
+                                            "boilerplate_name": "announcement.yaml",
+                                            "display_name": "Announcement"
+                                        }, {
+                                            "category": "html",
+                                            "boilerplate_name": "raw.yaml",
+                                            "display_name": "Raw HTML"
+                                        }],
+                                    "type": "html",
+                                    "support_legend": {
+                                        "show_legend": true,
+                                        "documentation_label": "Documentation Label:",
+                                        "allow_unsupported_xblocks": false
+                                    }
+                                }],
+                                {
+                                    parse: true
+                                }), supportDocumentation;
+                                renderContainerPage(this, mockContainerXBlockHtml, {}, templates);
+                                showTemplatePicker();
+                                supportDocumentation = containerPage.$('.support-documentation');
+                                // On this page, groups are being shown, each of which has a new component menu.
+                                expect(supportDocumentation.length).toBeGreaterThan(0);
+
+                                // check that the documentation label is displayed
+                                expect($(supportDocumentation[0]).find('.support-documentation-link').text().trim())
+                                    .toBe('Documentation Label:');
+
+                                // show_unsupported_xblocks is false, so only 2 support levels should be shown
+                                expect($(supportDocumentation[0]).find('.support-documentation-level').length).toBe(2);
+                            });
+
+                            it('does show unsupported level if enabled', function () {
+                                var templates = new ComponentTemplates([
+                                 {
+                                    "templates": [
+                                        {
+                                            "category": "html",
+                                            "boilerplate_name": null,
+                                            "display_name": "Text"
+                                        }, {
+                                            "category": "html",
+                                            "boilerplate_name": "announcement.yaml",
+                                            "display_name": "Announcement"
+                                        }, {
+                                            "category": "html",
+                                            "boilerplate_name": "raw.yaml",
+                                            "display_name": "Raw HTML"
+                                        }],
+                                    "type": "html",
+                                    "support_legend": {
+                                        "show_legend": true,
+                                        "documentation_label": "Documentation Label:",
+                                        "allow_unsupported_xblocks": true
+                                    }
+                                }],
+                                {
+                                    parse: true
+                                }), supportDocumentation;
+                                renderContainerPage(this, mockContainerXBlockHtml, {}, templates);
+                                showTemplatePicker();
+                                supportDocumentation = containerPage.$('.support-documentation');
+
+                                // show_unsupported_xblocks is true, so 3 support levels should be shown
+                                expect($(supportDocumentation[0]).find('.support-documentation-level').length).toBe(3);
+
+                                // verify only one has the unsupported item
+                                expect($(supportDocumentation[0]).find('.fa-circle-o').length).toBe(1);
+                            });
+                            
+                            it('does render support level indicators if present in JSON', function () {
+                                var templates = new ComponentTemplates([
+                                 {
+                                    "templates": [
+                                        {
+                                            "category": "html",
+                                            "boilerplate_name": null,
+                                            "display_name": "Text",
+                                            "support_level": "fs"
+                                        }, {
+                                            "category": "html",
+                                            "boilerplate_name": "announcement.yaml",
+                                            "display_name": "Announcement",
+                                            "support_level": "ps"
+                                        }, {
+                                            "category": "html",
+                                            "boilerplate_name": "raw.yaml",
+                                            "display_name": "Raw HTML",
+                                            "support_level": "us"
+                                        }],
+                                    "type": "html",
+                                    "support_legend": {
+                                        "show_legend": true,
+                                        "documentation_label": "Documentation Label:",
+                                        "allow_unsupported_xblocks": true
+                                    }
+                                }],
+                                {
+                                    parse: true
+                                }), supportLevelIndicators, getScreenReaderText;
+                                renderContainerPage(this, mockContainerXBlockHtml, {}, templates);
+                                showTemplatePicker();
+
+                                supportLevelIndicators = $(containerPage.$('.new-component-template')[0])
+                                    .find('.support-level');
+                                expect(supportLevelIndicators.length).toBe(3);
+
+                                getScreenReaderText = function(index){
+                                    return $($(supportLevelIndicators[index]).siblings()[0]).text().trim();
+                                };
+                                // Verify one level of each type was rendered.
+                                expect(getScreenReaderText(0)).toBe('Fully Supported');
+                                expect(getScreenReaderText(1)).toBe('Provisionally Supported');
+                                expect(getScreenReaderText(2)).toBe('Not Supported');
                             });
                         });
                     });
