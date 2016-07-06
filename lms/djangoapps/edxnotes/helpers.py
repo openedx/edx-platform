@@ -18,12 +18,13 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
+from provider.oauth2.models import Client
 
 from edxnotes.exceptions import EdxNotesParseError, EdxNotesServiceUnavailable
 from edxnotes.plugins import EdxNotesTab
 from courseware.views.views import get_current_child
 from courseware.access import has_access
-from openedx.core.lib.token_utils import get_id_token
+from openedx.core.lib.token_utils import JwtBuilder
 from student.models import anonymous_id_for_user
 from util.date_utils import get_default_time_display
 from xmodule.modulestore.django import modulestore
@@ -52,7 +53,19 @@ def get_edxnotes_id_token(user):
     """
     Returns generated ID Token for edxnotes.
     """
-    return get_id_token(user, CLIENT_NAME)
+    # TODO: Use the system's JWT_AUDIENCE and JWT_SECRET_KEY instead of client ID and name.
+    try:
+        client = Client.objects.get(name=CLIENT_NAME)
+    except Client.DoesNotExist:
+        raise ImproperlyConfigured(
+            'OAuth2 Client with name [{}] does not exist.'.format(CLIENT_NAME)
+        )
+
+    scopes = ['email', 'profile']
+    expires_in = settings.OAUTH_ID_TOKEN_EXPIRATION
+    jwt = JwtBuilder(user, secret=client.client_secret).build_token(scopes, expires_in, aud=client.client_id)
+
+    return jwt
 
 
 def get_token_url(course_id):
