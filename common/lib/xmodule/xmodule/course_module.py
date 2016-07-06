@@ -1244,7 +1244,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
                     raise ValueError
             return ret
         except (TypeError, ValueError):
-            log.exception(
+            log.info(
                 "Error parsing discussion_blackouts %s for course %s",
                 self.discussion_blackouts,
                 self.id
