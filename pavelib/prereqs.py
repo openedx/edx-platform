@@ -14,7 +14,7 @@ from .utils.envs import Env
 
 
 PREREQS_STATE_DIR = os.getenv('PREREQ_CACHE_DIR', Env.REPO_ROOT / '.prereqs_cache')
-NPM_REGISTRY = "http://registry.npmjs.org/"
+NPM_REGISTRY = "http://registry.nodejitsu.com/"
 NO_PREREQ_MESSAGE = "NO_PREREQ_INSTALL is set, not installing prereqs"
 
 # If you make any changes to this list you also need to make
