@@ -177,17 +177,6 @@ if (is_proctored_exam) {
                         <% } %>
                     </p>
                 </div>
-                <div class="status-hide-after-due">
-                    <p>
-                        <% if (!is_proctored_exam && xblockInfo.get('hide_after_due')) { %>
-                            <span class="icon fa fa-eye-slash" aria-hidden="true"></span>
-                            <span class="status-hide-after-due-value"> <%- gettext("Exam will remain hidden after due date") %> </span>
-                        <% } else { %>
-                            <span class="icon fa fa-eye" aria-hidden="true"></span>
-                            <span class="status-hide-after-due-value"> <%- gettext("Exam will be visible after due date") %> </span>
-                        <% } %>
-                    </p>
-                </div>
             <% } else if (xblockInfo.get('due_date') || xblockInfo.get('graded')) { %>
                 <div class="status-grading">
                     <p>
@@ -200,6 +189,14 @@ if (is_proctored_exam) {
                     </p>
                 </div>
             <% } %>
+            <div class="status-hide-after-due">
+                <p>
+                    <% if (xblockInfo.get('hide_after_due')) { %>
+                        <span class="icon fa fa-eye-slash" aria-hidden="true"></span>
+                        <span class="status-hide-after-due-value"> <%- gettext("Subsection is hidden after due date") %> </span>
+                    <% } %>
+                </p>
+            </div>
         <% } %>
         <% if (statusMessage) { %>
         <div class="status-message">

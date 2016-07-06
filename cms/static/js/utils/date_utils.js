@@ -52,7 +52,10 @@ function($, date, TriggerChangeEventOnEnter) {
         // given a pair of inputs (datepicker and timepicker), return a JS Date
         // object that corresponds to the datetime.js that they represent. Assume
         // UTC timezone, NOT the timezone of the user's browser.
-        var date = $(datepickerInput).datepicker("getDate"), time = null;
+        var date = null, time = null;
+        if (datepickerInput.length > 0) {
+            date = $(datepickerInput).datepicker("getDate");
+        }
         if (timepickerInput.length > 0) {
             time = $(timepickerInput).timepicker("getTime");
         }

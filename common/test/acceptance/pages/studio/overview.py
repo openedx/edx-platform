@@ -142,7 +142,10 @@ class CourseOutlineItem(object):
         Puts the item into editable form.
         """
         self.q(css=self._bounded_selector(self.CONFIGURATION_BUTTON_SELECTOR)).first.click()  # pylint: disable=no-member
-        modal = CourseOutlineModal(self)
+        if 'subsection' in self.BODY_SELECTOR:
+            modal = SubsectionOutlineModal(self)
+        else:
+            modal = CourseOutlineModal(self)
         EmptyPromise(lambda: modal.is_shown(), 'Modal is shown.')  # pylint: disable=unnecessary-lambda
         return modal
 
@@ -569,12 +572,15 @@ class CourseOutlinePage(CoursePage, CourseOutlineContainer):
         self.q(css=".action-save").first.click()
         self.wait_for_ajax()
 
-    def select_advanced_tab(self):
+    def select_advanced_tab(self, desired_item='special_exam'):
         """
         Select the advanced settings tab
         """
         self.q(css=".settings-tab-button[data-tab='advanced']").first.click()
-        self.wait_for_element_presence('input.no_special_exam', 'Special exam settings fields not present.')
+        if desired_item == 'special_exam':
+            self.wait_for_element_presence('input.no_special_exam', 'Special exam settings fields not present.')
+        if desired_item == 'gated_content':
+            self.wait_for_element_visibility('#is_prereq', 'Gating settings fields are present.')
 
     def make_exam_proctored(self):
         """
@@ -590,7 +596,7 @@ class CourseOutlinePage(CoursePage, CourseOutlineContainer):
         """
         self.q(css="input.timed_exam").first.click()
         if hide_after_due:
-            self.q(css='.field-hide-after-due input').first.click()
+            self.q(css='input[name=content-visibility][value=hide_after_due]').first.click()
         self.q(css=".action-save").first.click()
         self.wait_for_ajax()
 
@@ -630,12 +636,6 @@ class CourseOutlinePage(CoursePage, CourseOutlineContainer):
         """
         return self.q(css=".field-exam-review-rules").visible
 
-    def hide_after_due_field_visible(self):
-        """
-        Returns whether the hide after due field is visible
-        """
-        return self.q(css=".field-hide-after-due").visible
-
     def proctoring_items_are_displayed(self):
         """
         Returns True if all the items are found.
@@ -658,13 +658,6 @@ class CourseOutlinePage(CoursePage, CourseOutlineContainer):
             return False
 
         return True
-
-    def select_access_tab(self):
-        """
-        Select the access settings tab.
-        """
-        self.q(css=".settings-tab-button[data-tab='access']").first.click()
-        self.wait_for_element_visibility('#is_prereq', 'Gating settings fields are present.')
 
     def make_gating_prerequisite(self):
         """
@@ -848,6 +841,8 @@ class CourseOutlinePage(CoursePage, CourseOutlineContainer):
 class CourseOutlineModal(object):
     """
     Page object specifically for a modal window on the course outline page.
+
+    Subsections are handled slightly differently in some regards, and should use SubsectionOutlineModal.
     """
     MODAL_SELECTOR = ".wrapper-modal-window"
 
@@ -1037,17 +1032,38 @@ class CourseOutlineModal(object):
         ).fulfill()
 
     @property
+    def is_staff_lock_visible(self):
+        """
+        Returns True if the staff lock option is visible.
+        """
+        return self.find_css('#staff_lock').visible
+
+    def ensure_staff_lock_visible(self):
+        """
+        Ensures the staff lock option is visible, clicking on the advanced tab
+        if needed.
+        """
+        if not self.is_staff_lock_visible:
+            self.find_css(".settings-tab-button[data-tab=advanced]").click()
+        EmptyPromise(
+            lambda: self.is_staff_lock_visible,
+            "Staff lock option is visible",
+        ).fulfill()
+
+    @property
     def is_explicitly_locked(self):
         """
         Returns true if the explict staff lock checkbox is checked, false otherwise.
         """
+        self.ensure_staff_lock_visible()
         return self.find_css('#staff_lock')[0].is_selected()
 
     @is_explicitly_locked.setter
     def is_explicitly_locked(self, value):
         """
-        Checks the explicit staff lock box if value is true, otherwise unchecks the box.
+        Checks the explicit staff lock box if value is true, otherwise selects "visible".
         """
+        self.ensure_staff_lock_visible()
         if value != self.is_explicitly_locked:
             self.find_css('label[for="staff_lock"]').click()
         EmptyPromise(lambda: value == self.is_explicitly_locked, "Explicit staff lock is updated").fulfill()
@@ -1067,3 +1083,52 @@ class CourseOutlineModal(object):
             return select.first_selected_option.text
         else:
             return None
+
+
+class SubsectionOutlineModal(CourseOutlineModal):
+    """
+    Subclass to handle a few special cases with subsection modals.
+    """
+
+    def __init__(self, page):
+        super(SubsectionOutlineModal, self).__init__(page)
+
+    @property
+    def is_explicitly_locked(self):
+        """
+        Override - returns True if staff_only is set.
+        """
+        return self.subsection_visibility == 'staff_only'
+
+    @property
+    def subsection_visibility(self):
+        """
+        Returns the current visibility setting for a subsection
+        """
+        self.ensure_staff_lock_visible()
+        return self.find_css('input[name=content-visibility]:checked').first.attrs('value')[0]
+
+    @is_explicitly_locked.setter
+    def is_explicitly_locked(self, value):  # pylint: disable=arguments-differ
+        """
+        Override - sets visibility to staff_only if True, else 'visible'.
+
+        For hide_after_due, use the set_subsection_visibility method directly.
+        """
+        self.subsection_visibility = 'staff_only' if value else 'visible'
+
+    @subsection_visibility.setter
+    def subsection_visibility(self, value):
+        """
+        Sets the subsection visibility to the given value.
+        """
+        self.ensure_staff_lock_visible()
+        self.find_css('input[name=content-visibility][value=' + value + ']').click()
+        EmptyPromise(lambda: value == self.subsection_visibility, "Subsection visibility is updated").fulfill()
+
+    @property
+    def is_staff_lock_visible(self):
+        """
+        Override - Returns true if the staff lock option is visible.
+        """
+        return self.find_css('input[name=content-visibility]').visible
