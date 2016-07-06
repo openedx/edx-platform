@@ -207,8 +207,8 @@ class AuthTestCase(ContentStoreTestCase):
             self.assertIn(
                 (
                     "This account has been temporarily locked due to excessive login failures. "
-                    "Try again in {minutes} minute(s).  For security reasons, "
-                    "reseting the password will NOT lift the lockout. Please wait for {minutes} minute(s)."
+                    "Try again in {minutes} minutes.  For security reasons, "
+                    "resetting the password will NOT lift the lockout. Please wait for {minutes} minutes."
                 ).format(
                     minutes=LOGIN_LOCKOUT_PERIOD_PLUS_FIVE_MINUTES,
                 ),

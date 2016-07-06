@@ -27,7 +27,7 @@ from django.db import IntegrityError, transaction
 from django.http import (HttpResponse, HttpResponseBadRequest, HttpResponseForbidden,
                          HttpResponseServerError, Http404)
 from django.shortcuts import redirect
-from django.utils.translation import ungettext
+from django.utils.translation import ungettext, ngettext
 from django.utils.http import base36_to_int
 from django.utils.translation import ugettext as _, get_language
 from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
@@ -1288,10 +1288,14 @@ def login_user(request, error=""):  # pylint: disable=too-many-statements,unused
         if LoginFailures.is_user_locked_out(user_found_by_email_lookup):
             return JsonResponse({
                 "success": False,
-                "value": _(
+                "value": ngettext(
                     "This account has been temporarily locked due to excessive login failures. "
-                    "Try again in {minutes} minute(s).  For security reasons, "
-                    "reseting the password will NOT lift the lockout. Please wait for {minutes} minute(s).").format(
+                    "Try again in {minutes} minute.  For security reasons, "
+                    "resetting the password will NOT lift the lockout. Please wait for {minutes} minute.",
+                    "This account has been temporarily locked due to excessive login failures. "
+                    "Try again in {minutes} minutes.  For security reasons, "
+                    "resetting the password will NOT lift the lockout. Please wait for {minutes} minutes.",
+                    LOGIN_LOCKOUT_PERIOD_PLUS_FIVE_MINUTES).format(
                         minutes=LOGIN_LOCKOUT_PERIOD_PLUS_FIVE_MINUTES,),
             })  # TODO: this should be status code 429  # pylint: disable=fixme
 
