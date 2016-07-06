@@ -22,6 +22,7 @@ from static_replace.models import AssetBaseUrlConfig
 from xmodule.assetstore.assetmgr import AssetManager
 from xmodule.contentstore.django import contentstore
 from xmodule.contentstore.content import StaticContent
+from contentserver.url import get_location_from_path
 from xmodule.course_metadata_utils import DEFAULT_START_DATE
 from xmodule.course_module import (
     CATALOG_VISIBILITY_CATALOG_AND_ABOUT,
@@ -663,6 +664,8 @@ class CourseOverviewImageSetTestCase(ModuleStoreTestCase):
                 expected_path_start = "/asset-v1:"
 
             for url in overview.image_urls.values():
+                print expected_path_start
+                print url
                 self.assertTrue(url.startswith(expected_path_start))
 
             # Now enable the CDN...
@@ -797,7 +800,7 @@ class CourseOverviewImageSetTestCase(ModuleStoreTestCase):
 
             # Now make sure our thumbnails are of the sizes we expect...
             for image_url, expected_size in [(image_urls['small'], config.small), (image_urls['large'], config.large)]:
-                image_key = StaticContent.get_location_from_path(image_url)
+                image_key = get_location_from_path(image_url)
                 image_content = AssetManager.find(image_key)
                 image = Image.open(StringIO(image_content.data))
                 self.assertEqual(image.size, expected_size)
@@ -849,7 +852,7 @@ class CourseOverviewImageSetTestCase(ModuleStoreTestCase):
         image_urls = course_overview.image_urls
 
         for image_url, target in [(image_urls['small'], config.small), (image_urls['large'], config.large)]:
-            image_key = StaticContent.get_location_from_path(image_url)
+            image_key = get_location_from_path(image_url)
             image_content = AssetManager.find(image_key)
             image = Image.open(StringIO(image_content.data))
 

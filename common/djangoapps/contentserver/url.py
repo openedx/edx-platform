@@ -1,4 +1,5 @@
 import re
+import uuid
 
 from urlparse import urlparse, urlunparse, parse_qsl
 from urllib import urlencode, quote_plus
@@ -9,7 +10,6 @@ from xmodule.assetstore.assetmgr import AssetManager
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.exceptions import NotFoundError
 from xmodule.contentstore.content import StaticContent
-from static_replace.constants import STATIC_RESOURCE_PREFIX
 
 from . import CONTENTSERVER_VERSION
 
@@ -72,8 +72,8 @@ def get_asset_key_from_path(course_key, path):
     """
 
     # Clean up the path, removing any static prefix and any leading slash.
-    if path.startswith(STATIC_RESOURCE_PREFIX):
-        path = path[len(STATIC_RESOURCE_PREFIX):]
+    if path.startswith('/static/'):
+        path = path[len('/static/'):]
 
     path = path.lstrip('/')
 
