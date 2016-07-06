@@ -84,13 +84,15 @@ you can ask for help:
 -  `edx-code`_: anything else related to Open edX. This includes feature
    requests, idea proposals, refactorings, and so on.
 
-You can also join our IRC channel: `#edx-code on Freenode`_.
+Our real-time conversations are on Slack. You can request a `Slack
+invitation`_, then join our `community Slack team`_.
 
 .. _openedx-ops: https://groups.google.com/forum/#!forum/openedx-ops
 .. _openedx-translation: https://groups.google.com/forum/#!forum/openedx-translation
 .. _openedx-analytics: https://groups.google.com/forum/#!forum/openedx-analytics
 .. _edx-code: https://groups.google.com/forum/#!forum/edx-code
-.. _#edx-code on Freenode: http://webchat.freenode.net/?channels=edx-code
+.. _Slack invitation: https://openedx-slack-invite.herokuapp.com/
+.. _community Slack team: http://openedx.slack.com/
 
 
 Issue Tracker
@@ -110,7 +112,7 @@ How to Contribute
 -----------------
 
 Contributions are very welcome, but for legal reasons, you must submit a
-signed `individual contributor’s agreement`_ before we can accept your
+signed `individual contributor agreement`_ before we can accept your
 contribution. See our `CONTRIBUTING`_ file for more information – it
 also contains guidelines for how to maintain high code quality, which
 will make your contribution more likely to be accepted.
@@ -120,7 +122,7 @@ Reporting Security Issues
 -------------------------
 
 Please do not report security issues in public. Please email
-security@edx.org
+security@edx.org.
 
-.. _individual contributor’s agreement: http://open.edx.org/sites/default/files/wysiwyg/individual-contributor-agreement.pdf
+.. _individual contributor agreement: http://open.edx.org/sites/default/files/wysiwyg/individual-contributor-agreement.pdf
 .. _CONTRIBUTING: https://github.com/edx/edx-platform/blob/master/CONTRIBUTING.rst
