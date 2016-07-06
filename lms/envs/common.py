@@ -2342,7 +2342,8 @@ GRADES_DOWNLOAD_ROUTING_KEY = HIGH_MEM_QUEUE
 GRADES_DOWNLOAD = {
     'STORAGE_TYPE': 'localfs',
     'BUCKET': 'edx-grades',
-    'ROOT_PATH': '/tmp/edx-s3/grades',
+    'ROOT_PATH': os.path.join(MEDIA_ROOT, 'grades/'),
+    'ROOT_URL': os.path.join(MEDIA_URL, 'grades/'),
 }
 
 FINANCIAL_REPORTS = {

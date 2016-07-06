@@ -203,12 +203,8 @@ class ReportStore(object):
                 },
             )
         elif storage_type == 'localfs':
-            return DjangoStorageReportStore(
-                storage_class='django.core.files.storage.FileSystemStorage',
-                storage_kwargs={
-                    'location': config['ROOT_PATH'],
-                },
-            )
+            return LocalFSReportStore.from_config(config_name)
+
         return DjangoStorageReportStore.from_config(config_name)
 
     def _get_utf8_encoded_rows(self, rows):
@@ -296,3 +292,92 @@ class DjangoStorageReportStore(ReportStore):
         """
         hashed_course_id = hashlib.sha1(course_id.to_deprecated_string()).hexdigest()
         return os.path.join(hashed_course_id, filename)
+
+
+class LocalFSReportStore(ReportStore):
+    """
+    LocalFS implementation of a ReportStore. This is meant for debugging
+    purposes and is *absolutely not for production use*. Use S3ReportStore for
+    that. We use this in tests and for local development. When it generates
+    links, it will make file:/// style links. That means you actually have to
+    copy them and open them in a separate browser window, for security reasons.
+    This lets us do the cheap thing locally for debugging without having to open
+    up a separate URL that would only be used to send files in dev.
+    """
+    def __init__(self, root_path, root_url):
+        """
+        Initialize with root_path where we're going to store our files. We
+        will build a directory structure under this for each course.
+        """
+        self.root_path = root_path
+        self.root_url = root_url
+        if not os.path.exists(root_path):
+            os.makedirs(root_path)
+
+    @classmethod
+    def from_config(cls, config_name):
+        """
+        Generate an instance of this object from Django settings. It assumes
+        that there is a dict in settings named GRADES_DOWNLOAD and that it has
+        a ROOT_PATH that maps to an absolute file path that the web app has
+        write permissions to. `LocalFSReportStore` will create any intermediate
+        directories as needed.  ROOT_URL specifies the base URL from which
+        reports will be accessible. Example::
+
+            STORAGE_TYPE : "localfs"
+            ROOT_PATH : /edx/var/edxapp/media/grades/
+            ROOT_URL : /media/grades/
+        """
+        return cls(
+            getattr(settings, config_name).get("ROOT_PATH"),
+            getattr(settings, config_name).get("ROOT_URL")
+        )
+
+    def path_to(self, course_id, filename):
+        """Return the full path to a given file for a given course."""
+        return os.path.join(self.root_path, course_id.to_deprecated_string(), filename)
+
+    def store(self, course_id, filename, buff, config=None):  # pylint: disable=unused-argument
+        """
+        Given the `course_id` and `filename`, store the contents of `buff` in
+        that file. Overwrite anything that was there previously. `buff` is
+        assumed to be a StringIO objecd (or anything that can flush its contents
+        to string using `.getvalue()`).
+        """
+        full_path = self.path_to(course_id, filename)
+        directory = os.path.dirname(full_path)
+        if not os.path.exists(directory):
+            os.mkdir(directory)
+
+        with open(full_path, "wb") as f:
+            f.write(buff.getvalue())
+
+    def store_rows(self, course_id, filename, rows):
+        """
+        Given a course_id, filename, and rows (each row is an iterable of strings),
+        write this data out.
+        """
+        output_buffer = StringIO()
+        csvwriter = csv.writer(output_buffer)
+        csvwriter.writerows(self._get_utf8_encoded_rows(rows))
+
+        self.store(course_id, filename, output_buffer)
+
+    def links_for(self, course_id):
+        """
+        For a given `course_id`, return a list of `(filename, url)` tuples. `url`
+        can be plugged straight into an href. Note that `LocalFSReportStore`
+        will generate `file://` type URLs, so you'll need to copy the URL and
+        open it in a new browser window. Again, this class is only meant for
+        local development.
+        """
+        course_dir = self.path_to(course_id, '')
+        if not os.path.exists(course_dir):
+            return []
+        files = [(filename, os.path.join(course_dir, filename)) for filename in os.listdir(course_dir)]
+        files.sort(key=lambda (filename, full_path): os.path.getmtime(full_path), reverse=True)
+
+        return [
+            (filename, (os.path.join(self.root_url, os.path.relpath(full_path, self.root_path))))
+            for filename, full_path in files
+        ]
