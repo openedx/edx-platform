@@ -138,7 +138,7 @@ def get_canonicalized_asset_path(course_key, path, base_url, excluded_exts, enco
     query_params = parse_qsl(query_string)
     updated_query_params = []
     for query_name, query_val in query_params:
-        if query_val.startswith(STATIC_RESOURCE_PREFIX):
+        if query_val.startswith('/static/'):
             new_val = get_canonicalized_asset_path(
                 course_key, query_val, base_url, excluded_exts, encode=False)
             updated_query_params.append((query_name, new_val))

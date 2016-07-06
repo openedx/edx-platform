@@ -117,7 +117,6 @@ def test_storage_url_not_exists(mock_storage):
 @patch('static_replace.AssetBaseUrlConfig.get_base_url')
 @patch('static_replace.AssetExcludedExtensionsConfig.get_excluded_extensions')
 def test_mongo_filestore(mock_get_excluded_extensions, mock_get_base_url, mock_modulestore):
-
     mock_modulestore.return_value = Mock(MongoModuleStore)
     mock_get_base_url.return_value = u''
     mock_get_excluded_extensions.return_value = ['foobar']
