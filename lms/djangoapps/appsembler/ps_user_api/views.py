@@ -4,8 +4,7 @@ from django.core.exceptions import NON_FIELD_ERRORS, ValidationError
 
 from rest_framework.views import APIView
 from rest_framework import status
-
-from util.json_request import JsonResponse
+from rest_framework.response import Response
 
 from openedx.core.djangoapps.user_api.accounts.api import check_account_exists, get_account_settings
 from openedx.core.djangoapps.user_api.errors import UserNotFound
@@ -59,7 +58,7 @@ class CreateUserAccountView(APIView):
         conflicts = check_account_exists(email=email, username=username)
         if conflicts:
             errors = {"user_message": "User already exists"}
-            return JsonResponse(errors, status=409)
+            return Response(errors, status=409)
 
         try:
             user = create_account_with_params(request, data)
@@ -72,9 +71,9 @@ class CreateUserAccountView(APIView):
             assert NON_FIELD_ERRORS not in err.message_dict
             # Only return first error for each field
             errors = {"user_message": "Wrong parameters on user creation"}
-            return JsonResponse(errors, status=400)
+            return Response(errors, status=400)
 
-        response = JsonResponse({"success": True, 'user_id ': user_id })
+        response = Response({'user_id ': user_id }, status=200)
         return response
 
 
@@ -83,12 +82,23 @@ class GetUserAccountView(APIView):
     permission_classes = IsStaffOrOwner,
 
     def get(self, request, username):
+        """
+        check if a user exists based in the username
 
+        URL: /api/ps_user_api/v1/accounts/{username}
+        Args:
+            username: the username you are looking for
+
+        Returns:
+            200 OK and the user id
+            404 NOT_FOUND if the user doesn't exists
+
+        """
         try:
             account_settings = get_account_settings(request, username, view=request.query_params.get('view'))
         except UserNotFound:
-            return JsonResponse(
+            return Response(
                 status=status.HTTP_404_NOT_FOUND
             )
 
-        return JsonResponse(account_settings['username'])
+        return Response({'user_id': account_settings['username']}, status=200)
