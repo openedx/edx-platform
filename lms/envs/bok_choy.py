@@ -186,10 +186,6 @@ PROFILE_IMAGE_BACKEND = {
     },
 }
 
-# Make sure we test with the extended history table
-FEATURES['ENABLE_CSMH_EXTENDED'] = True
-INSTALLED_APPS += ('coursewarehistoryextended',)
-
 BADGING_BACKEND = 'lms.djangoapps.badges.backends.tests.dummy_backend.DummyBackend'
 
 # Configure the LMS to use our stub eCommerce implementation

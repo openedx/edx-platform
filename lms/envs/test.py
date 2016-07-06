@@ -200,9 +200,9 @@ if os.environ.get('DISABLE_MIGRATIONS'):
     # to Django 1.9, which allows setting MIGRATION_MODULES to None in order to skip migrations.
     MIGRATION_MODULES = NoOpMigrationModules()
 
-# Make sure we test with the extended history table
-FEATURES['ENABLE_CSMH_EXTENDED'] = True
-INSTALLED_APPS += ('coursewarehistoryextended',)
+# The extended StudentModule history table
+if FEATURES.get('ENABLE_CSMH_EXTENDED'):
+    INSTALLED_APPS += ('coursewarehistoryextended',)
 
 CACHES = {
     # This is the cache used for most things.

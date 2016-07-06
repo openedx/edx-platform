@@ -349,11 +349,8 @@ FEATURES = {
     # Show Language selector.
     'SHOW_LANGUAGE_SELECTOR': False,
 
-    # Write new CSM history to the extended table.
-    # This will eventually default to True and may be
-    # removed since all installs should have the separate
-    # extended history table.
-    'ENABLE_CSMH_EXTENDED': False,
+    # This may be removed when all installs have the separate extended history table.
+    'ENABLE_CSMH_EXTENDED': True,
 
     # Read from both the CSMH and CSMHE history tables.
     # This is the default, but can be disabled if all history
