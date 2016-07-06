@@ -540,7 +540,7 @@ class CanonicalContentTest(SharedModuleStoreTestCase):
         )
 
         expected = encode_unicode_characters_in_url(expected)
-        expected = expected.replace('VMARK', 'v[\d]')
+        expected = expected.replace('VMARK', r'v[\d]')
         expected = expected.replace('HMARK', '[a-f0-9]{32}')
         expected = expected.replace('+', r'\+').replace('?', r'\?')
 
@@ -738,7 +738,7 @@ class CanonicalContentTest(SharedModuleStoreTestCase):
         )
 
         expected = encode_unicode_characters_in_url(expected)
-        expected = expected.replace('VMARK', 'v[\d]')
+        expected = expected.replace('VMARK', r'v[\d]')
         expected = expected.replace('HMARK', '[a-f0-9]{32}')
         expected = expected.replace('+', r'\+').replace('?', r'\?')
 

@@ -43,13 +43,12 @@ class StaticContent(object):
         return self.location.category == 'thumbnail'
 
     @staticmethod
-    def compute_location(course_key, path, revision=None, is_thumbnail=False):
+    def compute_location(course_key, path, is_thumbnail=False):
         """
         Constructs a location object for static content.
 
         - course_key: the course that this asset belongs to
         - path: is the name of the static asset
-        - revision: is the object's revision information
         - is_thumbnail: is whether or not we want the thumbnail version of this
             asset
         """
@@ -86,6 +85,9 @@ class StaticContent(object):
         return self.location
 
     def stream_data(self):
+        """
+        Streams the data of this content to the caller.
+        """
         return self._data
 
     @property
@@ -102,6 +104,9 @@ class StaticContentStream(StaticContent):
         self._stream = stream
 
     def stream_data(self):
+        """
+        Streams the data of this content to the caller.
+        """
         while True:
             chunk = self._stream.read(STREAM_DATA_CHUNK_SIZE)
             if len(chunk) == 0:

@@ -1,9 +1,11 @@
+"""
+Helper functions to generate usable URLs from asset keys.
+"""
 import re
 import uuid
 
 from urlparse import urlparse, urlunparse, parse_qsl
 from urllib import urlencode, quote_plus
-from opaque_keys.edx.locator import AssetLocator
 from opaque_keys.edx.keys import CourseKey, AssetKey
 from opaque_keys import InvalidKeyError
 from xmodule.assetstore.assetmgr import AssetManager
@@ -165,6 +167,9 @@ def get_canonicalized_asset_path(course_key, path, base_url, excluded_exts, enco
 
 
 def get_base_url_path_for_course_assets(course_key):
+    """
+    Generates the base URL for an asset of a given course.
+    """
     if course_key is None:
         return None
 
@@ -193,7 +198,6 @@ def get_location_from_path(path):
 def serialize_asset_key_with_slash(asset_key):
     """
     Legacy code expects the serialized asset key to start w/ a slash; so, do that in one place
-    :param asset_key:
     """
     url = unicode(asset_key)
     if not url.startswith('/'):
@@ -210,13 +214,9 @@ def is_c4x_path(path_string):
 
 def get_static_path_from_location(location):
     """
-    This utility static method will take a location identifier and create a 'durable' /static/.. URL representation of it.
-    This link is 'durable' as it can maintain integrity across cloning of courseware across course-ids, e.g. reruns of
-    courses.
-    In the LMS/CMS, we have runtime link-rewriting, so at render time, this /static/... format will get translated into
-    the actual /c4x/... path which the client needs to reference static content
+    Generates the equivalent "static" version of an asset i.e. "/static/file.png"
     """
     if location is not None:
-        return u"/static/{name}".format(name=location.name)
+        return u"/static/{}".format(location.name)
     else:
         return None
