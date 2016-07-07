@@ -122,12 +122,6 @@ class ProgramListingPageA11yTest(ProgramPageBase):
 
         self.assertTrue(self.listing_page.is_sidebar_present)
         self.assertFalse(self.listing_page.are_cards_present)
-
-        self.listing_page.a11y_audit.config.set_rules({
-            "ignore": [
-                'section',  # TODO: AC-491
-            ]
-        })
         self.listing_page.a11y_audit.check_for_accessibility_errors()
 
     def test_cards_a11y(self):
@@ -137,12 +131,6 @@ class ProgramListingPageA11yTest(ProgramPageBase):
 
         self.assertTrue(self.listing_page.is_sidebar_present)
         self.assertTrue(self.listing_page.are_cards_present)
-
-        self.listing_page.a11y_audit.config.set_rules({
-            "ignore": [
-                'section',  # TODO: AC-491
-            ]
-        })
         self.listing_page.a11y_audit.check_for_accessibility_errors()
 
 
@@ -161,10 +149,4 @@ class ProgramDetailsPageA11yTest(ProgramPageBase):
         """Test the page's a11y compliance."""
         self.auth()
         self.details_page.visit()
-
-        self.details_page.a11y_audit.config.set_rules({
-            "ignore": [
-                'section',  # TODO: AC-491
-            ]
-        })
         self.details_page.a11y_audit.check_for_accessibility_errors()

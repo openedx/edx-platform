@@ -36,100 +36,6 @@ from .transformers.grades import GradesTransformer
 log = logging.getLogger("edx.courseware")
 
 
-class MaxScoresCache(object):
-    """
-    A cache for unweighted max scores for problems.
-
-    The key assumption here is that any problem that has not yet recorded a
-    score for a user is worth the same number of points. An XBlock is free to
-    score one student at 2/5 and another at 1/3. But a problem that has never
-    issued a score -- say a problem two students have only seen mentioned in
-    their progress pages and never interacted with -- should be worth the same
-    number of points for everyone.
-    """
-    def __init__(self, cache_prefix):
-        self.cache_prefix = cache_prefix
-        self._max_scores_cache = {}
-        self._max_scores_updates = {}
-
-    @classmethod
-    def create_for_course(cls, course):
-        """
-        Given a CourseDescriptor, return a correctly configured `MaxScoresCache`
-
-        This method will base the `MaxScoresCache` cache prefix value on the
-        last time something was published to the live version of the course.
-        This is so that we don't have to worry about stale cached values for
-        max scores -- any time a content change occurs, we change our cache
-        keys.
-        """
-        if course.subtree_edited_on is None:
-            # check for subtree_edited_on because old XML courses doesn't have this attribute
-            cache_key = u"{}".format(course.id)
-        else:
-            cache_key = u"{}.{}".format(course.id, course.subtree_edited_on.isoformat())
-        return cls(cache_key)
-
-    def fetch_from_remote(self, locations):
-        """
-        Populate the local cache with values from django's cache
-        """
-        remote_dict = cache.get_many([self._remote_cache_key(loc) for loc in locations])
-        self._max_scores_cache = {
-            self._local_cache_key(remote_key): value
-            for remote_key, value in remote_dict.items()
-            if value is not None
-        }
-
-    def push_to_remote(self):
-        """
-        Update the remote cache
-        """
-        if self._max_scores_updates:
-            cache.set_many(
-                {
-                    self._remote_cache_key(key): value
-                    for key, value in self._max_scores_updates.items()
-                },
-                60 * 60 * 24  # 1 day
-            )
-
-    def _remote_cache_key(self, location):
-        """Convert a location to a remote cache key (add our prefixing)."""
-        return u"grades.MaxScores.{}___{}".format(self.cache_prefix, unicode(location))
-
-    def _local_cache_key(self, remote_key):
-        """Convert a remote cache key to a local cache key (i.e. location str)."""
-        return remote_key.split(u"___", 1)[1]
-
-    def num_cached_from_remote(self):
-        """How many items did we pull down from the remote cache?"""
-        return len(self._max_scores_cache)
-
-    def num_cached_updates(self):
-        """How many local updates are we waiting to push to the remote cache?"""
-        return len(self._max_scores_updates)
-
-    def set(self, location, max_score):
-        """
-        Adds a max score to the max_score_cache
-        """
-        loc_str = unicode(location)
-        if self._max_scores_cache.get(loc_str) != max_score:
-            self._max_scores_updates[loc_str] = max_score
-
-    def get(self, location):
-        """
-        Retrieve a max score from the cache
-        """
-        loc_str = unicode(location)
-        max_score = self._max_scores_updates.get(loc_str)
-        if max_score is None:
-            max_score = self._max_scores_cache.get(loc_str)
-
-        return max_score
-
-
 class ProgressSummary(object):
     """
     Wrapper class for the computation of a user's scores across a course.
@@ -357,13 +263,13 @@ def answer_distributions(course_key):
     return answer_counts
 
 
-def grade(student, course, keep_raw_scores=False):
+def grade(student, course, keep_raw_scores=False, course_structure=None):
     """
     Returns the grade of the student.
 
     Also sends a signal to update the minimum grade requirement status.
     """
-    grade_summary = _grade(student, course, keep_raw_scores)
+    grade_summary = _grade(student, course, keep_raw_scores, course_structure)
     responses = GRADES_UPDATED.send_robust(
         sender=None,
         username=student.username,
@@ -378,7 +284,7 @@ def grade(student, course, keep_raw_scores=False):
     return grade_summary
 
 
-def _grade(student, course, keep_raw_scores):
+def _grade(student, course, keep_raw_scores, course_structure=None):
     """
     Unwrapped version of "grade"
 
@@ -392,7 +298,8 @@ def _grade(student, course, keep_raw_scores):
 
     More information on the format is in the docstring for CourseGrader.
     """
-    course_structure = get_course_blocks(student, course.location)
+    if course_structure is None:
+        course_structure = get_course_blocks(student, course.location)
     grading_context_result = grading_context(course_structure)
     scorable_locations = [block.location for block in grading_context_result['all_graded_blocks']]
 
@@ -412,15 +319,9 @@ def _grade(student, course, keep_raw_scores):
             course.id.to_deprecated_string(),
             anonymous_id_for_user(student, course.id)
         )
-        max_scores_cache = MaxScoresCache.create_for_course(course)
-
-        # For the moment, scores_client is ignorant of scorable_locations
-        # in the submissions API. As a further refactoring step, submissions should
-        # be hidden behind the ScoresClient.
-        max_scores_cache.fetch_from_remote(scorable_locations)
 
     totaled_scores, raw_scores = _calculate_totaled_scores(
-        student, grading_context_result, max_scores_cache, submissions_scores, scores_client, keep_raw_scores
+        student, grading_context_result, submissions_scores, scores_client, keep_raw_scores
     )
 
     with outer_atomic():
@@ -440,15 +341,12 @@ def _grade(student, course, keep_raw_scores):
             # so grader can be double-checked
             grade_summary['raw_scores'] = raw_scores
 
-        max_scores_cache.push_to_remote()
-
     return grade_summary
 
 
 def _calculate_totaled_scores(
         student,
         grading_context_result,
-        max_scores_cache,
         submissions_scores,
         scores_client,
         keep_raw_scores,
@@ -491,7 +389,6 @@ def _calculate_totaled_scores(
                             descendant,
                             scores_client,
                             submissions_scores,
-                            max_scores_cache,
                         )
                         if correct is None and total is None:
                             continue
@@ -559,12 +456,12 @@ def grade_for_percentage(grade_cutoffs, percentage):
     return letter_grade
 
 
-def progress_summary(student, course):
+def progress_summary(student, course, course_structure=None):
     """
     Returns progress summary for all chapters in the course.
     """
 
-    progress = _progress_summary(student, course)
+    progress = _progress_summary(student, course, course_structure)
     if progress:
         return progress.chapters
     else:
@@ -579,7 +476,7 @@ def get_weighted_scores(student, course):
     return _progress_summary(student, course)
 
 
-def _progress_summary(student, course):
+def _progress_summary(student, course, course_structure=None):
     """
     Unwrapped version of "progress_summary".
 
@@ -598,7 +495,8 @@ def _progress_summary(student, course):
         course: A Descriptor containing the course to grade
 
     """
-    course_structure = get_course_blocks(student, course.location)
+    if course_structure is None:
+        course_structure = get_course_blocks(student, course.location)
     if not len(course_structure):
         return None
     scorable_locations = [block_key for block_key in course_structure if possibly_scored(block_key)]
@@ -614,12 +512,6 @@ def _progress_summary(student, course):
         submissions_scores = sub_api.get_scores(
             unicode(course.id), anonymous_id_for_user(student, course.id)
         )
-
-        max_scores_cache = MaxScoresCache.create_for_course(course)
-        # For the moment, scores_client is ignorant of scorable_locations
-        # in the submissions API. As a further refactoring step, submissions should
-        # be hidden behind the ScoresClient.
-        max_scores_cache.fetch_from_remote(scorable_locations)
 
     # Check for gated content
     gated_content = gating_api.get_gated_content(course, student)
@@ -650,7 +542,6 @@ def _progress_summary(student, course):
                     descendant,
                     scores_client,
                     submissions_scores,
-                    max_scores_cache,
                 )
                 if correct is None and total is None:
                     continue
@@ -686,8 +577,6 @@ def _progress_summary(student, course):
             'sections': sections
         })
 
-    max_scores_cache.push_to_remote()
-
     return ProgressSummary(chapters, locations_to_weighted_scores, course_structure.get_children)
 
 
@@ -699,7 +588,7 @@ def weighted_score(raw_correct, raw_total, weight):
     return (float(raw_correct) * weight / raw_total, float(weight))
 
 
-def get_score(user, block, scores_client, submissions_scores_cache, max_scores_cache):
+def get_score(user, block, scores_client, submissions_scores_cache):
     """
     Return the score for a user on a problem, as a tuple (correct, total).
     e.g. (5,7) if you got 5 out of 7 points.
@@ -712,7 +601,6 @@ def get_score(user, block, scores_client, submissions_scores_cache, max_scores_c
     scores_client: an initialized ScoresClient
     submissions_scores_cache: A dict of location names to (earned, possible) point tuples.
            If an entry is found in this cache, it takes precedence.
-    max_scores_cache: a MaxScoresCache
     """
     submissions_scores_cache = submissions_scores_cache or {}
 
@@ -733,16 +621,10 @@ def get_score(user, block, scores_client, submissions_scores_cache, max_scores_c
     # older version of the problem -- they're still graded on what was possible
     # when they tried the problem, not what it's worth now.
     score = scores_client.get(block.location)
-    cached_max_score = max_scores_cache.get(block.location)
     if score and score.total is not None:
         # We have a valid score, just use it.
         correct = score.correct if score.correct is not None else 0.0
         total = score.total
-    elif cached_max_score is not None and settings.FEATURES.get("ENABLE_MAX_SCORE_CACHE"):
-        # We don't have a valid score entry but we know from our cache what the
-        # max possible score is, so they've earned 0.0 / cached_max_score
-        correct = 0.0
-        total = cached_max_score
     else:
         # This means we don't have a valid score entry and we don't have a
         # cached_max_score on hand. We know they've earned 0.0 points on this.
@@ -753,8 +635,6 @@ def get_score(user, block, scores_client, submissions_scores_cache, max_scores_c
         # In which case total might be None
         if total is None:
             return (None, None)
-        else:
-            max_scores_cache.set(block.location, total)
 
     return weighted_score(correct, total, block.weight)
 

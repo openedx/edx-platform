@@ -11,9 +11,9 @@ from openedx.core.djangolib.markup import HTML, Text
 
   <section class="message">
     %if not already_active:
-      <h1 class="valid">${_("Activation Complete!")}</h1>
+      <h1 class="valid">${_("Account Activated")}</h1>
     %else:
-      <h1>${_("Account already active!")}</h1>
+      <h1>${_("Account already active")}</h1>
     %endif
     <hr class="horizontal-divider">
 
@@ -28,7 +28,7 @@ from openedx.core.djangolib.markup import HTML, Text
         ${Text(_("Visit your {link_start}dashboard{link_end} to see your courses.")).format(
             link_start=HTML('<a href="{url}">').format(url=reverse('dashboard')), link_end=HTML('</a>'))}
       %else:
-        ${Text(_("You can now {link_start}log in{link_end}.")).format(
+        ${Text(_("You can now {link_start}sign in{link_end}.")).format(
             link_start=HTML('<a href="{url}">').format(url=reverse('signin_user')), link_end=HTML('</a>'))}
       %endif
     </p>

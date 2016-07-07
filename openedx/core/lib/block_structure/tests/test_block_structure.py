@@ -217,7 +217,7 @@ class TestBlockStructureData(TestCase, ChildrenMapTestMixin):
 
         self.assert_block_structure(block_structure, pruned_children_map, missing_blocks)
 
-    def test_remove_block_if(self):
+    def test_remove_block_traversal(self):
         block_structure = self.create_block_structure(ChildrenMapTestMixin.LINEAR_CHILDREN_MAP)
-        block_structure.remove_block_if(lambda block: block == 2)
+        block_structure.remove_block_traversal(lambda block: block == 2)
         self.assert_block_structure(block_structure, [[1], [], [], []], missing_blocks=[2])

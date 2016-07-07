@@ -65,7 +65,7 @@ def _remove_discussion_tab(course, user_id):
     """
     Remove the discussion tab for the course.
 
-    user_id is passed to the modulestore as the editor of the module.
+    user_id is passed to the modulestore as the editor of the xblock.
     """
     course.tabs = [tab for tab in course.tabs if not tab.type == 'discussion']
     modulestore().update_item(course, user_id)
@@ -206,8 +206,10 @@ class GetCourseTopicsTest(UrlResetMixin, ModuleStoreTestCase):
         self.request.user = self.user
         CourseEnrollmentFactory.create(user=self.user, course_id=self.course.id)
 
-    def make_discussion_module(self, topic_id, category, subcategory, **kwargs):
-        """Build a discussion module in self.course"""
+    def make_discussion_xblock(self, topic_id, category, subcategory, **kwargs):
+        """
+        Build a discussion xblock in self.course.
+        """
         ItemFactory.create(
             parent_location=self.course.location,
             category="discussion",
@@ -274,7 +276,7 @@ class GetCourseTopicsTest(UrlResetMixin, ModuleStoreTestCase):
         self.assertEqual(actual, expected)
 
     def test_with_courseware(self):
-        self.make_discussion_module("courseware-topic-id", "Foo", "Bar")
+        self.make_discussion_xblock("courseware-topic-id", "Foo", "Bar")
         actual = self.get_course_topics()
         expected = {
             "courseware_topics": [
@@ -297,11 +299,11 @@ class GetCourseTopicsTest(UrlResetMixin, ModuleStoreTestCase):
                 "B": {"id": "non-courseware-2"},
             }
             self.store.update_item(self.course, self.user.id)
-            self.make_discussion_module("courseware-1", "A", "1")
-            self.make_discussion_module("courseware-2", "A", "2")
-            self.make_discussion_module("courseware-3", "B", "1")
-            self.make_discussion_module("courseware-4", "B", "2")
-            self.make_discussion_module("courseware-5", "C", "1")
+            self.make_discussion_xblock("courseware-1", "A", "1")
+            self.make_discussion_xblock("courseware-2", "A", "2")
+            self.make_discussion_xblock("courseware-3", "B", "1")
+            self.make_discussion_xblock("courseware-4", "B", "2")
+            self.make_discussion_xblock("courseware-5", "C", "1")
         actual = self.get_course_topics()
         expected = {
             "courseware_topics": [
@@ -343,13 +345,13 @@ class GetCourseTopicsTest(UrlResetMixin, ModuleStoreTestCase):
                 "Z": {"id": "non-courseware-4", "sort_key": "W"},
             }
             self.store.update_item(self.course, self.user.id)
-            self.make_discussion_module("courseware-1", "First", "A", sort_key="D")
-            self.make_discussion_module("courseware-2", "First", "B", sort_key="B")
-            self.make_discussion_module("courseware-3", "First", "C", sort_key="E")
-            self.make_discussion_module("courseware-4", "Second", "A", sort_key="F")
-            self.make_discussion_module("courseware-5", "Second", "B", sort_key="G")
-            self.make_discussion_module("courseware-6", "Second", "C")
-            self.make_discussion_module("courseware-7", "Second", "D", sort_key="A")
+            self.make_discussion_xblock("courseware-1", "First", "A", sort_key="D")
+            self.make_discussion_xblock("courseware-2", "First", "B", sort_key="B")
+            self.make_discussion_xblock("courseware-3", "First", "C", sort_key="E")
+            self.make_discussion_xblock("courseware-4", "Second", "A", sort_key="F")
+            self.make_discussion_xblock("courseware-5", "Second", "B", sort_key="G")
+            self.make_discussion_xblock("courseware-6", "Second", "C")
+            self.make_discussion_xblock("courseware-7", "Second", "D", sort_key="A")
 
         actual = self.get_course_topics()
         expected = {
@@ -411,21 +413,21 @@ class GetCourseTopicsTest(UrlResetMixin, ModuleStoreTestCase):
             )
 
         with self.store.bulk_operations(self.course.id, emit_signals=False):
-            self.make_discussion_module("courseware-1", "First", "Everybody")
-            self.make_discussion_module(
+            self.make_discussion_xblock("courseware-1", "First", "Everybody")
+            self.make_discussion_xblock(
                 "courseware-2",
                 "First",
                 "Cohort A",
                 group_access={self.partition.id: [self.partition.groups[0].id]}
             )
-            self.make_discussion_module(
+            self.make_discussion_xblock(
                 "courseware-3",
                 "First",
                 "Cohort B",
                 group_access={self.partition.id: [self.partition.groups[1].id]}
             )
-            self.make_discussion_module("courseware-4", "Second", "Staff Only", visible_to_staff_only=True)
-            self.make_discussion_module(
+            self.make_discussion_xblock("courseware-4", "Second", "Staff Only", visible_to_staff_only=True)
+            self.make_discussion_xblock(
                 "courseware-5",
                 "Second",
                 "Future Start Date",
@@ -507,8 +509,8 @@ class GetCourseTopicsTest(UrlResetMixin, ModuleStoreTestCase):
         """
         topic_id_1 = "topic_id_1"
         topic_id_2 = "topic_id_2"
-        self.make_discussion_module(topic_id_1, "test_category_1", "test_target_1")
-        self.make_discussion_module(topic_id_2, "test_category_2", "test_target_2")
+        self.make_discussion_xblock(topic_id_1, "test_category_1", "test_target_1")
+        self.make_discussion_xblock(topic_id_2, "test_category_2", "test_target_2")
         actual = get_course_topics(self.request, self.course.id, {"topic_id_1", "topic_id_2"})
         self.assertEqual(
             actual,

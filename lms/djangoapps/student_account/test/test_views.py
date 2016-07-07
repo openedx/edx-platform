@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """ Tests for student account views. """
 
+from copy import copy
 import re
-from nose.plugins.attrib import attr
 from unittest import skipUnless
 from urllib import urlencode
 
@@ -18,11 +18,12 @@ from django.test import TestCase
 from django.test.utils import override_settings
 from django.http import HttpRequest
 from edx_rest_api_client import exceptions
+from nose.plugins.attrib import attr
 
-from course_modes.models import CourseMode
 from commerce.models import CommerceConfiguration
 from commerce.tests import TEST_API_URL, TEST_API_SIGNING_KEY, factories
 from commerce.tests.mocks import mock_get_orders
+from course_modes.models import CourseMode
 from openedx.core.djangoapps.programs.tests.mixins import ProgramsApiConfigMixin
 from openedx.core.djangoapps.user_api.accounts.api import activate_account, create_account
 from openedx.core.djangoapps.user_api.accounts import EMAIL_MAX_LENGTH
@@ -33,7 +34,7 @@ from student_account.views import account_settings_context, get_user_orders
 from third_party_auth.tests.testutil import simulate_running_pipeline, ThirdPartyAuthTestMixin
 from util.testing import UrlResetMixin
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from openedx.core.djangoapps.theming.tests.test_util import with_edx_domain_context
+from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme_context
 
 
 @ddt.ddt
@@ -261,13 +262,13 @@ class StudentAccountLoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMi
         self.assertRedirects(response, reverse("dashboard"))
 
     @ddt.data(
-        (False, "signin_user"),
-        (False, "register_user"),
-        (True, "signin_user"),
-        (True, "register_user"),
+        (None, "signin_user"),
+        (None, "register_user"),
+        ("edx.org", "signin_user"),
+        ("edx.org", "register_user"),
     )
     @ddt.unpack
-    def test_login_and_registration_form_signin_preserves_params(self, is_edx_domain, url_name):
+    def test_login_and_registration_form_signin_preserves_params(self, theme, url_name):
         params = [
             ('course_id', 'edX/DemoX/Demo_Course'),
             ('enrollment_action', 'enroll'),
@@ -275,7 +276,7 @@ class StudentAccountLoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMi
 
         # The response should have a "Sign In" button with the URL
         # that preserves the querystring params
-        with with_edx_domain_context(is_edx_domain):
+        with with_comprehensive_theme_context(theme):
             response = self.client.get(reverse(url_name), params)
 
         expected_url = '/login?{}'.format(self._finish_auth_url_param(params + [('next', '/dashboard')]))
@@ -291,7 +292,7 @@ class StudentAccountLoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMi
         ]
 
         # Verify that this parameter is also preserved
-        with with_edx_domain_context(is_edx_domain):
+        with with_comprehensive_theme_context(theme):
             response = self.client.get(reverse(url_name), params)
 
         expected_url = '/login?{}'.format(self._finish_auth_url_param(params))
@@ -463,6 +464,10 @@ class AccountSettingsViewTest(ThirdPartyAuthTestMixin, TestCase, ProgramsApiConf
         'preferred_language',
     ]
 
+    HIDDEN_FIELDS = [
+        'time_zone',
+    ]
+
     @mock.patch("django.conf.settings.MESSAGE_STORAGE", 'django.contrib.messages.storage.cookie.CookieStorage')
     def setUp(self):
         super(AccountSettingsViewTest, self).setUp()
@@ -507,13 +512,35 @@ class AccountSettingsViewTest(ThirdPartyAuthTestMixin, TestCase, ProgramsApiConf
         self.assertEqual(context['auth']['providers'][0]['name'], 'Facebook')
         self.assertEqual(context['auth']['providers'][1]['name'], 'Google')
 
-    def test_view(self):
+    def test_hidden_fields_not_visible(self):
+        """
+        Test that hidden fields are not visible when disabled.
+        """
+        temp_features = copy(settings.FEATURES)
+        temp_features['ENABLE_TIME_ZONE_PREFERENCE'] = False
+        with self.settings(FEATURES=temp_features):
+            view_path = reverse('account_settings')
+            response = self.client.get(path=view_path)
 
-        view_path = reverse('account_settings')
-        response = self.client.get(path=view_path)
+            for attribute in self.FIELDS:
+                self.assertIn(attribute, response.content)
+            for attribute in self.HIDDEN_FIELDS:
+                self.assertIn('"%s": {"enabled": false' % (attribute), response.content)
 
-        for attribute in self.FIELDS:
-            self.assertIn(attribute, response.content)
+    def test_hidden_fields_are_visible(self):
+        """
+        Test that hidden fields are visible when enabled.
+        """
+        temp_features = copy(settings.FEATURES)
+        temp_features['ENABLE_TIME_ZONE_PREFERENCE'] = True
+        with self.settings(FEATURES=temp_features):
+            view_path = reverse('account_settings')
+            response = self.client.get(path=view_path)
+
+            for attribute in self.FIELDS:
+                self.assertIn(attribute, response.content)
+            for attribute in self.HIDDEN_FIELDS:
+                self.assertIn('"%s": {"enabled": true' % (attribute), response.content)
 
     def test_header_with_programs_listing_enabled(self):
         """

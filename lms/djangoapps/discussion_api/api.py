@@ -42,7 +42,7 @@ from django_comment_common.signals import (
     comment_voted,
     comment_deleted,
 )
-from django_comment_client.utils import get_accessible_discussion_modules, is_commentable_cohorted
+from django_comment_client.utils import get_accessible_discussion_xblocks, is_commentable_cohorted
 from lms.djangoapps.discussion_api.pagination import DiscussionAPIPagination
 from lms.lib.comment_client.comment import Comment
 from lms.lib.comment_client.thread import Thread
@@ -215,41 +215,41 @@ def get_courseware_topics(request, course_key, course, topic_ids):
     courseware_topics = []
     existing_topic_ids = set()
 
-    def get_module_sort_key(module):
+    def get_xblock_sort_key(xblock):
         """
-        Get the sort key for the module (falling back to the discussion_target
+        Get the sort key for the xblock (falling back to the discussion_target
         setting if absent)
         """
-        return module.sort_key or module.discussion_target
+        return xblock.sort_key or xblock.discussion_target
 
-    def get_sorted_modules(category):
-        """Returns key sorted modules by category"""
-        return sorted(modules_by_category[category], key=get_module_sort_key)
+    def get_sorted_xblocks(category):
+        """Returns key sorted xblocks by category"""
+        return sorted(xblocks_by_category[category], key=get_xblock_sort_key)
 
-    discussion_modules = get_accessible_discussion_modules(course, request.user)
-    modules_by_category = defaultdict(list)
-    for module in discussion_modules:
-        modules_by_category[module.discussion_category].append(module)
+    discussion_xblocks = get_accessible_discussion_xblocks(course, request.user)
+    xblocks_by_category = defaultdict(list)
+    for xblock in discussion_xblocks:
+        xblocks_by_category[xblock.discussion_category].append(xblock)
 
-    for category in sorted(modules_by_category.keys()):
+    for category in sorted(xblocks_by_category.keys()):
         children = []
-        for module in get_sorted_modules(category):
-            if not topic_ids or module.discussion_id in topic_ids:
+        for xblock in get_sorted_xblocks(category):
+            if not topic_ids or xblock.discussion_id in topic_ids:
                 discussion_topic = DiscussionTopic(
-                    module.discussion_id,
-                    module.discussion_target,
-                    get_thread_list_url(request, course_key, [module.discussion_id]),
+                    xblock.discussion_id,
+                    xblock.discussion_target,
+                    get_thread_list_url(request, course_key, [xblock.discussion_id]),
                 )
                 children.append(discussion_topic)
 
-                if topic_ids and module.discussion_id in topic_ids:
-                    existing_topic_ids.add(module.discussion_id)
+                if topic_ids and xblock.discussion_id in topic_ids:
+                    existing_topic_ids.add(xblock.discussion_id)
 
         if not topic_ids or children:
             discussion_topic = DiscussionTopic(
                 None,
                 category,
-                get_thread_list_url(request, course_key, [item.discussion_id for item in get_sorted_modules(category)]),
+                get_thread_list_url(request, course_key, [item.discussion_id for item in get_sorted_xblocks(category)]),
                 children,
             )
             courseware_topics.append(DiscussionTopicSerializer(discussion_topic).data)
@@ -782,7 +782,9 @@ def _handle_read_field(api_content, form_value, user, cc_content):
     """
     if form_value and not cc_content['read']:
         user.read(cc_content)
-        api_content["unread_comment_count"] -= 1
+        # When a thread is marked as read, all of its responses and comments
+        # are also marked as read.
+        api_content["unread_comment_count"] = 0
 
 
 def create_thread(request, thread_data):

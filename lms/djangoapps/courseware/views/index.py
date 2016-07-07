@@ -26,6 +26,7 @@ from lang_pref import LANGUAGE_KEY
 from xblock.fragment import Fragment
 from opaque_keys.edx.keys import CourseKey
 from openedx.core.lib.gating import api as gating_api
+from openedx.core.lib.time_zone_utils import get_user_time_zone
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
 from shoppingcart.models import CourseRegistrationCode
 from student.models import CourseEnrollment
@@ -514,6 +515,7 @@ def render_accordion(request, course, table_of_contents):
             ('course_id', unicode(course.id)),
             ('csrf', csrf(request)['csrf_token']),
             ('due_date_display_format', course.due_date_display_format),
+            ('time_zone', get_user_time_zone(request.user).zone),
         ] + TEMPLATE_IMPORTS.items()
     )
     return render_to_string('courseware/accordion.html', context)

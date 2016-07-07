@@ -164,14 +164,21 @@ def celery(options):
 @needs('pavelib.prereqs.install_prereqs')
 @cmdopts([
     ("settings=", "s", "Django settings for both LMS and Studio"),
-    ("asset_settings=", "a", "Django settings for updating assets for both LMS and Studio (defaults to settings)"),
-    ("worker_settings=", "w", "Celery worker Django settings"),
+    ("asset-settings=", "a", "Django settings for updating assets for both LMS and Studio (defaults to settings)"),
+    ("worker-settings=", "w", "Celery worker Django settings"),
     ("fast", "f", "Skip updating assets"),
     ("optimized", "o", "Run with optimized assets"),
-    ("settings_lms=", "l", "Set LMS only, overriding the value from --settings (if provided)"),
-    ("asset_settings_lms=", None, "Set LMS only, overriding the value from --asset_settings (if provided)"),
-    ("settings_cms=", "c", "Set Studio only, overriding the value from --settings (if provided)"),
-    ("asset_settings_cms=", None, "Set Studio only, overriding the value from --asset_settings (if provided)"),
+    ("settings-lms=", "l", "Set LMS only, overriding the value from --settings (if provided)"),
+    ("asset-settings-lms=", None, "Set LMS only, overriding the value from --asset-settings (if provided)"),
+    ("settings-cms=", "c", "Set Studio only, overriding the value from --settings (if provided)"),
+    ("asset-settings-cms=", None, "Set Studio only, overriding the value from --asset-settings (if provided)"),
+
+    ("asset_settings=", None, "deprecated in favor of asset-settings"),
+    ("asset_settings_cms=", None, "deprecated in favor of asset-settings-cms"),
+    ("asset_settings_lms=", None, "deprecated in favor of asset-settings-lms"),
+    ("settings_cms=", None, "deprecated in favor of settings-cms"),
+    ("settings_lms=", None, "deprecated in favor of settings-lms"),
+    ("worker_settings=", None, "deprecated in favor of worker-settings"),
 ])
 def run_all_servers(options):
     """

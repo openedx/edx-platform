@@ -107,30 +107,3 @@ def instance_key(model, instance_or_pk):
         model._meta.model_name,
         getattr(instance_or_pk, 'pk', instance_or_pk),
     )
-
-
-def set_cached_content(content):
-    cache.set(unicode(content.location).encode("utf-8"), content)
-
-
-def get_cached_content(location):
-    return cache.get(unicode(location).encode("utf-8"))
-
-
-def del_cached_content(location):
-    """
-    delete content for the given location, as well as for content with run=None.
-    it's possible that the content could have been cached without knowing the
-    course_key - and so without having the run.
-    """
-    def location_str(loc):
-        return unicode(loc).encode("utf-8")
-
-    locations = [location_str(location)]
-    try:
-        locations.append(location_str(location.replace(run=None)))
-    except InvalidKeyError:
-        # although deprecated keys allowed run=None, new keys don't if there is no version.
-        pass
-
-    cache.delete_many(locations)

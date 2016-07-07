@@ -40,6 +40,7 @@ import survey.utils
 import survey.views
 from lms.djangoapps.ccx.utils import prep_course_for_grading
 from certificates import api as certs_api
+from course_blocks.api import get_course_blocks
 from openedx.core.djangoapps.models.course_details import CourseDetails
 from commerce.utils import EcommerceService
 from enrollment.api import add_enrollment
@@ -716,8 +717,11 @@ def _progress(request, course_key, student_id):
     # additional DB lookup (this kills the Progress page in particular).
     student = User.objects.prefetch_related("groups").get(id=student.id)
 
-    courseware_summary = grades.progress_summary(student, course)
-    grade_summary = grades.grade(student, course)
+    # Fetch course blocks once for performance reasons
+    course_structure = get_course_blocks(student, course.location)
+
+    courseware_summary = grades.progress_summary(student, course, course_structure)
+    grade_summary = grades.grade(student, course, course_structure=course_structure)
     studio_url = get_studio_url(course, 'settings/grading')
 
     if courseware_summary is None:
@@ -749,6 +753,7 @@ def _progress(request, course_key, student_id):
         'credit_course_requirements': _credit_course_requirements(course_key, student),
         'missing_required_verification': missing_required_verification,
         'certificate_invalidated': False,
+        'enrollment_mode': enrollment_mode,
     }
 
     if show_generate_cert_btn:

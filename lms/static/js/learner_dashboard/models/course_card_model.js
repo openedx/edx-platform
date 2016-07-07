@@ -15,19 +15,46 @@
                 }
             },
 
+            getUnselectedRunMode: function(runModes) {      
+                if(runModes && runModes.length > 0){  
+                    return {
+                        course_image_url: runModes[0].course_image_url,
+                        marketing_url: runModes[0].marketing_url,
+                        is_enrollment_open: runModes[0].is_enrollment_open,
+                        enrollment_open_date: runModes[0].enrollment_open_date
+                    };
+                }
+                return {};
+            },
+
             getRunMode: function(runModes){
-                //we should populate our model by looking at the run_modes
-                if (runModes.length > 0){
-                    if(runModes.length === 1){
-                        return runModes[0];
+                var enrolled_mode = _.findWhere(runModes, {is_enrolled: true}),
+                    openEnrollmentRunModes = this.getEnrollableRunModes(),
+                    desiredRunMode;
+                //we populate our model by looking at the run_modes
+                if (enrolled_mode){
+                    // If we have a run_mode we are already enrolled in,
+                    // return that one always
+                    desiredRunMode = enrolled_mode;
+                } else if (openEnrollmentRunModes.length > 0){
+                    if(openEnrollmentRunModes.length === 1){
+                        desiredRunMode = openEnrollmentRunModes[0];
                     }else{
-                        //We need to implement logic here to select the
-                        //most relevant run mode for the student to enroll
-                        return runModes[0];
+                        desiredRunMode = this.getUnselectedRunMode(openEnrollmentRunModes);
                     }
                 }else{
-                    return null;
-                } 
+                    desiredRunMode = this.getUnselectedRunMode(runModes); 
+                }
+                return desiredRunMode;
+            },
+
+            getEnrollableRunModes: function(){
+                return _.where(this.context.run_modes,
+                    {
+                        is_enrollment_open: true,
+                        is_enrolled: false,
+                        is_course_ended: false
+                    });
             },
 
             setActiveRunMode: function(runMode){
@@ -39,15 +66,27 @@
                         course_url: runMode.course_url || '',
                         display_name: this.context.display_name,
                         end_date: runMode.end_date,
+                        enrollable_run_modes: this.getEnrollableRunModes(),
+                        enrollment_open_date: runMode.enrollment_open_date || '',
+                        is_course_ended: runMode.is_course_ended,
                         is_enrolled: runMode.is_enrolled,
                         is_enrollment_open: runMode.is_enrollment_open,
                         key: this.context.key,
                         marketing_url: runMode.marketing_url || '',
                         mode_slug: runMode.mode_slug,
                         run_key: runMode.run_key,
-                        start_date: runMode.start_date
+                        start_date: runMode.start_date,
+                        upgrade_url: runMode.upgrade_url
                     });
                 }
+            },
+
+            setUnselected: function(){
+                //This should be called to reset the model
+                //back to the unselected state
+                var unselectedMode = this.getUnselectedRunMode(
+                    this.get('enrollable_run_modes'));
+                this.setActiveRunMode(unselectedMode);
             },
 
             updateRun: function(runKey){

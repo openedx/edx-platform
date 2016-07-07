@@ -53,10 +53,10 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url | n, js_escaped_string}'
 </div>
 
 <div class="wrapper-content wrapper">
-  <section class="content">
-    <article class="content-primary" role="main">
+  <div class="content">
+    <div class="content-primary">
       <form id="settings_details" class="settings-details" method="post" action="">
-        <section class="group-settings basic">
+        <div class="group-settings basic">
           <header>
             <h2 class="title-2">${_("Basic Information")}</h2>
             <span class="tip">${_("The nuts and bolts of your course")}</span>
@@ -124,11 +124,11 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url | n, js_escaped_string}'
             </div>
           </div>
           % endif
-        </section>
+        </div>
         <hr class="divide" />
 
         % if credit_eligibility_enabled and is_credit_course:
-          <section class="group-settings basic">
+          <div class="group-settings basic">
             <header>
               <h2 class="title-2">${_("Course Credit Requirements")}</h2>
               <span class="tip">${_("Steps required to earn course credit")}</span>
@@ -173,11 +173,11 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url | n, js_escaped_string}'
               % else:
                 <p>No credit requirements found.</p>
               % endif
-          </section>
+          </div>
           <hr class="divide" />
         % endif
 
-        <section class="group-settings schedule">
+        <div class="group-settings schedule">
           <header>
             <h2 class="title-2">${_('Course Schedule')}</h2>
             <span class="tip">${_('Dates that control when your course can be viewed')}</span>
@@ -267,10 +267,10 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url | n, js_escaped_string}'
             </div>
           </div>
           % endif
-        </section>
+        </div>
 
         % if about_page_editable:
-        <section class="group-settings course_details">
+        <div class="group-settings course_details">
           <header>
             <h2 class="title-2">${_('Course Details')}</h2>
             <span class="tip">${_('Provide useful information about your course')}</span>
@@ -287,11 +287,11 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url | n, js_escaped_string}'
               <span class="tip tip-stacked">${_("Identify the course language here. This is used to assist users find courses that are taught in a specific language.")}</span>
             </li>
           </ol>
-        </section>
+        </div>
         % endif
 
         <hr class="divide" />
-            <section class="group-settings marketing">
+            <div class="group-settings marketing">
               <header>
                 <h2 class="title-2">${_("Introducing Your Course")}</h2>
                 <span class="tip">${_("Information for prospective students")}</span>
@@ -462,11 +462,11 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url | n, js_escaped_string}'
                 </li>
                   % endif
               </ol>
-            </section>
+            </div>
 
           % if enable_extended_course_details:
             <hr class="divide" />
-            <section class="group-settings course-learning-info">
+            <div class="group-settings course-learning-info">
               <header>
                 <h2 class="title-2">${_("Learning Outcomes")}</h2>
                 <span class="tip">${_("Add the learning outcomes for this course")}</span>
@@ -479,10 +479,10 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url | n, js_escaped_string}'
                   <span class="icon fa fa-plus icon-inline" aria-hidden="true"></span>${_("Add Learning Outcome")}
                 </button>
               </div>
-            </section>
+            </div>
 
             <hr class="divide" />
-            <section class="group-settings instructor-types">
+            <div class="group-settings instructor-types">
               <header>
                 <h2 class="title-2">${_("Instructors")}</h2>
                 <span class="tip">${_("Add details about the instructors for this course")}</span>
@@ -495,13 +495,13 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url | n, js_escaped_string}'
                   <span class="icon fa fa-plus icon-inline" aria-hidden="true"></span>${_("Add Instructor")}
                 </button>
               </div>
-            </section>
+            </div>
           % endif
 
           % if about_page_editable or is_prerequisite_courses_enabled or is_entrance_exams_enabled:
             <hr class="divide" />
 
-            <section class="group-settings requirements">
+            <div class="group-settings requirements">
               <header>
                 <h2 class="title-2">${_("Requirements")}</h2>
                 <span class="tip">${_("Expectations of the students taking this course")}</span>
@@ -550,14 +550,14 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url | n, js_escaped_string}'
                 </li>
                 % endif
               </ol>
-            </section>
+            </div>
           % endif
 
           % if self_paced_enabled:
 
             <hr class="divide" />
 
-            <section class="group-settings pacing">
+            <div class="group-settings pacing">
               <header>
                 <h2 class="title-2">${_("Course Pacing")}</h2>
                 <span class="tip">${_("Set the pacing for this course")}</span>
@@ -576,14 +576,14 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url | n, js_escaped_string}'
                   <span class="tip">${_("Self-paced courses do not have release dates for course content or due dates for assignments. Learners can complete course material at any time before the course end date.")}</span>
                 </li>
               </ol>
-            </section>
+            </div>
 
           % endif
 
           % if settings.FEATURES.get("LICENSING", False):
             <hr class="divide" />
 
-            <section class="group-settings license">
+            <div class="group-settings license">
               <header>
                 <h2 class="title-2">${_("Course Content License")}</h2>
                 ## Translators: At the course settings, the editor is able to select the default course content license.
@@ -597,11 +597,11 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url | n, js_escaped_string}'
                   <div id="course-license-selector"></div>
                 </li>
               </ol>
-            </section>
+            </div>
           % endif
       </form>
-    </article>
-    <aside class="content-supplementary" role="complementary">
+    </div>
+    <div class="content-supplementary" role="complementary">
      <div class="bit">
         <h3 class="title-3">${_("How are these settings used?")}</h3>
         <p>${_("Your course's schedule determines when students can enroll in and begin a course.")}</p>
@@ -627,7 +627,7 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url | n, js_escaped_string}'
         </nav>
      % endif
      </div>
-    </aside>
-  </section>
+    </div>
+  </div>
 </div>
 </%block>

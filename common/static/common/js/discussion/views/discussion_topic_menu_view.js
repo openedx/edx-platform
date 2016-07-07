@@ -124,7 +124,7 @@
             },
 
             setSelectedTopicName: function(text) {
-                return this.selectedTopic.html(this.fitName(text));
+                return this.selectedTopic.text(this.fitName(text));
             },
             /**
              * Return full name for the `topicElement` if it is passed.
@@ -148,7 +148,7 @@
             // @TODO move into utils.coffee
             fitName: function(name) {
                 var ellipsisText = gettext('…'),
-                    partialName, path, rawName;
+                    partialName, path, rawName, concatedLength;
 
                 if (name.length < this.maxNameWidth) {
                     return name;
@@ -159,14 +159,15 @@
                     while (path.length > 1) {
                         path.shift();
                         partialName = ellipsisText + '/' + path.join('/');
-                        if (partialName.length > this.maxNameWidth) {
+                        if (partialName.length < this.maxNameWidth) {
                             return partialName;
                         }
                     }
                     rawName = path[0];
                     name = ellipsisText + ' / ' + rawName;
-                    while (name.length > this.maxNameWidth) {
-                      rawName = rawName.slice(0, this.maxNameWidth);
+                    if (name.length > this.maxNameWidth) {
+                      concatedLength = ellipsisText.length + ' / '.length + ellipsisText.length;
+                      rawName = rawName.slice(0, this.maxNameWidth - concatedLength);
                       name = ellipsisText + ' / ' + rawName + ' ' + ellipsisText;
                     }
                 }

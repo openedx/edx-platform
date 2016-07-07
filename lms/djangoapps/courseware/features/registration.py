@@ -9,15 +9,15 @@ import time
 def i_register_for_the_course(_step, course):
     url = django_url('courses/%s/about' % world.scenario_dict['COURSE'].id.to_deprecated_string())
     world.browser.visit(url)
-    world.css_click('section.intro a.register')
-    assert world.is_css_present('section.container.dashboard')
+    world.css_click('.intro a.register')
+    assert world.is_css_present('.container.dashboard')
 
 
 @step('I register to audit the course$')
 def i_register_to_audit_the_course(_step):
     url = django_url('courses/%s/about' % world.scenario_dict['COURSE'].id.to_deprecated_string())
     world.browser.visit(url)
-    world.css_click('section.intro a.register')
+    world.css_click('.intro a.register')
     # When the page first loads some animation needs to
     # complete before this button is in a stable location
     world.retry_on_exception(
@@ -26,18 +26,18 @@ def i_register_to_audit_the_course(_step):
         ignored_exceptions=AttributeError
     )
     time.sleep(1)
-    assert world.is_css_present('section.container.dashboard')
+    assert world.is_css_present('.container.dashboard')
 
 
 @step(u'I should see an empty dashboard message')
 def i_should_see_empty_dashboard(_step):
-    empty_dash_css = 'section.empty-dashboard-message'
+    empty_dash_css = '.empty-dashboard-message'
     assert world.is_css_present(empty_dash_css)
 
 
 @step(u'I should( NOT)? see the course numbered "([^"]*)" in my dashboard$')
 def i_should_see_that_course_in_my_dashboard(_step, doesnt_appear, course):
-    course_link_css = 'section.my-courses a[href*="%s"]' % course
+    course_link_css = '.my-courses a[href*="%s"]' % course
     if doesnt_appear:
         assert world.is_css_not_present(course_link_css)
     else:
@@ -54,6 +54,6 @@ def i_unenroll_from_that_course(_step, course):
     assert world.is_css_present(unregister_css)
     world.css_click(unregister_css)
 
-    button_css = 'section#unenroll-modal input[value="Unenroll"]'
+    button_css = '#unenroll-modal input[value="Unenroll"]'
     assert world.is_css_present(button_css)
     world.css_click(button_css)

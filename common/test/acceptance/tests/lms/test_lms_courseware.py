@@ -648,11 +648,6 @@ class CoursewareMultipleVerticalsTest(UniqueCourseTest, EventsTestMixin):
         # Set the scope to the sequence navigation
         self.courseware_page.a11y_audit.config.set_scope(
             include=['div.sequence-nav'])
-        self.courseware_page.a11y_audit.config.set_rules({
-            "ignore": [
-                'section',  # TODO: AC-491
-            ],
-        })
         self.courseware_page.a11y_audit.check_for_accessibility_errors()
 
 

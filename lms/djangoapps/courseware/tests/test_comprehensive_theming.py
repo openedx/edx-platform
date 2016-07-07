@@ -6,8 +6,9 @@ from django.test import TestCase
 from path import path           # pylint: disable=no-name-in-module
 from django.contrib import staticfiles
 
+import edxmako
 from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme
-from openedx.core.lib.tempdir import mkdtemp_clean
+from openedx.core.lib.tempdir import mkdtemp_clean, create_symlink, delete_symlink
 
 
 class TestComprehensiveTheming(TestCase):
@@ -19,8 +20,13 @@ class TestComprehensiveTheming(TestCase):
         # Clear the internal staticfiles caches, to get test isolation.
         staticfiles.finders.get_finder.cache_clear()
 
-    @with_comprehensive_theme(settings.REPO_ROOT / 'themes/red-theme')
+    @with_comprehensive_theme('red-theme')
     def test_red_footer(self):
+        """
+        Tests templates from theme are rendered if available.
+        `red-theme` has header.html and footer.html so this test
+        asserts presence of the content from header.html and footer.html
+        """
         resp = self.client.get('/')
         self.assertEqual(resp.status_code, 200)
         # This string comes from footer.html
@@ -34,11 +40,17 @@ class TestComprehensiveTheming(TestCase):
         # of test.
 
         # Make a temp directory as a theme.
-        tmp_theme = path(mkdtemp_clean())
-        template_dir = tmp_theme / "lms/templates"
+        themes_dir = path(mkdtemp_clean())
+        tmp_theme = "temp_theme"
+        template_dir = themes_dir / tmp_theme / "lms/templates"
         template_dir.makedirs()
         with open(template_dir / "footer.html", "w") as footer:
             footer.write("<footer>TEMPORARY THEME</footer>")
+
+        dest_path = path(settings.COMPREHENSIVE_THEME_DIRS[0]) / tmp_theme
+        create_symlink(themes_dir / tmp_theme, dest_path)
+
+        edxmako.paths.add_lookup('main', themes_dir, prepend=True)
 
         @with_comprehensive_theme(tmp_theme)
         def do_the_test(self):
@@ -48,28 +60,16 @@ class TestComprehensiveTheming(TestCase):
             self.assertContains(resp, "TEMPORARY THEME")
 
         do_the_test(self)
-
-    def test_theme_adjusts_staticfiles_search_path(self):
-        # Test that a theme adds itself to the staticfiles search path.
-        before_finders = list(settings.STATICFILES_FINDERS)
-        before_dirs = list(settings.STATICFILES_DIRS)
-
-        @with_comprehensive_theme(settings.REPO_ROOT / 'themes/red-theme')
-        def do_the_test(self):
-            """A function to do the work so we can use the decorator."""
-            self.assertEqual(list(settings.STATICFILES_FINDERS), before_finders)
-            self.assertEqual(settings.STATICFILES_DIRS[0], settings.REPO_ROOT / 'themes/red-theme/lms/static')
-            self.assertEqual(settings.STATICFILES_DIRS[1:], before_dirs)
-
-        do_the_test(self)
+        # remove symlinks before running subsequent tests
+        delete_symlink(dest_path)
 
     def test_default_logo_image(self):
         result = staticfiles.finders.find('images/logo.png')
         self.assertEqual(result, settings.REPO_ROOT / 'lms/static/images/logo.png')
 
-    @with_comprehensive_theme(settings.REPO_ROOT / 'themes/red-theme')
+    @with_comprehensive_theme('red-theme')
     def test_overridden_logo_image(self):
-        result = staticfiles.finders.find('images/logo.png')
+        result = staticfiles.finders.find('red-theme/images/logo.png')
         self.assertEqual(result, settings.REPO_ROOT / 'themes/red-theme/lms/static/images/logo.png')
 
     def test_default_favicon(self):
@@ -79,10 +79,10 @@ class TestComprehensiveTheming(TestCase):
         result = staticfiles.finders.find('images/favicon.ico')
         self.assertEqual(result, settings.REPO_ROOT / 'lms/static/images/favicon.ico')
 
-    @with_comprehensive_theme(settings.REPO_ROOT / 'themes/red-theme')
+    @with_comprehensive_theme('red-theme')
     def test_overridden_favicon(self):
         """
         Test comprehensive theme override on favicon image.
         """
-        result = staticfiles.finders.find('images/favicon.ico')
+        result = staticfiles.finders.find('red-theme/images/favicon.ico')
         self.assertEqual(result, settings.REPO_ROOT / 'themes/red-theme/lms/static/images/favicon.ico')

@@ -14,10 +14,8 @@ from django.core.urlresolvers import reverse
   </ul>
 
   <div class="wrapper-inner wrapper">
-    <section class="sock" id="sock">
-      <header>
-        <h2 class="title sr">${_("{studio_name} Documentation").format(studio_name=settings.STUDIO_NAME)}</h2>
-      </header>
+    <section class="sock" id="sock" aria-labelledby="sock-heading">
+        <h2 id="sock-heading" class="title sr">${_("{studio_name} Documentation").format(studio_name=settings.STUDIO_NAME)}</h2>
 
       <div class="support">
         <%!

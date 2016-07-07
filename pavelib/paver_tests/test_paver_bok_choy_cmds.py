@@ -24,25 +24,23 @@ class TestPaverBokChoyCmd(unittest.TestCase):
         and store.
         """
 
-        expected_statement = (
-            "DEFAULT_STORE={default_store} "
-            "SCREENSHOT_DIR='{repo_dir}/test_root/log{shard_str}' "
-            "BOK_CHOY_HAR_DIR='{repo_dir}/test_root/log{shard_str}/hars' "
-            "BOKCHOY_A11Y_CUSTOM_RULES_FILE='{repo_dir}/{a11y_custom_file}' "
-            "SELENIUM_DRIVER_LOG_DIR='{repo_dir}/test_root/log{shard_str}' "
-            "VERIFY_XSS='{verify_xss}' "
-            "nosetests {repo_dir}/common/test/acceptance/{exp_text} "
-            "--with-xunit "
-            "--xunit-file={repo_dir}/reports/bok_choy{shard_str}/xunit.xml "
-            "--verbosity=2 "
-        ).format(
-            default_store=store,
-            repo_dir=REPO_DIR,
-            shard_str='/shard_' + self.shard if self.shard else '',
-            exp_text=name,
-            a11y_custom_file='node_modules/edx-custom-a11y-rules/lib/custom_a11y_rules.js',
-            verify_xss=verify_xss
-        )
+        shard_str = '/shard_' + self.shard if self.shard else ''
+
+        expected_statement = [
+            "DEFAULT_STORE={}".format(store),
+            "SCREENSHOT_DIR='{}/test_root/log{}'".format(REPO_DIR, shard_str),
+            "BOK_CHOY_HAR_DIR='{}/test_root/log{}/hars'".format(REPO_DIR, shard_str),
+            "BOKCHOY_A11Y_CUSTOM_RULES_FILE='{}/{}'".format(
+                REPO_DIR,
+                'node_modules/edx-custom-a11y-rules/lib/custom_a11y_rules.js'
+            ),
+            "SELENIUM_DRIVER_LOG_DIR='{}/test_root/log{}'".format(REPO_DIR, shard_str),
+            "VERIFY_XSS='{}'".format(verify_xss),
+            "nosetests",
+            "{}/common/test/acceptance/{}".format(REPO_DIR, name),
+            "--xunit-file={}/reports/bok_choy{}/xunit.xml".format(REPO_DIR, shard_str),
+            "--verbosity=2",
+        ]
         return expected_statement
 
     def setUp(self):
@@ -93,7 +91,7 @@ class TestPaverBokChoyCmd(unittest.TestCase):
 
     def test_serversonly(self):
         suite = BokChoyTestSuite('', serversonly=True)
-        self.assertEqual(suite.cmd, "")
+        self.assertEqual(suite.cmd, None)
 
     def test_verify_xss(self):
         suite = BokChoyTestSuite('', verify_xss=True)
@@ -119,14 +117,15 @@ class TestPaverBokChoyCmd(unittest.TestCase):
         """
         Using 1 process means paver should ask for the traditional xunit plugin for plugin results
         """
-        expected_verbosity_string = (
-            "--with-xunit --xunit-file={repo_dir}/reports/bok_choy{shard_str}/xunit.xml --verbosity=2".format(
+        expected_verbosity_command = [
+            "--xunit-file={repo_dir}/reports/bok_choy{shard_str}/xunit.xml".format(
                 repo_dir=REPO_DIR,
                 shard_str='/shard_' + self.shard if self.shard else ''
-            )
-        )
+            ),
+            "--verbosity=2",
+        ]
         suite = BokChoyTestSuite('', num_processes=1)
-        self.assertEqual(BokChoyTestSuite.verbosity_processes_string(suite), expected_verbosity_string)
+        self.assertEqual(suite.verbosity_processes_command, expected_verbosity_command)
 
     def test_verbosity_settings_2_processes(self):
         """
@@ -134,32 +133,34 @@ class TestPaverBokChoyCmd(unittest.TestCase):
         be used.
         """
         process_count = 2
-        expected_verbosity_string = (
-            "--with-xunitmp --xunitmp-file={repo_dir}/reports/bok_choy{shard_str}/xunit.xml"
-            " --processes={procs} --no-color --process-timeout=1200".format(
+        expected_verbosity_command = [
+            "--xunitmp-file={repo_dir}/reports/bok_choy{shard_str}/xunit.xml".format(
                 repo_dir=REPO_DIR,
                 shard_str='/shard_' + self.shard if self.shard else '',
-                procs=process_count
-            )
-        )
+            ),
+            "--processes={}".format(process_count),
+            "--no-color",
+            "--process-timeout=1200",
+        ]
         suite = BokChoyTestSuite('', num_processes=process_count)
-        self.assertEqual(BokChoyTestSuite.verbosity_processes_string(suite), expected_verbosity_string)
+        self.assertEqual(suite.verbosity_processes_command, expected_verbosity_command)
 
     def test_verbosity_settings_3_processes(self):
         """
         With the above test, validate that num_processes can be set to various values
         """
         process_count = 3
-        expected_verbosity_string = (
-            "--with-xunitmp --xunitmp-file={repo_dir}/reports/bok_choy{shard_str}/xunit.xml"
-            " --processes={procs} --no-color --process-timeout=1200".format(
+        expected_verbosity_command = [
+            "--xunitmp-file={repo_dir}/reports/bok_choy{shard_str}/xunit.xml".format(
                 repo_dir=REPO_DIR,
                 shard_str='/shard_' + self.shard if self.shard else '',
-                procs=process_count
-            )
-        )
+            ),
+            "--processes={}".format(process_count),
+            "--no-color",
+            "--process-timeout=1200",
+        ]
         suite = BokChoyTestSuite('', num_processes=process_count)
-        self.assertEqual(BokChoyTestSuite.verbosity_processes_string(suite), expected_verbosity_string)
+        self.assertEqual(suite.verbosity_processes_command, expected_verbosity_command)
 
     def test_invalid_verbosity_and_processes(self):
         """
@@ -168,7 +169,8 @@ class TestPaverBokChoyCmd(unittest.TestCase):
         """
         suite = BokChoyTestSuite('', num_processes=2, verbosity=3)
         with self.assertRaises(BuildFailure):
-            BokChoyTestSuite.verbosity_processes_string(suite)
+            # pylint: disable=pointless-statement
+            suite.verbosity_processes_command
 
 
 class TestPaverPa11yCrawlerCmd(unittest.TestCase):
@@ -192,17 +194,16 @@ class TestPaverPa11yCrawlerCmd(unittest.TestCase):
         """
         Returns the expected command to run pa11ycrawler.
         """
-        expected_statement = (
-            'pa11ycrawler run {start_urls} '
-            '--pa11ycrawler-allowed-domains=localhost '
-            '--pa11ycrawler-reports-dir={report_dir} '
-            '--pa11ycrawler-deny-url-matcher=logout '
-            '--pa11y-reporter="1.0-json" '
-            '--depth-limit=6 '
-        ).format(
-            start_urls=' '.join(start_urls),
-            report_dir=report_dir,
-        )
+        expected_statement = [
+            'pa11ycrawler',
+            'run',
+        ] + start_urls + [
+            '--pa11ycrawler-allowed-domains=localhost',
+            '--pa11ycrawler-reports-dir={}'.format(report_dir),
+            '--pa11ycrawler-deny-url-matcher=logout',
+            '--pa11y-reporter="1.0-json"',
+            '--depth-limit=6',
+        ]
         return expected_statement
 
     def test_default(self):

@@ -113,7 +113,7 @@ class SettingsPage(CoursePage):
         Property. Returns the text of the license type for the course
         ("All Rights Reserved" or "Creative Commons")
         """
-        license_types_css = "section.license ul.license-types li.license-type"
+        license_types_css = ".license ul.license-types li.license-type"
         self.wait_for_element_presence(
             license_types_css,
             "license type buttons are present",
@@ -124,7 +124,7 @@ class SettingsPage(CoursePage):
 
         # Look for the license text that will be displayed by default,
         # if no button is yet explicitly selected
-        license_text = self.q(css='section.license span.license-text')
+        license_text = self.q(css='.license span.license-text')
         if license_text.is_present():
             return license_text.text[0]
         return None
@@ -135,13 +135,13 @@ class SettingsPage(CoursePage):
         Sets the course license to the given license_name
         (str, "All Rights Reserved" or "Creative Commons")
         """
-        license_types_css = "section.license ul.license-types li.license-type"
+        license_types_css = ".license ul.license-types li.license-type"
         self.wait_for_element_presence(
             license_types_css,
             "license type buttons are present",
         )
         button_xpath = (
-            "//section[contains(@class, 'license')]"
+            "//div[contains(@class, 'license')]"
             "//ul[contains(@class, 'license-types')]"
             "//li[contains(@class, 'license-type')]"
             "//button[contains(text(),'{license_name}')]"
@@ -151,7 +151,7 @@ class SettingsPage(CoursePage):
             raise Exception("Invalid license name: {name}".format(name=license_name))
         button.click()
 
-    pacing_css = 'section.pacing input[type=radio]'
+    pacing_css = '.pacing input[type=radio]'
 
     @property
     def checked_pacing_css(self):

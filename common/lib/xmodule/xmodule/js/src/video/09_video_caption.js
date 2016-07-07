@@ -5,11 +5,9 @@
     define('video/09_video_caption.js',[
         'video/00_sjson.js',
         'video/00_async_process.js',
-        'draggabilly',
-        'modernizr',
-        'afontgarde',
-        'edxicons'
-    ], function (Sjson, AsyncProcess, Draggabilly) {
+        'edx-ui-toolkit/js/utils/html-utils',
+        'draggabilly'
+    ], function (Sjson, AsyncProcess, HtmlUtils, Draggabilly) {
 
         /**
          * @desc VideoCaption module exports a function.
@@ -80,47 +78,51 @@
             renderElements: function () {
                 var languages = this.state.config.transcriptLanguages;
 
-                var langTemplate = [
-                    '<div class="grouped-controls">',
-                        '<button class="control toggle-captions" aria-disabled="false">',
-                            '<span class="icon-fallback-img">',
-                                '<span class="icon fa fa-cc" aria-hidden="true"></span>',
-                                '<span class="sr control-text"></span>',
-                            '</span>',
-                        '</button>',
-                        '<button class="control toggle-transcript" aria-disabled="false">',
-                            '<span class="icon-fallback-img">',
-                                '<span class="icon fa fa-quote-left" aria-hidden="true"></span>',
-                                '<span class="sr control-text"></span>',
-                            '</span>',
-                        '</button>',
-                        '<div class="lang menu-container" role="application">',
-                            '<p class="sr instructions" id="lang-instructions"></p>',
-                            '<button class="control language-menu" aria-disabled="false"',
-                                'aria-describedby="lang-instructions" ',
-                                'title="',
-                                    gettext('Open language menu'),
-                                '">',
-                                '<span class="icon-fallback-img">',
-                                    '<span class="icon fa fa-caret-left" aria-hidden="true"></span>',
-                                    '<span class="sr control-text"></span>',
-                                '</span>',
-                            '</button>',
-                        '</div>',
-                    '</div>'
-                ].join('');
+                var langHtml = HtmlUtils.interpolateHtml(
+                    HtmlUtils.HTML(
+                        [
+                            '<div class="grouped-controls">',
+                                '<button class="control toggle-captions" aria-disabled="false">',
+                                    '<span class="icon fa fa-cc" aria-hidden="true"></span>',
+                                '</button>',
+                                '<button class="control toggle-transcript" aria-disabled="false">',
+                                    '<span class="icon fa fa-quote-left" aria-hidden="true"></span>',
+                                '</button>',
+                                '<div class="lang menu-container" role="application">',
+                                    '<p class="sr instructions" id="lang-instructions"></p>',
+                                    '<button class="control language-menu" aria-disabled="false"',
+                                        'aria-describedby="lang-instructions" ',
+                                        'title="{langTitle}">',
+                                        '<span class="icon fa fa-caret-left" aria-hidden="true"></span>',
+                                    '</button>',
+                                '</div>',
+                            '</div>'
+                        ].join(''),
+                        {
+                            langTitle: gettext('Open language menu')
+                        }
+                    )
+                    
+                );
 
-                var template = [
-                    '<div class="subtitles" role="region" id="transcript-' + this.state.id + '">',
-                        '<h3 id="transcript-label-' + this.state.id + '" class="transcript-title sr"></h3>',
-                        '<ol id="transcript-captions" class="subtitles-menu" lang="' + this.state.lang + '"></ol>',
-                    '</div>'
-                ].join('');
+                var subtitlesHtml = HtmlUtils.interpolateHtml(
+                    HtmlUtils.HTML(
+                    [
+                        '<div class="subtitles" role="region" id="transcript-{courseId}">',
+                            '<h3 id="transcript-label-{courseId}" class="transcript-title sr"></h3>',
+                            '<ol id="transcript-captions" class="subtitles-menu" lang="{courseLang}"></ol>',
+                        '</div>'
+                    ].join('')),
+                    {
+                        courseId: this.state.id,
+                        courseLang: this.state.lang
+                    }
+                );
 
                 this.loaded = false;
-                this.subtitlesEl = $(template);
+                this.subtitlesEl = $(HtmlUtils.ensureHtml(subtitlesHtml).toString());
                 this.subtitlesMenuEl = this.subtitlesEl.find('.subtitles-menu');
-                this.container = $(langTemplate);
+                this.container = $(HtmlUtils.ensureHtml(langHtml).toString());
                 this.captionControlEl = this.container.find('.toggle-captions');
                 this.captionDisplayEl = this.state.el.find('.closed-captions');
                 this.transcriptControlEl = this.container.find('.toggle-transcript');
@@ -542,15 +544,26 @@
                             }
                         } else {
                             if (state.isTouch) {
-                                self.subtitlesEl.find('.subtitles-menu')
-                                    .text(gettext('Transcript will be displayed when you start playing the video.')) // jshint ignore: line
-                                    .wrapInner('<li></li>');
+                                HtmlUtils.setHtml(
+                                    self.subtitlesEl.find('.subtitles-menu'),
+                                    HtmlUtils.joinHtml(
+                                        HtmlUtils.HTML('<li>'),
+                                        gettext('Transcript will be displayed when you start playing the video.'),
+                                        HtmlUtils.HTML('</li>')
+                                    )
+                                );
                             } else {
                                 self.renderCaption(start, captions);
                             }
                             self.hideCaptions(state.hide_captions, false);
-                            self.state.el.find('.video-wrapper').after(self.subtitlesEl);
-                            self.state.el.find('.secondary-controls').append(self.container);
+                            HtmlUtils.append(
+                                self.state.el.find('.video-wrapper').parent(),
+                                HtmlUtils.HTML(self.subtitlesEl)
+                            );
+                            HtmlUtils.append(
+                                self.state.el.find('.secondary-controls'),
+                                HtmlUtils.HTML(self.container)
+                            );
                             self.bindHandlers();
                         }
 
@@ -630,9 +643,11 @@
             onResize: function () {
                 this.subtitlesEl
                     .find('.spacing').first()
-                    .height(this.topSpacingHeight()).end()
+                        .height(this.topSpacingHeight());
+
+                this.subtitlesEl
                     .find('.spacing').last()
-                    .height(this.bottomSpacingHeight());
+                        .height(this.bottomSpacingHeight());
 
                 this.scrollCaption();
                 this.setSubtitlesHeight();
@@ -649,8 +664,9 @@
             renderLanguageMenu: function (languages) {
                 var self = this,
                     state = this.state,
-                    menu = $('<ol class="langs-list menu">'),
-                    currentLang = state.getCurrentLanguage();
+                    $menu = $('<ol class="langs-list menu">'),
+                    currentLang = state.getCurrentLanguage(),
+                    $li, $link, linkHtml;
 
                 if (_.keys(languages).length < 2) {
                     // Remove the menu toggle button
@@ -661,20 +677,29 @@
                 this.showLanguageMenu = true;
 
                 $.each(languages, function(code, label) {
-                    var li = $('<li data-lang-code="' + code + '" />'),
-                        link = $('<button class="control control-lang">' + label + '</button>');
+                    $li = $('<li />', { 'data-lang-code': code });
+                    linkHtml = HtmlUtils.joinHtml(
+                        HtmlUtils.HTML('<button class="control control-lang">'),
+                        label,
+                        HtmlUtils.HTML('</button>')
+                    );
+                    $link = $(linkHtml.toString());
 
                     if (currentLang === code) {
-                        li.addClass('is-active');
+                        $li.addClass('is-active');
+                        $link.attr('aria-pressed', 'true');
                     }
 
-                    li.append(link);
-                    menu.append(li);
+                    $li.append($link);
+                    $menu.append($li);
                 });
+                
+                HtmlUtils.append(
+                    this.languageChooserEl,
+                    HtmlUtils.HTML($menu)
+                );
 
-                this.languageChooserEl.append(menu);
-
-                menu.on('click', '.control-lang', function (e) {
+                $menu.on('click', '.control-lang', function (e) {
                     var el = $(e.currentTarget).parent(),
                         state = self.state,
                         langCode = el.data('lang-code');
@@ -683,7 +708,11 @@
                         state.lang = langCode;
                         el  .addClass('is-active')
                             .siblings('li')
-                            .removeClass('is-active');
+                            .removeClass('is-active')
+                            .find('.control-lang')
+                            .attr('aria-pressed', 'false');
+                            
+                        $(e.currentTarget).attr('aria-pressed', 'true');
 
                         state.el.trigger('language_menu:change', [langCode]);
                         self.fetchCaption();
@@ -693,6 +722,7 @@
                         
                         // update the transcript lang attribute
                         self.subtitlesMenuEl.attr('lang', langCode);
+                        self.closeLanguageMenu(e);
                     }
                 });
             },
@@ -715,13 +745,18 @@
                             'data-index': index,
                             'data-start': start[index],
                             'tabindex': 0
-                        }).html(text);
+                        });
+
+                        HtmlUtils.setHtml($(liEl), HtmlUtils.HTML(text.toString()));
 
                         return liEl[0];
                     };
 
                 return AsyncProcess.array(captions, process).done(function (list) {
-                    container.append(list);
+                    HtmlUtils.append(
+                        container,
+                        HtmlUtils.HTML(list)
+                    );
                 });
             },
 
@@ -775,8 +810,6 @@
                     self.container.find('.menu-container .instructions')
                         .text(gettext('Press the UP arrow key to enter the language menu then use UP and DOWN arrow keys to navigate language options. Press ENTER to change to the selected language.')); // jshint ignore:line
 
-                    self.container.find('.menu-container .control .control-text')
-                        .text(gettext('Open language menu.'));
                 };
 
                 this.rendered = false;
@@ -790,17 +823,40 @@
             *     out of the tabbing order.
             *
             */
-            addPaddings: function () {
-
-                this.subtitlesMenuEl
-                    .prepend(
-                        $('<li class="spacing"><a href="#transcript-end-' + this.state.id + '" id="transcript-start-' + this.state.id + '" class="transcript-start"></a>') // jshint ignore: line
-                            .height(this.topSpacingHeight())
-                    )
-                    .append(
-                        $('<li class="spacing"><a href="#transcript-start-' + this.state.id + '" id="transcript-end-' + this.state.id + '" class="transcript-end"></a>') // jshint ignore: line
-                            .height(this.bottomSpacingHeight())
+            addPaddings: function() {
+                var topSpacer = HtmlUtils.interpolateHtml(
+                        HtmlUtils.HTML([
+                            '<li class="spacing" style="height: {height}px">',
+                                '<a href="#transcript-end-{id}" id="transcript-start-{id}" class="transcript-start"></a>', // jshint ignore:line
+                            '</li>'
+                        ].join('')),
+                        {
+                            id: this.state.id,
+                            height: this.topSpacingHeight()
+                        }
                     );
+
+                var bottomSpacer = HtmlUtils.interpolateHtml(
+                        HtmlUtils.HTML([
+                            '<li class="spacing" style="height: {height}px">',
+                                '<a href="#transcript-start-{id}" id="transcript-end-{id}" class="transcript-end"></a>', // jshint ignore:line
+                            '</li>'
+                        ].join('')),
+                        {
+                            id: this.state.id,
+                            height: this.bottomSpacingHeight()
+                        }
+                    );
+
+                HtmlUtils.prepend(
+                    this.subtitlesMenuEl,
+                    topSpacer
+                );
+                
+                HtmlUtils.append(
+                    this.subtitlesMenuEl,
+                    bottomSpacer
+                );
             },
 
             /**
@@ -1129,9 +1185,7 @@
 
                 this.captionControlEl
                     .addClass('is-active')
-                    .attr('title', gettext('Hide closed captions'))
-                    .find('.control-text')
-                        .text(gettext('Hide closed captions'));
+                    .attr('title', gettext('Hide closed captions'));
 
                 if (this.subtitlesEl.find('.current').text()) {
                     this.captionDisplayEl
@@ -1153,9 +1207,7 @@
 
                 this.captionControlEl
                     .removeClass('is-active')
-                    .attr('title', gettext('Turn on closed captioning'))
-                    .find('.control-text')
-                        .text(gettext('Turn on closed captioning'));
+                    .attr('title', gettext('Turn on closed captioning'));
 
                 this.state.el.trigger('captions:hide');
             },
@@ -1210,9 +1262,7 @@
 
                     transcriptControlEl
                         .removeClass('is-active')
-                        .attr('title', gettext(text))
-                        .find('.control-text')
-                            .text(gettext(text));
+                        .attr('title', gettext(text));
                 } else {
                     state.captionsHidden = false;
                     state.el.removeClass('closed');
@@ -1224,9 +1274,7 @@
 
                     transcriptControlEl
                         .addClass('is-active')
-                        .attr('title', gettext(text))
-                        .find('.control-text')
-                            .text(gettext(text));
+                        .attr('title', gettext(text));
                 }
 
                 if (state.resizer) {

@@ -36,7 +36,7 @@ else:
                 if section.get('due') is None:
                     due_date = ''
                 else:
-                    formatted_string = get_time_display(section['due'], due_date_display_format, coerce_tz=settings.TIME_ZONE_DISPLAYED_FOR_DEADLINES)
+                    formatted_string = get_time_display(section['due'], due_date_display_format, coerce_tz=time_zone)
                     due_date = '' if len(formatted_string)==0 else _('due {date}').format(date=formatted_string)
                 %>
 

@@ -126,7 +126,7 @@ class LoginTest(CacheIsolationTestCase):
         # Should now be unable to login
         response, mock_audit_log = self._login_response('test@edx.org', 'test_password')
         self._assert_response(response, success=False,
-                              value="This account has not been activated")
+                              value="Before you sign in, you need to activate your account")
         self._assert_audit_log(mock_audit_log, 'warning', [u'Login failed', u'Account not active for user'])
 
     @patch.dict("django.conf.settings.FEATURES", {'SQUELCH_PII_IN_LOGS': True})
@@ -138,7 +138,7 @@ class LoginTest(CacheIsolationTestCase):
         # Should now be unable to login
         response, mock_audit_log = self._login_response('test@edx.org', 'test_password')
         self._assert_response(response, success=False,
-                              value="This account has not been activated")
+                              value="Before you sign in, you need to activate your account")
         self._assert_audit_log(mock_audit_log, 'warning', [u'Login failed', u'Account not active for user'])
         self._assert_not_in_audit_log(mock_audit_log, 'warning', [u'test'])
 

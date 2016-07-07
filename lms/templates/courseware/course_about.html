@@ -202,8 +202,8 @@ from openedx.core.lib.courses import course_image_url
       </div>
   </header>
 
-  <section class="container">
-    <section class="details">
+  <div class="container">
+    <div class="details">
       % if staff_access and studio_url is not None:
         <div class="wrap-instructor-info studio-view">
           <a class="instructor-info-action" href="${studio_url}">${_("View About Page in studio")}</a>
@@ -213,10 +213,10 @@ from openedx.core.lib.courses import course_image_url
       <div class="inner-wrapper">
         ${get_course_about_section(request, course, "overview")}
       </div>
-    </section>
+  </div>
 
-    <section class="course-sidebar">
-      <section class="course-summary">
+    <div class="course-sidebar">
+      <div class="course-summary">
 
         <%include file="course_about_sidebar_header.html" />
 
@@ -275,7 +275,7 @@ from openedx.core.lib.courses import course_image_url
             <li class="important-dates-item"><span class="icon fa fa-book" aria-hidden="true"></span><p class="important-dates-item-title">${_("Requirements")}</p><span class="important-dates-item-text prerequisites">${get_course_about_section(request, course, "prerequisites")}</span></li>
           % endif
         </ol>
-      </section>
+    </div>
 
       ## CourseTalk widget
       % if show_coursetalk_widget:
@@ -286,23 +286,23 @@ from openedx.core.lib.courses import course_image_url
 
       ## For now, ocw links are the only thing that goes in additional resources
       % if get_course_about_section(request, course, "ocw_links"):
-      <section class="additional-resources">
+      <div class="additional-resources">
         <header>
           <h1>${_("Additional Resources")}</h1>
-        </header>
+      </div>
 
-        <section>
+        <div>
           ## "MITOpenCourseware" should *not* be translated
           <h2 class="opencourseware">MITOpenCourseware</h2>
              ${get_course_about_section(request, course, "ocw_links")}
-        </section>
-      </section>
+        </div>
+    </div>
       %endif
 
-    </section>
+  </div>
 
-  </section>
-</section>
+  </div>
+</div>
 
 ## Need to put this hidden form on the page so that the registration button works.
 ## Since it's no harm to display a hidden form, we display it with the most permissive conditional

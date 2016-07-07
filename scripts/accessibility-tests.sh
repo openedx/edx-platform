@@ -16,7 +16,7 @@ echo "Setting up for accessibility tests..."
 source scripts/jenkins-common.sh
 
 echo "Running explicit accessibility tests..."
-SELENIUM_BROWSER=phantomjs paver test_a11y
+SELENIUM_BROWSER=phantomjs paver test_a11y --with-xunitmp
 
 echo "Generating coverage report..."
 paver a11y_coverage
@@ -24,7 +24,7 @@ paver a11y_coverage
 if [ "$RUN_PA11YCRAWLER" = "1" ]
 then
     echo "Running pa11ycrawler against test course..."
-    paver pa11ycrawler --fasttest --skip_clean --fetch-course --with-html
+    paver pa11ycrawler --fasttest --skip-clean --fetch-course --with-html
 
     echo "Generating coverage report..."
     paver pa11ycrawler_coverage

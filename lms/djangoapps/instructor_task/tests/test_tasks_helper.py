@@ -869,60 +869,6 @@ class TestProblemReportCohortedContent(TestReportMixin, ContentGroupTestCase, In
         expected_grades = [self._format_user_grade(header_row, **user_grade) for user_grade in user_grades]
         self.verify_rows_in_csv(expected_grades)
 
-    @patch('courseware.grades.MaxScoresCache.get', Mock(return_value=1))
-    def test_cohort_content_with_maxcache(self):
-        """
-        Tests the cohoted course grading to test the scenario in which `max_scores_cache` is set for the course
-        problems.
-        """
-        # Course is cohorted
-        self.assertTrue(cohorts.is_course_cohorted(self.course.id))
-
-        # Verify user groups
-        self.assertEquals(
-            cohorts.get_cohort(self.alpha_user, self.course.id).id,
-            self.course.user_partitions[0].groups[0].id,
-            "alpha_user should be assigned to the correct cohort"
-        )
-        self.assertEquals(
-            cohorts.get_cohort(self.beta_user, self.course.id).id,
-            self.course.user_partitions[0].groups[1].id,
-            "beta_user should be assigned to the correct cohort"
-        )
-
-        # Verify user enrollment
-        for user in [self.alpha_user, self.beta_user, self.non_cohorted_user]:
-            self.assertTrue(CourseEnrollment.is_enrolled(user, self.course.id))
-
-        self.submit_student_answer(self.alpha_user.username, u'Pröblem0', ['Option 1', 'Option 1'])
-        resp = self.submit_student_answer(self.alpha_user.username, u'Pröblem1', ['Option 1', 'Option 1'])
-        self.assertEqual(resp.status_code, 404)
-
-        resp = self.submit_student_answer(self.beta_user.username, u'Pröblem0', ['Option 1', 'Option 2'])
-        self.assertEqual(resp.status_code, 404)
-        self.submit_student_answer(self.beta_user.username, u'Pröblem1', ['Option 1', 'Option 2'])
-
-        with patch('instructor_task.tasks_helper._get_current_task'):
-            result = upload_problem_grade_report(None, None, self.course.id, None, 'graded')
-            self.assertDictContainsSubset(
-                {'action_name': 'graded', 'attempted': 4, 'succeeded': 4, 'failed': 0}, result
-            )
-        problem_names = [u'Homework 1: Problem - Pröblem0', u'Homework 1: Problem - Pröblem1']
-        header_row = [u'Student ID', u'Email', u'Username', u'Final Grade']
-        for problem in problem_names:
-            header_row += [problem + ' (Earned)', problem + ' (Possible)']
-
-        user_grades = [
-            {'user': self.staff_user, 'grade': [u'0.0', u'N/A', u'N/A', u'N/A', u'N/A']},
-            {'user': self.alpha_user, 'grade': [u'1.0', u'2.0', u'2.0', u'N/A', u'N/A']},
-            {'user': self.beta_user, 'grade': [u'0.5', u'N/A', u'N/A', u'1.0', u'2.0']},
-            {'user': self.non_cohorted_user, 'grade': [u'0.0', u'N/A', u'N/A', u'N/A', u'N/A']},
-        ]
-
-        # Verify generated grades and expected grades match
-        expected_grades = [self._format_user_grade(header_row, **grade) for grade in user_grades]
-        self.verify_rows_in_csv(expected_grades)
-
 
 @ddt.ddt
 class TestExecutiveSummaryReport(TestReportMixin, InstructorTaskCourseTestCase):

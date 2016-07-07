@@ -8,6 +8,7 @@ The following internal data structures are implemented:
     _BlockRelations - Data structure for a single block's relations.
     _BlockData - Data structure for a single block's data.
 """
+from functools import partial
 from logging import getLogger
 
 from openedx.core.lib.graph_traversals import traverse_topologically, traverse_post_order
@@ -395,6 +396,12 @@ class BlockStructureBlockData(BlockStructure):
     Subclass of BlockStructure that is responsible for managing block
     and transformer data.
     """
+    # The latest version of the data structure of this class. Incrementally
+    # update this value whenever the data structure changes. Dependent storage
+    # layers can then use this value when serializing/deserializing block
+    # structures, and invalidating any previously cached/stored data.
+    VERSION = 1
+
     def __init__(self, root_block_usage_key):
         super(BlockStructureBlockData, self).__init__(root_block_usage_key)
 
@@ -602,11 +609,16 @@ class BlockStructureBlockData(BlockStructure):
                 for parent in parents:
                     self._add_relation(parent, child)
 
-    def remove_block_if(self, removal_condition, keep_descendants=False, **kwargs):
+    def create_universal_filter(self):
         """
-        A higher-order function that traverses the block structure
-        using topological sort and removes any blocks encountered that
-        satisfy the removal_condition.
+        Returns a filter function that always returns True for all blocks.
+        """
+        return lambda block_key: True
+
+    def create_removal_filter(self, removal_condition, keep_descendants=False):
+        """
+        Returns a filter function that automatically removes blocks that satisfy
+        the removal_condition.
 
         Arguments:
             removal_condition ((usage_key)->bool) - A function that
@@ -615,19 +627,67 @@ class BlockStructureBlockData(BlockStructure):
 
             keep_descendants (bool) - See the description in
                 remove_block.
+        """
+        return partial(
+            self.retain_or_remove,
+            removal_condition=removal_condition,
+            keep_descendants=keep_descendants,
+        )
+
+    def retain_or_remove(self, block_key, removal_condition, keep_descendants=False):
+        """
+        Removes the given block if it satisfies the removal_condition.
+        Returns True if the block was retained, and False if the block
+        was removed.
+
+        Arguments:
+            block_key (usage_key) - Usage key of the block.
+
+            removal_condition ((usage_key)->bool) - A function that
+                takes a block's usage key as input and returns whether
+                or not to remove that block from the block structure.
+
+            keep_descendants (bool) - See the description in
+                remove_block.
+        """
+        if removal_condition(block_key):
+            self.remove_block(block_key, keep_descendants)
+            return False
+        return True
+
+    def remove_block_traversal(self, removal_condition, keep_descendants=False):
+        """
+        A higher-order function that traverses the block structure
+        using topological sort and removes all blocks satisfying the given
+        removal_condition.
+
+        Arguments:
+            removal_condition ((usage_key)->bool) - A function that
+                takes a block's usage key as input and returns whether
+                or not to remove that block from the block structure.
+
+            keep_descendants (bool) - See the description in
+                remove_block.
+        """
+        self.filter_topological_traversal(
+            filter_func=self.create_removal_filter(
+                removal_condition, keep_descendants
+            )
+        )
+
+    def filter_topological_traversal(self, filter_func, **kwargs):
+        """
+        A higher-order function that traverses the block structure
+        using topological sort and applies the given filter.
+
+        Arguments:
+            filter_func ((usage_key)->bool) - Function that returns
+                whether or not to yield the given block key.
+                If None, the True function is assumed.
 
             kwargs (dict) - Optional keyword arguments to be forwarded
                 to topological_traversal.
         """
-        def filter_func(block_key):
-            """
-            Filter function for removing blocks that satisfy the
-            removal_condition.
-            """
-            if removal_condition(block_key):
-                self.remove_block(block_key, keep_descendants)
-                return False
-            return True
 
         # Note: For optimization, we remove blocks using the filter
         # function, since the graph traversal method can skip over

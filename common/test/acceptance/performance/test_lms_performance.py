@@ -2,15 +2,15 @@
 Single page performance tests for LMS.
 """
 from bok_choy.web_app_test import with_cache
-from ..pages.lms.auto_auth import AutoAuthPage
-from ..pages.lms.courseware import CoursewarePage
-from ..pages.lms.dashboard import DashboardPage
-from ..pages.lms.course_info import CourseInfoPage
-from ..pages.lms.login import LoginPage
-from ..pages.lms.progress import ProgressPage
-from ..pages.common.logout import LogoutPage
-from ..fixtures.course import CourseFixture, XBlockFixtureDesc, CourseUpdateDesc
-from ..tests.helpers import UniqueCourseTest, load_data_str
+from common.test.acceptance.pages.lms.auto_auth import AutoAuthPage
+from common.test.acceptance.pages.lms.courseware import CoursewarePage
+from common.test.acceptance.pages.lms.dashboard import DashboardPage
+from common.test.acceptance.pages.lms.course_info import CourseInfoPage
+from common.test.acceptance.pages.lms.login import LoginPage
+from common.test.acceptance.pages.lms.progress import ProgressPage
+from common.test.acceptance.pages.common.logout import LogoutPage
+from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc, CourseUpdateDesc
+from common.test.acceptance.tests.helpers import UniqueCourseTest, load_data_str
 from nose.plugins.attrib import attr
 
 
