@@ -86,38 +86,38 @@ describe 'Problem', ->
     it 'bind the show button', ->
       expect($('div.action button.show')).toHandleWith 'click', @problem.show
 
+
   describe 'renderProgressState', ->
     beforeEach ->
       @problem = new Problem($('.xblock-student_view'))
       #@renderProgressState = @problem.renderProgressState
 
+    testProgessData = (problem, status, detail, expected_progress_after_render) ->
+      problem.el.data('progress_status', status)
+      problem.el.data('progress_detail', detail)
+      expect(problem.$('.problem-progress').html()).toEqual ""
+      problem.renderProgressState()
+      expect(problem.$('.problem-progress').html()).toEqual expected_progress_after_render
+
     describe 'with a status of "none"', ->
       it 'reports the number of points possible', ->
-        @problem.el.data('progress_status', 'none')
-        @problem.el.data('progress_detail', '0/1')
-        @problem.renderProgressState()
-        expect(@problem.$('.problem-progress').html()).toEqual "(1 point possible)"
+        testProgessData(@problem, 'none', '0/1', "(1 point possible)")
 
       it 'displays the number of points possible when rendering happens with the content', ->
-        @problem.el.data('progress_status', 'none')
-        @problem.el.data('progress_detail', '0/2')
-        expect(@problem.$('.problem-progress').html()).toEqual ""
-        @problem.render(problem_content_default)
-        expect(@problem.$('.problem-progress').html()).toEqual "(2 points possible)"
+        testProgessData(@problem, 'none', '0/2', "(2 points possible)")
 
     describe 'with any other valid status', ->
+
       it 'reports the current score', ->
-        @problem.el.data('progress_status', 'foo')
-        @problem.el.data('progress_detail', '1/1')
-        @problem.renderProgressState()
-        expect(@problem.$('.problem-progress').html()).toEqual "(1/1 point)"
+        testProgessData(@problem, 'foo', '1/1', "(1/1 point)")
 
       it 'shows current score when rendering happens with the content', ->
-        @problem.el.data('progress_status', 'test status')
-        @problem.el.data('progress_detail', '2/2')
-        expect(@problem.$('.problem-progress').html()).toEqual ""
-        @problem.render(problem_content_default)
-        expect(@problem.$('.problem-progress').html()).toEqual "(2/2 points)"
+        testProgessData(@problem, 'test status', '2/2', "(2/2 points)")
+
+    describe 'with valid status and string containing an integer like "0" for detail', ->
+      # These tests are to address a failure specific to Chrome 51 and 52 +
+      it 'shows no score possible for the detail', ->
+        testProgessData(@problem, 'foo', '0', "")
 
   describe 'render', ->
     beforeEach ->
