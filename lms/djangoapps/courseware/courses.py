@@ -21,7 +21,7 @@ from xmodule.modulestore import ModuleStoreEnum
 from xmodule.x_module import STUDENT_VIEW
 from microsite_configuration import microsite
 
-from courseware.access import has_access
+from courseware.access import has_access, _has_access_to_course
 from courseware.date_summary import (
     CourseEndDate,
     CourseStartDate,
@@ -32,7 +32,7 @@ from courseware.date_summary import (
 from courseware.model_data import FieldDataCache
 from courseware.module_render import get_module
 from lms.djangoapps.courseware.courseware_access_exception import CoursewareAccessException
-from student.models import CourseEnrollment
+from student.models import CourseEnrollment, ManualEnrollmentAudit
 import branding
 
 from opaque_keys.edx.keys import UsageKey
@@ -114,6 +114,20 @@ def get_course_overview_with_access(user, action, course_key, check_if_enrolled=
     except CourseOverview.DoesNotExist:
         raise Http404("Course not found.")
     check_course_access(course_overview, user, action, check_if_enrolled)
+
+    # Set permissions block
+    is_staff = _has_access_to_course(user, 'staff', course_key)
+    is_instructor = _has_access_to_course(user, 'instructor', course_key)
+    course_overview.permissions = lambda: None
+    manual_enrollment = ManualEnrollmentAudit.get_manual_enrollment_by_email(user.email)
+    setattr(course_overview.permissions, 'is_staff', True)
+    setattr(course_overview.permissions, 'is_instructor', True)
+    if manual_enrollment:
+        setattr(course_overview.permissions, 
+            'enrolled_by', 
+            manual_enrollment.enrolled_by
+        )
+
     return course_overview
 
 

@@ -99,6 +99,7 @@ class CourseDetailSerializer(CourseSerializer):  # pylint: disable=abstract-meth
     """
 
     overview = serializers.SerializerMethodField()
+    permissions = serializers.SerializerMethodField()
 
     def get_overview(self, course_overview):
         """
@@ -108,3 +109,13 @@ class CourseDetailSerializer(CourseSerializer):  # pylint: disable=abstract-meth
         # fields from CourseSerializer, which get their data
         # from the CourseOverview object in SQL.
         return CourseDetails.fetch_about_attribute(course_overview.id, 'overview')
+
+    def get_permissions(self, course_overview):
+        permissions_dict = {'is_staff': course_overview.permissions.is_staff,
+            'is_instructor': course_overview.permissions.is_instructor
+        }
+        try:
+            permissions_dict['enrolled_by'] = course_overview.permissions.enrolled_by
+        except AttributeError:
+            pass
+        return permissions_dict
