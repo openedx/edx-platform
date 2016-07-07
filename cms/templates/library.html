@@ -74,17 +74,17 @@ from openedx.core.djangolib.markup import HTML, Text
 
 <div class="wrapper-content wrapper">
     <div class="inner-wrapper">
-        <section class="content-area">
+        <div class="content-area">
 
-            <article class="content-primary">
+            <div class="content-primary">
                 <div class="container-message wrapper-message"></div>
-                <section class="wrapper-xblock level-page is-hidden studio-xblock-wrapper" data-locator="${context_library.location}" data-course-key="${context_library.location.library_key}">
-                </section>
+                <div class="wrapper-xblock level-page is-hidden studio-xblock-wrapper" data-locator="${context_library.location}" data-course-key="${context_library.location.library_key}">
+                </div>
                 <div class="ui-loading">
                     <p><span class="spin"><span class="icon fa fa-refresh" aria-hidden="true"></span></span><span class="copy">${_("Loading")}</span></p>
                 </div>
-            </article>
-            <aside class="content-supplementary" role="complementary">
+            </div>
+            <div class="content-supplementary" role="complementary">
                 % if can_edit:
                 <div class="bit">
                     <h3 class="title-3">${_("Adding content to your library")}</h3>
@@ -100,8 +100,8 @@ from openedx.core.djangolib.markup import HTML, Text
                 <div class="bit external-help">
                     <a href="${get_online_help_info(online_help_token())['doc_url']}" target="_blank" class="button external-help-button">${_("Learn more about content libraries")}</a>
                 </div>
-            </aside>
-        </section>
+            </div>
+        </div>
     </div>
 </div>
 </%block>

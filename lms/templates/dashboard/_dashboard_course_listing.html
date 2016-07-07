@@ -61,7 +61,8 @@ from student.helpers import (
  % endif
 <article class="course${mode_class}">
   <% course_target = reverse('info', args=[unicode(course_overview.id)]) %>
-  <section class="details">
+  <section class="details" aria-labelledby="details-heading-${course_overview.number}">
+      <h2 class="hd hd-2 sr" id="details-heading-${course_overview.number}">${_('Course details')}</h2>
     <div class="wrapper-course-image" aria-hidden="true">
       % if show_courseware_link:
         % if not is_course_blocked:
