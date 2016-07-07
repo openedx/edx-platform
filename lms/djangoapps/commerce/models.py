@@ -35,7 +35,7 @@ class CommerceConfiguration(ConfigurationModel):
     )
     receipt_page = models.CharField(
         max_length=255,
-        default='/commerce/checkout/receipt/?orderNum=',
+        default='/commerce/checkout/receipt/?order_number=',
         help_text=_('Path to order receipt page.')
     )
 
