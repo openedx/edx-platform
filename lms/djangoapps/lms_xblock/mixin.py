@@ -5,6 +5,8 @@ Namespace that defines fields common to all blocks used in the LMS
 #from django.utils.translation import ugettext_noop as _
 from lazy import lazy
 
+from enum import Enum
+
 from xblock.fields import Boolean, Scope, String, XBlockMixin, Dict
 from xblock.validation import ValidationMessage
 from xmodule.modulestore.inheritance import UserPartitionList
@@ -13,6 +15,17 @@ from xmodule.partitions.partitions import NoSuchUserPartitionError, NoSuchUserPa
 # Please do not remove, this is a workaround for Django 1.8.
 # more information can be found here: https://openedx.atlassian.net/browse/PLAT-902
 _ = lambda text: text
+
+
+class LearnerVisibilityPolicy(Enum):
+    """
+    Possible visibility states
+    """
+    visible = 1
+    block_hidden = 2
+    content_hidden = 3
+    content_hidden_after_due_date = 4
+    content_hidden_after_submission = 5
 
 
 class GroupAccessDict(Dict):
@@ -24,6 +37,26 @@ class GroupAccessDict(Dict):
     def to_json(self, access_dict):
         if access_dict is not None:
             return {unicode(k): access_dict[k] for k in access_dict}
+
+
+class EnumString(String):
+    """
+    Provides a String field constrained to an enumerated set of configured
+    values.
+    """
+    def __init__(self, options=None, *args, **kwargs):
+        super(EnumString, self).__init__(*args, **kwargs)
+        self.options = options or set()
+
+    def from_json(self, string):
+        if string not in self.options:
+            raise ValueError('{!r} not in {}'.format(string, self.options))
+        return super(EnumString, self).from_json(string)
+
+    def to_json(self, string):
+        if string not in self.options:
+            raise ValueError('{!r} not in {}'.format(string, self.options))
+        return super(EnumString, self).to_json(string)
 
 
 class LmsBlockMixin(XBlockMixin):
@@ -66,8 +99,19 @@ class LmsBlockMixin(XBlockMixin):
         deprecated=True
     )
     visible_to_staff_only = Boolean(
-        help=_("If true, can be seen only by course staff, regardless of start date."),
+        help=_("If true, block is only visibl to course staff, regardless of start date."),
         default=False,
+        scope=Scope.settings,
+    )
+    content_visibility_policy = EnumString(
+        options={
+            u'visible',
+            u'hidden',
+            u'hidden_after_due_date',
+            u'hidden_after_submission',
+        },
+        help=_("Determines when and if block content is hidden from learners."),
+        default=u'always_visible',
         scope=Scope.settings,
     )
     group_access = GroupAccessDict(
@@ -102,7 +146,7 @@ class LmsBlockMixin(XBlockMixin):
 
         merged_access = parent.merged_group_access.copy()
         if self.group_access is not None:
-            for partition_id, group_ids in self.group_access.items():
+            for partition_id, group_ids in self.group_access.iteritems():
                 if group_ids:  # skip if the "local" group_access for this partition is None or empty.
                     if partition_id in merged_access:
                         if merged_access[partition_id] is False:
@@ -174,3 +218,23 @@ class LmsBlockMixin(XBlockMixin):
                 )
             )
         return validation
+
+
+    def learner_visibility_policy(self):
+        """
+        Return the unified visibility policy for this block.
+
+        This combines values from `visible_to_staff_only` and
+        `content_visibility_policy` to determine the policy for allowing a
+        learner to access the block or its content.  BlockTransformers will
+        handle actual implementation of this policy.
+        """
+        if self.visible_to_staff_only:
+            return LearnerVisibilityPolicy.block_hidden
+        else:
+            visibility_mapping = {
+                u'hidden': LearnerVisibilityPolicy.content_hidden,
+                u'hidden_after_due_date': LearnerVisibilityPolicy.content_hidden_after_due_date,
+                u'hidden_after_submission': LearnerVisibilityPolicy.content_hidden_after_submission,
+            }
+            return visibility_mapping.get(self.content_visibility_policy, LearnerVisibilityPolicy.visible)
