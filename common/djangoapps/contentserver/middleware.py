@@ -21,6 +21,8 @@ from .caching import get_cached_content, set_cached_content
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.exceptions import NotFoundError
 
+from .url import is_versioned_asset_path, parse_versioned_asset_path, get_location_from_path, add_version_to_asset_path
+
 # TODO: Soon as we have a reasonable way to serialize/deserialize AssetKeys, we need
 # to change this file so instead of using course_id_partial, we're just using asset keys
 
@@ -39,7 +41,7 @@ class StaticContentServer(object):
             or
             request.path.startswith('/' + AssetLocator.CANONICAL_NAMESPACE)
             or
-            StaticContent.is_versioned_asset_path(request.path)
+            is_versioned_asset_path(request.path)
         )
 
     def process_request(self, request):
@@ -53,12 +55,12 @@ class StaticContentServer(object):
 
             # If this is a versioned request, pull out the digest and chop off the prefix.
             requested_digest = None
-            if StaticContent.is_versioned_asset_path(asset_path):
-                requested_digest, asset_path = StaticContent.parse_versioned_asset_path(asset_path)
+            if is_versioned_asset_path(asset_path):
+                requested_digest, asset_path = parse_versioned_asset_path(asset_path)
 
             # Make sure we have a valid location value for this asset.
             try:
-                loc = StaticContent.get_location_from_path(asset_path)
+                loc = get_location_from_path(asset_path)
             except (InvalidLocationError, InvalidKeyError):
                 return HttpResponseBadRequest()
 
@@ -74,7 +76,7 @@ class StaticContentServer(object):
             # If this was a versioned asset, and the digest doesn't match, redirect
             # them to the actual version.
             if requested_digest is not None and actual_digest is not None and (actual_digest != requested_digest):
-                actual_asset_path = StaticContent.add_version_to_asset_path(asset_path, actual_digest)
+                actual_asset_path = add_version_to_asset_path(asset_path, actual_digest)
                 return HttpResponsePermanentRedirect(actual_asset_path)
 
             # Set the basics for this request. Make sure that the course key for this

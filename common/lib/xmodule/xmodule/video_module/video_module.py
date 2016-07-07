@@ -36,6 +36,7 @@ from xmodule.raw_module import EmptyDataRawDescriptor
 from xmodule.xml_module import is_pointer_tag, name_to_pathname, deserialize_field
 from xmodule.exceptions import NotFoundError
 from xmodule.contentstore.content import StaticContent
+from contentserver.url import serialize_asset_key_with_slash, get_location_from_path
 
 from .transcripts_utils import VideoTranscriptsMixin, Transcript, get_html5_ids
 from .video_utils import create_youtube_string, get_poster, rewrite_video_url, format_xml_exception_message
@@ -759,10 +760,10 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
         course_id = getattr(id_generator, 'target_course_id', None)
         # Update the handout location with current course_id
         if 'handout' in field_data.keys() and course_id:
-            handout_location = StaticContent.get_location_from_path(field_data['handout'])
+            handout_location = get_location_from_path(field_data['handout'])
             if isinstance(handout_location, AssetLocator):
                 handout_new_location = StaticContent.compute_location(course_id, handout_location.path)
-                field_data['handout'] = StaticContent.serialize_asset_key_with_slash(handout_new_location)
+                field_data['handout'] = serialize_asset_key_with_slash(handout_new_location)
 
         # For backwards compatibility: Add `source` if XML doesn't have `download_video`
         # attribute.

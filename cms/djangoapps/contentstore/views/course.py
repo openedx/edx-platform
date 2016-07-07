@@ -92,6 +92,7 @@ from util.organizations_helpers import (
 )
 from util.string_utils import _has_non_ascii_characters
 from xmodule.contentstore.content import StaticContent
+from contentserver.url import get_base_url_path_for_course_assets
 from xmodule.course_module import CourseFields
 from xmodule.course_module import DEFAULT_START_DATE
 from xmodule.error_module import ErrorDescriptor
@@ -892,7 +893,7 @@ def course_info_handler(request, course_key_string):
                     'context_course': course_module,
                     'updates_url': reverse_course_url('course_info_update_handler', course_key),
                     'handouts_locator': course_key.make_usage_key('course_info', 'handouts'),
-                    'base_asset_url': StaticContent.get_base_url_path_for_course_assets(course_module.id),
+                    'base_asset_url': get_base_url_path_for_course_assets(course_module.id),
                     'push_notification_enabled': push_notification_enabled()
                 }
             )

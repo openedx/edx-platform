@@ -13,6 +13,7 @@ import textwrap
 import dogstats_wrapper as dog_stats_api
 from xmodule.util.misc import escape_html_characters
 from xmodule.contentstore.content import StaticContent
+from contentserver.url import get_base_url_path_for_course_assets
 from xmodule.editing_module import EditingDescriptor
 from xmodule.edxnotes_utils import edxnotes
 from xmodule.html_checker import check_html
@@ -175,7 +176,7 @@ class HtmlDescriptor(HtmlBlock, XmlDescriptor, EditingDescriptor):  # pylint: di
         # Add some specific HTML rendering context when editing HTML modules where we pass
         # the root /c4x/ url for assets. This allows client-side substitutions to occur.
         _context.update({
-            'base_asset_url': StaticContent.get_base_url_path_for_course_assets(self.location.course_key),
+            'base_asset_url': get_base_url_path_for_course_assets(self.location.course_key),
             'enable_latex_compiler': self.use_latex_compiler,
             'editor': self.editor
         })

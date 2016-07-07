@@ -36,6 +36,7 @@ from xmodule.x_module import XModuleDescriptor, XModuleMixin
 from opaque_keys.edx.keys import UsageKey
 from xblock.fields import Scope, Reference, ReferenceList, ReferenceValueDict
 from xmodule.contentstore.content import StaticContent
+from contentserver.url import is_c4x_path, get_location_from_path, get_static_path_from_location
 from .inheritance import own_metadata
 from xmodule.errortracker import make_error_tracker
 from .store_utilities import rewrite_nonportable_content_links
@@ -516,9 +517,9 @@ class CourseImportManager(ImportManager):
         """
         for entry in course.pdf_textbooks:
             for chapter in entry.get('chapters', []):
-                if StaticContent.is_c4x_path(chapter.get('url', '')):
-                    asset_key = StaticContent.get_location_from_path(chapter['url'])
-                    chapter['url'] = StaticContent.get_static_path_from_location(asset_key)
+                if is_c4x_path(chapter.get('url', '')):
+                    asset_key = get_location_from_path(chapter['url'])
+                    chapter['url'] = get_static_path_from_location(asset_key)
 
         # Original wiki_slugs had value location.course. To make them unique this was changed to 'org.course.name'.
         # If we are importing into a course with a different course_id and wiki_slug is equal to either of these default

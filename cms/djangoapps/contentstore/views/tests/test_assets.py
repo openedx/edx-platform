@@ -14,6 +14,7 @@ from contentstore.views import assets
 from contentstore.utils import reverse_course_url
 from xmodule.assetstore import AssetMetadata
 from xmodule.contentstore.content import StaticContent
+from contentserver.url import get_static_path_from_location, get_location_from_path
 from xmodule.contentstore.django import contentstore
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore import ModuleStoreEnum
@@ -82,7 +83,7 @@ class BasicAssetsTestCase(AssetsTestCase):
 
         course_key = SlashSeparatedCourseKey('org', 'class', 'run')
         location = course_key.make_asset_key('asset', 'my_file_name.jpg')
-        path = StaticContent.get_static_path_from_location(location)
+        path = get_static_path_from_location(location)
         self.assertEquals(path, '/static/my_file_name.jpg')
 
     def test_pdf_asset(self):
@@ -379,7 +380,7 @@ class LockAssetTestCase(AssetsTestCase):
         """
         def verify_asset_locked_state(locked):
             """ Helper method to verify lock state in the contentstore """
-            asset_location = StaticContent.get_location_from_path('/c4x/edX/toy/asset/sample_static.html')
+            asset_location = get_location_from_path('/c4x/edX/toy/asset/sample_static.html')
             content = contentstore().find(asset_location)
             self.assertEqual(content.locked, locked)
 
@@ -465,7 +466,7 @@ class DeleteAssetTestCase(AssetsTestCase):
         response = self.client.post(self.url, {"name": "delete_image_thumb_test", "file": thumbnail_image_asset})
         self.assertEquals(response.status_code, 200)
         thumbnail_url = json.loads(response.content)['asset']['url']
-        thumbnail_location = StaticContent.get_location_from_path(thumbnail_url)
+        thumbnail_location = get_location_from_path(thumbnail_url)
 
         image_asset_location = AssetLocation.from_deprecated_string(uploaded_image_url)
         content = contentstore().find(image_asset_location)
@@ -491,7 +492,7 @@ class DeleteAssetTestCase(AssetsTestCase):
         """ Tests the sad path :( """
         test_url = reverse_course_url(
             'assets_handler', self.course.id, kwargs={'asset_key_string': unicode(self.uploaded_url)})
-        self.content.thumbnail_location = StaticContent.get_location_from_path('/c4x/edX/toy/asset/invalid')
+        self.content.thumbnail_location = get_location_from_path('/c4x/edX/toy/asset/invalid')
         contentstore().save(self.content)
         resp = self.client.delete(test_url, HTTP_ACCEPT="application/json")
         self.assertEquals(resp.status_code, 204)

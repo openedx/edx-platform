@@ -1,4 +1,5 @@
 from xmodule.contentstore.content import StaticContent
+from contentserver.url import get_location_from_path
 from .django import contentstore
 
 
@@ -29,7 +30,7 @@ def restore_asset_from_trashcan(location):
     trash = contentstore('trashcan')
     store = contentstore()
 
-    loc = StaticContent.get_location_from_path(location)
+    loc = get_location_from_path(location)
     content = trash.find(loc)
 
     # ok, save the content into the courseware

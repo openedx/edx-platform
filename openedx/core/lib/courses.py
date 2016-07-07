@@ -8,6 +8,7 @@ from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore import ModuleStoreEnum
+from contentserver.url import serialize_asset_key_with_slash
 
 
 def course_image_url(course, image_key='course_image'):
@@ -29,7 +30,7 @@ def course_image_url(course, image_key='course_image'):
         url = settings.STATIC_URL + settings.DEFAULT_COURSE_ABOUT_IMAGE_URL
     else:
         loc = StaticContent.compute_location(course.id, getattr(course, image_key))
-        url = StaticContent.serialize_asset_key_with_slash(loc)
+        url = serialize_asset_key_with_slash(loc)
 
     return url
 
@@ -44,4 +45,4 @@ def create_course_image_thumbnail(course, dimensions):
 
     _content, thumb_loc = contentstore().generate_thumbnail(course_image, dimensions=dimensions)
 
-    return StaticContent.serialize_asset_key_with_slash(thumb_loc)
+    return unicode(thumb_loc)

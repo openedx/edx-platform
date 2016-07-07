@@ -9,11 +9,12 @@ from static_replace.models import AssetBaseUrlConfig, AssetExcludedExtensionsCon
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.contentstore.content import StaticContent
-
 from opaque_keys.edx.locator import AssetLocator
+from contentserver.url import get_canonicalized_asset_path
+
+from .constants import XBLOCK_STATIC_RESOURCE_PREFIX, STATIC_RESOURCE_PREFIX
 
 log = logging.getLogger(__name__)
-XBLOCK_STATIC_RESOURCE_PREFIX = '/static/xblock'
 
 
 def _url_replace_regex(prefix):
@@ -189,7 +190,7 @@ def replace_static_urls(text, data_directory=None, course_id=None, static_asset_
                 # Mongo-backed database
                 base_url = AssetBaseUrlConfig.get_base_url()
                 excluded_exts = AssetExcludedExtensionsConfig.get_excluded_extensions()
-                url = StaticContent.get_canonicalized_asset_path(course_id, rest, base_url, excluded_exts)
+                url = get_canonicalized_asset_path(course_id, rest, base_url, excluded_exts)
 
                 if AssetLocator.CANONICAL_NAMESPACE in url:
                     url = url.replace('block@', 'block/', 1)

@@ -28,6 +28,8 @@ from contentserver.middleware import parse_range_header, HTTP_DATE_FORMAT, Stati
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory, AdminFactory
 
+from contentserver.url import get_location_from_path, add_version_to_asset_path
+
 log = logging.getLogger(__name__)
 
 TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)
@@ -42,9 +44,9 @@ def get_versioned_asset_url(asset_path):
     Creates a versioned asset URL.
     """
     try:
-        locator = StaticContent.get_location_from_path(asset_path)
+        locator = get_location_from_path(asset_path)
         content = AssetManager.find(locator, as_stream=True)
-        return StaticContent.add_version_to_asset_path(asset_path, content.content_digest)
+        return add_version_to_asset_path(asset_path, content.content_digest)
     except (InvalidKeyError, ItemNotFoundError):
         pass
 
@@ -115,7 +117,7 @@ class ContentStoreToyCourseTest(SharedModuleStoreTestCase):
         Test that unlocked assets that are versioned, but have a nonexistent version,
         are sent back as a 301 redirect which tells the caller the correct URL.
         """
-        url_unlocked_versioned_old = StaticContent.add_version_to_asset_path(self.url_unlocked, FAKE_MD5_HASH)
+        url_unlocked_versioned_old = add_version_to_asset_path(self.url_unlocked, FAKE_MD5_HASH)
 
         self.client.logout()
         resp = self.client.get(url_unlocked_versioned_old)

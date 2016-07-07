@@ -16,6 +16,7 @@ from contentstore.utils import reverse_course_url
 from xmodule.contentstore.django import contentstore
 from xmodule.modulestore.django import modulestore
 from xmodule.contentstore.content import StaticContent
+from contentserver.url import get_static_path_from_location, serialize_asset_key_with_slash
 from xmodule.exceptions import NotFoundError
 from contentstore.views.exception import AssetNotFoundException
 from django.core.exceptions import PermissionDenied
@@ -369,7 +370,7 @@ def _get_asset_json(display_name, content_type, date, location, thumbnail_locati
     """
     Helper method for formatting the asset information to send to client.
     """
-    asset_url = StaticContent.serialize_asset_key_with_slash(location)
+    asset_url = serialize_asset_key_with_slash(location)
     external_url = settings.LMS_BASE + asset_url
     return {
         'display_name': display_name,
@@ -377,8 +378,8 @@ def _get_asset_json(display_name, content_type, date, location, thumbnail_locati
         'date_added': get_default_time_display(date),
         'url': asset_url,
         'external_url': external_url,
-        'portable_url': StaticContent.get_static_path_from_location(location),
-        'thumbnail': StaticContent.serialize_asset_key_with_slash(thumbnail_location) if thumbnail_location else None,
+        'portable_url': get_static_path_from_location(location),
+        'thumbnail': serialize_asset_key_with_slash(thumbnail_location) if thumbnail_location else None,
         'locked': locked,
         # Needed for Backbone delete/update.
         'id': unicode(location)
