@@ -98,8 +98,8 @@ class CapaModule(CapaMixin, XModule):
         try:
             result = handlers[dispatch](data)
 
-        except NotFoundError as err:
-            log.exception(
+        except NotFoundError:
+            log.info(
                 "Unable to find data when dispatching %s to %s for user %s",
                 dispatch,
                 self.scope_ids.usage_id,
