@@ -749,9 +749,12 @@ MODULESTORE = {
 
 #################### Python sandbox ############################################
 
+for directory in '/edx/app/edxapp/venvs/edxapp-sandbox', sys.prefix, '{}-sandbox'.format(sys.prefix):
+    print directory, 'exists' if os.path.exists(directory) else 'does not exist'
+
 CODE_JAIL = {
     # Path to a sandboxed Python executable.  None means don't bother.
-    'python_bin': '/edx/app/edxapp/venvs/edxapp-sandbox/bin/python',
+    'python_bin': os.path.join(sys.prefix, 'bin/python'),
     # User to run as in the sandbox.
     'user': 'sandbox',
 
