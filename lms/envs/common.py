@@ -751,7 +751,7 @@ MODULESTORE = {
 
 CODE_JAIL = {
     # Path to a sandboxed Python executable.  None means don't bother.
-    'python_bin': None,
+    'python_bin': '/edx/app/edxapp/venvs/edxapp-sandbox/bin/python',
     # User to run as in the sandbox.
     'user': 'sandbox',
 
