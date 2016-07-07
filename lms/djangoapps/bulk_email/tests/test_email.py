@@ -3,7 +3,6 @@
 Unit tests for sending course email
 """
 import json
-import ddt
 from markupsafe import escape
 from mock import patch, Mock
 from nose.plugins.attrib import attr
@@ -16,12 +15,11 @@ from django.core.urlresolvers import reverse
 from django.core.management import call_command
 from django.test.utils import override_settings
 
-from bulk_email.models import Optout, BulkEmailFlag, CourseEmail, SEND_TO_MYSELF
-from bulk_email.tasks import _get_source_address, _get_course_email_context, perform_delegate_email_batches
+from bulk_email.models import Optout, BulkEmailFlag
+from bulk_email.tasks import _get_source_address, _get_course_email_context
 from openedx.core.djangoapps.course_groups.models import CourseCohort
 from openedx.core.djangoapps.course_groups.cohorts import add_user_to_cohort
 from courseware.tests.factories import StaffFactory, InstructorFactory
-from instructor_task.models import InstructorTask
 from instructor_task.subtasks import update_subtask_status
 from student.roles import CourseStaffRole
 from student.models import CourseEnrollment
@@ -479,7 +477,6 @@ class TestEmailSendFromDashboard(EmailSendFromDashboardTestCase):
         self.assertIn(uni_message, message_body)
 
 
-@ddt.ddt
 class TestCourseEmailContext(SharedModuleStoreTestCase):
     """
     Test the course email context hash used to send bulk emails.
@@ -488,7 +485,7 @@ class TestCourseEmailContext(SharedModuleStoreTestCase):
     @classmethod
     def setUpClass(cls):
         """
-        Create a course, InstructorTask, and CourseEmail shared by all tests.
+        Create a course shared by all tests.
         """
         super(TestCourseEmailContext, cls).setUpClass()
         cls.course_title = u"Финансовое программирование и политика, часть 1: макроэкономические счета и анализ"
@@ -501,32 +498,11 @@ class TestCourseEmailContext(SharedModuleStoreTestCase):
             number=cls.course_number,
             run=cls.course_run,
         )
-        cls.user = UserFactory()
-        cls.course_email = CourseEmail.create(
-            course_id=cls.course.id,
-            sender=cls.user,
-            targets=[SEND_TO_MYSELF],
-            subject='subject',
-            html_message='message',
-        )
-        cls.email_task = InstructorTask.create(
-            course_id=cls.course.id,
-            task_type='bulk_course_email',
-            task_key='key',
-            task_input={},
-            requester=cls.user,
-        )
 
-    @ddt.data(
-        (False, 'http'),
-        (True, 'https'),
-    )
-    @ddt.unpack
-    def test_context_urls(self, is_secure, scheme):
+    def verify_email_context(self, email_context, scheme):
         """
         This test tests that the bulk email context uses http or https urls as appropriate.
         """
-        email_context = _get_course_email_context(self.course, is_secure)
         self.assertEquals(email_context['platform_name'], 'edX')
         self.assertEquals(email_context['course_title'], self.course_title)
         self.assertEquals(email_context['course_url'],
@@ -541,23 +517,18 @@ class TestCourseEmailContext(SharedModuleStoreTestCase):
         self.assertEquals(email_context['email_settings_url'], '{}://edx.org/dashboard'.format(scheme))
         self.assertEquals(email_context['account_settings_url'], '{}://edx.org/account/settings'.format(scheme))
 
-    @ddt.data(
-        None,
-        False,
-        True,
-    )
-    @patch('bulk_email.tasks._get_course_email_context')
-    def test_task_input_is_secure(self, is_secure, get_course_email_context):
+    @override_settings(HTTPS="off")
+    def test_insecure_email_context(self):
         """
-        Test the effect of different task_input hashes on perform_delegate_email_batches,
-        to ensure that the correct http or https URL schemes are used in generated emails.
+        This test tests that the bulk email context uses http urls
         """
-        task_input = {'email_id': self.course_email.id}
-        if is_secure is not None:
-            task_input['is_secure'] = is_secure
-        else:
-            # https URLs used by default to maintain backwards compatibility
-            is_secure = True
+        email_context = _get_course_email_context(self.course)
+        self.verify_email_context(email_context, 'http')
 
-        perform_delegate_email_batches(self.email_task.id, self.course.id, task_input, 'emailed')
-        get_course_email_context.assert_called_with(self.course, is_secure)
+    @override_settings(HTTPS="on")
+    def test_secure_email_context(self):
+        """
+        This test tests that the bulk email context uses https urls
+        """
+        email_context = _get_course_email_context(self.course)
+        self.verify_email_context(email_context, 'https')
