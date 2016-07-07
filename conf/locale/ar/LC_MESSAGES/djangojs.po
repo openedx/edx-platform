@@ -4530,6 +4530,9 @@ msgid ""
 "We've sent a confirmation message to {new_email_address}. Click the link in "
 "the message to update your email address."
 msgstr ""
+"لقد قمنا بإرسال رسالة تأكيد إلى عنوان البريد الإلكتروني {new_email_address}."
+" الرجاء النقر على الرابط المتاح في هذه الرسالة لتحديث عنوان بريدك "
+"الإلكتروني."
 
 #: lms/static/js/student_account/views/account_settings_fields.js
 msgid ""

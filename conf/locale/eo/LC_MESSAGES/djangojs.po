@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-06-30 18:52+0000\n"
-"PO-Revision-Date: 2016-06-30 18:53:20.915372\n"
+"POT-Creation-Date: 2016-07-07 14:14+0000\n"
+"PO-Revision-Date: 2016-07-07 14:15:59.199191\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -4209,10 +4209,6 @@ msgstr ""
 "Théré wäs än érrör, trý séärçhïng ägäïn. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя#"
 
-#: lms/static/js/edxnotes/plugins/accessibility.js
-msgid "Focus grabber"
-msgstr "Föçüs gräßßér Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
-
 #: lms/static/js/edxnotes/views/notes_visibility_factory.js
 #: lms/static/js/edxnotes/views/search_box.js
 msgid ""
@@ -8009,8 +8005,8 @@ msgid "Coming Soon"
 msgstr "Çömïng Söön Ⱡ'σяєм ιρѕυм ∂σłσя #"
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
-msgid "Enrollment Opens"
-msgstr "Énröllmént Öpéns Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
+msgid "Enrollment Opens on"
+msgstr "Énröllmént Öpéns ön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
 
 #: lms/templates/learner_dashboard/empty_programs_list.underscore
 msgid "You are not enrolled in any XSeries Programs yet."
@@ -8063,6 +8059,18 @@ msgstr "Däshßöärd Ⱡ'σяєм ιρѕυм ∂σł#"
 #: lms/templates/learner_dashboard/program_header_view.underscore
 msgid "Programs"
 msgstr "Prögräms Ⱡ'σяєм ιρѕυм ∂#"
+
+#: lms/templates/learner_dashboard/upgrade_message.underscore
+msgid ""
+"You need a certificate in this course to be eligible for a program "
+"certificate."
+msgstr ""
+"Ýöü nééd ä çértïfïçäté ïn thïs çöürsé tö ßé élïgïßlé för ä prögräm "
+"çértïfïçäté. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
+
+#: lms/templates/learner_dashboard/upgrade_message.underscore
+msgid "Upgrade Now"
+msgstr "Ûpgrädé Nöw Ⱡ'σяєм ιρѕυм ∂σłσя #"
 
 #: lms/templates/search/course_search_results.underscore
 #: lms/templates/search/dashboard_search_results.underscore
