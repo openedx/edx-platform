@@ -1,4 +1,4 @@
-define(['backbone', 'jquery', 'js/instructor_dashboard/ecommerce'],
+define(['backbone', 'jquery', 'lms/js/instructor_dashboard/ecommerce'],
     function (Backbone, $, ExpiryCouponView) {
         'use strict';
         var expiryCouponView;

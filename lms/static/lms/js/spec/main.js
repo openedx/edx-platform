@@ -54,7 +54,7 @@
             'mathjax': '//cdn.mathjax.org/mathjax/2.6-latest/MathJax.js?config=TeX-MML-AM_SVG&delayStartupUntil=configured', // jshint ignore:line
             'youtube': '//www.youtube.com/player_api?noext',
             'coffee/src/ajax_prefix': 'xmodule_js/common_static/coffee/src/ajax_prefix',
-            'coffee/src/instructor_dashboard/student_admin': 'coffee/src/instructor_dashboard/student_admin',
+            'lms/js/instructor_dashboard/student_admin': 'lms/js/instructor_dashboard/student_admin',
             'xmodule_js/common_static/js/test/add_ajax_prefix': 'xmodule_js/common_static/js/test/add_ajax_prefix',
             'xblock/lms.runtime.v1': 'lms/js/xblock/lms.runtime.v1',
             'xblock': 'common/js/xblock',
@@ -289,8 +289,8 @@
                 exports: 'AjaxPrefix',
                 deps: ['coffee/src/ajax_prefix']
             },
-            'coffee/src/instructor_dashboard/util': {
-                exports: 'coffee/src/instructor_dashboard/util',
+            'lms/js/instructor_dashboard/util': {
+                exports: 'InstructorDashboard.util',
                 deps: ['jquery', 'underscore', 'slick.core', 'slick.grid'],
                 init: function() {
                     // Set global variables that the util code is expecting to be defined
@@ -304,12 +304,10 @@
                     });
                 }
             },
-            'coffee/src/instructor_dashboard/student_admin': {
-                exports: 'coffee/src/instructor_dashboard/student_admin',
-                deps: ['jquery', 'underscore', 'coffee/src/instructor_dashboard/util', 'string_utils']
+            'lms/js/instructor_dashboard/student_admin': {
+                deps: ['jquery', 'underscore', 'lms/js/instructor_dashboard/util', 'string_utils']
             },
-            'js/instructor_dashboard/certificates': {
-                exports: 'js/instructor_dashboard/certificates',
+            'lms/js/instructor_dashboard/certificates': {
                 deps: ['jquery', 'gettext', 'underscore']
             },
             // LMS class loaded explicitly until they are converted to use RequireJS
@@ -343,7 +341,7 @@
             },
 
             // Backbone classes loaded explicitly until they are converted to use RequireJS
-            'js/instructor_dashboard/ecommerce': {
+            'lms/js/instructor_dashboard/ecommerce': {
                 exports: 'edx.instructor_dashboard.ecommerce.ExpiryCouponView',
                 deps: ['backbone', 'jquery', 'underscore']
             },
@@ -681,7 +679,6 @@
     });
 
     var testFiles = [
-        'lms/js/spec/preview/preview_factory_spec.js',
         'js/spec/api_admin/catalog_preview_spec.js',
         'js/spec/courseware/bookmark_button_view_spec.js',
         'js/spec/courseware/bookmarks_list_view_spec.js',
@@ -732,12 +729,6 @@
         'js/spec/edxnotes/views/visibility_decorator_spec.js',
         'js/spec/financial-assistance/financial_assistance_form_view_spec.js',
         'js/spec/groups/views/cohorts_spec.js',
-        'js/spec/instructor_dashboard/certificates_bulk_exception_spec.js',
-        'js/spec/instructor_dashboard/certificates_exception_spec.js',
-        'js/spec/instructor_dashboard/certificates_invalidation_spec.js',
-        'js/spec/instructor_dashboard/certificates_spec.js',
-        'js/spec/instructor_dashboard/ecommerce_spec.js',
-        'js/spec/instructor_dashboard/student_admin_spec.js',
         'js/spec/learner_dashboard/certificate_view_spec.js',
         'js/spec/learner_dashboard/collection_list_view_spec.js',
         'js/spec/learner_dashboard/program_card_view_spec.js',
@@ -784,6 +775,15 @@
         'js/spec/views/file_uploader_spec.js',
         'js/spec/views/message_banner_spec.js',
         'js/spec/views/notification_spec.js',
+        'lms/js/spec/instructor_dashboard/certificates_bulk_exception_spec.js',
+        'lms/js/spec/instructor_dashboard/certificates_exception_spec.js',
+        'lms/js/spec/instructor_dashboard/certificates_invalidation_spec.js',
+        'lms/js/spec/instructor_dashboard/certificates_spec.js',
+        'lms/js/spec/instructor_dashboard/ecommerce_spec.js',
+        'lms/js/spec/instructor_dashboard/membership_spec.js',
+        'lms/js/spec/instructor_dashboard/send_email_spec.js',
+        'lms/js/spec/instructor_dashboard/student_admin_spec.js',
+        'lms/js/spec/preview/preview_factory_spec.js',
         'support/js/spec/collections/enrollment_spec.js',
         'support/js/spec/models/enrollment_spec.js',
         'support/js/spec/views/certificates_spec.js',

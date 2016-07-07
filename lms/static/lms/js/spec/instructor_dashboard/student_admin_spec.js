@@ -1,6 +1,9 @@
-define(['jquery', 'coffee/src/instructor_dashboard/student_admin', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'],
+define([
+        'jquery',
+        'lms/js/instructor_dashboard/student_admin',
+        'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'
+    ],
     function ($, StudentAdmin, AjaxHelpers) {
-        //'coffee/src/instructor_dashboard/student_admin'
         'use strict';
         describe("edx.instructor_dashboard.student_admin.StudentAdmin", function() {
             var studentadmin, dashboard_api_url, unique_student_identifier, alert_msg;
@@ -9,9 +12,9 @@ define(['jquery', 'coffee/src/instructor_dashboard/student_admin', 'edx-ui-toolk
                 loadFixtures('js/fixtures/instructor_dashboard/student_admin.html');
                 window.InstructorDashboard = {};
                 window.InstructorDashboard.util = {
-                    std_ajax_err: std_ajax_err,
-                    PendingInstructorTasks: PendingInstructorTasks,
-                    create_task_list_table: create_task_list_table
+                    std_ajax_err: InstructorDashboard.util.std_ajax_err,
+                    PendingInstructorTasks: InstructorDashboard.util.PendingInstructorTasks,
+                    create_task_list_table: InstructorDashboard.util.create_task_list_table
                 };
                 studentadmin = new window.StudentAdmin($('#student_admin'));
                 dashboard_api_url = '/courses/PU/FSc/2014_T4/instructor/api';
@@ -30,7 +33,7 @@ define(['jquery', 'coffee/src/instructor_dashboard/student_admin', 'edx-ui-toolk
 
                 var success_message = gettext("Entrance exam attempts is being reset for student '{student_id}'.");
                 var full_success_message = interpolate_text(success_message, {
-                  student_id: unique_student_identifier
+                    student_id: unique_student_identifier
                 });
 
                 // Spy on AJAX requests
@@ -71,7 +74,7 @@ define(['jquery', 'coffee/src/instructor_dashboard/student_admin', 'edx-ui-toolk
 
                 var error_message = gettext("Error resetting entrance exam attempts for student '{student_id}'. Make sure student identifier is correct.");
                 var full_error_message = interpolate_text(error_message, {
-                  student_id: unique_student_identifier
+                    student_id: unique_student_identifier
                 });
                 expect(studentadmin.$request_response_error_ee.text()).toEqual(full_error_message);
             });
@@ -84,7 +87,7 @@ define(['jquery', 'coffee/src/instructor_dashboard/student_admin', 'edx-ui-toolk
                 var success_message = gettext("Started entrance exam rescore task for student '{student_id}'." +
                     " Click the 'Show Background Task History for Student' button to see the status of the task.");
                 var full_success_message = interpolate_text(success_message, {
-                  student_id: unique_student_identifier
+                    student_id: unique_student_identifier
                 });
 
                 // Spy on AJAX requests
@@ -124,7 +127,7 @@ define(['jquery', 'coffee/src/instructor_dashboard/student_admin', 'edx-ui-toolk
                 var error_message = gettext("Error starting a task to rescore entrance exam for student '{student_id}'." +
                     " Make sure that entrance exam has problems in it and student identifier is correct.");
                 var full_error_message = interpolate_text(error_message, {
-                  student_id: unique_student_identifier
+                    student_id: unique_student_identifier
                 });
                 expect(studentadmin.$request_response_error_ee.text()).toEqual(full_error_message);
             });
@@ -136,7 +139,7 @@ define(['jquery', 'coffee/src/instructor_dashboard/student_admin', 'edx-ui-toolk
 
                 var success_message = "This student ('{student_id}') will skip the entrance exam.";
                 var full_success_message = interpolate_text(success_message, {
-                  student_id: unique_student_identifier
+                    student_id: unique_student_identifier
                 });
 
                 // Spy on AJAX requests
@@ -182,7 +185,7 @@ define(['jquery', 'coffee/src/instructor_dashboard/student_admin', 'edx-ui-toolk
 
                 var success_message = gettext("Entrance exam state is being deleted for student '{student_id}'.");
                 var full_success_message = interpolate_text(success_message, {
-                  student_id: unique_student_identifier
+                    student_id: unique_student_identifier
                 });
 
                 // Spy on AJAX requests
@@ -224,7 +227,7 @@ define(['jquery', 'coffee/src/instructor_dashboard/student_admin', 'edx-ui-toolk
                 var error_message = gettext("Error deleting entrance exam state for student '{student_id}'. " +
                     "Make sure student identifier is correct.");
                 var full_error_message = interpolate_text(error_message, {
-                  student_id: unique_student_identifier
+                    student_id: unique_student_identifier
                 });
                 expect(studentadmin.$request_response_error_ee.text()).toEqual(full_error_message);
             });
@@ -236,7 +239,7 @@ define(['jquery', 'coffee/src/instructor_dashboard/student_admin', 'edx-ui-toolk
 
                 var success_message = gettext("Entrance exam state is being deleted for student '{student_id}'.");
                 var full_success_message = interpolate_text(success_message, {
-                  student_id: unique_student_identifier
+                    student_id: unique_student_identifier
                 });
 
                 // Spy on AJAX requests
@@ -288,7 +291,7 @@ define(['jquery', 'coffee/src/instructor_dashboard/student_admin', 'edx-ui-toolk
                 var error_message = gettext("Error getting entrance exam task history for student '{student_id}'. " +
                     "Make sure student identifier is correct.");
                 var full_error_message = interpolate_text(error_message, {
-                  student_id: unique_student_identifier
+                    student_id: unique_student_identifier
                 });
                 expect(studentadmin.$request_response_error_ee.text()).toEqual(full_error_message);
             });

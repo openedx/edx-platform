@@ -2,7 +2,7 @@
 define([
         'jquery',
         'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
-        'js/instructor_dashboard/certificates'
+        'lms/js/instructor_dashboard/certificates'
     ],
     function($, AjaxHelpers) {
         'use strict';
