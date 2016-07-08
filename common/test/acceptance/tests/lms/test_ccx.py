@@ -21,23 +21,35 @@ class CreateCCXCoachTest(EventsTestMixin, UniqueCourseTest):
     def setUp(self):
         super(CreateCCXCoachTest, self).setUp()
         self.course_info.update({"settings": {"enable_ccx": "true"}})
-        self.course_fixture = CourseFixture(**self.course_info).install()
-        self.coach_dashboard_page = CoachDashboardPage(self.browser, self.course_id)
+        self.course_fixture = CourseFixture(**self.course_info)
+        self.course_fixture.add_advanced_settings({
+            "enable_ccx": {"value": "true"}
+        })
+        self.course_fixture.install()
 
-    def _auto_auth(self, username, email):
+        self.auto_auth(self.USERNAME, self.EMAIL)
+        self.coach_dashboard_page = self.visit_coach_dashboard()
+
+    def auto_auth(self, username, email):
         """
         Logout and login with given credentials.
         """
         AutoAuthPage(self.browser, username=username, email=email,
                      course_id=self.course_id, staff=True).visit()
 
+    def visit_coach_dashboard(self):
+        """
+        Visits the instructor dashboard.
+        """
+        coach_dashboard_page = CoachDashboardPage(self.browser, self.course_id)
+        coach_dashboard_page.visit()
+        return coach_dashboard_page
+
     def test_create_ccx(self):
         """
         Assert that ccx created.
         """
         ccx_name = "Test ccx"
-        self._auto_auth(self.USERNAME, self.EMAIL)
-        self.coach_dashboard_page.visit()
 
         self.coach_dashboard_page.fill_ccx_name_text_box(ccx_name)
         self.coach_dashboard_page.wait_for_page()
