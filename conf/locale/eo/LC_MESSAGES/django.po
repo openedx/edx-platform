@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-06-30 18:53+0000\n"
-"PO-Revision-Date: 2016-06-30 18:53:20.488016\n"
+"POT-Creation-Date: 2016-07-07 14:15+0000\n"
+"PO-Revision-Date: 2016-07-07 14:15:58.774596\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -6151,10 +6151,6 @@ msgid "in {relative} - {absolute}"
 msgstr "ïn {relative} - {absolute} Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
 #: lms/djangoapps/courseware/date_summary.py
-msgid "UTC"
-msgstr "ÛTÇ Ⱡ'σяєм#"
-
-#: lms/djangoapps/courseware/date_summary.py
 msgid "Today is {date}"
 msgstr "Tödäý ïs {date} Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
@@ -11015,6 +11011,12 @@ msgstr ""
 "ïn tïmézöné sét. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: openedx/core/djangoapps/user_api/preferences/api.py
+msgid "Value '{preference_value}' is not a valid time zone selection."
+msgstr ""
+"Välüé '{preference_value}' ïs nöt ä välïd tïmé zöné séléçtïön. Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: openedx/core/djangoapps/user_api/preferences/api.py
 msgid "Save failed for user preference '{key}' with value '{value}'."
 msgstr ""
 "Sävé fäïléd för üsér préférénçé '{key}' wïth välüé '{value}'. Ⱡ'σяєм ιρѕυм "
@@ -12810,6 +12812,7 @@ msgstr ""
 
 #: lms/templates/module-error.html
 #: lms/templates/courseware/courseware-error.html
+#: lms/templates/courseware/error-message.html
 msgid ""
 "We're sorry, this module is temporarily unavailable. Our staff is working to"
 " fix it as soon as possible. Please email us at {tech_support_email} to "
@@ -15533,6 +15536,10 @@ msgid "Course Material"
 msgstr "Çöürsé Mätérïäl Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 
 #: lms/templates/courseware/course_updates.html
+msgid "All course updates"
+msgstr "Àll çöürsé üpdätés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
+
+#: lms/templates/courseware/course_updates.html
 msgid "Hide"
 msgstr "Hïdé Ⱡ'σяєм ι#"
 
@@ -15599,22 +15606,6 @@ msgid "Your score is {current_score}%. You have passed the entrance exam."
 msgstr ""
 "Ýöür sçöré ïs {current_score}%. Ýöü hävé pässéd thé éntränçé éxäm. Ⱡ'σяєм "
 "ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: lms/templates/courseware/error-message.html
-msgid ""
-"We're sorry, this module is temporarily unavailable. Our staff is working to"
-" fix it as soon as possible. Please email us at {link_to_support_email} to "
-"report any problems or downtime."
-msgstr ""
-"Wé'ré sörrý, thïs mödülé ïs témpörärïlý ünäväïläßlé. Öür stäff ïs wörkïng tö"
-" fïx ït äs söön äs pössïßlé. Pléäsé émäïl üs ät {link_to_support_email} tö "
-"répört äný prößléms ör döwntïmé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя "
-"α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα"
-" αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ "
-"ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη "
-"яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα "
-"ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι "
-"σƒƒι¢ια ∂є#"
 
 #: lms/templates/courseware/gradebook.html
 msgid "Gradebook"
@@ -15703,6 +15694,18 @@ msgid "Course Progress for Student '{username}' ({email})"
 msgstr ""
 "Çöürsé Prögréss för Stüdént '{username}' ({email}) Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
 "αмєт, ¢σηѕє¢тєтυя#"
+
+#: lms/templates/courseware/progress.html
+msgid "Your enrollment: Audit track"
+msgstr "Ýöür énröllmént: Àüdït träçk Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
+
+#: lms/templates/courseware/progress.html
+msgid ""
+"You are enrolled in the audit track for this course. The audit track does "
+"not include a certificate."
+msgstr ""
+"Ýöü äré énrölléd ïn thé äüdït träçk för thïs çöürsé. Thé äüdït träçk döés "
+"nöt ïnçlüdé ä çértïfïçäté. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
 
 #: lms/templates/courseware/progress.html
 msgid ""
@@ -16120,6 +16123,10 @@ msgstr ""
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "{category} Program Course"
 msgstr "{category} Prögräm Çöürsé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Course details"
+msgstr "Çöürsé détäïls Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "{course_number} {course_name} Home Page"
