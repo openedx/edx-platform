@@ -96,9 +96,6 @@ FEATURES['ENABLE_VIDEO_BUMPER'] = True  # Enable video bumper in Studio settings
 # Enable partner support link in Studio footer
 PARTNER_SUPPORT_EMAIL = 'partner-support@example.com'
 
-# Disable some block types to test block deprecation logic
-DEPRECATED_BLOCK_TYPES = ['poll', 'survey']
-
 ########################### Entrance Exams #################################
 FEATURES['ENTRANCE_EXAMS'] = True
 
