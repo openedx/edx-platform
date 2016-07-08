@@ -2,6 +2,8 @@
 Test the Studio help links.
 """
 
+from flaky import flaky
+
 from .base_studio_test import StudioCourseTest
 from ...pages.studio.index import DashboardPage
 from ...pages.studio.utils import click_studio_help, studio_help_links
@@ -10,6 +12,7 @@ from ...pages.studio.utils import click_studio_help, studio_help_links
 class StudioHelpTest(StudioCourseTest):
     """Tests for Studio help."""
 
+    @flaky  # TODO: TNL-4954
     def test_studio_help_links(self):
         """Test that the help links are present and have the correct content."""
         page = DashboardPage(self.browser)
