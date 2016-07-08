@@ -42,16 +42,6 @@ class XBlockDisableConfig(ConfigurationModel):
         return block_type in config.disabled_blocks.split()
 
     @classmethod
-    def disabled_block_types(cls):
-        """ Return list of disabled xblock types. """
-
-        config = cls.current()
-        if not config.enabled:
-            return ()
-
-        return config.disabled_blocks.split()
-
-    @classmethod
     def disabled_create_block_types(cls):
         """ Return list of deprecated XBlock types. Merges types in settings file and field. """
 

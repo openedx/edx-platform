@@ -185,6 +185,25 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
                     self.mappings[course_key] = store
             self.modulestores.append(store)
 
+    @property
+    def disabled_xblock_types(self):
+        """
+        Returns the list of disabled xblock types.
+        """
+        return None if not hasattr(self, "_disabled_xblock_types") else self._disabled_xblock_types
+
+    @disabled_xblock_types.setter
+    def disabled_xblock_types(self, value):
+        """
+        Sets the list of disabled xblock types, and propagates down
+        to child modulestores if available.
+        """
+        self._disabled_xblock_types = value  # pylint: disable=attribute-defined-outside-init
+
+        if hasattr(self, 'modulestores'):
+            for store in self.modulestores:
+                store.disabled_xblock_types = value
+
     def _clean_locator_for_mapping(self, locator):
         """
         In order for mapping to work, the locator must be minimal--no version, no branch--
