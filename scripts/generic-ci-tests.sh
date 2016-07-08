@@ -132,7 +132,7 @@ case "$TEST_SUITE" in
         ;;
 
     "commonlib-unit")
-        paver test_lib --with-flaky --cov-args="-p" -v --with-xunitmp
+        paver test_lib --with-flaky --cov-args="-p" -v --with-xunit
         ;;
 
     "js-unit")
@@ -174,7 +174,7 @@ case "$TEST_SUITE" in
         cp -R $HOME/firefox/ firefox/
         export SELENIUM_FIREFOX_PATH=firefox/firefox
 
-        PAVER_ARGS="-n $NUMBER_OF_BOKCHOY_THREADS --with-flaky --with-xunitmp"
+        PAVER_ARGS="-n $NUMBER_OF_BOKCHOY_THREADS --with-flaky --with-xunit"
 
         case "$SHARD" in
 
