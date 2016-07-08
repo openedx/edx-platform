@@ -42,7 +42,11 @@ class UserPartitionTransformer(FilteringTransformerMixin, BlockStructureTransfor
         # Because user partitions are course-wide, only store data for
         # them on the root block.
         root_block = block_structure.get_xblock(block_structure.root_block_usage_key)
-        user_partitions = getattr(root_block, 'user_partitions', []) or []
+        user_partitions = [
+            user_partition
+            for user_partition in getattr(root_block, 'user_partitions', [])
+            if user_partition.active
+        ]
         block_structure.set_transformer_data(cls, 'user_partitions', user_partitions)
 
         # If there are no user partitions, this transformation is a
