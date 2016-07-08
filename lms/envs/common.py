@@ -749,21 +749,23 @@ MODULESTORE = {
 
 #################### Python sandbox ############################################
 
-for directory in '/edx/app/edxapp/venvs/edxapp-sandbox', sys.prefix, '{}-sandbox'.format(sys.prefix):
-    print directory, 'exists' if os.path.exists(directory) else 'does not exist'
-
+import codejail.languages
 CODE_JAIL = {
-    # Path to a sandboxed Python executable.  None means don't bother.
-    'python_bin': os.path.join(sys.prefix, 'bin/python'),
-    # User to run as in the sandbox.
-    'user': 'sandbox',
-
+    'jails': [
+        {
+            'command': 'python',
+            'bin_path': '/edx/app/edxapp/venvs/edxapp-sandbox/bin/python',
+            'user': 'sandbox',
+            'lang': codejail.languages.python2,
+        }
+    ],
     # Configurable limits.
     'limits': {
         # How many CPU seconds can jailed code use?
         'CPU': 1,
     },
 }
+
 
 # Some courses are allowed to run unsafe code. This is a list of regexes, one
 # of them must match the course id for that course to run unsafe code.

@@ -43,6 +43,8 @@ from capa.tests.response_xml_factory import (
 from capa.util import convert_files_to_filenames
 from capa.xqueue_interface import dateformat
 
+from codejail.django_integration import configure_from_settings
+
 
 class ResponseTest(unittest.TestCase):
     """Base class for tests of capa responses."""
@@ -53,6 +55,8 @@ class ResponseTest(unittest.TestCase):
     maxDiff = None
 
     def setUp(self):
+        from django.conf import settings
+        configure_from_settings(settings)
         super(ResponseTest, self).setUp()
         if self.xml_factory_class:
             self.xml_factory = self.xml_factory_class()
@@ -301,7 +305,6 @@ class SymbolicResponseTest(ResponseTest):  # pylint: disable=missing-docstring
         ]
 
         for (input_str, input_mathml, server_fixture) in correct_inputs:
-            print "Testing input: {0}".format(input_str)
             server_resp = load_fixture(server_fixture)
             self._assert_symbolic_grade(
                 problem, input_str, input_mathml,
