@@ -149,10 +149,10 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
 
         # enrollment information visible
         self.assertIn('<h3 class="hd hd-3">Enrollment Information</h3>', response.content)
-        self.assertTrue('<td>Verified</td>' in response.content)
-        self.assertTrue('<td>Audit</td>' in response.content)
-        self.assertTrue('<td>Honor</td>' in response.content)
-        self.assertTrue('<td>Professional</td>' in response.content)
+        self.assertIn('<th scope="row">Verified</th>', response.content)
+        self.assertIn('<th scope="row">Audit</th>', response.content)
+        self.assertIn('<th scope="row">Honor</th>', response.content)
+        self.assertIn('<th scope="row">Professional</th>', response.content)
 
         # dashboard link hidden
         self.assertFalse(self.get_dashboard_enrollment_message() in response.content)
@@ -166,11 +166,10 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         users = [UserFactory() for _ in range(2)]
         CourseEnrollment.enroll(users[0], self.course.id, mode="professional")
         CourseEnrollment.enroll(users[1], self.course.id, mode="no-id-professional")
-
         response = self.client.get(self.url)
 
         # Check that the number of professional enrollments is two
-        self.assertContains(response, "<td>Professional</td><td>2</td>")
+        self.assertContains(response, '<th scope="row">Professional</th><td>2</td>')
 
     @patch.dict(settings.FEATURES, {'DISPLAY_ANALYTICS_ENROLLMENTS': False})
     @override_settings(ANALYTICS_DASHBOARD_URL='http://example.com')
@@ -182,10 +181,10 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         response = self.client.get(self.url)
 
         # enrollment information hidden
-        self.assertFalse('<td>Verified</td>' in response.content)
-        self.assertFalse('<td>Audit</td>' in response.content)
-        self.assertFalse('<td>Honor</td>' in response.content)
-        self.assertFalse('<td>Professional</td>' in response.content)
+        self.assertNotIn('<th scope="row">Verified</th>', response.content)
+        self.assertNotIn('<th scope="row">Audit</th>', response.content)
+        self.assertNotIn('<th scope="row">Honor</th>', response.content)
+        self.assertNotIn('<th scope="row">Professional</th>', response.content)
 
         # link to dashboard shown
         expected_message = self.get_dashboard_enrollment_message()
