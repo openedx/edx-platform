@@ -70,7 +70,7 @@ git+https://github.com/edx/lettuce.git@0.2.20.002#egg=lettuce==0.2.20.002
 git+https://github.com/edx/pa11ycrawler.git@0.0.4#egg=pa11ycrawler==0.0.4
 
 # Our libraries:
-git+https://github.com/edx/XBlock.git@xblock-0.4.10#egg=XBlock==0.4.10
+git+https://github.com/edx/XBlock.git@xblock-0.4.11#egg=XBlock==0.4.11
 -e git+https://github.com/edx/codejail.git@6b17c33a89bef0ac510926b1d7fea2748b73aadd#egg=codejail
 -e git+https://github.com/edx/event-tracking.git@0.2.1#egg=event-tracking==0.2.1
 -e git+https://github.com/edx/django-splash.git@v0.2#egg=django-splash==0.2
