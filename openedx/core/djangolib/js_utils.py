@@ -34,7 +34,7 @@ def _escape_json_for_js(json_dumps_string):
     return json_dumps_string
 
 
-def dump_js_escaped_json(obj, cls=EdxJSONEncoder, default=None):
+def dump_js_escaped_json(obj, cls=EdxJSONEncoder):
     """
     JSON dumps and escapes objects that are safe to be embedded in JavaScript.
 
@@ -52,10 +52,6 @@ def dump_js_escaped_json(obj, cls=EdxJSONEncoder, default=None):
 
             var json_obj = ${dump_js_escaped_json(obj, cls) | n}
 
-        If you must use the default argument, then use as follows::
-
-            var json_obj = ${dump_js_escaped_json(obj, default=[lambda expression]) | n, decode.utf8}
-
         Use the "n" Mako filter above.  It is possible that the default filter
         may include html escaping in the future, and this ensures proper
         escaping.
@@ -68,13 +64,12 @@ def dump_js_escaped_json(obj, cls=EdxJSONEncoder, default=None):
             object can be anything but strings (e.g. dicts, tuples, lists, bools, and
             numbers).
         cls (class): The JSON encoder class (defaults to EdxJSONEncoder).
-        default (function): Function that returns a serializable version of the object.
 
     Returns:
         (string) Escaped encoded JSON.
 
     """
-    json_string = json.dumps(obj, ensure_ascii=True, cls=cls, default=default)
+    json_string = json.dumps(obj, ensure_ascii=True, cls=cls)
     json_string = _escape_json_for_js(json_string)
     return json_string
 

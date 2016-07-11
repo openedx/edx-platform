@@ -11,7 +11,6 @@ from django.template.defaultfilters import escapejs
 from openedx.core.djangolib.js_utils import (
     dump_js_escaped_json, js_escaped_string
 )
-import json
 %>
 
 <%block name="bodyclass">discussion-user-profile</%block>
@@ -29,7 +28,7 @@ import json
     profile_page_context = {
         'courseId': unicode(course.id),
         'courseName': course.display_name_with_default,
-        'userInfo': json.dumps(user_info, default=lambda x: None),
+        'userInfo': user_info,
         'threads': threads,
         'page': page,
         'numPages': num_pages,
