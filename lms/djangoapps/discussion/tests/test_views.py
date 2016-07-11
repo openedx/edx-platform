@@ -1355,6 +1355,7 @@ class ForumDiscussionXSSTestCase(UrlResetMixin, ModuleStoreTestCase):
         """
         Test that XSS attack is prevented
         """
+        mock_user.return_value.to_dict.return_value = {}
         reverse_url = "%s%s" % (reverse(
             "discussion.views.forum_form_discussion",
             kwargs={"course_id": unicode(self.course.id)}), '/forum_form_discussion')
@@ -1372,7 +1373,7 @@ class ForumDiscussionXSSTestCase(UrlResetMixin, ModuleStoreTestCase):
         Test that XSS attack is prevented
         """
         mock_threads.return_value = [], 1, 1
-        mock_from_django_user.return_value = Mock()
+        mock_from_django_user.return_value.to_dict.return_value = {}
         mock_request.side_effect = make_mock_request_impl(course=self.course, text='dummy')
 
         url = reverse('discussion.views.user_profile',
