@@ -571,7 +571,7 @@ def get_certificate_header_context(is_secure=True):
     data returned should be customized according to the microsite settings
     """
     data = dict(
-        logo_src=branding_api.get_logo_url(),
+        logo_src=branding_api.get_logo_url(is_secure),
         logo_url=branding_api.get_base_url(is_secure),
     )
 
