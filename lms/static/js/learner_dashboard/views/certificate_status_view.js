@@ -27,13 +27,10 @@
                 },
 
                 render: function() {
-                    var data = this.model.toJSON(),
-                        $icons;
+                    var data = this.model.toJSON();
 
+                    data = $.extend(data, {certificateSvg: this.iconTpl()});
                     HtmlUtils.setHtml(this.$el, this.statusTpl(data));
-
-                    $icons = this.$('.certificate-icon');
-                    HtmlUtils.setHtml($icons, this.iconTpl());
                 }
             });
         }

@@ -1272,9 +1272,4 @@ class LMSVideoModuleA11yTest(VideoBaseTest):
         self.video.a11y_audit.config.set_scope(
             include=["div.video"]
         )
-        self.video.a11y_audit.config.set_rules({
-            "ignore": [
-                'section',  # TODO: AC-491
-            ]
-        })
         self.video.a11y_audit.check_for_accessibility_errors()

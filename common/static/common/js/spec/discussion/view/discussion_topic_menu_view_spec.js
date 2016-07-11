@@ -10,7 +10,7 @@
                 }, options);
                 this.view = new DiscussionTopicMenuView(options);
                 this.view.render().appendTo('#fixture-element');
-                this.defaultTextWidth = this.view.getNameWidth(this.completeText);
+                this.defaultTextWidth = this.completeText.length;
             };
 
             this.openMenu = function() {
@@ -34,7 +34,13 @@
                     'subcategories': {
                         'Basic Question Types': {
                             'subcategories': {},
-                            'children': ['Selection From Options', 'Numerical Input'],
+                            'children': [
+                                'Selection From Options',
+                                'Numerical Input',
+                                'Very long category name',
+                                'Very very very very long category name',
+                                'Name with <em>HTML</em>'
+                            ],
                             'entries': {
                                 'Selection From Options': {
                                     'sort_key': null,
@@ -45,11 +51,40 @@
                                     'sort_key': null,
                                     'is_cohorted': false,
                                     'id': 'c49f0dfb8fc94c9c8d9999cc95190c56'
+                                },
+                                'Very long category name': {
+                                    'sort_key': null,
+                                    'is_cohorted': false,
+                                    'id': 'c49f0dfb8fc94c9c8d9999cc95190c59'
+                                },
+                                'Very very very very long category name': {
+                                    'sort_key': null,
+                                    'is_cohorted': false,
+                                    'id': 'c49f0dfb8fc94c9c8d9999cc95190e32'
+                                },
+                                'Name with <em>HTML</em>': {
+                                    'sort_key': null,
+                                    'is_cohorted': false,
+                                    'id': 'c49f0dfb8fc94c9c8d9999cc95190363'
+                                }
+
+                            }
+                        },
+                        'Example Inline Discussion': {
+                            'subcategories': {},
+                            'children': [
+                                'What Are Your Goals for Creating a MOOC?',
+                            ],
+                            'entries': {
+                                'What Are Your Goals for Creating a MOOC?': {
+                                    'sort_key': null,
+                                    'is_cohorted': true,
+                                    'id': 'cba3e4cd91d0466b9ac50926e495b931'
                                 }
                             }
                         }
                     },
-                    'children': ['Basic Question Types'],
+                    'children': ['Basic Question Types', 'Example Inline Discussion'],
                     'entries': {}
                 },
                 'is_cohorted': true
@@ -68,31 +103,38 @@
           expect(this.completeText).toEqual(dropdownText);
         });
 
-        it('completely show just sub-category', function() {
+        it('truncation happens with specific title lengths', function() {
             var dropdownText;
             this.createTopicView();
-            this.view.maxNameWidth = this.defaultTextWidth - 10;
-            this.view.$el.find('a.topic-title').first().click();
+            this.view.$el.find('a.topic-title')[2].click();
             dropdownText = this.view.$el.find('.js-selected-topic').text();
-            expect(dropdownText.indexOf('…')).toEqual(0);
-            expect(dropdownText).toContain(this.selectedOptionText);
+            expect(dropdownText).toEqual('…/Very long category name');
+
+            this.view.$el.find('a.topic-title')[5].click();
+            dropdownText = this.view.$el.find('.js-selected-topic').text();
+            expect(dropdownText).toEqual('… / What Are Your Goals f …');
         });
 
-        it('partially show sub-category', function() {
+        it('truncation happens with longer title lengths', function() {
+            var dropdownText;
             this.createTopicView();
-            var parentWidth = this.view.getNameWidth(this.parentCategoryText),
-                dropdownText;
-            this.view.maxNameWidth = this.defaultTextWidth - parentWidth;
-            this.view.$el.find('a.topic-title').first().click();
+            this.view.$el.find('a.topic-title')[3].click();
             dropdownText = this.view.$el.find('.js-selected-topic').text();
-            expect(dropdownText.indexOf('…')).toEqual(0);
-            expect(dropdownText.lastIndexOf('…')).toBeGreaterThan(0);
+            expect(dropdownText).toEqual('… / Very very very very l …');
+        });
+
+        it('titles are escaped before display', function() {
+            var dropdownText;
+            this.createTopicView();
+            this.view.$el.find('a.topic-title')[4].click();
+            dropdownText = this.view.$el.find('.js-selected-topic').text();
+            expect(dropdownText).toContain('em&gt;');
         });
 
         it('broken span doesn\'t occur', function() {
             var dropdownText;
             this.createTopicView();
-            this.view.maxNameWidth = this.view.getNameWidth(this.selectedOptionText) + 100;
+            this.view.maxNameWidth = this.selectedOptionText.length + 100;
             this.view.$el.find('a.topic-title').first().click();
             dropdownText = this.view.$el.find('.js-selected-topic').text();
             expect(dropdownText.indexOf('/ span>')).toEqual(-1);

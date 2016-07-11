@@ -1,5 +1,6 @@
 <%! from django.utils.translation import ugettext as _ %>
-<section>
+<section aria-labelledby="course-updates-heading">
+    <h2 class="hd hd-2 sr" id="course-updates-heading">${_('All course updates')}</h2>
 <div class="recent-updates">
   % for index, update in enumerate(visible_updates):
     <article class="updates-article">

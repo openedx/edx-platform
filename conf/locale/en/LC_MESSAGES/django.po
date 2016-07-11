@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-06-30 18:53+0000\n"
-"PO-Revision-Date: 2016-06-30 18:53:20.488016\n"
+"POT-Creation-Date: 2016-07-07 14:15+0000\n"
+"PO-Revision-Date: 2016-07-07 14:15:58.774596\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -4733,10 +4733,6 @@ msgid "in {relative} - {absolute}"
 msgstr ""
 
 #: lms/djangoapps/courseware/date_summary.py
-msgid "UTC"
-msgstr ""
-
-#: lms/djangoapps/courseware/date_summary.py
 msgid "Today is {date}"
 msgstr ""
 
@@ -8496,6 +8492,10 @@ msgid ""
 msgstr ""
 
 #: openedx/core/djangoapps/user_api/preferences/api.py
+msgid "Value '{preference_value}' is not a valid time zone selection."
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/preferences/api.py
 msgid "Save failed for user preference '{key}' with value '{value}'."
 msgstr ""
 
@@ -10030,6 +10030,7 @@ msgstr ""
 
 #: lms/templates/module-error.html
 #: lms/templates/courseware/courseware-error.html
+#: lms/templates/courseware/error-message.html
 msgid ""
 "We're sorry, this module is temporarily unavailable. Our staff is working to"
 " fix it as soon as possible. Please email us at {tech_support_email} to "
@@ -12118,6 +12119,10 @@ msgid "Course Material"
 msgstr ""
 
 #: lms/templates/courseware/course_updates.html
+msgid "All course updates"
+msgstr ""
+
+#: lms/templates/courseware/course_updates.html
 msgid "Hide"
 msgstr ""
 
@@ -12176,13 +12181,6 @@ msgstr ""
 
 #: lms/templates/courseware/courseware.html
 msgid "Your score is {current_score}%. You have passed the entrance exam."
-msgstr ""
-
-#: lms/templates/courseware/error-message.html
-msgid ""
-"We're sorry, this module is temporarily unavailable. Our staff is working to"
-" fix it as soon as possible. Please email us at {link_to_support_email} to "
-"report any problems or downtime."
 msgstr ""
 
 #: lms/templates/courseware/gradebook.html
@@ -12265,6 +12263,16 @@ msgstr ""
 
 #: lms/templates/courseware/progress.html
 msgid "Course Progress for Student '{username}' ({email})"
+msgstr ""
+
+#: lms/templates/courseware/progress.html
+msgid "Your enrollment: Audit track"
+msgstr ""
+
+#: lms/templates/courseware/progress.html
+msgid ""
+"You are enrolled in the audit track for this course. The audit track does "
+"not include a certificate."
 msgstr ""
 
 #: lms/templates/courseware/progress.html
@@ -12575,6 +12583,10 @@ msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "{category} Program Course"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Course details"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html

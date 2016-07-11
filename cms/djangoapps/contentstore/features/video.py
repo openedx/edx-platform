@@ -4,7 +4,7 @@ from lettuce import world, step
 
 SELECTORS = {
     'spinner': '.video-wrapper .spinner',
-    'controls': 'section.video-controls',
+    'controls': '.video-controls',
 }
 
 # We should wait 300 ms for event handler invocation + 200ms for safety.

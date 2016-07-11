@@ -5,7 +5,6 @@ Convenience methods for working with datetime objects
 from datetime import datetime, timedelta
 import re
 
-from django.utils.timezone import now
 from django.utils.translation import pgettext, ugettext
 from pytz import timezone, utc, UnknownTimeZoneError
 
@@ -61,15 +60,6 @@ def get_time_display(dtime, format_string=None, coerce_tz=None):
         return unicode(strftime_localized(dtime, format_string))
     except ValueError:
         return get_default_time_display(dtime)
-
-
-def get_formatted_time_zone(time_zone):
-    """
-    Returns a formatted time zone (e.g. 'Asia/Tokyo (JST +0900)') for user account settings time zone drop down
-    """
-    abbr = get_time_display(now(), '%Z', time_zone)
-    offset = get_time_display(now(), '%z', time_zone)
-    return "{name} ({abbr}, UTC{offset})".format(name=time_zone, abbr=abbr, offset=offset).replace("_", " ")
 
 
 def almost_same_datetime(dt1, dt2, allowed_delta=timedelta(minutes=1)):

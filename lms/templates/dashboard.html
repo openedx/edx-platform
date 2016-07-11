@@ -63,21 +63,21 @@ from openedx.core.djangolib.markup import HTML, Text
 
 <div class="dashboard-notifications" tabindex="-1">
     %if message:
-        <section class="dashboard-banner">
+        <div class="dashboard-banner">
             ${message | n, decode.utf8}
-        </section>
+        </div>
     %endif
 
     %if enrollment_message:
-        <section class="dashboard-banner">
+        <div class="dashboard-banner">
             ${enrollment_message | n,  decode.utf8}
-        </section>
+        </div>
     %endif
 </div>
 
 <main id="main" aria-label="Content" tabindex="-1">
-    <section class="container dashboard" id="dashboard-main">
-      <section class="my-courses" id="my-courses">
+    <div class="container dashboard" id="dashboard-main">
+      <div class="my-courses" id="my-courses">
         <header class="wrapper-header-courses">
           <h2 class="header-courses">${_("My Courses")}</h2>
         </header>
@@ -104,7 +104,7 @@ from openedx.core.djangolib.markup import HTML, Text
 
           </ul>
         % else:
-          <section class="empty-dashboard-message">
+          <div class="empty-dashboard-message">
             <p>${_("You are not enrolled in any courses yet.")}</p>
 
             % if settings.FEATURES.get('COURSES_ARE_BROWSABLE'):
@@ -113,7 +113,7 @@ from openedx.core.djangolib.markup import HTML, Text
               </a>
 
             %endif
-          </section>
+        </div>
         % endif
 
         % if staff_access and len(errored_courses) > 0:
@@ -132,7 +132,7 @@ from openedx.core.djangolib.markup import HTML, Text
           % endfor
           </div>
         % endif
-      </section>
+    </div>
 
       % if settings.FEATURES.get('ENABLE_DASHBOARD_SEARCH'):
         <div id="dashboard-search-bar" class="search-bar dashboard-search-bar" role="search" aria-label="Dashboard">
@@ -152,14 +152,14 @@ from openedx.core.djangolib.markup import HTML, Text
       % endif
 
       % if settings.FEATURES.get('ENABLE_DASHBOARD_SEARCH'):
-        <section id="dashboard-search-results" class="search-results dashboard-search-results"></section>
+        <div id="dashboard-search-results" class="search-results dashboard-search-results"></div>
       % endif
 
-      <section class="profile-sidebar" id="profile-sidebar" role="region" aria-label="Account Status Info">
+      <div class="profile-sidebar" id="profile-sidebar" role="region" aria-label="Account Status Info">
         <header class="profile">
           <h2 class="account-status-title sr">${_("Account Status Info")}: </h2>
         </header>
-        <section class="user-info">
+        <div class="user-info">
           <ul>
 
             % if len(order_history_list):
@@ -174,12 +174,12 @@ from openedx.core.djangolib.markup import HTML, Text
             <%include file="${static.get_template_path('dashboard/_dashboard_status_verification.html')}" />
 
           </ul>
-        </section>
-      </section>
-    </section>
+            </div>
+        </div>
+    </div>
 </main>
 
-<section id="email-settings-modal" class="modal" aria-hidden="true">
+<div id="email-settings-modal" class="modal" aria-hidden="true">
   <div class="inner-wrapper" role="dialog" aria-labelledby="email-settings-title">
     <button class="close-modal">
       <span class="icon fa fa-remove" aria-hidden="true"></span>
@@ -208,9 +208,9 @@ from openedx.core.djangolib.markup import HTML, Text
       </div>
     </form>
   </div>
-</section>
+</div>
 
-<section id="unenroll-modal" class="modal unenroll-modal" aria-hidden="true">
+<div id="unenroll-modal" class="modal unenroll-modal" aria-hidden="true">
   <div class="inner-wrapper" role="dialog" aria-labelledby="unenrollment-modal-title">
     <button class="close-modal">
       <span class="icon fa fa-remove" aria-hidden="true"></span>
@@ -240,4 +240,4 @@ from openedx.core.djangolib.markup import HTML, Text
       </div>
     </form>
   </div>
-</section>
+</div>

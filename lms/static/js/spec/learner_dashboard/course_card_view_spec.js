@@ -19,27 +19,30 @@ define([
                         key: 'ANUx'
                     },
                     run_modes: [{
-                        start_date: 'Apr 25, 2016',
-                        end_date: 'Jun 13, 2019',
-                        course_key: 'course-v1:ANUx+ANU-ASTRO1x+3T2015',
-                        course_url: 'http://localhost:8000/courses/course-v1:edX+DemoX+Demo_Course/info',
-                        marketing_url: 'https://www.edx.org/course/astrophysics-exploring',
+                        certificate_url: '',
                         course_image_url: 'http://test.com/image1',
+                        course_key: 'course-v1:ANUx+ANU-ASTRO1x+3T2015',
+                        course_started: true,
+                        course_url: 'http://localhost:8000/courses/course-v1:edX+DemoX+Demo_Course/info',
+                        end_date: 'Jun 13, 2019',
+                        enrollment_open_date: 'Mar 03, 2016',
+                        is_course_ended: false,
+                        is_enrolled: true,
+                        is_enrollment_open: true,
+                        marketing_url: 'https://www.edx.org/course/astrophysics-exploring',
                         mode_slug: 'verified',
                         run_key: '2T2016',
-                        course_started: true,
-                        is_enrolled: true,
-                        is_course_ended: false,
-                        is_enrollment_open: true,
-                        certificate_url: '',
-                        enrollment_open_date: 'Mar 03, 2016'
+                        start_date: 'Apr 25, 2016',
+                        upgrade_url: ''
                     }]
                 },
 
             setupView = function(data, isEnrolled){
-                data.run_modes[0].is_enrolled = isEnrolled;
+                var programData = $.extend({}, data);
+
+                programData.run_modes[0].is_enrolled = isEnrolled;
                 setFixtures('<div class="course-card card"></div>');
-                courseCardModel = new CourseCardModel(data);
+                courseCardModel = new CourseCardModel(programData);
                 view = new CourseCardView({
                     model: courseCardModel
                 });
@@ -86,37 +89,71 @@ define([
             });
 
             it('should only show certificate status section if a certificate has been earned', function() {
-                var data = context,
+                var data = $.extend({}, context),
                     certUrl = 'sample-certificate';
 
-                setupView(context, false);
-                expect(view.$('certificate-status').length).toEqual(0);
+                expect(view.$('.certificate-status').length).toEqual(0);
                 view.remove();
+
                 data.run_modes[0].certificate_url = certUrl;
                 setupView(data, false);
                 expect(view.$('.certificate-status').length).toEqual(1);
                 expect(view.$('.certificate-status .cta-secondary').attr('href')).toEqual(certUrl);
             });
 
-            it('should render the course card with coming soon', function(){
+            it('should only show upgrade message section if an upgrade is required', function() {
+                var data = $.extend({}, context),
+                    upgradeUrl = '/path/to/upgrade';
+
+                expect(view.$('.upgrade-message').length).toEqual(0);
                 view.remove();
-                context.run_modes[0].is_enrollment_open = false;
-                setupView(context, false);
-                expect(view.$('.header-img').attr('src')).toEqual(context.run_modes[0].course_image_url);
-                expect(view.$('.course-details .course-title').text().trim()).toEqual(context.display_name);
+
+                data.run_modes[0].upgrade_url = upgradeUrl;
+                setupView(data, false);
+                expect(view.$('.upgrade-message').length).toEqual(1);
+                expect(view.$('.upgrade-message .cta-primary').attr('href')).toEqual(upgradeUrl);
+            });
+
+            it('should not show both the upgrade message and certificate status sections', function() {
+                var data = $.extend({}, context);
+
+                // Verify that no empty elements are left in the DOM.
+                data.run_modes[0].upgrade_url = '';
+                data.run_modes[0].certificate_url = '';
+                setupView(data, false);
+                expect(view.$('.upgrade-message').length).toEqual(0);
+                expect(view.$('.certificate-status').length).toEqual(0);
+                view.remove();
+
+                // Verify that the upgrade message takes priority.
+                data.run_modes[0].upgrade_url = '/path/to/upgrade';
+                data.run_modes[0].certificate_url = '/path/to/certificate';
+                setupView(data, false);
+                expect(view.$('.upgrade-message').length).toEqual(1);
+                expect(view.$('.certificate-status').length).toEqual(0);
+            });
+
+            it('should render the course card with coming soon', function(){
+                var data = $.extend({}, context);
+
+                data.run_modes[0].is_enrollment_open = false;
+                setupView(data, false);
+                expect(view.$('.header-img').attr('src')).toEqual(data.run_modes[0].course_image_url);
+                expect(view.$('.course-details .course-title').text().trim()).toEqual(data.display_name);
                 expect(view.$('.course-details .course-title-link').length).toBe(0);
-                expect(view.$('.course-details .course-text .course-key').html()).toEqual(context.key);
+                expect(view.$('.course-details .course-text .course-key').html()).toEqual(data.key);
                 expect(view.$('.course-details .course-text .run-period').length).toBe(0);
                 expect(view.$('.no-action-message').text().trim()).toBe('Coming Soon');
                 expect(view.$('.enrollment-open-date').text().trim())
-                    .toEqual(context.run_modes[0].enrollment_open_date);
+                    .toEqual(data.run_modes[0].enrollment_open_date);
             });
 
             it('should render if enrollment_open_date is not provided', function(){
-                view.remove();
-                context.run_modes[0].is_enrollment_open = true;
-                delete context.run_modes[0].enrollment_open_date;
-                setupView(context, false);
+                var data = $.extend({}, context);
+
+                data.run_modes[0].is_enrollment_open = true;
+                delete data.run_modes[0].enrollment_open_date;
+                setupView(data, false);
                 validateCourseInfoDisplay();
             });
         });

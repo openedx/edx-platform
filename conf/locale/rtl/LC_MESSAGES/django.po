@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-06-30 18:53+0000\n"
-"PO-Revision-Date: 2016-06-30 18:53:20.488016\n"
+"POT-Creation-Date: 2016-07-07 14:15+0000\n"
+"PO-Revision-Date: 2016-07-07 14:15:58.774596\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -5263,10 +5263,6 @@ msgid "in {relative} - {absolute}"
 msgstr "هر {relative} - {absolute}"
 
 #: lms/djangoapps/courseware/date_summary.py
-msgid "UTC"
-msgstr "عفذ"
-
-#: lms/djangoapps/courseware/date_summary.py
 msgid "Today is {date}"
 msgstr "فخيشغ هس {date}"
 
@@ -9474,6 +9470,10 @@ msgstr ""
 "هر فهوثظخرث سثف."
 
 #: openedx/core/djangoapps/user_api/preferences/api.py
+msgid "Value '{preference_value}' is not a valid time zone selection."
+msgstr "دشمعث '{preference_value}' هس رخف ش دشمهي فهوث ظخرث سثمثذفهخر."
+
+#: openedx/core/djangoapps/user_api/preferences/api.py
 msgid "Save failed for user preference '{key}' with value '{value}'."
 msgstr "سشدث بشهمثي بخق عسثق حقثبثقثرذث '{key}' صهفا دشمعث '{value}'."
 
@@ -11088,6 +11088,7 @@ msgstr "فاثقث اشس زثثر شر ثققخق خر فاث {platform_name} �
 
 #: lms/templates/module-error.html
 #: lms/templates/courseware/courseware-error.html
+#: lms/templates/courseware/error-message.html
 msgid ""
 "We're sorry, this module is temporarily unavailable. Our staff is working to"
 " fix it as soon as possible. Please email us at {tech_support_email} to "
@@ -13539,6 +13540,10 @@ msgid "Course Material"
 msgstr "ذخعقسث وشفثقهشم"
 
 #: lms/templates/courseware/course_updates.html
+msgid "All course updates"
+msgstr "شمم ذخعقسث عحيشفثس"
+
+#: lms/templates/courseware/course_updates.html
 msgid "Hide"
 msgstr "اهيث"
 
@@ -13600,16 +13605,6 @@ msgstr ""
 #: lms/templates/courseware/courseware.html
 msgid "Your score is {current_score}%. You have passed the entrance exam."
 msgstr "غخعق سذخقث هس {current_score}%. غخع اشدث حشسسثي فاث ثرفقشرذث ثطشو."
-
-#: lms/templates/courseware/error-message.html
-msgid ""
-"We're sorry, this module is temporarily unavailable. Our staff is working to"
-" fix it as soon as possible. Please email us at {link_to_support_email} to "
-"report any problems or downtime."
-msgstr ""
-"صث'قث سخققغ, فاهس وخيعمث هس فثوحخقشقهمغ عرشدشهمشزمث. خعق سفشبب هس صخقنهرل فخ"
-" بهط هف شس سخخر شس حخسسهزمث. حمثشسث ثوشهم عس شف {link_to_support_email} فخ "
-"قثحخقف شرغ حقخزمثوس خق يخصرفهوث."
 
 #: lms/templates/courseware/gradebook.html
 msgid "Gradebook"
@@ -13694,6 +13689,18 @@ msgstr "دهثص لقشيهرل هر سفعيهخ"
 #: lms/templates/courseware/progress.html
 msgid "Course Progress for Student '{username}' ({email})"
 msgstr "ذخعقسث حقخلقثسس بخق سفعيثرف '{username}' ({email})"
+
+#: lms/templates/courseware/progress.html
+msgid "Your enrollment: Audit track"
+msgstr "غخعق ثرقخمموثرف: شعيهف فقشذن"
+
+#: lms/templates/courseware/progress.html
+msgid ""
+"You are enrolled in the audit track for this course. The audit track does "
+"not include a certificate."
+msgstr ""
+"غخع شقث ثرقخممثي هر فاث شعيهف فقشذن بخق فاهس ذخعقسث. فاث شعيهف فقشذن يخثس "
+"رخف هرذمعيث ش ذثقفهبهذشفث."
 
 #: lms/templates/courseware/progress.html
 msgid ""
@@ -14051,6 +14058,10 @@ msgstr ""
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "{category} Program Course"
 msgstr "{category} حقخلقشو ذخعقسث"
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Course details"
+msgstr "ذخعقسث يثفشهمس"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "{course_number} {course_name} Home Page"

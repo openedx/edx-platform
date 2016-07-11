@@ -1,7 +1,10 @@
 .course-card {
-  @include span(10);
-  margin-left: $baseline*2;
-  margin-bottom: $baseline;
+  width: 85%;
+  margin: {
+    left: auto;
+    right: auto;
+    bottom: $baseline;
+  }
   padding: $baseline/2 0;
 
   .section {
@@ -128,6 +131,7 @@
     }
   }
   
+  .upgrade-message,
   .certificate-status {
     border-top: 1px solid palette(grayscale, x-trans);
     padding-top: $baseline;

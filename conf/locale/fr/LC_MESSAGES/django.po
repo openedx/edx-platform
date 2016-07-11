@@ -135,6 +135,7 @@
 # Xavier Antoviaque <xavier@antoviaque.org>, 2014
 # PETIT Yannick <yannick.petit@gmail.com>, 2013
 # yepelboin <yves.epelboin@impmc.upmc.fr>, 2015
+# Андрей Поляков <polyakov.andrey@gmail.com>, 2016
 # #-#-#-#-#  mako-studio.po (edx-platform)  #-#-#-#-#
 # edX translation file
 # Copyright (C) 2016 edX

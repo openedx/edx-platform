@@ -248,7 +248,7 @@ class TestPreferencesAPI(UserAPITestCase):
                 "time_zone": {
                     "developer_message": u"Value 'Asia/Africa' not valid for preference 'time_zone': Not in "
                                          u"timezone set.",
-                    "user_message": u"Value 'Asia/Africa' is not valid for user preference 'time_zone'."
+                    "user_message": u"Value 'Asia/Africa' is not a valid time zone selection."
                 },
             }
         )
