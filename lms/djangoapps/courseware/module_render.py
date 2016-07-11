@@ -755,6 +755,7 @@ def get_module_system_for_user(user, student_data,  # TODO  # pylint: disable=to
             'user': DjangoXBlockUserService(user, user_is_staff=user_is_staff),
             "reverification": ReverificationService(),
             'proctoring': ProctoringService(),
+            'milestones': milestones_helpers.get_service(),
             'credit': CreditService(),
             'bookmarks': BookmarksService(user=user),
         },

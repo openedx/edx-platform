@@ -2,7 +2,6 @@
 """
 Utility library for working with the edx-milestones app
 """
-
 from django.conf import settings
 from django.utils.translation import ugettext as _
 
@@ -12,6 +11,7 @@ from opaque_keys.edx.keys import CourseKey
 from milestones import api as milestones_api
 from milestones.exceptions import InvalidMilestoneRelationshipTypeException
 from milestones.models import MilestoneRelationshipType
+from milestones.services import MilestonesService
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from xmodule.modulestore.django import modulestore
 import request_cache
@@ -418,3 +418,16 @@ def remove_user_milestone(user, milestone):
     if not settings.FEATURES.get('MILESTONES_APP'):
         return None
     return milestones_api.remove_user_milestone(user, milestone)
+
+
+def get_service():
+    """
+    Returns MilestonesService instance if feature flag enabled;
+    else returns None.
+
+    Note: MilestonesService only has access to the functions
+    explicitly requested in the MilestonesServices class
+    """
+    if not settings.FEATURES.get('MILESTONES_APP', False):
+        return None
+    return MilestonesService()
