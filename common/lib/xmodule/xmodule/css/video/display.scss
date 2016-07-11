@@ -10,56 +10,6 @@
 // --------
 
 // the html target is necessary for xblocks and xmodules, but works across the board
-.icon-fallback-img {
-
-  .fa-play {
-    background: url('#{$static-path}/edx-pattern-library/fonts/edx-icons/fallback-img/play.svg') center center no-repeat;
-  }
-
-  .fa-pause {
-    background: url('#{$static-path}/edx-pattern-library/fonts/edx-icons/fallback-img/pause.svg') center center no-repeat;
-  }
-
-  .fa-step-forward {
-    background: url('#{$static-path}/edx-pattern-library/fonts/edx-icons/fallback-img/fast-forward.svg') center center no-repeat;
-  }
-
-  .fa-arrows-alt {
-    background: url('#{$static-path}/edx-pattern-library/fonts/edx-icons/fallback-img/fullscreen.svg') center center no-repeat;
-  }
-
-  .fa-caret-right {
-    background: url('#{$static-path}/edx-pattern-library/fonts/edx-icons/fallback-img/caret-right.svg') center center no-repeat;
-  }
-
-  .fa-caret-left {
-    background: url('#{$static-path}/edx-pattern-library/fonts/edx-icons/fallback-img/caret-left.svg') center center no-repeat;
-  }
-
-  .fa-caret-up {
-    background: url('#{$static-path}/edx-pattern-library/fonts/edx-icons/fallback-img/caret-up.svg') center center no-repeat;
-  }
-
-  .fa-compress {
-    background: url('#{$static-path}/edx-pattern-library/fonts/edx-icons/fallback-img/exit-fullscreen.svg') center center no-repeat;
-  }
-
-  .fa-quote-left {
-    background: url('#{$static-path}/edx-pattern-library/fonts/edx-icons/fallback-img/quote-left.svg') center center no-repeat;
-  }
-
-  .fa-volume-up {
-    background: url('#{$static-path}/edx-pattern-library/fonts/edx-icons/fallback-img/volume-up.svg') center center no-repeat;
-  }
-
-  .fa-volume-down {
-    background: url('#{$static-path}/edx-pattern-library/fonts/edx-icons/fallback-img/volume-down.svg') center center no-repeat;
-  }
-
-  .fa-volume-off {
-    background: url('#{$static-path}/edx-pattern-library/fonts/edx-icons/fallback-img/volume-off.svg') center center no-repeat;
-  }
-}
 
 & {
     margin-bottom: ($baseline*1.5);
@@ -366,18 +316,13 @@
       .control {
         @extend %video-control;
 
-        .icon-fallback-img {
+        .icon {
+          width: 1em;
 
-          .icon {
-            // if the icon font doesn't render, we need to provide dimensions for the svg's
-            width: 1em;
-            height: 1em;
-
-            &.icon-hd {
-              // except when it's text, like with HD
-              // otherwise it's shifted to the right because "HD" is wider than 1em
-              width: auto;
-            }
+          &.icon-hd {
+            // except when it's text, like with HD
+            // otherwise it's shifted to the right because "HD" is wider than 1em
+            width: auto;
           }
         }
       }
@@ -535,6 +480,8 @@
 
                 .speed-option,
                 .control-lang {
+                  @include border-left($baseline/10 solid rgb(14, 166, 236));
+                  font-weight: $font-bold;
                   color: rgb(14, 166, 236); // UXPL primary accent
                 }
               }
@@ -553,14 +500,6 @@
         .lang,
         .grouped-controls {
           display: inline-block;
-
-          .control {
-
-            .icon-fallback-img {
-              @include float(left);
-              @include transform-origin(center center);
-            }
-          }
         }
 
         .speeds {

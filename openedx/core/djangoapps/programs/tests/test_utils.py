@@ -27,6 +27,7 @@ from openedx.core.djangoapps.programs.tests import factories
 from openedx.core.djangoapps.programs.tests.mixins import ProgramsApiConfigMixin, ProgramsDataMixin
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
+from util.date_utils import strftime_localized
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -675,7 +676,6 @@ class TestProgramProgressMeter(ProgramsApiConfigMixin, TestCase):
 class TestSupplementProgramData(ProgramsApiConfigMixin, ModuleStoreTestCase):
     """Tests of the utility function used to supplement program data."""
     password = 'test'
-    human_friendly_format = '%x'
     maxDiff = None
 
     def setUp(self):
@@ -702,14 +702,14 @@ class TestSupplementProgramData(ProgramsApiConfigMixin, ModuleStoreTestCase):
     def _assert_supplemented(self, actual, **kwargs):
         """DRY helper used to verify that program data is extended correctly."""
         course_overview = CourseOverview.get_from_id(self.course.id)  # pylint: disable=no-member
-
         run_mode = dict(
             factories.RunMode(
                 course_key=unicode(self.course.id),  # pylint: disable=no-member
                 course_url=reverse('course_root', args=[self.course.id]),  # pylint: disable=no-member
                 course_image_url=course_overview.course_image_url,
-                start_date=self.course.start.strftime(self.human_friendly_format),
-                end_date=self.course.end.strftime(self.human_friendly_format),
+                start_date=strftime_localized(self.course.start, 'SHORT_DATE'),
+                end_date=strftime_localized(self.course.end, 'SHORT_DATE'),
+                is_course_ended=self.course.end < timezone.now(),
                 is_enrolled=False,
                 is_enrollment_open=True,
                 marketing_url='',
@@ -745,7 +745,14 @@ class TestSupplementProgramData(ProgramsApiConfigMixin, ModuleStoreTestCase):
 
         data = utils.supplement_program_data(self.program, self.user)
 
-        self._assert_supplemented(data, is_enrollment_open=is_enrollment_open)
+        if is_enrollment_open:
+            self._assert_supplemented(data, is_enrollment_open=is_enrollment_open)
+        else:
+            self._assert_supplemented(
+                data,
+                is_enrollment_open=is_enrollment_open,
+                enrollment_open_date=strftime_localized(self.course.enrollment_start, 'SHORT_DATE')
+            )
 
     @ddt.data(True, False)
     @mock.patch(UTILS_MODULE + '.certificate_api.certificate_downloadable_status')
@@ -763,3 +770,40 @@ class TestSupplementProgramData(ProgramsApiConfigMixin, ModuleStoreTestCase):
             self._assert_supplemented(data, certificate_url=expected_url)
         else:
             self._assert_supplemented(data)
+
+    @mock.patch(UTILS_MODULE + '.get_organization_by_short_name')
+    def test_organization_logo_exists(self, mock_get_organization_by_short_name):
+        """ Verify the logo image is set from the organizations api """
+        mock_logo_url = 'edx/logo.png'
+        mock_image = mock.Mock()
+        mock_image.url = mock_logo_url
+        mock_get_organization_by_short_name.return_value = {
+            'logo': mock_image
+        }
+        data = utils.supplement_program_data(self.program, self.user)
+        self.assertEqual(data['organizations'][0].get('img'), mock_logo_url)
+
+    @mock.patch(UTILS_MODULE + '.get_organization_by_short_name')
+    def test_organization_missing(self, mock_get_organization_by_short_name):
+        """ Verify the logo image is not set if the organizations api returns None """
+        mock_get_organization_by_short_name.return_value = None
+        data = utils.supplement_program_data(self.program, self.user)
+        self.assertEqual(data['organizations'][0].get('img'), None)
+
+    @mock.patch(UTILS_MODULE + '.get_organization_by_short_name')
+    def test_organization_logo_missing(self, mock_get_organization_by_short_name):
+        """
+        Verify the logo image is not set if the organizations api returns organization,
+        but the logo is not available
+        """
+        mock_get_organization_by_short_name.return_value = {'logo': None}
+        data = utils.supplement_program_data(self.program, self.user)
+        self.assertEqual(data['organizations'][0].get('img'), None)
+
+    @ddt.data(-1, 0, 1)
+    def test_course_course_ended(self, days_offset):
+        self.course.end = timezone.now() + datetime.timedelta(days=days_offset)
+        self.course = self.update_course(self.course, self.user.id)  # pylint: disable=no-member
+        data = utils.supplement_program_data(self.program, self.user)
+
+        self._assert_supplemented(data)

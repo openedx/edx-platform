@@ -20,7 +20,7 @@ define([
                     },
                     run_modes: [{
                         start_date: 'Apr 25, 2016',
-                        end_date: 'Jun 13, 2016',
+                        end_date: 'Jun 13, 2019',
                         course_key: 'course-v1:ANUx+ANU-ASTRO1x+3T2015',
                         course_url: 'http://localhost:8000/courses/course-v1:edX+DemoX+Demo_Course/info',
                         marketing_url: 'https://www.edx.org/course/astrophysics-exploring',
@@ -29,12 +29,15 @@ define([
                         run_key: '2T2016',
                         course_started: true,
                         is_enrolled: true,
-                        certificate_url: ''
+                        is_course_ended: false,
+                        is_enrollment_open: true,
+                        certificate_url: '',
+                        enrollment_open_date: 'Mar 03, 2016'
                     }]
                 },
 
             setupView = function(data, isEnrolled){
-                context.run_modes[0].is_enrolled = isEnrolled;
+                data.run_modes[0].is_enrolled = isEnrolled;
                 setFixtures('<div class="course-card card"></div>');
                 courseCardModel = new CourseCardModel(data);
                 view = new CourseCardView({
@@ -93,6 +96,28 @@ define([
                 setupView(data, false);
                 expect(view.$('.certificate-status').length).toEqual(1);
                 expect(view.$('.certificate-status .cta-secondary').attr('href')).toEqual(certUrl);
+            });
+
+            it('should render the course card with coming soon', function(){
+                view.remove();
+                context.run_modes[0].is_enrollment_open = false;
+                setupView(context, false);
+                expect(view.$('.header-img').attr('src')).toEqual(context.run_modes[0].course_image_url);
+                expect(view.$('.course-details .course-title').text().trim()).toEqual(context.display_name);
+                expect(view.$('.course-details .course-title-link').length).toBe(0);
+                expect(view.$('.course-details .course-text .course-key').html()).toEqual(context.key);
+                expect(view.$('.course-details .course-text .run-period').length).toBe(0);
+                expect(view.$('.no-action-message').text().trim()).toBe('Coming Soon');
+                expect(view.$('.enrollment-open-date').text().trim())
+                    .toEqual(context.run_modes[0].enrollment_open_date);
+            });
+
+            it('should render if enrollment_open_date is not provided', function(){
+                view.remove();
+                context.run_modes[0].is_enrollment_open = true;
+                delete context.run_modes[0].enrollment_open_date;
+                setupView(context, false);
+                validateCourseInfoDisplay();
             });
         });
     }

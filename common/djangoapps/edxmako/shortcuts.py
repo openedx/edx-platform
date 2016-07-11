@@ -12,9 +12,10 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-from django.template import Context
-from django.http import HttpResponse
 import logging
+
+from django.http import HttpResponse
+from django.template import Context
 
 from microsite_configuration import microsite
 
@@ -22,6 +23,7 @@ from edxmako import lookup_template
 from edxmako.request_context import get_template_request_context
 from django.conf import settings
 from django.core.urlresolvers import reverse
+from openedx.core.djangoapps.theming.helpers import get_template_path
 log = logging.getLogger(__name__)
 
 
@@ -134,8 +136,7 @@ def render_to_string(template_name, dictionary, context=None, namespace='main', 
             this template. If not supplied, the current request will be used.
     """
 
-    # see if there is an override template defined in the microsite
-    template_name = microsite.get_template_path(template_name)
+    template_name = get_template_path(template_name)
 
     context_instance = Context(dictionary)
     # add dictionary to context_instance

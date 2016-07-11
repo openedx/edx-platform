@@ -25,6 +25,7 @@ from embargo.test_utils import restrict_course
 from student.models import CourseEnrollment
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from util.testing import UrlResetMixin
+from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme
 
 
 @attr('shard_3')
@@ -374,7 +375,7 @@ class CourseModeViewTest(UrlResetMixin, ModuleStoreTestCase):
         self.assertEquals(course_modes, expected_modes)
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
-    @theming_test_utils.with_is_edx_domain(True)
+    @with_comprehensive_theme("edx.org")
     def test_hide_nav(self):
         # Create the course modes
         for mode in ["honor", "verified"]:

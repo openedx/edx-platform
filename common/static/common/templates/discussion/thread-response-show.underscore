@@ -3,7 +3,7 @@
     <%= author_display %>
     <p class="posted-details">
         <span class="timeago" title="<%= created_at %>"><%= created_at %></span>
-        <% if (obj.endorsement) { %>
+        <% if (obj.endorsement && obj.endorsed) { %>
             -
             <%
             var fmt = null;

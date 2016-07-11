@@ -11,11 +11,14 @@
     padding: $baseline/2 $baseline;
   }
 
-  .course-image-link {
+  .course-image-container{
     @include float(left);
 
     .header-img {
-      max-width: 191px;
+      max-width: 100%;
+      @include susy-media($bp-screen-sm) {
+        max-width: 191px;
+      }
     }
   }
 
@@ -47,8 +50,28 @@
       margin-bottom: $baseline/2;
       text-transform: uppercase;
     }
-
-    .run-select-container {
+    .select-error{
+      color: palette(error, base);
+      margin-bottom: $baseline/4;
+      font-size: font-size(small);
+      visibility: hidden;
+    }
+    .no-action-message{
+      margin-bottom: $baseline/2;
+      color: palette(grayscale, dark);
+      font-size: font-size(large);
+      text-align: center;
+      text-transform: uppercase;
+      margin-top: $baseline*2;
+    }
+    .enrollment-opens{
+      text-align: center;
+      margin-bottom: $baseline/2;
+      .enrollment-open-date{
+         white-space: nowrap;
+      }
+    }
+    .run-select-container{
       margin-bottom: $baseline;
 
       .run-select {
@@ -61,8 +84,8 @@
       text-align: center;
     }
 
-    .view-course-link {
-      width: $baseline*10;
+    .view-course-link{
+      min-width: $baseline*10;
       text-align: center;
     }
   }

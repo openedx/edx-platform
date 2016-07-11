@@ -6,8 +6,6 @@ import re
 import cgi
 
 from django.conf import settings
-from django.contrib.sites.models import Site
-from django.core.exceptions import ImproperlyConfigured
 from django.shortcuts import redirect
 from django.utils.translation import ugettext as _
 
@@ -50,21 +48,6 @@ def course_wiki_redirect(request, course_id):  # pylint: disable=unused-argument
 
     if not valid_slug:
         return redirect("wiki:get", path="")
-
-    # The wiki needs a Site object created. We make sure it exists here
-    try:
-        Site.objects.get_current()
-    except Site.DoesNotExist:
-        new_site = Site()
-        new_site.domain = settings.SITE_NAME
-        new_site.name = "edX"
-        new_site.save()
-        site_id = str(new_site.id)
-        if site_id != str(settings.SITE_ID):
-            msg = "No site object was created and the SITE_ID doesn't match the newly created one. {} != {}".format(
-                site_id, settings.SITE_ID
-            )
-            raise ImproperlyConfigured(msg)
 
     try:
         urlpath = URLPath.get_by_path(course_slug, select_related=True)

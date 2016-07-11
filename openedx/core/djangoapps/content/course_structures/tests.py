@@ -32,12 +32,12 @@ class CourseStructureTaskTests(ModuleStoreTestCase):
         super(CourseStructureTaskTests, self).setUp()
         self.course = CourseFactory.create(org='TestX', course='TS101', run='T1')
         self.section = ItemFactory.create(parent=self.course, category='chapter', display_name='Test Section')
-        self.discussion_module_1 = ItemFactory.create(
+        self.discussion_xblock_1 = ItemFactory.create(
             parent=self.course,
             category='discussion',
             discussion_id='test_discussion_id_1'
         )
-        self.discussion_module_2 = ItemFactory.create(
+        self.discussion_xblock_2 = ItemFactory.create(
             parent=self.course,
             category='discussion',
             discussion_id='test_discussion_id_2'

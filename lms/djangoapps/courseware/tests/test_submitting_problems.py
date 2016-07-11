@@ -459,10 +459,9 @@ class TestCourseGrader(TestSubmittingProblems):
         csmh = BaseStudentModuleHistory.get_history(student_module)
         self.assertEqual(len(csmh), 3)
 
-    def test_grade_with_max_score_cache(self):
+    def test_grade_with_collected_max_score(self):
         """
-        Tests that the max score cache is populated after a grading run
-        and that the results of grading runs before and after the cache
+        Tests that the results of grading runs before and after the cache
         warms are the same.
         """
         self.basic_setup()
@@ -473,17 +472,11 @@ class TestCourseGrader(TestSubmittingProblems):
                 module_state_key=self.problem_location('p2')
             ).exists()
         )
-        location_to_cache = unicode(self.problem_location('p2'))
-        max_scores_cache = grades.MaxScoresCache.create_for_course(self.course)
 
-        # problem isn't in the cache
-        max_scores_cache.fetch_from_remote([location_to_cache])
-        self.assertIsNone(max_scores_cache.get(location_to_cache))
+        # problem isn't in the cache, but will be when graded
         self.check_grade_percent(0.33)
 
-        # problem is in the cache
-        max_scores_cache.fetch_from_remote([location_to_cache])
-        self.assertIsNotNone(max_scores_cache.get(location_to_cache))
+        # problem is in the cache, should be the same result
         self.check_grade_percent(0.33)
 
     def test_none_grade(self):
@@ -502,13 +495,6 @@ class TestCourseGrader(TestSubmittingProblems):
         self.submit_question_answer('p1', {'2_1': 'Correct'})
         self.check_grade_percent(0.33)
         self.assertEqual(self.get_grade_summary()['grade'], 'B')
-
-    @patch.dict("django.conf.settings.FEATURES", {"ENABLE_MAX_SCORE_CACHE": False})
-    def test_grade_no_max_score_cache(self):
-        """
-        Tests grading when the max score cache is disabled
-        """
-        self.test_b_grade_exact()
 
     def test_b_grade_above(self):
         """

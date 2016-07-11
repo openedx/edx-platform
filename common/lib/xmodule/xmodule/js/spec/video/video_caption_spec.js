@@ -266,6 +266,7 @@
                         expect($('.closed-captions')).toHaveAttrs({
                             'lang': 'de'
                         });
+                        expect(link).toHaveAttr('aria-pressed', 'true');
                     });
 
                     it('when clicking on link with current language', function () {
@@ -284,6 +285,7 @@
                         expect(state.storage.setItem)
                             .not.toHaveBeenCalledWith('language', 'en');
                         expect($('.langs-list li.is-active').length).toBe(1);
+                        expect(link).toHaveAttr('aria-pressed', 'true');
                     });
 
                     it('open the language toggle on hover', function () {
@@ -413,7 +415,7 @@
                 });
 
                 it('show explanation message', function () {
-                    expect($('.subtitles-menu li')).toHaveText(
+                    expect($('.subtitles .subtitles-menu li')).toHaveText(
                         'Transcript will be displayed when you start playing the video.'
                     );
                 });

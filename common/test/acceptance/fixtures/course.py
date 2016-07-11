@@ -13,8 +13,8 @@ from path import Path as path
 
 from opaque_keys.edx.keys import CourseKey
 
-from . import STUDIO_BASE_URL
-from .base import XBlockContainerFixture, FixtureError
+from common.test.acceptance.fixtures import STUDIO_BASE_URL
+from common.test.acceptance.fixtures.base import XBlockContainerFixture, FixtureError
 
 
 class XBlockFixtureDesc(object):

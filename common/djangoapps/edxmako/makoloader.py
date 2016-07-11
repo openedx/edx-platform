@@ -42,10 +42,14 @@ class MakoLoader(object):
     def load_template(self, template_name, template_dirs=None):
         source, file_path = self.load_template_source(template_name, template_dirs)
 
+        # In order to allow dynamic template overrides, we need to cache templates based on their absolute paths
+        # rather than relative paths, overriding templates would have same relative paths.
+        module_directory = self.module_directory.rstrip("/") + "/{dir_hash}/".format(dir_hash=hash(file_path))
+
         if source.startswith("## mako\n"):
             # This is a mako template
             template = Template(filename=file_path,
-                                module_directory=self.module_directory,
+                                module_directory=module_directory,
                                 input_encoding='utf-8',
                                 output_encoding='utf-8',
                                 default_filters=['decode.utf8'],

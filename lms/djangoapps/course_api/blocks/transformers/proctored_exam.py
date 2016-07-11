@@ -6,10 +6,10 @@ from django.conf import settings
 
 from edx_proctoring.api import get_attempt_status_summary
 from edx_proctoring.models import ProctoredExamStudentAttemptStatus
-from openedx.core.lib.block_structure.transformer import BlockStructureTransformer
+from openedx.core.lib.block_structure.transformer import BlockStructureTransformer, FilteringTransformerMixin
 
 
-class ProctoredExamTransformer(BlockStructureTransformer):
+class ProctoredExamTransformer(FilteringTransformerMixin, BlockStructureTransformer):
     """
     Exclude proctored exams unless the user is not a verified student or has
     declined taking the exam.
@@ -33,12 +33,9 @@ class ProctoredExamTransformer(BlockStructureTransformer):
         block_structure.request_xblock_fields('is_proctored_enabled')
         block_structure.request_xblock_fields('is_practice_exam')
 
-    def transform(self, usage_info, block_structure):
-        """
-        Mutates block_structure based on the given usage_info.
-        """
+    def transform_block_filters(self, usage_info, block_structure):
         if not settings.FEATURES.get('ENABLE_PROCTORED_EXAMS', False):
-            return
+            return [block_structure.create_universal_filter()]
 
         def is_proctored_exam_for_user(block_key):
             """
@@ -60,4 +57,4 @@ class ProctoredExamTransformer(BlockStructureTransformer):
                 )
                 return user_exam_summary and user_exam_summary['status'] != ProctoredExamStudentAttemptStatus.declined
 
-        block_structure.remove_block_if(is_proctored_exam_for_user)
+        return [block_structure.create_removal_filter(is_proctored_exam_for_user)]

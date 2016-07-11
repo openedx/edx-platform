@@ -27,7 +27,7 @@ class TestSuite(object):
         self.failed_suites = []
         self.verbosity = int(kwargs.get('verbosity', 1))
         self.skip_clean = kwargs.get('skip_clean', False)
-        self.pdb = kwargs.get('pdb', False)
+        self.passthrough_options = kwargs.get('passthrough_options', [])
 
     def __enter__(self):
         """
@@ -75,7 +75,7 @@ class TestSuite(object):
         It returns False if errors or failures occur. Otherwise, it
         returns True.
         """
-        cmd = self.cmd
+        cmd = " ".join(self.cmd)
 
         if tasks.environment.dry_run:
             tasks.environment.info(cmd)

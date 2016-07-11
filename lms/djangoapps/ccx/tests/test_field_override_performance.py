@@ -36,7 +36,6 @@ from openedx.core.djangoapps.content.block_structure.api import get_course_in_ca
     'django.conf.settings.FEATURES',
     {
         'ENABLE_XBLOCK_VIEW_ENDPOINT': True,
-        'ENABLE_MAX_SCORE_CACHE': False,
     }
 )
 @ddt.ddt

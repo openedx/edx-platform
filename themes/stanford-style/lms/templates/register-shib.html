@@ -2,6 +2,7 @@
 <%!
 from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse
+from openedx.core.djangolib.js_utils import js_escaped_string
 %>
 
 <%block name="pagetitle">${_("Preferences for {platform_name}").format(platform_name=settings.PLATFORM_NAME)}</%block>
@@ -43,7 +44,7 @@ from django.core.urlresolvers import reverse
       });
 
       $('#register-form').on('ajax:success', function(event, json, xhr) {
-        var url = json.redirect_url || "${reverse('dashboard')}";
+        var url = json.redirect_url || "${reverse('dashboard') | n, js_escaped_string }";
         location.href = url;
       });
 
@@ -65,14 +66,14 @@ from django.core.urlresolvers import reverse
           removeClass('is-disabled').
           attr('aria-disabled', false).
           removeProp('disabled').
-          text("${_('Update my {platform_name} Account').format(platform_name=settings.PLATFORM_NAME)}");
+          text("${_('Update my {platform_name} Account').format(platform_name=settings.PLATFORM_NAME) | n, js_escaped_string }");
       }
       else {
         $submitButton.
           addClass('is-disabled').
           attr('aria-disabled', true).
           prop('disabled', true).
-          text("${_('Processing your account information')}");
+          text("${_('Processing your account information') | n, js_escaped_string }");
       }
     }
   </script>

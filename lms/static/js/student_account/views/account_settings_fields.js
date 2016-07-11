@@ -41,10 +41,13 @@
             EmailFieldView: FieldViews.TextFieldView.extend({
                 fieldTemplate: field_text_account_template,
                 successMessage: function () {
-                    return this.indicators.success + StringUtils.interpolate(
+                    return HtmlUtils.joinHtml(
+                        this.indicators.success,
+                        StringUtils.interpolate(
                             gettext('We\'ve sent a confirmation message to {new_email_address}. Click the link in the message to update your email address.'), /* jshint ignore:line */
                             {'new_email_address': this.fieldValue()}
-                        );
+                        )
+                    );
                 }
             }),
             LanguagePreferenceFieldView: FieldViews.DropdownFieldView.extend({
@@ -65,8 +68,10 @@
                         },
                         error: function () {
                             view.showNotificationMessage(
-                                view.indicators.error +
-                                gettext('You must sign out and sign back in before your language changes take effect.')
+                                HtmlUtils.joinHtml(
+                                    view.indicators.error,
+                                    gettext('You must sign out and sign back in before your language changes take effect.') // jshint ignore:line
+                                )
                             );
                         }
                     });
@@ -106,10 +111,13 @@
                     });
                 },
                 successMessage: function () {
-                    return this.indicators.success + StringUtils.interpolate(
+                    return HtmlUtils.joinHtml(
+                        this.indicators.success,
+                        StringUtils.interpolate(
                             gettext('We\'ve sent a message to {email_address}. Click the link in the message to reset your password.'), /* jshint ignore:line */
                             {'email_address': this.model.get(this.options.emailAttribute)}
-                        );
+                        )
+                    );
                 }
             }),
             LanguageProficienciesFieldView: FieldViews.DropdownFieldView.extend({
@@ -169,7 +177,7 @@
                         );
                     }
 
-                    this.$el.html(this.template({
+                    HtmlUtils.setHtml(this.$el, HtmlUtils.template(this.fieldTemplate)({
                         id: this.options.valueAttribute,
                         title: this.options.title,
                         screenReaderTitle: screenReaderTitle,
@@ -220,12 +228,12 @@
                     });
                 },
                 inProgressMessage: function () {
-                    return this.indicators.inProgress + (
+                    return HtmlUtils.joinHtml(this.indicators.inProgress, (
                         this.options.connected ? gettext('Unlinking') : gettext('Linking')
-                    );
+                    ));
                 },
                 successMessage: function () {
-                    return this.indicators.success + gettext('Successfully unlinked.');
+                    return HtmlUtils.joinHtml(this.indicators.success, gettext('Successfully unlinked.'));
                 }
             }),
             
