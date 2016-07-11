@@ -212,6 +212,8 @@ case "$TEST_SUITE" in
 
             "8")
                 paver test_bokchoy --attr='shard_8' $PAVER_ARGS
+                mkdir -p $JENKINS_WORKSPACE/test_root/log/screenshots
+                cp $JENKINS_WORKSPACE/screenshots/* $JENKINS_WORKSPACE/$SHARD/test_root/log/
                 ;;
 
             "9")
