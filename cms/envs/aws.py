@@ -211,7 +211,14 @@ ASSET_IGNORE_REGEX = ENV_TOKENS.get('ASSET_IGNORE_REGEX', ASSET_IGNORE_REGEX)
 
 # Theme overrides
 THEME_NAME = ENV_TOKENS.get('THEME_NAME', None)
-COMPREHENSIVE_THEME_DIR = path(ENV_TOKENS.get('COMPREHENSIVE_THEME_DIR', COMPREHENSIVE_THEME_DIR))
+
+# following setting is for backward compatibility
+if ENV_TOKENS.get('COMPREHENSIVE_THEME_DIR', None):
+    COMPREHENSIVE_THEME_DIR = ENV_TOKENS.get('COMPREHENSIVE_THEME_DIR')
+
+COMPREHENSIVE_THEME_DIRS = ENV_TOKENS.get('COMPREHENSIVE_THEME_DIRS', COMPREHENSIVE_THEME_DIRS) or []
+DEFAULT_SITE_THEME = ENV_TOKENS.get('DEFAULT_SITE_THEME', DEFAULT_SITE_THEME)
+ENABLE_COMPREHENSIVE_THEMING = ENV_TOKENS.get('ENABLE_COMPREHENSIVE_THEMING', ENABLE_COMPREHENSIVE_THEMING)
 
 #Timezone overrides
 TIME_ZONE = ENV_TOKENS.get('TIME_ZONE', TIME_ZONE)
@@ -309,6 +316,20 @@ else:
     DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
 
 DATABASES = AUTH_TOKENS['DATABASES']
+
+# The normal database user does not have enough permissions to run migrations.
+# Migrations are run with separate credentials, given as DB_MIGRATION_*
+# environment variables
+for name, database in DATABASES.items():
+    if name != 'read_replica':
+        database.update({
+            'ENGINE': os.environ.get('DB_MIGRATION_ENGINE', database['ENGINE']),
+            'USER': os.environ.get('DB_MIGRATION_USER', database['USER']),
+            'PASSWORD': os.environ.get('DB_MIGRATION_PASS', database['PASSWORD']),
+            'NAME': os.environ.get('DB_MIGRATION_NAME', database['NAME']),
+            'HOST': os.environ.get('DB_MIGRATION_HOST', database['HOST']),
+            'PORT': os.environ.get('DB_MIGRATION_PORT', database['PORT']),
+        })
 
 MODULESTORE = convert_module_store_setting_if_needed(AUTH_TOKENS.get('MODULESTORE', MODULESTORE))
 

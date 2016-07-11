@@ -55,7 +55,7 @@ from openedx.core.djangolib.markup import HTML, Text
 <%block name="bodyclass">view-in-course view-course-info ${course.css_class or ''}</%block>
 
 <main id="main" aria-label="Content" tabindex="-1">
-    <section class="container">
+    <div class="container">
       <div class="home">
         <div class="page-header-main">
             <h1 class="page-title">${_("Welcome to {org}'s {course_name}!").format(org=course.display_org_with_default, course_name=course.display_number_with_default)}</h1>
@@ -108,5 +108,5 @@ from openedx.core.djangolib.markup import HTML, Text
         </section>
         % endif
       </div>
-    </section>
+  </div>
 </main>

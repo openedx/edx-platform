@@ -49,10 +49,10 @@
             <%- gettext('Coming Soon') %>
         </div>
         <div class="enrollment-opens">
-            <%- gettext('Enrollment Opens') %>
-        </div>
-        <div class="enroll-open-date">
-            <%- enrollment_open_date %>
+            <%- gettext('Enrollment Opens on') %>
+            <span class="enrollment-open-date">
+                <%- enrollment_open_date %>
+            </span>
         </div>
     <% } %>
 <% } %>

@@ -267,7 +267,7 @@ def coverage(options):
     sh("coverage xml --rcfile={}".format(rcfile))
     # Generate the coverage.py HTML report
     sh("coverage html --rcfile={}".format(rcfile))
-    call_task('diff_coverage', options=options.coverage)
+    diff_coverage()  # pylint: disable=no-value-for-parameter
 
 
 @task
@@ -275,12 +275,12 @@ def coverage(options):
 @cmdopts([
     ("compare-branch=", "b", "Branch to compare against, defaults to origin/master"),
     ("compare_branch=", None, "deprecated in favor of compare-branch"),
-])
+], share_with=['coverage'])
 def diff_coverage(options):
     """
     Build the diff coverage reports
     """
-    compare_branch = options.diff_coverage.get('compare_branch', 'origin/master')
+    compare_branch = options.get('compare_branch', 'origin/master')
 
     # Find all coverage XML files (both Python and JavaScript)
     xml_reports = []

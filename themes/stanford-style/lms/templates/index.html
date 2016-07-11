@@ -1,6 +1,7 @@
 <%inherit file="main.html" />
 <%!
 from django.utils.translation import ugettext as _
+from openedx.core.djangolib.markup import HTML
 %>
 
 <section class="home">
@@ -11,7 +12,7 @@ from django.utils.translation import ugettext as _
           % if homepage_overlay_html:
             ${homepage_overlay_html}
           % else:
-            <h1>${_("Free courses from <strong>{university_name}</strong>").format(university_name="Stanford")}</h1>
+            <h1>${_(HTML("Free courses from <strong>{university_name}</strong>")).format(university_name="Stanford")}</h1>
             <p>${_("For anyone, anywhere, anytime")}</p>
           % endif
         </div>

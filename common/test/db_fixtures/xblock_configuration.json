@@ -1,0 +1,22 @@
+[
+    {
+        "pk": 1,
+        "model": "xblock_django.XBlockConfiguration",
+        "fields": {
+            "name": "poll",
+            "enabled": true,
+            "deprecated": true,
+            "change_date": "2016-07-06"
+        }
+    },
+    {
+        "pk": 2,
+        "model": "xblock_django.XBlockConfiguration",
+        "fields": {
+            "name": "survey",
+            "enabled": true,
+            "deprecated": true,
+            "change_date": "2016-07-06"
+        }
+    }
+]

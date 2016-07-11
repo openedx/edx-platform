@@ -39,4 +39,5 @@
     </div>
 </div>
 <div class="section action-msg-view"></div>
+<div class="section upgrade-message"></div>
 <div class="section certificate-status"></div>

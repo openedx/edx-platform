@@ -31,7 +31,7 @@ from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.theming.helpers import is_request_in_themed_site, get_value as get_themed_value
 from openedx.core.djangoapps.user_api.accounts.api import request_password_change
 from openedx.core.djangoapps.user_api.errors import UserNotFound
-from openedx.core.djangoapps.user_api.models import UserPreference
+from openedx.core.lib.time_zone_utils import TIME_ZONE_CHOICES
 from openedx.core.lib.edx_api_utils import get_edx_api_data
 from student.models import UserProfile
 from student.views import (
@@ -449,7 +449,7 @@ def account_settings_context(request):
             }, 'preferred_language': {
                 'options': all_languages(),
             }, 'time_zone': {
-                'options': UserPreference.TIME_ZONE_CHOICES,
+                'options': TIME_ZONE_CHOICES,
                 'enabled': settings.FEATURES.get('ENABLE_TIME_ZONE_PREFERENCE'),
             }
         },

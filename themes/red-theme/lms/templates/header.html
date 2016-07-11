@@ -4,6 +4,7 @@
 <%!
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
+from openedx.core.djangolib.markup import HTML
 
 # App that handles subdomain specific branding
 import branding
@@ -36,7 +37,7 @@ site_status_msg = get_site_status_msg(course_id)
 % endif
 </%block>
 
-  <header id="global-navigation" class="global ${"slim" if course else ""}" >
+  <header id="global-navigation" class="header-global ${"slim" if course else ""}" >
     <!-- This file is only for demonstration, and is horrendous! -->
     <nav aria-label="${_('Global')}">
     <h1 class="logo">
@@ -53,7 +54,7 @@ site_status_msg = get_site_status_msg(course_id)
       <%
         display_name = course.display_name_with_default_escaped
         if settings.FEATURES.get('CUSTOM_COURSES_EDX', False):
-          ccx = get_current_ccx()
+          ccx = get_current_ccx(course.id)
           if ccx:
             display_name = ccx.display_name
       %>
@@ -152,7 +153,7 @@ site_status_msg = get_site_status_msg(course_id)
     <li class="nav-courseware-01">
       % if not settings.FEATURES['DISABLE_LOGIN_BUTTON']:
           % if course and settings.FEATURES.get('RESTRICT_ENROLL_BY_REG_METHOD') and course.enrollment_domain:
-          <a class="btn-brand btn-login" href="${reverse('course-specific-login', args=[course.id.to_deprecated_string()])}${login_query()}">${_("Sign in")}</a>
+          <a class="btn btn-login" href="${reverse('course-specific-login', args=[course.id.to_deprecated_string()])}${login_query()}">${_("Sign in")}</a>
           % else:
           <a class="btn-brand btn-login" href="/login${login_query()}">${_("Sign in")}</a>
           % endif
@@ -164,7 +165,7 @@ site_status_msg = get_site_status_msg(course_id)
 </header>
 % if course:
 <!--[if lte IE 8]>
-<div class="ie-banner" aria-hidden="true">${_('<strong>Warning:</strong> Your browser is not fully supported. We strongly recommend using {chrome_link} or {ff_link}.').format(chrome_link='<a href="https://www.google.com/intl/en/chrome/browser/" target="_blank">Chrome</a>', ff_link='<a href="http://www.mozilla.org/en-US/firefox/new/" target="_blank">Firefox</a>')}</div>
+<div class="ie-banner" aria-hidden="true">${_(HTML('<strong>Warning:</strong> Your browser is not fully supported. We strongly recommend using {chrome_link} or {ff_link}.')).format(chrome_link='<a href="https://www.google.com/intl/en/chrome/browser/" target="_blank">Chrome</a>', ff_link='<a href="http://www.mozilla.org/en-US/firefox/new/" target="_blank">Firefox</a>')}</div>
 <![endif]-->
 % endif
 

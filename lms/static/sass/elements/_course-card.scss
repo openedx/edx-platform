@@ -1,7 +1,10 @@
 .course-card {
-  @include span(10);
-  margin-left: $baseline*2;
-  margin-bottom: $baseline;
+  width: 85%;
+  margin: {
+    left: auto;
+    right: auto;
+    bottom: $baseline;
+  }
   padding: $baseline/2 0;
 
   .section {
@@ -15,7 +18,10 @@
     @include float(left);
 
     .header-img {
-      max-width: 191px;
+      max-width: 100%;
+      @include susy-media($bp-screen-sm) {
+        max-width: 191px;
+      }
     }
   }
 
@@ -55,16 +61,18 @@
     }
     .no-action-message{
       margin-bottom: $baseline/2;
-      color: palette(grayscale, black);
+      color: palette(grayscale, dark);
       font-size: font-size(large);
       text-align: center;
+      text-transform: uppercase;
+      margin-top: $baseline*2;
     }
     .enrollment-opens{
       text-align: center;
       margin-bottom: $baseline/2;
-    }
-    .enroll-open-date{
-      text-align: center;
+      .enrollment-open-date{
+         white-space: nowrap;
+      }
     }
     .run-select-container{
       margin-bottom: $baseline;
@@ -123,6 +131,7 @@
     }
   }
   
+  .upgrade-message,
   .certificate-status {
     border-top: 1px solid palette(grayscale, x-trans);
     padding-top: $baseline;

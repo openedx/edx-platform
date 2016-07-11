@@ -133,9 +133,9 @@ directory. There are two ways to do this.
             $ sudo /edx/bin/update edx-platform HEAD
 
 #.  Otherwise, edit the /edx/app/edxapp/lms.env.json file to add the
-    ``COMPREHENSIVE_THEME_DIR`` value::
+    ``COMPREHENSIVE_THEME_DIRS`` value::
 
-        "COMPREHENSIVE_THEME_DIR": "/full/path/to/my-theme",
+        "COMPREHENSIVE_THEME_DIRS": ["/full/path/to/my-theme"],
 
 Restart your site.  Your changes should now be visible.
 

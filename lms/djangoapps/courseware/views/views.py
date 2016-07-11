@@ -753,6 +753,7 @@ def _progress(request, course_key, student_id):
         'credit_course_requirements': _credit_course_requirements(course_key, student),
         'missing_required_verification': missing_required_verification,
         'certificate_invalidated': False,
+        'enrollment_mode': enrollment_mode,
     }
 
     if show_generate_cert_btn:

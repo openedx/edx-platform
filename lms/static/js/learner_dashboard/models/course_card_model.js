@@ -65,17 +65,18 @@
                         course_key: runMode.course_key,
                         course_url: runMode.course_url || '',
                         display_name: this.context.display_name,
-                        start_date: runMode.start_date,
                         end_date: runMode.end_date,
+                        enrollable_run_modes: this.getEnrollableRunModes(),
+                        enrollment_open_date: runMode.enrollment_open_date || '',
+                        is_course_ended: runMode.is_course_ended,
                         is_enrolled: runMode.is_enrolled,
                         is_enrollment_open: runMode.is_enrollment_open,
                         key: this.context.key,
                         marketing_url: runMode.marketing_url || '',
-                        is_course_ended: runMode.is_course_ended,
                         mode_slug: runMode.mode_slug,
                         run_key: runMode.run_key,
-                        enrollment_open_date: runMode.enrollment_open_date || '',
-                        enrollable_run_modes: this.getEnrollableRunModes()
+                        start_date: runMode.start_date,
+                        upgrade_url: runMode.upgrade_url
                     });
                 }
             },
