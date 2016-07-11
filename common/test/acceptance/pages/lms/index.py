@@ -3,7 +3,7 @@
 LMS index (home) page.
 """
 from bok_choy.page_object import PageObject
-from . import BASE_URL
+from common.test.acceptance.pages.lms import BASE_URL
 
 BANNER_SELECTOR = 'section.home header div.outer-wrapper div.title .heading-group h1'
 INTRO_VIDEO_SELECTOR = 'div.play-intro'

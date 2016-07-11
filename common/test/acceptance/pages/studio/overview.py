@@ -10,11 +10,11 @@ from selenium.webdriver import ActionChains
 from selenium.webdriver.support.ui import Select
 from selenium.webdriver.common.keys import Keys
 
-from ..common.utils import click_css, confirm_prompt
+from common.test.acceptance.pages.common.utils import click_css, confirm_prompt
 
-from .course_page import CoursePage
-from .container import ContainerPage
-from .utils import set_input_value_and_save, set_input_value
+from common.test.acceptance.pages.studio.course_page import CoursePage
+from common.test.acceptance.pages.studio.container import ContainerPage
+from common.test.acceptance.pages.studio.utils import set_input_value_and_save, set_input_value
 
 
 class CourseOutlineItem(object):

@@ -4,10 +4,10 @@ Instructor (2) dashboard page.
 """
 
 from bok_choy.page_object import PageObject
-from .course_page import CoursePage
+from common.test.acceptance.pages.lms.course_page import CoursePage
 import os
 from bok_choy.promise import EmptyPromise, Promise
-from ...tests.helpers import select_option_by_text, get_selected_option_text, get_options
+from common.test.acceptance.tests.helpers import select_option_by_text, get_selected_option_text, get_options
 
 
 class InstructorDashboardPage(CoursePage):

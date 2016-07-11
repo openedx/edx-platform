@@ -6,7 +6,7 @@ from selenium.webdriver.common.keys import Keys
 from bok_choy.javascript import js_defined
 from bok_choy.promise import EmptyPromise
 
-from ..common.utils import click_css, wait_for_notification
+from common.test.acceptance.pages.common.utils import click_css, wait_for_notification
 
 
 @js_defined('window.jQuery')

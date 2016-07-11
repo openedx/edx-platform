@@ -2,7 +2,7 @@
 Courseware page.
 """
 
-from .course_page import CoursePage
+from common.test.acceptance.pages.lms.course_page import CoursePage
 from bok_choy.promise import EmptyPromise
 from selenium.webdriver.common.action_chains import ActionChains
 
