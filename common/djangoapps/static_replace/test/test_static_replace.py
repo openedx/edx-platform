@@ -525,9 +525,9 @@ class CanonicalContentTest(SharedModuleStoreTestCase):
         # - finally shove back in our regex patterns
         digest = CanonicalContentTest.get_content_digest_for_asset_path(prefix, start)
         if digest:
-            adjusted_asset_key = u'assets/courseware/MARK/asset-v1:a+b+{}+type@asset+block'.format(prefix)
-            adjusted_th_key = u'assets/courseware/MARK/asset-v1:a+b+{}+type@thumbnail+block'.format(prefix)
-            encoded_asset_key = u'/assets/courseware/MARK/asset-v1:a+b+{}+type@asset+block@'.format(prefix)
+            adjusted_asset_key = u'assets/courseware/VMARK/HMARK/asset-v1:a+b+{}+type@asset+block'.format(prefix)
+            adjusted_th_key = u'assets/courseware/VMARK/HMARK/asset-v1:a+b+{}+type@thumbnail+block'.format(prefix)
+            encoded_asset_key = u'/assets/courseware/VMARK/HMARK/asset-v1:a+b+{}+type@asset+block@'.format(prefix)
             encoded_asset_key = urlquote(encoded_asset_key)
 
         expected = expected.format(
@@ -544,7 +544,8 @@ class CanonicalContentTest(SharedModuleStoreTestCase):
         )
 
         expected = encode_unicode_characters_in_url(expected)
-        expected = expected.replace('MARK', '[a-f0-9]{32}')
+        expected = expected.replace('VMARK', r'v[\d]')
+        expected = expected.replace('HMARK', '[a-f0-9]{32}')
         expected = expected.replace('+', r'\+').replace('?', r'\?')
 
         with check_mongo_calls(mongo_calls):
@@ -728,7 +729,7 @@ class CanonicalContentTest(SharedModuleStoreTestCase):
         # - finally shove back in our regex patterns
         digest = CanonicalContentTest.get_content_digest_for_asset_path(prefix, start)
         if digest:
-            adjusted_c4x_block = 'assets/courseware/MARK/c4x/a/b/asset'
+            adjusted_c4x_block = 'assets/courseware/VMARK/HMARK/c4x/a/b/asset'
             encoded_c4x_block = urlquote('/' + adjusted_c4x_block + '/')
 
         expected = expected.format(
@@ -741,7 +742,8 @@ class CanonicalContentTest(SharedModuleStoreTestCase):
         )
 
         expected = encode_unicode_characters_in_url(expected)
-        expected = expected.replace('MARK', '[a-f0-9]{32}')
+        expected = expected.replace('VMARK', r'v[\d]')
+        expected = expected.replace('HMARK', '[a-f0-9]{32}')
         expected = expected.replace('+', r'\+').replace('?', r'\?')
 
         with check_mongo_calls(mongo_calls):
