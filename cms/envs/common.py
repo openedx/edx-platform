@@ -75,6 +75,8 @@ from lms.envs.common import (
     # constants for redirects app
     REDIRECT_CACHE_TIMEOUT,
     REDIRECT_CACHE_KEY_PREFIX,
+
+    JWT_AUTH,
 )
 from path import Path as path
 from warnings import simplefilter

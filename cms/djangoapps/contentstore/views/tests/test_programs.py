@@ -147,18 +147,17 @@ class TestProgramsIdTokenView(ProgramsApiConfigMixin, SharedModuleStoreTestCase)
         self.assertEqual(response.status_code, 302)
         self.assertIn(settings.LOGIN_URL, response['Location'])
 
-    @mock.patch('cms.djangoapps.contentstore.views.program.get_id_token', return_value='test-id-token')
-    def test_config_enabled(self, mock_get_id_token):
+    @mock.patch('cms.djangoapps.contentstore.views.program.JwtBuilder.build_token')
+    def test_config_enabled(self, mock_build_token):
         """
         Ensure the endpoint responds with a valid JSON payload when authoring
         is enabled.
         """
+        mock_build_token.return_value = 'test-id-token'
+        ClientFactory(name=ProgramsApiConfig.OAUTH2_CLIENT_NAME, client_type=CONFIDENTIAL)
+
         self.create_programs_config()
         response = self.client.get(self.path)
         self.assertEqual(response.status_code, 200)
         payload = json.loads(response.content)
-        self.assertEqual(payload, {"id_token": "test-id-token"})
-        # this comparison is a little long-handed because we need to compare user instances directly
-        user, client_name = mock_get_id_token.call_args[0]
-        self.assertEqual(user, self.user)
-        self.assertEqual(client_name, "programs")
+        self.assertEqual(payload, {'id_token': 'test-id-token'})
