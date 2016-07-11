@@ -13,7 +13,7 @@ from django.http import (Http404, HttpResponse, HttpResponseNotAllowed,
 import dogstats_wrapper as dog_stats_api
 from edxmako.shortcuts import render_to_response
 import zendesk
-from microsite_configuration import microsite
+from openedx.core.djangoapps.theming.helpers import get_value as get_themed_value
 
 import calc
 import track.views
@@ -186,7 +186,8 @@ def _record_feedback_in_zendesk(
         tags,
         additional_info,
         group_name=None,
-        require_update=False
+        require_update=False,
+        support_email=None
 ):
     """
     Create a new user-requested Zendesk ticket.
@@ -214,7 +215,7 @@ def _record_feedback_in_zendesk(
 
     # Per edX support, we would like to be able to route white label feedback items
     # via tagging
-    white_label_org = microsite.get_value('course_org_filter')
+    white_label_org = get_themed_value('course_org_filter')
     if white_label_org:
         zendesk_tags = zendesk_tags + ["whitelabel_{org}".format(org=white_label_org)]
 
@@ -231,6 +232,11 @@ def _record_feedback_in_zendesk(
         group = zendesk_api.get_group(group_name)
         if group is not None:
             new_ticket['ticket']['group_id'] = group['id']
+    if support_email is not None:
+        # If we do not include the `recipient` key here, Zendesk will default to using its default reply
+        # email address when support agents respond to tickets. By setting the `recipient` key here,
+        # we can ensure that WL site users are responded to via the correct Zendesk support email address.
+        new_ticket['ticket']['recipient'] = support_email
     try:
         ticket_id = zendesk_api.create_ticket(new_ticket)
         if group_name is not None and group is None:
@@ -337,7 +343,15 @@ def submit_feedback(request):
     ]:
         additional_info[pretty] = request.META.get(header)
 
-    success = _record_feedback_in_zendesk(realname, email, subject, details, tags, additional_info)
+    success = _record_feedback_in_zendesk(
+        realname,
+        email,
+        subject,
+        details,
+        tags,
+        additional_info,
+        support_email=get_themed_value('email_from_address', settings.DEFAULT_FROM_EMAIL)
+    )
     _record_feedback_in_datadog(tags)
 
     return HttpResponse(status=(200 if success else 500))
