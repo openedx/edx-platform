@@ -846,6 +846,7 @@ class LoncapaProblem(object):
             response_id_str = self.problem_id + "_" + str(response_id)
             # create and save ID for this response
             response.set('id', response_id_str)
+            response_id += 1
 
             answer_id = 1
             input_tags = inputtypes.registry.registered_tags()
@@ -869,7 +870,7 @@ class LoncapaProblem(object):
 
             # Find the label and save it for html transformation step
             responsetype_label = response.find('label')
-            problem_data[response_id_str] = {
+            problem_data[self.problem_id + '_' + str(response_id)] = {
                 'label': responsetype_label.text if responsetype_label is not None else '',
                 'p_ids': p_ids
             }
@@ -879,7 +880,6 @@ class LoncapaProblem(object):
             responder = responsetype_cls(response, inputfields, self.context, self.capa_system, self.capa_module)
             # save in list in self
             self.responders[response] = responder
-            response_id += 1
 
         # get responder answers (do this only once, since there may be a performance cost,
         # eg with externalresponse)
