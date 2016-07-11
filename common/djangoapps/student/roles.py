@@ -397,15 +397,15 @@ class UserBasedRole(object):
         return CourseAccessRole.objects.filter(role=self.role, user=self.user)
 
 
-def get_aggregate_exclusion_user_ids(course_key):
+def get_aggregate_exclusion_user_ids(course_key, roles=None):  # pylint: disable=invalid-name
     """
     This helper method will return the list of user ids that are marked in roles
     that can be excluded from certain aggregate queries. The list of roles to exclude
-    can be defined in a AGGREGATION_EXCLUDE_ROLES settings variable
+    can either be passed in roles argument or defined in a AGGREGATION_EXCLUDE_ROLES settings variable
     """
 
     exclude_user_ids = set()
-    exclude_role_list = getattr(settings, 'AGGREGATION_EXCLUDE_ROLES', [CourseObserverRole.ROLE])
+    exclude_role_list = roles or getattr(settings, 'AGGREGATION_EXCLUDE_ROLES', [CourseObserverRole.ROLE])
 
     for role in exclude_role_list:
         users = CourseRole(role, course_key).users_with_role()
