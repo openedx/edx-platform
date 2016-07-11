@@ -114,6 +114,7 @@ urlpatterns = (
     url(r'^course_modes/', include('course_modes.urls')),
     url(r'^verify_student/', include('verify_student.urls')),
 
+    url(r'^update_lang/', include('dark_lang.urls', namespace='darklang')),
     # URLs for API access management
     url(r'^api-admin/', include('openedx.core.djangoapps.api_admin.urls', namespace='api_admin')),
 )
