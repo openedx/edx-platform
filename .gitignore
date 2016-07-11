@@ -19,6 +19,15 @@ cms/envs/private.py
 .redcar/
 codekit-config.json
 .pycharm_helpers/
+/_mac/* 
+/IntelliLang.xml 
+/conda_packages.xml 
+/databaseSettings.xml 
+/diff.xml 
+/inspection/Default.xml 
+/other.xml
+/packages.xml 
+/web-browsers.xml
 
 ### NFS artifacts
 .nfs*
