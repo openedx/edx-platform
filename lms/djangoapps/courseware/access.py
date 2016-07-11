@@ -62,6 +62,8 @@ from courseware.access_response import (
     VisibilityError,
 )
 from courseware.access_utils import adjust_start_date, check_start_date, debug, ACCESS_GRANTED, ACCESS_DENIED
+from ccx.models import CustomCourseForEdX  # Added by labster.
+
 
 log = logging.getLogger(__name__)
 
@@ -740,7 +742,6 @@ def _has_access_to_course(user, access_level, course_key):
 
     instructor_access = (
         CourseInstructorRole(course_key).has_user(user) or
-        CourseCcxCoachRole(course_key).has_user(user) or  # Added by labster.
         OrgInstructorRole(course_key.org).has_user(user)
     )
 
@@ -850,8 +851,15 @@ def get_user_role(user, course_key):
     course role in LMS.
     """
     role = get_masquerade_role(user, course_key)
+
+    ccx = None  # Added by labster.
+    if isinstance(course_key, CCXLocator):  # Added by labster.
+        ccx = CustomCourseForEdX.objects.get(pk=course_key.ccx)  # Added by labster.
+
     if role:
         return role
+    elif ccx is not None and CourseCcxCoachRole(ccx.course_id).has_user(user):  # Added by labster.
+        return 'instructor'  # Added by labster.
     elif has_access(user, 'instructor', course_key):
         return 'instructor'
     elif has_access(user, 'staff', course_key):
