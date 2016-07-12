@@ -156,10 +156,10 @@ class CapaHtmlRenderTest(unittest.TestCase):
         self.assertEqual(question_element.text, "Test question")
 
         # Expect that the response has been turned into a <span>
-        response_element = rendered_html.find("span")
-        self.assertEqual(response_element.tag, "span")
+        response_element = rendered_html.find("section")
+        self.assertEqual(response_element.tag, "section")
 
-        # Expect that the response <span>
+        # Expect that the response <section>
         # that contains a <div> for the textline
         textline_element = response_element.find("div")
         self.assertEqual(textline_element.text, 'Input Template Render')
