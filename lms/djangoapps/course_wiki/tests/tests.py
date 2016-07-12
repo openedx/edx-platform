@@ -86,11 +86,11 @@ class WikiRedirectTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
         """
 
         course_wiki_home = reverse('course_wiki', kwargs={'course_id': course.id.to_deprecated_string()})
-        referer = reverse("progress", kwargs={'course_id': self.toy.id.to_deprecated_string()})
+        referer = reverse("progress", kwargs={'course_id': course.id.to_deprecated_string()})
 
         resp = self.client.get(course_wiki_home, follow=True, HTTP_REFERER=referer)
 
-        course_wiki_page = referer.replace('progress', 'wiki/' + self.toy.wiki_slug + "/")
+        course_wiki_page = referer.replace('progress', 'wiki/' + course.wiki_slug + "/")
 
         ending_location = resp.redirect_chain[-1][0]
 
@@ -167,3 +167,32 @@ class WikiRedirectTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
         resp = self.client.get(course_wiki_page, follow=True)
         target_url, __ = resp.redirect_chain[-1]
         self.assertIn(reverse('signin_user'), target_url)
+
+    @patch.dict("django.conf.settings.FEATURES", {'ALLOW_WIKI_ROOT_ACCESS': True})
+    def test_create_wiki_with_long_course_id(self):
+        """
+        Tests that the wiki is successfully created for courses that have
+        very long course ids.
+        """
+        # Combined course key length is currently capped at 65 characters (see MAX_SUM_KEY_LENGTH
+        # in /common/static/common/js/components/utils/view_utils.js).
+        # The below key components combined are exactly 65 characters long.
+        org = 'a-very-long-org-name'
+        course = 'a-very-long-course-name'
+        display_name = 'very-long-display-name'
+        # This is how wiki_slug is generated in cms/djangoapps/contentstore/views/course.py.
+        wiki_slug = "{0}.{1}.{2}".format(org, course, display_name)
+
+        self.assertEqual(len(org + course + display_name), 65)  # sanity check
+
+        course = CourseFactory.create(org=org, course=course, display_name=display_name, wiki_slug=wiki_slug)
+
+        self.login(self.student, self.password)
+        self.enroll(course)
+        self.create_course_page(course)
+
+        course_wiki_page = reverse('wiki:get', kwargs={'path': course.wiki_slug + '/'})
+        referer = reverse("courseware", kwargs={'course_id': course.id.to_deprecated_string()})
+
+        resp = self.client.get(course_wiki_page, follow=True, HTTP_REFERER=referer)
+        self.assertEqual(resp.status_code, 200)
