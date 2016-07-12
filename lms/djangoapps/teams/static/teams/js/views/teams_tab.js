@@ -68,7 +68,7 @@
                     router = this.router = new Backbone.Router();
                     _.each([
                         [':default', _.bind(this.routeNotFound, this)],
-                        ['content', _.bind(function () {
+                        ['main', _.bind(function () {
                             // The backbone router unfortunately usurps the
                             // default behavior of in-page-links.  This hack
                             // prevents the screen reader in-page-link from
@@ -580,7 +580,7 @@
                 /**
                  * Set up the tabbed view and switch tabs.
                  */
-                goToTab: function (tab) {
+                goToTab: function(tab) {
                     this.mainView = this.tabbedView;
                     // Note that `render` should be called first so
                     // that the tabbed view's element is set
