@@ -75,7 +75,7 @@ html.video-fullscreen {
       color: $gray;
     }
     a:active, a:hover {
-      color: $link-hover;
+      color: $uxpl-blue-base;
     }
 
     .license-label,
@@ -151,7 +151,7 @@ html.video-fullscreen {
       }
       button.gated-sequence {
         background: $transparent;
-        color: $blue-d1;
+        color: $uxpl-blue-base;
         border: none;
         box-shadow: none;
         @include text-align(left);
@@ -160,7 +160,7 @@ html.video-fullscreen {
 
         &:hover {
           background-color: transparent;
-          color: $link-hover;
+          color: $uxpl-blue-hover-active;
         }
       }
 
@@ -169,12 +169,12 @@ html.video-fullscreen {
         font-size: 1.3em;
       }
       .gated-sequence {
-        color: #147ABA;
+        color: $uxpl-blue-base;
         font-weight: 600;
         padding: ($baseline / 1.5) ($baseline / 4);
         a.start-timed-exam {
           cursor: pointer;
-          color: #147ABA;
+          color: $uxpl-blue-base;
           font-weight: 600;
           position: relative;
           top: ($baseline/10);
@@ -306,7 +306,7 @@ html.video-fullscreen {
         }
         &:last-child {
           > .practice-exam {
-            color: #147ABA;
+            color: $uxpl-blue-base;
           }
           border-bottom: none;
         }
@@ -663,3 +663,14 @@ section.self-assessment {
 }
 
 
+/*
+ * CodeMirror color contrast overrides
+ * (so we don't change the vendor file)
+ */
+
+.CodeMirror {
+    
+    .CodeMirror-linenumber.CodeMirror-gutter-elt {
+        color: $gray-d3 !important;
+    }
+}

@@ -95,8 +95,7 @@ class BulkEmailTest(BaseInstructorDashboardTest):
         ])
         self.send_email_page.a11y_audit.config.set_rules({
             "ignore": [
-                'button-name',  # TinyMCE button is missing accessible text
-                'color-contrast',  # TODO: AC-491
+                'button-name',  # TODO: AC-491
             ]
         })
         self.send_email_page.a11y_audit.check_for_accessibility_errors()
@@ -1053,7 +1052,6 @@ class CertificatesTest(BaseInstructorDashboardTest):
             "ignore": [
                 'aria-valid-attr-value',  # TODO: AC-491
                 'checkboxgroup',  # TODO: AC-491
-                'color-contrast',  # TODO: AC-491
                 'duplicate-id',  # TODO: AC-491
                 'label',  # TODO: AC-491
                 'radiogroup',  # TODO: AC-491
@@ -1272,7 +1270,6 @@ class CertificateInvalidationTest(BaseInstructorDashboardTest):
             "ignore": [
                 'aria-valid-attr-value',  # TODO: AC-491
                 'checkboxgroup',  # TODO: AC-491
-                'color-contrast',  # TODO: AC-491
                 'duplicate-id',  # TODO: AC-491
                 'label',  # TODO: AC-491
                 'radiogroup',  # TODO: AC-491

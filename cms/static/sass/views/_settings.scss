@@ -104,7 +104,7 @@
         @include float(right);
         margin-top: ($baseline/2);
         @include text-align(right);
-        color: $gray-l2;
+        color: $gray-d1;
       }
     }
 
@@ -219,7 +219,7 @@
           margin: 0 0 ($baseline/4) 0;
 
           &.is-focused {
-            color: $blue;
+            color: $uxpl-blue-base;
           }
         }
 
@@ -242,7 +242,7 @@
           &:focus {
 
             + .tip {
-              color: $gray;
+              color: $gray-d1;
             }
           }
         }
@@ -398,9 +398,10 @@
             overflow: hidden;
             white-space: nowrap;
             text-overflow: ellipsis;
+            color: $uxpl-blue-base;
 
             &:hover {
-
+                color: $uxpl-blue-hover-active;
             }
           }
         }
@@ -546,7 +547,7 @@
           @extend %t-copy-sub2;
           display: block;
           margin-top: ($baseline/2);
-          color: $gray-l3;
+          color: $gray-d3;
         }
       }
 
@@ -562,7 +563,7 @@
 
         .action-upload-image {
           @extend %ui-btn-flat-outline;
-          float: right;
+          @include float(right);
           width: flex-grid(2,9);
           margin-top: ($baseline/4);
           padding: ($baseline/2) $baseline;
@@ -1039,7 +1040,7 @@
           }
 
           .tip {
-            color: $gray-l1;
+            color: $gray-d1;
           }
 
           input.error {
