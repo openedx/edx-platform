@@ -862,17 +862,10 @@ class LoncapaProblem(object):
                 entry.attrib['id'] = "%s_%i_%i" % (self.problem_id, response_id, answer_id)
                 answer_id = answer_id + 1
 
-            p_ids = []
-            for p_index, p_element in enumerate(response.findall('.//p')):
-                p_tag_id = '{}_q{}_desc{}'.format(self.problem_id, response_id, p_index)
-                p_element.attrib['id'] = p_tag_id
-                p_ids.append(p_tag_id)
-
             # Find the label and save it for html transformation step
             responsetype_label = response.find('label')
             problem_data[self.problem_id + '_' + str(response_id)] = {
-                'label': responsetype_label.text if responsetype_label is not None else '',
-                'p_ids': p_ids
+                'label': responsetype_label.text if responsetype_label is not None else ''
             }
 
             # instantiate capa Response
