@@ -551,9 +551,7 @@ window.InlineAnalytics = (function() {
                     context: this,
                     url: answerDistUrl,
                     type: 'POST',
-                    data: {
-                        data: JSON.stringify(data)
-                    },
+                    data: JSON.stringify(data),
                     dataType: 'json',
                     contentType: "application/json",
 

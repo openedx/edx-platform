@@ -1271,7 +1271,7 @@ def get_analytics_answer_dist(request):
             404 if api client returns no data,
             otherwise 200 with JSON body.
     """
-    all_data = json.loads(request.POST['data'])
+    all_data = json.loads(request.body)
     module_id = all_data['module_id']
     question_types_by_part = all_data['question_types_by_part']
     num_options_by_part = all_data['num_options_by_part']
