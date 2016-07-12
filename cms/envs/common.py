@@ -900,6 +900,9 @@ INSTALLED_APPS = (
     # programs support
     'openedx.core.djangoapps.programs',
 
+    # Catalog integration
+    'openedx.core.djangoapps.catalog',
+
     # Self-paced course configuration
     'openedx.core.djangoapps.self_paced',
 
