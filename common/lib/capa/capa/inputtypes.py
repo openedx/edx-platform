@@ -320,7 +320,7 @@ class InputTypeBase(object):
             'STATIC_URL': self.capa_system.STATIC_URL
         }
 
-        if self.response_data is not None:
+        if self.response_data and self.response_data['label'] != '':
             context['response_data'] = self.response_data
 
         context.update(
