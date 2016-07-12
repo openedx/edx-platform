@@ -1,1 +1,1 @@
-<button role="tab" class="nav-item tab" data-url="<%= url %>" data-index="<%= index %>" aria-selected="false" aria-expanded="false" aria-controls="<%= tabPanelId %>" tabindex="-1" id="tab-<%= index %>"><%= title %></button>
+<button role="tab" class="nav-item tab" data-url="<%- url %>" data-index="<%- index %>" aria-selected="false" aria-expanded="false" aria-controls="<%- tabPanelId %>" tabindex="-1" id="tab-<%- index %>"><%- title %></button>
