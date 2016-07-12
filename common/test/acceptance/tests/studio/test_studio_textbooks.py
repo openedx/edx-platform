@@ -60,7 +60,6 @@ class TextbooksTest(StudioCourseTest):
 
         self.textbook_view_page.a11y_audit.config.set_rules({
             'ignore': [
-                'color-contrast',  # AC-500
                 'skip-link',  # AC-501
                 'link-href',  # AC-502
                 'section'  # AC-503
