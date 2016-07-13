@@ -353,8 +353,9 @@ define(['backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers
             };
 
             beforeEach(function() {
-                setFixtures('<ul class="instructor-nav"><li class="nav-item"><<a href data-section=' +
-                    '"cohort_management" class="active-section">Cohort Management</a></li></ul><div></div>' +
+                setFixtures('<ul class="instructor-nav">' +
+                    '<li class="nav-item"><button type="button" data-section="cohort_management" ' +
+                    'class="active-section">Cohort Management</button></li></ul><div></div>' +
                     '<div class="cohort-management"><div class="cohort-state-message"></div></div>');
                 TemplateHelpers.installTemplate('templates/instructor/instructor_dashboard_2/cohorts');
                 TemplateHelpers.installTemplate('templates/instructor/instructor_dashboard_2/cohort-form');
@@ -608,7 +609,7 @@ define(['backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers
 
                 it('can select the Settings tab', function() {
                     createCohortsView(this, {selectCohort: 1});
-                    cohortsView.$('.tab-settings a').click();
+                    cohortsView.$('.tab-settings button').click();
                     expect(cohortsView.$('.tab-manage_students')).not.toHaveClass('is-selected');
                     expect(cohortsView.$('.tab-settings')).toHaveClass('is-selected');
                     expect(cohortsView.$('.tab-content-manage_students')).toHaveClass('is-hidden');

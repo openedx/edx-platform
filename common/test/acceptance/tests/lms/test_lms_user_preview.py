@@ -186,7 +186,6 @@ class StaffDebugTest(CourseWithoutContentGroupsTest):
         """
         staff_page = self._goto_staff_page()
         staff_page.answer_problem()
-
         staff_debug_page = staff_page.open_staff_debug_info()
         staff_debug_page.delete_state('INVALIDUSER')
         msg = staff_debug_page.idash_msg[0]
@@ -382,6 +381,24 @@ class CourseWithContentGroupsTest(StaffViewTest):
         # Masquerade as student in beta cohort:
         course_page.set_staff_view_mode_specific_student(student_b_username)
         verify_expected_problem_visibility(self, course_page, [self.beta_text, self.everyone_text])
+
+    @attr('a11y')
+    def test_course_page(self):
+        """
+        Run accessibility audit for course staff pages.
+        """
+        course_page = self._goto_staff_page()
+        course_page.a11y_audit.config.set_rules({
+            'ignore': [
+                'aria-allowed-attr',  # TODO: AC-559
+                'aria-roles',  # TODO: AC-559,
+                'aria-valid-attr',  # TODO: AC-559
+                'color-contrast',  # TODO: AC-559
+                'link-href',  # TODO: AC-559
+                'section',  # TODO: AC-559
+            ]
+        })
+        course_page.a11y_audit.check_for_accessibility_errors()
 
 
 def verify_expected_problem_visibility(test, courseware_page, expected_problems):

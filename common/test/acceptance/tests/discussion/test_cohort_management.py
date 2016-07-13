@@ -689,6 +689,13 @@ class CohortConfigurationTest(EventsTestMixin, UniqueCourseTest, CohortTestMixin
         messages = self.cohort_management_page.get_csv_messages()
         self.assertEquals(expected_message, messages[0])
 
+    @attr('a11y')
+    def test_cohorts_management_a11y(self):
+        """
+        Run accessibility audit for cohort management.
+        """
+        self.cohort_management_page.a11y_audit.check_for_accessibility_errors()
+
 
 @attr(shard=6)
 class CohortDiscussionTopicsTest(UniqueCourseTest, CohortTestMixin):
@@ -1149,7 +1156,8 @@ class CohortContentGroupAssociationTest(UniqueCourseTest, CohortTestMixin):
         self.cohort_management_page.add_cohort(new_cohort, content_group=cohort_group)
         # After adding the cohort, it should automatically be selected
         EmptyPromise(
-            lambda: new_cohort == self.cohort_management_page.get_selected_cohort(), "Waiting for new cohort to appear"
+            lambda: new_cohort == self.cohort_management_page.get_selected_cohort(),
+            "Waiting for new cohort to appear"
         ).fulfill()
         self.assertEqual(cohort_group, self.cohort_management_page.get_cohort_associated_content_group())
 

@@ -216,15 +216,15 @@
         {% trans "Back to history view" %}
       </a>
       {% if article|can_write:user %}
-        <a href="#" class="btn btn-large btn-primary switch-to-revision">
+        <button type="button" class="btn btn-large btn-primary switch-to-revision">
           <span class="icon fa fa-flag" aria-hidden="true"></span>
           {% trans "Switch to this version" %}
-        </a>
+        </button>
       {% else %}
-        <a href="#" class="btn btn-large btn-primary disabled">
+        <button type="button" class="btn btn-large btn-primary disabled">
           <span class="icon fa fa-lock" aria-hidden="true"></span>
           {% trans "Switch to this version" %}
-        </a>
+        </button>
       {% endif %}
       </div>
     </div>
@@ -251,15 +251,15 @@
           {% trans "Back to history view" %}
         </a>
         {% if article|can_write:user %}
-        <a href="#" class="btn btn-large btn-primary merge-revision-commit">
+        <button type="button" class="btn btn-large btn-primary merge-revision-commit">
           <span class="icon fa fa-file" aria-hidden="true"></span>
           {% trans "Create new merged version" %}
-        </a>
+        </button>
         {% else %}
-          <a href="#" class="btn btn-large btn-primary disabled">
+          <button type="button" class="btn btn-large btn-primary disabled">
             <span class="icon fa fa-lock" aria-hidden="true"></span>
             {% trans "Create new merged version" %}
-          </a>
+          </button>
         {% endif %}
       </div>
     </div>

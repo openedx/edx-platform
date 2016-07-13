@@ -266,10 +266,22 @@
             display: block;
             margin-bottom: ($baseline/2);
             margin-top: ($baseline/4);
-            color: $m-blue-d5;
+            border: none;
+            padding: 0;
+            background: transparent;
+            box-shadow: none;
+            text-transform: initial;
+            letter-spacing: normal;
+            color: $uxpl-blue-base;
             font-weight: $font-regular;
-            text-decoration: none !important; // needed but nasty
+            text-decoration: none;
+            text-shadow: none;
             font-family: $sans-serif;
+            
+            &:hover,
+            &:focus {
+                text-decoration: underline;
+            }
         }
 
         input,
