@@ -128,9 +128,15 @@ class LTIAuthBackend(BaseAuth):
         request = Request(
             uri=strategy.request.build_absolute_uri(), http_method=strategy.request.method, body=strategy.request.body
         )
-        lti_consumer_key = request.oauth_consumer_key
+
+        try:
+            lti_consumer_key = request.oauth_consumer_key
+        except AttributeError:
+            return None
+
         (lti_consumer_valid, lti_consumer_secret, lti_max_timestamp_age) = cls.load_lti_consumer(lti_consumer_key)
         current_time = calendar.timegm(time.gmtime())
+
         return cls._get_validated_lti_params_from_values(
             request=request, current_time=current_time,
             lti_consumer_valid=lti_consumer_valid,
@@ -148,42 +154,42 @@ class LTIAuthBackend(BaseAuth):
         # Taking a cue from oauthlib, to avoid leaking information through a timing attack,
         # we proceed through the entire validation before rejecting any request for any reason.
         # However, as noted there, the value of doing this is dubious.
+        try:
+            base_uri = normalize_base_string_uri(request.uri)
+            parameters = collect_parameters(uri_query=request.uri_query, body=request.body)
+            parameters_string = normalize_parameters(parameters)
+            base_string = construct_base_string(request.http_method, base_uri, parameters_string)
 
-        base_uri = normalize_base_string_uri(request.uri)
-        parameters = collect_parameters(uri_query=request.uri_query, body=request.body)
-        parameters_string = normalize_parameters(parameters)
-        base_string = construct_base_string(request.http_method, base_uri, parameters_string)
+            computed_signature = sign_hmac_sha1(base_string, unicode(lti_consumer_secret), '')
+            submitted_signature = request.oauth_signature
 
-        computed_signature = sign_hmac_sha1(base_string, unicode(lti_consumer_secret), '')
-        submitted_signature = request.oauth_signature
+            data = {parameter_value_pair[0]: parameter_value_pair[1] for parameter_value_pair in parameters}
 
-        data = {parameter_value_pair[0]: parameter_value_pair[1] for parameter_value_pair in parameters}
+            def safe_int(value):
+                """
+                Interprets parameter as an int or returns 0 if not possible
+                """
+                try:
+                    return int(value)
+                except (ValueError, TypeError):
+                    return 0
 
-        def safe_int(value):
-            """
-            Interprets parameter as an int or returns 0 if not possible
-            """
-            try:
-                return int(value)
-            except (ValueError, TypeError):
-                return 0
+            oauth_timestamp = safe_int(request.oauth_timestamp)
 
-        oauth_timestamp = safe_int(request.oauth_timestamp)
-
-        # As this must take constant time, do not use shortcutting operators such as 'and'.
-        # Instead, use constant time operators such as '&', which is the bitwise and.
-        valid = (lti_consumer_valid)
-        valid = valid & (submitted_signature == computed_signature)
-        valid = valid & (request.oauth_version == '1.0')
-        valid = valid & (request.oauth_signature_method == 'HMAC-SHA1')
-        valid = valid & ('user_id' in data)  # Not required by LTI but can't log in without one
-        valid = valid & (oauth_timestamp >= current_time - lti_max_timestamp_age)
-        valid = valid & (oauth_timestamp <= current_time)
-
-        if valid:
-            return data
-        else:
-            return None
+            # As this must take constant time, do not use shortcutting operators such as 'and'.
+            # Instead, use constant time operators such as '&', which is the bitwise and.
+            valid = (lti_consumer_valid)
+            valid = valid & (submitted_signature == computed_signature)
+            valid = valid & (request.oauth_version == '1.0')
+            valid = valid & (request.oauth_signature_method == 'HMAC-SHA1')
+            valid = valid & ('user_id' in data)  # Not required by LTI but can't log in without one
+            valid = valid & (oauth_timestamp >= current_time - lti_max_timestamp_age)
+            valid = valid & (oauth_timestamp <= current_time)
+            if valid:
+                return data
+        except AttributeError as error:
+            log.error("'{}' not found.".format(error.message))
+        return None
 
     @classmethod
     def load_lti_consumer(cls, lti_consumer_key):
