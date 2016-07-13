@@ -122,7 +122,10 @@ def login_and_registration_form(request, initial_mode="login"):
         'responsive': True,
         'allow_iframing': True,
         'disable_courseware_js': True,
-        'disable_footer': True,
+        'disable_footer': not get_themed_value(
+            'ENABLE_COMBINED_LOGIN_REGISTRATION_FOOTER',
+            settings.FEATURES['ENABLE_COMBINED_LOGIN_REGISTRATION_FOOTER']
+        ),
     }
 
     return render_to_response('student_account/login_and_register.html', context)
