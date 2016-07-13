@@ -38,7 +38,7 @@ from courseware.courses import get_course_by_id
 from config_models.models import ConfigurationModel
 from course_modes.models import CourseMode
 from edxmako.shortcuts import render_to_string
-from student.models import CourseEnrollment, UNENROLL_DONE
+from student.models import CourseEnrollment, UNENROLL_DONE, EnrollStatusChange
 from util.query import use_read_replica_if_available
 from xmodule_django.models import CourseKeyField
 from .exceptions import (
@@ -1587,6 +1587,10 @@ class PaidCourseRegistration(OrderItem):
         item.save()
         log.info("User {} added course registration {} to cart: order {}"
                  .format(order.user.email, course_id, order.id))
+
+        CourseEnrollment.send_signal_full(EnrollStatusChange.paid_start,
+                                          user=order.user, mode=item.mode, course_id=course_id,
+                                          cost=cost, currency=currency)
         return item
 
     def purchased_callback(self):
@@ -1607,6 +1611,8 @@ class PaidCourseRegistration(OrderItem):
 
         log.info("Enrolled {0} in paid course {1}, paid ${2}"
                  .format(self.user.email, self.course_id, self.line_cost))
+        self.course_enrollment.send_signal(EnrollStatusChange.paid_complete,
+                                           cost=self.line_cost, currency=self.currency)
 
     def generate_receipt_instructions(self):
         """
@@ -1977,6 +1983,9 @@ class CertificateItem(OrderItem):
         order.currency = currency
         order.save()
         item.save()
+
+        # signal course added to cart
+        course_enrollment.send_signal(EnrollStatusChange.paid_start, cost=cost, currency=currency)
         return item
 
     def purchased_callback(self):
@@ -1985,6 +1994,8 @@ class CertificateItem(OrderItem):
         """
         self.course_enrollment.change_mode(self.mode)
         self.course_enrollment.activate()
+        self.course_enrollment.send_signal(EnrollStatusChange.upgrade_complete,
+                                           cost=self.unit_cost, currency=self.currency)
 
     def additional_instruction_text(self):
         verification_reminder = ""

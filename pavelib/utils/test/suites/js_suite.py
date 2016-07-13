@@ -76,21 +76,22 @@ class JsTestSubSuite(TestSuite):
         """
         Run the tests using karma runner.
         """
-        cmd = (
-            "karma start {test_conf_file} --single-run={single_run} --capture-timeout=60000 "
-            "--junitreportpath={xunit_report}".format(
-                single_run='false' if self.mode == 'dev' else 'true',
-                test_conf_file=self.test_conf_file,
-                xunit_report=self.xunit_report,
-            )
-        )
+        cmd = [
+            "karma",
+            "start",
+            self.test_conf_file,
+            "--single-run={}".format('false' if self.mode == 'dev' else 'true'),
+            "--capture-timeout=60000",
+            "--junitreportpath={}".format(self.xunit_report),
+        ]
 
         if self.port:
-            cmd += " --port {port}".format(port=self.port)
+            cmd.append("--port={}".format(self.port))
 
         if self.run_under_coverage:
-            cmd += " --coverage --coveragereportpath={report_path}".format(
-                report_path=self.coverage_report
-            )
+            cmd.extend([
+                "--coverage",
+                "--coveragereportpath={}".format(self.coverage_report),
+            ])
 
         return cmd

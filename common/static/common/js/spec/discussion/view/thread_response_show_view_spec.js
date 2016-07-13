@@ -16,6 +16,7 @@
                 body: "this is a comment",
                 created_at: "2013-04-03T20:08:39Z",
                 endorsed: false,
+                endorsement: {},
                 abuse_flaggers: [],
                 votes: {
                     up_count: 42
@@ -132,7 +133,12 @@
             this.view.$(".action-answer").click();
             expect(this.view.$(".posted-details").text()).toMatch("marked as answer");
             this.view.$(".action-answer").click();
-            return expect(this.view.$(".posted-details").text()).not.toMatch("marked as answer");
+            expect(this.view.$(".posted-details").text()).not.toMatch("marked as answer");
+
+            // Previously the endorsement state would revert after a page load due to a bug in the template
+            this.view.render();
+            expect(this.view.$(".posted-details").text()).not.toMatch("marked as answer");
+
         });
         it("allows a moderator to mark an answer in a question thread", function() {
             var endorseButton;

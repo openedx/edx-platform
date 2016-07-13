@@ -13,12 +13,12 @@ def i_created_discussion_tag(step):
     )
 
 
-@step('I see three alphabetized settings and their expected values$')
+@step('I see three settings and their expected values$')
 def i_see_only_the_settings_and_values(step):
     world.verify_all_setting_entries(
         [
-            ['Category', "Week 1", False],
             ['Display Name', "Discussion", False],
+            ['Category', "Week 1", False],
             ['Subcategory', "Topic-Level Student-Visible Label", False]
         ])
 

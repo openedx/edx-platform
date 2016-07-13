@@ -1,13 +1,13 @@
 """
 User Partitions Transformer
 """
-from openedx.core.lib.block_structure.transformer import BlockStructureTransformer
+from openedx.core.lib.block_structure.transformer import BlockStructureTransformer, FilteringTransformerMixin
 
 from .split_test import SplitTestTransformer
 from .utils import get_field_on_block
 
 
-class UserPartitionTransformer(BlockStructureTransformer):
+class UserPartitionTransformer(FilteringTransformerMixin, BlockStructureTransformer):
     """
     A transformer that enforces the group access rules on course blocks,
     by honoring their user_partitions and group_access fields, and
@@ -68,25 +68,24 @@ class UserPartitionTransformer(BlockStructureTransformer):
             merged_group_access = _MergedGroupAccess(user_partitions, xblock, merged_parent_access_list)
             block_structure.set_transformer_block_field(block_key, cls, 'merged_group_access', merged_group_access)
 
-    def transform(self, usage_info, block_structure):
-        """
-        Mutates block_structure based on the given usage_info.
-        """
-        SplitTestTransformer().transform(usage_info, block_structure)
+    def transform_block_filters(self, usage_info, block_structure):
+        result_list = SplitTestTransformer().transform_block_filters(usage_info, block_structure)
 
         user_partitions = block_structure.get_transformer_data(self, 'user_partitions')
-
         if not user_partitions:
-            return
+            return [block_structure.create_universal_filter()]
 
         user_groups = _get_user_partition_groups(
             usage_info.course_key, user_partitions, usage_info.user
         )
-        block_structure.remove_block_if(
+        group_access_filter = block_structure.create_removal_filter(
             lambda block_key: not block_structure.get_transformer_block_field(
                 block_key, self, 'merged_group_access'
             ).check_group_access(user_groups)
         )
+
+        result_list.append(group_access_filter)
+        return result_list
 
 
 class _MergedGroupAccess(object):

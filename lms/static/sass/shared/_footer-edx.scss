@@ -83,6 +83,15 @@ footer#footer-edx-v3 {
       width: 100%;
     }
   }
+  
+  .social-media-links,
+  .mobile-app-links {
+      @extend %ui-no-list;
+      
+      .list-item {
+          display: inline-block;
+      }
+  }
 
   .mobile-app-links {
     @include clearfix();
@@ -126,8 +135,6 @@ footer#footer-edx-v3 {
   }
 
   .app-link {
-    position: absolute;
-    top: 0;
 
     &:first-of-type {
       @include left(0);

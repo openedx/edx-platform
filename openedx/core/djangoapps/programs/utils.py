@@ -10,11 +10,15 @@ from django.utils.text import slugify
 from opaque_keys.edx.keys import CourseKey
 import pytz
 
-from lms.djangoapps.certificates.api import get_certificates_for_user, is_passing_status
+from course_modes.models import CourseMode
+from lms.djangoapps.certificates import api as certificate_api
+from lms.djangoapps.commerce.utils import EcommerceService
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.lib.edx_api_utils import get_edx_api_data
 from student.models import CourseEnrollment
+from util.date_utils import strftime_localized
+from util.organizations_helpers import get_organization_by_short_name
 from xmodule.course_metadata_utils import DEFAULT_START_DATE
 
 
@@ -179,11 +183,11 @@ def get_completed_courses(student):
         iterable of dicts with structure {'course_id': course_key, 'mode': cert_type}
 
     """
-    all_certs = get_certificates_for_user(student.username)
+    all_certs = certificate_api.get_certificates_for_user(student.username)
     return [
         {'course_id': unicode(cert['course_key']), 'mode': cert['type']}
         for cert in all_certs
-        if is_passing_status(cert['status'])
+        if certificate_api.is_passing_status(cert['status'])
     ]
 
 
@@ -320,6 +324,7 @@ class ProgramProgressMeter(object):
         return parsed
 
 
+# TODO: This function will benefit from being refactored as a class.
 def supplement_program_data(program_data, user):
     """Supplement program course codes with CourseOverview and CourseEnrollment data.
 
@@ -327,28 +332,70 @@ def supplement_program_data(program_data, user):
         program_data (dict): Representation of a program.
         user (User): The user whose enrollments to inspect.
     """
+    for organization in program_data['organizations']:
+        # TODO: Cache the results of the get_organization_by_short_name call so
+        # the database is hit less frequently.
+        org_obj = get_organization_by_short_name(organization['key'])
+        if org_obj and org_obj.get('logo'):
+            organization['img'] = org_obj['logo'].url
+
     for course_code in program_data['course_codes']:
         for run_mode in course_code['run_modes']:
             course_key = CourseKey.from_string(run_mode['course_key'])
             course_overview = CourseOverview.get_from_id(course_key)
 
-            run_mode['course_url'] = reverse('course_root', args=[course_key])
-            run_mode['course_image_url'] = course_overview.course_image_url
+            course_url = reverse('course_root', args=[course_key])
+            course_image_url = course_overview.course_image_url
 
-            human_friendly_format = '%x'
-            start_date = course_overview.start or DEFAULT_START_DATE
+            start_date_string = course_overview.start_datetime_text()
+            end_date_string = course_overview.end_datetime_text()
+
             end_date = course_overview.end or datetime.datetime.max.replace(tzinfo=pytz.UTC)
-            run_mode['start_date'] = start_date.strftime(human_friendly_format)
-            run_mode['end_date'] = end_date.strftime(human_friendly_format)
+            is_course_ended = end_date < timezone.now()
 
-            run_mode['is_enrolled'] = CourseEnrollment.is_enrolled(user, course_key)
+            is_enrolled = CourseEnrollment.is_enrolled(user, course_key)
 
             enrollment_start = course_overview.enrollment_start or datetime.datetime.min.replace(tzinfo=pytz.UTC)
             enrollment_end = course_overview.enrollment_end or datetime.datetime.max.replace(tzinfo=pytz.UTC)
             is_enrollment_open = enrollment_start <= timezone.now() < enrollment_end
-            run_mode['is_enrollment_open'] = is_enrollment_open
 
-            # TODO: Currently unavailable on LMS.
-            run_mode['marketing_url'] = ''
+            enrollment_open_date = None if is_enrollment_open else strftime_localized(enrollment_start, 'SHORT_DATE')
+
+            certificate_data = certificate_api.certificate_downloadable_status(user, course_key)
+            certificate_uuid = certificate_data.get('uuid')
+            certificate_url = certificate_api.get_certificate_url(
+                course_id=course_key,
+                uuid=certificate_uuid,
+            ) if certificate_uuid else None
+
+            required_mode_slug = run_mode['mode_slug']
+            enrolled_mode_slug, _ = CourseEnrollment.enrollment_mode_for_user(user, course_key)
+            is_mode_mismatch = required_mode_slug != enrolled_mode_slug
+            is_upgrade_required = is_enrolled and is_mode_mismatch
+
+            # Requires that the ecommerce service be in use.
+            required_mode = CourseMode.mode_for_course(course_key, required_mode_slug)
+            ecommerce = EcommerceService()
+            sku = getattr(required_mode, 'sku', None)
+
+            if ecommerce.is_enabled(user) and sku:
+                upgrade_url = ecommerce.checkout_page_url(required_mode.sku) if is_upgrade_required else None
+            else:
+                upgrade_url = None
+
+            run_mode.update({
+                'certificate_url': certificate_url,
+                'course_image_url': course_image_url,
+                'course_url': course_url,
+                'end_date': end_date_string,
+                'enrollment_open_date': enrollment_open_date,
+                'is_course_ended': is_course_ended,
+                'is_enrolled': is_enrolled,
+                'is_enrollment_open': is_enrollment_open,
+                # TODO: Not currently available on LMS.
+                'marketing_url': None,
+                'start_date': start_date_string,
+                'upgrade_url': upgrade_url,
+            })
 
     return program_data

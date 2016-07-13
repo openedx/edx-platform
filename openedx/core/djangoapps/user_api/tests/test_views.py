@@ -1472,7 +1472,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
         self.assertEqual(sent_email.to, [self.EMAIL])
         self.assertEqual(sent_email.subject, "Activate Your edX Account")
         self.assertIn(
-            u"activating your {platform} account".format(platform=settings.PLATFORM_NAME),
+            u"you need to activate your {platform} account".format(platform=settings.PLATFORM_NAME),
             sent_email.body
         )
 

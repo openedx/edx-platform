@@ -49,7 +49,7 @@ class PipelineRenderTest(TestCase):
         Create static assets once for all pipeline render tests.
         """
         super(PipelineRenderTest, cls).setUpClass()
-        call_task('pavelib.assets.update_assets', args=('lms', '--settings=test'))
+        call_task('pavelib.assets.update_assets', args=('lms', '--settings=test', '--themes=no'))
 
     @skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in LMS')
     @ddt.data(

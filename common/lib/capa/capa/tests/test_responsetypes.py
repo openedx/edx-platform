@@ -946,12 +946,12 @@ class StringResponseTest(ResponseTest):  # pylint: disable=missing-docstring
         hint = correct_map.get_hint('1_2_1')
         self.assertEqual(hint, self._get_random_number_result(problem.seed))
 
-    def test_empty_answer_graded_as_incorrect(self):
+    def test_empty_answer_problem_creation_not_allowed(self):
         """
-        Tests that problem should be graded incorrect if blank space is chosen as answer
+        Tests that empty answer string is not allowed to create a problem
         """
-        problem = self.build_problem(answer=" ", case_sensitive=False, regexp=True)
-        self.assert_grade(problem, u" ", "incorrect")
+        with self.assertRaises(LoncapaProblemError):
+            self.build_problem(answer=" ", case_sensitive=False, regexp=True)
 
 
 class CodeResponseTest(ResponseTest):  # pylint: disable=missing-docstring

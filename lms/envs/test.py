@@ -67,7 +67,7 @@ FEATURES['ENABLE_SHOPPING_CART'] = True
 FEATURES['ENABLE_VERIFIED_CERTIFICATES'] = True
 
 # Enable this feature for course staff grade downloads, to enable acceptance tests
-FEATURES['ENABLE_S3_GRADE_DOWNLOADS'] = True
+FEATURES['ENABLE_GRADE_DOWNLOADS'] = True
 FEATURES['ALLOW_COURSE_STAFF_GRADE_DOWNLOADS'] = True
 
 GRADES_DOWNLOAD['ROOT_PATH'] += "-{}".format(os.getpid())
@@ -494,6 +494,8 @@ MICROSITE_CONFIGURATION = {
 MICROSITE_TEST_HOSTNAME = 'testmicrosite.testserver'
 MICROSITE_LOGISTRATION_HOSTNAME = 'logistration.testserver'
 
+TEST_THEME = COMMON_ROOT / "test" / "test-theme"
+
 # add extra template directory for test-only templates
 MAKO_TEMPLATES['main'].extend([
     COMMON_ROOT / 'test' / 'templates',
@@ -582,3 +584,5 @@ JWT_AUTH.update({
 OAUTH2_PROVIDER_APPLICATION_MODEL = 'oauth2_provider.Application'
 
 COURSE_CATALOG_API_URL = 'https://catalog.example.com/api/v1'
+
+COMPREHENSIVE_THEME_DIRS = [REPO_ROOT / "themes", REPO_ROOT / "common/test"]

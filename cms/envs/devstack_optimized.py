@@ -41,6 +41,6 @@ STATIC_URL = "/static/"
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
 )
-STATICFILES_DIRS = (
+STATICFILES_DIRS = [
     (TEST_ROOT / "staticfiles" / "cms").abspath(),
-)
+]

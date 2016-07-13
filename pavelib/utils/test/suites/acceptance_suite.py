@@ -34,21 +34,19 @@ class AcceptanceTest(TestSuite):
     def cmd(self):
 
         report_file = self.report_dir / "{}.xml".format(self.system)
-        report_args = "--with-xunit --xunit-file {}".format(report_file)
-
-        cmd = (
-            "DEFAULT_STORE={default_store} ./manage.py {system} --settings acceptance harvest --traceback "
-            "--debug-mode --verbosity {verbosity} {pdb}{report_args} {extra_args}".format(
-                default_store=self.default_store,
-                system=self.system,
-                verbosity=self.verbosity,
-                pdb="--pdb " if self.pdb else "",
-                report_args=report_args,
-                extra_args=self.extra_args,
-            )
-        )
-
-        return cmd
+        report_args = ["--xunit-file {}".format(report_file)]
+        return [
+            "DEFAULT_STORE={}".format(self.default_store),
+            "./manage.py",
+            self.system,
+            "--settings=acceptance",
+            "harvest",
+            "--traceback",
+            "--debug-mode",
+            "--verbosity={}".format(self.verbosity),
+        ] + report_args + [
+            self.extra_args
+        ] + self.passthrough_options
 
     def _update_assets(self):
         """

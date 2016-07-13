@@ -39,7 +39,7 @@ from commerce.models import CommerceConfiguration
 from commerce.tests import TEST_PAYMENT_DATA, TEST_API_URL, TEST_API_SIGNING_KEY, TEST_PUBLIC_URL_ROOT
 from embargo.test_utils import restrict_course
 from openedx.core.djangoapps.user_api.accounts.api import get_account_settings
-from openedx.core.djangoapps.theming.tests.test_util import with_is_edx_domain
+from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme
 from shoppingcart.models import Order, CertificateItem
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from student.models import CourseEnrollment
@@ -321,7 +321,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
         )
         self._assert_redirects_to_dashboard(response)
 
-    @with_is_edx_domain(True)
+    @with_comprehensive_theme("edx.org")
     @ddt.data("verify_student_start_flow", "verify_student_begin_flow")
     def test_pay_and_verify_hides_header_nav(self, payment_flow):
         course = self._create_course("verified")

@@ -134,6 +134,10 @@ a, a:visited {
   width: flex-grid(12);
 }
 
+.no-min-scale {
+  min-width: 0px !important;
+}
+
 span.edx {
   text-transform: none;
   font: inherit;

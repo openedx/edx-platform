@@ -1340,7 +1340,7 @@ class ProgressPageTests(ModuleStoreTestCase):
         self.assertContains(resp, u"Download Your Certificate")
 
     @ddt.data(
-        *itertools.product(((46, 4, True), (46, 4, False)), (True, False))
+        *itertools.product(((47, 4, True), (47, 4, False)), (True, False))
     )
     @ddt.unpack
     def test_query_counts(self, (sql_calls, mongo_calls, self_paced), self_paced_enabled):
@@ -1445,6 +1445,22 @@ class ProgressPageTests(ModuleStoreTestCase):
         )
         self.assertContains(resp, u'Download Your Certificate')
         self.assert_invalidate_certificate(generated_certificate)
+
+    def test_message_for_audit_mode(self):
+        """ Verify that message appears on progress page, if learner is enrolled
+         in audit mode.
+        """
+        user = UserFactory.create()
+        self.assertTrue(self.client.login(username=user.username, password='test'))
+        CourseEnrollmentFactory(user=user, course_id=self.course.id, mode=CourseMode.AUDIT)
+        response = self.client.get(
+            reverse('progress', args=[unicode(self.course.id)])
+        )
+
+        self.assertContains(
+            response,
+            u'You are enrolled in the audit track for this course. The audit track does not include a certificate.'
+        )
 
     def assert_invalidate_certificate(self, certificate):
         """ Dry method to mark certificate as invalid. And assert the response. """

@@ -269,10 +269,8 @@ def forum_form_discussion(request, course_key):
             'threads': json.dumps(threads),
             'thread_pages': query_params['num_pages'],
             'user_info': json.dumps(user_info, default=lambda x: None),
-            'can_create_comment': json.dumps(
-                has_permission(request.user, "create_comment", course.id)),
-            'can_create_subcomment': json.dumps(
-                has_permission(request.user, "create_sub_comment", course.id)),
+            'can_create_comment': has_permission(request.user, "create_comment", course.id),
+            'can_create_subcomment': has_permission(request.user, "create_sub_comment", course.id),
             'can_create_thread': has_permission(request.user, "create_thread", course.id),
             'flag_moderator': bool(
                 has_permission(request.user, 'openclose_thread', course.id) or
@@ -381,10 +379,8 @@ def single_thread(request, course_key, discussion_id, thread_id):
             'csrf': csrf(request)['csrf_token'],
             'init': '',   # TODO: What is this?
             'user_info': json.dumps(user_info),
-            'can_create_comment': json.dumps(
-                has_permission(request.user, "create_comment", course.id)),
-            'can_create_subcomment': json.dumps(
-                has_permission(request.user, "create_sub_comment", course.id)),
+            'can_create_comment': has_permission(request.user, "create_comment", course.id),
+            'can_create_subcomment': has_permission(request.user, "create_sub_comment", course.id),
             'can_create_thread': has_permission(request.user, "create_thread", course.id),
             'annotated_content_info': json.dumps(annotated_content_info),
             'course': course,

@@ -6,12 +6,16 @@ from openedx.core.djangolib.markup import HTML, Text
 <div class="wrapper-msg urgency-high">
     <div class="msg">
         <div class="msg-content">
-            <h2 class="title">${_("Thanks for Registering!")}</h2>
+            <h2 class="title">${_("You're almost there!")}</h2>
             <div class="copy">
                 <p class='activation-message'>${Text(_(
-                        "You've successfully created an account on {platform_name}. We've sent an account "
-                        "activation message to {email_start}{email}{email_end}. To activate your account and start enrolling in "
-                        "courses, click the link in the message."
+                        "There's just one more step: Before you "
+                        "enroll in a course, you need to activate "
+                        "your account. We've sent an email message to "
+                        "{email_start}{email}{email_end} with "
+                        "instructions for activating your account. If "
+                        "you don't receive this message, check your "
+                        "spam folder."
                         )).format(email_start=HTML("<strong>"),
                                   email_end=HTML("</strong>"),
                                   email=email,

@@ -4,7 +4,8 @@ Fixture to configure XQueue response.
 
 import requests
 import json
-from . import XQUEUE_STUB_URL
+
+from common.test.acceptance.fixtures import XQUEUE_STUB_URL
 
 
 class XQueueResponseFixtureError(Exception):

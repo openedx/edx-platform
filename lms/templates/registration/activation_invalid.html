@@ -13,16 +13,15 @@ from openedx.core.djangolib.markup import HTML, Text
     <h1 class="invalid">${_("Activation Invalid")}</h1>
     <hr class="horizontal-divider">
 
-    <p>${Text(_('Something went wrong. Check to make sure the URL you went to was '
-                'correct -- e-mail programs will sometimes split it into two '
-                'lines. If you still have issues, e-mail us to let us know what happened '
-                'at {email_start}{email}{email_end}.')).format(
+    <p>${Text(_("Something went wrong. Email programs sometimes split URLs "
+                "into two lines, so make sure the URL you're using is " "formatted correctly. If you still have issues, send us "
+                "an email message at " "{email_start}{email}{email_end}.")).format(
 		    email_start=HTML('<a href="mailto:{}">').format(settings.BUGS_EMAIL),
 		    email=settings.BUGS_EMAIL,
 		    email_end=HTML('</a>')
 		)}</p>
 
-    <p>${Text(_('Or you can go back to the {link_start}home page{link_end}.')).format(
+    <p>${Text(_('Return to the {link_start}home page{link_end}.')).format(
            link_start=HTML('<a href="/">'), link_end=HTML('</a>'))}</p>
   </section>
 </section>

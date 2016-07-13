@@ -187,6 +187,12 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
     Tests for Custom Courses views.
     """
 
+    @classmethod
+    def setUpClass(cls):
+        super(TestCoachDashboard, cls).setUpClass()
+        cls.course_disable_ccx = CourseFactory.create(enable_ccx=False)
+        cls.course_with_ccx_connect_set = CourseFactory.create(enable_ccx=True, ccx_connector="http://ccx.com")
+
     def setUp(self):
         """
         Set up tests
@@ -239,16 +245,12 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
         """
         Assert that coach cannot create ccx when ``ccx_connector`` url is set.
         """
-        course = CourseFactory.create()
-        course.ccx_connector = "http://ccx.com"
-        course.save()
-        self.store.update_item(course, 0)
-        role = CourseCcxCoachRole(course.id)
+        role = CourseCcxCoachRole(self.course_with_ccx_connect_set.id)
         role.add_users(self.coach)
 
         url = reverse(
             'create_ccx',
-            kwargs={'course_id': unicode(course.id)})
+            kwargs={'course_id': unicode(self.course_with_ccx_connect_set.id)})
 
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
@@ -310,6 +312,28 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
     @ddt.data("CCX demo 1", "CCX demo 2", "CCX demo 3")
     def test_create_multiple_ccx(self, ccx_name):
         self.test_create_ccx(ccx_name)
+
+    def test_dashboard_access_of_disabled_ccx(self):
+        """
+        User should not see coach dashboard if ccx is disbale in studio.
+        """
+        ccx = CcxFactory(course_id=self.course_disable_ccx.id, coach=self.coach)
+        url = reverse(
+            'ccx_coach_dashboard',
+            kwargs={'course_id': CCXLocator.from_course_locator(self.course_disable_ccx.id, ccx.id)})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 404)
+
+    def test_dashboard_access_with_invalid_ccx_id(self):
+        """
+        User should not see coach dashboard if ccx id is invalid.
+        """
+        self.make_ccx()
+        url = reverse(
+            'ccx_coach_dashboard',
+            kwargs={'course_id': CCXLocator.from_course_locator(self.course_disable_ccx.id, 700)})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 404)
 
     def test_get_date(self):
         """
@@ -789,7 +813,7 @@ class TestCoachDashboardSchedule(CcxTestCase, LoginEnrollmentTestCase, ModuleSto
 
     def setUp(self):
         super(TestCoachDashboardSchedule, self).setUp()
-        self.course = course = CourseFactory.create()
+        self.course = course = CourseFactory.create(enable_ccx=True)
 
         # Create a course outline
         self.mooc_start = start = datetime.datetime(

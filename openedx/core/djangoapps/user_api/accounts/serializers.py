@@ -85,7 +85,6 @@ class UserReadOnlySerializer(serializers.Serializer):
                 user,
                 self.context.get('request')
             ),
-            "time_zone": None,
             "language_proficiencies": LanguageProficiencySerializer(
                 profile.language_proficiencies.all(),
                 many=True

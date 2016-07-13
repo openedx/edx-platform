@@ -1,8 +1,9 @@
 ;(function (define, undefined) {
     'use strict';
     define([
-        'gettext', 'jquery', 'underscore', 'backbone', 'js/views/fields', 'js/views/image_field', 'backbone-super'
-    ], function (gettext, $, _, Backbone, FieldViews, ImageFieldView) {
+        'gettext', 'jquery', 'underscore', 'backbone', 'edx-ui-toolkit/js/utils/string-utils',
+        'edx-ui-toolkit/js/utils/html-utils', 'js/views/fields', 'js/views/image_field', 'backbone-super'
+    ], function (gettext, $, _, Backbone, StringUtils, HtmlUtils, FieldViews, ImageFieldView) {
 
         var LearnerProfileFieldViews = {};
 
@@ -16,22 +17,31 @@
             },
 
             showNotificationMessage: function () {
-                var accountSettingsLink = '<a href="' + this.options.accountSettingsPageUrl + '">' + gettext('Account Settings page.') + '</a>';
+                var accountSettingsLink = HtmlUtils.joinHtml(
+                    HtmlUtils.interpolateHtml(
+                        HtmlUtils.HTML('<a href="{settings_url}">'), {settings_url: this.options.accountSettingsPageUrl}
+                    ),
+                    gettext('Account Settings page.'),
+                    HtmlUtils.HTML('</a>')
+                );
                 if (this.profileIsPrivate) {
-                    this._super(interpolate_text(
-                        gettext("You must specify your birth year before you can share your full profile. To specify your birth year, go to the {account_settings_page_link}"),
-                        {'account_settings_page_link': accountSettingsLink}
-                    ));
+                    this._super(
+                        HtmlUtils.interpolateHtml(
+                            gettext("You must specify your birth year before you can share your full profile. To specify your birth year, go to the {account_settings_page_link}"), // jshint ignore:line
+                            {'account_settings_page_link':accountSettingsLink}
+                        )
+                    );
                 } else if (this.requiresParentalConsent) {
-                    this._super(interpolate_text(
-                        gettext('You must be over 13 to share a full profile. If you are over 13, make sure that you have specified a birth year on the {account_settings_page_link}'),
-                        {'account_settings_page_link': accountSettingsLink}
-                    ));
+                    this._super(
+                        HtmlUtils.interpolateHtml(
+                            gettext('You must be over 13 to share a full profile. If you are over 13, make sure that you have specified a birth year on the {account_settings_page_link}'), // jshint ignore:line
+                            {'account_settings_page_link': accountSettingsLink}
+                        )
+                    );
                 }
                 else {
                     this._super('');
-                }
-                return this._super();
+                } 
             },
 
             updateFieldValue: function() {

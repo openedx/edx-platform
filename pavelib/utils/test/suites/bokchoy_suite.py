@@ -118,33 +118,34 @@ class BokChoyTestSuite(TestSuite):
             sh("./manage.py lms --settings bok_choy flush --traceback --noinput")
             bokchoy_utils.clear_mongo()
 
-    def verbosity_processes_string(self):
+    @property
+    def verbosity_processes_command(self):
         """
         Multiprocessing, xunit, color, and verbosity do not work well together. We need to construct
         the proper combination for use with nosetests.
         """
-        substring = []
+        command = []
 
         if self.verbosity != DEFAULT_VERBOSITY and self.num_processes != DEFAULT_NUM_PROCESSES:
             msg = 'Cannot pass in both num_processors and verbosity. Quitting'
             raise BuildFailure(msg)
 
         if self.num_processes != 1:
-            # Construct "multiprocess" nosetest substring
-            substring = [
-                "--with-xunitmp --xunitmp-file={}".format(self.xunit_report),
+            # Construct "multiprocess" nosetest command
+            command = [
+                "--xunitmp-file={}".format(self.xunit_report),
                 "--processes={}".format(self.num_processes),
-                "--no-color --process-timeout=1200"
+                "--no-color",
+                "--process-timeout=1200",
             ]
 
         else:
-            substring = [
-                "--with-xunit",
+            command = [
                 "--xunit-file={}".format(self.xunit_report),
                 "--verbosity={}".format(self.verbosity),
             ]
 
-        return " ".join(substring)
+        return command
 
     def prepare_bokchoy_run(self):
         """
@@ -224,7 +225,7 @@ class BokChoyTestSuite(TestSuite):
     def cmd(self):
         """
         This method composes the nosetests command to send to the terminal. If nosetests aren't being run,
-         the command returns an empty string.
+         the command returns None.
         """
         # Default to running all tests if no specific test is specified
         if not self.test_spec:
@@ -235,7 +236,7 @@ class BokChoyTestSuite(TestSuite):
         # Skip any additional commands (such as nosetests) if running in
         # servers only mode
         if self.serversonly:
-            return ""
+            return None
 
         # Construct the nosetests command, specifying where to save
         # screenshots and XUnit XML reports
@@ -248,15 +249,13 @@ class BokChoyTestSuite(TestSuite):
             "VERIFY_XSS='{}'".format(self.verify_xss),
             "nosetests",
             test_spec,
-            "{}".format(self.verbosity_processes_string())
-        ]
-        if self.pdb:
-            cmd.append("--pdb")
+        ] + self.verbosity_processes_command
         if self.save_screenshots:
             cmd.append("--with-save-baseline")
-        cmd.append(self.extra_args)
+        if self.extra_args:
+            cmd.append(self.extra_args)
+        cmd.extend(self.passthrough_options)
 
-        cmd = (" ").join(cmd)
         return cmd
 
 
@@ -352,19 +351,14 @@ class Pa11yCrawler(BokChoyTestSuite):
         """
         Runs pa11ycrawler as staff user against the test course.
         """
-        cmd_str = (
-            'pa11ycrawler run {start_urls} '
-            '--pa11ycrawler-allowed-domains={allowed_domains} '
-            '--pa11ycrawler-reports-dir={report_dir} '
-            '--pa11ycrawler-deny-url-matcher={dont_go_here} '
-            '--pa11y-reporter="{reporter}" '
-            '--depth-limit={depth} '
-        ).format(
-            start_urls=' '.join(self.start_urls),
-            allowed_domains='localhost',
-            report_dir=self.pa11y_report_dir,
-            reporter="1.0-json",
-            dont_go_here="logout",
-            depth="6",
-        )
-        return cmd_str
+        cmd = [
+            'pa11ycrawler',
+            'run',
+        ] + self.start_urls + [
+            '--pa11ycrawler-allowed-domains=localhost',
+            '--pa11ycrawler-reports-dir={}'.format(self.pa11y_report_dir),
+            '--pa11ycrawler-deny-url-matcher=logout',
+            '--pa11y-reporter="1.0-json"',
+            '--depth-limit=6',
+        ]
+        return cmd

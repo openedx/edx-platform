@@ -1,13 +1,13 @@
 {
     "rules": {
-        "javascript-concat-html": 205,
+        "javascript-concat-html": 213,
         "javascript-escape": 7,
         "javascript-interpolate": 49,
         "javascript-jquery-append": 104,
         "javascript-jquery-html": 277,
         "javascript-jquery-insert-into-target": 28,
-        "javascript-jquery-insertion": 26,
-        "javascript-jquery-prepend": 11,
+        "javascript-jquery-insertion": 29,
+        "javascript-jquery-prepend": 13,
         "mako-html-entities": 0,
         "mako-invalid-html-filter": 27,
         "mako-invalid-js-filter": 207,

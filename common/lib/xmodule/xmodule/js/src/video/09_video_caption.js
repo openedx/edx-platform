@@ -6,10 +6,7 @@
         'video/00_sjson.js',
         'video/00_async_process.js',
         'edx-ui-toolkit/js/utils/html-utils',
-        'draggabilly',
-        'modernizr',
-        'afontgarde',
-        'edxicons'
+        'draggabilly'
     ], function (Sjson, AsyncProcess, HtmlUtils, Draggabilly) {
 
         /**
@@ -83,29 +80,20 @@
 
                 var langHtml = HtmlUtils.interpolateHtml(
                     HtmlUtils.HTML(
-                        [                    
+                        [
                             '<div class="grouped-controls">',
                                 '<button class="control toggle-captions" aria-disabled="false">',
-                                    '<span class="icon-fallback-img">',
-                                        '<span class="icon fa fa-cc" aria-hidden="true"></span>',
-                                        '<span class="sr control-text"></span>',
-                                    '</span>',
+                                    '<span class="icon fa fa-cc" aria-hidden="true"></span>',
                                 '</button>',
                                 '<button class="control toggle-transcript" aria-disabled="false">',
-                                    '<span class="icon-fallback-img">',
-                                        '<span class="icon fa fa-quote-left" aria-hidden="true"></span>',
-                                        '<span class="sr control-text"></span>',
-                                    '</span>',
+                                    '<span class="icon fa fa-quote-left" aria-hidden="true"></span>',
                                 '</button>',
                                 '<div class="lang menu-container" role="application">',
                                     '<p class="sr instructions" id="lang-instructions"></p>',
                                     '<button class="control language-menu" aria-disabled="false"',
                                         'aria-describedby="lang-instructions" ',
                                         'title="{langTitle}">',
-                                        '<span class="icon-fallback-img">',
-                                            '<span class="icon fa fa-caret-left" aria-hidden="true"></span>',
-                                            '<span class="sr control-text"></span>',
-                                        '</span>',
+                                        '<span class="icon fa fa-caret-left" aria-hidden="true"></span>',
                                     '</button>',
                                 '</div>',
                             '</div>'
@@ -759,7 +747,7 @@
                             'tabindex': 0
                         });
 
-                        $(liEl).html(text);
+                        HtmlUtils.setHtml($(liEl), HtmlUtils.HTML(text.toString()));
 
                         return liEl[0];
                     };
@@ -822,8 +810,6 @@
                     self.container.find('.menu-container .instructions')
                         .text(gettext('Press the UP arrow key to enter the language menu then use UP and DOWN arrow keys to navigate language options. Press ENTER to change to the selected language.')); // jshint ignore:line
 
-                    self.container.find('.menu-container .control .control-text')
-                        .text(gettext('Open language menu.'));
                 };
 
                 this.rendered = false;
@@ -1199,9 +1185,7 @@
 
                 this.captionControlEl
                     .addClass('is-active')
-                    .attr('title', gettext('Hide closed captions'))
-                    .find('.control-text')
-                        .text(gettext('Hide closed captions'));
+                    .attr('title', gettext('Hide closed captions'));
 
                 if (this.subtitlesEl.find('.current').text()) {
                     this.captionDisplayEl
@@ -1223,9 +1207,7 @@
 
                 this.captionControlEl
                     .removeClass('is-active')
-                    .attr('title', gettext('Turn on closed captioning'))
-                    .find('.control-text')
-                        .text(gettext('Turn on closed captioning'));
+                    .attr('title', gettext('Turn on closed captioning'));
 
                 this.state.el.trigger('captions:hide');
             },
@@ -1280,9 +1262,7 @@
 
                     transcriptControlEl
                         .removeClass('is-active')
-                        .attr('title', gettext(text))
-                        .find('.control-text')
-                            .text(gettext(text));
+                        .attr('title', gettext(text));
                 } else {
                     state.captionsHidden = false;
                     state.el.removeClass('closed');
@@ -1294,9 +1274,7 @@
 
                     transcriptControlEl
                         .addClass('is-active')
-                        .attr('title', gettext(text))
-                        .find('.control-text')
-                            .text(gettext(text));
+                        .attr('title', gettext(text));
                 }
 
                 if (state.resizer) {

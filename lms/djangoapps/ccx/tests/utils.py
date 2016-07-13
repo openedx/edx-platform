@@ -39,7 +39,7 @@ class CcxTestCase(SharedModuleStoreTestCase):
     @classmethod
     def setUpClass(cls):
         super(CcxTestCase, cls).setUpClass()
-        cls.course = course = CourseFactory.create()
+        cls.course = course = CourseFactory.create(enable_ccx=True)
 
         # Create a course outline
         cls.mooc_start = start = datetime.datetime(

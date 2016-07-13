@@ -30,6 +30,9 @@ define(['backbone',
                     'options': Helpers.FIELD_OPTIONS
                 }, 'preferred_language': {
                     'options': Helpers.FIELD_OPTIONS
+                }, 'time_zone': {
+                    'options': Helpers.FIELD_OPTIONS,
+                    'enabled': false
                 }
             };
 
@@ -148,7 +151,7 @@ define(['backbone',
 
                 var sectionsData = accountSettingsView.options.tabSections.aboutTabSections;
 
-                expect(sectionsData[0].fields.length).toBe(6);
+                expect(sectionsData[0].fields.length).toBe(7);
 
                 var textFields = [sectionsData[0].fields[1], sectionsData[0].fields[2]];
                 for (i = 0; i < textFields.length ; i++) {

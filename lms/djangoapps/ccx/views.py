@@ -14,6 +14,7 @@ from cStringIO import StringIO
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.http import (
+    Http404,
     HttpResponse,
     HttpResponseForbidden,
 )
@@ -84,14 +85,20 @@ def coach_dashboard(view):
         ccx = None
         if isinstance(course_key, CCXLocator):
             ccx_id = course_key.ccx
-            ccx = CustomCourseForEdX.objects.get(pk=ccx_id)
-            course_key = ccx.course_id
+            try:
+                ccx = CustomCourseForEdX.objects.get(pk=ccx_id)
+            except CustomCourseForEdX.DoesNotExist:
+                raise Http404
 
+        if ccx:
+            course_key = ccx.course_id
         course = get_course_by_id(course_key, depth=None)
         is_staff = has_access(request.user, 'staff', course)
         is_instructor = has_access(request.user, 'instructor', course)
 
-        if is_staff or is_instructor:
+        if not course.enable_ccx:
+            raise Http404
+        elif is_staff or is_instructor:
             # if user is staff or instructor then he can view ccx coach dashboard.
             return view(request, course, ccx)
         else:

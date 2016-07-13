@@ -61,9 +61,31 @@ from util.milestones_helpers import is_entrance_exams_enabled
 
 
 UNENROLL_DONE = Signal(providing_args=["course_enrollment", "skip_refund"])
+ENROLL_STATUS_CHANGE = Signal(providing_args=["event", "user", "course_id", "mode", "cost", "currency"])
 log = logging.getLogger(__name__)
 AUDIT_LOG = logging.getLogger("audit")
 SessionStore = import_module(settings.SESSION_ENGINE).SessionStore  # pylint: disable=invalid-name
+
+# enroll status changed events - signaled to email_marketing.  See email_marketing.tasks for more info
+
+
+# ENROLL signal used for free enrollment only
+class EnrollStatusChange(object):
+    """
+    Possible event types for ENROLL_STATUS_CHANGE signal
+    """
+    # enroll for a course
+    enroll = 'enroll'
+    # unenroll for a course
+    unenroll = 'unenroll'
+    # add an upgrade to cart
+    upgrade_start = 'upgrade_start'
+    # complete an upgrade purchase
+    upgrade_complete = 'upgrade_complete'
+    # add a paid course to the cart
+    paid_start = 'paid_start'
+    # complete a paid course purchase
+    paid_complete = 'paid_complete'
 
 UNENROLLED_TO_ALLOWEDTOENROLL = 'from unenrolled to allowed to enroll'
 ALLOWEDTOENROLL_TO_ENROLLED = 'from allowed to enroll to enrolled'
@@ -1030,32 +1052,14 @@ class CourseEnrollment(models.Model):
         if user.id is None:
             user.save()
 
-        try:
-            enrollment, created = cls.objects.get_or_create(
-                user=user,
-                course_id=course_key,
-            )
-
-            # If we *did* just create a new enrollment, set some defaults
-            if created:
-                enrollment.mode = CourseMode.DEFAULT_MODE_SLUG
-                enrollment.is_active = False
-                enrollment.save()
-
-        except IntegrityError:
-            log.info(
-                (
-                    "An integrity error occurred while getting-or-creating the enrollment"
-                    "for course key %s and student %s. This can occur if two processes try to get-or-create "
-                    "the enrollment at the same time and the database is set to REPEATABLE READ. We will try "
-                    "committing the transaction and retrying."
-                ),
-                course_key, user
-            )
-            enrollment = cls.objects.get(
-                user=user,
-                course_id=course_key,
-            )
+        enrollment, __ = cls.objects.get_or_create(
+            user=user,
+            course_id=course_key,
+            defaults={
+                'mode': CourseMode.DEFAULT_MODE_SLUG,
+                'is_active': False
+            }
+        )
 
         return enrollment
 
@@ -1131,6 +1135,7 @@ class CourseEnrollment(models.Model):
                 UNENROLL_DONE.send(sender=None, course_enrollment=self, skip_refund=skip_refund)
 
                 self.emit_event(EVENT_NAME_ENROLLMENT_DEACTIVATED)
+                self.send_signal(EnrollStatusChange.unenroll)
 
                 dog_stats_api.increment(
                     "common.student.unenrollment",
@@ -1142,6 +1147,24 @@ class CourseEnrollment(models.Model):
             # Only emit mode change events when the user's enrollment
             # mode has changed from its previous setting
             self.emit_event(EVENT_NAME_ENROLLMENT_MODE_CHANGED)
+
+    def send_signal(self, event, cost=None, currency=None):
+        """
+        Sends a signal announcing changes in course enrollment status.
+        """
+        ENROLL_STATUS_CHANGE.send(sender=None, event=event, user=self.user,
+                                  mode=self.mode, course_id=self.course_id,
+                                  cost=cost, currency=currency)
+
+    @classmethod
+    def send_signal_full(cls, event, user=user, mode=mode, course_id=course_id, cost=None, currency=None):
+        """
+        Sends a signal announcing changes in course enrollment status.
+        This version should be used if you don't already have a CourseEnrollment object
+        """
+        ENROLL_STATUS_CHANGE.send(sender=None, event=event, user=user,
+                                  mode=mode, course_id=course_id,
+                                  cost=cost, currency=currency)
 
     def emit_event(self, event_name):
         """
