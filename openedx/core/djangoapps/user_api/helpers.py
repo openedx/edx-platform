@@ -9,9 +9,10 @@ import json
 
 from django import forms
 from django.core.serializers.json import DjangoJSONEncoder
-from django.http import HttpResponseBadRequest
 from django.utils.encoding import force_text
 from django.utils.functional import Promise
+from django.http import HttpResponseBadRequest
+
 
 LOGGER = logging.getLogger(__name__)
 
@@ -58,8 +59,8 @@ def intercept_errors(api_error, ignore_errors=None):
                             u"{exception}"
                         ).format(
                             func_name=func.func_name,
-                            args=args,
-                            kwargs=kwargs,
+                            args=force_text(args),
+                            kwargs=force_text(kwargs),
                             exception=ex.developer_message if hasattr(ex, 'developer_message') else repr(ex)
                         )
                         LOGGER.warning(msg)
@@ -72,8 +73,8 @@ def intercept_errors(api_error, ignore_errors=None):
                     u"{exception}"
                 ).format(
                     func_name=func.func_name,
-                    args=args,
-                    kwargs=kwargs,
+                    args=force_text(args),
+                    kwargs=force_text(kwargs),
                     exception=ex.developer_message if hasattr(ex, 'developer_message') else repr(ex)
                 )
                 LOGGER.exception(msg)

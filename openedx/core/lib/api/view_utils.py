@@ -116,7 +116,7 @@ def add_serializer_errors(serializer, data, field_errors):
                 'developer_message': u"Value '{field_value}' is not valid for field '{field_name}': {error}".format(
                     field_value=data.get(key, ''), field_name=key, error=error
                 ),
-                'user_message': _(u"This value is invalid."),
+                'user_message': ' '.join(error),
             }
     return field_errors
 
