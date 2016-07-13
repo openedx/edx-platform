@@ -57,7 +57,7 @@ DiscussionBoardFactory({
     <header class="page-header has-secondary">
         <div class="page-header-main">
             <div class="sr-is-focusable" tabindex="-1"></div>
-            <h2 class="hd hd-2 page-title">${_("Discussion")}</h2>
+            <div class="has-breadcrumbs"></div>
         </div>
         <div class="page-header-secondary">
             % if has_permission(user, 'create_thread', course.id):
