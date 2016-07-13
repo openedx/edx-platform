@@ -4,6 +4,7 @@
 import ddt
 import re
 
+from django.test import override_settings
 from django.utils.http import urlquote, urlencode
 from urlparse import urlparse, urlunparse, parse_qsl
 from PIL import Image
@@ -207,6 +208,22 @@ def test_static_url_with_xblock_resource(mock_modulestore, mock_storage):
     mock_modulestore.return_value = Mock(MongoModuleStore)
 
     pre_text = 'EMBED src ="/static/xblock/resources/babys_first.lil_xblock/public/images/pacifier.png"'
+    post_text = pre_text
+    assert_equals(post_text, replace_static_urls(pre_text, DATA_DIRECTORY, COURSE_KEY))
+
+
+@patch('static_replace.staticfiles_storage', autospec=True)
+@patch('static_replace.modulestore', autospec=True)
+@override_settings(STATIC_URL='https://example.com/static/')
+def test_static_url_with_xblock_resource_on_cdn(mock_modulestore, mock_storage):
+    """
+    Make sure that for URLs with XBlock resource URL, which start with /static/,
+    we don't rewrite them, even if these are served from an absolute URL like a CDN.
+    """
+    mock_storage.exists.return_value = False
+    mock_modulestore.return_value = Mock(MongoModuleStore)
+
+    pre_text = 'EMBED src ="https://example.com/static/xblock/resources/tehehe.xblock/public/images/woo.png"'
     post_text = pre_text
     assert_equals(post_text, replace_static_urls(pre_text, DATA_DIRECTORY, COURSE_KEY))
 

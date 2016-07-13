@@ -114,7 +114,11 @@ def process_static_urls(text, replacement_function, data_dir=None):
         # Don't rewrite XBlock resource links.  Probably wasn't a good idea that /static
         # works for actual static assets and for magical course asset URLs....
         full_url = prefix + rest
-        if full_url.startswith(XBLOCK_STATIC_RESOURCE_PREFIX):
+
+        starts_with_static_url = full_url.startswith(unicode(settings.STATIC_URL))
+        starts_with_prefix = full_url.startswith(XBLOCK_STATIC_RESOURCE_PREFIX)
+        contains_prefix = XBLOCK_STATIC_RESOURCE_PREFIX in full_url
+        if starts_with_prefix or (starts_with_static_url and contains_prefix):
             return original
 
         return replacement_function(original, prefix, quote, rest)
