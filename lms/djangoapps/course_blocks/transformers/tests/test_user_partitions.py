@@ -5,6 +5,7 @@ Tests for UserPartitionTransformer.
 from collections import namedtuple
 import ddt
 from nose.plugins.attrib import attr
+import string
 
 from openedx.core.djangoapps.course_groups.partition_scheme import CohortPartitionScheme
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory, config_course_cohorts
@@ -25,7 +26,7 @@ class UserPartitionTestMixin(object):
     """
     TRANSFORMER_CLASS_TO_TEST = UserPartitionTransformer
 
-    def setup_groups_partitions(self, num_user_partitions=1, num_groups=4):
+    def setup_groups_partitions(self, num_user_partitions=1, num_groups=4, active=True):
         """
         Sets up groups and user partitions for testing.
         """
@@ -42,7 +43,8 @@ class UserPartitionTestMixin(object):
                 name='Partition ' + unicode(user_partition_num),
                 description='This is partition ' + unicode(user_partition_num),
                 groups=self.groups,
-                scheme=CohortPartitionScheme
+                scheme=CohortPartitionScheme,
+                active=active,
             )
             user_partition.scheme.name = "cohort"
             self.user_partitions.append(user_partition)
@@ -72,15 +74,16 @@ class UserPartitionTransformerTestCase(UserPartitionTestMixin, CourseStructureTe
     """
     UserPartitionTransformer Test
     """
-    def setUp(self):
+    def setup_partitions_and_course(self, active=True):
         """
         Setup course structure and create user for user partition
         transformer test.
+        Args:
+            active: boolean representing if the user partitions are
+            active or not
         """
-        super(UserPartitionTransformerTestCase, self).setUp()
-
         # Set up user partitions and groups.
-        self.setup_groups_partitions()
+        self.setup_groups_partitions(active=active)
         self.user_partition = self.user_partitions[0]
 
         # Build course.
@@ -89,7 +92,9 @@ class UserPartitionTransformerTestCase(UserPartitionTestMixin, CourseStructureTe
         self.course = self.blocks['course']
 
         # Enroll user in course.
-        CourseEnrollmentFactory.create(user=self.user, course_id=self.course.id, is_active=True)
+        CourseEnrollmentFactory.create(
+            user=self.user, course_id=self.course.id, is_active=True
+        )
 
         # Set up cohorts.
         self.setup_cohorts(self.course)
@@ -199,6 +204,7 @@ class UserPartitionTransformerTestCase(UserPartitionTestMixin, CourseStructureTe
     )
     @ddt.unpack
     def test_transform(self, group_id, expected_blocks):
+        self.setup_partitions_and_course()
         if group_id:
             cohort = self.partition_cohorts[self.user_partition.id - 1][group_id - 1]
             add_user_to_cohort(cohort, self.user.username)
@@ -208,6 +214,27 @@ class UserPartitionTransformerTestCase(UserPartitionTestMixin, CourseStructureTe
             self.course.location,
             self.transformers,
         )
+        self.assertSetEqual(
+            set(trans_block_structure.get_block_keys()),
+            self.get_block_key_set(self.blocks, *expected_blocks)
+        )
+
+    def test_transform_on_inactive_partition(self):
+        """
+        Tests UserPartitionTransformer for inactive UserPartition.
+        """
+        self.setup_partitions_and_course(active=False)
+
+        # we expect to find all blocks because the UserPartitions are all
+        # inactive
+        expected_blocks = ('course',) + tuple(string.ascii_uppercase[:15])
+
+        trans_block_structure = get_course_blocks(
+            self.user,
+            self.course.location,
+            self.transformers,
+        )
+
         self.assertSetEqual(
             set(trans_block_structure.get_block_keys()),
             self.get_block_key_set(self.blocks, *expected_blocks)
