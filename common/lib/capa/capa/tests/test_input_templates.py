@@ -122,15 +122,16 @@ class ChoiceGroupTemplateTest(TemplateTestCase):
 
     def setUp(self):
         choices = [('1', 'choice 1'), ('2', 'choice 2'), ('3', 'choice 3')]
-        self.context = {'id': '1',
-                        'choices': choices,
-                        'status': Status('correct'),
-                        'label': 'test',
-                        'input_type': 'checkbox',
-                        'name_array_suffix': '1',
-                        'value': '3',
-                        'response_data': {'label': 'test'}
-                        }
+        self.context = {
+            'id': '1',
+            'choices': choices,
+            'status': Status('correct'),
+            'label': 'test',
+            'input_type': 'checkbox',
+            'name_array_suffix': '1',
+            'value': '3',
+            'response_data': {'label': 'test'}
+        }
         super(ChoiceGroupTemplateTest, self).setUp()
 
     def test_problem_marked_correct(self):
