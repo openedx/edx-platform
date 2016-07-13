@@ -231,7 +231,7 @@ class ChoiceGroupTemplateTest(TemplateTestCase):
         for test_conditions in conditions:
             self.context.update(test_conditions)
             xml = self.render_to_xml(self.context)
-            xpath = "//label[@class='choicegroup_correct']"
+            xpath = "//label[contains(@class, 'choicegroup_correct')]"
             self.assert_has_xpath(xml, xpath, self.context)
 
             # Should NOT mark the whole problem
@@ -252,7 +252,7 @@ class ChoiceGroupTemplateTest(TemplateTestCase):
         for test_conditions in conditions:
             self.context.update(test_conditions)
             xml = self.render_to_xml(self.context)
-            xpath = "//label[@class='choicegroup_incorrect']"
+            xpath = "//label[contains(@class, 'choicegroup_incorrect')]"
             self.assert_has_xpath(xml, xpath, self.context)
 
             # Should NOT mark the whole problem
