@@ -392,10 +392,10 @@
             };
 
             DiscussionThreadListView.prototype.threadSelected = function(e) {
-                var thread_id;
-                thread_id = $(e.target).closest('.forum-nav-thread').attr('data-id');
-                this.setActiveThread(thread_id);
-                this.trigger('thread:selected', thread_id);
+                var threadId;
+                threadId = $(e.target).closest('.forum-nav-thread').attr('data-id');
+                this.setActiveThread(threadId);
+                this.trigger('thread:selected', threadId);
                 return false;
             };
 
@@ -477,6 +477,22 @@
                     return $(elem).text();
                 }).get();
                 return pathTitles.join(' / ');
+            };
+
+            DiscussionThreadListView.prototype.getBreadcrumbText = function($item) {
+                var subTopic = $('.forum-nav-browse-title', $item).first().text().trim(),
+                    $parentSubMenus = $item.parents('.forum-nav-browse-submenu'),
+                    crumbs = [];
+
+                $parentSubMenus.each(function(i, el) {
+                    crumbs.push($(el).siblings('.forum-nav-browse-title').first().text().trim());
+                });
+
+                if (subTopic !== 'All Discussions') {
+                    crumbs.push(subTopic);
+                }
+
+                return crumbs;
             };
 
             DiscussionThreadListView.prototype.filterTopics = function(event) {
@@ -568,25 +584,28 @@
             };
 
             DiscussionThreadListView.prototype.selectTopic = function($target) {
-                var allItems, discussionIds, item;
+                var allItems, discussionIds, $item;
                 this.hideBrowseMenu();
                 this.clearSearch();
-                item = $target.closest('.forum-nav-browse-menu-item');
-                this.setCurrentTopicDisplay(this.getPathText(item));
-                if (item.hasClass('forum-nav-browse-menu-all')) {
+                $item = $target.closest('.forum-nav-browse-menu-item');
+
+                this.setCurrentTopicDisplay(this.getPathText($item));
+                this.trigger('topic:selected', this.getBreadcrumbText($item));
+
+                if ($item.hasClass('forum-nav-browse-menu-all')) {
                     this.discussionIds = '';
                     this.$('.forum-nav-filter-cohort').show();
                     return this.retrieveAllThreads();
-                } else if (item.hasClass('forum-nav-browse-menu-following')) {
+                } else if ($item.hasClass('forum-nav-browse-menu-following')) {
                     this.retrieveFollowed();
                     return this.$('.forum-nav-filter-cohort').hide();
                 } else {
-                    allItems = item.find('.forum-nav-browse-menu-item').andSelf();
+                    allItems = $item.find('.forum-nav-browse-menu-item').andSelf();
                     discussionIds = allItems.filter('[data-discussion-id]').map(function(i, elem) {
                         return $(elem).data('discussion-id');
                     }).get();
                     this.retrieveDiscussions(discussionIds);
-                    return this.$('.forum-nav-filter-cohort').toggle(item.data('cohorted') === true);
+                    return this.$('.forum-nav-filter-cohort').toggle($item.data('cohorted') === true);
                 }
             };
 

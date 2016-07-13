@@ -29,6 +29,13 @@
   position: relative;
 }
 
+// Temporary breadcrumbs
+.has-breadcrumbs {
+  .breadcrumbs {
+    margin: 5px 0 0 0;
+  }
+}
+
 // ------------------------
 // navigation - browse menu
 // ------------------------
@@ -160,7 +167,7 @@ li[class*=forum-nav-thread-label-] {
 // Inline Discussion Module Overrides
 // -------
 .discussion-module {
-  
+
   .wrapper-post-header .post-title {
     margin-bottom: 0 !important; // overrides "#seq_content h1" styling
   }
