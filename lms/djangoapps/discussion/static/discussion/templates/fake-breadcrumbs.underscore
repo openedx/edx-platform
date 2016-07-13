@@ -1,0 +1,9 @@
+<h6 class="hd-6 breadcrumbs">
+    <span class="nav-item">
+        <a class="all-topics" href="">All Topics</a>
+    </span>
+    <% contents.forEach(function(content) { %>
+        <span class="fa fa-angle-right"></span>
+        <span class="nav-item"><%- content %></span>
+    <% }); %>
+</h6>
