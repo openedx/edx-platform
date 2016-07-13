@@ -4,7 +4,6 @@ Students grade peer submissions.
 
 from bok_choy.page_object import PageObject
 from bok_choy.promise import Promise
-from .rubric import RubricPage
 
 
 class PeerGradePage(PageObject):
@@ -37,13 +36,3 @@ class PeerGradePage(PageObject):
         """
         index = self.problem_list.index(problem_name) + 1
         self.q(css='a.problem-button:nth-of-type({})'.format(index)).first.click()
-
-    @property
-    def rubric(self):
-        """
-        Return a `RubricPage` to allow students to grade their peers.
-        If no rubric is available, raises a `BrokenPromise` exception.
-        """
-        rubric = RubricPage(self.browser)
-        rubric.wait_for_page()
-        return rubric
