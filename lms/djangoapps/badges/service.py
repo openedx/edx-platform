@@ -24,5 +24,7 @@ class BadgingService(object):
         course = modulestore.get_course(course_id)
         if course:
             self.course_badges_enabled = course.issue_badges
+            pass
+
 
     get_badge_class = BadgeClass.get_badge_class
