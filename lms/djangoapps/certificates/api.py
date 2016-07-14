@@ -28,10 +28,40 @@ from certificates.models import (
     CertificateTemplate,
 )
 from certificates.queue import XQueueCertInterface
-
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 
 log = logging.getLogger("edx.certificate")
 
+def get_certificates_for_user_basic(username):
+    """
+    Retrieve basic certificate information for a particular user.
+
+    Arguments:
+        username (unicode): The identifier of the user.
+
+    Returns: list
+
+    Example Usage:
+    >>> get_certificates_for_user_basic("bob")
+    [
+        {
+            "course_title": "some course",
+            "download_url": "/certificates/user/3/course/course-v1:APC101:2016_S1",
+        }
+    ]
+
+    """
+
+    return [
+        {
+            "course_title": CourseOverview.objects.get(id=cert.course_id).display_name,
+            "download_url": (
+                cert.download_url or get_certificate_url(cert.user.id, cert.course_id)
+                if cert.status == CertificateStatuses.downloadable
+                else None
+            ),
+        }
+        for cert in GeneratedCertificate.objects.filter(user__username=username).order_by("course_id") ]
 
 def get_certificates_for_user(username):
     """

@@ -14,7 +14,7 @@ from .image_helpers import get_profile_image_urls_for_user
 from . import (
     ACCOUNT_VISIBILITY_PREF_KEY, ALL_USERS_VISIBILITY, PRIVATE_VISIBILITY,
 )
-
+from certificates.api import get_certificates_for_user_basic
 
 PROFILE_IMAGE_KEY_PREFIX = 'image_url'
 
@@ -98,10 +98,13 @@ class UserReadOnlySerializer(serializers.Serializer):
             "account_privacy": self._get_profile_visibility(profile, user),
         }
 
-        return self._filter_fields(
+        filtered_data = self._filter_fields(
             self._visible_fields(profile, user),
             data
         )
+
+        filtered_data['certificates'] = get_certificates_for_user_basic(user.username)
+        return filtered_data
 
     def _visible_fields(self, user_profile, user):
         """
