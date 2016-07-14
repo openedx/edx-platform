@@ -232,16 +232,12 @@ def _update_course_context(request, context, course, platform_name):
     context['course_number'] = course_number
     if context['organization_long_name']:
         # Translators:  This text represents the description of course
-        context['accomplishment_copy_course_description'] = _('a course of study offered by {partner_short_name}, '
-                                                              'an online learning initiative of '
-                                                              '{partner_long_name}.').format(
-            partner_short_name=context['organization_short_name'],
+        context['accomplishment_copy_course_description'] = _('a course of study offered by {partner_long_name}.').format(
             partner_long_name=context['organization_long_name'],
             platform_name=platform_name)
     else:
         # Translators:  This text represents the description of course
-        context['accomplishment_copy_course_description'] = _('a course of study offered by '
-                                                              '{partner_short_name}.').format(
+        context['accomplishment_copy_course_description'] = _('a course of study offered by {partner_short_name}.').format(
             partner_short_name=context['organization_short_name'],
             platform_name=platform_name)
 
