@@ -826,6 +826,21 @@ def _allow_donation(course_modes, course_id, enrollment):
         True if the course is allowing donations.
 
     """
+    if course_id not in course_modes:
+        flat_unexpired_modes = {
+            unicode(course_id): [mode for mode in modes]
+            for course_id, modes in course_modes.iteritems()
+        }
+        flat_all_modes = {
+            unicode(course_id): [mode.slug for mode in modes]
+            for course_id, modes in CourseMode.all_modes_for_courses([course_id]).iteritems()
+        }
+        log.error(
+            u'Can not find `%s` in course modes.`%s`. All modes: `%s`',
+            course_id,
+            flat_unexpired_modes,
+            flat_all_modes
+        )
     donations_enabled = DonationConfiguration.current().enabled
     return (
         donations_enabled and
