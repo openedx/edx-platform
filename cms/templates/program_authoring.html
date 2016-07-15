@@ -1,16 +1,19 @@
+<%page expression_filter="h"/>
 <%namespace name='static' file='static_content.html'/>
-<%! from django.utils.translation import ugettext as _ %>
+<%!
+  from django.utils.translation import ugettext as _
+  from openedx.core.djangolib.js_utils import js_escaped_string
+%>
 
 <%inherit file="base.html" />
 <%block name="title">${_("Program Administration")}</%block>
 
 <%block name="header_extras">
-<%static:css group='style-edx-icons'/>
 <link rel="stylesheet" href=${authoring_app_config.css_url}>
 </%block>
 
 <%block name="requirejs">
-  require(['${authoring_app_config.js_url}'], function () {});
+  require(['${authoring_app_config.js_url | n, js_escaped_string}'], function () {});
 </%block>
 
 <%block name="content">

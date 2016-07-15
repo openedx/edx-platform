@@ -69,9 +69,6 @@
             'MathJaxProcessor': 'coffee/src/customwmd',
             'picturefill': 'common/js/vendor/picturefill',
             'draggabilly': 'xmodule_js/common_static/js/vendor/draggabilly',
-            'modernizr': 'edx-pattern-library/js/modernizr-custom',
-            'afontgarde': 'edx-pattern-library/js/afontgarde',
-            'edxicons': 'edx-pattern-library/js/edx-icons',
 
             // Manually specify LMS files that are not converted to RequireJS
             'history': 'js/vendor/history',
@@ -670,12 +667,6 @@
                     'xmodule_js/common_static/common/js/discussion/utils'
                 ],
                 exports: 'DiscussionSpecHelper'
-            },
-            'modernizr': {
-                exports: 'Modernizr'
-            },
-            'afontgarde': {
-                exports: 'AFontGarde'
             }
         }
     });
