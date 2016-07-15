@@ -1,6 +1,6 @@
 define([ "jquery", "edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers", "js/spec_helpers/edit_helpers",
     "js/views/container", "js/models/xblock_info", "jquery.simulate",
-    "xmodule", "coffee/src/main", "xblock/cms.runtime.v1"],
+    "xmodule", "js/main", "xblock/cms.runtime.v1"],
     function ($, AjaxHelpers, EditHelpers, ContainerView, XBlockInfo) {
 
         describe("Container View", function () {

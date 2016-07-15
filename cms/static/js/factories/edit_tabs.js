@@ -1,5 +1,5 @@
 define([
-    'js/models/explicit_url', 'js/views/tabs', 'xmodule', 'coffee/src/main', 'xblock/cms.runtime.v1'
+    'js/models/explicit_url', 'js/views/tabs', 'xmodule', 'js/main', 'xblock/cms.runtime.v1'
 ], function (TabsModel, TabsEditView, xmoduleLoader) {
     'use strict';
     return function (courseLocation, explicitUrl) {

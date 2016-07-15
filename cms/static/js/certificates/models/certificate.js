@@ -6,7 +6,7 @@ define([
         'backbone-relational',
         'backbone.associations',
         'gettext',
-        'coffee/src/main',
+        'js/main',
         'js/certificates/models/signatory',
         'js/certificates/collections/signatories'
     ],
