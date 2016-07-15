@@ -992,15 +992,17 @@ class MdlCertificateIssued(models.Model):
 
     class Meta(object):
         db_table = 'mdl_certificate_issues'
+        unique_together = ('code', 'certdate', 'timecreated',)
+
 
     mdl_cert_issue_id = models.IntegerField(default=0)
     certificateid = models.IntegerField(default=0)
     mdl_userid = models.IntegerField(default=0)
     timecreated = models.IntegerField(default=0)
     studentname = models.CharField(max_length=255, default='')
-    code = models.CharField(max_length=40, unique=True)
+    code = models.CharField(max_length=40)
     classname = models.CharField(max_length=255, default='')
     certdate = models.IntegerField(default=0)
 
     def download_url(self):
-        return "/certificates/moodle/{}".format(self.code)
+        return "/certificates/moodle/{}-{}-{}".format(self.code, self.timecreated, self.certdate)

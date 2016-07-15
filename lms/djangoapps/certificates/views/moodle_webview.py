@@ -11,7 +11,7 @@ from django.conf import settings
 def convert_timestamp_to_date(timestamp):
     return datetime.datetime.fromtimestamp(int(timestamp)).strftime('%B %d, %Y')
 
-def render_moodle_html_view(request, moodle_cert_code):
+def render_moodle_html_view(request, moodle_cert_code, time_created, cert_date):
     """
     This public view generates an HTML representation of the specified user and course
     If a certificate is not available, we display a "Sorry!" screen instead
@@ -24,8 +24,8 @@ def render_moodle_html_view(request, moodle_cert_code):
 
     context = common_context_content(platform_name, company_tos_url, company_about_url, course_id)
 
-    if MdlCertificateIssued.objects.filter(code=moodle_cert_code).exists():
-        context.update(valid_context_content(moodle_cert_code, platform_name, company_tos_url, company_about_url, course_id))
+    if MdlCertificateIssued.objects.filter(code=moodle_cert_code, timecreated=time_created, certdate=cert_date).exists():
+        context.update(valid_context_content(moodle_cert_code, platform_name, company_tos_url, company_about_url, course_id, time_created, cert_date))
         return render_to_response("certificates/valid.html", context)
 
     else:
@@ -73,9 +73,9 @@ def invalid_context_content():
     return context
 
 
-def valid_context_content(moodle_cert_code, platform_name, company_tos_url, company_about_url, course_id):
+def valid_context_content(moodle_cert_code, platform_name, company_tos_url, company_about_url, course_id, time_created, cert_date):
 
-    certificate_user = MdlCertificateIssued.objects.get(code=moodle_cert_code)
+    certificate_user = MdlCertificateIssued.objects.get(code=moodle_cert_code, timecreated=time_created, certdate=cert_date)
     student_name = certificate_user.studentname
     course_name = certificate_user.classname
     facebook_app_id = microsite.get_value("FACEBOOK_APP_ID", settings.FACEBOOK_APP_ID)

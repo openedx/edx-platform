@@ -26,10 +26,16 @@ urlpatterns = patterns(
 
     # Certificate HTML view end point to render Moodle web certs by certificate_uuid
     url(
-        r'^moodle/(?P<moodle_cert_code>[0-9A-Za-z]+)',
+        r'^moodle/(?P<moodle_cert_code>[0-9A-Za-z]+)-(?P<time_created>[0-9A-Za-z]+)-(?P<cert_date>[0-9A-Za-z]+)',
         views.render_moodle_html_view,
         name="render_moodle_html_view"
     ),
+    # url(
+    #     r'^moodle/(?P<moodle_cert_code>[0-9A-Za-z]+)',
+    #     views.render_moodle_html_view,
+    #     name="render_moodle_html_view"
+    # ),
+    
 
     # End-points used by student support
     # The views in the lms/djangoapps/support use these end-points
