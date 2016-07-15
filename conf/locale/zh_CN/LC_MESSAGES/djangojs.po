@@ -47,7 +47,7 @@
 # Jianfei Wang <me@thinxer.com>, 2013
 # 沈世奇 <vicapple22@gmail.com>, 2013
 # Wentao Han <wentao.han@gmail.com>, 2013
-# wzhd <wzhdev@gmail.com>, 2015
+# wzhd <transifex@wzhd.org>, 2015
 # 熊冬升 <xdsnet@gmail.com>, 2013
 # Xuejia Tong <snowytong@hotmail.com>, 2016
 # yan9yu, 2014
@@ -108,7 +108,7 @@
 # vingte <411029240@qq.com>, 2014
 # wanghe <1636807295@qq.com>, 2014
 # Wentao Han <wentao.han@gmail.com>, 2013,2015
-# wzhd <wzhdev@gmail.com>, 2015
+# wzhd <transifex@wzhd.org>, 2015
 # 熊冬升 <xdsnet@gmail.com>, 2013
 # xianwei yang <yetie.net@gmail.com>, 2014
 # 刘知远 <liuliudong@163.com>, 2013
@@ -177,7 +177,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-06-30 15:59+0000\n"
+"POT-Creation-Date: 2016-07-07 14:20+0000\n"
 "PO-Revision-Date: 2016-06-10 02:34+0000\n"
 "Last-Translator: Xuejia Tong <snowytong@hotmail.com>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/open-edx/edx-platform/language/zh_CN/)\n"
@@ -3808,10 +3808,6 @@ msgstr "我们找不到有关“%s”的任何结果。"
 msgid "There was an error, try searching again."
 msgstr "出错了，请尝试重新搜素。"
 
-#: lms/static/js/edxnotes/plugins/accessibility.js
-msgid "Focus grabber"
-msgstr "焦点采集器"
-
 #: lms/static/js/edxnotes/views/notes_visibility_factory.js
 #: lms/static/js/edxnotes/views/search_box.js
 msgid ""
@@ -7005,7 +7001,7 @@ msgid "Coming Soon"
 msgstr ""
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
-msgid "Enrollment Opens"
+msgid "Enrollment Opens on"
 msgstr ""
 
 #: lms/templates/learner_dashboard/empty_programs_list.underscore
@@ -7052,6 +7048,16 @@ msgstr "主控面板"
 #: lms/templates/learner_dashboard/program_header_view.underscore
 msgid "Programs"
 msgstr "项目"
+
+#: lms/templates/learner_dashboard/upgrade_message.underscore
+msgid ""
+"You need a certificate in this course to be eligible for a program "
+"certificate."
+msgstr ""
+
+#: lms/templates/learner_dashboard/upgrade_message.underscore
+msgid "Upgrade Now"
+msgstr ""
 
 #: lms/templates/search/course_search_results.underscore
 #: lms/templates/search/dashboard_search_results.underscore

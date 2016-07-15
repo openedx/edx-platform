@@ -339,7 +339,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-06-30 16:00+0000\n"
+"POT-Creation-Date: 2016-07-07 14:20+0000\n"
 "PO-Revision-Date: 2016-06-29 18:11+0000\n"
 "Last-Translator: Yue Fang <yfang@juilliard.edu>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/open-edx/edx-platform/language/zh_CN/)\n"
@@ -5116,10 +5116,6 @@ msgid "in {relative} - {absolute}"
 msgstr "in {relative} - {absolute}"
 
 #: lms/djangoapps/courseware/date_summary.py
-msgid "UTC"
-msgstr "国际标准时间"
-
-#: lms/djangoapps/courseware/date_summary.py
 msgid "Today is {date}"
 msgstr "今天是 {date}"
 
@@ -9013,6 +9009,10 @@ msgid ""
 msgstr ""
 
 #: openedx/core/djangoapps/user_api/preferences/api.py
+msgid "Value '{preference_value}' is not a valid time zone selection."
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/preferences/api.py
 msgid "Save failed for user preference '{key}' with value '{value}'."
 msgstr "使用值'{value}'保存用户参数'{key}'失败."
 
@@ -10566,6 +10566,7 @@ msgstr "{platform_name} 平台的服务器发生了错误"
 
 #: lms/templates/module-error.html
 #: lms/templates/courseware/courseware-error.html
+#: lms/templates/courseware/error-message.html
 msgid ""
 "We're sorry, this module is temporarily unavailable. Our staff is working to"
 " fix it as soon as possible. Please email us at {tech_support_email} to "
@@ -12768,6 +12769,10 @@ msgid "Course Material"
 msgstr "课程资料"
 
 #: lms/templates/courseware/course_updates.html
+msgid "All course updates"
+msgstr ""
+
+#: lms/templates/courseware/course_updates.html
 msgid "Hide"
 msgstr "隐藏"
 
@@ -12827,14 +12832,6 @@ msgstr "您在本测验的分数必须达到或高于 {required_score}% o才能�
 #: lms/templates/courseware/courseware.html
 msgid "Your score is {current_score}%. You have passed the entrance exam."
 msgstr "您的分数为 {current_score}%，通过了入门测试"
-
-#: lms/templates/courseware/error-message.html
-msgid ""
-"We're sorry, this module is temporarily unavailable. Our staff is working to"
-" fix it as soon as possible. Please email us at {link_to_support_email} to "
-"report any problems or downtime."
-msgstr ""
-"非常抱歉，该模块暂时无法使用，我们的教员正在努力尽修复问题。要报告您发现的任何问题或遇到网站非正常，请向{link_to_support_email}发送邮件"
 
 #: lms/templates/courseware/gradebook.html
 msgid "Gradebook"
@@ -12917,6 +12914,16 @@ msgstr "在Studio中查看评分情况"
 #: lms/templates/courseware/progress.html
 msgid "Course Progress for Student '{username}' ({email})"
 msgstr "学生'{username}' ({email})的学习进度"
+
+#: lms/templates/courseware/progress.html
+msgid "Your enrollment: Audit track"
+msgstr ""
+
+#: lms/templates/courseware/progress.html
+msgid ""
+"You are enrolled in the audit track for this course. The audit track does "
+"not include a certificate."
+msgstr ""
 
 #: lms/templates/courseware/progress.html
 msgid ""
@@ -13235,6 +13242,10 @@ msgstr ""
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "{category} Program Course"
 msgstr "{category} 项目课程"
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Course details"
+msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "{course_number} {course_name} Home Page"

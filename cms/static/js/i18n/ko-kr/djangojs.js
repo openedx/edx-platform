@@ -281,7 +281,6 @@
     "Find next": " \ub2e4\uc74c \uac80\uc0c9", 
     "Find previous": " \uc774\uc804 \uac80\uc0c9", 
     "Finish": " \uc885\ub8cc ", 
-    "Focus grabber": "Focus grabber ", 
     "Font Family": "\uae00\uaf34", 
     "Font Sizes": "\uae00\uc790 \ud06c\uae30", 
     "Footer": "\uaf2c\ub9bf\ub9d0", 
