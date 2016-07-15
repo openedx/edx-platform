@@ -6,7 +6,6 @@ from django.test.client import RequestFactory
 
 from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangoapps.content.block_structure.api import update_course_in_cache
-from openedx.core.djangoapps.content.block_structure.tests.helpers import EnableTransformerRegistryMixin
 from student.tests.factories import UserFactory
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
