@@ -6,6 +6,7 @@ from django.conf.urls import patterns, url
 
 from ..profile_images.views import ProfileImageView
 from .accounts.views import AccountView
+from .accounts.moodle_views import MoodleCertificateView
 from .preferences.views import PreferencesView, PreferencesDetailView
 
 USERNAME_PATTERN = r'(?P<username>[\w.+-]+)'
@@ -31,5 +32,10 @@ urlpatterns = patterns(
         r'^v1/preferences/{}/(?P<preference_key>[a-zA-Z0-9_]+)$'.format(USERNAME_PATTERN),
         PreferencesDetailView.as_view(),
         name="preferences_detail_api"
+    ),
+    url(
+        r'^v1/certificates/moodle/{}/$'.format(USERNAME_PATTERN),
+        MoodleCertificateView.as_view(),
+        name="moodle_certificate"
     ),
 )
