@@ -7,6 +7,7 @@ from pavelib.utils.test.suites.bokchoy_suite import BokChoyTestSuite, Pa11yCrawl
 from pavelib.utils.envs import Env
 from pavelib.utils.test.utils import check_firefox_version
 from pavelib.utils.passthrough_opts import PassthroughTask
+from pavelib.utils.timer import timed
 from optparse import make_option
 import os
 
@@ -86,6 +87,7 @@ def parse_bokchoy_opts(options, passthrough_options=None):
 @needs('pavelib.prereqs.install_prereqs')
 @cmdopts(BOKCHOY_OPTS)
 @PassthroughTask
+@timed
 def test_bokchoy(options, passthrough_options):
     """
     Run acceptance tests that use the bok-choy framework.
@@ -116,6 +118,7 @@ def test_bokchoy(options, passthrough_options):
 @needs('pavelib.prereqs.install_prereqs')
 @cmdopts(BOKCHOY_OPTS)
 @PassthroughTask
+@timed
 def test_a11y(options, passthrough_options):
     """
     Run accessibility tests that use the bok-choy framework.
@@ -142,6 +145,7 @@ def test_a11y(options, passthrough_options):
 @needs('pavelib.prereqs.install_prereqs')
 @cmdopts(BOKCHOY_OPTS)
 @PassthroughTask
+@timed
 def perf_report_bokchoy(options, passthrough_options):
     """
     Generates a har file for with page performance info.
@@ -164,6 +168,7 @@ def perf_report_bokchoy(options, passthrough_options):
     ),
 ])
 @PassthroughTask
+@timed
 def pa11ycrawler(options, passthrough_options):
     """
     Runs pa11ycrawler against the demo-test-course to generates accessibility
@@ -220,6 +225,7 @@ def parse_coverage(report_dir, coveragerc):
 
 
 @task
+@timed
 def bokchoy_coverage():
     """
     Generate coverage reports for bok-choy tests
@@ -231,6 +237,7 @@ def bokchoy_coverage():
 
 
 @task
+@timed
 def a11y_coverage():
     """
     Generate coverage reports for a11y tests. Note that this coverage report
@@ -246,6 +253,7 @@ def a11y_coverage():
 
 
 @task
+@timed
 def pa11ycrawler_coverage():
     """
     Generate coverage reports for bok-choy tests
