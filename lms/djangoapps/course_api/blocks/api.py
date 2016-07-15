@@ -3,6 +3,7 @@ API function for retrieving course blocks data
 """
 
 from lms.djangoapps.course_blocks.api import get_course_blocks, COURSE_BLOCK_ACCESS_TRANSFORMERS
+from opaque_keys.edx.locator import BlockUsageLocator
 from openedx.core.lib.block_structure.transformers import BlockStructureTransformers
 
 from .transformers.blocks_api import BlocksAPITransformer
@@ -62,7 +63,18 @@ def get_blocks(
     ]
 
     # transform
-    blocks = get_course_blocks(user, usage_key, transformers)
+    try:
+        blocks = get_course_blocks(user, usage_key, transformers)
+    except KeyError:
+        # If KeyError raises trying to exchange usage_key between mongo and split modulestores may fix the error.
+        if usage_key.deprecated: # old_mongo usage_key changing this to split usage_key.
+            new_usage_key_string = "block-v1:" + usage_key._to_string()
+        else: # split usage_key change this to old_mongo usage_key.
+            new_usage_key_string = usage_key._to_deprecated_string()
+        usage_key = BlockUsageLocator.from_string(new_usage_key_string).replace(org=usage_key.org,
+                                                                                run=usage_key.run,
+                                                                                course=usage_key.course)
+        blocks = get_course_blocks(user, usage_key, transformers)
 
     # filter blocks by types
     if block_types_filter:

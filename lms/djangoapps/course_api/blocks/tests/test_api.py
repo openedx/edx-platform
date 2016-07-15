@@ -4,8 +4,13 @@ Tests for Blocks api.py
 
 from django.test.client import RequestFactory
 
+from opaque_keys.edx.keys import CourseKey
+from openedx.core.djangoapps.content.block_structure.api import update_course_in_cache
+from openedx.core.djangoapps.content.block_structure.tests.helpers import EnableTransformerRegistryMixin
 from student.tests.factories import UserFactory
 from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import SampleCourseFactory
 
@@ -95,3 +100,31 @@ class TestGetBlocks(SharedModuleStoreTestCase):
         self.assertEquals(len(blocks['blocks']), 3)
         for block in blocks['blocks'].itervalues():
             self.assertEqual(block['type'], 'problem')
+
+    def test_get_blocks_old_mongo_course_with_split_usage_key(self):
+        """
+        Test that get_blocks of old_mongo course will fetch the blocks with split_course version of usage_key.
+        """
+        # default test course is old_mongo making a new usage_key of split version.
+        course_key = CourseKey.from_string('course-v1:org.0+course_0+Run_0')
+        split_usage_key = modulestore().make_course_usage_key(course_key)
+
+        blocks = get_blocks(self.request, split_usage_key, self.user)
+        self.assertEquals(blocks['root'], unicode(self.course.location))
+
+    def test_get_blocks_split_course_with_old_mongo_usage_key(self):
+        """
+        Test that get_blocks of split course will fetch the blocks with old_mongo version of usage_key.
+        """
+        # making split course and new usage_key of old_mongo version.
+        self.course = SampleCourseFactory.create(default_store=ModuleStoreEnum.Type.split,
+                                                 org='test_org',
+                                                 run='test_run',
+                                                 course='test_course')
+        update_course_in_cache(self.course.id) # updating the cache as get_blocks get the blocks from this.
+
+        course_key = CourseKey.from_string('test_org/test_course/test_run')
+        old_mongo_usage_key = modulestore().make_course_usage_key(course_key)
+
+        with self.assertRaises(ItemNotFoundError):
+            get_blocks(self.request, old_mongo_usage_key, self.user)
