@@ -17,6 +17,7 @@ from wiki.models import URLPath, Article
 from courseware.courses import get_course_by_id
 from course_wiki.utils import course_wiki_slug
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from openedx.core.djangoapps.theming.helpers import get_value as get_themed_value
 
 log = logging.getLogger(__name__)
 
@@ -60,7 +61,10 @@ def course_wiki_redirect(request, course_id):  # pylint: disable=unused-argument
         new_site.save()
         site_id = str(new_site.id)
         if site_id != str(settings.SITE_ID):
-            raise ImproperlyConfigured("No site object was created and the SITE_ID doesn't match the newly created one. {} != {}".format(site_id, settings.SITE_ID))
+            msg = "No site object was created and the SITE_ID doesn't match the newly created one. {} != {}".format(
+                site_id, settings.SITE_ID
+            )
+            raise ImproperlyConfigured(msg)
 
     try:
         urlpath = URLPath.get_by_path(course_slug, select_related=True)
@@ -125,7 +129,8 @@ def get_or_create_root():
         pass
 
     starting_content = "\n".join((
-        _("Welcome to the {platform_name} Wiki").format(platform_name=settings.PLATFORM_NAME),
+        _("Welcome to the {platform_name} Wiki").format(platform_name=get_themed_value('PLATFORM_NAME',
+                                                                                       settings.PLATFORM_NAME)),
         "===",
         _("Visit a course wiki to add an article."),
     ))
