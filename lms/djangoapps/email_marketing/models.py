@@ -60,14 +60,14 @@ class EmailMarketingConfiguration(ConfigurationModel):
         max_length=20,
         blank=True,
         help_text=_(
-            "Sailthru template to use on abandoned cart reminder. "
+            "Sailthru template to use on abandoned cart reminder. Deprecated."
         )
     )
 
     sailthru_abandoned_cart_delay = models.fields.IntegerField(
         default=60,
         help_text=_(
-            "Sailthru minutes to wait before sending abandoned cart message."
+            "Sailthru minutes to wait before sending abandoned cart message. Deprecated."
         )
     )
 
@@ -83,7 +83,7 @@ class EmailMarketingConfiguration(ConfigurationModel):
         max_length=20,
         blank=True,
         help_text=_(
-            "Sailthru send template to use on upgrading a course. "
+            "Sailthru send template to use on upgrading a course. Deprecated "
         )
     )
 
@@ -91,7 +91,7 @@ class EmailMarketingConfiguration(ConfigurationModel):
         max_length=20,
         blank=True,
         help_text=_(
-            "Sailthru send template to use on purchasing a course seat. "
+            "Sailthru send template to use on purchasing a course seat. Deprecated "
         )
     )
 
@@ -116,6 +116,14 @@ class EmailMarketingConfiguration(ConfigurationModel):
         default=100,
         help_text=_(
             "Cost in cents to report to Sailthru for enrolls."
+        )
+    )
+
+    sailthru_lms_url_override = models.fields.CharField(
+        max_length=80,
+        blank=True,
+        help_text=_(
+            "Optional lms url scheme + host used to construct urls for content library, e.g. https://courses.edx.org."
         )
     )
 
