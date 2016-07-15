@@ -998,7 +998,7 @@ class MdlCertificateIssued(models.Model):
     mdl_userid = models.IntegerField(default=0)
     timecreated = models.IntegerField(default=0)
     studentname = models.CharField(max_length=255, default='')
-    code = models.CharField(max_length=40)
+    code = models.CharField(max_length=40, unique=True)
     classname = models.CharField(max_length=255, default='')
     certdate = models.IntegerField(default=0)
 

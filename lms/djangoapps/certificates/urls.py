@@ -24,6 +24,13 @@ urlpatterns = patterns(
         name='render_cert_by_uuid'
     ),
 
+    # Certificate HTML view end point to render Moodle web certs by certificate_uuid
+    url(
+        r'^moodle/(?P<moodle_cert_code>[0-9A-Za-z]+)',
+        views.render_moodle_html_view,
+        name="render_moodle_html_view"
+    ),
+
     # End-points used by student support
     # The views in the lms/djangoapps/support use these end-points
     # to retrieve certificate information and regenerate certificates.
