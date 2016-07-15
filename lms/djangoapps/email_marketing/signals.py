@@ -6,6 +6,7 @@ import datetime
 import crum
 
 from django.dispatch import receiver
+from django.core.urlresolvers import reverse
 
 from student.models import ENROLL_STATUS_CHANGE
 from student.cookies import CREATE_LOGON_COOKIE
@@ -26,7 +27,7 @@ CHANGED_FIELDNAMES = ['username', 'is_active', 'name', 'gender', 'education',
 
 
 @receiver(ENROLL_STATUS_CHANGE)
-def handle_enroll_status_change(sender, event=None, user=None, mode=None, course_id=None, cost=None, currency=None,
+def handle_enroll_status_change(sender, event=None, user=None, mode=None, course_id=None,
                                 **kwargs):  # pylint: disable=unused-argument
     """
     Signal receiver for enroll/unenroll/purchase events
@@ -35,35 +36,39 @@ def handle_enroll_status_change(sender, event=None, user=None, mode=None, course
     if not email_config.enabled or not event or not user or not mode or not course_id:
         return
 
+    # skip tracking (un)enrolls if simulated cost=0
+    if email_config.sailthru_enroll_cost == 0:
+        return
+
     request = crum.get_current_request()
     if not request:
         return
 
+    # get string course_id serializable to send through celery
+    course_id_string = unicode(course_id)
+
     # figure out course url
-    course_url = _build_course_url(request, course_id.to_deprecated_string())
+    course_url = _build_course_url(request, course_id_string, email_config)
 
     # pass event to email_marketing.tasks
     update_course_enrollment.delay(user.email, course_url, event, mode,
-                                   unit_cost=cost, course_id=course_id, currency=currency,
+                                   course_id=course_id_string,
                                    message_id=request.COOKIES.get('sailthru_bid'))
 
 
-def _build_course_url(request, course_id):
+def _build_course_url(request, course_id, email_config):
     """
     Build a course url from a course id and the host from the current request
+    or use override in config
     :param request:
     :param course_id:
     :return:
     """
-    host = request.get_host()
-    # hack for integration testing since Sailthru rejects urls with localhost
-    if host.startswith('localhost'):
-        host = 'courses.edx.org'
-    return '{scheme}://{host}/courses/{course}/info'.format(
-        scheme=request.scheme,
-        host=host,
-        course=course_id
-    )
+    path = reverse('info', kwargs={'course_id': course_id})
+    if email_config.sailthru_lms_url_override:
+        return '{}{}'.format(email_config.sailthru_lms_url_override, path)
+    else:
+        return '{}://{}{}'.format(request.scheme, request.get_host(), path)
 
 
 @receiver(CREATE_LOGON_COOKIE)
@@ -142,7 +147,7 @@ def email_marketing_register_user(sender, user=None, profile=None,
         return
 
     # perform update asynchronously
-    update_user.delay(user.username, new_user=True)
+    update_user.delay(_create_sailthru_user_vars(user, user.profile), user.email, new_user=True)
 
 
 @receiver(USER_FIELD_CHANGED)
@@ -179,7 +184,8 @@ def email_marketing_user_field_changed(sender, user=None, table=None, setting=No
         if not email_config.enabled:
             return
         # perform update asynchronously, flag if activation
-        update_user.delay(user.username, new_user=False,
+        update_user.delay(_create_sailthru_user_vars(user, user.profile), user.email,
+                          new_user=False,
                           activation=(setting == 'is_active') and new_value is True)
 
     elif setting == 'email':
@@ -187,4 +193,24 @@ def email_marketing_user_field_changed(sender, user=None, table=None, setting=No
         email_config = EmailMarketingConfiguration.current()
         if not email_config.enabled:
             return
-        update_user_email.delay(user.username, old_value)
+        update_user_email.delay(user.email, old_value)
+
+
+def _create_sailthru_user_vars(user, profile):
+    """
+    Create sailthru user create/update vars from user + profile.
+    """
+    sailthru_vars = {'username': user.username,
+                     'activated': int(user.is_active),
+                     'joined_date': user.date_joined.strftime("%Y-%m-%d")}
+
+    if profile:
+        sailthru_vars['fullname'] = profile.name
+        sailthru_vars['gender'] = profile.gender
+        sailthru_vars['education'] = profile.level_of_education
+
+        if profile.year_of_birth:
+            sailthru_vars['year_of_birth'] = profile.year_of_birth
+        sailthru_vars['country'] = unicode(profile.country.code)
+
+    return sailthru_vars

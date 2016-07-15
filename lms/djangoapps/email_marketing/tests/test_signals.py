@@ -1,13 +1,11 @@
 """Tests of email marketing signal handlers."""
 import logging
 import ddt
-import datetime
 
 from django.test import TestCase
 from django.contrib.auth.models import AnonymousUser
 from mock import patch, ANY
 from util.json_request import JsonResponse
-from django.http import Http404
 
 from email_marketing.signals import handle_enroll_status_change, \
     email_marketing_register_user, \
@@ -18,13 +16,9 @@ from email_marketing.tasks import update_user, update_user_email, update_course_
 from email_marketing.models import EmailMarketingConfiguration
 from django.test.client import RequestFactory
 from student.tests.factories import UserFactory, UserProfileFactory
-from request_cache.middleware import RequestCache
 from student.models import EnrollStatusChange
 from opaque_keys.edx.keys import CourseKey
-from course_modes.models import CourseMode
-from xmodule.modulestore.tests.factories import CourseFactory
 
-from sailthru.sailthru_client import SailthruClient
 from sailthru.sailthru_response import SailthruResponse
 from sailthru.sailthru_error import SailthruClientError
 
@@ -33,8 +27,8 @@ log = logging.getLogger(__name__)
 TEST_EMAIL = "test@edx.org"
 
 
-def update_email_marketing_config(enabled=False, key='badkey', secret='badsecret', new_user_list='new list',
-                                  template='Activation'):
+def update_email_marketing_config(enabled=True, key='badkey', secret='badsecret', new_user_list='new list',
+                                  template='Activation', enroll_cost=100, lms_url_override='http://testserver'):
     """
     Enable / Disable Sailthru integration
     """
@@ -45,10 +39,10 @@ def update_email_marketing_config(enabled=False, key='badkey', secret='badsecret
         sailthru_new_user_list=new_user_list,
         sailthru_activation_template=template,
         sailthru_enroll_template='enroll_template',
-        sailthru_upgrade_template='upgrade_template',
-        sailthru_purchase_template='purchase_template',
-        sailthru_abandoned_cart_template='abandoned_template',
-        sailthru_get_tags_from_sailthru=False
+        sailthru_lms_url_override=lms_url_override,
+        sailthru_get_tags_from_sailthru=False,
+        sailthru_enroll_cost=enroll_cost,
+        sailthru_max_retries=0,
     )
 
 
@@ -59,9 +53,13 @@ class EmailMarketingTests(TestCase):
     """
 
     def setUp(self):
+        update_email_marketing_config(enabled=False)
         self.request_factory = RequestFactory()
         self.user = UserFactory.create(username='test', email=TEST_EMAIL)
         self.profile = self.user.profile
+        self.profile.year_of_birth = 1980
+        self.profile.save()
+
         self.request = self.request_factory.get("foo")
         update_email_marketing_config(enabled=True)
 
@@ -121,7 +119,7 @@ class EmailMarketingTests(TestCase):
         test async method in tasks that actually updates Sailthru
         """
         mock_sailthru.return_value = SailthruResponse(JsonResponse({'ok': True}))
-        update_user.delay(self.user.username, new_user=True)
+        update_user.delay({'gender': 'm', 'username': 'test', 'activated': 1}, TEST_EMAIL, new_user=True)
         self.assertFalse(mock_log_error.called)
         self.assertEquals(mock_sailthru.call_args[0][0], "user")
         userparms = mock_sailthru.call_args[0][1]
@@ -138,7 +136,7 @@ class EmailMarketingTests(TestCase):
         test send of activation template
         """
         mock_sailthru.return_value = SailthruResponse(JsonResponse({'ok': True}))
-        update_user.delay(self.user.username, new_user=True, activation=True)
+        update_user.delay({}, self.user.email, new_user=True, activation=True)
         # look for call args for 2nd call
         self.assertEquals(mock_sailthru.call_args[0][0], "send")
         userparms = mock_sailthru.call_args[0][1]
@@ -152,40 +150,27 @@ class EmailMarketingTests(TestCase):
         Ensure that error returned from Sailthru api is logged
         """
         mock_sailthru.return_value = SailthruResponse(JsonResponse({'error': 100, 'errormsg': 'Got an error'}))
-        update_user.delay(self.user.username)
+        update_user.delay({}, self.user.email)
         self.assertTrue(mock_log_error.called)
 
         # force Sailthru API exception
+        mock_log_error.reset_mock()
         mock_sailthru.side_effect = SailthruClientError
-        update_user.delay(self.user.username)
+        update_user.delay({}, self.user.email)
         self.assertTrue(mock_log_error.called)
 
         # force Sailthru API exception on 2nd call
-        mock_sailthru.side_effect = [None, SailthruClientError]
-        mock_sailthru.return_value = SailthruResponse(JsonResponse({'ok': True}))
-        update_user.delay(self.user.username, new_user=True)
+        mock_log_error.reset_mock()
+        mock_sailthru.side_effect = [SailthruResponse(JsonResponse({'ok': True})), SailthruClientError]
+        update_user.delay({}, self.user.email, activation=True)
         self.assertTrue(mock_log_error.called)
 
         # force Sailthru API error return on 2nd call
-        mock_sailthru.side_effect = None
-        mock_sailthru.return_value = [SailthruResponse(JsonResponse({'ok': True})),
-                                      SailthruResponse(JsonResponse({'error': 100, 'errormsg': 'Got an error'}))]
-        update_user.delay(self.user.username, new_user=True)
+        mock_log_error.reset_mock()
+        mock_sailthru.side_effect = [SailthruResponse(JsonResponse({'ok': True})),
+                                     SailthruResponse(JsonResponse({'error': 100, 'errormsg': 'Got an error'}))]
+        update_user.delay({}, self.user.email, activation=True)
         self.assertTrue(mock_log_error.called)
-
-    @patch('email_marketing.tasks.log.error')
-    @patch('email_marketing.tasks.SailthruClient.api_post')
-    def test_update_user_error_logging_bad_user(self, mock_sailthru, mock_log_error):
-        """
-        Test update_user with invalid user
-        """
-        update_user.delay('baduser')
-        self.assertTrue(mock_log_error.called)
-        self.assertFalse(mock_sailthru.called)
-
-        update_user_email.delay('baduser', 'aa@bb.com')
-        self.assertTrue(mock_log_error.called)
-        self.assertFalse(mock_sailthru.called)
 
     @patch('email_marketing.tasks.log.error')
     @patch('email_marketing.tasks.SailthruClient.api_post')
@@ -236,6 +221,13 @@ class EmailMarketingTests(TestCase):
         email_marketing_user_field_changed(None, user=anon)
         self.assertFalse(mock_log_error.called)
 
+        # make sure enroll ignored when cost = 0
+        update_email_marketing_config(enroll_cost=0)
+        handle_enroll_status_change(None, event=EnrollStatusChange.enroll,
+                                    user=self.user,
+                                    mode='audit', course_id=self.course_id)
+        self.assertFalse(mock_log_error.called)
+
     @patch('email_marketing.signals.crum.get_current_request')
     @patch('lms.djangoapps.email_marketing.tasks.update_course_enrollment.delay')
     def test_handle_enroll_status_change(self, mock_update_course_enrollment, mock_get_current_request):
@@ -259,10 +251,24 @@ class EmailMarketingTests(TestCase):
                                                          self.course_url,
                                                          EnrollStatusChange.enroll,
                                                          'audit',
-                                                         course_id=self.course_id,
-                                                         currency=None,
-                                                         message_id='cookie_bid',
-                                                         unit_cost=None)
+                                                         course_id=self.course_id_string,
+                                                         message_id='cookie_bid')
+
+        # now test with current request constructing url from request
+        mock_get_current_request.return_value = self.request
+        update_email_marketing_config(lms_url_override='')
+        self.request.COOKIES['sailthru_bid'] = 'cookie_bid'
+        handle_enroll_status_change(None, event=EnrollStatusChange.enroll,
+                                    user=self.user,
+                                    mode='audit', course_id=self.course_id,
+                                    cost=None, currency=None)
+        self.assertTrue(mock_update_course_enrollment.called)
+        mock_update_course_enrollment.assert_called_with(TEST_EMAIL,
+                                                         self.course_url,
+                                                         EnrollStatusChange.enroll,
+                                                         'audit',
+                                                         course_id=self.course_id_string,
+                                                         message_id='cookie_bid')
 
     @patch('email_marketing.tasks.SailthruClient.api_post')
     def test_change_email(self, mock_sailthru):
@@ -270,7 +276,7 @@ class EmailMarketingTests(TestCase):
         test async method in task that changes email in Sailthru
         """
         mock_sailthru.return_value = SailthruResponse(JsonResponse({'ok': True}))
-        update_user_email.delay(self.user.username, "old@edx.org")
+        update_user_email.delay(TEST_EMAIL, "old@edx.org")
         self.assertEquals(mock_sailthru.call_args[0][0], "user")
         userparms = mock_sailthru.call_args[0][1]
         self.assertEquals(userparms['key'], "email")
@@ -281,155 +287,83 @@ class EmailMarketingTests(TestCase):
     @patch('email_marketing.tasks.SailthruClient.purchase')
     @patch('email_marketing.tasks.SailthruClient.api_get')
     @patch('email_marketing.tasks.SailthruClient.api_post')
-    @patch('email_marketing.tasks.get_course_by_id')
-    def test_update_course_enrollment(self, mock_get_course, mock_sailthru_api_post,
+    def test_update_course_enrollment(self, mock_sailthru_api_post,
                                       mock_sailthru_api_get, mock_sailthru_purchase, mock_log_error):
         """
         test async method in task posts enrolls and purchases
         """
 
-        CourseMode.objects.create(
-            course_id=self.course_id,
-            mode_slug=CourseMode.AUDIT,
-            mode_display_name=CourseMode.AUDIT
-        )
-        CourseMode.objects.create(
-            course_id=self.course_id,
-            mode_slug=CourseMode.VERIFIED,
-            mode_display_name=CourseMode.VERIFIED,
-            min_price=49,
-            expiration_datetime=datetime.date(2020, 3, 12)
-        )
-        mock_get_course.return_value = {'display_name': "Test Title"}
         mock_sailthru_api_post.return_value = SailthruResponse(JsonResponse({'ok': True}))
         mock_sailthru_api_get.return_value = SailthruResponse(JsonResponse({'vars': {'unenrolled': ['course_u1']}}))
         mock_sailthru_purchase.return_value = SailthruResponse(JsonResponse({'ok': True}))
 
         # test enroll
-        mock_get_course.side_effect = Http404
         update_course_enrollment.delay(TEST_EMAIL,
                                        self.course_url,
                                        EnrollStatusChange.enroll,
                                        'audit',
-                                       course_id=self.course_id,
-                                       currency='USD',
-                                       message_id='cookie_bid',
-                                       unit_cost=0)
-        mock_sailthru_purchase.assert_called_with(TEST_EMAIL, [{'vars': {'course_run_id': self.course_id_string, 'mode': 'audit',
-                                                                         'upgrade_deadline_verified': '2020-03-12'},
+                                       course_id=self.course_id_string,
+                                       message_id='cookie_bid')
+        mock_sailthru_purchase.assert_called_with(TEST_EMAIL, [{'vars': {'course_run_id': self.course_id_string, 'mode': 'audit'},
                                                                 'title': 'Course ' + self.course_id_string + ' mode: audit',
                                                                 'url': self.course_url,
                                                                 'price': 100, 'qty': 1, 'id': self.course_id_string + '-audit'}],
                                                   options={'send_template': 'enroll_template'},
-                                                  incomplete=None, message_id='cookie_bid')
+                                                  message_id='cookie_bid')
 
         # test unenroll
         update_course_enrollment.delay(TEST_EMAIL,
                                        self.course_url,
                                        EnrollStatusChange.unenroll,
                                        'audit',
-                                       course_id=self.course_id,
-                                       currency='USD',
-                                       message_id='cookie_bid',
-                                       unit_cost=0)
-        mock_sailthru_purchase.assert_called_with(TEST_EMAIL, [{'vars': {'course_run_id': self.course_id_string, 'mode': 'audit',
-                                                                         'upgrade_deadline_verified': '2020-03-12'},
+                                       course_id=self.course_id_string,
+                                       message_id='cookie_bid')
+        mock_sailthru_purchase.assert_called_with(TEST_EMAIL, [{'vars': {'course_run_id': self.course_id_string, 'mode': 'audit'},
                                                                 'title': 'Course ' + self.course_id_string + ' mode: audit',
                                                                 'url': self.course_url,
                                                                 'price': 100, 'qty': 1, 'id': self.course_id_string + '-audit'}],
                                                   options={'send_template': 'enroll_template'},
-                                                  incomplete=None, message_id='cookie_bid')
-
-        # test add upgrade to cart
-        update_course_enrollment.delay(TEST_EMAIL,
-                                       self.course_url,
-                                       EnrollStatusChange.upgrade_start,
-                                       'verified',
-                                       course_id=self.course_id,
-                                       currency='USD',
-                                       message_id='cookie_bid',
-                                       unit_cost=49)
-        mock_sailthru_purchase.assert_called_with(TEST_EMAIL, [{'vars': {'course_run_id': self.course_id_string, 'mode': 'verified',
-                                                                         'upgrade_deadline_verified': '2020-03-12'},
-                                                                'title': 'Course ' + self.course_id_string + ' mode: verified',
-                                                                'url': self.course_url,
-                                                                'price': 4900, 'qty': 1, 'id': self.course_id_string + '-verified'}],
-                                                  options={'reminder_template': 'abandoned_template', 'reminder_time': '+60 minutes'},
-                                                  incomplete=1, message_id='cookie_bid')
-
-        # test add purchase to cart
-        update_course_enrollment.delay(TEST_EMAIL,
-                                       self.course_url,
-                                       EnrollStatusChange.paid_start,
-                                       'honor',
-                                       course_id=self.course_id,
-                                       currency='USD',
-                                       message_id='cookie_bid',
-                                       unit_cost=49)
-        mock_sailthru_purchase.assert_called_with(TEST_EMAIL, [{'vars': {'course_run_id': self.course_id_string, 'mode': 'honor',
-                                                                         'upgrade_deadline_verified': '2020-03-12'},
-                                                                'title': 'Course ' + self.course_id_string + ' mode: honor',
-                                                                'url': self.course_url,
-                                                                'price': 4900, 'qty': 1, 'id': self.course_id_string + '-honor'}],
-                                                  options={'reminder_template': 'abandoned_template', 'reminder_time': '+60 minutes'},
-                                                  incomplete=1, message_id='cookie_bid')
-
-        # test purchase complete
-        update_course_enrollment.delay(TEST_EMAIL,
-                                       self.course_url,
-                                       EnrollStatusChange.paid_complete,
-                                       'honor',
-                                       course_id=self.course_id,
-                                       currency='USD',
-                                       message_id='cookie_bid',
-                                       unit_cost=99)
-        mock_sailthru_purchase.assert_called_with(TEST_EMAIL, [{'vars': {'course_run_id': self.course_id_string, 'mode': 'honor',
-                                                                         'upgrade_deadline_verified': '2020-03-12'},
-                                                                'title': 'Course ' + self.course_id_string + ' mode: honor',
-                                                                'url': self.course_url,
-                                                                'price': 9900, 'qty': 1, 'id': self.course_id_string + '-honor'}],
-                                                  options={'send_template': 'purchase_template'},
-                                                  incomplete=None, message_id='cookie_bid')
-
-        # test upgrade complete
-        update_course_enrollment.delay(TEST_EMAIL,
-                                       self.course_url,
-                                       EnrollStatusChange.upgrade_complete,
-                                       'verified',
-                                       course_id=self.course_id,
-                                       currency='USD',
-                                       message_id='cookie_bid',
-                                       unit_cost=99)
-        mock_sailthru_purchase.assert_called_with(TEST_EMAIL, [{'vars': {'course_run_id': self.course_id_string, 'mode': 'verified',
-                                                                         'upgrade_deadline_verified': '2020-03-12'},
-                                                                'title': 'Course ' + self.course_id_string + ' mode: verified',
-                                                                'url': self.course_url,
-                                                                'price': 9900, 'qty': 1, 'id': self.course_id_string + '-verified'}],
-                                                  options={'send_template': 'upgrade_template'},
-                                                  incomplete=None, message_id='cookie_bid')
+                                                  message_id='cookie_bid')
 
         # test purchase API error
         mock_sailthru_purchase.return_value = SailthruResponse(JsonResponse({'error': 100, 'errormsg': 'Got an error'}))
         update_course_enrollment.delay(TEST_EMAIL,
                                        self.course_url,
-                                       EnrollStatusChange.upgrade_complete,
+                                       EnrollStatusChange.enroll,
                                        'verified',
-                                       course_id=self.course_id,
-                                       currency='USD',
-                                       message_id='cookie_bid',
-                                       unit_cost=99)
+                                       course_id=self.course_id_string,
+                                       message_id='cookie_bid')
         self.assertTrue(mock_log_error.called)
 
         # test purchase API exception
         mock_sailthru_purchase.side_effect = SailthruClientError
         update_course_enrollment.delay(TEST_EMAIL,
                                        self.course_url,
-                                       EnrollStatusChange.upgrade_complete,
+                                       EnrollStatusChange.enroll,
                                        'verified',
-                                       course_id=self.course_id,
-                                       currency='USD',
-                                       message_id='cookie_bid',
-                                       unit_cost=99)
+                                       course_id=self.course_id_string,
+                                       message_id='cookie_bid')
+        self.assertTrue(mock_log_error.called)
+
+        # test unsupported event
+        mock_sailthru_purchase.side_effect = SailthruClientError
+        mock_log_error.reset_mock()
+        update_course_enrollment.delay(TEST_EMAIL,
+                                       self.course_url,
+                                       EnrollStatusChange.upgrade_start,
+                                       'verified',
+                                       course_id=self.course_id_string,
+                                       message_id='cookie_bid')
+        self.assertFalse(mock_log_error.called)
+
+        # test error updating user
+        mock_sailthru_api_get.return_value = SailthruResponse(JsonResponse({'error': 100, 'errormsg': 'Got an error'}))
+        update_course_enrollment.delay(TEST_EMAIL,
+                                       self.course_url,
+                                       EnrollStatusChange.enroll,
+                                       'verified',
+                                       course_id=self.course_id_string,
+                                       message_id='cookie_bid')
         self.assertTrue(mock_log_error.called)
 
     @patch('email_marketing.tasks.SailthruClient')
@@ -533,3 +467,17 @@ class EmailMarketingTests(TestCase):
         """
         email_marketing_user_field_changed(None, self.user, table=table, setting=setting, new_value=value)
         self.assertEqual(mock_update_user.called, result)
+
+    @patch('lms.djangoapps.email_marketing.tasks.update_user_email.delay')
+    def test_modify_email(self, mock_update_user):
+        """
+        Test that change to email calls update_user_email
+        """
+        email_marketing_user_field_changed(None, self.user, table='auth_user', setting='email', old_value='new@a.com')
+        mock_update_user.assert_called_with(self.user.email, 'new@a.com')
+
+        # make sure nothing called if disabled
+        mock_update_user.reset_mock()
+        update_email_marketing_config(enabled=False)
+        email_marketing_user_field_changed(None, self.user, table='auth_user', setting='email', old_value='new@a.com')
+        self.assertFalse(mock_update_user.called)
