@@ -13,6 +13,7 @@ import pytz
 from course_modes.models import CourseMode
 from lms.djangoapps.certificates import api as certificate_api
 from lms.djangoapps.commerce.utils import EcommerceService
+from openedx.core.djangoapps.catalog.utils import get_run_marketing_url
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.lib.edx_api_utils import get_edx_api_data
@@ -392,8 +393,7 @@ def supplement_program_data(program_data, user):
                 'is_course_ended': is_course_ended,
                 'is_enrolled': is_enrolled,
                 'is_enrollment_open': is_enrollment_open,
-                # TODO: Not currently available on LMS.
-                'marketing_url': None,
+                'marketing_url': get_run_marketing_url(course_key, user),
                 'start_date': start_date_string,
                 'upgrade_url': upgrade_url,
             })

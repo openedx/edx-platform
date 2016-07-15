@@ -72,7 +72,7 @@
                         is_enrolled: runMode.is_enrolled,
                         is_enrollment_open: runMode.is_enrollment_open,
                         key: this.context.key,
-                        marketing_url: runMode.marketing_url || '',
+                        marketing_url: runMode.marketing_url,
                         mode_slug: runMode.mode_slug,
                         run_key: runMode.run_key,
                         start_date: runMode.start_date,
