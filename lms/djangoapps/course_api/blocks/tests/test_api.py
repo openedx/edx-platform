@@ -120,7 +120,7 @@ class TestGetBlocks(SharedModuleStoreTestCase):
                                                  org='test_org',
                                                  run='test_run',
                                                  course='test_course')
-        update_course_in_cache(self.course.id) # updating the cache as get_blocks get the blocks from this.
+        update_course_in_cache(self.course.id) #  updating the cache as get_blocks get the blocks from this.
 
         course_key = CourseKey.from_string('test_org/test_course/test_run')
         old_mongo_usage_key = modulestore().make_course_usage_key(course_key)
