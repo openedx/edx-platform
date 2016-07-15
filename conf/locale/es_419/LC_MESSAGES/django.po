@@ -178,7 +178,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-06-30 16:00+0000\n"
+"POT-Creation-Date: 2016-07-07 14:20+0000\n"
 "PO-Revision-Date: 2016-05-09 11:27+0000\n"
 "Last-Translator: Laura Silva <lingison@edx.org>\n"
 "Language-Team: Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/)\n"
@@ -5520,10 +5520,6 @@ msgid "in {relative} - {absolute}"
 msgstr "Dentro de {relative} - {absolute}"
 
 #: lms/djangoapps/courseware/date_summary.py
-msgid "UTC"
-msgstr "UTC"
-
-#: lms/djangoapps/courseware/date_summary.py
 msgid "Today is {date}"
 msgstr "Hoy es {date}"
 
@@ -9766,6 +9762,10 @@ msgid ""
 msgstr ""
 
 #: openedx/core/djangoapps/user_api/preferences/api.py
+msgid "Value '{preference_value}' is not a valid time zone selection."
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/preferences/api.py
 msgid "Save failed for user preference '{key}' with value '{value}'."
 msgstr ""
 "Ocurrió un fallo al guardar la preferencia '{key}' con el valor '{value}'."
@@ -11409,6 +11409,7 @@ msgstr "Ha habido un error en los servidores de {platform_name}"
 
 #: lms/templates/module-error.html
 #: lms/templates/courseware/courseware-error.html
+#: lms/templates/courseware/error-message.html
 msgid ""
 "We're sorry, this module is temporarily unavailable. Our staff is working to"
 " fix it as soon as possible. Please email us at {tech_support_email} to "
@@ -13635,6 +13636,10 @@ msgid "Course Material"
 msgstr "Material del curso"
 
 #: lms/templates/courseware/course_updates.html
+msgid "All course updates"
+msgstr ""
+
+#: lms/templates/courseware/course_updates.html
 msgid "Hide"
 msgstr "Ocultar"
 
@@ -13696,17 +13701,6 @@ msgstr ""
 #: lms/templates/courseware/courseware.html
 msgid "Your score is {current_score}%. You have passed the entrance exam."
 msgstr "Su puntaje es {current_score}%. Ha pasado el examen de acceso."
-
-#: lms/templates/courseware/error-message.html
-msgid ""
-"We're sorry, this module is temporarily unavailable. Our staff is working to"
-" fix it as soon as possible. Please email us at {link_to_support_email} to "
-"report any problems or downtime."
-msgstr ""
-"Lo sentimos, este módulo está temporalmente no disponible. Estamos "
-"trabajando para solucionarlo lo antes posible. Por favor escríbanos a "
-"{link_to_support_email} para reportar este tipo de problemas o caidas en el "
-"servicio."
 
 #: lms/templates/courseware/gradebook.html
 msgid "Gradebook"
@@ -13791,6 +13785,16 @@ msgstr "Ver las calificaciones en Studio"
 #: lms/templates/courseware/progress.html
 msgid "Course Progress for Student '{username}' ({email})"
 msgstr "Progreso del curso para el estudiante '{username}' ({email})"
+
+#: lms/templates/courseware/progress.html
+msgid "Your enrollment: Audit track"
+msgstr ""
+
+#: lms/templates/courseware/progress.html
+msgid ""
+"You are enrolled in the audit track for this course. The audit track does "
+"not include a certificate."
+msgstr ""
 
 #: lms/templates/courseware/progress.html
 msgid ""
@@ -14152,6 +14156,10 @@ msgstr ""
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "{category} Program Course"
 msgstr "Curso del programa de {category} "
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Course details"
+msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "{course_number} {course_name} Home Page"

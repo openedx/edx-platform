@@ -671,7 +671,6 @@
     "Find next": "Encontrar el siguiente", 
     "Find previous": "Encontrar el anterior", 
     "Finish": "Finalizar", 
-    "Focus grabber": "Captura del foco", 
     "Follow": "Seguir", 
     "Follow or unfollow posts": "Seguir o dejar de seguir publicaciones", 
     "Following": "Siguiendo", 

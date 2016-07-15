@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-07-07 14:14+0000\n"
-"PO-Revision-Date: 2016-07-07 14:15:59.199191\n"
+"POT-Creation-Date: 2016-07-14 22:53+0000\n"
+"PO-Revision-Date: 2016-07-14 22:54:56.092484\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -2701,14 +2701,10 @@ msgstr ""
 msgid "My Team"
 msgstr "وغ فثشو"
 
-#. Translators: sr_start and sr_end surround text meant only for screen
-#. readers.
-#. The whole string will be shown to users as "Browse teams" if they are using
-#. a
-#. screenreader, and "Browse" otherwise.
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
-msgid "Browse {sr_start} teams {sr_end}"
-msgstr "زقخصسث {sr_start} فثشوس {sr_end}"
+#: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
+msgid "Browse"
+msgstr "زقخصسث"
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "Your request could not be completed. Reload the page and try again."
@@ -6848,10 +6844,6 @@ msgstr ""
 "عسثقرشوث خق ثوشهم شييقثسس هر فاث بهقسف ذخووش سثحشقشفثي بهثمي. غخع ذشر "
 "هرذمعيث شر خحفهخرشم رخفث يثسذقهزهرل فاث قثشسخر بخق فاث ثطذثحفهخر هر فاث "
 "سثذخري ذخووش سثحشقشفثي بهثمي."
-
-#: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
-msgid "Browse"
-msgstr "زقخصسث"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list-editor.underscore

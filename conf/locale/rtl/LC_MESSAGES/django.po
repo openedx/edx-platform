@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-07-07 14:15+0000\n"
-"PO-Revision-Date: 2016-07-07 14:15:58.774596\n"
+"POT-Creation-Date: 2016-07-14 22:54+0000\n"
+"PO-Revision-Date: 2016-07-14 22:54:55.682400\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -5124,7 +5124,7 @@ msgstr "عسث فاث ذاثذنخعف حشلث اخسفثي زغ فاث ث-ذخ
 msgid "Path to single course checkout page hosted by the E-Commerce service."
 msgstr "حشفا فخ سهرلمث ذخعقسث ذاثذنخعف حشلث اخسفثي زغ فاث ث-ذخووثقذث سثقدهذث."
 
-#: lms/djangoapps/commerce/models.py
+#: lms/djangoapps/commerce/models.py openedx/core/djangoapps/catalog/models.py
 #: openedx/core/djangoapps/credentials/models.py
 #: openedx/core/djangoapps/credit/models.py
 #: openedx/core/djangoapps/programs/models.py
@@ -9159,6 +9159,26 @@ msgstr ""
 msgid "Bookmark with usage_id: {usage_id} does not exist."
 msgstr "زخخنوشقن صهفا عسشلث_هي: {usage_id} يخثس رخف ثطهسف."
 
+#: openedx/core/djangoapps/catalog/models.py
+msgid "Internal API URL"
+msgstr "هرفثقرشم شحه عقم"
+
+#: openedx/core/djangoapps/catalog/models.py
+msgid ""
+"API root to be used for server-to-server requests (e.g., https://catalog-"
+"internal.example.com/api/v1/)."
+msgstr ""
+"شحه قخخف فخ زث عسثي بخق سثقدثق-فخ-سثقدثق قثضعثسفس (ث.ل., اففحس://ذشفشمخل-"
+"هرفثقرشم.ثطشوحمث.ذخو/شحه/د1/)."
+
+#: openedx/core/djangoapps/catalog/models.py
+msgid ""
+"Specified in seconds. Enable caching of API responses by setting this to a "
+"value greater than 0."
+msgstr ""
+"سحثذهبهثي هر سثذخريس. ثرشزمث ذشذاهرل خب شحه قثسحخرسثس زغ سثففهرل فاهس فخ ش "
+"دشمعث لقثشفثق فاشر 0."
+
 #: openedx/core/djangoapps/course_groups/cohorts.py
 msgid "Default Group"
 msgstr "يثبشعمف لقخعح"
@@ -10327,6 +10347,7 @@ msgstr "قثضعهقثوثرفس"
 
 #: cms/templates/studio_xblock_wrapper.html lms/templates/help_modal.html
 #: lms/templates/module-error.html
+#: lms/templates/instructor/instructor_dashboard_2/certificates.html
 msgid "Details"
 msgstr "يثفشهمس"
 
@@ -11743,6 +11764,7 @@ msgstr "ثققخق"
 
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 #: lms/templates/ccx/schedule.html
+#: lms/templates/instructor/instructor_dashboard_2/certificates.html
 msgid "Date"
 msgstr "يشفث"
 
@@ -15535,6 +15557,10 @@ msgid "Certificate Generation History"
 msgstr "ذثقفهبهذشفث لثرثقشفهخر اهسفخقغ"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
+msgid "Task name"
+msgstr "فشسن رشوث"
+
+#: lms/templates/instructor/instructor_dashboard_2/certificates.html
 msgid "SET CERTIFICATE EXCEPTIONS"
 msgstr "سثف ذثقفهبهذشفث ثطذثحفهخرس"
 
@@ -15558,8 +15584,6 @@ msgstr "هردشمهيشفث ذثقفهبهذشفثس"
 msgid "Enrollment Information"
 msgstr "ثرقخمموثرف هربخقوشفهخر"
 
-#. Translators: 'track' refers to the enrollment type ('honor', 'verified', or
-#. 'audit')
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Number of enrollees (admins, staff, and students) by track"
 msgstr "رعوزثق خب ثرقخممثثس (شيوهرس, سفشبب, شري سفعيثرفس) زغ فقشذن"

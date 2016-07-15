@@ -626,7 +626,6 @@
     "Find next": "Encontrar pr\u00f3ximo", 
     "Find previous": "Encontrar anterior", 
     "Finish": "Terminar", 
-    "Focus grabber": "Centro de aten\u00e7\u00e3o", 
     "Follow": "Seguir", 
     "Following": "Seguindo", 
     "Font Family": "Tipo de fonte", 
