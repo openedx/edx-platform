@@ -1,0 +1,37 @@
+## mako
+<%page expression_filter="h"/>
+<%namespace name='static' file='static_content.html'/>
+<%! from django.utils.translation import ugettext as _ %>
+
+<section class="courses-section">
+  <div class="courses-container">
+    <div class="highlighted-courses">
+
+      % if settings.FEATURES.get('COURSES_ARE_BROWSABLE'):
+        <section class="courses">
+
+          <div class="grid-manual">
+            <div class="row">
+              <div class="col col-12 text-center">
+                <h2>
+                  <span class="course-list-heading"> Lorem ipsum dolor sit amet</span>
+                </h2>
+              </div>
+            </div>
+
+            <div class="row course-list">
+              %for course in courses[:6]:
+                <div class="col col-12 sm-col-12 md-col-4 lg-col-4">
+                  <div class="courses-listing-item">
+                    <%include file="course.html" args="course=course" />
+                  </div>
+                </div>
+              %endfor
+            </div>
+          </div>
+        </section>
+      % endif
+
+    </div>
+  </div>
+</section>
