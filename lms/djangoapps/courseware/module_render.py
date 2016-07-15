@@ -19,6 +19,7 @@ from django.core.cache import cache
 from django.core.context_processors import csrf
 from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
+from django.db import transaction
 from django.http import Http404, HttpResponse
 from django.test.client import RequestFactory
 from django.views.decorators.csrf import csrf_exempt
@@ -880,6 +881,7 @@ def handle_xblock_callback_noauth(request, course_id, usage_id, handler, suffix=
         return _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, course=course)
 
 
+@transaction.non_atomic_requests
 def handle_xblock_callback(request, course_id, usage_id, handler, suffix=None):
     """
     Generic view for extensions. This is where AJAX calls go.
