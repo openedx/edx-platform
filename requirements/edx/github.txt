@@ -71,7 +71,7 @@ git+https://github.com/edx/pa11ycrawler.git@0.0.4#egg=pa11ycrawler==0.0.4
 
 # Our libraries:
 git+https://github.com/edx/XBlock.git@xblock-0.4.10#egg=XBlock==0.4.10
--e git+https://github.com/edx/codejail.git@cdyer/django-integration#egg=codejail
+git+https://github.com/edx/codejail.git@1.1#egg=codejail
 -e git+https://github.com/edx/event-tracking.git@0.2.1#egg=event-tracking==0.2.1
 -e git+https://github.com/edx/django-splash.git@v0.2#egg=django-splash==0.2
 -e git+https://github.com/edx/acid-block.git@e46f9cda8a03e121a00c7e347084d142d22ebfb7#egg=acid-xblock
