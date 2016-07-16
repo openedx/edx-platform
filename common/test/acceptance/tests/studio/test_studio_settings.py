@@ -504,7 +504,6 @@ class StudioSettingsA11yTest(StudioCourseTest):
         self.settings_page.a11y_audit.config.set_rules({
             "ignore": [
                 'link-href',  # TODO: AC-226
-                'nav-aria-label',  # TODO: AC-227
                 'icon-aria-hidden',  # TODO: AC-229
             ],
         })
