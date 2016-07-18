@@ -7,10 +7,9 @@ import os
 from opaque_keys.edx.locator import CourseLocator
 from common.test.acceptance.pages.studio import BASE_URL
 from common.test.acceptance.pages.studio.course_page import CoursePage
-from bok_choy.javascript import wait_for_js, requirejs
+from bok_choy.javascript import wait_for_js
 
 
-@requirejs('js/views/assets')
 class AssetIndexPage(CoursePage):
 
     """
