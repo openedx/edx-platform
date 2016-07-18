@@ -1157,10 +1157,10 @@ class CCXCoachTabTestCase(CcxTestCase):
         """
         Staff can access coach dashboard on ccx course.
         """
-        staff = self.make_staff()
         self.make_coach()
         ccx = self.make_ccx()
         ccx_key = CCXLocator.from_course_locator(self.course.id, unicode(ccx.id))
+        staff = self.make_staff()
 
         with ccx_course(ccx_key) as course_ccx:
             allow_access(course_ccx, staff, 'staff')
@@ -1186,10 +1186,10 @@ class CCXCoachTabTestCase(CcxTestCase):
         """
         Instructor can access coach dashboard on ccx course.
         """
-        instructor = self.make_instructor()
         self.make_coach()
         ccx = self.make_ccx()
         ccx_key = CCXLocator.from_course_locator(self.course.id, unicode(ccx.id))
+        instructor = self.make_instructor()
 
         with ccx_course(ccx_key) as course_ccx:
             allow_access(course_ccx, instructor, 'instructor')
