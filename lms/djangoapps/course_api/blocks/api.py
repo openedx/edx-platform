@@ -67,9 +67,9 @@ def get_blocks(
         blocks = get_course_blocks(user, usage_key, transformers)
     except KeyError:
         # If KeyError raises trying to exchange usage_key between mongo and split modulestores may fix the error.
-        if usage_key.deprecated: #  old_mongo usage_key changing this to split usage_key.
+        if usage_key.deprecated:  # old_mongo usage_key changing this to split usage_key.
             new_usage_key_string = "block-v1:" + usage_key._to_string()
-        else: #  split usage_key change this to old_mongo usage_key.
+        else:  # split usage_key change this to old_mongo usage_key.
             new_usage_key_string = usage_key._to_deprecated_string()
         usage_key = BlockUsageLocator.from_string(new_usage_key_string).replace(org=usage_key.org,
                                                                                 run=usage_key.run,
