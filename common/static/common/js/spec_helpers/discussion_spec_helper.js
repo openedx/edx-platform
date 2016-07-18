@@ -72,12 +72,12 @@
                 'thread-response-edit', 'response-comment-show', 'response-comment-edit', 'thread-list-item',
                 'discussion-home', 'search-alert', 'new-post', 'thread-type', 'new-post-menu-entry',
                 'new-post-menu-category', 'topic', 'post-user-display', 'inline-discussion', 'pagination',
-                'user-profile', 'profile-thread'
+                'user-profile', 'profile-thread',  'customwmd-prompt', 'nav-loading'
             ];
             templateNamesNoTrailingTemplate = [
                 'forum-action-endorse', 'forum-action-answer', 'forum-action-follow', 'forum-action-vote',
-                'forum-action-report', 'forum-action-pin', 'forum-action-close', 'forum-action-edit',
-                'forum-action-delete', 'forum-actions'
+                'forum-action-report',  'forum-action-pin', 'forum-action-close', 'forum-action-edit',
+                'forum-action-delete', 'forum-actions', 'alert-popup', 'nav-load-more-link'
             ];
             for (_i = 0, _len = templateNames.length; _i < _len; _i++) {
                 templateName = templateNames[_i];

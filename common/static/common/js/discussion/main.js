@@ -34,10 +34,11 @@
                     course_settings: course_settings
                 });
                 /* jshint +W031*/
-                return Backbone.history.start({
-                    pushState: true,
-                    root: "/courses/" + $$course_id + "/discussion/forum/"
-                });
+                if (!Backbone.History.started) {
+                    Backbone.history.start({pushState: true, root: "/courses/" + $$course_id + "/discussion/forum/"});
+                } else {
+                    Backbone.history.loadUrl(window.location.pathname);
+                }
             }
         };
         DiscussionProfileApp = {

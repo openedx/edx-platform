@@ -35,6 +35,8 @@ var options = {
         {pattern: 'common/js/vendor/backbone.js', included: true},
 
         {pattern: 'edx-ui-toolkit/js/utils/global-loader.js', included: true},
+        {pattern: 'edx-ui-toolkit/js/utils/string-utils.js', included: true},
+        {pattern: 'edx-ui-toolkit/js/utils/html-utils.js', included: true},
 
         {pattern: 'js/vendor/jasmine-imagediff.js', included: true},
         {pattern: 'common/js/spec_helpers/jasmine-extensions.js', included: true},

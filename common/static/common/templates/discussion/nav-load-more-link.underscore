@@ -1,0 +1,5 @@
+<li class='forum-nav-load-more'>
+    <a href='#' class='forum-nav-load-more-link'>
+        <%- gettext("Load more") %>
+    </a>
+</li>
