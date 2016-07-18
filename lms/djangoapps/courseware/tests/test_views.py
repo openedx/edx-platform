@@ -1878,7 +1878,7 @@ class TestIndexView(ModuleStoreTestCase):
 
 
 @ddt.ddt
-class TestIndexViewWithVerticalPositions(ModuleStoreTestCase):
+class TestIndewViewWithVerticalPositions(ModuleStoreTestCase):
     """
     Test the index view to handle vertical positions. Confirms that first position is loaded
     if input position is non-positive or greater than number of positions available.
@@ -1888,7 +1888,7 @@ class TestIndexViewWithVerticalPositions(ModuleStoreTestCase):
         """
         Set up initial test data
         """
-        super(TestIndexViewWithVerticalPositions, self).setUp()
+        super(TestIndewViewWithVerticalPositions, self).setUp()
 
         self.user = UserFactory()
 
@@ -1966,7 +1966,6 @@ class TestIndexViewWithGating(ModuleStoreTestCase, MilestonesTestCaseMixin):
 
         CourseEnrollmentFactory(user=self.user, course_id=self.course.id)
 
-    @patch.dict(settings.FEATURES, {'MILESTONES_APP': True})
     def test_index_with_gated_sequential(self):
         """
         Test index view with a gated sequential raises Http404
