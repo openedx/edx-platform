@@ -44,15 +44,19 @@
         <button type="button" class="btn-brand btn cta-primary enroll-button">
             <%- gettext('Enroll Now') %>
         </button>
-    <% } else {%>
+    <% } else if (upcoming_run_modes.length > 0) {%>
         <div class="no-action-message">
             <%- gettext('Coming Soon') %>
         </div>
         <div class="enrollment-opens">
             <%- gettext('Enrollment Opens on') %>
             <span class="enrollment-open-date">
-                <%- enrollment_open_date %>
+                <%- upcoming_run_modes[0].enrollment_open_date %>
             </span>
+        </div>
+    <% } else { %>
+        <div class="no-action-message">
+            <%- gettext('Not Currently Available') %>
         </div>
     <% } %>
 <% } %>
