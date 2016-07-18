@@ -820,6 +820,22 @@ class TestSupplementProgramData(ProgramsApiConfigMixin, ModuleStoreTestCase):
             enrollment_open_date=enrollment_open_date,
         )
 
+    def test_no_enrollment_start_date(self):
+        """Verify that a closed course with no explicit enrollment start date doesn't cause an error.
+
+        Regression test for ECOM-4973.
+        """
+        self.course.enrollment_end = timezone.now() - datetime.timedelta(days=1)
+        self.course = self.update_course(self.course, self.user.id)  # pylint: disable=no-member
+
+        data = utils.supplement_program_data(self.program, self.user)
+
+        self._assert_supplemented(
+            data,
+            is_enrollment_open=False,
+            enrollment_open_date=strftime_localized(utils.DEFAULT_ENROLLMENT_START_DATE, 'SHORT_DATE'),
+        )
+
     @ddt.data(True, False)
     @mock.patch(UTILS_MODULE + '.certificate_api.certificate_downloadable_status')
     @mock.patch(CERTIFICATES_API_MODULE + '.has_html_certificates_enabled')
