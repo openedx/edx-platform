@@ -2017,7 +2017,7 @@ def password_reset(request):
     })
 
 
-def add_error_msg(form_errors):
+def add_password_error_msg(form_errors):
     if 'new_password1' in form_errors:
         return "Password field can't be empty"
     if 'new_password2' in form_errors:
@@ -2117,7 +2117,7 @@ def password_reset_confirm_wrapper(
             try:
                 form_errors = result.context_data['form'].errors
                 if form_errors:
-                     result.context_data['err_msg'] = add_error_msg(form_errors)
+                     result.context_data['err_msg'] = add_password_error_msg(form_errors)
             except:
                 pass
 
