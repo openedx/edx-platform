@@ -114,24 +114,27 @@ from openedx.core.djangolib.js_utils import dump_js_escaped_json, js_escaped_str
             <p class="under-heading">
                 ${_('To regenerate certificates for your course, choose the learners who will receive regenerated certificates and click Regenerate Certificates.')}
             </p>
-
-                <label style="display: inline" for="certificate_status_${section_data['status'].downloadable}">
-                    <input id="certificate_status_${section_data['status'].downloadable}" type="checkbox" name="certificate_statuses" value="${section_data['status'].downloadable}">
-                    ${_("Regenerate for learners who have already received certificates. ({count})").format(count=section_data['certificate_statuses_with_count'].get(section_data['status'].downloadable, 0))}
-                </label>
-                <br/>
-                <label style="display: inline" for="certificate_status_${section_data['status'].notpassing}">
-                    <input id="certificate_status_${section_data['status'].notpassing}" type="checkbox" name="certificate_statuses" value="${section_data['status'].notpassing}">
-                    ${_("Regenerate for learners who have not received certificates. ({count})").format(count=section_data['certificate_statuses_with_count'].get(section_data['status'].notpassing, 0))}
-                </label>
-                <br/>
-                <label style="display: inline" for="certificate_status_${section_data['status'].error}">
-                    <input id="certificate_status_${section_data['status'].error}" type="checkbox" name="certificate_statuses" value="${section_data['status'].error}">
-                    ${_("Regenerate for learners in an error state. ({count})").format(count=section_data['certificate_statuses_with_count'].get(section_data['status'].error, 0))}
-                </label>
-                <br/>
-                <br/>
-
+            <fieldset>
+                <legend class="sr">${_('Choose learner types for regeneration')}</legend>
+                <div>
+                    <label style="display: inline" for="certificate_status_${section_data['status'].downloadable}">
+                        <input id="certificate_status_${section_data['status'].downloadable}" type="checkbox" name="certificate_statuses" value="${section_data['status'].downloadable}">
+                        ${_("Regenerate for learners who have already received certificates. ({count})").format(count=section_data['certificate_statuses_with_count'].get(section_data['status'].downloadable, 0))}
+                    </label>
+                </div>
+                <div>
+                    <label style="display: inline" for="certificate_status_${section_data['status'].notpassing}">
+                        <input id="certificate_status_${section_data['status'].notpassing}" type="checkbox" name="certificate_statuses" value="${section_data['status'].notpassing}">
+                        ${_("Regenerate for learners who have not received certificates. ({count})").format(count=section_data['certificate_statuses_with_count'].get(section_data['status'].notpassing, 0))}
+                    </label>
+                </div>
+                <div>
+                    <label style="display: inline" for="certificate_status_${section_data['status'].error}">
+                        <input id="certificate_status_${section_data['status'].error}" type="checkbox" name="certificate_statuses" value="${section_data['status'].error}">
+                        ${_("Regenerate for learners in an error state. ({count})").format(count=section_data['certificate_statuses_with_count'].get(section_data['status'].error, 0))}
+                    </label>
+                </div>
+            </fieldset>
             <input type="button" class="btn-blue" id="btn-start-regenerating-certificates" value="${_('Regenerate Certificates')}" data-endpoint="${section_data['urls']['start_certificate_regeneration']}"/>
         </form>
         <div class="certificate-regeneration-status"></div>
