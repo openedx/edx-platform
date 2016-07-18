@@ -159,14 +159,6 @@ def toc_for_course(user, request, course, active_chapter, active_section, field_
         toc_chapters = list()
         chapters = course_module.get_display_items()
 
-        # Check for content which needs to be completed
-        # before the rest of the content is made available
-        required_content = milestones_helpers.get_required_content(course, user)
-
-        # The user may not actually have to complete the entrance exam, if one is required
-        if not user_must_complete_entrance_exam(request, user, course):
-            required_content = [content for content in required_content if not content == course.entrance_exam_id]
-
         previous_of_active_section, next_of_active_section = None, None
         last_processed_section, last_processed_chapter = None, None
         found_active_section = False
@@ -175,10 +167,6 @@ def toc_for_course(user, request, course, active_chapter, active_section, field_
             # chapter.hide_from_toc is read-only (bool)
             display_id = slugify(chapter.display_name_with_default_escaped)
             local_hide_from_toc = False
-            if required_content:
-                if unicode(chapter.location) not in required_content:
-                    local_hide_from_toc = True
-
             # Skip the current chapter if a hide flag is tripped
             if chapter.hide_from_toc or local_hide_from_toc:
                 continue
