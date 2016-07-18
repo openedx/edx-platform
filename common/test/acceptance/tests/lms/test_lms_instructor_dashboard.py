@@ -1050,10 +1050,9 @@ class CertificatesTest(BaseInstructorDashboardTest):
         ])
         self.certificates_section.a11y_audit.config.set_rules({
             "ignore": [
-                'aria-valid-attr-value',  # TODO: AC-491
                 'checkboxgroup',  # TODO: AC-491
-                'duplicate-id',  # TODO: AC-491
-                'label',  # TODO: AC-491
+                'duplicate-id',  # TODO: AC-523
+                'label',  # TODO: AC-524
                 'radiogroup',  # TODO: AC-491
             ]
         })
@@ -1268,7 +1267,6 @@ class CertificateInvalidationTest(BaseInstructorDashboardTest):
         ])
         self.certificates_section.a11y_audit.config.set_rules({
             "ignore": [
-                'aria-valid-attr-value',  # TODO: AC-491
                 'checkboxgroup',  # TODO: AC-491
                 'duplicate-id',  # TODO: AC-491
                 'label',  # TODO: AC-491
