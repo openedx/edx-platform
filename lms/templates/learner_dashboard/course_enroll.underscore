@@ -1,18 +1,18 @@
-<% if (is_enrolled){ %>
+<% if (is_enrolled) { %>
     <div class="enrollment-info"><%- gettext('enrolled') %></div>
-    <% if (is_enrollment_open || is_course_ended){ %>
+    <% if (is_enrollment_open || is_course_ended) { %>
         <a href="<%- course_url %>" class="btn-neutral btn view-course-link">
-            <% if (is_enrollment_open){ %>
+            <% if (is_enrollment_open) { %>
                 <%- gettext('View Course') %>
-            <% } else if (course_ended){ %>
+            <% } else if (is_course_ended) { %>
                 <%- gettext('View Archived Course') %>
             <% } %>
         </a>
     <% } %>
-<% }else{ %>
-    <% if (enrollable_run_modes.length > 0){ %>
+<% } else { %>
+    <% if (enrollable_run_modes.length > 0) { %>
         <div class="enrollment-info"><%- gettext('not enrolled') %></div>
-        <% if (enrollable_run_modes.length > 1){ %>
+        <% if (enrollable_run_modes.length > 1) { %>
             <div class="run-select-container">
                 <div class="select-error">
                     <%- gettext('Please select a course date') %>
@@ -24,10 +24,10 @@
                     <option value="" selected="selected">
                         <%- gettext('Choose Course Date') %>
                     </option>
-                    <% _.each (enrollable_run_modes, function(runMode){ %>
+                    <% _.each (enrollable_run_modes, function(runMode) { %>
                         <option
                             value="<%- runMode.run_key %>"
-                            <% if (run_key === runMode.run_key){ %>
+                            <% if (run_key === runMode.run_key) { %>
                                 selected="selected"
                             <% }%>
                         >
