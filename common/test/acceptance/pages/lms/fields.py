@@ -4,7 +4,7 @@ Mixins for fields.
 """
 from bok_choy.promise import EmptyPromise
 
-from ...tests.helpers import get_selected_option_text, select_option_by_text
+from common.test.acceptance.tests.helpers import get_selected_option_text, select_option_by_text
 
 
 class FieldsMixin(object):

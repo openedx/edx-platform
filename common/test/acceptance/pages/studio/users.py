@@ -3,9 +3,9 @@ Page classes to test either the Course Team page or the Library Team page.
 """
 from bok_choy.promise import EmptyPromise
 from bok_choy.page_object import PageObject
-from ...tests.helpers import disable_animations
-from .course_page import CoursePage
-from . import BASE_URL
+from common.test.acceptance.tests.helpers import disable_animations
+from common.test.acceptance.pages.studio.course_page import CoursePage
+from common.test.acceptance.pages.studio import BASE_URL
 
 
 def wait_for_ajax_or_reload(browser):

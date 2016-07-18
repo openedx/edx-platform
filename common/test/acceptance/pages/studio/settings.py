@@ -7,9 +7,9 @@ import os
 from bok_choy.promise import EmptyPromise
 from bok_choy.javascript import requirejs
 
-from .course_page import CoursePage
-from .users import wait_for_ajax_or_reload
-from .utils import press_the_notification_button
+from common.test.acceptance.pages.studio.course_page import CoursePage
+from common.test.acceptance.pages.studio.users import wait_for_ajax_or_reload
+from common.test.acceptance.pages.studio.utils import press_the_notification_button
 
 
 @requirejs('js/factories/settings')

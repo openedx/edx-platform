@@ -1,5 +1,5 @@
 from bok_choy.page_object import PageObject
-from . import BASE_URL
+from common.test.acceptance.pages.studio import BASE_URL
 
 
 class SignupPage(PageObject):

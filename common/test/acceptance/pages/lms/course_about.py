@@ -2,8 +2,8 @@
 Course about page (with registration button)
 """
 
-from .course_page import CoursePage
-from .login_and_register import RegisterPage
+from common.test.acceptance.pages.lms.course_page import CoursePage
+from common.test.acceptance.pages.lms.login_and_register import RegisterPage
 
 
 class CourseAboutPage(CoursePage):
