@@ -57,6 +57,11 @@ urlpatterns = patterns(
     url(r'^lang_pref/session_language', 'lang_pref.views.update_session_language', name='session_language'),
 )
 
+# Maintenance Dashboard
+urlpatterns += (
+    url(r'^maintenance/', include('maintenance.urls', app_name="maintenance", namespace='maintenance')),
+)
+
 # User creation and updating views
 urlpatterns += patterns(
     '',
