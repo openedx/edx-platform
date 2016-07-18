@@ -463,3 +463,23 @@ def remove_master_course_staff_from_ccx(master_course, ccx_key, display_name, se
                     email_students=send_email,
                     email_params=email_params,
                 )
+
+
+def list_course_members(course_id):
+    """
+    Returns list of students enroll in course/ccx excluding staff, instructors and coaches on master course.
+
+    Args:
+        course_id (CourseLocator): the course key
+
+    """
+    course_locator = course_id
+    if getattr(course_id, 'ccx', None):
+        course_locator = course_id.to_course_locator()
+
+    staff = CourseStaffRole(course_locator).users_with_role()
+    admins = CourseInstructorRole(course_locator).users_with_role()
+    coaches = CourseCcxCoachRole(course_locator).users_with_role()
+
+    query_set = CourseEnrollment.objects.filter(course_id=course_id, is_active=True)
+    return query_set.exclude(user__in=staff).exclude(user__in=admins).exclude(user__in=coaches)

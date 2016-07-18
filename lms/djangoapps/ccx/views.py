@@ -35,7 +35,11 @@ from courseware.grades import iterate_grades_for
 from edxmako.shortcuts import render_to_response
 from opaque_keys.edx.keys import CourseKey
 from ccx_keys.locator import CCXLocator
-from student.roles import CourseCcxCoachRole
+from student.roles import (
+    CourseCcxCoachRole,
+    CourseInstructorRole,
+    CourseStaffRole
+)
 from student.models import CourseEnrollment
 
 from instructor.views.api import _split_input_list
@@ -61,6 +65,7 @@ from lms.djangoapps.ccx.utils import (
     get_ccx_by_ccx_id,
     get_ccx_creation_dict,
     get_date,
+    list_course_members,
     parse_date,
     prep_course_for_grading,
 )
@@ -153,7 +158,7 @@ def dashboard(request, course, ccx=None):
         context['schedule'] = json.dumps(schedule, indent=4)
         context['save_url'] = reverse(
             'save_ccx', kwargs={'course_id': ccx_locator})
-        context['ccx_members'] = CourseEnrollment.objects.filter(course_id=ccx_locator, is_active=True)
+        context['ccx_members'] = list_course_members(ccx_locator)
         context['gradebook_url'] = reverse(
             'ccx_gradebook', kwargs={'course_id': ccx_locator})
         context['grades_csv_url'] = reverse(
@@ -499,7 +504,17 @@ def ccx_gradebook(request, course, ccx=None):
     ccx_key = CCXLocator.from_course_locator(course.id, ccx.id)
     with ccx_course(ccx_key) as course:
         prep_course_for_grading(course, request)
-        student_info, page = get_grade_book_page(request, course, course_key=ccx_key)
+
+        staff = [user.username for user in CourseStaffRole(course.id).users_with_role()]
+        instructors = [user.username for user in CourseInstructorRole(course.id).users_with_role()]
+        coaches = [user.username for user in CourseCcxCoachRole(course.id).users_with_role()]
+
+        exclude_users = {
+            'staff': staff,
+            'instructors': instructors,
+            'coaches': coaches
+        }
+        student_info, page = get_grade_book_page(request, course, course_key=ccx_key, exclude=exclude_users)
 
         return render_to_response('courseware/gradebook.html', {
             'page': page,
@@ -524,7 +539,11 @@ def ccx_grades_csv(request, course, ccx=None):
     if not ccx:
         raise Http404
 
+    staff = [user.username for user in CourseStaffRole(course.id).users_with_role()]
+    instructors = [user.username for user in CourseInstructorRole(course.id).users_with_role()]
+    coaches = [user.username for user in CourseCcxCoachRole(course.id).users_with_role()]
     ccx_key = CCXLocator.from_course_locator(course.id, ccx.id)
+
     with ccx_course(ccx_key) as course:
         prep_course_for_grading(course, request)
 
@@ -532,6 +551,11 @@ def ccx_grades_csv(request, course, ccx=None):
             courseenrollment__course_id=ccx_key,
             courseenrollment__is_active=1
         ).order_by('username').select_related("profile")
+
+        enrolled_students = enrolled_students.exclude(
+            username__in=staff
+        ).exclude(username__in=instructors).exclude(username__in=coaches)
+
         grades = iterate_grades_for(course, enrolled_students)
 
         header = None

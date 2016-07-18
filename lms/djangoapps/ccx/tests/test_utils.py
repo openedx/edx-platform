@@ -12,7 +12,10 @@ from student.roles import (
     CourseInstructorRole,
     CourseStaffRole,
 )
-from student.tests.factories import AdminFactory
+from student.tests.factories import (
+    AdminFactory,
+    UserFactory,
+)
 
 from student.models import CourseEnrollment, CourseEnrollmentException
 
@@ -31,6 +34,7 @@ from lms.djangoapps.instructor.access import (
 from lms.djangoapps.ccx.utils import (
     add_master_course_staff_to_ccx,
     ccx_course,
+    list_course_members,
     remove_master_course_staff_from_ccx
 )
 from lms.djangoapps.ccx.tests.factories import CcxFactory
@@ -110,6 +114,43 @@ class TestGetCourseChapters(CcxTestCase):
             sorted(course_chapters),
             sorted([unicode(child) for child in self.course.children])
         )
+
+
+@attr('shard_1')
+class TestCCXMembers(CcxTestCase):
+    """
+    Tests for the `list_course_members` util function
+    """
+    def setUp(self):
+        super(TestCCXMembers, self).setUp()
+        self.staff = self.make_staff()
+        self.instructor = self.make_instructor()
+        self.student = UserFactory.create(is_staff=False)
+
+        self.make_coach()
+        self.ccx = self.make_ccx()
+        self.ccx_locator = CCXLocator.from_course_locator(self.course.id, self.ccx.id)
+
+    def create_ccx_and_enroll(self):
+        """
+        Create student and setup staff users.
+        """
+        CourseEnrollment.enroll(self.student, self.ccx_locator)
+        add_master_course_staff_to_ccx(self.course, self.ccx_locator, self.ccx.display_name)
+
+    def test_members_list(self):
+        """
+        Assert that list of enrolled student do not have staff and coaches.
+        """
+        self.create_ccx_and_enroll()
+        self.assertTrue(CourseStaffRole(self.course.id).has_user(self.staff))
+        self.assertTrue(CourseInstructorRole(self.course.id).has_user(self.instructor))
+
+        members = [enrollment.user for enrollment in list_course_members(self.ccx_locator)]
+        self.assertIn(self.student, members)
+        self.assertNotIn(self.staff, members)
+        self.assertNotIn(self.instructor, members)
+        self.assertNotIn(self.coach, members)
 
 
 class TestStaffOnCCX(CcxTestCase):
