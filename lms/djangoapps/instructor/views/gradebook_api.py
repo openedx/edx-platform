@@ -64,7 +64,7 @@ def calculate_page_info(offset, total_students):
     }
 
 
-def get_grade_book_page(request, course, course_key):
+def get_grade_book_page(request, course, course_key, exclude=None):
     """
     Get student records per page along with page information i.e current page, total pages and
     offset information.
@@ -75,6 +75,10 @@ def get_grade_book_page(request, course, course_key):
         courseenrollment__course_id=course_key,
         courseenrollment__is_active=1
     ).order_by('username').select_related("profile")
+
+    if exclude:
+        for __, list in exclude.items():
+            enrolled_students = enrolled_students.exclude(username__in=list)
 
     total_students = enrolled_students.count()
     page = calculate_page_info(current_offset, total_students)

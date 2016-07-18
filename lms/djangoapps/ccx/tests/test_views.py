@@ -1026,6 +1026,30 @@ class TestCCXGrades(FieldOverrideTestMixin, SharedModuleStoreTestCase, LoginEnro
         self.client.login(username=coach.username, password="test")
         self.addCleanup(RequestCache.clear_request_cache)
 
+        # create staff and instructor on course.
+        self.staff = self.make_staff()
+        self.instructor = self.make_instructor()
+
+    def make_staff(self):
+        """
+        create staff user.
+        """
+        staff = UserFactory.create(password="test")
+        role = CourseStaffRole(self.course.id)
+        role.add_users(staff)
+
+        return staff
+
+    def make_instructor(self):
+        """
+        create instructor user.
+        """
+        instructor = UserFactory.create(password="test")
+        role = CourseInstructorRole(self.course.id)
+        role.add_users(instructor)
+
+        return instructor
+
     @patch('ccx.views.render_to_response', intercept_renderer)
     @patch('instructor.views.gradebook_api.MAX_STUDENTS_PER_PAGE_GRADE_BOOK', 1)
     def test_gradebook(self):
@@ -1040,6 +1064,11 @@ class TestCCXGrades(FieldOverrideTestMixin, SharedModuleStoreTestCase, LoginEnro
         self.assertEqual(response.status_code, 200)
         # Max number of student per page is one.  Patched setting MAX_STUDENTS_PER_PAGE_GRADE_BOOK = 1
         self.assertEqual(len(response.mako_context['students']), 1)  # pylint: disable=no-member
+
+        self.assertNotIn(self.staff.username, response.mako_context['students'])
+        self.assertNotIn(self.instructor.username, response.mako_context['students'])
+        self.assertNotIn(self.coach.username, response.mako_context['students'])
+
         student_info = response.mako_context['students'][0]  # pylint: disable=no-member
         self.assertEqual(student_info['grade_summary']['percent'], 0.5)
         self.assertEqual(
@@ -1065,6 +1094,10 @@ class TestCCXGrades(FieldOverrideTestMixin, SharedModuleStoreTestCase, LoginEnro
         )
         rows = response.content.strip().split('\r')
         headers = rows[0]
+
+        self.assertNotIn(self.staff.username, rows)
+        self.assertNotIn(self.instructor.username, rows)
+        self.assertNotIn(self.coach.username, rows)
 
         # picking first student records
         data = dict(zip(headers.strip().split(','), rows[1].strip().split(',')))
