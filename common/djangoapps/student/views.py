@@ -2017,6 +2017,13 @@ def password_reset(request):
     })
 
 
+def add_error_msg(form_errors):
+    if 'new_password1' in form_errors:
+        return "Password field can't be empty"
+    if 'new_password2' in form_errors:
+        return "Password fields must match"
+
+
 def password_reset_confirm_wrapper(
     request,
     uidb36=None,
@@ -2106,6 +2113,13 @@ def password_reset_confirm_wrapper(
             if updated_user.password != old_password_hash:
                 entry = PasswordHistory()
                 entry.create(updated_user)
+
+            try:
+                form_errors = result.context_data['form'].errors
+                if form_errors:
+                     result.context_data['err_msg'] = add_error_msg(form_errors)
+            except:
+                pass
 
             return result
         else:
