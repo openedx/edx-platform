@@ -97,7 +97,6 @@ from util.bad_request_rate_limiter import BadRequestRateLimiter
 from util.milestones_helpers import (
     get_pre_requisite_courses_not_completed,
 )
-from microsite_configuration import microsite
 
 from util.password_policy_validators import validate_password_strength
 import third_party_auth
@@ -123,6 +122,7 @@ from openedx.core.djangoapps.credit.email_utils import get_credit_provider_displ
 from openedx.core.djangoapps.user_api.preferences import api as preferences_api
 from openedx.core.djangoapps.programs.utils import get_programs_for_dashboard, get_display_category
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming import helpers as theming_helpers
 
 
@@ -164,31 +164,33 @@ def index(request, extra_context=None, user=AnonymousUser()):
 
     courses = get_courses(user)
 
-    if microsite.get_value("ENABLE_COURSE_SORTING_BY_START_DATE",
-                           settings.FEATURES["ENABLE_COURSE_SORTING_BY_START_DATE"]):
+    if configuration_helpers.get_value(
+            "ENABLE_COURSE_SORTING_BY_START_DATE",
+            settings.FEATURES["ENABLE_COURSE_SORTING_BY_START_DATE"],
+    ):
         courses = sort_by_start_date(courses)
     else:
         courses = sort_by_announcement(courses)
 
     context = {'courses': courses}
 
-    context['homepage_overlay_html'] = microsite.get_value('homepage_overlay_html')
+    context['homepage_overlay_html'] = configuration_helpers.get_value('homepage_overlay_html')
 
     # This appears to be an unused context parameter, at least for the master templates...
-    context['show_partners'] = microsite.get_value('show_partners', True)
+    context['show_partners'] = configuration_helpers.get_value('show_partners', True)
 
     # TO DISPLAY A YOUTUBE WELCOME VIDEO
     # 1) Change False to True
-    context['show_homepage_promo_video'] = microsite.get_value('show_homepage_promo_video', False)
+    context['show_homepage_promo_video'] = configuration_helpers.get_value('show_homepage_promo_video', False)
 
-    # 2) Add your video's YouTube ID (11 chars, eg "123456789xX"), or specify via microsite config
+    # 2) Add your video's YouTube ID (11 chars, eg "123456789xX"), or specify via site configuration
     # Note: This value should be moved into a configuration setting and plumbed-through to the
-    # context via the microsite configuration workflow, versus living here
-    youtube_video_id = microsite.get_value('homepage_promo_video_youtube_id', "your-youtube-id")
+    # context via the site configuration workflow, versus living here
+    youtube_video_id = configuration_helpers.get_value('homepage_promo_video_youtube_id', "your-youtube-id")
     context['homepage_promo_video_youtube_id'] = youtube_video_id
 
-    # allow for microsite override of the courses list
-    context['courses_list'] = microsite.get_template_path('courses_list.html')
+    # allow for theme override of the courses list
+    context['courses_list'] = theming_helpers.get_template_path('courses_list.html')
 
     # Insert additional context for use in the template
     context.update(extra_context)
@@ -264,8 +266,7 @@ def get_course_enrollments(user, org_to_include, orgs_to_exclude):
 
     Arguments:
         user (User): the user in question.
-        org_to_include (str): for use in Microsites. If not None, ONLY courses
-            of this org will be returned.
+        org_to_include (str): If not None, ONLY courses of this org will be returned.
         orgs_to_exclude (list[str]): If org_to_include is not None, this
             argument is ignored. Else, courses of this org will be excluded.
 
@@ -285,13 +286,11 @@ def get_course_enrollments(user, org_to_include, orgs_to_exclude):
             )
             continue
 
-        # If we are in a Microsite, then filter out anything that is not
-        # attributed (by ORG) to that Microsite.
+        # Filter out anything that is not attributed to the current ORG.
         if org_to_include and course_overview.location.org != org_to_include:
             continue
 
-        # Conversely, if we are not in a Microsite, then filter out any enrollments
-        # with courses attributed (by ORG) to Microsites.
+        # Conversely, filter out any enrollments with courses attributed to current ORG.
         elif course_overview.location.org in orgs_to_exclude:
             continue
 
@@ -385,8 +384,8 @@ def _cert_info(user, course_overview, cert_status, course_mode):  # pylint: disa
             linkedin_config = LinkedInAddToProfileConfiguration.current()
 
             # posting certificates to LinkedIn is not currently
-            # supported in microsites/White Labels
-            if linkedin_config.enabled and not microsite.is_request_in_microsite():
+            # supported in White Labels
+            if linkedin_config.enabled and not theming_helpers.is_request_in_themed_site():
                 status_dict['linked_in_url'] = linkedin_config.add_to_profile_url(
                     course_overview.id,
                     course_overview.display_name,
@@ -431,7 +430,7 @@ def signin_user(request):
         # pipeline, if any.
         'pipeline_running': 'true' if pipeline.running(request) else 'false',
         'pipeline_url': auth_pipeline_urls(pipeline.AUTH_ENTRY_LOGIN, redirect_url=redirect_to),
-        'platform_name': microsite.get_value(
+        'platform_name': configuration_helpers.get_value(
             'platform_name',
             settings.PLATFORM_NAME
         ),
@@ -459,7 +458,7 @@ def register_user(request, extra_context=None):
         'name': '',
         'running_pipeline': None,
         'pipeline_urls': auth_pipeline_urls(pipeline.AUTH_ENTRY_REGISTER, redirect_url=redirect_to),
-        'platform_name': microsite.get_value(
+        'platform_name': configuration_helpers.get_value(
             'platform_name',
             settings.PLATFORM_NAME
         ),
@@ -548,17 +547,17 @@ def is_course_blocked(request, redeemed_registration_codes, course_key):
 def dashboard(request):
     user = request.user
 
-    platform_name = microsite.get_value("platform_name", settings.PLATFORM_NAME)
+    platform_name = configuration_helpers.get_value("platform_name", settings.PLATFORM_NAME)
 
-    # for microsites, we want to filter and only show enrollments for courses within
-    # the microsites 'ORG'
-    course_org_filter = microsite.get_value('course_org_filter')
+    # we want to filter and only show enrollments for courses within
+    # the 'ORG' defined in configuration.
+    course_org_filter = configuration_helpers.get_value('course_org_filter')
 
     # Let's filter out any courses in an "org" that has been declared to be
-    # in a Microsite
-    org_filter_out_set = microsite.get_all_orgs()
+    # in a configuration
+    org_filter_out_set = configuration_helpers.get_all_orgs()
 
-    # remove our current Microsite from the "filter out" list, if applicable
+    # remove our current org from the "filter out" list, if applicable
     if course_org_filter:
         org_filter_out_set.remove(course_org_filter)
 
@@ -780,7 +779,7 @@ def _create_recent_enrollment_message(course_enrollments, course_modes):  # pyli
             for enrollment in recently_enrolled_courses
         ]
 
-        platform_name = microsite.get_value('platform_name', settings.PLATFORM_NAME)
+        platform_name = configuration_helpers.get_value('platform_name', settings.PLATFORM_NAME)
 
         return render_to_string(
             'enrollment/course_enrollment_message.html',
@@ -1107,7 +1106,7 @@ def login_user(request, error=""):  # pylint: disable=too-many-statements,unused
     third_party_auth_successful = False
     trumped_by_first_party_auth = bool(request.POST.get('email')) or bool(request.POST.get('password'))
     user = None
-    platform_name = microsite.get_value("platform_name", settings.PLATFORM_NAME)
+    platform_name = configuration_helpers.get_value("platform_name", settings.PLATFORM_NAME)
 
     if third_party_auth_requested and not trumped_by_first_party_auth:
         # The user has already authenticated via third-party auth and has not
@@ -1460,7 +1459,7 @@ def user_signup_handler(sender, **kwargs):  # pylint: disable=unused-argument
     when the user is created
     """
     if 'created' in kwargs and kwargs['created']:
-        site = microsite.get_value('SITE_NAME')
+        site = configuration_helpers.get_value('SITE_NAME')
         if site:
             user_signup_source = UserSignupSource(user=kwargs['instance'], site=site)
             user_signup_source.save()
@@ -1574,8 +1573,8 @@ def create_account_with_params(request, params):
     # params is request.POST, that results in a dict containing lists of values
     params = dict(params.items())
 
-    # allow for microsites to define their own set of required/optional/hidden fields
-    extra_fields = microsite.get_value(
+    # allow to define custom set of required/optional/hidden fields via configuration
+    extra_fields = configuration_helpers.get_value(
         'REGISTRATION_EXTRA_FIELDS',
         getattr(settings, 'REGISTRATION_EXTRA_FIELDS', {})
     )
@@ -1607,7 +1606,7 @@ def create_account_with_params(request, params):
         params["password"] = eamap.internal_password
         log.debug(u'In create_account with external_auth: user = %s, email=%s', params["name"], params["email"])
 
-    extended_profile_fields = microsite.get_value('extended_profile_fields', [])
+    extended_profile_fields = configuration_helpers.get_value('extended_profile_fields', [])
     enforce_password_policy = (
         settings.FEATURES.get("ENFORCE_PASSWORD_POLICY", False) and
         not do_external_auth
@@ -1771,7 +1770,7 @@ def create_account_with_params(request, params):
         subject = ''.join(subject.splitlines())
         message = render_to_string('emails/activation_email.txt', context)
 
-        from_address = theming_helpers.get_value(
+        from_address = configuration_helpers.get_value(
             'email_from_address',
             settings.DEFAULT_FROM_EMAIL
         )
@@ -2080,7 +2079,7 @@ def password_reset(request):
     form = PasswordResetFormNoActive(request.POST)
     if form.is_valid():
         form.save(use_https=request.is_secure(),
-                  from_email=theming_helpers.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL),
+                  from_email=configuration_helpers.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL),
                   request=request,
                   domain_override=request.get_host())
         # When password change is complete, a "edx.user.settings.changed" event will be emitted.
@@ -2184,7 +2183,7 @@ def password_reset_confirm_wrapper(request, uidb36=None, token=None):
     # convert old-style base36-encoded user id to base64
     uidb64 = uidb36_to_uidb64(uidb36)
     platform_name = {
-        "platform_name": microsite.get_value('platform_name', settings.PLATFORM_NAME)
+        "platform_name": configuration_helpers.get_value('platform_name', settings.PLATFORM_NAME)
     }
     try:
         uid_int = base36_to_int(uidb36)
@@ -2261,11 +2260,14 @@ def reactivation_email_for_user(user):
     message = render_to_string('emails/activation_email.txt', context)
 
     try:
-        user.email_user(subject, message, theming_helpers.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL))
+        user.email_user(subject, message, configuration_helpers.get_value(
+            'email_from_address',
+            settings.DEFAULT_FROM_EMAIL,
+        ))
     except Exception:  # pylint: disable=broad-except
         log.error(
             u'Unable to send reactivation email from "%s"',
-            theming_helpers.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL),
+            configuration_helpers.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL),
             exc_info=True
         )
         return JsonResponse({
@@ -2325,7 +2327,7 @@ def do_email_change_request(user, new_email, activation_key=None):
 
     message = render_to_string('emails/email_change.txt', context)
 
-    from_address = theming_helpers.get_value(
+    from_address = configuration_helpers.get_value(
         'email_from_address',
         settings.DEFAULT_FROM_EMAIL
     )
@@ -2389,7 +2391,7 @@ def confirm_email_change(request, key):  # pylint: disable=unused-argument
             user.email_user(
                 subject,
                 message,
-                theming_helpers.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL)
+                configuration_helpers.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL)
             )
         except Exception:    # pylint: disable=broad-except
             log.warning('Unable to send confirmation email to old address', exc_info=True)
@@ -2405,7 +2407,7 @@ def confirm_email_change(request, key):  # pylint: disable=unused-argument
             user.email_user(
                 subject,
                 message,
-                theming_helpers.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL)
+                configuration_helpers.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL)
             )
         except Exception:  # pylint: disable=broad-except
             log.warning('Unable to send confirmation email to new address', exc_info=True)

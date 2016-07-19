@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Tests for Microsite Dashboard with Shopping Cart History
+Dashboard with Shopping Cart History tests with configuration overrides.
 """
 import mock
 
@@ -19,32 +19,25 @@ from course_modes.models import CourseMode
 
 def fake_all_orgs(default=None):  # pylint: disable=unused-argument
     """
-    create a fake list of all microsites
+    Method to return fake orgs,
     """
     return set(['fakeX', 'fooX'])
 
 
-def fakex_microsite(name, default=None):  # pylint: disable=unused-argument
+def fake_site(name, default=None):  # pylint: disable=unused-argument
     """
-    create a fake microsite site name
+    Method to return a fake site name.
     """
     return 'fakeX'
 
 
-def non_microsite(name, default=None):  # pylint: disable=unused-argument
-    """
-    create a fake microsite site name
-    """
-    return None
-
-
 @patch.dict('django.conf.settings.FEATURES', {'ENABLE_PAID_COURSE_REGISTRATION': True})
-class TestOrderHistoryOnMicrositeDashboard(ModuleStoreTestCase):
+class TestOrderHistoryOnSiteDashboard(ModuleStoreTestCase):
     """
-    Test for microsite dashboard order history
+    Test for dashboard order history site configuration overrides.
     """
     def setUp(self):
-        super(TestOrderHistoryOnMicrositeDashboard, self).setUp()
+        super(TestOrderHistoryOnSiteDashboard, self).setUp()
 
         patcher = patch('student.models.tracker')
         self.mock_tracker = patcher.start()
@@ -54,7 +47,7 @@ class TestOrderHistoryOnMicrositeDashboard(ModuleStoreTestCase):
 
         self.addCleanup(patcher.stop)
 
-        # First Order with our (fakeX) microsite's course.
+        # First Order with our (fakeX) site's course.
         course1 = CourseFactory.create(org='fakeX', number='999', display_name='fakeX Course')
         course1_key = course1.id
         course1_mode = CourseMode(course_id=course1_key,
@@ -66,9 +59,9 @@ class TestOrderHistoryOnMicrositeDashboard(ModuleStoreTestCase):
         cart = Order.get_cart_for_user(self.user)
         PaidCourseRegistration.add_to_order(cart, course1_key)
         cart.purchase(first='FirstNameTesting123', street1='StreetTesting123')
-        self.orderid_microsite = cart.id
+        self.fakex_site_order_id = cart.id
 
-        # Second Order with another(fooX) microsite's course
+        # Second Order with another(fooX) site's course
         course2 = CourseFactory.create(org='fooX', number='888', display_name='fooX Course')
         course2_key = course2.id
         course2_mode = CourseMode(course_id=course2.id,
@@ -80,9 +73,9 @@ class TestOrderHistoryOnMicrositeDashboard(ModuleStoreTestCase):
         cart = Order.get_cart_for_user(self.user)
         PaidCourseRegistration.add_to_order(cart, course2_key)
         cart.purchase(first='FirstNameTesting123', street1='StreetTesting123')
-        self.orderid_other_microsite = cart.id
+        self.foox_site_order_id = cart.id
 
-        # Third Order with course not attributed to any microsite.
+        # Third Order with course not attributed to any site.
         course3 = CourseFactory.create(org='otherorg', number='777', display_name='otherorg Course')
         course3_key = course3.id
         course3_mode = CourseMode(course_id=course3.id,
@@ -94,9 +87,9 @@ class TestOrderHistoryOnMicrositeDashboard(ModuleStoreTestCase):
         cart = Order.get_cart_for_user(self.user)
         PaidCourseRegistration.add_to_order(cart, course3_key)
         cart.purchase(first='FirstNameTesting123', street1='StreetTesting123')
-        self.orderid_non_microsite = cart.id
+        self.order_id = cart.id
 
-        # Fourth Order with course not attributed to any microsite but with a CertificateItem
+        # Fourth Order with course not attributed to any site but with a CertificateItem
         course4 = CourseFactory.create(org='otherorg', number='888')
         course4_key = course4.id
         course4_mode = CourseMode(course_id=course4.id,
@@ -108,58 +101,61 @@ class TestOrderHistoryOnMicrositeDashboard(ModuleStoreTestCase):
         cart = Order.get_cart_for_user(self.user)
         CertificateItem.add_to_order(cart, course4_key, 20.0, 'verified')
         cart.purchase(first='FirstNameTesting123', street1='StreetTesting123')
-        self.orderid_cert_non_microsite = cart.id
+        self.certificate_order_id = cart.id
 
-        # Fifth Order with course not attributed to any microsite but with a Donation
+        # Fifth Order with course not attributed to any site but with a Donation
         course5 = CourseFactory.create(org='otherorg', number='999')
         course5_key = course5.id
 
         cart = Order.get_cart_for_user(self.user)
         Donation.add_to_order(cart, 20.0, course5_key)
         cart.purchase(first='FirstNameTesting123', street1='StreetTesting123')
-        self.orderid_donation = cart.id
+        self.donation_order_id = cart.id
 
         # also add a donation not associated with a course to make sure the None case works OK
         Donation.add_to_order(cart, 10.0, None)
         cart.purchase(first='FirstNameTesting123', street1='StreetTesting123')
-        self.orderid_courseless_donation = cart.id
+        self.courseless_donation_order_id = cart.id
 
-    @mock.patch("microsite_configuration.microsite.get_value", fakex_microsite)
-    @mock.patch("microsite_configuration.microsite.get_all_orgs", fake_all_orgs)
-    def test_when_in_microsite_shows_orders_with_microsite_courses_only(self):
+    @mock.patch("openedx.core.djangoapps.site_configuration.helpers.get_value", fake_site)
+    @mock.patch("openedx.core.djangoapps.site_configuration.helpers.get_all_orgs", fake_all_orgs)
+    def test_shows_orders_with_current_site_courses_only(self):
         self.client.login(username=self.user.username, password="password")
         response = self.client.get(reverse("dashboard"))
-        receipt_url_microsite_course = reverse('shoppingcart.views.show_receipt', kwargs={'ordernum': self.orderid_microsite})
-        receipt_url_microsite_course2 = reverse('shoppingcart.views.show_receipt', kwargs={'ordernum': self.orderid_other_microsite})
-        receipt_url_non_microsite = reverse('shoppingcart.views.show_receipt', kwargs={'ordernum': self.orderid_non_microsite})
-        receipt_url_cert_non_microsite = reverse('shoppingcart.views.show_receipt', kwargs={'ordernum': self.orderid_cert_non_microsite})
-        receipt_url_donation = reverse('shoppingcart.views.show_receipt', kwargs={'ordernum': self.orderid_donation})
+        receipt_url_course = reverse('shoppingcart.views.show_receipt', kwargs={'ordernum': self.fakex_site_order_id})
+        receipt_url_course2 = reverse('shoppingcart.views.show_receipt', kwargs={'ordernum': self.foox_site_order_id})
+        receipt_url = reverse('shoppingcart.views.show_receipt', kwargs={'ordernum': self.order_id})
+        receipt_url_cert = reverse('shoppingcart.views.show_receipt', kwargs={'ordernum': self.certificate_order_id})
+        receipt_url_donation = reverse('shoppingcart.views.show_receipt', kwargs={'ordernum': self.donation_order_id})
 
         # We need to decode because of these chars: © & ▸
         content = response.content.decode('utf-8')
-        self.assertIn(receipt_url_microsite_course, content)
-        self.assertNotIn(receipt_url_microsite_course2, content)
-        self.assertNotIn(receipt_url_non_microsite, content)
-        self.assertNotIn(receipt_url_cert_non_microsite, content)
+        self.assertIn(receipt_url_course, content)
+        self.assertNotIn(receipt_url_course2, content)
+        self.assertNotIn(receipt_url, content)
+        self.assertNotIn(receipt_url_cert, content)
         self.assertNotIn(receipt_url_donation, content)
 
-    @mock.patch("microsite_configuration.microsite.get_value", non_microsite)
-    @mock.patch("microsite_configuration.microsite.get_all_orgs", fake_all_orgs)
-    def test_when_not_in_microsite_shows_orders_with_non_microsite_courses_only(self):
+    @mock.patch("openedx.core.djangoapps.site_configuration.helpers.get_value", mock.Mock(return_value=None))
+    @mock.patch("openedx.core.djangoapps.site_configuration.helpers.get_all_orgs", fake_all_orgs)
+    def test_shows_orders_with_non_site_courses_only_when_no_configuration_override_exists(self):
         self.client.login(username=self.user.username, password="password")
         response = self.client.get(reverse("dashboard"))
-        receipt_url_microsite_course = reverse('shoppingcart.views.show_receipt', kwargs={'ordernum': self.orderid_microsite})
-        receipt_url_microsite_course2 = reverse('shoppingcart.views.show_receipt', kwargs={'ordernum': self.orderid_other_microsite})
-        receipt_url_non_microsite = reverse('shoppingcart.views.show_receipt', kwargs={'ordernum': self.orderid_non_microsite})
-        receipt_url_cert_non_microsite = reverse('shoppingcart.views.show_receipt', kwargs={'ordernum': self.orderid_cert_non_microsite})
-        receipt_url_donation = reverse('shoppingcart.views.show_receipt', kwargs={'ordernum': self.orderid_donation})
-        receipt_url_courseless_donation = reverse('shoppingcart.views.show_receipt', kwargs={'ordernum': self.orderid_courseless_donation})
+        receipt_url_course = reverse('shoppingcart.views.show_receipt', kwargs={'ordernum': self.fakex_site_order_id})
+        receipt_url_course2 = reverse('shoppingcart.views.show_receipt', kwargs={'ordernum': self.foox_site_order_id})
+        receipt_url = reverse('shoppingcart.views.show_receipt', kwargs={'ordernum': self.order_id})
+        receipt_url_cert = reverse('shoppingcart.views.show_receipt', kwargs={'ordernum': self.certificate_order_id})
+        receipt_url_donation = reverse('shoppingcart.views.show_receipt', kwargs={'ordernum': self.donation_order_id})
+        receipt_url_courseless_donation = reverse(
+            'shoppingcart.views.show_receipt',
+            kwargs={'ordernum': self.courseless_donation_order_id},
+        )
 
         # We need to decode because of these chars: © & ▸
         content = response.content.decode('utf-8')
-        self.assertNotIn(receipt_url_microsite_course, content)
-        self.assertNotIn(receipt_url_microsite_course2, content)
-        self.assertIn(receipt_url_non_microsite, content)
-        self.assertIn(receipt_url_cert_non_microsite, content)
+        self.assertNotIn(receipt_url_course, content)
+        self.assertNotIn(receipt_url_course2, content)
+        self.assertIn(receipt_url, content)
+        self.assertIn(receipt_url_cert, content)
         self.assertIn(receipt_url_donation, content)
         self.assertIn(receipt_url_courseless_donation, content)

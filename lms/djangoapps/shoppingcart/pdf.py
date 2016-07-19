@@ -12,8 +12,8 @@ from reportlab.lib.units import mm
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.platypus import Paragraph
 from reportlab.platypus.tables import Table, TableStyle
-from microsite_configuration import microsite
 from xmodule.modulestore.django import ModuleI18nService
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 log = logging.getLogger("PDF Generation")
 
@@ -90,24 +90,26 @@ class PDFInvoice(object):
 
         # From settings
         self.currency = settings.PAID_COURSE_REGISTRATION_CURRENCY[1]
-        self.logo_path = microsite.get_value("PDF_RECEIPT_LOGO_PATH", settings.PDF_RECEIPT_LOGO_PATH)
-        self.cobrand_logo_path = microsite.get_value(
+        self.logo_path = configuration_helpers.get_value("PDF_RECEIPT_LOGO_PATH", settings.PDF_RECEIPT_LOGO_PATH)
+        self.cobrand_logo_path = configuration_helpers.get_value(
             "PDF_RECEIPT_COBRAND_LOGO_PATH", settings.PDF_RECEIPT_COBRAND_LOGO_PATH
         )
-        self.tax_label = microsite.get_value("PDF_RECEIPT_TAX_ID_LABEL", settings.PDF_RECEIPT_TAX_ID_LABEL)
-        self.tax_id = microsite.get_value("PDF_RECEIPT_TAX_ID", settings.PDF_RECEIPT_TAX_ID)
-        self.footer_text = microsite.get_value("PDF_RECEIPT_FOOTER_TEXT", settings.PDF_RECEIPT_FOOTER_TEXT)
-        self.disclaimer_text = microsite.get_value("PDF_RECEIPT_DISCLAIMER_TEXT", settings.PDF_RECEIPT_DISCLAIMER_TEXT)
-        self.billing_address_text = microsite.get_value(
+        self.tax_label = configuration_helpers.get_value("PDF_RECEIPT_TAX_ID_LABEL", settings.PDF_RECEIPT_TAX_ID_LABEL)
+        self.tax_id = configuration_helpers.get_value("PDF_RECEIPT_TAX_ID", settings.PDF_RECEIPT_TAX_ID)
+        self.footer_text = configuration_helpers.get_value("PDF_RECEIPT_FOOTER_TEXT", settings.PDF_RECEIPT_FOOTER_TEXT)
+        self.disclaimer_text = configuration_helpers.get_value(
+            "PDF_RECEIPT_DISCLAIMER_TEXT", settings.PDF_RECEIPT_DISCLAIMER_TEXT,
+        )
+        self.billing_address_text = configuration_helpers.get_value(
             "PDF_RECEIPT_BILLING_ADDRESS", settings.PDF_RECEIPT_BILLING_ADDRESS
         )
-        self.terms_conditions_text = microsite.get_value(
+        self.terms_conditions_text = configuration_helpers.get_value(
             "PDF_RECEIPT_TERMS_AND_CONDITIONS", settings.PDF_RECEIPT_TERMS_AND_CONDITIONS
         )
-        self.brand_logo_height = microsite.get_value(
+        self.brand_logo_height = configuration_helpers.get_value(
             "PDF_RECEIPT_LOGO_HEIGHT_MM", settings.PDF_RECEIPT_LOGO_HEIGHT_MM
         ) * mm
-        self.cobrand_logo_height = microsite.get_value(
+        self.cobrand_logo_height = configuration_helpers.get_value(
             "PDF_RECEIPT_COBRAND_LOGO_HEIGHT_MM", settings.PDF_RECEIPT_COBRAND_LOGO_HEIGHT_MM
         ) * mm
 

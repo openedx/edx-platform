@@ -2,13 +2,12 @@
 This file contains implementation override of SearchFilterGenerator which will allow
     * Filter by all courses in which the user is enrolled in
 """
-from microsite_configuration import microsite
 
 from student.models import CourseEnrollment
 from search.filter_generator import SearchFilterGenerator
 from openedx.core.djangoapps.user_api.partition_schemes import RandomUserPartitionScheme
 from openedx.core.djangoapps.course_groups.partition_scheme import CohortPartitionScheme
-
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 INCLUDE_SCHEMES = [CohortPartitionScheme, RandomUserPartitionScheme, ]
 SCHEME_SUPPORTS_ASSIGNMENT = [RandomUserPartitionScheme, ]
@@ -35,19 +34,21 @@ class LmsSearchFilterGenerator(SearchFilterGenerator):
             field_dictionary['course'] = [unicode(enrollment.course_id) for enrollment in user_enrollments]
 
         # if we have an org filter, only include results for this org filter
-        course_org_filter = microsite.get_value('course_org_filter')
+        course_org_filter = configuration_helpers.get_value('course_org_filter')
         if course_org_filter:
             field_dictionary['org'] = course_org_filter
 
         return field_dictionary
 
     def exclude_dictionary(self, **kwargs):
-        """ If we are not on a microsite, then exclude any microsites that are defined """
+        """
+            Exclude any courses defined outside the current org.
+        """
         exclude_dictionary = super(LmsSearchFilterGenerator, self).exclude_dictionary(**kwargs)
-        course_org_filter = microsite.get_value('course_org_filter')
+        course_org_filter = configuration_helpers.get_value('course_org_filter')
         # If we have a course filter we are ensuring that we only get those courses above
         if not course_org_filter:
-            org_filter_out_set = microsite.get_all_orgs()
+            org_filter_out_set = configuration_helpers.get_all_orgs()
             if org_filter_out_set:
                 exclude_dictionary['org'] = list(org_filter_out_set)
 

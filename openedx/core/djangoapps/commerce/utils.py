@@ -3,7 +3,7 @@ from django.conf import settings
 from edx_rest_api_client.client import EdxRestApiClient
 from eventtracking import tracker
 
-from openedx.core.djangoapps.theming import helpers
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 ECOMMERCE_DATE_FORMAT = "%Y-%m-%dT%H:%M:%SZ"
 
@@ -25,17 +25,19 @@ def is_commerce_service_configured():
     Return a Boolean indicating whether or not configuration is present to use
     the external commerce service.
     """
-    ecommerce_api_url = helpers.get_value("ECOMMERCE_API_URL", settings.ECOMMERCE_API_URL)
-    ecommerce_api_signing_key = helpers.get_value("ECOMMERCE_API_SIGNING_KEY", settings.ECOMMERCE_API_SIGNING_KEY)
+    ecommerce_api_url = configuration_helpers.get_value("ECOMMERCE_API_URL", settings.ECOMMERCE_API_URL)
+    ecommerce_api_signing_key = configuration_helpers.get_value(
+        "ECOMMERCE_API_SIGNING_KEY", settings.ECOMMERCE_API_SIGNING_KEY,
+    )
     return bool(ecommerce_api_url and ecommerce_api_signing_key)
 
 
 def ecommerce_api_client(user):
     """ Returns an E-Commerce API client setup with authentication for the specified user. """
-    jwt_auth = helpers.get_value("JWT_AUTH", settings.JWT_AUTH)
+    jwt_auth = configuration_helpers.get_value("JWT_AUTH", settings.JWT_AUTH)
     return EdxRestApiClient(
-        helpers.get_value("ECOMMERCE_API_URL", settings.ECOMMERCE_API_URL),
-        helpers.get_value("ECOMMERCE_API_SIGNING_KEY", settings.ECOMMERCE_API_SIGNING_KEY),
+        configuration_helpers.get_value("ECOMMERCE_API_URL", settings.ECOMMERCE_API_URL),
+        configuration_helpers.get_value("ECOMMERCE_API_SIGNING_KEY", settings.ECOMMERCE_API_SIGNING_KEY),
         user.username,
         user.profile.name if hasattr(user, 'profile') else None,
         user.email,

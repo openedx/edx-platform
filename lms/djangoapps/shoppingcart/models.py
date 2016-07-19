@@ -33,7 +33,6 @@ from django.core.mail.message import EmailMessage
 from xmodule.modulestore.django import modulestore
 from eventtracking import tracker
 
-from openedx.core.djangoapps.theming.helpers import get_value as get_themed_value
 from courseware.courses import get_course_by_id
 from config_models.models import ConfigurationModel
 from course_modes.models import CourseMode
@@ -52,8 +51,8 @@ from .exceptions import (
     UnexpectedOrderItemStatus,
     ItemNotFoundInCartException
 )
-from microsite_configuration import microsite
 from shoppingcart.pdf import PDFInvoice
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 
 log = logging.getLogger("shoppingcart")
@@ -272,7 +271,9 @@ class Order(models.Model):
         if is_order_type_business:
             for cart_item in cart_items:
                 if hasattr(cart_item, 'paidcourseregistration'):
-                    course_reg_code_item = CourseRegCodeItem.add_to_order(self, cart_item.paidcourseregistration.course_id, cart_item.qty)
+                    course_reg_code_item = CourseRegCodeItem.add_to_order(
+                        self, cart_item.paidcourseregistration.course_id, cart_item.qty,
+                    )
                     # update the discounted prices if coupon redemption applied
                     course_reg_code_item.list_price = cart_item.list_price
                     course_reg_code_item.unit_cost = cart_item.unit_cost
@@ -282,7 +283,9 @@ class Order(models.Model):
         else:
             for cart_item in cart_items:
                 if hasattr(cart_item, 'courseregcodeitem'):
-                    paid_course_registration = PaidCourseRegistration.add_to_order(self, cart_item.courseregcodeitem.course_id)
+                    paid_course_registration = PaidCourseRegistration.add_to_order(
+                        self, cart_item.courseregcodeitem.course_id,
+                    )
                     # update the discounted prices if coupon redemption applied
                     paid_course_registration.list_price = cart_item.list_price
                     paid_course_registration.unit_cost = cart_item.unit_cost
@@ -370,7 +373,7 @@ class Order(models.Model):
             dashboard=reverse('dashboard')
         )
         try:
-            from_address = microsite.get_value(
+            from_address = configuration_helpers.get_value(
                 'email_from_address',
                 settings.PAYMENT_SUPPORT_EMAIL
             )
@@ -391,9 +394,11 @@ class Order(models.Model):
                             username=self.user.username, email=self.user.email
                         ),
                         'has_billing_info': settings.FEATURES['STORE_BILLING_INFO'],
-                        'platform_name': microsite.get_value('platform_name', settings.PLATFORM_NAME),
-                        'payment_support_email': microsite.get_value('payment_support_email', settings.PAYMENT_SUPPORT_EMAIL),
-                        'payment_email_signature': microsite.get_value('payment_email_signature'),
+                        'platform_name': configuration_helpers.get_value('platform_name', settings.PLATFORM_NAME),
+                        'payment_support_email': configuration_helpers.get_value(
+                            'payment_support_email', settings.PAYMENT_SUPPORT_EMAIL,
+                        ),
+                        'payment_email_signature': configuration_helpers.get_value('payment_email_signature'),
                     }
                 )
                 email = EmailMessage(
@@ -463,7 +468,7 @@ class Order(models.Model):
         # this should return all of the objects with the correct types of the
         # subclasses
         orderitems = OrderItem.objects.filter(order=self).select_subclasses()
-        site_name = microsite.get_value('SITE_NAME', settings.SITE_NAME)
+        site_name = configuration_helpers.get_value('SITE_NAME', settings.SITE_NAME)
 
         if self.order_type == OrderTypes.BUSINESS:
             self.update_order_type()
@@ -1909,7 +1914,7 @@ class CertificateItem(OrderItem):
                                                                                                        user_email=course_enrollment.user.email,
                                                                                                        order_number=order_number)
         to_email = [settings.PAYMENT_SUPPORT_EMAIL]
-        from_email = microsite.get_value('payment_support_email', settings.PAYMENT_SUPPORT_EMAIL)
+        from_email = configuration_helpers.get_value('payment_support_email', settings.PAYMENT_SUPPORT_EMAIL)
         try:
             send_mail(subject, message, from_email, to_email, fail_silently=False)
         except Exception as exception:  # pylint: disable=broad-except
@@ -2005,7 +2010,7 @@ class CertificateItem(OrderItem):
         is_professional_mode_verified = self.course_enrollment.is_professional_enrollment()
 
         if is_enrollment_mode_verified:
-            domain = microsite.get_value('SITE_NAME', settings.SITE_NAME)
+            domain = configuration_helpers.get_value('SITE_NAME', settings.SITE_NAME)
             path = reverse('verify_student_verify_now', kwargs={'course_id': unicode(self.course_id)})
             verification_url = "http://{domain}{path}".format(domain=domain, path=path)
 
@@ -2197,7 +2202,7 @@ class Donation(OrderItem):
             u"We greatly appreciate this generous contribution and your support of the {platform_name} mission.  "
             u"This receipt was prepared to support charitable contributions for tax purposes.  "
             u"We confirm that neither goods nor services were provided in exchange for this gift."
-        ).format(platform_name=get_themed_value('PLATFORM_NAME', settings.PLATFORM_NAME))
+        ).format(platform_name=configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME))
 
     @classmethod
     def _line_item_description(cls, course_id=None):
@@ -2230,8 +2235,9 @@ class Donation(OrderItem):
 
         # The donation is for the organization as a whole, not a specific course
         else:
-            return _(u"Donation for {platform_name}").format(platform_name=get_themed_value('PLATFORM_NAME',
-                                                                                            settings.PLATFORM_NAME))
+            return _(u"Donation for {platform_name}").format(
+                platform_name=configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),
+            )
 
     @property
     def single_item_receipt_context(self):
@@ -2256,8 +2262,8 @@ class Donation(OrderItem):
             data['name'] = unicode(self.course_id)
             data['category'] = unicode(self.course_id.org)
         else:
-            data['name'] = get_themed_value('PLATFORM_NAME', settings.PLATFORM_NAME)
-            data['category'] = get_themed_value('PLATFORM_NAME', settings.PLATFORM_NAME)
+            data['name'] = configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME)
+            data['category'] = configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME)
         return data
 
     @property

@@ -5,7 +5,7 @@ import jwt
 from django.conf import settings
 from edx_rest_api_client.client import EdxRestApiClient
 
-from openedx.core.djangoapps.theming import helpers
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from student.models import UserProfile, anonymous_id_for_user
 
 
@@ -33,13 +33,13 @@ def get_id_token(user):
         'name': full_name,
         'email': user.email,
         'administrator': user.is_staff,
-        'iss': helpers.get_value('OAUTH_OIDC_ISSUER', settings.OAUTH_OIDC_ISSUER),
+        'iss': configuration_helpers.get_value('OAUTH_OIDC_ISSUER', settings.OAUTH_OIDC_ISSUER),
         'exp': now + datetime.timedelta(seconds=expires_in),
         'iat': now,
-        'aud': helpers.get_value('JWT_AUTH', settings.JWT_AUTH)['JWT_AUDIENCE'],
+        'aud': configuration_helpers.get_value('JWT_AUTH', settings.JWT_AUTH)['JWT_AUDIENCE'],
         'sub': anonymous_id_for_user(user, None),
     }
-    secret_key = helpers.get_value('JWT_AUTH', settings.JWT_AUTH)['JWT_SECRET_KEY']
+    secret_key = configuration_helpers.get_value('JWT_AUTH', settings.JWT_AUTH)['JWT_SECRET_KEY']
 
     return jwt.encode(payload, secret_key).decode('utf-8')
 
