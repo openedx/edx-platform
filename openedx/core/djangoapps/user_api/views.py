@@ -28,7 +28,7 @@ from edxmako.shortcuts import marketing_link
 from student.forms import get_registration_extension_form
 from student.views import create_account_with_params
 from student.cookies import set_logged_in_cookies
-from openedx.core.djangoapps.theming.helpers import get_value as get_themed_value
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.lib.api.authentication import SessionAuthenticationAllowInactiveUser
 from util.json_request import JsonResponse
 from .preferences.api import update_email_opt_in
@@ -77,7 +77,7 @@ class LoginSessionView(APIView):
         # Translators: These instructions appear on the login form, immediately
         # below a field meant to hold the user's email address.
         email_instructions = _("The email address you used to register with {platform_name}").format(
-            platform_name=get_themed_value('PLATFORM_NAME', settings.PLATFORM_NAME)
+            platform_name=configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME)
         )
 
         form_desc.add_field(
@@ -193,7 +193,7 @@ class RegistrationView(APIView):
 
         # Backwards compatibility: Honor code is required by default, unless
         # explicitly set to "optional" in Django settings.
-        self._extra_fields_setting = copy.deepcopy(get_themed_value('REGISTRATION_EXTRA_FIELDS'))
+        self._extra_fields_setting = copy.deepcopy(configuration_helpers.get_value('REGISTRATION_EXTRA_FIELDS'))
         if not self._extra_fields_setting:
             self._extra_fields_setting = copy.deepcopy(settings.REGISTRATION_EXTRA_FIELDS)
         self._extra_fields_setting["honor_code"] = self._extra_fields_setting.get("honor_code", "required")
@@ -586,7 +586,7 @@ class RegistrationView(APIView):
         # Translators: This phrase appears above a field on the registration form
         # meant to hold the user's reasons for registering with edX.
         goals_label = _(u"Tell us why you're interested in {platform_name}").format(
-            platform_name=get_themed_value("PLATFORM_NAME", settings.PLATFORM_NAME)
+            platform_name=configuration_helpers.get_value("PLATFORM_NAME", settings.PLATFORM_NAME)
         )
 
         form_desc.add_field(
@@ -771,14 +771,14 @@ class RegistrationView(APIView):
         # Translators: "Terms of Service" is a legal document users must agree to
         # in order to register a new account.
         label = _(u"I agree to the {platform_name} {terms_of_service}.").format(
-            platform_name=get_themed_value("PLATFORM_NAME", settings.PLATFORM_NAME),
+            platform_name=configuration_helpers.get_value("PLATFORM_NAME", settings.PLATFORM_NAME),
             terms_of_service=terms_link
         )
 
         # Translators: "Terms of Service" is a legal document users must agree to
         # in order to register a new account.
         error_msg = _(u"You must agree to the {platform_name} {terms_of_service}.").format(
-            platform_name=get_themed_value("PLATFORM_NAME", settings.PLATFORM_NAME),
+            platform_name=configuration_helpers.get_value("PLATFORM_NAME", settings.PLATFORM_NAME),
             terms_of_service=terms_link
         )
 
@@ -814,14 +814,14 @@ class RegistrationView(APIView):
         # Translators: "Terms of service" is a legal document users must agree to
         # in order to register a new account.
         label = _(u"I agree to the {platform_name} {terms_of_service}.").format(
-            platform_name=get_themed_value("PLATFORM_NAME", settings.PLATFORM_NAME),
+            platform_name=configuration_helpers.get_value("PLATFORM_NAME", settings.PLATFORM_NAME),
             terms_of_service=terms_link
         )
 
         # Translators: "Terms of service" is a legal document users must agree to
         # in order to register a new account.
         error_msg = _(u"You must agree to the {platform_name} {terms_of_service}.").format(
-            platform_name=get_themed_value("PLATFORM_NAME", settings.PLATFORM_NAME),
+            platform_name=configuration_helpers.get_value("PLATFORM_NAME", settings.PLATFORM_NAME),
             terms_of_service=terms_link
         )
 
@@ -920,7 +920,7 @@ class PasswordResetView(APIView):
         # Translators: These instructions appear on the password reset form,
         # immediately below a field meant to hold the user's email address.
         email_instructions = _(u"The email address you used to register with {platform_name}").format(
-            platform_name=get_themed_value('PLATFORM_NAME', settings.PLATFORM_NAME)
+            platform_name=configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME)
         )
 
         form_desc.add_field(

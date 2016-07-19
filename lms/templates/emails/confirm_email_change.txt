@@ -1,11 +1,11 @@
 <%! from django.core.urlresolvers import reverse %>
 <%! from django.utils.translation import ugettext as _ %>
-<%! from openedx.core.djangoapps.theming.helpers import get_value as get_themed_value %>
+<%! from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers %>
 ${_("This is to confirm that you changed the e-mail associated with "
   "{platform_name} from {old_email} to {new_email}. If you "
   "did not make this request, please contact us immediately. Contact "
   "information is listed at:").format(
-      platform_name=get_themed_value('PLATFORM_NAME', settings.PLATFORM_NAME),
+      platform_name=configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),
       old_email=old_email,
       new_email=new_email
   )

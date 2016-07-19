@@ -492,7 +492,6 @@ TEMPLATES = [
                 'django.template.context_processors.i18n',
                 'django.contrib.auth.context_processors.auth',  # this is required for admin
                 'django.template.context_processors.csrf',
-                'microsite_configuration.context_processors.microsite_context',
 
                 # Added for django-wiki
                 'django.template.context_processors.media',
@@ -507,10 +506,11 @@ TEMPLATES = [
                 'shoppingcart.context_processor.user_has_cart_context_processor',
 
                 # Allows the open edX footer to be leveraged in Django Templates.
-                'edxmako.shortcuts.microsite_footer_context_processor',
+                'edxmako.shortcuts.footer_context_processor',
 
                 # Online contextual help
                 'context_processors.doc_url',
+                'openedx.core.djangoapps.site_configuration.context_processors.configuration_context'
             ],
             # Change 'debug' in your environment settings files - not here.
             'debug': False

@@ -40,7 +40,6 @@ from courseware.tests.factories import (
 from courseware.tests.helpers import LoginEnrollmentTestCase
 from django_comment_common.models import FORUM_ROLE_COMMUNITY_TA
 from django_comment_common.utils import seed_permissions_roles
-from microsite_configuration import microsite
 from shoppingcart.models import (
     RegistrationCodeRedemption, Order, CouponRedemption,
     PaidCourseRegistration, Coupon, Invoice, CourseRegistrationCode, CourseRegistrationCodeInvoiceItem,
@@ -71,6 +70,7 @@ from certificates.models import CertificateStatuses
 
 from openedx.core.djangoapps.course_groups.cohorts import set_course_cohort_settings
 from openedx.core.lib.xblock_utils import grade_histogram
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 from .test_tools import msk_from_problem_urlname
 
@@ -958,7 +958,7 @@ class TestInstructorAPIEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTest
         cls.course = CourseFactory.create()
 
         # Email URL values
-        cls.site_name = microsite.get_value(
+        cls.site_name = configuration_helpers.get_value(
             'SITE_NAME',
             settings.SITE_NAME
         )
@@ -1709,7 +1709,7 @@ class TestInstructorAPIBulkBetaEnrollment(SharedModuleStoreTestCase, LoginEnroll
         super(TestInstructorAPIBulkBetaEnrollment, cls).setUpClass()
         cls.course = CourseFactory.create()
         # Email URL values
-        cls.site_name = microsite.get_value(
+        cls.site_name = configuration_helpers.get_value(
             'SITE_NAME',
             settings.SITE_NAME
         )
