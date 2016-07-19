@@ -21,21 +21,24 @@ def get_course_run(course_key, user):
     """
     catalog_integration = CatalogIntegration.current()
 
-    scopes = ['email', 'profile']
-    expires_in = settings.OAUTH_ID_TOKEN_EXPIRATION
-    jwt = JwtBuilder(user).build_token(scopes, expires_in)
-    api = EdxRestApiClient(catalog_integration.internal_api_url, jwt=jwt)
+    if catalog_integration.enabled:
+        scopes = ['email', 'profile']
+        expires_in = settings.OAUTH_ID_TOKEN_EXPIRATION
+        jwt = JwtBuilder(user).build_token(scopes, expires_in)
+        api = EdxRestApiClient(catalog_integration.internal_api_url, jwt=jwt)
 
-    data = get_edx_api_data(
-        catalog_integration,
-        user,
-        'course_runs',
-        resource_id=unicode(course_key),
-        cache_key=catalog_integration.CACHE_KEY if catalog_integration.is_cache_enabled else None,
-        api=api,
-    )
+        data = get_edx_api_data(
+            catalog_integration,
+            user,
+            'course_runs',
+            resource_id=unicode(course_key),
+            cache_key=catalog_integration.CACHE_KEY if catalog_integration.is_cache_enabled else None,
+            api=api,
+        )
 
-    return data if data else {}
+        return data if data else {}
+    else:
+        return {}
 
 
 def get_run_marketing_url(course_key, user):
