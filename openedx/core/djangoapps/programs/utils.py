@@ -25,6 +25,9 @@ from xmodule.course_metadata_utils import DEFAULT_START_DATE
 
 log = logging.getLogger(__name__)
 
+# The datetime module's strftime() methods require a year >= 1900.
+DEFAULT_ENROLLMENT_START_DATE = datetime.datetime(1900, 1, 1, tzinfo=pytz.UTC)
+
 
 def get_programs(user, program_id=None):
     """Given a user, get programs from the Programs service.
@@ -356,7 +359,7 @@ def supplement_program_data(program_data, user):
 
             is_enrolled = CourseEnrollment.is_enrolled(user, course_key)
 
-            enrollment_start = course_overview.enrollment_start or datetime.datetime.min.replace(tzinfo=pytz.UTC)
+            enrollment_start = course_overview.enrollment_start or DEFAULT_ENROLLMENT_START_DATE
             enrollment_end = course_overview.enrollment_end or datetime.datetime.max.replace(tzinfo=pytz.UTC)
             is_enrollment_open = enrollment_start <= timezone.now() < enrollment_end
 
