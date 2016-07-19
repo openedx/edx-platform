@@ -20,7 +20,6 @@ from django.views.decorators.csrf import csrf_exempt
 from util.bad_request_rate_limiter import BadRequestRateLimiter
 from util.date_utils import get_default_time_display
 from django.contrib.auth.decorators import login_required
-from microsite_configuration import microsite
 from edxmako.shortcuts import render_to_response
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from opaque_keys.edx.locator import CourseLocator
@@ -51,6 +50,7 @@ from .processors import (
 
 import json
 from .decorators import enforce_shopping_cart_enabled
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 
 log = logging.getLogger("shoppingcart")
@@ -169,7 +169,7 @@ def show_cart(request):
     cart = Order.get_cart_for_user(request.user)
     is_any_course_expired, expired_cart_items, expired_cart_item_names, valid_cart_item_tuples = \
         verify_for_closed_enrollment(request.user, cart)
-    site_name = microsite.get_value('SITE_NAME', settings.SITE_NAME)
+    site_name = configuration_helpers.get_value('SITE_NAME', settings.SITE_NAME)
 
     if is_any_course_expired:
         for expired_item in expired_cart_items:
@@ -190,7 +190,7 @@ def show_cart(request):
         'form_html': form_html,
         'currency_symbol': settings.PAID_COURSE_REGISTRATION_CURRENCY[1],
         'currency': settings.PAID_COURSE_REGISTRATION_CURRENCY[0],
-        'enable_bulk_purchase': microsite.get_value('ENABLE_SHOPPING_CART_BULK_PURCHASE', True)
+        'enable_bulk_purchase': configuration_helpers.get_value('ENABLE_SHOPPING_CART_BULK_PURCHASE', True)
     }
     return render_to_response("shoppingcart/shopping_cart.html", context)
 
@@ -310,7 +310,7 @@ def register_code_redemption(request, registration_code):
     """
 
     # Add some rate limiting here by re-using the RateLimitMixin as a helper class
-    site_name = microsite.get_value('SITE_NAME', settings.SITE_NAME)
+    site_name = configuration_helpers.get_value('SITE_NAME', settings.SITE_NAME)
     limiter = BadRequestRateLimiter()
     if limiter.is_rate_limit_exceeded(request):
         AUDIT_LOG.warning("Rate limit exceeded in registration code redemption.")
@@ -719,7 +719,7 @@ def billing_details(request):
             'form_html': form_html,
             'currency_symbol': settings.PAID_COURSE_REGISTRATION_CURRENCY[1],
             'currency': settings.PAID_COURSE_REGISTRATION_CURRENCY[0],
-            'site_name': microsite.get_value('SITE_NAME', settings.SITE_NAME),
+            'site_name': configuration_helpers.get_value('SITE_NAME', settings.SITE_NAME),
         }
         return render_to_response("shoppingcart/billing_details.html", context)
     elif request.method == "POST":
@@ -914,7 +914,7 @@ def _show_receipt_html(request, order):
         'shoppingcart_items': shoppingcart_items,
         'any_refunds': any_refunds,
         'instructions': instructions,
-        'site_name': microsite.get_value('SITE_NAME', settings.SITE_NAME),
+        'site_name': configuration_helpers.get_value('SITE_NAME', settings.SITE_NAME),
         'order_type': order_type,
         'appended_course_names': appended_course_names,
         'appended_recipient_emails': appended_recipient_emails,

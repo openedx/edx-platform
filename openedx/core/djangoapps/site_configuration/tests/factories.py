@@ -14,3 +14,4 @@ class SiteConfigurationFactory(DjangoModelFactory):
         model = SiteConfiguration
 
     values = {}
+    enabled = True

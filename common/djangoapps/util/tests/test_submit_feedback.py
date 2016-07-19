@@ -11,7 +11,7 @@ from zendesk import ZendeskError
 import json
 import mock
 
-from student.tests.test_microsite import fake_microsite_get_value
+from student.tests.test_configuration_overrides import fake_get_value
 
 
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_FEEDBACK_SUBMISSION": True})
@@ -192,14 +192,14 @@ class SubmitFeedbackTest(TestCase):
         self.assertEqual(zendesk_mock_instance.mock_calls, expected_zendesk_calls)
         self._assert_datadog_called(datadog_mock, with_tags=True)
 
-    @mock.patch("microsite_configuration.microsite.get_value", fake_microsite_get_value)
-    def test_valid_request_anon_user_microsite(self, zendesk_mock_class, datadog_mock):
+    @mock.patch("openedx.core.djangoapps.site_configuration.helpers.get_value", fake_get_value)
+    def test_valid_request_anon_user_configuration_override(self, zendesk_mock_class, datadog_mock):
         """
-        Test a valid request from an anonymous user to a mocked out microsite
+        Test a valid request from an anonymous user to a mocked out site with configuration override
 
         The response should have a 200 (success) status code, and a ticket with
         the given information should have been submitted via the Zendesk API with the additional
-        tag that will come from microsite configuration
+        tag that will come from site configuration override.
         """
         zendesk_mock_instance = zendesk_mock_class.return_value
         zendesk_mock_instance.create_ticket.return_value = 42

@@ -22,10 +22,9 @@ from submissions import api as sub_api  # installed from the edx-submissions rep
 from student.models import anonymous_id_for_user
 from openedx.core.djangoapps.user_api.models import UserPreference
 
-from microsite_configuration import microsite
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
-from openedx.core.djangoapps.theming import helpers as theming_helpers
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 
 log = logging.getLogger(__name__)
@@ -300,7 +299,7 @@ def get_email_params(course, auto_enroll, secure=True, course_key=None, display_
     course_key = course_key or course.id.to_deprecated_string()
     display_name = display_name or course.display_name_with_default_escaped
 
-    stripped_site_name = microsite.get_value(
+    stripped_site_name = configuration_helpers.get_value(
         'SITE_NAME',
         settings.SITE_NAME
     )
@@ -372,7 +371,7 @@ def send_mail_to_student(student, param_dict, language=None):
     if 'display_name' in param_dict:
         param_dict['course_name'] = param_dict['display_name']
 
-    param_dict['site_name'] = microsite.get_value(
+    param_dict['site_name'] = configuration_helpers.get_value(
         'SITE_NAME',
         param_dict['site_name']
     )
@@ -380,8 +379,8 @@ def send_mail_to_student(student, param_dict, language=None):
     subject = None
     message = None
 
-    # see if we are running in a microsite and that there is an
-    # activation email template definition available as configuration, if so, then render that
+    # see if there is an activation email template definition available as configuration,
+    # if so, then render that
     message_type = param_dict['message']
 
     email_template_dict = {
@@ -427,7 +426,7 @@ def send_mail_to_student(student, param_dict, language=None):
 
         # Email subject *must not* contain newlines
         subject = ''.join(subject.splitlines())
-        from_address = theming_helpers.get_value(
+        from_address = configuration_helpers.get_value(
             'email_from_address',
             settings.DEFAULT_FROM_EMAIL
         )

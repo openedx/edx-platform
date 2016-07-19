@@ -11,7 +11,7 @@ from lms.lib.courseware_search.lms_filter_generator import LmsSearchFilterGenera
 
 
 class LmsSearchFilterGeneratorTestCase(ModuleStoreTestCase):
-    """ Test case class to test search result processor """
+    """ Tests for search result processor """
 
     def build_courses(self):
         """
@@ -87,52 +87,51 @@ class LmsSearchFilterGeneratorTestCase(ModuleStoreTestCase):
         self.assertTrue('start_date' in filter_dictionary)
         self.assertEqual(0, len(field_dictionary['course']))
 
-    def test_excludes_microsite(self):
+    def test_excludes_site_org(self):
         """
-        By default there is the test microsite and the microsite with logistration
-        to exclude
+        By default site orgs not belonging to current site org should be excluded.
         """
         _, _, exclude_dictionary = LmsSearchFilterGenerator.generate_field_filters(user=self.user)
         self.assertIn('org', exclude_dictionary)
         exclude_orgs = exclude_dictionary['org']
         self.assertEqual(2, len(exclude_orgs))
         self.assertEqual('LogistrationX', exclude_orgs[0])
-        self.assertEqual('TestMicrositeX', exclude_orgs[1])
+        self.assertEqual('TestSiteX', exclude_orgs[1])
 
-    @patch('microsite_configuration.microsite.get_all_orgs', Mock(return_value=[]))
-    def test_excludes_no_microsite(self):
-        """ Test when no microsite is present - nothing to exclude """
+    @patch('openedx.core.djangoapps.site_configuration.helpers.get_all_orgs', Mock(return_value=[]))
+    def test_no_excludes_with_no_orgs(self):
+        """ Test when no org is present - nothing to exclude """
         _, _, exclude_dictionary = LmsSearchFilterGenerator.generate_field_filters(user=self.user)
         self.assertNotIn('org', exclude_dictionary)
 
-    @patch('microsite_configuration.microsite.get_value', Mock(return_value='TestMicrositeX'))
-    def test_excludes_microsite_within(self):
+    @patch('openedx.core.djangoapps.site_configuration.helpers.get_value', Mock(return_value='TestSiteX'))
+    def test_excludes_org_within(self):
         field_dictionary, _, exclude_dictionary = LmsSearchFilterGenerator.generate_field_filters(user=self.user)
         self.assertNotIn('org', exclude_dictionary)
         self.assertIn('org', field_dictionary)
-        self.assertEqual('TestMicrositeX', field_dictionary['org'])
+        self.assertEqual('TestSiteX', field_dictionary['org'])
 
     @patch(
-        'microsite_configuration.microsite.get_all_orgs',
-        Mock(return_value=["TestMicrosite1", "TestMicrosite2", "TestMicrosite3", "TestMicrosite4"])
+        'openedx.core.djangoapps.site_configuration.helpers.get_all_orgs',
+        Mock(return_value=["TestSite1", "TestSite2", "TestSite3", "TestSite4"])
     )
-    def test_excludes_multi_microsites(self):
+    def test_excludes_multi_orgs(self):
         _, _, exclude_dictionary = LmsSearchFilterGenerator.generate_field_filters(user=self.user)
         self.assertIn('org', exclude_dictionary)
         exclude_orgs = exclude_dictionary['org']
         self.assertEqual(4, len(exclude_orgs))
-        self.assertIn('TestMicrosite1', exclude_orgs)
-        self.assertIn('TestMicrosite2', exclude_orgs)
-        self.assertIn('TestMicrosite3', exclude_orgs)
-        self.assertIn('TestMicrosite4', exclude_orgs)
+        self.assertIn('TestSite1', exclude_orgs)
+        self.assertIn('TestSite2', exclude_orgs)
+        self.assertIn('TestSite3', exclude_orgs)
+        self.assertIn('TestSite4', exclude_orgs)
 
     @patch(
-        'microsite_configuration.microsite.get_all_orgs',
-        Mock(return_value=["TestMicrosite1", "TestMicrosite2", "TestMicrosite3", "TestMicrosite4"])
+        'openedx.core.djangoapps.site_configuration.helpers.get_all_orgs',
+        Mock(return_value=["TestSite1", "TestSite2", "TestSite3", "TestSite4"])
     )
-    @patch('microsite_configuration.microsite.get_value', Mock(return_value='TestMicrosite3'))
-    def test_excludes_multi_microsites_within(self):
+    @patch('openedx.core.djangoapps.site_configuration.helpers.get_value', Mock(return_value='TestSite3'))
+    def test_excludes_multi_orgs_within(self):
         field_dictionary, _, exclude_dictionary = LmsSearchFilterGenerator.generate_field_filters(user=self.user)
         self.assertNotIn('org', exclude_dictionary)
         self.assertIn('org', field_dictionary)
-        self.assertEqual('TestMicrosite3', field_dictionary['org'])
+        self.assertEqual('TestSite3', field_dictionary['org'])

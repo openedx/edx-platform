@@ -17,7 +17,6 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.core.urlresolvers import reverse
 from opaque_keys.edx.keys import UsageKey
 import xmodule.graders as xmgraders
-from microsite_configuration import microsite
 from student.models import CourseEnrollmentAllowed
 from edx_proctoring.api import get_all_exam_attempts
 from courseware.models import StudentModule
@@ -25,6 +24,7 @@ from certificates.models import GeneratedCertificate
 from django.db.models import Count
 from certificates.models import CertificateStatuses
 from courseware.grades import grading_context_for_course
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 
 STUDENT_FEATURES = ('id', 'username', 'first_name', 'last_name', 'is_staff', 'email')
@@ -430,7 +430,7 @@ def course_registration_features(features, registration_codes, csv_type):
         :param features:
         :param csv_type:
         """
-        site_name = microsite.get_value('SITE_NAME', settings.SITE_NAME)
+        site_name = configuration_helpers.get_value('SITE_NAME', settings.SITE_NAME)
         registration_features = [x for x in COURSE_REGISTRATION_FEATURES if x in features]
 
         course_registration_dict = dict((feature, getattr(registration_code, feature)) for feature in registration_features)

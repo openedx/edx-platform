@@ -271,7 +271,7 @@ class MicrositeCertificatesViewsTests(ModuleStoreTestCase):
                 "logo_url": "http://www.edx.org"
             },
             "microsites": {
-                "testmicrosite": {
+                "test-site": {
                     "accomplishment_class_append": "accomplishment-certificate",
                     "platform_name": "platform_microsite",
                     "company_about_url": "http://www.microsite.org/about-us",
@@ -301,7 +301,7 @@ class MicrositeCertificatesViewsTests(ModuleStoreTestCase):
         self.assertIn('platform_microsite', response.content)
 
         # logo url is taken from microsite configuration setting
-        self.assertIn('http://test_microsite.localhost', response.content)
+        self.assertIn('http://test_site.localhost', response.content)
         self.assertIn('This is special microsite aware company_about_description content', response.content)
         self.assertIn('Microsite title', response.content)
 

@@ -8,10 +8,9 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.core.files.storage import get_storage_class
 from django.contrib.staticfiles.storage import staticfiles_storage
 
-from microsite_configuration import microsite
-
 from student.models import UserProfile
 from ..errors import UserNotFound
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 
 PROFILE_IMAGE_FILE_EXTENSION = 'jpg'   # All processed profile images are converted to JPEGs
@@ -121,7 +120,7 @@ def _get_default_profile_image_urls():
     TODO The result of this function should be memoized, but not in tests.
     """
     return _get_profile_image_urls(
-        microsite.get_value('PROFILE_IMAGE_DEFAULT_FILENAME', settings.PROFILE_IMAGE_DEFAULT_FILENAME),
+        configuration_helpers.get_value('PROFILE_IMAGE_DEFAULT_FILENAME', settings.PROFILE_IMAGE_DEFAULT_FILENAME),
         staticfiles_storage,
         file_extension=settings.PROFILE_IMAGE_DEFAULT_FILE_EXTENSION,
     )

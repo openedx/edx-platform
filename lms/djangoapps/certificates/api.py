@@ -568,7 +568,7 @@ def get_asset_url_by_slug(asset_slug):
 def get_certificate_header_context(is_secure=True):
     """
     Return data to be used in Certificate Header,
-    data returned should be customized according to the microsite settings
+    data returned should be customized according to the site configuration.
     """
     data = dict(
         logo_src=branding_api.get_logo_url(),
@@ -581,7 +581,7 @@ def get_certificate_header_context(is_secure=True):
 def get_certificate_footer_context():
     """
     Return data to be used in Certificate Footer,
-    data returned should be customized according to the microsite settings
+    data returned should be customized according to the site configuration.
     """
     data = dict()
 

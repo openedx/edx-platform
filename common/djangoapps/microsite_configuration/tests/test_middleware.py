@@ -51,7 +51,7 @@ class MicrositeSessionCookieTests(DatabaseMicrositeTestCase):
         with patch('microsite_configuration.microsite.BACKEND',
                    get_backend(site_backend, BaseMicrositeBackend)):
             response = self.client.get('/')
-            self.assertNotIn('test_microsite.localhost', str(response.cookies['sessionid']))
+            self.assertNotIn('test_site.localhost', str(response.cookies['sessionid']))
             self.assertNotIn('Domain', str(response.cookies['sessionid']))
 
     @ddt.data(*MICROSITE_BACKENDS)
@@ -63,7 +63,7 @@ class MicrositeSessionCookieTests(DatabaseMicrositeTestCase):
         with patch('microsite_configuration.microsite.BACKEND',
                    get_backend(site_backend, BaseMicrositeBackend)):
             response = self.client.get('/', HTTP_HOST=settings.MICROSITE_TEST_HOSTNAME)
-            self.assertIn('test_microsite.localhost', str(response.cookies['sessionid']))
+            self.assertIn('test_site.localhost', str(response.cookies['sessionid']))
 
     @ddt.data(*MICROSITE_BACKENDS)
     def test_microsite_none_cookie_domain(self, site_backend):
@@ -77,5 +77,5 @@ class MicrositeSessionCookieTests(DatabaseMicrositeTestCase):
             with patch('microsite_configuration.microsite.BACKEND',
                        get_backend(site_backend, BaseMicrositeBackend)):
                 response = self.client.get('/', HTTP_HOST=settings.MICROSITE_TEST_HOSTNAME)
-                self.assertNotIn('test_microsite.localhost', str(response.cookies['sessionid']))
+                self.assertNotIn('test_site.localhost', str(response.cookies['sessionid']))
                 self.assertNotIn('Domain', str(response.cookies['sessionid']))

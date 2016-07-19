@@ -74,10 +74,10 @@ class CertificateHtmlViewConfigurationFactory(DjangoModelFactory):
                 "certificate_type": "XSeries"
             },
             "microsites": {
-                "testmicrosite": {
-                    "company_about_url": "http://www.testmicrosite.org/about-us",
-                    "company_privacy_url": "http://www.testmicrosite.org/edx-privacy-policy",
-                    "company_tos_url": "http://www.testmicrosite.org/edx-terms-service"
+                "test-site": {
+                    "company_about_url": "http://www.test-site.org/about-us",
+                    "company_privacy_url": "http://www.test-site.org/edx-privacy-policy",
+                    "company_tos_url": "http://www.test-site.org/edx-terms-service"
                 }
             }
         }"""

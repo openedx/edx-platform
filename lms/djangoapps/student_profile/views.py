@@ -11,11 +11,11 @@ from django.contrib.staticfiles.storage import staticfiles_storage
 
 from badges.utils import badges_enabled
 from edxmako.shortcuts import render_to_response, marketing_link
-from microsite_configuration import microsite
 from openedx.core.djangoapps.user_api.accounts.api import get_account_settings
 from openedx.core.djangoapps.user_api.errors import UserNotFound, UserNotAuthorized
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preferences
 from student.models import User
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 
 @login_required
@@ -92,7 +92,7 @@ def learner_profile_context(request, profile_username, user_is_staff):
             'badges_logo': staticfiles_storage.url('certificates/images/backpack-logo.png'),
             'badges_icon': staticfiles_storage.url('certificates/images/ico-mozillaopenbadges.png'),
             'backpack_ui_img': staticfiles_storage.url('certificates/images/backpack-ui.png'),
-            'platform_name': microsite.get_value('platform_name', settings.PLATFORM_NAME),
+            'platform_name': configuration_helpers.get_value('platform_name', settings.PLATFORM_NAME),
         },
         'disable_courseware_js': True,
     }

@@ -76,7 +76,7 @@ from openedx.core.djangoapps.credit.api import (
     is_user_eligible_for_credit,
     is_credit_course
 )
-from openedx.core.djangoapps.theming import helpers as theming_helpers
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from shoppingcart.utils import is_shopping_cart_enabled
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from student.models import UserTestGroup, CourseEnrollment
@@ -138,7 +138,7 @@ def courses(request):
     if not settings.FEATURES.get('ENABLE_COURSE_DISCOVERY'):
         courses_list = get_courses(request.user)
 
-        if theming_helpers.get_value(
+        if configuration_helpers.get_value(
                 "ENABLE_COURSE_SORTING_BY_START_DATE",
                 settings.FEATURES["ENABLE_COURSE_SORTING_BY_START_DATE"]
         ):
@@ -539,7 +539,7 @@ def course_about(request, course_id):
         course_details = CourseDetails.populate(course)
         modes = CourseMode.modes_for_course_dict(course_key)
 
-        if theming_helpers.get_value('ENABLE_MKTG_SITE', settings.FEATURES.get('ENABLE_MKTG_SITE', False)):
+        if configuration_helpers.get_value('ENABLE_MKTG_SITE', settings.FEATURES.get('ENABLE_MKTG_SITE', False)):
             return redirect(reverse('info', args=[course.id.to_deprecated_string()]))
 
         registered = registered_for_course(course, request.user)
@@ -1089,7 +1089,7 @@ def generate_user_cert(request, course_id):
         log.info(u"Anon user trying to generate certificate for %s", course_id)
         return HttpResponseBadRequest(
             _('You must be signed in to {platform_name} to create a certificate.').format(
-                platform_name=theming_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME)
+                platform_name=configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME)
             )
         )
 
@@ -1205,7 +1205,7 @@ FINANCIAL_ASSISTANCE_HEADER = _(
     ' financial assistance program.'
 ).format(
     percent_sign="%",
-    platform_name=theming_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME)
+    platform_name=configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME)
 ).split('\n')
 
 
@@ -1325,7 +1325,7 @@ def financial_assistance_form(request):
         'student_faq_url': marketing_link('FAQ'),
         'dashboard_url': reverse('dashboard'),
         'account_settings_url': reverse('account_settings'),
-        'platform_name': theming_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),
+        'platform_name': configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),
         'user_details': {
             'email': user.email,
             'username': user.username,

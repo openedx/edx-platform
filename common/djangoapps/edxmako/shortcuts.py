@@ -17,13 +17,13 @@ import logging
 from django.http import HttpResponse
 from django.template import Context
 
-from microsite_configuration import microsite
-
 from edxmako import lookup_template
 from edxmako.request_context import get_template_request_context
 from django.conf import settings
 from django.core.urlresolvers import reverse
-from openedx.core.djangoapps.theming.helpers import get_template_path
+from openedx.core.djangoapps.theming.helpers import get_template_path, is_request_in_themed_site
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+
 log = logging.getLogger(__name__)
 
 
@@ -38,7 +38,7 @@ def marketing_link(name):
     # link_map maps URLs from the marketing site to the old equivalent on
     # the Django site
     link_map = settings.MKTG_URL_LINK_MAP
-    enable_mktg_site = microsite.get_value(
+    enable_mktg_site = configuration_helpers.get_value(
         'ENABLE_MKTG_SITE',
         settings.FEATURES.get('ENABLE_MKTG_SITE', False)
     )
@@ -71,7 +71,7 @@ def is_marketing_link_set(name):
     Returns a boolean if a given named marketing link is configured.
     """
 
-    enable_mktg_site = microsite.get_value(
+    enable_mktg_site = configuration_helpers.get_value(
         'ENABLE_MKTG_SITE',
         settings.FEATURES.get('ENABLE_MKTG_SITE', False)
     )
@@ -102,13 +102,13 @@ def marketing_link_context_processor(request):
     )
 
 
-def microsite_footer_context_processor(request):
+def footer_context_processor(request):  # pylint: disable=unused-argument
     """
     Checks the site name to determine whether to use the edX.org footer or the Open Source Footer.
     """
     return dict(
         [
-            ("IS_REQUEST_IN_MICROSITE", microsite.is_request_in_microsite())
+            ("IS_REQUEST_IN_MICROSITE", is_request_in_themed_site())
         ]
     )
 

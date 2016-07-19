@@ -30,7 +30,7 @@ class FilebasedMicrositeBackendTests(TestCase):
     """
     def setUp(self):
         super(FilebasedMicrositeBackendTests, self).setUp()
-        self.microsite_subdomain = 'testmicrosite'
+        self.microsite_subdomain = 'test-site'
 
     def tearDown(self):
         super(FilebasedMicrositeBackendTests, self).tearDown()
@@ -41,7 +41,7 @@ class FilebasedMicrositeBackendTests(TestCase):
         Tests microsite.get_value works as expected.
         """
         microsite.set_by_domain(self.microsite_subdomain)
-        self.assertEqual(microsite.get_value('platform_name'), 'Test Microsite')
+        self.assertEqual(microsite.get_value('platform_name'), 'Test Site')
 
     def test_is_request_in_microsite(self):
         """
@@ -63,15 +63,15 @@ class FilebasedMicrositeBackendTests(TestCase):
         """
         microsite.set_by_domain(self.microsite_subdomain)
         self.assertEqual(
-            microsite.get_value_for_org('TestMicrositeX', 'platform_name'),
-            'Test Microsite'
+            microsite.get_value_for_org('TestSiteX', 'platform_name'),
+            'Test Site'
         )
 
         # if no config is set
         microsite.clear()
         with patch('django.conf.settings.MICROSITE_CONFIGURATION', False):
             self.assertEqual(
-                microsite.get_value_for_org('TestMicrositeX', 'platform_name', 'Default Value'),
+                microsite.get_value_for_org('TestSiteX', 'platform_name', 'Default Value'),
                 'Default Value'
             )
 
@@ -82,7 +82,7 @@ class FilebasedMicrositeBackendTests(TestCase):
         microsite.set_by_domain(self.microsite_subdomain)
         self.assertEqual(
             microsite.get_all_orgs(),
-            set(['TestMicrositeX', 'LogistrationX'])
+            set(['TestSiteX', 'LogistrationX'])
         )
 
         # if no config is set
@@ -100,7 +100,7 @@ class FilebasedMicrositeBackendTests(TestCase):
         microsite.set_by_domain(self.microsite_subdomain)
         self.assertEqual(
             microsite.get_value('platform_name'),
-            'Test Microsite'
+            'Test Site'
         )
         microsite.clear()
         self.assertIsNone(microsite.get_value('platform_name'))
@@ -145,7 +145,7 @@ class FilebasedMicrositeTemplateBackendTests(ModuleStoreTestCase):
     """
     def setUp(self):
         super(FilebasedMicrositeTemplateBackendTests, self).setUp()
-        self.microsite_subdomain = 'testmicrosite'
+        self.microsite_subdomain = 'test-site'
         self.course = CourseFactory.create()
         self.user = UserFactory.create(username="Bob", email="bob@example.com", password="edx")
         self.client.login(username=self.user.username, password="edx")

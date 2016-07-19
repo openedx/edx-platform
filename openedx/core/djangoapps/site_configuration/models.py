@@ -12,6 +12,10 @@ from django_extensions.db.models import TimeStampedModel
 from jsonfield.fields import JSONField
 
 
+from logging import getLogger
+logger = getLogger(__name__)  # pylint: disable=invalid-name
+
+
 class SiteConfiguration(models.Model):
     """
     Model for storing site configuration. These configuration override OpenEdx configurations and settings.
@@ -22,6 +26,7 @@ class SiteConfiguration(models.Model):
         values (JSONField):  json field to store configurations for a site
     """
     site = models.OneToOneField(Site, related_name='configuration')
+    enabled = models.BooleanField(default=False, verbose_name="Enabled")
     values = JSONField(
         null=False,
         blank=True,
@@ -34,6 +39,65 @@ class SiteConfiguration(models.Model):
     def __repr__(self):
         return self.__unicode__()
 
+    def get_value(self, name, default=None):
+        """
+        Return Configuration value for the key specified as name argument.
+
+        Function logs a message if configuration is not enabled or if there is an error retrieving a key.
+
+        Args:
+            name (str): Name of the key for which to return configuration value.
+            default: default value tp return if key is not found in the configuration
+
+        Returns:
+            Configuration value for the given key or returns `None` if configuration is not enabled.
+        """
+        if self.enabled:
+            try:
+                return self.values.get(name, default)  # pylint: disable=no-member
+            except AttributeError as error:
+                logger.exception('Invalid JSON data. \n [%s]', error)
+        else:
+            logger.info("Site Configuration is not enabled for site (%s).", self.site)
+
+        return default
+
+    @classmethod
+    def get_value_for_org(cls, org, name, default=None):
+        """
+        This returns site configuration value which has an org_filter that matches
+        what is passed in,
+
+        Args:
+            org (str): Course ord filter, this value will be used to filter out the correct site configuration.
+            name (str): Name of the key for which to return configuration value.
+            default: default value tp return if key is not found in the configuration
+
+        Returns:
+            Configuration value for the given key.
+        """
+        for configuration in cls.objects.filter(values__contains=org, enabled=True).all():
+            org_filter = configuration.get_value('course_org_filter', None)
+            if org_filter == org:
+                return configuration.get_value(name, default)
+        return default
+
+    @classmethod
+    def get_all_orgs(cls):
+        """
+        This returns all of the orgs that are considered in site configurations, This can be used,
+        for example, to do filtering.
+
+        Returns:
+            Configuration value for the given key.
+        """
+        org_filter_set = set()
+        for configuration in cls.objects.filter(values__contains='course_org_filter', enabled=True).all():
+            org_filter = configuration.get_value('course_org_filter', None)
+            if org_filter:
+                org_filter_set.add(org_filter)
+        return org_filter_set
+
 
 class SiteConfigurationHistory(TimeStampedModel):
     """
@@ -45,6 +109,7 @@ class SiteConfigurationHistory(TimeStampedModel):
         values (JSONField): json field to store configurations for a site
     """
     site = models.ForeignKey(Site, related_name='configuration_histories')
+    enabled = models.BooleanField(default=False, verbose_name="Enabled")
     values = JSONField(
         null=False,
         blank=True,
@@ -74,4 +139,5 @@ def update_site_configuration_history(sender, instance, **kwargs):  # pylint: di
     SiteConfigurationHistory.objects.create(
         site=instance.site,
         values=instance.values,
+        enabled=instance.enabled,
     )

@@ -42,5 +42,5 @@ class TestMicrosites(DatabaseMicrositeTestCase):
         """
         with patch('microsite_configuration.microsite.BACKEND',
                    get_backend(site_backend, BaseMicrositeBackend)):
-            value = get_value_for_org("TestMicrositeX", "university", "default_value")
-            self.assertEquals(value, "test_microsite")
+            value = get_value_for_org("TestSiteX", "university", "default_value")
+            self.assertEquals(value, "test_site")
