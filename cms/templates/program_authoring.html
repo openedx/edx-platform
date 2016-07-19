@@ -9,11 +9,11 @@
 <%block name="title">${_("Program Administration")}</%block>
 
 <%block name="header_extras">
-<link rel="stylesheet" href=${authoring_app_config.css_url}>
+<%! main_css = "style-main-v2" %>
 </%block>
 
 <%block name="requirejs">
-  require(['${authoring_app_config.js_url | n, js_escaped_string}'], function () {});
+  require(["js/programs/program_admin_app"], function () {});
 </%block>
 
 <%block name="content">

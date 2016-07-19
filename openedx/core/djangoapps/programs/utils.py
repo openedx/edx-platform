@@ -20,7 +20,6 @@ from openedx.core.lib.edx_api_utils import get_edx_api_data
 from student.models import CourseEnrollment
 from util.date_utils import strftime_localized
 from util.organizations_helpers import get_organization_by_short_name
-from xmodule.course_metadata_utils import DEFAULT_START_DATE
 
 
 log = logging.getLogger(__name__)
