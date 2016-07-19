@@ -1,30 +1,33 @@
 <form>
-<h3 class="modal-section-title" id="content_visibility_label"><%- gettext('Student Visibility') %></h3>
+<h3 class="modal-section-title" id="content_visibility_label"><%- gettext('Subsection Visibility') %></h3>
 <div class="modal-section-content staff-lock">
     <ul class="list-fields list-input content-visibility" role="group" aria-labelledby="content_visibility_label">
         <li class="field-radio">
             <label class="label">
-                <input class="input input-radio" name="content-visibility" type="radio" value="staff_only">
-                <%- gettext('Hide from students') %>
+                <input class="input input-radio" name="content-visibility" type="radio" value="staff_only" aria-described-by="staff_only_description">
+                <%- gettext('Hide entire subsection') %>
             </label>
+            <p class='field-message' id='staff_only_description'> <%- gettext('Prevents learners from knowing that the subsection exists - they won\'t see it at all, and it won\'t be included in grade calculation.') %> </p>
         </li>
         <li class="field-radio">
             <label class="label">
-                <input class="input input-radio" name="content-visibility" type="radio" value="hide_after_due">
-                <%- gettext('Hide content but not grades from students after due date') %>
+                <input class="input input-radio" name="content-visibility" type="radio" value="hide_after_due" aria-described-by="hide_after_due_description">
+                <%- gettext('Hide contents after due date') %>
             </label>
+            <p class='field-message' id='hide_after_due_description'> <%- gettext('Removes the subsection\'s contents after the due date passes, but will not affect grading at all.') %> </p>
         </li>
         <li class="field-radio">
             <label class="label">
-                <input class="input input-radio" name="content-visibility" type="radio" value="visible">
-                <%- gettext('Always show to students (Default)') %>
+                <input class="input input-radio" name="content-visibility" type="radio" value="visible" aria-described-by"visible_description">
+                <%- gettext('Nothing hidden') %>
             </label>
+            <p class='field-message' id='visible_description'> <%- gettext('The default value, allows learners to see the published subsection and its content.') %> </p>
         </li>
     </ul>
 
     <% if (hasExplicitStaffLock && !ancestorLocked) { %>
         <p class="tip tip-warning">
-            <% var message = gettext('If you make this %(xblockType)s visible to students, students will be able to see its content after the release date has passed and you have published the unit. Any units that are explicitly hidden from students will remain hidden after you clear this option for the %(xblockType)s.'); %>
+            <% var message = gettext('If you make this %(xblockType)s visible to learners, learners may be able to see its content after you have published the unit. Any units that are explicitly hidden from learners will remain hidden after you clear this option for the %(xblockType)s.'); %>
             <%- interpolate(message, { xblockType: xblockType }, true) %>
         </p>
     <% } %>
