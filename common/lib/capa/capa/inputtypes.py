@@ -317,11 +317,9 @@ class InputTypeBase(object):
             'value': self.value,
             'status': Status(self.status, self.capa_system.i18n.ugettext),
             'msg': self.msg,
-            'STATIC_URL': self.capa_system.STATIC_URL
+            'response_data': self.response_data,
+            'STATIC_URL': self.capa_system.STATIC_URL,
         }
-
-        if self.response_data and self.response_data['label'] != '':
-            context['response_data'] = self.response_data
 
         context.update(
             (a, v) for (a, v) in self.loaded_attributes.iteritems() if a in self.to_render
