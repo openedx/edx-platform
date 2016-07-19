@@ -4,6 +4,8 @@ xModule implementation of a learning sequence
 
 # pylint: disable=abstract-method
 import collections
+from datetime import datetime
+from django.utils.timezone import UTC
 import json
 import logging
 from pkg_resources import resource_string
@@ -38,13 +40,22 @@ class SequenceFields(object):
     # NOTE: Position is 1-indexed.  This is silly, but there are now student
     # positions saved on prod, so it's not easy to fix.
     position = Integer(help="Last tab viewed in this sequence", scope=Scope.user_state)
+
     due = Date(
         display_name=_("Due Date"),
         help=_("Enter the date by which problems are due."),
         scope=Scope.settings,
     )
 
-    # Entrance Exam flag -- see cms/contentstore/views/entrance_exam.py for usage
+    hide_after_due = Boolean(
+        display_name=_("Hide sequence content After Due Date"),
+        help=_(
+            "If set, the sequence content is hidden for non-staff users after the due date has passed."
+        ),
+        default=False,
+        scope=Scope.settings,
+    )
+
     is_entrance_exam = Boolean(
         display_name=_("Is Entrance Exam"),
         help=_(
@@ -94,16 +105,6 @@ class ProctoringFields(object):
             "This setting indicates what rules the proctoring team should follow when viewing the videos."
         ),
         default='',
-        scope=Scope.settings,
-    )
-
-    hide_after_due = Boolean(
-        display_name=_("Hide Exam Results After Due Date"),
-        help=_(
-            "This setting overrides the default behavior of showing exam results after the due date has passed."
-            " Currently only supported for timed exams."
-        ),
-        default=False,
         scope=Scope.settings,
     )
 
@@ -177,73 +178,91 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
 
         raise NotFoundError('Unexpected dispatch type')
 
+    @classmethod
+    def verify_current_content_visibility(cls, due, hide_after_due):
+        """
+        Returns whether the content visibility policy passes
+        for the given due date and hide_after_due values and
+        the current date-time.
+        """
+        return (
+            not due or
+            not hide_after_due or
+            datetime.now(UTC()) < due
+        )
+
     def student_view(self, context):
+        context = context or {}
+        self._capture_basic_metrics()
+        banner_text = None
+        special_html_view = self._hidden_content_student_view(context) or self._special_exam_student_view()
+        if special_html_view:
+            masquerading_as_specific_student = context.get('specific_masquerade', False)
+            banner_text, special_html = special_html_view
+            if special_html and not masquerading_as_specific_student:
+                return Fragment(special_html)
+        return self._student_view(context, banner_text)
+
+    def _special_exam_student_view(self):
+        """
+        Checks whether this sequential is a special exam.  If so, returns
+        a banner_text or the fragment to display depending on whether
+        staff is masquerading.
+        """
+        if self.is_time_limited:
+            special_exam_html = self._time_limited_student_view()
+            if special_exam_html:
+                banner_text = _("This exam is hidden from the learner.")
+                return banner_text, special_exam_html
+
+    def _hidden_content_student_view(self, context):
+        """
+        Checks whether the content of this sequential is hidden from the
+        runtime user. If so, returns a banner_text or the fragment to
+        display depending on whether staff is masquerading.
+        """
+        if not self._can_user_view_content():
+            subsection_format = self.format or _("subsection")  # pylint: disable=no-member
+
+            # Translators: subsection_format refers to the assignment
+            # type of the subsection, such as Homework, Lab, Exam, etc.
+            banner_text = _(
+                "Because the due date has passed, "
+                "this {subsection_format} is hidden from the learner."
+            ).format(subsection_format=subsection_format)
+
+            hidden_content_html = self.system.render_template(
+                'hidden_content.html',
+                {
+                    'subsection_format': subsection_format,
+                    'progress_url': context.get('progress_url'),
+                }
+            )
+
+            return banner_text, hidden_content_html
+
+    def _can_user_view_content(self):
+        """
+        Returns whether the runtime user can view the content
+        of this sequential.
+        """
+        return (
+            self.runtime.user_is_staff or
+            self.verify_current_content_visibility(self.due, self.hide_after_due)
+        )
+
+    def _student_view(self, context, banner_text=None):
+        """
+        Returns the rendered student view of the content of this
+        sequential.  If banner_text is given, it is added to the
+        content.
+        """
         display_items = self.get_display_items()
-
-        # If we're rendering this sequence, but no position is set yet,
-        # or exceeds the length of the displayable items,
-        # default the position to the first element
-        if context.get('requested_child') == 'first':
-            self.position = 1
-        elif context.get('requested_child') == 'last':
-            self.position = len(display_items) or 1
-        elif self.position is None or self.position > len(display_items):
-            self.position = 1
-
-        ## Returns a set of all types of all sub-children
-        contents = []
+        self._update_position(context, len(display_items))
 
         fragment = Fragment()
-        context = context or {}
-
-        bookmarks_service = self.runtime.service(self, "bookmarks")
-        context["username"] = self.runtime.service(self, "user").get_current_user().opt_attrs['edx-platform.username']
-
-        parent_module = self.get_parent()
-        display_names = [
-            parent_module.display_name_with_default,
-            self.display_name_with_default
-        ]
-
-        # We do this up here because proctored exam functionality could bypass
-        # rendering after this section.
-        self._capture_basic_metrics()
-
-        # Is this sequential part of a timed or proctored exam?
-        masquerading = context.get('specific_masquerade', False)
-        special_exam_html = None
-        if self.is_time_limited:
-            special_exam_html = self._time_limited_student_view(context)
-
-            # Do we have an applicable alternate rendering
-            # from the edx_proctoring subsystem?
-            if special_exam_html and not masquerading:
-                fragment.add_content(special_exam_html)
-                return fragment
-
-        for child in display_items:
-            is_bookmarked = bookmarks_service.is_bookmarked(usage_key=child.scope_ids.usage_id)
-            context["bookmarked"] = is_bookmarked
-
-            progress = child.get_progress()
-            rendered_child = child.render(STUDENT_VIEW, context)
-            fragment.add_frag_resources(rendered_child)
-
-            childinfo = {
-                'content': rendered_child.content,
-                'page_title': getattr(child, 'tooltip_title', ''),
-                'progress_status': Progress.to_js_status_str(progress),
-                'progress_detail': Progress.to_js_detail_str(progress),
-                'type': child.get_icon_class(),
-                'id': child.scope_ids.usage_id.to_deprecated_string(),
-                'bookmarked': is_bookmarked,
-                'path': " > ".join(display_names + [child.display_name_with_default]),
-            }
-
-            contents.append(childinfo)
-
         params = {
-            'items': contents,
+            'items': self._render_student_view_for_items(context, display_items, fragment),
             'element_id': self.location.html_id(),
             'item_id': self.location.to_deprecated_string(),
             'position': self.position,
@@ -251,16 +270,65 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
             'ajax_url': self.system.ajax_url,
             'next_url': context.get('next_url'),
             'prev_url': context.get('prev_url'),
-            'override_hidden_exam': masquerading and special_exam_html is not None,
+            'banner_text': banner_text,
         }
-
         fragment.add_content(self.system.render_template("seq_module.html", params))
 
         self._capture_full_seq_item_metrics(display_items)
         self._capture_current_unit_metrics(display_items)
 
-        # Get all descendant XBlock types and counts
         return fragment
+
+    def _update_position(self, context, number_of_display_items):
+        """
+        Update the user's sequential position given the context and the
+        number_of_display_items
+        """
+        # If we're rendering this sequence, but no position is set yet,
+        # or exceeds the length of the displayable items,
+        # default the position to the first element
+        if context.get('requested_child') == 'first':
+            self.position = 1
+        elif context.get('requested_child') == 'last':
+            self.position = number_of_display_items or 1
+        elif self.position is None or self.position > number_of_display_items:
+            self.position = 1
+
+    def _render_student_view_for_items(self, context, display_items, fragment):
+        """
+        Updates the given fragment with rendered student views of the given
+        display_items.  Returns a list of dict objects with information about
+        the given display_items.
+        """
+        bookmarks_service = self.runtime.service(self, "bookmarks")
+        context["username"] = self.runtime.service(self, "user").get_current_user().opt_attrs['edx-platform.username']
+        display_names = [
+            self.get_parent().display_name_with_default,
+            self.display_name_with_default
+        ]
+        contents = []
+        for item in display_items:
+            is_bookmarked = bookmarks_service.is_bookmarked(usage_key=item.scope_ids.usage_id)
+            context["bookmarked"] = is_bookmarked
+
+            progress = item.get_progress()
+            rendered_item = item.render(STUDENT_VIEW, context)
+            fragment.add_frag_resources(rendered_item)
+
+            iteminfo = {
+                'content': rendered_item.content,
+                'page_title': getattr(item, 'tooltip_title', ''),
+                'progress_status': Progress.to_js_status_str(progress),
+                'progress_detail': Progress.to_js_detail_str(progress),
+                'type': item.get_icon_class(),
+                'id': item.scope_ids.usage_id.to_deprecated_string(),
+                'bookmarked': is_bookmarked,
+                'path': " > ".join(display_names + [item.display_name_with_default]),
+            }
+
+            contents.append(iteminfo)
+
+        return contents
 
     def _locations_in_subtree(self, node):
         """
@@ -328,7 +396,7 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
             for block_type, count in curr_block_counts.items():
                 newrelic.agent.add_custom_parameter('seq.current.block_counts.{}'.format(block_type), count)
 
-    def _time_limited_student_view(self, context):
+    def _time_limited_student_view(self):
         """
         Delegated rendering of a student view when in a time
         limited view. This ultimately calls down into edx_proctoring

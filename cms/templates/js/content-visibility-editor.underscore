@@ -1,0 +1,35 @@
+<form>
+<h3 class="modal-section-title" id="content_visibility_label"><%- gettext('Subsection Visibility') %></h3>
+<div class="modal-section-content staff-lock">
+    <ul class="list-fields list-input content-visibility" role="group" aria-labelledby="content_visibility_label">
+        <li class="field-radio">
+            <label class="label">
+                <input class="input input-radio" name="content-visibility" type="radio" value="visible" aria-described-by"visible_description">
+                <%- gettext('Show entire subsection') %>
+            </label>
+            <p class='field-message' id='visible_description'> <%- gettext('Learners see the published subsection and can access its content.') %> </p>
+        </li>
+        <li class="field-radio">
+            <label class="label">
+                <input class="input input-radio" name="content-visibility" type="radio" value="hide_after_due" aria-described-by="hide_after_due_description">
+                <%- gettext('Hide content after due date') %>
+            </label>
+            <p class='field-message' id='hide_after_due_description'> <%- gettext('After the subsection\'s due date has passed, learners can no longer access its content. The subsection remains included in grade calculations.') %> </p>
+        </li>
+        <li class="field-radio">
+            <label class="label">
+                <input class="input input-radio" name="content-visibility" type="radio" value="staff_only" aria-described-by="staff_only_description">
+                <%- gettext('Hide entire subsection') %>
+            </label>
+            <p class='field-message' id='staff_only_description'> <%- gettext('Learners do not see the subsection in the course outline. The subsection is not included in grade calculations.') %> </p>
+        </li>
+    </ul>
+
+    <% if (hasExplicitStaffLock && !ancestorLocked) { %>
+        <p class="tip tip-warning">
+            <% var message = gettext('If you make this %(xblockType)s visible to learners, learners may be able to see its content after you have published the unit. Any units that are explicitly hidden from learners will remain hidden after you clear this option for the %(xblockType)s.'); %>
+            <%- interpolate(message, { xblockType: xblockType }, true) %>
+        </p>
+    <% } %>
+</div>
+</form>

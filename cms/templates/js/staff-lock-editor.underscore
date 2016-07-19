@@ -7,25 +7,16 @@
             <label for="staff_lock" class="label">
               <span class="icon fa fa-check-square-o input-checkbox-checked" aria-hidden="true"></span>
               <span class="icon fa fa-square-o input-checkbox-unchecked" aria-hidden="true"></span>
-              <%= gettext('Hide from students') %>
+              <%= gettext('Hide from learners') %>
             </label>
 
             <% if (hasExplicitStaffLock && !ancestorLocked) { %>
                 <p class="tip tip-warning">
                   <% if (xblockInfo.isVertical()) { %>
-                    <%= gettext('If the unit was previously published and released to students, any changes you made to the unit when it was hidden will now be visible to students.') %>
+                    <%= gettext('If the unit was previously published and released to learners, any changes you made to the unit when it was hidden will now be visible to learners.') %>
                   <% } else { %>
-                    <% var message = gettext('If you make this %(xblockType)s visible to students, students will be able to see its content after the release date has passed and you have published the unit.'); %>
+                    <% var message = gettext('If you make this %(xblockType)s visible to learners, learners will be able to see its content after the release date has passed and you have published the unit. Any units that are explicitly hidden from learners will remain hidden after you clear this option for the %(xblockType)s.') %>
                     <%= interpolate(message, { xblockType: xblockType }, true) %>
-                  <% } %>
-                </p>
-
-                <p class="tip tip-warning">
-                  <% if (xblockInfo.isChapter()) { %>
-                    <%= gettext('Any subsections or units that are explicitly hidden from students will remain hidden after you clear this option for the section.') %>
-                  <% } %>
-                  <% if (xblockInfo.isSequential()) { %>
-                    <%= gettext('Any units that are explicitly hidden from students will remain hidden after you clear this option for the subsection.') %>
                   <% } %>
                 </p>
             <% } %>

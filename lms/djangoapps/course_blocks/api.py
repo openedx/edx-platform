@@ -2,11 +2,8 @@
 API entry point to the course_blocks app with top-level
 get_course_blocks function.
 """
-from django.core.cache import cache
 from openedx.core.djangoapps.content.block_structure.api import get_block_structure_manager
-from openedx.core.lib.block_structure.manager import BlockStructureManager
 from openedx.core.lib.block_structure.transformers import BlockStructureTransformers
-from xmodule.modulestore.django import modulestore
 
 from .transformers import (
     library_content,

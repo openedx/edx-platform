@@ -447,7 +447,7 @@ class CoursewareIndex(View):
             return "{url}?child={requested_child}".format(
                 url=reverse(
                     'courseware_section',
-                    args=[unicode(self.course.id), section_info['chapter_url_name'], section_info['url_name']],
+                    args=[unicode(self.course_key), section_info['chapter_url_name'], section_info['url_name']],
                 ),
                 requested_child=requested_child,
             )
@@ -455,6 +455,7 @@ class CoursewareIndex(View):
         section_context = {
             'activate_block_id': self.request.GET.get('activate_block_id'),
             'requested_child': self.request.GET.get("child"),
+            'progress_url': reverse('progress', kwargs={'course_id': unicode(self.course_key)}),
         }
         if previous_of_active_section:
             section_context['prev_url'] = _compute_section_url(previous_of_active_section, 'last')

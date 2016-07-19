@@ -7,10 +7,10 @@ define(["jquery", "edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers", "common/j
         describe("CourseOutlinePage", function() {
             var createCourseOutlinePage, displayNameInput, model, outlinePage, requests,
                 getItemsOfType, getItemHeaders, verifyItemsExpanded, expandItemsAndVerifyState,
-                collapseItemsAndVerifyState, createMockCourseJSON, createMockSectionJSON, createMockSubsectionJSON,
-                verifyTypePublishable, mockCourseJSON, mockEmptyCourseJSON, mockSingleSectionCourseJSON,
-                createMockVerticalJSON, createMockIndexJSON, mockCourseEntranceExamJSON,
-                mockOutlinePage = readFixtures('mock/mock-course-outline-page.underscore'),
+                collapseItemsAndVerifyState, selectBasicSettings, selectAdvancedSettings, createMockCourseJSON,
+                createMockSectionJSON, createMockSubsectionJSON, verifyTypePublishable, mockCourseJSON,
+                mockEmptyCourseJSON, mockSingleSectionCourseJSON, createMockVerticalJSON, createMockIndexJSON,
+                mockCourseEntranceExamJSON, mockOutlinePage = readFixtures('mock/mock-course-outline-page.underscore'),
                 mockRerunNotification = readFixtures('mock/mock-course-rerun-notification.underscore');
 
             createMockCourseJSON = function(options, children) {
@@ -137,6 +137,14 @@ define(["jquery", "edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers", "common/j
                 verifyItemsExpanded(type, false);
             };
 
+            selectBasicSettings = function() {
+               this.$(".modal-section .settings-tab-button[data-tab='basic']").click();
+            };
+
+            selectAdvancedSettings = function() {
+               this.$(".modal-section .settings-tab-button[data-tab='advanced']").click();
+            };
+
             createCourseOutlinePage = function(test, courseJSON, createOnly) {
                 requests = AjaxHelpers.requests(test);
                 model = new XBlockOutlineInfo(courseJSON, { parse: true });
@@ -230,8 +238,8 @@ define(["jquery", "edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers", "common/j
                     'course-outline', 'xblock-string-field-editor', 'modal-button',
                     'basic-modal', 'course-outline-modal', 'release-date-editor',
                     'due-date-editor', 'grading-editor', 'publish-editor',
-                    'staff-lock-editor', 'settings-modal-tabs', 'timed-examination-preference-editor',
-                    'access-editor'
+                    'staff-lock-editor','content-visibility-editor', 'settings-modal-tabs',
+                    'timed-examination-preference-editor', 'access-editor'
                 ]);
                 appendSetFixtures(mockOutlinePage);
                 mockCourseJSON = createMockCourseJSON({}, [
@@ -535,8 +543,10 @@ define(["jquery", "edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers", "common/j
                     expect($("due_date")).not.toExist();
                     expect($("grading_format")).not.toExist();
 
-                    // Staff lock controls are always visible
+                    // Staff lock controls are always visible on the advanced tab
+                    selectAdvancedSettings();
                     expect($("#staff_lock")).toExist();
+                    selectBasicSettings();
                     $(".wrapper-modal-window .action-save").click();
                     AjaxHelpers.expectJsonRequest(requests, 'POST', '/xblock/mock-section', {
                         "metadata":{
@@ -605,43 +615,35 @@ define(["jquery", "edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers", "common/j
             });
 
             describe("Subsection", function() {
-                var getDisplayNameWrapper, setEditModalValues, mockServerValuesJson,
-                    selectDisableSpecialExams, selectBasicSettings, selectAdvancedSettings,
-                    selectAccessSettings, selectTimedExam, selectProctoredExam, selectPracticeExam,
+                var getDisplayNameWrapper, setEditModalValues, setContentVisibility,  mockServerValuesJson,
+                    selectDisableSpecialExams, selectTimedExam, selectProctoredExam, selectPracticeExam,
                     selectPrerequisite, selectLastPrerequisiteSubsection, checkOptionFieldVisibility;
 
                 getDisplayNameWrapper = function() {
                     return getItemHeaders('subsection').find('.wrapper-xblock-field');
                 };
 
-                setEditModalValues = function (start_date, due_date, grading_type, is_locked) {
+                setEditModalValues = function (start_date, due_date, grading_type) {
                     $("#start_date").val(start_date);
                     $("#due_date").val(due_date);
                     $("#grading_type").val(grading_type);
-                    $("#staff_lock").prop('checked', is_locked);
+                };
+
+                setContentVisibility = function (visibility) {
+                    if (visibility) {
+                        $('input[name=content-visibility][value='+visibility+']').prop('checked', true);
+                    }
                 };
 
                 selectDisableSpecialExams = function() {
                     this.$("input.no_special_exam").prop('checked', true).trigger('change');
                 };
 
-                selectBasicSettings = function() {
-                   this.$(".modal-section .settings-tab-button[data-tab='basic']").click();
-                };
-
-                selectAdvancedSettings = function() {
-                   this.$(".modal-section .settings-tab-button[data-tab='advanced']").click();
-                };
-
-                selectAccessSettings = function() {
-                   this.$(".modal-section .settings-tab-button[data-tab='access']").click();
-                };
-
-                selectTimedExam = function(time_limit, hide_after_due) {
+                selectTimedExam = function(time_limit) {
                     this.$("input.timed_exam").prop('checked', true).trigger('change');
                     this.$(".field-time-limit input").val(time_limit);
                     this.$(".field-time-limit input").trigger('focusout');
-                    this.$('.field-hide-after-due input').prop('checked', hide_after_due).trigger('change');
+                    setContentVisibility("hide_after_due");
                 };
 
                 selectProctoredExam = function(time_limit) {
@@ -666,10 +668,9 @@ define(["jquery", "edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers", "common/j
                 };
 
                 // Helper to validate oft-checked additional option fields' visibility
-                checkOptionFieldVisibility = function(time_limit, review_rules, hide_after_due) {
+                checkOptionFieldVisibility = function(time_limit, review_rules) {
                     expect($('.field-time-limit').is(':visible')).toBe(time_limit);
                     expect($('.field-exam-review-rules').is(':visible')).toBe(review_rules);
-                    expect($('.field-hide-after-due').is(':visible')).toBe(hide_after_due);
                 };
 
                 // Contains hard-coded dates because dates are presented in different formats.
@@ -767,7 +768,6 @@ define(["jquery", "edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers", "common/j
                     selectBasicSettings();
                     expect($('.modal-section .settings-tab-button[data-tab="basic"]')).toHaveClass('active');
                     expect($('.modal-section .settings-tab-button[data-tab="advanced"]')).not.toHaveClass('active');
-                    expect($('.modal-section .settings-tab-button[data-tab="access"]')).not.toHaveClass('active');
                 });
 
                 it('can show advanced settings', function() {
@@ -776,20 +776,11 @@ define(["jquery", "edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers", "common/j
                     selectAdvancedSettings();
                     expect($('.modal-section .settings-tab-button[data-tab="basic"]')).not.toHaveClass('active');
                     expect($('.modal-section .settings-tab-button[data-tab="advanced"]')).toHaveClass('active');
-                    expect($('.modal-section .settings-tab-button[data-tab="access"]')).not.toHaveClass('active');
-                });
-
-                it('can show access settings', function() {
-                    createCourseOutlinePage(this, mockCourseJSON, false);
-                    outlinePage.$('.outline-subsection .configure-button').click();
-                    selectAccessSettings();
-                    expect($('.modal-section .settings-tab-button[data-tab="basic"]')).not.toHaveClass('active');
-                    expect($('.modal-section .settings-tab-button[data-tab="advanced"]')).not.toHaveClass('active');
-                    expect($('.modal-section .settings-tab-button[data-tab="access"]')).toHaveClass('active');
                 });
 
                 it('does not show settings tab headers if there is only one tab to show', function() {
-                    var mockSubsectionJSON = createMockSubsectionJSON({}, []);
+                    var mockVerticalJSON = createMockVerticalJSON({}, []);
+                    var mockSubsectionJSON = createMockSubsectionJSON({}, [mockVerticalJSON]);
                     delete mockSubsectionJSON.is_prereq;
                     delete mockSubsectionJSON.prereqs;
                     delete mockSubsectionJSON.prereq;
@@ -801,7 +792,7 @@ define(["jquery", "edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers", "common/j
                         createMockSectionJSON({}, [mockSubsectionJSON])
                     ]);
                     createCourseOutlinePage(this, mockCourseJSON, false);
-                    outlinePage.$('.outline-subsection .configure-button').click();
+                    outlinePage.$('.outline-unit .configure-button').click();
                     expect($(".settings-tabs-header").length).toBe(0);
                 });
 
@@ -818,7 +809,7 @@ define(["jquery", "edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers", "common/j
                     expect($(".edit-settings-release").length).toBe(0);
                     expect($(".grading-due-date").length).toBe(0);
                     expect($(".edit-settings-grading").length).toBe(1);
-                    expect($(".edit-staff-lock").length).toBe(1);
+                    expect($(".edit-content-visibility").length).toBe(1);
                 });
 
                 it('can select valid time', function() {
@@ -847,16 +838,16 @@ define(["jquery", "edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers", "common/j
                 it('can be edited', function() {
                     createCourseOutlinePage(this, mockCourseJSON, false);
                     outlinePage.$('.outline-subsection .configure-button').click();
-                    setEditModalValues("7/9/2014", "7/10/2014", "Lab", true);
+                    setEditModalValues("7/9/2014", "7/10/2014", "Lab");
                     selectAdvancedSettings();
-                    selectTimedExam("02:30", true);
+                    selectTimedExam("02:30");
                     $(".wrapper-modal-window .action-save").click();
                     AjaxHelpers.expectJsonRequest(requests, 'POST', '/xblock/mock-subsection', {
                         "graderType":"Lab",
                         "publish": "republish",
                         "isPrereq": false,
                         "metadata":{
-                            "visible_to_staff_only": true,
+                            "visible_to_staff_only": null,
                             "start":"2014-07-09T00:00:00.000Z",
                             "due":"2014-07-10T00:00:00.000Z",
                             "exam_review_rules": "",
@@ -892,21 +883,21 @@ define(["jquery", "edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers", "common/j
                     expect($("#start_date").val()).toBe('7/9/2014');
                     expect($("#due_date").val()).toBe('7/10/2014');
                     expect($("#grading_type").val()).toBe('Lab');
-                    expect($("#staff_lock").is(":checked")).toBe(true);
+                    expect($("input[name=content-visibility][value=staff_only]").is(":checked")).toBe(true);
                     expect($("input.timed_exam").is(":checked")).toBe(true);
                     expect($("input.proctored_exam").is(":checked")).toBe(false);
                     expect($("input.no_special_exam").is(":checked")).toBe(false);
                     expect($("input.practice_exam").is(":checked")).toBe(false);
                     expect($(".field-time-limit input").val()).toBe("02:30");
-                    expect($(".field-hide-after-due input").is(":checked")).toBe(true);
                 });
 
                 it('can hide time limit and hide after due fields when the None radio box is selected', function() {
                     createCourseOutlinePage(this, mockCourseJSON, false);
                     outlinePage.$('.outline-subsection .configure-button').click();
-                    setEditModalValues("7/9/2014", "7/10/2014", "Lab", true);
+                    setEditModalValues("7/9/2014", "7/10/2014", "Lab");
                     selectAdvancedSettings();
                     selectDisableSpecialExams();
+                    setContentVisibility("staff_only");
 
                     // all additional options should be hidden
                     expect($('.exam-options').is(':hidden')).toBe(true);
@@ -915,12 +906,13 @@ define(["jquery", "edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers", "common/j
                 it('can select the practice exam', function() {
                     createCourseOutlinePage(this, mockCourseJSON, false);
                     outlinePage.$('.outline-subsection .configure-button').click();
-                    setEditModalValues("7/9/2014", "7/10/2014", "Lab", true);
+                    setEditModalValues("7/9/2014", "7/10/2014", "Lab");
                     selectAdvancedSettings();
                     selectPracticeExam("00:30");
+                    setContentVisibility("staff_only");
 
-                    // time limit should be visible, review rules and hide after due should be hidden
-                    checkOptionFieldVisibility(true, false, false);
+                    // time limit should be visible, review rules should be hidden
+                    checkOptionFieldVisibility(true, false);
                     
                     $(".wrapper-modal-window .action-save").click();
                 });
@@ -928,12 +920,12 @@ define(["jquery", "edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers", "common/j
                 it('can select the timed exam', function() {
                     createCourseOutlinePage(this, mockCourseJSON, false);
                     outlinePage.$('.outline-subsection .configure-button').click();
-                    setEditModalValues("7/9/2014", "7/10/2014", "Lab", true);
+                    setEditModalValues("7/9/2014", "7/10/2014", "Lab");
                     selectAdvancedSettings();
                     selectTimedExam("00:30");
                     
-                    // time limit and hide after due should be visible, review rules should be hidden
-                    checkOptionFieldVisibility(true, false, true);
+                    // time limit should be visible, review rules should be hidden
+                    checkOptionFieldVisibility(true, false);
                 
                     $(".wrapper-modal-window .action-save").click();
                 });
@@ -941,12 +933,13 @@ define(["jquery", "edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers", "common/j
                 it('can select the Proctored exam option', function() {
                     createCourseOutlinePage(this, mockCourseJSON, false);
                     outlinePage.$('.outline-subsection .configure-button').click();
-                    setEditModalValues("7/9/2014", "7/10/2014", "Lab", true);
+                    setEditModalValues("7/9/2014", "7/10/2014", "Lab");
                     selectAdvancedSettings();
                     selectProctoredExam("00:30");
+                    setContentVisibility("staff_only");
                     
-                    // time limit and review rules should be visible, hide after due should be hidden
-                    checkOptionFieldVisibility(true, true, false);
+                    // time limit and review rules should be visible
+                    checkOptionFieldVisibility(true, true);
 
                     $(".wrapper-modal-window .action-save").click();
 
@@ -955,9 +948,10 @@ define(["jquery", "edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers", "common/j
                 it('entering invalid time format uses default value of 30 minutes.', function() {
                     createCourseOutlinePage(this, mockCourseJSON, false);
                     outlinePage.$('.outline-subsection .configure-button').click();
-                    setEditModalValues("7/9/2014", "7/10/2014", "Lab", true);
+                    setEditModalValues("7/9/2014", "7/10/2014", "Lab");
                     selectAdvancedSettings();
                     selectProctoredExam("abcd");
+                    setContentVisibility("staff_only");
 
                     // time limit field should be visible and have the correct value
                     expect($('.field-time-limit').is(':visible')).toBe(true);
@@ -992,7 +986,6 @@ define(["jquery", "edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers", "common/j
                     expect($("input.no_special_exam").is(":checked")).toBe(true);
                     expect($("input.practice_exam").is(":checked")).toBe(false);
                     expect($(".field-time-limit input").val()).toBe("02:30");
-                    expect($('.field-hide-after-due').is(':hidden')).toBe(true);
                 });
 
                 it('can show a saved timed exam correctly when hide_after_due is true', function() {
@@ -1022,7 +1015,6 @@ define(["jquery", "edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers", "common/j
                     expect($("input.no_special_exam").is(":checked")).toBe(false);
                     expect($("input.practice_exam").is(":checked")).toBe(false);
                     expect($(".field-time-limit input").val()).toBe("00:10");
-                    expect($('.field-hide-after-due input').is(":checked")).toBe(true);
                 });
 
                 it('can show a saved timed exam correctly when hide_after_due is true', function() {
@@ -1081,7 +1073,6 @@ define(["jquery", "edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers", "common/j
                     expect($("input.no_special_exam").is(":checked")).toBe(false);
                     expect($("input.practice_exam").is(":checked")).toBe(true);
                     expect($(".field-time-limit input").val()).toBe("02:30");
-                    expect($('.field-hide-after-due').is(':hidden')).toBe(true);
                 });
 
                 it('can show a saved proctored exam correctly', function() {
@@ -1110,7 +1101,6 @@ define(["jquery", "edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers", "common/j
                     expect($("input.no_special_exam").is(":checked")).toBe(false);
                     expect($("input.practice_exam").is(":checked")).toBe(false);
                     expect($(".field-time-limit input").val()).toBe("02:30");
-                    expect($('.field-hide-after-due').is(':hidden')).toBe(true);
                 });
 
                 it('does not show proctored settings if proctored exams not enabled', function() {
@@ -1138,7 +1128,6 @@ define(["jquery", "edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers", "common/j
                     expect($("input.timed_exam").is(":checked")).toBe(true);
                     expect($("input.no_special_exam").is(":checked")).toBe(false);
                     expect($(".field-time-limit input").val()).toBe("02:30");
-                    expect($('.field-hide-after-due input').is(":checked")).toBe(true);
                 });
 
                 it('can select prerequisite', function() {
@@ -1300,7 +1289,7 @@ define(["jquery", "edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers", "common/j
                     ]);
                     createCourseOutlinePage(this, mockCourseWithPreqsJSON, false);
                     outlinePage.$('.outline-subsection .configure-button').click();
-                    selectAccessSettings();
+                    selectAdvancedSettings();
                     selectLastPrerequisiteSubsection('');
                     expect($('#prereq_min_score_error').css('display')).toBe('none');
                     selectLastPrerequisiteSubsection('80');
@@ -1314,7 +1303,8 @@ define(["jquery", "edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers", "common/j
                 it('release date, due date, grading type, and staff lock can be cleared.', function() {
                     createCourseOutlinePage(this, mockCourseJSON, false);
                     outlinePage.$('.outline-item .outline-subsection .configure-button').click();
-                    setEditModalValues("7/9/2014", "7/10/2014", "Lab", true);
+                    setEditModalValues("7/9/2014", "7/10/2014", "Lab");
+                    setContentVisibility("staff_only");
                     $(".wrapper-modal-window .action-save").click();
 
                     // This is the response for the change operation.
@@ -1339,7 +1329,7 @@ define(["jquery", "edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers", "common/j
                     expect($("#start_date").val()).toBe('7/9/2014');
                     expect($("#due_date").val()).toBe('7/10/2014');
                     expect($("#grading_type").val()).toBe('Lab');
-                    expect($("#staff_lock").is(":checked")).toBe(true);
+                    expect($("input[name=content-visibility][value=staff_only]").is(":checked")).toBe(true);
 
                     $(".wrapper-modal-window .scheduled-date-input .action-clear").click();
                     $(".wrapper-modal-window .due-date-input .action-clear").click();
@@ -1347,7 +1337,7 @@ define(["jquery", "edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers", "common/j
                     expect($("#due_date").val()).toBe('');
 
                     $("#grading_type").val('notgraded');
-                    $("#staff_lock").prop('checked', false);
+                    setContentVisibility("visible");
 
                     $(".wrapper-modal-window .action-save").click();
 

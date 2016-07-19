@@ -81,7 +81,7 @@ var visibleToStaffOnly = visibilityState === 'staff_only';
                 <% } %>
             </p>
         <% } else { %>
-            <p class="visbility-copy copy"><%- gettext("Staff and Students") %></p>
+            <p class="visbility-copy copy"><%- gettext("Staff and Learners") %></p>
         <% } %>
             <% if (hasContentGroupComponents) { %>
                 <p class="note-visibility">
@@ -97,10 +97,14 @@ var visibleToStaffOnly = visibilityState === 'staff_only';
                 <% } else { %>
                     <span class="icon fa fa-square-o" aria-hidden="true"></span>
                 <% } %>
-                <%- gettext('Hide from students') %>
+                <%- gettext('Hide from learners') %>
             </a>
             </li>
         </ul>
+        <p>
+            <%- gettext("Note: Do not hide graded assignments after they have been released.") %>
+            <a href="#"><%- gettext("Link to documentation.") %></a>
+        </p>
     </div>
 
     <div class="wrapper-pub-actions bar-mod-actions">
