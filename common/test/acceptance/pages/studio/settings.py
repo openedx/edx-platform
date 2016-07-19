@@ -9,7 +9,10 @@ from bok_choy.javascript import requirejs
 
 from common.test.acceptance.pages.studio.course_page import CoursePage
 from common.test.acceptance.pages.studio.users import wait_for_ajax_or_reload
-from common.test.acceptance.pages.studio.utils import press_the_notification_button
+from common.test.acceptance.pages.studio.utils import (
+    press_the_notification_button,
+    type_in_codemirror
+)
 
 
 @requirejs('js/factories/settings')
@@ -69,6 +72,36 @@ class SettingsPage(CoursePage):
     def get_element(self, css_selector):
         results = self.get_elements(css_selector=css_selector)
         return results[0] if results else None
+
+    def set_element_values(self, element_values):
+        """
+        Set the values of the elements to those specified
+        in the element_values dict.
+        """
+        for css, value in element_values.iteritems():
+            element = self.get_element(css)
+            element.clear()
+            element.send_keys(value)
+
+    def un_focus_input_field(self):
+        """
+        Makes an input field un-focus by
+        clicking outside of it.
+        """
+        self.get_element('.title-2').click()
+
+    def is_element_present(self, css_selector):
+        """
+        Returns boolean based on the presence
+        of an element with css as passed.
+        """
+        return self.q(css=css_selector).present
+
+    def change_course_description(self, change_text):
+        """
+        Changes the course description
+        """
+        type_in_codemirror(self, 0, change_text, find_prefix="$")
 
     ################
     # Properties
@@ -207,6 +240,17 @@ class SettingsPage(CoursePage):
     ################
     # Clicks
     ################
+
+    def click_button(self, name):
+        """
+        Clicks the button
+        """
+        btn_css = 'div#page-notification button.action-{}'.format(name.lower())
+        EmptyPromise(
+            lambda: self.q(css=btn_css).visible,
+            '{} button is visible'.format(name)
+        ).fulfill()
+        press_the_notification_button(self, name)
 
     ################
     # Workflows
