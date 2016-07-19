@@ -4,8 +4,9 @@ Base test classes for LMS instructor-initiated background tasks
 """
 import os
 import json
-from mock import Mock
+from mock import Mock, patch
 import shutil
+from tempfile import mkdtemp
 import unicodecsv
 from uuid import uuid4
 
@@ -290,15 +291,30 @@ class TestReportMixin(object):
     """
     Cleans up after tests that place files in the reports directory.
     """
-    def tearDown(self):
-        report_store = ReportStore.from_config(config_name='GRADES_DOWNLOAD')
-        try:
-            reports_download_path = report_store.storage.path('')
-        except NotImplementedError:
-            pass  # storage backend does not use the local filesystem
-        else:
-            if os.path.exists(reports_download_path):
-                shutil.rmtree(reports_download_path)
+    def setUp(self):
+
+        def clean_up_tmpdir():
+            """Remove temporary directory created for instructor task models."""
+            if os.path.exists(self.tmp_dir):
+                shutil.rmtree(self.tmp_dir)
+
+        super(TestReportMixin, self).setUp()
+
+        # Ensure that working with the temp directories in tests is thread safe
+        # by creating a unique temporary directory for each testcase.
+        self.tmp_dir = mkdtemp()
+
+        mock_grades_download = {'STORAGE_TYPE': 'localfs', 'BUCKET': 'test-grades', 'ROOT_PATH': self.tmp_dir}
+        self.grades_patch = patch.dict('django.conf.settings.GRADES_DOWNLOAD', mock_grades_download)
+        self.grades_patch.start()
+        self.addCleanup(self.grades_patch.stop)
+
+        mock_fin_report = {'STORAGE_TYPE': 'localfs', 'BUCKET': 'test-financial-reports', 'ROOT_PATH': self.tmp_dir}
+        self.reports_patch = patch.dict('django.conf.settings.FINANCIAL_REPORTS', mock_fin_report)
+        self.reports_patch.start()
+        self.addCleanup(self.reports_patch.stop)
+
+        self.addCleanup(clean_up_tmpdir)
 
     def verify_rows_in_csv(self, expected_rows, file_index=0, verify_order=True, ignore_other_columns=False):
         """
