@@ -5,12 +5,10 @@ import urlparse
 FEATURES['SHOW_LABSTER_NOTIFICATION'] = True
 LABSTER_FEATURES = {
     "ENABLE_WIKI": True,
-    "ENABLE_TEACHER_DASHBOARD": True,
 }
 
 INSTALLED_APPS += (
     'labster_course_license',
-    'teacher_dashboard',
 )
 
 LABSTER_WIKI_LINK = 'https://theory.labster.com/'
@@ -20,10 +18,6 @@ LABSTER_API_URL = ''
 LABSTER_ENDPOINTS = {
     'available_simulations': 'https://example.com/available_simulations',
     'consumer_secret': 'https://example.com/consumer_secret',
-    'licenses': 'https://example.com/licenses',
-    'simulations': 'https://example.com/simulations',
-    'students': 'https://example.com/students',
-    'attempts': 'https://example.com/attempts',
 }
 
 LABSTER_DEFAULT_LTI_ID = 'MC'
