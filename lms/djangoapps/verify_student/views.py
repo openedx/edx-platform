@@ -1083,6 +1083,125 @@ class SubmitPhotosView(View):
             analytics.track(user.id, event_name, parameters, context=context)
 
 
+def _compose_message_reverification_email(
+        course_key, user_id, related_assessment_location, status, request
+):  # pylint: disable=invalid-name
+    """
+    Compose subject and message for photo reverification email.
+
+    Args:
+        course_key(CourseKey): CourseKey object
+        user_id(str): User Id
+        related_assessment_location(str): Location of reverification XBlock
+        photo_verification(QuerySet): Queryset of SoftwareSecure objects
+        status(str): Approval status
+        is_secure(Bool): Is running on secure protocol or not
+
+    Returns:
+        None if any error occurred else Tuple of subject and message strings
+    """
+    try:
+        usage_key = UsageKey.from_string(related_assessment_location)
+        reverification_block = modulestore().get_item(usage_key)
+
+        course = modulestore().get_course(course_key)
+        redirect_url = get_redirect_url(course_key, usage_key.replace(course_key=course_key))
+
+        subject = "Re-verification Status"
+        context = {
+            "status": status,
+            "course_name": course.display_name_with_default_escaped,
+            "assessment": reverification_block.related_assessment
+        }
+
+        # Allowed attempts is 1 if not set on verification block
+        allowed_attempts = reverification_block.attempts + 1
+        used_attempts = VerificationStatus.get_user_attempts(user_id, course_key, related_assessment_location)
+        left_attempts = allowed_attempts - used_attempts
+        is_attempt_allowed = left_attempts > 0
+        verification_open = True
+        if reverification_block.due:
+            verification_open = timezone.now() <= reverification_block.due
+
+        context["left_attempts"] = left_attempts
+        context["is_attempt_allowed"] = is_attempt_allowed
+        context["verification_open"] = verification_open
+        context["due_date"] = get_default_time_display(reverification_block.due)
+
+        context['platform_name'] = configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME)
+        context["used_attempts"] = used_attempts
+        context["allowed_attempts"] = allowed_attempts
+        context["support_link"] = configuration_helpers.get_value('email_from_address', settings.CONTACT_EMAIL)
+
+        re_verification_link = reverse(
+            'verify_student_incourse_reverify',
+            args=(
+                unicode(course_key),
+                related_assessment_location
+            )
+        )
+
+        context["course_link"] = request.build_absolute_uri(redirect_url)
+        context["reverify_link"] = request.build_absolute_uri(re_verification_link)
+
+        message = render_to_string('emails/reverification_processed.txt', context)
+        log.info(
+            "Sending email to User_Id=%s. Attempts left for this user are %s. "
+            "Allowed attempts %s. "
+            "Due Date %s",
+            str(user_id), left_attempts, allowed_attempts, str(reverification_block.due)
+        )
+        return subject, message
+    # Catch all exception to avoid raising back to view
+    except:  # pylint: disable=bare-except
+        log.exception("The email for re-verification sending failed for user_id %s", user_id)
+
+
+def _send_email(user_id, subject, message):
+    """ Send email to given user
+
+    Args:
+        user_id(str): User Id
+        subject(str): Subject lines of emails
+        message(str): Email message body
+
+    Returns:
+        None
+    """
+    from_address = configuration_helpers.get_value(
+        'email_from_address',
+        settings.DEFAULT_FROM_EMAIL
+    )
+    user = User.objects.get(id=user_id)
+    user.email_user(subject, message, from_address)
+
+
+def _set_user_requirement_status(attempt, namespace, status, reason=None):
+    """Sets the status of a credit requirement for the user,
+    based on a verification checkpoint.
+    """
+    checkpoint = None
+    try:
+        checkpoint = VerificationCheckpoint.objects.get(photo_verification=attempt)
+    except VerificationCheckpoint.DoesNotExist:
+        log.error("Unable to find checkpoint for user with id %d", attempt.user.id)
+
+    if checkpoint is not None:
+        try:
+            set_credit_requirement_status(
+                attempt.user.username,
+                checkpoint.course_id,
+                namespace,
+                checkpoint.checkpoint_location,
+                status=status,
+                reason=reason,
+            )
+        except Exception:  # pylint: disable=broad-except
+            # Catch exception if unable to add credit requirement
+            # status for user
+            log.error("Unable to add Credit requirement status for user with id %d", attempt.user.id)
+
+
 @require_POST
 @csrf_exempt  # SS does its own message signing, and their API won't have a cookie value
 def results_callback(request):
@@ -1208,3 +1327,130 @@ class ReverifyView(View):
                 "status": status
             }
             return render_to_response("verify_student/reverify_not_allowed.html", context)
+
+
+class InCourseReverifyView(View):
+    """
+    The in-course reverification view.
+
+    In-course reverification occurs while a student is taking a course.
+    At points in the course, students are prompted to submit face photos,
+    which are matched against the ID photos the user submitted during their
+    initial verification.
+
+    Students are prompted to enter this flow from an "In Course Reverification"
+    XBlock (courseware component) that course authors add to the course.
+    See https://github.com/edx/edx-reverification-block for more details.
+
+    """
+    @method_decorator(login_required)
+    def get(self, request, course_id, usage_id):
+        """Display the view for face photo submission.
+
+        Args:
+            request(HttpRequest): HttpRequest object
+            course_id(str): A string of course id
+            usage_id(str): Location of Reverification XBlock in courseware
+
+        Returns:
+            HttpResponse
+        """
+        user = request.user
+        course_key = CourseKey.from_string(course_id)
+        course = modulestore().get_course(course_key)
+        if course is None:
+            log.error(u"Could not find course '%s' for in-course reverification.", course_key)
+            raise Http404
+
+        try:
+            checkpoint = VerificationCheckpoint.objects.get(course_id=course_key, checkpoint_location=usage_id)
+        except VerificationCheckpoint.DoesNotExist:
+            log.error(
+                u"No verification checkpoint exists for the "
+                u"course '%s' and checkpoint location '%s'.",
+                course_key, usage_id
+            )
+            raise Http404
+
+        initial_verification = SoftwareSecurePhotoVerification.get_initial_verification(user)
+        if not initial_verification:
+            return self._redirect_to_initial_verification(user, course_key, usage_id)
+
+        # emit the reverification event
+        self._track_reverification_events('edx.bi.reverify.started', user.id, course_id, checkpoint.checkpoint_name)
+
+        context = {
+            'course_key': unicode(course_key),
+            'course_name': course.display_name_with_default_escaped,
+            'checkpoint_name': checkpoint.checkpoint_name,
+            'platform_name': configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),
+            'usage_id': usage_id,
+            'capture_sound': staticfiles_storage.url("audio/camera_capture.wav"),
+        }
+        return render_to_response("verify_student/incourse_reverify.html", context)
+
+    def _track_reverification_events(self, event_name, user_id, course_id, checkpoint):
+        """Track re-verification events for a user against a reverification
+        checkpoint of a course.
+
+        Arguments:
+            event_name (str): Name of event being tracked
+            user_id (str): The ID of the user
+            course_id (unicode): ID associated with the course
+            checkpoint (str): Checkpoint name
+
+        Returns:
+            None
+        """
+        log.info(
+            u"In-course reverification: event %s occurred for user '%s' in course '%s' at checkpoint '%s'",
+            event_name, user_id, course_id, checkpoint
+        )
+
+        if settings.LMS_SEGMENT_KEY:
+            tracking_context = tracker.get_tracker().resolve_context()
+            analytics.track(
+                user_id,
+                event_name,
+                {
+                    'category': "verification",
+                    'label': unicode(course_id),
+                    'checkpoint': checkpoint
+                },
+                context={
+                    'ip': tracking_context.get('ip'),
+                    'Google Analytics': {
+                        'clientId': tracking_context.get('client_id')
+                    }
+                }
+            )
+
+    def _redirect_to_initial_verification(self, user, course_key, checkpoint):
+        """
+        Redirect because the user does not have an initial verification.
+
+        We will redirect the user to the initial verification flow,
+        passing the identifier for this checkpoint.  When the user
+        submits a verification attempt, it will count for *both*
+        the initial and checkpoint verification.
+
+        Arguments:
+            user (User): The user who made the request.
+            course_key (CourseKey): The identifier for the course for which
+                the user is attempting to re-verify.
+            checkpoint (string): Location of the checkpoint in the courseware.
+
+        Returns:
+            HttpResponse
+
+        """
+        log.info(
+            u"User %s does not have an initial verification, so "
+            u"he/she will be redirected to the \"verify later\" flow "
+            u"for the course %s.",
+            user.id, course_key
+        )
+        base_url = reverse('verify_student_verify_now', kwargs={'course_id': unicode(course_key)})
+        params = urllib.urlencode({"checkpoint": checkpoint})
+        full_url = u"{base}?{params}".format(base=base_url, params=params)
+        return redirect(full_url)

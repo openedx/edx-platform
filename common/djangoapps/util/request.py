@@ -5,6 +5,9 @@ import re
 import logging
 
 from django.conf import settings
+from django.core.handlers.base import BaseHandler
+from django.test.client import RequestFactory
+
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey

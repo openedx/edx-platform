@@ -25,6 +25,24 @@ from util.json_request import JsonResponse
 log = logging.getLogger(__name__)
 
 
+def get_course_enrollments(user):
+    """
+    Returns the course enrollments for the passed in user within the context of current org, that
+    is filtered by course_org_filter
+    """
+    enrollments = CourseEnrollment.enrollments_for_user(user)
+    course_org = configuration_helpers.get_value('course_org_filter')
+    if course_org:
+        site_enrollments = [
+            enrollment for enrollment in enrollments if enrollment.course_id.org == course_org
+        ]
+    else:
+        site_enrollments = [
+            enrollment for enrollment in enrollments
+        ]
+    return site_enrollments
+
+
 @ensure_csrf_cookie
 @cache_if_anonymous()
 def index(request):
