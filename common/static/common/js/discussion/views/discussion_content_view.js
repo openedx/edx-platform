@@ -107,10 +107,10 @@
                 },
                 can_vote: {
                     enable: function() {
-                        return this.$(".action-vote").closest(".actions-item").removeClass("is-hidden");
+                        this.$('.action-vote').closest('.actions-item').removeClass('is-disabled');
                     },
                     disable: function() {
-                        return this.$(".action-vote").closest(".actions-item").addClass("is-hidden");
+                        this.$('.action-vote').closest('.actions-item').addClass('is-disabled');
                     }
                 }
             };
@@ -415,17 +415,19 @@
                 updates = {
                     upvoted_ids: (is_voting ? _.union : _.difference)(user.get('upvoted_ids'), [this.model.id])
                 };
-                return DiscussionUtil.updateWithUndo(user, updates, {
-                    url: url,
-                    type: "POST",
-                    $elem: $(event.currentTarget)
-                }, gettext("We had some trouble saving your vote.  Please try again.")).done(function() {
-                    if (is_voting) {
-                        return self.model.vote();
-                    } else {
-                        return self.model.unvote();
-                    }
-                });
+                if (!$(event.target.closest(".actions-item")).hasClass('is-disabled')) {
+                    return DiscussionUtil.updateWithUndo(user, updates, {
+                        url: url,
+                        type: "POST",
+                        $elem: $(event.currentTarget)
+                    }, gettext("We had some trouble saving your vote.  Please try again.")).done(function() {
+                        if (is_voting) {
+                            return self.model.vote();
+                        } else {
+                            return self.model.unvote();
+                        }
+                    });
+                }
             };
 
             DiscussionContentShowView.prototype.togglePin = function(event) {
