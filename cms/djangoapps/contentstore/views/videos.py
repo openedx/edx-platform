@@ -66,6 +66,7 @@ class StatusDisplayStrings(object):
         "pipeline_error": _FAILED,
         "duplicate": _DUPLICATE,
         "invalid_token": _INVALID_TOKEN,
+        "duplicate": _DUPLICATE,
         "imported": _IMPORTED,
     }
 
@@ -114,7 +115,8 @@ def video_encodings_download(request, course_key_string):
     in the following format:
 
     Video ID,Name,Status,Profile1 URL,Profile2 URL
-    aaaaaaaa-aaaa-4aaa-aaaa-aaaaaaaaaaaa,video.mp4,Complete,http://example.com/prof1.mp4,http://example.com/prof2.mp4
+    aaaaaaaa-aaaa-4aaa-aaaa-aaaaaaaaaaaa,video.mp4,Complete,
+        http://example.com/prof1.mp4,http://example.com/prof2.mp4
     """
     course = _get_and_validate_course(course_key_string, request.user)
 
@@ -248,10 +250,16 @@ def videos_index_html(course):
         "videos_index.html",
         {
             "context_course": course,
-            "post_url": reverse_course_url("videos_handler", unicode(course.id)),
-            "encodings_download_url": reverse_course_url("video_encodings_download", unicode(course.id)),
+            "post_url": reverse_course_url(
+                "videos_handler", unicode(course.id)
+            ),
+            "encodings_download_url": reverse_course_url(
+                "video_encodings_download", unicode(course.id)
+            ),
             "previous_uploads": _get_index_videos(course),
-            "concurrent_upload_limit": settings.VIDEO_UPLOAD_PIPELINE.get("CONCURRENT_UPLOAD_LIMIT", 0),
+            "concurrent_upload_limit": settings.VIDEO_UPLOAD_PIPELINE.get(
+                "CONCURRENT_UPLOAD_LIMIT", 0
+            ),
         }
     )
 
