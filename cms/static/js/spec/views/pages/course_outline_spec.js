@@ -630,20 +630,20 @@ define(["jquery", "edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers", "common/j
                 };
 
                 setContentVisibility = function (visibility) {
-                    $('input[name=content-visibility][value='+visibility+']').prop('checked', true);
+                    if (visibility) {
+                        $('input[name=content-visibility][value='+visibility+']').prop('checked', true);
+                    }
                 };
 
                 selectDisableSpecialExams = function() {
                     this.$("input.no_special_exam").prop('checked', true).trigger('change');
                 };
 
-                selectTimedExam = function(time_limit, hide_after_due) {
+                selectTimedExam = function(time_limit) {
                     this.$("input.timed_exam").prop('checked', true).trigger('change');
                     this.$(".field-time-limit input").val(time_limit);
                     this.$(".field-time-limit input").trigger('focusout');
-                    if (hide_after_due) {
-                        setContentVisibility('hide_after_due');
-                    }
+                    setContentVisibility("hide_after_due");
                 };
 
                 selectProctoredExam = function(time_limit) {
@@ -840,15 +840,14 @@ define(["jquery", "edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers", "common/j
                     outlinePage.$('.outline-subsection .configure-button').click();
                     setEditModalValues("7/9/2014", "7/10/2014", "Lab");
                     selectAdvancedSettings();
-                    selectTimedExam("02:30", false);
-                    setContentVisibility("staff_only");
+                    selectTimedExam("02:30");
                     $(".wrapper-modal-window .action-save").click();
                     AjaxHelpers.expectJsonRequest(requests, 'POST', '/xblock/mock-subsection', {
                         "graderType":"Lab",
                         "publish": "republish",
                         "isPrereq": false,
                         "metadata":{
-                            "visible_to_staff_only": true,
+                            "visible_to_staff_only": null,
                             "start":"2014-07-09T00:00:00.000Z",
                             "due":"2014-07-10T00:00:00.000Z",
                             "exam_review_rules": "",
@@ -856,7 +855,7 @@ define(["jquery", "edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers", "common/j
                             "is_practice_exam": false,
                             "is_proctored_enabled": false,
                             "default_time_limit_minutes": 150,
-                            "hide_after_due": null,
+                            "hide_after_due": true,
                         }
                     });
                     expect(requests[0].requestHeaders['X-HTTP-Method-Override']).toBe('PATCH');
@@ -924,9 +923,8 @@ define(["jquery", "edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers", "common/j
                     setEditModalValues("7/9/2014", "7/10/2014", "Lab");
                     selectAdvancedSettings();
                     selectTimedExam("00:30");
-                    setContentVisibility("staff_only");
                     
-                    // time limit and should be visible, review rules should be hidden
+                    // time limit should be visible, review rules should be hidden
                     checkOptionFieldVisibility(true, false);
                 
                     $(".wrapper-modal-window .action-save").click();

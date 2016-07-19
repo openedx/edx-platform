@@ -838,6 +838,8 @@ class CourseOutlinePage(CoursePage, CourseOutlineContainer):
 class CourseOutlineModal(object):
     """
     Page object specifically for a modal window on the course outline page.
+
+    Subsections are handled slightly differently in some regards, and should use SubsectionOutlineModal.
     """
     MODAL_SELECTOR = ".wrapper-modal-window"
 
@@ -1029,10 +1031,9 @@ class CourseOutlineModal(object):
     @property
     def is_staff_lock_visible(self):
         """
-        Returns true if the staff lock option is visible, either as a checkbox
-        (section and unit levels) or a radio button (subsection level).
+        Returns True if the staff lock option is visible.
         """
-        return self.find_css('#staff_lock').visible or self.find_css('input[name=content-visibility]').visible
+        return self.find_css('#staff_lock').visible
 
     def ensure_staff_lock_visible(self):
         """
@@ -1041,6 +1042,10 @@ class CourseOutlineModal(object):
         """
         if not self.is_staff_lock_visible:
             self.find_css(".settings-tab-button[data-tab=advanced]").click()
+        EmptyPromise(
+            lambda: self.is_staff_lock_visible,
+            "Staff lock option is visible",
+        ).fulfill()
 
     @property
     def is_explicitly_locked(self):
@@ -1048,10 +1053,7 @@ class CourseOutlineModal(object):
         Returns true if the explict staff lock checkbox is checked, false otherwise.
         """
         self.ensure_staff_lock_visible()
-        if self.find_css('input[name=content-visibility]').visible:
-            return self.find_css('input[name=content-visibility][value=staff_only]')[0].is_selected()
-        else:
-            return self.find_css('#staff_lock')[0].is_selected()
+        return self.find_css('#staff_lock')[0].is_selected()
 
     @is_explicitly_locked.setter
     def is_explicitly_locked(self, value):
@@ -1059,16 +1061,8 @@ class CourseOutlineModal(object):
         Checks the explicit staff lock box if value is true, otherwise selects "visible".
         """
         self.ensure_staff_lock_visible()
-        if self.find_css('#staff_lock').visible:
-            # Section or unit level - select checkbox as needed
-            if value != self.is_explicitly_locked:
-                self.find_css('label[for="staff_lock"]').click()
-        else:
-            # Subsection level - select correct radio button
-            if value:
-                self.find_css('input[name=content-visibility][value=staff_only]').click()
-            else:
-                self.find_css('input[name=content-visibility][value=visible]').click()
+        if value != self.is_explicitly_locked:
+            self.find_css('label[for="staff_lock"]').click()
         EmptyPromise(lambda: value == self.is_explicitly_locked, "Explicit staff lock is updated").fulfill()
 
     def shows_staff_lock_warning(self):
@@ -1086,3 +1080,52 @@ class CourseOutlineModal(object):
             return select.first_selected_option.text
         else:
             return None
+
+
+class SubsectionOutlineModal(CourseOutlineModal):
+    """
+    Subclass to handle a few special cases with subsection modals.
+    """
+
+    def __init__(self, page):
+        super(CourseOutlineModal, self).__init__(page)
+
+    @property
+    def is_explicitly_locked(self):
+        """
+        Override - returns True if staff_only is set.
+        """
+        return self.subsection_visibility == 'staff_only'
+
+    @property
+    def subsection_visibility(self):
+        """
+        Returns the current visibility setting for a subsection
+        """
+        self.ensure_staff_lock_visible()
+        return self.find_css('input[name=content-visibility]:checked')['value']
+
+    @is_explicitly_locked.setter
+    def is_explicitly_locked(self, value):
+        """
+        Override - sets visibility to staff_only if True, else 'visible'.
+
+        For hide_after_due, use the set_subsection_visibility method directly.
+        """
+        self.subsection_visibility = 'staff_only' if value == True else 'visible'
+
+    @subsection_visibility.setter
+    def subsection_visibility(self, value):
+        """
+        Sets the subsection visibility to the given value.
+        """
+        self.ensure_staff_lock_visible()
+        self.find_css('input[name=content-visibility][value=' + value + ']').click()
+        EmptyPromise(lambda: value == self.subsection_visibility, "Subsection visibility is updated").fulfill()
+
+    @property
+    def is_staff_lock_visible(self, section_type):
+        """
+        Override - Returns true if the staff lock option is visible.
+        """
+        return self.find_css('input[name=content-visibility]').visible

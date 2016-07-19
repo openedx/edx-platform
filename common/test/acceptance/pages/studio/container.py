@@ -179,12 +179,10 @@ class ContainerPage(PageObject):
     @property
     def is_staff_locked(self):
         """ Returns True if staff lock is currently enabled, False otherwise """
-        subsection_locked = self.q(css='input[name=content-visibility][value-staff_only]:checked').present
-        section_unit_locked = False
         for attr in self.q(css='a.action-staff-lock>.fa').attrs('class'):
             if 'fa-check-square-o' in attr:
-                section_unit_locked = True
-        return subsection_locked or section_unit_locked
+                return True
+        return False
 
     def toggle_staff_lock(self, inherits_staff_lock=False):
         """
@@ -193,19 +191,10 @@ class ContainerPage(PageObject):
         Returns True if the lock is now enabled, else False.
         """
         was_locked_initially = self.is_staff_locked
-
-        # Sections and Units lock differently than subsections, so try both actions
         if not was_locked_initially:
             self.q(css='a.action-staff-lock').first.click()
-            self.q(css='input[name=content-visibility][value=staff_only]').first.click()
         else:
             click_css(self, 'a.action-staff-lock', 0, require_notification=False)
-            click_css(
-                self,
-                'input[name=content-visibility][value=staff_only]',
-                0,
-                require_notification=False
-            )
             if not inherits_staff_lock:
                 confirm_prompt(self)
         self.wait_for_ajax()

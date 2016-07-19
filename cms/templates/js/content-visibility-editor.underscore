@@ -24,9 +24,8 @@
 
     <% if (hasExplicitStaffLock && !ancestorLocked) { %>
         <p class="tip tip-warning">
-            <% var message = gettext('If you make this %(xblockType)s visible to students, students will be able to see its content after the release date has passed and you have published the unit.'); %>
+            <% var message = gettext('If you make this %(xblockType)s visible to students, students will be able to see its content after the release date has passed and you have published the unit. Any units that are explicitly hidden from students will remain hidden after you clear this option for the %(xblockType)s.'); %>
             <%- interpolate(message, { xblockType: xblockType }, true) %>
-            <%- gettext('Any units that are explicitly hidden from students will remain hidden after you clear this option for the subsection.') %>
         </p>
     <% } %>
 </div>
