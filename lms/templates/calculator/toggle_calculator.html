@@ -57,7 +57,7 @@ from openedx.core.djangolib.markup import HTML, Text
                                                 ${_("Fractions")}<br />
                                                 ${_("Decimals")}
                                             </td>
-                                            <td>
+                                            <td dir="auto">
                                                 2520<br />
                                                 2/3<br />
                                                 3.14, .98
@@ -66,14 +66,14 @@ from openedx.core.djangolib.markup import HTML, Text
                                         <tr>
                                             <th scope="row">${_("Operators")}</th>
                                             ## Translators: Please do not translate mathematical symbols.
-                                            <td>
+                                            <td dir="auto">
                                                 ${_("+ - * / (add, subtract, multiply, divide)")}<br />
                                                 ## Translators: Please do not translate mathematical symbols.
                                                 ${_("^ (raise to a power)")}<br />
                                                 ## Translators: Please do not translate mathematical symbols.
                                                 ${_("|| (parallel resistors)")}
                                             </td>
-                                            <td>
+                                            <td dir="auto">
                                                 x+(2*y)/x-1
                                                 x^(n+1)<br />
                                                 v_IN+v_OUT<br />
@@ -82,16 +82,16 @@ from openedx.core.djangolib.markup import HTML, Text
                                         </tr>
                                         <tr>
                                             <th scope="row">${_("Constants")}</th>
-                                            <td>c, e, g, i, j, k, pi, q, T</td>
-                                            <td>
+                                            <td dir="auto">c, e, g, i, j, k, pi, q, T</td>
+                                            <td dir="auto">
                                                 20*c<br />
                                                 418*T
                                             </td>
                                         </tr>
                                         <tr>
                                             <th scope="row">${_("Affixes")}</th>
-                                            <td>${_("Percent sign (%) and metric affixes (d, c, m, u, n, p, k, M, G, T)")}</td>
-                                            <td>
+                                            <td dir="auto">${_("Percent sign (%) and metric affixes (d, c, m, u, n, p, k, M, G, T)")}</td>
+                                            <td dir="auto">
                                                 20%<br />
                                                 20c<br />
                                                 418T
@@ -99,37 +99,37 @@ from openedx.core.djangolib.markup import HTML, Text
                                         </tr>
                                         <tr>
                                             <th scope="row">${_("Basic functions")}</th>
-                                            <td>abs, exp, fact or factorial, ln, log2, log10, sqrt</td>
-                                            <td>
+                                            <td dir="auto">abs, exp, fact or factorial, ln, log2, log10, sqrt</td>
+                                            <td dir="auto">
                                                 abs(x+y)<br />
                                                 sqrt(x^2-y)
                                             </td>
                                         </tr>
                                         <tr>
                                             <th scope="row">${_("Trigonometric functions")}</th>
-                                            <td>
+                                            <td dir="auto">
                                                 sin, cos, tan, sec, csc, cot<br />
                                                 arcsin, sinh, arcsinh, etc.<br />
                                             </td>
-                                            <td>
+                                            <td dir="auto">
                                                 sin(4x+y)<br />
                                                 arccsch(4x+y)
                                             </td>
-                                            <td></td>
+                                            <td dir="auto"></td>
                                         </tr>
                                         <tr>
                                             ## Translators: Please see http://en.wikipedia.org/wiki/Scientific_notation
                                             <th scope="row">${_("Scientific notation")}</th>
                                             ## Translators: 10^ is a mathematical symbol. Please do not translate.
-                                            <td>${_("10^ and the exponent")}</td>
-                                            <td>10^-9</td>
+                                            <td dir="auto">${_("10^ and the exponent")}</td>
+                                            <td dir="auto">10^-9</td>
                                         </tr>
                                         <tr>
                                             ## Translators: this is part of scientific notation. Please see http://en.wikipedia.org/wiki/Scientific_notation#E_notation
                                             <th scope="row">${_("e notation")}</th>
                                             ## Translators: 1e is a mathematical symbol. Please do not translate.
-                                            <td>${_("1e and the exponent")}</td>
-                                            <td>1e-9</td>
+                                            <td dir="auto">${_("1e and the exponent")}</td>
+                                            <td dir="auto">1e-9</td>
                                         </tr>
                                     </tbody>
                                 </table>
