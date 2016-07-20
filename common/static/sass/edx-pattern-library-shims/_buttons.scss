@@ -1,0 +1,121 @@
+// ------------------------------
+// LMS Problem Feedback Revamp styling
+// Mirror styles from the Pattern Library
+
+// NOTE: This is the left-to-right (LTR) configured style compile.
+// It should mirror lms-problem-feedback-rtl w/ the exception of bi-app references.
+
+@import 'base/variables';
+
+
+// ----------------------------
+// #GLOBALS
+// ----------------------------
+%btn {
+  display: inline-block;
+  border-style: $btn-border-style;
+  border-radius: $btn-border-radius;
+  border-width: $btn-border-size;
+  box-shadow: none;
+  padding: 0.625rem 1.25rem;
+  font-size: 16px;
+  font-weight: normal;
+  text-shadow: none;
+  text-transform: capitalize;
+
+  // Display: block, one button per line, full width
+  &.block {
+      display: block;
+      width: 100%;
+  }
+
+  // STATE: is disabled
+  &:disabled,
+  &.is-disabled {
+    @extend %state-disabled;
+  }
+
+  .icon {
+    display: inline-block;
+    vertical-align: baseline;
+
+    &:only-child,
+    .sr-only + & {
+      margin-right: 0;
+    }
+  }
+  &.btn-small {
+    @extend %btn-small;
+  }
+}
+
+// ----------------------------
+// #DEFAULT
+// ----------------------------
+.btn-default {
+  @extend %btn;
+  border-color: $btn-default-border-color;
+  background: $btn-default-background;
+  color: $btn-default-color;
+
+  // STATE: hover and focus
+  &:hover,
+  &.is-hovered,
+  &:focus,
+  &.is-focused {
+    border-color: $btn-default-focus-border-color;
+    background-color: $btn-default-background;
+    color: $btn-default-focus-color;
+  }
+
+  // STATE: is pressed or active
+  &:active,
+  &.is-pressed,
+  &.is-active {
+    border-color: $btn-default-active-border-color;
+    color: $btn-default-active-color;
+  }
+
+  // STATE: is disabled
+  &:disabled,
+  &.is-disabled {
+    border-color: $btn-disabled-border-color;
+    color: $btn-disabled-color;
+  }
+}
+
+// ----------------------------
+// #BRAND
+// ----------------------------
+.btn-brand {
+  @extend %btn;
+  border-color: $btn-brand-border-color;
+  background: $btn-brand-background;
+  color: $btn-brand-color;
+
+  // STATE: hover and focus
+  &:hover,
+  &.is-hovered,
+  &:focus,
+  &.is-focused {
+    border-color: $btn-brand-focus-border-color;
+    background-color: $btn-brand-focus-background;
+    color: $btn-brand-focus-color;
+  }
+
+  // STATE: is pressed or active
+  &:active,
+  &.is-pressed,
+  &.is-active {
+    border-color: $btn-brand-active-border-color;
+    background: $btn-brand-active-background;
+  }
+
+  // STATE: is disabled
+  &:disabled,
+  &.is-disabled {
+    border-color: $btn-disabled-border-color;
+    background: $btn-brand-disabled-background;
+    color: $btn-brand-disabled-color;
+  }
+}
