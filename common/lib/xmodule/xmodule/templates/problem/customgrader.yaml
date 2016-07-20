@@ -41,8 +41,8 @@ data: |
 
       </script>
             <label>Enter two integers that sum to 10.</label>
-            <textline size="40" correct_answer="3" label="Integer #1"/><br/>
-            <textline size="40" correct_answer="7" label="Integer #2"/>
+            <textline size="40" correct_answer="3"/><br/>
+            <textline size="40" correct_answer="7"/>
             <solution>
                 <div class="detailed-solution">
                     <p>Explanation</p>
@@ -64,8 +64,8 @@ data: |
 
       </script>
             <label>Enter two integers that sum to 20.</label>
-            <textline size="40" correct_answer="11" label="Integer #1"/><br/>
-            <textline size="40" correct_answer="9" label="Integer #2"/>
+            <textline size="40" correct_answer="11"/><br/>
+            <textline size="40" correct_answer="9"/>
             <solution>
                 <div class="detailed-solution">
                     <p>Explanation</p>

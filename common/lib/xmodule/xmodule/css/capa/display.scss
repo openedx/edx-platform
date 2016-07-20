@@ -153,11 +153,8 @@ div.problem {
     }
   }
 
-  span > label {
-    display: block;
-    margin-bottom: $baseline;
-    font: inherit;
-    color: inherit;
+  .question-description {
+    @include margin(($baseline*0.75), 0);
   }
 }
 

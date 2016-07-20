@@ -71,9 +71,9 @@ class EntranceExamPassTest(EntranceExamTest):
         """
         xml = dedent("""
         <problem>
-        <p>What is height of eiffel tower without the antenna?.</p>
         <multiplechoiceresponse>
-          <choicegroup label="What is height of eiffel tower without the antenna?" type="MultipleChoice">
+          <label>What is height of eiffel tower without the antenna?.</label>
+          <choicegroup type="MultipleChoice">
             <choice correct="false">324 meters<choicehint>Antenna is 24 meters high</choicehint></choice>
             <choice correct="true">300 meters</choice>
             <choice correct="false">224 meters</choice>

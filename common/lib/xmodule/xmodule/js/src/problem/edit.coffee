@@ -197,7 +197,7 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
     demandHintTags = [];
     toXml = `function (markdown) {
       var xml = markdown,
-          i, splits, scriptFlag;
+          i, splits, makeParagraph;
       var responseTypes = [
         'optionresponse', 'multiplechoiceresponse', 'stringresponse', 'numericalresponse', 'choiceresponse'
       ];
@@ -208,6 +208,20 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
       // replace headers
       xml = xml.replace(/(^.*?$)(?=\n\=\=+$)/gm, '<h3 class="hd hd-2 problem-header">$1</h3>');
       xml = xml.replace(/\n^\=\=+$/gm, '');
+
+      // extract question and description(optional)
+      // >>question||description<< converts to
+      // <label>question</label> <description>description</description>
+      xml = xml.replace(/>>([^]+?)<</gm, function(match, questionText) {
+          var result = questionText.split('||'),
+              label = '<label>' + result[0] + '</label>' + '\n';
+
+          // don't add empty <description> tag
+          if (result.length === 1 || !result[1]) {
+              return label;
+          }
+          return label + '<description>' + result[1] + '</description>\n'
+      })
 
       // Pull out demand hints,  || a hint ||
       var demandhints = '';
@@ -515,35 +529,6 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
           return selectString;
       });
 
-      // replace labels
-      // looks for >>arbitrary text<< and inserts it into the label attribute of the input type directly below the text.
-      var split = xml.split('\n');
-      var new_xml = [];
-      var line, i, curlabel, prevlabel = '';
-      var didinput = false;
-      for (i = 0; i < split.length; i++) {
-        line = split[i];
-        if (match = line.match(/>>(.*)<</)) {
-          curlabel = match[1].replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-            .replace(/"/g, '&quot;')
-            .replace(/'/g, '&apos;');
-          // extract the question text and convert it to a <p> tag
-          line = line.replace(/>>(.*?)<</, "<p class='qtitle'>$1</p>");
-        } else if (line.match(/<\w+response/) && didinput && curlabel == prevlabel) {
-          // reset label to prevent gobbling up previous one (if multiple questions)
-          curlabel = '';
-          didinput = false;
-        } else if (line.match(/<(textline|optioninput|formulaequationinput|choicegroup|checkboxgroup)/) && curlabel != '' && curlabel != undefined) {
-          line = line.replace(/<(textline|optioninput|formulaequationinput|choicegroup|checkboxgroup)/, '<$1 label="' + curlabel + '"');
-          didinput = true;
-          prevlabel = curlabel;
-        }
-        new_xml.push(line);
-      }
-      xml = new_xml.join('\n');
-
       // replace code blocks
       xml = xml.replace(/\[code\]\n?([^\]]*)\[\/?code\]/gmi, function(match, p1) {
           var selectString = '<pre><code>\n' + p1 + '</code></pre>';
@@ -552,20 +537,23 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
       });
 
       // split scripts and preformatted sections, and wrap paragraphs
-      splits = xml.split(/(\<\/?(?:script|pre).*?\>)/g);
-      scriptFlag = false;
+      splits = xml.split(/(\<\/?(?:script|pre|label|description).*?\>)/g);
+
+      // Wrap a string by <p> tag when line is not already wrapped by another tag
+      // true when line is not already wrapped by another tag false otherwise
+      makeParagraph = true;
 
       for (i = 0; i < splits.length; i += 1) {
-          if(/\<(script|pre)/.test(splits[i])) {
-              scriptFlag = true;
+          if (/\<(script|pre|label|description)/.test(splits[i])) {
+              makeParagraph = false;
           }
 
-          if(!scriptFlag) {
+          if (makeParagraph) {
               splits[i] = splits[i].replace(/(^(?!\s*\<|$).*$)/gm, '<p>$1</p>');
           }
 
-          if(/\<\/(script|pre)/.test(splits[i])) {
-              scriptFlag = false;
+          if (/\<\/(script|pre|label|description)/.test(splits[i])) {
+              makeParagraph = true;
           }
       }
 
@@ -598,11 +586,6 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
             if (responseType[0].nodeName === child.nodeName) {
                 beforeInputtype = false;
                 return;
-            }
-
-            // replace <p> tag for question title with <label> tag
-            if (child.hasAttribute('class') && child.getAttribute('class') === 'qtitle') {
-                child = $('<label>' + child.textContent + '</label>')[0];
             }
 
             if (beforeInputtype) {
