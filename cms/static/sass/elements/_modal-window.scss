@@ -669,8 +669,13 @@
       }
     }
 
-    .edit-staff-lock {
+    .edit-staff-lock, .edit-content-visibility {
       margin-bottom: $baseline;
+
+      .tip {
+        font-weight: bold;
+        font-size: 12px;
+      }
     }
 
     // UI: staff lock section
