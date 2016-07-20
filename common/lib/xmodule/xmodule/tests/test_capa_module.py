@@ -480,7 +480,7 @@ class CapaModuleTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             result = CapaModule.make_dict_of_responses(invalid_get_dict)
 
-    def test_check_problem_correct(self):
+    def test_submit_problem_correct(self):
 
         module = CapaFactory.create(attempts=1)
 
@@ -495,7 +495,7 @@ class CapaModuleTest(unittest.TestCase):
 
             # Check the problem
             get_request_dict = {CapaFactory.input_key(): '3.14'}
-            result = module.check_problem(get_request_dict)
+            result = module.submit_problem(get_request_dict)
 
         # Expect that the problem is marked correct
         self.assertEqual(result['success'], 'correct')
@@ -506,7 +506,7 @@ class CapaModuleTest(unittest.TestCase):
         # Expect that the number of attempts is incremented by 1
         self.assertEqual(module.attempts, 2)
 
-    def test_check_problem_incorrect(self):
+    def test_submit_problem_incorrect(self):
 
         module = CapaFactory.create(attempts=0)
 
@@ -516,7 +516,7 @@ class CapaModuleTest(unittest.TestCase):
 
             # Check the problem
             get_request_dict = {CapaFactory.input_key(): '0'}
-            result = module.check_problem(get_request_dict)
+            result = module.submit_problem(get_request_dict)
 
         # Expect that the problem is marked correct
         self.assertEqual(result['success'], 'incorrect')
@@ -524,7 +524,7 @@ class CapaModuleTest(unittest.TestCase):
         # Expect that the number of attempts is incremented by 1
         self.assertEqual(module.attempts, 1)
 
-    def test_check_problem_closed(self):
+    def test_submit_problem_closed(self):
         module = CapaFactory.create(attempts=3)
 
         # Problem closed -- cannot submit
@@ -533,7 +533,7 @@ class CapaModuleTest(unittest.TestCase):
             mock_closed.return_value = True
             with self.assertRaises(xmodule.exceptions.NotFoundError):
                 get_request_dict = {CapaFactory.input_key(): '3.14'}
-                module.check_problem(get_request_dict)
+                module.submit_problem(get_request_dict)
 
         # Expect that number of attempts NOT incremented
         self.assertEqual(module.attempts, 3)
@@ -542,7 +542,7 @@ class CapaModuleTest(unittest.TestCase):
         RANDOMIZATION.ALWAYS,
         'true'
     )
-    def test_check_problem_resubmitted_with_randomize(self, rerandomize):
+    def test_submit_problem_resubmitted_with_randomize(self, rerandomize):
         # Randomize turned on
         module = CapaFactory.create(rerandomize=rerandomize, attempts=0)
 
@@ -552,7 +552,7 @@ class CapaModuleTest(unittest.TestCase):
         # Expect that we cannot submit
         with self.assertRaises(xmodule.exceptions.NotFoundError):
             get_request_dict = {CapaFactory.input_key(): '3.14'}
-            module.check_problem(get_request_dict)
+            module.submit_problem(get_request_dict)
 
         # Expect that number of attempts NOT incremented
         self.assertEqual(module.attempts, 0)
@@ -562,20 +562,20 @@ class CapaModuleTest(unittest.TestCase):
         'false',
         RANDOMIZATION.PER_STUDENT
     )
-    def test_check_problem_resubmitted_no_randomize(self, rerandomize):
+    def test_submit_problem_resubmitted_no_randomize(self, rerandomize):
         # Randomize turned off
         module = CapaFactory.create(rerandomize=rerandomize, attempts=0, done=True)
 
         # Expect that we can submit successfully
         get_request_dict = {CapaFactory.input_key(): '3.14'}
-        result = module.check_problem(get_request_dict)
+        result = module.submit_problem(get_request_dict)
 
         self.assertEqual(result['success'], 'correct')
 
         # Expect that number of attempts IS incremented
         self.assertEqual(module.attempts, 1)
 
-    def test_check_problem_queued(self):
+    def test_submit_problem_queued(self):
         module = CapaFactory.create(attempts=1)
 
         # Simulate that the problem is queued
@@ -589,7 +589,7 @@ class CapaModuleTest(unittest.TestCase):
             values['get_recentmost_queuetime'].return_value = datetime.datetime.now(UTC)
 
             get_request_dict = {CapaFactory.input_key(): '3.14'}
-            result = module.check_problem(get_request_dict)
+            result = module.submit_problem(get_request_dict)
 
             # Expect an AJAX alert message in 'success'
             self.assertIn('You must wait', result['success'])
@@ -597,8 +597,8 @@ class CapaModuleTest(unittest.TestCase):
         # Expect that the number of attempts is NOT incremented
         self.assertEqual(module.attempts, 1)
 
-    def test_check_problem_with_files(self):
-        # Check a problem with uploaded files, using the check_problem API.
+    def test_submit_problem_with_files(self):
+        # Check a problem with uploaded files, using the submit_problem API.
         # pylint: disable=protected-access
 
         # The files we'll be uploading.
@@ -615,13 +615,13 @@ class CapaModuleTest(unittest.TestCase):
         xqueue_interface._http_post = Mock(return_value=(0, "ok"))
         module.system.xqueue['interface'] = xqueue_interface
 
-        # Create a request dictionary for check_problem.
+        # Create a request dictionary for submit_problem.
         get_request_dict = {
             CapaFactoryWithFiles.input_key(response_num=2): fileobjs,
             CapaFactoryWithFiles.input_key(response_num=3): 'None',
         }
 
-        module.check_problem(get_request_dict)
+        module.submit_problem(get_request_dict)
 
         # _http_post is called like this:
         #   _http_post(
@@ -646,7 +646,7 @@ class CapaModuleTest(unittest.TestCase):
         for fpath, fileobj in kwargs['files'].iteritems():
             self.assertEqual(fpath, fileobj.name)
 
-    def test_check_problem_with_files_as_xblock(self):
+    def test_submit_problem_with_files_as_xblock(self):
         # Check a problem with uploaded files, using the XBlock API.
         # pylint: disable=protected-access
 
@@ -679,7 +679,7 @@ class CapaModuleTest(unittest.TestCase):
         for fpath, fileobj in kwargs['files'].iteritems():
             self.assertEqual(fpath, fileobj.name)
 
-    def test_check_problem_error(self):
+    def test_submit_problem_error(self):
 
         # Try each exception that capa_module should handle
         exception_classes = [StudentInputError,
@@ -698,7 +698,7 @@ class CapaModuleTest(unittest.TestCase):
                 mock_grade.side_effect = exception_class('test error')
 
                 get_request_dict = {CapaFactory.input_key(): '3.14'}
-                result = module.check_problem(get_request_dict)
+                result = module.submit_problem(get_request_dict)
 
             # Expect an AJAX alert message in 'success'
             expected_msg = 'Error: test error'
@@ -707,11 +707,11 @@ class CapaModuleTest(unittest.TestCase):
             # Expect that the number of attempts is NOT incremented
             self.assertEqual(module.attempts, 1)
 
-    def test_check_problem_other_errors(self):
+    def test_submit_problem_other_errors(self):
         """
         Test that errors other than the expected kinds give an appropriate message.
 
-        See also `test_check_problem_error` for the "expected kinds" or errors.
+        See also `test_submit_problem_error` for the "expected kinds" or errors.
         """
         # Create the module
         module = CapaFactory.create(attempts=1)
@@ -728,12 +728,12 @@ class CapaModuleTest(unittest.TestCase):
             mock_grade.side_effect = Exception(error_msg)
 
             get_request_dict = {CapaFactory.input_key(): '3.14'}
-            result = module.check_problem(get_request_dict)
+            result = module.submit_problem(get_request_dict)
 
         # Expect an AJAX alert message in 'success'
         self.assertIn(error_msg, result['success'])
 
-    def test_check_problem_zero_max_grade(self):
+    def test_submit_problem_zero_max_grade(self):
         """
         Test that a capa problem with a max grade of zero doesn't generate an error.
         """
@@ -745,9 +745,9 @@ class CapaModuleTest(unittest.TestCase):
 
         # Check the problem
         get_request_dict = {CapaFactory.input_key(): '3.14'}
-        module.check_problem(get_request_dict)
+        module.submit_problem(get_request_dict)
 
-    def test_check_problem_error_nonascii(self):
+    def test_submit_problem_error_nonascii(self):
 
         # Try each exception that capa_module should handle
         exception_classes = [StudentInputError,
@@ -766,7 +766,7 @@ class CapaModuleTest(unittest.TestCase):
                 mock_grade.side_effect = exception_class(u"ȧƈƈḗƞŧḗḓ ŧḗẋŧ ƒǿř ŧḗşŧīƞɠ")
 
                 get_request_dict = {CapaFactory.input_key(): '3.14'}
-                result = module.check_problem(get_request_dict)
+                result = module.submit_problem(get_request_dict)
 
             # Expect an AJAX alert message in 'success'
             expected_msg = u'Error: ȧƈƈḗƞŧḗḓ ŧḗẋŧ ƒǿř ŧḗşŧīƞɠ'
@@ -775,7 +775,7 @@ class CapaModuleTest(unittest.TestCase):
             # Expect that the number of attempts is NOT incremented
             self.assertEqual(module.attempts, 1)
 
-    def test_check_problem_error_with_staff_user(self):
+    def test_submit_problem_error_with_staff_user(self):
 
         # Try each exception that capa module should handle
         for exception_class in [StudentInputError,
@@ -793,7 +793,7 @@ class CapaModuleTest(unittest.TestCase):
                 mock_grade.side_effect = exception_class('test error')
 
                 get_request_dict = {CapaFactory.input_key(): '3.14'}
-                result = module.check_problem(get_request_dict)
+                result = module.submit_problem(get_request_dict)
 
             # Expect an AJAX alert message in 'success'
             self.assertIn('test error', result['success'])
@@ -991,55 +991,55 @@ class CapaModuleTest(unittest.TestCase):
         # Expect that we succeed
         self.assertTrue('success' in result and result['success'])
 
-    def test_check_button_name(self):
+    def test_submit_button_name(self):
         module = CapaFactory.create(attempts=0)
-        self.assertEqual(module.check_button_name(), "Submit")
+        self.assertEqual(module.submit_button_name(), "Submit")
 
-    def test_check_button_checking_name(self):
+    def test_submit_button_submitting_name(self):
         module = CapaFactory.create(attempts=1, max_attempts=10)
-        self.assertEqual(module.check_button_checking_name(), "Submitting")
+        self.assertEqual(module.submit_button_submitting_name(), "Submitting")
 
-    def test_should_show_check_button(self):
+    def test_should_enable_submit_button(self):
 
         attempts = random.randint(1, 10)
 
-        # If we're after the deadline, do NOT show check button
+        # If we're after the deadline, disable the submit button
         module = CapaFactory.create(due=self.yesterday_str)
-        self.assertFalse(module.should_show_check_button())
+        self.assertFalse(module.should_enable_submit_button())
 
-        # If user is out of attempts, do NOT show the check button
+        # If user is out of attempts, disable the submit button
         module = CapaFactory.create(attempts=attempts, max_attempts=attempts)
-        self.assertFalse(module.should_show_check_button())
+        self.assertFalse(module.should_enable_submit_button())
 
-        # If survey question (max_attempts = 0), do NOT show the check button
+        # If survey question (max_attempts = 0), disable the submit button
         module = CapaFactory.create(max_attempts=0)
-        self.assertFalse(module.should_show_check_button())
+        self.assertFalse(module.should_enable_submit_button())
 
         # If user submitted a problem but hasn't reset,
-        # do NOT show the check button
+        # disable the submit button
         # Note:  we can only reset when rerandomize="always" or "true"
         module = CapaFactory.create(rerandomize=RANDOMIZATION.ALWAYS, done=True)
-        self.assertFalse(module.should_show_check_button())
+        self.assertFalse(module.should_enable_submit_button())
 
         module = CapaFactory.create(rerandomize="true", done=True)
-        self.assertFalse(module.should_show_check_button())
+        self.assertFalse(module.should_enable_submit_button())
 
-        # Otherwise, DO show the check button
+        # Otherwise, enable the submit button
         module = CapaFactory.create()
-        self.assertTrue(module.should_show_check_button())
+        self.assertTrue(module.should_enable_submit_button())
 
         # If the user has submitted the problem
-        # and we do NOT have a reset button, then we can show the check button
+        # and we do NOT have a reset button, then we can enable the submit button
         # Setting rerandomize to "never" or "false" ensures that the reset button
         # is not shown
         module = CapaFactory.create(rerandomize=RANDOMIZATION.NEVER, done=True)
-        self.assertTrue(module.should_show_check_button())
+        self.assertTrue(module.should_enable_submit_button())
 
         module = CapaFactory.create(rerandomize="false", done=True)
-        self.assertTrue(module.should_show_check_button())
+        self.assertTrue(module.should_enable_submit_button())
 
         module = CapaFactory.create(rerandomize=RANDOMIZATION.PER_STUDENT, done=True)
-        self.assertTrue(module.should_show_check_button())
+        self.assertTrue(module.should_enable_submit_button())
 
     def test_should_show_reset_button(self):
 
@@ -1175,11 +1175,11 @@ class CapaModuleTest(unittest.TestCase):
 
         # We've tested the show/hide button logic in other tests,
         # so here we hard-wire the values
-        show_check_button = bool(random.randint(0, 1) % 2)
+        enable_submit_button = bool(random.randint(0, 1) % 2)
         show_reset_button = bool(random.randint(0, 1) % 2)
         show_save_button = bool(random.randint(0, 1) % 2)
 
-        module.should_show_check_button = Mock(return_value=show_check_button)
+        module.should_enable_submit_button = Mock(return_value=enable_submit_button)
         module.should_show_reset_button = Mock(return_value=show_reset_button)
         module.should_show_save_button = Mock(return_value=show_save_button)
 
@@ -1208,7 +1208,6 @@ class CapaModuleTest(unittest.TestCase):
 
         context = render_args[1]
         self.assertEqual(context['problem']['html'], "<div>Test Problem HTML</div>")
-        self.assertEqual(bool(context['check_button']), show_check_button)
         self.assertEqual(bool(context['reset_button']), show_reset_button)
         self.assertEqual(bool(context['save_button']), show_save_button)
 
@@ -1366,7 +1365,7 @@ class CapaModuleTest(unittest.TestCase):
 
         # Check the problem
         get_request_dict = {CapaFactory.input_key(): '3.14'}
-        module.check_problem(get_request_dict)
+        module.submit_problem(get_request_dict)
 
         # Expect that the seed is the same
         self.assertEqual(seed, module.seed)
@@ -1548,7 +1547,7 @@ class CapaModuleTest(unittest.TestCase):
         module = CapaFactory.create()
         module.get_progress = Mock(wraps=module.get_progress)
         module.get_html()
-        module.get_progress.assert_called_once_with()
+        module.get_progress.assert_called_with()
 
     def test_get_problem(self):
         """
@@ -1573,13 +1572,13 @@ class CapaModuleTest(unittest.TestCase):
 
     def test_check_unmask(self):
         """
-        Check that shuffle unmasking is plumbed through: when check_problem is called,
+        Check that shuffle unmasking is plumbed through: when submit_problem is called,
         unmasked names should appear in the track_function event_info.
         """
         module = CapaFactory.create(xml=self.common_shuffle_xml)
         with patch.object(module.runtime, 'publish') as mock_track_function:
             get_request_dict = {CapaFactory.input_key(): 'choice_3'}  # the correct choice
-            module.check_problem(get_request_dict)
+            module.submit_problem(get_request_dict)
             mock_call = mock_track_function.mock_calls[1]
             event_info = mock_call[1][2]
             self.assertEqual(event_info['answers'][CapaFactory.answer_key()], 'choice_3')
@@ -1605,7 +1604,7 @@ class CapaModuleTest(unittest.TestCase):
         """On problem reset, unmask names should appear track_function."""
         module = CapaFactory.create(xml=self.common_shuffle_xml)
         get_request_dict = {CapaFactory.input_key(): 'mask_0'}
-        module.check_problem(get_request_dict)
+        module.submit_problem(get_request_dict)
         # On reset, 'old_state' should use unmasked names
         with patch.object(module.runtime, 'track_function') as mock_track_function:
             module.reset_problem(None)
@@ -1620,7 +1619,7 @@ class CapaModuleTest(unittest.TestCase):
         """On problem rescore, unmasked names should appear on track_function."""
         module = CapaFactory.create(xml=self.common_shuffle_xml)
         get_request_dict = {CapaFactory.input_key(): 'mask_0'}
-        module.check_problem(get_request_dict)
+        module.submit_problem(get_request_dict)
         # On rescore, state/student_answers should use unmasked names
         with patch.object(module.runtime, 'track_function') as mock_track_function:
             module.rescore_problem()
@@ -1647,7 +1646,7 @@ class CapaModuleTest(unittest.TestCase):
         module = CapaFactory.create(xml=xml)
         with patch.object(module.runtime, 'publish') as mock_track_function:
             get_request_dict = {CapaFactory.input_key(): 'choice_2'}  # mask_X form when masking enabled
-            module.check_problem(get_request_dict)
+            module.submit_problem(get_request_dict)
             mock_call = mock_track_function.mock_calls[1]
             event_info = mock_call[1][2]
             self.assertEqual(event_info['answers'][CapaFactory.answer_key()], 'choice_2')
@@ -2567,7 +2566,7 @@ class TestProblemCheckTracking(unittest.TestCase):
 
     def get_event_for_answers(self, module, answer_input_dict):
         with patch.object(module.runtime, 'publish') as mock_track_function:
-            module.check_problem(answer_input_dict)
+            module.submit_problem(answer_input_dict)
 
             self.assertGreaterEqual(len(mock_track_function.mock_calls), 2)
             # There are potentially 2 track logs: answers and hint. [-1]=answers.

@@ -109,7 +109,7 @@ class ConditionalTest(UniqueCourseTest):
         # Answer the problem
         problem_page = ProblemPage(self.browser)
         problem_page.fill_answer('correct string')
-        problem_page.click_check()
+        problem_page.click_submit()
         # The conditional does not update on its own, so we need to reload the page.
         self.courseware_page.visit()
         # Verify that we can see the content.
