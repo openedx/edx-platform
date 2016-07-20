@@ -36,7 +36,9 @@ from openedx.core.djangolib.markup import HTML
     % endif
     % if answer_available:
     <span class="problem-action-button-wrapper">
-        <button class="show problem-action-btn btn-default btn-small"><span class="icon fa fa-exclamation-triangle" aria-hidden="true"></span><span class="show-label">${_('Show Answer')}</span></button>
+        <button class="show problem-action-btn btn-default btn-small" aria-describedby="${ id }-problem-title">
+            <span class="icon fa fa-exclamation-triangle" aria-hidden="true"></span><span class="show-label">${_('Show Answer')}</span>
+        </button>
     </span>
     % endif
     </div>
@@ -47,7 +49,7 @@ from openedx.core.djangolib.markup import HTML
     % endif
     % if attempts_allowed :
     <div class="submission_feedback" aria-live="polite">
-      ${_("You have used {num_used} of {num_total} attempts").format(num_used=attempts_used, num_total=attempts_allowed)}
+        ${_("You have used {num_used} of {num_total} attempts").format(num_used=attempts_used, num_total=attempts_allowed)}
     </div>
     % endif
     ## <%include file="problem_notifications.html" args="notification_type=notification_type,notification_icon=notification_icon,notification_message=notification_message,hint_notification=hint_notification"/>
