@@ -34,8 +34,9 @@ data: |
 
           <formularesponse type="ci" samples="R_1,R_2,R_3@1,2,3:3,4,5#10" answer="$VoVi">
               <label>Write an expression for the product of \( R_1\), \( R_2\), and the inverse of \( R_3\).</label>
+              <description>Enter the equation</description>
               <responseparam type="tolerance" default="0.00001"/>
-              <formulaequationinput size="40" label="Enter the equation"/>
+              <formulaequationinput size="40"/>
           </formularesponse>
 
           <script type="loncapa/python">
@@ -48,7 +49,8 @@ data: |
 
           <formularesponse type="ci" samples="x,n@1,2:3,4#10" answer="$derivative">
               <label>Let \( x\) be a variable, and let \( n\) be an arbitrary constant. What is the derivative of \( x^n\)?</label>
+              <description>Enter the equation</description>
               <responseparam type="tolerance" default="0.00001"/>
-              <formulaequationinput size="40"  label="Enter the equation"/>
+              <formulaequationinput size="40"/>
           </formularesponse>
       </problem>

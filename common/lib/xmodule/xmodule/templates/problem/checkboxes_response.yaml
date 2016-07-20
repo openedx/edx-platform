@@ -8,14 +8,12 @@ metadata:
 
        You can use the following example problem as a model.
 
-       >>The following languages are in the Indo-European family:<<
+       >>The following languages are in the Indo-European family:||Make sure you select all of the correct options—there may be more than one!<<
        [x] Urdu
        [ ] Finnish
        [x] Marathi
        [x] French
        [ ] Hungarian
-
-       Note: Make sure you select all of the correct options—there may be more than one!
 
        [explanation]
        Urdu, Marathi, and French are all Indo-European languages, while Finnish and Hungarian are in the Uralic family.
@@ -28,14 +26,14 @@ data:   |
                 <p>When you add the problem, be sure to select Settings to specify a Display Name and other values that apply.</p>
                 <p>You can use the following example problem as a model.</p>
                 <label>The following languages are in the Indo-European family:</label>
-                <checkboxgroup label="The following languages are in the Indo-European family:">
+                <description>Make sure you select all of the correct options—there may be more than one!</description>
+                <checkboxgroup>
                     <choice correct="true">Urdu</choice>
                     <choice correct="false">Finnish</choice>
                     <choice correct="true">Marathi</choice>
                     <choice correct="true">French</choice>
                     <choice correct="false">Hungarian</choice>
                 </checkboxgroup>
-                <p>Note: Make sure you select all of the correct options—there may be more than one!</p>
                 <solution>
                     <div class="detailed-solution">
                         <p>Explanation</p>
