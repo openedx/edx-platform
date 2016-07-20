@@ -413,25 +413,19 @@ class CapaMixin(CapaFields):
         # The logic flow is a little odd so that _('xxx') strings can be found for
         # translation while also running _() just once for each string.
         _ = self.runtime.service(self, "i18n").ugettext
-        check = _('Check')
-        final_check = _('Final Check')
+        check = _('submit')
 
         # Apply customizations if present
         if 'custom_check' in self.text_customization:
             check = _(self.text_customization.get('custom_check'))                # pylint: disable=translation-of-non-string
-        if 'custom_final_check' in self.text_customization:
-            final_check = _(self.text_customization.get('custom_final_check'))    # pylint: disable=translation-of-non-string
         # TODO: need a way to get the customized words into the list of
         # words to be translated
 
-        if self.max_attempts is not None and self.attempts >= self.max_attempts - 1:
-            return final_check
-        else:
-            return check
+        return check
 
     def check_button_checking_name(self):
         """
-        Return the "checking..." text for the "check" button.
+        Return the "submitting..." text for the "submit" button.
 
         After the user presses the "check" button, the button will briefly
         display the value returned by this function until a response is
@@ -445,7 +439,7 @@ class CapaMixin(CapaFields):
             return self.text_customization.get('custom_checking')
 
         _ = self.runtime.service(self, "i18n").ugettext
-        return _('Checking...')
+        return _('Submitting...')
 
     def should_show_check_button(self):
         """

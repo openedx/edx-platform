@@ -432,7 +432,7 @@ div.problem {
     }
 
     > span {
-      display: block;
+      //display: block;
       margin-bottom: lh(0.5);
     }
 
@@ -906,46 +906,69 @@ div.problem {
 // +Problem - Actions
 // ====================
 div.problem .action {
-  margin-top: $baseline;
+  @include margin($baseline 0 $baseline 0);
 
-  .save, .check, .show, .reset, .hint-button {
-    @include margin-right($baseline/2);
-    margin-bottom: ($baseline/2);
-    height: ($baseline*2);
-    vertical-align: middle;
-    text-transform: uppercase;
-    font-weight: 600;
-    @media print {
-      display: none;
+  // override default button hover
+  button.btn-brand {
+    &:hover {
+      background-image: none;
+      background-color: #0ea6ec;
+      box-shadow: none;
     }
   }
 
-  .save {
-    @extend .blue-button !optional;
+  button.btn-default {
+    &:hover {
+      background-image: none;
+      background-color: transparent;
+      box-shadow: none;
+    }
   }
 
-  .show {
+  @media (min-width: 768px) {
 
-    .show-label {
-      font-weight: 600;
-      font-size: 1.0em;
+    .problem-action-buttons-wrapper {
+      position: absolute;
+      @include margin-right(($baseline*.75));
+      right: 0;
+      height: ($baseline*2.6);
+    }
+
+  }
+
+  .problem-action-button-wrapper {
+    @include padding(($baseline*.75) 0 ($baseline/2) ($baseline/4));
+    border-right: 1px solid #ddd;
+    &:last-child {
+      border: none;
+    }
+  }
+
+  .save, .show, .reset, .hint-button {
+    margin-bottom: ($baseline/2);
+    vertical-align: middle;
+    @media print {
+      display: none;
+    }
+    .icon {
+      display: block;
     }
   }
 
   .submission_feedback {
-    // background: #F3F3F3;
-    // border: 1px solid #ddd;
-    // border-radius: 3px;
-    // padding: 8px 12px;
-    // margin-top: ($baseline/2);
     @include margin-left($baseline/2);
+    height: ($baseline*2);
     display: inline-block;
-    margin-top: 8px;
     color: $gray-d1;
-    font-style: italic;
+    font-size: 0.9em;;
     -webkit-font-smoothing: antialiased;
+
+    @media (min-width: 768px) {
+      font-size: 0.8em;
+    }
   }
 }
+
 
 // +Problem - Misc, Unclassified Mess Part 2
 // ====================
