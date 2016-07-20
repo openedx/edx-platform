@@ -74,6 +74,7 @@
                 };
 
                 this.platformName = options.platform_name;
+                this.faqUrl = options.faq_url;
 
                 // The login view listens for 'sync' events from the reset model
                 this.resetModel = new PasswordResetModel({}, {
@@ -124,7 +125,8 @@
                         model: model,
                         resetModel: this.resetModel,
                         thirdPartyAuth: this.thirdPartyAuth,
-                        platformName: this.platformName
+                        platformName: this.platformName,
+                        faqUrl: this.faqUrl
                     });
 
                     // Listen for 'password-help' event to toggle sub-views
@@ -161,7 +163,8 @@
                         fields: data.fields,
                         model: model,
                         thirdPartyAuth: this.thirdPartyAuth,
-                        platformName: this.platformName
+                        platformName: this.platformName,
+                        faqUrl: this.faqUrl
                     });
 
                     // Listen for 'auth-complete' event so we can enroll/redirect the user appropriately.
