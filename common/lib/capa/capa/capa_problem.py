@@ -374,7 +374,7 @@ class LoncapaProblem(object):
 
     def grade_answers(self, answers):
         """
-        Grade student responses.  Called by capa_module.check_problem.
+        Grade student responses.  Called by capa_module.submit_problem.
 
         `answers` is a dict of all the entries from request.POST, but with the first part
         of each key removed (the string before the first "_").

@@ -33,6 +33,7 @@ $checkmark-icon: '\f00c';
 $cross-icon: '\f00d';
 $asterisk-icon: '\f069';
 
+
 @import '../../../../../static/sass/edx-pattern-library-shims/base/variables';
 
 // +Extends - Capa
@@ -943,31 +944,39 @@ div.problem .action {
   }
 
   .problem-action-button-wrapper {
-    @include padding(($baseline / 10) 0 $baseline ($baseline / 4));
+    display: inline-block;
     @include border-right(1px solid $light-gray1);
+
     &:last-child {
       border: none;
     }
   }
 
   .problem-action-btn {
+    @include margin-right($baseline / 5);
     @media print {
       display: none;
     }
     .icon {
+      margin-bottom: $baseline / 10;
       display: block;
     }
   }
 
   .submission_feedback {
     @include margin-left($baseline/2);
-    height: ($baseline*2);
     display: inline-block;
     color: $gray-d1;
     font-size: $medium-font-size;
     -webkit-font-smoothing: antialiased;
+    max-width: flex-grid(4,10);
+    vertical-align: middle;
 
-   @media (min-width: $bp-screen-md) and (max-width: $bp-screen-lg) {
+    @media (min-width: $bp-screen-sm) and (max-width: $bp-screen-md) {
+      max-width: flex-grid(7,10);
+    }
+
+    @media (min-width: $bp-screen-md) and (max-width: $bp-screen-lg) {
       @include margin-left(0);
       margin-top: $baseline / 2;
       display: block;
