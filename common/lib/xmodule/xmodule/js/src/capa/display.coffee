@@ -758,14 +758,14 @@ class @Problem
         .add(@hintButton)
         .add(@showButton)
         .removeClass('is-disabled')
-        .attr({'aria-disabled': 'false'})
+        .removeAttr 'disabled'
     else
       @resetButton
         .add(@saveButton)
         .add(@hintButton)
         .add(@showButton)
         .addClass('is-disabled')
-        .attr({'aria-disabled': 'true'})
+        .attr({'disabled': 'disabled'})
 
     @enableCheckButton enable, isFromCheckOperation
 
@@ -777,12 +777,12 @@ class @Problem
     #    text of check button as well.
     if enable
       @checkButton.removeClass 'is-disabled'
-      @checkButton.attr({'aria-disabled': 'false'})
+      @checkButton.removeAttr 'disabled'
       if changeText
         @checkButtonLabel.text(@checkButtonCheckText)
     else
       @checkButton.addClass 'is-disabled'
-      @checkButton.attr({'aria-disabled': 'true'})
+      @checkButton.attr({'disabled': 'disabled'})
       if changeText
         @checkButtonLabel.text(@checkButtonCheckingText)
 

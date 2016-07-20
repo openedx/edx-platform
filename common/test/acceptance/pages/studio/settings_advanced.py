@@ -215,7 +215,6 @@ class AdvancedSettingsPage(CoursePage):
             'show_reset_button',
             'static_asset_path',
             'teams_configuration',
-            'text_customization',
             'annotation_storage_url',
             'social_sharing_url',
             'video_bumper',
