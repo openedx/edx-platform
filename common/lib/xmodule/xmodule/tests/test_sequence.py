@@ -2,6 +2,10 @@
 Tests for sequence module.
 """
 # pylint: disable=no-member
+from datetime import timedelta
+import ddt
+from django.utils.timezone import now
+from freezegun import freeze_time
 from mock import Mock
 from xblock.reference.user_service import XBlockUser, UserService
 from xmodule.tests import get_test_system
@@ -24,10 +28,15 @@ class StubUserService(UserService):
         return user
 
 
+@ddt.ddt
 class SequenceBlockTestCase(XModuleXmlImportTest):
     """
     Tests for the Sequence Module.
     """
+    TODAY = now()
+    TOMORROW = TODAY + timedelta(days=1)
+    DAY_AFTER_TOMORROW = TOMORROW + timedelta(days=1)
+
     @classmethod
     def setUpClass(cls):
         super(SequenceBlockTestCase, cls).setUpClass()
@@ -54,13 +63,16 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
         chapter_1 = xml.ChapterFactory.build(parent=course)  # has 2 child sequences
         xml.ChapterFactory.build(parent=course)  # has 0 child sequences
         chapter_3 = xml.ChapterFactory.build(parent=course)  # has 1 child sequence
-        chapter_4 = xml.ChapterFactory.build(parent=course)  # has 2 child sequences
+        chapter_4 = xml.ChapterFactory.build(parent=course)  # has 1 child sequence, with hide_after_due
 
         xml.SequenceFactory.build(parent=chapter_1)
         xml.SequenceFactory.build(parent=chapter_1)
         sequence_3_1 = xml.SequenceFactory.build(parent=chapter_3)  # has 3 verticals
-        xml.SequenceFactory.build(parent=chapter_4)
-        xml.SequenceFactory.build(parent=chapter_4)
+        xml.SequenceFactory.build(  # sequence_4_1
+            parent=chapter_4,
+            hide_after_due=str(True),
+            due=str(cls.TOMORROW),
+        )
 
         for _ in range(3):
             xml.VerticalFactory.build(parent=sequence_3_1)
@@ -98,9 +110,7 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
     def test_render_student_view(self):
         html = self._get_rendered_student_view(
             self.sequence_3_1,
-            requested_child=None,
-            next_url='NextSequential',
-            prev_url='PrevSequential'
+            extra_context=dict(next_url='NextSequential', prev_url='PrevSequential'),
         )
         self._assert_view_at_position(html, expected_position=1)
         self.assertIn(unicode(self.sequence_3_1.location), html)
@@ -115,20 +125,15 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
         html = self._get_rendered_student_view(self.sequence_3_1, requested_child='last')
         self._assert_view_at_position(html, expected_position=3)
 
-    def _get_rendered_student_view(self, sequence, requested_child, next_url=None, prev_url=None):
+    def _get_rendered_student_view(self, sequence, requested_child=None, extra_context=None):
         """
         Returns the rendered student view for the given sequence and the
         requested_child parameter.
         """
-        return sequence.xmodule_runtime.render(
-            sequence,
-            STUDENT_VIEW,
-            {
-                'requested_child': requested_child,
-                'next_url': next_url,
-                'prev_url': prev_url,
-            },
-        ).content
+        context = {'requested_child': requested_child}
+        if extra_context:
+            context.update(extra_context)
+        return sequence.xmodule_runtime.render(sequence, STUDENT_VIEW, context).content
 
     def _assert_view_at_position(self, rendered_html, expected_position):
         """
@@ -140,3 +145,46 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
         html = self._get_rendered_student_view(self.sequence_3_1, requested_child=None)
         for child in self.sequence_3_1.children:
             self.assertIn("'page_title': '{}'".format(child.name), html)
+
+    def test_hidden_content_before_due(self):
+        html = self._get_rendered_student_view(self.sequence_4_1)
+        self.assertIn("seq_module.html", html)
+        self.assertIn("'banner_text': None", html)
+
+    @freeze_time(DAY_AFTER_TOMORROW)
+    @ddt.data(
+        (None, 'subsection'),
+        ('Homework', 'homework'),
+    )
+    @ddt.unpack
+    def test_hidden_content_past_due(self, format_type, expected_text):
+        progress_url = 'http://test_progress_link'
+        self._set_sequence_format(self.sequence_4_1, format_type)
+        html = self._get_rendered_student_view(
+            self.sequence_4_1,
+            extra_context=dict(progress_url=progress_url),
+        )
+        self.assertIn("hidden_content.html", html)
+        self.assertIn(progress_url, html)
+        self.assertIn("'subsection_format': '{}'".format(expected_text), html)
+
+    @freeze_time(DAY_AFTER_TOMORROW)
+    def test_masquerade_hidden_content_past_due(self):
+        self._set_sequence_format(self.sequence_4_1, "Homework")
+        html = self._get_rendered_student_view(
+            self.sequence_4_1,
+            extra_context=dict(specific_masquerade=True),
+        )
+        self.assertIn("seq_module.html", html)
+        self.assertIn(
+            "'banner_text': 'Because the due date has passed, "
+            "this homework is hidden from the learner.'",
+            html
+        )
+
+    def _set_sequence_format(self, sequence, format_type):
+        """
+        Sets the format field on the given sequence to the
+        given value.
+        """
+        sequence._xmodule.format = format_type  # pylint: disable=protected-access

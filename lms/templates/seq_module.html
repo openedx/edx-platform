@@ -3,12 +3,12 @@
 
 <div id="sequence_${element_id}" class="sequence" data-id="${item_id}" data-position="${position}" data-ajax-url="${ajax_url}" data-next-url="${next_url}" data-prev-url="${prev_url}">
   <div class="path"></div>
-    % if override_hidden_exam:
+    % if banner_text:
       <div class="pattern-library-shim alert alert-information subsection-header" tabindex="-1">
         <span class="pattern-library-shim icon alert-icon fa fa-bullhorn" aria-hidden="true"></span>
         <div class="pattern-library-shim alert-message">
           <p class="pattern-library-shim alert-copy">
-            ${_("This exam is hidden from the learner.")}
+            ${banner_text}
           </p>
         </div>
       </div>
