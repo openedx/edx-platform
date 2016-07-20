@@ -31,9 +31,9 @@
             return Backbone.View.extend({
                 el: DOM_SELECTORS.bulk_exception,
                 events: {
-                    'change #browseBtn': 'chooseFile',
+                    'change #browseBtn-bulk-csv': 'chooseFile',
                     'click .upload-csv-button': 'uploadCSV',
-                    'click a.arrow': 'toggleMessageDetails'
+                    'click .arrow': 'toggleMessageDetails'
                 },
 
                 initialize: function(options){
@@ -138,7 +138,7 @@
                         $('<div/>', {
                             class: 'message ' + group
                         }).appendTo('.bulk-exception-results').prepend(
-                                "<a  id= '" + group + "' href='javascript:void(0);' class='arrow'> + </a>" +  heading
+                                "<button type='button' id= '" + group + "' class='arrow'> + </button>" +  heading
                         ).append($('<ul/>', {
                                 class: group
                             }));
@@ -206,7 +206,7 @@
                 chooseFile: function(event) {
                     if (event && event.preventDefault) { event.preventDefault(); }
                     if (event.currentTarget.files.length === 1) {
-                        this.$el.find(DOM_SELECTORS.upload_csv_button).attr('disabled', 'false');
+                        this.$el.find(DOM_SELECTORS.upload_csv_button).removeAttr('disabled');
                         this.$el.find(DOM_SELECTORS.browse_file).val(
                             event.currentTarget.value.substring(event.currentTarget.value.lastIndexOf("\\") + 1));
                     }

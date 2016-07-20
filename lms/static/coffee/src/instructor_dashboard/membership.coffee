@@ -186,7 +186,7 @@ class @AutoEnrollmentViaCsv
     @$students_list_file = @$container.find("input[name='students_list']")
     @$csrf_token = @$container.find("input[name='csrfmiddlewaretoken']")
     @$results = @$container.find("div.results")
-    @$browse_button = @$container.find("#browseBtn-auto_enroll_csv")
+    @$browse_button = @$container.find("#browseBtn-auto-enroll")
     @$browse_file = @$container.find("#browseFile")
 
     @processing = false

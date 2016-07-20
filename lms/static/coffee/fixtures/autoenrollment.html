@@ -7,14 +7,14 @@
 
   <form id="student-auto-enroll-form">
     <div class="customBrowseBtn">
-      <input disabled="disabled" id="browseFile" placeholder="choose file"/>
-
-      <div class="file-browse btn btn-primary">
-        <label for="browseBtn-auto_enroll_csv" class="browse">Browse</label>
-        <input class="file_field" id="browseBtn-auto_enroll_csv" name="students_list" type="file" accept=".csv"/>
-      </div>
+        <label for="browseBtn-auto-enroll">Upload a CSV for bulk enrollment</label>
+        <span id="browseFile" class="enhanced-input-file"></span>
+        <div class="file-browse btn btn-primary" aria-hidden="true">
+            <span class="browse">Browse</span>
+            <input class="file_field" id="browseBtn-auto-enroll" name="students_list" type="file" accept=".csv"/>
+        </div>
     </div>
-    <button type="submit" id="submitBtn-auto_enroll_csv" name="enrollment_signup_button">Upload CSV</button>
+    <button type="submit" class="btn-blue" id="submitBtn-auto_enroll_csv" name="enrollment_signup_button">Upload CSV</button>
   </form>
   <div class="results"></div>
 </div>
