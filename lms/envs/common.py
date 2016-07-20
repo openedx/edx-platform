@@ -262,6 +262,7 @@ FEATURES = {
 
     # Enable the combined login/registration form
     'ENABLE_COMBINED_LOGIN_REGISTRATION': False,
+    'ENABLE_COMBINED_LOGIN_REGISTRATION_FOOTER': False,
 
     # Enable organizational email opt-in
     'ENABLE_MKTG_EMAIL_OPT_IN': False,
@@ -339,9 +340,6 @@ FEATURES = {
 
     # Enable OpenBadge support. See the BADGR_* settings later in this file.
     'ENABLE_OPENBADGES': False,
-
-    # The block types to disable need to be specified in "x block disable config" in django admin.
-    'ENABLE_DISABLING_XBLOCK_TYPES': True,
 
     # Enable LTI Provider feature.
     'ENABLE_LTI_PROVIDER': False,
@@ -2041,6 +2039,9 @@ INSTALLED_APPS = (
 
     # programs support
     'openedx.core.djangoapps.programs',
+
+    # Catalog integration
+    'openedx.core.djangoapps.catalog',
 
     # Self-paced course configuration
     'openedx.core.djangoapps.self_paced',

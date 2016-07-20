@@ -96,6 +96,7 @@
 # omarithawi <oithawi@qrf.org>, 2014-2016
 # Osama M. Mneina <o.mneina@gmail.com>, 2014
 # Sarina Canelake <sarina@edx.org>, 2014
+# Sherif Halawa <shalawa@qrf.org>, 2016
 # Soha Assali <soha+transifex@qordoba.com>, 2015-2016
 # #-#-#-#-#  mako-studio.po (edx-platform)  #-#-#-#-#
 # edX translation file
@@ -139,7 +140,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-06-30 16:00+0000\n"
+"POT-Creation-Date: 2016-07-07 14:20+0000\n"
 "PO-Revision-Date: 2016-05-09 11:27+0000\n"
 "Last-Translator: Soha Assali <soha+transifex@qordoba.com>\n"
 "Language-Team: Arabic (http://www.transifex.com/open-edx/edx-platform/language/ar/)\n"
@@ -5399,10 +5400,6 @@ msgid "in {relative} - {absolute}"
 msgstr "في {relative} - {absolute}"
 
 #: lms/djangoapps/courseware/date_summary.py
-msgid "UTC"
-msgstr ""
-
-#: lms/djangoapps/courseware/date_summary.py
 msgid "Today is {date}"
 msgstr "تاريخ اليوم {date}"
 
@@ -9572,6 +9569,10 @@ msgid ""
 msgstr ""
 
 #: openedx/core/djangoapps/user_api/preferences/api.py
+msgid "Value '{preference_value}' is not a valid time zone selection."
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/preferences/api.py
 msgid "Save failed for user preference '{key}' with value '{value}'."
 msgstr "تعذّر حفظ القيمة '{value}' كتفضيل '{key}' للمستخدم."
 
@@ -11188,6 +11189,7 @@ msgstr "حدث خطأ ما في خوادم منصّة {platform_name} "
 
 #: lms/templates/module-error.html
 #: lms/templates/courseware/courseware-error.html
+#: lms/templates/courseware/error-message.html
 msgid ""
 "We're sorry, this module is temporarily unavailable. Our staff is working to"
 " fix it as soon as possible. Please email us at {tech_support_email} to "
@@ -11278,7 +11280,7 @@ msgstr "بدّل إمكانية رؤية الإجابة"
 
 #: lms/templates/problem.html
 msgid "You have used {num_used} of {num_total} submissions"
-msgstr "لقد استخدمتَ {num_used} تقديمات من أصل {num_total}"
+msgstr "لقد استخدمتَ {num_used} محاولات من أصل {num_total}"
 
 #: lms/templates/provider_login.html
 msgid "Log In"
@@ -13364,6 +13366,10 @@ msgid "Course Material"
 msgstr "مواد المساق"
 
 #: lms/templates/courseware/course_updates.html
+msgid "All course updates"
+msgstr ""
+
+#: lms/templates/courseware/course_updates.html
 msgid "Hide"
 msgstr "إخفاء"
 
@@ -13425,16 +13431,6 @@ msgstr ""
 #: lms/templates/courseware/courseware.html
 msgid "Your score is {current_score}%. You have passed the entrance exam."
 msgstr "علامتك هي {current_score}%. لقد نجحت في اختبار الدخول."
-
-#: lms/templates/courseware/error-message.html
-msgid ""
-"We're sorry, this module is temporarily unavailable. Our staff is working to"
-" fix it as soon as possible. Please email us at {link_to_support_email} to "
-"report any problems or downtime."
-msgstr ""
-"نأسف لعدم إمكانية الوصول إلى هذه الوحدة مؤقّتًا. ويعمل طاقمنا على إصلاحها في"
-" أقرب وقت ممكن. يُرجى مراسلتنا على البريد الإلكتروني {link_to_support_email}"
-" للإبلاغ عن أي مشاكل أو فترات توقّف."
 
 #: lms/templates/courseware/gradebook.html
 msgid "Gradebook"
@@ -13519,6 +13515,16 @@ msgstr "استعراض عملية التقييم في استوديو"
 #: lms/templates/courseware/progress.html
 msgid "Course Progress for Student '{username}' ({email})"
 msgstr "تقدّم عمل الطالب '{username}'‏ ({email}) في المساق"
+
+#: lms/templates/courseware/progress.html
+msgid "Your enrollment: Audit track"
+msgstr ""
+
+#: lms/templates/courseware/progress.html
+msgid ""
+"You are enrolled in the audit track for this course. The audit track does "
+"not include a certificate."
+msgstr ""
 
 #: lms/templates/courseware/progress.html
 msgid ""
@@ -13865,6 +13871,10 @@ msgstr ""
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "{category} Program Course"
 msgstr "برنامج مساق الفئة {category}"
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Course details"
+msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "{course_number} {course_name} Home Page"

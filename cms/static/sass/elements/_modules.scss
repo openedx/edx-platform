@@ -26,13 +26,13 @@
       @extend %t-title8;
       @extend %t-strong;
       margin-bottom: ($baseline/4);
-      color: $gray-l2;
+      color: $gray-d2;
       text-transform: uppercase;
     }
 
     .meta {
       @extend %t-copy-sub2;
-      color: $gray-l1;
+      color: $gray-d2;
     }
   }
 }
@@ -110,7 +110,7 @@
       @extend %t-title5;
       @extend %t-strong;
       margin-bottom: ($baseline*0.75);
-      color: $green-d1;
+      color: $uxpl-green-base;
     }
 
     // add component - list of green buttons
@@ -131,16 +131,10 @@
         height: ($baseline*5);
         margin-bottom: ($baseline/2);
         box-shadow: 0 1px 1px $shadow, 0 1px 0 rgba(255, 255, 255, .4) inset;
-        border: 1px solid $green-d2;
         border-radius: ($baseline/4);
         padding: 0;
-        background-color: $green-l1;
         text-align: center;
-        color: $white;
-
-        &:hover {
-          background: $green-s1;
-        }
+        @extend %btn-primary-green;
 
         .name {
           @include box-sizing(border-box);

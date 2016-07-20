@@ -4,9 +4,12 @@
     define(['jquery',
             'underscore',
             'backbone',
-            'common/js/components/views/tabbed_view'
+            'common/js/components/views/tabbed_view',
+            'jquery.simulate'
            ],
            function($, _, Backbone, TabbedView) {
+               var keys = $.simulate.keyCode;
+               
                var view,
                    TestSubview = Backbone.View.extend({
                        initialize: function (options) {
@@ -22,7 +25,7 @@
                        return view.$('.page-content-nav');
                    },
                    activeTabPanel = function () {
-                       return view.$('.tabpanel[aria-expanded="true"]');
+                       return view.$('.tabpanel[aria-hidden="false"]');
                    };
 
                describe('TabbedView component', function () {
@@ -39,21 +42,10 @@
                            }],
                            viewLabel: 'Tabs',
                        }).render();
-
-                       // _.defer() is used to make calls to
-                       // jQuery.focus() work in Chrome.  _.defer()
-                       // delays the execution of a function until the
-                       // current call stack is clear.  That behavior
-                       // will cause tests to fail, so we'll instead
-                       // make _.defer() immediately invoke its
-                       // argument.
-                       spyOn(_, 'defer').and.callFake(function (func) {
-                           func();
-                       });
                    });
 
                    it('can render itself', function () {
-                       expect(view.$el.html()).toContain('<nav class="page-content-nav"');
+                       expect(view.$el.html()).toContain('<div class="page-content-nav"');
                    });
 
                    it('shows its first tab by default', function () {
@@ -73,66 +65,100 @@
                    });
 
                    it('marks the active tab as selected using aria attributes', function () {
-                       expect(view.$('.nav-item[data-index=0]')).toHaveAttr('aria-expanded', 'true');
-                       expect(view.$('.nav-item[data-index=1]')).toHaveAttr('aria-expanded', 'false');
+                       expect(view.$('.nav-item[data-index=0]')).toHaveAttr({
+                           'aria-expanded': 'true',
+                           'aria-selected': 'true',
+                           'tabindex': '0'
+                       });
+                       expect(view.$('.nav-item[data-index=1]')).toHaveAttr({
+                           'aria-expanded': 'false',
+                           'aria-selected': 'false',
+                           'tabindex': '-1'
+                       });
                        view.$('.nav-item[data-index=1]').click();
-                       expect(view.$('.nav-item[data-index=0]')).toHaveAttr('aria-expanded', 'false');
-                       expect(view.$('.nav-item[data-index=1]')).toHaveAttr('aria-expanded', 'true');
-                   });
-
-                   it('sets focus for screen readers', function () {
-                       spyOn($.fn, 'focus');
-                       view.$('.nav-item[data-url="test-2"]').click();
-                       expect(view.$('.sr-is-focusable.test-2').focus).toHaveBeenCalled();
-                   });
-
-                   describe('history', function() {
-                       beforeEach(function () {
-                           spyOn(Backbone.history, 'navigate').and.callThrough();
-                           view = new TabbedView({
-                               tabs: [{
-                                   url: 'test 1',
-                                   title: 'Test 1',
-                                   view: new TestSubview({text: 'this is test text'})
-                               }, {
-                                   url: 'test 2',
-                                   title: 'Test 2',
-                                   view: new TestSubview({text: 'other text'})
-                               }],
-                               router: new Backbone.Router({
-                                   routes: {
-                                       'test 1': function () {
-                                           view.setActiveTab(0);
-                                       },
-                                       'test 2': function () {
-                                           view.setActiveTab(1);
-                                       }
-                                   }
-                               })
-                           }).render();
-                           Backbone.history.start();
+                       expect(view.$('.nav-item[data-index=0]')).toHaveAttr({
+                           'aria-expanded': 'false',
+                           'aria-selected': 'false',
+                           'tabindex': '-1'
                        });
-
-                       afterEach(function () {
-                           view.router.navigate('');
-                           Backbone.history.stop();
-                       });
-
-                       it('updates the page URL on tab switches without adding to browser history', function () {
-                           view.$('.nav-item[data-index=1]').click();
-                           expect(Backbone.history.navigate).toHaveBeenCalledWith(
-                               'test 2',
-                               {replace: true}
-                           );
-                       });
-
-                       it('changes tabs on URL navigation', function () {
-                           expect(view.$('.nav-item.is-active').data('index')).toEqual(0);
-                           Backbone.history.navigate('test 2', {trigger: true});
-                           expect(view.$('.nav-item.is-active').data('index')).toEqual(1);
+                       expect(view.$('.nav-item[data-index=1]')).toHaveAttr({
+                           'aria-expanded': 'true',
+                           'aria-selected': 'true',
+                           'tabindex': '0'
                        });
                    });
-
+                   
+                   it('works with keyboard navigation RIGHT and ENTER', function() {
+                       view.$('.nav-item[data-index=0]').focus();
+                       view.$('.nav-item[data-index=0]')
+                        .simulate("keydown", { keyCode: keys.RIGHT })
+                        .simulate("keydown", { keyCode: keys.ENTER });
+                       
+                       expect(view.$('.nav-item[data-index=0]')).toHaveAttr({
+                           'aria-expanded': 'false',
+                           'aria-selected': 'false',
+                           'tabindex': '-1'
+                       });
+                       expect(view.$('.nav-item[data-index=1]')).toHaveAttr({
+                           'aria-expanded': 'true',
+                           'aria-selected': 'true',
+                           'tabindex': '0'
+                       });
+                   });
+                   
+                   it('works with keyboard navigation DOWN and ENTER', function() {
+                       view.$('.nav-item[data-index=0]').focus();
+                       view.$('.nav-item[data-index=0]')
+                        .simulate("keydown", { keyCode: keys.DOWN })
+                        .simulate("keydown", { keyCode: keys.ENTER });
+                       
+                       expect(view.$('.nav-item[data-index=0]')).toHaveAttr({
+                           'aria-expanded': 'false',
+                           'aria-selected': 'false',
+                           'tabindex': '-1'
+                       });
+                       expect(view.$('.nav-item[data-index=1]')).toHaveAttr({
+                           'aria-expanded': 'true',
+                           'aria-selected': 'true',
+                           'tabindex': '0'
+                       });
+                   });
+                   
+                   it('works with keyboard navigation LEFT and ENTER', function() {
+                       view.$('.nav-item[data-index=1]').focus();
+                       view.$('.nav-item[data-index=1]')
+                        .simulate("keydown", { keyCode: keys.LEFT })
+                        .simulate("keydown", { keyCode: keys.ENTER });
+                       
+                       expect(view.$('.nav-item[data-index=1]')).toHaveAttr({
+                           'aria-expanded': 'false',
+                           'aria-selected': 'false',
+                           'tabindex': '-1'
+                       });
+                       expect(view.$('.nav-item[data-index=0]')).toHaveAttr({
+                           'aria-expanded': 'true',
+                           'aria-selected': 'true',
+                           'tabindex': '0'
+                       });
+                   });
+                   
+                   it('works with keyboard navigation UP and ENTER', function() {
+                       view.$('.nav-item[data-index=1]').focus();
+                       view.$('.nav-item[data-index=1]')
+                        .simulate("keydown", { keyCode: keys.UP })
+                        .simulate("keydown", { keyCode: keys.ENTER });
+                       
+                       expect(view.$('.nav-item[data-index=1]')).toHaveAttr({
+                           'aria-expanded': 'false',
+                           'aria-selected': 'false',
+                           'tabindex': '-1'
+                       });
+                       expect(view.$('.nav-item[data-index=0]')).toHaveAttr({
+                           'aria-expanded': 'true',
+                           'aria-selected': 'true',
+                           'tabindex': '0'
+                       });
+                   });
                });
            });
 }).call(this, define || RequireJS.define);

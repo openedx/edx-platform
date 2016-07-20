@@ -3,12 +3,13 @@ import uuid
 
 from xmodule.assetstore.assetmgr import AssetManager
 
+STATIC_CONTENT_VERSION = 1
 XASSET_LOCATION_TAG = 'c4x'
 XASSET_SRCREF_PREFIX = 'xasset:'
 XASSET_THUMBNAIL_TAIL_NAME = '.jpg'
 STREAM_DATA_CHUNK_SIZE = 1024
 VERSIONED_ASSETS_PREFIX = '/assets/courseware'
-VERSIONED_ASSETS_PATTERN = r'/assets/courseware/([a-f0-9]{32})'
+VERSIONED_ASSETS_PATTERN = r'/assets/courseware/(v[\d]/)?([a-f0-9]{32})'
 
 import os
 import logging
@@ -163,7 +164,7 @@ class StaticContent(object):
         if StaticContent.is_versioned_asset_path(asset_path):
             result = re.match(VERSIONED_ASSETS_PATTERN, asset_path)
             if result is not None:
-                asset_digest = result.groups()[0]
+                asset_digest = result.groups()[1]
             asset_path = re.sub(VERSIONED_ASSETS_PATTERN, '', asset_path)
 
         return (asset_digest, asset_path)
@@ -178,7 +179,9 @@ class StaticContent(object):
         if StaticContent.is_versioned_asset_path(path):
             return path
 
-        return VERSIONED_ASSETS_PREFIX + '/' + version + path
+        structure_version = 'v{}'.format(STATIC_CONTENT_VERSION)
+
+        return u'{}/{}/{}{}'.format(VERSIONED_ASSETS_PREFIX, structure_version, version, path)
 
     @staticmethod
     def get_asset_key_from_path(course_key, path):

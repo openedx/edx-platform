@@ -547,7 +547,6 @@
     "Find next": "\u67e5\u627e\u4e0b\u4e00\u4e2a", 
     "Find previous": "\u67e5\u627e\u4e0a\u4e00\u4e2a", 
     "Finish": "\u5b8c\u6210", 
-    "Focus grabber": "\u7126\u70b9\u91c7\u96c6\u5668", 
     "Follow": "\u5173\u6ce8", 
     "Follow or unfollow posts": "\u5173\u6ce8\u6216\u53d6\u6d88\u5173\u6ce8\u53d1\u5e16", 
     "Following": "\u5173\u6ce8", 

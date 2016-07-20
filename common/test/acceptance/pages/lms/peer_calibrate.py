@@ -5,7 +5,6 @@ Page that allows the student to grade calibration essays
 
 from bok_choy.page_object import PageObject
 from bok_choy.promise import Promise
-from .rubric import RubricPage
 
 
 class PeerCalibratePage(PageObject):
@@ -31,16 +30,6 @@ class PeerCalibratePage(PageObject):
         Continue to peer grading after completing calibration.
         """
         self.q(css='input.calibration-feedback-button').first.click()
-
-    @property
-    def rubric(self):
-        """
-        Return a `RubricPage` for the calibration essay.
-        If no rubric is available, raises a `BrokenPromise` exception.
-        """
-        rubric = RubricPage(self.browser)
-        rubric.wait_for_page(timeout=60)
-        return rubric
 
     @property
     def message(self):

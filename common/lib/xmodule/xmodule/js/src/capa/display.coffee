@@ -66,8 +66,8 @@ class @Problem
     detail = @el.data('progress_detail')
     status = @el.data('progress_status')
 
-    # Render 'x/y point(s)' if student has attempted question
-    if status != 'none' and detail? and detail.indexOf('/') > 0
+    # Render 'x/y point(s)' if student has attempted question 
+    if status != 'none' and detail? and (jQuery.type(detail) == "string") and detail.indexOf('/') > 0
         a = detail.split('/')
         earned = parseFloat(a[0])
         possible = parseFloat(a[1])
@@ -77,7 +77,7 @@ class @Problem
         progress = interpolate(progress_template, {'earned': earned, 'possible': possible}, true)
 
     # Render 'x point(s) possible' if student has not yet attempted question
-    if status == 'none' and detail? and detail.indexOf('/') > 0
+    if status == 'none' and detail? and (jQuery.type(detail) == "string") and detail.indexOf('/') > 0
         a = detail.split('/')
         possible = parseFloat(a[1])
         `// Translators: %(num_points)s is the number of points possible (examples: 1, 3, 10). There will always be at least 1 point possible.`

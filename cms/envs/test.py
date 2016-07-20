@@ -35,6 +35,7 @@ from lms.envs.test import (
     MEDIA_ROOT,
     MEDIA_URL,
     COMPREHENSIVE_THEME_DIRS,
+    JWT_AUTH,
 )
 
 # mongo connection settings

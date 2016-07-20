@@ -85,7 +85,7 @@
     <% } %>
 
     <% if ( courseModeSlug === 'no-id-professional') { %>
-    <div class="container register is-verified">
+    <div class="container register is-verified no-min-scale">
       <h3 class="title"><%- gettext( "ID-Verification is not required for this Professional Education course." ) %></h3>
       <p><%- gettext( "All professional education courses are fee-based, and require payment to complete the enrollment process." ) %></p>
     </div>

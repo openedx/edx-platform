@@ -4,6 +4,8 @@ OAuth Dispatch test mixins
 import jwt
 from django.conf import settings
 
+from student.models import UserProfile, anonymous_id_for_user
+
 
 class AccessTokenMixin(object):
     """ Mixin for tests dealing with OAuth 2 access tokens. """
@@ -35,10 +37,20 @@ class AccessTokenMixin(object):
             'iss': issuer,
             'preferred_username': user.username,
             'scopes': scopes,
+            'sub': anonymous_id_for_user(user, None),
         }
 
         if 'email' in scopes:
             expected['email'] = user.email
+
+        if 'profile' in scopes:
+            try:
+                name = UserProfile.objects.get(user=user).name
+            except UserProfile.DoesNotExist:
+                name = None
+
+            expected['name'] = name
+            expected['administrator'] = user.is_staff
 
         self.assertDictContainsSubset(expected, payload)
 

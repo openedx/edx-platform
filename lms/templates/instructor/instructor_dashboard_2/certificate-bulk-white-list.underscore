@@ -11,7 +11,7 @@
             <input class="file_field" id="browseBtn" name="students_list" type="file" accept=".csv"/>
         </div>
       </div>
-      <div><button class="btn-blue disabled upload-csv-button" type="submit"><%- gettext('Add to Exception List') %></button></div>
+      <div><button class="btn-blue upload-csv-button" type="submit"><%- gettext('Add to Exception List') %></button></div>
     </form>
     <div class="bulk-exception-results hidden"></div>
 </div>

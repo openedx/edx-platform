@@ -3,6 +3,7 @@
 <%def name="online_help_token()"><% return "progress" %></%def>
 <%!
 from course_modes.models import CourseMode
+from certificates.models import CertificateStatuses
 from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse
 from util.date_utils import get_time_display, DEFAULT_SHORT_DATE_FORMAT
@@ -49,66 +50,29 @@ from django.utils.http import urlquote_plus
             <h1 class="progress-certificates-title">${_("Course Progress for Student '{username}' ({email})").format(username=student.username, email=student.email) | h}</h1>
           </header>
         <div class="wrapper-msg wrapper-auto-cert">
-          %if enrollment_mode == CourseMode.AUDIT:
-            <div class="auto-cert-message">
-              <div class="msg-content">
-                <h2 class="title">${_("Your enrollment: Audit track")}</h2>
-                <p class="copy">${_("You are enrolled in the audit track for this course. The audit track does not include a certificate.")}</p>
-              </div>
-            </div>
-          %elif show_generate_cert_btn:
+          %if certificate_data:
             <div id="errors-info" class="errors-info"></div>
             %if passed:
             <div class="auto-cert-message" id="course-success">
               <div class="has-actions">
                   <% post_url = reverse('generate_user_cert', args=[unicode(course.id)]) %>
-                  ## If current certificate is invalidated by instructor then don't show the generate button.
-                  % if certificate_invalidated:
-                  <p class="copy">${_("Your certificate has been invalidated. Please contact your course team if you have any questions.")}</p>
-                  %elif is_downloadable:
                   <div class="msg-content">
-                    <h2 class="title">${_("Your certificate is available")}</h2>
-                    <p class="copy">
-                      ${_("You can keep working for a higher grade, or request your certificate now.")}
-                    </p>
+                    <h2 class="title">${certificate_data.title | h}</h2>
+                    <p class="copy">${certificate_data.msg | h}</p>
                   </div>
                   <div class="msg-actions">
-                    %if show_cert_web_view and cert_web_view_url:
-                    <a class="btn" href="${cert_web_view_url | h}" target="_blank" title="${_('View certificate in a new browser window or tab.')}">
+                    %if certificate_data.cert_web_view_url:
+                    <a class="btn" href="${certificate_data.cert_web_view_url | h}" target="_blank" title="${_('View certificate in a new browser window or tab.')}">
                       ${_("View Certificate")}
                     </a>
-                    %elif download_url:
-                    <a class="btn" href="${download_url | h}" target="_blank" title="${_('PDF will open in a new browser window or tab.')}">
+                    %elif certificate_data.cert_status == CertificateStatuses.downloadable and certificate_data.download_url:
+                    <a class="btn" href="${certificate_data.download_url | h}" target="_blank" title="${_('PDF will open in a new browser window or tab.')}">
                       ${_("Download Your Certificate")}
                     </a>
+                    %elif certificate_data.cert_status == CertificateStatuses.requesting:
+                      <button class="btn generate_certs" data-endpoint="${post_url | h}" id="btn_generate_cert">${_('Request Certificate')}</button>
                     %endif
                   </div>
-                  %elif is_generating:
-                  <div class="msg-content">
-                    ## Translators: This message appears to users when the system is processessing course certificates, which can take a few hours.
-                    <h2 class="title">${_("We're working on it...")}</h2>
-                    <p class="copy">${_("We're creating your certificate. You can keep working in your courses and a link to it will appear here and on your Dashboard when it is ready.")}</p>
-                  </div>
-                  <div class="msg-actions"></div>
-                  %elif missing_required_verification or is_unverified:
-                  ## The is_unverified variable comes from certificate status.
-                  ## At the moment, the assumption is we should not show generate certificate button
-                  ## if the certificate previously generated is in unverified status
-                  <div class="msg-content">
-                    ## Translators: This message appears to users when the users have not completed identity verification.
-                    <h2 class="title">${_("Certificate unavailable")}</h2>
-                    <p class="copy">${_("You have not received a certificate because you do not have a current {platform_name} verified identity. ").format(platform_name=settings.PLATFORM_NAME)} <a href="${reverse('verify_student_reverify')}"> ${_("Verify your identity now.")}</a></p>
-                  </div>
-                  <div class="msg-actions"></div>
-                  %else:
-                  <div class="msg-content">
-                    <h2 class="title">${_("Congratulations, you qualified for a certificate!")}</h2>
-                    <p class="copy">${_("You can keep working for a higher grade, or request your certificate now.")}</p>
-                  </div>
-                  <div class="msg-actions">
-                    <button class="btn generate_certs" data-endpoint="${post_url | h}" id="btn_generate_cert">${_('Request Certificate')}</button>
-                  </div>
-                  %endif
               </div>
             </div>
             %endif

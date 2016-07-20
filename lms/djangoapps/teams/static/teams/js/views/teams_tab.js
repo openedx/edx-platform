@@ -68,7 +68,7 @@
                     router = this.router = new Backbone.Router();
                     _.each([
                         [':default', _.bind(this.routeNotFound, this)],
-                        ['content', _.bind(function () {
+                        ['main', _.bind(function () {
                             // The backbone router unfortunately usurps the
                             // default behavior of in-page-links.  This hack
                             // prevents the screen reader in-page-link from
@@ -140,16 +140,7 @@
                                 url: 'my-teams',
                                 view: this.myTeamsView
                             }, {
-                                title: HtmlUtils.interpolateHtml(
-                                    // Translators: sr_start and sr_end surround text meant only for screen readers.
-                                    // The whole string will be shown to users as "Browse teams" if they are using a
-                                    // screenreader, and "Browse" otherwise.
-                                    gettext('Browse {sr_start} teams {sr_end}'),
-                                    {
-                                        sr_start: HtmlUtils.HTML('<span class="sr">'),
-                                        sr_end: HtmlUtils.HTML('</span>')
-                                    }
-                                ),
+                                title: gettext('Browse'),
                                 url: 'browse',
                                 view: this.topicsView
                             }],
@@ -580,7 +571,7 @@
                 /**
                  * Set up the tabbed view and switch tabs.
                  */
-                goToTab: function (tab) {
+                goToTab: function(tab) {
                     this.mainView = this.tabbedView;
                     // Note that `render` should be called first so
                     // that the tabbed view's element is set

@@ -75,6 +75,8 @@ from lms.envs.common import (
     # constants for redirects app
     REDIRECT_CACHE_TIMEOUT,
     REDIRECT_CACHE_KEY_PREFIX,
+
+    JWT_AUTH,
 )
 from path import Path as path
 from warnings import simplefilter
@@ -898,6 +900,9 @@ INSTALLED_APPS = (
     # programs support
     'openedx.core.djangoapps.programs',
 
+    # Catalog integration
+    'openedx.core.djangoapps.catalog',
+
     # Self-paced course configuration
     'openedx.core.djangoapps.self_paced',
 
@@ -1130,18 +1135,6 @@ XBLOCK_SETTINGS = {
 ################################ XBlock Deprecation ################################
 
 # The following settings are used for deprecating XBlocks.
-
-# Adding an XBlock to this list does the following:
-# 1. Shows a warning on the course outline if the XBlock is listed in
-#    "Advanced Module List" in "Advanced Settings" page.
-# 2. List all instances of that XBlock on the top of the course outline page asking
-#    course authors to delete or replace the instances.
-DEPRECATED_BLOCK_TYPES = [
-    'peergrading',
-    'combinedopenended',
-    'graphical_slider_tool',
-    'randomize',
-]
 
 # Adding components in this list will disable the creation of new problems for
 # those advanced components in Studio. Existing problems will work fine

@@ -44,10 +44,10 @@ body, input, button {
 a {
   @include transition(color $tmg-f2 ease-in-out 0s);
   text-decoration: none;
-  color: $blue;
+  color: $uxpl-blue-base;
 
   &:hover {
-    color: $orange-d1;
+    color: $uxpl-blue-hover-active;
   }
 }
 
@@ -84,7 +84,7 @@ h1 {
     position: relative;
     top: ($baseline/4);
     display: block;
-    color: $gray-l2;
+    color: $gray-d2;
   }
 }
 
@@ -293,14 +293,6 @@ p, ul, ol, dl {
         .button {
           padding: ($baseline/4) ($baseline/2) ($baseline/3) ($baseline/2);
         }
-
-        .new-button {
-
-        }
-
-        .view-button {
-
-        }
       }
     }
 
@@ -452,11 +444,11 @@ p, ul, ol, dl {
 
     .tip {
       @extend %t-copy-sub2;
+      @include text-align(right);
+      @include float(right);
       width: flex-grid(7, 12);
-      float: right;
       margin-top: ($baseline/2);
-      text-align: right;
-      color: $gray-l2;
+      color: $gray-d1;
     }
   }
 }
@@ -705,9 +697,10 @@ hr.divider {
       color: $white;
     }
 
-    &:hover {
+    &:hover,
+    &:active {
       top: 0;
-      background: $blue;
+      background: $uxpl-blue-base;
     }
   }
 

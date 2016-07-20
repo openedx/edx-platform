@@ -34,10 +34,10 @@
                     var template = this.loadTemplate('certificate-white-list');
                     this.$el.html(template({certificates: this.collection.models}));
                     if (!this.active_certificate || this.collection.isEmpty()){
-                        this.$("#generate-exception-certificates").addClass("is-disabled");
+                        this.$("#generate-exception-certificates").attr("disabled", "disabled");
                     }
                     else {
-                        this.$("#generate-exception-certificates").removeClass("is-disabled");
+                        this.$("#generate-exception-certificates").removeAttr("disabled");
                     }
                 },
 

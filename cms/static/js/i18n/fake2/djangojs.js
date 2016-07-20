@@ -301,7 +301,6 @@
     "Bottom": "\u0243\u00f8\u0287\u0287\u00f8\u026f", 
     "Browse": "\u0243\u0279\u00f8\u028ds\u01dd", 
     "Browse recently launched courses and see what\\'s new in your favorite subjects": "\u0243\u0279\u00f8\u028ds\u01dd \u0279\u01dd\u0254\u01ddn\u0287l\u028e l\u0250nn\u0254\u0265\u01ddd \u0254\u00f8n\u0279s\u01dds \u0250nd s\u01dd\u01dd \u028d\u0265\u0250\u0287\\'s n\u01dd\u028d \u1d09n \u028e\u00f8n\u0279 \u025f\u0250\u028c\u00f8\u0279\u1d09\u0287\u01dd snb\u027e\u01dd\u0254\u0287s", 
-    "Browse {sr_start} teams {sr_end}": "\u0243\u0279\u00f8\u028ds\u01dd {sr_start} \u0287\u01dd\u0250\u026fs {sr_end}", 
     "Bulk Exceptions": "\u0243nl\u029e \u0246x\u0254\u01ddd\u0287\u1d09\u00f8ns", 
     "Bullet list": "\u0243nll\u01dd\u0287 l\u1d09s\u0287", 
     "Bulleted List (Ctrl+U)": "\u0243nll\u01dd\u0287\u01ddd \u0141\u1d09s\u0287 (\u023b\u0287\u0279l+\u0244)", 
