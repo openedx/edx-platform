@@ -231,6 +231,20 @@ class ProblemTypeTestMixin(object):
         )
         self.assertIn('is-disabled', self.problem_page.q(css='div.problem button.check').attrs('class')[0])
 
+    @attr(shard=7)
+    def test_can_show_answer(self):
+        """
+        Scenario: Verifies that show answer button is working as expected.
+
+        Given that I am on courseware page
+        And I can see a CAPA problem with show answer button
+        When I click "Show Answer" button
+        And I should see question's solution
+        And I should see the problem title is focused
+        """
+        self.problem_page.click_show()
+        self.assertTrue(self.problem_page.is_focus_on_problem_meta())
+
     @attr('a11y')
     def test_problem_type_a11y(self):
         """
@@ -344,29 +358,21 @@ class CheckboxProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         else:
             self.problem_page.click_choice("choice_1")
 
-    @attr('shard_7')
-    def test_can_show_hide_answer(self):
+    @attr(shard=7)
+    def test_can_show_answer(self):
         """
-        Scenario: Verifies that show/hide answer button is working as expected.
+        Scenario: Verifies that show answer button is working as expected.
 
         Given that I am on courseware page
         And I can see a CAPA problem with show answer button
         When I click "Show Answer" button
-        Then I should see "Hide Answer" text on button
         And I should see question's solution
         And I should see correct choices highlighted
-        When I click "Hide Answer" button
-        Then I should see "Show Answer" text on button
-        And I should not see question's solution
-        And I should not see correct choices highlighted
         """
-        self.problem_page.click_show_hide_button()
+        self.problem_page.click_show()
         self.assertTrue(self.problem_page.is_solution_tag_present())
         self.assertTrue(self.problem_page.is_correct_choice_highlighted(correct_choices=[1, 3]))
-
-        self.problem_page.click_show_hide_button()
-        self.assertFalse(self.problem_page.is_solution_tag_present())
-        self.assertFalse(self.problem_page.is_correct_choice_highlighted(correct_choices=[1, 3]))
+        self.assertTrue(self.problem_page.is_focus_on_problem_meta())
 
 
 class MultipleChoiceProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):

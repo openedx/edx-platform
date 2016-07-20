@@ -65,7 +65,7 @@ describe 'Problem', ->
       expect($('div.action button.reset')).toHandleWith 'click', @problem.reset
 
     it 'bind the show button', ->
-      expect($('div.action button.show')).toHandleWith 'click', @problem.show
+      expect($('.action .show')).toHandleWith 'click', @problem.show
 
     it 'bind the save button', ->
       expect($('div.action button.save')).toHandleWith 'click', @problem.save
@@ -425,6 +425,7 @@ describe 'Problem', ->
     describe 'when the answer has not yet shown', ->
       beforeEach ->
         @problem.el.removeClass 'showed'
+        expect(@problem.el.find('.show').attr('disabled')).not.toEqual('disabled')
 
       it 'log the problem_show event', ->
         @problem.show()
@@ -444,30 +445,28 @@ describe 'Problem', ->
         expect($('#answer_1_1')).toHaveHtml 'One'
         expect($('#answer_1_2')).toHaveHtml 'Two'
 
-      it 'toggle the show answer button', ->
+      it 'sends the answers when text to the SR element', ->
         spyOn($, 'postWithPrefix').and.callFake (url, callback) -> callback(answers: {})
         @problem.show()
-        expect($('.show .show-label')).toHaveText 'Hide Answer'
         expect(window.SR.readElts).toHaveBeenCalled()
-
-      it 'toggle the show answer button, answers are strings', ->
+ 
+      it 'sends the answers when elements to the SR element, answers are strings', ->
         spyOn($, 'postWithPrefix').and.callFake (url, callback) -> callback(answers: '1_1': 'One', '1_2': 'Two')
         @problem.show()
-        expect($('.show .show-label')).toHaveText 'Hide Answer'
         expect(window.SR.readElts).toHaveBeenCalledWith ['<p>Answer: One</p>', '<p>Answer: Two</p>']
 
-      it 'toggle the show answer button, answers are elements', ->
+      it 'sends the answers when elements to the SR element, answers are elements', ->
         answer1 = '<div><span class="detailed-solution">one</span></div>'
         answer2 = '<div><span class="detailed-solution">two</span></div>'
         spyOn($, 'postWithPrefix').and.callFake (url, callback) -> callback(answers: '1_1': answer1, '1_2': answer2)
         @problem.show()
-        expect($('.show .show-label')).toHaveText 'Hide Answer'
         expect(window.SR.readElts).toHaveBeenCalledWith [jasmine.any(jQuery), jasmine.any(jQuery)]
 
       it 'add the showed class to element', ->
         spyOn($, 'postWithPrefix').and.callFake (url, callback) -> callback(answers: {})
         @problem.show()
         expect(@problem.el).toHaveClass 'showed'
+        expect(@problem.el.find('.show').attr('disabled')).toEqual('disabled')
 
       it 'reads the answers', (done) ->
         deferred = $.Deferred()
@@ -700,20 +699,6 @@ describe 'Problem', ->
         '''
         $('#answer_1_1').html('One')
         $('#answer_1_2').html('Two')
-
-      it 'hide the answers', ->
-        @problem.show()
-        expect($('#answer_1_1')).toHaveHtml ''
-        expect($('#answer_1_2')).toHaveHtml ''
-        expect($('label[for="input_1_1_1"]')).not.toHaveAttr 'correct_answer'
-
-      it 'toggle the show answer button', ->
-        @problem.show()
-        expect($('.show .show-label')).toHaveText 'Show Answer'
-
-      it 'remove the showed class from element', ->
-        @problem.show()
-        expect(@problem.el).not.toHaveClass 'showed'
 
   describe 'save', ->
     beforeEach ->
