@@ -992,77 +992,12 @@ class CapaModuleTest(unittest.TestCase):
         self.assertTrue('success' in result and result['success'])
 
     def test_check_button_name(self):
-
-        # If last attempt, button name changes to "Final Check"
-        # Just in case, we also check what happens if we have
-        # more attempts than allowed.
-        attempts = random.randint(1, 10)
-        module = CapaFactory.create(attempts=attempts - 1, max_attempts=attempts)
-        self.assertEqual(module.check_button_name(), "Final Check")
-
-        module = CapaFactory.create(attempts=attempts, max_attempts=attempts)
-        self.assertEqual(module.check_button_name(), "Final Check")
-
-        module = CapaFactory.create(attempts=attempts + 1, max_attempts=attempts)
-        self.assertEqual(module.check_button_name(), "Final Check")
-
-        # Otherwise, button name is "Check"
-        module = CapaFactory.create(attempts=attempts - 2, max_attempts=attempts)
-        self.assertEqual(module.check_button_name(), "Check")
-
-        module = CapaFactory.create(attempts=attempts - 3, max_attempts=attempts)
-        self.assertEqual(module.check_button_name(), "Check")
-
-        # If no limit on attempts, then always show "Check"
-        module = CapaFactory.create(attempts=attempts - 3)
-        self.assertEqual(module.check_button_name(), "Check")
-
         module = CapaFactory.create(attempts=0)
-        self.assertEqual(module.check_button_name(), "Check")
+        self.assertEqual(module.check_button_name(), "Submit")
 
     def test_check_button_checking_name(self):
         module = CapaFactory.create(attempts=1, max_attempts=10)
-        self.assertEqual(module.check_button_checking_name(), "Checking...")
-
-        module = CapaFactory.create(attempts=10, max_attempts=10)
-        self.assertEqual(module.check_button_checking_name(), "Checking...")
-
-    def test_check_button_name_customization(self):
-        module = CapaFactory.create(
-            attempts=1,
-            max_attempts=10,
-            text_customization={"custom_check": "Submit", "custom_final_check": "Final Submit"}
-        )
-        self.assertEqual(module.check_button_name(), "Submit")
-
-        module = CapaFactory.create(attempts=9,
-                                    max_attempts=10,
-                                    text_customization={"custom_check": "Submit", "custom_final_check": "Final Submit"}
-                                    )
-        self.assertEqual(module.check_button_name(), "Final Submit")
-
-    def test_check_button_checking_name_customization(self):
-        module = CapaFactory.create(
-            attempts=1,
-            max_attempts=10,
-            text_customization={
-                "custom_check": "Submit",
-                "custom_final_check": "Final Submit",
-                "custom_checking": "Checking..."
-            }
-        )
-        self.assertEqual(module.check_button_checking_name(), "Checking...")
-
-        module = CapaFactory.create(
-            attempts=9,
-            max_attempts=10,
-            text_customization={
-                "custom_check": "Submit",
-                "custom_final_check": "Final Submit",
-                "custom_checking": "Checking..."
-            }
-        )
-        self.assertEqual(module.check_button_checking_name(), "Checking...")
+        self.assertEqual(module.check_button_checking_name(), "Submitting")
 
     def test_should_show_check_button(self):
 
