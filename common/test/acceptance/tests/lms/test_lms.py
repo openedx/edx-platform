@@ -1085,12 +1085,12 @@ class ProblemExecutionTest(UniqueCourseTest):
 
         # Fill in the answer correctly.
         problem_page.fill_answer("20")
-        problem_page.click_check()
+        problem_page.click_submit()
         self.assertTrue(problem_page.is_correct())
 
         # Fill in the answer incorrectly.
         problem_page.fill_answer("4")
-        problem_page.click_check()
+        problem_page.click_submit()
         self.assertFalse(problem_page.is_correct())
 
 
