@@ -3,7 +3,7 @@
 
     <div class="${status.classname}" id="status_${id}">
 
-    <input type="text" name="input_${id}" id="input_${id}" aria-label="${label}" aria-describedby="answer_${id}" data-input-id="${id}" value="${value|h}"
+    <input type="text" name="input_${id}" id="input_${id}" aria-label="${response_data['label']}" aria-describedby="answer_${id}" data-input-id="${id}" value="${value|h}"
    % if size:
    size="${size}"
    % endif

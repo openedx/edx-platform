@@ -5,12 +5,11 @@
     ))
 %>
 <form class="choicegroup capa_inputtype" id="inputtype_${id}">
-    <fieldset>
-      % if response_data and response_data['label']:
-        <legend id="${id}-legend" class="response-fieldset-legend question-text">${response_data['label']}</legend>
-      % else:
-        <legend>Question</legend>
-      % endif
+    <fieldset ${describedby}>
+      <legend id="${id}-legend" class="response-fieldset-legend field-group-hd">${response_data['label']}</legend>
+      % for description_id, description_text in response_data['descriptions'].items():
+        <p class="question-description" id="${description_id}">${description_text}</p>
+      % endfor
         % for choice_id, choice_label in choices:
           <div class="field" aria-live="polite" aria-atomic="true">
             <%
@@ -33,8 +32,9 @@
                         <% label_class += ' choicegroup_' + correctness %>
                     % endif
                 % endif
-                class="${label_class}" >
-
+                class="${label_class}"
+                ${describedby}
+                >
                 <input type="${input_type}" name="input_${id}${name_array_suffix}" id="input_${id}_${choice_id}" class="field-input input-${input_type}" value="${choice_id}"
                 ## If the student selected this choice...
                 % if is_radio_input(choice_id):

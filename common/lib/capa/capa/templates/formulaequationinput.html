@@ -5,8 +5,7 @@
   <div class="${status.classname}" id="status_${id}">
     <input type="text" name="input_${id}" id="input_${id}"
         data-input-id="${id}" value="${value}"
-        aria-label="${label}"
-        aria-describedby="${id}_status"
+        ${describedby}
         % if size:
         size="${size}"
         % endif

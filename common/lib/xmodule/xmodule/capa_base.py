@@ -1256,7 +1256,6 @@ class CapaMixin(CapaFields):
         of the problem.  If problem related metadata cannot be located it should be replaced with empty
         strings ''.
         """
-
         input_metadata = {}
         for input_id, internal_answer in answers.iteritems():
             answer_input = self.lcp.inputs.get(input_id)
@@ -1290,7 +1289,7 @@ class CapaMixin(CapaFields):
                 is_correct = ''
 
             input_metadata[input_id] = {
-                'question': getattr(answer_input, 'loaded_attributes', {}).get('label', ''),
+                'question': answer_input.response_data.get('label', ''),
                 'answer': user_visible_answer,
                 'response_type': getattr(getattr(answer_response, 'xml', None), 'tag', ''),
                 'input_type': getattr(answer_input, 'tag', ''),
