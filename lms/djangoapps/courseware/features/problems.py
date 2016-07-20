@@ -151,7 +151,7 @@ def action_button_present(_step, buttonname, doesnt_appear):
 def show_hide_label_is(_step, label_name):
     # The label text is changed by static/xmodule_js/src/capa/display.js
     # so give it some time to change on the page.
-    label_css = 'button.show span.show-label'
+    label_css = 'button.show.btn-default.btn-small span.show-label'
     world.wait_for(lambda _: world.css_has_text(label_css, label_name))
 
 
