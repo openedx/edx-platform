@@ -5,6 +5,7 @@ import mock
 from opaque_keys.edx.keys import CourseKey
 
 from openedx.core.djangoapps.catalog import utils
+from openedx.core.djangoapps.catalog.models import CatalogIntegration
 from openedx.core.djangoapps.catalog.tests import factories, mixins
 from student.tests.factories import UserFactory
 
@@ -13,6 +14,8 @@ UTILS_MODULE = 'openedx.core.djangoapps.catalog.utils'
 
 
 @mock.patch(UTILS_MODULE + '.get_edx_api_data')
+# ConfigurationModels use the cache. Make every cache get a miss.
+@mock.patch('config_models.models.cache.get', return_value=None)
 class TestGetCourseRun(mixins.CatalogIntegrationMixin, TestCase):
     """Tests covering retrieval of course runs from the catalog service."""
     def setUp(self):
@@ -34,7 +37,7 @@ class TestGetCourseRun(mixins.CatalogIntegrationMixin, TestCase):
 
         return args, kwargs
 
-    def test_get_course_run(self, mock_get_catalog_data):
+    def test_get_course_run(self, _mock_cache, mock_get_catalog_data):
         course_run = factories.CourseRun()
         mock_get_catalog_data.return_value = course_run
 
@@ -43,7 +46,7 @@ class TestGetCourseRun(mixins.CatalogIntegrationMixin, TestCase):
         self.assert_contract(mock_get_catalog_data.call_args)
         self.assertEqual(data, course_run)
 
-    def test_course_run_unavailable(self, mock_get_catalog_data):
+    def test_course_run_unavailable(self, _mock_cache, mock_get_catalog_data):
         mock_get_catalog_data.return_value = []
 
         data = utils.get_course_run(self.course_key, self.user)
@@ -51,14 +54,14 @@ class TestGetCourseRun(mixins.CatalogIntegrationMixin, TestCase):
         self.assert_contract(mock_get_catalog_data.call_args)
         self.assertEqual(data, {})
 
-    def test_cache_disabled(self, mock_get_catalog_data):
+    def test_cache_disabled(self, _mock_cache, mock_get_catalog_data):
         utils.get_course_run(self.course_key, self.user)
 
         _, kwargs = self.assert_contract(mock_get_catalog_data.call_args)
 
         self.assertIsNone(kwargs['cache_key'])
 
-    def test_cache_enabled(self, mock_get_catalog_data):
+    def test_cache_enabled(self, _mock_cache, mock_get_catalog_data):
         catalog_integration = self.create_catalog_integration(cache_ttl=1)
 
         utils.get_course_run(self.course_key, self.user)
@@ -66,6 +69,13 @@ class TestGetCourseRun(mixins.CatalogIntegrationMixin, TestCase):
         _, kwargs = mock_get_catalog_data.call_args
 
         self.assertEqual(kwargs['cache_key'], catalog_integration.CACHE_KEY)
+
+    def test_config_missing(self, _mock_cache, _mock_get_catalog_data):
+        """Verify that no errors occur if this method is called when catalog config is missing."""
+        CatalogIntegration.objects.all().delete()
+
+        data = utils.get_course_run(self.course_key, self.user)
+        self.assertEqual(data, {})
 
 
 @mock.patch(UTILS_MODULE + '.get_course_run')
