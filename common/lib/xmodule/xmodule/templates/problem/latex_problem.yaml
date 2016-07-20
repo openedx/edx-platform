@@ -159,7 +159,7 @@ data: |
         <label>What was the first post-secondary school in China to allow both male and female students?</label>
         <additional_answer>National Central University</additional_answer>
         <additional_answer>Nanjing University</additional_answer>
-        <textline label="What was the first post-secondary school in China to allow both male and female students?" size="40"/>
+        <textline size="40"/>
         <solution>
           <div class="detailed-solution">
             <p>Explanation</p>
@@ -170,15 +170,15 @@ data: |
       <br/>
 
       <p><strong>Example Custom Python-Evaluated Input Problem</strong></p>
-      
+
       <customresponse cfn="test_add_to_ten">
         <script type="loncapa/python">
     def test_add_to_ten(expect, ans):
         return test_add(10, ans)
       </script>
         <label>Enter two integers that sum to 10.</label>
-        <textline size="40" correct_answer="3" label="Integer #1"/><br/>
-        <textline size="40" correct_answer="7" label="Integer #2"/>
+        <textline size="40" correct_answer="3"/><br/>
+        <textline size="40" correct_answer="7"/>
         <solution>
           <div class="detailed-solution">
             <p>Explanation</p>
@@ -198,8 +198,8 @@ data: |
             return False
       </script>
         <label>Enter two integers that sum to 20.</label>
-        <textline size="40" correct_answer="11" label="Integer #1"/><br/>
-        <textline size="40" correct_answer="9" label="Integer #2"/>
+        <textline size="40" correct_answer="11"/><br/>
+        <textline size="40" correct_answer="9"/>
         <solution>
           <div class="detailed-solution">
             <p>Explanation</p>

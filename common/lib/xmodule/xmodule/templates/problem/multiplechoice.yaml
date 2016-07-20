@@ -8,7 +8,7 @@ metadata:
 
        You can use the following example problem as a model.
 
-       >>Which of the following countries has the largest population?<<
+       >>Which of the following countries has the largest population?||You can select only one option.<<
        ( ) Brazil {{ timely feedback -- explain why an almost correct answer is wrong }}
        ( ) Germany
        (x) Indonesia
@@ -29,7 +29,8 @@ data:   |
                <p>When you add the problem, be sure to select Settings to specify a Display Name and other values that apply.</p>
                <p>You can use the following example problem as a model.</p>
                <label>Which of the following countries has the largest population?</label>
-               <choicegroup label="Which of the following countries has the largest population?" type="MultipleChoice">
+               <description>You can select only one option.</description>
+               <choicegroup type="MultipleChoice">
                    <choice correct="false">Brazil
                        <choicehint>timely feedback -- explain why an almost correct answer is wrong</choicehint>
                    </choice>
