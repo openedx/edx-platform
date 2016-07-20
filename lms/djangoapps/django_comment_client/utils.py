@@ -21,7 +21,7 @@ from django_comment_client.permissions import check_permissions_by_view, has_per
 from django_comment_client.settings import MAX_COMMENT_DEPTH
 from edxmako import lookup_template
 
-from courseware import courses
+from courseware import courses, tabs
 from courseware.access import has_access
 from openedx.core.djangoapps.content.course_structures.models import CourseStructure
 from openedx.core.djangoapps.course_groups.cohorts import (
@@ -796,4 +796,7 @@ def is_discussion_enabled(course_id):
     if settings.FEATURES.get('CUSTOM_COURSES_EDX', False):
         if get_current_ccx(course_id):
             return False
+    course = courses.get_course_by_id(course_id)
+    if not tabs.ExternalDiscussionCourseTab.is_enabled(course):
+        return False
     return settings.FEATURES.get('ENABLE_DISCUSSION_SERVICE')
