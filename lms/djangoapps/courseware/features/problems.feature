@@ -104,17 +104,17 @@ Feature: LMS.Answer problems
         When I answer a "multiple choice" problem "incorrectly"
         And I reset the problem
         Then I should see "You have used 2 of 3 submissions" somewhere in the page
-        And The "Final Check" button does appear
+        And The "Submit" button does appear
         When I answer a "multiple choice" problem "correctly"
         Then The "Reset" button does not appear
 
     Scenario: I can view and hide the answer if the problem has it:
         Given I am viewing a "numerical" that shows the answer "always"
-        When I press the button with the label "SHOW ANSWER"
-        Then the Show/Hide button label is "HIDE ANSWER"
+        When I press the button with the label "Show Answer"
+        Then the Show/Hide button label is "Hide Answer"
         And I should see "4.14159" somewhere in the page
-        When I press the button with the label "HIDE ANSWER"
-        Then the Show/Hide button label is "SHOW ANSWER"
+        When I press the button with the label "Hide Answer"
+        Then the Show/Hide button label is "Show Answer"
         And I should not see "4.14159" anywhere on the page
 
     Scenario: I can see my score on a problem when I answer it and after I reset it

@@ -241,7 +241,7 @@ describe 'Problem', ->
         return
       ).always done
 
-    it 'tests the expected change in text of check button', (done) ->
+    it 'tests the expected change in text of submit button', (done) ->
       deferred = $.Deferred()
       self = this
 
@@ -255,13 +255,13 @@ describe 'Problem', ->
               callable()
         spyOn @problem.checkButtonLabel, 'text'
         @problem.check()
-        expect(@problem.checkButtonLabel.text).toHaveBeenCalledWith 'Checking...'
+        expect(@problem.checkButtonLabel.text).toHaveBeenCalledWith 'Submitting'
         if jQuery.active == 0
           deferred.resolve()
         deferred.promise()
 
       runs.call(self).then(->
-        expect(self.problem.checkButtonLabel.text).toHaveBeenCalledWith 'Check'
+        expect(self.problem.checkButtonLabel.text).toHaveBeenCalledWith 'Submit'
         return
       ).always done
 
@@ -394,14 +394,14 @@ describe 'Problem', ->
         spyOn @problem, 'enableAllButtons'
         @problem.reset()
         expect(@problem.enableAllButtons).toHaveBeenCalledWith false, false
-        expect(@problem.checkButtonLabel).toHaveText 'Check'
+        expect(@problem.checkButtonLabel).toHaveText 'Submit'
         if jQuery.active == 0
           deferred.resolve()
         deferred.promise()
 
       runs.call(self).then(->
         expect(self.problem.enableAllButtons).toHaveBeenCalledWith true, false
-        expect(self.problem.checkButtonLabel).toHaveText 'Check'
+        expect(self.problem.checkButtonLabel).toHaveText 'Submit'
       ).always done
 
   describe 'show', ->
@@ -741,7 +741,7 @@ describe 'Problem', ->
         return
       ).always done
 
-    it 'tests if all the buttons are disabled and the text of check button does not change while saving.', (done) ->
+    it 'tests if all the buttons are disabled and the text of submit button does not change while saving.', (done) ->
       deferred = $.Deferred()
       self = this
 
@@ -754,14 +754,14 @@ describe 'Problem', ->
         spyOn @problem, 'enableAllButtons'
         @problem.save()
         expect(@problem.enableAllButtons).toHaveBeenCalledWith false, false
-        expect(@problem.checkButtonLabel).toHaveText 'Check'
+        expect(@problem.checkButtonLabel).toHaveText 'Submit'
         if jQuery.active == 0
           deferred.resolve()
         deferred.promise()
 
       runs.call(self).then(->
         expect(self.problem.enableAllButtons).toHaveBeenCalledWith true, false
-        expect(self.problem.checkButtonLabel).toHaveText 'Check'
+        expect(self.problem.checkButtonLabel).toHaveText 'Submit'
       ).always done
 
   describe 'refreshMath', ->
