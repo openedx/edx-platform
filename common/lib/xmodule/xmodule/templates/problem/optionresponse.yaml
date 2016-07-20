@@ -8,7 +8,7 @@ metadata:
 
          You can use the following example problem as a model.
 
-         >>Which of the following countries celebrates its independence on August 15?<<
+         >>Which of the following countries celebrates its independence on August 15?||You can select only one option.<<
 
          [[(India), Spain, China, Bermuda]]
 
@@ -22,7 +22,8 @@ data:   |
                 <p>When you add the problem, be sure to select Settings to specify a Display Name and other values that apply.</p>
                 <p>You can use the following example problem as a model.</p>
                 <label>Which of the following countries celebrates its independence on August 15?</label>
-                <optioninput label="Which of the following countries celebrates its independence on August 15?" options="('India','Spain','China','Bermuda')" correct="India"/>
+                <description>You can select only one option.</description>
+                <optioninput options="('India','Spain','China','Bermuda')" correct="India"/>
                 <solution>
                     <div class="detailed-solution">
                         <p>Explanation</p>

@@ -11,7 +11,7 @@ metadata:
 
         Use the following example problem as a model.
 
-        >>Which U.S. state has the largest land area?<<
+        >>Which U.S. state has the largest land area?||Be sure to check your spelling.<<
 
         =Alaska {{Alaska is 576,400 square miles, more than double the land area
         of the second largest state, Texas.}}
@@ -32,10 +32,11 @@ data:   |
                 <p>Be sure to select Settings to specify a Display Name and other values that apply.</p>
                 <p>Use the following example problem as a model.</p>
                 <label>Which U.S. state has the largest land area?</label>
+                <description>Be sure to check your spelling.</description>
                 <correcthint>Alaska is 576,400 square miles, more than double the land area of the second largest state, Texas.</correcthint>
                 <stringequalhint answer="Texas">While many people think Texas is the largest state, it is actually the second largest, with 261,797 square miles.</stringequalhint>
                 <stringequalhint answer="California">California is the third largest state, with 155,959 square miles.</stringequalhint>
-                <textline label="Which U.S. state has the largest land area?" size="20"/>
+                <textline size="20"/>
             </stringresponse>
             <demandhint>
                 <hint>Consider the square miles, not population.</hint>

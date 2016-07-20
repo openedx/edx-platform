@@ -14,7 +14,7 @@
       <div style="display:none;" name="${hidden}" inputid="input_${id}" />
     % endif
 
-  <input type="text" name="input_${id}" id="input_${id}" aria-label="${label}" aria-describedby="answer_${id}" value="${value|h}"
+  <input type="text" name="input_${id}" id="input_${id}" aria-label="${response_data['label']}" ${describedby} value="${value|h}"
         % if do_math:
             class="math"
         % endif
@@ -27,15 +27,15 @@
    />
    ${trailing_text | h}
 
-      <span class="status" 
+      <span class="status"
          %if status != 'unsubmitted':
          %endif
          aria-describedby="input_${id}" data-tooltip="${status.display_tooltip}">
         <span class="sr">
           %if value:
             ${value|h}
-          % else:
-            ${label}
+          %else:
+            ${response_data['label']}
           %endif
             -
             ${status.display_name}

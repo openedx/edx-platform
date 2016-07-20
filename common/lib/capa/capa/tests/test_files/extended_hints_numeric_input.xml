@@ -1,7 +1,8 @@
 <problem>
     <numericalresponse answer="1.141">
+        <label>What value when squared is approximately equal to 2 (give your answer to 2 decimal places)?</label>
         <responseparam default=".01" type="tolerance"/>
-        <formulaequationinput label="What value when squared is approximately equal to 2 (give your answer to 2 decimal places)?"/>
+        <formulaequationinput/>
 
         <correcthint label="Nice">
             The square root of two turns up in the strangest places.
@@ -11,8 +12,9 @@
     </numericalresponse>
 
     <numericalresponse answer="4">
+        <label>What is 2 + 2?</label>
         <responseparam default=".01" type="tolerance"/>
-        <formulaequationinput label="What is 2 + 2?"/>
+        <formulaequationinput/>
         <correcthint>
             Pretty easy, uh?.
         </correcthint>
@@ -34,4 +36,3 @@ also not multiple correcthint
         </lehint>
 -->
 </problem>
-
