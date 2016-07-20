@@ -9,7 +9,7 @@ setuptools==18.0.1
 
 # Numpy and scipy can't be installed in the same pip run.
 # Install numpy before other things to help resolve the problem.
-numpy==1.6.2
+numpy==1.11.0
 
 # Needed to make sure that options in base.txt are allowed
 pip==7.1.2
