@@ -100,6 +100,27 @@ registry.register(SolutionRenderer)
 #-----------------------------------------------------------------------------
 
 
+class DescriptionRenderer(object):
+    """
+    Description provides help text for a question.
+    """
+    tags = ['description']
+
+    def __init__(self, system, xml):
+        self.system = system
+        self.id = xml.get('id')
+        self.text = xml.text
+
+    def get_html(self):
+        context = {'id': self.id, 'text': self.text}
+        html = self.system.render_template("description.html", context)
+        return etree.XML(html)
+
+registry.register(DescriptionRenderer)
+
+#-----------------------------------------------------------------------------
+
+
 class TargetedFeedbackRenderer(object):
     """
     A targeted feedback is just a <span>...</span> that is used for displaying an

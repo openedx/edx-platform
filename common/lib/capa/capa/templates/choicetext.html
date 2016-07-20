@@ -9,8 +9,8 @@
 <section id="choicetextinput_${id}" class="choicetextinput">
 <form class="choicetextgroup capa_inputtype" id="inputtype_${id}">
     <div class="script_placeholder" data-src="${STATIC_URL}js/capa/choicetextinput.js"/>
-    
-    <fieldset aria-label="${label}">
+
+    <fieldset>
         % for choice_id, choice_description in choices:
         <%choice_id= choice_id %>
         <section id="forinput${choice_id}"
@@ -59,7 +59,7 @@
         <span id="answer_${id}"></span>
     </fieldset>
         <input class= "choicetextvalue" type="hidden"  name="input_${id}{}" id="input_${id}" value="${value|h}" />
-    
+
     <div class="indicator-container">
     % if input_type == 'checkbox' or not element_checked:
         <span class="status ${status.classname}" id="status_${id}"></span>

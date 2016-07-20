@@ -126,7 +126,6 @@ class ChoiceGroupTemplateTest(TemplateTestCase):
             'id': '1',
             'choices': choices,
             'status': Status('correct'),
-            'label': 'test',
             'input_type': 'checkbox',
             'name_array_suffix': '1',
             'value': '3',

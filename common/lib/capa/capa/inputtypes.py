@@ -380,7 +380,7 @@ class OptionInput(InputTypeBase):
 
     Example:
 
-    <optioninput options="('Up','Down')" label="Where is the sky?" correct="Up"/><text>The location of the sky</text>
+    <optioninput options="('Up','Down')" correct="Up"/><text>The location of the sky</text>
 
     # TODO: allow ordering to be randomized
     """
@@ -416,7 +416,6 @@ class OptionInput(InputTypeBase):
         Convert options to a convenient format.
         """
         return [Attribute('options', transform=cls.parse_options),
-                Attribute('label', ''),
                 Attribute('inline', False)]
 
 #-----------------------------------------------------------------------------
@@ -435,7 +434,7 @@ class ChoiceGroup(InputTypeBase):
 
     Example:
 
-    <choicegroup label="Which foil?">
+    <choicegroup>
       <choice correct="false" name="foil1">
         <text>This is foil One.</text>
       </choice>
@@ -478,7 +477,6 @@ class ChoiceGroup(InputTypeBase):
         #  `django.utils.translation.ugettext_noop` because Django cannot be imported in this file
         _ = lambda text: text
         return [Attribute("show_correctness", "always"),
-                Attribute('label', ''),
                 Attribute("submitted_message", _("Answer received."))]
 
     def _extra_context(self):
@@ -640,7 +638,7 @@ class TextLine(InputTypeBase):
     is used e.g. for embedding simulations turned into questions.
 
     Example:
-        <textline math="1" trailing_text="m/s" label="How fast is a cheetah?" />
+        <textline math="1" trailing_text="m/s"/>
 
     This example will render out a text line with a math preview and the text 'm/s'
     after the end of the text line.
@@ -656,7 +654,6 @@ class TextLine(InputTypeBase):
         """
         return [
             Attribute('size', None),
-            Attribute('label', ''),
 
             Attribute('hidden', False),
             Attribute('inline', False),
@@ -716,7 +713,6 @@ class FileSubmission(InputTypeBase):
         Convert the list of allowed files to a convenient format.
         """
         return [Attribute('allowed_files', '[]', transform=cls.parse_files),
-                Attribute('label', ''),
                 Attribute('required_files', '[]', transform=cls.parse_files), ]
 
     def setup(self):
@@ -1030,7 +1026,6 @@ class Schematic(InputTypeBase):
             Attribute('analyses', None),
             Attribute('initial_value', None),
             Attribute('submit_analyses', None),
-            Attribute('label', ''),
         ]
 
     def _extra_context(self):
@@ -1066,7 +1061,6 @@ class ImageInput(InputTypeBase):
         """
         return [Attribute('src'),
                 Attribute('height'),
-                Attribute('label', ''),
                 Attribute('width'), ]
 
     def setup(self):
@@ -1157,8 +1151,7 @@ class ChemicalEquationInput(InputTypeBase):
         """
         Can set size of text field.
         """
-        return [Attribute('size', '20'),
-                Attribute('label', ''), ]
+        return [Attribute('size', '20'), ]
 
     def _extra_context(self):
         """
@@ -1221,7 +1214,7 @@ class FormulaEquationInput(InputTypeBase):
 
     Example:
 
-    <formulaequationinput size="50" label="Enter the equation for motion" />
+    <formulaequationinput size="50"/>
 
     options: size -- width of the textbox.
              trailing_text -- text to show after the input textbox when
@@ -1239,7 +1232,6 @@ class FormulaEquationInput(InputTypeBase):
         return [
             Attribute('size', '20'),
             Attribute('inline', False),
-            Attribute('label', ''),
             Attribute('trailing_text', ''),
         ]
 
@@ -1629,7 +1621,7 @@ class ChoiceTextGroup(InputTypeBase):
         select the correct choice and fill in numbers to make it accurate.
       <endouttext/>
       <choicetextresponse>
-        <radiotextgroup label="What is the correct choice?">
+        <radiotextgroup>
           <choice correct="false">The lowest number rolled was:
             <decoy_input/> and the highest number rolled was:
             <decoy_input/> .</choice>
@@ -1652,7 +1644,7 @@ class ChoiceTextGroup(InputTypeBase):
         select the correct choices and fill in numbers to make them accurate.
       <endouttext/>
       <choicetextresponse>
-        <checkboxtextgroup label="What is the answer?">
+        <checkboxtextgroup>
              <choice correct="true">
                 The lowest number selected was <numtolerance_input answer="1.4142" tolerance="0.01"/>
              </choice>
@@ -1718,7 +1710,6 @@ class ChoiceTextGroup(InputTypeBase):
         return [
             Attribute("show_correctness", "always"),
             Attribute("submitted_message", _("Answer received.")),
-            Attribute("label", ""),
         ]
 
     def _extra_context(self):

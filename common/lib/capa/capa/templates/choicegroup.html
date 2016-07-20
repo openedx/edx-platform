@@ -5,7 +5,7 @@
     ))
 %>
 <form class="choicegroup capa_inputtype" id="inputtype_${id}">
-    <fieldset>
+    <fieldset aria-describedby="${response_data['description_ids']}">
       % if response_data and response_data['label']:
         <legend id="${id}-legend" class="response-fieldset-legend question-text">${response_data['label']}</legend>
       % else:
@@ -33,8 +33,9 @@
                         <% label_class += ' choicegroup_' + correctness %>
                     % endif
                 % endif
-                class="${label_class}" >
-
+                class="${label_class}"
+                aria-describedby="${response_data['description_ids']}"
+                >
                 <input type="${input_type}" name="input_${id}${name_array_suffix}" id="input_${id}_${choice_id}" class="field-input input-${input_type}" value="${choice_id}"
                 ## If the student selected this choice...
                 % if is_radio_input(choice_id):

@@ -855,18 +855,52 @@ class LoncapaProblem(object):
                 id=response_id_str
             )
 
-            # assign one answer_id for each input type or solution type
+            # assign one answer_id for each input type
             for entry in inputfields:
                 entry.attrib['response_id'] = str(response_id)
                 entry.attrib['answer_id'] = str(answer_id)
                 entry.attrib['id'] = "%s_%i_%i" % (self.problem_id, response_id, answer_id)
                 answer_id = answer_id + 1
 
-            # Find the label and save it for html transformation step
-            responsetype_label = response.find('label')
-            problem_data[self.problem_id + '_' + str(response_id)] = {
-                'label': responsetype_label.text if responsetype_label is not None else ''
-            }
+            question_id = self.problem_id + '_' + str(response_id)
+            label = ''
+
+            # Extract label value from <label> tag or label attribute from inside the responsetype
+            # Extract label value from <label> tag
+            responsetype_label_tag = response.find('label')
+            if responsetype_label_tag is not None:
+                label = responsetype_label_tag.text
+                # Delete <label> tag containing question text otherwise question will be rendered twice
+                response.remove(responsetype_label_tag)
+            elif 'label' in inputfields[0].attrib:
+                # Extract label value from label attribute
+                # This is the case when we have a problem with multiple questions having OLX only
+                label = inputfields[0].attrib['label']
+                # Delete <p> tag containing question text otherwise question will be rendered twice
+                p_tag = response.xpath("preceding-sibling::p[text()='{}']".format(label))
+                tree.remove(p_tag[0])
+            else:
+                # neither <label> tag nor label attribute is present inside responsetype
+                # existing problem with multi-questions without --- having markdown
+                # find the immediate <label> tag before the responsetype. also delete it avoid rendering twice
+                label_tag = response.xpath("preceding-sibling::label[1]")
+                if label_tag:
+                    label = label_tag[0].text
+                    tree.remove(label_tag[0])
+
+            problem_data[question_id] = {'label': label}
+
+            # Extract descriptions and set unique id on each description tag
+            descriptions = response.findall('description')
+            description_id = 1
+            description_ids = []
+            for description in descriptions:
+                description_tag_id = "%s_description_%i_%i" % (self.problem_id, response_id, description_id)
+                description.attrib['id'] = description_tag_id
+                description_ids.append(description_tag_id)
+                description_id += 1
+
+            problem_data[question_id]['description_ids'] = ' '.join(description_ids)
 
             # instantiate capa Response
             responsetype_cls = responsetypes.registry.get_class_for_tag(response.tag)
