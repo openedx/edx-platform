@@ -64,5 +64,6 @@ def parse_bokchoy_opts(options, passthrough_options=None):
         'test_dir': getattr(options, 'test_dir', 'tests'),
         'imports_dir': getattr(options, 'imports_dir', None),
         'save_screenshots': getattr(options, 'save_screenshots', False),
-        'passthrough_options': passthrough_options
+        'passthrough_options': passthrough_options,
+        'report_dir': getattr(options, 'report_dir', Env.BOK_CHOY_REPORT_DIR),
     }

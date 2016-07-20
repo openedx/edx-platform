@@ -71,10 +71,12 @@ def test_a11y(options, passthrough_options):
     It can also be left blank to run all tests in the suite that are tagged
     with `@attr("a11y")`.
     """
+    # Modify the options object directly, so that any subsequently called tasks
+    # that share with this task get the modified options
+    options['report_dir'] = Env.BOK_CHOY_A11Y_REPORT_DIR
+    options['coveragerc'] = Env.BOK_CHOY_A11Y_COVERAGERC
+    options['extra_args'] = options.get('extra_args', '') + ' -a "a11y" '
     opts = parse_bokchoy_opts(options, passthrough_options)
-    opts['report_dir'] = Env.BOK_CHOY_A11Y_REPORT_DIR
-    opts['coveragerc'] = Env.BOK_CHOY_A11Y_COVERAGERC
-    opts['extra_args'] = opts['extra_args'] + ' -a "a11y" '
     run_bokchoy(**opts)
 
 
@@ -86,8 +88,10 @@ def perf_report_bokchoy(options, passthrough_options):
     """
     Generates a har file for with page performance info.
     """
+    # Modify the options object directly, so that any subsequently called tasks
+    # that share with this task get the modified options
+    options['test_dir'] = 'performance'
     opts = parse_bokchoy_opts(options, passthrough_options)
-    opts['test_dir'] = 'performance'
 
     run_bokchoy(**opts)
 
@@ -114,11 +118,13 @@ def pa11ycrawler(options, passthrough_options):
     flag to get an environment running. The setup for this is the same as
     for bok-choy tests, only test course is imported as well.
     """
+    # Modify the options object directly, so that any subsequently called tasks
+    # that share with this task get the modified options
+    options['report_dir'] = Env.PA11YCRAWLER_REPORT_DIR
+    options['coveragerc'] = Env.PA11YCRAWLER_COVERAGERC
+    options['should_fetch_course'] = getattr(options, 'should_fetch_course', not options.get('fasttest'))
+    options['course_key'] = getattr(options, 'course-key', "course-v1:edX+Test101+course")
     opts = parse_bokchoy_opts(options, passthrough_options)
-    opts['report_dir'] = Env.PA11YCRAWLER_REPORT_DIR
-    opts['coveragerc'] = Env.PA11YCRAWLER_COVERAGERC
-    opts['should_fetch_course'] = getattr(options, 'should_fetch_course', not opts['fasttest'])
-    opts['course_key'] = getattr(options, 'course-key', "course-v1:edX+Test101+course")
     test_suite = Pa11yCrawler('a11y_crawler', **opts)
     test_suite.run()
 
