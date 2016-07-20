@@ -13,7 +13,7 @@ metadata:
 
         Use the following example problem as a model.
 
-        >>What is the arithmetic mean for the following set of numbers? (1, 5, 6, 3, 5)<<
+        >>What is the arithmetic mean for the following set of numbers? (1, 5, 6, 3, 5)||Use scientific notation to answer.<<
 
         = 4 {{The mean for this set of numbers is 20 / 5, which equals 4.}}
 
@@ -34,7 +34,8 @@ data:   |
                 <p>Be sure to select Settings to specify a Display Name and other values that apply.</p>
                 <p>Use the following example problem as a model.</p>
                 <label>What is the arithmetic mean for the following set of numbers? (1, 5, 6, 3, 5)</label>
-                <formulaequationinput label="What is the arithmetic mean for the following set of numbers? (1, 5, 6, 3, 5)"/>
+                <description>Use scientific notation to answer.</description>
+                <formulaequationinput/>
                 <correcthint>The mean for this set of numbers is 20 / 5, which equals 4.</correcthint>
                 <solution>
                     <div class="detailed-solution">

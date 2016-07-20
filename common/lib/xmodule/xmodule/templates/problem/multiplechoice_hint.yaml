@@ -11,7 +11,7 @@ metadata:
 
        Use the following example problem as a model.
 
-       >>Which of the following is a vegetable?<<
+       >>Which of the following is a vegetable?||You can select only one option.<<
        ( ) apple {{An apple is the fertilized ovary that comes from an apple tree and contains seeds, meaning it is a fruit.}}
        ( ) pumpkin {{A pumpkin is the fertilized ovary of a squash plant and contains seeds, meaning it is a fruit.}}
        (x) potato {{A potato is an edible part of a plant in tuber form and is a vegetable.}}
@@ -29,7 +29,8 @@ data:   |
                 <p>Be sure to select Settings to specify a Display Name and other values that apply.</p>
                 <p>Use the following example problem as a model.</p>
                 <label>Which of the following is a vegetable?</label>
-                <choicegroup label="Which of the following is a vegetable?" type="MultipleChoice">
+                <description>You can select only one option.</description>
+                <choicegroup>
                     <choice correct="false">apple
                         <choicehint>An apple is the fertilized ovary that comes from an apple tree and contains seeds, meaning it is a fruit.</choicehint>
                     </choice>
