@@ -436,6 +436,7 @@ def account_settings_context(request):
     context = {
         'auth': {},
         'duplicate_provider': None,
+        'nav_hidden': True,
         'fields': {
             'country': {
                 'options': list(countries),
