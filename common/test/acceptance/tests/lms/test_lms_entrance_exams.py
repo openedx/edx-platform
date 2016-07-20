@@ -99,7 +99,7 @@ class EntranceExamPassTest(EntranceExamTest):
         self.assertTrue(self.courseware_page.has_entrance_exam_message())
         self.assertFalse(self.courseware_page.has_passed_message())
         problem_page.click_choice('choice_1')
-        problem_page.click_check()
+        problem_page.click_submit()
         self.courseware_page.wait_for_page()
         self.assertTrue(self.courseware_page.has_passed_message())
         self.assertEqual(self.courseware_page.chapter_count_in_navigation, 2)

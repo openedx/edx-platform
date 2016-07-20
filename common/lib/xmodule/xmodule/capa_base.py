@@ -341,7 +341,7 @@ class CapaMixin(CapaFields):
 
     def set_last_submission_time(self):
         """
-        Set the module's last submission time (when the problem was checked)
+        Set the module's last submission time (when the problem was submitted)
         """
         self.last_submission_time = datetime.datetime.now(UTC())
 
@@ -397,23 +397,20 @@ class CapaMixin(CapaFields):
             'graded': self.graded,
         })
 
-    def check_button_name(self):
+    def submit_button_name(self):
         """
-        Determine the name for the "check" button.
-
-        Usually it is just "Check", but if this is the student's
-        final attempt, change the name to "Final Check".
+        Determine the name for the "submit" button.
         """
         # The logic flow is a little odd so that _('xxx') strings can be found for
         # translation while also running _() just once for each string.
         _ = self.runtime.service(self, "i18n").ugettext
-        check = _('Submit')
+        submit = _('Submit')
 
-        return check
+        return submit
 
-    def check_button_checking_name(self):
+    def submit_button_submitting_name(self):
         """
-        Return the "submitting..." text for the "submit" button.
+        Return the "Submitting" text for the "submit" button.
 
         After the user presses the "submit" button, the button will briefly
         display the value returned by this function until a response is
@@ -422,15 +419,15 @@ class CapaMixin(CapaFields):
         _ = self.runtime.service(self, "i18n").ugettext
         return _('Submitting')
 
-    def should_show_check_button(self):
+    def should_enable_submit_button(self):
         """
-        Return True/False to indicate whether to show the "Submit" button.
+        Return True/False to indicate whether to enable the "Submit" button.
         """
         submitted_without_reset = (self.is_submitted() and self.rerandomize == RANDOMIZATION.ALWAYS)
 
         # If the problem is closed (past due / too many attempts)
-        # then we do NOT show the "submit" button
-        # Also, do not show the "submit" button if we're waiting
+        # then we disable the "submit" button
+        # Also, disable the "submit" button if we're waiting
         # for the user to reset a randomized problem
         if self.closed() or submitted_without_reset:
             return False
@@ -570,7 +567,7 @@ class CapaMixin(CapaFields):
         """
         Return html for the problem.
 
-        Adds check, reset, save, and hint buttons as necessary based on the problem config
+        Adds submit, reset, save, and hint buttons as necessary based on the problem config
         and state.
         encapsulate: if True (the default) embed the html in a problem <div>
         hint_index: (None is the default) if not None, this is the index of the next demand
@@ -608,7 +605,7 @@ class CapaMixin(CapaFields):
         """
         Return html for the problem.
 
-        Adds check, reset, save, and hint buttons as necessary based on the problem config
+        Adds submit, reset, save, and hint buttons as necessary based on the problem config
         and state.
         encapsulate: if True (the default) embed the html in a problem <div>
         """
@@ -622,16 +619,10 @@ class CapaMixin(CapaFields):
 
         html = self.remove_tags_from_html(html)
 
-        # The convention is to pass the name of the check button if we want
-        # to show a check button, and False otherwise This works because
-        # non-empty strings evaluate to True.  We use the same convention
-        # for the "checking" state text.
-        if self.should_show_check_button():
-            check_button = self.check_button_name()
-            check_button_checking = self.check_button_checking_name()
-        else:
-            check_button = False
-            check_button_checking = False
+        # Enable/Disable Submit button if should_enable_submit_button returns True/False.
+        submit_button = self.submit_button_name()
+        submit_button_submitting = self.submit_button_submitting_name()
+        should_enable_submit_button = self.should_enable_submit_button()
 
         content = {
             'name': self.display_name_with_default,
@@ -643,17 +634,71 @@ class CapaMixin(CapaFields):
         demand_hints = self.lcp.tree.xpath("//problem/demandhint/hint")
         demand_hint_possible = len(demand_hints) > 0
 
+        # Get the current problem status and generate the answer notification and message.
+        answer_notification_message = None
+        answer_notification_type = None
+
+        progress = self.get_progress()
+        id_list = self.lcp.correct_map.keys()
+        if len(id_list) == 1:
+            # Only one answer available
+            answer_notification_type = self.lcp.correct_map.get_correctness(id_list[0])
+        elif len(id_list) > 1:
+            # Check the multiple answers that are available
+            answer_notification_type = self.lcp.correct_map.get_correctness(id_list[0])
+            for answer_id in id_list[1:]:
+                if self.lcp.correct_map.get_correctness(answer_id) != answer_notification_type:
+                    # There is at least 1 of the following combinations of correctness states
+                    # Correct and incorrect, Correct and partially correct, or Incorrect and partially correct
+                    # which all should have a message type of Partially Correct
+                    answer_notification_type = 'partially-correct'
+                    break
+
+        # Build the notification message based on the notification type and translate it.
+        ungettext = self.runtime.service(self, "i18n").ungettext
+        if answer_notification_type == 'incorrect':
+            if progress is not None:
+                answer_notification_message = ungettext(
+                    "Incorrect ({progress} point)",
+                    "Incorrect ({progress} points)",
+                    progress.frac()[1]
+                ).format(progress=str(progress))
+            else:
+                answer_notification_message = _('Incorrect')
+        elif answer_notification_type == 'correct':
+            if progress is not None:
+                answer_notification_message = ungettext(
+                    "Correct ({progress} point)",
+                    "Correct ({progress} points)",
+                    progress.frac()[1]
+                ).format(progress=str(progress))
+            else:
+                answer_notification_message = _('Correct')
+        elif answer_notification_type == 'partially-correct':
+            if progress is not None:
+                answer_notification_message = ungettext(
+                    "Partially correct ({progress} point)",
+                    "Partially correct ({progress} points)",
+                    progress.frac()[1]
+                ).format(progress=str(progress))
+            else:
+                answer_notification_message = _('Partially Correct')
+
         context = {
             'problem': content,
             'id': self.location.to_deprecated_string(),
-            'check_button': check_button,
-            'check_button_checking': check_button_checking,
+            'short_id': self.location.html_id(),
+            'submit_button': submit_button,
+            'submit_button_submitting': submit_button_submitting,
+            'should_enable_submit_button': should_enable_submit_button,
             'reset_button': self.should_show_reset_button(),
             'save_button': self.should_show_save_button(),
             'answer_available': self.answer_available(),
             'attempts_used': self.attempts,
             'attempts_allowed': self.max_attempts,
-            'demand_hint_possible': demand_hint_possible
+            'demand_hint_possible': demand_hint_possible,
+            'answer_notification_type': answer_notification_type,
+            'answer_notification_message': answer_notification_message,
         }
 
         html = self.runtime.render_template('problem.html', context)
@@ -971,7 +1016,7 @@ class CapaMixin(CapaFields):
         return {'grade': score['score'], 'max_grade': score['total']}
 
     # pylint: disable=too-many-statements
-    def check_problem(self, data, override_time=False):
+    def submit_problem(self, data, override_time=False):
         """
         Checks whether answers to a problem are correct
 
@@ -1009,7 +1054,7 @@ class CapaMixin(CapaFields):
             self.track_function_unmask('problem_check_fail', event_info)
             if dog_stats_api:
                 dog_stats_api.increment(metric_name('checks'), tags=[u'result:failed', u'failure:unreset'])
-            raise NotFoundError(_("Problem must be reset before it can be checked again."))
+            raise NotFoundError(_("Problem must be reset before it can be submitted again."))
 
         # Problem queued. Students must wait a specified waittime before they are allowed to submit
         # IDEA: consider stealing code from below: pretty-print of seconds, cueing of time remaining
@@ -1399,7 +1444,7 @@ class CapaMixin(CapaFields):
         if not self.max_attempts == 0:
             msg = _(
                 "Your answers have been saved but not graded. Click '{button_name}' to grade them."
-            ).format(button_name=self.check_button_name())
+            ).format(button_name=self.submit_button_name())
         return {
             'success': True,
             'msg': msg,
