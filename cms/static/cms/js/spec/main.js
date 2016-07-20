@@ -197,7 +197,7 @@
             'mock-ajax': {
                 deps: ['jquery']
             },
-            'coffee/src/main': {
+            'cms/js/main': {
                 deps: ['coffee/src/ajax_prefix']
             },
             'coffee/src/ajax_prefix': {
@@ -209,8 +209,8 @@
     jasmine.getFixtures().fixturesPath += 'coffee/fixtures';
 
     testFiles = [
+        'cms/js/spec/main_spec',
         'cms/js/spec/xblock/cms.runtime.v1_spec',
-        'coffee/spec/main_spec',
         'coffee/spec/models/course_spec',
         'coffee/spec/models/metadata_spec',
         'coffee/spec/models/section_spec',
