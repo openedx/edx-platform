@@ -41,12 +41,13 @@ define(["jquery", "underscore", "edx-ui-toolkit/js/utils/spec-helpers/ajax-helpe
 
         mockComponentTemplates = new ComponentTemplates([
             {
-                templates: [
+                "templates": [
                     {
-                        category: 'discussion',
-                        display_name: 'Discussion'
+                        "category": "discussion",
+                        "display_name": "Discussion"
                     }],
-                type: 'discussion'
+                "type": "discussion",
+                "support_legend": {"show_legend": false}
             }, {
                 "templates": [
                     {
@@ -62,7 +63,8 @@ define(["jquery", "underscore", "edx-ui-toolkit/js/utils/spec-helpers/ajax-helpe
                         "boilerplate_name": "raw.yaml",
                         "display_name": "Raw HTML"
                     }],
-                "type": "html"
+                "type": "html",
+                "support_legend": {"show_legend": false}
             }],
             {
                 parse: true
@@ -76,6 +78,8 @@ define(["jquery", "underscore", "edx-ui-toolkit/js/utils/spec-helpers/ajax-helpe
             TemplateHelpers.installTemplate('add-xblock-component-button');
             TemplateHelpers.installTemplate('add-xblock-component-menu');
             TemplateHelpers.installTemplate('add-xblock-component-menu-problem');
+            TemplateHelpers.installTemplate('add-xblock-component-support-legend');
+            TemplateHelpers.installTemplate('add-xblock-component-support-level');
 
             // Add templates needed by the edit XBlock modal
             TemplateHelpers.installTemplate('edit-xblock-modal');

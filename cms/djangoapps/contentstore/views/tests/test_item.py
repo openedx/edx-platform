@@ -24,7 +24,7 @@ from contentstore.views.item import (
 )
 from contentstore.tests.utils import CourseTestCase
 from student.tests.factories import UserFactory
-from xblock_django.models import XBlockDisableConfig
+from xblock_django.models import XBlockConfiguration, XBlockStudioConfiguration, XBlockStudioConfigurationFlag
 from xmodule.capa_module import CapaDescriptor
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
@@ -1458,12 +1458,19 @@ class TestComponentTemplates(CourseTestCase):
 
     def setUp(self):
         super(TestComponentTemplates, self).setUp()
-        self.templates = get_component_templates(self.course)
+        # Advanced Module support levels.
+        XBlockStudioConfiguration.objects.create(name='poll', enabled=True, support_level="fs")
+        XBlockStudioConfiguration.objects.create(name='survey', enabled=True, support_level="ps")
+        XBlockStudioConfiguration.objects.create(name='annotatable', enabled=True, support_level="us")
+        # Basic component support levels.
+        XBlockStudioConfiguration.objects.create(name='html', enabled=True, support_level="fs")
+        XBlockStudioConfiguration.objects.create(name='discussion', enabled=True, support_level="ps")
+        XBlockStudioConfiguration.objects.create(name='problem', enabled=True, support_level="us")
+        XBlockStudioConfiguration.objects.create(name='video', enabled=True, support_level="us")
+        # XBlock masquerading as a problem
+        XBlockStudioConfiguration.objects.create(name='openassessment', enabled=True, support_level="us")
 
-        # Initialize the deprecated modules settings with empty list
-        XBlockDisableConfig.objects.create(
-            disabled_create_blocks='', enabled=True
-        )
+        self.templates = get_component_templates(self.course)
 
     def get_templates_of_type(self, template_type):
         """
@@ -1482,11 +1489,39 @@ class TestComponentTemplates(CourseTestCase):
         """
         Test the handling of the basic component templates.
         """
-        self.assertIsNotNone(self.get_templates_of_type('discussion'))
-        self.assertIsNotNone(self.get_templates_of_type('html'))
-        self.assertIsNotNone(self.get_templates_of_type('problem'))
-        self.assertIsNotNone(self.get_templates_of_type('video'))
+        self._verify_basic_component("discussion", "Discussion")
+        self._verify_basic_component("video", "Video")
+        self.assertGreater(self.get_templates_of_type('html'), 0)
+        self.assertGreater(self.get_templates_of_type('problem'), 0)
         self.assertIsNone(self.get_templates_of_type('advanced'))
+
+        # Now fully disable video through XBlockConfiguration
+        XBlockConfiguration.objects.create(name='video', enabled=False)
+        self.templates = get_component_templates(self.course)
+        self.assertIsNone(self.get_templates_of_type('video'))
+
+    def test_basic_components_support_levels(self):
+        """
+        Test that support levels can be set on basic component templates.
+        """
+        XBlockStudioConfigurationFlag.objects.create(enabled=True)
+        self.templates = get_component_templates(self.course)
+        self._verify_basic_component("discussion", "Discussion", "ps")
+        self.assertEqual([], self.get_templates_of_type("video"))
+        self.assertEqual([], self.get_templates_of_type("problem"))
+
+        self.course.allow_unsupported_xblocks = True
+        self.templates = get_component_templates(self.course)
+        self._verify_basic_component("video", "Video", "us")
+        problem_templates = self.get_templates_of_type('problem')
+        problem_no_boilerplate = self.get_template(problem_templates, u'Blank Advanced Problem')
+        self.assertIsNotNone(problem_no_boilerplate)
+        self.assertEqual('us', problem_no_boilerplate['support_level'])
+
+        # Now fully disable video through XBlockConfiguration
+        XBlockConfiguration.objects.create(name='video', enabled=False)
+        self.templates = get_component_templates(self.course)
+        self.assertIsNone(self.get_templates_of_type('video'))
 
     def test_advanced_components(self):
         """
@@ -1511,6 +1546,11 @@ class TestComponentTemplates(CourseTestCase):
         self.assertNotEqual(only_template.get('category'), 'video')
         self.assertNotEqual(only_template.get('category'), 'openassessment')
 
+        # Now fully disable word_cloud through XBlockConfiguration
+        XBlockConfiguration.objects.create(name='word_cloud', enabled=False)
+        self.templates = get_component_templates(self.course)
+        self.assertIsNone(self.get_templates_of_type('advanced'))
+
     def test_advanced_problems(self):
         """
         Test the handling of advanced problem templates.
@@ -1521,44 +1561,101 @@ class TestComponentTemplates(CourseTestCase):
         self.assertEqual(circuit_template.get('category'), 'problem')
         self.assertEqual(circuit_template.get('boilerplate_name'), 'circuitschematic.yaml')
 
-    @patch('django.conf.settings.DEPRECATED_ADVANCED_COMPONENT_TYPES', [])
     def test_deprecated_no_advance_component_button(self):
         """
-        Test that there will be no `Advanced` button on unit page if units are
-        deprecated provided that they are the only modules in `Advanced Module List`
+        Test that there will be no `Advanced` button on unit page if xblocks have disabled
+        Studio support given that they are the only modules in `Advanced Module List`
         """
-        XBlockDisableConfig.objects.create(disabled_create_blocks='poll survey', enabled=True)
+        # Update poll and survey to have "enabled=False".
+        XBlockStudioConfiguration.objects.create(name='poll', enabled=False, support_level="fs")
+        XBlockStudioConfiguration.objects.create(name='survey', enabled=False, support_level="fs")
+        XBlockStudioConfigurationFlag.objects.create(enabled=True)
         self.course.advanced_modules.extend(['poll', 'survey'])
         templates = get_component_templates(self.course)
         button_names = [template['display_name'] for template in templates]
         self.assertNotIn('Advanced', button_names)
 
-    @patch('django.conf.settings.DEPRECATED_ADVANCED_COMPONENT_TYPES', [])
     def test_cannot_create_deprecated_problems(self):
         """
-        Test that we can't create problems if they are deprecated
+        Test that xblocks that have Studio support disabled do not show on the "new component" menu.
         """
-        XBlockDisableConfig.objects.create(disabled_create_blocks='poll survey', enabled=True)
+        # Update poll to have "enabled=False".
+        XBlockStudioConfiguration.objects.create(name='poll', enabled=False, support_level="fs")
+        XBlockStudioConfigurationFlag.objects.create(enabled=True)
         self.course.advanced_modules.extend(['annotatable', 'poll', 'survey'])
-        templates = get_component_templates(self.course)
-        button_names = [template['display_name'] for template in templates]
-        self.assertIn('Advanced', button_names)
-        self.assertEqual(len(templates[0]['templates']), 1)
-        template_display_names = [template['display_name'] for template in templates[0]['templates']]
-        self.assertEqual(template_display_names, ['Annotation'])
+        # Annotatable doesn't show up because it is unsupported (in test setUp).
+        self._verify_advanced_xblocks(['Survey'], ['ps'])
 
-    @patch('django.conf.settings.DEPRECATED_ADVANCED_COMPONENT_TYPES', ['poll'])
-    def test_create_non_deprecated_problems(self):
+        # Now enable unsupported components.
+        self.course.allow_unsupported_xblocks = True
+        self._verify_advanced_xblocks(['Annotation', 'Survey'], ['us', 'ps'])
+
+        # Now disable Annotatable completely through XBlockConfiguration
+        XBlockConfiguration.objects.create(name='annotatable', enabled=False)
+        self._verify_advanced_xblocks(['Survey'], ['ps'])
+
+    def test_create_support_level_flag_off(self):
         """
-        Test that we can create problems if they are not deprecated
+        Test that we can create any advanced xblock (that isn't completely disabled through
+        XBlockConfiguration) if XBlockStudioConfigurationFlag is False.
         """
-        self.course.advanced_modules.extend(['annotatable', 'poll', 'survey'])
+        XBlockStudioConfigurationFlag.objects.create(enabled=False)
+        self.course.advanced_modules.extend(['annotatable', 'survey'])
+        self._verify_advanced_xblocks(['Annotation', 'Survey'], [True, True])
+
+    def test_xblock_masquerading_as_problem(self):
+        """
+        Test the integration of xblocks masquerading as problems.
+        """
+        def get_openassessment():
+            """ Helper method to return the openassessment template from problem list """
+            self.templates = get_component_templates(self.course)
+            problem_templates = self.get_templates_of_type('problem')
+            return self.get_template(problem_templates, u'Peer Assessment')
+
+        def verify_openassessment_present(support_level):
+            """ Helper method to verify that openassessment template is present """
+            openassessment = get_openassessment()
+            self.assertIsNotNone(openassessment)
+            self.assertEqual(openassessment.get('category'), 'openassessment')
+            self.assertEqual(openassessment.get('support_level'), support_level)
+
+        verify_openassessment_present(True)
+
+        # Now enable XBlockStudioConfigurationFlag. The openassessment block is marked
+        # unsupported, so will no longer show up.
+        XBlockStudioConfigurationFlag.objects.create(enabled=True)
+        self.assertIsNone(get_openassessment())
+
+        # Now allow unsupported components.
+        self.course.allow_unsupported_xblocks = True
+        verify_openassessment_present('us')
+
+        # Now disable openassessment completely through XBlockConfiguration
+        XBlockConfiguration.objects.create(name='openassessment', enabled=False)
+        self.assertIsNone(get_openassessment())
+
+    def _verify_advanced_xblocks(self, expected_xblocks, expected_support_levels):
+        """
+        Verify the names of the advanced xblocks showing in the "new component" menu.
+        """
         templates = get_component_templates(self.course)
         button_names = [template['display_name'] for template in templates]
         self.assertIn('Advanced', button_names)
-        self.assertEqual(len(templates[0]['templates']), 2)
+        self.assertEqual(len(templates[0]['templates']), len(expected_xblocks))
         template_display_names = [template['display_name'] for template in templates[0]['templates']]
-        self.assertEqual(template_display_names, ['Annotation', 'Survey'])
+        self.assertEqual(template_display_names, expected_xblocks)
+        template_support_levels = [template['support_level'] for template in templates[0]['templates']]
+        self.assertEqual(template_support_levels, expected_support_levels)
+
+    def _verify_basic_component(self, component_type, display_name, support_level=True):
+        """
+        Verify the display name and support level of basic components (that have no boilerplates).
+        """
+        templates = self.get_templates_of_type(component_type)
+        self.assertEqual(1, len(templates))
+        self.assertEqual(display_name, templates[0]['display_name'])
+        self.assertEqual(support_level, templates[0]['support_level'])
 
 
 @ddt.ddt

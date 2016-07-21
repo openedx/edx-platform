@@ -49,7 +49,8 @@ define(["js/models/component_template"],
                         "boilerplate_name": "alternate_word_cloud.yaml",
                         "display_name": "Word Cloud"
                     }],
-                "type": "problem"
+                "type": "problem",
+                "support_legend": {"show_legend": false}
             };
 
             it('orders templates correctly', function () {

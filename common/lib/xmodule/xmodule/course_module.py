@@ -408,7 +408,7 @@ class CourseFields(object):
     )
     advanced_modules = List(
         display_name=_("Advanced Module List"),
-        help=_("Enter the names of the advanced components to use in your course."),
+        help=_("Enter the names of the advanced modules to use in your course."),
         scope=Scope.settings
     )
     has_children = True
@@ -829,6 +829,15 @@ class CourseFields(object):
             "instructors": []
         },
         scope=Scope.settings
+    )
+    allow_unsupported_xblocks = Boolean(
+        display_name=_("Add Unsupported Problems and Tools"),
+        help=_(
+            "Enter true or false. If true, you can add unsupported problems and tools to your course in Studio. "
+            "Unsupported problems and tools are not recommended for use in courses due to non-compliance with one or "
+            "more of the base requirements, such as testing, accessibility, internationalization, and documentation."
+        ),
+        scope=Scope.settings, default=False
     )
 
 

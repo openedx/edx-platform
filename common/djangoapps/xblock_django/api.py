@@ -22,11 +22,11 @@ def disabled_xblocks():
 
 def authorable_xblocks(allow_unsupported=False, name=None):
     """
-    If Studio XBlock support state is enabled (via `XBlockStudioConfigurationFlag`), this method returns
-    the QuerySet of XBlocks that can be created in Studio (by default, only fully supported and provisionally
-    supported). If `XBlockStudioConfigurationFlag` is not enabled, this method returns None.
-    Note that this method does not take into account fully disabled xblocks (as returned
-    by `disabled_xblocks`) or deprecated xblocks (as returned by `deprecated_xblocks`).
+    This method returns the QuerySet of XBlocks that can be created in Studio (by default, only fully supported
+    and provisionally supported XBlocks), as stored in `XBlockStudioConfiguration`.
+    Note that this method does NOT check the value `XBlockStudioConfigurationFlag`, nor does it take into account
+    fully disabled xblocks (as returned by `disabled_xblocks`) or deprecated xblocks
+    (as returned by `deprecated_xblocks`).
 
     Arguments:
         allow_unsupported (bool): If `True`, enabled but unsupported XBlocks will also be returned.
@@ -36,13 +36,10 @@ def authorable_xblocks(allow_unsupported=False, name=None):
         name (str): If provided, filters the returned XBlocks to those with the provided name. This is
             useful for XBlocks with lots of template types.
     Returns:
-        QuerySet: If `XBlockStudioConfigurationFlag` is enabled, returns authorable XBlocks,
-        taking into account `support_level`, `enabled` and `name` (if specified).
-        If `XBlockStudioConfigurationFlag` is disabled, returns None.
+        QuerySet: Returns authorable XBlocks, taking into account `support_level`, `enabled` and `name`
+        (if specified) as specified by `XBlockStudioConfiguration`. Does not take into account whether or not
+        `XBlockStudioConfigurationFlag` is enabled.
     """
-    if not XBlockStudioConfigurationFlag.is_enabled():
-        return None
-
     blocks = XBlockStudioConfiguration.objects.current_set().filter(enabled=True)
     if not allow_unsupported:
         blocks = blocks.exclude(support_level=XBlockStudioConfiguration.UNSUPPORTED)
