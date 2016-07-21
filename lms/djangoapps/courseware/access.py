@@ -20,7 +20,6 @@ from django.utils.timezone import UTC
 
 from opaque_keys.edx.keys import CourseKey, UsageKey
 
-from util import milestones_helpers as milestones_helpers
 from xblock.core import XBlock
 
 from xmodule.course_module import (
@@ -49,6 +48,7 @@ from student.roles import (
     OrgStaffRole,
 )
 from util.milestones_helpers import (
+    get_course_content_milestones,
     get_pre_requisite_courses_not_completed,
     any_unfulfilled_milestones,
     is_prerequisite_courses_enabled,
@@ -810,7 +810,7 @@ def _can_access_descriptor_with_milestones(user, descriptor, course_key):
         descriptor: the object being accessed
         course_key: key for the course for this descriptor
     """
-    if milestones_helpers.get_course_content_milestones(course_key, descriptor.location, 'requires', user.id):
+    if get_course_content_milestones(course_key, descriptor.location, 'requires', user.id):
         debug("Deny: user has not completed all milestones for content")
         return ACCESS_DENIED
     else:
