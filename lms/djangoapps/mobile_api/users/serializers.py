@@ -64,7 +64,7 @@ class CourseOverviewField(serializers.RelatedField):
                 'course-handouts-list',
                 kwargs={'course_id': course_id},
                 request=request,
-            ),
+            ) if course_overview.is_course_home_sidebar_enabled() else None,
             'discussion_url': reverse(
                 'discussion_course',
                 kwargs={'course_id': course_id},

@@ -507,6 +507,13 @@ class CourseOverview(TimeStampedModel):
             for course_overview in CourseOverview.objects.values('id')
         ]
 
+    def is_course_home_sidebar_enabled(self):
+        """
+        Returns True if course home sidebar (handouts) is enabled
+        """
+        course = modulestore().get_course(self.id)
+        return course.course_home_sidebar_enabled
+
     def is_discussion_tab_enabled(self):
         """
         Returns True if course has discussion tab and is enabled
