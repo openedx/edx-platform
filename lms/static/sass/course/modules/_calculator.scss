@@ -98,6 +98,7 @@
       }
 
       #calculator_output {
+        direction: ltr;  // Almost all of the real-world calculators are LTR
         background: $white;
         border: 1px solid $white;
         box-shadow: none;
@@ -130,6 +131,7 @@
         }
 
         #calculator_input {
+          direction: ltr;  // Almost all of the real-world calculators are LTR
           border: none;
           box-shadow: none;
           @include box-sizing(border-box);
