@@ -121,6 +121,9 @@ class CrossStoreXMLRoundtrip(CourseComparisonTest, PartitionTestCase):
                         self.exclude_field(None, 'wiki_slug')
                         self.exclude_field(None, 'xml_attributes')
                         self.exclude_field(None, 'parent')
+                        # discussion_ids are auto-generated based on usage_id, so they should change across
+                        # modulestores - see TNL-5001
+                        self.exclude_field(None, 'discussion_id')
                         self.ignore_asset_key('_id')
                         self.ignore_asset_key('uploadDate')
                         self.ignore_asset_key('content_son')
