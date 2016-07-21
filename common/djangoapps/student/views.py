@@ -1,6 +1,7 @@
 """
 Student Views
 """
+import re
 import datetime
 import logging
 import uuid
@@ -1525,6 +1526,21 @@ def create_account_with_params(request, params):
     # Copy params so we can modify it; we can't just do dict(params) because if
     # params is request.POST, that results in a dict containing lists of values
     params = dict(params.items())
+
+    username = params["username"]
+    email = params["email"]
+
+    # if a username is missing, auto-generate one from the email address
+    # and populate the field
+    if not username:
+        try:
+            params["username"] = re.sub(r'[^a-zA-Z0-9]', '', email.split('@')[0])
+        except AttributeError:
+            raise ValidationError({
+                    'username': [
+                        _("We could not create an account without a valid username")
+                    ]
+            })            
 
     # allow for microsites to define their own set of required/optional/hidden fields
     extra_fields = microsite.get_value(

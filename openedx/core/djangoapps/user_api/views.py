@@ -1,4 +1,5 @@
 """HTTP end-points for the User API. """
+import re
 import copy
 
 from opaque_keys import InvalidKeyError
@@ -299,6 +300,17 @@ class RegistrationView(APIView):
 
         email = data.get('email')
         username = data.get('username')
+
+        # if a username is missing, auto-generate one from the email address
+        # and populate the field
+        if not username:
+            try:
+                username = re.sub(r'[^a-zA-Z0-9]', '', email.split('@')[0])
+            except AttributeError:
+                errors = {
+                    "username": [{"user_message": "Please specify a username of at least two characters length."}] 
+                }
+                return JsonResponse(errors, status=400)        
 
         # Handle duplicate email/username
         conflicts = check_account_exists(email=email, username=username)
