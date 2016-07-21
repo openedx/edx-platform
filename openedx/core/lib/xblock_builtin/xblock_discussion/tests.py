@@ -69,7 +69,7 @@ class DiscussionXBlockImportExportTests(TestCase):
         patched_load_definition_xml.side_effect = Exception("Irrelevant")
 
         block = DiscussionXBlock.parse_xml(node, self.runtime_mock, self.keys, self.id_gen_mock)
-        self.assertEqual(block.discussion_id, discussion_id)
+        self.assertEqual(block.discussion_id, block.fields['discussion_id']._calculate_unique_id(block))
         self.assertEqual(block.discussion_category, category)
         self.assertEqual(block.discussion_target, target)
 
@@ -95,6 +95,7 @@ class DiscussionXBlockImportExportTests(TestCase):
         patched_load_definition_xml.return_value = (definition_node, "irrelevant")
 
         block = DiscussionXBlock.parse_xml(node, self.runtime_mock, self.keys, self.id_gen_mock)
+        self.assertEqual(block.discussion_id, block.fields['discussion_id']._calculate_unique_id(block))
         self.assertEqual(block.discussion_category, category)
         self.assertEqual(block.discussion_target, target)
 

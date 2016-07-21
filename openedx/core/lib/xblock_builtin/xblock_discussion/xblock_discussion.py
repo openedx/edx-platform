@@ -139,8 +139,11 @@ class DiscussionXBlock(XBlock, StudioEditableXBlockMixin, XmlParserMixin):
     @classmethod
     def parse_xml(cls, node, runtime, keys, id_generator):
         block = super(DiscussionXBlock, cls).parse_xml(node, runtime, keys, id_generator)
-        definition_xml = None
 
+        if 'discussion_id' in node.attrib:
+            block.fields['discussion_id'].delete_from(block)
+
+        definition_xml = None
         try:
             definition_xml, _ = cls.load_definition_xml(node, runtime, block.scope_ids.def_id)
         except Exception as err:  # pylint: disable=broad-except
