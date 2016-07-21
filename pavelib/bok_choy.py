@@ -4,7 +4,7 @@ http://bok-choy.readthedocs.org/en/latest/
 """
 from paver.easy import task, needs, cmdopts, sh
 from pavelib.utils.test.suites.bokchoy_suite import BokChoyTestSuite, Pa11yCrawler
-from pavelib.utils.test.bokchoy_options import BOKCHOY_OPTS, parse_bokchoy_opts
+from pavelib.utils.test.bokchoy_options import BOKCHOY_OPTS
 from pavelib.utils.envs import Env
 from pavelib.utils.test.utils import check_firefox_version
 from pavelib.utils.passthrough_opts import PassthroughTask
@@ -47,8 +47,7 @@ def test_bokchoy(options, passthrough_options):
     if validate_firefox:
         check_firefox_version()
 
-    opts = parse_bokchoy_opts(options, passthrough_options)
-    run_bokchoy(**opts)
+    run_bokchoy(passthrough_options=passthrough_options, **options)
 
 
 @needs('pavelib.prereqs.install_prereqs')
@@ -73,11 +72,10 @@ def test_a11y(options, passthrough_options):
     """
     # Modify the options object directly, so that any subsequently called tasks
     # that share with this task get the modified options
-    options['report_dir'] = Env.BOK_CHOY_A11Y_REPORT_DIR
-    options['coveragerc'] = Env.BOK_CHOY_A11Y_COVERAGERC
-    options['extra_args'] = options.get('extra_args', '') + ' -a "a11y" '
-    opts = parse_bokchoy_opts(options, passthrough_options)
-    run_bokchoy(**opts)
+    options['test_a11y']['report_dir'] = Env.BOK_CHOY_A11Y_REPORT_DIR
+    options['test_a11y']['coveragerc'] = Env.BOK_CHOY_A11Y_COVERAGERC
+    options['test_a11y']['extra_args'] = options.get('extra_args', '') + ' -a "a11y" '
+    run_bokchoy(passthrough_options=passthrough_options, **options['test_a11y'])
 
 
 @needs('pavelib.prereqs.install_prereqs')
@@ -90,10 +88,9 @@ def perf_report_bokchoy(options, passthrough_options):
     """
     # Modify the options object directly, so that any subsequently called tasks
     # that share with this task get the modified options
-    options['test_dir'] = 'performance'
-    opts = parse_bokchoy_opts(options, passthrough_options)
+    options['perf_report_bokchoy']['test_dir'] = 'performance'
 
-    run_bokchoy(**opts)
+    run_bokchoy(passthrough_options=passthrough_options, **options['perf_report_bokchoy'])
 
 
 @needs('pavelib.prereqs.install_prereqs')
@@ -120,12 +117,15 @@ def pa11ycrawler(options, passthrough_options):
     """
     # Modify the options object directly, so that any subsequently called tasks
     # that share with this task get the modified options
-    options['report_dir'] = Env.PA11YCRAWLER_REPORT_DIR
-    options['coveragerc'] = Env.PA11YCRAWLER_COVERAGERC
-    options['should_fetch_course'] = getattr(options, 'should_fetch_course', not options.get('fasttest'))
-    options['course_key'] = getattr(options, 'course-key', "course-v1:edX+Test101+course")
-    opts = parse_bokchoy_opts(options, passthrough_options)
-    test_suite = Pa11yCrawler('a11y_crawler', **opts)
+    options['pa11ycrawler']['report_dir'] = Env.PA11YCRAWLER_REPORT_DIR
+    options['pa11ycrawler']['coveragerc'] = Env.PA11YCRAWLER_COVERAGERC
+    options['pa11ycrawler']['should_fetch_course'] = getattr(
+        options,
+        'should_fetch_course',
+        not options.get('fasttest')
+    )
+    options['pa11ycrawler']['course_key'] = getattr(options, 'course-key', "course-v1:edX+Test101+course")
+    test_suite = Pa11yCrawler('a11y_crawler', passthrough_options=passthrough_options, **options['pa11ycrawler'])
     test_suite.run()
 
     if getattr(options, 'with_html', False):
