@@ -17,6 +17,7 @@ from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import BlockUsageLocator
 from openedx.core.djangoapps.content.block_structure.api import get_course_in_cache
 from openedx.core.lib.cache_utils import memoized
+from openedx.core.lib.gating import api as gating_api
 from courseware.model_data import FieldDataCache, ScoresClient
 from openedx.core.djangoapps.signals.signals import GRADES_UPDATED
 from student.models import anonymous_id_for_user
@@ -512,6 +513,9 @@ def _progress_summary(student, course, course_structure=None):
             unicode(course.id), anonymous_id_for_user(student, course.id)
         )
 
+    # Check for gated content
+    gated_content = gating_api.get_gated_content(course, student)
+
     chapters = []
     locations_to_weighted_scores = {}
 
@@ -519,6 +523,9 @@ def _progress_summary(student, course, course_structure=None):
         chapter = course_structure[chapter_key]
         sections = []
         for section_key in course_structure.get_children(chapter_key):
+            if unicode(section_key) in gated_content:
+                continue
+
             section = course_structure[section_key]
 
             graded = getattr(section, 'graded', False)
