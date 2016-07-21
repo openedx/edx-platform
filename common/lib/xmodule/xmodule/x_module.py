@@ -1371,7 +1371,7 @@ class DescriptorSystem(MetricsMixin, ConfigurableFragmentWrapper, Runtime):
     """
     # pylint: disable=bad-continuation
     def __init__(
-        self, load_item, resources_fs, error_tracker, get_policy=None, disabled_xblock_types=(), **kwargs
+        self, load_item, resources_fs, error_tracker, get_policy=None, disabled_xblock_types=lambda: [], **kwargs
     ):
         """
         load_item: Takes a Location and returns an XModuleDescriptor
@@ -1439,7 +1439,7 @@ class DescriptorSystem(MetricsMixin, ConfigurableFragmentWrapper, Runtime):
         """
         Returns a subclass of :class:`.XBlock` that corresponds to the specified `block_type`.
         """
-        if block_type in self.disabled_xblock_types:
+        if block_type in self.disabled_xblock_types():
             return self.default_class
         return super(DescriptorSystem, self).load_block_type(block_type)
 

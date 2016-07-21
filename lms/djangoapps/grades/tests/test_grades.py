@@ -380,7 +380,9 @@ class TestGetModuleScore(LoginEnrollmentTestCase, SharedModuleStoreTestCase):
         """
         Test test_get_module_score
         """
-        with self.assertNumQueries(1):
+        # One query is for getting the list of disabled XBlocks (which is
+        # then stored in the request).
+        with self.assertNumQueries(2):
             score = get_module_score(self.request.user, self.course, self.seq1)
         self.assertEqual(score, 0)
 

@@ -557,7 +557,7 @@ class CreditRequirementApiTests(CreditApiTestBase):
         self.assertFalse(api.is_user_eligible_for_credit("bob", self.course_key))
 
         # Satisfy the other requirement
-        with self.assertNumQueries(20):
+        with self.assertNumQueries(21):
             api.set_credit_requirement_status(
                 "bob",
                 self.course_key,
