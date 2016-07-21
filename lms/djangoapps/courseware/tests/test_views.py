@@ -1254,8 +1254,10 @@ class ProgressPageTests(ModuleStoreTestCase):
         self.assertNotContains(resp, 'Request Certificate')
 
     @patch.dict('django.conf.settings.FEATURES', {'CERTIFICATES_HTML_VIEW': True})
-    @patch('courseware.grades.grade', Mock(return_value={'grade': 'Pass', 'percent': 0.75, 'section_breakdown': [],
-                                                         'grade_breakdown': []}))
+    @patch(
+        'lms.djangoapps.grades.course_grades.summary',
+        Mock(return_value={'grade': 'Pass', 'percent': 0.75, 'section_breakdown': [], 'grade_breakdown': []})
+    )
     def test_view_certificate_link(self):
         """
         If certificate web view is enabled then certificate web view button should appear for user who certificate is
@@ -1315,8 +1317,10 @@ class ProgressPageTests(ModuleStoreTestCase):
         self.assertContains(resp, "creating your certificate")
 
     @patch.dict('django.conf.settings.FEATURES', {'CERTIFICATES_HTML_VIEW': False})
-    @patch('courseware.grades.grade', Mock(return_value={'grade': 'Pass', 'percent': 0.75, 'section_breakdown': [],
-                                                         'grade_breakdown': []}))
+    @patch(
+        'lms.djangoapps.grades.course_grades.summary',
+        Mock(return_value={'grade': 'Pass', 'percent': 0.75, 'section_breakdown': [], 'grade_breakdown': []})
+    )
     def test_view_certificate_link_hidden(self):
         """
         If certificate web view is disabled then certificate web view button should not appear for user who certificate
@@ -1355,7 +1359,7 @@ class ProgressPageTests(ModuleStoreTestCase):
             )
         self.assertEqual(resp.status_code, 200)
 
-    @patch('courseware.grades.grade', Mock(return_value={
+    @patch('lms.djangoapps.grades.course_grades.summary', Mock(return_value={
         'grade': 'Pass', 'percent': 0.75, 'section_breakdown': [], 'grade_breakdown': []
     }))
     @ddt.data(
@@ -1393,8 +1397,10 @@ class ProgressPageTests(ModuleStoreTestCase):
                 'Request Certificate' not in resp.content)
 
     @patch.dict('django.conf.settings.FEATURES', {'CERTIFICATES_HTML_VIEW': True})
-    @patch('courseware.grades.grade', Mock(return_value={'grade': 'Pass', 'percent': 0.75, 'section_breakdown': [],
-                                                         'grade_breakdown': []}))
+    @patch(
+        'lms.djangoapps.grades.course_grades.summary',
+        Mock(return_value={'grade': 'Pass', 'percent': 0.75, 'section_breakdown': [], 'grade_breakdown': []})
+    )
     def test_page_with_invalidated_certificate_with_html_view(self):
         """
         Verify that for html certs if certificate is marked as invalidated than
@@ -1427,8 +1433,10 @@ class ProgressPageTests(ModuleStoreTestCase):
         self.assertContains(resp, u"View Certificate")
         self.assert_invalidate_certificate(generated_certificate)
 
-    @patch('courseware.grades.grade', Mock(return_value={'grade': 'Pass', 'percent': 0.75, 'section_breakdown': [],
-                                                         'grade_breakdown': []}))
+    @patch(
+        'lms.djangoapps.grades.course_grades.summary',
+        Mock(return_value={'grade': 'Pass', 'percent': 0.75, 'section_breakdown': [], 'grade_breakdown': []})
+    )
     def test_page_with_invalidated_certificate_with_pdf(self):
         """
         Verify that for pdf certs if certificate is marked as invalidated than
@@ -1444,8 +1452,10 @@ class ProgressPageTests(ModuleStoreTestCase):
         self.assertContains(resp, u'Download Your Certificate')
         self.assert_invalidate_certificate(generated_certificate)
 
-    @patch('courseware.grades.grade', Mock(return_value={'grade': 'Pass', 'percent': 0.75, 'section_breakdown': [],
-                                                         'grade_breakdown': []}))
+    @patch(
+        'lms.djangoapps.grades.course_grades.summary',
+        Mock(return_value={'grade': 'Pass', 'percent': 0.75, 'section_breakdown': [], 'grade_breakdown': []})
+    )
     def test_message_for_audit_mode(self):
         """ Verify that message appears on progress page, if learner is enrolled
          in audit mode.
@@ -1632,19 +1642,19 @@ class IsCoursePassedTests(ModuleStoreTestCase):
         # If user has not grade then false will return
         self.assertFalse(views.is_course_passed(self.course, None, self.student, self.request))
 
-    @patch('courseware.grades.grade', Mock(return_value={'percent': 0.9}))
+    @patch('lms.djangoapps.grades.course_grades.summary', Mock(return_value={'percent': 0.9}))
     def test_user_pass_if_percent_appears_above_passing_point(self):
         # Mocking the grades.grade
         # If user has above passing marks then True will return
         self.assertTrue(views.is_course_passed(self.course, None, self.student, self.request))
 
-    @patch('courseware.grades.grade', Mock(return_value={'percent': 0.2}))
+    @patch('lms.djangoapps.grades.course_grades.summary', Mock(return_value={'percent': 0.2}))
     def test_user_fail_if_percent_appears_below_passing_point(self):
         # Mocking the grades.grade
         # If user has below passing marks then False will return
         self.assertFalse(views.is_course_passed(self.course, None, self.student, self.request))
 
-    @patch('courseware.grades.grade', Mock(return_value={'percent': SUCCESS_CUTOFF}))
+    @patch('lms.djangoapps.grades.course_grades.summary', Mock(return_value={'percent': SUCCESS_CUTOFF}))
     def test_user_with_passing_marks_and_achieved_marks_equal(self):
         # Mocking the grades.grade
         # If user's achieved passing marks are equal to the required passing
@@ -1678,7 +1688,7 @@ class GenerateUserCertTests(ModuleStoreTestCase):
         self.assertEqual(resp.status_code, HttpResponseBadRequest.status_code)
         self.assertIn("Your certificate will be available when you pass the course.", resp.content)
 
-    @patch('courseware.grades.grade', Mock(return_value={'grade': 'Pass', 'percent': 0.75}))
+    @patch('lms.djangoapps.grades.course_grades.summary', Mock(return_value={'grade': 'Pass', 'percent': 0.75}))
     @override_settings(CERT_QUEUE='certificates', LMS_SEGMENT_KEY="foobar")
     def test_user_with_passing_grade(self):
         # If user has above passing grading then json will return cert generating message and
@@ -1710,7 +1720,7 @@ class GenerateUserCertTests(ModuleStoreTestCase):
             )
             mock_tracker.reset_mock()
 
-    @patch('courseware.grades.grade', Mock(return_value={'grade': 'Pass', 'percent': 0.75}))
+    @patch('lms.djangoapps.grades.course_grades.summary', Mock(return_value={'grade': 'Pass', 'percent': 0.75}))
     def test_user_with_passing_existing_generating_cert(self):
         # If user has passing grade but also has existing generating cert
         # then json will return cert generating message with bad request code
@@ -1724,7 +1734,7 @@ class GenerateUserCertTests(ModuleStoreTestCase):
         self.assertEqual(resp.status_code, HttpResponseBadRequest.status_code)
         self.assertIn("Certificate is being created.", resp.content)
 
-    @patch('courseware.grades.grade', Mock(return_value={'grade': 'Pass', 'percent': 0.75}))
+    @patch('lms.djangoapps.grades.course_grades.summary', Mock(return_value={'grade': 'Pass', 'percent': 0.75}))
     @override_settings(CERT_QUEUE='certificates', LMS_SEGMENT_KEY="foobar")
     def test_user_with_passing_existing_downloadable_cert(self):
         # If user has already downloadable certificate

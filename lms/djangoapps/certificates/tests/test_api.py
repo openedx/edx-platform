@@ -14,6 +14,7 @@ from config_models.models import cache
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
 from courseware.tests.factories import GlobalStaffFactory
+from lms.djangoapps.grades.tests.utils import mock_passing_grade
 from microsite_configuration import microsite
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
@@ -47,16 +48,6 @@ class WebCertificateTestMixin(object):
     """
     Mixin with helpers for testing Web Certificates.
     """
-    @contextmanager
-    def _mock_passing_grade(self):
-        """
-        Mock the grading function to always return a passing grade.
-        """
-        symbol = 'courseware.grades.grade'
-        with patch(symbol) as mock_grade:
-            mock_grade.return_value = {'grade': 'Pass', 'percent': 0.75}
-            yield
-
     @contextmanager
     def _mock_queue(self, is_successful=True):
         """
@@ -193,7 +184,7 @@ class CertificateDownloadableStatusTests(WebCertificateTestMixin, ModuleStoreTes
     def test_with_downloadable_web_cert(self):
         CourseEnrollment.enroll(self.student, self.course.id, mode='honor')
         self._setup_course_certificate()
-        with self._mock_passing_grade():
+        with mock_passing_grade():
             certs_api.generate_user_certificates(self.student, self.course.id)
 
         cert_status = certificate_status_for_student(self.student, self.course.id)
@@ -437,7 +428,7 @@ class GenerateUserCertificatesTest(EventTestMixin, WebCertificateTestMixin, Modu
         self.request_factory = RequestFactory()
 
     def test_new_cert_requests_into_xqueue_returns_generating(self):
-        with self._mock_passing_grade():
+        with mock_passing_grade():
             with self._mock_queue():
                 certs_api.generate_user_certificates(self.student, self.course.id)
 
@@ -455,7 +446,7 @@ class GenerateUserCertificatesTest(EventTestMixin, WebCertificateTestMixin, Modu
         )
 
     def test_xqueue_submit_task_error(self):
-        with self._mock_passing_grade():
+        with mock_passing_grade():
             with self._mock_queue(is_successful=False):
                 certs_api.generate_user_certificates(self.student, self.course.id)
 
@@ -476,7 +467,7 @@ class GenerateUserCertificatesTest(EventTestMixin, WebCertificateTestMixin, Modu
             mode='verified'
         )
 
-        with self._mock_passing_grade():
+        with mock_passing_grade():
             with self._mock_queue(is_successful=False):
                 status = certs_api.generate_user_certificates(self.student, self.course.id)
                 self.assertEqual(status, None)
@@ -487,7 +478,7 @@ class GenerateUserCertificatesTest(EventTestMixin, WebCertificateTestMixin, Modu
         Test no message sent to Xqueue if HTML certificate view is enabled
         """
         self._setup_course_certificate()
-        with self._mock_passing_grade():
+        with mock_passing_grade():
             certs_api.generate_user_certificates(self.student, self.course.id)
 
         # Verify that the certificate has status 'downloadable'

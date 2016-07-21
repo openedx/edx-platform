@@ -14,7 +14,6 @@ from cStringIO import StringIO
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.http import (
-    Http404,
     HttpResponse,
     HttpResponseForbidden,
 )
@@ -31,8 +30,8 @@ from courseware.access import has_access
 from courseware.courses import get_course_by_id
 
 from courseware.field_overrides import disable_overrides
-from courseware.grades import iterate_grades_for
 from edxmako.shortcuts import render_to_response
+from grades.course_grades import iterate_grades_for
 from opaque_keys.edx.keys import CourseKey
 from ccx_keys.locator import CCXLocator
 from student.roles import CourseCcxCoachRole

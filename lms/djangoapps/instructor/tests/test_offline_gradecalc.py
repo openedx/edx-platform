@@ -57,7 +57,7 @@ class TestOfflineGradeCalc(ModuleStoreTestCase):
         self.user = UserFactory.create()
         CourseEnrollment.enroll(self.user, self.course.id)
 
-        patcher = patch('courseware.grades.grade', new=mock_grade)
+        patcher = patch('lms.djangoapps.grades.course_grades.summary', new=mock_grade)
         patcher.start()
         self.addCleanup(patcher.stop)
 
@@ -102,6 +102,6 @@ class TestOfflineGradeCalc(ModuleStoreTestCase):
     def test_student_grades(self):
         """ Test that the data returned by student_grades() and grades.grade() match """
         offline_grade_calculation(self.course.id)
-        with patch('courseware.grades.grade', side_effect=AssertionError('Should not re-grade')):
+        with patch('lms.djangoapps.grades.course_grades.summary', side_effect=AssertionError('Should not re-grade')):
             result = student_grades(self.user, None, self.course, use_offline=True)
         self.assertEqual(result, mock_grade(self.user, self.course))
