@@ -108,10 +108,13 @@ class DescriptionRenderer(object):
 
     def __init__(self, system, xml):
         self.system = system
-        self.id = xml.get('id')
+        self.id = xml.get('id')  # pylint: disable=invalid-name
         self.text = xml.text
 
     def get_html(self):
+        """
+        Return HTML for <description> tag.
+        """
         context = {'id': self.id, 'text': self.text}
         html = self.system.render_template("description.html", context)
         return etree.XML(html)

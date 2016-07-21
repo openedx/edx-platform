@@ -888,8 +888,6 @@ class LoncapaProblem(object):
                     label = label_tag[0].text
                     tree.remove(label_tag[0])
 
-            problem_data[question_id] = {'label': label}
-
             # Extract descriptions and set unique id on each description tag
             descriptions = response.findall('description')
             description_id = 1
@@ -900,7 +898,7 @@ class LoncapaProblem(object):
                 description_ids.append(description_tag_id)
                 description_id += 1
 
-            problem_data[question_id]['description_ids'] = ' '.join(description_ids)
+            problem_data[question_id] = {'label': label, 'description_ids': ' '.join(description_ids)}
 
             # instantiate capa Response
             responsetype_cls = responsetypes.registry.get_class_for_tag(response.tag)

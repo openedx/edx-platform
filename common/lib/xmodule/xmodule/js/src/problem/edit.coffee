@@ -197,7 +197,7 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
     demandHintTags = [];
     toXml = `function (markdown) {
       var xml = markdown,
-          i, splits, scriptFlag;
+          i, splits, wrappable;
       var responseTypes = [
         'optionresponse', 'multiplechoiceresponse', 'stringresponse', 'numericalresponse', 'choiceresponse'
       ];
@@ -208,7 +208,7 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
       // replace headers
       xml = xml.replace(/(^.*?$)(?=\n\=\=+$)/gm, '<h3 class="hd hd-2 problem-header">$1</h3>');
       xml = xml.replace(/\n^\=\=+$/gm, '');
-      
+
       // extract question and description(optional)
       // >>question||description<< converts to
       // <label>question</label> <description>description</description>
@@ -537,20 +537,20 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
       });
 
       // split scripts and preformatted sections, and wrap paragraphs
-      splits = xml.split(/(\<\/?(?:script|pre).*?\>)/g);
-      scriptFlag = false;
+      splits = xml.split(/(\<\/?(?:script|pre|label|description).*?\>)/g);
+      wrappable = true;
 
       for (i = 0; i < splits.length; i += 1) {
-          if(/\<(script|pre)/.test(splits[i])) {
-              scriptFlag = true;
+          if(/\<(script|pre|label|description)/.test(splits[i])) {
+              wrappable = false;
           }
 
-          if(!scriptFlag) {
+          if(wrappable) {
               splits[i] = splits[i].replace(/(^(?!\s*\<|$).*$)/gm, '<p>$1</p>');
           }
 
-          if(/\<\/(script|pre)/.test(splits[i])) {
-              scriptFlag = false;
+          if(/\<\/(script|pre|label|description)/.test(splits[i])) {
+              wrappable = true;
           }
       }
 
