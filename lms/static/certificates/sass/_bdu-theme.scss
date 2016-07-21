@@ -42,6 +42,8 @@ $border-width: 2rem;
 
                 &-left { float: left; }
                 &-right { float: right; }
+
+                &-bdu { width: 205px; }
             }
         }
 
@@ -79,6 +81,16 @@ $border-width: 2rem;
 // #LAYOUT
 // ------------------------------
 .layout-accomplishment {
+    .wrapper-introduction {
+        margin-bottom: 2.5rem !important;
+
+        .introduction {
+            &-copy {
+                margin-bottom: 0;
+            }
+        }
+    }
+
     .wrapper-accomplishment-rendering {
         position: relative;
 
