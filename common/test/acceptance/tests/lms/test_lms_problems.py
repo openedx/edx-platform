@@ -77,7 +77,8 @@ class ProblemClarificationTest(ProblemsTest):
                         <clarification>Return on Investment <strong>(per year)</strong></clarification> over 20 years.
                     </p>
                     <numericalresponse answer="6.5">
-                        <textline label="Enter the annual ROI" trailing_text="%" />
+                        <label>Enter the annual ROI</label>
+                        <textline trailing_text="%" />
                     </numericalresponse>
                 </text>
             </problem>
@@ -263,7 +264,8 @@ class ProblemWithMathjax(ProblemsTest):
             <problem>
                 <p>Check mathjax has rendered [mathjax]E=mc^2[/mathjax]</p>
                 <multiplechoiceresponse>
-                  <choicegroup label="Answer this?" type="MultipleChoice">
+                  <label>Answer this?</label>
+                  <choicegroup type="MultipleChoice">
                     <choice correct="true">Choice1 <choicehint>Correct choice message</choicehint></choice>
                     <choice correct="false">Choice2<choicehint>Wrong choice message</choicehint></choice>
                   </choicegroup>
@@ -310,7 +312,8 @@ class ProblemPartialCredit(ProblemsTest):
             <problem>
                 <p>The answer is 1. Partial credit for -1.</p>
                 <numericalresponse answer="1" partial_credit="list">
-                    <formulaequationinput label="How many miles away from Earth is the sun? Use scientific notation to answer." />
+                    <label>How many miles away from Earth is the sun? Use scientific notation to answer.</label>
+                    <formulaequationinput/>
                     <responseparam type="tolerance" default="0.01" />
                     <responseparam partial_answers="-1" />
                 </numericalresponse>
@@ -343,9 +346,9 @@ class LogoutDuringAnswering(ProblemsTest):
         """
         xml = dedent("""
             <problem>
-                <p>The answer is 1</p>
                 <numericalresponse answer="1">
-                    <formulaequationinput label="where are the songs of spring?" />
+                    <label>The answer is 1</label>
+                    <formulaequationinput/>
                     <responseparam type="tolerance" default="0.01" />
                 </numericalresponse>
             </problem>

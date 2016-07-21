@@ -2541,12 +2541,13 @@ class TestProblemCheckTracking(unittest.TestCase):
     def test_choice_answer_text(self):
         xml = """\
             <problem display_name="Multiple Choice Questions">
-              <p>What color is the open ocean on a sunny day?</p>
               <optionresponse>
-                <optioninput options="('yellow','blue','green')" correct="blue" label="What color is the open ocean on a sunny day?"/>
+                <label>What color is the open ocean on a sunny day?</label>
+                <optioninput options="('yellow','blue','green')" correct="blue"/>
               </optionresponse>
-              <p>Which piece of furniture is built for sitting?</p>
+
               <multiplechoiceresponse>
+                <label>Which piece of furniture is built for sitting?</label>
                 <choicegroup type="MultipleChoice">
                   <choice correct="false"><text>a table</text></choice>
                   <choice correct="false"><text>a desk</text></choice>
@@ -2554,9 +2555,10 @@ class TestProblemCheckTracking(unittest.TestCase):
                   <choice correct="false"><text>a bookshelf</text></choice>
                 </choicegroup>
               </multiplechoiceresponse>
-              <p>Which of the following are musical instruments?</p>
+
               <choiceresponse>
-                <checkboxgroup label="Which of the following are musical instruments?">
+                <label>Which of the following are musical instruments?</label>
+                <checkboxgroup>
                   <choice correct="true">a piano</choice>
                   <choice correct="false">a tree</choice>
                   <choice correct="true">a guitar</choice>
@@ -2588,7 +2590,7 @@ class TestProblemCheckTracking(unittest.TestCase):
                 'variant': '',
             },
             factory.answer_key(3): {
-                'question': '',
+                'question': 'Which piece of furniture is built for sitting?',
                 'answer': u'<text>a table</text>',
                 'response_type': 'multiplechoiceresponse',
                 'input_type': 'choicegroup',

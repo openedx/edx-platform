@@ -878,7 +878,8 @@ class LoncapaProblem(object):
                 label = inputfields[0].attrib['label']
                 # Delete <p> tag containing question text otherwise question will be rendered twice
                 p_tag = response.xpath("preceding-sibling::p[text()='{}']".format(label))
-                tree.remove(p_tag[0])
+                if p_tag:
+                    tree.remove(p_tag[0])
             else:
                 # neither <label> tag nor label attribute is present inside responsetype
                 # existing problem with multi-questions without --- having markdown

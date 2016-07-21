@@ -225,7 +225,7 @@ class InputTypeBase(object):
         self.hintmode = feedback.get('hintmode', None)
         self.input_state = state.get('input_state', {})
         self.answervariable = state.get('answervariable', None)
-        self.response_data = state.get('response_data', None)
+        self.response_data = state.get('response_data')
 
         # put hint above msg if it should be displayed
         if self.hintmode == 'always':

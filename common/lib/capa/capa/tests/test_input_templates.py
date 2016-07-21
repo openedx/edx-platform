@@ -129,7 +129,7 @@ class ChoiceGroupTemplateTest(TemplateTestCase):
             'input_type': 'checkbox',
             'name_array_suffix': '1',
             'value': '3',
-            'response_data': {'label': 'test'}
+            'response_data': {'label': 'test', 'description_ids': ''}
         }
         super(ChoiceGroupTemplateTest, self).setUp()
 
@@ -343,7 +343,7 @@ class ChoiceGroupTemplateTest(TemplateTestCase):
     def test_label(self):
         xml = self.render_to_xml(self.context)
         xpath = "//legend"
-        self.assert_has_text(xml, xpath, self.context['label'])
+        self.assert_has_text(xml, xpath, self.context['response_data']['label'])
 
 
 class TextlineTemplateTest(TemplateTestCase):
@@ -354,12 +354,14 @@ class TextlineTemplateTest(TemplateTestCase):
     TEMPLATE_NAME = 'textline.html'
 
     def setUp(self):
-        self.context = {'id': '1',
-                        'status': Status('correct'),
-                        'label': 'test',
-                        'value': '3',
-                        'preprocessor': None,
-                        'trailing_text': None}
+        self.context = {
+            'id': '1',
+            'status': Status('correct'),
+            'value': '3',
+            'preprocessor': None,
+            'trailing_text': None,
+            'response_data': {'label': 'test', 'description_ids': ''}
+        }
         super(TextlineTemplateTest, self).setUp()
 
     def test_section_class(self):
@@ -396,7 +398,7 @@ class TextlineTemplateTest(TemplateTestCase):
 
     def test_label(self):
         xml = self.render_to_xml(self.context)
-        xpath = "//input[@aria-label='%s']" % self.context['label']
+        xpath = "//input[@aria-label='%s']" % self.context['response_data']['label']
         self.assert_has_xpath(xml, xpath, self.context)
 
     def test_hidden(self):
@@ -484,10 +486,10 @@ class FormulaEquationInputTemplateTest(TemplateTestCase):
             'id': 2,
             'value': 'PREFILLED_VALUE',
             'status': Status('unsubmitted'),
-            'label': 'test',
             'previewer': 'file.js',
             'reported_status': 'REPORTED_STATUS',
             'trailing_text': None,
+            'response_data': {'label': 'test', 'description_ids': ''}
         }
         super(FormulaEquationInputTemplateTest, self).setUp()
 
@@ -510,20 +512,23 @@ class AnnotationInputTemplateTest(TemplateTestCase):
     TEMPLATE_NAME = 'annotationinput.html'
 
     def setUp(self):
-        self.context = {'id': 2,
-                        'value': '<p>Test value</p>',
-                        'title': '<h1>This is a title</h1>',
-                        'text': '<p><b>This</b> is a test.</p>',
-                        'comment': '<p>This is a test comment</p>',
-                        'comment_prompt': '<p>This is a test comment prompt</p>',
-                        'comment_value': '<p>This is the value of a test comment</p>',
-                        'tag_prompt': '<p>This is a tag prompt</p>',
-                        'options': [],
-                        'has_options_value': False,
-                        'debug': False,
-                        'status': Status('unsubmitted'),
-                        'return_to_annotation': False,
-                        'msg': '<p>This is a test message</p>', }
+        self.context = {
+            'id': 2,
+            'value': '<p>Test value</p>',
+            'title': '<h1>This is a title</h1>',
+            'text': '<p><b>This</b> is a test.</p>',
+            'comment': '<p>This is a test comment</p>',
+            'comment_prompt': '<p>This is a test comment prompt</p>',
+            'comment_value': '<p>This is the value of a test comment</p>',
+            'tag_prompt': '<p>This is a tag prompt</p>',
+            'options': [],
+            'has_options_value': False,
+            'debug': False,
+            'status': Status('unsubmitted'),
+            'return_to_annotation': False,
+            'msg': '<p>This is a test message</p>',
+            'response_data': {'label': 'test', 'description_ids': ''}
+        }
         super(AnnotationInputTemplateTest, self).setUp()
 
     def test_return_to_annotation(self):
@@ -682,8 +687,8 @@ class OptionInputTemplateTest(TemplateTestCase):
             'id': 2,
             'options': [],
             'status': Status('unsubmitted'),
-            'label': 'test',
-            'value': 0
+            'value': 0,
+            'response_data': {'label': 'test', 'description_ids': ''}
         }
         super(OptionInputTemplateTest, self).setUp()
 
@@ -729,7 +734,7 @@ class OptionInputTemplateTest(TemplateTestCase):
 
     def test_label(self):
         xml = self.render_to_xml(self.context)
-        xpath = "//select[@aria-label='%s']" % self.context['label']
+        xpath = "//select[@aria-label='%s']" % self.context['response_data']['label']
         self.assert_has_xpath(xml, xpath, self.context)
 
 
@@ -819,8 +824,8 @@ class ChoiceTextGroupTemplateTest(TemplateTestCase):
             'choices': choices,
             'status': Status('correct'),
             'input_type': 'radio',
-            'label': 'choicetext label',
             'value': self.VALUE_DICT,
+            'response_data': {'label': 'test', 'description_ids': ''}
         }
 
         super(ChoiceTextGroupTemplateTest, self).setUp()
@@ -964,5 +969,5 @@ class ChoiceTextGroupTemplateTest(TemplateTestCase):
 
     def test_label(self):
         xml = self.render_to_xml(self.context)
-        xpath = "//fieldset[@aria-label='%s']" % self.context['label']
+        xpath = "//fieldset[@aria-label='%s']" % self.context['response_data']['label']
         self.assert_has_xpath(xml, xpath, self.context)
