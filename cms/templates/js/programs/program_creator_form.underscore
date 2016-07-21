@@ -3,8 +3,10 @@
     <fieldset class="form-group bg-white">
         <div class="field">
             <label class="field-label" for="program-type"><%- gettext('Program type') %></label>
-            <select id="program-type" class="field-input input-select program-type" name="category" disabled>
+            <select id="program-type" class="field-input input-select program-type" name="category">
+                <option value=""><%- gettext('Select a type') %></option>
                 <option value="xseries"><%- gettext('XSeries') %></option>
+                <option value="micromasters"><%- gettext('MicroMasters') %></option>
             </select>
             <div class="field-message">
                 <span class="field-message-content"></span>

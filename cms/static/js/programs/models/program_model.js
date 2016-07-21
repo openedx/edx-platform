@@ -3,9 +3,10 @@ define([
         'jquery',
         'js/programs/utils/api_config',
         'js/programs/models/auto_auth_model',
+        'gettext',
         'jquery.cookie'
     ],
-    function( Backbone, $, apiConfig, AutoAuthModel ) {
+    function( Backbone, $, apiConfig, AutoAuthModel, gettext ) {
         'use strict';
 
         return AutoAuthModel.extend({
@@ -23,8 +24,7 @@ define([
                 },
                 category: {
                     required: true,
-                    // XSeries is currently the only valid Program type.
-                    oneOf: ['xseries']
+                    oneOf: ['xseries', 'micromasters']
                 },
                 organizations: 'validateOrganizations',
                 marketing_slug: {
