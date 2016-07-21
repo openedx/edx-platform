@@ -1217,6 +1217,7 @@ class TestEditSplitModule(ItemTest):
     """
     def setUp(self):
         super(TestEditSplitModule, self).setUp()
+        self.user = UserFactory()
         self.course.user_partitions = [
             UserPartition(
                 0, 'first_partition', 'First Partition',

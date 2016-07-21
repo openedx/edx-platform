@@ -31,7 +31,7 @@ class UserPreference(models.Model):
         unique_together = ("user", "key")
 
     @classmethod
-    def get_value(cls, user, preference_key):
+    def get_value(cls, user, preference_key, default=None):
         """Gets the user preference value for a given key.
 
         Note:
@@ -42,15 +42,16 @@ class UserPreference(models.Model):
         Arguments:
             user (User): The user whose preference should be set.
             preference_key (str): The key for the user preference.
+            default: The object to return if user does not have preference key set
 
         Returns:
-            The user preference value, or None if one is not set.
+            The user preference value, or default if one is not set.
         """
         try:
             user_preference = cls.objects.get(user=user, key=preference_key)
             return user_preference.value
         except cls.DoesNotExist:
-            return None
+            return default
 
 
 @receiver(pre_save, sender=UserPreference)
