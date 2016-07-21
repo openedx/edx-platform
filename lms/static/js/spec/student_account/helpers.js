@@ -101,14 +101,7 @@ define(['underscore'], function(_) {
             if (fieldsAreRendered === false) {
                 expect(sectionFieldElements.length).toBe(0);
             } else {
-                var visible_count = 0;
-                _.each(sectionsData[sectionIndex].fields, function(field) {
-                    if (field.view.enabled) {
-                        visible_count++;
-                    }
-                });
-
-                expect(sectionFieldElements.length).toBe(visible_count);
+                expect(sectionFieldElements.length).toBe(sectionsData[sectionIndex].fields.length);
 
                 _.each(sectionFieldElements, function (sectionFieldElement, fieldIndex) {
                     expectElementContainsField(sectionFieldElement, sectionsData[sectionIndex].fields[fieldIndex]);
