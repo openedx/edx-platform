@@ -119,7 +119,7 @@ def _update_certificate_context(context, user_certificate, platform_name):
     # Translators:  This text fragment appears after the student's name (displayed in a large font) on the certificate
     # screen.  The text describes the accomplishment represented by the certificate information displayed to the user
     context['accomplishment_copy_description_full'] = _("successfully completed, received a passing grade, and was "
-                                                        "awarded a {platform_name} {certificate_type} "
+                                                        "awarded a {platform_name} "
                                                         "Certificate of Completion in ").format(
         platform_name=platform_name,
         certificate_type=context.get("certificate_type"))
