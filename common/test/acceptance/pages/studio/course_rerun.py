@@ -2,8 +2,8 @@
 Course rerun page in Studio
 """
 
-from .course_page import CoursePage
-from .utils import set_input_value
+from common.test.acceptance.pages.studio.course_page import CoursePage
+from common.test.acceptance.pages.studio.utils import set_input_value
 
 
 class CourseRerunPage(CoursePage):

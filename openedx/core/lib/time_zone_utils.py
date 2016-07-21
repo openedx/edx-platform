@@ -11,10 +11,8 @@ def get_user_time_zone(user):
     Returns pytz time zone object of the user's time zone if available or UTC time zone if unavailable
     """
     #TODO: exception for unknown timezones?
-    time_zone = user.preferences.model.get_value(user, "time_zone")
-    if time_zone is not None:
-        return timezone(time_zone)
-    return utc
+    time_zone = user.preferences.model.get_value(user, "time_zone", 'utc')
+    return timezone(time_zone)
 
 
 def _format_time_zone_string(time_zone, date_time, format_string):

@@ -2,7 +2,7 @@
 Utility methods common to Studio and the LMS.
 """
 from bok_choy.promise import EmptyPromise
-from ...tests.helpers import disable_animations
+from common.test.acceptance.tests.helpers import disable_animations
 
 
 def wait_for_notification(page):

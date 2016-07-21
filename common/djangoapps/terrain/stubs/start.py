@@ -13,6 +13,7 @@ from .lti import StubLtiService
 from .video_source import VideoSourceHttpService
 from .edxnotes import StubEdxNotesService
 from .programs import StubProgramsService
+from .catalog import StubCatalogService
 
 
 USAGE = "USAGE: python -m stubs.start SERVICE_NAME PORT_NUM [CONFIG_KEY=CONFIG_VAL, ...]"
@@ -26,6 +27,7 @@ SERVICES = {
     'edxnotes': StubEdxNotesService,
     'programs': StubProgramsService,
     'ecommerce': StubEcommerceService,
+    'catalog': StubCatalogService,
 }
 
 # Log to stdout, including debug messages

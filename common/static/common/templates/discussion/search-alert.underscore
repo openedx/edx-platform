@@ -1,6 +1,6 @@
-<div class="search-alert" id="search-alert-<%- cid %>">
+<div class="search-alert <%- css_class %>" id="search-alert-<%- cid %>">
     <div class="search-alert-content">
-      <p class="message"><%= message %></p>
+      <p class="message"><%= HtmlUtils.ensureHtml(messageHtml) %></p>
     </div>
 
     <div class="search-alert-controls">

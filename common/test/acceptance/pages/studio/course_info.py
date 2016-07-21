@@ -2,7 +2,7 @@
 Course Updates page.
 """
 
-from .course_page import CoursePage
+from common.test.acceptance.pages.studio.course_page import CoursePage
 
 
 class CourseUpdatesPage(CoursePage):

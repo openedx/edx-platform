@@ -30,7 +30,7 @@
     <div class="instruction <% if ( !upgrade && isActive ) { %>center-col<% } %>">
       <% if ( _.some( requirements, function( isVisible ) { return isVisible; } ) ) { %>
       <p class="instruction-info">
-        <% if ( verificationDeadline ) { %>
+        <% if ( verificationDeadline && isActive) { %>
           <%- _.sprintf(
             gettext( "You can pay now even if you don't have the following items available, but you will need to have these by %(date)s to qualify to earn a Verified Certificate." ),
             { date: verificationDeadline }

@@ -3,9 +3,10 @@
     'use strict';
     describe('DiscussionUtil', function() {
         beforeEach(function() {
-            return DiscussionSpecHelper.setUpGlobals();
+            DiscussionSpecHelper.setUpGlobals();
         });
-        return describe("updateWithUndo", function() {
+
+        describe("updateWithUndo", function() {
             it("calls through to safeAjax with correct params, and reverts the model in case of failure", function() {
                 var deferred, model, res, updates;
                 deferred = $.Deferred();
@@ -45,13 +46,13 @@
                 updates = {
                     hello: "world"
                 };
-                $elem = jasmine.createSpyObj('$elem', ['attr']);
-                $elem.attr.and.returnValue(true);
+                $elem = jasmine.createSpyObj('$elem', ['prop']);
+                $elem.prop.and.returnValue(true);
                 res = DiscussionUtil.updateWithUndo(model, updates, {
                     foo: "bar",
                     $elem: $elem
                 }, "error message");
-                expect($elem.attr).toHaveBeenCalledWith("disabled");
+                expect($elem.prop).toHaveBeenCalledWith("disabled");
                 expect(DiscussionUtil.safeAjax).toHaveBeenCalled();
                 expect(model.attributes).toEqual({
                     hello: false,
@@ -62,6 +63,30 @@
                     failed = true;
                 });
                 return expect(failed).toBe(true);
+            });
+        });
+
+        describe('safeAjax', function() {
+            function dismissAlert() {
+                $(".modal#discussion-alert").remove();
+            }
+
+            it('respects global beforeSend', function() {
+                var beforeSendSpy = jasmine.createSpy();
+                $.ajaxSetup({beforeSend: beforeSendSpy});
+
+                var $elem = jasmine.createSpyObj('$elem', ['prop']);
+
+                DiscussionUtil.safeAjax({
+                    $elem: $elem,
+                    url: "/",
+                    type: "GET",
+                    dataType: "json"
+                }).always(function() {
+                    dismissAlert();
+                });
+                expect($elem.prop).toHaveBeenCalledWith("disabled", true);
+                expect(beforeSendSpy).toHaveBeenCalled();
             });
         });
     });

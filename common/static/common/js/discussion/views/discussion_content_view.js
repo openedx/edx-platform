@@ -107,10 +107,10 @@
                 },
                 can_vote: {
                     enable: function() {
-                        return this.$(".action-vote").closest(".actions-item").removeClass("is-hidden");
+                        this.$('.action-vote').closest('.actions-item').removeClass('is-disabled');
                     },
                     disable: function() {
-                        return this.$(".action-vote").closest(".actions-item").addClass("is-hidden");
+                        this.$('.action-vote').closest('.actions-item').addClass('is-disabled');
                     }
                 }
             };
@@ -271,20 +271,22 @@
                         return $button.toggleClass("is-checked", endorsed);
                     },
                     votes: function(votes) {
-                        var button, numVotes, selector, votesHtml, votesCountMsg;
+                        var button, numVotes, selector, votesText, votesCountMsg;
                         selector = ".action-vote";
                         this.updateButtonState(selector, window.user.voted(this.model));
                         button = this.$el.find(selector);
                         numVotes = votes.up_count;
                         votesCountMsg = ngettext(
-                            "there is currently %(numVotes)s vote", "there are currently %(numVotes)s votes", numVotes
+                            "there is currently {numVotes} vote", "there are currently {numVotes} votes", numVotes
                         );
-                        button.find(".js-sr-vote-count").html(interpolate(votesCountMsg, {numVotes: numVotes }, true));
-                        votesHtml = interpolate(ngettext("%(numVotes)s Vote", "%(numVotes)s Votes", numVotes), {
-                            numVotes: numVotes
-                        }, true);
-                        button.find(".vote-count").html(votesHtml);
-                        return this.$el.find('.display-vote .vote-count').html(votesHtml);
+                        button.find(".js-sr-vote-count").empty().text(
+                            edx.StringUtils.interpolate(votesCountMsg, {numVotes: numVotes })
+                        );
+                        votesText = edx.StringUtils.interpolate(
+                            ngettext("{numVotes} Vote", "{numVotes} Votes", numVotes),
+                            { numVotes: numVotes });
+                        button.find(".vote-count").empty().text(votesText);
+                        this.$el.find('.display-vote .vote-count').empty().text(votesText);
                     },
                     pinned: function(pinned) {
                         this.updateButtonState(".action-pin", pinned);
@@ -389,18 +391,18 @@
                         msg = gettext("We had some trouble removing this endorsement.  Please try again.");
                     }
                 }
-                beforeFunc = function() {
-                    return self.trigger("comment:endorse");
-                };
-                return DiscussionUtil.updateWithUndo(this.model, updates, {
-                    url: url,
-                    type: "POST",
-                    data: {
-                        endorsed: is_endorsing
+                return DiscussionUtil.updateWithUndo(
+                    this.model,
+                    updates,
+                    {
+                        url: url,
+                        type: "POST",
+                        data: { endorsed: is_endorsing },
+                        $elem: $(event.currentTarget)
                     },
-                    beforeSend: beforeFunc,
-                    $elem: $(event.currentTarget)
-                }, msg).always(this.trigger("comment:endorse"));
+                    msg,
+                    function() { return self.trigger("comment:endorse"); }
+                ).always(this.trigger("comment:endorse"));
             };
 
             DiscussionContentShowView.prototype.toggleVote = function(event) {
@@ -413,17 +415,19 @@
                 updates = {
                     upvoted_ids: (is_voting ? _.union : _.difference)(user.get('upvoted_ids'), [this.model.id])
                 };
-                return DiscussionUtil.updateWithUndo(user, updates, {
-                    url: url,
-                    type: "POST",
-                    $elem: $(event.currentTarget)
-                }, gettext("We had some trouble saving your vote.  Please try again.")).done(function() {
-                    if (is_voting) {
-                        return self.model.vote();
-                    } else {
-                        return self.model.unvote();
-                    }
-                });
+                if (!$(event.target.closest(".actions-item")).hasClass('is-disabled')) {
+                    return DiscussionUtil.updateWithUndo(user, updates, {
+                        url: url,
+                        type: "POST",
+                        $elem: $(event.currentTarget)
+                    }, gettext("We had some trouble saving your vote.  Please try again.")).done(function() {
+                        if (is_voting) {
+                            return self.model.vote();
+                        } else {
+                            return self.model.unvote();
+                        }
+                    });
+                }
             };
 
             DiscussionContentShowView.prototype.togglePin = function(event) {

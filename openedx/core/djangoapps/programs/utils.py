@@ -13,16 +13,19 @@ import pytz
 from course_modes.models import CourseMode
 from lms.djangoapps.certificates import api as certificate_api
 from lms.djangoapps.commerce.utils import EcommerceService
+from openedx.core.djangoapps.catalog.utils import get_run_marketing_url
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.lib.edx_api_utils import get_edx_api_data
 from student.models import CourseEnrollment
 from util.date_utils import strftime_localized
 from util.organizations_helpers import get_organization_by_short_name
-from xmodule.course_metadata_utils import DEFAULT_START_DATE
 
 
 log = logging.getLogger(__name__)
+
+# The datetime module's strftime() methods require a year >= 1900.
+DEFAULT_ENROLLMENT_START_DATE = datetime.datetime(1900, 1, 1, tzinfo=pytz.UTC)
 
 
 def get_programs(user, program_id=None):
@@ -355,7 +358,7 @@ def supplement_program_data(program_data, user):
 
             is_enrolled = CourseEnrollment.is_enrolled(user, course_key)
 
-            enrollment_start = course_overview.enrollment_start or datetime.datetime.min.replace(tzinfo=pytz.UTC)
+            enrollment_start = course_overview.enrollment_start or DEFAULT_ENROLLMENT_START_DATE
             enrollment_end = course_overview.enrollment_end or datetime.datetime.max.replace(tzinfo=pytz.UTC)
             is_enrollment_open = enrollment_start <= timezone.now() < enrollment_end
 
@@ -392,8 +395,7 @@ def supplement_program_data(program_data, user):
                 'is_course_ended': is_course_ended,
                 'is_enrolled': is_enrolled,
                 'is_enrollment_open': is_enrollment_open,
-                # TODO: Not currently available on LMS.
-                'marketing_url': None,
+                'marketing_url': get_run_marketing_url(course_key, user),
                 'start_date': start_date_string,
                 'upgrade_url': upgrade_url,
             })

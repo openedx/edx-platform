@@ -2,7 +2,7 @@
 Course info page.
 """
 
-from .course_page import CoursePage
+from common.test.acceptance.pages.lms.course_page import CoursePage
 
 
 class CourseInfoPage(CoursePage):

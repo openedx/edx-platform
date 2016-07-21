@@ -14,6 +14,7 @@ from django.test import override_settings
 from django.utils.text import slugify
 from edx_oauth2_provider.tests.factories import ClientFactory
 import httpretty
+import mock
 from provider.constants import CONFIDENTIAL
 
 from openedx.core.djangoapps.credentials.models import CredentialsApiConfig
@@ -26,6 +27,10 @@ from openedx.core.djangoapps.programs.utils import get_display_category
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
+
+
+UTILS_MODULE = 'openedx.core.djangoapps.programs.utils'
+MARKETING_URL = 'https://www.example.com/marketing/path'
 
 
 @httpretty.activate
@@ -290,6 +295,7 @@ class TestProgramListing(ProgramsApiConfigMixin, CredentialsApiConfigMixin, Shar
 @httpretty.activate
 @override_settings(MKTG_URLS={'ROOT': 'https://www.example.com'})
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@mock.patch(UTILS_MODULE + '.get_run_marketing_url', mock.Mock(return_value=MARKETING_URL))
 class TestProgramDetails(ProgramsApiConfigMixin, SharedModuleStoreTestCase):
     """Unit tests for the program details page."""
     program_id = 123

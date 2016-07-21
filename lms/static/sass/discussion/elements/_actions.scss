@@ -18,6 +18,28 @@
       &.is-hidden {
         display: none;
       }
+
+      &.is-disabled {
+        a {
+          pointer-events: none;
+
+          .action-icon {
+            display: none;
+          }
+
+          .action-label {
+            padding-right: 0px;
+          }
+
+          &:hover {
+            border-color: transparent;
+
+            .action-label {
+              color: $forum-color-active-text;
+            }
+          }
+        }
+      }
     }
 
     .more-wrapper {

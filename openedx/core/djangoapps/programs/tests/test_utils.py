@@ -36,7 +36,8 @@ from xmodule.modulestore.tests.factories import CourseFactory
 
 UTILS_MODULE = 'openedx.core.djangoapps.programs.utils'
 CERTIFICATES_API_MODULE = 'lms.djangoapps.certificates.api'
-ECOMMERCE_URL_ROOT = 'http://example-ecommerce.com'
+ECOMMERCE_URL_ROOT = 'https://example-ecommerce.com'
+MARKETING_URL = 'https://www.example.com/marketing/path'
 
 
 @skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
@@ -677,6 +678,7 @@ class TestProgramProgressMeter(ProgramsApiConfigMixin, TestCase):
 @ddt.ddt
 @override_settings(ECOMMERCE_PUBLIC_URL_ROOT=ECOMMERCE_URL_ROOT)
 @skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@mock.patch(UTILS_MODULE + '.get_run_marketing_url', mock.Mock(return_value=MARKETING_URL))
 class TestSupplementProgramData(ProgramsApiConfigMixin, ModuleStoreTestCase):
     """Tests of the utility function used to supplement program data."""
     maxDiff = None
@@ -719,7 +721,7 @@ class TestSupplementProgramData(ProgramsApiConfigMixin, ModuleStoreTestCase):
                 is_course_ended=self.course.end < timezone.now(),
                 is_enrolled=False,
                 is_enrollment_open=True,
-                marketing_url=None,
+                marketing_url=MARKETING_URL,
                 start_date=strftime_localized(self.course.start, 'SHORT_DATE'),
                 upgrade_url=None,
             ),
@@ -816,6 +818,22 @@ class TestSupplementProgramData(ProgramsApiConfigMixin, ModuleStoreTestCase):
             data,
             is_enrollment_open=is_enrollment_open,
             enrollment_open_date=enrollment_open_date,
+        )
+
+    def test_no_enrollment_start_date(self):
+        """Verify that a closed course with no explicit enrollment start date doesn't cause an error.
+
+        Regression test for ECOM-4973.
+        """
+        self.course.enrollment_end = timezone.now() - datetime.timedelta(days=1)
+        self.course = self.update_course(self.course, self.user.id)  # pylint: disable=no-member
+
+        data = utils.supplement_program_data(self.program, self.user)
+
+        self._assert_supplemented(
+            data,
+            is_enrollment_open=False,
+            enrollment_open_date=strftime_localized(utils.DEFAULT_ENROLLMENT_START_DATE, 'SHORT_DATE'),
         )
 
     @ddt.data(True, False)

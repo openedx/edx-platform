@@ -22,6 +22,7 @@ var options = {
     // Otherwise Istanbul which is used for coverage tracking will cause tests to not run.
     sourceFiles: [
         {pattern: 'coffee/src/**/!(*spec).js'},
+        {pattern: 'cms/js/**/!(*spec|djangojs).js'},
         {pattern: 'js/**/!(*spec|djangojs).js'}
     ],
 

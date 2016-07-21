@@ -1,0 +1,45 @@
+// +UI Dropdown Button - Extend
+// ====================
+%ui-btn-dd {
+  @extend %ui-btn;
+  @extend %ui-btn-pill;
+  padding:($baseline/4) ($baseline/2);
+  border-width: 1px;
+  border-style: solid;
+  border-color: transparent;
+  text-align: center;
+
+  &:hover, &:active {
+    @extend %ui-fake-link;
+    border-color: $gray-l3;
+  }
+
+  &.current, &.active, &.is-selected {
+    box-shadow: inset 0 1px 2px 1px $shadow-l1;
+    border-color: $gray-l3;
+  }
+}
+
+// +UI Nav Dropdown Button - Extend
+// ====================
+%ui-btn-dd-nav-primary {
+  @extend %ui-btn-dd;
+  background: $white;
+  border-color: $white;
+  color: $gray-d1;
+
+  &:hover, &:active {
+    background: $white;
+    color: $blue-s1;
+  }
+
+  &.current, &.active {
+    background: $white;
+    color: $gray-d4;
+
+    &:hover, &:active {
+      color: $blue-s1;
+    }
+  }
+}
+

@@ -94,7 +94,7 @@
                 this.view.render();
                 expectedGroupId = null;
                 DiscussionSpecHelper.makeAjaxSpy(function(params) {
-                    return expect(params.data.group_id).toEqual(expectedGroupId);
+                    expect(params.data.group_id).toEqual(expectedGroupId);
                 });
                 return _.each(["1", "2", ""], function(groupIdStr) {
                     expectedGroupId = groupIdStr;
@@ -103,6 +103,7 @@
                     self.view.$(".js-post-body textarea").val("dummy body");
                     self.view.$(".forum-new-post-form").submit();
                     expect($.ajax).toHaveBeenCalled();
+                    self.view.$(".forum-new-post-form").prop("disabled", false);
                     return $.ajax.calls.reset();
                 });
             });

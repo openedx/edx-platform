@@ -169,7 +169,8 @@ class LoginFromCombinedPageTest(UniqueCourseTest):
         # Navigate to the login page
         self.login_page.visit()
         # Baseline screen-shots are different for chrome and firefox.
-        self.assertScreenshot('#login .login-providers', 'login-providers-{}'.format(self.browser.name), .25)
+        #self.assertScreenshot('#login .login-providers', 'login-providers-{}'.format(self.browser.name), .25)
+        #The line above is commented out temporarily see SOL-1937
 
         # Try to log in using "Dummy" provider
         self.login_page.click_third_party_dummy_provider()
@@ -217,7 +218,8 @@ class LoginFromCombinedPageTest(UniqueCourseTest):
             )
 
             # Baseline screen-shots are different for chrome and firefox.
-            self.assertScreenshot('#hinted-login-form', 'hinted-login-{}'.format(self.browser.name), .25)
+            #self.assertScreenshot('#hinted-login-form', 'hinted-login-{}'.format(self.browser.name), .25)
+            #The line above is commented out temporarily see SOL-1937
             self.login_page.click_third_party_dummy_provider()
 
             # We should now be redirected to the course page
@@ -354,7 +356,8 @@ class RegisterFromCombinedPageTest(UniqueCourseTest):
         # Navigate to the register page
         self.register_page.visit()
         # Baseline screen-shots are different for chrome and firefox.
-        self.assertScreenshot('#register .login-providers', 'register-providers-{}'.format(self.browser.name), .25)
+        #self.assertScreenshot('#register .login-providers', 'register-providers-{}'.format(self.browser.name), .25)
+        # The line above is commented out temporarily see SOL-1937
 
         # Try to authenticate using the "Dummy" provider
         self.register_page.click_third_party_dummy_provider()

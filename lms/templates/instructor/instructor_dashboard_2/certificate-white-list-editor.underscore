@@ -2,11 +2,14 @@
 <p class="under-heading"> <%- gettext("Enter the username or email address of each learner that you want to add as an exception.") %></p>
 <div class='certificate-exception-inputs'>
     <div class="">
-    <input class='student-username-or-email' id="certificate-exception" type="text" placeholder="Student email or username" aria-describedby='student-user-name-or-email-tip'>
-    <textarea class='notes-field' id="notes" rows="10" placeholder="Free text notes" aria-describedby='notes-field-tip'></textarea>
+        <label for="certificate-exception" class="sr"><%- gettext("Student email or username") %></label>
+        <input class="student-username-or-email" id="certificate-exception" type="text" placeholder="<%- gettext('Student email or username') %>">
+        
+        <label for="notes" class="sr"><%- gettext('Free text notes') %></label>
+        <textarea class="notes-field" id="notes" rows="10" placeholder="<%- gettext('Free text notes') %>"></textarea>
     </div>
     <div>
-        <button type="button" class="btn-blue" id="add-exception" ><%- gettext("Add to Exception List") %> </button>
+        <button type="button" class="btn-blue" id="add-exception"><%- gettext("Add to Exception List") %></button>
     </div>
     <div class='message hidden'></div>
 </div>
