@@ -26,12 +26,7 @@ define([
                     }],
                     next: null
                 },
-                sampleInput = {
-                    organizations: 'test-org-key',
-                    name: 'Test Course Name',
-                    subtitle: 'Test Course Subtitle',
-                    marketing_slug: 'test-management'
-                },
+                sampleInput,
                 completeForm = function( data ) {
                     view.$el.find('#program-name').val( data.name );
                     view.$el.find('#program-subtitle').val( data.subtitle );
@@ -63,6 +58,13 @@ define([
                     expect( $errorMsg.find('.field-message-content').html() ).toEqual( inputErrorMsg );
                 };
 
+            var validateFormSubmitted = function(view, programId){
+                expect( $.ajax ).toHaveBeenCalled();
+                expect( view.saveSuccess ).toHaveBeenCalled();
+                expect( view.goToView ).toHaveBeenCalledWith( String( programId ) );
+                expect( view.saveError ).not.toHaveBeenCalled();
+            };
+
             beforeEach( function() {
                 // Set the DOM
                 setFixtures( '<div class="js-program-admin"></div>' );
@@ -73,6 +75,14 @@ define([
                 spyOn( ProgramCreatorView.prototype, 'goToView' ).and.callThrough();
                 spyOn( ProgramCreatorView.prototype, 'saveError' ).and.callThrough();
                 spyOn( Router.prototype, 'goHome' );
+
+                sampleInput = {
+                    category: 'xseries',
+                    organizations: 'test-org-key',
+                    name: 'Test Course Name',
+                    subtitle: 'Test Course Subtitle',
+                    marketing_slug: 'test-management'
+                };
 
                 view = new ProgramCreatorView({
                     router: new Router({
@@ -116,10 +126,22 @@ define([
 
                 view.$el.find('.js-create-program').click();
 
-                expect( $.ajax ).toHaveBeenCalled();
-                expect( view.saveSuccess ).toHaveBeenCalled();
-                expect( view.goToView ).toHaveBeenCalledWith( String( programId ) );
-                expect( view.saveError ).not.toHaveBeenCalled();
+                validateFormSubmitted(view, programId);
+            });
+
+            it( 'should submit the form correctly when creating micromasters program ', function(){
+                var programId = 221;
+                sampleInput.category = 'micromasters';
+                
+                completeForm( sampleInput );
+
+                spyOn( $, 'ajax' ).and.callFake( function( event ) {
+                    event.success({ id: programId });
+                });
+
+                view.$el.find('.js-create-program').click();
+
+                validateFormSubmitted(view, programId);
             });
 
             it( 'should run the saveError when model save failures occur', function() {
@@ -150,6 +172,19 @@ define([
                 expect( view.model.get('subtitle') ).toEqual( sampleInput.subtitle );
                 expect( view.model.get('organizations')[0].key ).toEqual( sampleInput.organizations );
                 expect( view.model.get('marketing_slug') ).toEqual( sampleInput.marketing_slug );
+            });
+
+            it( 'should not set the model when bad program type selected', function() {
+                var invalidInput = $.extend({}, sampleInput);
+                spyOn( view.model, 'save' );
+
+                // No name provided.
+                invalidInput.category = '';
+                verifyValidation( invalidInput, 'category' );
+
+                // bad program type name
+                invalidInput.name = 'badprogramtype';
+                verifyValidation( invalidInput, 'category' );
             });
 
             it( 'should not set the model when an invalid program name is submitted', function() {
