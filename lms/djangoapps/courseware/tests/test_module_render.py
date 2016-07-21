@@ -1112,7 +1112,6 @@ class TestGatedSubsectionRendering(SharedModuleStoreTestCase, MilestonesTestCase
 
         return None
 
-    @patch.dict(settings.FEATURES, {'MILESTONES_APP': True})
     def test_toc_with_gated_sequential(self):
         """
         Test generation of TOC for a course with a gated subsection
