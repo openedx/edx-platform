@@ -93,6 +93,8 @@ $border-width: 2rem;
 
     .wrapper-accomplishment-rendering {
         position: relative;
+        max-height: 765px;
+        min-height: 500px;
 
         &:after {
             padding-top: 56.25%; // 16:9 aspect ratio
