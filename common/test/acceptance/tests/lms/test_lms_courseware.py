@@ -9,19 +9,47 @@ from datetime import datetime, timedelta
 import ddt
 
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
-from common.test.acceptance.tests.helpers import UniqueCourseTest, EventsTestMixin
-from common.test.acceptance.pages.studio.auto_auth import AutoAuthPage
-from common.test.acceptance.pages.lms.create_mode import ModeCreationPage
-from common.test.acceptance.pages.studio.overview import CourseOutlinePage
-from common.test.acceptance.pages.lms.courseware import CoursewarePage, CoursewareSequentialTabPage
-from common.test.acceptance.pages.lms.course_nav import CourseNavPage
-from common.test.acceptance.pages.lms.problem import ProblemPage
-from common.test.acceptance.pages.common.logout import LogoutPage
-from common.test.acceptance.pages.lms.staff_view import StaffPage
-from common.test.acceptance.pages.lms.track_selection import TrackSelectionPage
-from common.test.acceptance.pages.lms.pay_and_verify import PaymentAndVerificationFlow, FakePaymentPage
-from common.test.acceptance.pages.lms.dashboard import DashboardPage
-from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
+from ..helpers import UniqueCourseTest, EventsTestMixin
+from ...pages.studio.auto_auth import AutoAuthPage
+from ...pages.lms.create_mode import ModeCreationPage
+from ...pages.studio.overview import CourseOutlinePage
+from ...pages.lms.courseware import CoursewarePage, CoursewareSequentialTabPage
+from ...pages.lms.course_nav import CourseNavPage
+from ...pages.lms.problem import ProblemPage
+from ...pages.common.logout import LogoutPage
+from ...pages.lms.staff_view import StaffPage
+from ...pages.lms.track_selection import TrackSelectionPage
+from ...pages.lms.pay_and_verify import PaymentAndVerificationFlow, FakePaymentPage
+from ...pages.lms.dashboard import DashboardPage
+from ...pages.lms.progress import ProgressPage
+from ...fixtures.course import CourseFixture, XBlockFixtureDesc
+
+
+def create_multiple_choice_problem(problem_name):
+    """
+    Return the Multiple Choice Problem Descriptor, given the name of the problem.
+    """
+    factory = MultipleChoiceResponseXMLFactory()
+    xml_data = factory.build_xml(
+        question_text='The correct answer is Choice 2',
+        choices=[False, False, True, False],
+        choice_names=['choice_0', 'choice_1', 'choice_2', 'choice_3']
+    )
+
+    return XBlockFixtureDesc(
+        'problem',
+        problem_name,
+        data=xml_data,
+        metadata={'rerandomize': 'always'}
+    )
+
+
+def _auto_auth(browser, username, email, staff, course_id):
+    """
+    Logout and login with given credentials.
+    """
+    AutoAuthPage(browser, username=username, email=email,
+                 course_id=course_id, staff=staff).visit()
 
 
 class CoursewareTest(UniqueCourseTest):
@@ -64,7 +92,7 @@ class CoursewareTest(UniqueCourseTest):
         ).install()
 
         # Auto-auth register for the course.
-        self._auto_auth(self.USERNAME, self.EMAIL, False)
+        _auto_auth(self.browser, self.USERNAME, self.EMAIL, False, self.course_id)
 
     def _goto_problem_page(self):
         """
@@ -78,13 +106,6 @@ class CoursewareTest(UniqueCourseTest):
         """ Create breadcrumb """
         return ['Test Section {}'.format(index), 'Test Subsection {}'.format(index), 'Test Problem {}'.format(index)]
 
-    def _auto_auth(self, username, email, staff):
-        """
-        Logout and login with given credentials.
-        """
-        AutoAuthPage(self.browser, username=username, email=email,
-                     course_id=self.course_id, staff=staff).visit()
-
     def test_courseware(self):
         """
         Test courseware if recent visited subsection become unpublished.
@@ -95,7 +116,7 @@ class CoursewareTest(UniqueCourseTest):
 
         # Logout and login as a staff user.
         LogoutPage(self.browser).visit()
-        self._auto_auth("STAFF_TESTER", "staff101@example.com", True)
+        _auto_auth(self.browser, "STAFF_TESTER", "staff101@example.com", True, self.course_id)
 
         # Visit course outline page in studio.
         self.course_outline.visit()
@@ -105,7 +126,7 @@ class CoursewareTest(UniqueCourseTest):
 
         # Logout and login as a student.
         LogoutPage(self.browser).visit()
-        self._auto_auth(self.USERNAME, self.EMAIL, False)
+        _auto_auth(self.browser, self.USERNAME, self.EMAIL, False, self.course_id)
 
         # Visit courseware as a student.
         self.courseware_page.visit()
@@ -184,21 +205,14 @@ class ProctoredExamTest(UniqueCourseTest):
         ).visit()
 
         # Auto-auth register for the course.
-        self._auto_auth(self.USERNAME, self.EMAIL, False)
-
-    def _auto_auth(self, username, email, staff):
-        """
-        Logout and login with given credentials.
-        """
-        AutoAuthPage(self.browser, username=username, email=email,
-                     course_id=self.course_id, staff=staff).visit()
+        _auto_auth(self.browser, self.USERNAME, self.EMAIL, False, self.course_id)
 
     def _login_as_a_verified_user(self):
         """
         login as a verififed user
         """
 
-        self._auto_auth(self.USERNAME, self.EMAIL, False)
+        _auto_auth(self.browser, self.USERNAME, self.EMAIL, False, self.course_id)
 
         # the track selection page cannot be visited. see the other tests to see if any prereq is there.
         # Navigate to the track selection page
@@ -221,7 +235,7 @@ class ProctoredExamTest(UniqueCourseTest):
         Then I can view all settings related to Proctored and timed exams
         """
         LogoutPage(self.browser).visit()
-        self._auto_auth("STAFF_TESTER", "staff101@example.com", True)
+        _auto_auth(self.browser, "STAFF_TESTER", "staff101@example.com", True, self.course_id)
         self.course_outline.visit()
 
         self.course_outline.open_subsection_settings_dialog()
@@ -237,7 +251,7 @@ class ProctoredExamTest(UniqueCourseTest):
         Then I can see an option to take the exam as a proctored exam.
         """
         LogoutPage(self.browser).visit()
-        self._auto_auth("STAFF_TESTER", "staff101@example.com", True)
+        _auto_auth(self.browser, "STAFF_TESTER", "staff101@example.com", True, self.course_id)
         self.course_outline.visit()
         self.course_outline.open_subsection_settings_dialog()
 
@@ -256,7 +270,7 @@ class ProctoredExamTest(UniqueCourseTest):
         then take it as student"
         """
         LogoutPage(self.browser).visit()
-        self._auto_auth("STAFF_TESTER", "staff101@example.com", True)
+        _auto_auth(self.browser, "STAFF_TESTER", "staff101@example.com", True, self.course_id)
         self.course_outline.visit()
         self.course_outline.open_subsection_settings_dialog()
 
@@ -295,13 +309,13 @@ class ProctoredExamTest(UniqueCourseTest):
         self._setup_and_take_timed_exam(hide_after_due)
 
         LogoutPage(self.browser).visit()
-        self._auto_auth("STAFF_TESTER", "staff101@example.com", True)
+        _auto_auth(self.browser, "STAFF_TESTER", "staff101@example.com", True, self.course_id)
         self.course_outline.visit()
         last_week = (datetime.today() - timedelta(days=7)).strftime("%m/%d/%Y")
         self.course_outline.change_problem_due_date(last_week)
 
         LogoutPage(self.browser).visit()
-        self._auto_auth(self.USERNAME, self.EMAIL, False)
+        _auto_auth(self.browser, self.USERNAME, self.EMAIL, False, self.course_id)
         self.courseware_page.visit()
         self.assertEqual(self.courseware_page.has_submitted_exam_message(), hide_after_due)
 
@@ -316,7 +330,7 @@ class ProctoredExamTest(UniqueCourseTest):
         self._setup_and_take_timed_exam()
 
         LogoutPage(self.browser).visit()
-        self._auto_auth("STAFF_TESTER", "staff101@example.com", True)
+        _auto_auth(self.browser, "STAFF_TESTER", "staff101@example.com", True, self.course_id)
         self.courseware_page.visit()
         staff_page = StaffPage(self.browser, self.course_id)
         self.assertEqual(staff_page.staff_view_mode, 'Staff')
@@ -338,7 +352,7 @@ class ProctoredExamTest(UniqueCourseTest):
         Practice: True, False
         """
         LogoutPage(self.browser).visit()
-        self._auto_auth("STAFF_TESTER", "staff101@example.com", True)
+        _auto_auth(self.browser, "STAFF_TESTER", "staff101@example.com", True, self.course_id)
         self.course_outline.visit()
 
         self.course_outline.open_subsection_settings_dialog()
@@ -671,8 +685,8 @@ class ProblemStateOnNavigationTest(UniqueCourseTest):
         course_fix.add_children(
             XBlockFixtureDesc('chapter', 'Test Section 1').add_children(
                 XBlockFixtureDesc('sequential', 'Test Subsection 1,1').add_children(
-                    self.create_multiple_choice_problem(self.problem1_name),
-                    self.create_multiple_choice_problem(self.problem2_name),
+                    create_multiple_choice_problem(self.problem1_name),
+                    create_multiple_choice_problem(self.problem2_name),
                 ),
             ),
         ).install()
@@ -685,24 +699,6 @@ class ProblemStateOnNavigationTest(UniqueCourseTest):
 
         self.courseware_page.visit()
         self.problem_page = ProblemPage(self.browser)
-
-    def create_multiple_choice_problem(self, problem_name):
-        """
-        Return the Multiple Choice Problem Descriptor, given the name of the problem.
-        """
-        factory = MultipleChoiceResponseXMLFactory()
-        xml_data = factory.build_xml(
-            question_text='The correct answer is Choice 2',
-            choices=[False, False, True, False],
-            choice_names=['choice_0', 'choice_1', 'choice_2', 'choice_3']
-        )
-
-        return XBlockFixtureDesc(
-            'problem',
-            problem_name,
-            data=xml_data,
-            metadata={'rerandomize': 'always'}
-        )
 
     def go_to_tab_and_assert_problem(self, position, problem_name):
         """
@@ -809,3 +805,106 @@ class ProblemStateOnNavigationTest(UniqueCourseTest):
         self.go_to_tab_and_assert_problem(1, self.problem1_name)
         problem1_content_after_coming_back = self.problem_page.problem_content
         self.assertEqual(problem1_content_before_switch, problem1_content_after_coming_back)
+
+
+class SubsectionHiddenAfterDueDateTest(UniqueCourseTest):
+    """
+    Tests the "hide after due date" setting for
+    subsections.
+    """
+    USERNAME = "STUDENT_TESTER"
+    EMAIL = "student101@example.com"
+
+    def setUp(self):
+        super(SubsectionHiddenAfterDueDateTest, self).setUp()
+
+        self.courseware_page = CoursewarePage(self.browser, self.course_id)
+        self.logout_page = LogoutPage(self.browser)
+
+        self.course_outline = CourseOutlinePage(
+            self.browser,
+            self.course_info['org'],
+            self.course_info['number'],
+            self.course_info['run']
+        )
+
+        # Install a course with sections/problems, tabs, updates, and handouts
+        course_fix = CourseFixture(
+            self.course_info['org'],
+            self.course_info['number'],
+            self.course_info['run'],
+            self.course_info['display_name']
+        )
+
+        course_fix.add_children(
+            XBlockFixtureDesc('chapter', 'Test Section 1').add_children(
+                XBlockFixtureDesc('sequential', 'Test Subsection 1').add_children(
+                    create_multiple_choice_problem('Test Problem 1')
+                )
+            )
+        ).install()
+
+        self.progress_page = ProgressPage(self.browser, self.course_id)
+        self._setup_subsection()
+
+        # Auto-auth register for the course.
+        _auto_auth(self.browser, self.USERNAME, self.EMAIL, False, self.course_id)
+
+    def _setup_subsection(self):
+        """
+        Helper to set up a problem subsection as staff, then take
+        it as a student.
+        """
+        self.logout_page.visit()
+        _auto_auth(self.browser, "STAFF_TESTER", "staff101@example.com", True, self.course_id)
+        self.course_outline.visit()
+        self.course_outline.open_subsection_settings_dialog()
+
+        self.course_outline.select_advanced_tab('hide_after_due_date')
+        self.course_outline.make_subsection_hidden_after_due_date()
+
+        self.logout_page.visit()
+        _auto_auth(self.browser, self.USERNAME, self.EMAIL, False, self.course_id)
+        self.courseware_page.visit()
+
+        self.logout_page.visit()
+
+    def test_subsecton_hidden_after_due_date(self):
+        """
+        Given that I am a staff member on the subsection settings section
+        And I select the advanced settings tab
+        When I Make the subsection hidden after its due date.
+        And I login as a student.
+        And visit the subsection in the courseware as a verified student.
+        Then I am able to see the subsection
+        And when I visit the progress page
+        Then I should be able to see my grade on the progress page
+        When I log in as staff
+        And I make the subsection due in the past so that the current date is past its due date
+        And I log in as a student
+        And I visit the subsection in the courseware
+        Then the subsection should be hidden with a message that its due date has passed
+        And when I visit the progress page
+        Then I should be able to see my grade on the progress page
+        """
+        self.logout_page.visit()
+        _auto_auth(self.browser, self.USERNAME, self.EMAIL, False, self.course_id)
+        self.courseware_page.visit()
+        self.assertFalse(self.courseware_page.content_hidden_past_due_date())
+
+        self.progress_page.visit()
+        self.assertEqual(self.progress_page.scores('Test Section 1', 'Test Subsection 1'), [(0, 1)])
+
+        self.logout_page.visit()
+        _auto_auth(self.browser, "STAFF_TESTER", "staff101@example.com", True, self.course_id)
+        self.course_outline.visit()
+        last_week = (datetime.today() - timedelta(days=7)).strftime("%m/%d/%Y")
+        self.course_outline.change_problem_due_date(last_week)
+
+        self.logout_page.visit()
+        _auto_auth(self.browser, self.USERNAME, self.EMAIL, False, self.course_id)
+        self.courseware_page.visit()
+        self.assertTrue(self.courseware_page.content_hidden_past_due_date())
+
+        self.progress_page.visit()
+        self.assertEqual(self.progress_page.scores('Test Section 1', 'Test Subsection 1'), [(0, 1)])
