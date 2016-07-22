@@ -1025,43 +1025,6 @@ class CapaModuleTest(unittest.TestCase):
         module = CapaFactory.create(attempts=10, max_attempts=10)
         self.assertEqual(module.check_button_checking_name(), "Checking...")
 
-    def test_check_button_name_customization(self):
-        module = CapaFactory.create(
-            attempts=1,
-            max_attempts=10,
-            text_customization={"custom_check": "Submit", "custom_final_check": "Final Submit"}
-        )
-        self.assertEqual(module.check_button_name(), "Submit")
-
-        module = CapaFactory.create(attempts=9,
-                                    max_attempts=10,
-                                    text_customization={"custom_check": "Submit", "custom_final_check": "Final Submit"}
-                                    )
-        self.assertEqual(module.check_button_name(), "Final Submit")
-
-    def test_check_button_checking_name_customization(self):
-        module = CapaFactory.create(
-            attempts=1,
-            max_attempts=10,
-            text_customization={
-                "custom_check": "Submit",
-                "custom_final_check": "Final Submit",
-                "custom_checking": "Checking..."
-            }
-        )
-        self.assertEqual(module.check_button_checking_name(), "Checking...")
-
-        module = CapaFactory.create(
-            attempts=9,
-            max_attempts=10,
-            text_customization={
-                "custom_check": "Submit",
-                "custom_final_check": "Final Submit",
-                "custom_checking": "Checking..."
-            }
-        )
-        self.assertEqual(module.check_button_checking_name(), "Checking...")
-
     def test_should_show_check_button(self):
 
         attempts = random.randint(1, 10)
