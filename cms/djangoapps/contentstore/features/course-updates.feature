@@ -59,16 +59,17 @@ Feature: CMS.Course updates
         And when I reload the page
         Then I should see the update "before <strong>middle</strong> after"
 
-    Scenario: Static links are rewritten when previewing a course update
-        Given I have opened a new course in Studio
-        And I go to the course updates page
-        When I add a new update with the text "<img src='/static/my_img.jpg'/>"
-        # Can only do partial text matches because of the quotes with in quotes (and regexp step matching).
-        Then I should see the asset update to "my_img.jpg"
-        And I change the update from "/static/my_img.jpg" to "<img src='/static/modified.jpg'/>"
-        Then I should see the asset update to "modified.jpg"
-        And when I reload the page
-        Then I should see the asset update to "modified.jpg"
+# Commenting out as flaky TNL-5051 07/22/2016
+#    Scenario: Static links are rewritten when previewing a course update
+#       Given I have opened a new course in Studio
+#       And I go to the course updates page
+#       When I add a new update with the text "<img src='/static/my_img.jpg'/>"
+#       # Can only do partial text matches because of the quotes with in quotes (and regexp step matching).
+#       Then I should see the asset update to "my_img.jpg"
+#       And I change the update from "/static/my_img.jpg" to "<img src='/static/modified.jpg'/>"
+#       Then I should see the asset update to "modified.jpg"
+#       And when I reload the page
+#       Then I should see the asset update to "modified.jpg"
 
     Scenario: Static links are rewritten when previewing handouts
         Given I have opened a new course in Studio
