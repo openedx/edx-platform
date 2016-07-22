@@ -180,12 +180,6 @@ class CapaFields(object):
         help=_("Source code for LaTeX and Word problems. This feature is not well-supported."),
         scope=Scope.settings
     )
-    text_customization = Dict(
-        help=_("String customization substitutions for particular locations"),
-        scope=Scope.settings
-        # TODO: someday it should be possible to not duplicate this definition here
-        # and in inheritance.py
-    )
     use_latex_compiler = Boolean(
         help=_("Enable LaTeX templates?"),
         default=False,
@@ -408,21 +402,12 @@ class CapaMixin(CapaFields):
 
         Usually it is just "Check", but if this is the student's
         final attempt, change the name to "Final Check".
-        The text can be customized by the text_customization setting.
         """
         # The logic flow is a little odd so that _('xxx') strings can be found for
         # translation while also running _() just once for each string.
         _ = self.runtime.service(self, "i18n").ugettext
         check = _('Check')
         final_check = _('Final Check')
-
-        # Apply customizations if present
-        if 'custom_check' in self.text_customization:
-            check = _(self.text_customization.get('custom_check'))                # pylint: disable=translation-of-non-string
-        if 'custom_final_check' in self.text_customization:
-            final_check = _(self.text_customization.get('custom_final_check'))    # pylint: disable=translation-of-non-string
-        # TODO: need a way to get the customized words into the list of
-        # words to be translated
 
         if self.max_attempts is not None and self.attempts >= self.max_attempts - 1:
             return final_check
@@ -440,10 +425,7 @@ class CapaMixin(CapaFields):
         The text can be customized by the text_customization setting.
 
         """
-        # Apply customizations if present
-        if 'custom_checking' in self.text_customization:
-            return self.text_customization.get('custom_checking')
-
+        # TODO: delete method
         _ = self.runtime.service(self, "i18n").ugettext
         return _('Checking...')
 
