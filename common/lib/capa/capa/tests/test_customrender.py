@@ -75,3 +75,21 @@ class MathRenderTest(unittest.TestCase):
         self.check_parse(r'$\displaystyle 2+2$', '[mathjax] 2+2[/mathjax]')
 
     # NOTE: not testing get_html yet because I don't understand why it's doing what it's doing.
+
+
+class DescriptionRenderTest(unittest.TestCase):
+    '''
+    Make sure description render properly.
+    '''
+    def test_rendering(self):
+        from nose.tools import set_trace; set_trace()
+        description = 'Once we become predictable, we become vulnerable.'
+        xml_str = """<description id="description_123">{}</description>""".format(description)
+        element = etree.fromstring(xml_str)
+
+        renderer = lookup_tag('description')(test_capa_system(), element)
+
+        # Our test_capa_system "renders" templates to a div with the repr of the context.
+        xml = renderer.get_html()
+        context = extract_context(xml)
+        self.assertEqual(context, {'id': 'description_123', 'text': description})

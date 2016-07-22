@@ -1761,7 +1761,7 @@ class CapaDescriptorTest(unittest.TestCase):
 
             <p>The following languages are in the Indo-European family:</p>
             <choiceresponse>
-              <checkboxgroup label="The following languages are in the Indo-European family:">
+              <checkboxgroup>
                 <choice correct="true">Urdu</choice>
                 <choice correct="false">Finnish</choice>
                 <choice correct="true">Marathi</choice>
@@ -1796,7 +1796,7 @@ class CapaDescriptorTest(unittest.TestCase):
 
 
             <optionresponse>
-              <optioninput label="lbl" options="('India','Spain','China','Bermuda')" correct="India"></optioninput>
+              <optioninput options="('India','Spain','China','Bermuda')" correct="India"></optioninput>
             </optionresponse>
 
              <solution>
@@ -1821,7 +1821,7 @@ class CapaDescriptorTest(unittest.TestCase):
 
             <p>Which of the following countries has the largest population?</p>
             <multiplechoiceresponse>
-              <choicegroup label="Which of the following countries has the largest population?" type="MultipleChoice">
+              <choicegroup type="MultipleChoice">
                 <choice correct="false">Brazil
                     <choicehint>timely feedback -- explain why an almost correct answer is wrong</choicehint>
                 </choice>
@@ -1865,14 +1865,13 @@ class CapaDescriptorTest(unittest.TestCase):
             <p>How many miles away from Earth is the sun? Use scientific notation to answer.</p>
 
             <numericalresponse answer="9.3*10^7">
-              <formulaequationinput label="How many miles away from Earth is the sun?
-              Use scientific notation to answer." />
+              <formulaequationinput/>
             </numericalresponse>
 
             <p>The square of what number is -100?</p>
 
             <numericalresponse answer="10*i">
-              <formulaequationinput label="The square of what number is -100?" />
+              <formulaequationinput/>
             </numericalresponse>
 
             <solution>
@@ -1905,8 +1904,7 @@ class CapaDescriptorTest(unittest.TestCase):
             <stringresponse answer="Nanjing Higher Normal Institute" type="ci" >
               <additional_answer answer="National Central University"></additional_answer>
               <additional_answer answer="Nanjing University"></additional_answer>
-              <textline label="What was the first post-secondary school in China to allow both male and female
-              students?" size="20"/>
+              <textline size="20"/>
             </stringresponse>
 
             <solution>
@@ -1938,7 +1936,7 @@ class CapaDescriptorTest(unittest.TestCase):
 
             <p>Which of the following is a fruit? Check all that apply.</p>
             <choiceresponse>
-              <checkboxgroup label="Which of the following is a fruit? Check all that apply.">
+              <checkboxgroup>
                 <choice correct="true">apple
                   <choicehint selected="true">You are correct that an apple is a fruit because it is the fertilized
                   ovary that comes from an apple tree and contains seeds.</choicehint>
@@ -1986,7 +1984,7 @@ class CapaDescriptorTest(unittest.TestCase):
 
             <p> A/an ________ is a vegetable.</p>
             <optionresponse>
-              <optioninput label=" A/an ________ is a vegetable.">
+              <optioninput>
                 <option correct="False">apple <optionhint>An apple is the fertilized ovary that comes from an apple
                 tree and contains seeds, meaning it is a fruit.</optionhint></option>
                 <option correct="False">pumpkin <optionhint>A pumpkin is the fertilized ovary of a squash plant and
@@ -2018,7 +2016,7 @@ class CapaDescriptorTest(unittest.TestCase):
 
             <p>Which of the following is a vegetable?</p>
             <multiplechoiceresponse>
-              <choicegroup label="Which of the following is a vegetable?" type="MultipleChoice">
+              <choicegroup type="MultipleChoice">
                 <choice correct="false">apple <choicehint>An apple is the fertilized ovary that comes from an apple
                 tree and contains seeds, meaning it is a fruit.</choicehint></choice>
                 <choice correct="false">pumpkin <choicehint>A pumpkin is the fertilized ovary of a squash plant and
@@ -2055,8 +2053,7 @@ class CapaDescriptorTest(unittest.TestCase):
             <p>What is the arithmetic mean for the following set of numbers? (1, 5, 6, 3, 5)</p>
 
             <numericalresponse answer="4">
-              <formulaequationinput label="What is the arithmetic mean for the following set of numbers?
-              (1, 5, 6, 3, 5)" />
+              <formulaequationinput/>
               <correcthint>The mean for this set of numbers is 20 / 5, which equals 4.</correcthint>
             </numericalresponse>
             <solution>
@@ -2097,7 +2094,7 @@ class CapaDescriptorTest(unittest.TestCase):
               second largest, with 261,797 square miles.</stringequalhint>
               <stringequalhint answer="California">California is the third largest state, with 155,959 square miles.
               </stringequalhint>
-              <textline label="Which U.S. state has the largest land area?" size="20"/>
+              <textline size="20"/>
             </stringresponse>
 
             <demandhint>
@@ -2137,6 +2134,7 @@ class CapaDescriptorTest(unittest.TestCase):
             <p>Label</p>
             <div>Some comment</div>
             <multiplechoiceresponse>
+              <description>In the end we are all alone</description>
               <choicegroup type="MultipleChoice" answer-pool="4">
                 <choice correct="false">Apple</choice>
                 <choice correct="false">Banana</choice>
@@ -2147,6 +2145,7 @@ class CapaDescriptorTest(unittest.TestCase):
             </problem>
         """)
         name = "Test Capa Problem"
+        from nose.tools import set_trace; set_trace()
         descriptor = self._create_descriptor(xml, name=name)
         self.assertEquals(descriptor.problem_types, {"multiplechoiceresponse"})
         self.assertEquals(descriptor.index_dictionary(), {
@@ -2174,7 +2173,7 @@ class CapaDescriptorTest(unittest.TestCase):
                   </choicegroup>
                 </multiplechoiceresponse>
                 <optionresponse>
-                    <optioninput label="Option" options="('1','2')" correct="2"></optioninput>
+                    <optioninput options="('1','2')" correct="2"></optioninput>
                 </optionresponse>
             </problem>
         """)
