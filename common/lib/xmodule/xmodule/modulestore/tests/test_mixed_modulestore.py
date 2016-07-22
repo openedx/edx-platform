@@ -1991,6 +1991,14 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
             # there should be no published problems with the old name
             assertNumProblems(problem_original_name, 0)
 
+        # verify branch setting is published-only in manager
+        with self.store.branch_setting(ModuleStoreEnum.Branch.published_only):
+            self.assertEquals(self.store.get_branch_setting(), ModuleStoreEnum.Branch.published_only)
+
+        # verify branch setting is draft-preferred in manager
+        with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred):
+            self.assertEquals(self.store.get_branch_setting(), ModuleStoreEnum.Branch.draft_preferred)
+
     def verify_default_store(self, store_type):
         """
         Verifies the default_store property

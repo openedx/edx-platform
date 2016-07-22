@@ -980,8 +980,13 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         to the given branch_setting.  If course_id is None, the default store is used.
         """
         store = self._verify_modulestore_support(course_id, 'branch_setting')
-        with store.branch_setting(branch_setting, course_id):
-            yield
+        previous_thread_branch_setting = getattr(self.thread_cache, 'branch_setting', None)
+        try:
+            self.thread_cache.branch_setting = branch_setting
+            with store.branch_setting(branch_setting, course_id):
+                yield
+        finally:
+            self.thread_cache.branch_setting = previous_thread_branch_setting
 
     @contextmanager
     def bulk_operations(self, course_id, emit_signals=True):
