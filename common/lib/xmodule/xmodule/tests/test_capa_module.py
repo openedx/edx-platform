@@ -2134,7 +2134,6 @@ class CapaDescriptorTest(unittest.TestCase):
             <p>Label</p>
             <div>Some comment</div>
             <multiplechoiceresponse>
-              <description>In the end we are all alone</description>
               <choicegroup type="MultipleChoice" answer-pool="4">
                 <choice correct="false">Apple</choice>
                 <choice correct="false">Banana</choice>
@@ -2145,7 +2144,6 @@ class CapaDescriptorTest(unittest.TestCase):
             </problem>
         """)
         name = "Test Capa Problem"
-        from nose.tools import set_trace; set_trace()
         descriptor = self._create_descriptor(xml, name=name)
         self.assertEquals(descriptor.problem_types, {"multiplechoiceresponse"})
         self.assertEquals(descriptor.index_dictionary(), {

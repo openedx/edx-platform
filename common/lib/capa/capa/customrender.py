@@ -97,7 +97,6 @@ class SolutionRenderer(object):
 
 registry.register(SolutionRenderer)
 
-
 #-----------------------------------------------------------------------------
 
 
