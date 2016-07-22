@@ -40,7 +40,7 @@ class CAPAProblemTest(unittest.TestCase):
                 {
                     'description_ids': '1_description_2_1',
                     'label': 'Select the correct synonym of paranoid?',
-                    'descriptions': ['Only the paranoid survive.']
+                    'descriptions': {'1_description_2_1': 'Only the paranoid survive.'}
                 }
             }
         )
@@ -66,7 +66,7 @@ class CAPAProblemTest(unittest.TestCase):
         problem = new_loncapa_problem(xml)
         self.assertEqual(
             problem.problem_data,
-            {'1_2': {'description_ids': '', 'label': question, 'descriptions': []}}
+            {'1_2': {'description_ids': '', 'label': question, 'descriptions': {}}}
 
         )
         self.assertEqual(
@@ -96,7 +96,7 @@ class CAPAProblemTest(unittest.TestCase):
         problem = new_loncapa_problem(xml)
         self.assertEqual(
             problem.problem_data,
-            {'1_2': {'description_ids': '', 'label': question, 'descriptions': []}}
+            {'1_2': {'description_ids': '', 'label': question, 'descriptions': {}}}
 
         )
         self.assertEqual(
@@ -114,7 +114,7 @@ class CAPAProblemTest(unittest.TestCase):
             <stringresponse answer="War" type="ci">
                 <label>___ requires sacrifices.</label>
                 <description>The problem with trying to be the bad guy, there's always someone worse.</description>
-                <description>Anyone who looks on the world as if it was a game of chess deserves to lose.</description>
+                <description>Anyone who looks the world as if it was a game of chess deserves to lose.</description>
                 <textline size="40"/>
             </stringresponse>
         </problem>
@@ -127,10 +127,10 @@ class CAPAProblemTest(unittest.TestCase):
                 {
                     'description_ids': '1_description_2_1 1_description_2_2',
                     'label': '___ requires sacrifices.',
-                    'descriptions': [
-                        "The problem with trying to be the bad guy, there's always someone worse.",
-                        "Anyone who looks on the world as if it was a game of chess deserves to lose."
-                    ]
+                    'descriptions': {
+                        '1_description_2_1': "The problem with trying to be the bad guy, there's always someone worse.",
+                        '1_description_2_2': "Anyone who looks the world as if it was a game of chess deserves to lose."
+                    }
                 }
             }
         )

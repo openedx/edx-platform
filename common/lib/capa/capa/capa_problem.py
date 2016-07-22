@@ -13,6 +13,7 @@ Main module which shows problems (of "capa" type).
 This is used by capa_module.
 """
 
+from collections import OrderedDict
 from copy import deepcopy
 from datetime import datetime
 import logging
@@ -892,19 +893,17 @@ class LoncapaProblem(object):
             # Extract descriptions and set unique id on each description tag
             description_tags = response.findall('description')
             description_id = 1
-            description_ids = []
-            descriptions = []
+            descriptions = OrderedDict()
             for description in description_tags:
-                description_tag_id = "%s_description_%i_%i" % (self.problem_id, response_id, description_id)
-                description.attrib['id'] = description_tag_id
-                description_ids.append(description_tag_id)
-                descriptions.append(description.text)
+                descriptions[
+                    "%s_description_%i_%i" % (self.problem_id, response_id, description_id)
+                ] = description.text
                 response.remove(description)
                 description_id += 1
 
             problem_data[question_id] = {
                 'label': label,
-                'description_ids': ' '.join(description_ids),
+                'description_ids': ' '.join(descriptions.keys()),
                 'descriptions': descriptions
             }
 
