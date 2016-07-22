@@ -35,7 +35,14 @@ class CAPAProblemTest(unittest.TestCase):
         problem = new_loncapa_problem(xml)
         self.assertEqual(
             problem.problem_data,
-            {'1_2': {'description_ids': '1_description_2_1', 'label': 'Select the correct synonym of paranoid?'}}
+            {
+                '1_2':
+                {
+                    'description_ids': '1_description_2_1',
+                    'label': 'Select the correct synonym of paranoid?',
+                    'descriptions': ['Only the paranoid survive.']
+                }
+            }
         )
         self.assertEqual(len(problem.tree.xpath('//label')), 0)
 
@@ -59,7 +66,7 @@ class CAPAProblemTest(unittest.TestCase):
         problem = new_loncapa_problem(xml)
         self.assertEqual(
             problem.problem_data,
-            {'1_2': {'description_ids': '', 'label': question}}
+            {'1_2': {'description_ids': '', 'label': question, 'descriptions': []}}
 
         )
         self.assertEqual(
@@ -89,7 +96,7 @@ class CAPAProblemTest(unittest.TestCase):
         problem = new_loncapa_problem(xml)
         self.assertEqual(
             problem.problem_data,
-            {'1_2': {'description_ids': '', 'label': question}}
+            {'1_2': {'description_ids': '', 'label': question, 'descriptions': []}}
 
         )
         self.assertEqual(
@@ -114,6 +121,16 @@ class CAPAProblemTest(unittest.TestCase):
         """
         problem = new_loncapa_problem(xml)
         self.assertEqual(
-            problem.problem_data['1_2']['description_ids'],
-            '1_description_2_1 1_description_2_2'
+            problem.problem_data,
+            {
+                '1_2':
+                {
+                    'description_ids': '1_description_2_1 1_description_2_2',
+                    'label': '___ requires sacrifices.',
+                    'descriptions': [
+                        "The problem with trying to be the bad guy, there's always someone worse.",
+                        "Anyone who looks on the world as if it was a game of chess deserves to lose."
+                    ]
+                }
+            }
         )
