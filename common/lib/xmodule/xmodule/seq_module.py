@@ -118,6 +118,14 @@ class ProctoringFields(object):
     )
 
     @property
+    def is_timed_exam(self):
+        """
+        Alias the permutation of above fields that corresponds to un-proctored timed exams
+        to the more clearly-named is_timed_exam
+        """
+        return not self.is_proctored_enabled and not self.is_practice_exam and self.is_time_limited
+
+    @property
     def is_proctored_exam(self):
         """ Alias the is_proctored_enabled field to the more legible is_proctored_exam """
         return self.is_proctored_enabled
