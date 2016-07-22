@@ -1,7 +1,6 @@
 """
 Test capa problem.
 """
-from lxml import etree
 import unittest
 
 from . import new_loncapa_problem
@@ -92,7 +91,7 @@ class CAPAProblemTest(unittest.TestCase):
                 <textline size="40"/>
             </stringresponse>
         </problem>
-        """.format(question, question)
+        """.format(question)
         problem = new_loncapa_problem(xml)
         self.assertEqual(
             problem.problem_data,

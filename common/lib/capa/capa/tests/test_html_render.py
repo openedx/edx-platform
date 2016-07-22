@@ -185,7 +185,7 @@ class CapaHtmlRenderTest(unittest.TestCase):
             'id': '1_2_1',
             'trailing_text': '',
             'size': None,
-            'response_data': {'description_ids': '', 'label': '', 'descriptions': []}
+            'response_data': {'description_ids': '', 'label': '', 'descriptions': {}}
         }
 
         expected_solution_context = {'id': '1_solution_1'}

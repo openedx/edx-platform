@@ -30,7 +30,7 @@ data:   |
                <p>You can use the following example problem as a model.</p>
                <label>Which of the following countries has the largest population?</label>
                <description>You can select only one option.</description>
-               <choicegrouptype="MultipleChoice">
+               <choicegroup type="MultipleChoice">
                    <choice correct="false">Brazil
                        <choicehint>timely feedback -- explain why an almost correct answer is wrong</choicehint>
                    </choice>
