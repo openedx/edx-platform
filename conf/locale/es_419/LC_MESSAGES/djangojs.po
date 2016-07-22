@@ -43,7 +43,7 @@
 # Translators:
 # Antonio Pardo <apardo@alabs.org>, 2013
 # Cristian Guerra <cristian.guerra.maya@gmail.com>, 2016
-# Cristian Salamea <ovnicraft@gmail.com>, 2014-2015
+# Cristian Salamea <ovnicraft@gmail.com>, 2014-2016
 # David Salazar <imdjsg@gmail.com>, 2014
 # Felipe Schmidt M <fschmidt@cercano.cl>, 2015
 # Felix Antonio Valdez Noverola <felix@itesm.mx>, 2015
@@ -68,7 +68,7 @@
 # 
 # Translators:
 # Claudio Anibal Barahona Flores <claudio.barahona@unah.edu.hn>, 2015
-# Cristian Salamea <ovnicraft@gmail.com>, 2014-2015
+# Cristian Salamea <ovnicraft@gmail.com>, 2014-2016
 # Giancarlo  De  Agostini <giancarlo.deagostini@iaen.edu.ec>, 2015
 # Jonathan Amaya <jonathan.amaya88@yahoo.com>, 2014
 # Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2015-2016
@@ -109,7 +109,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-07-07 14:20+0000\n"
+"POT-Creation-Date: 2016-07-15 14:47+0000\n"
 "PO-Revision-Date: 2016-05-25 00:06+0000\n"
 "Last-Translator: Juan Camilo Montoya Franco <juan.montoya@edunext.co>\n"
 "Language-Team: Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/)\n"
@@ -2807,14 +2807,9 @@ msgstr ""
 msgid "My Team"
 msgstr "Mi equipo"
 
-#. Translators: sr_start and sr_end surround text meant only for screen
-#. readers.
-#. The whole string will be shown to users as "Browse teams" if they are using
-#. a
-#. screenreader, and "Browse" otherwise.
-#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
-msgid "Browse {sr_start} teams {sr_end}"
-msgstr ""
+#: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
+msgid "Browse"
+msgstr "Explorar"
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "Your request could not be completed. Reload the page and try again."
@@ -5729,6 +5724,8 @@ msgid ""
 "Showing {currentItemRange} out of {totalItemsCount}, filtered by "
 "{assetType}, sorted by {sortName} ascending"
 msgstr ""
+"Mostrando {currentItemRange} de {totalItemsCount}, filtrado por {assetType},"
+" ordenado por {sortName} asc"
 
 #. Translators: sample result:
 #. "Showing 0-9 out of 25 total, filtered by Images, sorted by Date Added
@@ -5738,6 +5735,8 @@ msgid ""
 "Showing {currentItemRange} out of {totalItemsCount}, filtered by "
 "{assetType}, sorted by {sortName} descending"
 msgstr ""
+"Mostrando {currentItemRange} de {totalItemsCount}, filtrado por {assetType},"
+" ordenado por {sortName} desc"
 
 #. Translators: sample result:
 #. "Showing 0-9 out of 25 total, sorted by Date Added ascending"
@@ -5746,6 +5745,8 @@ msgid ""
 "Showing {currentItemRange} out of {totalItemsCount}, sorted by {sortName} "
 "ascending"
 msgstr ""
+"Mostrando {currentItemRange} de {totalItemsCount}, ordenado por {sortName} "
+"asc"
 
 #. Translators: sample result:
 #. "Showing 0-9 out of 25 total, sorted by Date Added descending"
@@ -5754,12 +5755,14 @@ msgid ""
 "Showing {currentItemRange} out of {totalItemsCount}, sorted by {sortName} "
 "descending"
 msgstr ""
+"Mostrando {currentItemRange} de {totalItemsCount}, ordenado por {sortName} "
+"desc."
 
 #. Translators: turns into "25 total" to be used in other sentences, e.g.
 #. "Showing 0-9 out of 25 total".
 #: cms/static/js/views/paging_header.js
 msgid "{totalItems} total"
-msgstr ""
+msgstr "{totalItems} total"
 
 #. Translators: This is listed as the duration for a video
 #. that has not yet reached the point in its processing by
@@ -6069,7 +6072,7 @@ msgstr "Reiniciar búsqueda"
 
 #: common/static/common/templates/discussion/discussion-home.underscore
 msgid "Discussion Home"
-msgstr ""
+msgstr "Inicio de la discusión"
 
 #: common/static/common/templates/discussion/discussion-home.underscore
 #, python-format
@@ -6411,7 +6414,7 @@ msgstr "Añadir una respuesta"
 
 #: common/static/common/templates/discussion/thread.underscore
 msgid "Add a response:"
-msgstr ""
+msgstr "Añada su respuesta:"
 
 #: common/static/common/templates/discussion/thread.underscore
 msgid "Expand discussion"
@@ -6642,7 +6645,7 @@ msgstr "Unirse al equipo"
 
 #: lms/djangoapps/teams/static/teams/templates/team-profile.underscore
 msgid "Add a Post"
-msgstr ""
+msgstr "Añadir un comentario:"
 
 #: lms/djangoapps/teams/static/teams/templates/team-profile.underscore
 msgid "Team Details"
@@ -6807,6 +6810,7 @@ msgstr "Obtenga créditos"
 msgid ""
 "Thank you %(full_name)s! We have received your payment for %(course_name)s."
 msgstr ""
+"Gracias %(full_name)s! Hemos recibido su pago para el curso %(course_name)s."
 
 #: lms/templates/commerce/receipt.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
@@ -6941,7 +6945,7 @@ msgstr "Haga clic para editar"
 
 #: lms/templates/fields/field_order_history.underscore
 msgid "Order Details"
-msgstr ""
+msgstr "Detalles de la orden"
 
 #: lms/templates/fields/field_text.underscore
 msgid "title"
@@ -7013,10 +7017,6 @@ msgstr ""
 "otorgado excepciones. Incluya el nombre de usuario o correo electrónico en "
 "el primer campo. Puede incluir además en un segundo campo, una nota opcional"
 " describiendo la razón para otorgar la excepción."
-
-#: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
-msgid "Browse"
-msgstr "Explorar"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list-editor.underscore
@@ -7357,56 +7357,56 @@ msgstr "certificado.nombre_mostrado"
 
 #: lms/templates/learner_dashboard/certificate_status.underscore
 msgid "Congratulations! You have earned a certificate for this course."
-msgstr ""
+msgstr "Felicitaciones! Usted a ganado un certificado de este curso."
 
 #: lms/templates/learner_dashboard/certificate_status.underscore
 msgid "View/Share Certificate"
-msgstr ""
+msgstr "Ver/compartir Certificado"
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
 msgid "enrolled"
-msgstr ""
+msgstr "inscritos"
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
 msgid "View Course"
-msgstr ""
+msgstr "Ver curso"
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
 msgid "View Archived Course"
-msgstr ""
+msgstr "Ver curso archivado"
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
 msgid "not enrolled"
-msgstr ""
+msgstr "No está inscrito"
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
 msgid "Please select a course date"
-msgstr ""
+msgstr "Por favor seleccione una fecha para el curso."
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
 msgid "Select Course Run"
-msgstr ""
+msgstr "Selecciona un curso a ejecutar"
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
 msgid "Choose Course Date"
-msgstr ""
+msgstr "Seleccione la fecha del curso"
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
 #, python-format
 msgid "Starts %(start)s"
-msgstr ""
+msgstr "Empieza %(start)s"
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
 msgid "Enroll Now"
-msgstr ""
+msgstr "Incríbase ahora"
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
 msgid "Coming Soon"
-msgstr ""
+msgstr "Próximamente"
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
 msgid "Enrollment Opens on"
-msgstr ""
+msgstr "Inscripciones abiertas en"
 
 #: lms/templates/learner_dashboard/empty_programs_list.underscore
 msgid "You are not enrolled in any XSeries Programs yet."
@@ -7443,29 +7443,31 @@ msgstr ""
 
 #: lms/templates/learner_dashboard/program_header_view.underscore
 msgid "{organization}\\'s logo"
-msgstr ""
+msgstr "Logo de la {organization}"
 
 #: lms/templates/learner_dashboard/program_header_view.underscore
 msgid "You are here"
-msgstr ""
+msgstr "Usted está aquí"
 
 #: lms/templates/learner_dashboard/program_header_view.underscore
 msgid "Dashboard"
-msgstr ""
+msgstr "Panel principal"
 
 #: lms/templates/learner_dashboard/program_header_view.underscore
 msgid "Programs"
-msgstr ""
+msgstr "Programas"
 
 #: lms/templates/learner_dashboard/upgrade_message.underscore
 msgid ""
 "You need a certificate in this course to be eligible for a program "
 "certificate."
 msgstr ""
+"Necesitas un certificado en este curso para ser elegible para un programa de"
+" certificación."
 
 #: lms/templates/learner_dashboard/upgrade_message.underscore
 msgid "Upgrade Now"
-msgstr ""
+msgstr "Actualizar Ahora"
 
 #: lms/templates/search/course_search_results.underscore
 #: lms/templates/search/dashboard_search_results.underscore
@@ -8096,16 +8098,20 @@ msgid ""
 "An email has been sent to {userEmail} with a link for you to activate your "
 "account."
 msgstr ""
+"Un correo electrónico ha sido enviado a su {userEmail} con un enlaze para "
+"activar su cuenta."
 
 #: lms/templates/verify_student/make_payment_step.underscore
 msgid "Why activate?"
-msgstr ""
+msgstr "Por qué activar?"
 
 #: lms/templates/verify_student/make_payment_step.underscore
 msgid ""
 "We ask you to activate your account to ensure it is really you creating the "
 "account and to prevent fraud."
 msgstr ""
+"Necesitamos que active su cuenta para asegurarnos que es usted realmente el "
+"que está creando la cuenta y para prevenir fraude."
 
 #: lms/templates/verify_student/make_payment_step.underscore
 msgid ""
