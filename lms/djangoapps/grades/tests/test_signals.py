@@ -5,7 +5,8 @@ Tests for the score change signals defined in the courseware models module.
 from django.test import TestCase
 from mock import patch, MagicMock
 
-from courseware.models import submissions_score_set_handler, submissions_score_reset_handler
+from ..signals import submissions_score_set_handler, submissions_score_reset_handler
+
 
 SUBMISSION_SET_KWARGS = {
     'points_possible': 10,
@@ -14,6 +15,7 @@ SUBMISSION_SET_KWARGS = {
     'course_id': 'CourseID',
     'item_id': 'i4x://org/course/usage/123456'
 }
+
 
 SUBMISSION_RESET_KWARGS = {
     'anonymous_user_id': 'anonymous_id',
@@ -35,25 +37,16 @@ class SubmissionSignalRelayTest(TestCase):
         Configure mocks for all the dependencies of the render method
         """
         super(SubmissionSignalRelayTest, self).setUp()
-        self.signal_mock = self.setup_patch('courseware.models.SCORE_CHANGED.send', None)
+        self.signal_mock = self.setup_patch('lms.djangoapps.grades.signals.SCORE_CHANGED.send', None)
         self.user_mock = MagicMock()
         self.user_mock.id = 42
-        self.get_user_mock = self.setup_patch('courseware.models.user_by_anonymous_id', self.user_mock)
+        self.get_user_mock = self.setup_patch('lms.djangoapps.grades.signals.user_by_anonymous_id', self.user_mock)
 
     def setup_patch(self, function_name, return_value):
         """
         Patch a function with a given return value, and return the mock
         """
         mock = MagicMock(return_value=return_value)
-        new_patch = patch(function_name, new=mock)
-        new_patch.start()
-        self.addCleanup(new_patch.stop)
-        return mock
-
-    def setup_patch_with_mock(self, function_name, mock):
-        """
-        Patch a function with a given mock
-        """
         new_patch = patch(function_name, new=mock)
         new_patch.start()
         self.addCleanup(new_patch.stop)
@@ -103,7 +96,7 @@ class SubmissionSignalRelayTest(TestCase):
         that has an invalid user ID, the courseware model does not generate a
         signal.
         """
-        self.get_user_mock = self.setup_patch('courseware.models.user_by_anonymous_id', None)
+        self.get_user_mock = self.setup_patch('lms.djangoapps.grades.signals.user_by_anonymous_id', None)
         submissions_score_set_handler(None, **SUBMISSION_SET_KWARGS)
         self.signal_mock.assert_not_called()
 
@@ -152,6 +145,6 @@ class SubmissionSignalRelayTest(TestCase):
         that has an invalid user ID, the courseware model does not generate a
         signal.
         """
-        self.get_user_mock = self.setup_patch('courseware.models.user_by_anonymous_id', None)
+        self.get_user_mock = self.setup_patch('lms.djangoapps.grades.signals.user_by_anonymous_id', None)
         submissions_score_reset_handler(None, **SUBMISSION_RESET_KWARGS)
         self.signal_mock.assert_not_called()

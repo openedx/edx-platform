@@ -1890,6 +1890,7 @@ INSTALLED_APPS = (
     'openedx.core.djangoapps.course_groups',
     'bulk_email',
     'branding',
+    'grades',
 
     # Student support tools
     'support',

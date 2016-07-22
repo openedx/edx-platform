@@ -3,10 +3,10 @@ Grades Transformer
 """
 from django.test.client import RequestFactory
 
+from courseware.model_data import FieldDataCache
+from courseware.module_render import get_module_for_descriptor
 from openedx.core.lib.block_structure.transformer import BlockStructureTransformer
 from openedx.core.djangoapps.util.user_utils import SystemUser
-from .. import module_render
-from courseware.model_data import FieldDataCache
 
 
 class GradesTransformer(BlockStructureTransformer):
@@ -98,5 +98,5 @@ class GradesTransformer(BlockStructureTransformer):
         for block_locator in block_structure.post_order_traversal():
             block = block_structure.get_xblock(block_locator)
             if getattr(block, 'has_score', False):
-                module = module_render.get_module_for_descriptor(user, request, block, cache, course_key)
+                module = get_module_for_descriptor(user, request, block, cache, course_key)
                 yield module

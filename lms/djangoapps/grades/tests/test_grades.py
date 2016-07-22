@@ -3,19 +3,12 @@ Test grade calculation.
 """
 from django.http import Http404
 from django.test import TestCase
-from django.test.client import RequestFactory
 
 from mock import patch, MagicMock
 from nose.plugins.attrib import attr
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from opaque_keys.edx.locator import CourseLocator, BlockUsageLocator
 
-from courseware.grades import (
-    grade,
-    iterate_grades_for,
-    ProgressSummary,
-    get_module_score
-)
 from courseware.module_render import get_module
 from courseware.model_data import FieldDataCache, set_score
 from courseware.tests.helpers import (
@@ -27,6 +20,11 @@ from student.tests.factories import UserFactory
 from student.models import CourseEnrollment
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+
+from .. import course_grades
+from ..course_grades import summary as grades_summary
+from ..module_grades import get_module_score
+from ..progress import ProgressSummary
 
 
 def _grade_with_errors(student, course, keep_raw_scores=False):
@@ -40,7 +38,7 @@ def _grade_with_errors(student, course, keep_raw_scores=False):
     if student.username in ['student3', 'student4']:
         raise Exception("I don't like {}".format(student.username))
 
-    return grade(student, course, keep_raw_scores=keep_raw_scores)
+    return grades_summary(student, course, keep_raw_scores=keep_raw_scores)
 
 
 @attr('shard_1')
@@ -76,7 +74,7 @@ class TestGradeIteration(SharedModuleStoreTestCase):
     def test_empty_student_list(self):
         """If we don't pass in any students, it should return a zero-length
         iterator, but it shouldn't error."""
-        gradeset_results = list(iterate_grades_for(self.course.id, []))
+        gradeset_results = list(course_grades.iterate_grades_for(self.course.id, []))
         self.assertEqual(gradeset_results, [])
 
     def test_nonexistent_course(self):
@@ -84,7 +82,7 @@ class TestGradeIteration(SharedModuleStoreTestCase):
         should be raised. This is a horrible crossing of abstraction boundaries
         and should be fixed, but for now we're just testing the behavior. :-("""
         with self.assertRaises(Http404):
-            gradeset_results = iterate_grades_for(SlashSeparatedCourseKey("I", "dont", "exist"), [])
+            gradeset_results = course_grades.iterate_grades_for(SlashSeparatedCourseKey("I", "dont", "exist"), [])
             gradeset_results.next()
 
     def test_all_empty_grades(self):
@@ -95,7 +93,7 @@ class TestGradeIteration(SharedModuleStoreTestCase):
             self.assertIsNone(gradeset['grade'])
             self.assertEqual(gradeset['percent'], 0.0)
 
-    @patch('courseware.grades.grade', _grade_with_errors)
+    @patch('lms.djangoapps.grades.course_grades.summary', _grade_with_errors)
     def test_grading_exception(self):
         """Test that we correctly capture exception messages that bubble up from
         grading. Note that we only see errors at this level if the grading
@@ -136,36 +134,12 @@ class TestGradeIteration(SharedModuleStoreTestCase):
         students_to_gradesets = {}
         students_to_errors = {}
 
-        for student, gradeset, err_msg in iterate_grades_for(course_id, students):
+        for student, gradeset, err_msg in course_grades.iterate_grades_for(course_id, students):
             students_to_gradesets[student] = gradeset
             if err_msg:
                 students_to_errors[student] = err_msg
 
         return students_to_gradesets, students_to_errors
-
-
-class TestFieldDataCacheScorableLocations(SharedModuleStoreTestCase):
-    """
-    Make sure we can filter the locations we pull back student state for via
-    the FieldDataCache.
-    """
-    @classmethod
-    def setUpClass(cls):
-        super(TestFieldDataCacheScorableLocations, cls).setUpClass()
-        cls.course = CourseFactory.create()
-        chapter = ItemFactory.create(category='chapter', parent=cls.course)
-        sequential = ItemFactory.create(category='sequential', parent=chapter)
-        vertical = ItemFactory.create(category='vertical', parent=sequential)
-        ItemFactory.create(category='video', parent=vertical)
-        ItemFactory.create(category='html', parent=vertical)
-        ItemFactory.create(category='discussion', parent=vertical)
-        ItemFactory.create(category='problem', parent=vertical)
-
-    def setUp(self):
-        super(TestFieldDataCacheScorableLocations, self).setUp()
-        self.student = UserFactory.create()
-
-        CourseEnrollment.enroll(self.student, self.course.id)
 
 
 class TestProgressSummary(TestCase):

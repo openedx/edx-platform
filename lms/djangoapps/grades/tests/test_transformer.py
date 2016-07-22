@@ -13,7 +13,7 @@ from xmodule.modulestore.tests.factories import check_mongo_calls
 from lms.djangoapps.course_blocks.api import get_course_blocks
 from lms.djangoapps.course_blocks.transformers.tests.helpers import CourseStructureTestCase
 from openedx.core.djangoapps.content.block_structure.api import get_cache
-from ..transformers.grades import GradesTransformer
+from ..transformer import GradesTransformer
 
 
 class GradesTransformerTestCase(CourseStructureTestCase):
