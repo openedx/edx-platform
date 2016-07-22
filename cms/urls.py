@@ -181,6 +181,12 @@ if settings.FEATURES.get('CERTIFICATES_HTML_VIEW'):
             'contentstore.views.certificates.certificates_list_handler')
     )
 
+# Maintenance Dashboard
+urlpatterns += patterns(
+    '',
+    url(r'^maintenance/', include('maintenance.urls', namespace='maintenance')),
+)
+
 urlpatterns += (
     # These views use a configuration model to determine whether or not to
     # display the Programs authoring app. If disabled, a 404 is returned.
