@@ -19,7 +19,7 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_http_methods
 
 from lang_pref.api import released_languages
-from edxmako.shortcuts import render_to_response
+from edxmako.shortcuts import render_to_response, marketing_link
 from microsite_configuration import microsite
 
 from external_auth.login_and_register import (
@@ -102,6 +102,9 @@ def login_and_registration_form(request, initial_mode="login"):
             pass
 
     # Otherwise, render the combined login/registration page
+    faq_url = None
+    if settings.FEATURES.get('ENABLE_MKTG_SITE'):
+        faq_url = marketing_link('FAQ')
     context = {
         'data': {
             'login_redirect_url': redirect_to,
@@ -109,6 +112,7 @@ def login_and_registration_form(request, initial_mode="login"):
             'third_party_auth': _third_party_auth_context(request, redirect_to),
             'third_party_auth_hint': third_party_auth_hint or '',
             'platform_name': settings.PLATFORM_NAME,
+            'faq_url': faq_url or '',
 
             # Include form descriptions retrieved from the user API.
             # We could have the JS client make these requests directly,
