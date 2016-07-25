@@ -12,7 +12,7 @@
                 if (data){
                     this.set({
                         name: data.name,
-                        type: data.display_category + ' Program',
+                        category: data.category,
                         subtitle: data.subtitle,
                         organizations: data.organizations,
                         detailUrl: data.detail_url,

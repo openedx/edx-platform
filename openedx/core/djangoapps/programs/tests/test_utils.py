@@ -93,24 +93,6 @@ class TestProgramRetrieval(ProgramsApiConfigMixin, ProgramsDataMixin, Credential
         # Verify the API was actually hit (not the cache).
         self.assertEqual(len(httpretty.httpretty.latest_requests), 1)
 
-    @ddt.data(True, False)
-    def test_get_programs_category_casing(self, is_detail):
-        """Temporary. Verify that program categories are lowercased."""
-        self.create_programs_config()
-
-        program = factories.Program(category='camelCase')
-
-        if is_detail:
-            program_id = program['id']
-
-            self.mock_programs_api(data=program, program_id=program_id)
-            data = utils.get_programs(self.user, program_id=program_id)
-            self.assertEqual(data['category'], 'camelcase')
-        else:
-            self.mock_programs_api(data={'results': [program]})
-            data = utils.get_programs(self.user)
-            self.assertEqual(data[0]['category'], 'camelcase')
-
     def test_get_programs_caching(self):
         """Verify that when enabled, the cache is used for non-staff users."""
         self.create_programs_config(cache_ttl=1)
@@ -234,18 +216,6 @@ class TestProgramRetrieval(ProgramsApiConfigMixin, ProgramsDataMixin, Credential
         ]
         actual = utils.get_programs_for_credentials(self.user, credential_data)
         self.assertEqual(actual, [])
-
-    def test_get_display_category_success(self):
-        self.create_programs_config()
-        self.mock_programs_api()
-        actual_programs = utils.get_programs(self.user)
-        for program in actual_programs:
-            expected = 'XSeries'
-            self.assertEqual(expected, utils.get_display_category(program))
-
-    def test_get_display_category_none(self):
-        self.assertEqual('', utils.get_display_category(None))
-        self.assertEqual('', utils.get_display_category({"id": "test"}))
 
 
 @skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')

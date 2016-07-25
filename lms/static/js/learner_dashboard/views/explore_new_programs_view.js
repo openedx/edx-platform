@@ -23,8 +23,8 @@
                     this.context = data.context;
                     this.$parentEl = $(this.parentEl);
 
-                    if (this.context.xseriesUrl){
-                        // Only render if there is an XSeries link
+                    if (this.context.marketingUrl){
+                        // Only render if there is a link
                         this.render();
                     } else {
                         /**

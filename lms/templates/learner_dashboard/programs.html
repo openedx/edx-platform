@@ -14,11 +14,11 @@ from openedx.core.djangolib.js_utils import (
 <%block name="js_extra">
 <%static:require_module module_name="js/learner_dashboard/program_list_factory" class_name="ProgramListFactory">
 ProgramListFactory({
-    programsData: ${programs | n, dump_js_escaped_json},
     certificatesData: ${credentials | n, dump_js_escaped_json},
-    userProgress: ${progress | n, dump_js_escaped_json},
-    xseriesUrl: '${xseries_url | n, js_escaped_string}',
-    xseriesImage: '${static.url('images/xseries-certificate-visual.png') | n, js_escaped_string}'
+    marketingUrl: '${marketing_url | n, js_escaped_string}',
+    programsData: ${programs | n, dump_js_escaped_json},
+    sampleCertImageSrc: '${static.url('images/programs/sample-cert.png') | n, js_escaped_string}',
+    userProgress: ${progress | n, dump_js_escaped_json}
 });
 </%static:require_module>
 </%block>

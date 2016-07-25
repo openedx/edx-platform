@@ -176,44 +176,9 @@ class TestCredentialsRetrieval(ProgramsApiConfigMixin, CredentialsApiConfigMixin
         # Mocking the API responses from programs and credentials
         self.mock_programs_api()
         self.mock_credentials_api(self.user, reset_url=False)
-        actual = get_programs_credentials(self.user, category='xseries')
-        expected = self.expected_credentials_display_data()
-
-        # Checking result is as expected
-        self.assertEqual(len(actual), 2)
-        self.assertEqual(actual, expected)
-
-    @httpretty.activate
-    def test_get_programs_credentials_category(self):
-        """ Verify behaviour when program category is provided."""
-        # create credentials and program configuration
-        self.create_credentials_config()
-        self.create_programs_config()
-
-        # Mocking the API responses from programs and credentials
-        self.mock_programs_api()
-        self.mock_credentials_api(self.user, reset_url=False)
-        actual = get_programs_credentials(self.user, category='dummy_category')
-        expected = self.expected_credentials_display_data()
-
-        self.assertEqual(len(actual), 0)
-
-        actual = get_programs_credentials(self.user, category='xseries')
-
-        self.assertEqual(len(actual), 2)
-        self.assertEqual(actual, expected)
-
-    @httpretty.activate
-    def test_get_programs_credentials_no_category(self):
-        """ Verify behaviour when no program category is provided. """
-        self.create_credentials_config()
-        self.create_programs_config()
-
-        # Mocking the API responses from programs and credentials
-        self.mock_programs_api()
-        self.mock_credentials_api(self.user, reset_url=False)
         actual = get_programs_credentials(self.user)
         expected = self.expected_credentials_display_data()
 
+        # Checking result is as expected
         self.assertEqual(len(actual), 2)
         self.assertEqual(actual, expected)
