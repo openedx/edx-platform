@@ -633,6 +633,13 @@ During acceptance test execution, Django log files are written to
 
 **Note**: The acceptance tests can *not* currently run in parallel.
 
+Running Tests on Paver Scripts
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To run tests on the scripts that power the various Paver commands, use the following command::
+
+  nosetests paver
+
 
 Testing internationalization with dummy translations
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
