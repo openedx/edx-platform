@@ -129,7 +129,7 @@ class ChoiceGroupTemplateTest(TemplateTestCase):
             'input_type': 'checkbox',
             'name_array_suffix': '1',
             'value': '3',
-            'response_data': {'label': 'test', 'description_ids': ''}
+            'response_data': {'label': 'test', 'description_ids': '', 'descriptions': {}}
         }
         super(ChoiceGroupTemplateTest, self).setUp()
 
@@ -360,7 +360,7 @@ class TextlineTemplateTest(TemplateTestCase):
             'value': '3',
             'preprocessor': None,
             'trailing_text': None,
-            'response_data': {'label': 'test', 'description_ids': ''}
+            'response_data': {'label': 'test', 'description_ids': '', 'descriptions': {}}
         }
         super(TextlineTemplateTest, self).setUp()
 
@@ -489,7 +489,7 @@ class FormulaEquationInputTemplateTest(TemplateTestCase):
             'previewer': 'file.js',
             'reported_status': 'REPORTED_STATUS',
             'trailing_text': None,
-            'response_data': {'label': 'test', 'description_ids': ''}
+            'response_data': {'label': 'test', 'description_ids': '', 'descriptions': {}}
         }
         super(FormulaEquationInputTemplateTest, self).setUp()
 
@@ -527,7 +527,7 @@ class AnnotationInputTemplateTest(TemplateTestCase):
             'status': Status('unsubmitted'),
             'return_to_annotation': False,
             'msg': '<p>This is a test message</p>',
-            'response_data': {'label': 'test', 'description_ids': ''}
+            'response_data': {'label': 'test', 'description_ids': '', 'descriptions': {}}
         }
         super(AnnotationInputTemplateTest, self).setUp()
 
@@ -688,7 +688,7 @@ class OptionInputTemplateTest(TemplateTestCase):
             'options': [],
             'status': Status('unsubmitted'),
             'value': 0,
-            'response_data': {'label': 'test', 'description_ids': ''}
+            'response_data': {'label': 'test', 'description_ids': '', 'descriptions': {}}
         }
         super(OptionInputTemplateTest, self).setUp()
 
@@ -825,7 +825,7 @@ class ChoiceTextGroupTemplateTest(TemplateTestCase):
             'status': Status('correct'),
             'input_type': 'radio',
             'value': self.VALUE_DICT,
-            'response_data': {'label': 'test', 'description_ids': ''}
+            'response_data': {'label': 'test', 'description_ids': '', 'descriptions': {}}
         }
 
         super(ChoiceTextGroupTemplateTest, self).setUp()

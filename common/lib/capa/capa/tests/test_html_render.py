@@ -7,6 +7,7 @@ import mock
 
 from .response_xml_factory import StringResponseXMLFactory, CustomResponseXMLFactory
 from . import test_capa_system, new_loncapa_problem
+from capa.capa_problem import DEFAULT_QUESTION_TEXT
 
 
 class CapaHtmlRenderTest(unittest.TestCase):
@@ -185,7 +186,7 @@ class CapaHtmlRenderTest(unittest.TestCase):
             'id': '1_2_1',
             'trailing_text': '',
             'size': None,
-            'response_data': {'description_ids': '', 'label': '', 'descriptions': {}}
+            'response_data': {'description_ids': '', 'label': DEFAULT_QUESTION_TEXT, 'descriptions': {}}
         }
 
         expected_solution_context = {'id': '1_solution_1'}

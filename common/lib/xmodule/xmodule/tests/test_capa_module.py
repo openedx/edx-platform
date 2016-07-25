@@ -20,6 +20,7 @@ from webob.multidict import MultiDict
 import xmodule
 from xmodule.tests import DATA_DIR
 from capa import responsetypes
+from capa.capa_problem import DEFAULT_QUESTION_TEXT
 from capa.responsetypes import (StudentInputError, LoncapaProblemError,
                                 ResponseError)
 from capa.xqueue_interface import XQueueInterface
@@ -2635,7 +2636,7 @@ class TestProblemCheckTracking(unittest.TestCase):
         event = self.get_event_for_answers(module, answer_input_dict)
         self.assertEquals(event['submission'], {
             factory.answer_key(2): {
-                'question': '',
+                'question': DEFAULT_QUESTION_TEXT,
                 'answer': '3.14',
                 'response_type': 'numericalresponse',
                 'input_type': 'textline',
@@ -2666,7 +2667,7 @@ class TestProblemCheckTracking(unittest.TestCase):
         event = self.get_event_for_answers(module, answer_input_dict)
         self.assertEquals(event['submission'], {
             factory.answer_key(2, 1): {
-                'question': '',
+                'question': DEFAULT_QUESTION_TEXT,
                 'answer': 'blue',
                 'response_type': 'optionresponse',
                 'input_type': 'optioninput',
@@ -2674,7 +2675,7 @@ class TestProblemCheckTracking(unittest.TestCase):
                 'variant': '',
             },
             factory.answer_key(2, 2): {
-                'question': '',
+                'question': DEFAULT_QUESTION_TEXT,
                 'answer': 'yellow',
                 'response_type': 'optionresponse',
                 'input_type': 'optioninput',
@@ -2731,7 +2732,7 @@ class TestProblemCheckTracking(unittest.TestCase):
         event = self.get_event_for_answers(module, answer_input_dict)
         self.assertEquals(event['submission'], {
             factory.answer_key(2, 1): {
-                'question': '',
+                'question': DEFAULT_QUESTION_TEXT,
                 'answer': 'apple',
                 'response_type': 'optionresponse',
                 'input_type': 'optioninput',
@@ -2739,7 +2740,7 @@ class TestProblemCheckTracking(unittest.TestCase):
                 'variant': '',
             },
             factory.answer_key(2, 2): {
-                'question': '',
+                'question': DEFAULT_QUESTION_TEXT,
                 'answer': 'cucumber',
                 'response_type': 'optionresponse',
                 'input_type': 'optioninput',
@@ -2759,7 +2760,7 @@ class TestProblemCheckTracking(unittest.TestCase):
         event = self.get_event_for_answers(module, answer_input_dict)
         self.assertEquals(event['submission'], {
             factory.answer_key(2): {
-                'question': '',
+                'question': DEFAULT_QUESTION_TEXT,
                 'answer': '3.14',
                 'response_type': 'numericalresponse',
                 'input_type': 'textline',
@@ -2791,7 +2792,7 @@ class TestProblemCheckTracking(unittest.TestCase):
         event = self.get_event_for_answers(module, answer_input_dict)
         self.assertEquals(event['submission'], {
             factory.answer_key(2): {
-                'question': '',
+                'question': DEFAULT_QUESTION_TEXT,
                 'answer': fpaths,
                 'response_type': 'coderesponse',
                 'input_type': 'filesubmission',
@@ -2801,7 +2802,7 @@ class TestProblemCheckTracking(unittest.TestCase):
             factory.answer_key(3): {
                 'answer': 'None',
                 'correct': True,
-                'question': '',
+                'question': DEFAULT_QUESTION_TEXT,
                 'response_type': 'customresponse',
                 'input_type': 'textline',
                 'variant': ''

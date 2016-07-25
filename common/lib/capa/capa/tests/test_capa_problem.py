@@ -103,7 +103,7 @@ class CAPAProblemTest(unittest.TestCase):
             0
         )
 
-    def test_mulitple_descriptions(self):
+    def test_multiple_descriptions(self):
         """
         Verify that multiple descriptions are handled correctly.
         """
@@ -129,6 +129,34 @@ class CAPAProblemTest(unittest.TestCase):
                     'descriptions': {
                         '1_description_2_1': "The problem with trying to be the bad guy, there's always someone worse.",
                         '1_description_2_2': "Anyone who looks the world as if it was a game of chess deserves to lose."
+                    }
+                }
+            }
+        )
+
+    def test_default_question_text(self):
+        """
+        Verify that default question text is shown when we question is missing.
+        """
+        xml = """
+        <problem>
+            <p>Be sure to check your spelling.</p>
+            <stringresponse answer="War" type="ci">
+                <description>Everybody needs somebody to talk to.</description>
+                <textline size="40"/>
+            </stringresponse>
+        </problem>
+        """
+        problem = new_loncapa_problem(xml)
+        self.assertEqual(
+            problem.problem_data,
+            {
+                '1_2':
+                {
+                    'description_ids': '1_description_2_1',
+                    'label': 'You must specify meaningful question text.',
+                    'descriptions': {
+                        '1_description_2_1': "Everybody needs somebody to talk to."
                     }
                 }
             }

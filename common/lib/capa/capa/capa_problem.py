@@ -16,6 +16,7 @@ This is used by capa_module.
 from collections import OrderedDict
 from copy import deepcopy
 from datetime import datetime
+from gettext import gettext as _
 import logging
 import os.path
 import re
@@ -61,6 +62,9 @@ log = logging.getLogger(__name__)
 
 #-----------------------------------------------------------------------------
 # main class for this module
+
+
+DEFAULT_QUESTION_TEXT = _("You must specify meaningful question text.")
 
 
 class LoncapaSystem(object):
@@ -902,7 +906,7 @@ class LoncapaProblem(object):
                 description_id += 1
 
             problem_data[question_id] = {
-                'label': label,
+                'label': label.strip() or DEFAULT_QUESTION_TEXT,
                 'description_ids': ' '.join(descriptions.keys()),
                 'descriptions': descriptions
             }
