@@ -7,10 +7,9 @@ import json
 from collections import defaultdict
 from django.contrib.auth.models import User
 from xmodule.modulestore.django import modulestore
-from milestones import api as milestones_api
 from openedx.core.lib.gating import api as gating_api
 from lms.djangoapps.grades.module_grades import get_module_score
-
+from util import milestones_helpers
 
 log = logging.getLogger(__name__)
 
@@ -81,6 +80,6 @@ def evaluate_prerequisite(course, prereq_content_key, user_id):
                             )
 
                     if score >= min_score:
-                        milestones_api.add_user_milestone({'id': user_id}, prereq_milestone)
+                        milestones_helpers.add_user_milestone({'id': user_id}, prereq_milestone)
                     else:
-                        milestones_api.remove_user_milestone({'id': user_id}, prereq_milestone)
+                        milestones_helpers.remove_user_milestone({'id': user_id}, prereq_milestone)
