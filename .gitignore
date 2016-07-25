@@ -97,7 +97,7 @@ cms/static/css/
 cms/static/sass/*.css
 cms/static/sass/*.css.map
 cms/static/themed_sass/
-themes/**/css/*.css
+themes/**/css/**/*.css
 
 ### Logging artifacts
 log/
