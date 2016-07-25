@@ -19,7 +19,6 @@ from mock import MagicMock, patch, Mock
 from opaque_keys.edx.keys import UsageKey, CourseKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from pyquery import PyQuery
-from courseware.module_render import hash_resource
 from xblock.field_data import FieldData
 from xblock.runtime import Runtime
 from xblock.fields import ScopeIds
@@ -2225,9 +2224,7 @@ class TestDisabledXBlockTypes(ModuleStoreTestCase):
     # pylint: disable=no-member
     def setUp(self):
         super(TestDisabledXBlockTypes, self).setUp()
-
-        for store in self.store.modulestores:
-            store.disabled_xblock_types = ('video',)
+        XBlockConfiguration(name='video', enabled=False).save()
 
     @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
     def test_get_item(self, default_ms):
@@ -2240,15 +2237,27 @@ class TestDisabledXBlockTypes(ModuleStoreTestCase):
         """Tests that the list of disabled xblocks can dynamically update."""
         with self.store.default_store(default_ms):
             course = CourseFactory()
-            self._verify_descriptor('problem', course, 'CapaDescriptorWithMixins')
+            item_usage_id = self._verify_descriptor('problem', course, 'CapaDescriptorWithMixins')
             XBlockConfiguration(name='problem', enabled=False).save()
-            self._verify_descriptor('problem', course, 'RawDescriptorWithMixins')
 
-    def _verify_descriptor(self, category, course, descriptor):
+            # First verify that the cached value is used until there is a new request cache.
+            self._verify_descriptor('problem', course, 'CapaDescriptorWithMixins', item_usage_id)
+
+            # Now simulate a new request cache.
+            self.store.request_cache.data = {}
+            self._verify_descriptor('problem', course, 'RawDescriptorWithMixins', item_usage_id)
+
+    def _verify_descriptor(self, category, course, descriptor, item_id=None):
         """
         Helper method that gets an item with the specified category from the
         modulestore and verifies that it has the expected descriptor name.
+
+        Returns the item's usage_id.
         """
-        item = ItemFactory(category=category, parent=course)
-        item = self.store.get_item(item.scope_ids.usage_id)
+        if not item_id:
+            item = ItemFactory(category=category, parent=course)
+            item_id = item.scope_ids.usage_id
+
+        item = self.store.get_item(item_id)
         self.assertEqual(item.__class__.__name__, descriptor)
+        return item_id
