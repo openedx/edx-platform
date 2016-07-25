@@ -17,15 +17,20 @@
                 console.error("Expected library to be included on page, but not found on window object: " + name);
             }
         };
+
         defineDependency("jQuery", "jquery");
+
+        /*
         defineDependency("_", "underscore");
         defineDependency("gettext", "gettext");
         defineDependency("Logger", "logger");
         defineDependency("URI", "URI");
         defineDependency("Backbone", "backbone");
 
+
         // utility.js adds two functions to the window object, but does not return anything
         defineDependency("isExternal", "utility", true);
+        */
     }
 
     require.config({
