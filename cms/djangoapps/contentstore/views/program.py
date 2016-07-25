@@ -28,11 +28,12 @@ class ProgramAuthoringView(View):
 
         if programs_config.is_studio_tab_enabled and request.user.is_staff:
             return render_to_response('program_authoring.html', {
+                'show_programs_header': programs_config.is_studio_tab_enabled,
+                'authoring_app_config': programs_config.authoring_app_config,
                 'lms_base_url': '//{}/'.format(settings.LMS_BASE),
                 'programs_api_url': programs_config.public_api_url,
                 'programs_token_url': reverse('programs_id_token'),
                 'studio_home_url': reverse('home'),
-                'uses_pattern_library': True
             })
         else:
             raise Http404

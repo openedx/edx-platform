@@ -1,8 +1,8 @@
-<%page expression_filter="h" args="online_help_token" />
 <%!
 from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse
 %>
+<%page args="online_help_token"/>
 <div class="wrapper-sock wrapper">
   <ul class="list-actions list-cta">
     <li class="action-item">
@@ -15,7 +15,8 @@ from django.core.urlresolvers import reverse
 
   <div class="wrapper-inner wrapper">
     <section class="sock" id="sock" aria-labelledby="sock-heading">
-        <h2 id="sock-heading" class="title sr-only">${_("{studio_name} Documentation").format(studio_name=settings.STUDIO_NAME)}</h2>
+        <h2 id="sock-heading" class="title sr">${_("{studio_name} Documentation").format(studio_name=settings.STUDIO_NAME)}</h2>
+
       <div class="support">
         <%!
         from django.conf import settings

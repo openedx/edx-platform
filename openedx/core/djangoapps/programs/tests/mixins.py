@@ -15,6 +15,8 @@ class ProgramsApiConfigMixin(object):
         'api_version_number': 1,
         'internal_service_url': 'http://internal.programs.org/',
         'public_service_url': 'http://public.programs.org/',
+        'authoring_app_js_path': '/path/to/js',
+        'authoring_app_css_path': '/path/to/css',
         'cache_ttl': 0,
         'enable_student_dashboard': True,
         'enable_studio_tab': True,
