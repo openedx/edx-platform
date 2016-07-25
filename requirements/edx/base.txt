@@ -65,7 +65,7 @@ mongoengine==0.10.0
 MySQL-python==1.2.5
 networkx==1.7
 nose-xunitmp==0.3.2
-oauthlib==0.7.2
+oauthlib==1.0.3
 paramiko==1.9.0
 path.py==7.2
 piexif==1.0.2

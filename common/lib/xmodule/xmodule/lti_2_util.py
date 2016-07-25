@@ -109,16 +109,16 @@ class LTI20ModuleMixin(object):
         log.debug("[LTI] oauth_body_hash = {}".format(oauth_body_hash))
         client_key, client_secret = self.get_client_key_secret()
         client = Client(client_key, client_secret)
-        params = client.get_oauth_params(None)
-        params.append((u'oauth_body_hash', oauth_body_hash))
         mock_request = mock.Mock(
             uri=unicode(urllib.unquote(request.url)),
             headers=request.headers,
             body=u"",
             decoded_body=u"",
-            oauth_params=params,
             http_method=unicode(request.method),
         )
+        params = client.get_oauth_params(mock_request)
+        mock_request.oauth_params = params
+        mock_request.oauth_params.append((u'oauth_body_hash', oauth_body_hash))
         sig = client.get_oauth_signature(mock_request)
         mock_request.oauth_params.append((u'oauth_signature', sig))
 
