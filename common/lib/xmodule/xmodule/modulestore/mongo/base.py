@@ -1088,6 +1088,11 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         Get the course with the given courseid (org/course/run)
         """
         assert isinstance(course_key, CourseKey)
+
+        if not course_key.deprecated:  # split course_key
+            # The supplied CourseKey is of the wrong type, so it can't possibly be stored in this modulestore.
+            raise ItemNotFoundError(course_key)
+
         course_key = self.fill_in_run(course_key)
         location = course_key.make_usage_key('course', course_key.run)
         try:

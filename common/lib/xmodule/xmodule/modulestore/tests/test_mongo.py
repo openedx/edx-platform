@@ -24,6 +24,7 @@ from xblock.runtime import KeyValueStore
 from xblock.exceptions import InvalidScopeError
 
 from xmodule.tests import DATA_DIR
+from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import Location
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.mongo import MongoKeyValueStore
@@ -289,6 +290,15 @@ class TestMongoModuleStore(TestMongoModuleStoreBase):
             )
             assert_false(self.draft_store.has_course(mix_cased))
             assert_false(self.draft_store.has_course(mix_cased, ignore_case=True))
+
+    def test_get_mongo_course_with_split_course_key(self):
+        """
+        Test mongo course using split course_key will not able to access it.
+        """
+        course_key = CourseKey.from_string('course-v1:edX+simple+2012_Fall')
+
+        with self.assertRaises(ItemNotFoundError):
+            self.draft_store.get_course(course_key)
 
     def test_has_course_with_library(self):
         """
