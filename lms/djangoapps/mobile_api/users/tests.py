@@ -430,7 +430,7 @@ class TestCourseStatusPATCH(CourseStatusAPITestCase, MobileAuthUserTestMixin,
 
 
 @attr('shard_2')
-class TestCourseEnrollmentSerializer(MobileAPITestCase):
+class TestCourseEnrollmentSerializer(MobileAPITestCase, MilestonesTestCaseMixin):
     """
     Test the course enrollment serializer
     """
