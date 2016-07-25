@@ -60,13 +60,15 @@ from ccx_keys.locator import CCXLocator
 
 from lms.djangoapps.ccx.models import CustomCourseForEdX
 from lms.djangoapps.ccx.overrides import get_override_for_ccx, override_field_for_ccx
-from lms.djangoapps.ccx.views import ccx_course
 from lms.djangoapps.ccx.tests.factories import CcxFactory
 from lms.djangoapps.ccx.tests.utils import (
     CcxTestCase,
     flatten,
 )
-from lms.djangoapps.ccx.utils import is_email
+from lms.djangoapps.ccx.utils import (
+    ccx_course,
+    is_email
+)
 from lms.djangoapps.ccx.views import get_date
 
 from xmodule.modulestore.django import modulestore
@@ -137,18 +139,21 @@ class TestAdminAccessCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
     """
     MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
 
+    def setUp(self):
+        super(TestAdminAccessCoachDashboard, self).setUp()
+        self.make_coach()
+        ccx = self.make_ccx()
+        ccx_key = CCXLocator.from_course_locator(self.course.id, ccx.id)
+        self.url = reverse('ccx_coach_dashboard', kwargs={'course_id': ccx_key})
+
     def test_staff_access_coach_dashboard(self):
         """
         User is staff, should access coach dashboard.
         """
         staff = self.make_staff()
         self.client.login(username=staff.username, password="test")
-        self.make_coach()
-        ccx = self.make_ccx()
-        url = reverse(
-            'ccx_coach_dashboard',
-            kwargs={'course_id': CCXLocator.from_course_locator(self.course.id, ccx.id)})
-        response = self.client.get(url)
+
+        response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
 
     def test_instructor_access_coach_dashboard(self):
@@ -157,12 +162,9 @@ class TestAdminAccessCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
         """
         instructor = self.make_instructor()
         self.client.login(username=instructor.username, password="test")
-        self.make_coach()
-        ccx = self.make_ccx()
-        url = reverse(
-            'ccx_coach_dashboard',
-            kwargs={'course_id': CCXLocator.from_course_locator(self.course.id, ccx.id)})
-        response = self.client.get(url)
+
+        # Now access URL
+        response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
 
     def test_forbidden_user_access_coach_dashboard(self):
@@ -171,12 +173,7 @@ class TestAdminAccessCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
         """
         user = UserFactory.create(password="test")
         self.client.login(username=user.username, password="test")
-        self.make_coach()
-        ccx = self.make_ccx()
-        url = reverse(
-            'ccx_coach_dashboard',
-            kwargs={'course_id': CCXLocator.from_course_locator(self.course.id, ccx.id)})
-        response = self.client.get(url)
+        response = self.client.get(self.url)
         self.assertEqual(response.status_code, 403)
 
 
@@ -1096,7 +1093,7 @@ class TestCCXGrades(FieldOverrideTestMixin, SharedModuleStoreTestCase, LoginEnro
 
 
 @ddt.ddt
-class CCXCoachTabTestCase(SharedModuleStoreTestCase):
+class CCXCoachTabTestCase(CcxTestCase):
     """
     Test case for CCX coach tab.
     """
@@ -1114,10 +1111,10 @@ class CCXCoachTabTestCase(SharedModuleStoreTestCase):
             role = CourseCcxCoachRole(course.id)
             role.add_users(self.user)
 
-    def check_ccx_tab(self, course):
+    def check_ccx_tab(self, course, user):
         """Helper function for verifying the ccx tab."""
         request = RequestFactory().request()
-        request.user = self.user
+        request.user = user
         all_tabs = get_course_tab_list(request, course)
         return any(tab.type == 'ccx_coach' for tab in all_tabs)
 
@@ -1137,8 +1134,66 @@ class CCXCoachTabTestCase(SharedModuleStoreTestCase):
             course = self.ccx_enabled_course if enable_ccx else self.ccx_disabled_course
             self.assertEquals(
                 expected_result,
-                self.check_ccx_tab(course)
+                self.check_ccx_tab(course, self.user)
             )
+
+    def test_ccx_tab_visibility_for_staff_when_not_coach_master_course(self):
+        """
+        Staff cannot view ccx coach dashboard on master course by default.
+        """
+        staff = self.make_staff()
+        self.assertFalse(self.check_ccx_tab(self.course, staff))
+
+    def test_ccx_tab_visibility_for_staff_when_coach_master_course(self):
+        """
+        Staff can view ccx coach dashboard only if he is coach on master course.
+        """
+        staff = self.make_staff()
+        role = CourseCcxCoachRole(self.course.id)
+        role.add_users(staff)
+        self.assertTrue(self.check_ccx_tab(self.course, staff))
+
+    def test_ccx_tab_visibility_for_staff_ccx_course(self):
+        """
+        Staff can access coach dashboard on ccx course.
+        """
+        self.make_coach()
+        ccx = self.make_ccx()
+        ccx_key = CCXLocator.from_course_locator(self.course.id, unicode(ccx.id))
+        staff = self.make_staff()
+
+        with ccx_course(ccx_key) as course_ccx:
+            allow_access(course_ccx, staff, 'staff')
+            self.assertTrue(self.check_ccx_tab(course_ccx, staff))
+
+    def test_ccx_tab_visibility_for_instructor_when_not_coach_master_course(self):
+        """
+        Instructor cannot view ccx coach dashboard on master course by default.
+        """
+        instructor = self.make_instructor()
+        self.assertFalse(self.check_ccx_tab(self.course, instructor))
+
+    def test_ccx_tab_visibility_for_instructor_when_coach_master_course(self):
+        """
+        Instructor can view ccx coach dashboard only if he is coach on master course.
+        """
+        instructor = self.make_instructor()
+        role = CourseCcxCoachRole(self.course.id)
+        role.add_users(instructor)
+        self.assertTrue(self.check_ccx_tab(self.course, instructor))
+
+    def test_ccx_tab_visibility_for_instructor_ccx_course(self):
+        """
+        Instructor can access coach dashboard on ccx course.
+        """
+        self.make_coach()
+        ccx = self.make_ccx()
+        ccx_key = CCXLocator.from_course_locator(self.course.id, unicode(ccx.id))
+        instructor = self.make_instructor()
+
+        with ccx_course(ccx_key) as course_ccx:
+            allow_access(course_ccx, instructor, 'instructor')
+            self.assertTrue(self.check_ccx_tab(course_ccx, instructor))
 
 
 class TestStudentViewsWithCCX(ModuleStoreTestCase):
