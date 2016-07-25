@@ -4,7 +4,7 @@ define([
         'underscore',
         'gettext'
     ],
-    function( Backbone, BackboneValidation, _, gettext ) {
+    function( Backbone, BackboneValidation, _ ) {
         'use strict';
 
         var errorClass = 'has-error',
@@ -24,7 +24,7 @@ define([
             minLength: gettext( '{0} must be at least {1} characters' ),
             maxLength: gettext( '{0} must be at most {1} characters' ),
             rangeLength: gettext( '{0} must be between {1} and {2} characters' ),
-            oneOf: gettext( '{0} must be one of: {1}' ),
+            oneOf: gettext( '{0} must be one of: gettext( {1}' ),
             equalTo: gettext( '{0} must be the same as {1}' ),
             digits: gettext( '{0} must only contain digits' ),
             number: gettext( '{0} must be a number' ),
