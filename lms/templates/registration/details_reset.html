@@ -42,7 +42,7 @@
       <h1 class="title details-reset-title">
         <span class="title-super">
           {% blocktrans with platform_name=platform_name %}
-          Access Your Beta {{ platform_name }} Account
+          Access Your {{ platform_name }} Account
           {% endblocktrans %}
         </span>
       </h1>
@@ -93,14 +93,10 @@
          <p class="instructions">
              <p class="reset-instruction first-reset-instruction">
                {% blocktrans %}
-                  A new Beta {{ platform_name }} account has been created based on your existing {{ platform_name }} (BDU) account.  Soon after the beta period is over, this account will display the history of courses completed, badges earned, and completion certificates obtained.
+                  On July 2016, {{ platform_name }} moved to a new system. If you are an existing {{ platform_name }} user accessing this site for the first time after the move, enter the email address associated to your {{ platform_name }} account. If you were using a Social Login button to log in to {{ platform_name }}, use the email associated with that social media account.
                {% endblocktrans %}
-               <p>
-               {% blocktrans %}
-                  To access your new account, enter the email address associated to your {{ platform_name }}. If you were using a Social Media button to log in to BDU, use the email associated with that social media account.
-               {% endblocktrans %}
-               </p>
-             <p>{% trans 'An email will be sent to you with a password to access your account.' %} </p>
+             </p>
+             <p>{% trans 'An email will be sent to you with a password to access your account on this new system.' %} </p>
           </p>
 
 
