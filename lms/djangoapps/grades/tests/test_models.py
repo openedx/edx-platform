@@ -4,7 +4,7 @@ Unit tests for grades models.
 from base64 import b64encode
 from collections import OrderedDict
 import ddt
-from hashlib import sha1
+from hashlib import sha256
 import json
 from mock import patch
 
@@ -12,7 +12,7 @@ from django.core.exceptions import ValidationError
 from django.test import TestCase
 from opaque_keys.edx.locator import CourseLocator, BlockUsageLocator
 
-from lms.djangoapps.grades.models import BlockRecord, BlockRecordSet, PersistentSubsectionGrade, VisibleBlocks
+from lms.djangoapps.grades.models import BlockRecord, VisibleBlocks, PersistentSubsectionGrade
 
 
 class GradesModelTestCase(TestCase):
@@ -84,41 +84,32 @@ class VisibleBlocksTest(GradesModelTestCase):
     """
     Test the VisibleBlocks model.
     """
+    def setUp(self):
+        super(VisibleBlocksTest, self).setUp()
+
     def test_creation(self):
         """
         Happy path test to ensure basic create functionality works as expected.
         """
-        vblocks = VisibleBlocks.objects.create_from_blockrecords([self.record_a])
+        vblocks = VisibleBlocks.create([self.record_a])
         expected_json = json.dumps([self.record_a._asdict()], separators=(',', ':'), sort_keys=True)
-        expected_hash = b64encode(sha1(expected_json).digest())
-        self.assertEqual(expected_json, vblocks.blocks_json)
+        expected_hash = b64encode(sha256(expected_json).digest())
+        self.assertEqual(expected_json, vblocks._blocks_json)  # pylint: disable=protected-access
         self.assertEqual(expected_hash, vblocks.hashed)
-
-    def test_ordering_does_not_matter(self):
-        """
-        When creating new vblocks, a different ordering of blocks produces the
-        same record in the database.
-        """
-        stored_vblocks = VisibleBlocks.objects.create_from_blockrecords([self.record_a, self.record_b])
-        repeat_vblocks = VisibleBlocks.objects.create_from_blockrecords([self.record_b, self.record_a])
-        new_vblocks = VisibleBlocks.objects.create_from_blockrecords([self.record_b])
-
-        self.assertEqual(stored_vblocks.pk, repeat_vblocks.pk)
-        self.assertEqual(stored_vblocks.hashed, repeat_vblocks.hashed)
-
-        self.assertNotEqual(stored_vblocks.pk, new_vblocks.pk)
-        self.assertNotEqual(stored_vblocks.hashed, new_vblocks.hashed)
 
     def test_blocks(self):
         """
         Ensures that, given an array of BlockRecord, creating visible_blocks and accessing visible_blocks.blocks yields
         a copy of the initial array. Also, trying to set the blocks property should raise an exception.
         """
-        expected_blocks = [self.record_a, self.record_b]
-        visible_blocks = VisibleBlocks.objects.create_from_blockrecords(expected_blocks)
-        self.assertEqual(BlockRecordSet(expected_blocks), visible_blocks.blocks)
-        with self.assertRaises(AttributeError):
-            visible_blocks.blocks = expected_blocks
+        blocks = [self.record_a, self.record_b]
+        vblocks = VisibleBlocks.create(blocks)
+        self.assertSequenceEqual(
+            [block._asdict() for block in blocks],
+            [block._asdict() for block in vblocks.blocks]
+        )
+        with self.assertRaises(NotImplementedError):
+            vblocks.blocks = blocks
 
 
 @ddt.ddt
@@ -150,10 +141,7 @@ class PersistentSubsectionGradeTest(GradesModelTestCase):
         Tests model creation, and confirms error when trying to recreate model.
         """
         created_grade = PersistentSubsectionGrade.objects.create(**self.params)
-        read_grade = PersistentSubsectionGrade.read_grade(
-            user_id=self.params["user_id"],
-            usage_key=self.params["usage_key"],
-        )
+        read_grade = PersistentSubsectionGrade.read(user_id=self.params["user_id"], usage_key=self.params["usage_key"])
         self.assertEqual(created_grade, read_grade)
         with self.assertRaises(ValidationError):
             created_grade = PersistentSubsectionGrade.objects.create(**self.params)
@@ -162,28 +150,21 @@ class PersistentSubsectionGradeTest(GradesModelTestCase):
         """
         Confirms create will fail if params are missing.
         """
-        del self.params["earned_graded"]
+        del self.params["course_version"]
         with self.assertRaises(ValidationError):
             PersistentSubsectionGrade.objects.create(**self.params)
 
-    def test_course_version_is_optional(self):
-        del self.params["course_version"]
-        PersistentSubsectionGrade.objects.create(**self.params)
-
-    def test_update_grade(self):
+    def test_update(self):
         """
         Tests model update, and confirms error when updating a nonexistent model.
         """
         with self.assertRaises(PersistentSubsectionGrade.DoesNotExist):
-            PersistentSubsectionGrade.update_grade(**self.params)
+            PersistentSubsectionGrade.update(**self.params)
         PersistentSubsectionGrade.objects.create(**self.params)
         self.params['earned_all'] = 12
         self.params['earned_graded'] = 8
-        PersistentSubsectionGrade.update_grade(**self.params)
-        read_grade = PersistentSubsectionGrade.read_grade(
-            user_id=self.params["user_id"],
-            usage_key=self.params["usage_key"],
-        )
+        PersistentSubsectionGrade.update(**self.params)
+        read_grade = PersistentSubsectionGrade.read(user_id=self.params["user_id"], usage_key=self.params["usage_key"])
         self.assertEqual(read_grade.earned_all, 12)
         self.assertEqual(read_grade.earned_graded, 8)
 
@@ -193,7 +174,7 @@ class PersistentSubsectionGradeTest(GradesModelTestCase):
             PersistentSubsectionGrade.objects.create(**self.params)
         module_prefix = "lms.djangoapps.grades.models.PersistentSubsectionGrade."
         with patch(module_prefix + "objects.create") as mock_create:
-            with patch(module_prefix + "update_grade", wraps=PersistentSubsectionGrade.update_grade) as mock_update:
+            with patch(module_prefix + "update", wraps=PersistentSubsectionGrade.update) as mock_update:
                 PersistentSubsectionGrade.save_grade(**self.params)
                 self.assertTrue(mock_update.called)
                 self.assertNotEqual(mock_create.called, already_created)

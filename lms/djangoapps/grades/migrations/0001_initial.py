@@ -24,7 +24,7 @@ class Migration(migrations.Migration):
                 ('course_id', xmodule_django.models.CourseKeyField(max_length=255)),
                 ('usage_key', xmodule_django.models.UsageKeyField(max_length=255)),
                 ('subtree_edited_date', models.DateTimeField(verbose_name=b'last content edit timestamp')),
-                ('course_version', models.CharField(max_length=255, verbose_name=b'guid of latest course version', blank=True)),
+                ('course_version', models.CharField(max_length=255, verbose_name=b'guid of latest course version')),
                 ('earned_all', models.FloatField()),
                 ('possible_all', models.FloatField()),
                 ('earned_graded', models.FloatField()),
@@ -35,14 +35,14 @@ class Migration(migrations.Migration):
             name='VisibleBlocks',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('blocks_json', models.TextField()),
-                ('hashed', models.CharField(unique=True, max_length=100)),
+                ('_blocks_json', models.TextField(db_column=b'blocks_json')),
+                ('hashed', models.CharField(unique=True, max_length=44)),
             ],
         ),
         migrations.AddField(
             model_name='persistentsubsectiongrade',
             name='visible_blocks',
-            field=models.ForeignKey(to='grades.VisibleBlocks', db_column=b'visible_blocks_hash', to_field=b'hashed'),
+            field=models.ForeignKey(to='grades.VisibleBlocks'),
         ),
         migrations.AlterUniqueTogether(
             name='persistentsubsectiongrade',
