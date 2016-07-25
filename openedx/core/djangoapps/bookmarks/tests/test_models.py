@@ -48,9 +48,9 @@ class BookmarksTestsBase(ModuleStoreTestCase):
         self.admin = AdminFactory()
         self.user = UserFactory.create(password=self.TEST_PASSWORD)
         self.other_user = UserFactory.create(password=self.TEST_PASSWORD)
-        self.setup_test_data(self.STORE_TYPE)
+        self.setup_data(self.STORE_TYPE)
 
-    def setup_test_data(self, store_type=ModuleStoreEnum.Type.mongo):
+    def setup_data(self, store_type=ModuleStoreEnum.Type.mongo):
         """ Create courses and add some test blocks. """
 
         with self.store.default_store(store_type):
@@ -273,7 +273,7 @@ class BookmarkModelTests(BookmarksTestsBase):
         is needed to fetch the parent blocks.
         """
 
-        self.setup_test_data(store_type)
+        self.setup_data(store_type)
         user = UserFactory.create()
 
         expected_path = [PathItem(
