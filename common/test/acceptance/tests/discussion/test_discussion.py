@@ -5,7 +5,6 @@ Tests for discussion pages
 import datetime
 from uuid import uuid4
 
-from flaky import flaky
 from nose.plugins.attrib import attr
 from pytz import UTC
 
@@ -35,6 +34,7 @@ from ...fixtures.discussion import (
     MultipleThreadFixture)
 
 from .helpers import BaseDiscussionMixin
+from ..helpers import skip_if_browser
 
 
 THREAD_CONTENT_WITH_LATEX = """Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt
@@ -1235,6 +1235,7 @@ class DiscussionSortPreferenceTest(UniqueCourseTest):
         selected_sort = self.sort_page.get_selected_sort_preference()
         self.assertEqual(selected_sort, "activity")
 
+    @skip_if_browser('chrome')  # TODO TE-1542 and TE-1543
     def test_change_sort_preference(self):
         """
         Test that if user sorting preference is changing properly.
@@ -1246,6 +1247,7 @@ class DiscussionSortPreferenceTest(UniqueCourseTest):
             selected_sort = self.sort_page.get_selected_sort_preference()
             self.assertEqual(selected_sort, sort_type)
 
+    @skip_if_browser('chrome')  # TODO TE-1542 and TE-1543
     def test_last_preference_saved(self):
         """
         Test that user last preference is saved.
