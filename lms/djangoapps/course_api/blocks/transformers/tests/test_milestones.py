@@ -10,8 +10,8 @@ from lms.djangoapps.course_blocks.transformers.tests.helpers import CourseStruct
 from milestones.tests.utils import MilestonesTestCaseMixin
 from opaque_keys.edx.keys import UsageKey
 from openedx.core.lib.gating import api as gating_api
-from request_cache.middleware import RequestCache
 from student.tests.factories import CourseEnrollmentFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 from ..milestones import MilestonesTransformer
 from ...api import get_course_blocks
@@ -20,7 +20,7 @@ from ...api import get_course_blocks
 @attr('shard_3')
 @ddt.ddt
 @patch.dict('django.conf.settings.FEATURES', {'ENABLE_SPECIAL_EXAMS': True, 'MILESTONES_APP': True})
-class MilestonesTransformerTestCase(CourseStructureTestCase, MilestonesTestCaseMixin):
+class MilestonesTransformerTestCase(CourseStructureTestCase, MilestonesTestCaseMixin, ModuleStoreTestCase):
     """
     Test behavior of ProctoredExamTransformer
     """
@@ -159,10 +159,12 @@ class MilestonesTransformerTestCase(CourseStructureTestCase, MilestonesTestCaseM
         """
         self.course.enable_subsection_gating = True
         self.setup_gated_section(self.blocks[gated_block_ref], self.blocks[gating_block_ref])
-        self.get_blocks_and_check_against_expected(self.user, expected_blocks_before_completion)
 
-        # We clear the request cache to simulate a new request in the LMS.
-        RequestCache.clear_request_cache()
+        with self.assertNumQueries(3):
+            self.get_blocks_and_check_against_expected(self.user, expected_blocks_before_completion)
+
+        # clear the request cache to simulate a new request
+        self.clear_caches()
 
         # mock the api that the lms gating api calls to get the score for each block to always return 1 (ie 100%)
         with patch('gating.api.get_module_score', Mock(return_value=1)):
@@ -173,8 +175,8 @@ class MilestonesTransformerTestCase(CourseStructureTestCase, MilestonesTestCaseM
                 self.course,
                 UsageKey.from_string(unicode(self.blocks[gating_block_child].location)),
                 self.user.id)
-
-        self.get_blocks_and_check_against_expected(self.user, self.ALL_BLOCKS_EXCEPT_SPECIAL)
+        with self.assertNumQueries(2):
+            self.get_blocks_and_check_against_expected(self.user, self.ALL_BLOCKS_EXCEPT_SPECIAL)
 
     def test_staff_access(self):
         """
