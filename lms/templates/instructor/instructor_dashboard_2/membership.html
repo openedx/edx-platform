@@ -264,6 +264,44 @@ from openedx.core.djangoapps.course_groups.partition_scheme import get_cohorted_
       data-modify-endpoint="${ section_data['update_forum_role_membership_url'] }"
       data-add-button-label="${_("Add Community TA")}"
     ></div>
+
+
+    ## FUN: we override this template to add 3 new forum roles
+    <%! from forum_contributors.views import FORUM_ROLE_OFFICIAL_CONTRIBUTOR, FORUM_ROLE_RECOMMENDED, FORUM_ROLE_ACTIVE %>
+    <%! from django.core.urlresolvers import reverse %>
+
+    <div class="auth-list-container"
+      data-rolename="${FORUM_ROLE_OFFICIAL_CONTRIBUTOR}"
+      data-display-name="${
+          _("Official contributors")}"
+      data-info-text="${
+          _("Official forum contributors.")}"
+      data-list-endpoint="${reverse('list_special_forum_contributors_url', kwargs={'course_id': context['course'].id.to_deprecated_string()})}"
+      data-modify-endpoint="${reverse('modify_special_forum_contributors_url', kwargs={'course_id': context['course'].id.to_deprecated_string()})}"
+      data-add-button-label="${_("Add contributor")}"
+    ></div>
+    <div class="auth-list-container"
+      data-rolename="${FORUM_ROLE_RECOMMENDED}"
+      data-display-name="${
+          _("Recommended contributors")}"
+      data-info-text="${
+          _("These forum contributors are recommended by the instructor.")}"
+      data-list-endpoint="${reverse('list_special_forum_contributors_url', kwargs={'course_id': context['course'].id.to_deprecated_string()})}"
+      data-modify-endpoint="${reverse('modify_special_forum_contributors_url', kwargs={'course_id': context['course'].id.to_deprecated_string()})}"
+      data-add-button-label="${_("Add contributor")}"
+    ></div>
+    <div class="auth-list-container"
+      data-rolename="${FORUM_ROLE_ACTIVE}"
+      data-display-name="${
+          _("Active contributors")}"
+      data-info-text="${
+          _("These forum contributors are very active.")}"
+      data-list-endpoint="${reverse('list_special_forum_contributors_url', kwargs={'course_id': context['course'].id.to_deprecated_string()})}"
+      data-modify-endpoint="${reverse('modify_special_forum_contributors_url', kwargs={'course_id': context['course'].id.to_deprecated_string()})}"
+      data-add-button-label="${_("Add contributor")}"
+    ></div>
+
+
   %endif
 
   %if section_data['access']['instructor'] and section_data['ccx_is_enabled']:
