@@ -26,6 +26,29 @@
 window.CMS = window.CMS || {};
 CMS.URL = CMS.URL || {};
 CMS.URL.UPLOAD_ASSET = '${upload_asset_url}';
+
+require(["domReady!", "jquery", "js/models/settings/course_details", "js/views/settings/main"],
+  function(doc, $, CourseDetailsModel, MainView) {
+    CourseDetailsModel.prototype.videosourceSample = function() {
+        if (this.has('intro_video')){
+            // This allow videosourceSample to handle public DailyMotion ID that might be given instead of Youtube's
+            var inputToProcess = this.get('intro_video');
+            var inputProcessed = inputToProcess;
+            // if we have DailyMotion ID (public or private)
+            if ((/^[a-zA-Z0-9]{6,10}$/.test(inputToProcess)) || (/^[a-zA-Z0-9]{19}$/.test(inputToProcess))) {
+                inputProcessed = "//www.dailymotion.com/embed/video/" + inputToProcess;
+            }
+            // keep the original solution used to handle youtube videos
+            else {
+                inputProcessed = "//www.youtube.com/embed/" + inputToProcess;
+            }
+            return inputProcessed;
+        } else {
+            return "";
+        }
+    }
+});
+
   </script>
 </%block>
 
