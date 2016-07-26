@@ -20,6 +20,7 @@ log = logging.getLogger(__name__)
 CLASS_PRIORITY = ['video', 'problem']
 
 
+@XBlock.needs('user', 'bookmarks')
 class VerticalBlock(SequenceFields, XModuleFields, StudioEditableBlock, XmlParserMixin, MakoTemplateBlockBase, XBlock):
     """
     Layout XBlock for rendering subblocks vertically.
@@ -41,7 +42,14 @@ class VerticalBlock(SequenceFields, XModuleFields, StudioEditableBlock, XmlParse
         fragment = Fragment()
         contents = []
 
-        child_context = {} if not context else copy(context)
+        if context:
+            child_context = copy(context)
+        else:
+            child_context = {
+                'bookmarked': self.runtime.service(self, 'bookmarks').is_bookmarked(usage_key=self.location),  # pylint: disable=no-member
+                'username': self.runtime.service(self, 'user').get_current_user().opt_attrs['edx-platform.username']
+            }
+
         child_context['child_of_vertical'] = True
 
         # pylint: disable=no-member
