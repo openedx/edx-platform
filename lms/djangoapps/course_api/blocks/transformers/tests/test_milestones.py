@@ -11,7 +11,6 @@ from milestones.tests.utils import MilestonesTestCaseMixin
 from opaque_keys.edx.keys import UsageKey
 from openedx.core.lib.gating import api as gating_api
 from student.tests.factories import CourseEnrollmentFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 from ..milestones import MilestonesTransformer
 from ...api import get_course_blocks
@@ -20,7 +19,7 @@ from ...api import get_course_blocks
 @attr('shard_3')
 @ddt.ddt
 @patch.dict('django.conf.settings.FEATURES', {'ENABLE_SPECIAL_EXAMS': True, 'MILESTONES_APP': True})
-class MilestonesTransformerTestCase(CourseStructureTestCase, MilestonesTestCaseMixin, ModuleStoreTestCase):
+class MilestonesTransformerTestCase(CourseStructureTestCase, MilestonesTestCaseMixin):
     """
     Test behavior of ProctoredExamTransformer
     """
