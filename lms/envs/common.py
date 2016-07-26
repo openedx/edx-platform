@@ -992,10 +992,11 @@ WIKI_LINK_DEFAULT_LEVEL = 2
 ##### Feedback submission mechanism #####
 FEEDBACK_SUBMISSION_EMAIL = None
 
-##### Zendesk #####
-ZENDESK_URL = None
-ZENDESK_USER = None
-ZENDESK_API_KEY = None
+##### Helpdesk #####
+HELPDESK = None
+HELPDESK_URL = None
+HELPDESK_USER = None
+HELPDESK_API_KEY = None
 
 ##### EMBARGO #####
 EMBARGO_SITE_REDIRECT_URL = None
@@ -1736,7 +1737,6 @@ REQUIRE_JS_PATH_OVERRIDES = {
 # We don't enable Django Debug Toolbar universally, but whenever we do, we want
 # to avoid patching settings.  Patched settings can cause circular import
 # problems: http://django-debug-toolbar.readthedocs.org/en/1.0/installation.html#explicit-setup
-
 DEBUG_TOOLBAR_PATCH_SETTINGS = False
 
 ################################# CELERY ######################################

@@ -19,6 +19,7 @@ from student.models import UNENROLL_DONE
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client, is_commerce_service_configured
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming import helpers as theming_helpers
+from util.views import create_helpdesk_ticket
 
 log = logging.getLogger(__name__)
 
@@ -145,53 +146,6 @@ def refund_seat(course_enrollment, request_user):
     return refund_ids
 
 
-def create_zendesk_ticket(requester_name, requester_email, subject, body, tags=None):
-    """ Create a Zendesk ticket via API. """
-    if not (settings.ZENDESK_URL and settings.ZENDESK_USER and settings.ZENDESK_API_KEY):
-        log.debug('Zendesk is not configured. Cannot create a ticket.')
-        return
-
-    # Copy the tags to avoid modifying the original list.
-    tags = list(tags or [])
-    tags.append('LMS')
-
-    # Remove duplicates
-    tags = list(set(tags))
-
-    data = {
-        'ticket': {
-            'requester': {
-                'name': requester_name,
-                'email': requester_email
-            },
-            'subject': subject,
-            'comment': {'body': body},
-            'tags': tags
-        }
-    }
-
-    # Encode the data to create a JSON payload
-    payload = json.dumps(data)
-
-    # Set the request parameters
-    url = urljoin(settings.ZENDESK_URL, '/api/v2/tickets.json')
-    user = '{}/token'.format(settings.ZENDESK_USER)
-    pwd = settings.ZENDESK_API_KEY
-    headers = {'content-type': 'application/json'}
-
-    try:
-        response = requests.post(url, data=payload, auth=(user, pwd), headers=headers)
-
-        # Check for HTTP codes other than 201 (Created)
-        if response.status_code != 201:
-            log.error('Failed to create ticket. Status: [%d], Body: [%s]', response.status_code, response.content)
-        else:
-            log.debug('Successfully created ticket.')
-    except Exception:  # pylint: disable=broad-except
-        log.exception('Failed to create ticket.')
-        return
-
-
 def generate_refund_notification_body(student, refund_ids):  # pylint: disable=invalid-name
     """ Returns a refund notification message body. """
     msg = _(
@@ -221,4 +175,5 @@ def send_refund_notification(course_enrollment, refund_ids):
     subject = _("[Refund] User-Requested Refund")
     body = generate_refund_notification_body(student, refund_ids)
     requester_name = student.profile.name or student.username
-    create_zendesk_ticket(requester_name, student.email, subject, body, tags)
+
+    create_helpdesk_ticket(requester_name, student.email, subject, body, tags)

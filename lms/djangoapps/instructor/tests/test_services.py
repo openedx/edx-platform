@@ -141,7 +141,7 @@ class InstructorServiceTests(SharedModuleStoreTestCase):
 
     def test_report_suspicious_attempt(self):
         """
-        Test to verify that the create_zendesk_ticket() is called
+        Test to verify that the create_helpdesk_ticket() is called
         """
         requester_name = "edx-proctoring"
         email = "edx-proctoring@edx.org"
@@ -154,7 +154,7 @@ class InstructorServiceTests(SharedModuleStoreTestCase):
         )
         tags = ["proctoring"]
 
-        with mock.patch("lms.djangoapps.instructor.services.create_zendesk_ticket") as mock_create_zendesk_ticket:
+        with mock.patch("common.djangoapps.util.views.create_helpdesk_ticket") as mock_create_helpdesk_ticket:
             self.service.send_support_notification(
                 course_id=unicode(self.course.id),
                 exam_name="test_exam",
@@ -162,4 +162,4 @@ class InstructorServiceTests(SharedModuleStoreTestCase):
                 review_status="Suspicious"
             )
 
-        mock_create_zendesk_ticket.assert_called_with(requester_name, email, subject, body, tags)
+        mock_create_helpdesk_ticket.assert_called_with(requester_name, email, subject, body, tags)

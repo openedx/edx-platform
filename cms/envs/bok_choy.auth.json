@@ -109,5 +109,7 @@
         "url": "http://localhost:18040"
     },
     "ZENDESK_API_KEY": "",
-    "ZENDESK_USER": ""
+    "ZENDESK_USER": "",
+    "HELPDESK_API_KEY": "",
+    "HELPDESK_USER": ""
 }
