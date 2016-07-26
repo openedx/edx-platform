@@ -751,10 +751,10 @@ class CourseFields(object):
         scope=Scope.settings
     )
 
-    create_zendesk_tickets = Boolean(
-        display_name=_("Create Zendesk Tickets For Suspicious Proctored Exam Attempts"),
+    create_helpdesk_tickets = Boolean(
+        display_name=_("Create Helpdesk Tickets For Suspicious Proctored Exam Attempts"),
         help=_(
-            "Enter true or false. If this value is true, a Zendesk ticket will be created for suspicious attempts."
+            "Enter true or false. If this value is true, a Helpdesk ticket will be created for suspicious attempts."
         ),
         default=True,
         scope=Scope.settings
