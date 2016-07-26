@@ -86,7 +86,7 @@ define([
                     }
                 ],
                 programData = {
-                    category: 'xseries',
+                    category: 'XSeries',
                     course_codes: [{
                         display_name: 'test-course-display_name',
                         key: 'test-course-key',

@@ -77,7 +77,7 @@ define([
                 spyOn( Router.prototype, 'goHome' );
 
                 sampleInput = {
-                    category: 'xseries',
+                    category: 'XSeries',
                     organizations: 'test-org-key',
                     name: 'Test Course Name',
                     subtitle: 'Test Course Subtitle',
@@ -131,7 +131,7 @@ define([
 
             it( 'should submit the form correctly when creating micromasters program ', function(){
                 var programId = 221;
-                sampleInput.category = 'micromasters';
+                sampleInput.category = 'MicroMasters';
                 
                 completeForm( sampleInput );
 

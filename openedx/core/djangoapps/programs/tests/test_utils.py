@@ -40,8 +40,10 @@ ECOMMERCE_URL_ROOT = 'https://example-ecommerce.com'
 MARKETING_URL = 'https://www.example.com/marketing/path'
 
 
-@skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@ddt.ddt
 @attr('shard_2')
+@httpretty.activate
+@skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class TestProgramRetrieval(ProgramsApiConfigMixin, ProgramsDataMixin, CredentialsDataMixin,
                            CredentialsApiConfigMixin, CacheIsolationTestCase):
     """Tests covering the retrieval of programs from the Programs service."""
@@ -77,7 +79,6 @@ class TestProgramRetrieval(ProgramsApiConfigMixin, ProgramsDataMixin, Credential
             )
         ]
 
-    @httpretty.activate
     def test_get_programs(self):
         """Verify programs data can be retrieved."""
         self.create_programs_config()
@@ -92,7 +93,24 @@ class TestProgramRetrieval(ProgramsApiConfigMixin, ProgramsDataMixin, Credential
         # Verify the API was actually hit (not the cache).
         self.assertEqual(len(httpretty.httpretty.latest_requests), 1)
 
-    @httpretty.activate
+    @ddt.data(True, False)
+    def test_get_programs_category_casing(self, is_detail):
+        """Temporary. Verify that program categories are lowercased."""
+        self.create_programs_config()
+
+        program = factories.Program(category='camelCase')
+        
+        if is_detail:
+            program_id = program['id']
+
+            self.mock_programs_api(data=program, program_id=program_id)
+            data = utils.get_programs(self.user, program_id=program_id)
+            self.assertEqual(data['category'], 'camelcase')
+        else:
+            self.mock_programs_api(data={'results': [program]})
+            data = utils.get_programs(self.user)
+            self.assertEqual(data[0]['category'], 'camelcase')
+
     def test_get_programs_caching(self):
         """Verify that when enabled, the cache is used for non-staff users."""
         self.create_programs_config(cache_ttl=1)
@@ -133,7 +151,6 @@ class TestProgramRetrieval(ProgramsApiConfigMixin, ProgramsDataMixin, Credential
         self.assertEqual(actual, [])
         self.assertTrue(mock_init.called)
 
-    @httpretty.activate
     def test_get_programs_data_retrieval_failure(self):
         """Verify behavior when data can't be retrieved from Programs."""
         self.create_programs_config()
@@ -142,7 +159,6 @@ class TestProgramRetrieval(ProgramsApiConfigMixin, ProgramsDataMixin, Credential
         actual = utils.get_programs(self.user)
         self.assertEqual(actual, [])
 
-    @httpretty.activate
     def test_get_programs_for_dashboard(self):
         """Verify programs data can be retrieved and parsed correctly."""
         self.create_programs_config()
@@ -165,7 +181,6 @@ class TestProgramRetrieval(ProgramsApiConfigMixin, ProgramsDataMixin, Credential
         actual = utils.get_programs_for_dashboard(self.user, self.COURSE_KEYS)
         self.assertEqual(actual, {})
 
-    @httpretty.activate
     def test_get_programs_for_dashboard_no_data(self):
         """Verify behavior when no programs data is found for the user."""
         self.create_programs_config()
@@ -174,17 +189,6 @@ class TestProgramRetrieval(ProgramsApiConfigMixin, ProgramsDataMixin, Credential
         actual = utils.get_programs_for_dashboard(self.user, self.COURSE_KEYS)
         self.assertEqual(actual, {})
 
-    @httpretty.activate
-    def test_get_programs_for_dashboard_invalid_data(self):
-        """Verify behavior when the Programs API returns invalid data and parsing fails."""
-        self.create_programs_config()
-        invalid_program = {'invalid_key': 'invalid_data'}
-        self.mock_programs_api(data={'results': [invalid_program]})
-
-        actual = utils.get_programs_for_dashboard(self.user, self.COURSE_KEYS)
-        self.assertEqual(actual, {})
-
-    @httpretty.activate
     def test_get_program_for_certificates(self):
         """Verify programs data can be retrieved and parsed correctly for certificates."""
         self.create_programs_config()
@@ -199,7 +203,6 @@ class TestProgramRetrieval(ProgramsApiConfigMixin, ProgramsDataMixin, Credential
         self.assertEqual(len(actual), 2)
         self.assertEqual(actual, expected)
 
-    @httpretty.activate
     def test_get_program_for_certificates_no_data(self):
         """Verify behavior when no programs data is found for the user."""
         self.create_programs_config()
@@ -210,7 +213,6 @@ class TestProgramRetrieval(ProgramsApiConfigMixin, ProgramsDataMixin, Credential
         actual = utils.get_programs_for_credentials(self.user, program_credentials_data)
         self.assertEqual(actual, [])
 
-    @httpretty.activate
     def test_get_program_for_certificates_id_not_exist(self):
         """Verify behavior when no program with the given program_id in
         credentials exists.
@@ -233,7 +235,6 @@ class TestProgramRetrieval(ProgramsApiConfigMixin, ProgramsDataMixin, Credential
         actual = utils.get_programs_for_credentials(self.user, credential_data)
         self.assertEqual(actual, [])
 
-    @httpretty.activate
     def test_get_display_category_success(self):
         self.create_programs_config()
         self.mock_programs_api()
