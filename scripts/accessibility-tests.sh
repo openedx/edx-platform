@@ -21,11 +21,8 @@ SELENIUM_BROWSER=phantomjs paver test_a11y --with-xunitmp
 echo "Generating coverage report..."
 paver a11y_coverage
 
-if [ "$RUN_PA11YCRAWLER" = "1" ]
-then
-    echo "Running pa11ycrawler against test course..."
-    paver pa11ycrawler --fasttest --skip-clean --fetch-course --with-html
+echo "Running pa11ycrawler against test course..."
+paver pa11ycrawler --fasttest --skip-clean --fetch-course --with-html
 
-    echo "Generating coverage report..."
-    paver pa11ycrawler_coverage
-fi
+echo "Generating coverage report..."
+paver pa11ycrawler_coverage
