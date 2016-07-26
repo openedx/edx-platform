@@ -145,18 +145,15 @@ class LoginFromCombinedPageTest(UniqueCourseTest):
         # Expect that we're shown a success message
         self.assertIn("Password Reset Email Sent", self.login_page.wait_for_success())
 
-    def test_password_reset_failure(self):
+    def test_password_reset_no_user(self):
         # Navigate to the password reset form
         self.login_page.visit()
 
         # User account does not exist
         self.login_page.password_reset(email="nobody@nowhere.com")
 
-        # Expect that we're shown a failure message
-        self.assertIn(
-            "No user with the provided email address exists.",
-            self.login_page.wait_for_errors()
-        )
+        # Expect that we're shown a success message
+        self.assertIn("Password Reset Email Sent", self.login_page.wait_for_success())
 
     def test_third_party_login(self):
         """
