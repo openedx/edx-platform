@@ -7,8 +7,6 @@ import sys
 
 from paver.easy import cmdopts, needs, sh, task
 
-from .utils.timer import timed
-
 
 DOC_PATHS = {
     "dev": "docs/en_us/developers",
@@ -66,7 +64,6 @@ def doc_path(options, allow_default=True):
     ("type=", "t", "Type of docs to compile"),
     ("verbose", "v", "Display verbose output"),
 ])
-@timed
 def build_docs(options):
     """
     Invoke sphinx 'make build' to generate docs.

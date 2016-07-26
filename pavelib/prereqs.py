@@ -11,7 +11,6 @@ import sys
 from paver.easy import sh, task
 
 from .utils.envs import Env
-from .utils.timer import timed
 
 
 PREREQS_STATE_DIR = os.getenv('PREREQ_CACHE_DIR', Env.REPO_ROOT / '.prereqs_cache')
@@ -146,7 +145,6 @@ def python_prereqs_installation():
 
 
 @task
-@timed
 def install_node_prereqs():
     """
     Installs Node prerequisites
@@ -170,7 +168,6 @@ PACKAGES_TO_UNINSTALL = [
 
 
 @task
-@timed
 def uninstall_python_packages():
     """
     Uninstall Python packages that need explicit uninstallation.
@@ -238,7 +235,6 @@ def package_in_frozen(package_name, frozen_output):
 
 
 @task
-@timed
 def install_python_prereqs():
     """
     Installs Python prerequisites.
@@ -272,7 +268,6 @@ def install_python_prereqs():
 
 
 @task
-@timed
 def install_prereqs():
     """
     Installs Node and Python prerequisites
