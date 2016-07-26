@@ -27,6 +27,7 @@ window.CMS = window.CMS || {};
 CMS.URL = CMS.URL || {};
 CMS.URL.UPLOAD_ASSET = '${upload_asset_url}';
 
+// FUN: Add the support of DailyMotion videos for teaser (keeping Youtube available)
 require(["domReady!", "jquery", "js/models/settings/course_details", "js/views/settings/main"],
   function(doc, $, CourseDetailsModel, MainView) {
     CourseDetailsModel.prototype.videosourceSample = function() {
