@@ -1,3 +1,5 @@
+/* globals analytics, course_location_analytics */
+
 (function(analytics, course_location_analytics) {
     'use strict';
 
@@ -199,5 +201,4 @@
             })(Backbone.View);
             return TabsEdit;
         });
-
-}).call(this, analytics, course_location_analytics); //jshint ignore:line
+}).call(this, analytics, course_location_analytics);

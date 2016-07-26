@@ -378,8 +378,7 @@
             });
             htmlString = $div.html();
             htmlString = htmlString.replace(/\\\$/g, ESCAPED_DOLLAR);
-            // suppressing Don't make functions within a loop.
-            /* jshint -W083 */
+            /* eslint-disable no-loop-func */
             while (true) {
                 if (RE_INLINEMATH.test(htmlString)) {
                     htmlString = htmlString.replace(RE_INLINEMATH, function($0, $1, $2, $3) {
@@ -400,7 +399,7 @@
                     break;
                 }
             }
-            /* jshint +W083 */
+            /* eslint-enable no-loop-func */
             htmlString = processedHtmlString;
             htmlString = htmlString.replace(new RegExp(ESCAPED_DOLLAR, 'g'), '\\$');
             htmlString = htmlString.replace(/\\\\\\\\/g, ESCAPED_BACKSLASH);

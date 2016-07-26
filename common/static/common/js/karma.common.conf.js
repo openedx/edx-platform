@@ -33,9 +33,8 @@
 // does not use graceful-fs and tries to read files simultaneously.
 //
 
+/* eslint-env node */
 
-/* jshint node: true */
-/*jshint -W079 */
 'use strict';
 
 var path = require('path');

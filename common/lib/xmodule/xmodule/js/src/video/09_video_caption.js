@@ -102,7 +102,7 @@
                             langTitle: gettext('Open language menu')
                         }
                     )
-                    
+
                 );
 
                 var subtitlesHtml = HtmlUtils.interpolateHtml(
@@ -693,7 +693,7 @@
                     $li.append($link);
                     $menu.append($li);
                 });
-                
+
                 HtmlUtils.append(
                     this.languageChooserEl,
                     HtmlUtils.HTML($menu)
@@ -711,15 +711,15 @@
                             .removeClass('is-active')
                             .find('.control-lang')
                             .attr('aria-pressed', 'false');
-                            
+
                         $(e.currentTarget).attr('aria-pressed', 'true');
 
                         state.el.trigger('language_menu:change', [langCode]);
                         self.fetchCaption();
-                        
+
                         // update the closed-captions lang attribute
                         self.captionDisplayEl.attr('lang', langCode);
-                        
+
                         // update the transcript lang attribute
                         self.subtitlesMenuEl.attr('lang', langCode);
                         self.closeLanguageMenu(e);
@@ -794,7 +794,7 @@
                     self.state.el.addClass('is-captions-rendered');
 
                     self.subtitlesEl
-                        .attr('aria-label', gettext('Activating a link in this group will skip to the corresponding point in the video.')); // jshint ignore:line
+                        .attr('aria-label', gettext('Activating a link in this group will skip to the corresponding point in the video.'));  // eslint-disable-line max-len
 
                     self.subtitlesEl.find('.transcript-title')
                         .text(gettext('Video transcript'));
@@ -808,7 +808,7 @@
                         .attr('lang', $('html').attr('lang'));
 
                     self.container.find('.menu-container .instructions')
-                        .text(gettext('Press the UP arrow key to enter the language menu then use UP and DOWN arrow keys to navigate language options. Press ENTER to change to the selected language.')); // jshint ignore:line
+                        .text(gettext('Press the UP arrow key to enter the language menu then use UP and DOWN arrow keys to navigate language options. Press ENTER to change to the selected language.'));  // eslint-disable-line max-len
 
                 };
 
@@ -827,7 +827,7 @@
                 var topSpacer = HtmlUtils.interpolateHtml(
                         HtmlUtils.HTML([
                             '<li class="spacing" style="height: {height}px">',
-                                '<a href="#transcript-end-{id}" id="transcript-start-{id}" class="transcript-start"></a>', // jshint ignore:line
+                                '<a href="#transcript-end-{id}" id="transcript-start-{id}" class="transcript-start"></a>',  // eslint-disable-line max-len, indent
                             '</li>'
                         ].join('')),
                         {
@@ -839,7 +839,7 @@
                 var bottomSpacer = HtmlUtils.interpolateHtml(
                         HtmlUtils.HTML([
                             '<li class="spacing" style="height: {height}px">',
-                                '<a href="#transcript-start-{id}" id="transcript-end-{id}" class="transcript-end"></a>', // jshint ignore:line
+                                '<a href="#transcript-start-{id}" id="transcript-end-{id}" class="transcript-end"></a>',  // eslint-disable-line max-len, indent
                             '</li>'
                         ].join('')),
                         {
@@ -852,7 +852,7 @@
                     this.subtitlesMenuEl,
                     topSpacer
                 );
-                
+
                 HtmlUtils.append(
                     this.subtitlesMenuEl,
                     bottomSpacer
@@ -1194,7 +1194,7 @@
                     this.captionDisplayEl
                         .text(gettext('(Caption will be displayed when you start playing the video.)'));
                 }
-                
+
                 this.state.el.trigger('captions:show');
             },
 

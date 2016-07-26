@@ -95,7 +95,7 @@ define(["jquery", "underscore", "gettext", "common/js/components/utils/view_util
                 );
 
             if (xblockInfo.get('is_prereq')) {
-                messageBody += ' ' + gettext('Any content that has listed this content as a prerequisite will also have access limitations removed.'); // jshint ignore:line
+                messageBody += ' ' + gettext('Any content that has listed this content as a prerequisite will also have access limitations removed.');   // eslint-disable-line max-len
                 ViewUtils.confirmThenRunOperation(
                     interpolate(
                         gettext('Delete this %(xblock_type)s (and prerequisite)?'),

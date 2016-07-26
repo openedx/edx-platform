@@ -1,8 +1,7 @@
+/* eslint-env node */
+
 // Karma config for xmodule suite.
 // Docs and troubleshooting tips in common/static/common/js/karma.common.conf.js
-
-/* jshint node: true */
-/*jshint -W079 */
 
 'use strict';
 var path = require('path');

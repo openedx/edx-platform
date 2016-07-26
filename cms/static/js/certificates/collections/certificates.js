@@ -1,6 +1,6 @@
 // Backbone.js Application Collection: Certificates
 
-define([ // jshint ignore:line
+define([
     'backbone',
     'gettext',
     'js/certificates/models/certificate'

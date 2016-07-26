@@ -1,4 +1,4 @@
-/* globals DiscussionUtil */
+/* globals DiscussionUtil, Comments */
 (function() {
     'use strict';
 
@@ -105,7 +105,7 @@
             Content.prototype.resetComments = function(children) {
                 var comment, _i, _len, _ref, _results;
                 this.set('children', []);
-                this.set('comments', new Comments());  // jshint ignore:line
+                this.set('comments', new Comments());
                 _ref = children || [];
                 _results = [];
                 for (_i = 0, _len = _ref.length; _i < _len; _i++) {

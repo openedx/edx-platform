@@ -1,7 +1,7 @@
 ;(function (define, undefined) {
     'use strict';
     define([
-        'gettext', 'jquery', 'underscore', 'backbone', 
+        'gettext', 'jquery', 'underscore', 'backbone',
         'edx-ui-toolkit/js/utils/html-utils',
         'text!templates/fields/field_readonly.underscore',
         'text!templates/fields/field_dropdown.underscore',
@@ -21,7 +21,7 @@
         var FieldViews = {};
 
         FieldViews.FieldView = Backbone.View.extend({
-                
+
             fieldType: 'generic',
 
             className: function () {
@@ -32,27 +32,27 @@
 
             indicators: {
                 'canEdit': HtmlUtils.joinHtml(
-                    HtmlUtils.HTML('<span class="icon fa fa-pencil message-can-edit" aria-hidden="true"></span><span class="sr">'), // jshint ignore:line
+                    HtmlUtils.HTML('<span class="icon fa fa-pencil message-can-edit" aria-hidden="true"></span><span class="sr">'),  // eslint-disable-line max-len
                     gettext("Editable"),
                     HtmlUtils.HTML('</span>')
                 ),
                 'error': HtmlUtils.joinHtml(
-                    HtmlUtils.HTML('<span class="fa fa-exclamation-triangle message-error" aria-hidden="true"></span><span class="sr">'), // jshint ignore:line
+                    HtmlUtils.HTML('<span class="fa fa-exclamation-triangle message-error" aria-hidden="true"></span><span class="sr">'),  // eslint-disable-line max-len
                     gettext("Error"),
                     HtmlUtils.HTML('</span>')
                 ),
                 'validationError': HtmlUtils.joinHtml(
-                    HtmlUtils.HTML('<span class="fa fa-exclamation-triangle message-validation-error" aria-hidden="true"></span><span class="sr">'), // jshint ignore:line
+                    HtmlUtils.HTML('<span class="fa fa-exclamation-triangle message-validation-error" aria-hidden="true"></span><span class="sr">'),  // eslint-disable-line max-len
                     gettext("Validation Error"),
                     HtmlUtils.HTML('</span>')
                 ),
                 'inProgress': HtmlUtils.joinHtml(
-                    HtmlUtils.HTML('<span class="fa fa-spinner fa-pulse message-in-progress" aria-hidden="true"></span><span class="sr">'), // jshint ignore:line
+                    HtmlUtils.HTML('<span class="fa fa-spinner fa-pulse message-in-progress" aria-hidden="true"></span><span class="sr">'),  // eslint-disable-line max-len
                     gettext("In Progress"),
                     HtmlUtils.HTML('</span>')
                 ),
                 'success': HtmlUtils.joinHtml(
-                    HtmlUtils.HTML('<span class="fa fa-check message-success" aria-hidden="true"></span><span class="sr">'), // jshint ignore:line
+                    HtmlUtils.HTML('<span class="fa fa-check message-success" aria-hidden="true"></span><span class="sr">'),  // eslint-disable-line max-len
                     gettext("Success"),
                     HtmlUtils.HTML('</span>')
                 ),

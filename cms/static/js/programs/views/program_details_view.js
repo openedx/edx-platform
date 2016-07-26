@@ -135,7 +135,6 @@ define([
             },
 
             getModalContent: function() {
-                /* jshint maxlen: 300 */
                 return {
                     name: gettext('confirm'),
                     title: gettext('Publish this program?'),

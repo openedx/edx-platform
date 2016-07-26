@@ -50,7 +50,7 @@ define(["domReady", "jquery", "underscore", "js/views/utils/create_course_utils"
 
             // Go into creating re-run state
             $('.rerun-course-save').addClass('is-disabled').attr('aria-disabled', true).addClass('is-processing').html(
-               '<span class="icon fa fa-refresh fa-spin" aria-hidden="true"></span>' + gettext('Processing Re-run Request') //jshint ignore:line
+               '<span class="icon fa fa-refresh fa-spin" aria-hidden="true"></span>' + gettext('Processing Re-run Request')  // eslint-disable-line max-len
             );
             $('.action-cancel').addClass('is-hidden');
         };
