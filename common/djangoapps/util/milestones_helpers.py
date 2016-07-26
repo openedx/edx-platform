@@ -9,12 +9,18 @@ from django.utils.translation import ugettext as _
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
+from milestones import api as milestones_api
+from milestones.exceptions import InvalidMilestoneRelationshipTypeException
+from milestones.models import MilestoneRelationshipType
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from xmodule.modulestore.django import modulestore
+import request_cache
 
 NAMESPACE_CHOICES = {
     'ENTRANCE_EXAM': 'entrance_exams'
 }
+
+REQUEST_CACHE_NAME = "milestones"
 
 
 def get_namespace_choices():
@@ -29,15 +35,14 @@ def is_entrance_exams_enabled():
     Checks to see if the Entrance Exams feature is enabled
     Use this operation instead of checking the feature flag all over the place
     """
-    return settings.FEATURES.get('ENTRANCE_EXAMS', False)
+    return settings.FEATURES.get('ENTRANCE_EXAMS')
 
 
 def is_prerequisite_courses_enabled():
     """
     Returns boolean indicating prerequisite courses enabled system wide or not.
     """
-    return settings.FEATURES.get('ENABLE_PREREQUISITE_COURSES', False) \
-        and settings.FEATURES.get('MILESTONES_APP', False)
+    return settings.FEATURES.get('ENABLE_PREREQUISITE_COURSES') and settings.FEATURES.get('MILESTONES_APP')
 
 
 def add_prerequisite_course(course_key, prerequisite_course_key):
@@ -49,7 +54,6 @@ def add_prerequisite_course(course_key, prerequisite_course_key):
     """
     if not is_prerequisite_courses_enabled():
         return None
-    from milestones import api as milestones_api
     milestone_name = _('Course {course_id} requires {prerequisite_course_id}').format(
         course_id=unicode(course_key),
         prerequisite_course_id=unicode(prerequisite_course_key)
@@ -73,7 +77,6 @@ def remove_prerequisite_course(course_key, milestone):
     """
     if not is_prerequisite_courses_enabled():
         return None
-    from milestones import api as milestones_api
     milestones_api.remove_course_milestone(
         course_key,
         milestone,
@@ -89,7 +92,6 @@ def set_prerequisite_courses(course_key, prerequisite_course_keys):
     """
     if not is_prerequisite_courses_enabled():
         return None
-    from milestones import api as milestones_api
     #remove any existing requirement milestones with this pre-requisite course as requirement
     course_milestones = milestones_api.get_course_milestones(course_key=course_key, relationship="requires")
     if course_milestones:
@@ -123,7 +125,6 @@ def get_pre_requisite_courses_not_completed(user, enrolled_courses):  # pylint: 
     if not is_prerequisite_courses_enabled():
         return {}
 
-    from milestones import api as milestones_api
     pre_requisite_courses = {}
 
     for course_key in enrolled_courses:
@@ -183,10 +184,8 @@ def fulfill_course_milestone(course_key, user):
     Marks the course specified by the given course_key as complete for the given user.
     If any other courses require this course as a prerequisite, their milestones will be appropriately updated.
     """
-    if not settings.FEATURES.get('MILESTONES_APP', False):
+    if not settings.FEATURES.get('MILESTONES_APP'):
         return None
-    from milestones import api as milestones_api
-    from milestones.exceptions import InvalidMilestoneRelationshipTypeException
     try:
         course_milestones = milestones_api.get_course_milestones(course_key=course_key, relationship="fulfills")
     except InvalidMilestoneRelationshipTypeException:
@@ -201,9 +200,8 @@ def remove_course_milestones(course_key, user, relationship):
     """
     Remove all user milestones for the course specified by course_key.
     """
-    if not settings.FEATURES.get('MILESTONES_APP', False):
+    if not settings.FEATURES.get('MILESTONES_APP'):
         return None
-    from milestones import api as milestones_api
     course_milestones = milestones_api.get_course_milestones(course_key=course_key, relationship=relationship)
     for milestone in course_milestones:
         milestones_api.remove_user_milestone({'id': user.id}, milestone)
@@ -215,8 +213,7 @@ def get_required_content(course, user):
     and if those milestones can be fulfilled via completion of a particular course content module
     """
     required_content = []
-    if settings.FEATURES.get('MILESTONES_APP', False):
-        from milestones.exceptions import InvalidMilestoneRelationshipTypeException
+    if settings.FEATURES.get('MILESTONES_APP'):
         # Get all of the outstanding milestones for this course, for this user
         try:
             milestone_paths = get_course_milestones_fulfillment_paths(
@@ -239,9 +236,8 @@ def milestones_achieved_by_user(user, namespace):
     """
     It would fetch list of milestones completed by user
     """
-    if not settings.FEATURES.get('MILESTONES_APP', False):
+    if not settings.FEATURES.get('MILESTONES_APP'):
         return None
-    from milestones import api as milestones_api
     return milestones_api.get_user_milestones({'id': user.id}, namespace)
 
 
@@ -260,9 +256,8 @@ def seed_milestone_relationship_types():
     """
     Helper method to pre-populate MRTs so the tests can run
     """
-    if not settings.FEATURES.get('MILESTONES_APP', False):
+    if not settings.FEATURES.get('MILESTONES_APP'):
         return None
-    from milestones.models import MilestoneRelationshipType
     MilestoneRelationshipType.objects.create(name='requires')
     MilestoneRelationshipType.objects.create(name='fulfills')
 
@@ -289,9 +284,8 @@ def add_milestone(milestone_data):
     """
     Client API operation adapter/wrapper
     """
-    if not settings.FEATURES.get('MILESTONES_APP', False):
+    if not settings.FEATURES.get('MILESTONES_APP'):
         return None
-    from milestones import api as milestones_api
     return milestones_api.add_milestone(milestone_data)
 
 
@@ -299,9 +293,8 @@ def get_milestones(namespace):
     """
     Client API operation adapter/wrapper
     """
-    if not settings.FEATURES.get('MILESTONES_APP', False):
+    if not settings.FEATURES.get('MILESTONES_APP'):
         return []
-    from milestones import api as milestones_api
     return milestones_api.get_milestones(namespace)
 
 
@@ -309,9 +302,8 @@ def get_milestone_relationship_types():
     """
     Client API operation adapter/wrapper
     """
-    if not settings.FEATURES.get('MILESTONES_APP', False):
+    if not settings.FEATURES.get('MILESTONES_APP'):
         return {}
-    from milestones import api as milestones_api
     return milestones_api.get_milestone_relationship_types()
 
 
@@ -319,9 +311,8 @@ def add_course_milestone(course_id, relationship, milestone):
     """
     Client API operation adapter/wrapper
     """
-    if not settings.FEATURES.get('MILESTONES_APP', False):
+    if not settings.FEATURES.get('MILESTONES_APP'):
         return None
-    from milestones import api as milestones_api
     return milestones_api.add_course_milestone(course_id, relationship, milestone)
 
 
@@ -329,9 +320,8 @@ def get_course_milestones(course_id):
     """
     Client API operation adapter/wrapper
     """
-    if not settings.FEATURES.get('MILESTONES_APP', False):
+    if not settings.FEATURES.get('MILESTONES_APP'):
         return []
-    from milestones import api as milestones_api
     return milestones_api.get_course_milestones(course_id)
 
 
@@ -339,34 +329,43 @@ def add_course_content_milestone(course_id, content_id, relationship, milestone)
     """
     Client API operation adapter/wrapper
     """
-    if not settings.FEATURES.get('MILESTONES_APP', False):
+    if not settings.FEATURES.get('MILESTONES_APP'):
         return None
-    from milestones import api as milestones_api
     return milestones_api.add_course_content_milestone(course_id, content_id, relationship, milestone)
 
 
 def get_course_content_milestones(course_id, content_id, relationship, user_id=None):
     """
     Client API operation adapter/wrapper
+    Uses the request cache to store all of a user's
+    milestones
     """
-    if not settings.FEATURES.get('MILESTONES_APP', False):
+    if not settings.FEATURES.get('MILESTONES_APP'):
         return []
-    from milestones import api as milestones_api
-    return milestones_api.get_course_content_milestones(
-        course_id,
-        content_id,
-        relationship,
-        {'id': user_id} if user_id else None
-    )
+
+    if user_id is None:
+        return milestones_api.get_course_content_milestones(course_id, content_id, relationship)
+
+    request_cache_dict = request_cache.get_cache(REQUEST_CACHE_NAME)
+    if user_id not in request_cache_dict:
+        request_cache_dict[user_id] = {}
+
+    if relationship not in request_cache_dict[user_id]:
+        request_cache_dict[user_id][relationship] = milestones_api.get_course_content_milestones(
+            course_key=course_id,
+            relationship=relationship,
+            user={"id": user_id}
+        )
+
+    return [m for m in request_cache_dict[user_id][relationship] if m['content_id'] == content_id]
 
 
 def remove_course_content_user_milestones(course_key, content_key, user, relationship):
     """
     Removes the specified User-Milestone link from the system for the specified course content module.
     """
-    if not settings.FEATURES.get('MILESTONES_APP', False):
+    if not settings.FEATURES.get('MILESTONES_APP'):
         return []
-    from milestones import api as milestones_api
 
     course_content_milestones = milestones_api.get_course_content_milestones(course_key, content_key, relationship)
     for milestone in course_content_milestones:
@@ -377,15 +376,14 @@ def remove_content_references(content_id):
     """
     Client API operation adapter/wrapper
     """
-    if not settings.FEATURES.get('MILESTONES_APP', False):
+    if not settings.FEATURES.get('MILESTONES_APP'):
         return None
-    from milestones import api as milestones_api
     return milestones_api.remove_content_references(content_id)
 
 
 def any_unfulfilled_milestones(course_id, user_id):
     """ Returns a boolean if user has any unfulfilled milestones """
-    if not settings.FEATURES.get('MILESTONES_APP', False):
+    if not settings.FEATURES.get('MILESTONES_APP'):
         return False
     return bool(
         get_course_milestones_fulfillment_paths(course_id, {"id": user_id})
@@ -396,9 +394,8 @@ def get_course_milestones_fulfillment_paths(course_id, user_id):
     """
     Client API operation adapter/wrapper
     """
-    if not settings.FEATURES.get('MILESTONES_APP', False):
+    if not settings.FEATURES.get('MILESTONES_APP'):
         return None
-    from milestones import api as milestones_api
     return milestones_api.get_course_milestones_fulfillment_paths(
         course_id,
         user_id
@@ -409,7 +406,15 @@ def add_user_milestone(user, milestone):
     """
     Client API operation adapter/wrapper
     """
-    if not settings.FEATURES.get('MILESTONES_APP', False):
+    if not settings.FEATURES.get('MILESTONES_APP'):
         return None
-    from milestones import api as milestones_api
     return milestones_api.add_user_milestone(user, milestone)
+
+
+def remove_user_milestone(user, milestone):
+    """
+    Client API operation adapter/wrapper
+    """
+    if not settings.FEATURES.get('MILESTONES_APP'):
+        return None
+    return milestones_api.remove_user_milestone(user, milestone)

@@ -158,7 +158,12 @@ class MilestonesTransformerTestCase(CourseStructureTestCase, MilestonesTestCaseM
         """
         self.course.enable_subsection_gating = True
         self.setup_gated_section(self.blocks[gated_block_ref], self.blocks[gating_block_ref])
-        self.get_blocks_and_check_against_expected(self.user, expected_blocks_before_completion)
+
+        with self.assertNumQueries(3):
+            self.get_blocks_and_check_against_expected(self.user, expected_blocks_before_completion)
+
+        # clear the request cache to simulate a new request
+        self.clear_caches()
 
         # mock the api that the lms gating api calls to get the score for each block to always return 1 (ie 100%)
         with patch('gating.api.get_module_score', Mock(return_value=1)):
@@ -169,8 +174,8 @@ class MilestonesTransformerTestCase(CourseStructureTestCase, MilestonesTestCaseM
                 self.course,
                 UsageKey.from_string(unicode(self.blocks[gating_block_child].location)),
                 self.user.id)
-
-        self.get_blocks_and_check_against_expected(self.user, self.ALL_BLOCKS_EXCEPT_SPECIAL)
+        with self.assertNumQueries(2):
+            self.get_blocks_and_check_against_expected(self.user, self.ALL_BLOCKS_EXCEPT_SPECIAL)
 
     def test_staff_access(self):
         """

@@ -9,7 +9,6 @@ from opaque_keys.edx.keys import UsageKey
 from xmodule.modulestore.django import modulestore
 from openedx.core.lib.gating.exceptions import GatingValidationError
 
-
 log = logging.getLogger(__name__)
 
 # This is used to namespace gating-specific milestones
