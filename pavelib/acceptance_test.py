@@ -4,6 +4,7 @@ Acceptance test tasks
 from paver.easy import cmdopts, needs
 from pavelib.utils.test.suites import AcceptanceTestSuite
 from pavelib.utils.passthrough_opts import PassthroughTask
+from pavelib.utils.timer import timed
 from optparse import make_option
 
 try:
@@ -29,6 +30,7 @@ __test__ = False  # do not collect
     ('extra_args=', 'e', 'deprecated, pass extra options directly in the paver commandline'),
 ])
 @PassthroughTask
+@timed
 def test_acceptance(options, passthrough_options):
     """
     Run the acceptance tests for either lms or cms
