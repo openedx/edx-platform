@@ -635,7 +635,7 @@ class TestProblemGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
                     unicode(self.student_2.id),
                     self.student_2.email,
                     self.student_2.username,
-                    '0.0', 'N/A', 'N/A'
+                    '0.0', '0.0', '2'
                 ]
             ))
         ])
@@ -1671,7 +1671,7 @@ class TestCertificateGeneration(InstructorTaskModuleTestCase):
             'skipped': 2
         }
 
-        with self.assertNumQueries(214):
+        with self.assertNumQueries(150):
             self.assertCertificatesGenerated(task_input, expected_results)
 
     @ddt.data(

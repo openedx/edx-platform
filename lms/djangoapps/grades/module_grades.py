@@ -1,8 +1,11 @@
 """
 Functionality for module-level grades.
 """
-# TODO The code in this file needs to be updated to use BlockTransformers. (TNL-4448)
-# TODO The code here needs to be validated - may not be calculating correctly.
+# TODO The score computation in this file is not accurate
+# since it is summing percentages instead of computing a
+# final percentage of the individual sums.
+# Regardless, this file and its code should be removed soon
+# as part of TNL-5062.
 
 from django.test.client import RequestFactory
 from courseware.model_data import FieldDataCache, ScoresClient

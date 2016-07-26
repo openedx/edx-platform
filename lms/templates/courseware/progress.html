@@ -150,13 +150,13 @@ from django.utils.http import urlquote_plus
                 %for section in chapter['sections']:
                 <div>
                   <%
-                  earned = section['section_total'].earned
-                  total = section['section_total'].possible
+                  earned = section.all_total.earned
+                  total = section.all_total.possible
                   percentageString = "{0:.0%}".format( float(earned)/total) if earned > 0 and total > 0 else ""
                   %>
 
-                  <h3><a href="${reverse('courseware_section', kwargs=dict(course_id=course.id.to_deprecated_string(), chapter=chapter['url_name'], section=section['url_name'])) | h}">
-                    ${ section['display_name'] | h}
+                  <h3><a href="${reverse('courseware_section', kwargs=dict(course_id=course.id.to_deprecated_string(), chapter=chapter['url_name'], section=section.url_name)) | h}">
+                    ${ section.display_name | h}
                     %if total > 0 or earned > 0:
                       <span class="sr">
                         ${_("{earned} of {total} possible points").format(earned='{:.3n}'.format(float(earned)), total='{:.3n}'.format(float(total))) | h}
@@ -168,11 +168,11 @@ from django.utils.http import urlquote_plus
                     %endif
                   </h3>
                   <p>
-                    ${section['format'] | h}
+                    ${section.format | h}
 
-                    %if section.get('due') is not None:
+                    %if section.due is not None:
                       <%
-                          formatted_string = get_time_display(section['due'], course.due_date_display_format, coerce_tz=settings.TIME_ZONE_DISPLAYED_FOR_DEADLINES)
+                          formatted_string = get_time_display(section.due, course.due_date_display_format, coerce_tz=settings.TIME_ZONE_DISPLAYED_FOR_DEADLINES)
                           due_date = '' if len(formatted_string)==0 else _(u'due {date}').format(date=formatted_string)
                       %>
                       <em>
@@ -182,10 +182,10 @@ from django.utils.http import urlquote_plus
                   </p>
 
                   <div class="scores">
-                    %if len(section['scores']) > 0:
-                      <h3> ${ _("Problem Scores: ") if section['graded'] else _("Practice Scores: ")} </h3>
+                    %if len(section.scores) > 0:
+                      <h3> ${ _("Problem Scores: ") if section.graded else _("Practice Scores: ")} </h3>
                       <ol>
-                        %for score in section['scores']:
+                        %for score in section.scores:
                         <li>${"{0:.3n}/{1:.3n}".format(float(score.earned),float(score.possible)) | h}</li>
                         %endfor
                       </ol>

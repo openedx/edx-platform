@@ -253,7 +253,7 @@ class TestCCXProgressChanges(CcxTestCase, LoginEnrollmentTestCase):
         grade_summary = progress_page_response.mako_context['courseware_summary']  # pylint: disable=no-member
         chapter = grade_summary[0]
         section = chapter['sections'][0]
-        progress_page_due_date = section['due'].strftime("%Y-%m-%d %H:%M")
+        progress_page_due_date = section.due.strftime("%Y-%m-%d %H:%M")
         self.assertEqual(progress_page_due_date, due)
 
     @patch('ccx.views.render_to_response', intercept_renderer)
