@@ -24,10 +24,10 @@ from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from .. import course_grades
 from ..course_grades import summary as grades_summary
 from ..module_grades import get_module_score
-from ..progress import ProgressSummary
+from ..new.course_grade import CourseGrade
 
 
-def _grade_with_errors(student, course, keep_raw_scores=False):
+def _grade_with_errors(student, course):
     """This fake grade method will throw exceptions for student3 and
     student4, but allow any other students to go through normal grading.
 
@@ -38,7 +38,7 @@ def _grade_with_errors(student, course, keep_raw_scores=False):
     if student.username in ['student3', 'student4']:
         raise Exception("I don't like {}".format(student.username))
 
-    return grades_summary(student, course, keep_raw_scores=keep_raw_scores)
+    return grades_summary(student, course)
 
 
 @attr('shard_1')
@@ -200,9 +200,11 @@ class TestProgressSummary(TestCase):
             self.loc_k: [],
             self.loc_m: [],
         }
-        self.progress_summary = ProgressSummary(
-            None, weighted_scores, locations_to_scored_children
-        )
+
+        course_structure = MagicMock()
+        course_structure.get_children = lambda location: locations_to_scored_children[location]
+        self.course_grade = CourseGrade(student=None, course=None, course_structure=course_structure)
+        self.course_grade.locations_to_scores = weighted_scores
 
     def create_score(self, earned, possible):
         """
@@ -222,47 +224,47 @@ class TestProgressSummary(TestCase):
         )
 
     def test_score_chapter(self):
-        earned, possible = self.progress_summary.score_for_module(self.loc_a)
+        earned, possible = self.course_grade.score_for_module(self.loc_a)
         self.assertEqual(earned, 9)
         self.assertEqual(possible, 24)
 
     def test_score_section_many_leaves(self):
-        earned, possible = self.progress_summary.score_for_module(self.loc_b)
+        earned, possible = self.course_grade.score_for_module(self.loc_b)
         self.assertEqual(earned, 6)
         self.assertEqual(possible, 14)
 
     def test_score_section_one_leaf(self):
-        earned, possible = self.progress_summary.score_for_module(self.loc_c)
+        earned, possible = self.course_grade.score_for_module(self.loc_c)
         self.assertEqual(earned, 3)
         self.assertEqual(possible, 10)
 
     def test_score_vertical_two_leaves(self):
-        earned, possible = self.progress_summary.score_for_module(self.loc_d)
+        earned, possible = self.course_grade.score_for_module(self.loc_d)
         self.assertEqual(earned, 5)
         self.assertEqual(possible, 10)
 
     def test_score_vertical_two_leaves_one_unscored(self):
-        earned, possible = self.progress_summary.score_for_module(self.loc_e)
+        earned, possible = self.course_grade.score_for_module(self.loc_e)
         self.assertEqual(earned, 1)
         self.assertEqual(possible, 4)
 
     def test_score_vertical_no_score(self):
-        earned, possible = self.progress_summary.score_for_module(self.loc_f)
+        earned, possible = self.course_grade.score_for_module(self.loc_f)
         self.assertEqual(earned, 0)
         self.assertEqual(possible, 0)
 
     def test_score_vertical_one_leaf(self):
-        earned, possible = self.progress_summary.score_for_module(self.loc_g)
+        earned, possible = self.course_grade.score_for_module(self.loc_g)
         self.assertEqual(earned, 3)
         self.assertEqual(possible, 10)
 
     def test_score_leaf(self):
-        earned, possible = self.progress_summary.score_for_module(self.loc_h)
+        earned, possible = self.course_grade.score_for_module(self.loc_h)
         self.assertEqual(earned, 2)
         self.assertEqual(possible, 5)
 
     def test_score_leaf_no_score(self):
-        earned, possible = self.progress_summary.score_for_module(self.loc_m)
+        earned, possible = self.course_grade.score_for_module(self.loc_m)
         self.assertEqual(earned, 0)
         self.assertEqual(possible, 0)
 

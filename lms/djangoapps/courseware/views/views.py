@@ -47,6 +47,7 @@ from commerce.utils import EcommerceService
 from enrollment.api import add_enrollment
 from course_modes.models import CourseMode
 from lms.djangoapps.grades import course_grades, progress as grades_progress
+from lms.djangoapps.grades.new.course_grade import CourseGradeFactory
 from courseware.access import has_access, has_ccx_coach_role, _adjust_start_date_for_beta_testers
 from courseware.access_response import StartDateError
 from courseware.access_utils import in_preview_mode
@@ -720,15 +721,14 @@ def _progress(request, course_key, student_id):
     # additional DB lookup (this kills the Progress page in particular).
     student = User.objects.prefetch_related("groups").get(id=student.id)
 
-    # Fetch course blocks once for performance reasons
-    course_structure = get_course_blocks(student, course.location)
-
-    courseware_summary = grades_progress.summary(student, course, course_structure).chapters
-    if courseware_summary is None:
+    course_grade = CourseGradeFactory.create(student, course)
+    if not course_grade.has_access_to_course:
         # This means the student didn't have access to the course (which the instructor requested)
         raise Http404
 
-    grade_summary = course_grades.summary(student, course, course_structure=course_structure)
+    courseware_summary = course_grade.chapter_grades
+    grade_summary = course_grade.summary
+
     studio_url = get_studio_url(course, 'settings/grading')
 
     # checking certificate generation configuration

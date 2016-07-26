@@ -13,6 +13,9 @@ log = logging.getLogger("edx.courseware")
 Score = namedtuple("Score", "earned possible graded section module_id")
 
 
+FLOAT_SUM = lambda iterable: float(sum(iterable))
+
+
 def aggregate_scores(scores, section_name="summary"):
     """
     scores: A list of Score objects
@@ -20,11 +23,11 @@ def aggregate_scores(scores, section_name="summary"):
         all_total: A Score representing the total score summed over all input scores
         graded_total: A Score representing the score summed over all graded input scores
     """
-    total_correct_graded = sum(score.earned for score in scores if score.graded)
-    total_possible_graded = sum(score.possible for score in scores if score.graded)
+    total_correct_graded = FLOAT_SUM(score.earned for score in scores if score.graded)
+    total_possible_graded = FLOAT_SUM(score.possible for score in scores if score.graded)
 
-    total_correct = sum(score.earned for score in scores)
-    total_possible = sum(score.possible for score in scores)
+    total_correct = FLOAT_SUM(score.earned for score in scores)
+    total_possible = FLOAT_SUM(score.possible for score in scores)
 
     #regardless of whether or not it is graded
     all_total = Score(
@@ -341,7 +344,7 @@ class AssignmentFormatGrader(CourseGrader):
                     possible=float(possible)
                 )
             else:
-                percentage = 0
+                percentage = 0.0
                 summary = u"{section_type} {index} Unreleased - 0% (?/?)".format(
                     index=i + self.starting_index,
                     section_type=self.section_type
