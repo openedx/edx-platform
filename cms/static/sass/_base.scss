@@ -590,6 +590,35 @@ hr.divide {
   }
 }
 
+.tooltip {
+  @include transition(opacity $tmg-f3 ease-out 0s);
+  @include font-size(12);
+  @extend %t-regular;
+  @extend %ui-depth5;
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: 0 10px;
+  border-radius: 3px;
+  background: rgba(0, 0, 0, 0.85);
+  line-height: 26px;
+  color: $white;
+  pointer-events: none;
+  opacity: 0.0;
+
+  &:after {
+    @include font-size(20);
+    content: '▾';
+    display: block;
+    position: absolute;
+    bottom: -14px;
+    left: 50%;
+    margin-left: -7px;
+    color: rgba(0, 0, 0, 0.85);
+  }
+}
+
+
 // +Utility - Basic
 // ====================
 

@@ -1,38 +1,13 @@
-require([
-    "domReady",
-    "jquery",
-    "underscore",
-    "gettext",
-    "common/js/components/views/feedback_notification",
-    "common/js/components/views/feedback_prompt",
-    "js/utils/date_utils",
-    "js/utils/module",
-    "js/utils/handle_iframe_binding",
-    "edx-ui-toolkit/js/dropdown-menu/dropdown-menu-view", 
-    "jquery.ui",
-    "jquery.leanModal",
-    "jquery.form",
-    "jquery.smoothScroll"
-    ],
-    function(
-        domReady,
-        $,
-        _,
-        gettext,
-        NotificationView,
-        PromptView,
-        DateUtils,
-        ModuleUtils,
-        IframeUtils,
-        DropdownMenuView
-    )
+require(["domReady", "jquery", "underscore", "gettext", "common/js/components/views/feedback_notification",
+        "common/js/components/views/feedback_prompt", "js/utils/date_utils",
+        "js/utils/module", "js/utils/handle_iframe_binding", "jquery.ui", "jquery.leanModal",
+        "jquery.form", "jquery.smoothScroll"],
+    function(domReady, $, _, gettext, NotificationView, PromptView, DateUtils, ModuleUtils, IframeUtils)
 {
 
 var $body;
 
 domReady(function() {
-    var dropdownMenuView;
-    
     $body = $('body');
 
     $body.on('click', '.embeddable-xml-input', function() {
@@ -91,14 +66,6 @@ domReady(function() {
     // disable ajax caching in IE so that backbone fetches work
     if ($.browser.msie) {
         $.ajaxSetup({ cache: false });
-    }
-
-    //Initiate the edx tool kit dropdown menu
-    if ($('.js-header-user-menu').length){
-        dropdownMenuView = new DropdownMenuView({
-            el: '.js-header-user-menu'
-        });
-        dropdownMenuView.postRender();
     }
 });
 

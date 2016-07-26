@@ -54,7 +54,6 @@ NPM_INSTALLED_LIBRARIES = [
     'picturefill/dist/picturefill.js',
     'backbone/backbone.js',
     'edx-ui-toolkit/node_modules/backbone.paginator/lib/backbone.paginator.js',
-    'backbone-validation/dist/backbone-validation-min.js',
 ]
 
 # Directory to install static vendor files

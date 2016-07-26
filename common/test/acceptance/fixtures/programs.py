@@ -31,13 +31,16 @@ class ProgramsFixture(object):
 
 class ProgramsConfigMixin(object):
     """Mixin providing a method used to configure the programs feature."""
-    def set_programs_api_configuration(self, is_enabled=False, api_version=1, api_url=PROGRAMS_STUB_URL):
+    def set_programs_api_configuration(self, is_enabled=False, api_version=1, api_url=PROGRAMS_STUB_URL,
+                                       js_path='/js', css_path='/css'):
         """Dynamically adjusts the Programs config model during tests."""
         ConfigModelFixture('/config/programs', {
             'enabled': is_enabled,
             'api_version_number': api_version,
             'internal_service_url': api_url,
             'public_service_url': api_url,
+            'authoring_app_js_path': js_path,
+            'authoring_app_css_path': css_path,
             'cache_ttl': 0,
             'enable_student_dashboard': is_enabled,
             'enable_studio_tab': is_enabled,
