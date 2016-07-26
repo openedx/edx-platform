@@ -3,7 +3,7 @@
  */
 define(["jquery", "underscore", "edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers",
         "common/js/spec_helpers/template_helpers", "js/spec_helpers/modal_helpers", "js/views/modals/edit_xblock",
-        "js/collections/component_template", "xmodule", "coffee/src/main", "xblock/cms.runtime.v1"],
+        "js/collections/component_template", "xmodule", "cms/js/main", "xblock/cms.runtime.v1"],
     function($, _, AjaxHelpers, TemplateHelpers, modal_helpers, EditXBlockModal, ComponentTemplates) {
 
         var installMockXBlock, uninstallMockXBlock, installMockXModule, uninstallMockXModule,
@@ -41,12 +41,13 @@ define(["jquery", "underscore", "edx-ui-toolkit/js/utils/spec-helpers/ajax-helpe
 
         mockComponentTemplates = new ComponentTemplates([
             {
-                templates: [
+                "templates": [
                     {
-                        category: 'discussion',
-                        display_name: 'Discussion'
+                        "category": "discussion",
+                        "display_name": "Discussion"
                     }],
-                type: 'discussion'
+                "type": "discussion",
+                "support_legend": {"show_legend": false}
             }, {
                 "templates": [
                     {
@@ -62,7 +63,8 @@ define(["jquery", "underscore", "edx-ui-toolkit/js/utils/spec-helpers/ajax-helpe
                         "boilerplate_name": "raw.yaml",
                         "display_name": "Raw HTML"
                     }],
-                "type": "html"
+                "type": "html",
+                "support_legend": {"show_legend": false}
             }],
             {
                 parse: true
@@ -76,6 +78,8 @@ define(["jquery", "underscore", "edx-ui-toolkit/js/utils/spec-helpers/ajax-helpe
             TemplateHelpers.installTemplate('add-xblock-component-button');
             TemplateHelpers.installTemplate('add-xblock-component-menu');
             TemplateHelpers.installTemplate('add-xblock-component-menu-problem');
+            TemplateHelpers.installTemplate('add-xblock-component-support-legend');
+            TemplateHelpers.installTemplate('add-xblock-component-support-level');
 
             // Add templates needed by the edit XBlock modal
             TemplateHelpers.installTemplate('edit-xblock-modal');

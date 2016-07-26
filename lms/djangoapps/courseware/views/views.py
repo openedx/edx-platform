@@ -46,7 +46,7 @@ from openedx.core.djangoapps.models.course_details import CourseDetails
 from commerce.utils import EcommerceService
 from enrollment.api import add_enrollment
 from course_modes.models import CourseMode
-from courseware import grades
+from lms.djangoapps.grades import course_grades, progress as grades_progress
 from courseware.access import has_access, has_ccx_coach_role, _adjust_start_date_for_beta_testers
 from courseware.access_response import StartDateError
 from courseware.access_utils import in_preview_mode
@@ -723,12 +723,12 @@ def _progress(request, course_key, student_id):
     # Fetch course blocks once for performance reasons
     course_structure = get_course_blocks(student, course.location)
 
-    courseware_summary = grades.progress_summary(student, course, course_structure)
+    courseware_summary = grades_progress.summary(student, course, course_structure).chapters
     if courseware_summary is None:
         # This means the student didn't have access to the course (which the instructor requested)
         raise Http404
 
-    grade_summary = grades.grade(student, course, course_structure=course_structure)
+    grade_summary = course_grades.summary(student, course, course_structure=course_structure)
     studio_url = get_studio_url(course, 'settings/grading')
 
     # checking certificate generation configuration
@@ -1123,7 +1123,7 @@ def is_course_passed(course, grade_summary=None, student=None, request=None):
     success_cutoff = min(nonzero_cutoffs) if nonzero_cutoffs else None
 
     if grade_summary is None:
-        grade_summary = grades.grade(student, course)
+        grade_summary = course_grades.summary(student, course)
 
     return success_cutoff and grade_summary['percent'] >= success_cutoff
 

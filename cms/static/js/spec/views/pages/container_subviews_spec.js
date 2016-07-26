@@ -434,7 +434,7 @@ define(["jquery", "underscore", "underscore.string", "edx-ui-toolkit/js/utils/sp
                             expect(visibilityCopy).toContain('Staff Only');
                             expect(containerPage.$(bitPublishingCss)).toHaveClass(staffOnlyClass);
                         } else {
-                            expect(visibilityCopy).toBe('Staff and Students');
+                            expect(visibilityCopy).toBe('Staff and Learners');
                             expect(containerPage.$(bitPublishingCss)).not.toHaveClass(staffOnlyClass);
                             verifyExplicitStaffOnly(false);
                             verifyImplicitStaffOnly(false);

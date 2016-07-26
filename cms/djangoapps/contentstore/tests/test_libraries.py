@@ -25,6 +25,7 @@ from openedx.core.djangoapps.content.course_structures.tests import SignalDiscon
 from xblock_django.user_service import DjangoXBlockUserService
 from xmodule.x_module import STUDIO_VIEW
 from student import auth
+from student.tests.factories import UserFactory
 
 
 class LibraryTestCase(ModuleStoreTestCase):
@@ -34,6 +35,7 @@ class LibraryTestCase(ModuleStoreTestCase):
     def setUp(self):
         super(LibraryTestCase, self).setUp()
 
+        self.user = UserFactory(password=self.user_password, is_staff=True)
         self.client = AjaxEnabledTestClient()
         self._login_as_staff_user(logout_first=False)
 
@@ -477,7 +479,8 @@ class TestLibraryAccess(SignalDisconnectTestMixin, LibraryTestCase):
     def setUp(self):
         """ Create a library, staff user, and non-staff user """
         super(TestLibraryAccess, self).setUp()
-        self.non_staff_user, self.non_staff_user_password = self.create_non_staff_user()
+        self.non_staff_user_password = 'foo'
+        self.non_staff_user = UserFactory(password=self.non_staff_user_password, is_staff=False)
 
     def _login_as_non_staff_user(self, logout_first=True):
         """ Login as a user that starts out with no roles/permissions granted. """

@@ -61,28 +61,21 @@ class XBlockSupportTestCase(CacheIsolationTestCase):
         disabled_xblock_names = [block.name for block in disabled_xblocks()]
         self.assertItemsEqual(["survey", "poll"], disabled_xblock_names)
 
-    def test_authorable_blocks_flag_disabled(self):
-        """
-        Tests authorable_xblocks returns None if the configuration flag is not enabled.
-        """
-        self.assertFalse(XBlockStudioConfigurationFlag.is_enabled())
-        self.assertIsNone(authorable_xblocks())
-
     def test_authorable_blocks_empty_model(self):
         """
-        Tests authorable_xblocks returns an empty list if the configuration flag is enabled but
-        the XBlockStudioConfiguration table is empty.
+        Tests authorable_xblocks returns an empty list if XBlockStudioConfiguration table is empty, regardless
+        of whether or not XBlockStudioConfigurationFlag is enabled.
         """
-        XBlockStudioConfigurationFlag(enabled=True).save()
         XBlockStudioConfiguration.objects.all().delete()
+        self.assertFalse(XBlockStudioConfigurationFlag.is_enabled())
+        self.assertEqual(0, len(authorable_xblocks(allow_unsupported=True)))
+        XBlockStudioConfigurationFlag(enabled=True).save()
         self.assertEqual(0, len(authorable_xblocks(allow_unsupported=True)))
 
     def test_authorable_blocks(self):
         """
-        Tests authorable_xblocks when configuration flag is enabled and name is not specified.
+        Tests authorable_xblocks when name is not specified.
         """
-        XBlockStudioConfigurationFlag(enabled=True).save()
-
         authorable_xblock_names = [block.name for block in authorable_xblocks()]
         self.assertItemsEqual(["done", "problem", "problem", "html"], authorable_xblock_names)
 
@@ -99,7 +92,7 @@ class XBlockSupportTestCase(CacheIsolationTestCase):
 
     def test_authorable_blocks_by_name(self):
         """
-        Tests authorable_xblocks when configuration flag is enabled and name is specified.
+        Tests authorable_xblocks when name is specified.
         """
         def verify_xblock_fields(name, template, support_level, block):
             """
@@ -108,8 +101,6 @@ class XBlockSupportTestCase(CacheIsolationTestCase):
             self.assertEqual(name, block.name)
             self.assertEqual(template, block.template)
             self.assertEqual(support_level, block.support_level)
-
-        XBlockStudioConfigurationFlag(enabled=True).save()
 
         # There are no xblocks with name video.
         authorable_blocks = authorable_xblocks(name="video")

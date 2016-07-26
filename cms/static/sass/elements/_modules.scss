@@ -168,11 +168,39 @@
 
     // specific menu types
     &.new-component-problem {
-      padding-bottom: ($baseline/2);
-
       .problem-type-tabs {
         display: inline-block;
       }
+    }
+
+    .support-documentation {
+      float: right;
+      @include margin($baseline, 0, ($baseline/2), ($baseline/2));
+      @include font-size(14);
+
+      .support-documentation-level {
+        padding-right: ($baseline/2);
+      }
+
+      .support-documentation-link {
+        // Override JQuery ui-widget-content link color (black) with our usual link color and hover action.
+        color: $uxpl-blue-base;
+        text-decoration: none;
+        padding-right: ($baseline/2);
+
+        &:hover {
+          color: $uxpl-blue-hover-active;
+          text-decoration: underline;
+        }
+      }
+    }
+
+    .support-level {
+      padding-right: ($baseline/2);
+    }
+
+    .icon {
+      color: $uxpl-primary-accent;
     }
   }
 
@@ -180,6 +208,7 @@
   // --------------------
   .new-component-template {
     @include clearfix();
+    margin-bottom: 0;
 
     li {
       border: none;
@@ -190,7 +219,7 @@
       }
     }
 
-  .button-component {
+    .button-component {
       @include clearfix();
       @include transition(none);
       @extend %t-demi-strong;
@@ -201,11 +230,16 @@
       background: $white;
       color: $gray-d3;
       text-align: left;
+      font-family: $f-sans-serif;
 
       &:hover {
         @include transition(background-color $tmg-f2 linear 0s);
         background: tint($green,30%);
         color: $white;
+
+        .icon {
+          color: $white;
+        }
       }
     }
   }

@@ -96,6 +96,7 @@
 # Harry Li <harry75369@gmail.com>, 2014
 # hohomi <hohomi@gmail.com>, 2016
 # hohomi <hohomi@gmail.com>, 2016
+# Iris Zeng <yz3535@nyu.edu>, 2016
 # Jerome Huang <canni3269@gmail.com>, 2014
 # Jianfei Wang <me@thinxer.com>, 2013
 # jiangnan.hugo <jiangnan.hugo@gmail.com>, 2014
@@ -339,7 +340,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-07-07 14:20+0000\n"
+"POT-Creation-Date: 2016-07-15 14:48+0000\n"
 "PO-Revision-Date: 2016-06-29 18:11+0000\n"
 "Last-Translator: Yue Fang <yfang@juilliard.edu>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/open-edx/edx-platform/language/zh_CN/)\n"
@@ -4987,7 +4988,7 @@ msgstr "透过使用电子商务服务承载结帐页面。"
 msgid "Path to single course checkout page hosted by the E-Commerce service."
 msgstr "透过电子商务服务承载单门课程结帐页面之途径"
 
-#: lms/djangoapps/commerce/models.py
+#: lms/djangoapps/commerce/models.py openedx/core/djangoapps/catalog/models.py
 #: openedx/core/djangoapps/credentials/models.py
 #: openedx/core/djangoapps/credit/models.py
 #: openedx/core/djangoapps/programs/models.py
@@ -8731,6 +8732,22 @@ msgstr "您可以建立 {max_num_bookmarks_per_course} 书签。您必须在新�
 msgid "Bookmark with usage_id: {usage_id} does not exist."
 msgstr "书签 usage_id: {usage_id}  不存在。"
 
+#: openedx/core/djangoapps/catalog/models.py
+msgid "Internal API URL"
+msgstr ""
+
+#: openedx/core/djangoapps/catalog/models.py
+msgid ""
+"API root to be used for server-to-server requests (e.g., https://catalog-"
+"internal.example.com/api/v1/)."
+msgstr ""
+
+#: openedx/core/djangoapps/catalog/models.py
+msgid ""
+"Specified in seconds. Enable caching of API responses by setting this to a "
+"value greater than 0."
+msgstr ""
+
 #: openedx/core/djangoapps/course_groups/cohorts.py
 msgid "Default Group"
 msgstr "默认组"
@@ -9831,6 +9848,7 @@ msgstr "修习要求"
 
 #: cms/templates/studio_xblock_wrapper.html lms/templates/help_modal.html
 #: lms/templates/module-error.html
+#: lms/templates/instructor/instructor_dashboard_2/certificates.html
 msgid "Details"
 msgstr "细节"
 
@@ -11195,6 +11213,7 @@ msgstr "错误"
 
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 #: lms/templates/ccx/schedule.html
+#: lms/templates/instructor/instructor_dashboard_2/certificates.html
 msgid "Date"
 msgstr "日期"
 
@@ -12916,31 +12935,6 @@ msgid "Course Progress for Student '{username}' ({email})"
 msgstr "学生'{username}' ({email})的学习进度"
 
 #: lms/templates/courseware/progress.html
-msgid "Your enrollment: Audit track"
-msgstr ""
-
-#: lms/templates/courseware/progress.html
-msgid ""
-"You are enrolled in the audit track for this course. The audit track does "
-"not include a certificate."
-msgstr ""
-
-#: lms/templates/courseware/progress.html
-msgid ""
-"Your certificate has been invalidated. Please contact your course team if "
-"you have any questions."
-msgstr ""
-
-#: lms/templates/courseware/progress.html
-msgid "Your certificate is available"
-msgstr "您的证书有效"
-
-#: lms/templates/courseware/progress.html
-msgid ""
-"You can keep working for a higher grade, or request your certificate now."
-msgstr "您可以继续努力以获得更高分数，也可以马上申请证书。"
-
-#: lms/templates/courseware/progress.html
 msgid "View certificate in a new browser window or tab."
 msgstr "在一个新的浏览器窗口或标签中查看证书。"
 
@@ -12955,40 +12949,6 @@ msgstr "PDF将在新的浏览器窗口或标签打开"
 #: lms/templates/courseware/progress.html
 msgid "Download Your Certificate"
 msgstr "下载您的证书"
-
-#. Translators: This message appears to users when the system is processessing
-#. course certificates, which can take a few hours.
-#: lms/templates/courseware/progress.html
-msgid "We're working on it..."
-msgstr "我们正在努力..."
-
-#: lms/templates/courseware/progress.html
-msgid ""
-"We're creating your certificate. You can keep working in your courses and a "
-"link to it will appear here and on your Dashboard when it is ready."
-msgstr "我们正在为您生成证书。您可以继续学习您的课程，一旦证书准备就绪，这里及您的课程面板中都会显示指向证书的链接。"
-
-#. Translators: This message appears to users when the users have not
-#. completed
-#. identity verification.
-#: lms/templates/courseware/progress.html
-msgid "Certificate unavailable"
-msgstr "无法查看证书"
-
-#: lms/templates/courseware/progress.html
-msgid ""
-"You have not received a certificate because you do not have a current "
-"{platform_name} verified identity. "
-msgstr "您还未获得证书，是因为您未在当前的{platform_name}平台上验证您的身份。"
-
-#: lms/templates/courseware/progress.html
-#: lms/templates/dashboard/_dashboard_certificate_information.html
-msgid "Verify your identity now."
-msgstr "立刻验证您的身份。"
-
-#: lms/templates/courseware/progress.html
-msgid "Congratulations, you qualified for a certificate!"
-msgstr "恭喜！您已经通过认证！"
 
 #: lms/templates/courseware/progress.html
 msgid "Request Certificate"
@@ -13183,6 +13143,10 @@ msgid ""
 "Your certificate was not issued because you do not have a current verified "
 "identity with {platform_name}. "
 msgstr "我们未向您颁发证书，是因为您未在当前的{platform_name}平台上验证您的身份。"
+
+#: lms/templates/dashboard/_dashboard_certificate_information.html
+msgid "Verify your identity now."
+msgstr "立刻验证您的身份。"
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid "Your {cert_name_short} is Generating"
@@ -14566,6 +14530,10 @@ msgid "Certificate Generation History"
 msgstr "证书生成历史"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
+msgid "Task name"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/certificates.html
 msgid "SET CERTIFICATE EXCEPTIONS"
 msgstr "设置证书特殊处理"
 
@@ -14585,8 +14553,6 @@ msgstr "无效证书"
 msgid "Enrollment Information"
 msgstr "选课信息"
 
-#. Translators: 'track' refers to the enrollment type ('honor', 'verified', or
-#. 'audit')
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Number of enrollees (admins, staff, and students) by track"
 msgstr "总参与人数(包括管理员、员工和学生)"

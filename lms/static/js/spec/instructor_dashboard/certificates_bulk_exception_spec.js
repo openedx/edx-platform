@@ -136,7 +136,7 @@ define([
                 this.view.$el.find(SELECTORS.bulk_white_list_exception_form).submit(submitCallback);
                 this.view.$el.find(SELECTORS.upload_csv_button).click();
                 expect(this.view.$el.find("div.message > .successfully-added")).toBeHidden();
-                this.view.$el.find("a.arrow#successfully-added").trigger( "click" );
+                this.view.$el.find(".arrow#successfully-added").trigger( "click" );
                 expect(this.view.$el.find("div.message > .successfully-added")).toBeVisible();
 
             });

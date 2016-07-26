@@ -982,6 +982,11 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
         "user_partitions": get_user_partition_info(xblock, course=course),
     }
 
+    if xblock.category == 'sequential':
+        xblock_info.update({
+            "hide_after_due": xblock.hide_after_due,
+        })
+
     # update xblock_info with special exam information if the feature flag is enabled
     if settings.FEATURES.get('ENABLE_SPECIAL_EXAMS'):
         if xblock.category == 'course':
@@ -997,7 +1002,6 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
                 "is_time_limited": xblock.is_time_limited,
                 "exam_review_rules": xblock.exam_review_rules,
                 "default_time_limit_minutes": xblock.default_time_limit_minutes,
-                "hide_after_due": xblock.hide_after_due,
             })
 
     # Update with gating info

@@ -24,7 +24,7 @@ from courseware.models import StudentModule
 from certificates.models import GeneratedCertificate
 from django.db.models import Count
 from certificates.models import CertificateStatuses
-from courseware.grades import grading_context_for_course
+from grades.context import grading_context_for_course
 
 
 STUDENT_FEATURES = ('id', 'username', 'first_name', 'last_name', 'is_staff', 'email')

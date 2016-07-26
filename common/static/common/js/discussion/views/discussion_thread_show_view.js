@@ -38,7 +38,6 @@
 
             DiscussionThreadShowView.prototype.renderTemplate = function() {
                 var context;
-                this.template = _.template($("#thread-show-template").html());
                 context = $.extend({
                     mode: this.mode,
                     flagged: this.model.isFlagged(),
@@ -46,27 +45,25 @@
                     cid: this.model.cid,
                     readOnly: $('.discussion-module').data('read-only')
                 }, this.model.attributes);
-                return this.template(context);
+                return edx.HtmlUtils.template($("#thread-show-template").html())(context);
             };
 
             DiscussionThreadShowView.prototype.render = function() {
-                this.$el.html(this.renderTemplate());
+                edx.HtmlUtils.setHtml(
+                    this.$el,
+                    this.renderTemplate()
+                );
                 this.delegateEvents();
                 this.renderAttrs();
                 this.$("span.timeago").timeago();
                 this.convertMath();
-                this.highlight(this.$(".post-body"));
-                this.highlight(this.$("h1,h3"));
+                this.$(".post-body");
+                this.$("h1,h3");
                 return this;
             };
 
             DiscussionThreadShowView.prototype.convertMath = function() {
-                var element;
-                element = this.$(".post-body");
-                element.html(DiscussionUtil.postMathJaxProcessor(DiscussionUtil.markdownWithHighlight(element.text())));
-                if (typeof MathJax !== "undefined" && MathJax !== null) {
-                    return MathJax.Hub.Queue(["Typeset", MathJax.Hub, element[0]]);
-                }
+                DiscussionUtil.convertMath(this.$(".post-body"));
             };
 
             DiscussionThreadShowView.prototype.edit = function(event) {
@@ -75,12 +72,6 @@
 
             DiscussionThreadShowView.prototype._delete = function(event) {
                 return this.trigger("thread:_delete", event);
-            };
-
-            DiscussionThreadShowView.prototype.highlight = function(el) {
-                if (el.html()) {
-                    return el.html(el.html().replace(/&lt;mark&gt;/g, "<mark>").replace(/&lt;\/mark&gt;/g, "</mark>"));
-                }
             };
 
             return DiscussionThreadShowView;

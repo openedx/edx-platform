@@ -1,0 +1,99 @@
+// ------------------------------
+// Programs: Components
+
+// About: styling for specific UI components ranging from global to modular.
+
+// #BUTTONS
+// #FORMS
+
+
+// ------------------------------
+// #BUTTONS
+// ------------------------------
+.btn {
+  &.btn-delete,
+  &.btn-edit {
+    border: none;
+    background: none;
+    color: palette(grayscale, base);
+
+    &:hover,
+    &:focus,
+    &:active {
+      color: palette(grayscale, black);
+    }
+  }
+
+  &.full {
+    width: 100%;
+  }
+
+  &.right {
+    @include float(right);
+  }
+
+  &.btn-create {
+    background: palette(success, base);
+    border-color: palette(success, base);
+
+    // STATE: hover and focus
+    &:hover,
+    &.is-hovered,
+    &:focus,
+    &.is-focused {
+      background: shade($success, 33%);
+      color: $btn-default-focus-color;
+    }
+
+    // STATE: is pressed or active
+    &:active,
+    &.is-pressed,
+    &.is-active {
+      border-color: shade($success, 33%);
+      background: shade($success, 33%);
+    }
+
+    .text {
+      margin-left: 5px;
+    }
+  }
+
+  .icon,
+  .text {
+    vertical-align: middle;
+  }
+
+  .icon {
+    font-size: 16px;
+  }
+}
+
+// ------------------------------
+// #FORMS
+// ------------------------------
+.field {
+  .invalid {
+    border: 2px solid palette(error, base);
+  }
+
+  .field-input,
+  .field-hint,
+  .field-message {
+    min-with: 300px;
+    width: 50%;
+
+    &.is-hidden {
+      @extend .is-hidden;
+    }
+  }
+
+  .copy {
+    vertical-align: middle;
+  }
+}
+
+.form-group {
+  &.bg-white {
+    background-color: palette(grayscale, white);
+  }
+}

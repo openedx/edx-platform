@@ -117,7 +117,7 @@ class AuthListWidget extends MemberListWidget
 
         # create revoke button and insert it into the row
         label_trans = gettext("Revoke access")
-        $revoke_btn = $ _.template('<div class="revoke"><span class="icon fa fa-times-circle" aria-hidden="true"></span> <%= label %></div>')({label: label_trans}),
+        $revoke_btn = $ _.template('<div class="revoke"><span class="icon fa fa-times-circle" aria-hidden="true"></span> <%- label %></div>')({label: label_trans}),
           class: 'revoke'
         $revoke_btn.click =>
             @modify_member_access member.email, 'revoke', (error) =>
@@ -166,10 +166,10 @@ class AuthListWidget extends MemberListWidget
     @clear_errors()
     @clear_input()
     if data.userDoesNotExist
-      msg = gettext("Could not find a user with username or email address '<%= identifier %>'.")
+      msg = gettext("Could not find a user with username or email address '<%- identifier %>'.")
       @show_errors _.template(msg, {identifier: data.unique_student_identifier})
     else if data.inactiveUser
-      msg = gettext("Error: User '<%= username %>' has not yet activated their account. Users must create and activate their accounts before they can be assigned a role.")
+      msg = gettext("Error: User '<%- username %>' has not yet activated their account. Users must create and activate their accounts before they can be assigned a role.")
       @show_errors _.template(msg, {username: data.unique_student_identifier})
     else if data.removingSelfAsInstructor
       @show_errors gettext "Error: You cannot remove yourself from the Instructor group!"
@@ -181,12 +181,12 @@ class @AutoEnrollmentViaCsv
     # Wrapper for the AutoEnrollmentViaCsv subsection.
     # This object handles buttons, success and failure reporting,
     # and server communication.
-    @$student_enrollment_form = @$container.find("form#student-auto-enroll-form")
-    @$enrollment_signup_button = @$container.find("[name='enrollment_signup_button']")
+    @$student_enrollment_form = @$container.find("#student-auto-enroll-form")
+    @$enrollment_signup_button = @$container.find("#submitBtn-auto_enroll_csv")
     @$students_list_file = @$container.find("input[name='students_list']")
     @$csrf_token = @$container.find("input[name='csrfmiddlewaretoken']")
     @$results = @$container.find("div.results")
-    @$browse_button = @$container.find("#browseBtn")
+    @$browse_button = @$container.find("#browseBtn-auto-enroll")
     @$browse_file = @$container.find("#browseFile")
 
     @processing = false

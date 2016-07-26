@@ -8,10 +8,13 @@ from xblock_django.user_service import (
     ATTR_KEY_USER_ID,
     ATTR_KEY_USERNAME,
     ATTR_KEY_USER_IS_STAFF,
+    ATTR_KEY_USER_PREFERENCES,
+    USER_PREFERENCES_WHITE_LIST,
 )
 from student.models import anonymous_id_for_user
 from student.tests.factories import UserFactory, AnonymousUserFactory
 from opaque_keys.edx.keys import CourseKey
+from openedx.core.djangoapps.user_api.preferences.api import set_user_preference
 
 
 class UserServiceTestCase(TestCase):
@@ -22,6 +25,9 @@ class UserServiceTestCase(TestCase):
         super(UserServiceTestCase, self).setUp()
         self.user = UserFactory(username="tester", email="test@tester.com")
         self.user.profile.name = "Test Tester"
+        set_user_preference(self.user, 'pref-lang', 'en')
+        set_user_preference(self.user, 'time_zone', 'US/Pacific')
+        set_user_preference(self.user, 'not_white_listed', 'hidden_value')
         self.anon_user = AnonymousUserFactory()
 
     def assert_is_anon_xb_user(self, xb_user):
@@ -42,6 +48,12 @@ class UserServiceTestCase(TestCase):
         self.assertEqual(xb_user.opt_attrs[ATTR_KEY_USERNAME], dj_user.username)
         self.assertEqual(xb_user.opt_attrs[ATTR_KEY_USER_ID], dj_user.id)
         self.assertFalse(xb_user.opt_attrs[ATTR_KEY_USER_IS_STAFF])
+        self.assertTrue(
+            all(
+                pref in USER_PREFERENCES_WHITE_LIST
+                for pref in xb_user.opt_attrs[ATTR_KEY_USER_PREFERENCES]
+            )
+        )
 
     def test_convert_anon_user(self):
         """

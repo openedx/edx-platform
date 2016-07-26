@@ -101,7 +101,7 @@ class SendCompositeOutcomeTest(BaseOutcomeTest):
         )
         self.weighted_scores = MagicMock()
         self.weighted_scores_mock = self.setup_patch(
-            'lti_provider.tasks.get_weighted_scores', self.weighted_scores
+            'lti_provider.tasks.progress.summary', self.weighted_scores
         )
         self.module_store = MagicMock()
         self.module_store.get_item = MagicMock(return_value=self.descriptor)

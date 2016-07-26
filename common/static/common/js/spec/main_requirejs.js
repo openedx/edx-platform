@@ -34,9 +34,6 @@
             'backbone-super': 'js/vendor/backbone-super',
             'jasmine-imagediff': 'js/vendor/jasmine-imagediff',
             'URI': 'js/vendor/URI.min',
-            'modernizr': 'edx-pattern-library/js/modernizr-custom',
-            'afontgarde': 'edx-pattern-library/js/afontgarde',
-            'edxicons': 'edx-pattern-library/js/edx-icons',
             'draggabilly': 'js/vendor/draggabilly'
         },
         shim: {
@@ -151,12 +148,6 @@
             },
             "sinon": {
                 exports: "sinon"
-            },
-            "modernizr": {
-                exports: "Modernizr"
-            },
-            "afontgarde": {
-                exports: "AFontGarde"
             }
         }
     });

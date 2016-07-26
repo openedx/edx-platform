@@ -4,10 +4,10 @@ Instructor (2) dashboard page.
 """
 
 from bok_choy.page_object import PageObject
-from .course_page import CoursePage
+from common.test.acceptance.pages.lms.course_page import CoursePage
 import os
 from bok_choy.promise import EmptyPromise, Promise
-from ...tests.helpers import select_option_by_text, get_selected_option_text, get_options
+from common.test.acceptance.tests.helpers import select_option_by_text, get_selected_option_text, get_options
 
 
 class InstructorDashboardPage(CoursePage):
@@ -748,7 +748,7 @@ class MembershipPageAutoEnrollSection(PageObject):
     """
     url = None
 
-    auto_enroll_browse_button_selector = '.auto_enroll_csv .file-browse input.file_field#browseBtn'
+    auto_enroll_browse_button_selector = '.auto_enroll_csv .file-browse input.file_field#browseBtn-auto-enroll'
     auto_enroll_upload_button_selector = '.auto_enroll_csv button[name="enrollment_signup_button"]'
     batch_enrollment_selector = '.batch-enrollment'
     NOTIFICATION_ERROR = 'error'

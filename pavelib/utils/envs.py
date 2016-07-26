@@ -103,15 +103,20 @@ class Env(object):
             'log': BOK_CHOY_LOG_DIR / "bok_choy_edxnotes.log",
         },
 
+        'ecommerce': {
+            'port': 8043,
+            'log': BOK_CHOY_LOG_DIR / "bok_choy_ecommerce.log",
+        },
+
         'programs': {
             'port': 8090,
             'log': BOK_CHOY_LOG_DIR / "bok_choy_programs.log",
         },
 
-        'ecommerce': {
-            'port': 8043,
-            'log': BOK_CHOY_LOG_DIR / "bok_choy_ecommerce.log",
-        }
+        'catalog': {
+            'port': 8091,
+            'log': BOK_CHOY_LOG_DIR / "bok_choy_catalog.log",
+        },
     }
 
     # Mongo databases that will be dropped before/after the tests run

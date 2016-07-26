@@ -2,7 +2,9 @@
 Django module for Course Metadata class -- manages advanced settings and related parameters
 """
 from xblock.fields import Scope
+from xblock_django.models import XBlockStudioConfigurationFlag
 from xmodule.modulestore.django import modulestore
+
 from django.utils.translation import ugettext as _
 from django.conf import settings
 
@@ -92,6 +94,11 @@ class CourseMetadata(object):
         if not settings.FEATURES.get('CUSTOM_COURSES_EDX'):
             filtered_list.append('enable_ccx')
             filtered_list.append('ccx_connector')
+
+        # If the XBlockStudioConfiguration table is not being used, there is no need to
+        # display the "Allow Unsupported XBlocks" setting.
+        if not XBlockStudioConfigurationFlag.is_enabled():
+            filtered_list.append('allow_unsupported_xblocks')
 
         return filtered_list
 

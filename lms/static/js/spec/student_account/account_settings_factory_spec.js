@@ -32,7 +32,6 @@ define(['backbone',
                     'options': Helpers.FIELD_OPTIONS
                 }, 'time_zone': {
                     'options': Helpers.FIELD_OPTIONS,
-                    'enabled': false
                 }
             };
 

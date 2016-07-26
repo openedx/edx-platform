@@ -93,6 +93,10 @@ class UserPreferenceModelTest(ModuleStoreTestCase):
         pref = UserPreference.get_value(user, 'testkey_none')
         self.assertIsNone(pref)
 
+        # get default value for key that doesn't exist for user
+        pref = UserPreference.get_value(user, 'testkey_none', 'default_value')
+        self.assertEqual('default_value', pref)
+
 
 class TestUserPreferenceEvents(UserSettingsEventTestMixin, TestCase):
     """

@@ -87,7 +87,7 @@ class GatingTest(UniqueCourseTest):
         # Make the first subsection a prerequisite
         self.course_outline.visit()
         self.course_outline.open_subsection_settings_dialog(0)
-        self.course_outline.select_access_tab()
+        self.course_outline.select_advanced_tab(desired_item='gated_content')
         self.course_outline.make_gating_prerequisite()
 
     def _setup_gated_subsection(self):
@@ -100,7 +100,7 @@ class GatingTest(UniqueCourseTest):
         # Gate the second subsection based on the score achieved in the first subsection
         self.course_outline.visit()
         self.course_outline.open_subsection_settings_dialog(1)
-        self.course_outline.select_access_tab()
+        self.course_outline.select_advanced_tab(desired_item='gated_content')
         self.course_outline.add_prerequisite_to_subsection("80")
 
     def test_subsection_gating_in_studio(self):
@@ -116,7 +116,7 @@ class GatingTest(UniqueCourseTest):
         # Assert settings are displayed correctly for a prerequisite subsection
         self.course_outline.visit()
         self.course_outline.open_subsection_settings_dialog(0)
-        self.course_outline.select_access_tab()
+        self.course_outline.select_advanced_tab(desired_item='gated_content')
         self.assertTrue(self.course_outline.gating_prerequisite_checkbox_is_visible())
         self.assertTrue(self.course_outline.gating_prerequisite_checkbox_is_checked())
         self.assertFalse(self.course_outline.gating_prerequisites_dropdown_is_visible())
@@ -127,7 +127,7 @@ class GatingTest(UniqueCourseTest):
         # Assert settings are displayed correctly for a gated subsection
         self.course_outline.visit()
         self.course_outline.open_subsection_settings_dialog(1)
-        self.course_outline.select_access_tab()
+        self.course_outline.select_advanced_tab(desired_item='gated_content')
         self.assertTrue(self.course_outline.gating_prerequisite_checkbox_is_visible())
         self.assertTrue(self.course_outline.gating_prerequisites_dropdown_is_visible())
         self.assertTrue(self.course_outline.gating_prerequisite_min_score_is_visible())

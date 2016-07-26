@@ -36,7 +36,8 @@ from xmodule.modulestore.tests.factories import CourseFactory
 
 UTILS_MODULE = 'openedx.core.djangoapps.programs.utils'
 CERTIFICATES_API_MODULE = 'lms.djangoapps.certificates.api'
-ECOMMERCE_URL_ROOT = 'http://example-ecommerce.com'
+ECOMMERCE_URL_ROOT = 'https://example-ecommerce.com'
+MARKETING_URL = 'https://www.example.com/marketing/path'
 
 
 @skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
@@ -677,15 +678,16 @@ class TestProgramProgressMeter(ProgramsApiConfigMixin, TestCase):
 @ddt.ddt
 @override_settings(ECOMMERCE_PUBLIC_URL_ROOT=ECOMMERCE_URL_ROOT)
 @skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
-class TestSupplementProgramData(ProgramsApiConfigMixin, ModuleStoreTestCase):
-    """Tests of the utility function used to supplement program data."""
+@mock.patch(UTILS_MODULE + '.get_run_marketing_url', mock.Mock(return_value=MARKETING_URL))
+class TestProgramDataExtender(ProgramsApiConfigMixin, ModuleStoreTestCase):
+    """Tests of the program data extender utility class."""
     maxDiff = None
     sku = 'abc123'
     password = 'test'
     checkout_path = '/basket'
 
     def setUp(self):
-        super(TestSupplementProgramData, self).setUp()
+        super(TestProgramDataExtender, self).setUp()
 
         self.user = UserFactory()
         self.client.login(username=self.user.username, password=self.password)
@@ -715,11 +717,11 @@ class TestSupplementProgramData(ProgramsApiConfigMixin, ModuleStoreTestCase):
                 course_key=unicode(self.course.id),  # pylint: disable=no-member
                 course_url=reverse('course_root', args=[self.course.id]),  # pylint: disable=no-member
                 end_date=strftime_localized(self.course.end, 'SHORT_DATE'),
-                enrollment_open_date=None,
+                enrollment_open_date=strftime_localized(utils.DEFAULT_ENROLLMENT_START_DATE, 'SHORT_DATE'),
                 is_course_ended=self.course.end < timezone.now(),
                 is_enrolled=False,
                 is_enrollment_open=True,
-                marketing_url=None,
+                marketing_url=MARKETING_URL,
                 start_date=strftime_localized(self.course.start, 'SHORT_DATE'),
                 upgrade_url=None,
             ),
@@ -755,7 +757,7 @@ class TestSupplementProgramData(ProgramsApiConfigMixin, ModuleStoreTestCase):
         if is_enrolled:
             CourseEnrollmentFactory(user=self.user, course_id=self.course.id, mode=enrolled_mode)  # pylint: disable=no-member
 
-        data = utils.supplement_program_data(self.program, self.user)
+        data = utils.ProgramDataExtender(self.program, self.user).extend()
 
         self._assert_supplemented(
             data,
@@ -775,7 +777,7 @@ class TestSupplementProgramData(ProgramsApiConfigMixin, ModuleStoreTestCase):
             is_active=False,
         )
 
-        data = utils.supplement_program_data(self.program, self.user)
+        data = utils.ProgramDataExtender(self.program, self.user).extend()
 
         self._assert_supplemented(data)
 
@@ -790,7 +792,7 @@ class TestSupplementProgramData(ProgramsApiConfigMixin, ModuleStoreTestCase):
 
         CourseEnrollmentFactory(user=self.user, course_id=self.course.id, mode=MODES.audit)  # pylint: disable=no-member
 
-        data = utils.supplement_program_data(self.program, self.user)
+        data = utils.ProgramDataExtender(self.program, self.user).extend()
 
         self._assert_supplemented(data, is_enrolled=True, upgrade_url=None)
 
@@ -805,17 +807,27 @@ class TestSupplementProgramData(ProgramsApiConfigMixin, ModuleStoreTestCase):
         self.course.enrollment_end = timezone.now() - datetime.timedelta(days=end_offset)
         self.course = self.update_course(self.course, self.user.id)  # pylint: disable=no-member
 
-        data = utils.supplement_program_data(self.program, self.user)
-
-        if is_enrollment_open:
-            enrollment_open_date = None
-        else:
-            enrollment_open_date = strftime_localized(self.course.enrollment_start, 'SHORT_DATE')
+        data = utils.ProgramDataExtender(self.program, self.user).extend()
 
         self._assert_supplemented(
             data,
             is_enrollment_open=is_enrollment_open,
-            enrollment_open_date=enrollment_open_date,
+            enrollment_open_date=strftime_localized(self.course.enrollment_start, 'SHORT_DATE'),
+        )
+
+    def test_no_enrollment_start_date(self):
+        """Verify that a closed course with no explicit enrollment start date doesn't cause an error.
+
+        Regression test for ECOM-4973.
+        """
+        self.course.enrollment_end = timezone.now() - datetime.timedelta(days=1)
+        self.course = self.update_course(self.course, self.user.id)  # pylint: disable=no-member
+
+        data = utils.ProgramDataExtender(self.program, self.user).extend()
+
+        self._assert_supplemented(
+            data,
+            is_enrollment_open=False,
         )
 
     @ddt.data(True, False)
@@ -827,7 +839,7 @@ class TestSupplementProgramData(ProgramsApiConfigMixin, ModuleStoreTestCase):
         mock_get_cert_data.return_value = {'uuid': test_uuid} if is_uuid_available else {}
         mock_html_certs_enabled.return_value = True
 
-        data = utils.supplement_program_data(self.program, self.user)
+        data = utils.ProgramDataExtender(self.program, self.user).extend()
 
         expected_url = reverse(
             'certificates:render_cert_by_uuid',
@@ -841,7 +853,7 @@ class TestSupplementProgramData(ProgramsApiConfigMixin, ModuleStoreTestCase):
         self.course.end = timezone.now() + datetime.timedelta(days=days_offset)
         self.course = self.update_course(self.course, self.user.id)  # pylint: disable=no-member
 
-        data = utils.supplement_program_data(self.program, self.user)
+        data = utils.ProgramDataExtender(self.program, self.user).extend()
 
         self._assert_supplemented(data)
 
@@ -855,14 +867,14 @@ class TestSupplementProgramData(ProgramsApiConfigMixin, ModuleStoreTestCase):
             'logo': mock_image
         }
 
-        data = utils.supplement_program_data(self.program, self.user)
+        data = utils.ProgramDataExtender(self.program, self.user).extend()
         self.assertEqual(data['organizations'][0].get('img'), mock_logo_url)
 
     @mock.patch(UTILS_MODULE + '.get_organization_by_short_name')
     def test_organization_missing(self, mock_get_organization_by_short_name):
         """ Verify the logo image is not set if the organizations api returns None """
         mock_get_organization_by_short_name.return_value = None
-        data = utils.supplement_program_data(self.program, self.user)
+        data = utils.ProgramDataExtender(self.program, self.user).extend()
         self.assertEqual(data['organizations'][0].get('img'), None)
 
     @mock.patch(UTILS_MODULE + '.get_organization_by_short_name')
@@ -872,5 +884,5 @@ class TestSupplementProgramData(ProgramsApiConfigMixin, ModuleStoreTestCase):
         but the logo is not available
         """
         mock_get_organization_by_short_name.return_value = {'logo': None}
-        data = utils.supplement_program_data(self.program, self.user)
+        data = utils.ProgramDataExtender(self.program, self.user).extend()
         self.assertEqual(data['organizations'][0].get('img'), None)

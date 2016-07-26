@@ -2,7 +2,7 @@
 Course Textbooks page.
 """
 
-from .course_page import CoursePage
+from common.test.acceptance.pages.lms.course_page import CoursePage
 from bok_choy.promise import EmptyPromise
 
 

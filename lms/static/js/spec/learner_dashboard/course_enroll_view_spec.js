@@ -14,6 +14,25 @@ define([
                 courseEnrollModel,
                 urlModel,
                 setupView,
+                singleRunModeList,
+                multiRunModeList,
+                context = {      
+                    display_name: 'Edx Demo course',
+                    key: 'edX+DemoX+Demo_Course',
+                    organization: {
+                        display_name: 'edx.org',
+                        key: 'edX'
+                    }
+                },
+                urls = {
+                    dashboard_url: '/dashboard',
+                    id_verification_url: '/verify_student/start_flow/',
+                    track_selection_url: '/select_track/course/'
+                };
+
+            beforeEach(function() {
+                // Redefine this data prior to each test case so that tests can't
+                // break each other by modifying data copied by reference.
                 singleRunModeList = [{
                     start_date: 'Apr 25, 2016',
                     end_date: 'Jun 13, 2016',
@@ -26,7 +45,8 @@ define([
                     run_key: '2T2016',
                     is_enrolled: false,
                     is_enrollment_open: true
-                }],
+                }];
+
                 multiRunModeList = [{
                     start_date: 'May 21, 2015',
                     end_date: 'Sep 21, 2015',
@@ -51,20 +71,8 @@ define([
                     run_key: '2T2015',
                     is_enrolled: false,
                     is_enrollment_open: true
-                }],
-                context = {      
-                    display_name: 'Edx Demo course',
-                    key: 'edX+DemoX+Demo_Course',
-                    organization: {
-                        display_name: 'edx.org',
-                        key: 'edX'
-                    }
-                },
-                urls = {
-                    dashboard_url: '/dashboard',
-                    id_verification_url: '/verify_student/start_flow/',
-                    track_selection_url: '/select_track/course/'
-                };
+                }];
+            });
 
             setupView = function(runModes, urls){
                 context.run_modes = runModes;
@@ -105,12 +113,24 @@ define([
 
             it('should render the course enroll view based on enrolled data', function(){
                 singleRunModeList[0].is_enrolled = true;
+
                 setupView(singleRunModeList);
+
                 expect(view.$('.enrollment-info').html().trim()).toEqual('enrolled');
-                expect(view.$('.view-course-link').attr('href')).toEqual(
-                    context.run_modes[0].course_url);
+                expect(view.$('.view-course-link').attr('href')).toEqual(context.run_modes[0].course_url);
                 expect(view.$('.view-course-link').text().trim()).toEqual('View Course');
                 expect(view.$('.run-select').length).toBe(0);
+            });
+
+            it('should allow the learner to view an archived course', function(){
+                // Regression test for ECOM-4974.
+                singleRunModeList[0].is_enrolled = true;
+                singleRunModeList[0].is_enrollment_open = false;
+                singleRunModeList[0].is_course_ended = true;
+
+                setupView(singleRunModeList);
+
+                expect(view.$('.view-course-link').text().trim()).toEqual('View Archived Course');
             });
 
             it('should not render anything if run modes is empty', function(){
@@ -140,7 +160,6 @@ define([
             });
 
             it('should enroll learner when enroll button clicked', function(){
-                singleRunModeList[0].is_enrolled = false;
                 setupView(singleRunModeList);
                 expect(view.$('.enroll-button').length).toBe(1);
                 spyOn(courseEnrollModel, 'save');

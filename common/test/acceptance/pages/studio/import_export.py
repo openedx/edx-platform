@@ -9,11 +9,11 @@ import os
 import re
 import requests
 
-from ..common.utils import click_css
+from common.test.acceptance.pages.common.utils import click_css
 
-from .library import LibraryPage
-from .course_page import CoursePage
-from . import BASE_URL
+from common.test.acceptance.pages.studio.library import LibraryPage
+from common.test.acceptance.pages.studio.course_page import CoursePage
+from common.test.acceptance.pages.studio import BASE_URL
 
 
 class TemplateCheckMixin(object):

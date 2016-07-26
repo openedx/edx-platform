@@ -177,7 +177,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-07-07 14:20+0000\n"
+"POT-Creation-Date: 2016-07-15 14:47+0000\n"
 "PO-Revision-Date: 2016-06-10 02:34+0000\n"
 "Last-Translator: Xuejia Tong <snowytong@hotmail.com>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/open-edx/edx-platform/language/zh_CN/)\n"
@@ -2763,14 +2763,9 @@ msgstr "在你的课程中查看以主题组织的所有团队。加入一个团
 msgid "My Team"
 msgstr "我的团队"
 
-#. Translators: sr_start and sr_end surround text meant only for screen
-#. readers.
-#. The whole string will be shown to users as "Browse teams" if they are using
-#. a
-#. screenreader, and "Browse" otherwise.
-#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
-msgid "Browse {sr_start} teams {sr_end}"
-msgstr ""
+#: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
+msgid "Browse"
+msgstr "浏览"
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "Your request could not be completed. Reload the page and try again."
@@ -6642,10 +6637,6 @@ msgid ""
 msgstr ""
 "上传一个用逗号隔开的值 (.csv) "
 "文件，文件要包含获得特例的学员的用户名或电子邮箱地址。将用户名或电子邮箱地址列入第一个逗号隔开的字段中。你可以在第二个用逗号隔开的字段中列入描述特殊处理原因的可选备注。"
-
-#: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
-msgid "Browse"
-msgstr "浏览"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list-editor.underscore

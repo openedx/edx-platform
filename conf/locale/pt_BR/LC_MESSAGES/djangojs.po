@@ -29,6 +29,7 @@
 # Hudson Martins dos Santos <p4p4l3gu4x@gmail.com>, 2015
 # javiercencig <javier@jecnet.com.br>, 2014
 # Jefferson Floyd Conz, 2014
+# Kaio Vinícius Vilerá <kaiovilera@gmail.com>, 2016
 # Kayo Leone Dias Perim <kayo_2008_@hotmail.com>, 2014
 # Kevin Grist <kgrist@localconcept.com>, 2014
 # Leonardo Flores Zambaldi <fzleonardo@gmail.com>, 2014
@@ -180,7 +181,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-07-07 14:20+0000\n"
+"POT-Creation-Date: 2016-07-15 14:47+0000\n"
 "PO-Revision-Date: 2016-07-08 23:20+0000\n"
 "Last-Translator: Rodrigo Mozelli <romozelli@outlook.com>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/open-edx/edx-platform/language/pt_BR/)\n"
@@ -2864,14 +2865,9 @@ msgstr ""
 msgid "My Team"
 msgstr "Minha equipe"
 
-#. Translators: sr_start and sr_end surround text meant only for screen
-#. readers.
-#. The whole string will be shown to users as "Browse teams" if they are using
-#. a
-#. screenreader, and "Browse" otherwise.
-#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
-msgid "Browse {sr_start} teams {sr_end}"
-msgstr ""
+#: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
+msgid "Browse"
+msgstr "Navegar"
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "Your request could not be completed. Reload the page and try again."
@@ -7003,10 +6999,6 @@ msgstr ""
 "Incluir o número de usuário ou endereço de e-mail no primeiro campo separado"
 " por virgula. Você pode incluir uma nota opcional descrevendo a razão para a"
 " exceção no segundo campo separado por vírgula. "
-
-#: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
-msgid "Browse"
-msgstr "Navegar"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list-editor.underscore

@@ -331,11 +331,11 @@ class ProctoredExamTest(UniqueCourseTest):
         And the subsection edit dialog is open
         select advanced settings tab
         For each of None, Timed, Proctored, and Practice exam types
-        The time allotted, review rules, and hide after due fields have proper visibility
-        None: False, False, False
-        Timed: True, False, True
-        Proctored: True, True, False
-        Practice: True, False, False
+        The time allotted and review rules fields have proper visibility
+        None: False, False
+        Timed: True, False
+        Proctored: True, True
+        Practice: True, False
         """
         LogoutPage(self.browser).visit()
         self._auto_auth("STAFF_TESTER", "staff101@example.com", True)
@@ -347,22 +347,18 @@ class ProctoredExamTest(UniqueCourseTest):
         self.course_outline.select_none_exam()
         self.assertFalse(self.course_outline.time_allotted_field_visible())
         self.assertFalse(self.course_outline.exam_review_rules_field_visible())
-        self.assertFalse(self.course_outline.hide_after_due_field_visible())
 
         self.course_outline.select_timed_exam()
         self.assertTrue(self.course_outline.time_allotted_field_visible())
         self.assertFalse(self.course_outline.exam_review_rules_field_visible())
-        self.assertTrue(self.course_outline.hide_after_due_field_visible())
 
         self.course_outline.select_proctored_exam()
         self.assertTrue(self.course_outline.time_allotted_field_visible())
         self.assertTrue(self.course_outline.exam_review_rules_field_visible())
-        self.assertFalse(self.course_outline.hide_after_due_field_visible())
 
         self.course_outline.select_practice_exam()
         self.assertTrue(self.course_outline.time_allotted_field_visible())
         self.assertFalse(self.course_outline.exam_review_rules_field_visible())
-        self.assertFalse(self.course_outline.hide_after_due_field_visible())
 
 
 class CoursewareMultipleVerticalsTest(UniqueCourseTest, EventsTestMixin):

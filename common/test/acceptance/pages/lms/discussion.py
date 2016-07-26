@@ -4,7 +4,7 @@ from bok_choy.javascript import wait_for_js
 from bok_choy.page_object import PageObject
 from bok_choy.promise import EmptyPromise, Promise
 
-from .course_page import CoursePage
+from common.test.acceptance.pages.lms.course_page import CoursePage
 
 
 class DiscussionPageMixin(object):

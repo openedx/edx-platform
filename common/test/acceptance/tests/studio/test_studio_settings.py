@@ -11,12 +11,13 @@ from nose.plugins.attrib import attr
 from base_studio_test import StudioCourseTest
 from bok_choy.promise import EmptyPromise
 from ...fixtures.course import XBlockFixtureDesc
-from ..helpers import create_user_partition_json
+from common.test.acceptance.tests.helpers import create_user_partition_json, element_has_text
 from ...pages.studio.overview import CourseOutlinePage
 from ...pages.studio.settings import SettingsPage
 from ...pages.studio.settings_advanced import AdvancedSettingsPage
 from ...pages.studio.settings_group_configurations import GroupConfigurationsPage
 from ...pages.lms.courseware import CoursewarePage
+from common.test.acceptance.pages.studio.utils import get_input_value
 from textwrap import dedent
 from xmodule.partitions.partitions import Group
 
@@ -504,7 +505,6 @@ class StudioSettingsA11yTest(StudioCourseTest):
         self.settings_page.a11y_audit.config.set_rules({
             "ignore": [
                 'link-href',  # TODO: AC-226
-                'nav-aria-label',  # TODO: AC-227
                 'icon-aria-hidden',  # TODO: AC-229
             ],
         })
@@ -589,7 +589,6 @@ class StudioSettingsImageUploadTest(StudioCourseTest):
         super(StudioSettingsImageUploadTest, self).setUp()
         self.settings_page = SettingsPage(self.browser, self.course_info['org'], self.course_info['number'],
                                           self.course_info['run'])
-        # from nose.tools import set_trace; set_trace()
         self.settings_page.visit()
 
         # Ensure jquery is loaded before running a jQuery
@@ -617,3 +616,305 @@ class StudioSettingsImageUploadTest(StudioCourseTest):
         file_to_upload = 'image.jpg'
         self.settings_page.upload_image('#upload-video-thumbnail-image', file_to_upload)
         self.assertIn(file_to_upload, self.settings_page.get_uploaded_image_path('#video-thumbnail-image'))
+
+
+class CourseSettingsTest(StudioCourseTest):
+    """
+    Class to test course settings.
+    """
+    COURSE_START_DATE_CSS = "#course-start-date"
+    COURSE_END_DATE_CSS = "#course-end-date"
+    ENROLLMENT_START_DATE_CSS = "#course-enrollment-start-date"
+    ENROLLMENT_END_DATE_CSS = "#course-enrollment-end-date"
+
+    COURSE_START_TIME_CSS = "#course-start-time"
+    COURSE_END_TIME_CSS = "#course-end-time"
+    ENROLLMENT_START_TIME_CSS = "#course-enrollment-start-time"
+    ENROLLMENT_END_TIME_CSS = "#course-enrollment-end-time"
+
+    course_start_date = '12/20/2013'
+    course_end_date = '12/26/2013'
+    enrollment_start_date = '12/01/2013'
+    enrollment_end_date = '12/10/2013'
+
+    dummy_time = "15:30"
+
+    def setUp(self, is_staff=False, test_xss=True):
+        super(CourseSettingsTest, self).setUp()
+
+        self.settings_page = SettingsPage(
+            self.browser,
+            self.course_info['org'],
+            self.course_info['number'],
+            self.course_info['run']
+        )
+
+        # Before every test, make sure to visit the page first
+        self.settings_page.visit()
+        self.ensure_input_fields_are_loaded()
+
+    def set_course_dates(self):
+        """
+        Set dates for the course.
+        """
+        dates_dictionary = {
+            self.COURSE_START_DATE_CSS: self.course_start_date,
+            self.COURSE_END_DATE_CSS: self.course_end_date,
+            self.ENROLLMENT_START_DATE_CSS: self.enrollment_start_date,
+            self.ENROLLMENT_END_DATE_CSS: self.enrollment_end_date
+        }
+
+        self.settings_page.set_element_values(dates_dictionary)
+
+    def ensure_input_fields_are_loaded(self):
+        """
+        Ensures values in input fields are loaded.
+        """
+        EmptyPromise(
+            lambda: self.settings_page.q(css='#course-organization').attrs('value')[0],
+            "Waiting for input fields to be loaded"
+        ).fulfill()
+
+    def test_user_can_set_course_date(self):
+        """
+        Scenario: User can set course dates
+        Given I have opened a new course in Studio
+        When I select Schedule and Details
+        And I set course dates
+        And I press the "Save" notification button
+        And I reload the page
+        Then I see the set dates
+        """
+
+        # Set dates
+        self.set_course_dates()
+        # Set times
+        time_dictionary = {
+            self.COURSE_START_TIME_CSS: self.dummy_time,
+            self.ENROLLMENT_END_TIME_CSS: self.dummy_time
+        }
+        self.settings_page.set_element_values(time_dictionary)
+        # Save changes
+        self.settings_page.save_changes()
+        self.settings_page.refresh_and_wait_for_load()
+        self.ensure_input_fields_are_loaded()
+        css_selectors = [self.COURSE_START_DATE_CSS, self.COURSE_END_DATE_CSS,
+                         self.ENROLLMENT_START_DATE_CSS, self.ENROLLMENT_END_DATE_CSS,
+                         self.COURSE_START_TIME_CSS, self.ENROLLMENT_END_TIME_CSS]
+
+        expected_values = [self.course_start_date, self.course_end_date,
+                           self.enrollment_start_date, self.enrollment_end_date,
+                           self.dummy_time, self.dummy_time]
+        # Assert changes have been persistent.
+        self.assertEqual(
+            [get_input_value(self.settings_page, css_selector) for css_selector in css_selectors],
+            expected_values
+        )
+
+    def test_clear_previously_set_course_dates(self):
+        """
+        Scenario: User can clear previously set course dates (except start date)
+        Given I have set course dates
+        And I clear all the dates except start
+        And I press the "Save" notification button
+        And I reload the page
+        Then I see cleared dates
+        """
+
+        # Set dates
+        self.set_course_dates()
+        # Clear all dates except start date
+        values_to_set = {
+            self.COURSE_END_DATE_CSS: '',
+            self.ENROLLMENT_START_DATE_CSS: '',
+            self.ENROLLMENT_END_DATE_CSS: ''
+        }
+        self.settings_page.set_element_values(values_to_set)
+        # Save changes and refresh the page
+        self.settings_page.save_changes()
+        self.settings_page.refresh_and_wait_for_load()
+        self.ensure_input_fields_are_loaded()
+        css_selectors = [self.COURSE_START_DATE_CSS, self.COURSE_END_DATE_CSS,
+                         self.ENROLLMENT_START_DATE_CSS, self.ENROLLMENT_END_DATE_CSS]
+
+        expected_values = [self.course_start_date, '', '', '']
+        # Assert changes have been persistent.
+        self.assertEqual(
+            [get_input_value(self.settings_page, css_selector) for css_selector in css_selectors],
+            expected_values
+        )
+
+    def test_cannot_clear_the_course_start_date(self):
+        """
+        Scenario: User cannot clear the course start date
+        Given I have set course dates
+        And I press the "Save" notification button
+        And I clear the course start date
+        Then I receive a warning about course start date
+        And I reload the page
+        And the previously set start date is shown
+        """
+        # Set dates
+        self.set_course_dates()
+        # Save changes
+        self.settings_page.save_changes()
+        # Get default start date
+        default_start_date = get_input_value(self.settings_page, self.COURSE_START_DATE_CSS)
+        # Set course start date to empty
+        self.settings_page.set_element_values({self.COURSE_START_DATE_CSS: ''})
+        # Make sure error message is show with appropriate message
+        error_message_css = '.message-error'
+        self.settings_page.wait_for_element_presence(error_message_css, 'Error message is present')
+        self.assertEqual(element_has_text(self.settings_page, error_message_css,
+                                          "The course must have an assigned start date."), True)
+        # Refresh the page and assert start date has not changed.
+        self.settings_page.refresh_and_wait_for_load()
+        self.ensure_input_fields_are_loaded()
+        self.assertEqual(
+            get_input_value(self.settings_page, self.COURSE_START_DATE_CSS),
+            default_start_date
+        )
+
+    def test_user_can_correct_course_start_date_warning(self):
+        """
+        Scenario: User can correct the course start date warning
+        Given I have tried to clear the course start
+        And I have entered a new course start date
+        And I press the "Save" notification button
+        Then The warning about course start date goes away
+        And I reload the page
+        Then my new course start date is shown
+        """
+        # Set course start date to empty
+        self.settings_page.set_element_values({self.COURSE_START_DATE_CSS: ''})
+        # Make sure we get error message
+        error_message_css = '.message-error'
+        self.settings_page.wait_for_element_presence(error_message_css, 'Error message is present')
+        self.assertEqual(element_has_text(self.settings_page, error_message_css,
+                                          "The course must have an assigned start date."), True)
+        # Set new course start value
+        self.settings_page.set_element_values({self.COURSE_START_DATE_CSS: self.course_start_date})
+        self.settings_page.un_focus_input_field()
+        # Error message disappears
+        self.settings_page.wait_for_element_absence(error_message_css, 'Error message is not present')
+        # Save the changes and refresh the page.
+        self.settings_page.save_changes()
+        self.settings_page.refresh_and_wait_for_load()
+        self.ensure_input_fields_are_loaded()
+        # Assert changes are persistent.
+        self.assertEqual(
+            get_input_value(self.settings_page, self.COURSE_START_DATE_CSS),
+            self.course_start_date
+        )
+
+    def test_settings_are_only_persisted_when_saved(self):
+        """
+        Scenario: Settings are only persisted when saved
+        Given I have set course dates
+        And I press the "Save" notification button
+        When I change fields
+        And I reload the page
+        Then I do not see the changes
+        """
+        # Set course dates.
+        self.set_course_dates()
+        # Save changes.
+        self.settings_page.save_changes()
+        default_value_enrollment_start_date = get_input_value(self.settings_page,
+                                                              self.ENROLLMENT_START_TIME_CSS)
+        # Set the value of enrollment start time and
+        # reload the page without saving.
+        self.settings_page.set_element_values({self.ENROLLMENT_START_TIME_CSS: self.dummy_time})
+        self.settings_page.refresh_and_wait_for_load()
+        self.ensure_input_fields_are_loaded()
+
+        css_selectors = [self.COURSE_START_DATE_CSS, self.COURSE_END_DATE_CSS,
+                         self.ENROLLMENT_START_DATE_CSS, self.ENROLLMENT_END_DATE_CSS,
+                         self.ENROLLMENT_START_TIME_CSS]
+
+        expected_values = [self.course_start_date, self.course_end_date,
+                           self.enrollment_start_date, self.enrollment_end_date,
+                           default_value_enrollment_start_date]
+        # Assert that value of enrolment start time
+        # is not saved.
+        self.assertEqual(
+            [get_input_value(self.settings_page, css_selector) for css_selector in css_selectors],
+            expected_values
+        )
+
+    def test_settings_are_reset_on_cancel(self):
+        """
+        Scenario: Settings are reset on cancel
+        Given I have set course dates
+        And I press the "Save" notification button
+        When I change fields
+        And I press the "Cancel" notification button
+        Then I do not see the changes
+        """
+        # Set course date
+        self.set_course_dates()
+        # Save changes
+        self.settings_page.save_changes()
+        default_value_enrollment_start_date = get_input_value(self.settings_page,
+                                                              self.ENROLLMENT_START_TIME_CSS)
+        # Set value but don't save it.
+        self.settings_page.set_element_values({self.ENROLLMENT_START_TIME_CSS: self.dummy_time})
+        self.settings_page.click_button("cancel")
+        # Make sure changes are not saved after cancel.
+        css_selectors = [self.COURSE_START_DATE_CSS, self.COURSE_END_DATE_CSS,
+                         self.ENROLLMENT_START_DATE_CSS, self.ENROLLMENT_END_DATE_CSS,
+                         self.ENROLLMENT_START_TIME_CSS]
+
+        expected_values = [self.course_start_date, self.course_end_date,
+                           self.enrollment_start_date, self.enrollment_end_date,
+                           default_value_enrollment_start_date]
+
+        self.assertEqual(
+            [get_input_value(self.settings_page, css_selector) for css_selector in css_selectors],
+            expected_values
+        )
+
+    def test_confirmation_is_shown_on_save(self):
+        """
+        Scenario: Confirmation is shown on save
+        Given I have opened a new course in Studio
+        When I select Schedule and Details
+        And I change the "<field>" field to "<value>"
+        And I press the "Save" notification button
+        Then I see a confirmation that my changes have been saved
+        """
+        # Set date
+        self.settings_page.set_element_values({self.COURSE_START_DATE_CSS: self.course_start_date})
+        # Confirmation is showed upon save.
+        # Save_changes function ensures that save
+        # confirmation is shown.
+        self.settings_page.save_changes()
+
+    def test_changes_in_course_overview_show_a_confirmation(self):
+        """
+        Scenario: Changes in Course Overview show a confirmation
+        Given I have opened a new course in Studio
+        When I select Schedule and Details
+        And I change the course overview
+        And I press the "Save" notification button
+        Then I see a confirmation that my changes have been saved
+        """
+        # Change the value of course overview
+        self.settings_page.change_course_description('Changed overview')
+        # Save changes
+        # Save_changes function ensures that save
+        # confirmation is shown.
+        self.settings_page.save_changes()
+
+    def test_user_cannot_save_invalid_settings(self):
+        """
+        Scenario: User cannot save invalid settings
+        Given I have opened a new course in Studio
+        When I select Schedule and Details
+        And I change the "Course Start Date" field to ""
+        Then the save notification button is disabled
+        """
+        # Change the course start date to invalid date.
+        self.settings_page.set_element_values({self.COURSE_START_DATE_CSS: ''})
+        # Confirm that save button is disabled.
+        self.assertEqual(self.settings_page.is_element_present(".action-primary.action-save.is-disabled"), True)
