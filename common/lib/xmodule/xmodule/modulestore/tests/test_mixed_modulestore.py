@@ -425,6 +425,25 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
                 revision=ModuleStoreEnum.RevisionOption.draft_preferred
             )
 
+    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    def test_course_version_on_block(self, default_ms):
+        self.initdb(default_ms)
+        self._create_block_hierarchy()
+
+        course = self.store.get_course(self.course.id)
+        course_version = course.course_version
+
+        if default_ms == ModuleStoreEnum.Type.split:
+            self.assertIsNotNone(course_version)
+        else:
+            self.assertIsNone(course_version)
+
+        blocks = self.store.get_items(self.course.id, qualifiers={'category': 'problem'})
+        blocks.append(self.store.get_item(self.problem_x1a_1))
+        self.assertEquals(len(blocks), 7)
+        for block in blocks:
+            self.assertEquals(block.course_version, course_version)
+
     @ddt.data((ModuleStoreEnum.Type.split, 2, False), (ModuleStoreEnum.Type.mongo, 3, True))
     @ddt.unpack
     def test_get_items_include_orphans(self, default_ms, expected_items_in_tree, orphan_in_items):

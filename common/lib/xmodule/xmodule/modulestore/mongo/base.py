@@ -953,7 +953,14 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
             system.module_data.update(data_cache)
             system.cached_metadata.update(cached_metadata)
 
-        return system.load_item(location, for_parent=for_parent)
+        item = system.load_item(location, for_parent=for_parent)
+
+        # TODO Once PLAT-1055 is implemented, we can remove the following line
+        # of code. Until then, set the course_version field on the block to be
+        # consistent with the Split modulestore. Since Mongo modulestore doesn't
+        # maintain course versions set it to None.
+        item.course_version = None
+        return item
 
     def _load_items(self, course_key, items, depth=0, using_descriptor_system=None, for_parent=None):
         """
