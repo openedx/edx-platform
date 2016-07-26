@@ -7,7 +7,6 @@ import sys
 from paver.easy import sh, task, cmdopts, needs, call_task
 from pavelib.utils.test import suites
 from pavelib.utils.envs import Env
-from pavelib.utils.timer import timed
 from pavelib.utils.passthrough_opts import PassthroughTask
 from optparse import make_option
 
@@ -56,7 +55,6 @@ __test__ = False  # do not collect
     ('skip_clean', None, 'deprecated in favor of skip-clean'),
 ], share_with=['pavelib.utils.test.utils.clean_reports_dir'])
 @PassthroughTask
-@timed
 def test_system(options, passthrough_options):
     """
     Run tests on our djangoapps for lms and cms
@@ -122,7 +120,6 @@ def test_system(options, passthrough_options):
     ("test_id=", None, "deprecated in favor of test-id"),
 ], share_with=['pavelib.utils.test.utils.clean_reports_dir'])
 @PassthroughTask
-@timed
 def test_lib(options, passthrough_options):
     """
     Run tests for common/lib/ and pavelib/ (paver-tests)
@@ -187,7 +184,6 @@ def test_lib(options, passthrough_options):
     ("fail_fast", None, "deprecated in favor of fail-fast"),
 ])
 @PassthroughTask
-@timed
 def test_python(options, passthrough_options):
     """
     Run all python tests
@@ -220,7 +216,6 @@ def test_python(options, passthrough_options):
     ),
 ])
 @PassthroughTask
-@timed
 def test(options, passthrough_options):
     """
     Run all tests
@@ -244,8 +239,7 @@ def test(options, passthrough_options):
     ("compare-branch=", "b", "Branch to compare against, defaults to origin/master"),
     ("compare_branch=", None, "deprecated in favor of compare-branch"),
 ])
-@timed
-def coverage():
+def coverage(options):
     """
     Build the html, xml, and diff coverage reports
     """
@@ -282,7 +276,6 @@ def coverage():
     ("compare-branch=", "b", "Branch to compare against, defaults to origin/master"),
     ("compare_branch=", None, "deprecated in favor of compare-branch"),
 ], share_with=['coverage'])
-@timed
 def diff_coverage(options):
     """
     Build the diff coverage reports

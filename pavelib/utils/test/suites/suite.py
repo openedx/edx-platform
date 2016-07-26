@@ -61,6 +61,14 @@ class TestSuite(object):
         """
         return None
 
+    def generate_optimized_static_assets(self):
+        """
+        Collect static assets using test_static_optimized.py which generates
+        optimized files to a dedicated test static root.
+        """
+        print colorize('green', "Generating optimized static assets...")
+        sh("paver update_assets --settings=test_static_optimized")
+
     def run_test(self):
         """
         Runs a self.cmd in a subprocess and waits for it to finish.

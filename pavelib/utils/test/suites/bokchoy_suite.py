@@ -7,15 +7,11 @@ from urllib import urlencode
 from common.test.acceptance.fixtures.course import CourseFixture, FixtureError
 
 from path import Path as path
-from paver.easy import sh, BuildFailure, cmdopts, task, needs
+from paver.easy import sh, BuildFailure
 from pavelib.utils.test.suites.suite import TestSuite
 from pavelib.utils.envs import Env
-from pavelib.utils.test.bokchoy_utils import (
-    clear_mongo, start_servers, check_services, wait_for_test_servers
-)
-from pavelib.utils.test.bokchoy_options import BOKCHOY_OPTS
+from pavelib.utils.test import bokchoy_utils
 from pavelib.utils.test import utils as test_utils
-from pavelib.utils.timer import timed
 
 import os
 
@@ -28,77 +24,6 @@ __test__ = False  # do not collect
 
 DEFAULT_NUM_PROCESSES = 1
 DEFAULT_VERBOSITY = 2
-
-
-@task
-@cmdopts(BOKCHOY_OPTS, share_with=['test_bokchoy', 'test_a11y', 'pa11ycrawler'])
-@timed
-def load_bok_choy_data(options):
-    """
-    Loads data into database from db_fixtures
-    """
-    print 'Loading data from json fixtures in db_fixtures directory'
-    sh(
-        "DEFAULT_STORE={default_store}"
-        " ./manage.py lms --settings bok_choy loaddata --traceback"
-        " common/test/db_fixtures/*.json".format(
-            default_store=options.default_store,
-        )
-    )
-
-
-@task
-@cmdopts(BOKCHOY_OPTS, share_with=['test_bokchoy', 'test_a11y', 'pa11ycrawler'])
-@timed
-def load_courses(options):
-    """
-    Loads courses from options.imports_dir.
-
-    Note: options.imports_dir is the directory that contains the directories
-    that have courses in them. For example, if the course is located in
-    `test_root/courses/test-example-course/`, options.imports_dir should be
-    `test_root/courses/`.
-    """
-    if 'imports_dir' in options:
-        msg = colorize('green', "Importing courses from {}...".format(options.imports_dir))
-        print msg
-
-        sh(
-            "DEFAULT_STORE={default_store}"
-            " ./manage.py cms --settings=bok_choy import {import_dir}".format(
-                default_store=options.default_store,
-                import_dir=options.imports_dir
-            )
-        )
-
-
-@task
-@timed
-def reset_test_database():
-    """
-    Reset the database used by the bokchoy tests.
-    """
-    sh("{}/scripts/reset-test-db.sh".format(Env.REPO_ROOT))
-
-
-@task
-@needs(['reset_test_database', 'clear_mongo', 'load_bok_choy_data', 'load_courses'])
-@cmdopts(BOKCHOY_OPTS, share_with=['test_bokchoy', 'test_a11y', 'pa11ycrawler'])
-@timed
-def prepare_bokchoy_run(options, call_task):
-    """
-    Sets up and starts servers for a Bok Choy run. If --fasttest is not
-    specified then static assets are collected
-    """
-    if not options.get('fasttest', False):
-        print colorize('green', "Generating optimized static assets...")
-        # Use call_task so that we can specify options
-        call_task('update_assets', args=['--settings', 'test_static_optimized'])
-
-    # Ensure the test servers are available
-    msg = colorize('green', "Confirming servers are running...")
-    print msg
-    start_servers()  # pylint: disable=no-value-for-parameter
 
 
 class BokChoyTestSuite(TestSuite):
@@ -148,24 +73,24 @@ class BokChoyTestSuite(TestSuite):
         self.log_dir.makedirs_p()
         self.har_dir.makedirs_p()
         self.report_dir.makedirs_p()
-        test_utils.clean_reports_dir()  # pylint: disable=no-value-for-parameter
+        test_utils.clean_reports_dir()      # pylint: disable=no-value-for-parameter
 
         if not (self.fasttest or self.skip_clean or self.testsonly):
             test_utils.clean_test_files()
 
         msg = colorize('green', "Checking for mongo, memchache, and mysql...")
         print msg
-        check_services()
+        bokchoy_utils.check_services()
 
         if not self.testsonly:
-            prepare_bokchoy_run()  # pylint: disable=no-value-for-parameter
+            self.prepare_bokchoy_run()
         else:
             # load data in db_fixtures
-            load_bok_choy_data()  # pylint: disable=no-value-for-parameter
+            self.load_data()
 
         msg = colorize('green', "Confirming servers have started...")
         print msg
-        wait_for_test_servers()
+        bokchoy_utils.wait_for_test_servers()
         try:
             # Create course in order to seed forum data underneath. This is
             # a workaround for a race condition. The first time a course is created;
@@ -191,7 +116,7 @@ class BokChoyTestSuite(TestSuite):
             msg = colorize('green', "Cleaning up databases...")
             print msg
             sh("./manage.py lms --settings bok_choy flush --traceback --noinput")
-            clear_mongo()
+            bokchoy_utils.clear_mongo()
 
     @property
     def verbosity_processes_command(self):
@@ -221,6 +146,66 @@ class BokChoyTestSuite(TestSuite):
             ]
 
         return command
+
+    def prepare_bokchoy_run(self):
+        """
+        Sets up and starts servers for a Bok Choy run. If --fasttest is not
+        specified then static assets are collected
+        """
+        sh("{}/scripts/reset-test-db.sh".format(Env.REPO_ROOT))
+
+        if not self.fasttest:
+            self.generate_optimized_static_assets()
+
+        # Clear any test data already in Mongo or MySQLand invalidate
+        # the cache
+        bokchoy_utils.clear_mongo()
+        self.cache.flush_all()
+
+        # load data in db_fixtures
+        self.load_data()
+
+        # load courses if self.imports_dir is set
+        self.load_courses()
+
+        # Ensure the test servers are available
+        msg = colorize('green', "Confirming servers are running...")
+        print msg
+        bokchoy_utils.start_servers(self.default_store, self.coveragerc)
+
+    def load_courses(self):
+        """
+        Loads courses from self.imports_dir.
+
+        Note: self.imports_dir is the directory that contains the directories
+        that have courses in them. For example, if the course is located in
+        `test_root/courses/test-example-course/`, self.imports_dir should be
+        `test_root/courses/`.
+        """
+        msg = colorize('green', "Importing courses from {}...".format(self.imports_dir))
+        print msg
+
+        if self.imports_dir:
+            sh(
+                "DEFAULT_STORE={default_store}"
+                " ./manage.py cms --settings=bok_choy import {import_dir}".format(
+                    default_store=self.default_store,
+                    import_dir=self.imports_dir
+                )
+            )
+
+    def load_data(self):
+        """
+        Loads data into database from db_fixtures
+        """
+        print 'Loading data from json fixtures in db_fixtures directory'
+        sh(
+            "DEFAULT_STORE={default_store}"
+            " ./manage.py lms --settings bok_choy loaddata --traceback"
+            " common/test/db_fixtures/*.json".format(
+                default_store=self.default_store,
+            )
+        )
 
     def run_servers_continuously(self):
         """
