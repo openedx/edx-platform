@@ -5,8 +5,8 @@
             <label class="field-label" for="program-type"><%- gettext('Program type') %></label>
             <select id="program-type" class="field-input input-select program-type" name="category">
                 <option value=""><%- gettext('Select a type') %></option>
-                <option value="xseries"><%- gettext('XSeries') %></option>
-                <option value="micromasters"><%- gettext('MicroMasters') %></option>
+                <option value="XSeries"><%- gettext('XSeries') %></option>
+                <option value="MicroMasters"><%- gettext('MicroMasters') %></option>
             </select>
             <div class="field-message">
                 <span class="field-message-content"></span>
