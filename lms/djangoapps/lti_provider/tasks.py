@@ -7,8 +7,8 @@ from django.contrib.auth.models import User
 from django.dispatch import receiver
 import logging
 
-from courseware.grades import get_weighted_scores
-from courseware.models import SCORE_CHANGED
+from lms.djangoapps.grades import progress
+from lms.djangoapps.grades.signals import SCORE_CHANGED
 from lms import CELERY_APP
 from lti_provider.models import GradedAssignment
 import lti_provider.outcomes as outcomes
@@ -23,7 +23,7 @@ log = logging.getLogger("edx.lti_provider")
 def score_changed_handler(sender, **kwargs):  # pylint: disable=unused-argument
     """
     Consume signals that indicate score changes. See the definition of
-    courseware.models.SCORE_CHANGED for a description of the signal.
+    SCORE_CHANGED for a description of the signal.
     """
     points_possible = kwargs.get('points_possible', None)
     points_earned = kwargs.get('points_earned', None)
@@ -109,7 +109,7 @@ def send_composite_outcome(user_id, course_id, assignment_id, version):
     mapped_usage_key = assignment.usage_key.map_into_course(course_key)
     user = User.objects.get(id=user_id)
     course = modulestore().get_course(course_key, depth=0)
-    progress_summary = get_weighted_scores(user, course)
+    progress_summary = progress.summary(user, course)
     earned, possible = progress_summary.score_for_module(mapped_usage_key)
     if possible == 0:
         weighted_score = 0

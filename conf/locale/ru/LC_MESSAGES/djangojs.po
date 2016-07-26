@@ -121,7 +121,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-06-30 15:59+0000\n"
+"POT-Creation-Date: 2016-07-15 14:47+0000\n"
 "PO-Revision-Date: 2016-06-24 14:40+0000\n"
 "Last-Translator: Liubov Fomicheva <liubov.nelapa@gmail.com>\n"
 "Language-Team: Russian (http://www.transifex.com/open-edx/edx-platform/language/ru/)\n"
@@ -2858,14 +2858,9 @@ msgstr ""
 msgid "My Team"
 msgstr "Моя команда"
 
-#. Translators: sr_start and sr_end surround text meant only for screen
-#. readers.
-#. The whole string will be shown to users as "Browse teams" if they are using
-#. a
-#. screenreader, and "Browse" otherwise.
-#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
-msgid "Browse {sr_start} teams {sr_end}"
-msgstr ""
+#: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
+msgid "Browse"
+msgstr "Открыть в браузере"
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "Your request could not be completed. Reload the page and try again."
@@ -4015,10 +4010,6 @@ msgstr "Нет результатов для «%s»."
 #: lms/templates/search/search_error.underscore
 msgid "There was an error, try searching again."
 msgstr "Произошла ошибка.  Попробуйте повторить поиск."
-
-#: lms/static/js/edxnotes/plugins/accessibility.js
-msgid "Focus grabber"
-msgstr "Cкрадывающий фокус"
 
 #: lms/static/js/edxnotes/views/notes_visibility_factory.js
 #: lms/static/js/edxnotes/views/search_box.js
@@ -7041,10 +7032,6 @@ msgstr ""
 "во второе поле после запятой."
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
-msgid "Browse"
-msgstr "Открыть в браузере"
-
-#: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list-editor.underscore
 msgid "Add to Exception List"
 msgstr "Добавить в список исключений"
@@ -7428,7 +7415,7 @@ msgid "Coming Soon"
 msgstr ""
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
-msgid "Enrollment Opens"
+msgid "Enrollment Opens on"
 msgstr ""
 
 #: lms/templates/learner_dashboard/empty_programs_list.underscore
@@ -7474,6 +7461,16 @@ msgstr ""
 
 #: lms/templates/learner_dashboard/program_header_view.underscore
 msgid "Programs"
+msgstr ""
+
+#: lms/templates/learner_dashboard/upgrade_message.underscore
+msgid ""
+"You need a certificate in this course to be eligible for a program "
+"certificate."
+msgstr ""
+
+#: lms/templates/learner_dashboard/upgrade_message.underscore
+msgid "Upgrade Now"
 msgstr ""
 
 #: lms/templates/search/course_search_results.underscore

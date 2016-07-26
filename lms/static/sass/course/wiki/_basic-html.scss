@@ -6,56 +6,62 @@ section.wiki-body {
    }
 
   div#wiki_article {
-    html, address, blockquote, body, dd, div, dl, dt, fieldset, form, frame, frameset, h1, h2, h3, h4, h5, h6, noframes, ol, p, ul, center, dir, hr, menu, pre   {
+    html, address, blockquote, body, dd, div, dl, dt, fieldset, form, frame, frameset, h1, h2, h3, h4, h5, h6, noframes, ol, p, ul, center, dir, hr, menu, pre {
       display: block;
-      unicode-bidi: embed
+      unicode-bidi: embed;
     }
 
     li {
-      display: list-item
+      display: list-item;
     }
 
     head {
-      display: none
+      display: none;
     }
 
     table {
-      display: table
+      display: table;
     }
 
     tr {
-      display: table-row
+      display: table-row;
     }
 
     thead {
-      display: table-header-group
+      display: table-header-group;
     }
 
     tbody {
-      display: table-row-group
+      display: table-row-group;
     }
 
     tfoot {
-      display: table-footer-group
+      display: table-footer-group;
     }
 
-    col { display: table-column }
+    col {
+      display: table-column;
+    }
 
-    colgroup { display: table-column-group }
+    colgroup {
+      display: table-column-group;
+    }
 
-    td, th { display: table-cell }
+    td, th {
+      display: table-cell;
+    }
 
     caption {
-      display: table-caption
+      display: table-caption;
     }
 
     th {
       font-weight: bolder;
-      text-align: center
+      text-align: center;
     }
 
     caption {
-      text-align: center
+      text-align: center;
     }
 
     h1 {
@@ -80,58 +86,108 @@ section.wiki-body {
       font-size: 1.1em;
     }
 
-    h4, p, blockquote, ul, fieldset, form, ol, dl, dir, menu  { margin: 1.12em 0 }
+    h4, p, blockquote, ul, fieldset, form, ol, dl, dir, menu {
+      margin: 1.12em 0;
+    }
 
-    h5 { font-size: 1em; margin: 1.5em 0 }
+    h5 {
+      font-size: 1em;
+      margin: 1.5em 0;
+    }
 
-    h6 { font-size: 0.5em; margin: 1.67em 0 }
+    h6 {
+      font-size: 0.5em;
+      margin: 1.67em 0;
+    }
 
-    b, strong { font-weight: bolder }
+    b, strong {
+      font-weight: bolder;
+    }
 
-    blockquote      {
+    blockquote {
       padding: ($baseline/2) $baseline;
       background: #e3e3e3;
       border-left: 4px solid;
     }
 
-    i, cite, em, var, address  { font-style: italic }
+    i, cite, em, var, address {
+      font-style: italic;
+    }
 
-    pre, tt, code, kbd, samp  {
+    pre, tt, code, kbd, samp {
       font-family: monospace;
     }
 
-    pre { white-space: pre }
+    pre {
+      white-space: pre;
+    }
 
-    button, textarea, input, select   { display: inline-block }
+    button, textarea, input, select {
+      display: inline-block;
+    }
 
-    big { font-size: 1.17em }
+    big {
+      font-size: 1.17em;
+    }
 
-    small, sub, sup { font-size: .83em }
+    small, sub, sup {
+      font-size: .83em;
+    }
 
-    sub { vertical-align: sub }
+    sub {
+      vertical-align: sub;
+    }
 
-    sup { vertical-align: super }
+    sup {
+      vertical-align: super;
+    }
 
-    table { border-spacing: 2px; }
+    table {
+      border-spacing: 2px;
+    }
 
-    thead, tbody, tfoot { vertical-align: middle }
+    thead, tbody, tfoot {
+      vertical-align: middle;
+    }
 
-    td, th, tr { vertical-align: inherit }
+    td, th, tr {
+      vertical-align: inherit;
+    }
 
-    s, strike, del  { text-decoration: line-through }
+    s, strike, del {
+      text-decoration: line-through;
+    }
 
-    hr { height: 1px; background: #999; border: none;}
+    hr {
+      height: 1px;
+      background: #999;
+      border: none;
+    }
 
-    ol, ul, dir, menu, dd { margin-left: 40px }
+    ol, ul, dir, menu, dd {
+      margin-left: 40px;
+    }
 
-    ol { list-style-type: decimal }
+    ol {
+      list-style-type: decimal;
+    }
 
-    ol ul, ul ol, ul ul, ol ol    { margin-top: 0; margin-bottom: 0 }
+    ol ul, ul ol, ul ul, ol ol {
+      margin-top: 0;
+      margin-bottom: 0;
+    }
 
-    u, ins { text-decoration: underline }
+    u, ins {
+      text-decoration: underline;
+    }
 
-    br:before { content: "\A"; white-space: pre-line }
+    br:before {
+      content: "\A";
+      white-space: pre-line;
+    }
 
-    center { text-align: center }
+    center {
+      text-align: center;
+    }
   }
 }

@@ -5,8 +5,8 @@
 # 
 # Translators:
 # bossnm11 <bossnm11@gmail.com>, 2014
-# Hongseob Lee <shevious@gmail.com>, 2015
-# Hongseob Lee <shevious@yahoo.com>, 2015
+# kmooc <shevious@gmail.com>, 2015
+# shevious <shevious@yahoo.com>, 2015
 # Jong-Dae Park <jdpark7@gmail.com>, 2013
 # jeon <bluerespect@nate.com>, 2014-2015
 # Jong-Dae Park <jdpark7@gmail.com>, 2013
@@ -20,8 +20,8 @@
 # Translators:
 # SEUNGWON <baeksw0620@gmail.com>, 2014
 # bossnm11 <bossnm11@gmail.com>, 2014
-# Hongseob Lee <shevious@gmail.com>, 2015
-# Hongseob Lee <shevious@yahoo.com>, 2015
+# kmooc <shevious@gmail.com>, 2015
+# shevious <shevious@yahoo.com>, 2015
 # Jong-Dae Park <jdpark7@gmail.com>, 2013
 # jeon <bluerespect@nate.com>, 2014-2015
 # Chanseok <kcsgoodboy@gmail.com>, 2014
@@ -34,8 +34,8 @@
 # 
 # Translators:
 # bossnm11 <bossnm11@gmail.com>, 2014
-# Hongseob Lee <shevious@gmail.com>, 2015-2016
-# Hongseob Lee <shevious@yahoo.com>, 2015
+# kmooc <shevious@gmail.com>, 2015-2016
+# shevious <shevious@yahoo.com>, 2015
 # jeon <bluerespect@nate.com>, 2014
 # Jong-Dae Park <jdpark7@gmail.com>, 2015
 # Kevin Min <gr326887@graded.br>, 2015
@@ -47,8 +47,8 @@
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
-# Hongseob Lee <shevious@gmail.com>, 2015
-# Hongseob Lee <shevious@yahoo.com>, 2015
+# kmooc <shevious@gmail.com>, 2015
+# shevious <shevious@yahoo.com>, 2015
 # jeon <bluerespect@nate.com>, 2014-2015
 # Kevin Min <gr326887@graded.br>, 2015
 # Kunwoo Kim <crazyabtmath@naver.com>, 2015
@@ -57,7 +57,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-06-30 15:59+0000\n"
+"POT-Creation-Date: 2016-07-15 14:47+0000\n"
 "PO-Revision-Date: 2016-05-09 11:26+0000\n"
 "Last-Translator: Ned Batchelder <ned@edx.org>\n"
 "Language-Team: Korean (Korea) (http://www.transifex.com/open-edx/edx-platform/language/ko_KR/)\n"
@@ -2590,13 +2590,9 @@ msgstr "강좌에서 주제별로 조직된 모든 팀을 보세요. 관심사�
 msgid "My Team"
 msgstr ""
 
-#. Translators: sr_start and sr_end surround text meant only for screen
-#. readers.
-#. The whole string will be shown to users as "Browse teams" if they are using
-#. a
-#. screenreader, and "Browse" otherwise.
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
-msgid "Browse {sr_start} teams {sr_end}"
+#: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
+msgid "Browse"
 msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
@@ -3642,10 +3638,6 @@ msgstr "\"%s\"를 찾을 수 없습니다. "
 #: lms/templates/search/search_error.underscore
 msgid "There was an error, try searching again."
 msgstr "오류가 발생했습니다. 다시 검색하세요."
-
-#: lms/static/js/edxnotes/plugins/accessibility.js
-msgid "Focus grabber"
-msgstr "Focus grabber "
 
 #: lms/static/js/edxnotes/views/notes_visibility_factory.js
 #: lms/static/js/edxnotes/views/search_box.js
@@ -6474,10 +6466,6 @@ msgid ""
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
-msgid "Browse"
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list-editor.underscore
 msgid "Add to Exception List"
 msgstr ""
@@ -6830,7 +6818,7 @@ msgid "Coming Soon"
 msgstr ""
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
-msgid "Enrollment Opens"
+msgid "Enrollment Opens on"
 msgstr ""
 
 #: lms/templates/learner_dashboard/empty_programs_list.underscore
@@ -6876,6 +6864,16 @@ msgstr ""
 
 #: lms/templates/learner_dashboard/program_header_view.underscore
 msgid "Programs"
+msgstr ""
+
+#: lms/templates/learner_dashboard/upgrade_message.underscore
+msgid ""
+"You need a certificate in this course to be eligible for a program "
+"certificate."
+msgstr ""
+
+#: lms/templates/learner_dashboard/upgrade_message.underscore
+msgid "Upgrade Now"
 msgstr ""
 
 #: lms/templates/search/course_search_results.underscore

@@ -190,7 +190,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-06-30 16:00+0000\n"
+"POT-Creation-Date: 2016-07-15 14:48+0000\n"
 "PO-Revision-Date: 2016-05-09 11:27+0000\n"
 "Last-Translator: Liubov Fomicheva <liubov.nelapa@gmail.com>\n"
 "Language-Team: Russian (http://www.transifex.com/open-edx/edx-platform/language/ru/)\n"
@@ -5367,7 +5367,7 @@ msgstr "Для оплаты используйте страницу на E-Comme
 msgid "Path to single course checkout page hosted by the E-Commerce service."
 msgstr "Ссылка на страницу E-Commerce для оплаты всех выбранных курсов."
 
-#: lms/djangoapps/commerce/models.py
+#: lms/djangoapps/commerce/models.py openedx/core/djangoapps/catalog/models.py
 #: openedx/core/djangoapps/credentials/models.py
 #: openedx/core/djangoapps/credit/models.py
 #: openedx/core/djangoapps/programs/models.py
@@ -5505,10 +5505,6 @@ msgstr "{relative} - {absolute}"
 #: lms/djangoapps/courseware/date_summary.py
 msgid "in {relative} - {absolute}"
 msgstr "в {relative} - {absolute}"
-
-#: lms/djangoapps/courseware/date_summary.py
-msgid "UTC"
-msgstr "UTC"
 
 #: lms/djangoapps/courseware/date_summary.py
 msgid "Today is {date}"
@@ -9435,6 +9431,22 @@ msgstr ""
 msgid "Bookmark with usage_id: {usage_id} does not exist."
 msgstr "Закладки с usage_id: {usage_id} не существует."
 
+#: openedx/core/djangoapps/catalog/models.py
+msgid "Internal API URL"
+msgstr ""
+
+#: openedx/core/djangoapps/catalog/models.py
+msgid ""
+"API root to be used for server-to-server requests (e.g., https://catalog-"
+"internal.example.com/api/v1/)."
+msgstr ""
+
+#: openedx/core/djangoapps/catalog/models.py
+msgid ""
+"Specified in seconds. Enable caching of API responses by setting this to a "
+"value greater than 0."
+msgstr ""
+
 #: openedx/core/djangoapps/course_groups/cohorts.py
 msgid "Default Group"
 msgstr ""
@@ -9747,6 +9759,10 @@ msgstr ""
 msgid ""
 "Value '{preference_value}' not valid for preference '{preference_key}': Not "
 "in timezone set."
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/preferences/api.py
+msgid "Value '{preference_value}' is not a valid time zone selection."
 msgstr ""
 
 #: openedx/core/djangoapps/user_api/preferences/api.py
@@ -10614,6 +10630,7 @@ msgstr "Требования"
 
 #: cms/templates/studio_xblock_wrapper.html lms/templates/help_modal.html
 #: lms/templates/module-error.html
+#: lms/templates/instructor/instructor_dashboard_2/certificates.html
 msgid "Details"
 msgstr "Подробности"
 
@@ -11384,6 +11401,7 @@ msgstr "Ошибка на серверах {platform_name}"
 
 #: lms/templates/module-error.html
 #: lms/templates/courseware/courseware-error.html
+#: lms/templates/courseware/error-message.html
 msgid ""
 "We're sorry, this module is temporarily unavailable. Our staff is working to"
 " fix it as soon as possible. Please email us at {tech_support_email} to "
@@ -12035,6 +12053,7 @@ msgstr "Ошибка"
 
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 #: lms/templates/ccx/schedule.html
+#: lms/templates/instructor/instructor_dashboard_2/certificates.html
 msgid "Date"
 msgstr "Дата"
 
@@ -13588,6 +13607,10 @@ msgid "Course Material"
 msgstr "Материалы курса"
 
 #: lms/templates/courseware/course_updates.html
+msgid "All course updates"
+msgstr ""
+
+#: lms/templates/courseware/course_updates.html
 msgid "Hide"
 msgstr "Скрыть"
 
@@ -13649,16 +13672,6 @@ msgstr ""
 #: lms/templates/courseware/courseware.html
 msgid "Your score is {current_score}%. You have passed the entrance exam."
 msgstr "Ваша оценка - {current_score}%. Вы сдали вступительное испытание."
-
-#: lms/templates/courseware/error-message.html
-msgid ""
-"We're sorry, this module is temporarily unavailable. Our staff is working to"
-" fix it as soon as possible. Please email us at {link_to_support_email} to "
-"report any problems or downtime."
-msgstr ""
-"К сожалению, этот модуль временно недоступен. Наши сотрудники работают над "
-"устранением проблемы. Пожалуйста, свяжитесь с нами по адресу "
-"{link_to_support_email}, чтобы сообщить о любых проблемах или неполадках."
 
 #: lms/templates/courseware/gradebook.html
 msgid "Gradebook"
@@ -13744,23 +13757,6 @@ msgid "Course Progress for Student '{username}' ({email})"
 msgstr "Достижения '{username}' ({email}) на курсе"
 
 #: lms/templates/courseware/progress.html
-msgid ""
-"Your certificate has been invalidated. Please contact your course team if "
-"you have any questions."
-msgstr ""
-
-#: lms/templates/courseware/progress.html
-msgid "Your certificate is available"
-msgstr "Ваш сертификат доступен"
-
-#: lms/templates/courseware/progress.html
-msgid ""
-"You can keep working for a higher grade, or request your certificate now."
-msgstr ""
-"Вы можете продолжать заниматься для лучшей оценки или запросить свой "
-"сертификат сразу."
-
-#: lms/templates/courseware/progress.html
 msgid "View certificate in a new browser window or tab."
 msgstr "Открыть сертификат для просмотра в новом окне или вкладке браузера."
 
@@ -13775,42 +13771,6 @@ msgstr "PDF откроется в новом окне или в новой вк�
 #: lms/templates/courseware/progress.html
 msgid "Download Your Certificate"
 msgstr "Скачать свой сертификат"
-
-#. Translators: This message appears to users when the system is processessing
-#. course certificates, which can take a few hours.
-#: lms/templates/courseware/progress.html
-msgid "We're working on it..."
-msgstr "Мы работаем над этим..."
-
-#: lms/templates/courseware/progress.html
-msgid ""
-"We're creating your certificate. You can keep working in your courses and a "
-"link to it will appear here and on your Dashboard when it is ready."
-msgstr ""
-"Мы создали ваш сертификат. Продолжайте обучение, и ссылка на сертификат "
-"появится на панели управления, когда он будет готов."
-
-#. Translators: This message appears to users when the users have not
-#. completed
-#. identity verification.
-#: lms/templates/courseware/progress.html
-msgid "Certificate unavailable"
-msgstr ""
-
-#: lms/templates/courseware/progress.html
-msgid ""
-"You have not received a certificate because you do not have a current "
-"{platform_name} verified identity. "
-msgstr ""
-
-#: lms/templates/courseware/progress.html
-#: lms/templates/dashboard/_dashboard_certificate_information.html
-msgid "Verify your identity now."
-msgstr ""
-
-#: lms/templates/courseware/progress.html
-msgid "Congratulations, you qualified for a certificate!"
-msgstr "Поздравляем, вы аттестованы для получения сертификата!"
 
 #: lms/templates/courseware/progress.html
 msgid "Request Certificate"
@@ -14039,6 +13999,10 @@ msgid ""
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
+msgid "Verify your identity now."
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid "Your {cert_name_short} is Generating"
 msgstr "Ваш {cert_name_short} в процессе обработки"
 
@@ -14100,6 +14064,10 @@ msgstr ""
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "{category} Program Course"
 msgstr "{category} Программа курса"
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Course details"
+msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "{course_number} {course_name} Home Page"
@@ -15590,6 +15558,10 @@ msgid "Certificate Generation History"
 msgstr "История создания сертификатов"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
+msgid "Task name"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/certificates.html
 msgid "SET CERTIFICATE EXCEPTIONS"
 msgstr "ОПРЕДЕЛИТЬ  СЕРТИФИКАТЫ - ИСКЛЮЧЕНИЯ"
 
@@ -15613,8 +15585,6 @@ msgstr "Аннулировать сертификаты"
 msgid "Enrollment Information"
 msgstr "Информация о записи на курс"
 
-#. Translators: 'track' refers to the enrollment type ('honor', 'verified', or
-#. 'audit')
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Number of enrollees (admins, staff, and students) by track"
 msgstr ""

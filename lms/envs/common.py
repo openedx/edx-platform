@@ -358,9 +358,6 @@ FEATURES = {
     # lives in the Extended table, saving the frontend from
     # making multiple queries.
     'ENABLE_READING_FROM_MULTIPLE_HISTORY_TABLES': True,
-
-    # WIP -- will be removed in Ticket #TNL-4750.
-    'ENABLE_TIME_ZONE_PREFERENCE': False,
 }
 
 # Ignore static asset files on import which match this pattern
@@ -1262,8 +1259,7 @@ base_vendor_js = [
     'js/vendor/requirejs/require.js',
     'js/RequireJS-namespace-undefine.js',
     'js/vendor/URI.min.js',
-    'common/js/vendor/backbone.js',
-    'edx-pattern-library/js/modernizr-custom.js',
+    'common/js/vendor/backbone.js'
 ]
 
 main_vendor_js = base_vendor_js + [
@@ -1375,7 +1371,6 @@ credit_web_view_js = [
 PIPELINE_CSS = {
     'style-vendor': {
         'source_filenames': [
-            'js/vendor/afontgarde/afontgarde.css',
             'css/vendor/font-awesome.css',
             'css/vendor/jquery.qtip.min.css',
         ],
@@ -1704,8 +1699,6 @@ REQUIRE_JS_PATH_OVERRIDES = {
     'js/student_profile/views/learner_profile_factory': 'js/student_profile/views/learner_profile_factory.js',
     'js/courseware/courseware_factory': 'js/courseware/courseware_factory.js',
     'js/groups/views/cohorts_dashboard_factory': 'js/groups/views/cohorts_dashboard_factory.js',
-    'afontgarde': 'edx-pattern-library/js/afontgarde.js',
-    'edxicons': 'edx-pattern-library/js/edx-icons.js',
     'draggabilly': 'js/vendor/draggabilly.js'
 }
 ################################# CELERY ######################################
@@ -1894,6 +1887,7 @@ INSTALLED_APPS = (
     'openedx.core.djangoapps.course_groups',
     'bulk_email',
     'branding',
+    'grades',
 
     # Student support tools
     'support',

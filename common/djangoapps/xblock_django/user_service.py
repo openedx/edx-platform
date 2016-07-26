@@ -3,13 +3,16 @@ Support for converting a django user to an XBlock user
 """
 from django.contrib.auth.models import User
 from opaque_keys.edx.keys import CourseKey
-from xblock.reference.user_service import XBlockUser, UserService
+from openedx.core.djangoapps.user_api.preferences.api import get_user_preferences
 from student.models import anonymous_id_for_user, get_user_by_username_or_email
+from xblock.reference.user_service import XBlockUser, UserService
 
 ATTR_KEY_IS_AUTHENTICATED = 'edx-platform.is_authenticated'
 ATTR_KEY_USER_ID = 'edx-platform.user_id'
 ATTR_KEY_USERNAME = 'edx-platform.username'
 ATTR_KEY_USER_IS_STAFF = 'edx-platform.user_is_staff'
+ATTR_KEY_USER_PREFERENCES = 'edx-platform.user_preferences'
+USER_PREFERENCES_WHITE_LIST = ['pref-lang', 'time_zone']
 
 
 class DjangoXBlockUserService(UserService):
@@ -69,6 +72,12 @@ class DjangoXBlockUserService(UserService):
             xblock_user.opt_attrs[ATTR_KEY_USER_ID] = django_user.id
             xblock_user.opt_attrs[ATTR_KEY_USERNAME] = django_user.username
             xblock_user.opt_attrs[ATTR_KEY_USER_IS_STAFF] = django_user.user_is_staff
+            user_preferences = get_user_preferences(django_user)
+            xblock_user.opt_attrs[ATTR_KEY_USER_PREFERENCES] = {
+                pref: user_preferences.get(pref)
+                for pref in USER_PREFERENCES_WHITE_LIST
+                if pref in user_preferences
+            }
         else:
             xblock_user.opt_attrs[ATTR_KEY_IS_AUTHENTICATED] = False
 

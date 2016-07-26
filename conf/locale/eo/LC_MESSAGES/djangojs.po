@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-07-07 14:14+0000\n"
-"PO-Revision-Date: 2016-07-07 14:15:59.199191\n"
+"POT-Creation-Date: 2016-07-22 10:07+0000\n"
+"PO-Revision-Date: 2016-07-22 10:08:19.725997\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -53,14 +53,15 @@ msgstr ""
 msgid "Saving"
 msgstr "Sävïng Ⱡ'σяєм ιρѕυ#"
 
+#. #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: cms/static/coffee/src/views/tabs.js
 #: cms/static/js/views/course_info_update.js cms/static/js/views/tabs.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: common/static/coffee/src/discussion/utils.js
-#: common/static/common/js/discussion/utils.js
 #: lms/static/js/Markdown.Editor.js
+#: common/static/common/templates/discussion/alert-popup.underscore
 msgid "OK"
 msgstr "ÖK Ⱡ'σя#"
 
@@ -69,8 +70,9 @@ msgstr "ÖK Ⱡ'σя#"
 #. browser when a user needs to edit HTML
 #: cms/static/coffee/src/views/tabs.js
 #: cms/static/js/certificates/views/signatory_editor.js
-#: cms/static/js/factories/export.js cms/static/js/views/asset.js
-#: cms/static/js/views/course_info_update.js
+#: cms/static/js/factories/export.js
+#: cms/static/js/programs/views/program_details_view.js
+#: cms/static/js/views/asset.js cms/static/js/views/course_info_update.js
 #: cms/static/js/views/manage_users_and_roles.js
 #: cms/static/js/views/modals/base_modal.js
 #: cms/static/js/views/modals/course_outline_modals.js
@@ -90,6 +92,7 @@ msgstr "ÖK Ⱡ'σя#"
 #: cms/templates/js/section-name-edit.underscore
 #: cms/templates/js/signatory-actions.underscore
 #: cms/templates/js/xblock-string-field-editor.underscore
+#: cms/templates/js/programs/program_creator_form.underscore
 #: common/static/common/templates/discussion/new-post.underscore
 #: common/static/common/templates/discussion/response-comment-edit.underscore
 #: common/static/common/templates/discussion/thread-edit.underscore
@@ -139,13 +142,14 @@ msgstr "Ûplöädïng Ⱡ'σяєм ιρѕυм ∂σł#"
 #: cms/templates/js/course-instructor-details.underscore
 #: cms/templates/js/previous-video-upload-list.underscore
 #: cms/templates/js/signatory-details.underscore
+#: cms/templates/js/programs/program_creator_form.underscore
+#: cms/templates/js/programs/program_details.underscore
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
 msgid "Name"
 msgstr "Nämé Ⱡ'σяєм ι#"
 
 #: cms/static/js/views/assets.js lms/static/js/Markdown.Editor.js
 #: cms/templates/js/asset-upload-modal.underscore
-#: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
 msgid "Choose File"
 msgstr "Çhöösé Fïlé Ⱡ'σяєм ιρѕυм ∂σłσя #"
 
@@ -207,8 +211,8 @@ msgstr "Àdvänçéd Ⱡ'σяєм ιρѕυм ∂#"
 #: cms/static/js/views/modals/edit_xblock.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: common/static/coffee/src/discussion/utils.js
-#: common/static/common/js/discussion/utils.js
 #: common/static/common/templates/image-modal.underscore
+#: common/static/common/templates/discussion/alert-popup.underscore
 #: common/static/common/templates/discussion/forum-action-close.underscore
 #: common/static/common/templates/discussion/search-alert.underscore
 #: lms/templates/student_profile/share_modal.underscore
@@ -1896,6 +1900,7 @@ msgstr "Shöw Dïsçüssïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 #: common/static/coffee/src/discussion/views/discussion_user_profile_view.js
 #: common/static/coffee/src/discussion/views/response_comment_view.js
 #: common/static/common/js/discussion/discussion_module_view.js
+#: common/static/common/js/discussion/discussion_router.js
 #: common/static/common/js/discussion/utils.js
 #: common/static/common/js/discussion/views/discussion_thread_list_view.js
 #: common/static/common/js/discussion/views/discussion_thread_view.js
@@ -1949,7 +1954,6 @@ msgid "…"
 msgstr "… Ⱡ#"
 
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
-#: common/static/common/js/discussion/views/discussion_content_view.js
 msgid "there is currently %(numVotes)s vote"
 msgid_plural "there are currently %(numVotes)s votes"
 msgstr[0] ""
@@ -1958,7 +1962,6 @@ msgstr[1] ""
 "théré äré çürréntlý %(numVotes)s vötés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
 
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
-#: common/static/common/js/discussion/views/discussion_content_view.js
 msgid "%(numVotes)s Vote"
 msgid_plural "%(numVotes)s Votes"
 msgstr[0] "%(numVotes)s Vöté Ⱡ'σяєм ιρѕυм ∂#"
@@ -2060,7 +2063,7 @@ msgstr ""
 "∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
-#: common/static/common/js/discussion/views/discussion_thread_list_view.js
+#: common/static/common/templates/discussion/nav-load-more-link.underscore
 msgid "Load more"
 msgstr "Löäd möré Ⱡ'σяєм ιρѕυм ∂σł#"
 
@@ -2077,7 +2080,6 @@ msgstr ""
 "∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
-#: common/static/common/js/discussion/views/discussion_thread_list_view.js
 msgid "%(unread_count)s new comment"
 msgid_plural "%(unread_count)s new comments"
 msgstr[0] "%(unread_count)s néw çömmént Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
@@ -2115,11 +2117,11 @@ msgid "No threads matched your query."
 msgstr "Nö thréäds mätçhéd ýöür qüérý. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
-#: common/static/common/js/discussion/views/discussion_thread_list_view.js
 msgid "Show posts by %(username)s."
 msgstr "Shöw pösts ßý %(username)s. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
+#: common/static/common/js/discussion/discussion_router.js
 #: common/static/common/js/discussion/views/discussion_thread_view.js
 msgid ""
 "The thread you selected has been deleted. Please select another thread."
@@ -2135,6 +2137,7 @@ msgstr ""
 "∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
+#: common/static/common/js/discussion/discussion_router.js
 #: common/static/common/js/discussion/views/discussion_thread_view.js
 msgid "We had some trouble loading more responses. Please try again."
 msgstr ""
@@ -2142,14 +2145,12 @@ msgstr ""
 "∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
-#: common/static/common/js/discussion/views/discussion_thread_view.js
 msgid "%(numResponses)s other response"
 msgid_plural "%(numResponses)s other responses"
 msgstr[0] "%(numResponses)s öthér réspönsé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
 msgstr[1] "%(numResponses)s öthér réspönsés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
-#: common/static/common/js/discussion/views/discussion_thread_view.js
 msgid "%(numResponses)s response"
 msgid_plural "%(numResponses)s responses"
 msgstr[0] "%(numResponses)s réspönsé Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
@@ -2174,7 +2175,6 @@ msgid "Load all responses"
 msgstr "Löäd äll réspönsés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
-#: common/static/common/js/discussion/views/discussion_thread_view.js
 msgid "Load next %(numResponses)s responses"
 msgstr "Löäd néxt %(numResponses)s réspönsés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
 
@@ -2274,10 +2274,60 @@ msgstr ""
 "Wé häd sömé tröüßlé pröçéssïng ýöür réqüést. Pléäsé énsüré ýöü hävé çöpïéd "
 "äný  Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
 
-#: common/static/common/js/discussion/views/discussion_thread_list_view.js
-msgid "No results found for %(original_query)s. "
+#: common/static/common/js/discussion/utils.js
+msgid "Some images in this post have been omitted"
 msgstr ""
-"Nö résülts föünd för %(original_query)s.  Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
+"Sömé ïmägés ïn thïs pöst hävé ßéén ömïttéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя #"
+
+#: common/static/common/js/discussion/utils.js
+msgid "image omitted"
+msgstr "ïmägé ömïttéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
+
+#: common/static/common/js/discussion/views/discussion_content_view.js
+msgid "there is currently {numVotes} vote"
+msgid_plural "there are currently {numVotes} votes"
+msgstr[0] ""
+"théré ïs çürréntlý {numVotes} vöté Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
+msgstr[1] ""
+"théré äré çürréntlý {numVotes} vötés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
+
+#: common/static/common/js/discussion/views/discussion_content_view.js
+msgid "{numVotes} Vote"
+msgid_plural "{numVotes} Votes"
+msgstr[0] "{numVotes} Vöté Ⱡ'σяєм ιρѕυм ∂#"
+msgstr[1] "{numVotes} Vötés Ⱡ'σяєм ιρѕυм ∂σł#"
+
+#: common/static/common/js/discussion/views/discussion_thread_list_view.js
+msgid "{unread_count} new comment"
+msgid_plural "{unread_count} new comments"
+msgstr[0] "{unread_count} néw çömmént Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
+msgstr[1] "{unread_count} néw çömménts Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
+
+#: common/static/common/js/discussion/views/discussion_thread_list_view.js
+msgid "No results found for {original_query}. "
+msgstr ""
+"Nö résülts föünd för {original_query}.  Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
+
+#: common/static/common/js/discussion/views/discussion_thread_list_view.js
+msgid "Show posts by {username}."
+msgstr "Shöw pösts ßý {username}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
+
+#: common/static/common/js/discussion/views/discussion_thread_view.js
+msgid "{numResponses} other response"
+msgid_plural "{numResponses} other responses"
+msgstr[0] "{numResponses} öthér réspönsé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
+msgstr[1] "{numResponses} öthér réspönsés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
+
+#: common/static/common/js/discussion/views/discussion_thread_view.js
+msgid "{numResponses} response"
+msgid_plural "{numResponses} responses"
+msgstr[0] "{numResponses} réspönsé Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
+msgstr[1] "{numResponses} réspönsés Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
+
+#: common/static/common/js/discussion/views/discussion_thread_view.js
+msgid "Load next {numResponses} responses"
+msgstr "Löäd néxt {numResponses} réspönsés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
 
 #: common/static/common/js/utils/edx.utils.validate.js
 msgid "The email address you've provided isn't formatted correctly."
@@ -2610,6 +2660,7 @@ msgstr "Téäms Ⱡ'σяєм ιρѕ#"
 #: cms/templates/js/certificate-editor.underscore
 #: cms/templates/js/content-group-editor.underscore
 #: cms/templates/js/group-configuration-editor.underscore
+#: cms/templates/js/programs/program_creator_form.underscore
 msgid "Create"
 msgstr "Çréäté Ⱡ'σяєм ιρѕυ#"
 
@@ -2849,14 +2900,10 @@ msgstr ""
 msgid "My Team"
 msgstr "Mý Téäm Ⱡ'σяєм ιρѕυм #"
 
-#. Translators: sr_start and sr_end surround text meant only for screen
-#. readers.
-#. The whole string will be shown to users as "Browse teams" if they are using
-#. a
-#. screenreader, and "Browse" otherwise.
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
-msgid "Browse {sr_start} teams {sr_end}"
-msgstr "Bröwsé {sr_start} téäms {sr_end} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+#: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
+msgid "Browse"
+msgstr "Bröwsé Ⱡ'σяєм ιρѕυ#"
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "Your request could not be completed. Reload the page and try again."
@@ -3098,17 +3145,17 @@ msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid ""
-"Could not find a user with username or email address '<%= identifier %>'."
+"Could not find a user with username or email address '<%- identifier %>'."
 msgstr ""
-"Çöüld nöt fïnd ä üsér wïth üsérnämé ör émäïl äddréss '<%= identifier %>'. "
+"Çöüld nöt fïnd ä üsér wïth üsérnämé ör émäïl äddréss '<%- identifier %>'. "
 "Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid ""
-"Error: User '<%= username %>' has not yet activated their account. Users "
+"Error: User '<%- username %>' has not yet activated their account. Users "
 "must create and activate their accounts before they can be assigned a role."
 msgstr ""
-"Érrör: Ûsér '<%= username %>' häs nöt ýét äçtïvätéd théïr äççöünt. Ûsérs "
+"Érrör: Ûsér '<%- username %>' häs nöt ýét äçtïvätéd théïr äççöünt. Ûsérs "
 "müst çréäté änd äçtïväté théïr äççöünts ßéföré théý çän ßé ässïgnéd ä rölé. "
 "Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ "
 "тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм,"
@@ -5231,12 +5278,7 @@ msgstr[1] "%(num_questions)s qüéstïöns Ⱡ'σяєм ιρѕυм ∂σłσя �
 msgid "Number of Students"
 msgstr "Nümßér öf Stüdénts Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
 
-#: cms/static/cms/js/xblock/cms.runtime.v1.js
-#: cms/static/coffee/src/xblock/cms.runtime.v1.js
-msgid "OpenAssessment Save Error"
-msgstr "ÖpénÀsséssmént Sävé Érrör Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
-
-#: cms/static/coffee/src/main.js
+#: cms/static/cms/js/main.js cms/static/coffee/src/main.js
 msgid ""
 "This may be happening because of an error with our server or your internet "
 "connection. Try refreshing the page or making sure you are online."
@@ -5250,11 +5292,16 @@ msgstr ""
 "¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт "
 "ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłłιт αηιм ι∂ єѕт #"
 
-#: cms/static/coffee/src/main.js
+#: cms/static/cms/js/main.js cms/static/coffee/src/main.js
 msgid "Studio's having trouble saving your work"
 msgstr ""
 "Stüdïö's hävïng tröüßlé sävïng ýöür wörk Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя#"
+
+#: cms/static/cms/js/xblock/cms.runtime.v1.js
+#: cms/static/coffee/src/xblock/cms.runtime.v1.js
+msgid "OpenAssessment Save Error"
+msgstr "ÖpénÀsséssmént Sävé Érrör Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
 
 #: cms/static/coffee/src/views/tabs.js cms/static/js/views/tabs.js
 msgid "Delete Page Confirmation"
@@ -5740,6 +5787,124 @@ msgstr ""
 "Thïs çömpönént häs välïdätïön ïssüés. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυ#"
 
+#: cms/static/js/programs/models/course_model.js
+#: cms/templates/js/programs/course_details.underscore
+msgid "Course Code"
+msgstr "Çöürsé Çödé Ⱡ'σяєм ιρѕυм ∂σłσя #"
+
+#: cms/static/js/programs/models/course_model.js
+#: cms/templates/js/certificate-details.underscore
+#: cms/templates/js/certificate-editor.underscore
+#: cms/templates/js/programs/course_details.underscore
+msgid "Course Title"
+msgstr "Çöürsé Tïtlé Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
+
+#: cms/static/js/programs/models/program_model.js
+msgid "Please select a valid organization."
+msgstr ""
+"Pléäsé séléçt ä välïd örgänïzätïön. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
+
+#: cms/static/js/programs/utils/validation_config.js
+msgid "{0} is required"
+msgstr "{0} ïs réqüïréd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
+
+#: cms/static/js/programs/utils/validation_config.js
+msgid "{0} must be accepted"
+msgstr "{0} müst ßé äççéptéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+
+#: cms/static/js/programs/utils/validation_config.js
+msgid "{0} must be greater than or equal to {1}"
+msgstr ""
+"{0} müst ßé gréätér thän ör éqüäl tö {1} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя#"
+
+#: cms/static/js/programs/utils/validation_config.js
+msgid "{0} must be less than or equal to {1}"
+msgstr ""
+"{0} müst ßé léss thän ör éqüäl tö {1} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυ#"
+
+#: cms/static/js/programs/utils/validation_config.js
+msgid "{0} must be between {1} and {2}"
+msgstr "{0} müst ßé ßétwéén {1} änd {2} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
+
+#: cms/static/js/programs/utils/validation_config.js
+msgid "{0} must be {1} characters"
+msgstr "{0} müst ßé {1} çhäräçtérs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
+
+#: cms/static/js/programs/utils/validation_config.js
+msgid "{0} must be at least {1} characters"
+msgstr ""
+"{0} müst ßé ät léäst {1} çhäräçtérs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
+
+#: cms/static/js/programs/utils/validation_config.js
+msgid "{0} must be at most {1} characters"
+msgstr ""
+"{0} müst ßé ät möst {1} çhäräçtérs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
+
+#: cms/static/js/programs/utils/validation_config.js
+msgid "{0} must be between {1} and {2} characters"
+msgstr ""
+"{0} müst ßé ßétwéén {1} änd {2} çhäräçtérs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя #"
+
+#: cms/static/js/programs/utils/validation_config.js
+msgid "{0} must be one of: gettext( {1}"
+msgstr ""
+"{0} müst ßé öné öf: géttéxt( {1} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
+
+#: cms/static/js/programs/utils/validation_config.js
+msgid "{0} must be the same as {1}"
+msgstr "{0} müst ßé thé sämé äs {1} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
+
+#: cms/static/js/programs/utils/validation_config.js
+msgid "{0} must only contain digits"
+msgstr "{0} müst önlý çöntäïn dïgïts Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
+
+#: cms/static/js/programs/utils/validation_config.js
+msgid "{0} must be a number"
+msgstr "{0} müst ßé ä nümßér Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+
+#: cms/static/js/programs/utils/validation_config.js
+msgid "{0} must be a valid email"
+msgstr "{0} müst ßé ä välïd émäïl Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
+
+#: cms/static/js/programs/utils/validation_config.js
+msgid "{0} must be a valid url"
+msgstr "{0} müst ßé ä välïd ürl Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
+
+#: cms/static/js/programs/utils/validation_config.js
+msgid "{0} is invalid"
+msgstr "{0} ïs ïnvälïd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
+
+#: cms/static/js/programs/views/program_details_view.js
+msgid "confirm"
+msgstr "çönfïrm Ⱡ'σяєм ιρѕυм #"
+
+#: cms/static/js/programs/views/program_details_view.js
+msgid "Publish this program?"
+msgstr "Püßlïsh thïs prögräm? Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+
+#: cms/static/js/programs/views/program_details_view.js
+msgid ""
+"After you publish this program, you cannot add or remove course codes or "
+"remove course runs."
+msgstr ""
+"Àftér ýöü püßlïsh thïs prögräm, ýöü çännöt ädd ör rémövé çöürsé çödés ör "
+"rémövé çöürsé rüns. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
+
+#: cms/static/js/programs/views/program_details_view.js
+#: cms/static/js/views/modals/course_outline_modals.js
+#: cms/templates/js/course-outline.underscore
+#: cms/templates/js/publish-xblock.underscore
+#: cms/templates/js/programs/program_details.underscore
+msgid "Publish"
+msgstr "Püßlïsh Ⱡ'σяєм ιρѕυм #"
+
+#: cms/static/js/programs/views/program_details_view.js
+msgid "Marketing Slug is required."
+msgstr "Märkétïng Slüg ïs réqüïréd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
+
 #: cms/static/js/views/active_video_upload_list.js
 msgid "Your video uploads are not complete."
 msgstr ""
@@ -6081,38 +6246,27 @@ msgstr ""
 "ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: cms/static/js/views/modals/course_outline_modals.js
-msgid "%(display_name)s Settings"
-msgstr "%(display_name)s Séttïngs Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
+msgid "{display_name} Settings"
+msgstr "{display_name} Séttïngs Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
 #: cms/static/js/views/modals/course_outline_modals.js
-msgid "Change the settings for %(display_name)s"
+msgid "Change the settings for {display_name}"
 msgstr ""
-"Çhängé thé séttïngs för %(display_name)s Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
+"Çhängé thé séttïngs för {display_name} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
 
 #: cms/static/js/views/modals/course_outline_modals.js
-msgid "Publish %(display_name)s"
-msgstr "Püßlïsh %(display_name)s Ⱡ'σяєм ιρѕυм ∂σłσя #"
+msgid "Publish {display_name}"
+msgstr "Püßlïsh {display_name} Ⱡ'σяєм ιρѕυм ∂σłσя #"
 
 #: cms/static/js/views/modals/course_outline_modals.js
-msgid "Publish all unpublished changes for this %(item)s?"
+msgid "Publish all unpublished changes for this {item}?"
 msgstr ""
-"Püßlïsh äll ünpüßlïshéd çhängés för thïs %(item)s? Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"Püßlïsh äll ünpüßlïshéd çhängés för thïs {item}? Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
 "αмєт, ¢σηѕє¢тєтυя #"
-
-#: cms/static/js/views/modals/course_outline_modals.js
-#: cms/templates/js/course-outline.underscore
-#: cms/templates/js/publish-xblock.underscore
-msgid "Publish"
-msgstr "Püßlïsh Ⱡ'σяєм ιρѕυм #"
 
 #: cms/static/js/views/modals/course_outline_modals.js
 msgid "Basic"
 msgstr "Bäsïç Ⱡ'σяєм ιρѕ#"
-
-#. Translators: This label refers to access to course content.
-#: cms/static/js/views/modals/course_outline_modals.js
-msgid "Access"
-msgstr "Àççéss Ⱡ'σяєм ιρѕυ#"
 
 #. Translators: "title" is the name of the current component being edited.
 #: cms/static/js/views/modals/edit_xblock.js
@@ -6535,6 +6689,7 @@ msgstr "Ûpdätïng Tägs Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 
 #: cms/templates/js/asset-library.underscore
 #: cms/templates/js/basic-modal.underscore
+#: cms/templates/js/programs/confirm_modal.underscore
 #: lms/templates/instructor/instructor_dashboard_2/enrollment-code-lookup-links.underscore
 msgid "Actions"
 msgstr "Àçtïöns Ⱡ'σяєм ιρѕυм #"
@@ -7592,8 +7747,8 @@ msgstr ""
 " αłιqυα. υт єηι#"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
-msgid "Browse"
-msgstr "Bröwsé Ⱡ'σяєм ιρѕυ#"
+msgid "Upload a CSV file"
+msgstr "Ûplöäd ä ÇSV fïlé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list-editor.underscore
@@ -7653,6 +7808,14 @@ msgid ""
 msgstr ""
 "Éntér thé üsérnämé ör émäïl äddréss öf éäçh léärnér thät ýöü wänt tö ädd äs "
 "än éxçéptïön. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
+
+#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list-editor.underscore
+msgid "Student email or username"
+msgstr "Stüdént émäïl ör üsérnämé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
+
+#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list-editor.underscore
+msgid "Free text notes"
+msgstr "Fréé téxt nötés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
 msgid "Generate Exception Certificates"
@@ -9240,11 +9403,6 @@ msgstr "Çértïfïçäté Détäïls Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт
 
 #: cms/templates/js/certificate-details.underscore
 #: cms/templates/js/certificate-editor.underscore
-msgid "Course Title"
-msgstr "Çöürsé Tïtlé Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
-
-#: cms/templates/js/certificate-details.underscore
-#: cms/templates/js/certificate-editor.underscore
 msgid "Course Title Override"
 msgstr "Çöürsé Tïtlé Övérrïdé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
@@ -9386,6 +9544,66 @@ msgstr ""
 "Thïs çöntént gröüp ïs üséd ïn öné ör möré ünïts. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
 "αмєт, ¢σηѕє¢тєтυя α#"
 
+#: cms/templates/js/content-visibility-editor.underscore
+msgid "Subsection Visibility"
+msgstr "Süßséçtïön Vïsïßïlïtý Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+
+#: cms/templates/js/content-visibility-editor.underscore
+msgid "Show entire subsection"
+msgstr "Shöw éntïré süßséçtïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
+
+#: cms/templates/js/content-visibility-editor.underscore
+msgid "Learners see the published subsection and can access its content."
+msgstr ""
+"Léärnérs séé thé püßlïshéd süßséçtïön änd çän äççéss ïts çöntént. Ⱡ'σяєм "
+"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: cms/templates/js/content-visibility-editor.underscore
+msgid "Hide content after due date"
+msgstr "Hïdé çöntént äftér düé däté Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
+
+#: cms/templates/js/content-visibility-editor.underscore
+msgid ""
+"After the subsection\\'s due date has passed, learners can no longer access "
+"its content. The subsection remains included in grade calculations."
+msgstr ""
+"Àftér thé süßséçtïön\\'s düé däté häs pässéd, léärnérs çän nö löngér äççéss "
+"ïts çöntént. Thé süßséçtïön rémäïns ïnçlüdéd ïn grädé çälçülätïöns. Ⱡ'σяєм "
+"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя "
+"ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ "
+"ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ "
+"¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє "
+"¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт "
+"ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłłιт αηιм ι∂ єѕт#"
+
+#: cms/templates/js/content-visibility-editor.underscore
+msgid "Hide entire subsection"
+msgstr "Hïdé éntïré süßséçtïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
+
+#: cms/templates/js/content-visibility-editor.underscore
+msgid ""
+"Learners do not see the subsection in the course outline. The subsection is "
+"not included in grade calculations."
+msgstr ""
+"Léärnérs dö nöt séé thé süßséçtïön ïn thé çöürsé öütlïné. Thé süßséçtïön ïs "
+"nöt ïnçlüdéd ïn grädé çälçülätïöns. Ⱡ'σяєм ιρѕυм ∂σłσя #"
+
+#: cms/templates/js/content-visibility-editor.underscore
+msgid ""
+"Units inherit the visibility setting of the subsection they are in. If you "
+"make this subsection visible to learners, published units that were "
+"previously hidden also become visible. Only units that were explicitly "
+"hidden remain hidden regardless of the option you select for this "
+"subsection."
+msgstr ""
+"Ûnïts ïnhérït thé vïsïßïlïtý séttïng öf thé süßséçtïön théý äré ïn. Ìf ýöü "
+"mäké thïs süßséçtïön vïsïßlé tö léärnérs, püßlïshéd ünïts thät wéré "
+"prévïöüslý hïddén älsö ßéçömé vïsïßlé. Önlý ünïts thät wéré éxplïçïtlý "
+"hïddén rémäïn hïddén régärdléss öf thé öptïön ýöü séléçt för thïs "
+"süßséçtïön. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ "
+"∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ "
+"мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяι#"
+
 #: cms/templates/js/course-instructor-details.underscore
 msgid "Instructor Name"
 msgstr "Ìnstrüçtör Nämé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
@@ -9406,6 +9624,7 @@ msgstr ""
 
 #: cms/templates/js/course-instructor-details.underscore
 #: cms/templates/js/signatory-details.underscore
+#: cms/templates/js/programs/program_creator_form.underscore
 msgid "Organization"
 msgstr "Örgänïzätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
@@ -9542,15 +9761,9 @@ msgid "Due:"
 msgstr "Düé: Ⱡ'σяєм ι#"
 
 #: cms/templates/js/course-outline.underscore
-msgid "Exam will remain hidden after due date"
+msgid "Subsection is hidden after due date"
 msgstr ""
-"Éxäm wïll rémäïn hïddén äftér düé däté Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя#"
-
-#: cms/templates/js/course-outline.underscore
-msgid "Exam will be visible after due date"
-msgstr ""
-"Éxäm wïll ßé vïsïßlé äftér düé däté Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
+"Süßséçtïön ïs hïddén äftér düé däté Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
 
 #: cms/templates/js/course-outline.underscore
 #: cms/templates/js/xblock-outline.underscore
@@ -10015,8 +10228,8 @@ msgid "with %(section_or_subsection)s"
 msgstr "wïth %(section_or_subsection)s Ⱡ'σяєм ιρѕυм ∂#"
 
 #: cms/templates/js/publish-xblock.underscore
-msgid "Staff and Students"
-msgstr "Stäff änd Stüdénts Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
+msgid "Staff and Learners"
+msgstr "Stäff änd Léärnérs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
 
 #: cms/templates/js/publish-xblock.underscore
 msgid "Some content in this unit is visible only to particular content groups"
@@ -10026,8 +10239,14 @@ msgstr ""
 
 #: cms/templates/js/publish-xblock.underscore
 #: cms/templates/js/staff-lock-editor.underscore
-msgid "Hide from students"
-msgstr "Hïdé fröm stüdénts Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
+msgid "Hide from learners"
+msgstr "Hïdé fröm léärnérs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
+
+#: cms/templates/js/publish-xblock.underscore
+msgid "Note: Do not hide graded assignments after they have been released."
+msgstr ""
+"Nöté: Dö nöt hïdé grädéd ässïgnménts äftér théý hävé ßéén réléäséd. Ⱡ'σяєм "
+"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
 
 #: cms/templates/js/release-date-editor.underscore
 msgid "Release Date and Time"
@@ -10123,16 +10342,20 @@ msgid "Upload Signature Image"
 msgstr "Ûplöäd Sïgnätüré Ìmägé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
 
 #: cms/templates/js/staff-lock-editor.underscore
-msgid "Student Visibility"
-msgstr "Stüdént Vïsïßïlïtý Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
+msgid "Unit Visibility"
+msgstr "Ûnït Vïsïßïlïtý Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
+
+#: cms/templates/js/staff-lock-editor.underscore
+msgid "Section Visibility"
+msgstr "Séçtïön Vïsïßïlïtý Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
 
 #: cms/templates/js/staff-lock-editor.underscore
 msgid ""
-"If the unit was previously published and released to students, any changes "
-"you made to the unit when it was hidden will now be visible to students."
+"If the unit was previously published and released to learners, any changes "
+"you made to the unit when it was hidden will now be visible to learners."
 msgstr ""
-"Ìf thé ünït wäs prévïöüslý püßlïshéd änd réléäséd tö stüdénts, äný çhängés "
-"ýöü mädé tö thé ünït whén ït wäs hïddén wïll nöw ßé vïsïßlé tö stüdénts. "
+"Ìf thé ünït wäs prévïöüslý püßlïshéd änd réléäséd tö léärnérs, äný çhängés "
+"ýöü mädé tö thé ünït whén ït wäs hïddén wïll nöw ßé vïsïßlé tö léärnérs. "
 "Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ "
 "тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм,"
 " qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ "
@@ -10143,34 +10366,19 @@ msgstr ""
 #: cms/templates/js/staff-lock-editor.underscore
 #, python-format
 msgid ""
-"If you make this %(xblockType)s visible to students, students will be able "
+"If you make this %(xblockType)s visible to learners, learners will be able "
 "to see its content after the release date has passed and you have published "
-"the unit."
+"the unit. Only units that are explicitly hidden from learners will remain "
+"hidden after you clear this option for the %(xblockType)s."
 msgstr ""
-"Ìf ýöü mäké thïs %(xblockType)s vïsïßlé tö stüdénts, stüdénts wïll ßé äßlé "
+"Ìf ýöü mäké thïs %(xblockType)s vïsïßlé tö léärnérs, léärnérs wïll ßé äßlé "
 "tö séé ïts çöntént äftér thé réléäsé däté häs pässéd änd ýöü hävé püßlïshéd "
-"thé ünït. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ "
-"єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм"
-" νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα "
-"¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт"
-" єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт "
-"¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłłιт αηι#"
-
-#: cms/templates/js/staff-lock-editor.underscore
-msgid ""
-"Any subsections or units that are explicitly hidden from students will "
-"remain hidden after you clear this option for the section."
-msgstr ""
-"Àný süßséçtïöns ör ünïts thät äré éxplïçïtlý hïddén fröm stüdénts wïll "
-"rémäïn hïddén äftér ýöü çléär thïs öptïön för thé séçtïön. Ⱡ'σ#"
-
-#: cms/templates/js/staff-lock-editor.underscore
-msgid ""
-"Any units that are explicitly hidden from students will remain hidden after "
-"you clear this option for the subsection."
-msgstr ""
-"Àný ünïts thät äré éxplïçïtlý hïddén fröm stüdénts wïll rémäïn hïddén äftér "
-"ýöü çléär thïs öptïön för thé süßséçtïön. Ⱡ'σяєм ιρѕυм ∂#"
+"thé ünït. Önlý ünïts thät äré éxplïçïtlý hïddén fröm léärnérs wïll rémäïn "
+"hïddén äftér ýöü çléär thïs öptïön för thé %(xblockType)s. Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя "
+"ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ "
+"ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ "
+"¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σł#"
 
 #: cms/templates/js/team-member.underscore
 msgid "Current Role:"
@@ -10305,24 +10513,6 @@ msgstr ""
 "∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα"
 " ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт ηση ρяσι∂єηт, ѕυ#"
 
-#: cms/templates/js/timed-examination-preference-editor.underscore
-msgid "Hide Exam After Due Date"
-msgstr "Hïdé Éxäm Àftér Düé Däté Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
-
-#: cms/templates/js/timed-examination-preference-editor.underscore
-msgid ""
-"By default, submitted exams are available for review after the due date has "
-"passed. Select this option to keep exams hidden after that date."
-msgstr ""
-"Bý défäült, süßmïttéd éxäms äré äväïläßlé för révïéw äftér thé düé däté häs "
-"pässéd. Séléçt thïs öptïön tö kéép éxäms hïddén äftér thät däté. Ⱡ'σяєм "
-"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя "
-"ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ "
-"ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ "
-"¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє "
-"¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт "
-"ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłłιт αηιм ι∂ єѕт ł#"
-
 #: cms/templates/js/upload-dialog.underscore
 msgid "File upload succeeded"
 msgstr "Fïlé üplöäd süççéédéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
@@ -10378,6 +10568,151 @@ msgstr "Édït %(display_name)s (réqüïréd) Ⱡ'σяєм ιρѕυм ∂σłσ
 #: cms/templates/js/xblock-string-field-editor.underscore
 msgid "formLabel"
 msgstr "förmLäßél Ⱡ'σяєм ιρѕυм ∂σł#"
+
+#: cms/templates/js/programs/course_details.underscore
+msgid "Delete course"
+msgstr "Délété çöürsé Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
+
+#: cms/templates/js/programs/course_details.underscore
+#, python-format
+msgid "Remove %(name)s from the program"
+msgstr "Rémövé %(name)s fröm thé prögräm Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
+
+#: cms/templates/js/programs/course_details.underscore
+msgid "Add another run"
+msgstr "Àdd änöthér rün Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
+
+#: cms/templates/js/programs/course_details.underscore
+msgid ""
+"The unique number that identifies your course within your organization, e.g."
+" CS101."
+msgstr ""
+"Thé ünïqüé nümßér thät ïdéntïfïés ýöür çöürsé wïthïn ýöür örgänïzätïön, é.g."
+" ÇS101. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
+
+#: cms/templates/js/programs/course_details.underscore
+msgid ""
+"The title entered here will override the title set for the individual run of"
+" the course. It will be displayed on the XSeries progress page and in "
+"marketing presentations."
+msgstr ""
+"Thé tïtlé éntéréd héré wïll övérrïdé thé tïtlé sét för thé ïndïvïdüäl rün öf"
+" thé çöürsé. Ìt wïll ßé dïspläýéd ön thé XSérïés prögréss pägé änd ïn "
+"märkétïng préséntätïöns. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя "
+"α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα"
+" αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ "
+"ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη "
+"яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα "
+"ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι "
+"σ#"
+
+#: cms/templates/js/programs/course_details.underscore
+msgid "Save Course"
+msgstr "Sävé Çöürsé Ⱡ'σяєм ιρѕυм ∂σłσя #"
+
+#: cms/templates/js/programs/course_run.underscore
+#, python-format
+msgid "Run %(key)s"
+msgstr "Rün %(key)s Ⱡ'σяєм ιρѕυм #"
+
+#: cms/templates/js/programs/course_run.underscore
+msgid "Delete course run"
+msgstr "Délété çöürsé rün Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
+
+#: cms/templates/js/programs/course_run.underscore
+#, python-format
+msgid "Remove run %(key)s from the program"
+msgstr ""
+"Rémövé rün %(key)s fröm thé prögräm Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
+
+#: cms/templates/js/programs/course_run.underscore
+#, python-format
+msgid "Start Date: %(date)s"
+msgstr "Stärt Däté: %(date)s Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
+
+#: cms/templates/js/programs/course_run.underscore
+#, python-format
+msgid "Mode: %(mode)s"
+msgstr "Mödé: %(mode)s Ⱡ'σяєм ιρѕυм ∂σł#"
+
+#: cms/templates/js/programs/course_run.underscore
+msgid "Please select a Course Run"
+msgstr "Pléäsé séléçt ä Çöürsé Rün Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
+
+#: cms/templates/js/programs/program_creator_form.underscore
+msgid "Create a New Program"
+msgstr "Çréäté ä Néw Prögräm Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+
+#: cms/templates/js/programs/program_creator_form.underscore
+msgid "Program type"
+msgstr "Prögräm týpé Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
+
+#: cms/templates/js/programs/program_creator_form.underscore
+msgid "XSeries"
+msgstr "XSérïés Ⱡ'σяєм ιρѕυм #"
+
+#: cms/templates/js/programs/program_creator_form.underscore
+msgid "Select an organization"
+msgstr "Séléçt än örgänïzätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
+
+#: cms/templates/js/programs/program_creator_form.underscore
+msgid "The public display name of the program."
+msgstr ""
+"Thé püßlïç dïspläý nämé öf thé prögräm. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя#"
+
+#: cms/templates/js/programs/program_creator_form.underscore
+#: cms/templates/js/programs/program_details.underscore
+msgid "Subtitle"
+msgstr "Süßtïtlé Ⱡ'σяєм ιρѕυм ∂#"
+
+#: cms/templates/js/programs/program_creator_form.underscore
+msgid ""
+"A short description of the program, including concepts covered and expected "
+"outcomes (255 character limit)."
+msgstr ""
+"À shört désçrïptïön öf thé prögräm, ïnçlüdïng çönçépts çövéréd änd éxpéçtéd "
+"öütçömés (255 çhäräçtér lïmït). Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
+
+#: cms/templates/js/programs/program_creator_form.underscore
+#: cms/templates/js/programs/program_details.underscore
+msgid "Marketing Slug"
+msgstr "Märkétïng Slüg Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
+
+#: cms/templates/js/programs/program_creator_form.underscore
+msgid "Slug used to generate links to the marketing site."
+msgstr ""
+"Slüg üséd tö généräté lïnks tö thé märkétïng sïté. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢тєтυя α#"
+
+#: cms/templates/js/programs/program_details.underscore
+msgid "Edit the program title"
+msgstr "Édït thé prögräm tïtlé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
+
+#: cms/templates/js/programs/program_details.underscore
+msgid "Edit the program\\'s name."
+msgstr "Édït thé prögräm\\'s nämé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
+
+#: cms/templates/js/programs/program_details.underscore
+msgid "Edit the program subtitle"
+msgstr "Édït thé prögräm süßtïtlé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
+
+#: cms/templates/js/programs/program_details.underscore
+msgid "Edit the program\\'s subtitle."
+msgstr "Édït thé prögräm\\'s süßtïtlé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
+
+#: cms/templates/js/programs/program_details.underscore
+msgid "Edit the program marketing slug"
+msgstr "Édït thé prögräm märkétïng slüg Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
+
+#: cms/templates/js/programs/program_details.underscore
+msgid "Edit the program\\'s marketing slug."
+msgstr ""
+"Édït thé prögräm\\'s märkétïng slüg. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
+
+#: cms/templates/js/programs/program_details.underscore
+msgid "Add a course"
+msgstr "Àdd ä çöürsé Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
 #: cms/templates/js/video/transcripts/metadata-videolist-entry.underscore
 msgid "Add URLs for additional versions"

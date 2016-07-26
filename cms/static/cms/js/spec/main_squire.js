@@ -34,6 +34,7 @@
             'backbone': 'common/js/vendor/backbone',
             'backbone.associations': 'xmodule_js/common_static/js/vendor/backbone-associations-min',
             'backbone.paginator': 'common/js/vendor/backbone.paginator',
+            'backbone.validation': 'common/js/vendor/backbone-validation',
             'tinymce': 'xmodule_js/common_static/js/vendor/tinymce/js/tinymce/tinymce.full.min',
             'jquery.tinymce': 'xmodule_js/common_static/js/vendor/tinymce/js/tinymce/jquery.tinymce',
             'xmodule': 'xmodule_js/src/xmodule',
@@ -42,9 +43,6 @@
             'utility': 'xmodule_js/common_static/js/src/utility',
             'sinon': 'xmodule_js/common_static/js/vendor/sinon-1.17.0',
             'squire': 'xmodule_js/common_static/js/vendor/Squire',
-            'modernizr': 'edx-pattern-library/js/modernizr-custom',
-            'afontgarde': 'edx-pattern-library/js/afontgarde',
-            'edxicons': 'edx-pattern-library/js/edx-icons',
             'draggabilly': 'xmodule_js/common_static/js/vendor/draggabilly',
             'domReady': 'xmodule_js/common_static/js/vendor/domReady',
             'URI': 'xmodule_js/common_static/js/vendor/URI.min',
@@ -174,17 +172,11 @@
                 exports: 'XBlock',
                 deps: ['xblock/core']
             },
-            'coffee/src/main': {
+            'cms/js/main': {
                 deps: ['coffee/src/ajax_prefix']
             },
             'coffee/src/ajax_prefix': {
                 deps: ['jquery']
-            },
-            'modernizr': {
-                exports: 'Modernizr'
-            },
-            'afontgarde': {
-                exports: 'AFontGarde'
             }
         }
     });

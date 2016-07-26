@@ -26,17 +26,6 @@ class TestProgramsApiConfig(ProgramsApiConfigMixin, TestCase):
             programs_config.public_service_url.strip('/') + '/api/v{}/'.format(programs_config.api_version_number)
         )
 
-        authoring_app_config = programs_config.authoring_app_config
-
-        self.assertEqual(
-            authoring_app_config.js_url,
-            programs_config.public_service_url.strip('/') + programs_config.authoring_app_js_path
-        )
-        self.assertEqual(
-            authoring_app_config.css_url,
-            programs_config.public_service_url.strip('/') + programs_config.authoring_app_css_path
-        )
-
     @ddt.data(
         (0, False),
         (1, True),
@@ -70,9 +59,6 @@ class TestProgramsApiConfig(ProgramsApiConfigMixin, TestCase):
         self.assertFalse(programs_config.is_studio_tab_enabled)
 
         programs_config = self.create_programs_config(enable_studio_tab=False)
-        self.assertFalse(programs_config.is_studio_tab_enabled)
-
-        programs_config = self.create_programs_config(authoring_app_js_path='', authoring_app_css_path='')
         self.assertFalse(programs_config.is_studio_tab_enabled)
 
         programs_config = self.create_programs_config()

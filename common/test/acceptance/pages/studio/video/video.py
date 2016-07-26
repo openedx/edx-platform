@@ -6,9 +6,9 @@ import os
 import requests
 from bok_choy.promise import EmptyPromise, Promise
 from bok_choy.javascript import wait_for_js, js_defined
-from ....tests.helpers import YouTubeStubConfig
-from ...lms.video.video import VideoPage
-from ...common.utils import wait_for_notification
+from common.test.acceptance.tests.helpers import YouTubeStubConfig
+from common.test.acceptance.pages.lms.video.video import VideoPage
+from common.test.acceptance.pages.common.utils import wait_for_notification
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.action_chains import ActionChains
 

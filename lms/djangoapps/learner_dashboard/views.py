@@ -62,7 +62,7 @@ def program_details(request, program_id):
     if not program_data:
         raise Http404
 
-    program_data = utils.supplement_program_data(program_data, request.user)
+    program_data = utils.ProgramDataExtender(program_data, request.user).extend()
 
     urls = {
         'program_listing_url': reverse('program_listing_view'),

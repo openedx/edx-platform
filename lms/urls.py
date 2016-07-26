@@ -13,6 +13,7 @@ import auth_exchange.views
 from courseware.views.views import EnrollStaffView
 from config_models.views import ConfigurationModelCurrentAPIView
 from courseware.views.index import CoursewareIndex
+from openedx.core.djangoapps.catalog.models import CatalogIntegration
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from student.views import LogoutView
@@ -969,6 +970,7 @@ if settings.FEATURES.get("ENABLE_LTI_PROVIDER"):
 urlpatterns += (
     url(r'config/self_paced', ConfigurationModelCurrentAPIView.as_view(model=SelfPacedConfiguration)),
     url(r'config/programs', ConfigurationModelCurrentAPIView.as_view(model=ProgramsApiConfig)),
+    url(r'config/catalog', ConfigurationModelCurrentAPIView.as_view(model=CatalogIntegration)),
 )
 
 urlpatterns = patterns(*urlpatterns)

@@ -32,6 +32,7 @@ from xblock.exceptions import NoSuchHandlerError, NoSuchViewError
 from xblock.reference.plugins import FSService
 
 import static_replace
+from openedx.core.lib.gating import api as gating_api
 from courseware.access import has_access, get_user_role
 from courseware.entrance_exams import (
     get_entrance_exam_score,
@@ -45,7 +46,7 @@ from courseware.masquerade import (
     setup_masquerade,
 )
 from courseware.model_data import DjangoKeyValueStore, FieldDataCache, set_score
-from courseware.models import SCORE_CHANGED
+from lms.djangoapps.grades.signals import SCORE_CHANGED
 from edxmako.shortcuts import render_to_string
 from lms.djangoapps.lms_xblock.field_data import LmsFieldData
 from lms.djangoapps.lms_xblock.models import XBlockAsidesConfig
@@ -163,6 +164,9 @@ def toc_for_course(user, request, course, active_chapter, active_section, field_
         # before the rest of the content is made available
         required_content = milestones_helpers.get_required_content(course, user)
 
+        # Check for gated content
+        gated_content = gating_api.get_gated_content(course, user)
+
         # The user may not actually have to complete the entrance exam, if one is required
         if not user_must_complete_entrance_exam(request, user, course):
             required_content = [content for content in required_content if not content == course.entrance_exam_id]
@@ -185,7 +189,9 @@ def toc_for_course(user, request, course, active_chapter, active_section, field_
 
             sections = list()
             for section in chapter.get_display_items():
-                # skip the section if it is hidden from the user
+                # skip the section if it is gated/hidden from the user
+                if gated_content and unicode(section.location) in gated_content:
+                    continue
                 if section.hide_from_toc:
                     continue
 

@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """ Tests for student account views. """
 
-from copy import copy
 import re
 from unittest import skipUnless
 from urllib import urlencode
@@ -462,9 +461,6 @@ class AccountSettingsViewTest(ThirdPartyAuthTestMixin, TestCase, ProgramsApiConf
         'password',
         'year_of_birth',
         'preferred_language',
-    ]
-
-    HIDDEN_FIELDS = [
         'time_zone',
     ]
 
@@ -512,35 +508,15 @@ class AccountSettingsViewTest(ThirdPartyAuthTestMixin, TestCase, ProgramsApiConf
         self.assertEqual(context['auth']['providers'][0]['name'], 'Facebook')
         self.assertEqual(context['auth']['providers'][1]['name'], 'Google')
 
-    def test_hidden_fields_not_visible(self):
+    def test_view(self):
         """
-        Test that hidden fields are not visible when disabled.
+        Test that all fields are  visible
         """
-        temp_features = copy(settings.FEATURES)
-        temp_features['ENABLE_TIME_ZONE_PREFERENCE'] = False
-        with self.settings(FEATURES=temp_features):
-            view_path = reverse('account_settings')
-            response = self.client.get(path=view_path)
+        view_path = reverse('account_settings')
+        response = self.client.get(path=view_path)
 
-            for attribute in self.FIELDS:
-                self.assertIn(attribute, response.content)
-            for attribute in self.HIDDEN_FIELDS:
-                self.assertIn('"%s": {"enabled": false' % (attribute), response.content)
-
-    def test_hidden_fields_are_visible(self):
-        """
-        Test that hidden fields are visible when enabled.
-        """
-        temp_features = copy(settings.FEATURES)
-        temp_features['ENABLE_TIME_ZONE_PREFERENCE'] = True
-        with self.settings(FEATURES=temp_features):
-            view_path = reverse('account_settings')
-            response = self.client.get(path=view_path)
-
-            for attribute in self.FIELDS:
-                self.assertIn(attribute, response.content)
-            for attribute in self.HIDDEN_FIELDS:
-                self.assertIn('"%s": {"enabled": true' % (attribute), response.content)
+        for attribute in self.FIELDS:
+            self.assertIn(attribute, response.content)
 
     def test_header_with_programs_listing_enabled(self):
         """

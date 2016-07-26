@@ -474,7 +474,7 @@
             });
             it("doesn't show voting button if can_vote ability is disabled", function() {
                 this.view.render();
-                return expect(this.view.$el.find(".action-vote").closest(".actions-item")).toHaveClass('is-hidden');
+                return expect(this.view.$el.find(".action-vote").closest(".actions-item")).toHaveClass('is-disabled');
             });
         });
     });

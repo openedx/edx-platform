@@ -2,8 +2,8 @@
 Courseware Boomarks
 """
 from bok_choy.promise import EmptyPromise
-from .course_page import CoursePage
-from ..common.paging import PaginatedUIMixin
+from common.test.acceptance.pages.lms.course_page import CoursePage
+from common.test.acceptance.pages.common.paging import PaginatedUIMixin
 
 
 class BookmarksPage(CoursePage, PaginatedUIMixin):

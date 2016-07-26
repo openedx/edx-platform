@@ -96,6 +96,7 @@
 # omarithawi <oithawi@qrf.org>, 2014-2016
 # Osama M. Mneina <o.mneina@gmail.com>, 2014
 # Sarina Canelake <sarina@edx.org>, 2014
+# Sherif Halawa <shalawa@qrf.org>, 2016
 # Soha Assali <soha+transifex@qordoba.com>, 2015-2016
 # #-#-#-#-#  mako-studio.po (edx-platform)  #-#-#-#-#
 # edX translation file
@@ -139,7 +140,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-06-30 16:00+0000\n"
+"POT-Creation-Date: 2016-07-15 14:48+0000\n"
 "PO-Revision-Date: 2016-05-09 11:27+0000\n"
 "Last-Translator: Soha Assali <soha+transifex@qordoba.com>\n"
 "Language-Team: Arabic (http://www.transifex.com/open-edx/edx-platform/language/ar/)\n"
@@ -5261,7 +5262,7 @@ msgstr ""
 "مسار صفحة ’السحب لفحص المراجعة‘ الخاصة بمساق واحد، والمُستضافة من قبل خدمة "
 "التجارة الإلكترونية."
 
-#: lms/djangoapps/commerce/models.py
+#: lms/djangoapps/commerce/models.py openedx/core/djangoapps/catalog/models.py
 #: openedx/core/djangoapps/credentials/models.py
 #: openedx/core/djangoapps/credit/models.py
 #: openedx/core/djangoapps/programs/models.py
@@ -5397,10 +5398,6 @@ msgstr "{relative} مضى - {absolute}"
 #: lms/djangoapps/courseware/date_summary.py
 msgid "in {relative} - {absolute}"
 msgstr "في {relative} - {absolute}"
-
-#: lms/djangoapps/courseware/date_summary.py
-msgid "UTC"
-msgstr ""
 
 #: lms/djangoapps/courseware/date_summary.py
 msgid "Today is {date}"
@@ -9269,6 +9266,22 @@ msgstr ""
 msgid "Bookmark with usage_id: {usage_id} does not exist."
 msgstr "ضع علامة باستخدام ’usage_id‘: {usage_id}  غير موجود."
 
+#: openedx/core/djangoapps/catalog/models.py
+msgid "Internal API URL"
+msgstr ""
+
+#: openedx/core/djangoapps/catalog/models.py
+msgid ""
+"API root to be used for server-to-server requests (e.g., https://catalog-"
+"internal.example.com/api/v1/)."
+msgstr ""
+
+#: openedx/core/djangoapps/catalog/models.py
+msgid ""
+"Specified in seconds. Enable caching of API responses by setting this to a "
+"value greater than 0."
+msgstr ""
+
 #: openedx/core/djangoapps/course_groups/cohorts.py
 msgid "Default Group"
 msgstr "المجموعة الافتراضية"
@@ -9569,6 +9582,10 @@ msgstr ""
 msgid ""
 "Value '{preference_value}' not valid for preference '{preference_key}': Not "
 "in timezone set."
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/preferences/api.py
+msgid "Value '{preference_value}' is not a valid time zone selection."
 msgstr ""
 
 #: openedx/core/djangoapps/user_api/preferences/api.py
@@ -10419,6 +10436,7 @@ msgstr "المتطلّبات"
 
 #: cms/templates/studio_xblock_wrapper.html lms/templates/help_modal.html
 #: lms/templates/module-error.html
+#: lms/templates/instructor/instructor_dashboard_2/certificates.html
 msgid "Details"
 msgstr "التفاصيل"
 
@@ -11188,6 +11206,7 @@ msgstr "حدث خطأ ما في خوادم منصّة {platform_name} "
 
 #: lms/templates/module-error.html
 #: lms/templates/courseware/courseware-error.html
+#: lms/templates/courseware/error-message.html
 msgid ""
 "We're sorry, this module is temporarily unavailable. Our staff is working to"
 " fix it as soon as possible. Please email us at {tech_support_email} to "
@@ -11278,7 +11297,7 @@ msgstr "بدّل إمكانية رؤية الإجابة"
 
 #: lms/templates/problem.html
 msgid "You have used {num_used} of {num_total} submissions"
-msgstr "لقد استخدمتَ {num_used} تقديمات من أصل {num_total}"
+msgstr "لقد استخدمتَ {num_used} محاولات من أصل {num_total}"
 
 #: lms/templates/provider_login.html
 msgid "Log In"
@@ -11834,6 +11853,7 @@ msgstr "خطأ"
 
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 #: lms/templates/ccx/schedule.html
+#: lms/templates/instructor/instructor_dashboard_2/certificates.html
 msgid "Date"
 msgstr "التاريخ "
 
@@ -13364,6 +13384,10 @@ msgid "Course Material"
 msgstr "مواد المساق"
 
 #: lms/templates/courseware/course_updates.html
+msgid "All course updates"
+msgstr ""
+
+#: lms/templates/courseware/course_updates.html
 msgid "Hide"
 msgstr "إخفاء"
 
@@ -13425,16 +13449,6 @@ msgstr ""
 #: lms/templates/courseware/courseware.html
 msgid "Your score is {current_score}%. You have passed the entrance exam."
 msgstr "علامتك هي {current_score}%. لقد نجحت في اختبار الدخول."
-
-#: lms/templates/courseware/error-message.html
-msgid ""
-"We're sorry, this module is temporarily unavailable. Our staff is working to"
-" fix it as soon as possible. Please email us at {link_to_support_email} to "
-"report any problems or downtime."
-msgstr ""
-"نأسف لعدم إمكانية الوصول إلى هذه الوحدة مؤقّتًا. ويعمل طاقمنا على إصلاحها في"
-" أقرب وقت ممكن. يُرجى مراسلتنا على البريد الإلكتروني {link_to_support_email}"
-" للإبلاغ عن أي مشاكل أو فترات توقّف."
 
 #: lms/templates/courseware/gradebook.html
 msgid "Gradebook"
@@ -13521,22 +13535,6 @@ msgid "Course Progress for Student '{username}' ({email})"
 msgstr "تقدّم عمل الطالب '{username}'‏ ({email}) في المساق"
 
 #: lms/templates/courseware/progress.html
-msgid ""
-"Your certificate has been invalidated. Please contact your course team if "
-"you have any questions."
-msgstr ""
-
-#: lms/templates/courseware/progress.html
-msgid "Your certificate is available"
-msgstr "شهادتك جاهزة"
-
-#: lms/templates/courseware/progress.html
-msgid ""
-"You can keep working for a higher grade, or request your certificate now."
-msgstr ""
-"يمكنك الاستمرار في العمل سعيًا وراء شهادة أعلى أو يمكنك طلب شهادتك الآن."
-
-#: lms/templates/courseware/progress.html
 msgid "View certificate in a new browser window or tab."
 msgstr "مشاهدة الشهادة في نافذة متصفح جديدة/تبويبة جديدة"
 
@@ -13551,42 +13549,6 @@ msgstr "سوف يفتح ملف PDF في نافذة متصفح جديدة أو ت
 #: lms/templates/courseware/progress.html
 msgid "Download Your Certificate"
 msgstr "تنزيل شهادتك"
-
-#. Translators: This message appears to users when the system is processessing
-#. course certificates, which can take a few hours.
-#: lms/templates/courseware/progress.html
-msgid "We're working on it..."
-msgstr "جاري العمل على ذلك..."
-
-#: lms/templates/courseware/progress.html
-msgid ""
-"We're creating your certificate. You can keep working in your courses and a "
-"link to it will appear here and on your Dashboard when it is ready."
-msgstr ""
-"جاري إنشاء شهادتك. يمكنك متابعة العمل في مساقاتك وسوف يظهر رابط لشهادتك هنا "
-"على لوح معلوماتك ما أن تصبح جاهزة."
-
-#. Translators: This message appears to users when the users have not
-#. completed
-#. identity verification.
-#: lms/templates/courseware/progress.html
-msgid "Certificate unavailable"
-msgstr ""
-
-#: lms/templates/courseware/progress.html
-msgid ""
-"You have not received a certificate because you do not have a current "
-"{platform_name} verified identity. "
-msgstr ""
-
-#: lms/templates/courseware/progress.html
-#: lms/templates/dashboard/_dashboard_certificate_information.html
-msgid "Verify your identity now."
-msgstr ""
-
-#: lms/templates/courseware/progress.html
-msgid "Congratulations, you qualified for a certificate!"
-msgstr "تهانينا، لقد تأهلت للحصول على شهادة!"
 
 #: lms/templates/courseware/progress.html
 msgid "Request Certificate"
@@ -13805,6 +13767,10 @@ msgid ""
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
+msgid "Verify your identity now."
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid "Your {cert_name_short} is Generating"
 msgstr "جاري إعداد شهادتك {cert_name_short}"
 
@@ -13865,6 +13831,10 @@ msgstr ""
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "{category} Program Course"
 msgstr "برنامج مساق الفئة {category}"
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Course details"
+msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "{course_number} {course_name} Home Page"
@@ -15329,6 +15299,10 @@ msgid "Certificate Generation History"
 msgstr "سجل عمليات إنشاء الشهادات"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
+msgid "Task name"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/certificates.html
 msgid "SET CERTIFICATE EXCEPTIONS"
 msgstr "عيّن استثناءات الشهادة"
 
@@ -15351,8 +15325,6 @@ msgstr "إلغاء الشهادة"
 msgid "Enrollment Information"
 msgstr "معلومات التسجيل"
 
-#. Translators: 'track' refers to the enrollment type ('honor', 'verified', or
-#. 'audit')
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Number of enrollees (admins, staff, and students) by track"
 msgstr "عدد المسجلين (المشرفون والطاقم والطلاب) بحسب المسار."

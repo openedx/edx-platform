@@ -13,6 +13,7 @@ import freezegun
 import pytz
 
 from course_modes.models import CourseMode
+from lms.djangoapps.grades.tests.utils import mock_passing_grade
 from opaque_keys.edx.locator import CourseLocator
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
@@ -58,7 +59,8 @@ class XQueueCertInterfaceAddCertificateTest(ModuleStoreTestCase):
         SoftwareSecurePhotoVerificationFactory.create(user=self.user_2, status='approved')
 
     def test_add_cert_callback_url(self):
-        with patch('courseware.grades.grade', Mock(return_value={'grade': 'Pass', 'percent': 0.75})):
+
+        with mock_passing_grade():
             with patch.object(XQueueInterface, 'send_to_queue') as mock_send:
                 mock_send.return_value = (0, None)
                 self.xqueue.add_cert(self.user, self.course.id)
@@ -73,7 +75,7 @@ class XQueueCertInterfaceAddCertificateTest(ModuleStoreTestCase):
         """
         Tests there is no certificate create message in the queue if generate_pdf is False
         """
-        with patch('courseware.grades.grade', Mock(return_value={'grade': 'Pass', 'percent': 0.75})):
+        with mock_passing_grade():
             with patch.object(XQueueInterface, 'send_to_queue') as mock_send:
                 self.xqueue.add_cert(self.user, self.course.id, generate_pdf=False)
 
@@ -121,7 +123,7 @@ class XQueueCertInterfaceAddCertificateTest(ModuleStoreTestCase):
         CertificateWhitelistFactory(course_id=self.course.id, user=self.user_2)
 
         # Generate certs
-        with patch('courseware.grades.grade', Mock(return_value={'grade': 'Pass', 'percent': 0.75})):
+        with mock_passing_grade():
             with patch.object(XQueueInterface, 'send_to_queue') as mock_send:
                 mock_send.return_value = (0, None)
                 self.xqueue.add_cert(self.user_2, self.course.id)
@@ -145,7 +147,7 @@ class XQueueCertInterfaceAddCertificateTest(ModuleStoreTestCase):
             is_active=True,
             mode=mode,
         )
-        with patch('courseware.grades.grade', Mock(return_value={'grade': 'Pass', 'percent': 0.75})):
+        with mock_passing_grade():
             with patch.object(XQueueInterface, 'send_to_queue') as mock_send:
                 mock_send.return_value = (0, None)
                 self.xqueue.add_cert(self.user_2, self.course.id)
@@ -270,7 +272,7 @@ class XQueueCertInterfaceAddCertificateTest(ModuleStoreTestCase):
             )
 
         # Run grading/cert generation again
-        with patch('courseware.grades.grade', Mock(return_value={'grade': grade, 'percent': 0.75})):
+        with mock_passing_grade(grade_pass=grade):
             with patch.object(XQueueInterface, 'send_to_queue') as mock_send:
                 mock_send.return_value = (0, None)
                 self.xqueue.add_cert(self.user_2, self.course.id)

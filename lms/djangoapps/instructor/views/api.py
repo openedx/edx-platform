@@ -35,6 +35,7 @@ from util.file import (
     FileValidationException, UniversalNewlineIterator
 )
 from util.json_request import JsonResponse, JsonResponseBadRequest
+from util.views import require_global_staff
 from instructor.views.instructor_task_helpers import extract_email_features, extract_task_features
 
 from microsite_configuration import microsite
@@ -205,20 +206,6 @@ def require_level(level):
                 return HttpResponseForbidden()
         return wrapped
     return decorator
-
-
-def require_global_staff(func):
-    """View decorator that requires that the user have global staff permissions. """
-    def wrapped(request, *args, **kwargs):  # pylint: disable=missing-docstring
-        if GlobalStaff().has_user(request.user):
-            return func(request, *args, **kwargs)
-        else:
-            return HttpResponseForbidden(
-                u"Must be {platform_name} staff to perform this action.".format(
-                    platform_name=theming_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME)
-                )
-            )
-    return wrapped
 
 
 def require_sales_admin(func):

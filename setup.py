@@ -49,9 +49,10 @@ setup(
             "start_date = lms.djangoapps.course_blocks.transformers.start_date:StartDateTransformer",
             "user_partitions = lms.djangoapps.course_blocks.transformers.user_partitions:UserPartitionTransformer",
             "visibility = lms.djangoapps.course_blocks.transformers.visibility:VisibilityTransformer",
+            "hidden_content = lms.djangoapps.course_blocks.transformers.hidden_content:HiddenContentTransformer",
             "course_blocks_api = lms.djangoapps.course_api.blocks.transformers.blocks_api:BlocksAPITransformer",
-            "proctored_exam = lms.djangoapps.course_api.blocks.transformers.proctored_exam:ProctoredExamTransformer",
-            "grades = lms.djangoapps.courseware.transformers.grades:GradesTransformer",
+            "milestones = lms.djangoapps.course_api.blocks.transformers.milestones:MilestonesTransformer",
+            "grades = lms.djangoapps.grades.transformer:GradesTransformer",
         ],
     }
 )

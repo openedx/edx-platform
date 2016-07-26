@@ -33,8 +33,10 @@
                     }
                 });
                 this.event = DiscussionSpecHelper.makeEventSpy();
+                this.event.target = $("body");
                 spyOn(this.comment, "remove");
-                return spyOn(this.view.$el, "remove");
+                spyOn(this.view.$el, "remove");
+                $(this.event.target).prop("disabled", false);
             });
             setAjaxResult = function(isSuccess) {
                 return spyOn($, "ajax").and.callFake(function(params) {
@@ -151,7 +153,7 @@
                     this.view.$el.find(".edit-comment-body").html($("<textarea></textarea>"));
                     this.view.$el.find(".edit-comment-body textarea").val(this.updatedBody);
                     spyOn(this.view, 'cancelEdit');
-                    return spyOn($, "ajax").and.callFake(function(params) {
+                    spyOn($, "ajax").and.callFake(function(params) {
                         if (self.ajaxSucceed) {
                             params.success();
                         } else {
@@ -164,10 +166,17 @@
                             }
                         };
                     });
+
+                    this.event = DiscussionSpecHelper.makeEventSpy();
+                    // All the way down in discussion/utils.js there's this line
+                    // element.after(...);
+                    // element is event.target in this case. This causes a JS exception, so we override the target
+                    this.event.target = $("body");
+                    $(this.event.target).prop("disabled", false);
                 });
                 it('calls the update endpoint correctly and displays the show view on success', function() {
                     this.ajaxSucceed = true;
-                    this.view.update(DiscussionSpecHelper.makeEventSpy());
+                    this.view.update(this.event);
                     expect($.ajax).toHaveBeenCalled();
                     expect($.ajax.calls.mostRecent().args[0].url._parts.path)
                         .toEqual('/courses/edX/999/test/discussion/comments/01234567/update');
@@ -179,7 +188,7 @@
                     var originalBody;
                     originalBody = this.comment.get("body");
                     this.ajaxSucceed = false;
-                    this.view.update(DiscussionSpecHelper.makeEventSpy());
+                    this.view.update(this.event);
                     expect($.ajax).toHaveBeenCalled();
                     expect($.ajax.calls.mostRecent().args[0].url._parts.path)
                         .toEqual('/courses/edX/999/test/discussion/comments/01234567/update');

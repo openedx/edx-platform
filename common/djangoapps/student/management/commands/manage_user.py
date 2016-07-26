@@ -4,7 +4,7 @@ Django users, set/unset permission bits, and associate groups by name.
 """
 
 from django.contrib.auth import get_user_model
-from django.contrib.auth.models import Group
+from django.contrib.auth.models import Group, BaseUserManager
 from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
 from django.utils.translation import gettext as _
@@ -81,7 +81,10 @@ class Command(BaseCommand):
         )
 
         if created:
-            user.set_unusable_password()
+            # Set the password to a random, unknown, but usable password
+            # allowing self-service password resetting.  Cases where unusable
+            # passwords are required, should be explicit, and will be handled below.
+            user.set_password(BaseUserManager().make_random_password(25))
             self.stderr.write(_('Created new user: "{}"').format(user))
         else:
             # NOTE, we will not update the email address of an existing user.

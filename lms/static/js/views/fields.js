@@ -60,7 +60,7 @@
                     HtmlUtils.HTML('<span class="fa fa-plus placeholder" aria-hidden="true"></span><span class="sr">'),
                     gettext("Placeholder"),
                     HtmlUtils.HTML('</span>')
-                )
+                ),
             },
 
             messages: {
@@ -82,7 +82,6 @@
 
                 this.helpMessage = this.options.helpMessage || '';
                 this.showMessages = _.isUndefined(this.options.showMessages) ? true : this.options.showMessages;
-                this.enabled = _.isUndefined(this.options.enabled) ? true: this.options.enabled;
 
                 _.bindAll(this, 'modelValue', 'modelValueIsSet', 'showNotificationMessage','getNotificationMessage',
                     'getMessage', 'title', 'showHelpMessage', 'showInProgressMessage', 'showSuccessMessage',
@@ -98,8 +97,8 @@
                 return (this.modelValue() === true);
             },
 
-            title: function (text) {
-                return this.$('.u-field-title').text(text);
+            title: function (title) {
+                return HtmlUtils.setHtml(this.$('.u-field-title'), title);
             },
 
             getMessage: function(message_status) {
@@ -528,7 +527,8 @@
                     placeholderValue: this.options.placeholderValue
                 }));
                 this.delegateEvents();
-                this.title((this.modelValue() || this.mode === 'edit') ? this.options.title : this.indicators['plus'] + this.options.title);
+                this.title((this.modelValue() || this.mode === 'edit') ?
+                    this.options.title : HtmlUtils.joinHtml(this.indicators.plus, this.options.title));
 
                 if (this.editable === 'toggle') {
                     this.showCanEditMessage(this.mode === 'display');

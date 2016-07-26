@@ -293,7 +293,9 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
         """
         test entrance exam score. we will hit the method get_entrance_exam_score to verify exam score.
         """
-        with self.assertNumQueries(1):
+        # One query is for getting the list of disabled XBlocks (which is
+        # then stored in the request).
+        with self.assertNumQueries(2):
             exam_score = get_entrance_exam_score(self.request, self.course)
         self.assertEqual(exam_score, 0)
 

@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-07-07 14:15+0000\n"
-"PO-Revision-Date: 2016-07-07 14:15:58.774596\n"
+"POT-Creation-Date: 2016-07-22 10:08+0000\n"
+"PO-Revision-Date: 2016-07-22 10:08:19.302067\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -1312,7 +1312,7 @@ msgid "must be {0} characters or more"
 msgstr ""
 
 #: common/djangoapps/util/password_policy_validators.py
-msgid "must be {0} characters or less"
+msgid "must be {0} characters or fewer"
 msgstr ""
 
 #: common/djangoapps/util/password_policy_validators.py
@@ -3489,6 +3489,16 @@ msgid "Enter the date by which problems are due."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/seq_module.py
+msgid "Hide sequence content After Due Date"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/seq_module.py
+msgid ""
+"If set, the sequence content is hidden for non-staff users after the due "
+"date has passed."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/seq_module.py
 msgid "Is Entrance Exam"
 msgstr ""
 
@@ -3537,16 +3547,6 @@ msgid ""
 msgstr ""
 
 #: common/lib/xmodule/xmodule/seq_module.py
-msgid "Hide Exam Results After Due Date"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/seq_module.py
-msgid ""
-"This setting overrides the default behavior of showing exam results after "
-"the due date has passed. Currently only supported for timed exams."
-msgstr ""
-
-#: common/lib/xmodule/xmodule/seq_module.py
 msgid "Is Practice Exam"
 msgstr ""
 
@@ -3554,6 +3554,20 @@ msgstr ""
 msgid ""
 "This setting indicates whether this exam is for testing purposes only. "
 "Practice exams are not verified."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/seq_module.py
+msgid "This exam is hidden from the learner."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/seq_module.py
+msgid "subsection"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/seq_module.py
+msgid ""
+"Because the due date has passed, this {subsection_format} is hidden from the"
+" learner."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/split_test_module.py
@@ -4604,7 +4618,7 @@ msgstr ""
 msgid "Path to single course checkout page hosted by the E-Commerce service."
 msgstr ""
 
-#: lms/djangoapps/commerce/models.py
+#: lms/djangoapps/commerce/models.py openedx/core/djangoapps/catalog/models.py
 #: openedx/core/djangoapps/credentials/models.py
 #: openedx/core/djangoapps/credit/models.py
 #: openedx/core/djangoapps/programs/models.py
@@ -5232,11 +5246,12 @@ msgid "Sailthru template to use on activation send. "
 msgstr ""
 
 #: lms/djangoapps/email_marketing/models.py
-msgid "Sailthru template to use on abandoned cart reminder. "
+msgid "Sailthru template to use on abandoned cart reminder. Deprecated."
 msgstr ""
 
 #: lms/djangoapps/email_marketing/models.py
-msgid "Sailthru minutes to wait before sending abandoned cart message."
+msgid ""
+"Sailthru minutes to wait before sending abandoned cart message. Deprecated."
 msgstr ""
 
 #: lms/djangoapps/email_marketing/models.py
@@ -5244,11 +5259,11 @@ msgid "Sailthru send template to use on enrolling for audit. "
 msgstr ""
 
 #: lms/djangoapps/email_marketing/models.py
-msgid "Sailthru send template to use on upgrading a course. "
+msgid "Sailthru send template to use on upgrading a course. Deprecated "
 msgstr ""
 
 #: lms/djangoapps/email_marketing/models.py
-msgid "Sailthru send template to use on purchasing a course seat. "
+msgid "Sailthru send template to use on purchasing a course seat. Deprecated "
 msgstr ""
 
 #: lms/djangoapps/email_marketing/models.py
@@ -5261,6 +5276,12 @@ msgstr ""
 
 #: lms/djangoapps/email_marketing/models.py
 msgid "Cost in cents to report to Sailthru for enrolls."
+msgstr ""
+
+#: lms/djangoapps/email_marketing/models.py
+msgid ""
+"Optional lms url scheme + host used to construct urls for content library, "
+"e.g. https://courses.edx.org."
 msgstr ""
 
 #: lms/djangoapps/instructor/paidcourse_enrollment_report.py
@@ -8217,6 +8238,22 @@ msgstr ""
 msgid "Bookmark with usage_id: {usage_id} does not exist."
 msgstr ""
 
+#: openedx/core/djangoapps/catalog/models.py
+msgid "Internal API URL"
+msgstr ""
+
+#: openedx/core/djangoapps/catalog/models.py
+msgid ""
+"API root to be used for server-to-server requests (e.g., https://catalog-"
+"internal.example.com/api/v1/)."
+msgstr ""
+
+#: openedx/core/djangoapps/catalog/models.py
+msgid ""
+"Specified in seconds. Enable caching of API responses by setting this to a "
+"value greater than 0."
+msgstr ""
+
 #: openedx/core/djangoapps/course_groups/cohorts.py
 msgid "Default Group"
 msgstr ""
@@ -9303,6 +9340,7 @@ msgstr ""
 
 #: cms/templates/studio_xblock_wrapper.html lms/templates/help_modal.html
 #: lms/templates/module-error.html
+#: lms/templates/instructor/instructor_dashboard_2/certificates.html
 msgid "Details"
 msgstr ""
 
@@ -9343,11 +9381,6 @@ msgstr ""
 #: cms/templates/widgets/header.html lms/templates/help_modal.html
 #: lms/templates/static_templates/help.html wiki/plugins/help/wiki_plugin.py
 msgid "Help"
-msgstr ""
-
-#: cms/templates/widgets/header.html lms/templates/user_dropdown.html
-#: themes/red-theme/lms/templates/header.html
-msgid "Sign Out"
 msgstr ""
 
 #: cms/templates/widgets/sock.html
@@ -9404,6 +9437,19 @@ msgstr ""
 #: themes/edx.org/cms/templates/widgets/sock.html
 #: themes/stanford-style/lms/templates/static_templates/about.html
 msgid "Contact Us"
+msgstr ""
+
+#: cms/templates/widgets/user_dropdown.html lms/templates/user_dropdown.html
+msgid "Usermenu"
+msgstr ""
+
+#: cms/templates/widgets/user_dropdown.html lms/templates/user_dropdown.html
+msgid "Usermenu dropdown"
+msgstr ""
+
+#: cms/templates/widgets/user_dropdown.html lms/templates/user_dropdown.html
+#: themes/red-theme/lms/templates/header.html
+msgid "Sign Out"
 msgstr ""
 
 #: common/lib/capa/capa/templates/codeinput.html
@@ -9787,6 +9833,17 @@ msgstr ""
 
 #: lms/templates/help_modal.html
 msgid "Please try again later."
+msgstr ""
+
+#: lms/templates/hidden_content.html
+msgid "The due date for this {subsection_format} has passed."
+msgstr ""
+
+#: lms/templates/hidden_content.html
+msgid ""
+"Because the due date has passed, this {subsection_format} is no longer "
+"available.{line_break}If you have completed this {subsection_format}, your "
+"grade is available on the {link_start}progress page{link_end}."
 msgstr ""
 
 #: lms/templates/imageannotation.html
@@ -10365,10 +10422,6 @@ msgid ""
 msgstr ""
 
 #: lms/templates/seq_module.html
-msgid "This exam is hidden from the learner."
-msgstr ""
-
-#: lms/templates/seq_module.html
 msgid "Previous"
 msgstr ""
 
@@ -10654,6 +10707,7 @@ msgstr ""
 
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 #: lms/templates/ccx/schedule.html
+#: lms/templates/instructor/instructor_dashboard_2/certificates.html
 msgid "Date"
 msgstr ""
 
@@ -10709,14 +10763,6 @@ msgstr ""
 
 #: lms/templates/user_dropdown.html themes/red-theme/lms/templates/header.html
 msgid "Dashboard for:"
-msgstr ""
-
-#: lms/templates/user_dropdown.html
-msgid "Usermenu"
-msgstr ""
-
-#: lms/templates/user_dropdown.html
-msgid "Usermenu dropdown"
 msgstr ""
 
 #: lms/templates/user_dropdown.html
@@ -11437,6 +11483,8 @@ msgstr ""
 msgid "Decimals"
 msgstr ""
 
+#. Translators: This refers to mathematical operators such as `plus`, `minus`,
+#. `division` and others.
 #: lms/templates/calculator/toggle_calculator.html
 msgid "Operators"
 msgstr ""
@@ -11455,18 +11503,16 @@ msgstr ""
 msgid "|| (parallel resistors)"
 msgstr ""
 
-#: lms/templates/calculator/toggle_calculator.html
-msgid "Greek letters"
-msgstr ""
-
-#: lms/templates/calculator/toggle_calculator.html
-msgid "Name of letter"
-msgstr ""
-
+#. Translators: This refers to symbols that are mathematical constants, such
+#. as
+#. "i" (square root of -1)
 #: lms/templates/calculator/toggle_calculator.html
 msgid "Constants"
 msgstr ""
 
+#. Translators: This refers to symbols that appear at the end of a number,
+#. such
+#. as the percent sign (%) and metric affixes
 #: lms/templates/calculator/toggle_calculator.html
 msgid "Affixes"
 msgstr ""
@@ -11475,10 +11521,13 @@ msgstr ""
 msgid "Percent sign (%) and metric affixes (d, c, m, u, n, p, k, M, G, T)"
 msgstr ""
 
+#. Translators: This refers to basic mathematical functions such as "square
+#. root"
 #: lms/templates/calculator/toggle_calculator.html
 msgid "Basic functions"
 msgstr ""
 
+#. Translators: This refers to mathematical Sine, Cosine and Tan
 #: lms/templates/calculator/toggle_calculator.html
 msgid "Trigonometric functions"
 msgstr ""
@@ -12266,31 +12315,6 @@ msgid "Course Progress for Student '{username}' ({email})"
 msgstr ""
 
 #: lms/templates/courseware/progress.html
-msgid "Your enrollment: Audit track"
-msgstr ""
-
-#: lms/templates/courseware/progress.html
-msgid ""
-"You are enrolled in the audit track for this course. The audit track does "
-"not include a certificate."
-msgstr ""
-
-#: lms/templates/courseware/progress.html
-msgid ""
-"Your certificate has been invalidated. Please contact your course team if "
-"you have any questions."
-msgstr ""
-
-#: lms/templates/courseware/progress.html
-msgid "Your certificate is available"
-msgstr ""
-
-#: lms/templates/courseware/progress.html
-msgid ""
-"You can keep working for a higher grade, or request your certificate now."
-msgstr ""
-
-#: lms/templates/courseware/progress.html
 msgid "View certificate in a new browser window or tab."
 msgstr ""
 
@@ -12304,40 +12328,6 @@ msgstr ""
 
 #: lms/templates/courseware/progress.html
 msgid "Download Your Certificate"
-msgstr ""
-
-#. Translators: This message appears to users when the system is processessing
-#. course certificates, which can take a few hours.
-#: lms/templates/courseware/progress.html
-msgid "We're working on it..."
-msgstr ""
-
-#: lms/templates/courseware/progress.html
-msgid ""
-"We're creating your certificate. You can keep working in your courses and a "
-"link to it will appear here and on your Dashboard when it is ready."
-msgstr ""
-
-#. Translators: This message appears to users when the users have not
-#. completed
-#. identity verification.
-#: lms/templates/courseware/progress.html
-msgid "Certificate unavailable"
-msgstr ""
-
-#: lms/templates/courseware/progress.html
-msgid ""
-"You have not received a certificate because you do not have a current "
-"{platform_name} verified identity. "
-msgstr ""
-
-#: lms/templates/courseware/progress.html
-#: lms/templates/dashboard/_dashboard_certificate_information.html
-msgid "Verify your identity now."
-msgstr ""
-
-#: lms/templates/courseware/progress.html
-msgid "Congratulations, you qualified for a certificate!"
 msgstr ""
 
 #: lms/templates/courseware/progress.html
@@ -12526,6 +12516,10 @@ msgstr ""
 msgid ""
 "Your certificate was not issued because you do not have a current verified "
 "identity with {platform_name}. "
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_certificate_information.html
+msgid "Verify your identity now."
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
@@ -13859,6 +13853,10 @@ msgid ""
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
+msgid "Choose learner types for regeneration"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/certificates.html
 msgid ""
 "Regenerate for learners who have already received certificates. ({count})"
 msgstr ""
@@ -13873,6 +13871,10 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
 msgid "Certificate Generation History"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/certificates.html
+msgid "Task name"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
@@ -13895,8 +13897,6 @@ msgstr ""
 msgid "Enrollment Information"
 msgstr ""
 
-#. Translators: 'track' refers to the enrollment type ('honor', 'verified', or
-#. 'audit')
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Number of enrollees (admins, staff, and students) by track"
 msgstr ""
@@ -16921,7 +16921,7 @@ msgstr ""
 
 #: cms/templates/course_outline.html
 msgid ""
-"No course content is currently visible, and no students are enrolled. Be "
+"No course content is currently visible, and no learners are enrolled. Be "
 "sure to review and reset all dates, including the Course Start Date; set up "
 "the course team; review course updates and other assets for dated material; "
 "and seed the discussions and wiki."
@@ -17035,6 +17035,10 @@ msgid "Drag sections, subsections, and units to new locations in the outline."
 msgstr ""
 
 #: cms/templates/course_outline.html
+msgid "Learn more about the course outline"
+msgstr ""
+
+#: cms/templates/course_outline.html
 msgid "Setting release dates and grading policies"
 msgstr ""
 
@@ -17046,7 +17050,11 @@ msgid ""
 msgstr ""
 
 #: cms/templates/course_outline.html
-msgid "Changing the content students see"
+msgid "Learn more about grading policy settings"
+msgstr ""
+
+#: cms/templates/course_outline.html
+msgid "Changing the content learners see"
 msgstr ""
 
 #: cms/templates/course_outline.html
@@ -17057,12 +17065,22 @@ msgstr ""
 
 #: cms/templates/course_outline.html
 msgid ""
-"To hide content from students, select the Configure icon for a section, "
-"subsection, or unit, then select {em_start}Hide from students{em_end}."
+"To make a section, subsection, or unit unavailable to learners, select the "
+"Configure icon for that level, then select the appropriate "
+"{em_start}Hide{em_end} option. Grades for hidden sections, subsections, and "
+"units are not included in grade calculations."
 msgstr ""
 
 #: cms/templates/course_outline.html
-msgid "Learn more about the course outline"
+msgid ""
+"To hide the content of a subsection from learners after the subsection due "
+"date has passed, select the Configure icon for a subsection, then select "
+"{em_start}Hide content after due date{em_end}. Grades for the subsection "
+"remain included in grade calculations."
+msgstr ""
+
+#: cms/templates/course_outline.html
+msgid "Learn more about content visibility settings"
 msgstr ""
 
 #. Translators: Pages refer to the tabs that appear in the top navigation of
@@ -17900,7 +17918,7 @@ msgstr ""
 msgid "Learn more about importing a course"
 msgstr ""
 
-#: cms/templates/index.html cms/templates/widgets/header.html
+#: cms/templates/index.html cms/templates/widgets/user_dropdown.html
 msgid "{studio_name} Home"
 msgstr ""
 
@@ -19373,15 +19391,15 @@ msgid "Current Library:"
 msgstr ""
 
 #: cms/templates/widgets/header.html
+msgid "Language preference"
+msgstr ""
+
+#: cms/templates/widgets/header.html
 msgid "Account Navigation"
 msgstr ""
 
 #: cms/templates/widgets/header.html
 msgid "Contextual Online Help"
-msgstr ""
-
-#: cms/templates/widgets/header.html
-msgid "Currently signed in as:"
 msgstr ""
 
 #: cms/templates/widgets/metadata-edit.html
@@ -19446,6 +19464,10 @@ msgstr ""
 
 #: cms/templates/widgets/tabs-aggregator.html
 msgid "name"
+msgstr ""
+
+#: cms/templates/widgets/user_dropdown.html
+msgid "Currently signed in as:"
 msgstr ""
 
 #: wiki/forms.py

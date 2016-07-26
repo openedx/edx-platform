@@ -555,7 +555,6 @@ from openedx.core.lib.rooted_paths import rooted_glob
 PIPELINE_CSS = {
     'style-vendor': {
         'source_filenames': [
-            'js/vendor/afontgarde/afontgarde.css',
             'css/vendor/normalize.css',
             'css/vendor/font-awesome.css',
             'css/vendor/html5-input-polyfills/number-polyfill.css',
@@ -604,12 +603,6 @@ PIPELINE_CSS = {
             'css/studio-main-v2-rtl.css',
         ],
         'output_filename': 'css/studio-main-v2-rtl.css',
-    },
-    'style-edx-icons': {
-        'source_filenames': [
-            'css/edx-icons.css',
-        ],
-        'output_filename': 'css/edx-icons.css',
     },
     'style-xmodule-annotations': {
         'source_filenames': [
@@ -833,6 +826,9 @@ INSTALLED_APPS = (
     'openedx.core.djangoapps.course_groups',  # not used in cms (yet), but tests run
     'openedx.core.djangoapps.coursetalk',  # not used in cms (yet), but tests run
     'xblock_config',
+
+    # Maintenance tools
+    'maintenance',
 
     # Tracking
     'track',

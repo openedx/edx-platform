@@ -29,6 +29,7 @@
 # Hudson Martins dos Santos <p4p4l3gu4x@gmail.com>, 2015
 # javiercencig <javier@jecnet.com.br>, 2014
 # Jefferson Floyd Conz, 2014
+# Kaio Vinícius Vilerá <kaiovilera@gmail.com>, 2016
 # Kayo Leone Dias Perim <kayo_2008_@hotmail.com>, 2014
 # Kevin Grist <kgrist@localconcept.com>, 2014
 # Leonardo Flores Zambaldi <fzleonardo@gmail.com>, 2014
@@ -172,6 +173,7 @@
 # Monica Farias <monifar.tp@gmail.com>, 2015-2016
 # Renata Barboza-Murray, 2015
 # Ricardo Pietrobon <pietr007@gmail.com>, 2014
+# Rodrigo Mozelli <romozelli@outlook.com>, 2016
 # Victor Hochgreb de Freitas <victorfeec@gmail.com>, 2015
 # Victor Hochgreb de Freitas <victorhochgreb@gmail.com>, 2015
 # Willian Pascoal <willianpascoal@protonmail.com>, 2016
@@ -179,9 +181,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-06-30 15:59+0000\n"
-"PO-Revision-Date: 2016-05-11 19:11+0000\n"
-"Last-Translator: Willian Pascoal <willianpascoal@protonmail.com>\n"
+"POT-Creation-Date: 2016-07-15 14:47+0000\n"
+"PO-Revision-Date: 2016-07-08 23:20+0000\n"
+"Last-Translator: Rodrigo Mozelli <romozelli@outlook.com>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/open-edx/edx-platform/language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -2863,14 +2865,9 @@ msgstr ""
 msgid "My Team"
 msgstr "Minha equipe"
 
-#. Translators: sr_start and sr_end surround text meant only for screen
-#. readers.
-#. The whole string will be shown to users as "Browse teams" if they are using
-#. a
-#. screenreader, and "Browse" otherwise.
-#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
-msgid "Browse {sr_start} teams {sr_end}"
-msgstr ""
+#: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
+msgid "Browse"
+msgstr "Navegar"
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "Your request could not be completed. Reload the page and try again."
@@ -4001,10 +3998,6 @@ msgstr "Não foi possível encontrar resultados para \"%s\"."
 #: lms/templates/search/search_error.underscore
 msgid "There was an error, try searching again."
 msgstr "Ocorreu um erro, tente realizar a busca novamente."
-
-#: lms/static/js/edxnotes/plugins/accessibility.js
-msgid "Focus grabber"
-msgstr "Centro de atenção"
 
 #: lms/static/js/edxnotes/views/notes_visibility_factory.js
 #: lms/static/js/edxnotes/views/search_box.js
@@ -7008,10 +7001,6 @@ msgstr ""
 " exceção no segundo campo separado por vírgula. "
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
-msgid "Browse"
-msgstr "Navegar"
-
-#: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list-editor.underscore
 msgid "Add to Exception List"
 msgstr "Adicionar a Lista de Exceção"
@@ -7382,7 +7371,7 @@ msgid "Coming Soon"
 msgstr ""
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
-msgid "Enrollment Opens"
+msgid "Enrollment Opens on"
 msgstr ""
 
 #: lms/templates/learner_dashboard/empty_programs_list.underscore
@@ -7428,6 +7417,16 @@ msgstr ""
 
 #: lms/templates/learner_dashboard/program_header_view.underscore
 msgid "Programs"
+msgstr ""
+
+#: lms/templates/learner_dashboard/upgrade_message.underscore
+msgid ""
+"You need a certificate in this course to be eligible for a program "
+"certificate."
+msgstr ""
+
+#: lms/templates/learner_dashboard/upgrade_message.underscore
+msgid "Upgrade Now"
 msgstr ""
 
 #: lms/templates/search/course_search_results.underscore

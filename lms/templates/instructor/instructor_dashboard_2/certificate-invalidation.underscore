@@ -3,9 +3,16 @@
 </p>
 
 <div class="add-certificate-invalidation">
-    <input class='student-username-or-email' id="certificate-invalidation-user" type="text" placeholder="<%- gettext('Username or email address') %>" aria-describedby='student-user-name-or-email-tip'>
-    <textarea class='notes-field' id="certificate-invalidation-notes" rows="10" placeholder="<%- gettext('Add notes about this learner') %>" aria-describedby='notes-field-tip'></textarea>
+    <div>
+        <label for="certificate-invalidation-user"><%- gettext('Username or email address') %></label>
+        <input class="student-username-or-email" id="certificate-invalidation-user" type="text">
+    </div>
+    <div>
+        <label for="certificate-invalidation-notes"><%- gettext('Add notes about this learner') %></label>
+        <textarea class="notes-field" id="certificate-invalidation-notes" rows="10"></textarea>
+    </div>
     <br/>
+    
     <button type="button" class="btn-blue" id="invalidate-certificate"><%- gettext('Invalidate Certificate') %></button>
 </div>
 

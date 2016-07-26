@@ -33,19 +33,18 @@
             };
 
             ThreadResponseShowView.prototype.renderTemplate = function() {
-                var context;
-                this.template = _.template($("#thread-response-show-template").html());
-                context = _.extend({
-                    cid: this.model.cid,
-                    author_display: this.getAuthorDisplay(),
-                    endorser_display: this.getEndorserDisplay(),
-                    readOnly: $('.discussion-module').data('read-only')
-                }, this.model.attributes);
-                return this.template(context);
+                var template = edx.HtmlUtils.template($("#thread-response-show-template").html()),
+                    context = _.extend({
+                        cid: this.model.cid,
+                        author_display: this.getAuthorDisplay(),
+                        endorser_display: this.getEndorserDisplay(),
+                        readOnly: $('.discussion-module').data('read-only')
+                    }, this.model.attributes);
+                return template(context);
             };
 
             ThreadResponseShowView.prototype.render = function() {
-                this.$el.html(this.renderTemplate());
+                edx.HtmlUtils.setHtml(this.$el, this.renderTemplate());
                 this.delegateEvents();
                 this.renderAttrs();
                 this.$el.find(".posted-details .timeago").timeago();
@@ -54,12 +53,7 @@
             };
 
             ThreadResponseShowView.prototype.convertMath = function() {
-                var element;
-                element = this.$(".response-body");
-                element.html(DiscussionUtil.postMathJaxProcessor(DiscussionUtil.markdownWithHighlight(element.text())));
-                if (typeof MathJax !== "undefined" && MathJax !== null) {
-                    return MathJax.Hub.Queue(["Typeset", MathJax.Hub, element[0]]);
-                }
+                DiscussionUtil.convertMath(this.$(".response-body"));
             };
 
             ThreadResponseShowView.prototype.edit = function(event) {

@@ -5,8 +5,8 @@
 # 
 # Translators:
 # bossnm11 <bossnm11@gmail.com>, 2014
-# Hongseob Lee <shevious@gmail.com>, 2015
-# Hongseob Lee <shevious@yahoo.com>, 2015
+# kmooc <shevious@gmail.com>, 2015
+# shevious <shevious@yahoo.com>, 2015
 # Jong-Dae Park <jdpark7@gmail.com>, 2013
 # jeon <bluerespect@nate.com>, 2014
 # Jong-Dae Park <jdpark7@gmail.com>, 2013
@@ -22,8 +22,8 @@
 # Translators:
 # bossnm11 <bossnm11@gmail.com>, 2014
 # mariana1201 <gogo3135@naver.com>, 2014
-# Hongseob Lee <shevious@gmail.com>, 2015
-# Hongseob Lee <shevious@yahoo.com>, 2015
+# kmooc <shevious@gmail.com>, 2015
+# shevious <shevious@yahoo.com>, 2015
 # Hongseob Lee <shevreg@yahoo.com>, 2015
 # Jong-Dae Park <jdpark7@gmail.com>, 2013
 # jeon <bluerespect@nate.com>, 2014-2015
@@ -38,8 +38,8 @@
 # bossnm11 <bossnm11@gmail.com>, 2014
 # Chul Park <parkchul@nate.com>, 2015
 # mariana1201 <gogo3135@naver.com>, 2014
-# Hongseob Lee <shevious@gmail.com>, 2015-2016
-# Hongseob Lee <shevious@yahoo.com>, 2015
+# kmooc <shevious@gmail.com>, 2015-2016
+# shevious <shevious@yahoo.com>, 2015
 # Hongseob Lee <shevreg@yahoo.com>, 2015
 # Jong-Dae Park <jdpark7@gmail.com>, 2013
 # jeon <bluerespect@nate.com>, 2014-2015
@@ -57,8 +57,8 @@
 # Pope, 2014
 # bossnm11 <bossnm11@gmail.com>, 2014
 # KimKyudong <choemh@nate.com>, 2014
-# Hongseob Lee <shevious@gmail.com>, 2015-2016
-# Hongseob Lee <shevious@yahoo.com>, 2015
+# kmooc <shevious@gmail.com>, 2015-2016
+# shevious <shevious@yahoo.com>, 2015
 # Jong-Dae Park <jdpark7@gmail.com>, 2013
 # jeon <bluerespect@nate.com>, 2014-2015
 # Chanseok <kcsgoodboy@gmail.com>, 2014
@@ -74,8 +74,8 @@
 # bossnm11 <bossnm11@gmail.com>, 2014
 # David10000 <gameness@naver.com>, 2014
 # Gil <gedwarp@gmail.com>, 2014
-# Hongseob Lee <shevious@gmail.com>, 2015
-# Hongseob Lee <shevious@yahoo.com>, 2015
+# kmooc <shevious@gmail.com>, 2015
+# shevious <shevious@yahoo.com>, 2015
 # Chanseok <kcsgoodboy@gmail.com>, 2014
 # Kevin Min <gr326887@graded.br>, 2015
 # Nicole <dlruddk1112@gmail.com>, 2014
@@ -84,7 +84,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-06-30 16:00+0000\n"
+"POT-Creation-Date: 2016-07-15 14:48+0000\n"
 "PO-Revision-Date: 2016-05-09 11:27+0000\n"
 "Last-Translator: Sarina Canelake <sarina@edx.org>\n"
 "Language-Team: Korean (Korea) (http://www.transifex.com/open-edx/edx-platform/language/ko_KR/)\n"
@@ -4586,7 +4586,7 @@ msgstr ""
 msgid "Path to single course checkout page hosted by the E-Commerce service."
 msgstr ""
 
-#: lms/djangoapps/commerce/models.py
+#: lms/djangoapps/commerce/models.py openedx/core/djangoapps/catalog/models.py
 #: openedx/core/djangoapps/credentials/models.py
 #: openedx/core/djangoapps/credit/models.py
 #: openedx/core/djangoapps/programs/models.py
@@ -4712,10 +4712,6 @@ msgstr ""
 
 #: lms/djangoapps/courseware/date_summary.py
 msgid "in {relative} - {absolute}"
-msgstr ""
-
-#: lms/djangoapps/courseware/date_summary.py
-msgid "UTC"
 msgstr ""
 
 #: lms/djangoapps/courseware/date_summary.py
@@ -8141,6 +8137,22 @@ msgstr ""
 msgid "Bookmark with usage_id: {usage_id} does not exist."
 msgstr ""
 
+#: openedx/core/djangoapps/catalog/models.py
+msgid "Internal API URL"
+msgstr ""
+
+#: openedx/core/djangoapps/catalog/models.py
+msgid ""
+"API root to be used for server-to-server requests (e.g., https://catalog-"
+"internal.example.com/api/v1/)."
+msgstr ""
+
+#: openedx/core/djangoapps/catalog/models.py
+msgid ""
+"Specified in seconds. Enable caching of API responses by setting this to a "
+"value greater than 0."
+msgstr ""
+
 #: openedx/core/djangoapps/course_groups/cohorts.py
 msgid "Default Group"
 msgstr ""
@@ -8413,6 +8425,10 @@ msgstr ""
 msgid ""
 "Value '{preference_value}' not valid for preference '{preference_key}': Not "
 "in timezone set."
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/preferences/api.py
+msgid "Value '{preference_value}' is not a valid time zone selection."
 msgstr ""
 
 #: openedx/core/djangoapps/user_api/preferences/api.py
@@ -9210,6 +9226,7 @@ msgstr "학습 시간 및 선수 강좌"
 
 #: cms/templates/studio_xblock_wrapper.html lms/templates/help_modal.html
 #: lms/templates/module-error.html
+#: lms/templates/instructor/instructor_dashboard_2/certificates.html
 msgid "Details"
 msgstr "세부사항"
 
@@ -9947,6 +9964,7 @@ msgstr "{platform_name} 서버에서 오류가 발생했습니다."
 
 #: lms/templates/module-error.html
 #: lms/templates/courseware/courseware-error.html
+#: lms/templates/courseware/error-message.html
 msgid ""
 "We're sorry, this module is temporarily unavailable. Our staff is working to"
 " fix it as soon as possible. Please email us at {tech_support_email} to "
@@ -10576,6 +10594,7 @@ msgstr "오류"
 
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 #: lms/templates/ccx/schedule.html
+#: lms/templates/instructor/instructor_dashboard_2/certificates.html
 msgid "Date"
 msgstr "날짜"
 
@@ -12054,6 +12073,10 @@ msgid "Course Material"
 msgstr "학습 자료"
 
 #: lms/templates/courseware/course_updates.html
+msgid "All course updates"
+msgstr ""
+
+#: lms/templates/courseware/course_updates.html
 msgid "Hide"
 msgstr "감추기"
 
@@ -12115,15 +12138,6 @@ msgstr ""
 #: lms/templates/courseware/courseware.html
 msgid "Your score is {current_score}%. You have passed the entrance exam."
 msgstr "현재 점수는 {current_score}%입니다. 사전 평가를 통과하였습니다."
-
-#: lms/templates/courseware/error-message.html
-msgid ""
-"We're sorry, this module is temporarily unavailable. Our staff is working to"
-" fix it as soon as possible. Please email us at {link_to_support_email} to "
-"report any problems or downtime."
-msgstr ""
-"죄송합니다. 이 모듈을 일시적으로 사용할 수 없습니다. 담당 직원이 가능한 빨리 고치려고 작업중입니다. "
-"{link_to_support_email} 에 문제나 중지를 보고하기 위해 이메일 주십시오."
 
 #: lms/templates/courseware/gradebook.html
 msgid "Gradebook"
@@ -12208,21 +12222,6 @@ msgid "Course Progress for Student '{username}' ({email})"
 msgstr "'{username}' ({email})의 학습 진행 상황"
 
 #: lms/templates/courseware/progress.html
-msgid ""
-"Your certificate has been invalidated. Please contact your course team if "
-"you have any questions."
-msgstr ""
-
-#: lms/templates/courseware/progress.html
-msgid "Your certificate is available"
-msgstr "강좌 이수증이 준비되었습니다."
-
-#: lms/templates/courseware/progress.html
-msgid ""
-"You can keep working for a higher grade, or request your certificate now."
-msgstr "더 높은 성적을 받기 위해 계속 하거나, 지금 이수증을 신청할 수도 있습니다. "
-
-#: lms/templates/courseware/progress.html
 msgid "View certificate in a new browser window or tab."
 msgstr "새 브라우저 창/탭에서 강좌 이수증이 열립니다."
 
@@ -12237,42 +12236,6 @@ msgstr "PDF는 새로운 브라우져 창 혹은 탭에 열릴 것입니다."
 #: lms/templates/courseware/progress.html
 msgid "Download Your Certificate"
 msgstr "강좌 이수증 다운로드하기"
-
-#. Translators: This message appears to users when the system is processessing
-#. course certificates, which can take a few hours.
-#: lms/templates/courseware/progress.html
-msgid "We're working on it..."
-msgstr "작업중입니다."
-
-#: lms/templates/courseware/progress.html
-msgid ""
-"We're creating your certificate. You can keep working in your courses and a "
-"link to it will appear here and on your Dashboard when it is ready."
-msgstr ""
-"강좌 이수증을 생성하고 있습니다. 강좌를 계속 학습할 수 있으며, 이수증 생성이 완료되면 대시보드의 지금 이 영역에서 링크가 나타날 "
-"것입니다. "
-
-#. Translators: This message appears to users when the users have not
-#. completed
-#. identity verification.
-#: lms/templates/courseware/progress.html
-msgid "Certificate unavailable"
-msgstr ""
-
-#: lms/templates/courseware/progress.html
-msgid ""
-"You have not received a certificate because you do not have a current "
-"{platform_name} verified identity. "
-msgstr ""
-
-#: lms/templates/courseware/progress.html
-#: lms/templates/dashboard/_dashboard_certificate_information.html
-msgid "Verify your identity now."
-msgstr ""
-
-#: lms/templates/courseware/progress.html
-msgid "Congratulations, you qualified for a certificate!"
-msgstr "축하합니다. 당신은 강좌 이수증을 받기 위한 조건을 모두 충족하였습니다. "
 
 #: lms/templates/courseware/progress.html
 msgid "Request Certificate"
@@ -12472,6 +12435,10 @@ msgid ""
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
+msgid "Verify your identity now."
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid "Your {cert_name_short} is Generating"
 msgstr "{cert_name_short}이 만들어지고 있습니다."
 
@@ -12528,6 +12495,10 @@ msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "{category} Program Course"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Course details"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
@@ -13855,6 +13826,10 @@ msgid "Certificate Generation History"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
+msgid "Task name"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/certificates.html
 msgid "SET CERTIFICATE EXCEPTIONS"
 msgstr ""
 
@@ -13874,8 +13849,6 @@ msgstr ""
 msgid "Enrollment Information"
 msgstr "등록 정보"
 
-#. Translators: 'track' refers to the enrollment type ('honor', 'verified', or
-#. 'audit')
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Number of enrollees (admins, staff, and students) by track"
 msgstr "유형별 (관리자, 운영팀, 학습자)  등록 인원"

@@ -5,12 +5,11 @@ The Files and Uploads page for a course in Studio
 import urllib
 import os
 from opaque_keys.edx.locator import CourseLocator
-from . import BASE_URL
-from .course_page import CoursePage
-from bok_choy.javascript import wait_for_js, requirejs
+from common.test.acceptance.pages.studio import BASE_URL
+from common.test.acceptance.pages.studio.course_page import CoursePage
+from bok_choy.javascript import wait_for_js
 
 
-@requirejs('js/views/assets')
 class AssetIndexPage(CoursePage):
 
     """

@@ -94,16 +94,16 @@
 # Mohamed Ibrahim <root.php@hotmail.com>, 2015
 # wd3bbas <mohed.alabbas@gmail.com>, 2014
 # Nabeel El-Dughailib <nabeel@qordoba.com>, 2014-2015
-# omarithawi <oithawi@qrf.org>, 2015
+# omarithawi <oithawi@qrf.org>, 2015-2016
 # Saramami.mami <saramami.mami@yahoo.com>, 2014
 # Soha Assali <soha+transifex@qordoba.com>, 2015-2016
 msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-06-30 15:59+0000\n"
-"PO-Revision-Date: 2016-05-22 10:46+0000\n"
-"Last-Translator: Ahmed Jazzar <ajazzar@qrf.org>\n"
+"POT-Creation-Date: 2016-07-15 14:47+0000\n"
+"PO-Revision-Date: 2016-07-21 02:37+0000\n"
+"Last-Translator: omarithawi <oithawi@qrf.org>\n"
 "Language-Team: Arabic (http://www.transifex.com/open-edx/edx-platform/language/ar/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -2858,14 +2858,9 @@ msgstr ""
 msgid "My Team"
 msgstr "فريقي"
 
-#. Translators: sr_start and sr_end surround text meant only for screen
-#. readers.
-#. The whole string will be shown to users as "Browse teams" if they are using
-#. a
-#. screenreader, and "Browse" otherwise.
-#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
-msgid "Browse {sr_start} teams {sr_end}"
-msgstr ""
+#: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
+msgid "Browse"
+msgstr "تصفّح"
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "Your request could not be completed. Reload the page and try again."
@@ -4008,10 +4003,6 @@ msgstr "عذرًا، لم نجد أي نتائج لـ\"%s\"."
 #: lms/templates/search/search_error.underscore
 msgid "There was an error, try searching again."
 msgstr "نأسف لحدوث خطأ، يُرجى إعادة البحث مجدّدًا."
-
-#: lms/static/js/edxnotes/plugins/accessibility.js
-msgid "Focus grabber"
-msgstr "ضابط التركيز"
 
 #: lms/static/js/edxnotes/views/notes_visibility_factory.js
 #: lms/static/js/edxnotes/views/search_box.js
@@ -7047,10 +7038,6 @@ msgstr ""
 " ملاحظة اختيارية تصف سبب منح الاستثناء في الحقل الثاني المفصول بفاصلة. "
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
-msgid "Browse"
-msgstr "تصفّح"
-
-#: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list-editor.underscore
 msgid "Add to Exception List"
 msgstr "إضف إلى لائحة الاستثناءات"
@@ -7430,7 +7417,7 @@ msgid "Coming Soon"
 msgstr ""
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
-msgid "Enrollment Opens"
+msgid "Enrollment Opens on"
 msgstr ""
 
 #: lms/templates/learner_dashboard/empty_programs_list.underscore
@@ -7479,6 +7466,16 @@ msgstr ""
 #: lms/templates/learner_dashboard/program_header_view.underscore
 msgid "Programs"
 msgstr "البرامج"
+
+#: lms/templates/learner_dashboard/upgrade_message.underscore
+msgid ""
+"You need a certificate in this course to be eligible for a program "
+"certificate."
+msgstr ""
+
+#: lms/templates/learner_dashboard/upgrade_message.underscore
+msgid "Upgrade Now"
+msgstr ""
 
 #: lms/templates/search/course_search_results.underscore
 #: lms/templates/search/dashboard_search_results.underscore
@@ -8718,7 +8715,7 @@ msgstr "امتحان مراقَب"
 
 #: cms/templates/js/course-outline.underscore
 msgid "Timed Exam"
-msgstr "امتحان محدَّد التوقيت"
+msgstr "امتحان موقوت"
 
 #: cms/templates/js/course-outline.underscore
 #: cms/templates/js/xblock-outline.underscore

@@ -6,10 +6,12 @@ import logging
 
 from xblockutils.resources import ResourceLoader
 from xblockutils.studio_editable import StudioEditableXBlockMixin
+from xmodule.raw_module import RawDescriptor
 
 from xblock.core import XBlock
 from xblock.fields import Scope, String, UNIQUE_ID
 from xblock.fragment import Fragment
+from xmodule.xml_module import XmlParserMixin
 
 log = logging.getLogger(__name__)
 loader = ResourceLoader(__name__)  # pylint: disable=invalid-name
@@ -24,11 +26,11 @@ def _(text):
 
 @XBlock.needs('user')
 @XBlock.needs('i18n')
-class DiscussionXBlock(XBlock, StudioEditableXBlockMixin):
+class DiscussionXBlock(XBlock, StudioEditableXBlockMixin, XmlParserMixin):
     """
     Provides a discussion forum that is inline with other content in the courseware.
     """
-    discussion_id = String(scope=Scope.settings, default=UNIQUE_ID, force_export=True)
+    discussion_id = String(scope=Scope.settings, default=UNIQUE_ID)
     display_name = String(
         display_name=_("Display Name"),
         help=_("Display name for this component"),
@@ -58,6 +60,11 @@ class DiscussionXBlock(XBlock, StudioEditableXBlockMixin):
     editable_fields = ["display_name", "discussion_category", "discussion_target"]
 
     has_author_view = True  # Tells Studio to use author_view
+
+    # support for legacy OLX format - consumed by XmlParserMixin.load_metadata
+    metadata_translations = dict(RawDescriptor.metadata_translations)
+    metadata_translations['id'] = 'discussion_id'
+    metadata_translations['for'] = 'discussion_target'
 
     @property
     def course_key(self):
@@ -134,3 +141,55 @@ class DiscussionXBlock(XBlock, StudioEditableXBlockMixin):
         Returns a JSON representation of the student_view of this XBlock.
         """
         return {'topic_id': self.discussion_id}
+
+    @classmethod
+    def parse_xml(cls, node, runtime, keys, id_generator):
+        """
+        Parses OLX into XBlock.
+
+        This method is overridden here to allow parsing legacy OLX, coming from discussion XModule.
+        XBlock stores all the associated data, fields and children in a XML element inlined into vertical XML file
+        XModule stored only minimal data on the element included into vertical XML and used a dedicated "discussion"
+        folder in OLX to store fields and children. Also, some info was put into "policy.json" file.
+
+        If no external data sources are found (file in "discussion" folder), it is exactly equivalent to base method
+        XBlock.parse_xml. Otherwise this method parses file in "discussion" folder (known as definition_xml), applies
+        policy.json and updates fields accordingly.
+        """
+        block = super(DiscussionXBlock, cls).parse_xml(node, runtime, keys, id_generator)
+
+        cls._apply_translations_to_node_attributes(block, node)
+        cls._apply_metadata_and_policy(block, node, runtime)
+
+        return block
+
+    @classmethod
+    def _apply_translations_to_node_attributes(cls, block, node):
+        """
+        Applies metadata translations for attributes stored on an inlined XML element.
+        """
+        for old_attr, target_attr in cls.metadata_translations.iteritems():
+            if old_attr in node.attrib and hasattr(block, target_attr):
+                setattr(block, target_attr, node.attrib[old_attr])
+
+    @classmethod
+    def _apply_metadata_and_policy(cls, block, node, runtime):
+        """
+        Attempt to load definition XML from "discussion" folder in OLX, than parse it and update block fields
+        """
+        try:
+            definition_xml, _ = cls.load_definition_xml(node, runtime, block.scope_ids.def_id)
+        except Exception as err:  # pylint: disable=broad-except
+            log.info(
+                "Exception %s when trying to load definition xml for block %s - assuming XBlock export format",
+                err,
+                block
+            )
+            return
+
+        metadata = cls.load_metadata(definition_xml)
+        cls.apply_policy(metadata, runtime.get_policy(block.scope_ids.usage_id))
+
+        for field_name, value in metadata.iteritems():
+            if field_name in block.fields:
+                setattr(block, field_name, value)

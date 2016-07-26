@@ -140,16 +140,7 @@
                                 url: 'my-teams',
                                 view: this.myTeamsView
                             }, {
-                                title: HtmlUtils.interpolateHtml(
-                                    // Translators: sr_start and sr_end surround text meant only for screen readers.
-                                    // The whole string will be shown to users as "Browse teams" if they are using a
-                                    // screenreader, and "Browse" otherwise.
-                                    gettext('Browse {sr_start} teams {sr_end}'),
-                                    {
-                                        sr_start: HtmlUtils.HTML('<span class="sr">'),
-                                        sr_end: HtmlUtils.HTML('</span>')
-                                    }
-                                ),
+                                title: gettext('Browse'),
                                 url: 'browse',
                                 view: this.topicsView
                             }],

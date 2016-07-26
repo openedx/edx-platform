@@ -13,16 +13,19 @@ import pytz
 from course_modes.models import CourseMode
 from lms.djangoapps.certificates import api as certificate_api
 from lms.djangoapps.commerce.utils import EcommerceService
+from openedx.core.djangoapps.catalog.utils import get_run_marketing_url
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.lib.edx_api_utils import get_edx_api_data
 from student.models import CourseEnrollment
 from util.date_utils import strftime_localized
 from util.organizations_helpers import get_organization_by_short_name
-from xmodule.course_metadata_utils import DEFAULT_START_DATE
 
 
 log = logging.getLogger(__name__)
+
+# The datetime module's strftime() methods require a year >= 1900.
+DEFAULT_ENROLLMENT_START_DATE = datetime.datetime(1900, 1, 1, tzinfo=pytz.UTC)
 
 
 def get_programs(user, program_id=None):
@@ -324,78 +327,110 @@ class ProgramProgressMeter(object):
         return parsed
 
 
-# TODO: This function will benefit from being refactored as a class.
-def supplement_program_data(program_data, user):
-    """Supplement program course codes with CourseOverview and CourseEnrollment data.
+# pylint: disable=missing-docstring
+class ProgramDataExtender(object):
+    """Utility for extending program course codes with CourseOverview and CourseEnrollment data.
 
     Arguments:
         program_data (dict): Representation of a program.
         user (User): The user whose enrollments to inspect.
     """
-    for organization in program_data['organizations']:
+    def __init__(self, program_data, user):
+        self.data = program_data
+        self.user = user
+        self.course_key = None
+        self.course_overview = None
+        self.enrollment_start = None
+
+    def extend(self):
+        """Execute extension handlers, returning the extended data."""
+        self._execute('_extend')
+        return self.data
+
+    def _execute(self, prefix, *args):
+        """Call handlers whose name begins with the given prefix with the given arguments."""
+        [getattr(self, handler)(*args) for handler in self._handlers(prefix)]  # pylint: disable=expression-not-assigned
+
+    @classmethod
+    def _handlers(cls, prefix):
+        """Returns a generator yielding method names beginning with the given prefix."""
+        return (name for name in cls.__dict__ if name.startswith(prefix))
+
+    def _extend_organizations(self):
+        """Execute organization data handlers."""
+        for organization in self.data['organizations']:
+            self._execute('_attach_organization', organization)
+
+    def _extend_run_modes(self):
+        """Execute run mode data handlers."""
+        for course_code in self.data['course_codes']:
+            for run_mode in course_code['run_modes']:
+                # State to be shared across handlers.
+                self.course_key = CourseKey.from_string(run_mode['course_key'])
+                self.course_overview = CourseOverview.get_from_id(self.course_key)
+                self.enrollment_start = self.course_overview.enrollment_start or DEFAULT_ENROLLMENT_START_DATE
+
+                self._execute('_attach_run_mode', run_mode)
+
+    def _attach_organization_logo(self, organization):
         # TODO: Cache the results of the get_organization_by_short_name call so
         # the database is hit less frequently.
         org_obj = get_organization_by_short_name(organization['key'])
         if org_obj and org_obj.get('logo'):
             organization['img'] = org_obj['logo'].url
 
-    for course_code in program_data['course_codes']:
-        for run_mode in course_code['run_modes']:
-            course_key = CourseKey.from_string(run_mode['course_key'])
-            course_overview = CourseOverview.get_from_id(course_key)
+    def _attach_run_mode_certificate_url(self, run_mode):
+        certificate_data = certificate_api.certificate_downloadable_status(self.user, self.course_key)
+        certificate_uuid = certificate_data.get('uuid')
+        run_mode['certificate_url'] = certificate_api.get_certificate_url(
+            course_id=self.course_key,
+            uuid=certificate_uuid,
+        ) if certificate_uuid else None
 
-            course_url = reverse('course_root', args=[course_key])
-            course_image_url = course_overview.course_image_url
+    def _attach_run_mode_course_image_url(self, run_mode):
+        run_mode['course_image_url'] = self.course_overview.course_image_url
 
-            start_date_string = course_overview.start_datetime_text()
-            end_date_string = course_overview.end_datetime_text()
+    def _attach_run_mode_course_url(self, run_mode):
+        run_mode['course_url'] = reverse('course_root', args=[self.course_key])
 
-            end_date = course_overview.end or datetime.datetime.max.replace(tzinfo=pytz.UTC)
-            is_course_ended = end_date < timezone.now()
+    def _attach_run_mode_end_date(self, run_mode):
+        run_mode['end_date'] = self.course_overview.end_datetime_text()
 
-            is_enrolled = CourseEnrollment.is_enrolled(user, course_key)
+    def _attach_run_mode_enrollment_open_date(self, run_mode):
+        run_mode['enrollment_open_date'] = strftime_localized(self.enrollment_start, 'SHORT_DATE')
 
-            enrollment_start = course_overview.enrollment_start or datetime.datetime.min.replace(tzinfo=pytz.UTC)
-            enrollment_end = course_overview.enrollment_end or datetime.datetime.max.replace(tzinfo=pytz.UTC)
-            is_enrollment_open = enrollment_start <= timezone.now() < enrollment_end
+    def _attach_run_mode_is_course_ended(self, run_mode):
+        end_date = self.course_overview.end or datetime.datetime.max.replace(tzinfo=pytz.UTC)
+        run_mode['is_course_ended'] = end_date < timezone.now()
 
-            enrollment_open_date = None if is_enrollment_open else strftime_localized(enrollment_start, 'SHORT_DATE')
+    def _attach_run_mode_is_enrolled(self, run_mode):
+        run_mode['is_enrolled'] = CourseEnrollment.is_enrolled(self.user, self.course_key)
 
-            certificate_data = certificate_api.certificate_downloadable_status(user, course_key)
-            certificate_uuid = certificate_data.get('uuid')
-            certificate_url = certificate_api.get_certificate_url(
-                course_id=course_key,
-                uuid=certificate_uuid,
-            ) if certificate_uuid else None
+    def _attach_run_mode_is_enrollment_open(self, run_mode):
+        enrollment_end = self.course_overview.enrollment_end or datetime.datetime.max.replace(tzinfo=pytz.UTC)
+        run_mode['is_enrollment_open'] = self.enrollment_start <= timezone.now() < enrollment_end
 
-            required_mode_slug = run_mode['mode_slug']
-            enrolled_mode_slug, _ = CourseEnrollment.enrollment_mode_for_user(user, course_key)
-            is_mode_mismatch = required_mode_slug != enrolled_mode_slug
-            is_upgrade_required = is_enrolled and is_mode_mismatch
+    def _attach_run_mode_marketing_url(self, run_mode):
+        run_mode['marketing_url'] = get_run_marketing_url(self.course_key, self.user)
 
+    def _attach_run_mode_start_date(self, run_mode):
+        run_mode['start_date'] = self.course_overview.start_datetime_text()
+
+    def _attach_run_mode_upgrade_url(self, run_mode):
+        required_mode_slug = run_mode['mode_slug']
+        enrolled_mode_slug, _ = CourseEnrollment.enrollment_mode_for_user(self.user, self.course_key)
+        is_mode_mismatch = required_mode_slug != enrolled_mode_slug
+        is_upgrade_required = is_mode_mismatch and CourseEnrollment.is_enrolled(self.user, self.course_key)
+
+        if is_upgrade_required:
             # Requires that the ecommerce service be in use.
-            required_mode = CourseMode.mode_for_course(course_key, required_mode_slug)
+            required_mode = CourseMode.mode_for_course(self.course_key, required_mode_slug)
             ecommerce = EcommerceService()
             sku = getattr(required_mode, 'sku', None)
 
-            if ecommerce.is_enabled(user) and sku:
-                upgrade_url = ecommerce.checkout_page_url(required_mode.sku) if is_upgrade_required else None
+            if ecommerce.is_enabled(self.user) and sku:
+                run_mode['upgrade_url'] = ecommerce.checkout_page_url(required_mode.sku)
             else:
-                upgrade_url = None
-
-            run_mode.update({
-                'certificate_url': certificate_url,
-                'course_image_url': course_image_url,
-                'course_url': course_url,
-                'end_date': end_date_string,
-                'enrollment_open_date': enrollment_open_date,
-                'is_course_ended': is_course_ended,
-                'is_enrolled': is_enrolled,
-                'is_enrollment_open': is_enrollment_open,
-                # TODO: Not currently available on LMS.
-                'marketing_url': None,
-                'start_date': start_date_string,
-                'upgrade_url': upgrade_url,
-            })
-
-    return program_data
+                run_mode['upgrade_url'] = None
+        else:
+            run_mode['upgrade_url'] = None

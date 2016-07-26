@@ -1,7 +1,7 @@
 """
 Tests for instructor_task/models.py.
 """
-
+import copy
 from cStringIO import StringIO
 import time
 
@@ -14,21 +14,6 @@ from common.test.utils import MockS3Mixin
 from instructor_task.models import ReportStore
 from instructor_task.tests.test_base import TestReportMixin
 from opaque_keys.edx.locator import CourseLocator
-
-
-LOCAL_SETTINGS = {
-    'STORAGE_KWARGS': {
-        'location': settings.GRADES_DOWNLOAD['ROOT_PATH'],
-    },
-}
-
-S3_SETTINGS = {
-    'STORAGE_CLASS': 'storages.backends.s3boto.S3BotoStorage',
-    'STORAGE_KWARGS': {
-        'bucket': settings.GRADES_DOWNLOAD['BUCKET'],
-        'location': settings.GRADES_DOWNLOAD['ROOT_PATH'],
-    },
-}
 
 
 class ReportStoreTestMixin(object):
@@ -92,7 +77,6 @@ class S3ReportStoreTestCase(MockS3Mixin, ReportStoreTestMixin, TestReportMixin, 
         return ReportStore.from_config(config_name='GRADES_DOWNLOAD')
 
 
-@override_settings(GRADES_DOWNLOAD=LOCAL_SETTINGS)
 class DjangoStorageReportStoreLocalTestCase(ReportStoreTestMixin, TestReportMixin, SimpleTestCase):
     """
     Test the DjangoStorageReportStore implementation using the local
@@ -103,10 +87,12 @@ class DjangoStorageReportStoreLocalTestCase(ReportStoreTestMixin, TestReportMixi
         Create and return a DjangoStorageReportStore configured to use the
         local filesystem for storage.
         """
-        return ReportStore.from_config(config_name='GRADES_DOWNLOAD')
+        test_settings = copy.deepcopy(settings.GRADES_DOWNLOAD)
+        test_settings['STORAGE_KWARGS'] = {'location': settings.GRADES_DOWNLOAD['ROOT_PATH']}
+        with override_settings(GRADES_DOWNLOAD=test_settings):
+            return ReportStore.from_config(config_name='GRADES_DOWNLOAD')
 
 
-@override_settings(GRADES_DOWNLOAD=S3_SETTINGS)
 class DjangoStorageReportStoreS3TestCase(MockS3Mixin, ReportStoreTestMixin, TestReportMixin, SimpleTestCase):
     """
     Test the DjangoStorageReportStore implementation using S3 stubs.
@@ -116,6 +102,13 @@ class DjangoStorageReportStoreS3TestCase(MockS3Mixin, ReportStoreTestMixin, Test
         Create and return a DjangoStorageReportStore configured to use S3 for
         storage.
         """
-        connection = boto.connect_s3()
-        connection.create_bucket(settings.GRADES_DOWNLOAD['STORAGE_KWARGS']['bucket'])
-        return ReportStore.from_config(config_name='GRADES_DOWNLOAD')
+        test_settings = copy.deepcopy(settings.GRADES_DOWNLOAD)
+        test_settings['STORAGE_CLASS'] = 'storages.backends.s3boto.S3BotoStorage'
+        test_settings['STORAGE_KWARGS'] = {
+            'bucket': settings.GRADES_DOWNLOAD['BUCKET'],
+            'location': settings.GRADES_DOWNLOAD['ROOT_PATH'],
+        }
+        with override_settings(GRADES_DOWNLOAD=test_settings):
+            connection = boto.connect_s3()
+            connection.create_bucket(settings.GRADES_DOWNLOAD['STORAGE_KWARGS']['bucket'])
+            return ReportStore.from_config(config_name='GRADES_DOWNLOAD')

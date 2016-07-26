@@ -795,8 +795,11 @@ def _submit_for_retry(entry_id, email_id, to_list, global_email_context,
         raise retry_task
     except RetryTaskError as retry_error:
         # If the retry call is successful, update with the current progress:
-        log.exception(u'Task %s: email with id %d caused send_course_email task to retry.',
-                      task_id, email_id)
+        log.info(
+            u'Task %s: email with id %d caused send_course_email task to retry again.',
+            task_id,
+            email_id
+        )
         return subtask_status, retry_error
     except Exception as retry_exc:  # pylint: disable=broad-except
         # If there are no more retries, because the maximum has been reached,

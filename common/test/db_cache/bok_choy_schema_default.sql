@@ -809,6 +809,21 @@ CREATE TABLE `bulk_email_target` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `catalog_catalogintegration`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `catalog_catalogintegration` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `change_date` datetime(6) NOT NULL,
+  `enabled` tinyint(1) NOT NULL,
+  `internal_api_url` varchar(200) NOT NULL,
+  `cache_ttl` int(10) unsigned NOT NULL,
+  `changed_by_id` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `catalog_catalogin_changed_by_id_4c786efa531d484b_fk_auth_user_id` (`changed_by_id`),
+  CONSTRAINT `catalog_catalogin_changed_by_id_4c786efa531d484b_fk_auth_user_id` FOREIGN KEY (`changed_by_id`) REFERENCES `auth_user` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `ccx_ccxfieldoverride`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
@@ -1914,7 +1929,7 @@ CREATE TABLE `django_migrations` (
   `name` varchar(255) NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=172 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=175 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_openid_auth_association`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -4655,7 +4670,7 @@ CREATE TABLE `wiki_articlerevision` (
   `revision_number` int(11) NOT NULL,
   `user_message` longtext NOT NULL,
   `automatic_log` longtext NOT NULL,
-  `ip_address` char(15) DEFAULT NULL,
+  `ip_address` char(39) DEFAULT NULL,
   `modified` datetime(6) NOT NULL,
   `created` datetime(6) NOT NULL,
   `deleted` tinyint(1) NOT NULL,
@@ -4695,7 +4710,7 @@ CREATE TABLE `wiki_attachmentrevision` (
   `revision_number` int(11) NOT NULL,
   `user_message` longtext NOT NULL,
   `automatic_log` longtext NOT NULL,
-  `ip_address` char(15) DEFAULT NULL,
+  `ip_address` char(39) DEFAULT NULL,
   `modified` datetime(6) NOT NULL,
   `created` datetime(6) NOT NULL,
   `deleted` tinyint(1) NOT NULL,
@@ -4778,7 +4793,7 @@ CREATE TABLE `wiki_revisionpluginrevision` (
   `revision_number` int(11) NOT NULL,
   `user_message` longtext NOT NULL,
   `automatic_log` longtext NOT NULL,
-  `ip_address` char(15) DEFAULT NULL,
+  `ip_address` char(39) DEFAULT NULL,
   `modified` datetime(6) NOT NULL,
   `created` datetime(6) NOT NULL,
   `deleted` tinyint(1) NOT NULL,
@@ -4913,21 +4928,6 @@ CREATE TABLE `xblock_django_xblockconfiguration` (
   KEY `xblock_django_xbl_changed_by_id_61068ae9f50d6490_fk_auth_user_id` (`changed_by_id`),
   KEY `xblock_django_xblockconfiguration_b068931c` (`name`),
   CONSTRAINT `xblock_django_xbl_changed_by_id_61068ae9f50d6490_fk_auth_user_id` FOREIGN KEY (`changed_by_id`) REFERENCES `auth_user` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-DROP TABLE IF EXISTS `xblock_django_xblockdisableconfig`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `xblock_django_xblockdisableconfig` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `change_date` datetime(6) NOT NULL,
-  `enabled` tinyint(1) NOT NULL,
-  `disabled_blocks` longtext NOT NULL,
-  `changed_by_id` int(11) DEFAULT NULL,
-  `disabled_create_blocks` longtext NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `xblock_django_xbl_changed_by_id_429bdccb9201831c_fk_auth_user_id` (`changed_by_id`),
-  CONSTRAINT `xblock_django_xbl_changed_by_id_429bdccb9201831c_fk_auth_user_id` FOREIGN KEY (`changed_by_id`) REFERENCES `auth_user` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `xblock_django_xblockstudioconfiguration`;

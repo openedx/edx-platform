@@ -60,7 +60,6 @@ class LMSInstructorDashboardA11yTest(BaseInstructorDashboardTest):
     def test_instructor_dashboard_a11y(self):
         self.instructor_dashboard_page.a11y_audit.config.set_rules({
             "ignore": [
-                'checkboxgroup',  # TODO: AC-552
                 'link-href',  # TODO: AC-491
             ]
         })
@@ -1050,10 +1049,8 @@ class CertificatesTest(BaseInstructorDashboardTest):
         ])
         self.certificates_section.a11y_audit.config.set_rules({
             "ignore": [
-                'aria-valid-attr-value',  # TODO: AC-491
                 'checkboxgroup',  # TODO: AC-491
                 'duplicate-id',  # TODO: AC-491
-                'label',  # TODO: AC-491
                 'radiogroup',  # TODO: AC-491
             ]
         })
@@ -1268,10 +1265,7 @@ class CertificateInvalidationTest(BaseInstructorDashboardTest):
         ])
         self.certificates_section.a11y_audit.config.set_rules({
             "ignore": [
-                'aria-valid-attr-value',  # TODO: AC-491
-                'checkboxgroup',  # TODO: AC-491
                 'duplicate-id',  # TODO: AC-491
-                'label',  # TODO: AC-491
                 'radiogroup',  # TODO: AC-491
             ]
         })

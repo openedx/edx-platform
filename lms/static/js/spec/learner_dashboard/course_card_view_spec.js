@@ -10,32 +10,7 @@ define([
         describe('Course Card View', function () {
             var view = null,
                 courseCardModel,
-                context = {      
-                    course_modes: [],
-                    display_name: 'Astrophysics: Exploring Exoplanets',
-                    key: 'ANU-ASTRO1x',
-                    organization: {
-                        display_name: 'Australian National University',
-                        key: 'ANUx'
-                    },
-                    run_modes: [{
-                        certificate_url: '',
-                        course_image_url: 'http://test.com/image1',
-                        course_key: 'course-v1:ANUx+ANU-ASTRO1x+3T2015',
-                        course_started: true,
-                        course_url: 'http://localhost:8000/courses/course-v1:edX+DemoX+Demo_Course/info',
-                        end_date: 'Jun 13, 2019',
-                        enrollment_open_date: 'Mar 03, 2016',
-                        is_course_ended: false,
-                        is_enrolled: true,
-                        is_enrollment_open: true,
-                        marketing_url: 'https://www.edx.org/course/astrophysics-exploring',
-                        mode_slug: 'verified',
-                        run_key: '2T2016',
-                        start_date: 'Apr 25, 2016',
-                        upgrade_url: ''
-                    }]
-                },
+                context,
 
             setupView = function(data, isEnrolled){
                 var programData = $.extend({}, data);
@@ -53,13 +28,43 @@ define([
                 expect(view.$('.header-img').attr('src')).toEqual(context.run_modes[0].course_image_url);
                 expect(view.$('.course-details .course-title-link').text().trim()).toEqual(context.display_name);
                 expect(view.$('.course-details .course-title-link').attr('href')).toEqual(
-                    context.run_modes[0].course_url);
+                    context.run_modes[0].marketing_url
+                );
                 expect(view.$('.course-details .course-text .course-key').html()).toEqual(context.key);
                 expect(view.$('.course-details .course-text .run-period').html())
                     .toEqual(context.run_modes[0].start_date + ' - ' + context.run_modes[0].end_date);
             };
 
             beforeEach(function() {
+                // Redefine this data prior to each test case so that tests can't
+                // break each other by modifying data copied by reference.
+                context = {      
+                    course_modes: [],
+                    display_name: 'Astrophysics: Exploring Exoplanets',
+                    key: 'ANU-ASTRO1x',
+                    organization: {
+                        display_name: 'Australian National University',
+                        key: 'ANUx'
+                    },
+                    run_modes: [{
+                        certificate_url: '',
+                        course_image_url: 'http://test.com/image1',
+                        course_key: 'course-v1:ANUx+ANU-ASTRO1x+3T2015',
+                        course_started: true,
+                        course_url: 'https://courses.example.com/courses/course-v1:edX+DemoX+Demo_Course',
+                        end_date: 'Jun 13, 2019',
+                        enrollment_open_date: 'Apr 1, 2016',
+                        is_course_ended: false,
+                        is_enrolled: true,
+                        is_enrollment_open: true,
+                        marketing_url: 'https://www.example.com/marketing/site',
+                        mode_slug: 'verified',
+                        run_key: '2T2016',
+                        start_date: 'Apr 25, 2016',
+                        upgrade_url: ''
+                    }]
+                };
+
                 setupView(context, false);
             });
 
@@ -89,72 +94,98 @@ define([
             });
 
             it('should only show certificate status section if a certificate has been earned', function() {
-                var data = $.extend({}, context),
-                    certUrl = 'sample-certificate';
+                var certUrl = 'sample-certificate';
 
                 expect(view.$('.certificate-status').length).toEqual(0);
                 view.remove();
 
-                data.run_modes[0].certificate_url = certUrl;
-                setupView(data, false);
+                context.run_modes[0].certificate_url = certUrl;
+                setupView(context, false);
                 expect(view.$('.certificate-status').length).toEqual(1);
                 expect(view.$('.certificate-status .cta-secondary').attr('href')).toEqual(certUrl);
             });
 
             it('should only show upgrade message section if an upgrade is required', function() {
-                var data = $.extend({}, context),
-                    upgradeUrl = '/path/to/upgrade';
+                var upgradeUrl = '/path/to/upgrade';
 
                 expect(view.$('.upgrade-message').length).toEqual(0);
                 view.remove();
 
-                data.run_modes[0].upgrade_url = upgradeUrl;
-                setupView(data, false);
+                context.run_modes[0].upgrade_url = upgradeUrl;
+                setupView(context, false);
                 expect(view.$('.upgrade-message').length).toEqual(1);
                 expect(view.$('.upgrade-message .cta-primary').attr('href')).toEqual(upgradeUrl);
             });
 
             it('should not show both the upgrade message and certificate status sections', function() {
-                var data = $.extend({}, context);
-
                 // Verify that no empty elements are left in the DOM.
-                data.run_modes[0].upgrade_url = '';
-                data.run_modes[0].certificate_url = '';
-                setupView(data, false);
+                context.run_modes[0].upgrade_url = '';
+                context.run_modes[0].certificate_url = '';
+                setupView(context, false);
                 expect(view.$('.upgrade-message').length).toEqual(0);
                 expect(view.$('.certificate-status').length).toEqual(0);
                 view.remove();
 
                 // Verify that the upgrade message takes priority.
-                data.run_modes[0].upgrade_url = '/path/to/upgrade';
-                data.run_modes[0].certificate_url = '/path/to/certificate';
-                setupView(data, false);
+                context.run_modes[0].upgrade_url = '/path/to/upgrade';
+                context.run_modes[0].certificate_url = '/path/to/certificate';
+                setupView(context, false);
                 expect(view.$('.upgrade-message').length).toEqual(1);
                 expect(view.$('.certificate-status').length).toEqual(0);
             });
 
-            it('should render the course card with coming soon', function(){
-                var data = $.extend({}, context);
+            it('should show a message if an there is an upcoming course run', function(){
+                context.run_modes[0].is_enrollment_open = false;
 
-                data.run_modes[0].is_enrollment_open = false;
-                setupView(data, false);
-                expect(view.$('.header-img').attr('src')).toEqual(data.run_modes[0].course_image_url);
-                expect(view.$('.course-details .course-title').text().trim()).toEqual(data.display_name);
-                expect(view.$('.course-details .course-title-link').length).toBe(0);
-                expect(view.$('.course-details .course-text .course-key').html()).toEqual(data.key);
+                setupView(context, false);
+
+                expect(view.$('.header-img').attr('src')).toEqual(context.run_modes[0].course_image_url);
+                expect(view.$('.course-details .course-title').text().trim()).toEqual(context.display_name);
+                expect(view.$('.course-details .course-text .course-key').html()).toEqual(context.key);
                 expect(view.$('.course-details .course-text .run-period').length).toBe(0);
                 expect(view.$('.no-action-message').text().trim()).toBe('Coming Soon');
-                expect(view.$('.enrollment-open-date').text().trim())
-                    .toEqual(data.run_modes[0].enrollment_open_date);
+                expect(view.$('.enrollment-open-date').text().trim()).toEqual(
+                    context.run_modes[0].enrollment_open_date
+                );
             });
 
-            it('should render if enrollment_open_date is not provided', function(){
-                var data = $.extend({}, context);
+            it('should show a message if there are no known upcoming course runs', function(){
+                context.run_modes[0].is_enrollment_open = false;
+                context.run_modes[0].is_course_ended = true;
 
-                data.run_modes[0].is_enrollment_open = true;
-                delete data.run_modes[0].enrollment_open_date;
-                setupView(data, false);
-                validateCourseInfoDisplay();
+                setupView(context, false);
+
+                expect(view.$('.header-img').attr('src')).toEqual(context.run_modes[0].course_image_url);
+                expect(view.$('.course-details .course-title').text().trim()).toEqual(context.display_name);
+                expect(view.$('.course-details .course-text .course-key').html()).toEqual(context.key);
+                expect(view.$('.course-details .course-text .run-period').length).toBe(0);
+                expect(view.$('.no-action-message').text().trim()).toBe('Not Currently Available');
+                expect(view.$('.enrollment-opens').length).toEqual(0);
+            });
+
+            it('should link to the marketing site when a URL is available', function(){
+                $.each([ '.course-image-link', '.course-title-link' ], function( index, selector ) {
+                    expect(view.$(selector).attr('href')).toEqual(context.run_modes[0].marketing_url);
+                });
+            });
+
+            it('should link to the course home when no marketing URL is available', function(){
+                context.run_modes[0].marketing_url = null;
+                setupView(context, false);
+
+                $.each([ '.course-image-link', '.course-title-link' ], function( index, selector ) {
+                    expect(view.$(selector).attr('href')).toEqual(context.run_modes[0].course_url);
+                });
+            });
+
+            it('should not link to the marketing site or the course home if neither URL is available', function(){
+                context.run_modes[0].marketing_url = null;
+                context.run_modes[0].course_url = null;
+                setupView(context, false);
+
+                $.each([ '.course-image-link', '.course-title-link' ], function( index, selector ) {
+                    expect(view.$(selector).length).toEqual(0);
+                });
             });
         });
     }
