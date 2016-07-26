@@ -17,6 +17,7 @@ from watchdog.events import PatternMatchingEventHandler
 
 from .utils.envs import Env
 from .utils.cmd import cmd, django_cmd
+from .utils.timer import timed
 
 from openedx.core.djangoapps.theming.paver_helpers import get_theme_paths
 
@@ -387,6 +388,7 @@ def coffeescript_files():
 
 @task
 @no_help
+@timed
 def compile_coffeescript(*files):
     """
     Compile CoffeeScript to JavaScript.
@@ -407,6 +409,7 @@ def compile_coffeescript(*files):
     ('debug', 'd', 'Debug mode'),
     ('force', '', 'Force full compilation'),
 ])
+@timed
 def compile_sass(options):
     """
     Compile Sass to CSS. If command is called without any arguments, it will
@@ -694,6 +697,7 @@ def execute_compile_sass(args):
     ('theme-dirs=', '-td', 'The themes dir containing all themes (defaults to None)'),
     ('themes=', '-t', 'The themes to add sass watchers for (defaults to None)'),
 ])
+@timed
 def watch_assets(options):
     """
     Watch for changes to asset files, and regenerate js/css
@@ -742,6 +746,7 @@ def watch_assets(options):
     'pavelib.prereqs.install_node_prereqs',
 )
 @consume_args
+@timed
 def update_assets(args):
     """
     Compile CoffeeScript and Sass, then collect static assets.

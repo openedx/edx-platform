@@ -9,6 +9,7 @@ import re
 from openedx.core.djangolib.markup import HTML
 
 from .utils.envs import Env
+from .utils.timer import timed
 
 ALL_SYSTEMS = 'lms,cms,common,openedx,pavelib'
 
@@ -38,6 +39,7 @@ def top_python_dirs(dirname):
 @cmdopts([
     ("system=", "s", "System to act on"),
 ])
+@timed
 def find_fixme(options):
     """
     Run pylint on system code, only looking for fixme items.
@@ -82,6 +84,7 @@ def find_fixme(options):
     ("errors", "e", "Check for errors only"),
     ("limit=", "l", "limit for number of acceptable violations"),
 ])
+@timed
 def run_pylint(options):
     """
     Run pylint on system code. When violations limit is passed in,
@@ -197,6 +200,7 @@ def _pep8_violations(report_file):
 @cmdopts([
     ("system=", "s", "System to act on"),
 ])
+@timed
 def run_pep8(options):  # pylint: disable=unused-argument
     """
     Run pep8 on system code.
@@ -224,6 +228,7 @@ def run_pep8(options):  # pylint: disable=unused-argument
 
 @task
 @needs('pavelib.prereqs.install_python_prereqs')
+@timed
 def run_complexity():
     """
     Uses radon to examine cyclomatic complexity.
@@ -262,6 +267,7 @@ def run_complexity():
 @cmdopts([
     ("limit=", "l", "limit for number of acceptable violations"),
 ])
+@timed
 def run_eslint(options):
     """
     Runs eslint on static asset directories.
@@ -306,6 +312,7 @@ def run_eslint(options):
 @cmdopts([
     ("thresholds=", "t", "json containing limit for number of acceptable violations per rule"),
 ])
+@timed
 def run_safelint(options):
     """
     Runs safe_template_linter.py on the codebase
@@ -407,6 +414,7 @@ def run_safelint(options):
 
 @task
 @needs('pavelib.prereqs.install_python_prereqs')
+@timed
 def run_safecommit_report():
     """
     Runs safe-commit-linter.sh on the current branch.
@@ -584,6 +592,7 @@ def _get_safecommit_count(filename):
     ("compare-branch=", "b", "Branch to compare against, defaults to origin/master"),
     ("percentage=", "p", "fail if diff-quality is below this percentage"),
 ])
+@timed
 def run_quality(options):
     """
     Build the html diff quality reports, and print the reports to the console.

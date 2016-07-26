@@ -6,9 +6,11 @@ import os
 import time
 import httplib
 import subprocess
-from paver.easy import sh
+from paver.easy import sh, task, cmdopts
 from pavelib.utils.envs import Env
 from pavelib.utils.process import run_background_process
+from pavelib.utils.test.bokchoy_options import BOKCHOY_OPTS
+from pavelib.utils.timer import timed
 
 try:
     from pygments.console import colorize
@@ -18,11 +20,14 @@ except ImportError:
 __test__ = False  # do not collect
 
 
-def start_servers(default_store, coveragerc=None):
+@task
+@cmdopts(BOKCHOY_OPTS, share_with=['test_bokchoy', 'test_a11y', 'pa11ycrawler'])
+@timed
+def start_servers(options):
     """
     Start the servers we will run tests on, returns PIDs for servers.
     """
-    coveragerc = coveragerc or Env.BOK_CHOY_COVERAGERC
+    coveragerc = options.get('coveragerc', Env.BOK_CHOY_COVERAGERC)
 
     def start_server(cmd, logfile, cwd=None):
         """
@@ -38,7 +43,7 @@ def start_servers(default_store, coveragerc=None):
             "coverage run --rcfile={coveragerc} -m "
             "manage {service} --settings bok_choy runserver "
             "{address} --traceback --noreload".format(
-                default_store=default_store,
+                default_store=options.default_store,
                 coveragerc=coveragerc,
                 service=service,
                 address=address,
@@ -137,6 +142,8 @@ def is_mysql_running():
     return returncode == 0
 
 
+@task
+@timed
 def clear_mongo():
     """
     Clears mongo database.
@@ -148,6 +155,8 @@ def clear_mongo():
     )
 
 
+@task
+@timed
 def check_mongo():
     """
     Check that mongo is running
@@ -158,6 +167,8 @@ def check_mongo():
         sys.exit(1)
 
 
+@task
+@timed
 def check_memcache():
     """
     Check that memcache is running
@@ -168,6 +179,8 @@ def check_memcache():
         sys.exit(1)
 
 
+@task
+@timed
 def check_mysql():
     """
     Check that mysql is running
@@ -178,6 +191,8 @@ def check_mysql():
         sys.exit(1)
 
 
+@task
+@timed
 def check_services():
     """
     Check that all required services are running
