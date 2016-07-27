@@ -176,33 +176,31 @@ urlpatterns += (url(
     RedirectView.as_view(url=settings.STATIC_URL + favicon_path, permanent=True)
 ),)
 
-# Semi-static views only used by edX, not by themes
-if not settings.FEATURES["USE_CUSTOM_THEME"]:
-    urlpatterns += (
-        url(r'^blog$', 'static_template_view.views.render',
-            {'template': 'blog.html'}, name="blog"),
-        url(r'^contact$', 'static_template_view.views.render',
-            {'template': 'contact.html'}, name="contact"),
-        url(r'^donate$', 'static_template_view.views.render',
-            {'template': 'donate.html'}, name="donate"),
-        url(r'^faq$', 'static_template_view.views.render',
-            {'template': 'faq.html'}, name="faq"),
-        url(r'^help$', 'static_template_view.views.render',
-            {'template': 'help.html'}, name="help_edx"),
-        url(r'^jobs$', 'static_template_view.views.render',
-            {'template': 'jobs.html'}, name="jobs"),
-        url(r'^news$', 'static_template_view.views.render',
-            {'template': 'news.html'}, name="news"),
-        url(r'^press$', 'static_template_view.views.render',
-            {'template': 'press.html'}, name="press"),
-        url(r'^media-kit$', 'static_template_view.views.render',
-            {'template': 'media-kit.html'}, name="media-kit"),
-        url(r'^copyright$', 'static_template_view.views.render',
-            {'template': 'copyright.html'}, name="copyright"),
+urlpatterns += (
+    url(r'^blog$', 'static_template_view.views.render',
+        {'template': 'blog.html'}, name="blog"),
+    url(r'^contact$', 'static_template_view.views.render',
+        {'template': 'contact.html'}, name="contact"),
+    url(r'^donate$', 'static_template_view.views.render',
+        {'template': 'donate.html'}, name="donate"),
+    url(r'^faq$', 'static_template_view.views.render',
+        {'template': 'faq.html'}, name="faq"),
+    url(r'^help$', 'static_template_view.views.render',
+        {'template': 'help.html'}, name="help_edx"),
+    url(r'^jobs$', 'static_template_view.views.render',
+        {'template': 'jobs.html'}, name="jobs"),
+    url(r'^news$', 'static_template_view.views.render',
+        {'template': 'news.html'}, name="news"),
+    url(r'^press$', 'static_template_view.views.render',
+        {'template': 'press.html'}, name="press"),
+    url(r'^media-kit$', 'static_template_view.views.render',
+        {'template': 'media-kit.html'}, name="media-kit"),
+    url(r'^copyright$', 'static_template_view.views.render',
+        {'template': 'copyright.html'}, name="copyright"),
 
-        # Press releases
-        url(r'^press/([_a-zA-Z0-9-]+)$', 'static_template_view.views.render_press_release', name='press_release'),
-    )
+    # Press releases
+    url(r'^press/([_a-zA-Z0-9-]+)$', 'static_template_view.views.render_press_release', name='press_release'),
+)
 
 # Only enable URLs for those marketing links actually enabled in the
 # settings. Disable URLs by marking them as None.
@@ -221,11 +219,6 @@ for key, value in settings.MKTG_URL_LINK_MAP.items():
         # Append STATIC_TEMPLATE_VIEW_DEFAULT_FILE_EXTENSION if
         # no file extension was specified in the key
         template = "%s.%s" % (template, settings.STATIC_TEMPLATE_VIEW_DEFAULT_FILE_EXTENSION)
-
-    # To allow theme templates to inherit from default templates,
-    # prepend a standard prefix
-    if settings.FEATURES["USE_CUSTOM_THEME"]:
-        template = "theme-" + template
 
     # Make the assumption that the URL we want is the lowercased
     # version of the map key

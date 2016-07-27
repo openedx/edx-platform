@@ -153,9 +153,6 @@ FEATURES = {
     # Enable URL that shows information about the status of variuous services
     'ENABLE_SERVICE_STATUS': False,
 
-    # Toggle to indicate use of the Stanford theming system
-    'USE_CUSTOM_THEME': False,
-
     # Don't autoplay videos for students
     'AUTOPLAY_VIDEOS': False,
 
