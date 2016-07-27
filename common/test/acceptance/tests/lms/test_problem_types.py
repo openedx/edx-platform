@@ -462,12 +462,6 @@ class DropDownProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         Additional setup for DropDownProblemTypeTest
         """
         super(DropDownProblemTypeTest, self).setUp(*args, **kwargs)
-        self.problem_page.a11y_audit.config.set_rules({
-            'ignore': [
-                'section',  # TODO: AC-491
-                'label',  # TODO: AC-291
-            ]
-        })
 
     def answer_problem(self, correct):
         """
