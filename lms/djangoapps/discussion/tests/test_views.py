@@ -136,7 +136,6 @@ def make_mock_thread_data(
         text,
         thread_id,
         num_children,
-        include_children,
         group_id=None,
         group_name=None,
         commentable_id=None,
@@ -191,7 +190,6 @@ def make_mock_request_impl(
                         text=text,
                         thread_id=thread_id,
                         num_children=None,
-                        include_children=False,
                         group_id=group_id,
                         commentable_id=commentable_id,
                     )
@@ -203,7 +201,6 @@ def make_mock_request_impl(
                 text=text,
                 thread_id=thread_id,
                 num_children=num_thread_responses,
-                include_children=True,
                 group_id=group_id,
                 commentable_id=commentable_id
             )
@@ -512,7 +509,7 @@ class SingleCohortedThreadTestCase(CohortedTestCase):
 
 
 @patch('lms.lib.comment_client.utils.requests.request', autospec=True)
-class SingleThreadAccessTestCase(CohortedContentTestCase):
+class SingleThreadAccessTestCase(CohortedTestCase):
     def call_view(self, mock_request, commentable_id, user, group_id, thread_group_id=None, pass_group_id=True):
         thread_id = "test_thread_id"
         mock_request.side_effect = make_mock_request_impl(
@@ -1140,66 +1137,6 @@ class InlineDiscussionTestCase(ForumsEnableMixin, ModuleStoreTestCase):
         response = self.send_request(mock_request)
         self.assertEqual(mock_request.call_args[1]['params']['context'], ThreadContext.STANDALONE)
         self.verify_response(response)
-
-
-@patch('requests.request')
-class SingleCohortedThreadTestCase(CohortedTestCase):
-    def _create_mock_cohorted_thread(self, mock_request):
-        self.mock_text = "dummy content"
-        self.mock_thread_id = "test_thread_id"
-        mock_request.side_effect = make_mock_request_impl(
-            course=self.course, text=self.mock_text, thread_id=self.mock_thread_id, group_id=self.student_cohort.id
-        )
-
-    def test_ajax(self, mock_request):
-        self._create_mock_cohorted_thread(mock_request)
-
-        request = RequestFactory().get(
-            "dummy_url",
-            HTTP_X_REQUESTED_WITH="XMLHttpRequest"
-        )
-        request.user = self.student
-        response = views.single_thread(
-            request,
-            self.course.id.to_deprecated_string(),
-            "cohorted_topic",
-            self.mock_thread_id
-        )
-
-        self.assertEquals(response.status_code, 200)
-        response_data = json.loads(response.content)
-        self.assertEquals(
-            response_data["content"],
-            make_mock_thread_data(
-                course=self.course,
-                text=self.mock_text,
-                thread_id=self.mock_thread_id,
-                num_children=1,
-                include_children=True,
-                group_id=self.student_cohort.id,
-                group_name=self.student_cohort.name,
-            )
-        )
-
-    def test_html(self, mock_request):
-        self._create_mock_cohorted_thread(mock_request)
-
-        request = RequestFactory().get("dummy_url")
-        request.user = self.student
-        mako_middleware_process_request(request)
-        response = views.single_thread(
-            request,
-            self.course.id.to_deprecated_string(),
-            "cohorted_topic",
-            self.mock_thread_id
-        )
-
-        self.assertEquals(response.status_code, 200)
-        self.assertEqual(response['Content-Type'], 'text/html; charset=utf-8')
-        html = response.content
-
-        # Verify that the group name is correctly included in the HTML
-        self.assertRegexpMatches(html, r'&quot;group_name&quot;: &quot;student_cohort&quot;')
 
 
 @patch('requests.request', autospec=True)

@@ -16,6 +16,7 @@ from opaque_keys.edx.keys import CourseKey
 
 from common.test.utils import MockSignalHandlerMixin, disable_signal
 from django_comment_client.base import views
+from django_comment_client.utils import is_commentable_cohorted
 from django_comment_client.tests.group_id import (
     CohortedTopicGroupIdTestMixin, NonCohortedTopicGroupIdTestMixin, GroupIdAssertionMixin
 )
@@ -35,7 +36,7 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, chec
 
 from openedx.core.djangoapps.course_groups.models import CourseCohort
 
-from openedx.core.djangoapps.course_groups.cohorts import is_commentable_cohorted, add_cohort, add_user_to_cohort
+from openedx.core.djangoapps.course_groups.cohorts import add_cohort, add_user_to_cohort
 from openedx.core.djangoapps.course_groups.models import CourseCohort
 
 from edx_notifications.lib.consumer import get_notifications_for_user, get_notifications_count_for_user

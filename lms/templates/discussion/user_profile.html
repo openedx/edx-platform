@@ -1,0 +1,40 @@
+<%inherit file="../main.html" />
+<%namespace name='static' file='../static_content.html'/>
+<%!
+from django.utils.translation import ugettext as _
+from django.template.defaultfilters import escapejs
+%>
+
+<%block name="bodyclass">discussion</%block>
+<%block name="pagetitle">${_("Discussion - {course_number}").format(course_number=course.display_number_with_default) | h}</%block>
+
+<%block name="headextra">
+<%static:css group='style-course-vendor'/>
+<%static:css group='style-course'/>
+
+<%include file="_js_head_dependencies.html" />
+</%block>
+
+<%block name="js_extra">
+<%include file="_js_body_dependencies.html" />
+<%static:js group='discussion'/>
+</%block>
+
+<%include file="../courseware/course_navigation.html" args="active_page='discussion'" />
+
+<section class="container">
+  <div class="course-wrapper">
+    <section class="user-profile">
+      <nav aria-label="${_('User Profile')}">
+
+        <article class="sidebar-module discussion-sidebar">
+          <%include file="_user_profile.html" />
+        </article>
+
+      </nav>
+    </section>
+    <section class="course-content container discussion-user-threads" data-course-id="${course.id | h}" data-course-name="${course.display_name_with_default_escaped | h}" data-threads="${threads | h}" data-user-info="${user_info | h}" data-page="${page | h}" data-num-pages="${num_pages | h}"/>
+  </div>
+</section>
+
+<%include file="_underscore_templates.html" />

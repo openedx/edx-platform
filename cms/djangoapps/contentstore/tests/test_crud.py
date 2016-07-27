@@ -13,7 +13,7 @@ from xmodule.seq_module import SequenceDescriptor
 from openedx.core.djangoapps.util.testing import SignalDisconnectTestMixin
 
 
-class TemplateTests(SignalDisconnectTestMixin, ModuleStoreTestCase):
+class TemplateTests(ModuleStoreTestCase):
     """
     Test finding and using the templates (boilerplates) for xblocks.
     """

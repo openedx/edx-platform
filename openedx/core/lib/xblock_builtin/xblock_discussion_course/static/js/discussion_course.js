@@ -1,16 +1,14 @@
-/* globals window, $$course_id, DiscussionUtil */
-function DiscussionCourseBlock(runtime, element) {
-    'use strict';
-    var hasPushState = window.history && window.history.pushState ? true : false;
-    DiscussionUtil.force_async = true;
+var $$course_id = "{{course_id}}";
 
-    // Restart the Backbone router to use the discussion root when
-    // links inside this component are clicked.
-    if (Backbone.History.started) {
-        Backbone.history.stop();
+function DiscussionCourseBlock(runtime, element) {
+    var el = $(element).find('section.discussion');
+
+    var testUrl = runtime.handlerUrl(element, 'test');
+    if (testUrl.match(/^(http|https):\/\//)) {
+        var hostname = testUrl.match(/^(.*:\/\/[a-z0-9:\-.]+)\//)[1];
+        DiscussionUtil.setBaseUrl(hostname);
     }
-    Backbone.history.start({
-        pushState: hasPushState,
-        root: "/courses/" + $$course_id + "/discussion/"
-    });
+
+    DiscussionUtil.force_async = true;
+    DiscussionApp.start(el);
 }

@@ -48,7 +48,14 @@ class CourseStructureApiTests(ModuleStoreTestCase):
             parent_location=self.vertical.location, category="html", display_name="My HTML"
         )
 
-        self.addCleanup(SignalDisconnectTestMixin.disconnect_course_published_signals)
+        self.addCleanup(self._disconnect_course_published_event)
+
+    def _disconnect_course_published_event(self):
+        """
+        Disconnect course_published event.
+        """
+        # If we don't disconnect then tests are getting failed in test_crud.py
+        SignalHandler.course_published.disconnect(listen_for_course_publish)
 
     def _expected_blocks(self, block_types=None, get_parent=False):
         """

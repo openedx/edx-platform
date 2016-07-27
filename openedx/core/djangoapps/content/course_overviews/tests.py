@@ -32,11 +32,8 @@ from xmodule.course_module import (
 from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.django import SignalHandler
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls, check_mongo_calls_range
-from openedx.core.djangoapps.util.testing import SignalDisconnectTestMixin
-from openedx.core.djangoapps.content.course_overviews.signals import listen_for_course_publish
 
 from .models import CourseOverview, CourseOverviewImageSet, CourseOverviewImageConfig
 
