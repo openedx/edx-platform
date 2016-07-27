@@ -7,15 +7,15 @@ from nose.plugins.attrib import attr
 
 from studio.base_studio_test import ContainerBase
 
-from ..pages.studio.settings_group_configurations import GroupConfigurationsPage
-from ..pages.studio.auto_auth import AutoAuthPage as StudioAutoAuthPage
-from ..fixtures.course import XBlockFixtureDesc
-from ..fixtures import LMS_BASE_URL
-from ..pages.studio.component_editor import ComponentVisibilityEditorView
-from ..pages.lms.instructor_dashboard import InstructorDashboardPage
-from ..pages.lms.courseware import CoursewarePage
-from ..pages.lms.auto_auth import AutoAuthPage as LmsAutoAuthPage
-from ..tests.lms.test_lms_user_preview import verify_expected_problem_visibility
+from common.test.acceptance.pages.studio.settings_group_configurations import GroupConfigurationsPage
+from common.test.acceptance.pages.studio.auto_auth import AutoAuthPage as StudioAutoAuthPage
+from common.test.acceptance.fixtures.course import XBlockFixtureDesc
+from common.test.acceptance.fixtures import LMS_BASE_URL
+from common.test.acceptance.pages.studio.component_editor import ComponentVisibilityEditorView
+from common.test.acceptance.pages.lms.instructor_dashboard import InstructorDashboardPage
+from common.test.acceptance.pages.lms.courseware import CoursewarePage
+from common.test.acceptance.pages.lms.auto_auth import AutoAuthPage as LmsAutoAuthPage
+from common.test.acceptance.tests.lms.test_lms_user_preview import verify_expected_problem_visibility
 
 from bok_choy.promise import EmptyPromise
 from bok_choy.page_object import XSS_INJECTION

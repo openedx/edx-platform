@@ -8,13 +8,13 @@ from datetime import datetime
 from pytz import UTC, utc
 from bok_choy.promise import EmptyPromise
 from nose.plugins.attrib import attr
-from .helpers import CohortTestMixin
-from ..helpers import UniqueCourseTest, EventsTestMixin, create_user_partition_json
+from common.test.acceptance.tests.discussion.helpers import CohortTestMixin
+from common.test.acceptance.tests.helpers import UniqueCourseTest, EventsTestMixin, create_user_partition_json
 from xmodule.partitions.partitions import Group
-from ...fixtures.course import CourseFixture, XBlockFixtureDesc
-from ...pages.lms.auto_auth import AutoAuthPage
-from ...pages.lms.instructor_dashboard import InstructorDashboardPage, DataDownloadPage
-from ...pages.studio.settings_group_configurations import GroupConfigurationsPage
+from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
+from common.test.acceptance.pages.lms.auto_auth import AutoAuthPage
+from common.test.acceptance.pages.lms.instructor_dashboard import InstructorDashboardPage, DataDownloadPage
+from common.test.acceptance.pages.studio.settings_group_configurations import GroupConfigurationsPage
 
 import os
 import unicodecsv

@@ -8,11 +8,11 @@ from uuid import uuid4
 from nose.plugins.attrib import attr
 from pytz import UTC
 
-from .helpers import BaseDiscussionTestCase
-from ..helpers import UniqueCourseTest
-from ...pages.lms.auto_auth import AutoAuthPage
-from ...pages.lms.courseware import CoursewarePage
-from ...pages.lms.discussion import (
+from common.test.acceptance.tests.discussion.helpers import BaseDiscussionTestCase
+from common.test.acceptance.tests.helpers import UniqueCourseTest
+from common.test.acceptance.pages.lms.auto_auth import AutoAuthPage
+from common.test.acceptance.pages.lms.courseware import CoursewarePage
+from common.test.acceptance.pages.lms.discussion import (
     DiscussionTabSingleThreadPage,
     InlineDiscussionPage,
     InlineDiscussionThreadPage,
@@ -20,10 +20,10 @@ from ...pages.lms.discussion import (
     DiscussionTabHomePage,
     DiscussionSortPreferencePage,
 )
-from ...pages.lms.learner_profile import LearnerProfilePage
+from common.test.acceptance.pages.lms.learner_profile import LearnerProfilePage
 
-from ...fixtures.course import CourseFixture, XBlockFixtureDesc
-from ...fixtures.discussion import (
+from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
+from common.test.acceptance.fixtures.discussion import (
     SingleThreadViewFixture,
     UserProfileViewFixture,
     SearchResultFixture,
@@ -33,8 +33,9 @@ from ...fixtures.discussion import (
     SearchResult,
     MultipleThreadFixture)
 
-from .helpers import BaseDiscussionMixin
-from ..helpers import skip_if_browser
+from common.test.acceptance.tests.discussion.helpers import BaseDiscussionMixin
+from common.test.acceptance.tests.helpers import skip_if_browser
+
 
 
 THREAD_CONTENT_WITH_LATEX = """Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt
