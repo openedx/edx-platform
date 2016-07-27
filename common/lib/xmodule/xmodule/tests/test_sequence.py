@@ -7,25 +7,12 @@ import ddt
 from django.utils.timezone import now
 from freezegun import freeze_time
 from mock import Mock
-from xblock.reference.user_service import XBlockUser, UserService
 from xmodule.tests import get_test_system
+from xmodule.tests.helpers import StubUserService
 from xmodule.tests.xml import XModuleXmlImportTest
 from xmodule.tests.xml import factories as xml
 from xmodule.x_module import STUDENT_VIEW
 from xmodule.seq_module import SequenceModule
-
-
-class StubUserService(UserService):
-    """
-    Stub UserService for testing the sequence module.
-    """
-    def get_current_user(self):
-        """
-        Implements abstract method for getting the current user.
-        """
-        user = XBlockUser()
-        user.opt_attrs['edx-platform.username'] = 'test user'
-        return user
 
 
 @ddt.ddt
