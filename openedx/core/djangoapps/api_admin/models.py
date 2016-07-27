@@ -17,7 +17,7 @@ from edxmako.shortcuts import render_to_string
 from simple_history.models import HistoricalRecords
 
 from config_models.models import ConfigurationModel
-from openedx.core.djangoapps.theming.helpers import get_value as get_themed_value
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 log = logging.getLogger(__name__)
 
@@ -162,7 +162,7 @@ def _send_decision_email(instance):
         'authentication_docs_url': settings.AUTH_DOCUMENTATION_URL,
         'api_docs_url': settings.API_DOCUMENTATION_URL,
         'support_email_address': settings.API_ACCESS_FROM_EMAIL,
-        'platform_name': get_themed_value('PLATFORM_NAME', settings.PLATFORM_NAME)
+        'platform_name': configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME)
     }
 
     message = render_to_string(

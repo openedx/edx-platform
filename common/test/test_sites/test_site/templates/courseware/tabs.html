@@ -19,7 +19,7 @@ def url_class(is_active):
   %>
   <li>
   <a href="${tab.link_func(course, reverse) | h}" class="${tab_class}">
-  Test Microsite Tab: ${_(tab.name) | h}
+  Test Site Tab: ${_(tab.name) | h}
   % if tab_is_active:
       <span class="sr">, current location</span>
   %endif

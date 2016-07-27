@@ -20,7 +20,7 @@ from django.conf import settings
 from edxmako.shortcuts import render_to_string
 from util.request import safe_get_host
 from util.testing import EventTestMixin
-from openedx.core.djangoapps.theming import helpers as theming_helpers
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme
 
 
@@ -57,7 +57,7 @@ class EmailTestMixin(object):
         email_user.assert_called_with(
             mock_render_to_string(subject_template, subject_context),
             mock_render_to_string(body_template, body_context),
-            theming_helpers.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL)
+            configuration_helpers.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL)
         )
 
     def append_allowed_hosts(self, hostname):
@@ -298,7 +298,7 @@ class EmailChangeRequestTests(EventTestMixin, TestCase):
         send_mail.assert_called_with(
             mock_render_to_string('emails/email_change_subject.txt', context),
             mock_render_to_string('emails/email_change.txt', context),
-            theming_helpers.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL),
+            configuration_helpers.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL),
             [new_email]
         )
         self.assert_event_emitted(

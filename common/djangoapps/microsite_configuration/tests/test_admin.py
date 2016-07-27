@@ -35,8 +35,8 @@ class MicrositeAdminTests(DatabaseMicrositeTestCase):
         Tests save action for Microsite model form.
         """
         new_values = {
-            "domain_prefix": "testmicrosite_new",
-            "platform_name": "Test Microsite New"
+            "domain_prefix": "test-site-new",
+            "platform_name": "Test Site New"
         }
         microsite_form = self.microsite_admin.get_form(self.request)(instance=self.microsite, data={
             "key": self.microsite.key,

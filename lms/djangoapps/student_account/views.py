@@ -28,7 +28,8 @@ from external_auth.login_and_register import (
 from lang_pref.api import released_languages, all_languages
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
-from openedx.core.djangoapps.theming.helpers import is_request_in_themed_site, get_value as get_themed_value
+from openedx.core.djangoapps.theming.helpers import is_request_in_themed_site
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api.accounts.api import request_password_change
 from openedx.core.djangoapps.user_api.errors import UserNotFound
 from openedx.core.lib.time_zone_utils import TIME_ZONE_CHOICES
@@ -75,9 +76,9 @@ def login_and_registration_form(request, initial_mode="login"):
     # If this is a themed site, revert to the old login/registration pages.
     # We need to do this for now to support existing themes.
     # Themed sites can use the new logistration page by setting
-    # 'ENABLE_COMBINED_LOGIN_REGISTRATION' in their theme/microsite
+    # 'ENABLE_COMBINED_LOGIN_REGISTRATION' in their
     # configuration settings.
-    if is_request_in_themed_site() and not get_themed_value('ENABLE_COMBINED_LOGIN_REGISTRATION', False):
+    if is_request_in_themed_site() and not configuration_helpers.get_value('ENABLE_COMBINED_LOGIN_REGISTRATION', False):
         if initial_mode == "login":
             return old_login_view(request)
         elif initial_mode == "register":
@@ -108,7 +109,7 @@ def login_and_registration_form(request, initial_mode="login"):
             'initial_mode': initial_mode,
             'third_party_auth': _third_party_auth_context(request, redirect_to),
             'third_party_auth_hint': third_party_auth_hint or '',
-            'platform_name': get_themed_value('PLATFORM_NAME', settings.PLATFORM_NAME),
+            'platform_name': configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),
 
             # Include form descriptions retrieved from the user API.
             # We could have the JS client make these requests directly,
@@ -122,7 +123,7 @@ def login_and_registration_form(request, initial_mode="login"):
         'responsive': True,
         'allow_iframing': True,
         'disable_courseware_js': True,
-        'disable_footer': not get_themed_value(
+        'disable_footer': not configuration_helpers.get_value(
             'ENABLE_COMBINED_LOGIN_REGISTRATION_FOOTER',
             settings.FEATURES['ENABLE_COMBINED_LOGIN_REGISTRATION_FOOTER']
         ),
@@ -456,7 +457,7 @@ def account_settings_context(request):
                 'options': TIME_ZONE_CHOICES,
             }
         },
-        'platform_name': get_themed_value('PLATFORM_NAME', settings.PLATFORM_NAME),
+        'platform_name': configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),
         'user_accounts_api_url': reverse("accounts_api", kwargs={'username': user.username}),
         'user_preferences_api_url': reverse('preferences_api', kwargs={'username': user.username}),
         'disable_courseware_js': True,

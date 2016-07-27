@@ -1,14 +1,14 @@
 <%! from django.utils.translation import ugettext as _ %>
-<%! from openedx.core.djangoapps.theming.helpers import get_value as get_themed_value %>
+<%! from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers %>
 ${_("Thank you for creating an account with {platform_name}!").format(
-    platform_name=get_themed_value('PLATFORM_NAME', settings.PLATFORM_NAME)
+    platform_name=configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME)
 )}
 
 ${_("There's just one more step before you can enroll in a course: "
     "you need to activate your {platform_name} account. To activate "
     "your account, click the following link. If that doesn't work, "
     "copy and paste the link into your browser's address bar.").format(
-        platform_name=get_themed_value('PLATFORM_NAME', settings.PLATFORM_NAME)
+        platform_name=configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME)
     )}
 
 % if is_secure:
@@ -19,4 +19,4 @@ ${_("There's just one more step before you can enroll in a course: "
 ${_("If you didn't create an account, you don't need to do anything; you "
       "won't receive any more email from us. If you need assistance, please "
       "do not reply to this email message. Check the help section of the "
-      "{platform_name} website.").format(platform_name=get_themed_value('PLATFORM_NAME', settings.PLATFORM_NAME))}
+      "{platform_name} website.").format(platform_name=configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME))}
