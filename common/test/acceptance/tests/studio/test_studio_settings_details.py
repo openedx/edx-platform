@@ -6,12 +6,12 @@ from flaky import flaky
 from nose.plugins.attrib import attr
 from unittest import skip
 
-from ...fixtures.config import ConfigModelFixture
-from ...fixtures.course import CourseFixture
-from ...pages.studio.settings import SettingsPage
-from ...pages.studio.overview import CourseOutlinePage
-from ...tests.studio.base_studio_test import StudioCourseTest
-from ..helpers import (
+from common.test.acceptance.fixtures.config import ConfigModelFixture
+from common.test.acceptance.fixtures.course import CourseFixture
+from common.test.acceptance.pages.studio.settings import SettingsPage
+from common.test.acceptance.pages.studio.overview import CourseOutlinePage
+from common.test.acceptance.tests.studio.base_studio_test import StudioCourseTest
+from common.test.acceptance.tests.helpers import (
     generate_course_key,
     select_option_by_value,
     is_option_value_selected,

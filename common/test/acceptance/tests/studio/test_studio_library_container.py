@@ -5,12 +5,12 @@ import ddt
 from nose.plugins.attrib import attr
 import textwrap
 
-from .base_studio_test import StudioLibraryTest
-from ...fixtures.course import CourseFixture
-from ..helpers import UniqueCourseTest, TestWithSearchIndexMixin
-from ...pages.studio.library import StudioLibraryContentEditor, StudioLibraryContainerXBlockWrapper
-from ...pages.studio.overview import CourseOutlinePage
-from ...fixtures.course import XBlockFixtureDesc
+from common.test.acceptance.tests.studio.base_studio_test import StudioLibraryTest
+from common.test.acceptance.fixtures.course import CourseFixture
+from common.test.acceptance.tests.helpers import UniqueCourseTest, TestWithSearchIndexMixin
+from common.test.acceptance.pages.studio.library import StudioLibraryContentEditor, StudioLibraryContainerXBlockWrapper
+from common.test.acceptance.pages.studio.overview import CourseOutlinePage
+from common.test.acceptance.fixtures.course import XBlockFixtureDesc
 
 SECTION_NAME = 'Test Section'
 SUBSECTION_NAME = 'Test Subsection'

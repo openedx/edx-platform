@@ -9,14 +9,14 @@ from flaky import flaky
 from abc import abstractmethod
 from bok_choy.promise import EmptyPromise
 
-from .base_studio_test import StudioLibraryTest, StudioCourseTest
-from ...fixtures.course import XBlockFixtureDesc
-from ...pages.studio.import_export import ExportLibraryPage, ExportCoursePage, ImportLibraryPage, ImportCoursePage
-from ...pages.studio.library import LibraryEditPage
-from ...pages.studio.container import ContainerPage
-from ...pages.studio.overview import CourseOutlinePage
-from ...pages.lms.courseware import CoursewarePage
-from ...pages.lms.staff_view import StaffPage
+from common.test.acceptance.tests.studio.base_studio_test import StudioLibraryTest, StudioCourseTest
+from common.test.acceptance.fixtures.course import XBlockFixtureDesc
+from common.test.acceptance.pages.studio.import_export import ExportLibraryPage, ExportCoursePage, ImportLibraryPage, ImportCoursePage
+from common.test.acceptance.pages.studio.library import LibraryEditPage
+from common.test.acceptance.pages.studio.container import ContainerPage
+from common.test.acceptance.pages.studio.overview import CourseOutlinePage
+from common.test.acceptance.pages.lms.courseware import CoursewarePage
+from common.test.acceptance.pages.lms.staff_view import StaffPage
 
 
 class ExportTestMixin(object):
