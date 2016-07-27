@@ -7,7 +7,7 @@ from urllib import urlencode
 from common.test.acceptance.fixtures.course import CourseFixture, FixtureError
 
 from path import Path as path
-from paver.easy import sh, BuildFailure, cmdopts, task, needs, might_call, call_task
+from paver.easy import sh, BuildFailure, cmdopts, task, needs, might_call, call_task, dry
 from pavelib.utils.test.suites.suite import TestSuite
 from pavelib.utils.envs import Env
 from pavelib.utils.test.bokchoy_utils import (
@@ -233,7 +233,10 @@ class BokChoyTestSuite(TestSuite):
             # Create course in order to seed forum data underneath. This is
             # a workaround for a race condition. The first time a course is created;
             # role permissions are set up for forums.
-            CourseFixture('foobar_org', '1117', 'seed_forum', 'seed_foo').install()
+            dry(
+                "Installing course fixture for forums",
+                CourseFixture('foobar_org', '1117', 'seed_forum', 'seed_foo').install
+            )
             print 'Forums permissions/roles data has been seeded'
         except FixtureError:
             # this means it's already been done
