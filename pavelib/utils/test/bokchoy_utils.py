@@ -6,10 +6,13 @@ import os
 import time
 import httplib
 import subprocess
-from paver.easy import sh, task, cmdopts
+from paver import tasks
+from paver.easy import sh, task, cmdopts, needs
 from pavelib.utils.envs import Env
 from pavelib.utils.process import run_background_process
-from pavelib.utils.test.bokchoy_options import BOKCHOY_OPTS
+from pavelib.utils.test.bokchoy_options import (
+    BOKCHOY_COVERAGERC, BOKCHOY_DEFAULT_STORE, BOKCHOY_DEFAULT_STORE_DEPR
+)
 from pavelib.utils.timer import timed
 
 try:
@@ -21,7 +24,7 @@ __test__ = False  # do not collect
 
 
 @task
-@cmdopts(BOKCHOY_OPTS, share_with=['test_bokchoy', 'test_a11y', 'pa11ycrawler'])
+@cmdopts([BOKCHOY_COVERAGERC, BOKCHOY_DEFAULT_STORE, BOKCHOY_DEFAULT_STORE_DEPR])
 @timed
 def start_servers(options):
     """
