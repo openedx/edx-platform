@@ -6,6 +6,7 @@ from bok_choy.page_object import PageObject
 from common.test.acceptance.tests.helpers import disable_animations
 from common.test.acceptance.pages.studio.course_page import CoursePage
 from common.test.acceptance.pages.studio import BASE_URL
+from common.test.acceptance.pages.studio.utils import HelpMixin
 
 
 def wait_for_ajax_or_reload(browser):
@@ -147,7 +148,7 @@ class UsersPageMixin(PageObject):
         disable_animations(self)
 
 
-class LibraryUsersPage(UsersPageMixin):
+class LibraryUsersPage(UsersPageMixin, HelpMixin):
     """
     Library Team page in Studio
     """

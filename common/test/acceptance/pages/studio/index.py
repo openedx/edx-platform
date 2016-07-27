@@ -7,6 +7,7 @@ from selenium.webdriver import ActionChains
 from common.test.acceptance.pages.studio import BASE_URL
 from common.test.acceptance.pages.studio.login import LoginPage
 from common.test.acceptance.pages.studio.signup import SignupPage
+from common.test.acceptance.pages.studio.utils import HelpMixin
 
 
 class HeaderMixin(object):
@@ -40,7 +41,7 @@ class IndexPage(PageObject, HeaderMixin):
         return self.q(css='.wrapper-text-welcome').visible
 
 
-class DashboardPage(PageObject):
+class DashboardPage(PageObject, HelpMixin):
     """
     Studio Dashboard page with courses.
     The user must be logged in to access this page.

@@ -10,13 +10,13 @@ from common.test.acceptance.pages.studio.container import XBlockWrapper
 from common.test.acceptance.pages.studio.users import UsersPageMixin
 from common.test.acceptance.pages.studio.pagination import PaginatedMixin
 from selenium.webdriver.common.keys import Keys
-
+from common.test.acceptance.pages.studio.utils import HelpMixin
 from common.test.acceptance.pages.common.utils import confirm_prompt, wait_for_notification
 
 from common.test.acceptance.pages.studio import BASE_URL
 
 
-class LibraryPage(PageObject):
+class LibraryPage(PageObject, HelpMixin):
     """
     Base page for Library pages. Defaults URL to the edit page.
     """
