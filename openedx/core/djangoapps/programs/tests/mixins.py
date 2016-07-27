@@ -99,11 +99,13 @@ class ProgramsDataMixin(object):
         ]
     }
 
-    def mock_programs_api(self, data=None, status_code=200):
+    def mock_programs_api(self, data=None, program_id='', status_code=200):
         """Utility for mocking out Programs API URLs."""
         self.assertTrue(httpretty.is_enabled(), msg='httpretty must be enabled to mock Programs API calls.')
 
         url = ProgramsApiConfig.current().internal_api_url.strip('/') + '/programs/'
+        if program_id:
+            url += '{}/'.format(str(program_id))
 
         if data is None:
             data = self.PROGRAMS_API_RESPONSE
