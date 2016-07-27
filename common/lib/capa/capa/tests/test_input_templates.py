@@ -813,15 +813,15 @@ class OptionInputTemplateTest(TemplateTestCase):
 
     def test_label(self):
         xml = self.render_to_xml(self.context)
-        xpath = "//select[@aria-label='%s']" % self.context['response_data']['label']
-        self.assert_has_xpath(xml, xpath, self.context)
+        xpath = "//label[@class='problem-group-label']"
+        self.assert_has_xpath(xml, xpath, self.RESPONSE_DATA['label'])
 
     def test_description(self):
         """
         Test that correct description information is set on desired elements.
         """
         xpaths = ['//select/@aria-describedby']
-        self.assert_description(xpaths, descriptions=False)
+        self.assert_description(xpaths)
         self.assert_describedby_attribute(xpaths)
 
 

@@ -535,3 +535,29 @@ class ProblemTextInputA11yTest(CAPAProblemA11yBaseTestMixin, ProblemsTest):
             </stringresponse>
         </problem>""")
         return XBlockFixtureDesc('problem', 'TEXTINPUT PROBLEM', data=xml)
+
+
+@attr('a11y')
+class CAPAProblemDropDownA11yTest(CAPAProblemA11yBaseTestMixin, ProblemsTest):
+    """TestCase Class to verify accessibility for dropdowns(optioninput) CAPA problems."""
+
+    def get_problem(self):
+        """
+        Problem structure.
+        """
+        xml = dedent("""
+        <problem>
+            <optionresponse>
+                <p>You can use this template as a guide to the simple editor markdown and OLX markup to use for
+                 dropdown problems. Edit this component to replace this template with your own assessment.</p>
+                <label>Which of the following is a fruit</label>
+                <description>Choose wisely</description>
+                <optioninput>
+                    <option correct="False">radish</option>
+                    <option correct="True">appple</option>
+                    <option correct="False">carrot</option>
+                </optioninput>
+            </optionresponse>
+        </problem>
+        """)
+        return XBlockFixtureDesc('problem', 'Problem A11Y TEST', data=xml)
