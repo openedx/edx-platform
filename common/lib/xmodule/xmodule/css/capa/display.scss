@@ -156,6 +156,13 @@ div.problem {
   .question-description {
     @include margin(($baseline*0.75), 0);
   }
+
+  form > label {
+    display: block;
+    margin-bottom: $baseline;
+    font: inherit;
+    color: inherit;
+  }
 }
 
 // Choice Group - silent class
