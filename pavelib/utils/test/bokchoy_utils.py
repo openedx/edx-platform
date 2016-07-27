@@ -198,11 +198,10 @@ def check_mysql():
 
 
 @task
+@needs('check_mongo', 'check_memcache', 'check_mysql')
 @timed
 def check_services():
     """
     Check that all required services are running
     """
-    check_mongo()
-    check_memcache()
-    check_mysql()
+    pass
