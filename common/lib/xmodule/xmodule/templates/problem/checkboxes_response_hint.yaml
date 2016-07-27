@@ -3,65 +3,50 @@ metadata:
     display_name: Checkboxes with Hints and Feedback
     markdown: |
 
-      You can provide feedback for each option in a checkbox problem, with distinct feedback depending on whether or not the learner selects that option.
+      You can use this template as a guide to the simple editor markdown and OLX markup to use for checkboxes with hints and feedback problems. Edit this component to replace this template with your own assessment.
 
-      You can also provide compound feedback for a specific combination of answers. For example, if you have three possible answers in the problem, you can configure specific feedback for when a learner selects each combination of possible answers.
+      >>Add the question text, or prompt, here. This text is required.||You can add an optional tip or note related to the prompt like this.<<
 
-      You can also add hints for learners.
-
-      Be sure to select Settings to specify a Display Name and other values that apply.
-
-      Use the following example problem as a model.
-
-      >>Which of the following is a fruit?||Make sure you select all of the correct options—there may be more than one!<<
-
-      [x] apple  {{ selected: You are correct that an apple is a fruit because it is the fertilized ovary that comes from an apple tree and contains seeds. }, { unselected: Remember that an apple is also a fruit.}}
-      [x] pumpkin {{ selected: You are correct that a pumpkin is a fruit because it is the fertilized ovary of a squash plant and contains seeds. }, { unselected: Remember that a pumpkin is also a fruit.}}
-      [ ] potato   {{ U: You are correct that a potato is a vegetable because it is an edible part of a plant in tuber form.}, { S: A potato is a vegetable, not a fruit, because it does not come from a flower and does not contain seeds.}}
-      [x] tomato  {{ S: You are correct that a tomato is a fruit because it is the fertilized ovary of a tomato plant and contains seeds. }, { U: Many people mistakenly think a tomato is a vegetable. However, because a tomato is the fertilized ovary of a tomato plant and contains seeds, it is a fruit.}}
+      [x] a correct answer {{ selected: You can specify optional feedback that appears after the learner selects and submits this answer. }, { unselected: You can specify optional feedback that appears after the learner clears and submits this answer.}}
+      [ ] an incorrect answer
+      [ ] an incorrect answer {{ selected: You can specify optional feedback for none, all, or a subset of the answers. }, { unselected: You can specify optional feedback for selected answers, cleared answers, or both.}}
+      [x] a correct answer
 
 
-      {{ ((A B D)) An apple, pumpkin, and tomato are all fruits as they all are fertilized ovaries of a plant and contain seeds. }}
-      {{ ((A B C D)) You are correct that an apple, pumpkin, and tomato are all fruits as they all are fertilized ovaries of a plant and contain seeds. However, a potato is not a fruit as it is an edible part of a plant in tuber form and is a vegetable.  }}
+      {{ ((A B D)) You can specify optional feedback for a combination of answers which appears after the specified set of answers is submitted. }}
+      {{ ((A B C D)) You can specify optional feedback for one, several, or all answer combinations. }}
 
-      ||A fruit is the fertilized ovary from a flower.||
-      ||A fruit contains seeds of the plant.||
+      ||You can add an optional hint like this. Problems that have a hint include a hint button, and this text appears the first time learners select the button.||
+      ||If you add more than one hint, a different hint appears each time learners select the hint button.||
+
 
 hinted: true
 data:   |
         <problem>
             <choiceresponse>
-                <p>You can provide feedback for each option in a checkbox problem, with distinct feedback depending on whether or not the learner selects that option.</p>
-                <p>You can also provide compound feedback for a specific combination of answers. For example, if you have three possible answers in the problem, you can configure specific feedback for when a learner selects each combination of possible answers.</p>
-                <p>You can also add hints for learners.</p>
-                <p>Be sure to select Settings to specify a Display Name and other values that apply.</p>
-                <p>Use the following example problem as a model.</p>
-                <label>Which of the following is a fruit?</label>
-                <description>Make sure you select all of the correct options—there may be more than one!</description>
+                <p>You can use this template as a guide to the simple editor markdown and OLX markup to use for checkboxes with hints and feedback problems. Edit this component to replace this template with your own assessment.</p>
+                <label>Add the question text, or prompt, here. This text is required.</label>
+                <description>You can add an optional tip or note related to the prompt like this.</description>
                 <checkboxgroup>
-                    <choice correct="true">apple
-                        <choicehint selected="true">You are correct that an apple is a fruit because it is the fertilized ovary that comes from an apple tree and contains seeds.</choicehint>
-                        <choicehint selected="false">Remember that an apple is also a fruit.</choicehint>
+                    <choice correct="true">a correct answer
+                        <choicehint selected="true">You can specify optional feedback that appears after the learner selects and submits this answer.</choicehint>
+                        <choicehint selected="false">You can specify optional feedback that appears after the learner clears and submits this answer.</choicehint>
                     </choice>
-                    <choice correct="true">pumpkin
-                        <choicehint selected="true">You are correct that a pumpkin is a fruit because it is the fertilized ovary of a squash plant and contains seeds.</choicehint>
-                        <choicehint selected="false">Remember that a pumpkin is also a fruit.</choicehint>
+                    <choice correct="false">an incorrect answer
                     </choice>
-                    <choice correct="false">potato
-                        <choicehint selected="true">A potato is a vegetable, not a fruit, because it does not come from a flower and does not contain seeds.</choicehint>
-                        <choicehint selected="false">You are correct that a potato is a vegetable because it is an edible part of a plant in tuber form.</choicehint>
+                    <choice correct="false">an incorrect answer
+                        <choicehint selected="true">You can specify optional feedback for none, all, or a subset of the answers.</choicehint>
+                        <choicehint selected="false">You can specify optional feedback for selected answers, cleared answers, or both.</choicehint>
                     </choice>
-                    <choice correct="true">tomato
-                        <choicehint selected="true">You are correct that a tomato is a fruit because it is the fertilized ovary of a tomato plant and contains seeds.</choicehint>
-                        <choicehint selected="false">Many people mistakenly think a tomato is a vegetable. However, because a tomato is the fertilized ovary of a tomato plant and contains seeds, it is a fruit.</choicehint>
+                    <choice correct="true">a correct answer
                     </choice>
-                    <compoundhint value="A B D">An apple, pumpkin, and tomato are all fruits as they all are fertilized ovaries of a plant and contain seeds.</compoundhint>
-                    <compoundhint value="A B C D">You are correct that an apple, pumpkin, and tomato are all fruits as they all are fertilized ovaries of a plant and contain seeds. However, a potato is not a fruit as it is an edible part of a plant in tuber form and is a vegetable.</compoundhint>
+                    <compoundhint value="A B D">You can specify optional feedback for a combination of answers which appears after the specified set of answers is submitted.</compoundhint>
+                    <compoundhint value="A B C D">You can specify optional feedback for one, several, or all answer combinations.</compoundhint>
                 </checkboxgroup>
             </choiceresponse>
 
             <demandhint>
-                <hint>A fruit is the fertilized ovary from a flower.</hint>
-                <hint>A fruit contains seeds of the plant.</hint>
+                <hint>You can add an optional hint like this. Problems that have a hint include a hint button, and this text appears the first time learners select the button.</hint>
+                <hint>If you add more than one hint, a different hint appears each time learners select the hint button.</hint>
             </demandhint>
         </problem>
