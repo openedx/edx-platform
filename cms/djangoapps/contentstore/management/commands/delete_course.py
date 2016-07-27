@@ -13,7 +13,6 @@ from util.prompt import query_yes_no
 from contentstore.utils import delete_course_and_groups
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys import InvalidKeyError
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 
@@ -31,7 +30,7 @@ class Command(BaseCommand):
         try:
             course_key = CourseKey.from_string(options['course_key'])
         except InvalidKeyError:
-            course_key = SlashSeparatedCourseKey.from_deprecated_string(options['course_key'])
+            raise CommandError("Invalid course_key: '%s'." % options['course_key'])
 
         if not modulestore().get_course(course_key):
             raise CommandError("Course with '%s' key not found." % options['course_key'])

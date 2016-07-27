@@ -60,6 +60,8 @@ FEATURES['DISABLE_START_DATES'] = True
 # the one in cms/envs/test.py
 FEATURES['ENABLE_DISCUSSION_SERVICE'] = False
 
+FEATURES['ENABLE_DISCUSSION_EMAIL_DIGEST'] = True
+
 FEATURES['ENABLE_SERVICE_STATUS'] = True
 
 FEATURES['ENABLE_SHOPPING_CART'] = True
@@ -77,14 +79,9 @@ FINANCIAL_REPORTS['ROOT_PATH'] += "-{}".format(os.getpid())
 # Toggles embargo on for testing
 FEATURES['EMBARGO'] = True
 
-# Toggles API on for testing
-FEATURES['API'] = True
 FEATURES['ALLOW_STUDENT_STATE_UPDATES_ON_CLOSED_COURSE'] = False
 
 FEATURES['ENABLE_COMBINED_LOGIN_REGISTRATION'] = True
-
-# Toggles API on for testing
-FEATURES['API'] = True
 
 # Need wiki for courseware views to work. TODO (vshnayder): shouldn't need it.
 WIKI_ENABLED = True
@@ -568,6 +565,27 @@ FACEBOOK_API_VERSION = "v2.2"
 ######### custom courses #########
 INSTALLED_APPS += ('lms.djangoapps.ccx', 'openedx.core.djangoapps.ccxcon')
 FEATURES['CUSTOM_COURSES_EDX'] = True
+
+##### edx solutions apps for McKA #####
+EDX_API_KEY = 'test_api_key'
+TEST_MODE = True
+FEATURES['EDX_SOLUTIONS_API'] = True
+
+INSTALLED_APPS += (
+    'course_metadata',
+    'edx_solutions_api_integration',
+    'social_engagement',
+    'gradebook',
+    'progress',
+    'edx_solutions_projects',
+    'edx_solutions_organizations',
+)
+
+
+############# Student Module #################
+FEATURES['SIGNAL_ON_SCORE_CHANGED'] = True
+
+FEATURES['DISABLE_SOLUTIONS_APPS_SIGNALS'] = True
 
 # Set dummy values for profile image settings.
 PROFILE_IMAGE_BACKEND = {

@@ -18,38 +18,6 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='HistoricalVerificationDeadline',
-            fields=[
-                ('id', models.IntegerField(verbose_name='ID', db_index=True, auto_created=True, blank=True)),
-                ('created', model_utils.fields.AutoCreatedField(default=django.utils.timezone.now, verbose_name='created', editable=False)),
-                ('modified', model_utils.fields.AutoLastModifiedField(default=django.utils.timezone.now, verbose_name='modified', editable=False)),
-                ('course_key', xmodule_django.models.CourseKeyField(help_text='The course for which this deadline applies', max_length=255, db_index=True)),
-                ('deadline', models.DateTimeField(help_text='The datetime after which users are no longer allowed to submit photos for verification.')),
-                ('history_id', models.AutoField(serialize=False, primary_key=True)),
-                ('history_date', models.DateTimeField()),
-                ('history_type', models.CharField(max_length=1, choices=[('+', 'Created'), ('~', 'Changed'), ('-', 'Deleted')])),
-                ('history_user', models.ForeignKey(related_name='+', on_delete=django.db.models.deletion.SET_NULL, to=settings.AUTH_USER_MODEL, null=True)),
-            ],
-            options={
-                'ordering': ('-history_date', '-history_id'),
-                'get_latest_by': 'history_date',
-                'verbose_name': 'historical verification deadline',
-            },
-        ),
-        migrations.CreateModel(
-            name='IcrvStatusEmailsConfiguration',
-            fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('change_date', models.DateTimeField(auto_now_add=True, verbose_name='Change date')),
-                ('enabled', models.BooleanField(default=False, verbose_name='Enabled')),
-                ('changed_by', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, editable=False, to=settings.AUTH_USER_MODEL, null=True, verbose_name='Changed by')),
-            ],
-            options={
-                'ordering': ('-change_date',),
-                'abstract': False,
-            },
-        ),
-        migrations.CreateModel(
             name='InCourseReverificationConfiguration',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
@@ -88,7 +56,6 @@ class Migration(migrations.Migration):
                 ('error_msg', models.TextField(blank=True)),
                 ('error_code', models.CharField(max_length=50, blank=True)),
                 ('photo_id_key', models.TextField(max_length=1024)),
-                ('copy_id_photo_from', models.ForeignKey(blank=True, to='verify_student.SoftwareSecurePhotoVerification', null=True)),
                 ('reviewing_user', models.ForeignKey(related_name='photo_verifications_reviewed', default=None, to=settings.AUTH_USER_MODEL, null=True)),
                 ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
             ],
@@ -105,19 +72,6 @@ class Migration(migrations.Migration):
                 ('checkpoint_location', models.CharField(max_length=255)),
                 ('photo_verification', models.ManyToManyField(to='verify_student.SoftwareSecurePhotoVerification')),
             ],
-        ),
-        migrations.CreateModel(
-            name='VerificationDeadline',
-            fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('created', model_utils.fields.AutoCreatedField(default=django.utils.timezone.now, verbose_name='created', editable=False)),
-                ('modified', model_utils.fields.AutoLastModifiedField(default=django.utils.timezone.now, verbose_name='modified', editable=False)),
-                ('course_key', xmodule_django.models.CourseKeyField(help_text='The course for which this deadline applies', unique=True, max_length=255, db_index=True)),
-                ('deadline', models.DateTimeField(help_text='The datetime after which users are no longer allowed to submit photos for verification.')),
-            ],
-            options={
-                'abstract': False,
-            },
         ),
         migrations.CreateModel(
             name='VerificationStatus',

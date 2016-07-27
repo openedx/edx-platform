@@ -22,18 +22,18 @@ def mock_grade(_student, course, **_kwargs):
         'grade': u'Pass',
         'totaled_scores': {
             u'Homework': [
-                Score(earned=10.0, possible=10.0, graded=True, section=u'Subsection 1', module_id=None),
+                Score(earned=10.0, possible=10.0, graded=True, section=u'Subsection 1', module_id=None, due=None),
             ]
         },
         'percent': 0.85,
         'raw_scores': [
             Score(
                 earned=5.0, possible=5.0, graded=True, section=u'Numerical Input',
-                module_id=course.id.make_usage_key('problem', 'problem1'),
+                module_id=course.id.make_usage_key('problem', 'problem1'), due=None,
             ),
             Score(
                 earned=5.0, possible=5.0, graded=True, section=u'Multiple Choice',
-                module_id=course.id.make_usage_key('problem', 'problem2'),
+                module_id=course.id.make_usage_key('problem', 'problem2'), due=None,
             ),
         ],
         'section_breakdown': [
@@ -71,7 +71,14 @@ class TestOfflineGradeCalc(ModuleStoreTestCase):
         self.assertEqual(decoded['percent'], 0.85)
         self.assertEqual(decoded['totaled_scores'], {
             "Homework": [
-                {"earned": 10.0, "possible": 10.0, "graded": True, "section": "Subsection 1", "module_id": None}
+                {
+                    "earned": 10.0,
+                    "possible": 10.0,
+                    "graded": True,
+                    "section": "Subsection 1",
+                    "module_id": None,
+                    "due": None
+                }
             ]
         })
         self.assertEqual(decoded['raw_scores'], [
@@ -81,6 +88,7 @@ class TestOfflineGradeCalc(ModuleStoreTestCase):
                 "graded": True,
                 "section": "Numerical Input",
                 "module_id": unicode(self.course.id.make_usage_key('problem', 'problem1')),
+                "due": None,
             },
             {
                 "earned": 5.0,
@@ -88,6 +96,7 @@ class TestOfflineGradeCalc(ModuleStoreTestCase):
                 "graded": True,
                 "section": "Multiple Choice",
                 "module_id": unicode(self.course.id.make_usage_key('problem', 'problem2')),
+                "due": None,
             }
         ])
         self.assertEqual(decoded['section_breakdown'], [

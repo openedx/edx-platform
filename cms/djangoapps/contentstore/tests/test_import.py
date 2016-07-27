@@ -10,7 +10,7 @@ from django.conf import settings
 import ddt
 import copy
 
-from openedx.core.djangoapps.util.testing import SignalDisconnectTestMixin
+from openedx.core.djangoapps.content.course_structures.tests import SignalDisconnectTestMixin
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore

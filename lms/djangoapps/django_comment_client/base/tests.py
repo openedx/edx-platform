@@ -18,6 +18,7 @@ from lms.lib.comment_client import Thread
 
 from common.test.utils import MockSignalHandlerMixin, disable_signal
 from django_comment_client.base import views
+from django_comment_client.utils import is_commentable_cohorted
 from django_comment_client.tests.group_id import (
     CohortedTopicGroupIdTestMixin, NonCohortedTopicGroupIdTestMixin, GroupIdAssertionMixin
 )
@@ -35,7 +36,7 @@ from xmodule.modulestore.tests.factories import check_mongo_calls
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore import ModuleStoreEnum
 
-from openedx.core.djangoapps.course_groups.cohorts import is_commentable_cohorted, add_cohort, add_user_to_cohort
+from openedx.core.djangoapps.course_groups.cohorts import add_cohort, add_user_to_cohort
 from openedx.core.djangoapps.course_groups.models import CourseCohort
 
 from edx_notifications.lib.consumer import get_notifications_count_for_user
@@ -581,6 +582,11 @@ class ViewsTestCase(
             yield
 
     def test_create_thread(self, mock_request):
+        # make sure course is not cohorted
+        self.course.cohort_config = {
+            'cohorted': False,
+        }
+        self.store.update_item(self.course, self.student.id)
         with self.assert_discussion_signals('thread_created'):
             self.create_thread_helper(mock_request)
 
@@ -1475,7 +1481,7 @@ class ViewPermissionsTestCase(UrlResetMixin, SharedModuleStoreTestCase, MockRequ
 
 @attr('shard_2')
 @patch.dict("django.conf.settings.FEATURES", {"ENABLE_SOCIAL_ENGAGEMENT": False})
-class CreateThreadUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin, MockRequestSetupMixin):
+class CreateThreadUnicodeTestCase(SharedModuleStoreTestCase, UnicodeTestMixin, MockRequestSetupMixin):
     def setUp(self):
         super(CreateThreadUnicodeTestCase, self).setUp()
 
@@ -1515,7 +1521,7 @@ class CreateThreadUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin, MockReq
 @attr('shard_2')
 @disable_signal(views, 'thread_edited')
 @patch.dict("django.conf.settings.FEATURES", {"ENABLE_SOCIAL_ENGAGEMENT": False})
-class UpdateThreadUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin, MockRequestSetupMixin):
+class UpdateThreadUnicodeTestCase(SharedModuleStoreTestCase, UnicodeTestMixin, MockRequestSetupMixin):
     def setUp(self):
         super(UpdateThreadUnicodeTestCase, self).setUp()
 

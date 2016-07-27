@@ -200,6 +200,12 @@ FEATURES = {
     # Can the visibility of the discussion tab be configured on a per-course basis?
     'ALLOW_HIDING_DISCUSSION_TAB': False,
 
+    # edx-notifications subsystem
+    'ENABLE_NOTIFICATIONS': False,
+
+    # Whether edx-notifications should use Celery for bulk operations
+    'ENABLE_NOTIFICATIONS_CELERY': False,
+
     # Special Exams, aka Timed and Proctored Exams
     'ENABLE_SPECIAL_EXAMS': False,
 
@@ -888,7 +894,6 @@ INSTALLED_APPS = (
 
     'openedx.core.djangoapps.content.course_overviews',
     'openedx.core.djangoapps.content.course_structures',
-    'course_metadata',
 
     # Credit courses
     'openedx.core.djangoapps.credit',
@@ -1173,6 +1178,71 @@ CREDIT_TASK_MAX_RETRIES = 5
 # when a credit provider notifies us that a student has been approved
 # or denied for credit.
 CREDIT_PROVIDER_TIMESTAMP_EXPIRATION = 15 * 60
+
+################################ Deprecated Blocks Info ################################
+
+DEPRECATED_BLOCK_TYPES = ['peergrading', 'combinedopenended']
+
+################################### EDX-NOTIFICATIONS SUBSYSTEM ######################################
+
+INSTALLED_APPS += (
+    'edx_notifications',
+    'edx_notifications.server.web',
+)
+
+
+NOTIFICATION_STORE_PROVIDER = {
+    "class": "edx_notifications.stores.sql.store_provider.SQLNotificationStoreProvider",
+    "options": {
+    }
+}
+
+# to prevent run-away queries from happening
+NOTIFICATION_MAX_LIST_SIZE = 100
+
+#
+# Various mapping tables which is used by the MsgTypeToUrlLinkResolver
+# to map a notification type to a statically defined URL path
+#
+# NOTE: NOTIFICATION_CLICK_LINK_URL_MAPS will usually get read in by the *.envs.json file
+#
+NOTIFICATION_CLICK_LINK_URL_MAPS = {
+    'open-edx.studio.announcements.*': '/courses/{course_id}/announcements',
+    'open-edx.lms.leaderboard.*': '/courses/{course_id}/cohort',
+    'open-edx.lms.discussions.*': '/courses/{course_id}/discussion/{commentable_id}/threads/{thread_id}',
+    'open-edx.xblock.group-project.*': '/courses/{course_id}/group_work?seqid={activity_location}',
+    'open-edx.xblock.group-project-v2.*': '/courses/{course_id}/group_work?activate_block_id={location}',
+}
+
+# list all known channel providers
+NOTIFICATION_CHANNEL_PROVIDERS = {
+    'durable': {
+        'class': 'edx_notifications.channels.durable.BaseDurableNotificationChannel',
+        'options': {
+            # list out all link resolvers
+            'link_resolvers': {
+                # right now the only defined resolver is 'type_to_url', which
+                # attempts to look up the msg type (key) via
+                # matching on the value
+                'msg_type_to_url': {
+                    'class': 'edx_notifications.channels.link_resolvers.MsgTypeToUrlLinkResolver',
+                    'config': {
+                        '_click_link': NOTIFICATION_CLICK_LINK_URL_MAPS,
+                    }
+                }
+            }
+        }
+    },
+    'null': {
+        'class': 'edx_notifications.channels.null.NullNotificationChannel',
+        'options': {}
+    }
+}
+
+# list all of the mappings of notification types to channel
+NOTIFICATION_CHANNEL_PROVIDER_TYPE_MAPS = {
+    '*': 'durable',  # default global mapping
+}
 
 ################################ Settings for Microsites ################################
 

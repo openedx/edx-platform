@@ -38,14 +38,6 @@ GRADER_TYPES = {
 }
 
 
-# Add Discussion templates
-add_lookup('lms.main', 'templates', package='discussion_app')
-
-
-# Add Discussion templates
-add_lookup('lms.main', 'templates', package='discussion_app')
-
-
 def event(request):
     '''
     A noop to swallow the analytics call so that cms methods don't spook and poor developers looking at

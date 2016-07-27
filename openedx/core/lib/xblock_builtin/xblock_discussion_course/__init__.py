@@ -1,0 +1,1 @@
+from .xblock_discussion_course import DiscussionCourseXBlock

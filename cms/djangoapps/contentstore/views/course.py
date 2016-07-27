@@ -22,6 +22,7 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import Location
+from util.html import strip_tags
 
 from .component import (
     ADVANCED_COMPONENT_TYPES,

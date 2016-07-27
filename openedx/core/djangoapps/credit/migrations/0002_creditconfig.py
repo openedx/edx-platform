@@ -28,4 +28,29 @@ class Migration(migrations.Migration):
                 'abstract': False,
             },
         ),
+        migrations.AddField(
+            model_name='creditprovider',
+            name='provider_description',
+            field=models.TextField(default=b'', help_text='Description for the credit provider displayed to users.'),
+        ),
+        migrations.AddField(
+            model_name='creditprovider',
+            name='fulfillment_instructions',
+            field=models.TextField(help_text='Plain text or html content for displaying further steps on receipt page *after* paying for the credit to get credit for a credit course against a credit provider.', null=True, blank=True),
+        ),
+        migrations.AddField(
+            model_name='creditprovider',
+            name='eligibility_email_message',
+            field=models.TextField(default=b'', help_text='Plain text or html content for displaying custom message inside credit eligibility email content which is sent when user has met all credit eligibility requirements.'),
+        ),
+        migrations.AddField(
+            model_name='creditprovider',
+            name='receipt_email_message',
+            field=models.TextField(default=b'', help_text='Plain text or html content for displaying custom message inside credit receipt email content which is sent *after* paying to get credit for a credit course.'),
+        ),
+        migrations.AddField(
+            model_name='creditprovider',
+            name='thumbnail_url',
+            field=models.URLField(default=b'', help_text='Thumbnail image url of the credit provider.', max_length=255),
+        ),
     ]

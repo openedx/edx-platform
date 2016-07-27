@@ -17,7 +17,6 @@ from xmodule.contentstore.django import contentstore
 from xmodule.error_module import ErrorDescriptor
 from xmodule.exceptions import NotFoundError, ProcessingError
 from xmodule.studio_editable import has_author_view
-from xmodule.services import SettingsService
 from xmodule.modulestore.django import modulestore, ModuleI18nService
 from xmodule.mixin import wrap_with_license
 from opaque_keys.edx.keys import UsageKey
@@ -27,7 +26,6 @@ from xblock.runtime import KvsFieldData
 from xblock.django.request import webob_to_django_response, django_to_webob_request
 from xblock.exceptions import NoSuchHandlerError
 from xblock.fragment import Fragment
-from student.auth import has_studio_read_access, has_studio_write_access
 from xblock_django.user_service import DjangoXBlockUserService
 from xmodule.services import SettingsService, NotificationsService, CoursewareParentInfoService
 
@@ -163,10 +161,9 @@ def get_available_xblock_services(request=None, field_data=None):
     """
 
     services = {
-        "i18n": ModuleI18nService(),
+        "i18n": ModuleI18nService,
         "settings": SettingsService(),
         "courseware_parent_info": CoursewareParentInfoService(),
-        "library_tools": LibraryToolsService(modulestore()),
     }
     if request:
         services['user'] = DjangoXBlockUserService(request.user)
@@ -221,8 +218,6 @@ def _preview_module_system(request, descriptor, field_data):
     if settings.FEATURES.get("LICENSING", False):
         # stick the license wrapper in front
         wrappers.insert(0, wrap_with_license)
-
-    descriptor.runtime._services['studio_user_permissions'] = StudioPermissionsService(request)  # pylint: disable=protected-access
 
     services = get_available_xblock_services(request, field_data)
 

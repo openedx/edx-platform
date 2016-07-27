@@ -6,6 +6,7 @@ import django.utils.timezone
 from django.conf import settings
 import model_utils.fields
 import xmodule_django.models
+import certificates.models
 
 
 class Migration(migrations.Migration):
@@ -29,4 +30,40 @@ class Migration(migrations.Migration):
                 ('instructor_task', models.ForeignKey(to='instructor_task.InstructorTask')),
             ],
         ),
+        migrations.CreateModel(
+            name='CertificateTemplate',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('created', model_utils.fields.AutoCreatedField(default=django.utils.timezone.now, verbose_name='created', editable=False)),
+                ('modified', model_utils.fields.AutoLastModifiedField(default=django.utils.timezone.now, verbose_name='modified', editable=False)),
+                ('name', models.CharField(help_text='Name of template.', max_length=255)),
+                ('description', models.CharField(help_text='Description and/or admin notes.', max_length=255, null=True, blank=True)),
+                ('template', models.TextField(help_text='Django template HTML.')),
+                ('organization_id', models.IntegerField(help_text='Organization of template.', null=True, db_index=True, blank=True)),
+                ('course_key', xmodule_django.models.CourseKeyField(db_index=True, max_length=255, null=True, blank=True)),
+                ('mode', models.CharField(default=b'honor', choices=[(b'verified', b'verified'), (b'honor', b'honor'), (b'audit', b'audit'), (b'professional', b'professional'), (b'no-id-professional', b'no-id-professional')], max_length=125, blank=True, help_text='The course mode for this template.', null=True)),
+                ('is_active', models.BooleanField(default=False, help_text='On/Off switch.')),
+            ],
+            options={
+                'get_latest_by': 'created',
+            },
+        ),
+        migrations.CreateModel(
+            name='CertificateTemplateAsset',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('created', model_utils.fields.AutoCreatedField(default=django.utils.timezone.now, verbose_name='created', editable=False)),
+                ('modified', model_utils.fields.AutoLastModifiedField(default=django.utils.timezone.now, verbose_name='modified', editable=False)),
+                ('description', models.CharField(help_text='Description of the asset.', max_length=255, null=True, blank=True)),
+                ('asset', models.FileField(help_text='Asset file. It could be an image or css file.', max_length=255, upload_to=certificates.models.template_assets_path)),
+            ],
+            options={
+                'get_latest_by': 'created',
+            },
+        ),
+        migrations.AlterUniqueTogether(
+            name='certificatetemplate',
+            unique_together=set([('organization_id', 'course_key', 'mode')]),
+        ),
+
     ]

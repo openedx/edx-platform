@@ -18,6 +18,7 @@ Common traits:
 
 import datetime
 import json
+import importlib
 import warnings
 
 import dateutil
@@ -361,7 +362,6 @@ if FEATURES.get('AUTH_USE_CAS'):
     MIDDLEWARE_CLASSES += ('django_cas.middleware.CASMiddleware',)
     CAS_ATTRIBUTE_CALLBACK = ENV_TOKENS.get('CAS_ATTRIBUTE_CALLBACK', None)
     if CAS_ATTRIBUTE_CALLBACK:
-        import importlib
         CAS_USER_DETAILS_RESOLVER = getattr(
             importlib.import_module(CAS_ATTRIBUTE_CALLBACK['module']),
             CAS_ATTRIBUTE_CALLBACK['function']
@@ -391,11 +391,6 @@ CSRF_COOKIE_SECURE = ENV_TOKENS.get('CSRF_COOKIE_SECURE', False)
 ############# CORS headers for cross-domain requests #################
 
 if FEATURES.get('ENABLE_CORS_HEADERS') or FEATURES.get('ENABLE_CROSS_DOMAIN_CSRF_COOKIE'):
-    INSTALLED_APPS += ('corsheaders', 'cors_csrf')
-    MIDDLEWARE_CLASSES = (
-        'corsheaders.middleware.CorsMiddleware',
-        'cors_csrf.middleware.CorsCSRFMiddleware',
-    ) + MIDDLEWARE_CLASSES
     CORS_ALLOW_CREDENTIALS = True
     CORS_ORIGIN_WHITELIST = ENV_TOKENS.get('CORS_ORIGIN_WHITELIST', ())
     CORS_ORIGIN_ALLOW_ALL = ENV_TOKENS.get('CORS_ORIGIN_ALLOW_ALL', False)
@@ -582,12 +577,8 @@ STUDENT_FILEUPLOAD_MAX_SIZE = ENV_TOKENS.get("STUDENT_FILEUPLOAD_MAX_SIZE", STUD
 PROGRESS_DETACHED_APPS = ['group_project_v2']
 for app in PROGRESS_DETACHED_APPS:
     try:
-        app_module = __import__(app, fromlist=['app_config'])
+        app_config = importlib.import_module('.app_config', app)
     except ImportError:
-        continue
-
-    app_config = getattr(app_module, 'app_config', None)
-    if not app_config:
         continue
 
     detached_module_categories = getattr(app_config, 'PROGRESS_DETACHED_CATEGORIES', [])
@@ -805,6 +796,18 @@ ECOMMERCE_API_TIMEOUT = ENV_TOKENS.get('ECOMMERCE_API_TIMEOUT', ECOMMERCE_API_TI
 
 COURSE_CATALOG_API_URL = ENV_TOKENS.get('COURSE_CATALOG_API_URL', COURSE_CATALOG_API_URL)
 
+##### edx solutions apps for McKA #####
+if FEATURES.get('EDX_SOLUTIONS_API'):
+    INSTALLED_APPS += (
+        'course_metadata',
+        'edx_solutions_api_integration',
+        'social_engagement',
+        'gradebook',
+        'progress',
+        'edx_solutions_projects',
+        'edx_solutions_organizations',
+    )
+
 ##### Custom Courses for EdX #####
 if FEATURES.get('CUSTOM_COURSES_EDX'):
     INSTALLED_APPS += ('lms.djangoapps.ccx', 'openedx.core.djangoapps.ccxcon')
@@ -895,6 +898,58 @@ STUDENTMODULEHISTORYEXTENDED_OFFSET = ENV_TOKENS.get(
 # Cutoff date for granting audit certificates
 if ENV_TOKENS.get('AUDIT_CERT_CUTOFF_DATE', None):
     AUDIT_CERT_CUTOFF_DATE = dateutil.parser.parse(ENV_TOKENS.get('AUDIT_CERT_CUTOFF_DATE'))
+
+##### EDX-NOTIFICATIONS ######
+NOTIFICATION_CLICK_LINK_URL_MAPS = ENV_TOKENS.get(
+    'NOTIFICATION_CLICK_LINK_URL_MAPS',
+    NOTIFICATION_CLICK_LINK_URL_MAPS
+)
+NOTIFICATION_STORE_PROVIDER = ENV_TOKENS.get(
+    'NOTIFICATION_STORE_PROVIDER',
+    NOTIFICATION_STORE_PROVIDER
+)
+NOTIFICATION_CHANNEL_PROVIDERS = ENV_TOKENS.get(
+    'NOTIFICATION_CHANNEL_PROVIDERS',
+    NOTIFICATION_CHANNEL_PROVIDERS
+)
+NOTIFICATION_CHANNEL_PROVIDER_TYPE_MAPS = ENV_TOKENS.get(
+    'NOTIFICATION_CHANNEL_PROVIDER_TYPE_MAPS',
+    NOTIFICATION_CHANNEL_PROVIDER_TYPE_MAPS
+)
+
+NOTIFICATION_MAX_LIST_SIZE = ENV_TOKENS.get(
+    'NOTIFICATION_MAX_LIST_SIZE',
+    NOTIFICATION_MAX_LIST_SIZE
+)
+
+NOTIFICATION_DAILY_DIGEST_SUBJECT = ENV_TOKENS.get(
+    'NOTIFICATION_DAILY_DIGEST_SUBJECT',
+    NOTIFICATION_DAILY_DIGEST_SUBJECT
+)
+NOTIFICATION_WEEKLY_DIGEST_SUBJECT = ENV_TOKENS.get(
+    'NOTIFICATION_WEEKLY_DIGEST_SUBJECT',
+    NOTIFICATION_WEEKLY_DIGEST_SUBJECT
+)
+NOTIFICATION_BRANDED_DEFAULT_LOGO = ENV_TOKENS.get(
+    'NOTIFICATION_BRANDED_DEFAULT_LOGO',
+    NOTIFICATION_BRANDED_DEFAULT_LOGO
+)
+NOTIFICATION_EMAIL_FROM_ADDRESS = ENV_TOKENS.get(
+    'NOTIFICATION_EMAIL_FROM_ADDRESS',
+    NOTIFICATION_EMAIL_FROM_ADDRESS
+)
+NOTIFICATION_APP_HOSTNAME = ENV_TOKENS.get(
+    'NOTIFICATION_APP_HOSTNAME',
+    SITE_NAME
+)
+NOTIFICATION_EMAIL_CLICK_LINK_ROOT = ENV_TOKENS.get(
+    'NOTIFICATION_EMAIL_CLICK_LINK_ROOT',
+    NOTIFICATION_EMAIL_CLICK_LINK_ROOT
+)
+NOTIFICATION_DIGEST_SEND_TIMEFILTERED = ENV_TOKENS.get(
+    'NOTIFICATION_DIGEST_SEND_TIMEFILTERED',
+    NOTIFICATION_DIGEST_SEND_TIMEFILTERED
+)
 
 ################################ Settings for Credentials Service ################################
 

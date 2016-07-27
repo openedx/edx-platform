@@ -74,23 +74,23 @@ else
             ;;
 
         1)  # run all of the lms unit tests
-            paver test_system -s lms --with-flaky --cov-args="-p" --with-xunitmp
+            paver test_system -s lms --with-flaky --cov-args="-p" --with-xunitmp --disable-migrations
             ;;
 
         2)  # run all of the cms unit tests
-            paver test_system -s cms --with-flaky --cov-args="-p" --with-xunitmp
+            paver test_system -s cms --with-flaky --cov-args="-p" --with-xunitmp --disable-migrations
             ;;
 
-    3)  # run the commonlib and solutions apps unit tests
-        paver test_lib --extra_args="--with-flaky" --cov_args="-p" --with-xunitmp
-        paver test_system -s lms -t edx_solutions_organizations
-        paver test_system -s lms -t gradebook
-        paver test_system -s lms -t progress
-        paver test_system -s lms -t edx_solutions_projects
-        paver test_system -s lms -t course_metadata
-        paver test_system -s lms -t social_engagement
-        paver test_system -s lms -t edx_solutions_api_integration
-        ;;
+        3)  # run the commonlib and solutions apps unit tests
+            paver test_lib --extra_args="--with-flaky" --cov_args="-p" --with-xunitmp
+            paver test_system -s lms -t edx_solutions_api_integration --with-xunitmp --disable-migrations
+            paver test_system -s lms -t edx_solutions_organizations --with-xunitmp --disable-migrations
+            paver test_system -s lms -t edx_solutions_projects --with-xunitmp --disable-migrations
+            paver test_system -s lms -t gradebook --with-xunitmp --disable-migrations
+            paver test_system -s lms -t progress --with-xunitmp --disable-migrations
+            paver test_system -s lms -t social_engagement  --with-xunitmp --disable-migrations
+            paver test_system -s lms -t course_metadata  --with-xunitmp --disable-migrations
+            ;;
 
         *)
             echo "No tests were executed in this container."

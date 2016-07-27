@@ -559,6 +559,18 @@ def get_module_system_for_user(user, student_data,  # TODO  # pylint: disable=to
             course_id,
             descriptor.location,
         )
+
+        # Send a signal out to any listeners who are waiting for score change
+        # events.
+        SCORE_CHANGED.send(
+            sender=None,
+            points_possible=event.get('max_value'),
+            points_earned=event.get('value'),
+            user_id=user_id,
+            course_id=unicode(course_id),
+            usage_id=unicode(descriptor.location)
+        )
+
         # we can treat a grading event as a indication that a user
         # "completed" an xBlock
         if settings.FEATURES.get('MARK_PROGRESS_ON_GRADING_EVENT', False):
@@ -579,17 +591,6 @@ def get_module_system_for_user(user, student_data,  # TODO  # pylint: disable=to
         user_id = event.get('user_id', user.id)
         if not user_id:
             return
-
-        # Send a signal out to any listeners who are waiting for score change
-        # events.
-        SCORE_CHANGED.send(
-            sender=None,
-            points_possible=event.get('max_value'),
-            points_earned=event.get('value'),
-            user_id=user_id,
-            course_id=unicode(course_id),
-            usage_id=unicode(descriptor.location)
-        )
 
         CourseModuleCompletion.objects.get_or_create(
             user_id=user_id,
@@ -761,13 +762,15 @@ def get_module_system_for_user(user, student_data,  # TODO  # pylint: disable=to
     user_is_staff = bool(has_access(user, u'staff', descriptor.location, course_id))
 
     services_list = {
-        'i18n': ModuleI18nService(),
         'fs': FSService(),
         'field-data': field_data,
+        'user': DjangoXBlockUserService(user, user_is_staff=user_is_staff),
         'settings': SettingsService(),
         'courseware_parent_info': CoursewareParentInfoService(),
         "reverification": ReverificationService(),
-        'user': DjangoXBlockUserService(user, user_is_staff=user_is_staff),
+        'proctoring': ProctoringService(),
+        'credit': CreditService(),
+        'bookmarks': BookmarksService(user=user),
     }
 
     if settings.FEATURES.get('ENABLE_NOTIFICATIONS', False):

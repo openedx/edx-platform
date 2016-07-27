@@ -21,7 +21,7 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from mock import Mock
 from opaque_keys.edx.locator import CourseKey, LibraryLocator
-from openedx.core.djangoapps.util.testing import SignalDisconnectTestMixin
+from openedx.core.djangoapps.content.course_structures.tests import SignalDisconnectTestMixin
 from xblock_django.user_service import DjangoXBlockUserService
 from xmodule.x_module import STUDIO_VIEW
 from student import auth

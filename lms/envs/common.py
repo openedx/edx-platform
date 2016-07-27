@@ -63,6 +63,7 @@ DISCUSSION_SETTINGS = {
 
 # Features
 FEATURES = {
+    'EDX_SOLUTIONS_API': False,
     'DISPLAY_DEBUG_INFO_TO_STAFF': True,
     'DISPLAY_HISTOGRAMS_TO_STAFF': False,  # For large courses this slows down courseware access for staff.
 
@@ -120,6 +121,9 @@ FEATURES = {
     # Allows to enable an API endpoint to serve XBlock view, used for example by external applications.
     # See jquey-xblock: https://github.com/edx-solutions/jquery-xblock
     'ENABLE_XBLOCK_VIEW_ENDPOINT': False,
+
+    # Allows to configure the LMS to provide CORS headers to serve requests from other domains
+    'ENABLE_CORS_HEADERS': False,
 
     # Can be turned off if course lists need to be hidden. Effects views and templates.
     'COURSES_ARE_BROWSABLE': True,
@@ -339,6 +343,22 @@ FEATURES = {
 
     # The block types to disable need to be specified in "x block disable config" in django admin.
     'ENABLE_DISABLING_XBLOCK_TYPES': True,
+
+    # Whether an xBlock publishing a 'grade' event should be considered a 'progress' event as well
+    'MARK_PROGRESS_ON_GRADING_EVENT': False,
+
+    # Broadcast score changes to the rest of the system
+    'SIGNAL_ON_SCORE_CHANGED': False,
+
+    # Enable the edx-notifications subssytem
+    'ENABLE_NOTIFICATIONS': False,
+
+    # Whether edx-notifications should use Celery for bulk operations
+    'ENABLE_NOTIFICATIONS_CELERY': False,
+
+    # whether to turn on Social Engagment scoring
+    # driven through the comment service
+    'ENABLE_SOCIAL_ENGAGEMENT': False,
 
     # Enable LTI Provider feature.
     'ENABLE_LTI_PROVIDER': False,
@@ -585,6 +605,10 @@ USAGE_ID_PATTERN = r'(?P<usage_id>(?:i4x://?[^/]+/[^/]+/[^/]+/[^@]+(?:@[^/]+)?)|
 
 USERNAME_PATTERN = r'(?P<username>[\w.@+-]+)'
 
+# Verticals having children with any of these categories would be excluded from progress calculations
+PROGRESS_DETACHED_VERTICAL_CATEGORIES = ['discussion-course', 'group-project', 'gp-v2-project']
+# Modules having these categories would be excluded from progress calculations
+PROGRESS_DETACHED_CATEGORIES = PROGRESS_DETACHED_VERTICAL_CATEGORIES + ['discussion-forum']
 ############################## EVENT TRACKING #################################
 LMS_SEGMENT_KEY = None
 
@@ -1509,6 +1533,10 @@ PIPELINE_CSS = {
         ],
         'output_filename': 'css/certificates-style-rtl.css'
     },
+    'discussion': {
+        'source_filenames': ['sass/discussion-forum.css'],
+        'output_filename': 'css/lms-style-discussion-forum.css'
+    },
     'style-learner-dashboard': {
         'source_filenames': [
             'css/lms-learner-dashboard.css',
@@ -2278,22 +2306,17 @@ if FEATURES.get('AUTH_USE_CAS'):
     INSTALLED_APPS += ('django_cas',)
     MIDDLEWARE_CLASSES += ('django_cas.middleware.CASMiddleware',)
 
+############# Cross-domain requests #################
+
+if FEATURES.get('ENABLE_CORS_HEADERS'):
+    CORS_ALLOW_CREDENTIALS = True
+    CORS_ORIGIN_WHITELIST = ()
+    CORS_ORIGIN_ALLOW_ALL = False
+
 # Default cache expiration for the cross-domain proxy HTML page.
 # This is a static page that can be iframed into an external page
 # to simulate cross-domain requests.
 XDOMAIN_PROXY_CACHE_TIMEOUT = 60 * 15
-
-############# CORS headers for cross-domain requests #################
-
-if FEATURES.get('ENABLE_CORS_HEADERS'):
-    CORS_ORIGIN_ALLOW_ALL = False
-    INSTALLED_APPS += ('corsheaders', 'cors_csrf')
-    MIDDLEWARE_CLASSES = (
-        'corsheaders.middleware.CorsMiddleware',
-        'cors_csrf.middleware.CorsCSRFMiddleware',
-    ) + MIDDLEWARE_CLASSES
-    CORS_ALLOW_CREDENTIALS = True
-    CORS_ORIGIN_WHITELIST = ()
 
 ###################### Registration ##################################
 
@@ -2914,6 +2937,73 @@ DEPRECATED_ADVANCED_COMPONENT_TYPES = []
 # Cutoff date for granting audit certificates
 
 AUDIT_CERT_CUTOFF_DATE = None
+
+################################### EDX-NOTIFICATIONS SUBSYSTEM ######################################
+
+INSTALLED_APPS += (
+    'edx_notifications',
+    'edx_notifications.server.web',
+)
+
+NOTIFICATION_STORE_PROVIDER = {
+    "class": "edx_notifications.stores.sql.store_provider.SQLNotificationStoreProvider",
+    "options": {
+    }
+}
+
+# to prevent run-away queries from happening
+NOTIFICATION_MAX_LIST_SIZE = 100
+
+#
+# Various mapping tables which is used by the MsgTypeToUrlLinkResolver
+# to map a notification type to a statically defined URL path
+#
+# NOTE: NOTIFICATION_CLICK_LINK_GROUP_URLS will usually get read in by the *.envs.json file
+#
+NOTIFICATION_CLICK_LINK_URL_MAPS = {
+    'open-edx.studio.announcements.*': '/courses/{course_id}/announcements',
+    'open-edx.lms.leaderboard.*': '/courses/{course_id}/cohort',
+    'open-edx.lms.discussions.*': '/courses/{course_id}/discussion/{commentable_id}/threads/{thread_id}',
+    'open-edx.xblock.group-project.*': '/courses/{course_id}/group_work?seqid={activity_location}',
+    'open-edx.xblock.group-project-v2.*': '/courses/{course_id}/group_work?activate_block_id={location}',
+}
+
+# list all known channel providers
+NOTIFICATION_CHANNEL_PROVIDERS = {
+    'durable': {
+        'class': 'edx_notifications.channels.durable.BaseDurableNotificationChannel',
+        'options': {
+            # list out all link resolvers
+            'link_resolvers': {
+                # right now the only defined resolver is 'type_to_url', which
+                # attempts to look up the msg type (key) via
+                # matching on the value
+                'msg_type_to_url': {
+                    'class': 'edx_notifications.channels.link_resolvers.MsgTypeToUrlLinkResolver',
+                    'config': {
+                        '_click_link': NOTIFICATION_CLICK_LINK_URL_MAPS,
+                    }
+                }
+            }
+        }
+    },
+    'null': {
+        'class': 'edx_notifications.channels.null.NullNotificationChannel',
+        'options': {}
+    }
+}
+
+# list all of the mappings of notification types to channel
+NOTIFICATION_CHANNEL_PROVIDER_TYPE_MAPS = {
+    '*': 'durable',  # default global mapping
+}
+
+NOTIFICATION_DAILY_DIGEST_SUBJECT = "Your unread notifications for '{display_name}'"
+NOTIFICATION_WEEKLY_DIGEST_SUBJECT = "Your unread notifications for '{display_name}'"
+NOTIFICATION_BRANDED_DEFAULT_LOGO = 'edx_notifications/img/edx-openedx-logo-tag.png'
+NOTIFICATION_EMAIL_FROM_ADDRESS = ''
+NOTIFICATION_EMAIL_CLICK_LINK_ROOT = 'http://localhost'
+NOTIFICATION_DIGEST_SEND_TIMEFILTERED = True
 
 ################################ Settings for Credentials Service ################################
 

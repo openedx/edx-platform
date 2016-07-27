@@ -192,12 +192,6 @@ class CourseCohortsSettings(models.Model):
         """Un-Jsonify the cohorted_discussions"""
         self._cohorted_discussions = json.dumps(value)
 
-    class Meta(object):
-        """
-        Meta options for this model.
-        """
-        verbose_name_plural = "Course Cohort Settings"
-
 
 class CourseCohort(models.Model):
     """

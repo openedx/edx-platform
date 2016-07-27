@@ -305,6 +305,8 @@ class UserProfile(models.Model):
     allow_certificate = models.BooleanField(default=1)
     bio = models.CharField(blank=True, null=True, max_length=3000, db_index=False)
     profile_image_uploaded_at = models.DateTimeField(null=True, blank=True)
+    title = models.CharField(blank=True, max_length=255, null=True)
+    avatar_url = models.CharField(blank=True, max_length=255, null=True)  # pointer to avatar/image resource
 
     @property
     def has_profile_image(self):

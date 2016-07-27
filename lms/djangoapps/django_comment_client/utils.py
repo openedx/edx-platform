@@ -428,23 +428,6 @@ def get_discussion_categories_ids(course, user, include_all=False):
     return course.top_level_discussion_topic_ids + accessible_discussion_ids
 
 
-def get_discussion_categories_ids(course):
-    """
-    Returns a list of available ids of categories for the course.
-    """
-    ids = []
-    queue = [get_discussion_category_map(course)]
-    while queue:
-        category_map = queue.pop()
-        for child in category_map["children"]:
-            if child in category_map["entries"]:
-                ids.append(category_map["entries"][child]["id"])
-            else:
-                queue.append(category_map["subcategories"][child])
-
-    return ids
-
-
 class JsonResponse(HttpResponse):
     """
     Django response object delivering JSON representations
@@ -754,10 +737,10 @@ def get_group_id_for_comments_service(request, course_key, commentable_id=None):
         ValueError if the requested group_id is invalid
     """
     if commentable_id is None or is_commentable_cohorted(course_key, commentable_id):
-        if request.method == "POST":
-            requested_group_id = request.POST.get('group_id')
-        else:
+        if request.method == "GET":
             requested_group_id = request.GET.get('group_id')
+        elif request.method == "POST":
+            requested_group_id = request.POST.get('group_id')
         if has_permission(request.user, "see_all_cohorts", course_key):
             if not requested_group_id:
                 return None

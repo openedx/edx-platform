@@ -22,7 +22,6 @@ class Migration(migrations.Migration):
                 ('modified', model_utils.fields.AutoLastModifiedField(default=django.utils.timezone.now, verbose_name='modified', editable=False)),
                 ('course_id', xmodule_django.models.CourseKeyField(unique=True, max_length=255, verbose_name=b'Course ID', db_index=True)),
                 ('structure_json', util.models.CompressedTextField(null=True, verbose_name=b'Structure JSON', blank=True)),
-                ('discussion_id_map_json', util.models.CompressedTextField(null=True, verbose_name=b'Discussion ID Map JSON', blank=True)),
             ],
         ),
     ]

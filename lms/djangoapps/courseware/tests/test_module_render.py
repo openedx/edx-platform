@@ -1775,15 +1775,12 @@ class TestModuleTrackingContext(SharedModuleStoreTestCase):
             'problem_check',
         )
 
-        mock_calls = mock_tracker.send.mock_calls
-        for call in mock_calls:
-            call_data = call[1][0]
-            event_type = call_data.get('event_type')
-            if event_type == 'problem_check':
-                break
-            self.fail('Event type "problem_check" not found in call list.')
+        self.assertEquals(len(mock_tracker.send.mock_calls), 1)
+        mock_call = mock_tracker.send.mock_calls[0]
+        event = mock_call[1][0]
 
-        return call_data['context']['module']
+        self.assertEquals(event['event_type'], 'problem_check')
+        return event['context']
 
     def handle_callback_and_get_module_info(self, mock_tracker, problem_display_name=None):
         """

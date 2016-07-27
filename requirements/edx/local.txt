@@ -10,3 +10,4 @@
 -e common/lib/xmodule
 
 -e openedx/core/lib/xblock_builtin/xblock_discussion
+-e openedx/core/lib/xblock_builtin/xblock_discussion_course

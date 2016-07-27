@@ -62,10 +62,6 @@ from pipeline_mako import render_require_js_path_overrides
 
   <%static:css group='style-vendor'/>
   <%static:css group='${self.attr.main_css}'/>
-  <%static:css group='style-app'/>
-  <%static:css group='style-app-extend1'/>
-  <%static:css group='style-app-extend2'/>
-
 
   % if not uses_pattern_library:
     % if disable_courseware_js:
@@ -149,17 +145,6 @@ from pipeline_mako import render_require_js_path_overrides
     % endif
 
 % if not disable_window_wrap:
-<body class="<%block name='bodyclass'/> lang_${LANGUAGE_CODE}">
-  <a class="nav-skip" href="<%block name="nav_skip">#content</%block>">${_("Skip to this view's content")}</a>
-
-  <%include file="mathjax_include.html" />
-  <%include file="mathjax_accessible.html" />
-
-  <%include file="${header_file}" />
-
-  <div class="content-wrapper" id="content">
-    ${self.body()}
-    <%block name="bodyextra"/>
   </div>
 % endif
 

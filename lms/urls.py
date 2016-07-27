@@ -134,8 +134,8 @@ if settings.FEATURES["ENABLE_MOBILE_REST_API"]:
         url(r'^api/mobile/v0.5/', include('mobile_api.urls')),
     )
 
-# OPEN EDX API
-if settings.FEATURES["API"]:
+# EDX SOLUTIONS API
+if settings.FEATURES.get('EDX_SOLUTIONS_API'):
     urlpatterns += (
         url(r'^api/server/', include('edx_solutions_api_integration.urls')),
     )

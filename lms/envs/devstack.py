@@ -88,28 +88,6 @@ DEBUG_TOOLBAR_CONFIG = {
 def should_show_debug_toolbar(_):
     return True  # We always want the toolbar on devstack regardless of IP, auth, etc.
 
-INSTALLED_APPS += (
-    # Mongo perf stats
-    'debug_toolbar_mongo',
-)
-
-############# Performance Profiler #################
-# Note: The Django Debug Toolbar creates a lot of profiling noise, so
-# when the profiler is enabled in Devstack we should also disable the toolbar
-FEATURES['PROFILER'] = False
-if FEATURES.get('PROFILER'):
-    INSTALLED_APPS += ('profiler',)
-    MIDDLEWARE_CLASSES += (
-        'profiler.middleware.HotshotProfilerMiddleware',
-        'profiler.middleware.CProfileProfilerMiddleware',
-    )
-
-
-DEBUG_TOOLBAR_PANELS += (
-    'debug_toolbar_mongo.panel.MongoDebugPanel',
-)
-
-
 ########################### PIPELINE #################################
 
 PIPELINE_ENABLED = False
@@ -301,12 +279,3 @@ if os.path.isfile(join(dirname(abspath(__file__)), 'private.py')):
 MODULESTORE = convert_module_store_setting_if_needed(MODULESTORE)
 
 SECRET_KEY = '85920908f28904ed733fe576320db18cabd7b6cd'
-
-############# Student Module #################
-FEATURES['SIGNAL_ON_SCORE_CHANGED'] = True
-
-
-############# Student Gradebook #################
-FEATURES['STUDENT_GRADEBOOK'] = True
-if FEATURES.get('STUDENT_GRADEBOOK', False):
-    INSTALLED_APPS += ('gradebook',)

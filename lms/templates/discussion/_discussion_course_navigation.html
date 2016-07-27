@@ -1,0 +1,14 @@
+<%page expression_filter="h"/>
+<%inherit file="../courseware/course_navigation.html" />
+<%!
+from django.utils.translation import ugettext as _
+from django_comment_client.permissions import has_permission
+%>
+
+<%block name="extratabs">
+% if has_permission(user, 'create_thread', course.id):
+    <li class="right">
+        <button class="new-post-btn btn-neutral btn-small">${_("Add a Post")}</button>
+    </li>
+% endif
+</%block>
