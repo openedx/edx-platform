@@ -10,6 +10,8 @@ from django.test.utils import override_settings
 from django.utils import translation
 
 from django_comment_client.forum.views import get_threads
+from django_comment_common.utils import ThreadContext
+from django_comment_common.models import ForumsConfig
 from django_comment_client.permissions import get_team
 from django_comment_client.tests.group_id import (
     GroupIdAssertionMixin,
@@ -164,9 +166,6 @@ def make_mock_thread_data(
     if is_commentable_divided is not None:
         thread_data['is_commentable_divided'] = is_commentable_divided
     if num_children is not None:
-        thread_data['group_id'] = group_id
-        thread_data['group_name'] = group_name
-    if include_children:
         thread_data["children"] = [{
             "id": "dummy_comment_id_{}".format(i),
             "type": "comment",
@@ -194,7 +193,6 @@ def make_mock_request_impl(
                         text=text,
                         thread_id=thread_id,
                         num_children=None,
-                        include_children=False,
                         group_id=group_id,
                         commentable_id=commentable_id,
                     )
@@ -206,7 +204,6 @@ def make_mock_request_impl(
                 text=text,
                 thread_id=thread_id,
                 num_children=num_thread_responses,
-                include_children=True,
                 group_id=group_id,
                 commentable_id=commentable_id
             )
@@ -284,7 +281,7 @@ class SingleThreadTestCase(ForumsEnableMixin, ModuleStoreTestCase):
         self.assertEquals(
             response_data["content"],
             strip_none(make_mock_thread_data(
-                course=self.course, text=text, thread_id=thread_id, num_children=1, include_children=True
+                course=self.course, text=text, thread_id=thread_id, num_children=1
             ))
         )
         mock_request.assert_called_with(
@@ -322,7 +319,7 @@ class SingleThreadTestCase(ForumsEnableMixin, ModuleStoreTestCase):
         self.assertEquals(
             response_data["content"],
             strip_none(make_mock_thread_data(
-                course=self.course, text=text, thread_id=thread_id, num_children=1, include_children=True,
+                course=self.course, text=text, thread_id=thread_id, num_children=1
             ))
         )
         mock_request.assert_called_with(

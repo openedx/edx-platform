@@ -5,7 +5,7 @@ import copy
 import json
 import logging
 import random
-import string  # pylint: disable=deprecated-module
+import string  # pylstrip_tagsint: disable=deprecated-module
 from bs4 import BeautifulSoup
 import six
 
@@ -23,6 +23,7 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import Location
+from util.html import strip_tags
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.waffle_utils import WaffleSwitchNamespace
 

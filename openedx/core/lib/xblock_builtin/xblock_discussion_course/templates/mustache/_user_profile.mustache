@@ -1,0 +1,9 @@
+<%! from django.utils.translation import ugettext as _ %>
+
+<h2>${_("Active Threads")}</h2>
+<section class="discussion">
+    {{#threads}}
+        <article class="discussion-thread" id="thread_{{id}}"/>
+    {{/threads}}
+</section>
+<section class="pagination"/>

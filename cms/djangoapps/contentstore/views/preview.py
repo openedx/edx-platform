@@ -154,10 +154,9 @@ def get_available_xblock_services(request=None, field_data=None):
     """
 
     services = {
-        "i18n": ModuleI18nService(),
+        "i18n": ModuleI18nService,
         "settings": SettingsService(),
         "courseware_parent_info": CoursewareParentInfoService(),
-        "library_tools": LibraryToolsService(modulestore()),
     }
     if request:
         services['user'] = DjangoXBlockUserService(request.user)
@@ -212,8 +211,6 @@ def _preview_module_system(request, descriptor, field_data):
     if settings.FEATURES.get("LICENSING", False):
         # stick the license wrapper in front
         wrappers.insert(0, wrap_with_license)
-
-    descriptor.runtime._services['studio_user_permissions'] = StudioPermissionsService(request)  # pylint: disable=protected-access
 
     services = get_available_xblock_services(request, field_data)
 

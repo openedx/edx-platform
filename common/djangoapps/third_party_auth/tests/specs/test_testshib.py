@@ -159,6 +159,21 @@ class SamlIntegrationTestUtilities(object):
         self.assertEqual(user.profile.name, full_name)
         self.assertTrue(user.is_active)
 
+    def _fake_testshib_login_and_return(self):
+        """ Mocked: the user logs in to TestShib and then gets redirected back """
+        # The SAML provider (TestShib) will authenticate the user, then get the browser to POST a response:
+        return self.client.post(
+            TPA_TESTSHIB_COMPLETE_URL,
+            content_type='application/x-www-form-urlencoded',
+            data=self.read_data_file('testshib_response.txt'),
+        )
+
+    def _verify_user_email(self, email):
+        """ Mark the user with the given email as verified """
+        user = User.objects.get(email=email)
+        user.is_active = True
+        user.save()
+
 
 @ddt.ddt
 @unittest.skipUnless(testutil.AUTH_FEATURE_ENABLED, testutil.AUTH_FEATURES_KEY + ' not enabled')

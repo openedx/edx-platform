@@ -53,11 +53,6 @@ class Migration(migrations.Migration):
                 ('enable_integration', models.BooleanField(default=False, help_text='When true, automatically notify the credit provider when a user requests credit. In order for this to work, a shared secret key MUST be configured for the credit provider in secure auth settings.')),
                 ('provider_url', models.URLField(default=b'', help_text='URL of the credit provider.  If automatic integration is enabled, this will the the end-point that we POST to to notify the provider of a credit request.  Otherwise, the user will be shown a link to this URL, so the user can request credit from the provider directly.')),
                 ('provider_status_url', models.URLField(default=b'', help_text='URL from the credit provider where the user can check the status of his or her request for credit.  This is displayed to students *after* they have requested credit.')),
-                ('provider_description', models.TextField(default=b'', help_text='Description for the credit provider displayed to users.')),
-                ('fulfillment_instructions', models.TextField(help_text='Plain text or html content for displaying further steps on receipt page *after* paying for the credit to get credit for a credit course against a credit provider.', null=True, blank=True)),
-                ('eligibility_email_message', models.TextField(default=b'', help_text='Plain text or html content for displaying custom message inside credit eligibility email content which is sent when user has met all credit eligibility requirements.')),
-                ('receipt_email_message', models.TextField(default=b'', help_text='Plain text or html content for displaying custom message inside credit receipt email content which is sent *after* paying to get credit for a credit course.')),
-                ('thumbnail_url', models.URLField(default=b'', help_text='Thumbnail image url of the credit provider.', max_length=255)),
             ],
             options={
                 'abstract': False,

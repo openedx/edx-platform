@@ -2,12 +2,12 @@
 Views handling read (GET) requests for the Discussion tab and inline discussions.
 """
 
+import json
 import logging
 from contextlib import contextmanager
 from functools import wraps
 from sets import Set
 
-import django_comment_client.utils as utils
 import newrelic.agent
 from courseware.views.views import CourseTabView
 from django.conf import settings
@@ -28,13 +28,16 @@ import newrelic.agent
 
 from courseware.courses import get_course_with_access
 from openedx.core.djangoapps.course_groups.cohorts import (
+    is_course_cohorted,
+    get_cohort_id,
     is_commentable_cohorted,
     get_cohorted_commentables,
-    get_cohort_id,
     get_cohorted_threads_privacy,
 )
+from openedx.core.djangoapps.course_groups.models import CourseUserGroup
 from courseware.access import has_access
 
+from django_comment_common.utils import ThreadContext, get_course_discussion_settings, set_course_discussion_settings
 from django_comment_client.permissions import has_permission, get_team
 from django_comment_client.utils import (
     available_division_schemes,
@@ -42,10 +45,14 @@ from django_comment_client.utils import (
     get_group_id_for_comments_service,
     get_group_id_for_user,
     get_group_names_by_id,
-    is_commentable_divided
+    is_commentable_divided,
+    is_commentable_cohorted
 )
+
 from django_comment_client.utils import (merge_dict, extract, strip_none, add_courseware_context, add_thread_group_name)
-from django_comment_common.utils import ThreadContext, get_course_discussion_settings, set_course_discussion_settings
+import django_comment_client.utils as utils
+import lms.lib.comment_client as cc
+
 from opaque_keys.edx.keys import CourseKey
 from rest_framework import status
 from student.models import CourseEnrollment
@@ -120,10 +127,9 @@ def get_threads(request, course, user_info, discussion_id=None, per_page=THREADS
     default_query_params = {
         'page': 1,
         'per_page': per_page,
-        'sort_key': 'date',
+        'sort_key': 'activity',
         'text': '',
         'course_id': unicode(course.id),
-        'commentable_id': discussion_id,
         'user_id': request.user.id,
         'context': ThreadContext.COURSE,
         'group_id': get_group_id_for_comments_service(request, course.id, discussion_id),  # may raise ValueError
@@ -541,7 +547,7 @@ def user_profile(request, course_key, user_id):
                 'discussion_data': threads,
                 'page': query_params['page'],
                 'num_pages': query_params['num_pages'],
-                'annotated_content_info': annotated_content_info,
+                'annotated_content_info': json.dumps(annotated_content_info),
             })
         else:
             user_roles = django_user.roles.filter(
@@ -557,8 +563,8 @@ def user_profile(request, course_key, user_id):
                 'django_user': django_user,
                 'django_user_roles': user_roles,
                 'profiled_user': profiled_user.to_dict(),
-                'threads': threads,
-                'user_info': user_info,
+                'threads': json.dumps(threads),
+                'user_info': json.dumps(user_info, default=lambda x: None),
                 'roles': utils.get_role_ids(course_key),
                 'can_create_comment': has_permission(request.user, "create_comment", course.id),
                 'can_create_subcomment': has_permission(request.user, "create_sub_comment", course.id),
@@ -567,7 +573,7 @@ def user_profile(request, course_key, user_id):
                     has_permission(request.user, 'openclose_thread', course.id) or
                     has_access(request.user, 'staff', course)
                 ),
-                'annotated_content_info': annotated_content_info,
+                'annotated_content_info': json.dumps(annotated_content_info),
                 'page': query_params['page'],
                 'num_pages': query_params['num_pages'],
                 'sort_preference': user.default_sort_key,

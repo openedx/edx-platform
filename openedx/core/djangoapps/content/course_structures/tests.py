@@ -20,7 +20,9 @@ class SignalDisconnectTestMixin(object):
 
     def setUp(self):
         super(SignalDisconnectTestMixin, self).setUp()
-        SignalHandler.course_published.disconnect(listen_for_course_publish)
+        SignalHandler.course_published.disconnect(
+            listen_for_course_publish, dispatch_uid='openedx.core.djangoapps.content.course_structures'
+        )
 
 
 @attr(shard=2)
