@@ -77,6 +77,9 @@ def wait_for_server(server, port):
         )
     )
 
+    if tasks.environment.dry_run:
+        return True
+
     attempts = 0
     server_ok = False
 
