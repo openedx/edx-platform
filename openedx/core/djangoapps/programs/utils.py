@@ -48,7 +48,17 @@ def get_programs(user, program_id=None):
     # Bypass caching for staff users, who may be creating Programs and want
     # to see them displayed immediately.
     cache_key = programs_config.CACHE_KEY if programs_config.is_cache_enabled and not user.is_staff else None
-    return get_edx_api_data(programs_config, user, 'programs', resource_id=program_id, cache_key=cache_key)
+
+    data = get_edx_api_data(programs_config, user, 'programs', resource_id=program_id, cache_key=cache_key)
+
+    # TODO: Temporary, to be removed once category names are cased for display. ECOM-5018.
+    if data and program_id:
+        data['category'] = data['category'].lower()
+    else:
+        for program in data:
+            program['category'] = program['category'].lower()
+
+    return data
 
 
 def flatten_programs(programs, course_ids):

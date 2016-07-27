@@ -24,7 +24,8 @@ define([
                 },
                 category: {
                     required: true,
-                    oneOf: ['xseries', 'micromasters']
+                    // TODO: Populate with the results of an API call for valid categories.
+                    oneOf: ['XSeries', 'MicroMasters']
                 },
                 organizations: 'validateOrganizations',
                 marketing_slug: {
