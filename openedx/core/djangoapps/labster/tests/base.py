@@ -1,6 +1,8 @@
 """
 Base classes for labster tests.
 """
+from datetime import datetime, timedelta
+
 import mock
 from django.test.utils import override_settings
 
@@ -29,9 +31,16 @@ class CCXCourseTestBase(ModuleStoreTestCase):
 
         self.consumer_keys = ['123', '789']
         self.lti_passports = self.make_lti_passports(self.consumer_keys)
+
+        start_datetime = datetime.now() - timedelta(days=1)
+        end_datetime = datetime.now() + timedelta(days=1)
+
         self.course = CourseFactory.create(
             enable_ccx=True,
-            display_name='Test Course', lti_passports=self.lti_passports
+            display_name='Test Course',
+            lti_passports=self.lti_passports,
+            start=start_datetime,
+            end=end_datetime
         )
         # Create instructor account
         self.user = UserFactory.create()

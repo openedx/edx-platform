@@ -710,6 +710,11 @@ if settings.FEATURES.get('ENABLE_OAUTH2_PROVIDER'):
         ),
     )
 
+if settings.LABSTER_FEATURES.get('ENABLE_VOUCHERS'):
+    urlpatterns += (
+        url(r'^vouchers/', include('labster_vouchers.urls')),
+    )
+
 # Certificates
 urlpatterns += (
     url(r'^certificates/', include('certificates.urls', app_name="certificates", namespace="certificates")),
