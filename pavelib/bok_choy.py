@@ -4,7 +4,12 @@ http://bok-choy.readthedocs.org/en/latest/
 """
 from paver.easy import task, needs, cmdopts, sh
 from pavelib.utils.test.suites.bokchoy_suite import BokChoyTestSuite, Pa11yCrawler
-from pavelib.utils.test.bokchoy_options import BOKCHOY_OPTS
+from pavelib.utils.test.bokchoy_options import (
+    BOKCHOY_OPTS,
+    PA11Y_HTML,
+    PA11Y_COURSE_KEY,
+    PA11Y_FETCH_COURSE,
+)
 from pavelib.utils.envs import Env
 from pavelib.utils.test.utils import check_firefox_version
 from pavelib.utils.passthrough_opts import PassthroughTask
@@ -93,17 +98,11 @@ def perf_report_bokchoy(options, passthrough_options):
     run_bokchoy(options.perf_report_bokchoy, passthrough_options)
 
 
-@needs('pavelib.prereqs.install_prereqs')
-@cmdopts(BOKCHOY_OPTS + [
-    ('with-html', 'w', 'Include html reports'),
-    make_option('--course-key', help='Course key for test course'),
-    make_option(
-        "--fetch-course",
-        action="store_true",
-        dest="should_fetch_course",
-        help='Course key for test course',
-    ),
-])
+@needs('pavelib.prereqs.install_prereqs', 'get_test_course')
+@cmdopts(
+    BOKCHOY_OPTS + [PA11Y_HTML, PA11Y_COURSE_KEY, PA11Y_FETCH_COURSE],
+    share_with = ['get_test_course', 'prepare_bokchoy_run', 'load_courses']
+)
 @PassthroughTask
 @timed
 def pa11ycrawler(options, passthrough_options):

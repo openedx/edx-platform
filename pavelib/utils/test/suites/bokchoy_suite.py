@@ -7,13 +7,18 @@ from urllib import urlencode
 from common.test.acceptance.fixtures.course import CourseFixture, FixtureError
 
 from path import Path as path
-from paver.easy import sh, BuildFailure, cmdopts, task, needs
+from paver.easy import sh, BuildFailure, cmdopts, task, needs, might_call
 from pavelib.utils.test.suites.suite import TestSuite
 from pavelib.utils.envs import Env
 from pavelib.utils.test.bokchoy_utils import (
     clear_mongo, start_servers, check_services, wait_for_test_servers
 )
-from pavelib.utils.test.bokchoy_options import BOKCHOY_OPTS
+from pavelib.utils.test.bokchoy_options import (
+    BOKCHOY_IMPORTS_DIR, BOKCHOY_IMPORTS_DIR_DEPR,
+    BOKCHOY_DEFAULT_STORE, BOKCHOY_DEFAULT_STORE_DEPR,
+    BOKCHOY_FASTTEST,
+    PA11Y_FETCH_COURSE
+)
 from pavelib.utils.test import utils as test_utils
 from pavelib.utils.timer import timed
 
@@ -29,9 +34,12 @@ __test__ = False  # do not collect
 DEFAULT_NUM_PROCESSES = 1
 DEFAULT_VERBOSITY = 2
 
+DEMO_COURSE_TAR_GZ = "https://github.com/edx/demo-test-course/archive/master.tar.gz"
+DEMO_COURSE_IMPORT_DIR = path('test_root/courses/')
+
 
 @task
-@cmdopts(BOKCHOY_OPTS, share_with=['test_bokchoy', 'test_a11y', 'pa11ycrawler'])
+@cmdopts([BOKCHOY_DEFAULT_STORE, BOKCHOY_DEFAULT_STORE_DEPR])
 @timed
 def load_bok_choy_data(options):
     """
@@ -48,7 +56,10 @@ def load_bok_choy_data(options):
 
 
 @task
-@cmdopts(BOKCHOY_OPTS, share_with=['test_bokchoy', 'test_a11y', 'pa11ycrawler'])
+@cmdopts([
+    BOKCHOY_IMPORTS_DIR, BOKCHOY_IMPORTS_DIR_DEPR, BOKCHOY_DEFAULT_STORE,
+    BOKCHOY_DEFAULT_STORE_DEPR
+])
 @timed
 def load_courses(options):
     """
@@ -70,6 +81,51 @@ def load_courses(options):
                 import_dir=options.imports_dir
             )
         )
+    else:
+        print colorize('blue', "--imports-dir not set, skipping import")
+
+
+@task
+@cmdopts([BOKCHOY_IMPORTS_DIR, BOKCHOY_IMPORTS_DIR_DEPR, PA11Y_FETCH_COURSE])
+@timed
+def get_test_course(options):
+    """
+    Fetches the test course.
+    """
+
+    if options.get('imports_dir'):
+        print colorize("green", "--imports-dir specified, skipping fetch of test course")
+        return
+
+    if not options.get('should_fetch_course', False):
+        print colorize("green", "--skip-fetch specified, skipping fetch of test course")
+        return
+
+    # Set the imports_dir for use by other tasks
+    options.imports_dir = DEMO_COURSE_IMPORT_DIR
+
+    options.imports_dir.makedirs_p()
+    zipped_course = options.imports_dir + 'demo_course.tar.gz'
+
+    msg = colorize('green', "Fetching the test course from github...")
+    print msg
+
+    sh(
+        'wget {tar_gz_file} -O {zipped_course}'.format(
+            tar_gz_file=DEMO_COURSE_TAR_GZ,
+            zipped_course=zipped_course,
+        )
+    )
+
+    msg = colorize('green', "Uncompressing the test course...")
+    print msg
+
+    sh(
+        'tar zxf {zipped_course} -C {courses_dir}'.format(
+            zipped_course=zipped_course,
+            courses_dir=options.imports_dir,
+        )
+    )
 
 
 @task
@@ -83,7 +139,8 @@ def reset_test_database():
 
 @task
 @needs(['reset_test_database', 'clear_mongo', 'load_bok_choy_data', 'load_courses'])
-@cmdopts(BOKCHOY_OPTS, share_with=['test_bokchoy', 'test_a11y', 'pa11ycrawler'])
+@might_call('start_servers')
+@cmdopts([BOKCHOY_FASTTEST], share_with=['start_servers'])
 @timed
 def prepare_bokchoy_run(options, call_task):
     """
@@ -283,21 +340,7 @@ class Pa11yCrawler(BokChoyTestSuite):
     def __init__(self, *args, **kwargs):
         super(Pa11yCrawler, self).__init__(*args, **kwargs)
         self.course_key = kwargs.get('course_key')
-        if self.imports_dir:
-            # If imports_dir has been specified, assume the files are
-            # already there -- no need to fetch them from github. This
-            # allows someome to crawl a different course. They are responsible
-            # for putting it, un-archived, in the directory.
-            self.should_fetch_course = False
-        else:
-            # Otherwise, obey `--skip-fetch` command and use the default
-            # test course.  Note that the fetch will also be skipped when
-            # using `--fast`.
-            self.should_fetch_course = kwargs.get('should_fetch_course')
-            self.imports_dir = path('test_root/courses/')
-
         self.pa11y_report_dir = os.path.join(self.report_dir, 'pa11ycrawler_reports')
-        self.tar_gz_file = "https://github.com/edx/demo-test-course/archive/master.tar.gz"
 
         self.start_urls = []
         auto_auth_params = {
@@ -318,38 +361,6 @@ class Pa11yCrawler(BokChoyTestSuite):
         auto_auth_params.update({'redirect_to': sequence_url})
         lms_params = urlencode(auto_auth_params)
         self.start_urls.append("\"http://localhost:8003/auto_auth?{}\"".format(lms_params))
-
-    def __enter__(self):
-        if self.should_fetch_course:
-            self.get_test_course()
-        super(Pa11yCrawler, self).__enter__()
-
-    def get_test_course(self):
-        """
-        Fetches the test course.
-        """
-        self.imports_dir.makedirs_p()
-        zipped_course = self.imports_dir + 'demo_course.tar.gz'
-
-        msg = colorize('green', "Fetching the test course from github...")
-        print msg
-
-        sh(
-            'wget {tar_gz_file} -O {zipped_course}'.format(
-                tar_gz_file=self.tar_gz_file,
-                zipped_course=zipped_course,
-            )
-        )
-
-        msg = colorize('green', "Uncompressing the test course...")
-        print msg
-
-        sh(
-            'tar zxf {zipped_course} -C {courses_dir}'.format(
-                zipped_course=zipped_course,
-                courses_dir=self.imports_dir,
-            )
-        )
 
     def generate_html_reports(self):
         """

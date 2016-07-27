@@ -8,19 +8,34 @@ import os
 from pavelib.utils.envs import Env
 
 
+BOKCHOY_IMPORTS_DIR = ('imports-dir=', 'i', 'Directory containing (un-archived) courses to be imported')
+BOKCHOY_IMPORTS_DIR_DEPR = ('imports_dir=', None, 'deprecated in favor of imports-dir')
+BOKCHOY_DEFAULT_STORE = make_option(
+    "-s", "--default-store",
+    default=os.environ.get('DEFAULT_STORE', 'split'),
+    help='Default modulestore'
+)
+BOKCHOY_DEFAULT_STORE_DEPR = make_option(
+    "--default_store",
+    default=os.environ.get('DEFAULT_STORE', 'split'),
+    help='deprecated in favor of default-store'
+)
+BOKCHOY_FASTTEST = make_option('-a', '--fasttest', action='store_true', help='Skip some setup')
+BOKCHOY_COVERAGERC = make_option('--coveragerc', help='coveragerc file to use during this test')
+
 BOKCHOY_OPTS = [
     ('test-spec=', 't', 'Specific test to run'),
-    make_option('-a', '--fasttest', action='store_true', help='Skip some setup'),
+    BOKCHOY_FASTTEST,
     ('skip-clean', 'C', 'Skip cleaning repository before running tests'),
     make_option('-r', '--serversonly', action='store_true', help='Prepare suite and leave servers running'),
     make_option('-o', '--testsonly', action='store_true', help='Assume servers are running and execute tests only'),
-    make_option("-s", "--default-store", default=os.environ.get('DEFAULT_STORE', 'split'), help='Default modulestore'),
+    BOKCHOY_DEFAULT_STORE,
     make_option(
         '-d', '--test-dir',
         default='tests',
         help='Directory for finding tests (relative to common/test/acceptance)'
     ),
-    ('imports-dir=', 'i', 'Directory containing (un-archived) courses to be imported'),
+    BOKCHOY_IMPORTS_DIR,
     make_option('-n', '--num-processes', type='int', help='Number of test threads (for multiprocessing)'),
     make_option(
         '-x', '--verify-xss',
@@ -35,17 +50,13 @@ BOKCHOY_OPTS = [
     make_option("--save-screenshots", action='store_true', dest="save_screenshots"),
     make_option("--report-dir", default=Env.BOK_CHOY_REPORT_DIR, help="Directory to store reports in"),
 
-    make_option(
-        "--default_store",
-        default=os.environ.get('DEFAULT_STORE', 'split'),
-        help='deprecated in favor of default-store'
-    ),
+    BOKCHOY_DEFAULT_STORE_DEPR,
     make_option(
         '-e', '--extra_args',
         default='',
         help='deprecated, pass extra options directly in the paver commandline'
     ),
-    ('imports_dir=', None, 'deprecated in favor of imports-dir'),
+    BOKCHOY_IMPORTS_DIR_DEPR,
     make_option('--num_processes', type='int', help='deprecated in favor of num-processes'),
     ('skip_clean', None, 'deprecated in favor of skip-clean'),
     make_option('--test_dir', default='tests', help='deprecated in favor of test-dir'),
@@ -69,3 +80,12 @@ BOKCHOY_OPTS = [
         help="deprecated in favor of save-screenshots"
     ),
 ]
+
+PA11Y_HTML = ('with-html', 'w', 'Include html reports')
+PA11Y_COURSE_KEY = make_option('--course-key', help='Course key for test course')
+PA11Y_FETCH_COURSE = make_option(
+    "--fetch-course",
+    action="store_true",
+    dest="should_fetch_course",
+    help='Course key for test course',
+)

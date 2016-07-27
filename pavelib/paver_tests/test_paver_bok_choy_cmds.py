@@ -9,6 +9,7 @@ from mock import patch, call
 from test.test_support import EnvironmentVarGuard
 from paver.easy import BuildFailure
 from pavelib.utils.test.suites import BokChoyTestSuite, Pa11yCrawler
+from pavelib.utils.test.bokchoy_suite import DEMO_COURSE_TAR_GZ
 
 REPO_DIR = os.getcwd()
 
@@ -218,7 +219,7 @@ class TestPaverPa11yCrawlerCmd(unittest.TestCase):
         suite.get_test_course()
         self._mock_sh.assert_has_calls([
             call(
-                'wget {targz} -O {dir}demo_course.tar.gz'.format(targz=suite.tar_gz_file, dir=suite.imports_dir)),
+                'wget {targz} -O {dir}demo_course.tar.gz'.format(targz=DEMO_COURSE_TAR_GZ, dir=suite.imports_dir)),
             call(
                 'tar zxf {dir}demo_course.tar.gz -C {dir}'.format(dir=suite.imports_dir)),
         ])
