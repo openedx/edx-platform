@@ -1151,6 +1151,9 @@ class ContentStoreTest(ContentStoreTestCase, XssTestMixin):
     """
     Tests for the CMS ContentStore application.
     """
+    duplicate_course_error = ("There is already a course defined with the same organization and course number. "
+                              "Please change either organization or course number to be unique.")
+
     def setUp(self):
         super(ContentStoreTest, self).setUp()
 
@@ -1202,6 +1205,22 @@ class ContentStoreTest(ContentStoreTestCase, XssTestMixin):
         self.course_data['number'] = 'course.number'
         self.course_data['run'] = 'run.name'
         self.assert_created_course()
+
+    @ddt.data(ModuleStoreEnum.Type.split, ModuleStoreEnum.Type.mongo)
+    def test_course_with_different_cases(self, default_store):
+        """
+        Tests that course can not be created with different case using an AJAX request to
+        course handler.
+        """
+        course_number = '99x'
+        with self.store.default_store(default_store):
+            # Verify create a course passes with lower case.
+            self.course_data['number'] = course_number.lower()
+            self.assert_created_course()
+
+            # Verify create a course fail when same course number is provided with different case.
+            self.course_data['number'] = course_number.upper()
+            self.assert_course_creation_failed(self.duplicate_course_error)
 
     def test_create_course_check_forum_seeding(self):
         """Test new course creation and verify forum seeding """
@@ -1289,7 +1308,7 @@ class ContentStoreTest(ContentStoreTestCase, XssTestMixin):
     def test_create_course_duplicate_course(self):
         """Test new course creation - error path"""
         self.client.ajax_post('/course/', self.course_data)
-        self.assert_course_creation_failed('There is already a course defined with the same organization and course number. Please change either organization or course number to be unique.')
+        self.assert_course_creation_failed(self.duplicate_course_error)
 
     def assert_course_creation_failed(self, error_message):
         """
@@ -1318,21 +1337,38 @@ class ContentStoreTest(ContentStoreTestCase, XssTestMixin):
         self.course_data['display_name'] = 'Robot Super Course Two'
         self.course_data['run'] = '2013_Summer'
 
-        self.assert_course_creation_failed('There is already a course defined with the same organization and course number. Please change either organization or course number to be unique.')
+        self.assert_course_creation_failed(self.duplicate_course_error)
 
-    def test_create_course_case_change(self):
+    @ddt.data(ModuleStoreEnum.Type.split, ModuleStoreEnum.Type.mongo)
+    def test_create_course_case_change(self, default_store):
         """Test new course creation - error path due to case insensitive name equality"""
-        self.course_data['number'] = 'capital'
-        self.client.ajax_post('/course/', self.course_data)
-        cache_current = self.course_data['org']
-        self.course_data['org'] = self.course_data['org'].lower()
-        self.assert_course_creation_failed('There is already a course defined with the same organization and course number. Please change either organization or course number to be unique.')
-        self.course_data['org'] = cache_current
+        self.course_data['number'] = '99x'
 
-        self.client.ajax_post('/course/', self.course_data)
-        cache_current = self.course_data['number']
-        self.course_data['number'] = self.course_data['number'].upper()
-        self.assert_course_creation_failed('There is already a course defined with the same organization and course number. Please change either organization or course number to be unique.')
+        with self.store.default_store(default_store):
+
+            # Verify that the course was created properly.
+            self.assert_created_course()
+
+            # Keep the copy of original org
+            cache_current = self.course_data['org']
+
+            # Change `org` to lower case and verify that course did not get created
+            self.course_data['org'] = self.course_data['org'].lower()
+            self.assert_course_creation_failed(self.duplicate_course_error)
+
+            # Replace the org with its actual value, and keep the copy of course number.
+            self.course_data['org'] = cache_current
+            cache_current = self.course_data['number']
+
+            self.course_data['number'] = self.course_data['number'].upper()
+            self.assert_course_creation_failed(self.duplicate_course_error)
+
+            # Replace the org with its actual value, and keep the copy of course number.
+            self.course_data['number'] = cache_current
+            __ = self.course_data['run']
+
+            self.course_data['run'] = self.course_data['run'].upper()
+            self.assert_course_creation_failed(self.duplicate_course_error)
 
     def test_course_substring(self):
         """
