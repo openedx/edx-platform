@@ -8,18 +8,18 @@ from pytz import UTC
 from bok_choy.promise import EmptyPromise
 from nose.plugins.attrib import attr
 
-from ...pages.studio.settings_advanced import AdvancedSettingsPage
-from ...pages.studio.overview import CourseOutlinePage, ContainerPage, ExpandCollapseLinkState
-from ...pages.studio.utils import add_discussion, drag, verify_ordering
-from ...pages.lms.courseware import CoursewarePage
-from ...pages.lms.course_nav import CourseNavPage
-from ...pages.lms.staff_view import StaffPage
-from ...fixtures.config import ConfigModelFixture
-from ...fixtures.course import XBlockFixtureDesc
+from common.test.acceptance.pages.studio.settings_advanced import AdvancedSettingsPage
+from common.test.acceptance.pages.studio.overview import CourseOutlinePage, ContainerPage, ExpandCollapseLinkState
+from common.test.acceptance.pages.studio.utils import add_discussion, drag, verify_ordering
+from common.test.acceptance.pages.lms.courseware import CoursewarePage
+from common.test.acceptance.pages.lms.course_nav import CourseNavPage
+from common.test.acceptance.pages.lms.staff_view import StaffPage
+from common.test.acceptance.fixtures.config import ConfigModelFixture
+from common.test.acceptance.fixtures.course import XBlockFixtureDesc
 
 from base_studio_test import StudioCourseTest
-from ..helpers import load_data_str
-from ...pages.lms.progress import ProgressPage
+from common.test.acceptance.tests.helpers import load_data_str
+from common.test.acceptance.pages.lms.progress import ProgressPage
 
 
 SECTION_NAME = 'Test Section'
