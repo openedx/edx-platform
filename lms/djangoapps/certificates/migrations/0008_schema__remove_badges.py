@@ -12,14 +12,6 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AlterUniqueTogether(
-            name='badgeassertion',
-            unique_together=set([]),
-        ),
-        migrations.RemoveField(
-            model_name='badgeassertion',
-            name='user',
-        ),
         migrations.DeleteModel(
             name='BadgeImageConfiguration',
         ),

@@ -8,6 +8,8 @@ general:
     - "test_root/log"
 
 dependencies:
+  pre:
+    - bash ./scripts/install-system-req.sh
   override:
     - npm install
 
@@ -21,6 +23,7 @@ dependencies:
     # from scratch again.
     - pip install --exists-action w -r requirements/edx/pre.txt
     - pip install --exists-action w -r requirements/edx/github.txt
+    - pip install --exists-action w -r requirements/edx/custom.txt
     - pip install --exists-action w -r requirements/edx/local.txt
 
     # HACK: within base.txt stevedore had a
@@ -28,7 +31,6 @@ dependencies:
     # Install a version which falls within that range.
     - pip install  --exists-action w pbr==0.9.0
     - pip install --exists-action w -r requirements/edx/base.txt
-    - pip install --exists-action w -r requirements/edx/paver.txt
     - if [ -e requirements/edx/post.txt ]; then pip install --exists-action w -r requirements/edx/post.txt ; fi
 
     - pip install coveralls==1.0
@@ -36,6 +38,14 @@ dependencies:
     # Output the installed python packages to the console to help
     # with troubleshooting any issues with python requirements.
     - pip freeze
+  post:
+    # install custom sqlite 3.14
+    - wget https://github.com/ghaering/pysqlite/archive/2.8.3.tar.gz
+    - wget https://www.sqlite.org/2016/sqlite-autoconf-3140100.tar.gz
+    - tar -xzvf sqlite-autoconf-3140100.tar.gz
+    - tar -xzvf 2.8.3.tar.gz
+    - cp -av sqlite-autoconf-3140100/. pysqlite-2.8.3/
+    - cd ./pysqlite-2.8.3 && python setup.py build_static install
 
 test:
   override:

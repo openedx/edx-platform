@@ -1,0 +1,57 @@
+<%page expression_filter="h"/>
+<%!
+from django.utils.translation import ugettext as _
+
+from openedx.core.djangolib.markup import HTML
+%>
+
+<%def name="render_dropdown(map)">
+    % for child in map["children"]:
+        % if child in map["entries"]:
+            ${HTML(render_entry(map["entries"], child))}
+        %else:
+            ${HTML(render_category(map["subcategories"], child))}
+        %endif
+    %endfor
+</%def>
+
+<%def name="render_entry(entries, entry)">
+    <li
+        class="forum-nav-browse-menu-item"
+        data-discussion-id='${entries[entry]["id"]}'
+        data-cohorted="${str(entries[entry]['is_cohorted']).lower()}"
+    >
+        <button type="button" class="forum-nav-browse-title">${entry}</button>
+    </li>
+</%def>
+
+<%def name="render_category(categories, category)">
+    <li class="forum-nav-browse-menu-item">
+        <button type="button" class="forum-nav-browse-title">${category}</button>
+        <ul class="forum-nav-browse-submenu">
+            ${HTML(render_dropdown(categories[category]))}
+        </ul>
+    </li>
+</%def>
+
+<div class="forum-nav-browse-menu-wrapper" style="display: none">
+    <form class="forum-nav-browse-filter">
+        <label>
+            <span class="sr">${_("Filter Topics")}</span>
+            <input type="text" class="forum-nav-browse-filter-input" placeholder="${_("filter topics")}">
+            <span class="icon fa fa-filter" aria-hidden="true"></span>
+        </label>
+    </form>
+    <ul class="forum-nav-browse-menu">
+        <li class="forum-nav-browse-menu-item forum-nav-browse-menu-all">
+            <button type="button" class="forum-nav-browse-title">${_("All Discussions")}</button>
+        </li>
+        <li class="forum-nav-browse-menu-item forum-nav-browse-menu-following">
+            <button type="button" class="forum-nav-browse-title">
+                <span class="icon fa fa-star" aria-hidden="true"></span>
+                ${_("Posts I'm Following")}
+            </button>
+        </li>
+        ${HTML(render_dropdown(category_map))}
+    </ul>
+</div>

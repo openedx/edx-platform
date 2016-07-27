@@ -10,10 +10,9 @@ from xmodule.seq_module import SequenceDescriptor
 from xmodule.capa_module import CapaDescriptor
 from xmodule.html_module import HtmlDescriptor
 from xmodule.modulestore.exceptions import DuplicateCourseError
-from openedx.core.djangoapps.util.testing import SignalDisconnectTestMixin
 
 
-class TemplateTests(SignalDisconnectTestMixin, ModuleStoreTestCase):
+class TemplateTests(ModuleStoreTestCase):
     """
     Test finding and using the templates (boilerplates) for xblocks.
     """

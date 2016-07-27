@@ -1,11 +1,15 @@
-"""Setup for discussion-forum XBlock."""
+"""
+Setup for discussion-course XBlock.
+"""
 
 import os
 from setuptools import setup
 
 
 def package_data(pkg, root_list):
-    """Generic function to find package_data for `pkg` under `root`."""
+    """
+    Generic function to find package_data for `pkg` under `root`.
+    """
     data = []
     for root in root_list:
         for dirname, _, files in os.walk(os.path.join(pkg, root)):
@@ -16,20 +20,16 @@ def package_data(pkg, root_list):
 
 
 setup(
-    name='xblock-discussion',
+    name='xblock-discussion-course',
     version='0.1',
-    description='XBlock - Discussion Forum',
-    packages=[
-        'discussion_forum'
-    ],
+    description='XBlock - Course Discussion',
     install_requires=[
         'XBlock',
     ],
     entry_points={
         'xblock.v1': [
-            'discussion-forum = discussion_forum:DiscussionXBlock',
-            'discussion-course = discussion_forum:DiscussionCourseXBlock'
+            'discussion-course = xblock_discussion_course:DiscussionCourseXBlock',
         ]
     },
-    package_data=package_data("discussion_forum", ["static"]),
+    package_data=package_data("xblock_discussion_course", ["static"]),
 )

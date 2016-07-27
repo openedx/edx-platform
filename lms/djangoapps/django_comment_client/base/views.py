@@ -767,7 +767,7 @@ def vote_for_comment(request, course_id, comment_id, value):
     if value == 'up':
         # call into the social_engagement django app to
         # rescore this user
-        _update_user_engagement_score(course_key, comment.user_id)
+        _update_user_engagement_score(course_key, request.user.id)
 
     return result
 
@@ -798,7 +798,7 @@ def vote_for_thread(request, course_id, thread_id, value):
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     # call into the social_engagement django app to
     # rescore this user
-    _update_user_engagement_score(course_key, thread.user_id)
+    _update_user_engagement_score(course_key, request.user.id)
 
     # Feature Flag to check that notifications are enabled or not.
     if value == 'up' and settings.FEATURES.get("ENABLE_NOTIFICATIONS", False):
@@ -952,7 +952,7 @@ def follow_thread(request, course_id, thread_id):
 
     # call into the social_engagement django app to
     # rescore this user
-    _update_user_engagement_score(course_key, thread.user_id)
+    _update_user_engagement_score(course_key, request.user.id)
 
     # Feature Flag to check that notifications are enabled or not.
     if settings.FEATURES.get("ENABLE_NOTIFICATIONS", False):
