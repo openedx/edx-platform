@@ -125,7 +125,8 @@ def add_email_marketing_cookies(sender, response=None, user=None,
             log.error("No cookie returned attempting to obtain cookie from Sailthru for %s", user.email)
     else:
         error = sailthru_response.get_error()
-        log.error("Error attempting to obtain cookie from Sailthru: %s", error.get_message())
+        # generally invalid email address
+        log.info("Error attempting to obtain cookie from Sailthru: %s", error.get_message())
     return response
 
 
