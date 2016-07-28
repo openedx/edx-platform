@@ -77,6 +77,14 @@
       }
     }
 
+    .enrolment-regenerate-cert-note {
+      margin-top: 10px;
+
+      span {
+        font-size: 14px;
+      }
+    }
+
     .enrollment-change-errors {
       @extend %t-copy-sub1;
       @extend %t-light;

@@ -13,6 +13,8 @@ from django.core.urlresolvers import reverse
 from nose.plugins.attrib import attr
 from pytz import UTC
 
+from certificates import api as cert_api
+from certificates.models import GeneratedCertificate, CertificateStatuses
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
 from lms.djangoapps.verify_student.models import VerificationDeadline
@@ -239,6 +241,71 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
         self.assertEqual(response.status_code, 200)
         self.assertIsNotNone(ManualEnrollmentAudit.get_manual_enrollment_by_email(self.student.email))
         self.assert_enrollment(CourseMode.VERIFIED)
+
+    def test_change_enrollment_invalidates_certificate(self):
+        """
+        Test that updating user enrollment invalidates user certificate as well.
+        """
+        self.assertIsNone(ManualEnrollmentAudit.get_manual_enrollment_by_email(self.student.email))
+
+        # Create a user certificate and check certificate status is downloadable.
+        user_certificate = GeneratedCertificate.eligible_certificates.create(
+            user=self.student,
+            course_id=self.course.id,
+            grade=0.90,
+            status=CertificateStatuses.downloadable,
+            mode=CourseMode.AUDIT,
+            download_url='http://www.example.com/cert.pdf',
+        )
+        self.assertTrue(user_certificate.is_valid())
+        self.assertNotEqual(user_certificate.status, 'unavailable')
+
+        # Change user enrolment.
+        url = reverse(
+            'support:enrollment_list',
+            kwargs={'username_or_email': getattr(self.student, 'username')}
+        )
+        response = self.client.post(url, data={
+            'course_id': unicode(self.course.id),  # pylint: disable=no-member
+            'old_mode': CourseMode.AUDIT,
+            'new_mode': CourseMode.VERIFIED,
+            'reason': 'Financial Assistance'
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertIsNotNone(ManualEnrollmentAudit.get_manual_enrollment_by_email(self.student.email))
+        self.assert_enrollment(CourseMode.VERIFIED)
+
+        # Check that user certificate is invalidated.
+        user_certificate = cert_api.get_certificate_for_user(self.student, self.course.id, format=False)
+        self.assertEqual(user_certificate.status, 'unavailable')
+
+    def test_change_enrollment_no_user_certificate(self):
+        """
+        Test `change enrollment` does not fail when user has not certificate generated.
+        """
+        self.assertIsNone(ManualEnrollmentAudit.get_manual_enrollment_by_email(self.student.email))
+
+        # Check that user certificate is not generated previously.
+        user_certificate = cert_api.get_certificate_for_user(self.student, self.course.id, format=False)
+        self.assertFalse(user_certificate)
+
+        url = reverse(
+            'support:enrollment_list',
+            kwargs={'username_or_email': getattr(self.student, 'username')}
+        )
+        response = self.client.post(url, data={
+            'course_id': unicode(self.course.id),  # pylint: disable=no-member
+            'old_mode': CourseMode.AUDIT,
+            'new_mode': CourseMode.VERIFIED,
+            'reason': 'Financial Assistance'
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertIsNotNone(ManualEnrollmentAudit.get_manual_enrollment_by_email(self.student.email))
+        self.assert_enrollment(CourseMode.VERIFIED)
+
+        # Check that user certificate is not generated/updated after the enrollment change.
+        user_certificate = cert_api.get_certificate_for_user(self.student, self.course.id, format=False)
+        self.assertFalse(user_certificate)
 
     @ddt.data(
         ({}, r"The field '\w+' is required."),

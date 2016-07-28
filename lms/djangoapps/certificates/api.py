@@ -106,14 +106,15 @@ def get_certificates_for_user(username):
     ]
 
 
-def get_certificate_for_user(username, course_key):
+def get_certificate_for_user(username, course_key, format=True):
     """
     Retrieve certificate information for a particular user for a specific course.
 
     Arguments:
         username (unicode): The identifier of the user.
         course_key (CourseKey): A Course Key.
-    Returns: dict
+        format (Bool): If True, certificate would be formated.
+    Returns: dict if format=True otherwise GeneratedCertificate object.
     """
     try:
         cert = GeneratedCertificate.eligible_certificates.get(
@@ -122,7 +123,9 @@ def get_certificate_for_user(username, course_key):
         )
     except GeneratedCertificate.DoesNotExist:
         return None
-    return format_certificate_for_user(username, cert)
+    if cert and format:
+        return format_certificate_for_user(username, cert)
+    return cert
 
 
 def generate_user_certificates(student, course_key, course=None, insecure=False, generation_mode='batch',
