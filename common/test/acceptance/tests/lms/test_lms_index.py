@@ -6,7 +6,7 @@ what students see @ edx.org because we redirect requests to a separate web appli
 import datetime
 
 from bok_choy.web_app_test import WebAppTest
-from ...pages.lms.index import IndexPage
+from common.test.acceptance.pages.lms.index import IndexPage
 
 
 class BaseLmsIndexTest(WebAppTest):

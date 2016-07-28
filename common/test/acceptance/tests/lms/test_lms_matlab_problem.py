@@ -4,10 +4,10 @@ Test for matlab problems
 """
 import time
 
-from ...pages.lms.matlab_problem import MatlabProblemPage
-from ...fixtures.course import XBlockFixtureDesc
-from ...fixtures.xqueue import XQueueResponseFixture
-from .test_lms_problems import ProblemsTest
+from common.test.acceptance.pages.lms.matlab_problem import MatlabProblemPage
+from common.test.acceptance.fixtures.course import XBlockFixtureDesc
+from common.test.acceptance.fixtures.xqueue import XQueueResponseFixture
+from common.test.acceptance.tests.lms.test_lms_problems import ProblemsTest
 from textwrap import dedent
 
 
