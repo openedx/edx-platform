@@ -7,21 +7,21 @@ from eventtracking import tracker
 
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
+from django_countries import countries
 from django.db import IntegrityError
 from django.utils.translation import ugettext as _
 from django.utils.translation import ugettext_noop
 
+from pytz import common_timezones, common_timezones_set, country_timezones
 from student.models import User, UserProfile
 from request_cache import get_request_or_stub
 from ..errors import (
     UserAPIInternalError, UserAPIRequestError, UserNotFound, UserNotAuthorized,
-    PreferenceValidationError, PreferenceUpdateError
+    PreferenceValidationError, PreferenceUpdateError, CountryCodeError
 )
 from ..helpers import intercept_errors
 from ..models import UserOrgTag, UserPreference
 from ..serializers import UserSerializer, RawUserPreferenceSerializer
-
-from pytz import common_timezones_set
 
 log = logging.getLogger(__name__)
 
@@ -417,3 +417,21 @@ def _create_preference_update_error(preference_key, preference_value, error):
             key=preference_key, value=preference_value
         ),
     )
+
+
+def get_country_time_zones(country_code=None):
+    """
+    Returns a list of time zones commonly used in given country
+    or list of all time zones, if country code is None.
+
+    Arguments:
+        country_code (str): ISO 3166-1 Alpha-2 country code
+
+    Raises:
+        CountryCodeError: the given country code is invalid
+    """
+    if country_code is None:
+        return common_timezones
+    if country_code.upper() in set(countries.alt_codes):
+        return country_timezones(country_code)
+    raise CountryCodeError

@@ -93,3 +93,8 @@ class PreferenceUpdateError(PreferenceRequestError):
     def __init__(self, developer_message, user_message=None):
         self.developer_message = developer_message
         self.user_message = user_message
+
+
+class CountryCodeError(ValueError):
+    """There was a problem with the country code"""
+    pass

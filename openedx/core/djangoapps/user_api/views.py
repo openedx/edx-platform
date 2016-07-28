@@ -31,7 +31,7 @@ from student.cookies import set_logged_in_cookies
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.lib.api.authentication import SessionAuthenticationAllowInactiveUser
 from util.json_request import JsonResponse
-from .preferences.api import update_email_opt_in
+from .preferences.api import get_country_time_zones, update_email_opt_in
 from .helpers import FormDescription, shim_student_view, require_post_params
 from .models import UserPreference, UserProfile
 from .accounts import (
@@ -39,7 +39,7 @@ from .accounts import (
     USERNAME_MIN_LENGTH, USERNAME_MAX_LENGTH
 )
 from .accounts.api import check_account_exists
-from .serializers import UserSerializer, UserPreferenceSerializer
+from .serializers import CountryTimeZoneSerializer, UserSerializer, UserPreferenceSerializer
 
 
 class LoginSessionView(APIView):
@@ -1036,3 +1036,37 @@ class UpdateEmailOptInPreference(APIView):
         email_opt_in = request.data['email_opt_in'].lower() == 'true'
         update_email_opt_in(request.user, org, email_opt_in)
         return HttpResponse(status=status.HTTP_200_OK)
+
+
+class CountryTimeZoneListView(generics.ListAPIView):
+    """
+    **Use Cases**
+
+        Retrieves a list of all time zones, by default, or common time zones for country, if given
+
+        The country is passed in as its ISO 3166-1 Alpha-2 country code as an
+        optional 'country_code' argument. The country code is also case-insensitive.
+
+    **Example Requests**
+
+        GET /user_api/v1/preferences/time_zones/
+
+        GET /user_api/v1/preferences/time_zones/?country_code=FR
+
+    **Example GET Response**
+
+        If the request is successful, an HTTP 200 "OK" response is returned along with a
+        list of time zone dictionaries for all time zones or just for time zones commonly
+        used in a country, if given.
+
+        Each time zone dictionary contains the following values.
+
+            * time_zone: The name of the time zone.
+            * description: The display version of the time zone
+    """
+    serializer_class = CountryTimeZoneSerializer
+    paginator = None
+
+    def get_queryset(self):
+        country_code = self.request.GET.get('country_code', None)
+        return get_country_time_zones(country_code)
