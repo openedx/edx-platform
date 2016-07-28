@@ -375,7 +375,9 @@ def _get_users(discussion_entity_type, discussion_entity, username_profile_dict)
 
         A dict of users with username as key and user profile details as value.
     """
-    users = {discussion_entity['author']: _user_profile(username_profile_dict[discussion_entity['author']])}
+    users = {}
+    if discussion_entity['author']:
+        users[discussion_entity['author']] = _user_profile(username_profile_dict[discussion_entity['author']])
 
     if discussion_entity_type == DiscussionEntity.comment and discussion_entity['endorsed']:
         users[discussion_entity['endorsed_by']] = _user_profile(username_profile_dict[discussion_entity['endorsed_by']])
@@ -446,7 +448,7 @@ def _serialize_discussion_entities(request, context, discussion_entities, reques
         results.append(serialized_entity)
 
         if include_profile_image:
-            if serialized_entity['author'] not in usernames:
+            if serialized_entity['author'] and serialized_entity['author'] not in usernames:
                 usernames.append(serialized_entity['author'])
             if (
                     'endorsed' in serialized_entity and serialized_entity['endorsed'] and
