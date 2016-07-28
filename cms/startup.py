@@ -5,6 +5,7 @@ Module with code executed during Studio startup
 from django.conf import settings
 
 # Force settings to run so that the python path is modified
+
 settings.INSTALLED_APPS  # pylint: disable=pointless-statement
 
 from openedx.core.lib.django_startup import autostartup
@@ -18,6 +19,7 @@ from openedx.core.lib.xblock_utils import xblock_local_resource_url
 import xmodule.x_module
 import cms.lib.xblock.runtime
 
+from startup_configurations.validate_config import validate_cms_config
 from openedx.core.djangoapps.theming.core import enable_theming
 from openedx.core.djangoapps.theming.helpers import is_comprehensive_theming_enabled
 
@@ -46,6 +48,9 @@ def run():
     # https://openedx.atlassian.net/wiki/display/PLAT/Convert+from+Storage-centric+runtimes+to+Application-centric+runtimes
     xmodule.x_module.descriptor_global_handler_url = cms.lib.xblock.runtime.handler_url
     xmodule.x_module.descriptor_global_local_resource_url = xblock_local_resource_url
+
+    # validate configurations on startup
+    validate_cms_config(settings)
 
 
 def add_mimetypes():

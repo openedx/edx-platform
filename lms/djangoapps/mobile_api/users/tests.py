@@ -11,7 +11,7 @@ import pytz
 from django.conf import settings
 from django.utils import timezone
 from django.template import defaultfilters
-from django.test import RequestFactory
+from django.test import RequestFactory, override_settings
 from milestones.tests.utils import MilestonesTestCaseMixin
 from xmodule.course_module import DEFAULT_START_DATE
 from xmodule.modulestore.tests.factories import ItemFactory, CourseFactory
@@ -73,6 +73,7 @@ class TestUserInfoApi(MobileAPITestCase, MobileAuthTestMixin):
 
 @attr('shard_2')
 @ddt.ddt
+@override_settings(MKTG_URLS={'ROOT': 'dummy-root'})
 class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTestMixin,
                             MobileCourseAccessTestMixin, MilestonesTestCaseMixin):
     """
@@ -86,7 +87,7 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
     LAST_WEEK = datetime.datetime.now(pytz.UTC) - datetime.timedelta(days=7)
     ADVERTISED_START = "Spring 2016"
 
-    @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+    @patch.dict(settings.FEATURES, {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self, *args, **kwargs):
         super(TestUserEnrollmentApi, self).setUp()
 
@@ -117,6 +118,7 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
         courses = response.data
         self.assertEqual(len(courses), 0)
 
+    @patch.dict(settings.FEATURES, {'ENABLE_MKTG_SITE': True})
     def test_sort_order(self):
         self.login()
 
@@ -134,9 +136,12 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
                 unicode(courses[num_courses - course_index - 1].id)
             )
 
-    @patch.dict(
-        settings.FEATURES, {'ENABLE_PREREQUISITE_COURSES': True, 'MILESTONES_APP': True, 'DISABLE_START_DATES': False}
-    )
+    @patch.dict(settings.FEATURES, {
+        'ENABLE_PREREQUISITE_COURSES': True,
+        'MILESTONES_APP': True,
+        'DISABLE_START_DATES': False,
+        'ENABLE_MKTG_SITE': True,
+    })
     def test_courseware_access(self):
         self.login()
 
@@ -181,7 +186,7 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
         (DEFAULT_START_DATE, None, None, "empty"),
     )
     @ddt.unpack
-    @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
+    @patch.dict(settings.FEATURES, {'DISABLE_START_DATES': False, 'ENABLE_MKTG_SITE': True})
     def test_start_type_and_display(self, start, advertised_start, expected_display, expected_type):
         """
         Tests that the correct start_type and start_display are returned in the
@@ -195,6 +200,7 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
         self.assertEqual(response.data[0]['course']['start_type'], expected_type)
         self.assertEqual(response.data[0]['course']['start_display'], expected_display)
 
+    @patch.dict(settings.FEATURES, {'ENABLE_MKTG_SITE': True})
     def test_no_certificate(self):
         self.login_and_enroll()
 
@@ -222,21 +228,21 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
         certificate_data = response.data[0]['certificate']
         self.assertEquals(certificate_data['url'], certificate_url)
 
-    @patch.dict(settings.FEATURES, {'CERTIFICATES_HTML_VIEW': False})
+    @patch.dict(settings.FEATURES, {'CERTIFICATES_HTML_VIEW': False, 'ENABLE_MKTG_SITE': True})
     def test_pdf_certificate_with_html_cert_disabled(self):
         """
         Tests PDF certificates with CERTIFICATES_HTML_VIEW set to False.
         """
         self.verify_pdf_certificate()
 
-    @patch.dict(settings.FEATURES, {'CERTIFICATES_HTML_VIEW': True})
+    @patch.dict(settings.FEATURES, {'CERTIFICATES_HTML_VIEW': True, 'ENABLE_MKTG_SITE': True})
     def test_pdf_certificate_with_html_cert_enabled(self):
         """
         Tests PDF certificates with CERTIFICATES_HTML_VIEW set to True.
         """
         self.verify_pdf_certificate()
 
-    @patch.dict(settings.FEATURES, {'CERTIFICATES_HTML_VIEW': True})
+    @patch.dict(settings.FEATURES, {'CERTIFICATES_HTML_VIEW': True, 'ENABLE_MKTG_SITE': True})
     def test_web_certificate(self):
         CourseMode.objects.create(
             course_id=self.course.id,
@@ -261,7 +267,7 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
             )
         )
 
-    @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+    @patch.dict(settings.FEATURES, {"ENABLE_DISCUSSION_SERVICE": True, 'ENABLE_MKTG_SITE': True})
     def test_discussion_url(self):
         self.login_and_enroll()
 
@@ -430,6 +436,8 @@ class TestCourseStatusPATCH(CourseStatusAPITestCase, MobileAuthUserTestMixin,
 
 
 @attr('shard_2')
+@patch.dict(settings.FEATURES, {'ENABLE_MKTG_SITE': True})
+@override_settings(MKTG_URLS={'ROOT': 'dummy-root'})
 class TestCourseEnrollmentSerializer(MobileAPITestCase, MilestonesTestCaseMixin):
     """
     Test the course enrollment serializer

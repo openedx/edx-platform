@@ -1,6 +1,7 @@
 """
 Milestone related tests for the mobile_api
 """
+from django.conf import settings
 from mock import patch
 
 from courseware.access_response import MilestoneError
@@ -26,14 +27,22 @@ class MobileAPIMilestonesMixin(object):
 
     ALLOW_ACCESS_TO_MILESTONE_COURSE = False  # pylint: disable=invalid-name
 
-    @patch.dict('django.conf.settings.FEATURES', {'ENABLE_PREREQUISITE_COURSES': True, 'MILESTONES_APP': True})
+    @patch.dict(settings.FEATURES, {
+        'ENABLE_PREREQUISITE_COURSES': True,
+        'MILESTONES_APP': True,
+        'ENABLE_MKTG_SITE': True,
+    })
     def test_unfulfilled_prerequisite_course(self):
         """ Tests the case for an unfulfilled pre-requisite course """
         self._add_prerequisite_course()
         self.init_course_access()
         self._verify_unfulfilled_milestone_response()
 
-    @patch.dict('django.conf.settings.FEATURES', {'ENABLE_PREREQUISITE_COURSES': True, 'MILESTONES_APP': True})
+    @patch.dict(settings.FEATURES, {
+        'ENABLE_PREREQUISITE_COURSES': True,
+        'MILESTONES_APP': True,
+        'ENABLE_MKTG_SITE': True,
+    })
     def test_unfulfilled_prerequisite_course_for_staff(self):
         self._add_prerequisite_course()
         self.user.is_staff = True
@@ -41,7 +50,11 @@ class MobileAPIMilestonesMixin(object):
         self.init_course_access()
         self.api_response()
 
-    @patch.dict('django.conf.settings.FEATURES', {'ENABLE_PREREQUISITE_COURSES': True, 'MILESTONES_APP': True})
+    @patch.dict(settings.FEATURES, {
+        'ENABLE_PREREQUISITE_COURSES': True,
+        'MILESTONES_APP': True,
+        'ENABLE_MKTG_SITE': True,
+    })
     def test_fulfilled_prerequisite_course(self):
         """
         Tests the case when a user fulfills existing pre-requisite course
@@ -52,7 +65,11 @@ class MobileAPIMilestonesMixin(object):
         self.init_course_access()
         self.api_response()
 
-    @patch.dict('django.conf.settings.FEATURES', {'ENTRANCE_EXAMS': True, 'MILESTONES_APP': True})
+    @patch.dict(settings.FEATURES, {
+        'ENTRANCE_EXAMS': True,
+        'MILESTONES_APP': True,
+        'ENABLE_MKTG_SITE': True,
+    })
     def test_unpassed_entrance_exam(self):
         """
         Tests the case where the user has not passed the entrance exam
@@ -61,7 +78,11 @@ class MobileAPIMilestonesMixin(object):
         self.init_course_access()
         self._verify_unfulfilled_milestone_response()
 
-    @patch.dict('django.conf.settings.FEATURES', {'ENTRANCE_EXAMS': True, 'MILESTONES_APP': True})
+    @patch.dict(settings.FEATURES, {
+        'ENTRANCE_EXAMS': True,
+        'MILESTONES_APP': True,
+        'ENABLE_MKTG_SITE': True,
+    })
     def test_unpassed_entrance_exam_for_staff(self):
         self._add_entrance_exam()
         self.user.is_staff = True
@@ -69,7 +90,11 @@ class MobileAPIMilestonesMixin(object):
         self.init_course_access()
         self.api_response()
 
-    @patch.dict('django.conf.settings.FEATURES', {'ENTRANCE_EXAMS': True, 'MILESTONES_APP': True})
+    @patch.dict(settings.FEATURES, {
+        'ENTRANCE_EXAMS': True,
+        'MILESTONES_APP': True,
+        'ENABLE_MKTG_SITE': True,
+    })
     def test_passed_entrance_exam(self):
         """
         Tests access when user has passed the entrance exam

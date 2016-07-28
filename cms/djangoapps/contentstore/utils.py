@@ -104,42 +104,6 @@ def get_lms_link_for_item(location, preview=False):
     )
 
 
-def get_lms_link_for_about_page(course_key):
-    """
-    Returns the url to the course about page from the location tuple.
-    """
-
-    assert isinstance(course_key, CourseKey)
-
-    if settings.FEATURES.get('ENABLE_MKTG_SITE', False):
-        if not hasattr(settings, 'MKTG_URLS'):
-            log.exception("ENABLE_MKTG_SITE is True, but MKTG_URLS is not defined.")
-            return None
-
-        marketing_urls = settings.MKTG_URLS
-
-        # Root will be "https://www.edx.org". The complete URL will still not be exactly correct,
-        # but redirects exist from www.edx.org to get to the Drupal course about page URL.
-        about_base = marketing_urls.get('ROOT', None)
-
-        if about_base is None:
-            log.exception('There is no ROOT defined in MKTG_URLS')
-            return None
-
-        # Strip off https:// (or http://) to be consistent with the formatting of LMS_BASE.
-        about_base = re.sub(r"^https?://", "", about_base)
-
-    elif settings.LMS_BASE is not None:
-        about_base = settings.LMS_BASE
-    else:
-        return None
-
-    return u"//{about_base_url}/courses/{course_key}/about".format(
-        about_base_url=about_base,
-        course_key=course_key.to_deprecated_string()
-    )
-
-
 # pylint: disable=invalid-name
 def get_lms_link_for_certificate_web_view(user_id, course_key, mode):
     """
