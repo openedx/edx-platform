@@ -11,6 +11,7 @@ from django.test.utils import override_settings
 
 from courseware.tests.helpers import LoginEnrollmentTestCase
 from courseware.tests.factories import GlobalStaffFactory
+from milestones.tests.utils import MilestonesTestCaseMixin
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
@@ -18,7 +19,7 @@ from xmodule.modulestore.django import modulestore
 
 
 @attr('shard_1')
-class TestNavigation(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
+class TestNavigation(SharedModuleStoreTestCase, LoginEnrollmentTestCase, MilestonesTestCaseMixin):
     """
     Check that navigation state is saved properly.
     """

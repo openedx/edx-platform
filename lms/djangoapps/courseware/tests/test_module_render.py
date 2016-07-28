@@ -407,7 +407,7 @@ class ModuleRenderTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
 
 
 @attr('shard_1')
-class TestHandleXBlockCallback(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
+class TestHandleXBlockCallback(SharedModuleStoreTestCase, LoginEnrollmentTestCase, MilestonesTestCaseMixin):
     """
     Test the handle_xblock_callback function
     """

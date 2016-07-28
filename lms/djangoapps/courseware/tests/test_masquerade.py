@@ -22,6 +22,7 @@ from courseware.masquerade import (
 from courseware.tests.factories import StaffFactory
 from courseware.tests.helpers import LoginEnrollmentTestCase, get_request_for_user
 from courseware.tests.test_submitting_problems import ProblemSubmissionTestMixin
+from milestones.tests.utils import MilestonesTestCaseMixin
 from student.tests.factories import UserFactory
 from xblock.runtime import DictKeyValueStore
 from xmodule.modulestore.django import modulestore
@@ -31,7 +32,7 @@ from xmodule.partitions.partitions import Group, UserPartition
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 
 
-class MasqueradeTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
+class MasqueradeTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase, MilestonesTestCaseMixin):
     """
     Base class for masquerade tests that sets up a test course and enrolls a user in the course.
     """
