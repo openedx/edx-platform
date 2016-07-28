@@ -70,62 +70,69 @@ class OLIAnalyticsBackend(BaseBackend):
 
         user_id = context.get('user_id')
         if not user_id:
+            LOG.info('user_id attribute missing from event for OLI service')
             return None
 
         event_data = event.get('event')
         if not event_data:
+            LOG.info('event_data attribute missing from event for OLI service')
             return None
 
         problem_id = event_data.get('problem_id')
         if not problem_id:
+            LOG.info('problem_id attribute missing from event for OLI service')
             return None
 
-        success = event_data.get('success')
-        if not success:
+        grade = event_data.get('grade')
+        if grade is None:
+            LOG.info('grade attribute missing from event for OLI service')
             return None
 
-        is_correct = success == 'correct'
+        max_grade = event_data.get('max_grade')
+        if max_grade is None:
+            LOG.info('max_grade attribute missing from event for OLI service')
+            return None
+
+        timestamp = event.get('time')
+        if not timestamp:
+            LOG.info('time attribute missing from event for OLI service')
+            return None
 
         # put the most expensive operation (DB access) at the end, to not do it needlessly
         try:
             user = User.objects.get(pk=user_id)
         except User.DoesNotExist:
-            LOG.warning('Can not find a user with user_id: %s', user_id)
+            LOG.info('Can not find a user with user_id: %s', user_id)
             return None
 
-        payload = {
-            'course_id': course_id,
-            'resource_id': problem_id,
-            'student_id': anonymous_id_for_user(user, None),
-            'result': is_correct,
-        }
+        request_payload_string = json.dumps({
+            'payload': {
+                'course_id': course_id,
+                'resource_id': problem_id,
+                'student_id': anonymous_id_for_user(user, None),
+                'grade': grade,
+                'max_grade': max_grade,
+                'timestamp': timestamp.isoformat(),
+            },
+        })
 
-        request_payload_string = json.dumps({'payload': json.dumps(payload)})
-        request_payload = {'request': request_payload_string}
         endpoint = urljoin(self.url, self.path)
+
         try:
-            response = self.oauth.put(endpoint, request_payload)
-
-            # Note: CourseBuilder's API always returns status_code=200, regardless of the actual error,
-            # so response.status_code is misleading.
-            # You should check the actual contents of the response.
-            # The response body will look like {"status":200, "message":"OK", "payload": .....}.
-
-            # Because Google prepends ')]}'\n to all json responses, to protect
-            # against XSSI (cross-site-scripting-inclusion), need to reformat the
-            # returned payloads
-
-            message = json.loads(response.content.split('\n')[-1])
-            if message['status'] == 200:
-                return 'OK'
-            else:
-                LOG.warning('OLI analytics service returns error status: %s.', message)
-                return 'Error'
+            response = self.oauth.put(endpoint, request_payload_string)
+            status_code = response.status_code
         except Exception as error:
-            LOG.warning(
-                "Unable to send event to OLI analytics service: %s: %s: %s",
+            LOG.info(
+                "Unable to send event to OLI analytics service: %s: %s: %s: %s",
                 endpoint,
-                payload,
+                request_payload_string,
+                response,
                 error,
             )
             return None
+
+        if status_code == 200:
+            return 'OK'
+        else:
+            LOG.info('OLI analytics service returns error status code: %s.', response.status_code)
+            return 'Error'

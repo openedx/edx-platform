@@ -125,7 +125,7 @@ class TestOLIBackend(TestCase):
                 'course_id': u'edX/DemoX/Demo_Course',
                 'path': u'/courses/edX/DemoX/Demo_Course/xblock/i4x:;_;_edX;_DemoX;_problem;_c554538a57664fac80783b99d9d6da7c/handler/xmodule_handler/problem_check',
             },
-            'time': datetime.datetime.now,
+            'time': datetime.datetime.now(),
             'page': 'x_module',
         }
         # pylint: enable=line-too-long
@@ -154,7 +154,7 @@ class TestOLIBackend(TestCase):
                 'course_id': u'edX/DemoX/Demo_Course',
                 'path': u'/courses/edX/DemoX/Demo_Course/courseware/interactive_demonstrations/',
             },
-            'time': datetime.datetime.now,
+            'time': datetime.datetime.now(),
             'page': None,
         }
         # pylint: enable=line-too-long
@@ -238,7 +238,7 @@ class TestOLIBackend(TestCase):
                 'course_id': u'edX/DemoX/Demo_Course2',
                 'path': u'/courses/edX/DemoX/Demo_Course/xblock/i4x:;_;_edX;_DemoX;_problem;_c554538a57664fac80783b99d9d6da7c/handler/xmodule_handler/problem_check',
             },
-            'time': datetime.datetime.now,
+            'time': datetime.datetime.now(),
             'page': 'x_module',
         }
         # pylint: enable=line-too-long
@@ -256,12 +256,8 @@ def mock_put(_self, _endpoint, _request_payload):
         'result': False,
         'resource_id': 'i4x://edX/DemoX/problem/c554538a57664fac80783b99d9d6da7c',
     })
-    response = {
-        'status': 200,
-        'message': 'OK',
-        'payload': payload,
-    }
-    response = json.dumps(response)
-    response = ')]}\n' + response
-    mock_result = Mock(content=response)
-    return mock_result
+    mock_response = Mock()
+    mock_response.status_code = 200
+    mock_response.message = 'OK'
+    mock_response.payload = payload
+    return mock_response

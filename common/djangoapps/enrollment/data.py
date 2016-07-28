@@ -13,10 +13,14 @@ from enrollment.errors import (
 )
 from enrollment.serializers import CourseEnrollmentSerializer, CourseSerializer
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from student.auth import user_has_role
 from student.models import (
     CourseEnrollment, NonExistentCourseError, EnrollmentClosedError,
     CourseFullError, AlreadyEnrolledError, CourseEnrollmentAttribute
 )
+from student.models import UserProfile
+from student.models import anonymous_id_for_user
+from student.roles import CourseStaffRole
 
 
 log = logging.getLogger(__name__)
@@ -293,3 +297,28 @@ def get_course_enrollment_info(course_id, include_expired=False):
         raise CourseNotFoundError(msg)
     else:
         return CourseSerializer(course, include_expired=include_expired).data
+
+def get_roster(course_id):
+    """
+    Returns roster with PII of all enrollees in course
+    """
+    course_key = CourseKey.from_string(course_id)
+    enrollments = CourseEnrollment.objects.filter(
+        course_id=course_key,
+        is_active=True,
+    ).order_by('user__username')
+
+    roster = [
+        {
+            'anonymous_user_id': anonymous_id_for_user(enrollment.user, None),
+            'user_id': enrollment.user.id,
+            'username': enrollment.user.username,
+            'email': enrollment.user.email,
+            'mode': enrollment.mode,
+            'is_staff': user_has_role(enrollment.user, CourseStaffRole(course_key)),
+            'name': getattr(UserProfile.objects.get(user=enrollment.user), 'name', ''),
+        }
+        for enrollment in enrollments
+    ]
+
+    return roster

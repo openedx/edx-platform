@@ -3,6 +3,7 @@ The Enrollment API Views should be simple, lean HTTP endpoints for API access. T
 consist primarily of authentication, request validation, and serialization.
 
 """
+import json
 import logging
 
 from django.core.exceptions import ObjectDoesNotExist
@@ -276,6 +277,36 @@ class EnrollmentCourseDetailView(APIView):
                     ).format(course_id=course_id)
                 }
             )
+
+
+class EnrollmentCourseRosterView(APIView, ApiKeyPermissionMixIn):
+    """
+    Read roster for a particular course. (contains PII)
+    """
+    authentication_classes = OAuth2AuthenticationAllowInactiveUser,
+    permission_classes = ApiKeyHeaderPermissionIsAuthenticated,
+
+    @method_decorator(ensure_csrf_cookie_cross_domain)
+    def get(self, request, course_id=None):
+        """
+        HTTP endpoint for retrieving roster
+        """
+        try:
+            course_key = CourseKey.from_string(course_id)
+        except InvalidKeyError:
+            return Response(
+                status=status.HTTP_400_BAD_REQUEST,
+                data={"message": u"Invalid or missing course_id"},
+            )
+
+        if not user_has_role(request.user, CourseStaffRole(course_key)):
+            return Response(
+                status=status.HTTP_403_FORBIDDEN,
+                data={"message": u"User does not have permission to view roster for [{course_id}].".format(course_id=course_id)},
+            )
+
+        roster = api.get_roster(course_id)
+        return Response(data=json.dumps({'roster': roster}))
 
 
 @can_disable_rate_limit
