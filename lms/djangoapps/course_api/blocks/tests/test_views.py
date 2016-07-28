@@ -8,6 +8,7 @@ from string import join
 from urllib import urlencode
 from urlparse import urlunparse
 
+from milestones.tests.utils import MilestonesTestCaseMixin
 from opaque_keys.edx.locator import CourseLocator
 from student.models import CourseEnrollment
 from student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
@@ -17,7 +18,7 @@ from xmodule.modulestore.tests.factories import ToyCourseFactory
 from .helpers import deserialize_usage_key
 
 
-class TestBlocksView(SharedModuleStoreTestCase):
+class TestBlocksView(SharedModuleStoreTestCase, MilestonesTestCaseMixin):
     """
     Test class for BlocksView
     """

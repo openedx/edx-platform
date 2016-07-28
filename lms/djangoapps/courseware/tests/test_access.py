@@ -557,7 +557,7 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, MilestonesTes
         """
         Test course access on mobile for staff and students.
         """
-        descriptor = Mock(user_partitions=[])
+        descriptor = Mock(id=self.course.id, user_partitions=[])
         descriptor._class_tags = {}
         descriptor.visible_to_staff_only = False
         descriptor.mobile_available = mobile_available
@@ -697,7 +697,7 @@ class CourseOverviewAccessTestCase(ModuleStoreTestCase):
         self.user_normal = UserFactory.create()
         self.user_beta_tester = BetaTesterFactory.create(course_key=self.course_not_started.id)
         self.user_completed_pre_requisite = UserFactory.create()
-        fulfill_course_milestone(self.user_completed_pre_requisite, self.course_started.id)
+        fulfill_course_milestone(self.course_started.id, self.user_completed_pre_requisite)
         self.user_staff = UserFactory.create(is_staff=True)
         self.user_anonymous = AnonymousUserFactory.create()
 
