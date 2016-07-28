@@ -9,7 +9,7 @@ from mock import patch, call
 from test.test_support import EnvironmentVarGuard
 from paver.easy import BuildFailure
 from pavelib.utils.test.suites import BokChoyTestSuite, Pa11yCrawler
-from pavelib.utils.test.bokchoy_suite import DEMO_COURSE_TAR_GZ
+from pavelib.utils.test.suites.bokchoy_suite import DEMO_COURSE_TAR_GZ
 
 REPO_DIR = os.getcwd()
 
