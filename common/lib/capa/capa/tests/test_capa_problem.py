@@ -161,3 +161,60 @@ class CAPAProblemTest(unittest.TestCase):
                 }
             }
         )
+
+    def test_question_is_not_removed(self):
+        """
+        Verify that tag with question text is not removed when responsetype is not fully accessible.
+        """
+        question = "Click the country which is home to the Pyramids."
+        xml = """
+        <problem>
+            <p>{}</p>
+            <imageresponse>
+                <imageinput label="{}"
+                src="/static/Africa.png" width="600" height="638" rectangle="(338,98)-(412,168)"/>
+            </imageresponse>
+        </problem>
+        """.format(question, question)
+        problem = new_loncapa_problem(xml)
+        self.assertEqual(
+            problem.problem_data,
+            {
+                '1_2':
+                {
+                    'description_ids': '',
+                    'label': 'Click the country which is home to the Pyramids.',
+                    'descriptions': {}
+                }
+            }
+        )
+        # <p> tag with question text should not be deleted
+        self.assertEqual(problem.tree.xpath("string(p[text()='{}'])".format(question)), question)
+
+    def test_label_is_empty_if_no_label_attribute(self):
+        """
+        Verify that label in response_data is empty string when label
+        attribute is missing and responsetype is not fully accessible.
+        """
+        question = "Click the country which is home to the Pyramids."
+        xml = """
+        <problem>
+            <p>{}</p>
+            <imageresponse>
+                <imageinput
+                src="/static/Africa.png" width="600" height="638" rectangle="(338,98)-(412,168)"/>
+            </imageresponse>
+        </problem>
+        """.format(question)
+        problem = new_loncapa_problem(xml)
+        self.assertEqual(
+            problem.problem_data,
+            {
+                '1_2':
+                {
+                    'description_ids': '',
+                    'label': '',
+                    'descriptions': {}
+                }
+            }
+        )

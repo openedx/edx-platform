@@ -37,6 +37,16 @@ from capa.safe_exec import safe_exec
 # extra things displayed after "show answers" is pressed
 solution_tags = ['solution']
 
+# fully accesible capa response types
+ACCESSIBLE_CAPA_RESPONSE_TYPES = [
+    'choiceresponse',
+    'multiplechoiceresponse',
+    'optionresponse',
+    'numericalresponse',
+    'stringresponse',
+    'formularesponse',
+]
+
 # these get captured as student responses
 response_properties = ["codeparam", "responseparam", "answer", "openendedparam"]
 
@@ -869,6 +879,7 @@ class LoncapaProblem(object):
 
             question_id = self.problem_id + '_' + str(response_id)
             label = ''
+            element_to_be_deleted = None
 
             # Extract label value from <label> tag or label attribute from inside the responsetype
             # Extract label value from <label> tag
@@ -876,7 +887,7 @@ class LoncapaProblem(object):
             if responsetype_label_tag is not None:
                 label = responsetype_label_tag.text
                 # Delete <label> tag containing question text otherwise question will be rendered twice
-                response.remove(responsetype_label_tag)
+                element_to_be_deleted = responsetype_label_tag
             elif 'label' in inputfields[0].attrib:
                 # Extract label value from label attribute
                 # This is the case when we have a problem with multiple questions having OLX only
@@ -884,7 +895,7 @@ class LoncapaProblem(object):
                 # Delete <p> tag containing question text otherwise question will be rendered twice
                 p_tag = response.xpath("preceding-sibling::p[text()='{}']".format(label))
                 if p_tag:
-                    tree.remove(p_tag[0])
+                    element_to_be_deleted = p_tag[0]
             else:
                 # neither <label> tag nor label attribute is present inside responsetype
                 # existing problem with multi-questions without --- having markdown
@@ -892,7 +903,18 @@ class LoncapaProblem(object):
                 label_tag = response.xpath("preceding-sibling::label[1]")
                 if label_tag:
                     label = label_tag[0].text
-                    tree.remove(label_tag[0])
+                    element_to_be_deleted = label_tag[0]
+
+            label = label.strip() or DEFAULT_QUESTION_TEXT
+
+            # delete label or p element only if responsetype is fully accessible
+            if response.tag in ACCESSIBLE_CAPA_RESPONSE_TYPES and element_to_be_deleted is not None:
+                element_to_be_deleted.getparent().remove(element_to_be_deleted)
+
+            # for non-accessible responsetypes it may be possible that label attribute is not present
+            # in this case pass an empty label. remember label attribute is only used as value for aria-label
+            if response.tag not in ACCESSIBLE_CAPA_RESPONSE_TYPES and label == DEFAULT_QUESTION_TEXT:
+                label = ''
 
             # Extract descriptions and set unique id on each description tag
             description_tags = response.findall('description')
@@ -906,7 +928,7 @@ class LoncapaProblem(object):
                 description_id += 1
 
             problem_data[question_id] = {
-                'label': label.strip() or DEFAULT_QUESTION_TEXT,
+                'label': label,
                 'description_ids': ' '.join(descriptions.keys()),
                 'descriptions': descriptions
             }

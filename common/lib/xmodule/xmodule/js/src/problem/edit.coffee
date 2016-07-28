@@ -217,7 +217,7 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
               label = '<label>' + result[0] + '</label>' + '\n';
 
           // don't add empty <description> tag
-          if (result.length == 1 || result[1].length == 0) {
+          if (result.length == 1 || !result[1]) {
               return label;
           }
           return label + '<description>' + result[1] + '</description>\n'

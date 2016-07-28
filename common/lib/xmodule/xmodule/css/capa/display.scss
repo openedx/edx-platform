@@ -154,7 +154,7 @@ div.problem {
   }
 
   .question-description {
-    @include margin(($baseline*0.75), 0, ($baseline*0.75), 0);
+    @include margin(($baseline*0.75), 0);
   }
 }
 

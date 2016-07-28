@@ -893,7 +893,7 @@ class ChoiceTextGroupTemplateTest(TemplateTestCase):
             'status': Status('correct'),
             'input_type': 'radio',
             'value': self.VALUE_DICT,
-            'response_data': {'label': 'test', 'description_ids': '', 'descriptions': {}}
+            'response_data': {'label': 'choicetext label', 'description_ids': '', 'descriptions': {}}
         }
 
         super(ChoiceTextGroupTemplateTest, self).setUp()
@@ -1034,3 +1034,8 @@ class ChoiceTextGroupTemplateTest(TemplateTestCase):
             # Should NOT mark the whole problem
             xpath = "//div[@class='indicator-container']/span"
             self.assert_no_xpath(xml, xpath, self.context)
+
+    def test_label(self):
+        xml = self.render_to_xml(self.context)
+        xpath = "//fieldset[@aria-label='%s']" % self.context['response_data']['label']
+        self.assert_has_xpath(xml, xpath, self.context)

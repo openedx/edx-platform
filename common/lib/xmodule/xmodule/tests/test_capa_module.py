@@ -2792,7 +2792,7 @@ class TestProblemCheckTracking(unittest.TestCase):
         event = self.get_event_for_answers(module, answer_input_dict)
         self.assertEquals(event['submission'], {
             factory.answer_key(2): {
-                'question': DEFAULT_QUESTION_TEXT,
+                'question': '',
                 'answer': fpaths,
                 'response_type': 'coderesponse',
                 'input_type': 'filesubmission',
@@ -2802,7 +2802,7 @@ class TestProblemCheckTracking(unittest.TestCase):
             factory.answer_key(3): {
                 'answer': 'None',
                 'correct': True,
-                'question': DEFAULT_QUESTION_TEXT,
+                'question': '',
                 'response_type': 'customresponse',
                 'input_type': 'textline',
                 'variant': ''

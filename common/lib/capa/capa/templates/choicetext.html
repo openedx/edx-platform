@@ -10,7 +10,7 @@
 <form class="choicetextgroup capa_inputtype" id="inputtype_${id}">
     <div class="script_placeholder" data-src="${STATIC_URL}js/capa/choicetextinput.js"/>
 
-    <fieldset>
+    <fieldset aria-label="${response_data['label']}">
         % for choice_id, choice_description in choices:
         <%choice_id= choice_id %>
         <section id="forinput${choice_id}"
