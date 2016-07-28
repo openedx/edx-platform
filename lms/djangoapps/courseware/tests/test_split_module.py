@@ -7,6 +7,7 @@ from nose.plugins.attrib import attr
 
 from courseware.module_render import get_module_for_descriptor
 from courseware.model_data import FieldDataCache
+from milestones.tests.utils import MilestonesTestCaseMixin
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from xmodule.modulestore.tests.factories import ItemFactory, CourseFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
@@ -15,7 +16,7 @@ from openedx.core.djangoapps.user_api.tests.factories import UserCourseTagFactor
 
 
 @attr('shard_1')
-class SplitTestBase(SharedModuleStoreTestCase):
+class SplitTestBase(SharedModuleStoreTestCase, MilestonesTestCaseMixin):
     """
     Sets up a basic course and user for split test testing.
     Also provides tests of rendered HTML for two user_tag conditions, 0 and 1.
