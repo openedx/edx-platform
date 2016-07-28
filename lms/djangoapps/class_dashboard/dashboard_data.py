@@ -311,7 +311,7 @@ def construct_problem_data(prob_grade_distrib, total_student_count, c_subsection
         'xValue': label,
         'stackData': stack_data,
     }
-    return problem
+    return problem, c_problem
 
 
 def get_d3_problem_grade_distrib(course_id, enrollment):
@@ -350,7 +350,7 @@ def get_d3_problem_grade_distrib(course_id, enrollment):
 
                     # Student data is at the problem level
                     if child.location.category in PROB_TYPE_LIST:
-                        problem = construct_problem_data(
+                        problem, c_problem = construct_problem_data(
                             prob_grade_distrib,
                             total_student_count,
                             c_subsection,
@@ -361,7 +361,7 @@ def get_d3_problem_grade_distrib(course_id, enrollment):
                         data.append(problem)
                     elif child.location.category in settings.TYPES_WITH_CHILD_PROBLEMS_LIST:
                         for library_problem in child.get_children():
-                            problem = construct_problem_data(
+                            problem, c_problem = construct_problem_data(
                                 prob_grade_distrib,
                                 total_student_count,
                                 c_subsection,
