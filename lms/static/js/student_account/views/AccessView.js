@@ -74,7 +74,7 @@
                 };
 
                 this.platformName = options.platform_name;
-                this.registrationFooter = options.registration_footer;
+                this.isNonMicrositeTheme = options.is_non_microsite_theme
 
                 // The login view listens for 'sync' events from the reset model
                 this.resetModel = new PasswordResetModel({}, {
@@ -162,7 +162,7 @@
                         fields: data.fields,
                         model: model,
                         thirdPartyAuth: this.thirdPartyAuth,
-                        registrationFooter: this.registrationFooter,
+                        isNonMicrositeTheme: this.isNonMicrositeTheme,
                         platformName: this.platformName
                     });
 
