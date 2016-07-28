@@ -33,7 +33,7 @@ EXPECTED_PREPROCESS_ASSETS_COMMAND = (
     u" {system}/static/sass/*.scss {system}/static/themed_sass"
 )
 EXPECTED_COLLECT_STATIC_COMMAND = (
-    u"python manage.py {system} --settings={asset_settings} collectstatic --noinput > /dev/null"
+    u"python manage.py {system} --settings={asset_settings} collectstatic --link --noinput > /dev/null"
 )
 EXPECTED_CELERY_COMMAND = (
     u"python manage.py lms --settings={settings} celery worker --beat --loglevel=INFO --pythonpath=."
