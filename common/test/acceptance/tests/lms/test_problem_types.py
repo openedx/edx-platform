@@ -505,12 +505,6 @@ class StringProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         Additional setup for StringProblemTypeTest
         """
         super(StringProblemTypeTest, self).setUp(*args, **kwargs)
-        self.problem_page.a11y_audit.config.set_rules({
-            'ignore': [
-                'section',  # TODO: AC-491
-                'label',  # TODO: AC-290
-            ]
-        })
 
     def answer_problem(self, correct):
         """
