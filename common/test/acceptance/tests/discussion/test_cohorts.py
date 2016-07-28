@@ -9,7 +9,10 @@ from common.test.acceptance.tests.helpers import UniqueCourseTest
 from common.test.acceptance.pages.lms.auto_auth import AutoAuthPage
 from common.test.acceptance.fixtures.course import (CourseFixture, XBlockFixtureDesc)
 
-from common.test.acceptance.pages.lms.discussion import (DiscussionTabSingleThreadPage, InlineDiscussionThreadPage, InlineDiscussionPage)
+from common.test.acceptance.pages.lms.discussion import (
+    DiscussionTabSingleThreadPage,
+    InlineDiscussionThreadPage,
+    InlineDiscussionPage)
 from common.test.acceptance.pages.lms.courseware import CoursewarePage
 
 from nose.plugins.attrib import attr

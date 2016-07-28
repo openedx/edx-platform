@@ -6,8 +6,6 @@ from flaky import flaky
 from opaque_keys.edx.locator import LibraryLocator
 from uuid import uuid4
 
-from common.test.acceptance.fixtures import PROGRAMS_STUB_URL
-from common.test.acceptance.fixtures.config import ConfigModelFixture
 from common.test.acceptance.fixtures.programs import ProgramsFixture, ProgramsConfigMixin
 from common.test.acceptance.pages.studio.auto_auth import AutoAuthPage
 from common.test.acceptance.pages.studio.library import LibraryEditPage
