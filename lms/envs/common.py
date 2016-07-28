@@ -2235,43 +2235,6 @@ REGISTRATION_EXTRA_FIELDS = {
     'city': 'hidden',
     'country': 'hidden',
 }
-REGISTRATION_FOOTER_DISCLAIMER = {
-    'institution_name': PLATFORM_NAME,
-    'institution_name_short': PLATFORM_NAME,
-    'institution_name_general': 'Institution',
-    'platform_name_on_tos': PLATFORM_NAME,
-    'html': _(
-        "{paragraph_start}{institution_name} pursues the science of "
-        "learning.  Online learners are important participants in that "
-        "pursuit. The information we gather from your engagement with our "
-        "instructional offerings makes it possible for faculty, "
-        "researchers, designers and engineers to continuously improve "
-        "their work and, in that process, build learning science.{paragraph_end}"
-        "{paragraph_start}By registering as an online learner, you are "
-        "also participating in research intended to enhance "
-        "{institution_name_short}'s instructional offerings as well as "
-        "the quality of learning and related sciences worldwide. In the "
-        "interest of research, you may be exposed to some variations in "
-        "the course materials.  {institution_name_short} does not use "
-        "learner data for any purpose beyond the "
-        "{institution_name_general}'s stated missions of education and "
-        "research. For purposes of research, we may share information we "
-        "collect from online learning activities, including "
-        "{pii_link_start}Personally Identifiable Information{link_end}, "
-        "with researchers beyond {institution_name_short}. However, your "
-        "Personally Identifiable Information will only be shared as "
-        "permitted by applicable law, will be limited to what is "
-        "necessary to perform the research, and will be subject to an "
-        "agreement to protect the data. We may also share with the public "
-        "or third parties aggregated information that does not personally "
-        "identify you. Similarly, any research findings will be reported "
-        "at the aggregate level and will not expose your personal "
-        "identity.{paragraph_end}{paragraph_start}Please read our "
-        "{privacy_link_start}Privacy Policy{link_end} for more "
-        "information regarding the processing, transmission and use of "
-        "data collected through the {platform_name_on_tos} platform.{paragraph_end}"
-    ),
-}
 
 ########################## CERTIFICATE NAME ########################
 CERT_NAME_SHORT = "Certificate"
