@@ -9,19 +9,19 @@ from datetime import datetime, timedelta
 import ddt
 
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
-from ..helpers import UniqueCourseTest, EventsTestMixin
-from ...pages.studio.auto_auth import AutoAuthPage
-from ...pages.lms.create_mode import ModeCreationPage
-from ...pages.studio.overview import CourseOutlinePage
-from ...pages.lms.courseware import CoursewarePage, CoursewareSequentialTabPage
-from ...pages.lms.course_nav import CourseNavPage
-from ...pages.lms.problem import ProblemPage
-from ...pages.common.logout import LogoutPage
-from ...pages.lms.staff_view import StaffPage
-from ...pages.lms.track_selection import TrackSelectionPage
-from ...pages.lms.pay_and_verify import PaymentAndVerificationFlow, FakePaymentPage
-from ...pages.lms.dashboard import DashboardPage
-from ...fixtures.course import CourseFixture, XBlockFixtureDesc
+from common.test.acceptance.tests.helpers import UniqueCourseTest, EventsTestMixin
+from common.test.acceptance.pages.studio.auto_auth import AutoAuthPage
+from common.test.acceptance.pages.lms.create_mode import ModeCreationPage
+from common.test.acceptance.pages.studio.overview import CourseOutlinePage
+from common.test.acceptance.pages.lms.courseware import CoursewarePage, CoursewareSequentialTabPage
+from common.test.acceptance.pages.lms.course_nav import CourseNavPage
+from common.test.acceptance.pages.lms.problem import ProblemPage
+from common.test.acceptance.pages.common.logout import LogoutPage
+from common.test.acceptance.pages.lms.staff_view import StaffPage
+from common.test.acceptance.pages.lms.track_selection import TrackSelectionPage
+from common.test.acceptance.pages.lms.pay_and_verify import PaymentAndVerificationFlow, FakePaymentPage
+from common.test.acceptance.pages.lms.dashboard import DashboardPage
+from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
 
 
 class CoursewareTest(UniqueCourseTest):

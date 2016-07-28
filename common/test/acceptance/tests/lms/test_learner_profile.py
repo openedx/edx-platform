@@ -9,13 +9,13 @@ from datetime import datetime
 from flaky import flaky
 from nose.plugins.attrib import attr
 
-from ...pages.common.logout import LogoutPage
-from ...pages.lms.account_settings import AccountSettingsPage
-from ...pages.lms.auto_auth import AutoAuthPage
-from ...pages.lms.learner_profile import LearnerProfilePage
-from ...pages.lms.dashboard import DashboardPage
+from common.test.acceptance.pages.common.logout import LogoutPage
+from common.test.acceptance.pages.lms.account_settings import AccountSettingsPage
+from common.test.acceptance.pages.lms.auto_auth import AutoAuthPage
+from common.test.acceptance.pages.lms.learner_profile import LearnerProfilePage
+from common.test.acceptance.pages.lms.dashboard import DashboardPage
 
-from ..helpers import EventsTestMixin
+from common.test.acceptance.tests.helpers import EventsTestMixin
 
 
 class LearnerProfileTestMixin(EventsTestMixin):

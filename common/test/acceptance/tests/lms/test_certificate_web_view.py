@@ -1,16 +1,16 @@
 """
 Acceptance tests for the certificate web view feature.
 """
-from ..helpers import UniqueCourseTest, EventsTestMixin, load_data_str, get_element_padding
+from common.test.acceptance.tests.helpers import UniqueCourseTest, EventsTestMixin, load_data_str, get_element_padding
 from nose.plugins.attrib import attr
-from ...fixtures.course import CourseFixture, XBlockFixtureDesc, CourseUpdateDesc
-from ...fixtures.certificates import CertificateConfigFixture
-from ...pages.lms.auto_auth import AutoAuthPage
-from ...pages.lms.certificate_page import CertificatePage
-from ...pages.lms.course_info import CourseInfoPage
-from ...pages.lms.tab_nav import TabNavPage
-from ...pages.lms.course_nav import CourseNavPage
-from ...pages.lms.progress import ProgressPage
+from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc, CourseUpdateDesc
+from common.test.acceptance.fixtures.certificates import CertificateConfigFixture
+from common.test.acceptance.pages.lms.auto_auth import AutoAuthPage
+from common.test.acceptance.pages.lms.certificate_page import CertificatePage
+from common.test.acceptance.pages.lms.course_info import CourseInfoPage
+from common.test.acceptance.pages.lms.tab_nav import TabNavPage
+from common.test.acceptance.pages.lms.course_nav import CourseNavPage
+from common.test.acceptance.pages.lms.progress import ProgressPage
 
 
 @attr('shard_5')
