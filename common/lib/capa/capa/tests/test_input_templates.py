@@ -461,8 +461,7 @@ class TextlineTemplateTest(TemplateTestCase):
 
     def test_label(self):
         xml = self.render_to_xml(self.context)
-        xpath = "//input[@aria-label='%s']" % self.context['response_data']['label']
-        self.assert_has_xpath(xml, xpath, self.context)
+        self.assert_has_xpath(xml, "//label[@class='question-label']", self.RESPONSE_DATA['label'])
 
     def test_hidden(self):
         self.context['hidden'] = True
@@ -542,7 +541,7 @@ class TextlineTemplateTest(TemplateTestCase):
         Test that correct description information is set on desired elements.
         """
         xpaths = ['//input/@aria-describedby']
-        self.assert_description(xpaths, descriptions=False)
+        self.assert_description(xpaths)
         self.assert_describedby_attribute(xpaths)
 
 

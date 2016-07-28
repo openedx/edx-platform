@@ -2,38 +2,27 @@
 metadata:
     display_name: Text Input
     markdown: |
-        In text input problems, also known as "fill-in-the-blank" problems, learners enter text into a response field. The text can include letters and characters such as punctuation marks. The text that the learner enters must match your specified answer text exactly. You can specify more than one correct answer. Learners must enter a response that matches one of the correct answers exactly.
+        You can use this template as a guide to the simple editor markdown and OLX markup to use for text input with
+        hints and feedback problems. Edit this component to replace this template with your own assessment.
 
-        When you add the problem, be sure to select Settings to specify a Display Name and other values that apply.
+        >>Add the question text, or prompt, here. This text is required.||You can add an optional tip or note related
+        to the prompt like this. <<
 
-        You can use the following example problem as a model.
-
-        >>What was the first post-secondary school in China to allow both male and female students?||Be sure to check your spelling.<<
-
-        = Nanjing Higher Normal Institute
-        or= National Central University
-        or= Nanjing University
-
-        [explanation]
-        Nanjing Higher Normal Institute first admitted female students in 1920.
-        [explanation]
+        = the correct answer {{You can specify optional feedback like this, which appears after this answer is submitted.}}
+        or= optional acceptable variant of the correct answer
+        not= optional incorrect answer such as a frequent misconception  {{You can specify optional feedback for none, a subset, or all of the answers.}}
 
 data:   |
         <problem>
-            <stringresponse answer="Nanjing Higher Normal Institute" type="ci">
-                <p>In text input problems, also known as "fill-in-the-blank" problems, learners enter text into a response field. The text that the learner enters must match your specified answer text exactly. You can specify more than one correct answer. Learners must enter a response that matches one of the correct answers exactly.</p>
-                <p>When you add the problem, be sure to select <strong>Settings</strong> to specify a <strong>Display Name</strong> and other values that apply.</p>
-                <p>You can use the following example problem as a model.</p>
-                <label>What was the first post-secondary school in China to allow both male and female students?</label>
-                <description>Be sure to check your spelling.</description>
-                <additional_answer>National Central University</additional_answer>
-                <additional_answer>Nanjing University</additional_answer>
-                <textline size="40"/>
-                <solution>
-                    <div class="detailed-solution">
-                        <p>Explanation</p>
-                        <p>Nanjing Higher Normal Institute first admitted female students in 1920.</p>
-                    </div>
-                </solution>
+            <stringresponse answer="the correct answer" type="ci">
+                <p>You can use this template as a guide to the simple editor markdown and OLX markup to use for text input with</p>
+                <p>hints and feedback problems. Edit this component to replace this template with your own assessment.</p>
+                <label>Add the question text, or prompt, here. This text is required.</label>
+                <description>You can add an optional tip or note related to the prompt like this.
+                </description>
+                <correcthint>You can specify optional feedback like this, which appears after this answer is submitted.</correcthint>
+                <additional_answer answer="optional acceptable variant of the correct answer"/>
+                <stringequalhint answer="optional incorrect answer such as a frequent misconception">You can specify optional feedback for none, a subset, or all of the answers.</stringequalhint>
+                <textline size="20"/>
             </stringresponse>
         </problem>
