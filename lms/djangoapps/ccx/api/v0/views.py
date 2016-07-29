@@ -492,7 +492,7 @@ class CCXListView(GenericAPIView):
             make_user_coach(coach, master_course_key)
 
             # pull the ccx course key
-            ccx_course_key = CCXLocator.from_course_locator(master_course_object.id, ccx_course_object.id)
+            ccx_course_key = CCXLocator.from_course_locator(master_course_object.id, unicode(ccx_course_object.id))
             # enroll the coach in the newly created ccx
             email_params = get_email_params(
                 master_course_object,

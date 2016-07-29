@@ -133,7 +133,7 @@ def dashboard(request, course, ccx=None):
         if ccx:
             url = reverse(
                 'ccx_coach_dashboard',
-                kwargs={'course_id': CCXLocator.from_course_locator(course.id, ccx.id)}
+                kwargs={'course_id': CCXLocator.from_course_locator(course.id, unicode(ccx.id))}
             )
             return redirect(url)
 
@@ -218,7 +218,7 @@ def create_ccx(request, course, ccx=None):
             for vertical in sequential.get_children():
                 override_field_for_ccx(ccx, vertical, hidden, True)
 
-    ccx_id = CCXLocator.from_course_locator(course.id, ccx.id)
+    ccx_id = CCXLocator.from_course_locator(course.id, unicode(ccx.id))
 
     url = reverse('ccx_coach_dashboard', kwargs={'course_id': ccx_id})
 
@@ -373,7 +373,7 @@ def set_grading_policy(request, course, ccx=None):
 
     url = reverse(
         'ccx_coach_dashboard',
-        kwargs={'course_id': CCXLocator.from_course_locator(course.id, ccx.id)}
+        kwargs={'course_id': CCXLocator.from_course_locator(course.id, unicode(ccx.id))}
     )
     return redirect(url)
 
@@ -474,7 +474,7 @@ def ccx_invite(request, course, ccx=None):
     identifiers_raw = request.POST.get('student-ids')
     identifiers = _split_input_list(identifiers_raw)
     email_students = 'email-students' in request.POST
-    course_key = CCXLocator.from_course_locator(course.id, ccx.id)
+    course_key = CCXLocator.from_course_locator(course.id, unicode(ccx.id))
     email_params = get_email_params(course, auto_enroll=True, course_key=course_key, display_name=ccx.display_name)
 
     ccx_students_enrolling_center(action, identifiers, email_students, course_key, email_params, ccx.coach)
@@ -497,7 +497,7 @@ def ccx_student_management(request, course, ccx=None):
     student_id = request.POST.get('student-id', '')
     email_students = 'email-students' in request.POST
     identifiers = [student_id]
-    course_key = CCXLocator.from_course_locator(course.id, ccx.id)
+    course_key = CCXLocator.from_course_locator(course.id, unicode(ccx.id))
     email_params = get_email_params(course, auto_enroll=True, course_key=course_key, display_name=ccx.display_name)
 
     errors = ccx_students_enrolling_center(action, identifiers, email_students, course_key, email_params, ccx.coach)
