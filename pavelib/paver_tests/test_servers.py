@@ -29,7 +29,7 @@ EXPECTED_CMS_SASS_COMMAND = [
     u"python manage.py cms --settings={asset_settings} compile_sass cms ",
 ]
 EXPECTED_COLLECT_STATIC_COMMAND = (
-    u"python manage.py {system} --settings={asset_settings} collectstatic --noinput > /dev/null"
+    u"python manage.py {system} --settings={asset_settings} collectstatic --link --noinput > /dev/null"
 )
 EXPECTED_CELERY_COMMAND = (
     u"python manage.py lms --settings={settings} celery worker --beat --loglevel=INFO --pythonpath=."

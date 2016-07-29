@@ -1,12 +1,68 @@
 """
 Acceptance test suite
 """
-from paver.easy import sh, call_task
+from paver.easy import sh, call_task, task
 from pavelib.utils.test import utils as test_utils
 from pavelib.utils.test.suites.suite import TestSuite
 from pavelib.utils.envs import Env
+from pavelib.utils.timer import timed
 
 __test__ = False  # do not collect
+
+
+DBS = {
+    'default': Env.REPO_ROOT / 'test_root/db/test_edx.db',
+    'student_module_history': Env.REPO_ROOT / 'test_root/db/test_student_module_history.db'
+}
+DB_CACHES = {
+    'default': Env.REPO_ROOT / 'common/test/db_cache/lettuce.db',
+    'student_module_history': Env.REPO_ROOT / 'common/test/db_cache/lettuce_student_module_history.db'
+}
+
+
+@task
+@timed
+def setup_acceptance_db():
+    """
+    TODO: Improve the following
+
+    Since the CMS depends on the existence of some database tables
+    that are now in common but used to be in LMS (Role/Permissions for Forums)
+    we need to create/migrate the database tables defined in the LMS.
+    We might be able to address this by moving out the migrations from
+    lms/django_comment_client, but then we'd have to repair all the existing
+    migrations from the upgrade tables in the DB.
+    But for now for either system (lms or cms), use the lms
+    definitions to sync and migrate.
+    """
+
+    for db in DBS.keys():
+        if DBS[db].isfile():
+            # Since we are using SQLLite, we can reset the database by deleting it on disk.
+            DBS[db].remove()
+
+    if all(DB_CACHES[cache].isfile() for cache in DB_CACHES.keys()):
+        # To speed up migrations, we check for a cached database file and start from that.
+        # The cached database file should be checked into the repo
+
+        # Copy the cached database to the test root directory
+        for db_alias in DBS.keys():
+            sh("cp {db_cache} {db}".format(db_cache=DB_CACHES[db_alias], db=DBS[db_alias]))
+
+        # Run migrations to update the db, starting from its cached state
+        for db_alias in sorted(DBS.keys()):
+            # pylint: disable=line-too-long
+            sh("./manage.py lms --settings acceptance migrate --traceback --noinput --fake-initial --database {}".format(db_alias))
+            sh("./manage.py cms --settings acceptance migrate --traceback --noinput --fake-initial --database {}".format(db_alias))
+    else:
+        # If no cached database exists, syncdb before migrating, then create the cache
+        for db_alias in sorted(DBS.keys()):
+            sh("./manage.py lms --settings acceptance migrate --traceback --noinput --database {}".format(db_alias))
+            sh("./manage.py cms --settings acceptance migrate --traceback --noinput --database {}".format(db_alias))
+
+        # Create the cache if it doesn't already exist
+        for db_alias in DBS.keys():
+            sh("cp {db} {db_cache}".format(db_cache=DB_CACHES[db_alias], db=DBS[db_alias]))
 
 
 class AcceptanceTest(TestSuite):
@@ -67,14 +123,6 @@ class AcceptanceTestSuite(TestSuite):
     def __init__(self, *args, **kwargs):
         super(AcceptanceTestSuite, self).__init__(*args, **kwargs)
         self.root = 'acceptance'
-        self.dbs = {
-            'default': Env.REPO_ROOT / 'test_root/db/test_edx.db',
-            'student_module_history': Env.REPO_ROOT / 'test_root/db/test_student_module_history.db'
-        }
-        self.db_caches = {
-            'default': Env.REPO_ROOT / 'common/test/db_cache/lettuce.db',
-            'student_module_history': Env.REPO_ROOT / 'common/test/db_cache/lettuce_student_module_history.db'
-        }
         self.fasttest = kwargs.get('fasttest', False)
 
         if kwargs.get('system'):
@@ -102,46 +150,4 @@ class AcceptanceTestSuite(TestSuite):
             test_utils.clean_test_files()
 
         if not self.fasttest:
-            self._setup_acceptance_db()
-
-    def _setup_acceptance_db(self):
-        """
-        TODO: Improve the following
-
-        Since the CMS depends on the existence of some database tables
-        that are now in common but used to be in LMS (Role/Permissions for Forums)
-        we need to create/migrate the database tables defined in the LMS.
-        We might be able to address this by moving out the migrations from
-        lms/django_comment_client, but then we'd have to repair all the existing
-        migrations from the upgrade tables in the DB.
-        But for now for either system (lms or cms), use the lms
-        definitions to sync and migrate.
-        """
-
-        for db in self.dbs.keys():
-            if self.dbs[db].isfile():
-                # Since we are using SQLLite, we can reset the database by deleting it on disk.
-                self.dbs[db].remove()
-
-        if all(self.db_caches[cache].isfile() for cache in self.db_caches.keys()):
-            # To speed up migrations, we check for a cached database file and start from that.
-            # The cached database file should be checked into the repo
-
-            # Copy the cached database to the test root directory
-            for db_alias in self.dbs.keys():
-                sh("cp {db_cache} {db}".format(db_cache=self.db_caches[db_alias], db=self.dbs[db_alias]))
-
-            # Run migrations to update the db, starting from its cached state
-            for db_alias in sorted(self.dbs.keys()):
-                # pylint: disable=line-too-long
-                sh("./manage.py lms --settings acceptance migrate --traceback --noinput --fake-initial --database {}".format(db_alias))
-                sh("./manage.py cms --settings acceptance migrate --traceback --noinput --fake-initial --database {}".format(db_alias))
-        else:
-            # If no cached database exists, syncdb before migrating, then create the cache
-            for db_alias in sorted(self.dbs.keys()):
-                sh("./manage.py lms --settings acceptance migrate --traceback --noinput --database {}".format(db_alias))
-                sh("./manage.py cms --settings acceptance migrate --traceback --noinput --database {}".format(db_alias))
-
-            # Create the cache if it doesn't already exist
-            for db_alias in self.dbs.keys():
-                sh("cp {db} {db_cache}".format(db_cache=self.db_caches[db_alias], db=self.dbs[db_alias]))
+            setup_acceptance_db()
