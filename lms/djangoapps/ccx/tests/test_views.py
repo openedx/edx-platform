@@ -7,6 +7,7 @@ import re
 import pytz
 import ddt
 import urlparse
+from dateutil.tz import tzutc
 from mock import patch, MagicMock
 from nose.plugins.attrib import attr
 
@@ -67,7 +68,7 @@ from lms.djangoapps.ccx.tests.utils import (
 )
 from lms.djangoapps.ccx.utils import (
     ccx_course,
-    is_email
+    is_email,
 )
 from lms.djangoapps.ccx.views import get_date
 
@@ -133,6 +134,16 @@ def setup_students_and_grades(context):
                     )
 
 
+def unhide(unit):
+    """
+    Recursively unhide a unit and all of its children in the CCX
+    schedule.
+    """
+    unit['hidden'] = False
+    for child in unit.get('children', ()):
+        unhide(child)
+
+
 class TestAdminAccessCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
     """
     Tests for Custom Courses views.
@@ -175,6 +186,121 @@ class TestAdminAccessCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
         self.client.login(username=user.username, password="test")
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 403)
+
+
+@attr('shard_1')
+@override_settings(
+    XBLOCK_FIELD_DATA_WRAPPERS=['lms.djangoapps.courseware.field_overrides:OverrideModulestoreFieldData.wrap'],
+    MODULESTORE_FIELD_OVERRIDE_PROVIDERS=['ccx.overrides.CustomCoursesForEdxOverrideProvider'],
+)
+class TestCCXProgressChanges(CcxTestCase, LoginEnrollmentTestCase):
+    """
+    Tests ccx schedule changes in progress page
+    """
+    @classmethod
+    def setUpClass(cls):
+        """
+        Set up tests
+        """
+        super(TestCCXProgressChanges, cls).setUpClass()
+        start = datetime.datetime(2016, 7, 1, 0, 0, tzinfo=tzutc())
+        due = datetime.datetime(2016, 7, 8, 0, 0, tzinfo=tzutc())
+
+        cls.course = course = CourseFactory.create(enable_ccx=True, start=start)
+        chapter = ItemFactory.create(start=start, parent=course, category=u'chapter')
+        sequential = ItemFactory.create(
+            parent=chapter,
+            start=start,
+            due=due,
+            category=u'sequential',
+            metadata={'graded': True, 'format': 'Homework'}
+        )
+        vertical = ItemFactory.create(
+            parent=sequential,
+            start=start,
+            due=due,
+            category=u'vertical',
+            metadata={'graded': True, 'format': 'Homework'}
+        )
+
+        # Trying to wrap the whole thing in a bulk operation fails because it
+        # doesn't find the parents. But we can at least wrap this part...
+        with cls.store.bulk_operations(course.id, emit_signals=False):
+            flatten([ItemFactory.create(
+                parent=vertical,
+                start=start,
+                due=due,
+                category="problem",
+                data=StringResponseXMLFactory().build_xml(answer='foo'),
+                metadata={'rerandomize': 'always'}
+            )] for _ in xrange(2))
+
+    def assert_progress_summary(self, ccx_course_key, due):
+        """
+        assert signal and schedule update.
+        """
+        student = UserFactory.create(is_staff=False, password="test")
+        CourseEnrollment.enroll(student, ccx_course_key)
+        self.assertTrue(
+            CourseEnrollment.objects.filter(course_id=ccx_course_key, user=student).exists()
+        )
+
+        # login as student
+        self.client.login(username=student.username, password="test")
+        progress_page_response = self.client.get(
+            reverse('progress', kwargs={'course_id': ccx_course_key})
+        )
+        grade_summary = progress_page_response.mako_context['courseware_summary']  # pylint: disable=no-member
+        chapter = grade_summary[0]
+        section = chapter['sections'][0]
+        progress_page_due_date = section['due'].strftime("%Y-%m-%d %H:%M")
+        self.assertEqual(progress_page_due_date, due)
+
+    @patch('ccx.views.render_to_response', intercept_renderer)
+    @patch('courseware.views.views.render_to_response', intercept_renderer)
+    @patch.dict('django.conf.settings.FEATURES', {'CUSTOM_COURSES_EDX': True})
+    def test_edit_schedule(self):
+        """
+        Get CCX schedule, modify it, save it.
+        """
+        self.make_coach()
+        ccx = self.make_ccx()
+        ccx_course_key = CCXLocator.from_course_locator(self.course.id, unicode(ccx.id))
+        self.client.login(username=self.coach.username, password="test")
+
+        url = reverse('ccx_coach_dashboard', kwargs={'course_id': ccx_course_key})
+        response = self.client.get(url)
+
+        schedule = json.loads(response.mako_context['schedule'])  # pylint: disable=no-member
+        self.assertEqual(len(schedule), 1)
+
+        unhide(schedule[0])
+
+        # edit schedule
+        date = datetime.datetime.now() - datetime.timedelta(days=5)
+        start = date.strftime("%Y-%m-%d %H:%M")
+        due = (date + datetime.timedelta(days=3)).strftime("%Y-%m-%d %H:%M")
+
+        schedule[0]['start'] = start
+        schedule[0]['children'][0]['start'] = start
+        schedule[0]['children'][0]['due'] = due
+        schedule[0]['children'][0]['children'][0]['start'] = start
+        schedule[0]['children'][0]['children'][0]['due'] = due
+
+        url = reverse('save_ccx', kwargs={'course_id': ccx_course_key})
+        response = self.client.post(url, json.dumps(schedule), content_type='application/json')
+
+        self.assertEqual(response.status_code, 200)
+
+        schedule = json.loads(response.content)['schedule']
+        self.assertEqual(schedule[0]['hidden'], False)
+        self.assertEqual(schedule[0]['start'], start)
+        self.assertEqual(schedule[0]['children'][0]['start'], start)
+        self.assertEqual(schedule[0]['children'][0]['due'], due)
+        self.assertEqual(schedule[0]['children'][0]['children'][0]['due'], due)
+        self.assertEqual(schedule[0]['children'][0]['children'][0]['start'], start)
+
+        self.assert_progress_summary(ccx_course_key, due)
 
 
 @attr('shard_1')
@@ -383,15 +509,6 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
         url = reverse(
             'save_ccx',
             kwargs={'course_id': CCXLocator.from_course_locator(self.course.id, ccx.id)})
-
-        def unhide(unit):
-            """
-            Recursively unhide a unit and all of its children in the CCX
-            schedule.
-            """
-            unit['hidden'] = False
-            for child in unit.get('children', ()):
-                unhide(child)
 
         unhide(schedule[0])
         schedule[0]['start'] = u'2014-11-20 00:00'
@@ -1017,11 +1134,18 @@ class TestCCXGrades(FieldOverrideTestMixin, SharedModuleStoreTestCase, LoginEnro
 
         # create a ccx locator and retrieve the course structure using that key
         # which emulates how a student would get access.
-        self.ccx_key = CCXLocator.from_course_locator(self._course.id, ccx.id)
+        self.ccx_key = CCXLocator.from_course_locator(self._course.id, unicode(ccx.id))
         self.course = get_course_by_id(self.ccx_key, depth=None)
         setup_students_and_grades(self)
         self.client.login(username=coach.username, password="test")
         self.addCleanup(RequestCache.clear_request_cache)
+        from xmodule.modulestore.django import SignalHandler
+
+        # using CCX object as sender here.
+        SignalHandler.course_published.send(
+            sender=ccx,
+            course_key=self.ccx_key
+        )
 
     @patch('ccx.views.render_to_response', intercept_renderer)
     @patch('instructor.views.gradebook_api.MAX_STUDENTS_PER_PAGE_GRADE_BOOK', 1)

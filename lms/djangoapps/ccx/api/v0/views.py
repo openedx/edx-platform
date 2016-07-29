@@ -17,6 +17,7 @@ from rest_framework_oauth.authentication import OAuth2Authentication
 
 from ccx_keys.locator import CCXLocator
 from courseware import courses
+from xmodule.modulestore.django import SignalHandler
 from edx_rest_framework_extensions.authentication import JwtAuthentication
 from instructor.enrollment import (
     enroll_email,
@@ -491,7 +492,7 @@ class CCXListView(GenericAPIView):
             make_user_coach(coach, master_course_key)
 
             # pull the ccx course key
-            ccx_course_key = CCXLocator.from_course_locator(master_course_object.id, ccx_course_object.id)
+            ccx_course_key = CCXLocator.from_course_locator(master_course_object.id, unicode(ccx_course_object.id))
             # enroll the coach in the newly created ccx
             email_params = get_email_params(
                 master_course_object,
@@ -517,6 +518,14 @@ class CCXListView(GenericAPIView):
             )
 
         serializer = self.get_serializer(ccx_course_object)
+
+        # using CCX object as sender here.
+        responses = SignalHandler.course_published.send(
+            sender=ccx_course_object,
+            course_key=ccx_course_key
+        )
+        for rec, response in responses:
+            log.info('Signal fired when course is published. Receiver: %s. Response: %s', rec, response)
         return Response(
             status=status.HTTP_201_CREATED,
             data=serializer.data
@@ -759,6 +768,14 @@ class CCXDetailView(GenericAPIView):
                 )
                 # enroll the coach to the newly created ccx
                 assign_coach_role_to_ccx(ccx_course_key, coach, master_course_object.id)
+
+        # using CCX object as sender here.
+        responses = SignalHandler.course_published.send(
+            sender=ccx_course_object,
+            course_key=ccx_course_key
+        )
+        for rec, response in responses:
+            log.info('Signal fired when course is published. Receiver: %s. Response: %s', rec, response)
 
         return Response(
             status=status.HTTP_204_NO_CONTENT,
