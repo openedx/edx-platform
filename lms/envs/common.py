@@ -60,6 +60,7 @@ DISCUSSION_SETTINGS = {
     'MAX_COMMENT_DEPTH': 2,
 }
 
+LMS_ROOT_URL = "http://localhost:8000"
 
 # Features
 FEATURES = {
