@@ -53,6 +53,8 @@ var edx = edx || {};
             if (providerId) {
                 this.getProviderData(providerId).then(this.renderProvider, this.renderError)
             }
+
+            receiptCallback();
         },
         renderCourseNamePlaceholder: function (courseId) {
             // Display the course Id or name (if available) in the placeholder
@@ -345,4 +347,8 @@ function completeOrder(event) {     // jshint ignore:line
     edx.commerce.credit.createCreditRequest(providerId, courseKey, username).fail(function () {
         $errorContainer.removeClass("hidden");
     });
+}
+
+function receiptCallback(){
+    //Not Implemented in edx-platform. White label sites can provide an implementation for this function.
 }
