@@ -1,0 +1,172 @@
+$component-border-radius:                   3px !default;
+
+// #SPACING
+// ----------------------------
+// spacing - baseline
+$baseline:                  20px !default;
+
+// vertical spacing
+$baseline-vertical:         ($baseline*2) !default;
+
+$spacing-vertical:          (
+    base:                   $baseline-vertical,
+    mid-small:              ($baseline-vertical*0.75),
+    small:                  ($baseline-vertical/2),
+    x-small:                ($baseline-vertical/4),
+    xx-small:               ($baseline-vertical/8),
+    xxx-small:              ($baseline-vertical/10),
+    mid-large:              ($baseline-vertical*1.5),
+    large:                  ($baseline-vertical*2),
+    x-large:                ($baseline-vertical*4)
+);
+
+// horizontal spacing
+$baseline-horizontal:       $baseline !default;
+
+$spacing-horizontal:        (
+    base:                   $baseline-horizontal,
+    mid-small:              ($baseline-horizontal*0.75),
+    small:                  ($baseline-horizontal/2),
+    x-small:                ($baseline-horizontal/4),
+    xx-small:               ($baseline-horizontal/8),
+    mid-large:              ($baseline-horizontal*1.5),
+    large:                  ($baseline-horizontal*2),
+    x-large:                ($baseline-horizontal*4)
+);
+
+// get vertical spacings from defined map values
+@function spacing-vertical($key) {
+  @if map-has-key($spacing-vertical, $key) {
+    @return rem(map-get($spacing-vertical, $key));
+  }
+
+  @warn "Unknown `#{$key}` in $spacing-vertical.";
+  @return null;
+}
+
+// get horizontal spacings from defined map values
+@function spacing-horizontal($key) {
+  @if map-has-key($spacing-horizontal, $key) {
+    @return rem(map-get($spacing-horizontal, $key));
+  }
+
+  @warn "Unknown `#{$key}` in $spacing-horizontal.";
+  @return null;
+}
+
+// typography: weights
+$font-weights: (
+    normal:         400,
+    light:          300,
+    x-light:        200,
+    semi-bold:      600,
+    bold:           700
+);
+
+// typography: sizes
+$font-sizes: (
+    xxxx-large:     38,
+    xxx-large:      28,
+    xx-large:       24,
+    x-large:        21,
+    large:          18,
+    base:           16,
+    small:          14,
+    x-small:        12,
+    xx-small:       11,
+    xxx-small:      10,
+);
+
+// get font sizes from defined map values
+@function font-size($key) {
+  @if map-has-key($font-sizes, $key) {
+    @return rem(map-get($font-sizes, $key));
+  }
+
+  @warn "Unknown `#{$key}` in $font-sizes.";
+  @return null;
+}
+
+// get font weight from defined map values
+@function font-weight($key) {
+  @if map-has-key($font-weights, $key) {
+    @return map-get($font-weights, $key);
+  }
+
+  @warn "Unknown `#{$key}` in $font-weights.";
+  @return null;
+}
+
+
+
+// visual disabled
+%state-disabled {
+    pointer-events: none;
+    outline: none;
+    cursor: not-allowed;
+}
+
+// BUTTONS
+
+// disabled button
+$btn-disabled-border-color:                 #d2d0d0 !default;
+$btn-disabled-color:                        #6b6969 !default;
+
+// base button
+$btn-default-border-color:                transparent !default;
+$btn-default-background:                  transparent !default;
+$btn-default-color:                       #0079BC !default;
+$btn-default-focus-border-color:          #0079BC !default;
+$btn-default-focus-color:                 #0079BC !default;
+$btn-default-active-border-color:         #0079BC !default;
+$btn-default-active-color:                #0079BC !default;
+
+// brand button
+$btn-brand-border-color:                  #0079BC !default;
+$btn-brand-background:                    #0079BC !default;
+$btn-brand-color:                         #fcfcfc !default;
+$btn-brand-focus-color:                   $btn-brand-color !default;
+$btn-brand-focus-border-color:            #0ea6ec !default;
+$btn-brand-focus-background:              #0ea6ec !default;
+$btn-brand-active-border-color:           #0079BC !default;
+$btn-brand-active-background:             #0079BC !default;
+$btn-brand-disabled-background:           #e7e6e6 !default;
+$btn-brand-disabled-color:                #6b6969 !default;
+
+
+// ----------------------------
+// #SETTINGS
+// ----------------------------
+$btn-border-style:                          solid !default;
+$btn-border-size:                           1px !default;
+$btn-shadow:                                3px !default;
+$btn-font-weight:                           font-weight(semi-bold) !default;
+$btn-border-radius:                         $component-border-radius !default;
+
+// sizes
+$btn-large-padding-vertical: spacing-vertical(small);
+$btn-large-padding-horizontal: spacing-horizontal(mid-large);
+
+
+$btn-base-padding-vertical: spacing-vertical(x-small);
+$btn-base-padding-horizontal: spacing-horizontal(base);
+$btn-base-font-size: font-size(base);
+
+$btn-small-padding-vertical: spacing-vertical(x-small);
+$btn-small-padding-horizontal: spacing-horizontal(small);
+
+
+// ----------------------------
+// #SIZES
+// ----------------------------
+// large
+%btn-large {
+  padding: 1.25rem 1.875rem;
+  font-size: 18px;
+}
+
+// small
+%btn-small {
+  padding: 0.625rem 0.625rem;
+  font-size: 14px;
+}
