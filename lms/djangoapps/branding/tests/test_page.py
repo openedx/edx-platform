@@ -118,7 +118,7 @@ class PreRequisiteCourseCatalog(ModuleStoreTestCase, LoginEnrollmentTestCase, Mi
     Test to simulate and verify fix for disappearing courses in
     course catalog when using pre-requisite courses
     """
-    @patch.dict(settings.FEATURES, {'ENABLE_PREREQUISITE_COURSES': True, 'MILESTONES_APP': True})
+    @patch.dict(settings.FEATURES, {'ENABLE_PREREQUISITE_COURSES': True})
     def test_course_with_prereq(self):
         """
         Simulate having a course which has closed enrollments that has

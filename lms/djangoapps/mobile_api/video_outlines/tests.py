@@ -10,7 +10,6 @@ from collections import namedtuple
 import ddt
 from nose.plugins.attrib import attr
 from edxval import api
-from milestones.tests.utils import MilestonesTestCaseMixin
 from xmodule.modulestore.tests.factories import ItemFactory
 from xmodule.video_module import transcripts_utils
 from xmodule.modulestore.django import modulestore

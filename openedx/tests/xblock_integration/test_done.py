@@ -4,14 +4,10 @@ Tests for the DoneXBlock.
 This is nice as a simple example of the edX XBlock test framework.
 '''
 
-from mock import patch
 from openedx.tests.xblock_integration.xblock_testcase import XBlockTestCase
 
 
-# We set MILESTONES_APP to False to avoid XBlock access issues in this test,
-# which is meant to exist independent of our particular LMS instance.
 # pylint: disable=abstract-method
-@patch.dict('django.conf.settings.FEATURES', {'MILESTONES_APP': False})
 class TestDone(XBlockTestCase):
     """
     Simple tests for the completion XBlock. We set up a page with two

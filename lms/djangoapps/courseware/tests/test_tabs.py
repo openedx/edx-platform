@@ -330,14 +330,14 @@ class StaticTabDateTestCaseXML(LoginEnrollmentTestCase, ModuleStoreTestCase):
 
 
 @attr(shard=1)
-@patch.dict('django.conf.settings.FEATURES', {'ENTRANCE_EXAMS': True, 'MILESTONES_APP': True})
+@patch.dict('django.conf.settings.FEATURES', {'ENTRANCE_EXAMS': True})
 class EntranceExamsTabsTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, MilestonesTestCaseMixin):
     """
     Validate tab behavior when dealing with Entrance Exams
     """
     MODULESTORE = TEST_DATA_MIXED_MODULESTORE
 
-    @patch.dict('django.conf.settings.FEATURES', {'ENTRANCE_EXAMS': True, 'MILESTONES_APP': True})
+    @patch.dict('django.conf.settings.FEATURES', {'ENTRANCE_EXAMS': True})
     def setUp(self):
         """
         Test case scaffolding
