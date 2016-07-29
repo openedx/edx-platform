@@ -251,7 +251,9 @@ class LoncapaResponse(object):
           - response_msg: a message displayed at the end of the Response
         """
         # render ourself as a <span> + our content
-        tree = etree.Element('span')
+        tree = etree.Element('section')
+        tree.set('class', 'wrapper-problem-response')
+        tree.set('tabindex', '-1')
 
         # problem author can make this span display:inline
         if self.xml.get('inline', ''):
