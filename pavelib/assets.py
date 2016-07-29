@@ -520,6 +520,7 @@ def compile_sass(options):
         print("\033[91m\nFailed compilations:\n--- " + "\n--- ".join(compilation_results['failure']) + "\n\033[00m")
 
 
+@timed
 def _compile_sass(system, theme, debug, force, timing_info):
     """
     Compile sass files for the given system and theme.
@@ -588,6 +589,7 @@ def _compile_sass(system, theme, debug, force, timing_info):
     return True
 
 
+@timed
 def compile_templated_sass(systems, settings):
     """
     Render Mako templates for Sass files.
@@ -605,6 +607,7 @@ def compile_templated_sass(systems, settings):
         print("\t\tFinished preprocessing {} assets.".format(system))
 
 
+@timed
 def process_npm_assets():
     """
     Process vendor libraries installed via NPM.
@@ -625,6 +628,7 @@ def process_npm_assets():
         ))
 
 
+@timed
 def process_xmodule_assets():
     """
     Process XModule static assets.
@@ -644,7 +648,7 @@ def restart_django_servers():
         "touch", 'lms/urls.py', 'cms/urls.py',
     ))
 
-
+@timed
 def collect_assets(systems, settings):
     """
     Collect static assets, including Django pipeline processing.
@@ -655,7 +659,7 @@ def collect_assets(systems, settings):
         sh(django_cmd(sys, settings, "collectstatic --link --noinput > /dev/null"))
         print("\t\tFinished collecting {} assets.".format(sys))
 
-
+@timed
 def execute_compile_sass(args):
     """
     Construct django management command compile_sass (defined in theming app) and execute it.
