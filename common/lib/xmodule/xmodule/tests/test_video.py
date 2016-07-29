@@ -233,6 +233,17 @@ class TestCreateYoutubeString(VideoDescriptorTestBase):
         expected = "0.75:izygArpw-Qo,1.00:p2Q6BrNhdh8,1.25:1EeWXzPdhSA"
         self.assertEqual(create_youtube_string(self.descriptor), expected)
 
+class TestCreateYouTubeUrl(VideoDescriptorTestBase):
+    """
+    Tests for helper method `create_youtube_url`.
+    """
+    def test_create_youtube_url_unicode(self):
+        """
+        Test that passing unicode to `create_youtube_url` doesn't throw
+        an error.
+        """
+        self.descriptor.create_youtube_url(u"üñîçø∂é")
+
 
 @ddt.ddt
 class VideoDescriptorImportTestCase(unittest.TestCase):
