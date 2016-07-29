@@ -929,7 +929,7 @@ class TestProctoringRendering(SharedModuleStoreTestCase):
             CourseMode.VERIFIED,
             False,
             'error',
-            'There was a problem with your proctoring session',
+            'A technical error has occurred with your proctored exam',
             False
         ),
     )
