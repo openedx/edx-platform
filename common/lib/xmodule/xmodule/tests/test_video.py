@@ -233,6 +233,7 @@ class TestCreateYoutubeString(VideoDescriptorTestBase):
         expected = "0.75:izygArpw-Qo,1.00:p2Q6BrNhdh8,1.25:1EeWXzPdhSA"
         self.assertEqual(create_youtube_string(self.descriptor), expected)
 
+
 class TestCreateYouTubeUrl(VideoDescriptorTestBase):
     """
     Tests for helper method `create_youtube_url`.
