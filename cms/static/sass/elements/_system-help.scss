@@ -280,7 +280,7 @@
     .nav-item {
       @extend %wipe-last-child;
       margin-bottom: ($baseline/4);
-      border-bottom: 1px dotted $gray-l4;
+      border-bottom: 1px dotted $gray-l5;
       padding-bottom: ($baseline/4);
     }
   }
