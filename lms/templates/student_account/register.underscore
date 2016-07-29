@@ -58,7 +58,15 @@
 
     <%= context.fields %>
 
-    <%= context.registrationFooter %>
+    <% if (context.isNonMicrositeTheme) { %>
+        <p class="instructions"><%- _.sprintf( gettext('%(university_name)s pursues the science of learning. Online learners are important participants in that pursuit. The information we gather from your engagement with our instructional offerings makes it possible for faculty, researchers, designers and engineers to continuously improve their work and, in that process, build learning science.'), {university_name:"Stanford University"} ) %></p>
+
+        <p class="instructions"><%= _.sprintf( gettext("By registering as an online learner, you are also participating in research intended to enhance Stanford's instructional offerings as well as the quality of learning and related sciences worldwide. In the interest of research, you may be exposed to some variations in the course materials. Stanford does not use learner data for any purpose beyond the University's stated missions of education and research. For purposes of research, we may share information we collect from online learning activities, including %(link_start)sPersonally Identifiable Information%(link_end)s, with researchers beyond Stanford. However, your Personally Identifiable Information will only be shared as permitted by applicable law, will be limited to what is necessary to perform the research, and will be subject to an agreement to protect the data. We may also share with the public or third parties aggregated information that does not personally identify you. Similarly, any research findings will be reported at the aggregate level and will not expose your personal identity."), {link_start:'<a href="/tos#pii"><strong>', link_end:'</strong></a>'} ) %>
+        </p>
+
+        <p class="instructions"><%= _.sprintf( gettext("Please read our %(link_start)sPrivacy Policy%(link_end)s for more information regarding the processing, transmission and use of data collected through the Stanford Online website and Stanford's Lagunita platform."), {link_start:'<a href="/tos#privacy"><strong>', link_end:'</strong></a>'} ) %>
+        </p>
+    <% } %>
 
     <button type="submit" class="action action-primary action-update js-register register-button"><%- gettext("Create your account") %></button>
     <p class="note">* <%- gettext("Required field") %></p>

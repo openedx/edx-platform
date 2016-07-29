@@ -2423,19 +2423,19 @@ msgstr "إظهار %(first_index)s-%(last_index)s من أصل %(num_items)s."
 
 #: common/static/common/js/utils/edx.utils.validate.js
 msgid "The email address you've provided isn't formatted correctly."
-msgstr ""
+msgstr "صيغة عنوان البريد الإلكتروني الذي ذكرته غير صحيحة"
 
 #: common/static/common/js/utils/edx.utils.validate.js
 msgid "%(field)s must have at least %(count)d characters."
-msgstr ""
+msgstr "يجب أن تحوي الحقول %(field)s على %(count)d حرفًا على الأقل"
 
 #: common/static/common/js/utils/edx.utils.validate.js
 msgid "%(field)s can only contain up to %(count)d characters."
-msgstr ""
+msgstr "يجب ألا يتجاوز عدد أحرف الحقول %(field)s الـ %(count)d حرفًا."
 
 #: common/static/common/js/utils/edx.utils.validate.js
 msgid "Please enter your %(field)s."
-msgstr ""
+msgstr "يُرجى إدخال بيانات %(field)s."
 
 #: common/static/js/capa/drag_and_drop/base_image.js
 msgid "Drop target image"
@@ -7862,7 +7862,7 @@ msgstr "الصفحة الرئيسية للمناقشة:"
 #: common/static/common/templates/discussion/discussion-home.underscore
 #, python-format
 msgid "How to use %(platform_name)s discussions"
-msgstr ""
+msgstr "كيفية استخدام نقاشات %(platform_name)s"
 
 #: common/static/common/templates/discussion/discussion-home.underscore
 msgid "Find discussions"
@@ -7886,7 +7886,7 @@ msgstr "شارك في المنشورات"
 
 #: common/static/common/templates/discussion/discussion-home.underscore
 msgid "Upvote posts and good responses"
-msgstr ""
+msgstr "صوِّت لتحسين تقييم المنشورات والردود الجيّدة"
 
 #: common/static/common/templates/discussion/discussion-home.underscore
 msgid "Report Forum Misuse"
@@ -8140,12 +8140,12 @@ msgstr "مصادقة عليها %(time_ago)s"
 #, python-format
 msgid "Show Comment (%(num_comments)s)"
 msgid_plural "Show Comments (%(num_comments)s)"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
-msgstr[4] ""
-msgstr[5] ""
+msgstr[0] "إظهار التعليق (%(num_comments)s)"
+msgstr[1] "إظهار التعليق (%(num_comments)s)"
+msgstr[2] "إظهار التعليقات (%(num_comments)s)"
+msgstr[3] "إظهار التعليقات (%(num_comments)s)"
+msgstr[4] "إظهار التعليقات (%(num_comments)s)"
+msgstr[5] "إظهار التعليقات (%(num_comments)s)"
 
 #: common/static/common/templates/discussion/thread-response.underscore
 msgid "fmts"

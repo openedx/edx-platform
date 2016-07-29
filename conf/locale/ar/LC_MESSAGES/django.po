@@ -511,6 +511,8 @@ msgid ""
 "Usernames must contain only letters, numbers, underscores (_), and hyphens "
 "(-)."
 msgstr ""
+"يجب أن تحوي أسماء المستخدمين على حروف وأرقام وحرف الخط السفلي(_) "
+"والشرطة(-)فقط"
 
 #: common/djangoapps/student/forms.py
 #, python-format
@@ -593,7 +595,7 @@ msgstr "أنثى"
 #. Translators: 'Other' refers to the student's gender
 #: common/djangoapps/student/models.py
 msgid "Other/Prefer Not to Say"
-msgstr ""
+msgstr "أخرى/ أفضّل عدم الإفصاح"
 
 #: common/djangoapps/student/models.py
 msgid "Doctorate"
@@ -626,12 +628,12 @@ msgstr "المدرسة الابتدائية"
 #. Translators: 'None' refers to the student's level of education
 #: common/djangoapps/student/models.py
 msgid "No Formal Education"
-msgstr ""
+msgstr "لا تعليم رسمي"
 
 #. Translators: 'Other' refers to the student's level of education
 #: common/djangoapps/student/models.py
 msgid "Other Education"
-msgstr ""
+msgstr "تعليم آخر"
 
 #: common/djangoapps/student/models.py
 msgid "{platform_name} Honor Code Certificate for {course_name}"
@@ -12692,7 +12694,7 @@ msgstr ""
 
 #: lms/templates/courseware/course_about.html
 msgid "You are enrolled in this course"
-msgstr ""
+msgstr "أنت مسجّل في هذا المساق"
 
 #: lms/templates/courseware/course_about.html
 msgid "View Courseware"
@@ -12720,7 +12722,7 @@ msgstr ""
 
 #: lms/templates/courseware/course_about.html
 msgid "Enroll in {course_name}"
-msgstr ""
+msgstr "التسجيل في {course_name}"
 
 #: lms/templates/courseware/course_about.html
 msgid "View About Page in studio"
@@ -13593,6 +13595,8 @@ msgstr "لن يعاد لك المبلغ الذي دفعته."
 msgid ""
 "Are you sure you want to unenroll from %(course_name)s (%(course_number)s)?"
 msgstr ""
+"هل أنت متأكّد من رغبتك في إلغاء تسجيلك في المساقات %(course_name)s "
+"(%(course_number)s)؟"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #, python-format
