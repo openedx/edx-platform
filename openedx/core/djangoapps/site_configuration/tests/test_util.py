@@ -26,9 +26,13 @@ def with_site_configuration(domain="test.localhost", configuration=None):
         def _decorated(*args, **kwargs):        # pylint: disable=missing-docstring
             # make a domain name out of directory name
             site, __ = Site.objects.get_or_create(domain=domain, name=domain)
-            site_configuration, __ = SiteConfiguration.objects.get_or_create(
-                site=site, enabled=True, values=configuration,
+            site_configuration, created = SiteConfiguration.objects.get_or_create(
+                site=site,
+                defaults={"enabled": True, "values": configuration},
             )
+            if not created:
+                site_configuration.values = configuration
+                site_configuration.save()
 
             with patch('openedx.core.djangoapps.site_configuration.helpers.get_current_site_configuration',
                        return_value=site_configuration):
@@ -48,9 +52,13 @@ def with_site_configuration_context(domain="test.localhost", configuration=None)
         configuration (dict): configuration to use for the test site.
     """
     site, __ = Site.objects.get_or_create(domain=domain, name=domain)
-    site_configuration, __ = SiteConfiguration.objects.get_or_create(
-        site=site, enabled=True, values=configuration,
+    site_configuration, created = SiteConfiguration.objects.get_or_create(
+        site=site,
+        defaults={"enabled": True, "values": configuration},
     )
+    if not created:
+        site_configuration.values = configuration
+        site_configuration.save()
 
     with patch('openedx.core.djangoapps.site_configuration.helpers.get_current_site_configuration',
                return_value=site_configuration):

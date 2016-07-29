@@ -168,19 +168,21 @@ def has_override_value(name):
 
 def get_value_for_org(org, val_name, default=None):
     """
-    This returns a configuration value for a site configuration which has an org_filter that matches
-    what is passed in.
+    This returns a configuration value for a site configuration or microsite configuration
+    which has an org_filter that matches with the argument.
 
     Args:
-        org (str): Course ord filter, this value will be used to filter out the correct site configuration.
+        org (str): Course org filter, this value will be used to filter out the correct site configuration.
         name (str): Name of the key for which to return configuration value.
-        default: default value tp return if key is not found in the configuration
+        default: default value to return if key is not present in the configuration
 
     Returns:
         Configuration value for the given key.
 
     """
-    if is_site_configuration_enabled():
+    # Here we first look for the asked org inside site configuration, and if org is not present in site configuration
+    # then we go ahead and look it inside microsite configuration.
+    if SiteConfiguration.has_org(org):
         return SiteConfiguration.get_value_for_org(org, val_name, default)
     else:
         return microsite.get_value_for_org(org, val_name, default)
@@ -188,16 +190,16 @@ def get_value_for_org(org, val_name, default=None):
 
 def get_all_orgs():
     """
-        This returns all of the orgs that are considered in site configurations, This can be used,
-        for example, to do filtering.
+    This returns all of the orgs that are considered in site configurations or microsite configuration,
+    This can be used, for example, to do filtering.
 
-        Returns:
-            Configuration value for the given key.
+    Returns:
+        A list of all organizations present in either microsite configuration or site configuration.
     """
-    if is_site_configuration_enabled():
-        return SiteConfiguration.get_all_orgs()
-    else:
-        return microsite.get_all_orgs()
+    site_configuration_orgs = SiteConfiguration.get_all_orgs()
+    microsite_orgs = microsite.get_all_orgs()
+
+    return site_configuration_orgs.union(microsite_orgs)
 
 
 def page_title_breadcrumbs(*crumbs, **kwargs):

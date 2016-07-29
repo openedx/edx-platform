@@ -148,11 +148,42 @@ class TestHelpers(TestCase):
                 "default for non existent"
             )
 
+    def test_get_value_for_org_2(self):
+        """
+        Test that get_value_for_org returns correct value for any given key.
+        """
+        test_org = test_config['course_org_filter']
+        with with_site_configuration_context(configuration=test_config):
+
+            # Make sure if ORG is not present in site configuration then microsite configuration is used instead
+            self.assertEqual(
+                configuration_helpers.get_value_for_org("TestSiteX", "email_from_address"),
+                "test_site@edx.org"
+            )
+            # Make sure 'default' is returned if org is present but key is not
+            self.assertEqual(
+                configuration_helpers.get_value_for_org(test_org, "email_from_address"),
+                None
+            )
+            # Make sure if ORG is not present in site configuration then microsite configuration is used instead
+            self.assertEqual(
+                configuration_helpers.get_value_for_org("LogistrationX", "email_from_address"),
+                "test_site@edx.org"
+            )
+
+        # This test must come after the above test
+        with with_site_configuration_context(configuration={"course_org_filter": "TestSiteX", "university": "Test"}):
+            # Make sure site configuration gets preference over microsite configuration
+            self.assertEqual(
+                configuration_helpers.get_value_for_org("TestSiteX", "university"),
+                "Test"
+            )
+
     def test_get_all_orgs(self):
         """
-        Test that get_all_orgs returns correct values.
+        Test that get_all_orgs returns organizations defined in both site configuration and microsite configuration.
         """
-        test_orgs = [test_config['course_org_filter']]
+        test_orgs = [test_config['course_org_filter'], "LogistrationX", "TestSiteX"]
         with with_site_configuration_context(configuration=test_config):
             self.assertItemsEqual(
                 list(configuration_helpers.get_all_orgs()),

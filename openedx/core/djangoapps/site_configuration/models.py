@@ -89,14 +89,25 @@ class SiteConfiguration(models.Model):
         for example, to do filtering.
 
         Returns:
-            Configuration value for the given key.
+            A list of all organizations present in site configuration.
         """
         org_filter_set = set()
+
         for configuration in cls.objects.filter(values__contains='course_org_filter', enabled=True).all():
             org_filter = configuration.get_value('course_org_filter', None)
             if org_filter:
                 org_filter_set.add(org_filter)
         return org_filter_set
+
+    @classmethod
+    def has_org(cls, org):
+        """
+        Check if the given organization is present in any of the site configuration.
+
+        Returns:
+            True if given organization is present in site configurations otherwise False.
+        """
+        return org in cls.get_all_orgs()
 
 
 class SiteConfigurationHistory(TimeStampedModel):
