@@ -1717,6 +1717,8 @@ def create_account_with_params(request, params):
             external_auth.views.SHIBBOLETH_DOMAIN_PREFIX
         )
     )
+    if not tos_required:
+        extra_fields.pop('terms_of_service', None)
 
     form = AccountCreationForm(
         data=params,
