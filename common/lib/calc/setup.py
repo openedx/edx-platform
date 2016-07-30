@@ -7,6 +7,6 @@ setup(
     install_requires=[
         "pyparsing==2.0.1",
         "numpy",
-        "scipy"
+        "scipy<0.18"
     ],
 )
