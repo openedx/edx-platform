@@ -1,12 +1,12 @@
 # DON'T JUST ADD NEW DEPENDENCIES!!!
 #
 # If you open a pull request that adds a new dependency, you should notify:
-#   * @mollydb to check licensing
+#   * @nedbat to check licensing
 #   * @edx/devops to check system requirements
 #
 # A correct GitHub reference looks like this:
 #
-#   git+https://github.com/OWNER/REPO-NAME.git@TAG-OR-SHA#egg=KIT-NAME==VERSION
+#   git+https://github.com/OWNER/REPO-NAME.git@TAG-OR-SHA#egg=DIST-NAME==VERSION
 #
 # For example:
 #
@@ -17,7 +17,7 @@
 #   OWNER = edx
 #   REPO-NAME = edx-lint
 #   TAG-OR-SHA = v0.3.2
-#   KIT-NAME = edx_lint
+#   DIST-NAME = edx_lint
 #   VERSION = 0.3.2
 #
 #
@@ -27,10 +27,12 @@
 #
 #   * Don't use -e
 #
-#   * TAG-OR-SHA must be a git tag, or a git SHA.  Don't use branch names here.
+#   * TAG-OR-SHA is the specific commit to install.  It must be a git tag,
+#     or a git SHA.  Don't use branch names here.
 #
-#   * KIT-NAME might be different than REPO-NAME.  KIT-NAME must be the same as
-#     the `name="KIT-NAME"` value in the repo's setup.py.
+#   * DIST-NAME is the distribution name, the same name you'd use in a
+#     "pip install" command.  It might be different than REPO-NAME. It must
+#     be the same as the `name="DIST-NAME"` value in the repo's setup.py.
 #
 #   * VERSION might not be the same as TAG-OR-SHA, but if the tag names the
 #     version, please make it match the VERSION, but with a "v" prefix.
