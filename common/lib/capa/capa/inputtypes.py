@@ -1614,7 +1614,7 @@ class AnnotationInput(InputTypeBase):
 
 @registry.register
 class ChoiceTextGroup(InputTypeBase):
-    """
+    r"""
     Groups of radiobutton/checkboxes with text inputs.
 
     Examples:

@@ -100,7 +100,7 @@ class StudentAccountUpdateTest(CacheIsolationTestCase, UrlResetMixin):
 
         # Retrieve the activation link from the email body
         email_body = mail.outbox[0].body
-        result = re.search('(?P<url>https?://[^\s]+)', email_body)
+        result = re.search(r'(?P<url>https?://[^\s]+)', email_body)
         self.assertIsNot(result, None)
         activation_link = result.group('url')
 
