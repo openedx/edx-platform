@@ -634,7 +634,7 @@ class ViewsTestCase(ModuleStoreTestCase, MilestonesTestCaseMixin):
         })
         response = self.client.get(url)
         # Tests that we do not get an "Invalid x" response when passing correct arguments to view
-        self.assertFalse('Invalid' in response.content)
+        self.assertNotIn('Invalid', response.content)
 
     def test_submission_history_xss(self):
         # log into a staff account
@@ -649,7 +649,7 @@ class ViewsTestCase(ModuleStoreTestCase, MilestonesTestCaseMixin):
             'location': '<script>alert("hello");</script>'
         })
         response = self.client.get(url)
-        self.assertFalse('<script>' in response.content)
+        self.assertNotIn('<script>', response.content)
 
         # try it with a malicious user and a non-existent location
         url = reverse('submission_history', kwargs={
@@ -658,7 +658,7 @@ class ViewsTestCase(ModuleStoreTestCase, MilestonesTestCaseMixin):
             'location': 'dummy'
         })
         response = self.client.get(url)
-        self.assertFalse('<script>' in response.content)
+        self.assertNotIn('<script>', response.content)
 
     def test_submission_history_contents(self):
         # log into a staff account

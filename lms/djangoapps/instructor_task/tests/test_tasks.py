@@ -191,7 +191,7 @@ class TestInstructorTasks(InstructorTaskModuleTestCase):
         output = json.loads(entry.task_output)
         self.assertEquals(output['exception'], 'TestTaskFailure')
         self.assertEquals(output['message'], expected_message[:len(output['message']) - 3] + "...")
-        self.assertTrue('traceback' not in output)
+        self.assertNotIn('traceback', output)
 
     def _test_run_with_short_error_msg(self, task_class):
         """

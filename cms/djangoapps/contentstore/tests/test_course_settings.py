@@ -806,7 +806,7 @@ class CourseMetadataEditingTest(CourseTestCase):
             user=self.user
         )
         self.assertTrue(is_valid)
-        self.assertTrue(len(errors) == 0)
+        self.assertEqual(len(errors), 0)
         self.update_check(test_model)
 
         # Tab gets tested in test_advanced_settings_munge_tabs

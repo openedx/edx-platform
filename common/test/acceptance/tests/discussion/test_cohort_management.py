@@ -248,7 +248,7 @@ class CohortConfigurationTest(EventsTestMixin, UniqueCourseTest, CohortTestMixin
         Create a new cohort and verify the new and existing settings.
         """
         start_time = datetime.now(UTC)
-        self.assertFalse(cohort_name in self.cohort_management_page.get_cohorts())
+        self.assertNotIn(cohort_name, self.cohort_management_page.get_cohorts())
         self.cohort_management_page.add_cohort(cohort_name, assignment_type=assignment_type)
         # After adding the cohort, it should automatically be selected
         EmptyPromise(
@@ -306,7 +306,7 @@ class CohortConfigurationTest(EventsTestMixin, UniqueCourseTest, CohortTestMixin
                 confirmation_messages = self.cohort_management_page.get_cohort_settings_messages()
                 self.assertEqual(["Saved cohort"], confirmation_messages)
                 self.assertEqual(new_cohort_name, self.cohort_management_page.cohort_name_in_header)
-                self.assertTrue(new_cohort_name in self.cohort_management_page.get_cohorts())
+                self.assertIn(new_cohort_name, self.cohort_management_page.get_cohorts())
                 self.assertEqual(1, self.cohort_management_page.get_selected_cohort_count())
                 self.assertEqual(
                     new_assignment_type,

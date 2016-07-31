@@ -544,7 +544,7 @@ class MatlabTest(unittest.TestCase):
         test_capa_system().xqueue['interface'].send_to_queue.assert_called_with(header=ANY, body=ANY)
 
         self.assertTrue(response['success'])
-        self.assertTrue(self.the_input.input_state['queuekey'] is not None)
+        self.assertIsNotNone(self.the_input.input_state['queuekey'])
         self.assertEqual(self.the_input.input_state['queuestate'], 'queued')
 
     def test_plot_data_failure(self):
@@ -572,8 +572,8 @@ class MatlabTest(unittest.TestCase):
         queue_msg = json.dumps({'msg': inner_msg})
 
         the_input.ungraded_response(queue_msg, queuekey)
-        self.assertTrue(input_state['queuekey'] is None)
-        self.assertTrue(input_state['queuestate'] is None)
+        self.assertIsNone(input_state['queuekey'])
+        self.assertIsNone(input_state['queuestate'])
         self.assertEqual(input_state['queue_msg'], inner_msg)
 
     @patch('capa.inputtypes.time.time', return_value=10)

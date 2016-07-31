@@ -181,7 +181,7 @@ class CertificatesBaseTestCase(object):
         with self.assertRaises(Exception) as context:
             CertificateManager.validate(json_data_1)
 
-        self.assertTrue("Unsupported certificate schema version: 100.  Expected version: 1." in context.exception)
+        self.assertIn("Unsupported certificate schema version: 100.  Expected version: 1.", context.exception)
 
         #Test certificate name is missing
         json_data_2 = {
@@ -192,7 +192,7 @@ class CertificatesBaseTestCase(object):
         with self.assertRaises(Exception) as context:
             CertificateManager.validate(json_data_2)
 
-        self.assertTrue('must have name of the certificate' in context.exception)
+        self.assertIn('must have name of the certificate', context.exception)
 
 
 @ddt.ddt

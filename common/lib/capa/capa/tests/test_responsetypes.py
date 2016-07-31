@@ -71,7 +71,7 @@ class ResponseTest(unittest.TestCase):
 
     def assert_answer_format(self, problem):  # pylint: disable=missing-docstring
         answers = problem.get_question_answers()
-        self.assertTrue(answers['1_2_1'] is not None)
+        self.assertIsNotNone(answers['1_2_1'])
 
     def assert_multiple_grade(self, problem, correct_answers, incorrect_answers):  # pylint: disable=missing-docstring
         for input_str in correct_answers:

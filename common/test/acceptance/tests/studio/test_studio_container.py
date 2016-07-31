@@ -898,7 +898,7 @@ class UnitPublishingTest(ContainerBase):
         unit.wait_for_ajax()
         self._verify_publish_title(unit, self.PUBLISHED_LIVE_STATUS)
         self._view_published_version(unit)
-        self.assertTrue(modified_content in self.courseware.xblock_component_html_content(0))
+        self.assertIn(modified_content, self.courseware.xblock_component_html_content(0))
 
     def test_cancel_does_not_create_draft(self):
         """
@@ -1019,8 +1019,8 @@ class UnitPublishingTest(ContainerBase):
         """
         Verifies that last published and last saved messages respectively contain the given strings.
         """
-        self.assertTrue(expected_published_prefix in unit.last_published_text)
-        self.assertTrue(expected_saved_prefix in unit.last_saved_text)
+        self.assertIn(expected_published_prefix, unit.last_published_text)
+        self.assertIn(expected_saved_prefix, unit.last_saved_text)
 
     def _verify_explicit_lock_overrides_implicit_lock_information(self, unit_page):
         """

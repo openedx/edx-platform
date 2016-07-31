@@ -92,8 +92,8 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
                 # Check if list_problem_responses returned expected results:
                 self.assertEqual(len(problem_responses), len(mock_results))
                 for mock_result in mock_results:
-                    self.assertTrue(
-                        {'username': mock_result.student.username, 'state': mock_result.state} in
+                    self.assertIn(
+                        {'username': mock_result.student.username, 'state': mock_result.state},
                         problem_responses
                     )
 

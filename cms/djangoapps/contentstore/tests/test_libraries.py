@@ -489,7 +489,7 @@ class TestLibraryAccess(SignalDisconnectTestMixin, LibraryTestCase):
 
     def _assert_cannot_create_library(self, org="org", library="libfail", expected_code=403):
         """ Ensure the current user is not able to create a library. """
-        self.assertTrue(expected_code >= 300)
+        self.assertGreaterEqual(expected_code, 300)
         response = self.client.ajax_post(
             LIBRARY_REST_URL,
             {'org': org, 'library': library, 'display_name': "Irrelevant"}

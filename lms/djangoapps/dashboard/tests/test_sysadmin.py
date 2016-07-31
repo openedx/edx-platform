@@ -166,7 +166,7 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
         self._mkdir(settings.GIT_REPO_DIR)
 
         def_ms = modulestore()
-        self.assertFalse('xml' == def_ms.get_modulestore_type(None))
+        self.assertNotEqual('xml', def_ms.get_modulestore_type(None))
 
         self._add_edx4edx()
         course = def_ms.get_course(SlashSeparatedCourseKey('MITx', 'edx4edx', 'edx4edx'))

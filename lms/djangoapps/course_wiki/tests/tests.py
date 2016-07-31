@@ -166,4 +166,4 @@ class WikiRedirectTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
         # and end up at the login page
         resp = self.client.get(course_wiki_page, follow=True)
         target_url, __ = resp.redirect_chain[-1]
-        self.assertTrue(reverse('signin_user') in target_url)
+        self.assertIn(reverse('signin_user'), target_url)
