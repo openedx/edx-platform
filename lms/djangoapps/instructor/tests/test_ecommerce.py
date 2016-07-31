@@ -196,8 +196,8 @@ class TestECommerceDashboardViews(SharedModuleStoreTestCase):
 
         data['code'] = 'Vs23Ws4j'
         response = self.client.post(add_coupon_url, data)
-        self.assertTrue("The code ({code}) that you have tried to define is already in use as a registration code"
-                        .format(code=data['code']) in response.content)
+        msg = "The code ({code}) that you have tried to define is already in use as a registration code"
+        self.assertIn(msg.format(code=data['code']), response.content)
 
     def test_delete_coupon(self):
         """
