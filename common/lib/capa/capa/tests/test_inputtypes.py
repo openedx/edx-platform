@@ -358,7 +358,6 @@ class CodeInputTest(unittest.TestCase):
         element = etree.fromstring(xml_str)
 
         escapedict = {'"': '&quot;'}
-        esc = lambda s: saxutils.escape(s, escapedict)
 
         state = {'value': 'print "good evening"',
                  'status': 'incomplete',

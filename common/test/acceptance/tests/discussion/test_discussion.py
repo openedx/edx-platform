@@ -1072,14 +1072,14 @@ class DiscussionUserProfileTest(UniqueCourseTest):
                 self.assertFalse(page.is_next_button_shown())
 
         # click all the way up through each page
-        for i in range(current_page, total_pages):
+        for __ in range(current_page, total_pages):
             _check_page()
             if current_page < total_pages:
                 page.click_on_page(current_page + 1)
                 current_page += 1
 
         # click all the way back down
-        for i in range(current_page, 0, -1):
+        for __ in range(current_page, 0, -1):
             _check_page()
             if current_page > 1:
                 page.click_on_page(current_page - 1)

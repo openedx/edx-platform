@@ -542,8 +542,6 @@ def get_thread_list(
         "sort_order": order_direction,
     }
 
-    text_search_rewrite = None
-
     if view:
         if view in ["unread", "unanswered"]:
             query_params[view] = "true"

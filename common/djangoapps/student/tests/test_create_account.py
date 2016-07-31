@@ -601,7 +601,7 @@ class TestCreateCommentsServiceUser(TransactionTestCase):
     def test_cs_user_not_created(self, register, request):
         "If user account creation fails, we should not create a comments service user"
         try:
-            response = self.client.post(self.url, self.params)
+            self.client.post(self.url, self.params)
         except:
             pass
         with self.assertRaises(User.DoesNotExist):

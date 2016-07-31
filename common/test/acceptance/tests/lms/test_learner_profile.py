@@ -209,7 +209,7 @@ class OwnLearnerProfilePageTest(LearnerProfileTestMixin, WebAppTest):
         When I go to my profile page.
         Then I see that the profile visibility is set to public.
         """
-        username, user_id = self.log_in_as_unique_user()
+        username, __ = self.log_in_as_unique_user()
         profile_page = self.visit_profile_page(username)
         self.verify_profile_page_is_public(profile_page)
 
@@ -277,7 +277,7 @@ class OwnLearnerProfilePageTest(LearnerProfileTestMixin, WebAppTest):
         When I click on Profile link.
         Then I will be navigated to Profile page.
         """
-        username, user_id = self.log_in_as_unique_user()
+        username, __ = self.log_in_as_unique_user()
         dashboard_page = DashboardPage(self.browser)
         dashboard_page.visit()
         dashboard_page.click_username_dropdown()
@@ -362,7 +362,7 @@ class OwnLearnerProfilePageTest(LearnerProfileTestMixin, WebAppTest):
         Then `country` field mode should be `edit`
         And `country` field icon should be visible.
         """
-        username, user_id = self.log_in_as_unique_user()
+        username, __ = self.log_in_as_unique_user()
         profile_page = self.visit_profile_page(username, privacy=self.PRIVACY_PUBLIC)
         self._test_dropdown_field(profile_page, 'country', 'Pakistan', 'Pakistan', 'display')
 
@@ -390,7 +390,7 @@ class OwnLearnerProfilePageTest(LearnerProfileTestMixin, WebAppTest):
         Then `language` field mode should be `edit`
         And `language` field icon should be visible.
         """
-        username, user_id = self.log_in_as_unique_user()
+        username, __ = self.log_in_as_unique_user()
         profile_page = self.visit_profile_page(username, privacy=self.PRIVACY_PUBLIC)
         self._test_dropdown_field(profile_page, 'language_proficiencies', 'Urdu', 'Urdu', 'display')
         self._test_dropdown_field(profile_page, 'language_proficiencies', '', 'Add language', 'placeholder')
@@ -427,7 +427,7 @@ class OwnLearnerProfilePageTest(LearnerProfileTestMixin, WebAppTest):
             "why you're taking courses, or what you hope to learn."
         )
 
-        username, user_id = self.log_in_as_unique_user()
+        username, __ = self.log_in_as_unique_user()
         profile_page = self.visit_profile_page(username, privacy=self.PRIVACY_PUBLIC)
         self._test_textarea_field(profile_page, 'bio', 'ThisIsIt', 'ThisIsIt', 'display')
         self._test_textarea_field(profile_page, 'bio', '', placeholder_value, 'placeholder')
@@ -478,7 +478,7 @@ class OwnLearnerProfilePageTest(LearnerProfileTestMixin, WebAppTest):
         And i cannot upload/remove the image.
         """
         year_of_birth = datetime.now().year - 5
-        username, user_id = self.log_in_as_unique_user()
+        username, __ = self.log_in_as_unique_user()
         profile_page = self.visit_profile_page(username, privacy=self.PRIVACY_PRIVATE)
 
         self.verify_profile_forced_private_message(
@@ -499,7 +499,7 @@ class OwnLearnerProfilePageTest(LearnerProfileTestMixin, WebAppTest):
         Then i can see the upload/remove image text
         And i am able to upload new image
         """
-        username, user_id = self.log_in_as_unique_user()
+        username, __ = self.log_in_as_unique_user()
         profile_page = self.visit_profile_page(username, privacy=self.PRIVACY_PUBLIC)
 
         self.assert_default_image_has_public_access(profile_page)
@@ -664,7 +664,7 @@ class OwnLearnerProfilePageTest(LearnerProfileTestMixin, WebAppTest):
         Then i can see only the upload image text
         And i cannot see the remove image text
         """
-        username, user_id = self.log_in_as_unique_user()
+        username, __ = self.log_in_as_unique_user()
         profile_page = self.visit_profile_page(username, privacy=self.PRIVACY_PUBLIC)
 
         self.assert_default_image_has_public_access(profile_page)

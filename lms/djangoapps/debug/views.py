@@ -27,7 +27,7 @@ def run_python(request):
         g = {}
         try:
             safe_exec(py_code, g)
-        except Exception as e:
+        except Exception:   # pylint: disable=broad-except
             c['results'] = traceback.format_exc()
         else:
             c['results'] = pprint.pformat(g)

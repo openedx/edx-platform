@@ -1479,7 +1479,7 @@ class CapaModuleTest(unittest.TestCase):
             of the form test_func() -> bool
             '''
             success = False
-            for i in range(num_tries):
+            for __ in range(num_tries):
                 if test_func() is True:
                     success = True
                     break

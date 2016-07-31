@@ -108,7 +108,7 @@ class CapaModule(CapaMixin, XModule):
             _, _, traceback_obj = sys.exc_info()  # pylint: disable=redefined-outer-name
             raise ProcessingError(not_found_error_message), None, traceback_obj
 
-        except Exception as err:
+        except Exception:
             log.exception(
                 "Unknown error when dispatching %s to %s for user %s",
                 dispatch,

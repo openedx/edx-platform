@@ -142,7 +142,7 @@ class ApiTest(TestCase):
 
     def create_notes(self, num_notes, create=True):
         notes = []
-        for n in range(num_notes):
+        for __ in range(num_notes):
             note = models.Note(**self.note)
             if create:
                 note.save()
@@ -437,7 +437,7 @@ class NoteTest(TestCase):
             note.clean(json.dumps({
                 'text': 'foo',
                 'quote': 'bar',
-                'ranges': [{} for i in range(10)]  # too many ranges
+                'ranges': [{} for __ in range(10)]  # too many ranges
             }))
 
     def test_as_dict(self):

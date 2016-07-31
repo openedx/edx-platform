@@ -1289,7 +1289,7 @@ class FormulaEquationInput(InputTypeBase):
             # At some point, we might want to mark invalid variables as red
             # or something, and this is where we would need to pass those in.
             result['preview'] = latex_preview(formula)
-        except pyparsing.ParseException as err:
+        except pyparsing.ParseException:
             result['error'] = _("Sorry, couldn't parse formula")
             result['formula'] = formula
         except Exception:

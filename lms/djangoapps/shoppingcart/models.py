@@ -1577,7 +1577,7 @@ class PaidCourseRegistration(OrderItem):
 
         super(PaidCourseRegistration, cls).add_to_order(order, course_id, cost, currency=currency)
 
-        item, created = cls.objects.get_or_create(order=order, user=order.user, course_id=course_id)
+        item, __ = cls.objects.get_or_create(order=order, user=order.user, course_id=course_id)
         item.status = order.status
         item.mode = course_mode.slug
         item.qty = 1

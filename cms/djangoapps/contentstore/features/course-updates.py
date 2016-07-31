@@ -73,7 +73,7 @@ def change_date(_step, new_date):
     world.css_click(button_css)
     date_css = 'input.date'
     date = world.css_find(date_css)
-    for i in range(len(date.value)):
+    for __ in range(len(date.value)):
         date._element.send_keys(Keys.END, Keys.BACK_SPACE)
     date._element.send_keys(new_date)
     save_css = '.save-button'

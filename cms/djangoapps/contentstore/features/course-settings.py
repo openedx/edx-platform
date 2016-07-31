@@ -3,7 +3,7 @@
 
 from lettuce import world, step
 from selenium.webdriver.common.keys import Keys
-from common import type_in_codemirror
+from cms.djangoapps.contentstore.features.common import type_in_codemirror
 from django.conf import settings
 
 from nose.tools import assert_true, assert_false

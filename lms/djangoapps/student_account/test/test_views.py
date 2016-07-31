@@ -193,7 +193,7 @@ class StudentAccountUpdateTest(CacheIsolationTestCase, UrlResetMixin):
         self.client.logout()
 
         # Make many consecutive bad requests in an attempt to trigger the rate limiter
-        for attempt in xrange(self.INVALID_ATTEMPTS):
+        for __ in xrange(self.INVALID_ATTEMPTS):
             self._change_password(email=self.NEW_EMAIL)
 
         response = self._change_password(email=self.NEW_EMAIL)

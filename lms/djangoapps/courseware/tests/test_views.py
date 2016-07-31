@@ -826,7 +826,7 @@ class ViewsTestCase(ModuleStoreTestCase, MilestonesTestCaseMixin):
         response = self._submit_financial_assistance_form(data)
         self.assertEqual(response.status_code, 204)
 
-        __, ___, ticket_subject, ticket_body, tags, additional_info = mock_record_feedback.call_args[0]
+        __, __, ticket_subject, __, tags, additional_info = mock_record_feedback.call_args[0]
         mocked_kwargs = mock_record_feedback.call_args[1]
         group_name = mocked_kwargs['group_name']
         require_update = mocked_kwargs['require_update']
