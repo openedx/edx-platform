@@ -2,7 +2,6 @@
 
 import copy
 import mock
-from mock import patch
 import shutil
 import lxml.html
 from lxml import etree

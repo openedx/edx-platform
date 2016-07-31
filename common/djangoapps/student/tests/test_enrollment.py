@@ -13,7 +13,7 @@ from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from util.testing import UrlResetMixin
 from embargo.test_utils import restrict_course
-from student.tests.factories import UserFactory, CourseModeFactory, CourseEnrollmentFactory
+from student.tests.factories import UserFactory, CourseModeFactory
 from student.models import CourseEnrollment, CourseFullError
 from student.roles import (
     CourseInstructorRole,

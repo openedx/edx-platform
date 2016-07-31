@@ -18,7 +18,6 @@ from freezegun import freeze_time
 from mock import Mock, patch
 from nose.plugins.attrib import attr
 import tempfile
-from openedx.core.djangoapps.course_groups import cohorts
 import unicodecsv
 from django.core.urlresolvers import reverse
 from django.test.utils import override_settings

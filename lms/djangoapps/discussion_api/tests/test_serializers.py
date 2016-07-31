@@ -16,7 +16,6 @@ from discussion_api.tests.utils import (
     CommentsServiceMockMixin,
     make_minimal_cs_thread,
     make_minimal_cs_comment,
-    ProfileImageTestMixin,
 )
 from django_comment_common.models import (
     FORUM_ROLE_ADMINISTRATOR,

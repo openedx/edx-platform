@@ -11,7 +11,6 @@ import io
 import json
 import shutil
 import tempfile
-from urllib import quote
 
 from django.conf import settings
 from django.contrib.auth.models import User

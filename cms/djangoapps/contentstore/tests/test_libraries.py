@@ -14,7 +14,6 @@ from student.roles import (
     CourseInstructorRole, CourseStaffRole, CourseCreatorRole, LibraryUserRole,
     OrgStaffRole, OrgInstructorRole, OrgLibraryUserRole,
 )
-from xblock.reference.user_service import XBlockUser
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase

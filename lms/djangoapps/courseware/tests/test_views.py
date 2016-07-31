@@ -45,7 +45,7 @@ from courseware.testutils import RenderXBlockTestMixin
 from courseware.tests.factories import StudentModuleFactory, GlobalStaffFactory
 from courseware.url_helpers import get_redirect_url
 from courseware.user_state_client import DjangoXBlockUserStateClient
-from courseware.views.index import render_accordion, CoursewareIndex
+from courseware.views.index import render_accordion
 from lms.djangoapps.commerce.utils import EcommerceService  # pylint: disable=import-error
 from milestones.tests.utils import MilestonesTestCaseMixin
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration

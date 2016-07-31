@@ -11,7 +11,6 @@ from django.core.urlresolvers import reverse
 from django.test.client import RequestFactory
 import mock
 from nose.plugins.attrib import attr
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from courseware.courses import (
     get_cms_block_link,

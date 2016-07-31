@@ -6,7 +6,6 @@ from contextlib import contextmanager
 
 from bok_choy.web_app_test import WebAppTest
 from datetime import datetime
-from flaky import flaky
 from nose.plugins.attrib import attr
 
 from common.test.acceptance.pages.common.logout import LogoutPage

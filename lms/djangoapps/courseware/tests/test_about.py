@@ -10,7 +10,6 @@ from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
 from mock import patch
 from nose.plugins.attrib import attr
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from course_modes.models import CourseMode
 from track.tests import EventTrackingTestCase

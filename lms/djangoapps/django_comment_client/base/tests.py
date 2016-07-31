@@ -4,8 +4,6 @@ import logging
 import json
 import ddt
 
-from django.conf import settings
-from django.core.cache import caches
 from django.test.client import RequestFactory
 from django.contrib.auth.models import User
 from django.core.management import call_command

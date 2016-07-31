@@ -16,7 +16,6 @@ from nose.plugins.attrib import attr
 from edxmako.shortcuts import render_to_response
 
 from branding.views import index
-import student.views
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 

@@ -63,7 +63,7 @@ from courseware.courses import (
     UserNotEnrolled
 )
 from courseware.masquerade import setup_masquerade
-from courseware.model_data import FieldDataCache, ScoresClient
+from courseware.model_data import FieldDataCache
 from courseware.models import StudentModule, BaseStudentModuleHistory
 from courseware.url_helpers import get_redirect_url, get_redirect_url_for_global_staff
 from courseware.user_state_client import DjangoXBlockUserStateClient

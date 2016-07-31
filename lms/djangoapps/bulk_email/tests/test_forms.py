@@ -2,7 +2,7 @@
 """
 Unit tests for bulk-email-related forms.
 """
-from django.conf import settings
+
 from nose.plugins.attrib import attr
 
 from bulk_email.models import CourseEmailTemplate, BulkEmailFlag
@@ -10,8 +10,6 @@ from bulk_email.forms import CourseAuthorizationAdminForm, CourseEmailTemplateFo
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore import ModuleStoreEnum
 
 
 @attr('shard_1')

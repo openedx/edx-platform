@@ -13,7 +13,6 @@ from django.http import Http404
 from django.conf import settings
 
 from edxmako.shortcuts import render_to_string
-from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from static_replace import replace_static_urls

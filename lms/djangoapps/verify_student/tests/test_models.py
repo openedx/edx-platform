@@ -6,7 +6,6 @@ import boto
 import ddt
 from django.conf import settings
 from django.db import IntegrityError
-from django.test import TestCase
 from freezegun import freeze_time
 import mock
 from mock import patch

@@ -9,7 +9,6 @@ from nose.plugins.attrib import attr
 from django.core import mail
 from django.core.management import call_command
 from django.core.urlresolvers import reverse
-from django.conf import settings
 
 from student.tests.factories import UserFactory, AdminFactory, CourseEnrollmentFactory
 from student.models import CourseEnrollment

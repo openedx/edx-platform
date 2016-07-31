@@ -3,7 +3,6 @@ Unit tests for bulk-email-related models.
 """
 from django.test import TestCase
 from django.core.management import call_command
-from django.conf import settings
 
 from student.tests.factories import UserFactory
 

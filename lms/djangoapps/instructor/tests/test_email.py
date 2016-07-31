@@ -4,7 +4,7 @@ Additionally tests that bulk email is always disabled for
 non-Mongo backed courses, regardless of email feature flag, and
 that the view is conditionally available when Course Auth is turned on.
 """
-from django.conf import settings
+
 from django.core.urlresolvers import reverse
 from nose.plugins.attrib import attr
 from opaque_keys.edx.locations import SlashSeparatedCourseKey

@@ -1,13 +1,7 @@
-from django.conf import settings
-from django.core.urlresolvers import clear_url_caches, resolve
-
 from django.test import TestCase
 from django.test.utils import override_settings
 
-from mock import patch
 from nose.plugins.attrib import attr
-
-import sys
 
 from util.testing import UrlResetMixin
 
