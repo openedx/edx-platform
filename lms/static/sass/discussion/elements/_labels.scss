@@ -2,28 +2,44 @@
 // ====================
 
 body.discussion, .discussion-module {
-  .post-label-pinned {
-    @include forum-post-label($forum-color-pinned);
-  }
+  .post-label {
+    @include margin($baseline/4, $baseline/2, 0, 0);
+    @extend %t-weight4;
+    font-size: $forum-small-font-size;
+    display: inline;
+    white-space: nowrap;
 
-  .post-label-following {
-    @include forum-post-label($forum-color-following);
-  }
+    .icon {
+      @include margin-right($baseline/5);
+    }
 
-  .post-label-reported {
-    @include forum-post-label($forum-color-reported);
-  }
+    &.is-hidden {
+      display: none;
+    }
 
-  .post-label-closed {
-    @include forum-post-label($forum-color-closed);
-  }
+    &.post-label-pinned {
+      color: $forum-color-pinned;
+    }
 
-  .post-label-by-staff {
-    @include forum-post-label($forum-color-staff);
-  }
+    &.post-label-following {
+      color: $forum-color-following;
+    }
 
-  .post-label-by-community-ta {
-    @include forum-post-label($forum-color-community-ta);
+    &.post-label-reported {
+      color: $forum-color-reported;
+    }
+
+    &.post-label-closed {
+      color: $forum-color-closed;
+    }
+
+    &.post-label-by-staff {
+      color: $forum-color-staff;
+    }
+
+    &.post-label-by-community-ta {
+      color: $forum-color-community-ta;
+    }
   }
 
   .user-label-staff {
@@ -33,5 +49,15 @@ body.discussion, .discussion-module {
   .user-label-community-ta {
     @include forum-user-label($forum-color-community-ta);
   }
+}
 
+// Make post labels tighter when shown inside the left nav
+.forum-nav-thread-link {
+  .forum-nav-thread-labels {
+    .post-label {
+      .icon {
+        @include margin-right(0);
+      }
+    }
+  }
 }

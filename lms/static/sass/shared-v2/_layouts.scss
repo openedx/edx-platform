@@ -49,13 +49,10 @@
                 .form-actions > * {
                     @include margin-left($baseline/2);
                     vertical-align: middle;
-                    min-width: 200px;
                     height: 34px;
                 }
 
                 .form-actions > button {
-                    padding: $baseline/5;
-                    min-width: 200px;
                     height: 34px;
                 }
 

@@ -37,7 +37,9 @@
                     votes: {
                         up_count: '12'
                     },
+                    read: true,
                     comments_count: 3,
+                    unread_comments_count: 2,
                     created_at: '2013-04-03T20:06:39Z'
                 }), DiscussionViewSpecHelper.makeThreadWithProps({
                     id: '4',
@@ -172,7 +174,8 @@
         describe('thread rendering should be correct', function() {
             var checkRender;
             checkRender = function(threads, type, sortOrder) {
-                var discussion, view;
+                var discussion, view,
+                    isOrderedByVotes = type === 'votes';
                 discussion = new Discussion(_.map(threads, function(thread) {
                     return new Thread(thread);
                 }), {
@@ -183,25 +186,30 @@
                 view.render();
                 checkThreadsOrdering(view, sortOrder, type);
                 expect(view.$el.find('.forum-nav-thread-comments-count:visible').length)
-                    .toEqual(type === 'votes' ? 0 : 4);
+                    .toEqual(isOrderedByVotes ? 0 : 4);
+                expect(view.$el.find('.forum-nav-thread-unread-comments-count:visible').length)
+                    .toEqual(isOrderedByVotes ? 0 : 1);
                 expect(view.$el.find('.forum-nav-thread-votes-count:visible').length)
-                    .toEqual(type === 'votes' ? 4 : 0);
-                if (type === 'votes') {
+                    .toEqual(isOrderedByVotes ? 4 : 0);
+                if (isOrderedByVotes) {
                     expect(_.map(view.$el.find('.forum-nav-thread-votes-count'), function(element) {
                         return $(element).text().trim();
                     })).toEqual(['+25 votes', '+20 votes', '+42 votes', '+12 votes']);
+                } else {
+                    expect(view.$el.find('.forum-nav-thread-votes-count:visible').length)
+                        .toEqual(0);
                 }
             };
 
-            it('with sort preference activity', function() {
+            it('with sort preference "activity"', function() {
                 checkRender(this.threads, 'activity', ['Thread1', 'Thread2', 'Thread3', 'Thread4']);
             });
 
-            it('with sort preference votes', function() {
+            it('with sort preference "votes"', function() {
                 checkRender(this.threads, 'votes', ['Thread4', 'Thread1', 'Thread2', 'Thread3']);
             });
 
-            it('with sort preference comments', function() {
+            it('with sort preference "comments"', function() {
                 checkRender(this.threads, 'comments', ['Thread1', 'Thread4', 'Thread3', 'Thread2']);
             });
         });
