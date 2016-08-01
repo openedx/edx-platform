@@ -963,9 +963,9 @@ div.problem .action {
   .problem-action-buttons-wrapper {
     margin-bottom: $baseline / 2;
 
-    @media (min-width: 768px) {
+    @media (min-width: $bp-screen-md) {
       position: absolute;
-      right: $baseline * 1.5;
+      @include right($baseline * 1.5);
       margin-top: -$baseline / 2;
     }
 
@@ -993,11 +993,13 @@ div.problem .action {
     height: ($baseline*2);
     display: inline-block;
     color: $gray-d1;
-    font-size: $small-font-size;
+    font-size: $medium-font-size;
     -webkit-font-smoothing: antialiased;
 
-    @media (min-width: 768px) {
-      font-size: $medium-font-size
+   @media (min-width: $bp-screen-md) and (max-width: $bp-screen-lg) {
+      @include margin-left(0);
+      margin-top: $baseline / 2;
+      display: block;
     }
   }
 }
@@ -1098,6 +1100,46 @@ div.problem {
     border-radius: 3px;
     background: #fffcdd;
     font-size: 0.9em;
+  }
+
+  .notification {
+    margin-top: $baseline / 2;
+    padding: ($baseline * 0.4) ($baseline / 2);
+    min-width: auto;
+    &.success {
+      @include notification-by-type($success-color);
+    }
+    &.error {
+      @include notification-by-type($error-color);
+    }
+    &.info {
+      @include notification-by-type($info-color);
+    }
+    &.warning {
+      @include notification-by-type($warning-color);
+    }
+    .icon {
+      position: relative;
+      @include float(left);
+      top: $baseline / 5;
+    }
+    .notification-message {
+      display: inline-block;
+      width: flex-grid(8,10);
+    }
+    .notification-btn-wrapper {
+      @include float(right);
+    }
+  }
+
+  .notification-btn {
+    @include float(right);
+    padding: ($baseline / 10) ($baseline / 4);
+    display: block;
+    clear: both;
+    &:first-child {
+      margin-bottom: $baseline / 4;
+    }
   }
 
   div.capa_reset {
