@@ -10,10 +10,12 @@ import json
 import logging
 import re
 import time
+from functools import wraps
 from django.conf import settings
-from django.views.decorators.csrf import ensure_csrf_cookie, csrf_exempt
+from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_POST, require_http_methods
 from django.views.decorators.cache import cache_control
+from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ValidationError, PermissionDenied
 from django.core.mail.message import EmailMessage
 from django.core.exceptions import ObjectDoesNotExist
@@ -207,16 +209,17 @@ def require_level(level):
 
 def require_global_staff(func):
     """View decorator that requires that the user have global staff permissions. """
+    @wraps(func)
     def wrapped(request, *args, **kwargs):  # pylint: disable=missing-docstring
         if GlobalStaff().has_user(request.user):
             return func(request, *args, **kwargs)
         else:
             return HttpResponseForbidden(
                 u"Must be {platform_name} staff to perform this action.".format(
-                    platform_name=theming_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME)
+                    platform_name=settings.PLATFORM_NAME
                 )
             )
-    return wrapped
+    return login_required(wrapped)
 
 
 def require_sales_admin(func):
