@@ -1,0 +1,22 @@
+<%page expression_filter="h" args="notification_type, notification_icon, notification_message, hint_notification"/>
+<%!
+from django.utils.translation import ugettext as _
+from openedx.core.djangolib.markup import HTML
+%>
+<%
+    notification_type = "info"
+    notification_icon = "question"
+    notification_message = "Hint (1 of 2): A fruit is the fertilized ovary from a flower. Hint (2 of 2): A fruit contains seeds of the plant."
+    hint_notification = True
+%>
+
+<div class="notification ${notification_type}">
+    <span class="icon fa fa-${notification_icon}" aria-hidden="true"></span>
+    <span class="notification-message">${notification_message}</span>
+    <div class="notification-btn-wrapper">
+        % if hint_notification:
+        <button class="btn btn-default btn-small notification-btn">${_('Next Hint')}</button>
+        % endif
+        <button class="btn btn-default btn-small notification-btn review-btn sr">${_('Review')}</button>
+    </div>
+</div>
