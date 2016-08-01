@@ -70,12 +70,6 @@
 // The following rules would be unnecessary but for broadly scoped rules defined
 // elsewhere in our CSS.
 
-// Override global ul rules
-.forum-nav-thread-list, .forum-nav-thread-labels {
-  margin: 0;
-  padding-left: 0;
-}
-
 li[class*=forum-nav-thread-label-] {
   // Override global span rules
   span {
