@@ -109,7 +109,7 @@
   }
 
   .hd-3 {
-    color: palette(grayscale, x-dark);
+    color: palette(grayscale, dark);
     min-height: ($baseline*3);
     line-height: 1;
   }
@@ -146,7 +146,7 @@
 
   .progress {
     height: 5px;
-    background: palette(grayscale-cool, x-light);
+    background: palette(grayscale, x-back);
 
     .bar {
       @include float(left);

@@ -7,12 +7,12 @@
 // ------------------------------
 
 // certificate characteristics
-$cert-base-color: palette(grayscale-cool, dark);
+$cert-base-color: palette(grayscale, dark);
 $cert-distinguished-color: palette(primary, accent);
 
-$cert-decorative-color: palette(grayscale-cool, light);
-$cert-decorative-color-de-emphasized: palette(grayscale-cool, x-trans);
-$cert-decorative-color-emphasized: palette(grayscale-cool, mid-light);
+$cert-decorative-color: palette(grayscale, back);
+$cert-decorative-color-de-emphasized: transparentize(palette(grayscale, base), 0.75);
+$cert-decorative-color-emphasized: palette(grayscale, accent);
 
 // typography: config
 @include font-face(

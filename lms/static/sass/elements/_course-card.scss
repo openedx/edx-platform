@@ -138,7 +138,7 @@
   
   .upgrade-message,
   .certificate-status {
-    border-top: 1px solid palette(grayscale, x-trans);
+    border-top: 1px solid transparentize(palette(grayscale, base), 0.75);
     padding-top: $baseline;
 
     @include susy-media($bp-screen-md) {

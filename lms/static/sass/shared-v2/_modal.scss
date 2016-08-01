@@ -122,7 +122,7 @@
         }
 
         .modal-form-error {
-            background: palette(error, xx-trans);
+            background: transparentize(palette(error, back), 0.95);
             border: 1px solid palette(error, dark);
             color: palette(error, dark);
             display: none;
@@ -155,7 +155,7 @@
 
             .input-group {
                 @include clearfix();
-                border-bottom: 1px solid palette(grayscale, light);
+                border-bottom: 1px solid palette(grayscale, back);
                 box-shadow: 0 1px 0 0 $white-opacity-60;
                 margin-bottom: ($baseline*1.5);
                 padding-bottom: ($baseline/2);
@@ -186,7 +186,7 @@
             }
 
             textarea {
-                background: palette(grayscale, white-t);
+                background: $white;
                 display: block;
                 height: 45px;
                 margin-bottom: $baseline;
@@ -196,7 +196,7 @@
             input[type="email"],
             input[type="text"],
             input[type="password"] {
-                background: palette(grayscale, white-t);
+                background: $white;
                 display: block;
                 height: 45px;
                 margin-bottom: $baseline;
