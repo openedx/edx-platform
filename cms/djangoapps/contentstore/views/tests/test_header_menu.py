@@ -8,14 +8,13 @@ from django.test.utils import override_settings
 
 from contentstore.tests.utils import CourseTestCase
 from contentstore.utils import reverse_course_url
-from util.testing import UrlResetMixin
 
 FEATURES_WITH_CERTS_ENABLED = settings.FEATURES.copy()
 FEATURES_WITH_CERTS_ENABLED['CERTIFICATES_HTML_VIEW'] = True
 
 
 @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
-class TestHeaderMenu(CourseTestCase, UrlResetMixin):
+class TestHeaderMenu(CourseTestCase):
     """
     Unit tests for the course header menu.
     """
@@ -24,7 +23,6 @@ class TestHeaderMenu(CourseTestCase, UrlResetMixin):
         Set up the for the course header menu tests.
         """
         super(TestHeaderMenu, self).setUp()
-        self.reset_urls()
 
     def test_header_menu_without_web_certs_enabled(self):
         """
