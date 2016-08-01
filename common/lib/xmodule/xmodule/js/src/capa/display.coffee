@@ -28,6 +28,9 @@ class @Problem
     problem_prefix = @element_id.replace(/problem_/,'')
     @inputs = @$("[id^='input_#{problem_prefix}_']")
     @$('div.action button').click @refreshAnswers
+    @questionTitle = @$('.problem-header')
+    @reviewButton = @$('div.action .review-btn')
+    @reviewButton.click @review_question_click
     @checkButton = @$('div.action button.check')
     @checkButtonLabel = @$('div.action button.check span.check-label')
     @checkButtonCheckText = @checkButtonLabel.text()
@@ -48,6 +51,12 @@ class @Problem
       window.globalTooltipManager.openTooltip icon
     @$('.clarification').blur (ev) =>
       window.globalTooltipManager.hide()
+
+    @$('.review-btn').focus (ev) =>
+      $(ev.target).removeClass('sr');
+
+    @$('.review-btn').blur (ev) =>
+      $(ev.target).addClass('sr');
 
     @bindResetCorrectness()
     if @checkButton.length
@@ -216,6 +225,12 @@ class @Problem
         flag = false
     return flag
 
+  # Review button click brings user back to top of problem
+  review_question_click: =>
+    $('html, body').animate({
+      scrollTop: @questionTitle.offset().top
+    }, 500);
+    @questionTitle.focus();
 
   ###
   # 'check_fd' uses FormData to allow file submissions in the 'problem_check' dispatch,

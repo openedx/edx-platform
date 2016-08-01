@@ -85,25 +85,25 @@ Feature: LMS.Answer problems
 
     Scenario: I can answer a problem with multiple attempts correctly and still reset the problem
         Given I am viewing a "multiple choice" problem with "3" attempts
-        Then I should see "You have used 0 of 3 submissions" somewhere in the page
+        Then I should see "You have used 0 of 3 attempts" somewhere in the page
         When I answer a "multiple choice" problem "correctly"
         Then The "Reset" button does appear
 
     Scenario: I can answer a problem with multiple attempts correctly but cannot reset because randomization is off
         Given I am viewing a randomization "never" "multiple choice" problem with "3" attempts with reset
-        Then I should see "You have used 0 of 3 submissions" somewhere in the page
+        Then I should see "You have used 0 of 3 attempts" somewhere in the page
         When I answer a "multiple choice" problem "correctly"
         Then The "Reset" button does not appear
 
     Scenario: I can view how many attempts I have left on a problem
         Given I am viewing a "multiple choice" problem with "3" attempts
-        Then I should see "You have used 0 of 3 submissions" somewhere in the page
+        Then I should see "You have used 0 of 3 attempts" somewhere in the page
         When I answer a "multiple choice" problem "incorrectly"
         And I reset the problem
-        Then I should see "You have used 1 of 3 submissions" somewhere in the page
+        Then I should see "You have used 1 of 3 attempts" somewhere in the page
         When I answer a "multiple choice" problem "incorrectly"
         And I reset the problem
-        Then I should see "You have used 2 of 3 submissions" somewhere in the page
+        Then I should see "You have used 2 of 3 attempts" somewhere in the page
         And The "Submit" button does appear
         When I answer a "multiple choice" problem "correctly"
         Then The "Reset" button does not appear
