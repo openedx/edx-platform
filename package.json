@@ -18,8 +18,8 @@
   },
   "devDependencies": {
     "edx-custom-a11y-rules": "0.1.2",
-    "pa11y": "3.6.0",
-    "pa11y-reporter-1.0-json": "1.0.2",
+    "eslint": "^2.13.1",
+    "eslint-config-edx": "^1.2.0",
     "jasmine-core": "^2.4.1",
     "jasmine-jquery": "^2.1.1",
     "jquery": "^2.1.4",
@@ -31,8 +31,10 @@
     "karma-jasmine": "^0.3.8",
     "karma-jasmine-html-reporter": "^0.2.0",
     "karma-junit-reporter": "^0.4.1",
-    "karma-spec-reporter": "^0.0.20",
     "karma-requirejs": "^0.2.6",
+    "karma-spec-reporter": "^0.0.20",
+    "pa11y": "3.6.0",
+    "pa11y-reporter-1.0-json": "1.0.2",
     "plato": "1.2.2"
   }
 }

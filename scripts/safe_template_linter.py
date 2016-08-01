@@ -543,7 +543,7 @@ class SummaryResults(object):
                     print("{}: {}{} violations".format(rule_id, padding, self.totals_by_rule[rule_id]), file=out)
                 print("", file=out)
 
-            # matches output of jshint for simplicity
+            # matches output of eslint for simplicity
             print("", file=out)
             print("{} violations total".format(self.total_violations), file=out)
 
