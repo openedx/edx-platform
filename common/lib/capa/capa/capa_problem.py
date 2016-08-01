@@ -889,15 +889,25 @@ class LoncapaProblem(object):
                 element_to_be_deleted = responsetype_label_tag
             elif 'label' in inputfields[0].attrib:
                 # Extract label value from label attribute
-                # This is the case when we have a problem with multiple questions having OLX only
+                # This is the case when we have a problem
+                # * with multiple questions without separation
+                # * single question with old XML format only
+
                 label = inputfields[0].attrib['label']
-                # Delete <p> tag containing question text otherwise question will be rendered twice
-                p_tag = response.xpath("preceding-sibling::p[text()='{}']".format(label))
+                # Get first <p> tag before responsetype
+                p_tag = response.xpath('preceding-sibling::p[1]')
+
                 if p_tag:
+                    # It may be possible that label attribute value doesn't match with <p> tag
+                    # This happens when author updated the question <p> tag directly in XML but
+                    # didn't changed the label attribute value. In this case we will consider the
+                    # first <p> tag before responsetype as question.
+                    if label != p_tag[0].text:
+                        label = p_tag[0].text
                     element_to_be_deleted = p_tag[0]
             else:
                 # neither <label> tag nor label attribute is present inside responsetype
-                # existing problem with multi-questions without --- having markdown
+                # This is the case when we have a problem with multi-questions without --- having markdown
                 # find the immediate <label> tag before the responsetype. also delete it avoid rendering twice
                 label_tag = response.xpath("preceding-sibling::label[1]")
                 if label_tag:

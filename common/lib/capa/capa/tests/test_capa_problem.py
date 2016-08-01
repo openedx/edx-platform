@@ -288,3 +288,42 @@ class CAPAProblemTest(unittest.TestCase):
             }
         )
         self.assertEqual(len(problem.tree.xpath('//label')), 0)
+
+    def test_label_attribute_mismatches_question_tag(self):
+        """
+        Verify that question text is extracted correctly when label attribtue value
+        mismatched with question tag value.
+
+        This is the case when author updated the question <p> tag directly in XML but
+        didn't changed the label attribute value. In this case we will consider the
+        first <p> tag before responsetype as question.
+        """
+        question = 'Select the correct synonym of paranoid?'
+        xml = """
+        <problem>
+            <p>Choose wisely.</p>
+            <p>{}</p>
+            <choiceresponse>
+                <checkboxgroup label="Is egg plant a fruit?">
+                    <choice correct="true">over-suspicious</choice>
+                    <choice correct="false">funny</choice>
+                </checkboxgroup>
+            </choiceresponse>
+        </problem>
+        """.format(question)
+        problem = new_loncapa_problem(xml)
+        self.assertEqual(
+            problem.problem_data,
+            {
+                '1_2':
+                {
+                    'description_ids': '',
+                    'label': question,
+                    'descriptions': {}
+                }
+            }
+        )
+        self.assertEqual(
+            len(problem.tree.xpath('//p[text()="{}"]'.format(question))),
+            0
+        )
