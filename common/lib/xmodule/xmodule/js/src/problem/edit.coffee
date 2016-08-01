@@ -538,6 +538,8 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
 
       // split scripts and preformatted sections, and wrap paragraphs
       splits = xml.split(/(\<\/?(?:script|pre|label|description).*?\>)/g);
+
+      // used to check if a text string be wrapped by <p> tag  
       wrappable = true;
 
       for (i = 0; i < splits.length; i += 1) {

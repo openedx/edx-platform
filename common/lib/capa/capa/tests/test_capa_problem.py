@@ -49,8 +49,6 @@ class CAPAProblemTest(unittest.TestCase):
         """
         Verify that label is extracted and <p> tag with question
         text is removed when label attribute is set on inputtype.
-
-        This is the case when we have a OLX only problem with multiple-questions.
         """
         question = "Once we become predictable, we become ______?"
         xml = """
@@ -82,7 +80,8 @@ class CAPAProblemTest(unittest.TestCase):
         tag and label attribute inside responsetype. But we have a label tag
         before the responsetype.
         """
-        question = "People who say they have nothing to ____ almost always do?"
+        question1 = 'People who say they have nothing to ____ almost always do?'
+        question2 = 'Select the correct synonym of paranoid?'
         xml = """
         <problem>
             <p>Be sure to check your spelling.</p>
@@ -90,18 +89,39 @@ class CAPAProblemTest(unittest.TestCase):
             <stringresponse answer="hide" type="ci">
                 <textline size="40"/>
             </stringresponse>
+            <choiceresponse>
+                <label>{}</label>
+                <checkboxgroup>
+                    <choice correct="true">over-suspicious</choice>
+                    <choice correct="false">funny</choice>
+                </checkboxgroup>
+            </choiceresponse>
         </problem>
-        """.format(question)
+        """.format(question1, question2)
         problem = new_loncapa_problem(xml)
         self.assertEqual(
             problem.problem_data,
-            {'1_2': {'description_ids': '', 'label': question, 'descriptions': {}}}
+            {
+                '1_2':
+                {
+                    'description_ids': '',
+                    'label': question1,
+                    'descriptions': {}
+                },
+                '1_3':
+                {
+                    'description_ids': '',
+                    'label': question2,
+                    'descriptions': {}
+                }
+            }
 
         )
-        self.assertEqual(
-            len(problem.tree.xpath('//label[text()="{}"]'.format(question))),
-            0
-        )
+        for question in (question1, question2):
+            self.assertEqual(
+                len(problem.tree.xpath('//label[text()="{}"]'.format(question))),
+                0
+            )
 
     def test_multiple_descriptions(self):
         """
@@ -136,7 +156,7 @@ class CAPAProblemTest(unittest.TestCase):
 
     def test_default_question_text(self):
         """
-        Verify that default question text is shown when we question is missing.
+        Verify that default question text is shown when question is missing.
         """
         xml = """
         <problem>
@@ -218,3 +238,53 @@ class CAPAProblemTest(unittest.TestCase):
                 }
             }
         )
+
+    def test_multiple_questions_problem(self):
+        """
+        For a problem with multiple questions verify that for each question
+        * label is extracted
+        * descriptions info is constructed
+        * <label> tag is removed to avoid duplication
+        """
+        xml = """
+        <problem>
+            <choiceresponse>
+                <label>Select the correct synonym of paranoid?</label>
+                <description>Only the paranoid survive.</description>
+                <checkboxgroup>
+                    <choice correct="true">over-suspicious</choice>
+                    <choice correct="false">funny</choice>
+                </checkboxgroup>
+            </choiceresponse>
+            <multiplechoiceresponse>
+                <p>one more question</p>
+                <label>What Apple device competed with the portable CD player?</label>
+                <description>Device looks like an egg plant.</description>
+                <choicegroup type="MultipleChoice">
+                    <choice correct="false">The iPad</choice>
+                    <choice correct="false">Napster</choice>
+                    <choice correct="true">The iPod</choice>
+                    <choice correct="false">The vegetable peeler</choice>
+                </choicegroup>
+            </multiplechoiceresponse>
+        </problem>
+        """
+        problem = new_loncapa_problem(xml)
+        self.assertEqual(
+            problem.problem_data,
+            {
+                '1_2':
+                {
+                    'description_ids': '1_description_2_1',
+                    'label': 'Select the correct synonym of paranoid?',
+                    'descriptions': {'1_description_2_1': 'Only the paranoid survive.'}
+                },
+                '1_3':
+                {
+                    'description_ids': '1_description_3_1',
+                    'label': 'What Apple device competed with the portable CD player?',
+                    'descriptions': {'1_description_3_1': 'Device looks like an egg plant.'}
+                }
+            }
+        )
+        self.assertEqual(len(problem.tree.xpath('//label')), 0)

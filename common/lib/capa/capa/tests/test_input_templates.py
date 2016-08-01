@@ -49,6 +49,8 @@ class TemplateTestCase(unittest.TestCase):
         with open(self.template_path) as f:
             self.template = MakoTemplate(f.read())
 
+        self.context = {}
+
     def render_to_xml(self, context_dict):
         """
         Render the template using the `context_dict` dict.
@@ -119,6 +121,39 @@ class TemplateTestCase(unittest.TestCase):
         else:
             self.assertIn(text, element_list[0].text)
 
+    def assert_description(self, input_describedby_xpath, label_describedby_xpath=None, descriptions=True):
+        """
+        Verify that descriptions information is correct.
+
+        Arguments:
+            input_describedby_xpath (str): xpath for input element aria-describedby attribute
+            label_describedby_xpath (str): xpath for label aria-describedby attribute
+        """
+        xml = self.render_to_xml(self.context)
+
+        # Verify that each description <p> tag has correct id, text and order
+        if descriptions:
+            descriptions = OrderedDict(
+                (tag.get('id'), tag.text) for tag in xml.xpath('//p[@class="question-description"]')
+            )
+            self.assertEqual(self.DESCRIPTIONS, descriptions)
+
+        # Verify that desired input element aria-describedby attribute has correct description ids
+        input_aria_describedby = xml.xpath(input_describedby_xpath)
+        # TODO! This should be assertEqual but using assertIn because currently aria-describedby
+        #       attribute value also contains answer id. Should be changed once templates are
+        #       updated as per accessibility requirements for individual problems.
+        self.assertIn(
+            self.context['response_data']['description_ids'],
+            input_aria_describedby
+        )
+
+        # Verify that each label aria-describedby attribute has correct description ids
+        if label_describedby_xpath:
+            label_aria_describedbys = xml.xpath(label_describedby_xpath)
+            for aria_describedby in label_aria_describedbys:
+                self.assertEqual(aria_describedby, self.context['response_data']['description_ids'])
+
 
 class ChoiceGroupTemplateTest(TemplateTestCase):
     """
@@ -128,6 +163,7 @@ class ChoiceGroupTemplateTest(TemplateTestCase):
     TEMPLATE_NAME = 'choicegroup.html'
 
     def setUp(self):
+        super(ChoiceGroupTemplateTest, self).setUp()
         choices = [('1', 'choice 1'), ('2', 'choice 2'), ('3', 'choice 3')]
         self.context = {
             'id': '1',
@@ -138,7 +174,6 @@ class ChoiceGroupTemplateTest(TemplateTestCase):
             'value': '3',
             'response_data': self.RESPONSE_DATA
         }
-        super(ChoiceGroupTemplateTest, self).setUp()
 
     def test_problem_marked_correct(self):
         """
@@ -356,23 +391,7 @@ class ChoiceGroupTemplateTest(TemplateTestCase):
         """
         Test that correct description information is set on desired elements.
         """
-        xml = self.render_to_xml(self.context)
-
-        # Verify that each description <p> tag has correct id, text and order
-        descriptions = OrderedDict((tag.get('id'), tag.text) for tag in xml.xpath('//p[@class="question-description"]'))
-        self.assertEqual(self.DESCRIPTIONS, descriptions)
-
-        # Verify that fieldset aria-describedby attribute has correct description ids
-        fieldset_aria_describedby = xml.xpath("string(//fieldset/@aria-describedby)")
-        self.assertEqual(
-            self.context['response_data']['description_ids'],
-            fieldset_aria_describedby
-        )
-
-        # Verify that each label aria-describedby attribute has correct description ids
-        label_aria_describedbys = xml.xpath("//label/@aria-describedby")
-        for aria_describedby in label_aria_describedbys:
-            self.assertEqual(aria_describedby, self.context['response_data']['description_ids'])
+        self.assert_description('string(//fieldset/@aria-describedby)', '//label/@aria-describedby')
 
 
 class TextlineTemplateTest(TemplateTestCase):
@@ -383,6 +402,7 @@ class TextlineTemplateTest(TemplateTestCase):
     TEMPLATE_NAME = 'textline.html'
 
     def setUp(self):
+        super(TextlineTemplateTest, self).setUp()
         self.context = {
             'id': '1',
             'status': Status('correct'),
@@ -391,7 +411,6 @@ class TextlineTemplateTest(TemplateTestCase):
             'trailing_text': None,
             'response_data': self.RESPONSE_DATA
         }
-        super(TextlineTemplateTest, self).setUp()
 
     def test_section_class(self):
         cases = [({}, ' capa_inputtype  textline'),
@@ -507,14 +526,7 @@ class TextlineTemplateTest(TemplateTestCase):
         """
         Test that correct description information is set on desired elements.
         """
-        xml = self.render_to_xml(self.context)
-
-        # Verify that input aria-describedby attribute has correct description ids
-        fieldset_aria_describedby = xml.xpath("string(//input/@aria-describedby)")
-        self.assertIn(
-            self.context['response_data']['description_ids'],
-            fieldset_aria_describedby
-        )
+        self.assert_description('string(//input/@aria-describedby)', descriptions=False)
 
 
 class FormulaEquationInputTemplateTest(TemplateTestCase):
@@ -524,6 +536,7 @@ class FormulaEquationInputTemplateTest(TemplateTestCase):
     TEMPLATE_NAME = 'formulaequationinput.html'
 
     def setUp(self):
+        super(FormulaEquationInputTemplateTest, self).setUp()
         self.context = {
             'id': 2,
             'value': 'PREFILLED_VALUE',
@@ -533,7 +546,6 @@ class FormulaEquationInputTemplateTest(TemplateTestCase):
             'trailing_text': None,
             'response_data': self.RESPONSE_DATA
         }
-        super(FormulaEquationInputTemplateTest, self).setUp()
 
     def test_no_size(self):
         xml = self.render_to_xml(self.context)
@@ -549,14 +561,7 @@ class FormulaEquationInputTemplateTest(TemplateTestCase):
         """
         Test that correct description information is set on desired elements.
         """
-        xml = self.render_to_xml(self.context)
-
-        # Verify that input aria-describedby attribute has correct description ids
-        fieldset_aria_describedby = xml.xpath("string(//input/@aria-describedby)")
-        self.assertIn(
-            self.context['response_data']['description_ids'],
-            fieldset_aria_describedby
-        )
+        self.assert_description('string(//input/@aria-describedby)', descriptions=False)
 
 
 class AnnotationInputTemplateTest(TemplateTestCase):
@@ -567,6 +572,7 @@ class AnnotationInputTemplateTest(TemplateTestCase):
     TEMPLATE_NAME = 'annotationinput.html'
 
     def setUp(self):
+        super(AnnotationInputTemplateTest, self).setUp()
         self.context = {
             'id': 2,
             'value': '<p>Test value</p>',
@@ -584,7 +590,6 @@ class AnnotationInputTemplateTest(TemplateTestCase):
             'msg': '<p>This is a test message</p>',
             'response_data': {'label': 'test', 'description_ids': '', 'descriptions': {}}
         }
-        super(AnnotationInputTemplateTest, self).setUp()
 
     def test_return_to_annotation(self):
         """
@@ -696,8 +701,8 @@ class MathStringTemplateTest(TemplateTestCase):
     TEMPLATE_NAME = 'mathstring.html'
 
     def setUp(self):
-        self.context = {'isinline': False, 'mathstr': '', 'tail': ''}
         super(MathStringTemplateTest, self).setUp()
+        self.context = {'isinline': False, 'mathstr': '', 'tail': ''}
 
     def test_math_string_inline(self):
         self.context['isinline'] = True
@@ -738,6 +743,7 @@ class OptionInputTemplateTest(TemplateTestCase):
     TEMPLATE_NAME = 'optioninput.html'
 
     def setUp(self):
+        super(OptionInputTemplateTest, self).setUp()
         self.context = {
             'id': 2,
             'options': [],
@@ -745,7 +751,6 @@ class OptionInputTemplateTest(TemplateTestCase):
             'value': 0,
             'response_data': self.RESPONSE_DATA
         }
-        super(OptionInputTemplateTest, self).setUp()
 
     def test_select_options(self):
 
@@ -796,14 +801,7 @@ class OptionInputTemplateTest(TemplateTestCase):
         """
         Test that correct description information is set on desired elements.
         """
-        xml = self.render_to_xml(self.context)
-
-        # Verify that select aria-describedby attribute has correct description ids
-        fieldset_aria_describedby = xml.xpath("string(//select/@aria-describedby)")
-        self.assertIn(
-            self.context['response_data']['description_ids'],
-            fieldset_aria_describedby
-        )
+        self.assert_description('string(//select/@aria-describedby)', descriptions=False)
 
 
 class DragAndDropTemplateTest(TemplateTestCase):
@@ -814,12 +812,12 @@ class DragAndDropTemplateTest(TemplateTestCase):
     TEMPLATE_NAME = 'drag_and_drop_input.html'
 
     def setUp(self):
+        super(DragAndDropTemplateTest, self).setUp()
         self.context = {'id': 2,
                         'drag_and_drop_json': '',
                         'value': 0,
                         'status': Status('unsubmitted'),
                         'msg': ''}
-        super(DragAndDropTemplateTest, self).setUp()
 
     def test_status(self):
 
@@ -871,6 +869,7 @@ class ChoiceTextGroupTemplateTest(TemplateTestCase):
                              '1_choiceinput_1_textinput_0': '0'}
 
     def setUp(self):
+        super(ChoiceTextGroupTemplateTest, self).setUp()
         choices = [
             (
                 '1_choiceinput_0bc',
@@ -895,8 +894,6 @@ class ChoiceTextGroupTemplateTest(TemplateTestCase):
             'value': self.VALUE_DICT,
             'response_data': {'label': 'choicetext label', 'description_ids': '', 'descriptions': {}}
         }
-
-        super(ChoiceTextGroupTemplateTest, self).setUp()
 
     def test_grouping_tag(self):
         """

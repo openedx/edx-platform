@@ -882,7 +882,6 @@ class LoncapaProblem(object):
             element_to_be_deleted = None
 
             # Extract label value from <label> tag or label attribute from inside the responsetype
-            # Extract label value from <label> tag
             responsetype_label_tag = response.find('label')
             if responsetype_label_tag is not None:
                 label = responsetype_label_tag.text
