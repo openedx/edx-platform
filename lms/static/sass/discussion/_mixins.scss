@@ -112,32 +112,6 @@
   text-overflow: ellipsis;
 }
 
-@mixin forum-post-label($color) {
-  @extend %t-weight4;
-  font-size: $forum-small-font-size;
-  display: inline;
-  margin-top: ($baseline/4);
-  border: 1px solid;
-  border-radius: $forum-border-radius;
-  padding: 1px 6px;
-  white-space: nowrap;
-
-  border-color: $color;
-  color: $color;
-
-  .icon {
-    @include margin-right($baseline/5);
-  }
-
-  &:last-child {
-    @include margin-right(0);
-  }
-
-  &.is-hidden {
-    display: none;
-  }
-}
-
 @mixin forum-user-label($color) {
   @include margin-left($baseline/4);
   @extend %t-weight5;
