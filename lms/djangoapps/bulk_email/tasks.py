@@ -104,20 +104,18 @@ def _get_course_email_context(course):
     course_id = course.id.to_deprecated_string()
     course_title = course.display_name
     course_end_date = get_default_time_display(course.end)
-    scheme = u'https' if settings.HTTPS == "on" else u'http'
-    base_url = '{}://{}'.format(scheme, settings.SITE_NAME)
     course_url = '{}{}'.format(
-        base_url,
+        settings.LMS_ROOT_URL,
         reverse('course_root', kwargs={'course_id': course_id})
     )
-    image_url = u'{}{}'.format(base_url, course_image_url(course))
+    image_url = u'{}{}'.format(settings.LMS_ROOT_URL, course_image_url(course))
     email_context = {
         'course_title': course_title,
         'course_url': course_url,
         'course_image_url': image_url,
         'course_end_date': course_end_date,
-        'account_settings_url': '{}{}'.format(base_url, reverse('account_settings')),
-        'email_settings_url': '{}{}'.format(base_url, reverse('dashboard')),
+        'account_settings_url': '{}{}'.format(settings.LMS_ROOT_URL, reverse('account_settings')),
+        'email_settings_url': '{}{}'.format(settings.LMS_ROOT_URL, reverse('dashboard')),
         'platform_name': configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),
     }
     return email_context

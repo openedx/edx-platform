@@ -517,7 +517,7 @@ class TestCourseEmailContext(SharedModuleStoreTestCase):
         self.assertEquals(email_context['email_settings_url'], '{}://edx.org/dashboard'.format(scheme))
         self.assertEquals(email_context['account_settings_url'], '{}://edx.org/account/settings'.format(scheme))
 
-    @override_settings(HTTPS="off")
+    @override_settings(LMS_ROOT_URL="http://edx.org")
     def test_insecure_email_context(self):
         """
         This test tests that the bulk email context uses http urls
@@ -525,7 +525,7 @@ class TestCourseEmailContext(SharedModuleStoreTestCase):
         email_context = _get_course_email_context(self.course)
         self.verify_email_context(email_context, 'http')
 
-    @override_settings(HTTPS="on")
+    @override_settings(LMS_ROOT_URL="https://edx.org")
     def test_secure_email_context(self):
         """
         This test tests that the bulk email context uses https urls
