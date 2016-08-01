@@ -15,7 +15,6 @@
 
     .wrapper-post-header {
         padding-bottom: 0;
-        margin-bottom: ($baseline*0.75);
     }
 
     .post-header-content {
@@ -34,7 +33,7 @@
 
 .posted-details {
     @extend %t-copy-sub2;
-    margin-top: ($baseline/5);
+    margin: ($baseline/5) 0;
     color: $gray-d1;
 
     .username {
@@ -178,6 +177,11 @@ body.discussion {
 
 // Layout control for discussion modules that does not apply to the discussion board
 .discussion-module {
+    .discussion {
+        clear: both;
+        padding-top: ($baseline/2);
+    }
+
     .btn-brand {
         @include blue-button;
         display: inline-block;
