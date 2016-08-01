@@ -5,15 +5,15 @@ import os
 import json
 
 from bok_choy.web_app_test import WebAppTest
-from ..helpers import generate_course_key
-from ...pages.common.logout import LogoutPage
-from ...pages.common.utils import click_css
-from ...pages.studio.utils import add_html_component, type_in_codemirror
-from ...pages.studio.auto_auth import AutoAuthPage
-from ...pages.studio.overview import CourseOutlinePage
-from ...pages.studio.container import ContainerPage
-from ...pages.lms.dashboard_search import DashboardSearchPage
-from ...fixtures.course import CourseFixture, XBlockFixtureDesc
+from common.test.acceptance.tests.helpers import generate_course_key
+from common.test.acceptance.pages.common.logout import LogoutPage
+from common.test.acceptance.pages.common.utils import click_css
+from common.test.acceptance.pages.studio.utils import add_html_component, type_in_codemirror
+from common.test.acceptance.pages.studio.auto_auth import AutoAuthPage
+from common.test.acceptance.pages.studio.overview import CourseOutlinePage
+from common.test.acceptance.pages.studio.container import ContainerPage
+from common.test.acceptance.pages.lms.dashboard_search import DashboardSearchPage
+from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
 
 
 class DashboardSearchTest(WebAppTest):

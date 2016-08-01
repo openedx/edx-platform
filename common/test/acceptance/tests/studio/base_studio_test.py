@@ -3,12 +3,12 @@ Base classes used by studio tests.
 """
 from bok_choy.web_app_test import WebAppTest
 from bok_choy.page_object import XSS_INJECTION
-from ...pages.studio.auto_auth import AutoAuthPage
-from ...fixtures.course import CourseFixture
-from ...fixtures.library import LibraryFixture
-from ..helpers import UniqueCourseTest
-from ...pages.studio.overview import CourseOutlinePage
-from ...pages.studio.utils import verify_ordering
+from common.test.acceptance.pages.studio.auto_auth import AutoAuthPage
+from common.test.acceptance.fixtures.course import CourseFixture
+from common.test.acceptance.fixtures.library import LibraryFixture
+from common.test.acceptance.tests.helpers import UniqueCourseTest
+from common.test.acceptance.pages.studio.overview import CourseOutlinePage
+from common.test.acceptance.pages.studio.utils import verify_ordering
 
 
 class StudioCourseTest(UniqueCourseTest):

@@ -4,14 +4,14 @@ End-to-end tests for the gating feature.
 """
 from textwrap import dedent
 
-from ..helpers import UniqueCourseTest
-from ...pages.studio.auto_auth import AutoAuthPage
-from ...pages.studio.overview import CourseOutlinePage
-from ...pages.lms.courseware import CoursewarePage
-from ...pages.lms.problem import ProblemPage
-from ...pages.lms.staff_view import StaffPage
-from ...pages.common.logout import LogoutPage
-from ...fixtures.course import CourseFixture, XBlockFixtureDesc
+from common.test.acceptance.tests.helpers import UniqueCourseTest
+from common.test.acceptance.pages.studio.auto_auth import AutoAuthPage
+from common.test.acceptance.pages.studio.overview import CourseOutlinePage
+from common.test.acceptance.pages.lms.courseware import CoursewarePage
+from common.test.acceptance.pages.lms.problem import ProblemPage
+from common.test.acceptance.pages.lms.staff_view import StaffPage
+from common.test.acceptance.pages.common.logout import LogoutPage
+from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
 
 
 class GatingTest(UniqueCourseTest):

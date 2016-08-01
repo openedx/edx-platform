@@ -6,14 +6,12 @@ from flaky import flaky
 from opaque_keys.edx.locator import LibraryLocator
 from uuid import uuid4
 
-from ...fixtures import PROGRAMS_STUB_URL
-from ...fixtures.config import ConfigModelFixture
-from ...fixtures.programs import ProgramsFixture, ProgramsConfigMixin
-from ...pages.studio.auto_auth import AutoAuthPage
-from ...pages.studio.library import LibraryEditPage
-from ...pages.studio.index import DashboardPage, DashboardPageWithPrograms
-from ...pages.lms.account_settings import AccountSettingsPage
-from ..helpers import (
+from common.test.acceptance.fixtures.programs import ProgramsFixture, ProgramsConfigMixin
+from common.test.acceptance.pages.studio.auto_auth import AutoAuthPage
+from common.test.acceptance.pages.studio.library import LibraryEditPage
+from common.test.acceptance.pages.studio.index import DashboardPage, DashboardPageWithPrograms
+from common.test.acceptance.pages.lms.account_settings import AccountSettingsPage
+from common.test.acceptance.tests.helpers import (
     select_option_by_text,
     get_selected_option_text
 )

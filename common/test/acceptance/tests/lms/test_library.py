@@ -6,15 +6,15 @@ import ddt
 import textwrap
 
 from nose.plugins.attrib import attr
-from ..helpers import UniqueCourseTest, TestWithSearchIndexMixin
-from ...pages.studio.auto_auth import AutoAuthPage
-from ...pages.studio.overview import CourseOutlinePage
-from ...pages.studio.library import StudioLibraryContentEditor, StudioLibraryContainerXBlockWrapper
-from ...pages.lms.courseware import CoursewarePage
-from ...pages.lms.library import LibraryContentXBlockWrapper
-from ...pages.common.logout import LogoutPage
-from ...fixtures.course import CourseFixture, XBlockFixtureDesc
-from ...fixtures.library import LibraryFixture
+from common.test.acceptance.tests.helpers import UniqueCourseTest, TestWithSearchIndexMixin
+from common.test.acceptance.pages.studio.auto_auth import AutoAuthPage
+from common.test.acceptance.pages.studio.overview import CourseOutlinePage
+from common.test.acceptance.pages.studio.library import StudioLibraryContentEditor, StudioLibraryContainerXBlockWrapper
+from common.test.acceptance.pages.lms.courseware import CoursewarePage
+from common.test.acceptance.pages.lms.library import LibraryContentXBlockWrapper
+from common.test.acceptance.pages.common.logout import LogoutPage
+from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
+from common.test.acceptance.fixtures.library import LibraryFixture
 
 SECTION_NAME = 'Test Section'
 SUBSECTION_NAME = 'Test Subsection'

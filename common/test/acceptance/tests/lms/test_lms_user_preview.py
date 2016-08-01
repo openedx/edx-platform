@@ -6,12 +6,12 @@ Tests the "preview" selector in the LMS that allows changing between Staff, Stud
 
 from nose.plugins.attrib import attr
 
-from ..helpers import UniqueCourseTest, create_user_partition_json
-from ...pages.studio.auto_auth import AutoAuthPage
-from ...pages.lms.courseware import CoursewarePage
-from ...pages.lms.instructor_dashboard import InstructorDashboardPage
-from ...pages.lms.staff_view import StaffPage
-from ...fixtures.course import CourseFixture, XBlockFixtureDesc
+from common.test.acceptance.tests.helpers import UniqueCourseTest, create_user_partition_json
+from common.test.acceptance.pages.studio.auto_auth import AutoAuthPage
+from common.test.acceptance.pages.lms.courseware import CoursewarePage
+from common.test.acceptance.pages.lms.instructor_dashboard import InstructorDashboardPage
+from common.test.acceptance.pages.lms.staff_view import StaffPage
+from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
 from bok_choy.promise import EmptyPromise
 from xmodule.partitions.partitions import Group
 from textwrap import dedent

@@ -6,14 +6,14 @@ for displaying containers within units.
 from nose.plugins.attrib import attr
 from unittest import skip
 
-from ...fixtures.course import XBlockFixtureDesc
-from ...pages.studio.component_editor import ComponentEditorView, ComponentVisibilityEditorView
-from ...pages.studio.container import ContainerPage
-from ...pages.studio.html_component_editor import HtmlComponentEditorView
-from ...pages.studio.utils import add_discussion, drag
-from ...pages.lms.courseware import CoursewarePage
-from ...pages.lms.staff_view import StaffPage
-from ...tests.helpers import create_user_partition_json
+from common.test.acceptance.fixtures.course import XBlockFixtureDesc
+from common.test.acceptance.pages.studio.component_editor import ComponentEditorView, ComponentVisibilityEditorView
+from common.test.acceptance.pages.studio.container import ContainerPage
+from common.test.acceptance.pages.studio.html_component_editor import HtmlComponentEditorView
+from common.test.acceptance.pages.studio.utils import add_discussion, drag
+from common.test.acceptance.pages.lms.courseware import CoursewarePage
+from common.test.acceptance.pages.lms.staff_view import StaffPage
+from common.test.acceptance.tests.helpers import create_user_partition_json
 
 import datetime
 from bok_choy.promise import Promise, EmptyPromise

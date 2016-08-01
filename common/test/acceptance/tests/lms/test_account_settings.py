@@ -10,11 +10,11 @@ from bok_choy.page_object import XSS_INJECTION
 from datetime import datetime
 from pytz import timezone, utc
 
-from ...pages.lms.account_settings import AccountSettingsPage
-from ...pages.lms.auto_auth import AutoAuthPage
-from ...pages.lms.dashboard import DashboardPage
+from common.test.acceptance.pages.lms.account_settings import AccountSettingsPage
+from common.test.acceptance.pages.lms.auto_auth import AutoAuthPage
+from common.test.acceptance.pages.lms.dashboard import DashboardPage
 
-from ..helpers import EventsTestMixin
+from common.test.acceptance.tests.helpers import EventsTestMixin
 
 
 class AccountSettingsTestMixin(EventsTestMixin, WebAppTest):
