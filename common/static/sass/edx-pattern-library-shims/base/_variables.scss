@@ -9,6 +9,12 @@ $medium-font-size: 0.9em !default;
 
 $component-border-radius:                   3px !default;
 
+// grid - breakpoints
+$bp-screen-sm:                  480px !default;
+$bp-screen-md:                  768px !default;
+$bp-screen-lg:                  1024px !default;
+$bp-screen-xl:                  1280px !default;
+
 // #SPACING
 // ----------------------------
 // spacing - baseline
@@ -123,6 +129,12 @@ $uxpl-green-base: rgba(0, 129, 0, 1); // wcag2a compliant
 $uxpl-green-hover-active: lighten($uxpl-green-base, 7%); // wcag2a compliant
 
 
+// Alert styles
+$error-color: rgb(203, 7, 18) !default;
+$success-color: rgb(0, 155, 0) !default;
+$warning-color: rgb(255, 192 ,31) !default;
+$info-color: rgb(0, 134, 206) !default;
+
 
 // BUTTONS
 
@@ -186,4 +198,16 @@ $btn-small-padding-horizontal: spacing-horizontal(small);
 %btn-small {
   padding: 0.625rem 0.625rem;
   font-size: 14px;
+}
+
+// ----------------------------
+// Problem Notifications
+// ----------------------------
+
+@mixin notification-by-type($color) {
+  border-top: 3px solid $color;
+  .icon {
+    @include margin-right($baseline / 2);
+    color: $color;
+  }
 }
