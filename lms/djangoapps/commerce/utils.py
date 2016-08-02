@@ -5,7 +5,7 @@ from urlparse import urljoin
 from django.conf import settings
 
 from commerce.models import CommerceConfiguration
-from openedx.core.djangoapps.theming import helpers
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 log = logging.getLogger(__name__)
 
@@ -61,7 +61,10 @@ class EcommerceService(object):
         Example:
             http://localhost:8002/basket/single_item/
         """
-        ecommerce_url_root = helpers.get_value('ECOMMERCE_PUBLIC_URL_ROOT', settings.ECOMMERCE_PUBLIC_URL_ROOT)
+        ecommerce_url_root = configuration_helpers.get_value(
+            'ECOMMERCE_PUBLIC_URL_ROOT',
+            settings.ECOMMERCE_PUBLIC_URL_ROOT,
+        )
         return urljoin(ecommerce_url_root, self.config.single_course_checkout_page)
 
     def checkout_page_url(self, sku):

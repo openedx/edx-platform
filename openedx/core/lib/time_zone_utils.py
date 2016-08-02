@@ -43,12 +43,13 @@ def get_time_zone_offset(time_zone, date_time=None):
     return _format_time_zone_string(time_zone, date_time, '%z')
 
 
-def get_formatted_time_zone(time_zone):
+def get_display_time_zone(time_zone_name):
     """
-    Returns a formatted time zone (e.g. 'Asia/Tokyo (JST, UTC+0900)')
+    Returns a formatted display time zone (e.g. 'Asia/Tokyo (JST, UTC+0900)')
 
-    :param time_zone: Pytz time zone object
+    :param time_zone_name (str): Name of Pytz time zone
     """
+    time_zone = timezone(time_zone_name)
     tz_abbr = get_time_zone_abbr(time_zone)
     tz_offset = get_time_zone_offset(time_zone)
 
@@ -56,6 +57,6 @@ def get_formatted_time_zone(time_zone):
 
 
 TIME_ZONE_CHOICES = sorted(
-    [(tz, get_formatted_time_zone(timezone(tz))) for tz in common_timezones],
+    [(tz, get_display_time_zone(tz)) for tz in common_timezones],
     key=lambda tz_tuple: tz_tuple[1]
 )

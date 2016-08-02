@@ -43,7 +43,7 @@ class BlocksAPITransformer(BlockStructureTransformer):
         transform method.
         """
         # collect basic xblock fields
-        block_structure.request_xblock_fields('graded', 'format', 'display_name', 'category')
+        block_structure.request_xblock_fields('graded', 'format', 'display_name', 'category', 'due')
 
         # collect data from containing transformers
         StudentViewTransformer.collect(block_structure)

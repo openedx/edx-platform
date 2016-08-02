@@ -5,12 +5,9 @@ Django admin dashboard configuration.
 from django.contrib import admin
 from config_models.admin import ConfigurationModelAdmin, KeyedConfigurationModelAdmin
 from xblock_django.models import (
-    XBlockDisableConfig, XBlockConfiguration, XBlockStudioConfiguration, XBlockStudioConfigurationFlag
+    XBlockConfiguration, XBlockStudioConfiguration, XBlockStudioConfigurationFlag
 )
 from django.utils.translation import ugettext_lazy as _
-
-
-admin.site.register(XBlockDisableConfig, ConfigurationModelAdmin)
 
 
 class XBlockConfigurationAdmin(KeyedConfigurationModelAdmin):

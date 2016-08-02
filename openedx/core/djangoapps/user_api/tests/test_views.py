@@ -15,11 +15,12 @@ from django.test.client import RequestFactory
 from django.test.testcases import TransactionTestCase
 from django.test.utils import override_settings
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
-from pytz import UTC
+from pytz import common_timezones_set, UTC
 from social.apps.django_app.default.models import UserSocialAuth
 
 from django_comment_common import models
 from openedx.core.lib.api.test_utils import ApiTestCase, TEST_API_KEY
+from openedx.core.lib.time_zone_utils import get_display_time_zone
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from student.tests.factories import UserFactory
 from third_party_auth.tests.testutil import simulate_running_pipeline, ThirdPartyAuthTestMixin
@@ -1963,3 +1964,40 @@ class UpdateEmailOptInTestCase(UserAPITestCase, SharedModuleStoreTestCase):
         self.assertHttpBadRequest(response)
         with self.assertRaises(UserOrgTag.DoesNotExist):
             UserOrgTag.objects.get(user=self.user, org=self.course.id.org, key="email-optin")
+
+
+@ddt.ddt
+class CountryTimeZoneListViewTest(UserApiTestCase):
+    """
+    Test cases covering the list viewing behavior for country time zones
+    """
+    ALL_TIME_ZONES_URI = "/user_api/v1/preferences/time_zones/"
+    COUNTRY_TIME_ZONES_URI = "/user_api/v1/preferences/time_zones/?country_code=cA"
+
+    @ddt.data(ALL_TIME_ZONES_URI, COUNTRY_TIME_ZONES_URI)
+    def test_options(self, country_uri):
+        """ Verify that following options are allowed """
+        self.assertAllowedMethods(country_uri, ['OPTIONS', 'GET', 'HEAD'])
+
+    @ddt.data(ALL_TIME_ZONES_URI, COUNTRY_TIME_ZONES_URI)
+    def test_methods_not_allowed(self, country_uri):
+        """ Verify that put, patch, and delete are not allowed """
+        unallowed_methods = ['put', 'patch', 'delete']
+        for unallowed_method in unallowed_methods:
+            self.assertHttpMethodNotAllowed(self.request_with_auth(unallowed_method, country_uri))
+
+    def _assert_time_zone_is_valid(self, time_zone_info):
+        """ Asserts that the time zone is a valid pytz time zone """
+        time_zone_name = time_zone_info['time_zone']
+        self.assertIn(time_zone_name, common_timezones_set)
+        self.assertEqual(time_zone_info['description'], get_display_time_zone(time_zone_name))
+
+    @ddt.data((ALL_TIME_ZONES_URI, 432),
+              (COUNTRY_TIME_ZONES_URI, 27))
+    @ddt.unpack
+    def test_get_basic(self, country_uri, expected_count):
+        """ Verify that correct time zone info is returned """
+        results = self.get_json(country_uri)
+        self.assertEqual(len(results), expected_count)
+        for time_zone_info in results:
+            self._assert_time_zone_is_valid(time_zone_info)

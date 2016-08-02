@@ -6,11 +6,13 @@ from django.utils.translation import get_language_bidi
 from mako.exceptions import TemplateLookupException
 
 from openedx.core.djangolib.js_utils import js_escaped_string
-from openedx.core.djangoapps.theming.helpers import (
-  get_page_title_breadcrumbs,
+from openedx.core.djangoapps.site_configuration.helpers import (
+  page_title_breadcrumbs,
   get_value,
+)
+
+from openedx.core.djangoapps.theming.helpers import (
   get_template_path,
-  get_themed_template_path,
   is_request_in_themed_site,
 )
 from certificates.api import get_asset_url_by_slug
@@ -138,7 +140,7 @@ else:
 
 
 <%def name="get_page_title_breadcrumbs(*args)"><%
-    return get_page_title_breadcrumbs(*args)
+    return page_title_breadcrumbs(*args)
 %></%def>
 
 <%def name="get_platform_name()"><%
@@ -151,10 +153,6 @@ else:
 
 <%def name="get_template_path(relative_path, **kwargs)"><%
     return get_template_path(relative_path, **kwargs)
-%></%def>
-
-<%def name="get_themed_template_path(relative_path, default_path, **kwargs)"><%
-    return get_themed_template_path(relative_path, default_path, **kwargs)
 %></%def>
 
 <%def name="is_request_in_themed_site()"><%

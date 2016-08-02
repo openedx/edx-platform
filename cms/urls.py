@@ -55,6 +55,9 @@ urlpatterns = patterns(
 
     # Update session view
     url(r'^lang_pref/session_language', 'lang_pref.views.update_session_language', name='session_language'),
+
+    # Darklang View to change the preview language (or dark language)
+    url(r'^update_lang/', include('dark_lang.urls', namespace='darklang')),
 )
 
 # User creation and updating views

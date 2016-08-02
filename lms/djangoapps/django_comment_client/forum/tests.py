@@ -341,9 +341,14 @@ class SingleThreadQueryCountTestCase(ModuleStoreTestCase):
     MODULESTORE = TEST_DATA_MONGO_MODULESTORE
 
     @ddt.data(
-        # old mongo with cache
-        (ModuleStoreEnum.Type.mongo, 1, 6, 4, 17, 8),
-        (ModuleStoreEnum.Type.mongo, 50, 6, 4, 17, 8),
+        # Old mongo with cache. There is an additional SQL query for old mongo
+        # because the first time that disabled_xblocks is queried is in call_single_thread,
+        # vs. the creation of the course (CourseFactory.create). The creation of the
+        # course is outside the context manager that is verifying the number of queries,
+        # and with split mongo, that method ends up querying disabled_xblocks (which is then
+        # cached and hence not queried as part of call_single_thread).
+        (ModuleStoreEnum.Type.mongo, 1, 6, 4, 18, 8),
+        (ModuleStoreEnum.Type.mongo, 50, 6, 4, 18, 8),
         # split mongo: 3 queries, regardless of thread response size.
         (ModuleStoreEnum.Type.split, 1, 3, 3, 17, 8),
         (ModuleStoreEnum.Type.split, 50, 3, 3, 17, 8),

@@ -110,6 +110,11 @@ class MilestonesHelpersTestCase(ModuleStoreTestCase):
         response = milestones_helpers.add_user_milestone(self.user, self.milestone)
         self.assertIsNone(response)
 
+    def test_get_service_returns_none_when_app_disabled(self):
+        """MilestonesService is None when app disabled"""
+        response = milestones_helpers.get_service()
+        self.assertIsNone(response)
+
     @patch.dict('django.conf.settings.FEATURES', {'MILESTONES_APP': True})
     def test_any_unfulfilled_milestones(self):
         """ Tests any_unfulfilled_milestones for invalid arguments """

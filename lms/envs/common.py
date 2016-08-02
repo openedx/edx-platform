@@ -60,6 +60,7 @@ DISCUSSION_SETTINGS = {
     'MAX_COMMENT_DEPTH': 2,
 }
 
+LMS_ROOT_URL = "http://localhost:8000"
 
 # Features
 FEATURES = {
@@ -152,9 +153,6 @@ FEATURES = {
 
     # Enable URL that shows information about the status of variuous services
     'ENABLE_SERVICE_STATUS': False,
-
-    # Toggle to indicate use of the Stanford theming system
-    'USE_CUSTOM_THEME': False,
 
     # Don't autoplay videos for students
     'AUTOPLAY_VIDEOS': False,
@@ -492,7 +490,6 @@ TEMPLATES = [
                 'django.template.context_processors.i18n',
                 'django.contrib.auth.context_processors.auth',  # this is required for admin
                 'django.template.context_processors.csrf',
-                'microsite_configuration.context_processors.microsite_context',
 
                 # Added for django-wiki
                 'django.template.context_processors.media',
@@ -507,10 +504,11 @@ TEMPLATES = [
                 'shoppingcart.context_processor.user_has_cart_context_processor',
 
                 # Allows the open edX footer to be leveraged in Django Templates.
-                'edxmako.shortcuts.microsite_footer_context_processor',
+                'edxmako.shortcuts.footer_context_processor',
 
                 # Online contextual help
                 'context_processors.doc_url',
+                'openedx.core.djangoapps.site_configuration.context_processors.configuration_context'
             ],
             # Change 'debug' in your environment settings files - not here.
             'debug': False

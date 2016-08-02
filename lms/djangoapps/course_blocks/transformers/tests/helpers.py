@@ -73,12 +73,12 @@ class CourseStructureTestCase(TransformerRegistryTestMixin, ModuleStoreTestCase)
 
         if block_type != 'course':
             kwargs['category'] = block_type
+            kwargs['publish_item'] = True,
         if parent:
             kwargs['parent'] = parent
 
         xblock = factory.create(
             display_name=self.create_block_id(block_type, block_ref),
-            publish_item=True,
             **kwargs
         )
         block_map[block_ref] = xblock

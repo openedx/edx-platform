@@ -138,6 +138,7 @@ EMAIL_PORT = ENV_TOKENS.get('EMAIL_PORT', EMAIL_PORT)
 EMAIL_USE_TLS = ENV_TOKENS.get('EMAIL_USE_TLS', EMAIL_USE_TLS)
 
 LMS_BASE = ENV_TOKENS.get('LMS_BASE')
+LMS_ROOT_URL = ENV_TOKENS.get('LMS_ROOT_URL')
 # Note that FEATURES['PREVIEW_LMS_BASE'] gets read in from the environment file.
 
 SITE_NAME = ENV_TOKENS['SITE_NAME']
@@ -208,9 +209,6 @@ for name, value in ENV_TOKENS.get("CODE_JAIL", {}).items():
 COURSES_WITH_UNSAFE_CODE = ENV_TOKENS.get("COURSES_WITH_UNSAFE_CODE", [])
 
 ASSET_IGNORE_REGEX = ENV_TOKENS.get('ASSET_IGNORE_REGEX', ASSET_IGNORE_REGEX)
-
-# Theme overrides
-THEME_NAME = ENV_TOKENS.get('THEME_NAME', None)
 
 # following setting is for backward compatibility
 if ENV_TOKENS.get('COMPREHENSIVE_THEME_DIR', None):

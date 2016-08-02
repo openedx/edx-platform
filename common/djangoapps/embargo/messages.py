@@ -38,12 +38,3 @@ COURSEWARE_MESSAGES = {
         template='static_templates/embargo.html'
     )
 }
-
-# Backwards compatibility with themes
-# created for earlier implementations of the embargo app.
-CUSTOM_THEME_OVERRIDES = {
-    'embargo': BlockedMessage(
-        description='Embargo',
-        template='static_templates/theme-embargo.html'
-    )
-}

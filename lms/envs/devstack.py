@@ -19,6 +19,8 @@ PLATFORM_NAME = ENV_TOKENS.get('PLATFORM_NAME', 'Devstack')
 CELERY_ALWAYS_EAGER = True
 HTTPS = 'off'
 
+LMS_ROOT_URL = 'http://localhost:8000'
+
 ################################ LOGGERS ######################################
 
 # Silence noisy logs
@@ -264,7 +266,6 @@ Ld/IRK0DgpGP5EJRwpKsDYe/UQ==
 -----END PRIVATE KEY-----"""
 
 JWT_AUTH.update({
-    'JWT_ALGORITHM': 'HS256',
     'JWT_SECRET_KEY': 'lms-secret',
     'JWT_ISSUER': 'http://127.0.0.1:8000/oauth2',
     'JWT_AUDIENCE': 'lms-key',

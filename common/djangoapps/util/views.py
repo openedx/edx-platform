@@ -13,7 +13,7 @@ from django.http import (Http404, HttpResponse, HttpResponseNotAllowed,
 import dogstats_wrapper as dog_stats_api
 from edxmako.shortcuts import render_to_response
 import zendesk
-from openedx.core.djangoapps.theming.helpers import get_value as get_themed_value
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 import calc
 import track.views
@@ -215,7 +215,7 @@ def _record_feedback_in_zendesk(
 
     # Per edX support, we would like to be able to route white label feedback items
     # via tagging
-    white_label_org = get_themed_value('course_org_filter')
+    white_label_org = configuration_helpers.get_value('course_org_filter')
     if white_label_org:
         zendesk_tags = zendesk_tags + ["whitelabel_{org}".format(org=white_label_org)]
 
@@ -350,7 +350,7 @@ def submit_feedback(request):
         details,
         tags,
         additional_info,
-        support_email=get_themed_value('email_from_address', settings.DEFAULT_FROM_EMAIL)
+        support_email=configuration_helpers.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL)
     )
     _record_feedback_in_datadog(tags)
 

@@ -20,7 +20,7 @@ class SoftwareSecurePhotoVerificationAdmin(admin.ModelAdmin):
     list_display = ('id', 'user', 'status', 'receipt_id', 'submitted_at', 'updated_at')
     raw_id_fields = ('user', 'reviewing_user')
     search_fields = (
-        'receipt_id',
+        'receipt_id', 'user__username'
     )
 
 

@@ -118,6 +118,14 @@ class ProctoringFields(object):
     )
 
     @property
+    def is_timed_exam(self):
+        """
+        Alias the permutation of above fields that corresponds to un-proctored timed exams
+        to the more clearly-named is_timed_exam
+        """
+        return not self.is_proctored_enabled and not self.is_practice_exam and self.is_time_limited
+
+    @property
     def is_proctored_exam(self):
         """ Alias the is_proctored_enabled field to the more legible is_proctored_exam """
         return self.is_proctored_enabled
@@ -129,6 +137,7 @@ class ProctoringFields(object):
 
 
 @XBlock.wants('proctoring')
+@XBlock.wants('milestones')
 @XBlock.wants('credit')
 @XBlock.needs("user")
 @XBlock.needs("bookmarks")
@@ -201,6 +210,8 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
             banner_text, special_html = special_html_view
             if special_html and not masquerading_as_specific_student:
                 return Fragment(special_html)
+        else:
+            banner_text = self._gated_content_staff_banner()
         return self._student_view(context, banner_text)
 
     def _special_exam_student_view(self):
@@ -240,6 +251,20 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
             )
 
             return banner_text, hidden_content_html
+
+    def _gated_content_staff_banner(self):
+        """
+        Checks whether the content is gated for learners. If so,
+        returns a banner_text depending on whether user is staff.
+        """
+        milestones_service = self.runtime.service(self, 'milestones')
+        if milestones_service:
+            content_milestones = milestones_service.get_course_content_milestones(
+                self.course_id, self.location, 'requires'
+            )
+            banner_text = _('This subsection is unlocked for learners when they meet the prerequisite requirements.')
+            if content_milestones and self.runtime.user_is_staff:
+                return banner_text
 
     def _can_user_view_content(self):
         """

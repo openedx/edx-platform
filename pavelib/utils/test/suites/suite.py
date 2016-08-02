@@ -61,13 +61,19 @@ class TestSuite(object):
         """
         return None
 
-    def generate_optimized_static_assets(self):
+    def generate_optimized_static_assets(self, log_dir=None):
         """
         Collect static assets using test_static_optimized.py which generates
-        optimized files to a dedicated test static root.
+        optimized files to a dedicated test static root. Optionally use
+        a log directory for collectstatic output.
         """
         print colorize('green', "Generating optimized static assets...")
-        sh("paver update_assets --settings=test_static_optimized")
+        if not log_dir:
+            sh("paver update_assets --settings=test_static_optimized")
+        else:
+            sh("paver update_assets --settings=test_static_optimized --collect-log={log_dir}".format(
+                log_dir=log_dir
+            ))
 
     def run_test(self):
         """

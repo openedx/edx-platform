@@ -193,6 +193,8 @@ BADGING_BACKEND = 'lms.djangoapps.badges.backends.tests.dummy_backend.DummyBacke
 ECOMMERCE_API_URL = 'http://localhost:8043/api/v2/'
 ECOMMERCE_API_SIGNING_KEY = 'ecommerce-key'
 
+LMS_ROOT_URL = "http://localhost:8000"
+
 #####################################################################
 # Lastly, see if the developer has any local overrides.
 try:

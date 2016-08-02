@@ -89,13 +89,13 @@ class CoursesTest(ModuleStoreTestCase):
         """
         Verify that org filtering performs as expected, and that an empty result
         is returned if the org passed by the caller does not match the designated
-        microsite org.
+        org.
         """
         primary = 'primary'
         alternate = 'alternate'
 
         def _fake_get_value(value, default=None):
-            """Used to stub out microsite.get_value()."""
+            """Used to stub out site_configuration.helpers.get_value()."""
             if value == 'course_org_filter':
                 return alternate
 
@@ -120,17 +120,20 @@ class CoursesTest(ModuleStoreTestCase):
             all(course.org == primary_course.org for course in filtered_courses)
         )
 
-        with mock.patch('microsite_configuration.microsite.get_value', autospec=True) as mock_get_value:
+        with mock.patch(
+            'openedx.core.djangoapps.site_configuration.helpers.get_value',
+            autospec=True,
+        ) as mock_get_value:
             mock_get_value.side_effect = _fake_get_value
 
-            # Request filtering for an org distinct from the designated microsite org.
+            # Request filtering for an org distinct from the designated org.
             no_courses = get_courses(user, org=primary)
             self.assertEqual(no_courses, [])
 
-            # Request filtering for an org matching the designated microsite org.
-            microsite_courses = get_courses(user, org=alternate)
+            # Request filtering for an org matching the designated org.
+            site_courses = get_courses(user, org=alternate)
             self.assertTrue(
-                all(course.org == alternate_course.org for course in microsite_courses)
+                all(course.org == alternate_course.org for course in site_courses)
             )
 
     def test_get_courses_with_filter(self):

@@ -354,6 +354,28 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pro
         thread.update(overrides or {})
         return thread
 
+    def create_source_thread(self, overrides=None):
+        """
+        Create a sample source cs_thread
+        """
+        thread = make_minimal_cs_thread({
+            "id": "test_thread",
+            "course_id": unicode(self.course.id),
+            "commentable_id": "test_topic",
+            "user_id": str(self.user.id),
+            "username": self.user.username,
+            "created_at": "2015-04-28T00:00:00Z",
+            "updated_at": "2015-04-28T11:11:11Z",
+            "title": "Test Title",
+            "body": "Test body",
+            "votes": {"up_count": 4},
+            "comments_count": 5,
+            "unread_comments_count": 3,
+        })
+
+        thread.update(overrides or {})
+        return thread
+
     def test_course_id_missing(self):
         response = self.client.get(self.url)
         self.assert_response_correct(
@@ -372,20 +394,9 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pro
 
     def test_basic(self):
         self.register_get_user_response(self.user, upvoted_ids=["test_thread"])
-        source_threads = [make_minimal_cs_thread({
-            "id": "test_thread",
-            "course_id": unicode(self.course.id),
-            "commentable_id": "test_topic",
-            "user_id": str(self.author.id),
-            "username": self.author.username,
-            "created_at": "2015-04-28T00:00:00Z",
-            "updated_at": "2015-04-28T11:11:11Z",
-            "title": "Test Title",
-            "body": "Test body",
-            "votes": {"up_count": 4},
-            "comments_count": 5,
-            "unread_comments_count": 3,
-        })]
+        source_threads = [
+            self.create_source_thread({"user_id": str(self.author.id), "username": self.author.username})
+        ]
         expected_threads = [self.make_expected_thread({
             "created_at": "2015-04-28T00:00:00Z",
             "updated_at": "2015-04-28T11:11:11Z",
@@ -640,54 +651,8 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pro
         user_2.profile.year_of_birth = 1970
         user_2.profile.save()
         source_threads = [
-            {
-                "type": "thread",
-                "id": "test_thread",
-                "course_id": unicode(self.course.id),
-                "commentable_id": "test_topic",
-                "group_id": None,
-                "user_id": str(self.user.id),
-                "username": self.user.username,
-                "anonymous": False,
-                "anonymous_to_peers": False,
-                "created_at": "2015-04-28T00:00:00Z",
-                "updated_at": "2015-04-28T11:11:11Z",
-                "thread_type": "discussion",
-                "title": "Test Title",
-                "body": "Test body",
-                "pinned": False,
-                "closed": False,
-                "abuse_flaggers": [],
-                "votes": {"up_count": 4},
-                "comments_count": 5,
-                "unread_comments_count": 3,
-                "read": False,
-                "endorsed": False
-            },
-            {
-                "type": "thread",
-                "id": "test_thread",
-                "course_id": unicode(self.course.id),
-                "commentable_id": "test_topic",
-                "group_id": None,
-                "user_id": str(user_2.id),
-                "username": user_2.username,
-                "anonymous": False,
-                "anonymous_to_peers": False,
-                "created_at": "2015-04-28T00:00:00Z",
-                "updated_at": "2015-04-28T11:11:11Z",
-                "thread_type": "discussion",
-                "title": "Test Title",
-                "body": "Test body",
-                "pinned": False,
-                "closed": False,
-                "abuse_flaggers": [],
-                "votes": {"up_count": 4},
-                "comments_count": 5,
-                "unread_comments_count": 3,
-                "read": False,
-                "endorsed": False
-            }
+            self.create_source_thread(),
+            self.create_source_thread({"user_id": str(user_2.id), "username": user_2.username}),
         ]
 
         self.register_get_user_response(self.user, upvoted_ids=["test_thread"])
@@ -706,6 +671,28 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pro
             expected_profile_data = self.get_expected_user_profile(response_thread['author'])
             response_users = response_thread['users']
             self.assertEqual(expected_profile_data, response_users[response_thread['author']])
+
+    def test_profile_image_requested_field_anonymous_user(self):
+        """
+        Tests profile_image in requested_fields for thread created with anonymous user
+        """
+        source_threads = [
+            self.create_source_thread(
+                {"user_id": None, "username": None, "anonymous": True, "anonymous_to_peers": True}
+            ),
+        ]
+
+        self.register_get_user_response(self.user, upvoted_ids=["test_thread"])
+        self.register_get_threads_response(source_threads, page=1, num_pages=1)
+
+        response = self.client.get(
+            self.url,
+            {"course_id": unicode(self.course.id), "requested_fields": "profile_image"},
+        )
+        self.assertEqual(response.status_code, 200)
+        response_thread = json.loads(response.content)['results'][0]
+        self.assertIsNone(response_thread['author'])
+        self.assertEqual({}, response_thread['users'])
 
 
 @httpretty.activate

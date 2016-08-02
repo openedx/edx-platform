@@ -15,7 +15,7 @@ from wiki.models import URLPath, Article
 from courseware.courses import get_course_by_id
 from course_wiki.utils import course_wiki_slug
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
-from openedx.core.djangoapps.theming.helpers import get_value as get_themed_value
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 log = logging.getLogger(__name__)
 
@@ -112,8 +112,9 @@ def get_or_create_root():
         pass
 
     starting_content = "\n".join((
-        _("Welcome to the {platform_name} Wiki").format(platform_name=get_themed_value('PLATFORM_NAME',
-                                                                                       settings.PLATFORM_NAME)),
+        _("Welcome to the {platform_name} Wiki").format(
+            platform_name=configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),
+        ),
         "===",
         _("Visit a course wiki to add an article."),
     ))
