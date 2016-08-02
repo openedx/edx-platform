@@ -619,9 +619,9 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
             A full youtube url to the video whose ID is passed in
         """
         if youtube_id:
-            return 'https://www.youtube.com/watch?v={0}'.format(youtube_id)
+            return u'https://www.youtube.com/watch?v={0}'.format(youtube_id)
         else:
-            return ''
+            return u''
 
     def get_context(self):
         """
