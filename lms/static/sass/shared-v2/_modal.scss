@@ -122,9 +122,9 @@
         }
 
         .modal-form-error {
-            background: transparentize(palette(error, back), 0.95);
-            border: 1px solid palette(error, dark);
-            color: palette(error, dark);
+            background: palette(error, back);
+            border: 1px solid palette(error, accent);
+            color: palette(error, text);
             display: none;
             margin-bottom: $baseline;
             padding: 12px;
@@ -171,12 +171,12 @@
 
                 &.field-error {
                     display: block;
-                    color: palette(error, dark);
+                    color: palette(error, text);
 
                     + input,
                     + textarea {
-                        border: 1px solid palette(error, dark);
-                        color: palette(error, dark);
+                        border: 1px solid palette(error, accent);
+                        color: palette(error, text);
                     }
                 }
             }

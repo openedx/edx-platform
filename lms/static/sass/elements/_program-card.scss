@@ -154,11 +154,11 @@
       position: relative;
 
       &.complete {
-        background: palette(success, dark);
+        background: palette(success, back);
       }
 
       &.in-progress {
-        background: palette(warning, base);
+        background: palette(warning, back);
       }
     }
   }

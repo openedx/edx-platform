@@ -96,7 +96,7 @@
 
 // message to user-centric banner
 .wrapper-banner-user {
-    box-shadow: inset 0 rem(2) rem(2) 0 palette(grayscale, black);
+    box-shadow: inset 0 rem(2) rem(2) 0 $black;
     background: palette(grayscale, dark);
 }
 
@@ -161,7 +161,7 @@
 
 // main accomplishment
 .accomplishment-main {
-    background: transparentize(palette(grayscale, back), 0.75);
+    background: palette(grayscale, x-back);
 }
 
 // brief accomplishment
@@ -467,7 +467,7 @@
     }
 
     .accomplishment-main {
-        background: transparentize(palette(grayscale, dark), 0.9);
+        background: palette(grayscale, x-back);
     }
 
     .accomplishment-rendering {
@@ -492,7 +492,7 @@
     }
 
     .accomplishment-main {
-        background: transparentize(palette(primary, accent), 0.9);
+        background: palette(primary, back);
     }
 
     .accomplishment-rendering {
@@ -537,7 +537,7 @@
 // #FOOTER
 // ------------------------------
 .footer-app {
-    border-top: rem(4) solid transparentize(palette(grayscale, base), 0.95);
+    border-top: rem(4) solid palette(grayscale, x-back);
     padding-top: spacing-vertical(base);
 }
 

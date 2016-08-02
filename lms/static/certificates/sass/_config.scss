@@ -11,7 +11,7 @@ $cert-base-color: palette(grayscale, dark);
 $cert-distinguished-color: palette(primary, accent);
 
 $cert-decorative-color: palette(grayscale, back);
-$cert-decorative-color-de-emphasized: transparentize(palette(grayscale, base), 0.75);
+$cert-decorative-color-de-emphasized: palette(grayscale, back);
 $cert-decorative-color-emphasized: palette(grayscale, accent);
 
 // typography: config

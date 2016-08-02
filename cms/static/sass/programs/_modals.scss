@@ -15,7 +15,7 @@
 
 .modal-window {
   position: absolute;
-  background-color: palette(grayscale, black);
+  background-color: $black;
   width: 80%;
   left: 10%;
   top: 40%;
@@ -26,7 +26,7 @@
   margin: 5px;
   padding: 20px;
   background-color: palette(grayscale, dark);
-  border-top: 5px solid palette(warning, base);
+  border-top: 5px solid palette(warning, accent);
 
   .copy {
     color: $white;
@@ -46,8 +46,9 @@
   }
 
   .btn-brand {
-    background: palette(warning, base);
-    border-color: palette(warning, base);
+    background: palette(warning, back);
+    color: palette(grayscale, dark);
+    border-color: palette(warning, accent);
 
     &:hover,
     &:focus,

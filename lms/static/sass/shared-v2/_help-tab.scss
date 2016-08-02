@@ -12,8 +12,8 @@
         border: 1px solid $lms-border-color;
         border-top-style: none;
         border-radius: 0 0 ($baseline/2) ($baseline/2);
-        background: transparentize($white, 0.25);
-        color: transparentize(palette(grayscale, dark), 0.25);
+        background: $white;
+        color: palette(grayscale, base);
         font-weight: bold;
         text-decoration: none;
         padding: 6px 22px 11px;
