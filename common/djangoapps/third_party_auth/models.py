@@ -176,8 +176,6 @@ class ProviderConfig(ConfigurationModel):
         # an error on submit.
         suggested_username = pipeline_kwargs.get('username')
         #
-        if len(re.findall(r'[^@]+@[^@]+\.[^@]+', suggested_username)) > 0:
-            suggested_username = suggested_username.split('@')[0]
         suggested_username = ''.join(e for e in suggested_username if e.isalnum())
         #
         return {
