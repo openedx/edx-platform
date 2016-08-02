@@ -1,0 +1,6 @@
+hidden-contributors: [aculich, anant*, kimtonyhyun, rcchirwa, terman]
+nick: edx
+oeps: {}
+openedx-release: {ref: release, requirements: requirements/edx/github.txt}
+owner: MUST FILL IN OWNER
+track-pulls: true
