@@ -16,9 +16,8 @@ from openedx.core.lib.token_utils import JwtBuilder
 class ProgramAuthoringView(View):
     """View rendering a template which hosts the Programs authoring app.
 
-    The Programs authoring app is a Backbone SPA maintained in a separate repository.
-    The app handles its own routing and provides a UI which can be used to create and
-    publish new Programs (e.g, XSeries).
+    The Programs authoring app is a Backbone SPA. The app handles its own routing
+    and provides a UI which can be used to create and publish new Programs.
     """
 
     @method_decorator(login_required)
