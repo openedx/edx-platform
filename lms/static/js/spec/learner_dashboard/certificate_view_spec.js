@@ -19,7 +19,7 @@ define([
                                 "credential_url": "https://credentials.stage.edx.org/credentials/dummy-uuid-2/"
                             }
                         ],
-                        xseriesImage: "/images/testing.png"
+                        sampleCertImageSrc: "/images/programs/sample-cert.png"
                     }
                 };
 
@@ -45,8 +45,8 @@ define([
                     expect($(el).html().trim()).toEqual(data.context.certificatesData[index].display_name);
                     expect($(el).attr('href')).toEqual(data.context.certificatesData[index].credential_url);
                 });
-                expect(view.$el.find('.hd-6').html().trim()).toEqual('XSeries Program Certificates:');
-                expect(view.$el.find('img').attr('src')).toEqual('/images/testing.png');
+                expect(view.$el.find('.hd-6').html().trim()).toEqual('Program Certificates');
+                expect(view.$el.find('img').attr('src')).toEqual(data.context.sampleCertImageSrc);
             });
 
              it('should display no certificate box if certificates list is empty', function() {

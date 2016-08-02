@@ -28,8 +28,8 @@
                     var childList;
 
                     if (!this.collection.length) {
-                        if (this.context.xseriesUrl) {
-                            //Only show the xseries advertising panel if the link is passed in
+                        if (this.context.marketingUrl) {
+                            //Only show the advertising panel if the link is passed in
                             HtmlUtils.setHtml(this.$el, HtmlUtils.template(emptyProgramsListTpl)(this.context));
                         }
                     } else {        

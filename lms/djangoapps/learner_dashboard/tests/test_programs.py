@@ -23,7 +23,6 @@ from openedx.core.djangoapps.credentials.tests.mixins import CredentialsApiConfi
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.programs.tests import factories as programs_factories
 from openedx.core.djangoapps.programs.tests.mixins import ProgramsApiConfigMixin
-from openedx.core.djangoapps.programs.utils import get_display_category
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -64,8 +63,6 @@ class TestProgramListing(ProgramsApiConfigMixin, CredentialsApiConfigMixin, Shar
         )
 
         cls.data = sorted([cls.first_program, cls.second_program], key=cls.program_sort_key)
-
-        cls.marketing_root = urljoin(settings.MKTG_URLS.get('ROOT'), 'xseries').rstrip('/')
 
     def setUp(self):
         super(TestProgramListing, self).setUp()
@@ -187,30 +184,19 @@ class TestProgramListing(ProgramsApiConfigMixin, CredentialsApiConfigMixin, Shar
 
         for index, actual_program in enumerate(actual):
             expected_program = self.data[index]
-
             self.assert_dict_contains_subset(actual_program, expected_program)
-            self.assertEqual(
-                actual_program['display_category'],
-                get_display_category(expected_program)
-            )
 
-    def test_toggle_xseries_advertising(self):
+    def test_program_discovery(self):
         """
-        Verify that when XSeries advertising is disabled, no link to the marketing site
-        appears in the response (and vice versa).
+        Verify that a link to a programs marketing page appears in the response.
         """
-        # Verify the URL is present when advertising is enabled.
-        self.create_programs_config()
+        self.create_programs_config(marketing_path='bar')
         self.mock_programs_api(self.data)
 
-        response = self.client.get(self.url)
-        self.assertContains(response, self.marketing_root)
-
-        # Verify the URL is missing when advertising is disabled.
-        self.create_programs_config(xseries_ad_enabled=False)
+        marketing_root = urljoin(settings.MKTG_URLS.get('ROOT'), 'bar').rstrip('/')
 
         response = self.client.get(self.url)
-        self.assertNotContains(response, self.marketing_root)
+        self.assertContains(response, marketing_root)
 
     def test_links_to_detail_pages(self):
         """
@@ -237,7 +223,8 @@ class TestProgramListing(ProgramsApiConfigMixin, CredentialsApiConfigMixin, Shar
             )
 
         # Verify that links to the marketing site are present when detail pages are disabled.
-        self.create_programs_config(program_details_enabled=False)
+        self.create_programs_config(program_details_enabled=False, marketing_path='bar')
+        marketing_root = urljoin(settings.MKTG_URLS.get('ROOT'), 'bar').rstrip('/')
 
         response = self.client.get(self.url)
         actual = self.load_serialized_data(response, 'programsData')
@@ -248,7 +235,7 @@ class TestProgramListing(ProgramsApiConfigMixin, CredentialsApiConfigMixin, Shar
 
             self.assertEqual(
                 actual_program['detail_url'],
-                '{}/{}'.format(self.marketing_root, expected_program['marketing_slug'])
+                '{}/{}'.format(marketing_root, expected_program['marketing_slug'])
             )
 
     def test_certificates_listed(self):

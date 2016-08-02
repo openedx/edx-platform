@@ -889,7 +889,7 @@ class AnonymousLookupTable(ModuleStoreTestCase):
         self.assertEqual(anonymous_id, anonymous_id_for_user(self.user, course2.id, save=False))
 
 
-# TODO: Clean up these tests so that they use program factories.
+# TODO: Clean up these tests so that they use program factories and don't mention XSeries!
 @attr('shard_3')
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 @ddt.ddt
@@ -907,8 +907,7 @@ class DashboardTestXSeriesPrograms(ModuleStoreTestCase, ProgramsApiConfigMixin):
         self.course_2 = CourseFactory.create()
         self.course_3 = CourseFactory.create()
         self.program_name = 'Testing Program'
-        self.category = 'xseries'
-        self.display_category = 'XSeries'
+        self.category = 'XSeries'
 
         CourseModeFactory.create(
             course_id=self.course_1.id,
@@ -990,8 +989,7 @@ class DashboardTestXSeriesPrograms(ModuleStoreTestCase, ProgramsApiConfigMixin):
                 self.assertEqual(
                     {
                         u'edx/demox/Run_1': {
-                            'category': 'xseries',
-                            'display_category': 'XSeries',
+                            'category': self.category,
                             'course_program_list': [{
                                 'program_id': 0,
                                 'course_count': len(course_codes),
@@ -1150,11 +1148,17 @@ class DashboardTestXSeriesPrograms(ModuleStoreTestCase, ProgramsApiConfigMixin):
         """
         self.assertContains(response, 'label-xseries-association', count)
         self.assertContains(response, 'btn xseries-', count)
-        self.assertContains(response, 'XSeries Program Course', count)
-        self.assertContains(response, 'XSeries Program: Interested in more courses in this subject?', count)
+
+        self.assertContains(response, '{category} Program Course'.format(category=self.category), count)
+        self.assertContains(
+            response,
+            '{category} Program: Interested in more courses in this subject?'.format(category=self.category),
+            count
+        )
+        self.assertContains(response, 'View {category} Details'.format(category=self.category), count)
+
         self.assertContains(response, 'This course is 1 of 3 courses in the', count)
         self.assertContains(response, self.program_name, count * 2)
-        self.assertContains(response, 'View XSeries Details', count)
 
 
 class UserAttributeTests(TestCase):

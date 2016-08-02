@@ -13,8 +13,7 @@ define([
             var view = null,
                 programModel,
                 program = {
-                    category: 'xseries',
-                    display_category: 'XSeries',
+                    category: 'FooBar',
                     status: 'active',
                     subtitle: 'program 1',
                     name: 'test program 1',
@@ -53,7 +52,7 @@ define([
                 cardRenders = function($card) {
                     expect($card).toBeDefined();
                     expect($card.find('.title').html().trim()).toEqual(program.name);
-                    expect($card.find('.category span').html().trim()).toEqual('XSeries Program');
+                    expect($card.find('.category span').html().trim()).toEqual(program.category);
                     expect($card.find('.organization').html().trim()).toEqual(program.organizations[0].key);
                     expect($card.find('.card-link').attr('href')).toEqual(program.detail_url);
                 };
