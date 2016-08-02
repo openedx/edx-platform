@@ -98,8 +98,6 @@
                 'keyup .forum-nav-browse-filter-input': 'filterTopics',
                 'click .forum-nav-browse-menu-wrapper': 'ignoreClick',
                 'click .forum-nav-browse-title': 'selectTopicHandler',
-                'keydown .forum-nav-search-input': 'performSearch',
-                'click .fa-search': 'performSearch',
                 'change .forum-nav-sort-control': 'sortThreads',
                 'click .forum-nav-thread-link': 'threadSelected',
                 'click .forum-nav-load-more-link': 'loadMorePages',
@@ -591,7 +589,6 @@
             DiscussionThreadListView.prototype.selectTopic = function($target) {
                 var allItems, discussionIds, $item;
                 this.hideBrowseMenu();
-                this.clearSearch();
                 $item = $target.closest('.forum-nav-browse-menu-item');
 
                 this.setCurrentTopicDisplay(this.getPathText($item));
@@ -666,22 +663,15 @@
                 return this.retrieveFirstPage(event);
             };
 
-            DiscussionThreadListView.prototype.performSearch = function(event) {
-                /*
-                 event.which 13 represent the Enter button
-                 */
-
-                var text;
-                if (event.which === 13 || event.type === 'click') {
-                    event.preventDefault();
-                    this.hideBrowseMenu();
-                    this.setCurrentTopicDisplay(gettext('Search Results'));
-                    text = this.$('.forum-nav-search-input').val();
-                    this.searchFor(text);
-                }
+            DiscussionThreadListView.prototype.performSearch = function($searchInput) {
+                this.hideBrowseMenu();
+                this.setCurrentTopicDisplay(gettext('Search Results'));
+                // trigger this event so the breadcrumbs can update as well
+                this.trigger('search:initiated');
+                this.searchFor($searchInput.val(), $searchInput);
             };
 
-            DiscussionThreadListView.prototype.searchFor = function(text) {
+            DiscussionThreadListView.prototype.searchFor = function(text, $searchInput) {
                 var url, self = this;
                 this.clearSearchAlerts();
                 this.clearFilters();
@@ -696,7 +686,7 @@
                 */
 
                 return DiscussionUtil.safeAjax({
-                    $elem: this.$('.forum-nav-search-input'),
+                    $elem: $searchInput,
                     data: {
                         text: text
                     },
@@ -788,12 +778,6 @@
                         }
                     }
                 });
-            };
-
-            DiscussionThreadListView.prototype.clearSearch = function() {
-                this.$('.forum-nav-search-input').val('');
-                this.current_search = '';
-                return this.clearSearchAlerts();
             };
 
             DiscussionThreadListView.prototype.clearFilters = function() {

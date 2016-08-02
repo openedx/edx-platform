@@ -7,7 +7,30 @@
 }
 
 // ------
-// Header
+// Discussion Forums Page Header
+// ------
+.discussion-board > .page-header {
+    $searchBoxPadding: rem($baseline / 2 + 2);
+    $searchBoxHeight: (rem($baseline) + ($searchBoxPadding * 2));
+
+    div {
+        display: inline-block;
+        vertical-align: middle;
+    }
+
+    .page-header-main {
+        line-height: $searchBoxHeight;
+    }
+
+    .page-header-secondary > .form-actions > button {
+        // Overrides base size set in lms/static/sass/shared-v2/_layouts.scss
+        // Done to match size of UXPL's search box. This is bad, I know.
+        height: $searchBoxHeight !important;
+    }
+}
+
+// ------
+// Topic Listing Header
 // ------
 .forum-nav-header {
   box-sizing: border-box;
@@ -20,10 +43,8 @@
 
 .forum-nav-browse {
     box-sizing: border-box;
-    // TODO: don't use table-cell for layout purposes as it switches the screenreader mode
-    display: table-cell;
+    width: 100%;
     vertical-align: middle;
-    width: auto;
     padding: 11px;
     border: 0;
     border-radius: 0;
@@ -52,28 +73,6 @@
 
 .forum-nav-browse-drop-arrow {
   @include margin-left($baseline/4);
-}
-
-.forum-nav-search {
-  box-sizing: border-box;
-  // TODO: don't use table-cell for layout purposes as it switches the screenreader mode
-  display: table-cell;
-  position: relative;
-  vertical-align: middle;
-  width: 50%;
-  padding: ($baseline/4);
-}
-
-.forum-nav-search .icon {
-  font-size: $forum-small-font-size;
-  position: absolute;
-  margin-top: -6px;
-  top: 50%;
-  @include right($baseline/4 + 1px + $baseline / 4); // Wrapper padding + border + input padding
-}
-
-.forum-nav-search-input {
-  width: 100%;
 }
 
 // -----------
