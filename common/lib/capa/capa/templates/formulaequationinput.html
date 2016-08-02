@@ -3,7 +3,7 @@
   <div class="${status.classname}" id="status_${id}">
     <input type="text" name="input_${id}" id="input_${id}"
         data-input-id="${id}" value="${value|h}"
-        aria-describedby="${id}_status ${response_data['description_ids']}"
+        ${describedby}
         % if size:
         size="${size}"
         % endif

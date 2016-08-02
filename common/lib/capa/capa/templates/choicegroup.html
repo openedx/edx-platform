@@ -5,7 +5,7 @@
     ))
 %>
 <form class="choicegroup capa_inputtype" id="inputtype_${id}">
-    <fieldset aria-describedby="${response_data['description_ids']}">
+    <fieldset ${describedby}>
       <legend id="${id}-legend" class="response-fieldset-legend field-group-hd">${response_data['label']}</legend>
       % for description_id, description_text in response_data['descriptions'].items():
         <p class="question-description" id="${description_id}">${description_text}</p>
@@ -33,7 +33,7 @@
                     % endif
                 % endif
                 class="${label_class}"
-                aria-describedby="${response_data['description_ids']}"
+                ${describedby}
                 >
                 <input type="${input_type}" name="input_${id}${name_array_suffix}" id="input_${id}_${choice_id}" class="field-input input-${input_type}" value="${choice_id}"
                 ## If the student selected this choice...

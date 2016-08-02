@@ -319,7 +319,13 @@ class InputTypeBase(object):
             'msg': self.msg,
             'response_data': self.response_data,
             'STATIC_URL': self.capa_system.STATIC_URL,
+            'describedby': '',
         }
+
+        if self.response_data.get('description_ids'):
+            context.update(
+                {'describedby': 'aria-describedby="{}"'.format(self.response_data.get('description_ids'))}
+            )
 
         context.update(
             (a, v) for (a, v) in self.loaded_attributes.iteritems() if a in self.to_render

@@ -197,7 +197,7 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
     demandHintTags = [];
     toXml = `function (markdown) {
       var xml = markdown,
-          i, splits, wrappable;
+          i, splits, makeParagraph;
       var responseTypes = [
         'optionresponse', 'multiplechoiceresponse', 'stringresponse', 'numericalresponse', 'choiceresponse'
       ];
@@ -539,20 +539,21 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
       // split scripts and preformatted sections, and wrap paragraphs
       splits = xml.split(/(\<\/?(?:script|pre|label|description).*?\>)/g);
 
-      // used to check if a text string be wrapped by <p> tag  
-      wrappable = true;
+      // Wrap a string by <p> tag when line is not already wrapped by another tag
+      // true when line is not already wrapped by another tag false otherwise
+      makeParagraph = true;
 
       for (i = 0; i < splits.length; i += 1) {
           if(/\<(script|pre|label|description)/.test(splits[i])) {
-              wrappable = false;
+              makeParagraph = false;
           }
 
-          if(wrappable) {
+          if(makeParagraph) {
               splits[i] = splits[i].replace(/(^(?!\s*\<|$).*$)/gm, '<p>$1</p>');
           }
 
           if(/\<\/(script|pre|label|description)/.test(splits[i])) {
-              wrappable = true;
+              makeParagraph = true;
           }
       }
 

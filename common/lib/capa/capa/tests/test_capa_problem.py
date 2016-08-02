@@ -37,9 +37,9 @@ class CAPAProblemTest(unittest.TestCase):
             {
                 '1_2':
                 {
-                    'description_ids': '1_description_2_1',
+                    'description_ids': 'description_1_2_1',
                     'label': 'Select the correct synonym of paranoid?',
-                    'descriptions': {'1_description_2_1': 'Only the paranoid survive.'}
+                    'descriptions': {'description_1_2_1': 'Only the paranoid survive.'}
                 }
             }
         )
@@ -144,11 +144,11 @@ class CAPAProblemTest(unittest.TestCase):
             {
                 '1_2':
                 {
-                    'description_ids': '1_description_2_1 1_description_2_2',
+                    'description_ids': 'description_1_2_1 description_1_2_2',
                     'label': '___ requires sacrifices.',
                     'descriptions': {
-                        '1_description_2_1': "The problem with trying to be the bad guy, there's always someone worse.",
-                        '1_description_2_2': "Anyone who looks the world as if it was a game of chess deserves to lose."
+                        'description_1_2_1': "The problem with trying to be the bad guy, there's always someone worse.",
+                        'description_1_2_2': "Anyone who looks the world as if it was a game of chess deserves to lose."
                     }
                 }
             }
@@ -173,10 +173,10 @@ class CAPAProblemTest(unittest.TestCase):
             {
                 '1_2':
                 {
-                    'description_ids': '1_description_2_1',
+                    'description_ids': 'description_1_2_1',
                     'label': 'You must specify meaningful question text.',
                     'descriptions': {
-                        '1_description_2_1': "Everybody needs somebody to talk to."
+                        'description_1_2_1': "Everybody needs somebody to talk to."
                     }
                 }
             }
@@ -275,15 +275,15 @@ class CAPAProblemTest(unittest.TestCase):
             {
                 '1_2':
                 {
-                    'description_ids': '1_description_2_1',
+                    'description_ids': 'description_1_2_1',
                     'label': 'Select the correct synonym of paranoid?',
-                    'descriptions': {'1_description_2_1': 'Only the paranoid survive.'}
+                    'descriptions': {'description_1_2_1': 'Only the paranoid survive.'}
                 },
                 '1_3':
                 {
-                    'description_ids': '1_description_3_1',
+                    'description_ids': 'description_1_3_1',
                     'label': 'What Apple device competed with the portable CD player?',
-                    'descriptions': {'1_description_3_1': 'Device looks like an egg plant.'}
+                    'descriptions': {'description_1_3_1': 'Device looks like an egg plant.'}
                 }
             }
         )

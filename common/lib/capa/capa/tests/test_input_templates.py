@@ -30,6 +30,7 @@ class TemplateTestCase(unittest.TestCase):
     # The template name should include the .html extension:
     # for example: choicegroup.html
     TEMPLATE_NAME = None
+    DESCRIBEDBY = 'aria-describedby="desc-1 desc-2"'
     DESCRIPTIONS = OrderedDict([('desc-1', 'description text 1'), ('desc-2', 'description text 2')])
     RESPONSE_DATA = {
         'label': 'question text 101',
@@ -121,38 +122,48 @@ class TemplateTestCase(unittest.TestCase):
         else:
             self.assertIn(text, element_list[0].text)
 
-    def assert_description(self, input_describedby_xpath, label_describedby_xpath=None, descriptions=True):
+    def assert_description(self, describedby_xpaths, descriptions=True):
         """
         Verify that descriptions information is correct.
 
         Arguments:
-            input_describedby_xpath (str): xpath for input element aria-describedby attribute
-            label_describedby_xpath (str): xpath for label aria-describedby attribute
+            describedby_xpaths (list): list of xpaths to check aria-describedby attribute
+            descriptions (bool): tells whether we need to check description <p> tags
         """
         xml = self.render_to_xml(self.context)
 
-        # Verify that each description <p> tag has correct id, text and order
+        # TODO! This check should be removed once description <p> tags are added into all templates.
         if descriptions:
+            # Verify that each description <p> tag has correct id, text and order
             descriptions = OrderedDict(
                 (tag.get('id'), tag.text) for tag in xml.xpath('//p[@class="question-description"]')
             )
             self.assertEqual(self.DESCRIPTIONS, descriptions)
 
-        # Verify that desired input element aria-describedby attribute has correct description ids
-        input_aria_describedby = xml.xpath(input_describedby_xpath)
-        # TODO! This should be assertEqual but using assertIn because currently aria-describedby
-        #       attribute value also contains answer id. Should be changed once templates are
-        #       updated as per accessibility requirements for individual problems.
-        self.assertIn(
-            self.context['response_data']['description_ids'],
-            input_aria_describedby
-        )
+        # for each xpath verify that description_ids are set correctly
+        for describedby_xpath in describedby_xpaths:
+            describedbys = xml.xpath(describedby_xpath)
 
-        # Verify that each label aria-describedby attribute has correct description ids
-        if label_describedby_xpath:
-            label_aria_describedbys = xml.xpath(label_describedby_xpath)
-            for aria_describedby in label_aria_describedbys:
-                self.assertEqual(aria_describedby, self.context['response_data']['description_ids'])
+            # aria-describedby attributes must have ids
+            self.assertTrue(describedbys)
+
+            for describedby in describedbys:
+                self.assertEqual(describedby, self.context['response_data']['description_ids'])
+
+    def assert_describedby_attribute(self, describedby_xpaths):
+        """
+        Verify that an element has no aria-describedby attribute if there are no descriptions.
+
+        Arguments:
+            describedby_xpaths (list): list of xpaths to check aria-describedby attribute
+        """
+        self.context['describedby'] = ''
+        xml = self.render_to_xml(self.context)
+
+        # for each xpath verify that description_ids are set correctly
+        for describedby_xpath in describedby_xpaths:
+            describedbys = xml.xpath(describedby_xpath)
+            self.assertFalse(describedbys)
 
 
 class ChoiceGroupTemplateTest(TemplateTestCase):
@@ -172,7 +183,8 @@ class ChoiceGroupTemplateTest(TemplateTestCase):
             'input_type': 'checkbox',
             'name_array_suffix': '1',
             'value': '3',
-            'response_data': self.RESPONSE_DATA
+            'response_data': self.RESPONSE_DATA,
+            'describedby': self.DESCRIBEDBY,
         }
 
     def test_problem_marked_correct(self):
@@ -391,7 +403,9 @@ class ChoiceGroupTemplateTest(TemplateTestCase):
         """
         Test that correct description information is set on desired elements.
         """
-        self.assert_description('string(//fieldset/@aria-describedby)', '//label/@aria-describedby')
+        xpaths = ['//fieldset/@aria-describedby', '//label/@aria-describedby']
+        self.assert_description(xpaths)
+        self.assert_describedby_attribute(xpaths)
 
 
 class TextlineTemplateTest(TemplateTestCase):
@@ -409,7 +423,8 @@ class TextlineTemplateTest(TemplateTestCase):
             'value': '3',
             'preprocessor': None,
             'trailing_text': None,
-            'response_data': self.RESPONSE_DATA
+            'response_data': self.RESPONSE_DATA,
+            'describedby': self.DESCRIBEDBY,
         }
 
     def test_section_class(self):
@@ -526,7 +541,9 @@ class TextlineTemplateTest(TemplateTestCase):
         """
         Test that correct description information is set on desired elements.
         """
-        self.assert_description('string(//input/@aria-describedby)', descriptions=False)
+        xpaths = ['//input/@aria-describedby']
+        self.assert_description(xpaths, descriptions=False)
+        self.assert_describedby_attribute(xpaths)
 
 
 class FormulaEquationInputTemplateTest(TemplateTestCase):
@@ -544,7 +561,8 @@ class FormulaEquationInputTemplateTest(TemplateTestCase):
             'previewer': 'file.js',
             'reported_status': 'REPORTED_STATUS',
             'trailing_text': None,
-            'response_data': self.RESPONSE_DATA
+            'response_data': self.RESPONSE_DATA,
+            'describedby': self.DESCRIBEDBY,
         }
 
     def test_no_size(self):
@@ -561,7 +579,9 @@ class FormulaEquationInputTemplateTest(TemplateTestCase):
         """
         Test that correct description information is set on desired elements.
         """
-        self.assert_description('string(//input/@aria-describedby)', descriptions=False)
+        xpaths = ['//input/@aria-describedby']
+        self.assert_description(xpaths, descriptions=False)
+        self.assert_describedby_attribute(xpaths)
 
 
 class AnnotationInputTemplateTest(TemplateTestCase):
@@ -588,7 +608,6 @@ class AnnotationInputTemplateTest(TemplateTestCase):
             'status': Status('unsubmitted'),
             'return_to_annotation': False,
             'msg': '<p>This is a test message</p>',
-            'response_data': {'label': 'test', 'description_ids': '', 'descriptions': {}}
         }
 
     def test_return_to_annotation(self):
@@ -749,7 +768,8 @@ class OptionInputTemplateTest(TemplateTestCase):
             'options': [],
             'status': Status('unsubmitted'),
             'value': 0,
-            'response_data': self.RESPONSE_DATA
+            'response_data': self.RESPONSE_DATA,
+            'describedby': self.DESCRIBEDBY,
         }
 
     def test_select_options(self):
@@ -801,7 +821,9 @@ class OptionInputTemplateTest(TemplateTestCase):
         """
         Test that correct description information is set on desired elements.
         """
-        self.assert_description('string(//select/@aria-describedby)', descriptions=False)
+        xpaths = ['//select/@aria-describedby']
+        self.assert_description(xpaths, descriptions=False)
+        self.assert_describedby_attribute(xpaths)
 
 
 class DragAndDropTemplateTest(TemplateTestCase):
@@ -892,7 +914,7 @@ class ChoiceTextGroupTemplateTest(TemplateTestCase):
             'status': Status('correct'),
             'input_type': 'radio',
             'value': self.VALUE_DICT,
-            'response_data': {'label': 'choicetext label', 'description_ids': '', 'descriptions': {}}
+            'response_data': self.RESPONSE_DATA
         }
 
     def test_grouping_tag(self):

@@ -931,7 +931,7 @@ class LoncapaProblem(object):
             descriptions = OrderedDict()
             for description in description_tags:
                 descriptions[
-                    "%s_description_%i_%i" % (self.problem_id, response_id, description_id)
+                    "description_%s_%i_%i" % (self.problem_id, response_id, description_id)
                 ] = description.text
                 response.remove(description)
                 description_id += 1
