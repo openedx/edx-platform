@@ -257,51 +257,6 @@ def run_complexity():
         print "ERROR: Unable to calculate python-only code-complexity."
 
 
-# @TODO: Remove, deprecated in favor of ESLint
-@task
-@needs('pavelib.prereqs.install_node_prereqs')
-@cmdopts([
-    ("limit=", "l", "limit for number of acceptable violations"),
-])
-def run_jshint(options):
-    """
-    Runs jshint on static asset directories
-    """
-
-    violations_limit = int(getattr(options, 'limit', -1))
-
-    jshint_report_dir = (Env.REPORT_DIR / "jshint")
-    jshint_report = jshint_report_dir / "jshint.report"
-    _prepare_report_dir(jshint_report_dir)
-
-    sh(
-        "jshint . --config .jshintrc >> {jshint_report}".format(
-            jshint_report=jshint_report
-        ),
-        ignore_error=True
-    )
-
-    try:
-        num_violations = int(_get_count_from_last_line(jshint_report, "jshint"))
-    except TypeError:
-        raise BuildFailure(
-            "Error. Number of jshint violations could not be found in {jshint_report}".format(
-                jshint_report=jshint_report
-            )
-        )
-
-    # Record the metric
-    _write_metric(num_violations, (Env.METRICS_DIR / "jshint"))
-
-    # Fail if number of violations is greater than the limit
-    if num_violations > violations_limit > -1:
-        raise BuildFailure(
-            "JSHint Failed. Too many violations ({count}).\nThe limit is {violations_limit}.".format(
-                count=num_violations, violations_limit=violations_limit
-            )
-        )
-
-
 @task
 @needs('pavelib.prereqs.install_node_prereqs')
 @cmdopts([
@@ -713,10 +668,6 @@ def run_quality(options):
     pylint_files = get_violations_reports("pylint")
     pylint_reports = u' '.join(pylint_files)
 
-    # @TODO: Remove, deprecated in favor of ESLint
-    jshint_files = get_violations_reports("jshint")
-    jshint_reports = u' '.join(jshint_files)
-
     eslint_files = get_violations_reports("eslint")
     eslint_reports = u' '.join(eslint_files)
 
@@ -730,18 +681,6 @@ def run_quality(options):
             violations_type="pylint",
             prefix=pythonpath_prefix,
             reports=pylint_reports,
-            percentage_string=percentage_string,
-            branch_string=compare_branch_string,
-            dquality_dir=dquality_dir
-    ):
-        diff_quality_percentage_pass = False
-
-    # @TODO: Remove, deprecated in favor of ESLint
-    # run diff-quality for jshint.
-    if not run_diff_quality(
-            violations_type="jshint",
-            prefix=pythonpath_prefix,
-            reports=jshint_reports,
             percentage_string=percentage_string,
             branch_string=compare_branch_string,
             dquality_dir=dquality_dir

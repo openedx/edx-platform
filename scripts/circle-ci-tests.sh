@@ -62,10 +62,6 @@ else
             mkdir -p reports
             PATH=$PATH:node_modules/.bin
 
-            # @TODO: Remove, deprecated in favor of ESLint
-            echo "Finding JSHint violations and storing report..."
-            paver run_jshint -l $JSHINT_THRESHOLD > jshint.log || { cat jshint.log; EXIT=1; }
-
             echo "Finding ESLint violations and storing report..."
             paver run_eslint -l $ESLINT_THRESHOLD > eslint.log || { cat eslint.log; EXIT=1; }
 
