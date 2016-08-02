@@ -1,0 +1,9 @@
+<label class="field-label sr-only" for="search" id="search-hint"><%- gettext("Search all posts") %></label>
+<input
+    class="field-input input-text search-input"
+    type="search"
+    name="search"
+    id="search"
+    placeholder="<%- gettext("Search all posts") %>"
+/>
+<button class="btn-brand btn-small search-btn" type="button"><%- gettext("Search") %></button>

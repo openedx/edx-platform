@@ -55,16 +55,20 @@ DiscussionBoardFactory({
          data-flag-moderator="${flag_moderator}"
          data-user-cohort-id="${user_cohort}">
     <header class="page-header has-secondary">
+        ## Breadcrumb navigation
         <div class="page-header-main">
             <div class="sr-is-focusable" tabindex="-1"></div>
             <div class="has-breadcrumbs"></div>
         </div>
         <div class="page-header-secondary">
+            ## Add Post button
             % if has_permission(user, 'create_thread', course.id):
             <div class="form-actions">
                 <button class="btn btn-small new-post-btn">${_("Add a Post")}</button>
             </div>
             % endif
+            ## Search box
+            <div class="forum-search"></div>
         </div>
     </header>
     <div class="page-content">

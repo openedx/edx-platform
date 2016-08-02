@@ -48,16 +48,15 @@
                 ##  - update the Pattern Library's markup to match
                 <div class="page-header-search">
                     <form class="search-form" role="search">
-                        <div class="search-box">
-                            <input class="search-field" type="text" value=""
-                                   aria-label="Search all the things" placeholder="Search all the things">
-                            <button type="button" class="btn action action-clear" aria-label="Clear search">
-                                <span class="fa fa-times-circle" aria-hidden="true"></span>
-                            </button>
-                        </div>
-                        <button type="submit" class="btn-brand action action-search" aria-label="Search items">
-                            <span class="fa fa-search" aria-hidden="true"></span>
-                        </button>
+                        <label class="field-label sr-only" for="search" id="search-hint">Search all the things</label>
+                        <input
+                            class="field-input input-text search-input"
+                            type="search"
+                            name="search"
+                            id="search"
+                            placeholder="Search all the things"
+                        />
+                        <button class="btn-brand btn-small search-btn" type="button">Search</button>
                     </form>
                 </div>
             </div>
