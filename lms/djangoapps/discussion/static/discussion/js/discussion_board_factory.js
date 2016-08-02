@@ -7,9 +7,10 @@
             'backbone',
             'discussion/js/discussion_router',
             'discussion/js/views/discussion_fake_breadcrumbs',
+            'discussion/js/views/discussion_search_view',
             'common/js/discussion/views/new_post_view'
         ],
-        function($, Backbone, DiscussionRouter, DiscussionFakeBreadcrumbs, NewPostView) {
+        function($, Backbone, DiscussionRouter, DiscussionFakeBreadcrumbs, DiscussionSearchView, NewPostView) {
             return function(options) {
                 var userInfo = options.user_info,
                     sortPreference = options.sort_preference,
@@ -22,7 +23,9 @@
                     newPostView,
                     router,
                     breadcrumbs,
-                    BreadcrumbsModel;
+                    BreadcrumbsModel,
+                    searchBox,
+                    routerEvents;
 
                 // TODO: Perhaps eliminate usage of global variables when possible
                 window.DiscussionUtil.loadRoles(options.roles);
@@ -53,6 +56,13 @@
                 });
                 router.start();
 
+                // Initialize and render search box
+                searchBox = new DiscussionSearchView({
+                    el: $('.forum-search'),
+                    threadListView: router.nav
+                }).render();
+
+                // Initialize and render breadcrumbs
                 BreadcrumbsModel = Backbone.Model.extend({
                     defaults: {
                         contents: []
@@ -65,6 +75,7 @@
                     events: {
                         'click .all-topics': function(event) {
                             event.preventDefault();
+                            searchBox.clearSearch();
                             this.model.set('contents', []);
                             router.navigate('', {trigger: true});
                             router.nav.selectTopic($('.forum-nav-browse-menu-all'));
@@ -72,9 +83,23 @@
                     }
                 }).render();
 
-                // Add new breadcrumbs when the user selects topics
-                router.nav.on('topic:selected', function(topic) {
-                    breadcrumbs.model.set('contents', topic);
+                routerEvents = {
+                    // Add new breadcrumbs and clear search box when the user selects topics
+                    'topic:selected': function(topic) {
+                        breadcrumbs.model.set('contents', topic);
+                    },
+                    // Clear search box when a thread is selected
+                    'thread:selected': function() {
+                        searchBox.clearSearch();
+                    },
+                    // Add 'Search Results' to breadcrumbs when user searches
+                    'search:initiated': function() {
+                        breadcrumbs.model.set('contents', ['Search Results']);
+                    }
+                };
+
+                Object.keys(routerEvents).forEach(function(key) {
+                    router.nav.on(key, routerEvents[key]);
                 });
             };
         });
