@@ -1,4 +1,4 @@
-<%page args="course_overview, enrollment, show_courseware_link, cert_status, can_unenroll, credit_status, show_email_settings, course_mode_info, show_refund_option, is_paid_course, is_course_blocked, verification_status, course_requirements, dashboard_index, share_settings, course_program_info" expression_filter="h"/>
+<%page args="course_overview, enrollment, show_courseware_link, cert_status, can_unenroll, credit_status, show_email_settings, course_mode_info, show_refund_option, is_paid_course, is_course_blocked, verification_status, course_requirements, dashboard_index, share_settings, related_programs" expression_filter="h"/>
 
 <%!
 import urllib
@@ -53,12 +53,6 @@ from student.helpers import (
     <% mode_class = '' %>
   % endif
 <div class="course-container">
- % if course_program_info and course_program_info.get('category')=='XSeries':
-  <div class="label-xseries-association">
-    <span class="xseries-icon" aria-hidden="true"></span>
-    <p class="message-copy">${_("{category} Program Course").format(category=course_program_info['category'])}</p>
-  </div>
- % endif
 <article class="course${mode_class}">
   <% course_target = reverse('info', args=[unicode(course_overview.id)]) %>
   <section class="details" aria-labelledby="details-heading-${course_overview.number}">
@@ -283,6 +277,20 @@ from student.helpers import (
   </section>
   <footer class="wrapper-messages-primary">
     <ul class="messages-list">
+      % if related_programs:
+      <div class="message message-related-programs is-shown">
+        <span class="related-programs-preface">${_('Related Programs')}:</span>
+        <ul>
+          % for program in related_programs:
+          <li>
+            <span class="category-icon ${program['category'].lower()}-icon" aria-hidden="true"></span>
+            <span><a href="${program['detail_url']}">${'{name} {category}'.format(name=program['name'], category=program['category'])}</a></span>
+          </li>
+          % endfor
+        </ul>
+      </div>
+      % endif
+
       % if course_overview.may_certify() and cert_status:
         <%include file='_dashboard_certificate_information.html' args='cert_status=cert_status,course_overview=course_overview, enrollment=enrollment, reverify_link=reverify_link'/>
       % endif

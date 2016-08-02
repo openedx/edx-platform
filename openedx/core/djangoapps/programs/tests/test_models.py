@@ -36,20 +36,6 @@ class TestProgramsApiConfig(ProgramsApiConfigMixin, TestCase):
         programs_config = self.create_programs_config(cache_ttl=cache_ttl)
         self.assertEqual(programs_config.is_cache_enabled, is_cache_enabled)
 
-    def test_is_student_dashboard_enabled(self, _mock_cache):
-        """
-        Verify that the property controlling display on the student dashboard is only True
-        when configuration is enabled and all required configuration is provided.
-        """
-        programs_config = self.create_programs_config(enabled=False)
-        self.assertFalse(programs_config.is_student_dashboard_enabled)
-
-        programs_config = self.create_programs_config(enable_student_dashboard=False)
-        self.assertFalse(programs_config.is_student_dashboard_enabled)
-
-        programs_config = self.create_programs_config()
-        self.assertTrue(programs_config.is_student_dashboard_enabled)
-
     def test_is_studio_tab_enabled(self, _mock_cache):
         """
         Verify that the property controlling display of the Studio tab is only True
