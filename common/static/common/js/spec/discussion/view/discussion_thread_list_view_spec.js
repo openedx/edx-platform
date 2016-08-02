@@ -374,24 +374,6 @@
             });
         });
 
-        describe('Search events', function() {
-            it('perform search when enter pressed inside search textfield', function() {
-                setupAjax();
-                spyOn(this.view, 'searchFor');
-                this.view.$el.find('.forum-nav-search-input').trigger($.Event('keydown', {
-                    which: 13
-                }));
-                return expect(this.view.searchFor).toHaveBeenCalled();
-            });
-
-            it('perform search when search icon is clicked', function() {
-                setupAjax();
-                spyOn(this.view, 'searchFor');
-                this.view.$el.find('.fa-search').click();
-                return expect(this.view.searchFor).toHaveBeenCalled();
-            });
-        });
-
         describe('username search', function() {
             var setAjaxResults;
 
@@ -582,14 +564,6 @@
                     return expectBrowseMenuVisible(false);
                 });
 
-                it('should hide when a search is executed', function() {
-                    setupAjax();
-                    $('.forum-nav-search-input').trigger($.Event('keydown', {
-                        which: 13
-                    }));
-                    return expectBrowseMenuVisible(false);
-                });
-
                 it('should hide when a category is clicked', function() {
                     $('.forum-nav-browse-title')[0].click();
                     return expectBrowseMenuVisible(false);
@@ -635,13 +609,6 @@
 
             describe('selecting an item', function() {
                 var testSelectionRequest;
-
-                it('should clear the search box', function() {
-                    setupAjax();
-                    $('.forum-nav-search-input').val('foobar');
-                    $('.forum-nav-browse-menu-following .forum-nav-browse-title').click();
-                    return expect($('.forum-nav-search-input').val()).toEqual('');
-                });
 
                 it('should change the button text', function() {
                     setupAjax();

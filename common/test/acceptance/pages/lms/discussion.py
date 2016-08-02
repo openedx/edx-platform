@@ -678,7 +678,7 @@ class DiscussionTabHomePage(CoursePage, DiscussionPageMixin):
         return self.q(css=".discussion-body section.home-header").present
 
     def perform_search(self, text="dummy"):
-        self.q(css=".forum-nav-search-input").fill(text + chr(10))
+        self.q(css=".search-input").fill(text + chr(10))
         EmptyPromise(
             self.is_ajax_finished,
             "waiting for server to return result"
