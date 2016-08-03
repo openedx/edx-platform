@@ -374,11 +374,7 @@ class MultipleChoiceProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         Additional setup for MultipleChoiceProblemTypeTest
         """
         super(MultipleChoiceProblemTypeTest, self).setUp(*args, **kwargs)
-        self.problem_page.a11y_audit.config.set_rules({
-            'ignore': [
-                'section'  # TODO: AC-491
-            ]
-        })
+        self.problem_page.a11y_audit.config.set_rules()
 
     def answer_problem(self, correct):
         """
@@ -416,11 +412,7 @@ class RadioProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         Additional setup for RadioProblemTypeTest
         """
         super(RadioProblemTypeTest, self).setUp(*args, **kwargs)
-        self.problem_page.a11y_audit.config.set_rules({
-            'ignore': [
-                'section'  # TODO: AC-491
-            ]
-        })
+        self.problem_page.a11y_audit.config.set_rules()
 
     def answer_problem(self, correct):
         """
