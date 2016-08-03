@@ -46,7 +46,7 @@ from certificates.models import (
 )
 from certificates.api import generate_user_certificates
 from courseware.courses import get_course_by_id, get_problems_in_section
-from grades.course_grades import iterate_grades_for
+from lms.djangoapps.grades.course_grades import iterate_grades_for
 from courseware.models import StudentModule
 from courseware.model_data import DjangoKeyValueStore, FieldDataCache
 from courseware.module_render import get_module_for_descriptor_internal

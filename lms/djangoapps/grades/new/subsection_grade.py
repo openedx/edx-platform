@@ -8,7 +8,8 @@ from django.conf import settings
 
 from courseware.model_data import ScoresClient
 from lms.djangoapps.grades.scores import get_score, possibly_scored
-from student.models import anonymous_id_for_user
+from lms.djangoapps.grades.models import BlockRecord, PersistentSubsectionGrade
+from student.models import anonymous_id_for_user, User
 from submissions import api as submissions_api
 from xmodule import block_metadata_utils, graders
 from xmodule.graders import Score
@@ -36,7 +37,7 @@ class SubsectionGrade(object):
         """
         List of all problem scores in the subsection.
         """
-        return list(self.locations_to_scores.itervalues())
+        return [score for score, weight in self.locations_to_scores.itervalues()]
 
     def compute(self, student, course_structure, scores_client, submissions_scores):
         """
@@ -46,34 +47,101 @@ class SubsectionGrade(object):
                 filter_func=possibly_scored,
                 start_node=self.location,
         ):
-            descendant = course_structure[descendant_key]
+            self._compute_block_score(student, descendant_key, course_structure, scores_client, submissions_scores)
 
-            if not getattr(descendant, 'has_score', False):
-                continue
+        self.all_total, self.graded_total = graders.aggregate_scores(self.scores, self.display_name)
 
+    def save(self, student, subsection, course):
+        """
+        Persist the SubsectionGrade.
+        """
+        visible_blocks = [
+            BlockRecord(unicode(location), weight, score.possible)
+            for location, (score, weight) in self.locations_to_scores.iteritems()
+        ]
+        PersistentSubsectionGrade.save_grade(
+            user_id=student.id,
+            usage_key=self.location,
+            course_version=course.course_version,
+            subtree_edited_date=subsection.subtree_edited_on,
+            earned_all=self.all_total.earned,
+            possible_all=self.all_total.possible,
+            earned_graded=self.graded_total.earned,
+            possible_graded=self.graded_total.possible,
+            visible_blocks=visible_blocks,
+        )
+
+    def load_from_data(self, model, course_structure, scores_client, submissions_scores):
+        """
+        Load the subsection grade from the persisted model.
+        """
+        for block in model.visible_blocks.blocks:
+            persisted_values = {'weight': block.weight, 'possible': block.max_score}
+            self._compute_block_score(
+                User.objects.get(id=model.user_id),
+                block.locator,
+                course_structure,
+                scores_client,
+                submissions_scores,
+                persisted_values
+            )
+
+        self.graded_total = Score(
+            model.earned_graded,
+            model.possible_graded,
+            True,
+            self.display_name,
+            self.location,
+        )
+        self.all_total = Score(
+            model.earned_all,
+            model.possible_all,
+            False,
+            self.display_name,
+            self.location,
+        )
+
+    def _compute_block_score(
+        self,
+        student,
+        block_key,
+        course_structure,
+        scores_client,
+        submissions_scores,
+        persisted_values = None,
+    ):
+        """
+        Compute score for the given block. If persisted_values is provided, it will be used for possible and weight.
+        """
+        block = course_structure[block_key]
+
+        if getattr(block, 'has_score', False):
             (earned, possible) = get_score(
                 student,
-                descendant,
+                block,
                 scores_client,
                 submissions_scores,
             )
-            if earned is None and possible is None:
-                continue
 
-            # cannot grade a problem with a denominator of 0
-            descendant_graded = descendant.graded if possible > 0 else False
+            weight = block.weight
+            if persisted_values:
+                possible = persisted_values.get('possible', possible)
+                weight = persisted_values.get('weight', weight)
 
-            self.locations_to_scores[descendant.location] = Score(
-                earned,
-                possible,
-                descendant_graded,
-                block_metadata_utils.display_name_with_default_escaped(descendant),
-                descendant.location,
-            )
+            if earned is not None or possible is not None:
+                # cannot grade a problem with a denominator of 0
+                block_graded = block.graded if possible > 0 else False
 
-        self.all_total, self.graded_total = graders.aggregate_scores(
-            self.scores, self.display_name,
-        )
+                self.locations_to_scores[block.location] = (
+                    Score(
+                        earned,
+                        possible,
+                        block_graded,
+                        block_metadata_utils.display_name_with_default_escaped(block),
+                        block.location,
+                    ),
+                    weight,
+                )
 
 
 class SubsectionGradeFactory(object):
@@ -90,8 +158,9 @@ class SubsectionGradeFactory(object):
         """
         Returns the SubsectionGrade object for the student and subsection.
         """
+        self._prefetch_scores(course_structure, course)
         return (
-            self._get_saved_grade(subsection, course) or
+            self._get_saved_grade(subsection, course_structure, course) or
             self._compute_and_update_grade(subsection, course_structure, course)
         )
 
@@ -99,27 +168,34 @@ class SubsectionGradeFactory(object):
         """
         Freshly computes and updates the grade for the student and subsection.
         """
-        self._prefetch_scores(course_structure, course)
         subsection_grade = SubsectionGrade(subsection)
         subsection_grade.compute(self.student, course_structure, self._scores_client, self._submissions_scores)
         self._update_saved_grade(subsection_grade, subsection, course)
         return subsection_grade
 
-    def _get_saved_grade(self, subsection, course):  # pylint: disable=unused-argument
+    def _get_saved_grade(self, subsection, course_structure, course):  # pylint: disable=unused-argument
         """
-        Returns the saved grade for the given course and student.
+        Returns the saved grade for the student and subsection.
         """
-        if settings.FEATURES.get('ENABLE_SUBSECTION_GRADES_SAVED') and course.enable_subsection_grades_saved:
-            # TODO Retrieve the saved grade for the subsection, if it exists.
-            pass
+        #if settings.FEATURES.get('ENABLE_SUBSECTION_GRADES_SAVED') and course.enable_subsection_grades_saved:
+        try:
+            model = PersistentSubsectionGrade.read(
+                user_id=self.student.id,
+                usage_key=subsection.location,
+            )
+            subsection_grade = SubsectionGrade(subsection)
+            subsection_grade.load_from_data(model, course_structure, self._scores_client, self._submissions_scores)
+            return subsection_grade
+        except PersistentSubsectionGrade.DoesNotExist:
+            return None
 
     def _update_saved_grade(self, subsection_grade, subsection, course):  # pylint: disable=unused-argument
         """
-        Returns the saved grade for the given course and student.
+        Updates the saved grade for the student and subsection.
         """
-        if settings.FEATURES.get('ENABLE_SUBSECTION_GRADES_SAVED') and course.enable_subsection_grades_saved:
-            # TODO Update the saved grade for the subsection.
-            _pretend_to_save_subsection_grades()
+        #if settings.FEATURES.get('ENABLE_SUBSECTION_GRADES_SAVED') and course.enable_subsection_grades_saved:
+        _pretend_to_save_subsection_grades()
+        subsection_grade.save(self.student, subsection, course)
 
     def _prefetch_scores(self, course_structure, course):
         """
