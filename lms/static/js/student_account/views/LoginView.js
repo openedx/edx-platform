@@ -1,13 +1,13 @@
 ;(function (define) {
     'use strict';
     define([
-            'jquery',
-            'underscore',
-            'gettext',
-            'js/student_account/views/FormView'
+        'jquery',
+        'underscore',
+        'gettext',
+        'edx-ui-toolkit/js/utils/html-utils',
+        'js/student_account/views/FormView'
         ],
-        function($, _, gettext, FormView) {
-
+        function($, _, gettext, HtmlUtils, FormView) {
         return FormView.extend({
             el: '#login-form',
             tpl: '#login-tpl',
@@ -29,6 +29,7 @@
                 this.errorMessage = data.thirdPartyAuth.errorMessage || '';
                 this.platformName = data.platformName;
                 this.resetModel = data.resetModel;
+                this.supportURL = data.supportURL;
 
                 this.listenTo( this.model, 'sync', this.saveSuccess );
                 this.listenTo( this.resetModel, 'sync', this.resetEmail );
@@ -36,6 +37,13 @@
 
             render: function( html ) {
                 var fields = html || '';
+                this.successMessage = HtmlUtils.interpolateHtml(
+                    // eslint-disable-next-line
+                    gettext('We have sent an email message with password reset instructions to the email address you provided.  If you do not receive this message, {anchorStart}contact technical support{anchorEnd}.'), {  // jshint ignore:line
+                        anchorStart: HtmlUtils.HTML('<a href="' + this.supportURL + '">'),
+                        anchorEnd: HtmlUtils.HTML('</a>')
+                    }
+                );
 
                 $(this.el).html(_.template(this.tpl)({
                     // We pass the context object to the template so that
@@ -86,6 +94,16 @@
 
             resetEmail: function() {
                 this.element.hide( this.$errors );
+                this.resetMessage = this.$resetSuccess.find('.message-copy');
+                if (this.resetMessage.find('p').length === 0) {
+                    this.resetMessage.append(
+                        HtmlUtils.joinHtml(
+                            HtmlUtils.HTML('<p>'),
+                            this.successMessage,
+                            HtmlUtils.HTML('</p>')
+                        ).toString()
+                    );
+                }
                 this.element.show( this.$resetSuccess );
             },
 

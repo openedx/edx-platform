@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """ Tests for student account views. """
 
+import logging
 import re
 from unittest import skipUnless
 from urllib import urlencode
@@ -18,6 +19,7 @@ from django.test.utils import override_settings
 from django.http import HttpRequest
 from edx_rest_api_client import exceptions
 from nose.plugins.attrib import attr
+from testfixtures import LogCapture
 
 from commerce.models import CommerceConfiguration
 from commerce.tests import TEST_API_URL, TEST_API_SIGNING_KEY, factories
@@ -34,6 +36,9 @@ from third_party_auth.tests.testutil import simulate_running_pipeline, ThirdPart
 from util.testing import UrlResetMixin
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme_context
+
+
+LOGGER_NAME = 'audit'
 
 
 @ddt.ddt
@@ -175,9 +180,11 @@ class StudentAccountUpdateTest(CacheIsolationTestCase, UrlResetMixin):
         # Log out the user created during test setup
         self.client.logout()
 
-        # Send the view an email address not tied to any user
-        response = self._change_password(email=self.NEW_EMAIL)
-        self.assertEqual(response.status_code, 400)
+        with LogCapture(LOGGER_NAME, level=logging.INFO) as logger:
+            # Send the view an email address not tied to any user
+            response = self._change_password(email=self.NEW_EMAIL)
+            self.assertEqual(response.status_code, 200)
+            logger.check((LOGGER_NAME, 'INFO', 'Invalid password reset attempt'))
 
     def test_password_change_rate_limited(self):
         # Log out the user created during test setup, to prevent the view from
