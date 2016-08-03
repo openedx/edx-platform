@@ -123,7 +123,7 @@ class HtmlDescriptor(HtmlBlock, XmlDescriptor, EditingDescriptor):  # pylint: di
     template_dir_name = "html"
     show_in_read_only_mode = True
 
-    js = {'coffee': [resource_string(__name__, 'js/src/html/edit.coffee')]}
+    js = {'js': [resource_string(__name__, 'js/src/html/edit.js')]}
     js_module_name = "HTMLEditingDescriptor"
     css = {'scss': [resource_string(__name__, 'css/editor/edit.scss'), resource_string(__name__, 'css/html/edit.scss')]}
 
