@@ -11,7 +11,7 @@ set -e
 ###############################################################################
 
 # Violations thresholds for failing the build
-export PYLINT_THRESHOLD=4175
+export PYLINT_THRESHOLD=3750
 export ESLINT_THRESHOLD=49019
 
 SAFELINT_THRESHOLDS=`cat scripts/safelint_thresholds.json`
