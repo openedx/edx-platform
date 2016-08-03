@@ -13,7 +13,7 @@ metadata:
 
       Use the following example problem as a model.
 
-      >>Which of the following is a fruit? Check all that apply.||Make sure you select all of the correct options—there may be more than one!<<
+      >>Which of the following is a fruit?||Make sure you select all of the correct options—there may be more than one!<<
 
       [x] apple  {{ selected: You are correct that an apple is a fruit because it is the fertilized ovary that comes from an apple tree and contains seeds. }, { unselected: Remember that an apple is also a fruit.}}
       [x] pumpkin {{ selected: You are correct that a pumpkin is a fruit because it is the fertilized ovary of a squash plant and contains seeds. }, { unselected: Remember that a pumpkin is also a fruit.}}
@@ -36,7 +36,7 @@ data:   |
                 <p>You can also add hints for learners.</p>
                 <p>Be sure to select Settings to specify a Display Name and other values that apply.</p>
                 <p>Use the following example problem as a model.</p>
-                <label>Which of the following is a fruit? Check all that apply.</label>
+                <label>Which of the following is a fruit?</label>
                 <description>Make sure you select all of the correct options—there may be more than one!</description>
                 <checkboxgroup>
                     <choice correct="true">apple
