@@ -249,7 +249,7 @@
         @include float(right);
         padding: ($baseline/4) ($baseline/2);
         border-radius: ($baseline/4);
-        background-color: $shadow-l2;
+        background-color: $light-gray1;
         @include text-align(right);
         text-transform: uppercase;
         color: $staff-color;
