@@ -35,7 +35,7 @@ def weighted_score(raw_earned, raw_possible, weight):
     # If there is no weighting, or weighting can't be applied, return input.
     if weight is None or raw_possible == 0:
         return (raw_earned, raw_possible)
-    return (float(raw_earned) * weight / raw_possible, float(weight))
+    return float(raw_earned) * weight / raw_possible, float(weight)
 
 
 def get_score(user, block, scores_client, submissions_scores_cache):

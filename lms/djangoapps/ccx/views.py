@@ -31,7 +31,7 @@ from courseware.courses import get_course_by_id
 
 from courseware.field_overrides import disable_overrides
 from edxmako.shortcuts import render_to_response
-from grades.course_grades import iterate_grades_for
+from lms.djangoapps.grades.course_grades import iterate_grades_for
 from opaque_keys.edx.keys import CourseKey
 from ccx_keys.locator import CCXLocator
 from student.roles import CourseCcxCoachRole
