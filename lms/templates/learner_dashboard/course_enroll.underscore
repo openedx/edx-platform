@@ -1,7 +1,7 @@
 <% if (is_enrolled) { %>
     <div class="enrollment-info"><%- gettext('enrolled') %></div>
     <% if (is_enrollment_open || is_course_ended) { %>
-        <a href="<%- course_url %>" class="btn-neutral btn view-course-link">
+        <a href="<%- course_url %>" class="btn view-course-link">
             <% if (is_enrollment_open) { %>
                 <%- gettext('View Course') %>
             <% } else if (is_course_ended) { %>
