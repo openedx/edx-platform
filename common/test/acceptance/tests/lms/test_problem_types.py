@@ -333,9 +333,7 @@ class CheckboxProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         """
         super(CheckboxProblemTypeTest, self).setUp(*args, **kwargs)
         self.problem_page.a11y_audit.config.set_rules({
-            'ignore': [
-                'section'  # TODO: AC-491
-            ]
+            'ignore': []
         })
 
     def answer_problem(self, correct):
@@ -375,9 +373,7 @@ class MultipleChoiceProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         """
         super(MultipleChoiceProblemTypeTest, self).setUp(*args, **kwargs)
         self.problem_page.a11y_audit.config.set_rules({
-            'ignore': [
-                'section'  # TODO: AC-491
-            ]
+            'ignore': []
         })
 
     def answer_problem(self, correct):
@@ -417,9 +413,7 @@ class RadioProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         """
         super(RadioProblemTypeTest, self).setUp(*args, **kwargs)
         self.problem_page.a11y_audit.config.set_rules({
-            'ignore': [
-                'section'  # TODO: AC-491
-            ]
+            'ignore': []
         })
 
     def answer_problem(self, correct):
