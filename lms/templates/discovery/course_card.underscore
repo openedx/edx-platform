@@ -10,7 +10,7 @@
             <h2 class="course-name">
                 <span class="course-organization"><%- org %></span>
                 <span class="course-code"><%- content.number %></span>
-                <span class="course-title"><%- content.display_name %></span>
+                <span class="course-title"><%= HtmlUtils.ensureHtml(content.display_name) %></span>
             </h2>
             <div class="course-date" aria-hidden="true">
                 <%- interpolate(

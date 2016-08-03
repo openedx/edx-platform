@@ -5,8 +5,10 @@ define([
     'underscore',
     'backbone',
     'gettext',
-    'date'
-], function ($, _, Backbone, gettext, Date) {
+    'date',
+    'edx-ui-toolkit/js/utils/html-utils',
+    'text!templates/discovery/course_card.underscore'
+], function ($, _, Backbone, gettext, Date, HtmlUtils, CourseCardTemplate) {
     'use strict';
 
     function formatDate(date) {
@@ -32,14 +34,14 @@ define([
         className: 'courses-listing-item',
 
         initialize: function () {
-            this.tpl = _.template($(this.templateId).html());
+            this.tpl = HtmlUtils.template(CourseCardTemplate);
         },
 
         render: function () {
             var data = _.clone(this.model.attributes);
             data.start = formatDate(new Date(data.start));
             data.enrollment_start = formatDate(new Date(data.enrollment_start));
-            this.$el.html(this.tpl(data));
+            HtmlUtils.setHtml(this.$el, this.tpl(data));
             return this;
         }
 
