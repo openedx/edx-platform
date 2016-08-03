@@ -785,11 +785,7 @@ class RadioTextProblemTypeTest(ChoiceTextProbelmTypeTestBase, ProblemTypeTestMix
         """
         super(RadioTextProblemTypeTest, self).setUp(*args, **kwargs)
         self.problem_page.a11y_audit.config.set_rules({
-            'ignore': [
-                'section',  # TODO: AC-491
-                'label',  # TODO: AC-285
-                'radiogroup',  # TODO: AC-285
-            ]
+            'ignore': []
         })
 
 
@@ -818,11 +814,7 @@ class CheckboxTextProblemTypeTest(ChoiceTextProbelmTypeTestBase, ProblemTypeTest
         """
         super(CheckboxTextProblemTypeTest, self).setUp(*args, **kwargs)
         self.problem_page.a11y_audit.config.set_rules({
-            'ignore': [
-                'section',  # TODO: AC-491
-                'label',  # TODO: AC-284
-                'checkboxgroup',  # TODO: AC-284
-            ]
+            'ignore': []
         })
 
 
