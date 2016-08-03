@@ -122,13 +122,16 @@ class ChoiceGroupTemplateTest(TemplateTestCase):
 
     def setUp(self):
         choices = [('1', 'choice 1'), ('2', 'choice 2'), ('3', 'choice 3')]
-        self.context = {'id': '1',
-                        'choices': choices,
-                        'status': Status('correct'),
-                        'label': 'test',
-                        'input_type': 'checkbox',
-                        'name_array_suffix': '1',
-                        'value': '3'}
+        self.context = {
+            'id': '1',
+            'choices': choices,
+            'status': Status('correct'),
+            'label': 'test',
+            'input_type': 'checkbox',
+            'name_array_suffix': '1',
+            'value': '3',
+            'response_data': {'label': 'test'}
+        }
         super(ChoiceGroupTemplateTest, self).setUp()
 
     def test_problem_marked_correct(self):
@@ -229,7 +232,7 @@ class ChoiceGroupTemplateTest(TemplateTestCase):
         for test_conditions in conditions:
             self.context.update(test_conditions)
             xml = self.render_to_xml(self.context)
-            xpath = "//label[@class='choicegroup_correct']"
+            xpath = "//label[contains(@class, 'choicegroup_correct')]"
             self.assert_has_xpath(xml, xpath, self.context)
 
             # Should NOT mark the whole problem
@@ -250,7 +253,7 @@ class ChoiceGroupTemplateTest(TemplateTestCase):
         for test_conditions in conditions:
             self.context.update(test_conditions)
             xml = self.render_to_xml(self.context)
-            xpath = "//label[@class='choicegroup_incorrect']"
+            xpath = "//label[contains(@class, 'choicegroup_incorrect')]"
             self.assert_has_xpath(xml, xpath, self.context)
 
             # Should NOT mark the whole problem
@@ -340,8 +343,8 @@ class ChoiceGroupTemplateTest(TemplateTestCase):
 
     def test_label(self):
         xml = self.render_to_xml(self.context)
-        xpath = "//fieldset[@aria-label='%s']" % self.context['label']
-        self.assert_has_xpath(xml, xpath, self.context)
+        xpath = "//legend"
+        self.assert_has_text(xml, xpath, self.context['label'])
 
 
 class TextlineTemplateTest(TemplateTestCase):

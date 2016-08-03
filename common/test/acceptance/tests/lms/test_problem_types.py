@@ -334,11 +334,7 @@ class CheckboxProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         super(CheckboxProblemTypeTest, self).setUp(*args, **kwargs)
         self.problem_page.a11y_audit.config.set_rules({
             'ignore': [
-                'section',  # TODO: AC-491
-                'aria-allowed-attr',  # TODO: AC-251
-                'aria-valid-attr',  # TODO: AC-251
-                'aria-roles',  # TODO: AC-251
-                'checkboxgroup',  # TODO: AC-251
+                'section'  # TODO: AC-491
             ]
         })
 
@@ -378,13 +374,7 @@ class MultipleChoiceProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         Additional setup for MultipleChoiceProblemTypeTest
         """
         super(MultipleChoiceProblemTypeTest, self).setUp(*args, **kwargs)
-        self.problem_page.a11y_audit.config.set_rules({
-            'ignore': [
-                'section',  # TODO: AC-491
-                'aria-valid-attr',  # TODO: AC-251
-                'radiogroup',  # TODO: AC-251
-            ]
-        })
+        self.problem_page.a11y_audit.config.set_rules()
 
     def answer_problem(self, correct):
         """
@@ -422,13 +412,7 @@ class RadioProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         Additional setup for RadioProblemTypeTest
         """
         super(RadioProblemTypeTest, self).setUp(*args, **kwargs)
-        self.problem_page.a11y_audit.config.set_rules({
-            'ignore': [
-                'section',  # TODO: AC-491
-                'aria-valid-attr',  # TODO: AC-292
-                'radiogroup',  # TODO: AC-292
-            ]
-        })
+        self.problem_page.a11y_audit.config.set_rules()
 
     def answer_problem(self, correct):
         """
@@ -885,9 +869,9 @@ class SymbolicProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
     }
 
     status_indicators = {
-        'correct': ['span div.correct'],
-        'incorrect': ['span div.incorrect'],
-        'unanswered': ['span div.unanswered'],
+        'correct': ['div.capa_inputtype div.correct'],
+        'incorrect': ['div.capa_inputtype div.incorrect'],
+        'unanswered': ['div.capa_inputtype div.unanswered'],
     }
 
     def setUp(self, *args, **kwargs):
