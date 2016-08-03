@@ -1,9 +1,9 @@
 // LMS variables
 
 $lms-gray: palette(grayscale, base);
-$lms-background-color: palette(grayscale, white);  // Why is the Pattern Library default background different?
-$lms-container-background-color: palette(grayscale, white-t);
-$lms-border-color: palette(grayscale, light);
+$lms-background-color: palette(grayscale, x-back);  // Why is the Pattern Library default background different?
+$lms-container-background-color: $white;
+$lms-border-color: palette(grayscale, back);
 $lms-label-color: palette(grayscale, black);
 $lms-active-color: palette(primary, base);
 
@@ -17,5 +17,5 @@ $light-grey-transparent: rgba(200,200,200, 0);
 $light-grey-solid: rgba(200,200,200, 1);
 
 // Icons
-$lms-dark-icon-color: palette(grayscale, white-t);
+$lms-dark-icon-color: $white;
 $lms-dark-icon-background-color: palette(grayscale, black);

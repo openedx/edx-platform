@@ -8,7 +8,7 @@ from django_comment_client.permissions import has_permission
 <%block name="extratabs">
 % if has_permission(user, 'create_thread', course.id):
     <li class="right">
-        <button class="new-post-btn btn-neutral btn-small">${_("Add a Post")}</button>
+        <button class="new-post-btn btn btn-small">${_("Add a Post")}</button>
     </li>
 % endif
 </%block>

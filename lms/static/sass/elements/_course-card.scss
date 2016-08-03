@@ -56,7 +56,7 @@
     }
 
     .select-error {
-      color: palette(error, base);
+      color: palette(error, text);
       margin-bottom: $baseline/4;
       font-size: font-size(small);
       visibility: hidden;
@@ -100,14 +100,14 @@
 
   .cta-primary {
     display: inline-block;
-    background-color: palette(success, dark);
-    border-color: palette(success, dark);
+    background-color: palette(success, back);
+    border-color: palette(success, accent);
 
     &:active,
     &:focus,
     &:hover {
-      background-color: palette(success, base);
-      border-color: palette(success, base);
+      background-color: palette(success, back);
+      border-color: palette(success, accent);
     }
   }
 
@@ -138,7 +138,7 @@
   
   .upgrade-message,
   .certificate-status {
-    border-top: 1px solid palette(grayscale, x-trans);
+    border-top: 1px solid palette(grayscale, back);
     padding-top: $baseline;
 
     @include susy-media($bp-screen-md) {
