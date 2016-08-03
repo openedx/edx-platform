@@ -1,21 +1,24 @@
 """
 Test grade calculation.
 """
+
+import ddt
+from django.conf import settings
 from django.http import Http404
 from django.test import TestCase
-
 from mock import patch, MagicMock
 from nose.plugins.attrib import attr
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from opaque_keys.edx.locator import CourseLocator, BlockUsageLocator
 
+from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from courseware.module_render import get_module
 from courseware.model_data import FieldDataCache, set_score
 from courseware.tests.helpers import (
     LoginEnrollmentTestCase,
     get_request_for_user
 )
-from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
+from lms.djangoapps.course_blocks.api import get_course_blocks
 from student.tests.factories import UserFactory
 from student.models import CourseEnrollment
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
@@ -24,10 +27,11 @@ from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from .. import course_grades
 from ..course_grades import summary as grades_summary
 from ..module_grades import get_module_score
-from ..progress import ProgressSummary
+from ..new.course_grade import CourseGrade, CourseGradeFactory
+from ..new.subsection_grade import SubsectionGradeFactory
 
 
-def _grade_with_errors(student, course, keep_raw_scores=False):
+def _grade_with_errors(student, course):
     """This fake grade method will throw exceptions for student3 and
     student4, but allow any other students to go through normal grading.
 
@@ -38,7 +42,7 @@ def _grade_with_errors(student, course, keep_raw_scores=False):
     if student.username in ['student3', 'student4']:
         raise Exception("I don't like {}".format(student.username))
 
-    return grades_summary(student, course, keep_raw_scores=keep_raw_scores)
+    return grades_summary(student, course)
 
 
 @attr('shard_1')
@@ -200,9 +204,11 @@ class TestProgressSummary(TestCase):
             self.loc_k: [],
             self.loc_m: [],
         }
-        self.progress_summary = ProgressSummary(
-            None, weighted_scores, locations_to_scored_children
-        )
+
+        course_structure = MagicMock()
+        course_structure.get_children = lambda location: locations_to_scored_children[location]
+        self.course_grade = CourseGrade(student=None, course=None, course_structure=course_structure)
+        self.course_grade.locations_to_scores = weighted_scores
 
     def create_score(self, earned, possible):
         """
@@ -222,49 +228,133 @@ class TestProgressSummary(TestCase):
         )
 
     def test_score_chapter(self):
-        earned, possible = self.progress_summary.score_for_module(self.loc_a)
+        earned, possible = self.course_grade.score_for_module(self.loc_a)
         self.assertEqual(earned, 9)
         self.assertEqual(possible, 24)
 
     def test_score_section_many_leaves(self):
-        earned, possible = self.progress_summary.score_for_module(self.loc_b)
+        earned, possible = self.course_grade.score_for_module(self.loc_b)
         self.assertEqual(earned, 6)
         self.assertEqual(possible, 14)
 
     def test_score_section_one_leaf(self):
-        earned, possible = self.progress_summary.score_for_module(self.loc_c)
+        earned, possible = self.course_grade.score_for_module(self.loc_c)
         self.assertEqual(earned, 3)
         self.assertEqual(possible, 10)
 
     def test_score_vertical_two_leaves(self):
-        earned, possible = self.progress_summary.score_for_module(self.loc_d)
+        earned, possible = self.course_grade.score_for_module(self.loc_d)
         self.assertEqual(earned, 5)
         self.assertEqual(possible, 10)
 
     def test_score_vertical_two_leaves_one_unscored(self):
-        earned, possible = self.progress_summary.score_for_module(self.loc_e)
+        earned, possible = self.course_grade.score_for_module(self.loc_e)
         self.assertEqual(earned, 1)
         self.assertEqual(possible, 4)
 
     def test_score_vertical_no_score(self):
-        earned, possible = self.progress_summary.score_for_module(self.loc_f)
+        earned, possible = self.course_grade.score_for_module(self.loc_f)
         self.assertEqual(earned, 0)
         self.assertEqual(possible, 0)
 
     def test_score_vertical_one_leaf(self):
-        earned, possible = self.progress_summary.score_for_module(self.loc_g)
+        earned, possible = self.course_grade.score_for_module(self.loc_g)
         self.assertEqual(earned, 3)
         self.assertEqual(possible, 10)
 
     def test_score_leaf(self):
-        earned, possible = self.progress_summary.score_for_module(self.loc_h)
+        earned, possible = self.course_grade.score_for_module(self.loc_h)
         self.assertEqual(earned, 2)
         self.assertEqual(possible, 5)
 
     def test_score_leaf_no_score(self):
-        earned, possible = self.progress_summary.score_for_module(self.loc_m)
+        earned, possible = self.course_grade.score_for_module(self.loc_m)
         self.assertEqual(earned, 0)
         self.assertEqual(possible, 0)
+
+
+@ddt.ddt
+class TestCourseGradeFactory(SharedModuleStoreTestCase):
+    """
+    Test that CourseGrades are calculated properly
+    """
+    @classmethod
+    def setUpClass(cls):
+        super(TestCourseGradeFactory, cls).setUpClass()
+        cls.course = CourseFactory.create()
+        cls.chapter = ItemFactory.create(
+            parent=cls.course,
+            category="chapter",
+            display_name="Test Chapter"
+        )
+        cls.sequence = ItemFactory.create(
+            parent=cls.chapter,
+            category='sequential',
+            display_name="Test Sequential 1",
+            graded=True
+        )
+        cls.vertical = ItemFactory.create(
+            parent=cls.sequence,
+            category='vertical',
+            display_name='Test Vertical 1'
+        )
+        problem_xml = MultipleChoiceResponseXMLFactory().build_xml(
+            question_text='The correct answer is Choice 3',
+            choices=[False, False, True, False],
+            choice_names=['choice_0', 'choice_1', 'choice_2', 'choice_3']
+        )
+        cls.problem = ItemFactory.create(
+            parent=cls.vertical,
+            category="problem",
+            display_name="Test Problem",
+            data=problem_xml
+        )
+
+    def setUp(self):
+        """
+        Set up test course
+        """
+        super(TestCourseGradeFactory, self).setUp()
+        self.request = get_request_for_user(UserFactory())
+        self.client.login(username=self.request.user.username, password="test")
+        CourseEnrollment.enroll(self.request.user, self.course.id)
+
+    @ddt.data(
+        (True, True),
+        (True, False),
+        (False, True),
+        (False, False),
+    )
+    @ddt.unpack
+    def test_course_grade_feature_gating(self, feature_flag, course_setting):
+        # Grades are only saved if the feature flag and the advanced setting are
+        # both set to True.
+        grade_factory = CourseGradeFactory(self.request.user)
+        with patch('lms.djangoapps.grades.new.course_grade._pretend_to_save_course_grades') as mock_save_grades:
+            with patch.dict(settings.FEATURES, {'ENABLE_SUBSECTION_GRADES_SAVED': feature_flag}):
+                with patch.object(self.course, 'enable_subsection_grades_saved', new=course_setting):
+                    grade_factory.create(self.course)
+        self.assertEqual(mock_save_grades.called, feature_flag and course_setting)
+
+    @ddt.data(
+        (True, True),
+        (True, False),
+        (False, True),
+        (False, False),
+    )
+    @ddt.unpack
+    def test_subsection_grade_feature_gating(self, feature_flag, course_setting):
+        # Grades are only saved if the feature flag and the advanced setting are
+        # both set to True.
+        grade_factory = SubsectionGradeFactory(self.request.user)
+        course_structure = get_course_blocks(self.request.user, self.course.location)
+        with patch(
+            'lms.djangoapps.grades.new.subsection_grade._pretend_to_save_subsection_grades'
+        ) as mock_save_grades:
+            with patch.dict(settings.FEATURES, {'ENABLE_SUBSECTION_GRADES_SAVED': feature_flag}):
+                with patch.object(self.course, 'enable_subsection_grades_saved', new=course_setting):
+                    grade_factory.create(self.sequence, course_structure, self.course)
+        self.assertEqual(mock_save_grades.called, feature_flag and course_setting)
 
 
 class TestGetModuleScore(LoginEnrollmentTestCase, SharedModuleStoreTestCase):
@@ -376,13 +466,16 @@ class TestGetModuleScore(LoginEnrollmentTestCase, SharedModuleStoreTestCase):
         self.client.login(username=self.request.user.username, password="test")
         CourseEnrollment.enroll(self.request.user, self.course.id)
 
+        # warm up the score cache to allow accurate query counts, even if tests are run in random order
+        get_module_score(self.request.user, self.course, self.seq1)
+
     def test_get_module_score(self):
         """
         Test test_get_module_score
         """
         # One query is for getting the list of disabled XBlocks (which is
         # then stored in the request).
-        with self.assertNumQueries(2):
+        with self.assertNumQueries(1):
             score = get_module_score(self.request.user, self.course, self.seq1)
         self.assertEqual(score, 0)
 

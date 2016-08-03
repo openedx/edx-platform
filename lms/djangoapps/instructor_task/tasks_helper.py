@@ -933,7 +933,7 @@ def upload_problem_grade_report(_xmodule_instance_args, _entry_id, course_id, _t
     error_rows = [list(header_row.values()) + ['error_msg']]
     current_step = {'step': 'Calculating Grades'}
 
-    for student, gradeset, err_msg in iterate_grades_for(course_id, enrolled_students, keep_raw_scores=True):
+    for student, gradeset, err_msg in iterate_grades_for(course_id, enrolled_students):
         student_fields = [getattr(student, field_name) for field_name in header_row]
         task_progress.attempted += 1
 

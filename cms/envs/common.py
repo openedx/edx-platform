@@ -208,6 +208,12 @@ FEATURES = {
 
     # Show Language selector
     'SHOW_LANGUAGE_SELECTOR': False,
+
+    # Temporary feature flag for disabling saving of subsection grades.
+    # There is also an advanced setting in the course module.  The
+    # feature flag and the advanced setting must both be true for
+    # a course to use saved grades.
+    'ENABLE_SUBSECTION_GRADES_SAVED': False,
 }
 
 ENABLE_JASMINE = False

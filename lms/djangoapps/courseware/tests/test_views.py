@@ -21,7 +21,7 @@ from django.test import TestCase
 from django.test.client import RequestFactory
 from django.test.client import Client
 from django.test.utils import override_settings
-from mock import MagicMock, patch, create_autospec, Mock
+from mock import MagicMock, patch, create_autospec, PropertyMock
 from opaque_keys.edx.locations import Location, SlashSeparatedCourseKey
 from pytz import UTC
 from xblock.core import XBlock
@@ -1255,8 +1255,8 @@ class ProgressPageTests(ModuleStoreTestCase):
 
     @patch.dict('django.conf.settings.FEATURES', {'CERTIFICATES_HTML_VIEW': True})
     @patch(
-        'lms.djangoapps.grades.course_grades.summary',
-        Mock(return_value={'grade': 'Pass', 'percent': 0.75, 'section_breakdown': [], 'grade_breakdown': []})
+        'lms.djangoapps.grades.new.course_grade.CourseGrade.summary',
+        PropertyMock(return_value={'grade': 'Pass', 'percent': 0.75, 'section_breakdown': [], 'grade_breakdown': []}),
     )
     def test_view_certificate_link(self):
         """
@@ -1318,8 +1318,8 @@ class ProgressPageTests(ModuleStoreTestCase):
 
     @patch.dict('django.conf.settings.FEATURES', {'CERTIFICATES_HTML_VIEW': False})
     @patch(
-        'lms.djangoapps.grades.course_grades.summary',
-        Mock(return_value={'grade': 'Pass', 'percent': 0.75, 'section_breakdown': [], 'grade_breakdown': []})
+        'lms.djangoapps.grades.new.course_grade.CourseGrade.summary',
+        PropertyMock(return_value={'grade': 'Pass', 'percent': 0.75, 'section_breakdown': [], 'grade_breakdown': []})
     )
     def test_view_certificate_link_hidden(self):
         """
@@ -1346,7 +1346,7 @@ class ProgressPageTests(ModuleStoreTestCase):
         self.assertContains(resp, u"Download Your Certificate")
 
     @ddt.data(
-        *itertools.product(((49, 4, True), (49, 4, False)), (True, False))
+        *itertools.product(((38, 4, True), (38, 4, False)), (True, False))
     )
     @ddt.unpack
     def test_query_counts(self, (sql_calls, mongo_calls, self_paced), self_paced_enabled):
@@ -1359,9 +1359,10 @@ class ProgressPageTests(ModuleStoreTestCase):
             )
         self.assertEqual(resp.status_code, 200)
 
-    @patch('lms.djangoapps.grades.course_grades.summary', Mock(return_value={
-        'grade': 'Pass', 'percent': 0.75, 'section_breakdown': [], 'grade_breakdown': []
-    }))
+    @patch(
+        'lms.djangoapps.grades.new.course_grade.CourseGrade.summary',
+        PropertyMock(return_value={'grade': 'Pass', 'percent': 0.75, 'section_breakdown': [], 'grade_breakdown': []})
+    )
     @ddt.data(
         *itertools.product(
             (
@@ -1398,8 +1399,8 @@ class ProgressPageTests(ModuleStoreTestCase):
 
     @patch.dict('django.conf.settings.FEATURES', {'CERTIFICATES_HTML_VIEW': True})
     @patch(
-        'lms.djangoapps.grades.course_grades.summary',
-        Mock(return_value={'grade': 'Pass', 'percent': 0.75, 'section_breakdown': [], 'grade_breakdown': []})
+        'lms.djangoapps.grades.new.course_grade.CourseGrade.summary',
+        PropertyMock(return_value={'grade': 'Pass', 'percent': 0.75, 'section_breakdown': [], 'grade_breakdown': []})
     )
     def test_page_with_invalidated_certificate_with_html_view(self):
         """
@@ -1434,8 +1435,8 @@ class ProgressPageTests(ModuleStoreTestCase):
         self.assert_invalidate_certificate(generated_certificate)
 
     @patch(
-        'lms.djangoapps.grades.course_grades.summary',
-        Mock(return_value={'grade': 'Pass', 'percent': 0.75, 'section_breakdown': [], 'grade_breakdown': []})
+        'lms.djangoapps.grades.new.course_grade.CourseGrade.summary',
+        PropertyMock(return_value={'grade': 'Pass', 'percent': 0.75, 'section_breakdown': [], 'grade_breakdown': []})
     )
     def test_page_with_invalidated_certificate_with_pdf(self):
         """
@@ -1453,8 +1454,8 @@ class ProgressPageTests(ModuleStoreTestCase):
         self.assert_invalidate_certificate(generated_certificate)
 
     @patch(
-        'lms.djangoapps.grades.course_grades.summary',
-        Mock(return_value={'grade': 'Pass', 'percent': 0.75, 'section_breakdown': [], 'grade_breakdown': []})
+        'lms.djangoapps.grades.new.course_grade.CourseGrade.summary',
+        PropertyMock(return_value={'grade': 'Pass', 'percent': 0.75, 'section_breakdown': [], 'grade_breakdown': []})
     )
     def test_message_for_audit_mode(self):
         """ Verify that message appears on progress page, if learner is enrolled
@@ -1642,19 +1643,22 @@ class IsCoursePassedTests(ModuleStoreTestCase):
         # If user has not grade then false will return
         self.assertFalse(views.is_course_passed(self.course, None, self.student, self.request))
 
-    @patch('lms.djangoapps.grades.course_grades.summary', Mock(return_value={'percent': 0.9}))
+    @patch('lms.djangoapps.grades.new.course_grade.CourseGrade.summary', PropertyMock(return_value={'percent': 0.9}))
     def test_user_pass_if_percent_appears_above_passing_point(self):
         # Mocking the grades.grade
         # If user has above passing marks then True will return
         self.assertTrue(views.is_course_passed(self.course, None, self.student, self.request))
 
-    @patch('lms.djangoapps.grades.course_grades.summary', Mock(return_value={'percent': 0.2}))
+    @patch('lms.djangoapps.grades.new.course_grade.CourseGrade.summary', PropertyMock(return_value={'percent': 0.2}))
     def test_user_fail_if_percent_appears_below_passing_point(self):
         # Mocking the grades.grade
         # If user has below passing marks then False will return
         self.assertFalse(views.is_course_passed(self.course, None, self.student, self.request))
 
-    @patch('lms.djangoapps.grades.course_grades.summary', Mock(return_value={'percent': SUCCESS_CUTOFF}))
+    @patch(
+        'lms.djangoapps.grades.new.course_grade.CourseGrade.summary',
+        PropertyMock(return_value={'percent': SUCCESS_CUTOFF})
+    )
     def test_user_with_passing_marks_and_achieved_marks_equal(self):
         # Mocking the grades.grade
         # If user's achieved passing marks are equal to the required passing
@@ -1688,7 +1692,10 @@ class GenerateUserCertTests(ModuleStoreTestCase):
         self.assertEqual(resp.status_code, HttpResponseBadRequest.status_code)
         self.assertIn("Your certificate will be available when you pass the course.", resp.content)
 
-    @patch('lms.djangoapps.grades.course_grades.summary', Mock(return_value={'grade': 'Pass', 'percent': 0.75}))
+    @patch(
+        'lms.djangoapps.grades.new.course_grade.CourseGrade.summary',
+        PropertyMock(return_value={'grade': 'Pass', 'percent': 0.75})
+    )
     @override_settings(CERT_QUEUE='certificates', LMS_SEGMENT_KEY="foobar")
     def test_user_with_passing_grade(self):
         # If user has above passing grading then json will return cert generating message and
@@ -1720,7 +1727,10 @@ class GenerateUserCertTests(ModuleStoreTestCase):
             )
             mock_tracker.reset_mock()
 
-    @patch('lms.djangoapps.grades.course_grades.summary', Mock(return_value={'grade': 'Pass', 'percent': 0.75}))
+    @patch(
+        'lms.djangoapps.grades.new.course_grade.CourseGrade.summary',
+        PropertyMock(return_value={'grade': 'Pass', 'percent': 0.75})
+    )
     def test_user_with_passing_existing_generating_cert(self):
         # If user has passing grade but also has existing generating cert
         # then json will return cert generating message with bad request code
@@ -1734,7 +1744,10 @@ class GenerateUserCertTests(ModuleStoreTestCase):
         self.assertEqual(resp.status_code, HttpResponseBadRequest.status_code)
         self.assertIn("Certificate is being created.", resp.content)
 
-    @patch('lms.djangoapps.grades.course_grades.summary', Mock(return_value={'grade': 'Pass', 'percent': 0.75}))
+    @patch(
+        'lms.djangoapps.grades.new.course_grade.CourseGrade.summary',
+        PropertyMock(return_value={'grade': 'Pass', 'percent': 0.75})
+    )
     @override_settings(CERT_QUEUE='certificates', LMS_SEGMENT_KEY="foobar")
     def test_user_with_passing_existing_downloadable_cert(self):
         # If user has already downloadable certificate
