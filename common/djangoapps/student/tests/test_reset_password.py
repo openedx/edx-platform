@@ -13,8 +13,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.hashers import UNUSABLE_PASSWORD_PREFIX
 from django.contrib.auth.tokens import default_token_generator
 
-from django.utils.encoding import force_bytes, force_text
-from django.utils.http import urlsafe_base64_encode, base36_to_int, int_to_base36
+from django.utils.http import int_to_base36
 
 from mock import Mock, patch
 import ddt

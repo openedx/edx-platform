@@ -4,7 +4,6 @@ import unittest
 from mock import patch
 from django.core.urlresolvers import reverse
 from django.conf import settings
-from mako.exceptions import TopLevelLookupException
 import ddt
 
 from util.testing import UrlResetMixin

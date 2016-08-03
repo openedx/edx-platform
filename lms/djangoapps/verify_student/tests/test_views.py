@@ -83,7 +83,7 @@ class StartView(TestCase):
         Test the case where the user has no pending `PhotoVerificationAttempts`,
         but is just starting their first.
         """
-        user = UserFactory.create(username="rusty", password="test")
+        UserFactory.create(username="rusty", password="test")
         self.client.login(username="rusty", password="test")
 
     def must_be_logged_in(self):

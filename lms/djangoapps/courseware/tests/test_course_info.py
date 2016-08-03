@@ -10,7 +10,6 @@ from ccx_keys.locator import CCXLocator
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from util.date_utils import strftime_localized

@@ -152,7 +152,7 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase):
         self.rate_limit_config.save()
 
         throttle = EnrollmentUserThrottle()
-        self.rate_limit, rate_duration = throttle.parse_rate(throttle.rate)
+        self.rate_limit, __ = throttle.parse_rate(throttle.rate)
 
         # Pass emit_signals when creating the course so it would be cached
         # as a CourseOverview.
@@ -543,7 +543,7 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase):
             mode_display_name=CourseMode.DEFAULT_MODE_SLUG,
         )
 
-        for attempt in xrange(self.rate_limit + 10):
+        for __ in xrange(self.rate_limit + 10):
             self.assert_enrollment_status(as_server=True)
 
     def test_create_enrollment_with_mode(self):

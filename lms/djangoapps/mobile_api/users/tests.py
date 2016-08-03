@@ -68,7 +68,7 @@ class TestUserInfoApi(MobileAPITestCase, MobileAuthTestMixin):
         self.login()
 
         response = self.api_response(expected_response_code=302)
-        self.assertTrue(self.username in response['location'])
+        self.assertIn(self.username, response['location'])
 
 
 @attr('shard_2')

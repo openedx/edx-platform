@@ -23,7 +23,7 @@ from nose.plugins.attrib import attr
 from urllib import urlencode
 
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
-from student.views import create_account, change_enrollment
+from student.views import change_enrollment
 from student.models import UserProfile, CourseEnrollment
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.factories import CourseFactory

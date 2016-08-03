@@ -113,7 +113,7 @@ class Command(BaseCommand):
                 diff = datetime.datetime.now() - start
                 timeleft = diff * (total - count) / STATUS_INTERVAL
                 hours, remainder = divmod(timeleft.seconds, 3600)
-                minutes, seconds = divmod(remainder, 60)
+                minutes, __ = divmod(remainder, 60)
                 print "{0}/{1} completed ~{2:02}:{3:02}m remaining".format(
                     count, total, hours, minutes)
                 start = datetime.datetime.now()

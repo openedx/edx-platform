@@ -46,8 +46,8 @@ class TestProctoringDashboardViews(SharedModuleStoreTestCase):
         self.instructor.save()
 
         response = self.client.get(self.url)
-        self.assertTrue(self.proctoring_link in response.content)
-        self.assertTrue('Allowance Section' in response.content)
+        self.assertIn(self.proctoring_link, response.content)
+        self.assertIn('Allowance Section', response.content)
 
     def test_no_tab_non_global_staff(self):
         """
@@ -58,8 +58,8 @@ class TestProctoringDashboardViews(SharedModuleStoreTestCase):
         self.instructor.save()
 
         response = self.client.get(self.url)
-        self.assertFalse(self.proctoring_link in response.content)
-        self.assertFalse('Allowance Section' in response.content)
+        self.assertNotIn(self.proctoring_link, response.content)
+        self.assertNotIn('Allowance Section', response.content)
 
     @patch.dict(settings.FEATURES, {'ENABLE_SPECIAL_EXAMS': False})
     def test_no_tab_flag_unset(self):
@@ -71,5 +71,5 @@ class TestProctoringDashboardViews(SharedModuleStoreTestCase):
         self.instructor.save()
 
         response = self.client.get(self.url)
-        self.assertFalse(self.proctoring_link in response.content)
-        self.assertFalse('Allowance Section' in response.content)
+        self.assertNotIn(self.proctoring_link, response.content)
+        self.assertNotIn('Allowance Section', response.content)

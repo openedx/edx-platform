@@ -41,7 +41,6 @@ from discussion_api.tests.utils import (
     make_minimal_cs_comment,
     make_minimal_cs_thread,
     make_paginated_api_response,
-    ProfileImageTestMixin,
 )
 from django_comment_common.models import (
     FORUM_ROLE_ADMINISTRATOR,

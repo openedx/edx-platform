@@ -14,7 +14,6 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 
 from lms.djangoapps.commerce.tests import test_utils as ecomm_test_utils
-from openedx.core.djangoapps.theming.tests import test_util as theming_test_utils
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.factories import CourseFactory

@@ -124,7 +124,7 @@ class MasqueradeTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase, Mil
         Verifies that the staff debug control visibility is as expected (for staff only).
         """
         content = self.get_courseware_page().content
-        self.assertTrue(self.sequential_display_name in content, "Subsection should be visible")
+        self.assertIn(self.sequential_display_name, content, "Subsection should be visible")
         self.assertEqual(staff_debug_expected, 'Staff Debug Info' in content)
 
     def get_problem(self):
@@ -147,7 +147,7 @@ class MasqueradeTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase, Mil
         Verifies that "Show Answer" is only present when expected (for staff only).
         """
         problem_html = json.loads(self.get_problem().content)['html']
-        self.assertTrue(self.problem_display_name in problem_html)
+        self.assertIn(self.problem_display_name, problem_html)
         self.assertEqual(show_answer_expected, "Show Answer" in problem_html)
 
 

@@ -369,6 +369,7 @@ def validate_user_preference_serializer(serializer, preference_key, preference_v
         PreferenceValidationError: the supplied key and/or value for a user preference are invalid.
     """
     if preference_value is None or unicode(preference_value).strip() == '':
+        # pylint: disable=translation-of-non-string
         format_string = ugettext_noop(u"Preference '{preference_key}' cannot be set to an empty value.")
         raise PreferenceValidationError({
             preference_key: {

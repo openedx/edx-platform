@@ -110,7 +110,7 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         CourseFinanceAdminRole(self.course.id).add_users(self.instructor)
         total_amount = PaidCourseRegistration.get_total_amount_of_purchased_item(self.course.id)
         response = self.client.get(self.url)
-        self.assertTrue('${amount}'.format(amount=total_amount) in response.content)
+        self.assertIn('${amount}'.format(amount=total_amount), response.content)
 
     def test_course_name_xss(self):
         """Test that the instructor dashboard correctly escapes course names
@@ -155,7 +155,7 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         self.assertIn('<th scope="row">Professional</th>', response.content)
 
         # dashboard link hidden
-        self.assertFalse(self.get_dashboard_enrollment_message() in response.content)
+        self.assertNotIn(self.get_dashboard_enrollment_message(), response.content)
 
     @patch.dict(settings.FEATURES, {'DISPLAY_ANALYTICS_ENROLLMENTS': True})
     @override_settings(ANALYTICS_DASHBOARD_URL='')
@@ -188,7 +188,7 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
 
         # link to dashboard shown
         expected_message = self.get_dashboard_enrollment_message()
-        self.assertTrue(expected_message in response.content)
+        self.assertIn(expected_message, response.content)
 
     @override_settings(ANALYTICS_DASHBOARD_URL='')
     @override_settings(ANALYTICS_DASHBOARD_NAME='')
@@ -198,7 +198,7 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         """
         response = self.client.get(self.url)
         analytics_section = '<li class="nav-item"><a href="" data-section="instructor_analytics">Analytics</a></li>'
-        self.assertFalse(analytics_section in response.content)
+        self.assertNotIn(analytics_section, response.content)
 
     @override_settings(ANALYTICS_DASHBOARD_URL='http://example.com')
     @override_settings(ANALYTICS_DASHBOARD_NAME='Example')
@@ -208,11 +208,11 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         """
         response = self.client.get(self.url)
         analytics_section = '<li class="nav-item"><a href="" data-section="instructor_analytics">Analytics</a></li>'
-        self.assertTrue(analytics_section in response.content)
+        self.assertIn(analytics_section, response.content)
 
         # link to dashboard shown
         expected_message = self.get_dashboard_analytics_message()
-        self.assertTrue(expected_message in response.content)
+        self.assertIn(expected_message, response.content)
 
     def add_course_to_user_cart(self, cart, course_key):
         """

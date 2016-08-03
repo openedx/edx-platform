@@ -1,12 +1,9 @@
 """
 Models.
 """
-from django.utils.translation import ugettext_lazy as _
 
-from django.conf import settings
-
-from django.db.models import TextField
 from django.db import models
+from django.utils.translation import ugettext_lazy as _
 
 from config_models.models import ConfigurationModel
 

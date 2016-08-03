@@ -1,7 +1,8 @@
 """
 Tests for the gating API
 """
-from mock import patch, MagicMock
+
+from mock import patch
 from nose.plugins.attrib import attr
 from ddt import ddt, data
 from milestones.tests.utils import MilestonesTestCaseMixin

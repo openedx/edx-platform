@@ -1875,8 +1875,6 @@ class TestGoogleRegistrationView(
     """Tests the User API registration endpoint with Google authentication."""
     __test__ = True
 
-    pass
-
 
 @ddt.ddt
 class UpdateEmailOptInTestCase(UserAPITestCase, SharedModuleStoreTestCase):

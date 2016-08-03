@@ -40,7 +40,7 @@ class TestRecentEnrollments(ModuleStoreTestCase, XssTestMixin):
 
         # Old Course
         old_course_location = locator.CourseLocator('Org0', 'Course0', 'Run0')
-        course, enrollment = self._create_course_and_enrollment(old_course_location)
+        __, enrollment = self._create_course_and_enrollment(old_course_location)
         enrollment.created = datetime.datetime(1900, 12, 31, 0, 0, 0, 0)
         enrollment.save()
 

@@ -17,7 +17,6 @@ from xmodule.partitions.partitions import Group, UserPartition, UserPartitionErr
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, TEST_DATA_MIXED_MODULESTORE
 from xmodule.modulestore.tests.factories import ToyCourseFactory
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from openedx.core.djangoapps.user_api.partition_schemes import RandomUserPartitionScheme
 from ..partition_scheme import CohortPartitionScheme, get_cohorted_user_partition

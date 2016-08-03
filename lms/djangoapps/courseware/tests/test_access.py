@@ -9,7 +9,6 @@ import pytz
 
 from django.contrib.auth.models import User
 from ccx_keys.locator import CCXLocator
-from django.http import Http404
 from django.test.client import RequestFactory
 from django.core.urlresolvers import reverse
 from django.test import TestCase
@@ -28,7 +27,6 @@ from courseware.tests.factories import (
     StaffFactory,
     UserFactory,
 )
-import courseware.views.views as views
 from courseware.tests.helpers import LoginEnrollmentTestCase
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from student.models import CourseEnrollment

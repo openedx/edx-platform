@@ -4,7 +4,7 @@ Unit test tasks
 import re
 import os
 import sys
-from paver.easy import sh, task, cmdopts, needs, call_task
+from paver.easy import sh, task, cmdopts, needs
 from pavelib.utils.test import suites
 from pavelib.utils.envs import Env
 from pavelib.utils.passthrough_opts import PassthroughTask

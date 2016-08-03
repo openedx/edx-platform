@@ -9,7 +9,6 @@ from nose.plugins.attrib import attr
 from django.core import mail
 from django.core.management import call_command
 from django.core.urlresolvers import reverse
-from django.conf import settings
 
 from student.tests.factories import UserFactory, AdminFactory, CourseEnrollmentFactory
 from student.models import CourseEnrollment
@@ -56,7 +55,7 @@ class TestOptoutCourseEmails(ModuleStoreTestCase):
         response = self.client.get(url)
         email_section = '<div class="vert-left send-email" id="section-send-email">'
         # If this fails, it is likely because BulkEmailFlag.is_enabled() is set to False
-        self.assertTrue(email_section in response.content)
+        self.assertIn(email_section, response.content)
 
     def test_optout_course(self):
         """

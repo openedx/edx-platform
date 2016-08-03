@@ -607,7 +607,7 @@ class TestDuplicateItem(ItemTest, DuplicateHelper):
             parent = self.get_item_from_modulestore(parent_usage_key)
             children = parent.children
             if source_position is None:
-                self.assertFalse(source_usage_key in children, 'source item not expected in children array')
+                self.assertNotIn(source_usage_key, children, 'source item not expected in children array')
                 self.assertEqual(
                     children[len(children) - 1],
                     usage_key,
@@ -2102,7 +2102,7 @@ class TestXBlockPublishingInfo(ItemTest):
         Returns the child xblock info at the specified index.
         """
         children = xblock_info['child_info']['children']
-        self.assertTrue(len(children) > index)
+        self.assertGreater(len(children), index)
         return children[index]
 
     def _get_xblock_info(self, location):

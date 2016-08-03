@@ -9,7 +9,6 @@ from nose.plugins.attrib import attr
 import os
 from unittest import skipIf
 
-from django.conf import settings
 from django.core import mail
 from django.core.mail.message import forbid_multi_line_headers
 from django.core.urlresolvers import reverse

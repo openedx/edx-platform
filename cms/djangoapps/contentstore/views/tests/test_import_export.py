@@ -335,7 +335,7 @@ class ImportTestCase(CourseTestCase):
                 args = {"name": tarpath, "course-data": [tar]}
                 resp = self.client.post(self.url, args)
             self.assertEquals(resp.status_code, 400)
-            self.assertTrue("SuspiciousFileOperation" in resp.content)
+            self.assertIn("SuspiciousFileOperation", resp.content)
 
         try_tar(self._fifo_tar())
         try_tar(self._symlink_tar())
