@@ -250,10 +250,16 @@ class LoncapaResponse(object):
           - renderer : procedure which produces HTML given an ElementTree
           - response_msg: a message displayed at the end of the Response
         """
-        # render ourself as a <span> + our content
+        RESPONSE_LABEL = _('Question')
+
+        # get responsetype index to make responsetype label
+        response_idx = self.xml.attrib['id'].split('_')[-1]
+
+        # wrap the content insode a section
         tree = etree.Element('section')
         tree.set('class', 'wrapper-problem-response')
         tree.set('tabindex', '-1')
+        tree.set('aria-label', RESPONSE_LABEL + ' ' + response_idx)
 
         # problem author can make this span display:inline
         if self.xml.get('inline', ''):
