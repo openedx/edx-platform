@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-07-22 10:07+0000\n"
-"PO-Revision-Date: 2016-07-22 10:08:19.725997\n"
+"POT-Creation-Date: 2016-08-04 18:22+0000\n"
+"PO-Revision-Date: 2016-08-04 18:23:44.358027\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -4044,6 +4044,13 @@ msgstr ""
 
 #: lms/static/js/student_account/views/LoginView.js
 msgid ""
+"We have sent an email message with password reset instructions to the email "
+"address you provided.  If you do not receive this message, "
+"{anchorStart}contact technical support{anchorEnd}."
+msgstr ""
+
+#: lms/static/js/student_account/views/LoginView.js
+msgid ""
 "An error has occurred. Try refreshing the page, or check your Internet "
 "connection."
 msgstr ""
@@ -4981,7 +4988,7 @@ msgid "{0} must be between {1} and {2} characters"
 msgstr ""
 
 #: cms/static/js/programs/utils/validation_config.js
-msgid "{0} must be one of: gettext( {1}"
+msgid "{0} must be one of: {1}"
 msgstr ""
 
 #: cms/static/js/programs/utils/validation_config.js
@@ -6722,13 +6729,11 @@ msgid "Generate Exception Certificates"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
-msgid ""
-"Generate certificates for all users on the Exception list who do not yet "
-"have a certificate"
+msgid "All users on the Exception list who do not yet have a certificate"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
-msgid "Generate a Certificate for all users on the Exception list"
+msgid "All users on the Exception list"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
@@ -6955,7 +6960,7 @@ msgid "Valid"
 msgstr ""
 
 #: lms/templates/learner_dashboard/certificate.underscore
-msgid "XSeries Program Certificates"
+msgid "Program Certificates"
 msgstr ""
 
 #: lms/templates/learner_dashboard/certificate.underscore
@@ -6971,7 +6976,7 @@ msgid "Congratulations! You have earned a certificate for this course."
 msgstr ""
 
 #: lms/templates/learner_dashboard/certificate_status.underscore
-msgid "View/Share Certificate"
+msgid "View Certificate"
 msgstr ""
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
@@ -7019,12 +7024,16 @@ msgstr ""
 msgid "Enrollment Opens on"
 msgstr ""
 
-#: lms/templates/learner_dashboard/empty_programs_list.underscore
-msgid "You are not enrolled in any XSeries Programs yet."
+#: lms/templates/learner_dashboard/course_enroll.underscore
+msgid "Not Currently Available"
 msgstr ""
 
 #: lms/templates/learner_dashboard/empty_programs_list.underscore
-msgid "Explore XSeries Programs"
+msgid "You are not enrolled in any programs yet."
+msgstr ""
+
+#: lms/templates/learner_dashboard/empty_programs_list.underscore
+msgid "Explore Programs"
 msgstr ""
 
 #: lms/templates/learner_dashboard/explore_new_programs.underscore
@@ -7034,11 +7043,11 @@ msgid ""
 msgstr ""
 
 #: lms/templates/learner_dashboard/explore_new_programs.underscore
-msgid "Explore New XSeries"
+msgid "Explore New Programs"
 msgstr ""
 
 #: lms/templates/learner_dashboard/program_card.underscore
-msgid "type"
+msgid "category"
 msgstr ""
 
 #: lms/templates/learner_dashboard/program_card.underscore
@@ -7170,12 +7179,6 @@ msgstr ""
 
 #: lms/templates/student_account/login.underscore
 msgid "Password Reset Email Sent"
-msgstr ""
-
-#: lms/templates/student_account/login.underscore
-msgid ""
-"We've sent instructions for resetting your password to the email address you"
-" provided."
 msgstr ""
 
 #: lms/templates/student_account/login.underscore
@@ -7917,6 +7920,27 @@ msgstr ""
 
 #: cms/templates/js/add-xblock-component-menu-problem.underscore
 msgid "Common Problem Types"
+msgstr ""
+
+#: cms/templates/js/add-xblock-component-support-legend.underscore
+msgid "Supported"
+msgstr ""
+
+#: cms/templates/js/add-xblock-component-support-legend.underscore
+msgid "Provisional"
+msgstr ""
+
+#: cms/templates/js/add-xblock-component-support-legend.underscore
+#: cms/templates/js/add-xblock-component-support-level.underscore
+msgid "Not Supported"
+msgstr ""
+
+#: cms/templates/js/add-xblock-component-support-level.underscore
+msgid "Fully Supported"
+msgstr ""
+
+#: cms/templates/js/add-xblock-component-support-level.underscore
+msgid "Provisionally Supported"
 msgstr ""
 
 #: cms/templates/js/add-xblock-component.underscore
@@ -9036,7 +9060,15 @@ msgid "Program type"
 msgstr ""
 
 #: cms/templates/js/programs/program_creator_form.underscore
+msgid "Select a type"
+msgstr ""
+
+#: cms/templates/js/programs/program_creator_form.underscore
 msgid "XSeries"
+msgstr ""
+
+#: cms/templates/js/programs/program_creator_form.underscore
+msgid "MicroMasters"
 msgstr ""
 
 #: cms/templates/js/programs/program_creator_form.underscore
