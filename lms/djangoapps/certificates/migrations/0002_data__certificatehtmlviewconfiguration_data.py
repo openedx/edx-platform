@@ -2,26 +2,29 @@
 
 from __future__ import unicode_literals
 import json
+import os
 
 # Converted from the original South migration 0020_certificatehtmlviewconfiguration_data.py
 
 from django.db import migrations, models
+from django.conf import settings
 
 
 def forwards(apps, schema_editor):
     """
     Bootstraps the HTML view template with some default configuration parameters
     """
+    _links = getattr(settings, "MKTG_URL_LINK_MAP", {})
     config = {
         "default": {
             "accomplishment_class_append": "accomplishment-certificate",
-            "platform_name": "Your Platform Name Here",
-            "company_about_url": "http://www.example.com/about-us",
-            "company_privacy_url": "http://www.example.com/privacy-policy",
-            "company_tos_url": "http://www.example.com/terms-service",
-            "company_verified_certificate_url": "http://www.example.com/verified-certificate",
-            "logo_src": "/static/certificates/images/logo.png",
-            "logo_url": "http://www.example.com"
+            "platform_name": getattr(settings, "PLATFORM_NAME", "Your Platform Name Here"),
+             "company_about_url": '/%s' % _links.get("ABOUT", ''),
+             "company_privacy_url": '/%s' % _links.get("PRIVACY", ''),
+             "company_tos_url": '/%s' % _links.get("TOS", ''),
+             "company_verified_certificate_url": "https://edx.org/verified-certificate",
+             "logo_src": "images/logo.png",
+             "logo_url": ""
         },
         "honor": {
             "certificate_type": "Honor Code",

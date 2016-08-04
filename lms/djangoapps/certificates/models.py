@@ -758,6 +758,7 @@ class CertificateGenerationConfiguration(ConfigurationModel):
     class Meta(ConfigurationModel.Meta):
         app_label = "certificates"
 
+CertificateGenerationConfiguration._meta.get_field('enabled').default = True
 
 class CertificateHtmlViewConfiguration(ConfigurationModel):
     """
@@ -775,11 +776,34 @@ class CertificateHtmlViewConfiguration(ConfigurationModel):
             }
         }
     """
+    _links = getattr(settings, "MKTG_URL_LINK_MAP", {})
+    default_config = {
+        "default": {
+            "accomplishment_class_append": "accomplishment-certificate",
+            "platform_name": getattr(settings, "PLATFORM_NAME", "Your Platform Name Here"),
+            "company_about_url": '/%s' % _links.get("ABOUT", ''),
+            "company_privacy_url": '/%s' % _links.get("PRIVACY", ''),
+            "company_tos_url": '/%s' % _links.get("TOS", ''),
+            "company_verified_certificate_url": "https://edx.org/verified-certificate",
+            "logo_src": "images/logo.png",
+            "logo_url": ""
+        },
+        "honor": {
+            "certificate_type": "Honor Code",
+            "certificate_title": "Certificate of Achievement",
+        },
+        "verified": {
+            "certificate_type": "Verified",
+            "certificate_title": "Verified Certificate of Achievement",
+        }
+    }
+
     class Meta(ConfigurationModel.Meta):
         app_label = "certificates"
 
     configuration = models.TextField(
-        help_text="Certificate HTML View Parameters (JSON)"
+        help_text="Certificate HTML View Parameters (JSON)",
+        default=json.dumps(default_config)
     )
 
     def clean(self):
@@ -800,6 +824,7 @@ class CertificateHtmlViewConfiguration(ConfigurationModel):
         json_data = json.loads(instance.configuration) if instance.enabled else {}
         return json_data
 
+CertificateHtmlViewConfiguration._meta.get_field('enabled').default = True
 
 class BadgeAssertion(models.Model):
     """
