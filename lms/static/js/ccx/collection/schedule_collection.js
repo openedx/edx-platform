@@ -1,3 +1,8 @@
+/* eslint quote-props: "off",
+   no-param-reassign: "off",
+   consistent-return: "off",
+   array-callback-return: "off"
+*/
 (function(define) {
     'use strict';
     define([
@@ -67,6 +72,7 @@
                 // hide child (can be chapter, sequential or vertical) in collection.
                 var scheduleJson = this.toJSON();
                 var errorMessage;
+                var unit;
 
                 var units = this.findLineage(
                     scheduleJson,
@@ -79,12 +85,12 @@
                     errorMessage = this.validUnitDates(startDate, dueDate, units[units.length - 1]);
                     if (!errorMessage) {
                         units.map(this.show);
-                        var unit = units[units.length - 1];
+                        unit = units[units.length - 1];
                         if (!_.isUndefined(unit)) {
                             unit.start = startDate;
                             unit.due = dueDate;
                             if (unit.category === 'sequential' && unit.children) {
-                                _.each(unit.children, function (vertical) {
+                                _.each(unit.children, function(vertical) {
                                     vertical.start = startDate;
                                     vertical.due = dueDate;
                                 });
@@ -138,19 +144,19 @@
                 if (!chapterLocation) {
                     return;
                 }
-                _.each(tree, function (chapter, chapterIndex) {
+                _.each(tree, function(chapter, chapterIndex) {
                     if (chapter.location === chapterLocation) {
                         if (chapter.location === unit.location) {
                             tree[chapterIndex] = unit;
                             return true;
                         }
-                        _.each(chapter.children, function (subSection, subSectionIndex) {
+                        _.each(chapter.children, function(subSection, subSectionIndex) {
                             if (subSection.location === sequentialLocation &&
                                 subSection.location === unit.location) {
                                 // update that subsection in tree
                                 tree[chapterIndex].children[subSectionIndex] = unit;
 
-                                _.each(subSection.children, function (__, verticalIndex) {
+                                _.each(subSection.children, function(__, verticalIndex) {
                                     // update start and due dates of verticals
                                     tree[chapterIndex].children[subSectionIndex].
                                         children[verticalIndex].start = unit.start;
@@ -169,14 +175,14 @@
             pruned: function(tree, filter) {
                 var self = this;
                 return tree.filter(filter)
-                    .map(function (node) {
+                    .map(function(node) {
                         var copy = {};
                         $.extend(copy, node);
                         if (node.children) {
                             copy.children = self.pruned(node.children, filter);
                         }
                         return copy;
-                    }).filter(function (node) {
+                    }).filter(function(node) {
                         return node.children === undefined || node.children.length;
                     });
             },
@@ -191,7 +197,7 @@
 
             changeVisibilityOfUnitInSchedule: function(units, applyVisibility) {
                 var self = this;
-                units.map(function (unit) {
+                units.map(function(unit) {
                     applyVisibility(unit);
                     if (unit !== undefined && unit.children !== undefined) {
                         self.changeVisibilityOfUnitInSchedule(unit.children, applyVisibility);
@@ -213,6 +219,8 @@
 
             validUnitDates: function(start, due, unit) {
                 var errorMessage;
+                var parsedDueDate;
+                var parsedStartDate;
                 // Start date is compulsory and due date is optional.
                 if (_.isEmpty(start) && !_.isEmpty(due)) {
                     errorMessage = StringUtils.interpolate(
@@ -220,11 +228,11 @@
                             'Please enter valid start ' +
                             'date and time for {type} "{displayName}".'
                         ),
-                        { 'displayName': unit.display_name, 'type': unit.category }
+                        {'displayName': unit.display_name, 'type': unit.category}
                     );
                 } else if (!_.isEmpty(start) && !_.isEmpty(due)) {
-                    var parsedDueDate = moment(due, 'YYYY-MM-DD HH:mm');
-                    var parsedStartDate = moment(start, 'YYYY-MM-DD HH:mm');
+                    parsedDueDate = moment(due, 'YYYY-MM-DD HH:mm');
+                    parsedStartDate = moment(start, 'YYYY-MM-DD HH:mm');
                     if (parsedDueDate.isBefore(parsedStartDate)) {
                         errorMessage = StringUtils.interpolate(
                             gettext(
@@ -241,9 +249,10 @@
             findLineage: function(tree, chapterLocation, sequentialLocation, verticalLocation) {
                 var units = [];
                 var chapter = this.findUnitAtLocation(tree, chapterLocation);
+                var sequential;
                 units[units.length] = chapter;
                 if (sequentialLocation) {
-                    var sequential = this.findUnitAtLocation(
+                    sequential = this.findUnitAtLocation(
                         chapter.children, sequentialLocation
                     );
                     units[units.length] = sequential;
@@ -262,7 +271,8 @@
             },
 
             findUnitAtLocation: function(seq, location) {
-                for (var i = 0; i < seq.length; i++) {
+                var i;
+                for (i = 0; i < seq.length; i++) {
                     if (seq[i].location === location) {
                         return seq[i];
                     }
