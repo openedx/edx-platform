@@ -100,13 +100,13 @@
 
   .cta-primary {
     display: inline-block;
-    background-color: palette(success, back);
-    border-color: palette(success, accent);
+    background-color: palette(success, text);
+    border-color: palette(success, text);
 
     &:active,
     &:focus,
     &:hover {
-      background-color: palette(success, back);
+      background-color: palette(success, accent);
       border-color: palette(success, accent);
     }
   }

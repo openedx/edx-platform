@@ -146,7 +146,7 @@
 
   .progress {
     height: 5px;
-    background: palette(grayscale, x-back);
+    background: palette(grayscale, back);
 
     .bar {
       @include float(left);
@@ -154,11 +154,11 @@
       position: relative;
 
       &.complete {
-        background: palette(success, back);
+        background: palette(success, accent);
       }
 
       &.in-progress {
-        background: palette(warning, back);
+        background: palette(warning, accent);
       }
     }
   }

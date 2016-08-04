@@ -22,7 +22,6 @@
   .aside {
     padding: $baseline;
     margin-bottom: $baseline;
-    background-color: $body-bg;
     box-sizing: border-box;
     border: 1px solid $border-color-l3;
   }
@@ -30,7 +29,7 @@
   .program-advertise {
     clear: both;
 
-    .btn-neutral {
+    .new-programs-btn {
       width: 100%;
       text-align: center;
       padding: 10px;
