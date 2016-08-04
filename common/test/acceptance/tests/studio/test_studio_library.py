@@ -13,7 +13,7 @@ from common.test.acceptance.pages.studio.library import LibraryEditPage
 from common.test.acceptance.pages.studio.users import LibraryUsersPage
 
 
-@attr('shard_2')
+@attr(shard=2)
 @ddt
 class LibraryEditPageTest(StudioLibraryTest):
     """
@@ -186,7 +186,7 @@ class LibraryEditPageTest(StudioLibraryTest):
         self.assertIn("Checkboxes", problem_block.name)
 
 
-@attr('shard_2')
+@attr(shard=2)
 @ddt
 class LibraryNavigationTest(StudioLibraryTest):
     """

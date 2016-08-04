@@ -17,7 +17,7 @@ from xmodule.modulestore.tests.factories import CourseFactory
 from bulk_email.models import BulkEmailFlag
 
 
-@attr('shard_1')
+@attr(shard=1)
 @patch('bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message', autospec=True))
 class TestOptoutCourseEmails(ModuleStoreTestCase):
     """

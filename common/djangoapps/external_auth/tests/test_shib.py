@@ -73,7 +73,7 @@ def gen_all_identities():
                     yield _build_identity_dict(mail, display_name, given_name, surname)
 
 
-@attr('shard_3')
+@attr(shard=3)
 @ddt
 @override_settings(SESSION_ENGINE='django.contrib.sessions.backends.cache')
 class ShibSPTest(CacheIsolationTestCase):

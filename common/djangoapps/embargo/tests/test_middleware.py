@@ -21,7 +21,7 @@ from embargo.models import RestrictedCourse, IPFilter
 from embargo.test_utils import restrict_course
 
 
-@attr('shard_3')
+@attr(shard=3)
 @ddt.ddt
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class EmbargoMiddlewareAccessTests(UrlResetMixin, ModuleStoreTestCase):

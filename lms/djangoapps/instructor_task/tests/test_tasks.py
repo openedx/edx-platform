@@ -214,7 +214,7 @@ class TestInstructorTasks(InstructorTaskModuleTestCase):
         self.assertEquals(output['traceback'][-3:], "...")
 
 
-@attr('shard_3')
+@attr(shard=3)
 class TestRescoreInstructorTask(TestInstructorTasks):
     """Tests problem-rescoring instructor task."""
 
@@ -317,7 +317,7 @@ class TestRescoreInstructorTask(TestInstructorTasks):
         self.assertGreater(output.get('duration_ms'), 0)
 
 
-@attr('shard_3')
+@attr(shard=3)
 class TestResetAttemptsInstructorTask(TestInstructorTasks):
     """Tests instructor task that resets problem attempts."""
 
@@ -416,7 +416,7 @@ class TestResetAttemptsInstructorTask(TestInstructorTasks):
         self._test_reset_with_student(True)
 
 
-@attr('shard_3')
+@attr(shard=3)
 class TestDeleteStateInstructorTask(TestInstructorTasks):
     """Tests instructor task that deletes problem state."""
 

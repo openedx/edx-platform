@@ -126,7 +126,7 @@ class EnrollmentTestMixin(object):
         self.assertEqual(actual_mode, expected_mode)
 
 
-@attr('shard_3')
+@attr(shard=3)
 @override_settings(EDX_API_KEY="i am a key")
 @ddt.ddt
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')

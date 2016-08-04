@@ -32,7 +32,7 @@ from edx_proctoring.api import create_exam
 from edx_proctoring.models import ProctoredExamStudentAttempt
 
 
-@attr('shard_3')
+@attr(shard=3)
 class TestAnalyticsBasic(ModuleStoreTestCase):
     """ Test basic analytics functions. """
 

@@ -14,7 +14,7 @@ from openedx.core.djangolib.js_utils import (
 )
 
 
-@attr('shard_2')
+@attr(shard=2)
 class TestJSUtils(TestCase):
     """
     Test JS utils

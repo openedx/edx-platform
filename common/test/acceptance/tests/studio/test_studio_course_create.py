@@ -10,7 +10,7 @@ from common.test.acceptance.pages.studio.index import DashboardPage
 from common.test.acceptance.pages.studio.overview import CourseOutlinePage
 
 
-@attr('shard_8')
+@attr(shard=8)
 class CreateCourseTest(WebAppTest):
     """
     Test that we can create a new course the studio home page.

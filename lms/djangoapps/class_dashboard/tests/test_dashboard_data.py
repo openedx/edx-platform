@@ -27,7 +27,7 @@ from class_dashboard.views import has_instructor_access_for_class
 USER_COUNT = 11
 
 
-@attr('shard_1')
+@attr(shard=1)
 class TestGetProblemGradeDistribution(SharedModuleStoreTestCase):
     """
     Tests related to class_dashboard/dashboard_data.py

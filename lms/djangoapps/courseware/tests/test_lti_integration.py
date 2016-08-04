@@ -18,7 +18,7 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.x_module import STUDENT_VIEW
 
 
-@attr('shard_1')
+@attr(shard=1)
 class TestLTI(BaseTestXmodule):
     """
     Integration test for lti xmodule.
@@ -124,7 +124,7 @@ class TestLTI(BaseTestXmodule):
         self.assertEqual(generated_content, expected_content)
 
 
-@attr('shard_1')
+@attr(shard=1)
 class TestLTIModuleListing(SharedModuleStoreTestCase):
     """
     a test for the rest endpoint that lists LTI modules in a course

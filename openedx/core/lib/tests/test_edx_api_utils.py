@@ -22,7 +22,7 @@ TEST_API_URL = 'http://www-internal.example.com/api'
 TEST_API_SIGNING_KEY = 'edx'
 
 
-@attr('shard_2')
+@attr(shard=2)
 @httpretty.activate
 class TestGetEdxApiData(ProgramsApiConfigMixin, CacheIsolationTestCase):
     """Tests for edX API data retrieval utility."""

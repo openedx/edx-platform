@@ -8,7 +8,7 @@ from nose.plugins.attrib import attr
 from branding.models import BrandingInfoConfig
 
 
-@attr('shard_1')
+@attr(shard=1)
 class BrandingInfoConfigTest(TestCase):
     """
     Test the BrandingInfoConfig model.

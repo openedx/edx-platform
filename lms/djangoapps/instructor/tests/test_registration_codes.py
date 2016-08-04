@@ -19,7 +19,7 @@ from django.test.utils import override_settings
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 
 
-@attr('shard_1')
+@attr(shard=1)
 @override_settings(REGISTRATION_CODE_LENGTH=8)
 class TestCourseRegistrationCodeStatus(SharedModuleStoreTestCase):
     """

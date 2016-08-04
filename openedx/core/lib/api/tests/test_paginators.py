@@ -13,7 +13,7 @@ from rest_framework import serializers
 from openedx.core.lib.api.paginators import NamespacedPageNumberPagination, paginate_search_results
 
 
-@attr('shard_2')
+@attr(shard=2)
 @ddt.ddt
 class PaginateSearchResultsTestCase(TestCase):
     """Test cases for paginate_search_results method"""
@@ -124,7 +124,7 @@ class PaginateSearchResultsTestCase(TestCase):
             paginate_search_results(self.mock_model, self.search_results, self.default_size, page_num)
 
 
-@attr('shard_2')
+@attr(shard=2)
 class NamespacedPaginationTestCase(TestCase):
     """
     Test behavior of `NamespacedPageNumberPagination`

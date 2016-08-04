@@ -23,7 +23,7 @@ class SignalDisconnectTestMixin(object):
         SignalHandler.course_published.disconnect(listen_for_course_publish)
 
 
-@attr('shard_2')
+@attr(shard=2)
 class CourseStructureTaskTests(ModuleStoreTestCase):
     """
     Test cases covering Course Structure task-related workflows

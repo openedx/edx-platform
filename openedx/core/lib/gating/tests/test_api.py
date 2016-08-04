@@ -14,7 +14,7 @@ from openedx.core.lib.gating.exceptions import GatingValidationError
 from student.tests.factories import UserFactory
 
 
-@attr('shard_2')
+@attr(shard=2)
 @ddt
 @patch.dict('django.conf.settings.FEATURES', {'MILESTONES_APP': True})
 class TestGatingApi(ModuleStoreTestCase, MilestonesTestCaseMixin):

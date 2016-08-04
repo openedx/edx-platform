@@ -10,7 +10,7 @@ from common.test.acceptance.pages.studio.users import CourseTeamPage
 from common.test.acceptance.pages.studio.index import DashboardPage
 
 
-@attr('shard_2')
+@attr(shard=2)
 class CourseTeamPageTest(StudioCourseTest):
     """ As a course author, I want to be able to add others to my team """
     def _make_user(self, username):

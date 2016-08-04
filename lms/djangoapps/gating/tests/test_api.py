@@ -115,7 +115,7 @@ class TestGetXBlockParent(GatingTestCase):
         self.assertIsNone(result)
 
 
-@attr('shard_3')
+@attr(shard=3)
 @ddt
 class TestEvaluatePrerequisite(GatingTestCase, MilestonesTestCaseMixin):
     """

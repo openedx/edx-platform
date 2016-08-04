@@ -7,7 +7,7 @@ from nose.plugins.attrib import attr
 from openedx.core.djangoapps.programs.tests.mixins import ProgramsApiConfigMixin
 
 
-@attr('shard_2')
+@attr(shard=2)
 @ddt.ddt
 # ConfigurationModels use the cache. Make every cache get a miss.
 @mock.patch('config_models.models.cache.get', return_value=None)

@@ -45,7 +45,7 @@ def _grade_with_errors(student, course):
     return grades_summary(student, course)
 
 
-@attr('shard_1')
+@attr(shard=1)
 class TestGradeIteration(SharedModuleStoreTestCase):
     """
     Test iteration through student gradesets.

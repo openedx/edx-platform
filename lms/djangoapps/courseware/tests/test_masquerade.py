@@ -151,7 +151,7 @@ class MasqueradeTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase, Mil
         self.assertEqual(show_answer_expected, "Show Answer" in problem_html)
 
 
-@attr('shard_1')
+@attr(shard=1)
 class NormalStudentVisibilityTest(MasqueradeTestCase):
     """
     Verify the course displays as expected for a "normal" student (to ensure test setup is correct).
@@ -206,7 +206,7 @@ class StaffMasqueradeTestCase(MasqueradeTestCase):
         return response
 
 
-@attr('shard_1')
+@attr(shard=1)
 class TestStaffMasqueradeAsStudent(StaffMasqueradeTestCase):
     """
     Check for staff being able to masquerade as student.
@@ -244,7 +244,7 @@ class TestStaffMasqueradeAsStudent(StaffMasqueradeTestCase):
         self.verify_show_answer_present(True)
 
 
-@attr('shard_1')
+@attr(shard=1)
 class TestStaffMasqueradeAsSpecificStudent(StaffMasqueradeTestCase, ProblemSubmissionTestMixin):
     """
     Check for staff being able to masquerade as a specific student.
@@ -362,7 +362,7 @@ class TestStaffMasqueradeAsSpecificStudent(StaffMasqueradeTestCase, ProblemSubmi
         self.assertIn("OOGIE BLOOGIE", content)
 
 
-@attr('shard_1')
+@attr(shard=1)
 class TestGetMasqueradingGroupId(StaffMasqueradeTestCase):
     """
     Check for staff being able to masquerade as belonging to a group.

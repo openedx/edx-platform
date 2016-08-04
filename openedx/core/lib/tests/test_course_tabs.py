@@ -9,7 +9,7 @@ import xmodule.tabs as xmodule_tabs
 from openedx.core.lib.course_tabs import CourseTabPluginManager
 
 
-@attr('shard_2')
+@attr(shard=2)
 class CourseTabPluginManagerTestCase(TestCase):
     """Test cases for CourseTabPluginManager class"""
 
@@ -39,7 +39,7 @@ class CourseTabPluginManagerTestCase(TestCase):
         )
 
 
-@attr('shard_2')
+@attr(shard=2)
 class KeyCheckerTestCase(TestCase):
     """Test cases for KeyChecker class"""
 
@@ -58,7 +58,7 @@ class KeyCheckerTestCase(TestCase):
             xmodule_tabs.key_checker(self.invalid_keys)(self.dict_value)
 
 
-@attr('shard_2')
+@attr(shard=2)
 class NeedNameTestCase(TestCase):
     """Test cases for NeedName validator"""
 

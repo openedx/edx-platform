@@ -21,7 +21,7 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 
 
-@attr('shard_1')
+@attr(shard=1)
 class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Check that view authentication works properly.
@@ -390,7 +390,7 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertTrue(self.enroll(self.course))
 
 
-@attr('shard_1')
+@attr(shard=1)
 class TestBetatesterAccess(ModuleStoreTestCase, CourseAccessTestMixin):
     """
     Tests for the beta tester feature

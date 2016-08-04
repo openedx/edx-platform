@@ -65,7 +65,7 @@ render_mock = Mock(side_effect=mock_render_to_response)
 postpay_mock = Mock()
 
 
-@attr('shard_3')
+@attr(shard=3)
 @patch.dict('django.conf.settings.FEATURES', {'ENABLE_PAID_COURSE_REGISTRATION': True})
 @ddt.ddt
 class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):

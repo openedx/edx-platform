@@ -17,7 +17,7 @@ from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
-@attr('shard_1')
+@attr(shard=1)
 class TestECommerceDashboardViews(SharedModuleStoreTestCase):
     """
     Check for E-commerce view on the new instructor dashboard

@@ -31,7 +31,7 @@ from lms.djangoapps.ccx.tests.factories import CcxFactory
 from openedx.core.djangoapps.content.block_structure.api import get_course_in_cache
 
 
-@attr('shard_3')
+@attr(shard=3)
 @mock.patch.dict(
     'django.conf.settings.FEATURES',
     {

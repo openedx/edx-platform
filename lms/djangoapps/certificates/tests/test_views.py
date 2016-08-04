@@ -36,7 +36,7 @@ FEATURES_WITH_CUSTOM_CERTS_ENABLED = {
 FEATURES_WITH_CUSTOM_CERTS_ENABLED.update(FEATURES_WITH_CERTS_ENABLED)
 
 
-@attr('shard_1')
+@attr(shard=1)
 @ddt.ddt
 class UpdateExampleCertificateViewTest(CacheIsolationTestCase):
     """Tests for the XQueue callback that updates example certificates. """
@@ -180,7 +180,7 @@ class UpdateExampleCertificateViewTest(CacheIsolationTestCase):
         self.assertEqual(content['return_code'], 0)
 
 
-@attr('shard_1')
+@attr(shard=1)
 class MicrositeCertificatesViewsTests(ModuleStoreTestCase):
     """
     Tests for the microsite certificates web/html views

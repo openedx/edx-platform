@@ -163,7 +163,7 @@ class LtiLaunchTest(LtiTestMixin, TestCase):
         self.assertEqual(consumer.instance_guid, u'consumer instance guid')
 
 
-@attr('shard_3')
+@attr(shard=3)
 class LtiLaunchTestRender(LtiTestMixin, RenderXBlockTestMixin, ModuleStoreTestCase):
     """
     Tests for the rendering returned by lti_launch view.

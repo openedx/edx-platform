@@ -13,7 +13,7 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from ..courses import course_image_url
 
 
-@attr('shard_2')
+@attr(shard=2)
 @ddt.ddt
 class CourseImageTestCase(ModuleStoreTestCase):
     """Tests for course image URLs."""

@@ -43,7 +43,7 @@ FEATURES_WITH_SSL_AUTH = settings.FEATURES.copy()
 FEATURES_WITH_SSL_AUTH['AUTH_USE_CERTIFICATES'] = True
 
 
-@attr('shard_3')
+@attr(shard=3)
 @override_settings(
     MONGODB_LOG=TEST_MONGODB_LOG,
     GIT_REPO_DIR=settings.TEST_ROOT / "course_repos_{}".format(uuid4().hex)

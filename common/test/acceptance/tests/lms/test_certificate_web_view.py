@@ -13,7 +13,7 @@ from common.test.acceptance.pages.lms.course_nav import CourseNavPage
 from common.test.acceptance.pages.lms.progress import ProgressPage
 
 
-@attr('shard_5')
+@attr(shard=5)
 class CertificateWebViewTest(EventsTestMixin, UniqueCourseTest):
     """
     Tests for verifying certificate web view features
@@ -94,7 +94,7 @@ class CertificateWebViewTest(EventsTestMixin, UniqueCourseTest):
         self.assert_events_match(expected_events, actual_events)
 
 
-@attr('shard_5')
+@attr(shard=5)
 class CertificateProgressPageTest(UniqueCourseTest):
     """
     Tests for verifying Certificate info on Progress tab of course page.

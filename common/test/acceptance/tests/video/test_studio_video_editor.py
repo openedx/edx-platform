@@ -7,7 +7,7 @@ from nose.plugins.attrib import attr
 from common.test.acceptance.tests.video.test_studio_video_module import CMSVideoBaseTest
 
 
-@attr('shard_6')
+@attr(shard=6)
 class VideoEditorTest(CMSVideoBaseTest):
     """
     CMS Video Editor Test Class

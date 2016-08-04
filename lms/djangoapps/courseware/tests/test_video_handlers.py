@@ -123,7 +123,7 @@ def attach_bumper_transcript(item, filename, lang="en"):
     item.video_bumper["transcripts"][lang] = filename
 
 
-@attr('shard_1')
+@attr(shard=1)
 class TestVideo(BaseTestXmodule):
     """Integration tests: web client + mongo."""
     CATEGORY = "video"
@@ -189,7 +189,7 @@ class TestVideo(BaseTestXmodule):
         super(TestVideo, self).tearDown()
 
 
-@attr('shard_1')
+@attr(shard=1)
 class TestTranscriptAvailableTranslationsDispatch(TestVideo):
     """
     Test video handler that provide available translations info.
@@ -249,7 +249,7 @@ class TestTranscriptAvailableTranslationsDispatch(TestVideo):
         self.assertEqual(json.loads(response.body), ['en', 'uk'])
 
 
-@attr('shard_1')
+@attr(shard=1)
 @ddt.ddt
 class TestTranscriptAvailableTranslationsBumperDispatch(TestVideo):
     """
@@ -372,7 +372,7 @@ class TestTranscriptDownloadDispatch(TestVideo):
         self.assertEqual(response.headers['Content-Disposition'], 'attachment; filename="塞.srt"')
 
 
-@attr('shard_1')
+@attr(shard=1)
 @ddt.ddt
 class TestTranscriptTranslationGetDispatch(TestVideo):
     """
@@ -604,7 +604,7 @@ class TestTranscriptTranslationGetDispatch(TestVideo):
             store.update_item(self.course, self.user.id)
 
 
-@attr('shard_1')
+@attr(shard=1)
 class TestStudioTranscriptTranslationGetDispatch(TestVideo):
     """
     Test Studio video handler that provide translation transcripts.
@@ -662,7 +662,7 @@ class TestStudioTranscriptTranslationGetDispatch(TestVideo):
         self.assertEqual(response.headers['Content-Language'], 'zh')
 
 
-@attr('shard_1')
+@attr(shard=1)
 class TestStudioTranscriptTranslationPostDispatch(TestVideo):
     """
     Test Studio video handler that provide translation transcripts.
@@ -723,7 +723,7 @@ class TestStudioTranscriptTranslationPostDispatch(TestVideo):
         self.assertTrue(_check_asset(self.item_descriptor.location, u'filename.srt'))
 
 
-@attr('shard_1')
+@attr(shard=1)
 class TestGetTranscript(TestVideo):
     """
     Make sure that `get_transcript` method works correctly

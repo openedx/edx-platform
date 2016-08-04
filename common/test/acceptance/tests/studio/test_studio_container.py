@@ -72,7 +72,7 @@ class NestedVerticalTest(ContainerBase):
 
 
 @skip("Flaky: 01/16/2015")
-@attr('shard_1')
+@attr(shard=1)
 class DragAndDropTest(NestedVerticalTest):
     """
     Tests of reordering within the container page.
@@ -152,7 +152,7 @@ class DragAndDropTest(NestedVerticalTest):
         self.do_action_and_verify(add_new_components_and_rearrange, expected_ordering)
 
 
-@attr('shard_1')
+@attr(shard=1)
 class AddComponentTest(NestedVerticalTest):
     """
     Tests of adding a component to the container page.
@@ -192,7 +192,7 @@ class AddComponentTest(NestedVerticalTest):
         self.add_and_verify(container_menu, expected_ordering)
 
 
-@attr('shard_1')
+@attr(shard=1)
 class DuplicateComponentTest(NestedVerticalTest):
     """
     Tests of duplicating a component on the container page.
@@ -238,7 +238,7 @@ class DuplicateComponentTest(NestedVerticalTest):
         self.do_action_and_verify(duplicate_twice, expected_ordering)
 
 
-@attr('shard_1')
+@attr(shard=1)
 class DeleteComponentTest(NestedVerticalTest):
     """
     Tests of deleting a component from the container page.
@@ -261,7 +261,7 @@ class DeleteComponentTest(NestedVerticalTest):
         self.delete_and_verify(group_a_item_1_delete_index, expected_ordering)
 
 
-@attr('shard_1')
+@attr(shard=1)
 class EditContainerTest(NestedVerticalTest):
     """
     Tests of editing a container.
@@ -312,7 +312,7 @@ class EditContainerTest(NestedVerticalTest):
         self.assertEqual(component.student_content, "modified content")
 
 
-@attr('shard_3')
+@attr(shard=3)
 class EditVisibilityModalTest(ContainerBase):
     """
     Tests of the visibility settings modal for components on the unit
@@ -572,7 +572,7 @@ class EditVisibilityModalTest(ContainerBase):
         self.verify_visibility_set(self.html_component, True)
 
 
-@attr('shard_1')
+@attr(shard=1)
 class UnitPublishingTest(ContainerBase):
     """
     Tests of the publishing control and related widgets on the Unit page.
@@ -1042,7 +1042,7 @@ class UnitPublishingTest(ContainerBase):
     #     self.assertEqual('discussion', self.courseware.xblock_component_type(1))
 
 
-@attr('shard_3')
+@attr(shard=3)
 class DisplayNameTest(ContainerBase):
     """
     Test consistent use of display_name_with_default
@@ -1079,7 +1079,7 @@ class DisplayNameTest(ContainerBase):
         self.assertEqual(container.name, title_on_unit_page)
 
 
-@attr('shard_3')
+@attr(shard=3)
 class ProblemCategoryTabsTest(ContainerBase):
     """
     Test to verify tabs in problem category.

@@ -21,7 +21,7 @@ from openedx.core.djangoapps.course_groups.models import CourseCohort
 from opaque_keys.edx.keys import CourseKey
 
 
-@attr('shard_1')
+@attr(shard=1)
 @patch('bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message', autospec=True))
 class CourseEmailTest(TestCase):
     """Test the CourseEmail model."""
@@ -82,7 +82,7 @@ class CourseEmailTest(TestCase):
         self.assertEqual(target.long_display(), 'Cohort: test cohort')
 
 
-@attr('shard_1')
+@attr(shard=1)
 class NoCourseEmailTemplateTest(TestCase):
     """Test the CourseEmailTemplate model without loading the template data."""
 
@@ -91,7 +91,7 @@ class NoCourseEmailTemplateTest(TestCase):
             CourseEmailTemplate.get_template()
 
 
-@attr('shard_1')
+@attr(shard=1)
 class CourseEmailTemplateTest(TestCase):
     """Test the CourseEmailTemplate model."""
 
@@ -190,7 +190,7 @@ class CourseEmailTemplateTest(TestCase):
         self.assertIn(context['name'], message)
 
 
-@attr('shard_1')
+@attr(shard=1)
 class CourseAuthorizationTest(TestCase):
     """Test the CourseAuthorization model."""
 

@@ -19,7 +19,7 @@ from common.test.acceptance.tests.helpers import (
 )
 
 
-@attr('shard_4')
+@attr(shard=4)
 class StudioSettingsDetailsTest(StudioCourseTest):
     """Base class for settings and details page tests."""
 
@@ -37,7 +37,7 @@ class StudioSettingsDetailsTest(StudioCourseTest):
         self.assertTrue(self.settings_detail.is_browser_on_page())
 
 
-@attr('shard_4')
+@attr(shard=4)
 class SettingsMilestonesTest(StudioSettingsDetailsTest):
     """
     Tests for milestones feature in Studio's settings tab
@@ -206,7 +206,7 @@ class SettingsMilestonesTest(StudioSettingsDetailsTest):
         ))
 
 
-@attr('shard_4')
+@attr(shard=4)
 class CoursePacingTest(StudioSettingsDetailsTest):
     """Tests for setting a course to self-paced."""
 

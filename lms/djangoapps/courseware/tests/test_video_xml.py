@@ -35,7 +35,7 @@ SOURCE_XML = """
 """
 
 
-@attr('shard_1')
+@attr(shard=1)
 class VideoModuleLogicTest(LogicTest):
     """Tests for logic of Video Xmodule."""
 

@@ -41,7 +41,7 @@ MARKETING_URL = 'https://www.example.com/marketing/path'
 
 
 @ddt.ddt
-@attr('shard_2')
+@attr(shard=2)
 @httpretty.activate
 @skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class TestProgramRetrieval(ProgramsApiConfigMixin, ProgramsDataMixin, CredentialsDataMixin,
@@ -262,7 +262,7 @@ class GetCompletedCoursesTestCase(TestCase):
         ])
 
 
-@attr('shard_2')
+@attr(shard=2)
 @httpretty.activate
 @skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class TestProgramProgressMeter(ProgramsApiConfigMixin, TestCase):

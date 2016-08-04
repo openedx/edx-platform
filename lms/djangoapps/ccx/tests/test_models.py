@@ -25,7 +25,7 @@ from ..overrides import override_field_for_ccx
 
 
 @ddt.ddt
-@attr('shard_1')
+@attr(shard=1)
 class TestCCX(ModuleStoreTestCase):
     """Unit tests for the CustomCourseForEdX model
     """

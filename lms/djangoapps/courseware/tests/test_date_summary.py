@@ -29,7 +29,7 @@ from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
-@attr('shard_1')
+@attr(shard=1)
 @ddt.ddt
 class CourseDateSummaryTest(SharedModuleStoreTestCase):
     """Tests for course date summary blocks."""

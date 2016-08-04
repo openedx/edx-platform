@@ -223,7 +223,7 @@ class TextbooksTestCase(TabTestCase):
         self.assertEquals(num_textbooks_found, self.num_textbooks)
 
 
-@attr('shard_1')
+@attr(shard=1)
 class StaticTabDateTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase):
     """Test cases for Static Tab Dates."""
 
@@ -279,7 +279,7 @@ class StaticTabDateTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase):
             self.assertIn("this module is temporarily unavailable", static_tab)
 
 
-@attr('shard_1')
+@attr(shard=1)
 class StaticTabDateTestCaseXML(LoginEnrollmentTestCase, ModuleStoreTestCase):
     """
     Tests for the static tab dates of an XML course
@@ -329,7 +329,7 @@ class StaticTabDateTestCaseXML(LoginEnrollmentTestCase, ModuleStoreTestCase):
         self.assertIn(self.xml_data, resp.content)
 
 
-@attr('shard_1')
+@attr(shard=1)
 @patch.dict('django.conf.settings.FEATURES', {'ENTRANCE_EXAMS': True, 'MILESTONES_APP': True})
 class EntranceExamsTabsTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, MilestonesTestCaseMixin):
     """
@@ -437,7 +437,7 @@ class EntranceExamsTabsTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, Mi
         self.assertEqual(len(course_tab_list), 5)
 
 
-@attr('shard_1')
+@attr(shard=1)
 class TextBookCourseViewsTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase):
     """
     Validate tab behavior when dealing with textbooks.
@@ -562,7 +562,7 @@ class TabListTestCase(TabTestCase):
         self.all_valid_tab_list = xmodule_tabs.CourseTabList().from_json(self.valid_tabs[1])
 
 
-@attr('shard_1')
+@attr(shard=1)
 class ValidateTabsTestCase(TabListTestCase):
     """Test cases for validating tabs."""
 
@@ -592,7 +592,7 @@ class ValidateTabsTestCase(TabListTestCase):
         )
 
 
-@attr('shard_1')
+@attr(shard=1)
 class CourseTabListTestCase(TabListTestCase):
     """Testing the generator method for iterating through displayable tabs"""
 
@@ -687,7 +687,7 @@ class CourseTabListTestCase(TabListTestCase):
             self.assertEquals(xmodule_tabs.CourseTabList.get_tab_by_id(self.course.tabs, tab.tab_id), tab)
 
 
-@attr('shard_1')
+@attr(shard=1)
 class ProgressTestCase(TabTestCase):
     """Test cases for Progress Tab."""
 
@@ -717,7 +717,7 @@ class ProgressTestCase(TabTestCase):
         )
 
 
-@attr('shard_1')
+@attr(shard=1)
 class StaticTabTestCase(TabTestCase):
     """Test cases for Static Tab."""
 
@@ -736,7 +736,7 @@ class StaticTabTestCase(TabTestCase):
         self.check_get_and_set_method_for_key(tab, 'url_slug')
 
 
-@attr('shard_1')
+@attr(shard=1)
 class DiscussionLinkTestCase(TabTestCase):
     """Test cases for discussion link tab."""
 

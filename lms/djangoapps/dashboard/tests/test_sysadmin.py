@@ -109,7 +109,7 @@ class SysadminBaseTestCase(SharedModuleStoreTestCase):
         self.addCleanup(shutil.rmtree, path)
 
 
-@attr('shard_1')
+@attr(shard=1)
 @override_settings(
     MONGODB_LOG=TEST_MONGODB_LOG,
     GIT_REPO_DIR=settings.TEST_ROOT / "course_repos_{}".format(uuid4().hex)

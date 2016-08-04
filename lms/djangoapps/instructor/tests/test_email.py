@@ -17,7 +17,7 @@ from student.tests.factories import AdminFactory
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
-@attr('shard_1')
+@attr(shard=1)
 class TestNewInstructorDashboardEmailViewMongoBacked(SharedModuleStoreTestCase):
     """
     Check for email view on the new instructor dashboard
@@ -110,7 +110,7 @@ class TestNewInstructorDashboardEmailViewMongoBacked(SharedModuleStoreTestCase):
         self.assertNotIn(self.email_link, response.content)
 
 
-@attr('shard_1')
+@attr(shard=1)
 class TestNewInstructorDashboardEmailViewXMLBacked(SharedModuleStoreTestCase):
     """
     Check for email view on the new instructor dashboard

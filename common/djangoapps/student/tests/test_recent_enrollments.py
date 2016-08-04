@@ -20,7 +20,7 @@ from student.views import get_course_enrollments, _get_recently_enrolled_courses
 from common.test.utils import XssTestMixin
 
 
-@attr('shard_3')
+@attr(shard=3)
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 @ddt.ddt
 class TestRecentEnrollments(ModuleStoreTestCase, XssTestMixin):

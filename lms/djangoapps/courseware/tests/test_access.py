@@ -143,7 +143,7 @@ class CoachAccessTestCaseCCX(SharedModuleStoreTestCase, LoginEnrollmentTestCase)
         self.assertEqual(resp.status_code, 404)
 
 
-@attr('shard_1')
+@attr(shard=1)
 @ddt.ddt
 class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, MilestonesTestCaseMixin):
     """
@@ -608,7 +608,7 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, MilestonesTes
         self.assertEqual(response.status_code, 200)
 
 
-@attr('shard_1')
+@attr(shard=1)
 class UserRoleTestCase(TestCase):
     """
     Tests for user roles.
@@ -665,7 +665,7 @@ class UserRoleTestCase(TestCase):
         )
 
 
-@attr('shard_3')
+@attr(shard=3)
 @ddt.ddt
 class CourseOverviewAccessTestCase(ModuleStoreTestCase):
     """
