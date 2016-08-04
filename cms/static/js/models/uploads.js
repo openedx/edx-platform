@@ -15,7 +15,7 @@ var FileUpload = Backbone.Model.extend({
     validate: function(attrs, options) {
         if(attrs.selectedFile && !this.checkTypeValidity(attrs.selectedFile)) {
             return {
-                message: _.template(gettext("Only <%= fileTypes %> files can be uploaded. Please select a file ending in <%= fileExtensions %> to upload."))( // jshint ignore:line
+                message: _.template(gettext('Only <%= fileTypes %> files can be uploaded. Please select a file ending in <%= fileExtensions %> to upload.'))(  // eslint-disable-line max-len
                     this.formatValidTypes()
                 ),
                 attributes: {selectedFile: true}

@@ -44,7 +44,7 @@
                     return HtmlUtils.joinHtml(
                         this.indicators.success,
                         StringUtils.interpolate(
-                            gettext('We\'ve sent a confirmation message to {new_email_address}. Click the link in the message to update your email address.'), /* jshint ignore:line */
+                            gettext('We\'ve sent a confirmation message to {new_email_address}. Click the link in the message to update your email address.'),  // eslint-disable-line max-len
                             {'new_email_address': this.fieldValue()}
                         )
                     );
@@ -70,7 +70,7 @@
                             view.showNotificationMessage(
                                 HtmlUtils.joinHtml(
                                     view.indicators.error,
-                                    gettext('You must sign out and sign back in before your language changes take effect.') // jshint ignore:line
+                                    gettext('You must sign out and sign back in before your language changes take effect.')  // eslint-disable-line max-len
                                 )
                             );
                         }
@@ -114,7 +114,7 @@
                     return HtmlUtils.joinHtml(
                         this.indicators.success,
                         StringUtils.interpolate(
-                            gettext('We\'ve sent a message to {email_address}. Click the link in the message to reset your password.'), /* jshint ignore:line */
+                            gettext('We\'ve sent a message to {email_address}. Click the link in the message to reset your password.'),  // eslint-disable-line max-len
                             {'email_address': this.model.get(this.options.emailAttribute)}
                         )
                     );
@@ -161,7 +161,7 @@
                         linkTitle = gettext('Unlink This Account');
                         linkClass = 'social-field-linked';
                         subTitle = StringUtils.interpolate(
-                            gettext('You can use your {accountName} account to sign in to your {platformName} account.'), /* jshint ignore:line */
+                            gettext('You can use your {accountName} account to sign in to your {platformName} account.'),  // eslint-disable-line max-len
                             {accountName: this.options.title, platformName: this.options.platformName}
                         );
                         screenReaderTitle = StringUtils.interpolate(
@@ -172,7 +172,7 @@
                         linkTitle = gettext('Link Your Account');
                         linkClass = 'social-field-unlinked';
                         subTitle = StringUtils.interpolate(
-                            gettext('Link your {accountName} account to your {platformName} account and use {accountName} to sign in to {platformName}.'), /* jshint ignore:line */
+                            gettext('Link your {accountName} account to your {platformName} account and use {accountName} to sign in to {platformName}.'),  // eslint-disable-line max-len
                             {accountName: this.options.title, platformName: this.options.platformName}
                         );
                     }
@@ -236,7 +236,7 @@
                     return HtmlUtils.joinHtml(this.indicators.success, gettext('Successfully unlinked.'));
                 }
             }),
-            
+
             OrderHistoryFieldView: FieldViews.ReadonlyFieldView.extend({
                 fieldType: 'orderHistory',
                 fieldTemplate: field_order_history_template,

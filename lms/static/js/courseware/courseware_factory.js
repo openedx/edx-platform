@@ -20,7 +20,7 @@
                 });
 
                 // 2. instantiating this button attaches events to all buttons in the courseware.
-                new BookmarksListButton(); // jshint ignore:line
+                new BookmarksListButton();  // eslint-disable-line no-new
             };
         }
     );

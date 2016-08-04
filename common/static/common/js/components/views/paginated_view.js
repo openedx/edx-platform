@@ -72,7 +72,7 @@
 
             renderError: function () {
                 this.$el.text(
-                    gettext('Your request could not be completed. Reload the page and try again. If the issue persists, click the Help tab to report the problem.') // jshint ignore: line
+                    gettext('Your request could not be completed. Reload the page and try again. If the issue persists, click the Help tab to report the problem.')  // eslint-disable-line max-len
                 );
             },
 

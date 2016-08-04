@@ -135,12 +135,11 @@
                     it(
                         "body with " + numImages + " images and " + (truncatedText ? "truncated" : "untruncated") +
                         " text",
-                        // suppressing Don't make functions within a loop.
-                        /* jshint -W083 */
+                        // eslint-disable no-loop-func
                         function() {
                             return checkPostWithImages(numImages, truncatedText, this.threadData, this.imageTag);
                         }
-                        /* jshint +W083 */
+                        // eslint-enable no-loop-func
                     );
                 }
             }

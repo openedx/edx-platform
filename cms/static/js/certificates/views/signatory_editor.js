@@ -1,6 +1,6 @@
 // Backbone Application View: Signatory Editor
 
-define([ // jshint ignore:line
+define([
     'jquery',
     'underscore',
     'backbone',

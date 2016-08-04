@@ -2,7 +2,7 @@
 // User can preview the certificate web layout/styles. 'Preview Certificate' button will open a new tab in LMS for
 // the selected course mode from the drop down.
 
-define([ // jshint ignore:line
+define([
     'underscore',
     'gettext',
     'js/views/baseview',

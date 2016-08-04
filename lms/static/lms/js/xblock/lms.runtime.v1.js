@@ -1,3 +1,5 @@
+/* globals URI */
+
 (function(URI) {
     'use strict';
 
@@ -51,5 +53,4 @@
         return v1;
 
     })(XBlock.Runtime.v1);
-
-}).call(this, URI);  // jshint ignore:line
+}).call(this, URI);

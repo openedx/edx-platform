@@ -32,7 +32,7 @@ define(
         template: [
             '<div class="speeds menu-container" role="application">',
                 '<p class="sr instructions" id="speed-instructions">',
-                    gettext('Press UP to enter the speed menu then use the UP and DOWN arrow keys to navigate the different speeds, then press ENTER to change to the selected speed.'), // jshint ignore: line
+                    gettext('Press UP to enter the speed menu then use the UP and DOWN arrow keys to navigate the different speeds, then press ENTER to change to the selected speed.'),  // eslint-disable-line max-len, indent
                 '</p>',
                 '<button class="control speed-button" aria-disabled="false" aria-expanded="false"',
                     'title="',
@@ -242,20 +242,20 @@ define(
             this.resetActiveSpeed();
             this.setActiveSpeed(speed);
         },
-        
+
         resetActiveSpeed: function() {
             var speedOptions = this.speedsContainer.find('li');
-            
+
             $(speedOptions).each(function(index, el) {
                 $(el).removeClass('is-active')
                     .find('.speed-option')
                     .attr('aria-pressed', 'false');
             });
         },
-        
+
         setActiveSpeed: function(speed) {
             var speedOption = this.speedsContainer.find('li[data-speed="' + speed + '"]');
-            
+
             speedOption.addClass('is-active')
                 .find('.speed-option')
                 .attr('aria-pressed', 'true');
@@ -280,7 +280,7 @@ define(
         clickLinkHandler: function (event) {
             var el = $(event.currentTarget).parent(),
                 speed = $(el).data('speed');
-                
+
             this.resetActiveSpeed();
             this.setActiveSpeed(speed);
             this.state.videoCommands.execute('speed', speed);

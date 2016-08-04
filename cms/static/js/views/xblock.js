@@ -106,7 +106,7 @@ define(["jquery", "underscore", "common/js/components/utils/view_utils", "js/vie
              * may have thrown JavaScript errors after rendering in which case the xblock parameter
              * will be null.
              */
-            xblockReady: function(xblock) {  // jshint ignore:line
+            xblockReady: function(xblock) {  // eslint-disable-line no-unused-vars
                 // Do nothing
             },
 

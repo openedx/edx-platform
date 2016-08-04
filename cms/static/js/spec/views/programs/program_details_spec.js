@@ -10,7 +10,6 @@ define([
               ProgramDetailsView, constants ) {
         'use strict';
 
-        /* jshint maxlen: 300 */
         describe('ProgramDetailsView', function () {
             var view = {},
                 model = {},
@@ -36,7 +35,7 @@ define([
                         end: null,
                         enrollment_start: null,
                         enrollment_end: null,
-                        blocks_url: 'http://127.0.0.1:8000/api/courses/v1/blocks/?course_id=course-v1%3AedX%2BDemoX%2BDemo_Course'
+                        blocks_url: 'http://127.0.0.1:8000/api/courses/v1/blocks/?course_id=course-v1%3AedX%2BDemoX%2BDemo_Course'  // eslint-disable-line max-len
                     },
                     {
                         id: 'course-v1:edx+Krampus25+2015_12_05',
@@ -59,7 +58,7 @@ define([
                         end: null,
                         enrollment_start: null,
                         enrollment_end: null,
-                        blocks_url: 'http://127.0.0.1:8000/api/courses/v1/blocks/?course_id=course-v1%3Aedx%2BKrampus25%2B2015_12_05'
+                        blocks_url: 'http://127.0.0.1:8000/api/courses/v1/blocks/?course_id=course-v1%3Aedx%2BKrampus25%2B2015_12_05'  // eslint-disable-line max-len
                     },
                     {
                         id: 'course-v1:edx+shiaLB101+2016_01',
@@ -82,7 +81,7 @@ define([
                         end: null,
                         enrollment_start: null,
                         enrollment_end: null,
-                        blocks_url: 'http://127.0.0.1:8000/api/courses/v1/blocks/?course_id=course-v1%3Aedx%2BshiaLB101%2B2016_01'
+                        blocks_url: 'http://127.0.0.1:8000/api/courses/v1/blocks/?course_id=course-v1%3Aedx%2BshiaLB101%2B2016_01'  // eslint-disable-line max-len
                     }
                 ],
                 programData = {
@@ -381,7 +380,7 @@ define([
                     addCourse();
                     expect( view.$(runSelect).length ).toEqual(0);
                     view.$('.js-add-course-run').first().click();
-                    
+
                     $runSelect = view.$(runSelect);
                     expect( $runSelect.length ).toEqual(1);
                     expect( view.$('.js-remove-run').length ).toEqual(savedRunCount);
@@ -402,7 +401,7 @@ define([
                     $courseView = view.$('.course-container').last();
                     $addRunBtn = $courseView.find('.js-add-course-run');
                     $addRunBtn.click();
-                    
+
                     expect( view.$(runSelect).length ).toEqual(1);
                     expect( view.$(runSelect).find('option').length ).toEqual(courseRunOptionsCount);
 

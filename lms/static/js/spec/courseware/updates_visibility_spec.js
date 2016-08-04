@@ -6,9 +6,7 @@ define(['jquery', 'logger', 'js/courseware/toggle_element_visibility', 'moment']
 
             beforeEach(function() {
                 loadFixtures('js/fixtures/courseware/course_updates.html');
-                /*jshint newcap: false */
                 ToggleElementVisibility();
-                /*jshint newcap: true */
                 spyOn(Logger, 'log');
             });
 

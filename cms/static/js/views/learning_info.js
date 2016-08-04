@@ -1,6 +1,6 @@
 // Backbone Application View: Course Learning Information
 
-define([ // jshint ignore:line
+define([
     'jquery',
     'underscore',
     'backbone',

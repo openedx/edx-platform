@@ -39,7 +39,7 @@
                 var fields = html || '';
                 this.successMessage = HtmlUtils.interpolateHtml(
                     // eslint-disable-next-line
-                    gettext('We have sent an email message with password reset instructions to the email address you provided.  If you do not receive this message, {anchorStart}contact technical support{anchorEnd}.'), {  // jshint ignore:line
+                    gettext('We have sent an email message with password reset instructions to the email address you provided.  If you do not receive this message, {anchorStart}contact technical support{anchorEnd}.'), {  // eslint-disable-line max-len
                         anchorStart: HtmlUtils.HTML('<a href="' + this.supportURL + '">'),
                         anchorEnd: HtmlUtils.HTML('</a>')
                     }
@@ -151,4 +151,3 @@
         });
     });
 }).call(this, define || RequireJS.define);
-

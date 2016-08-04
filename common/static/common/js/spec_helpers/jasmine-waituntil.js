@@ -1,12 +1,11 @@
+/* eslint-env node */
 
 // Takes a latch function and optionally timeout and error message.
 // Polls the latch function until the it returns true or the maximum timeout expires
 // whichever comes first.
 (function(root, factory) {
-    /* jshint strict: false */
     factory(root, root.jQuery);
 }((function() {
-    /* jshint strict: false */
     return this;
 }()), function(window, $) {
     'use strict';
@@ -30,7 +29,7 @@
             } else {
                 if (elapsedTimeInMs >= maxTimeout) {
                     // explicitly fail the spec with the given message
-                    fail(message); // jshint ignore:line
+                    fail(message);
 
                     // clear timeout and reject the promise
                     realClearTimeout(timeout);

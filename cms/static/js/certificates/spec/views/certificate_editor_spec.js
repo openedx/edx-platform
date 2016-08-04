@@ -1,6 +1,6 @@
 // Jasmine Test Suite: Certifiate Editor View
 
-define([ // jshint ignore:line
+define([
     'underscore',
     'js/models/course',
     'js/certificates/models/certificate',
@@ -119,7 +119,7 @@ function(_, Course, CertificateModel, SignatoryModel, CertificatesCollection, Ce
                 max_signatories_limit: MAX_SIGNATORIES_LIMIT
             });
             appendSetFixtures(this.view.render().el);
-            CustomMatchers(); // jshint ignore:line
+            CustomMatchers();
         });
 
         afterEach(function() {

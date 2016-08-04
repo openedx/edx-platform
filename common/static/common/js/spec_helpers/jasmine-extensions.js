@@ -1,3 +1,5 @@
+/* eslint-env node */
+
 // Extensions to Jasmine.
 //
 // This file adds the following:
@@ -9,7 +11,6 @@
 //    jQuery has been loaded, we set these matchers up again in this module.
 
 (function(root, factory) {
-    /* jshint strict: false */
     if (typeof define === 'function' && define.amd) {
         require(['jquery'], function ($) {
             factory(root, $);
@@ -18,7 +19,6 @@
         factory(root, root.jQuery);
     }
 }((function() {
-    /* jshint strict: false */
     return this;
 }()), function(window, $) {
     'use strict';
@@ -91,7 +91,7 @@
         });
     });
 
-    /* jshint ignore:start */
+    /* eslint-disable */
     // All the code below is taken from:
     // https://github.com/velesin/jasmine-jquery/blob/2.1.1/lib/jasmine-jquery.js
     beforeEach(function() {
@@ -271,5 +271,5 @@
             data.handlers = [];
         }
     };
-    /* jshint ignore:end */
+    /* eslint-enable */
 }));

@@ -1,5 +1,6 @@
+/* eslint-env node */
+
 // Custom library to replace the legacy non jasmine 2.0 compatible jasmine-stealth
-// jshint ignore: start
 (function (root, factory) {
     factory(root, root.jasmine, root._);
 }((function () {

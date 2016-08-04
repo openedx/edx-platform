@@ -580,22 +580,22 @@ function (Component) {
             },
             options = {
                 items: [{
-                    label: i18n['Play'], // jshint ignore:line
+                    label: i18n.Play,
                     callback: function () {
                         state.videoCommands.execute('togglePlayback');
                     },
                     initialize: function (menuitem) {
                         state.el.on({
                             'play': function () {
-                                menuitem.setLabel(i18n['Pause']); // jshint ignore:line
+                                menuitem.setLabel(i18n.Pause);
                             },
                             'pause': function () {
-                                menuitem.setLabel(i18n['Play']); // jshint ignore:line
+                                menuitem.setLabel(i18n.Play);
                             }
                         });
                     }
                 }, {
-                    label: state.videoVolumeControl.getMuteStatus() ? i18n['Unmute'] : i18n['Mute'], // jshint ignore:line
+                    label: state.videoVolumeControl.getMuteStatus() ? i18n.Unmute : i18n.Mute,
                     callback: function () {
                         state.videoCommands.execute('toggleMute');
                     },
@@ -603,9 +603,9 @@ function (Component) {
                         state.el.on({
                             'volumechange': function () {
                                 if (state.videoVolumeControl.getMuteStatus()) {
-                                    menuitem.setLabel(i18n['Unmute']); // jshint ignore:line
+                                    menuitem.setLabel(i18n.Unmute);
                                 } else {
-                                    menuitem.setLabel(i18n['Mute']); // jshint ignore:line
+                                    menuitem.setLabel(i18n.Mute);
                                 }
                             }
                         });
@@ -627,7 +627,7 @@ function (Component) {
                         });
                     }
                 }, {
-                    label: i18n['Speed'], // jshint ignore:line
+                    label: i18n.Speed,
                     items: _.map(state.speeds, function (speed) {
                         var isSelected = speed === state.speed;
                         return {label: speed + 'x', callback: speedCallback, speed: speed, isSelected: isSelected};

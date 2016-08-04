@@ -1,6 +1,6 @@
 // Backbone Application View: Certificates List
 
-define([ // jshint ignore:line
+define([
     'gettext',
     'js/views/list',
     'js/certificates/views/certificate_item'

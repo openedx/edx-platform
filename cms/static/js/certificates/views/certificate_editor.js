@@ -1,6 +1,6 @@
 // Backbone Application View: Certificate Editor
 
-define([ // jshint ignore:line
+define([
     'jquery',
     'underscore',
     'backbone',
@@ -83,7 +83,7 @@ function($, _, Backbone, gettext,
 
         addSignatory: function() {
             // Append a new signatory to the certificate model's signatories collection
-            var signatory = new SignatoryModel({certificate: this.getSaveableModel()}); // jshint ignore:line
+            var signatory = new SignatoryModel({certificate: this.getSaveableModel()});  // eslint-disable-line max-len, no-unused-vars
             this.render();
         },
 

@@ -27,13 +27,10 @@
                     sort: sort_preference
                 });
                 course_settings = new DiscussionCourseSettings(element.data("course-settings"));
-                // suppressing Do not use 'new' for side effects.
-                /* jshint -W031*/
-                new DiscussionRouter({
+                new DiscussionRouter({  // eslint-disable-line no-new
                     discussion: discussion,
                     course_settings: course_settings
                 });
-                /* jshint +W031*/
                 if (!Backbone.History.started) {
                     Backbone.history.start({pushState: true, root: "/courses/" + $$course_id + "/discussion/forum/"});
                 } else {

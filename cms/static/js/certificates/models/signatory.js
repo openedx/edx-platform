@@ -1,6 +1,6 @@
 // Backbone.js Application Model: Certificate Signatory
 
-define([ // jshint ignore:line
+define([
     'underscore',
     'backbone',
     'backbone-relational'

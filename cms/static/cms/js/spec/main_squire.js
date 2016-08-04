@@ -1,3 +1,5 @@
+/* globals requirejs, requireSerial */
+
 (function(requirejs, requireSerial) {
     'use strict';
 
@@ -21,9 +23,9 @@
             'jquery.cookie': 'xmodule_js/common_static/js/vendor/jquery.cookie',
             'jquery.qtip': 'xmodule_js/common_static/js/vendor/jquery.qtip.min',
             'jquery.fileupload': 'xmodule_js/common_static/js/vendor/jQuery-File-Upload/js/jquery.fileupload',
-            'jquery.fileupload-process': 'xmodule_js/common_static/js/vendor/jQuery-File-Upload/js/jquery.fileupload-process',  // jshint ignore:line
-            'jquery.fileupload-validate': 'xmodule_js/common_static/js/vendor/jQuery-File-Upload/js/jquery.fileupload-validate',  // jshint ignore:line
-            'jquery.iframe-transport': 'xmodule_js/common_static/js/vendor/jQuery-File-Upload/js/jquery.iframe-transport',  // jshint ignore:line
+            'jquery.fileupload-process': 'xmodule_js/common_static/js/vendor/jQuery-File-Upload/js/jquery.fileupload-process',   // eslint-disable-line max-len
+            'jquery.fileupload-validate': 'xmodule_js/common_static/js/vendor/jQuery-File-Upload/js/jquery.fileupload-validate',   // eslint-disable-line max-len
+            'jquery.iframe-transport': 'xmodule_js/common_static/js/vendor/jQuery-File-Upload/js/jquery.iframe-transport',   // eslint-disable-line max-len
             'jquery.inputnumber': 'xmodule_js/common_static/js/vendor/html5-input-polyfills/number-polyfill',
             'jquery.immediateDescendents': 'xmodule_js/common_static/coffee/src/jquery.immediateDescendents',
             'datepair': 'xmodule_js/common_static/js/vendor/timepicker/datepair',
@@ -46,7 +48,7 @@
             'draggabilly': 'xmodule_js/common_static/js/vendor/draggabilly',
             'domReady': 'xmodule_js/common_static/js/vendor/domReady',
             'URI': 'xmodule_js/common_static/js/vendor/URI.min',
-            'mathjax': '//cdn.mathjax.org/mathjax/2.6-latest/MathJax.js?config=TeX-MML-AM_SVG&delayStartupUntil=configured',  // jshint ignore:line
+            mathjax: '//cdn.mathjax.org/mathjax/2.6-latest/MathJax.js?config=TeX-MML-AM_SVG&delayStartupUntil=configured',   // eslint-disable-line max-len
             'youtube': '//www.youtube.com/player_api?noext',
             'coffee/src/ajax_prefix': 'xmodule_js/common_static/coffee/src/ajax_prefix'
         },
@@ -206,5 +208,4 @@
     requireSerial(specHelpers.concat(testFiles), function() {
         return window.__karma__.start();
     });
-
-}).call(this, requirejs, requireSerial);  // jshint ignore:line
+}).call(this, requirejs, requireSerial);
