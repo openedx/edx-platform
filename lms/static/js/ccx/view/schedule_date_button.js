@@ -1,28 +1,27 @@
-;(function (define) {
+(function(define) {
     'use strict';
     define([
-            'backbone',
-            'jquery',
-            'underscore',
-            'gettext',
-            'text!templates/ccx/underscore/date-button.underscore',
-            'edx-ui-toolkit/js/utils/html-utils'
-        ],
-        function (Backbone,
-                  $,
-                  _,
-                  gettext,
-                  scheduleTreeDateButtonTemplate,
-                  HtmlUtils) {
+        'backbone',
+        'jquery',
+        'underscore',
+        'gettext',
+        'text!templates/ccx/underscore/date-button.underscore',
+        'edx-ui-toolkit/js/utils/html-utils'
+    ], function(Backbone,
+        $,
+        _,
+        gettext,
+        scheduleTreeDateButtonTemplate,
+        HtmlUtils) {
             return Backbone.View.extend({
 
-                initialize: function (options) {
+                initialize: function(options) {
                     this.dateType = options.dateType;
                     this.date = options.date;
                     this.template = HtmlUtils.template(scheduleTreeDateButtonTemplate);
                 },
 
-                render: function () {
+                render: function() {
                     HtmlUtils.setHtml(
                         this.$el,
                         this.template({date: this.date})
@@ -36,7 +35,7 @@
                     return this;
                 },
 
-                editDateCCXSchedule: function () {
+                editDateCCXSchedule: function() {
                     var self = this;
                     return function () {
                         var dateParts;

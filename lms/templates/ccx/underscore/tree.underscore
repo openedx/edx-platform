@@ -1,10 +1,10 @@
 <div>
   <div align="right">
     <button id="ccx_expand_all_btn" class="ccx-button-link">
-      <i class="fa fa-expand" aria-hidden="true"></i> <%- gettext('Expand All') %>
+      <span class="fa fa-expand" aria-hidden="true"></span> <%- gettext('Expand All') %>
     </button>
     <button id="ccx_collapse_all_btn" class="ccx-button-link">
-      <i class="fa fa-compress" aria-hidden="true"></i> <%- gettext('Collapse All') %>
+      <span class="fa fa-compress" aria-hidden="true"></span> <%- gettext('Collapse All') %>
     </button>
   </div>
   <br/>
@@ -18,7 +18,7 @@
         <th scope="col"><%- gettext('Start Date') %></th>
         <th scope="col"><%- gettext('Due Date') %></th>
         <th scope="col"><button id="remove-all" class="ccx-button-link">
-          <i class="fa fa-remove" aria-hidden="true"></i> <%- gettext('remove all') %>
+          <span class="fa fa-remove" aria-hidden="true"></span> <%- gettext('remove all') %>
         </button></th>
       </tr>
     </thead>

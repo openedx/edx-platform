@@ -1,21 +1,21 @@
-;(function (define) {
+(function(define) {
     'use strict';
     define([
-            'backbone',
-            'jquery',
-            'underscore',
-            'js/ccx/view/schedule_date_button',
-            'text!templates/ccx/underscore/unit.underscore',
-            'text!templates/ccx/underscore/tree.underscore',
-            'edx-ui-toolkit/js/utils/html-utils'
-        ],
-        function (Backbone,
-                  $,
-                  _,
-                  DateButtonView,
-                  scheduleTreeNodeTemplate,
-                  scheduleTreeContentTemplate,
-                  HtmlUtils) {
+        'backbone',
+        'jquery',
+        'underscore',
+        'js/ccx/view/schedule_date_button',
+        'text!templates/ccx/underscore/unit.underscore',
+        'text!templates/ccx/underscore/tree.underscore',
+        'edx-ui-toolkit/js/utils/html-utils'
+    ], function (
+        Backbone,
+        $,
+        _,
+        DateButtonView,
+        scheduleTreeNodeTemplate,
+        scheduleTreeContentTemplate,
+        HtmlUtils) {
             return Backbone.View.extend({
 
                 events: {

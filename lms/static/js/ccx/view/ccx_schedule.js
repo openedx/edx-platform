@@ -1,24 +1,23 @@
 ;(function (define) {
     'use strict';
     define([
-            'backbone',
-            'jquery',
-            'underscore',
-            'js/ccx/view/schedule_tree',
-            'js/ccx/view/schedule_right_container',
-            'text!templates/ccx/underscore/schedule.underscore',
-            'edx-ui-toolkit/js/utils/html-utils'
-        ],
-        function (Backbone,
-                  $,
-                  _,
-                  ScheduleTree,
-                  ScheduleRightContainerView,
-                  scheduleTemplate,
-                  HtmlUtils) {
+        'backbone',
+        'jquery',
+        'underscore',
+        'js/ccx/view/schedule_tree',
+        'js/ccx/view/schedule_right_container',
+        'text!templates/ccx/underscore/schedule.underscore',
+        'edx-ui-toolkit/js/utils/html-utils'
+    ], function(Backbone,
+        $,
+        _,
+        ScheduleTree,
+        ScheduleRightContainerView,
+        scheduleTemplate,
+        HtmlUtils) {
             return Backbone.View.extend({
 
-                initialize: function (options) {
+                initialize: function(options) {
                     var self = this;
                     this.template = HtmlUtils.template(scheduleTemplate);
                     this.saveCCXScheduleUrl = options.saveCCXScheduleUrl;
@@ -29,7 +28,7 @@
                     });
                 },
 
-                render: function () {
+                render: function() {
                     HtmlUtils.setHtml(
                         this.$el,
                         this.template()
@@ -39,7 +38,7 @@
                     return this;
                 },
 
-                loadScheduleRightContainer: function () {
+                loadScheduleRightContainer: function() {
                     // Right container consist of a form and alert messages.
                     this.scheduleRightContainer = new ScheduleRightContainerView({
                         el: this.$("#ccx-schedule-form"),
@@ -66,7 +65,7 @@
                     );
                 },
 
-                loadScheduleTree: function () {
+                loadScheduleTree: function() {
                     // This data will be render on schedule tree.
                     this.scheduleTreeView = new ScheduleTree({
                         el: this.$("#new-ccx-schedule"),
@@ -91,7 +90,7 @@
                     );
                 },
 
-                saveSchedule: function () {
+                saveSchedule: function() {
                     // saves schedule on server.
                     var self = this;
                     Backbone.ajax({
@@ -112,7 +111,7 @@
                     });
                 },
 
-                applyUnitToScheduleTree: function (dateType,
+                applyUnitToScheduleTree: function(dateType,
                                                    newDate,
                                                    chapterLocation,
                                                    sequentialLocation,
@@ -130,7 +129,7 @@
                     }
                 },
 
-                hideUnitFromScheduleTree: function (chapterLocation, sequentialLocation,
+                hideUnitFromScheduleTree: function(chapterLocation, sequentialLocation,
                                                     verticalLocation) {
                     // hide child (can be chapter, sequential or vertical) in collection.
                     this.collection.hideUnitFromScheduleTree(
@@ -140,12 +139,12 @@
                     );
                 },
 
-                hideAllUnitFromScheduleTree: function () {
+                hideAllUnitFromScheduleTree: function() {
                     // clear schedule tree on remove all click
                     this.collection.hideAllUnitFromScheduleTree();
                 },
 
-                showUnitInScheduleTree: function (chapterLocation, sequentialLocation, verticalLocation,
+                showUnitInScheduleTree: function(chapterLocation, sequentialLocation, verticalLocation,
                                                   startDate, dueDate) {
                     // hide child (can be chapter, sequential or vertical) in collection.
                     this.errorMessage = this.collection.showUnitInScheduleTree(
@@ -161,13 +160,13 @@
                     }
                 },
 
-                showAllUnitsInScheduleTree: function () {
+                showAllUnitsInScheduleTree: function() {
                     // show all units i.e chapters, subsections and verticals
                     // in schedule tree
                     this.collection.showAllUnitsInScheduleTree();
                 },
 
-                showErrorMessage: function () {
+                showErrorMessage: function() {
                     if (this.errorMessage) {
                         HtmlUtils.setHtml(
                             this.$('#ccx_schedule_error_message'),
