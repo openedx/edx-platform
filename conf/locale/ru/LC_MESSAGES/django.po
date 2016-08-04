@@ -738,7 +738,7 @@ msgstr "Группа с названием \"{}\" не была найдена -
 
 #: common/djangoapps/student/management/commands/manage_group.py
 msgid "Invalid group name: \"{group_name}\". {messages}"
-msgstr "Недействительное название группы:  \"{группа_имя}\". {сообщения}"
+msgstr "Недействительное название группы:  \"{group_name}\". {messages}"
 
 #: common/djangoapps/student/management/commands/manage_group.py
 msgid "Created new group: \"{}\""
@@ -750,11 +750,11 @@ msgstr "Найти существующую группу: \"{}\""
 
 #: common/djangoapps/student/management/commands/manage_group.py
 msgid "Adding {codenames} permissions to group \"{group}\""
-msgstr "Редактировать  {кодовыеимена} права доступа к группе  \"{группа}\""
+msgstr "Редактировать {codenames} права доступа к группе \"{group}\""
 
 #: common/djangoapps/student/management/commands/manage_group.py
 msgid "Removing {codenames} permissions from group \"{group}\""
-msgstr "Удалить  {кодовыеимена} права доступа с группы \"{группа}\""
+msgstr "Удалить {codenames} права доступа с группы \"{group}\""
 
 #: common/djangoapps/student/management/commands/manage_group.py
 msgid ""
@@ -769,14 +769,12 @@ msgid ""
 "Invalid permission codename: \"{codename}\".  No such permission exists for "
 "the model {module}.{model_name}."
 msgstr ""
-"Неподтвержденные кодовые имена прав доступа:  \"{кодовоеимя}\". Не "
-"существует прав доступа к модели {мордуль}.{модель_имя}."
+"Неподтвержденные кодовые имена прав доступа: \"{codename}\". Не существует "
+"прав доступа к модели {module}.{model_name}."
 
 #: common/djangoapps/student/management/commands/manage_user.py
 msgid "Setting {attribute} for user \"{username}\" to \"{new_value}\""
-msgstr ""
-"Настройки {аттрибут} для пользователя \"{имяпользователя}\" на "
-"\"{новое_значение}\""
+msgstr "Настройки {attribute} для пользователя \"{username}\" на \"{new_value}\""
 
 #: common/djangoapps/student/management/commands/manage_user.py
 msgid ""
@@ -816,11 +814,11 @@ msgstr "Невозможно найти группу названную \"{}\" -
 
 #: common/djangoapps/student/management/commands/manage_user.py
 msgid "Adding user \"{username}\" to groups {group_names}"
-msgstr "Редактировать пользователя \"{имяпользователя}\" в группу {группа_имена}"
+msgstr "Редактировать пользователя \"{username}\" в группу {group_names}"
 
 #: common/djangoapps/student/management/commands/manage_user.py
 msgid "Removing user \"{username}\" from groups {group_names}"
-msgstr "Удаление пользователя  \"{имяпользователя}\" с группы {группа_имена}"
+msgstr "Удаление пользователя \"{username}\" с группы {group_names}"
 
 #: common/djangoapps/student/middleware.py
 msgid ""

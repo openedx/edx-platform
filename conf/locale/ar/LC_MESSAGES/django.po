@@ -93,6 +93,7 @@
 # Nabeel El-Dughailib <nabeel@qordoba.com>, 2014-2015
 # Najwan Al Rousan <najwanrousan@gmail.com>, 2013-2014
 # Najwan Al Rousan <najwanrousan@gmail.com>, 2013
+# Ned Batchelder <ned@edx.org>, 2016
 # omarithawi <oithawi@qrf.org>, 2014-2016
 # Osama M. Mneina <o.mneina@gmail.com>, 2014
 # Sarina Canelake <sarina@edx.org>, 2014
@@ -11427,7 +11428,7 @@ msgid ""
 "{begin_strong}Warning:{end_strong} Your browser is not fully supported. We "
 "strongly recommend using {chrome_link} or {ff_link}."
 msgstr ""
-"{beging_strong}تحذير:{end_strong} متصفحك غير مدعوم. ننصحك باستخدام "
+"{begin_strong}تحذير:{end_strong} متصفحك غير مدعوم. ننصحك باستخدام "
 "{chrome_link} أو {ff_link}."
 
 #: lms/templates/notes.html lms/templates/textannotation.html

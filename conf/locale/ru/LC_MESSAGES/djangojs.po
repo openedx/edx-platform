@@ -27,6 +27,7 @@
 # mcha121 <mcha-12-1@bk.ru>, 2014
 # Michael Orlov <mike.orlv@gmail.com>, 2015
 # Michael Savin <m.savin.ru@gmail.com>, 2015-2016
+# Ned Batchelder <ned@edx.org>, 2016
 # Ничик Дмитрий Валерьевич <dmi.nichik@gmail.com>, 2013
 # Nikolay K Medvedev <elsin16@gmail.com>, 2014
 # Olga <olg.makarova@gmail.com>, 2014
@@ -2327,13 +2328,11 @@ msgstr ""
 
 #: common/static/common/js/components/views/paging_header.js
 msgid "Showing {firstIndex} out of {numItems} total"
-msgstr "Показывать совокупность {первогоиндекса} к {количествуэлементов} "
+msgstr "Показывать совокупность {firstIndex} к {numItems} "
 
 #: common/static/common/js/components/views/paging_header.js
 msgid "Showing {firstIndex}-{lastIndex} out of {numItems} total"
-msgstr ""
-"Показывать совокупность  {первогоиндекса}-{последнегоиндекса} к "
-"{количествуэлементов} "
+msgstr "Показывать совокупность {firstIndex}-{lastIndex} к {numItems} "
 
 #: common/static/common/js/discussion/utils.js
 msgid ""
@@ -2955,7 +2954,7 @@ msgstr "Поиск команды"
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "Showing results for \"{searchString}\""
-msgstr "Отображение результатов для \"{Строка поиска}\""
+msgstr "Отображение результатов для \"{searchString}\""
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "Create a New Team"
@@ -4579,7 +4578,7 @@ msgid ""
 "{platform_name}."
 msgstr ""
 "Вы можете связать свои аккаунты в социальных сетях для упрощения входа в "
-"{PLATFORM_NAME}."
+"{platform_name}."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "ORDER NAME"
@@ -4634,7 +4633,7 @@ msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_fields.js
 msgid "Link your {accountName} account"
-msgstr "Свяжите свой {Имяаккаунта} аккаунт "
+msgstr "Свяжите свой {accountName} аккаунт "
 
 #: lms/static/js/student_account/views/account_settings_fields.js
 msgid "Unlink This Account"
@@ -4650,7 +4649,7 @@ msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_fields.js
 msgid "Unlink your {accountName} account"
-msgstr "Отвяжите свой {Имяаккаунта} аккаунт "
+msgstr "Отвяжите свой {accountName} аккаунт "
 
 #: lms/static/js/student_account/views/account_settings_fields.js
 msgid "Link Your Account"
@@ -6037,8 +6036,8 @@ msgstr ""
 msgid ""
 "For grading to work, you must change all {oldName} subsections to {newName}."
 msgstr ""
-"Для классификации по работе, вам необходимо изменить все {Староеимя} в "
-"подраздел  {Новоеимя}."
+"Для классификации по работе, вам необходимо изменить все {oldName} в "
+"подраздел  {newName}."
 
 #: cms/static/js/views/settings/main.js
 msgid "Course Credit Requirements"
@@ -6054,7 +6053,7 @@ msgstr "Порядок курса не может быть изменен, по�
 
 #: cms/static/js/views/settings/main.js
 msgid "{hours}:{minutes} (current UTC time)"
-msgstr "{часы}:{минуты} (текущее время UTC)"
+msgstr "{hours}:{minutes} (текущее время UTC)"
 
 #: cms/static/js/views/settings/main.js
 msgid "Upload your course image."
