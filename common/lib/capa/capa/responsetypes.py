@@ -68,7 +68,6 @@ QUESTION_HINT_INCORRECT_STYLE = 'feedback-hint-incorrect'
 QUESTION_HINT_LABEL_STYLE = 'hint-label'
 QUESTION_HINT_TEXT_STYLE = 'hint-text'
 QUESTION_HINT_MULTILINE = 'feedback-hint-multi'
-RESPONSE_LABEL = _(u'Question')
 
 #-----------------------------------------------------------------------------
 # Exceptions
@@ -251,15 +250,18 @@ class LoncapaResponse(object):
           - renderer : procedure which produces HTML given an ElementTree
           - response_msg: a message displayed at the end of the Response
         """
+        _ = self.capa_system.i18n.ugettext
 
         # get responsetype index to make responsetype label
         response_index = self.xml.attrib['id'].split('_')[-1]
+        # Translators: index here could be 1,2,3 and so on
+        response_label = _(u'Question {index}').format(index=response_index)
 
         # wrap the content inside a section
         tree = etree.Element('section')
         tree.set('class', 'wrapper-problem-response')
         tree.set('tabindex', '-1')
-        tree.set('aria-label', RESPONSE_LABEL + ' ' + response_index)
+        tree.set('aria-label', response_label)
 
         # problem author can make this span display:inline
         if self.xml.get('inline', ''):
