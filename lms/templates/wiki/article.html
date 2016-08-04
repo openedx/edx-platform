@@ -16,6 +16,7 @@
     <article class="main-article" id="main-article">
         {% if selected_tab != "edit" %}
           <h1>{{ article.current_revision.title }}</h1>
+          <h1>{{ article.current_revision.title|truncatechars:30 }}</h1>
 
         {% endif %}
 
