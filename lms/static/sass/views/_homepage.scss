@@ -91,11 +91,15 @@ $learn-more-horizontal-position: calc(50% - 100px); // calculate the left positi
         .course-organization {
           @include line-height(11);
           padding: ($baseline/2) ($baseline*0.75) ($baseline/10) ($baseline*0.75);
+          text-overflow: ellipsis;
+          overflow: hidden;
         }
 
         .course-code {
           @include line-height(16);
           padding: 0 ($baseline*0.75);
+          text-overflow: ellipsis;
+          overflow: hidden;
         }
 
         .course-title {
@@ -105,6 +109,8 @@ $learn-more-horizontal-position: calc(50% - 100px); // calculate the left positi
           padding: 0 ($baseline*0.75);
           height: $course-title-height;
           color: $link-color;
+          text-overflow: ellipsis;
+          overflow: hidden;
         }
 
         .course-date {
