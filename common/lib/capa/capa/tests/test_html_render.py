@@ -155,7 +155,7 @@ class CapaHtmlRenderTest(unittest.TestCase):
         question_element = rendered_html.find("p")
         self.assertEqual(question_element.text, "Test question")
 
-        # Expect that the response has been turned into a <span>
+        # Expect that the response has been turned into a <section>
         response_element = rendered_html.find("section")
         self.assertEqual(response_element.tag, "section")
 

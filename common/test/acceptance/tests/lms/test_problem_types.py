@@ -332,9 +332,6 @@ class CheckboxProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         Additional setup for CheckboxProblemTypeTest
         """
         super(CheckboxProblemTypeTest, self).setUp(*args, **kwargs)
-        self.problem_page.a11y_audit.config.set_rules({
-            'ignore': []
-        })
 
     def answer_problem(self, correct):
         """
@@ -372,9 +369,6 @@ class MultipleChoiceProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         Additional setup for MultipleChoiceProblemTypeTest
         """
         super(MultipleChoiceProblemTypeTest, self).setUp(*args, **kwargs)
-        self.problem_page.a11y_audit.config.set_rules({
-            'ignore': []
-        })
 
     def answer_problem(self, correct):
         """
@@ -412,9 +406,6 @@ class RadioProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         Additional setup for RadioProblemTypeTest
         """
         super(RadioProblemTypeTest, self).setUp(*args, **kwargs)
-        self.problem_page.a11y_audit.config.set_rules({
-            'ignore': []
-        })
 
     def answer_problem(self, correct):
         """
@@ -784,9 +775,6 @@ class RadioTextProblemTypeTest(ChoiceTextProbelmTypeTestBase, ProblemTypeTestMix
         Additional setup for RadioTextProblemTypeTest
         """
         super(RadioTextProblemTypeTest, self).setUp(*args, **kwargs)
-        self.problem_page.a11y_audit.config.set_rules({
-            'ignore': []
-        })
 
 
 class CheckboxTextProblemTypeTest(ChoiceTextProbelmTypeTestBase, ProblemTypeTestMixin):
@@ -813,9 +801,6 @@ class CheckboxTextProblemTypeTest(ChoiceTextProbelmTypeTestBase, ProblemTypeTest
         Additional setup for CheckboxTextProblemTypeTest
         """
         super(CheckboxTextProblemTypeTest, self).setUp(*args, **kwargs)
-        self.problem_page.a11y_audit.config.set_rules({
-            'ignore': []
-        })
 
 
 class ImageProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):

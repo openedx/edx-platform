@@ -68,7 +68,7 @@ QUESTION_HINT_INCORRECT_STYLE = 'feedback-hint-incorrect'
 QUESTION_HINT_LABEL_STYLE = 'hint-label'
 QUESTION_HINT_TEXT_STYLE = 'hint-text'
 QUESTION_HINT_MULTILINE = 'feedback-hint-multi'
-RESPONSE_LABEL = _('Question')
+RESPONSE_LABEL = _(u'Question')
 
 #-----------------------------------------------------------------------------
 # Exceptions
