@@ -1,9 +1,9 @@
-(function () {
+(function() {
     'use strict';
     var origAjax = $.ajax;
 
     var stubbedYT = {
-        Player: function () {
+        Player: function() {
             var Player = jasmine.createSpyObj(
                 'YT.Player',
                 [
@@ -33,7 +33,7 @@
             BUFFERING: 3,
             CUED: 5
         },
-        ready: function (f) {
+        ready: function(f) {
             return f();
         }
     };
@@ -43,7 +43,7 @@
 
     window.STATUS = window.YT.PlayerState;
 
-    window.onTouchBasedDevice = function () {
+    window.onTouchBasedDevice = function() {
         return navigator.userAgent.match(/iPhone|iPod|iPad/i);
     };
 
@@ -77,31 +77,31 @@
 
     jasmine.stubbedMetadata = {
         '7tqY6eQzVhE': {
-            contentDetails : {
+            contentDetails: {
                 id: '7tqY6eQzVhE',
                 duration: 'PT5M0S'
             }
         },
         'cogebirgzzM': {
-            contentDetails : {
+            contentDetails: {
                 id: 'cogebirgzzM',
                 duration: 'PT3M20S'
             }
         },
         'abcdefghijkl': {
-            contentDetails : {
+            contentDetails: {
                 id: 'abcdefghijkl',
                 duration: 'PT6M40S'
             }
         },
         bogus: {
-            contentDetails : {
+            contentDetails: {
                 duration: 'PT1M40S'
             }
         }
     };
 
-    jasmine.fireEvent = function (el, eventName) {
+    jasmine.fireEvent = function(el, eventName) {
         var event;
 
         if (document.createEvent) {
@@ -123,20 +123,20 @@
 
     jasmine.stubbedHtml5Speeds = ['0.75', '1.0', '1.25', '1.50'];
 
-    jasmine.stubRequests = function () {
+    jasmine.stubRequests = function() {
         var spy = $.ajax;
         if (!jasmine.isSpy($.ajax)) {
             spy = spyOn($, 'ajax');
         }
 
-        return spy.and.callFake(function (settings) {
+        return spy.and.callFake(function(settings) {
             var match = settings.url
                     .match(/googleapis\.com\/.+\/videos\/\?id=(.+)&part=contentDetails/),
                 status, callCallback;
             if (match) {
                 status = match[1].split('_');
                 if (status && status[0] === 'status') {
-                    callCallback = function (callback) {
+                    callCallback = function(callback) {
                         callback.call(window, {}, status[1]);
                     };
 
@@ -151,10 +151,10 @@
                     });
                 } else {
                     return {
-                        always: function (callback) {
+                        always: function(callback) {
                             return callback.call(window, {}, 'success');
                         },
-                        done: function (callback) {
+                        done: function(callback) {
                             return callback.call(window, {}, 'success');
                         }
                     };
@@ -177,7 +177,7 @@
                 return;
             } else if (settings.url === '/save_user_state') {
                 return {success: true};
-            } else if(settings.url.match(new RegExp(jasmine.getFixtures().fixturesPath + ".+", 'g'))) {
+            } else if (settings.url.match(new RegExp(jasmine.getFixtures().fixturesPath + '.+', 'g'))) {
                 return origAjax(settings);
             } else {
                 $.ajax.and.callThrough();
@@ -196,9 +196,9 @@
 
     // Stub window.Video.loadYouTubeIFrameAPI()
     window.Video.loadYouTubeIFrameAPI = jasmine.createSpy('window.Video.loadYouTubeIFrameAPI').and.returnValue(
-        function (scriptTag) {
+        function(scriptTag) {
             var event = document.createEvent('Event');
-            if (fixture === "video.html") {
+            if (fixture === 'video.html') {
                 event.initEvent('load', false, false);
             } else {
                 event.initEvent('error', false, false);
@@ -207,7 +207,7 @@
         }
     );
 
-    jasmine.initializePlayer = function (fixture, params) {
+    jasmine.initializePlayer = function(fixture, params) {
         var state;
 
         if (_.isString(fixture)) {
@@ -235,7 +235,7 @@
         jasmine.stubRequests();
         state = new window.Video('#example');
 
-        state.resizer = (function () {
+        state.resizer = (function() {
             var methods = [
                     'align',
                     'alignByWidthOnly',
@@ -251,7 +251,7 @@
                     reset: jasmine.createSpy().and.returnValue(obj)
                 };
 
-            $.each(methods, function (index, method) {
+            $.each(methods, function(index, method) {
                 obj[method] = jasmine.createSpy(method).and.returnValue(obj);
             });
 
@@ -264,7 +264,7 @@
         return state;
     };
 
-    jasmine.initializePlayerYouTube = function (params) {
+    jasmine.initializePlayerYouTube = function(params) {
         // "video.html" contains HTML template for a YouTube video.
         return jasmine.initializePlayer('video.html', params);
     };

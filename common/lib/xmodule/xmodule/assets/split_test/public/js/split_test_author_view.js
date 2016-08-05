@@ -1,10 +1,10 @@
 /* JavaScript for editing operations that can be done on the split test author view. */
-window.SplitTestAuthorView = function (runtime, element) {
-    "use strict";
+window.SplitTestAuthorView = function(runtime, element) {
+    'use strict';
     var $element = $(element);
     var splitTestLocator = $element.closest('.studio-xblock-wrapper').data('locator');
 
-    runtime.listenTo("add-missing-groups", function (parentLocator) {
+    runtime.listenTo('add-missing-groups', function(parentLocator) {
         if (splitTestLocator === parentLocator) {
             runtime.notify('save', {
                 state: 'start',

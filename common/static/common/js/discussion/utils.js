@@ -2,14 +2,13 @@
 (function() {
     'use strict';
     this.DiscussionUtil = (function() {
-
         function DiscussionUtil() {
         }
 
         DiscussionUtil.wmdEditors = {};
 
         DiscussionUtil.getTemplate = function(id) {
-            return $("script#" + id).html();
+            return $('script#' + id).html();
         };
 
         DiscussionUtil.setUser = function(user) {
@@ -25,7 +24,7 @@
         };
 
         DiscussionUtil.loadRolesFromContainer = function() {
-            return this.loadRoles($("#discussion-container").data("roles"));
+            return this.loadRoles($('#discussion-container').data('roles'));
         };
 
         DiscussionUtil.isStaff = function(userId) {
@@ -63,52 +62,52 @@
         };
 
         DiscussionUtil.generateDiscussionLink = function(cls, txt, handler) {
-            return $("<a>")
-                .addClass("discussion-link").attr("href", "#")
-                .addClass(cls).text(txt).click(function() {return handler(this);});
+            return $('<a>')
+                .addClass('discussion-link').attr('href', '#')
+                .addClass(cls).text(txt).click(function() { return handler(this); });
         };
 
         DiscussionUtil.urlFor = function(name, param, param1, param2) {
             return {
-                follow_discussion: "/courses/" + $$course_id + "/discussion/" + param + "/follow",
-                unfollow_discussion: "/courses/" + $$course_id + "/discussion/" + param + "/unfollow",
-                create_thread: "/courses/" + $$course_id + "/discussion/" + param + "/threads/create",
-                update_thread: "/courses/" + $$course_id + "/discussion/threads/" + param + "/update",
-                create_comment: "/courses/" + $$course_id + "/discussion/threads/" + param + "/reply",
-                delete_thread: "/courses/" + $$course_id + "/discussion/threads/" + param + "/delete",
-                flagAbuse_thread: "/courses/" + $$course_id + "/discussion/threads/" + param + "/flagAbuse",
-                unFlagAbuse_thread: "/courses/" + $$course_id + "/discussion/threads/" + param + "/unFlagAbuse",
-                flagAbuse_comment: "/courses/" + $$course_id + "/discussion/comments/" + param + "/flagAbuse",
-                unFlagAbuse_comment: "/courses/" + $$course_id + "/discussion/comments/" + param + "/unFlagAbuse",
-                upvote_thread: "/courses/" + $$course_id + "/discussion/threads/" + param + "/upvote",
-                downvote_thread: "/courses/" + $$course_id + "/discussion/threads/" + param + "/downvote",
-                pin_thread: "/courses/" + $$course_id + "/discussion/threads/" + param + "/pin",
-                un_pin_thread: "/courses/" + $$course_id + "/discussion/threads/" + param + "/unpin",
-                undo_vote_for_thread: "/courses/" + $$course_id + "/discussion/threads/" + param + "/unvote",
-                follow_thread: "/courses/" + $$course_id + "/discussion/threads/" + param + "/follow",
-                unfollow_thread: "/courses/" + $$course_id + "/discussion/threads/" + param + "/unfollow",
-                update_comment: "/courses/" + $$course_id + "/discussion/comments/" + param + "/update",
-                endorse_comment: "/courses/" + $$course_id + "/discussion/comments/" + param + "/endorse",
-                create_sub_comment: "/courses/" + $$course_id + "/discussion/comments/" + param + "/reply",
-                delete_comment: "/courses/" + $$course_id + "/discussion/comments/" + param + "/delete",
-                upvote_comment: "/courses/" + $$course_id + "/discussion/comments/" + param + "/upvote",
-                downvote_comment: "/courses/" + $$course_id + "/discussion/comments/" + param + "/downvote",
-                undo_vote_for_comment: "/courses/" + $$course_id + "/discussion/comments/" + param + "/unvote",
-                upload: "/courses/" + $$course_id + "/discussion/upload",
-                users: "/courses/" + $$course_id + "/discussion/users",
-                search: "/courses/" + $$course_id + "/discussion/forum/search",
-                retrieve_discussion: "/courses/" + $$course_id + "/discussion/forum/" + param + "/inline",
-                retrieve_single_thread: "/courses/" + $$course_id + "/discussion/forum/" + param + "/threads/" + param1,
-                openclose_thread: "/courses/" + $$course_id + "/discussion/threads/" + param + "/close",
-                permanent_link_thread: "/courses/" + $$course_id + "/discussion/forum/" + param + "/threads/" + param1,
-                permanent_link_comment: "/courses/" + $$course_id +
-                                        "/discussion/forum/" + param + "/threads/" + param1 + "#" + param2,
-                user_profile: "/courses/" + $$course_id + "/discussion/forum/users/" + param,
-                followed_threads: "/courses/" + $$course_id + "/discussion/forum/users/" + param + "/followed",
-                threads: "/courses/" + $$course_id + "/discussion/forum",
-                "enable_notifications": "/notification_prefs/enable/",
-                "disable_notifications": "/notification_prefs/disable/",
-                "notifications_status": "/notification_prefs/status/"
+                follow_discussion: '/courses/' + $$course_id + '/discussion/' + param + '/follow',
+                unfollow_discussion: '/courses/' + $$course_id + '/discussion/' + param + '/unfollow',
+                create_thread: '/courses/' + $$course_id + '/discussion/' + param + '/threads/create',
+                update_thread: '/courses/' + $$course_id + '/discussion/threads/' + param + '/update',
+                create_comment: '/courses/' + $$course_id + '/discussion/threads/' + param + '/reply',
+                delete_thread: '/courses/' + $$course_id + '/discussion/threads/' + param + '/delete',
+                flagAbuse_thread: '/courses/' + $$course_id + '/discussion/threads/' + param + '/flagAbuse',
+                unFlagAbuse_thread: '/courses/' + $$course_id + '/discussion/threads/' + param + '/unFlagAbuse',
+                flagAbuse_comment: '/courses/' + $$course_id + '/discussion/comments/' + param + '/flagAbuse',
+                unFlagAbuse_comment: '/courses/' + $$course_id + '/discussion/comments/' + param + '/unFlagAbuse',
+                upvote_thread: '/courses/' + $$course_id + '/discussion/threads/' + param + '/upvote',
+                downvote_thread: '/courses/' + $$course_id + '/discussion/threads/' + param + '/downvote',
+                pin_thread: '/courses/' + $$course_id + '/discussion/threads/' + param + '/pin',
+                un_pin_thread: '/courses/' + $$course_id + '/discussion/threads/' + param + '/unpin',
+                undo_vote_for_thread: '/courses/' + $$course_id + '/discussion/threads/' + param + '/unvote',
+                follow_thread: '/courses/' + $$course_id + '/discussion/threads/' + param + '/follow',
+                unfollow_thread: '/courses/' + $$course_id + '/discussion/threads/' + param + '/unfollow',
+                update_comment: '/courses/' + $$course_id + '/discussion/comments/' + param + '/update',
+                endorse_comment: '/courses/' + $$course_id + '/discussion/comments/' + param + '/endorse',
+                create_sub_comment: '/courses/' + $$course_id + '/discussion/comments/' + param + '/reply',
+                delete_comment: '/courses/' + $$course_id + '/discussion/comments/' + param + '/delete',
+                upvote_comment: '/courses/' + $$course_id + '/discussion/comments/' + param + '/upvote',
+                downvote_comment: '/courses/' + $$course_id + '/discussion/comments/' + param + '/downvote',
+                undo_vote_for_comment: '/courses/' + $$course_id + '/discussion/comments/' + param + '/unvote',
+                upload: '/courses/' + $$course_id + '/discussion/upload',
+                users: '/courses/' + $$course_id + '/discussion/users',
+                search: '/courses/' + $$course_id + '/discussion/forum/search',
+                retrieve_discussion: '/courses/' + $$course_id + '/discussion/forum/' + param + '/inline',
+                retrieve_single_thread: '/courses/' + $$course_id + '/discussion/forum/' + param + '/threads/' + param1,
+                openclose_thread: '/courses/' + $$course_id + '/discussion/threads/' + param + '/close',
+                permanent_link_thread: '/courses/' + $$course_id + '/discussion/forum/' + param + '/threads/' + param1,
+                permanent_link_comment: '/courses/' + $$course_id +
+                                        '/discussion/forum/' + param + '/threads/' + param1 + '#' + param2,
+                user_profile: '/courses/' + $$course_id + '/discussion/forum/users/' + param,
+                followed_threads: '/courses/' + $$course_id + '/discussion/forum/users/' + param + '/followed',
+                threads: '/courses/' + $$course_id + '/discussion/forum',
+                'enable_notifications': '/notification_prefs/enable/',
+                'disable_notifications': '/notification_prefs/disable/',
+                'notifications_status': '/notification_prefs/status/'
             }[name];
         };
 
@@ -136,8 +135,8 @@
         DiscussionUtil.showLoadingIndicator = function(element, takeFocus) {
             var animElem = edx.HtmlUtils.joinHtml(
                 edx.HtmlUtils.HTML("<div class='loading-animation' tabindex='0'><span class='sr'>"),
-                gettext("Loading content"),
-                edx.HtmlUtils.HTML("</span></div>")
+                gettext('Loading content'),
+                edx.HtmlUtils.HTML('</span></div>')
             );
             var $animElem = $(animElem.toString());
             element.after($animElem);
@@ -157,31 +156,31 @@
             // Prevents "text" is undefined in underscore.js in tests - looks like some tests use
             // discussions somehow, but never append discussion fixtures or reset them; this causes
             // entire test suite (lms, cms, common) to fail due to unhandled JS exception
-            var popupTemplate = $("#alert-popup").html() || "";
-            if ($("#discussion-alert").length === 0) {
+            var popupTemplate = $('#alert-popup').html() || '';
+            if ($('#discussion-alert').length === 0) {
                 $alertDiv = $(
                     edx.HtmlUtils.template(popupTemplate)({}).toString()
                 );
-                this.makeFocusTrap($alertDiv.find("button"));
-                $alertTrigger = $("<a href='#discussion-alert' id='discussion-alert-trigger'/>").css("display", "none");
+                this.makeFocusTrap($alertDiv.find('button'));
+                $alertTrigger = $("<a href='#discussion-alert' id='discussion-alert-trigger'/>").css('display', 'none');
                 $alertTrigger.leanModal({
-                    closeButton: "#discussion-alert .dismiss",
+                    closeButton: '#discussion-alert .dismiss',
                     overlay: 1,
                     top: 200
                 });
-                $("body").append($alertDiv).append($alertTrigger);
+                $('body').append($alertDiv).append($alertTrigger);
             }
-            $("#discussion-alert header h2").text(header);
-            $("#discussion-alert p").text(body);
-            $("#discussion-alert-trigger").click();
-            $("#discussion-alert button").focus();
+            $('#discussion-alert header h2').text(header);
+            $('#discussion-alert p').text(body);
+            $('#discussion-alert-trigger').click();
+            $('#discussion-alert button').focus();
         };
 
         DiscussionUtil.safeAjax = function(params) {
             var $elem, deferred, request,
                 self = this;
             $elem = params.$elem;
-            if ($elem && $elem.prop("disabled")) {
+            if ($elem && $elem.prop('disabled')) {
                 deferred = $.Deferred();
                 deferred.reject();
                 return deferred.promise();
@@ -192,16 +191,16 @@
             if (!params.error) {
                 params.error = function() {
                     self.discussionAlert(
-                        gettext("Sorry"),
+                        gettext('Sorry'),
                         gettext(
-                            "We had some trouble processing your request. Please ensure you have copied any " +
-                            "unsaved work and then reload the page.")
+                            'We had some trouble processing your request. Please ensure you have copied any ' +
+                            'unsaved work and then reload the page.')
                     );
                 };
             }
 
             if ($elem) {
-                $elem.prop("disabled", true);
+                $elem.prop('disabled', true);
             }
             if (params.$loading) {
                 if (params.loadingCallback) {
@@ -213,7 +212,7 @@
 
             request = $.ajax(params).always(function() {
                 if ($elem) {
-                    $elem.prop("disabled", false);
+                    $elem.prop('disabled', false);
                 }
                 if (params.$loading) {
                     if (params.loadedCallback) {
@@ -231,7 +230,7 @@
                 self = this;
             if (errorMsg) {
                 safeAjaxParams.error = function() {
-                    return self.discussionAlert(gettext("Sorry"), errorMsg);
+                    return self.discussionAlert(gettext('Sorry'), errorMsg);
                 };
             }
             undo = _.pick(model.attributes, _.keys(updates));
@@ -248,7 +247,7 @@
             var event, eventSelector, handler, selector, _ref, _results;
             _results = [];
             for (eventSelector in eventsHandler) {
-                if (eventsHandler.hasOwnProperty(eventSelector)){
+                if (eventsHandler.hasOwnProperty(eventSelector)) {
                     handler = eventsHandler[eventSelector];
                     _ref = eventSelector.split(' ');
                     event = _ref[0];
@@ -264,7 +263,7 @@
                 var makeErrorElem, response, _i, _len, _ref, _results, $errorItem;
                 makeErrorElem = function(message) {
                     return edx.HtmlUtils.setHtml(
-                        $("<li>").addClass("post-error"),
+                        $('<li>').addClass('post-error'),
                         message
                     );
                 };
@@ -283,7 +282,7 @@
                     }
                 } else {
                     $errorItem = makeErrorElem(
-                        gettext("We had some trouble processing your request. Please try again.")
+                        gettext('We had some trouble processing your request. Please try again.')
                     );
                     return errorsField.append($errorItem);
                 }
@@ -301,11 +300,11 @@
             return this.processEachMathAndCode(htmlSnippet, function(s, type) {
                 if (type === 'display') {
                     return s.replace(RE_DISPLAYMATH, function($0, $1) {
-                        return "\\[" + $1 + "\\]";
+                        return '\\[' + $1 + '\\]';
                     });
                 } else if (type === 'inline') {
                     return s.replace(RE_INLINEMATH, function($0, $1) {
-                        return "\\(" + $1 + "\\)";
+                        return '\\(' + $1 + '\\)';
                     });
                 } else {
                     return s;
@@ -315,10 +314,10 @@
 
         DiscussionUtil.makeWmdEditor = function($content, $local, cls_identifier) {
             var appended_id, editor, elem, id, imageUploadUrl, placeholder, _processor;
-            elem = $local("." + cls_identifier);
+            elem = $local('.' + cls_identifier);
             placeholder = elem.data('placeholder');
-            id = elem.attr("data-id");
-            appended_id = "-" + cls_identifier + "-" + id;
+            id = elem.attr('data-id');
+            appended_id = '-' + cls_identifier + '-' + id;
             imageUploadUrl = this.urlFor('upload');
             _processor = function(self) {
                 return function(text) {
@@ -326,25 +325,25 @@
                 };
             };
             editor = Markdown.makeWmdEditor(elem, appended_id, imageUploadUrl, _processor(this));
-            this.wmdEditors["" + cls_identifier + "-" + id] = editor;
+            this.wmdEditors['' + cls_identifier + '-' + id] = editor;
             if (placeholder) {
-                elem.find("#wmd-input" + appended_id).attr('placeholder', placeholder);
+                elem.find('#wmd-input' + appended_id).attr('placeholder', placeholder);
             }
             return editor;
         };
 
         DiscussionUtil.getWmdEditor = function($content, $local, cls_identifier) {
             var elem, id;
-            elem = $local("." + cls_identifier);
-            id = elem.attr("data-id");
-            return this.wmdEditors["" + cls_identifier + "-" + id];
+            elem = $local('.' + cls_identifier);
+            id = elem.attr('data-id');
+            return this.wmdEditors['' + cls_identifier + '-' + id];
         };
 
         DiscussionUtil.getWmdInput = function($content, $local, cls_identifier) {
             var elem, id;
-            elem = $local("." + cls_identifier);
-            id = elem.attr("data-id");
-            return $local("#wmd-input-" + cls_identifier + "-" + id);
+            elem = $local('.' + cls_identifier);
+            id = elem.attr('data-id');
+            return $local('#wmd-input-' + cls_identifier + '-' + id);
         };
 
         DiscussionUtil.getWmdContent = function($content, $local, cls_identifier) {
@@ -370,9 +369,9 @@
         DiscussionUtil.processEachMathAndCode = function(htmlSnippet, processor) {
             var $div, codeArchive, processedHtmlString, htmlString;
             codeArchive = {};
-            processedHtmlString = "";
-            $div = edx.HtmlUtils.setHtml($("<div>"), edx.HtmlUtils.ensureHtml(htmlSnippet));
-            $div.find("code").each(function(index, code) {
+            processedHtmlString = '';
+            $div = edx.HtmlUtils.setHtml($('<div>'), edx.HtmlUtils.ensureHtml(htmlSnippet));
+            $div.find('code').each(function(index, code) {
                 codeArchive[index] = $(code).html();
                 return $(code).text(index);
             });
@@ -382,7 +381,7 @@
             while (true) {
                 if (RE_INLINEMATH.test(htmlString)) {
                     htmlString = htmlString.replace(RE_INLINEMATH, function($0, $1, $2, $3) {
-                        processedHtmlString += $1 + processor("$" + $2 + "$", 'inline');
+                        processedHtmlString += $1 + processor('$' + $2 + '$', 'inline');
                         return $3;
                     });
                 } else if (RE_DISPLAYMATH.test(htmlString)) {
@@ -390,7 +389,7 @@
                         /*
                          bug fix, ordering is off
                          */
-                        processedHtmlString = processor("$$" + $2 + "$$", 'display') + processedHtmlString;
+                        processedHtmlString = processor('$$' + $2 + '$$', 'display') + processedHtmlString;
                         processedHtmlString = $1 + processedHtmlString;
                         return $3;
                     });
@@ -404,11 +403,11 @@
             htmlString = htmlString.replace(new RegExp(ESCAPED_DOLLAR, 'g'), '\\$');
             htmlString = htmlString.replace(/\\\\\\\\/g, ESCAPED_BACKSLASH);
             htmlString = htmlString.replace(/\\begin\{([a-z]*\*?)\}([\s\S]*?)\\end\{\1\}/img, function($0, $1, $2) {
-                return processor(("\\begin{" + $1 + "}") + $2 + ("\\end{" + $1 + "}"));
+                return processor(('\\begin{' + $1 + '}') + $2 + ('\\end{' + $1 + '}'));
             });
             htmlString = htmlString.replace(new RegExp(ESCAPED_BACKSLASH, 'g'), '\\\\\\\\');
-            $div = edx.HtmlUtils.setHtml($("<div>"), edx.HtmlUtils.HTML(htmlString));
-            $div.find("code").each(function(index, code) {
+            $div = edx.HtmlUtils.setHtml($('<div>'), edx.HtmlUtils.HTML(htmlString));
+            $div.find('code').each(function(index, code) {
                 edx.HtmlUtils.setHtml(
                     $(code),
                     edx.HtmlUtils.HTML(processor(codeArchive[index], 'code'))
@@ -421,15 +420,15 @@
             return edx.HtmlUtils.HTML(
                 htmlSnippet.toString().replace(
                     /\&lt\;highlight\&gt\;/g,
-                    "<span class='search-highlight'>").replace(/\&lt\;\/highlight\&gt\;/g, "</span>"
+                    "<span class='search-highlight'>").replace(/\&lt\;\/highlight\&gt\;/g, '</span>'
                 )
             );
         };
 
         DiscussionUtil.stripHighlight = function(htmlString) {
             return htmlString
-                    .replace(/\&(amp\;)?lt\;highlight\&(amp\;)?gt\;/g, "")
-                    .replace(/\&(amp\;)?lt\;\/highlight\&(amp\;)?gt\;/g, "");
+                    .replace(/\&(amp\;)?lt\;highlight\&(amp\;)?gt\;/g, '')
+                    .replace(/\&(amp\;)?lt\;\/highlight\&(amp\;)?gt\;/g, '');
         };
 
         DiscussionUtil.stripLatexHighlight = function(htmlSnippet) {
@@ -443,7 +442,7 @@
          */
         DiscussionUtil.markdownWithHighlight = function(unsafeText) {
             var converter;
-            unsafeText = unsafeText.replace(/^\&gt\;/gm, ">");
+            unsafeText = unsafeText.replace(/^\&gt\;/gm, '>');
             converter = Markdown.getMathCompatibleConverter();
             /*
             * converter.makeHtml and HTML escaping:
@@ -476,8 +475,8 @@
         };
 
         DiscussionUtil.typesetMathJax = function(element) {
-            if (typeof MathJax !== "undefined" && MathJax !== null) {
-                MathJax.Hub.Queue(["Typeset", MathJax.Hub, element[0]]);
+            if (typeof MathJax !== 'undefined' && MathJax !== null) {
+                MathJax.Hub.Queue(['Typeset', MathJax.Hub, element[0]]);
             }
         };
 
@@ -489,23 +488,23 @@
                 ellipsis: gettext('…')
             }));
             $result = $(edx.HtmlUtils.joinHtml(
-                edx.HtmlUtils.HTML("<div>"),
+                edx.HtmlUtils.HTML('<div>'),
                 truncated_text,
-                edx.HtmlUtils.HTML("</div>")
+                edx.HtmlUtils.HTML('</div>')
             ).toString());
-            imagesToReplace = $result.find("img:not(:first)");
+            imagesToReplace = $result.find('img:not(:first)');
             if (imagesToReplace.length > 0) {
                 edx.HtmlUtils.append(
                     $result,
                     edx.HtmlUtils.interpolateHtml(
-                        edx.HtmlUtils.HTML("<p><em>{text}</em></p>"),
-                        {text: gettext("Some images in this post have been omitted")}
+                        edx.HtmlUtils.HTML('<p><em>{text}</em></p>'),
+                        {text: gettext('Some images in this post have been omitted')}
                     )
                 );
             }
             // See TNL-4983 for an explanation of why the linter requires ensureHtml()
             var afterMessage = edx.HtmlUtils.interpolateHtml(
-                edx.HtmlUtils.HTML("<em>{text}</em>"), {text: gettext("image omitted")}
+                edx.HtmlUtils.HTML('<em>{text}</em>'), {text: gettext('image omitted')}
             );
             imagesToReplace.after(edx.HtmlUtils.ensureHtml(afterMessage).toString()).remove();
             return $result.html();

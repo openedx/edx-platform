@@ -11,6 +11,6 @@
 // Internet Explorer does not have built-in property 'window.location.origin',
 // we need to create one here as some vendor code such as TinyMCE uses this.
 if (!window.location.origin) {
-    window.location.origin = window.location.protocol + "//" + window.location.hostname
+    window.location.origin = window.location.protocol + '//' + window.location.hostname
                            + (window.location.port ? ':' + window.location.port : '');
 }

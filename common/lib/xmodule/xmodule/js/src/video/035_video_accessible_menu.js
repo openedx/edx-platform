@@ -1,7 +1,7 @@
 (function(define) {
-'use strict';
+    'use strict';
 // VideoAccessibleMenu module.
-define(
+    define(
 'video/035_video_accessible_menu.js', [],
 function() {
     /**
@@ -51,7 +51,7 @@ function() {
             this.menuList = this.el.children('.a11y-menu-list');
             this.menuItems = this.menuList.children('.a11y-menu-item');
             this.menuItemsLinks = this.menuItems.children('.a11y-menu-item-link');
-            value = (function (val, activeElement) {
+            value = (function(val, activeElement) {
                 return val || activeElement.find('a').data('value') || 'srt';
             }(this.value, this.menuItems.filter('.active')));
             msg = '.' + value;
@@ -159,57 +159,57 @@ function() {
                 index = target.parent().index();
                 switch (keyCode) {
                     // Scroll up menu, wrapping at the top. Keep menu open.
-                    case KEY.UP:
-                        this.previousMenuItemLink(this.menuItemsLinks, index).focus();
-                        break;
+                case KEY.UP:
+                    this.previousMenuItemLink(this.menuItemsLinks, index).focus();
+                    break;
                     // Scroll down  menu, wrapping at the bottom. Keep menu
                     // open.
-                    case KEY.DOWN:
-                        this.nextMenuItemLink(this.menuItemsLinks, index).focus();
-                        break;
+                case KEY.DOWN:
+                    this.nextMenuItemLink(this.menuItemsLinks, index).focus();
+                    break;
                     // Close menu.
-                    case KEY.TAB:
-                        this.closeMenu();
+                case KEY.TAB:
+                    this.closeMenu();
                         // TODO
                         // What has to happen here? In speed menu, tabbing backward
                         // will give focus to Play/Pause button and tabbing
                         // forward to Volume button.
-                        break;
+                    break;
                     // Close menu, give focus to button and change
                     // file type.
-                    case KEY.ENTER:
-                    case KEY.SPACE:
-                        this.button.focus();
-                        this.changeFileType.call(this, event);
-                        this.closeMenu();
-                        break;
+                case KEY.ENTER:
+                case KEY.SPACE:
+                    this.button.focus();
+                    this.changeFileType.call(this, event);
+                    this.closeMenu();
+                    break;
                     // Close menu and give focus to speed control.
-                    case KEY.ESCAPE:
-                        this.closeMenu();
-                        this.button.focus();
-                        break;
+                case KEY.ESCAPE:
+                    this.closeMenu();
+                    this.button.focus();
+                    break;
                 }
                 return false;
             }
             else {
-                switch(keyCode) {
+                switch (keyCode) {
                     // Open menu and focus on last element of list above it.
-                    case KEY.ENTER:
-                    case KEY.SPACE:
-                    case KEY.UP:
-                        this.openMenu();
-                        this.menuItemsLinks.last().focus();
-                        break;
+                case KEY.ENTER:
+                case KEY.SPACE:
+                case KEY.UP:
+                    this.openMenu();
+                    this.menuItemsLinks.last().focus();
+                    break;
                     // Close menu.
-                    case KEY.ESCAPE:
-                        this.closeMenu();
-                        break;
+                case KEY.ESCAPE:
+                    this.closeMenu();
+                    break;
                 }
                 // We do not stop propagation and default behavior on a TAB
                 // keypress.
                 return event.keyCode === KEY.TAB;
             }
-        },
+                                                },
 
         setValue: function(value) {
             this.value = value;
