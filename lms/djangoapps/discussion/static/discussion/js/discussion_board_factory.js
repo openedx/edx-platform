@@ -55,7 +55,7 @@
 
                 BreadcrumbsModel = Backbone.Model.extend({
                     defaults: {
-                        contents: [],
+                        contents: []
                     }
                 });
 

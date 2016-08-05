@@ -8,7 +8,7 @@
         paths: {
             'gettext': 'xmodule_js/common_static/js/test/i18n',
             'codemirror': 'xmodule_js/common_static/js/vendor/CodeMirror/codemirror',
-            'jquery': 'common/js/vendor/jquery',
+            jquery: 'common/js/vendor/jquery',
             'jquery-migrate': 'common/js/vendor/jquery-migrate',
             'jquery.ui': 'xmodule_js/common_static/js/vendor/jquery-ui.min',
             'jquery.eventDrag': 'xmodule_js/common_static/js/vendor/jquery.event.drag-2.2',
