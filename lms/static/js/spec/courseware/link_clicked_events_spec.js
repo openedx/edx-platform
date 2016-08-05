@@ -12,7 +12,7 @@ define(['jquery', 'logger', 'js/courseware/courseware_factory'], function($, Log
             $('.external-link').click();
             expect(Logger.log).toHaveBeenCalledWith('edx.ui.lms.link_clicked', {
                 target_url: 'http://example.com/',
-                current_url: 'http://' + window.location.host + '/context.html'
+                current_url: window.location.toString()
             });
         });
 
