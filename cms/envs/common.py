@@ -933,6 +933,9 @@ INSTALLED_APPS = (
 
     # Enables default site and redirects
     'django_sites_extensions',
+
+    # additional release utilities to ease automation
+    'release_util'
 )
 
 
