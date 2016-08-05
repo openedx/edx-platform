@@ -343,6 +343,17 @@ class CheckboxProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         else:
             self.problem_page.click_choice("choice_1")
 
+    @attr('shard_7')
+    def test_can_show_answer(self):
+        msg = "Wait for correct choices to be highlighted"
+        selector = ', '.join([
+            'fieldset div:nth-child(1) label.choicegroup_correct',
+            'fieldset div:nth-child(1) label.choicegroup_correct'
+        ])
+
+        self.problem_page.q(css='div.problem div.action .show').click()
+        self.problem_page.wait_for_element_presence(selector, msg)
+
 
 class MultipleChoiceProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
     """
