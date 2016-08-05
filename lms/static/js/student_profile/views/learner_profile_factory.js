@@ -1,4 +1,4 @@
-;(function (define, undefined) {
+(function(define, undefined) {
     'use strict';
     define([
         'gettext',
@@ -17,12 +17,10 @@
         'js/student_account/views/account_settings_fields',
         'js/views/message_banner',
         'string_utils'
-    ], function (gettext, $, _, Backbone, Logger, PagingCollection, AccountSettingsModel, AccountPreferencesModel,
+    ], function(gettext, $, _, Backbone, Logger, PagingCollection, AccountSettingsModel, AccountPreferencesModel,
                  FieldsView, LearnerProfileFieldsView, LearnerProfileView, BadgeModel, BadgeListContainer,
                  AccountSettingsFieldViews, MessageBannerView) {
-
-        return function (options) {
-
+        return function(options) {
             var learnerProfileElement = $('.wrapper-profile');
 
             var accountSettingsModel = new AccountSettingsModel(
@@ -56,7 +54,7 @@
                 title: interpolate_text(
                     gettext('{platform_name} learners can see my:'), {platform_name: options.platform_name}
                 ),
-                valueAttribute: "account_privacy",
+                valueAttribute: 'account_privacy',
                 options: [
                     ['private', gettext('Limited Profile')],
                     ['all_users', gettext('Full Profile')]
@@ -78,10 +76,10 @@
             });
 
             var usernameFieldView = new FieldsView.ReadonlyFieldView({
-                    model: accountSettingsModel,
-                    screenReaderTitle: gettext('Username'),
-                    valueAttribute: "username",
-                    helpMessage: ""
+                model: accountSettingsModel,
+                screenReaderTitle: gettext('Username'),
+                valueAttribute: 'username',
+                helpMessage: ''
             });
 
             var sectionOneFieldViews = [
@@ -94,7 +92,7 @@
                     showMessages: false,
                     iconName: 'fa-map-marker',
                     placeholderValue: gettext('Add Country'),
-                    valueAttribute: "country",
+                    valueAttribute: 'country',
                     options: options.country_options,
                     helpMessage: '',
                     persistChanges: true
@@ -108,7 +106,7 @@
                     showMessages: false,
                     iconName: 'fa-comment',
                     placeholderValue: gettext('Add language'),
-                    valueAttribute: "language_proficiencies",
+                    valueAttribute: 'language_proficiencies',
                     options: options.language_options,
                     helpMessage: '',
                     persistChanges: true
@@ -122,7 +120,7 @@
                     showMessages: false,
                     title: gettext('About me'),
                     placeholderValue: gettext("Tell other learners a little about yourself: where you live, what your interests are, why you're taking courses, or what you hope to learn."),
-                    valueAttribute: "bio",
+                    valueAttribute: 'bio',
                     helpMessage: '',
                     persistChanges: true,
                     messagePosition: 'header'
@@ -174,7 +172,7 @@
             var showLearnerProfileView = function() {
                 // Record that the profile page was viewed
                 Logger.log('edx.user.settings.viewed', {
-                    page: "profile",
+                    page: 'profile',
                     visibility: getProfileVisibility(),
                     user_id: options.profile_user_id
                 });

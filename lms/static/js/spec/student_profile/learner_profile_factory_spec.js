@@ -10,19 +10,18 @@ define(['backbone', 'jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helper
         'js/student_profile/views/learner_profile_factory',
         'js/views/message_banner'
         ],
-    function (Backbone, $, _, AjaxHelpers, TemplateHelpers, Helpers, LearnerProfileHelpers, FieldViews,
+    function(Backbone, $, _, AjaxHelpers, TemplateHelpers, Helpers, LearnerProfileHelpers, FieldViews,
               UserAccountModel, UserPreferencesModel, LearnerProfileView, LearnerProfileFields, LearnerProfilePage) {
         'use strict';
 
-        describe("edx.user.LearnerProfileFactory", function () {
-
+        describe('edx.user.LearnerProfileFactory', function() {
             var requests;
 
-            beforeEach(function () {
+            beforeEach(function() {
                 loadFixtures('js/fixtures/student_profile/student_profile.html');
             });
 
-            afterEach(function () {
+            afterEach(function() {
                 Backbone.history.stop();
             });
 
@@ -48,7 +47,7 @@ define(['backbone', 'jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helper
                 });
             };
 
-            it("renders the full profile for a user", function() {
+            it('renders the full profile for a user', function() {
                 requests = AjaxHelpers.requests(this);
 
                 var context = createProfilePage(true),
@@ -60,7 +59,6 @@ define(['backbone', 'jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helper
             });
 
             it("renders the limited profile for undefined 'year_of_birth'", function() {
-
                 var context = createProfilePage(true, {year_of_birth: '', requires_parental_consent: true}),
                     learnerProfileView = context.learnerProfileView;
 
@@ -68,7 +66,6 @@ define(['backbone', 'jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helper
             });
 
             it("doesn't show the mode toggle if badges are disabled", function() {
-
                 requests = AjaxHelpers.requests(this);
 
                 var context = createProfilePage(true, {accomplishments_shared: false}),
@@ -80,7 +77,6 @@ define(['backbone', 'jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helper
             });
 
             it("doesn't show the mode toggle if badges fail to fetch", function() {
-
                 requests = AjaxHelpers.requests(this);
 
                 var context = createProfilePage(true, {accomplishments_shared: false}),
@@ -91,8 +87,7 @@ define(['backbone', 'jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helper
                 LearnerProfileHelpers.expectBadgesHidden(learnerProfileView);
             });
 
-            it("renders the mode toggle if there are badges", function() {
-
+            it('renders the mode toggle if there are badges', function() {
                 requests = AjaxHelpers.requests(this);
 
                 var context = createProfilePage(true, {accomplishments_shared: true}),
@@ -105,8 +100,7 @@ define(['backbone', 'jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helper
                 LearnerProfileHelpers.expectTabbedViewToBeShown(tabbedView);
             });
 
-            it("renders the mode toggle if badges enabled but none exist", function() {
-
+            it('renders the mode toggle if badges enabled but none exist', function() {
                 requests = AjaxHelpers.requests(this);
 
                 var context = createProfilePage(true, {accomplishments_shared: true}),
@@ -119,8 +113,7 @@ define(['backbone', 'jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helper
                 LearnerProfileHelpers.expectTabbedViewToBeShown(tabbedView);
             });
 
-            it("displays the badges when the accomplishments toggle is selected", function () {
-
+            it('displays the badges when the accomplishments toggle is selected', function() {
                 requests = AjaxHelpers.requests(this);
 
                 var context = createProfilePage(true, {accomplishments_shared: true}),
@@ -138,8 +131,7 @@ define(['backbone', 'jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helper
                 LearnerProfileHelpers.expectBadgesHidden(learnerProfileView);
             });
 
-            it("displays a placeholder on the last page of badges", function () {
-
+            it('displays a placeholder on the last page of badges', function() {
                 requests = AjaxHelpers.requests(this);
 
                 var context = createProfilePage(true, {accomplishments_shared: true}),
@@ -157,8 +149,7 @@ define(['backbone', 'jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helper
                 LearnerProfileHelpers.expectBadgesHidden(learnerProfileView);
             });
 
-            it("displays a placeholder when the accomplishments toggle is selected and no badges exist", function () {
-
+            it('displays a placeholder when the accomplishments toggle is selected and no badges exist', function() {
                 requests = AjaxHelpers.requests(this);
 
                 var context = createProfilePage(true, {accomplishments_shared: true}),
@@ -176,7 +167,7 @@ define(['backbone', 'jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helper
                 LearnerProfileHelpers.expectBadgesHidden(learnerProfileView);
             });
 
-            it("shows a paginated list of badges", function() {
+            it('shows a paginated list of badges', function() {
                 requests = AjaxHelpers.requests(this);
 
                 var context = createProfilePage(true, {accomplishments_shared: true}),
@@ -192,7 +183,7 @@ define(['backbone', 'jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helper
                 LearnerProfileHelpers.expectPage(learnerProfileView, LearnerProfileHelpers.firstPageBadges);
             });
 
-            it("allows forward and backward navigation of badges", function () {
+            it('allows forward and backward navigation of badges', function() {
                 requests = AjaxHelpers.requests(this);
 
                 var context = createProfilePage(true, {accomplishments_shared: true}),
@@ -226,8 +217,7 @@ define(['backbone', 'jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helper
             });
 
 
-            it("renders the limited profile for under 13 users", function() {
-
+            it('renders the limited profile for under 13 users', function() {
                 var context = createProfilePage(
                     true,
                     {year_of_birth: new Date().getFullYear() - 10, requires_parental_consent: true}

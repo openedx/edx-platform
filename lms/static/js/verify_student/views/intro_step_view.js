@@ -3,14 +3,14 @@
  */
 var edx = edx || {};
 
-(function( $ ) {
+(function($) {
     'use strict';
 
     edx.verify_student = edx.verify_student || {};
 
     edx.verify_student.IntroStepView = edx.verify_student.StepView.extend({
 
-        templateName: "intro_step",
+        templateName: 'intro_step',
 
         defaultContext: function() {
             return {
@@ -31,9 +31,8 @@ var edx = edx || {};
         // second step.
         postRender: function() {
             // Track a virtual pageview, for easy funnel reconstruction.
-            window.analytics.page( 'verification', this.templateName );
+            window.analytics.page('verification', this.templateName);
         }
 
     });
-
-})( jQuery );
+})(jQuery);

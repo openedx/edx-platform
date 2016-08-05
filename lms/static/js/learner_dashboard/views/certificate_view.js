@@ -1,4 +1,4 @@
-;(function (define) {
+(function(define) {
     'use strict';
     define(['backbone',
             'jquery',
@@ -13,27 +13,27 @@
              gettext,
              certificateTpl
          ) {
-            return Backbone.View.extend({
-                el: '.certificates-list',
-                tpl: _.template(certificateTpl),
-                initialize: function(data) {
-                    this.context = data.context;
-                    this.render();
-                },
-                render: function() {
-                    var certificatesData = this.context.certificatesData || [];
+             return Backbone.View.extend({
+                 el: '.certificates-list',
+                 tpl: _.template(certificateTpl),
+                 initialize: function(data) {
+                     this.context = data.context;
+                     this.render();
+                 },
+                 render: function() {
+                     var certificatesData = this.context.certificatesData || [];
 
-                    if (certificatesData.length) {
-                        this.$el.html(this.tpl(this.context));
-                    } else {
+                     if (certificatesData.length) {
+                         this.$el.html(this.tpl(this.context));
+                     } else {
                         /**
                          *  If not rendering remove el because
                          *  styles are applied to it
                          */
-                        this.remove();
-                    }
-                }
-            });
-        }
+                         this.remove();
+                     }
+                 }
+             });
+         }
     );
 }).call(this, define || RequireJS.define);

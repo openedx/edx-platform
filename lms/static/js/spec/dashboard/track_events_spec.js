@@ -1,11 +1,10 @@
-(function (define) {
+(function(define) {
     'use strict';
     define([
         'jquery',
         'js/dashboard/track_events'
     ],
     function($) {
-
         describe('edx.dashboard.trackEvents', function() {
             beforeEach(function() {
                 // Stub the analytics event tracker
@@ -71,7 +70,7 @@
                 window.edx.dashboard.trackLearnVerifiedLinkClicked(
                     $learnVerified,
                     window.edx.dashboard.generateTrackProperties);
-                //Verify that analytics events fire when the 'Learned about verified track' link is clicked.
+                // Verify that analytics events fire when the 'Learned about verified track' link is clicked.
                 expect(window.analytics.trackLink).toHaveBeenCalledWith(
                     $learnVerified,
                     'edx.bi.dashboard.verified_info_link.clicked',

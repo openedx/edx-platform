@@ -1,7 +1,6 @@
-;(function (define) {
+(function(define) {
     'use strict';
     define(['jquery', 'underscore', 'backbone', 'gettext'], function($, _, Backbone, gettext) {
-
         var CourseCohortSettingsNotificationView = Backbone.View.extend({
             initialize: function(options) {
                 this.template = _.template($('#cohort-state-tpl').text());
@@ -14,7 +13,7 @@
                 return this;
             },
 
-            showCohortStateMessage: function () {
+            showCohortStateMessage: function() {
                 var actionToggleMessage = this.$('.action-toggle-message');
 
                 AnimationUtil.triggerAnimation(actionToggleMessage);

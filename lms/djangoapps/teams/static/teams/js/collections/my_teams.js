@@ -1,17 +1,17 @@
-;(function (define) {
+(function(define) {
     'use strict';
-    define(['teams/js/collections/team'], function (TeamCollection) {
+    define(['teams/js/collections/team'], function(TeamCollection) {
         var MyTeamsCollection = TeamCollection.extend({
             queryParams: {
-                username: function () {
+                username: function() {
                     return this.options.username;
                 },
-                text_search: function () {
+                text_search: function() {
                     return this.searchString || '';
                 }
             },
 
-            constructor: function (teams, options) {
+            constructor: function(teams, options) {
                 TeamCollection.prototype.constructor.call(this, teams, options);
                 delete this.queryParams.topic_id;
             }

@@ -3,7 +3,7 @@ define(['jquery', 'backbone', 'teams/js/teams_tab_factory', 'teams/js/views/team
     function($, Backbone, TeamsTabFactory, TeamsTabView, PageHelpers, TeamSpecHelpers) {
         'use strict';
 
-        describe("Teams Tab Factory", function() {
+        describe('Teams Tab Factory', function() {
             var initializeTeamsTabFactory = function() {
                 TeamsTabFactory(TeamSpecHelpers.createMockContext());
             };
