@@ -97,16 +97,19 @@ class ProgressPageCreditRequirementsTest(SharedModuleStoreTestCase):
         )
 
     def test_credit_requirements_eligible(self):
-        # Mark the user as eligible for all requirements
+        """
+        Mark the user as eligible for all requirements. Requirements are only displayed
+        for credit and verified enrollments.
+        """
         credit_api.set_credit_requirement_status(
-            self.user.username, self.course.id,
+            self.user, self.course.id,
             "grade", "grade",
             status="satisfied",
             reason={"final_grade": 0.95}
         )
 
         credit_api.set_credit_requirement_status(
-            self.user.username, self.course.id,
+            self.user, self.course.id,
             "reverification", "midterm",
             status="satisfied", reason={}
         )
@@ -123,9 +126,12 @@ class ProgressPageCreditRequirementsTest(SharedModuleStoreTestCase):
         self.assertNotContains(response, "95%")
 
     def test_credit_requirements_not_eligible(self):
-        # Mark the user as having failed both requirements
+        """
+        Mark the user as having failed both requirements. Requirements are only displayed
+        for credit and verified enrollments.
+        """
         credit_api.set_credit_requirement_status(
-            self.user.username, self.course.id,
+            self.user, self.course.id,
             "reverification", "midterm",
             status="failed", reason={}
         )
