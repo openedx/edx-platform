@@ -15,9 +15,9 @@ from xmodule.modulestore.inheritance import own_metadata
 from instructor_analytics.csvs import create_csv_response
 from analyticsclient.client import Client
 from analyticsclient.exceptions import NotFoundError
-from opaque_keys.edx.locations import Location
 from student.models import CourseAccessRole
 from opaque_keys.edx import locator
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 # Used to limit the length of list displayed to the screen.
 MAX_SCREEN_LIST_LENGTH = 250
@@ -600,11 +600,11 @@ def get_students_opened_subsection(request, csv=False):
     If 'csv' is True, returns a header array, and an array of arrays in the format:
     student names, usernames for CSV download.
     """
-    module_state_key = Location.from_deprecated_string(request.GET.get('module_id'))
-    course_id = request.GET.get('course_id')
     csv = request.GET.get('csv')
+    course_id = request.GET.get('course_id')
+    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    module_state_key = course_key.make_usage_key_from_deprecated_string(request.GET.get('module_id'))
 
-    course_key = locator.CourseLocator.from_string(course_id)
     non_student_list = get_non_student_list(course_key)
 
     # Query for "opened a subsection" students
@@ -655,11 +655,11 @@ def get_students_problem_grades(request, csv=False):
     If 'csv' is True, returns a header array, and an array of arrays in the format:
     student names, usernames, grades, percents for CSV download.
     """
-    module_state_key = Location.from_deprecated_string(request.GET.get('module_id'))
-    course_id = request.GET.get('course_id')
     csv = request.GET.get('csv')
+    course_id = request.GET.get('course_id')
+    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    module_state_key = course_key.make_usage_key_from_deprecated_string(request.GET.get('module_id'))
 
-    course_key = locator.CourseLocator.from_string(course_id)
     non_student_list = get_non_student_list(course_key)
 
     # Query for "problem grades" students
