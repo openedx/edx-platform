@@ -191,7 +191,7 @@ class TestJumpTo(ModuleStoreTestCase):
 
 @attr(shard=2)
 @ddt.ddt
-class ViewsTestCase(ModuleStoreTestCase, MilestonesTestCaseMixin):
+class ViewsTestCase(ModuleStoreTestCase):
     """
     Tests for views.py methods.
     """
@@ -939,7 +939,7 @@ class ViewsTestCase(ModuleStoreTestCase, MilestonesTestCaseMixin):
 @attr(shard=1)
 # setting TIME_ZONE_DISPLAYED_FOR_DEADLINES explicitly
 @override_settings(TIME_ZONE_DISPLAYED_FOR_DEADLINES="UTC")
-class BaseDueDateTests(ModuleStoreTestCase, MilestonesTestCaseMixin):
+class BaseDueDateTests(ModuleStoreTestCase):
     """
     Base class that verifies that due dates are rendered correctly on a page
     """
@@ -1829,7 +1829,7 @@ class ViewCheckerBlock(XBlock):
 
 @attr(shard=1)
 @ddt.ddt
-class TestIndexView(ModuleStoreTestCase, MilestonesTestCaseMixin):
+class TestIndexView(ModuleStoreTestCase):
     """
     Tests of the courseware.views.index view.
     """
@@ -1901,7 +1901,7 @@ class TestIndexView(ModuleStoreTestCase, MilestonesTestCaseMixin):
 
 
 @ddt.ddt
-class TestIndexViewWithVerticalPositions(ModuleStoreTestCase, MilestonesTestCaseMixin):
+class TestIndexViewWithVerticalPositions(ModuleStoreTestCase):
     """
     Test the index view to handle vertical positions. Confirms that first position is loaded
     if input position is non-positive or greater than number of positions available.

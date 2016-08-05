@@ -166,8 +166,7 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, MilestonesTes
 
     def verify_access(self, mock_unit, student_should_have_access, expected_error_type=None):
         """ Verify the expected result from _has_access_descriptor """
-        response = access._has_access_descriptor(self.anonymous_user, 'load',
-                                                 mock_unit, course_key=self.course.id)
+        response = access._has_access_descriptor(self.anonymous_user, 'load', mock_unit, course_key=self.course.id)
         self.assertEqual(student_should_have_access, bool(response))
 
         if expected_error_type is not None:
@@ -383,7 +382,7 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, MilestonesTes
         Tests that "visible_to_staff_only" overrides start date.
         """
         expected_access = expected_error_type is None
-        mock_unit = Mock(user_partitions=[])
+        mock_unit = Mock(location=self.course.location, user_partitions=[])
         mock_unit._class_tags = {}  # Needed for detached check in _has_access_descriptor
         mock_unit.visible_to_staff_only = visible_to_staff_only
         mock_unit.start = start
@@ -406,7 +405,7 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, MilestonesTes
         """
         Tests that descriptor has access in preview mode.
         """
-        mock_unit = Mock(user_partitions=[])
+        mock_unit = Mock(location=self.course.location, user_partitions=[])
         mock_unit._class_tags = {}  # Needed for detached check in _has_access_descriptor
         mock_unit.visible_to_staff_only = False
         mock_unit.start = start
@@ -425,7 +424,7 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, MilestonesTes
         Tests that descriptor has no access when start date in future & without preview.
         """
         expected_access = expected_error_type is None
-        mock_unit = Mock(user_partitions=[])
+        mock_unit = Mock(location=self.course.location, user_partitions=[])
         mock_unit._class_tags = {}  # Needed for detached check in _has_access_descriptor
         mock_unit.visible_to_staff_only = False
         mock_unit.start = start

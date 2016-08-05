@@ -91,7 +91,7 @@ class CertificatesModelTest(ModuleStoreTestCase, MilestonesTestCaseMixin):
         certificate_info = certificate_info_for_user(student, course.id, grade, whitelisted)
         self.assertEqual(certificate_info, output)
 
-    @patch.dict(settings.FEATURES, {'ENABLE_PREREQUISITE_COURSES': True, 'MILESTONES_APP': True})
+    @patch.dict(settings.FEATURES, {'ENABLE_PREREQUISITE_COURSES': True})
     def test_course_milestone_collected(self):
         student = UserFactory()
         course = CourseFactory.create(org='edx', number='998', display_name='Test Course')

@@ -138,7 +138,6 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
 
     @patch.dict(settings.FEATURES, {
         'ENABLE_PREREQUISITE_COURSES': True,
-        'MILESTONES_APP': True,
         'DISABLE_START_DATES': False,
         'ENABLE_MKTG_SITE': True,
     })

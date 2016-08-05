@@ -140,7 +140,7 @@ class AboutTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase, EventTra
         info_url = reverse('info', args=[self.course.id.to_deprecated_string()])
         self.assertTrue(target_url.endswith(info_url))
 
-    @patch.dict(settings.FEATURES, {'ENABLE_PREREQUISITE_COURSES': True, 'MILESTONES_APP': True})
+    @patch.dict(settings.FEATURES, {'ENABLE_PREREQUISITE_COURSES': True})
     def test_pre_requisite_course(self):
         pre_requisite_course = CourseFactory.create(org='edX', course='900', display_name='pre requisite course')
         course = CourseFactory.create(pre_requisite_courses=[unicode(pre_requisite_course.id)])
@@ -154,7 +154,7 @@ class AboutTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase, EventTra
                       .format(pre_requisite_course_about_url, pre_requisite_courses[0]['display']),
                       resp.content.strip('\n'))
 
-    @patch.dict(settings.FEATURES, {'ENABLE_PREREQUISITE_COURSES': True, 'MILESTONES_APP': True})
+    @patch.dict(settings.FEATURES, {'ENABLE_PREREQUISITE_COURSES': True})
     def test_about_page_unfulfilled_prereqs(self):
         pre_requisite_course = CourseFactory.create(
             org='edX',
