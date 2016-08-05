@@ -11,14 +11,13 @@
                     numPages = options.numPages;
                 // Roles are not included in user profile page, but they are not used for anything
                 window.DiscussionUtil.loadRoles({
-                    'Moderator': [],
-                    'Administrator': [],
+                    Moderator: [],
+                    Administrator: [],
                     'Community TA': []
                 });
                 window.$$course_id = options.courseId;
                 window.user = new window.DiscussionUser(userInfo);
-                // jshint nonew:false
-                new DiscussionUserProfileView({
+                new DiscussionUserProfileView({  // eslint-disable-line no-new
                     el: $element,
                     collection: threads,
                     page: page,

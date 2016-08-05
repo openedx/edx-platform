@@ -62,15 +62,7 @@ define(
             });
 
             describe('pagination rendering should be correct', function() {
-                var baseUri, checkRender, pageInfo;
-                baseUri = URI(window.location);
-                pageInfo = function(page) {
-                    return {
-                        url: baseUri.clone().addSearch('page', page).toString(),
-                        number: page
-                    };
-                };
-                checkRender = function(params) {
+                var checkRender = function(params) {
                     var getPageNumber, paginator, view;
                     view = makeView([], params.page, params.numPages);
                     paginator = view.$('.discussion-paginator');

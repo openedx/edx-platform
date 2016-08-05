@@ -12,7 +12,7 @@
     define([
         'backbone',
         'edx-ui-toolkit/js/utils/html-utils',
-        'text!discussion/templates/fake-breadcrumbs.underscore',
+        'text!discussion/templates/fake-breadcrumbs.underscore'
     ],
     function(Backbone, HtmlUtils, breadcrumbsTemplate) {
         var DiscussionFakeBreadcrumbs = Backbone.View.extend({

@@ -1,4 +1,4 @@
-/* globals Content, Discussion, DiscussionUtil */
+/* globals _, Backbone, Content, Discussion, DiscussionUtil */
 (function() {
     'use strict';
     var __hasProp = {}.hasOwnProperty,
@@ -156,16 +156,13 @@
             /**
              * Creates search alert model and adds it to collection
              * @param message - alert message
-             * @param css_class - Allows setting custom css class for a message. This can be used to style messages
-             *                    of different types differently (i.e. other background, completely hide, etc.)
+             * @param cssClass - Allows setting custom css class for a message. This can be used to style messages
+             *                   of different types differently (i.e. other background, completely hide, etc.)
              * @returns {Backbone.Model}
              */
-            DiscussionThreadListView.prototype.addSearchAlert = function(message, css_class) {
+            DiscussionThreadListView.prototype.addSearchAlert = function(message, cssClass) {
                 var m;
-                if (typeof css_class === 'undefined' || css_class === null) {
-                    css_class = '';
-                }
-                m = new Backbone.Model({'message': message, 'css_class': css_class});
+                m = new Backbone.Model({message: message, css_class: cssClass || ''});
                 this.searchAlertCollection.add(m);
                 return m;
             };
@@ -179,16 +176,16 @@
             };
 
             DiscussionThreadListView.prototype.reloadDisplayedCollection = function(thread) {
-                var active, $content, current_el, thread_id;
+                var active, $content, $currentElement, threadId;
                 this.clearSearchAlerts();
-                thread_id = thread.get('id');
+                threadId = thread.get('id');
                 $content = this.renderThread(thread);
-                current_el = this.$('.forum-nav-thread[data-id=' + thread_id + ']');
-                active = current_el.has('.forum-nav-thread-link.is-active').length !== 0;
-                current_el.replaceWith($content);
+                $currentElement = this.$('.forum-nav-thread[data-id=' + threadId + ']');
+                active = $currentElement.has('.forum-nav-thread-link.is-active').length !== 0;
+                $currentElement.replaceWith($content);
                 this.showMetadataAccordingToSort();
                 if (active) {
-                    return this.setActiveThread(thread_id);
+                    return this.setActiveThread(threadId);
                 }
             };
 
@@ -198,14 +195,14 @@
 
 
             DiscussionThreadListView.prototype.addAndSelectThread = function(thread) {
-                var commentable_id, menuItem,
+                var commentableId, menuItem,
                     self = this;
-                commentable_id = thread.get('commentable_id');
+                commentableId = thread.get('commentable_id');
                 menuItem = this.$('.forum-nav-browse-menu-item[data-discussion-id]').filter(function() {
-                    return $(this).data('discussion-id') === commentable_id;
+                    return $(this).data('discussion-id') === commentableId;
                 });
                 this.setCurrentTopicDisplay(this.getPathText(menuItem));
-                return this.retrieveDiscussion(commentable_id, function() {
+                return this.retrieveDiscussion(commentableId, function() {
                     return self.trigger('thread:created', thread.get('id'));
                 });
             };
@@ -403,27 +400,28 @@
                 this.trigger('thread:removed', thread);
             };
 
-            DiscussionThreadListView.prototype.setActiveThread = function(thread_id) {
+            DiscussionThreadListView.prototype.setActiveThread = function(threadId) {
                 var $srElem;
                 this.$('.forum-nav-thread-link').find('.sr').remove();
-                this.$(".forum-nav-thread[data-id!='" + thread_id + "'] .forum-nav-thread-link")
+                this.$(".forum-nav-thread[data-id!='" + threadId + "'] .forum-nav-thread-link")
                     .removeClass('is-active');
                 $srElem = edx.HtmlUtils.joinHtml(
                     edx.HtmlUtils.HTML('<span class="sr">'),
                     edx.HtmlUtils.ensureHtml(gettext('Current conversation')),
                     edx.HtmlUtils.HTML('</span>')
                 ).toString();
-                this.$(".forum-nav-thread[data-id='" + thread_id + "'] .forum-nav-thread-link")
+                this.$(".forum-nav-thread[data-id='" + threadId + "'] .forum-nav-thread-link")
                     .addClass('is-active').find('.forum-nav-thread-wrapper-1')
                     .prepend($srElem);
             };
 
             DiscussionThreadListView.prototype.goHome = function() {
-                var url, $tpl_content;
+                var url, $templateContent;
                 this.template = _.template($('#discussion-home-template').html());
-                $tpl_content = $(this.template());
-                $('.forum-content').empty().append($tpl_content);
-                $('.forum-nav-thread-list a').removeClass('is-active').find('.sr').remove();
+                $templateContent = $(this.template());
+                $('.forum-content').empty().append($templateContent);
+                $('.forum-nav-thread-list a').removeClass('is-active').find('.sr')
+                    .remove();
                 $('input.email-setting').bind('click', this.updateEmailNotifications);
                 url = DiscussionUtil.urlFor('notifications_status', window.user.get('id'));
                 DiscussionUtil.safeAjax({
@@ -480,12 +478,19 @@
             };
 
             DiscussionThreadListView.prototype.getBreadcrumbText = function($item) {
-                var subTopic = $('.forum-nav-browse-title', $item).first().text().trim(),
-                    $parentSubMenus = $item.parents('.forum-nav-browse-submenu'),
-                    crumbs = [];
+                var $parentSubMenus = $item.parents('.forum-nav-browse-submenu'),
+                    crumbs = [],
+                    subTopic = $('.forum-nav-browse-title', $item)
+                        .first()
+                        .text()
+                        .trim();
 
                 $parentSubMenus.each(function(i, el) {
-                    crumbs.push($(el).siblings('.forum-nav-browse-title').first().text().trim());
+                    crumbs.push($(el).siblings('.forum-nav-browse-title')
+                        .first()
+                        .text()
+                        .trim()
+                    );
                 });
 
                 if (subTopic !== 'All Discussions') {
@@ -505,15 +510,15 @@
                 } else {
                     items.hide();
                     return items.each(function(i, item) {
-                        var path, pathText;
-                        item = $(item);
-                        if (!item.is(':visible')) {
-                            pathText = self.getPathText(item).toLowerCase();
+                        var path, pathText,
+                            $item = $(item);
+                        if (!$item.is(':visible')) {
+                            pathText = self.getPathText($item).toLowerCase();
                             if (query.split(' ').every(function(term) {
                                 return pathText.search(term.toLowerCase()) !== -1;
                             })) {
-                                path = item.parents('.forum-nav-browse-menu-item').andSelf();
-                                return path.add(item.find('.forum-nav-browse-menu-item')).show();
+                                path = $item.parents('.forum-nav-browse-menu-item').andSelf();
+                                return path.add($item.find('.forum-nav-browse-menu-item')).show();
                             }
                         }
                     });
@@ -559,7 +564,7 @@
                         _results.push(x.replace(/^\s+|\s+$/g, ''));
                     }
                     return _results;
-                })();
+                }());
                 prefix = '';
                 while (path.length > 1) {
                     prefix = gettext('…') + '/';
@@ -619,9 +624,10 @@
                 return this.retrieveFirstPage();
             };
 
-            DiscussionThreadListView.prototype.retrieveDiscussion = function(discussion_id, callback) {
-                var url, self = this;
-                url = DiscussionUtil.urlFor('retrieve_discussion', discussion_id);
+            DiscussionThreadListView.prototype.retrieveDiscussion = function(discussionId, callback) {
+                var url,
+                    self = this;
+                url = DiscussionUtil.urlFor('retrieve_discussion', discussionId);
                 return DiscussionUtil.safeAjax({
                     url: url,
                     type: 'GET',
@@ -671,7 +677,7 @@
                     this.hideBrowseMenu();
                     this.setCurrentTopicDisplay(gettext('Search Results'));
                     text = this.$('.forum-nav-search-input').val();
-                    return this.searchFor(text);
+                    this.searchFor(text);
                 }
             };
 
@@ -730,10 +736,10 @@
                                 message = edx.HtmlUtils.interpolateHtml(
                                     noResponseMsg,
                                     {
-                                        'original_query': edx.HtmlUtils.joinHtml(
+                                        original_query: edx.HtmlUtils.joinHtml(
                                             edx.HtmlUtils.HTML('<em>'), text, edx.HtmlUtils.HTML('</em>')
                                         ),
-                                        'suggested_query': edx.HtmlUtils.joinHtml(
+                                        suggested_query: edx.HtmlUtils.joinHtml(
                                             edx.HtmlUtils.HTML('<em>'),
                                             response.corrected_text,
                                             edx.HtmlUtils.HTML('</em>')
