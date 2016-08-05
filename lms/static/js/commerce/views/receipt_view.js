@@ -36,36 +36,25 @@ var edx = edx || {};
             // Add the receipt info to the template context
             this.courseKey = this.getOrderCourseKey(data);
             this.username = this.$el.data('username');
-            var self = this;
-            $.ajax({
-              type: "GET",
-              url: "/commerce/checkout/verification_status/",
-              data: { course_id: this.courseKey}
-            }).success(function(response){
-                _.extend(context, {
-                    receipt: self.receiptContext(data),
-                    courseKey: self.courseKey,
-                    is_verification_required: response.is_verification_required
-
+            _.extend(context, {
+                receipt: this.receiptContext(data),
+                courseKey: this.courseKey
             });
 
-                self.$el.html(_.template(templateHtml)(context));
+            this.$el.html(_.template(templateHtml)(context));
 
-                self.trackLinks();
+            this.trackLinks();
 
-                self.trackPurchase(data);
+            this.trackPurchase(data);
 
-                self.renderCourseNamePlaceholder(self.courseKey);
+            this.renderCourseNamePlaceholder(this.courseKey);
 
-                self.renderUserFullNamePlaceholder(self.username);
+            this.renderUserFullNamePlaceholder(this.username);
 
-                providerId = self.getCreditProviderId(data);
-                if (providerId) {
-                    self.getProviderData(providerId).then(self.renderProvider, self.renderError);
-                }
-            }).error(function(){
-                self.renderError();
-            });
+            providerId = this.getCreditProviderId(data);
+            if (providerId) {
+                this.getProviderData(providerId).then(this.renderProvider, this.renderError)
+            }
         },
         renderCourseNamePlaceholder: function (courseId) {
             // Display the course Id or name (if available) in the placeholder

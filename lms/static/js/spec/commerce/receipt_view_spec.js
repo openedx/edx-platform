@@ -37,11 +37,6 @@ define([
                 mockRequests(requests, 'GET', orderUrlFormat, data);
 
                 mockRequests(
-                    requests, 'GET', '/commerce/checkout/verification_status/?course_id=' +
-                    encodeURIComponent('course-v1:edx+dummy+2015_T3'), {is_verification_required: true}
-                );
-
-                mockRequests(
                     requests, 'GET', '/api/courses/v1/courses/course-v1:edx+dummy+2015_T3/', courseResponseData
                 );
 
