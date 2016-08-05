@@ -1,4 +1,4 @@
-;(function(require, define) {
+(function(require, define) {
     'use strict';
 
     if (window) {
@@ -210,12 +210,12 @@
                     window.MathJax.Hub.Config({
                         tex2jax: {
                             inlineMath: [
-                                ['\\(','\\)'],
-                                ['[mathjaxinline]','[/mathjaxinline]']
+                                ['\\(', '\\)'],
+                                ['[mathjaxinline]', '[/mathjaxinline]']
                             ],
                             displayMath: [
-                                ['\\[','\\]'],
-                                ['[mathjax]','[/mathjax]']
+                                ['\\[', '\\]'],
+                                ['[mathjax]', '[/mathjax]']
                             ]
                         }
                     });

@@ -16,7 +16,7 @@ define([
     'js/certificates/spec/custom_matchers'
 ],
 function(_, Course, CertificatesCollection, CertificateModel, CertificateDetailsView, CertificateEditorView,
-         CertificateItemView, CertificatesListView, CertificatePreview,  Notification, AjaxHelpers, TemplateHelpers,
+         CertificateItemView, CertificatesListView, CertificatePreview, Notification, AjaxHelpers, TemplateHelpers,
          CustomMatchers) {
     'use strict';
 
@@ -54,7 +54,7 @@ function(_, Course, CertificatesCollection, CertificateModel, CertificateDetails
             }, {add: true});
 
             this.collection = new CertificatesCollection([], {
-                certificateUrl: '/certificates/'+ window.course.id
+                certificateUrl: '/certificates/' + window.course.id
             });
             this.model.set('id', 0);
             this.view = new CertificatesListView({
@@ -70,7 +70,7 @@ function(_, Course, CertificatesCollection, CertificateModel, CertificateDetails
             delete window.CMS.User;
         });
 
-        describe('empty template', function () {
+        describe('empty template', function() {
             it('should be rendered if no certificates', function() {
                 expect(this.view.$(SELECTORS.noContent)).toExist();
                 expect(this.view.$(SELECTORS.noContent)).toContainText(emptyMessage);
@@ -99,7 +99,6 @@ function(_, Course, CertificatesCollection, CertificateModel, CertificateDetails
                 this.collection.add(this.model);
                 expect(this.view.$(SELECTORS.itemEditView)).toExist();
             });
-
         });
     });
 });

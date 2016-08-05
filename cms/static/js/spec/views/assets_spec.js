@@ -1,8 +1,7 @@
-define([ "jquery", "edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers", "URI", "js/views/assets",
-         "js/collections/asset", "common/js/spec_helpers/view_helpers"],
-    function ($, AjaxHelpers, URI, AssetsView, AssetCollection, ViewHelpers) {
-
-        describe("Assets", function() {
+define(['jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'URI', 'js/views/assets',
+         'js/collections/asset', 'common/js/spec_helpers/view_helpers'],
+    function($, AjaxHelpers, URI, AssetsView, AssetCollection, ViewHelpers) {
+        describe('Assets', function() {
             var assetsView, mockEmptyAssetsResponse, mockAssetUploadResponse, mockFileUpload,
                 assetLibraryTpl, assetTpl, uploadModalTpl;
 
@@ -10,13 +9,13 @@ define([ "jquery", "edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers", "URI", "
             assetTpl = readFixtures('asset.underscore');
             uploadModalTpl = readFixtures('asset-upload-modal.underscore');
 
-            beforeEach(function () {
-                setFixtures($("<script>", { id: "asset-library-tpl", type: "text/template" }).text(assetLibraryTpl));
-                appendSetFixtures($("<script>", { id: "asset-tpl", type: "text/template" }).text(assetTpl));
+            beforeEach(function() {
+                setFixtures($('<script>', {id: 'asset-library-tpl', type: 'text/template'}).text(assetLibraryTpl));
+                appendSetFixtures($('<script>', {id: 'asset-tpl', type: 'text/template'}).text(assetTpl));
                 appendSetFixtures(uploadModalTpl);
-                appendSetFixtures(sandbox({ id: "asset_table_body" }));
+                appendSetFixtures(sandbox({id: 'asset_table_body'}));
 
-                spyOn($.fn, "fileupload").and.returnValue("");
+                spyOn($.fn, 'fileupload').and.returnValue('');
 
                 var TestAssetsCollection = AssetCollection.extend({
                     state: {
@@ -25,7 +24,7 @@ define([ "jquery", "edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers", "URI", "
                     }
                 });
                 var collection = new TestAssetsCollection();
-                collection.url = "assets-url";
+                collection.url = 'assets-url';
                 assetsView = new AssetsView({
                     collection: collection,
                     el: $('#asset_table_body')
@@ -35,7 +34,7 @@ define([ "jquery", "edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers", "URI", "
             });
 
             var mockAsset = {
-                display_name: "dummy.jpg",
+                display_name: 'dummy.jpg',
                 url: 'actual_asset_url',
                 portable_url: 'portable_url',
                 date_added: 'date',
@@ -54,38 +53,38 @@ define([ "jquery", "edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers", "URI", "
             };
 
             var mockExampleAssetsResponse = {
-                sort: "uploadDate",
+                sort: 'uploadDate',
                 end: 2,
                 assets: [
                     {
-                        "display_name": "test.jpg",
-                        "url": "/c4x/A/CS102/asset/test.jpg",
-                        "date_added": "Nov 07, 2014 at 17:47 UTC",
-                        "id": "/c4x/A/CS102/asset/test.jpg",
-                        "portable_url": "/static/test.jpg",
-                        "thumbnail": "/c4x/A/CS102/thumbnail/test.jpg",
-                        "locked": false,
-                        "external_url": "localhost:8000/c4x/A/CS102/asset/test.jpg"
+                        'display_name': 'test.jpg',
+                        'url': '/c4x/A/CS102/asset/test.jpg',
+                        'date_added': 'Nov 07, 2014 at 17:47 UTC',
+                        'id': '/c4x/A/CS102/asset/test.jpg',
+                        'portable_url': '/static/test.jpg',
+                        'thumbnail': '/c4x/A/CS102/thumbnail/test.jpg',
+                        'locked': false,
+                        'external_url': 'localhost:8000/c4x/A/CS102/asset/test.jpg'
                     },
                     {
-                        "display_name": "test.pdf",
-                        "url": "/c4x/A/CS102/asset/test.pdf",
-                        "date_added": "Oct 20, 2014 at 11:00 UTC",
-                        "id": "/c4x/A/CS102/asset/test.pdf",
-                        "portable_url": "/static/test.pdf",
-                        "thumbnail": null,
-                        "locked": false,
-                        "external_url": "localhost:8000/c4x/A/CS102/asset/test.pdf"
+                        'display_name': 'test.pdf',
+                        'url': '/c4x/A/CS102/asset/test.pdf',
+                        'date_added': 'Oct 20, 2014 at 11:00 UTC',
+                        'id': '/c4x/A/CS102/asset/test.pdf',
+                        'portable_url': '/static/test.pdf',
+                        'thumbnail': null,
+                        'locked': false,
+                        'external_url': 'localhost:8000/c4x/A/CS102/asset/test.pdf'
                     },
                     {
-                        "display_name": "test.odt",
-                        "url": "/c4x/A/CS102/asset/test.odt",
-                        "date_added": "Oct 20, 2014 at 11:00 UTC",
-                        "id": "/c4x/A/CS102/asset/test.odt",
-                        "portable_url": "/static/test.odt",
-                        "thumbnail": null,
-                        "locked": false,
-                        "external_url": "localhost:8000/c4x/A/CS102/asset/test.odt"
+                        'display_name': 'test.odt',
+                        'url': '/c4x/A/CS102/asset/test.odt',
+                        'date_added': 'Oct 20, 2014 at 11:00 UTC',
+                        'id': '/c4x/A/CS102/asset/test.odt',
+                        'portable_url': '/static/test.odt',
+                        'thumbnail': null,
+                        'locked': false,
+                        'external_url': 'localhost:8000/c4x/A/CS102/asset/test.odt'
                     }
                 ],
                 pageSize: 2,
@@ -95,18 +94,18 @@ define([ "jquery", "edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers", "URI", "
             };
 
             var mockExampleFilteredAssetsResponse = {
-                sort: "uploadDate",
+                sort: 'uploadDate',
                 end: 1,
                 assets: [
                     {
-                        "display_name": "test.jpg",
-                        "url": "/c4x/A/CS102/asset/test.jpg",
-                        "date_added": "Nov 07, 2014 at 17:47 UTC",
-                        "id": "/c4x/A/CS102/asset/test.jpg",
-                        "portable_url": "/static/test.jpg",
-                        "thumbnail": "/c4x/A/CS102/thumbnail/test.jpg",
-                        "locked": false,
-                        "external_url": "localhost:8000/c4x/A/CS102/asset/test.jpg"
+                        'display_name': 'test.jpg',
+                        'url': '/c4x/A/CS102/asset/test.jpg',
+                        'date_added': 'Nov 07, 2014 at 17:47 UTC',
+                        'id': '/c4x/A/CS102/asset/test.jpg',
+                        'portable_url': '/static/test.jpg',
+                        'thumbnail': '/c4x/A/CS102/thumbnail/test.jpg',
+                        'locked': false,
+                        'external_url': 'localhost:8000/c4x/A/CS102/asset/test.jpg'
                     }
                 ],
                 pageSize: 1,
@@ -117,7 +116,7 @@ define([ "jquery", "edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers", "URI", "
 
             mockAssetUploadResponse = {
                 asset: mockAsset,
-                msg: "Upload completed"
+                msg: 'Upload completed'
             };
 
             mockFileUpload = {
@@ -134,14 +133,14 @@ define([ "jquery", "edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers", "URI", "
             };
 
             var event = {};
-            event.target = {"value": "dummy.jpg"};
+            event.target = {'value': 'dummy.jpg'};
 
-            describe("AssetsView", function () {
+            describe('AssetsView', function() {
                 var setup;
                 setup = function(responseData) {
                     var requests = AjaxHelpers.requests(this);
                     assetsView.pagingView.setPage(1);
-                    if (!responseData){
+                    if (!responseData) {
                         AjaxHelpers.respondWithJson(requests, mockEmptyAssetsResponse);
                     } else {
                         AjaxHelpers.respondWithJson(requests, responseData);
@@ -149,15 +148,15 @@ define([ "jquery", "edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers", "URI", "
                     return requests;
                 };
 
-                beforeEach(function () {
+                beforeEach(function() {
                     ViewHelpers.installMockAnalytics();
                 });
 
-                afterEach(function () {
+                afterEach(function() {
                     ViewHelpers.removeMockAnalytics();
                 });
 
-                it('shows the upload modal when clicked on "Upload your first asset" button', function () {
+                it('shows the upload modal when clicked on "Upload your first asset" button', function() {
                     expect(assetsView).toBeDefined();
                     appendSetFixtures('<div class="ui-loading"/>');
                     expect($('.ui-loading').is(':visible')).toBe(true);
@@ -183,10 +182,10 @@ define([ "jquery", "edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers", "URI", "
                     expect(assetsView.largeFileErrorMsg).toBeNull();
                 });
 
-                it('uploads file properly', function () {
+                it('uploads file properly', function() {
                     var requests = setup.call(this);
                     expect(assetsView).toBeDefined();
-                    spyOn(assetsView, "addAsset").and.callFake(function () {
+                    spyOn(assetsView, 'addAsset').and.callFake(function() {
                         assetsView.collection.add(mockAssetUploadResponse.asset);
                         assetsView.pagingView.renderPageItems();
                         assetsView.pagingView.setPage(1);
@@ -196,18 +195,18 @@ define([ "jquery", "edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers", "URI", "
                     expect($('.upload-modal').is(':visible')).toBe(true);
 
                     $('.choose-file-button').click();
-                    $("input[type=file]").change();
-                    expect($('.upload-modal h1').text()).toContain("Uploading");
+                    $('input[type=file]').change();
+                    expect($('.upload-modal h1').text()).toContain('Uploading');
 
                     assetsView.showUploadFeedback(event, 100);
-                    expect($('div.progress-bar').text()).toContain("100%");
+                    expect($('div.progress-bar').text()).toContain('100%');
 
                     assetsView.displayFinishedUpload(mockAssetUploadResponse);
-                    expect($('div.progress-bar').text()).toContain("Upload completed");
+                    expect($('div.progress-bar').text()).toContain('Upload completed');
                     $('.close-button').click();
                     expect($('.upload-modal').is(':visible')).toBe(false);
 
-                    expect($('#asset_table_body').html()).toContain("dummy.jpg");
+                    expect($('#asset_table_body').html()).toContain('dummy.jpg');
                     expect(assetsView.collection.length).toBe(1);
                 });
 
@@ -217,11 +216,11 @@ define([ "jquery", "edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers", "URI", "
                     mockFileUpload.files[0].size = assetsView.maxFileSize * 10;
 
                     $('.choose-file-button').click();
-                    $(".upload-modal .file-chooser").fileupload('add', mockFileUpload);
-                    expect($('.upload-modal h1').text()).not.toContain("Uploading");
+                    $('.upload-modal .file-chooser').fileupload('add', mockFileUpload);
+                    expect($('.upload-modal h1').text()).not.toContain('Uploading');
 
                     expect(assetsView.largeFileErrorMsg).toBeDefined();
-                    expect($('div.progress-bar').text()).not.toContain("Upload completed");
+                    expect($('div.progress-bar').text()).not.toContain('Upload completed');
                     expect($('div.progress-fill').width()).toBe(0);
                 });
 
@@ -231,7 +230,7 @@ define([ "jquery", "edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers", "URI", "
                     mockFileUpload.files[0].size = assetsView.maxFileSize;
 
                     $('.choose-file-button').click();
-                    $(".upload-modal .file-chooser").fileupload('add', mockFileUpload);
+                    $('.upload-modal .file-chooser').fileupload('add', mockFileUpload);
 
                     expect(assetsView.largeFileErrorMsg).toBeNull();
                 });
@@ -242,12 +241,12 @@ define([ "jquery", "edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers", "URI", "
                     mockFileUpload.files[0].size = assetsView.maxFileSize / 100;
 
                     $('.choose-file-button').click();
-                    $(".upload-modal .file-chooser").fileupload('add', mockFileUpload);
+                    $('.upload-modal .file-chooser').fileupload('add', mockFileUpload);
 
                     expect(assetsView.largeFileErrorMsg).toBeNull();
                 });
 
-                it('returns the registered info for a filter column', function () {
+                it('returns the registered info for a filter column', function() {
                     assetsView.pagingView.registerSortableColumn('test-col', 'Test Column', 'testField', 'asc');
                     assetsView.pagingView.registerFilterableColumn('js-asset-type-col', 'Type', 'asset_type');
                     var filterInfo = assetsView.pagingView.filterableColumnInfo('js-asset-type-col');
@@ -255,24 +254,24 @@ define([ "jquery", "edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers", "URI", "
                     expect(filterInfo.fieldName).toBe('asset_type');
                 });
 
-                it('throws an exception for an unregistered filter column', function () {
+                it('throws an exception for an unregistered filter column', function() {
                     expect(function() {
                         assetsView.filterableColumnInfo('no-such-column');
                     }).toThrow();
                 });
 
 
-                it('make sure selectFilter sets collection filter if undefined', function () {
+                it('make sure selectFilter sets collection filter if undefined', function() {
                     expect(assetsView).toBeDefined();
                     assetsView.collection.filterField = '';
                     assetsView.pagingView.selectFilter('js-asset-type-col');
                     expect(assetsView.collection.filterField).toEqual('asset_type');
                 });
 
-                it('make sure _toggleFilterColumn filters asset list', function () {
+                it('make sure _toggleFilterColumn filters asset list', function() {
                     expect(assetsView).toBeDefined();
                     var requests = AjaxHelpers.requests(this);
-                    $.each(assetsView.pagingView.filterableColumns, function(columnID, columnData){
+                    $.each(assetsView.pagingView.filterableColumns, function(columnID, columnData) {
                         var $typeColumn = $('#' + columnID);
                         assetsView.pagingView.setPage(1);
                         respondWithMockAssets(requests);
@@ -285,10 +284,10 @@ define([ "jquery", "edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers", "URI", "
                     });
                 });
 
-                it('opens and closes select type menu', function () {
+                it('opens and closes select type menu', function() {
                     expect(assetsView).toBeDefined();
                     setup.call(this, mockExampleAssetsResponse);
-                    $.each(assetsView.pagingView.filterableColumns, function(columnID, columnData){
+                    $.each(assetsView.pagingView.filterableColumns, function(columnID, columnData) {
                         var $typeColumn = $('#' + columnID);
                         expect($typeColumn).toBeVisible();
                         var assetsNumber = $('#asset-table-body .type-col').length;
@@ -301,7 +300,7 @@ define([ "jquery", "edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers", "URI", "
                     });
                 });
 
-                it('check filtering works with sorting by column on', function () {
+                it('check filtering works with sorting by column on', function() {
                     expect(assetsView).toBeDefined();
                     var requests = AjaxHelpers.requests(this);
                     assetsView.pagingView.registerSortableColumn('name-col', 'Name Column', 'nameField', 'asc');
@@ -316,10 +315,9 @@ define([ "jquery", "edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers", "URI", "
                     respondWithMockAssets(requests);
                     var assetsNumberFiltered = assetsView.collection.length;
                     expect(assetsNumberFiltered).toBe(1);
-
                 });
 
-                it('shows type select menu, selects type, and filters results', function () {
+                it('shows type select menu, selects type, and filters results', function() {
                     expect(assetsView).toBeDefined();
                     var requests = AjaxHelpers.requests(this);
                     $.each(assetsView.pagingView.filterableColumns, function(columnID, columnData) {
@@ -352,68 +350,68 @@ define([ "jquery", "edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers", "URI", "
                     mockFileUpload.files[0].size = assetsView.maxFileSize;
 
                     $('.choose-file-button').click();
-                    $(".upload-modal .file-chooser").fileupload('add', mockFileUpload);
+                    $('.upload-modal .file-chooser').fileupload('add', mockFileUpload);
 
                     expect(assetsView.largeFileErrorMsg).toBeDefined();
 
                     mockFileUpload.files[0].size = assetsView.maxFileSize / 10;
                     $('.choose-file-button').click();
-                    $(".upload-modal .file-chooser").fileupload('add', mockFileUpload);
+                    $('.upload-modal .file-chooser').fileupload('add', mockFileUpload);
                     expect(assetsView.largeFileErrorMsg).toBeNull();
                 });
 
-                describe('Paging footer', function () {
+                describe('Paging footer', function() {
                     var firstPageAssets = {
-                        sort: "uploadDate",
-                        end: 1,
-                        assets: [
-                            {
-                                "display_name": "test.jpg",
-                                "url": "/c4x/A/CS102/asset/test.jpg",
-                                "date_added": "Nov 07, 2014 at 17:47 UTC",
-                                "id": "/c4x/A/CS102/asset/test.jpg",
-                                "portable_url": "/static/test.jpg",
-                                "thumbnail": "/c4x/A/CS102/thumbnail/test.jpg",
-                                "locked": false,
-                                "external_url": "localhost:8000/c4x/A/CS102/asset/test.jpg"
-                            },
-                            {
-                                "display_name": "test.pdf",
-                                "url": "/c4x/A/CS102/asset/test.pdf",
-                                "date_added": "Oct 20, 2014 at 11:00 UTC",
-                                "id": "/c4x/A/CS102/asset/test.pdf",
-                                "portable_url": "/static/test.pdf",
-                                "thumbnail": null,
-                                "locked": false,
-                                "external_url": "localhost:8000/c4x/A/CS102/asset/test.pdf"
-                            }
-                        ],
-                        pageSize: 2,
-                        totalCount: 3,
-                        start: 0,
-                        page: 0
-                    }, secondPageAssets = {
-                        sort: "uploadDate",
-                        end: 2,
-                        assets: [
-                            {
-                                "display_name": "test.odt",
-                                "url": "/c4x/A/CS102/asset/test.odt",
-                                "date_added": "Oct 20, 2014 at 11:00 UTC",
-                                "id": "/c4x/A/CS102/asset/test.odt",
-                                "portable_url": "/static/test.odt",
-                                "thumbnail": null,
-                                "locked": false,
-                                "external_url": "localhost:8000/c4x/A/CS102/asset/test.odt"
-                            }
-                        ],
-                        pageSize: 2,
-                        totalCount: 3,
-                        start: 2,
-                        page: 1
-                    };
+                            sort: 'uploadDate',
+                            end: 1,
+                            assets: [
+                                {
+                                    'display_name': 'test.jpg',
+                                    'url': '/c4x/A/CS102/asset/test.jpg',
+                                    'date_added': 'Nov 07, 2014 at 17:47 UTC',
+                                    'id': '/c4x/A/CS102/asset/test.jpg',
+                                    'portable_url': '/static/test.jpg',
+                                    'thumbnail': '/c4x/A/CS102/thumbnail/test.jpg',
+                                    'locked': false,
+                                    'external_url': 'localhost:8000/c4x/A/CS102/asset/test.jpg'
+                                },
+                                {
+                                    'display_name': 'test.pdf',
+                                    'url': '/c4x/A/CS102/asset/test.pdf',
+                                    'date_added': 'Oct 20, 2014 at 11:00 UTC',
+                                    'id': '/c4x/A/CS102/asset/test.pdf',
+                                    'portable_url': '/static/test.pdf',
+                                    'thumbnail': null,
+                                    'locked': false,
+                                    'external_url': 'localhost:8000/c4x/A/CS102/asset/test.pdf'
+                                }
+                            ],
+                            pageSize: 2,
+                            totalCount: 3,
+                            start: 0,
+                            page: 0
+                        }, secondPageAssets = {
+                            sort: 'uploadDate',
+                            end: 2,
+                            assets: [
+                                {
+                                    'display_name': 'test.odt',
+                                    'url': '/c4x/A/CS102/asset/test.odt',
+                                    'date_added': 'Oct 20, 2014 at 11:00 UTC',
+                                    'id': '/c4x/A/CS102/asset/test.odt',
+                                    'portable_url': '/static/test.odt',
+                                    'thumbnail': null,
+                                    'locked': false,
+                                    'external_url': 'localhost:8000/c4x/A/CS102/asset/test.odt'
+                                }
+                            ],
+                            pageSize: 2,
+                            totalCount: 3,
+                            start: 2,
+                            page: 1
+                        };
 
-                    it('can move forward a page using the next page button', function () {
+                    it('can move forward a page using the next page button', function() {
                         var requests = AjaxHelpers.requests(this);
                         assetsView.pagingView.setPage(1);
                         AjaxHelpers.respondWithJson(requests, firstPageAssets);
@@ -426,7 +424,7 @@ define([ "jquery", "edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers", "URI", "
                             .toHaveClass('is-disabled');
                     });
 
-                    it('can move back a page using the previous page button', function () {
+                    it('can move back a page using the previous page button', function() {
                         var requests = AjaxHelpers.requests(this);
                         assetsView.pagingView.setPage(2);
                         AjaxHelpers.respondWithJson(requests, secondPageAssets);
@@ -439,7 +437,7 @@ define([ "jquery", "edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers", "URI", "
                             .toHaveClass('is-disabled');
                     });
 
-                    it('can set the current page using the page number input', function () {
+                    it('can set the current page using the page number input', function() {
                         var requests = AjaxHelpers.requests(this);
                         assetsView.pagingView.setPage(1);
                         AjaxHelpers.respondWithJson(requests, firstPageAssets);

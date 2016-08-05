@@ -13,7 +13,7 @@ function(Backbone, _, str, ModuleUtils) {
             'display_name': null,
             'category': null,
             'data': null,
-            'metadata' : null,
+            'metadata': null,
             /**
              * The Studio URL for this xblock, or null if it doesn't have one.
              */
@@ -30,16 +30,16 @@ function(Backbone, _, str, ModuleUtils) {
             /**
              * Date of the last edit to this xblock or any of its descendants.
              */
-            'edited_on':null,
+            'edited_on': null,
             /**
              * User who last edited the xblock or any of its descendants. Will only be present if
              * publishing info was explicitly requested.
              */
-            'edited_by':null,
+            'edited_by': null,
             /**
              * True iff a published version of the xblock exists.
              */
-            "published": null,
+            'published': null,
             /**
              * Date of the last publish of this xblock, or null if never published.
              */
@@ -54,12 +54,12 @@ function(Backbone, _, str, ModuleUtils) {
              * Note: this is not always provided as a performance optimization. It is only provided for
              * verticals functioning as units.
              */
-            "has_changes": null,
+            'has_changes': null,
             /**
              * Represents the possible publish states for an xblock. See the documentation
              * for XBlockVisibility to see a comprehensive enumeration of the states.
              */
-            "visibility_state": null,
+            'visibility_state': null,
             /**
              * True if the release date of the xblock is in the past.
              */
@@ -75,7 +75,7 @@ function(Backbone, _, str, ModuleUtils) {
              * This can be null if the release date is unscheduled. Will only be present if
              * publishing info was explicitly requested.
              */
-            'release_date_from':null,
+            'release_date_from': null,
             /**
              * True if this xblock is currently visible to students. This is computed server-side
              * so that the logic isn't duplicated on the client. Will only be present if
@@ -149,16 +149,16 @@ function(Backbone, _, str, ModuleUtils) {
              * The XBlock's group access rules.  This is a dictionary keyed to user partition IDs,
              * where the values are lists of group IDs.
              */
-             'group_access': null,
+            'group_access': null,
             /**
              * User partition dictionary.  This is pre-processed by Studio, so it contains
              * some additional fields that are not stored in the course descriptor
              * (for example, which groups are selected for this particular XBlock).
              */
-             'user_partitions': null,
+            'user_partitions': null
         },
 
-        initialize: function () {
+        initialize: function() {
             // Extend our Model by helper methods.
             _.extend(this, this.getCategoryHelpers());
         },
@@ -180,7 +180,7 @@ function(Backbone, _, str, ModuleUtils) {
         },
 
         createChild: function(response) {
-            return new XBlockInfo(response, { parse: true });
+            return new XBlockInfo(response, {parse: true});
         },
 
         hasChildren: function() {
@@ -188,7 +188,7 @@ function(Backbone, _, str, ModuleUtils) {
             return childInfo && childInfo.children.length > 0;
         },
 
-        isPublishable: function(){
+        isPublishable: function() {
             return !this.get('published') || this.get('has_changes');
         },
 
@@ -200,13 +200,13 @@ function(Backbone, _, str, ModuleUtils) {
             return this.isActionRequired('draggable');
         },
 
-        isChildAddable: function(){
+        isChildAddable: function() {
             return this.isActionRequired('childAddable');
         },
 
-        isHeaderVisible: function(){
-            if(this.get('is_header_visible') !== null) {
-              return this.get('is_header_visible');
+        isHeaderVisible: function() {
+            if (this.get('is_header_visible') !== null) {
+                return this.get('is_header_visible');
             }
             return true;
         },
@@ -217,7 +217,7 @@ function(Backbone, _, str, ModuleUtils) {
         */
         isActionRequired: function(actionName) {
             var actions = this.get('actions');
-            if(actions !== null) {
+            if (actions !== null) {
                 if (_.has(actions, actionName) && !actions[actionName]) {
                     return false;
                 }
@@ -229,26 +229,26 @@ function(Backbone, _, str, ModuleUtils) {
          * Return a list of convenience methods to check affiliation to the category.
          * @return {Array}
         */
-       getCategoryHelpers: function () {
+        getCategoryHelpers: function() {
             var categories = ['course', 'chapter', 'sequential', 'vertical'],
                 helpers = {};
 
-            _.each(categories, function (item) {
-                helpers['is' + str.titleize(item)] = function () {
+            _.each(categories, function(item) {
+                helpers['is' + str.titleize(item)] = function() {
                     return this.get('category') === item;
                 };
             }, this);
 
             return helpers;
-       },
+        },
 
        /**
         * Check if we can edit current XBlock or not on Course Outline page.
         * @return {Boolean}
         */
-       isEditableOnCourseOutline: function() {
-           return this.isSequential() || this.isChapter() || this.isVertical();
-       },
+        isEditableOnCourseOutline: function() {
+            return this.isSequential() || this.isChapter() || this.isVertical();
+        },
 
        /*
         * Check whether any verification checkpoints are defined in the course.
@@ -256,10 +256,10 @@ function(Backbone, _, str, ModuleUtils) {
         * that uses the verification partition scheme.
         */
         hasVerifiedCheckpoints: function() {
-            var partitions = this.get("user_partitions") || [];
+            var partitions = this.get('user_partitions') || [];
 
             return Boolean(_.find(partitions, function(p) {
-                return p.scheme === "verification";
+                return p.scheme === 'verification';
             }));
         }
     });

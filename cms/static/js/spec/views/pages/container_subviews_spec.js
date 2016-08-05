@@ -1,20 +1,20 @@
-define(["jquery", "underscore", "underscore.string", "edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers",
-        "common/js/spec_helpers/template_helpers", "js/spec_helpers/edit_helpers",
-        "common/js/components/views/feedback_prompt", "js/views/pages/container",
-        "js/views/pages/container_subviews", "js/models/xblock_info", "js/views/utils/xblock_utils",
+define(['jquery', 'underscore', 'underscore.string', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
+        'common/js/spec_helpers/template_helpers', 'js/spec_helpers/edit_helpers',
+        'common/js/components/views/feedback_prompt', 'js/views/pages/container',
+        'js/views/pages/container_subviews', 'js/models/xblock_info', 'js/views/utils/xblock_utils',
         'js/models/course'],
-    function ($, _, str, AjaxHelpers, TemplateHelpers, EditHelpers, Prompt, ContainerPage, ContainerSubviews,
+    function($, _, str, AjaxHelpers, TemplateHelpers, EditHelpers, Prompt, ContainerPage, ContainerSubviews,
               XBlockInfo, XBlockUtils, Course) {
         var VisibilityState = XBlockUtils.VisibilityState;
 
-        describe("Container Subviews", function() {
+        describe('Container Subviews', function() {
             var model, containerPage, requests, createContainerPage, renderContainerPage,
                 respondWithHtml, fetch,
-                disabledCss = "is-disabled", defaultXBlockInfo, createXBlockInfo,
+                disabledCss = 'is-disabled', defaultXBlockInfo, createXBlockInfo,
                 mockContainerPage = readFixtures('mock/mock-container-page.underscore'),
                 mockContainerXBlockHtml = readFixtures('mock/mock-empty-container-xblock.underscore');
 
-            beforeEach(function () {
+            beforeEach(function() {
                 window.course = new Course({
                     id: '5',
                     name: 'Course Name',
@@ -44,8 +44,8 @@ define(["jquery", "underscore", "underscore.string", "edx-ui-toolkit/js/utils/sp
                 published: false,
                 has_changes: false,
                 visibility_state: VisibilityState.unscheduled,
-                edited_on: "Jul 02, 2014 at 14:20 UTC", edited_by: "joe",
-                published_on: "Jul 01, 2014 at 12:45 UTC", published_by: "amako",
+                edited_on: 'Jul 02, 2014 at 14:20 UTC', edited_by: 'joe',
+                published_on: 'Jul 01, 2014 at 12:45 UTC', published_by: 'amako',
                 currently_visible_to_students: false
             };
 
@@ -53,8 +53,8 @@ define(["jquery", "underscore", "underscore.string", "edx-ui-toolkit/js/utils/sp
                 return _.extend(_.extend({}, defaultXBlockInfo), options || {});
             };
 
-            createContainerPage = function (test, options) {
-                model = new XBlockInfo(createXBlockInfo(options), { parse: true });
+            createContainerPage = function(test, options) {
+                model = new XBlockInfo(createXBlockInfo(options), {parse: true});
                 containerPage = new ContainerPage({
                     model: model,
                     templates: EditHelpers.mockComponentTemplates,
@@ -63,7 +63,7 @@ define(["jquery", "underscore", "underscore.string", "edx-ui-toolkit/js/utils/sp
                 });
             };
 
-            renderContainerPage = function (test, html, options) {
+            renderContainerPage = function(test, html, options) {
                 createContainerPage(test, options);
                 containerPage.render();
                 respondWithHtml(html, options);
@@ -72,32 +72,32 @@ define(["jquery", "underscore", "underscore.string", "edx-ui-toolkit/js/utils/sp
             respondWithHtml = function(html, options) {
                 AjaxHelpers.respondWithJson(
                     requests,
-                    { html: html, "resources": [] }
+                    {html: html, 'resources': []}
                 );
                 AjaxHelpers.expectJsonRequest(requests, 'GET', '/xblock/locator-container');
                 AjaxHelpers.respondWithJson(requests, createXBlockInfo(options));
             };
 
-            fetch = function (json) {
+            fetch = function(json) {
                 json = createXBlockInfo(json);
                 model.fetch();
                 AjaxHelpers.expectJsonRequest(requests, 'GET', '/xblock/locator-container');
                 AjaxHelpers.respondWithJson(requests, json);
             };
 
-            describe("ViewLiveButtonController", function () {
+            describe('ViewLiveButtonController', function() {
                 var viewPublishedCss = '.button-view',
                     visibilityNoteCss = '.note-visibility';
 
-                it('renders correctly for unscheduled unit', function () {
+                it('renders correctly for unscheduled unit', function() {
                     renderContainerPage(this, mockContainerXBlockHtml);
                     expect(containerPage.$(viewPublishedCss)).toHaveClass(disabledCss);
-                    expect(containerPage.$(viewPublishedCss).attr('title')).toBe("Open the courseware in the LMS");
+                    expect(containerPage.$(viewPublishedCss).attr('title')).toBe('Open the courseware in the LMS');
                     expect(containerPage.$('.button-preview')).not.toHaveClass(disabledCss);
-                    expect(containerPage.$('.button-preview').attr('title')).toBe("Preview the courseware in the LMS");
+                    expect(containerPage.$('.button-preview').attr('title')).toBe('Preview the courseware in the LMS');
                 });
 
-                it('updates when publish state changes', function () {
+                it('updates when publish state changes', function() {
                     renderContainerPage(this, mockContainerXBlockHtml);
                     fetch({published: true});
                     expect(containerPage.$(viewPublishedCss)).not.toHaveClass(disabledCss);
@@ -106,7 +106,7 @@ define(["jquery", "underscore", "underscore.string", "edx-ui-toolkit/js/utils/sp
                     expect(containerPage.$(viewPublishedCss)).toHaveClass(disabledCss);
                 });
 
-                it('updates when has_content_group_components attribute changes', function () {
+                it('updates when has_content_group_components attribute changes', function() {
                     renderContainerPage(this, mockContainerXBlockHtml);
                     fetch({has_content_group_components: false});
                     expect(containerPage.$(visibilityNoteCss).length).toBe(0);
@@ -119,22 +119,22 @@ define(["jquery", "underscore", "underscore.string", "edx-ui-toolkit/js/utils/sp
                 });
             });
 
-            describe("Publisher", function () {
+            describe('Publisher', function() {
                 var headerCss = '.pub-status',
-                    bitPublishingCss = "div.bit-publishing",
-                    liveClass = "is-live",
-                    readyClass = "is-ready",
-                    staffOnlyClass = "is-staff-only",
-                    scheduledClass = "is-scheduled",
-                    unscheduledClass = "",
+                    bitPublishingCss = 'div.bit-publishing',
+                    liveClass = 'is-live',
+                    readyClass = 'is-ready',
+                    staffOnlyClass = 'is-staff-only',
+                    scheduledClass = 'is-scheduled',
+                    unscheduledClass = '',
                     hasWarningsClass = 'has-warnings',
-                    publishButtonCss = ".action-publish",
-                    discardChangesButtonCss = ".action-discard",
-                    lastDraftCss = ".wrapper-last-draft",
-                    releaseDateTitleCss = ".wrapper-release .title",
-                    releaseDateContentCss = ".wrapper-release .copy",
-                    releaseDateDateCss = ".wrapper-release .copy .release-date",
-                    releaseDateWithCss = ".wrapper-release .copy .release-with",
+                    publishButtonCss = '.action-publish',
+                    discardChangesButtonCss = '.action-discard',
+                    lastDraftCss = '.wrapper-last-draft',
+                    releaseDateTitleCss = '.wrapper-release .title',
+                    releaseDateContentCss = '.wrapper-release .copy',
+                    releaseDateDateCss = '.wrapper-release .copy .release-date',
+                    releaseDateWithCss = '.wrapper-release .copy .release-with',
                     promptSpies, sendDiscardChangesToServer, verifyPublishingBitUnscheduled;
 
                 sendDiscardChangesToServer = function() {
@@ -151,8 +151,8 @@ define(["jquery", "underscore", "underscore.string", "edx-ui-toolkit/js/utils/sp
                     expect(promptSpies.constructor).toHaveBeenCalled();
                     promptSpies.constructor.calls.mostRecent().args[0].actions.primary.click(promptSpies);
 
-                    AjaxHelpers.expectJsonRequest(requests, "POST", "/xblock/locator-container",
-                        {"publish": "discard_changes"}
+                    AjaxHelpers.expectJsonRequest(requests, 'POST', '/xblock/locator-container',
+                        {'publish': 'discard_changes'}
                     );
                 };
 
@@ -166,11 +166,11 @@ define(["jquery", "underscore", "underscore.string", "edx-ui-toolkit/js/utils/sp
                 };
 
                 beforeEach(function() {
-                    promptSpies = jasmine.stealth.spyOnConstructor(Prompt, "Warning", ["show", "hide"]);
+                    promptSpies = jasmine.stealth.spyOnConstructor(Prompt, 'Warning', ['show', 'hide']);
                     promptSpies.show.and.returnValue(this.promptSpies);
                 });
 
-                it('renders correctly with private content', function () {
+                it('renders correctly with private content', function() {
                     var verifyPrivateState = function() {
                         expect(containerPage.$(headerCss).text()).toContain('Draft (Never published)');
                         expect(containerPage.$(publishButtonCss)).not.toHaveClass(disabledCss);
@@ -187,11 +187,11 @@ define(["jquery", "underscore", "underscore.string", "edx-ui-toolkit/js/utils/sp
                     verifyPrivateState();
                 });
 
-                it('renders correctly with published content', function () {
+                it('renders correctly with published content', function() {
                     renderContainerPage(this, mockContainerXBlockHtml);
                     fetch({
                         published: true, has_changes: false, visibility_state: VisibilityState.ready,
-                        release_date: "Jul 02, 2030 at 14:20 UTC"
+                        release_date: 'Jul 02, 2030 at 14:20 UTC'
                     });
                     expect(containerPage.$(headerCss).text()).toContain('Published (not yet released)');
                     expect(containerPage.$(publishButtonCss)).toHaveClass(disabledCss);
@@ -201,7 +201,7 @@ define(["jquery", "underscore", "underscore.string", "edx-ui-toolkit/js/utils/sp
 
                     fetch({
                         published: true, has_changes: true, visibility_state: VisibilityState.needsAttention,
-                        release_date: "Jul 02, 2030 at 14:20 UTC"
+                        release_date: 'Jul 02, 2030 at 14:20 UTC'
                     });
                     expect(containerPage.$(headerCss).text()).toContain('Draft (Unpublished changes)');
                     expect(containerPage.$(publishButtonCss)).not.toHaveClass(disabledCss);
@@ -210,7 +210,7 @@ define(["jquery", "underscore", "underscore.string", "edx-ui-toolkit/js/utils/sp
                     expect(containerPage.$(bitPublishingCss)).toHaveClass(scheduledClass);
 
                     fetch({published: true, has_changes: false, visibility_state: VisibilityState.live,
-                        release_date: "Jul 02, 1990 at 14:20 UTC"
+                        release_date: 'Jul 02, 1990 at 14:20 UTC'
                     });
                     expect(containerPage.$(headerCss).text()).toContain('Published and Live');
                     expect(containerPage.$(publishButtonCss)).toHaveClass(disabledCss);
@@ -227,7 +227,7 @@ define(["jquery", "underscore", "underscore.string", "edx-ui-toolkit/js/utils/sp
                     verifyPublishingBitUnscheduled();
                 });
 
-                it('can publish private content', function () {
+                it('can publish private content', function() {
                     var notificationSpy = EditHelpers.createNotificationSpy();
                     renderContainerPage(this, mockContainerXBlockHtml);
                     expect(containerPage.$(bitPublishingCss)).not.toHaveClass(hasWarningsClass);
@@ -238,15 +238,15 @@ define(["jquery", "underscore", "underscore.string", "edx-ui-toolkit/js/utils/sp
                     containerPage.$(publishButtonCss).click();
                     EditHelpers.verifyNotificationShowing(notificationSpy, /Publishing/);
 
-                    AjaxHelpers.expectJsonRequest(requests, "POST", "/xblock/locator-container",
-                        {"publish": "make_public"}
+                    AjaxHelpers.expectJsonRequest(requests, 'POST', '/xblock/locator-container',
+                        {'publish': 'make_public'}
                     );
 
                     // Response to publish call
-                    AjaxHelpers.respondWithJson(requests, {"id": "locator-container", "data": null, "metadata":{}});
+                    AjaxHelpers.respondWithJson(requests, {'id': 'locator-container', 'data': null, 'metadata': {}});
                     EditHelpers.verifyNotificationHidden(notificationSpy);
 
-                    AjaxHelpers.expectJsonRequest(requests, "GET", "/xblock/locator-container");
+                    AjaxHelpers.expectJsonRequest(requests, 'GET', '/xblock/locator-container');
                     // Response to fetch
                     AjaxHelpers.respondWithJson(
                         requests,
@@ -258,10 +258,10 @@ define(["jquery", "underscore", "underscore.string", "edx-ui-toolkit/js/utils/sp
                     // Verify updates displayed
                     expect(containerPage.$(bitPublishingCss)).toHaveClass(readyClass);
                     // Verify that the "published" value has been cleared out of the model.
-                    expect(containerPage.model.get("publish")).toBeNull();
+                    expect(containerPage.model.get('publish')).toBeNull();
                 });
 
-                it('does not refresh if publish fails', function () {
+                it('does not refresh if publish fails', function() {
                     renderContainerPage(this, mockContainerXBlockHtml);
                     verifyPublishingBitUnscheduled();
 
@@ -275,10 +275,10 @@ define(["jquery", "underscore", "underscore.string", "edx-ui-toolkit/js/utils/sp
                     // Verify still in draft (unscheduled) state.
                     verifyPublishingBitUnscheduled();
                     // Verify that the "published" value has been cleared out of the model.
-                    expect(containerPage.model.get("publish")).toBeNull();
+                    expect(containerPage.model.get('publish')).toBeNull();
                 });
 
-                it('can discard changes', function () {
+                it('can discard changes', function() {
                     var notificationSpy, renderPageSpy, numRequests;
                     createContainerPage(this);
                     notificationSpy = EditHelpers.createNotificationSpy();
@@ -288,17 +288,17 @@ define(["jquery", "underscore", "underscore.string", "edx-ui-toolkit/js/utils/sp
                     numRequests = requests.length;
 
                     // Respond with success.
-                    AjaxHelpers.respondWithJson(requests, {"id": "locator-container"});
+                    AjaxHelpers.respondWithJson(requests, {'id': 'locator-container'});
                     EditHelpers.verifyNotificationHidden(notificationSpy);
 
                     // Verify other requests are sent to the server to update page state.
                     // Response to fetch, specifying the very next request (as multiple requests will be sent to server)
                     expect(requests.length > numRequests).toBeTruthy();
-                    expect(containerPage.model.get("publish")).toBeNull();
+                    expect(containerPage.model.get('publish')).toBeNull();
                     expect(renderPageSpy).toHaveBeenCalled();
                 });
 
-                it('does not fetch if discard changes fails', function () {
+                it('does not fetch if discard changes fails', function() {
                     var renderPageSpy, numRequests;
                     createContainerPage(this);
                     renderPageSpy = spyOn(containerPage.xblockPublisher, 'renderPage').and.callThrough();
@@ -309,11 +309,11 @@ define(["jquery", "underscore", "underscore.string", "edx-ui-toolkit/js/utils/sp
                     AjaxHelpers.respondWithError(requests);
                     AjaxHelpers.expectNoRequests(requests);
                     expect(containerPage.$(discardChangesButtonCss)).not.toHaveClass('is-disabled');
-                    expect(containerPage.model.get("publish")).toBeNull();
+                    expect(containerPage.model.get('publish')).toBeNull();
                     expect(renderPageSpy).not.toHaveBeenCalled();
                 });
 
-                it('does not discard changes on cancel', function () {
+                it('does not discard changes on cancel', function() {
                     renderContainerPage(this, mockContainerXBlockHtml);
                     fetch({published: true, has_changes: true, visibility_state: VisibilityState.needsAttention});
 
@@ -328,67 +328,67 @@ define(["jquery", "underscore", "underscore.string", "edx-ui-toolkit/js/utils/sp
                     expect(containerPage.$(discardChangesButtonCss)).not.toHaveClass('is-disabled');
                 });
 
-                it('renders the last published date and user when there are no changes', function () {
+                it('renders the last published date and user when there are no changes', function() {
                     renderContainerPage(this, mockContainerXBlockHtml);
-                    fetch({published_on: "Jul 01, 2014 at 12:45 UTC", published_by: "amako"});
+                    fetch({published_on: 'Jul 01, 2014 at 12:45 UTC', published_by: 'amako'});
                     expect(containerPage.$(lastDraftCss).text()).
-                        toContain("Last published Jul 01, 2014 at 12:45 UTC by amako");
+                        toContain('Last published Jul 01, 2014 at 12:45 UTC by amako');
                 });
 
-                it('renders the last saved date and user when there are changes', function () {
+                it('renders the last saved date and user when there are changes', function() {
                     renderContainerPage(this, mockContainerXBlockHtml);
-                    fetch({has_changes: true, edited_on: "Jul 02, 2014 at 14:20 UTC", edited_by: "joe"});
+                    fetch({has_changes: true, edited_on: 'Jul 02, 2014 at 14:20 UTC', edited_by: 'joe'});
                     expect(containerPage.$(lastDraftCss).text()).
-                        toContain("Draft saved on Jul 02, 2014 at 14:20 UTC by joe");
+                        toContain('Draft saved on Jul 02, 2014 at 14:20 UTC by joe');
                 });
 
-                describe("Release Date", function() {
-                    it('renders correctly when unreleased', function () {
+                describe('Release Date', function() {
+                    it('renders correctly when unreleased', function() {
                         renderContainerPage(this, mockContainerXBlockHtml);
                         fetch({
                             visibility_state: VisibilityState.ready, released_to_students: false,
-                            release_date: "Jul 02, 2014 at 14:20 UTC", release_date_from: 'Section "Week 1"'
+                            release_date: 'Jul 02, 2014 at 14:20 UTC', release_date_from: 'Section "Week 1"'
                         });
-                        expect(containerPage.$(releaseDateTitleCss).text()).toContain("Scheduled:");
+                        expect(containerPage.$(releaseDateTitleCss).text()).toContain('Scheduled:');
                         expect(containerPage.$(releaseDateDateCss).text()).toContain('Jul 02, 2014 at 14:20 UTC');
                         expect(containerPage.$(releaseDateWithCss).text()).toContain('with Section "Week 1"');
                     });
 
-                    it('renders correctly when released', function () {
+                    it('renders correctly when released', function() {
                         renderContainerPage(this, mockContainerXBlockHtml);
                         fetch({
                             visibility_state: VisibilityState.live, released_to_students: true,
-                            release_date: "Jul 02, 2014 at 14:20 UTC", release_date_from: 'Section "Week 1"'
+                            release_date: 'Jul 02, 2014 at 14:20 UTC', release_date_from: 'Section "Week 1"'
                         });
-                        expect(containerPage.$(releaseDateTitleCss).text()).toContain("Released:");
+                        expect(containerPage.$(releaseDateTitleCss).text()).toContain('Released:');
                         expect(containerPage.$(releaseDateDateCss).text()).toContain('Jul 02, 2014 at 14:20 UTC');
                         expect(containerPage.$(releaseDateWithCss).text()).toContain('with Section "Week 1"');
                     });
 
-                    it('renders correctly when the release date is not set', function () {
+                    it('renders correctly when the release date is not set', function() {
                         renderContainerPage(this, mockContainerXBlockHtml);
                         fetch({
-                            visibility_state: VisibilityState.unscheduled, "released_to_students": false,
+                            visibility_state: VisibilityState.unscheduled, 'released_to_students': false,
                             release_date: null, release_date_from: null
                         });
-                        expect(containerPage.$(releaseDateTitleCss).text()).toContain("Release:");
-                        expect(containerPage.$(releaseDateContentCss).text()).toContain("Unscheduled");
+                        expect(containerPage.$(releaseDateTitleCss).text()).toContain('Release:');
+                        expect(containerPage.$(releaseDateContentCss).text()).toContain('Unscheduled');
                     });
 
-                    it('renders correctly when the unit is not published', function () {
+                    it('renders correctly when the unit is not published', function() {
                         renderContainerPage(this, mockContainerXBlockHtml);
                         fetch({
                             visibility_state: VisibilityState.needsAttention, released_to_students: true,
-                            release_date: "Jul 02, 2014 at 14:20 UTC", release_date_from: 'Section "Week 1"'
+                            release_date: 'Jul 02, 2014 at 14:20 UTC', release_date_from: 'Section "Week 1"'
                         });
                         containerPage.xblockPublisher.render();
-                        expect(containerPage.$(releaseDateTitleCss).text()).toContain("Release:");
+                        expect(containerPage.$(releaseDateTitleCss).text()).toContain('Release:');
                         expect(containerPage.$(releaseDateDateCss).text()).toContain('Jul 02, 2014 at 14:20 UTC');
                         expect(containerPage.$(releaseDateWithCss).text()).toContain('with Section "Week 1"');
                     });
                 });
 
-                describe("Content Visibility", function () {
+                describe('Content Visibility', function() {
                     var requestStaffOnly, verifyStaffOnly, verifyExplicitStaffOnly, verifyImplicitStaffOnly, promptSpy,
                         visibilityTitleCss = '.wrapper-visibility .title';
 
@@ -404,11 +404,11 @@ define(["jquery", "underscore", "underscore.string", "edx-ui-toolkit/js/utils/sp
 
                         AjaxHelpers.expectJsonRequest(requests, 'POST', '/xblock/locator-container', {
                             publish: 'republish',
-                            metadata: { visible_to_staff_only: isStaffOnly ? true : null }
+                            metadata: {visible_to_staff_only: isStaffOnly ? true : null}
                         });
                         AjaxHelpers.respondWithJson(requests, {
                             data: null,
-                            id: "locator-container",
+                            id: 'locator-container',
                             metadata: {
                                 visible_to_staff_only: isStaffOnly ? true : null
                             }
@@ -424,7 +424,7 @@ define(["jquery", "underscore", "underscore.string", "edx-ui-toolkit/js/utils/sp
                             published: containerPage.model.get('published'),
                             has_explicit_staff_lock: isStaffOnly,
                             visibility_state: newVisibilityState,
-                            release_date: "Jul 02, 2000 at 14:20 UTC"
+                            release_date: 'Jul 02, 2000 at 14:20 UTC'
                         }));
                     };
 
@@ -457,7 +457,7 @@ define(["jquery", "underscore", "underscore.string", "edx-ui-toolkit/js/utils/sp
                         }
                     };
 
-                    it("is initially shown to all", function() {
+                    it('is initially shown to all', function() {
                         renderContainerPage(this, mockContainerXBlockHtml);
                         verifyStaffOnly(false);
                     });
@@ -480,7 +480,7 @@ define(["jquery", "underscore", "underscore.string", "edx-ui-toolkit/js/utils/sp
                         expect(containerPage.$(visibilityTitleCss).text()).toContain('Will Be Visible To');
                     });
 
-                    it("can be explicitly set to staff only", function() {
+                    it('can be explicitly set to staff only', function() {
                         renderContainerPage(this, mockContainerXBlockHtml);
                         requestStaffOnly(true);
                         verifyExplicitStaffOnly(true);
@@ -488,22 +488,22 @@ define(["jquery", "underscore", "underscore.string", "edx-ui-toolkit/js/utils/sp
                         verifyStaffOnly(true);
                     });
 
-                    it("can be implicitly set to staff only", function() {
+                    it('can be implicitly set to staff only', function() {
                         renderContainerPage(this, mockContainerXBlockHtml, {
                             visibility_state: VisibilityState.staffOnly,
                             ancestor_has_staff_lock: true,
-                            staff_lock_from: "Section Foo"
+                            staff_lock_from: 'Section Foo'
                         });
                         verifyImplicitStaffOnly(true);
                         verifyExplicitStaffOnly(false);
                         verifyStaffOnly(true);
                     });
 
-                    it("can be explicitly and implicitly set to staff only", function() {
+                    it('can be explicitly and implicitly set to staff only', function() {
                         renderContainerPage(this, mockContainerXBlockHtml, {
                             visibility_state: VisibilityState.staffOnly,
                             ancestor_has_staff_lock: true,
-                            staff_lock_from: "Section Foo"
+                            staff_lock_from: 'Section Foo'
                         });
                         requestStaffOnly(true);
                         // explicit staff lock overrides the display of implicit staff lock
@@ -512,7 +512,7 @@ define(["jquery", "underscore", "underscore.string", "edx-ui-toolkit/js/utils/sp
                         verifyStaffOnly(true);
                     });
 
-                    it("can remove explicit staff only setting without having implicit staff only", function() {
+                    it('can remove explicit staff only setting without having implicit staff only', function() {
                         promptSpy = EditHelpers.createPromptSpy();
                         renderContainerPage(this, mockContainerXBlockHtml, {
                             visibility_state: VisibilityState.staffOnly,
@@ -523,13 +523,13 @@ define(["jquery", "underscore", "underscore.string", "edx-ui-toolkit/js/utils/sp
                         verifyStaffOnly(false);
                     });
 
-                    it("can remove explicit staff only setting while having implicit staff only", function() {
+                    it('can remove explicit staff only setting while having implicit staff only', function() {
                         promptSpy = EditHelpers.createPromptSpy();
                         renderContainerPage(this, mockContainerXBlockHtml, {
                             visibility_state: VisibilityState.staffOnly,
                             ancestor_has_staff_lock: true,
                             has_explicit_staff_lock: true,
-                            staff_lock_from: "Section Foo"
+                            staff_lock_from: 'Section Foo'
                         });
                         requestStaffOnly(false);
                         verifyExplicitStaffOnly(false);
@@ -537,7 +537,7 @@ define(["jquery", "underscore", "underscore.string", "edx-ui-toolkit/js/utils/sp
                         verifyStaffOnly(true);
                     });
 
-                    it("does not refresh if removing staff only is canceled", function() {
+                    it('does not refresh if removing staff only is canceled', function() {
                         promptSpy = EditHelpers.createPromptSpy();
                         renderContainerPage(this, mockContainerXBlockHtml, {
                             visibility_state: VisibilityState.staffOnly,
@@ -551,7 +551,7 @@ define(["jquery", "underscore", "underscore.string", "edx-ui-toolkit/js/utils/sp
                         verifyStaffOnly(true);
                     });
 
-                    it("does not refresh when failing to set staff only", function() {
+                    it('does not refresh when failing to set staff only', function() {
                         renderContainerPage(this, mockContainerXBlockHtml);
                         containerPage.$('.action-staff-lock').click();
                         AjaxHelpers.respondWithError(requests);
@@ -561,35 +561,35 @@ define(["jquery", "underscore", "underscore.string", "edx-ui-toolkit/js/utils/sp
                 });
             });
 
-            describe("PublishHistory", function () {
-                var lastPublishCss = ".wrapper-last-publish";
+            describe('PublishHistory', function() {
+                var lastPublishCss = '.wrapper-last-publish';
 
-                it('renders never published when the block is unpublished', function () {
+                it('renders never published when the block is unpublished', function() {
                     renderContainerPage(this, mockContainerXBlockHtml, {
                         published: false, published_on: null, published_by: null
                     });
-                    expect(containerPage.$(lastPublishCss).text()).toContain("Never published");
+                    expect(containerPage.$(lastPublishCss).text()).toContain('Never published');
                 });
 
                 it('renders the last published date and user when the block is published', function() {
                     renderContainerPage(this, mockContainerXBlockHtml);
                     fetch({
-                        published: true, published_on: "Jul 01, 2014 at 12:45 UTC", published_by: "amako"
+                        published: true, published_on: 'Jul 01, 2014 at 12:45 UTC', published_by: 'amako'
                     });
                     expect(containerPage.$(lastPublishCss).text()).
-                        toContain("Last published Jul 01, 2014 at 12:45 UTC by amako");
+                        toContain('Last published Jul 01, 2014 at 12:45 UTC by amako');
                 });
 
-                it('renders correctly when the block is published without publish info', function () {
+                it('renders correctly when the block is published without publish info', function() {
                     renderContainerPage(this, mockContainerXBlockHtml);
                     fetch({
                         published: true, published_on: null, published_by: null
                     });
-                    expect(containerPage.$(lastPublishCss).text()).toContain("Previously published");
+                    expect(containerPage.$(lastPublishCss).text()).toContain('Previously published');
                 });
             });
 
-            describe("Message Area", function() {
+            describe('Message Area', function() {
                 var messageSelector = '.container-message .warning',
                     warningMessage = 'Caution: The last published version of this unit is live. ' +
                         'By publishing changes you will change the student experience.';
@@ -612,7 +612,7 @@ define(["jquery", "underscore", "underscore.string", "edx-ui-toolkit/js/utils/sp
                     renderContainerPage(this, mockContainerXBlockHtml, {
                         currently_visible_to_students: true
                     });
-                    fetch({ currently_visible_to_students: false });
+                    fetch({currently_visible_to_students: false});
                     expect(containerPage.$(messageSelector).text().trim()).toBe('');
                 });
 
@@ -620,7 +620,7 @@ define(["jquery", "underscore", "underscore.string", "edx-ui-toolkit/js/utils/sp
                     renderContainerPage(this, mockContainerXBlockHtml, {
                         currently_visible_to_students: false
                     });
-                    fetch({ currently_visible_to_students: true });
+                    fetch({currently_visible_to_students: true});
                     expect(containerPage.$(messageSelector).text().trim()).toBe(warningMessage);
                 });
             });

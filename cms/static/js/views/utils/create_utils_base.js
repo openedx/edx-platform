@@ -1,9 +1,9 @@
 /**
  * Mixin class for creation of things like courses and libraries.
  */
-define(["jquery", "underscore", "gettext", "common/js/components/utils/view_utils"],
-    function ($, _, gettext, ViewUtils) {
-        return function (selectors, classes, keyLengthViolationMessage, keyFieldSelectors, nonEmptyCheckFieldSelectors) {
+define(['jquery', 'underscore', 'gettext', 'common/js/components/utils/view_utils'],
+    function($, _, gettext, ViewUtils) {
+        return function(selectors, classes, keyLengthViolationMessage, keyFieldSelectors, nonEmptyCheckFieldSelectors) {
             var self = this;
 
             this.selectors = selectors;
@@ -16,12 +16,12 @@ define(["jquery", "underscore", "gettext", "common/js/components/utils/view_util
             // Fields that must not be empty on your model.
             this.nonEmptyCheckFieldSelectors = nonEmptyCheckFieldSelectors;
 
-            this.create = function (courseInfo, errorHandler) {
+            this.create = function(courseInfo, errorHandler) {
                 // Replace this with a function that will make a request to create the object.
             };
 
             // Ensure that key fields passes checkTotalKeyLengthViolations check
-            this.validateTotalKeyLength = function () {
+            this.validateTotalKeyLength = function() {
                 ViewUtils.checkTotalKeyLengthViolations(
                     self.selectors, self.classes,
                     self.keyFieldSelectors,
@@ -29,12 +29,12 @@ define(["jquery", "underscore", "gettext", "common/js/components/utils/view_util
                 );
             };
 
-            this.toggleSaveButton = function (is_enabled) {
+            this.toggleSaveButton = function(is_enabled) {
                 var is_disabled = !is_enabled;
                 $(self.selectors.save).toggleClass(self.classes.disabled, is_disabled).attr('aria-disabled', is_disabled);
             };
 
-            this.setFieldInErr = function (element, message) {
+            this.setFieldInErr = function(element, message) {
                 if (message) {
                     element.addClass(self.classes.error);
                     element.children(self.selectors.tipError).addClass(self.classes.showing).removeClass(self.classes.hiding).text(message);
@@ -51,10 +51,10 @@ define(["jquery", "underscore", "gettext", "common/js/components/utils/view_util
             };
 
             // One final check for empty values
-            this.hasInvalidRequiredFields = function () {
+            this.hasInvalidRequiredFields = function() {
                 return _.reduce(
                     self.nonEmptyCheckFieldSelectors,
-                    function (acc, element) {
+                    function(acc, element) {
                         var $element = $(element);
                         var error = self.validateRequiredField($element.val());
                         self.setFieldInErr($element.parent(), error);
@@ -65,10 +65,10 @@ define(["jquery", "underscore", "gettext", "common/js/components/utils/view_util
             };
 
             // Ensure that all fields are not empty
-            this.validateFilledFields = function () {
+            this.validateFilledFields = function() {
                 return _.reduce(
                     self.nonEmptyCheckFieldSelectors,
-                    function (acc, element) {
+                    function(acc, element) {
                         var $element = $(element);
                         return $element.val().length !== 0 ? acc : false;
                     },
@@ -77,12 +77,12 @@ define(["jquery", "underscore", "gettext", "common/js/components/utils/view_util
             };
 
             // Handle validation asynchronously
-            this.configureHandlers = function () {
+            this.configureHandlers = function() {
                 _.each(
                     self.keyFieldSelectors,
-                    function (element) {
+                    function(element) {
                         var $element = $(element);
-                        $element.on('keyup', function (event) {
+                        $element.on('keyup', function(event) {
                             // Don't bother showing "required field" error when
                             // the user tabs into a new field; this is distracting
                             // and unnecessary
@@ -100,7 +100,7 @@ define(["jquery", "underscore", "gettext", "common/js/components/utils/view_util
                 );
 
                 var $name = $(self.selectors.name);
-                $name.on('keyup', function () {
+                $name.on('keyup', function() {
                     var error = self.validateRequiredField($name.val());
                     self.setFieldInErr($name.parent(), error);
                     self.validateTotalKeyLength();
@@ -118,6 +118,6 @@ define(["jquery", "underscore", "gettext", "common/js/components/utils/view_util
                 validateFilledFields: self.validateFilledFields,
                 configureHandlers: self.configureHandlers
             };
-        }
+        };
     }
 );

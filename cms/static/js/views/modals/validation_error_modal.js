@@ -32,31 +32,29 @@ define(['jquery', 'underscore', 'gettext', 'js/views/modals/base_modal'],
                 this.response = json_object;
             },
 
-            /* Create the content HTML for this modal by passing necessary 
+            /* Create the content HTML for this modal by passing necessary
              * parameters to template (validation-error-modal) */
             getContentHtml: function() {
-
                 return this.template({
                     response: this.response,
                     num_errors: this.response.length
                 });
             },
 
-            /* Receive calback function from the view, so that it can be 
+            /* Receive calback function from the view, so that it can be
              * invoked when the user clicks the reset button */
             setResetCallback: function(reset_callback) {
                 this.reset_callback = reset_callback;
             },
 
-            /* Upon receiving a user's clicking event on the reset button, 
+            /* Upon receiving a user's clicking event on the reset button,
              * resets all setting changes, and hide the modal */
             resetAction: function() {
-
                 // reset page content
                 this.reset_callback();
 
                 // hide the modal
-                BaseModal.prototype.hide.call(this); 
+                BaseModal.prototype.hide.call(this);
             }
         });
 

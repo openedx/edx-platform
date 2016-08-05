@@ -41,15 +41,15 @@ function(_, Course, CertificatesCollection, CertificateModel, CertificateDetails
         inputSignatoryTitle: '.signatory-title-input',
         inputSignatoryOrganization: '.signatory-organization-input'
     };
-    var verifyAndConfirmPrompt = function(promptSpy, promptText){
+    var verifyAndConfirmPrompt = function(promptSpy, promptText) {
         ViewHelpers.verifyPromptShowing(promptSpy, gettext(promptText));
         ViewHelpers.confirmPrompt(promptSpy);
         ViewHelpers.verifyPromptHidden(promptSpy);
     };
 
     describe('Certificate Details Spec:', function() {
-        var setValuesToInputs = function (view, values) {
-            _.each(values, function (value, selector) {
+        var setValuesToInputs = function(view, values) {
+            _.each(values, function(value, selector) {
                 if (SELECTORS[selector]) {
                     view.$(SELECTORS[selector]).val(value);
                     view.$(SELECTORS[selector]).trigger('change');
@@ -96,8 +96,8 @@ function(_, Course, CertificatesCollection, CertificateModel, CertificateDetails
                 is_active: true
             }, this.newModelOptions);
 
-            this.collection = new CertificatesCollection([ this.model ], {
-                certificateUrl: '/certificates/'+ window.course.id
+            this.collection = new CertificatesCollection([this.model], {
+                certificateUrl: '/certificates/' + window.course.id
             });
             this.model.set('id', 0);
             this.view = new CertificateDetailsView({
@@ -120,44 +120,43 @@ function(_, Course, CertificatesCollection, CertificateModel, CertificateDetails
 
 
         describe('The Certificate Details view', function() {
-
-            it('should parse a JSON string collection into a Backbone model collection', function () {
-                var course_title = "Test certificate course title override 2";
+            it('should parse a JSON string collection into a Backbone model collection', function() {
+                var course_title = 'Test certificate course title override 2';
                 var CERTIFICATE_JSON = '[{"course_title": "' + course_title + '", "signatories":"[]"}]';
                 this.collection.parse(CERTIFICATE_JSON);
                 var model = this.collection.at(1);
                 expect(model.get('course_title')).toEqual(course_title);
             });
 
-            it('should parse a JSON object collection into a Backbone model collection', function () {
-                var course_title = "Test certificate course title override 2";
+            it('should parse a JSON object collection into a Backbone model collection', function() {
+                var course_title = 'Test certificate course title override 2';
                 var CERTIFICATE_JSON_OBJECT = [{
-                    "course_title" : course_title,
-                    "signatories" : "[]"
+                    'course_title': course_title,
+                    'signatories': '[]'
                 }];
                 this.collection.parse(CERTIFICATE_JSON_OBJECT);
                 var model = this.collection.at(1);
                 expect(model.get('course_title')).toEqual(course_title);
             });
 
-            it('should have empty certificate collection if there is an error parsing certifcate JSON', function () {
+            it('should have empty certificate collection if there is an error parsing certifcate JSON', function() {
                 var CERTIFICATE_INVALID_JSON = '[{"course_title": Test certificate course title override, "signatories":"[]"}]';  // eslint-disable-line max-len
                 var collection_length = this.collection.length;
                 this.collection.parse(CERTIFICATE_INVALID_JSON);
-                //collection length should remain the same since we have error parsing JSON
+                // collection length should remain the same since we have error parsing JSON
                 expect(this.collection.length).toEqual(collection_length);
             });
 
-            it('should display the certificate course title override', function () {
+            it('should display the certificate course title override', function() {
                 expect(this.view.$(SELECTORS.course_title)).toExist();
                 expect(this.view.$(SELECTORS.course_title)).toContainText('Test Course Title Override');
             });
 
-            it('should present an Edit action', function () {
+            it('should present an Edit action', function() {
                 expect(this.view.$('.edit')).toExist();
             });
 
-            it('should change to "edit" mode when clicking the Edit button and confirming the prompt', function(){
+            it('should change to "edit" mode when clicking the Edit button and confirming the prompt', function() {
                 expect(this.view.$('.action-edit .edit')).toExist();
                 var promptSpy = ViewHelpers.createPromptSpy();
                 this.view.$('.action-edit .edit').click();
@@ -165,67 +164,64 @@ function(_, Course, CertificatesCollection, CertificateModel, CertificateDetails
                 expect(this.model.get('editing')).toBe(true);
             });
 
-            it('should not show confirmation prompt when clicked on "edit" in case of inactive certificate', function(){
+            it('should not show confirmation prompt when clicked on "edit" in case of inactive certificate', function() {
                 this.model.set('is_active', false);
                 expect(this.view.$('.action-edit .edit')).toExist();
                 this.view.$('.action-edit .edit').click();
                 expect(this.model.get('editing')).toBe(true);
             });
 
-            it('should not present a Edit action if user is not global staff and certificate is active', function () {
+            it('should not present a Edit action if user is not global staff and certificate is active', function() {
                 window.CMS.User = {isGlobalStaff: false};
                 appendSetFixtures(this.view.render().el);
                 expect(this.view.$('.action-edit .edit')).not.toExist();
             });
 
-            it('should present a Delete action', function () {
+            it('should present a Delete action', function() {
                 expect(this.view.$('.action-delete .delete')).toExist();
             });
 
-            it('should not present a Delete action if user is not global staff and certificate is active', function () {
+            it('should not present a Delete action if user is not global staff and certificate is active', function() {
                 window.CMS.User = {isGlobalStaff: false};
                 appendSetFixtures(this.view.render().el);
                 expect(this.view.$('.action-delete .delete')).not.toExist();
             });
 
-            it('should prompt the user when when clicking the Delete button', function(){
+            it('should prompt the user when when clicking the Delete button', function() {
                 expect(this.view.$('.action-delete .delete')).toExist();
                 this.view.$('.action-delete .delete').click();
             });
 
-            it('should scroll to top after rendering if necessary', function () {
+            it('should scroll to top after rendering if necessary', function() {
                 $.smoothScroll = jasmine.createSpy('jQuery.smoothScroll');
                 appendSetFixtures(this.view.render().el);
                 expect($.smoothScroll).toHaveBeenCalled();
             });
-
         });
 
-        describe('Signatory details', function(){
-
+        describe('Signatory details', function() {
             beforeEach(function() {
                 this.view.render();
             });
 
-            it('displays certificate signatories details', function(){
+            it('displays certificate signatories details', function() {
                 this.view.$('.show-details').click();
                 expect(this.view.$(SELECTORS.signatory_name_value)).toContainText('');
                 expect(this.view.$(SELECTORS.signatory_title_value)).toContainText('');
                 expect(this.view.$(SELECTORS.signatory_organization_value)).toContainText('');
             });
 
-            it('should present Edit action on signaotry', function () {
+            it('should present Edit action on signaotry', function() {
                 expect(this.view.$(SELECTORS.edit_signatory)).toExist();
             });
 
-            it('should not present Edit action on signaotry if user is not global staff and certificate is active', function () {
+            it('should not present Edit action on signaotry if user is not global staff and certificate is active', function() {
                 window.CMS.User = {isGlobalStaff: false};
                 this.view.render();
                 expect(this.view.$(SELECTORS.edit_signatory)).not.toExist();
             });
 
             it('supports in-line editing of signatory information', function() {
-
                 this.view.$(SELECTORS.edit_signatory).click();
                 expect(this.view.$(SELECTORS.inputSignatoryName)).toExist();
                 expect(this.view.$(SELECTORS.inputSignatoryTitle)).toExist();
@@ -233,7 +229,6 @@ function(_, Course, CertificatesCollection, CertificateModel, CertificateDetails
             });
 
             it('correctly persists changes made during in-line signatory editing', function() {
-
                 var requests = AjaxHelpers.requests(this),
                     notificationSpy = ViewHelpers.createNotificationSpy();
 
