@@ -49,6 +49,8 @@ def move_to_verified_cohort(sender, instance, **kwargs):  # pylint: disable=unus
                     'verified_cohort_name': verified_cohort_name,
                     'default_cohort_name': random_cohort.name
                 }
+                log.info("Queuing automatic cohorting for user '%s' in course '%s'", instance.user.username, course_key)
+
                 # Do the update with a 3-second delay in hopes that the CourseEnrollment transaction has been
                 # completed before the celery task runs. We want a reasonably short delay in case the learner
                 # immediately goes to the courseware.
