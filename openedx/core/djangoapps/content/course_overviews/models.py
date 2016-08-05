@@ -522,7 +522,7 @@ class CourseOverview(TimeStampedModel):
         # creates circular import; hence explicitly referenced is_discussion_enabled
         for tab in tabs:
             if tab.tab_id == "discussion" and django_comment_client.utils.is_discussion_enabled(self.id):
-                return True
+                return tab.is_hidden
         return False
 
     @property

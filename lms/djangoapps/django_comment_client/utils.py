@@ -796,7 +796,4 @@ def is_discussion_enabled(course_id):
     if settings.FEATURES.get('CUSTOM_COURSES_EDX', False):
         if get_current_ccx(course_id):
             return False
-    course = courses.get_course_by_id(course_id)
-    if not tabs.ExternalDiscussionCourseTab.is_enabled(course):
-        return False
     return settings.FEATURES.get('ENABLE_DISCUSSION_SERVICE')
