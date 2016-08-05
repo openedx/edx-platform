@@ -333,6 +333,18 @@ class CheckboxProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         """
         super(CheckboxProblemTypeTest, self).setUp(*args, **kwargs)
 
+    def get_problem(self):
+        """
+        Creates a {problem_type} problem
+        """
+        # Generate the problem XML using capa.tests.response_xml_factory
+        return XBlockFixtureDesc(
+            'problem',
+            self.problem_name,
+            data=self.factory.build_xml(**self.factory_kwargs),
+            metadata={'rerandomize': 'always', 'showanswer': 'always'}
+        )
+
     def answer_problem(self, correct):
         """
         Answer checkbox problem.
@@ -344,15 +356,17 @@ class CheckboxProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
             self.problem_page.click_choice("choice_1")
 
     @attr('shard_7')
-    def test_can_show_answer(self):
+    def test_can_show_hide_answer(self):
         msg = "Wait for correct choices to be highlighted"
-        selector = ', '.join([
-            'fieldset div:nth-child(1) label.choicegroup_correct',
-            'fieldset div:nth-child(1) label.choicegroup_correct'
-        ])
 
+        #from nose.tools import stack_trace; stack_trace()
         self.problem_page.q(css='div.problem div.action .show').click()
-        self.problem_page.wait_for_element_presence(selector, msg)
+        self.problem_page.wait_for_element_presence('.solution-span div.detailed-solution', msg)
+
+        #self.assertEqual(self.problem_page.q(css='fieldset div.field').attrs('class'), ['field'])
+
+        # self.problem_page.q(css='div.problem div.action .show').click()
+        # self.problem_page.wait_for_element_absence('section.solution-span .detailed-solution', msg)
 
 
 class MultipleChoiceProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
