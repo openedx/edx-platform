@@ -929,7 +929,10 @@ class TaskQueue(SysadminDashboardView):
         try:
             task = InstructorTask.objects.get(
                 id=row_id,
-                task_state='QUEUING',
+                task_state__in=[
+                    'QUEUING',
+                    'PROGRESS',
+                ],
             )
         except InstructorTask.DoesNotExist, err:
             msg = _('Cannot find task with ID {row_id} and task_state QUEUING - {error}').format(
@@ -950,7 +953,10 @@ class TaskQueue(SysadminDashboardView):
         data = []
 
         tasks = InstructorTask.objects.filter(
-            task_state='QUEUING',
+            task_state__in=[
+                'QUEUING',
+                'PROGRESS',
+            ],
         ).order_by('id').reverse()
         for task in tasks:
             data.append(
@@ -969,7 +975,7 @@ class TaskQueue(SysadminDashboardView):
                 _('Task Type'),
                 _('Task State'),
             ],
-            title=_('List of Queueing Tasks'),
+            title=_('List of Tasks'),
             data=data,
         )
 
