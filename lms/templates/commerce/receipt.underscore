@@ -88,7 +88,7 @@
     <% } %>
 
     <nav class="nav-wizard is-ready">
-        <% if ( !is_verification_required ||  verified || is_request_in_themed_site) { %>
+        <% if ( verified || is_request_in_themed_site) { %>
             <a class="next action-primary right" href="/dashboard"><%- gettext( "Go to Dashboard" ) %></a>
         <% } else { %>
           <a id="verify_later_button" class="next action-secondary verify-later nav-link" href="/dashboard" data-tooltip="<%- edx.StringUtils.interpolate( gettext( "If you don't verify your identity now, you can still explore your course from your dashboard. You will receive periodic reminders from {platformName} to verify your identity." ), { platformName: platformName } ) %>">
