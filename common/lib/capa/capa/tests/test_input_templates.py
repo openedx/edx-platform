@@ -579,7 +579,7 @@ class FormulaEquationInputTemplateTest(TemplateTestCase):
         Test that correct description information is set on desired elements.
         """
         xpaths = ['//input/@aria-describedby']
-        self.assert_description(xpaths, descriptions=False)
+        self.assert_description(xpaths)
         self.assert_describedby_attribute(xpaths)
 
 
