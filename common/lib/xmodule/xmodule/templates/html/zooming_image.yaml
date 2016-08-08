@@ -42,6 +42,7 @@ data: |
       <div class="zooming-image-place" style="position: relative;">
         <a class="edx-zoom" href="https://studio.edx.org/c4x/edX/DemoX/asset/pathways_detail_01.png">
             <img alt="magnify" src="https://studio.edx.org/c4x/edX/DemoX/asset/pathways_overview_01.png" />
+            <span class="indicator icon fa fa-search-plus" aria-hidden="true"></span>
           </a>
         <div class="script_placeholder" data-src="https://studio.edx.org/c4x/edX/DemoX/asset/image-zoom-tool.js" />
       </div>

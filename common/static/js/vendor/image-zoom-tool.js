@@ -53,24 +53,22 @@
                 filter: 'alpha(opacity=75)',
                 background: '#000'
             });
-            
+
             $errorMessage
                 .text(settings.errorMessage)
                     .css({
                         height: settings.height,
                         width: settings.width
                     });
-                    
+
             $loader.css({
                 height: settings.height,
                 width: settings.width
             });
 
-            $this.on('click keydown', function(event) {
-                event.preventDefault();
-            });
-
             $targetImage.on('click', function(event) {
+                event.preventDefault();
+
                 if (!$zoomed.hasClass('is-visible')) {
                     var left = event.pageX,
                         top = event.pageY;
@@ -80,7 +78,7 @@
                     }
 
                     setTimeout(function() {
-                        appendZoomed();
+                        appendZoomed(true);
                         magnifyWithMouse(left, top);
 
                         if (settings.lightbox == true) {
@@ -111,18 +109,16 @@
             }).mouseleave(function() {
                 pulseZoomed();
             });
-            
+
             $imageArea.on('keydown', function(event) {
                 var left = event.pageX,
                     top = event.pageY;
 
                 switch (event.which) {
-                    case keys.tab:
-                        return true;
-                        break;
-
                     case keys.enter:
                     case keys.space:
+                        event.preventDefault();
+
                         if (!$zoomed.hasClass('is-visible')) {
                             var left = event.pageX,
                                 top = event.pageY;
@@ -145,12 +141,9 @@
                     default:
                         return true;
                 }
-                
             });
-            
-            $zoomed.on('keydown', function(event) {
-                event.preventDefault();
 
+            $zoomed.on('keydown', function(event) {
                 var left,
                     top,
                     $zoomedImage = $zoomed.find('img'),
@@ -161,7 +154,7 @@
 
                 switch (event.which) {
                     case keys.esc:
-                    case keys.tab:
+                        event.preventDefault();
                         if ($zoomed.hasClass('is-visible')) {
                             detachZoomed();
 
@@ -174,21 +167,25 @@
                         break;
 
                     case keys.up:
-                        magnifyWithKeyboard(0, -1);
+                        // we move two spaces at a time
+                        magnifyWithKeyboard(0, 2, event);
                         break;
 
                     case keys.down:
-                        magnifyWithKeyboard(0, 1);
+                        // we move two spaces at a time
+                        magnifyWithKeyboard(0, -2, event);
                         break;
 
                     case keys.left:
-                        magnifyWithKeyboard(-1, 0);
+                        // we move two spaces at a time
+                        magnifyWithKeyboard(2, 0, event);
                         break;
 
                     case keys.right:
-                        magnifyWithKeyboard(1, 0);
+                        // we move two spaces at a time
+                        magnifyWithKeyboard(-2, 0, event);
                         break;
-                        
+
                     default:
                         return true;
                 }
@@ -206,11 +203,6 @@
 
             $(window).resize(function() {
                 if ($zoomed.is(':visible')) {
-                    // $zoomed.css({
-                    //     left: $targetImage.offset().left + ($targetImage.width() / 2) - ($zoomed.width() / 2),
-                    //     top: $targetImage.offset().top + ($targetImage.height() / 2) - ($zoomed.height() / 2)
-                    // });
-
                     $magnifiedImage.css({
                         left: -($magnifiedImage.width() / 2) + ($zoomed.width() / 2),
                         top: -($magnifiedImage.height() / 2) + ($zoomed.height() / 2)
@@ -242,10 +234,12 @@
                     left: magnifierLeft
                 });
             };
-            
-            function magnifyWithKeyboard(left, top) {
+
+            function magnifyWithKeyboard(left, top, event) {
                 var newLeft,
                     newTop;
+
+                event.preventDefault();
 
                 newLeft = $magnifiedImage.css('left');
                 newLeft = newLeft.replace('px', '');
@@ -324,9 +318,6 @@
 
     $.fn.edxImageZoomTool.defaults = {
         zIndex: 1000,
-        // width: 150,
-        // height: 150,
-        // border: '2px solid #191919',
         fadeSpeed: 250,
         lightbox: true,
         errorMessage: 'Image load error'
