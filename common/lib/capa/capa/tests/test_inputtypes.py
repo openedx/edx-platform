@@ -40,7 +40,6 @@ DESCRIBEDBY = 'aria-describedby="desc-1 desc-2"'
 DESCRIPTIONS = OrderedDict([('desc-1', 'description text 1'), ('desc-2', 'description text 2')])
 RESPONSE_DATA = {
     'label': 'question text 101',
-    'description_ids': 'desc-1 desc-2',
     'descriptions': DESCRIPTIONS
 }
 

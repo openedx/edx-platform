@@ -322,9 +322,11 @@ class InputTypeBase(object):
             'describedby': '',
         }
 
-        if self.response_data.get('description_ids'):
+        # Don't add aria-describedby attribute if there are no descriptions
+        if self.response_data.get('descriptions'):
+            description_ids = ' '.join(self.response_data.get('descriptions').keys())
             context.update(
-                {'describedby': 'aria-describedby="{}"'.format(self.response_data.get('description_ids'))}
+                {'describedby': 'aria-describedby="{}"'.format(description_ids)}
             )
 
         context.update(

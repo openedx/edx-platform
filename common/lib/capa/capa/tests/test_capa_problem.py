@@ -4,6 +4,7 @@ Test capa problem.
 import unittest
 
 from . import new_loncapa_problem
+from capa.capa_problem import DEFAULT_QUESTION_TEXT
 
 
 class CAPAProblemTest(unittest.TestCase):
@@ -13,7 +14,6 @@ class CAPAProblemTest(unittest.TestCase):
         """
         Verify that
         * label is extracted
-        * description_ids are constructed
         * <label> tag is removed to avoid duplication
 
         This is the case when we have a problem with single question or
@@ -37,7 +37,6 @@ class CAPAProblemTest(unittest.TestCase):
             {
                 '1_2':
                 {
-                    'description_ids': 'description_1_2_1',
                     'label': 'Select the correct synonym of paranoid?',
                     'descriptions': {'description_1_2_1': 'Only the paranoid survive.'}
                 }
@@ -63,7 +62,7 @@ class CAPAProblemTest(unittest.TestCase):
         problem = new_loncapa_problem(xml)
         self.assertEqual(
             problem.problem_data,
-            {'1_2': {'description_ids': '', 'label': question, 'descriptions': {}}}
+            {'1_2': {'label': question, 'descriptions': {}}}
 
         )
         self.assertEqual(
@@ -104,13 +103,11 @@ class CAPAProblemTest(unittest.TestCase):
             {
                 '1_2':
                 {
-                    'description_ids': '',
                     'label': question1,
                     'descriptions': {}
                 },
                 '1_3':
                 {
-                    'description_ids': '',
                     'label': question2,
                     'descriptions': {}
                 }
@@ -144,7 +141,6 @@ class CAPAProblemTest(unittest.TestCase):
             {
                 '1_2':
                 {
-                    'description_ids': 'description_1_2_1 description_1_2_2',
                     'label': '___ requires sacrifices.',
                     'descriptions': {
                         'description_1_2_1': "The problem with trying to be the bad guy, there's always someone worse.",
@@ -173,8 +169,7 @@ class CAPAProblemTest(unittest.TestCase):
             {
                 '1_2':
                 {
-                    'description_ids': 'description_1_2_1',
-                    'label': 'You must specify meaningful question text.',
+                    'label': DEFAULT_QUESTION_TEXT,
                     'descriptions': {
                         'description_1_2_1': "Everybody needs somebody to talk to."
                     }
@@ -202,7 +197,6 @@ class CAPAProblemTest(unittest.TestCase):
             {
                 '1_2':
                 {
-                    'description_ids': '',
                     'label': 'Click the country which is home to the Pyramids.',
                     'descriptions': {}
                 }
@@ -232,7 +226,6 @@ class CAPAProblemTest(unittest.TestCase):
             {
                 '1_2':
                 {
-                    'description_ids': '',
                     'label': '',
                     'descriptions': {}
                 }
@@ -275,13 +268,11 @@ class CAPAProblemTest(unittest.TestCase):
             {
                 '1_2':
                 {
-                    'description_ids': 'description_1_2_1',
                     'label': 'Select the correct synonym of paranoid?',
                     'descriptions': {'description_1_2_1': 'Only the paranoid survive.'}
                 },
                 '1_3':
                 {
-                    'description_ids': 'description_1_3_1',
                     'label': 'What Apple device competed with the portable CD player?',
                     'descriptions': {'description_1_3_1': 'Device looks like an egg plant.'}
                 }
@@ -295,7 +286,7 @@ class CAPAProblemTest(unittest.TestCase):
         mismatched with question tag value.
 
         This is the case when author updated the question <p> tag directly in XML but
-        didn't changed the label attribute value. In this case we will consider the
+        didn't change the label attribute value. In this case we will consider the
         first <p> tag before responsetype as question.
         """
         question = 'Select the correct synonym of paranoid?'
@@ -317,7 +308,6 @@ class CAPAProblemTest(unittest.TestCase):
             {
                 '1_2':
                 {
-                    'description_ids': '',
                     'label': question,
                     'descriptions': {}
                 }

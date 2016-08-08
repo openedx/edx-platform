@@ -16,7 +16,6 @@ This is used by capa_module.
 from collections import OrderedDict
 from copy import deepcopy
 from datetime import datetime
-from gettext import gettext as _
 import logging
 import os.path
 import re
@@ -37,7 +36,7 @@ from capa.safe_exec import safe_exec
 # extra things displayed after "show answers" is pressed
 solution_tags = ['solution']
 
-# fully accesible capa response types
+# fully accessible capa response types
 ACCESSIBLE_CAPA_RESPONSE_TYPES = [
     'choiceresponse',
     'multiplechoiceresponse',
@@ -73,8 +72,10 @@ log = logging.getLogger(__name__)
 #-----------------------------------------------------------------------------
 # main class for this module
 
-
-DEFAULT_QUESTION_TEXT = _("You must specify meaningful question text.")
+# Make '_' a no-op so we can scrape strings. Using lambda instead of
+#  `django.utils.translation.ugettext_noop` because Django cannot be imported in this file
+_ = lambda text: text
+DEFAULT_QUESTION_TEXT = _("Formatting error: You must explicitly specify the question text.")
 
 
 class LoncapaSystem(object):
@@ -877,7 +878,7 @@ class LoncapaProblem(object):
                 entry.attrib['id'] = "%s_%i_%i" % (self.problem_id, response_id, answer_id)
                 answer_id = answer_id + 1
 
-            question_id = self.problem_id + '_' + str(response_id)
+            question_id = '{}_{}'.format(self.problem_id, response_id)
             label = ''
             element_to_be_deleted = None
 
@@ -885,7 +886,8 @@ class LoncapaProblem(object):
             responsetype_label_tag = response.find('label')
             if responsetype_label_tag is not None:
                 label = responsetype_label_tag.text
-                # Delete <label> tag containing question text otherwise question will be rendered twice
+                # store <label> tag containing question text to delete
+                # it later otherwise question will be rendered twice
                 element_to_be_deleted = responsetype_label_tag
             elif 'label' in inputfields[0].attrib:
                 # Extract label value from label attribute
@@ -894,7 +896,7 @@ class LoncapaProblem(object):
                 # * single question with old XML format only
 
                 label = inputfields[0].attrib['label']
-                # Get first <p> tag before responsetype
+                # Get first <p> tag before responsetype, this <p> contains the question text.
                 p_tag = response.xpath('preceding-sibling::p[1]')
 
                 if p_tag:
@@ -906,15 +908,16 @@ class LoncapaProblem(object):
                         label = p_tag[0].text
                     element_to_be_deleted = p_tag[0]
             else:
-                # neither <label> tag nor label attribute is present inside responsetype
-                # This is the case when we have a problem with multi-questions without --- having markdown
-                # find the immediate <label> tag before the responsetype. also delete it avoid rendering twice
+                # In this case the problems don't have tag or label attribute inside the responsetype
+                # so we will get the first preceding label tag w.r.t to this responsetype.
+                # This will take care of those multi-question problems that are not using --- in their markdown.
                 label_tag = response.xpath("preceding-sibling::label[1]")
                 if label_tag:
                     label = label_tag[0].text
                     element_to_be_deleted = label_tag[0]
 
-            label = label.strip() or DEFAULT_QUESTION_TEXT
+            _ = self.capa_system.i18n.ugettext
+            label = label.strip() or _(DEFAULT_QUESTION_TEXT)
 
             # delete label or p element only if responsetype is fully accessible
             if response.tag in ACCESSIBLE_CAPA_RESPONSE_TYPES and element_to_be_deleted is not None:
@@ -922,7 +925,7 @@ class LoncapaProblem(object):
 
             # for non-accessible responsetypes it may be possible that label attribute is not present
             # in this case pass an empty label. remember label attribute is only used as value for aria-label
-            if response.tag not in ACCESSIBLE_CAPA_RESPONSE_TYPES and label == DEFAULT_QUESTION_TEXT:
+            if response.tag not in ACCESSIBLE_CAPA_RESPONSE_TYPES and label == _(DEFAULT_QUESTION_TEXT):
                 label = ''
 
             # Extract descriptions and set unique id on each description tag
@@ -938,7 +941,6 @@ class LoncapaProblem(object):
 
             problem_data[question_id] = {
                 'label': label,
-                'description_ids': ' '.join(descriptions.keys()),
                 'descriptions': descriptions
             }
 

@@ -32,9 +32,9 @@ class TemplateTestCase(unittest.TestCase):
     TEMPLATE_NAME = None
     DESCRIBEDBY = 'aria-describedby="desc-1 desc-2"'
     DESCRIPTIONS = OrderedDict([('desc-1', 'description text 1'), ('desc-2', 'description text 2')])
+    DESCRIPTION_IDS = ' '.join(DESCRIPTIONS.keys())
     RESPONSE_DATA = {
         'label': 'question text 101',
-        'description_ids': 'desc-1 desc-2',
         'descriptions': DESCRIPTIONS
     }
 
@@ -148,7 +148,7 @@ class TemplateTestCase(unittest.TestCase):
             self.assertTrue(describedbys)
 
             for describedby in describedbys:
-                self.assertEqual(describedby, self.context['response_data']['description_ids'])
+                self.assertEqual(describedby, self.DESCRIPTION_IDS)
 
     def assert_describedby_attribute(self, describedby_xpaths):
         """

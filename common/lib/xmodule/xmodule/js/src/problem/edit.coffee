@@ -217,7 +217,7 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
               label = '<label>' + result[0] + '</label>' + '\n';
 
           // don't add empty <description> tag
-          if (result.length == 1 || !result[1]) {
+          if (result.length === 1 || !result[1]) {
               return label;
           }
           return label + '<description>' + result[1] + '</description>\n'
@@ -544,15 +544,15 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
       makeParagraph = true;
 
       for (i = 0; i < splits.length; i += 1) {
-          if(/\<(script|pre|label|description)/.test(splits[i])) {
+          if (/\<(script|pre|label|description)/.test(splits[i])) {
               makeParagraph = false;
           }
 
-          if(makeParagraph) {
+          if (makeParagraph) {
               splits[i] = splits[i].replace(/(^(?!\s*\<|$).*$)/gm, '<p>$1</p>');
           }
 
-          if(/\<\/(script|pre|label|description)/.test(splits[i])) {
+          if (/\<\/(script|pre|label|description)/.test(splits[i])) {
               makeParagraph = true;
           }
       }

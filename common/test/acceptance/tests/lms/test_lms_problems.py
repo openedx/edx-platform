@@ -448,7 +448,7 @@ class ProblemQuestionDescriptionTest(ProblemsTest):
         """
         Scenario: Test that question and description are rendered as expected.
         Given I am enrolled in a course.
-        And I visit a unit page with a CAPA question.
+        When I visit a unit page with a CAPA question.
         Then label and description should be rendered correctly.
         """
         self.courseware_page.visit()
@@ -490,7 +490,7 @@ class CAPAProblemQuestionDescriptionA11yTest(ProblemsTest):
         """)
         return XBlockFixtureDesc('problem', 'Problem A11Y TEST', data=xml)
 
-    def test_unique_ids(self):
+    def test_a11y(self):
         """
         Scenario: Verifies that each question and description has unique id.
         Given I am enrolled in a course.
