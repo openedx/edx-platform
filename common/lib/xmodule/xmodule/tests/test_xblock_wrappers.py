@@ -290,6 +290,7 @@ class XBlockWrapperTestMixin(object):
         # pylint: disable=no-member
         descriptor.runtime.id_reader.get_definition_id = Mock(return_value='a')
         descriptor.runtime.modulestore = modulestore
+        descriptor._xmodule.graded = 'False'
         self.check_property(descriptor)
 
     # Test that when an xmodule is generated from descriptor_cls
