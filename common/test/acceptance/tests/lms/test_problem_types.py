@@ -462,12 +462,6 @@ class DropDownProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         Additional setup for DropDownProblemTypeTest
         """
         super(DropDownProblemTypeTest, self).setUp(*args, **kwargs)
-        self.problem_page.a11y_audit.config.set_rules({
-            'ignore': [
-                'section',  # TODO: AC-491
-                'label',  # TODO: AC-291
-            ]
-        })
 
     def answer_problem(self, correct):
         """
@@ -477,6 +471,22 @@ class DropDownProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         selector_element = self.problem_page.q(
             css='.problem .option-input select')
         select_option_by_text(selector_element, answer)
+
+    @attr('a11y')
+    def test_problem_type_a11y(self):
+        """
+        Run accessibility audit for the dropdown problem type.
+        """
+        self.problem_page.wait_for(
+            lambda: self.problem_page.problem_name == self.problem_name,
+            "Make sure the correct problem is on the page"
+        )
+
+        # Set the scope to the problem container
+        self.problem_page.a11y_audit.config.set_scope(include=['section.wrapper-problem-response'])
+
+        # Run the accessibility audit.
+        self.problem_page.a11y_audit.check_for_accessibility_errors()
 
 
 class StringProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):

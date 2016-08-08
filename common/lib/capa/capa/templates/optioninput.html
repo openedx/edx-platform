@@ -1,11 +1,19 @@
 <% doinline = "inline" if inline else "" %>
 
 <form class="inputtype option-input ${doinline}">
+  <label class="problem-group-label" for="input_${id}">
+    ${response_data['label']}
+  </label>
+
+  % for desc_id, desc_text in response_data['descriptions'].iteritems():
+    <p id="${desc_id}">${desc_text}</p>
+  % endfor
+
    <select name="input_${id}" id="input_${id}" aria-label="${response_data['label']}" ${describedby}>
       <option value="option_${id}_dummy_default">  </option>
       % for option_id, option_description in options:
           <option value="${option_id}"
-          % if (option_id==value or option_id==answervariable):
+          % if (option_id == value or option_id == answervariable):
         	selected="true"
           % endif
           > ${option_description}</option>
@@ -23,5 +31,4 @@
   % if msg:
       <span class="message">${msg|n}</span>
   % endif
-
 </form>
