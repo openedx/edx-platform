@@ -72,10 +72,7 @@ log = logging.getLogger(__name__)
 #-----------------------------------------------------------------------------
 # main class for this module
 
-# Make '_' a no-op so we can scrape strings. Using lambda instead of
-#  `django.utils.translation.ugettext_noop` because Django cannot be imported in this file
-_ = lambda text: text
-DEFAULT_QUESTION_TEXT = _("Formatting error: You must explicitly specify the question text.")
+DEFAULT_QUESTION_TEXT = "Formatting error: You must explicitly specify the question text."
 
 
 class LoncapaSystem(object):
@@ -917,7 +914,7 @@ class LoncapaProblem(object):
                     element_to_be_deleted = label_tag[0]
 
             _ = self.capa_system.i18n.ugettext
-            label = label.strip() or _(DEFAULT_QUESTION_TEXT)
+            label = label.strip() or DEFAULT_QUESTION_TEXT
 
             # delete label or p element only if responsetype is fully accessible
             if response.tag in ACCESSIBLE_CAPA_RESPONSE_TYPES and element_to_be_deleted is not None:
@@ -925,7 +922,7 @@ class LoncapaProblem(object):
 
             # for non-accessible responsetypes it may be possible that label attribute is not present
             # in this case pass an empty label. remember label attribute is only used as value for aria-label
-            if response.tag not in ACCESSIBLE_CAPA_RESPONSE_TYPES and label == _(DEFAULT_QUESTION_TEXT):
+            if response.tag not in ACCESSIBLE_CAPA_RESPONSE_TYPES and label == DEFAULT_QUESTION_TEXT:
                 label = ''
 
             # Extract descriptions and set unique id on each description tag
