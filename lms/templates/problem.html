@@ -5,13 +5,13 @@ from openedx.core.djangolib.markup import HTML
 %>
 
 <%namespace name='static' file='static_content.html'/>
-<h3 class="hd hd-2 problem-header">
+<h3 class="hd hd-2 problem-header" id="${ id }-problem-title" aria-describedby="${ id }-problem-progress" tabindex="-1">
   ${ problem['name'] }
 </h3>
 
-<div class="problem-progress"></div>
+<div class="problem-progress" id="${ id }-problem-progress"></div>
 
-<div class="problem">
+<div class="problem" aria-labelledby="${ id }-problem-title">
   ${ HTML(problem['html']) }
   <div class="action">
     <input type="hidden" name="problem_id" value="${ problem['name'] }" />

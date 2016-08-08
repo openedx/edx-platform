@@ -122,12 +122,9 @@ iframe[seamless]{
 }
 
 div.problem-progress {
-  @include padding-left($baseline/4);
-  @extend %t-ultralight;
   display: inline-block;
   color: $gray-d1;
-  font-weight: 100;
-  font-size: em(16);
+  font-size: em(14);
 }
 
 // +Problem - Base
