@@ -1,3 +1,4 @@
+<%! from openedx.core.djangolib.markup import HTML %>
 <% doinline = "inline" if inline else "" %>
 
 <form class="inputtype option-input ${doinline}">
@@ -29,6 +30,6 @@
   </div>
   <p class="answer" id="answer_${id}"></p>
   % if msg:
-      <span class="message">${msg|n}</span>
+      <span class="message">${HTML(msg)}</span>
   % endif
 </form>

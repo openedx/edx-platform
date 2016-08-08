@@ -58,7 +58,7 @@ data: |
         '''
       ]]>
       </script>
-            <label>In the following image, click the objects until the cone is yellow and the cube is blue.</label>
+            <p>In the following image, click the objects until the cone is yellow and the cube is blue.</p>
             <jsinput gradefn="WebGLDemo.getGrade"
               get_statefn="WebGLDemo.getState"
               set_statefn="WebGLDemo.setState"

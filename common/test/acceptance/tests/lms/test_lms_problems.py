@@ -561,3 +561,42 @@ class CAPAProblemDropDownA11yTest(CAPAProblemA11yBaseTestMixin, ProblemsTest):
         </problem>
         """)
         return XBlockFixtureDesc('problem', 'Problem A11Y TEST', data=xml)
+
+
+@attr('a11y')
+class ProblemNumericalInputA11yTest(CAPAProblemA11yBaseTestMixin, ProblemsTest):
+    """Tests NumericalInput accessibility."""
+
+    def get_problem(self):
+        """NumericalInput problem XML."""
+        xml = dedent("""
+        <problem>
+            <numericalresponse answer="10*i">
+                <label>The square of what number is -100?</label>
+                <description>Use scientific notation to answer.</description>
+                <formulaequationinput/>
+            </numericalresponse>
+        </problem>""")
+        return XBlockFixtureDesc('problem', 'NUMERICALINPUT PROBLEM', data=xml)
+
+
+@attr('a11y')
+class ProblemMathExpressionInputA11yTest(CAPAProblemA11yBaseTestMixin, ProblemsTest):
+    """Tests MathExpressionInput accessibility."""
+
+    def get_problem(self):
+        """MathExpressionInput problem XML."""
+        xml = dedent(r"""
+        <problem>
+            <script type="loncapa/python">
+        derivative = "n*x^(n-1)"
+            </script>
+
+            <formularesponse type="ci" samples="x,n@1,2:3,4#10" answer="$derivative">
+                <label>Let \( x\) be a variable, and let \( n\) be an arbitrary constant. What is the derivative of \( x^n\)?</label>
+                <description>Enter the equation</description>
+                <responseparam type="tolerance" default="0.00001"/>
+                <formulaequationinput size="40"/>
+            </formularesponse>
+        </problem>""")
+        return XBlockFixtureDesc('problem', 'MATHEXPRESSIONINPUT PROBLEM', data=xml)
