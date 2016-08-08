@@ -6,7 +6,7 @@
   </label>
 
   % for desc_id, desc_text in response_data['descriptions'].iteritems():
-    <p id="${desc_id}}">${desc_text}</p>
+    <p id="${desc_id}">${desc_text}</p>
   % endfor
 
    <select name="input_${id}" id="input_${id}" aria-label="${response_data['label']}" ${describedby}>
