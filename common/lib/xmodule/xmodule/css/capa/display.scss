@@ -152,6 +152,14 @@ div.problem {
       margin-top: $baseline;
     }
   }
+
+  .MathJax_Preview {
+    display: inline-block;
+  }
+
+  .MathJax, .MathJax_CHTML, .MathJax_PHTML, .MathJax_MathML, .MathJax_SVG, .MathJax_PlainSource {
+    display: inline;
+  }
 }
 
 // +Problem - Choice Group
