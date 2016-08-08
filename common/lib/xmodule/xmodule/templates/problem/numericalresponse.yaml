@@ -15,44 +15,46 @@ metadata:
         = 9.3*10^7
         or= 9.296*10^7
 
+        [explanation]
+        The sun is 93,000,000, or 9.3*10^7, miles away from Earth.
+        [explanation]
+
+        ---
+
         >>The square of what number is -100?<<
 
         = 10*i
 
         [explanation]
-        The sun is 93,000,000, or 9.3*10^7, miles away from Earth.
         -100 is the square of 10 times the imaginary number, i.
         [explanation]
-data: |
-    <problem>
+data:   |
+        <problem>
+            <numericalresponse answer="9.3*10^7">
+                <p>In a numerical input problem, learners enter numbers or a specific and relatively simple mathematical expression. Learners enter the response in plain text, and the system then converts the text to a symbolic expression that learners can see below the response field.</p>
+                <p>The system can handle several types of characters, including basic operators, fractions, exponents, and common constants such as i. You can refer learners to
+                    <a href="http://edx.readthedocs.io/projects/edx-guide-for-students/en/latest/completing_assignments/SFD_mathformatting.html#math-formatting" target="_blank">Entering Mathematical and Scientific Expressions</a>in the<i> EdX Learner's Guide</i>
+                for information about how to enter text into the field.</p>
+                <p>When you add the problem, be sure to select <strong>Settings</strong> to specify a <strong>Display Name</strong> and other values that apply.</p>
+                <p>You can use the following example problems as models.</p>
+                <label>How many miles away from Earth is the sun? Use scientific notation to answer.</label>
+                <formulaequationinput label="How many million miles are between Earth and the sun? Use scientific notation to answer."/>
+                <solution>
+                    <div class="detailed-solution">
+                    <p>Explanation</p>
+                    <p>The sun is 93,000,000, or 9.3*10^7, miles away from Earth.</p>
+                    </div>
+                </solution>
+            </numericalresponse>
 
-    <p>In a numerical input problem, learners enter numbers or a specific and
-    relatively simple mathematical expression. Learners enter the response in
-    plain text, and the system then converts the text to a symbolic expression
-    that learners can see below the response field.</p>
-
-    <p>The system can handle several types of characters, including basic
-    operators, fractions, exponents, and common constants such as i. You can
-    refer learners to
-    <a href="http://edx.readthedocs.io/projects/edx-guide-for-students/en/latest/completing_assignments/SFD_mathformatting.html#math-formatting" target="_blank">Entering Mathematical and Scientific Expressions</a> in the <i>EdX Learner's Guide</i> for information about how to enter text into the field.</p>
-    <p>When you add the problem, be sure to select <strong>Settings</strong>
-    to specify a <strong>Display Name</strong> and other values that apply.</p>
-
-    <p>You can use the following example problems as models.</p>
-      <p>How many miles away from Earth is the sun? Use scientific notation to answer.</p>
-      <numericalresponse answer="9.3*10^7">
-        <formulaequationinput label="How many million miles are between Earth and the sun? Use scientific notation to answer." />
-      </numericalresponse>
-
-      <p>The square of what number is -100?</p>
-      <numericalresponse answer="10*i">
-        <formulaequationinput label="The square of what number is -100?" />
-      </numericalresponse>
-    <solution>
-      <div class="detailed-solution">
-        <p>Explanation</p>
-        <p>The sun is 93,000,000, or 9.3*10^7, miles away from Earth.</p>
-        <p>-100 is the square of 10 times the imaginary number, i.</p>
-      </div>
-    </solution>
-    </problem>
+            <numericalresponse answer="10*i">
+                <label>The square of what number is -100?</label>
+                <formulaequationinput label="The square of what number is -100?"/>
+                <solution>
+                    <div class="detailed-solution">
+                        <p>Explanation</p>
+                        <p>-100 is the square of 10 times the imaginary number, i.</p>
+                    </div>
+                </solution>
+            </numericalresponse>
+        </problem>

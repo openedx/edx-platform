@@ -5,35 +5,45 @@ from openedx.core.djangolib.markup import HTML
 %>
 
 <%namespace name='static' file='static_content.html'/>
-<h3 class="hd hd-2 problem-header">
+<h3 class="hd hd-2 problem-header" id="${ id }-problem-title" aria-describedby="${ id }-problem-progress" tabindex="-1">
   ${ problem['name'] }
 </h3>
 
-<div class="problem-progress"></div>
+<div class="problem-progress" id="${ id }-problem-progress"></div>
 
-<div class="problem">
-    <div aria-live="polite">
-        ${ HTML(problem['html']) }
-    </div>
+<div class="problem" aria-labelledby="${ id }-problem-title">
+  ${ HTML(problem['html']) }
   <div class="action">
     <input type="hidden" name="problem_id" value="${ problem['name'] }" />
     % if demand_hint_possible:
     <div class="problem-hint" aria-live="polite"></div>
     % endif
-    % if check_button:
-    <button class="check ${ check_button }" data-checking="${ check_button_checking }" data-value="${ check_button }"><span class="check-label">${ check_button }</span><span class="sr"> ${_("your answer")}</span></button>
-    % endif
+    <div class="problem-action-buttons-wrapper">
     % if demand_hint_possible:
-    <button class="hint-button" data-value="${_('Hint')}">${_('Hint')}</button>
-    % endif
-    % if reset_button:
-    <button class="reset" data-value="${_('Reset')}">${_('Reset')}<span class="sr"> ${_("your answer")}</span></button>
+    <span class="problem-action-button-wrapper">
+        <button class="hint-button problem-action-btn btn-default btn-small" data-value="${_('Hint')}"><span class="icon fa fa-question" aria-hidden="true"></span>${_('Hint')}</button>
+    </span>
     % endif
     % if save_button:
-    <button class="save" data-value="${_('Save')}">${_('Save')}<span class="sr"> ${_("your answer")}</span></button>
+    <span class="problem-action-button-wrapper">
+        <button class="save problem-action-btn btn-default btn-small" data-value="${_('Save')}"><span class="icon fa fa-floppy-o" aria-hidden="true"></span>${_('Save')}<span class="sr"> ${_("your answer")}</span></button>
+    </span>
+    % endif
+    % if reset_button:
+    <span class="problem-action-button-wrapper">
+        <button class="reset problem-action-btn btn-default btn-small" data-value="${_('Reset')}"><span class="icon fa fa-refresh" aria-hidden="true"></span>${_('Reset')}<span class="sr"> ${_("your answer")}</span></button>
+    </span>
     % endif
     % if answer_available:
-    <button class="show"><span class='sr'>${_('Toggle Answer Visibility')}</span><span class="show-label">${_('Show Answer')}</span></button>
+    <span class="problem-action-button-wrapper">
+        <button class="show problem-action-btn btn-default btn-small"><span class="icon fa fa-exclamation-triangle" aria-hidden="true"></span><span class="show-label">${_('Show Answer')}</span></button>
+    </span>
+    % endif
+    </div>
+    % if check_button:
+    <button class="check ${ check_button } btn-brand" data-checking="${ check_button_checking }" data-value="${ check_button }">
+        <span class="check-label">${ check_button }</span><span class="sr"> ${_("your answer")}</span>
+    </button>
     % endif
     % if attempts_allowed :
     <div class="submission_feedback" aria-live="polite">

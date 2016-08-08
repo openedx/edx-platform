@@ -65,6 +65,7 @@ class @Problem
   renderProgressState: =>
     detail = @el.data('progress_detail')
     status = @el.data('progress_status')
+    graded = @el.data('graded')
 
     # Render 'x/y point(s)' if student has attempted question 
     if status != 'none' and detail? and (jQuery.type(detail) == "string") and detail.indexOf('/') > 0
@@ -73,17 +74,22 @@ class @Problem
         possible = parseFloat(a[1])
         # This comment needs to be on one line to be properly scraped for the translators. Sry for length.
         `// Translators: %(earned)s is the number of points earned. %(total)s is the total number of points (examples: 0/1, 1/1, 2/3, 5/10). The total number of points will always be at least 1. We pluralize based on the total number of points (example: 0/1 point; 1/2 points)`
-        progress_template = ngettext('(%(earned)s/%(possible)s point)', '(%(earned)s/%(possible)s points)', possible)
+        progress_template = ngettext('%(earned)s/%(possible)s point earned', '%(earned)s/%(possible)s points earned', possible)
         progress = interpolate(progress_template, {'earned': earned, 'possible': possible}, true)
 
     # Render 'x point(s) possible' if student has not yet attempted question
-    if status == 'none' and detail? and (jQuery.type(detail) == "string") and detail.indexOf('/') > 0
-        a = detail.split('/')
-        possible = parseFloat(a[1])
-        `// Translators: %(num_points)s is the number of points possible (examples: 1, 3, 10). There will always be at least 1 point possible.`
-        progress_template = ngettext("(%(num_points)s point possible)", "(%(num_points)s points possible)", possible)
+    if status == 'none' or status == 0
+        if detail? and (jQuery.type(detail) == "string") and detail.indexOf('/') > 0
+            a = detail.split('/')
+            possible = parseFloat(a[1])
+        else
+            possible = 0
+        `// Translators: %(num_points)s is the number of points possible (examples: 1, 3, 10).`
+        progress_template = ngettext("%(num_points)s point possible", "%(num_points)s points possible", possible)
         progress = interpolate(progress_template, {'num_points': possible}, true)
 
+    graded = if (graded == "True" and possible != 0) then "graded" else "practice problem"
+    progress = progress + interpolate(" (%(graded)s)", {"graded": graded}, true)
     @$('.problem-progress').html(progress)
 
   updateProgress: (response) =>
@@ -758,14 +764,14 @@ class @Problem
         .add(@hintButton)
         .add(@showButton)
         .removeClass('is-disabled')
-        .attr({'aria-disabled': 'false'})
+        .removeAttr 'disabled'
     else
       @resetButton
         .add(@saveButton)
         .add(@hintButton)
         .add(@showButton)
         .addClass('is-disabled')
-        .attr({'aria-disabled': 'true'})
+        .attr({'disabled': 'disabled'})
 
     @enableCheckButton enable, isFromCheckOperation
 
@@ -777,12 +783,12 @@ class @Problem
     #    text of check button as well.
     if enable
       @checkButton.removeClass 'is-disabled'
-      @checkButton.attr({'aria-disabled': 'false'})
+      @checkButton.removeAttr 'disabled'
       if changeText
         @checkButtonLabel.text(@checkButtonCheckText)
     else
       @checkButton.addClass 'is-disabled'
-      @checkButton.attr({'aria-disabled': 'true'})
+      @checkButton.attr({'disabled': 'disabled'})
       if changeText
         @checkButtonLabel.text(@checkButtonCheckingText)
 

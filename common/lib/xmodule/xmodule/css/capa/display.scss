@@ -27,6 +27,8 @@ $correct: $green-d2;
 $partiallycorrect: $green-d2;
 $incorrect: $red;
 
+@import '../../../../../static/sass/edx-pattern-library-shims/base/variables';
+
 // +Extends - Capa
 // ====================
 // Duplicated from _mixins.scss due to xmodule compilation, inheritance issues
@@ -120,12 +122,9 @@ iframe[seamless]{
 }
 
 div.problem-progress {
-  @include padding-left($baseline/4);
-  @extend %t-ultralight;
   display: inline-block;
   color: $gray-d1;
-  font-weight: 100;
-  font-size: em(16);
+  font-size: em(14);
 }
 
 // +Problem - Base
@@ -151,6 +150,13 @@ div.problem {
     + p {
       margin-top: $baseline;
     }
+  }
+
+  span > label {
+    display: block;
+    margin-bottom: $baseline;
+    font: inherit;
+    color: inherit;
   }
 }
 
@@ -429,7 +435,6 @@ div.problem {
     }
 
     > span {
-      display: block;
       margin-bottom: lh(0.5);
     }
 
@@ -903,46 +908,76 @@ div.problem {
 // +Problem - Actions
 // ====================
 div.problem .action {
-  margin-top: $baseline;
+  @include margin($baseline 0);
+  min-height: $baseline;
 
-  .save, .check, .show, .reset, .hint-button {
-    @include margin-right($baseline/2);
-    margin-bottom: ($baseline/2);
-    height: ($baseline*2);
-    vertical-align: middle;
-    text-transform: uppercase;
-    font-weight: 600;
-    @media print {
-      display: none;
+  // override default button hover
+  button {
+    &:hover {
+      background-image: none;
+      box-shadow: none;
+    }
+    &:focus {
+      box-shadow: none;
+    }
+    &.btn-default {
+      background-color: transparent;
+    }
+    &.btn-brand {
+      &:hover {
+        background-color: $btn-brand-focus-background;
+      }
+      &.check {
+        &.is-disabled {
+          background: $btn-brand-disabled-background;
+          color: $btn-brand-disabled-color;
+        }
+      }
     }
   }
 
-  .save {
-    @extend .blue-button !optional;
+  .problem-action-buttons-wrapper {
+    margin-bottom: $baseline / 2;
+
+    @media (min-width: 768px) {
+      position: absolute;
+      right: $baseline * 1.5;
+      margin-top: -$baseline / 2;
+    }
+
   }
 
-  .show {
+  .problem-action-button-wrapper {
+    @include padding(($baseline / 10) 0 $baseline ($baseline / 4));
+    border-right: 1px solid $light-gray1;
+    &:last-child {
+      border: none;
+    }
+  }
 
-    .show-label {
-      font-weight: 600;
-      font-size: 1.0em;
+  .problem-action-btn {
+    @media print {
+      display: none;
+    }
+    .icon {
+      display: block;
     }
   }
 
   .submission_feedback {
-    // background: #F3F3F3;
-    // border: 1px solid #ddd;
-    // border-radius: 3px;
-    // padding: 8px 12px;
-    // margin-top: ($baseline/2);
     @include margin-left($baseline/2);
+    height: ($baseline*2);
     display: inline-block;
-    margin-top: 8px;
     color: $gray-d1;
-    font-style: italic;
+    font-size: $small-font-size;
     -webkit-font-smoothing: antialiased;
+
+    @media (min-width: 768px) {
+      font-size: $medium-font-size
+    }
   }
 }
+
 
 // +Problem - Misc, Unclassified Mess Part 2
 // ====================
