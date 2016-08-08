@@ -324,7 +324,8 @@ class CheckboxProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         'question_text': 'The correct answer is Choice 0 and Choice 2',
         'choice_type': 'checkbox',
         'choices': [True, False, True, False],
-        'choice_names': ['Choice 0', 'Choice 1', 'Choice 2', 'Choice 3']
+        'choice_names': ['Choice 0', 'Choice 1', 'Choice 2', 'Choice 3'],
+        'explanation_text': 'This is explanation text'
     }
 
     def setUp(self, *args, **kwargs):
@@ -332,18 +333,6 @@ class CheckboxProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         Additional setup for CheckboxProblemTypeTest
         """
         super(CheckboxProblemTypeTest, self).setUp(*args, **kwargs)
-
-    def get_problem(self):
-        """
-        Creates a {problem_type} problem
-        """
-        # Generate the problem XML using capa.tests.response_xml_factory
-        return XBlockFixtureDesc(
-            'problem',
-            self.problem_name,
-            data=self.factory.build_xml(**self.factory_kwargs),
-            metadata={'rerandomize': 'always', 'showanswer': 'always'}
-        )
 
     def answer_problem(self, correct):
         """
@@ -357,16 +346,27 @@ class CheckboxProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
 
     @attr('shard_7')
     def test_can_show_hide_answer(self):
-        msg = "Wait for correct choices to be highlighted"
+        """
+        Scenario: Verifies that show/hide answer button is working as expected.
 
-        #from nose.tools import stack_trace; stack_trace()
-        self.problem_page.q(css='div.problem div.action .show').click()
-        self.problem_page.wait_for_element_presence('.solution-span div.detailed-solution', msg)
+        Given that I am on courseware page
+        And I can see a CAPA problem with show answer button
+        When I click "Show Answer" button
+        Then I should see "Hide Answer" text on button
+        And I should see question's solution
+        And I should see correct choices highlighted
+        When I click "Hide Answer" button
+        Then I should see "Show Answer" text on button
+        And I should not see question's solution
+        And I should not see correct choices highlighted
+        """
+        self.problem_page.click_show_hide_button()
+        self.assertTrue(self.problem_page.is_solution_tag_present())
+        self.assertTrue(self.problem_page.is_correct_choice_highlighted(correct_choices=[1, 3]))
 
-        #self.assertEqual(self.problem_page.q(css='fieldset div.field').attrs('class'), ['field'])
-
-        # self.problem_page.q(css='div.problem div.action .show').click()
-        # self.problem_page.wait_for_element_absence('section.solution-span .detailed-solution', msg)
+        self.problem_page.click_show_hide_button()
+        self.assertFalse(self.problem_page.is_solution_tag_present())
+        self.assertFalse(self.problem_page.is_correct_choice_highlighted(correct_choices=[1, 3]))
 
 
 class MultipleChoiceProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
