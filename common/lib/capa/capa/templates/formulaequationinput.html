@@ -16,23 +16,23 @@
             />
         <span class="trailing_text">${trailing_text}</span>
 
-        <span class="status" id="${id}_status" data-tooltip="${status.display_tooltip}">
-            <span class="sr">
-                ${status.display_name}
-            </span>
+      <span class="status" id="${id}_status" data-tooltip="${status.display_tooltip}">
+        <span class="sr">
+          ${status.display_name}
         </span>
+      </span>
 
-        <p id="answer_${id}" class="answer"></p>
+      <p id="answer_${id}" class="answer"></p>
 
-        <div id="input_${id}_preview" class="equation">
-            \(\)
-            <img src="${STATIC_URL}images/spinner.gif" class="loading" alt="Loading"/>
-        </div>
-    </div>
+      <div id="input_${id}_preview" class="equation">
+        \(\)
+        <img src="${STATIC_URL}images/spinner.gif" class="loading" alt="Loading"/>
+      </div>
+  </div>
 
-    <div class="script_placeholder" data-src="${previewer}"/>
+  <div class="script_placeholder" data-src="${previewer}"/>
 
   % if msg:
       <span class="message">${HTML(msg)}</span>
   % endif
-</div>
+</section>
