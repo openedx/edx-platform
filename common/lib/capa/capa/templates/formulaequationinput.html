@@ -1,8 +1,12 @@
 <%page expression_filter="h"/>
 <%! from openedx.core.djangolib.markup import HTML %>
 <% doinline = 'style="display:inline-block;vertical-align:top"' if inline else "" %>
-<section id="formulaequationinput_${id}" class="inputtype formulaequationinput" ${doinline}>
+<div id="formulaequationinput_${id}" class="inputtype formulaequationinput" ${doinline}>
   <div class="${status.classname}" id="status_${id}">
+      <label class="question-label" for="input_${id}">${response_data['label']}</label>
+  % for description_id, description_text in response_data['descriptions'].items():
+      <p class="question-description" id="${description_id}">${description_text}</p>
+  % endfor
     <input type="text" name="input_${id}" id="input_${id}"
         data-input-id="${id}" value="${value}"
         ${describedby| n}
@@ -31,4 +35,4 @@
   % if msg:
       <span class="message">${HTML(msg)}</span>
   % endif
-</section>
+</div>

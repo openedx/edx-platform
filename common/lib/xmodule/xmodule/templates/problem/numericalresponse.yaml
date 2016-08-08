@@ -2,61 +2,22 @@
 metadata:
     display_name: Numerical Input
     markdown: |
-        In a numerical input problem, learners enter numbers or a specific and relatively simple mathematical expression. Learners enter the response in plain text, and the system then converts the text to a symbolic expression that learners can see below the response field.
+        You can use this template as a guide to the simple editor markdown and OLX markup to use for
+        numerical input with hints and feedback problems. Edit this component to replace this template
+        with your own assessment.
 
-        The system can handle several types of characters, including basic operators, fractions, exponents, and common constants such as "i". You can refer learners to "Entering Mathematical and Scientific Expressions" in the edX Guide for Students for more information.
+        >>Add the question text, or prompt, here. This text is required.||You can add an optional tip
+        or note related to the prompt like this. <<
 
-        When you add the problem, be sure to select Settings to specify a Display Name and other values that apply.
+        = the correct answer +- 0.001% an optional variance {{You can specify optional feedback like this, which appears after this answer is submitted.}}
 
-        You can use the following example problems as models.
-
-        >>How many miles away from Earth is the sun?||Use scientific notation to answer.<<
-
-        = 9.3*10^7
-        or= 9.296*10^7
-
-        [explanation]
-        The sun is 93,000,000, or 9.3*10^7, miles away from Earth.
-        [explanation]
-
-        ---
-
-        >>The square of what number is -100?||Use scientific notation to answer.<<
-
-        = 10*i
-
-        [explanation]
-        -100 is the square of 10 times the imaginary number, i.
-        [explanation]
 data:   |
         <problem>
-            <numericalresponse answer="9.3*10^7">
-                <p>In a numerical input problem, learners enter numbers or a specific and relatively simple mathematical expression. Learners enter the response in plain text, and the system then converts the text to a symbolic expression that learners can see below the response field.</p>
-                <p>The system can handle several types of characters, including basic operators, fractions, exponents, and common constants such as i. You can refer learners to
-                    <a href="http://edx.readthedocs.io/projects/edx-guide-for-students/en/latest/completing_assignments/SFD_mathformatting.html#math-formatting" target="_blank">Entering Mathematical and Scientific Expressions</a>in the<i> EdX Learner's Guide</i>
-                for information about how to enter text into the field.</p>
-                <p>When you add the problem, be sure to select <strong>Settings</strong> to specify a <strong>Display Name</strong> and other values that apply.</p>
-                <p>You can use the following example problems as models.</p>
-                <label>How many miles away from Earth is the sun?</label>
-                <description>Use scientific notation to answer.</description>
-                <formulaequationinput/>
-                <solution>
-                    <div class="detailed-solution">
-                    <p>Explanation</p>
-                    <p>The sun is 93,000,000, or 9.3*10^7, miles away from Earth.</p>
-                    </div>
-                </solution>
-            </numericalresponse>
-
-            <numericalresponse answer="10*i">
-                <label>The square of what number is -100?</label>
-                <description>Use scientific notation to answer.</description>
-                <formulaequationinput/>
-                <solution>
-                    <div class="detailed-solution">
-                        <p>Explanation</p>
-                        <p>-100 is the square of 10 times the imaginary number, i.</p>
-                    </div>
-                </solution>
-            </numericalresponse>
+            <stringresponse answer="the correct answer +- 0.001% an optional variance" type="ci">
+                <p>You can use this template as a guide to the simple editor markdown and OLX markup to use for numerical input with hints and feedback problems. Edit this component to replace this template with your own assessment.</p>
+                <label>Add the question text, or prompt, here. This text is required.</label>
+                <description>You can add an optional tip or note related to the prompt like this.</description>
+                <correcthint>You can specify optional feedback like this, which appears after this answer is submitted.</correcthint>
+                <textline size="20"/>
+            </stringresponse>
         </problem>

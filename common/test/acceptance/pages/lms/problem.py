@@ -104,7 +104,7 @@ class ProblemPage(PageObject):
         """
         Fill in the answer to a numerical problem.
         """
-        self.q(css='div.problem section.inputtype input').fill(text)
+        self.q(css='div.problem div.inputtype input').fill(text)
         self.wait_for_element_invisibility('.loading', 'wait for loading icon to disappear')
         self.wait_for_ajax()
 
@@ -138,7 +138,7 @@ class ProblemPage(PageObject):
         """
         wait for status icon
         """
-        self.wait_for_element_visibility('div.problem section.inputtype div .status', 'wait for status icon')
+        self.wait_for_element_visibility('div.problem div.inputtype div .status', 'wait for status icon')
 
     def wait_for_expected_status(self, status_selector, message):
         """
@@ -175,19 +175,19 @@ class ProblemPage(PageObject):
         """
         Is there a "correct" status showing? Works with simple problem types.
         """
-        return self.q(css="div.problem section.inputtype div.correct span.status").is_present()
+        return self.q(css="div.problem div.inputtype div.correct span.status").is_present()
 
     def simpleprob_is_partially_correct(self):
         """
         Is there a "partially correct" status showing? Works with simple problem types.
         """
-        return self.q(css="div.problem section.inputtype div.partially-correct span.status").is_present()
+        return self.q(css="div.problem div.inputtype div.partially-correct span.status").is_present()
 
     def simpleprob_is_incorrect(self):
         """
         Is there an "incorrect" status showing? Works with simple problem types.
         """
-        return self.q(css="div.problem section.inputtype div.incorrect span.status").is_present()
+        return self.q(css="div.problem div.inputtype div.incorrect span.status").is_present()
 
     def click_clarification(self, index=0):
         """
