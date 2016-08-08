@@ -2,51 +2,28 @@
 metadata:
     display_name: Numerical Input with Hints and Feedback
     markdown: |
+        You can use this template as a guide to the simple editor markdown and OLX markup to use for numerical input with hints and feedback problems. Edit this component to replace this template with your own assessment.
 
-        You can provide feedback for correct answers in numerical input problems. You cannot provide feedback for incorrect answers.
+        >>Add the question text, or prompt, here. This text is required.||You can add an optional tip or note related to the prompt like this. <<
 
-        Use feedback for the correct answer to reinforce the process for arriving at the numerical value.
+        = 100 +-5 {{You can specify optional feedback like this, which appears after this answer is submitted.}}
 
-        You can also add hints for learners.
-
-        Be sure to select Settings to specify a Display Name and other values that apply.
-
-        Use the following example problem as a model.
-
-        >>What is the arithmetic mean for the following set of numbers? (1, 5, 6, 3, 5)||Use scientific notation to answer.<<
-
-        = 4 {{The mean for this set of numbers is 20 / 5, which equals 4.}}
-
-        ||The mean is calculated by summing the set of numbers and dividing by n.||
-        ||n is the count of items in the set.||
-
-        [explanation]
-        The mean is calculated by summing the set of numbers and dividing by n. In this case: (1 + 5 + 6 + 3 + 5) / 5 = 20 / 5 = 4.
-        [explanation]
+        ||You can add an optional hint like this. Problems that have a hint include a hint button, and this text appears the first time learners select the button.||
+        ||If you add more than one hint, a different hint appears each time learners select the hint button.||
 
 hinted: true
 data:   |
         <problem>
-            <numericalresponse answer="4">
-                <p>You can provide feedback for correct answers in numerical input problems. You cannot provide feedback for incorrect answers.</p>
-                <p>Use feedback for the correct answer to reinforce the process for arriving at the numerical value.</p>
-                <p>You can also add hints for learners.</p>
-                <p>Be sure to select Settings to specify a Display Name and other values that apply.</p>
-                <p>Use the following example problem as a model.</p>
-                <label>What is the arithmetic mean for the following set of numbers? (1, 5, 6, 3, 5)</label>
-                <description>Use scientific notation to answer.</description>
+            <numericalresponse answer="100">
+                <p>You can use this template as a guide to the simple editor markdown and OLX markup to use for numerical input with hints and feedback problems. Edit this component to replace this template with your own assessment.</p>
+                <label>Add the question text, or prompt, here. This text is required.</label>
+                <description>You can add an optional tip or note related to the prompt like this.</description>
+                <responseparam type="tolerance" default="5"/>
                 <formulaequationinput/>
-                <correcthint>The mean for this set of numbers is 20 / 5, which equals 4.</correcthint>
-                <solution>
-                    <div class="detailed-solution">
-                        <p>Explanation</p>
-                        <p>The mean is calculated by summing the set of numbers and dividing by n. In this case: (1 + 5 + 6 + 3 + 5) / 5 = 20 / 5 = 4.</p>
-                    </div>
-                </solution>
+                <correcthint>You can specify optional feedback like this, which appears after this answer is submitted.</correcthint>
             </numericalresponse>
-
             <demandhint>
-                <hint>The mean is calculated by summing the set of numbers and dividing by n.</hint>
-                <hint>n is the count of items in the set.</hint>
+                <hint>You can add an optional hint like this. Problems that have a hint include a hint button, and this text appears the first time learners select the button.</hint>
+                <hint>If you add more than one hint, a different hint appears each time learners select the hint button.</hint>
             </demandhint>
         </problem>
