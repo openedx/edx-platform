@@ -1,5 +1,5 @@
 <%! from django.utils.translation import ugettext as _ %>
-<div id="problem_${element_id}" class="problems-wrapper" data-problem-id="${id}" data-url="${ajax_url}" data-progress_status="${progress_status}" data-progress_detail="${progress_detail}" data-content="${content | h}">
+<div id="problem_${element_id}" class="problems-wrapper" data-problem-id="${id}" data-url="${ajax_url}" data-progress_status="${progress_status}" data-progress_detail="${progress_detail}" data-content="${content | h}" data-graded="${graded}">
     <p class="loading-spinner">
         <span class="icon fa fa-spinner fa-pulse fa-2x fa-fw" aria-hidden="true"></span>
         <span class="sr">${_('Loading')}</span>

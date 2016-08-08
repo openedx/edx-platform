@@ -161,7 +161,7 @@ def see_score(_step, score):
     # cms/static/xmodule_js/src/capa/display.js
     # so give it some time to render on the page.
     score_css = 'div.problem-progress'
-    expected_text = '({})'.format(score)
+    expected_text = '{}'.format(score)
     world.wait_for(lambda _: world.css_has_text(score_css, expected_text))
 
 
