@@ -11,7 +11,7 @@ import logging
 import re
 import time
 from django.conf import settings
-from django.views.decorators.csrf import ensure_csrf_cookie, csrf_exempt
+from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_POST, require_http_methods
 from django.views.decorators.cache import cache_control
 from django.core.exceptions import ValidationError, PermissionDenied
@@ -29,7 +29,7 @@ import random
 import unicodecsv
 import decimal
 from student import auth
-from student.roles import GlobalStaff, CourseSalesAdminRole, CourseFinanceAdminRole
+from student.roles import CourseSalesAdminRole, CourseFinanceAdminRole
 from util.file import (
     store_uploaded_file, course_and_time_based_filename_generator,
     FileValidationException, UniversalNewlineIterator
@@ -37,8 +37,6 @@ from util.file import (
 from util.json_request import JsonResponse, JsonResponseBadRequest
 from util.views import require_global_staff
 from instructor.views.instructor_task_helpers import extract_email_features, extract_task_features
-
-from microsite_configuration import microsite
 
 from courseware.access import has_access
 from courseware.courses import get_course_with_access, get_course_by_id
@@ -111,7 +109,7 @@ from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from opaque_keys import InvalidKeyError
 from openedx.core.djangoapps.course_groups.cohorts import is_course_cohorted
-from openedx.core.djangoapps.theming import helpers as theming_helpers
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 log = logging.getLogger(__name__)
 
@@ -287,7 +285,10 @@ def register_and_enroll_students(request, course_id):  # pylint: disable=too-man
      The failure will be messaged in a response in the browser.
     """
 
-    if not microsite.get_value('ALLOW_AUTOMATED_SIGNUPS', settings.FEATURES.get('ALLOW_AUTOMATED_SIGNUPS', False)):
+    if not configuration_helpers.get_value(
+            'ALLOW_AUTOMATED_SIGNUPS',
+            settings.FEATURES.get('ALLOW_AUTOMATED_SIGNUPS', False),
+    ):
         return HttpResponseForbidden()
 
     course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
@@ -534,7 +535,7 @@ def create_and_enroll_user(email, username, name, country, password, course_id, 
                 'message': 'account_creation_and_enrollment',
                 'email_address': email,
                 'password': password,
-                'platform_name': microsite.get_value('platform_name', settings.PLATFORM_NAME),
+                'platform_name': configuration_helpers.get_value('platform_name', settings.PLATFORM_NAME),
             })
             send_mail_to_student(email, email_params)
         except Exception as ex:  # pylint: disable=broad-except
@@ -1198,7 +1199,7 @@ def get_students_features(request, course_id, csv=False):  # pylint: disable=red
 
     available_features = instructor_analytics.basic.AVAILABLE_FEATURES
 
-    # Allow for microsites to be able to define additional columns.
+    # Allow for sites to be able to define additional columns.
     # Note that adding additional columns has the potential to break
     # the student profile report due to a character limit on the
     # asynchronous job input which in this case is a JSON string
@@ -1206,7 +1207,7 @@ def get_students_features(request, course_id, csv=False):  # pylint: disable=red
     # TODO: Refactor the student profile report code to remove the list of columns
     # that should be included in the report from the asynchronous job input.
     # We need to clone the list because we modify it below
-    query_features = list(microsite.get_value('student_profile_download_fields', []))
+    query_features = list(configuration_helpers.get_value('student_profile_download_fields', []))
 
     if not query_features:
         query_features = [
@@ -1691,15 +1692,15 @@ def generate_registration_codes(request, course_id):
         )
         registration_codes.append(generated_registration_code)
 
-    site_name = microsite.get_value('SITE_NAME', 'localhost')
+    site_name = configuration_helpers.get_value('SITE_NAME', 'localhost')
     quantity = course_code_number
     discount = (float(quantity * course_price) - float(sale_price))
     course_url = '{base_url}{course_about}'.format(
-        base_url=microsite.get_value('SITE_NAME', settings.SITE_NAME),
+        base_url=configuration_helpers.get_value('SITE_NAME', settings.SITE_NAME),
         course_about=reverse('about_course', kwargs={'course_id': course_id.to_deprecated_string()})
     )
     dashboard_url = '{base_url}{dashboard}'.format(
-        base_url=microsite.get_value('SITE_NAME', settings.SITE_NAME),
+        base_url=configuration_helpers.get_value('SITE_NAME', settings.SITE_NAME),
         dashboard=reverse('dashboard')
     )
 
@@ -1709,7 +1710,7 @@ def generate_registration_codes(request, course_id):
         log.exception('Exception at creating pdf file.')
         pdf_file = None
 
-    from_address = theming_helpers.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL)
+    from_address = configuration_helpers.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL)
     context = {
         'invoice': sale_invoice,
         'site_name': site_name,
@@ -1722,11 +1723,14 @@ def generate_registration_codes(request, course_id):
         'registration_codes': registration_codes,
         'currency_symbol': settings.PAID_COURSE_REGISTRATION_CURRENCY[1],
         'course_url': course_url,
-        'platform_name': microsite.get_value('platform_name', settings.PLATFORM_NAME),
+        'platform_name': configuration_helpers.get_value('platform_name', settings.PLATFORM_NAME),
         'dashboard_url': dashboard_url,
         'contact_email': from_address,
-        'corp_address': microsite.get_value('invoice_corp_address', settings.INVOICE_CORP_ADDRESS),
-        'payment_instructions': microsite.get_value('invoice_payment_instructions', settings. INVOICE_PAYMENT_INSTRUCTIONS),
+        'corp_address': configuration_helpers.get_value('invoice_corp_address', settings.INVOICE_CORP_ADDRESS),
+        'payment_instructions': configuration_helpers.get_value(
+            'invoice_payment_instructions',
+            settings. INVOICE_PAYMENT_INSTRUCTIONS,
+        ),
         'date': time.strftime("%m/%d/%Y")
     }
     # composes registration codes invoice email
@@ -1740,11 +1744,11 @@ def generate_registration_codes(request, course_id):
     csv_writer = csv.writer(csv_file)
     for registration_code in registration_codes:
         full_redeem_code_url = 'http://{base_url}{redeem_code_url}'.format(
-            base_url=microsite.get_value('SITE_NAME', settings.SITE_NAME),
+            base_url=configuration_helpers.get_value('SITE_NAME', settings.SITE_NAME),
             redeem_code_url=reverse('register_code_redemption', kwargs={'registration_code': registration_code.code})
         )
         csv_writer.writerow([registration_code.code, full_redeem_code_url])
-    finance_email = microsite.get_value('finance_email', settings.FINANCE_EMAIL)
+    finance_email = configuration_helpers.get_value('finance_email', settings.FINANCE_EMAIL)
     if finance_email:
         # append the finance email into the recipient_list
         recipient_list.append(finance_email)
@@ -2485,13 +2489,13 @@ def send_email(request, course_id):
     subject = request.POST.get("subject")
     message = request.POST.get("message")
 
-    # allow two branding points to come from Microsites: which CourseEmailTemplate should be used
+    # allow two branding points to come from Site Configuration: which CourseEmailTemplate should be used
     # and what the 'from' field in the email should be
     #
-    # If these are None (because we are not in a Microsite or they are undefined in Microsite config) than
+    # If these are None (there is no site configuration enabled for the current site) than
     # the system will use normal system defaults
-    template_name = microsite.get_value('course_email_template_name')
-    from_addr = microsite.get_value('course_email_from_addr')
+    template_name = configuration_helpers.get_value('course_email_template_name')
+    from_addr = configuration_helpers.get_value('course_email_from_addr')
 
     # Create the CourseEmail object.  This is saved immediately, so that
     # any transaction that has been pending up to this point will also be
