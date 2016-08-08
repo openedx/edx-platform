@@ -140,6 +140,7 @@ class CapaFactory(object):
             else:
                 module.get_score = lambda: {'score': 0, 'total': 1}
 
+        module.graded = 'False'
         return module
 
 
