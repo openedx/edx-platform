@@ -2,7 +2,7 @@
 Unit tests for grades models.
 """
 import ddt
-from hashlib import md5
+from hashlib import sha256
 import json
 from mock import patch
 
@@ -102,7 +102,7 @@ class VisibleBlocksTest(GradesModelTestCase):
         """
         vblocks = VisibleBlocks.create([self.record_a])
         expected_json = json.dumps([self.record_a.to_dict()])
-        expected_hash = md5(expected_json).hexdigest()
+        expected_hash = sha256(expected_json).hexdigest()
         # pylint: disable=protected-access
         self.assertEqual(expected_json, vblocks._blocks_json)
         self.assertEqual(expected_hash, vblocks.hashed)
@@ -171,7 +171,7 @@ class PersistentSubsectionGradeTest(GradesModelTestCase):
             created_grade = PersistentSubsectionGrade.create(**self.params)
 
     @ddt.data(
-        ("missing", KeyError),
+        ("missing", TypeError),
         ("invalid", AttributeError),
     )
     @ddt.unpack
@@ -204,13 +204,9 @@ class PersistentSubsectionGradeTest(GradesModelTestCase):
     def test_save(self, already_created):
         if already_created:
             _ = PersistentSubsectionGrade.create(**self.params)
-            mock_fn_called = "update"
-            mock_fn_uncalled = "create"
-        else:
-            mock_fn_called = "update"
-            mock_fn_uncalled = "create"
-        with patch("lms.djangoapps.grades.models.PersistentSubsectionGrade." + mock_fn_called) as mock_called:
-            with patch("lms.djangoapps.grades.models.PersistentSubsectionGrade." + mock_fn_uncalled) as mock_uncalled:
-                PersistentSubsectionGrade.save_grade()
-                self.assertTrue(mock_called.called)
-                self.assertFalse(mock_uncalled.called)
+        module_prefix = "lms.djangoapps.grades.models.PersistentSubsectionGrade."
+        with patch(module_prefix + "create") as mock_create:
+            with patch(module_prefix + "update", wraps=PersistentSubsectionGrade.update) as mock_update:
+                PersistentSubsectionGrade.save_grade(**self.params)
+                self.assertTrue(mock_update.called)
+                self.assertNotEqual(mock_create.called, already_created)

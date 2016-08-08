@@ -12,7 +12,7 @@ from coursewarehistoryextended.fields import UnsignedBigIntAutoField
 from opaque_keys.edx.locator import BlockUsageLocator
 from xmodule_django.models import CourseKeyField, UsageKeyField
 
-from hashlib import md5
+from hashlib import sha256
 import json
 
 
@@ -36,7 +36,7 @@ class VisibleBlocks(models.Model):
     @classmethod
     def create(cls, blocks):
         """
-        Creates a new VisibleBlocks model. Argument 'blocks' should be an array of BlockRecords.
+        Creates a new VisibleBlocks model. Argument 'blocks' should be an iterable collection of BlockRecords.
         """
         # Start by sorting the blocks to ensure equality regardless of how the blocks are ordered
         sorted_blocks = sorted(
@@ -49,21 +49,18 @@ class VisibleBlocks(models.Model):
                 for block in sorted_blocks
             ]
         )
-        hashed = md5(_blocks_json).hexdigest()
+        hashed = sha256(_blocks_json).hexdigest()
         model, _ = cls.objects.get_or_create(hashed=hashed, defaults={'_blocks_json': _blocks_json})
         return model
 
     @property
     def blocks(self):
         """
-        Returns the blocks_json data stored on this model as an array of BlockRecords. If for some reason block_json
-        is not parsable, the json error will bubble up.
+        Returns the blocks_json data stored on this model as an list of BlockRecords. If for some reason block_json
+        is not parsable, a json error will bubble up.
         """
         block_dicts = json.loads(self._blocks_json)
-        return [
-            BlockRecord(data['weight'], data['max_score'], data['block_key'])
-            for data in block_dicts
-        ]
+        return [BlockRecord(data['weight'], data['max_score'], data['block_key']) for data in block_dicts]
 
     @blocks.setter
     def blocks(self, value):
@@ -143,8 +140,6 @@ class PersistentSubsectionGrade(TimeStampedModel):
     usage_key = UsageKeyField(max_length=255)
     course_version = models.CharField('guid of latest course version', max_length=255)
 
-    #is_valid = models.BinaryField()  # Might be needed if doing async updates
-
     visible_blocks = models.ForeignKey(VisibleBlocks)
 
     def __unicode__(self):
@@ -165,11 +160,24 @@ class PersistentSubsectionGrade(TimeStampedModel):
             cls.create(**kwargs)
 
     @classmethod
-    def create(cls, **kwargs):
+    def create(
+        cls,
+        user_id,
+        usage_key,
+        course_version,
+        subtree_edited_date,
+        earned_all,
+        possible_all,
+        earned_graded,
+        possible_graded,
+        visible_blocks,
+    ):
         """
-        Instantiates a new model instance using the provided kwargs, formatted as follows:
+        Instantiates a new model instance.
+
+        Example arguments:
             user_id: "student12345"
-            usage_key: "block-v1:edX+BeAwesomeX+2016+type@subsection+block@f007ba11"
+            usage_key: BlockUsageLocator object
             course_version: "deadbeef"
             subtree_edited_date: "2016-08-01 18:53:24.354741"
             earned_all: 6
@@ -178,24 +186,24 @@ class PersistentSubsectionGrade(TimeStampedModel):
             possible_graded: 8
             visible_blocks: [<list of BlockRecord objects>]
         """
-        visible_blocks_model = VisibleBlocks.create(blocks=kwargs['visible_blocks'])
+        visible_blocks_model = VisibleBlocks.create(blocks=visible_blocks)
 
-        model = cls.objects.create(
-            user_id=kwargs['user_id'],
-            course_id=kwargs['usage_key'].course_key,
-            usage_key=kwargs['usage_key'],
-            course_version=kwargs['course_version'],
-            subtree_edited_date=kwargs['subtree_edited_date'],
-            earned_all=kwargs['earned_all'],
-            possible_all=kwargs['possible_all'],
-            earned_graded=kwargs['earned_graded'],
-            possible_graded=kwargs['possible_graded'],
+        return cls.objects.create(
+            user_id=user_id,
+            course_id=usage_key.course_key,
+            usage_key=usage_key,
+            course_version=course_version,
+            subtree_edited_date=subtree_edited_date,
+            earned_all=earned_all,
+            possible_all=possible_all,
+            earned_graded=earned_graded,
+            possible_graded=possible_graded,
             visible_blocks=visible_blocks_model,
         )
         return model
 
     @classmethod
-    def read(cls, **kwargs):
+    def read(cls, user_id, usage_key):
         """
         Reads a grade from database
 
@@ -206,29 +214,40 @@ class PersistentSubsectionGrade(TimeStampedModel):
         Raises PersistentSubsectionGrade.DoesNotExist if applicable
         """
         return cls.objects.get(
-            user_id=kwargs["user_id"],
-            usage_key=kwargs["usage_key"],
+            user_id=user_id,
+            usage_key=usage_key,
         )
 
     @classmethod
-    def update(cls, **kwargs):
+    def update(
+        cls,
+        user_id,
+        usage_key,
+        course_version,
+        subtree_edited_date,
+        earned_all,
+        possible_all,
+        earned_graded,
+        possible_graded,
+        visible_blocks,
+    ):
         """
         Updates a previously existing grade.
 
         Requires all the arguments listed in docstring for create_grade
         """
         grade = cls.objects.get(
-            user_id=kwargs["user_id"],
-            usage_key=kwargs["usage_key"],
+            user_id=user_id,
+            usage_key=usage_key,
         )
 
-        visible_blocks_model = VisibleBlocks.create(blocks=kwargs['visible_blocks'])
+        visible_blocks_model = VisibleBlocks.create(blocks=visible_blocks)
 
-        grade.course_version = kwargs["course_version"]
-        grade.subtree_edited_date = kwargs["subtree_edited_date"]
-        grade.earned_all = kwargs["earned_all"]
-        grade.possible_all = kwargs["possible_all"]
-        grade.earned_graded = kwargs["earned_graded"]
-        grade.possible_graded = kwargs["possible_graded"]
+        grade.course_version = course_version
+        grade.subtree_edited_date = subtree_edited_date
+        grade.earned_all = earned_all
+        grade.possible_all = possible_all
+        grade.earned_graded = earned_graded
+        grade.possible_graded = possible_graded
         grade.visible_blocks = visible_blocks_model
         grade.save()
