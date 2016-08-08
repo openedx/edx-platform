@@ -15,6 +15,7 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.cache import cache_control
 from django.views.decorators.http import require_http_methods
 
+from courseware.courses import get_course_about_section
 from edxmako.shortcuts import render_to_response
 from enrollment.api import add_enrollment
 from enrollment.errors import (
@@ -23,6 +24,7 @@ from enrollment.errors import (
 from labster_course_license.models import CourseLicense
 from labster_vouchers import forms, tasks
 from student.models import anonymous_id_for_user
+from xmodule.modulestore.django import modulestore
 
 
 log = logging.getLogger(__name__)
@@ -93,19 +95,21 @@ def activate_voucher(request):
 
     course_license = course_licenses[0]
     course_id = course_license.course_id
+    course = modulestore().get_course(course_id)
+    course_name = get_course_about_section(course, 'title')
     try:
         # enroll student to course
         add_enrollment(request.user, unicode(course_id))
     except CourseNotFoundError:
         messages.error(
             request,
-            _(u"No course '{course_id}' found for enrollment").format(course_id=course_id)
+            _(u"No course '{course_name}' found for enrollment").format(course_name=course_name)
         )
         return redirect(enter_voucher_url)
     except CourseEnrollmentExistsError:
         messages.error(
             request,
-            _(u"You have been already enrolled to the course '{course_id}' before.").format(course_id=course_id)
+            _(u"You have been already enrolled to the course '{course_name}' before.").format(course_name=course_name)
         )
         return redirect(enter_voucher_url)
     except CourseEnrollmentError:
@@ -113,8 +117,8 @@ def activate_voucher(request):
             request,
             _(
                 u"An error occurred while creating the new course enrollment for user "
-                u"'{username}' in course '{course_id}'"
-            ).format(username=request.user.username, course_id=course_id)
+                u"'{username}' in course '{course_name}'"
+            ).format(username=request.user.username, course_name=course_name)
         )
         return redirect(enter_voucher_url)
 
