@@ -519,10 +519,9 @@ class CourseOverview(TimeStampedModel):
         Returns True if course has discussion tab and is enabled
         """
         course = modulestore().get_course(self.id)
-        # creates circular import; hence explicitly referenced is_discussion_enabled
         for tab in course.tabs:
             if tab.type == "discussion" and django_comment_client.utils.is_discussion_enabled(self.id):
-                return tab.is_hidden
+                return not tab.is_hidden
         return False
 
     @property
