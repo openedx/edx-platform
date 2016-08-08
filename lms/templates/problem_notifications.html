@@ -3,14 +3,8 @@
 from django.utils.translation import ugettext as _
 from openedx.core.djangolib.markup import HTML
 %>
-<%
-    notification_type = "info"
-    notification_icon = "question"
-    notification_message = "Hint (1 of 2): A fruit is the fertilized ovary from a flower. Hint (2 of 2): A fruit contains seeds of the plant."
-    hint_notification = True
-%>
 
-<div class="notification ${notification_type}">
+<div class="notification ${notification_type}" tabindex="-1">
     <span class="icon fa fa-${notification_icon}" aria-hidden="true"></span>
     <span class="notification-message">${notification_message}</span>
     <div class="notification-btn-wrapper">
