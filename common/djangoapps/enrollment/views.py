@@ -17,6 +17,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.throttling import UserRateThrottle
 from rest_framework.views import APIView
+from rest_framework_oauth.authentication import OAuth2Authentication
 from opaque_keys.edx.keys import CourseKey
 from embargo import api as embargo_api
 from cors_csrf.authentication import SessionAuthenticationCrossDomainCsrf
@@ -283,7 +284,7 @@ class EnrollmentCourseRosterView(APIView, ApiKeyPermissionMixIn):
     """
     Read roster for a particular course. (contains PII)
     """
-    authentication_classes = OAuth2AuthenticationAllowInactiveUser,
+    authentication_classes = OAuth2Authentication,
     permission_classes = ApiKeyHeaderPermissionIsAuthenticated,
 
     @method_decorator(ensure_csrf_cookie_cross_domain)
