@@ -12,7 +12,7 @@
 
 (function(root, factory) {
     if (typeof define === 'function' && define.amd) {
-        require(['jquery'], function ($) {
+        require(['jquery'], function($) {
             factory(root, $);
         });
     } else {
@@ -25,7 +25,6 @@
 
     // Add custom Jasmine matchers.
     beforeEach(function() {
-
         if (window.imagediff) {
             jasmine.addMatchers(window.imagediff.jasmine);
         }
@@ -72,16 +71,16 @@
             toBeInstanceOf: function() {
                 // Assert the type of the value being tested matches the provided type
                 return {
-                    compare: function (actual, expected) {
+                    compare: function(actual, expected) {
                         return {
                             pass: actual instanceof expected
                         };
                     }
                 };
             },
-            toHaveIndex: function () {
+            toHaveIndex: function() {
                 return {
-                    compare: function (actual, expected) {
+                    compare: function(actual, expected) {
                         return {
                             pass: $(actual).index() === expected
                         };

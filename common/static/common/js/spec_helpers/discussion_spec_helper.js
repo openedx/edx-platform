@@ -1,49 +1,48 @@
 /* global DiscussionCourseSettings, DiscussionUtil, DiscussionUser */
-(function () {
+(function() {
     'use strict';
-    this.DiscussionSpecHelper = (function () {
-
+    this.DiscussionSpecHelper = (function() {
         function DiscussionSpecHelper() {
         }
 
-        DiscussionSpecHelper.setUpGlobals = function () {
+        DiscussionSpecHelper.setUpGlobals = function() {
             DiscussionUtil.loadRoles({
-                "Moderator": [],
-                "Administrator": [],
-                "Community TA": []
+                'Moderator': [],
+                'Administrator': [],
+                'Community TA': []
             });
-            window.$$course_id = "edX/999/test";
+            window.$$course_id = 'edX/999/test';
             window.user = new DiscussionUser({
-                username: "test_user",
-                id: "567",
+                username: 'test_user',
+                id: '567',
                 upvoted_ids: []
             });
             return DiscussionUtil.setUser(window.user);
         };
 
-        DiscussionSpecHelper.makeTA = function () {
-            return DiscussionUtil.roleIds["Community TA"].push(parseInt(DiscussionUtil.getUser().id));
+        DiscussionSpecHelper.makeTA = function() {
+            return DiscussionUtil.roleIds['Community TA'].push(parseInt(DiscussionUtil.getUser().id));
         };
 
-        DiscussionSpecHelper.makeModerator = function () {
+        DiscussionSpecHelper.makeModerator = function() {
             return DiscussionUtil.roleIds.Moderator.push(parseInt(DiscussionUtil.getUser().id));
         };
 
-        DiscussionSpecHelper.makeAjaxSpy = function (fakeAjax) {
-            return spyOn($, "ajax").and.callFake(function (params) {
+        DiscussionSpecHelper.makeAjaxSpy = function(fakeAjax) {
+            return spyOn($, 'ajax').and.callFake(function(params) {
                 fakeAjax(params);
                 return {
-                    always: function () {
+                    always: function() {
                     }
                 };
             });
         };
 
-        DiscussionSpecHelper.makeEventSpy = function () {
+        DiscussionSpecHelper.makeEventSpy = function() {
             return jasmine.createSpyObj('event', ['preventDefault', 'target']);
         };
 
-        DiscussionSpecHelper.makeCourseSettings = function (is_cohorted) {
+        DiscussionSpecHelper.makeCourseSettings = function(is_cohorted) {
             if (typeof is_cohorted === 'undefined' || is_cohorted === null) {
                 is_cohorted = true;
             }
@@ -65,18 +64,18 @@
             });
         };
 
-        DiscussionSpecHelper.setUnderscoreFixtures = function () {
+        DiscussionSpecHelper.setUnderscoreFixtures = function() {
             var templateFixture, templateName, templateNames, templateNamesNoTrailingTemplate, _i, _j, _len, _len1;
             templateNames = [
                 'thread', 'thread-show', 'thread-edit', 'thread-response', 'thread-response-show',
                 'thread-response-edit', 'response-comment-show', 'response-comment-edit', 'thread-list-item',
                 'discussion-home', 'search-alert', 'new-post', 'thread-type', 'new-post-menu-entry',
                 'new-post-menu-category', 'topic', 'post-user-display', 'inline-discussion', 'pagination',
-                'user-profile', 'profile-thread',  'customwmd-prompt', 'nav-loading'
+                'user-profile', 'profile-thread', 'customwmd-prompt', 'nav-loading'
             ];
             templateNamesNoTrailingTemplate = [
                 'forum-action-endorse', 'forum-action-answer', 'forum-action-follow', 'forum-action-vote',
-                'forum-action-report',  'forum-action-pin', 'forum-action-close', 'forum-action-edit',
+                'forum-action-report', 'forum-action-pin', 'forum-action-close', 'forum-action-edit',
                 'forum-action-delete', 'forum-actions', 'alert-popup', 'nav-load-more-link'
             ];
             for (_i = 0, _len = templateNames.length; _i < _len; _i++) {
@@ -96,18 +95,16 @@
                 }).text(templateFixture));
             }
             return appendSetFixtures(
-                "<div id=\"fixture-element\"></div>\n" +
-                "<div id=\"discussion-container\"" +
-                "   data-course-name=\"Fake Course\"" +
-                "   data-user-create-comment=\"true\"" +
-                "   data-user-create-subcomment=\"true\"" +
-                "   data-read-only=\"false\"" +
-                "></div>"
+                '<div id="fixture-element"></div>\n' +
+                '<div id="discussion-container"' +
+                '   data-course-name="Fake Course"' +
+                '   data-user-create-comment="true"' +
+                '   data-user-create-subcomment="true"' +
+                '   data-read-only="false"' +
+                '></div>'
             );
         };
 
         return DiscussionSpecHelper;
-
     })();
-
 }).call(this);

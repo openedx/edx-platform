@@ -1,7 +1,7 @@
-(function (define) {
-'use strict';
-define('video/00_component.js', [],
-function () {
+(function(define) {
+    'use strict';
+    define('video/00_component.js', [],
+function() {
      /**
      * Creates a new object with the specified prototype object and properties.
      * @param {Object} o The object which should be the prototype of the
@@ -10,10 +10,10 @@ function () {
      * @throws {TypeError, Error}
      * @return {Object}
      */
-    var inherit = Object.create || (function () {
-        var F = function () {};
+    var inherit = Object.create || (function() {
+        var F = function() {};
 
-        return function (o) {
+        return function(o) {
             if (arguments.length > 1) {
                 throw Error('Second argument not supported');
             }
@@ -36,7 +36,7 @@ function () {
      * @constructor
      * @return {jquery Promise}
      */
-    var Component = function () {
+    var Component = function() {
         if ($.isFunction(this.initialize)) {
             return this.initialize.apply(this, arguments);
         }
@@ -49,9 +49,9 @@ function () {
      * the prototype.
      * @return {Object}
      */
-    Component.extend = function (protoProps, staticProps) {
+    Component.extend = function(protoProps, staticProps) {
         var Parent = this,
-            Child = function () {
+            Child = function() {
                 if ($.isFunction(this.initialize)) {
                     return this.initialize.apply(this, arguments);
                 }

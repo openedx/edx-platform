@@ -17,9 +17,8 @@
             return child;
         };
 
-    if (typeof Backbone !== "undefined" && Backbone !== null) {
+    if (typeof Backbone !== 'undefined' && Backbone !== null) {
         this.DiscussionCourseSettings = (function(_super) {
-
             __extends(DiscussionCourseSettings, _super);
 
             function DiscussionCourseSettings() {
@@ -27,8 +26,6 @@
             }
 
             return DiscussionCourseSettings;
-
         })(Backbone.Model);
     }
-
 }).call(this);

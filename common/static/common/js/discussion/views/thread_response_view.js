@@ -21,9 +21,8 @@
             return child;
         };
 
-    if (typeof Backbone !== "undefined" && Backbone !== null) {
+    if (typeof Backbone !== 'undefined' && Backbone !== null) {
         this.ThreadResponseView = (function(_super) {
-
             __extends(ThreadResponseView, _super);
 
             function ThreadResponseView() {
@@ -46,13 +45,13 @@
                 return ThreadResponseView.__super__.constructor.apply(this, arguments);
             }
 
-            ThreadResponseView.prototype.tagName = "li";
+            ThreadResponseView.prototype.tagName = 'li';
 
-            ThreadResponseView.prototype.className = "forum-response";
+            ThreadResponseView.prototype.className = 'forum-response';
 
             ThreadResponseView.prototype.events = {
-                "click .discussion-submit-comment": "submitComment",
-                "focus .wmd-input": "showEditorChrome"
+                'click .discussion-submit-comment': 'submitComment',
+                'focus .wmd-input': 'showEditorChrome'
             };
 
             ThreadResponseView.prototype.$ = function(selector) {
@@ -67,26 +66,26 @@
 
             ThreadResponseView.prototype.renderTemplate = function() {
                 var container, templateData, _ref;
-                this.template = _.template($("#thread-response-template").html());
-                container = $("#discussion-container");
+                this.template = _.template($('#thread-response-template').html());
+                container = $('#discussion-container');
                 if (!container.length) {
-                    container = $(".discussion-module");
+                    container = $('.discussion-module');
                 }
                 templateData = _.extend(this.model.toJSON(), {
                     wmdId: (_ref = this.model.id) !== null ? _ref : (new Date()).getTime(),
-                    create_sub_comment: container.data("user-create-subcomment"),
+                    create_sub_comment: container.data('user-create-subcomment'),
                     readOnly: this.readOnly
                 });
                 return this.template(templateData);
             };
 
             ThreadResponseView.prototype.render = function() {
-                this.$el.addClass("response_" + this.model.get("id"));
+                this.$el.addClass('response_' + this.model.get('id'));
                 this.$el.html(this.renderTemplate());
                 this.delegateEvents();
                 this.renderShowView();
                 this.renderAttrs();
-                if (this.model.get("thread").get("closed")) {
+                if (this.model.get('thread').get('closed')) {
                     this.hideCommentForm();
                 }
                 this.renderComments();
@@ -94,7 +93,7 @@
             };
 
             ThreadResponseView.prototype.afterInsert = function() {
-                this.makeWmdEditor("comment-body");
+                this.makeWmdEditor('comment-body');
                 return this.hideEditorChrome();
             };
 
@@ -140,14 +139,14 @@
                     return self.renderComment(comment, false, null);
                 });
                 if (this.collapseComments && comments.length) {
-                    this.$(".comments").hide();
-                    return this.$(".action-show-comments").on("click", function(event) {
+                    this.$('.comments').hide();
+                    return this.$('.action-show-comments').on('click', function(event) {
                         event.preventDefault();
-                        self.$(".action-show-comments").hide();
-                        return self.$(".comments").show();
+                        self.$('.action-show-comments').hide();
+                        return self.$('.comments').show();
                     });
                 } else {
-                    return this.$(".action-show-comments").hide();
+                    return this.$('.action-show-comments').hide();
                 }
             };
 
@@ -162,16 +161,16 @@
                 if (this.readOnly) {
                     this.$el.find('.comments').append(view.el);
                 } else {
-                    this.$el.find(".comments .new-comment").before(view.el);
+                    this.$el.find('.comments .new-comment').before(view.el);
                 }
-                view.bind("comment:edit", function(event) {
+                view.bind('comment:edit', function(event) {
                     if (self.editView) {
                         self.cancelEdit(event);
                     }
                     self.cancelCommentEdits();
                     return self.hideCommentForm();
                 });
-                view.bind("comment:cancel_edit", function() {
+                view.bind('comment:cancel_edit', function() {
                     return self.showCommentForm();
                 });
                 this.commentViews.push(view);
@@ -182,26 +181,26 @@
                 var body, comment, url, view;
                 event.preventDefault();
                 url = this.model.urlFor('reply');
-                body = this.getWmdContent("comment-body");
+                body = this.getWmdContent('comment-body');
                 if (!body.trim().length) {
                     return;
                 }
-                this.setWmdContent("comment-body", "");
+                this.setWmdContent('comment-body', '');
                 comment = new Comment({
                     body: body,
                     created_at: (new Date()).toISOString(),
-                    username: window.user.get("username"),
+                    username: window.user.get('username'),
                     abuse_flaggers: [],
-                    user_id: window.user.get("id"),
-                    id: "unsaved"
+                    user_id: window.user.get('id'),
+                    id: 'unsaved'
                 });
                 view = this.renderComment(comment);
                 this.hideEditorChrome();
-                this.trigger("comment:add", comment);
+                this.trigger('comment:add', comment);
                 return DiscussionUtil.safeAjax({
                     $elem: $(event.target),
                     url: url,
-                    type: "POST",
+                    type: 'POST',
                     dataType: 'json',
                     data: {
                         body: body
@@ -220,7 +219,7 @@
                 if (!this.model.can('can_delete')) {
                     return;
                 }
-                if (!confirm(gettext("Are you sure you want to delete this response?"))) {
+                if (!confirm(gettext('Are you sure you want to delete this response?'))) {
                     return;
                 }
                 url = this.model.urlFor('_delete');
@@ -230,7 +229,7 @@
                 return DiscussionUtil.safeAjax({
                     $elem: $elem,
                     url: url,
-                    type: "POST"
+                    type: 'POST'
                 });
             };
 
@@ -244,8 +243,8 @@
                     this.editView = new ThreadResponseEditView({
                         model: this.model
                     });
-                    this.editView.bind("response:update", this.update);
-                    return this.editView.bind("response:cancel_edit", this.cancelEdit);
+                    this.editView.bind('response:update', this.update);
+                    return this.editView.bind('response:cancel_edit', this.cancelEdit);
                 }
             };
 
@@ -285,10 +284,10 @@
                     this.showView = new ThreadResponseShowView({
                         model: this.model
                     });
-                    this.showView.bind("response:_delete", this._delete);
-                    this.showView.bind("response:edit", this.edit);
-                    return this.showView.on("comment:endorse", function() {
-                        return self.trigger("comment:endorse");
+                    this.showView.bind('response:_delete', this._delete);
+                    this.showView.bind('response:edit', this.edit);
+                    return this.showView.on('comment:endorse', function() {
+                        return self.trigger('comment:endorse');
                     });
                 }
             };
@@ -314,21 +313,21 @@
             ThreadResponseView.prototype.update = function(event) {
                 var newBody, url,
                     self = this;
-                newBody = this.editView.$(".edit-post-body textarea").val();
+                newBody = this.editView.$('.edit-post-body textarea').val();
                 url = DiscussionUtil.urlFor('update_comment', this.model.id);
                 return DiscussionUtil.safeAjax({
                     $elem: $(event.target),
                     $loading: event ? $(event.target) : void 0,
                     url: url,
-                    type: "POST",
+                    type: 'POST',
                     dataType: 'json',
                     data: {
                         body: newBody
                     },
-                    error: DiscussionUtil.formErrorHandler(this.$(".edit-post-form-errors")),
+                    error: DiscussionUtil.formErrorHandler(this.$('.edit-post-form-errors')),
                     success: function() {
-                        self.editView.$(".edit-post-body textarea").val("").attr("prev-text", "");
-                        self.editView.$(".wmd-preview p").html("");
+                        self.editView.$('.edit-post-body textarea').val('').attr('prev-text', '');
+                        self.editView.$('.wmd-preview p').html('');
                         self.model.set({
                             body: newBody
                         });
@@ -340,8 +339,6 @@
             };
 
             return ThreadResponseView;
-
         })(DiscussionContentView);
     }
-
 }).call(window);

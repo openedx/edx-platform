@@ -1,6 +1,6 @@
 (function() {
     'use strict';
-    var TooltipManager = function (element) {
+    var TooltipManager = function(element) {
         this.element = $(element);
         // If tooltip container already exist, use it.
         this.tooltip = $('div.' + this.className.split(/\s+/).join('.'));
@@ -21,7 +21,7 @@
         className: 'tooltip',
         SELECTOR: '[data-tooltip]',
 
-        bindEvents: function () {
+        bindEvents: function() {
             this.element.on({
                 'mouseover.TooltipManager': this.showTooltip,
                 'mousemove.TooltipManager': this.moveTooltip,
@@ -30,18 +30,18 @@
             }, this.SELECTOR);
         },
 
-        getCoords: function (pageX, pageY) {
+        getCoords: function(pageX, pageY) {
             return {
                 'left': pageX - 0.5 * this.tooltip.outerWidth(),
                 'top': pageY - (this.tooltip.outerHeight() + 15)
             };
         },
 
-        show: function () {
+        show: function() {
             this.tooltip.show().css('opacity', 1);
         },
 
-        hide: function () {
+        hide: function() {
             this.tooltip.hide().css('opacity', 0);
         },
 
@@ -54,8 +54,8 @@
         },
 
         prepareTooltip: function(element, pageX, pageY) {
-            pageX = typeof pageX !== 'undefined' ? pageX : element.offset().left + element.width()/2;
-            pageY = typeof pageY !== 'undefined' ? pageY : element.offset().top + element.height()/2;
+            pageX = typeof pageX !== 'undefined' ? pageX : element.offset().left + element.width() / 2;
+            pageY = typeof pageY !== 'undefined' ? pageY : element.offset().top + element.height() / 2;
             var tooltipText = $(element).attr('data-tooltip');
             this.tooltip
                 .html(tooltipText)
@@ -94,7 +94,7 @@
             }
         },
 
-        destroy: function () {
+        destroy: function() {
             this.tooltip.remove();
             // Unbind all delegated event handlers in the ".TooltipManager"
             // namespace.
@@ -103,7 +103,7 @@
     };
 
     window.TooltipManager = TooltipManager;
-    $(document).ready(function () {
+    $(document).ready(function() {
         window.globalTooltipManager = new TooltipManager(document.body);
     });
 }());

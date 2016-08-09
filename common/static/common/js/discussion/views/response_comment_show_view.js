@@ -18,9 +18,8 @@
             return child;
         };
 
-    if (typeof Backbone !== "undefined" && Backbone !== null) {
+    if (typeof Backbone !== 'undefined' && Backbone !== null) {
         this.ResponseCommentShowView = (function(_super) {
-
             __extends(ResponseCommentShowView, _super);
 
             function ResponseCommentShowView() {
@@ -34,10 +33,10 @@
                 return ResponseCommentShowView.__super__.constructor.apply(this, arguments);
             }
 
-            ResponseCommentShowView.prototype.tagName = "li";
+            ResponseCommentShowView.prototype.tagName = 'li';
 
             ResponseCommentShowView.prototype.render = function() {
-                var template = edx.HtmlUtils.template($("#response-comment-show-template").html());
+                var template = edx.HtmlUtils.template($('#response-comment-show-template').html());
                 var context = _.extend({
                     cid: this.model.cid,
                     author_display: this.getAuthorDisplay(),
@@ -47,7 +46,7 @@
                 edx.HtmlUtils.setHtml(this.$el, template(context));
                 this.delegateEvents();
                 this.renderAttrs();
-                this.$el.find(".timeago").timeago();
+                this.$el.find('.timeago').timeago();
                 this.convertMath();
                 this.addReplyLink();
                 return this;
@@ -56,7 +55,7 @@
             ResponseCommentShowView.prototype.addReplyLink = function() {
                 var html, name;
                 if (this.model.hasOwnProperty('parent')) {
-                    name = this.model.parent.get('username') || gettext("anonymous");
+                    name = this.model.parent.get('username') || gettext('anonymous');
                     html = edx.HtmlUtils.interpolateHtml(
                         edx.HtmlUtils.HTML("<a href='#comment_{parent_id}'>@{name}</a>:  "),
                         {
@@ -72,20 +71,18 @@
             };
 
             ResponseCommentShowView.prototype.convertMath = function() {
-                DiscussionUtil.convertMath(this.$el.find(".response-body"));
+                DiscussionUtil.convertMath(this.$el.find('.response-body'));
             };
 
             ResponseCommentShowView.prototype._delete = function(event) {
-                return this.trigger("comment:_delete", event);
+                return this.trigger('comment:_delete', event);
             };
 
             ResponseCommentShowView.prototype.edit = function(event) {
-                return this.trigger("comment:edit", event);
+                return this.trigger('comment:edit', event);
             };
 
             return ResponseCommentShowView;
-
         })(DiscussionContentShowView);
     }
-
 }).call(window);

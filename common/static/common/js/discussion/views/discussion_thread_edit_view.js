@@ -25,15 +25,15 @@
             },
 
             render: function() {
-                var formId = _.uniqueId("form-"),
-                    threadTypeTemplate = edx.HtmlUtils.template($("#thread-type-template").html()),
+                var formId = _.uniqueId('form-'),
+                    threadTypeTemplate = edx.HtmlUtils.template($('#thread-type-template').html()),
                     $threadTypeSelector = $(threadTypeTemplate({form_id: formId}).toString()),
                     mainTemplate = edx.HtmlUtils.template($('#thread-edit-template').html());
                 edx.HtmlUtils.setHtml(this.$el, mainTemplate(this.model.toJSON()));
                 this.container.append(this.$el);
                 this.$submitBtn = this.$('.post-update');
                 this.addField($threadTypeSelector);
-                this.$("#" + formId + "-post-type-" + this.threadType).attr('checked', true);
+                this.$('#' + formId + '-post-type-' + this.threadType).attr('checked', true);
                 // Only allow the topic field for course threads, as standalone threads
                 // cannot be moved.
                 if (this.context === 'course') {
@@ -58,7 +58,7 @@
 
             save: function() {
                 var title = this.$('.edit-post-title').val(),
-                    threadType = this.$(".post-type-input:checked").val(),
+                    threadType = this.$('.post-type-input:checked').val(),
                     body = this.$('.edit-post-body textarea').val(),
                     postData = {
                         title: title,
@@ -87,7 +87,7 @@
                         this.model.set(postData).unset('abbreviatedBody');
                         this.trigger('thread:updated');
                         if (this.threadType !== threadType) {
-                            this.model.set("thread_type", threadType);
+                            this.model.set('thread_type', threadType);
                             this.model.trigger('thread:thread_type_updated');
                             this.trigger('comment:endorse');
                         }
@@ -105,7 +105,7 @@
 
             cancelHandler: function(event) {
                 event.preventDefault();
-                this.trigger("thread:cancel_edit", event);
+                this.trigger('thread:cancel_edit', event);
                 this.remove();
                 return this;
             }

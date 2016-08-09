@@ -13,7 +13,7 @@ describe('Tests for split_test staff view switching', function() {
         delete window.XBlock;
     });
 
-    it("test that we have only one visible condition", function() {
+    it('test that we have only one visible condition', function() {
         var containers = elem.find('.split-test-child-container').length;
         var conditions_shown = elem.find('.split-test-child-container .condition-text').length;
         expect(containers).toEqual(1);
@@ -21,17 +21,15 @@ describe('Tests for split_test staff view switching', function() {
         expect(XBlock.initializeBlocks).toHaveBeenCalled();
     });
 
-    it("test that the right child is visible when selected", function() {
+    it('test that the right child is visible when selected', function() {
         var groups = ['0', '1', '2'];
 
-        for(var i = 0; i < groups.length; i++) {
+        for (var i = 0; i < groups.length; i++) {
             var to_select = groups[i];
             elem.find('.split-test-select').val(to_select).change();
             var child_text = elem.find('.split-test-child-container .condition-text').text();
             expect(child_text).toContain(to_select);
             expect(XBlock.initializeBlocks).toHaveBeenCalled();
         }
-
     });
-
 });

@@ -73,7 +73,7 @@
                         'Example Inline Discussion': {
                             'subcategories': {},
                             'children': [
-                                'What Are Your Goals for Creating a MOOC?',
+                                'What Are Your Goals for Creating a MOOC?'
                             ],
                             'entries': {
                                 'What Are Your Goals for Creating a MOOC?': {
@@ -95,12 +95,12 @@
         });
 
         it('completely show parent category and sub-category', function() {
-          var dropdownText;
-          this.createTopicView();
-          this.view.maxNameWidth = this.defaultTextWidth + 1;
-          this.view.$el.find('a.topic-title').first().click();
-          dropdownText = this.view.$el.find('.js-selected-topic').text();
-          expect(this.completeText).toEqual(dropdownText);
+            var dropdownText;
+            this.createTopicView();
+            this.view.maxNameWidth = this.defaultTextWidth + 1;
+            this.view.$el.find('a.topic-title').first().click();
+            dropdownText = this.view.$el.find('.js-selected-topic').text();
+            expect(this.completeText).toEqual(dropdownText);
         });
 
         it('truncation happens with specific title lengths', function() {
