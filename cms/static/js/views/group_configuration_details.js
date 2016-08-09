@@ -16,7 +16,7 @@ function(BaseView, _, gettext, str, StringUtils, HtmlUtils) {
             'click .hide-groups': 'hideGroups'
         },
 
-        className: function () {
+        className: function() {
             var index = this.model.collection.indexOf(this.model);
 
             return [
@@ -59,7 +59,7 @@ function(BaseView, _, gettext, str, StringUtils, HtmlUtils) {
             this.model.set('showGroups', false);
         },
 
-        getGroupsCountTitle: function () {
+        getGroupsCountTitle: function() {
             var count = this.model.get('groups').length,
                 /* globals ngettext */
                 message = ngettext(
@@ -71,10 +71,10 @@ function(BaseView, _, gettext, str, StringUtils, HtmlUtils) {
                     count
                 );
 
-            return StringUtils.interpolate(message, { count: count });
+            return StringUtils.interpolate(message, {count: count});
         },
 
-        getUsageCountTitle: function () {
+        getUsageCountTitle: function() {
             var count = this.model.get('usage').length;
 
             if (count === 0) {

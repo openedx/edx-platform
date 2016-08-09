@@ -2,9 +2,9 @@ define(
     [
         'jquery', 'underscore', 'squire'
     ],
-function ($, _, Squire) {
+function($, _, Squire) {
     'use strict';
-    describe('FileUploader', function () {
+    describe('FileUploader', function() {
         var FileUploaderTemplate = readFixtures(
                 'metadata-file-uploader-entry.underscore'
             ),
@@ -23,12 +23,12 @@ function ($, _, Squire) {
             },
             self, injector;
 
-        var setValue = function (view, value) {
+        var setValue = function(view, value) {
             view.setValueInEditor(value);
             view.updateModel();
         };
 
-        var createPromptSpy = function (name) {
+        var createPromptSpy = function(name) {
             var spy = jasmine.createSpyObj(name, ['constructor', 'show', 'hide']);
             spy.constructor.and.returnValue(spy);
             spy.show.and.returnValue(spy);
@@ -37,15 +37,15 @@ function ($, _, Squire) {
             return spy;
         };
 
-        beforeEach(function (done) {
+        beforeEach(function(done) {
             self = this;
 
             jasmine.addMatchers({
                 assertValueInView: function() {
                     return {
-                        compare: function (actual, expected) {
+                        compare: function(actual, expected) {
                             var value = actual.getValueFromEditor(),
-                            passed = _.isEqual(value, expected);
+                                passed = _.isEqual(value, expected);
 
                             return {
                                 pass: passed,
@@ -54,9 +54,9 @@ function ($, _, Squire) {
                         }
                     };
                 },
-                assertCanUpdateView: function () {
+                assertCanUpdateView: function() {
                     return {
-                        compare: function (actual, expected) {
+                        compare: function(actual, expected) {
                             var view = actual,
                                 value,
                                 passed;
@@ -73,9 +73,9 @@ function ($, _, Squire) {
                         }
                     };
                 },
-                assertClear: function () {
+                assertClear: function() {
                     return {
-                        compare: function (actual, modelValue) {
+                        compare: function(actual, modelValue) {
                             var view = actual,
                                 model = view.model,
                                 passed;
@@ -90,9 +90,9 @@ function ($, _, Squire) {
                         }
                     };
                 },
-                assertUpdateModel: function () {
+                assertUpdateModel: function() {
                     return {
-                        compare: function (actual, originalValue, newValue) {
+                        compare: function(actual, originalValue, newValue) {
                             var view = actual,
                                 model = view.model,
                                 expectOriginal,
@@ -111,9 +111,9 @@ function ($, _, Squire) {
                         }
                     };
                 },
-                verifyButtons: function () {
+                verifyButtons: function() {
                     return {
-                        compare: function (actual, upload, download) {
+                        compare: function(actual, upload, download) {
                             var view = actual,
                                 uploadBtn = view.$('.upload-setting'),
                                 downloadBtn = view.$('.download-setting'),
@@ -144,16 +144,16 @@ function ($, _, Squire) {
             this.uploadSpies = createPromptSpy('UploadDialog');
 
             injector = new Squire();
-            injector.mock('js/views/uploads', function () {
+            injector.mock('js/views/uploads', function() {
                 return self.uploadSpies.constructor;
             });
             injector.mock('js/views/video/transcripts/metadata_videolist');
             injector.mock('js/views/video/translations_editor');
 
             injector.require([
-                    'js/models/metadata', 'js/views/metadata'
-                ],
-                function (MetadataModel, MetadataView) {
+                'js/models/metadata', 'js/views/metadata'
+            ],
+                function(MetadataModel, MetadataView) {
                     var model = new MetadataModel($.extend(true, {}, modelStub));
                     self.view = new MetadataView.FileUploader({
                         model: model,
@@ -164,21 +164,21 @@ function ($, _, Squire) {
                 });
         });
 
-        afterEach(function () {
+        afterEach(function() {
             injector.clean();
             injector.remove();
         });
 
-        it('returns the initial value upon initialization', function () {
+        it('returns the initial value upon initialization', function() {
             expect(this.view).assertValueInView('http://example.org/test_1');
             expect(this.view).verifyButtons(true, true);
         });
 
-        it('updates its value correctly', function () {
+        it('updates its value correctly', function() {
             expect(this.view).assertCanUpdateView('http://example.org/test_2');
         });
 
-        it('upload works correctly', function () {
+        it('upload works correctly', function() {
             var options;
 
             setValue(this.view, '');
@@ -200,14 +200,14 @@ function ($, _, Squire) {
             expect(this.view.getValueFromEditor()).toEqual('http://example.org/test_3');
         });
 
-        it('has a clear method to revert to the model default', function () {
+        it('has a clear method to revert to the model default', function() {
             setValue(this.view, 'http://example.org/test_5');
 
             this.view.clear();
             expect(this.view).assertClear('http://example.org/test_1');
         });
 
-        it('has an update model method', function () {
+        it('has an update model method', function() {
             expect(this.view).assertUpdateModel(null, 'http://example.org/test_6');
         });
     });

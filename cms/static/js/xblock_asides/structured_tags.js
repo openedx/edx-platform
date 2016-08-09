@@ -2,10 +2,9 @@
     'use strict';
 
     function StructuredTagsView(runtime, element) {
-
         var $element = $(element);
 
-        $element.find("select").each(function() {
+        $element.find('select').each(function() {
             var loader = this;
             var sts = $(this).attr('structured-tags-select-init');
 

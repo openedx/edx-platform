@@ -1,17 +1,17 @@
-define(["backbone"], function(Backbone) {
+define(['backbone'], function(Backbone) {
     /**
      * Model used for metadata setting editors. This model does not do its own saving,
      * as that is done by module_edit.coffee.
      */
     var Metadata = Backbone.Model.extend({
         defaults: {
-            "field_name": null,
-            "display_name": null,
-            "value" : null,
-            "explicitly_set": null,
-            "default_value" : null,
-            "options" : null,
-            "type" : null
+            'field_name': null,
+            'display_name': null,
+            'value': null,
+            'explicitly_set': null,
+            'default_value': null,
+            'options': null,
+            'type': null
         },
 
         initialize: function() {
@@ -23,7 +23,7 @@ define(["backbone"], function(Backbone) {
          * Returns true if the stored value is different, or if the "explicitly_set"
          * property has changed.
          */
-        isModified : function() {
+        isModified: function() {
             if (!this.get('explicitly_set') && !this.original_explicitly_set) {
                 return false;
             }
@@ -43,7 +43,7 @@ define(["backbone"], function(Backbone) {
         /**
          * The value, as shown in the UI. This may be an inherited or default value.
          */
-        getDisplayValue : function () {
+        getDisplayValue: function() {
             return this.get('value');
         },
 
@@ -59,7 +59,7 @@ define(["backbone"], function(Backbone) {
         /**
          * Sets the displayed value.
          */
-        setValue: function (value) {
+        setValue: function(value) {
             this.set({
                 explicitly_set: true,
                 value: value
@@ -70,7 +70,7 @@ define(["backbone"], function(Backbone) {
          * Returns the field name, which should be used for persisting the metadata
          * field to the server.
          */
-        getFieldName: function () {
+        getFieldName: function() {
             return this.get('field_name');
         },
 
@@ -78,7 +78,7 @@ define(["backbone"], function(Backbone) {
          * Returns the options. This may be a array of possible values, or an object
          * with properties like "max", "min" and "step".
          */
-        getOptions: function () {
+        getOptions: function() {
             return this.get('options');
         },
 
@@ -102,14 +102,14 @@ define(["backbone"], function(Backbone) {
         }
     });
 
-    Metadata.SELECT_TYPE = "Select";
-    Metadata.INTEGER_TYPE = "Integer";
-    Metadata.FLOAT_TYPE = "Float";
-    Metadata.GENERIC_TYPE = "Generic";
-    Metadata.LIST_TYPE = "List";
-    Metadata.DICT_TYPE = "Dict";
-    Metadata.VIDEO_LIST_TYPE = "VideoList";
-    Metadata.RELATIVE_TIME_TYPE = "RelativeTime";
+    Metadata.SELECT_TYPE = 'Select';
+    Metadata.INTEGER_TYPE = 'Integer';
+    Metadata.FLOAT_TYPE = 'Float';
+    Metadata.GENERIC_TYPE = 'Generic';
+    Metadata.LIST_TYPE = 'List';
+    Metadata.DICT_TYPE = 'Dict';
+    Metadata.VIDEO_LIST_TYPE = 'VideoList';
+    Metadata.RELATIVE_TIME_TYPE = 'RelativeTime';
 
     return Metadata;
 });

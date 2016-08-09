@@ -20,7 +20,7 @@ define([
 ],
 function($, CertificatesCollection, Certificate, CertificatesPage, CertificatePreview) {
     'use strict';
-    return function (certificatesJson, certificateUrl, courseOutlineUrl, course_modes, certificate_web_view_url,
+    return function(certificatesJson, certificateUrl, courseOutlineUrl, course_modes, certificate_web_view_url,
                      is_active, certificate_activation_handler_url) {
         // Initialize the model collection, passing any necessary options to the constructor
         var certificatesCollection = new CertificatesCollection(certificatesJson, {
@@ -31,7 +31,7 @@ function($, CertificatesCollection, Certificate, CertificatesPage, CertificatePr
 
         // associating the certificate_preview globally.
         // need to show / hide this view in some other places.
-        if(!window.certWebPreview && certificate_web_view_url) {
+        if (!window.certWebPreview && certificate_web_view_url) {
             window.certWebPreview = new CertificatePreview({
                 course_modes: course_modes,
                 certificate_web_view_url: certificate_web_view_url,

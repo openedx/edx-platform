@@ -1,10 +1,9 @@
 define([
     'domReady', 'js/views/import', 'jquery', 'gettext', 'jquery.fileupload', 'jquery.cookie'
 ], function(domReady, Import, $, gettext) {
-
     'use strict';
 
-    return function (feedbackUrl, library) {
+    return function(feedbackUrl, library) {
         var dbError;
 
         if (library) {
@@ -27,14 +26,14 @@ define([
             previousImport = Import.storedImport(),
             file;
 
-        var onComplete = function () {
+        var onComplete = function() {
             bar.hide();
             chooseBtn
-                .find('.copy').html(gettext("Choose new file")).end()
+                .find('.copy').html(gettext('Choose new file')).end()
                 .show();
-        }
+        };
 
-        $(window).on('beforeunload', function (event) { unloading = true; });
+        $(window).on('beforeunload', function(event) { unloading = true; });
 
         // Display the status of last file upload on page load
         if (previousImport) {
@@ -70,11 +69,11 @@ define([
                         ).then(onComplete);
 
                         submitBtn.hide();
-                        data.submit().complete(function (result, textStatus, xhr) {
+                        data.submit().complete(function(result, textStatus, xhr) {
                             if (xhr.status !== 200) {
                                 var serverMsg, errMsg, stage;
 
-                                try{
+                                try {
                                     serverMsg = $.parseJSON(result.responseText) || {};
                                 } catch (e) {
                                     return;
@@ -104,7 +103,7 @@ define([
                 }
             },
 
-            progressall: function(e, data){
+            progressall: function(e, data) {
                 var percentInt = data.loaded / data.total * 100,
                     percentVal = parseInt(percentInt, 10) + '%',
                     doneAt;
@@ -121,7 +120,7 @@ define([
 
                     // Start feedback with delay so that current stage of
                     // import properly updates in session
-                    setTimeout(function () { Import.pollStatus(); }, 3000);
+                    setTimeout(function() { Import.pollStatus(); }, 3000);
                 } else {
                     bar.show();
                     fill.width(percentVal).html(percentVal);
@@ -132,7 +131,7 @@ define([
         });
 
 
-        var showImportSubmit = function (e) {
+        var showImportSubmit = function(e) {
             var filepath = $(this).val();
 
             if (filepath.substr(filepath.length - 6, 6) === 'tar.gz') {
@@ -150,10 +149,10 @@ define([
             }
         };
 
-        domReady(function () {
+        domReady(function() {
             // import form setup
             $('.view-import .file-input').bind('change', showImportSubmit);
-            $('.view-import .choose-file-button, .view-import .choose-file-button-inline').bind('click', function (e) {
+            $('.view-import .choose-file-button, .view-import .choose-file-button-inline').bind('click', function(e) {
                 e.preventDefault();
                 $('.view-import .file-input').click();
             });

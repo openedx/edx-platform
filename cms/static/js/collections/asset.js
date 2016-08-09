@@ -1,13 +1,13 @@
 define([
-    "underscore",
-    "edx-ui-toolkit/js/pagination/paging-collection",
-    "js/models/asset"
+    'underscore',
+    'edx-ui-toolkit/js/pagination/paging-collection',
+    'js/models/asset'
 ], function(_, PagingCollection, AssetModel) {
     'use strict';
 
     var AssetCollection = PagingCollection.extend({
         assetType: '',
-        model : AssetModel,
+        model: AssetModel,
 
         state: {
             firstPage: 0,

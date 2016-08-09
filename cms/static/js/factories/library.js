@@ -5,7 +5,7 @@ define([
 ],
 function($, _, XBlockInfo, PagedContainerPage, LibraryContainerView, ComponentTemplates, xmoduleLoader) {
     'use strict';
-    return function (componentTemplates, XBlockInfoJson, options) {
+    return function(componentTemplates, XBlockInfoJson, options) {
         var main_options = {
             el: $('#content'),
             model: new XBlockInfo(XBlockInfoJson, {parse: true}),
@@ -15,7 +15,7 @@ function($, _, XBlockInfo, PagedContainerPage, LibraryContainerView, ComponentTe
             canEdit: true
         };
 
-        xmoduleLoader.done(function () {
+        xmoduleLoader.done(function() {
             var view = new PagedContainerPage(_.extend(main_options, options));
             view.render();
         });

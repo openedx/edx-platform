@@ -2,10 +2,10 @@ define(
     [
         'jquery', 'underscore', 'squire'
     ],
-function ($, _, Squire) {
+function($, _, Squire) {
     'use strict';
     // TODO: fix BLD-1100 Disabled due to intermittent failure on master and in PR builds
-    xdescribe('VideoTranslations', function () {
+    xdescribe('VideoTranslations', function() {
         var TranslationsEntryTemplate = readFixtures(
                 'video/metadata-translations-entry.underscore'
             ),
@@ -38,12 +38,12 @@ function ($, _, Squire) {
             },
             self, injector;
 
-        var setValue = function (view, value) {
+        var setValue = function(view, value) {
             view.setValueInEditor(value);
             view.updateModel();
         };
 
-        var createPromptSpy = function (name) {
+        var createPromptSpy = function(name) {
             var spy = jasmine.createSpyObj(name, ['constructor', 'show', 'hide']);
             spy.constructor.and.returnValue(spy);
             spy.show.and.returnValue(spy);
@@ -52,13 +52,13 @@ function ($, _, Squire) {
             return spy;
         };
 
-        beforeEach(function (done) {
+        beforeEach(function(done) {
             self = this;
 
             jasmine.addMatchers({
                 assertValueInView: function() {
                     return {
-                        compare: function (actual, expected) {
+                        compare: function(actual, expected) {
                             var value = actual.getValueFromEditor();
                             var passed = _.isEqual(value, expected);
 
@@ -69,9 +69,9 @@ function ($, _, Squire) {
                         }
                     };
                 },
-                assertCanUpdateView: function () {
+                assertCanUpdateView: function() {
                     return {
-                        compare: function (actual, expected) {
+                        compare: function(actual, expected) {
                             var view = actual,
                                 value,
                                 passed;
@@ -87,9 +87,9 @@ function ($, _, Squire) {
                         }
                     };
                 },
-                assertClear: function () {
+                assertClear: function() {
                     return {
-                        compare: function (actual, modelValue) {
+                        compare: function(actual, modelValue) {
                             var view = actual,
                                 model = view.model,
                                 passed;
@@ -104,9 +104,9 @@ function ($, _, Squire) {
                         }
                     };
                 },
-                assertUpdateModel: function () {
+                assertUpdateModel: function() {
                     return {
-                        compare: function (actual, originalValue, newValue) {
+                        compare: function(actual, originalValue, newValue) {
                             var view = actual,
                                 model = view.model,
                                 expectOriginal,
@@ -125,9 +125,9 @@ function ($, _, Squire) {
                         }
                     };
                 },
-                verifyKeysUnique: function () {
+                verifyKeysUnique: function() {
                     return {
-                        compare: function (actual, initial, expected, testData) {
+                        compare: function(actual, initial, expected, testData) {
                             var view = this.actual,
                                 item,
                                 value,
@@ -149,9 +149,9 @@ function ($, _, Squire) {
                         }
                     };
                 },
-                verifyButtons: function () {
+                verifyButtons: function() {
                     return {
-                        compare: function (actual, upload, download, remove, index) {
+                        compare: function(actual, upload, download, remove, index) {
                             var view = this.actual,
                                 items = view.$el.find('.list-settings-item'),
                                 item = index ? items.eq(index) : items.last(),
@@ -188,14 +188,14 @@ function ($, _, Squire) {
             this.uploadSpies = createPromptSpy('UploadDialog');
 
             injector = new Squire();
-            injector.mock('js/views/uploads', function () {
+            injector.mock('js/views/uploads', function() {
                 return self.uploadSpies;
             });
 
             injector.require([
-                    'js/models/metadata', 'js/views/video/translations_editor'
-                ],
-                function (MetadataModel, Translations) {
+                'js/models/metadata', 'js/views/video/translations_editor'
+            ],
+                function(MetadataModel, Translations) {
                     var model = new MetadataModel($.extend(true, {}, modelStub));
                     self.view = new Translations({model: model});
 
@@ -203,12 +203,12 @@ function ($, _, Squire) {
                 });
         });
 
-        afterEach(function () {
+        afterEach(function() {
             injector.clean();
             injector.remove();
         });
 
-        it('returns the initial value upon initialization', function () {
+        it('returns the initial value upon initialization', function() {
             expect(this.view).assertValueInView({
                 'en': 'en.srt',
                 'ru': 'ru.srt',
@@ -219,7 +219,7 @@ function ($, _, Squire) {
             expect(this.view).verifyButtons(true, true, true);
         });
 
-        it('updates its value correctly', function () {
+        it('updates its value correctly', function() {
             expect(this.view).assertCanUpdateView({
                 'ru': 'ru.srt',
                 'uk': 'uk.srt',
@@ -227,7 +227,7 @@ function ($, _, Squire) {
             });
         });
 
-        it('upload works correctly', function () {
+        it('upload works correctly', function() {
             var options;
 
             setValue(this.view, {
@@ -259,7 +259,7 @@ function ($, _, Squire) {
             });
         });
 
-        it('has a clear method to revert to the model default', function () {
+        it('has a clear method to revert to the model default', function() {
             setValue(this.view, {
                 'fr': 'en.srt',
                 'uk': 'ru.srt'
@@ -277,17 +277,17 @@ function ($, _, Squire) {
             expect(this.view.$el.find('.create-setting')).not.toHaveClass('is-disabled');
         });
 
-        it('has an update model method', function () {
+        it('has an update model method', function() {
             expect(this.view).assertUpdateModel(null, {'fr': 'fr.srt'});
         });
 
-        it('can add an entry', function () {
+        it('can add an entry', function() {
             expect(_.keys(this.view.model.get('value')).length).toEqual(4);
             this.view.$el.find('.create-setting').click();
             expect(this.view.$el.find('select').length).toEqual(5);
         });
 
-        it('can remove an entry', function () {
+        it('can remove an entry', function() {
             setValue(this.view, {
                 'en': 'en.srt',
                 'ru': 'ru.srt',
@@ -298,14 +298,14 @@ function ($, _, Squire) {
             expect(_.keys(this.view.model.get('value')).length).toEqual(2);
         });
 
-        it('only allows one blank entry at a time', function () {
+        it('only allows one blank entry at a time', function() {
             expect(this.view.$el.find('select').length).toEqual(4);
             this.view.$el.find('.create-setting').click();
             this.view.$el.find('.create-setting').click();
             expect(this.view.$el.find('select').length).toEqual(5);
         });
 
-        it('only allows unique keys', function () {
+        it('only allows unique keys', function() {
             expect(this.view).verifyKeysUnique(
                 {'ru': 'ru.srt'}, {'ru': 'ru.srt'}, {'key': 'ru', 'value': ''}
             );
@@ -319,7 +319,7 @@ function ($, _, Squire) {
             );
         });
 
-        it('re-enables the add setting button after entering a new value', function () {
+        it('re-enables the add setting button after entering a new value', function() {
             expect(this.view.$el.find('select').length).toEqual(4);
             this.view.$el.find('.create-setting').click();
             expect(this.view).verifyButtons(false, false, true);

@@ -11,7 +11,7 @@ function(CertificateModel, CertificateCollection) {
         beforeEach(function() {
             this.newModelOptions = {add: true};
             this.model = new CertificateModel({editing: true}, this.newModelOptions);
-            this.collection = new CertificateCollection([ this.model ], {certificateUrl: '/outline'});
+            this.collection = new CertificateCollection([this.model], {certificateUrl: '/outline'});
         });
 
         describe('Basic', function() {
@@ -39,18 +39,16 @@ function(CertificateModel, CertificateCollection) {
 
         describe('Validation', function() {
             it('requires a name', function() {
-                var model = new CertificateModel({ name: '' }, this.newModelOptions);
+                var model = new CertificateModel({name: ''}, this.newModelOptions);
 
                 expect(model.isValid()).toBeFalsy();
             });
 
             it('can pass validation', function() {
-                var model = new CertificateModel({ name: 'foo' }, this.newModelOptions);
+                var model = new CertificateModel({name: 'foo'}, this.newModelOptions);
 
                 expect(model.isValid()).toBeTruthy();
             });
-
         });
     });
-
 });

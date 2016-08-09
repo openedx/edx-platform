@@ -1,15 +1,15 @@
 // Backbone.js Application Model: Certificate
 
 define([
-        'underscore',
-        'backbone',
-        'backbone-relational',
-        'backbone.associations',
-        'gettext',
-        'cms/js/main',
-        'js/certificates/models/signatory',
-        'js/certificates/collections/signatories'
-    ],
+    'underscore',
+    'backbone',
+    'backbone-relational',
+    'backbone.associations',
+    'gettext',
+    'cms/js/main',
+    'js/certificates/models/signatory',
+    'js/certificates/collections/signatories'
+],
     function(_, Backbone, BackboneRelational, BackboneAssociations, gettext, CoffeeSrcMain,
              SignatoryModel, SignatoryCollection) {
         'use strict';
@@ -78,7 +78,7 @@ define([
                         attributes: {name: true}
                     };
                 }
-                var allSignatoriesValid  = _.every(attrs.signatories.models, function(signatory){
+                var allSignatoriesValid = _.every(attrs.signatories.models, function(signatory) {
                     return signatory.isValid();
                 });
                 if (!allSignatoriesValid) {
