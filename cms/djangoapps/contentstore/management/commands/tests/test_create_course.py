@@ -61,3 +61,37 @@ class TestCreateCourse(ModuleStoreTestCase):
         )
         # pylint: disable=protected-access
         self.assertEqual(store, modulestore()._get_modulestore_for_courselike(new_key).get_modulestore_type())
+
+# import cProfile, pstats, StringIO
+# from xmodule.modulestore import ModuleStoreEnum
+# from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+#
+# class TestCreateSingleCourse(ModuleStoreTestCase):
+#     """
+#     Unit tests for creating a course in either old mongo or split mongo via command line
+#
+#     These are just here for profiling tests and will be removed later.
+#     """
+#
+#     @classmethod
+#     def setUpClass(cls):
+#         cls.pr = cProfile.Profile()
+#         cls.pr.enable()
+#
+#     @classmethod
+#     def tearDownClass(cls):
+#         cls.pr.disable()
+#         cls.pr.dump_stats("steelix/ms_tc2.stats")
+#
+#     def setUp(self):
+#         super(TestCreateSingleCourse, self).setUp()
+#
+#     def test_old_mongo(self):
+#         course = CourseFactory.create(
+#             default_store=ModuleStoreEnum.Type.mongo, emit_signals=False
+#         )
+#
+#     def test_split(self):
+#         course = CourseFactory.create(
+#             default_store=ModuleStoreEnum.Type.split, emit_signals=False
+#         )

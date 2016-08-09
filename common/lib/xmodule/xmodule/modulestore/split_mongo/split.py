@@ -1823,7 +1823,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
     def create_course(
         self, org, course, run, user_id, master_branch=None, fields=None,
         versions_dict=None, search_targets=None, root_category='course',
-        root_block_id=None, **kwargs
+        root_block_id=None, emit_signals=True, **kwargs
     ):
         """
         Create a new entry in the active courses index which points to an existing or new structure. Returns
@@ -1873,13 +1873,14 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         locator = CourseLocator(org=org, course=course, run=run, branch=master_branch)
         return self._create_courselike(
             locator, user_id, master_branch, fields, versions_dict,
-            search_targets, root_category, root_block_id, **kwargs
+            search_targets, root_category, root_block_id, emit_signals=emit_signals,
+            **kwargs
         )
 
     def _create_courselike(
         self, locator, user_id, master_branch, fields=None,
         versions_dict=None, search_targets=None, root_category='course',
-        root_block_id=None, **kwargs
+        root_block_id=None, emit_signals=True, **kwargs
     ):
         """
         Internal code for creating a course or library
@@ -1943,7 +1944,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             draft_structure = self._lookup_course(draft_version).structure
 
         locator = locator.replace(version_guid=new_id)
-        with self.bulk_operations(locator):
+        with self.bulk_operations(locator, emit_signals=emit_signals):
             self.update_structure(locator, draft_structure)
             index_entry = {
                 '_id': ObjectId(),

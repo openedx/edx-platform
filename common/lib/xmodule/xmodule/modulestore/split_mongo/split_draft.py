@@ -19,7 +19,7 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
     A subclass of Split that supports a dual-branch fall-back versioning framework
         with a Draft branch that falls back to a Published branch.
     """
-    def create_course(self, org, course, run, user_id, skip_auto_publish=False, **kwargs):
+    def create_course(self, org, course, run, user_id, skip_auto_publish=False, emit_signals=True, **kwargs):
         """
         Creates and returns the course.
 
@@ -33,7 +33,8 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
         Returns: a CourseDescriptor
         """
         master_branch = kwargs.pop('master_branch', ModuleStoreEnum.BranchName.draft)
-        with self.bulk_operations(CourseLocator(org, course, run)):
+
+        with self.bulk_operations(CourseLocator(org, course, run), emit_signals=emit_signals):
             item = super(DraftVersioningModuleStore, self).create_course(
                 org, course, run, user_id, master_branch=master_branch, **kwargs
             )

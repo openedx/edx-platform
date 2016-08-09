@@ -130,9 +130,13 @@ class CourseFactory(XModuleFactory):
             with store.bulk_operations(course_key, emit_signals=emit_signals):
                 if default_store_override is not None:
                     with store.default_store(default_store_override):
-                        new_course = store.create_course(org, number, run, user_id, fields=kwargs)
+                        new_course = store.create_course(
+                            org, number, run, user_id, emit_signals=emit_signals, fields=kwargs
+                        )
                 else:
-                    new_course = store.create_course(org, number, run, user_id, fields=kwargs)
+                    new_course = store.create_course(
+                        org, number, run, user_id, emit_signals=emit_signals, fields=kwargs
+                    )
 
                 last_course.loc = new_course.location
                 return new_course
