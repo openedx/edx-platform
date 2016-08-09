@@ -90,7 +90,7 @@ class CohortMembership(models.Model):
     def save(self, *args, **kwargs):
         self.full_clean(validate_unique=False)
 
-        log.info("Saving CohortMembership for '%s' (id=%s) in '%s'", self.user.username, self.user.id, self.course_id)
+        log.info("Saving CohortMembership for user '%s' in '%s'", self.user.id, self.course_id)
 
         # Avoid infinite recursion if creating from get_or_create() call below.
         # This block also allows middleware to use CohortMembership.get_or_create without worrying about outer_atomic
