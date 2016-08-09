@@ -66,7 +66,7 @@ class @Problem
     detail = @el.data('progress_detail')
     status = @el.data('progress_status')
 
-    # Render 'x/y point(s)' if student has attempted question 
+    # Render 'x/y point(s)' if student has attempted question
     if status != 'none' and detail? and (jQuery.type(detail) == "string") and detail.indexOf('/') > 0
         a = detail.split('/')
         earned = parseFloat(a[0])
@@ -628,10 +628,10 @@ class @Problem
     choicegroup: (element, display, answers) =>
       element = $(element)
 
-      input_id = element.attr('id').replace(/inputtype_/,'')
+      input_id = element.attr('id').replace(/inputtype_/, '')
       answer = answers[input_id]
       for choice in answer
-        element.find("label[for='input_#{input_id}_#{choice}']").addClass 'choicegroup_correct'
+        element.find("#input_#{input_id}_#{choice}").parent("label").addClass 'choicegroup_correct'
 
     javascriptinput: (element, display, answers) =>
       answer_id = $(element).attr('id').split("_")[1...].join("_")
@@ -641,7 +641,7 @@ class @Problem
     choicetextgroup: (element, display, answers) =>
       element = $(element)
 
-      input_id = element.attr('id').replace(/inputtype_/,'')
+      input_id = element.attr('id').replace(/inputtype_/, '')
       answer = answers[input_id]
       for choice in answer
         element.find("section#forinput#{choice}").addClass 'choicetextgroup_show_correct'
@@ -821,4 +821,3 @@ class @Problem
       ]
       hint_container.attr('hint_index', response.hint_index)
       @$('.hint-button').focus()  # a11y focus on click, like the Check button
-

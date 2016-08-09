@@ -4,6 +4,7 @@ Bok choy acceptance tests for problems in the LMS
 
 See also old lettuce tests in lms/djangoapps/courseware/features/problems.feature
 """
+from nose.plugins.attrib import attr
 from textwrap import dedent
 
 from common.test.acceptance.tests.helpers import UniqueCourseTest
@@ -51,7 +52,7 @@ class ProblemsTest(UniqueCourseTest):
             email=self.email,
             password=self.password,
             course_id=self.course_id,
-            staff=False
+            staff=True
         ).visit()
 
     def get_problem(self):
@@ -77,7 +78,8 @@ class ProblemClarificationTest(ProblemsTest):
                         <clarification>Return on Investment <strong>(per year)</strong></clarification> over 20 years.
                     </p>
                     <numericalresponse answer="6.5">
-                        <textline label="Enter the annual ROI" trailing_text="%" />
+                        <label>Enter the annual ROI</label>
+                        <textline trailing_text="%" />
                     </numericalresponse>
                 </text>
             </problem>
@@ -263,7 +265,8 @@ class ProblemWithMathjax(ProblemsTest):
             <problem>
                 <p>Check mathjax has rendered [mathjax]E=mc^2[/mathjax]</p>
                 <multiplechoiceresponse>
-                  <choicegroup label="Answer this?" type="MultipleChoice">
+                  <label>Answer this?</label>
+                  <choicegroup type="MultipleChoice">
                     <choice correct="true">Choice1 <choicehint>Correct choice message</choicehint></choice>
                     <choice correct="false">Choice2<choicehint>Wrong choice message</choicehint></choice>
                   </choicegroup>
@@ -310,7 +313,8 @@ class ProblemPartialCredit(ProblemsTest):
             <problem>
                 <p>The answer is 1. Partial credit for -1.</p>
                 <numericalresponse answer="1" partial_credit="list">
-                    <formulaequationinput label="How many miles away from Earth is the sun? Use scientific notation to answer." />
+                    <label>How many miles away from Earth is the sun? Use scientific notation to answer.</label>
+                    <formulaequationinput/>
                     <responseparam type="tolerance" default="0.01" />
                     <responseparam partial_answers="-1" />
                 </numericalresponse>
@@ -343,9 +347,9 @@ class LogoutDuringAnswering(ProblemsTest):
         """
         xml = dedent("""
             <problem>
-                <p>The answer is 1</p>
                 <numericalresponse answer="1">
-                    <formulaequationinput label="where are the songs of spring?" />
+                    <label>The answer is 1</label>
+                    <formulaequationinput/>
                     <responseparam type="tolerance" default="0.01" />
                 </numericalresponse>
             </problem>
@@ -412,3 +416,94 @@ class LogoutDuringAnswering(ProblemsTest):
 
         self.assertTrue(problem_page.is_browser_on_page())
         self.assertEqual(problem_page.problem_name, 'TEST PROBLEM')
+
+
+class ProblemQuestionDescriptionTest(ProblemsTest):
+    """TestCase Class to verify question and description rendering."""
+    descriptions = [
+        "A vegetable is an edible part of a plant in tuber form.",
+        "A fruit is a fertilized ovary of a plant and contains seeds."
+    ]
+
+    def get_problem(self):
+        """
+        Create a problem with question and description.
+        """
+        xml = dedent("""
+            <problem>
+                <choiceresponse>
+                    <label>Eggplant is a _____?</label>
+                    <description>{}</description>
+                    <description>{}</description>
+                    <checkboxgroup>
+                        <choice correct="true">vegetable</choice>
+                        <choice correct="false">fruit</choice>
+                    </checkboxgroup>
+                </choiceresponse>
+            </problem>
+        """.format(*self.descriptions))
+        return XBlockFixtureDesc('problem', 'Label with Description', data=xml)
+
+    def test_question_with_description(self):
+        """
+        Scenario: Test that question and description are rendered as expected.
+        Given I am enrolled in a course.
+        When I visit a unit page with a CAPA question.
+        Then label and description should be rendered correctly.
+        """
+        self.courseware_page.visit()
+        problem_page = ProblemPage(self.browser)
+        problem_page.wait_for_element_visibility(problem_page.CSS_PROBLEM_HEADER, 'wait for problem header')
+        self.assertEqual(problem_page.problem_name, 'Label with Description')
+        self.assertEqual(problem_page.problem_question, 'Eggplant is a _____?')
+        self.assertEqual(problem_page.problem_question_descriptions, self.descriptions)
+
+
+@attr('a11y')
+class CAPAProblemQuestionDescriptionA11yTest(ProblemsTest):
+    """TestCase Class to verify CAPA problem questions accessibility."""
+    def get_problem(self):
+        """
+        Problem structure.
+        """
+        xml = dedent("""
+        <problem>
+            <choiceresponse>
+                <label>question 1 text here</label>
+                <description>description 2 text 1</description>
+                <description>description 2 text 2</description>
+                <checkboxgroup>
+                    <choice correct="true">True</choice>
+                    <choice correct="false">False</choice>
+                </checkboxgroup>
+            </choiceresponse>
+            <multiplechoiceresponse>
+                <label>question 2 text here</label>
+                <description>description 2 text 1</description>
+                <description>description 2 text 2</description>
+                <choicegroup type="MultipleChoice">
+                    <choice correct="false">Alpha <choicehint>A hint</choicehint></choice>
+                    <choice correct="true">Beta</choice>
+                </choicegroup>
+            </multiplechoiceresponse>
+         </problem>
+        """)
+        return XBlockFixtureDesc('problem', 'Problem A11Y TEST', data=xml)
+
+    def test_a11y(self):
+        """
+        Scenario: Verifies that each question and description has unique id.
+        Given I am enrolled in a course.
+        And I visit a unit page with two CAPA problems
+        Then I check question and description has unique IDs
+        """
+        self.courseware_page.visit()
+        problem_page = ProblemPage(self.browser)
+
+        # Set the scope to the problem question
+        problem_page.a11y_audit.config.set_scope(
+            include=['section.wrapper-problem-response']
+        )
+
+        # Run the accessibility audit.
+        problem_page.a11y_audit.check_for_accessibility_errors()
