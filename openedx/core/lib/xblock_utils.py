@@ -382,6 +382,8 @@ def add_staff_markup(user, has_instructor_access, disable_staff_debug_info, bloc
         'block_content': frag.content,
         'is_released': is_released,
         'has_instructor_access': has_instructor_access,
+        'can_reset_attempts': 'attempts' in block.fields,
+        'can_rescore_problem': hasattr(block, 'rescore_problem'),
         'disable_staff_debug_info': disable_staff_debug_info,
     }
     return wrap_fragment(frag, render_to_string("staff_problem_info.html", staff_context))
