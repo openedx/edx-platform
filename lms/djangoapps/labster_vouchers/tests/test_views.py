@@ -31,6 +31,21 @@ class TestActivateVouchers(CCXCourseTestBase):
         self.url = reverse("activate_voucher")
         self.client.login(username=self.user.username, password="test")
 
+    def test_not_activated(self):
+        """
+        Ensure displays an error message when the user is not activated.
+        """
+        self.user.is_active = False
+        self.user.save()
+        voucher = "A" * 10
+        res = self.client.post(self.url, data={"code": voucher}, follow=True)
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertContains(
+            res,
+            'Voucher cannot be applied, because your account has not been activated yet.'
+        )
+
     def test_invalid_voucher(self):
         """
         Ensure displays an error message when voucher code is invalid.

@@ -69,11 +69,18 @@ def activate_voucher(request):
     """
     Gets license code from API, fetches related course_id and enrolls student.
     """
-    form = forms.ValidationForm(request.POST)
     enter_voucher_url = reverse('enter_voucher')
 
+    if not request.user.is_active:
+        messages.error(request, _(
+            "Voucher cannot be applied, because your account has not been activated yet."
+        ))
+        return redirect(enter_voucher_url)
+
+    form = forms.ValidationForm(request.POST)
+
     if not form.is_valid():
-        messages.error(request, "Enter a valid voucher code.")
+        messages.error(request, _("Enter a valid voucher code."))
         return redirect(enter_voucher_url)
 
     code = form.cleaned_data['code']
