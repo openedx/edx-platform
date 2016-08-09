@@ -3,8 +3,8 @@
     <div class="meta-info grid-container">
         <div class="organization col"><%- orgList %></div>
         <div class="category col col-last">
-            <span class="category-text"><%- gettext(type) %></span>
-            <span class="xseries-icon" aria-hidden="true"></span>
+            <span class="category-text"><%- gettext(category) %></span>
+            <span class="category-icon <%- category.toLowerCase() %>-icon" aria-hidden="true"></span>
         </div>
     </div>
   <% if (progress) { %>  

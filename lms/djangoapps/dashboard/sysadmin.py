@@ -7,7 +7,6 @@ import json
 import logging
 import os
 import subprocess
-import time
 import StringIO
 
 from django.conf import settings
@@ -39,7 +38,6 @@ from external_auth.models import ExternalAuthMap
 from external_auth.views import generate_password
 from student.models import CourseEnrollment, UserProfile, Registration
 import track.views
-from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 

@@ -64,7 +64,7 @@ function (HtmlUtils) {
                 '</div>',
             '</div>'].join('')),
             {
-                volumeInstructions: gettext('Click on this button to mute or unmute this video or press UP or DOWN buttons to increase or decrease volume level.'), // jshint ignore: line
+                volumeInstructions: gettext('Click on this button to mute or unmute this video or press UP or DOWN buttons to increase or decrease volume level.'),  // eslint-disable-line max-len
                 adjustVideoVolume: gettext('Adjust video volume'),
                 volumeText: gettext('Volume')
             }
@@ -130,7 +130,7 @@ function (HtmlUtils) {
          */
         render: function() {
             var container = this.el.find('.volume-slider');
-            
+
             HtmlUtils.append(container, HtmlUtils.HTML('<div class="ui-slider-handle volume-handle"></div>'));
 
             this.volumeSlider = container.slider({

@@ -8,11 +8,11 @@ from uuid import uuid4
 from nose.plugins.attrib import attr
 from pytz import UTC
 
-from .helpers import BaseDiscussionTestCase
-from ..helpers import UniqueCourseTest
-from ...pages.lms.auto_auth import AutoAuthPage
-from ...pages.lms.courseware import CoursewarePage
-from ...pages.lms.discussion import (
+from common.test.acceptance.tests.discussion.helpers import BaseDiscussionTestCase
+from common.test.acceptance.tests.helpers import UniqueCourseTest
+from common.test.acceptance.pages.lms.auto_auth import AutoAuthPage
+from common.test.acceptance.pages.lms.courseware import CoursewarePage
+from common.test.acceptance.pages.lms.discussion import (
     DiscussionTabSingleThreadPage,
     InlineDiscussionPage,
     InlineDiscussionThreadPage,
@@ -20,10 +20,10 @@ from ...pages.lms.discussion import (
     DiscussionTabHomePage,
     DiscussionSortPreferencePage,
 )
-from ...pages.lms.learner_profile import LearnerProfilePage
+from common.test.acceptance.pages.lms.learner_profile import LearnerProfilePage
 
-from ...fixtures.course import CourseFixture, XBlockFixtureDesc
-from ...fixtures.discussion import (
+from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
+from common.test.acceptance.fixtures.discussion import (
     SingleThreadViewFixture,
     UserProfileViewFixture,
     SearchResultFixture,
@@ -33,8 +33,8 @@ from ...fixtures.discussion import (
     SearchResult,
     MultipleThreadFixture)
 
-from .helpers import BaseDiscussionMixin
-from ..helpers import skip_if_browser
+from common.test.acceptance.tests.discussion.helpers import BaseDiscussionMixin
+from common.test.acceptance.tests.helpers import skip_if_browser
 
 
 THREAD_CONTENT_WITH_LATEX = """Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt
@@ -178,7 +178,7 @@ class DiscussionResponsePaginationTestMixin(BaseDiscussionMixin):
         self.assertFalse(self.thread_page.has_add_response_button())
 
 
-@attr('shard_2')
+@attr(shard=2)
 class DiscussionHomePageTest(UniqueCourseTest):
     """
     Tests for the discussion home page.
@@ -217,7 +217,7 @@ class DiscussionHomePageTest(UniqueCourseTest):
         self.page.a11y_audit.check_for_accessibility_errors()
 
 
-@attr('shard_2')
+@attr(shard=2)
 class DiscussionTabSingleThreadTest(BaseDiscussionTestCase, DiscussionResponsePaginationTestMixin):
     """
     Tests for the discussion page displaying a single thread
@@ -290,7 +290,7 @@ class DiscussionTabSingleThreadTest(BaseDiscussionTestCase, DiscussionResponsePa
         self.assertFalse(self.thread_page.is_show_comments_visible(response_id))
 
 
-@attr('shard_2')
+@attr(shard=2)
 class DiscussionTabMultipleThreadTest(BaseDiscussionTestCase):
     """
     Tests for the discussion page with multiple threads
@@ -371,7 +371,7 @@ class DiscussionTabMultipleThreadTest(BaseDiscussionTestCase):
         self.thread_page_2.a11y_audit.check_for_accessibility_errors()
 
 
-@attr('shard_2')
+@attr(shard=2)
 class DiscussionOpenClosedThreadTest(BaseDiscussionTestCase):
     """
     Tests for checking the display of attributes on open and closed threads
@@ -446,7 +446,7 @@ class DiscussionOpenClosedThreadTest(BaseDiscussionTestCase):
         page.a11y_audit.check_for_accessibility_errors()
 
 
-@attr('shard_2')
+@attr(shard=2)
 class DiscussionCommentDeletionTest(BaseDiscussionTestCase):
     """
     Tests for deleting comments displayed beneath responses in the single thread view.
@@ -486,7 +486,7 @@ class DiscussionCommentDeletionTest(BaseDiscussionTestCase):
         page.delete_comment("comment_other_author")
 
 
-@attr('shard_2')
+@attr(shard=2)
 class DiscussionResponseEditTest(BaseDiscussionTestCase):
     """
     Tests for editing responses displayed beneath thread in the single thread view.
@@ -737,7 +737,7 @@ class DiscussionResponseEditTest(BaseDiscussionTestCase):
         page.a11y_audit.check_for_accessibility_errors()
 
 
-@attr('shard_2')
+@attr(shard=2)
 class DiscussionCommentEditTest(BaseDiscussionTestCase):
     """
     Tests for editing comments displayed beneath responses in the single thread view.
@@ -837,7 +837,7 @@ class DiscussionCommentEditTest(BaseDiscussionTestCase):
         page.a11y_audit.check_for_accessibility_errors()
 
 
-@attr('shard_2')
+@attr(shard=2)
 class InlineDiscussionTest(UniqueCourseTest, DiscussionResponsePaginationTestMixin):
     """
     Tests for inline discussions
@@ -996,7 +996,7 @@ class InlineDiscussionTest(UniqueCourseTest, DiscussionResponsePaginationTestMix
         self.assertFalse(self.additional_discussion_page._is_element_visible(".new-post-article"))
 
 
-@attr('shard_2')
+@attr(shard=2)
 class DiscussionUserProfileTest(UniqueCourseTest):
     """
     Tests for user profile page in discussion tab.
@@ -1072,14 +1072,14 @@ class DiscussionUserProfileTest(UniqueCourseTest):
                 self.assertFalse(page.is_next_button_shown())
 
         # click all the way up through each page
-        for i in range(current_page, total_pages):
+        for __ in range(current_page, total_pages):
             _check_page()
             if current_page < total_pages:
                 page.click_on_page(current_page + 1)
                 current_page += 1
 
         # click all the way back down
-        for i in range(current_page, 0, -1):
+        for __ in range(current_page, 0, -1):
             _check_page()
             if current_page > 1:
                 page.click_on_page(current_page - 1)
@@ -1125,7 +1125,7 @@ class DiscussionUserProfileTest(UniqueCourseTest):
         self.assertTrue(learner_profile_page.field_is_visible('username'))
 
 
-@attr('shard_2')
+@attr(shard=2)
 class DiscussionSearchAlertTest(UniqueCourseTest):
     """
     Tests for spawning and dismissing alerts related to user search actions and their results.
@@ -1211,7 +1211,7 @@ class DiscussionSearchAlertTest(UniqueCourseTest):
         self.page.a11y_audit.check_for_accessibility_errors()
 
 
-@attr('shard_2')
+@attr(shard=2)
 class DiscussionSortPreferenceTest(UniqueCourseTest):
     """
     Tests for the discussion page displaying a single thread.

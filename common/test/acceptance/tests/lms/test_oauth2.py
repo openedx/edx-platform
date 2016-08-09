@@ -4,8 +4,6 @@ from common.test.acceptance.pages.lms.oauth2_confirmation import OAuth2Confirmat
 from common.test.acceptance.pages.lms.auto_auth import AutoAuthPage
 from bok_choy.web_app_test import WebAppTest
 
-from flaky import flaky
-
 from urlparse import urlparse, parse_qsl
 
 

@@ -107,7 +107,6 @@ describe("Formula Equation Preview", function () {
         });
 
         it('does not request again if the initial request has already been made', function (done) {
-            // jshint undef:false
             expect(window.Problem.inputAjax.calls.count()).toEqual(1);
 
             // Reset the spy in order to check calls again.

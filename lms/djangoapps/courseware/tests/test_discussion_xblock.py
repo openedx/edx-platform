@@ -15,7 +15,6 @@ import mock
 from django.core.urlresolvers import reverse
 from course_api.blocks.tests.helpers import deserialize_usage_key
 from courseware.module_render import get_module_for_descriptor_internal
-from milestones.tests.utils import MilestonesTestCaseMixin
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from xblock.field_data import DictFieldData
 from xblock.fragment import Fragment
@@ -253,7 +252,7 @@ class TestTemplates(TestDiscussionXBlock):
 
 
 @ddt.ddt
-class TestXBlockInCourse(SharedModuleStoreTestCase, MilestonesTestCaseMixin):
+class TestXBlockInCourse(SharedModuleStoreTestCase):
     """
     Test the discussion xblock as rendered in the course and course API.
     """

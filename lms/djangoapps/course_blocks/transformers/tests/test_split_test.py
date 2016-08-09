@@ -15,7 +15,7 @@ from ..user_partitions import UserPartitionTransformer, _get_user_partition_grou
 from .helpers import CourseStructureTestCase, create_location
 
 
-@attr('shard_3')
+@attr(shard=3)
 @ddt.ddt
 class SplitTestTransformerTestCase(CourseStructureTestCase):
     """

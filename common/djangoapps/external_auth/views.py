@@ -496,7 +496,7 @@ def shib_login(request):
         http://www.incommonfederation.org/attributesummary.html#eduPersonPrincipal
         but the configuration is in the shibboleth software.
     """
-    shib_error_msg = _(dedent(
+    shib_error_msg = dedent(_(
         """
         Your university identity server did not return your ID information to us.
         Please try logging in again.  (You may need to restart your browser.)

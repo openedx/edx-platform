@@ -268,7 +268,7 @@ class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase, Probl
         ungraded problems, and is good for displaying a course summary with due dates,
         etc.
         """
-        return progress.summary(self.student_user, self.course).chapters
+        return progress.summary(self.student_user, self.course).chapter_grades
 
     def check_grade_percent(self, percent):
         """
@@ -299,11 +299,11 @@ class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase, Probl
             sections_list.extend(chapter['sections'])
 
         # get the first section that matches the url (there should only be one)
-        hw_section = next(section for section in sections_list if section.get('url_name') == hw_url_name)
-        return [s.earned for s in hw_section['scores']]
+        hw_section = next(section for section in sections_list if section.url_name == hw_url_name)
+        return [s.earned for s in hw_section.scores]
 
 
-@attr('shard_3')
+@attr(shard=3)
 class TestCourseGrader(TestSubmittingProblems):
     """
     Suite of tests for the course grader.
@@ -682,7 +682,7 @@ class TestCourseGrader(TestSubmittingProblems):
         self.assertEqual(req_status[0]["status"], 'satisfied')
 
 
-@attr('shard_1')
+@attr(shard=1)
 class ProblemWithUploadedFilesTest(TestSubmittingProblems):
     """Tests of problems with uploaded files."""
     # Tell Django to clean out all databases, not just default
@@ -737,7 +737,7 @@ class ProblemWithUploadedFilesTest(TestSubmittingProblems):
         self.assertItemsEqual(kwargs['files'].keys(), filenames.split())
 
 
-@attr('shard_1')
+@attr(shard=1)
 class TestPythonGradedResponse(TestSubmittingProblems):
     """
     Check that we can submit a schematic and custom response, and it answers properly.
@@ -988,7 +988,7 @@ class TestPythonGradedResponse(TestSubmittingProblems):
         self._check_ireset(name)
 
 
-@attr('shard_1')
+@attr(shard=1)
 class TestConditionalContent(TestSubmittingProblems):
     """
     Check that conditional content works correctly with grading.
@@ -1168,7 +1168,7 @@ class TestConditionalContent(TestSubmittingProblems):
 
         self.assertEqual(self.score_for_hw('homework1'), [1.0])
         self.assertEqual(self.score_for_hw('homework2'), [])
-        self.assertEqual(self.earned_hw_scores(), [1.0, 0.0])
+        self.assertEqual(self.earned_hw_scores(), [1.0])
 
         # Grade percent is .25. Here is the calculation.
         homework_1_score = 1.0 / 2

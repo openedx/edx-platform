@@ -3,7 +3,7 @@
 import pprint
 import traceback
 
-from django.http import Http404, HttpResponse, HttpResponseNotFound
+from django.http import Http404, HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.utils.html import escape
 
@@ -11,8 +11,6 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from edxmako.shortcuts import render_to_response
 
 from codejail.safe_exec import safe_exec
-
-from mako.exceptions import TopLevelLookupException
 
 
 @login_required
@@ -29,7 +27,7 @@ def run_python(request):
         g = {}
         try:
             safe_exec(py_code, g)
-        except Exception as e:
+        except Exception:   # pylint: disable=broad-except
             c['results'] = traceback.format_exc()
         else:
             c['results'] = pprint.pformat(g)

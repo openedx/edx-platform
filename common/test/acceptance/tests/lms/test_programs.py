@@ -1,12 +1,12 @@
 """Acceptance tests for LMS-hosted Programs pages"""
 from nose.plugins.attrib import attr
 
-from ...fixtures.catalog import CatalogFixture, CatalogConfigMixin
-from ...fixtures.programs import ProgramsFixture, ProgramsConfigMixin
-from ...fixtures.course import CourseFixture
-from ..helpers import UniqueCourseTest
-from ...pages.lms.auto_auth import AutoAuthPage
-from ...pages.lms.programs import ProgramListingPage, ProgramDetailsPage
+from common.test.acceptance.fixtures.catalog import CatalogFixture, CatalogConfigMixin
+from common.test.acceptance.fixtures.programs import ProgramsFixture, ProgramsConfigMixin
+from common.test.acceptance.fixtures.course import CourseFixture
+from common.test.acceptance.tests.helpers import UniqueCourseTest
+from common.test.acceptance.pages.lms.auto_auth import AutoAuthPage
+from common.test.acceptance.pages.lms.programs import ProgramListingPage, ProgramDetailsPage
 from openedx.core.djangoapps.catalog.tests import factories as catalog_factories
 from openedx.core.djangoapps.programs.tests import factories as program_factories
 

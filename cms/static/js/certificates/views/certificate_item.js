@@ -1,7 +1,7 @@
 // Backbone Application View: Certificate Item
 // Renders an editor view or a details view depending on the state of the underlying model.
 
-define([ // jshint ignore:line
+define([
     'gettext',
     'js/views/list_item',
     'js/certificates/views/certificate_details',

@@ -104,7 +104,7 @@ class CourseListViewTests(CourseApiViewTestMixin, ModuleStoreTestCase):
         self.assertListEqual(actual, expected)
 
 
-@attr('shard_3')
+@attr(shard=3)
 @ddt.ddt
 class CourseRetrieveUpdateViewTests(CourseApiViewTestMixin, ModuleStoreTestCase):
     """ Tests for CourseRetrieveUpdateView. """
@@ -390,7 +390,7 @@ class CourseRetrieveUpdateViewTests(CourseApiViewTestMixin, ModuleStoreTestCase)
         self.assertDictEqual(expected_dict, json.loads(response.content))
 
 
-@attr('shard_1')
+@attr(shard=1)
 @override_settings(ECOMMERCE_API_URL=TEST_API_URL, ECOMMERCE_API_SIGNING_KEY=TEST_API_SIGNING_KEY)
 class OrderViewTests(UserMixin, TestCase):
     """ Tests for the basket order view. """

@@ -2,13 +2,13 @@
 Acceptance tests for Studio related to the textbooks.
 """
 from common.test.acceptance.tests.studio.base_studio_test import StudioCourseTest
-from ...pages.studio.textbook_upload import TextbookUploadPage
-from ...pages.lms.textbook_view import TextbookViewPage
-from ...tests.helpers import disable_animations
+from common.test.acceptance.pages.studio.textbook_upload import TextbookUploadPage
+from common.test.acceptance.pages.lms.textbook_view import TextbookViewPage
+from common.test.acceptance.tests.helpers import disable_animations
 from nose.plugins.attrib import attr
 
 
-@attr('shard_2')
+@attr(shard=2)
 class TextbooksTest(StudioCourseTest):
     """
     Test that textbook functionality is working properly on studio side

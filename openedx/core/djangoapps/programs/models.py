@@ -21,6 +21,14 @@ class ProgramsApiConfig(ConfigurationModel):
     internal_service_url = models.URLField(verbose_name=_("Internal Service URL"))
     public_service_url = models.URLField(verbose_name=_("Public Service URL"))
 
+    marketing_path = models.CharField(
+        max_length=255,
+        blank=True,
+        help_text=_(
+            'Path used to construct URLs to programs marketing pages (e.g., "/foo").'
+        )
+    )
+
     # TODO: The property below is obsolete. Delete at the earliest safe moment. See ECOM-4995
     authoring_app_js_path = models.CharField(
         verbose_name=_("Path to authoring app's JS"),
@@ -73,6 +81,7 @@ class ProgramsApiConfig(ConfigurationModel):
         )
     )
 
+    # TODO: Remove unused field.
     xseries_ad_enabled = models.BooleanField(
         verbose_name=_("Do we want to show xseries program advertising"),
         default=False
@@ -130,13 +139,6 @@ class ProgramsApiConfig(ConfigurationModel):
         certificates for Program completion.
         """
         return self.enabled and self.enable_certification
-
-    @property
-    def show_xseries_ad(self):
-        """
-        Indicates whether we should show xseries add
-        """
-        return self.enabled and self.xseries_ad_enabled
 
     @property
     def show_program_listing(self):

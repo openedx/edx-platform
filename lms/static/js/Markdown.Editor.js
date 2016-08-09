@@ -35,16 +35,16 @@
 
     // The text that appears on the dialog box when entering Images.
     var imageDialogText = gettext("Insert Image (upload file or type URL)"),
-        imageUrlHelpText = gettext("Type in a URL or use the \"Choose File\" button to upload a file from your machine. (e.g. 'http://example.com/img/clouds.jpg')"),  // jshint ignore:line
+        imageUrlHelpText = gettext("Type in a URL or use the \"Choose File\" button to upload a file from your machine. (e.g. 'http://example.com/img/clouds.jpg')"),  // eslint-disable-line max-len
         imageDescriptionLabel = gettext("Image Description"),
         imageDefaultText = "http://", // The default text that appears in input
-        imageDescError = gettext("Please describe this image or agree that it has no contextual value by checking the checkbox."),  // jshint ignore:line
-        imageDescriptionHelpText = gettext("e.g. 'Sky with clouds'. The description is helpful for users who cannot see the image."),  // jshint ignore:line
+        imageDescError = gettext('Please describe this image or agree that it has no contextual value by checking the checkbox.'),  // eslint-disable-line max-len
+        imageDescriptionHelpText = gettext("e.g. 'Sky with clouds'. The description is helpful for users who cannot see the image."),  // eslint-disable-line max-len
         imageDescriptionHelpLink = {
             href: 'http://www.w3.org/TR/html5/embedded-content-0.html#alt',
             text: gettext("How to create useful text alternatives.")
         },
-        imageIsDecorativeLabel = gettext("This image is for decorative purposes only and does not require a description.");  // jshint ignore:line
+        imageIsDecorativeLabel = gettext('This image is for decorative purposes only and does not require a description.');  // eslint-disable-line max-len
 
     // Text that is shared between both link and image dialog boxes.
     var defaultHelpHoverTitle = gettext("Markdown Editing Help"),

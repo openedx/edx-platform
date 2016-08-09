@@ -33,7 +33,6 @@
     "%(cohort_name)s (%(user_count)s)": "%(cohort_name)s (%(user_count)s)", 
     "%(comments_count)s %(span_sr_open)scomments %(span_close)s": "%(comments_count)s %(span_sr_open)s\u8bc4\u8bba %(span_close)s", 
     "%(comments_count)s %(span_sr_open)scomments (%(unread_comments_count)s unread comments)%(span_close)s": "%(comments_count)s %(span_sr_open)s\u8bc4\u8bba (%(unread_comments_count)s \u672a\u8bfb\u8bc4\u8bba)%(span_close)s", 
-    "%(display_name)s Settings": "%(display_name)s\u8bbe\u7f6e", 
     "%(download_link_start)sDownload this image (right-click or option-click, save as)%(link_end)s and then %(upload_link_start)supload%(link_end)s it to your backpack.</li>": "%(download_link_start)s\u4e0b\u8f7d\u6b64\u56fe\u50cf\uff08\u53f3\u51fb\u6216\u5355\u51fb\u9009\u9879\uff0c\u53e6\u5b58\u4e3a\uff09%(link_end)s\uff0c\u968f\u540e%(upload_link_start)s\u4e0a\u4f20%(link_end)s\u81f3\u4f60\u7684 backpack \u4e2d\u3002</li>", 
     "%(errorCount)s error found in form.": [
       "\u8868\u683c\u4e2d\u53d1\u73b0 %(errorCount)s \u4e2a\u9519\u8bef\u3002"
@@ -267,7 +266,6 @@
     "Change Manually": "\u624b\u52a8\u66f4\u6539", 
     "Change My Email Address": "\u66f4\u6539\u6211\u7684\u7535\u5b50\u90ae\u4ef6", 
     "Change image": "\u4fee\u6539\u56fe\u7247", 
-    "Change the settings for %(display_name)s": "\u4fee\u6539%(display_name)s\u7684\u8bbe\u7f6e", 
     "Check Your Email": "\u68c0\u67e5\u4f60\u7684\u7535\u5b50\u90ae\u4ef6", 
     "Check the box to remove %(count)s flag.": [
       "\u9009\u4e2d\u6b64\u9009\u6846\u4ee5\u79fb\u9664 %(count)s \u4e2a\u6807\u8bb0\u3002"
@@ -337,7 +335,6 @@
     "Correct failed component": "\u7ea0\u6b63\u5931\u8d25\u7684\u7ec4\u4ef6", 
     "Could not find Certificate Exception in white list. Please refresh the page and try again": "\u5728\u8bb8\u53ef\u540d\u5355\u4e2d\u627e\u4e0d\u5230\u8bc1\u4e66\u7279\u4f8b\u7684\u4eba\u3002\u8bf7\u91cd\u65b0\u8f7d\u5165\u9875\u9762\u6216\u518d\u8bd5\u4e00\u6b21\u3002", 
     "Could not find Certificate Invalidation in the list. Please refresh the page and try again": "\u65e0\u6cd5\u5728\u8fd9\u4efd\u5217\u8868\u4e2d\u627e\u5230\u8bc1\u4e66\u5931\u6548\u8bc1\u660e\u3002\u8bf7\u91cd\u65b0\u8f7d\u5165\u9875\u9762\u6216\u518d\u8bd5\u4e00\u6b21\u3002", 
-    "Could not find a user with username or email address '<%= identifier %>'.": "\u627e\u4e0d\u5230\u7528\u6237\u540d\u6216\u7535\u5b50\u90ae\u4ef6\u5730\u5740\u4e3a\u201c<%= identifier %>\u201d\u7684\u7528\u6237\u3002", 
     "Could not find the specified string.": "\u65e0\u6cd5\u627e\u5230\u6307\u5b9a\u7684\u5b57\u7b26\u4e32\u3002", 
     "Could not find users associated with the following identifiers:": "\u672a\u80fd\u627e\u5230\u4e0e\u4ee5\u4e0b\u8bc6\u522b\u7801\u5173\u8054\u7684\u7528\u6237\uff1a", 
     "Could not retrieve payment information": "\u65e0\u6cd5\u8bfb\u53d6\u652f\u4ed8\u4fe1\u606f", 
@@ -514,7 +511,6 @@
     "Error: Import failed.": "\u9519\u8bef\uff1a\u5bfc\u5165\u5931\u8d25\u3002", 
     "Error: Replacing failed.": "\u9519\u8bef\uff1a\u66ff\u6362\u5931\u8d25\u3002", 
     "Error: Uploading failed.": "\u9519\u8bef\uff1a\u4e0a\u4f20\u5931\u8d25\u3002", 
-    "Error: User '<%= username %>' has not yet activated their account. Users must create and activate their accounts before they can be assigned a role.": "\u9519\u8bef\uff1a\u7528\u6237\u201c<%= username %>\u201d\u5c1a\u672a\u6fc0\u6d3b\u4ed6\u7684\u8d26\u6237\uff0c\u7528\u6237\u5fc5\u987b\u5148\u521b\u5efa\u5e76\u6fc0\u6d3b\u540e\u65b9\u53ef\u4e3a\u5176\u5206\u914d\u89d2\u8272\u3002", 
     "Error: You cannot remove yourself from the Instructor group!": "\u9519\u8bef\uff1a\u60a8\u4e0d\u53ef\u4ee5\u5c06\u81ea\u5df1\u4ece\u6559\u5e08\u7ec4\u4e2d\u5220\u9664\u3002", 
     "Errors": "\u9519\u8bef", 
     "Exception Granted": "\u7279\u6b8a\u5904\u7406\u5df2\u6279\u51c6", 
@@ -874,8 +870,6 @@
     "Programs": "\u9879\u76ee", 
     "Public": "\u516c\u5f00", 
     "Publish": "\u53d1\u5e03", 
-    "Publish %(display_name)s": "\u53d1\u5e03%(display_name)s", 
-    "Publish all unpublished changes for this %(item)s?": "\u8981\u53d1\u5e03\u6b64%(item)s\u4e2d\u6240\u6709\u5c1a\u672a\u53d1\u5e03\u7684\u66f4\u6539\u5417\uff1f", 
     "Publishing": "\u6b63\u5728\u53d1\u5e03", 
     "Question": "\u95ee\u9898", 
     "Questions raise issues that need answers. Discussions share ideas and start conversations.": "\u201c\u95ee\u9898\u201d\u63d0\u51fa\u9700\u8981\u7b54\u6848\u7684\u8bae\u9898\uff0c\u201c\u8ba8\u8bba\u201d\u5206\u4eab\u60f3\u6cd5\u5e76\u5f00\u59cb\u4ea4\u6d41\u3002", 

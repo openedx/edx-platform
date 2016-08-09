@@ -6,14 +6,14 @@ import uuid
 
 from nose.plugins.attrib import attr
 
-from .base_studio_test import StudioCourseTest
-from ...pages.lms.create_mode import ModeCreationPage
-from ...pages.studio.settings_certificates import CertificatesPage
-from ...pages.studio.settings_advanced import AdvancedSettingsPage
-from ..helpers import skip_if_browser
+from common.test.acceptance.tests.studio.base_studio_test import StudioCourseTest
+from common.test.acceptance.pages.lms.create_mode import ModeCreationPage
+from common.test.acceptance.pages.studio.settings_certificates import CertificatesPage
+from common.test.acceptance.pages.studio.settings_advanced import AdvancedSettingsPage
+from common.test.acceptance.tests.helpers import skip_if_browser
 
 
-@attr('shard_8')
+@attr(shard=8)
 class CertificatesTest(StudioCourseTest):
     """
     Tests for settings/certificates Page.

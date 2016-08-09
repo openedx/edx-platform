@@ -36,12 +36,9 @@ from django.core.mail import EmailMultiAlternatives, get_connection
 from django.core.mail.message import forbid_multi_line_headers
 from django.core.urlresolvers import reverse
 
-from bulk_email.models import (
-    CourseEmail, Optout, Target
-)
+from bulk_email.models import CourseEmail, Optout
 from courseware.courses import get_course
 from openedx.core.lib.courses import course_image_url
-from student.roles import CourseStaffRole, CourseInstructorRole
 from instructor_task.models import InstructorTask
 from instructor_task.subtasks import (
     SubtaskStatus,
@@ -49,7 +46,6 @@ from instructor_task.subtasks import (
     check_subtask_is_valid,
     update_subtask_status,
 )
-from util.query import use_read_replica_if_available
 from util.date_utils import get_default_time_display
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 

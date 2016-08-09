@@ -5,7 +5,7 @@ import unittest
 
 from django.conf import settings
 from django.core.urlresolvers import reverse
-from django.test import TestCase, override_settings
+from django.test import TestCase
 from django.contrib import staticfiles
 
 from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme

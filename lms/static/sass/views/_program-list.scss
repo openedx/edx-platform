@@ -22,7 +22,6 @@
   .aside {
     padding: $baseline;
     margin-bottom: $baseline;
-    background-color: $body-bg;
     box-sizing: border-box;
     border: 1px solid $border-color-l3;
   }
@@ -30,7 +29,7 @@
   .program-advertise {
     clear: both;
 
-    .btn-neutral {
+    .new-programs-btn {
       width: 100%;
       text-align: center;
       padding: 10px;
@@ -76,33 +75,5 @@
   .hd-3 {
     color: $black;
     margin-bottom: $baseline;
-  }
-
-  .find-xseries-programs {
-    background: $black;
-    border-color: $black;
-    color: $white;
-
-    .action-xseries-icon {
-      @include float(left);
-      @include margin-right($baseline*0.4);
-
-      display: inline;
-      background: url('#{$static-path}/images/icon-sm-xseries-white.png') no-repeat;
-      background-color: transparent;
-      width: ($baseline*1.1);
-      height: ($baseline*1.1);
-    }
-
-    &:active,
-    &:hover,
-    &:focus {
-      background: $white;
-      color: $black;
-
-      .action-xseries-icon {
-        background: url('#{$static-path}/images/icon-sm-xseries-black.png') no-repeat;
-      }
-    }
   }
 }

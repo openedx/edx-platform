@@ -67,7 +67,7 @@
                     }
                     else{
                         this.escapeAndShowMessage(
-                            gettext('Could not find Certificate Exception in white list. Please refresh the page and try again') // jshint ignore:line
+                            gettext('Could not find Certificate Exception in white list. Please refresh the page and try again')  // eslint-disable-line max-len
                         );
                     }
                 },

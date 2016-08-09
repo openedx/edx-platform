@@ -3,14 +3,14 @@ Acceptance tests for course in studio
 """
 from nose.plugins.attrib import attr
 
-from .base_studio_test import StudioCourseTest
-from ...pages.studio.auto_auth import AutoAuthPage
+from common.test.acceptance.tests.studio.base_studio_test import StudioCourseTest
+from common.test.acceptance.pages.studio.auto_auth import AutoAuthPage
 
-from ...pages.studio.users import CourseTeamPage
-from ...pages.studio.index import DashboardPage
+from common.test.acceptance.pages.studio.users import CourseTeamPage
+from common.test.acceptance.pages.studio.index import DashboardPage
 
 
-@attr('shard_2')
+@attr(shard=2)
 class CourseTeamPageTest(StudioCourseTest):
     """ As a course author, I want to be able to add others to my team """
     def _make_user(self, username):

@@ -5,9 +5,9 @@ import json
 from nose.plugins.attrib import attr
 import ddt
 
-from ..helpers import EventsTestMixin
-from .test_video_module import VideoBaseTest
-from ...pages.lms.video.video import _parse_time_str
+from common.test.acceptance.tests.helpers import EventsTestMixin
+from common.test.acceptance.tests.video.test_video_module import VideoBaseTest
+from common.test.acceptance.pages.lms.video.video import _parse_time_str
 
 from openedx.core.lib.tests.assertions.events import assert_event_matches, assert_events_equal
 from opaque_keys.edx.keys import UsageKey, CourseKey
@@ -149,7 +149,7 @@ class VideoEventsTest(VideoEventsTestMixin):
         assert_events_equal(static_fields_pattern, load_video_event)
 
 
-@attr('shard_8')
+@attr(shard=8)
 @ddt.ddt
 class VideoBumperEventsTest(VideoEventsTestMixin):
     """ Test bumper video event emission """

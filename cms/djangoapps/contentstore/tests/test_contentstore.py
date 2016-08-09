@@ -2,7 +2,6 @@
 
 import copy
 import mock
-from mock import patch
 import shutil
 import lxml.html
 from lxml import etree
@@ -475,12 +474,12 @@ class ImportRequiredTestCases(ContentStoreTestCase):
         renamed_chapter = [item for item in all_items if item.location.block_id == 'renamed_chapter'][0]
         self.assertIsNotNone(renamed_chapter.published_on)
         self.assertIsNotNone(renamed_chapter.parent)
-        self.assertTrue(renamed_chapter.location in course_after_rename[0].children)
+        self.assertIn(renamed_chapter.location, course_after_rename[0].children)
         original_chapter = [item for item in all_items
                             if item.location.block_id == 'b9870b9af59841a49e6e02765d0e3bbf'][0]
         self.assertIsNone(original_chapter.published_on)
         self.assertIsNone(original_chapter.parent)
-        self.assertFalse(original_chapter.location in course_after_rename[0].children)
+        self.assertNotIn(original_chapter.location, course_after_rename[0].children)
 
     def test_empty_data_roundtrip(self):
         """
@@ -935,7 +934,7 @@ class MiscCourseTests(ContentStoreTestCase):
 
     def test_import_polls(self):
         items = self.store.get_items(self.course.id, qualifiers={'category': 'poll_question'})
-        self.assertTrue(len(items) > 0)
+        self.assertGreater(len(items), 0)
         # check that there's actually content in the 'question' field
         self.assertGreater(len(items[0].question), 0)
 
@@ -1265,7 +1264,7 @@ class ContentStoreTest(ContentStoreTestCase, XssTestMixin):
 
         auth.add_users(self.user, instructor_role, self.user)
 
-        self.assertTrue(len(instructor_role.users_with_role()) > 0)
+        self.assertGreater(len(instructor_role.users_with_role()), 0)
 
         # Now delete course and check that user not in instructor groups of this course
         delete_course_and_groups(course_id, self.user.id)

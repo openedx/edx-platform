@@ -9,7 +9,6 @@ from lettuce import world, step, before
 from lettuce.django import django_url
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
-from milestones.models import MilestoneRelationshipType
 from student.models import CourseEnrollment
 from xmodule.modulestore.django import modulestore
 from xmodule.course_module import CourseDescriptor
@@ -17,12 +16,6 @@ from courseware.courses import get_course_by_id
 from xmodule import seq_module, vertical_block
 from logging import getLogger
 logger = getLogger(__name__)
-
-
-@before.each_scenario  # pylint: disable=no-member
-def setup_milestones_app(scenario):  # pylint: disable=unused-argument
-    MilestoneRelationshipType.objects.get_or_create(name='requires')
-    MilestoneRelationshipType.objects.get_or_create(name='fulfills')
 
 
 @step('I (.*) capturing of screenshots before and after each step$')

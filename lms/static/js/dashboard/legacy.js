@@ -5,6 +5,9 @@
  * for the dashboard should be implemented as self-contained
  * modules with unit tests.
  */
+
+ /* globals Logger, accessible_modal, interpolate */
+
  var edx = edx || {};
 
 (function($, gettext, Logger, accessibleModal, interpolate) {
@@ -180,5 +183,4 @@
             $("#unenroll_course_name").text($(event.target).data("course-name"));
         });
     };
-
-})(jQuery, gettext, Logger, accessible_modal, interpolate); // jshint undef:false
+})(jQuery, gettext, Logger, accessible_modal, interpolate);

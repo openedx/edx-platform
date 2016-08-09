@@ -6,14 +6,14 @@
   width: 23px;
   height: 20px;
   padding: 2px;
-  background-color: palette(grayscale, white-t);
+  background-color: $white;
   border-style: solid;
   border-width: 2px;
 }
 
 .green-certificate-icon .certificate-body {
-  fill: palette(success, dark);
-  border-color: palette(success, dark);
+  fill: palette(success, accent);
+  border-color: palette(success, accent);
 }
 
 .blue-certificate-icon .certificate-body {

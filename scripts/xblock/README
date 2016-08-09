@@ -1,0 +1,33 @@
+## XBlocks count script
+
+The script in this directory, xblock_counts.py, when run will produce 2 csv files containing a summary
+of the XBlock usage in courses.
+
+This script requires a list of XBlock types. The xblock_studio_configuration.json file included is an example. The file
+contains a list of types for the tool to summarize with counts.
+
+{
+  "data": [
+    {
+      "name": "problem",
+    },
+    {
+      "name": "video",
+    },
+    ...
+  ]
+}
+
+### Steps for usage
+
+1. Ensure all python requirements are up to date including those listed in the requirements.txt file.
+
+2. Request a OAUTH2_Client ID on the api platform you are querying.
+
+3. Execute the command line to run the script.
+
+### Example command line usage
+
+python xblock_counts.py -u <email> -p <password> -c <OAUTH2 Client_id> -m 12 -x xblock_studio_configuration.json -a https://courses.edx.org
+
+Use python xblock_counts.py -h to get a list of command line options. 

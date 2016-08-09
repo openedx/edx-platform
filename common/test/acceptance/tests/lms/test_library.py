@@ -6,22 +6,22 @@ import ddt
 import textwrap
 
 from nose.plugins.attrib import attr
-from ..helpers import UniqueCourseTest, TestWithSearchIndexMixin
-from ...pages.studio.auto_auth import AutoAuthPage
-from ...pages.studio.overview import CourseOutlinePage
-from ...pages.studio.library import StudioLibraryContentEditor, StudioLibraryContainerXBlockWrapper
-from ...pages.lms.courseware import CoursewarePage
-from ...pages.lms.library import LibraryContentXBlockWrapper
-from ...pages.common.logout import LogoutPage
-from ...fixtures.course import CourseFixture, XBlockFixtureDesc
-from ...fixtures.library import LibraryFixture
+from common.test.acceptance.tests.helpers import UniqueCourseTest, TestWithSearchIndexMixin
+from common.test.acceptance.pages.studio.auto_auth import AutoAuthPage
+from common.test.acceptance.pages.studio.overview import CourseOutlinePage
+from common.test.acceptance.pages.studio.library import StudioLibraryContentEditor, StudioLibraryContainerXBlockWrapper
+from common.test.acceptance.pages.lms.courseware import CoursewarePage
+from common.test.acceptance.pages.lms.library import LibraryContentXBlockWrapper
+from common.test.acceptance.pages.common.logout import LogoutPage
+from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
+from common.test.acceptance.fixtures.library import LibraryFixture
 
 SECTION_NAME = 'Test Section'
 SUBSECTION_NAME = 'Test Subsection'
 UNIT_NAME = 'Test Unit'
 
 
-@attr('shard_7')
+@attr(shard=7)
 class LibraryContentTestBase(UniqueCourseTest):
     """ Base class for library content block tests """
     USERNAME = "STUDENT_TESTER"
@@ -144,7 +144,7 @@ class LibraryContentTestBase(UniqueCourseTest):
 
 
 @ddt.ddt
-@attr('shard_7')
+@attr(shard=7)
 class LibraryContentTest(LibraryContentTestBase):
     """
     Test courseware.
@@ -197,7 +197,7 @@ class LibraryContentTest(LibraryContentTestBase):
 
 
 @ddt.ddt
-@attr('shard_7')
+@attr(shard=7)
 class StudioLibraryContainerCapaFilterTest(LibraryContentTestBase, TestWithSearchIndexMixin):
     """
     Test Library Content block in LMS

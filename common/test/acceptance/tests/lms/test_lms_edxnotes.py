@@ -6,13 +6,13 @@ import random
 from uuid import uuid4
 from datetime import datetime
 from nose.plugins.attrib import attr
-from ..helpers import UniqueCourseTest, EventsTestMixin
-from ...fixtures.course import CourseFixture, XBlockFixtureDesc
-from ...pages.lms.auto_auth import AutoAuthPage
-from ...pages.lms.course_nav import CourseNavPage
-from ...pages.lms.courseware import CoursewarePage
-from ...pages.lms.edxnotes import EdxNotesUnitPage, EdxNotesPage, EdxNotesPageNoContent
-from ...fixtures.edxnotes import EdxNotesFixture, Note, Range
+from common.test.acceptance.tests.helpers import UniqueCourseTest, EventsTestMixin
+from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
+from common.test.acceptance.pages.lms.auto_auth import AutoAuthPage
+from common.test.acceptance.pages.lms.course_nav import CourseNavPage
+from common.test.acceptance.pages.lms.courseware import CoursewarePage
+from common.test.acceptance.pages.lms.edxnotes import EdxNotesUnitPage, EdxNotesPage, EdxNotesPageNoContent
+from common.test.acceptance.fixtures.edxnotes import EdxNotesFixture, Note, Range
 from flaky import flaky
 
 
@@ -122,7 +122,7 @@ class EdxNotesTestMixin(UniqueCourseTest):
         self.edxnotes_fixture.install()
 
 
-@attr('shard_4')
+@attr(shard=4)
 class EdxNotesDefaultInteractionsTest(EdxNotesTestMixin):
     """
     Tests for creation, editing, deleting annotations inside annotatable components in LMS.
@@ -338,7 +338,7 @@ class EdxNotesDefaultInteractionsTest(EdxNotesTestMixin):
             self.assertTrue(note.has_sr_label(1, 3, "Tags (space-separated)"))
 
 
-@attr('shard_4')
+@attr(shard=4)
 class EdxNotesPageTest(EventsTestMixin, EdxNotesTestMixin):
     """
     Tests for Notes page.
@@ -1410,7 +1410,7 @@ class EdxNotesPageTest(EventsTestMixin, EdxNotesTestMixin):
         )
 
 
-@attr('shard_4')
+@attr(shard=4)
 class EdxNotesToggleSingleNoteTest(EdxNotesTestMixin):
     """
     Tests for toggling single annotation.
@@ -1479,7 +1479,7 @@ class EdxNotesToggleSingleNoteTest(EdxNotesTestMixin):
         self.assertTrue(note_2.is_visible)
 
 
-@attr('shard_4')
+@attr(shard=4)
 class EdxNotesToggleNotesTest(EdxNotesTestMixin):
     """
     Tests for toggling visibility of all notes.

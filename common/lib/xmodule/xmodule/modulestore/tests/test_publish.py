@@ -209,7 +209,7 @@ class DraftPublishedOpTestCourseSetup(unittest.TestCase):
             Add a level of the binary course structure by creating the items as children of the proper parents.
             """
             parent_id = 'course'
-            for idx in xrange(0, num_items):
+            for idx in xrange(num_items):
                 if parent_type != 'course':
                     parent_id = _make_block_id(parent_type, idx / 2)
                 parent_item = getattr(self, parent_id)
@@ -245,13 +245,13 @@ class DraftPublishedOpTestCourseSetup(unittest.TestCase):
 
         # Create a list of all verticals for convenience.
         block_type = 'vertical'
-        for idx in xrange(0, 8):
+        for idx in xrange(8):
             block_id = _make_block_id(block_type, idx)
             self.all_verticals.append((block_type, block_id))
 
         # Create a list of all html units for convenience.
         block_type = 'html'
-        for idx in xrange(0, 16):
+        for idx in xrange(16):
             block_id = _make_block_id(block_type, idx)
             self.all_units.append((block_type, block_id))
 

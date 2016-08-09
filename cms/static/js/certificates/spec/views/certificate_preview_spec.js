@@ -1,6 +1,6 @@
 // Jasmine Test Suite: Certificate Web Preview
 
-define([ // jshint ignore:line
+define([
     'underscore',
     'jquery',
     'js/models/course',

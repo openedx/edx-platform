@@ -22,7 +22,7 @@
                 $selectElement.change(function() {
                     var selectedOption;
                     if ($selectElement.attr('disabled')) {
-                        return alert(gettext('You cannot view the course as a student or beta tester before the course release date.'));  // jshint ignore:line
+                        return alert(gettext('You cannot view the course as a student or beta tester before the course release date.'));  // eslint-disable-line max-len, no-alert
                     }
                     selectedOption = $selectElement.find('option:selected');
                     if (selectedOption.val() === 'specific student') {

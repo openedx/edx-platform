@@ -111,4 +111,4 @@
             }
         });
     }
-}).call(window); // jshint ignore:line
+}).call(window);

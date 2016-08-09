@@ -6,7 +6,7 @@
   overflow: hidden;
 }
 
-.program-card{
+.program-card {
   @include span(12);  
   border: 1px solid $border-color-l3;
   border-bottom: none;
@@ -21,7 +21,7 @@
     }
   }
 
-  .card-link{
+  .card-link {
     @include left(0);
     @include right(0);
     position: absolute;
@@ -33,11 +33,11 @@
     
     &:active,
     &:hover,
-    &:focus{
+    &:focus {
       opacity: 1;
     }
 
-    .banner-image-container{
+    .banner-image-container {
       position: relative;
       overflow: hidden;
       height: 166px;
@@ -46,7 +46,7 @@
       @include susy-media($bp-screen-md) { height: 116px; }
       @include susy-media($bp-screen-lg) { height: 145px; }
 
-      .banner-image{
+      .banner-image {
         @include left(50%);
         position: absolute;
         top: 0;
@@ -57,7 +57,7 @@
     }
   }
 
-  .text-section{
+  .text-section {
     padding: 40px $baseline $baseline;
     position: relative;
     margin-top: 156px;
@@ -67,7 +67,7 @@
     @include susy-media($bp-screen-lg) { margin-top: 135px; }
   }
 
-  .meta-info{
+  .meta-info {
     font-size: font-size(x-small);
     color: palette(grayscale, dark);
     position: absolute;
@@ -75,33 +75,41 @@
     width: calc(100% - 40px);
   }
 
-  .organization{
+  .organization {
     @include span(6);
     white-space: nowrap;
     overflow: hidden;
   }
 
-  .category{
+  .category {
     @include span(6);
     @include text-align(right);
 
-    .category-text{
-        @include float(right);
+    .category-text {
+      @include float(right);
     }
 
-    .xseries-icon{
+    .category-icon {
       @include float(right);
       @include margin-right($baseline*0.25);
-      background: url('#{$static-path}/images/icon-sm-xseries-black.png') no-repeat;
       background-color: transparent;
       background-size: 100%;
       width: ($baseline*0.7);
       height: ($baseline*0.7);
     }
+
+    .xseries-icon{
+      background: url('#{$static-path}/images/programs/xseries-icon.svg') no-repeat;
+    }
+
+    .micromasters-icon{
+      margin-top: $baseline * 0.05;
+      background: url('#{$static-path}/images/programs/micromasters-icon.svg') no-repeat;
+    }
   }
-  
+
   .hd-3 {
-    color: palette(grayscale, x-dark);
+    color: palette(grayscale, dark);
     min-height: ($baseline*3);
     line-height: 1;
   }
@@ -138,7 +146,7 @@
 
   .progress {
     height: 5px;
-    background: palette(grayscale-cool, x-light);
+    background: palette(grayscale, back);
 
     .bar {
       @include float(left);
@@ -146,11 +154,11 @@
       position: relative;
 
       &.complete {
-        background: palette(success, dark);
+        background: palette(success, accent);
       }
 
       &.in-progress {
-        background: palette(warning, base);
+        background: palette(warning, accent);
       }
     }
   }

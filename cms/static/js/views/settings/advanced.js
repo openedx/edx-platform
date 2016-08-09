@@ -115,9 +115,9 @@ var AdvancedView = ValidatingView.extend({
         var self = this;
         this.model.save({}, {
             success : function() {
-                self.render();
                 var title = gettext("Your policy changes have been saved.");
-                var message = gettext("No validation is performed on policy keys or value pairs. If you are having difficulties, check your formatting.");  // jshint ignore:line
+                var message = gettext('No validation is performed on policy keys or value pairs. If you are having difficulties, check your formatting.');  // eslint-disable-line max-len
+                self.render();
                 self.showSavedBar(title, message);
                 analytics.track('Saved Advanced Settings', {
                     'course': course_location_analytics

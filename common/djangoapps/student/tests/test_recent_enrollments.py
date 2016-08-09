@@ -20,7 +20,7 @@ from student.views import get_course_enrollments, _get_recently_enrolled_courses
 from common.test.utils import XssTestMixin
 
 
-@attr('shard_3')
+@attr(shard=3)
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 @ddt.ddt
 class TestRecentEnrollments(ModuleStoreTestCase, XssTestMixin):
@@ -40,7 +40,7 @@ class TestRecentEnrollments(ModuleStoreTestCase, XssTestMixin):
 
         # Old Course
         old_course_location = locator.CourseLocator('Org0', 'Course0', 'Run0')
-        course, enrollment = self._create_course_and_enrollment(old_course_location)
+        __, enrollment = self._create_course_and_enrollment(old_course_location)
         enrollment.created = datetime.datetime(1900, 12, 31, 0, 0, 0, 0)
         enrollment.save()
 

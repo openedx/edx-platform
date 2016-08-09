@@ -30,7 +30,7 @@ from student.tests.tests import EnrollmentEventTestMixin
 from xmodule.modulestore.django import modulestore
 
 
-@attr('shard_1')
+@attr(shard=1)
 @ddt.ddt
 @override_settings(ECOMMERCE_API_URL=TEST_API_URL, ECOMMERCE_API_SIGNING_KEY=TEST_API_SIGNING_KEY)
 class BasketsViewTests(EnrollmentEventTestMixin, UserMixin, ModuleStoreTestCase):
@@ -362,7 +362,7 @@ class BasketsViewTests(EnrollmentEventTestMixin, UserMixin, ModuleStoreTestCase)
             self.assertEqual(self._post_to_view().status_code, 406)
 
 
-@attr('shard_1')
+@attr(shard=1)
 @override_settings(ECOMMERCE_API_URL=TEST_API_URL, ECOMMERCE_API_SIGNING_KEY=TEST_API_SIGNING_KEY)
 class BasketOrderViewTests(UserMixin, TestCase):
     """ Tests for the basket order view. """

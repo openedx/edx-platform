@@ -1,6 +1,6 @@
 // Jasmine Test Suite: Certificate List View
 
-define([ // jshint ignore:line
+define([
     'underscore',
     'js/models/course',
     'js/certificates/collections/certificates',
@@ -61,7 +61,7 @@ function(_, Course, CertificatesCollection, CertificateModel, CertificateDetails
                 collection: this.collection
             });
             appendSetFixtures(this.view.render().el);
-            CustomMatchers(); // jshint ignore:line
+            CustomMatchers();
         });
 
         afterEach(function() {

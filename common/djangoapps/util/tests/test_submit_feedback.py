@@ -68,9 +68,9 @@ class SubmitFeedbackTest(TestCase):
         """
         self.assertEqual(response.status_code, 400)
         resp_json = json.loads(response.content)
-        self.assertTrue("field" in resp_json)
+        self.assertIn("field", resp_json)
         self.assertEqual(resp_json["field"], field)
-        self.assertTrue("error" in resp_json)
+        self.assertIn("error", resp_json)
         # There should be absolutely no interaction with Zendesk
         self.assertFalse(zendesk_mock_class.return_value.mock_calls)
         self.assertFalse(datadog_mock.mock_calls)

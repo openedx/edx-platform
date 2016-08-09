@@ -171,7 +171,7 @@ class CommonCertificatesTestCase(ModuleStoreTestCase):
         template.save()
 
 
-@attr('shard_1')
+@attr(shard=1)
 @ddt.ddt
 class CertificatesViewsTests(CommonCertificatesTestCase):
     """
@@ -1145,7 +1145,7 @@ class CertificatesViewsTests(CommonCertificatesTestCase):
         )
 
 
-@attr('shard_1')
+@attr(shard=1)
 class CertificateEventTests(CommonCertificatesTestCase, EventTrackingTestCase):
     """
     Test events emitted by certificate handling.

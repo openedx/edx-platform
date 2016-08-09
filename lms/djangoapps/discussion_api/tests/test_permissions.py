@@ -65,7 +65,7 @@ class GetInitializableFieldsTest(ModuleStoreTestCase):
         self.assertEqual(actual, expected)
 
 
-@attr('shard_3')
+@attr(shard=3)
 @ddt.ddt
 class GetEditableFieldsTest(ModuleStoreTestCase):
     """Tests for get_editable_fields"""

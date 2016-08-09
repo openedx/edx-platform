@@ -10,6 +10,7 @@ from path import Path as path
 from paver.easy import task, cmdopts, needs, sh
 
 from .utils.cmd import django_cmd
+from .utils.timer import timed
 
 try:
     from pygments.console import colorize
@@ -28,6 +29,7 @@ DEFAULT_SETTINGS = 'devstack'
 @cmdopts([
     ("verbose", "v", "Sets 'verbose' to True"),
 ])
+@timed
 def i18n_extract(options):
     """
     Extract localizable strings from sources
@@ -42,6 +44,7 @@ def i18n_extract(options):
 
 
 @task
+@timed
 def i18n_fastgenerate():
     """
     Compile localizable strings from sources without re-extracting strings first.
@@ -51,6 +54,7 @@ def i18n_fastgenerate():
 
 @task
 @needs("pavelib.i18n.i18n_extract")
+@timed
 def i18n_generate():
     """
     Compile localizable strings from sources, extracting strings first.
@@ -60,6 +64,7 @@ def i18n_generate():
 
 @task
 @needs("pavelib.i18n.i18n_extract")
+@timed
 def i18n_generate_strict():
     """
     Compile localizable strings from sources, extracting strings first.
@@ -70,6 +75,7 @@ def i18n_generate_strict():
 
 @task
 @needs("pavelib.i18n.i18n_extract")
+@timed
 def i18n_dummy():
     """
     Simulate international translation by generating dummy strings
@@ -85,6 +91,7 @@ def i18n_dummy():
 
 
 @task
+@timed
 def i18n_validate_gettext():
     """
     Make sure GNU gettext utilities are available
@@ -107,6 +114,7 @@ def i18n_validate_gettext():
 
 
 @task
+@timed
 def i18n_validate_transifex_config():
     """
     Make sure config file with username/password exists
@@ -130,6 +138,7 @@ def i18n_validate_transifex_config():
 
 @task
 @needs("pavelib.i18n.i18n_validate_transifex_config")
+@timed
 def i18n_transifex_push():
     """
     Push source strings to Transifex for translation
@@ -139,6 +148,7 @@ def i18n_transifex_push():
 
 @task
 @needs("pavelib.i18n.i18n_validate_transifex_config")
+@timed
 def i18n_transifex_pull():
     """
     Pull translated strings from Transifex
@@ -147,6 +157,7 @@ def i18n_transifex_pull():
 
 
 @task
+@timed
 def i18n_rtl():
     """
     Pull all RTL translations (reviewed AND unreviewed) from Transifex
@@ -164,6 +175,7 @@ def i18n_rtl():
 
 
 @task
+@timed
 def i18n_ltr():
     """
     Pull all LTR translations (reviewed AND unreviewed) from Transifex
@@ -188,6 +200,7 @@ def i18n_ltr():
     "pavelib.i18n.i18n_dummy",
     "pavelib.i18n.i18n_generate_strict",
 )
+@timed
 def i18n_robot_pull():
     """
     Pull source strings, generate po and mo files, and validate
@@ -215,6 +228,7 @@ def i18n_robot_pull():
 
 
 @task
+@timed
 def i18n_clean():
     """
     Clean the i18n directory of artifacts
@@ -227,6 +241,7 @@ def i18n_clean():
     "pavelib.i18n.i18n_extract",
     "pavelib.i18n.i18n_transifex_push",
 )
+@timed
 def i18n_robot_push():
     """
     Extract new strings, and push to transifex
@@ -239,6 +254,7 @@ def i18n_robot_push():
     "pavelib.i18n.i18n_validate_transifex_config",
     "pavelib.i18n.i18n_generate",
 )
+@timed
 def i18n_release_push():
     """
     Push release-specific resources to Transifex.
@@ -251,6 +267,7 @@ def i18n_release_push():
 @needs(
     "pavelib.i18n.i18n_validate_transifex_config",
 )
+@timed
 def i18n_release_pull():
     """
     Pull release-specific translations from Transifex.

@@ -193,9 +193,9 @@
 .button {
 
   .icon {
+    @include margin-right($baseline/4);
     display: inline-block;
     vertical-align: middle;
-    margin-right: ($baseline/4);
   }
 }
 
@@ -321,9 +321,9 @@
 
   .ui-toggle-expansion {
     @include transition(all $tmg-f2 ease-in-out 0s);
+    @include margin-right($baseline/4);
     @extend %t-action1;
     display: inline-block;
-    margin-right: ($baseline/4);
     color: $gray-l3;
     vertical-align: middle;
   }

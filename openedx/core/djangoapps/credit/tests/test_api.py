@@ -187,7 +187,7 @@ class CreditApiTestBase(ModuleStoreTestCase):
         )
 
 
-@attr('shard_2')
+@attr(shard=2)
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in LMS')
 @ddt.ddt
 class CreditRequirementApiTests(CreditApiTestBase):
@@ -769,7 +769,7 @@ class CreditRequirementApiTests(CreditApiTestBase):
         self.assertIn(providers_email_message, text_content_first)
 
 
-@attr('shard_2')
+@attr(shard=2)
 @ddt.ddt
 class CreditProviderIntegrationApiTests(CreditApiTestBase):
     """
@@ -1098,7 +1098,7 @@ class CreditProviderIntegrationApiTests(CreditApiTestBase):
         self.assertEqual(statuses[0]["status"], expected_status)
 
 
-@attr('shard_2')
+@attr(shard=2)
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in LMS')
 @override_settings(
     ECOMMERCE_API_URL=TEST_API_URL,

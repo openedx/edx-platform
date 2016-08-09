@@ -106,7 +106,7 @@ class StubCommentsServiceHandler(StubHttpRequestHandler):
 
     def do_threads(self):
         threads = self.server.config.get('threads', {})
-        threads_data = [val for key, val in threads.items()]
+        threads_data = threads.values()
         self.send_json_response({"collection": threads_data, "page": 1, "num_pages": 1})
 
     def do_search_threads(self):

@@ -1,7 +1,8 @@
 """
 API methods related to xblock state.
 """
-from xblock_django.models import XBlockConfiguration, XBlockStudioConfiguration, XBlockStudioConfigurationFlag
+
+from xblock_django.models import XBlockConfiguration, XBlockStudioConfiguration
 
 
 def deprecated_xblocks():

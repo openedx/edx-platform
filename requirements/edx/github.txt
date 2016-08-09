@@ -1,12 +1,12 @@
 # DON'T JUST ADD NEW DEPENDENCIES!!!
 #
 # If you open a pull request that adds a new dependency, you should notify:
-#   * @mollydb to check licensing
+#   * @nedbat to check licensing
 #   * @edx/devops to check system requirements
 #
 # A correct GitHub reference looks like this:
 #
-#   git+https://github.com/OWNER/REPO-NAME.git@TAG-OR-SHA#egg=KIT-NAME==VERSION
+#   git+https://github.com/OWNER/REPO-NAME.git@TAG-OR-SHA#egg=DIST-NAME==VERSION
 #
 # For example:
 #
@@ -17,7 +17,7 @@
 #   OWNER = edx
 #   REPO-NAME = edx-lint
 #   TAG-OR-SHA = v0.3.2
-#   KIT-NAME = edx_lint
+#   DIST-NAME = edx_lint
 #   VERSION = 0.3.2
 #
 #
@@ -27,10 +27,12 @@
 #
 #   * Don't use -e
 #
-#   * TAG-OR-SHA must be a git tag, or a git SHA.  Don't use branch names here.
+#   * TAG-OR-SHA is the specific commit to install.  It must be a git tag,
+#     or a git SHA.  Don't use branch names here.
 #
-#   * KIT-NAME might be different than REPO-NAME.  KIT-NAME must be the same as
-#     the `name="KIT-NAME"` value in the repo's setup.py.
+#   * DIST-NAME is the distribution name, the same name you'd use in a
+#     "pip install" command.  It might be different than REPO-NAME. It must
+#     be the same as the `name="DIST-NAME"` value in the repo's setup.py.
 #
 #   * VERSION might not be the same as TAG-OR-SHA, but if the tag names the
 #     version, please make it match the VERSION, but with a "v" prefix.
@@ -84,7 +86,7 @@ git+https://github.com/pmitros/RecommenderXBlock.git@v1.1#egg=recommender-xblock
 git+https://github.com/solashirai/crowdsourcehinter.git@518605f0a95190949fe77bd39158450639e2e1dc#egg=crowdsourcehinter-xblock==0.1
 -e git+https://github.com/pmitros/RateXBlock.git@367e19c0f6eac8a5f002fd0f1559555f8e74bfff#egg=rate-xblock
 -e git+https://github.com/pmitros/DoneXBlock.git@857bf365f19c904d7e48364428f6b93ff153fabd#egg=done-xblock
-git+https://github.com/edx/edx-milestones.git@v0.1.9#egg=edx-milestones==0.1.9
+git+https://github.com/edx/edx-milestones.git@v0.1.10#egg=edx-milestones==0.1.10
 git+https://github.com/edx/xblock-utils.git@v1.0.2#egg=xblock-utils==1.0.2
 -e git+https://github.com/edx-solutions/xblock-google-drive.git@138e6fa0bf3a2013e904a085b9fed77dab7f3f21#egg=xblock-google-drive
 -e git+https://github.com/edx/edx-reverification-block.git@0.0.5#egg=edx-reverification-block==0.0.5

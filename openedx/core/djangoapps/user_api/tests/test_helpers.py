@@ -33,7 +33,7 @@ def intercepted_function(raise_error=None):
 
     """
     if raise_error is not None:
-        raise raise_error
+        raise raise_error                   # pylint: disable=raising-bad-type
 
 
 class InterceptErrorsTest(TestCase):

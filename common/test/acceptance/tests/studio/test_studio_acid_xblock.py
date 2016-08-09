@@ -3,10 +3,10 @@ Acceptance tests for Studio related to the acid xblock.
 """
 from bok_choy.web_app_test import WebAppTest
 
-from ...pages.studio.auto_auth import AutoAuthPage
-from ...pages.studio.overview import CourseOutlinePage
-from ...pages.xblock.acid import AcidView
-from ...fixtures.course import CourseFixture, XBlockFixtureDesc
+from common.test.acceptance.pages.studio.auto_auth import AutoAuthPage
+from common.test.acceptance.pages.studio.overview import CourseOutlinePage
+from common.test.acceptance.pages.xblock.acid import AcidView
+from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
 
 
 class XBlockAcidBase(WebAppTest):

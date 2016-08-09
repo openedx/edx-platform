@@ -7,6 +7,6 @@
     <a href="<%- certificate_url %>" class="btn-brand cta-secondary">
         <% // safe-lint: disable=underscore-not-escaped %>
         <span class="certificate-icon blue-certificate-icon" aria-hidden="true"><%= certificateSvg %></span>
-        <%- gettext('View/Share Certificate') %>
+        <%- gettext('View Certificate') %>
     </a>
 </div>

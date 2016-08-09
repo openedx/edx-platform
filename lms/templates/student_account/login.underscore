@@ -10,9 +10,6 @@
     <div class="js-reset-success status submission-success hidden">
         <h4 class="message-title"><%- gettext("Password Reset Email Sent") %></h4>
         <div class="message-copy">
-            <p>
-                <%- gettext("We've sent instructions for resetting your password to the email address you provided.") %>
-            </p>
         </div>
     </div>
 

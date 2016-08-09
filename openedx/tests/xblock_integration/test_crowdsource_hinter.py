@@ -137,7 +137,7 @@ class TestCrowdsourceHinter(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assert_request_status_code(200, self.course_url)
 
 
-@attr('shard_1')
+@attr(shard=1)
 class TestHinterFunctions(TestCrowdsourceHinter):
     """
     Check that the essential functions of the hinter work as expected.

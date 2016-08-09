@@ -29,7 +29,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from unittest import TestCase
 
 
-from ..pages.common import BASE_URL
+from common.test.acceptance.pages.common import BASE_URL
 
 
 MAX_EVENTS_IN_FAILURE_OUTPUT = 20

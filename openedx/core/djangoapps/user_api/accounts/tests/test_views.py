@@ -121,7 +121,7 @@ class UserAPITestCase(APITestCase):
     {'full': 50, 'small': 10},
     clear=True
 )
-@attr('shard_2')
+@attr(shard=2)
 class TestAccountAPI(CacheIsolationTestCase, UserAPITestCase):
     """
     Unit tests for the Account API.
@@ -728,7 +728,7 @@ class TestAccountAPI(CacheIsolationTestCase, UserAPITestCase):
         )
 
 
-@attr('shard_2')
+@attr(shard=2)
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class TestAccountAPITransactions(TransactionTestCase):
     """

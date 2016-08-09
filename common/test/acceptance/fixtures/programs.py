@@ -42,7 +42,6 @@ class ProgramsConfigMixin(object):
             'enable_student_dashboard': is_enabled,
             'enable_studio_tab': is_enabled,
             'enable_certification': is_enabled,
-            'xseries_ad_enabled': is_enabled,
             'program_listing_enabled': is_enabled,
             'program_details_enabled': is_enabled,
         }).install()

@@ -53,10 +53,10 @@ from student.helpers import (
     <% mode_class = '' %>
   % endif
 <div class="course-container">
- % if course_program_info and course_program_info.get('category')=='xseries':
+ % if course_program_info and course_program_info.get('category')=='XSeries':
   <div class="label-xseries-association">
     <span class="xseries-icon" aria-hidden="true"></span>
-    <p class="message-copy">${_("{category} Program Course").format(category=course_program_info['display_category'])}</p>
+    <p class="message-copy">${_("{category} Program Course").format(category=course_program_info['category'])}</p>
   </div>
  % endif
 <article class="course${mode_class}">
@@ -308,7 +308,7 @@ from student.helpers import (
               % endif
             </div>
             <div class="verification-cta">
-              <a href="${reverse('verify_student_verify_now', kwargs={'course_id': unicode(course_overview.id)})}" class="cta" data-course-id="${course_overview.id}">${_('Verify Now')}</a>
+              <a href="${reverse('verify_student_verify_now', kwargs={'course_id': unicode(course_overview.id)})}" class="btn" data-course-id="${course_overview.id}">${_('Verify Now')}</a>
             </div>
           % elif verification_status['status'] == VERIFY_STATUS_SUBMITTED:
             <h4 class="message-title">${_('You have already verified your ID!')}</h4>
@@ -370,9 +370,9 @@ from student.helpers import (
           </div>
         %endif
 
-        % if course_program_info and course_program_info.get('category')=='xseries':
+        % if course_program_info and course_program_info.get('category'):
           %for program_data in course_program_info.get('course_program_list', []):
-            <%include file = "_dashboard_xseries_info.html" args="program_data=program_data, enrollment_mode=enrollment.mode, display_category=course_program_info['display_category']" />
+            <%include file = "_dashboard_program_info.html" args="program_data=program_data, enrollment_mode=enrollment.mode, category=course_program_info['category']" />
           %endfor
         % endif
 

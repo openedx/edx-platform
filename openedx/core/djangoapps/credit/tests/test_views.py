@@ -99,7 +99,7 @@ class ReadOnlyMixin(object):
         self.assertEqual(response.status_code, 405)
 
 
-@attr('shard_2')
+@attr(shard=2)
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class CreditCourseViewSetTests(UserMixin, TestCase):
     """ Tests for the CreditCourse endpoints.
@@ -261,7 +261,7 @@ class CreditCourseViewSetTests(UserMixin, TestCase):
         self.assertTrue(credit_course.enabled)
 
 
-@attr('shard_2')
+@attr(shard=2)
 @ddt.ddt
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class CreditProviderViewSetTests(ApiTestCaseMixin, ReadOnlyMixin, AuthMixin, UserMixin, TestCase):
@@ -306,7 +306,7 @@ class CreditProviderViewSetTests(ApiTestCaseMixin, ReadOnlyMixin, AuthMixin, Use
         self.assertEqual(response.data, CreditProviderSerializer(self.bayside).data)
 
 
-@attr('shard_2')
+@attr(shard=2)
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class CreditProviderRequestCreateViewTests(ApiTestCaseMixin, UserMixin, TestCase):
     """ Tests for CreditProviderRequestCreateView. """
@@ -455,7 +455,7 @@ class CreditProviderRequestCreateViewTests(ApiTestCaseMixin, UserMixin, TestCase
         self.assertEqual(response.status_code, 400)
 
 
-@attr('shard_2')
+@attr(shard=2)
 @ddt.ddt
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class CreditProviderCallbackViewTests(UserMixin, TestCase):
@@ -609,7 +609,7 @@ class CreditProviderCallbackViewTests(UserMixin, TestCase):
             self.assertEqual(response.status_code, 403)
 
 
-@attr('shard_2')
+@attr(shard=2)
 @ddt.ddt
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class CreditEligibilityViewTests(AuthMixin, UserMixin, ReadOnlyMixin, TestCase):

@@ -3,9 +3,8 @@ Tests for Version Based App Upgrade Middleware
 """
 from datetime import datetime
 import ddt
-from django.core.cache import cache, caches
+from django.core.cache import caches
 from django.http import HttpRequest, HttpResponse
-from django.test import TestCase
 import mock
 from pytz import UTC
 from mobile_api.middleware import AppVersionUpgrade

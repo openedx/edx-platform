@@ -21,7 +21,7 @@ from openedx.core.djangoapps.credit.models import CreditCourse, CreditProvider
 from openedx.core.djangoapps.credit.signals import listen_for_grade_calculation
 
 
-@attr('shard_2')
+@attr(shard=2)
 @skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in LMS')
 @ddt.ddt
 class TestMinGradedRequirementStatus(ModuleStoreTestCase):

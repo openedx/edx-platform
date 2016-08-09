@@ -67,7 +67,7 @@ class SymmathCheckTest(TestCase):
         # Expect that an incorrect response is marked incorrect
         result = symmath_check(expected_str, input_str, dynamath=[dynamath])
         self.assertTrue('ok' in result and not result['ok'])
-        self.assertFalse('fail' in result['msg'])
+        self.assertNotIn('fail', result['msg'])
 
     def _symmath_check_numbers(self, number_list):
 

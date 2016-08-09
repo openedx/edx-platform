@@ -41,11 +41,16 @@ $transparent: rgba(0,0,0,0); // used when color value is needed for UI width/tra
 
 // +Colors - UXPL new pattern library colors
 // ====================
-$uxpl-blue-base: rgba(0, 116, 180, 1); // wcag2a compliant
-$uxpl-blue-hover-active: lighten($uxpl-blue-base, 7%); // wcag2a compliant
+$uxpl-blue-base: rgb(0, 117, 180); // wcag2a compliant
+$uxpl-blue-hover-active: rgb(41, 145, 195); // wcag2a compliant
 
-$uxpl-green-base: rgba(0, 129, 0, 1); // wcag2a compliant
-$uxpl-green-hover-active: lighten($uxpl-green-base, 7%); // wcag2a compliant
+$uxpl-green-base: rgb(0, 129, 0); // wcag2a compliant
+$uxpl-green-hover-active: rgb(0, 155, 0); // wcag2a compliant
+
+$uxpl-pink-base: rgb(194, 56, 125); // wcag2a compliant
+$uxpl-pink-hover-active: lighten($uxpl-pink-base, 7%); // wcag2a compliant
+
+$uxpl-grayscale-x-back: rgb(245, 245, 245); // UXPL grayscale, x-back
 
 $uxpl-primary-accent: rgb(14, 166, 236);
 

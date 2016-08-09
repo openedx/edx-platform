@@ -3,7 +3,6 @@ Common utility functions useful throughout the contentstore
 """
 
 import logging
-import re
 from datetime import datetime
 from pytz import UTC
 

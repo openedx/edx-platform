@@ -40,7 +40,7 @@ from ...preferences.api import (
 )
 
 
-@attr('shard_2')
+@attr(shard=2)
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Account APIs are only supported in LMS')
 class TestPreferenceAPI(TestCase):
     """
@@ -180,9 +180,6 @@ class TestPreferenceAPI(TestCase):
         """
         Verifies the basic behavior of update_user_preferences.
         """
-        expected_user_preferences = {
-            self.test_preference_key: "new_value",
-        }
         set_user_preference(self.user, self.test_preference_key, "new_value")
         self.assertEqual(
             get_user_preference(self.user, self.test_preference_key),
@@ -332,7 +329,7 @@ class TestPreferenceAPI(TestCase):
         )
 
 
-@attr('shard_2')
+@attr(shard=2)
 @ddt.ddt
 class UpdateEmailOptInTests(ModuleStoreTestCase):
     """

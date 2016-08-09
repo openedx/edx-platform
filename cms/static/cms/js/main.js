@@ -1,3 +1,5 @@
+/* globals AjaxPrefix */
+
 (function(AjaxPrefix) {
     'use strict';
     define(['domReady', 'jquery', 'underscore.string', 'backbone', 'gettext',
@@ -34,7 +36,7 @@
                         message = str.truncate(jqXHR.responseText, 300);
                     }
                 } else {
-                    message = gettext('This may be happening because of an error with our server or your internet connection. Try refreshing the page or making sure you are online.');  //jshint ignore:line
+                    message = gettext('This may be happening because of an error with our server or your internet connection. Try refreshing the page or making sure you are online.');  // eslint-disable-line max-len
                 }
                 msg = new NotificationView.Error({
                     'title': gettext("Studio's having trouble saving your work"),
@@ -65,5 +67,4 @@
         main();
         return main;
     });
-
-}).call(this, AjaxPrefix);  //jshint ignore:line
+}).call(this, AjaxPrefix);

@@ -1,6 +1,8 @@
 /**
  * View for the receipt page.
  */
+
+/* globals _, Backbone */
 var edx = edx || {};
 
 (function ($, _, Backbone) {
@@ -24,6 +26,7 @@ var edx = edx || {};
 
         renderReceipt: function (data) {
             var templateHtml = $("#receipt-tpl").html(),
+                self = this,
                 context = {
                     platformName: this.$el.data('platform-name'),
                     verified: this.$el.data('verified').toLowerCase() === 'true',
@@ -34,25 +37,34 @@ var edx = edx || {};
             // Add the receipt info to the template context
             this.courseKey = this.getOrderCourseKey(data);
             this.username = this.$el.data('username');
-            _.extend(context, {
-                receipt: this.receiptContext(data),
-                courseKey: this.courseKey
+            $.ajax({
+                type: 'GET',
+                url: '/commerce/checkout/verification_status/',
+                data: {course_id: this.courseKey}
+            }).success(function(response) {
+                _.extend(context, {
+                    receipt: self.receiptContext(data),
+                    courseKey: self.courseKey,
+                    is_verification_required: response.is_verification_required
+                });
+
+                self.$el.html(_.template(templateHtml)(context));
+
+                self.trackLinks();
+
+                self.trackPurchase(data);
+
+                self.renderCourseNamePlaceholder(self.courseKey);
+
+                self.renderUserFullNamePlaceholder(self.username);
+
+                providerId = self.getCreditProviderId(data);
+                if (providerId) {
+                    self.getProviderData(providerId).then(self.renderProvider, self.renderError);
+                }
+            }).error(function() {
+                self.renderError();
             });
-
-            this.$el.html(_.template(templateHtml)(context));
-
-            this.trackLinks();
-
-            this.trackPurchase(data);
-
-            this.renderCourseNamePlaceholder(this.courseKey);
-
-            this.renderUserFullNamePlaceholder(this.username);
-
-            providerId = this.getCreditProviderId(data);
-            if (providerId) {
-                this.getProviderData(providerId).then(this.renderProvider, this.renderError)
-            }
         },
         renderCourseNamePlaceholder: function (courseId) {
             // Display the course Id or name (if available) in the placeholder
@@ -319,10 +331,10 @@ var edx = edx || {};
     new edx.commerce.ReceiptView({
         el: $('#receipt-container')
     });
+})(jQuery, _, Backbone);
 
-})(jQuery, _, Backbone);     // jshint ignore:line
-
-function completeOrder(event) {     // jshint ignore:line
+function completeOrder(event) {
+    'use strict';
     var courseKey = $(event).data("course-key"),
         username = $(event).data("username"),
         providerId = $(event).data("provider"),

@@ -62,7 +62,7 @@ class LmsSearchFilterGeneratorTestCase(ModuleStoreTestCase):
         """
         field_dictionary, filter_dictionary, _ = LmsSearchFilterGenerator.generate_field_filters(user=self.user)
 
-        self.assertTrue('start_date' in filter_dictionary)
+        self.assertIn('start_date', filter_dictionary)
         self.assertIn(unicode(self.courses[0].id), field_dictionary['course'])
         self.assertIn(unicode(self.courses[1].id), field_dictionary['course'])
 
@@ -75,7 +75,7 @@ class LmsSearchFilterGeneratorTestCase(ModuleStoreTestCase):
             course_id=unicode(self.courses[0].id)
         )
 
-        self.assertTrue('start_date' in filter_dictionary)
+        self.assertIn('start_date', filter_dictionary)
         self.assertEqual(unicode(self.courses[0].id), field_dictionary['course'])
 
     def test_user_not_provided(self):
@@ -84,7 +84,7 @@ class LmsSearchFilterGeneratorTestCase(ModuleStoreTestCase):
         """
         field_dictionary, filter_dictionary, _ = LmsSearchFilterGenerator.generate_field_filters()
 
-        self.assertTrue('start_date' in filter_dictionary)
+        self.assertIn('start_date', filter_dictionary)
         self.assertEqual(0, len(field_dictionary['course']))
 
     def test_excludes_site_org(self):

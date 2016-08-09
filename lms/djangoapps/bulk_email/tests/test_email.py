@@ -9,7 +9,6 @@ from nose.plugins.attrib import attr
 import os
 from unittest import skipIf
 
-from django.conf import settings
 from django.core import mail
 from django.core.mail.message import forbid_multi_line_headers
 from django.core.urlresolvers import reverse
@@ -130,7 +129,7 @@ class EmailSendFromDashboardTestCase(SharedModuleStoreTestCase):
         BulkEmailFlag.objects.all().delete()
 
 
-@attr('shard_1')
+@attr(shard=1)
 @patch('bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message', autospec=True))
 class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase):
     """
@@ -443,7 +442,7 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
         self.assertItemsEqual(outbox_contents, should_send_contents)
 
 
-@attr('shard_1')
+@attr(shard=1)
 @skipIf(os.environ.get("TRAVIS") == 'true', "Skip this test in Travis CI.")
 class TestEmailSendFromDashboard(EmailSendFromDashboardTestCase):
     """

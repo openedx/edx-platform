@@ -19,9 +19,9 @@ class ProgramsApiConfigMixin(object):
         'enable_student_dashboard': True,
         'enable_studio_tab': True,
         'enable_certification': True,
-        'xseries_ad_enabled': True,
         'program_listing_enabled': True,
         'program_details_enabled': True,
+        'marketing_path': 'foo',
     }
 
     def create_programs_config(self, **kwargs):

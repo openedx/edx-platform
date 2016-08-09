@@ -9,6 +9,7 @@ import re
 from openedx.core.djangolib.markup import HTML
 
 from .utils.envs import Env
+from .utils.timer import timed
 
 ALL_SYSTEMS = 'lms,cms,common,openedx,pavelib'
 
@@ -38,6 +39,7 @@ def top_python_dirs(dirname):
 @cmdopts([
     ("system=", "s", "System to act on"),
 ])
+@timed
 def find_fixme(options):
     """
     Run pylint on system code, only looking for fixme items.
@@ -82,6 +84,7 @@ def find_fixme(options):
     ("errors", "e", "Check for errors only"),
     ("limit=", "l", "limit for number of acceptable violations"),
 ])
+@timed
 def run_pylint(options):
     """
     Run pylint on system code. When violations limit is passed in,
@@ -197,6 +200,7 @@ def _pep8_violations(report_file):
 @cmdopts([
     ("system=", "s", "System to act on"),
 ])
+@timed
 def run_pep8(options):  # pylint: disable=unused-argument
     """
     Run pep8 on system code.
@@ -224,6 +228,7 @@ def run_pep8(options):  # pylint: disable=unused-argument
 
 @task
 @needs('pavelib.prereqs.install_python_prereqs')
+@timed
 def run_complexity():
     """
     Uses radon to examine cyclomatic complexity.
@@ -262,40 +267,41 @@ def run_complexity():
 @cmdopts([
     ("limit=", "l", "limit for number of acceptable violations"),
 ])
-def run_jshint(options):
+@timed
+def run_eslint(options):
     """
-    Runs jshint on static asset directories
+    Runs eslint on static asset directories.
+    If limit option is passed, fails build if more violations than the limit are found.
     """
 
+    eslint_report_dir = (Env.REPORT_DIR / "eslint")
+    eslint_report = eslint_report_dir / "eslint.report"
+    _prepare_report_dir(eslint_report_dir)
     violations_limit = int(getattr(options, 'limit', -1))
 
-    jshint_report_dir = (Env.REPORT_DIR / "jshint")
-    jshint_report = jshint_report_dir / "jshint.report"
-    _prepare_report_dir(jshint_report_dir)
-
     sh(
-        "jshint . --config .jshintrc >> {jshint_report}".format(
-            jshint_report=jshint_report
+        "eslint --format=compact . | tee {eslint_report}".format(
+            eslint_report=eslint_report
         ),
         ignore_error=True
     )
 
     try:
-        num_violations = int(_get_count_from_last_line(jshint_report, "jshint"))
+        num_violations = int(_get_count_from_last_line(eslint_report, "eslint"))
     except TypeError:
         raise BuildFailure(
-            "Error. Number of jshint violations could not be found in {jshint_report}".format(
-                jshint_report=jshint_report
+            "Error. Number of eslint violations could not be found in {eslint_report}".format(
+                eslint_report=eslint_report
             )
         )
 
     # Record the metric
-    _write_metric(num_violations, (Env.METRICS_DIR / "jshint"))
+    _write_metric(num_violations, (Env.METRICS_DIR / "eslint"))
 
     # Fail if number of violations is greater than the limit
     if num_violations > violations_limit > -1:
         raise BuildFailure(
-            "JSHint Failed. Too many violations ({count}).\nThe limit is {violations_limit}.".format(
+            "ESLint Failed. Too many violations ({count}).\nThe limit is {violations_limit}.".format(
                 count=num_violations, violations_limit=violations_limit
             )
         )
@@ -306,6 +312,7 @@ def run_jshint(options):
 @cmdopts([
     ("thresholds=", "t", "json containing limit for number of acceptable violations per rule"),
 ])
+@timed
 def run_safelint(options):
     """
     Runs safe_template_linter.py on the codebase
@@ -407,6 +414,7 @@ def run_safelint(options):
 
 @task
 @needs('pavelib.prereqs.install_python_prereqs')
+@timed
 def run_safecommit_report():
     """
     Runs safe-commit-linter.sh on the current branch.
@@ -451,9 +459,11 @@ def run_safecommit_report():
 def _write_metric(metric, filename):
     """
     Write a given metric to a given file
-    Used for things like reports/metrics/jshint, which will simply tell you the number of
-    jshint violations found
+    Used for things like reports/metrics/eslint, which will simply tell you the number of
+    eslint violations found
     """
+    Env.METRICS_DIR.makedirs_p()
+
     with open(filename, "w") as metric_file:
         metric_file.write(str(metric))
 
@@ -485,7 +495,9 @@ def _get_report_contents(filename, last_line_only=False):
         with open(filename, 'r') as report_file:
             if last_line_only:
                 lines = report_file.readlines()
-                return lines[len(lines) - 1]
+                for line in reversed(lines):
+                    if line != '\n':
+                        return line
             else:
                 return report_file.read()
     else:
@@ -503,7 +515,7 @@ def _get_count_from_last_line(filename, file_type):
         # Example of the last line of a complexity report: "Average complexity: A (1.93953443446)"
         regex = r'\d+.\d+'
     else:
-        # Example of the last line of a jshint report (for example): "3482 errors"
+        # Example of the last line of a compact-formatted eslint report (for example): "62829 problems"
         regex = r'^\d+'
 
     try:
@@ -580,6 +592,7 @@ def _get_safecommit_count(filename):
     ("compare-branch=", "b", "Branch to compare against, defaults to origin/master"),
     ("percentage=", "p", "fail if diff-quality is below this percentage"),
 ])
+@timed
 def run_quality(options):
     """
     Build the html diff quality reports, and print the reports to the console.
@@ -663,8 +676,9 @@ def run_quality(options):
 
     pylint_files = get_violations_reports("pylint")
     pylint_reports = u' '.join(pylint_files)
-    jshint_files = get_violations_reports("jshint")
-    jshint_reports = u' '.join(jshint_files)
+
+    eslint_files = get_violations_reports("eslint")
+    eslint_reports = u' '.join(eslint_files)
 
     pythonpath_prefix = (
         "PYTHONPATH=$PYTHONPATH:lms:lms/djangoapps:cms:cms/djangoapps:"
@@ -682,11 +696,11 @@ def run_quality(options):
     ):
         diff_quality_percentage_pass = False
 
-    # run diff-quality for jshint.
+    # run diff-quality for eslint.
     if not run_diff_quality(
-            violations_type="jshint",
+            violations_type="eslint",
             prefix=pythonpath_prefix,
-            reports=jshint_reports,
+            reports=eslint_reports,
             percentage_string=percentage_string,
             branch_string=compare_branch_string,
             dquality_dir=dquality_dir
@@ -702,7 +716,7 @@ def run_diff_quality(
         violations_type=None, prefix=None, reports=None, percentage_string=None, branch_string=None, dquality_dir=None
 ):
     """
-    This executes the diff-quality commandline tool for the given violation type (e.g., pylint, jshint).
+    This executes the diff-quality commandline tool for the given violation type (e.g., pylint, eslint).
     If diff-quality fails due to quality issues, this method returns False.
 
     """

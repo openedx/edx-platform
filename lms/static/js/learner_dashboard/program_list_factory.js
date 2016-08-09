@@ -28,10 +28,12 @@
                 }
             }).render();
 
-            new SidebarView({
-                el: '.sidebar',
-                context: options
-            }).render();
+            if ( options.programsData.length ) {
+                new SidebarView({
+                    el: '.sidebar',
+                    context: options
+                }).render();
+            }
         };
     });
 }).call(this, define || RequireJS.define);

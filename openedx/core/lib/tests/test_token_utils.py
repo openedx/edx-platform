@@ -9,7 +9,7 @@ from openedx.core.lib.token_utils import JwtBuilder
 from student.tests.factories import UserFactory, UserProfileFactory
 
 
-@attr('shard_2')
+@attr(shard=2)
 @ddt.ddt
 class TestJwtBuilder(mixins.AccessTokenMixin, TestCase):
     """

@@ -11,7 +11,7 @@ The RequireJS Optimizer is only enabled in Studio at present, so the page factor
 We do intend to enable page factories on the LMS too.
 */
 
-define([ // jshint ignore:line
+define([
     'jquery',
     'js/certificates/collections/certificates',
     'js/certificates/models/certificate',
