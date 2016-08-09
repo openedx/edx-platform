@@ -6,14 +6,20 @@ of any changes that may occur to the course after the score is achieved.
 """
 
 from django.db import models
+from django.db.utils import IntegrityError
 from model_utils.models import TimeStampedModel
 
 from coursewarehistoryextended.fields import UnsignedBigIntAutoField
-from opaque_keys.edx.locator import BlockUsageLocator
 from xmodule_django.models import CourseKeyField, UsageKeyField
 
+from base64 import b64encode
+from collections import namedtuple
 from hashlib import sha256
 import json
+import logging
+
+
+log = logging.getLogger(__name__)
 
 
 class VisibleBlocks(models.Model):
@@ -25,42 +31,31 @@ class VisibleBlocks(models.Model):
     hash of this json array is used for lookup purposes.
     """
     _blocks_json = models.TextField(db_column="blocks_json")
-    hashed = models.CharField(max_length=32, primary_key=True)
+    hashed = models.CharField(max_length=44, unique=True)
 
     def __unicode__(self):
         """
         String representation of this model.
         """
-        return self.hashed
+        return "VisibleBlocks object - hash:{}, raw json:'{}'".format(self.hashed, self._blocks_json)
 
     @classmethod
     def create(cls, blocks):
         """
         Creates a new VisibleBlocks model. Argument 'blocks' should be an iterable collection of BlockRecords.
         """
-        # Start by sorting the blocks to ensure equality regardless of how the blocks are ordered
-        sorted_blocks = sorted(
-            blocks,
-            key=lambda block: '{}{}{}'.format(block.block_key, block.max_score, block.weight)
-        )
-        _blocks_json = json.dumps(
-            [
-                block.to_dict()
-                for block in sorted_blocks
-            ]
-        )
-        hashed = sha256(_blocks_json).hexdigest()
+        _blocks_json = json.dumps([block._asdict() for block in blocks], separators=(',', ':'), sort_keys=True)
+        hashed = b64encode(sha256(_blocks_json).digest())
         model, _ = cls.objects.get_or_create(hashed=hashed, defaults={'_blocks_json': _blocks_json})
         return model
 
     @property
     def blocks(self):
         """
-        Returns the blocks_json data stored on this model as an list of BlockRecords. If for some reason block_json
-        is not parsable, a json error will bubble up.
+        Returns the blocks_json data stored on this model as a list of BlockRecords in the order they were provided.
         """
         block_dicts = json.loads(self._blocks_json)
-        return [BlockRecord(data['weight'], data['max_score'], data['block_key']) for data in block_dicts]
+        return [BlockRecord(data['locator'], data['weight'], data['max_score']) for data in block_dicts]
 
     @blocks.setter
     def blocks(self, value):
@@ -72,81 +67,89 @@ class VisibleBlocks(models.Model):
         )
 
 
-class BlockRecord(object):
+class BlockRecord(namedtuple('BlockRecordBase', ['locator', 'weight', 'max_score'])):
     """
-    An object encapsulating all relevant information for representing a block at the time it was used for grade
-    calculation.
+    A namedtuple used to serialize information about a block at the time it was used in grade calculation.
     """
+    pass
 
-    def __init__(self, weight, max_score, locator):
-        """
-        Creates a BlockRecord.
 
-        Params:
-            weight (float)
-            max_score (float)
-            locator (BlockUsageLocator or string)
+class PersistentSubsectionGradeManager(models.QuerySet):
+    """
+    A custom QuerySet (to be used as a manager), that handles creating a VisibleBlocks model on creation.
+    """
+    def create(self, **kwargs):
         """
-        self.weight = weight
-        self.max_score = max_score
-        # pylint: disable=protected-access
-        self.block_key = locator._to_string() if isinstance(locator, BlockUsageLocator) else locator
+        Instantiates a new model instance after creating a VisibleBlocks instance.
 
-    def to_dict(self):
+        Arguments:
+            user_id (int)
+            usage_key (serialized UsageKey)
+            course_version (str)
+            subtree_edited_date (datetime)
+            earned_all (float)
+            possible_all (float)
+            earned_graded (float)
+            possible_graded (float)
+            visible_blocks (iterable of BlockRecord)
         """
-        Serialize this object to a dict object.
-        """
-        return {
-            'weight': self.weight,
-            'max_score': self.max_score,
-            'block_key': self.block_key,
-        }
+        visible_blocks_model = VisibleBlocks.create(blocks=kwargs.pop('visible_blocks'))
 
-    @property
-    def locator(self):
-        """
-        Convenience property allowing a BlockUsageLocator to be returned from this object's serialized data.
-        """
-        return BlockUsageLocator._from_string(self.block_key)  # pylint: disable=protected-access
+        grade = self.model(
+            course_id=kwargs['usage_key'].course_key,
+            visible_blocks=visible_blocks_model,
+            **kwargs
+        )
+        grade.full_clean()
+        grade.save()
+        return grade
 
 
 class PersistentSubsectionGrade(TimeStampedModel):
     """
     A django model tracking persistent grades at the subsection level.
-
-    TODO: here are the other query patterns listed in the ticket that are not currently used. Should any of these
-    indices be built?
-        user_id, course_id, content_type, is_valid
-        course_id, edit-timestamp
-        edit-timestamp
     """
 
     class Meta(object):
-        index_together = [
-            ('user_id', 'usage_key')
-        ]
+        unique_together = (('user_id', 'course_id', 'usage_key'), )
 
-        unique_together = (('user_id', 'usage_key'))
-
+    # primary key will need to be large for this table
     id = UnsignedBigIntAutoField(primary_key=True)  # pylint: disable=invalid-name
-    subtree_edited_date = models.DateTimeField('last content edit timestamp')
-    user_id = models.CharField(max_length=255)
-    earned_all = models.IntegerField()
-    possible_all = models.IntegerField()
-    earned_graded = models.IntegerField()
-    possible_graded = models.IntegerField()
 
-    course_id = CourseKeyField(max_length=255)
-    usage_key = UsageKeyField(max_length=255)
-    course_version = models.CharField('guid of latest course version', max_length=255)
+    # uniquely identify this particular grade object
+    user_id = models.IntegerField(blank=False)
+    course_id = CourseKeyField(blank=False, max_length=255)
+    usage_key = UsageKeyField(blank=False, max_length=255)
 
+    # Information relating to the state of content when grade was calculated
+    subtree_edited_date = models.DateTimeField('last content edit timestamp', blank=False)
+    course_version = models.CharField('guid of latest course version', blank=False, max_length=255)
+
+    # earned/possible refers to the number of points achieved and avaiable to achieve.
+    # graded refers to the subset of all problems that are marked as being graded.
+    earned_all = models.FloatField(blank=False)
+    possible_all = models.FloatField(blank=False)
+    earned_graded = models.FloatField(blank=False)
+    possible_graded = models.FloatField(blank=False)
+
+    # track which blocks were visible at the time of grade calculation
     visible_blocks = models.ForeignKey(VisibleBlocks)
+
+    # use custom manager
+    objects = PersistentSubsectionGradeManager.as_manager()
 
     def __unicode__(self):
         """
         Returns a string representation of this model.
         """
-        return "PersistentSubsectionGrade for user {} in subsection {}".format(self.user_id, self.usage_key)
+        return "PersistentSubsectionGrade user:{}, subsection {}. {}/{} graded, {}/{} all".format(
+            self.user_id,
+            self.usage_key,
+            self.earned_graded,
+            self.possible_graded,
+            self.earned_all,
+            self.possible_all,
+        )
 
     @classmethod
     def save_grade(cls, **kwargs):
@@ -157,50 +160,7 @@ class PersistentSubsectionGrade(TimeStampedModel):
         try:
             cls.update(**kwargs)
         except cls.DoesNotExist:
-            cls.create(**kwargs)
-
-    @classmethod
-    def create(
-        cls,
-        user_id,
-        usage_key,
-        course_version,
-        subtree_edited_date,
-        earned_all,
-        possible_all,
-        earned_graded,
-        possible_graded,
-        visible_blocks,
-    ):
-        """
-        Instantiates a new model instance.
-
-        Example arguments:
-            user_id: "student12345"
-            usage_key: BlockUsageLocator object
-            course_version: "deadbeef"
-            subtree_edited_date: "2016-08-01 18:53:24.354741"
-            earned_all: 6
-            possible_all: 12
-            earned_graded: 6
-            possible_graded: 8
-            visible_blocks: [<list of BlockRecord objects>]
-        """
-        visible_blocks_model = VisibleBlocks.create(blocks=visible_blocks)
-
-        return cls.objects.create(
-            user_id=user_id,
-            course_id=usage_key.course_key,
-            usage_key=usage_key,
-            course_version=course_version,
-            subtree_edited_date=subtree_edited_date,
-            earned_all=earned_all,
-            possible_all=possible_all,
-            earned_graded=earned_graded,
-            possible_graded=possible_graded,
-            visible_blocks=visible_blocks_model,
-        )
-        return model
+            cls.objects.create(**kwargs)
 
     @classmethod
     def read(cls, user_id, usage_key):
@@ -220,16 +180,16 @@ class PersistentSubsectionGrade(TimeStampedModel):
 
     @classmethod
     def update(
-        cls,
-        user_id,
-        usage_key,
-        course_version,
-        subtree_edited_date,
-        earned_all,
-        possible_all,
-        earned_graded,
-        possible_graded,
-        visible_blocks,
+            cls,
+            user_id,
+            usage_key,
+            course_version,
+            subtree_edited_date,
+            earned_all,
+            possible_all,
+            earned_graded,
+            possible_graded,
+            visible_blocks,
     ):
         """
         Updates a previously existing grade.
@@ -241,7 +201,14 @@ class PersistentSubsectionGrade(TimeStampedModel):
             usage_key=usage_key,
         )
 
-        visible_blocks_model = VisibleBlocks.create(blocks=visible_blocks)
+        # Thanks to repeatable read, there's a non-zero chance of a race condition ocurring on insert.
+        # If that happens, the situation is unrecoverable, as we need to read a new piece of data (a visible_blocks FK)
+        # that won't be visible inside the current transaction. In those cases, log the issue and abort.
+        try:
+            visible_blocks_model = VisibleBlocks.create(blocks=visible_blocks)
+        except IntegrityError:
+            log.error("Race condition hit in robust grading data model. Unrecoverable repeatable-read issue.")
+            raise
 
         grade.course_version = course_version
         grade.subtree_edited_date = subtree_edited_date

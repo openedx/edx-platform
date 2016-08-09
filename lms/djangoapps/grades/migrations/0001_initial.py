@@ -20,22 +20,23 @@ class Migration(migrations.Migration):
                 ('created', model_utils.fields.AutoCreatedField(default=django.utils.timezone.now, verbose_name='created', editable=False)),
                 ('modified', model_utils.fields.AutoLastModifiedField(default=django.utils.timezone.now, verbose_name='modified', editable=False)),
                 ('id', coursewarehistoryextended.fields.UnsignedBigIntAutoField(serialize=False, primary_key=True)),
-                ('subtree_edited_date', models.DateTimeField(verbose_name=b'last content edit timestamp')),
-                ('user_id', models.CharField(max_length=255)),
-                ('earned_all', models.IntegerField()),
-                ('possible_all', models.IntegerField()),
-                ('earned_graded', models.IntegerField()),
-                ('possible_graded', models.IntegerField()),
+                ('user_id', models.IntegerField()),
                 ('course_id', xmodule_django.models.CourseKeyField(max_length=255)),
                 ('usage_key', xmodule_django.models.UsageKeyField(max_length=255)),
+                ('subtree_edited_date', models.DateTimeField(verbose_name=b'last content edit timestamp')),
                 ('course_version', models.CharField(max_length=255, verbose_name=b'guid of latest course version')),
+                ('earned_all', models.FloatField()),
+                ('possible_all', models.FloatField()),
+                ('earned_graded', models.FloatField()),
+                ('possible_graded', models.FloatField()),
             ],
         ),
         migrations.CreateModel(
             name='VisibleBlocks',
             fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('_blocks_json', models.TextField(db_column=b'blocks_json')),
-                ('hashed', models.CharField(max_length=32, serialize=False, primary_key=True)),
+                ('hashed', models.CharField(unique=True, max_length=44)),
             ],
         ),
         migrations.AddField(
@@ -45,10 +46,6 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterUniqueTogether(
             name='persistentsubsectiongrade',
-            unique_together=set([('user_id', 'usage_key')]),
-        ),
-        migrations.AlterIndexTogether(
-            name='persistentsubsectiongrade',
-            index_together=set([('user_id', 'usage_key')]),
+            unique_together=set([('user_id', 'course_id', 'usage_key')]),
         ),
     ]
