@@ -44,6 +44,13 @@ class LabsterApiError(Exception):
     pass
 
 
+class VoucherError(Exception):
+    """
+    This exception is raised in the case where problems with vouchers appear.
+    """
+    pass
+
+
 @require_http_methods(["GET"])
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @login_required
@@ -73,6 +80,9 @@ def activate_voucher(request):
 
     try:
         license_code = get_license(code)
+    except VoucherError as ex:
+        messages.error(request, unicode(ex))
+        return redirect(enter_voucher_url)
     except ItemNotFoundError:
         messages.error(request, _(
             "Cannot find a voucher '{}'. Please contact Labster support team."
@@ -145,7 +155,12 @@ def get_license(voucher):
     try:
         response = requests.get(url, headers=headers)
         response.raise_for_status()
-        return response.json()['license']
+        content = response.json()
+
+        if 'error' in content:
+            raise VoucherError(content['error'])
+
+        return content['license']
     except RequestException as ex:
         if getattr(response, 'status_code', None) == 404:
             raise ItemNotFoundError

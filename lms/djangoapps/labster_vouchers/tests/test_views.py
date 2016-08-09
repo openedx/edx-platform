@@ -56,6 +56,24 @@ class TestActivateVouchers(CCXCourseTestBase):
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertContains(res, 'Cannot find a voucher')
 
+    def test_already_active_voucher(self):
+        """
+        Ensure displays an error message when voucher code has been already activated.
+        """
+        err_message = "Error message."
+        voucher = "A" * 10
+        httpretty.register_uri(
+            httpretty.GET,
+            settings.LABSTER_ENDPOINTS.get('voucher_license').format(voucher),
+            status=status.HTTP_200_OK,
+            body=json.dumps({"error": err_message})
+        )
+
+        res = self.client.post(self.url, data={"code": voucher}, follow=True)
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertContains(res, err_message)
+
     def test_api_error(self):
         """
         Ensure displays an error message when API is unavailable.
