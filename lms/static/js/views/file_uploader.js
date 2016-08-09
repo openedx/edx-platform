@@ -22,16 +22,16 @@
  * @param errorNotification, optional callback that can return a success NotificationModel for display
  *     after a file failed to upload. This method will be passed the attempted file, event, and data.
  */
-(function (Backbone, $, _, gettext, interpolate_text, NotificationModel, NotificationView) {
+(function(Backbone, $, _, gettext, interpolate_text, NotificationModel, NotificationView) {
     // Requires JQuery-File-Upload.
     var FileUploaderView = Backbone.View.extend({
 
-        initialize: function (options) {
+        initialize: function(options) {
             this.template = _.template($('#file-upload-tpl').text());
             this.options = options;
         },
 
-        render: function () {
+        render: function() {
             var options = this.options,
                 get_option_with_default = function(option, default_value) {
                     var optionVal = options[option];
@@ -40,12 +40,12 @@
                 submitButton, resultNotification;
 
             this.$el.html(this.template({
-                title: get_option_with_default("title", ""),
-                inputLabel: get_option_with_default("inputLabel", ""),
-                inputTip: get_option_with_default("inputTip", ""),
-                extensions: get_option_with_default("extensions", ""),
-                submitButtonText: get_option_with_default("submitButtonText", gettext("Upload File")),
-                url: get_option_with_default("url", "")
+                title: get_option_with_default('title', ''),
+                inputLabel: get_option_with_default('inputLabel', ''),
+                inputTip: get_option_with_default('inputTip', ''),
+                extensions: get_option_with_default('extensions', ''),
+                submitButtonText: get_option_with_default('submitButtonText', gettext('Upload File')),
+                url: get_option_with_default('url', '')
             }));
 
             submitButton = this.$el.find('.submit-file-button');
@@ -58,22 +58,22 @@
                 fail: this.errorHandler.bind(this),
                 autoUpload: false,
                 replaceFileInput: false,
-                add: function (e, data) {
+                add: function(e, data) {
                     var file = data.files[0];
-                    submitButton.removeClass("is-disabled").attr('aria-disabled', false);
+                    submitButton.removeClass('is-disabled').attr('aria-disabled', false);
                     submitButton.unbind('click');
-                    submitButton.click(function (event) {
+                    submitButton.click(function(event) {
                         event.preventDefault();
                         data.submit();
                     });
-                    resultNotification.html("");
+                    resultNotification.html('');
                 }
             });
 
             return this;
         },
 
-        successHandler: function (event, data) {
+        successHandler: function(event, data) {
             var file = data.files[0].name;
             var notificationModel;
             if (this.options.successNotification) {
@@ -81,7 +81,7 @@
             }
             else {
                 notificationModel = new NotificationModel({
-                    type: "confirmation",
+                    type: 'confirmation',
                     title: interpolate_text(gettext("Your upload of '{file}' succeeded."), {file: file})
                 });
             }
@@ -92,7 +92,7 @@
             notification.render();
         },
 
-        errorHandler: function (event, data) {
+        errorHandler: function(event, data) {
             var file = data.files[0].name, message = null, jqXHR = data.response().jqXHR;
             var notificationModel;
             if (this.options.errorNotification) {
@@ -110,7 +110,7 @@
                     message = interpolate_text(gettext("Your upload of '{file}' failed."), {file: file});
                 }
                 notificationModel = new NotificationModel({
-                    type: "error",
+                    type: 'error',
                     title: message
                 });
             }

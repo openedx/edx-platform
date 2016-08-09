@@ -1,9 +1,9 @@
 /**
  * Model for a team membership.
  */
-(function (define) {
+(function(define) {
     'use strict';
-    define(['backbone', 'teams/js/models/team'], function (Backbone, TeamModel) {
+    define(['backbone', 'teams/js/models/team'], function(Backbone, TeamModel) {
         var TeamMembership = Backbone.Model.extend({
             defaults: {
                 date_joined: '',
@@ -12,7 +12,7 @@
                 user: null
             },
 
-            parse: function (response) {
+            parse: function(response) {
                 response.team = new TeamModel(response.team);
                 return response;
             }

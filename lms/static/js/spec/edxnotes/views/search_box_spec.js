@@ -21,7 +21,7 @@ define([
             'results': [null, null]
         };
 
-        getSearchBox = function (options) {
+        getSearchBox = function(options) {
             options = _.defaults(options || {}, {
                 el: $('#search-notes-form').get(0),
                 perPage: 10,
@@ -34,30 +34,30 @@ define([
             return new SearchBoxView(options);
         };
 
-        submitForm = function (searchBox, text) {
+        submitForm = function(searchBox, text) {
             searchBox.$('.search-notes-input').val(text);
             searchBox.$('.search-notes-submit').click();
         };
 
-        assertBoxIsEnabled = function (searchBox) {
+        assertBoxIsEnabled = function(searchBox) {
             expect(searchBox.$el).not.toHaveClass('is-looking');
             expect(searchBox.$('.search-notes-submit')).not.toHaveClass('is-disabled');
             expect(searchBox.isDisabled).toBeFalsy();
         };
 
-        assertBoxIsDisabled = function (searchBox) {
+        assertBoxIsDisabled = function(searchBox) {
             expect(searchBox.$el).toHaveClass('is-looking');
             expect(searchBox.$('.search-notes-submit')).toHaveClass('is-disabled');
             expect(searchBox.isDisabled).toBeTruthy();
         };
 
-        beforeEach(function () {
+        beforeEach(function() {
             loadFixtures('js/fixtures/edxnotes/edxnotes.html');
             spyOn(Logger, 'log');
             this.searchBox = getSearchBox();
         });
 
-        it('sends a request with proper information on submit the form', function () {
+        it('sends a request with proper information on submit the form', function() {
             var requests = AjaxHelpers.requests(this),
                 form = this.searchBox.el,
                 request;
@@ -72,7 +72,7 @@ define([
             );
         });
 
-        it('returns success result', function () {
+        it('returns success result', function() {
             var requests = AjaxHelpers.requests(this);
             submitForm(this.searchBox, 'test_text');
             expect(this.searchBox.options.beforeSearchStart).toHaveBeenCalledWith(
@@ -89,7 +89,7 @@ define([
             );
         });
 
-        it('should log the edx.course.student_notes.searched event properly', function () {
+        it('should log the edx.course.student_notes.searched event properly', function() {
             var requests = AjaxHelpers.requests(this);
             submitForm(this.searchBox, 'test_text');
             AjaxHelpers.respondWithJson(requests, searchResponse);
@@ -100,7 +100,7 @@ define([
             });
         });
 
-        it('returns default error message if received data structure is wrong', function () {
+        it('returns default error message if received data structure is wrong', function() {
             var requests = AjaxHelpers.requests(this);
             submitForm(this.searchBox, 'test_text');
             AjaxHelpers.respondWithJson(requests, {});
@@ -113,7 +113,7 @@ define([
             );
         });
 
-        it('returns default error message if network error occurs', function () {
+        it('returns default error message if network error occurs', function() {
             var requests = AjaxHelpers.requests(this);
             submitForm(this.searchBox, 'test_text');
             AjaxHelpers.respondWithError(requests);
@@ -126,7 +126,7 @@ define([
             );
         });
 
-        it('returns error message if server error occurs', function () {
+        it('returns error message if server error occurs', function() {
             var requests = AjaxHelpers.requests(this);
             submitForm(this.searchBox, 'test_text');
             assertBoxIsDisabled(this.searchBox);
@@ -148,7 +148,7 @@ define([
             );
         });
 
-        it('does not send second request during current search', function () {
+        it('does not send second request during current search', function() {
             var requests = AjaxHelpers.requests(this);
             submitForm(this.searchBox, 'test_text');
             assertBoxIsDisabled(this.searchBox);
@@ -158,7 +158,7 @@ define([
             expect(requests).toHaveLength(1);
         });
 
-        it('returns error message if the field is empty', function () {
+        it('returns error message if the field is empty', function() {
             var requests = AjaxHelpers.requests(this);
             submitForm(this.searchBox, '   ');
             expect(requests).toHaveLength(0);
@@ -169,7 +169,7 @@ define([
             );
         });
 
-        it('can clear its input box', function () {
+        it('can clear its input box', function() {
             this.searchBox.$('.search-notes-input').val('search me');
             this.searchBox.clearInput();
             expect(this.searchBox.$('#search-notes-input').val()).toEqual('');

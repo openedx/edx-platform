@@ -3,14 +3,14 @@
  */
 var edx = edx || {};
 
-(function( $, _, gettext ) {
+(function($, _, gettext) {
     'use strict';
 
     edx.verify_student = edx.verify_student || {};
 
     edx.verify_student.PaymentConfirmationStepView = edx.verify_student.StepView.extend({
 
-        templateName: "payment_confirmation_step",
+        templateName: 'payment_confirmation_step',
 
         defaultContext: function() {
             return {
@@ -40,19 +40,19 @@ var edx = edx || {};
          * @return {object} A JQuery promise that resolves with the modified
          *                    template context.
          */
-        updateContext: function( templateContext ) {
+        updateContext: function(templateContext) {
             var view = this;
             return $.Deferred(
-                function( defer ) {
-                    var paymentOrderNum = $.url( '?payment-order-num' );
-                    if ( paymentOrderNum ) {
+                function(defer) {
+                    var paymentOrderNum = $.url('?payment-order-num');
+                    if (paymentOrderNum) {
                         // If there is a payment order number, try to retrieve
                         // the receipt information from the shopping cart.
-                        view.getReceiptData( paymentOrderNum ).done(
-                            function( data ) {
+                        view.getReceiptData(paymentOrderNum).done(
+                            function(data) {
                                 // Add the receipt info to the template context
-                                _.extend( templateContext, { receipt: this.receiptContext( data ) } );
-                                defer.resolveWith( view, [ templateContext ]);
+                                _.extend(templateContext, {receipt: this.receiptContext(data)});
+                                defer.resolveWith(view, [templateContext]);
                             }
                         ).fail(function() {
                             // Display an error
@@ -61,16 +61,16 @@ var edx = edx || {};
                             defer.rejectWith(
                                 this,
                                 [
-                                    gettext( "Error" ),
-                                    gettext( "Could not retrieve payment information" )
+                                    gettext('Error'),
+                                    gettext('Could not retrieve payment information')
                                 ]
                             );
                         });
                     } else {
                         // If no payment order is provided, return the original context
                         // The template is responsible for displaying a default state.
-                        _.extend( templateContext, { receipt: null } );
-                        defer.resolveWith( view, [ templateContext ]);
+                        _.extend(templateContext, {receipt: null});
+                        defer.resolveWith(view, [templateContext]);
                     }
                 }
             ).promise();
@@ -87,15 +87,15 @@ var edx = edx || {};
                 $verifyLaterButton = $('#verify_later_button');
 
             // Track a virtual pageview, for easy funnel reconstruction.
-            window.analytics.page( 'payment', this.templateName );
+            window.analytics.page('payment', this.templateName);
 
             // Track the user's decision to verify immediately
-            window.analytics.trackLink( $verifyNowButton, 'edx.bi.user.verification.immediate', {
+            window.analytics.trackLink($verifyNowButton, 'edx.bi.user.verification.immediate', {
                 category: 'verification'
             });
 
             // Track the user's decision to defer their verification
-            window.analytics.trackLink( $verifyLaterButton, 'edx.bi.user.verification.deferred', {
+            window.analytics.trackLink($verifyLaterButton, 'edx.bi.user.verification.deferred', {
                 category: 'verification'
             });
         },
@@ -105,9 +105,9 @@ var edx = edx || {};
          * @param  {int} paymentOrderNum The order number of the payment.
          * @return {object}                 JQuery Promise.
          */
-        getReceiptData: function( paymentOrderNum ) {
+        getReceiptData: function(paymentOrderNum) {
             return $.ajax({
-                url: _.sprintf( '/shoppingcart/receipt/%s/', paymentOrderNum ),
+                url: _.sprintf('/shoppingcart/receipt/%s/', paymentOrderNum),
                 type: 'GET',
                 dataType: 'json',
                 context: this
@@ -121,7 +121,7 @@ var edx = edx || {};
          * @param  {object} data Receipt data received from the server
          * @return {object}      Receipt template context.
          */
-        receiptContext: function( data ) {
+        receiptContext: function(data) {
             var view = this,
                 receiptContext;
 
@@ -129,8 +129,8 @@ var edx = edx || {};
                 orderNum: data.orderNum,
                 currency: data.currency,
                 purchasedDatetime: data.purchase_datetime,
-                totalCost: view.formatMoney( data.total_cost ),
-                isRefunded: data.status === "refunded",
+                totalCost: view.formatMoney(data.total_cost),
+                isRefunded: data.status === 'refunded',
                 billedTo: {
                     firstName: data.billed_to.first_name,
                     lastName: data.billed_to.last_name,
@@ -144,10 +144,10 @@ var edx = edx || {};
 
             receiptContext.items = _.map(
                 data.items,
-                function( item ) {
+                function(item) {
                     return {
                         lineDescription: item.line_desc,
-                        cost: view.formatMoney( item.line_cost )
+                        cost: view.formatMoney(item.line_cost)
                     };
                 }
             );
@@ -155,9 +155,8 @@ var edx = edx || {};
             return receiptContext;
         },
 
-        formatMoney: function( moneyStr ) {
-            return Number( moneyStr ).toFixed(2);
+        formatMoney: function(moneyStr) {
+            return Number(moneyStr).toFixed(2);
         }
     });
-
-})( jQuery, _, gettext );
+})(jQuery, _, gettext);

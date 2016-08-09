@@ -1,4 +1,4 @@
-;(function (define) {
+(function(define) {
     'use strict';
     define(['backbone'], function(Backbone) {
         var VerifiedTrackSettingsModel = Backbone.Model.extend({

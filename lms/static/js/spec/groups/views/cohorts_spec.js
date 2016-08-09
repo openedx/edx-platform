@@ -6,12 +6,12 @@ define(['backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers
         'js/groups/views/cohort_discussions', 'js/groups/views/cohort_discussions_course_wide',
         'js/groups/views/cohort_discussions_inline'
         ],
-    function (Backbone, $, AjaxHelpers, TemplateHelpers, CohortsView, CohortCollection, ContentGroupModel,
+    function(Backbone, $, AjaxHelpers, TemplateHelpers, CohortsView, CohortCollection, ContentGroupModel,
               CourseCohortSettingsModel, AnimationUtil, Qubit, CourseCohortSettingsNotificationView, DiscussionTopicsSettingsModel,
               CohortDiscussionsView, CohortCourseWideDiscussionsView, CohortInlineDiscussionsView) {
         'use strict';
 
-        describe("Cohorts View", function () {
+        describe('Cohorts View', function() {
             var catLoversInitialCount = 123, dogLoversInitialCount = 456, unknownUserMessage,
                 createMockCohort, createMockCohorts, createMockContentGroups, createMockCohortSettingsJson,
                 createMockVerifiedTrackCohortsJson, flushVerifiedTrackCohortRequests, createCohortsView,
@@ -24,7 +24,7 @@ define(['backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers
                 createMockCohortDiscussionsJson, createMockCohortDiscussions, showAndAssertDiscussionTopics;
 
             // Selectors
-            var discussionsToggle ='.toggle-cohort-management-discussions',
+            var discussionsToggle = '.toggle-cohort-management-discussions',
                 inlineDiscussionsFormCss = '.cohort-inline-discussions-form',
                 courseWideDiscussionsFormCss = '.cohort-course-wide-discussions-form',
                 courseWideDiscussionsSaveButtonCss = '.cohort-course-wide-discussions-form .action-save',
@@ -39,7 +39,7 @@ define(['backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers
             MOCK_STUDIO_GROUP_CONFIGURATIONS_URL = 'http://studio/group_configurations';
             MOCK_VERIFIED_TRACK_COHORTING_URL = 'http://courses/foo/verified_track_content/settings';
 
-            createMockCohort = function (name, id, userCount, groupId, userPartitionId, assignmentType) {
+            createMockCohort = function(name, id, userCount, groupId, userPartitionId, assignmentType) {
                 return {
                     id: id !== undefined ? id : 1,
                     name: name,
@@ -50,7 +50,7 @@ define(['backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers
                 };
             };
 
-            createMockCohorts = function (catCount, dogCount) {
+            createMockCohorts = function(catCount, dogCount) {
                 return {
                     cohorts: [
                         createMockCohort('Cat Lovers', 1, catCount || catLoversInitialCount),
@@ -59,7 +59,7 @@ define(['backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers
                 };
             };
 
-            createMockContentGroups = function () {
+            createMockContentGroups = function() {
                 return [
                     new ContentGroupModel({
                         id: 0, name: 'Dog Content', user_partition_id: MOCK_COHORTED_USER_PARTITION_ID
@@ -70,7 +70,7 @@ define(['backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers
                 ];
             };
 
-            createMockCohortSettingsJson = function (isCohorted, cohortedInlineDiscussions, cohortedCourseWideDiscussions, alwaysCohortInlineDiscussions) {
+            createMockCohortSettingsJson = function(isCohorted, cohortedInlineDiscussions, cohortedCourseWideDiscussions, alwaysCohortInlineDiscussions) {
                 return {
                     id: 0,
                     is_cohorted: isCohorted || false,
@@ -80,21 +80,21 @@ define(['backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers
                 };
             };
 
-            createMockCohortSettings = function (isCohorted, cohortedInlineDiscussions, cohortedCourseWideDiscussions, alwaysCohortInlineDiscussions) {
+            createMockCohortSettings = function(isCohorted, cohortedInlineDiscussions, cohortedCourseWideDiscussions, alwaysCohortInlineDiscussions) {
                 return new CourseCohortSettingsModel(
                     createMockCohortSettingsJson(isCohorted, cohortedInlineDiscussions, cohortedCourseWideDiscussions, alwaysCohortInlineDiscussions)
                 );
             };
 
-            createMockCohortDiscussionsJson = function (allCohorted) {
+            createMockCohortDiscussionsJson = function(allCohorted) {
                 return {
                     course_wide_discussions: {
                         children: ['Topic_C_1', 'Topic_C_2'],
                         entries: {
                             Topic_C_1: {
-                               sort_key: null,
-                               is_cohorted: true,
-                               id: 'Topic_C_1'
+                                sort_key: null,
+                                is_cohorted: true,
+                                id: 'Topic_C_1'
                             },
                             Topic_C_2: {
                                 sort_key: null,
@@ -127,25 +127,25 @@ define(['backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers
                 };
             };
 
-            createMockCohortDiscussions = function (allCohorted) {
+            createMockCohortDiscussions = function(allCohorted) {
                 return new DiscussionTopicsSettingsModel(
                     createMockCohortDiscussionsJson(allCohorted)
                 );
             };
 
-            createMockVerifiedTrackCohortsJson = function (enabled) {
+            createMockVerifiedTrackCohortsJson = function(enabled) {
                 if (enabled) {
                     return {
                         enabled: true,
-                        verified_cohort_name: "Verified Track"
+                        verified_cohort_name: 'Verified Track'
                     };
                 }
                 else {
-                    return { enabled: false };
+                    return {enabled: false};
                 }
             };
 
-            createCohortsView = function (test, options) {
+            createCohortsView = function(test, options) {
                 var cohortsJson, cohorts, contentGroups, cohortSettings, cohortDiscussions;
                 options = options || {};
                 cohortsJson = options.cohorts ? {cohorts: options.cohorts} : createMockCohorts();
@@ -183,8 +183,8 @@ define(['backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers
             // Flush out all requests to get verified track cohort information.
             // The order relative to other requests is not important to encode,
             // and for pre-existing test cases, we don't care about these additional requests.
-            flushVerifiedTrackCohortRequests = function (enableVerifiedTrackCohorting) {
-                for (var i = requests.length-1; i >= 0 ; i--) {
+            flushVerifiedTrackCohortRequests = function(enableVerifiedTrackCohorting) {
+                for (var i = requests.length - 1; i >= 0; i--) {
                     if (requests[i].url === MOCK_VERIFIED_TRACK_COHORTING_URL) {
                         AjaxHelpers.respondWithJson(
                             requests, createMockVerifiedTrackCohortsJson(enableVerifiedTrackCohorting), i
@@ -270,7 +270,7 @@ define(['backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers
                 var numDetails = cohortsView.$('.summary-items').children().length;
                 verifyMessage(expectedTitle, expectedMessageType, expectedAction, true);
                 expect(numDetails).toBe(expectedDetails.length);
-                cohortsView.$('.summary-item').each(function (index) {
+                cohortsView.$('.summary-item').each(function(index) {
                     expect($(this).text().trim()).toBe(expectedDetails[index]);
                 });
             };
@@ -293,9 +293,9 @@ define(['backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers
                     )
                 );
                 assignmentType = assignmentType || MOCK_MANUAL_ASSIGNMENT;
-                var manualMessage = "Learners are added to this cohort only when you provide their email addresses " +
-                    "or usernames on this page.";
-                var randomMessage = "Learners are added to this cohort automatically.";
+                var manualMessage = 'Learners are added to this cohort only when you provide their email addresses ' +
+                    'or usernames on this page.';
+                var randomMessage = 'Learners are added to this cohort automatically.';
                 var message = (assignmentType === MOCK_MANUAL_ASSIGNMENT) ? manualMessage : randomMessage;
                 expect(header.find('.cohort-management-group-setup .setup-value').text().trim().split('\n')[0]).toBe(message);
             };
@@ -315,7 +315,6 @@ define(['backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers
             };
 
             showAndAssertDiscussionTopics = function(that) {
-
                 createCohortsView(that);
 
                 // Should see the control to toggle cohort discussions.
@@ -349,11 +348,11 @@ define(['backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers
                     toContain('Specify whether content-specific discussion topics are divided by cohort.');
             };
 
-            unknownUserMessage = function (name) {
-                return "Unknown user: " +  name;
+            unknownUserMessage = function(name) {
+                return 'Unknown user: ' + name;
             };
 
-            beforeEach(function () {
+            beforeEach(function() {
                 setFixtures('<ul class="instructor-nav"><li class="nav-item"><<a href data-section=' +
                     '"cohort_management" class="active-section">Cohort Management</a></li></ul><div></div>' +
                     '<div class="cohort-management"><div class="cohort-state-message"></div></div>');
@@ -371,7 +370,7 @@ define(['backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers
                 TemplateHelpers.installTemplate('templates/file-upload');
             });
 
-            it("shows an error if no cohorts are defined", function() {
+            it('shows an error if no cohorts are defined', function() {
                 createCohortsView(this, {cohorts: []});
                 verifyMessage(
                     'You currently have no cohorts configured',
@@ -385,17 +384,17 @@ define(['backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers
                 expect(cohortsView.$('.cohort-discussions-nav')).toHaveClass('is-hidden');
             });
 
-            it("syncs data when membership tab is clicked", function() {
+            it('syncs data when membership tab is clicked', function() {
                 createCohortsView(this, {selectCohort: 1});
                 verifyHeader(1, 'Cat Lovers', catLoversInitialCount);
-                $(cohortsView.getSectionCss("cohort_management")).click();
+                $(cohortsView.getSectionCss('cohort_management')).click();
                 AjaxHelpers.expectRequest(requests, 'GET', '/mock_service/cohorts');
                 respondToRefresh(1001, 2);
                 verifyHeader(1, 'Cat Lovers', 1001);
             });
 
-            it('can upload a CSV of cohort assignments if a cohort exists', function () {
-                var uploadCsvToggle, fileUploadForm, fileUploadFormCss='#file-upload-form';
+            it('can upload a CSV of cohort assignments if a cohort exists', function() {
+                var uploadCsvToggle, fileUploadForm, fileUploadFormCss = '#file-upload-form';
 
                 createCohortsView(this);
 
@@ -422,38 +421,38 @@ define(['backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers
                     .toBe("Your file 'upload_file.txt' has been uploaded. Allow a few minutes for processing.");
             });
 
-            it('can show discussion topics if cohort exists', function () {
+            it('can show discussion topics if cohort exists', function() {
                 showAndAssertDiscussionTopics(this);
             });
 
-            describe("Cohort Selector", function () {
-                it('has no initial selection', function () {
+            describe('Cohort Selector', function() {
+                it('has no initial selection', function() {
                     createCohortsView(this);
                     expect(cohortsView.$('.cohort-select').val()).toBe('');
                     expect(cohortsView.$('.cohort-management-group-header .title-value').text()).toBe('');
                 });
 
-                it('can select a cohort', function () {
+                it('can select a cohort', function() {
                     createCohortsView(this, {selectCohort: 1});
                     verifyHeader(1, 'Cat Lovers', catLoversInitialCount);
                 });
 
-                it('can switch cohort', function () {
+                it('can switch cohort', function() {
                     createCohortsView(this, {selectCohort: 1});
                     cohortsView.$('.cohort-select').val('2').change();
                     verifyHeader(2, 'Dog Lovers', dogLoversInitialCount);
                 });
             });
 
-            describe("Verified Track Cohorting Settings View", function () {
-                it('displays no message if the feature is disabled', function () {
+            describe('Verified Track Cohorting Settings View', function() {
+                it('displays no message if the feature is disabled', function() {
                     createCohortsView(this);
                     verifyVerifiedTrackMessage(false);
                     verifyVerifiedTrackUIUpdates(false, false);
                 });
 
-                it('displays a confirmation if the feature is enabled and a verified track cohort exists', function () {
-                    var cohortName = "Verified Track";
+                it('displays a confirmation if the feature is enabled and a verified track cohort exists', function() {
+                    var cohortName = 'Verified Track';
                     createCohortsView(this, {
                         cohorts: [
                             {
@@ -467,33 +466,33 @@ define(['backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers
                         enableVerifiedTrackCohorting: true
                     });
                     verifyVerifiedTrackMessage(
-                        "confirmation", "automatic cohorting for verified track learners. You cannot disable cohorts"
+                        'confirmation', 'automatic cohorting for verified track learners. You cannot disable cohorts'
                     );
                     verifyVerifiedTrackUIUpdates(true, true);
                 });
 
-                it('displays an error if no verified track cohort exists', function () {
+                it('displays an error if no verified track cohort exists', function() {
                     createCohortsView(this, {enableVerifiedTrackCohorting: true});
                     verifyVerifiedTrackMessage(
-                        "error", "cohorting enabled for verified track learners, but the required cohort does not exist"
+                        'error', 'cohorting enabled for verified track learners, but the required cohort does not exist'
                     );
                     verifyVerifiedTrackUIUpdates(true, false);
                 });
 
-                it('displays an error if cohorting is disabled', function () {
+                it('displays an error if cohorting is disabled', function() {
                     createCohortsView(this, {
                         cohortSettings: createMockCohortSettings(false),
                         enableVerifiedTrackCohorting: true
                     });
                     verifyVerifiedTrackMessage(
-                        "error", "automatic cohorting enabled for verified track learners, but cohorts are disabled"
+                        'error', 'automatic cohorting enabled for verified track learners, but cohorts are disabled'
                     );
                     verifyVerifiedTrackUIUpdates(false);
                 });
             });
 
-            describe("Course Cohort Settings", function () {
-                it('can enable and disable cohorting', function () {
+            describe('Course Cohort Settings', function() {
+                it('can enable and disable cohorting', function() {
                     createCohortsView(this, {cohortSettings: createMockCohortSettings(false)});
 
                     expect(cohortsView.$('.cohorts-state').prop('checked')).toBeFalsy();
@@ -522,14 +521,14 @@ define(['backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers
                 });
 
 
-                it('shows an appropriate cohort status message', function () {
-                     var createCourseCohortSettingsNotificationView = function (is_cohorted) {
+                it('shows an appropriate cohort status message', function() {
+                    var createCourseCohortSettingsNotificationView = function(is_cohorted) {
                         var notificationView = new CourseCohortSettingsNotificationView({
                             el: $('.cohort-state-message'),
                             cohortEnabled: is_cohorted});
                         notificationView.render();
                         return notificationView;
-                     };
+                    };
 
                     var notificationView = createCourseCohortSettingsNotificationView(true);
                     expect(notificationView.$('.action-toggle-message').text().trim()).toBe('Cohorts Enabled');
@@ -538,7 +537,7 @@ define(['backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers
                     expect(notificationView.$('.action-toggle-message').text().trim()).toBe('Cohorts Disabled');
                 });
 
-                it('shows an appropriate error message for HTTP500', function () {
+                it('shows an appropriate error message for HTTP500', function() {
                     createCohortsView(this, {cohortSettings: createMockCohortSettings(false)});
                     expect(cohortsView.$('.cohorts-state').prop('checked')).toBeFalsy();
                     cohortsView.$('.cohorts-state').prop('checked', true).change();
@@ -548,8 +547,8 @@ define(['backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers
                 });
             });
 
-            describe("Cohort Group Header", function () {
-                it("renders header correctly", function () {
+            describe('Cohort Group Header', function() {
+                it('renders header correctly', function() {
                     var cohortName = 'Transformers',
                         newCohortName = 'X Men';
                     var expectedRequest = function(assignment_type) {
@@ -598,8 +597,8 @@ define(['backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers
                 });
             });
 
-            describe("Cohort Editor Tab Panel", function () {
-                it("initially selects the Manage Students tab", function () {
+            describe('Cohort Editor Tab Panel', function() {
+                it('initially selects the Manage Students tab', function() {
                     createCohortsView(this, {selectCohort: 1});
                     expect(cohortsView.$('.tab-manage_students')).toHaveClass('is-selected');
                     expect(cohortsView.$('.tab-settings')).not.toHaveClass('is-selected');
@@ -607,7 +606,7 @@ define(['backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers
                     expect(cohortsView.$('.tab-content-settings')).toHaveClass('is-hidden');
                 });
 
-                it("can select the Settings tab", function () {
+                it('can select the Settings tab', function() {
                     createCohortsView(this, {selectCohort: 1});
                     cohortsView.$('.tab-settings a').click();
                     expect(cohortsView.$('.tab-manage_students')).not.toHaveClass('is-selected');
@@ -617,11 +616,11 @@ define(['backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers
                 });
             });
 
-            describe("Add Cohorts Form", function () {
+            describe('Add Cohorts Form', function() {
                 var defaultCohortName = 'New Cohort';
                 var assignmentType = 'random';
 
-                it("can add a cohort", function() {
+                it('can add a cohort', function() {
                     var contentGroupId = 0;
                     createCohortsView(this, {cohorts: []});
                     cohortsView.$('.action-create').click();
@@ -645,7 +644,7 @@ define(['backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers
                     );
                     AjaxHelpers.respondWithJson(
                         requests,
-                        { cohorts: createMockCohort(defaultCohortName, 1, 0, null, null, assignmentType) }
+                        {cohorts: createMockCohort(defaultCohortName, 1, 0, null, null, assignmentType)}
                     );
                     verifyMessage(
                         'The ' + defaultCohortName + ' cohort has been created.' +
@@ -658,8 +657,8 @@ define(['backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers
                     expect(getAddModal().find('.cohort-management-settings-form').length).toBe(0);
                 });
 
-                it("has default assignment type set to manual", function() {
-                    var cohortName = "iCohort";
+                it('has default assignment type set to manual', function() {
+                    var cohortName = 'iCohort';
                     createCohortsView(this, {cohorts: []});
                     cohortsView.$('.action-create').click();
                     cohortsView.$('.cohort-name').val(cohortName);
@@ -677,12 +676,12 @@ define(['backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers
                     );
                     AjaxHelpers.respondWithJson(
                         requests,
-                        { cohorts: createMockCohort(cohortName, 1, 0, null, null, MOCK_MANUAL_ASSIGNMENT) }
+                        {cohorts: createMockCohort(cohortName, 1, 0, null, null, MOCK_MANUAL_ASSIGNMENT)}
                     );
                     verifyHeader(1, cohortName, 0, MOCK_MANUAL_ASSIGNMENT);
                 });
 
-                it("trims off whitespace before adding a cohort", function() {
+                it('trims off whitespace before adding a cohort', function() {
                     createCohortsView(this);
                     cohortsView.$('.action-create').click();
                     cohortsView.$('.cohort-name').val('  New Cohort   ');
@@ -690,14 +689,14 @@ define(['backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers
                     expectCohortAddRequest('New Cohort', null, null, MOCK_MANUAL_ASSIGNMENT);
                 });
 
-                it("does not allow a blank cohort name to be submitted", function() {
+                it('does not allow a blank cohort name to be submitted', function() {
                     createCohortsView(this, {selectCohort: 1});
                     cohortsView.$('.action-create').click();
                     cohortsView.$('.cohort-name').val('  ');
                     saveFormAndExpectErrors('add', ['You must specify a name for the cohort']);
                 });
 
-                it("shows a message saving when choosing to have content groups but not selecting one", function() {
+                it('shows a message saving when choosing to have content groups but not selecting one', function() {
                     createCohortsView(this, {selectCohort: 1});
                     cohortsView.$('.action-create').click();
                     cohortsView.$('.cohort-name').val('New Cohort');
@@ -705,7 +704,7 @@ define(['backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers
                     saveFormAndExpectErrors('add', ['You did not select a content group']);
                 });
 
-                it("shows two message when both fields have problems", function() {
+                it('shows two message when both fields have problems', function() {
                     createCohortsView(this, {selectCohort: 1});
                     cohortsView.$('.action-create').click();
                     cohortsView.$('.cohort-name').val('');
@@ -716,7 +715,7 @@ define(['backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers
                     ]);
                 });
 
-                it("shows a message when adding a cohort returns a server error", function() {
+                it('shows a message when adding a cohort returns a server error', function() {
                     var addModal;
                     createCohortsView(this, {selectCohort: 1});
                     cohortsView.$('.action-create').click();
@@ -744,7 +743,7 @@ define(['backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers
                     expect(cohortsView.$('.cohort-management-nav')).not.toHaveClass('is-disabled');
                 });
 
-                it("shows an error if canceled when no cohorts are defined", function() {
+                it('shows an error if canceled when no cohorts are defined', function() {
                     createCohortsView(this, {cohorts: []});
                     cohortsView.$('.action-create').click();
                     expect(getAddModal().find('.cohort-management-settings-form').length).toBe(1);
@@ -757,7 +756,7 @@ define(['backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers
                     );
                 });
 
-                it("hides any error message when switching to show a cohort", function() {
+                it('hides any error message when switching to show a cohort', function() {
                     createCohortsView(this, {selectCohort: 1});
 
                     // First try to save a blank name to create a message
@@ -771,7 +770,7 @@ define(['backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers
                     verifyNoMessage();
                 });
 
-                it("hides any error message when canceling the form", function() {
+                it('hides any error message when canceling the form', function() {
                     createCohortsView(this, {selectCohort: 1});
 
                     // First try to save a blank name to create a message
@@ -785,7 +784,7 @@ define(['backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers
                 });
             });
 
-            describe("Add Students Button", function () {
+            describe('Add Students Button', function() {
                 var getStudentInput, addStudents, respondToAdd;
 
                 getStudentInput = function() {
@@ -800,7 +799,7 @@ define(['backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers
                 respondToAdd = function(result) {
                     AjaxHelpers.respondWithJson(
                         requests,
-                        _.extend({ unknown: [], added: [], present: [], changed: [], success: true }, result)
+                        _.extend({unknown: [], added: [], present: [], changed: [], success: true}, result)
                     );
                 };
 
@@ -816,7 +815,7 @@ define(['backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers
                     var catLoversUpdatedCount = catLoversInitialCount + 1;
                     createCohortsView(this, {selectCohort: 1});
                     addStudents('student@sample.com');
-                    respondToAdd({ added: ['student@sample.com'] });
+                    respondToAdd({added: ['student@sample.com']});
                     respondToRefresh(catLoversUpdatedCount, dogLoversInitialCount);
                     verifyHeader(1, 'Cat Lovers', catLoversUpdatedCount);
                     verifyMessage('1 student has been added to this cohort', 'confirmation');
@@ -829,7 +828,7 @@ define(['backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers
                     AjaxHelpers.expectRequest(
                         requests, 'POST', '/mock_service/cohorts/1/add', 'users=unknown%40sample.com'
                     );
-                    respondToAdd({ unknown: ['unknown@sample.com'] });
+                    respondToAdd({unknown: ['unknown@sample.com']});
                     respondToRefresh(catLoversInitialCount, dogLoversInitialCount);
                     verifyHeader(1, 'Cat Lovers', catLoversInitialCount);
                     verifyDetailedMessage('There was an error when trying to add students:', 'error',
@@ -845,9 +844,9 @@ define(['backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers
                     addStudents(sixUsers);
                     AjaxHelpers.expectRequest(
                         requests, 'POST', '/mock_service/cohorts/1/add',
-                        'users=' + sixUsers.replace(/@/g, "%40").replace(/, /g, "%2C+")
+                        'users=' + sixUsers.replace(/@/g, '%40').replace(/, /g, '%2C+')
                     );
-                    respondToAdd({ unknown: [
+                    respondToAdd({unknown: [
                         'unknown1@sample.com',
                         'unknown2@sample.com',
                         'unknown3@sample.com',
@@ -882,7 +881,7 @@ define(['backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers
 
                     addStudents(sixUsers);
                     AjaxHelpers.expectRequest(requests, 'POST', '/mock_service/cohorts/1/add',
-                            'users=' + sixUsers.replace(/@/g, "%40").replace(/, /g, "%2C+")
+                            'users=' + sixUsers.replace(/@/g, '%40').replace(/, /g, '%2C+')
                     );
                     respondToAdd({
                         changed: [
@@ -896,9 +895,9 @@ define(['backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers
 
                     verifyDetailedMessage('3 students have been added to this cohort', 'confirmation',
                         [
-                            "2 students were removed from cohort 2",
-                            "1 student was removed from cohort 3",
-                            "1 student was already in the cohort"
+                            '2 students were removed from cohort 2',
+                            '1 student was removed from cohort 3',
+                            '1 student was already in the cohort'
                         ]
                     );
                     expect(getStudentInput().val()).toBe('');
@@ -922,14 +921,14 @@ define(['backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers
 
                     // Now verify that the error is removed on a subsequent add
                     addStudents('student@sample.com');
-                    respondToAdd({ added: ['student@sample.com'] });
+                    respondToAdd({added: ['student@sample.com']});
                     respondToRefresh(catLoversInitialCount + 1, dogLoversInitialCount);
                     verifyMessage('1 student has been added to this cohort', 'confirmation');
                 });
             });
 
-            describe("Cohort Settings", function() {
-                describe("Content Group Setting", function() {
+            describe('Cohort Settings', function() {
+                describe('Content Group Setting', function() {
                     var createCohortsViewWithDeletedContentGroup;
 
                     createCohortsViewWithDeletedContentGroup = function(test) {
@@ -947,7 +946,7 @@ define(['backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers
                         });
                     };
 
-                    it("shows a select element with an option for each content group", function () {
+                    it('shows a select element with an option for each content group', function() {
                         var options;
                         createCohortsView(this, {selectCohort: 1});
                         cohortsView.$('.tab-settings a').click();
@@ -959,7 +958,7 @@ define(['backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers
                         expect($(options[2]).text().trim()).toBe('Dog Content');
                     });
 
-                    it("can select a single content group", function () {
+                    it('can select a single content group', function() {
                         createCohortsView(this, {selectCohort: 1});
                         cohortsView.$('.tab-settings a').click();
 
@@ -985,7 +984,7 @@ define(['backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers
                         verifyMessage('Saved cohort', 'confirmation');
                     });
 
-                    it("can clear selected content group", function () {
+                    it('can clear selected content group', function() {
                         createCohortsView(this, {
                             cohorts: [
                                 {id: 1, name: 'Cat Lovers', group_id: 0, 'assignment_type': MOCK_MANUAL_ASSIGNMENT}
@@ -1014,7 +1013,7 @@ define(['backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers
                         verifyMessage('Saved cohort', 'confirmation');
                     });
 
-                    it("shows a message saving when choosing to have content groups but not selecting one", function() {
+                    it('shows a message saving when choosing to have content groups but not selecting one', function() {
                         createCohortsView(this, {selectCohort: 1});
                         cohortsView.$('.tab-settings a').click();
                         cohortsView.$('.cohort-name').val('New Cohort');
@@ -1022,7 +1021,7 @@ define(['backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers
                         saveFormAndExpectErrors('update', ['You did not select a content group']);
                     });
 
-                    it("shows a message when the selected content group does not exist", function () {
+                    it('shows a message when the selected content group does not exist', function() {
                         createCohortsViewWithDeletedContentGroup(this);
                         cohortsView.$('.tab-settings a').click();
                         expect(cohortsView.$('option.option-unavailable').text().trim()).toBe('Deleted Content Group');
@@ -1031,7 +1030,7 @@ define(['backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers
                         );
                     });
 
-                    it("can clear a selected content group which had been deleted", function () {
+                    it('can clear a selected content group which had been deleted', function() {
                         createCohortsViewWithDeletedContentGroup(this);
                         cohortsView.$('.tab-settings a').click();
                         expect(cohortsView.$('.radio-yes').prop('checked')).toBeTruthy();
@@ -1050,13 +1049,13 @@ define(['backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers
                         expect(cohortsView.$('.cohort-management-details-association-course .copy-error').text().trim()).toBe('');
                     });
 
-                    it("shows an error when saving with a deleted content group", function () {
+                    it('shows an error when saving with a deleted content group', function() {
                         createCohortsViewWithDeletedContentGroup(this);
                         cohortsView.$('.tab-settings a').click();
                         saveFormAndExpectErrors('save', ['The selected content group does not exist']);
                     });
 
-                    it("shows an error when the save fails", function () {
+                    it('shows an error when the save fails', function() {
                         createCohortsView(this, {selectCohort: 1});
                         cohortsView.$('.tab-settings a').click();
                         cohortsView.$('.action-save').click();
@@ -1067,7 +1066,7 @@ define(['backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers
                         );
                     });
 
-                    it("shows an error message when no content groups are specified", function () {
+                    it('shows an error message when no content groups are specified', function() {
                         var message;
                         createCohortsView(this, {selectCohort: 1, contentGroups: []});
                         cohortsView.$('.tab-settings a').click();
@@ -1081,7 +1080,7 @@ define(['backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers
                         );
                     });
 
-                    it("can update existing cohort settings", function () {
+                    it('can update existing cohort settings', function() {
                         var cohortName = 'Transformers',
                             newCohortName = 'X Men';
                         var expectedRequest = function(assignment_type) {
@@ -1143,7 +1142,7 @@ define(['backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers
                         saveFormAndExpectErrors('update', ['You must specify a name for the cohort']);
                     });
 
-                    it("assignment settings are disabled for default cohort", function() {
+                    it('assignment settings are disabled for default cohort', function() {
                         createCohortsView(this, {
                             cohorts: [
                                 {
@@ -1159,10 +1158,10 @@ define(['backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers
 
                         // We have a single random cohort so we should not be allowed to change it assignment type
                         expect(cohortsView.$('.cohort-management-assignment-type-settings')).toHaveClass('is-disabled');
-                        expect(cohortsView.$('.copy-error').text()).toContain("There must be one cohort to which students can automatically be assigned.");
+                        expect(cohortsView.$('.copy-error').text()).toContain('There must be one cohort to which students can automatically be assigned.');
                     });
 
-                    it("cancel settings works", function() {
+                    it('cancel settings works', function() {
                         createCohortsView(this, {selectCohort: 1, contentGroups: []});
                         cohortsView.$('.tab-settings a').click();
                         cohortsView.$('.cohort-name').val('One Two Three');
@@ -1173,7 +1172,7 @@ define(['backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers
                 });
             });
 
-            describe("Discussion Topics", function() {
+            describe('Discussion Topics', function() {
                 var createCourseWideView, createInlineView,
                     inlineView, courseWideView, assertCohortedTopics;
 
@@ -1208,8 +1207,7 @@ define(['backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers
                     showAndAssertDiscussionTopics(this);
                 });
 
-                describe("Course Wide", function() {
-
+                describe('Course Wide', function() {
                     it('shows the "Save" button as disabled initially', function() {
                         createCourseWideView(this);
                         expect(courseWideView.$(courseWideDiscussionsSaveButtonCss).prop('disabled')).toBeTruthy();
@@ -1298,7 +1296,7 @@ define(['backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers
                         expect(courseWideView.$('.message-title').text().trim()).toBe(expectedTitle);
                     });
 
-                    it('shows an appropriate error message for HTTP500', function () {
+                    it('shows an appropriate error message for HTTP500', function() {
                         createCourseWideView(this);
 
                         $(courseWideView.$('.check-discussion-subcategory-course-wide')[1]).prop('checked', 'checked').change();
@@ -1310,7 +1308,7 @@ define(['backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers
                     });
                 });
 
-                describe("Inline", function() {
+                describe('Inline', function() {
                     var enableSaveButton, mockGetRequest, verifySuccess, mockPatchRequest;
 
                     enableSaveButton = function() {
@@ -1485,7 +1483,6 @@ define(['backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers
                     });
 
                     it('shows an appropriate message when no inline topics exist', function() {
-
                         var topicsJson, discussionTopicsSettingsModel;
 
                         topicsJson = {
@@ -1493,9 +1490,9 @@ define(['backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers
                                 children: ['Topic_C_1'],
                                 entries: {
                                     Topic_C_1: {
-                                       sort_key: null,
-                                       is_cohorted: true,
-                                       id: 'Topic_C_1'
+                                        sort_key: null,
+                                        is_cohorted: true,
+                                        id: 'Topic_C_1'
                                     }
                                 }
                             },
@@ -1508,7 +1505,7 @@ define(['backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers
 
                         createInlineView(this, discussionTopicsSettingsModel);
 
-                        var expectedTitle = "No content-specific discussion topics exist.";
+                        var expectedTitle = 'No content-specific discussion topics exist.';
                         expect(inlineView.$('.no-topics').text().trim()).toBe(expectedTitle);
                     });
 
@@ -1531,7 +1528,7 @@ define(['backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers
                         expect(inlineView.$('.message-title').text().trim()).toBe(expectedTitle);
                     });
 
-                    it('shows an appropriate error message for HTTP500', function () {
+                    it('shows an appropriate error message for HTTP500', function() {
                         createInlineView(this);
                         enableSaveButton();
 
@@ -1542,9 +1539,7 @@ define(['backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers
                         var expectedTitle = "We've encountered an error. Refresh your browser and then try again.";
                         expect(inlineView.$('.message-title').text().trim()).toBe(expectedTitle);
                     });
-
                 });
-
             });
         });
     });

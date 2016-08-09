@@ -9,7 +9,7 @@ define([
             this.wrapper = document.getElementById('edx-notes-wrapper-123');
         });
 
-        afterEach(function () {
+        afterEach(function() {
             while (Annotator._instances.length > 0) {
                 Annotator._instances[0].destroy();
             }
@@ -20,13 +20,13 @@ define([
                 token = Helpers.makeToken(),
                 options = {
                     user: 'a user',
-                    usage_id : 'an usage',
+                    usage_id: 'an usage',
                     course_id: 'a course'
                 },
                 annotator = NotesFactory.factory(this.wrapper, {
                     endpoint: '/test_endpoint',
                     user: 'a user',
-                    usageId : 'an usage',
+                    usageId: 'an usage',
                     courseId: 'a course',
                     token: token,
                     tokenUrl: '/test_token_url'

@@ -1,19 +1,18 @@
 define(['edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'js/student_account/emailoptin'],
-    function( AjaxHelpers, EmailOptInInterface ) {
+    function(AjaxHelpers, EmailOptInInterface) {
         'use strict';
 
-        describe( 'EmailOptInInterface', function() {
-
+        describe('EmailOptInInterface', function() {
             var COURSE_KEY = 'edX/DemoX/Fall',
                 EMAIL_OPT_IN = 'True',
                 EMAIL_OPT_IN_URL = '/user_api/v1/preferences/email_opt_in/';
 
             it('Opts in for organization emails', function() {
                 // Spy on Ajax requests
-                var requests = AjaxHelpers.requests( this );
+                var requests = AjaxHelpers.requests(this);
 
                 // Attempt to enroll the user
-                EmailOptInInterface.setPreference( COURSE_KEY, EMAIL_OPT_IN );
+                EmailOptInInterface.setPreference(COURSE_KEY, EMAIL_OPT_IN);
 
                 // Expect that the correct request was made to the server
                 AjaxHelpers.expectRequest(

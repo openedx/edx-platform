@@ -4,13 +4,13 @@
 
 var edx = edx || {};
 
-(function ($) {
+(function($) {
     'use strict';
 
     edx.dashboard = edx.dashboard || {};
 
     // Generate the properties object to be passed along with business intelligence events.
-    edx.dashboard.generateTrackProperties = function(element){
+    edx.dashboard.generateTrackProperties = function(element) {
         var $el = $(element),
             properties = {};
 
@@ -32,7 +32,7 @@ var edx = edx || {};
     };
 
     // Emit an event when the 'course title link' is clicked.
-    edx.dashboard.trackCourseTitleClicked = function($courseTitleLink, properties){
+    edx.dashboard.trackCourseTitleClicked = function($courseTitleLink, properties) {
         var trackProperty = properties || edx.dashboard.generateTrackProperties;
 
         window.analytics.trackLink(
@@ -43,7 +43,7 @@ var edx = edx || {};
     };
 
     // Emit an event  when the 'course image' is clicked.
-    edx.dashboard.trackCourseImageLinkClicked = function($courseImageLink, properties){
+    edx.dashboard.trackCourseImageLinkClicked = function($courseImageLink, properties) {
         var trackProperty = properties || edx.dashboard.generateTrackProperties;
         window.analytics.trackLink(
             $courseImageLink,
@@ -53,7 +53,7 @@ var edx = edx || {};
     };
 
     // Emit an event  when the 'View Course' button is clicked.
-    edx.dashboard.trackEnterCourseLinkClicked = function($enterCourseLink, properties){
+    edx.dashboard.trackEnterCourseLinkClicked = function($enterCourseLink, properties) {
         var trackProperty = properties || edx.dashboard.generateTrackProperties;
         window.analytics.trackLink(
             $enterCourseLink,
@@ -63,7 +63,7 @@ var edx = edx || {};
     };
 
     // Emit an event when the options dropdown is engaged.
-    edx.dashboard.trackCourseOptionDropdownClicked = function($optionsDropdown, properties){
+    edx.dashboard.trackCourseOptionDropdownClicked = function($optionsDropdown, properties) {
         var trackProperty = properties || edx.dashboard.generateTrackProperties;
         window.analytics.trackLink(
             $optionsDropdown,
@@ -73,7 +73,7 @@ var edx = edx || {};
     };
 
     // Emit an event  when the 'Learn about verified' link is clicked.
-    edx.dashboard.trackLearnVerifiedLinkClicked = function($courseLearnVerified, properties){
+    edx.dashboard.trackLearnVerifiedLinkClicked = function($courseLearnVerified, properties) {
         var trackProperty = properties || edx.dashboard.generateTrackProperties;
         window.analytics.trackLink(
             $courseLearnVerified,
@@ -83,8 +83,8 @@ var edx = edx || {};
     };
 
     // Emit an event  when the 'Find Courses' button is clicked.
-    edx.dashboard.trackFindCourseBtnClicked = function($findCoursesBtn, properties){
-        var trackProperty = properties || { category: 'dashboard', label: null };
+    edx.dashboard.trackFindCourseBtnClicked = function($findCoursesBtn, properties) {
+        var trackProperty = properties || {category: 'dashboard', label: null};
         window.analytics.trackLink(
             $findCoursesBtn,
             'edx.bi.dashboard.find_courses_button.clicked',
@@ -93,7 +93,7 @@ var edx = edx || {};
     };
 
     // Emit an event when the 'View XSeries Details' button is clicked
-    edx.dashboard.trackXseriesBtnClicked = function($xseriesBtn, properties){
+    edx.dashboard.trackXseriesBtnClicked = function($xseriesBtn, properties) {
         var trackProperty = properties || edx.dashboard.generateProgramProperties;
         window.analytics.trackLink(
             $xseriesBtn,
@@ -103,11 +103,10 @@ var edx = edx || {};
     };
 
     edx.dashboard.xseriesTrackMessages = function() {
-
         $('.xseries-action .btn').each(function(i, element) {
             var data = edx.dashboard.generateProgramProperties($(element));
 
-            window.analytics.track( 'edx.bi.dashboard.xseries_cta_message.viewed', data );
+            window.analytics.track('edx.bi.dashboard.xseries_cta_message.viewed', data);
         });
     };
 
