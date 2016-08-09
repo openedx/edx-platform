@@ -11,7 +11,7 @@ metadata:
 
         Use the following example problem as a model.
 
-        >> A/an ________ is a vegetable.<<
+        >> A/an ________ is a vegetable.||You can select only one option.<<
 
         [[
             apple {{An apple is the fertilized ovary that comes from an apple tree and contains seeds, meaning it is a fruit.}}
@@ -32,7 +32,8 @@ data:   |
                 <p>Be sure to select Settings to specify a Display Name and other values that apply.</p>
                 <p>Use the following example problem as a model.</p>
                 <label>A/an ________ is a vegetable.</label>
-                <optioninput label=" A/an ________ is a vegetable.">
+                <description>You can select only one option.</description>
+                <optioninput>
                     <option correct="False">apple
                         <optionhint>An apple is the fertilized ovary that comes from an apple tree and contains seeds, meaning it is a fruit.</optionhint>
                     </option>

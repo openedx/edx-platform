@@ -221,3 +221,17 @@ class ProblemPage(PageObject):
             if not self.q(xpath=xpath.format(choice)).is_present():
                 return False
         return True
+
+    @property
+    def problem_question(self):
+        """
+        Return the question text of the problem.
+        """
+        return self.q(css="div.problem .wrapper-problem-response legend").text[0]
+
+    @property
+    def problem_question_descriptions(self):
+        """
+        Return a list of question descriptions of the problem.
+        """
+        return self.q(css="div.problem .wrapper-problem-response .question-description").text
