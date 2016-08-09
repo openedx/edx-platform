@@ -2,33 +2,25 @@
 metadata:
     display_name: Dropdown
     markdown: |
-         Dropdown problems allow learners to select only one option from a list of options.
-
-         When you add the problem, be sure to select Settings to specify a Display Name and other values that apply.
-
-         You can use the following example problem as a model.
-
-         >>Which of the following countries celebrates its independence on August 15?||You can select only one option.<<
-
-         [[(India), Spain, China, Bermuda]]
-
-         [explanation]
-         India became an independent nation on August 15, 1947.
-         [explanation]
+         You can use this template as a guide to the simple editor markdown and OLX markup to use for dropdown problems. Edit this component to replace this template with your own assessment.
+         >>Add the question text, or prompt, here. This text is required.||You can add an optional tip or note related to the prompt
+         like this. <<
+         [[
+         an incorrect answer
+         (the correct answer)
+         an incorrect answer
+         ]]
 data:   |
         <problem>
             <optionresponse>
-                <p>Dropdown problems allow learners to select only one option from a list of options.</p>
-                <p>When you add the problem, be sure to select Settings to specify a Display Name and other values that apply.</p>
-                <p>You can use the following example problem as a model.</p>
-                <label>Which of the following countries celebrates its independence on August 15?</label>
-                <description>You can select only one option.</description>
-                <optioninput options="('India','Spain','China','Bermuda')" correct="India"/>
-                <solution>
-                    <div class="detailed-solution">
-                        <p>Explanation</p>
-                        <p>India became an independent nation on August 15, 1947.</p>
-                    </div>
-                </solution>
+            <p>You can use this template as a guide to the simple editor markdown and OLX markup to use for dropdown problems. Edit this component to replace this template with your own assessment.</p>
+            <label>Add the question text, or prompt, here. This text is required.</label>
+            <description>You can add an optional tip or note related to the prompt
+            like this. </description>
+            <optioninput>
+                <option correct="False">an incorrect answer</option>
+                <option correct="True">the correct answer</option>
+                <option correct="False">an incorrect answer</option>
+              </optioninput>
             </optionresponse>
         </problem>
