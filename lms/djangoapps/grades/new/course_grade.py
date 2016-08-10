@@ -26,6 +26,12 @@ class CourseGrade(object):
         self.course_structure = course_structure
         self.chapter_grades = []
 
+        # TODO: currently, data model won't accept null for course version, but tests do that a lot. Determine correct solution to this problem.
+            # - course_version not always needed for PersistentSubsectionGrade?
+            # - tests all need to ensure their courses have a course_version?
+        if self.course.course_version is None:
+            self.course.course_version = 1
+
     @lazy
     def subsection_grade_totals_by_format(self):
         """
