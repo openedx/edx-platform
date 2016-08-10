@@ -154,7 +154,6 @@
 
                 switch (event.which) {
                     case keys.esc:
-                        event.preventDefault();
                         if ($zoomed.hasClass('is-visible')) {
                             detachZoomed();
 
