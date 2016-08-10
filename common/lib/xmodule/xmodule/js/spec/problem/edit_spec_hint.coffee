@@ -858,19 +858,19 @@ describe 'Markdown to xml extended hint with tricky syntax cases', ->
     """)
     expect(data).toXMLEqual("""
     <problem>
-      <multiplechoiceresponse>
-        <label>á and Ø</label>
-        <choicegroup label="á and Ø" type="MultipleChoice">
-            <choice correct="true">Ø
-              <choicehint>Ø</choicehint>
-            </choice>
-            <choice correct="false">BB</choice>
-        </choicegroup>
-      </multiplechoiceresponse>
+        <multiplechoiceresponse>
+            <label>á and Ø</label>
+            <choicegroup type="MultipleChoice">
+                <choice correct="true">Ø
+                    <choicehint>Ø</choicehint>
+                </choice>
+                <choice correct="false">BB</choice>
+            </choicegroup>
+        </multiplechoiceresponse>
 
-      <demandhint>
-        <hint>Ø</hint>
-      </demandhint>
+        <demandhint>
+            <hint>Ø</hint>
+        </demandhint>
     </problem>
     """)
 
