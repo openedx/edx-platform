@@ -43,9 +43,7 @@ Options:
             fh.setLevel(logging.DEBUG)
             formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
             fh.setFormatter(formatter)
-            log.addHandler(fh)
-            #log = logging.basicConfig(filename='repair_users_roles_on_all_courses.log',level=logging.INFO)
-            print log        
+            log.addHandler(fh)      
         
         log.info(msg_string)
 
@@ -128,7 +126,7 @@ Options:
         msg_string += "Number of users with both observer and ta status in same course: {}, number of users that should be removed from global observer group: {}.".format(number_of_conflicted_users, number_of_single_conflicted_users)
         if not dry_run:
             log.info("All users roles are cleaned!")
-            
+
         log.info(msg_string)
         log.info('--------------------------------------------------------------------------------------------------------------------')
 
