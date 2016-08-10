@@ -1,0 +1,55 @@
+// The LMS version is in:
+// /lms/static/sass/course/_image-zoom-tool.scss
+
+// edX image zoom tool
+.zooming-image-place {
+
+    .indicator {
+        display: none;
+        position: absolute;
+        @include left(46%);
+        top: 45%;
+        width: 50px;
+        height: 50px;
+        background: $gray-d4;
+        color: $white;
+        font-size: 32px;
+        text-align: center;
+        line-height: 50px;
+    }
+
+    a:focus {
+        
+        .indicator {
+            display: block;
+        }
+    }
+    
+    a:hover,
+    a:active {
+
+        .indicator {
+            display: none;
+        }
+    }
+    
+    .larger {
+        display: none;
+        position: absolute;
+        height: 350px;
+        width: 350px;
+        top: -375px;
+        @include left(50%);
+        @include margin-left(-175px);
+        border-radius: 50%;
+        border: 2px solid $gray-d4;
+        background: $white;
+        box-shadow: 0 0 3px $gray-d4;
+        overflow: hidden;
+        cursor: none;
+
+        .is-visible {
+            display: block;
+        }
+    }
+}

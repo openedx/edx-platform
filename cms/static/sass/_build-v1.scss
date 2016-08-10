@@ -79,6 +79,7 @@
 @import 'xmodule/modules/css/module-styles.scss';
 @import 'xmodule/descriptors/css/module-styles.scss';
 @import 'xmodule/headings';
+@import 'xmodule/image-zoom-tool'; // styles for the custom image zoom tool
 @import 'elements/xmodules'; // styling for Studio-specific contexts
 
 @import 'developer'; // used for any developer-created scss that needs further polish/refactoring
