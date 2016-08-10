@@ -8,10 +8,10 @@ from django.conf import settings
 from django.utils.translation import ugettext as _
 from courseware.courses import get_course_by_id
 from instructor.enrollment_report import BaseAbstractEnrollmentReportProvider
-from microsite_configuration import microsite
 from shoppingcart.models import RegistrationCodeRedemption, PaidCourseRegistration, CouponRedemption, OrderItem, \
     InvoiceTransaction
 from student.models import CourseEnrollment, ManualEnrollmentAudit
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 
 class PaidCourseEnrollmentReportProvider(BaseAbstractEnrollmentReportProvider):
@@ -29,7 +29,7 @@ class PaidCourseEnrollmentReportProvider(BaseAbstractEnrollmentReportProvider):
 
         # check the user enrollment role
         if user.is_staff:
-            platform_name = microsite.get_value('platform_name', settings.PLATFORM_NAME)
+            platform_name = configuration_helpers.get_value('platform_name', settings.PLATFORM_NAME)
             enrollment_role = _('{platform_name} Staff').format(platform_name=platform_name)
         elif is_course_staff:
             enrollment_role = _('Course Staff')

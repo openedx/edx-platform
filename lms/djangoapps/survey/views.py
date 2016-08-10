@@ -18,7 +18,7 @@ from opaque_keys.edx.keys import CourseKey
 
 from edxmako.shortcuts import render_to_response
 from survey.models import SurveyForm
-from microsite_configuration import microsite
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 log = logging.getLogger("edx.survey")
 
@@ -51,7 +51,7 @@ def view_student_survey(user, survey_name, course=None, redirect_url=None, is_re
     # just remove that outer key to make the JSON payload simplier
     existing_answers = survey.get_answers(user=user).get(user.id, {})
 
-    platform_name = microsite.get_value('platform_name', settings.PLATFORM_NAME)
+    platform_name = configuration_helpers.get_value('platform_name', settings.PLATFORM_NAME)
 
     context = {
         'existing_data_json': json.dumps(existing_answers),
@@ -61,7 +61,7 @@ def view_student_survey(user, survey_name, course=None, redirect_url=None, is_re
         'dashboard_redirect_url': dashboard_redirect_url,
         'survey_form': survey.form,
         'is_required': is_required,
-        'mail_to_link': microsite.get_value('email_from_address', settings.CONTACT_EMAIL),
+        'mail_to_link': configuration_helpers.get_value('email_from_address', settings.CONTACT_EMAIL),
         'platform_name': platform_name,
         'course': course,
     }

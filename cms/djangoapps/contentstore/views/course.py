@@ -58,7 +58,6 @@ from course_action_state.managers import CourseActionStateItemNotFoundError
 from course_action_state.models import CourseRerunState, CourseRerunUIStateManager
 from course_creators.views import get_course_creator_status, add_user_with_status_unrequested
 from edxmako.shortcuts import render_to_response
-from microsite_configuration import microsite
 from models.settings.course_grading import CourseGradingModel
 from models.settings.course_metadata import CourseMetadata
 from models.settings.encoder import CourseSettingsEncoder
@@ -69,6 +68,7 @@ from openedx.core.djangoapps.models.course_details import CourseDetails
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.programs.utils import get_programs
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.lib.course_tabs import CourseTabPluginManager
 from openedx.core.lib.courses import course_image_url
 from openedx.core.djangolib.js_utils import dump_js_escaped_json
@@ -973,14 +973,14 @@ def settings_handler(request, course_key_string):
         if 'text/html' in request.META.get('HTTP_ACCEPT', '') and request.method == 'GET':
             upload_asset_url = reverse_course_url('assets_handler', course_key)
 
-            # see if the ORG of this course can be attributed to a 'Microsite'. In that case, the
+            # see if the ORG of this course can be attributed to a defined configuration . In that case, the
             # course about page should be editable in Studio
-            marketing_site_enabled = microsite.get_value_for_org(
+            marketing_site_enabled = configuration_helpers.get_value_for_org(
                 course_module.location.org,
                 'ENABLE_MKTG_SITE',
                 settings.FEATURES.get('ENABLE_MKTG_SITE', False)
             )
-            enable_extended_course_details = microsite.get_value_for_org(
+            enable_extended_course_details = configuration_helpers.get_value_for_org(
                 course_module.location.org,
                 'ENABLE_EXTENDED_COURSE_DETAILS',
                 settings.FEATURES.get('ENABLE_EXTENDED_COURSE_DETAILS', False)

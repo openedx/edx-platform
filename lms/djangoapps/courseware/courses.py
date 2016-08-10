@@ -19,7 +19,6 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 from static_replace import replace_static_urls
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.x_module import STUDENT_VIEW
-from microsite_configuration import microsite
 
 from courseware.access import has_access
 from courseware.date_summary import (
@@ -37,6 +36,7 @@ import branding
 
 from opaque_keys.edx.keys import UsageKey
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 
 log = logging.getLogger(__name__)
@@ -380,7 +380,7 @@ def get_courses(user, org=None, filter_=None):
     """
     courses = branding.get_visible_courses(org=org, filter_=filter_)
 
-    permission_name = microsite.get_value(
+    permission_name = configuration_helpers.get_value(
         'COURSE_CATALOG_VISIBILITY_PERMISSION',
         settings.COURSE_CATALOG_VISIBILITY_PERMISSION
     )
@@ -394,7 +394,7 @@ def get_permission_for_course_about():
     """
     Returns the CourseOverview object for the course after checking for access.
     """
-    return microsite.get_value(
+    return configuration_helpers.get_value(
         'COURSE_ABOUT_VISIBILITY_PERMISSION',
         settings.COURSE_ABOUT_VISIBILITY_PERMISSION
     )

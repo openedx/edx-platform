@@ -8,13 +8,13 @@ from django.views.generic.base import RedirectView
 from ratelimitbackend import admin
 from django.conf.urls.static import static
 
-from microsite_configuration import microsite
 import auth_exchange.views
 from courseware.views.views import EnrollStaffView
 from config_models.views import ConfigurationModelCurrentAPIView
 from courseware.views.index import CoursewareIndex
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from student.views import LogoutView
 
 # Uncomment the next two lines to enable the admin:
@@ -169,7 +169,7 @@ urlpatterns += (
 )
 
 # Favicon
-favicon_path = microsite.get_value('favicon_path', settings.FAVICON_PATH)
+favicon_path = configuration_helpers.get_value('favicon_path', settings.FAVICON_PATH)  # pylint: disable=invalid-name
 urlpatterns += (url(
     r'^favicon\.ico$',
     RedirectView.as_view(url=settings.STATIC_URL + favicon_path, permanent=True)

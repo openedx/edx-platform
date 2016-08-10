@@ -16,7 +16,7 @@ from django.views.generic import View
 from edx_oauth2_provider import views as dop_views  # django-oauth2-provider views
 from oauth2_provider import models as dot_models, views as dot_views  # django-oauth-toolkit
 
-from openedx.core.djangoapps.theming import helpers
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 from . import adapters
 
@@ -126,7 +126,7 @@ class AccessTokenView(_DispatchingView):
     def _generate_jwt(self, user, scopes, expires_in):
         """ Returns a JWT access token. """
         now = int(time())
-        jwt_auth = helpers.get_value("JWT_AUTH", settings.JWT_AUTH)
+        jwt_auth = configuration_helpers.get_value("JWT_AUTH", settings.JWT_AUTH)
         payload = {
             'iss': jwt_auth['JWT_ISSUER'],
             'aud': jwt_auth['JWT_AUDIENCE'],

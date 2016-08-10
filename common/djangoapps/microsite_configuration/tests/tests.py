@@ -22,7 +22,7 @@ class DatabaseMicrositeTestCase(TestCase):
     def setUp(self):
         super(DatabaseMicrositeTestCase, self).setUp()
         self.microsite = MicrositeFactory.create()
-        MicrositeOrganizationMappingFactory.create(microsite=self.microsite, organization='TestMicrositeX')
+        MicrositeOrganizationMappingFactory.create(microsite=self.microsite, organization='TestSiteX')
 
 
 def side_effect_for_get_value(value, return_value):
