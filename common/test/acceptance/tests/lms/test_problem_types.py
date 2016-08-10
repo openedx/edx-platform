@@ -245,6 +245,31 @@ class ProblemTypeTestMixin(object):
         self.problem_page.click_show()
         self.assertTrue(self.problem_page.is_focus_on_problem_meta())
 
+    @attr(shard=7)
+    def test_reset_clears_answer_and_focus(self):
+        """
+        Scenario: Reset will clear answers and focus on problem meta
+        If I select an answer
+        and then reset the problem
+        There should be no answer selected
+        And the focus should shift appropriately
+        """
+        self.problem_page.wait_for(
+            lambda: self.problem_page.problem_name == self.problem_name,
+            "Make sure the correct problem is on the page"
+        )
+        self.wait_for_status('unanswered')
+        # Set an answer
+        self.answer_problem(correct=True)
+        self.problem_page.click_check()
+        self.wait_for_status('correct')
+        # clear the answers
+        self.problem_page.click_reset()
+        # Focus should change to meta
+        self.assertTrue(self.problem_page.is_focus_on_problem_meta())
+        # Answer should be reset
+        self.wait_for_status('unanswered')
+
     @attr('a11y')
     def test_problem_type_a11y(self):
         """
@@ -285,7 +310,6 @@ class AnnotationProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
     factory = AnnotationResponseXMLFactory()
 
     can_submit_blank = True
-
     factory_kwargs = {
         'title': 'Annotation Problem',
         'text': 'The text being annotated',
@@ -710,6 +734,13 @@ class CodeProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         """
         pass
 
+    def wait_for_status(self, status):
+        """
+        Overridden for script test because the testing grader always responds
+        with "correct"
+        """
+        pass
+
 
 class ChoiceTextProbelmTypeTestBase(ProblemTypeTestBase):
     """
@@ -785,7 +816,6 @@ class CheckboxTextProblemTypeTest(ChoiceTextProbelmTypeTestBase, ProblemTypeTest
     problem_name = 'CHECKBOX TEXT TEST PROBLEM'
     problem_type = 'checkbox_text'
     choice_type = 'checkbox'
-
     factory = ChoiceTextResponseXMLFactory()
 
     factory_kwargs = {
