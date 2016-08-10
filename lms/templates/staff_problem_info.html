@@ -87,16 +87,17 @@ ${block_content}
     <div class="staff_info" style="display:block">
 is_released = ${is_released}
 location = ${location.to_deprecated_string() | h}
+
 <table summary="${_('Module Fields')}">
   <tr><th>${_('Module Fields')}</th></tr>
   %for name, field in fields:
-  <tr><td>${name}</td><td><pre style="display:inline-block; margin: 0;">${field | h}</pre></td></tr>
+  <tr><td style="width:25%">${name}</td><td><pre style="display:inline-block; margin: 0;">${field | h}</pre></td></tr>
   %endfor
 </table>
 <table>
   <tr><th>${_('XML attributes')}</th></tr>
   %for name, field in xml_attributes.items():
-  <tr><td>${name}</td><td><pre style="display:inline-block; margin: 0;">${field | h}</pre></td></tr>
+  <tr><td style="width:25%">${name}</td><td><pre style="display:inline-block; margin: 0;">${field | h}</pre></td></tr>
   %endfor
 </table>
 category = ${category | h}
