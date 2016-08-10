@@ -30,6 +30,10 @@ git+https://github.com/open-craft/problem-builder.git@v2.0.4#egg=xblock-problem-
 -e git+https://github.com/pmitros/AnimationXBlock.git@d2b551bb8f49a138088e10298576102164145b87#egg=animation-xblock
 -e git+https://github.com/pmitros/ProfileXBlock.git@4aeaa24aa2bc7d9cb2d2bb60d6f05def3b856be0#egg=profile-xblock
 
+# This is obsoleted by FeedbackXBlock. We are leaving it in for compatibility
+# with old courses
+-e git+https://github.com/pmitros/RateXBlock.git@367e19c0f6eac8a5f002fd0f1559555f8e74bfff#egg=rate-xblock 
+
 # Peer instruction XBlock
 ubcpi-xblock==0.5.3
 
