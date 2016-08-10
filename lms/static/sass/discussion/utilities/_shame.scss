@@ -7,28 +7,6 @@
   color: $black !important;
 }
 
-// Override global label rules
-.forum-nav-search label {
-  margin-bottom: 0;
-}
-
-// Override global input rules
-.forum-nav-search-input {
-  @include padding-left($baseline/4 !important);
-  @include padding-right($baseline/2 + 12px !important); // Leave room for icon
-  box-shadow: none !important;
-  border: 1px solid $forum-color-border !important;
-  border-radius: $forum-border-radius !important;
-  height: auto !important;
-  font-size: $forum-small-font-size !important;
-}
-
-// Firefox does not compute the correct containing box for absolute positioning
-// of .forum-nav-search .icon, so there's an extra div to make it happy
-.forum-nav-search-ff-position-fix {
-  position: relative;
-}
-
 // Temporary breadcrumbs
 .has-breadcrumbs {
   .breadcrumbs {

@@ -267,6 +267,14 @@ class DiscussionNavigationTest(BaseDiscussionTestCase):
         self.thread_page.q(css=".breadcrumbs .nav-item")[0].click()
         self.assertEqual(len(self.thread_page.q(css=".breadcrumbs .nav-item")), 1)
 
+    def test_breadcrumbs_clear_search(self):
+        self.thread_page.q(css=".search-input").fill("search text")
+        self.thread_page.q(css=".search-btn").click()
+
+        # Verify that clicking the first breadcrumb clears your search
+        self.thread_page.q(css=".breadcrumbs .nav-item")[0].click()
+        self.assertEqual(self.thread_page.q(css=".search-input").text[0], "")
+
 
 @attr(shard=2)
 class DiscussionTabSingleThreadTest(BaseDiscussionTestCase, DiscussionResponsePaginationTestMixin):
