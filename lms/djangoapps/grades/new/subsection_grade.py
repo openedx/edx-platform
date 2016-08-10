@@ -37,7 +37,7 @@ class SubsectionGrade(object):
         """
         List of all problem scores in the subsection.
         """
-        return [score for score, weight in self.locations_to_scores.itervalues()]
+        return [score for score, _ in self.locations_to_scores.itervalues()]
 
     def compute(self, student, course_structure, scores_client, submissions_scores):
         """
@@ -49,7 +49,7 @@ class SubsectionGrade(object):
         ):
             self._compute_block_score(student, descendant_key, course_structure, scores_client, submissions_scores)
 
-        self.all_total, self.graded_total = graders.aggregate_scores(self.scores, self.display_name)
+        self.all_total, self.graded_total = graders.aggregate_scores(self.scores, self.display_name, self.location)
 
     def save(self, student, subsection, course):
         """
@@ -62,7 +62,7 @@ class SubsectionGrade(object):
         PersistentSubsectionGrade.save_grade(
             user_id=student.id,
             usage_key=self.location,
-            course_version=course.course_version,
+            course_version=getattr(course, 'course_version', ""),
             subtree_edited_date=subsection.subtree_edited_on,
             earned_all=self.all_total.earned,
             possible_all=self.all_total.possible,
@@ -102,13 +102,13 @@ class SubsectionGrade(object):
         )
 
     def _compute_block_score(
-        self,
-        student,
-        block_key,
-        course_structure,
-        scores_client,
-        submissions_scores,
-        persisted_values = None,
+            self,
+            student,
+            block_key,
+            course_structure,
+            scores_client,
+            submissions_scores,
+            persisted_values=None,
     ):
         """
         Compute score for the given block. If persisted_values is provided, it will be used for possible and weight.
@@ -177,25 +177,24 @@ class SubsectionGradeFactory(object):
         """
         Returns the saved grade for the student and subsection.
         """
-        #if settings.FEATURES.get('ENABLE_SUBSECTION_GRADES_SAVED') and course.enable_subsection_grades_saved:
-        try:
-            model = PersistentSubsectionGrade.read(
-                user_id=self.student.id,
-                usage_key=subsection.location,
-            )
-            subsection_grade = SubsectionGrade(subsection)
-            subsection_grade.load_from_data(model, course_structure, self._scores_client, self._submissions_scores)
-            return subsection_grade
-        except PersistentSubsectionGrade.DoesNotExist:
-            return None
+        if settings.FEATURES.get('ENABLE_SUBSECTION_GRADES_SAVED') and course.enable_subsection_grades_saved:
+            try:
+                model = PersistentSubsectionGrade.read(
+                    user_id=self.student.id,
+                    usage_key=subsection.location,
+                )
+                subsection_grade = SubsectionGrade(subsection)
+                subsection_grade.load_from_data(model, course_structure, self._scores_client, self._submissions_scores)
+                return subsection_grade
+            except PersistentSubsectionGrade.DoesNotExist:
+                return None
 
     def _update_saved_grade(self, subsection_grade, subsection, course):  # pylint: disable=unused-argument
         """
         Updates the saved grade for the student and subsection.
         """
-        #if settings.FEATURES.get('ENABLE_SUBSECTION_GRADES_SAVED') and course.enable_subsection_grades_saved:
-        _pretend_to_save_subsection_grades()
-        subsection_grade.save(self.student, subsection, course)
+        if settings.FEATURES.get('ENABLE_SUBSECTION_GRADES_SAVED') and course.enable_subsection_grades_saved:
+            subsection_grade.save(self.student, subsection, course)
 
     def _prefetch_scores(self, course_structure, course):
         """
@@ -209,10 +208,3 @@ class SubsectionGradeFactory(object):
             self._submissions_scores = submissions_api.get_scores(
                 unicode(course.id), anonymous_id_for_user(self.student, course.id)
             )
-
-
-def _pretend_to_save_subsection_grades():
-    """
-    Stub to facilitate testing feature flag until robust grade work lands.
-    """
-    pass

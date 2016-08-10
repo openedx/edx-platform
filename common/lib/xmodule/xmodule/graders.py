@@ -26,7 +26,7 @@ def float_sum(iterable):
     return float(sum(iterable))
 
 
-def aggregate_scores(scores, section_name="summary"):
+def aggregate_scores(scores, section_name="summary", location=None):
     """
     scores: A list of Score objects
     returns: A tuple (all_total, graded_total).
@@ -45,7 +45,7 @@ def aggregate_scores(scores, section_name="summary"):
         total_possible,
         False,
         section_name,
-        None
+        location
     )
     #selecting only graded things
     graded_total = Score(
@@ -53,7 +53,7 @@ def aggregate_scores(scores, section_name="summary"):
         total_possible_graded,
         True,
         section_name,
-        None
+        location
     )
 
     return all_total, graded_total
