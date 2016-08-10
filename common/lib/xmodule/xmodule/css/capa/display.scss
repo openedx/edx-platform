@@ -819,10 +819,8 @@ div.problem {
   }
 
   .capa_inputtype.textline.text-input-dynamath, .inputtype.formulaequationinput {
-    display: inline-block;
-
-    input {
-      width: calc(100% - 45px);
+    .trailing_text {
+      display: inline-block;
     }
   }
 }
