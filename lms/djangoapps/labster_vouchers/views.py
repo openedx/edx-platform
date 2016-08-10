@@ -143,7 +143,7 @@ def activate_voucher(request):
     context_id = course_id.to_deprecated_string()
     tasks.activate_voucher.delay(code, anon_uid, request.user.email, context_id)
 
-    return redirect(reverse('dashboard'))
+    return redirect(reverse('info', args=[unicode(course_id)]))
 
 
 def get_license(voucher):

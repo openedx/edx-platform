@@ -5,7 +5,7 @@ import logging
 
 import requests
 from requests.exceptions import RequestException
-from cms import CELERY_APP
+from lms import CELERY_APP
 from django.conf import settings
 
 
