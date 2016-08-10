@@ -75,19 +75,24 @@ def i18n_generate_strict():
 
 @task
 @needs("pavelib.i18n.i18n_extract")
+@cmdopts([
+    ("settings=", "s", "The settings to use (defaults to devstack)"),
+])
 @timed
-def i18n_dummy():
+def i18n_dummy(options):
     """
     Simulate international translation by generating dummy strings
     corresponding to source strings.
     """
+    settings = options.get('settings', DEFAULT_SETTINGS)
+
     sh("i18n_tool dummy")
     # Need to then compile the new dummy strings
     sh("i18n_tool generate")
 
     # Generate static i18n JS files.
     for system in ['lms', 'cms']:
-        sh(django_cmd(system, DEFAULT_SETTINGS, 'compilejsi18n'))
+        sh(django_cmd(system, settings, 'compilejsi18n'))
 
 
 @task
