@@ -1,21 +1,21 @@
 /**
  * Provides helper methods for invoking Studio modal windows in Jasmine tests.
  */
-define(["jquery", "common/js/components/views/feedback_notification", "common/js/components/views/feedback_prompt",
-        "common/js/spec_helpers/template_helpers"],
+define(['jquery', 'common/js/components/views/feedback_notification', 'common/js/components/views/feedback_prompt',
+        'common/js/spec_helpers/template_helpers'],
     function($, NotificationView, Prompt, TemplateHelpers) {
         var installViewTemplates, createFeedbackSpy, verifyFeedbackShowing,
             verifyFeedbackHidden, createNotificationSpy, verifyNotificationShowing,
             verifyNotificationHidden, createPromptSpy, confirmPrompt, inlineEdit, verifyInlineEditChange,
             installMockAnalytics, removeMockAnalytics, verifyPromptShowing, verifyPromptHidden;
 
-        assertDetailsView = function (view, text) {
+        assertDetailsView = function(view, text) {
             expect(view.$el).toContainText(text);
             expect(view.$el).toContainText('ID: 0');
             expect(view.$('.delete')).toExist();
         };
 
-        assertControllerView = function (view, detailsView, editView) {
+        assertControllerView = function(view, detailsView, editView) {
             // Details view by default
             expect(view.$(detailsView)).toExist();
             view.$('.action-edit .edit').click();
@@ -26,7 +26,7 @@ define(["jquery", "common/js/components/views/feedback_notification", "common/js
             expect(view.$(editView)).not.toExist();
         };
 
-        assertAndDeleteItemError = function (that, url, promptText) {
+        assertAndDeleteItemError = function(that, url, promptText) {
             var requests = AjaxHelpers.requests(that),
                 promptSpy = ViewHelpers.createPromptSpy(),
                 notificationSpy = ViewHelpers.createNotificationSpy();
@@ -40,7 +40,7 @@ define(["jquery", "common/js/components/views/feedback_notification", "common/js
             expect($(SELECTORS.itemView)).not.toExist();
         };
 
-        assertAndDeleteItemWithError = function (that, url, listItemView, promptText) {
+        assertAndDeleteItemWithError = function(that, url, listItemView, promptText) {
             var requests = AjaxHelpers.requests(that),
                 promptSpy = ViewHelpers.createPromptSpy(),
                 notificationSpy = ViewHelpers.createNotificationSpy();
@@ -53,14 +53,14 @@ define(["jquery", "common/js/components/views/feedback_notification", "common/js
             expect($(listItemView)).toExist();
         };
 
-        assertUnusedOptions = function (that) {
+        assertUnusedOptions = function(that) {
             that.model.set('usage', []);
             that.view.render();
             expect(that.view.$(SELECTORS.warningMessage)).not.toExist();
             expect(that.view.$(SELECTORS.warningIcon)).not.toExist();
         };
 
-        assertCannotDeleteUsed = function (that, toolTipText, warningText){
+        assertCannotDeleteUsed = function(that, toolTipText, warningText) {
             setUsageInfo(that.model);
             that.view.render();
             expect(that.view.$(SELECTORS.note)).toHaveAttr(

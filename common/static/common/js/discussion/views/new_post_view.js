@@ -18,9 +18,8 @@
             return child;
         };
 
-    if (typeof Backbone !== "undefined" && Backbone !== null) {
+    if (typeof Backbone !== 'undefined' && Backbone !== null) {
         this.NewPostView = (function(_super) {
-
             __extends(NewPostView, _super);
 
             function NewPostView() {
@@ -36,9 +35,9 @@
 
             NewPostView.prototype.initialize = function(options) {
                 var _ref;
-                this.mode = options.mode || "inline";
-                if ((_ref = this.mode) !== "tab" && _ref !== "inline") {
-                    throw new Error("invalid mode: " + this.mode);
+                this.mode = options.mode || 'inline';
+                if ((_ref = this.mode) !== 'tab' && _ref !== 'inline') {
+                    throw new Error('invalid mode: ' + this.mode);
                 }
                 this.course_settings = options.course_settings;
                 this.is_commentable_cohorted = options.is_commentable_cohorted;
@@ -52,15 +51,15 @@
                     cohort_options: this.getCohortOptions(),
                     is_commentable_cohorted: this.is_commentable_cohorted,
                     mode: this.mode,
-                    form_id: this.mode + (this.topicId ? "-" + this.topicId : "")
+                    form_id: this.mode + (this.topicId ? '-' + this.topicId : '')
                 });
-                this.$el.html(_.template($("#new-post-template").html())(context));
-                threadTypeTemplate = _.template($("#thread-type-template").html());
+                this.$el.html(_.template($('#new-post-template').html())(context));
+                threadTypeTemplate = _.template($('#thread-type-template').html());
                 if ($('.js-group-select').is(':disabled')) {
                     $('.group-selector-wrapper').addClass('disabled');
                 }
                 this.addField(threadTypeTemplate({
-                    form_id: _.uniqueId("form-")
+                    form_id: _.uniqueId('form-')
                 }));
                 if (this.isTabMode()) {
                     this.topicView = new DiscussionTopicMenuView({
@@ -70,7 +69,7 @@
                     this.topicView.on('thread:topic_change', this.toggleGroupDropdown);
                     this.addField(this.topicView.render());
                 }
-                return DiscussionUtil.makeWmdEditor(this.$el, $.proxy(this.$, this), "js-post-body");
+                return DiscussionUtil.makeWmdEditor(this.$el, $.proxy(this.$, this), 'js-post-body');
             };
 
             NewPostView.prototype.addField = function(fieldView) {
@@ -78,14 +77,14 @@
             };
 
             NewPostView.prototype.isTabMode = function() {
-                return this.mode === "tab";
+                return this.mode === 'tab';
             };
 
             NewPostView.prototype.getCohortOptions = function() {
                 var user_cohort_id;
-                if (this.course_settings.get("is_cohorted") && DiscussionUtil.isPrivilegedUser()) {
-                    user_cohort_id = $("#discussion-container").data("user-cohort-id");
-                    return _.map(this.course_settings.get("cohorts"), function(cohort) {
+                if (this.course_settings.get('is_cohorted') && DiscussionUtil.isPrivilegedUser()) {
+                    user_cohort_id = $('#discussion-container').data('user-cohort-id');
+                    return _.map(this.course_settings.get('cohorts'), function(cohort) {
                         return {
                             value: cohort.id,
                             text: cohort.name,
@@ -98,10 +97,10 @@
             };
 
             NewPostView.prototype.events = {
-                "submit .forum-new-post-form": "createPost",
-                "change .post-option-input": "postOptionChange",
-                "click .cancel": "cancel",
-                "reset .forum-new-post-form": "updateStyles"
+                'submit .forum-new-post-form': 'createPost',
+                'change .post-option-input': 'postOptionChange',
+                'click .cancel': 'cancel',
+                'reset .forum-new-post-form': 'updateStyles'
             };
 
             NewPostView.prototype.toggleGroupDropdown = function($target) {
@@ -117,11 +116,11 @@
             NewPostView.prototype.postOptionChange = function(event) {
                 var $optionElem, $target;
                 $target = $(event.target);
-                $optionElem = $target.closest(".post-option");
-                if ($target.is(":checked")) {
-                    return $optionElem.addClass("is-enabled");
+                $optionElem = $target.closest('.post-option');
+                if ($target.is(':checked')) {
+                    return $optionElem.addClass('is-enabled');
                 } else {
-                    return $optionElem.removeClass("is-enabled");
+                    return $optionElem.removeClass('is-enabled');
                 }
             };
 
@@ -129,20 +128,20 @@
                 var anonymous, anonymous_to_peers, body, follow, group, thread_type, title, topicId, url,
                     self = this;
                 event.preventDefault();
-                thread_type = this.$(".post-type-input:checked").val();
-                title = this.$(".js-post-title").val();
-                body = this.$(".js-post-body").find(".wmd-input").val();
-                group = this.$(".js-group-select option:selected").attr("value");
-                anonymous = false || this.$(".js-anon").is(":checked");
-                anonymous_to_peers = false || this.$(".js-anon-peers").is(":checked");
-                follow = false || this.$(".js-follow").is(":checked");
+                thread_type = this.$('.post-type-input:checked').val();
+                title = this.$('.js-post-title').val();
+                body = this.$('.js-post-body').find('.wmd-input').val();
+                group = this.$('.js-group-select option:selected').attr('value');
+                anonymous = false || this.$('.js-anon').is(':checked');
+                anonymous_to_peers = false || this.$('.js-anon-peers').is(':checked');
+                follow = false || this.$('.js-follow').is(':checked');
                 topicId = this.isTabMode() ? this.topicView.getCurrentTopicId() : this.topicId;
                 url = DiscussionUtil.urlFor('create_thread', topicId);
                 return DiscussionUtil.safeAjax({
                     $elem: $(event.target),
                     $loading: event ? $(event.target) : void 0,
                     url: url,
-                    type: "POST",
+                    type: 'POST',
                     dataType: 'json',
                     data: {
                         thread_type: thread_type,
@@ -153,7 +152,7 @@
                         auto_subscribe: follow,
                         group_id: group
                     },
-                    error: DiscussionUtil.formErrorHandler(this.$(".post-errors")),
+                    error: DiscussionUtil.formErrorHandler(this.$('.post-errors')),
                     success: function(response) {
                         var thread;
                         thread = new Thread(response.content);
@@ -166,7 +165,7 @@
 
             NewPostView.prototype.cancel = function(event) {
                 event.preventDefault();
-                if (!confirm(gettext("Your post will be discarded."))) {
+                if (!confirm(gettext('Your post will be discarded.'))) {
                     return;
                 }
                 this.trigger('newPost:cancel');
@@ -174,22 +173,20 @@
             };
 
             NewPostView.prototype.resetForm = function() {
-                this.$(".forum-new-post-form")[0].reset();
-                DiscussionUtil.clearFormErrors(this.$(".post-errors"));
-                this.$(".wmd-preview p").html("");
+                this.$('.forum-new-post-form')[0].reset();
+                DiscussionUtil.clearFormErrors(this.$('.post-errors'));
+                this.$('.wmd-preview p').html('');
                 if (this.isTabMode()) {
-                    return this.topicView.setTopic(this.$("a.topic-title").first());
+                    return this.topicView.setTopic(this.$('a.topic-title').first());
                 }
             };
 
             NewPostView.prototype.updateStyles = function() {
                 var self = this;
-                return setTimeout(function() {return self.$(".post-option-input").trigger("change");}, 1);
+                return setTimeout(function() { return self.$('.post-option-input').trigger('change'); }, 1);
             };
 
             return NewPostView;
-
         })(Backbone.View);
     }
-
 }).call(window);

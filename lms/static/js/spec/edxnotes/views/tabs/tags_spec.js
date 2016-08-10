@@ -10,17 +10,17 @@ define([
         var notes = Helpers.getDefaultNotes(),
             getView, getText, getNoteText;
 
-        getText = function (selector) {
-            return $(selector).map(function () { return _.trim($(this).text()); }).toArray();
+        getText = function(selector) {
+            return $(selector).map(function() { return _.trim($(this).text()); }).toArray();
         };
 
-        getNoteText = function (groupIndex) {
-            return $($('.note-group')[groupIndex]).find('.note-excerpt-p').map(function () {
+        getNoteText = function(groupIndex) {
+            return $($('.note-group')[groupIndex]).find('.note-excerpt-p').map(function() {
                 return _.trim($(this).text());
             }).toArray();
         };
 
-        getView = function (collection, tabsCollection, options) {
+        getView = function(collection, tabsCollection, options) {
             var view;
 
             options = _.defaults(options || {}, {
@@ -35,7 +35,7 @@ define([
             return view;
         };
 
-        beforeEach(function () {
+        beforeEach(function() {
             loadFixtures('js/fixtures/edxnotes/edxnotes.html');
             TemplateHelpers.installTemplates([
                 'templates/edxnotes/note-item', 'templates/edxnotes/tab-item'
@@ -45,7 +45,7 @@ define([
             this.tabsCollection = new TabsCollection();
         });
 
-        it('displays a tab and content properly ordered by tag', function () {
+        it('displays a tab and content properly ordered by tag', function() {
             var view = getView(this.collection, this.tabsCollection),
                 tags = getText('.tags-title'),
                 pumpkinNotes = getNoteText(0),

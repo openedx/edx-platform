@@ -29,7 +29,7 @@ function(Backbone, gettext, Certificate) {
             } catch (ex) {
                 // If it didn't parse, and `certificate_info` is an object then return as it is
                 // otherwise return empty array
-                if (typeof certificate_info === 'object'){
+                if (typeof certificate_info === 'object') {
                     return_array = certificate_info;
                 }
                 else {
@@ -44,28 +44,28 @@ function(Backbone, gettext, Certificate) {
             return return_array;
         },
 
-        onModelRemoved: function () {
+        onModelRemoved: function() {
             // remove the certificate web preview UI.
-            if(window.certWebPreview && this.length === 0) {
+            if (window.certWebPreview && this.length === 0) {
                 window.certWebPreview.remove();
             }
             this.toggleAddNewItemButtonState();
         },
 
-        onModelAdd: function () {
+        onModelAdd: function() {
             this.toggleAddNewItemButtonState();
         },
 
         toggleAddNewItemButtonState: function() {
             // user can create a new item e.g certificate; if not exceeded the maxAllowed limit.
-            if(this.length >= this.maxAllowed) {
-                $(".action-add").addClass('action-add-hidden');
+            if (this.length >= this.maxAllowed) {
+                $('.action-add').addClass('action-add-hidden');
             } else {
-                $(".action-add").removeClass('action-add-hidden');
+                $('.action-add').removeClass('action-add-hidden');
             }
         },
 
-        parse: function (certificatesJson) {
+        parse: function(certificatesJson) {
             // Transforms the provided JSON into a Certificates collection
             var modelArray = this.certificate_array(certificatesJson);
 

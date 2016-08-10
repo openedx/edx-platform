@@ -18,7 +18,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
         ContentVisibilityEditor, VerificationAccessEditor, TimedExaminationPreferenceEditor, AccessEditor;
 
     CourseOutlineXBlockModal = BaseModal.extend({
-        events : _.extend({}, BaseModal.prototype.events, {
+        events: _.extend({}, BaseModal.prototype.events, {
             'click .action-save': 'save'
         }),
 
@@ -37,13 +37,13 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             this.options.title = this.getTitle();
         },
 
-        afterRender: function () {
+        afterRender: function() {
             BaseModal.prototype.afterRender.call(this);
             this.initializeEditors();
         },
 
-        initializeEditors: function () {
-            this.options.editors = _.map(this.options.editors, function (Editor) {
+        initializeEditors: function() {
+            this.options.editors = _.map(this.options.editors, function(Editor) {
                 return new Editor({
                     parentElement: this.$('.modal-section'),
                     model: this.model,
@@ -54,11 +54,11 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             }, this);
         },
 
-        getTitle: function () {
+        getTitle: function() {
             return '';
         },
 
-        getIntroductionMessage: function () {
+        getIntroductionMessage: function() {
             return '';
         },
 
@@ -69,7 +69,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
         save: function(event) {
             event.preventDefault();
             var requestData = this.getRequestData();
-            if (!_.isEqual(requestData, { metadata: {} })) {
+            if (!_.isEqual(requestData, {metadata: {}})) {
                 XBlockViewUtils.updateXBlockFields(this.model, requestData, {
                     success: this.options.onSave
                 });
@@ -81,7 +81,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
          * Return context for the modal.
          * @return {Object}
          */
-        getContext: function () {
+        getContext: function() {
             return $.extend({
                 xblockInfo: this.model,
                 introductionMessage: this.getIntroductionMessage(),
@@ -94,8 +94,8 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
          * Return request data.
          * @return {Object}
          */
-        getRequestData: function () {
-            var requestData = _.map(this.options.editors, function (editor) {
+        getRequestData: function() {
+            var requestData = _.map(this.options.editors, function(editor) {
                 return editor.getRequestData();
             });
 
@@ -105,26 +105,26 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
 
     SettingsXBlockModal = CourseOutlineXBlockModal.extend({
 
-        getTitle: function () {
+        getTitle: function() {
             return StringUtils.interpolate(
                 gettext('{display_name} Settings'),
-                { display_name: this.model.get('display_name') }
+                {display_name: this.model.get('display_name')}
             );
         },
 
-        getIntroductionMessage: function () {
+        getIntroductionMessage: function() {
             var message = '';
             var tabs = this.options.tabs;
             if (!tabs || tabs.length < 2) {
                 message = StringUtils.interpolate(
                     gettext('Change the settings for {display_name}'),
-                    { display_name: this.model.get('display_name') }
+                    {display_name: this.model.get('display_name')}
                 );
             }
             return message;
         },
 
-        initializeEditors: function () {
+        initializeEditors: function() {
             var tabs = this.options.tabs;
             if (tabs && tabs.length > 0) {
                 if (tabs.length > 1) {
@@ -133,7 +133,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
                     _.each(this.options.tabs, function(tab) {
                         this.options.editors.push.apply(
                             this.options.editors,
-                            _.map(tab.editors, function (Editor) {
+                            _.map(tab.editors, function(Editor) {
                                 return new Editor({
                                     parent: this,
                                     parentElement: this.$('.modal-section .' + tab.name),
@@ -164,19 +164,19 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
          * Return request data.
          * @return {Object}
          */
-        getRequestData: function () {
-            var requestData = _.map(this.options.editors, function (editor) {
+        getRequestData: function() {
+            var requestData = _.map(this.options.editors, function(editor) {
                 return editor.getRequestData();
             });
             return $.extend.apply(this, [true, {}].concat(requestData));
         },
 
-        handleShowTab: function (event) {
+        handleShowTab: function(event) {
             event.preventDefault();
             this.showTab($(event.target).data('tab'));
         },
 
-        showTab: function (tab) {
+        showTab: function(tab) {
             this.$('.modal-section .settings-tab-button').removeClass('active');
             this.$('.modal-section .settings-tab-button[data-tab="' + tab + '"]').addClass('active');
             this.$('.modal-section .settings-tab').hide();
@@ -186,7 +186,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
 
 
     PublishXBlockModal = CourseOutlineXBlockModal.extend({
-        events : _.extend({}, CourseOutlineXBlockModal.prototype.events, {
+        events: _.extend({}, CourseOutlineXBlockModal.prototype.events, {
             'click .action-publish': 'save'
         }),
 
@@ -197,17 +197,17 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             }
         },
 
-        getTitle: function () {
+        getTitle: function() {
             return StringUtils.interpolate(
                 gettext('Publish {display_name}'),
-                { display_name: this.model.get('display_name') }
+                {display_name: this.model.get('display_name')}
             );
         },
 
-        getIntroductionMessage: function () {
+        getIntroductionMessage: function() {
             return StringUtils.interpolate(
                 gettext('Publish all unpublished changes for this {item}?'),
-                { item: this.options.xblockType }
+                {item: this.options.xblockType}
             );
         },
 
@@ -227,7 +227,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             this.render();
         },
 
-        render: function () {
+        render: function() {
             var html = this.template($.extend({}, {
                 xblockInfo: this.model,
                 xblockType: this.options.xblockType,
@@ -239,11 +239,11 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             this.parentElement.append(this.$el);
         },
 
-        getContext: function () {
+        getContext: function() {
             return {};
         },
 
-        getRequestData: function () {
+        getRequestData: function() {
             return {};
         }
     });
@@ -252,15 +252,15 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
         // Attribute name in the model, should be defined in children classes.
         fieldName: null,
 
-        events : {
+        events: {
             'click .clear-date': 'clearValue'
         },
 
-        afterRender: function () {
+        afterRender: function() {
             AbstractEditor.prototype.afterRender.call(this);
             this.$('input.date').datepicker({'dateFormat': 'm/d/yy'});
             this.$('input.time').timepicker({
-                'timeFormat' : 'H:i',
+                'timeFormat': 'H:i',
                 'forceRoundTime': false
             });
             if (this.model.get(this.fieldName)) {
@@ -277,16 +277,16 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
         templateName: 'due-date-editor',
         className: 'modal-section-content has-actions due-date-input grading-due-date',
 
-        getValue: function () {
+        getValue: function() {
             return DateUtils.getDate(this.$('#due_date'), this.$('#due_time'));
         },
 
-        clearValue: function (event) {
+        clearValue: function(event) {
             event.preventDefault();
             this.$('#due_time, #due_date').val('');
         },
 
-        getRequestData: function () {
+        getRequestData: function() {
             return {
                 metadata: {
                     'due': this.getValue()
@@ -301,23 +301,23 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
         className: 'edit-settings-release scheduled-date-input',
         startingReleaseDate: null,
 
-        afterRender: function () {
+        afterRender: function() {
             BaseDateEditor.prototype.afterRender.call(this);
             // Store the starting date and time so that we can determine if the user
             // actually changed it when "Save" is pressed.
             this.startingReleaseDate = this.getValue();
         },
 
-        getValue: function () {
+        getValue: function() {
             return DateUtils.getDate(this.$('#start_date'), this.$('#start_time'));
         },
 
-        clearValue: function (event) {
+        clearValue: function(event) {
             event.preventDefault();
             this.$('#start_time, #start_date').val('');
         },
 
-        getRequestData: function () {
+        getRequestData: function() {
             var newReleaseDate = this.getValue();
             if (JSON.stringify(newReleaseDate) === JSON.stringify(this.startingReleaseDate)) {
                 return {};
@@ -333,19 +333,19 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
     TimedExaminationPreferenceEditor = AbstractEditor.extend({
         templateName: 'timed-examination-preference-editor',
         className: 'edit-settings-timed-examination',
-        events : {
+        events: {
             'change input.no_special_exam': 'notTimedExam',
             'change input.timed_exam': 'setTimedExam',
             'change input.practice_exam': 'setPracticeExam',
             'change input.proctored_exam': 'setProctoredExam',
             'focusout .field-time-limit input': 'timeLimitFocusout'
         },
-        notTimedExam: function (event) {
+        notTimedExam: function(event) {
             event.preventDefault();
             this.$('.exam-options').hide();
             this.$('.field-time-limit input').val('00:00');
         },
-        selectSpecialExam: function (showRulesField) {
+        selectSpecialExam: function(showRulesField) {
             this.$('.exam-options').show();
             this.$('.field-time-limit').show();
             if (!this.isValidTimeLimit(this.$('.field-time-limit input').val())) {
@@ -358,15 +358,15 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
                 this.$('.field-exam-review-rules').hide();
             }
         },
-        setTimedExam: function (event) {
+        setTimedExam: function(event) {
             event.preventDefault();
             this.selectSpecialExam(false);
         },
-        setPracticeExam: function (event) {
+        setPracticeExam: function(event) {
             event.preventDefault();
             this.selectSpecialExam(false);
         },
-        setProctoredExam: function (event) {
+        setProctoredExam: function(event) {
             event.preventDefault();
             this.selectSpecialExam(true);
         },
@@ -374,13 +374,13 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             event.preventDefault();
             var selectedTimeLimit = $(event.currentTarget).val();
             if (!this.isValidTimeLimit(selectedTimeLimit)) {
-                $(event.currentTarget).val("00:30");
+                $(event.currentTarget).val('00:30');
             }
         },
-        afterRender: function () {
+        afterRender: function() {
             AbstractEditor.prototype.afterRender.call(this);
             this.$('input.time').timepicker({
-                'timeFormat' : 'H:i',
+                'timeFormat': 'H:i',
                 'minTime': '00:30',
                 'maxTime': '24:00',
                 'forceRoundTime': false
@@ -421,48 +421,48 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             var time = this.convertTimeLimitMinutesToString(value);
             this.$('.field-time-limit input').val(time);
         },
-        setReviewRules: function (value) {
+        setReviewRules: function(value) {
             this.$('.field-exam-review-rules textarea').val(value);
         },
         isValidTimeLimit: function(time_limit) {
             var pattern = new RegExp('^\\d{1,2}:[0-5][0-9]$');
-            return pattern.test(time_limit) && time_limit !== "00:00";
+            return pattern.test(time_limit) && time_limit !== '00:00';
         },
-        getExamTimeLimit: function () {
+        getExamTimeLimit: function() {
             return this.$('.field-time-limit input').val();
         },
-        convertTimeLimitMinutesToString: function (timeLimitMinutes) {
-            var hoursStr = "" + Math.floor(timeLimitMinutes / 60);
-            var actualMinutesStr = "" + (timeLimitMinutes % 60);
-            hoursStr = "00".substring(0, 2 - hoursStr.length) + hoursStr;
-            actualMinutesStr = "00".substring(0, 2 - actualMinutesStr.length) + actualMinutesStr;
-            return hoursStr + ":" + actualMinutesStr;
+        convertTimeLimitMinutesToString: function(timeLimitMinutes) {
+            var hoursStr = '' + Math.floor(timeLimitMinutes / 60);
+            var actualMinutesStr = '' + (timeLimitMinutes % 60);
+            hoursStr = '00'.substring(0, 2 - hoursStr.length) + hoursStr;
+            actualMinutesStr = '00'.substring(0, 2 - actualMinutesStr.length) + actualMinutesStr;
+            return hoursStr + ':' + actualMinutesStr;
         },
-        convertTimeLimitToMinutes: function (time_limit) {
+        convertTimeLimitToMinutes: function(time_limit) {
             var time = time_limit.split(':');
             var total_time = (parseInt(time[0]) * 60) + parseInt(time[1]);
             return total_time;
         },
-        getRequestData: function () {
+        getRequestData: function() {
             var is_time_limited;
             var is_practice_exam;
             var is_proctored_exam;
             var time_limit = this.getExamTimeLimit();
             var exam_review_rules = this.$('.field-exam-review-rules textarea').val();
 
-            if (this.$('input.no_special_exam').is(':checked')){
+            if (this.$('input.no_special_exam').is(':checked')) {
                 is_time_limited = false;
                 is_practice_exam = false;
                 is_proctored_exam = false;
-            } else if (this.$('input.timed_exam').is(':checked')){
+            } else if (this.$('input.timed_exam').is(':checked')) {
                 is_time_limited = true;
                 is_practice_exam = false;
                 is_proctored_exam = false;
-            } else if (this.$('input.proctored_exam').is(':checked')){
+            } else if (this.$('input.proctored_exam').is(':checked')) {
                 is_time_limited = true;
                 is_practice_exam = false;
                 is_proctored_exam = true;
-            } else if (this.$('input.practice_exam').is(':checked')){
+            } else if (this.$('input.practice_exam').is(':checked')) {
                 is_time_limited = true;
                 is_practice_exam = true;
                 is_proctored_exam = true;
@@ -488,11 +488,11 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
     AccessEditor = AbstractEditor.extend({
         templateName: 'access-editor',
         className: 'edit-settings-access',
-        events : {
+        events: {
             'change #prereq': 'handlePrereqSelect',
             'keyup #prereq_min_score': 'validateMinScore'
         },
-        afterRender: function () {
+        afterRender: function() {
             AbstractEditor.prototype.afterRender.call(this);
             var prereq = this.model.get('prereq') || '';
             var prereq_min_score = this.model.get('prereq_min_score') || '';
@@ -501,11 +501,11 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             this.$('#prereq_min_score').val(prereq_min_score);
             this.$('#prereq_min_score_input').toggle(prereq.length > 0);
         },
-        handlePrereqSelect: function () {
+        handlePrereqSelect: function() {
             var showPrereqInput = this.$('#prereq option:selected').val().length > 0;
             this.$('#prereq_min_score_input').toggle(showPrereqInput);
         },
-        validateMinScore: function () {
+        validateMinScore: function() {
             var minScore = this.$('#prereq_min_score').val().trim();
             var minScoreInt = parseInt(minScore);
             // minScore needs to be an integer between 0 and 100
@@ -525,7 +525,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
                 BaseModal.prototype.enableActionButton.call(this.parent, 'save');
             }
         },
-        getRequestData: function () {
+        getRequestData: function() {
             var minScore = this.$('#prereq_min_score').val();
             if (minScore) {
                 minScore = minScore.trim();
@@ -537,31 +537,31 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             };
         }
     });
-    
+
     GradingEditor = AbstractEditor.extend({
         templateName: 'grading-editor',
         className: 'edit-settings-grading',
 
-        afterRender: function () {
+        afterRender: function() {
             AbstractEditor.prototype.afterRender.call(this);
             this.setValue(this.model.get('format') || 'notgraded');
         },
 
-        setValue: function (value) {
+        setValue: function(value) {
             this.$('#grading_type').val(value);
         },
 
-        getValue: function () {
+        getValue: function() {
             return this.$('#grading_type').val();
         },
 
-        getRequestData: function () {
+        getRequestData: function() {
             return {
                 'graderType': this.getValue()
             };
         },
 
-        getContext: function () {
+        getContext: function() {
             return {
                 graderTypes: this.model.get('course_graders')
             };
@@ -571,7 +571,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
     PublishEditor = AbstractEditor.extend({
         templateName: 'publish-editor',
         className: 'edit-settings-publish',
-        getRequestData: function () {
+        getRequestData: function() {
             return {
                 publish: 'make_public'
             };
@@ -579,7 +579,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
     });
 
     AbstractVisibilityEditor = AbstractEditor.extend({
-        afterRender: function () {
+        afterRender: function() {
             AbstractEditor.prototype.afterRender.call(this);
         },
 
@@ -591,7 +591,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             return this.model.get('ancestor_has_staff_lock');
         },
 
-        getContext: function () {
+        getContext: function() {
             return {
                 hasExplicitStaffLock: this.isModelLocked(),
                 ancestorLocked: this.isAncestorLocked()
@@ -602,7 +602,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
     StaffLockEditor = AbstractVisibilityEditor.extend({
         templateName: 'staff-lock-editor',
         className: 'edit-staff-lock',
-        afterRender: function () {
+        afterRender: function() {
             AbstractVisibilityEditor.prototype.afterRender.call(this);
             this.setLock(this.isModelLocked());
         },
@@ -630,7 +630,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             } else {
                 return {};
             }
-        },
+        }
     });
 
     ContentVisibilityEditor = AbstractVisibilityEditor.extend({
@@ -650,14 +650,14 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             }
         },
 
-        afterRender: function () {
+        afterRender: function() {
             AbstractVisibilityEditor.prototype.afterRender.call(this);
             this.setVisibility(this.modelVisibility());
             this.$('input[name=content-visibility]:checked').change();
         },
 
         setVisibility: function(value) {
-            this.$('input[name=content-visibility][value='+value+']').prop('checked', true);
+            this.$('input[name=content-visibility][value=' + value + ']').prop('checked', true);
         },
 
         currentVisibility: function() {
@@ -708,11 +708,11 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             }
         },
 
-        getContext: function () {
+        getContext: function() {
             return $.extend(
                 {},
                 AbstractVisibilityEditor.prototype.getContext.call(this),
-                { hide_after_due: this.modelVisibility() === 'hide_after_due'}
+                {hide_after_due: this.modelVisibility() === 'hide_after_due'}
             );
         }
     });
@@ -726,11 +726,11 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
         ALLOW_GROUP_ID: 1,
 
         getSelectedPartition: function() {
-            var hasRestrictions = $("#verification-access-checkbox").is(":checked"),
+            var hasRestrictions = $('#verification-access-checkbox').is(':checked'),
                 selectedPartitionID = null;
 
             if (hasRestrictions) {
-                selectedPartitionID = $("#verification-partition-select").val();
+                selectedPartitionID = $('#verification-partition-select').val();
             }
 
             return parseInt(selectedPartitionID, 10);
@@ -765,7 +765,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             // Otherwise, all groups in the partition have access.
             //
             _.each(userPartitions, function(partition) {
-                if (partition.scheme === "verification") {
+                if (partition.scheme === 'verification') {
                     if (selectedPartition === partition.id) {
                         groupAccess[partition.id] = [that.ALLOW_GROUP_ID];
                     } else {
@@ -784,13 +784,13 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             return hasChanges ? {
                 publish: 'republish',
                 metadata: {
-                    group_access: groupAccess,
+                    group_access: groupAccess
                 }
             } : {};
         },
 
         getContext: function() {
-            var partitions = this.model.get("user_partitions"),
+            var partitions = this.model.get('user_partitions'),
                 hasRestrictions = false,
                 verificationPartitions = [],
                 isSelected = false;
@@ -801,27 +801,27 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             // To avoid searching all the groups, we're assuming that the editor
             // either sets the ALLOW group or doesn't set any groups (implicitly allow all).
             _.each(partitions, function(item) {
-                if (item.scheme === "verification") {
-                    isSelected = _.any(_.pluck(item.groups, "selected"));
+                if (item.scheme === 'verification') {
+                    isSelected = _.any(_.pluck(item.groups, 'selected'));
                     hasRestrictions = hasRestrictions || isSelected;
 
                     verificationPartitions.push({
-                        "id": item.id,
-                        "name": item.name,
-                        "selected": isSelected,
+                        'id': item.id,
+                        'name': item.name,
+                        'selected': isSelected
                     });
                 }
             });
 
             return {
-                "hasVerificationRestrictions": hasRestrictions,
-                "verificationPartitions": verificationPartitions,
+                'hasVerificationRestrictions': hasRestrictions,
+                'verificationPartitions': verificationPartitions
             };
         }
     });
 
     return {
-        getModal: function (type, xblockInfo, options) {
+        getModal: function(type, xblockInfo, options) {
             if (type === 'edit') {
                 return this.getEditModal(xblockInfo, options);
             } else if (type === 'publish') {
@@ -829,8 +829,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             }
         },
 
-        getEditModal: function (xblockInfo, options) {
-
+        getEditModal: function(xblockInfo, options) {
             var tabs = [];
             var editors = [];
             if (xblockInfo.isVertical()) {
@@ -872,7 +871,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             /* globals course */
             if (course.get('self_paced')) {
                 editors = _.without(editors, ReleaseDateEditor, DueDateEditor);
-                _.each(tabs, function (tab) {
+                _.each(tabs, function(tab) {
                     tab.editors = _.without(tab.editors, ReleaseDateEditor, DueDateEditor);
                 });
             }
@@ -884,7 +883,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             }, options));
         },
 
-        getPublishModal: function (xblockInfo, options) {
+        getPublishModal: function(xblockInfo, options) {
             return new PublishXBlockModal($.extend({
                 editors: [PublishEditor],
                 model: xblockInfo

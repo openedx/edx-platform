@@ -1,10 +1,10 @@
 define([
     'backbone', 'underscore', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'teams/js/models/team',
     'teams/js/views/team_profile_header_actions', 'teams/js/spec_helpers/team_spec_helpers'
-], function (Backbone, _, AjaxHelpers, TeamModel, TeamProfileHeaderActionsView, TeamSpecHelpers) {
+], function(Backbone, _, AjaxHelpers, TeamModel, TeamProfileHeaderActionsView, TeamSpecHelpers) {
     'use strict';
 
-    describe('TeamProfileHeaderActionsView', function () {
+    describe('TeamProfileHeaderActionsView', function() {
         var createTeamsUrl,
             createTeamModelData,
             createMembershipData,
@@ -12,12 +12,12 @@ define([
             verifyErrorMessage,
             ACCOUNTS_API_URL = '/api/user/v1/accounts/';
 
-        createTeamsUrl = function (teamId) {
+        createTeamsUrl = function(teamId) {
             return TeamSpecHelpers.testContext.teamsUrl + teamId + '?expand=user';
         };
 
-        createTeamModelData = function (teamId, teamName, membership) {
-            return  {
+        createTeamModelData = function(teamId, teamName, membership) {
+            return {
                 id: teamId,
                 name: teamName,
                 membership: membership,
@@ -26,7 +26,7 @@ define([
         };
 
         createHeaderActionsView = function(requests, maxTeamSize, currentUsername, teamModelData, showEditButton) {
-            var model = new TeamModel(teamModelData, { parse: true }),
+            var model = new TeamModel(teamModelData, {parse: true}),
                 context = TeamSpecHelpers.createMockContext({
                     maxTeamSize: maxTeamSize,
                     userInfo: TeamSpecHelpers.createMockUserInfo({
@@ -46,37 +46,36 @@ define([
             ).render();
         };
 
-        createMembershipData = function (username) {
+        createMembershipData = function(username) {
             return [
                 {
-                    "user": {
-                        "username": username,
-                        "url": ACCOUNTS_API_URL + username
+                    'user': {
+                        'username': username,
+                        'url': ACCOUNTS_API_URL + username
                     }
                 }
             ];
         };
 
-        describe('JoinButton', function () {
-
-            beforeEach(function () {
+        describe('JoinButton', function() {
+            beforeEach(function() {
                 setFixtures(
                     '<div class="teams-content"><div class="msg-content"><div class="copy"></div></div><div class="header-action-view"></div></div>'
                 );
             });
 
-            verifyErrorMessage = function (requests, errorMessage, expectedMessage, joinTeam) {
+            verifyErrorMessage = function(requests, errorMessage, expectedMessage, joinTeam) {
                 var view = createHeaderActionsView(requests, 1, 'ma', createTeamModelData('teamA', 'teamAlpha', []));
                 if (joinTeam) {
                     // if we want the error to return when user try to join team, respond with no membership
-                    AjaxHelpers.respondWithJson(requests, {"count": 0});
+                    AjaxHelpers.respondWithJson(requests, {'count': 0});
                     view.$('.action.action-primary').click();
                 }
                 AjaxHelpers.respondWithTextError(requests, 400, errorMessage);
                 expect($('.msg-content .copy').text().trim()).toBe(expectedMessage);
             };
 
-            it('can render itself', function () {
+            it('can render itself', function() {
                 var requests = AjaxHelpers.requests(this);
                 var teamModelData = createTeamModelData('teamA', 'teamAlpha', createMembershipData('ma'));
                 var view = createHeaderActionsView(requests, 1, 'ma', teamModelData);
@@ -84,7 +83,7 @@ define([
                 expect(view.$('.join-team').length).toEqual(1);
             });
 
-            it('can join team successfully', function () {
+            it('can join team successfully', function() {
                 var requests = AjaxHelpers.requests(this);
                 var currentUsername = 'ma1';
                 var teamId = 'teamA';
@@ -103,7 +102,7 @@ define([
                 );
 
                 // current user is not a member of any team so we should see the Join Team button
-                AjaxHelpers.respondWithJson(requests, {"count": 0});
+                AjaxHelpers.respondWithJson(requests, {'count': 0});
                 expect(view.$('.action.action-primary').length).toEqual(1);
 
                 // a post request will be sent to add current user to current team
@@ -132,7 +131,7 @@ define([
                 expect(view.$('.join-team-message').length).toEqual(0);
             });
 
-            it('shows already member message', function () {
+            it('shows already member message', function() {
                 var requests = AjaxHelpers.requests(this);
                 var currentUsername = 'ma1';
                 var view = createHeaderActionsView(requests, 1, currentUsername, createTeamModelData('teamA', 'teamAlpha', []));
@@ -148,12 +147,12 @@ define([
                 );
 
                 // current user is a member of another team so we should see the correct message
-                AjaxHelpers.respondWithJson(requests, {"count": 1});
+                AjaxHelpers.respondWithJson(requests, {'count': 1});
                 expect(view.$('.action.action-primary').length).toEqual(0);
                 expect(view.$('.join-team-message').text().trim()).toBe(view.alreadyMemberMessage);
             });
 
-            it('shows team full message', function () {
+            it('shows team full message', function() {
                 var requests = AjaxHelpers.requests(this);
                 var view = createHeaderActionsView(
                     requests,
@@ -171,7 +170,7 @@ define([
                 AjaxHelpers.expectNoRequests(requests);
             });
 
-            it('shows correct error message if user fails to join team', function () {
+            it('shows correct error message if user fails to join team', function() {
                 var requests = AjaxHelpers.requests(this);
 
                 // verify user_message
@@ -199,7 +198,7 @@ define([
                 );
             });
 
-            it('shows correct error message if initializing the view fails', function () {
+            it('shows correct error message if initializing the view fails', function() {
                 var requests = AjaxHelpers.requests(this);
 
                 // verify user_message
@@ -231,17 +230,17 @@ define([
                 expect(view.$('.action-edit-team').length).toEqual(showEditButton ? 1 : 0);
             };
 
-            it('renders when option showEditButton is true', function () {
+            it('renders when option showEditButton is true', function() {
                 var requests = AjaxHelpers.requests(this);
                 createAndAssertView(requests, true);
             });
 
-            it('does not render when option showEditButton is false', function () {
+            it('does not render when option showEditButton is false', function() {
                 var requests = AjaxHelpers.requests(this);
                 createAndAssertView(requests, false);
             });
 
-            it("can navigate to correct url", function () {
+            it('can navigate to correct url', function() {
                 var requests = AjaxHelpers.requests(this);
                 spyOn(Backbone.history, 'navigate');
                 createAndAssertView(requests, true);

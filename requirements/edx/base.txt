@@ -183,3 +183,6 @@ pynliner==0.5.2
 
 # for sailthru integration
 sailthru-client==2.2.3
+
+# Release utils for the edx release pipeline
+edx-django-release-util==0.0.4

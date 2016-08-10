@@ -1,4 +1,4 @@
-;(function (define) {
+(function(define) {
     'use strict';
 
     define([
@@ -8,13 +8,13 @@
         'js/learner_dashboard/collections/program_collection',
         'js/learner_dashboard/collections/program_progress_collection'
     ],
-    function (CollectionListView, SidebarView, ProgramCardView, ProgramCollection, ProgressCollection) {
-        return function (options) {
+    function(CollectionListView, SidebarView, ProgramCardView, ProgramCollection, ProgressCollection) {
+        return function(options) {
             var progressCollection = new ProgressCollection();
 
-            if ( options.userProgress ) {
+            if (options.userProgress) {
                 progressCollection.set(options.userProgress);
-                options.progressCollection = progressCollection; 
+                options.progressCollection = progressCollection;
             }
 
             new CollectionListView({
@@ -28,7 +28,7 @@
                 }
             }).render();
 
-            if ( options.programsData.length ) {
+            if (options.programsData.length) {
                 new SidebarView({
                     el: '.sidebar',
                     context: options

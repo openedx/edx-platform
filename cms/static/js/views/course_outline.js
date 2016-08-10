@@ -8,13 +8,12 @@
  *  - changes cause a refresh of the entire section rather than just the view for the changed xblock
  *  - adding units will automatically redirect to the unit page rather than showing them inline
  */
-define(["jquery", "underscore", "js/views/xblock_outline", "common/js/components/utils/view_utils", "js/views/utils/xblock_utils",
-        "js/models/xblock_outline_info", "js/views/modals/course_outline_modals", "js/utils/drag_and_drop"],
+define(['jquery', 'underscore', 'js/views/xblock_outline', 'common/js/components/utils/view_utils', 'js/views/utils/xblock_utils',
+        'js/models/xblock_outline_info', 'js/views/modals/course_outline_modals', 'js/utils/drag_and_drop'],
     function(
         $, _, XBlockOutlineView, ViewUtils, XBlockViewUtils,
         XBlockOutlineInfo, CourseOutlineModalsFactory, ContentDragger
     ) {
-
         var CourseOutlineView = XBlockOutlineView.extend({
             // takes XBlockOutlineInfo as a model
 
@@ -67,7 +66,7 @@ define(["jquery", "underscore", "js/views/xblock_outline", "common/js/components
              * @param isCollapsed true if the element should be collapsed, else false
              */
             refreshWithCollapsedState: function(isCollapsed) {
-                var locator =  this.model.get('id');
+                var locator = this.model.get('id');
                 if (isCollapsed) {
                     this.expandedLocators.remove(locator);
                 }
@@ -192,7 +191,7 @@ define(["jquery", "underscore", "js/views/xblock_outline", "common/js/components
             },
 
             makeContentDraggable: function(element) {
-                if ($(element).hasClass("outline-section")) {
+                if ($(element).hasClass('outline-section')) {
                     ContentDragger.makeDraggable(element, {
                         type: '.outline-section',
                         handleClass: '.section-drag-handle',
@@ -202,7 +201,7 @@ define(["jquery", "underscore", "js/views/xblock_outline", "common/js/components
                         ensureChildrenRendered: this.ensureChildrenRendered.bind(this)
                     });
                 }
-                else if ($(element).hasClass("outline-subsection")) {
+                else if ($(element).hasClass('outline-subsection')) {
                     ContentDragger.makeDraggable(element, {
                         type: '.outline-subsection',
                         handleClass: '.subsection-drag-handle',
@@ -212,7 +211,7 @@ define(["jquery", "underscore", "js/views/xblock_outline", "common/js/components
                         ensureChildrenRendered: this.ensureChildrenRendered.bind(this)
                     });
                 }
-                else if ($(element).hasClass("outline-unit")) {
+                else if ($(element).hasClass('outline-unit')) {
                     ContentDragger.makeDraggable(element, {
                         type: '.outline-unit',
                         handleClass: '.unit-drag-handle',

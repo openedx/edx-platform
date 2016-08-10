@@ -1,12 +1,12 @@
-/* 
+/*
  * JSChannel (https://github.com/mozilla/jschannel) will be loaded prior to this
- * script. We will use it use to let JSInput call 'gradeFn', and eventually 
- * 'stateGetter' & 'stateSetter' in the iframe's content even if it hasn't the 
+ * script. We will use it use to let JSInput call 'gradeFn', and eventually
+ * 'stateGetter' & 'stateSetter' in the iframe's content even if it hasn't the
  * same origin, therefore bypassing SOP:
  * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Same_origin_policy_for_JavaScript
- */    
+ */
 
-var JSInput = (function ($, undefined) {
+var JSInput = (function($, undefined) {
     // Initialize js inputs on current page.
     // N.B.: No library assumptions about the iframe can be made (including,
     // most relevantly, jquery). Keep in mind what happens in which context
@@ -22,12 +22,12 @@ var JSInput = (function ($, undefined) {
 
     // Take a string and find the nested object that corresponds to it. E.g.:
     //    _deepKey(obj, "an.example") -> obj["an"]["example"]
-    function _deepKey(obj, path){
-        for (var i = 0, p=path.split('.'), len = p.length; i < len; i++){
+    function _deepKey(obj, path) {
+        for (var i = 0, p = path.split('.'), len = p.length; i < len; i++) {
             obj = obj[p[i]];
         }
         return obj;
-    };
+    }
 
 
     /*      END     Utils                                   */
@@ -40,41 +40,41 @@ var JSInput = (function ($, undefined) {
         /*                      Private methods                          */
 
         var section = $(elem).parent().find('section[class="jsinput"]'),
-            sectionAttr = function (e) { return $(section).attr(e); },
+            sectionAttr = function(e) { return $(section).attr(e); },
             iframe = $(elem).find('iframe[name^="iframe_"]').get(0),
             cWindow = iframe.contentWindow,
-            path = iframe.src.substring(0, iframe.src.lastIndexOf("/")+1),
+            path = iframe.src.substring(0, iframe.src.lastIndexOf('/') + 1),
             // Get the hidden input field to pass to customresponse
             inputField = $(elem).parent().find('input[id^="input_"]'),
             // Get the grade function name
-            gradeFn = sectionAttr("data"),
+            gradeFn = sectionAttr('data'),
             // Get state getter
-            stateGetter = sectionAttr("data-getstate"),
+            stateGetter = sectionAttr('data-getstate'),
             // Get state setter
-            stateSetter = sectionAttr("data-setstate"),
+            stateSetter = sectionAttr('data-setstate'),
             // Get stored state
-            storedState = sectionAttr("data-stored"),
+            storedState = sectionAttr('data-stored'),
             // Get initial state
-            initialState = sectionAttr("data-initial-state"),
+            initialState = sectionAttr('data-initial-state'),
             // Bypass single-origin policy only if this attribute is "false"
             // In that case, use JSChannel to do so.
-            sop = sectionAttr("data-sop"),
+            sop = sectionAttr('data-sop'),
             channel;
-        
-        sop = (sop !== "false");
+
+        sop = (sop !== 'false');
 
         if (!sop) {
             channel = Channel.build({
                 window: cWindow,
                 origin: path,
-                scope: "JSInput"
+                scope: 'JSInput'
             });
-         }   
+        }
 
         /*                       Public methods                     */
-        
+
         // Only one public method that updates the hidden input field.
-        var update = function (callback) {
+        var update = function(callback) {
             var answer, state, store;
 
             if (sop) {
@@ -85,7 +85,7 @@ var JSInput = (function ($, undefined) {
                     state = unescape(_deepKey(cWindow, stateGetter)());
                     store = {
                         answer: answer,
-                        state:  state
+                        state: state
                     };
                     inputField.val(JSON.stringify(store));
                 } else {
@@ -94,8 +94,8 @@ var JSInput = (function ($, undefined) {
                 callback();
             } else {
                 channel.call({
-                    method: "getGrade",
-                    params: "",
+                    method: 'getGrade',
+                    params: '',
                     success: function(val) {
                         answer = decodeURI(val.toString());
 
@@ -103,13 +103,13 @@ var JSInput = (function ($, undefined) {
                         // state unless set state is defined.
                         if (stateGetter && stateSetter) {
                             channel.call({
-                                method: "getState",
-                                params: "",
+                                method: 'getState',
+                                params: '',
                                 success: function(val) {
                                     state = decodeURI(val.toString());
                                     store = {
                                         answer: answer,
-                                        state:  state
+                                        state: state
                                     };
                                     inputField.val(JSON.stringify(store));
                                     callback();
@@ -144,8 +144,8 @@ var JSInput = (function ($, undefined) {
                     jsonValue = storedState;
                 }
 
-                if (typeof(jsonValue) === "object") {
-                    stateValue = jsonValue["state"];
+                if (typeof(jsonValue) === 'object') {
+                    stateValue = jsonValue['state'];
                 } else {
                     stateValue = jsonValue;
                 }
@@ -161,19 +161,19 @@ var JSInput = (function ($, undefined) {
             // calling it, but might just need more time. Give the functions
             // more time.)
             // 200 ms and 5 times are arbitrary but this has functioned with the
-            // only application that has ever used JSInput, jsVGL. Something 
+            // only application that has ever used JSInput, jsVGL. Something
             // more sturdy should be put in place.
             function whileloop(n) {
-                if (n > 0){
+                if (n > 0) {
                     try {
                         if (sop) {
                             _deepKey(cWindow, stateSetter)(stateValue);
                         } else {
                             channel.call({
-                                method: "setState",
+                                method: 'setState',
                                 params: stateValue,
                                 success: function() {
-                                }    
+                                }
                             });
                         }
                     } catch (err) {
@@ -181,7 +181,7 @@ var JSInput = (function ($, undefined) {
                     }
                 }
                 else {
-                    console.debug("Error: could not set state");
+                    console.debug('Error: could not set state');
                 }
             }
             whileloop(5);
@@ -197,17 +197,17 @@ var JSInput = (function ($, undefined) {
         // rest of the page or when it is submitted, will this constructor be
         // called again.
         allSections.each(function(index, value) {
-            var dataProcessed = ($(value).attr("data-processed") === "true");
+            var dataProcessed = ($(value).attr('data-processed') === 'true');
             if (!dataProcessed) {
                 jsinputConstructor(value);
-                $(value).attr("data-processed", 'true');
+                $(value).attr('data-processed', 'true');
             }
         });
     }
 
     // This is ugly, but without a timeout pages with multiple/heavy jsinputs
     // don't load properly.
-    // 300 ms is arbitrary but this has functioned with the only application 
+    // 300 ms is arbitrary but this has functioned with the only application
     // that has ever used JSInput, jsVGL. Something more sturdy should be put in
     // place.
     if ($.isReady) {
@@ -220,5 +220,4 @@ var JSInput = (function ($, undefined) {
         jsinputConstructor: jsinputConstructor,
         walkDOM: walkDOM
     };
-    
 })(window.jQuery);

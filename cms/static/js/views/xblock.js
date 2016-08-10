@@ -1,12 +1,12 @@
-define(["jquery", "underscore", "common/js/components/utils/view_utils", "js/views/baseview", "xblock/runtime.v1"],
-    function ($, _, ViewUtils, BaseView, XBlock) {
+define(['jquery', 'underscore', 'common/js/components/utils/view_utils', 'js/views/baseview', 'xblock/runtime.v1'],
+    function($, _, ViewUtils, BaseView, XBlock) {
         'use strict';
 
         var XBlockView = BaseView.extend({
             // takes XBlockInfo as a model
 
             events: {
-                "click .notification-action-button": "fireNotificationActionEvent"
+                'click .notification-action-button': 'fireNotificationActionEvent'
             },
 
             initialize: function() {
@@ -20,10 +20,10 @@ define(["jquery", "underscore", "common/js/components/utils/view_utils", "js/vie
                     xblockInfo = this.model,
                     xblockUrl = xblockInfo.url();
                 return $.ajax({
-                    url: decodeURIComponent(xblockUrl) + "/" + view,
+                    url: decodeURIComponent(xblockUrl) + '/' + view,
                     type: 'GET',
                     cache: false,
-                    headers: { Accept: 'application/json' },
+                    headers: {Accept: 'application/json'},
                     success: function(fragment) {
                         self.handleXBlockFragment(fragment, options);
                     }
@@ -54,10 +54,10 @@ define(["jquery", "underscore", "common/js/components/utils/view_utils", "js/vie
                         self.xblock = self.initRuntimeData(xblock, options);
                         self.xblockReady(self.xblock);
                         self.$('.xblock_asides-v1').each(function() {
-                             if (!$(this).hasClass('xblock-initialized')) {
-                                 var aside = XBlock.initializeBlock($(this));
-                                 self.initRuntimeData(aside, options);
-                             }
+                            if (!$(this).hasClass('xblock-initialized')) {
+                                var aside = XBlock.initializeBlock($(this));
+                                self.initRuntimeData(aside, options);
+                            }
                         });
                         if (successCallback) {
                             successCallback(xblock);
@@ -92,7 +92,7 @@ define(["jquery", "underscore", "common/js/components/utils/view_utils", "js/vie
                 } else if (this.xblock) {
                     var xblock_children = this.xblock.element && $(this.xblock.element).prop('xblock_children');
                     if (xblock_children) {
-                        $(xblock_children).each(function () {
+                        $(xblock_children).each(function() {
                             if (this.runtime) {
                                 this.runtime.notify(eventName, data);
                             }
@@ -134,7 +134,7 @@ define(["jquery", "underscore", "common/js/components/utils/view_utils", "js/vie
                 try {
                     this.updateHtml(element, html);
                     return this.addXBlockFragmentResources(resources);
-                } catch(e) {
+                } catch (e) {
                     console.error(e.stack);
                     return $.Deferred().resolve();
                 }
@@ -202,20 +202,20 @@ define(["jquery", "underscore", "common/js/components/utils/view_utils", "js/vie
                     kind = resource.kind,
                     placement = resource.placement,
                     data = resource.data;
-                if (mimetype === "text/css") {
-                    if (kind === "text") {
-                        head.append("<style type='text/css'>" + data + "</style>");
-                    } else if (kind === "url") {
+                if (mimetype === 'text/css') {
+                    if (kind === 'text') {
+                        head.append("<style type='text/css'>" + data + '</style>');
+                    } else if (kind === 'url') {
                         head.append("<link rel='stylesheet' href='" + data + "' type='text/css'>");
                     }
-                } else if (mimetype === "application/javascript") {
-                    if (kind === "text") {
-                        head.append("<script>" + data + "</script>");
-                    } else if (kind === "url") {
+                } else if (mimetype === 'application/javascript') {
+                    if (kind === 'text') {
+                        head.append('<script>' + data + '</script>');
+                    } else if (kind === 'url') {
                         return ViewUtils.loadJavaScript(data);
                     }
-                } else if (mimetype === "text/html") {
-                    if (placement === "head") {
+                } else if (mimetype === 'text/html') {
+                    if (placement === 'head') {
                         head.append(data);
                     }
                 }
@@ -224,10 +224,10 @@ define(["jquery", "underscore", "common/js/components/utils/view_utils", "js/vie
             },
 
             fireNotificationActionEvent: function(event) {
-                var eventName = $(event.currentTarget).data("notification-action");
+                var eventName = $(event.currentTarget).data('notification-action');
                 if (eventName) {
                     event.preventDefault();
-                    this.notifyRuntime(eventName, this.model.get("id"));
+                    this.notifyRuntime(eventName, this.model.get('id'));
                 }
             }
         });

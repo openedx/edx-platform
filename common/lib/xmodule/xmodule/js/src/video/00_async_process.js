@@ -1,9 +1,9 @@
-(function (define) {
-define(
+(function(define) {
+    define(
 'video/00_async_process.js',
 [],
 function() {
-"use strict";
+    'use strict';
 /**
  * Provides convenient way to process big amount of data without UI blocking.
  *
@@ -13,7 +13,7 @@ function() {
  *                 certain type bound to the collection, queued or not, have finished.
  */
     var AsyncProcess = {
-        array: function (list, process) {
+        array: function(list, process) {
             if (!_.isArray(list)) {
                 return $.Deferred().reject().promise();
             }
@@ -28,11 +28,11 @@ function() {
                 index = 0,
                 len = list.length;
 
-            var getCurrentTime = function () {
+            var getCurrentTime = function() {
                 return (new Date()).getTime();
             };
 
-            var handler = function () {
+            var handler = function() {
                 var start = getCurrentTime();
 
                 do {

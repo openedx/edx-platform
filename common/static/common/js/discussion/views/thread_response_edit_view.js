@@ -18,9 +18,8 @@
             return child;
         };
 
-    if (typeof Backbone !== "undefined" && Backbone !== null) {
+    if (typeof Backbone !== 'undefined' && Backbone !== null) {
         this.ThreadResponseEditView = (function(_super) {
-
             __extends(ThreadResponseEditView, _super);
 
             function ThreadResponseEditView() {
@@ -28,8 +27,8 @@
             }
 
             ThreadResponseEditView.prototype.events = {
-                "click .post-update": "update",
-                "click .post-cancel": "cancel_edit"
+                'click .post-update': 'update',
+                'click .post-cancel': 'cancel_edit'
             };
 
             ThreadResponseEditView.prototype.$ = function(selector) {
@@ -41,24 +40,22 @@
             };
 
             ThreadResponseEditView.prototype.render = function() {
-                this.template = _.template($("#thread-response-edit-template").html());
+                this.template = _.template($('#thread-response-edit-template').html());
                 this.$el.html(this.template(this.model.toJSON()));
                 this.delegateEvents();
-                DiscussionUtil.makeWmdEditor(this.$el, $.proxy(this.$, this), "edit-post-body");
+                DiscussionUtil.makeWmdEditor(this.$el, $.proxy(this.$, this), 'edit-post-body');
                 return this;
             };
 
             ThreadResponseEditView.prototype.update = function(event) {
-                return this.trigger("response:update", event);
+                return this.trigger('response:update', event);
             };
 
             ThreadResponseEditView.prototype.cancel_edit = function(event) {
-                return this.trigger("response:cancel_edit", event);
+                return this.trigger('response:cancel_edit', event);
             };
 
             return ThreadResponseEditView;
-
         })(Backbone.View);
     }
-
 }).call(window);

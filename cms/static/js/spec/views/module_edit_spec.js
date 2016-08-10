@@ -228,7 +228,7 @@
                         return expect($('head').append).toHaveBeenCalledWith('head-html');
                     });
                     it("doesn't load body html", function() {
-                        return expect($.fn.append).not.toHaveBeenCalledWith("not-head-html");
+                        return expect($.fn.append).not.toHaveBeenCalledWith('not-head-html');
                     });
                     it("doesn't reload resources", function() {
                         var count;

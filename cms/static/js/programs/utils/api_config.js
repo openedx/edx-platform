@@ -1,7 +1,7 @@
 define([
-        'js/programs/models/api_config_model'
-    ],
-    function( ApiConfigModel ) {
+    'js/programs/models/api_config_model'
+],
+    function(ApiConfigModel) {
         'use strict';
 
         /**
@@ -16,6 +16,5 @@ define([
         }
 
         return instance;
-
     }
 );

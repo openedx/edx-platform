@@ -1,7 +1,6 @@
-define(["jquery", "underscore", "js/views/modals/base_modal", "js/spec_helpers/modal_helpers"],
-    function ($, _, BaseModal, ModelHelpers) {
-
-        describe("BaseModal", function() {
+define(['jquery', 'underscore', 'js/views/modals/base_modal', 'js/spec_helpers/modal_helpers'],
+    function($, _, BaseModal, ModelHelpers) {
+        describe('BaseModal', function() {
             var MockModal, modal, showMockModal;
 
             MockModal = BaseModal.extend({
@@ -12,12 +11,12 @@ define(["jquery", "underscore", "js/views/modals/base_modal", "js/spec_helpers/m
 
             showMockModal = function() {
                 modal = new MockModal({
-                    title: "Mock Modal"
+                    title: 'Mock Modal'
                 });
                 modal.show();
             };
 
-            beforeEach(function () {
+            beforeEach(function() {
                 ModelHelpers.installModalTemplates();
             });
 
@@ -25,8 +24,8 @@ define(["jquery", "underscore", "js/views/modals/base_modal", "js/spec_helpers/m
                 ModelHelpers.hideModalIfShowing(modal);
             });
 
-            describe("Single Modal", function() {
-                it('is visible after show is called', function () {
+            describe('Single Modal', function() {
+                it('is visible after show is called', function() {
                     showMockModal();
                     expect(ModelHelpers.isShowingModal(modal)).toBeTruthy();
                 });
@@ -40,26 +39,26 @@ define(["jquery", "underscore", "js/views/modals/base_modal", "js/spec_helpers/m
                     }).then(done);
                 });
 
-                it('is removed after hide is called', function () {
+                it('is removed after hide is called', function() {
                     showMockModal();
                     modal.hide();
                     expect(ModelHelpers.isShowingModal(modal)).toBeFalsy();
                 });
 
-                it('is removed after cancel is clicked', function () {
+                it('is removed after cancel is clicked', function() {
                     showMockModal();
                     ModelHelpers.cancelModal(modal);
                     expect(ModelHelpers.isShowingModal(modal)).toBeFalsy();
                 });
             });
 
-            describe("Nested Modal", function() {
+            describe('Nested Modal', function() {
                 var nestedModal, showNestedModal;
 
                 showNestedModal = function() {
                     showMockModal();
                     nestedModal = new MockModal({
-                        title: "Nested Modal",
+                        title: 'Nested Modal',
                         parent: modal
                     });
                     nestedModal.show();
@@ -71,12 +70,12 @@ define(["jquery", "underscore", "js/views/modals/base_modal", "js/spec_helpers/m
                     }
                 });
 
-                it('is visible after show is called', function () {
+                it('is visible after show is called', function() {
                     showNestedModal();
                     expect(ModelHelpers.isShowingModal(nestedModal)).toBeTruthy();
                 });
 
-                it('is removed after hide is called', function () {
+                it('is removed after hide is called', function() {
                     showNestedModal();
                     nestedModal.hide();
                     expect(ModelHelpers.isShowingModal(nestedModal)).toBeFalsy();
@@ -85,7 +84,7 @@ define(["jquery", "underscore", "js/views/modals/base_modal", "js/spec_helpers/m
                     expect(ModelHelpers.isShowingModal(modal)).toBeTruthy();
                 });
 
-                it('is removed after cancel is clicked', function () {
+                it('is removed after cancel is clicked', function() {
                     showNestedModal();
                     ModelHelpers.cancelModal(nestedModal);
                     expect(ModelHelpers.isShowingModal(nestedModal)).toBeFalsy();

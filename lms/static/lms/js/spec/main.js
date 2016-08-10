@@ -391,7 +391,7 @@
                         'underscore.string',
                         'edx-ui-toolkit/js/utils/html-utils',
                         'edx-ui-toolkit/js/utils/string-utils'
-                    ], function (_, str, HtmlUtils, StringUtils) {
+                    ], function(_, str, HtmlUtils, StringUtils) {
                         window._ = _;
                         window._.str = str;
                         window.edx = edx || {};

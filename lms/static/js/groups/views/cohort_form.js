@@ -1,11 +1,10 @@
-;(function (define) {
+(function(define) {
     'use strict';
     define(['jquery', 'underscore', 'backbone', 'gettext', 'edx-ui-toolkit/js/utils/html-utils',
             'js/models/notification', 'js/views/notification'],
         function($, _, Backbone, gettext, HtmlUtils) {
-
             var CohortFormView = Backbone.View.extend({
-                events : {
+                events: {
                     'change .cohort-management-details-association-course input': 'onRadioButtonChange'
                 },
 
@@ -46,7 +45,7 @@
                     if (_.isUndefined(cohorts)) {
                         return false;
                     }
-                    var randomModels = cohorts.where({assignment_type:'random'});
+                    var randomModels = cohorts.where({assignment_type: 'random'});
                     return (randomModels.length === 1) && (randomModels[0].get('name') === name);
                 },
 
@@ -75,7 +74,7 @@
                     ids = selectValue.split(':');
                     groupId = parseInt(ids[0]);
                     userPartitionId = parseInt(ids[1]);
-                    for (i=0; i < this.contentGroups.length; i++) {
+                    for (i = 0; i < this.contentGroups.length; i++) {
                         contentGroup = this.contentGroups[i];
                         if (contentGroup.get('id') === groupId && contentGroup.get('user_partition_id') === userPartitionId) {
                             return contentGroup;
@@ -139,7 +138,7 @@
 
                     if (errorMessages.length > 0) {
                         showErrorMessage(
-                            isUpdate ? gettext("The cohort cannot be saved") : gettext("The cohort cannot be added"),
+                            isUpdate ? gettext('The cohort cannot be saved') : gettext('The cohort cannot be added'),
                             errorMessages
                         );
                         saveOperation.reject();
@@ -155,7 +154,7 @@
                             try {
                                 var jsonResponse = JSON.parse(result.responseText);
                                 errorMessage = jsonResponse.error;
-                            } catch(e) {
+                            } catch (e) {
                                 // Ignore the exception and show the default error message instead.
                             }
                             if (!errorMessage) {

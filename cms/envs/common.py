@@ -834,6 +834,9 @@ INSTALLED_APPS = (
     'openedx.core.djangoapps.coursetalk',  # not used in cms (yet), but tests run
     'xblock_config',
 
+    # Maintenance tools
+    'maintenance',
+
     # Tracking
     'track',
     'eventtracking.django.apps.EventTrackingConfig',
@@ -933,6 +936,9 @@ INSTALLED_APPS = (
 
     # Enables default site and redirects
     'django_sites_extensions',
+
+    # additional release utilities to ease automation
+    'release_util'
 )
 
 

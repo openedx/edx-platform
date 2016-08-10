@@ -1,4 +1,4 @@
-;(function (define, undefined) {
+(function(define, undefined) {
     'use strict';
     define([
         'gettext', 'jquery', 'underscore', 'backbone', 'logger',
@@ -7,10 +7,9 @@
         'js/student_account/views/account_settings_fields',
         'js/student_account/views/account_settings_view',
         'edx-ui-toolkit/js/utils/string-utils'
-    ], function (gettext, $, _, Backbone, Logger, UserAccountModel, UserPreferencesModel,
+    ], function(gettext, $, _, Backbone, Logger, UserAccountModel, UserPreferencesModel,
                  AccountSettingsFieldViews, AccountSettingsView, StringUtils) {
-
-        return function (
+        return function(
             fieldsData,
             ordersHistoryData,
             authData,
@@ -32,7 +31,7 @@
             userPreferencesModel.url = userPreferencesApiUrl;
 
             aboutSectionsData = [
-                 {
+                {
                     title: gettext('Basic Account Information'),
                     subtitle: gettext('These settings include basic information about your account. You can also specify additional information and see your linked social accounts on this page.'),  // eslint-disable-line max-len
                     fields: [
@@ -243,10 +242,10 @@
 
             accountSettingsView.render();
 
-            showAccountSettingsPage = function () {
+            showAccountSettingsPage = function() {
                 // Record that the account settings page was viewed.
                 Logger.log('edx.user.settings.viewed', {
-                    page: "account",
+                    page: 'account',
                     visibility: null,
                     user_id: accountUserId
                 });
@@ -255,12 +254,12 @@
                 accountSettingsView.renderFields();
             };
 
-            showLoadingError = function () {
+            showLoadingError = function() {
                 accountSettingsView.showLoadingError();
             };
 
             userAccountModel.fetch({
-                success: function () {
+                success: function() {
                     // Fetch the user preferences model
                     userPreferencesModel.fetch({
                         success: showAccountSettingsPage,

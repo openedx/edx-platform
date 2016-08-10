@@ -1,7 +1,6 @@
 var edx = edx || {},
 
     Navigation = (function() {
-
         var navigation = {
 
             init: function() {
@@ -122,9 +121,8 @@ var edx = edx || {},
         return {
             init: navigation.init
         };
-
     })();
 
-    edx.util = edx.util || {};
-    edx.util.navigation = Navigation;
-    edx.util.navigation.init();
+edx.util = edx.util || {};
+edx.util.navigation = Navigation;
+edx.util.navigation.init();

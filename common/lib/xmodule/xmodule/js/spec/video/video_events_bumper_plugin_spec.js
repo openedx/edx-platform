@@ -1,10 +1,10 @@
-(function (undefined) {
+(function(undefined) {
     'use strict';
-    describe('VideoPlayer Events Bumper plugin', function () {
+    describe('VideoPlayer Events Bumper plugin', function() {
         var Logger = window.Logger;
         var state, oldOTBD;
 
-        beforeEach(function () {
+        beforeEach(function() {
             oldOTBD = window.onTouchBasedDevice;
             window.onTouchBasedDevice = jasmine
                 .createSpy('onTouchBasedDevice')
@@ -17,7 +17,7 @@
             spyOn(state.bumperState.videoEventsBumperPlugin, 'getDuration').and.returnValue(20);
         });
 
-        afterEach(function () {
+        afterEach(function() {
             $('source').remove();
             window.onTouchBasedDevice = oldOTBD;
             state.storage.clear();
@@ -29,7 +29,7 @@
             }
         });
 
-        it('can emit "edx.video.bumper.loaded" event', function () {
+        it('can emit "edx.video.bumper.loaded" event', function() {
             state.el.trigger('ready');
             expect(Logger.log).toHaveBeenCalledWith('edx.video.bumper.loaded', {
                 host_component_id: 'id',
@@ -39,7 +39,7 @@
             });
         });
 
-        it('can emit "edx.video.bumper.played" event', function () {
+        it('can emit "edx.video.bumper.played" event', function() {
             state.el.trigger('play');
             expect(Logger.log).toHaveBeenCalledWith('edx.video.bumper.played', {
                 host_component_id: 'id',
@@ -50,7 +50,7 @@
             });
         });
 
-        it('can emit "edx.video.bumper.stopped" event', function () {
+        it('can emit "edx.video.bumper.stopped" event', function() {
             state.el.trigger('ended');
             expect(Logger.log).toHaveBeenCalledWith('edx.video.bumper.stopped', {
                 host_component_id: 'id',
@@ -71,7 +71,7 @@
             });
         });
 
-        it('can emit "edx.video.bumper.skipped" event', function () {
+        it('can emit "edx.video.bumper.skipped" event', function() {
             state.el.trigger('skip', [false]);
             expect(Logger.log).toHaveBeenCalledWith('edx.video.bumper.skipped', {
                 host_component_id: 'id',
@@ -82,7 +82,7 @@
             });
         });
 
-        it('can emit "edx.video.bumper.dismissed" event', function () {
+        it('can emit "edx.video.bumper.dismissed" event', function() {
             state.el.trigger('skip', [true]);
             expect(Logger.log).toHaveBeenCalledWith('edx.video.bumper.dismissed', {
                 host_component_id: 'id',
@@ -93,7 +93,7 @@
             });
         });
 
-        it('can emit "edx.video.bumper.transcript.menu.shown" event', function () {
+        it('can emit "edx.video.bumper.transcript.menu.shown" event', function() {
             state.el.trigger('language_menu:show');
             expect(Logger.log).toHaveBeenCalledWith('edx.video.bumper.transcript.menu.shown', {
                 host_component_id: 'id',
@@ -103,7 +103,7 @@
             });
         });
 
-        it('can emit "edx.video.bumper.transcript.menu.hidden" event', function () {
+        it('can emit "edx.video.bumper.transcript.menu.hidden" event', function() {
             state.el.trigger('language_menu:hide');
             expect(Logger.log).toHaveBeenCalledWith('edx.video.bumper.transcript.menu.hidden', {
                 host_component_id: 'id',
@@ -113,7 +113,7 @@
             });
         });
 
-        it('can emit "edx.video.bumper.transcript.shown" event', function () {
+        it('can emit "edx.video.bumper.transcript.shown" event', function() {
             state.el.trigger('captions:show');
             expect(Logger.log).toHaveBeenCalledWith('edx.video.bumper.transcript.shown', {
                 host_component_id: 'id',
@@ -124,7 +124,7 @@
             });
         });
 
-        it('can emit "edx.video.bumper.transcript.hidden" event', function () {
+        it('can emit "edx.video.bumper.transcript.hidden" event', function() {
             state.el.trigger('captions:hide');
             expect(Logger.log).toHaveBeenCalledWith('edx.video.bumper.transcript.hidden', {
                 host_component_id: 'id',
@@ -135,7 +135,7 @@
             });
         });
 
-        it('can destroy itself', function () {
+        it('can destroy itself', function() {
             var plugin = state.bumperState.videoEventsBumperPlugin;
             spyOn($.fn, 'off').and.callThrough();
             plugin.destroy();
@@ -153,5 +153,4 @@
             });
         });
     });
-
 }).call(this);

@@ -2,7 +2,7 @@ define([
     'jquery', 'underscore', 'gettext', 'js/views/pages/base_page',
     'js/views/group_configurations_list', 'js/views/content_group_list'
 ],
-function ($, _, gettext, BasePage, GroupConfigurationsListView, ContentGroupListView) {
+function($, _, gettext, BasePage, GroupConfigurationsListView, ContentGroupListView) {
     'use strict';
     var GroupConfigurationsPage = BasePage.extend({
         initialize: function(options) {
@@ -34,11 +34,11 @@ function ($, _, gettext, BasePage, GroupConfigurationsListView, ContentGroupList
             return $.Deferred().resolve().promise();
         },
 
-        addWindowActions: function () {
+        addWindowActions: function() {
             $(window).on('beforeunload', this.onBeforeUnload.bind(this));
         },
 
-        onBeforeUnload: function () {
+        onBeforeUnload: function() {
             var dirty = this.contentGroupConfiguration.isDirty() ||
                 (this.experimentsEnabled && this.experimentGroupConfigurations.find(function(configuration) {
                     return configuration.isDirty();
@@ -61,7 +61,7 @@ function ($, _, gettext, BasePage, GroupConfigurationsListView, ContentGroupList
          * Focus on and expand group configuration with peculiar id.
          * @param {String|Number} Id of the group configuration.
          */
-        expandConfiguration: function (id) {
+        expandConfiguration: function(id) {
             var groupConfig = this.experimentsEnabled && this.experimentGroupConfigurations.findWhere({
                 id: parseInt(id)
             });

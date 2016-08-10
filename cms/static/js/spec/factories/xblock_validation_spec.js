@@ -1,33 +1,32 @@
 define(['jquery', 'js/factories/xblock_validation', 'common/js/spec_helpers/template_helpers'],
     function($, XBlockValidationFactory, TemplateHelpers) {
-
         describe('XBlockValidationFactory', function() {
             var messageDiv;
 
-            beforeEach(function () {
+            beforeEach(function() {
                 TemplateHelpers.installTemplate('xblock-validation-messages');
                 appendSetFixtures($('<div class="messages"></div>'));
                 messageDiv = $('.messages');
             });
 
             it('Does not attach a view if messages is empty', function() {
-                XBlockValidationFactory({"empty": true}, false, false, messageDiv);
+                XBlockValidationFactory({'empty': true}, false, false, messageDiv);
                 expect(messageDiv.children().length).toEqual(0);
             });
 
             it('Does attach a view if messages are not empty', function() {
-                XBlockValidationFactory({"empty": false}, false, false, messageDiv);
+                XBlockValidationFactory({'empty': false}, false, false, messageDiv);
                 expect(messageDiv.children().length).toEqual(1);
             });
 
             it('Passes through the root property to the view.', function() {
-                var noContainerContent = "no-container-content";
+                var noContainerContent = 'no-container-content';
 
                 var notConfiguredMessages = {
-                    "empty": false,
-                    "summary": {"text": "my summary", "type": "not-configured"},
-                    "messages": [],
-                    "xblock_id": "id"
+                    'empty': false,
+                    'summary': {'text': 'my summary', 'type': 'not-configured'},
+                    'messages': [],
+                    'xblock_id': 'id'
                 };
                 // Root is false, will not add noContainerContent.
                 XBlockValidationFactory(notConfiguredMessages, true, false, messageDiv);
@@ -41,16 +40,16 @@ define(['jquery', 'js/factories/xblock_validation', 'common/js/spec_helpers/temp
             describe('Controls display of detailed messages based on url and root property', function() {
                 var messagesWithSummary, checkDetailedMessages;
 
-                beforeEach(function () {
+                beforeEach(function() {
                     messagesWithSummary = {
-                        "empty": false,
-                        "summary": {"text": "my summary"},
-                        "messages": [{"text": "one", "type": "warning"}, {"text": "two", "type": "error"}],
-                        "xblock_id": "id"
+                        'empty': false,
+                        'summary': {'text': 'my summary'},
+                        'messages': [{'text': 'one', 'type': 'warning'}, {'text': 'two', 'type': 'error'}],
+                        'xblock_id': 'id'
                     };
                 });
 
-                checkDetailedMessages = function (expectedDetailedMessages) {
+                checkDetailedMessages = function(expectedDetailedMessages) {
                     expect(messageDiv.children().length).toEqual(1);
                     expect(messageDiv.find('.xblock-message-item').length).toBe(expectedDetailedMessages);
                 };

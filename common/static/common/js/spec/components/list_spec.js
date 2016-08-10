@@ -1,7 +1,7 @@
 define(['jquery', 'backbone', 'underscore', 'common/js/components/views/list'],
-    function ($, Backbone, _, ListView) {
+    function($, Backbone, _, ListView) {
         'use strict';
-        describe('ListView', function () {
+        describe('ListView', function() {
             var Model = Backbone.Model.extend({
                     defaults: {
                         name: 'default name'
@@ -11,7 +11,7 @@ define(['jquery', 'backbone', 'underscore', 'common/js/components/views/list'],
                     tagName: 'div',
                     className: 'my-view',
                     template: _.template('<p>Name: "<%- name %>"</p>'),
-                    render: function () {
+                    render: function() {
                         this.$el.html(this.template(this.model.attributes));
                         return this;
                     }
@@ -19,15 +19,15 @@ define(['jquery', 'backbone', 'underscore', 'common/js/components/views/list'],
                 Collection = Backbone.Collection.extend({
                     model: Model
                 }),
-                expectListNames = function (names) {
+                expectListNames = function(names) {
                     expect(listView.$('.my-view').length).toBe(names.length);
-                    _.each(names, function (name, index) {
+                    _.each(names, function(name, index) {
                         expect($(listView.$('.my-view')[index]).text()).toContain(name);
                     });
                 },
                 listView;
 
-            beforeEach(function () {
+            beforeEach(function() {
                 setFixtures('<div class="list"></div>');
                 listView = new ListView({
                     el: $('.list'),
@@ -39,16 +39,16 @@ define(['jquery', 'backbone', 'underscore', 'common/js/components/views/list'],
                 listView.render();
             });
 
-            it('renders itself', function () {
+            it('renders itself', function() {
                 expectListNames(['first model', 'second model', 'third model']);
             });
 
-            it('does not render subviews for an empty collection', function () {
+            it('does not render subviews for an empty collection', function() {
                 listView.collection.set([]);
                 expectListNames([]);
             });
 
-            it('re-renders itself when the collection changes', function () {
+            it('re-renders itself when the collection changes', function() {
                 expectListNames(['first model', 'second model', 'third model']);
                 listView.collection.set([{name: 'foo'}, {name: 'bar'}, {name: 'third model'}]);
                 expectListNames(['foo', 'bar', 'third model']);
@@ -56,7 +56,7 @@ define(['jquery', 'backbone', 'underscore', 'common/js/components/views/list'],
                 expectListNames(['baz', 'bar', 'quux']);
             });
 
-            it('re-renders itself when items are added to the collection', function () {
+            it('re-renders itself when items are added to the collection', function() {
                 expectListNames(['first model', 'second model', 'third model']);
                 listView.collection.add({name: 'fourth model'});
                 expectListNames(['first model', 'second model', 'third model', 'fourth model']);
@@ -69,7 +69,7 @@ define(['jquery', 'backbone', 'underscore', 'common/js/components/views/list'],
                 ]);
             });
 
-            it('re-renders itself when items are removed from the collection', function () {
+            it('re-renders itself when items are removed from the collection', function() {
                 listView.collection.reset([{name: 'one'}, {name: 'two'}, {name: 'three'}, {name: 'four'}]);
                 expectListNames(['one', 'two', 'three', 'four']);
                 listView.collection.remove(listView.collection.at(0));
@@ -82,7 +82,7 @@ define(['jquery', 'backbone', 'underscore', 'common/js/components/views/list'],
                 expectListNames([]);
             });
 
-            it('removes old views', function () {
+            it('removes old views', function() {
                 listView.collection.reset(null);
                 expect(listView.itemViews).toEqual([]);
             });

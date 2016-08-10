@@ -13,10 +13,9 @@
  *  - scroll_offset - the scroll offset to use for the locator being shown
  *  - edit_display_name - true if the shown xblock's display name should be in inline edit mode
  */
-define(["jquery", "underscore", "gettext", "js/views/baseview", "common/js/components/utils/view_utils",
-        "js/views/utils/xblock_utils", "js/views/xblock_string_field_editor"],
+define(['jquery', 'underscore', 'gettext', 'js/views/baseview', 'common/js/components/utils/view_utils',
+        'js/views/utils/xblock_utils', 'js/views/xblock_string_field_editor'],
     function($, _, gettext, BaseView, ViewUtils, XBlockViewUtils, XBlockStringFieldEditor) {
-
         var XBlockOutlineView = BaseView.extend({
             // takes XBlockInfo as a model
 
@@ -49,7 +48,7 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "common/js/compo
                 // need to add the current model's id/locator to the set of expanded locators
                 if (this.model.get('is_header_visible') !== null && !this.model.get('is_header_visible')) {
                     var locator = this.model.get('id');
-                    if(!_.isUndefined(this.expandedLocators) && !this.expandedLocators.contains(locator)) {
+                    if (!_.isUndefined(this.expandedLocators) && !this.expandedLocators.contains(locator)) {
                         this.expandedLocators.add(locator);
                         this.refresh();
                     }
@@ -216,7 +215,7 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "common/js/compo
 
             onSync: function(event) {
                 if (ViewUtils.hasChangedAttributes(this.model, ['visibility_state', 'child_info', 'display_name'])) {
-                   this.onXBlockChange();
+                    this.onXBlockChange();
                 }
             },
 
@@ -246,7 +245,7 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "common/js/compo
                     if (locatorElement.length > 0) {
                         ViewUtils.setScrollOffset(locatorElement, scrollOffset);
                     } else {
-                        console.error("Failed to show item with locator " + locatorToShow + "");
+                        console.error('Failed to show item with locator ' + locatorToShow + '');
                     }
                     if (editDisplayName) {
                         locatorElement.find('> div[class$="header"] .xblock-field-value-edit').click();

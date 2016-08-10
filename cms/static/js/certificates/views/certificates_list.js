@@ -5,7 +5,7 @@ define([
     'js/views/list',
     'js/certificates/views/certificate_item'
 ],
-function (gettext, ListView, CertificateItemView) {
+function(gettext, ListView, CertificateItemView) {
     'use strict';
     var CertificatesListView = ListView.extend({
         tagName: 'div',

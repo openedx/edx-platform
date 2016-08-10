@@ -18,9 +18,8 @@
             return child;
         };
 
-    if (typeof Backbone !== "undefined" && Backbone !== null) {
+    if (typeof Backbone !== 'undefined' && Backbone !== null) {
         this.DiscussionThreadShowView = (function(_super) {
-
             __extends(DiscussionThreadShowView, _super);
 
             function DiscussionThreadShowView() {
@@ -30,9 +29,9 @@
             DiscussionThreadShowView.prototype.initialize = function(options) {
                 var _ref;
                 DiscussionThreadShowView.__super__.initialize.call(this);
-                this.mode = options.mode || "inline";
-                if ((_ref = this.mode) !== "tab" && _ref !== "inline") {
-                    throw new Error("invalid mode: " + this.mode);
+                this.mode = options.mode || 'inline';
+                if ((_ref = this.mode) !== 'tab' && _ref !== 'inline') {
+                    throw new Error('invalid mode: ' + this.mode);
                 }
             };
 
@@ -45,7 +44,7 @@
                     cid: this.model.cid,
                     readOnly: $('.discussion-module').data('read-only')
                 }, this.model.attributes);
-                return edx.HtmlUtils.template($("#thread-show-template").html())(context);
+                return edx.HtmlUtils.template($('#thread-show-template').html())(context);
             };
 
             DiscussionThreadShowView.prototype.render = function() {
@@ -55,28 +54,26 @@
                 );
                 this.delegateEvents();
                 this.renderAttrs();
-                this.$("span.timeago").timeago();
+                this.$('span.timeago').timeago();
                 this.convertMath();
-                this.$(".post-body");
-                this.$("h1,h3");
+                this.$('.post-body');
+                this.$('h1,h3');
                 return this;
             };
 
             DiscussionThreadShowView.prototype.convertMath = function() {
-                DiscussionUtil.convertMath(this.$(".post-body"));
+                DiscussionUtil.convertMath(this.$('.post-body'));
             };
 
             DiscussionThreadShowView.prototype.edit = function(event) {
-                return this.trigger("thread:edit", event);
+                return this.trigger('thread:edit', event);
             };
 
             DiscussionThreadShowView.prototype._delete = function(event) {
-                return this.trigger("thread:_delete", event);
+                return this.trigger('thread:_delete', event);
             };
 
             return DiscussionThreadShowView;
-
         })(DiscussionContentShowView);
     }
-
 }).call(window);

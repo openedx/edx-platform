@@ -21,7 +21,7 @@
 
             // Cohort partitions (user is allowed to select more than one)
             element.find('.field-visibility-content-group input:checked').each(function(index, input) {
-                checkboxValues = $(input).val().split("-");
+                checkboxValues = $(input).val().split('-');
                 partitionId = parseInt(checkboxValues[0], 10);
                 groupId = parseInt(checkboxValues[1], 10);
 
@@ -61,7 +61,7 @@
     VisibilityEditorView.prototype.collectFieldData = function collectFieldData() {
         return {
             metadata: {
-                "group_access": this.getGroupAccess()
+                'group_access': this.getGroupAccess()
             }
         };
     };

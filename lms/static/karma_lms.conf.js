@@ -54,6 +54,6 @@ var options = {
     ]
 };
 
-module.exports = function (config) {
+module.exports = function(config) {
     configModule.configure(config, options);
 };

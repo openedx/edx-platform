@@ -1,32 +1,32 @@
-;(function (define) {
+(function(define) {
     'use strict';
     define(['jquery', 'underscore', 'backbone', 'gettext', 'edx-ui-toolkit/js/utils/string-utils',
             'js/models/notification', 'js/views/notification'],
-        function ($, _, Backbone, gettext, StringUtils) {
-            /*global NotificationModel, NotificationView */
+        function($, _, Backbone, gettext, StringUtils) {
+            /* global NotificationModel, NotificationView */
 
             var VerifiedTrackSettingsNotificationView = Backbone.View.extend({
 
-                render: function () {
+                render: function() {
                     // All rendering is done in validateSettings, which must be called with some additional information.
                     return this;
                 },
 
-                validateSettings: function (isCohorted, cohortCollection, enableCohortsCheckbox) {
+                validateSettings: function(isCohorted, cohortCollection, enableCohortsCheckbox) {
                     if (this.model.get('enabled')) {
                         var verifiedCohortName = this.model.get('verified_cohort_name');
                         if (isCohorted) {
                             var verifiedCohortExists = false;
-                            $.each(cohortCollection, function (_, cohort) {
-                                    if (cohort.get('assignment_type') === 'manual' &&
+                            $.each(cohortCollection, function(_, cohort) {
+                                if (cohort.get('assignment_type') === 'manual' &&
                                         cohort.get('name') === verifiedCohortName) {
-                                        verifiedCohortExists = true;
-                                        cohort.disableEditingName = true;
-                                    }
-                                    else {
-                                        cohort.disableEditingName = false;
-                                    }
+                                    verifiedCohortExists = true;
+                                    cohort.disableEditingName = true;
                                 }
+                                else {
+                                    cohort.disableEditingName = false;
+                                }
+                            }
                             );
                             if (verifiedCohortExists) {
                                 this.showNotification({
@@ -36,7 +36,6 @@
                                         {verifiedCohortName: verifiedCohortName}
                                     )
                                 });
-
                             }
                             else {
                                 this.showNotification({
@@ -59,7 +58,7 @@
                     }
                 },
 
-                showNotification: function (options) {
+                showNotification: function(options) {
                     if (this.notification) {
                         this.notification.remove();
                     }
