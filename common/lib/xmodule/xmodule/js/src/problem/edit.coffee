@@ -197,7 +197,7 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
     demandHintTags = [];
     toXml = `function (markdown) {
       var xml = markdown,
-          i, splits, scriptFlag;
+          i, splits, makeParagraph;
       var responseTypes = [
         'optionresponse', 'multiplechoiceresponse', 'stringresponse', 'numericalresponse', 'choiceresponse'
       ];
@@ -585,27 +585,6 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
             // we don't want to add the responsetype again into new xml
             if (responseType[0].nodeName === child.nodeName) {
                 beforeInputtype = false;
-                return;
-            }
-
-            if (beforeInputtype) {
-                // safe-lint: disable=javascript-jquery-insert-into-target
-                responseType[0].insertBefore(child, inputtype);
-            } else {
-                responseType[0].appendChild(child);
-            }
-        })
-        var serializer = new XMLSerializer();
-
-        xml = serializer.serializeToString(responseType[0]);
-
-            // replace <p> tag for question title with <label> tag
-            if (child.hasAttribute('class') && child.getAttribute('class') === 'qtitle') {
-                child = $('<label>' + child.textContent + '</label>')[0];
-            }
-
-            if (_.contains(independentTagNames, child.nodeName)) {
-                independentTagNodes.push(child)
                 return;
             }
 
