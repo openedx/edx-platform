@@ -598,3 +598,63 @@ class ProblemMathExpressionInputA11yTest(CAPAProblemA11yBaseTestMixin, ProblemsT
             </formularesponse>
         </problem>""")
         return XBlockFixtureDesc('problem', 'MATHEXPRESSIONINPUT PROBLEM', data=xml)
+
+
+class ProblemMetaGradedTest(ProblemsTest):
+    """
+    TestCase Class to verify that the graded variable is passed
+    """
+    def get_problem(self):
+        """
+        Problem structure
+        """
+        xml = dedent("""
+            <problem>
+                <label>Which of the following countries has the largest population?</label>
+                    <multiplechoiceresponse>
+                      <choicegroup type="MultipleChoice">
+                        <choice correct="false">Brazil <choicehint>timely feedback -- explain why an almost correct answer is wrong</choicehint></choice>
+                        <choice correct="false">Germany</choice>
+                        <choice correct="true">Indonesia</choice>
+                        <choice correct="false">Russia</choice>
+                      </choicegroup>
+                    </multiplechoiceresponse>
+            </problem>
+        """)
+        return XBlockFixtureDesc('problem', 'TEST PROBLEM', data=xml, grader_type='Final Exam')
+
+    def test_grader_type_displayed(self):
+        self.courseware_page.visit()
+        problem_page = ProblemPage(self.browser)
+        self.assertEqual(problem_page.problem_name, 'TEST PROBLEM')
+        self.assertEqual(problem_page.problem_progress_graded_value, "1 point possible (graded)")
+
+
+class ProblemMetaUngradedTest(ProblemsTest):
+    """
+    TestCase Class to verify that the ungraded variable is passed
+    """
+    def get_problem(self):
+        """
+        Problem structure
+        """
+        xml = dedent("""
+            <problem>
+                <label>Which of the following countries has the largest population?</label>
+                    <multiplechoiceresponse>
+                      <choicegroup type="MultipleChoice">
+                        <choice correct="false">Brazil <choicehint>timely feedback -- explain why an almost correct answer is wrong</choicehint></choice>
+                        <choice correct="false">Germany</choice>
+                        <choice correct="true">Indonesia</choice>
+                        <choice correct="false">Russia</choice>
+                      </choicegroup>
+                    </multiplechoiceresponse>
+            </problem>
+        """)
+        return XBlockFixtureDesc('problem', 'TEST PROBLEM', data=xml)
+
+    def test_grader_type_displayed(self):
+        self.courseware_page.visit()
+        problem_page = ProblemPage(self.browser)
+        self.assertEqual(problem_page.problem_name, 'TEST PROBLEM')
+        self.assertEqual(problem_page.problem_progress_graded_value, "1 point possible (ungraded)")
