@@ -1,15 +1,17 @@
+<%page expression_filter="h"/>
+<%! from openedx.core.djangolib.markup import HTML %>
 <% doinline = 'style="display:inline-block;vertical-align:top"' if inline else "" %>
 <section id="formulaequationinput_${id}" class="inputtype formulaequationinput" ${doinline}>
   <div class="${status.classname}" id="status_${id}">
     <input type="text" name="input_${id}" id="input_${id}"
-        data-input-id="${id}" value="${value|h}"
+        data-input-id="${id}" value="${value}"
         aria-label="${label}"
         aria-describedby="${id}_status"
         % if size:
         size="${size}"
         % endif
         />
-    ${trailing_text | h}
+    <span class="trailing_text">${trailing_text}</span>
 
       <span class="status" id="${id}_status" data-tooltip="${status.display_tooltip}">
         <span class="sr">
@@ -28,6 +30,6 @@
   <div class="script_placeholder" data-src="${previewer}"/>
 
   % if msg:
-      <span class="message">${msg|n}</span>
+      <span class="message">${HTML(msg)}</span>
   % endif
 </section>
