@@ -17,6 +17,8 @@ import httpretty
 import mock
 from provider.constants import CONFIDENTIAL
 
+from openedx.core.djangoapps.catalog.tests import factories as catalog_factories
+from openedx.core.djangoapps.catalog.tests.mixins import CatalogIntegrationMixin
 from openedx.core.djangoapps.credentials.models import CredentialsApiConfig
 from openedx.core.djangoapps.credentials.tests import factories as credentials_factories
 from openedx.core.djangoapps.credentials.tests.mixins import CredentialsApiConfigMixin
@@ -265,9 +267,10 @@ class TestProgramListing(ProgramsApiConfigMixin, CredentialsApiConfigMixin, Shar
 @httpretty.activate
 @override_settings(MKTG_URLS={'ROOT': 'https://www.example.com'})
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
-@mock.patch(UTILS_MODULE + '.get_run_marketing_url', mock.Mock(return_value=MARKETING_URL))
-class TestProgramDetails(ProgramsApiConfigMixin, SharedModuleStoreTestCase):
-    """Unit tests for the program details page."""
+class TestProgramDetails(ProgramsApiConfigMixin, SharedModuleStoreTestCase, CatalogIntegrationMixin):
+    """
+    Unit tests for the program details page.
+    """
     program_id = 123
     password = 'test'
     url = reverse('program_details_view', args=[program_id])
@@ -279,6 +282,7 @@ class TestProgramDetails(ProgramsApiConfigMixin, SharedModuleStoreTestCase):
         ClientFactory(name=ProgramsApiConfig.OAUTH2_CLIENT_NAME, client_type=CONFIDENTIAL)
 
         course = CourseFactory()
+        cls.course_id_string = unicode(course.id)  # pylint: disable=no-member
         organization = programs_factories.Organization()
         run_mode = programs_factories.RunMode(course_key=unicode(course.id))  # pylint: disable=no-member
         course_code = programs_factories.CourseCode(run_modes=[run_mode])
@@ -287,6 +291,7 @@ class TestProgramDetails(ProgramsApiConfigMixin, SharedModuleStoreTestCase):
             organizations=[organization],
             course_codes=[course_code]
         )
+        cls.course_run = catalog_factories.CourseRun(key=cls.course_id_string)
 
     def setUp(self):
         super(TestProgramDetails, self).setUp()
@@ -295,7 +300,9 @@ class TestProgramDetails(ProgramsApiConfigMixin, SharedModuleStoreTestCase):
         self.client.login(username=self.user.username, password=self.password)
 
     def mock_programs_api(self, data, status=200):
-        """Helper for mocking out Programs API URLs."""
+        """
+        Helper for mocking out Programs API URLs.
+        """
         self.assertTrue(httpretty.is_enabled(), msg='httpretty must be enabled to mock Programs API calls.')
 
         url = '{api_root}/programs/{id}/'.format(
@@ -314,7 +321,9 @@ class TestProgramDetails(ProgramsApiConfigMixin, SharedModuleStoreTestCase):
         )
 
     def assert_program_data_present(self, response):
-        """Verify that program data is present."""
+        """
+        Verify that program data is present.
+        """
         self.assertContains(response, 'programData')
         self.assertContains(response, 'urls')
         self.assertContains(response, 'program_listing_url')
@@ -322,7 +331,9 @@ class TestProgramDetails(ProgramsApiConfigMixin, SharedModuleStoreTestCase):
         self.assert_programs_tab_present(response)
 
     def assert_programs_tab_present(self, response):
-        """Verify that the programs tab is present in the nav."""
+        """
+        Verify that the programs tab is present in the nav.
+        """
         soup = BeautifulSoup(response.content, 'html.parser')
         self.assertTrue(
             any(soup.find_all('a', class_='tab-nav-link', href=reverse('program_listing_view')))
@@ -332,21 +343,24 @@ class TestProgramDetails(ProgramsApiConfigMixin, SharedModuleStoreTestCase):
         """
         Verify that login is required to access the page.
         """
-        self.create_programs_config()
-        self.mock_programs_api(self.data)
+        with mock.patch('openedx.core.djangoapps.catalog.utils.get_course_runs', return_value={
+            self.course_id_string: self.course_run,
+        }):
+            self.create_programs_config()
+            self.mock_programs_api(self.data)
 
-        self.client.logout()
+            self.client.logout()
 
-        response = self.client.get(self.url)
-        self.assertRedirects(
-            response,
-            '{}?next={}'.format(reverse('signin_user'), self.url)
-        )
+            response = self.client.get(self.url)
+            self.assertRedirects(
+                response,
+                '{}?next={}'.format(reverse('signin_user'), self.url)
+            )
 
-        self.client.login(username=self.user.username, password=self.password)
+            self.client.login(username=self.user.username, password=self.password)
 
-        response = self.client.get(self.url)
-        self.assert_program_data_present(response)
+            response = self.client.get(self.url)
+            self.assert_program_data_present(response)
 
     def test_404_if_disabled(self):
         """
@@ -358,7 +372,9 @@ class TestProgramDetails(ProgramsApiConfigMixin, SharedModuleStoreTestCase):
         self.assertEqual(response.status_code, 404)
 
     def test_404_if_no_data(self):
-        """Verify that the page 404s if no program data is found."""
+        """
+        Verify that the page 404s if no program data is found.
+        """
         self.create_programs_config()
 
         self.mock_programs_api(self.data, status=404)
@@ -372,7 +388,9 @@ class TestProgramDetails(ProgramsApiConfigMixin, SharedModuleStoreTestCase):
         self.assertEqual(response.status_code, 404)
 
     def test_page_routing(self):
-        """Verify that the page can be hit with or without a program name in the URL."""
+        """
+        Verify that the page can be hit with or without a program name in the URL.
+        """
         self.create_programs_config()
         self.mock_programs_api(self.data)
 
