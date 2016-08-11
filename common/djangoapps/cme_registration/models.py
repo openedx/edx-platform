@@ -101,12 +101,13 @@ class CmeUserProfile(UserProfile):
     specialty = models.CharField(blank=True, null=True, max_length=255, choices=SPECIALTY_CHOICES)
     sub_specialty = models.CharField(blank=True, null=True, max_length=255)
 
-    AFFILIATION_CHOICES = (('Lucile Packard Children\'s Hospital Stanford', 'Lucile Packard Children\'s Hospital Stanford'),
+    AFFILIATION_CHOICES = (('Stanford Children\'s Health', 'Stanford Children\'s Health'),
                            ('Packard Children\'s Health Alliance', 'Packard Children\'s Health Alliance'),
-                           ('Stanford Hospital and Clinics', 'Stanford Hospital and Clinics'),
+                           ('Stanford Health Care', 'Stanford Health Care'),
                            ('Stanford University', 'Stanford University'),
                            ('University Healthcare Alliance', 'University Healthcare Alliance'),
-                           ('Other', 'Other'))
+                           ('Other', 'Other'),
+                           )
     affiliation = models.CharField(blank=True, null=True, max_length=46, choices=AFFILIATION_CHOICES)
     other_affiliation = models.CharField(blank=True, null=True, max_length=46)
     sub_affiliation = models.CharField(blank=True, null=True, max_length=46)
