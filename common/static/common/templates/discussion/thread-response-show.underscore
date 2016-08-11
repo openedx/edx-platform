@@ -1,4 +1,7 @@
 <header class="wrapper-response-header">
+  <div class="author-image level-response">
+    <img class="image-frame" src="https://d37djvu3ytnwxt.cloudfront.net/static/images/edx-theme/default-profile_120.41d2f8cbbbbd.png" alt="Profile image for post author">
+  </div>
   <div class="response-header-content">
     <%= author_display %>
     <p class="posted-details">
