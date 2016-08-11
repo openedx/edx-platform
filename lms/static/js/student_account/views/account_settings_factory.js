@@ -20,7 +20,7 @@
         ) {
             var accountSettingsElement, userAccountModel, userPreferencesModel, aboutSectionsData,
                 accountsSectionData, ordersSectionData, accountSettingsView, showAccountSettingsPage,
-                showLoadingError, orderNumber;
+                showLoadingError, orderNumber, getUserField, userFields, timeZoneDropdownField, countryDropdownField;
 
             accountSettingsElement = $('.wrapper-account-settings');
 
@@ -110,7 +110,7 @@
                             })
                         },
                         {
-                            view: new AccountSettingsFieldViews.DropdownFieldView({
+                            view: new AccountSettingsFieldViews.TimeZoneFieldView({
                                 model: userPreferencesModel,
                                 required: true,
                                 title: gettext('Time Zone'),
@@ -120,7 +120,10 @@
                                     'time zone here, course dates, including assignment deadlines, are displayed in ' +
                                     'Coordinated Universal Time (UTC).'
                                 ),
-                                options: fieldsData.time_zone.options,
+                                groupOptions: [{
+                                    groupTitle: gettext('All Time Zones'),
+                                    selectOptions: fieldsData.time_zone.options
+                                }],
                                 persistChanges: true
                             })
                         }
@@ -168,6 +171,19 @@
                     ]
                 }
             ];
+
+            // set TimeZoneField to listen to CountryField
+            getUserField = function(list, search) {
+                return _.find(list, function(field) {
+                    return field.view.options.valueAttribute === search;
+                }).view;
+            };
+            userFields = _.find(aboutSectionsData, function(section) {
+                return section.title === gettext('Basic Account Information');
+            }).fields;
+            timeZoneDropdownField = getUserField(userFields, 'time_zone');
+            countryDropdownField = getUserField(userFields, 'country');
+            timeZoneDropdownField.listenToCountryView(countryDropdownField);
 
             accountsSectionData = [
                 {

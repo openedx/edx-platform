@@ -108,6 +108,11 @@ define(['backbone',
 
                 request = requests[1];
                 expect(request.method).toBe('GET');
+                expect(request.url).toBe('/user_api/v1/preferences/time_zones/?country_code=1');
+                AjaxHelpers.respondWithJson(requests, Helpers.TIME_ZONE_RESPONSE);
+
+                request = requests[2];
+                expect(request.method).toBe('GET');
                 expect(request.url).toBe(Helpers.USER_PREFERENCES_API_URL);
 
                 AjaxHelpers.respondWithError(requests, 500);
@@ -126,6 +131,7 @@ define(['backbone',
                 Helpers.expectSettingsSectionsButNotFieldsToBeRendered(accountSettingsView);
 
                 AjaxHelpers.respondWithJson(requests, Helpers.createAccountSettingsData());
+                AjaxHelpers.respondWithJson(requests, Helpers.TIME_ZONE_RESPONSE);
                 AjaxHelpers.respondWithJson(requests, Helpers.createUserPreferencesData());
 
                 Helpers.expectLoadingIndicatorIsVisible(accountSettingsView, false);
@@ -141,6 +147,7 @@ define(['backbone',
                 var accountSettingsView = createAccountSettingsPage();
 
                 AjaxHelpers.respondWithJson(requests, Helpers.createAccountSettingsData());
+                AjaxHelpers.respondWithJson(requests, Helpers.TIME_ZONE_RESPONSE);
                 AjaxHelpers.respondWithJson(requests, Helpers.createUserPreferencesData());
                 AjaxHelpers.respondWithJson(requests, {});  // Page viewed analytics event
 

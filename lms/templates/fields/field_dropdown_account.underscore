@@ -23,8 +23,13 @@
             <% if (showBlankOption) { %>
                 <option value=""></option>
             <% } %>
-            <% _.each(selectOptions, function(selectOption) { %>
-                <option value="<%- selectOption[0] %>"><%- selectOption[1] %></option>
+            <% _.each(groupOptions, function(groupOption) { %>
+                <% if (groupOption.groupTitle != null) { %>
+                    <optgroup label="<%- groupOption.groupTitle %>">
+                <% } %>
+                <% _.each(groupOption.selectOptions, function(selectOption) { %>
+                    <option value="<%- selectOption[0] %>"><%- selectOption[1] %></option>
+                <% }); %>
             <% }); %>
         </select>
         <span class="icon-caret-down" aria-hidden="true"></span>
