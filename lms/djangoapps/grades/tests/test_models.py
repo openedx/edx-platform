@@ -91,7 +91,7 @@ class VisibleBlocksTest(GradesModelTestCase):
         """
         Happy path test to ensure basic create functionality works as expected.
         """
-        vblocks = VisibleBlocks.create([self.record_a])
+        vblocks = VisibleBlocks.objects.create_from_blockrecords([self.record_a])
         expected_json = json.dumps([self.record_a._asdict()], separators=(',', ':'), sort_keys=True)
         expected_hash = b64encode(sha256(expected_json).digest())
         self.assertEqual(expected_json, vblocks._blocks_json)  # pylint: disable=protected-access
@@ -103,7 +103,7 @@ class VisibleBlocksTest(GradesModelTestCase):
         a copy of the initial array. Also, trying to set the blocks property should raise an exception.
         """
         blocks = [self.record_a, self.record_b]
-        vblocks = VisibleBlocks.create(blocks)
+        vblocks = VisibleBlocks.objects.create_from_blockrecords(blocks)
         self.assertSequenceEqual(
             [block._asdict() for block in blocks],
             [block._asdict() for block in vblocks.blocks]

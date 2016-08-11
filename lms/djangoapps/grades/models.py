@@ -22,6 +22,25 @@ import logging
 log = logging.getLogger(__name__)
 
 
+BlockRecord = namedtuple('BlockRecord', ['locator', 'weight', 'max_score'])
+
+
+class VisibleBlocksQuerySet(models.QuerySet):
+    """
+    A custom QuerySet representing VisibleBlocks.
+    """
+    def create_from_blockrecords(self, blocks):
+        """
+        Creates a new VisibleBlocks model object. 
+
+        Argument 'blocks' should be an iterable collection of BlockRecords.
+        """
+        _blocks_json = json.dumps([block._asdict() for block in blocks], separators=(',', ':'), sort_keys=True)
+        hashed = b64encode(sha256(_blocks_json).digest())
+        model, _ = self.get_or_create(hashed=hashed, defaults={'_blocks_json': _blocks_json})
+        return model
+
+
 class VisibleBlocks(models.Model):
     """
     A django model used to track the state of a set of visible blocks under a given subsection at the time they are
@@ -33,21 +52,13 @@ class VisibleBlocks(models.Model):
     _blocks_json = models.TextField(db_column="blocks_json")
     hashed = models.CharField(max_length=44, unique=True)
 
+    objects = VisibleBlocksQuerySet.as_manager()
+
     def __unicode__(self):
         """
         String representation of this model.
         """
         return "VisibleBlocks object - hash:{}, raw json:'{}'".format(self.hashed, self._blocks_json)
-
-    @classmethod
-    def create(cls, blocks):
-        """
-        Creates a new VisibleBlocks model. Argument 'blocks' should be an iterable collection of BlockRecords.
-        """
-        _blocks_json = json.dumps([block._asdict() for block in blocks], separators=(',', ':'), sort_keys=True)
-        hashed = b64encode(sha256(_blocks_json).digest())
-        model, _ = cls.objects.get_or_create(hashed=hashed, defaults={'_blocks_json': _blocks_json})
-        return model
 
     @property
     def blocks(self):
@@ -67,16 +78,10 @@ class VisibleBlocks(models.Model):
         )
 
 
-class BlockRecord(namedtuple('BlockRecordBase', ['locator', 'weight', 'max_score'])):
+class PersistentSubsectionGradeQuerySet(models.QuerySet):
     """
-    A namedtuple used to serialize information about a block at the time it was used in grade calculation.
-    """
-    pass
-
-
-class PersistentSubsectionGradeManager(models.QuerySet):
-    """
-    A custom QuerySet (to be used as a manager), that handles creating a VisibleBlocks model on creation.
+    A custom QuerySet, that handles creating a VisibleBlocks model on creation, and
+    separates the course key from the.
     """
     def create(self, **kwargs):
         """
@@ -93,7 +98,7 @@ class PersistentSubsectionGradeManager(models.QuerySet):
             possible_graded (float)
             visible_blocks (iterable of BlockRecord)
         """
-        visible_blocks_model = VisibleBlocks.create(blocks=kwargs.pop('visible_blocks'))
+        visible_blocks_model = VisibleBlocks.objects.create_from_blockrecords(blocks=kwargs.pop('visible_blocks'))
 
         grade = self.model(
             course_id=kwargs['usage_key'].course_key,
@@ -136,7 +141,7 @@ class PersistentSubsectionGrade(TimeStampedModel):
     visible_blocks = models.ForeignKey(VisibleBlocks)
 
     # use custom manager
-    objects = PersistentSubsectionGradeManager.as_manager()
+    objects = PersistentSubsectionGradeQuerySet.as_manager()
 
     def __unicode__(self):
         """
@@ -205,7 +210,7 @@ class PersistentSubsectionGrade(TimeStampedModel):
         # If that happens, the situation is unrecoverable, as we need to read a new piece of data (a visible_blocks FK)
         # that won't be visible inside the current transaction. In those cases, log the issue and abort.
         try:
-            visible_blocks_model = VisibleBlocks.create(blocks=visible_blocks)
+            visible_blocks_model = VisibleBlocks.objects.create_from_blockrecords(blocks=visible_blocks)
         except IntegrityError:
             log.error("Race condition hit in robust grading data model. Unrecoverable repeatable-read issue.")
             raise
