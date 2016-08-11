@@ -7,6 +7,7 @@ from django.db import models
 from config_models.models import ConfigurationModel
 
 
+# TODO: To be simplified as part of ECOM-5136.
 class ProgramsApiConfig(ConfigurationModel):
     """
     Manages configuration for connecting to the Programs service and using its
@@ -29,7 +30,6 @@ class ProgramsApiConfig(ConfigurationModel):
         )
     )
 
-    # TODO: The property below is obsolete. Delete at the earliest safe moment. See ECOM-4995
     authoring_app_js_path = models.CharField(
         verbose_name=_("Path to authoring app's JS"),
         max_length=255,
@@ -39,7 +39,6 @@ class ProgramsApiConfig(ConfigurationModel):
         )
     )
 
-    # TODO: The property below is obsolete. Delete at the earliest safe moment. See ECOM-4995
     authoring_app_css_path = models.CharField(
         verbose_name=_("Path to authoring app's CSS"),
         max_length=255,
@@ -81,7 +80,6 @@ class ProgramsApiConfig(ConfigurationModel):
         )
     )
 
-    # TODO: Remove unused field.
     xseries_ad_enabled = models.BooleanField(
         verbose_name=_("Do we want to show xseries program advertising"),
         default=False
@@ -115,14 +113,6 @@ class ProgramsApiConfig(ConfigurationModel):
     def is_cache_enabled(self):
         """Whether responses from the Programs API will be cached."""
         return self.cache_ttl > 0
-
-    @property
-    def is_student_dashboard_enabled(self):
-        """
-        Indicates whether LMS dashboard functionality related to Programs should
-        be enabled or not.
-        """
-        return self.enabled and self.enable_student_dashboard
 
     @property
     def is_studio_tab_enabled(self):

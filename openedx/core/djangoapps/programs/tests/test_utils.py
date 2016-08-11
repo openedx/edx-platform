@@ -12,9 +12,11 @@ from django.core.urlresolvers import reverse
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.utils import timezone
+from django.utils.text import slugify
 import httpretty
 import mock
 from nose.plugins.attrib import attr
+from opaque_keys.edx.keys import CourseKey
 from edx_oauth2_provider.tests.factories import ClientFactory
 from provider.constants import CONFIDENTIAL
 
@@ -141,36 +143,6 @@ class TestProgramRetrieval(ProgramsApiConfigMixin, ProgramsDataMixin, Credential
         actual = utils.get_programs(self.user)
         self.assertEqual(actual, [])
 
-    def test_get_programs_for_dashboard(self):
-        """Verify programs data can be retrieved and parsed correctly."""
-        self.create_programs_config()
-        self.mock_programs_api()
-
-        actual = utils.get_programs_for_dashboard(self.user, self.COURSE_KEYS)
-        expected = {}
-        for program in self.PROGRAMS_API_RESPONSE['results']:
-            for course_code in program['course_codes']:
-                for run in course_code['run_modes']:
-                    course_key = run['course_key']
-                    expected.setdefault(course_key, []).append(program)
-
-        self.assertEqual(actual, expected)
-
-    def test_get_programs_for_dashboard_dashboard_display_disabled(self):
-        """Verify behavior when student dashboard display is disabled."""
-        self.create_programs_config(enable_student_dashboard=False)
-
-        actual = utils.get_programs_for_dashboard(self.user, self.COURSE_KEYS)
-        self.assertEqual(actual, {})
-
-    def test_get_programs_for_dashboard_no_data(self):
-        """Verify behavior when no programs data is found for the user."""
-        self.create_programs_config()
-        self.mock_programs_api(data={'results': []})
-
-        actual = utils.get_programs_for_dashboard(self.user, self.COURSE_KEYS)
-        self.assertEqual(actual, {})
-
     def test_get_program_for_certificates(self):
         """Verify programs data can be retrieved and parsed correctly for certificates."""
         self.create_programs_config()
@@ -216,6 +188,78 @@ class TestProgramRetrieval(ProgramsApiConfigMixin, ProgramsDataMixin, Credential
         ]
         actual = utils.get_programs_for_credentials(self.user, credential_data)
         self.assertEqual(actual, [])
+
+
+@skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+class GetProgramsByRunTests(TestCase):
+    """Tests verifying that programs are inverted correctly."""
+    maxDiff = None
+
+    @classmethod
+    def setUpClass(cls):
+        super(GetProgramsByRunTests, cls).setUpClass()
+
+        cls.user = UserFactory()
+
+        course_keys = [
+            CourseKey.from_string('some/course/run'),
+            CourseKey.from_string('some/other/run'),
+        ]
+
+        cls.enrollments = [CourseEnrollmentFactory(user=cls.user, course_id=c) for c in course_keys]
+        cls.course_ids = [unicode(c) for c in course_keys]
+
+        organization = factories.Organization()
+        joint_programs = sorted([
+            factories.Program(
+                organizations=[organization],
+                course_codes=[
+                    factories.CourseCode(run_modes=[
+                        factories.RunMode(course_key=cls.course_ids[0]),
+                    ]),
+                ]
+            ) for __ in range(2)
+        ], key=lambda p: p['name'])
+
+        cls.programs = joint_programs + [
+            factories.Program(
+                organizations=[organization],
+                course_codes=[
+                    factories.CourseCode(run_modes=[
+                        factories.RunMode(course_key=cls.course_ids[1]),
+                    ]),
+                ]
+            ),
+            factories.Program(
+                organizations=[organization],
+                course_codes=[
+                    factories.CourseCode(run_modes=[
+                        factories.RunMode(course_key='yet/another/run'),
+                    ]),
+                ]
+            ),
+        ]
+
+    def test_get_programs_by_run(self):
+        """Verify that programs are organized by run ID."""
+        programs_by_run, course_ids = utils.get_programs_by_run(self.programs, self.enrollments)
+
+        self.assertEqual(programs_by_run[self.course_ids[0]], self.programs[:2])
+        self.assertEqual(programs_by_run[self.course_ids[1]], self.programs[2:3])
+
+        self.assertEqual(course_ids, self.course_ids)
+
+    def test_no_programs(self):
+        """Verify that the utility can cope with missing programs data."""
+        programs_by_run, course_ids = utils.get_programs_by_run([], self.enrollments)
+        self.assertEqual(programs_by_run, {})
+        self.assertEqual(course_ids, self.course_ids)
+
+    def test_no_enrollments(self):
+        """Verify that the utility can cope with missing enrollment data."""
+        programs_by_run, course_ids = utils.get_programs_by_run(self.programs, [])
+        self.assertEqual(programs_by_run, {})
+        self.assertEqual(course_ids, [])
 
 
 @skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
@@ -297,6 +341,14 @@ class TestProgramProgressMeter(ProgramsApiConfigMixin, TestCase):
         """Construct a list containing the display names of the indicated course codes."""
         return [program['course_codes'][cc]['display_name'] for cc in course_codes]
 
+    def _attach_detail_url(self, programs):
+        """Add expected detail URLs to a list of program dicts."""
+        for program in programs:
+            base = reverse('program_details_view', kwargs={'program_id': program['id']}).rstrip('/')
+            slug = slugify(program['name'])
+
+            program['detail_url'] = '{base}/{slug}'.format(base=base, slug=slug)
+
     def test_no_enrollments(self):
         """Verify behavior when programs exist, but no relevant enrollments do."""
         data = [
@@ -311,7 +363,7 @@ class TestProgramProgressMeter(ProgramsApiConfigMixin, TestCase):
 
         meter = utils.ProgramProgressMeter(self.user)
 
-        self.assertEqual(meter.engaged_programs, [])
+        self.assertEqual(meter.engaged_programs(), [])
         self._assert_progress(meter)
         self.assertEqual(meter.completed_programs, [])
 
@@ -322,7 +374,7 @@ class TestProgramProgressMeter(ProgramsApiConfigMixin, TestCase):
         self._create_enrollments('org/course/run')
         meter = utils.ProgramProgressMeter(self.user)
 
-        self.assertEqual(meter.engaged_programs, [])
+        self.assertEqual(meter.engaged_programs(), [])
         self._assert_progress(meter)
         self.assertEqual(meter.completed_programs, [])
 
@@ -353,8 +405,9 @@ class TestProgramProgressMeter(ProgramsApiConfigMixin, TestCase):
         self._create_enrollments(course_id)
         meter = utils.ProgramProgressMeter(self.user)
 
+        self._attach_detail_url(data)
         program = data[0]
-        self.assertEqual(meter.engaged_programs, [program])
+        self.assertEqual(meter.engaged_programs(), [program])
         self._assert_progress(
             meter,
             factories.Progress(
@@ -399,8 +452,9 @@ class TestProgramProgressMeter(ProgramsApiConfigMixin, TestCase):
         self._create_enrollments(second_course_id, first_course_id)
         meter = utils.ProgramProgressMeter(self.user)
 
+        self._attach_detail_url(data)
         programs = data[:2]
-        self.assertEqual(meter.engaged_programs, programs)
+        self.assertEqual(meter.engaged_programs(), programs)
         self._assert_progress(
             meter,
             factories.Progress(id=programs[0]['id'], in_progress=self._extract_names(programs[0], 0)),
@@ -414,7 +468,8 @@ class TestProgramProgressMeter(ProgramsApiConfigMixin, TestCase):
         appearing in multiple programs.
         """
         shared_course_id, solo_course_id = 'org/shared-course/run', 'org/solo-course/run'
-        data = [
+
+        joint_programs = sorted([
             factories.Program(
                 organizations=[factories.Organization()],
                 course_codes=[
@@ -422,15 +477,10 @@ class TestProgramProgressMeter(ProgramsApiConfigMixin, TestCase):
                         factories.RunMode(course_key=shared_course_id),
                     ]),
                 ]
-            ),
-            factories.Program(
-                organizations=[factories.Organization()],
-                course_codes=[
-                    factories.CourseCode(run_modes=[
-                        factories.RunMode(course_key=shared_course_id),
-                    ]),
-                ]
-            ),
+            ) for __ in range(2)
+        ], key=lambda p: p['name'])
+
+        data = joint_programs + [
             factories.Program(
                 organizations=[factories.Organization()],
                 course_codes=[
@@ -446,14 +496,16 @@ class TestProgramProgressMeter(ProgramsApiConfigMixin, TestCase):
                 ]
             ),
         ]
+
         self._mock_programs_api(data)
 
         # Enrollment for the shared course ID created last (most recently).
         self._create_enrollments(solo_course_id, shared_course_id)
         meter = utils.ProgramProgressMeter(self.user)
 
+        self._attach_detail_url(data)
         programs = data[:3]
-        self.assertEqual(meter.engaged_programs, programs)
+        self.assertEqual(meter.engaged_programs(), programs)
         self._assert_progress(
             meter,
             factories.Progress(id=programs[0]['id'], in_progress=self._extract_names(programs[0], 0)),

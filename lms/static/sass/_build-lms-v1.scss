@@ -13,11 +13,12 @@
 @import 'base/base';
 
 // base - elements
-@import 'elements/typography';
 @import 'elements/controls';
+@import 'elements/creative-commons';
+@import 'elements/icons';
 @import 'elements/navigation';
 @import 'elements/pagination';
-@import 'elements/creative-commons';
+@import 'elements/typography';
 
 // shared - course
 @import 'shared/fields';
