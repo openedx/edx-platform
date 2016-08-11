@@ -2,51 +2,31 @@
 metadata:
     display_name: Multiple Choice
     markdown: |
-       Multiple choice problems allow learners to select only one option. Learners can see all the options along with the problem text.
 
-       When you add the problem, be sure to select Settings to specify a Display Name and other values that apply.
+        You can use this template as a guide to the simple editor markdown and OLX markup to use for multiple choice with hints and feedback problems. Edit this component to replace this template with your own assessment.
 
-       You can use the following example problem as a model.
+        >>Add the question text, or prompt, here. This text is required.||You can add an optional tip or note related to the prompt like this. <<
 
-       >>Which of the following countries has the largest population?||You can select only one option.<<
-       ( ) Brazil {{ timely feedback -- explain why an almost correct answer is wrong }}
-       ( ) Germany
-       (x) Indonesia
-       ( ) Russia
+        ( ) an incorrect answer {{You can specify optional feedback like this, which appears after this answer is submitted.}}
+        (x) the correct answer
+        ( ) an incorrect answer {{You can specify optional feedback for none, a subset, or all of the answers.}}
 
-       [explanation]
-       According to September 2014 estimates:
-       The population of Indonesia is approximately 250 million.
-       The population of Brazil  is approximately 200 million.
-       The population of Russia is approximately 146 million.
-       The population of Germany is approximately 81 million.
-       [explanation]
 
 data:   |
         <problem>
-           <multiplechoiceresponse>
-               <p>Multiple choice problems allow learners to select only one option. Learners can see all the options along with the problem text.</p>
-               <p>When you add the problem, be sure to select Settings to specify a Display Name and other values that apply.</p>
-               <p>You can use the following example problem as a model.</p>
-               <label>Which of the following countries has the largest population?</label>
-               <description>You can select only one option.</description>
-               <choicegroup type="MultipleChoice">
-                   <choice correct="false">Brazil
-                       <choicehint>timely feedback -- explain why an almost correct answer is wrong</choicehint>
-                   </choice>
-                   <choice correct="false">Germany</choice>
-                   <choice correct="true">Indonesia</choice>
-                   <choice correct="false">Russia</choice>
-               </choicegroup>
-               <solution>
-                   <div class="detailed-solution">
-                       <p>Explanation</p>
-                       <p>According to September 2014 estimates:</p>
-                       <p>The population of Indonesia is approximately 250 million.</p>
-                       <p>The population of Brazil is approximately 200 million.</p>
-                       <p>The population of Russia is approximately 146 million.</p>
-                       <p>The population of Germany is approximately 81 million.</p>
-                   </div>
-               </solution>
-           </multiplechoiceresponse>
+            <multiplechoiceresponse>
+                <p>You can use this template as a guide to the simple editor markdown and OLX markup to use for multiple choice with hints and feedback problems. Edit this component to replace this template with your own assessment.</p>
+                <label>Add the question text, or prompt, here. This text is required.</label>
+                <description>You can add an optional tip or note related to the prompt like this.</description>
+                <choicegroup>
+                    <choice correct="false">an incorrect answer
+                        <choicehint>You can specify optional feedback like this, which appears after this answer is submitted.</choicehint>
+                    </choice>
+                    <choice correct="true">the correct answer
+                    </choice>
+                    <choice correct="false">an incorrect answer
+                        <choicehint>You can specify optional feedback for none, a subset, or all of the answers.</choicehint>
+                    </choice>
+                </choicegroup>
+            </multiplechoiceresponse>
         </problem>
