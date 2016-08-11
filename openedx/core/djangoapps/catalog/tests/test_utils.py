@@ -1,14 +1,18 @@
-"""Tests covering utilities for integrating with the catalog service."""
+"""
+Tests covering utilities for integrating with the catalog service.
+"""
 import uuid
 
-import ddt
+from django.core.cache import cache
 from django.test import TestCase
+import httpretty
 import mock
 from opaque_keys.edx.keys import CourseKey
 
 from openedx.core.djangoapps.catalog import utils
 from openedx.core.djangoapps.catalog.models import CatalogIntegration
 from openedx.core.djangoapps.catalog.tests import factories, mixins
+from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from student.tests.factories import UserFactory
 
 
@@ -19,7 +23,9 @@ UTILS_MODULE = 'openedx.core.djangoapps.catalog.utils'
 # ConfigurationModels use the cache. Make every cache get a miss.
 @mock.patch('config_models.models.cache.get', return_value=None)
 class TestGetPrograms(mixins.CatalogIntegrationMixin, TestCase):
-    """Tests covering retrieval of programs from the catalog service."""
+    """
+    Tests covering retrieval of programs from the catalog service.
+    """
     def setUp(self):
         super(TestGetPrograms, self).setUp()
 
@@ -29,7 +35,9 @@ class TestGetPrograms(mixins.CatalogIntegrationMixin, TestCase):
         self.catalog_integration = self.create_catalog_integration(cache_ttl=1)
 
     def assert_contract(self, call_args, program_uuid=None, type=None):  # pylint: disable=redefined-builtin
-        """Verify that API data retrieval utility is used correctly."""
+        """
+        Verify that API data retrieval utility is used correctly.
+        """
         args, kwargs = call_args
 
         for arg in (self.catalog_integration, self.user, 'programs'):
@@ -108,7 +116,9 @@ class TestGetPrograms(mixins.CatalogIntegrationMixin, TestCase):
 
 
 class TestMungeCatalogProgram(TestCase):
-    """Tests covering querystring stripping."""
+    """
+    Tests covering querystring stripping.
+    """
     catalog_program = factories.Program()
 
     def test_munge_catalog_program(self):
@@ -153,90 +163,173 @@ class TestMungeCatalogProgram(TestCase):
         self.assertEqual(munged, expected)
 
 
-@mock.patch(UTILS_MODULE + '.get_edx_api_data')
-@mock.patch('config_models.models.cache.get', return_value=None)
-class TestGetCourseRun(mixins.CatalogIntegrationMixin, TestCase):
-    """Tests covering retrieval of course runs from the catalog service."""
+@httpretty.activate
+class TestGetCourseRun(mixins.CatalogIntegrationMixin, CacheIsolationTestCase):
+    """
+    Tests covering retrieval of course runs from the catalog service.
+    """
+
+    ENABLED_CACHES = ['default']
+
     def setUp(self):
         super(TestGetCourseRun, self).setUp()
 
         self.user = UserFactory()
-        self.course_key = CourseKey.from_string('foo/bar/baz')
-        self.catalog_integration = self.create_catalog_integration()
+        self.catalog_integration = self.create_catalog_integration(
+            internal_api_url="http://catalog.example.com:443/api/v1",
+            cache_ttl=1,
+        )
+        self.course_runs = [factories.CourseRun() for __ in range(4)]
+        self.course_key_1 = CourseKey.from_string(self.course_runs[0]["key"])
+        self.course_key_2 = CourseKey.from_string(self.course_runs[1]["key"])
+        self.course_key_3 = CourseKey.from_string(self.course_runs[2]["key"])
+        self.course_key_4 = CourseKey.from_string(self.course_runs[3]["key"])
 
-    def assert_contract(self, call_args):
-        """Verify that API data retrieval utility is used correctly."""
-        args, kwargs = call_args
-
-        for arg in (self.catalog_integration, self.user, 'course_runs'):
-            self.assertIn(arg, args)
-
-        self.assertEqual(kwargs['resource_id'], unicode(self.course_key))
-        self.assertEqual(kwargs['api']._store['base_url'], self.catalog_integration.internal_api_url)  # pylint: disable=protected-access
-
-        return args, kwargs
-
-    def test_get_course_run(self, _mock_cache, mock_get_catalog_data):
-        course_run = factories.CourseRun()
-        mock_get_catalog_data.return_value = course_run
-
-        data = utils.get_course_run(self.course_key, self.user)
-
-        self.assert_contract(mock_get_catalog_data.call_args)
-        self.assertEqual(data, course_run)
-
-    def test_course_run_unavailable(self, _mock_cache, mock_get_catalog_data):
-        mock_get_catalog_data.return_value = []
-
-        data = utils.get_course_run(self.course_key, self.user)
-
-        self.assert_contract(mock_get_catalog_data.call_args)
-        self.assertEqual(data, {})
-
-    def test_cache_disabled(self, _mock_cache, mock_get_catalog_data):
-        utils.get_course_run(self.course_key, self.user)
-
-        _, kwargs = self.assert_contract(mock_get_catalog_data.call_args)
-
-        self.assertIsNone(kwargs['cache_key'])
-
-    def test_cache_enabled(self, _mock_cache, mock_get_catalog_data):
-        catalog_integration = self.create_catalog_integration(cache_ttl=1)
-
-        utils.get_course_run(self.course_key, self.user)
-
-        _, kwargs = mock_get_catalog_data.call_args
-
-        self.assertEqual(kwargs['cache_key'], catalog_integration.CACHE_KEY)
-
-    def test_config_missing(self, _mock_cache, _mock_get_catalog_data):
-        """Verify that no errors occur if this method is called when catalog config is missing."""
+    def test_config_missing(self):
+        """
+        Verify that no errors occur if this method is called when catalog config is missing.
+        """
         CatalogIntegration.objects.all().delete()
 
-        data = utils.get_course_run(self.course_key, self.user)
+        data = utils.get_course_runs([], self.user)
         self.assertEqual(data, {})
 
+    def test_get_course_run(self):
+        course_keys = [self.course_key_1]
+        course_key_strings = [self.course_runs[0]["key"]]
+        self.register_catalog_course_run_response(course_key_strings, [self.course_runs[0]])
 
-@mock.patch(UTILS_MODULE + '.get_course_run')
-class TestGetRunMarketingUrl(TestCase):
-    """Tests covering retrieval of course run marketing URLs."""
+        course_catalog_data_dict = utils.get_course_runs(course_keys, self.user)
+        expected_data = {self.course_runs[0]["key"]: self.course_runs[0]}
+        self.assertEqual(expected_data, course_catalog_data_dict)
+
+    def test_get_multiple_course_run(self):
+        course_key_strings = [self.course_runs[0]["key"], self.course_runs[1]["key"], self.course_runs[2]["key"]]
+        course_keys = [self.course_key_1, self.course_key_2, self.course_key_3]
+        self.register_catalog_course_run_response(
+            course_key_strings, [self.course_runs[0], self.course_runs[1], self.course_runs[2]]
+        )
+
+        course_catalog_data_dict = utils.get_course_runs(course_keys, self.user)
+        expected_data = {
+            self.course_runs[0]["key"]: self.course_runs[0],
+            self.course_runs[1]["key"]: self.course_runs[1],
+            self.course_runs[2]["key"]: self.course_runs[2],
+        }
+        self.assertEqual(expected_data, course_catalog_data_dict)
+
+    def test_course_run_unavailable(self):
+        course_key_strings = [self.course_runs[0]["key"], self.course_runs[3]["key"]]
+        course_keys = [self.course_key_1, self.course_key_4]
+        self.register_catalog_course_run_response(course_key_strings, [self.course_runs[0]])
+
+        course_catalog_data_dict = utils.get_course_runs(course_keys, self.user)
+        expected_data = {self.course_runs[0]["key"]: self.course_runs[0]}
+        self.assertEqual(expected_data, course_catalog_data_dict)
+
+    def test_cached_course_run_data(self):
+        course_key_strings = [self.course_runs[0]["key"], self.course_runs[1]["key"]]
+        course_keys = [self.course_key_1, self.course_key_2]
+        course_cached_keys = [
+            "{}{}".format(utils.CatalogCacheUtility.CACHE_KEY_PREFIX, self.course_runs[0]["key"]),
+            "{}{}".format(utils.CatalogCacheUtility.CACHE_KEY_PREFIX, self.course_runs[1]["key"]),
+        ]
+        self.register_catalog_course_run_response(course_key_strings, [self.course_runs[0], self.course_runs[1]])
+        expected_data = {
+            self.course_runs[0]["key"]: self.course_runs[0],
+            self.course_runs[1]["key"]: self.course_runs[1],
+        }
+
+        course_catalog_data_dict = utils.get_course_runs(course_keys, self.user)
+        self.assertEqual(expected_data, course_catalog_data_dict)
+        cached_data = cache.get_many(course_cached_keys)
+        self.assertEqual(set(course_cached_keys), set(cached_data.keys()))
+
+        with mock.patch('openedx.core.djangoapps.catalog.utils.get_edx_api_data') as mock_method:
+            course_catalog_data_dict = utils.get_course_runs(course_keys, self.user)
+            self.assertEqual(0, mock_method.call_count)
+            self.assertEqual(expected_data, course_catalog_data_dict)
+
+
+class TestGetRunMarketingUrl(TestCase, mixins.CatalogIntegrationMixin):
+    """
+    Tests covering retrieval of course run marketing URLs.
+    """
     def setUp(self):
         super(TestGetRunMarketingUrl, self).setUp()
-
-        self.course_key = CourseKey.from_string('foo/bar/baz')
         self.user = UserFactory()
+        self.course_runs = [factories.CourseRun() for __ in range(2)]
+        self.course_key_1 = CourseKey.from_string(self.course_runs[0]["key"])
 
-    def test_get_run_marketing_url(self, mock_get_course_run):
-        course_run = factories.CourseRun()
-        mock_get_course_run.return_value = course_run
+    def test_get_run_marketing_url(self):
+        with mock.patch('openedx.core.djangoapps.catalog.utils.get_course_runs', return_value={
+            self.course_runs[0]["key"]: self.course_runs[0],
+            self.course_runs[1]["key"]: self.course_runs[1],
+        }):
+            course_marketing_url = utils.get_run_marketing_url(self.course_key_1, self.user)
+            self.assertEqual(self.course_runs[0]["marketing_url"], course_marketing_url)
 
-        url = utils.get_run_marketing_url(self.course_key, self.user)
+    def test_marketing_url_catalog_course_run_not_found(self):
+        with mock.patch('openedx.core.djangoapps.catalog.utils.get_course_runs', return_value={
+            self.course_runs[0]["key"]: self.course_runs[0],
+        }):
+            course_marketing_url = utils.get_run_marketing_url(self.course_key_1, self.user)
+            self.assertEqual(self.course_runs[0]["marketing_url"], course_marketing_url)
 
-        self.assertEqual(url, course_run['marketing_url'])
+    def test_marketing_url_missing(self):
+        self.course_runs[1]["marketing_url"] = None
+        with mock.patch('openedx.core.djangoapps.catalog.utils.get_course_runs', return_value={
+            self.course_runs[0]["key"]: self.course_runs[0],
+            self.course_runs[1]["key"]: self.course_runs[1],
+        }):
+            course_marketing_url = utils.get_run_marketing_url(CourseKey.from_string("foo2/bar2/baz2"), self.user)
+            self.assertEqual(None, course_marketing_url)
 
-    def test_marketing_url_missing(self, mock_get_course_run):
-        mock_get_course_run.return_value = {}
 
-        url = utils.get_run_marketing_url(self.course_key, self.user)
+class TestGetRunMarketingUrls(TestCase, mixins.CatalogIntegrationMixin):
+    """
+    Tests covering retrieval of course run marketing URLs.
+    """
+    def setUp(self):
+        super(TestGetRunMarketingUrls, self).setUp()
+        self.user = UserFactory()
+        self.course_runs = [factories.CourseRun() for __ in range(2)]
+        self.course_keys = [
+            CourseKey.from_string(self.course_runs[0]["key"]),
+            CourseKey.from_string(self.course_runs[1]["key"]),
+        ]
 
-        self.assertEqual(url, None)
+    def test_get_run_marketing_url(self):
+        expected_data = {
+            self.course_runs[0]["key"]: self.course_runs[0]["marketing_url"],
+            self.course_runs[1]["key"]: self.course_runs[1]["marketing_url"],
+        }
+        with mock.patch('openedx.core.djangoapps.catalog.utils.get_course_runs', return_value={
+            self.course_runs[0]["key"]: self.course_runs[0],
+            self.course_runs[1]["key"]: self.course_runs[1],
+        }):
+            course_marketing_url_dict = utils.get_run_marketing_urls(self.course_keys, self.user)
+            self.assertEqual(expected_data, course_marketing_url_dict)
+
+    def test_marketing_url_catalog_course_run_not_found(self):
+        expected_data = {
+            self.course_runs[0]["key"]: self.course_runs[0]["marketing_url"],
+        }
+        with mock.patch('openedx.core.djangoapps.catalog.utils.get_course_runs', return_value={
+            self.course_runs[0]["key"]: self.course_runs[0],
+        }):
+            course_marketing_url_dict = utils.get_run_marketing_urls(self.course_keys, self.user)
+            self.assertEqual(expected_data, course_marketing_url_dict)
+
+    def test_marketing_url_missing(self):
+        expected_data = {
+            self.course_runs[0]["key"]: self.course_runs[0]["marketing_url"],
+            self.course_runs[1]["key"]: None,
+        }
+        self.course_runs[1]["marketing_url"] = None
+        with mock.patch('openedx.core.djangoapps.catalog.utils.get_course_runs', return_value={
+            self.course_runs[0]["key"]: self.course_runs[0],
+            self.course_runs[1]["key"]: self.course_runs[1],
+        }):
+            course_marketing_url_dict = utils.get_run_marketing_urls(self.course_keys, self.user)
+            self.assertEqual(expected_data, course_marketing_url_dict)
