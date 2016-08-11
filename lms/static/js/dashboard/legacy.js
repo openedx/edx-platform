@@ -200,7 +200,6 @@
         });
 
         $("#change_name_form").submit(function(){
-            debugger;
             var new_name = $('#new_name_field').val();
             var rationale = $('#name_rationale_field').val();
 
