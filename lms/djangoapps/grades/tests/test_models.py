@@ -84,9 +84,6 @@ class VisibleBlocksTest(GradesModelTestCase):
     """
     Test the VisibleBlocks model.
     """
-    def setUp(self):
-        super(VisibleBlocksTest, self).setUp()
-
     def test_creation(self):
         """
         Happy path test to ensure basic create functionality works as expected.
@@ -94,8 +91,24 @@ class VisibleBlocksTest(GradesModelTestCase):
         vblocks = VisibleBlocks.objects.create_from_blockrecords([self.record_a])
         expected_json = json.dumps([self.record_a._asdict()], separators=(',', ':'), sort_keys=True)
         expected_hash = b64encode(sha256(expected_json).digest())
-        self.assertEqual(expected_json, vblocks._blocks_json)  # pylint: disable=protected-access
+        self.assertEqual(expected_json, vblocks.blocks_json)
         self.assertEqual(expected_hash, vblocks.hashed)
+
+    def test_ordering_matters(self):
+        """
+        When creating new vbocks, a different ordering produces a different 
+        record in the database.  Saving blocks with the same order returns
+        the same record
+        """
+        stored_vblocks = VisibleBlocks.objects.create_from_blockrecords([self.record_a, self.record_b])
+        repeat_vblocks = VisibleBlocks.objects.create_from_blockrecords([self.record_a, self.record_b])
+        new_vblocks = VisibleBlocks.objects.create_from_blockrecords([self.record_b, self.record_a])
+
+        self.assertEqual(stored_vblocks.pk, repeat_vblocks.pk)
+        self.assertEqual(stored_vblocks.hashed, repeat_vblocks.hashed)
+
+        self.assertNotEqual(stored_vblocks.pk, new_vblocks.pk)
+        self.assertNotEqual(stored_vblocks.hashed, new_vblocks.hashed)
 
     def test_blocks(self):
         """

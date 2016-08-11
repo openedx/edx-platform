@@ -23,6 +23,25 @@ log = logging.getLogger(__name__)
 
 
 BlockRecord = namedtuple('BlockRecord', ['locator', 'weight', 'max_score'])
+"""
+A namedtuple used to serialize information about a block at the time it was used in grade calculation.
+"""
+
+
+def blockrecord_list_to_json(blocks):
+    """
+    Return a JSON-serialized version of the list of block records.
+    """
+    return json.dumps([block._asdict() for block in blocks], separators=(',', ':'), sort_keys=True)
+
+def blockrecord_json_to_hash(block_json):
+    """
+    Return a hashed version of the list of block records.
+
+    This currently hashes using sha256, and returns a b64 encoded version
+    of the binary digest.
+    """
+    return b64encode(sha256(block_json).digest())
 
 
 class VisibleBlocksQuerySet(models.QuerySet):
@@ -31,13 +50,13 @@ class VisibleBlocksQuerySet(models.QuerySet):
     """
     def create_from_blockrecords(self, blocks):
         """
-        Creates a new VisibleBlocks model object. 
+        Creates a new VisibleBlocks model object.
 
         Argument 'blocks' should be an iterable collection of BlockRecords.
         """
-        _blocks_json = json.dumps([block._asdict() for block in blocks], separators=(',', ':'), sort_keys=True)
-        hashed = b64encode(sha256(_blocks_json).digest())
-        model, _ = self.get_or_create(hashed=hashed, defaults={'_blocks_json': _blocks_json})
+        blocks_json = blockrecord_list_to_json(blocks)
+        hashed = blockrecord_json_to_hash(blocks_json)
+        model, _ = self.get_or_create(hashed=hashed, defaults={'blocks_json': blocks_json})
         return model
 
 
@@ -49,7 +68,7 @@ class VisibleBlocks(models.Model):
     This state is represented using an array of serialized BlockRecords, stored in the blocks_json field. A
     hash of this json array is used for lookup purposes.
     """
-    _blocks_json = models.TextField(db_column="blocks_json")
+    blocks_json = models.TextField()
     hashed = models.CharField(max_length=44, unique=True)
 
     objects = VisibleBlocksQuerySet.as_manager()
@@ -58,14 +77,14 @@ class VisibleBlocks(models.Model):
         """
         String representation of this model.
         """
-        return "VisibleBlocks object - hash:{}, raw json:'{}'".format(self.hashed, self._blocks_json)
+        return "VisibleBlocks object - hash:{}, raw json:'{}'".format(self.hashed, self.blocks_json)
 
     @property
     def blocks(self):
         """
         Returns the blocks_json data stored on this model as a list of BlockRecords in the order they were provided.
         """
-        block_dicts = json.loads(self._blocks_json)
+        block_dicts = json.loads(self.blocks_json)
         return [BlockRecord(data['locator'], data['weight'], data['max_score']) for data in block_dicts]
 
     @blocks.setter
@@ -98,11 +117,20 @@ class PersistentSubsectionGradeQuerySet(models.QuerySet):
             possible_graded (float)
             visible_blocks (iterable of BlockRecord)
         """
-        visible_blocks_model = VisibleBlocks.objects.create_from_blockrecords(blocks=kwargs.pop('visible_blocks'))
+        blocks = kwargs.pop('visible_blocks')
+        try:
+            visible_blocks_model = VisibleBlocks.objects.create_from_blockrecords(blocks=blocks)
+        except IntegrityError:
+            # If an integrity error occurs, the VisibleBlocks model we want to
+            # create already exists.  Use the hash for our current list of
+            # blocks as the foreign key.
+            visible_hash = blockrecord_json_to_hash(blockrecord_list_to_json(blocks))
+        else:
+            visible_hash = visible_blocks_model.hashed
 
         grade = self.model(
             course_id=kwargs['usage_key'].course_key,
-            visible_blocks=visible_blocks_model,
+            visible_blocks_id=visible_hash,
             **kwargs
         )
         grade.full_clean()
@@ -138,7 +166,7 @@ class PersistentSubsectionGrade(TimeStampedModel):
     possible_graded = models.FloatField(blank=False)
 
     # track which blocks were visible at the time of grade calculation
-    visible_blocks = models.ForeignKey(VisibleBlocks)
+    visible_blocks = models.ForeignKey(VisibleBlocks, db_column='visible_blocks_hash', to_field='hashed')
 
     # use custom manager
     objects = PersistentSubsectionGradeQuerySet.as_manager()
