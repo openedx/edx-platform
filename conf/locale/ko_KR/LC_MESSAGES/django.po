@@ -84,7 +84,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-07-30 10:48+0000\n"
+"POT-Creation-Date: 2016-08-04 18:45+0000\n"
 "PO-Revision-Date: 2016-05-09 11:27+0000\n"
 "Last-Translator: Sarina Canelake <sarina@edx.org>\n"
 "Language-Team: Korean (Korea) (http://www.transifex.com/open-edx/edx-platform/language/ko_KR/)\n"
@@ -450,6 +450,14 @@ msgstr ""
 msgid ""
 "You have already created an account using an external login like WebAuth or "
 "Shibboleth. Please contact {tech_support_email} for support."
+msgstr ""
+
+#: common/djangoapps/external_auth/views.py
+msgid ""
+"\n"
+"        Your university identity server did not return your ID information to us.\n"
+"        Please try logging in again.  (You may need to restart your browser.)\n"
+"        "
 msgstr ""
 
 #: common/djangoapps/student/admin.py
@@ -2858,6 +2866,16 @@ msgstr ""
 msgid ""
 "Enter true or false. If this value is true, you can hide a subsection until "
 "learners earn a minimum score in another, prerequisite subsection."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Enable Subsection Grades Saved"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Enter true or false. If this value is true, the robust grades feature of "
+"saving subsection grades is enabled for this course."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
@@ -7289,10 +7307,6 @@ msgid "You do not have permission to view this page."
 msgstr ""
 
 #: lms/djangoapps/student_account/views.py
-msgid "No user with the provided email address exists."
-msgstr ""
-
-#: lms/djangoapps/student_account/views.py
 msgid "No email address provided."
 msgstr ""
 
@@ -7321,7 +7335,6 @@ msgstr ""
 msgid "Email Address"
 msgstr "이메일 주소"
 
-#: cms/templates/maintenance/_force_publish_course.html
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 #: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
@@ -8401,6 +8414,10 @@ msgid "API Version"
 msgstr ""
 
 #: openedx/core/djangoapps/programs/models.py
+msgid "Path used to construct URLs to programs marketing pages (e.g., \"/foo\")."
+msgstr ""
+
+#: openedx/core/djangoapps/programs/models.py
 msgid "Path to authoring app's JS"
 msgstr ""
 
@@ -9114,39 +9131,6 @@ msgid ""
 "denied)"
 msgstr ""
 
-#: cms/djangoapps/maintenance/views.py
-#: cms/templates/maintenance/_force_publish_course.html
-msgid "Force Publish Course"
-msgstr ""
-
-#: cms/djangoapps/maintenance/views.py
-msgid ""
-"Sometimes the draft and published branches of a course can get out of sync. "
-"Force publish course command resets the published branch of a course to "
-"point to the draft branch, effectively force publishing the course. This "
-"view dry runs the force publish command"
-msgstr ""
-
-#: cms/djangoapps/maintenance/views.py
-msgid "Please provide course id."
-msgstr ""
-
-#: cms/djangoapps/maintenance/views.py
-msgid "Invalid course key."
-msgstr ""
-
-#: cms/djangoapps/maintenance/views.py
-msgid "No matching course found."
-msgstr ""
-
-#: cms/djangoapps/maintenance/views.py
-msgid "Force publishing course is not supported with old mongo courses."
-msgstr ""
-
-#: cms/djangoapps/maintenance/views.py
-msgid "Course is already in published state."
-msgstr ""
-
 #: cms/djangoapps/models/settings/course_metadata.py
 msgid "Incorrect format for field '{name}'. {detailed_message}"
 msgstr ""
@@ -9331,12 +9315,6 @@ msgstr "보기"
 msgid "Preview Language Setting"
 msgstr ""
 
-#: cms/templates/maintenance/_force_publish_course.html
-#: common/templates/darklang/preview_lang_include.html
-#: lms/templates/problem.html lms/templates/shoppingcart/shopping_cart.html
-msgid "Reset"
-msgstr "초기화"
-
 #: cms/templates/registration/activation_complete.html
 #: lms/templates/registration/activation_complete.html
 msgid "Thanks for activating your account."
@@ -9487,6 +9465,11 @@ msgstr ""
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid "Submit"
 msgstr "제출"
+
+#: common/templates/darklang/preview_lang_include.html
+#: lms/templates/problem.html lms/templates/shoppingcart/shopping_cart.html
+msgid "Reset"
+msgstr "초기화"
 
 #: common/templates/darklang/preview_lang_include.html
 msgid "Please refresh the page to see the changes applied."
@@ -12849,6 +12832,20 @@ msgid ""
 "An error occurred with this transaction. For help, contact {support_email}."
 msgstr "결제 처리과정에서 오류가 발생했습니다. {support_email}에게 문의하세요."
 
+#: lms/templates/dashboard/_dashboard_program_info.html
+msgid "{category} Program: Interested in more courses in this subject?"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_program_info.html
+msgid ""
+"This course is 1 of {course_count} courses in the "
+"{link_start}{program_display_name}{link_end} {program_category}."
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_program_info.html
+msgid "View {category} Details"
+msgstr ""
+
 #: lms/templates/dashboard/_dashboard_status_verification.html
 msgid "Verification Status: Approved"
 msgstr ""
@@ -12900,20 +12897,6 @@ msgid ""
 "The {provider_name} account you selected is already linked to another "
 "{platform_name} account."
 msgstr "선택한 {provider_name} 계정은 이미 다른 {platform_name} 계정에 링크되어 있습니다."
-
-#: lms/templates/dashboard/_dashboard_xseries_info.html
-msgid "{category} Program: Interested in more courses in this subject?"
-msgstr ""
-
-#: lms/templates/dashboard/_dashboard_xseries_info.html
-msgid ""
-"This course is 1 of {course_count} courses in the "
-"{link_start}{program_display_name}{link_end} {program_category}."
-msgstr ""
-
-#: lms/templates/dashboard/_dashboard_xseries_info.html
-msgid "View {category} Details"
-msgstr ""
 
 #: lms/templates/debug/run_python_form.html
 msgid "Results:"
@@ -19641,22 +19624,6 @@ msgstr "{studio_name} 에서의 강좌 개설 권한이 폐지되었습니다. �
 msgid "Your course creator status for {studio_name}"
 msgstr "{studio_name} 강좌 개설 준비 상태"
 
-#: cms/templates/maintenance/_force_publish_course.html
-msgid "Required data to force publish course."
-msgstr ""
-
-#: cms/templates/maintenance/_force_publish_course.html
-msgid "course-v1:edX+DemoX+Demo_Course"
-msgstr ""
-
-#: cms/templates/maintenance/_force_publish_course.html
-msgid "Reset values"
-msgstr ""
-
-#: cms/templates/maintenance/base.html cms/templates/maintenance/index.html
-msgid "Maintenance Dashboard"
-msgstr ""
-
 #: cms/templates/registration/reg_complete.html
 msgid ""
 "We've sent an email message to {email} with instructions for activating your"
@@ -19780,10 +19747,6 @@ msgstr "이름"
 #: cms/templates/widgets/user_dropdown.html
 msgid "Currently signed in as:"
 msgstr "현재 로그인된 사용자이름:"
-
-#: cms/templates/widgets/user_dropdown.html
-msgid "Maintenance"
-msgstr ""
 
 #: wiki/forms.py
 msgid "Only localhost... muahahaha"

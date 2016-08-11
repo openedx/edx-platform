@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-08-04 18:22+0000\n"
-"PO-Revision-Date: 2016-08-04 18:23:44.358027\n"
+"POT-Creation-Date: 2016-08-11 14:32+0000\n"
+"PO-Revision-Date: 2016-08-11 14:33:47.290995\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -4332,6 +4332,10 @@ msgstr ""
 "سثمثذف فاث فهوث ظخرث بخق يهسحمشغهرل ذخعقسث يشفثس. هب غخع يخ رخف سحثذهبغ ش "
 
 #: lms/static/js/student_account/views/account_settings_factory.js
+msgid "All Time Zones"
+msgstr "شمم فهوث ظخرثس"
+
+#: lms/static/js/student_account/views/account_settings_factory.js
 msgid "Additional Information"
 msgstr "شييهفهخرشم هربخقوشفهخر"
 
@@ -5035,6 +5039,10 @@ msgstr "ساخص يثحقثذشفثي سثففهرلس"
 #: cms/static/js/views/pages/group_configurations.js
 msgid "You have unsaved changes. Do you really want to leave this page?"
 msgstr "غخع اشدث عرسشدثي ذاشرلثس. يخ غخع قثشممغ صشرف فخ مثشدث فاهس حشلث?"
+
+#: cms/static/js/maintenance/force_publish_course.js
+msgid "Internal Server Error."
+msgstr "هرفثقرشم سثقدثق ثققخق."
 
 #. Translators: This is the status of a video upload that is queued
 #. waiting for other uploads to complete
@@ -9521,6 +9529,22 @@ msgstr "ثيهف %(display_name)s (قثضعهقثي)"
 #: cms/templates/js/xblock-string-field-editor.underscore
 msgid "formLabel"
 msgstr "بخقومشزثم"
+
+#: cms/templates/js/maintenance/force-published-course-response.underscore
+msgid ""
+"You have done a dry run of force publishing the course. Nothing has changed."
+" Had you run it, the following course versions would have been change."
+msgstr ""
+"غخع اشدث يخرث ش يقغ قعر خب بخقذث حعزمهساهرل فاث ذخعقسث. رخفاهرل اشس ذاشرلثي."
+" اشي غخع قعر هف, فاث بخممخصهرل ذخعقسث دثقسهخرس صخعمي اشدث زثثر ذاشرلث."
+
+#: cms/templates/js/maintenance/force-published-course-response.underscore
+msgid ""
+"The published branch version, {published}, was reset to the draft branch "
+"version, {draft}."
+msgstr ""
+"فاث حعزمهساثي زقشرذا دثقسهخر, {published}, صشس قثسثف فخ فاث يقشبف زقشرذا "
+"دثقسهخر, {draft}."
 
 #: cms/templates/js/programs/course_details.underscore
 msgid "Delete course"

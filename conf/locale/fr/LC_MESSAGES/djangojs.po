@@ -125,8 +125,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-07-30 10:47+0000\n"
-"PO-Revision-Date: 2016-07-29 14:05+0000\n"
+"POT-Creation-Date: 2016-08-04 18:44+0000\n"
+"PO-Revision-Date: 2016-08-04 18:47+0000\n"
 "Last-Translator: Ned Batchelder <ned@edx.org>\n"
 "Language-Team: French (http://www.transifex.com/open-edx/edx-platform/language/fr/)\n"
 "MIME-Version: 1.0\n"
@@ -4345,6 +4345,13 @@ msgstr "Chargement de vos cours"
 
 #: lms/static/js/student_account/views/LoginView.js
 msgid ""
+"We have sent an email message with password reset instructions to the email "
+"address you provided.  If you do not receive this message, "
+"{anchorStart}contact technical support{anchorEnd}."
+msgstr ""
+
+#: lms/static/js/student_account/views/LoginView.js
+msgid ""
 "An error has occurred. Try refreshing the page, or check your Internet "
 "connection."
 msgstr ""
@@ -5128,10 +5135,6 @@ msgid "You have unsaved changes. Do you really want to leave this page?"
 msgstr ""
 "Il reste des modifications non sauvegardées. Voulez-vous vraiment quitter "
 "cette page ?"
-
-#: cms/static/js/maintenance/force_publish_course.js
-msgid "Internal Server Error."
-msgstr ""
 
 #. Translators: This is the status of a video upload that is queued
 #. waiting for other uploads to complete
@@ -7107,13 +7110,11 @@ msgid "Generate Exception Certificates"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
-msgid ""
-"Generate certificates for all users on the Exception list who do not yet "
-"have a certificate"
+msgid "All users on the Exception list who do not yet have a certificate"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
-msgid "Generate a Certificate for all users on the Exception list"
+msgid "All users on the Exception list"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
@@ -7352,7 +7353,7 @@ msgid "Valid"
 msgstr "Valide"
 
 #: lms/templates/learner_dashboard/certificate.underscore
-msgid "XSeries Program Certificates"
+msgid "Program Certificates"
 msgstr ""
 
 #: lms/templates/learner_dashboard/certificate.underscore
@@ -7368,7 +7369,7 @@ msgid "Congratulations! You have earned a certificate for this course."
 msgstr ""
 
 #: lms/templates/learner_dashboard/certificate_status.underscore
-msgid "View/Share Certificate"
+msgid "View Certificate"
 msgstr ""
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
@@ -7421,11 +7422,11 @@ msgid "Not Currently Available"
 msgstr ""
 
 #: lms/templates/learner_dashboard/empty_programs_list.underscore
-msgid "You are not enrolled in any XSeries Programs yet."
+msgid "You are not enrolled in any programs yet."
 msgstr ""
 
 #: lms/templates/learner_dashboard/empty_programs_list.underscore
-msgid "Explore XSeries Programs"
+msgid "Explore Programs"
 msgstr ""
 
 #: lms/templates/learner_dashboard/explore_new_programs.underscore
@@ -7435,11 +7436,11 @@ msgid ""
 msgstr ""
 
 #: lms/templates/learner_dashboard/explore_new_programs.underscore
-msgid "Explore New XSeries"
+msgid "Explore New Programs"
 msgstr ""
 
 #: lms/templates/learner_dashboard/program_card.underscore
-msgid "type"
+msgid "category"
 msgstr ""
 
 #: lms/templates/learner_dashboard/program_card.underscore
@@ -7576,14 +7577,6 @@ msgstr ""
 #: lms/templates/student_account/login.underscore
 msgid "Password Reset Email Sent"
 msgstr "L'email de réinitialisation du mot de passe a été envoyé"
-
-#: lms/templates/student_account/login.underscore
-msgid ""
-"We've sent instructions for resetting your password to the email address you"
-" provided."
-msgstr ""
-"Nous avons envoyé les instructions pour réinitialiser votre mot de passe à "
-"l'adresse email que vous avez fournie."
 
 #: lms/templates/student_account/login.underscore
 msgid "We couldn't sign you in."
@@ -9441,18 +9434,6 @@ msgstr ""
 
 #: cms/templates/js/xblock-string-field-editor.underscore
 msgid "formLabel"
-msgstr ""
-
-#: cms/templates/js/maintenance/force-published-course-response.underscore
-msgid ""
-"You have done a dry run of force publishing the course. Nothing has changed."
-" Had you run it, the following course versions would have been change."
-msgstr ""
-
-#: cms/templates/js/maintenance/force-published-course-response.underscore
-msgid ""
-"The published branch version, {published}, was reset to the draft branch "
-"version, {draft}."
 msgstr ""
 
 #: cms/templates/js/programs/course_details.underscore

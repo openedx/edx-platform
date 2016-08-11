@@ -35,6 +35,7 @@
 # Sarina Canelake <sarina@edx.org>, 2015
 # UAbierta Universidad de Chile <uabierta@u.uchile.cl>, 2015
 # Valeria Freire <valtodopds@hotmail.com>, 2014-2015
+# Yusuf (Josè) Luis <alagunajs@gmail.com>, 2016
 # #-#-#-#-#  djangojs-studio.po (edx-platform)  #-#-#-#-#
 # edX translation file.
 # Copyright (C) 2016 EdX
@@ -111,9 +112,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-07-30 10:47+0000\n"
-"PO-Revision-Date: 2016-08-02 01:03+0000\n"
-"Last-Translator: Juan Camilo Montoya Franco <juan.montoya@edunext.co>\n"
+"POT-Creation-Date: 2016-08-04 18:44+0000\n"
+"PO-Revision-Date: 2016-08-04 18:47+0000\n"
+"Last-Translator: Ned Batchelder <ned@edx.org>\n"
 "Language-Team: Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -4397,6 +4398,13 @@ msgstr "Cargando sus cursos"
 
 #: lms/static/js/student_account/views/LoginView.js
 msgid ""
+"We have sent an email message with password reset instructions to the email "
+"address you provided.  If you do not receive this message, "
+"{anchorStart}contact technical support{anchorEnd}."
+msgstr ""
+
+#: lms/static/js/student_account/views/LoginView.js
+msgid ""
 "An error has occurred. Try refreshing the page, or check your Internet "
 "connection."
 msgstr ""
@@ -5211,10 +5219,6 @@ msgstr "Mostrar configuraciones descartadas"
 #: cms/static/js/views/pages/group_configurations.js
 msgid "You have unsaved changes. Do you really want to leave this page?"
 msgstr "Tiene cambios no guardados. ¿Realmente desea abandonar esta página?"
-
-#: cms/static/js/maintenance/force_publish_course.js
-msgid "Internal Server Error."
-msgstr ""
 
 #. Translators: This is the status of a video upload that is queued
 #. waiting for other uploads to complete
@@ -7280,16 +7284,12 @@ msgid "Generate Exception Certificates"
 msgstr "Generar excepciones de certificados"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
-msgid ""
-"Generate certificates for all users on the Exception list who do not yet "
-"have a certificate"
+msgid "All users on the Exception list who do not yet have a certificate"
 msgstr ""
-"Producir certificados para todos los usuarios en la lista de excepciones que"
-" aún no tienen un certificado"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
-msgid "Generate a Certificate for all users on the Exception list"
-msgstr "Generar un certificado para cada usuario en la lista de excepciones"
+msgid "All users on the Exception list"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
 msgid "User Email"
@@ -7542,8 +7542,8 @@ msgid "Valid"
 msgstr "Válido"
 
 #: lms/templates/learner_dashboard/certificate.underscore
-msgid "XSeries Program Certificates"
-msgstr "Certificados de programas de XSeries"
+msgid "Program Certificates"
+msgstr ""
 
 #: lms/templates/learner_dashboard/certificate.underscore
 msgid "certificate.credential_url"
@@ -7558,8 +7558,8 @@ msgid "Congratulations! You have earned a certificate for this course."
 msgstr "Felicitaciones! Usted a ganado un certificado de este curso."
 
 #: lms/templates/learner_dashboard/certificate_status.underscore
-msgid "View/Share Certificate"
-msgstr "Ver/compartir Certificado"
+msgid "View Certificate"
+msgstr ""
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
 msgid "enrolled"
@@ -7611,12 +7611,12 @@ msgid "Not Currently Available"
 msgstr ""
 
 #: lms/templates/learner_dashboard/empty_programs_list.underscore
-msgid "You are not enrolled in any XSeries Programs yet."
-msgstr "No se encuentra inscrito en ningún Programa de XSeries aún."
+msgid "You are not enrolled in any programs yet."
+msgstr ""
 
 #: lms/templates/learner_dashboard/empty_programs_list.underscore
-msgid "Explore XSeries Programs"
-msgstr "Explora Programas de XSeries nuevos"
+msgid "Explore Programs"
+msgstr ""
 
 #: lms/templates/learner_dashboard/explore_new_programs.underscore
 msgid ""
@@ -7627,12 +7627,12 @@ msgstr ""
 "en tus temas favoritos."
 
 #: lms/templates/learner_dashboard/explore_new_programs.underscore
-msgid "Explore New XSeries"
-msgstr "Explora XSeries nuevos"
+msgid "Explore New Programs"
+msgstr ""
 
 #: lms/templates/learner_dashboard/program_card.underscore
-msgid "type"
-msgstr "tipo"
+msgid "category"
+msgstr ""
 
 #: lms/templates/learner_dashboard/program_card.underscore
 #, python-format
@@ -7772,14 +7772,6 @@ msgstr ""
 #: lms/templates/student_account/login.underscore
 msgid "Password Reset Email Sent"
 msgstr "El correo para restablecer contraseña ha sido enviado."
-
-#: lms/templates/student_account/login.underscore
-msgid ""
-"We've sent instructions for resetting your password to the email address you"
-" provided."
-msgstr ""
-"Te hemos enviado las instrucciones para restablecer la contraseña a la "
-"dirección de correo electrónico que has proporcionado."
 
 #: lms/templates/student_account/login.underscore
 msgid "We couldn't sign you in."
@@ -9781,20 +9773,6 @@ msgstr "Editar %(display_name)s (requerido)"
 #: cms/templates/js/xblock-string-field-editor.underscore
 msgid "formLabel"
 msgstr "Etiqueta"
-
-#: cms/templates/js/maintenance/force-published-course-response.underscore
-msgid ""
-"You have done a dry run of force publishing the course. Nothing has changed."
-" Had you run it, the following course versions would have been change."
-msgstr ""
-
-#: cms/templates/js/maintenance/force-published-course-response.underscore
-msgid ""
-"The published branch version, {published}, was reset to the draft branch "
-"version, {draft}."
-msgstr ""
-"La versión publicada {published}, fué restablecida a la versión borrador "
-"{draft}."
 
 #: cms/templates/js/programs/course_details.underscore
 msgid "Delete course"
