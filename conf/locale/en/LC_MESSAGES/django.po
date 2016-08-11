@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-08-04 18:23+0000\n"
-"PO-Revision-Date: 2016-08-04 18:23:43.924696\n"
+"POT-Creation-Date: 2016-08-11 14:33+0000\n"
+"PO-Revision-Date: 2016-08-11 14:33:46.856803\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -7417,6 +7417,7 @@ msgid "Email Address"
 msgstr ""
 
 #: lms/djangoapps/support/views/refund.py
+#: cms/templates/maintenance/_force_publish_course.html
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 #: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
@@ -9224,6 +9225,39 @@ msgid ""
 "denied)"
 msgstr ""
 
+#: cms/djangoapps/maintenance/views.py
+#: cms/templates/maintenance/_force_publish_course.html
+msgid "Force Publish Course"
+msgstr ""
+
+#: cms/djangoapps/maintenance/views.py
+msgid ""
+"Sometimes the draft and published branches of a course can get out of sync. "
+"Force publish course command resets the published branch of a course to "
+"point to the draft branch, effectively force publishing the course. This "
+"view dry runs the force publish command"
+msgstr ""
+
+#: cms/djangoapps/maintenance/views.py
+msgid "Please provide course id."
+msgstr ""
+
+#: cms/djangoapps/maintenance/views.py
+msgid "Invalid course key."
+msgstr ""
+
+#: cms/djangoapps/maintenance/views.py
+msgid "No matching course found."
+msgstr ""
+
+#: cms/djangoapps/maintenance/views.py
+msgid "Force publishing course is not supported with old mongo courses."
+msgstr ""
+
+#: cms/djangoapps/maintenance/views.py
+msgid "Course is already in published state."
+msgstr ""
+
 #: cms/djangoapps/models/settings/course_metadata.py
 msgid "Incorrect format for field '{name}'. {detailed_message}"
 msgstr ""
@@ -9408,6 +9442,12 @@ msgstr ""
 msgid "Preview Language Setting"
 msgstr ""
 
+#: cms/templates/maintenance/_force_publish_course.html
+#: common/templates/darklang/preview_lang_include.html
+#: lms/templates/problem.html lms/templates/shoppingcart/shopping_cart.html
+msgid "Reset"
+msgstr ""
+
 #: cms/templates/registration/activation_complete.html
 #: lms/templates/registration/activation_complete.html
 msgid "Thanks for activating your account."
@@ -9557,11 +9597,6 @@ msgstr ""
 #: lms/templates/survey/survey.html
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid "Submit"
-msgstr ""
-
-#: common/templates/darklang/preview_lang_include.html
-#: lms/templates/problem.html lms/templates/shoppingcart/shopping_cart.html
-msgid "Reset"
 msgstr ""
 
 #: common/templates/darklang/preview_lang_include.html
@@ -12648,10 +12683,6 @@ msgid ""
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "{category} Program Course"
-msgstr ""
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Course details"
 msgstr ""
 
@@ -12739,6 +12770,10 @@ msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Email Settings"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Related Programs"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
@@ -12877,20 +12912,6 @@ msgstr ""
 #: lms/templates/dashboard/_dashboard_credit_info.html
 msgid ""
 "An error occurred with this transaction. For help, contact {support_email}."
-msgstr ""
-
-#: lms/templates/dashboard/_dashboard_program_info.html
-msgid "{category} Program: Interested in more courses in this subject?"
-msgstr ""
-
-#: lms/templates/dashboard/_dashboard_program_info.html
-msgid ""
-"This course is 1 of {course_count} courses in the "
-"{link_start}{program_display_name}{link_end} {program_category}."
-msgstr ""
-
-#: lms/templates/dashboard/_dashboard_program_info.html
-msgid "View {category} Details"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
@@ -19423,6 +19444,22 @@ msgstr ""
 msgid "Your course creator status for {studio_name}"
 msgstr ""
 
+#: cms/templates/maintenance/_force_publish_course.html
+msgid "Required data to force publish course."
+msgstr ""
+
+#: cms/templates/maintenance/_force_publish_course.html
+msgid "course-v1:edX+DemoX+Demo_Course"
+msgstr ""
+
+#: cms/templates/maintenance/_force_publish_course.html
+msgid "Reset values"
+msgstr ""
+
+#: cms/templates/maintenance/base.html cms/templates/maintenance/index.html
+msgid "Maintenance Dashboard"
+msgstr ""
+
 #: cms/templates/registration/reg_complete.html
 msgid ""
 "We've sent an email message to {email} with instructions for activating your"
@@ -19543,6 +19580,10 @@ msgstr ""
 
 #: cms/templates/widgets/user_dropdown.html
 msgid "Currently signed in as:"
+msgstr ""
+
+#: cms/templates/widgets/user_dropdown.html
+msgid "Maintenance"
 msgstr ""
 
 #: wiki/forms.py
