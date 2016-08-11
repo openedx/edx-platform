@@ -75,7 +75,7 @@ pycrypto>=2.6
 pygments==2.0.1
 pygraphviz==1.1
 PyJWT==1.4.0
-pymongo==2.9.1
+pymongo==3.3.0
 pyparsing==2.0.1
 python-memcached==1.48
 python-openid==2.2.5
