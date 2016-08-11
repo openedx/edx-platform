@@ -6,31 +6,25 @@ import os
 import re
 import shutil
 import unittest
+from uuid import uuid4
 from util.date_utils import get_time_display, DEFAULT_DATE_TIME_FORMAT
 from nose.plugins.attrib import attr
 
 from django.conf import settings
-from django.contrib.auth.hashers import check_password
-from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.test.client import Client
 from django.test.utils import override_settings
 from django.utils.timezone import utc as UTC
-from django.utils.translation import ugettext as _
 import mongoengine
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
-from xmodule.modulestore.tests.django_utils import TEST_DATA_XML_MODULESTORE
-
 from dashboard.models import CourseImportLog
-from dashboard.sysadmin import Users
-from dashboard.git_import import GitImportError
+from dashboard.git_import import GitImportErrorNoDir
 from datetime import datetime
-from external_auth.models import ExternalAuthMap
 from student.roles import CourseStaffRole, GlobalStaff
 from student.tests.factories import UserFactory
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
 
 
@@ -46,7 +40,7 @@ FEATURES_WITH_SSL_AUTH = settings.FEATURES.copy()
 FEATURES_WITH_SSL_AUTH['AUTH_USE_CERTIFICATES'] = True
 
 
-class SysadminBaseTestCase(ModuleStoreTestCase):
+class SysadminBaseTestCase(SharedModuleStoreTestCase):
     """
     Base class with common methods used in XML and Mongo tests
     """
@@ -57,7 +51,7 @@ class SysadminBaseTestCase(ModuleStoreTestCase):
 
     def setUp(self):
         """Setup test case by adding primary user."""
-        super(SysadminBaseTestCase, self).setUp(create_user=False)
+        super(SysadminBaseTestCase, self).setUp()
         self.user = UserFactory.create(username='test_user',
                                        email='test_user+sysadmin@edx.org',
                                        password='foo')
@@ -115,299 +109,11 @@ class SysadminBaseTestCase(ModuleStoreTestCase):
         self.addCleanup(shutil.rmtree, path)
 
 
-@attr('shard_1')
-@unittest.skipUnless(settings.FEATURES.get('ENABLE_SYSADMIN_DASHBOARD'),
-                     "ENABLE_SYSADMIN_DASHBOARD not set")
-@override_settings(GIT_IMPORT_WITH_XMLMODULESTORE=True)
-class TestSysadmin(SysadminBaseTestCase):
-    """
-    Test sysadmin dashboard features using XMLModuleStore
-    """
-    MODULESTORE = TEST_DATA_XML_MODULESTORE
-
-    def test_staff_access(self):
-        """Test access controls."""
-
-        test_views = ['sysadmin', 'sysadmin_courses', 'sysadmin_staffing', ]
-        for view in test_views:
-            response = self.client.get(reverse(view))
-            self.assertEqual(response.status_code, 302)
-
-        self.user.is_staff = False
-        self.user.save()
-
-        logged_in = self.client.login(username=self.user.username,
-                                      password='foo')
-        self.assertTrue(logged_in)
-
-        for view in test_views:
-            response = self.client.get(reverse(view))
-            self.assertEqual(response.status_code, 404)
-
-        response = self.client.get(reverse('gitlogs'))
-        self.assertEqual(response.status_code, 404)
-
-        self.user.is_staff = True
-        self.user.save()
-
-        self.client.logout()
-        self.client.login(username=self.user.username, password='foo')
-
-        for view in test_views:
-            response = self.client.get(reverse(view))
-            self.assertTrue(response.status_code, 200)
-
-        response = self.client.get(reverse('gitlogs'))
-        self.assertTrue(response.status_code, 200)
-
-    def test_user_mod(self):
-        """Create and delete a user"""
-
-        self._setstaff_login()
-
-        self.client.login(username=self.user.username, password='foo')
-
-        # Create user tests
-
-        # No uname
-        response = self.client.post(reverse('sysadmin'),
-                                    {'action': 'create_user',
-                                     'student_fullname': 'blah',
-                                     'student_password': 'foozor', })
-        self.assertIn('Must provide username', response.content.decode('utf-8'))
-        # no full name
-        response = self.client.post(reverse('sysadmin'),
-                                    {'action': 'create_user',
-                                     'student_uname': 'test_cuser+sysadmin@edx.org',
-                                     'student_password': 'foozor', })
-        self.assertIn('Must provide full name', response.content.decode('utf-8'))
-
-        # Test create valid user
-        self.client.post(reverse('sysadmin'),
-                         {'action': 'create_user',
-                          'student_uname': 'test_cuser+sysadmin@edx.org',
-                          'student_fullname': 'test cuser',
-                          'student_password': 'foozor', })
-
-        self.assertIsNotNone(
-            User.objects.get(username='test_cuser+sysadmin@edx.org',
-                             email='test_cuser+sysadmin@edx.org'))
-
-        # login as new user to confirm
-        self.assertTrue(self.client.login(
-            username='test_cuser+sysadmin@edx.org', password='foozor'))
-
-        self.client.logout()
-        self.client.login(username=self.user.username, password='foo')
-
-        # Delete user tests
-
-        # Try no username
-        response = self.client.post(reverse('sysadmin'),
-                                    {'action': 'del_user', })
-        self.assertIn('Must provide username', response.content.decode('utf-8'))
-
-        # Try bad usernames
-        response = self.client.post(reverse('sysadmin'),
-                                    {'action': 'del_user',
-                                     'student_uname': 'flabbergast@example.com',
-                                     'student_fullname': 'enigma jones', })
-        self.assertIn('Cannot find user with email address', response.content.decode('utf-8'))
-
-        response = self.client.post(reverse('sysadmin'),
-                                    {'action': 'del_user',
-                                     'student_uname': 'flabbergast',
-                                     'student_fullname': 'enigma jones', })
-        self.assertIn('Cannot find user with username', response.content.decode('utf-8'))
-
-        self.client.post(reverse('sysadmin'),
-                         {'action': 'del_user',
-                          'student_uname': 'test_cuser+sysadmin@edx.org',
-                          'student_fullname': 'test cuser', })
-
-        self.assertEqual(0, len(User.objects.filter(
-            username='test_cuser+sysadmin@edx.org',
-            email='test_cuser+sysadmin@edx.org')))
-
-        self.assertEqual(1, len(User.objects.all()))
-
-    def test_user_csv(self):
-        """Download and validate user CSV"""
-
-        num_test_users = 100
-        self._setstaff_login()
-
-        # Stuff full of users to test streaming
-        for user_num in xrange(num_test_users):
-            Users().create_user('testingman_with_long_name{}'.format(user_num),
-                                'test test')
-
-        response = self.client.post(reverse('sysadmin'),
-                                    {'action': 'download_users', })
-
-        self.assertIn('attachment', response['Content-Disposition'])
-        self.assertEqual('text/csv', response['Content-Type'])
-        self.assertIn('test_user', response.content)
-        self.assertTrue(num_test_users + 2, len(response.content.splitlines()))
-
-        # Clean up
-        User.objects.filter(
-            username__startswith='testingman_with_long_name').delete()
-
-    @override_settings(FEATURES=FEATURES_WITH_SSL_AUTH)
-    def test_authmap_repair(self):
-        """Run authmap check and repair"""
-
-        self._setstaff_login()
-
-        Users().create_user('test0', 'test test')
-        # Will raise exception, so no assert needed
-        eamap = ExternalAuthMap.objects.get(external_name='test test')
-        mitu = User.objects.get(username='test0')
-
-        self.assertTrue(check_password(eamap.internal_password, mitu.password))
-        mitu.set_password('not autogenerated')
-        mitu.save()
-        self.assertFalse(check_password(eamap.internal_password, mitu.password))
-
-        # Create really non user AuthMap
-        ExternalAuthMap(external_id='ll',
-                        external_domain='ll',
-                        external_credentials='{}',
-                        external_email='a@b.c',
-                        external_name='c',
-                        internal_password='').save()
-
-        response = self.client.post(reverse('sysadmin'),
-                                    {'action': 'repair_eamap', })
-
-        self.assertIn('{0} test0'.format('Failed in authenticating'),
-                      response.content)
-        self.assertIn('fixed password', response.content.decode('utf-8'))
-
-        self.assertTrue(self.client.login(username='test0',
-                                          password=eamap.internal_password))
-
-        # Check for all OK
-        self._setstaff_login()
-        response = self.client.post(reverse('sysadmin'),
-                                    {'action': 'repair_eamap', })
-        self.assertIn('All ok!', response.content.decode('utf-8'))
-
-    def test_xml_course_add_delete(self):
-        """add and delete course from xml module store"""
-
-        self._setstaff_login()
-
-        # Try bad git repo
-        response = self.client.post(reverse('sysadmin_courses'), {
-            'repo_location': 'github.com/mitocw/edx4edx_lite',
-            'action': 'add_course', })
-        self.assertIn(_("The git repo location should end with '.git', "
-                        "and be a valid url"), response.content.decode('utf-8'))
-
-        response = self.client.post(reverse('sysadmin_courses'), {
-            'repo_location': 'http://example.com/not_real.git',
-            'action': 'add_course', })
-        self.assertIn('Unable to clone or pull repository',
-                      response.content.decode('utf-8'))
-        # Create git loaded course
-        response = self._add_edx4edx()
-
-        def_ms = modulestore()
-
-        self.assertEqual('xml', def_ms.get_modulestore_type(None))
-        course = def_ms.courses.get('{0}/edx4edx_lite'.format(
-            os.path.abspath(settings.DATA_DIR)), None)
-        self.assertIsNotNone(course)
-
-        # Delete a course
-        self._rm_edx4edx()
-        course = def_ms.courses.get('{0}/edx4edx_lite'.format(
-            os.path.abspath(settings.DATA_DIR)), None)
-        self.assertIsNone(course)
-
-        # Load a bad git branch
-        response = self._add_edx4edx('asdfasdfasdf')
-        self.assertIn(GitImportError.REMOTE_BRANCH_MISSING,
-                      response.content.decode('utf-8'))
-
-        # Load a course from a git branch
-        self._add_edx4edx(self.TEST_BRANCH)
-        course = def_ms.courses.get('{0}/edx4edx_lite'.format(
-            os.path.abspath(settings.DATA_DIR)), None)
-        self.assertIsNotNone(course)
-        self.assertEqual(self.TEST_BRANCH_COURSE, course.id)
-        self._rm_edx4edx()
-
-        # Try and delete a non-existent course
-        response = self.client.post(reverse('sysadmin_courses'),
-                                    {'course_id': 'foobar/foo/blah',
-                                     'action': 'del_course', })
-        self.assertIn('Error - cannot get course with ID',
-                      response.content.decode('utf-8'))
-
-    @override_settings(GIT_IMPORT_WITH_XMLMODULESTORE=False)
-    def test_xml_safety_flag(self):
-        """Make sure the settings flag to disable xml imports is working"""
-
-        self._setstaff_login()
-        response = self._add_edx4edx()
-        self.assertIn('GIT_IMPORT_WITH_XMLMODULESTORE', response.content)
-
-        def_ms = modulestore()
-        course = def_ms.courses.get('{0}/edx4edx_lite'.format(
-            os.path.abspath(settings.DATA_DIR)), None)
-        self.assertIsNone(course)
-
-    def test_git_pull(self):
-        """Make sure we can pull"""
-
-        self._setstaff_login()
-
-        response = self._add_edx4edx()
-        response = self._add_edx4edx()
-        self.assertIn(_("The course {0} already exists in the data directory! "
-                        "(reloading anyway)").format('edx4edx_lite'),
-                      response.content.decode('utf-8'))
-        self._rm_edx4edx()
-
-    def test_staff_csv(self):
-        """Download and validate staff CSV"""
-
-        self._setstaff_login()
-        self._add_edx4edx()
-
-        def_ms = modulestore()
-        course = def_ms.get_course(SlashSeparatedCourseKey('MITx', 'edx4edx', 'edx4edx'))
-        CourseStaffRole(course.id).add_users(self.user)
-
-        response = self.client.post(reverse('sysadmin_staffing'),
-                                    {'action': 'get_staff_csv', })
-        self.assertIn('attachment', response['Content-Disposition'])
-        self.assertEqual('text/csv', response['Content-Type'])
-        columns = ['course_id', 'role', 'username',
-                   'email', 'full_name', ]
-        self.assertIn(','.join('"' + c + '"' for c in columns),
-                      response.content)
-
-        self._rm_edx4edx()
-
-    def test_enrollment_page(self):
-        """
-        Adds a course and makes sure that it shows up on the staffing and
-        enrollment page
-        """
-
-        self._setstaff_login()
-        self._add_edx4edx()
-        response = self.client.get(reverse('sysadmin_staffing'))
-        self.assertIn('edx4edx', response.content)
-        self._rm_edx4edx()
-
-
-@attr('shard_1')
-@override_settings(MONGODB_LOG=TEST_MONGODB_LOG)
+@attr(shard=1)
+@override_settings(
+    MONGODB_LOG=TEST_MONGODB_LOG,
+    GIT_REPO_DIR=settings.TEST_ROOT / "course_repos_{}".format(uuid4().hex)
+)
 @unittest.skipUnless(settings.FEATURES.get('ENABLE_SYSADMIN_DASHBOARD'),
                      "ENABLE_SYSADMIN_DASHBOARD not set")
 class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
@@ -447,7 +153,7 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
 
         # Create git loaded course
         response = self._add_edx4edx()
-        self.assertIn(GitImportError.NO_DIR,
+        self.assertIn(GitImportErrorNoDir(settings.GIT_REPO_DIR).message,
                       response.content.decode('UTF-8'))
 
     def test_mongo_course_add_delete(self):
@@ -460,7 +166,7 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
         self._mkdir(settings.GIT_REPO_DIR)
 
         def_ms = modulestore()
-        self.assertFalse('xml' == def_ms.get_modulestore_type(None))
+        self.assertNotEqual('xml', def_ms.get_modulestore_type(None))
 
         self._add_edx4edx()
         course = def_ms.get_course(SlashSeparatedCourseKey('MITx', 'edx4edx', 'edx4edx'))

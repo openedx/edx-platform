@@ -1,7 +1,7 @@
 <div id="page-alert">
     <div class="wrapper wrapper-alert wrapper-alert-announcement is-shown">
         <div class="alert announcement has-actions">
-            <i class="feedback-symbol icon fa fa-bullhorn"></i>
+            <span class="feedback-symbol icon fa fa-bullhorn" aria-hidden="true"></span>
 
             <div class="copy">
                 <h2 class="title title-3">This course was created as a re-run. Some manual configuration is needed.</h2>
@@ -14,7 +14,7 @@
             <ul class="nav-actions">
                 <li class="action action-dismiss">
                     <a href="#" class="button dismiss-button" data-dismiss-link="dummy_dismiss_url">
-                        <i class="icon icon fa fa-times-circle"></i>
+                        <span class="icon icon fa fa-times-circle" aria-hidden="true"></span>
                         <span class="button-copy">Dismiss</span>
                     </a>
                 </li>

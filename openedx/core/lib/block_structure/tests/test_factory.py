@@ -1,6 +1,7 @@
 """
 Tests for block_structure_factory.py
 """
+from nose.plugins.attrib import attr
 from unittest import TestCase
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
@@ -11,6 +12,7 @@ from .helpers import (
 )
 
 
+@attr(shard=2)
 class TestBlockStructureFactory(TestCase, ChildrenMapTestMixin):
     """
     Tests for BlockStructureFactory

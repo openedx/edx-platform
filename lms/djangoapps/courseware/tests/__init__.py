@@ -82,9 +82,6 @@ class BaseTestXmodule(ModuleStoreTestCase):
 
         self.item_descriptor.xmodule_runtime = self.new_module_runtime()
 
-        #self.item_module = self.item_descriptor.xmodule_runtime.xmodule_instance
-        #self.item_module is None at this time
-
         self.item_url = unicode(self.item_descriptor.location)
 
     def setup_course(self):

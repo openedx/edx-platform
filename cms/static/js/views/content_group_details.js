@@ -3,8 +3,9 @@
  * It is expected to be backed by a Group model.
  */
 define([
-    'js/views/baseview', 'underscore', 'gettext', 'underscore.string'
-], function(BaseView, _, gettext, str) {
+    'js/views/baseview', 'underscore', 'gettext', 'underscore.string',
+    'edx-ui-toolkit/js/utils/string-utils', 'edx-ui-toolkit/js/utils/html-utils'
+], function(BaseView, _, gettext, str, StringUtils, HtmlUtils) {
     'use strict';
 
     var ContentGroupDetailsView = BaseView.extend({
@@ -15,7 +16,7 @@ define([
             'click .hide-groups': 'hideContentGroupUsages'
         },
 
-        className: function () {
+        className: function() {
             var index = this.model.collection.indexOf(this.model);
 
             return [
@@ -35,11 +36,12 @@ define([
         },
 
         render: function(showContentGroupUsages) {
-           var attrs = $.extend({}, this.model.attributes, {
+            var attrs = $.extend({}, this.model.attributes, {
                 usageCountMessage: this.getUsageCountTitle(),
-                outlineAnchorMessage: this.getOutlineAnchorMessage(),
+                courseOutlineUrl: this.model.collection.parents[0].outlineUrl,
                 index: this.model.collection.indexOf(this.model),
-                showContentGroupUsages: showContentGroupUsages || false
+                showContentGroupUsages: showContentGroupUsages || false,
+                HtmlUtils: HtmlUtils
             });
             this.$el.html(this.template(attrs));
             return this;
@@ -55,42 +57,24 @@ define([
             this.render(false);
         },
 
-        getUsageCountTitle: function () {
-            var count = this.model.get('usage').length, message;
+        getUsageCountTitle: function() {
+            var count = this.model.get('usage').length;
 
             if (count === 0) {
-                message = gettext('Not in Use');
+                return gettext('Not in Use');
             } else {
-                message = ngettext(
+                /* globals ngettext */
+                return StringUtils.interpolate(ngettext(
                     /*
                         Translators: 'count' is number of units that the group
                         configuration is used in.
                     */
-                    'Used in %(count)s unit', 'Used in %(count)s units',
+                    'Used in {count} unit', 'Used in {count} units',
                     count
+                ),
+                    {count: count}
                 );
             }
-
-            return interpolate(message, { count: count }, true);
-        },
-
-        getOutlineAnchorMessage: function () {
-            var message = gettext(
-                    /*
-                        Translators: 'outlineAnchor' is an anchor pointing to
-                        the course outline page.
-                    */
-                    'This content group is not in use. Add a content group to any unit from the %(outlineAnchor)s.'
-                ),
-                anchor = str.sprintf(
-                    '<a href="%(url)s" title="%(text)s">%(text)s</a>',
-                    {
-                            url: this.model.collection.parents[0].outlineUrl,
-                            text: gettext('Course Outline')
-                    }
-                );
-
-            return str.sprintf(message, {outlineAnchor: anchor});
         }
     });
 

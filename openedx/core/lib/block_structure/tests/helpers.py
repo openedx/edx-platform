@@ -6,7 +6,7 @@ from mock import patch
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
 from ..block_structure import BlockStructureBlockData
-from ..transformer import BlockStructureTransformer
+from ..transformer import BlockStructureTransformer, FilteringTransformerMixin
 
 
 class MockXBlock(object):
@@ -68,6 +68,13 @@ class MockModulestore(object):
             raise ItemNotFoundError
         return item
 
+    @contextmanager
+    def bulk_operations(self, ignore):  # pylint: disable=unused-argument
+        """
+        A context manager for notifying the store of bulk operations.
+        """
+        yield
+
 
 class MockCache(object):
     """
@@ -78,13 +85,15 @@ class MockCache(object):
         # An in-memory map of cache keys to cache values.
         self.map = {}
         self.set_call_count = 0
+        self.timeout_from_last_call = 0
 
-    def set(self, key, val):
+    def set(self, key, val, timeout):
         """
         Associates the given key with the given value in the cache.
         """
         self.set_call_count += 1
         self.map[key] = val
+        self.timeout_from_last_call = timeout
 
     def get(self, key, default=None):
         """
@@ -136,6 +145,21 @@ class MockTransformer(BlockStructureTransformer):
 
     def transform(self, usage_info, block_structure):
         pass
+
+
+class MockFilteringTransformer(FilteringTransformerMixin, BlockStructureTransformer):
+    """
+    A mock FilteringTransformerMixin class.
+    """
+    VERSION = 1
+
+    @classmethod
+    def name(cls):
+        # Use the class' name for Mock transformers.
+        return cls.__name__
+
+    def transform_block_filters(self, usage_info, block_structure):
+        return [block_structure.create_universal_filter()]
 
 
 @contextmanager
@@ -219,7 +243,7 @@ class ChildrenMapTestMixin(object):
         for block_key, children in enumerate(children_map):
             # Verify presence
             self.assertEquals(
-                block_structure.has_block(block_key),
+                block_key in block_structure,
                 block_key not in missing_blocks,
                 'Expected presence in block_structure for block_key {} to match absence in missing_blocks.'.format(
                     unicode(block_key)

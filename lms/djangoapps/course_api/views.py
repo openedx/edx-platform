@@ -17,7 +17,7 @@ class CourseDetailView(DeveloperErrorViewMixin, RetrieveAPIView):
     """
     **Use Cases**
 
-        Request information on a course
+        Request details for a course
 
     **Example Requests**
 
@@ -27,12 +27,11 @@ class CourseDetailView(DeveloperErrorViewMixin, RetrieveAPIView):
 
         Body consists of the following fields:
 
-        * blocks_url: Used to fetch the course blocks
         * effort: A textual description of the weekly hours of effort expected
             in the course.
-        * end: Date the course ends
-        * enrollment_end: Date enrollment ends
-        * enrollment_start: Date enrollment begins
+        * end: Date the course ends, in ISO 8601 notation
+        * enrollment_end: Date enrollment ends, in ISO 8601 notation
+        * enrollment_start: Date enrollment begins, in ISO 8601 notation
         * id: A unique identifier of the course; a serialized representation
             of the opaque key identifying the course.
         * media: An object that contains named media items.  Included here:
@@ -46,15 +45,17 @@ class CourseDetailView(DeveloperErrorViewMixin, RetrieveAPIView):
             Note: this field is only included in the Course Detail view, not
             the Course List view.
         * short_description: A textual description of the course
-        * start: Date the course begins
+        * start: Date the course begins, in ISO 8601 notation
         * start_display: Readably formatted start of the course
         * start_type: Hint describing how `start_display` is set. One of:
-            * `"string"`: manually set
-            * `"timestamp"`: generated form `start` timestamp
-            * `"empty"`: the start date should not be shown
+            * `"string"`: manually set by the course author
+            * `"timestamp"`: generated from the `start` timestamp
+            * `"empty"`: no start date is specified
+        * pacing: Course pacing. Possible values: instructor, self
 
         Deprecated fields:
 
+        * blocks_url: Used to fetch the course blocks
         * course_id: Course key (use 'id' instead)
 
     **Parameters:**
@@ -94,7 +95,8 @@ class CourseDetailView(DeveloperErrorViewMixin, RetrieveAPIView):
                 "overview: "<p>A verbose description of the course.</p>"
                 "start": "2015-07-17T12:00:00Z",
                 "start_display": "July 17, 2015",
-                "start_type": "timestamp"
+                "start_type": "timestamp",
+                "pacing": "instructor"
             }
     """
 

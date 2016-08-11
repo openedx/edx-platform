@@ -31,6 +31,7 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 ################################# LMS INTEGRATION #############################
 
 LMS_BASE = "localhost:8000"
+LMS_ROOT_URL = "http://{}".format(LMS_BASE)
 FEATURES['PREVIEW_LMS_BASE'] = "preview." + LMS_BASE
 
 ########################### PIPELINE #################################
@@ -41,6 +42,7 @@ STATICFILES_STORAGE = 'openedx.core.storage.DevelopmentStorage'
 
 # Revert to the default set of finders as we don't want the production pipeline
 STATICFILES_FINDERS = [
+    'openedx.core.djangoapps.theming.finders.ThemeFilesFinder',
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
 ]
@@ -121,6 +123,12 @@ REQUIRE_DEBUG = DEBUG
 
 ########################### OAUTH2 #################################
 OAUTH_OIDC_ISSUER = 'http://127.0.0.1:8000/oauth2'
+
+JWT_AUTH.update({
+    'JWT_SECRET_KEY': 'lms-secret',
+    'JWT_ISSUER': 'http://127.0.0.1:8000/oauth2',
+    'JWT_AUDIENCE': 'lms-key',
+})
 
 ###############################################################################
 # See if the developer has any local overrides.

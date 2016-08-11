@@ -7,6 +7,7 @@ Tests for credit app views.
 from __future__ import unicode_literals
 import datetime
 import json
+from nose.plugins.attrib import attr
 import unittest
 
 import ddt
@@ -14,7 +15,7 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test import TestCase, Client
 from django.test.utils import override_settings
-from oauth2_provider.tests.factories import AccessTokenFactory, ClientFactory
+from edx_oauth2_provider.tests.factories import AccessTokenFactory, ClientFactory
 from opaque_keys.edx.keys import CourseKey
 import pytz
 
@@ -98,6 +99,7 @@ class ReadOnlyMixin(object):
         self.assertEqual(response.status_code, 405)
 
 
+@attr(shard=2)
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class CreditCourseViewSetTests(UserMixin, TestCase):
     """ Tests for the CreditCourse endpoints.
@@ -259,6 +261,7 @@ class CreditCourseViewSetTests(UserMixin, TestCase):
         self.assertTrue(credit_course.enabled)
 
 
+@attr(shard=2)
 @ddt.ddt
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class CreditProviderViewSetTests(ApiTestCaseMixin, ReadOnlyMixin, AuthMixin, UserMixin, TestCase):
@@ -303,6 +306,7 @@ class CreditProviderViewSetTests(ApiTestCaseMixin, ReadOnlyMixin, AuthMixin, Use
         self.assertEqual(response.data, CreditProviderSerializer(self.bayside).data)
 
 
+@attr(shard=2)
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class CreditProviderRequestCreateViewTests(ApiTestCaseMixin, UserMixin, TestCase):
     """ Tests for CreditProviderRequestCreateView. """
@@ -451,6 +455,7 @@ class CreditProviderRequestCreateViewTests(ApiTestCaseMixin, UserMixin, TestCase
         self.assertEqual(response.status_code, 400)
 
 
+@attr(shard=2)
 @ddt.ddt
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class CreditProviderCallbackViewTests(UserMixin, TestCase):
@@ -604,6 +609,7 @@ class CreditProviderCallbackViewTests(UserMixin, TestCase):
             self.assertEqual(response.status_code, 403)
 
 
+@attr(shard=2)
 @ddt.ddt
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class CreditEligibilityViewTests(AuthMixin, UserMixin, ReadOnlyMixin, TestCase):

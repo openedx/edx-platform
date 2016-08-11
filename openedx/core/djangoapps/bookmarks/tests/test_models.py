@@ -6,6 +6,7 @@ import datetime
 import ddt
 from freezegun import freeze_time
 import mock
+from nose.plugins.attrib import attr
 import pytz
 from unittest import skipUnless
 
@@ -39,15 +40,17 @@ class BookmarksTestsBase(ModuleStoreTestCase):
     STORE_TYPE = ModuleStoreEnum.Type.mongo
     TEST_PASSWORD = 'test'
 
+    ENABLED_CACHES = ['default', 'mongo_metadata_inheritance', 'loc_cache']
+
     def setUp(self):
         super(BookmarksTestsBase, self).setUp()
 
         self.admin = AdminFactory()
         self.user = UserFactory.create(password=self.TEST_PASSWORD)
         self.other_user = UserFactory.create(password=self.TEST_PASSWORD)
-        self.setup_test_data(self.STORE_TYPE)
+        self.setup_data(self.STORE_TYPE)
 
-    def setup_test_data(self, store_type=ModuleStoreEnum.Type.mongo):
+    def setup_data(self, store_type=ModuleStoreEnum.Type.mongo):
         """ Create courses and add some test blocks. """
 
         with self.store.default_store(store_type):
@@ -223,6 +226,7 @@ class BookmarksTestsBase(ModuleStoreTestCase):
             self.assertEqual(bookmark_data['path'], bookmark.path)
 
 
+@attr(shard=2)
 @ddt.ddt
 @skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Tests only valid in LMS')
 class BookmarkModelTests(BookmarksTestsBase):
@@ -251,10 +255,10 @@ class BookmarkModelTests(BookmarksTestsBase):
 
     @ddt.data(
         (ModuleStoreEnum.Type.mongo, 'course', [], 3),
-        (ModuleStoreEnum.Type.mongo, 'chapter_1', [], 3),
-        (ModuleStoreEnum.Type.mongo, 'sequential_1', ['chapter_1'], 4),
-        (ModuleStoreEnum.Type.mongo, 'vertical_1', ['chapter_1', 'sequential_1'], 5),
-        (ModuleStoreEnum.Type.mongo, 'html_1', ['chapter_1', 'sequential_2', 'vertical_2'], 6),
+        (ModuleStoreEnum.Type.mongo, 'chapter_1', [], 4),
+        (ModuleStoreEnum.Type.mongo, 'sequential_1', ['chapter_1'], 6),
+        (ModuleStoreEnum.Type.mongo, 'vertical_1', ['chapter_1', 'sequential_1'], 8),
+        (ModuleStoreEnum.Type.mongo, 'html_1', ['chapter_1', 'sequential_2', 'vertical_2'], 10),
         (ModuleStoreEnum.Type.split, 'course', [], 3),
         (ModuleStoreEnum.Type.split, 'chapter_1', [], 2),
         (ModuleStoreEnum.Type.split, 'sequential_1', ['chapter_1'], 2),
@@ -264,11 +268,12 @@ class BookmarkModelTests(BookmarksTestsBase):
     @ddt.unpack
     def test_path_and_queries_on_create(self, store_type, block_to_bookmark, ancestors_attrs, expected_mongo_calls):
         """
-        In case of mongo, 1 query is used to fetch the block, and 2 by path_to_location(), and then
-        1 query per parent in path is needed to fetch the parent blocks.
+        In case of mongo, 1 query is used to fetch the block, and 2
+        by path_to_location(), and then 1 query per parent in path
+        is needed to fetch the parent blocks.
         """
 
-        self.setup_test_data(store_type)
+        self.setup_data(store_type)
         user = UserFactory.create()
 
         expected_path = [PathItem(
@@ -407,6 +412,7 @@ class BookmarkModelTests(BookmarksTestsBase):
             self.assertEqual(bookmark.path, [])
 
 
+@attr(shard=2)
 @ddt.ddt
 class XBlockCacheModelTest(ModuleStoreTestCase):
     """

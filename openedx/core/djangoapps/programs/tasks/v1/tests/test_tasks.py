@@ -1,34 +1,41 @@
 """
 Tests for programs celery tasks.
 """
-
-import ddt
-import httpretty
 import json
-import mock
+import unittest
 
 from celery.exceptions import MaxRetriesExceededError
+import ddt
 from django.conf import settings
+from django.core.cache import cache
 from django.test import override_settings, TestCase
 from edx_rest_api_client.client import EdxRestApiClient
+from edx_oauth2_provider.tests.factories import ClientFactory
+import httpretty
+import mock
+from provider.constants import CONFIDENTIAL
 
-from oauth2_provider.tests.factories import ClientFactory
+from lms.djangoapps.certificates.api import MODES
 from openedx.core.djangoapps.credentials.tests.mixins import CredentialsApiConfigMixin
+from openedx.core.djangoapps.programs.tests import factories
 from openedx.core.djangoapps.programs.tests.mixins import ProgramsApiConfigMixin
 from openedx.core.djangoapps.programs.tasks.v1 import tasks
+from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from student.tests.factories import UserFactory
 
 
 TASKS_MODULE = 'openedx.core.djangoapps.programs.tasks.v1.tasks'
+UTILS_MODULE = 'openedx.core.djangoapps.programs.utils'
 
 
+@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class GetApiClientTestCase(TestCase, ProgramsApiConfigMixin):
     """
     Test the get_api_client function
     """
 
-    @mock.patch(TASKS_MODULE + '.get_id_token')
-    def test_get_api_client(self, mock_get_id_token):
+    @mock.patch(TASKS_MODULE + '.JwtBuilder.build_token')
+    def test_get_api_client(self, mock_build_token):
         """
         Ensure the function is making the right API calls based on inputs
         """
@@ -38,83 +45,75 @@ class GetApiClientTestCase(TestCase, ProgramsApiConfigMixin):
             internal_service_url='http://foo',
             api_version_number=99,
         )
-        mock_get_id_token.return_value = 'test-token'
+        mock_build_token.return_value = 'test-token'
 
         api_client = tasks.get_api_client(api_config, student)
-        self.assertEqual(mock_get_id_token.call_args[0], (student, 'programs'))
         self.assertEqual(api_client._store['base_url'], 'http://foo/api/v99/')  # pylint: disable=protected-access
         self.assertEqual(api_client._store['session'].auth.token, 'test-token')  # pylint: disable=protected-access
 
 
-class GetCompletedCoursesTestCase(TestCase):
-    """
-    Test the get_completed_courses function
-    """
-
-    def make_cert_result(self, **kwargs):
-        """
-        Helper to create dummy results from the certificates API
-        """
-        result = {
-            'username': 'dummy-username',
-            'course_key': 'dummy-course',
-            'type': 'dummy-type',
-            'status': 'dummy-status',
-            'download_url': 'http://www.example.com/cert.pdf',
-            'grade': '0.98',
-            'created': '2015-07-31T00:00:00Z',
-            'modified': '2015-07-31T00:00:00Z',
-        }
-        result.update(**kwargs)
-        return result
-
-    @mock.patch(TASKS_MODULE + '.get_certificates_for_user')
-    def test_get_completed_courses(self, mock_get_certs_for_user):
-        """
-        Ensure the function correctly calls to and handles results from the
-        certificates API
-        """
-        student = UserFactory(username='test-username')
-        mock_get_certs_for_user.return_value = [
-            self.make_cert_result(status='downloadable', type='verified', course_key='downloadable-course'),
-            self.make_cert_result(status='generating', type='prof-ed', course_key='generating-course'),
-            self.make_cert_result(status='unknown', type='honor', course_key='unknown-course'),
-        ]
-
-        result = tasks.get_completed_courses(student)
-        self.assertEqual(mock_get_certs_for_user.call_args[0], (student.username, ))
-        self.assertEqual(result, [
-            {'course_id': 'downloadable-course', 'mode': 'verified'},
-            {'course_id': 'generating-course', 'mode': 'prof-ed'},
-        ])
-
-
-class GetCompletedProgramsTestCase(TestCase):
+@httpretty.activate
+@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+class GetCompletedProgramsTestCase(ProgramsApiConfigMixin, CacheIsolationTestCase):
     """
     Test the get_completed_programs function
     """
+    ENABLED_CACHES = ['default']
 
-    @httpretty.activate
-    def test_get_completed_programs(self):
+    def setUp(self):
+        super(GetCompletedProgramsTestCase, self).setUp()
+
+        self.user = UserFactory()
+        self.programs_config = self.create_programs_config(cache_ttl=5)
+
+        ClientFactory(name=self.programs_config.OAUTH2_CLIENT_NAME, client_type=CONFIDENTIAL)
+
+        cache.clear()
+
+    def _mock_programs_api(self, data):
+        """Helper for mocking out Programs API URLs."""
+        self.assertTrue(httpretty.is_enabled(), msg='httpretty must be enabled to mock Programs API calls.')
+
+        url = self.programs_config.internal_api_url.strip('/') + '/programs/'
+        body = json.dumps({'results': data})
+
+        httpretty.register_uri(httpretty.GET, url, body=body, content_type='application/json')
+
+    def _assert_num_requests(self, count):
+        """DRY helper for verifying request counts."""
+        self.assertEqual(len(httpretty.httpretty.latest_requests), count)
+
+    @mock.patch(UTILS_MODULE + '.get_completed_courses')
+    def test_get_completed_programs(self, mock_get_completed_courses):
         """
-        Ensure the correct API call gets made
+        Verify that completed programs are found, using the cache when possible.
         """
-        test_client = EdxRestApiClient('http://test-server', jwt='test-token')
-        httpretty.register_uri(
-            httpretty.POST,
-            'http://test-server/programs/complete/',
-            body='{"program_ids": [1, 2, 3]}',
-            content_type='application/json',
-        )
-        payload = [
-            {'course_id': 'test-course-1', 'mode': 'verified'},
-            {'course_id': 'test-course-2', 'mode': 'prof-ed'},
+        course_id = 'org/course/run'
+        data = [
+            factories.Program(
+                organizations=[factories.Organization()],
+                course_codes=[
+                    factories.CourseCode(run_modes=[
+                        factories.RunMode(course_key=course_id),
+                    ]),
+                ]
+            ),
         ]
-        result = tasks.get_completed_programs(test_client, payload)
-        self.assertEqual(json.loads(httpretty.last_request().body), {'completed_courses': payload})
-        self.assertEqual(result, [1, 2, 3])
+        self._mock_programs_api(data)
+
+        mock_get_completed_courses.return_value = [
+            {'course_id': course_id, 'mode': MODES.verified}
+        ]
+
+        for _ in range(2):
+            result = tasks.get_completed_programs(self.user)
+            self.assertEqual(result, [data[0]['id']])
+
+        # Verify that only one request to programs was made (i.e., the cache was hit).
+        self._assert_num_requests(1)
 
 
+@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class GetAwardedCertificateProgramsTestCase(TestCase):
     """
     Test the get_awarded_certificate_programs function
@@ -155,6 +154,7 @@ class GetAwardedCertificateProgramsTestCase(TestCase):
         self.assertEqual(result, [1])
 
 
+@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class AwardProgramCertificateTestCase(TestCase):
     """
     Test the award_program_certificate function
@@ -183,11 +183,11 @@ class AwardProgramCertificateTestCase(TestCase):
         self.assertEqual(json.loads(httpretty.last_request().body), expected_body)
 
 
+@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 @ddt.ddt
 @mock.patch(TASKS_MODULE + '.award_program_certificate')
 @mock.patch(TASKS_MODULE + '.get_awarded_certificate_programs')
 @mock.patch(TASKS_MODULE + '.get_completed_programs')
-@mock.patch(TASKS_MODULE + '.get_completed_courses')
 @override_settings(CREDENTIALS_SERVICE_USERNAME='test-service-username')
 class AwardProgramCertificatesTestCase(TestCase, ProgramsApiConfigMixin, CredentialsApiConfigMixin):
     """
@@ -206,7 +206,6 @@ class AwardProgramCertificatesTestCase(TestCase, ProgramsApiConfigMixin, Credent
 
     def test_completion_check(
             self,
-            mock_get_completed_courses,
             mock_get_completed_programs,
             mock_get_awarded_certificate_programs,  # pylint: disable=unused-argument
             mock_award_program_certificate,  # pylint: disable=unused-argument
@@ -215,18 +214,8 @@ class AwardProgramCertificatesTestCase(TestCase, ProgramsApiConfigMixin, Credent
         Checks that the Programs API is used correctly to determine completed
         programs.
         """
-        completed_courses = [
-            {'course_id': 'course-1', 'type': 'verified'},
-            {'course_id': 'course-2', 'type': 'prof-ed'},
-        ]
-        mock_get_completed_courses.return_value = completed_courses
-
         tasks.award_program_certificates.delay(self.student.username).get()
-
-        self.assertEqual(
-            mock_get_completed_programs.call_args[0][1],
-            completed_courses
-        )
+        mock_get_completed_programs.assert_called_once_with(self.student)
 
     @ddt.data(
         ([1], [2, 3]),
@@ -238,7 +227,6 @@ class AwardProgramCertificatesTestCase(TestCase, ProgramsApiConfigMixin, Credent
             self,
             already_awarded_program_ids,
             expected_awarded_program_ids,
-            mock_get_completed_courses,  # pylint: disable=unused-argument
             mock_get_completed_programs,
             mock_get_awarded_certificate_programs,
             mock_award_program_certificate,
@@ -289,30 +277,8 @@ class AwardProgramCertificatesTestCase(TestCase, ProgramsApiConfigMixin, Credent
         for mock_helper in mock_helpers:
             self.assertFalse(mock_helper.called)
 
-    def test_abort_if_no_completed_courses(
-            self,
-            mock_get_completed_courses,
-            mock_get_completed_programs,
-            mock_get_awarded_certificate_programs,
-            mock_award_program_certificate,
-    ):
-        """
-        Checks that the task will be aborted without further action if the
-        student does not have any completed courses, but that a warning is
-        logged.
-        """
-        mock_get_completed_courses.return_value = []
-        with mock.patch(TASKS_MODULE + '.LOGGER.warning') as mock_warning:
-            tasks.award_program_certificates.delay(self.student.username).get()
-            self.assertTrue(mock_warning.called)
-        self.assertTrue(mock_get_completed_courses.called)
-        self.assertFalse(mock_get_completed_programs.called)
-        self.assertFalse(mock_get_awarded_certificate_programs.called)
-        self.assertFalse(mock_award_program_certificate.called)
-
     def test_abort_if_no_completed_programs(
             self,
-            mock_get_completed_courses,
             mock_get_completed_programs,
             mock_get_awarded_certificate_programs,
             mock_award_program_certificate,
@@ -323,7 +289,6 @@ class AwardProgramCertificatesTestCase(TestCase, ProgramsApiConfigMixin, Credent
         """
         mock_get_completed_programs.return_value = []
         tasks.award_program_certificates.delay(self.student.username).get()
-        self.assertTrue(mock_get_completed_courses.called)
         self.assertTrue(mock_get_completed_programs.called)
         self.assertFalse(mock_get_awarded_certificate_programs.called)
         self.assertFalse(mock_award_program_certificate.called)
@@ -349,7 +314,6 @@ class AwardProgramCertificatesTestCase(TestCase, ProgramsApiConfigMixin, Credent
 
     def test_continue_awarding_certs_if_error(
             self,
-            mock_get_completed_courses,  # pylint: disable=unused-argument
             mock_get_completed_programs,
             mock_get_awarded_certificate_programs,
             mock_award_program_certificate,
@@ -373,24 +337,8 @@ class AwardProgramCertificatesTestCase(TestCase, ProgramsApiConfigMixin, Credent
         mock_info.assert_any_call(mock.ANY, 1, self.student.username)
         mock_info.assert_any_call(mock.ANY, 2, self.student.username)
 
-    def test_retry_on_certificates_api_errors(
-            self,
-            mock_get_completed_courses,
-            *_mock_helpers  # pylint: disable=unused-argument
-    ):
-        """
-        Ensures that any otherwise-unhandled errors that arise while trying
-        to get existing course certificates (e.g. network issues or other
-        transient API errors) will cause the task to be failed and queued for
-        retry.
-        """
-        mock_get_completed_courses.side_effect = self._make_side_effect([Exception('boom'), None])
-        tasks.award_program_certificates.delay(self.student.username).get()
-        self.assertEqual(mock_get_completed_courses.call_count, 2)
-
     def test_retry_on_programs_api_errors(
             self,
-            mock_get_completed_courses,  # pylint: disable=unused-argument
             mock_get_completed_programs,
             *_mock_helpers  # pylint: disable=unused-argument
     ):
@@ -406,7 +354,6 @@ class AwardProgramCertificatesTestCase(TestCase, ProgramsApiConfigMixin, Credent
 
     def test_retry_on_credentials_api_errors(
             self,
-            mock_get_completed_courses,  # pylint: disable=unused-argument
             mock_get_completed_programs,
             mock_get_awarded_certificate_programs,
             mock_award_program_certificate,

@@ -1,8 +1,11 @@
 """
 Tests for manager.py
 """
+from nose.plugins.attrib import attr
 from unittest import TestCase
 
+from ..block_structure import BlockStructureBlockData
+from ..exceptions import UsageKeyNotInBlockStructure
 from ..manager import BlockStructureManager
 from ..transformers import BlockStructureTransformers
 from .helpers import (
@@ -82,6 +85,7 @@ class TestTransformer1(MockTransformer):
         return data_key + 't1.val1.' + unicode(block_key)
 
 
+@attr(shard=2)
 class TestBlockStructureManager(TestCase, ChildrenMapTestMixin):
     """
     Test class for BlockStructureManager.
@@ -127,6 +131,19 @@ class TestBlockStructureManager(TestCase, ChildrenMapTestMixin):
         TestTransformer1.assert_collected(block_structure)
         TestTransformer1.assert_transformed(block_structure)
 
+    def test_get_transformed_with_starting_block(self):
+        with mock_registered_transformers(self.registered_transformers):
+            block_structure = self.bs_manager.get_transformed(self.transformers, starting_block_usage_key=1)
+        substructure_of_children_map = [[], [3, 4], [], [], []]
+        self.assert_block_structure(block_structure, substructure_of_children_map, missing_blocks=[0, 2])
+        TestTransformer1.assert_collected(block_structure)
+        TestTransformer1.assert_transformed(block_structure)
+
+    def test_get_transformed_with_nonexistent_starting_block(self):
+        with mock_registered_transformers(self.registered_transformers):
+            with self.assertRaises(UsageKeyNotInBlockStructure):
+                self.bs_manager.get_transformed(self.transformers, starting_block_usage_key=100)
+
     def test_get_collected_cached(self):
         self.collect_and_verify(expect_modulestore_called=True, expect_cache_updated=True)
         self.collect_and_verify(expect_modulestore_called=False, expect_cache_updated=False)
@@ -135,6 +152,12 @@ class TestBlockStructureManager(TestCase, ChildrenMapTestMixin):
     def test_get_collected_outdated_data(self):
         self.collect_and_verify(expect_modulestore_called=True, expect_cache_updated=True)
         TestTransformer1.VERSION += 1
+        self.collect_and_verify(expect_modulestore_called=True, expect_cache_updated=True)
+        self.assertEquals(TestTransformer1.collect_call_count, 2)
+
+    def test_get_collected_version_update(self):
+        self.collect_and_verify(expect_modulestore_called=True, expect_cache_updated=True)
+        BlockStructureBlockData.VERSION += 1
         self.collect_and_verify(expect_modulestore_called=True, expect_cache_updated=True)
         self.assertEquals(TestTransformer1.collect_call_count, 2)
 

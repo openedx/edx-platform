@@ -6,6 +6,7 @@ import ddt
 import itertools
 from collections import namedtuple
 from xmodule.course_module import CourseSummary
+from mock import patch
 
 from xmodule.modulestore.tests.utils import (
     PureModulestoreTestCase, MongoModulestoreBuilder,
@@ -15,7 +16,10 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.draft_and_published import DIRECT_ONLY_CATEGORIES
-from xblock.core import XBlock
+from xblock.core import XBlock, XBlockAside
+from xblock.fields import Scope, String
+from xblock.runtime import DictKeyValueStore, KvsFieldData
+from xblock.test.tools import TestRuntime
 
 DETACHED_BLOCK_TYPES = dict(XBlock.load_tagged_classes('detached'))
 
@@ -24,6 +28,13 @@ TESTABLE_BLOCK_TYPES = set(DIRECT_ONLY_CATEGORIES)
 TESTABLE_BLOCK_TYPES.discard('course')
 
 TestField = namedtuple('TestField', ['field_name', 'initial', 'updated'])
+
+
+class AsideTest(XBlockAside):
+    """
+    Test xblock aside class
+    """
+    content = String(default="content", scope=Scope.content)
 
 
 @ddt.ddt
@@ -42,6 +53,8 @@ class DirectOnlyCategorySemantics(PureModulestoreTestCase):
         'static_tab': TestField('data', '<div>test data</div>', '<div>different test data</div>'),
         'course_info': TestField('data', '<div>test data</div>', '<div>different test data</div>'),
     }
+
+    ASIDE_DATA_FIELD = TestField('content', '<div>aside test data</div>', '<div>aside different test data</div>')
 
     def setUp(self):
         super(DirectOnlyCategorySemantics, self).setUp()
@@ -73,7 +86,8 @@ class DirectOnlyCategorySemantics(PureModulestoreTestCase):
                 with self.assertRaises(ItemNotFoundError):
                     self.store.get_item(block_usage_key)
 
-    def assertBlockHasContent(self, block_usage_key, field_name, content, draft=None):
+    def assertBlockHasContent(self, block_usage_key, field_name, content,
+                              aside_field_name=None, aside_content=None, draft=None):
         """
         Assert that the block ``block_usage_key`` has the value ``content`` for ``field_name``
         when it is loaded.
@@ -82,6 +96,8 @@ class DirectOnlyCategorySemantics(PureModulestoreTestCase):
             block_usage_key: The xblock to check.
             field_name (string): The name of the field to check.
             content: The value to assert is in the field.
+            aside_field_name (string): The name of the field to check (in connected xblock aside)
+            aside_content: The value to assert is in the xblock aside field.
             draft (optional): If omitted, verify both published and draft branches.
                 If True, verify only the draft branch. If False, verify only the
                 published branch.
@@ -92,6 +108,10 @@ class DirectOnlyCategorySemantics(PureModulestoreTestCase):
                     block_usage_key,
                 )
                 self.assertEquals(content, target_block.fields[field_name].read_from(target_block))
+                if aside_field_name and aside_content:
+                    aside = self._get_aside(target_block)
+                    self.assertIsNotNone(aside)
+                    self.assertEquals(aside_content, aside.fields[aside_field_name].read_from(aside))
 
         if draft is None or draft:
             with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred):
@@ -99,6 +119,10 @@ class DirectOnlyCategorySemantics(PureModulestoreTestCase):
                     block_usage_key,
                 )
                 self.assertEquals(content, target_block.fields[field_name].read_from(target_block))
+                if aside_field_name and aside_content:
+                    aside = self._get_aside(target_block)
+                    self.assertIsNotNone(aside)
+                    self.assertEquals(aside_content, aside.fields[aside_field_name].read_from(aside))
 
     def assertParentOf(self, parent_usage_key, child_usage_key, draft=None):
         """
@@ -202,9 +226,29 @@ class DirectOnlyCategorySemantics(PureModulestoreTestCase):
     def test_create(self, block_type):
         self._do_create(block_type)
 
+    def _prepare_asides(self, scope_ids):
+        """
+        Return list with connected aside xblocks
+        """
+        key_store = DictKeyValueStore()
+        field_data = KvsFieldData(key_store)
+
+        aside = AsideTest(scope_ids=scope_ids, runtime=TestRuntime(services={'field-data': field_data}))   # pylint: disable=abstract-class-instantiated
+        aside.fields[self.ASIDE_DATA_FIELD.field_name].write_to(aside, self.ASIDE_DATA_FIELD.initial)
+        return [aside]
+
+    def _get_aside(self, block):
+        """
+        Return connected xblock aside
+        """
+        for aside in block.runtime.get_asides(block):
+            if isinstance(aside, AsideTest):
+                return aside
+        return None
+
     # This function is split out from the test_create method so that it can be called
     # by other tests
-    def _do_create(self, block_type):
+    def _do_create(self, block_type, with_asides=False):
         """
         Create a block of block_type (which should be a DIRECT_ONLY_CATEGORY),
         and then verify that it was created successfully, and is visible in
@@ -228,21 +272,33 @@ class DirectOnlyCategorySemantics(PureModulestoreTestCase):
                     block_id=block_usage_key.block_id
                 )
                 block.fields[test_data.field_name].write_to(block, initial_field_value)
-                self.store.update_item(block, ModuleStoreEnum.UserID.test, allow_not_found=True)
+                asides = []
+                if with_asides:
+                    asides = self._prepare_asides(self.course.scope_ids.usage_id)
+                self.store.update_item(block, ModuleStoreEnum.UserID.test, asides=asides, allow_not_found=True)
             else:
-                block = self.store.create_child(
+                asides = []
+                if with_asides:
+                    asides = self._prepare_asides(self.course.scope_ids.usage_id)
+                self.store.create_child(
                     user_id=ModuleStoreEnum.UserID.test,
                     parent_usage_key=self.course.scope_ids.usage_id,
                     block_type=block_type,
                     block_id=block_usage_key.block_id,
                     fields={test_data.field_name: initial_field_value},
+                    asides=asides
                 )
 
         if self.is_detached(block_type):
             self.assertCourseDoesntPointToBlock(block_usage_key)
         else:
             self.assertCoursePointsToBlock(block_usage_key)
-        self.assertBlockHasContent(block_usage_key, test_data.field_name, initial_field_value)
+
+        if with_asides:
+            self.assertBlockHasContent(block_usage_key, test_data.field_name, initial_field_value,
+                                       self.ASIDE_DATA_FIELD.field_name, self.ASIDE_DATA_FIELD.initial)
+        else:
+            self.assertBlockHasContent(block_usage_key, test_data.field_name, initial_field_value)
 
         return block_usage_key
 
@@ -354,12 +410,39 @@ class DirectOnlyCategorySemantics(PureModulestoreTestCase):
             self.assertBlockDoesntExist(child_usage_key)
 
 
+@ddt.ddt
 class TestSplitDirectOnlyCategorySemantics(DirectOnlyCategorySemantics):
     """
     Verify DIRECT_ONLY_CATEGORY semantics against the SplitMongoModulestore.
     """
     MODULESTORE = SPLIT_MODULESTORE_SETUP
     __test__ = True
+
+    @ddt.data(*TESTABLE_BLOCK_TYPES)
+    @XBlockAside.register_temp_plugin(AsideTest, 'test_aside')
+    @patch('xmodule.modulestore.split_mongo.caching_descriptor_system.CachingDescriptorSystem.applicable_aside_types',
+           lambda self, block: ['test_aside'])
+    def test_create_with_asides(self, block_type):
+        self._do_create(block_type, with_asides=True)
+
+    @ddt.data(*TESTABLE_BLOCK_TYPES)
+    @XBlockAside.register_temp_plugin(AsideTest, 'test_aside')
+    @patch('xmodule.modulestore.split_mongo.caching_descriptor_system.CachingDescriptorSystem.applicable_aside_types',
+           lambda self, block: ['test_aside'])
+    def test_update_asides(self, block_type):
+        block_usage_key = self._do_create(block_type, with_asides=True)
+        test_data = self.DATA_FIELDS[block_type]
+
+        with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred):
+            block = self.store.get_item(block_usage_key)
+            aside = self._get_aside(block)
+            self.assertIsNotNone(aside)
+            aside.fields[self.ASIDE_DATA_FIELD.field_name].write_to(aside, self.ASIDE_DATA_FIELD.updated)
+
+            self.store.update_item(block, ModuleStoreEnum.UserID.test, allow_not_found=True, asides=[aside])
+
+        self.assertBlockHasContent(block_usage_key, test_data.field_name, test_data.initial,
+                                   self.ASIDE_DATA_FIELD.field_name, self.ASIDE_DATA_FIELD.updated)
 
 
 class TestMongoDirectOnlyCategorySemantics(DirectOnlyCategorySemantics):

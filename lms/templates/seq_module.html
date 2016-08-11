@@ -1,7 +1,18 @@
+<%page expression_filter="h"/>
 <%! from django.utils.translation import ugettext as _ %>
 
-<div id="sequence_${element_id}" class="sequence" data-id="${item_id}" data-position="${position}" data-ajax-url="${ajax_url}" >
+<div id="sequence_${element_id}" class="sequence" data-id="${item_id}" data-position="${position}" data-ajax-url="${ajax_url}" data-next-url="${next_url}" data-prev-url="${prev_url}">
   <div class="path"></div>
+    % if banner_text:
+      <div class="pattern-library-shim alert alert-information subsection-header" tabindex="-1">
+        <span class="pattern-library-shim icon alert-icon fa fa-bullhorn" aria-hidden="true"></span>
+        <div class="pattern-library-shim alert-message">
+          <p class="pattern-library-shim alert-copy">
+            ${banner_text}
+          </p>
+        </div>
+      </div>
+    % endif
   <div class="sequence-nav">
     <button class="sequence-nav-button button-previous">
         <span class="icon fa fa-chevron-prev" aria-hidden="true"></span><span class="sr">${_('Previous')}</span>
@@ -14,19 +25,16 @@
         ## implementation note: will need to figure out how to handle combining detail
         ## statuses of multiple modules in js.
         <li>
-        <a class="seq_${item['type']} inactive progress-${item['progress_status']} nav-item"
+        <button class="seq_${item['type']} inactive progress-${item['progress_status']} nav-item"
            data-id="${item['id']}"
            data-element="${idx+1}"
-           href="javascript:void(0);"
-           data-page-title="${item['page_title']|h}"
-           data-path="${item['path']|h}"
-           aria-controls="seq_contents_${idx}"
-           id="tab_${idx}"
-           tabindex="0">
-            <i class="icon fa seq_${item['type']}" aria-hidden="true"></i>
-            <i class="fa fa-fw fa-bookmark bookmark-icon ${"is-hidden" if not item['bookmarked'] else "bookmarked"}" aria-hidden="true"></i>
-            <p><span class="sr">${item['type']}</span> ${item['title']}<span class="sr bookmark-icon-sr">&nbsp;${_("Bookmarked") if item['bookmarked'] else ""}</span></p>
-          </a>
+           data-page-title="${item['page_title']}"
+           data-path="${item['path']}"
+           id="tab_${idx}">
+            <span class="icon fa seq_${item['type']}" aria-hidden="true"></span>
+            <span class="fa fa-fw fa-bookmark bookmark-icon ${"is-hidden" if not item['bookmarked'] else "bookmarked"}" aria-hidden="true"></span>
+            <div class="sequence-tooltip sr"><span class="sr">${item['type']}&nbsp;</span>${item['page_title']}<span class="sr bookmark-icon-sr">&nbsp;${_("Bookmarked") if item['bookmarked'] else ""}</span></div>
+          </button>
         </li>
         % endfor
       </ol>
@@ -43,7 +51,7 @@
     aria-labelledby="tab_${idx}"
     aria-hidden="true"
     class="seq_contents tex2jax_ignore asciimath2jax_ignore">
-    ${item['content'] | h}
+    ${item['content']}
   </div>
   % endfor
   <div id="seq_content"></div>

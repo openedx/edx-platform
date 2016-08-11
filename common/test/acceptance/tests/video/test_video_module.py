@@ -8,14 +8,17 @@ import os
 from mock import patch
 from nose.plugins.attrib import attr
 from unittest import skipIf, skip
-from ..helpers import UniqueCourseTest, is_youtube_available, YouTubeStubConfig
-from ...pages.lms.video.video import VideoPage
-from ...pages.lms.tab_nav import TabNavPage
-from ...pages.lms.course_nav import CourseNavPage
-from ...pages.lms.auto_auth import AutoAuthPage
-from ...pages.lms.course_info import CourseInfoPage
-from ...fixtures.course import CourseFixture, XBlockFixtureDesc
-from ..helpers import skip_if_browser
+from selenium.webdriver.common.by import By
+from selenium.webdriver.common.action_chains import ActionChains
+from common.test.acceptance.tests.helpers import UniqueCourseTest, is_youtube_available, YouTubeStubConfig
+from common.test.acceptance.pages.lms.video.video import VideoPage
+from common.test.acceptance.pages.lms.tab_nav import TabNavPage
+from common.test.acceptance.pages.lms.courseware import CoursewarePage
+from common.test.acceptance.pages.lms.course_nav import CourseNavPage
+from common.test.acceptance.pages.lms.auto_auth import AutoAuthPage
+from common.test.acceptance.pages.lms.course_info import CourseInfoPage
+from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
+from common.test.acceptance.tests.helpers import skip_if_browser
 
 from flaky import flaky
 
@@ -49,6 +52,7 @@ class VideoBaseTest(UniqueCourseTest):
         self.video = VideoPage(self.browser)
         self.tab_nav = TabNavPage(self.browser)
         self.course_nav = CourseNavPage(self.browser)
+        self.courseware = CoursewarePage(self.browser, self.course_id)
         self.course_info_page = CourseInfoPage(self.browser, self.course_id)
         self.auth_page = AutoAuthPage(self.browser, course_id=self.course_id)
 
@@ -59,7 +63,7 @@ class VideoBaseTest(UniqueCourseTest):
 
         self.metadata = None
         self.assets = []
-        self.verticals = None
+        self.contents_of_verticals = None
         self.youtube_configuration = {}
         self.user_info = {}
 
@@ -100,28 +104,28 @@ class VideoBaseTest(UniqueCourseTest):
         :return: a list of XBlockFixtureDesc
         """
         xblock_verticals = []
-        _verticals = self.verticals
+        _contents_of_verticals = self.contents_of_verticals
 
         # Video tests require at least one vertical with a single video.
-        if not _verticals:
-            _verticals = [[{'display_name': 'Video', 'metadata': self.metadata}]]
+        if not _contents_of_verticals:
+            _contents_of_verticals = [[{'display_name': 'Video', 'metadata': self.metadata}]]
 
-        for vertical_index, vertical in enumerate(_verticals):
+        for vertical_index, vertical in enumerate(_contents_of_verticals):
             xblock_verticals.append(self._create_single_vertical(vertical, vertical_index))
 
         return xblock_verticals
 
-    def _create_single_vertical(self, vertical, vertical_index):
+    def _create_single_vertical(self, vertical_contents, vertical_index):
         """
         Create a single course vertical of type XBlockFixtureDesc with category `vertical`.
         A single course vertical can contain single or multiple video modules.
-        :param vertical: vertical data list
+        :param vertical_contents: a list of items for the vertical to contain
         :param vertical_index: index for the vertical display name
         :return: XBlockFixtureDesc
         """
         xblock_course_vertical = XBlockFixtureDesc('vertical', 'Test Vertical-{0}'.format(vertical_index))
 
-        for video in vertical:
+        for video in vertical_contents:
             xblock_course_vertical.add_children(
                 XBlockFixtureDesc('video', video['display_name'], metadata=video.get('metadata')))
 
@@ -190,11 +194,11 @@ class VideoBaseTest(UniqueCourseTest):
         """
         Navigate to sequential specified by `video_display_name`
         """
-        self.course_nav.go_to_sequential_position(position)
+        self.courseware.go_to_sequential_position(position)
         self.video.wait_for_video_player_render()
 
 
-@attr('shard_4')
+@attr(shard=4)
 class YouTubeVideoTest(VideoBaseTest):
     """ Test YouTube Video Player """
 
@@ -510,13 +514,13 @@ class YouTubeVideoTest(VideoBaseTest):
         data_c = {'track': 'http://example.org/', 'download_track': True}
         html5_c_metadata = self.metadata_for_mode('html5', additional_data=data_c)
 
-        self.verticals = [
+        self.contents_of_verticals = [
             [{'display_name': 'A', 'metadata': youtube_a_metadata}],
             [{'display_name': 'B', 'metadata': youtube_b_metadata}],
             [{'display_name': 'C', 'metadata': html5_c_metadata}]
         ]
 
-        # open the section with videos (open video "A")
+        # open the section with videos (open vertical containing video "A")
         self.navigate_to_video()
 
         # check if we can download transcript in "srt" format that has text "00:00:00,260"
@@ -528,14 +532,14 @@ class YouTubeVideoTest(VideoBaseTest):
         # check if we can download transcript in "txt" format that has text "Welcome to edX."
         self.assertTrue(self.video.downloaded_transcript_contains_text('txt', 'Welcome to edX.'))
 
-        # open video "B"
-        self.course_nav.go_to_sequential('B')
+        # open vertical containing video "B"
+        self.course_nav.go_to_vertical('Test Vertical-1')
 
         # check if we can download transcript in "txt" format that has text "Equal transcripts"
         self.assertTrue(self.video.downloaded_transcript_contains_text('txt', 'Equal transcripts'))
 
-        # open video "C"
-        self.course_nav.go_to_sequential('C')
+        # open vertical containing video "C"
+        self.course_nav.go_to_vertical('Test Vertical-2')
 
         # menu "download_transcript" doesn't exist
         self.assertFalse(self.video.is_menu_present('download_transcript'))
@@ -614,7 +618,7 @@ class YouTubeVideoTest(VideoBaseTest):
 
         # we start the video, then pause it to activate the transcript
         self.video.click_player_button('play')
-        self.video.wait_for_position('0:01')
+        self.video.wait_for_position('0:03')
         self.video.click_player_button('pause')
 
         self.video.select_language('en')
@@ -630,10 +634,11 @@ class YouTubeVideoTest(VideoBaseTest):
         """
         Scenario: Multiple videos in sequentials all load and work, switching between sequentials
         Given it has videos "A,B" in "Youtube" mode in position "1" of sequential
-        And videos "E,F" in "Youtube" mode in position "2" of sequential
+        And videos "C,D" in "Youtube" mode in position "2" of sequential
         """
-        self.verticals = [
-            [{'display_name': 'A'}, {'display_name': 'B'}], [{'display_name': 'C'}, {'display_name': 'D'}]
+        self.contents_of_verticals = [
+            [{'display_name': 'A'}, {'display_name': 'B'}],
+            [{'display_name': 'C'}, {'display_name': 'D'}]
         ]
 
         tab1_video_names = ['A', 'B']
@@ -651,15 +656,16 @@ class YouTubeVideoTest(VideoBaseTest):
 
         # go to video
         self.navigate_to_video()
-
         execute_video_steps(tab1_video_names)
 
         # go to second sequential position
+        # import ipdb; ipdb.set_trace()
         self.go_to_sequential_position(2)
         execute_video_steps(tab2_video_names)
 
         # go back to first sequential position
         # we are again playing tab 1 videos to ensure that switching didn't broke some video functionality.
+        # import ipdb; ipdb.set_trace()
         self.go_to_sequential_position(1)
         execute_video_steps(tab1_video_names)
 
@@ -670,7 +676,9 @@ class YouTubeVideoTest(VideoBaseTest):
         And a video "B" in "Youtube" mode in position "2" of sequential
         And a video "C" in "HTML5" mode in position "3" of sequential
         """
-        self.verticals = [
+        # vertical titles are created in VideoBaseTest._create_single_vertical
+        # and are of the form Test Vertical-{_} where _ is the index in self.contents_of_verticals
+        self.contents_of_verticals = [
             [{'display_name': 'A'}], [{'display_name': 'B'}],
             [{'display_name': 'C', 'metadata': self.metadata_for_mode('html5')}]
         ]
@@ -678,17 +686,17 @@ class YouTubeVideoTest(VideoBaseTest):
         self.navigate_to_video()
 
         # select the "2.0" speed on video "A"
-        self.course_nav.go_to_sequential('A')
+        self.course_nav.go_to_vertical('Test Vertical-0')
         self.video.wait_for_video_player_render()
         self.video.speed = '2.0'
 
         # select the "0.50" speed on video "B"
-        self.course_nav.go_to_sequential('B')
+        self.course_nav.go_to_vertical('Test Vertical-1')
         self.video.wait_for_video_player_render()
         self.video.speed = '0.50'
 
         # open video "C"
-        self.course_nav.go_to_sequential('C')
+        self.course_nav.go_to_vertical('Test Vertical-2')
         self.video.wait_for_video_player_render()
 
         # Since the playback speed was set to .5 in "B", this video will also be impacted
@@ -696,8 +704,8 @@ class YouTubeVideoTest(VideoBaseTest):
         # does not have a .5 playback option, so the closest possible (.75) should be selected.
         self.video.verify_speed_changed('0.75x')
 
-        # open video "A"
-        self.course_nav.go_to_sequential('A')
+        # go to the vertical containing video "A"
+        self.course_nav.go_to_vertical('Test Vertical-0')
 
         # Video "A" should still play at speed 2.0 because it was explicitly set to that.
         self.assertEqual(self.video.speed, '2.0x')
@@ -705,8 +713,8 @@ class YouTubeVideoTest(VideoBaseTest):
         # reload the page
         self.video.reload_page()
 
-        # open video "A"
-        self.course_nav.go_to_sequential('A')
+        # go to the vertical containing video "A"
+        self.course_nav.go_to_vertical('Test Vertical-0')
 
         # check if video "A" should start playing at speed "2.0"
         self.assertEqual(self.video.speed, '2.0x')
@@ -714,14 +722,14 @@ class YouTubeVideoTest(VideoBaseTest):
         # select the "1.0" speed on video "A"
         self.video.speed = '1.0'
 
-        # open video "B"
-        self.course_nav.go_to_sequential('B')
+        # go to the vertical containing "B"
+        self.course_nav.go_to_vertical('Test Vertical-1')
 
         # Video "B" should still play at speed .5 because it was explicitly set to that.
         self.assertEqual(self.video.speed, '0.50x')
 
-        # open video "C"
-        self.course_nav.go_to_sequential('C')
+        # go to the vertical containing video "C"
+        self.course_nav.go_to_vertical('Test Vertical-2')
 
         # The change of speed for Video "A" should  impact Video "C" because it still has
         # not been explicitly set to a speed.
@@ -765,19 +773,19 @@ class YouTubeVideoTest(VideoBaseTest):
         Given the course has a Video component in "Youtube" mode
         Then the video has rendered in "Youtube" mode
         And I click video button "play""
-        Then I wait until video reaches at position "0.05"
+        Then I wait until video reaches at position "0.03"
         And I click video button "pause"
         And I reload the page with video
         And I click video button "play""
         And I click video button "pause"
-        Then video slider should be Equal or Greater than "0:05"
+        Then video slider should be Equal or Greater than "0:03"
 
         """
         self.navigate_to_video()
 
         self.video.click_player_button('play')
 
-        self.video.wait_for_position('0:05')
+        self.video.wait_for_position('0:03')
 
         self.video.click_player_button('pause')
 
@@ -786,7 +794,7 @@ class YouTubeVideoTest(VideoBaseTest):
         self.video.click_player_button('play')
         self.video.click_player_button('pause')
 
-        self.assertGreaterEqual(self.video.seconds, 5)
+        self.assertGreaterEqual(self.video.seconds, 3)
 
     @skip("Intermittently fails 03 June 2014")
     def test_video_position_stored_correctly_with_seek(self):
@@ -877,7 +885,7 @@ class YouTubeVideoTest(VideoBaseTest):
             }
         }
 
-        self.verticals = [
+        self.contents_of_verticals = [
             [{'display_name': 'A'}, {'display_name': 'B', 'metadata': self.metadata_for_mode('html5')}],
             [{'display_name': 'C'}]
         ]
@@ -914,20 +922,20 @@ class YouTubeVideoTest(VideoBaseTest):
         execute_video_steps(['A'])
 
         # go to second sequential position
-        self.course_nav.go_to_sequential_position(2)
+        self.courseware.go_to_sequential_position(2)
 
         execute_video_steps(tab2_video_names)
 
         # go back to first sequential position
         # we are again playing tab 1 videos to ensure that switching didn't broke some video functionality.
-        self.course_nav.go_to_sequential_position(1)
+        self.courseware.go_to_sequential_position(1)
         execute_video_steps(tab1_video_names)
 
         self.video.browser.refresh()
         execute_video_steps(tab1_video_names)
 
 
-@attr('shard_4')
+@attr(shard=4)
 class YouTubeHtml5VideoTest(VideoBaseTest):
     """ Test YouTube HTML5 Video Player """
 
@@ -949,7 +957,7 @@ class YouTubeHtml5VideoTest(VideoBaseTest):
         self.assertTrue(self.video.is_video_rendered('youtube'))
 
 
-@attr('shard_4')
+@attr(shard=4)
 class Html5VideoTest(VideoBaseTest):
     """ Test HTML5 Video Player """
 
@@ -1135,7 +1143,7 @@ class Html5VideoTest(VideoBaseTest):
         self.assertTrue(all([source in HTML5_SOURCES for source in self.video.sources]))
 
 
-@attr('shard_4')
+@attr(shard=4)
 class YouTubeQualityTest(VideoBaseTest):
     """ Test YouTube Video Quality Button """
 
@@ -1184,6 +1192,52 @@ class YouTubeQualityTest(VideoBaseTest):
         self.video.wait_for(lambda: self.video.is_quality_button_active, 'waiting for quality button activation')
 
 
+@attr(shard=4)
+class DragAndDropTest(VideoBaseTest):
+    """
+    Tests draggability of closed captions within videos.
+    """
+    def setUp(self):
+        super(DragAndDropTest, self).setUp()
+
+    def test_if_captions_are_draggable(self):
+        """
+        Loads transcripts so that closed-captioning is available.
+        Ensures they are draggable by checking start and dropped location.
+        """
+        self.assets.append('subs_3_yD_cEKoCk.srt.sjson')
+        data = {'sub': '3_yD_cEKoCk'}
+
+        self.metadata = self.metadata_for_mode('html5', additional_data=data)
+        self.navigate_to_video()
+        self.assertTrue(self.video.is_video_rendered('html5'))
+        self.video.show_closed_captions()
+        self.video.wait_for_closed_captions()
+        self.assertTrue(self.video.is_closed_captions_visible)
+
+        action = ActionChains(self.browser)
+        captions = self.browser.find_element(By.CLASS_NAME, 'closed-captions')
+
+        captions_start = captions.location
+        action.drag_and_drop_by_offset(captions, 0, -15).perform()
+
+        captions_end = captions.location
+        # We have to branch here due to unexpected behaviour of chrome.
+        # Chrome sets the y offset of element to 834 instead of 650
+        if self.browser.name == 'chrome':
+            self.assertEqual(
+                captions_end.get('y') - 168,
+                captions_start.get('y'),
+                'Closed captions did not get dragged.'
+            )
+        else:
+            self.assertEqual(
+                captions_end.get('y') + 15,
+                captions_start.get('y'),
+                'Closed captions did not get dragged.'
+            )
+
+
 @attr('a11y')
 class LMSVideoModuleA11yTest(VideoBaseTest):
     """
@@ -1205,13 +1259,17 @@ class LMSVideoModuleA11yTest(VideoBaseTest):
             super(LMSVideoModuleA11yTest, self).setUp()
 
     def test_video_player_a11y(self):
-        self.navigate_to_video()
+        # load transcripts so we can test skipping to
+        self.assets.extend(['english_single_transcript.srt', 'subs_3_yD_cEKoCk.srt.sjson'])
+        data = {'transcripts': {"en": "english_single_transcript.srt"}, 'sub': '3_yD_cEKoCk'}
+        self.metadata = self.metadata_for_mode('youtube', additional_data=data)
 
-        # Limit the scope of the audit to the video player only.
-        self.video.a11y_audit.config.set_scope(include=["div.video"])
-        self.video.a11y_audit.config.set_rules({
-            "ignore": [
-                'link-href',  # TODO: AC-223
-            ],
-        })
+        # go to video
+        self.navigate_to_video()
+        self.video.show_captions()
+
+        # limit the scope of the audit to the video player only.
+        self.video.a11y_audit.config.set_scope(
+            include=["div.video"]
+        )
         self.video.a11y_audit.check_for_accessibility_errors()

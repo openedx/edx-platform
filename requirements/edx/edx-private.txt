@@ -8,7 +8,7 @@
 
 # For Harvard courses:
 -e git+https://github.com/gsehub/xblock-mentoring.git@4d1cce78dc232d5da6ffd73817b5c490e87a6eee#egg=xblock-mentoring
-git+https://github.com/open-craft/problem-builder.git@v2.0.2#egg=xblock-problem-builder==2.0.2
+git+https://github.com/open-craft/problem-builder.git@v2.0.4#egg=xblock-problem-builder==2.0.4
 
 # Oppia XBlock
 -e git+https://github.com/oppia/xblock.git@9f6b95b7eb7dbabb96b77198a3202604f96adf65#egg=oppia-xblock
@@ -30,8 +30,8 @@ git+https://github.com/open-craft/problem-builder.git@v2.0.2#egg=xblock-problem-
 -e git+https://github.com/pmitros/AnimationXBlock.git@d2b551bb8f49a138088e10298576102164145b87#egg=animation-xblock
 -e git+https://github.com/pmitros/ProfileXBlock.git@4aeaa24aa2bc7d9cb2d2bb60d6f05def3b856be0#egg=profile-xblock
 
-# Peer instruction XBlock - prototype (from UBC; not for use on edx.org yet)
-ubcpi-xblock==0.5.0
+# Peer instruction XBlock
+ubcpi-xblock==0.5.3
 
 # Vector Drawing and ActiveTable XBlocks (Davidson)
 -e git+https://github.com/open-craft/xblock-vectordraw.git@ded76fc8f6c99ba4949ed57a7bf62a1f12e44683#egg=xblock-vectordraw

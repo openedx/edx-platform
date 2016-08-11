@@ -4,6 +4,7 @@ Tests for functionality in openedx/core/lib/courses.py.
 
 import ddt
 from django.test.utils import override_settings
+from nose.plugins.attrib import attr
 
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -12,6 +13,7 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from ..courses import course_image_url
 
 
+@attr(shard=2)
 @ddt.ddt
 class CourseImageTestCase(ModuleStoreTestCase):
     """Tests for course image URLs."""
@@ -62,4 +64,22 @@ class CourseImageTestCase(ModuleStoreTestCase):
         self.assertEquals(
             'static/test.png',
             course_image_url(course),
+        )
+
+    def test_get_banner_image_url(self):
+        """Test banner image URL formatting."""
+        banner_image = u'banner_image.jpg'
+        course = CourseFactory.create(banner_image=banner_image)
+        self.verify_url(
+            unicode(course.id.make_asset_key('asset', banner_image)),
+            course_image_url(course, 'banner_image')
+        )
+
+    def test_get_video_thumbnail_image_url(self):
+        """Test video thumbnail image URL formatting."""
+        thumbnail_image = u'thumbnail_image.jpg'
+        course = CourseFactory.create(video_thumbnail_image=thumbnail_image)
+        self.verify_url(
+            unicode(course.id.make_asset_key('asset', thumbnail_image)),
+            course_image_url(course, 'video_thumbnail_image')
         )

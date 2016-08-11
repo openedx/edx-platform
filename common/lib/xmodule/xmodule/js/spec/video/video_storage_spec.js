@@ -1,25 +1,25 @@
-(function (requirejs, require, define, undefined) {
-require(
+(function(requirejs, require, define, undefined) {
+    require(
 ['video/00_video_storage.js'],
-function (VideoStorage) {
-    describe('VideoStorage', function () {
+function(VideoStorage) {
+    describe('VideoStorage', function() {
         var namespace = 'test_storage',
             id = 'video_id';
 
-        afterEach(function () {
+        afterEach(function() {
             VideoStorage(namespace, id).clear();
         });
 
-        describe('initialize', function () {
-            it('with namespace and id', function () {
+        describe('initialize', function() {
+            it('with namespace and id', function() {
                 var storage = VideoStorage(namespace, id);
 
                 expect(window[namespace]).toBeDefined();
                 expect(window[namespace][id]).toBeDefined();
             });
 
-            it('without namespace and id', function () {
-                spyOn(Number.prototype, 'toString').andReturn('0.abcdedg');
+            it('without namespace and id', function() {
+                spyOn(Number.prototype, 'toString').and.returnValue('0.abcdedg');
                 var storage = VideoStorage();
 
                 expect(window.VideoStorage).toBeDefined();
@@ -27,10 +27,10 @@ function (VideoStorage) {
             });
         });
 
-        describe('methods: ', function () {
+        describe('methods: ', function() {
             var data, storage;
 
-            beforeEach(function () {
+            beforeEach(function() {
                 data = {
                     item_2: 'value_2'
                 };
@@ -42,7 +42,7 @@ function (VideoStorage) {
                 storage = VideoStorage(namespace, id);
             });
 
-            it('setItem', function () {
+            it('setItem', function() {
                 var expected = $.extend(true, {}, data, {item_4: 'value_4'});
 
                 expected[id]['item_3'] = 'value_3';
@@ -51,7 +51,7 @@ function (VideoStorage) {
                 expect(window[namespace]).toEqual(expected);
             });
 
-            it('getItem', function () {
+            it('getItem', function() {
                 var data = window[namespace],
                     getItem = storage.getItem;
 
@@ -60,7 +60,7 @@ function (VideoStorage) {
                 expect(getItem('item_3')).toBeUndefined();
             });
 
-            it('removeItem', function () {
+            it('removeItem', function() {
                 var data = window[namespace],
                     removeItem = storage.removeItem;
 
@@ -70,7 +70,7 @@ function (VideoStorage) {
                 expect(data['item_2']).toBeUndefined();
             });
 
-            it('clear', function () {
+            it('clear', function() {
                 var expected = {};
 
                 expected[id] = {};

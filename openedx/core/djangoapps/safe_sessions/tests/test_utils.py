@@ -23,6 +23,16 @@ class TestSafeSessionsLogMixin(object):
             self.assertRegexpMatches(mock_log.call_args_list[0][0][0], log_string)
 
     @contextmanager
+    def assert_logged_with_message(self, log_string, log_level='error'):
+        """
+        Asserts that the logger with the given log_level was called
+        with a string.
+        """
+        with patch('openedx.core.djangoapps.safe_sessions.middleware.log.' + log_level) as mock_log:
+            yield
+            mock_log.assert_any_call(log_string)
+
+    @contextmanager
     def assert_not_logged(self):
         """
         Asserts that the logger was not called with either a warning
@@ -104,28 +114,29 @@ class TestSafeSessionsLogMixin(object):
             yield
 
     @contextmanager
-    def assert_request_user_mismatch(self, user_at_request, user_at_response):
+    def assert_logged_for_request_user_mismatch(self, user_at_request, user_at_response, log_level):
         """
-        Asserts that the logger was called when request.user at request
-        time doesn't match the request.user at response time.
+        Asserts that warning was logged when request.user
+        was not equal to user at response
         """
-        with self.assert_logged(
+        with self.assert_logged_with_message(
             "SafeCookieData user at request '{}' does not match user at response: '{}'".format(
                 user_at_request, user_at_response
             ),
-            log_level='warning',
+            log_level=log_level,
         ):
             yield
 
     @contextmanager
-    def assert_session_user_mismatch(self, user_at_request, user_in_session):
+    def assert_logged_for_session_user_mismatch(self, user_at_request, user_in_session):
         """
-        Asserts that the logger was called when request.user at request
-        time doesn't match the request.user at response time.
+        Asserts that warning was logged when request.user
+        was not equal to user at session
         """
-        with self.assert_logged(
+        with self.assert_logged_with_message(
             "SafeCookieData user at request '{}' does not match user in session: '{}'".format(
                 user_at_request, user_in_session
             ),
+            log_level='warning',
         ):
             yield

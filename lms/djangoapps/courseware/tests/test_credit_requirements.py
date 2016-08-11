@@ -11,7 +11,7 @@ from pytz import UTC
 from django.conf import settings
 from django.core.urlresolvers import reverse
 
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from util.date_utils import get_time_display, DEFAULT_SHORT_DATE_FORMAT
@@ -23,7 +23,7 @@ from openedx.core.djangoapps.credit.models import CreditCourse
 
 @patch.dict(settings.FEATURES, {"ENABLE_CREDIT_ELIGIBILITY": True})
 @ddt.ddt
-class ProgressPageCreditRequirementsTest(ModuleStoreTestCase):
+class ProgressPageCreditRequirementsTest(SharedModuleStoreTestCase):
     """
     Tests for credit requirement display on the progress page.
     """
@@ -35,11 +35,15 @@ class ProgressPageCreditRequirementsTest(ModuleStoreTestCase):
     MIN_GRADE_REQ_DISPLAY = "Final Grade Credit Requirement"
     VERIFICATION_REQ_DISPLAY = "Midterm Exam Credit Requirement"
 
+    @classmethod
+    def setUpClass(cls):
+        super(ProgressPageCreditRequirementsTest, cls).setUpClass()
+        cls.course = CourseFactory.create()
+
     def setUp(self):
         super(ProgressPageCreditRequirementsTest, self).setUp()
 
-        # Create a course and configure it as a credit course
-        self.course = CourseFactory.create()
+        # Configure course as a credit course
         CreditCourse.objects.create(course_key=self.course.id, enabled=True)
 
         # Configure credit requirements (passing grade and in-course reverification)
@@ -115,8 +119,8 @@ class ProgressPageCreditRequirementsTest(ModuleStoreTestCase):
             response,
             "{}, you have met the requirements for credit in this course.".format(self.USER_FULL_NAME)
         )
-        self.assertContains(response, "Completed {date}".format(date=self._now_formatted_date()))
-        self.assertContains(response, "95%")
+        self.assertContains(response, "Completed by {date}".format(date=self._now_formatted_date()))
+        self.assertNotContains(response, "95%")
 
     def test_credit_requirements_not_eligible(self):
         # Mark the user as having failed both requirements

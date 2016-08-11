@@ -7,6 +7,7 @@ import re
 import pytz
 import ddt
 import urlparse
+from dateutil.tz import tzutc
 from mock import patch, MagicMock
 from nose.plugins.attrib import attr
 
@@ -15,15 +16,26 @@ from courseware.courses import get_course_by_id
 from courseware.tests.factories import StudentModuleFactory
 from courseware.tests.helpers import LoginEnrollmentTestCase
 from courseware.tabs import get_course_tab_list
+from courseware.testutils import FieldOverrideTestMixin
+from instructor.access import (
+    allow_access,
+    list_with_level,
+)
+
 from django.conf import settings
 from django.core.urlresolvers import reverse, resolve
+from django.utils.translation import ugettext as _
 from django.utils.timezone import UTC
 from django.test.utils import override_settings
 from django.test import RequestFactory
 from edxmako.shortcuts import render_to_response
 from request_cache.middleware import RequestCache
 from opaque_keys.edx.keys import CourseKey
-from student.roles import CourseCcxCoachRole
+from student.roles import (
+    CourseCcxCoachRole,
+    CourseInstructorRole,
+    CourseStaffRole,
+)
 from student.models import (
     CourseEnrollment,
     CourseEnrollmentAllowed,
@@ -36,7 +48,6 @@ from student.tests.factories import (
 
 from xmodule.x_module import XModuleMixin
 from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import (
     ModuleStoreTestCase,
     SharedModuleStoreTestCase,
@@ -44,6 +55,7 @@ from xmodule.modulestore.tests.django_utils import (
 from xmodule.modulestore.tests.factories import (
     CourseFactory,
     ItemFactory,
+    SampleCourseFactory,
 )
 from ccx_keys.locator import CCXLocator
 
@@ -54,8 +66,13 @@ from lms.djangoapps.ccx.tests.utils import (
     CcxTestCase,
     flatten,
 )
-from lms.djangoapps.ccx.utils import is_email
+from lms.djangoapps.ccx.utils import (
+    ccx_course,
+    is_email,
+)
 from lms.djangoapps.ccx.views import get_date
+
+from xmodule.modulestore.django import modulestore
 
 
 def intercept_renderer(path, context):
@@ -117,7 +134,176 @@ def setup_students_and_grades(context):
                     )
 
 
-@attr('shard_1')
+def unhide(unit):
+    """
+    Recursively unhide a unit and all of its children in the CCX
+    schedule.
+    """
+    unit['hidden'] = False
+    for child in unit.get('children', ()):
+        unhide(child)
+
+
+class TestAdminAccessCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
+    """
+    Tests for Custom Courses views.
+    """
+    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
+
+    def setUp(self):
+        super(TestAdminAccessCoachDashboard, self).setUp()
+        self.make_coach()
+        ccx = self.make_ccx()
+        ccx_key = CCXLocator.from_course_locator(self.course.id, ccx.id)
+        self.url = reverse('ccx_coach_dashboard', kwargs={'course_id': ccx_key})
+
+    def test_staff_access_coach_dashboard(self):
+        """
+        User is staff, should access coach dashboard.
+        """
+        staff = self.make_staff()
+        self.client.login(username=staff.username, password="test")
+
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+
+    def test_instructor_access_coach_dashboard(self):
+        """
+        User is instructor, should access coach dashboard.
+        """
+        instructor = self.make_instructor()
+        self.client.login(username=instructor.username, password="test")
+
+        # Now access URL
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+
+    def test_forbidden_user_access_coach_dashboard(self):
+        """
+        Assert user with no access must not see dashboard.
+        """
+        user = UserFactory.create(password="test")
+        self.client.login(username=user.username, password="test")
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 403)
+
+
+@attr(shard=1)
+@override_settings(
+    XBLOCK_FIELD_DATA_WRAPPERS=['lms.djangoapps.courseware.field_overrides:OverrideModulestoreFieldData.wrap'],
+    MODULESTORE_FIELD_OVERRIDE_PROVIDERS=['ccx.overrides.CustomCoursesForEdxOverrideProvider'],
+)
+class TestCCXProgressChanges(CcxTestCase, LoginEnrollmentTestCase):
+    """
+    Tests ccx schedule changes in progress page
+    """
+    @classmethod
+    def setUpClass(cls):
+        """
+        Set up tests
+        """
+        super(TestCCXProgressChanges, cls).setUpClass()
+        start = datetime.datetime(2016, 7, 1, 0, 0, tzinfo=tzutc())
+        due = datetime.datetime(2016, 7, 8, 0, 0, tzinfo=tzutc())
+
+        cls.course = course = CourseFactory.create(enable_ccx=True, start=start)
+        chapter = ItemFactory.create(start=start, parent=course, category=u'chapter')
+        sequential = ItemFactory.create(
+            parent=chapter,
+            start=start,
+            due=due,
+            category=u'sequential',
+            metadata={'graded': True, 'format': 'Homework'}
+        )
+        vertical = ItemFactory.create(
+            parent=sequential,
+            start=start,
+            due=due,
+            category=u'vertical',
+            metadata={'graded': True, 'format': 'Homework'}
+        )
+
+        # Trying to wrap the whole thing in a bulk operation fails because it
+        # doesn't find the parents. But we can at least wrap this part...
+        with cls.store.bulk_operations(course.id, emit_signals=False):
+            flatten([ItemFactory.create(
+                parent=vertical,
+                start=start,
+                due=due,
+                category="problem",
+                data=StringResponseXMLFactory().build_xml(answer='foo'),
+                metadata={'rerandomize': 'always'}
+            )] for _ in xrange(2))
+
+    def assert_progress_summary(self, ccx_course_key, due):
+        """
+        assert signal and schedule update.
+        """
+        student = UserFactory.create(is_staff=False, password="test")
+        CourseEnrollment.enroll(student, ccx_course_key)
+        self.assertTrue(
+            CourseEnrollment.objects.filter(course_id=ccx_course_key, user=student).exists()
+        )
+
+        # login as student
+        self.client.login(username=student.username, password="test")
+        progress_page_response = self.client.get(
+            reverse('progress', kwargs={'course_id': ccx_course_key})
+        )
+        grade_summary = progress_page_response.mako_context['courseware_summary']  # pylint: disable=no-member
+        chapter = grade_summary[0]
+        section = chapter['sections'][0]
+        progress_page_due_date = section.due.strftime("%Y-%m-%d %H:%M")
+        self.assertEqual(progress_page_due_date, due)
+
+    @patch('ccx.views.render_to_response', intercept_renderer)
+    @patch('courseware.views.views.render_to_response', intercept_renderer)
+    @patch.dict('django.conf.settings.FEATURES', {'CUSTOM_COURSES_EDX': True})
+    def test_edit_schedule(self):
+        """
+        Get CCX schedule, modify it, save it.
+        """
+        self.make_coach()
+        ccx = self.make_ccx()
+        ccx_course_key = CCXLocator.from_course_locator(self.course.id, unicode(ccx.id))
+        self.client.login(username=self.coach.username, password="test")
+
+        url = reverse('ccx_coach_dashboard', kwargs={'course_id': ccx_course_key})
+        response = self.client.get(url)
+
+        schedule = json.loads(response.mako_context['schedule'])  # pylint: disable=no-member
+        self.assertEqual(len(schedule), 1)
+
+        unhide(schedule[0])
+
+        # edit schedule
+        date = datetime.datetime.now() - datetime.timedelta(days=5)
+        start = date.strftime("%Y-%m-%d %H:%M")
+        due = (date + datetime.timedelta(days=3)).strftime("%Y-%m-%d %H:%M")
+
+        schedule[0]['start'] = start
+        schedule[0]['children'][0]['start'] = start
+        schedule[0]['children'][0]['due'] = due
+        schedule[0]['children'][0]['children'][0]['start'] = start
+        schedule[0]['children'][0]['children'][0]['due'] = due
+
+        url = reverse('save_ccx', kwargs={'course_id': ccx_course_key})
+        response = self.client.post(url, json.dumps(schedule), content_type='application/json')
+
+        self.assertEqual(response.status_code, 200)
+
+        schedule = json.loads(response.content)['schedule']
+        self.assertEqual(schedule[0]['hidden'], False)
+        self.assertEqual(schedule[0]['start'], start)
+        self.assertEqual(schedule[0]['children'][0]['start'], start)
+        self.assertEqual(schedule[0]['children'][0]['due'], due)
+        self.assertEqual(schedule[0]['children'][0]['children'][0]['due'], due)
+        self.assertEqual(schedule[0]['children'][0]['children'][0]['start'], start)
+
+        self.assert_progress_summary(ccx_course_key, due)
+
+
+@attr(shard=1)
 @ddt.ddt
 class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
     """
@@ -127,6 +313,8 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
     @classmethod
     def setUpClass(cls):
         super(TestCoachDashboard, cls).setUpClass()
+        cls.course_disable_ccx = CourseFactory.create(enable_ccx=False)
+        cls.course_with_ccx_connect_set = CourseFactory.create(enable_ccx=True, ccx_connector="http://ccx.com")
 
     def setUp(self):
         """
@@ -136,36 +324,26 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
         # Login with the instructor account
         self.client.login(username=self.coach.username, password="test")
 
-    def assert_elements_in_schedule(self, url, n_chapters=2, n_sequentials=4, n_verticals=8):
-        """
-        Helper function to count visible elements in the schedule
-        """
-        response = self.client.get(url)
-        # the schedule contains chapters
-        chapters = json.loads(response.mako_context['schedule'])  # pylint: disable=no-member
-        sequentials = flatten([chapter.get('children', []) for chapter in chapters])
-        verticals = flatten([sequential.get('children', []) for sequential in sequentials])
-        # check that the numbers of nodes at different level are the expected ones
-        self.assertEqual(n_chapters, len(chapters))
-        self.assertEqual(n_sequentials, len(sequentials))
-        self.assertEqual(n_verticals, len(verticals))
-        # extract the locations of all the nodes
-        all_elements = chapters + sequentials + verticals
-        return [elem['location'] for elem in all_elements if 'location' in elem]
+        # adding staff to master course.
+        staff = UserFactory()
+        allow_access(self.course, staff, 'staff')
+        self.assertTrue(CourseStaffRole(self.course.id).has_user(staff))
 
-    def hide_node(self, node):
-        """
-        Helper function to set the node `visible_to_staff_only` property
-        to True and save the change
-        """
-        node.visible_to_staff_only = True
-        self.mstore.update_item(node, self.coach.id)
+        # adding instructor to master course.
+        instructor = UserFactory()
+        allow_access(self.course, instructor, 'instructor')
+        self.assertTrue(CourseInstructorRole(self.course.id).has_user(instructor))
 
     def test_not_a_coach(self):
         """
         User is not a coach, should get Forbidden response.
         """
+        self.make_coach()
         ccx = self.make_ccx()
+
+        # create session of non-coach user
+        user = UserFactory.create(password="test")
+        self.client.login(username=user.username, password="test")
         url = reverse(
             'ccx_coach_dashboard',
             kwargs={'course_id': CCXLocator.from_course_locator(self.course.id, ccx.id)})
@@ -186,7 +364,26 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
             '<form action=".+create_ccx"',
             response.content))
 
-    def test_create_ccx(self):
+    def test_create_ccx_with_ccx_connector_set(self):
+        """
+        Assert that coach cannot create ccx when ``ccx_connector`` url is set.
+        """
+        role = CourseCcxCoachRole(self.course_with_ccx_connect_set.id)
+        role.add_users(self.coach)
+
+        url = reverse(
+            'create_ccx',
+            kwargs={'course_id': unicode(self.course_with_ccx_connect_set.id)})
+
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        error_message = _(
+            "A CCX can only be created on this course through an external service."
+            " Contact a course admin to give you access."
+        )
+        self.assertTrue(re.search(error_message, response.content))
+
+    def test_create_ccx(self, ccx_name='New CCX'):
         """
         Create CCX. Follow redirect to coach dashboard, confirm we see
         the coach dashboard for the new CCX.
@@ -197,7 +394,7 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
             'create_ccx',
             kwargs={'course_id': unicode(self.course.id)})
 
-        response = self.client.post(url, {'name': 'New CCX'})
+        response = self.client.post(url, {'name': ccx_name})
         self.assertEqual(response.status_code, 302)
         url = response.get('location')  # pylint: disable=no-member
         response = self.client.get(url)
@@ -222,6 +419,45 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
         role = CourseCcxCoachRole(course_key)
         self.assertTrue(role.has_user(self.coach))
 
+        # assert that staff and instructors of master course has staff and instructor roles on ccx
+        list_staff_master_course = list_with_level(self.course, 'staff')
+        list_instructor_master_course = list_with_level(self.course, 'instructor')
+
+        with ccx_course(course_key) as course_ccx:
+            list_staff_ccx_course = list_with_level(course_ccx, 'staff')
+            self.assertEqual(len(list_staff_master_course), len(list_staff_ccx_course))
+            self.assertEqual(list_staff_master_course[0].email, list_staff_ccx_course[0].email)
+
+            list_instructor_ccx_course = list_with_level(course_ccx, 'instructor')
+            self.assertEqual(len(list_instructor_ccx_course), len(list_instructor_master_course))
+            self.assertEqual(list_instructor_ccx_course[0].email, list_instructor_master_course[0].email)
+
+    @ddt.data("CCX demo 1", "CCX demo 2", "CCX demo 3")
+    def test_create_multiple_ccx(self, ccx_name):
+        self.test_create_ccx(ccx_name)
+
+    def test_dashboard_access_of_disabled_ccx(self):
+        """
+        User should not see coach dashboard if ccx is disbale in studio.
+        """
+        ccx = CcxFactory(course_id=self.course_disable_ccx.id, coach=self.coach)
+        url = reverse(
+            'ccx_coach_dashboard',
+            kwargs={'course_id': CCXLocator.from_course_locator(self.course_disable_ccx.id, ccx.id)})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 404)
+
+    def test_dashboard_access_with_invalid_ccx_id(self):
+        """
+        User should not see coach dashboard if ccx id is invalid.
+        """
+        self.make_ccx()
+        url = reverse(
+            'ccx_coach_dashboard',
+            kwargs={'course_id': CCXLocator.from_course_locator(self.course_disable_ccx.id, 700)})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 404)
+
     def test_get_date(self):
         """
         Assert that get_date returns valid date.
@@ -236,43 +472,6 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
                 for unit in subsection.get_children():
                     self.assertEqual(get_date(ccx, unit, 'start', parent_node=subsection), self.mooc_start)
                     self.assertEqual(get_date(ccx, unit, 'due', parent_node=subsection), self.mooc_due)
-
-    @SharedModuleStoreTestCase.modifies_courseware
-    @patch('ccx.views.render_to_response', intercept_renderer)
-    @patch('ccx.views.TODAY')
-    def test_get_ccx_schedule(self, today):
-        """
-        Gets CCX schedule and checks number of blocks in it.
-        Hides nodes at a different depth and checks that these nodes
-        are not in the schedule.
-        """
-        today.return_value = datetime.datetime(2014, 11, 25, tzinfo=pytz.UTC)
-        self.make_coach()
-        ccx = self.make_ccx()
-        url = reverse(
-            'ccx_coach_dashboard',
-            kwargs={
-                'course_id': CCXLocator.from_course_locator(
-                    self.course.id, ccx.id)
-            }
-        )
-        # all the elements are visible
-        self.assert_elements_in_schedule(url)
-        # hide a vertical
-        vertical = self.verticals[0]
-        self.hide_node(vertical)
-        locations = self.assert_elements_in_schedule(url, n_verticals=7)
-        self.assertNotIn(unicode(vertical.location), locations)
-        # hide a sequential
-        sequential = self.sequentials[0]
-        self.hide_node(sequential)
-        locations = self.assert_elements_in_schedule(url, n_sequentials=3, n_verticals=6)
-        self.assertNotIn(unicode(sequential.location), locations)
-        # hide a chapter
-        chapter = self.chapters[0]
-        self.hide_node(chapter)
-        locations = self.assert_elements_in_schedule(url, n_chapters=1, n_sequentials=2, n_verticals=4)
-        self.assertNotIn(unicode(chapter.location), locations)
 
     @patch('ccx.views.render_to_response', intercept_renderer)
     @patch('ccx.views.TODAY')
@@ -310,15 +509,6 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
         url = reverse(
             'save_ccx',
             kwargs={'course_id': CCXLocator.from_course_locator(self.course.id, ccx.id)})
-
-        def unhide(unit):
-            """
-            Recursively unhide a unit and all of its children in the CCX
-            schedule.
-            """
-            unit['hidden'] = False
-            for child in unit.get('children', ()):
-                unhide(child)
 
         unhide(schedule[0])
         schedule[0]['start'] = u'2014-11-20 00:00'
@@ -472,10 +662,14 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
         # create ccx and limit the maximum amount of students that can be enrolled to 2
         ccx = self.make_ccx(max_students_allowed=2)
         ccx_course_key = CCXLocator.from_course_locator(self.course.id, ccx.id)
+        staff = self.make_staff()
+        instructor = self.make_instructor()
+
         # create some users
-        students = [
+        students = [instructor, staff, self.coach] + [
             UserFactory.create(is_staff=False) for _ in range(3)
         ]
+
         url = reverse(
             'ccx_invite',
             kwargs={'course_id': ccx_course_key}
@@ -486,15 +680,26 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
         }
         response = self.client.post(url, data=data, follow=True)
         self.assertEqual(response.status_code, 200)
-        # a CcxMembership exists for the first two students but not the third
+        # even if course is coach can enroll staff and admins of master course into ccx
         self.assertTrue(
-            CourseEnrollment.objects.filter(course_id=ccx_course_key, user=students[0]).exists()
+            CourseEnrollment.objects.filter(course_id=ccx_course_key, user=instructor).exists()
         )
         self.assertTrue(
-            CourseEnrollment.objects.filter(course_id=ccx_course_key, user=students[1]).exists()
+            CourseEnrollment.objects.filter(course_id=ccx_course_key, user=staff).exists()
+        )
+        self.assertTrue(
+            CourseEnrollment.objects.filter(course_id=ccx_course_key, user=self.coach).exists()
+        )
+
+        # a CcxMembership exists for the first five students but not the sixth
+        self.assertTrue(
+            CourseEnrollment.objects.filter(course_id=ccx_course_key, user=students[3]).exists()
+        )
+        self.assertTrue(
+            CourseEnrollment.objects.filter(course_id=ccx_course_key, user=students[4]).exists()
         )
         self.assertFalse(
-            CourseEnrollment.objects.filter(course_id=ccx_course_key, user=students[2]).exists()
+            CourseEnrollment.objects.filter(course_id=ccx_course_key, user=students[5]).exists()
         )
 
     def test_manage_student_enrollment_limit(self):
@@ -506,11 +711,13 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
         """
         students_limit = 1
         self.make_coach()
+        staff = self.make_staff()
         ccx = self.make_ccx(max_students_allowed=students_limit)
         ccx_course_key = CCXLocator.from_course_locator(self.course.id, ccx.id)
         students = [
             UserFactory.create(is_staff=False) for _ in range(2)
         ]
+
         url = reverse(
             'ccx_manage_student',
             kwargs={'course_id': CCXLocator.from_course_locator(self.course.id, ccx.id)}
@@ -518,7 +725,7 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
         # enroll the first student
         data = {
             'student-action': 'add',
-            'student-id': u','.join([students[0].email, ]),
+            'student-id': students[0].email,
         }
         response = self.client.post(url, data=data, follow=True)
         self.assertEqual(response.status_code, 200)
@@ -526,11 +733,12 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
         self.assertTrue(
             CourseEnrollment.objects.filter(course_id=ccx_course_key, user=students[0]).exists()
         )
+
         # try to enroll the second student without success
         # enroll the first student
         data = {
             'student-action': 'add',
-            'student-id': u','.join([students[1].email, ]),
+            'student-id': students[1].email,
         }
         response = self.client.post(url, data=data, follow=True)
         self.assertEqual(response.status_code, 200)
@@ -542,6 +750,27 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
             students_limit=students_limit
         )
         self.assertContains(response, error_message, status_code=200)
+
+        # try to enroll the 3rd student which is staff
+        data = {
+            'student-action': 'add',
+            'student-id': staff.email,
+        }
+        response = self.client.post(url, data=data, follow=True)
+        self.assertEqual(response.status_code, 200)
+        # staff gets enroll
+        self.assertTrue(
+            CourseEnrollment.objects.filter(course_id=ccx_course_key, user=staff).exists()
+        )
+
+        self.assertEqual(CourseEnrollment.objects.num_enrolled_in_exclude_admins(ccx_course_key), 1)
+
+        # asert that number of enroll is still 0 because staff and instructor do not count.
+        CourseEnrollment.enroll(staff, self.course.id)
+        self.assertEqual(CourseEnrollment.objects.num_enrolled_in_exclude_admins(self.course.id), 0)
+        # assert that handles  wrong ccx id code
+        ccx_course_key_fake = CCXLocator.from_course_locator(self.course.id, 55)
+        self.assertEqual(CourseEnrollment.objects.num_enrolled_in_exclude_admins(ccx_course_key_fake), 0)
 
     @ddt.data(
         ('ccx_invite', True, 1, 'student-ids', ('enrollment-button', 'Unenroll')),
@@ -632,10 +861,7 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
 
         # some error messages are returned for one of the views only
         if view_name == 'ccx_manage_student' and not is_email(identifier):
-            error_message = 'Could not find a user with name or email "{identifier}" '.format(
-                identifier=identifier
-            )
-            self.assertContains(response, error_message, status_code=200)
+            self.assertContains(response, 'Could not find a user with name or email ', status_code=200)
 
         if is_email(identifier):
             if send_email:
@@ -691,6 +917,134 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
         )
 
 
+@attr(shard=1)
+class TestCoachDashboardSchedule(CcxTestCase, LoginEnrollmentTestCase, ModuleStoreTestCase):
+    """
+    Tests of the CCX Coach Dashboard which need to modify the course content.
+    """
+
+    ENABLED_CACHES = ['default', 'mongo_inheritance_cache', 'loc_cache']
+
+    def setUp(self):
+        super(TestCoachDashboardSchedule, self).setUp()
+        self.course = course = CourseFactory.create(enable_ccx=True)
+
+        # Create a course outline
+        self.mooc_start = start = datetime.datetime(
+            2010, 5, 12, 2, 42, tzinfo=pytz.UTC
+        )
+        self.mooc_due = due = datetime.datetime(
+            2010, 7, 7, 0, 0, tzinfo=pytz.UTC
+        )
+
+        self.chapters = [
+            ItemFactory.create(start=start, parent=course) for _ in xrange(2)
+        ]
+        self.sequentials = flatten([
+            [
+                ItemFactory.create(parent=chapter) for _ in xrange(2)
+            ] for chapter in self.chapters
+        ])
+        self.verticals = flatten([
+            [
+                ItemFactory.create(
+                    start=start, due=due, parent=sequential, graded=True, format='Homework', category=u'vertical'
+                ) for _ in xrange(2)
+            ] for sequential in self.sequentials
+        ])
+
+        # Trying to wrap the whole thing in a bulk operation fails because it
+        # doesn't find the parents. But we can at least wrap this part...
+        with self.store.bulk_operations(course.id, emit_signals=False):
+            blocks = flatten([  # pylint: disable=unused-variable
+                [
+                    ItemFactory.create(parent=vertical) for _ in xrange(2)
+                ] for vertical in self.verticals
+            ])
+
+        # Create instructor account
+        self.coach = UserFactory.create()
+        # create an instance of modulestore
+        self.mstore = modulestore()
+
+        # Login with the instructor account
+        self.client.login(username=self.coach.username, password="test")
+
+        # adding staff to master course.
+        staff = UserFactory()
+        allow_access(self.course, staff, 'staff')
+        self.assertTrue(CourseStaffRole(self.course.id).has_user(staff))
+
+        # adding instructor to master course.
+        instructor = UserFactory()
+        allow_access(self.course, instructor, 'instructor')
+        self.assertTrue(CourseInstructorRole(self.course.id).has_user(instructor))
+
+        self.assertTrue(modulestore().has_course(self.course.id))
+
+    def assert_elements_in_schedule(self, url, n_chapters=2, n_sequentials=4, n_verticals=8):
+        """
+        Helper function to count visible elements in the schedule
+        """
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        # the schedule contains chapters
+        chapters = json.loads(response.mako_context['schedule'])  # pylint: disable=no-member
+        sequentials = flatten([chapter.get('children', []) for chapter in chapters])
+        verticals = flatten([sequential.get('children', []) for sequential in sequentials])
+        # check that the numbers of nodes at different level are the expected ones
+        self.assertEqual(n_chapters, len(chapters))
+        self.assertEqual(n_sequentials, len(sequentials))
+        self.assertEqual(n_verticals, len(verticals))
+        # extract the locations of all the nodes
+        all_elements = chapters + sequentials + verticals
+        return [elem['location'] for elem in all_elements if 'location' in elem]
+
+    def hide_node(self, node):
+        """
+        Helper function to set the node `visible_to_staff_only` property
+        to True and save the change
+        """
+        node.visible_to_staff_only = True
+        self.mstore.update_item(node, self.coach.id)
+
+    @patch('ccx.views.render_to_response', intercept_renderer)
+    @patch('ccx.views.TODAY')
+    def test_get_ccx_schedule(self, today):
+        """
+        Gets CCX schedule and checks number of blocks in it.
+        Hides nodes at a different depth and checks that these nodes
+        are not in the schedule.
+        """
+        today.return_value = datetime.datetime(2014, 11, 25, tzinfo=pytz.UTC)
+        self.make_coach()
+        ccx = self.make_ccx()
+        url = reverse(
+            'ccx_coach_dashboard',
+            kwargs={
+                'course_id': CCXLocator.from_course_locator(
+                    self.course.id, ccx.id)
+            }
+        )
+        # all the elements are visible
+        self.assert_elements_in_schedule(url)
+        # hide a vertical
+        vertical = self.verticals[0]
+        self.hide_node(vertical)
+        locations = self.assert_elements_in_schedule(url, n_verticals=7)
+        self.assertNotIn(unicode(vertical.location), locations)
+        # hide a sequential
+        sequential = self.sequentials[0]
+        self.hide_node(sequential)
+        locations = self.assert_elements_in_schedule(url, n_sequentials=3, n_verticals=6)
+        self.assertNotIn(unicode(sequential.location), locations)
+        # hide a chapter
+        chapter = self.chapters[0]
+        self.hide_node(chapter)
+        locations = self.assert_elements_in_schedule(url, n_chapters=1, n_sequentials=2, n_verticals=4)
+        self.assertNotIn(unicode(chapter.location), locations)
+
+
 GET_CHILDREN = XModuleMixin.get_children
 
 
@@ -705,11 +1059,13 @@ def patched_get_children(self, usage_key_filter=None):
     return list(iter_children())
 
 
-@attr('shard_1')
-@override_settings(FIELD_OVERRIDE_PROVIDERS=(
-    'ccx.overrides.CustomCoursesForEdxOverrideProvider',))
+@attr(shard=1)
+@override_settings(
+    XBLOCK_FIELD_DATA_WRAPPERS=['lms.djangoapps.courseware.field_overrides:OverrideModulestoreFieldData.wrap'],
+    MODULESTORE_FIELD_OVERRIDE_PROVIDERS=['ccx.overrides.CustomCoursesForEdxOverrideProvider'],
+)
 @patch('xmodule.x_module.XModuleMixin.get_children', patched_get_children, spec=True)
-class TestCCXGrades(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
+class TestCCXGrades(FieldOverrideTestMixin, SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Tests for Custom Courses views.
     """
@@ -778,11 +1134,18 @@ class TestCCXGrades(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
 
         # create a ccx locator and retrieve the course structure using that key
         # which emulates how a student would get access.
-        self.ccx_key = CCXLocator.from_course_locator(self._course.id, ccx.id)
+        self.ccx_key = CCXLocator.from_course_locator(self._course.id, unicode(ccx.id))
         self.course = get_course_by_id(self.ccx_key, depth=None)
         setup_students_and_grades(self)
         self.client.login(username=coach.username, password="test")
         self.addCleanup(RequestCache.clear_request_cache)
+        from xmodule.modulestore.django import SignalHandler
+
+        # using CCX object as sender here.
+        SignalHandler.course_published.send(
+            sender=ccx,
+            course_key=self.ccx_key
+        )
 
     @patch('ccx.views.render_to_response', intercept_renderer)
     @patch('instructor.views.gradebook_api.MAX_STUDENTS_PER_PAGE_GRADE_BOOK', 1)
@@ -832,10 +1195,10 @@ class TestCCXGrades(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertEqual(data['HW 03'], '0.25')
         self.assertEqual(data['HW Avg'], '0.5')
 
-    @patch('courseware.views.render_to_response', intercept_renderer)
+    @patch('courseware.views.views.render_to_response', intercept_renderer)
     def test_student_progress(self):
         self.course.enable_ccx = True
-        patch_context = patch('courseware.views.get_course_with_access')
+        patch_context = patch('courseware.views.views.get_course_with_access')
         get_course = patch_context.start()
         get_course.return_value = self.course
         self.addCleanup(patch_context.stop)
@@ -854,7 +1217,7 @@ class TestCCXGrades(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
 
 
 @ddt.ddt
-class CCXCoachTabTestCase(SharedModuleStoreTestCase):
+class CCXCoachTabTestCase(CcxTestCase):
     """
     Test case for CCX coach tab.
     """
@@ -872,10 +1235,10 @@ class CCXCoachTabTestCase(SharedModuleStoreTestCase):
             role = CourseCcxCoachRole(course.id)
             role.add_users(self.user)
 
-    def check_ccx_tab(self, course):
+    def check_ccx_tab(self, course, user):
         """Helper function for verifying the ccx tab."""
         request = RequestFactory().request()
-        request.user = self.user
+        request.user = user
         all_tabs = get_course_tab_list(request, course)
         return any(tab.type == 'ccx_coach' for tab in all_tabs)
 
@@ -895,13 +1258,71 @@ class CCXCoachTabTestCase(SharedModuleStoreTestCase):
             course = self.ccx_enabled_course if enable_ccx else self.ccx_disabled_course
             self.assertEquals(
                 expected_result,
-                self.check_ccx_tab(course)
+                self.check_ccx_tab(course, self.user)
             )
 
+    def test_ccx_tab_visibility_for_staff_when_not_coach_master_course(self):
+        """
+        Staff cannot view ccx coach dashboard on master course by default.
+        """
+        staff = self.make_staff()
+        self.assertFalse(self.check_ccx_tab(self.course, staff))
 
-class TestStudentDashboardWithCCX(ModuleStoreTestCase):
+    def test_ccx_tab_visibility_for_staff_when_coach_master_course(self):
+        """
+        Staff can view ccx coach dashboard only if he is coach on master course.
+        """
+        staff = self.make_staff()
+        role = CourseCcxCoachRole(self.course.id)
+        role.add_users(staff)
+        self.assertTrue(self.check_ccx_tab(self.course, staff))
+
+    def test_ccx_tab_visibility_for_staff_ccx_course(self):
+        """
+        Staff can access coach dashboard on ccx course.
+        """
+        self.make_coach()
+        ccx = self.make_ccx()
+        ccx_key = CCXLocator.from_course_locator(self.course.id, unicode(ccx.id))
+        staff = self.make_staff()
+
+        with ccx_course(ccx_key) as course_ccx:
+            allow_access(course_ccx, staff, 'staff')
+            self.assertTrue(self.check_ccx_tab(course_ccx, staff))
+
+    def test_ccx_tab_visibility_for_instructor_when_not_coach_master_course(self):
+        """
+        Instructor cannot view ccx coach dashboard on master course by default.
+        """
+        instructor = self.make_instructor()
+        self.assertFalse(self.check_ccx_tab(self.course, instructor))
+
+    def test_ccx_tab_visibility_for_instructor_when_coach_master_course(self):
+        """
+        Instructor can view ccx coach dashboard only if he is coach on master course.
+        """
+        instructor = self.make_instructor()
+        role = CourseCcxCoachRole(self.course.id)
+        role.add_users(instructor)
+        self.assertTrue(self.check_ccx_tab(self.course, instructor))
+
+    def test_ccx_tab_visibility_for_instructor_ccx_course(self):
+        """
+        Instructor can access coach dashboard on ccx course.
+        """
+        self.make_coach()
+        ccx = self.make_ccx()
+        ccx_key = CCXLocator.from_course_locator(self.course.id, unicode(ccx.id))
+        instructor = self.make_instructor()
+
+        with ccx_course(ccx_key) as course_ccx:
+            allow_access(course_ccx, instructor, 'instructor')
+            self.assertTrue(self.check_ccx_tab(course_ccx, instructor))
+
+
+class TestStudentViewsWithCCX(ModuleStoreTestCase):
     """
-    Test to ensure that the student dashboard works for users enrolled in CCX
+    Test to ensure that the student dashboard and courseware works for users enrolled in CCX
     courses.
     """
 
@@ -909,13 +1330,13 @@ class TestStudentDashboardWithCCX(ModuleStoreTestCase):
         """
         Set up courses and enrollments.
         """
-        super(TestStudentDashboardWithCCX, self).setUp()
+        super(TestStudentViewsWithCCX, self).setUp()
 
         # Create a Draft Mongo and a Split Mongo course and enroll a student user in them.
         self.student_password = "foobar"
         self.student = UserFactory.create(username="test", password=self.student_password, is_staff=False)
-        self.draft_course = CourseFactory.create(default_store=ModuleStoreEnum.Type.mongo)
-        self.split_course = CourseFactory.create(default_store=ModuleStoreEnum.Type.split)
+        self.draft_course = SampleCourseFactory.create(default_store=ModuleStoreEnum.Type.mongo)
+        self.split_course = SampleCourseFactory.create(default_store=ModuleStoreEnum.Type.split)
         CourseEnrollment.enroll(self.student, self.draft_course.id)
         CourseEnrollment.enroll(self.student, self.split_course.id)
 
@@ -928,11 +1349,16 @@ class TestStudentDashboardWithCCX(ModuleStoreTestCase):
         self.ccx = CcxFactory(course_id=self.split_course.id, coach=self.coach)
         last_week = datetime.datetime.now(UTC()) - datetime.timedelta(days=7)
         override_field_for_ccx(self.ccx, self.split_course, 'start', last_week)  # Required by self.ccx.has_started().
-        course_key = CCXLocator.from_course_locator(self.split_course.id, self.ccx.id)
-        CourseEnrollment.enroll(self.student, course_key)
+        self.ccx_course_key = CCXLocator.from_course_locator(self.split_course.id, self.ccx.id)
+        CourseEnrollment.enroll(self.student, self.ccx_course_key)
 
     def test_load_student_dashboard(self):
         self.client.login(username=self.student.username, password=self.student_password)
         response = self.client.get(reverse('dashboard'))
         self.assertEqual(response.status_code, 200)
         self.assertTrue(re.search('Test CCX', response.content))
+
+    def test_load_courseware(self):
+        self.client.login(username=self.student.username, password=self.student_password)
+        response = self.client.get(reverse('courseware', kwargs={'course_id': unicode(self.ccx_course_key)}))
+        self.assertEqual(response.status_code, 200)

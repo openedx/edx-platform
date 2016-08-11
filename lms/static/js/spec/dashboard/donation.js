@@ -1,26 +1,27 @@
-define(['common/js/spec_helpers/template_helpers', 'common/js/spec_helpers/ajax_helpers', 'js/dashboard/donation'],
+define(['common/js/spec_helpers/template_helpers',
+        'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
+        'js/dashboard/donation'],
     function(TemplateHelpers, AjaxHelpers) {
         'use strict';
 
-        describe("edx.dashboard.donation.DonationView", function() {
-
-            var PAYMENT_URL = "https://fake.processor.com/pay/";
+        describe('edx.dashboard.donation.DonationView', function() {
+            var PAYMENT_URL = 'https://fake.processor.com/pay/';
             var PAYMENT_PARAMS = {
-                orderId: "test-order",
-                signature: "abcd1234"
+                orderId: 'test-order',
+                signature: 'abcd1234'
             };
-            var AMOUNT = "45.67";
-            var COURSE_ID = "edx/DemoX/Demo";
+            var AMOUNT = '45.67';
+            var COURSE_ID = 'edx/DemoX/Demo';
 
             var view = null;
             var requests = null;
 
             beforeEach(function() {
-                setFixtures("<div></div>");
+                setFixtures('<div></div>');
                 TemplateHelpers.installTemplate('templates/dashboard/donation');
 
                 view = new edx.dashboard.donation.DonationView({
-                    el: $("#jasmine-fixtures"),
+                    el: $('#jasmine-fixtures'),
                     course: COURSE_ID
                 }).render();
 
@@ -29,13 +30,13 @@ define(['common/js/spec_helpers/template_helpers', 'common/js/spec_helpers/ajax_
                 // This function gets passed the dynamically constructed
                 // form with signed payment parameters from the LMS server,
                 // so we can verify that the form is constructed correctly.
-                spyOn(view, 'submitPaymentForm').andCallFake(function() {});
+                spyOn(view, 'submitPaymentForm').and.callFake(function() {});
 
                 // Stub the analytics event tracker
                 window.analytics = jasmine.createSpyObj('analytics', ['track']);
             });
 
-            it("processes a donation for a course", function() {
+            it('processes a donation for a course', function() {
                 // Spy on AJAX requests
                 requests = AjaxHelpers.requests(this);
 
@@ -47,15 +48,15 @@ define(['common/js/spec_helpers/template_helpers', 'common/js/spec_helpers/ajax_
                 // the donation item in the shopping cart and receive
                 // the signed payment params.
                 AjaxHelpers.expectRequest(
-                    requests, "POST", "/shoppingcart/donation/",
-                    $.param({ amount: AMOUNT, course_id: COURSE_ID })
+                    requests, 'POST', '/shoppingcart/donation/',
+                    $.param({amount: AMOUNT, course_id: COURSE_ID})
                 );
 
                 // Simulate a response from the server containing the signed
                 // parameters to send to the payment processor
                 AjaxHelpers.respondWithJson(requests, {
                     payment_url: PAYMENT_URL,
-                    payment_params: PAYMENT_PARAMS,
+                    payment_params: PAYMENT_PARAMS
                 });
 
                 // Verify that the payment form has the payment parameters
@@ -64,60 +65,60 @@ define(['common/js/spec_helpers/template_helpers', 'common/js/spec_helpers/ajax_
                 // We stub out the actual submission of the form to avoid
                 // leaving the current page during the test.
                 expect(view.submitPaymentForm).toHaveBeenCalled();
-                var form = view.submitPaymentForm.mostRecentCall.args[0];
+                var form = view.submitPaymentForm.calls.mostRecent().args[0];
                 expect(form.serialize()).toEqual($.param(PAYMENT_PARAMS));
-                expect(form.attr('method')).toEqual("post");
+                expect(form.attr('method')).toEqual('post');
                 expect(form.attr('action')).toEqual(PAYMENT_URL);
             });
 
-            it("validates the donation amount", function() {
+            it('validates the donation amount', function() {
                 var assertValidAmount = function(amount, isValid) {
                     expect(view.validateAmount(amount)).toBe(isValid);
                 };
-                assertValidAmount("", false);
-                assertValidAmount("  ", false);
-                assertValidAmount("abc", false);
-                assertValidAmount("14.", false);
-                assertValidAmount(".1", false);
-                assertValidAmount("-1", false);
-                assertValidAmount("-1.00", false);
-                assertValidAmount("-", false);
-                assertValidAmount("0", false);
-                assertValidAmount("0.00", false);
-                assertValidAmount("00.00", false);
-                assertValidAmount("3", true);
-                assertValidAmount("12.34", true);
-                assertValidAmount("278", true);
-                assertValidAmount("278.91", true);
-                assertValidAmount("0.14", true);
+                assertValidAmount('', false);
+                assertValidAmount('  ', false);
+                assertValidAmount('abc', false);
+                assertValidAmount('14.', false);
+                assertValidAmount('.1', false);
+                assertValidAmount('-1', false);
+                assertValidAmount('-1.00', false);
+                assertValidAmount('-', false);
+                assertValidAmount('0', false);
+                assertValidAmount('0.00', false);
+                assertValidAmount('00.00', false);
+                assertValidAmount('3', true);
+                assertValidAmount('12.34', true);
+                assertValidAmount('278', true);
+                assertValidAmount('278.91', true);
+                assertValidAmount('0.14', true);
             });
 
-            it("displays validation errors", function() {
+            it('displays validation errors', function() {
                 // Attempt to submit an invalid donation amount
-                view.$amount.val("");
+                view.$amount.val('');
                 view.donate();
 
                 // Verify that the amount field is marked as having a validation error
-                expect(view.$amount).toHaveClass("validation-error");
+                expect(view.$amount).toHaveClass('validation-error');
 
                 // Verify that the error message appears
-                expect(view.$errorMsg.text()).toEqual("Please enter a valid donation amount.");
+                expect(view.$errorMsg.text()).toEqual('Please enter a valid donation amount.');
 
                 // Expect that the submit button is re-enabled to allow users to submit again
-                expect(view.$submit).not.toHaveClass("disabled");
+                expect(view.$submit).not.toHaveClass('disabled');
 
                 // Try again, this time submitting a valid amount
                 view.$amount.val(AMOUNT);
                 view.donate();
 
                 // Expect that the errors are cleared
-                expect(view.$errorMsg.text()).toEqual("");
+                expect(view.$errorMsg.text()).toEqual('');
 
                 // Expect that the submit button is disabled
-                expect(view.$submit).toHaveClass("disabled");
+                expect(view.$submit).toHaveClass('disabled');
             });
 
-            it("displays an error when the server cannot be contacted", function() {
+            it('displays an error when the server cannot be contacted', function() {
                 // Spy on AJAX requests
                 requests = AjaxHelpers.requests(this);
 
@@ -126,16 +127,16 @@ define(['common/js/spec_helpers/template_helpers', 'common/js/spec_helpers/ajax_
                 AjaxHelpers.respondWithError(requests);
 
                 // Expect that the error is displayed
-                expect(view.$errorMsg.text()).toEqual("Your donation could not be submitted.");
+                expect(view.$errorMsg.text()).toEqual('Your donation could not be submitted.');
 
                 // Verify that the submit button is re-enabled
                 // so users can try again.
-                expect(view.$submit).not.toHaveClass("disabled");
+                expect(view.$submit).not.toHaveClass('disabled');
             });
 
-            it("disables the submit button once the user donates", function() {
+            it('disables the submit button once the user donates', function() {
                 // Before we submit, the button should be enabled
-                expect(view.$submit).not.toHaveClass("disabled");
+                expect(view.$submit).not.toHaveClass('disabled');
 
                 // Simulate starting a donation
                 // Since we're not simulating the AJAX response, this will block
@@ -143,10 +144,10 @@ define(['common/js/spec_helpers/template_helpers', 'common/js/spec_helpers/ajax_
                 view.donate();
 
                 // Verify that the submit button is disabled
-                expect(view.$submit).toHaveClass("disabled");
+                expect(view.$submit).toHaveClass('disabled');
             });
 
-            it("sends an analytics event when the user submits a donation", function() {
+            it('sends an analytics event when the user submits a donation', function() {
                 // Simulate the submission to the payment processor
                 // We skip the intermediary steps here by passing in
                 // the payment url and parameters,
@@ -158,9 +159,9 @@ define(['common/js/spec_helpers/template_helpers', 'common/js/spec_helpers/ajax_
 
                 // Verify that the analytics event was fired
                 expect(window.analytics.track).toHaveBeenCalledWith(
-                    "edx.bi.user.payment_processor.visited",
+                    'edx.bi.user.payment_processor.visited',
                     {
-                        category: "donations",
+                        category: 'donations',
                         label: COURSE_ID
                     }
                 );

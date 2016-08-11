@@ -27,7 +27,7 @@ from .component import (
 )
 from .item import create_xblock_info
 from .library import LIBRARIES_ENABLED
-from contentstore import utils
+from ccx_keys.locator import CCXLocator
 from contentstore.course_group_config import (
     COHORT_SCHEME,
     GroupConfiguration,
@@ -57,7 +57,6 @@ from course_action_state.managers import CourseActionStateItemNotFoundError
 from course_action_state.models import CourseRerunState, CourseRerunUIStateManager
 from course_creators.views import get_course_creator_status, add_user_with_status_unrequested
 from edxmako.shortcuts import render_to_response
-from microsite_configuration import microsite
 from models.settings.course_grading import CourseGradingModel
 from models.settings.course_metadata import CourseMetadata
 from models.settings.encoder import CourseSettingsEncoder
@@ -68,15 +67,18 @@ from openedx.core.djangoapps.models.course_details import CourseDetails
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.programs.utils import get_programs
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.lib.course_tabs import CourseTabPluginManager
 from openedx.core.lib.courses import course_image_url
 from openedx.core.djangolib.js_utils import dump_js_escaped_json
 from student import auth
+from student.models import OrganizationUser
 from student.auth import has_course_author_access, has_studio_write_access, has_studio_read_access
 from student.roles import (
     CourseInstructorRole, CourseStaffRole, CourseCreatorRole, GlobalStaff, UserBasedRole
 )
-from student.models import OrganizationUser
+
+from util.course import get_lms_link_for_about_page
 from util.date_utils import get_default_time_display
 from util.json_request import JsonResponse, JsonResponseBadRequest, expect_json
 from util.milestones_helpers import (
@@ -92,6 +94,7 @@ from util.organizations_helpers import (
 )
 from organizations.models import Organization
 from util.string_utils import _has_non_ascii_characters
+from xblock_django.api import deprecated_xblocks
 from xmodule.contentstore.content import StaticContent
 from xmodule.course_module import CourseFields
 from xmodule.course_module import DEFAULT_START_DATE
@@ -166,7 +169,7 @@ def course_notifications_handler(request, course_key_string=None, action_state_i
     if not course_key_string or not action_state_id:
         return HttpResponseBadRequest()
 
-    response_format = request.REQUEST.get('format', 'html')
+    response_format = request.GET.get('format') or request.POST.get('format') or 'html'
 
     course_key = CourseKey.from_string(course_key_string)
 
@@ -252,7 +255,7 @@ def course_handler(request, course_key_string=None):
         json: delete this branch from this course (leaving off /branch/draft would imply delete the course)
     """
     try:
-        response_format = request.REQUEST.get('format', 'html')
+        response_format = request.GET.get('format') or request.POST.get('format') or 'html'
         if response_format == 'json' or 'application/json' in request.META.get('HTTP_ACCEPT', 'application/json'):
             if request.method == 'GET':
                 course_key = CourseKey.from_string(course_key_string)
@@ -429,6 +432,11 @@ def _accessible_courses_list(request):
         if isinstance(course, ErrorDescriptor):
             return False
 
+        # Custom Courses for edX (CCX) is an edX feature for re-using course content.
+        # CCXs cannot be edited in Studio (aka cms) and should not be shown in this dashboard.
+        if isinstance(course.id, CCXLocator):
+            return False
+
         # pylint: disable=fixme
         # TODO remove this condition when templates purged from db
         if course.location.course == 'templates':
@@ -449,12 +457,16 @@ def _accessible_courses_list_from_groups(request):
     """
     List all courses available to the logged in user by reversing access group names
     """
+    def filter_ccx(course_access):
+        """ CCXs cannot be edited in Studio and should not be shown in this dashboard """
+        return not isinstance(course_access.course_id, CCXLocator)
+
     courses_list = {}
     in_process_course_actions = []
 
     instructor_courses = UserBasedRole(request.user, CourseInstructorRole.ROLE).courses_with_role()
     staff_courses = UserBasedRole(request.user, CourseStaffRole.ROLE).courses_with_role()
-    all_courses = instructor_courses | staff_courses
+    all_courses = filter(filter_ccx, instructor_courses | staff_courses)
 
     for course_access in all_courses:
         course_key = course_access.course_id
@@ -476,8 +488,9 @@ def _accessible_courses_list_from_groups(request):
             except ItemNotFoundError:
                 # If a user has access to a course that doesn't exist, don't do anything with that course
                 pass
+
             if course is not None and not isinstance(course, ErrorDescriptor):
-                # ignore deleted or errored courses
+                # ignore deleted, errored or ccx courses
                 courses_list[course_key] = course
 
     return courses_list.values(), in_process_course_actions
@@ -600,11 +613,8 @@ def _deprecated_blocks_info(course_module, deprecated_block_types):
     except errors.CourseStructureNotAvailableError:
         return data
 
-    blocks = []
     for block in structure_data['blocks'].values():
-        blocks.append([reverse_usage_url('container_handler', block['parent']), block['display_name']])
-
-    data['blocks'].extend(blocks)
+        data['blocks'].append([reverse_usage_url('container_handler', block['parent']), block['display_name']])
 
     return data
 
@@ -629,7 +639,7 @@ def course_index(request, course_key):
             reindex_link = "/course/{course_id}/search_reindex".format(course_id=unicode(course_key))
         sections = course_module.get_children()
         course_structure = _course_outline_json(request, course_module)
-        locator_to_show = request.REQUEST.get('show', None)
+        locator_to_show = request.GET.get('show', None)
         course_release_date = get_default_time_display(course_module.start) if course_module.start != DEFAULT_START_DATE else _("Unscheduled")
         settings_url = reverse_course_url('settings_handler', course_key)
 
@@ -638,7 +648,8 @@ def course_index(request, course_key):
         except (ItemNotFoundError, CourseActionStateItemNotFoundError):
             current_action = None
 
-        deprecated_blocks_info = _deprecated_blocks_info(course_module, settings.DEPRECATED_BLOCK_TYPES)
+        deprecated_block_names = [block.name for block in deprecated_xblocks()]
+        deprecated_blocks_info = _deprecated_blocks_info(course_module, deprecated_block_names)
 
         return render_to_response('course_outline.html', {
             'context_course': course_module,
@@ -758,7 +769,7 @@ def _create_or_rerun_course(request):
     """
     if _get_course_creator_status(request.user) != 'granted':
         raise PermissionDenied()
-    
+
     try:
         org = request.json.get('org')
         course = request.json.get('number', request.json.get('course'))
@@ -1025,25 +1036,31 @@ def settings_handler(request, course_key_string):
         if 'text/html' in request.META.get('HTTP_ACCEPT', '') and request.method == 'GET':
             upload_asset_url = reverse_course_url('assets_handler', course_key)
 
-            # see if the ORG of this course can be attributed to a 'Microsite'. In that case, the
+            # see if the ORG of this course can be attributed to a defined configuration . In that case, the
             # course about page should be editable in Studio
-            marketing_site_enabled = microsite.get_value_for_org(
+            marketing_site_enabled = configuration_helpers.get_value_for_org(
                 course_module.location.org,
                 'ENABLE_MKTG_SITE',
                 settings.FEATURES.get('ENABLE_MKTG_SITE', False)
+            )
+            enable_extended_course_details = configuration_helpers.get_value_for_org(
+                course_module.location.org,
+                'ENABLE_EXTENDED_COURSE_DETAILS',
+                settings.FEATURES.get('ENABLE_EXTENDED_COURSE_DETAILS', False)
             )
 
             about_page_editable = not marketing_site_enabled
             enrollment_end_editable = GlobalStaff().has_user(request.user) or not marketing_site_enabled
             short_description_editable = settings.FEATURES.get('EDITABLE_SHORT_DESCRIPTION', True)
-
             self_paced_enabled = SelfPacedConfiguration.current().enabled
 
             settings_context = {
                 'context_course': course_module,
                 'course_locator': course_key,
-                'lms_link_for_about_page': utils.get_lms_link_for_about_page(course_key),
-                'course_image_url': course_image_url(course_module),
+                'lms_link_for_about_page': get_lms_link_for_about_page(course_key),
+                'course_image_url': course_image_url(course_module, 'course_image'),
+                'banner_image_url': course_image_url(course_module, 'banner_image'),
+                'video_thumbnail_image_url': course_image_url(course_module, 'video_thumbnail_image'),
                 'details_url': reverse_course_url('settings_handler', course_key),
                 'about_page_editable': about_page_editable,
                 'short_description_editable': short_description_editable,
@@ -1057,6 +1074,7 @@ def settings_handler(request, course_key_string):
                 'is_prerequisite_courses_enabled': is_prerequisite_courses_enabled(),
                 'is_entrance_exams_enabled': is_entrance_exams_enabled(),
                 'self_paced_enabled': self_paced_enabled,
+                'enable_extended_course_details': enable_extended_course_details
             }
             if is_prerequisite_courses_enabled():
                 courses, in_process_course_actions = get_courses_accessible_to_user(request)

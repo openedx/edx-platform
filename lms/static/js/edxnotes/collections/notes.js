@@ -1,24 +1,40 @@
-;(function (define, undefined) {
-'use strict';
-define([
-    'backbone', 'js/edxnotes/models/note'
-], function (Backbone, NoteModel) {
-    var NotesCollection = Backbone.Collection.extend({
-        model: NoteModel,
+(function(define) {
+    'use strict';
+    define([
+        'underscore', 'edx-ui-toolkit/js/pagination/paging-collection', 'js/edxnotes/models/note'
+    ], function(_, PagingCollection, NoteModel) {
+        return PagingCollection.extend({
+            model: NoteModel,
+
+            state: {
+                pageSize: 10
+            },
+
+            queryParams: {},
+
+            constructor: function(models, options) {
+                this.url = options.url;
+                this.state.pageSize = options.perPage;
+
+                if (options.text) {
+                    this.queryParams.text = options.text;
+                }
+
+                PagingCollection.prototype.constructor.call(this, models, options);
+            },
 
         /**
          * Returns course structure from the list of notes.
          * @return {Object}
          */
-        getCourseStructure: (function () {
-            var courseStructure = null;
-            return function () {
-                var chapters = {},
-                    sections = {},
-                    units = {};
+            getCourseStructure: (function() {
+                var courseStructure = null;
+                return function() {
+                    var chapters = {},
+                        sections = {},
+                        units = {};
 
-                if (!courseStructure) {
-                    this.each(function (note) {
+                    this.each(function(note) {
                         var chapter = note.get('chapter'),
                             section = note.get('section'),
                             unit = note.get('unit');
@@ -30,17 +46,14 @@ define([
                     });
 
                     courseStructure = {
-                        chapters: _.sortBy(_.toArray(chapters), function (c) {return c.index;}),
+                        chapters: _.sortBy(_.toArray(chapters), function(c) { return c.index; }),
                         sections: sections,
                         units: units
                     };
-                }
 
-                return courseStructure;
-            };
-        }())
+                    return courseStructure;
+                };
+            }())
+        });
     });
-
-    return NotesCollection;
-});
 }).call(this, define || RequireJS.define);

@@ -5,6 +5,7 @@ import json
 
 from ddt import ddt, data, unpack
 from mock import sentinel
+from nose.plugins.attrib import attr
 
 from django.contrib.auth.models import User
 from django.test.client import RequestFactory
@@ -21,12 +22,8 @@ ENDPOINT = '/segmentio/test/event'
 USER_ID = 10
 
 MOBILE_SHIM_PROCESSOR = [
-    {
-        'ENGINE': 'track.shim.LegacyFieldMappingProcessor'
-    },
-    {
-        'ENGINE': 'track.shim.VideoEventProcessor'
-    }
+    {'ENGINE': 'track.shim.LegacyFieldMappingProcessor'},
+    {'ENGINE': 'track.shim.PrefixedEventProcessor'},
 ]
 
 
@@ -40,6 +37,7 @@ def expect_failure_with_message(message):
     return test_decorator
 
 
+@attr(shard=3)
 @ddt
 @override_settings(
     TRACKING_SEGMENTIO_WEBHOOK_SECRET=SECRET,
@@ -411,19 +409,29 @@ class SegmentIOTrackingTestCase(EventTrackingTestCase):
         assert_event_matches(expected_event, actual_event)
 
     @data(
-        # Verify positive slide case. Verify slide to onSlideSeek. Verify edx.video.seeked emitted from iOS v1.0.02 is changed to edx.video.position.changed.
+        # Verify positive slide case. Verify slide to onSlideSeek. Verify
+        # edx.video.seeked emitted from iOS v1.0.02 is changed to
+        # edx.video.position.changed.
         (1, 1, "seek_type", "slide", "onSlideSeek", "edx.video.seeked", "edx.video.position.changed", 'edx.mobileapp.iOS', '1.0.02'),
-        # Verify negative slide case. Verify slide to onSlideSeek. Verify edx.video.seeked to edx.video.position.changed.
+        # Verify negative slide case. Verify slide to onSlideSeek. Verify
+        # edx.video.seeked to edx.video.position.changed.
         (-2, -2, "seek_type", "slide", "onSlideSeek", "edx.video.seeked", "edx.video.position.changed", 'edx.mobileapp.iOS', '1.0.02'),
-        # Verify +30 is changed to -30 which is incorrectly emitted in iOS v1.0.02. Verify skip to onSkipSeek
+        # Verify +30 is changed to -30 which is incorrectly emitted in iOS
+        # v1.0.02. Verify skip to onSkipSeek
         (30, -30, "seek_type", "skip", "onSkipSeek", "edx.video.position.changed", "edx.video.position.changed", 'edx.mobileapp.iOS', '1.0.02'),
-        # Verify the correct case of -30 is also handled as well. Verify skip to onSkipSeek
+        # Verify the correct case of -30 is also handled as well. Verify skip
+        # to onSkipSeek
         (-30, -30, "seek_type", "skip", "onSkipSeek", "edx.video.position.changed", "edx.video.position.changed", 'edx.mobileapp.iOS', '1.0.02'),
-        # Verify positive slide case where onSkipSeek is changed to onSlideSkip. Verify edx.video.seeked emitted from Android v1.0.02 is changed to edx.video.position.changed.
+        # Verify positive slide case where onSkipSeek is changed to
+        # onSlideSkip. Verify edx.video.seeked emitted from Android v1.0.02 is
+        # changed to edx.video.position.changed.
         (1, 1, "type", "onSkipSeek", "onSlideSeek", "edx.video.seeked", "edx.video.position.changed", 'edx.mobileapp.android', '1.0.02'),
-        # Verify positive slide case where onSkipSeek is changed to onSlideSkip. Verify edx.video.seeked emitted from Android v1.0.02 is changed to edx.video.position.changed.
+        # Verify positive slide case where onSkipSeek is changed to
+        # onSlideSkip. Verify edx.video.seeked emitted from Android v1.0.02 is
+        # changed to edx.video.position.changed.
         (-2, -2, "type", "onSkipSeek", "onSlideSeek", "edx.video.seeked", "edx.video.position.changed", 'edx.mobileapp.android', '1.0.02'),
-        # Verify positive skip case where onSkipSeek is not changed and does not become negative.
+        # Verify positive skip case where onSkipSeek is not changed and does
+        # not become negative.
         (30, 30, "type", "onSkipSeek", "onSkipSeek", "edx.video.position.changed", "edx.video.position.changed", 'edx.mobileapp.android', '1.0.02'),
         # Verify positive skip case where onSkipSeek is not changed.
         (-30, -30, "type", "onSkipSeek", "onSkipSeek", "edx.video.position.changed", "edx.video.position.changed", 'edx.mobileapp.android', '1.0.02')

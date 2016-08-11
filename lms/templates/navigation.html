@@ -1,14 +1,14 @@
 ## mako
+<%page expression_filter="h" args="online_help_token"/>
 <%namespace name='static' file='static_content.html'/>
 <%namespace file='main.html' import="login_query"/>
 <%!
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
 
+from context_processors import doc_url
 from lms.djangoapps.ccx.overrides import get_current_ccx
-from microsite_configuration import microsite
-from microsite_configuration.templatetags.microsite import platform_name
-from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_urls_for_user
+from openedx.core.djangolib.markup import HTML, Text
 
 # App that handles subdomain specific branding
 from branding import api as branding_api
@@ -18,6 +18,15 @@ from status.status import get_site_status_msg
 
 ## Provide a hook for themes to inject branding on top.
 <%block name="navigation_top" />
+
+## Add UI Toolkit components if using the Pattern Library
+% if uses_pattern_library:
+    <%block name="js_extra">
+    <%static:require_module module_name="js/header_factory" class_name="HeaderFactory">
+    HeaderFactory();
+    </%static:require_module>
+    </%block>
+% endif
 
 <%block>
 <%
@@ -37,130 +46,120 @@ site_status_msg = get_site_status_msg(course_id)
 </div>
 % endif
 </%block>
-  <header id="global-navigation" class="global ${"slim" if course else ""}" >
-    <nav class="nav-wrapper" aria-label="${_('Global')}">
+  <header id="global-navigation" class="header-global ${"slim" if course else ""}" >
+    <nav class="wrapper-header" aria-label="${_('Global')}">
     <h1 class="logo">
       <a href="${marketing_link('ROOT')}">
         <%block name="navigation_logo">
-            <img src="${static.url(branding_api.get_logo_url())}" alt="${_("{platform_name} Home Page").format(platform_name=static.get_platform_name())}"/>
+            <img src="${branding_api.get_logo_url(is_secure)}" alt="${_("{platform_name} Home Page").format(platform_name=static.get_platform_name())}"/>
         </%block>
       </a>
     </h1>
 
     % if course:
-    <h2 class="course-header"><span class="provider">${course.display_org_with_default | h}:</span>
-      <span class="course-number">${course.display_number_with_default | h}</span>
-      <%
-        display_name = course.display_name_with_default_escaped
+      <h2 class="course-header"><span class="provider">${course.display_org_with_default}:</span>
+        <span class="course-number">${course.display_number_with_default}</span>
+        <%
+        display_name = course.display_name_with_default
         if settings.FEATURES.get('CUSTOM_COURSES_EDX', False):
           ccx = get_current_ccx(course.id)
           if ccx:
             display_name = ccx.display_name
-      %>
-      <span class="course-name">${display_name}</span></h2>
-    % endif
+        %>
+        <span class="course-name">${display_name}</span></h2>
+      % endif
 
-    % if user.is_authenticated():
-    <ol class="left nav-global authenticated">
-      <%block name="navigation_global_links_authenticated">
-        % if settings.FEATURES.get('COURSES_ARE_BROWSABLE'):
-          <li class="nav-global-01">
-            <a href="${marketing_link('COURSES')}">${_('Find Courses')}</a>
-          </li>
-        % endif
-        %if settings.FEATURES.get('ENABLE_SYSADMIN_DASHBOARD','') and user.is_staff:
-          <li>
-            ## Translators: This is short for "System administration".
-            <a href="${reverse('sysadmin')}">${_("Sysadmin")}</a>
-          </li>
-        %endif
-      </%block>
-    </ol>
-    <ol class="user">
-      <li class="primary">
-        <a href="${reverse('dashboard')}" class="user-link">
-          <span class="sr">${_("Dashboard for:")}</span>
-          <%
-          username = user.username
-          profile_image_url = get_profile_image_urls_for_user(user)['medium']
-          %>
-          <img class="user-image-frame" src="${profile_image_url}" alt="${_('Profile image for {username}').format(username=username)}">
-          <div class="label-username">${username}</div>
-        </a>
-      </li>
-      <li class="primary">
-        <button class="dropdown" aria-haspopup="true" aria-expanded="false"><span class="sr">${_("More options dropdown")}</span><span class="fa fa-sort-desc" aria-hidden="true"></span></button>
-        <ul class="dropdown-menu" aria-label="More Options" role="menu">
-          <%block name="navigation_dropdown_menu_links" >
-            <li><a href="${reverse('dashboard')}">${_("Dashboard")}</a></li>
-            <li><a href="${reverse('learner_profile', kwargs={'username': user.username})}">${_("Profile")}</a></li>
-            <li><a href="${reverse('account_settings')}">${_("Account")}</a></li>
-          </%block>
-          <li><a href="${reverse('logout')}" role="menuitem">${_("Sign Out")}</a></li>
-        </ul>
-      </li>
-    </ol>
+      % if user.is_authenticated():
+        <ol class="left nav-global list-inline authenticated">
+        <%block name="navigation_global_links_authenticated">
+          % if settings.FEATURES.get('COURSES_ARE_BROWSABLE') and not show_program_listing:
+            <li class="item nav-global-01">
+              <a href="${marketing_link('COURSES')}">${_('Explore courses')}</a>
+            </li>
+          % endif
+          % if show_program_listing:
+            <li class="tab-nav-item">
+              <a class="${'active ' if reverse('dashboard') == request.path else ''}tab-nav-link" href="${reverse('dashboard')}">
+                ${_("Courses")}
+              </a>
+            </li>
+            <li class="tab-nav-item">
+              <a class="${'active ' if reverse('program_listing_view') in request.path else ''}tab-nav-link" href="${reverse('program_listing_view')}">
+                ${_("Programs")}
+              </a>
+            </li>
+          % endif
+          %if settings.FEATURES.get('ENABLE_SYSADMIN_DASHBOARD','') and user.is_staff:
+            <li class="item">
+              ## Translators: This is short for "System administration".
+              <a href="${reverse('sysadmin')}">${_("Sysadmin")}</a>
+            </li>
+          %endif
+        </%block>
+      </ol>
+
+      <%include file="user_dropdown.html"/>
+
       % if should_display_shopping_cart_func() and not (course and static.is_request_in_themed_site()): # see shoppingcart.context_processor.user_has_cart_context_processor
         <ol class="user">
           <li class="primary">
             <a class="shopping-cart" href="${reverse('shoppingcart.views.show_cart')}">
-              <i class="icon fa fa-shopping-cart"></i> ${_("Shopping Cart")}
+              <span class="icon fa fa-shopping-cart" aria-hidden="true"></span> ${_("Shopping Cart")}
             </a>
           </li>
         </ol>
       % endif
     % else:
-    <ol class="left nav-global">
-      <%block name="navigation_global_links">
-        % if static.get_value('ENABLE_MKTG_SITE', settings.FEATURES.get('ENABLE_MKTG_SITE', False)):
-          <li class="nav-global-01">
-            <a href="${marketing_link('HOW_IT_WORKS')}">${_("How it Works")}</a>
-          </li>
-          % if settings.FEATURES.get('COURSES_ARE_BROWSABLE'):
-            <li class="nav-global-02">
-              <a href="${marketing_link('COURSES')}">${_("Courses")}</a>
+      <ol class="left list-inline nav-global">
+        <%block name="navigation_global_links">
+          % if static.get_value('ENABLE_MKTG_SITE', settings.FEATURES.get('ENABLE_MKTG_SITE', False)):
+            <li class="item nav-global-01">
+              <a href="${marketing_link('HOW_IT_WORKS')}">${_("How it Works")}</a>
+            </li>
+            % if settings.FEATURES.get('COURSES_ARE_BROWSABLE'):
+              <li class="item nav-global-02">
+                <a href="${marketing_link('COURSES')}">${_("Courses")}</a>
+              </li>
+            % endif
+            <li class="item nav-global-03">
+              <a href="${marketing_link('SCHOOLS')}">${_("Schools")}</a>
             </li>
           % endif
-          <li class="nav-global-03">
-            <a href="${marketing_link('SCHOOLS')}">${_("Schools")}</a>
-          </li>
-        % endif
-      </%block>
+        </%block>
 
-      <%block name="navigation_other_global_links">
-        % if not settings.FEATURES['DISABLE_LOGIN_BUTTON']:
+        <%block name="navigation_other_global_links">
+          % if not settings.FEATURES['DISABLE_LOGIN_BUTTON']:
             % if settings.FEATURES.get('ENABLE_COURSE_DISCOVERY'):
-            <li class="nav-global-05">
-              <a class="cta cta-discovery" href="/courses">${_("Find Courses")}</a>
-            </li>
+              <li class="item nav-global-05">
+                <a class="btn" href="/courses">${_("Explore Courses")}</a>
+              </li>
             %endif
             % if course and settings.FEATURES.get('RESTRICT_ENROLL_BY_REG_METHOD') and course.enrollment_domain:
-            <li class="nav-global-04">
-              <a class="cta cta-register" href="${reverse('course-specific-register', args=[course.id.to_deprecated_string()])}">${_("Register")}</a>
-            </li>
+              <li class="item nav-global-04">
+                <a class="btn-neutral" href="${reverse('course-specific-register', args=[course.id.to_deprecated_string()])}">${_("Register")}</a>
+              </li>
             % else:
-            <li class="nav-global-04">
-              <a class="cta cta-register" href="/register${login_query()}">${_("Register")}</a>
-            </li>
+              <li class="item nav-global-04">
+                <a class="btn-neutral" href="/register${login_query()}">${_("Register")}</a>
+              </li>
             % endif
-
-        % endif
-      </%block>
-    </ol>
-
-    <ol class="right nav-courseware">
-      <%block name="navigation_sign_in">
-        <li class="nav-courseware-01">
-          % if not settings.FEATURES['DISABLE_LOGIN_BUTTON']:
-              % if course and settings.FEATURES.get('RESTRICT_ENROLL_BY_REG_METHOD') and course.enrollment_domain:
-              <a class="cta cta-login" href="${reverse('course-specific-login', args=[course.id.to_deprecated_string()])}${login_query()}">${_("Sign in")}</a>
-              % else:
-              <a class="cta cta-login" href="/login${login_query()}">${_("Sign in")}</a>
-              % endif
           % endif
-        </li>
-      </%block>
-    </ol>
+        </%block>
+      </ol>
+
+      <ol class="right nav-courseware list-inline">
+        <%block name="navigation_sign_in">
+          <li class="item nav-courseware-01">
+            % if not settings.FEATURES['DISABLE_LOGIN_BUTTON']:
+              % if course and settings.FEATURES.get('RESTRICT_ENROLL_BY_REG_METHOD') and course.enrollment_domain:
+                <a class="btn btn-login" href="${reverse('course-specific-login', args=[course.id.to_deprecated_string()])}${login_query()}">${_("Sign in")}</a>
+              % else:
+                <a class="btn btn-login" href="/login${login_query()}">${_("Sign in")}</a>
+              % endif
+            % endif
+          </li>
+        </%block>
+      </ol>
     % endif
     % if static.show_language_selector():
      <% languages = static.get_released_languages() %>
@@ -194,7 +193,12 @@ site_status_msg = get_site_status_msg(course_id)
 </header>
 % if course:
 <!--[if lte IE 9]>
-<div class="ie-banner" aria-hidden="true">${_('<strong>Warning:</strong> Your browser is not fully supported. We strongly recommend using {chrome_link} or {ff_link}.').format(chrome_link='<a href="https://www.google.com/chrome" target="_blank">Chrome</a>', ff_link='<a href="http://www.mozilla.org/firefox" target="_blank">Firefox</a>')}</div>
+<div class="ie-banner" aria-hidden="true">${Text(_('{begin_strong}Warning:{end_strong} Your browser is not fully supported. We strongly recommend using {chrome_link} or {ff_link}.')).format(
+    begin_strong=HTML('<strong>'),
+    end_strong=HTML('</strong>'),
+    chrome_link=HTML('<a href="https://www.google.com/chrome" target="_blank">Chrome</a>'),
+    ff_link=HTML('<a href="http://www.mozilla.org/firefox" target="_blank">Firefox</a>'),
+)}</div>
 <![endif]-->
 % endif
 

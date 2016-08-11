@@ -28,9 +28,10 @@ from edxmako.shortcuts import marketing_link
 from student.forms import get_registration_extension_form
 from student.views import create_account_with_params
 from student.cookies import set_logged_in_cookies
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.lib.api.authentication import SessionAuthenticationAllowInactiveUser
 from util.json_request import JsonResponse
-from .preferences.api import update_email_opt_in
+from .preferences.api import get_country_time_zones, update_email_opt_in
 from .helpers import FormDescription, shim_student_view, require_post_params
 from .models import UserPreference, UserProfile
 from .accounts import (
@@ -38,7 +39,7 @@ from .accounts import (
     USERNAME_MIN_LENGTH, USERNAME_MAX_LENGTH
 )
 from .accounts.api import check_account_exists
-from .serializers import UserSerializer, UserPreferenceSerializer
+from .serializers import CountryTimeZoneSerializer, UserSerializer, UserPreferenceSerializer
 
 
 class LoginSessionView(APIView):
@@ -76,7 +77,7 @@ class LoginSessionView(APIView):
         # Translators: These instructions appear on the login form, immediately
         # below a field meant to hold the user's email address.
         email_instructions = _("The email address you used to register with {platform_name}").format(
-            platform_name=settings.PLATFORM_NAME
+            platform_name=configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME)
         )
 
         form_desc.add_field(
@@ -159,11 +160,16 @@ class RegistrationView(APIView):
     DEFAULT_FIELDS = ["email", "name", "username", "password"]
 
     EXTRA_FIELDS = [
+        "first_name",
+        "last_name",
         "city",
+        "state",
         "country",
         "gender",
         "year_of_birth",
         "level_of_education",
+        "company",
+        "title",
         "mailing_address",
         "goals",
         "honor_code",
@@ -187,7 +193,9 @@ class RegistrationView(APIView):
 
         # Backwards compatibility: Honor code is required by default, unless
         # explicitly set to "optional" in Django settings.
-        self._extra_fields_setting = copy.deepcopy(settings.REGISTRATION_EXTRA_FIELDS)
+        self._extra_fields_setting = copy.deepcopy(configuration_helpers.get_value('REGISTRATION_EXTRA_FIELDS'))
+        if not self._extra_fields_setting:
+            self._extra_fields_setting = copy.deepcopy(settings.REGISTRATION_EXTRA_FIELDS)
         self._extra_fields_setting["honor_code"] = self._extra_fields_setting.get("honor_code", "required")
 
         # Check that the setting is configured correctly
@@ -578,7 +586,7 @@ class RegistrationView(APIView):
         # Translators: This phrase appears above a field on the registration form
         # meant to hold the user's reasons for registering with edX.
         goals_label = _(u"Tell us why you're interested in {platform_name}").format(
-            platform_name=settings.PLATFORM_NAME
+            platform_name=configuration_helpers.get_value("PLATFORM_NAME", settings.PLATFORM_NAME)
         )
 
         form_desc.add_field(
@@ -605,6 +613,106 @@ class RegistrationView(APIView):
         form_desc.add_field(
             "city",
             label=city_label,
+            required=required
+        )
+
+    def _add_state_field(self, form_desc, required=False):
+        """Add a State/Province/Region field to a form description.
+
+        Arguments:
+            form_desc: A form description
+
+        Keyword Arguments:
+            required (bool): Whether this field is required; defaults to False
+
+        """
+        # Translators: This label appears above a field on the registration form
+        # which allows the user to input the State/Province/Region in which they live.
+        state_label = _(u"State/Province/Region")
+
+        form_desc.add_field(
+            "state",
+            label=state_label,
+            required=required
+        )
+
+    def _add_company_field(self, form_desc, required=False):
+        """Add a Company field to a form description.
+
+        Arguments:
+            form_desc: A form description
+
+        Keyword Arguments:
+            required (bool): Whether this field is required; defaults to False
+
+        """
+        # Translators: This label appears above a field on the registration form
+        # which allows the user to input the Company
+        company_label = _(u"Company")
+
+        form_desc.add_field(
+            "company",
+            label=company_label,
+            required=required
+        )
+
+    def _add_title_field(self, form_desc, required=False):
+        """Add a Title field to a form description.
+
+        Arguments:
+            form_desc: A form description
+
+        Keyword Arguments:
+            required (bool): Whether this field is required; defaults to False
+
+        """
+        # Translators: This label appears above a field on the registration form
+        # which allows the user to input the Title
+        title_label = _(u"Title")
+
+        form_desc.add_field(
+            "title",
+            label=title_label,
+            required=required
+        )
+
+    def _add_first_name_field(self, form_desc, required=False):
+        """Add a First Name field to a form description.
+
+        Arguments:
+            form_desc: A form description
+
+        Keyword Arguments:
+            required (bool): Whether this field is required; defaults to False
+
+        """
+        # Translators: This label appears above a field on the registration form
+        # which allows the user to input the First Name
+        first_name_label = _(u"First Name")
+
+        form_desc.add_field(
+            "first_name",
+            label=first_name_label,
+            required=required
+        )
+
+    def _add_last_name_field(self, form_desc, required=False):
+        """Add a Last Name field to a form description.
+
+        Arguments:
+            form_desc: A form description
+
+        Keyword Arguments:
+            required (bool): Whether this field is required; defaults to False
+
+        """
+        # Translators: This label appears above a field on the registration form
+        # which allows the user to input the First Name
+        last_name_label = _(u"Last Name")
+
+        form_desc.add_field(
+            "last_name",
+            label=last_name_label,
             required=required
         )
 
@@ -663,14 +771,14 @@ class RegistrationView(APIView):
         # Translators: "Terms of Service" is a legal document users must agree to
         # in order to register a new account.
         label = _(u"I agree to the {platform_name} {terms_of_service}.").format(
-            platform_name=settings.PLATFORM_NAME,
+            platform_name=configuration_helpers.get_value("PLATFORM_NAME", settings.PLATFORM_NAME),
             terms_of_service=terms_link
         )
 
         # Translators: "Terms of Service" is a legal document users must agree to
         # in order to register a new account.
         error_msg = _(u"You must agree to the {platform_name} {terms_of_service}.").format(
-            platform_name=settings.PLATFORM_NAME,
+            platform_name=configuration_helpers.get_value("PLATFORM_NAME", settings.PLATFORM_NAME),
             terms_of_service=terms_link
         )
 
@@ -706,14 +814,14 @@ class RegistrationView(APIView):
         # Translators: "Terms of service" is a legal document users must agree to
         # in order to register a new account.
         label = _(u"I agree to the {platform_name} {terms_of_service}.").format(
-            platform_name=settings.PLATFORM_NAME,
+            platform_name=configuration_helpers.get_value("PLATFORM_NAME", settings.PLATFORM_NAME),
             terms_of_service=terms_link
         )
 
         # Translators: "Terms of service" is a legal document users must agree to
         # in order to register a new account.
         error_msg = _(u"You must agree to the {platform_name} {terms_of_service}.").format(
-            platform_name=settings.PLATFORM_NAME,
+            platform_name=configuration_helpers.get_value("PLATFORM_NAME", settings.PLATFORM_NAME),
             terms_of_service=terms_link
         )
 
@@ -812,7 +920,7 @@ class PasswordResetView(APIView):
         # Translators: These instructions appear on the password reset form,
         # immediately below a field meant to hold the user's email address.
         email_instructions = _(u"The email address you used to register with {platform_name}").format(
-            platform_name=settings.PLATFORM_NAME
+            platform_name=configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME)
         )
 
         form_desc.add_field(
@@ -928,3 +1036,37 @@ class UpdateEmailOptInPreference(APIView):
         email_opt_in = request.data['email_opt_in'].lower() == 'true'
         update_email_opt_in(request.user, org, email_opt_in)
         return HttpResponse(status=status.HTTP_200_OK)
+
+
+class CountryTimeZoneListView(generics.ListAPIView):
+    """
+    **Use Cases**
+
+        Retrieves a list of all time zones, by default, or common time zones for country, if given
+
+        The country is passed in as its ISO 3166-1 Alpha-2 country code as an
+        optional 'country_code' argument. The country code is also case-insensitive.
+
+    **Example Requests**
+
+        GET /user_api/v1/preferences/time_zones/
+
+        GET /user_api/v1/preferences/time_zones/?country_code=FR
+
+    **Example GET Response**
+
+        If the request is successful, an HTTP 200 "OK" response is returned along with a
+        list of time zone dictionaries for all time zones or just for time zones commonly
+        used in a country, if given.
+
+        Each time zone dictionary contains the following values.
+
+            * time_zone: The name of the time zone.
+            * description: The display version of the time zone
+    """
+    serializer_class = CountryTimeZoneSerializer
+    paginator = None
+
+    def get_queryset(self):
+        country_code = self.request.GET.get('country_code', None)
+        return get_country_time_zones(country_code)

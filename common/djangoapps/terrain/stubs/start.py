@@ -4,13 +4,16 @@ Command-line utility to start a stub service.
 import sys
 import time
 import logging
+
 from .comments import StubCommentsService
+from .ecommerce import StubEcommerceService
 from .xqueue import StubXQueueService
 from .youtube import StubYouTubeService
 from .lti import StubLtiService
 from .video_source import VideoSourceHttpService
 from .edxnotes import StubEdxNotesService
 from .programs import StubProgramsService
+from .catalog import StubCatalogService
 
 
 USAGE = "USAGE: python -m stubs.start SERVICE_NAME PORT_NUM [CONFIG_KEY=CONFIG_VAL, ...]"
@@ -23,6 +26,8 @@ SERVICES = {
     'video': VideoSourceHttpService,
     'edxnotes': StubEdxNotesService,
     'programs': StubProgramsService,
+    'ecommerce': StubEcommerceService,
+    'catalog': StubCatalogService,
 }
 
 # Log to stdout, including debug messages
@@ -76,7 +81,6 @@ def _parse_config_args(args):
 
         except:
             print "Warning: could not interpret config value '{0}'".format(config_str)
-            pass
 
     return config_dict
 

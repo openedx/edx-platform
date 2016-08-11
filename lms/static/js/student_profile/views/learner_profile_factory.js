@@ -1,20 +1,26 @@
-;(function (define, undefined) {
+(function(define, undefined) {
     'use strict';
     define([
-        'gettext', 'jquery', 'underscore', 'backbone', 'logger',
+        'gettext',
+        'jquery',
+        'underscore',
+        'backbone',
+        'logger',
+        'edx-ui-toolkit/js/pagination/paging-collection',
         'js/student_account/models/user_account_model',
         'js/student_account/models/user_preferences_model',
         'js/views/fields',
         'js/student_profile/views/learner_profile_fields',
         'js/student_profile/views/learner_profile_view',
+        'js/student_profile/models/badges_model',
+        'js/student_profile/views/badge_list_container',
         'js/student_account/views/account_settings_fields',
         'js/views/message_banner',
         'string_utils'
-    ], function (gettext, $, _, Backbone, Logger, AccountSettingsModel, AccountPreferencesModel, FieldsView,
-                 LearnerProfileFieldsView, LearnerProfileView, AccountSettingsFieldViews, MessageBannerView) {
-
-        return function (options) {
-
+    ], function(gettext, $, _, Backbone, Logger, PagingCollection, AccountSettingsModel, AccountPreferencesModel,
+                 FieldsView, LearnerProfileFieldsView, LearnerProfileView, BadgeModel, BadgeListContainer,
+                 AccountSettingsFieldViews, MessageBannerView) {
+        return function(options) {
             var learnerProfileElement = $('.wrapper-profile');
 
             var accountSettingsModel = new AccountSettingsModel(
@@ -48,7 +54,7 @@
                 title: interpolate_text(
                     gettext('{platform_name} learners can see my:'), {platform_name: options.platform_name}
                 ),
-                valueAttribute: "account_privacy",
+                valueAttribute: 'account_privacy',
                 options: [
                     ['private', gettext('Limited Profile')],
                     ['all_users', gettext('Full Profile')]
@@ -60,7 +66,7 @@
 
             var profileImageFieldView = new LearnerProfileFieldsView.ProfileImageFieldView({
                 model: accountSettingsModel,
-                valueAttribute: "profile_image",
+                valueAttribute: 'profile_image',
                 editable: editable === 'toggle',
                 messageView: messageView,
                 imageMaxBytes: options['profile_image_max_bytes'],
@@ -70,10 +76,10 @@
             });
 
             var usernameFieldView = new FieldsView.ReadonlyFieldView({
-                    model: accountSettingsModel,
-                    screenReaderTitle: gettext('Username'),
-                    valueAttribute: "username",
-                    helpMessage: ""
+                model: accountSettingsModel,
+                screenReaderTitle: gettext('Username'),
+                valueAttribute: 'username',
+                helpMessage: ''
             });
 
             var sectionOneFieldViews = [
@@ -86,7 +92,7 @@
                     showMessages: false,
                     iconName: 'fa-map-marker',
                     placeholderValue: gettext('Add Country'),
-                    valueAttribute: "country",
+                    valueAttribute: 'country',
                     options: options.country_options,
                     helpMessage: '',
                     persistChanges: true
@@ -100,7 +106,7 @@
                     showMessages: false,
                     iconName: 'fa-comment',
                     placeholderValue: gettext('Add language'),
-                    valueAttribute: "language_proficiencies",
+                    valueAttribute: 'language_proficiencies',
                     options: options.language_options,
                     helpMessage: '',
                     persistChanges: true
@@ -114,12 +120,32 @@
                     showMessages: false,
                     title: gettext('About me'),
                     placeholderValue: gettext("Tell other learners a little about yourself: where you live, what your interests are, why you're taking courses, or what you hope to learn."),
-                    valueAttribute: "bio",
+                    valueAttribute: 'bio',
                     helpMessage: '',
                     persistChanges: true,
                     messagePosition: 'header'
                 })
             ];
+
+            var BadgeCollection = PagingCollection.extend({
+                queryParams: {
+                    currentPage: 'current_page'
+                }
+            });
+            var badgeCollection = new BadgeCollection();
+            badgeCollection.url = options.badges_api_url;
+
+            var badgeListContainer = new BadgeListContainer({
+                'attributes': {'class': 'badge-set-display'},
+                'collection': badgeCollection,
+                'find_courses_url': options.find_courses_url,
+                'ownProfile': options.own_profile,
+                'badgeMeta': {
+                    'badges_logo': options.badges_logo,
+                    'backpack_ui_img': options.backpack_ui_img,
+                    'badges_icon': options.badges_icon
+                }
+            });
 
             var learnerProfileView = new LearnerProfileView({
                 el: learnerProfileElement,
@@ -131,7 +157,8 @@
                 profileImageFieldView: profileImageFieldView,
                 usernameFieldView: usernameFieldView,
                 sectionOneFieldViews: sectionOneFieldViews,
-                sectionTwoFieldViews: sectionTwoFieldViews
+                sectionTwoFieldViews: sectionTwoFieldViews,
+                badgeListContainer: badgeListContainer
             });
 
             var getProfileVisibility = function() {
@@ -145,7 +172,7 @@
             var showLearnerProfileView = function() {
                 // Record that the profile page was viewed
                 Logger.log('edx.user.settings.viewed', {
-                    page: "profile",
+                    page: 'profile',
                     visibility: getProfileVisibility(),
                     user_id: options.profile_user_id
                 });
@@ -164,7 +191,8 @@
             return {
                 accountSettingsModel: accountSettingsModel,
                 accountPreferencesModel: accountPreferencesModel,
-                learnerProfileView: learnerProfileView
+                learnerProfileView: learnerProfileView,
+                badgeListContainer: badgeListContainer
             };
         };
     });

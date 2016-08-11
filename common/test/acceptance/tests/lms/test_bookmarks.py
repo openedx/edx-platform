@@ -5,17 +5,17 @@ End-to-end tests for the courseware unit bookmarks.
 import json
 from nose.plugins.attrib import attr
 import requests
-from ...pages.studio.auto_auth import AutoAuthPage as StudioAutoAuthPage
-from ...pages.lms.auto_auth import AutoAuthPage as LmsAutoAuthPage
-from ...pages.lms.bookmarks import BookmarksPage
-from ...pages.lms.courseware import CoursewarePage
-from ...pages.lms.course_nav import CourseNavPage
-from ...pages.studio.overview import CourseOutlinePage
-from ...pages.common.logout import LogoutPage
-from ...pages.common import BASE_URL
+from common.test.acceptance.pages.studio.auto_auth import AutoAuthPage as StudioAutoAuthPage
+from common.test.acceptance.pages.lms.auto_auth import AutoAuthPage as LmsAutoAuthPage
+from common.test.acceptance.pages.lms.bookmarks import BookmarksPage
+from common.test.acceptance.pages.lms.courseware import CoursewarePage
+from common.test.acceptance.pages.lms.course_nav import CourseNavPage
+from common.test.acceptance.pages.studio.overview import CourseOutlinePage
+from common.test.acceptance.pages.common.logout import LogoutPage
+from common.test.acceptance.pages.common import BASE_URL
 
-from ...fixtures.course import CourseFixture, XBlockFixtureDesc
-from ..helpers import EventsTestMixin, UniqueCourseTest, is_404_page
+from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
+from common.test.acceptance.tests.helpers import EventsTestMixin, UniqueCourseTest, is_404_page
 
 
 class BookmarksTestMixin(EventsTestMixin, UniqueCourseTest):
@@ -60,7 +60,7 @@ class BookmarksTestMixin(EventsTestMixin, UniqueCourseTest):
         self.assert_events_match(event_data, actual_events)
 
 
-@attr('shard_8')
+@attr(shard=8)
 class BookmarksTest(BookmarksTestMixin):
     """
     Tests to verify bookmarks functionality.

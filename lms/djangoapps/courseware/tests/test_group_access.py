@@ -51,7 +51,7 @@ def resolve_attrs(test_method):
     return _wrapper
 
 
-@attr('shard_1')
+@attr(shard=2)
 @ddt.ddt
 class GroupAccessTestCase(ModuleStoreTestCase):
     """

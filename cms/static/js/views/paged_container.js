@@ -1,8 +1,9 @@
-define(["jquery", "underscore", "common/js/components/utils/view_utils", "js/views/container", "js/utils/module", "gettext",
-        "common/js/components/views/feedback_notification", "js/views/paging_header", "common/js/components/views/paging_footer"],
-    function ($, _, ViewUtils, ContainerView, ModuleUtils, gettext, NotificationView, PagingHeader, PagingFooter) {
+define(['jquery', 'underscore', 'common/js/components/utils/view_utils', 'js/views/container', 'js/utils/module', 'gettext',
+        'common/js/components/views/feedback_notification', 'js/views/paging_header', 'common/js/components/views/paging_footer'],
+    function($, _, ViewUtils, ContainerView, ModuleUtils, gettext, NotificationView, PagingHeader, PagingFooter) {
         var PagedContainerView = ContainerView.extend({
-            initialize: function(options){
+
+            initialize: function(options) {
                 var self = this;
                 ContainerView.prototype.initialize.call(this);
                 this.page_size = this.options.page_size;
@@ -16,7 +17,7 @@ define(["jquery", "underscore", "common/js/components/utils/view_utils", "js/vie
                     currentPage: 0,
                     totalPages: 0,
                     totalCount: 0,
-                    sortDirection: "desc",
+                    sortDirection: 'desc',
                     start: 0,
                     _size: 0,
                     // Paging header and footer expect this to be a Backbone model they can listen to for changes, but
@@ -30,11 +31,11 @@ define(["jquery", "underscore", "common/js/components/utils/view_utils", "js/vie
 
                     // PagingFooter expects to be able to control paging through the collection instead of the view,
                     // so we just make these functions act as pass-throughs
-                    setPage: function (page) {
+                    setPage: function(page) {
                         self.setPage(page - 1);
                     },
 
-                    nextPage: function () {
+                    nextPage: function() {
                         self.nextPage();
                     },
 
@@ -42,16 +43,32 @@ define(["jquery", "underscore", "common/js/components/utils/view_utils", "js/vie
                         self.previousPage();
                     },
 
-                    getPage: function () {
+                    getPage: function() {
                         return self.collection.currentPage + 1;
                     },
 
-                    hasPreviousPage: function () {
+                    hasPreviousPage: function() {
                         return self.collection.currentPage > 0;
                     },
 
-                    hasNextPage: function () {
+                    hasNextPage: function() {
                         return self.collection.currentPage < self.collection.totalPages - 1;
+                    },
+
+                    getTotalPages: function() {
+                        return this.totalPages;
+                    },
+
+                    getPageNumber: function() {
+                        return this.getPage();
+                    },
+
+                    getTotalRecords: function() {
+                        return this.totalCount;
+                    },
+
+                    getPageSize: function() {
+                        return self.page_size;
                     }
                 };
             },
@@ -60,26 +77,27 @@ define(["jquery", "underscore", "common/js/components/utils/view_utils", "js/vie
 
             render: function(options) {
                 options = options || {};
-                options.page_number = typeof options.page_number !== "undefined"
+                options.page_number = typeof options.page_number !== 'undefined'
                     ? options.page_number
                     : this.collection.currentPage;
                 return this.renderPage(options);
             },
 
-            renderPage: function(options){
+            renderPage: function(options) {
                 var self = this,
                     view = this.view,
                     xblockInfo = this.model,
                     xblockUrl = xblockInfo.url();
+
                 return $.ajax({
-                    url: decodeURIComponent(xblockUrl) + "/" + view,
+                    url: decodeURIComponent(xblockUrl) + '/' + view,
                     type: 'GET',
                     cache: false,
                     data: this.getRenderParameters(options.page_number, options.force_render),
-                    headers: { Accept: 'application/json' },
+                    headers: {Accept: 'application/json'},
                     success: function(fragment) {
                         self.handleXBlockFragment(fragment, options);
-                        self.processPaging({ requested_page: options.page_number });
+                        self.processPaging({requested_page: options.page_number});
                         self.page.updatePreviewButton(self.collection.showChildrenPreviews);
                         self.page.renderAddXBlockComponents();
                         if (options.force_render) {
@@ -101,8 +119,10 @@ define(["jquery", "underscore", "common/js/components/utils/view_utils", "js/vie
                 };
             },
 
-            getPageCount: function(total_count){
-                if (total_count===0) return 1;
+            getPageCount: function(total_count) {
+                if (total_count === 0) {
+                    return 1;
+                }
                 return Math.ceil(total_count / this.page_size);
             },
 
@@ -129,7 +149,7 @@ define(["jquery", "underscore", "common/js/components/utils/view_utils", "js/vie
                 }
             },
 
-            processPaging: function(options){
+            processPaging: function(options) {
                 // We have the Django template sneak us the pagination information,
                 // and we load it from a div here.
                 var $element = this.$el.find('.xblock-container-paging-parameters'),
@@ -148,7 +168,7 @@ define(["jquery", "underscore", "common/js/components/utils/view_utils", "js/vie
                 this.processPagingHeaderAndFooter();
             },
 
-            processPagingHeaderAndFooter: function(){
+            processPagingHeaderAndFooter: function() {
                 // Rendering the container view detaches the header and footer from the DOM.
                 // It's just as easy to recreate them as it is to try to shove them back into the tree.
                 if (this.pagingHeader)
@@ -171,24 +191,24 @@ define(["jquery", "underscore", "common/js/components/utils/view_utils", "js/vie
 
             refresh: function(xblockView, block_added, is_duplicate) {
                 if (!block_added) {
-                    return
+                    return;
                 }
                 if (is_duplicate) {
                     // Duplicated blocks can be inserted onto the current page.
-                    var xblock = xblockView.xblock.element.parents(".studio-xblock-wrapper").first();
-                    var all_xblocks = xblock.parent().children(".studio-xblock-wrapper");
+                    var xblock = xblockView.xblock.element.parents('.studio-xblock-wrapper').first();
+                    var all_xblocks = xblock.parent().children('.studio-xblock-wrapper');
                     var index = all_xblocks.index(xblock);
                     if ((index + 1 <= this.page_size) && (all_xblocks.length > this.page_size)) {
                         // Pop the last XBlock off the bottom.
                         all_xblocks[all_xblocks.length - 1].remove();
-                        return
+                        return;
                     }
                 }
                 this.collection.totalCount += 1;
-                this.collection._size +=1;
+                this.collection._size += 1;
                 if (this.collection.totalCount == 1) {
                     this.render();
-                    return
+                    return;
                 }
                 this.collection.totalPages = this.getPageCount(this.collection.totalCount);
                 var target_page = this.collection.totalPages - 1;
@@ -203,14 +223,13 @@ define(["jquery", "underscore", "common/js/components/utils/view_utils", "js/vie
                         target_page,
                         {force_render: force_render}
                     );
-
                 } else {
                     this.pagingHeader.render();
                     this.pagingFooter.render();
                 }
             },
 
-            acknowledgeXBlockDeletion: function (locator){
+            acknowledgeXBlockDeletion: function(locator) {
                 this.notifyRuntime('deleted-child', locator);
                 this.collection._size -= 1;
                 this.collection.totalCount -= 1;
@@ -221,10 +240,10 @@ define(["jquery", "underscore", "common/js/components/utils/view_utils", "js/vie
                 if ((current_page + 1) > total_pages) {
                     // The number of total pages has changed. Move down.
                     // Also, be mindful of the off-by-one.
-                    this.setPage(total_pages - 1)
+                    this.setPage(total_pages - 1);
                 } else if ((current_page + 1) != total_pages) {
                     // Refresh page to get any blocks shifted from the next page.
-                    this.setPage(current_page)
+                    this.setPage(current_page);
                 } else {
                     // We're on the last page, just need to update the numbers in the
                     // pagination interface.
@@ -234,17 +253,17 @@ define(["jquery", "underscore", "common/js/components/utils/view_utils", "js/vie
             },
 
             sortDisplayName: function() {
-                return gettext("Date added");  // TODO add support for sorting
+                return gettext('Date added');  // TODO add support for sorting
             },
 
-            togglePreviews: function(){
+            togglePreviews: function() {
                 var self = this,
                     xblockUrl = this.model.url();
                 return $.ajax({
                     // No runtime, so can't get this via the handler() call.
-                    url: '/preview' + decodeURIComponent(xblockUrl) + "/handler/trigger_previews",
+                    url: '/preview' + decodeURIComponent(xblockUrl) + '/handler/trigger_previews',
                     type: 'POST',
-                    data: JSON.stringify({ showChildrenPreviews: !this.collection.showChildrenPreviews}),
+                    data: JSON.stringify({showChildrenPreviews: !this.collection.showChildrenPreviews}),
                     dataType: 'json'
                 })
                 .then(self.render).promise();

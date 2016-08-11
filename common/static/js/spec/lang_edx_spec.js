@@ -1,52 +1,51 @@
-/*global Language:true*/
+/* global Language:true*/
 (function() {
     'use strict';
-    describe('Language change test for lang-edx.js', function () {
-
+    describe('Language change test for lang-edx.js', function() {
         var lang_selector,
             deferred;
 
-        beforeEach(function () {
+        beforeEach(function() {
             loadFixtures('js/fixtures/lang-edx-fixture.html');
             lang_selector = $('#settings-language-value');
             deferred = $.Deferred();
         });
 
-        it("can spy on language selector change event", function () {
+        it('can spy on language selector change event', function() {
             spyOnEvent(lang_selector, 'change');
             lang_selector.trigger('change');
             expect('change').toHaveBeenTriggeredOn(lang_selector);
         });
 
-        it("should make an AJAX request to the correct URL", function () {
-            spyOn($, 'ajax').andReturn(deferred);
+        it('should make an AJAX request to the correct URL', function() {
+            spyOn($, 'ajax').and.returnValue(deferred);
             Language.init();
             lang_selector.trigger('change');
-            expect($.ajax.mostRecentCall.args[0].url).toEqual("/api/user/v1/preferences/test1/");
+            expect($.ajax.calls.mostRecent().args[0].url).toEqual('/api/user/v1/preferences/test1/');
         });
 
-        it("should make an AJAX request with correct type", function () {
-            spyOn($, 'ajax').andReturn(deferred);
+        it('should make an AJAX request with correct type', function() {
+            spyOn($, 'ajax').and.returnValue(deferred);
             Language.init();
             lang_selector.trigger('change');
-            expect($.ajax.mostRecentCall.args[0].type).toEqual("PATCH");
+            expect($.ajax.calls.mostRecent().args[0].type).toEqual('PATCH');
         });
 
-        it("should make an AJAX request with correct data", function () {
-            spyOn($, 'ajax').andReturn(deferred);
+        it('should make an AJAX request with correct data', function() {
+            spyOn($, 'ajax').and.returnValue(deferred);
             Language.init();
             lang_selector.val('ar');
             lang_selector.trigger('change');
-            expect($.ajax.mostRecentCall.args[0].data).toEqual('{"pref-lang":"ar"}');
+            expect($.ajax.calls.mostRecent().args[0].data).toEqual('{"pref-lang":"ar"}');
 
             // change to 'en' from 'ar'
             lang_selector.val('en');
             lang_selector.trigger('change');
-            expect($.ajax.mostRecentCall.args[0].data).toEqual('{"pref-lang":"en"}');
+            expect($.ajax.calls.mostRecent().args[0].data).toEqual('{"pref-lang":"en"}');
         });
 
-        it("should call refresh on ajax failure", function () {
-            spyOn($, 'ajax').andCallFake(function () {
+        it('should call refresh on ajax failure', function() {
+            spyOn($, 'ajax').and.callFake(function() {
                 var d = $.Deferred();
                 d.reject();
                 return d.promise();

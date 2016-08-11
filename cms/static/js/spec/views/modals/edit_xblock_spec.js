@@ -1,8 +1,7 @@
-define(["jquery", "underscore", "common/js/spec_helpers/ajax_helpers", "js/spec_helpers/edit_helpers",
-    "js/views/modals/edit_xblock", "js/models/xblock_info"],
-    function ($, _, AjaxHelpers, EditHelpers, EditXBlockModal, XBlockInfo) {
-
-        describe("EditXBlockModal", function() {
+define(['jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'js/spec_helpers/edit_helpers',
+    'js/views/modals/edit_xblock', 'js/models/xblock_info'],
+    function($, _, AjaxHelpers, EditHelpers, EditXBlockModal, XBlockInfo) {
+        describe('EditXBlockModal', function() {
             var model, modal, showModal;
 
             showModal = function(requests, mockHtml, options) {
@@ -10,7 +9,7 @@ define(["jquery", "underscore", "common/js/spec_helpers/ajax_helpers", "js/spec_
                 return EditHelpers.showEditModal(requests, xblockElement, model, mockHtml, options);
             };
 
-            beforeEach(function () {
+            beforeEach(function() {
                 EditHelpers.installEditTemplates();
                 appendSetFixtures('<div class="xblock" data-locator="mock-xblock"></div>');
                 model = new XBlockInfo({
@@ -24,12 +23,12 @@ define(["jquery", "underscore", "common/js/spec_helpers/ajax_helpers", "js/spec_
                 EditHelpers.cancelModalIfShowing();
             });
 
-            describe("XBlock Editor", function() {
+            describe('XBlock Editor', function() {
                 var mockXBlockEditorHtml;
 
                 mockXBlockEditorHtml = readFixtures('mock/mock-xblock-editor.underscore');
 
-                beforeEach(function () {
+                beforeEach(function() {
                     EditHelpers.installMockXBlock();
                 });
 
@@ -70,9 +69,9 @@ define(["jquery", "underscore", "common/js/spec_helpers/ajax_helpers", "js/spec_
                         refresh = function() {
                             refreshed = true;
                         };
-                    modal = showModal(requests, mockXBlockEditorHtml, { refresh: refresh });
-                    modal.editorView.notifyRuntime('save', { state: 'start' });
-                    modal.editorView.notifyRuntime('save', { state: 'end' });
+                    modal = showModal(requests, mockXBlockEditorHtml, {refresh: refresh});
+                    modal.editorView.notifyRuntime('save', {state: 'start'});
+                    modal.editorView.notifyRuntime('save', {state: 'end'});
                     expect(EditHelpers.isShowingModal(modal)).toBeFalsy();
                     expect(refreshed).toBeTruthy();
                 });
@@ -83,13 +82,13 @@ define(["jquery", "underscore", "common/js/spec_helpers/ajax_helpers", "js/spec_
                         refresh = function() {
                             refreshed = true;
                         };
-                    modal = showModal(requests, mockXBlockEditorHtml, { refresh: refresh });
+                    modal = showModal(requests, mockXBlockEditorHtml, {refresh: refresh});
                     modal.editorView.notifyRuntime('cancel');
                     expect(EditHelpers.isShowingModal(modal)).toBeFalsy();
                     expect(refreshed).toBeFalsy();
                 });
 
-                describe("Custom Buttons", function() {
+                describe('Custom Buttons', function() {
                     var mockCustomButtonsHtml;
 
                     mockCustomButtonsHtml = readFixtures('mock/mock-xblock-editor-with-custom-buttons.underscore');
@@ -102,7 +101,7 @@ define(["jquery", "underscore", "common/js/spec_helpers/ajax_helpers", "js/spec_
                 });
             });
 
-            describe("XModule Editor", function() {
+            describe('XModule Editor', function() {
                 var mockXModuleEditorHtml;
 
                 mockXModuleEditorHtml = readFixtures('mock/mock-xmodule-editor.underscore');
@@ -111,7 +110,7 @@ define(["jquery", "underscore", "common/js/spec_helpers/ajax_helpers", "js/spec_
                     EditHelpers.installMockXModule();
                 });
 
-                afterEach(function () {
+                afterEach(function() {
                     EditHelpers.uninstallMockXModule();
                 });
 
@@ -158,7 +157,7 @@ define(["jquery", "underscore", "common/js/spec_helpers/ajax_helpers", "js/spec_
                     expect(modal.$('.metadata_edit')).toHaveClass('is-inactive');
                 });
 
-                describe("Custom Tabs", function() {
+                describe('Custom Tabs', function() {
                     var mockCustomTabsHtml;
 
                     mockCustomTabsHtml = readFixtures('mock/mock-xmodule-editor-with-custom-tabs.underscore');
@@ -177,7 +176,7 @@ define(["jquery", "underscore", "common/js/spec_helpers/ajax_helpers", "js/spec_
                 });
             });
 
-            describe("XModule Editor (settings only)", function() {
+            describe('XModule Editor (settings only)', function() {
                 var mockXModuleEditorHtml;
 
                 mockXModuleEditorHtml = readFixtures('mock/mock-xmodule-settings-only-editor.underscore');
@@ -186,7 +185,7 @@ define(["jquery", "underscore", "common/js/spec_helpers/ajax_helpers", "js/spec_
                     EditHelpers.installMockXModule();
                 });
 
-                afterEach(function () {
+                afterEach(function() {
                     EditHelpers.uninstallMockXModule();
                 });
 

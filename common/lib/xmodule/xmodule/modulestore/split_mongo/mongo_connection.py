@@ -556,3 +556,43 @@ class MongoConnection(object):
             unique=True,
             background=True
         )
+
+    def close_connections(self):
+        """
+        Closes any open connections to the underlying databases
+        """
+        self.database.connection.close()
+
+    def mongo_wire_version(self):
+        """
+        Returns the wire version for mongo. Only used to unit tests which instrument the connection.
+        """
+        return self.database.connection.max_wire_version
+
+    def _drop_database(self, database=True, collections=True, connections=True):
+        """
+        A destructive operation to drop the underlying database and close all connections.
+        Intended to be used by test code for cleanup.
+
+        If database is True, then this should drop the entire database.
+        Otherwise, if collections is True, then this should drop all of the collections used
+        by this modulestore.
+        Otherwise, the modulestore should remove all data from the collections.
+
+        If connections is True, then close the connection to the database as well.
+        """
+        connection = self.database.connection
+
+        if database:
+            connection.drop_database(self.database.name)
+        elif collections:
+            self.course_index.drop()
+            self.structures.drop()
+            self.definitions.drop()
+        else:
+            self.course_index.remove({})
+            self.structures.remove({})
+            self.definitions.remove({})
+
+        if connections:
+            connection.close()

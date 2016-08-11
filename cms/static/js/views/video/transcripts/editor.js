@@ -1,17 +1,16 @@
 define(
     [
-        "jquery", "backbone", "underscore",
-        "js/views/video/transcripts/utils",
-        "js/views/metadata", "js/collections/metadata",
-        "js/views/video/transcripts/metadata_videolist"
+        'jquery', 'backbone', 'underscore',
+        'js/views/video/transcripts/utils',
+        'js/views/metadata', 'js/collections/metadata',
+        'js/views/video/transcripts/metadata_videolist'
     ],
 function($, Backbone, _, Utils, MetadataView, MetadataCollection) {
-
     var Editor = Backbone.View.extend({
 
         tagName: 'div',
 
-        initialize: function () {
+        initialize: function() {
             // prepare data for MetadataView.Editor
 
             var metadata = this.$el.data('metadata'),
@@ -45,7 +44,7 @@ function($, Backbone, _, Utils, MetadataView, MetadataCollection) {
         * toModels(metadata) // => [{.1.}, {.2.}]
         *
         */
-        toModels: function (data) {
+        toModels: function(data) {
             var metadata = (_.isString(data)) ? JSON.parse(data) : data,
                 models = [];
 
@@ -69,7 +68,7 @@ function($, Backbone, _, Utils, MetadataView, MetadataCollection) {
         *                                    setting editors in `Advanced` tab.
         *
         */
-        syncBasicTab: function (metadataCollection, metadataView) {
+        syncBasicTab: function(metadataCollection, metadataView) {
             var result = [],
                 getField = Utils.getField,
                 component_locator = this.$el.closest('[data-locator]').data('locator'),
@@ -87,8 +86,8 @@ function($, Backbone, _, Utils, MetadataView, MetadataCollection) {
 
             modifiedValues = metadataView.getModifiedMetadataValues();
 
-            var isSubsModified = (function (values) {
-                var isSubsChanged = subs.hasChanged("value");
+            var isSubsModified = (function(values) {
+                var isSubsChanged = subs.hasChanged('value');
 
                 return Boolean(
                     isSubsChanged &&
@@ -124,7 +123,7 @@ function($, Backbone, _, Utils, MetadataView, MetadataCollection) {
 
             values.youtube = getField(metadataCollection, 'youtube_id_1_0').getDisplayValue();
 
-            values.html5Sources = _.filter(html5Sources, function (value) {
+            values.html5Sources = _.filter(html5Sources, function(value) {
                 var link = Utils.parseLink(value),
                     mode = link && link.mode;
 
@@ -150,7 +149,7 @@ function($, Backbone, _, Utils, MetadataView, MetadataCollection) {
             // Synchronize other fields that has the same `field_name` property.
             Utils.syncCollections(metadataCollection, this.collection);
 
-            if (isSubsModified){
+            if (isSubsModified) {
                 // When `sub` field is changed, clean Storage to avoid overwriting.
                 Utils.Storage.remove('sub');
 
@@ -173,7 +172,7 @@ function($, Backbone, _, Utils, MetadataView, MetadataCollection) {
         *                                    setting editors in `Advanced` tab.
         *
         */
-        syncAdvancedTab: function (metadataCollection, metadataView) {
+        syncAdvancedTab: function(metadataCollection, metadataView) {
             var getField = Utils.getField,
                 subsValue = Utils.Storage.get('sub'),
                 subs = getField(metadataCollection, 'sub'),
@@ -213,7 +212,7 @@ function($, Backbone, _, Utils, MetadataView, MetadataCollection) {
             // }
             result = _.groupBy(
                 videoUrlValue,
-                function (value) {
+                function(value) {
                     return Utils.parseLink(value).mode;
                 }
             );

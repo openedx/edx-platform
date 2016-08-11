@@ -16,7 +16,7 @@
     }
 
     .page-subtitle {
-      color: $dark-gray2;
+      color: $dark-gray1;
       font-size: 14px;
       text-transform: none;
     }
@@ -82,6 +82,13 @@ div.info-wrapper {
         display: block;
         text-align: center;
         cursor: pointer;
+        background: none;
+
+        &:hover, &:focus {
+          background-color: unset;
+          color: $m-blue-d3;
+          border: 1px solid black;
+        }
       }
 
       > li,article {
@@ -109,7 +116,12 @@ div.info-wrapper {
         .toggle-visibility-button {
           @extend %t-title9;
           @include float(right);
+          padding: 0;
           cursor: pointer;
+          background: none;
+          border: none;
+          color: $blue;
+          font-weight: normal;
         }
 
         .toggle-visibility-element {
@@ -175,7 +187,7 @@ div.info-wrapper {
       right: auto;
     }
 
-    h1 {
+    .handouts-header {
       @include text-align(left);
       @extend %t-strong;
       @extend %t-title6;

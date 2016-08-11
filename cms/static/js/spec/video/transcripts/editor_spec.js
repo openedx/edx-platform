@@ -1,13 +1,12 @@
 define(
     [
-        "jquery", "backbone", "underscore",
-        "js/views/video/transcripts/utils", "js/views/video/transcripts/editor",
-        "js/views/metadata", "js/models/metadata", "js/collections/metadata",
-        "underscore.string", "xmodule", "js/views/video/transcripts/metadata_videolist",
-        "jasmine-jquery"
+        'jquery', 'backbone', 'underscore',
+        'js/views/video/transcripts/utils', 'js/views/video/transcripts/editor',
+        'js/views/metadata', 'js/models/metadata', 'js/collections/metadata',
+        'underscore.string', 'xmodule', 'js/views/video/transcripts/metadata_videolist'
     ],
-function ($, Backbone, _, Utils, Editor, MetadataView, MetadataModel, MetadataCollection, _str) {
-    describe('Transcripts.Editor', function () {
+function($, Backbone, _, Utils, Editor, MetadataView, MetadataModel, MetadataCollection, _str) {
+    describe('Transcripts.Editor', function() {
         var VideoListEntry = {
                 default_value: ['a thing', 'another thing'],
                 display_name: 'Video URL',
@@ -43,25 +42,31 @@ function ($, Backbone, _, Utils, Editor, MetadataView, MetadataModel, MetadataCo
             },
             transcripts, container;
 
-        beforeEach(function () {
-            var tpl = sandbox({
-                    'class': 'wrapper-comp-settings basic_metadata_edit',
-                    'data-metadata': JSON.stringify(metadataDict['object'])
-                });
+        var waitsForDisplayName = function(collection) {
+            return jasmine.waitUntil(function() {
+                var displayNameValue = collection[0].getValue();
+                return displayNameValue !== '' && displayNameValue !== 'video_id';
+            });
+        };
 
-                appendSetFixtures(tpl);
-                container = $('.basic_metadata_edit');
+        beforeEach(function() {
+            var tpl = sandbox({
+                'class': 'wrapper-comp-settings basic_metadata_edit',
+                'data-metadata': JSON.stringify(metadataDict['object'])
+            });
+
+            appendSetFixtures(tpl);
+            container = $('.basic_metadata_edit');
 
             spyOn(Utils, 'command');
         });
 
-        afterEach(function () {
+        afterEach(function() {
             Utils.Storage.remove('sub');
         });
 
-        describe('Test initialization', function () {
-
-            beforeEach(function () {
+        describe('Test initialization', function() {
+            beforeEach(function() {
                 spyOn(MetadataView, 'Editor');
 
                 transcripts = new Editor({
@@ -70,14 +75,12 @@ function ($, Backbone, _, Utils, Editor, MetadataView, MetadataModel, MetadataCo
             });
 
             $.each(metadataDict, function(index, val) {
-                it('toModels with argument as ' + index, function () {
-
+                it('toModels with argument as ' + index, function() {
                     expect(transcripts.toModels(val)).toEqual(models);
                 });
             });
 
-            it('MetadataView.Editor is initialized', function () {
-
+            it('MetadataView.Editor is initialized', function() {
                 expect(MetadataView.Editor).toHaveBeenCalledWith({
                     el: container,
                     collection: transcripts.collection
@@ -85,7 +88,7 @@ function ($, Backbone, _, Utils, Editor, MetadataView, MetadataModel, MetadataCo
             });
         });
 
-        describe('Test synchronization', function () {
+        describe('Test synchronization', function() {
             var nameEntry = {
                     default_value: 'default value',
                     display_name: 'Display Name',
@@ -133,7 +136,7 @@ function ($, Backbone, _, Utils, Editor, MetadataView, MetadataModel, MetadataCo
                 metadataView;
 
 
-            beforeEach(function () {
+            beforeEach(function() {
                 spyOn(MetadataView, 'Editor');
 
                 transcripts = new Editor({
@@ -157,31 +160,27 @@ function ($, Backbone, _, Utils, Editor, MetadataView, MetadataModel, MetadataCo
                 );
             });
 
-            describe('Test Advanced to Basic synchronization', function () {
-                it('Correct data', function () {
+            describe('Test Advanced to Basic synchronization', function() {
+                it('Correct data', function(done) {
                     transcripts.syncBasicTab(metadataCollection, metadataView);
-
                     var collection = transcripts.collection.models;
 
-                    waitsFor(function() {
-                        var displayNameValue = collection[0].getValue();
-                        return (displayNameValue !== "" && displayNameValue != "video_id");
-                    }, "Defaults never loaded", 1000);
+                    waitsForDisplayName(collection)
+                        .then(function() {
+                            var displayNameValue = collection[0].getValue(),
+                                videoUrlValue = collection[1].getValue();
 
-                    runs(function() {
-                        var displayNameValue = collection[0].getValue(),
-                            videoUrlValue = collection[1].getValue();
-
-                        expect(displayNameValue).toEqual('default');
-                        expect(videoUrlValue).toEqual([
-                            'http://youtu.be/OEoXaMPEzfM',
-                            'default.mp4',
-                            'default.webm'
-                        ]);
-                    });
+                            expect(displayNameValue).toEqual('default');
+                            expect(videoUrlValue).toEqual([
+                                'http://youtu.be/OEoXaMPEzfM',
+                                'default.mp4',
+                                'default.webm'
+                            ]);
+                        })
+                        .always(done);
                 });
 
-                it('If metadataCollection is not defined', function () {
+                it('If metadataCollection is not defined', function() {
                     transcripts.syncBasicTab(null);
 
                     var collection = transcripts.collection.models,
@@ -194,7 +193,7 @@ function ($, Backbone, _, Utils, Editor, MetadataView, MetadataModel, MetadataCo
                     ]);
                 });
 
-                it('Youtube Id has length not eqaul 11', function () {
+                it('Youtube Id has length not eqaul 11', function() {
                     var model = metadataCollection.findWhere({
                         field_name: 'youtube_id_1_0'
                     });
@@ -218,35 +217,30 @@ function ($, Backbone, _, Utils, Editor, MetadataView, MetadataModel, MetadataCo
                 });
             });
 
-            describe('Test Basic to Advanced synchronization', function () {
-                it('Correct data', function () {
+            describe('Test Basic to Advanced synchronization', function() {
+                it('Correct data', function(done) {
                     transcripts.syncAdvancedTab(metadataCollection);
 
                     var collection = metadataCollection.models;
+                    waitsForDisplayName(collection)
+                        .then(function() {
+                            var displayNameValue = collection[0].getValue();
+                            var subValue = collection[1].getValue();
+                            var html5SourcesValue = collection[2].getValue();
+                            var youtubeValue = collection[3].getValue();
 
-                    waitsFor(function() {
-                        var displayNameValue = collection[0].getValue();
-                        return (displayNameValue !== "" && displayNameValue != "video_id");
-                    }, "Defaults never loaded", 1000);
-
-                    runs(function() {
-
-                        var displayNameValue = collection[0].getValue();
-                        var subValue = collection[1].getValue();
-                        var html5SourcesValue = collection[2].getValue();
-                        var youtubeValue = collection[3].getValue();
-
-                        expect(displayNameValue).toEqual('display value');
-                        expect(subValue).toEqual('default');
-                        expect(html5SourcesValue).toEqual([
-                            'video.mp4',
-                            'video.webm'
-                        ]);
-                        expect(youtubeValue).toEqual('12345678901');
-                    });
+                            expect(displayNameValue).toEqual('display value');
+                            expect(subValue).toEqual('default');
+                            expect(html5SourcesValue).toEqual([
+                                'video.mp4',
+                                'video.webm'
+                            ]);
+                            expect(youtubeValue).toEqual('12345678901');
+                        })
+                        .always(done);
                 });
 
-                it('metadataCollection is not defined', function () {
+                it('metadataCollection is not defined', function() {
                     transcripts.syncAdvancedTab(null);
 
                     var collection = metadataCollection.models,
@@ -264,7 +258,7 @@ function ($, Backbone, _, Utils, Editor, MetadataView, MetadataModel, MetadataCo
                     expect(youtubeValue).toEqual('OEoXaMPEzfM');
                 });
 
-                it('Youtube Id is not adjusted', function () {
+                it('Youtube Id is not adjusted', function() {
                     var model = transcripts.collection.models[1];
 
                     model.setValue([
@@ -285,7 +279,7 @@ function ($, Backbone, _, Utils, Editor, MetadataView, MetadataModel, MetadataCo
                     expect(youtubeValue).toEqual('');
                 });
 
-                it('Timed Transcript field is updated', function () {
+                it('Timed Transcript field is updated', function() {
                     Utils.Storage.set('sub', 'test_value');
 
                     transcripts.syncAdvancedTab(metadataCollection);
@@ -296,7 +290,7 @@ function ($, Backbone, _, Utils, Editor, MetadataView, MetadataModel, MetadataCo
                     expect(subValue).toEqual('test_value');
                 });
 
-                it('Timed Transcript field is updated just once', function () {
+                it('Timed Transcript field is updated just once', function() {
                     Utils.Storage.set('sub', 'test_value');
 
                     var collection = metadataCollection.models,
@@ -307,10 +301,8 @@ function ($, Backbone, _, Utils, Editor, MetadataView, MetadataModel, MetadataCo
                     transcripts.syncAdvancedTab(metadataCollection);
                     transcripts.syncAdvancedTab(metadataCollection);
                     transcripts.syncAdvancedTab(metadataCollection);
-
-                    expect(subModel.setValue.calls.length).toEqual(1);
+                    expect(subModel.setValue.calls.count()).toEqual(1);
                 });
-
             });
         });
     });

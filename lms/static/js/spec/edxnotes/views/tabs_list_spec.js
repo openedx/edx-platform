@@ -1,11 +1,10 @@
 define([
     'jquery', 'common/js/spec_helpers/template_helpers', 'js/edxnotes/collections/tabs',
-    'js/edxnotes/views/tabs_list', 'js/spec/edxnotes/custom_matchers', 'jasmine-jquery'
-], function($, TemplateHelpers, TabsCollection, TabsListView, customMatchers) {
+    'js/edxnotes/views/tabs_list'
+], function($, TemplateHelpers, TabsCollection, TabsListView) {
     'use strict';
     describe('EdxNotes TabsListView', function() {
-        beforeEach(function () {
-            customMatchers(this);
+        beforeEach(function() {
             TemplateHelpers.installTemplate('templates/edxnotes/tab-item');
             this.collection = new TabsCollection([
                 {identifier: 'first-item'},
@@ -16,7 +15,7 @@ define([
             }).render();
         });
 
-        it('has correct order and class names', function () {
+        it('has correct order and class names', function() {
             var firstItem = this.tabsList.$('#first-item'),
                 secondItem = this.tabsList.$('#second-item');
 
@@ -25,7 +24,7 @@ define([
             expect(secondItem).toHaveIndex(1);
         });
 
-        it('can add a new tab', function () {
+        it('can add a new tab', function() {
             var firstItem = this.tabsList.$('#first-item'),
                 thirdItem;
 
@@ -37,7 +36,7 @@ define([
             expect(this.tabsList.$('.tab')).toHaveLength(3);
         });
 
-        it('can remove tabs', function () {
+        it('can remove tabs', function() {
             var secondItem = this.tabsList.$('#second-item');
 
             this.collection.at(0).destroy(); // remove first tab

@@ -1,8 +1,8 @@
 """
 Command to load course overviews.
 """
+
 import logging
-from optparse import make_option
 
 from django.core.management.base import BaseCommand, CommandError
 from opaque_keys import InvalidKeyError

@@ -896,7 +896,6 @@ $light-border: 1px solid $gray-l5;
     padding: $baseline;
 
     h2 {
-      @xtend %t-title5;
       @extend %t-strong;
       margin-bottom: 0;
       color: $dark-gray1;

@@ -14,6 +14,7 @@ from django.test.client import RequestFactory
 from django.core.urlresolvers import reverse
 from contentstore.utils import reverse_usage_url, reverse_course_url
 
+from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from contentstore.views.component import (
     component_handler, get_component_templates
 )
@@ -23,7 +24,7 @@ from contentstore.views.item import (
 )
 from contentstore.tests.utils import CourseTestCase
 from student.tests.factories import UserFactory
-from xblock_django.models import XBlockDisableConfig
+from xblock_django.models import XBlockConfiguration, XBlockStudioConfiguration, XBlockStudioConfigurationFlag
 from xmodule.capa_module import CapaDescriptor
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
@@ -31,11 +32,32 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, TEST_DAT
 from xmodule.modulestore.tests.factories import ItemFactory, LibraryFactory, check_mongo_calls, CourseFactory
 from xmodule.x_module import STUDIO_VIEW, STUDENT_VIEW
 from xmodule.course_module import DEFAULT_START_DATE
+from xblock.core import XBlockAside
+from xblock.fields import Scope, String, ScopeIds
+from xblock.fragment import Fragment
+from xblock.runtime import DictKeyValueStore, KvsFieldData
+from xblock.test.tools import TestRuntime
 from xblock.exceptions import NoSuchHandlerError
 from xblock_django.user_service import DjangoXBlockUserService
 from opaque_keys.edx.keys import UsageKey, CourseKey
 from opaque_keys.edx.locations import Location
 from xmodule.partitions.partitions import Group, UserPartition
+
+
+class AsideTest(XBlockAside):
+    """
+    Test xblock aside class
+    """
+    FRAG_CONTENT = u"<p>Aside Foo rendered</p>"
+
+    field11 = String(default="aside1_default_value1", scope=Scope.content)
+    field12 = String(default="aside1_default_value2", scope=Scope.settings)
+    field13 = String(default="aside1_default_value3", scope=Scope.parent)
+
+    @XBlockAside.aside_for('student_view')
+    def student_view_aside(self, block, context):  # pylint: disable=unused-argument
+        """Add to the student view"""
+        return Fragment(self.FRAG_CONTENT)
 
 
 class ItemTest(CourseTestCase):
@@ -175,7 +197,8 @@ class GetItemTest(ItemTest):
 
         # Add a problem beneath a child vertical
         child_vertical_usage_key = self._create_vertical(parent_usage_key=root_usage_key)
-        resp = self.create_xblock(parent_usage_key=child_vertical_usage_key, category='problem', boilerplate='multiplechoice.yaml')
+        resp = self.create_xblock(parent_usage_key=child_vertical_usage_key, category='problem',
+                                  boilerplate='multiplechoice.yaml')
         self.assertEqual(resp.status_code, 200)
 
         # Get the preview HTML
@@ -200,7 +223,8 @@ class GetItemTest(ItemTest):
         self.assertEqual(resp.status_code, 200)
         wrapper_usage_key = self.response_usage_key(resp)
 
-        resp = self.create_xblock(parent_usage_key=wrapper_usage_key, category='problem', boilerplate='multiplechoice.yaml')
+        resp = self.create_xblock(parent_usage_key=wrapper_usage_key, category='problem',
+                                  boilerplate='multiplechoice.yaml')
         self.assertEqual(resp.status_code, 200)
 
         # Get the preview HTML and verify the View -> link is present.
@@ -222,9 +246,11 @@ class GetItemTest(ItemTest):
         root_usage_key = self._create_vertical()
         resp = self.create_xblock(category='split_test', parent_usage_key=root_usage_key)
         split_test_usage_key = self.response_usage_key(resp)
-        resp = self.create_xblock(parent_usage_key=split_test_usage_key, category='html', boilerplate='announcement.yaml')
+        resp = self.create_xblock(parent_usage_key=split_test_usage_key, category='html',
+                                  boilerplate='announcement.yaml')
         self.assertEqual(resp.status_code, 200)
-        resp = self.create_xblock(parent_usage_key=split_test_usage_key, category='html', boilerplate='zooming_image.yaml')
+        resp = self.create_xblock(parent_usage_key=split_test_usage_key, category='html',
+                                  boilerplate='zooming_image.yaml')
         self.assertEqual(resp.status_code, 200)
         html, __ = self._get_container_preview(split_test_usage_key)
         self.assertIn('Announcement', html)
@@ -264,7 +290,8 @@ class GetItemTest(ItemTest):
         }
 
         response = self.client.put(
-            reverse_course_url('group_configurations_detail_handler', self.course.id, kwargs={'group_configuration_id': 0}),
+            reverse_course_url('group_configurations_detail_handler', self.course.id,
+                               kwargs={'group_configuration_id': 0}),
             data=json.dumps(GROUP_CONFIGURATION_JSON),
             content_type="application/json",
             HTTP_ACCEPT="application/json",
@@ -444,7 +471,96 @@ class TestCreateItem(ItemTest):
         self.assertEquals(new_tab.display_name, 'Empty')
 
 
-class TestDuplicateItem(ItemTest):
+class DuplicateHelper(object):
+    """
+    Helper mixin class for TestDuplicateItem and TestDuplicateItemWithAsides
+    """
+    def _duplicate_and_verify(self, source_usage_key, parent_usage_key, check_asides=False):
+        """ Duplicates the source, parenting to supplied parent. Then does equality check. """
+        usage_key = self._duplicate_item(parent_usage_key, source_usage_key)
+        # pylint: disable=no-member
+        self.assertTrue(
+            self._check_equality(source_usage_key, usage_key, parent_usage_key, check_asides=check_asides),
+            "Duplicated item differs from original"
+        )
+
+    def _check_equality(self, source_usage_key, duplicate_usage_key, parent_usage_key=None, check_asides=False):
+        """
+        Gets source and duplicated items from the modulestore using supplied usage keys.
+        Then verifies that they represent equivalent items (modulo parents and other
+        known things that may differ).
+        """
+        # pylint: disable=no-member
+        original_item = self.get_item_from_modulestore(source_usage_key)
+        duplicated_item = self.get_item_from_modulestore(duplicate_usage_key)
+
+        if check_asides:
+            original_asides = original_item.runtime.get_asides(original_item)
+            duplicated_asides = duplicated_item.runtime.get_asides(duplicated_item)
+            self.assertEqual(len(original_asides), 1)
+            self.assertEqual(len(duplicated_asides), 1)
+            self.assertEqual(original_asides[0].field11, duplicated_asides[0].field11)
+            self.assertEqual(original_asides[0].field12, duplicated_asides[0].field12)
+            self.assertNotEqual(original_asides[0].field13, duplicated_asides[0].field13)
+            self.assertEqual(duplicated_asides[0].field13, 'aside1_default_value3')
+
+        self.assertNotEqual(
+            unicode(original_item.location),
+            unicode(duplicated_item.location),
+            "Location of duplicate should be different from original"
+        )
+
+        # Parent will only be equal for root of duplicated structure, in the case
+        # where an item is duplicated in-place.
+        if parent_usage_key and unicode(original_item.parent) == unicode(parent_usage_key):
+            self.assertEqual(
+                unicode(parent_usage_key), unicode(duplicated_item.parent),
+                "Parent of duplicate should equal parent of source for root xblock when duplicated in-place"
+            )
+        else:
+            self.assertNotEqual(
+                unicode(original_item.parent), unicode(duplicated_item.parent),
+                "Parent duplicate should be different from source"
+            )
+
+        # Set the location, display name, and parent to be the same so we can make sure the rest of the
+        # duplicate is equal.
+        duplicated_item.location = original_item.location
+        duplicated_item.display_name = original_item.display_name
+        duplicated_item.parent = original_item.parent
+
+        # Children will also be duplicated, so for the purposes of testing equality, we will set
+        # the children to the original after recursively checking the children.
+        if original_item.has_children:
+            self.assertEqual(
+                len(original_item.children),
+                len(duplicated_item.children),
+                "Duplicated item differs in number of children"
+            )
+            for i in xrange(len(original_item.children)):
+                if not self._check_equality(original_item.children[i], duplicated_item.children[i]):
+                    return False
+            duplicated_item.children = original_item.children
+
+        return original_item == duplicated_item
+
+    def _duplicate_item(self, parent_usage_key, source_usage_key, display_name=None):
+        """
+        Duplicates the source.
+        """
+        # pylint: disable=no-member
+        data = {
+            'parent_locator': unicode(parent_usage_key),
+            'duplicate_source_locator': unicode(source_usage_key)
+        }
+        if display_name is not None:
+            data['display_name'] = display_name
+
+        resp = self.client.ajax_post(reverse('contentstore.views.xblock_handler'), json.dumps(data))
+        return self.response_usage_key(resp)
+
+
+class TestDuplicateItem(ItemTest, DuplicateHelper):
     """
     Test the duplicate method.
     """
@@ -460,7 +576,8 @@ class TestDuplicateItem(ItemTest):
         self.seq_usage_key = self.response_usage_key(resp)
 
         # create problem and an html component
-        resp = self.create_xblock(parent_usage_key=self.seq_usage_key, category='problem', boilerplate='multiplechoice.yaml')
+        resp = self.create_xblock(parent_usage_key=self.seq_usage_key, category='problem',
+                                  boilerplate='multiplechoice.yaml')
         self.problem_usage_key = self.response_usage_key(resp)
 
         resp = self.create_xblock(parent_usage_key=self.seq_usage_key, category='html')
@@ -474,67 +591,10 @@ class TestDuplicateItem(ItemTest):
         Tests that a duplicated xblock is identical to the original,
         except for location and display name.
         """
-        def duplicate_and_verify(source_usage_key, parent_usage_key):
-            """ Duplicates the source, parenting to supplied parent. Then does equality check. """
-            usage_key = self._duplicate_item(parent_usage_key, source_usage_key)
-            self.assertTrue(
-                check_equality(source_usage_key, usage_key, parent_usage_key),
-                "Duplicated item differs from original"
-            )
-
-        def check_equality(source_usage_key, duplicate_usage_key, parent_usage_key=None):
-            """
-            Gets source and duplicated items from the modulestore using supplied usage keys.
-            Then verifies that they represent equivalent items (modulo parents and other
-            known things that may differ).
-            """
-            original_item = self.get_item_from_modulestore(source_usage_key)
-            duplicated_item = self.get_item_from_modulestore(duplicate_usage_key)
-
-            self.assertNotEqual(
-                unicode(original_item.location),
-                unicode(duplicated_item.location),
-                "Location of duplicate should be different from original"
-            )
-
-            # Parent will only be equal for root of duplicated structure, in the case
-            # where an item is duplicated in-place.
-            if parent_usage_key and unicode(original_item.parent) == unicode(parent_usage_key):
-                self.assertEqual(
-                    unicode(parent_usage_key), unicode(duplicated_item.parent),
-                    "Parent of duplicate should equal parent of source for root xblock when duplicated in-place"
-                )
-            else:
-                self.assertNotEqual(
-                    unicode(original_item.parent), unicode(duplicated_item.parent),
-                    "Parent duplicate should be different from source"
-                )
-
-            # Set the location, display name, and parent to be the same so we can make sure the rest of the
-            # duplicate is equal.
-            duplicated_item.location = original_item.location
-            duplicated_item.display_name = original_item.display_name
-            duplicated_item.parent = original_item.parent
-
-            # Children will also be duplicated, so for the purposes of testing equality, we will set
-            # the children to the original after recursively checking the children.
-            if original_item.has_children:
-                self.assertEqual(
-                    len(original_item.children),
-                    len(duplicated_item.children),
-                    "Duplicated item differs in number of children"
-                )
-                for i in xrange(len(original_item.children)):
-                    if not check_equality(original_item.children[i], duplicated_item.children[i]):
-                        return False
-                duplicated_item.children = original_item.children
-
-            return original_item == duplicated_item
-
-        duplicate_and_verify(self.problem_usage_key, self.seq_usage_key)
-        duplicate_and_verify(self.html_usage_key, self.seq_usage_key)
-        duplicate_and_verify(self.seq_usage_key, self.chapter_usage_key)
-        duplicate_and_verify(self.chapter_usage_key, self.usage_key)
+        self._duplicate_and_verify(self.problem_usage_key, self.seq_usage_key)
+        self._duplicate_and_verify(self.html_usage_key, self.seq_usage_key)
+        self._duplicate_and_verify(self.seq_usage_key, self.chapter_usage_key)
+        self._duplicate_and_verify(self.chapter_usage_key, self.usage_key)
 
     def test_ordering(self):
         """
@@ -547,7 +607,7 @@ class TestDuplicateItem(ItemTest):
             parent = self.get_item_from_modulestore(parent_usage_key)
             children = parent.children
             if source_position is None:
-                self.assertFalse(source_usage_key in children, 'source item not expected in children array')
+                self.assertNotIn(source_usage_key, children, 'source item not expected in children array')
                 self.assertEqual(
                     children[len(children) - 1],
                     usage_key,
@@ -598,16 +658,67 @@ class TestDuplicateItem(ItemTest):
         # Now send a custom display name for the duplicate.
         verify_name(self.seq_usage_key, self.chapter_usage_key, "customized name", display_name="customized name")
 
-    def _duplicate_item(self, parent_usage_key, source_usage_key, display_name=None):
-        data = {
-            'parent_locator': unicode(parent_usage_key),
-            'duplicate_source_locator': unicode(source_usage_key)
-        }
-        if display_name is not None:
-            data['display_name'] = display_name
 
-        resp = self.client.ajax_post(reverse('contentstore.views.xblock_handler'), json.dumps(data))
-        return self.response_usage_key(resp)
+class TestDuplicateItemWithAsides(ItemTest, DuplicateHelper):
+    """
+    Test the duplicate method for blocks with asides.
+    """
+    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
+
+    def setUp(self):
+        """ Creates the test course structure and a few components to 'duplicate'. """
+        super(TestDuplicateItemWithAsides, self).setUp()
+        # Create a parent chapter
+        resp = self.create_xblock(parent_usage_key=self.usage_key, category='chapter')
+        self.chapter_usage_key = self.response_usage_key(resp)
+
+        # create a sequential containing a problem and an html component
+        resp = self.create_xblock(parent_usage_key=self.chapter_usage_key, category='sequential')
+        self.seq_usage_key = self.response_usage_key(resp)
+
+        # create problem and an html component
+        resp = self.create_xblock(parent_usage_key=self.seq_usage_key, category='problem',
+                                  boilerplate='multiplechoice.yaml')
+        self.problem_usage_key = self.response_usage_key(resp)
+
+        resp = self.create_xblock(parent_usage_key=self.seq_usage_key, category='html')
+        self.html_usage_key = self.response_usage_key(resp)
+
+    @XBlockAside.register_temp_plugin(AsideTest, 'test_aside')
+    @patch('xmodule.modulestore.split_mongo.caching_descriptor_system.CachingDescriptorSystem.applicable_aside_types',
+           lambda self, block: ['test_aside'])
+    def test_duplicate_equality_with_asides(self):
+        """
+        Tests that a duplicated xblock aside is identical to the original
+        """
+        def create_aside(usage_key, block_type):
+            """
+            Helper function to create aside
+            """
+            item = self.get_item_from_modulestore(usage_key)
+
+            key_store = DictKeyValueStore()
+            field_data = KvsFieldData(key_store)
+            runtime = TestRuntime(services={'field-data': field_data})  # pylint: disable=abstract-class-instantiated
+
+            def_id = runtime.id_generator.create_definition(block_type)
+            usage_id = runtime.id_generator.create_usage(def_id)
+
+            aside = AsideTest(scope_ids=ScopeIds('user', block_type, def_id, usage_id), runtime=runtime)
+            aside.field11 = '%s_new_value11' % block_type
+            aside.field12 = '%s_new_value12' % block_type
+            aside.field13 = '%s_new_value13' % block_type
+
+            self.store.update_item(item, self.user.id, asides=[aside])
+
+        create_aside(self.html_usage_key, 'html')
+        create_aside(self.problem_usage_key, 'problem')
+        create_aside(self.seq_usage_key, 'seq')
+        create_aside(self.chapter_usage_key, 'chapter')
+
+        self._duplicate_and_verify(self.problem_usage_key, self.seq_usage_key, check_asides=True)
+        self._duplicate_and_verify(self.html_usage_key, self.seq_usage_key, check_asides=True)
+        self._duplicate_and_verify(self.seq_usage_key, self.chapter_usage_key, check_asides=True)
 
 
 class TestEditItemSetup(ItemTest):
@@ -693,6 +804,22 @@ class TestEditItem(TestEditItemSetup):
         sequential = self.get_item_from_modulestore(self.seq_usage_key)
         self.assertEqual(sequential.due, datetime(2010, 11, 22, 4, 0, tzinfo=UTC))
         self.assertEqual(sequential.start, datetime(2010, 9, 12, 14, 0, tzinfo=UTC))
+
+    def test_update_generic_fields(self):
+        new_display_name = 'New Display Name'
+        new_max_attempts = 2
+        self.client.ajax_post(
+            self.problem_update_url,
+            data={
+                'fields': {
+                    'display_name': new_display_name,
+                    'max_attempts': new_max_attempts,
+                }
+            }
+        )
+        problem = self.get_item_from_modulestore(self.problem_usage_key, verify_is_draft=True)
+        self.assertEqual(problem.display_name, new_display_name)
+        self.assertEqual(problem.max_attempts, new_max_attempts)
 
     def test_delete_child(self):
         """
@@ -861,7 +988,8 @@ class TestEditItem(TestEditItemSetup):
             data={'publish': 'discard_changes'}
         )
         self._verify_published_with_no_draft(self.problem_usage_key)
-        published = modulestore().get_item(self.problem_usage_key, revision=ModuleStoreEnum.RevisionOption.published_only)
+        published = modulestore().get_item(self.problem_usage_key,
+                                           revision=ModuleStoreEnum.RevisionOption.published_only)
         self.assertIsNone(published.due)
 
     def test_republish(self):
@@ -968,7 +1096,8 @@ class TestEditItem(TestEditItemSetup):
             data={'publish': 'make_public'}
         )
         self._verify_published_with_no_draft(self.problem_usage_key)
-        published = modulestore().get_item(self.problem_usage_key, revision=ModuleStoreEnum.RevisionOption.published_only)
+        published = modulestore().get_item(self.problem_usage_key,
+                                           revision=ModuleStoreEnum.RevisionOption.published_only)
 
         # Now make a draft
         self.client.ajax_post(
@@ -1088,6 +1217,7 @@ class TestEditSplitModule(ItemTest):
     """
     def setUp(self):
         super(TestEditSplitModule, self).setUp()
+        self.user = UserFactory()
         self.course.user_partitions = [
             UserPartition(
                 0, 'first_partition', 'First Partition',
@@ -1317,7 +1447,8 @@ class TestComponentHandler(TestCase):
 
         self.descriptor.handle = create_response
 
-        self.assertEquals(component_handler(self.request, self.usage_key_string, 'dummy_handler').status_code, status_code)
+        self.assertEquals(component_handler(self.request, self.usage_key_string, 'dummy_handler').status_code,
+                          status_code)
 
 
 class TestComponentTemplates(CourseTestCase):
@@ -1327,12 +1458,19 @@ class TestComponentTemplates(CourseTestCase):
 
     def setUp(self):
         super(TestComponentTemplates, self).setUp()
-        self.templates = get_component_templates(self.course)
+        # Advanced Module support levels.
+        XBlockStudioConfiguration.objects.create(name='poll', enabled=True, support_level="fs")
+        XBlockStudioConfiguration.objects.create(name='survey', enabled=True, support_level="ps")
+        XBlockStudioConfiguration.objects.create(name='annotatable', enabled=True, support_level="us")
+        # Basic component support levels.
+        XBlockStudioConfiguration.objects.create(name='html', enabled=True, support_level="fs")
+        XBlockStudioConfiguration.objects.create(name='discussion', enabled=True, support_level="ps")
+        XBlockStudioConfiguration.objects.create(name='problem', enabled=True, support_level="us")
+        XBlockStudioConfiguration.objects.create(name='video', enabled=True, support_level="us")
+        # XBlock masquerading as a problem
+        XBlockStudioConfiguration.objects.create(name='openassessment', enabled=True, support_level="us")
 
-        # Initialize the deprecated modules settings with empty list
-        XBlockDisableConfig.objects.create(
-            disabled_create_blocks='', enabled=True
-        )
+        self.templates = get_component_templates(self.course)
 
     def get_templates_of_type(self, template_type):
         """
@@ -1351,11 +1489,39 @@ class TestComponentTemplates(CourseTestCase):
         """
         Test the handling of the basic component templates.
         """
-        self.assertIsNotNone(self.get_templates_of_type('discussion'))
-        self.assertIsNotNone(self.get_templates_of_type('html'))
-        self.assertIsNotNone(self.get_templates_of_type('problem'))
-        self.assertIsNotNone(self.get_templates_of_type('video'))
+        self._verify_basic_component("discussion", "Discussion")
+        self._verify_basic_component("video", "Video")
+        self.assertGreater(self.get_templates_of_type('html'), 0)
+        self.assertGreater(self.get_templates_of_type('problem'), 0)
         self.assertIsNone(self.get_templates_of_type('advanced'))
+
+        # Now fully disable video through XBlockConfiguration
+        XBlockConfiguration.objects.create(name='video', enabled=False)
+        self.templates = get_component_templates(self.course)
+        self.assertIsNone(self.get_templates_of_type('video'))
+
+    def test_basic_components_support_levels(self):
+        """
+        Test that support levels can be set on basic component templates.
+        """
+        XBlockStudioConfigurationFlag.objects.create(enabled=True)
+        self.templates = get_component_templates(self.course)
+        self._verify_basic_component("discussion", "Discussion", "ps")
+        self.assertEqual([], self.get_templates_of_type("video"))
+        self.assertEqual([], self.get_templates_of_type("problem"))
+
+        self.course.allow_unsupported_xblocks = True
+        self.templates = get_component_templates(self.course)
+        self._verify_basic_component("video", "Video", "us")
+        problem_templates = self.get_templates_of_type('problem')
+        problem_no_boilerplate = self.get_template(problem_templates, u'Blank Advanced Problem')
+        self.assertIsNotNone(problem_no_boilerplate)
+        self.assertEqual('us', problem_no_boilerplate['support_level'])
+
+        # Now fully disable video through XBlockConfiguration
+        XBlockConfiguration.objects.create(name='video', enabled=False)
+        self.templates = get_component_templates(self.course)
+        self.assertIsNone(self.get_templates_of_type('video'))
 
     def test_advanced_components(self):
         """
@@ -1380,6 +1546,11 @@ class TestComponentTemplates(CourseTestCase):
         self.assertNotEqual(only_template.get('category'), 'video')
         self.assertNotEqual(only_template.get('category'), 'openassessment')
 
+        # Now fully disable word_cloud through XBlockConfiguration
+        XBlockConfiguration.objects.create(name='word_cloud', enabled=False)
+        self.templates = get_component_templates(self.course)
+        self.assertIsNone(self.get_templates_of_type('advanced'))
+
     def test_advanced_problems(self):
         """
         Test the handling of advanced problem templates.
@@ -1390,44 +1561,101 @@ class TestComponentTemplates(CourseTestCase):
         self.assertEqual(circuit_template.get('category'), 'problem')
         self.assertEqual(circuit_template.get('boilerplate_name'), 'circuitschematic.yaml')
 
-    @patch('django.conf.settings.DEPRECATED_ADVANCED_COMPONENT_TYPES', [])
     def test_deprecated_no_advance_component_button(self):
         """
-        Test that there will be no `Advanced` button on unit page if units are
-        deprecated provided that they are the only modules in `Advanced Module List`
+        Test that there will be no `Advanced` button on unit page if xblocks have disabled
+        Studio support given that they are the only modules in `Advanced Module List`
         """
-        XBlockDisableConfig.objects.create(disabled_create_blocks='poll survey', enabled=True)
+        # Update poll and survey to have "enabled=False".
+        XBlockStudioConfiguration.objects.create(name='poll', enabled=False, support_level="fs")
+        XBlockStudioConfiguration.objects.create(name='survey', enabled=False, support_level="fs")
+        XBlockStudioConfigurationFlag.objects.create(enabled=True)
         self.course.advanced_modules.extend(['poll', 'survey'])
         templates = get_component_templates(self.course)
         button_names = [template['display_name'] for template in templates]
         self.assertNotIn('Advanced', button_names)
 
-    @patch('django.conf.settings.DEPRECATED_ADVANCED_COMPONENT_TYPES', [])
     def test_cannot_create_deprecated_problems(self):
         """
-        Test that we can't create problems if they are deprecated
+        Test that xblocks that have Studio support disabled do not show on the "new component" menu.
         """
-        XBlockDisableConfig.objects.create(disabled_create_blocks='poll survey', enabled=True)
+        # Update poll to have "enabled=False".
+        XBlockStudioConfiguration.objects.create(name='poll', enabled=False, support_level="fs")
+        XBlockStudioConfigurationFlag.objects.create(enabled=True)
         self.course.advanced_modules.extend(['annotatable', 'poll', 'survey'])
-        templates = get_component_templates(self.course)
-        button_names = [template['display_name'] for template in templates]
-        self.assertIn('Advanced', button_names)
-        self.assertEqual(len(templates[0]['templates']), 1)
-        template_display_names = [template['display_name'] for template in templates[0]['templates']]
-        self.assertEqual(template_display_names, ['Annotation'])
+        # Annotatable doesn't show up because it is unsupported (in test setUp).
+        self._verify_advanced_xblocks(['Survey'], ['ps'])
 
-    @patch('django.conf.settings.DEPRECATED_ADVANCED_COMPONENT_TYPES', ['poll'])
-    def test_create_non_deprecated_problems(self):
+        # Now enable unsupported components.
+        self.course.allow_unsupported_xblocks = True
+        self._verify_advanced_xblocks(['Annotation', 'Survey'], ['us', 'ps'])
+
+        # Now disable Annotatable completely through XBlockConfiguration
+        XBlockConfiguration.objects.create(name='annotatable', enabled=False)
+        self._verify_advanced_xblocks(['Survey'], ['ps'])
+
+    def test_create_support_level_flag_off(self):
         """
-        Test that we can create problems if they are not deprecated
+        Test that we can create any advanced xblock (that isn't completely disabled through
+        XBlockConfiguration) if XBlockStudioConfigurationFlag is False.
         """
-        self.course.advanced_modules.extend(['annotatable', 'poll', 'survey'])
+        XBlockStudioConfigurationFlag.objects.create(enabled=False)
+        self.course.advanced_modules.extend(['annotatable', 'survey'])
+        self._verify_advanced_xblocks(['Annotation', 'Survey'], [True, True])
+
+    def test_xblock_masquerading_as_problem(self):
+        """
+        Test the integration of xblocks masquerading as problems.
+        """
+        def get_openassessment():
+            """ Helper method to return the openassessment template from problem list """
+            self.templates = get_component_templates(self.course)
+            problem_templates = self.get_templates_of_type('problem')
+            return self.get_template(problem_templates, u'Peer Assessment')
+
+        def verify_openassessment_present(support_level):
+            """ Helper method to verify that openassessment template is present """
+            openassessment = get_openassessment()
+            self.assertIsNotNone(openassessment)
+            self.assertEqual(openassessment.get('category'), 'openassessment')
+            self.assertEqual(openassessment.get('support_level'), support_level)
+
+        verify_openassessment_present(True)
+
+        # Now enable XBlockStudioConfigurationFlag. The openassessment block is marked
+        # unsupported, so will no longer show up.
+        XBlockStudioConfigurationFlag.objects.create(enabled=True)
+        self.assertIsNone(get_openassessment())
+
+        # Now allow unsupported components.
+        self.course.allow_unsupported_xblocks = True
+        verify_openassessment_present('us')
+
+        # Now disable openassessment completely through XBlockConfiguration
+        XBlockConfiguration.objects.create(name='openassessment', enabled=False)
+        self.assertIsNone(get_openassessment())
+
+    def _verify_advanced_xblocks(self, expected_xblocks, expected_support_levels):
+        """
+        Verify the names of the advanced xblocks showing in the "new component" menu.
+        """
         templates = get_component_templates(self.course)
         button_names = [template['display_name'] for template in templates]
         self.assertIn('Advanced', button_names)
-        self.assertEqual(len(templates[0]['templates']), 2)
+        self.assertEqual(len(templates[0]['templates']), len(expected_xblocks))
         template_display_names = [template['display_name'] for template in templates[0]['templates']]
-        self.assertEqual(template_display_names, ['Annotation', 'Survey'])
+        self.assertEqual(template_display_names, expected_xblocks)
+        template_support_levels = [template['support_level'] for template in templates[0]['templates']]
+        self.assertEqual(template_support_levels, expected_support_levels)
+
+    def _verify_basic_component(self, component_type, display_name, support_level=True):
+        """
+        Verify the display name and support level of basic components (that have no boilerplates).
+        """
+        templates = self.get_templates_of_type(component_type)
+        self.assertEqual(1, len(templates))
+        self.assertEqual(display_name, templates[0]['display_name'])
+        self.assertEqual(support_level, templates[0]['support_level'])
 
 
 @ddt.ddt
@@ -1847,6 +2075,7 @@ class TestLibraryXBlockCreation(ItemTest):
         self.assertFalse(lib.children)
 
 
+@ddt.ddt
 class TestXBlockPublishingInfo(ItemTest):
     """
     Unit tests for XBlock's outline handling.
@@ -1873,7 +2102,7 @@ class TestXBlockPublishingInfo(ItemTest):
         Returns the child xblock info at the specified index.
         """
         children = xblock_info['child_info']['children']
-        self.assertTrue(len(children) > index)
+        self.assertGreater(len(children), index)
         return children[index]
 
     def _get_xblock_info(self, location):
@@ -1930,7 +2159,8 @@ class TestXBlockPublishingInfo(ItemTest):
         if path:
             direct_child_xblock_info = self._get_child_xblock_info(xblock_info, path[0])
             remaining_path = path[1:] if len(path) > 1 else None
-            self._verify_xblock_info_state(direct_child_xblock_info, xblock_info_field, expected_state, remaining_path, should_equal)
+            self._verify_xblock_info_state(direct_child_xblock_info, xblock_info_field,
+                                           expected_state, remaining_path, should_equal)
         else:
             if should_equal:
                 self.assertEqual(xblock_info[xblock_info_field], expected_state)
@@ -2100,7 +2330,8 @@ class TestXBlockPublishingInfo(ItemTest):
         self._create_child(sequential, 'vertical', "Unit")
         self._create_child(sequential, 'vertical', "Locked Unit", staff_only=True)
         xblock_info = self._get_xblock_info(chapter.location)
-        self._verify_visibility_state(xblock_info, VisibilityState.staff_only, self.FIRST_SUBSECTION_PATH, should_equal=False)
+        self._verify_visibility_state(xblock_info, VisibilityState.staff_only, self.FIRST_SUBSECTION_PATH,
+                                      should_equal=False)
         self._verify_visibility_state(xblock_info, VisibilityState.staff_only, self.FIRST_UNIT_PATH, should_equal=False)
         self._verify_visibility_state(xblock_info, VisibilityState.staff_only, self.SECOND_UNIT_PATH)
 
@@ -2169,3 +2400,31 @@ class TestXBlockPublishingInfo(ItemTest):
         self._verify_has_staff_only_message(xblock_info, True)
         self._verify_has_staff_only_message(xblock_info, True, path=self.FIRST_SUBSECTION_PATH)
         self._verify_has_staff_only_message(xblock_info, True, path=self.FIRST_UNIT_PATH)
+
+    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    def test_self_paced_item_visibility_state(self, store_type):
+        """
+        Test that in self-paced course, item has `live` visibility state.
+        Test that when item was initially in `scheduled` state in instructor mode, change course pacing to self-paced,
+        now in self-paced course, item should have `live` visibility state.
+        """
+        SelfPacedConfiguration(enabled=True).save()
+
+        # Create course, chapter and setup future release date to make chapter in scheduled state
+        course = CourseFactory.create(default_store=store_type)
+        chapter = self._create_child(course, 'chapter', "Test Chapter")
+        self._set_release_date(chapter.location, datetime.now(UTC) + timedelta(days=1))
+
+        # Check that chapter has scheduled state
+        xblock_info = self._get_xblock_info(chapter.location)
+        self._verify_visibility_state(xblock_info, VisibilityState.ready)
+        self.assertFalse(course.self_paced)
+
+        # Change course pacing to self paced
+        course.self_paced = True
+        self.store.update_item(course, self.user.id)
+        self.assertTrue(course.self_paced)
+
+        # Check that in self paced course content has live state now
+        xblock_info = self._get_xblock_info(chapter.location)
+        self._verify_visibility_state(xblock_info, VisibilityState.live)

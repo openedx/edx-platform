@@ -2,7 +2,7 @@
 metadata:
     display_name: IFrame Tool
 data: |
-      <h3>IFrame Tool</h3>
+      <h3 class="hd hd-2">IFrame Tool</h3>
       <p>Use the IFrame tool to embed an exercise or tool from any web site into your course content. For example, the tool below allows learners to experiment with how the shape of a triangle affects a line that is derived from the triangle.</p>
       <p>Exercises in an IFrame are not graded. To embed graded exercises, use a Custom JavaScript Problem.</p>
       <p>The following code is the HTML format required to use the IFrame tool. For the IFrame in this template, you must replace the values in <i>italics</i>.</p>

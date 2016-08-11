@@ -8,7 +8,7 @@ The following internal data structures are implemented:
     _BlockRelations - Data structure for a single block's relations.
     _BlockData - Data structure for a single block's data.
 """
-from collections import defaultdict
+from functools import partial
 from logging import getLogger
 
 from openedx.core.lib.graph_traversals import traverse_topologically, traverse_post_order
@@ -58,19 +58,22 @@ class BlockStructure(object):
         # Map of a block's usage key to its block relations. The
         # existence of a block in the structure is determined by its
         # presence in this map.
-        # defaultdict {UsageKey: _BlockRelations}
-        self._block_relations = defaultdict(_BlockRelations)
+        # dict {UsageKey: _BlockRelations}
+        self._block_relations = {}
 
         # Add the root block.
         self._add_block(self._block_relations, root_block_usage_key)
 
     def __iter__(self):
         """
-        The default iterator for a block structure is a topological
-        traversal since it's the more common case and we currently
-        need to support DAGs.
+        The default iterator for a block structure is get_block_keys()
+        since we need to filter blocks as a list.
+        A topological traversal can be used to support DAGs.
         """
-        return self.topological_traversal()
+        return self.get_block_keys()
+
+    def __len__(self):
+        return len(self._block_relations)
 
     #--- Block structure relation methods ---#
 
@@ -79,6 +82,7 @@ class BlockStructure(object):
         Returns the parents of the block identified by the given
         usage_key.
 
+
         Arguments:
             usage_key - The usage key of the block whose parents
                 are to be returned.
@@ -86,7 +90,7 @@ class BlockStructure(object):
         Returns:
             [UsageKey] - A list of usage keys of the block's parents.
         """
-        return self._block_relations[usage_key].parents if self.has_block(usage_key) else []
+        return self._block_relations[usage_key].parents if usage_key in self else []
 
     def get_children(self, usage_key):
         """
@@ -100,9 +104,24 @@ class BlockStructure(object):
         Returns:
             [UsageKey] - A list of usage keys of the block's children.
         """
-        return self._block_relations[usage_key].children if self.has_block(usage_key) else []
+        return self._block_relations[usage_key].children if usage_key in self else []
 
-    def has_block(self, usage_key):
+    def set_root_block(self, usage_key):
+        """
+        Sets the given usage key as the new root of the block structure.
+
+        Note: This method does *not* prune the rest of the structure. For
+        performance reasons, it is left to the caller to decide when exactly
+        to prune.
+
+        Arguments:
+            usage_key - The usage key of the block that is to be set as the
+                new root of the block structure.
+        """
+        self.root_block_usage_key = usage_key
+        self._block_relations[usage_key].parents = []
+
+    def __contains__(self, usage_key):
         """
         Returns whether a block with the given usage_key is in this
         block structure.
@@ -133,6 +152,7 @@ class BlockStructure(object):
             self,
             filter_func=None,
             yield_descendants_of_unyielded=False,
+            start_node=None,
     ):
         """
         Performs a topological sort of the block structure and yields
@@ -147,7 +167,7 @@ class BlockStructure(object):
                 traverse_topologically method.
         """
         return traverse_topologically(
-            start_node=self.root_block_usage_key,
+            start_node=start_node or self.root_block_usage_key,
             get_parents=self.get_parents,
             get_children=self.get_children,
             filter_func=filter_func,
@@ -157,6 +177,7 @@ class BlockStructure(object):
     def post_order_traversal(
             self,
             filter_func=None,
+            start_node=None,
     ):
         """
         Performs a post-order sort of the block structure and yields
@@ -171,7 +192,7 @@ class BlockStructure(object):
                 traverse_post_order method.
         """
         return traverse_post_order(
-            start_node=self.root_block_usage_key,
+            start_node=start_node or self.root_block_usage_key,
             get_children=self.get_children,
             filter_func=filter_func,
         )
@@ -186,7 +207,7 @@ class BlockStructure(object):
 
         # Create a new block relations map to store only those blocks
         # that are still linked
-        pruned_block_relations = defaultdict(_BlockRelations)
+        pruned_block_relations = {}
         old_block_relations = self._block_relations
 
         # Build the structure from the leaves up by doing a post-order
@@ -224,7 +245,7 @@ class BlockStructure(object):
         relations map.
 
         Arguments:
-            block_relations (defaultdict({UsageKey: _BlockRelations})) -
+            block_relations (dict({UsageKey: _BlockRelations})) -
                 Internal map of a block's usage key to its
                 parents/children relations.
 
@@ -232,6 +253,9 @@ class BlockStructure(object):
 
             child_key (UsageKey) - Usage key of the child block.
         """
+        BlockStructure._add_block(block_relations, parent_key)
+        BlockStructure._add_block(block_relations, child_key)
+
         block_relations[child_key].parents.append(parent_key)
         block_relations[parent_key].children.append(child_key)
 
@@ -241,29 +265,130 @@ class BlockStructure(object):
         Adds the given usage_key to the given block_relations map.
 
         Arguments:
-            block_relations (defaultdict({UsageKey: _BlockRelations})) -
+            block_relations (dict({UsageKey: _BlockRelations})) -
                 Internal map of a block's usage key to its
                 parents/children relations.
 
             usage_key (UsageKey) - Usage key of the block that is to
                 be added to the given block_relations.
         """
-        block_relations[usage_key] = _BlockRelations()
+        if usage_key not in block_relations:
+            block_relations[usage_key] = _BlockRelations()
 
 
-class _BlockData(object):
+class FieldData(object):
+    """
+    Data structure to encapsulate collected fields.
+    """
+    def class_field_names(self):
+        """
+        Returns list of names of fields that are defined directly
+        on the class. Can be overridden by subclasses. All other
+        fields are assumed to be stored in the self.fields dict.
+        """
+        return ['fields']
+
+    def __init__(self):
+        # Map of field name to the field's value for this block.
+        # dict {string: any picklable type}
+        self.fields = {}
+
+    def __getattr__(self, field_name):
+        if self._is_own_field(field_name):
+            return super(FieldData, self).__getattr__(field_name)
+        try:
+            return self.fields[field_name]
+        except KeyError:
+            raise AttributeError("Field {0} does not exist".format(field_name))
+
+    def __setattr__(self, field_name, field_value):
+        if self._is_own_field(field_name):
+            return super(FieldData, self).__setattr__(field_name, field_value)
+        else:
+            self.fields[field_name] = field_value
+
+    def __delattr__(self, field_name):
+        if self._is_own_field(field_name):
+            return super(FieldData, self).__delattr__(field_name)
+        else:
+            delattr(self.fields, field_name)
+
+    def _is_own_field(self, field_name):
+        """
+        Returns whether the given field_name is the name of an
+        actual field of this class.
+        """
+        return field_name in self.class_field_names()
+
+
+class TransformerData(FieldData):
+    """
+    Data structure to encapsulate collected data for a transformer.
+    """
+    pass
+
+
+class TransformerDataMap(dict):
+    """
+    A map of Transformer name to its corresponding TransformerData.
+    The map can be accessed by the Transformer's name or the
+    Transformer's class type.
+    """
+    def __getitem__(self, key):
+        key = self._translate_key(key)
+        return dict.__getitem__(self, key)
+
+    def __setitem__(self, key, value):
+        key = self._translate_key(key)
+        dict.__setitem__(self, key, value)
+
+    def __delitem__(self, key):
+        key = self._translate_key(key)
+        dict.__delitem__(self, key)
+
+    def get_or_create(self, key):
+        """
+        Returns the TransformerData associated with the given
+        key.  If not found, creates and returns a new TransformerData
+        and maps it to the given key.
+        """
+        try:
+            return self[key]
+        except KeyError:
+            new_transformer_data = TransformerData()
+            self[key] = new_transformer_data
+            return new_transformer_data
+
+    def _translate_key(self, key):
+        """
+        Allows the given key to be either the transformer's class or name,
+        always returning the transformer's name.  This allows
+        TransformerDataMap to be accessed in either of the following ways:
+
+            map[TransformerClass] or
+            map['transformer_name']
+        """
+        try:
+            return key.name()
+        except AttributeError:
+            return key
+
+
+class BlockData(FieldData):
     """
     Data structure to encapsulate collected data for a single block.
     """
-    def __init__(self):
-        # Map of xblock field name to the field's value for this block.
-        # dict {string: any picklable type}
-        self.xblock_fields = {}
+    def class_field_names(self):
+        return super(BlockData, self).class_field_names() + ['location', 'transformer_data']
 
-        # Map of transformer name to the transformer's data for this
-        # block.
-        # defaultdict {string: dict}
-        self.transformer_data = defaultdict(dict)
+    def __init__(self, usage_key):
+        super(BlockData, self).__init__()
+
+        # Location (or usage key) of the block.
+        self.location = usage_key
+
+        # Map of transformer name to its block-specific data.
+        self.transformer_data = TransformerDataMap()
 
 
 class BlockStructureBlockData(BlockStructure):
@@ -271,17 +396,42 @@ class BlockStructureBlockData(BlockStructure):
     Subclass of BlockStructure that is responsible for managing block
     and transformer data.
     """
+    # The latest version of the data structure of this class. Incrementally
+    # update this value whenever the data structure changes. Dependent storage
+    # layers can then use this value when serializing/deserializing block
+    # structures, and invalidating any previously cached/stored data.
+    VERSION = 1
+
     def __init__(self, root_block_usage_key):
         super(BlockStructureBlockData, self).__init__(root_block_usage_key)
 
         # Map of a block's usage key to its collected data, including
         # its xBlock fields and block-specific transformer data.
-        # defaultdict {UsageKey: _BlockData}
-        self._block_data_map = defaultdict(_BlockData)
+        # dict {UsageKey: BlockData}
+        self._block_data_map = {}
 
         # Map of a transformer's name to its non-block-specific data.
-        # defaultdict {string: dict}
-        self._transformer_data = defaultdict(dict)
+        self.transformer_data = TransformerDataMap()
+
+    def iteritems(self):
+        """
+        Returns iterator of (UsageKey, BlockData) pairs for all
+        blocks in the BlockStructure.
+        """
+        return self._block_data_map.iteritems()
+
+    def itervalues(self):
+        """
+        Returns iterator of BlockData for all blocks in the
+        BlockStructure.
+        """
+        return self._block_data_map.itervalues()
+
+    def __getitem__(self, usage_key):
+        """
+        Returns the BlockData associated with the given key.
+        """
+        return self._block_data_map.get(usage_key)
 
     def get_xblock_field(self, usage_key, field_name, default=None):
         """
@@ -300,7 +450,7 @@ class BlockStructureBlockData(BlockStructure):
                 not found.
         """
         block_data = self._block_data_map.get(usage_key)
-        return block_data.xblock_fields.get(field_name, default) if block_data else default
+        return getattr(block_data, field_name, default) if block_data else default
 
     def get_transformer_data(self, transformer, key, default=None):
         """
@@ -314,7 +464,10 @@ class BlockStructureBlockData(BlockStructure):
             key (string) - A dictionary key to the transformer's data
                 that is requested.
         """
-        return self._transformer_data.get(transformer.name(), {}).get(key, default)
+        try:
+            return getattr(self.transformer_data[transformer], key, default)
+        except KeyError:
+            return default
 
     def set_transformer_data(self, transformer, key, value):
         """
@@ -330,7 +483,23 @@ class BlockStructureBlockData(BlockStructure):
             value (any picklable type) - The value to associate with the
                 given key for the given transformer's data.
         """
-        self._transformer_data[transformer.name()][key] = value
+        setattr(self.transformer_data.get_or_create(transformer), key, value)
+
+    def get_transformer_block_data(self, usage_key, transformer):
+        """
+        Returns the TransformerData for the given
+        transformer for the block identified by the given usage_key.
+
+        Raises KeyError if not found.
+
+        Arguments:
+            usage_key (UsageKey) - Usage key of the block whose
+                transformer data is requested.
+
+            transformer (BlockStructureTransformer) - The transformer
+                whose dictionary data is requested.
+        """
+        return self._block_data_map[usage_key].transformer_data[transformer]
 
     def get_transformer_block_field(self, usage_key, transformer, key, default=None):
         """
@@ -351,8 +520,11 @@ class BlockStructureBlockData(BlockStructure):
             default (any type) - The value to return if a dictionary
                 entry is not found.
         """
-        transformer_data = self.get_transformer_block_data(usage_key, transformer)
-        return transformer_data.get(key, default)
+        try:
+            transformer_data = self.get_transformer_block_data(usage_key, transformer)
+        except KeyError:
+            return default
+        return getattr(transformer_data, key, default)
 
     def set_transformer_block_field(self, usage_key, transformer, key, value):
         """
@@ -372,30 +544,11 @@ class BlockStructureBlockData(BlockStructure):
                 given key for the given transformer's data for the
                 requested block.
         """
-        self._block_data_map[usage_key].transformer_data[transformer.name()][key] = value
-
-    def get_transformer_block_data(self, usage_key, transformer):
-        """
-        Returns the entire transformer data dict for the given
-        transformer for the block identified by the given usage_key;
-        returns an empty dict {} if not found.
-
-        Arguments:
-            usage_key (UsageKey) - Usage key of the block whose
-                transformer data is requested.
-
-            transformer (BlockStructureTransformer) - The transformer
-                whose dictionary data is requested.
-
-            key (string) - A dictionary key to the transformer's data
-                that is requested.
-        """
-        default = {}
-        block_data = self._block_data_map.get(usage_key)
-        if not block_data:
-            return default
-        else:
-            return block_data.transformer_data.get(transformer.name(), default)
+        setattr(
+            self._get_or_create_block(usage_key).transformer_data.get_or_create(transformer),
+            key,
+            value,
+        )
 
     def remove_transformer_block_field(self, usage_key, transformer, key):
         """
@@ -409,8 +562,11 @@ class BlockStructureBlockData(BlockStructure):
             transformer (BlockStructureTransformer) - The transformer
                 whose data entry is to be deleted.
         """
-        transformer_block_data = self.get_transformer_block_data(usage_key, transformer)
-        transformer_block_data.pop(key, None)
+        try:
+            transformer_block_data = self.get_transformer_block_data(usage_key, transformer)
+            delattr(transformer_block_data, key)
+        except (AttributeError, KeyError):
+            pass
 
     def remove_block(self, usage_key, keep_descendants):
         """
@@ -453,11 +609,16 @@ class BlockStructureBlockData(BlockStructure):
                 for parent in parents:
                     self._add_relation(parent, child)
 
-    def remove_block_if(self, removal_condition, keep_descendants=False, **kwargs):
+    def create_universal_filter(self):
         """
-        A higher-order function that traverses the block structure
-        using topological sort and removes any blocks encountered that
-        satisfy the removal_condition.
+        Returns a filter function that always returns True for all blocks.
+        """
+        return lambda block_key: True
+
+    def create_removal_filter(self, removal_condition, keep_descendants=False):
+        """
+        Returns a filter function that automatically removes blocks that satisfy
+        the removal_condition.
 
         Arguments:
             removal_condition ((usage_key)->bool) - A function that
@@ -466,19 +627,67 @@ class BlockStructureBlockData(BlockStructure):
 
             keep_descendants (bool) - See the description in
                 remove_block.
+        """
+        return partial(
+            self.retain_or_remove,
+            removal_condition=removal_condition,
+            keep_descendants=keep_descendants,
+        )
+
+    def retain_or_remove(self, block_key, removal_condition, keep_descendants=False):
+        """
+        Removes the given block if it satisfies the removal_condition.
+        Returns True if the block was retained, and False if the block
+        was removed.
+
+        Arguments:
+            block_key (usage_key) - Usage key of the block.
+
+            removal_condition ((usage_key)->bool) - A function that
+                takes a block's usage key as input and returns whether
+                or not to remove that block from the block structure.
+
+            keep_descendants (bool) - See the description in
+                remove_block.
+        """
+        if removal_condition(block_key):
+            self.remove_block(block_key, keep_descendants)
+            return False
+        return True
+
+    def remove_block_traversal(self, removal_condition, keep_descendants=False):
+        """
+        A higher-order function that traverses the block structure
+        using topological sort and removes all blocks satisfying the given
+        removal_condition.
+
+        Arguments:
+            removal_condition ((usage_key)->bool) - A function that
+                takes a block's usage key as input and returns whether
+                or not to remove that block from the block structure.
+
+            keep_descendants (bool) - See the description in
+                remove_block.
+        """
+        self.filter_topological_traversal(
+            filter_func=self.create_removal_filter(
+                removal_condition, keep_descendants
+            )
+        )
+
+    def filter_topological_traversal(self, filter_func, **kwargs):
+        """
+        A higher-order function that traverses the block structure
+        using topological sort and applies the given filter.
+
+        Arguments:
+            filter_func ((usage_key)->bool) - Function that returns
+                whether or not to yield the given block key.
+                If None, the True function is assumed.
 
             kwargs (dict) - Optional keyword arguments to be forwarded
                 to topological_traversal.
         """
-        def filter_func(block_key):
-            """
-            Filter function for removing blocks that satisfy the
-            removal_condition.
-            """
-            if removal_condition(block_key):
-                self.remove_block(block_key, keep_descendants)
-                return False
-            return True
 
         # Note: For optimization, we remove blocks using the filter
         # function, since the graph traversal method can skip over
@@ -510,6 +719,19 @@ class BlockStructureBlockData(BlockStructure):
         if transformer.VERSION == 0:
             raise TransformerException('VERSION attribute is not set on transformer {0}.', transformer.name())
         self.set_transformer_data(transformer, TRANSFORMER_VERSION_KEY, transformer.VERSION)
+
+    def _get_or_create_block(self, usage_key):
+        """
+        Returns the BlockData associated with the given usage_key.
+        If not found, creates and returns a new BlockData and
+        maps it to the given key.
+        """
+        try:
+            return self._block_data_map[usage_key]
+        except KeyError:
+            block_data = BlockData(usage_key)
+            self._block_data_map[usage_key] = block_data
+            return block_data
 
 
 class BlockStructureModulestoreData(BlockStructureBlockData):
@@ -583,23 +805,19 @@ class BlockStructureModulestoreData(BlockStructureBlockData):
         Iterates through all instantiated xBlocks that were added and
         collects all xBlock fields that were requested.
         """
-        if not self._requested_xblock_fields:
-            return
-
         for xblock_usage_key, xblock in self._xblock_map.iteritems():
+            block_data = self._get_or_create_block(xblock_usage_key)
             for field_name in self._requested_xblock_fields:
-                self._set_xblock_field(xblock_usage_key, xblock, field_name)
+                self._set_xblock_field(block_data, xblock, field_name)
 
-    def _set_xblock_field(self, usage_key, xblock, field_name):
+    def _set_xblock_field(self, block_data, xblock, field_name):
         """
         Updates the given block's xBlock fields data with the xBlock
         value for the given field name.
 
         Arguments:
-            usage_key (UsageKey) - Usage key of the given xBlock.  This
-                value is passed in separately as opposed to retrieving
-                it from the given xBlock since this interface is
-                agnostic to and decoupled from the xBlock interface.
+            block_data (BlockData) - A BlockStructure BlockData
+                object.
 
             xblock (XBlock) - An instantiated XBlock object whose
                 field is being accessed and collected for later
@@ -609,4 +827,4 @@ class BlockStructureModulestoreData(BlockStructureBlockData):
                 being collected and stored.
         """
         if hasattr(xblock, field_name):
-            self._block_data_map[usage_key].xblock_fields[field_name] = getattr(xblock, field_name)
+            setattr(block_data, field_name, getattr(xblock, field_name))

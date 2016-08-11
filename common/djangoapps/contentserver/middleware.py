@@ -3,21 +3,21 @@ Middleware to serve assets.
 """
 
 import logging
-
 import datetime
+import newrelic.agent
 from django.http import (
     HttpResponse, HttpResponseNotModified, HttpResponseForbidden,
-    HttpResponseBadRequest, HttpResponseNotFound)
+    HttpResponseBadRequest, HttpResponseNotFound, HttpResponsePermanentRedirect)
 from student.models import CourseEnrollment
-from contentserver.models import CourseAssetCacheTtlConfig
+from contentserver.models import CourseAssetCacheTtlConfig, CdnUserAgentsConfig
 
-from clean_headers import remove_headers_from_response
+from header_control import force_header_for_response
 from xmodule.assetstore.assetmgr import AssetManager
 from xmodule.contentstore.content import StaticContent, XASSET_LOCATION_TAG
 from xmodule.modulestore import InvalidLocationError
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locator import AssetLocator
-from cache_toolbox.core import get_cached_content, set_cached_content
+from .caching import get_cached_content, set_cached_content
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.exceptions import NotFoundError
 
@@ -29,31 +29,72 @@ HTTP_DATE_FORMAT = "%a, %d %b %Y %H:%M:%S GMT"
 
 
 class StaticContentServer(object):
+    """
+    Serves course assets to end users.  Colloquially referred to as "contentserver."
+    """
     def is_asset_request(self, request):
         """Determines whether the given request is an asset request"""
         return (
             request.path.startswith('/' + XASSET_LOCATION_TAG + '/')
             or
             request.path.startswith('/' + AssetLocator.CANONICAL_NAMESPACE)
+            or
+            StaticContent.is_versioned_asset_path(request.path)
         )
 
     def process_request(self, request):
         """Process the given request"""
+        asset_path = request.path
+
         if self.is_asset_request(request):
             # Make sure we can convert this request into a location.
-            if AssetLocator.CANONICAL_NAMESPACE in request.path:
-                request.path = request.path.replace('block/', 'block@', 1)
+            if AssetLocator.CANONICAL_NAMESPACE in asset_path:
+                asset_path = asset_path.replace('block/', 'block@', 1)
+
+            # If this is a versioned request, pull out the digest and chop off the prefix.
+            requested_digest = None
+            if StaticContent.is_versioned_asset_path(asset_path):
+                requested_digest, asset_path = StaticContent.parse_versioned_asset_path(asset_path)
+
+            # Make sure we have a valid location value for this asset.
             try:
-                loc = StaticContent.get_location_from_path(request.path)
+                loc = StaticContent.get_location_from_path(asset_path)
             except (InvalidLocationError, InvalidKeyError):
                 return HttpResponseBadRequest()
 
-            # Try and load the asset.
-            content = None
+            # Attempt to load the asset to make sure it exists, and grab the asset digest
+            # if we're able to load it.
+            actual_digest = None
             try:
                 content = self.load_asset_from_location(loc)
+                actual_digest = getattr(content, "content_digest", None)
             except (ItemNotFoundError, NotFoundError):
                 return HttpResponseNotFound()
+
+            # If this was a versioned asset, and the digest doesn't match, redirect
+            # them to the actual version.
+            if requested_digest is not None and actual_digest is not None and (actual_digest != requested_digest):
+                actual_asset_path = StaticContent.add_version_to_asset_path(asset_path, actual_digest)
+                return HttpResponsePermanentRedirect(actual_asset_path)
+
+            # Set the basics for this request. Make sure that the course key for this
+            # asset has a run, which old-style courses do not.  Otherwise, this will
+            # explode when the key is serialized to be sent to NR.
+            safe_course_key = loc.course_key
+            if safe_course_key.run is None:
+                safe_course_key = safe_course_key.replace(run='only')
+
+            newrelic.agent.add_custom_parameter('course_id', safe_course_key)
+            newrelic.agent.add_custom_parameter('org', loc.org)
+            newrelic.agent.add_custom_parameter('contentserver.path', loc.path)
+
+            # Figure out if this is a CDN using us as the origin.
+            is_from_cdn = StaticContentServer.is_cdn_request(request)
+            newrelic.agent.add_custom_parameter('contentserver.from_cdn', is_from_cdn)
+
+            # Check if this content is locked or not.
+            locked = self.is_content_locked(content)
+            newrelic.agent.add_custom_parameter('contentserver.locked', locked)
 
             # Check that user has access to the content.
             if not self.is_user_authorized(request, content, loc):
@@ -109,6 +150,8 @@ class StaticContentServer(object):
                             )
                             response['Content-Length'] = str(last - first + 1)
                             response.status_code = 206  # Partial Content
+
+                            newrelic.agent.add_custom_parameter('contentserver.ranged', True)
                         else:
                             log.warning(
                                 u"Cannot satisfy ranges in Range header: %s for content: %s", header_value, unicode(loc)
@@ -119,6 +162,9 @@ class StaticContentServer(object):
             if response is None:
                 response = HttpResponse(content.stream_data())
                 response['Content-Length'] = content.length
+
+            newrelic.agent.add_custom_parameter('contentserver.content_len', content.length)
+            newrelic.agent.add_custom_parameter('contentserver.content_type', content.content_type)
 
             # "Accept-Ranges: bytes" tells the user that only "bytes" ranges are allowed
             response['Accept-Ranges'] = 'bytes'
@@ -146,14 +192,37 @@ class StaticContentServer(object):
         # indicate there should be no caching whatsoever.
         cache_ttl = CourseAssetCacheTtlConfig.get_cache_ttl()
         if cache_ttl > 0 and not is_locked:
+            newrelic.agent.add_custom_parameter('contentserver.cacheable', True)
+
             response['Expires'] = StaticContentServer.get_expiration_value(datetime.datetime.utcnow(), cache_ttl)
             response['Cache-Control'] = "public, max-age={ttl}, s-maxage={ttl}".format(ttl=cache_ttl)
         elif is_locked:
+            newrelic.agent.add_custom_parameter('contentserver.cacheable', False)
+
             response['Cache-Control'] = "private, no-cache, no-store"
 
         response['Last-Modified'] = content.last_modified_at.strftime(HTTP_DATE_FORMAT)
 
-        remove_headers_from_response(response, "Vary")
+        # Force the Vary header to only vary responses on Origin, so that XHR and browser requests get cached
+        # separately and don't screw over one another. i.e. a browser request that doesn't send Origin, and
+        # caches a version of the response without CORS headers, in turn breaking XHR requests.
+        force_header_for_response(response, 'Vary', 'Origin')
+
+    @staticmethod
+    def is_cdn_request(request):
+        """
+        Attempts to determine whether or not the given request is coming from a CDN.
+
+        Currently, this is a static check because edx.org only uses CloudFront, but may
+        be expanded in the future.
+        """
+        cdn_user_agents = CdnUserAgentsConfig.get_cdn_user_agents()
+        user_agent = request.META.get('HTTP_USER_AGENT', '')
+        if user_agent in cdn_user_agents:
+            # This is a CDN request.
+            return True
+
+        return False
 
     @staticmethod
     def get_expiration_value(now, cache_ttl):
@@ -161,13 +230,17 @@ class StaticContentServer(object):
         expire_dt = now + datetime.timedelta(seconds=cache_ttl)
         return expire_dt.strftime(HTTP_DATE_FORMAT)
 
+    def is_content_locked(self, content):
+        """
+        Determines whether or not the given content is locked.
+        """
+        return bool(getattr(content, "locked", False))
+
     def is_user_authorized(self, request, content, location):
         """
         Determines whether or not the user for this request is authorized to view the given asset.
         """
-
-        is_locked = getattr(content, "locked", False)
-        if not is_locked:
+        if not self.is_content_locked(content):
             return True
 
         if not hasattr(request, "user") or not request.user.is_authenticated():

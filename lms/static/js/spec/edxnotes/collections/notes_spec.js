@@ -5,11 +5,11 @@ define([
     describe('EdxNotes NotesCollection', function() {
         var notes = Helpers.getDefaultNotes();
 
-        beforeEach(function () {
-            this.collection = new NotesCollection(notes);
+        beforeEach(function() {
+            this.collection = new NotesCollection(notes, {perPage: 10, parse: true});
         });
 
-        it('can return correct course structure', function () {
+        it('can return correct course structure', function() {
             var structure = this.collection.getCourseStructure();
 
             expect(structure.chapters).toEqual([
@@ -23,11 +23,22 @@ define([
                 'i4x://section/2': Helpers.getSection('First Section', 2, [3])
             });
 
-            expect(structure.units).toEqual({
+            var compareUnits = function(structureUnits, collectionUnits) {
+                expect(structureUnits.length === collectionUnits.length).toBeTruthy();
+                for (var i = 0; i < structureUnits.length; i++) {
+                    expect(structureUnits[i].attributes).toEqual(collectionUnits[i].attributes);
+                }
+            };
+
+            var units = {
                 'i4x://unit/0': [this.collection.at(0), this.collection.at(1)],
                 'i4x://unit/1': [this.collection.at(2)],
                 'i4x://unit/2': [this.collection.at(3)],
                 'i4x://unit/3': [this.collection.at(4)]
+            };
+
+            _.each(units, function(value, key) {
+                compareUnits(structure.units[key], value);
             });
         });
     });

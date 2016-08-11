@@ -1,3 +1,4 @@
+<%page expression_filter="h"/>
 <%inherit file="base.html" />
 <%def name="online_help_token()"><% return "updates" %></%def>
 <%namespace name='static' file='static_content.html'/>
@@ -44,7 +45,7 @@ from openedx.core.djangolib.js_utils import (
         <h3 class="sr">${_('Page Actions')}</h3>
         <ul>
           <li class="nav-item">
-            <a href="#" class=" button new-button new-update-button"><i class="icon fa fa-plus"></i> ${_('New Update')}</a>
+            <a href="#" class=" button new-button new-update-button"><span class="icon fa fa-plus" aria-hidden="true"></span> ${_('New Update')}</a>
           </li>
         </ul>
       </nav>

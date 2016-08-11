@@ -3,16 +3,18 @@
 Tests for js_utils.py
 """
 import json
+from nose.plugins.attrib import attr
 from unittest import TestCase
 import HTMLParser
 
 from mako.template import Template
 
 from openedx.core.djangolib.js_utils import (
-    dump_js_escaped_json, dump_html_escaped_json, js_escaped_string
+    dump_js_escaped_json, js_escaped_string
 )
 
 
+@attr(shard=2)
 class TestJSUtils(TestCase):
     """
     Test JS utils
@@ -66,38 +68,6 @@ class TestJSUtils(TestCase):
         escaped_json = dump_js_escaped_json(malicious_dict, cls=self.SampleJSONEncoder)
         self.assertEquals(expected_custom_escaped_json, escaped_json)
 
-    def test_dump_html_escaped_json_escapes_unsafe_html(self):
-        """
-        Test dump_html_escaped_json properly escapes &, <, and >.
-        """
-        malicious_dict = {"</script><script>alert('hello, ');</script>": "</script><script>alert('&world!');</script>"}
-        expected_escaped_json = (
-            "{&#34;&lt;/script&gt;&lt;script&gt;alert(&#39;hello, &#39;);&lt;/script&gt;&#34;: "
-            "&#34;&lt;/script&gt;&lt;script&gt;alert(&#39;&amp;world!&#39;);&lt;/script&gt;&#34;}"
-        )
-
-        escaped_json = dump_html_escaped_json(malicious_dict)
-        self.assertEquals(expected_escaped_json, escaped_json)
-
-    def test_dump_html_escaped_json_with_custom_encoder_escapes_unsafe_html(self):
-        """
-        Test dump_html_escaped_json first encodes with custom JSNOEncoder before escaping &, <, and >
-
-        The test encoder class should first perform the replacement of "<script>" with
-        "sample-encoder-was-here", and then should escape the remaining &, <, and >.
-
-        """
-        malicious_dict = {
-            "</script><script>alert('hello, ');</script>":
-            self.NoDefaultEncoding("</script><script>alert('&world!');</script>")
-        }
-        expected_custom_escaped_json = (
-            "{&#34;&lt;/script&gt;&lt;script&gt;alert(&#39;hello, &#39;);&lt;/script&gt;&#34;: "
-            "&#34;&lt;/script&gt;sample-encoder-was-herealert(&#39;&amp;world!&#39;);&lt;/script&gt;&#34;}"
-        )
-        escaped_json = dump_html_escaped_json(malicious_dict, cls=self.SampleJSONEncoder)
-        self.assertEquals(expected_custom_escaped_json, escaped_json)
-
     def test_js_escaped_string_escapes_unsafe_html(self):
         """
         Test js_escaped_string escapes &, <, and >, as well as returns a unicode type
@@ -137,17 +107,18 @@ class TestJSUtils(TestCase):
         template = Template(
             """
                 <%!
+                import json
                 from openedx.core.djangolib.js_utils import (
-                    dump_js_escaped_json, dump_html_escaped_json, js_escaped_string
+                    dump_js_escaped_json, js_escaped_string
                 )
                 %>
                 <body>
                     <div
-                        data-test-dict='${test_dict | n, dump_html_escaped_json}'
+                        data-test-dict='${json.dumps(test_dict)}'
                         data-test-string='${test_dict["test_string"]}'
-                        data-test-tuple='${test_dict["test_tuple"] | n, dump_html_escaped_json}'
-                        data-test-number='${test_dict["test_number"] | n, dump_html_escaped_json}'
-                        data-test-bool='${test_dict["test_bool"] | n, dump_html_escaped_json}'
+                        data-test-tuple='${json.dumps(test_dict["test_tuple"])}'
+                        data-test-number='${json.dumps(test_dict["test_number"])}'
+                        data-test-bool='${json.dumps(test_dict["test_bool"])}'
                     ></div>
 
                     <script>

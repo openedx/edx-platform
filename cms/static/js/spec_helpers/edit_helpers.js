@@ -1,11 +1,10 @@
 /**
  * Provides helper methods for invoking Studio editors in Jasmine tests.
  */
-define(["jquery", "underscore", "common/js/spec_helpers/ajax_helpers", "common/js/spec_helpers/template_helpers",
-        "js/spec_helpers/modal_helpers", "js/views/modals/edit_xblock", "js/collections/component_template",
-        "xmodule", "coffee/src/main", "xblock/cms.runtime.v1"],
+define(['jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
+        'common/js/spec_helpers/template_helpers', 'js/spec_helpers/modal_helpers', 'js/views/modals/edit_xblock',
+        'js/collections/component_template', 'xmodule', 'cms/js/main', 'xblock/cms.runtime.v1'],
     function($, _, AjaxHelpers, TemplateHelpers, modal_helpers, EditXBlockModal, ComponentTemplates) {
-
         var installMockXBlock, uninstallMockXBlock, installMockXModule, uninstallMockXModule,
             mockComponentTemplates, installEditTemplates, showEditModal, verifyXBlockRequest;
 
@@ -41,28 +40,30 @@ define(["jquery", "underscore", "common/js/spec_helpers/ajax_helpers", "common/j
 
         mockComponentTemplates = new ComponentTemplates([
             {
-                templates: [
+                'templates': [
                     {
-                        category: 'discussion',
-                        display_name: 'Discussion'
+                        'category': 'discussion',
+                        'display_name': 'Discussion'
                     }],
-                type: 'discussion'
+                'type': 'discussion',
+                'support_legend': {'show_legend': false}
             }, {
-                "templates": [
+                'templates': [
                     {
-                        "category": "html",
-                        "boilerplate_name": null,
-                        "display_name": "Text"
+                        'category': 'html',
+                        'boilerplate_name': null,
+                        'display_name': 'Text'
                     }, {
-                        "category": "html",
-                        "boilerplate_name": "announcement.yaml",
-                        "display_name": "Announcement"
+                        'category': 'html',
+                        'boilerplate_name': 'announcement.yaml',
+                        'display_name': 'Announcement'
                     }, {
-                        "category": "html",
-                        "boilerplate_name": "raw.yaml",
-                        "display_name": "Raw HTML"
+                        'category': 'html',
+                        'boilerplate_name': 'raw.yaml',
+                        'display_name': 'Raw HTML'
                     }],
-                "type": "html"
+                'type': 'html',
+                'support_legend': {'show_legend': false}
             }],
             {
                 parse: true
@@ -76,6 +77,8 @@ define(["jquery", "underscore", "common/js/spec_helpers/ajax_helpers", "common/j
             TemplateHelpers.installTemplate('add-xblock-component-button');
             TemplateHelpers.installTemplate('add-xblock-component-menu');
             TemplateHelpers.installTemplate('add-xblock-component-menu-problem');
+            TemplateHelpers.installTemplate('add-xblock-component-support-legend');
+            TemplateHelpers.installTemplate('add-xblock-component-support-level');
 
             // Add templates needed by the edit XBlock modal
             TemplateHelpers.installTemplate('edit-xblock-modal');
@@ -92,16 +95,16 @@ define(["jquery", "underscore", "common/js/spec_helpers/ajax_helpers", "common/j
             modal.edit(xblockElement, model, options);
             AjaxHelpers.respondWithJson(requests, {
                 html: mockHtml,
-                "resources": []
+                'resources': []
             });
             return modal;
         };
 
-        verifyXBlockRequest = function (requests, expectedJson) {
+        verifyXBlockRequest = function(requests, expectedJson) {
             var request = AjaxHelpers.currentRequest(requests),
                 actualJson = JSON.parse(request.requestBody);
-            expect(request.url).toEqual("/xblock/");
-            expect(request.method).toEqual("POST");
+            expect(request.url).toEqual('/xblock/');
+            expect(request.method).toEqual('POST');
             expect(actualJson).toEqual(expectedJson);
         };
 

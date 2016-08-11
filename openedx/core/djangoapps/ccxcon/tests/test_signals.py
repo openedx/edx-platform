@@ -3,12 +3,14 @@ Test for contentstore signals receiver
 """
 
 import mock
+from nose.plugins.attrib import attr
 
 from django.test import TestCase
 from opaque_keys.edx.keys import CourseKey
 from xmodule.modulestore.django import modulestore, SignalHandler
 
 
+@attr(shard=2)
 class CCXConSignalTestCase(TestCase):
     """
     The only tests currently implemented are for verifying that

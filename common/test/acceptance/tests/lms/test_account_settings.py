@@ -6,12 +6,15 @@ from unittest import skip
 from nose.plugins.attrib import attr
 
 from bok_choy.web_app_test import WebAppTest
+from bok_choy.page_object import XSS_INJECTION
+from datetime import datetime
+from pytz import timezone, utc
 
-from ...pages.lms.account_settings import AccountSettingsPage
-from ...pages.lms.auto_auth import AutoAuthPage
-from ...pages.lms.dashboard import DashboardPage
+from common.test.acceptance.pages.lms.account_settings import AccountSettingsPage
+from common.test.acceptance.pages.lms.auto_auth import AutoAuthPage
+from common.test.acceptance.pages.lms.dashboard import DashboardPage
 
-from ..helpers import EventsTestMixin
+from common.test.acceptance.tests.helpers import EventsTestMixin
 
 
 class AccountSettingsTestMixin(EventsTestMixin, WebAppTest):
@@ -33,12 +36,12 @@ class AccountSettingsTestMixin(EventsTestMixin, WebAppTest):
         self.account_settings_page.visit()
         self.account_settings_page.wait_for_ajax()
 
-    def log_in_as_unique_user(self, email=None):
+    def log_in_as_unique_user(self, email=None, full_name=None):
         """
         Create a unique user and return the account's username and id.
         """
         username = "test_{uuid}".format(uuid=self.unique_id[0:6])
-        auto_auth_page = AutoAuthPage(self.browser, username=username, email=email).visit()
+        auto_auth_page = AutoAuthPage(self.browser, username=username, email=email, full_name=full_name).visit()
         user_id = auto_auth_page.get_user_id()
         return username, user_id
 
@@ -87,7 +90,7 @@ class AccountSettingsTestMixin(EventsTestMixin, WebAppTest):
         self.assert_no_matching_events_were_emitted({'event_type': self.USER_SETTINGS_CHANGED_EVENT_NAME})
 
 
-@attr('shard_8')
+@attr(shard=8)
 class DashboardMenuTest(AccountSettingsTestMixin, WebAppTest):
     """
     Tests that the dashboard menu works correctly with the account settings page.
@@ -110,7 +113,7 @@ class DashboardMenuTest(AccountSettingsTestMixin, WebAppTest):
         dashboard_page.click_account_settings_link()
 
 
-@attr('shard_8')
+@attr(shard=8)
 class AccountSettingsPageTest(AccountSettingsTestMixin, WebAppTest):
     """
     Tests that verify behaviour of the Account Settings page.
@@ -122,7 +125,8 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, WebAppTest):
         Initialize account and pages.
         """
         super(AccountSettingsPageTest, self).setUp()
-        self.username, self.user_id = self.log_in_as_unique_user()
+        self.full_name = XSS_INJECTION
+        self.username, self.user_id = self.log_in_as_unique_user(full_name=self.full_name)
         self.visit_account_settings_page()
 
     def test_page_view_event(self):
@@ -156,31 +160,24 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, WebAppTest):
         """
         expected_sections_structure = [
             {
-                'title': 'Basic Account Information (required)',
+                'title': 'Basic Account Information',
                 'fields': [
                     'Username',
                     'Full Name',
                     'Email Address',
                     'Password',
                     'Language',
-                    'Country or Region'
+                    'Country or Region',
+                    'Time Zone',
                 ]
             },
             {
-                'title': 'Additional Information (optional)',
+                'title': 'Additional Information',
                 'fields': [
                     'Education Completed',
                     'Gender',
                     'Year of Birth',
                     'Preferred Language',
-                ]
-            },
-            {
-                'title': 'Connected Accounts',
-                'fields': [
-                    'Dummy',
-                    'Facebook',
-                    'Google',
                 ]
             }
         ]
@@ -229,7 +226,8 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, WebAppTest):
 
         for new_value in new_values:
             self.assertEqual(self.account_settings_page.value_for_dropdown_field(field_id, new_value), new_value)
-            self.account_settings_page.wait_for_message(field_id, success_message)
+            # An XHR request is made when changing the field
+            self.account_settings_page.wait_for_ajax()
             if reloads_on_save:
                 self.account_settings_page.wait_for_loading_indicator()
             else:
@@ -237,13 +235,13 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, WebAppTest):
                 self.account_settings_page.wait_for_page()
             self.assertEqual(self.account_settings_page.value_for_dropdown_field(field_id), new_value)
 
-    def _test_link_field(self, field_id, title, link_title, success_message):
+    def _test_link_field(self, field_id, title, link_title, field_type, success_message):
         """
         Test behaviour a link field.
         """
         self.assertEqual(self.account_settings_page.title_for_field(field_id), title)
         self.assertEqual(self.account_settings_page.link_title_for_link_field(field_id), link_title)
-        self.account_settings_page.click_on_link_in_link_field(field_id)
+        self.account_settings_page.click_on_link_in_link_field(field_id, field_type=field_type)
         self.account_settings_page.wait_for_message(field_id, success_message)
 
     def test_username_field(self):
@@ -259,16 +257,16 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, WebAppTest):
         self._test_text_field(
             u'name',
             u'Full Name',
-            self.username,
+            self.full_name,
             u'@',
-            [u'another name', self.username],
+            [u'another name', self.full_name],
         )
 
         actual_events = self.wait_for_events(event_filter=self.settings_changed_event_filter, number_of_matches=2)
         self.assert_events_match(
             [
-                self.expected_settings_changed_event('name', self.username, 'another name'),
-                self.expected_settings_changed_event('name', 'another name', self.username),
+                self.expected_settings_changed_event('name', self.full_name, 'another name'),
+                self.expected_settings_changed_event('name', 'another name', self.full_name),
             ],
             actual_events
         )
@@ -284,7 +282,7 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, WebAppTest):
             u'email',
             u'Email Address',
             email,
-            u'@',
+            u'test@example.com' + XSS_INJECTION,
             [u'me@here.com', u'you@there.com'],
             success_message='Click the link in the message to update your email address.',
             assert_after_reload=False
@@ -313,7 +311,8 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, WebAppTest):
         self._test_link_field(
             u'password',
             u'Password',
-            u'Reset Password',
+            u'Reset Your Password',
+            u'button',
             success_message='Click the link in the message to reset your password.',
         )
 
@@ -409,6 +408,32 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, WebAppTest):
             [u'Pakistan', u'Palau'],
         )
 
+    def test_time_zone_field(self):
+        """
+        Test behaviour of "Time Zone" field
+        """
+        kiev_abbr, kiev_offset = self._get_time_zone_info('Europe/Kiev')
+        pacific_abbr, pacific_offset = self._get_time_zone_info('US/Pacific')
+        self._test_dropdown_field(
+            u'time_zone',
+            u'Time Zone',
+            u'',
+            [
+                u'Europe/Kiev ({abbr}, UTC{offset})'.format(abbr=kiev_abbr, offset=kiev_offset),
+                u'US/Pacific ({abbr}, UTC{offset})'.format(abbr=pacific_abbr, offset=pacific_offset),
+            ],
+        )
+
+    def _get_time_zone_info(self, time_zone_str):
+        """
+        Helper that returns current time zone abbreviation and UTC offset
+        and accounts for daylight savings time
+        """
+        time_zone = datetime.now(utc).astimezone(timezone(time_zone_str))
+        abbr = time_zone.strftime('%Z')
+        offset = time_zone.strftime('%z')
+        return abbr, offset
+
     def test_preferred_language_field(self):
         """
         Test behaviour of "Preferred Language" field.
@@ -431,7 +456,7 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, WebAppTest):
             actual_events
         )
 
-    def test_connected_accounts(self):
+    def test_linked_accounts(self):
         """
         Test that fields for third party auth providers exist.
 
@@ -439,12 +464,36 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, WebAppTest):
         because that would require accounts with the providers.
         """
         providers = (
-            ['auth-oa2-facebook', 'Facebook', 'Link'],
-            ['auth-oa2-google-oauth2', 'Google', 'Link'],
+            ['auth-oa2-facebook', 'Facebook', 'Link Your Account'],
+            ['auth-oa2-google-oauth2', 'Google', 'Link Your Account'],
         )
+        # switch to "Linked Accounts" tab
+        self.account_settings_page.switch_account_settings_tabs('accounts-tab')
         for field_id, title, link_title in providers:
             self.assertEqual(self.account_settings_page.title_for_field(field_id), title)
             self.assertEqual(self.account_settings_page.link_title_for_link_field(field_id), link_title)
+
+    def test_order_history(self):
+        """
+        Test that we can see orders on Order History tab.
+        """
+        # switch to "Order History" tab
+        self.account_settings_page.switch_account_settings_tabs('orders-tab')
+        # verify that we are on correct tab
+        self.assertTrue(self.account_settings_page.is_order_history_tab_visible)
+
+        expected_order_data = {
+            'title': 'Test Course',
+            'date': 'Date Placed:\nApr 21, 2016',
+            'price': 'Cost:\n$100.0',
+            'number': 'Order Number:\nEdx-123'
+        }
+        for field_name, value in expected_order_data.iteritems():
+            self.assertEqual(
+                self.account_settings_page.get_value_of_order_history_row_item('order-Edx-123', field_name), value
+            )
+
+        self.assertTrue(self.account_settings_page.order_button_is_visible('order-Edx-123'))
 
 
 @attr('a11y')
@@ -461,8 +510,7 @@ class AccountSettingsA11yTest(AccountSettingsTestMixin, WebAppTest):
         self.visit_account_settings_page()
         self.account_settings_page.a11y_audit.config.set_rules({
             'ignore': [
-                'link-href',  # TODO: AC-233, AC-238
-                'skip-link',  # TODO: AC-179
+                'link-href',  # TODO: AC-233
             ],
         })
         self.account_settings_page.a11y_audit.check_for_accessibility_errors()

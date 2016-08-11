@@ -5,7 +5,6 @@
 
 .wrapper-footer {
   @extend %ui-print-excluded;
-  margin-top: ($baseline*2);
   box-shadow: 0 -1px 5px 0 $shadow-l1;
   border-top: 1px solid tint($m-gray, 50%);
   padding: 25px ($baseline/2) ($baseline*1.5) ($baseline/2);
@@ -191,9 +190,7 @@
 
   // edx theme overrides
   &.edx-footer {
-
     footer {
-
       .copyright {
         text-align: right;
       }
@@ -213,89 +210,6 @@
 
     .colophon-about img {
       margin-top: ($baseline*1.5);
-    }
-  }
-}
-
-
-// edX theme: LMS Footer
-// ====================
-$edx-footer-spacing: ($baseline*0.75);
-$edx-footer-link-color: $link-color;
-$edx-footer-bg-color: rgb(252,252,252);
-
-%edx-footer-reset {
-  @include box-sizing(border-box);
-}
-
-%edx-footer-section {
-  @include float(left);
-  min-height: ($baseline*17.5);
-  @include margin-right(flex-gutter());
-  @include border-right(1px solid rgb(230, 230, 230));
-  @include padding-right($baseline*1.5);
-
-  // CASE: last child
-  &:last-child {
-    @include margin-right(0);
-    border: none;
-    @include padding-right(0);
-  }
-}
-
-%edx-footer-title {
-  // TODO: refactor _typography.scss to extend this set of styling
-  @extend %t-title;
-  @extend %t-weight4;
-  @include font-size(15);
-  @include line-height(15);
-  text-transform: none;
-  letter-spacing: inherit;
-  color: rgb(61, 62, 63);
-}
-
-%edx-footer-link {
-  @extend %t-copy-sub1;
-  @include transition(color $tmg-f2 ease-in-out 0);
-  display: block;
-  margin-bottom: ($baseline/2);
-
-  // NOTE: resetting poor link styles
-  border: none;
-  padding: 0;
-  color: $edx-footer-link-color;
-
-  .copy {
-    @include transition(border-color $tmg-f2 ease-in-out 0);
-    display: inline-block;
-    border-bottom: 1px solid transparent;
-    padding: 0 0 ($baseline/20) 0;
-    color: $edx-footer-link-color;
-  }
-
-  // STATE: hover + focused
-  &:hover, &:focus {
-    color: saturate($edx-footer-link-color, 25%);
-
-    // NOTE: resetting poor link styles
-    border: none;
-
-    .copy {
-      border-bottom-color: saturate($edx-footer-link-color, 25%);
-    }
-  }
-
-  // CASE: last child
-  &:last-child {
-    margin-bottom: 0;
-  }
-
-  // CASE: has visual emphasis
-  &.has-emphasis {
-    @extend %t-weight4;
-
-    .copy {
-      @extend %t-weight4;
     }
   }
 }

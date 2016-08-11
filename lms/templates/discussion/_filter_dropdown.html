@@ -1,14 +1,16 @@
+<%page expression_filter="h"/>
 <%!
 from django.utils.translation import ugettext as _
-import json
+
+from openedx.core.djangolib.markup import HTML
 %>
 
 <%def name="render_dropdown(map)">
     % for child in map["children"]:
         % if child in map["entries"]:
-            ${render_entry(map["entries"], child)}
+            ${HTML(render_entry(map["entries"], child))}
         %else:
-            ${render_category(map["subcategories"], child)}
+            ${HTML(render_category(map["subcategories"], child))}
         %endif
     %endfor
 </%def>
@@ -27,7 +29,7 @@ import json
     <li class="forum-nav-browse-menu-item">
         <button type="button" class="forum-nav-browse-title">${category}</button>
         <ul class="forum-nav-browse-submenu">
-            ${render_dropdown(categories[category])}
+            ${HTML(render_dropdown(categories[category]))}
         </ul>
     </li>
 </%def>
@@ -50,6 +52,6 @@ import json
                 ${_("Posts I'm Following")}
             </button>
         </li>
-        ${render_dropdown(category_map)}
+        ${HTML(render_dropdown(category_map))}
     </ul>
 </div>

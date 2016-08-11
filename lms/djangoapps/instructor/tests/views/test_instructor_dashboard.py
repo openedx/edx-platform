@@ -2,7 +2,10 @@
 Unit tests for instructor_dashboard.py.
 """
 import ddt
+import datetime
 from mock import patch
+from nose.plugins.attrib import attr
+from pytz import UTC
 
 from django.conf import settings
 from django.core.urlresolvers import reverse
@@ -10,16 +13,16 @@ from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from edxmako.shortcuts import render_to_response
 
-from lms.djangoapps.ccx.tests.test_views import setup_students_and_grades
 from courseware.tabs import get_course_tab_list
-from courseware.tests.factories import UserFactory
+from courseware.tests.factories import UserFactory, StudentModuleFactory
 from courseware.tests.helpers import LoginEnrollmentTestCase
 from instructor.views.gradebook_api import calculate_page_info
 
 from common.test.utils import XssTestMixin
-from student.tests.factories import AdminFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
+from student.tests.factories import AdminFactory, CourseEnrollmentFactory
+from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, TEST_DATA_SPLIT_MODULESTORE
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
 from shoppingcart.models import PaidCourseRegistration, Order, CourseRegCodeItem
 from course_modes.models import CourseMode
 from student.roles import CourseFinanceAdminRole
@@ -40,6 +43,7 @@ def intercept_renderer(path, context):
     return response
 
 
+@attr(shard=3)
 @ddt.ddt
 class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssTestMixin):
     """
@@ -106,7 +110,7 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         CourseFinanceAdminRole(self.course.id).add_users(self.instructor)
         total_amount = PaidCourseRegistration.get_total_amount_of_purchased_item(self.course.id)
         response = self.client.get(self.url)
-        self.assertTrue('${amount}'.format(amount=total_amount) in response.content)
+        self.assertIn('${amount}'.format(amount=total_amount), response.content)
 
     def test_course_name_xss(self):
         """Test that the instructor dashboard correctly escapes course names
@@ -133,7 +137,7 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         """
         response = self.client.get(self.url)
         # no enrollment information should be visible
-        self.assertFalse('<h2>Enrollment Information</h2>' in response.content)
+        self.assertNotIn('<h3 class="hd hd-3">Enrollment Information</h3>', response.content)
 
     @patch.dict(settings.FEATURES, {'DISPLAY_ANALYTICS_ENROLLMENTS': True})
     @override_settings(ANALYTICS_DASHBOARD_URL='')
@@ -144,14 +148,14 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         response = self.client.get(self.url)
 
         # enrollment information visible
-        self.assertTrue('<h2>Enrollment Information</h2>' in response.content)
-        self.assertTrue('<td>Verified</td>' in response.content)
-        self.assertTrue('<td>Audit</td>' in response.content)
-        self.assertTrue('<td>Honor</td>' in response.content)
-        self.assertTrue('<td>Professional</td>' in response.content)
+        self.assertIn('<h3 class="hd hd-3">Enrollment Information</h3>', response.content)
+        self.assertIn('<th scope="row">Verified</th>', response.content)
+        self.assertIn('<th scope="row">Audit</th>', response.content)
+        self.assertIn('<th scope="row">Honor</th>', response.content)
+        self.assertIn('<th scope="row">Professional</th>', response.content)
 
         # dashboard link hidden
-        self.assertFalse(self.get_dashboard_enrollment_message() in response.content)
+        self.assertNotIn(self.get_dashboard_enrollment_message(), response.content)
 
     @patch.dict(settings.FEATURES, {'DISPLAY_ANALYTICS_ENROLLMENTS': True})
     @override_settings(ANALYTICS_DASHBOARD_URL='')
@@ -162,11 +166,10 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         users = [UserFactory() for _ in range(2)]
         CourseEnrollment.enroll(users[0], self.course.id, mode="professional")
         CourseEnrollment.enroll(users[1], self.course.id, mode="no-id-professional")
-
         response = self.client.get(self.url)
 
         # Check that the number of professional enrollments is two
-        self.assertContains(response, "<td>Professional</td><td>2</td>")
+        self.assertContains(response, '<th scope="row">Professional</th><td>2</td>')
 
     @patch.dict(settings.FEATURES, {'DISPLAY_ANALYTICS_ENROLLMENTS': False})
     @override_settings(ANALYTICS_DASHBOARD_URL='http://example.com')
@@ -178,14 +181,14 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         response = self.client.get(self.url)
 
         # enrollment information hidden
-        self.assertFalse('<td>Verified</td>' in response.content)
-        self.assertFalse('<td>Audit</td>' in response.content)
-        self.assertFalse('<td>Honor</td>' in response.content)
-        self.assertFalse('<td>Professional</td>' in response.content)
+        self.assertNotIn('<th scope="row">Verified</th>', response.content)
+        self.assertNotIn('<th scope="row">Audit</th>', response.content)
+        self.assertNotIn('<th scope="row">Honor</th>', response.content)
+        self.assertNotIn('<th scope="row">Professional</th>', response.content)
 
         # link to dashboard shown
         expected_message = self.get_dashboard_enrollment_message()
-        self.assertTrue(expected_message in response.content)
+        self.assertIn(expected_message, response.content)
 
     @override_settings(ANALYTICS_DASHBOARD_URL='')
     @override_settings(ANALYTICS_DASHBOARD_NAME='')
@@ -195,7 +198,7 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         """
         response = self.client.get(self.url)
         analytics_section = '<li class="nav-item"><a href="" data-section="instructor_analytics">Analytics</a></li>'
-        self.assertFalse(analytics_section in response.content)
+        self.assertNotIn(analytics_section, response.content)
 
     @override_settings(ANALYTICS_DASHBOARD_URL='http://example.com')
     @override_settings(ANALYTICS_DASHBOARD_NAME='Example')
@@ -205,11 +208,11 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         """
         response = self.client.get(self.url)
         analytics_section = '<li class="nav-item"><a href="" data-section="instructor_analytics">Analytics</a></li>'
-        self.assertTrue(analytics_section in response.content)
+        self.assertIn(analytics_section, response.content)
 
         # link to dashboard shown
         expected_message = self.get_dashboard_analytics_message()
-        self.assertTrue(expected_message in response.content)
+        self.assertIn(expected_message, response.content)
 
     def add_course_to_user_cart(self, cart, course_key):
         """
@@ -284,7 +287,10 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
     @patch('instructor.views.gradebook_api.render_to_response', intercept_renderer)
     @patch('instructor.views.gradebook_api.MAX_STUDENTS_PER_PAGE_GRADE_BOOK', 1)
     def test_spoc_gradebook_pages(self):
-        setup_students_and_grades(self)
+        for i in xrange(2):
+            username = "user_%d" % i
+            student = UserFactory.create(username=username)
+            CourseEnrollmentFactory.create(user=student, course_id=self.course.id)
         url = reverse(
             'spoc_gradebook',
             kwargs={'course_id': self.course.id}
@@ -293,3 +299,98 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         self.assertEqual(response.status_code, 200)
         # Max number of student per page is one.  Patched setting MAX_STUDENTS_PER_PAGE_GRADE_BOOK = 1
         self.assertEqual(len(response.mako_context['students']), 1)  # pylint: disable=no-member
+
+
+@ddt.ddt
+class TestInstructorDashboardPerformance(ModuleStoreTestCase, LoginEnrollmentTestCase, XssTestMixin):
+    """
+    Tests for the instructor dashboard from the performance point of view.
+    """
+    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
+
+    def setUp(self):
+        """
+        Set up tests
+        """
+        super(TestInstructorDashboardPerformance, self).setUp()
+        self.course = CourseFactory.create(
+            grading_policy={"GRADE_CUTOFFS": {"A": 0.75, "B": 0.63, "C": 0.57, "D": 0.5}},
+            display_name='<script>alert("XSS")</script>',
+            default_store=ModuleStoreEnum.Type.split
+        )
+
+        self.course_mode = CourseMode(
+            course_id=self.course.id,
+            mode_slug=CourseMode.DEFAULT_MODE_SLUG,
+            mode_display_name=CourseMode.DEFAULT_MODE.name,
+            min_price=40
+        )
+        self.course_mode.save()
+        # Create instructor account
+        self.instructor = AdminFactory.create()
+        self.client.login(username=self.instructor.username, password="test")
+
+    def test_spoc_gradebook_mongo_calls(self):
+        """
+        Test that the MongoDB cache is used in API to return grades
+        """
+        # prepare course structure
+        course = ItemFactory.create(
+            parent_location=self.course.location,
+            category="course",
+            display_name="Test course",
+        )
+
+        students = []
+        for i in xrange(20):
+            username = "user_%d" % i
+            student = UserFactory.create(username=username)
+            CourseEnrollmentFactory.create(user=student, course_id=self.course.id)
+            students.append(student)
+
+        chapter = ItemFactory.create(
+            parent=course,
+            category='chapter',
+            display_name="Chapter",
+            publish_item=True,
+            start=datetime.datetime(2015, 3, 1, tzinfo=UTC),
+        )
+        sequential = ItemFactory.create(
+            parent=chapter,
+            category='sequential',
+            display_name="Lesson",
+            publish_item=True,
+            start=datetime.datetime(2015, 3, 1, tzinfo=UTC),
+            metadata={'graded': True, 'format': 'Homework'},
+        )
+        vertical = ItemFactory.create(
+            parent=sequential,
+            category='vertical',
+            display_name='Subsection',
+            publish_item=True,
+            start=datetime.datetime(2015, 4, 1, tzinfo=UTC),
+        )
+        for i in xrange(10):
+            problem = ItemFactory.create(
+                category="problem",
+                parent=vertical,
+                display_name="A Problem Block %d" % i,
+                weight=1,
+                publish_item=False,
+                metadata={'rerandomize': 'always'},
+            )
+            for j in students:
+                grade = i % 2
+                StudentModuleFactory.create(
+                    grade=grade,
+                    max_grade=1,
+                    student=j,
+                    course_id=self.course.id,
+                    module_state_key=problem.location
+                )
+
+        # check MongoDB calls count
+        url = reverse('spoc_gradebook', kwargs={'course_id': self.course.id})
+        with check_mongo_calls(7):
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, 200)

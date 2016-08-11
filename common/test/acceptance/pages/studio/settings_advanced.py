@@ -3,8 +3,12 @@ Course Advanced Settings page
 """
 
 from bok_choy.promise import EmptyPromise
-from .course_page import CoursePage
-from .utils import press_the_notification_button, type_in_codemirror, get_codemirror_value
+from common.test.acceptance.pages.studio.course_page import CoursePage
+from common.test.acceptance.pages.studio.utils import (
+    press_the_notification_button,
+    type_in_codemirror,
+    get_codemirror_value,
+)
 
 
 KEY_CSS = '.key h3.title'
@@ -173,6 +177,8 @@ class AdvancedSettingsPage(CoursePage):
             'cert_name_short',
             'certificates_display_behavior',
             'course_image',
+            'banner_image',
+            'video_thumbnail_image',
             'cosmetic_display_price',
             'advertised_start',
             'announcement',
@@ -186,9 +192,7 @@ class AdvancedSettingsPage(CoursePage):
             'display_coursenumber',
             'display_organization',
             'catalog_visibility',
-            'chrome',
             'days_early_for_beta',
-            'default_tab',
             'disable_progress_graph',
             'discussion_blackouts',
             'discussion_sort_alpha',
@@ -221,4 +225,9 @@ class AdvancedSettingsPage(CoursePage):
             'enable_proctored_exams',
             'enable_timed_exams',
             'enable_subsection_gating',
+            'learning_info',
+            'instructor_info',
+            'create_zendesk_tickets',
+            'ccx_connector',
+            'enable_ccx'
         ]

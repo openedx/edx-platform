@@ -5,7 +5,7 @@ Feature: CMS.Discussion Component Editor
   Scenario: User can view discussion component metadata
     Given I have created a Discussion Tag
     And I edit the component
-    Then I see three alphabetized settings and their expected values
+    Then I see three settings and their expected values
 
   # Safari doesn't save the name properly
   @skip_safari

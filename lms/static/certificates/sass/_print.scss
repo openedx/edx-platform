@@ -30,8 +30,8 @@
     }
 
     %print-black-on-white {
-        background: palette(grayscale, white-t) !important;
-        color: palette(grayscale, black-t) !important;
+        background: $white !important;
+        color: $black !important;
     }
 
     %print-layout-wrapper {
@@ -191,7 +191,7 @@
 
     .accomplishment-rendering {
         top: 0 !important;
-        border: rem(1) solid palette(grayscale, light);
+        border: rem(1) solid palette(grayscale, back);
         border-top: rem(2) solid $cert-base-color;
         box-shadow: none;
         padding: spacing-vertical(small) spacing-horizontal(mid-large);
@@ -207,7 +207,7 @@
         }
 
         .wrapper-statement-and-signatories {
-            border-bottom: rem(2) solid palette(grayscale-cool, x-light);
+            border-bottom: rem(2) solid palette(grayscale, x-back);
         }
 
         .accomplishment-statement {

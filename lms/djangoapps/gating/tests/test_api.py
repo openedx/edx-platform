@@ -2,6 +2,7 @@
 Unit tests for gating.signals module
 """
 from mock import patch
+from nose.plugins.attrib import attr
 from ddt import ddt, data, unpack
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -24,10 +25,6 @@ class GatingTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
         Initial data setup
         """
         super(GatingTestCase, self).setUp()
-
-        # Patch Milestones feature flag
-        self.settings_patcher = patch.dict('django.conf.settings.FEATURES', {'MILESTONES_APP': True})
-        self.settings_patcher.start()
 
         # create course
         self.course = CourseFactory.create(
@@ -80,13 +77,6 @@ class GatingTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
             display_name='untitled problem 2'
         )
 
-    def tearDown(self):
-        """
-        Tear down initial setup
-        """
-        self.settings_patcher.stop()
-        super(GatingTestCase, self).tearDown()
-
 
 class TestGetXBlockParent(GatingTestCase):
     """
@@ -114,6 +104,7 @@ class TestGetXBlockParent(GatingTestCase):
         self.assertIsNone(result)
 
 
+@attr(shard=3)
 @ddt
 class TestEvaluatePrerequisite(GatingTestCase, MilestonesTestCaseMixin):
     """
@@ -134,7 +125,7 @@ class TestEvaluatePrerequisite(GatingTestCase, MilestonesTestCaseMixin):
         gating_api.set_required_content(self.course.id, self.seq2.location, self.seq1.location, min_score)
         self.prereq_milestone = gating_api.get_gating_milestone(self.course.id, self.seq1.location, 'fulfills')
 
-    @patch('courseware.grades.get_module_score')
+    @patch('gating.api.get_module_score')
     @data((.5, True), (1, True), (0, False))
     @unpack
     def test_min_score_achieved(self, module_score, result, mock_module_score):
@@ -147,7 +138,7 @@ class TestEvaluatePrerequisite(GatingTestCase, MilestonesTestCaseMixin):
         self.assertEqual(milestones_api.user_has_milestone(self.user_dict, self.prereq_milestone), result)
 
     @patch('gating.api.log.warning')
-    @patch('courseware.grades.get_module_score')
+    @patch('gating.api.get_module_score')
     @data((.5, False), (1, True))
     @unpack
     def test_invalid_min_score(self, module_score, result, mock_module_score, mock_log):
@@ -160,21 +151,21 @@ class TestEvaluatePrerequisite(GatingTestCase, MilestonesTestCaseMixin):
         self.assertEqual(milestones_api.user_has_milestone(self.user_dict, self.prereq_milestone), result)
         self.assertTrue(mock_log.called)
 
-    @patch('courseware.grades.get_module_score')
+    @patch('gating.api.get_module_score')
     def test_orphaned_xblock(self, mock_module_score):
         """ Test test_orphaned_xblock """
 
         evaluate_prerequisite(self.course, self.prob2.location, self.user.id)
         self.assertFalse(mock_module_score.called)
 
-    @patch('courseware.grades.get_module_score')
+    @patch('gating.api.get_module_score')
     def test_no_prerequisites(self, mock_module_score):
         """ Test test_no_prerequisites """
 
         evaluate_prerequisite(self.course, self.prob1.location, self.user.id)
         self.assertFalse(mock_module_score.called)
 
-    @patch('courseware.grades.get_module_score')
+    @patch('gating.api.get_module_score')
     def test_no_gated_content(self, mock_module_score):
         """ Test test_no_gated_content """
 

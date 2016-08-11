@@ -8,6 +8,7 @@ paths actually work.
 import json
 import logging
 from mock import patch
+from nose.plugins.attrib import attr
 import textwrap
 
 from celery.states import SUCCESS, FAILURE
@@ -53,7 +54,7 @@ class TestIntegrationTask(InstructorTaskModuleTestCase):
         self.assertEqual(instructor_task.requester.username, 'instructor')
         self.assertEqual(instructor_task.task_type, task_type)
         task_input = json.loads(instructor_task.task_input)
-        self.assertFalse('student' in task_input)
+        self.assertNotIn('student', task_input)
         self.assertEqual(task_input['problem_url'], InstructorTaskModuleTestCase.problem_location(problem_url_name).to_deprecated_string())
         status = json.loads(instructor_task.task_output)
         self.assertEqual(status['exception'], 'ZeroDivisionError')
@@ -63,6 +64,7 @@ class TestIntegrationTask(InstructorTaskModuleTestCase):
         self.assertEqual(status['message'], expected_message)
 
 
+@attr(shard=3)
 class TestRescoringTask(TestIntegrationTask):
     """
     Integration-style tests for rescoring problems in a background task.
@@ -116,8 +118,8 @@ class TestRescoringTask(TestIntegrationTask):
         attempts = state['attempts']
         self.assertEqual(attempts, expected_attempts)
         if attempts > 0:
-            self.assertTrue('correct_map' in state)
-            self.assertTrue('student_answers' in state)
+            self.assertIn('correct_map', state)
+            self.assertIn('student_answers', state)
             self.assertGreater(len(state['correct_map']), 0)
             self.assertGreater(len(state['student_answers']), 0)
 
@@ -207,7 +209,7 @@ class TestRescoringTask(TestIntegrationTask):
         self.assertEqual(instructor_task.requester.username, 'instructor')
         self.assertEqual(instructor_task.task_type, 'rescore_problem')
         task_input = json.loads(instructor_task.task_input)
-        self.assertFalse('student' in task_input)
+        self.assertNotIn('student', task_input)
         self.assertEqual(task_input['problem_url'], InstructorTaskModuleTestCase.problem_location(problem_url_name).to_deprecated_string())
         status = json.loads(instructor_task.task_output)
         self.assertEqual(status['attempted'], 1)
@@ -439,7 +441,7 @@ class TestDeleteProblemTask(TestIntegrationTask):
             self.submit_student_answer(username, problem_url_name, [OPTION_1, OPTION_1])
         # confirm that state exists:
         for username in self.userlist:
-            self.assertTrue(self.get_student_module(username, descriptor) is not None)
+            self.assertIsNotNone(self.get_student_module(username, descriptor))
         # run delete task:
         self.delete_problem_state('instructor', location)
         # confirm that no state can be found:

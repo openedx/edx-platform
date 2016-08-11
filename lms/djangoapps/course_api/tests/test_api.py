@@ -144,13 +144,24 @@ class TestGetCourseList(CourseListTestMixin, SharedModuleStoreTestCase):
         with self.assertRaises(PermissionDenied):
             self._make_api_call(anonuser, self.staff_user)
 
-    @SharedModuleStoreTestCase.modifies_courseware
+
+class TestGetCourseListMultipleCourses(CourseListTestMixin, ModuleStoreTestCase):
+    """
+    Test the behavior of the `list_courses` api function (with tests that
+    modify the courseware).
+    """
+
+    def setUp(self):
+        super(TestGetCourseListMultipleCourses, self).setUp()
+        self.course = self.create_course()
+        self.staff_user = self.create_user("staff", is_staff=True)
+        self.honor_user = self.create_user("honor", is_staff=False)
+
     def test_multiple_courses(self):
         self.create_course(course='second')
         courses = self._make_api_call(self.honor_user, self.honor_user)
         self.assertEqual(len(courses), 2)
 
-    @SharedModuleStoreTestCase.modifies_courseware
     def test_filter_by_org(self):
         """Verify that courses are filtered by the provided org key."""
         # Create a second course to be filtered out of queries.
@@ -173,7 +184,6 @@ class TestGetCourseList(CourseListTestMixin, SharedModuleStoreTestCase):
             all(course.org == self.course.org for course in filtered_courses)
         )
 
-    @SharedModuleStoreTestCase.modifies_courseware
     def test_filter(self):
         # Create a second course to be filtered out of queries.
         alternate_course = self.create_course(course='mobile', mobile_available=True)

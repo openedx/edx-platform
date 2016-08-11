@@ -3,6 +3,7 @@ Tests for graph traversal generator functions.
 """
 
 from collections import defaultdict
+from nose.plugins.attrib import attr
 from unittest import TestCase
 
 from ..graph_traversals import (
@@ -10,6 +11,7 @@ from ..graph_traversals import (
 )
 
 
+@attr(shard=2)
 class TestGraphTraversals(TestCase):
     """
     Test Class for graph traversal generator functions.

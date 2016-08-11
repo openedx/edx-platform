@@ -14,7 +14,6 @@ from student.roles import (
     CourseInstructorRole, CourseStaffRole, CourseCreatorRole, LibraryUserRole,
     OrgStaffRole, OrgInstructorRole, OrgLibraryUserRole,
 )
-from xblock.reference.user_service import XBlockUser
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -22,6 +21,10 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from mock import Mock
 from opaque_keys.edx.locator import CourseKey, LibraryLocator
 from openedx.core.djangoapps.content.course_structures.tests import SignalDisconnectTestMixin
+from xblock_django.user_service import DjangoXBlockUserService
+from xmodule.x_module import STUDIO_VIEW
+from student import auth
+from student.tests.factories import UserFactory
 
 
 class LibraryTestCase(ModuleStoreTestCase):
@@ -29,15 +32,22 @@ class LibraryTestCase(ModuleStoreTestCase):
     Common functionality for content libraries tests
     """
     def setUp(self):
-        user_password = super(LibraryTestCase, self).setUp()
+        super(LibraryTestCase, self).setUp()
 
+        self.user = UserFactory(password=self.user_password, is_staff=True)
         self.client = AjaxEnabledTestClient()
-        self.client.login(username=self.user.username, password=user_password)
+        self._login_as_staff_user(logout_first=False)
 
         self.lib_key = self._create_library()
         self.library = modulestore().get_library(self.lib_key)
 
         self.session_data = {}  # Used by _bind_module
+
+    def _login_as_staff_user(self, logout_first=True):
+        """ Login as a staff user """
+        if logout_first:
+            self.client.logout()
+        self.client.login(username=self.user.username, password=self.user_password)
 
     def _create_library(self, org="org", library="lib", display_name="Test Library"):
         """
@@ -83,9 +93,8 @@ class LibraryTestCase(ModuleStoreTestCase):
         of a LibraryContent block
         """
         if 'user' not in lib_content_block.runtime._services:  # pylint: disable=protected-access
-            mocked_user_service = Mock(user_id=self.user.id)
-            mocked_user_service.get_current_user.return_value = XBlockUser(is_current_user=True)
-            lib_content_block.runtime._services['user'] = mocked_user_service  # pylint: disable=protected-access
+            user_service = DjangoXBlockUserService(self.user)
+            lib_content_block.runtime._services['user'] = user_service  # pylint: disable=protected-access
 
         handler_url = reverse_usage_url(
             'component_handler',
@@ -469,7 +478,8 @@ class TestLibraryAccess(SignalDisconnectTestMixin, LibraryTestCase):
     def setUp(self):
         """ Create a library, staff user, and non-staff user """
         super(TestLibraryAccess, self).setUp()
-        self.non_staff_user, self.non_staff_user_password = self.create_non_staff_user()
+        self.non_staff_user_password = 'foo'
+        self.non_staff_user = UserFactory(password=self.non_staff_user_password, is_staff=False)
 
     def _login_as_non_staff_user(self, logout_first=True):
         """ Login as a user that starts out with no roles/permissions granted. """
@@ -479,7 +489,7 @@ class TestLibraryAccess(SignalDisconnectTestMixin, LibraryTestCase):
 
     def _assert_cannot_create_library(self, org="org", library="libfail", expected_code=403):
         """ Ensure the current user is not able to create a library. """
-        self.assertTrue(expected_code >= 300)
+        self.assertGreaterEqual(expected_code, 300)
         response = self.client.ajax_post(
             LIBRARY_REST_URL,
             {'org': org, 'library': library, 'display_name': "Irrelevant"}
@@ -728,6 +738,64 @@ class TestLibraryAccess(SignalDisconnectTestMixin, LibraryTestCase):
         self._bind_module(lc_block, user=self.non_staff_user)
         lc_block = self._refresh_children(lc_block, status_code_expected=200 if expected_result else 403)
         self.assertEqual(len(lc_block.children), 1 if expected_result else 0)
+
+    def test_studio_user_permissions(self):
+        """
+        Test that user could attach to the problem only libraries that he has access (or which were created by him).
+        This test was created on the basis of bug described in the pull requests on github:
+        https://github.com/edx/edx-platform/pull/11331
+        https://github.com/edx/edx-platform/pull/11611
+        """
+        self._create_library(org='admin_org_1', library='lib_adm_1', display_name='admin_lib_1')
+        self._create_library(org='admin_org_2', library='lib_adm_2', display_name='admin_lib_2')
+
+        self._login_as_non_staff_user()
+
+        self._create_library(org='staff_org_1', library='lib_staff_1', display_name='staff_lib_1')
+        self._create_library(org='staff_org_2', library='lib_staff_2', display_name='staff_lib_2')
+
+        with modulestore().default_store(ModuleStoreEnum.Type.split):
+            course = CourseFactory.create()
+
+        instructor_role = CourseInstructorRole(course.id)
+        auth.add_users(self.user, instructor_role, self.non_staff_user)
+
+        lib_block = ItemFactory.create(
+            category='library_content',
+            parent_location=course.location,
+            user_id=self.non_staff_user.id,
+            publish_item=False
+        )
+
+        def _get_settings_html():
+            """
+            Helper function to get block settings HTML
+            Used to check the available libraries.
+            """
+            edit_view_url = reverse_usage_url("xblock_view_handler", lib_block.location, {"view_name": STUDIO_VIEW})
+
+            resp = self.client.get_json(edit_view_url)
+            self.assertEquals(resp.status_code, 200)
+
+            return parse_json(resp)['html']
+
+        self._login_as_staff_user()
+        staff_settings_html = _get_settings_html()
+        self.assertIn('staff_lib_1', staff_settings_html)
+        self.assertIn('staff_lib_2', staff_settings_html)
+        self.assertIn('admin_lib_1', staff_settings_html)
+        self.assertIn('admin_lib_2', staff_settings_html)
+
+        self._login_as_non_staff_user()
+        response = self.client.get_json(LIBRARY_REST_URL)
+        staff_libs = parse_json(response)
+        self.assertEquals(2, len(staff_libs))
+
+        non_staff_settings_html = _get_settings_html()
+        self.assertIn('staff_lib_1', non_staff_settings_html)
+        self.assertIn('staff_lib_2', non_staff_settings_html)
+        self.assertNotIn('admin_lib_1', non_staff_settings_html)
+        self.assertNotIn('admin_lib_2', non_staff_settings_html)
 
 
 @ddt.ddt

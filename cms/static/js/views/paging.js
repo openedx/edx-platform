@@ -1,8 +1,7 @@
-;(function (define) {
+(function(define) {
     'use strict';
-    define(["underscore", "backbone", "gettext"],
+    define(['underscore', 'backbone', 'gettext'],
         function(_, Backbone, gettext) {
-
             var PagingView = Backbone.View.extend({
                 // takes a Backbone Paginator as a model
 
@@ -19,7 +18,7 @@
                     collection.bind('remove', _.bind(this.onPageRefresh, this));
                     collection.bind('reset', _.bind(this.onPageRefresh, this));
                     collection.bind('error', _.bind(this.onError, this));
-                    collection.bind('page_changed', function () { window.scrollTo(0, 0); });
+                    collection.bind('page_changed', function() { window.scrollTo(0, 0); });
                 },
 
                 onPageRefresh: function() {
@@ -33,15 +32,15 @@
                     // Do nothing by default
                 },
 
-                setPage: function (page) {
+                setPage: function(page) {
                     this.collection.setPage(page);
                 },
 
-                nextPage: function () {
+                nextPage: function() {
                     this.collection.nextPage();
                 },
 
-                previousPage: function () {
+                previousPage: function() {
                     this.collection.previousPage();
                 },
 
@@ -116,12 +115,15 @@
                         sortInfo = this.sortableColumnInfo(sortColumn),
                         sortField = sortInfo.fieldName,
                         defaultSortDirection = sortInfo.defaultSortDirection;
+
                     if (collection.sortField === sortField) {
                         collection.sortDirection = collection.sortDirection === 'asc' ? 'desc' : 'asc';
                     } else {
                         collection.sortField = sortField;
                         collection.sortDirection = defaultSortDirection;
                     }
+
+                    collection.setSorting(sortField, collection.sortDirection);
                     this.sortColumn = sortColumn;
                     this.collection.setPage(1);
                 },
@@ -129,8 +131,8 @@
                 selectFilter: function(filterColumn) {
                     var collection = this.collection,
                         filterInfo = this.filterableColumnInfo(filterColumn),
-                        filterField = filterInfo.fieldName,
-                        defaultFilterKey = false;
+                        filterField = filterInfo.fieldName;
+
                     if (collection.filterField !== filterField) {
                         collection.filterField = filterField;
                     }

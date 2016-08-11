@@ -17,23 +17,20 @@
 
   .calc {
     @include transition(background-color $tmg-f2 ease-in-out 0s);
-    background: url("#{$static-path}/images/calc-icon.png") $black-t1 no-repeat center;
-    border-bottom: 0;
-    color: $white;
-    float: right;
-    height: $baseline;
-    margin-right: ($baseline*0.75);
-    padding: $baseline;
+    @include float(right);
+    @include right($baseline*.75);
     position: relative;
     top: -42px;
-    width: ($baseline*0.75);
+    border-bottom: 0;
+    padding: ($baseline/1.5);
+    background: $black-t1;
+    color: $white;
 
     &:hover, &:focus {
-      background: url("../images/calc-icon.png") $gray-d1 no-repeat center;
+      background: $gray-d1;
     }
 
     &.closed {
-      background-image: url("#{$static-path}/images/close-calc-icon.png");
       background-color: $black;
       top: -36px;
     }
@@ -73,12 +70,12 @@
       }
 
       #calculator_button {
-        background: #111;
-        border: 1px solid $black;
+        background: $white;
+        border: 1px solid $white;
         border-radius: 0;
         box-shadow: none;
         @include box-sizing(border-box);
-        color: $white;
+        color: $black;
         float: left;
         font-size: 30px;
         font-weight: bold;
@@ -90,7 +87,8 @@
         width: flex-grid(.5) + flex-gutter();
 
         &:hover, &:focus {
-          color: $link-color;
+          background: $blue-d2;
+          color: $white;
         }
 
         .calc-button-label {
@@ -100,11 +98,12 @@
       }
 
       #calculator_output {
-        background: #111;
-        border: 0;
+        direction: ltr;  // Almost all of the real-world calculators are LTR
+        background: $white;
+        border: 1px solid $white;
         box-shadow: none;
         @include box-sizing(border-box);
-        color: $white;
+        color: $black;
         float: left;
         font-size: 16px;
         font-weight: bold;
@@ -112,6 +111,11 @@
         padding: 10px;
         -webkit-appearance: none;
         width: flex-grid(4);
+        
+        &.has-result {
+            border: 1px solid $green-d1;
+            box-shadow: inset 0px 0px ($baseline/3) $green-d1;
+        }
       }
 
       .input-wrapper {
@@ -127,6 +131,7 @@
         }
 
         #calculator_input {
+          direction: ltr;  // Almost all of the real-world calculators are LTR
           border: none;
           box-shadow: none;
           @include box-sizing(border-box);

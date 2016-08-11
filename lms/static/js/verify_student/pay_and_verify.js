@@ -10,7 +10,7 @@
  */
 var edx = edx || {};
 
-(function( $, _ ) {
+(function($, _) {
     'use strict';
     var errorView,
         el = $('#pay-and-verify-container');
@@ -49,17 +49,18 @@ var edx = edx || {};
                 requirements: el.data('requirements'),
                 courseKey: el.data('course-key'),
                 courseName: el.data('course-name'),
+                userEmail: el.data('user-email'),
                 hasVisibleReqs: _.some(
                     el.data('requirements'),
-                    function( isVisible ) { return isVisible; }
+                    function(isVisible) { return isVisible; }
                 ),
                 upgrade: el.data('msg-key') === 'upgrade',
                 minPrice: el.data('course-mode-min-price'),
                 sku: el.data('course-mode-sku'),
                 contributionAmount: el.data('contribution-amount'),
                 suggestedPrices: _.filter(
-                    (el.data('course-mode-suggested-prices').toString()).split(","),
-                    function( price ) { return Boolean( price ); }
+                    (el.data('course-mode-suggested-prices').toString()).split(','),
+                    function(price) { return Boolean(price); }
                 ),
                 currency: el.data('course-mode-currency'),
                 processors: el.data('processors'),
@@ -67,7 +68,7 @@ var edx = edx || {};
                 courseModeSlug: el.data('course-mode-slug'),
                 alreadyVerified: el.data('already-verified'),
                 verificationGoodUntil: el.data('verification-good-until'),
-                isABTesting:  el.data('is-ab-testing')
+                isABTesting: el.data('is-ab-testing')
             },
             'payment-confirmation-step': {
                 courseKey: el.data('course-key'),
@@ -97,4 +98,4 @@ var edx = edx || {};
             }
         }
     }).render();
-})( jQuery, _ );
+})(jQuery, _);

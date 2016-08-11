@@ -38,9 +38,10 @@ DEBUG_TOOLBAR_PANELS += (
     'debug_toolbar_mongo.panel.MongoDebugPanel',
 )
 
-# HOSTNAME_MODULESTORE_DEFAULT_MAPPINGS defines, as dictionary of regex's, a set of mappings of HTTP request hostnames to
-# what the 'default' modulestore to use while processing the request
-# for example 'preview.edx.org' should use the draft modulestore
+# HOSTNAME_MODULESTORE_DEFAULT_MAPPINGS defines, as dictionary of regex's, a
+# set of mappings of HTTP request hostnames to what the 'default' modulestore
+# to use while processing the request.
+# for example 'preview.edx.org' should use the draft modulestore.
 HOSTNAME_MODULESTORE_DEFAULT_MAPPINGS = {
-    'preview\.': 'draft-preferred'
+    r'preview\.': 'draft-preferred'
 }

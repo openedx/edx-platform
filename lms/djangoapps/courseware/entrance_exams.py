@@ -1,7 +1,6 @@
 """
 This file contains all entrance exam related utils/logic.
 """
-from django.conf import settings
 
 from courseware.access import has_access
 from courseware.model_data import FieldDataCache, ScoresClient
@@ -26,7 +25,7 @@ def course_has_entrance_exam(course):
     return True
 
 
-def user_can_skip_entrance_exam(request, user, course):
+def user_can_skip_entrance_exam(user, course):
     """
     Checks all of the various override conditions for a user to skip an entrance exam
     Begin by short-circuiting if the course does not have an entrance exam
@@ -39,7 +38,7 @@ def user_can_skip_entrance_exam(request, user, course):
         return True
     if EntranceExamConfiguration.user_can_skip_entrance_exam(user, course.id):
         return True
-    if not get_entrance_exam_content(request, course):
+    if not get_entrance_exam_content(user, course):
         return True
     return False
 
@@ -67,7 +66,7 @@ def user_must_complete_entrance_exam(request, user, course):
     whether or not the user is allowed to clear the Entrance Exam gate and access the rest of the course.
     """
     # First, let's see if the user is allowed to skip
-    if user_can_skip_entrance_exam(request, user, course):
+    if user_can_skip_entrance_exam(user, course):
         return False
     # If they can't actually skip the exam, we'll need to see if they've already passed it
     if user_has_passed_entrance_exam(request, course):
@@ -158,11 +157,11 @@ def get_entrance_exam_score(request, course):
     return _calculate_entrance_exam_score(request.user, course, exam_modules)
 
 
-def get_entrance_exam_content(request, course):
+def get_entrance_exam_content(user, course):
     """
     Get the entrance exam content information (ie, chapter module)
     """
-    required_content = get_required_content(course, request.user)
+    required_content = get_required_content(course, user)
 
     exam_module = None
     for content in required_content:

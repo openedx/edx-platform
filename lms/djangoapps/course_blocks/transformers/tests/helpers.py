@@ -73,12 +73,12 @@ class CourseStructureTestCase(TransformerRegistryTestMixin, ModuleStoreTestCase)
 
         if block_type != 'course':
             kwargs['category'] = block_type
+            kwargs['publish_item'] = True,
         if parent:
             kwargs['parent'] = parent
 
         xblock = factory.create(
             display_name=self.create_block_id(block_type, block_ref),
-            publish_item=True,
             **kwargs
         )
         block_map[block_ref] = xblock
@@ -255,7 +255,7 @@ class BlockParentsMapTestCase(TransformerRegistryTestMixin, ModuleStoreTestCase)
             self,
             test_user,
             expected_user_accessible_blocks,
-            blocks_with_differing_access,
+            blocks_with_differing_access=None,
             transformers=None,
     ):
         """
@@ -272,7 +272,8 @@ class BlockParentsMapTestCase(TransformerRegistryTestMixin, ModuleStoreTestCase)
             blocks_with_differing_access (set(int)): Set of
                 blocks (indices) whose access will differ from the
                 transformers result and the current implementation of
-                has_access.
+                has_access.  If not provided, does not compare with
+                has_access results.
 
             transformers (BlockStructureTransformers): An optional collection
                 of transformers that are to be executed.  If not
@@ -311,8 +312,7 @@ class BlockParentsMapTestCase(TransformerRegistryTestMixin, ModuleStoreTestCase)
         for i, xblock_key in enumerate(self.xblock_keys):
 
             # compute access results of the block
-            block_structure_result = block_structure.has_block(xblock_key)
-            has_access_result = bool(has_access(user, 'load', self.get_block(i), course_key=self.course.id))
+            block_structure_result = xblock_key in block_structure
 
             # compare with expected value
             self.assertEquals(
@@ -323,23 +323,25 @@ class BlockParentsMapTestCase(TransformerRegistryTestMixin, ModuleStoreTestCase)
                 )
             )
 
-            # compare with has_access_result
-            if i in blocks_with_differing_access:
-                self.assertNotEqual(
-                    block_structure_result,
-                    has_access_result,
-                    "block structure ({0}) & has_access ({1}) results are equal for block {2} for user {3}".format(
-                        block_structure_result, has_access_result, i, user.username
+            if blocks_with_differing_access:
+                # compare with has_access_result
+                has_access_result = bool(has_access(user, 'load', self.get_block(i), course_key=self.course.id))
+                if i in blocks_with_differing_access:
+                    self.assertNotEqual(
+                        block_structure_result,
+                        has_access_result,
+                        "block structure ({0}) & has_access ({1}) results are equal for block {2} for user {3}".format(
+                            block_structure_result, has_access_result, i, user.username
+                        )
                     )
-                )
-            else:
-                self.assertEquals(
-                    block_structure_result,
-                    has_access_result,
-                    "block structure ({0}) & has_access ({1}) results not equal for block {2} for user {3}".format(
-                        block_structure_result, has_access_result, i, user.username
+                else:
+                    self.assertEquals(
+                        block_structure_result,
+                        has_access_result,
+                        "block structure ({0}) & has_access ({1}) results not equal for block {2} for user {3}".format(
+                            block_structure_result, has_access_result, i, user.username
+                        )
                     )
-                )
 
         self.client.logout()
 

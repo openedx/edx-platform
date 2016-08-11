@@ -272,7 +272,7 @@ class ThreadSerializer(_ContentSerializer):
     def update(self, instance, validated_data):
         for key, val in validated_data.items():
             instance[key] = val
-        instance.save(params={"requested_user_id": self.context["cc_requester"]["id"]})
+        instance.save()
         return instance
 
 
@@ -290,6 +290,7 @@ class CommentSerializer(_ContentSerializer):
     endorsed_by = serializers.SerializerMethodField()
     endorsed_by_label = serializers.SerializerMethodField()
     endorsed_at = serializers.SerializerMethodField()
+    child_count = serializers.IntegerField(read_only=True)
     children = serializers.SerializerMethodField(required=False)
 
     non_updatable_fields = NON_UPDATABLE_COMMENT_FIELDS
@@ -394,3 +395,33 @@ class CommentSerializer(_ContentSerializer):
 
         instance.save()
         return instance
+
+
+class DiscussionTopicSerializer(serializers.Serializer):
+    """
+    Serializer for DiscussionTopic
+    """
+    id = serializers.CharField(read_only=True)  # pylint: disable=invalid-name
+    name = serializers.CharField(read_only=True)
+    thread_list_url = serializers.CharField(read_only=True)
+    children = serializers.SerializerMethodField()
+
+    def get_children(self, obj):
+        """
+        Returns a list of children of DiscussionTopicSerializer type
+        """
+        if not obj.children:
+            return []
+        return [DiscussionTopicSerializer(child).data for child in obj.children]
+
+    def create(self, validated_data):
+        """
+        Overriden create abstract method
+        """
+        pass
+
+    def update(self, instance, validated_data):
+        """
+        Overriden update abstract method
+        """
+        pass

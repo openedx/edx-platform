@@ -1,16 +1,19 @@
 """ Tests for commerce views. """
-import json
-from uuid import uuid4
+
 from nose.plugins.attrib import attr
 
 import ddt
-from django.conf import settings
+import json
 from django.core.urlresolvers import reverse
 from django.test import TestCase
 import mock
 
 from student.tests.factories import UserFactory
-from openedx.core.djangoapps.theming.test_util import with_is_edx_domain
+from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme
+from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from student.models import CourseEnrollment
+from course_modes.models import CourseMode
 
 
 class UserMixin(object):
@@ -25,10 +28,23 @@ class UserMixin(object):
         self.client.login(username=self.user.username, password='test')
 
 
-@attr('shard_1')
+@attr(shard=1)
 @ddt.ddt
-class ReceiptViewTests(UserMixin, TestCase):
+class ReceiptViewTests(UserMixin, ModuleStoreTestCase):
     """ Tests for the receipt view. """
+
+    def setUp(self):
+        """
+        Add a user and a course
+        """
+        super(ReceiptViewTests, self).setUp()
+        self.user = UserFactory()
+        self.client.login(username=self.user.username, password='test')
+        self.course = CourseFactory.create(
+            org='edX',
+            course='900',
+            run='test_run'
+        )
 
     def test_login_required(self):
         """ The view should redirect to the login page if the user is not logged in. """
@@ -41,6 +57,30 @@ class ReceiptViewTests(UserMixin, TestCase):
         response = self.client.post(reverse('commerce:checkout_receipt'), params={'basket_id': 1}, data=post_data)
         self.assertEqual(response.status_code, 200)
         return response
+
+    def test_user_verification_status_success(self):
+        """
+        Test user verification status. If the user enrollment for the course belongs to verified modes
+        e.g. Verified, Professional then verification is required.
+        """
+        # Enroll as verified in the course with the current user.
+        CourseEnrollment.enroll(self.user, self.course.id, mode=CourseMode.VERIFIED)
+        response = self.client.get(reverse('commerce:user_verification_status'), data={'course_id': self.course.id})
+        json_data = json.loads(response.content)
+        self.assertEqual(json_data['is_verification_required'], True)
+
+        # Enroll as honor in the course with the current user.
+        CourseEnrollment.enroll(self.user, self.course.id, mode=CourseMode.HONOR)
+        response = self.client.get(reverse('commerce:user_verification_status'), data={'course_id': self.course.id})
+        json_data = json.loads(response.content)
+        self.assertEqual(json_data['is_verification_required'], False)
+
+    def test_user_verification_status_failure(self):
+        """
+        Test user verification status failure. View should required HttpResponseBadRequest 400 if course id is missing.
+        """
+        response = self.client.get(reverse('commerce:user_verification_status'))
+        self.assertEqual(response.status_code, 400)
 
     @ddt.data('decision', 'reason_code', 'signed_field_names', None)
     def test_is_cybersource(self, post_key):
@@ -87,7 +127,7 @@ class ReceiptViewTests(UserMixin, TestCase):
         self.assertRegexpMatches(response.content, user_message if is_user_message_expected else system_message)
         self.assertNotRegexpMatches(response.content, user_message if not is_user_message_expected else system_message)
 
-    @with_is_edx_domain(True)
+    @with_comprehensive_theme("edx.org")
     def test_hide_nav_header(self):
         self._login()
         post_data = {'decision': 'ACCEPT', 'reason_code': '200', 'signed_field_names': 'dummy'}

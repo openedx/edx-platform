@@ -22,6 +22,7 @@ from pytz import UTC
 from freezegun import freeze_time
 from datetime import datetime, timedelta
 from mock import patch, Mock
+from nose.plugins.attrib import attr
 import ddt
 
 from common.test.utils import XssTestMixin
@@ -64,9 +65,14 @@ render_mock = Mock(side_effect=mock_render_to_response)
 postpay_mock = Mock()
 
 
+@attr(shard=3)
 @patch.dict('django.conf.settings.FEATURES', {'ENABLE_PAID_COURSE_REGISTRATION': True})
 @ddt.ddt
 class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
+    """
+    Test shopping cart view under various states
+    """
+
     @classmethod
     def setUpClass(cls):
         super(ShoppingCartViewsTests, cls).setUpClass()
@@ -592,7 +598,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         response = self.client.get(redeem_url)
         self.assertEquals(response.status_code, 200)
         # check button text
-        self.assertTrue('Activate Course Enrollment' in response.content)
+        self.assertIn('Activate Course Enrollment', response.content)
 
         #now activate the user by enrolling him/her to the course
         response = self.client.post(redeem_url)
@@ -623,7 +629,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         response = self.client.get(redeem_url)
         self.assertEquals(response.status_code, 200)
         # check button text
-        self.assertTrue('Activate Course Enrollment' in response.content)
+        self.assertIn('Activate Course Enrollment', response.content)
 
         #now activate the user by enrolling him/her to the course
         response = self.client.post(redeem_url)
@@ -1091,7 +1097,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         response = self.client.get(redeem_url)
         self.assertEquals(response.status_code, 200)
         # check button text
-        self.assertTrue('Activate Course Enrollment' in response.content)
+        self.assertIn('Activate Course Enrollment', response.content)
 
         #now activate the user by enrolling him/her to the course
         response = self.client.post(redeem_url)
@@ -1118,7 +1124,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         resp = self.client.get(redeem_url)
         self.assertEquals(resp.status_code, 200)
         # check button text
-        self.assertTrue('Activate Course Enrollment' in resp.content)
+        self.assertIn('Activate Course Enrollment', resp.content)
 
         #now activate the user by enrolling him/her to the course
         resp = self.client.post(redeem_url)
@@ -1272,7 +1278,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         #now activate the user by enrolling him/her to the course
         response = self.client.post(redeem_url)
         self.assertEquals(response.status_code, 200)
-        self.assertTrue('View Dashboard' in response.content)
+        self.assertIn('View Dashboard', response.content)
 
         # now view the receipt page again to see if any registration codes
         # has been expired or not
@@ -1701,6 +1707,9 @@ class RegistrationCodeRedemptionCourseEnrollment(SharedModuleStoreTestCase):
     """
     Test suite for RegistrationCodeRedemption Course Enrollments
     """
+
+    ENABLED_CACHES = ['default', 'mongo_metadata_inheritance', 'loc_cache']
+
     @classmethod
     def setUpClass(cls):
         super(RegistrationCodeRedemptionCourseEnrollment, cls).setUpClass()
@@ -1837,9 +1846,11 @@ class RedeemCodeEmbargoTests(UrlResetMixin, ModuleStoreTestCase):
     USERNAME = 'bob'
     PASSWORD = 'test'
 
+    URLCONF_MODULES = ['embargo']
+
     @patch.dict(settings.FEATURES, {'EMBARGO': True})
     def setUp(self):
-        super(RedeemCodeEmbargoTests, self).setUp('embargo')
+        super(RedeemCodeEmbargoTests, self).setUp()
         self.course = CourseFactory.create()
         self.user = UserFactory.create(username=self.USERNAME, password=self.PASSWORD)
         result = self.client.login(username=self.user.username, password=self.PASSWORD)

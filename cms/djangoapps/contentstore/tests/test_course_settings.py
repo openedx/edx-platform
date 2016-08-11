@@ -6,7 +6,7 @@ import ddt
 import json
 import copy
 import mock
-from mock import patch
+from mock import Mock, patch
 import unittest
 
 from django.conf import settings
@@ -19,8 +19,9 @@ from models.settings.course_metadata import CourseMetadata
 from models.settings.encoder import CourseSettingsEncoder
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.djangoapps.models.course_details import CourseDetails
-from student.roles import CourseInstructorRole
+from student.roles import CourseInstructorRole, CourseStaffRole
 from student.tests.factories import UserFactory
+from xblock_django.models import XBlockStudioConfigurationFlag
 from xmodule.fields import Date
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
@@ -28,7 +29,7 @@ from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.tabs import InvalidTabsException
 from milestones.tests.utils import MilestonesTestCaseMixin
 
-from .utils import CourseTestCase
+from .utils import CourseTestCase, AjaxEnabledTestClient
 
 
 def get_url(course_id, handler_name='settings_handler'):
@@ -51,6 +52,18 @@ class CourseSettingsEncoderTest(CourseTestCase):
         self.assertIsNone(jsondetails['intro_video'], "intro_video somehow initialized")
         self.assertIsNone(jsondetails['effort'], "effort somehow initialized")
         self.assertIsNone(jsondetails['language'], "language somehow initialized")
+
+    def test_pre_1900_date(self):
+        """
+        Tests that the encoder can handle a pre-1900 date, since strftime
+        doesn't work for these dates.
+        """
+        details = CourseDetails.fetch(self.course.id)
+        pre_1900 = datetime.datetime(1564, 4, 23, 1, 1, 1, tzinfo=UTC())
+        details.enrollment_start = pre_1900
+        dumped_jsondetails = json.dumps(details, cls=CourseSettingsEncoder)
+        loaded_jsondetails = json.loads(dumped_jsondetails)
+        self.assertEqual(loaded_jsondetails['enrollment_start'], pre_1900.isoformat())
 
     def test_ooc_encoder(self):
         """
@@ -154,13 +167,13 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
         elif field in encoded and encoded[field] is not None:
             self.fail(field + " included in encoding but missing from details at " + context)
 
-    @mock.patch.dict("django.conf.settings.FEATURES", {'ENABLE_PREREQUISITE_COURSES': True, 'MILESTONES_APP': True})
+    @mock.patch.dict("django.conf.settings.FEATURES", {'ENABLE_PREREQUISITE_COURSES': True})
     def test_pre_requisite_course_list_present(self):
         settings_details_url = get_url(self.course.id)
         response = self.client.get_html(settings_details_url)
         self.assertContains(response, "Prerequisite Course")
 
-    @mock.patch.dict("django.conf.settings.FEATURES", {'ENABLE_PREREQUISITE_COURSES': True, 'MILESTONES_APP': True})
+    @mock.patch.dict("django.conf.settings.FEATURES", {'ENABLE_PREREQUISITE_COURSES': True})
     def test_pre_requisite_course_update_and_fetch(self):
         url = get_url(self.course.id)
         resp = self.client.get_json(url)
@@ -187,7 +200,7 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
         course_detail_json = json.loads(resp.content)
         self.assertEqual([], course_detail_json['pre_requisite_courses'])
 
-    @mock.patch.dict("django.conf.settings.FEATURES", {'ENABLE_PREREQUISITE_COURSES': True, 'MILESTONES_APP': True})
+    @mock.patch.dict("django.conf.settings.FEATURES", {'ENABLE_PREREQUISITE_COURSES': True})
     def test_invalid_pre_requisite_course(self):
         url = get_url(self.course.id)
         resp = self.client.get_json(url)
@@ -206,6 +219,7 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
         (False, True, False),
         (True, True, True),
     )
+    @override_settings(MKTG_URLS={'ROOT': 'dummy-root'})
     def test_visibility_of_entrance_exam_section(self, feature_flags):
         """
         Tests entrance exam section is available if ENTRANCE_EXAMS feature is enabled no matter any other
@@ -243,11 +257,17 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
             self.assertContains(response, "not the dates shown on your course summary page")
 
             self.assertContains(response, "Introducing Your Course")
-            self.assertContains(response, "Course Image")
+            self.assertContains(response, "Course Card Image")
             self.assertContains(response, "Course Short Description")
+            self.assertNotContains(response, "Course Title")
+            self.assertNotContains(response, "Course Subtitle")
+            self.assertNotContains(response, "Course Duration")
+            self.assertNotContains(response, "Course Description")
             self.assertNotContains(response, "Course Overview")
             self.assertNotContains(response, "Course Introduction Video")
             self.assertNotContains(response, "Requirements")
+            self.assertNotContains(response, "Course Banner Image")
+            self.assertNotContains(response, "Course Video Thumbnail Image")
 
     @unittest.skipUnless(settings.FEATURES.get('ENTRANCE_EXAMS', False), True)
     def test_entrance_exam_created_updated_and_deleted_successfully(self):
@@ -355,7 +375,8 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
     def test_regular_site_fetch(self):
         settings_details_url = get_url(self.course.id)
 
-        with mock.patch.dict('django.conf.settings.FEATURES', {'ENABLE_MKTG_SITE': False}):
+        with mock.patch.dict('django.conf.settings.FEATURES', {'ENABLE_MKTG_SITE': False,
+                                                               'ENABLE_EXTENDED_COURSE_DETAILS': True}):
             response = self.client.get_html(settings_details_url)
             self.assertContains(response, "Course Summary Page")
             self.assertContains(response, "Send a note to students via email")
@@ -368,11 +389,17 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
             self.assertNotContains(response, "not the dates shown on your course summary page")
 
             self.assertContains(response, "Introducing Your Course")
-            self.assertContains(response, "Course Image")
+            self.assertContains(response, "Course Card Image")
+            self.assertContains(response, "Course Title")
+            self.assertContains(response, "Course Subtitle")
+            self.assertContains(response, "Course Duration")
+            self.assertContains(response, "Course Description")
             self.assertContains(response, "Course Short Description")
             self.assertContains(response, "Course Overview")
             self.assertContains(response, "Course Introduction Video")
             self.assertContains(response, "Requirements")
+            self.assertContains(response, "Course Banner Image")
+            self.assertContains(response, "Course Video Thumbnail Image")
 
 
 @ddt.ddt
@@ -759,6 +786,15 @@ class CourseMetadataEditingTest(CourseTestCase):
         )
         self.assertNotIn('edxnotes', test_model)
 
+    def test_allow_unsupported_xblocks(self):
+        """
+        allow_unsupported_xblocks is only shown in Advanced Settings if
+        XBlockStudioConfigurationFlag is enabled.
+        """
+        self.assertNotIn('allow_unsupported_xblocks', CourseMetadata.fetch(self.fullcourse))
+        XBlockStudioConfigurationFlag(enabled=True).save()
+        self.assertIn('allow_unsupported_xblocks', CourseMetadata.fetch(self.fullcourse))
+
     def test_validate_from_json_correct_inputs(self):
         is_valid, errors, test_model = CourseMetadata.validate_and_update_from_json(
             self.course,
@@ -770,7 +806,7 @@ class CourseMetadataEditingTest(CourseTestCase):
             user=self.user
         )
         self.assertTrue(is_valid)
-        self.assertTrue(len(errors) == 0)
+        self.assertEqual(len(errors), 0)
         self.update_check(test_model)
 
         # Tab gets tested in test_advanced_settings_munge_tabs
@@ -949,6 +985,23 @@ class CourseMetadataEditingTest(CourseTestCase):
         tab_list.append(self.notes_tab)
         self.assertEqual(tab_list, course.tabs)
 
+    @patch.dict(settings.FEATURES, {'ENABLE_EDXNOTES': True})
+    @patch('xmodule.util.django.get_current_request')
+    def test_post_settings_with_staff_not_enrolled(self, mock_request):
+        """
+        Tests that we can post advance settings when course staff is not enrolled.
+        """
+        mock_request.return_value = Mock(META={'HTTP_HOST': 'localhost'})
+        user = UserFactory.create(is_staff=True)
+        CourseStaffRole(self.course.id).add_users(user)
+
+        client = AjaxEnabledTestClient()
+        client.login(username=user.username, password=user.password)
+        response = self.client.ajax_post(self.course_setting_url, {
+            'advanced_modules': {"value": [""]}
+        })
+        self.assertEqual(response.status_code, 200)
+
 
 class CourseGraderUpdatesTest(CourseTestCase):
     """
@@ -1109,6 +1162,7 @@ id=\"course-enrollment-end-time\" value=\"\" placeholder=\"HH:MM\" autocomplete=
         self._verify_editable(self._get_course_details_response(False))
 
     @mock.patch.dict("django.conf.settings.FEATURES", {'ENABLE_MKTG_SITE': True})
+    @override_settings(MKTG_URLS={'ROOT': 'dummy-root'})
     def test_course_details_with_enabled_setting_global_staff(self):
         """ Test that user enrollment end date is editable in response.
 
@@ -1118,6 +1172,7 @@ id=\"course-enrollment-end-time\" value=\"\" placeholder=\"HH:MM\" autocomplete=
         self._verify_editable(self._get_course_details_response(True))
 
     @mock.patch.dict("django.conf.settings.FEATURES", {'ENABLE_MKTG_SITE': True})
+    @override_settings(MKTG_URLS={'ROOT': 'dummy-root'})
     def test_course_details_with_enabled_setting_non_global_staff(self):
         """ Test that user enrollment end date is not editable in response.
 

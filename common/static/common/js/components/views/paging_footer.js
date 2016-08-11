@@ -1,51 +1,60 @@
-;(function (define) {
+(function(define) {
     'use strict';
-    define(["underscore", "gettext", "backbone", "text!common/templates/components/paging-footer.underscore"],
-        function(_, gettext, Backbone, paging_footer_template) {
-
+    define([
+        'underscore',
+        'gettext',
+        'backbone',
+        'edx-ui-toolkit/js/utils/html-utils',
+        'text!common/templates/components/paging-footer.underscore'
+    ],
+        function(_, gettext, Backbone, HtmlUtils, pagingFooterTemplate) {
             var PagingFooter = Backbone.View.extend({
-                events : {
-                    "click .next-page-link": "nextPage",
-                    "click .previous-page-link": "previousPage",
-                    "change .page-number-input": "changePage"
+                events: {
+                    'click .next-page-link': 'nextPage',
+                    'click .previous-page-link': 'previousPage',
+                    'change .page-number-input': 'changePage'
                 },
 
                 initialize: function(options) {
                     this.collection = options.collection;
                     this.hideWhenOnePage = options.hideWhenOnePage || false;
+                    this.paginationLabel = options.paginationLabel || gettext('Pagination');
                     this.collection.bind('add', _.bind(this.render, this));
                     this.collection.bind('remove', _.bind(this.render, this));
                     this.collection.bind('reset', _.bind(this.render, this));
-                    this.render();
                 },
 
                 render: function() {
                     var onFirstPage = !this.collection.hasPreviousPage(),
                         onLastPage = !this.collection.hasNextPage();
                     if (this.hideWhenOnePage) {
-                        if (_.isUndefined(this.collection.totalPages)
-                                || this.collection.totalPages <= 1) {
+                        if (this.collection.getTotalPages() <= 1) {
                             this.$el.addClass('hidden');
                         } else if (this.$el.hasClass('hidden')) {
                             this.$el.removeClass('hidden');
                         }
                     }
-                    this.$el.html(_.template(paging_footer_template, {
-                        current_page: this.collection.getPage(),
-                        total_pages: this.collection.totalPages
-                    }));
-                    this.$(".previous-page-link").toggleClass("is-disabled", onFirstPage).attr('aria-disabled', onFirstPage);
-                    this.$(".next-page-link").toggleClass("is-disabled", onLastPage).attr('aria-disabled', onLastPage);
+
+                    HtmlUtils.setHtml(
+                        this.$el,
+                        HtmlUtils.template(pagingFooterTemplate)({
+                            current_page: this.collection.getPageNumber(),
+                            total_pages: this.collection.getTotalPages(),
+                            paginationLabel: this.paginationLabel
+                        })
+                    );
+                    this.$('.previous-page-link').toggleClass('is-disabled', onFirstPage).attr('aria-disabled', onFirstPage);
+                    this.$('.next-page-link').toggleClass('is-disabled', onLastPage).attr('aria-disabled', onLastPage);
                     return this;
                 },
 
                 changePage: function() {
                     var collection = this.collection,
-                        currentPage = collection.getPage(),
-                        pageInput = this.$("#page-number-input"),
+                        currentPage = collection.getPageNumber(),
+                        pageInput = this.$('#page-number-input'),
                         pageNumber = parseInt(pageInput.val(), 10),
                         validInput = true;
-                    if (!pageNumber || pageNumber > collection.totalPages || pageNumber < 1) {
+                    if (!pageNumber || pageNumber > collection.getTotalPages() || pageNumber < 1) {
                         validInput = false;
                     }
                     // If we still have a page number by this point,

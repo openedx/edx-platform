@@ -15,7 +15,7 @@
 %>
 
 <%block name="header_extras">
-% for template_name in ["course_grade_policy"]:
+% for template_name in ["course_grade_policy", "course_grade_cutoff"]:
   <script type="text/template" id="${template_name}-tpl">
     <%static:include path="js/${template_name}.underscore" />
   </script>
@@ -58,7 +58,7 @@
           <ol class="list-input">
             <li class="field" id="field-course-grading-range">
               <div class="grade-controls course-grading-range well">
-                <a href="#" class="new-grade-button"><span class="icon fa fa-plus"></span></a>
+                <a href="#" class="new-grade-button"><span class="icon fa fa-plus" aria-hidden="true"></span><span class="sr">${_("Add grade")}</span></a>
                 <div class="grade-slider" dir="ltr">
                   <div class="grade-bar">
                     <ol class="increments">
@@ -131,7 +131,7 @@
 
           <div class="actions">
             <a href="#" class="new-button new-course-grading-item add-grading-data">
-              <i class="icon fa fa-plus"></i> ${_("New Assignment Type")}
+              <span class="icon fa fa-plus" aria-hidden="true"></span> ${_("New Assignment Type")}
             </a>
           </div>
         </section>

@@ -108,3 +108,4 @@ class FakeEmailInfo(FakeInfo):
         fake_email_dict = fake_email.to_dict()
         self.email = {feature: fake_email_dict[feature] for feature in self.EMAIL_FEATURES}
         self.requester = u'expected'
+        self.sent_to = [u'expected']

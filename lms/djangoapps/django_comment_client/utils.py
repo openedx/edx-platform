@@ -108,44 +108,44 @@ def has_forum_access(uname, course_id, rolename):
     return role.users.filter(username=uname).exists()
 
 
-def has_required_keys(module):
+def has_required_keys(xblock):
     """
-    Returns True iff module has the proper attributes for generating metadata
+    Returns True iff xblock has the proper attributes for generating metadata
     with get_discussion_id_map_entry()
     """
     for key in ('discussion_id', 'discussion_category', 'discussion_target'):
-        if getattr(module, key, None) is None:
+        if getattr(xblock, key, None) is None:
             log.debug(
                 "Required key '%s' not in discussion %s, leaving out of category map",
                 key,
-                module.location
+                xblock.location
             )
             return False
     return True
 
 
-def get_accessible_discussion_modules(course, user, include_all=False):  # pylint: disable=invalid-name
+def get_accessible_discussion_xblocks(course, user, include_all=False):  # pylint: disable=invalid-name
     """
-    Return a list of all valid discussion modules in this course that
+    Return a list of all valid discussion xblocks in this course that
     are accessible to the given user.
     """
-    all_modules = modulestore().get_items(course.id, qualifiers={'category': 'discussion'}, include_orphans=False)
+    all_xblocks = modulestore().get_items(course.id, qualifiers={'category': 'discussion'}, include_orphans=False)
 
     return [
-        module for module in all_modules
-        if has_required_keys(module) and (include_all or has_access(user, 'load', module, course.id))
+        xblock for xblock in all_xblocks
+        if has_required_keys(xblock) and (include_all or has_access(user, 'load', xblock, course.id))
     ]
 
 
-def get_discussion_id_map_entry(module):
+def get_discussion_id_map_entry(xblock):
     """
     Returns a tuple of (discussion_id, metadata) suitable for inclusion in the results of get_discussion_id_map().
     """
     return (
-        module.discussion_id,
+        xblock.discussion_id,
         {
-            "location": module.location,
-            "title": module.discussion_category.split("/")[-1].strip() + " / " + module.discussion_target
+            "location": xblock.location,
+            "title": xblock.discussion_category.split("/")[-1].strip() + " / " + xblock.discussion_target
         }
     )
 
@@ -157,7 +157,7 @@ class DiscussionIdMapIsNotCached(Exception):
 
 def get_cached_discussion_key(course, discussion_id):
     """
-    Returns the usage key of the discussion module associated with discussion_id if it is cached. If the discussion id
+    Returns the usage key of the discussion xblock associated with discussion_id if it is cached. If the discussion id
     map is cached but does not contain discussion_id, returns None. If the discussion id map is not cached for course,
     raises a DiscussionIdMapIsNotCached exception.
     """
@@ -172,7 +172,7 @@ def get_cached_discussion_key(course, discussion_id):
 
 def get_cached_discussion_id_map(course, discussion_ids, user):
     """
-    Returns a dict mapping discussion_ids to respective discussion module metadata if it is cached and visible to the
+    Returns a dict mapping discussion_ids to respective discussion xblock metadata if it is cached and visible to the
     user. If not, returns the result of get_discussion_id_map
     """
     try:
@@ -181,10 +181,10 @@ def get_cached_discussion_id_map(course, discussion_ids, user):
             key = get_cached_discussion_key(course, discussion_id)
             if not key:
                 continue
-            module = modulestore().get_item(key)
-            if not (has_required_keys(module) and has_access(user, 'load', module, course.id)):
+            xblock = modulestore().get_item(key)
+            if not (has_required_keys(xblock) and has_access(user, 'load', xblock, course.id)):
                 continue
-            entries.append(get_discussion_id_map_entry(module))
+            entries.append(get_discussion_id_map_entry(xblock))
         return dict(entries)
     except DiscussionIdMapIsNotCached:
         return get_discussion_id_map(course, user)
@@ -192,13 +192,13 @@ def get_cached_discussion_id_map(course, discussion_ids, user):
 
 def get_discussion_id_map(course, user):
     """
-    Transform the list of this course's discussion modules (visible to a given user) into a dictionary of metadata keyed
+    Transform the list of this course's discussion xblocks (visible to a given user) into a dictionary of metadata keyed
     by discussion_id.
     """
-    return dict(map(get_discussion_id_map_entry, get_accessible_discussion_modules(course, user)))
+    return dict(map(get_discussion_id_map_entry, get_accessible_discussion_xblocks(course, user)))
 
 
-def _filter_unstarted_categories(category_map):
+def _filter_unstarted_categories(category_map, course):
     """
     Returns a subset of categories from the provided map which have not yet met the start date
     Includes information about category children, subcategories (different), and entries
@@ -221,7 +221,7 @@ def _filter_unstarted_categories(category_map):
 
         for child in unfiltered_map["children"]:
             if child in unfiltered_map["entries"]:
-                if unfiltered_map["entries"][child]["start_date"] <= now:
+                if course.self_paced or unfiltered_map["entries"][child]["start_date"] <= now:
                     filtered_map["children"].append(child)
                     filtered_map["entries"][child] = {}
                     for key in unfiltered_map["entries"][child]:
@@ -230,7 +230,7 @@ def _filter_unstarted_categories(category_map):
                 else:
                     log.debug(u"Filtering out:%s with start_date: %s", child, unfiltered_map["entries"][child]["start_date"])
             else:
-                if unfiltered_map["subcategories"][child]["start_date"] < now:
+                if course.self_paced or unfiltered_map["subcategories"][child]["start_date"] < now:
                     filtered_map["children"].append(child)
                     filtered_map["subcategories"][child] = {}
                     unfiltered_queue.append(unfiltered_map["subcategories"][child])
@@ -256,7 +256,7 @@ def _sort_map_entries(category_map, sort_alpha):
 
 def get_discussion_category_map(course, user, cohorted_if_in_list=False, exclude_unstarted=True):
     """
-    Transform the list of this course's discussion modules into a recursive dictionary structure.  This is used
+    Transform the list of this course's discussion xblocks into a recursive dictionary structure.  This is used
     to render the discussion category map in the discussion tab sidebar for a given user.
 
     Args:
@@ -301,18 +301,21 @@ def get_discussion_category_map(course, user, cohorted_if_in_list=False, exclude
     """
     unexpanded_category_map = defaultdict(list)
 
-    modules = get_accessible_discussion_modules(course, user)
+    xblocks = get_accessible_discussion_xblocks(course, user)
 
     course_cohort_settings = get_course_cohort_settings(course.id)
 
-    for module in modules:
-        id = module.discussion_id
-        title = module.discussion_target
-        sort_key = module.sort_key
-        category = " / ".join([x.strip() for x in module.discussion_category.split("/")])
-        # Handle case where module.start is None
-        entry_start_date = module.start if module.start else datetime.max.replace(tzinfo=pytz.UTC)
-        unexpanded_category_map[category].append({"title": title, "id": id, "sort_key": sort_key, "start_date": entry_start_date})
+    for xblock in xblocks:
+        discussion_id = xblock.discussion_id
+        title = xblock.discussion_target
+        sort_key = xblock.sort_key
+        category = " / ".join([x.strip() for x in xblock.discussion_category.split("/")])
+        # Handle case where xblock.start is None
+        entry_start_date = xblock.start if xblock.start else datetime.max.replace(tzinfo=pytz.UTC)
+        unexpanded_category_map[category].append({"title": title,
+                                                  "id": discussion_id,
+                                                  "sort_key": sort_key,
+                                                  "start_date": entry_start_date})
 
     category_map = {"entries": defaultdict(dict), "subcategories": defaultdict(dict)}
     for category_path, entries in unexpanded_category_map.items():
@@ -382,10 +385,10 @@ def get_discussion_category_map(course, user, cohorted_if_in_list=False, exclude
 
     _sort_map_entries(category_map, course.discussion_sort_alpha)
 
-    return _filter_unstarted_categories(category_map) if exclude_unstarted else category_map
+    return _filter_unstarted_categories(category_map, course) if exclude_unstarted else category_map
 
 
-def discussion_category_id_access(course, user, discussion_id):
+def discussion_category_id_access(course, user, discussion_id, xblock=None):
     """
     Returns True iff the given discussion_id is accessible for user in course.
     Assumes that the commentable identified by discussion_id has a null or 'course' context.
@@ -395,11 +398,12 @@ def discussion_category_id_access(course, user, discussion_id):
     if discussion_id in course.top_level_discussion_topic_ids:
         return True
     try:
-        key = get_cached_discussion_key(course, discussion_id)
-        if not key:
-            return False
-        module = modulestore().get_item(key)
-        return has_required_keys(module) and has_access(user, 'load', module, course.id)
+        if not xblock:
+            key = get_cached_discussion_key(course, discussion_id)
+            if not key:
+                return False
+            xblock = modulestore().get_item(key)
+        return has_required_keys(xblock) and has_access(user, 'load', xblock, course.id)
     except DiscussionIdMapIsNotCached:
         return discussion_id in get_discussion_categories_ids(course, user)
 
@@ -416,7 +420,7 @@ def get_discussion_categories_ids(course, user, include_all=False):
 
     """
     accessible_discussion_ids = [
-        module.discussion_id for module in get_accessible_discussion_modules(course, user, include_all=include_all)
+        xblock.discussion_id for xblock in get_accessible_discussion_xblocks(course, user, include_all=include_all)
     ]
     return course.top_level_discussion_topic_ids + accessible_discussion_ids
 
@@ -509,7 +513,18 @@ def get_ability(course_id, content, user):
         'can_reply': check_permissions_by_view(user, course_id, content, "create_comment" if content['type'] == 'thread' else "create_sub_comment"),
         'can_delete': check_permissions_by_view(user, course_id, content, "delete_thread" if content['type'] == 'thread' else "delete_comment"),
         'can_openclose': check_permissions_by_view(user, course_id, content, "openclose_thread") if content['type'] == 'thread' else False,
-        'can_vote': check_permissions_by_view(user, course_id, content, "vote_for_thread" if content['type'] == 'thread' else "vote_for_comment"),
+        'can_vote': not is_content_authored_by(content, user) and check_permissions_by_view(
+            user,
+            course_id,
+            content,
+            "vote_for_thread" if content['type'] == 'thread' else "vote_for_comment"
+        ),
+        'can_report': not is_content_authored_by(content, user) and check_permissions_by_view(
+            user,
+            course_id,
+            content,
+            "flag_abuse_for_thread" if content['type'] == 'thread' else "flag_abuse_for_comment"
+        )
     }
 
 # TODO: RENAME
@@ -654,7 +669,7 @@ def prepare_content(content, course_key, is_staff=False, course_is_cohorted=None
         'read', 'group_id', 'group_name', 'pinned', 'abuse_flaggers',
         'stats', 'resp_skip', 'resp_limit', 'resp_total', 'thread_type',
         'endorsed_responses', 'non_endorsed_responses', 'non_endorsed_resp_total',
-        'endorsement', 'context', 'private_to_peers'
+        'endorsement', 'context', 'last_activity_at', 'private_to_peers'
     ]
 
     if (content.get('anonymous') is False) and ((content.get('anonymous_to_peers') is False) or is_staff):
@@ -800,3 +815,13 @@ def is_discussion_enabled(course_id):
     if not tabs.ExternalDiscussionCourseTab.is_enabled(course):
         return False
     return settings.FEATURES.get('ENABLE_DISCUSSION_SERVICE')
+
+
+def is_content_authored_by(content, user):
+    """
+    Return True if the author is this content is the passed user, else False
+    """
+    try:
+        return int(content.get('user_id')) == user.id
+    except (ValueError, TypeError):
+        return False

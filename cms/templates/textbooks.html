@@ -10,7 +10,7 @@ from openedx.core.djangolib.js_utils import dump_js_escaped_json
 <%block name="bodyclass">is-signedin course view-textbooks</%block>
 
 <%block name="header_extras">
-% for template_name in ["edit-textbook", "show-textbook", "edit-chapter", "no-textbooks", "basic-modal", "modal-button", "upload-dialog"]:
+% for template_name in ["edit-textbook", "show-textbook", "no-textbooks", "basic-modal", "modal-button", "upload-dialog"]:
   <script type="text/template" id="${template_name}-tpl">
     <%static:include path="js/${template_name}.underscore" />
   </script>
@@ -44,7 +44,7 @@ CMS.URL.LMS_BASE = "${settings.LMS_BASE}"
         <h3 class="sr">${_("Page Actions")}</h3>
         <ul>
           <li class="nav-item">
-            <a href="#" class="button new-button"><i class="icon fa fa-plus"></i> ${_("New Textbook")}</a>
+            <a href="#" class="button new-button"><span class="icon fa fa-plus" aria-hidden="true"></span> ${_("New Textbook")}</a>
           </li>
         </ul>
       </nav>

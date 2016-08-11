@@ -3,16 +3,13 @@
 
 // About: Sass compile for the Open edX Certificates Elements.
 
-// NOTE: This is the right to left (RTL) configured style compile. It should mirror main-ltr w/ the exception of bi-app references.
+// NOTE: This is the right to left (RTL) configured style compile.
+// It should mirror main-ltr w/ the exception of bi-app references.
 
 
-// ------------------------------
-// #CONFIG - layout direction
-// ------------------------------
-@import 'rtl';                        // RTL-specifc settings and utilities
+// Load the RTL version of the edX Pattern Library
+$pattern-library-path: '../../edx-pattern-library' !default;
+@import 'edx-pattern-library/pattern-library/sass/edx-pattern-library-rtl';
 
-
-// ------------------------------
-// #BUILD
-// ------------------------------
-@import 'build';                      // shared compile/build order for both LTR and RTL UI
+// Load the shared build
+@import 'build';

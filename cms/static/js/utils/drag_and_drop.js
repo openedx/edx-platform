@@ -1,24 +1,24 @@
-define(["jquery", "jquery.ui", "underscore", "gettext", "draggabilly",
-        "js/utils/module", "common/js/components/views/feedback_notification"],
-    function ($, ui, _, gettext, Draggabilly, ModuleUtils, NotificationView) {
+define(['jquery', 'jquery.ui', 'underscore', 'gettext', 'draggabilly',
+        'js/utils/module', 'common/js/components/views/feedback_notification'],
+    function($, ui, _, gettext, Draggabilly, ModuleUtils, NotificationView) {
         'use strict';
 
         var contentDragger = {
             droppableClasses: 'drop-target drop-target-prepend drop-target-before drop-target-after',
-            validDropClass: "valid-drop",
-            expandOnDropClass: "expand-on-drop",
-            collapsedClass: "is-collapsed",
+            validDropClass: 'valid-drop',
+            expandOnDropClass: 'expand-on-drop',
+            collapsedClass: 'is-collapsed',
 
             /*
              * Determine information about where to drop the currently dragged
              * element. Returns the element to attach to and the method of
              * attachment ('before', 'after', or 'prepend').
              */
-            findDestination: function (ele, yChange) {
+            findDestination: function(ele, yChange) {
                 var eleY = ele.offset().top;
                 var eleYEnd = eleY + ele.outerHeight();
                 var containers = $(ele.data('droppable-class'));
-                var isSibling = function () {
+                var isSibling = function() {
                     return $(this).data('locator') !== undefined && !$(this).is(ele);
                 };
 
@@ -32,7 +32,7 @@ define(["jquery", "jquery.ui", "underscore", "gettext", "draggabilly",
                     // position of the container
                     var parentList = container.parents(ele.data('parent-location-selector')).first();
                     if (parentList.hasClass(this.collapsedClass)) {
-                        var parentListTop =  parentList.offset().top;
+                        var parentListTop = parentList.offset().top;
                         // To make it easier to drop subsections into collapsed sections (which have
                         // a lot of visual padding around them), allow a fudge factor around the
                         // parent element.
@@ -148,7 +148,7 @@ define(["jquery", "jquery.ui", "underscore", "gettext", "draggabilly",
             // Information about the current drag.
             dragState: {},
 
-            onDragStart: function (draggable) {
+            onDragStart: function(draggable) {
                 var ele = $(draggable.element);
                 this.dragState = {
                     // Which element will be dropped into/onto on success
@@ -176,7 +176,7 @@ define(["jquery", "jquery.ui", "underscore", "gettext", "draggabilly",
                 ele.removeClass('was-dragging');
             },
 
-            onDragMove: function (draggable, event, pointer) {
+            onDragMove: function(draggable, event, pointer) {
                 // Handle scrolling of the browser.
                 var scrollAmount = 0;
                 var dragBuffer = 10;
@@ -220,7 +220,7 @@ define(["jquery", "jquery.ui", "underscore", "gettext", "draggabilly",
                 }
             },
 
-            onDragEnd: function (draggable, event, pointer) {
+            onDragEnd: function(draggable, event, pointer) {
                 var ele = $(draggable.element);
                 var destination = this.dragState.dropDestination;
 
@@ -260,11 +260,11 @@ define(["jquery", "jquery.ui", "underscore", "gettext", "draggabilly",
                 this.dragState = {};
             },
 
-            pointerInBounds: function (pointer, ele) {
+            pointerInBounds: function(pointer, ele) {
                 return pointer.clientX >= ele.offset().left && pointer.clientX < ele.offset().left + ele.outerWidth();
             },
 
-            expandElement: function (ele) {
+            expandElement: function(ele) {
                 // Verify all children of the element are rendered.
                 var ensureChildrenRendered = ele.data('ensureChildrenRendered');
                 if (_.isFunction(ensureChildrenRendered)) { ensureChildrenRendered(); }
@@ -276,7 +276,7 @@ define(["jquery", "jquery.ui", "underscore", "gettext", "draggabilly",
             /*
              * Find all parent-child changes and save them.
              */
-            handleReorder: function (element) {
+            handleReorder: function(element) {
                 var parentSelector = element.data('parent-location-selector'),
                     childrenSelector = element.data('child-selector'),
                     newParentEle = element.parents(parentSelector).first(),
@@ -284,14 +284,13 @@ define(["jquery", "jquery.ui", "underscore", "gettext", "draggabilly",
                     oldParentLocator = element.data('parent'),
                     oldParentEle, saving, refreshParent;
 
-                refreshParent = function (element) {
+                refreshParent = function(element) {
                     var refresh = element.data('refresh');
                     // If drop was into a collapsed parent, the parent will have been
                     // expanded. Views using this class may need to track the
                     // collapse/expand state, so send it with the refresh callback.
                     var collapsed = element.hasClass(contentDragger.collapsedClass);
                     if (_.isFunction(refresh)) { refresh(collapsed); }
-
                 };
                 saving = new NotificationView.Mini({
                     title: gettext('Saving')
@@ -299,10 +298,10 @@ define(["jquery", "jquery.ui", "underscore", "gettext", "draggabilly",
                 saving.show();
                 element.addClass('was-dropped');
                 // Timeout interval has to match what is in the CSS.
-                setTimeout(function () {
+                setTimeout(function() {
                     element.removeClass('was-dropped');
                 }, 1000);
-                this.saveItem(newParentEle, childrenSelector, function () {
+                this.saveItem(newParentEle, childrenSelector, function() {
                     saving.hide();
 
                     // Refresh new parent.
@@ -310,7 +309,7 @@ define(["jquery", "jquery.ui", "underscore", "gettext", "draggabilly",
 
                     // Refresh old parent.
                     if (newParentLocator !== oldParentLocator) {
-                        oldParentEle = $(parentSelector).filter(function () {
+                        oldParentEle = $(parentSelector).filter(function() {
                             return $(this).data('locator') === oldParentLocator;
                         });
                         refreshParent(oldParentEle);
@@ -324,11 +323,11 @@ define(["jquery", "jquery.ui", "underscore", "gettext", "draggabilly",
              * representing the parent item to save, a CSS selector to find
              * its children, and a success callback.
              */
-            saveItem: function (ele, childrenSelector, success) {
+            saveItem: function(ele, childrenSelector, success) {
                 // Find all current child IDs.
                 var children = _.map(
                     ele.find(childrenSelector),
-                    function (child) {
+                    function(child) {
                         return $(child).data('locator');
                     }
                 );
@@ -356,15 +355,15 @@ define(["jquery", "jquery.ui", "underscore", "gettext", "draggabilly",
              *   `refresh` - method that will be called after dragging to refresh
              *      views of the target and source xblocks.
              */
-            makeDraggable: function (element, options) {
+            makeDraggable: function(element, options) {
                 var draggable;
                 options = _.defaults({
-                    type: null,
-                    handleClass: null,
-                    droppableClass: null,
-                    parentLocationSelector: null,
-                    refresh: null,
-                    ensureChildrenRendered: null
+                    type: undefined,
+                    handleClass: undefined,
+                    droppableClass: undefined,
+                    parentLocationSelector: undefined,
+                    refresh: undefined,
+                    ensureChildrenRendered: undefined
                 }, options);
 
                 if ($(element).data('droppable-class') !== options.droppableClass) {

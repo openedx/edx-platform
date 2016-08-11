@@ -12,11 +12,11 @@ body.view-in-course {
   }
 
   // courseware header
-  header.global,
-  header.global.slim {
+  .header-global,
+  .header-global.slim {
     width: auto;
 
-    .nav-wrapper {
+    .wrapper-header {
       min-width: auto;
       padding-right: 2%;
       padding-left: 2%;

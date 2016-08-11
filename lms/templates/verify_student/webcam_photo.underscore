@@ -10,7 +10,7 @@
     <object type="application/x-shockwave-flash"
       id="flash_video"
       name="flash_video"
-      data="/static/js/verify_student/CameraCapture.swf"
+      data="js/verify_student/CameraCapture.swf"
       width="500"
       height="375">
       <param name="quality" value="high">
@@ -25,7 +25,7 @@
   </div>
   <div class="control control-do is-hidden" id="webcam_capture_button">
     <button class="action action-do">
-      <i class="icon fa fa-camera" aria-hidden="true"></i> <span class="sr"><%- gettext( "Take Photo" ) %></span>
+      <span class="icon fa fa-camera" aria-hidden="true"></span> <span class="sr"><%- gettext( "Take Photo" ) %></span>
     </button>
   </div>
   <audio id="webcam_capture_sound"></audio>

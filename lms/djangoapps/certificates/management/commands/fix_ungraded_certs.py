@@ -4,7 +4,8 @@ Management command which fixes ungraded certificates for students
 
 
 from certificates.models import GeneratedCertificate
-from courseware import grades, courses
+from courseware import courses
+from lms.djangoapps.grades import course_grades
 from django.test.client import RequestFactory
 from django.core.management.base import BaseCommand
 from optparse import make_option
@@ -51,7 +52,7 @@ class Command(BaseCommand):
 
         for cert in ungraded:
             # grade the student
-            grade = grades.grade(cert.user, request, course)
+            grade = course_grades.summary(cert.user, course)
             print "grading {0} - {1}".format(cert.user, grade['percent'])
             cert.grade = grade['percent']
             if not options['noop']:

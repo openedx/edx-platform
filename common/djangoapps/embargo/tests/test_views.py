@@ -2,19 +2,19 @@
 
 import unittest
 from mock import patch
-from django.test import TestCase
 from django.core.urlresolvers import reverse
 from django.conf import settings
-from mako.exceptions import TopLevelLookupException
 import ddt
 
 from util.testing import UrlResetMixin
 from embargo import messages
+from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
+from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 @ddt.ddt
-class CourseAccessMessageViewTest(UrlResetMixin, TestCase):
+class CourseAccessMessageViewTest(CacheIsolationTestCase, UrlResetMixin):
     """Tests for the courseware access message view.
 
     These end-points serve static content.
@@ -32,9 +32,13 @@ class CourseAccessMessageViewTest(UrlResetMixin, TestCase):
 
     """
 
+    ENABLED_CACHES = ['default']
+
+    URLCONF_MODULES = ['embargo']
+
     @patch.dict(settings.FEATURES, {'EMBARGO': True})
     def setUp(self):
-        super(CourseAccessMessageViewTest, self).setUp('embargo')
+        super(CourseAccessMessageViewTest, self).setUp()
 
     @ddt.data(*messages.ENROLL_MESSAGES.keys())
     def test_enrollment_messages(self, msg_key):
@@ -48,23 +52,21 @@ class CourseAccessMessageViewTest(UrlResetMixin, TestCase):
     def test_invalid_message_key(self, access_point):
         self._load_page(access_point, 'invalid', expected_status=404)
 
-    @patch.dict(settings.FEATURES, {'USE_CUSTOM_THEME': True})
+    @with_comprehensive_theme("test-theme")
     @ddt.data('enrollment', 'courseware')
     def test_custom_theme_override(self, access_point):
         # Custom override specified for the "embargo" message
         # for backwards compatibility with previous versions
         # of the embargo app.
-        # This template isn't available by default, but we can at least
-        # verify that the view will look for it when the USE_CUSTOM_THEME
-        # feature flag is specified.
-        with self.assertRaisesRegexp(TopLevelLookupException, 'static_templates/theme-embargo.html'):
-            self._load_page(access_point, 'embargo')
-
-    @patch.dict(settings.FEATURES, {'USE_CUSTOM_THEME': True})
-    @ddt.data('enrollment', 'courseware')
-    def test_custom_theme_override_not_specified(self, access_point):
-        # No custom override specified for the "default" message
-        self._load_page(access_point, 'default')
+        url = reverse('embargo_blocked_message', kwargs={
+            'access_point': access_point,
+            'message_key': "embargo"
+        })
+        response = self.client.get(url)
+        self.assertContains(
+            response,
+            "This is a test template to test embargo message override for theming."
+        )
 
     def _load_page(self, access_point, message_key, expected_status=200):
         """Load the message page and check the status code. """

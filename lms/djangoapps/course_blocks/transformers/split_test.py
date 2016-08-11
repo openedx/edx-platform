@@ -1,10 +1,10 @@
 """
 Split Test Block Transformer
 """
-from openedx.core.lib.block_structure.transformer import BlockStructureTransformer
+from openedx.core.lib.block_structure.transformer import BlockStructureTransformer, FilteringTransformerMixin
 
 
-class SplitTestTransformer(BlockStructureTransformer):
+class SplitTestTransformer(FilteringTransformerMixin, BlockStructureTransformer):
     """
     A nested transformer of the UserPartitionTransformer that honors the
     block structure pathways created by split_test modules.
@@ -66,16 +66,18 @@ class SplitTestTransformer(BlockStructureTransformer):
             for child_location in xblock.children:
                 child = block_structure.get_xblock(child_location)
                 group = child_to_group.get(child_location, None)
-                child.group_access[partition_for_this_block.id] = [group] if group else []
+                child.group_access[partition_for_this_block.id] = [group] if group is not None else []
 
-    def transform(self, usage_info, block_structure):
+    def transform_block_filters(self, usage_info, block_structure):
         """
         Mutates block_structure based on the given usage_info.
         """
 
         # The UserPartitionTransformer will enforce group access, so
         # go ahead and remove all extraneous split_test modules.
-        block_structure.remove_block_if(
-            lambda block_key: block_key.block_type == 'split_test',
-            keep_descendants=True,
-        )
+        return [
+            block_structure.create_removal_filter(
+                lambda block_key: block_key.block_type == 'split_test',
+                keep_descendants=True,
+            )
+        ]

@@ -1,12 +1,11 @@
-(function (requirejs, require, define) {
+(function(requirejs, require, define) {
 // VideoControl module.
-define(
+    define(
 'video/04_video_control.js',
 [],
-function () {
-
+function() {
     // VideoControl() function - what this module "exports".
-    return function (state) {
+    return function(state) {
         var dfd = $.Deferred();
 
         state.videoControl = {};
@@ -49,6 +48,9 @@ function () {
         });
 
         this.el.off('controls:show');
+        if (this.controlHideTimeout) {
+            clearTimeout(this.controlHideTimeout);
+        }
         delete this.videoControl;
     }
 
@@ -134,7 +136,7 @@ function () {
         }
 
         this.controlState = 'hiding';
-        this.videoControl.el.fadeOut(this.videoControl.fadeOutTimeout, function () {
+        this.videoControl.el.fadeOut(this.videoControl.fadeOutTimeout, function() {
             _this.controlState = 'invisible';
             // If the focus was on the video control or the volume control,
             // then we must make sure to close these dialogs. Otherwise, after
@@ -153,7 +155,5 @@ function () {
         endTime = Math.min(endTime, params.duration);
         this.videoControl.vidTimeEl.html(Time.format(params.time) + ' / ' + Time.format(endTime));
     }
-
 });
-
 }(RequireJS.requirejs, RequireJS.require, RequireJS.define));

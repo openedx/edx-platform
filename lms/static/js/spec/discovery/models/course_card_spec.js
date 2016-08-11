@@ -1,13 +1,12 @@
 define(['js/discovery/models/course_card'], function(CourseCard) {
     'use strict';
 
-    describe('discovery.models.CourseCard', function () {
-
-        beforeEach(function () {
+    describe('discovery.models.CourseCard', function() {
+        beforeEach(function() {
             this.card = new CourseCard();
         });
 
-        it('has properties', function () {
+        it('has properties', function() {
             expect(this.card.get('modes')).toBeDefined();
             expect(this.card.get('course')).toBeDefined();
             expect(this.card.get('enrollment_start')).toBeDefined();
@@ -22,7 +21,5 @@ define(['js/discovery/models/course_card'], function(CourseCard) {
             expect(this.card.get('org')).toBeDefined();
             expect(this.card.get('id')).toBeDefined();
         });
-
     });
-
 });

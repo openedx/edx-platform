@@ -2,8 +2,11 @@
 Top-level module for the Block Structure framework with a class for managing
 BlockStructures.
 """
-from .factory import BlockStructureFactory
+from contextlib import contextmanager
+
 from .cache import BlockStructureCache
+from .factory import BlockStructureFactory
+from .exceptions import UsageKeyNotInBlockStructure
 from .transformers import BlockStructureTransformers
 
 
@@ -30,23 +33,39 @@ class BlockStructureManager(object):
         self.modulestore = modulestore
         self.block_structure_cache = BlockStructureCache(cache)
 
-    def get_transformed(self, transformers):
+    def get_transformed(self, transformers, starting_block_usage_key=None):
         """
         Returns the transformed Block Structure for the root_block_usage_key,
-        getting block data from the cache and modulestore, as needed.
+        starting at starting_block_usage_key, getting block data from the cache
+        and modulestore, as needed.
 
-        Details: Same as the get_collected method, except the transformers'
+        Details: Similar to the get_collected method, except the transformers'
         transform methods are also called.
 
         Arguments:
             transformers (BlockStructureTransformers) - Collection of
                 transformers to apply.
 
+            starting_block_usage_key (UsageKey) - Specifies the starting block
+                in the block structure that is to be transformed.
+                If None, root_block_usage_key is used.
+
         Returns:
             BlockStructureBlockData - A transformed block structure,
-                starting at self.root_block_usage_key.
+                starting at starting_block_usage_key.
         """
         block_structure = self.get_collected()
+        if starting_block_usage_key:
+            # Override the root_block_usage_key so traversals start at the
+            # requested location.  The rest of the structure will be pruned
+            # as part of the transformation.
+            if starting_block_usage_key not in block_structure:
+                raise UsageKeyNotInBlockStructure(
+                    "The requested usage_key '{0}' is not found in the block_structure with root '{1}'",
+                    unicode(starting_block_usage_key),
+                    unicode(self.root_block_usage_key),
+                )
+            block_structure.set_root_block(starting_block_usage_key)
         transformers.transform(block_structure)
         return block_structure
 
@@ -70,12 +89,13 @@ class BlockStructureManager(object):
         )
         cache_miss = block_structure is None
         if cache_miss or BlockStructureTransformers.is_collected_outdated(block_structure):
-            block_structure = BlockStructureFactory.create_from_modulestore(
-                self.root_block_usage_key,
-                self.modulestore
-            )
-            BlockStructureTransformers.collect(block_structure)
-            self.block_structure_cache.add(block_structure)
+            with self._bulk_operations():
+                block_structure = BlockStructureFactory.create_from_modulestore(
+                    self.root_block_usage_key,
+                    self.modulestore
+                )
+                BlockStructureTransformers.collect(block_structure)
+                self.block_structure_cache.add(block_structure)
         return block_structure
 
     def update_collected(self):
@@ -94,3 +114,15 @@ class BlockStructureManager(object):
         root block key.
         """
         self.block_structure_cache.delete(self.root_block_usage_key)
+
+    @contextmanager
+    def _bulk_operations(self):
+        """
+        A context manager for notifying the store of bulk operations.
+        """
+        try:
+            course_key = self.root_block_usage_key.course_key
+        except AttributeError:
+            course_key = None
+        with self.modulestore.bulk_operations(course_key):
+            yield

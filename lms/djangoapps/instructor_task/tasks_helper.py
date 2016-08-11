@@ -18,7 +18,7 @@ from celery import Task, current_task
 from celery.states import SUCCESS, FAILURE
 from django.contrib.auth.models import User
 from django.core.files.storage import DefaultStorage
-from django.db import transaction, reset_queries
+from django.db import reset_queries
 from django.db.models import Q
 import dogstats_wrapper as dog_stats_api
 from pytz import UTC
@@ -46,7 +46,7 @@ from certificates.models import (
 )
 from certificates.api import generate_user_certificates
 from courseware.courses import get_course_by_id, get_problems_in_section
-from courseware.grades import iterate_grades_for
+from grades.course_grades import iterate_grades_for
 from courseware.models import StudentModule
 from courseware.model_data import DjangoKeyValueStore, FieldDataCache
 from courseware.module_render import get_module_for_descriptor_internal
@@ -57,6 +57,7 @@ from instructor_analytics.basic import (
     list_problem_responses
 )
 from instructor_analytics.csvs import format_dictlist
+from openassessment.data import OraAggregateData
 from instructor_task.models import ReportStore, InstructorTask, PROGRESS
 from lms.djangoapps.lms_xblock.runtime import LmsPartitionService
 from openedx.core.djangoapps.course_groups.cohorts import get_cohort
@@ -648,10 +649,6 @@ def upload_exec_summary_to_store(data_dict, report_name, course_id, generated_at
             timestamp_str=generated_at.strftime("%Y-%m-%d-%H%M")
         ),
         output_buffer,
-        config={
-            'content_type': 'text/html',
-            'content_encoding': None,
-        }
     )
     tracker.emit(REPORT_REQUESTED_EVENT_NAME, {"report_type": report_name})
 
@@ -837,7 +834,7 @@ def _order_problems(blocks):
         an OrderedDict that maps a problem id to its headers in the final report.
     """
     problems = OrderedDict()
-    assignments = dict()
+    assignments = OrderedDict()
     # First, sort out all the blocks into their correct assignments and all the
     # assignments into their correct types.
     for block in blocks:
@@ -940,7 +937,7 @@ def upload_problem_grade_report(_xmodule_instance_args, _entry_id, course_id, _t
     error_rows = [list(header_row.values()) + ['error_msg']]
     current_step = {'step': 'Calculating Grades'}
 
-    for student, gradeset, err_msg in iterate_grades_for(course_id, enrolled_students, keep_raw_scores=True):
+    for student, gradeset, err_msg in iterate_grades_for(course_id, enrolled_students):
         student_fields = [getattr(student, field_name) for field_name in header_row]
         task_progress.attempted += 1
 
@@ -999,7 +996,7 @@ def upload_students_csv(_xmodule_instance_args, _entry_id, course_id, task_input
     task_progress.update_task_state(extra_meta=current_step)
 
     # compute the student features table and format it
-    query_features = task_input.get('features')
+    query_features = task_input
     student_data = enrolled_students_features(course_id, query_features)
     header, rows = format_dictlist(student_data, query_features)
 
@@ -1412,30 +1409,49 @@ def generate_students_certificates(
     json column, otherwise generate certificates for all enrolled students.
     """
     start_time = time()
-    enrolled_students = CourseEnrollment.objects.users_enrolled_in(course_id)
+    students_to_generate_certs_for = CourseEnrollment.objects.users_enrolled_in(course_id)
 
-    students = task_input.get('students', None)
+    student_set = task_input.get('student_set')
+    if student_set == 'all_whitelisted':
+        # Generate Certificates for all white listed students.
+        students_to_generate_certs_for = students_to_generate_certs_for.filter(
+            certificatewhitelist__course_id=course_id,
+            certificatewhitelist__whitelist=True
+        )
 
-    if students is not None:
-        enrolled_students = enrolled_students.filter(id__in=students)
+    elif student_set == 'whitelisted_not_generated':
+        # Whitelist students who did not get certificates already.
+        students_to_generate_certs_for = students_to_generate_certs_for.filter(
+            certificatewhitelist__course_id=course_id,
+            certificatewhitelist__whitelist=True
+        ).exclude(
+            generatedcertificate__course_id=course_id,
+            generatedcertificate__status__in=CertificateStatuses.PASSED_STATUSES
+        )
 
-    task_progress = TaskProgress(action_name, enrolled_students.count(), start_time)
+    elif student_set == "specific_student":
+        specific_student_id = task_input.get('specific_student_id')
+        students_to_generate_certs_for = students_to_generate_certs_for.filter(id=specific_student_id)
+
+    task_progress = TaskProgress(action_name, students_to_generate_certs_for.count(), start_time)
 
     current_step = {'step': 'Calculating students already have certificates'}
     task_progress.update_task_state(extra_meta=current_step)
 
     statuses_to_regenerate = task_input.get('statuses_to_regenerate', [])
-    if students is not None and not statuses_to_regenerate:
+    if student_set is not None and not statuses_to_regenerate:
         # We want to skip 'filtering students' only when students are given and statuses to regenerate are not
-        students_require_certs = enrolled_students
+        students_require_certs = students_to_generate_certs_for
     else:
-        students_require_certs = students_require_certificate(course_id, enrolled_students, statuses_to_regenerate)
+        students_require_certs = students_require_certificate(
+            course_id, students_to_generate_certs_for, statuses_to_regenerate
+        )
 
     if statuses_to_regenerate:
         # Mark existing generated certificates as 'unavailable' before regenerating
         # We need to call this method after "students_require_certificate" otherwise "students_require_certificate"
         # would return no results.
-        invalidate_generated_certificates(course_id, enrolled_students, statuses_to_regenerate)
+        invalidate_generated_certificates(course_id, students_to_generate_certs_for, statuses_to_regenerate)
 
     task_progress.skipped = task_progress.total - len(students_require_certs)
 
@@ -1603,3 +1619,70 @@ def invalidate_generated_certificates(course_id, enrolled_students, certificate_
         download_url='',
         grade='',
     )
+
+
+def upload_ora2_data(
+        _xmodule_instance_args, _entry_id, course_id, _task_input, action_name
+):
+    """
+    Collect ora2 responses and upload them to S3 as a CSV
+    """
+
+    start_date = datetime.now(UTC)
+    start_time = time()
+
+    num_attempted = 1
+    num_total = 1
+
+    fmt = u'Task: {task_id}, InstructorTask ID: {entry_id}, Course: {course_id}, Input: {task_input}'
+    task_info_string = fmt.format(
+        task_id=_xmodule_instance_args.get('task_id') if _xmodule_instance_args is not None else None,
+        entry_id=_entry_id,
+        course_id=course_id,
+        task_input=_task_input
+    )
+    TASK_LOG.info(u'%s, Task type: %s, Starting task execution', task_info_string, action_name)
+
+    task_progress = TaskProgress(action_name, num_total, start_time)
+    task_progress.attempted = num_attempted
+
+    curr_step = {'step': "Collecting responses"}
+    TASK_LOG.info(
+        u'%s, Task type: %s, Current step: %s for all submissions',
+        task_info_string,
+        action_name,
+        curr_step,
+    )
+
+    task_progress.update_task_state(extra_meta=curr_step)
+
+    try:
+        header, datarows = OraAggregateData.collect_ora2_data(course_id)
+        rows = [header] + [row for row in datarows]
+    # Update progress to failed regardless of error type
+    except Exception:  # pylint: disable=broad-except
+        TASK_LOG.exception('Failed to get ORA data.')
+        task_progress.failed = 1
+        curr_step = {'step': "Error while collecting data"}
+
+        task_progress.update_task_state(extra_meta=curr_step)
+
+        return UPDATE_STATUS_FAILED
+
+    task_progress.succeeded = 1
+    curr_step = {'step': "Uploading CSV"}
+    TASK_LOG.info(
+        u'%s, Task type: %s, Current step: %s',
+        task_info_string,
+        action_name,
+        curr_step,
+    )
+    task_progress.update_task_state(extra_meta=curr_step)
+
+    upload_csv_to_report_store(rows, 'ORA_data', course_id, start_date)
+
+    curr_step = {'step': 'Finalizing ORA data report'}
+    task_progress.update_task_state(extra_meta=curr_step)
+    TASK_LOG.info(u'%s, Task type: %s, Upload complete.', task_info_string, action_name)
+
+    return UPDATE_STATUS_SUCCEEDED

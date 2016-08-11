@@ -3,11 +3,13 @@ Tests for the plugin API
 """
 
 from django.test import TestCase
+from nose.plugins.attrib import attr
 
 from openedx.core.lib.api.plugins import PluginError
 from openedx.core.lib.course_tabs import CourseTabPluginManager
 
 
+@attr(shard=2)
 class TestPluginApi(TestCase):
     """
     Unit tests for the plugin API

@@ -5,6 +5,7 @@ import sys
 from paver.easy import task, cmdopts, needs
 from pavelib.utils.test.suites import JsTestSuite
 from pavelib.utils.envs import Env
+from pavelib.utils.timer import timed
 
 __test__ = False  # do not collect
 
@@ -19,8 +20,10 @@ __test__ = False  # do not collect
     ("mode=", "m", "dev or run"),
     ("coverage", "c", "Run test under coverage"),
     ("port=", "p", "Port to run test server on (dev mode only)"),
-    ('skip_clean', 'C', 'skip cleaning repository before running tests'),
+    ('skip-clean', 'C', 'skip cleaning repository before running tests'),
+    ('skip_clean', None, 'deprecated in favor of skip-clean'),
 ], share_with=["pavelib.utils.tests.utils.clean_reports_dir"])
+@timed
 def test_js(options):
     """
     Run the JavaScript tests
@@ -57,6 +60,7 @@ def test_js(options):
     ("suite=", "s", "Test suite to run"),
     ("coverage", "c", "Run test under coverage"),
 ])
+@timed
 def test_js_run(options):
     """
     Run the JavaScript tests and print results to the console
@@ -70,6 +74,7 @@ def test_js_run(options):
     ("suite=", "s", "Test suite to run"),
     ("port=", "p", "Port to run test server on"),
 ])
+@timed
 def test_js_dev(options):
     """
     Run the JavaScript tests in your default browsers

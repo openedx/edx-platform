@@ -1,37 +1,36 @@
 define([
-    'common/js/spec_helpers/ajax_helpers', 'js/discovery/models/search_state'
+    'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'js/discovery/models/search_state'
 ], function(AjaxHelpers, SearchState) {
     'use strict';
 
 
     var JSON_RESPONSE = {
-        "total": 365,
-        "results": [
+        'total': 365,
+        'results': [
             {
-                "data": {
-                    "modes": [
-                        "honor"
+                'data': {
+                    'modes': [
+                        'honor'
                     ],
-                    "course": "edX/DemoX/Demo_Course",
-                    "enrollment_start": "2015-04-21T00:00:00+00:00",
-                    "number": "DemoX",
-                    "content": {
-                        "overview": " About This Course Include your long course description here.",
-                        "display_name": "edX Demonstration Course",
-                        "number": "DemoX"
+                    'course': 'edX/DemoX/Demo_Course',
+                    'enrollment_start': '2015-04-21T00:00:00+00:00',
+                    'number': 'DemoX',
+                    'content': {
+                        'overview': ' About This Course Include your long course description here.',
+                        'display_name': 'edX Demonstration Course',
+                        'number': 'DemoX'
                     },
-                    "start": "1970-01-01T05:00:00+00:00",
-                    "image_url": "/c4x/edX/DemoX/asset/images_course_image.jpg",
-                    "org": "edX",
-                    "id": "edX/DemoX/Demo_Course"
+                    'start': '1970-01-01T05:00:00+00:00',
+                    'image_url': '/c4x/edX/DemoX/asset/images_course_image.jpg',
+                    'org': 'edX',
+                    'id': 'edX/DemoX/Demo_Course'
                 }
             }
         ]
     };
 
-    describe('discovery.models.SearchState', function () {
-
-        beforeEach(function () {
+    describe('discovery.models.SearchState', function() {
+        beforeEach(function() {
             this.search = new SearchState();
             this.onSearch = jasmine.createSpy('onSearch');
             this.onNext = jasmine.createSpy('onNext');
@@ -41,25 +40,25 @@ define([
             this.search.on('error', this.onError);
         });
 
-        it('perform search', function () {
+        it('perform search', function() {
             var requests = AjaxHelpers.requests(this);
             this.search.performSearch('dummy');
             AjaxHelpers.respondWithJson(requests, JSON_RESPONSE);
             expect(this.onSearch).toHaveBeenCalledWith('dummy', 365);
             expect(this.search.discovery.courseCards.length).toBe(1);
-            this.search.refineSearch({ modes: 'honor' });
+            this.search.refineSearch({modes: 'honor'});
             AjaxHelpers.respondWithJson(requests, JSON_RESPONSE);
             expect(this.onSearch).toHaveBeenCalledWith('dummy', 365);
         });
 
-        it('returns an error', function () {
+        it('returns an error', function() {
             var requests = AjaxHelpers.requests(this);
             this.search.performSearch('');
             AjaxHelpers.respondWithError(requests, 500);
             expect(this.onError).toHaveBeenCalled();
         });
 
-        it('loads next page', function () {
+        it('loads next page', function() {
             var requests = AjaxHelpers.requests(this);
             this.search.performSearch('dummy');
             AjaxHelpers.respondWithJson(requests, JSON_RESPONSE);
@@ -68,11 +67,11 @@ define([
             expect(this.onNext).toHaveBeenCalled();
         });
 
-        it('shows all results when there are none', function () {
+        it('shows all results when there are none', function() {
             var requests = AjaxHelpers.requests(this);
-            this.search.performSearch('dummy', { modes: 'SomeOption' });
+            this.search.performSearch('dummy', {modes: 'SomeOption'});
             // no results
-            AjaxHelpers.respondWithJson(requests, { total: 0 });
+            AjaxHelpers.respondWithJson(requests, {total: 0});
             expect(this.onSearch).not.toHaveBeenCalled();
             // there should be another Ajax call to fetch all courses
             AjaxHelpers.respondWithJson(requests, JSON_RESPONSE);
@@ -80,11 +79,9 @@ define([
             // new search
             this.search.performSearch('something');
             // no results
-            AjaxHelpers.respondWithJson(requests, { total: 0 });
+            AjaxHelpers.respondWithJson(requests, {total: 0});
             // should load cached results
             expect(this.onSearch).toHaveBeenCalledWith('dummy', 0);
         });
-
     });
-
 });

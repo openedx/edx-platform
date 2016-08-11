@@ -3,19 +3,20 @@
 Unit tests for sending course email
 """
 import json
+from markupsafe import escape
 from mock import patch, Mock
 from nose.plugins.attrib import attr
 import os
 from unittest import skipIf
 
-from django.conf import settings
 from django.core import mail
+from django.core.mail.message import forbid_multi_line_headers
 from django.core.urlresolvers import reverse
 from django.core.management import call_command
 from django.test.utils import override_settings
 
 from bulk_email.models import Optout, BulkEmailFlag
-from bulk_email.tasks import _get_source_address
+from bulk_email.tasks import _get_source_address, _get_course_email_context
 from openedx.core.djangoapps.course_groups.models import CourseCohort
 from openedx.core.djangoapps.course_groups.cohorts import add_user_to_cohort
 from courseware.tests.factories import StaffFactory, InstructorFactory
@@ -23,7 +24,8 @@ from instructor_task.subtasks import update_subtask_status
 from student.roles import CourseStaffRole
 from student.models import CourseEnrollment
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 STAFF_COUNT = 3
@@ -47,32 +49,71 @@ class MockCourseEmailResult(object):
         return mock_update_subtask_status
 
 
-class EmailSendFromDashboardTestCase(ModuleStoreTestCase):
+class EmailSendFromDashboardTestCase(SharedModuleStoreTestCase):
     """
     Test that emails send correctly.
     """
 
-    @patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': False})
-    def setUp(self):
-        super(EmailSendFromDashboardTestCase, self).setUp()
-        course_title = u"ẗëṡẗ title ｲ乇丂ｲ ﾶ乇丂丂ﾑg乇 ｷo尺 ﾑﾚﾚ тэѕт мэѕѕаБэ"
-        self.course = CourseFactory.create(display_name=course_title)
-
+    def create_staff_and_instructor(self):
+        """
+        Creates one instructor and several course staff for self.course. Assigns
+        them to self.instructor (single user) and self.staff (list of users),
+        respectively.
+        """
         self.instructor = InstructorFactory(course_key=self.course.id)
 
-        # Create staff
-        self.staff = [StaffFactory(course_key=self.course.id)
-                      for _ in xrange(STAFF_COUNT)]
+        self.staff = [
+            StaffFactory(course_key=self.course.id) for __ in xrange(STAFF_COUNT)
+        ]
 
-        # Create students
+    def create_students(self):
+        """
+        Creates users and enrolls them in self.course. Assigns these users to
+        self.students.
+        """
         self.students = [UserFactory() for _ in xrange(STUDENT_COUNT)]
         for student in self.students:
             CourseEnrollmentFactory.create(user=student, course_id=self.course.id)
 
+    def login_as_user(self, user):
+        """
+        Log in self.client as user.
+        """
+        self.client.login(username=user.username, password="test")
+
+
+    def goto_instructor_dash_email_view(self):
+        """
+        Goes to the instructor dashboard to verify that the email section is
+        there.
+        """
+        url = reverse('instructor_dashboard', kwargs={'course_id': unicode(self.course.id)})
+        # Response loads the whole instructor dashboard, so no need to explicitly
+        # navigate to a particular email section
+        response = self.client.get(url)
+        email_section = '<div class="vert-left send-email" id="section-send-email">'
+        # If this fails, it is likely because BulkEmailFlag.is_enabled() is set to False
+        self.assertIn(email_section, response.content)
+
+    @classmethod
+    def setUpClass(cls):
+        super(EmailSendFromDashboardTestCase, cls).setUpClass()
+        course_title = u"ẗëṡẗ title ｲ乇丂ｲ ﾶ乇丂丂ﾑg乇 ｷo尺 ﾑﾚﾚ тэѕт мэѕѕаБэ"
+        cls.course = CourseFactory.create(
+            display_name=course_title,
+            default_store=ModuleStoreEnum.Type.split
+        )
+
+    def setUp(self):
+        super(EmailSendFromDashboardTestCase, self).setUp()
+        BulkEmailFlag.objects.create(enabled=True, require_course_email_auth=False)
+        self.create_staff_and_instructor()
+        self.create_students()
+
         # load initial content (since we don't run migrations as part of tests):
         call_command("loaddata", "course_email_template.json")
 
-        self.client.login(username=self.instructor.username, password="test")
+        self.login_as_user(self.instructor)
 
         # Pulling up the instructor dash email view here allows us to test sending emails in tests
         self.goto_instructor_dash_email_view()
@@ -80,26 +121,29 @@ class EmailSendFromDashboardTestCase(ModuleStoreTestCase):
             'send_email', kwargs={'course_id': unicode(self.course.id)}
         )
         self.success_content = {
-            'course_id': self.course.id.to_deprecated_string(),
+            'course_id': unicode(self.course.id),
             'success': True,
         }
 
+    def tearDown(self):
+        super(EmailSendFromDashboardTestCase, self).tearDown()
+        BulkEmailFlag.objects.all().delete()
 
-@attr('shard_1')
-@patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': False})
+
+@attr(shard=1)
 @patch('bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message', autospec=True))
 class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase):
     """
     Tests email sending with mocked html_to_text.
     """
-    @patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': True})
     def test_email_disabled(self):
         """
         Test response when email is disabled for course.
         """
+        BulkEmailFlag.objects.create(enabled=True, require_course_email_auth=True)
         test_email = {
             'action': 'Send email',
-            'send_to': 'myself',
+            'send_to': '["myself"]',
             'subject': 'test subject for myself',
             'message': 'test message for myself'
         }
@@ -114,7 +158,7 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
         """
         test_email = {
             'action': 'send',
-            'send_to': 'myself',
+            'send_to': '["myself"]',
             'subject': 'test subject for myself',
             'message': 'test message for myself'
         }
@@ -126,6 +170,13 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
         self.assertEqual(len(mail.outbox[0].to), 1)
         self.assertEquals(mail.outbox[0].to[0], self.instructor.email)
         self.assertEquals(mail.outbox[0].subject, 'test subject for myself')
+        self.assertEquals(
+            mail.outbox[0].from_email,
+            u'"{course_display_name}" Course Staff <{course_name}-no-reply@example.com>'.format(
+                course_display_name=self.course.display_name,
+                course_name=self.course.id.course
+            )
+        )
 
     def test_send_to_staff(self):
         """
@@ -133,7 +184,7 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
         """
         test_email = {
             'action': 'Send email',
-            'send_to': 'staff',
+            'send_to': '["staff"]',
             'subject': 'test subject for staff',
             'message': 'test message for subject'
         }
@@ -195,7 +246,7 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
 
         test_email = {
             'action': 'Send email',
-            'send_to': 'all',
+            'send_to': '["myself", "staff", "learners"]',
             'subject': 'test subject for all',
             'message': 'test message for all'
         }
@@ -253,7 +304,7 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
         uni_subject = u'téśt śúbjéćt főŕ áĺĺ'
         test_email = {
             'action': 'Send email',
-            'send_to': 'all',
+            'send_to': '["myself", "staff", "learners"]',
             'subject': uni_subject,
             'message': 'test message for all'
         }
@@ -279,7 +330,7 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
 
         test_email = {
             'action': 'Send email',
-            'send_to': 'all',
+            'send_to': '["myself", "staff", "learners"]',
             'subject': 'test subject for all',
             'message': 'test message for all'
         }
@@ -292,6 +343,65 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
             [e.to[0] for e in mail.outbox],
             [self.instructor.email] + [s.email for s in self.staff] + [s.email for s in self.students]
         )
+
+    @override_settings(BULK_EMAIL_DEFAULT_FROM_EMAIL="no-reply@courseupdates.edx.org")
+    def test_long_course_display_name(self):
+        """
+        This test tests that courses with exorbitantly large display names
+        can still send emails, since it appears that 320 appears to be the
+        character length limit of from emails for Amazon SES.
+        """
+        test_email = {
+            'action': 'Send email',
+            'send_to': '["myself", "staff", "learners"]',
+            'subject': 'test subject for self',
+            'message': 'test message for self'
+        }
+
+        # make display_name that's longer than 320 characters when encoded
+        # to ascii and escaped, but shorter than 320 unicode characters
+        long_name = u"Финансовое программирование и политика, часть 1: макроэкономические счета и анализ"
+
+        course = CourseFactory.create(
+            display_name=long_name,
+            org="IMF",
+            number="FPP.1x",
+            run="2016",
+        )
+        instructor = InstructorFactory(course_key=course.id)
+
+        unexpected_from_addr = _get_source_address(
+            course.id, course.display_name, truncate=False
+        )
+        __, encoded_unexpected_from_addr = forbid_multi_line_headers(
+            "from", unexpected_from_addr, 'utf-8'
+        )
+        escaped_encoded_unexpected_from_addr = escape(encoded_unexpected_from_addr)
+
+        # it's shorter than 320 characters when just encoded
+        self.assertEqual(len(encoded_unexpected_from_addr), 318)
+        # escaping it brings it over that limit
+        self.assertEqual(len(escaped_encoded_unexpected_from_addr), 324)
+        # when not escaped or encoded, it's well below 320 characters
+        self.assertEqual(len(unexpected_from_addr), 137)
+
+        self.login_as_user(instructor)
+        send_mail_url = reverse('send_email', kwargs={'course_id': unicode(course.id)})
+        response = self.client.post(send_mail_url, test_email)
+        self.assertTrue(json.loads(response.content)['success'])
+
+        self.assertEqual(len(mail.outbox), 1)
+        from_email = mail.outbox[0].from_email
+
+        expected_from_addr = (
+            u'"{course_name}" Course Staff <{course_name}-no-reply@courseupdates.edx.org>'
+        ).format(course_name=course.id.course)
+
+        self.assertEqual(
+            from_email,
+            expected_from_addr
+        )
+        self.assertEqual(len(from_email), 61)
 
     @override_settings(BULK_EMAIL_EMAILS_PER_TASK=3)
     @patch('bulk_email.tasks.update_subtask_status')
@@ -316,7 +426,7 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
 
         test_email = {
             'action': 'Send email',
-            'send_to': 'all',
+            'send_to': '["myself", "staff", "learners"]',
             'subject': 'test subject for all',
             'message': 'test message for all'
         }
@@ -333,8 +443,7 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
         self.assertItemsEqual(outbox_contents, should_send_contents)
 
 
-@attr('shard_1')
-@patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': False})
+@attr(shard=1)
 @skipIf(os.environ.get("TRAVIS") == 'true', "Skip this test in Travis CI.")
 class TestEmailSendFromDashboard(EmailSendFromDashboardTestCase):
     """
@@ -352,7 +461,7 @@ class TestEmailSendFromDashboard(EmailSendFromDashboardTestCase):
         uni_message = u'ẗëṡẗ ṁëṡṡäġë ḟöṛ äḷḷ ｲ乇丂ｲ ﾶ乇丂丂ﾑg乇 ｷo尺 ﾑﾚﾚ тэѕт мэѕѕаБэ fоѓ аll'
         test_email = {
             'action': 'Send email',
-            'send_to': 'all',
+            'send_to': '["myself", "staff", "learners"]',
             'subject': 'test subject for all',
             'message': uni_message
         }
@@ -367,3 +476,60 @@ class TestEmailSendFromDashboard(EmailSendFromDashboardTestCase):
 
         message_body = mail.outbox[0].body
         self.assertIn(uni_message, message_body)
+
+
+class TestCourseEmailContext(SharedModuleStoreTestCase):
+    """
+    Test the course email context hash used to send bulk emails.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        """
+        Create a course shared by all tests.
+        """
+        super(TestCourseEmailContext, cls).setUpClass()
+        cls.course_title = u"Финансовое программирование и политика, часть 1: макроэкономические счета и анализ"
+        cls.course_org = 'IMF'
+        cls.course_number = "FPP.1x"
+        cls.course_run = "2016"
+        cls.course = CourseFactory.create(
+            display_name=cls.course_title,
+            org=cls.course_org,
+            number=cls.course_number,
+            run=cls.course_run,
+        )
+
+    def verify_email_context(self, email_context, scheme):
+        """
+        This test tests that the bulk email context uses http or https urls as appropriate.
+        """
+        self.assertEquals(email_context['platform_name'], 'edX')
+        self.assertEquals(email_context['course_title'], self.course_title)
+        self.assertEquals(email_context['course_url'],
+                          '{}://edx.org/courses/{}/{}/{}/'.format(scheme,
+                                                                  self.course_org,
+                                                                  self.course_number,
+                                                                  self.course_run))
+        self.assertEquals(email_context['course_image_url'],
+                          '{}://edx.org/c4x/{}/{}/asset/images_course_image.jpg'.format(scheme,
+                                                                                        self.course_org,
+                                                                                        self.course_number))
+        self.assertEquals(email_context['email_settings_url'], '{}://edx.org/dashboard'.format(scheme))
+        self.assertEquals(email_context['account_settings_url'], '{}://edx.org/account/settings'.format(scheme))
+
+    @override_settings(LMS_ROOT_URL="http://edx.org")
+    def test_insecure_email_context(self):
+        """
+        This test tests that the bulk email context uses http urls
+        """
+        email_context = _get_course_email_context(self.course)
+        self.verify_email_context(email_context, 'http')
+
+    @override_settings(LMS_ROOT_URL="https://edx.org")
+    def test_secure_email_context(self):
+        """
+        This test tests that the bulk email context uses https urls
+        """
+        email_context = _get_course_email_context(self.course)
+        self.verify_email_context(email_context, 'https')

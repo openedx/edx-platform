@@ -1,107 +1,212 @@
-"""Tests covering Api utils."""
+"""Tests covering edX API utilities."""
+import json
 
 from django.core.cache import cache
-from django.test import TestCase
+from django.test.utils import override_settings
 import httpretty
 import mock
-from oauth2_provider.tests.factories import ClientFactory
+from nose.plugins.attrib import attr
+from edx_oauth2_provider.tests.factories import ClientFactory
 from provider.constants import CONFIDENTIAL
-from testfixtures import LogCapture
 
-from openedx.core.djangoapps.credentials.models import CredentialsApiConfig
-from openedx.core.djangoapps.credentials.tests.mixins import CredentialsApiConfigMixin, CredentialsDataMixin
+from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
-from openedx.core.djangoapps.programs.tests.mixins import ProgramsApiConfigMixin, ProgramsDataMixin
+from openedx.core.djangoapps.programs.tests.mixins import ProgramsApiConfigMixin
+from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from openedx.core.lib.edx_api_utils import get_edx_api_data
 from student.tests.factories import UserFactory
 
 
-LOGGER_NAME = 'openedx.core.lib.edx_api_utils'
+UTILITY_MODULE = 'openedx.core.lib.edx_api_utils'
+TEST_API_URL = 'http://www-internal.example.com/api'
+TEST_API_SIGNING_KEY = 'edx'
 
 
-class TestApiDataRetrieval(CredentialsApiConfigMixin, CredentialsDataMixin, ProgramsApiConfigMixin, ProgramsDataMixin,
-                           TestCase):
-    """Test utility for API data retrieval."""
+@attr(shard=2)
+@httpretty.activate
+class TestGetEdxApiData(ProgramsApiConfigMixin, CacheIsolationTestCase):
+    """Tests for edX API data retrieval utility."""
+
+    ENABLED_CACHES = ['default']
+
     def setUp(self):
-        super(TestApiDataRetrieval, self).setUp()
-        ClientFactory(name=CredentialsApiConfig.OAUTH2_CLIENT_NAME, client_type=CONFIDENTIAL)
-        ClientFactory(name=ProgramsApiConfig.OAUTH2_CLIENT_NAME, client_type=CONFIDENTIAL)
+        super(TestGetEdxApiData, self).setUp()
+
         self.user = UserFactory()
+        ClientFactory(name=ProgramsApiConfig.OAUTH2_CLIENT_NAME, client_type=CONFIDENTIAL)
 
         cache.clear()
 
-    @httpretty.activate
-    def test_get_edx_api_data_programs(self):
-        """Verify programs data can be retrieved using get_edx_api_data."""
-        program_config = self.create_programs_config()
-        self.mock_programs_api()
+    def _mock_programs_api(self, responses, url=None):
+        """Helper for mocking out Programs API URLs."""
+        self.assertTrue(httpretty.is_enabled(), msg='httpretty must be enabled to mock Programs API calls.')
 
-        actual = get_edx_api_data(program_config, self.user, 'programs')
-        self.assertEqual(
-            actual,
-            self.PROGRAMS_API_RESPONSE['results']
+        url = url if url else ProgramsApiConfig.current().internal_api_url.strip('/') + '/programs/'
+
+        httpretty.register_uri(httpretty.GET, url, responses=responses)
+
+    def _assert_num_requests(self, count):
+        """DRY helper for verifying request counts."""
+        self.assertEqual(len(httpretty.httpretty.latest_requests), count)
+
+    def test_get_unpaginated_data(self):
+        """Verify that unpaginated data can be retrieved."""
+        program_config = self.create_programs_config()
+
+        expected_collection = ['some', 'test', 'data']
+        data = {
+            'next': None,
+            'results': expected_collection,
+        }
+
+        self._mock_programs_api(
+            [httpretty.Response(body=json.dumps(data), content_type='application/json')]
         )
 
-        # Verify the API was actually hit (not the cache).
-        self.assertEqual(len(httpretty.httpretty.latest_requests), 1)
+        actual_collection = get_edx_api_data(program_config, self.user, 'programs')
+        self.assertEqual(actual_collection, expected_collection)
 
-    def test_get_edx_api_data_disable_config(self):
-        """Verify no data is retrieved if configuration is disabled."""
+        # Verify the API was actually hit (not the cache)
+        self._assert_num_requests(1)
+
+    def test_get_paginated_data(self):
+        """Verify that paginated data can be retrieved."""
+        program_config = self.create_programs_config()
+
+        expected_collection = ['some', 'test', 'data']
+        url = ProgramsApiConfig.current().internal_api_url.strip('/') + '/programs/?page={}'
+
+        responses = []
+        for page, record in enumerate(expected_collection, start=1):
+            data = {
+                'next': url.format(page + 1) if page < len(expected_collection) else None,
+                'results': [record],
+            }
+
+            body = json.dumps(data)
+            responses.append(
+                httpretty.Response(body=body, content_type='application/json')
+            )
+
+        self._mock_programs_api(responses)
+
+        actual_collection = get_edx_api_data(program_config, self.user, 'programs')
+        self.assertEqual(actual_collection, expected_collection)
+
+        self._assert_num_requests(len(expected_collection))
+
+    def test_get_specific_resource(self):
+        """Verify that a specific resource can be retrieved."""
+        program_config = self.create_programs_config()
+
+        resource_id = 1
+        url = '{api_root}/programs/{resource_id}/'.format(
+            api_root=ProgramsApiConfig.current().internal_api_url.strip('/'),
+            resource_id=resource_id,
+        )
+
+        expected_resource = {'key': 'value'}
+
+        self._mock_programs_api(
+            [httpretty.Response(body=json.dumps(expected_resource), content_type='application/json')],
+            url=url
+        )
+
+        actual_resource = get_edx_api_data(program_config, self.user, 'programs', resource_id=resource_id)
+        self.assertEqual(actual_resource, expected_resource)
+
+        self._assert_num_requests(1)
+
+    def test_cache_utilization(self):
+        """Verify that when enabled, the cache is used."""
+        program_config = self.create_programs_config(cache_ttl=5)
+
+        expected_collection = ['some', 'test', 'data']
+        data = {
+            'next': None,
+            'results': expected_collection,
+        }
+
+        self._mock_programs_api(
+            [httpretty.Response(body=json.dumps(data), content_type='application/json')],
+        )
+
+        resource_id = 1
+        url = '{api_root}/programs/{resource_id}/'.format(
+            api_root=ProgramsApiConfig.current().internal_api_url.strip('/'),
+            resource_id=resource_id,
+        )
+
+        expected_resource = {'key': 'value'}
+
+        self._mock_programs_api(
+            [httpretty.Response(body=json.dumps(expected_resource), content_type='application/json')],
+            url=url
+        )
+
+        cache_key = ProgramsApiConfig.current().CACHE_KEY
+
+        # Warm up the cache.
+        get_edx_api_data(program_config, self.user, 'programs', cache_key=cache_key)
+        get_edx_api_data(program_config, self.user, 'programs', resource_id=resource_id, cache_key=cache_key)
+
+        # Hit the cache.
+        actual_collection = get_edx_api_data(program_config, self.user, 'programs', cache_key=cache_key)
+        self.assertEqual(actual_collection, expected_collection)
+
+        actual_resource = get_edx_api_data(
+            program_config, self.user, 'programs', resource_id=resource_id, cache_key=cache_key
+        )
+        self.assertEqual(actual_resource, expected_resource)
+
+        # Verify that only two requests were made, not four.
+        self._assert_num_requests(2)
+
+    @mock.patch(UTILITY_MODULE + '.log.warning')
+    def test_api_config_disabled(self, mock_warning):
+        """Verify that no data is retrieved if the provided config model is disabled."""
         program_config = self.create_programs_config(enabled=False)
 
         actual = get_edx_api_data(program_config, self.user, 'programs')
+
+        self.assertTrue(mock_warning.called)
         self.assertEqual(actual, [])
 
-    @httpretty.activate
-    def test_get_edx_api_data_cache(self):
-        """Verify that when enabled, the cache is used."""
-        program_config = self.create_programs_config(cache_ttl=1)
-        self.mock_programs_api()
-
-        # Warm up the cache.
-        get_edx_api_data(program_config, self.user, 'programs', cache_key='test.key')
-
-        # Hit the cache.
-        get_edx_api_data(program_config, self.user, 'programs', cache_key='test.key')
-
-        # Verify only one request was made.
-        self.assertEqual(len(httpretty.httpretty.latest_requests), 1)
-
     @mock.patch('edx_rest_api_client.client.EdxRestApiClient.__init__')
-    def test_get_edx_api_data_client_initialization_failure(self, mock_init):
-        """Verify no data is retrieved and exception logged when API client
-        fails to initialize.
-        """
-        program_config = self.create_programs_config()
+    @mock.patch(UTILITY_MODULE + '.log.exception')
+    def test_client_initialization_failure(self, mock_exception, mock_init):
+        """Verify that an exception is logged when the API client fails to initialize."""
         mock_init.side_effect = Exception
 
-        with LogCapture(LOGGER_NAME) as logger:
-            actual = get_edx_api_data(program_config, self.user, 'programs')
-            logger.check(
-                (LOGGER_NAME, 'ERROR', u'Failed to initialize the programs API client.')
-            )
-            self.assertEqual(actual, [])
-            self.assertTrue(mock_init.called)
-
-    @httpretty.activate
-    def test_get_edx_api_data_retrieval_failure(self):
-        """Verify exception is logged when data can't be retrieved from API."""
         program_config = self.create_programs_config()
-        self.mock_programs_api(status_code=500)
-        with LogCapture(LOGGER_NAME) as logger:
-            actual = get_edx_api_data(program_config, self.user, 'programs')
-            logger.check(
-                (LOGGER_NAME, 'ERROR', u'Failed to retrieve data from the programs API.')
-            )
-            self.assertEqual(actual, [])
 
-    @httpretty.activate
-    def test_get_edx_api_data_multiple_page(self):
-        """Verify that all data is retrieve for multiple page response."""
-        credentials_config = self.create_credentials_config()
-        self.mock_credentials_api(self.user, is_next_page=True)
-        querystring = {'username': self.user.username}
+        actual = get_edx_api_data(program_config, self.user, 'programs')
 
-        actual = get_edx_api_data(credentials_config, self.user, 'user_credentials', querystring=querystring)
-        expected_data = self.CREDENTIALS_NEXT_API_RESPONSE['results'] + self.CREDENTIALS_API_RESPONSE['results']
-        self.assertEqual(actual, expected_data)
+        self.assertTrue(mock_exception.called)
+        self.assertEqual(actual, [])
+
+    @mock.patch(UTILITY_MODULE + '.log.exception')
+    def test_data_retrieval_failure(self, mock_exception):
+        """Verify that an exception is logged when data can't be retrieved."""
+        program_config = self.create_programs_config()
+
+        self._mock_programs_api(
+            [httpretty.Response(body='clunk', content_type='application/json', status_code=500)]
+        )
+
+        actual = get_edx_api_data(program_config, self.user, 'programs')
+
+        self.assertTrue(mock_exception.called)
+        self.assertEqual(actual, [])
+
+    @override_settings(JWT_AUTH={'JWT_ISSUER': 'http://example.com/oauth', 'JWT_EXPIRATION': 30},
+                       ECOMMERCE_API_SIGNING_KEY=TEST_API_SIGNING_KEY, ECOMMERCE_API_URL=TEST_API_URL)
+    def test_client_passed(self):
+        """ Verify that when API client is passed edx_rest_api_client is not
+        used.
+        """
+        program_config = self.create_programs_config()
+        api = ecommerce_api_client(self.user)
+        with mock.patch('openedx.core.lib.edx_api_utils.EdxRestApiClient.__init__') as mock_init:
+            get_edx_api_data(program_config, self.user, 'orders', api=api)
+            self.assertFalse(mock_init.called)

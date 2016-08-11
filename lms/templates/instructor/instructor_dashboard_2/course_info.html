@@ -1,32 +1,38 @@
-<%! from django.utils.translation import ugettext as _ %>
-<%page args="section_data"/>
+<%page args="section_data" expression_filter="h"/>
+<%!
+from django.utils.translation import ugettext as _
+from openedx.core.djangolib.markup import HTML, Text
+%>
 
 %if settings.FEATURES.get('DISPLAY_ANALYTICS_ENROLLMENTS') or section_data.get('enrollment_message'):
+  <h3 class="hd hd-3">${_("Enrollment Information")}</h3>
   <div class="enrollment-wrapper">
-    <h2>${_("Enrollment Information")}</h2>
-
     %if settings.FEATURES.get('DISPLAY_ANALYTICS_ENROLLMENTS'):
       ## Translators: 'track' refers to the enrollment type ('honor', 'verified', or 'audit')
-      <span class="tip">${_("Number of enrollees (admins, staff, and students) by track")}</span>
-      <br/><br/>
       <% modes = section_data['enrollment_count'] %>
-      <table>
-        <tr>
-          <td>${_("Verified")}</td><td>${modes['verified']}</td>
-        </tr>
-        <tr>
-          <td>${_("Audit")}</td><td>${modes['audit']}</td>
-        </tr>
-        <tr>
-          <td>${_("Honor")}</td><td>${modes['honor']}</td>
-        </tr>
-        <tr>
-          <td>${_("Professional")}</td><td>${modes['professional'] + modes['no-id-professional']}</td>
-        </tr>
-        <tr style="color:green;border-top:1px solid #000">
-          <td style="padding-top:10px;"><b>${_("Total")}</b></td><td style="padding-top:10px;"><b>${modes['total']}</b></td>
-        </tr>
-      </table>
+        <table>
+            <caption class="tip">${_("Number of enrollees (admins, staff, and students) by track")}</caption>
+            <tr>
+                <th scope="row">${_("Verified")}</th><td>${modes['verified']}</td>
+            </tr>
+            <tr>
+                <th scope="row">${_("Audit")}</th><td>${modes['audit']}</td>
+            </tr>
+            <tr>
+                <th scope="row">${_("Honor")}</th><td>${modes['honor']}</td>
+            </tr>
+            <tr>
+                <th scope="row">${_("Professional")}</th><td>${modes['professional'] + modes['no-id-professional']}</td>
+            </tr>
+            <tr style="color:green;border-top:1px solid #000">
+                <th scope="row" style="padding-top:10px;">
+                    <strong>${_("Total")}</strong>
+                </th>
+                <td style="padding-top:10px;">
+                    <strong>${modes['total']}</strong>
+                </td>
+            </tr>
+        </table>
       %elif section_data.get('enrollment_message'):
         <p>${section_data['enrollment_message']}</p>
       %endif
@@ -35,27 +41,27 @@
 %endif
 
 <div class="basic-wrapper">
-  <h2>${_("Basic Course Information")}</h2>
+  <h3 class="hd hd-3">${_("Basic Course Information")}</h3>
 
   <ul class="list-input">
     <li class="field text is-not-editable" id="field-course-organization">
       <label for="course-organization">${_("Organization:")}</label>
-      <b>${ section_data['course_id'].org | h}</b>
+      <b>${ section_data['course_id'].org}</b>
     </li>
 
     <li class="field text is-not-editable" id="field-course-number">
       <label for="course-number">${_("Course Number:")}</label>
-      <b>${ section_data['course_id'].course | h}</b>
+      <b>${ section_data['course_id'].course}</b>
     </li>
 
     <li class="field text is-not-editable" id="field-course-name">
       <label for="course-name">${_("Course Name:")}</label>
-      <b>${ section_data['course_id'].run | h}</b>
+      <b>${ section_data['course_id'].run}</b>
     </li>
 
     <li class="field text is-not-editable" id="field-course-display-name">
       <label for="course-display-name">${_("Course Display Name:")}</label>
-      <b>${ section_data['course_display_name'] | h}</b>
+      <b>${ section_data['course_display_name']}</b>
     </li>
 
     <li class="field text is-not-editable" id="field-course-start-date">
@@ -98,9 +104,9 @@
   %if settings.FEATURES.get('ENABLE_SYSADMIN_DASHBOARD', ''):
       <p>
         ## Translators: git is a version-control system; see http://git-scm.com/about
-        ${_("View detailed Git import logs for this course {link_start}by clicking here{link_end}.").format(
-            link_start='<a href="{}">'.format(section_data['detailed_gitlogs_url']),
-            link_end='</a>'
+        ${Text(_("View detailed Git import logs for this course {link_start}by clicking here{link_end}.")).format(
+            link_start=HTML('<a href="{}">').format(section_data['detailed_gitlogs_url']),
+            link_end=HTML('</a>')
         )}
       </p>
   %endif
@@ -110,7 +116,7 @@
 %if settings.FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS'):
   <div class="running-tasks-container action-type-container">
     <hr>
-    <h2> ${_("Pending Tasks")} </h2>
+    <h3 class="hd hd-3"> ${_("Pending Tasks")} </h3>
     <div class="running-tasks-section">
       <p>${_("The status for any active tasks appears in a table below.")} </p>
       <br />
@@ -127,7 +133,7 @@
     <hr>
     <p>
     <div class="toggle-wrapper">
-      <h2 class="title">${_("Course Warnings")}:</h2>
+      <h3 class="hd hd-3 title">${_("Course Warnings")}:</h3>
       <div class="triangle"></div>
     </div>
     <div class="course-errors-visibility-wrapper">

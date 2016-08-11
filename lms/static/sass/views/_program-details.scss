@@ -1,0 +1,78 @@
+.program-details {
+    .content-wrapper {
+        max-width: 100%;
+        padding-top: 0;
+    }
+}
+
+.program-header {
+    .banner-content {
+        padding-top: 100px;
+    }
+
+    .title {
+        margin: 0;
+    }
+
+    .title,
+    .subtitle {
+        color: $white;
+        font-weight: font-weight(semi-bold);
+    }
+
+    .org-wrapper {
+        position: absolute;
+        top: 0;
+        background: $white;
+        opacity: 0.7;
+        left: 0;
+        padding: 20px;
+    }
+
+    .org-logo {
+        height: 50px;
+    }
+
+    .breadcrumb-wrapper {
+        padding: $full-width-banner-margin;
+
+        @include susy-media(1200px) {
+            padding-left: 0;
+        }
+    }
+
+    .breadcrumb-list {
+        list-style-type: none;
+        margin: 0;
+    }
+
+    .crumb {
+        position: relative;
+        float: left;
+        font-size: font-size(x-small);
+        line-height: line-height(x-small);
+        color: palette(grayscale, dark);
+
+        &.active {
+            color: palette(grayscale, dark);
+        }
+    }
+
+    .crumb-link {
+        font-size: inherit;
+        line-height: inherit;
+        color: palette(primary, base);
+
+        &:hover,
+        &:focus {
+            color: palette(grayscale, black);
+            text-decoration: underline;
+        }
+    }
+
+    .crumb-separator {
+        font-size: font-size(xx-small);
+        line-height: line-height(xx-small);
+        padding: 0 $full-width-banner-margin/4;
+    }
+}

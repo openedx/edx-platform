@@ -1,12 +1,12 @@
 # DON'T JUST ADD NEW DEPENDENCIES!!!
 #
 # If you open a pull request that adds a new dependency, you should notify:
-#   * @mollydb to check licensing
+#   * @nedbat to check licensing
 #   * @edx/devops to check system requirements
 #
 # A correct GitHub reference looks like this:
 #
-#   git+https://github.com/OWNER/REPO-NAME.git@TAG-OR-SHA#egg=KIT-NAME==VERSION
+#   git+https://github.com/OWNER/REPO-NAME.git@TAG-OR-SHA#egg=DIST-NAME==VERSION
 #
 # For example:
 #
@@ -17,7 +17,7 @@
 #   OWNER = edx
 #   REPO-NAME = edx-lint
 #   TAG-OR-SHA = v0.3.2
-#   KIT-NAME = edx_lint
+#   DIST-NAME = edx_lint
 #   VERSION = 0.3.2
 #
 #
@@ -27,10 +27,12 @@
 #
 #   * Don't use -e
 #
-#   * TAG-OR-SHA must be a git tag, or a git SHA.  Don't use branch names here.
+#   * TAG-OR-SHA is the specific commit to install.  It must be a git tag,
+#     or a git SHA.  Don't use branch names here.
 #
-#   * KIT-NAME might be different than REPO-NAME.  KIT-NAME must be the same as
-#     the `name="KIT-NAME"` value in the repo's setup.py.
+#   * DIST-NAME is the distribution name, the same name you'd use in a
+#     "pip install" command.  It might be different than REPO-NAME. It must
+#     be the same as the `name="DIST-NAME"` value in the repo's setup.py.
 #
 #   * VERSION might not be the same as TAG-OR-SHA, but if the tag names the
 #     version, please make it match the VERSION, but with a "v" prefix.
@@ -44,17 +46,16 @@
 # Python libraries to install directly from github
 
 # Third-party:
--e git+https://github.com/cyberdelia/django-pipeline.git@1.5.3#egg=django-pipeline
+git+https://github.com/cyberdelia/django-pipeline.git@1.5.3#egg=django-pipeline==1.5.3
 git+https://github.com/edx/django-wiki.git@v0.0.8#egg=django-wiki==0.0.8
 git+https://github.com/edx/django-openid-auth.git@0.8#egg=django-openid-auth==0.8
--e git+https://github.com/edx/django-rest-framework-oauth.git@f0b503fda8c254a38f97fef802ded4f5fe367f7a#egg=djangorestframework-oauth==1.0.1
 git+https://github.com/edx/MongoDBProxy.git@25b99097615bda06bd7cdfe5669ed80dc2a7fed0#egg=MongoDBProxy==0.1.0
 git+https://github.com/edx/nltk.git@2.0.6#egg=nltk==2.0.6
 -e git+https://github.com/dementrock/pystache_custom.git@776973740bdaad83a3b029f96e415a7d1e8bec2f#egg=pystache_custom-dev
 -e git+https://github.com/appliedsec/pygeoip.git@95e69341cebf5a6a9fbf7c4f5439d458898bdc3b#egg=pygeoip
 -e git+https://github.com/jazkarta/edx-jsme.git@c5bfa5d361d6685d8c643838fc0055c25f8b7999#egg=edx-jsme
 git+https://github.com/edx/django-pyfs.git@1.0.3#egg=django-pyfs==1.0.3
-git+https://github.com/mitocw/django-cas.git@60a5b8e5a62e63e0d5d224a87f0b489201a0c695#egg=django-cas
+git+https://github.com/mitodl/django-cas.git@v2.1.1#egg=django-cas
 -e git+https://github.com/dgrtwo/ParsePy.git@7949b9f754d1445eff8e8f20d0e967b9a6420639#egg=parse_rest
 # Master pyfs has a bug working with VPC auth. This is a fix. We should switch
 # back to master when and if this fix is merged back.
@@ -63,37 +64,37 @@ git+https://github.com/pmitros/pyfs.git@96e1922348bfe6d99201b9512a9ed946c87b7e0b
 # The officially released version of django-debug-toolbar-mongo doesn't support DJDT 1.x. This commit does.
 git+https://github.com/hmarr/django-debug-toolbar-mongo.git@b0686a76f1ce3532088c4aee6e76b9abe61cc808
 
-# custom opaque-key implementations for CCX
-git+https://github.com/edx/ccx-keys.git@0.1.1#egg=ccx-keys==0.1.1
-
+# NOTE (CCB): This must remain. There is one commit on the upstream repo that has not been released to PyPI.
 git+https://github.com/edx/rfc6266.git@v0.0.5-edx#egg=rfc6266==0.0.5-edx
+
 # Used for testing
 git+https://github.com/edx/lettuce.git@0.2.20.002#egg=lettuce==0.2.20.002
+git+https://github.com/edx/pa11ycrawler.git@0.0.4#egg=pa11ycrawler==0.0.4
 
 # Our libraries:
-git+https://github.com/edx/XBlock.git@xblock-0.4.4#egg=XBlock==0.4.4
+git+https://github.com/edx/XBlock.git@xblock-0.4.12#egg=XBlock==0.4.12
 -e git+https://github.com/edx/codejail.git@6b17c33a89bef0ac510926b1d7fea2748b73aadd#egg=codejail
--e git+https://github.com/edx/js-test-tool.git@v0.1.6#egg=js_test_tool
 -e git+https://github.com/edx/event-tracking.git@0.2.1#egg=event-tracking==0.2.1
 -e git+https://github.com/edx/django-splash.git@v0.2#egg=django-splash==0.2
 -e git+https://github.com/edx/acid-block.git@e46f9cda8a03e121a00c7e347084d142d22ebfb7#egg=acid-xblock
--e git+https://github.com/edx/edx-ora2.git@0.2.7#egg=ora2==0.2.7
--e git+https://github.com/edx/edx-submissions.git@0.1.3#egg=edx-submissions==0.1.3
+git+https://github.com/edx/edx-ora2.git@1.1.7#egg=ora2==1.1.7
+-e git+https://github.com/edx/edx-submissions.git@1.1.1#egg=edx-submissions==1.1.1
 git+https://github.com/edx/ease.git@release-2015-07-14#egg=ease==0.1.3
-git+https://github.com/edx/i18n-tools.git@v0.2#egg=i18n-tools==v0.2
+git+https://github.com/edx/i18n-tools.git@v0.3.2#egg=i18n-tools==v0.3.2
 git+https://github.com/edx/edx-val.git@0.0.9#egg=edxval==0.0.9
--e git+https://github.com/pmitros/RecommenderXBlock.git@518234bc354edbfc2651b9e534ddb54f96080779#egg=recommender-xblock
+git+https://github.com/pmitros/RecommenderXBlock.git@v1.1#egg=recommender-xblock==1.1
+git+https://github.com/solashirai/crowdsourcehinter.git@518605f0a95190949fe77bd39158450639e2e1dc#egg=crowdsourcehinter-xblock==0.1
 -e git+https://github.com/pmitros/RateXBlock.git@367e19c0f6eac8a5f002fd0f1559555f8e74bfff#egg=rate-xblock
 -e git+https://github.com/pmitros/DoneXBlock.git@857bf365f19c904d7e48364428f6b93ff153fabd#egg=done-xblock
-git+https://github.com/edx/edx-milestones.git@v0.1.8#egg=edx-milestones==0.1.8
-git+https://github.com/edx/edx-lint.git@v0.4.1#egg=edx_lint==0.4.1
+git+https://github.com/edx/edx-milestones.git@v0.1.10#egg=edx-milestones==0.1.10
 git+https://github.com/edx/xblock-utils.git@v1.0.2#egg=xblock-utils==1.0.2
 -e git+https://github.com/edx-solutions/xblock-google-drive.git@138e6fa0bf3a2013e904a085b9fed77dab7f3f21#egg=xblock-google-drive
 -e git+https://github.com/edx/edx-reverification-block.git@0.0.5#egg=edx-reverification-block==0.0.5
 git+https://github.com/edx/edx-user-state-client.git@1.0.1#egg=edx-user-state-client==1.0.1
-git+https://github.com/edx/edx-proctoring.git@0.12.9#egg=edx-proctoring==0.12.9
-git+https://github.com/edx/xblock-lti-consumer.git@v1.0.3#egg=xblock-lti-consumer==1.0.3
+git+https://github.com/edx/xblock-lti-consumer.git@v1.0.9#egg=xblock-lti-consumer==1.0.9
+git+https://github.com/edx/edx-proctoring.git@0.12.21#egg=edx-proctoring==0.12.21
 
 # Third Party XBlocks
 -e git+https://github.com/mitodl/edx-sga@172a90fd2738f8142c10478356b2d9ed3e55334a#egg=edx-sga
--e git+https://github.com/open-craft/xblock-poll@e7a6c95c300e95c51e42bfd1eba70489c05a6527#egg=xblock-poll
+-e git+https://github.com/open-craft/xblock-poll@v1.1#egg=xblock-poll==1.1
+git+https://github.com/edx-solutions/xblock-drag-and-drop-v2@v2.0.7#egg=xblock-drag-and-drop-v2==2.0.7

@@ -10,62 +10,105 @@ import unittest
 from uuid import uuid4
 
 from django.conf import settings
+from django.test import RequestFactory
 from django.test.client import Client
 from django.test.utils import override_settings
 from mock import patch
 
 from xmodule.contentstore.django import contentstore
+from xmodule.contentstore.content import StaticContent, VERSIONED_ASSETS_PREFIX
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.xml_importer import import_course_from_xml
+from xmodule.assetstore.assetmgr import AssetManager
+from opaque_keys import InvalidKeyError
+from xmodule.modulestore.exceptions import ItemNotFoundError
 
 from contentserver.middleware import parse_range_header, HTTP_DATE_FORMAT, StaticContentServer
 from student.models import CourseEnrollment
+from student.tests.factories import UserFactory, AdminFactory
 
 log = logging.getLogger(__name__)
 
 TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)
 TEST_DATA_CONTENTSTORE['DOC_STORE_CONFIG']['db'] = 'test_xcontent_%s' % uuid4().hex
-
 TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
+
+FAKE_MD5_HASH = 'ffffffffffffffffffffffffffffffff'
+
+
+def get_versioned_asset_url(asset_path):
+    """
+    Creates a versioned asset URL.
+    """
+    try:
+        locator = StaticContent.get_location_from_path(asset_path)
+        content = AssetManager.find(locator, as_stream=True)
+        return StaticContent.add_version_to_asset_path(asset_path, content.content_digest)
+    except (InvalidKeyError, ItemNotFoundError):
+        pass
+
+    return asset_path
+
+
+def get_old_style_versioned_asset_url(asset_path):
+    """
+    Creates an old-style versioned asset URL.
+    """
+    try:
+        locator = StaticContent.get_location_from_path(asset_path)
+        content = AssetManager.find(locator, as_stream=True)
+        return u'{}/{}{}'.format(VERSIONED_ASSETS_PREFIX, content.content_digest, asset_path)
+    except (InvalidKeyError, ItemNotFoundError):
+        pass
+
+    return asset_path
 
 
 @ddt.ddt
 @override_settings(CONTENTSTORE=TEST_DATA_CONTENTSTORE)
-class ContentStoreToyCourseTest(ModuleStoreTestCase):
+class ContentStoreToyCourseTest(SharedModuleStoreTestCase):
     """
     Tests that use the toy course.
     """
+
+    @classmethod
+    def setUpClass(cls):
+        super(ContentStoreToyCourseTest, cls).setUpClass()
+
+        cls.contentstore = contentstore()
+        cls.modulestore = modulestore()
+
+        cls.course_key = cls.modulestore.make_course_key('edX', 'toy', '2012_Fall')
+
+        import_course_from_xml(
+            cls.modulestore, 1, TEST_DATA_DIR, ['toy'],
+            static_content_store=cls.contentstore, verbose=True
+        )
+
+        # A locked asset
+        cls.locked_asset = cls.course_key.make_asset_key('asset', 'sample_static.html')
+        cls.url_locked = unicode(cls.locked_asset)
+        cls.url_locked_versioned = get_versioned_asset_url(cls.url_locked)
+        cls.url_locked_versioned_old_style = get_old_style_versioned_asset_url(cls.url_locked)
+        cls.contentstore.set_attr(cls.locked_asset, 'locked', True)
+
+        # An unlocked asset
+        cls.unlocked_asset = cls.course_key.make_asset_key('asset', 'another_static.txt')
+        cls.url_unlocked = unicode(cls.unlocked_asset)
+        cls.url_unlocked_versioned = get_versioned_asset_url(cls.url_unlocked)
+        cls.url_unlocked_versioned_old_style = get_old_style_versioned_asset_url(cls.url_unlocked)
+        cls.length_unlocked = cls.contentstore.get_attr(cls.unlocked_asset, 'length')
 
     def setUp(self):
         """
         Create user and login.
         """
-        self.staff_pwd = super(ContentStoreToyCourseTest, self).setUp()
-        self.staff_usr = self.user
-        self.non_staff_usr, self.non_staff_pwd = self.create_non_staff_user()
+        super(ContentStoreToyCourseTest, self).setUp()
+        self.staff_usr = AdminFactory.create()
+        self.non_staff_usr = UserFactory.create()
 
         self.client = Client()
-        self.contentstore = contentstore()
-        store = modulestore()._get_modulestore_by_type(ModuleStoreEnum.Type.mongo)  # pylint: disable=protected-access
-
-        self.course_key = store.make_course_key('edX', 'toy', '2012_Fall')
-
-        import_course_from_xml(
-            store, self.user.id, TEST_DATA_DIR, ['toy'],
-            static_content_store=self.contentstore, verbose=True
-        )
-
-        # A locked asset
-        self.locked_asset = self.course_key.make_asset_key('asset', 'sample_static.txt')
-        self.url_locked = unicode(self.locked_asset)
-        self.contentstore.set_attr(self.locked_asset, 'locked', True)
-
-        # An unlocked asset
-        self.unlocked_asset = self.course_key.make_asset_key('asset', 'another_static.txt')
-        self.url_unlocked = unicode(self.unlocked_asset)
-        self.length_unlocked = self.contentstore.get_attr(self.unlocked_asset, 'length')
 
     def test_unlocked_asset(self):
         """
@@ -73,6 +116,56 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         """
         self.client.logout()
         resp = self.client.get(self.url_unlocked)
+        self.assertEqual(resp.status_code, 200)
+
+    def test_unlocked_versioned_asset(self):
+        """
+        Test that unlocked assets that are versioned are being served.
+        """
+        self.client.logout()
+        resp = self.client.get(self.url_unlocked_versioned)
+        self.assertEqual(resp.status_code, 200)
+
+    def test_unlocked_versioned_asset_old_style(self):
+        """
+        Test that unlocked assets that are versioned (old-style) are being served.
+        """
+        self.client.logout()
+        resp = self.client.get(self.url_unlocked_versioned_old_style)
+        self.assertEqual(resp.status_code, 200)
+
+    def test_unlocked_versioned_asset_with_nonexistent_version(self):
+        """
+        Test that unlocked assets that are versioned, but have a nonexistent version,
+        are sent back as a 301 redirect which tells the caller the correct URL.
+        """
+        url_unlocked_versioned_old = StaticContent.add_version_to_asset_path(self.url_unlocked, FAKE_MD5_HASH)
+
+        self.client.logout()
+        resp = self.client.get(url_unlocked_versioned_old)
+        self.assertEqual(resp.status_code, 301)
+        self.assertTrue(resp.url.endswith(self.url_unlocked_versioned))  # pylint: disable=no-member
+
+    def test_locked_versioned_asset(self):
+        """
+        Test that locked assets that are versioned are being served.
+        """
+        CourseEnrollment.enroll(self.non_staff_usr, self.course_key)
+        self.assertTrue(CourseEnrollment.is_enrolled(self.non_staff_usr, self.course_key))
+
+        self.client.login(username=self.non_staff_usr, password='test')
+        resp = self.client.get(self.url_locked_versioned)
+        self.assertEqual(resp.status_code, 200)
+
+    def test_locked_versioned_old_styleasset(self):
+        """
+        Test that locked assets that are versioned (old-style) are being served.
+        """
+        CourseEnrollment.enroll(self.non_staff_usr, self.course_key)
+        self.assertTrue(CourseEnrollment.is_enrolled(self.non_staff_usr, self.course_key))
+
+        self.client.login(username=self.non_staff_usr, password='test')
+        resp = self.client.get(self.url_locked_versioned_old_style)
         self.assertEqual(resp.status_code, 200)
 
     def test_locked_asset_not_logged_in(self):
@@ -89,7 +182,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         Test that locked assets behave appropriately in case user is logged in
         in but not registered for the course.
         """
-        self.client.login(username=self.non_staff_usr, password=self.non_staff_pwd)
+        self.client.login(username=self.non_staff_usr, password='test')
         resp = self.client.get(self.url_locked)
         self.assertEqual(resp.status_code, 403)
 
@@ -101,7 +194,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         CourseEnrollment.enroll(self.non_staff_usr, self.course_key)
         self.assertTrue(CourseEnrollment.is_enrolled(self.non_staff_usr, self.course_key))
 
-        self.client.login(username=self.non_staff_usr, password=self.non_staff_pwd)
+        self.client.login(username=self.non_staff_usr, password='test')
         resp = self.client.get(self.url_locked)
         self.assertEqual(resp.status_code, 200)
 
@@ -109,7 +202,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         """
         Test that locked assets behave appropriately in case user is staff.
         """
-        self.client.login(username=self.staff_usr, password=self.staff_pwd)
+        self.client.login(username=self.staff_usr, password='test')
         resp = self.client.get(self.url_locked)
         self.assertEqual(resp.status_code, 200)
 
@@ -191,6 +284,15 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
             first=(self.length_unlocked), last=(self.length_unlocked)))
         self.assertEqual(resp.status_code, 416)
 
+    def test_vary_header_sent(self):
+        """
+        Tests that we're properly setting the Vary header to ensure browser requests don't get
+        cached in a way that breaks XHR requests to the same asset.
+        """
+        resp = self.client.get(self.url_unlocked)
+        self.assertEqual(resp.status_code, 200)
+        self.assertEquals('Origin', resp['Vary'])
+
     @patch('contentserver.models.CourseAssetCacheTtlConfig.get_cache_ttl')
     def test_cache_headers_with_ttl_unlocked(self, mock_get_cache_ttl):
         """
@@ -215,7 +317,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         CourseEnrollment.enroll(self.non_staff_usr, self.course_key)
         self.assertTrue(CourseEnrollment.is_enrolled(self.non_staff_usr, self.course_key))
 
-        self.client.login(username=self.non_staff_usr, password=self.non_staff_pwd)
+        self.client.login(username=self.non_staff_usr, password='test')
         resp = self.client.get(self.url_locked)
         self.assertEqual(resp.status_code, 200)
         self.assertNotIn('Expires', resp)
@@ -245,7 +347,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         CourseEnrollment.enroll(self.non_staff_usr, self.course_key)
         self.assertTrue(CourseEnrollment.is_enrolled(self.non_staff_usr, self.course_key))
 
-        self.client.login(username=self.non_staff_usr, password=self.non_staff_pwd)
+        self.client.login(username=self.non_staff_usr, password='test')
         resp = self.client.get(self.url_locked)
         self.assertEqual(resp.status_code, 200)
         self.assertNotIn('Expires', resp)
@@ -256,19 +358,48 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         near_expire_dt = StaticContentServer.get_expiration_value(start_dt, 55)
         self.assertEqual("Thu, 01 Dec 1983 20:00:55 GMT", near_expire_dt)
 
-    def test_response_no_vary_header_unlocked(self):
-        resp = self.client.get(self.url_unlocked)
-        self.assertEqual(resp.status_code, 200)
-        self.assertNotIn('Vary', resp)
+    @patch('contentserver.models.CdnUserAgentsConfig.get_cdn_user_agents')
+    def test_cache_is_cdn_with_normal_request(self, mock_get_cdn_user_agents):
+        """
+        Tests that when a normal request is made -- i.e. from an end user with their
+        browser -- that we don't classify the request as coming from a CDN.
+        """
+        mock_get_cdn_user_agents.return_value = 'Amazon CloudFront'
 
-    def test_response_no_vary_header_locked(self):
-        CourseEnrollment.enroll(self.non_staff_usr, self.course_key)
-        self.assertTrue(CourseEnrollment.is_enrolled(self.non_staff_usr, self.course_key))
+        request_factory = RequestFactory()
+        browser_request = request_factory.get('/fake', HTTP_USER_AGENT='Chrome 1234')
 
-        self.client.login(username=self.non_staff_usr, password=self.non_staff_pwd)
-        resp = self.client.get(self.url_locked)
-        self.assertEqual(resp.status_code, 200)
-        self.assertNotIn('Vary', resp)
+        is_from_cdn = StaticContentServer.is_cdn_request(browser_request)
+        self.assertEqual(is_from_cdn, False)
+
+    @patch('contentserver.models.CdnUserAgentsConfig.get_cdn_user_agents')
+    def test_cache_is_cdn_with_cdn_request(self, mock_get_cdn_user_agents):
+        """
+        Tests that when a CDN request is made -- i.e. from an edge node back to the
+        origin -- that we classify the request as coming from a CDN.
+        """
+        mock_get_cdn_user_agents.return_value = 'Amazon CloudFront'
+
+        request_factory = RequestFactory()
+        browser_request = request_factory.get('/fake', HTTP_USER_AGENT='Amazon CloudFront')
+
+        is_from_cdn = StaticContentServer.is_cdn_request(browser_request)
+        self.assertEqual(is_from_cdn, True)
+
+    @patch('contentserver.models.CdnUserAgentsConfig.get_cdn_user_agents')
+    def test_cache_is_cdn_with_cdn_request_multiple_user_agents(self, mock_get_cdn_user_agents):
+        """
+        Tests that when a CDN request is made -- i.e. from an edge node back to the
+        origin -- that we classify the request as coming from a CDN when multiple UAs
+        are configured.
+        """
+        mock_get_cdn_user_agents.return_value = 'Amazon CloudFront\nAkamai GHost'
+
+        request_factory = RequestFactory()
+        browser_request = request_factory.get('/fake', HTTP_USER_AGENT='Amazon CloudFront')
+
+        is_from_cdn = StaticContentServer.is_cdn_request(browser_request)
+        self.assertEqual(is_from_cdn, True)
 
 
 @ddt.ddt

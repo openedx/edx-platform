@@ -1,10 +1,12 @@
-define(["jquery", "common/js/spec_helpers/ajax_helpers", "common/js/spec_helpers/view_helpers", "js/index",
-        "common/js/components/utils/view_utils"],
-    function ($, AjaxHelpers, ViewHelpers, IndexUtils, ViewUtils) {
-        describe("Course listing page", function () {
+define(['jquery',
+        'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
+        'common/js/spec_helpers/view_helpers', 'js/index',
+        'common/js/components/utils/view_utils'],
+    function($, AjaxHelpers, ViewHelpers, IndexUtils, ViewUtils) {
+        describe('Course listing page', function() {
             var mockIndexPageHTML = readFixtures('mock/mock-index-page.underscore');
 
-            var fillInFields = function (org, number, run, name) {
+            var fillInFields = function(org, number, run, name) {
                 $('.new-course-org').val(org);
                 $('.new-course-number').val(number);
                 $('.new-course-run').val(run);
@@ -17,18 +19,18 @@ define(["jquery", "common/js/spec_helpers/ajax_helpers", "common/js/spec_helpers
                 $('.new-library-name').val(name).keyup();
             };
 
-            beforeEach(function () {
+            beforeEach(function() {
                 ViewHelpers.installMockAnalytics();
                 appendSetFixtures(mockIndexPageHTML);
                 IndexUtils.onReady();
             });
 
-            afterEach(function () {
+            afterEach(function() {
                 ViewHelpers.removeMockAnalytics();
                 delete window.source_course_key;
             });
 
-            it("can dismiss notifications", function () {
+            it('can dismiss notifications', function() {
                 var requests = AjaxHelpers.requests(this);
                 var reloadSpy = spyOn(ViewUtils, 'reload');
                 $('.dismiss-button').click();
@@ -37,10 +39,10 @@ define(["jquery", "common/js/spec_helpers/ajax_helpers", "common/js/spec_helpers
                 expect(reloadSpy).toHaveBeenCalled();
             });
 
-            it("saves new courses", function () {
+            it('saves new courses', function() {
                 var requests = AjaxHelpers.requests(this);
                 var redirectSpy = spyOn(ViewUtils, 'redirect');
-                $('.new-course-button').click()
+                $('.new-course-button').click();
                 AjaxHelpers.expectJsonRequest(requests, 'GET', '/organizations');
                 AjaxHelpers.respondWithJson(requests, ['DemoX', 'DemoX2', 'DemoX3']);
                 fillInFields('DemoX', 'DM101', '2014', 'Demo course');
@@ -55,10 +57,10 @@ define(["jquery", "common/js/spec_helpers/ajax_helpers", "common/js/spec_helpers
                     url: 'dummy_test_url'
                 });
                 expect(redirectSpy).toHaveBeenCalledWith('dummy_test_url');
-                $(".new-course-org").autocomplete("destroy");
+                $('.new-course-org').autocomplete('destroy');
             });
 
-            it("displays an error when saving fails", function () {
+            it('displays an error when saving fails', function() {
                 var requests = AjaxHelpers.requests(this);
                 $('.new-course-button').click();
                 AjaxHelpers.expectJsonRequest(requests, 'GET', '/organizations');
@@ -72,10 +74,10 @@ define(["jquery", "common/js/spec_helpers/ajax_helpers", "common/js/spec_helpers
                 expect($('#course_creation_error')).toContainText('error message');
                 expect($('.new-course-save')).toHaveClass('is-disabled');
                 expect($('.new-course-save')).toHaveAttr('aria-disabled', 'true');
-                $(".new-course-org").autocomplete("destroy");
+                $('.new-course-org').autocomplete('destroy');
             });
 
-            it("saves new libraries", function () {
+            it('saves new libraries', function() {
                 var requests = AjaxHelpers.requests(this);
                 var redirectSpy = spyOn(ViewUtils, 'redirect');
                 $('.new-library-button').click();
@@ -92,16 +94,16 @@ define(["jquery", "common/js/spec_helpers/ajax_helpers", "common/js/spec_helpers
                 expect(redirectSpy).toHaveBeenCalledWith('dummy_test_url');
             });
 
-            it("displays an error when a required field is blank", function () {
+            it('displays an error when a required field is blank', function() {
                 var requests = AjaxHelpers.requests(this);
                 $('.new-library-button').click();
                 var values = ['DemoX', 'DM101', 'Demo library'];
                 // Try making each of these three values empty one at a time and ensure the form won't submit:
-                for (var i=0; i<values.length;i++) {
+                for (var i = 0; i < values.length; i++) {
                     var values_with_blank = values.slice();
                     values_with_blank[i] = '';
                     fillInLibraryFields.apply(this, values_with_blank);
-                    expect($('.create-library li.field.text input[value=]').parent()).toHaveClass('error');
+                    expect($('.create-library li.field.text input').parent()).toHaveClass('error');
                     expect($('.new-library-save')).toHaveClass('is-disabled');
                     expect($('.new-library-save')).toHaveAttr('aria-disabled', 'true');
                     $('.new-library-save').click();
@@ -109,7 +111,7 @@ define(["jquery", "common/js/spec_helpers/ajax_helpers", "common/js/spec_helpers
                 }
             });
 
-            it("can cancel library creation", function () {
+            it('can cancel library creation', function() {
                 $('.new-library-button').click();
                 fillInLibraryFields('DemoX', 'DM101', 'Demo library');
                 $('.new-library-cancel').click();
@@ -119,7 +121,7 @@ define(["jquery", "common/js/spec_helpers/ajax_helpers", "common/js/spec_helpers
                 });
             });
 
-            it("displays an error when saving a library fails", function () {
+            it('displays an error when saving a library fails', function() {
                 var requests = AjaxHelpers.requests(this);
                 $('.new-library-button').click();
                 fillInLibraryFields('DemoX', 'DM101', 'Demo library');
@@ -133,7 +135,7 @@ define(["jquery", "common/js/spec_helpers/ajax_helpers", "common/js/spec_helpers
                 expect($('.new-library-save')).toHaveAttr('aria-disabled', 'true');
             });
 
-            it("can switch tabs", function() {
+            it('can switch tabs', function() {
                 var $courses_tab = $('.courses-tab'),
                     $libraraies_tab = $('.libraries-tab');
 

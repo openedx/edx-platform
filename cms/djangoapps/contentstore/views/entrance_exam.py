@@ -3,7 +3,6 @@ Entrance Exams view module -- handles all requests related to entrance exam mana
 Intended to be utilized as an AJAX callback handler, versus a proper view/screen
 """
 from functools import wraps
-import json
 import logging
 
 from django.contrib.auth.decorators import login_required
@@ -83,7 +82,7 @@ def entrance_exam(request, course_key_string):
 
     # Create a new entrance exam for the specified course (returns 201 if created)
     elif request.method == 'POST':
-        response_format = request.REQUEST.get('format', 'html')
+        response_format = request.POST.get('format', 'html')
         http_accept = request.META.get('http_accept')
         if response_format == 'json' or 'application/json' in http_accept:
             ee_min_score = request.POST.get('entrance_exam_minimum_score_pct', None)

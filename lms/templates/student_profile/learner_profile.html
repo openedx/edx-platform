@@ -1,4 +1,6 @@
+<%page expression_filter="h"/>
 <%inherit file="/main.html" />
+<%def name="online_help_token()"><% return "profile" %></%def>
 <%namespace name='static' file='/static_content.html'/>
 <%!
 import json
@@ -8,16 +10,17 @@ from openedx.core.djangolib.js_utils import dump_js_escaped_json
 %>
 
 <%block name="pagetitle">${_("Learner Profile")}</%block>
-<%block name="nav_skip">#content</%block>
 
 <%block name="bodyclass">view-profile</%block>
 
 <div class="message-banner" aria-live="polite"></div>
-<div class="wrapper-profile">
-    <div class="ui-loading-indicator">
-        <p><span class="spin"><i class="icon fa fa-refresh" aria-hidden="true"></i></span> <span class="copy">${_("Loading")}</span></p>
+<main id="main" aria-label="Content" tabindex="-1">
+    <div class="wrapper-profile">
+        <div class="ui-loading-indicator">
+            <p><span class="spin"><span class="icon fa fa-refresh" aria-hidden="true"></span></span> <span class="copy">${_("Loading")}</span></p>
+        </div>
     </div>
-</div>
+</main>
 <%block name="headextra">
     <%static:css group='style-course'/>
 </%block>

@@ -16,6 +16,7 @@ from course_modes.models import CourseMode
 from edxmako.shortcuts import render_to_response
 from enrollment.api import get_enrollments, update_enrollment
 from enrollment.errors import CourseModeNotFoundError
+from enrollment.serializers import ModeSerializer
 from lms.djangoapps.support.decorators import require_support_permission
 from lms.djangoapps.support.serializers import ManualEnrollmentSerializer
 from lms.djangoapps.verify_student.models import VerificationDeadline
@@ -61,6 +62,8 @@ class EnrollmentSupportListView(GenericAPIView):
             # Folds the course_details field up into the main JSON object.
             enrollment.update(**enrollment.pop('course_details'))
             course_key = CourseKey.from_string(enrollment['course_id'])
+            # get the all courses modes and replace with existing modes.
+            enrollment['course_modes'] = self.get_course_modes(course_key)
             # Add the price of the course's verified mode.
             self.include_verified_mode_info(enrollment, course_key)
             # Add manual enrollment history, if it exists
@@ -83,6 +86,8 @@ class EnrollmentSupportListView(GenericAPIView):
                     username=user.username,
                     old_mode=old_mode
                 ))
+            if new_mode == CourseMode.CREDIT_MODE:
+                return HttpResponseBadRequest(u'Enrollment cannot be changed to credit mode.')
         except KeyError as err:
             return HttpResponseBadRequest(u'The field {} is required.'.format(err.message))
         except InvalidKeyError:
@@ -98,7 +103,7 @@ class EnrollmentSupportListView(GenericAPIView):
             # Wrapped in a transaction so that we can be sure the
             # ManualEnrollmentAudit record is always created correctly.
             with transaction.atomic():
-                update_enrollment(user.username, course_id, mode=new_mode)
+                update_enrollment(user.username, course_id, mode=new_mode, include_expired=True)
                 manual_enrollment = ManualEnrollmentAudit.create_manual_enrollment_audit(
                     request.user,
                     enrollment.user.email,
@@ -150,3 +155,24 @@ class EnrollmentSupportListView(GenericAPIView):
         if manual_enrollment_audit is None:
             return {}
         return ManualEnrollmentSerializer(instance=manual_enrollment_audit).data
+
+    @staticmethod
+    def get_course_modes(course_key):
+        """
+        Returns a list of all modes including expired modes for a given course id
+
+        Arguments:
+            course_id (CourseKey): Search for course modes for this course.
+
+        Returns:
+            list of `Mode`
+
+        """
+        course_modes = CourseMode.modes_for_course(
+            course_key,
+            include_expired=True
+        )
+        return [
+            ModeSerializer(mode).data
+            for mode in course_modes
+        ]

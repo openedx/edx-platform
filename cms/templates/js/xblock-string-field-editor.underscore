@@ -1,6 +1,6 @@
 <div class="incontext-editor-action-wrapper">
-    <a href="" class="action-edit action-inline xblock-field-value-edit incontext-editor-open-action" title="<%= gettext('Edit the name') %>">
-        <i class="icon fa fa-pencil"></i><span class="sr"> <%= gettext("Edit") %></span>
+    <a href="" class="action-edit action-inline xblock-field-value-edit incontext-editor-open-action" title="<%- gettext('Edit the name') %>">
+        <span class="icon fa fa-pencil" aria-hidden="true"></span><span class="sr"> <%- gettext("Edit") %></span>
     </a>
 </div>
 

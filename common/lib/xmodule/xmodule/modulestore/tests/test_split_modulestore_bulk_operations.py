@@ -422,7 +422,7 @@ class TestBulkWriteMixinFindMethods(TestBulkWriteMixin):
 
         db_definitions = [db_definition(_id) for _id in db_ids if _id not in active_ids]
         self.bulk._begin_bulk_operation(self.course_key)
-        for n, _id in enumerate(active_ids):
+        for _id in active_ids:
             self.bulk.update_definition(self.course_key, active_definition(_id))
 
         self.conn.get_definitions.return_value = db_definitions
@@ -704,7 +704,7 @@ class TestBulkWriteMixinOpen(TestBulkWriteMixin):
             from_index=self.conn.get_course_index.return_value,
             course_context=self.course_key,
         )
-        self.conn.get_course_index.assert_called_once_with(self.course_key)
+        self.conn.get_course_index.assert_called_once_with(self.course_key, ignore_case=False)
 
 
 class TestBulkWriteMixinOpenAfterPrevTransaction(TestBulkWriteMixinOpen, TestBulkWriteMixinPreviousTransaction):

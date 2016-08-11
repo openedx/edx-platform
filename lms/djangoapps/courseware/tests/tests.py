@@ -10,15 +10,16 @@ from nose.plugins.attrib import attr
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from courseware.tests.helpers import LoginEnrollmentTestCase
-from xmodule.modulestore.tests.django_utils import TEST_DATA_XML_MODULESTORE as XML_MODULESTORE
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_TOY_MODULESTORE as TOY_MODULESTORE
 from lms.djangoapps.lms_xblock.field_data import LmsFieldData
 from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import (
+    ModuleStoreTestCase, TEST_DATA_MIXED_MODULESTORE
+)
+from xmodule.modulestore.tests.factories import ToyCourseFactory
 
 
-@attr('shard_1')
+@attr(shard=1)
 class ActivateLoginTest(LoginEnrollmentTestCase):
     """
     Test logging in and logging out.
@@ -38,6 +39,14 @@ class ActivateLoginTest(LoginEnrollmentTestCase):
         Test logout -- setup function does login.
         """
         self.logout()
+
+    def test_request_attr_on_logout(self):
+        """
+        Test request object after logging out to see whether it
+        has 'is_from_log_out' attribute set to true.
+        """
+        response = self.client.get(reverse('logout'))
+        self.assertTrue(getattr(response.wsgi_request, 'is_from_logout', False))  # pylint: disable=no-member
 
 
 class PageLoaderTestCase(LoginEnrollmentTestCase):
@@ -114,34 +123,17 @@ class PageLoaderTestCase(LoginEnrollmentTestCase):
             self.assertNotIsInstance(descriptor, ErrorDescriptor)
 
 
-@attr('shard_1')
-class TestXmlCoursesLoad(ModuleStoreTestCase, PageLoaderTestCase):
-    """
-    Check that all pages in test courses load properly from XML.
-    """
-    MODULESTORE = XML_MODULESTORE
-
-    def setUp(self):
-        super(TestXmlCoursesLoad, self).setUp()
-        self.setup_user()
-
-    def test_toy_course_loads(self):
-        # Load one of the XML based courses
-        # Our test mapping rules allow the MixedModuleStore
-        # to load this course from XML, not Mongo.
-        self.check_all_pages_load(SlashSeparatedCourseKey('edX', 'toy', '2012_Fall'))
-
-
-@attr('shard_1')
+@attr(shard=1)
 class TestMongoCoursesLoad(ModuleStoreTestCase, PageLoaderTestCase):
     """
     Check that all pages in test courses load properly from Mongo.
     """
-    MODULESTORE = TOY_MODULESTORE
+    MODULESTORE = TEST_DATA_MIXED_MODULESTORE
 
     def setUp(self):
         super(TestMongoCoursesLoad, self).setUp()
         self.setup_user()
+        self.toy_course_key = ToyCourseFactory.create().id
 
     @mock.patch('xmodule.course_module.requests.get')
     def test_toy_textbooks_loads(self, mock_get):
@@ -150,13 +142,12 @@ class TestMongoCoursesLoad(ModuleStoreTestCase, PageLoaderTestCase):
             <entry page="5" page_label="ii" name="Table of Contents"/>
             </table_of_contents>
         """).strip()
-
-        location = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall').make_usage_key('course', '2012_Fall')
+        location = self.toy_course_key.make_usage_key('course', '2012_Fall')
         course = self.store.get_item(location)
         self.assertGreater(len(course.textbooks), 0)
 
 
-@attr('shard_1')
+@attr(shard=1)
 class TestDraftModuleStore(ModuleStoreTestCase):
     def test_get_items_with_course_items(self):
         store = modulestore()
@@ -169,7 +160,7 @@ class TestDraftModuleStore(ModuleStoreTestCase):
         # not allowed to be passed in (i.e. was throwing exception)
 
 
-@attr('shard_1')
+@attr(shard=1)
 class TestLmsFieldData(TestCase):
     """
     Tests of the LmsFieldData class

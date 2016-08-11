@@ -39,7 +39,7 @@ REQUIREJS_WAIT = {
     # Unit page
     re.compile(r'^Unit \|'): [
         "jquery", "js/base", "js/models/xblock_info", "js/views/pages/container",
-        "js/collections/component_template", "xmodule", "coffee/src/main", "xblock/cms.runtime.v1"],
+        "js/collections/component_template", "xmodule", "cms/js/main", "xblock/cms.runtime.v1"],
 
     # Content - Outline
     # Note that calling your org, course number, or display name, 'course' will mess this up
@@ -49,18 +49,18 @@ REQUIREJS_WAIT = {
     # Dashboard
     re.compile(r'^Studio Home \|'): [
         "js/sock", "gettext", "js/base",
-        "jquery.ui", "coffee/src/main", "underscore"],
+        "jquery.ui", "cms/js/main", "underscore"],
 
     # Upload
     re.compile(r'^\s*Files & Uploads'): [
-        'js/base', 'jquery.ui', 'coffee/src/main', 'underscore',
+        'js/base', 'jquery.ui', 'cms/js/main', 'underscore',
         'js/views/assets', 'js/views/asset'
     ],
 
     # Pages
     re.compile(r'^Pages \|'): [
-        'js/models/explicit_url', 'coffee/src/views/tabs',
-        'xmodule', 'coffee/src/main', 'xblock/cms.runtime.v1'
+        'js/models/explicit_url', 'js/views/tabs',
+        'xmodule', 'cms/js/main', 'xblock/cms.runtime.v1'
     ],
 }
 
@@ -346,9 +346,9 @@ def css_contains_text(css_selector, partial_text, index=0):
     # If we're expecting a non-empty string, give the page
     # a chance to fill in text fields.
     if partial_text:
-        wait_for(lambda _: css_text(css_selector, index=index))
+        wait_for(lambda _: css_html(css_selector, index=index), timeout=8)
 
-    actual_text = css_text(css_selector, index=index)
+    actual_text = css_html(css_selector, index=index)
 
     return partial_text in actual_text
 

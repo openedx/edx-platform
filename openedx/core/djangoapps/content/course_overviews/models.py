@@ -3,7 +3,7 @@ Declaration of CourseOverview model
 """
 import json
 import logging
-from urlparse import urlunparse
+from urlparse import urlparse, urlunparse
 
 from django.db import models, transaction
 from django.db.models.fields import BooleanField, DateTimeField, DecimalField, TextField, FloatField, IntegerField
@@ -18,9 +18,10 @@ from opaque_keys.edx.keys import CourseKey
 from config_models.models import ConfigurationModel
 from lms.djangoapps import django_comment_client
 from openedx.core.djangoapps.models.course_details import CourseDetails
+from pytz import utc
 from static_replace.models import AssetBaseUrlConfig
 from util.date_utils import strftime_localized
-from xmodule import course_metadata_utils
+from xmodule import course_metadata_utils, block_metadata_utils
 from xmodule.course_module import CourseDescriptor, DEFAULT_START_DATE
 from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore.django import modulestore
@@ -45,7 +46,7 @@ class CourseOverview(TimeStampedModel):
         app_label = 'course_overviews'
 
     # IMPORTANT: Bump this whenever you modify this model and/or add a migration.
-    VERSION = 3
+    VERSION = 4
 
     # Cache entry versioning.
     version = IntegerField()
@@ -66,7 +67,6 @@ class CourseOverview(TimeStampedModel):
 
     # URLs
     course_image_url = TextField()
-    facebook_url = TextField(null=True)
     social_sharing_url = TextField(null=True)
     end_of_course_survey_url = TextField(null=True)
 
@@ -99,6 +99,7 @@ class CourseOverview(TimeStampedModel):
     short_description = TextField(null=True)
     course_video_url = TextField(null=True)
     effort = TextField(null=True)
+    self_paced = BooleanField(default=False)
 
     @classmethod
     def _create_from_course(cls, course):
@@ -156,7 +157,6 @@ class CourseOverview(TimeStampedModel):
             announcement=course.announcement,
 
             course_image_url=course_image_url(course),
-            facebook_url=course.facebook_url,
             social_sharing_url=course.social_sharing_url,
 
             certificates_display_behavior=course.certificates_display_behavior,
@@ -183,6 +183,7 @@ class CourseOverview(TimeStampedModel):
             short_description=CourseDetails.fetch_about_attribute(course.id, 'short_description'),
             effort=CourseDetails.fetch_about_attribute(course.id, 'effort'),
             course_video_url=CourseDetails.fetch_video_url(course.id),
+            self_paced=course.self_paced,
         )
 
     @classmethod
@@ -317,14 +318,14 @@ class CourseOverview(TimeStampedModel):
         """
         Returns this course's URL name.
         """
-        return course_metadata_utils.url_name_for_course_location(self.location)
+        return block_metadata_utils.url_name_for_block(self)
 
     @property
     def display_name_with_default(self):
         """
         Return reasonable display name for the course.
         """
-        return course_metadata_utils.display_name_with_default(self)
+        return block_metadata_utils.display_name_with_default(self)
 
     @property
     def display_name_with_default_escaped(self):
@@ -338,7 +339,7 @@ class CourseOverview(TimeStampedModel):
         migrate and test switching to display_name_with_default, which is no
         longer escaped.
         """
-        return course_metadata_utils.display_name_with_default_escaped(self)
+        return block_metadata_utils.display_name_with_default_escaped(self)
 
     def has_started(self):
         """
@@ -359,15 +360,17 @@ class CourseOverview(TimeStampedModel):
 
         return course_metadata_utils.course_starts_within(self.start, days)
 
-    def start_datetime_text(self, format_string="SHORT_DATE"):
+    def start_datetime_text(self, format_string="SHORT_DATE", time_zone=utc):
         """
-        Returns the desired text corresponding the course's start date and
-        time in UTC.  Prefers .advertised_start, then falls back to .start.
+        Returns the desired text corresponding to the course's start date and
+        time in the specified time zone, or utc if no time zone given.
+        Prefers .advertised_start, then falls back to .start.
         """
         return course_metadata_utils.course_start_datetime_text(
             self.start,
             self.advertised_start,
             format_string,
+            time_zone,
             ugettext,
             strftime_localized
         )
@@ -383,13 +386,14 @@ class CourseOverview(TimeStampedModel):
             self.advertised_start,
         )
 
-    def end_datetime_text(self, format_string="SHORT_DATE"):
+    def end_datetime_text(self, format_string="SHORT_DATE", time_zone=utc):
         """
         Returns the end date or datetime for the course formatted as a string.
         """
         return course_metadata_utils.course_end_datetime_text(
             self.end,
             format_string,
+            time_zone,
             strftime_localized
         )
 
@@ -558,9 +562,19 @@ class CourseOverview(TimeStampedModel):
             urls['small'] = self.image_set.small_url or raw_image_url
             urls['large'] = self.image_set.large_url or raw_image_url
 
-        return self._apply_cdn(urls)
+        return self.apply_cdn_to_urls(urls)
 
-    def _apply_cdn(self, image_urls):
+    @property
+    def pacing(self):
+        """ Returns the pacing for the course.
+
+        Potential values:
+            self: Self-paced courses
+            instructor: Instructor-led courses
+        """
+        return 'self' if self.self_paced else 'instructor'
+
+    def apply_cdn_to_urls(self, image_urls):
         """
         Given a dict of resolutions -> urls, return a copy with CDN applied.
 
@@ -577,9 +591,31 @@ class CourseOverview(TimeStampedModel):
         base_url = cdn_config.base_url
 
         return {
-            resolution: urlunparse((None, base_url, url, None, None, None))
+            resolution: self._apply_cdn_to_url(url, base_url)
             for resolution, url in image_urls.items()
         }
+
+    def _apply_cdn_to_url(self, url, base_url):
+        """
+        Applies a new CDN/base URL to the given URL.
+
+        If a URL is absolute, we skip switching the host since it could
+        be a hostname that isn't behind our CDN, and we could unintentionally
+        break the URL overall.
+        """
+
+        # The URL can't be empty.
+        if not url:
+            return url
+
+        _, netloc, path, params, query, fragment = urlparse(url)
+
+        # If this is an absolute URL, just return it as is.  It could be a domain
+        # that isn't ours, and thus CDNing it would actually break it.
+        if netloc:
+            return url
+
+        return urlunparse((None, base_url, path, params, query, fragment))
 
     def __unicode__(self):
         """Represent ourselves with the course key."""

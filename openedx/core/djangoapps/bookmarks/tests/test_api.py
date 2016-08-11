@@ -3,6 +3,7 @@ Tests for bookmarks api.
 """
 import ddt
 from mock import patch
+from nose.plugins.attrib import attr
 from unittest import skipUnless
 
 from django.conf import settings
@@ -35,6 +36,7 @@ class BookmarkApiEventTestMixin(object):
         self.assertFalse(mock_tracker.called)  # pylint: disable=maybe-no-member
 
 
+@attr(shard=2)
 @ddt.ddt
 @skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Tests only valid in LMS')
 class BookmarksAPITests(BookmarkApiEventTestMixin, BookmarksTestsBase):
@@ -112,7 +114,7 @@ class BookmarksAPITests(BookmarkApiEventTestMixin, BookmarksTestsBase):
         with self.assertNumQueries(1):
             bookmarks = api.get_bookmarks(user=self.user, course_key=course.id, serialized=False)
             self.assertEqual(len(bookmarks), count)
-        self.assertTrue(bookmarks.model is Bookmark)  # pylint: disable=no-member
+        self.assertIs(bookmarks.model, Bookmark)  # pylint: disable=no-member
 
     @patch('openedx.core.djangoapps.bookmarks.api.tracker.emit')
     def test_create_bookmark(self, mock_tracker):
@@ -121,7 +123,7 @@ class BookmarksAPITests(BookmarkApiEventTestMixin, BookmarksTestsBase):
         """
         self.assertEqual(len(api.get_bookmarks(user=self.user, course_key=self.course.id)), 2)
 
-        with self.assertNumQueries(9):
+        with self.assertNumQueries(10):
             bookmark_data = api.create_bookmark(user=self.user, usage_key=self.vertical_2.location)
 
         self.assert_bookmark_event_emitted(
@@ -142,7 +144,7 @@ class BookmarksAPITests(BookmarkApiEventTestMixin, BookmarksTestsBase):
         """
         self.assertEqual(len(api.get_bookmarks(user=self.user, course_key=self.course.id)), 2)
 
-        with self.assertNumQueries(9):
+        with self.assertNumQueries(10):
             bookmark_data = api.create_bookmark(user=self.user, usage_key=self.vertical_2.location)
 
         self.assert_bookmark_event_emitted(

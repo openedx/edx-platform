@@ -6,10 +6,11 @@ import os
 import requests
 from bok_choy.promise import EmptyPromise, Promise
 from bok_choy.javascript import wait_for_js, js_defined
-from ....tests.helpers import YouTubeStubConfig
-from ...lms.video.video import VideoPage
-from ...common.utils import wait_for_notification
+from common.test.acceptance.tests.helpers import YouTubeStubConfig
+from common.test.acceptance.pages.lms.video.video import VideoPage
+from common.test.acceptance.pages.common.utils import wait_for_notification
 from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.common.action_chains import ActionChains
 
 
 CLASS_SELECTORS = {
@@ -53,7 +54,7 @@ DISPLAY_NAME = "Component Display Name"
 DEFAULT_SETTINGS = [
     # basic
     [DISPLAY_NAME, 'Video', False],
-    ['Default Video URL', 'http://youtu.be/3_yD_cEKoCk, , ', False],
+    ['Default Video URL', 'https://www.youtube.com/watch?v=3_yD_cEKoCk, , ', False],
 
     # advanced
     [DISPLAY_NAME, 'Video', False],
@@ -134,6 +135,13 @@ class VideoComponentPage(VideoPage):
 
         """
         return self.q(css=CLASS_SELECTORS['video_controls']).visible
+
+    def click_button_subtitles(self):
+        """
+        Click .setting-replace button after first hovering to it.
+        """
+        element = self.q(css='.setting-replace')[0]
+        ActionChains(self.browser).move_to_element(element).click(element).perform()
 
     def click_button(self, button_name, index=0, require_notification=False):
         """

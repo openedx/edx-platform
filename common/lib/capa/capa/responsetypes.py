@@ -189,7 +189,10 @@ class LoncapaResponse(object):
             raise LoncapaProblemError(msg)
 
         for prop in self.required_attributes:
-            if not xml.get(prop):
+            prop_value = xml.get(prop)
+            if prop_value:  # Stripping off the empty strings
+                prop_value = prop_value.strip()
+            if not prop_value:
                 msg = "Error in problem specification: %s missing required attribute %s" % (
                     unicode(self), prop)
                 msg += "\nSee XML source line %s" % getattr(
@@ -1939,7 +1942,7 @@ class NumericalResponse(LoncapaResponse):
 
 @registry.register
 class StringResponse(LoncapaResponse):
-    """
+    r"""
     This response type allows one or more answers.
 
     Additional answers are added by `additional_answer` tag.
@@ -2134,6 +2137,10 @@ class StringResponse(LoncapaResponse):
         Note: for old code, which supports _or_ separator, we add some  backward compatibility handling.
         Should be removed soon. When to remove it, is up to Lyla Fisher.
         """
+        # if given answer is empty.
+        if not given:
+            return False
+
         _ = self.capa_system.i18n.ugettext
         # backward compatibility, should be removed in future.
         if self.backward:
@@ -2815,6 +2822,7 @@ class CodeResponse(LoncapaResponse):
         student_info = {
             'anonymous_student_id': anonymous_student_id,
             'submission_time': qtime,
+            'random_seed': self.context['seed'],
         }
         contents.update({'student_info': json.dumps(student_info)})
 
@@ -3146,6 +3154,7 @@ class FormulaResponse(LoncapaResponse):
     allowed_inputfields = ['textline', 'formulaequationinput']
     required_attributes = ['answer', 'samples']
     max_inputfields = 1
+    multi_device_support = True
 
     def __init__(self, *args, **kwargs):
         self.correct_answer = ''

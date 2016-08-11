@@ -5,7 +5,7 @@
         <div class="form-fields">
             <div class="form-field">
                 <div class="inline-discussion-topics">
-                    <h3 class="subsection-title"><%- gettext('Content-Specific Discussion Topics') %></h3>
+                    <h4 class="hd hd-4 subsection-title"><%- gettext('Content-Specific Discussion Topics') %></h4>
                     <p><%- gettext('Specify whether content-specific discussion topics are divided by cohort.') %></p>
                     <div class="always_cohort_inline_discussions">
                         <label>
@@ -21,8 +21,8 @@
                     </div>
                     <hr class="divider divider-lv1" />
                     <div class="field">
-                        <% if ( inlineDiscussionTopics ) { %>
-                           <ul class="inline-topics discussions-wrapper"><%= inlineDiscussionTopics %></ul>
+                        <% if ( inlineDiscussionTopicsHtml.valueOf() ) { %>
+                           <ul class="inline-topics discussions-wrapper"><%= HtmlUtils.ensureHtml(inlineDiscussionTopicsHtml) %></ul>
                         <% } else {  %>
                            <span class="no-topics"><%- gettext('No content-specific discussion topics exist.') %></span>
                         <% } %>

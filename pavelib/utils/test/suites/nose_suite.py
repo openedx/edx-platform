@@ -6,6 +6,11 @@ from pavelib.utils.test import utils as test_utils
 from pavelib.utils.test.suites.suite import TestSuite
 from pavelib.utils.envs import Env
 
+try:
+    from pygments.console import colorize
+except ImportError:
+    colorize = lambda color, text: text
+
 __test__ = False  # do not collect
 
 
@@ -33,6 +38,7 @@ class NoseTestSuite(TestSuite):
         self.test_ids = self.test_id_dir / 'noseids'
         self.extra_args = kwargs.get('extra_args', '')
         self.cov_args = kwargs.get('cov_args', '')
+        self.use_ids = True
 
     def __enter__(self):
         super(NoseTestSuite, self).__enter__()
@@ -53,23 +59,21 @@ class NoseTestSuite(TestSuite):
         unaltered otherwise.
         """
         if self.run_under_coverage:
-            cmd0, cmd_rest = cmd.split(" ", 1)
             # We use "python -m coverage" so that the proper python
             # will run the importable coverage rather than the
             # coverage that OS path finds.
 
-            if not cmd0.endswith('.py'):
-                cmd0 = "`which {}`".format(cmd0)
+            if not cmd[0].endswith('.py'):
+                cmd[0] = "`which {}`".format(cmd[0])
 
-            cmd = (
-                "python -m coverage run {cov_args} --rcfile={rcfile} "
-                "{cmd0} {cmd_rest}".format(
-                    cov_args=self.cov_args,
-                    rcfile=Env.PYTHON_COVERAGERC,
-                    cmd0=cmd0,
-                    cmd_rest=cmd_rest,
-                )
-            )
+            cmd = [
+                "python",
+                "-m",
+                "coverage",
+                "run",
+                self.cov_args,
+                "--rcfile={}".format(Env.PYTHON_COVERAGERC),
+            ] + cmd
 
         return cmd
 
@@ -79,27 +83,27 @@ class NoseTestSuite(TestSuite):
         Takes the test options and returns the appropriate flags
         for the command.
         """
-        opts = " "
+        opts = []
 
         # Handle "--failed" as a special case: we want to re-run only
         # the tests that failed within our Django apps
         # This sets the --failed flag for the nosetests command, so this
         # functionality is the same as described in the nose documentation
         if self.failed_only:
-            opts += "--failed"
+            opts.append("--failed")
 
         # This makes it so we use nose's fail-fast feature in two cases.
-        # Case 1: --fail_fast is passed as an arg in the paver command
+        # Case 1: --fail-fast is passed as an arg in the paver command
         # Case 2: The environment variable TESTS_FAIL_FAST is set as True
         env_fail_fast_set = (
             'TESTS_FAIL_FAST' in os.environ and os.environ['TEST_FAIL_FAST']
         )
 
         if self.fail_fast or env_fail_fast_set:
-            opts += " --stop"
+            opts.append("--stop")
 
-        if self.pdb:
-            opts += " --pdb"
+        if self.use_ids:
+            opts.append("--with-id")
 
         return opts
 
@@ -113,23 +117,50 @@ class SystemTestSuite(NoseTestSuite):
         self.test_id = kwargs.get('test_id', self._default_test_id)
         self.fasttest = kwargs.get('fasttest', False)
 
+        self.processes = kwargs.get('processes', None)
+        self.randomize = kwargs.get('randomize', None)
+
+        if self.processes is None:
+            # Don't use multiprocessing by default
+            self.processes = 0
+
+        self.processes = int(self.processes)
+
+        if self.randomize is None:
+            self.randomize = self.root == 'lms'
+
+        if self.processes != 0 and self.verbosity > 1:
+            print colorize(
+                'red',
+                "The TestId module and multiprocessing module can't be run "
+                "together in verbose mode. Disabling TestId for {} tests.".format(self.root)
+            )
+            self.use_ids = False
+
     def __enter__(self):
         super(SystemTestSuite, self).__enter__()
 
     @property
     def cmd(self):
-        cmd = (
-            './manage.py {system} test --verbosity={verbosity} '
-            '{test_id} {test_opts} --settings=test {extra} '
-            '--with-xunit --xunit-file={xunit_report}'.format(
-                system=self.root,
-                verbosity=self.verbosity,
-                test_id=self.test_id,
-                test_opts=self.test_options_flags,
-                extra=self.extra_args,
-                xunit_report=self.report_dir / "nosetests.xml",
-            )
-        )
+
+        cmd = [
+            './manage.py', self.root, 'test',
+            '--verbosity={}'.format(self.verbosity),
+            self.test_id,
+        ] + self.test_options_flags + [
+            '--settings=test',
+            self.extra_args,
+            '--xunitmp-file={}'.format(self.report_dir / "nosetests.xml"),
+            '--with-database-isolation',
+        ]
+
+        if self.processes != 0:
+            cmd.append('--processes={}'.format(self.processes))
+
+        if self.randomize:
+            cmd.append('--with-randomly')
+
+        cmd.extend(self.passthrough_options)
 
         return self._under_coverage_cmd(cmd)
 
@@ -177,17 +208,14 @@ class LibTestSuite(NoseTestSuite):
 
     @property
     def cmd(self):
-        cmd = (
-            "nosetests --id-file={test_ids} {test_id} {test_opts} "
-            "--with-xunit --xunit-file={xunit_report} {extra} "
-            "--verbosity={verbosity}".format(
-                test_ids=self.test_ids,
-                test_id=self.test_id,
-                test_opts=self.test_options_flags,
-                xunit_report=self.xunit_report,
-                verbosity=self.verbosity,
-                extra=self.extra_args,
-            )
-        )
+        cmd = [
+            "nosetests",
+            "--id-file={}".format(self.test_ids),
+            self.test_id,
+        ] + self.test_options_flags + [
+            "--xunit-file={}".format(self.xunit_report),
+            self.extra_args,
+            "--verbosity={}".format(self.verbosity),
+        ] + self.passthrough_options
 
         return self._under_coverage_cmd(cmd)

@@ -16,9 +16,10 @@ import mock
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
 from lang_pref import LANGUAGE_KEY
 from notification_prefs import NOTIFICATION_PREF_KEY
-from edxmako.tests import mako_middleware_process_request
 from external_auth.models import ExternalAuthMap
 import student
+from student.models import UserAttribute
+from student.views import REGISTRATION_AFFILIATE_ID
 
 TEST_CS_URL = 'https://comments.service.test:123/'
 
@@ -136,6 +137,7 @@ class TestCreateAccount(TestCase):
             'username': self.params['username'],
             'name': self.params['name'],
             'age': 13,
+            'yearOfBirth': year_of_birth,
             'education': 'Associate degree',
             'address': self.params['mailing_address'],
             'gender': 'Other/Prefer Not to Say',
@@ -228,9 +230,9 @@ class TestCreateAccount(TestCase):
         request.session['ExternalAuthMap'] = extauth
         request.user = AnonymousUser()
 
-        mako_middleware_process_request(request)
-        with mock.patch('django.contrib.auth.models.User.email_user') as mock_send_mail:
-            student.views.create_account(request)
+        with mock.patch('edxmako.request_context.get_current_request', return_value=request):
+            with mock.patch('django.contrib.auth.models.User.email_user') as mock_send_mail:
+                student.views.create_account(request)
 
         # check that send_mail is called
         if bypass_activation_email:
@@ -249,7 +251,7 @@ class TestCreateAccount(TestCase):
 
     @unittest.skipUnless(settings.FEATURES.get('AUTH_USE_SHIB'), "AUTH_USE_SHIB not set")
     @mock.patch.dict(settings.FEATURES, {'BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH': False, 'AUTOMATIC_AUTH_FOR_TESTING': False})
-    def test_extauth_bypass_sending_activation_email_without_bypass(self):
+    def test_extauth_bypass_sending_activation_email_without_bypass_1(self):
         """
         Tests user creation without sending activation email when
         settings.FEATURES['BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH']=False and doing external auth
@@ -258,7 +260,7 @@ class TestCreateAccount(TestCase):
 
     @unittest.skipUnless(settings.FEATURES.get('AUTH_USE_SHIB'), "AUTH_USE_SHIB not set")
     @mock.patch.dict(settings.FEATURES, {'BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH': False, 'AUTOMATIC_AUTH_FOR_TESTING': False, 'SKIP_EMAIL_VALIDATION': True})
-    def test_extauth_bypass_sending_activation_email_without_bypass(self):
+    def test_extauth_bypass_sending_activation_email_without_bypass_2(self):
         """
         Tests user creation without sending activation email when
         settings.FEATURES['BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH']=False and doing external auth
@@ -276,6 +278,24 @@ class TestCreateAccount(TestCase):
                 self.assertIsNotNone(preference)
             else:
                 self.assertIsNone(preference)
+
+    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+    def test_referral_attribution(self):
+        """
+        Verify that a referral attribution is recorded if an affiliate
+        cookie is present upon a new user's registration.
+        """
+        affiliate_id = 'test-partner'
+        self.client.cookies[settings.AFFILIATE_COOKIE_NAME] = affiliate_id
+        user = self.create_account_and_fetch_profile().user
+        self.assertEqual(UserAttribute.get_user_attribute(user, REGISTRATION_AFFILIATE_ID), affiliate_id)
+
+    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+    def test_no_referral(self):
+        """Verify that no referral is recorded when a cookie is not present."""
+        self.assertIsNone(self.client.cookies.get(settings.AFFILIATE_COOKIE_NAME))  # pylint: disable=no-member
+        user = self.create_account_and_fetch_profile().user
+        self.assertIsNone(UserAttribute.get_user_attribute(user, REGISTRATION_AFFILIATE_ID))
 
 
 @ddt.ddt
@@ -367,8 +387,19 @@ class TestCreateAccountValidation(TestCase):
             assert_email_error("A properly formatted e-mail is required")
 
         # Too long
-        params["email"] = "this_email_address_has_76_characters_in_it_so_it_is_unacceptable@example.com"
-        assert_email_error("Email cannot be more than 75 characters long")
+        params["email"] = '{email}@example.com'.format(
+            email='this_email_address_has_254_characters_in_it_so_it_is_unacceptable' * 4
+        )
+
+        # Assert that we get error when email has more than 254 characters.
+        self.assertGreater(len(params['email']), 254)
+        assert_email_error("Email cannot be more than 254 characters long")
+
+        # Valid Email
+        params["email"] = "student@edx.com"
+        # Assert success on valid email
+        self.assertLess(len(params["email"]), 254)
+        self.assert_success(params)
 
         # Invalid
         params["email"] = "not_an_email_address"
@@ -570,7 +601,7 @@ class TestCreateCommentsServiceUser(TransactionTestCase):
     def test_cs_user_not_created(self, register, request):
         "If user account creation fails, we should not create a comments service user"
         try:
-            response = self.client.post(self.url, self.params)
+            self.client.post(self.url, self.params)
         except:
             pass
         with self.assertRaises(User.DoesNotExist):

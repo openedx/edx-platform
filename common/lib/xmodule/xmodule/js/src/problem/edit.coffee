@@ -202,7 +202,7 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
       xml = xml.replace(/\r\n/g, '\n');
 
       // replace headers
-      xml = xml.replace(/(^.*?$)(?=\n\=\=+$)/gm, '<h3 class="problem-header">$1</h3>');
+      xml = xml.replace(/(^.*?$)(?=\n\=\=+$)/gm, '<h3 class="hd hd-2 problem-header">$1</h3>');
       xml = xml.replace(/\n^\=\=+$/gm, '');
 
       // Pull out demand hints,  || a hint ||

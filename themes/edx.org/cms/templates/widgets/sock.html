@@ -1,12 +1,12 @@
+<%page expression_filter="h" args="online_help_token"/>
 <%!
 from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse
 %>
-<%page args="online_help_token"/>
 <div class="wrapper-sock wrapper">
   <ul class="list-actions list-cta">
     <li class="action-item">
-      <a href="#sock" class="cta cta-show-sock"><i class="icon fa fa-question-circle"></i>
+      <a href="#sock" class="cta cta-show-sock"><span class="icon fa fa-question-circle" aria-hidden="true"></span>
         <span class="copy-show is-shown">${_("Looking for help with {studio_name}?").format(studio_name=settings.STUDIO_SHORT_NAME)}</span>
         <span class="copy-hide is-hidden">${_("Hide {studio_name} Help").format(studio_name=settings.STUDIO_SHORT_NAME)}</span>
       </a>
@@ -16,7 +16,7 @@ from django.core.urlresolvers import reverse
   <div class="wrapper-inner wrapper">
     <section class="sock" id="sock">
       <header>
-        <h2 class="title sr">${_("{studio_name} Documentation").format(studio_name=settings.STUDIO_NAME)}</h2>
+        <h2 class="title sr-only">${_("{studio_name} Documentation").format(studio_name=settings.STUDIO_NAME)}</h2>
       </header>
 
       <div class="support">

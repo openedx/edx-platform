@@ -15,6 +15,9 @@ class CredentialsApiConfig(ConfigurationModel):
     Manages configuration for connecting to the Credential service and using its
     API.
     """
+    class Meta(object):
+        app_label = "credentials"
+
     OAUTH2_CLIENT_NAME = 'credentials'
     API_NAME = 'credentials'
     CACHE_KEY = 'credentials.api.data'

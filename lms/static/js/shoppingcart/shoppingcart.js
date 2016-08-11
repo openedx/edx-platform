@@ -28,8 +28,8 @@ var edx = edx || {};
         */
         var isCourseEnrollmentAllowed = function() {
             return $.ajax({
-                url: "/shoppingcart/verify_cart/",
-                type: "GET"
+                url: '/shoppingcart/verify_cart/',
+                type: 'GET'
             });
         };
 
@@ -66,7 +66,7 @@ var edx = edx || {};
                 }
 
                 // Immediately disable the submit button to prevent duplicate submissions
-                this.$el.find('input[type="submit"]').addClass("disabled");
+                this.$el.find('input[type="submit"]').addClass('disabled');
 
                 this.$paymentForm = this.$el;
                 isCourseEnrollmentAllowed()
@@ -84,7 +84,7 @@ var edx = edx || {};
             */
             responseFromServer: function(data) {
                 if (data.is_course_enrollment_closed == true) {
-                    location.href = "/shoppingcart";
+                    location.href = '/shoppingcart';
                 }
                 else {
                     this.submitPaymentForm(this.$paymentForm);
@@ -97,13 +97,13 @@ var edx = edx || {};
             */
             errorFromServer: function() {
                 // Immediately enable the submit button to allow submission
-                this.$el.find('input[type="submit"]').removeClass("disabled");
+                this.$el.find('input[type="submit"]').removeClass('disabled');
             },
 
             /**
             * Submit the payment from to the external payment processor.
             *
-            * @param {Object} form 
+            * @param {Object} form
             */
             submitPaymentForm: function(form) {
                 form.submit();
@@ -121,13 +121,13 @@ var edx = edx || {};
             // before going to make payment
             // if exists then trigger click event of the apply code button
             var code = $('div.code-input input#input_code').val();
-            if (typeof(code) != 'undefined' && code != ''){
-                 $('div.code-input #submit-code').trigger('click');
+            if (typeof(code) != 'undefined' && code != '') {
+                $('div.code-input #submit-code').trigger('click');
                 return false;
             }
             var container = $('.confirm-enrollment.cart-view form');
             var view = new edx.shoppingcart.showcart.CartView({
-                el:container
+                el: container
             }).submit(event);
         });
     });

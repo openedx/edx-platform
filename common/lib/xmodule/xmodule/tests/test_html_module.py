@@ -3,7 +3,7 @@ import unittest
 from mock import Mock
 
 from xblock.field_data import DictFieldData
-from xmodule.html_module import HtmlModule, HtmlDescriptor
+from xmodule.html_module import HtmlModule, HtmlDescriptor, CourseInfoModule
 
 from . import get_test_system, get_test_descriptor_system
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
@@ -144,3 +144,103 @@ class HtmlDescriptorIndexingTestCase(unittest.TestCase):
             "content": {"html_content": " This has HTML comment in it. HTML end. ", "display_name": "Text"},
             "content_type": "Text"
         })
+
+
+class CourseInfoModuleTestCase(unittest.TestCase):
+    """
+    Make sure that CourseInfoModule renders updates properly
+    """
+    def test_updates_render(self):
+        """
+        Tests that a course info module will render its updates, even if they are malformed.
+        """
+        sample_update_data = [
+            {
+                "id": i,
+                "date": data,
+                "content": "This is a very important update!",
+                "status": CourseInfoModule.STATUS_VISIBLE,
+            } for i, data in enumerate(
+                [
+                    'January 1, 1970',
+                    'Marchtober 45, -1963',
+                    'Welcome!',
+                    'Date means "title", right?'
+                ]
+            )
+        ]
+        info_module = CourseInfoModule(
+            Mock(),
+            get_test_system(),
+            DictFieldData({'items': sample_update_data, 'data': ""}),
+            Mock()
+        )
+
+        # Prior to TNL-4115, an exception would be raised when trying to parse invalid dates in this method
+        try:
+            info_module.get_html()
+        except ValueError:
+            self.fail("CourseInfoModule could not parse an invalid date!")
+
+    def test_updates_order(self):
+        """
+        Tests that a course info module will render its updates in the correct order.
+        """
+        sample_update_data = [
+            {
+                "id": 3,
+                "date": "March 18, 1982",
+                "content": "This is a very important update that was inserted last with an older date!",
+                "status": CourseInfoModule.STATUS_VISIBLE,
+            },
+            {
+                "id": 1,
+                "date": "January 1, 2012",
+                "content": "This is a very important update that was inserted first!",
+                "status": CourseInfoModule.STATUS_VISIBLE,
+            },
+            {
+                "id": 2,
+                "date": "January 1, 2012",
+                "content": "This is a very important update that was inserted second!",
+                "status": CourseInfoModule.STATUS_VISIBLE,
+            }
+        ]
+        info_module = CourseInfoModule(
+            Mock(),
+            Mock(),
+            DictFieldData({'items': sample_update_data, 'data': ""}),
+            Mock()
+        )
+
+        # This is the expected context that should be used by the render function
+        expected_context = {
+            'visible_updates': [
+                {
+                    "id": 2,
+                    "date": "January 1, 2012",
+                    "content": "This is a very important update that was inserted second!",
+                    "status": CourseInfoModule.STATUS_VISIBLE,
+                },
+                {
+                    "id": 1,
+                    "date": "January 1, 2012",
+                    "content": "This is a very important update that was inserted first!",
+                    "status": CourseInfoModule.STATUS_VISIBLE,
+                },
+                {
+                    "id": 3,
+                    "date": "March 18, 1982",
+                    "content": "This is a very important update that was inserted last with an older date!",
+                    "status": CourseInfoModule.STATUS_VISIBLE,
+                }
+            ],
+            'hidden_updates': [],
+        }
+        template_name = "{0}/course_updates.html".format(info_module.TEMPLATE_DIR)
+        info_module.get_html()
+        # Assertion to validate that render function is called with the expected context
+        info_module.system.render_template.assert_called_once_with(
+            template_name,
+            expected_context
+        )

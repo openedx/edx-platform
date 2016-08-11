@@ -3,12 +3,12 @@ define(['jquery',
         'moment-with-locales',
         'teams/js/views/team_card',
         'teams/js/models/team'],
-    function ($, _, moment, TeamCardView, Team) {
+    function($, _, moment, TeamCardView, Team) {
         'use strict';
 
-        describe('TeamCardView', function () {
+        describe('TeamCardView', function() {
             var createTeamCardView, view;
-            createTeamCardView = function () {
+            createTeamCardView = function() {
                 var model = new Team({
                         id: 'test-team',
                         name: 'Test Team',
@@ -16,7 +16,7 @@ define(['jquery',
                         course_id: 'test/course/id',
                         topic_id: 'test-topic',
                         description: 'A team for testing',
-                        last_activity_at: "2015-08-21T18:53:01.145Z",
+                        last_activity_at: '2015-08-21T18:53:01.145Z',
                         country: 'us',
                         language: 'en',
                         membership: []
@@ -35,13 +35,13 @@ define(['jquery',
                 });
             };
 
-            beforeEach(function () {
+            beforeEach(function() {
                 moment.locale('en');
                 view = createTeamCardView();
                 view.render();
             });
 
-            it('can render itself', function () {
+            it('can render itself', function() {
                 expect(view.$el).toHaveClass('list-card');
                 expect(view.$el.find('.card-title').text()).toContain('Test Team');
                 expect(view.$el.find('.card-description').text()).toContain('A team for testing');
@@ -52,11 +52,11 @@ define(['jquery',
                 expect(view.$el.find('.team-language').text()).toContain('English');
             });
 
-            it('navigates to the associated team page when its action button is clicked', function () {
+            it('navigates to the associated team page when its action button is clicked', function() {
                 expect(view.$('.action').attr('href')).toEqual('#teams/test-topic/test-team');
             });
 
-            describe('Profile Image Thumbnails', function () {
+            describe('Profile Image Thumbnails', function() {
                 /**
                  * Takes an array of objects representing team
                  * members, each having the keys 'username',
@@ -66,9 +66,9 @@ define(['jquery',
                  */
                 var setMemberships, expectThumbnailsOrder;
 
-                setMemberships = function (memberships) {
+                setMemberships = function(memberships) {
                     view.model.set({
-                        membership: _.map(memberships, function (m) {
+                        membership: _.map(memberships, function(m) {
                             return {
                                 user: {username: m.username, profile_image: {image_url_small: m.image_url}},
                                 last_activity_at: m.last_activity
@@ -85,58 +85,58 @@ define(['jquery',
                  * rendered on the team card match, in order, the
                  * members of the provided list.
                  */
-                expectThumbnailsOrder = function (members) {
+                expectThumbnailsOrder = function(members) {
                     var thumbnails = view.$('.item-member-thumb img');
                     expect(thumbnails.length).toBe(members.length);
-                    thumbnails.each(function (index, imgEl) {
+                    thumbnails.each(function(index, imgEl) {
                         expect(thumbnails.eq(index).attr('alt')).toBe(members[index].username);
                         expect(thumbnails.eq(index).attr('src')).toBe(members[index].image_url);
                     });
                 };
 
-                it('displays no thumbnails for an empty team', function () {
+                it('displays no thumbnails for an empty team', function() {
                     view.model.set({membership: []});
                     view.render();
                     expect(view.$('.item-member-thumb').length).toBe(0);
                 });
 
-                it('displays thumbnails for a nonempty team', function () {
+                it('displays thumbnails for a nonempty team', function() {
                     var users = [
                         {
                             username: 'user_1', image_url: 'user_1_image',
-                            last_activity: new Date("2010/1/1").toString()
+                            last_activity: new Date('2010/1/1').toString()
                         }, {
                             username: 'user_2', image_url: 'user_2_image',
-                            last_activity: new Date("2011/1/1").toString()
+                            last_activity: new Date('2011/1/1').toString()
                         }
                     ];
                     setMemberships(users);
                     expectThumbnailsOrder([
                         {username: 'user_2', image_url: 'user_2_image'},
-                        {username: 'user_1', image_url: 'user_1_image'},
+                        {username: 'user_1', image_url: 'user_1_image'}
                     ]);
                 });
 
-                it('displays thumbnails and an ellipsis for a team with greater than 5 members', function () {
+                it('displays thumbnails and an ellipsis for a team with greater than 5 members', function() {
                     var users = [
                         {
                             username: 'user_1', image_url: 'user_1_image',
-                            last_activity: new Date("2001/1/1").toString()
+                            last_activity: new Date('2001/1/1').toString()
                         }, {
                             username: 'user_2', image_url: 'user_2_image',
-                            last_activity: new Date("2006/1/1").toString()
+                            last_activity: new Date('2006/1/1').toString()
                         }, {
                             username: 'user_3', image_url: 'user_3_image',
-                            last_activity: new Date("2003/1/1").toString()
+                            last_activity: new Date('2003/1/1').toString()
                         }, {
                             username: 'user_4', image_url: 'user_4_image',
-                            last_activity: new Date("2002/1/1").toString()
+                            last_activity: new Date('2002/1/1').toString()
                         }, {
                             username: 'user_5', image_url: 'user_5_image',
-                            last_activity: new Date("2005/1/1").toString()
+                            last_activity: new Date('2005/1/1').toString()
                         }, {
                             username: 'user_6', image_url: 'user_6_image',
-                            last_activity: new Date("2004/1/1").toString()
+                            last_activity: new Date('2004/1/1').toString()
                         }
                     ];
                     setMemberships(users);

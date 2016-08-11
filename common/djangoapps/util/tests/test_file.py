@@ -158,7 +158,7 @@ class StoreUploadedFileTestCase(TestCase):
 
         def success_validator(storage, filename):
             """ Validation test function that is a no-op """
-            self.assertTrue("success_file" in os.path.basename(filename))
+            self.assertIn("success_file", os.path.basename(filename))
             store_file_data(storage, filename)
 
         with self.assertRaises(FileValidationException) as error:
@@ -216,7 +216,7 @@ class StoreUploadedFileTestCase(TestCase):
             self.request, "nonunique_file", [".txt"], requested_file_name, self.default_max_size
         )
         self.assertNotEqual(first_stored_file_name, second_stored_file_name)
-        self.assertTrue(requested_file_name in second_stored_file_name)
+        self.assertIn(requested_file_name, second_stored_file_name)
         self._verify_successful_upload(file_storage, second_stored_file_name, file_content)
 
     def _verify_successful_upload(self, storage, file_name, expected_content):

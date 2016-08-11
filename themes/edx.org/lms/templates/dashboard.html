@@ -1,3 +1,4 @@
+<%page expression_filter="h"/>
 <%inherit file="main.html" />
 <%namespace name='static' file='static_content.html'/>
 <%!
@@ -5,9 +6,11 @@ from django.utils.translation import ugettext as _
 from django.template import RequestContext
 import third_party_auth
 from third_party_auth import pipeline
-from microsite_configuration import microsite
 from django.core.urlresolvers import reverse
 import json
+from openedx.core.djangolib.js_utils import dump_js_escaped_json, js_escaped_string
+from openedx.core.djangolib.markup import HTML, Text
+from openedx.core.djangoapps.theming import helpers as theming_helpers
 %>
 
 <%
@@ -18,7 +21,6 @@ import json
 
 <%block name="pagetitle">${_("Dashboard")}</%block>
 <%block name="bodyclass">view-dashboard is-authenticated</%block>
-<%block name="nav_skip">#my-courses</%block>
 
 <%block name="header_extras">
 % for template_name in ["donation"]:
@@ -40,9 +42,9 @@ import json
   <script type="text/javascript">
     $(document).ready(function() {
       edx.dashboard.legacy.init({
-        dashboard: "${reverse('dashboard')}",
-        signInUser: "${reverse('signin_user')}",
-        changeEmailSettings: "${reverse('change_email_settings')}"
+        dashboard: "${reverse('dashboard') | n, js_escaped_string}",
+        signInUser: "${reverse('signin_user') | n, js_escaped_string}",
+        changeEmailSettings: "${reverse('change_email_settings') | n, js_escaped_string}"
       });
     });
   </script>
@@ -55,7 +57,7 @@ import json
     <%static:require_module module_name="js/views/message_banner" class_name="MessageBannerView">
         var banner = new MessageBannerView({urgency: 'low', type: 'warning'});
         $('#content').prepend(banner.$el);
-        banner.showMessage(${json.dumps(redirect_message)})
+        banner.showMessage(${redirect_message | n, dump_js_escaped_json})
     </%static:require_module>
   % endif
 </%block>
@@ -63,19 +65,20 @@ import json
 <div class="dashboard-notifications" tabindex="-1">
     %if message:
         <section class="dashboard-banner">
-            ${message}
+            ${message | n, decode.utf8}
         </section>
     %endif
 
     %if enrollment_message:
         <section class="dashboard-banner">
-            ${enrollment_message}
+            ${enrollment_message | n, decode.utf8}
         </section>
     %endif
 </div>
 
 <section class="container dashboard" id="dashboard-main">
-  <section class="my-courses" id="my-courses" role="main" aria-label="Content">
+<main id="main" aria-label="Content" tabindex="-1">
+  <section class="my-courses" id="my-courses">
     <header class="wrapper-header-courses">
       <h2 class="header-courses">${_("My Courses")}</h2>
     </header>
@@ -103,11 +106,11 @@ import json
       </ul>
     % else:
       <section class="empty-dashboard-message">
-        <p>${_("Looks like you haven't enrolled in any courses yet.")}</p>
+        <p>${_("You are not enrolled in any courses yet.")}</p>
 
         % if settings.FEATURES.get('COURSES_ARE_BROWSABLE'):
           <a href="${marketing_link('COURSES')}">
-            ${_("Find courses now!")}
+            ${_("Explore courses")}
           </a>
         %endif
       </section>
@@ -118,7 +121,7 @@ import json
         <h2>${_("Course-loading errors")}</h2>
 
       % for course_dir, errors in errored_courses.items():
-         <h3>${course_dir | h}</h3>
+         <h3>${course_dir}</h3>
              <ul>
            % for (msg, err) in errors:
                <li>${msg}
@@ -130,6 +133,7 @@ import json
       </div>
     % endif
   </section>
+</main>
 
   % if settings.FEATURES.get('ENABLE_DASHBOARD_SEARCH'):
     <div id="dashboard-search-bar" class="search-bar dashboard-search-bar" role="search" aria-label="Dashboard">
@@ -137,11 +141,11 @@ import json
         <label for="dashboard-search-input">${_('Search Your Courses')}</label>
         <div class="search-field-wrapper">
           <input id="dashboard-search-input" type="text" class="search-field"/>
-          <button type="submit" class="search-button" aria-label="${_('Search')}">
-            <i class="icon fa fa-search" aria-hidden="true"></i>
+          <button type="submit" class="search-button" title="${_('Search')}">
+            <span class="icon fa fa-search" aria-hidden="true"></span>
           </button>
-          <button type="button" class="cancel-button" aria-label="${_('Clear search')}">
-            <i class="icon fa fa-remove" aria-hidden="true"></i>
+          <button type="button" class="cancel-button" title="${_('Clear search')}">
+            <span class="icon fa fa-remove" aria-hidden="true"></span>
           </button>
         </div>
       </form>
@@ -153,10 +157,19 @@ import json
   % endif
 
   % if settings.FEATURES.get('COURSES_ARE_BROWSABLE'):
-    <div class="wrapper-find-courses">
-      <p class="copy">${_("Check out our recently launched courses and what's new in your favorite subjects")}</p>
-      <p><a class="btn-find-courses" href="${marketing_link('COURSES')}">${_("Find New Courses")}</a></p>
-    </div>
+      <div class="wrapper-find-courses">
+          <div class="course-advertise">
+              <div class="advertise-message">
+                  ${_("Browse recently launched courses and see what's new in your favorite subjects.")}
+              </div>
+              <div class="ad-link">
+                  <a class="btn-neutral" href="${marketing_link('COURSES')}">
+                      <span class="icon fa fa-search" aria-hidden="true"></span>
+                      ${_("Explore New Courses")}
+                  </a>
+              </div>
+          </div>
+      </div>
   % endif
 
   <section class="profile-sidebar" id="profile-sidebar" role="region" aria-label="Account Status Info">
@@ -175,30 +188,17 @@ import json
         </li>
         % endif
 
-        <%include file="${microsite.get_template_path('dashboard/_dashboard_status_verification.html')}" />
+        <%include file="${theming_helpers.get_template_path('dashboard/_dashboard_status_verification.html')}" />
 
       </ul>
     </section>
   </section>
-  % if xseries_credentials:
-    <div class="wrapper-xseries-certificates">
-      <p class="title">${_("XSeries Program Certificates")}</p>
-      <p class="copy">${_("You have received a certificate for the following XSeries programs:")}</p>
-      <ul>
-      % for xseries_credential in xseries_credentials:
-        <li>
-          <a class="copy" href="${xseries_credential['credential_url']}">${xseries_credential['display_name']}</a>
-        </li>
-      % endfor
-      </ul>
-    </div>
-  % endif
 </section>
 
 <section id="email-settings-modal" class="modal" aria-hidden="true">
   <div class="inner-wrapper" role="dialog" aria-labelledby="email-settings-title">
     <button class="close-modal">
-      <i class="icon fa fa-remove"></i>
+      <span class="icon fa fa-remove" aria-hidden="true"></span>
       <span class="sr">
         ## Translators: this is a control to allow users to exit out of this modal interface (a menu or piece of UI that takes the full focus of the screen)
         ${_("Close")}
@@ -207,7 +207,7 @@ import json
 
     <header>
       <h2 id="email-settings-title">
-        ${_("Email Settings for {course_number}").format(course_number='<span id="email_settings_course_number"></span>')}
+        ${Text(_("Email Settings for {course_number}")).format(course_number=HTML('<span id="email_settings_course_number"></span>'))}
         <span class="sr">,
           ## Translators: this text gives status on if the modal interface (a menu or piece of UI that takes the full focus of the screen) is open or not
           ${_("window open")}
@@ -229,7 +229,7 @@ import json
 <section id="unenroll-modal" class="modal unenroll-modal" aria-hidden="true">
   <div class="inner-wrapper" role="dialog" aria-labelledby="unenrollment-modal-title">
     <button class="close-modal">
-      <i class="icon fa fa-remove"></i>
+      <span class="icon fa fa-remove" aria-hidden="true"></span>
       <span class="sr">
         ## Translators: this is a control to allow users to exit out of this modal interface (a menu or piece of UI that takes the full focus of the screen)
         ${_("Close")}

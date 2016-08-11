@@ -1,21 +1,20 @@
-(function (undefined) {
+(function(undefined) {
     'use strict';
-    describe('VideoPlayer Events plugin', function () {
+    describe('VideoPlayer Events plugin', function() {
         var state, oldOTBD, Logger = window.Logger;
 
-        beforeEach(function () {
+        beforeEach(function() {
             oldOTBD = window.onTouchBasedDevice;
             window.onTouchBasedDevice = jasmine
                 .createSpy('onTouchBasedDevice')
-                .andReturn(null);
+                .and.returnValue(null);
 
-            jasmine.stubRequests();
             state = jasmine.initializePlayer();
             spyOn(Logger, 'log');
-            spyOn(state.videoEventsPlugin, 'getCurrentTime').andReturn(10);
+            spyOn(state.videoEventsPlugin, 'getCurrentTime').and.returnValue(10);
         });
 
-        afterEach(function () {
+        afterEach(function() {
             $('source').remove();
             window.onTouchBasedDevice = oldOTBD;
             state.storage.clear();
@@ -24,7 +23,7 @@
             }
         });
 
-        it('can emit "load_video" event', function () {
+        it('can emit "load_video" event', function() {
             state.el.trigger('ready');
             expect(Logger.log).toHaveBeenCalledWith('load_video', {
                 id: 'id',
@@ -32,7 +31,7 @@
             });
         });
 
-        it('can emit "play_video" event when emitPlayVideoEvent is true', function () {
+        it('can emit "play_video" event when emitPlayVideoEvent is true', function() {
             state.videoEventsPlugin.emitPlayVideoEvent = true;
             state.el.trigger('play');
             expect(Logger.log).toHaveBeenCalledWith('play_video', {
@@ -43,13 +42,13 @@
             expect(state.videoEventsPlugin.emitPlayVideoEvent).toBeFalsy();
         });
 
-        it('can not emit "play_video" event when emitPlayVideoEvent is false', function () {
+        it('can not emit "play_video" event when emitPlayVideoEvent is false', function() {
             state.videoEventsPlugin.emitPlayVideoEvent = false;
             state.el.trigger('play');
             expect(Logger.log).not.toHaveBeenCalled();
         });
 
-        it('can emit "pause_video" event', function () {
+        it('can emit "pause_video" event', function() {
             state.el.trigger('pause');
             expect(Logger.log).toHaveBeenCalledWith('pause_video', {
                 id: 'id',
@@ -59,7 +58,7 @@
             expect(state.videoEventsPlugin.emitPlayVideoEvent).toBeTruthy();
         });
 
-        it('can emit "speed_change_video" event', function () {
+        it('can emit "speed_change_video" event', function() {
             state.el.trigger('speedchange', ['2.0', '1.0']);
             expect(Logger.log).toHaveBeenCalledWith('speed_change_video', {
                 id: 'id',
@@ -70,7 +69,7 @@
             });
         });
 
-        it('can emit "seek_video" event', function () {
+        it('can emit "seek_video" event', function() {
             state.el.trigger('seek', [1, 0, 'any']);
             expect(Logger.log).toHaveBeenCalledWith('seek_video', {
                 id: 'id',
@@ -81,7 +80,7 @@
             });
         });
 
-        it('can emit "stop_video" event', function () {
+        it('can emit "stop_video" event', function() {
             state.el.trigger('ended');
             expect(Logger.log).toHaveBeenCalledWith('stop_video', {
                 id: 'id',
@@ -90,7 +89,7 @@
             });
             expect(state.videoEventsPlugin.emitPlayVideoEvent).toBeTruthy();
 
-            Logger.log.reset();
+            Logger.log.calls.reset();
             state.el.trigger('stop');
             expect(Logger.log).toHaveBeenCalledWith('stop_video', {
                 id: 'id',
@@ -100,7 +99,7 @@
             expect(state.videoEventsPlugin.emitPlayVideoEvent).toBeTruthy();
         });
 
-        it('can emit "skip_video" event', function () {
+        it('can emit "skip_video" event', function() {
             state.el.trigger('skip', [false]);
             expect(Logger.log).toHaveBeenCalledWith('skip_video', {
                 id: 'id',
@@ -109,7 +108,7 @@
             });
         });
 
-        it('can emit "do_not_show_again_video" event', function () {
+        it('can emit "do_not_show_again_video" event', function() {
             state.el.trigger('skip', [true]);
             expect(Logger.log).toHaveBeenCalledWith('do_not_show_again_video', {
                 id: 'id',
@@ -118,24 +117,25 @@
             });
         });
 
-        it('can emit "video_show_cc_menu" event', function () {
+        it('can emit "edx.video.language_menu.shown" event', function() {
             state.el.trigger('language_menu:show');
-            expect(Logger.log).toHaveBeenCalledWith('video_show_cc_menu', {
+            expect(Logger.log).toHaveBeenCalledWith('edx.video.language_menu.shown', {
                 id: 'id',
                 code: 'html5'
             });
         });
 
-        it('can emit "video_hide_cc_menu" event', function () {
+        it('can emit "edx.video.language_menu.hidden" event', function() {
             state.el.trigger('language_menu:hide');
-            expect(Logger.log).toHaveBeenCalledWith('video_hide_cc_menu', {
+            expect(Logger.log).toHaveBeenCalledWith('edx.video.language_menu.hidden', {
                 id: 'id',
-                code: 'html5'
+                code: 'html5',
+                language: 'en'
             });
         });
 
-        it('can emit "show_transcript" event', function () {
-            state.el.trigger('captions:show');
+        it('can emit "show_transcript" event', function() {
+            state.el.trigger('transcript:show');
             expect(Logger.log).toHaveBeenCalledWith('show_transcript', {
                 id: 'id',
                 code: 'html5',
@@ -143,8 +143,8 @@
             });
         });
 
-        it('can emit "hide_transcript" event', function () {
-            state.el.trigger('captions:hide');
+        it('can emit "hide_transcript" event', function() {
+            state.el.trigger('transcript:hide');
             expect(Logger.log).toHaveBeenCalledWith('hide_transcript', {
                 id: 'id',
                 code: 'html5',
@@ -152,9 +152,27 @@
             });
         });
 
-        it('can destroy itself', function () {
+        it('can emit "edx.video.closed_captions.shown" event', function() {
+            state.el.trigger('captions:show');
+            expect(Logger.log).toHaveBeenCalledWith('edx.video.closed_captions.shown', {
+                id: 'id',
+                code: 'html5',
+                current_time: 10
+            });
+        });
+
+        it('can emit "edx.video.closed_captions.hidden" event', function() {
+            state.el.trigger('captions:hide');
+            expect(Logger.log).toHaveBeenCalledWith('edx.video.closed_captions.hidden', {
+                id: 'id',
+                code: 'html5',
+                current_time: 10
+            });
+        });
+
+        it('can destroy itself', function() {
             var plugin = state.videoEventsPlugin;
-            spyOn($.fn, 'off').andCallThrough();
+            spyOn($.fn, 'off').and.callThrough();
             state.videoEventsPlugin.destroy();
             expect(state.videoEventsPlugin).toBeUndefined();
             expect($.fn.off).toHaveBeenCalledWith({
@@ -167,11 +185,12 @@
                 'speedchange': plugin.onSpeedChange,
                 'language_menu:show': plugin.onShowLanguageMenu,
                 'language_menu:hide': plugin.onHideLanguageMenu,
+                'transcript:show': plugin.onShowTranscript,
+                'transcript:hide': plugin.onHideTranscript,
                 'captions:show': plugin.onShowCaptions,
                 'captions:hide': plugin.onHideCaptions,
                 'destroy': plugin.destroy
             });
         });
     });
-
 }).call(this);

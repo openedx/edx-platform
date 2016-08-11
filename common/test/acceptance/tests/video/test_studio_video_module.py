@@ -8,11 +8,11 @@ import os
 from mock import patch
 from nose.plugins.attrib import attr
 from unittest import skipIf
-from ...pages.studio.auto_auth import AutoAuthPage
-from ...pages.studio.overview import CourseOutlinePage
-from ...pages.studio.video.video import VideoComponentPage
-from ...fixtures.course import CourseFixture, XBlockFixtureDesc
-from ..helpers import UniqueCourseTest, is_youtube_available, YouTubeStubConfig
+from common.test.acceptance.pages.studio.auto_auth import AutoAuthPage
+from common.test.acceptance.pages.studio.overview import CourseOutlinePage
+from common.test.acceptance.pages.studio.video.video import VideoComponentPage
+from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
+from common.test.acceptance.tests.helpers import UniqueCourseTest, is_youtube_available, YouTubeStubConfig
 
 
 @skipIf(is_youtube_available() is False, 'YouTube is not available!')
@@ -76,7 +76,7 @@ class CMSVideoBaseTest(UniqueCourseTest):
         # Why 2? One video component is created by default for each test. Please see
         # test_studio_video_module.py:CMSVideoTest._create_course_unit
         # And we are creating second video component here.
-        self.assertTrue(video_xblocks == 2)
+        self.assertEqual(video_xblocks, 2)
 
     def _install_course_fixture(self):
         """
@@ -161,7 +161,7 @@ class CMSVideoBaseTest(UniqueCourseTest):
         self.unit_page.xblocks[1].save_settings()
 
 
-@attr('shard_4')
+@attr(shard=4)
 class CMSVideoTest(CMSVideoBaseTest):
     """
     CMS Video Test Class
@@ -234,6 +234,7 @@ class CMSVideoTest(CMSVideoBaseTest):
         And first is private video
         When I reload the page
         Then video controls for all videos are visible
+        And the error message isn't shown
         """
         self._create_course_unit(youtube_stub_config={'youtube_api_private_video': True})
         self.video.create_video()
@@ -247,6 +248,9 @@ class CMSVideoTest(CMSVideoBaseTest):
         # again open unit page and check that video controls show for both videos
         self._navigate_to_course_unit_page()
         self.assertTrue(self.video.is_controls_visible())
+
+        # verify that the error message isn't shown by default
+        self.assertFalse(self.video.is_error_message_shown)
 
     def test_captions_shown_correctly(self):
         """
@@ -341,13 +345,17 @@ class CMSVideoA11yTest(CMSVideoBaseTest):
             super(CMSVideoA11yTest, self).setUp()
 
     def test_video_player_a11y(self):
-        # Limit the scope of the audit to the video player only.
-        self.outline.a11y_audit.config.set_scope(include=["div.video"])
-        self.outline.a11y_audit.config.set_rules({
-            "ignore": [
-                'link-href',  # TODO: AC-223
-            ],
-        })
+        # we're loading a shorter transcript to ensure both skip links are available
+        self._create_course_unit(subtitles=True)
+        self.edit_component()
+        self.video.upload_transcript('english_single_transcript.srt')
 
-        self._create_course_unit()
+        self.save_unit_settings()
+        self.video.wait_for_captions()
+        self.assertTrue(self.video.is_captions_visible())
+
+        # limit the scope of the audit to the video player only.
+        self.outline.a11y_audit.config.set_scope(
+            include=["div.video"]
+        )
         self.outline.a11y_audit.check_for_accessibility_errors()

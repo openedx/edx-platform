@@ -28,21 +28,26 @@ html {
 body {
   @extend %t-copy-base;
   min-width: $fg-min-width;
-  background: $gray-l5;
-  color: $gray-d2;
+  background: $uxpl-grayscale-x-back;
+  color: $gray-d3;
 }
 
 body, input, button {
   font-family: 'Open Sans', sans-serif;
 }
 
+// removing the outline on any element that we make programmatically focusable
+[tabindex="-1"] {
+    outline: none;
+}
+
 a {
   @include transition(color $tmg-f2 ease-in-out 0s);
   text-decoration: none;
-  color: $blue;
+  color: $uxpl-blue-base;
 
   &:hover {
-    color: $orange-d1;
+    color: $uxpl-blue-hover-active;
   }
 }
 
@@ -79,7 +84,7 @@ h1 {
     position: relative;
     top: ($baseline/4);
     display: block;
-    color: $gray-l2;
+    color: $gray-d2;
   }
 }
 
@@ -288,14 +293,6 @@ p, ul, ol, dl {
         .button {
           padding: ($baseline/4) ($baseline/2) ($baseline/3) ($baseline/2);
         }
-
-        .new-button {
-
-        }
-
-        .view-button {
-
-        }
       }
     }
 
@@ -447,11 +444,11 @@ p, ul, ol, dl {
 
     .tip {
       @extend %t-copy-sub2;
+      @include text-align(right);
+      @include float(right);
       width: flex-grid(7, 12);
-      float: right;
       margin-top: ($baseline/2);
-      text-align: right;
-      color: $gray-l2;
+      color: $gray-d1;
     }
   }
 }
@@ -593,40 +590,11 @@ hr.divide {
   }
 }
 
-.tooltip {
-  @include transition(opacity $tmg-f3 ease-out 0s);
-  @include font-size(12);
-  @extend %t-regular;
-  @extend %ui-depth5;
-  position: absolute;
-  top: 0;
-  left: 0;
-  padding: 0 10px;
-  border-radius: 3px;
-  background: rgba(0, 0, 0, 0.85);
-  line-height: 26px;
-  color: $white;
-  pointer-events: none;
-  opacity: 0.0;
-
-  &:after {
-    @include font-size(20);
-    content: '▾';
-    display: block;
-    position: absolute;
-    bottom: -14px;
-    left: 50%;
-    margin-left: -7px;
-    color: rgba(0, 0, 0, 0.85);
-  }
-}
-
-
 // +Utility - Basic
 // ====================
 
 // UI - semantically hide text
-.sr {
+.sr, .sr-only {
   @extend %cont-text-sr;
 }
 
@@ -646,23 +614,25 @@ hr.divider {
 }
 
 // ui - skipnav
-.nav-skip {
+.nav-skip,
+.transcript-skip {
   @extend %t-action3;
-  display: block;
+  display: inline-block;
   position: absolute;
   left: 0px;
   top: -($baseline*30);
-  width: 1px;
-  height: 1px;
   overflow: hidden;
   background: $white;
   border-bottom: 1px solid $gray-l4;
   padding: ($baseline*0.75) ($baseline/2);
 
-  &:focus, &:active {
-    position: static;
+  &:focus,
+  &:active {
+    position: relative;
+    top: auto;
     width: auto;
     height: auto;
+    margin: 0;
   }
 }
 
@@ -698,9 +668,10 @@ hr.divider {
       color: $white;
     }
 
-    &:hover {
+    &:hover,
+    &:active {
       top: 0;
-      background: $blue;
+      background: $uxpl-blue-base;
     }
   }
 
@@ -725,4 +696,3 @@ hr.divider {
     color: $gray-l1;
   }
 }
-

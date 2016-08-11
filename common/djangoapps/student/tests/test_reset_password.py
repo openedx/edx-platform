@@ -6,32 +6,39 @@ import re
 import unittest
 
 from django.core.cache import cache
+from django.core.urlresolvers import reverse
 from django.conf import settings
-from django.test import TestCase
 from django.test.client import RequestFactory
 from django.contrib.auth.models import User
 from django.contrib.auth.hashers import UNUSABLE_PASSWORD_PREFIX
 from django.contrib.auth.tokens import default_token_generator
 
-from django.utils.encoding import force_bytes, force_text
-from django.utils.http import urlsafe_base64_encode, base36_to_int, int_to_base36
+from django.utils.http import int_to_base36
 
 from mock import Mock, patch
 import ddt
 
+from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from student.views import password_reset, password_reset_confirm_wrapper, SETTING_CHANGE_INITIATED
 from student.tests.factories import UserFactory
 from student.tests.test_email import mock_render_to_string
 from util.testing import EventTestMixin
 
-from .test_microsite import fake_microsite_get_value
+from .test_configuration_overrides import fake_get_value
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 
+@unittest.skipUnless(
+    settings.ROOT_URLCONF == "lms.urls",
+    "reset password tests should only run in LMS"
+)
 @ddt.ddt
-class ResetPasswordTests(EventTestMixin, TestCase):
+class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
     """ Tests that clicking reset password sends email, and doesn't activate the user
     """
     request_factory = RequestFactory()
+
+    ENABLED_CACHES = ['default']
 
     def setUp(self):
         super(ResetPasswordTests, self).setUp('student.views.tracker')
@@ -45,10 +52,6 @@ class ResetPasswordTests(EventTestMixin, TestCase):
         self.user_bad_passwd.is_active = False
         self.user_bad_passwd.password = UNUSABLE_PASSWORD_PREFIX
         self.user_bad_passwd.save()
-
-    def uidb36_to_uidb64(self, uidb36=None):
-        """ Converts uidb36 into uidb64 """
-        return force_text(urlsafe_base64_encode(force_bytes(base36_to_int(uidb36 or self.uidb36))))
 
     @patch('student.views.render_to_string', Mock(side_effect=mock_render_to_string, autospec=True))
     def test_user_bad_password_reset(self):
@@ -121,7 +124,7 @@ class ResetPasswordTests(EventTestMixin, TestCase):
         (subject, msg, from_addr, to_addrs) = send_email.call_args[0]
         self.assertIn("Password reset", subject)
         self.assertIn("You're receiving this e-mail because you requested a password reset", msg)
-        self.assertEquals(from_addr, settings.DEFAULT_FROM_EMAIL)
+        self.assertEquals(from_addr, configuration_helpers.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL))
         self.assertEquals(len(to_addrs), 1)
         self.assertIn(self.user.email, to_addrs)
 
@@ -191,9 +194,9 @@ class ResetPasswordTests(EventTestMixin, TestCase):
             )
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', "Test only valid in LMS")
-    @patch("microsite_configuration.microsite.get_value", fake_microsite_get_value)
+    @patch("openedx.core.djangoapps.site_configuration.helpers.get_value", fake_get_value)
     @patch('django.core.mail.send_mail')
-    def test_reset_password_email_microsite(self, send_email):
+    def test_reset_password_email_configuration_override(self, send_email):
         """
         Tests that the right url domain and platform name is included in
         the reset password email
@@ -215,50 +218,51 @@ class ResetPasswordTests(EventTestMixin, TestCase):
         )
         self.assertEqual(from_addr, "no-reply@fakeuniversity.com")
 
-    @patch('student.views.password_reset_confirm')
-    def test_reset_password_bad_token(self, reset_confirm):
+    @ddt.data(
+        ('invalidUid', 'invalid_token'),
+        (None, 'invalid_token'),
+        ('invalidUid', None),
+    )
+    @ddt.unpack
+    def test_reset_password_bad_token(self, uidb36, token):
         """Tests bad token and uidb36 in password reset"""
+        if uidb36 is None:
+            uidb36 = self.uidb36
+        if token is None:
+            token = self.token
 
-        bad_reset_req = self.request_factory.get('/password_reset_confirm/NO-OP/')
-        password_reset_confirm_wrapper(bad_reset_req, 'NO', 'OP')
-        confirm_kwargs = reset_confirm.call_args[1]
-
-        self.assertEquals(confirm_kwargs['uidb64'], self.uidb36_to_uidb64('NO'))
-
-        self.assertEquals(confirm_kwargs['token'], 'OP')
+        bad_request = self.request_factory.get(
+            reverse(
+                "password_reset_confirm",
+                kwargs={"uidb36": uidb36, "token": token}
+            )
+        )
+        password_reset_confirm_wrapper(bad_request, uidb36, token)
         self.user = User.objects.get(pk=self.user.pk)
         self.assertFalse(self.user.is_active)
 
-    @patch('student.views.password_reset_confirm')
-    def test_reset_password_good_token(self, reset_confirm):
+    def test_reset_password_good_token(self):
         """Tests good token and uidb36 in password reset"""
-
-        good_reset_req = self.request_factory.get('/password_reset_confirm/{0}-{1}/'.format(self.uidb36, self.token))
+        url = reverse(
+            "password_reset_confirm",
+            kwargs={"uidb36": self.uidb36, "token": self.token}
+        )
+        good_reset_req = self.request_factory.get(url)
         password_reset_confirm_wrapper(good_reset_req, self.uidb36, self.token)
-        confirm_kwargs = reset_confirm.call_args[1]
-        self.assertEquals(confirm_kwargs['uidb64'], self.uidb36_to_uidb64())
-        self.assertEquals(confirm_kwargs['token'], self.token)
         self.user = User.objects.get(pk=self.user.pk)
         self.assertTrue(self.user.is_active)
 
     @patch('student.views.password_reset_confirm')
-    @patch("microsite_configuration.microsite.get_value", fake_microsite_get_value)
-    def test_reset_password_good_token_microsite(self, reset_confirm):
-        """Tests password reset confirmation page for micro site"""
-
-        good_reset_req = self.request_factory.get('/password_reset_confirm/{0}-{1}/'.format(self.uidb36, self.token))
+    @patch("openedx.core.djangoapps.site_configuration.helpers.get_value", fake_get_value)
+    def test_reset_password_good_token_configuration_override(self, reset_confirm):
+        """Tests password reset confirmation page for site configuration override."""
+        url = reverse(
+            "password_reset_confirm",
+            kwargs={"uidb36": self.uidb36, "token": self.token}
+        )
+        good_reset_req = self.request_factory.get(url)
         password_reset_confirm_wrapper(good_reset_req, self.uidb36, self.token)
         confirm_kwargs = reset_confirm.call_args[1]
         self.assertEquals(confirm_kwargs['extra_context']['platform_name'], 'Fake University')
-
-    @patch('student.views.password_reset_confirm')
-    def test_reset_password_with_reused_password(self, reset_confirm):
-        """Tests good token and uidb36 in password reset"""
-
-        good_reset_req = self.request_factory.get('/password_reset_confirm/{0}-{1}/'.format(self.uidb36, self.token))
-        password_reset_confirm_wrapper(good_reset_req, self.uidb36, self.token)
-        confirm_kwargs = reset_confirm.call_args[1]
-        self.assertEquals(confirm_kwargs['uidb64'], self.uidb36_to_uidb64())
-        self.assertEquals(confirm_kwargs['token'], self.token)
         self.user = User.objects.get(pk=self.user.pk)
         self.assertTrue(self.user.is_active)

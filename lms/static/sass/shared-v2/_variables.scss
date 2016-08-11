@@ -1,0 +1,21 @@
+// LMS variables
+
+$lms-gray: palette(grayscale, base);
+$lms-background-color: rgb(252, 252, 252);  // Correct shade of grey not available in the Pattern Library
+$lms-container-background-color: $white;
+$lms-border-color: palette(grayscale, back);
+$lms-label-color: palette(grayscale, black);
+$lms-active-color: palette(primary, base);
+
+$white-transparent: rgba(255, 255, 255, 0);
+$white-opacity-40: rgba(255, 255, 255, 0.4);
+$white-opacity-60: rgba(255, 255, 255, 0.6);
+$white-opacity-70: rgba(255, 255, 255, 0.7);
+$white-opacity-80: rgba(255, 255, 255, 0.8);
+
+$light-grey-transparent: rgba(200,200,200, 0);
+$light-grey-solid: rgba(200,200,200, 1);
+
+// Icons
+$lms-dark-icon-color: $white;
+$lms-dark-icon-background-color: palette(grayscale, black);

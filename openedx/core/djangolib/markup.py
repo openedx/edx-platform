@@ -2,50 +2,33 @@
 Utilities for use in Mako markup.
 """
 
-from django.utils.translation import ugettext as django_ugettext
-from django.utils.translation import ungettext as django_ungettext
 import markupsafe
 
 
-# So that we can use escape() imported from here.
-escape = markupsafe.escape                      # pylint: disable=invalid-name
-
-
-def ugettext(text):
-    """Translate a string, and escape it as plain text.
-
-    Use like this in Mako::
-
-        <% from openedx.core.djangolib.markup import ugettext as _ %>
-        <p>${_("Hello, world!")}</p>
-
-    Or with formatting::
-
-        <% from openedx.core.djangolib.markup import HTML, ugettext as _ %>
-        ${_("Write & send {start}email{end}").format(
-            start=HTML("<a href='mailto:ned@edx.org'>"),
-            end=HTML("</a>"),
-           )}
-
-    """
-    return markupsafe.escape(django_ugettext(text))
-
-
-def ungettext(text1, text2, num):
-    """Translate a number-sensitive string, and escape it as plain text."""
-    return markupsafe.escape(django_ungettext(text1, text2, num))
+# Text() can be used to declare a string as plain text, as HTML() is used
+# for HTML.  It simply wraps markupsafe's escape, which will HTML-escape if
+# it isn't already escaped.
+Text = markupsafe.escape                        # pylint: disable=invalid-name
 
 
 def HTML(html):                                 # pylint: disable=invalid-name
-    """Mark a string as already HTML, so that it won't be escaped before output.
+    """
+    Mark a string as already HTML, so that it won't be escaped before output.
 
-    Use this when formatting HTML into other strings::
+    Use this function when formatting HTML into other strings.  It must be
+    used in conjunction with ``Text()``, and both ``HTML()`` and ``Text()``
+    must be closed before any calls to ``format()``::
 
-        <% from openedx.core.djangolib.markup import HTML, ugettext as _ %>
-        ${_("Write & send {start}email{end}").format(
-            start=HTML("<a href='mailto:ned@edx.org'>"),
+        <%page expression_filter="h"/>
+        <%!
+        from django.utils.translation import ugettext as _
+
+        from openedx.core.djangolib.markup import HTML, Text
+        %>
+        ${Text(_("Write & send {start}email{end}")).format(
+            start=HTML("<a href='mailto:{}'>").format(user.email),
             end=HTML("</a>"),
-           )}
+        )}
 
     """
     return markupsafe.Markup(html)

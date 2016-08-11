@@ -59,9 +59,9 @@ STATIC_URL = "/static/"
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
 )
-STATICFILES_DIRS = (
+STATICFILES_DIRS = [
     (TEST_ROOT / "staticfiles" / "cms").abspath(),
-)
+]
 
 # Silence noisy logs
 import logging
@@ -96,9 +96,6 @@ FEATURES['ENABLE_VIDEO_BUMPER'] = True  # Enable video bumper in Studio settings
 # Enable partner support link in Studio footer
 PARTNER_SUPPORT_EMAIL = 'partner-support@example.com'
 
-# Disable some block types to test block deprecation logic
-DEPRECATED_BLOCK_TYPES = ['poll', 'survey']
-
 ########################### Entrance Exams #################################
 FEATURES['ENTRANCE_EXAMS'] = True
 
@@ -122,6 +119,8 @@ MOCK_SEARCH_BACKING_FILE = (
 
 # this secret key should be the same as lms/envs/bok_choy.py's
 SECRET_KEY = "very_secret_bok_choy_key"
+
+LMS_ROOT_URL = "http://localhost:8000"
 
 #####################################################################
 # Lastly, see if the developer has any local overrides.

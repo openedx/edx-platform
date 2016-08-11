@@ -38,8 +38,8 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 
-@attr('shard_1')
-@patch.dict('django.conf.settings.FEATURES', {'ENTRANCE_EXAMS': True, 'MILESTONES_APP': True})
+@attr(shard=2)
+@patch.dict('django.conf.settings.FEATURES', {'ENTRANCE_EXAMS': True})
 class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, MilestonesTestCaseMixin):
     """
     Check that content is properly gated.
@@ -47,7 +47,7 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
     Creates a test course from scratch. The tests below are designed to execute
     workflows regardless of the feature flag settings.
     """
-    @patch.dict('django.conf.settings.FEATURES', {'ENTRANCE_EXAMS': True, 'MILESTONES_APP': True})
+    @patch.dict('django.conf.settings.FEATURES', {'ENTRANCE_EXAMS': True})
     def setUp(self):
         """
         Test case scaffolding
@@ -62,7 +62,7 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
             parent=self.course,
             display_name='Overview'
         )
-        ItemFactory.create(
+        self.welcome = ItemFactory.create(
             parent=self.chapter,
             display_name='Welcome'
         )
@@ -250,13 +250,12 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
                                kwargs={
                                    'course_id': unicode(self.course.id),
                                    'chapter': self.chapter.location.name,
-                                   'section': self.chapter_subsection.location.name
+                                   'section': self.welcome.location.name
                                })
         resp = self.client.get(url)
         self.assertRedirects(resp, expected_url, status_code=302, target_status_code=200)
         resp = self.client.get(expected_url)
-        self.assertNotIn('Exam Problem - Problem 1', resp.content)
-        self.assertNotIn('Exam Problem - Problem 2', resp.content)
+        self.assertNotIn('Exam Vertical - Unit 1', resp.content)
 
     def test_entrance_exam_content_presence(self):
         """
@@ -273,21 +272,20 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
         resp = self.client.get(url)
         self.assertRedirects(resp, expected_url, status_code=302, target_status_code=200)
         resp = self.client.get(expected_url)
-        self.assertIn('Exam Problem - Problem 1', resp.content)
-        self.assertIn('Exam Problem - Problem 2', resp.content)
+        self.assertIn('Exam Vertical - Unit 1', resp.content)
 
     def test_get_entrance_exam_content(self):
         """
         test get entrance exam content method
         """
-        exam_chapter = get_entrance_exam_content(self.request, self.course)
+        exam_chapter = get_entrance_exam_content(self.request.user, self.course)
         self.assertEqual(exam_chapter.url_name, self.entrance_exam.url_name)
         self.assertFalse(user_has_passed_entrance_exam(self.request, self.course))
 
         answer_entrance_exam_problem(self.course, self.request, self.problem_1)
         answer_entrance_exam_problem(self.course, self.request, self.problem_2)
 
-        exam_chapter = get_entrance_exam_content(self.request, self.course)
+        exam_chapter = get_entrance_exam_content(self.request.user, self.course)
         self.assertEqual(exam_chapter, None)
         self.assertTrue(user_has_passed_entrance_exam(self.request, self.course))
 
@@ -295,7 +293,9 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
         """
         test entrance exam score. we will hit the method get_entrance_exam_score to verify exam score.
         """
-        with self.assertNumQueries(1):
+        # One query is for getting the list of disabled XBlocks (which is
+        # then stored in the request).
+        with self.assertNumQueries(2):
             exam_score = get_entrance_exam_score(self.request, self.course)
         self.assertEqual(exam_score, 0)
 
@@ -316,7 +316,7 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
             kwargs={
                 'course_id': unicode(self.course.id),
                 'chapter': self.entrance_exam.location.name,
-                'section': self.exam_1.location.name
+                'section': self.exam_1.location.name,
             }
         )
         resp = self.client.get(url)
@@ -459,11 +459,13 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
             kwargs={'course_id': unicode(self.course.id), 'chapter': self.chapter.url_name}
         )
         response = self.client.get(url)
-        redirect_url = reverse('courseware', args=[unicode(self.course.id)])
-        self.assertRedirects(response, redirect_url, status_code=302, target_status_code=302)
-        response = self.client.get(redirect_url)
-        exam_url = response.get('Location')
-        self.assertRedirects(response, exam_url)
+        expected_url = reverse('courseware_section',
+                               kwargs={
+                                   'course_id': unicode(self.course.id),
+                                   'chapter': self.entrance_exam.location.name,
+                                   'section': self.exam_1.location.name
+                               })
+        self.assertRedirects(response, expected_url, status_code=302, target_status_code=200)
 
     @patch('courseware.entrance_exams.user_has_passed_entrance_exam', Mock(return_value=False))
     def test_courseinfo_page_access_without_passing_entrance_exam(self):
@@ -518,7 +520,7 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
         """
         Test can_skip_entrance_exam method with anonymous user
         """
-        self.assertFalse(user_can_skip_entrance_exam(self.request, self.anonymous_user, self.course))
+        self.assertFalse(user_can_skip_entrance_exam(self.anonymous_user, self.course))
 
     def test_has_passed_entrance_exam_with_anonymous_user(self):
         """
@@ -585,7 +587,7 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
             self.request.user,
             self.entrance_exam
         )
-        return toc_for_course(
+        toc = toc_for_course(
             self.request.user,
             self.request,
             self.course,
@@ -593,6 +595,7 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
             self.exam_1.url_name,
             self.field_data_cache
         )
+        return toc['chapters']
 
 
 def answer_entrance_exam_problem(course, request, problem, user=None):

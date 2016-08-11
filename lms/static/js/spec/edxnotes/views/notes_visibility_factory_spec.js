@@ -1,23 +1,21 @@
 define([
-    'jquery', 'underscore', 'annotator_1.2.9', 'common/js/spec_helpers/ajax_helpers',
-    'js/edxnotes/views/notes_visibility_factory', 'js/spec/edxnotes/helpers',
-    'js/spec/edxnotes/custom_matchers', 'jasmine-jquery'
+    'jquery', 'underscore', 'annotator_1.2.9', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
+    'js/edxnotes/views/notes_visibility_factory', 'js/spec/edxnotes/helpers'
 ], function(
-    $, _, Annotator, AjaxHelpers, NotesVisibilityFactory, Helpers, customMatchers
+    $, _, Annotator, AjaxHelpers, NotesVisibilityFactory, Helpers
 ) {
     'use strict';
     describe('EdxNotes ToggleNotesFactory', function() {
         var params = {
             endpoint: '/test_endpoint',
             user: 'a user',
-            usageId : 'an usage',
+            usageId: 'an usage',
             courseId: 'a course',
             token: Helpers.makeToken(),
             tokenUrl: '/test_token_url'
         };
 
         beforeEach(function() {
-            customMatchers(this);
             loadFixtures(
                 'js/fixtures/edxnotes/edxnotes_wrapper.html',
                 'js/fixtures/edxnotes/toggle_notes.html'
@@ -32,12 +30,14 @@ define([
             this.button = $('.action-toggle-notes');
             this.label = this.button.find('.utility-control-label');
             this.toggleMessage = $('.action-toggle-message');
-            spyOn(this.toggleNotes, 'toggleHandler').andCallThrough();
+            spyOn(this.toggleNotes, 'toggleHandler').and.callThrough();
         });
 
-        afterEach(function () {
+        afterEach(function() {
             NotesVisibilityFactory.VisibilityDecorator._setVisibility(null);
-            _.invoke(Annotator._instances, 'destroy');
+            while (Annotator._instances.length > 0) {
+                Annotator._instances[0].destroy();
+            }
             $('.annotator-notice').remove();
         });
 
@@ -88,16 +88,17 @@ define([
 
         it('can handle errors', function() {
             var requests = AjaxHelpers.requests(this),
-                errorContainer = $('.annotator-notice');
+                $errorContainer = $('.annotator-notice');
 
             this.button.click();
             AjaxHelpers.respondWithError(requests);
-            expect(errorContainer).toContainText(
-                "An error has occurred. Make sure that you are connected to the Internet, and then try refreshing the page."
+            expect($errorContainer).toContainText(
+                'An error has occurred. Make sure that you are connected to the Internet, ' +
+                'and then try refreshing the page.'
             );
-            expect(errorContainer).toBeVisible();
-            expect(errorContainer).toHaveClass('annotator-notice-show');
-            expect(errorContainer).toHaveClass('annotator-notice-error');
+            expect($errorContainer).toBeVisible();
+            expect($errorContainer).toHaveClass('annotator-notice-show');
+            expect($errorContainer).toHaveClass('annotator-notice-error');
 
             this.button.click();
 
@@ -112,10 +113,10 @@ define([
             AjaxHelpers.respondWithJson(requests, {});
 
             AjaxHelpers.respondWithJson(requests, {});
-            expect(errorContainer).not.toHaveClass('annotator-notice-show');
+            expect($errorContainer).not.toHaveClass('annotator-notice-show');
         });
 
-        it('toggles notes when CTRL + SHIFT + [ keydown on document', function () {
+        it('toggles notes when CTRL + SHIFT + [ keydown on document', function() {
             // Character '[' has keyCode 219
             $(document).trigger($.Event('keydown', {keyCode: 219, ctrlKey: true, shiftKey: true}));
             expect(this.toggleNotes.toggleHandler).toHaveBeenCalled();

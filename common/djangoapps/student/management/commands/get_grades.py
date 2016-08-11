@@ -2,11 +2,12 @@
 Management command to generate a list of grades for
 all students that are enrolled in a course.
 """
-from courseware import grades, courses
-from certificates.models import GeneratedCertificate
 from django.test.client import RequestFactory
 from django.core.management.base import BaseCommand, CommandError
 import os
+from lms.djangoapps.courseware import courses
+from lms.djangoapps.certificates.models import GeneratedCertificate
+from lms.djangoapps.grades import course_grades
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
@@ -112,12 +113,12 @@ class Command(BaseCommand):
                 diff = datetime.datetime.now() - start
                 timeleft = diff * (total - count) / STATUS_INTERVAL
                 hours, remainder = divmod(timeleft.seconds, 3600)
-                minutes, seconds = divmod(remainder, 60)
+                minutes, __ = divmod(remainder, 60)
                 print "{0}/{1} completed ~{2:02}:{3:02}m remaining".format(
                     count, total, hours, minutes)
                 start = datetime.datetime.now()
             request.user = student
-            grade = grades.grade(student, request, course)
+            grade = course_grades.summary(student, request, course)
             if not header:
                 header = [section['label'] for section in grade[u'section_breakdown']]
                 rows.append(["email", "username", "certificate-grade", "grade"] + header)

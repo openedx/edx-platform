@@ -24,6 +24,7 @@
 // * +Content - Text Wrap - Extend
 // * +Content - Text Truncate - Extend
 // * +Icon - Font-Awesome  - Extend
+// * +Icon - SSO icon images
 
 // +Font Sizing - Mixin
 // ====================
@@ -260,14 +261,6 @@
   background: transparent;
   line-height: 1.5em;
   text-align: center;
-
-  &:hover, &:active, &:focus {
-
-  }
-
-  &.current, &.active {
-
-  }
 }
 
 %ui-btn-flat-outline {
@@ -276,14 +269,14 @@
   @extend %t-action4;
   text-align: center;
   border-radius: ($baseline/4);
-  border: 1px solid $blue-l2;
+  border: 1px solid $uxpl-blue-base;
   padding: 1px ($baseline/2) 2px ($baseline/2);
-  background-color: transparent;
-  color: $blue-l2;
+  background-color: $white;
+  color: $uxpl-blue-base;
 
   &:hover, &:focus {
-    border: 1px solid $blue;
-    background-color: $blue;
+    border: 1px solid $uxpl-blue-hover-active;
+    background-color: $uxpl-blue-hover-active;
     color: $white;
   }
 
@@ -312,10 +305,6 @@
     background-color: $gray-l1;
     color: $white;
   }
-
-  span {
-    @extend %cont-text-sr;
-  }
 }
 
 // button with no button shell until hover for understated actions
@@ -323,7 +312,7 @@
   @extend %ui-btn-non;
 
   &:hover, &:focus {
-    background-color: $blue;
+    background-color: $uxpl-blue-base;
     color: $white;
   }
 }
@@ -447,4 +436,18 @@
   border: 0;
   padding: 0;
   margin: 0;
+}
+
+
+// * +Icon - SSO icon images
+// ====================
+
+%sso-icon {
+  .icon-image {
+    width: auto;
+    height: auto;
+    max-height: 1.4em;
+    max-width: 1.4em;
+    margin-top: -2px;
+  }
 }

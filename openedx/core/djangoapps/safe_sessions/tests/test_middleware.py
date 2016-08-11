@@ -12,6 +12,7 @@ from django.test import TestCase
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from mock import patch
+from nose.plugins.attrib import attr
 
 from student.tests.factories import UserFactory
 
@@ -30,6 +31,7 @@ def create_mock_request():
     return request
 
 
+@attr(shard=2)
 class TestSafeSessionProcessRequest(TestSafeSessionsLogMixin, TestCase):
     """
     Test class for SafeSessionMiddleware.process_request
@@ -130,6 +132,7 @@ class TestSafeSessionProcessRequest(TestSafeSessionsLogMixin, TestCase):
         self.assert_user_in_session()
 
 
+@attr(shard=2)
 @ddt.ddt
 class TestSafeSessionProcessResponse(TestSafeSessionsLogMixin, TestCase):
     """
@@ -192,16 +195,19 @@ class TestSafeSessionProcessResponse(TestSafeSessionsLogMixin, TestCase):
 
     def test_different_user_at_step_2_error(self):
         self.request.safe_cookie_verified_user_id = "different_user"
-        with self.assert_request_user_mismatch("different_user", self.user.id):
-            with self.assert_session_user_mismatch("different_user", self.user.id):
-                self.assert_response(set_request_user=True, set_session_cookie=True)
+
+        with self.assert_logged_for_request_user_mismatch("different_user", self.user.id, 'warning'):
+            self.assert_response(set_request_user=True, set_session_cookie=True)
+
+        with self.assert_logged_for_session_user_mismatch("different_user", self.user.id):
+            self.assert_response(set_request_user=True, set_session_cookie=True)
 
     def test_anonymous_user(self):
         self.request.safe_cookie_verified_user_id = self.user.id
         self.request.user = AnonymousUser()
         self.request.session[SESSION_KEY] = self.user.id
         with self.assert_no_error_logged():
-            with self.assert_request_user_mismatch(self.user.id, None):
+            with self.assert_logged_for_request_user_mismatch(self.user.id, None, 'debug'):
                 self.assert_response(set_request_user=False, set_session_cookie=True)
 
     def test_update_cookie_data_at_step_3(self):
@@ -229,6 +235,7 @@ class TestSafeSessionProcessResponse(TestSafeSessionsLogMixin, TestCase):
         self.assert_response_with_delete_cookie()
 
 
+@attr(shard=2)
 @ddt.ddt
 class TestSafeSessionMiddleware(TestSafeSessionsLogMixin, TestCase):
     """

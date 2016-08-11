@@ -1,3 +1,4 @@
+<%page expression_filter="h"/>
 <%inherit file="base.html" />
 <%def name="online_help_token()">
 <% 
@@ -11,6 +12,7 @@ else:
 
 <%!
   from django.utils.translation import ugettext as _
+  from openedx.core.djangolib.markup import HTML, Text
   from openedx.core.djangolib.js_utils import (
       dump_js_escaped_json, js_escaped_string
   )
@@ -73,7 +75,10 @@ else:
               <p>${_("You can export courses and edit them outside of {studio_name}. The exported file is a .tar.gz file (that is, a .tar file compressed with GNU Zip) that contains the course structure and content. You can also re-import courses that you've exported.").format(
                 studio_name=settings.STUDIO_SHORT_NAME
               )}</p>
-              <p>${_("{em_start}Caution:{em_end} When you export a course, information such as MATLAB API keys, LTI passports, annotation secret token strings, and annotation storage URLs are included in the exported data. If you share your exported files, you may also be sharing sensitive or license-specific information.").format(em_start='<strong>', em_end="</strong>")}</p>
+              <p>${Text(_("{em_start}Caution:{em_end} When you export a course, information such as MATLAB API keys, LTI passports, annotation secret token strings, and annotation storage URLs are included in the exported data. If you share your exported files, you may also be sharing sensitive or license-specific information.")).format(
+                    em_start=HTML('<strong>'),
+                    em_end=HTML("</strong>")
+                  )}</p>
           </div>
         %endif
       </div>
@@ -89,7 +94,7 @@ else:
         <ul class="list-actions">
           <li class="item-action">
             <a class="action action-export action-primary" href="${export_url}">
-              <i class="icon fa fa-arrow-circle-o-down"></i>
+              <span class="icon fa fa-arrow-circle-o-down" aria-hidden="true"></span>
               <span class="copy">
                   %if library:
                       ${_("Export Library Content")}
@@ -103,7 +108,11 @@ else:
     %if not library:
       <div class="export-contents">
         <div class="export-includes">
-          <h3 class="title-3">${_("Data {em_start}exported with{em_end} your course:").format(em_start='<strong>', em_end="</strong>")}</h3>
+          <h3 class="title-3">
+              ${Text(_("Data {em_start}exported with{em_end} your course:")).format(
+                em_start=HTML('<strong>'),
+                em_end=HTML("</strong>")
+              )}</h3>
           <ul class="list-details list-export-includes">
             <li class="item-detail">${_("Values from Advanced Settings, including MATLAB API keys and LTI passports")}</li>
             <li class="item-detail">${_("Course Content (all Sections, Sub-sections, and Units)")}</li>
@@ -116,7 +125,11 @@ else:
         </div>
 
         <div class="export-excludes">
-          <h3 class="title-3">${_("Data {em_start}not exported{em_end} with your course:").format(em_start='<strong>', em_end="</strong>")}</h3>
+          <h3 class="title-3">
+              ${Text(_("Data {em_start}not exported{em_end} with your course:")).format(
+                em_start=HTML('<strong>'),
+                em_end=HTML("</strong>")
+              )}</h3>
           <ul class="list-details list-export-excludes">
             <li class="item-detail">${_("User Data")}</li>
             <li class="item-detail">${_("Course Team Data")}</li>

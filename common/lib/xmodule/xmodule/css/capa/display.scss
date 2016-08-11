@@ -141,6 +141,10 @@ div.problem {
     }
   }
 
+  input.math {
+    direction: ltr; // Equations are always English
+  }
+
   .inline {
     display: inline;
 
@@ -376,7 +380,7 @@ div.problem {
         display: inline-block;
         width: 25px;
         height: 20px;
-        background: url('../images/partially-correct-icon.png') center center no-repeat;
+        background: url('#{$static-path}/images/partially-correct-icon.png') center center no-repeat;
       }
 
       input {
@@ -462,26 +466,16 @@ div.problem {
 
       span {
         margin-bottom: 0;
+        display: inline-block;
 
-        &.math {
-          display: inline-block;
+        &.MathJax_CHTML, &.MathJax, &.MathJax_SVG {
           padding: 6px;
           min-width: 30px;
           border: 1px solid #e3e3e3;
           border-radius: 4px;
           background: #f1f1f1;
-
-          & span {
-            // Needed to fix mathjax rendering bug in chrome (TNL-4080)
-            border-left-style: none !important;
-          }
         }
       }
-    }
-
-    // Fix for formulaequationinput, overriding MathJax_Display default style to allow "loading" image to sit next to it
-    section.formulaequationinput div.equation .MathJax_Display {
-      display: inline-block !important;
     }
 
     // Hides equation previews in symbolic response problems when printing
@@ -821,6 +815,14 @@ div.problem {
       .status {
         @include status-icon($gray-l4, "\f128");
       }
+    }
+  }
+
+  .capa_inputtype.textline.text-input-dynamath, .inputtype.formulaequationinput {
+    display: inline-block;
+
+    input {
+      width: calc(100% - 45px);
     }
   }
 }
@@ -1211,7 +1213,7 @@ div.problem {
         }
 
         .result-partially-correct {
-          background: url('../images/partially-correct-icon.png') left 20px no-repeat;
+          background: url('#{$static-path}/images/partially-correct-icon.png') left 20px no-repeat;
 
           .result-actual-output {
             color: #090;
@@ -1471,7 +1473,7 @@ div.problem .imageinput.capa_inputtype {
   }
 
   .partially-correct {
-    background: url('../images/partially-correct-icon.png') center center no-repeat;
+    background: url('#{$static-path}/images/partially-correct-icon.png') center center no-repeat;
   }
 }
 
@@ -1490,15 +1492,14 @@ div.problem .annotation-input {
   }
 
   .correct {
-    background: url('../images/correct-icon.png') center center no-repeat;
+    background: url('#{$static-path}/images/correct-icon.png') center center no-repeat;
   }
 
   .incorrect {
-    background: url('../images/incorrect-icon.png') center center no-repeat;
+    background: url('#{$static-path}/images/incorrect-icon.png') center center no-repeat;
   }
 
   .partially-correct {
-    background: url('../images/partially-correct-icon.png') center center no-repeat;
+    background: url('#{$static-path}/images/partially-correct-icon.png') center center no-repeat;
   }
 }
-

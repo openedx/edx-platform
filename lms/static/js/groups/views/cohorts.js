@@ -1,19 +1,23 @@
-;(function (define) {
+(function(define) {
     'use strict';
-    define(['jquery', 'underscore', 'backbone', 'gettext', 'js/groups/models/cohort', 
-            'js/groups/views/cohort_editor', 'js/groups/views/cohort_form', 
+    define(['jquery', 'underscore', 'backbone', 'gettext', 'js/groups/models/cohort',
+            'js/groups/models/verified_track_settings',
+            'js/groups/views/cohort_editor', 'js/groups/views/cohort_form',
             'js/groups/views/course_cohort_settings_notification',
             'js/groups/views/cohort_discussions_inline', 'js/groups/views/cohort_discussions_course_wide',
+            'js/groups/views/verified_track_settings_notification',
+            'edx-ui-toolkit/js/utils/html-utils',
             'js/views/file_uploader', 'js/models/notification', 'js/views/notification', 'string_utils'],
-        function($, _, Backbone, gettext, CohortModel, CohortEditorView, CohortFormView,
-                CourseCohortSettingsNotificationView, InlineDiscussionsView, CourseWideDiscussionsView) {
-
+        function($, _, Backbone, gettext, CohortModel, VerifiedTrackSettingsModel, CohortEditorView, CohortFormView,
+                CourseCohortSettingsNotificationView, InlineDiscussionsView, CourseWideDiscussionsView,
+                 VerifiedTrackSettingsNotificationView, HtmlUtils) {
             var hiddenClass = 'is-hidden',
-                disabledClass = 'is-disabled';
+                disabledClass = 'is-disabled',
+                enableCohortsSelector = '.cohorts-state';
 
 
             var CohortsView = Backbone.View.extend({
-                events : {
+                events: {
                     'change .cohort-select': 'onCohortSelected',
                     'change .cohorts-state': 'onCohortsEnabledChanged',
                     'click .action-create': 'showAddCohortForm',
@@ -27,8 +31,8 @@
                 initialize: function(options) {
                     var model = this.model;
 
-                    this.template = _.template($('#cohorts-tpl').text());
-                    this.selectorTemplate = _.template($('#cohort-selector-tpl').text());
+                    this.template = HtmlUtils.template($('#cohorts-tpl').text());
+                    this.selectorTemplate = HtmlUtils.template($('#cohort-selector-tpl').text());
                     this.context = options.context;
                     this.contentGroups = options.contentGroups;
                     this.cohortSettings = options.cohortSettings;
@@ -37,22 +41,35 @@
                     // Update cohort counts when the user clicks back on the cohort management tab
                     // (for example, after uploading a csv file of cohort assignments and then
                     // checking results on data download tab).
-                    $(this.getSectionCss('cohort_management')).click(function () {
+                    $(this.getSectionCss('cohort_management')).click(function() {
                         model.fetch();
                     });
                 },
 
                 render: function() {
-                    this.$el.html(this.template({
+                    HtmlUtils.setHtml(this.$el, this.template({
                         cohorts: this.model.models,
                         cohortsEnabled: this.cohortSettings.get('is_cohorted')
                     }));
                     this.onSync();
+                    // Don't create this view until the first render is called, as at that point the
+                    // various other models whose state is required to properly view the notification
+                    // will have completed their fetch operations.
+                    if (!this.verifiedTrackSettingsNotificationView) {
+                        var verifiedTrackSettingsModel = new VerifiedTrackSettingsModel();
+                        verifiedTrackSettingsModel.url = this.context.verifiedTrackCohortingUrl;
+                        verifiedTrackSettingsModel.fetch({
+                            success: _.bind(this.renderVerifiedTrackSettingsNotificationView, this)
+                        });
+                        this.verifiedTrackSettingsNotificationView = new VerifiedTrackSettingsNotificationView({
+                            model: verifiedTrackSettingsModel
+                        });
+                    }
                     return this;
                 },
 
                 renderSelector: function(selectedCohort) {
-                    this.$('.cohort-select').html(this.selectorTemplate({
+                    HtmlUtils.setHtml(this.$('.cohort-select'), this.selectorTemplate({
                         cohorts: this.model.models,
                         selectedCohort: selectedCohort
                     }));
@@ -64,6 +81,14 @@
                         cohortEnabled: this.getCohortsEnabled()
                     });
                     cohortStateMessageNotificationView.render();
+                },
+
+                renderVerifiedTrackSettingsNotificationView: function() {
+                    if (this.verifiedTrackSettingsNotificationView) {
+                        this.verifiedTrackSettingsNotificationView.validateSettings(
+                            this.getCohortsEnabled(), this.model.models, this.$(enableCohortsSelector)
+                        );
+                    }
                 },
 
                 onSync: function(model, response, options) {
@@ -99,6 +124,7 @@
                             actionIconClass: 'fa-plus'
                         });
                     }
+                    this.renderVerifiedTrackSettingsNotificationView();
                 },
 
                 getSelectedCohort: function() {
@@ -138,7 +164,7 @@
                 },
 
                 getCohortsEnabled: function() {
-                    return this.$('.cohorts-state').prop('checked');
+                    return this.$(enableCohortsSelector).prop('checked');
                 },
 
                 showCohortEditor: function(cohort) {
@@ -248,7 +274,7 @@
 
                 showSection: function(event) {
                     event.preventDefault();
-                    var section = $(event.currentTarget).data("section");
+                    var section = $(event.currentTarget).data('section');
                     $(this.getSectionCss(section)).click();
                     $(window).scrollTop(0);
                 },
@@ -262,18 +288,18 @@
                     if (!this.fileUploaderView) {
                         this.fileUploaderView = new FileUploaderView({
                             el: uploadElement,
-                            title: gettext("Assign students to cohorts by uploading a CSV file."),
-                            inputLabel: gettext("Choose a .csv file"),
-                            inputTip: gettext("Only properly formatted .csv files will be accepted."),
-                            submitButtonText: gettext("Upload File and Assign Students"),
-                            extensions: ".csv",
+                            title: gettext('Assign students to cohorts by uploading a CSV file.'),
+                            inputLabel: gettext('Choose a .csv file'),
+                            inputTip: gettext('Only properly formatted .csv files will be accepted.'),
+                            submitButtonText: gettext('Upload File and Assign Students'),
+                            extensions: '.csv',
                             url: this.context.uploadCohortsCsvUrl,
-                            successNotification: function (file, event, data) {
+                            successNotification: function(file, event, data) {
                                 var message = interpolate_text(gettext(
                                     "Your file '{file}' has been uploaded. Allow a few minutes for processing."
                                 ), {file: file});
                                 return new NotificationModel({
-                                    type: "confirmation",
+                                    type: 'confirmation',
                                     title: message
                                 });
                             }
@@ -294,7 +320,7 @@
                             cohortSettings: this.cohortSettings
                         }).render();
                     }
-                    if(!this.InlineDiscussionsView) {
+                    if (!this.InlineDiscussionsView) {
                         this.InlineDiscussionsView = new InlineDiscussionsView({
                             el: cohortDiscussionsElement,
                             model: this.context.discussionTopicsSettingsModel,
@@ -303,10 +329,10 @@
                     }
                 },
 
-                getSectionCss: function (section) {
+                getSectionCss: function(section) {
                     return ".instructor-nav .nav-item a[data-section='" + section + "']";
                 }
             });
             return CohortsView;
-    });
+        });
 }).call(this, define || RequireJS.define);

@@ -23,12 +23,12 @@ var edx = edx || {};
          * @param {Object} params - Form data, included as hidden inputs.
          */
         var configureForm = function(form, method, url, params) {
-            $("input", form).remove();
-            form.attr("action", url);
-            form.attr("method", method);
+            $('input', form).remove();
+            form.attr('action', url);
+            form.attr('method', method);
             _.each(params, function(value, key) {
-                $("<input>").attr({
-                    type: "hidden",
+                $('<input>').attr({
+                    type: 'hidden',
                     name: key,
                     value: value
                 }).appendTo(form);
@@ -43,9 +43,9 @@ var edx = edx || {};
         */
         var firePaymentAnalyticsEvent = function(course) {
             analytics.track(
-                "edx.bi.user.payment_processor.visited",
+                'edx.bi.user.payment_processor.visited',
                 {
-                    category: "donations",
+                    category: 'donations',
                     label: course
                 }
             );
@@ -62,8 +62,8 @@ var edx = edx || {};
         */
         var addDonationToCart = function(amount, course) {
             return $.ajax({
-                url: "/shoppingcart/donation/",
-                type: "POST",
+                url: '/shoppingcart/donation/',
+                type: 'POST',
                 data: {
                     amount: amount,
                     course_id: course
@@ -97,12 +97,12 @@ var edx = edx || {};
             * @returns {DonationView}
             */
             render: function() {
-                var html = _.template($("#donation-tpl").html(), {});
+                var html = _.template($('#donation-tpl').html())({});
                 this.$el.html(html);
-                this.$amount = $("input[name=\"amount\"]", this.$el);
-                this.$submit = $(".action-donate", this.$el);
-                this.$errorMsg = $(".donation-error-msg", this.$el);
-                this.$paymentForm = $(".payment-form", this.$el);
+                this.$amount = $('input[name="amount"]', this.$el);
+                this.$submit = $('.action-donate', this.$el);
+                this.$errorMsg = $('.donation-error-msg', this.$el);
+                this.$paymentForm = $('.payment-form', this.$el);
                 this.$submit.click(this.donate);
                 return this;
             },
@@ -122,7 +122,7 @@ var edx = edx || {};
                 }
 
                 // Immediately disable the submit button to prevent duplicate submissions
-                this.$submit.addClass("disabled");
+                this.$submit.addClass('disabled');
 
                 if (this.validate()) {
                     var amount = this.$amount.val();
@@ -132,7 +132,7 @@ var edx = edx || {};
                 }
                 else {
                     // If an error occurred, allow the user to resubmit
-                    this.$submit.removeClass("disabled");
+                    this.$submit.removeClass('disabled');
                 }
             },
 
@@ -166,13 +166,13 @@ var edx = edx || {};
 
                 if (isValid) {
                     this.$amount.removeClass('validation-error');
-                    this.$errorMsg.text("");
+                    this.$errorMsg.text('');
                 }
 
                 else {
                     this.$amount.addClass('validation-error');
                     this.$errorMsg.text(
-                        gettext("Please enter a valid donation amount.")
+                        gettext('Please enter a valid donation amount.')
                     );
                 }
 
@@ -204,10 +204,10 @@ var edx = edx || {};
             */
             displayServerError: function() {
                 // Display the error message
-                this.$errorMsg.text(gettext("Your donation could not be submitted."));
+                this.$errorMsg.text(gettext('Your donation could not be submitted.'));
 
                 // Re-enable the submit button to allow the user to retry
-                this.$submit.removeClass("disabled");
+                this.$submit.removeClass('disabled');
             },
 
             /**
@@ -218,7 +218,7 @@ var edx = edx || {};
             */
             submitPaymentForm: function(form) {
                 form.submit();
-            },
+            }
         };
 
         view.initialize(params);
@@ -231,14 +231,13 @@ var edx = edx || {};
         // For each one, create a new donation view to handle
         // that form, and parameterize it based on the
         // "data-course" attribute (the course ID).
-        $(".donate-container").each(function() {
+        $('.donate-container').each(function() {
             var container = $(this);
-            var course = container.data("course");
+            var course = container.data('course');
             var view = new edx.dashboard.donation.DonationView({
                 el: container,
                 course: course
             }).render();
         });
     });
-
 })(jQuery);

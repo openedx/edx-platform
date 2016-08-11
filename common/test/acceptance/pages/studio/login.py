@@ -1,33 +1,54 @@
 """
 Login page for Studio.
 """
-
 from bok_choy.page_object import PageObject
 from bok_choy.promise import EmptyPromise
-from . import BASE_URL
+
+from common.test.acceptance.pages.studio import BASE_URL
+from common.test.acceptance.pages.studio.course_page import CoursePage
 
 
-class LoginPage(PageObject):
+class LoginMixin(object):
     """
-    Login page for Studio.
+    Mixin class used for logging into the system.
     """
-
-    url = BASE_URL + "/signin"
-
-    def is_browser_on_page(self):
-        return self.q(css='body.view-signin').present
-
-    def login(self, email, password):
+    def fill_field(self, css, value):
         """
-        Attempt to log in using `email` and `password`.
+        Fill the login form field with the value.
         """
+        self.q(css=css).fill(value)
 
-        self.q(css='input#email').fill(email)
-        self.q(css='input#password').fill(password)
+    def login(self, email, password, expect_success=True):
+        """
+        Attempt to log in using 'email' and 'password'.
+        """
+        self.fill_field('input#email', email)
+        self.fill_field('input#password', password)
         self.q(css='button#submit').first.click()
 
         # Ensure that we make it to another page
-        EmptyPromise(
-            lambda: "login" not in self.browser.current_url,
-            "redirected from the login page"
-        ).fulfill()
+        if expect_success:
+            EmptyPromise(
+                lambda: "signin" not in self.browser.current_url,
+                "redirected from the login page"
+            ).fulfill()
+
+
+class LoginPage(PageObject, LoginMixin):
+    """
+    Login page for Studio.
+    """
+    url = BASE_URL + "/signin"
+
+    def is_browser_on_page(self):
+        return self.q(css='body.view-signin').visible
+
+
+class CourseOutlineSignInRedirectPage(CoursePage, LoginMixin):
+    """
+    Page shown when the user tries to accesses the course while not signed in.
+    """
+    url_path = "course"
+
+    def is_browser_on_page(self):
+        return self.q(css='body.view-signin').visible

@@ -19,7 +19,9 @@ DATABASES = {
         'ENGINE': 'django.db.backends.sqlite3',
         'ATOMIC_REQUESTS': True,
     },
-
+    'student_module_history': {
+        'ENGINE': 'django.db.backends.sqlite3',
+    },
 }
 
 # Provide a dummy XQUEUE_INTERFACE setting as LMS expects it to exist on start up
@@ -42,6 +44,7 @@ STATICFILES_STORAGE = 'openedx.core.lib.django_require.staticstorage.OptimizedCa
 STATICFILES_FINDERS = [
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    'openedx.core.lib.xblock_pipeline.finder.XBlockPipelineFinder',
 ]
 
 # Redirect to the test_root folder within the repo

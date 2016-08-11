@@ -1,3 +1,0 @@
-<div class="tabpanel is-hidden" id="<%= tabId %>" aria-expanded="false">
-    <div class="sr-is-focusable <%= tabId %>" tabindex="-1"></div>
-</div>

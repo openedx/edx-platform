@@ -2,11 +2,12 @@
 Tests of the LMS XBlock Mixin
 """
 import ddt
+from nose.plugins.attrib import attr
 
 from xblock.validation import ValidationMessage
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.factories import CourseFactory, ToyCourseFactory, ItemFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, TEST_DATA_MIXED_TOY_MODULESTORE
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, TEST_DATA_MIXED_MODULESTORE
 from xmodule.partitions.partitions import Group, UserPartition
 
 
@@ -151,27 +152,24 @@ class OpenAssessmentBlockMixinTestCase(ModuleStoreTestCase):
         self.assertTrue(self.open_assessment.has_score)
 
 
+@attr(shard=3)
 @ddt.ddt
 class XBlockGetParentTest(LmsXBlockMixinTestCase):
     """
     Test that XBlock.get_parent returns correct results with each modulestore
     backend.
     """
-    MODULESTORE = TEST_DATA_MIXED_TOY_MODULESTORE
+    MODULESTORE = TEST_DATA_MIXED_MODULESTORE
 
-    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split, ModuleStoreEnum.Type.xml)
+    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
     def test_parents(self, modulestore_type):
         with self.store.default_store(modulestore_type):
 
             # setting up our own local course tree here, since it needs to be
             # created with the correct modulestore type.
 
-            if modulestore_type == 'xml':
-                course_key = self.store.make_course_key('edX', 'toy', '2012_Fall')
-            else:
-                course_key = ToyCourseFactory.create(run='2012_Fall_copy').id
+            course_key = ToyCourseFactory.create().id
             course = self.store.get_course(course_key)
-
             self.assertIsNone(course.get_parent())
 
             def recurse(parent):
@@ -247,6 +245,7 @@ def ddt_named(parent, child):
     return args
 
 
+@attr(shard=3)
 @ddt.ddt
 class XBlockMergedGroupAccessTest(LmsXBlockMixinTestCase):
     """

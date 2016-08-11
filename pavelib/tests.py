@@ -1,11 +1,14 @@
 """
 Unit test tasks
 """
+import re
 import os
 import sys
-from paver.easy import sh, task, cmdopts, needs, call_task
+from paver.easy import sh, task, cmdopts, needs
 from pavelib.utils.test import suites
 from pavelib.utils.envs import Env
+from pavelib.utils.timer import timed
+from pavelib.utils.passthrough_opts import PassthroughTask
 from optparse import make_option
 
 try:
@@ -16,168 +19,218 @@ except ImportError:
 __test__ = False  # do not collect
 
 
-@task
 @needs(
     'pavelib.prereqs.install_prereqs',
     'pavelib.utils.test.utils.clean_reports_dir',
 )
 @cmdopts([
     ("system=", "s", "System to act on"),
-    ("test_id=", "t", "Test id"),
+    ("test-id=", "t", "Test id"),
     ("failed", "f", "Run only failed tests"),
-    ("fail_fast", "x", "Fail suite on first failed test"),
+    ("fail-fast", "x", "Fail suite on first failed test"),
     ("fasttest", "a", "Run without collectstatic"),
-    ('extra_args=', 'e', 'adds as extra args to the test command'),
-    ('cov_args=', 'c', 'adds as args to coverage for the test run'),
-    ('skip_clean', 'C', 'skip cleaning repository before running tests'),
+    make_option(
+        '-c', '--cov-args', default='',
+        help='adds as args to coverage for the test run'
+    ),
+    ('skip-clean', 'C', 'skip cleaning repository before running tests'),
+    ('processes=', 'p', 'number of processes to use running tests'),
+    make_option('-r', '--randomize', action='store_true', help='run the tests in a random order'),
+    make_option('--no-randomize', action='store_false', dest='randomize', help="don't run the tests in a random order"),
     make_option("--verbose", action="store_const", const=2, dest="verbosity"),
     make_option("-q", "--quiet", action="store_const", const=0, dest="verbosity"),
     make_option("-v", "--verbosity", action="count", dest="verbosity", default=1),
-    make_option("--pdb", action="store_true", help="Drop into debugger on failures or errors"),
+    make_option(
+        '--disable-migrations',
+        action='store_true',
+        dest='disable_migrations',
+        help="Create tables directly from apps' models. Can also be used by exporting DISABLE_MIGRATIONS=1."
+    ),
+    ("fail_fast", None, "deprecated in favor of fail-fast"),
+    ("test_id=", None, "deprecated in favor of test-id"),
+    ('cov_args=', None, 'deprecated in favor of cov-args'),
+    make_option(
+        "-e", "--extra_args", default="",
+        help="deprecated, pass extra options directly in the paver commandline"
+    ),
+    ('skip_clean', None, 'deprecated in favor of skip-clean'),
 ], share_with=['pavelib.utils.test.utils.clean_reports_dir'])
-def test_system(options):
+@PassthroughTask
+@timed
+def test_system(options, passthrough_options):
     """
     Run tests on our djangoapps for lms and cms
     """
     system = getattr(options, 'system', None)
     test_id = getattr(options, 'test_id', None)
 
-    opts = {
-        'failed_only': getattr(options, 'failed', None),
-        'fail_fast': getattr(options, 'fail_fast', None),
-        'fasttest': getattr(options, 'fasttest', None),
-        'verbosity': getattr(options, 'verbosity', 1),
-        'extra_args': getattr(options, 'extra_args', ''),
-        'cov_args': getattr(options, 'cov_args', ''),
-        'skip_clean': getattr(options, 'skip_clean', False),
-        'pdb': getattr(options, 'pdb', False),
-    }
-
     if test_id:
         if not system:
             system = test_id.split('/')[0]
         if system in ['common', 'openedx']:
             system = 'lms'
-        opts['test_id'] = test_id
+        options.test_system['test_id'] = test_id
 
     if test_id or system:
-        system_tests = [suites.SystemTestSuite(system, **opts)]
+        system_tests = [suites.SystemTestSuite(
+            system,
+            passthrough_options=passthrough_options,
+            **options.test_system
+        )]
     else:
         system_tests = []
         for syst in ('cms', 'lms'):
-            system_tests.append(suites.SystemTestSuite(syst, **opts))
+            system_tests.append(suites.SystemTestSuite(
+                syst,
+                passthrough_options=passthrough_options,
+                **options.test_system
+            ))
 
-    test_suite = suites.PythonTestSuite('python tests', subsuites=system_tests, **opts)
+    test_suite = suites.PythonTestSuite(
+        'python tests',
+        subsuites=system_tests,
+        passthrough_options=passthrough_options,
+        **options.test_system
+    )
     test_suite.run()
 
 
-@task
 @needs(
     'pavelib.prereqs.install_prereqs',
     'pavelib.utils.test.utils.clean_reports_dir',
 )
 @cmdopts([
     ("lib=", "l", "lib to test"),
-    ("test_id=", "t", "Test id"),
+    ("test-id=", "t", "Test id"),
     ("failed", "f", "Run only failed tests"),
-    ("fail_fast", "x", "Run only failed tests"),
-    ('extra_args=', 'e', 'adds as extra args to the test command'),
-    ('cov_args=', 'c', 'adds as args to coverage for the test run'),
-    ('skip_clean', 'C', 'skip cleaning repository before running tests'),
+    ("fail-fast", "x", "Run only failed tests"),
+    make_option(
+        '-c', '--cov-args', default='',
+        help='adds as args to coverage for the test run'
+    ),
+    ('skip-clean', 'C', 'skip cleaning repository before running tests'),
     make_option("--verbose", action="store_const", const=2, dest="verbosity"),
     make_option("-q", "--quiet", action="store_const", const=0, dest="verbosity"),
     make_option("-v", "--verbosity", action="count", dest="verbosity", default=1),
-    make_option("--pdb", action="store_true", help="Drop into debugger on failures or errors"),
+    ('cov_args=', None, 'deprecated in favor of cov-args'),
+    make_option(
+        '-e', '--extra_args', default='',
+        help='deprecated, pass extra options directly in the paver commandline'
+    ),
+    ("fail_fast", None, "deprecated in favor of fail-fast"),
+    ('skip_clean', None, 'deprecated in favor of skip-clean'),
+    ("test_id=", None, "deprecated in favor of test-id"),
 ], share_with=['pavelib.utils.test.utils.clean_reports_dir'])
-def test_lib(options):
+@PassthroughTask
+@timed
+def test_lib(options, passthrough_options):
     """
     Run tests for common/lib/ and pavelib/ (paver-tests)
     """
     lib = getattr(options, 'lib', None)
     test_id = getattr(options, 'test_id', lib)
 
-    opts = {
-        'failed_only': getattr(options, 'failed', None),
-        'fail_fast': getattr(options, 'fail_fast', None),
-        'verbosity': getattr(options, 'verbosity', 1),
-        'extra_args': getattr(options, 'extra_args', ''),
-        'cov_args': getattr(options, 'cov_args', ''),
-        'skip_clean': getattr(options, 'skip_clean', False),
-        'pdb': getattr(options, 'pdb', False),
-    }
-
     if test_id:
         if '/' in test_id:
             lib = '/'.join(test_id.split('/')[0:3])
         else:
             lib = 'common/lib/' + test_id.split('.')[0]
-        opts['test_id'] = test_id
-        lib_tests = [suites.LibTestSuite(lib, **opts)]
+        options.test_lib['test_id'] = test_id
+        lib_tests = [suites.LibTestSuite(
+            lib,
+            passthrough_options=passthrough_options,
+            **options.test_lib
+        )]
     else:
-        lib_tests = [suites.LibTestSuite(d, **opts) for d in Env.LIB_TEST_DIRS]
+        lib_tests = [
+            suites.LibTestSuite(
+                d,
+                passthrough_options=passthrough_options,
+                **options.test_lib
+            ) for d in Env.LIB_TEST_DIRS
+        ]
 
-    test_suite = suites.PythonTestSuite('python tests', subsuites=lib_tests, **opts)
+    test_suite = suites.PythonTestSuite(
+        'python tests',
+        subsuites=lib_tests,
+        passthrough_options=passthrough_options,
+        **options.test_lib
+    )
     test_suite.run()
 
 
-@task
 @needs(
     'pavelib.prereqs.install_prereqs',
     'pavelib.utils.test.utils.clean_reports_dir',
 )
 @cmdopts([
     ("failed", "f", "Run only failed tests"),
-    ("fail_fast", "x", "Run only failed tests"),
-    ('extra_args=', 'e', 'adds as extra args to the test command'),
-    ('cov_args=', 'c', 'adds as args to coverage for the test run'),
+    ("fail-fast", "x", "Run only failed tests"),
+    make_option(
+        '-c', '--cov-args', default='',
+        help='adds as args to coverage for the test run'
+    ),
     make_option("--verbose", action="store_const", const=2, dest="verbosity"),
     make_option("-q", "--quiet", action="store_const", const=0, dest="verbosity"),
     make_option("-v", "--verbosity", action="count", dest="verbosity", default=1),
-    make_option("--pdb", action="store_true", help="Drop into debugger on failures or errors"),
+    make_option(
+        '--disable-migrations',
+        action='store_true',
+        dest='disable_migrations',
+        help="Create tables directly from apps' models. Can also be used by exporting DISABLE_MIGRATIONS=1."
+    ),
+    ('cov_args=', None, 'deprecated in favor of cov-args'),
+    make_option(
+        '-e', '--extra_args', default='',
+        help='deprecated, pass extra options directly in the paver commandline'
+    ),
+    ("fail_fast", None, "deprecated in favor of fail-fast"),
 ])
-def test_python(options):
+@PassthroughTask
+@timed
+def test_python(options, passthrough_options):
     """
     Run all python tests
     """
-    opts = {
-        'failed_only': getattr(options, 'failed', None),
-        'fail_fast': getattr(options, 'fail_fast', None),
-        'verbosity': getattr(options, 'verbosity', 1),
-        'extra_args': getattr(options, 'extra_args', ''),
-        'cov_args': getattr(options, 'cov_args', ''),
-        'pdb': getattr(options, 'pdb', False),
-    }
-
-    python_suite = suites.PythonTestSuite('Python Tests', **opts)
+    python_suite = suites.PythonTestSuite(
+        'Python Tests',
+        passthrough_options=passthrough_options,
+        **options.test_python
+    )
     python_suite.run()
 
 
-@task
 @needs(
     'pavelib.prereqs.install_prereqs',
     'pavelib.utils.test.utils.clean_reports_dir',
 )
 @cmdopts([
     ("suites", "s", "List of unit test suites to run. (js, lib, cms, lms)"),
-    ('extra_args=', 'e', 'adds as extra args to the test command'),
-    ('cov_args=', 'c', 'adds as args to coverage for the test run'),
+    make_option(
+        '-c', '--cov-args', default='',
+        help='adds as args to coverage for the test run'
+    ),
     make_option("--verbose", action="store_const", const=2, dest="verbosity"),
     make_option("-q", "--quiet", action="store_const", const=0, dest="verbosity"),
     make_option("-v", "--verbosity", action="count", dest="verbosity", default=1),
-    make_option("--pdb", action="store_true", help="Drop into debugger on failures or errors"),
+    ('cov_args=', None, 'deprecated in favor of cov-args'),
+    make_option(
+        '-e', '--extra_args', default='',
+        help='deprecated, pass extra options directly in the paver commandline'
+    ),
 ])
-def test(options):
+@PassthroughTask
+@timed
+def test(options, passthrough_options):
     """
     Run all tests
     """
-    opts = {
-        'verbosity': getattr(options, 'verbosity', 1),
-        'extra_args': getattr(options, 'extra_args', ''),
-        'cov_args': getattr(options, 'cov_args', ''),
-        'pdb': getattr(options, 'pdb', False),
-    }
     # Subsuites to be added to the main suite
-    python_suite = suites.PythonTestSuite('Python Tests', **opts)
+    python_suite = suites.PythonTestSuite(
+        'Python Tests',
+        passthrough_options=passthrough_options,
+        **options.test
+    )
     js_suite = suites.JsTestSuite('JS Tests', mode='run', with_coverage=True)
 
     # Main suite to be run
@@ -188,9 +241,11 @@ def test(options):
 @task
 @needs('pavelib.prereqs.install_prereqs')
 @cmdopts([
-    ("compare_branch=", "b", "Branch to compare against, defaults to origin/master"),
+    ("compare-branch=", "b", "Branch to compare against, defaults to origin/master"),
+    ("compare_branch=", None, "deprecated in favor of compare-branch"),
 ])
-def coverage(options):
+@timed
+def coverage():
     """
     Build the html, xml, and diff coverage reports
     """
@@ -218,25 +273,27 @@ def coverage(options):
     sh("coverage xml --rcfile={}".format(rcfile))
     # Generate the coverage.py HTML report
     sh("coverage html --rcfile={}".format(rcfile))
-    call_task('diff_coverage', options=dict(options))
+    diff_coverage()  # pylint: disable=no-value-for-parameter
 
 
 @task
 @needs('pavelib.prereqs.install_prereqs')
 @cmdopts([
-    ("compare_branch=", "b", "Branch to compare against, defaults to origin/master"),
-])
+    ("compare-branch=", "b", "Branch to compare against, defaults to origin/master"),
+    ("compare_branch=", None, "deprecated in favor of compare-branch"),
+], share_with=['coverage'])
+@timed
 def diff_coverage(options):
     """
     Build the diff coverage reports
     """
-    compare_branch = getattr(options, 'compare_branch', 'origin/master')
+    compare_branch = options.get('compare_branch', 'origin/master')
 
     # Find all coverage XML files (both Python and JavaScript)
     xml_reports = []
 
     for filepath in Env.REPORT_DIR.walk():
-        if filepath.basename() == 'coverage.xml':
+        if bool(re.match(r'^coverage.*\.xml$', filepath.basename())):
             xml_reports.append(filepath)
 
     if not xml_reports:

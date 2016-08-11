@@ -1,16 +1,17 @@
 // Backbone Application View: Certificate Editor
 
-define([ // jshint ignore:line
+define([
     'jquery',
     'underscore',
     'backbone',
     'gettext',
     'js/views/list_item_editor',
     'js/certificates/models/signatory',
-    'js/certificates/views/signatory_editor'
+    'js/certificates/views/signatory_editor',
+    'text!templates/certificate-editor.underscore'
 ],
 function($, _, Backbone, gettext,
-         ListItemEditorView, SignatoryModel, SignatoryEditorView) {
+         ListItemEditorView, SignatoryModel, SignatoryEditorView, certificateEditorTemplate) {
     'use strict';
 
     // If signatories limit is required to specific value then we can change it.
@@ -29,7 +30,7 @@ function($, _, Backbone, gettext,
             'click .action-add-signatory': 'addSignatory'
         },
 
-        className: function () {
+        className: function() {
             // Determine the CSS class names for this model instance
             var index = this.model.collection.indexOf(this.model);
 
@@ -41,14 +42,15 @@ function($, _, Backbone, gettext,
             ].join(' ');
         },
 
-        initialize: function() {
+        initialize: function(options) {
             // Set up the initial state of the attributes set for this model instance
-            _.bindAll(this, "onSignatoryRemoved", "clearErrorMessage");
+            _.bindAll(this, 'onSignatoryRemoved', 'clearErrorMessage');
+            this.max_signatories_limit = options.max_signatories_limit || MAX_SIGNATORIES_LIMIT;
+            this.template = _.template(certificateEditorTemplate);
             this.eventAgg = _.extend({}, Backbone.Events);
-            this.eventAgg.bind("onSignatoryRemoved", this.onSignatoryRemoved);
-            this.eventAgg.bind("onSignatoryUpdated", this.clearErrorMessage);
+            this.eventAgg.bind('onSignatoryRemoved', this.onSignatoryRemoved);
+            this.eventAgg.bind('onSignatoryUpdated', this.clearErrorMessage);
             ListItemEditorView.prototype.initialize.call(this);
-            this.template = this.loadTemplate('certificate-editor');
         },
 
         onSignatoryRemoved: function() {
@@ -67,7 +69,7 @@ function($, _, Backbone, gettext,
             ListItemEditorView.prototype.render.call(this);
             var self = this;
             // Ensure we have at least one signatory associated with the certificate.
-            this.model.get("signatories").each(function( modelSignatory) {
+            this.model.get('signatories').each(function(modelSignatory) {
                 var signatory_view = new SignatoryEditorView({
                     model: modelSignatory,
                     isEditingAllCollections: true,
@@ -81,14 +83,14 @@ function($, _, Backbone, gettext,
 
         addSignatory: function() {
             // Append a new signatory to the certificate model's signatories collection
-            var signatory = new SignatoryModel({certificate: this.getSaveableModel()}); // jshint ignore:line
+            var signatory = new SignatoryModel({certificate: this.getSaveableModel()});  // eslint-disable-line max-len, no-unused-vars
             this.render();
         },
 
         disableAddSignatoryButton: function() {
             // Disable the 'Add Signatory' link if the constraint has been met.
-            if(this.$(".signatory-edit-list > div.signatory-edit").length >= MAX_SIGNATORIES_LIMIT) {
-                this.$(".action-add-signatory").addClass("disableClick");
+            if (this.$('.signatory-edit-list > div.signatory-edit').length >= this.max_signatories_limit) {
+                this.$('.action-add-signatory').addClass('disableClick');
             }
         },
 
@@ -97,11 +99,11 @@ function($, _, Backbone, gettext,
             return {
                 id: this.model.get('id'),
                 uniqueId: _.uniqueId(),
-                name: this.model.escape('name'),
-                description: this.model.escape('description'),
-                course_title: this.model.escape('course_title'),
-                org_logo_path: this.model.escape('org_logo_path'),
-                is_active: this.model.escape('is_active'),
+                name: this.model.get('name'),
+                description: this.model.get('description'),
+                course_title: this.model.get('course_title'),
+                org_logo_path: this.model.get('org_logo_path'),
+                is_active: this.model.get('is_active'),
                 isNew: this.model.isNew()
             };
         },
@@ -116,7 +118,7 @@ function($, _, Backbone, gettext,
             if (event && event.preventDefault) { event.preventDefault(); }
             this.model.set(
                 'name', this.$('.collection-name-input').val(),
-                { silent: true }
+                {silent: true}
             );
         },
 
@@ -126,7 +128,7 @@ function($, _, Backbone, gettext,
             this.model.set(
                 'description',
                 this.$('.certificate-description-input').val(),
-                { silent: true }
+                {silent: true}
             );
         },
 
@@ -136,7 +138,7 @@ function($, _, Backbone, gettext,
             this.model.set(
                 'course_title',
                 this.$('.certificate-course-title-input').val(),
-                { silent: true }
+                {silent: true}
             );
         },
 

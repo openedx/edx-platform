@@ -14,14 +14,19 @@ source =
 omit =
     cms/envs/*
     cms/manage.py
+    cms/djangoapps/contentstore/views/dev.py
     cms/djangoapps/*/migrations/*
     cms/djangoapps/*/features/*
+    lms/debug/*
     lms/envs/*
     lms/djangoapps/*/migrations/*
     lms/djangoapps/*/features/*
     common/djangoapps/terrain/*
     common/djangoapps/*/migrations/*
     openedx/core/djangoapps/*/migrations/*
+    openedx/core/djangoapps/debug/*
+
+concurrency=multiprocessing
 
 [report]
 ignore_errors = True
@@ -39,8 +44,8 @@ output = reports/coverage.xml
 
 [paths]
 jenkins_source =
-    /home/jenkins/workspace/edx-platform-unit-coverage
-    /home/jenkins/workspace/edx-platform-test-subset
+    /home/jenkins/workspace/$JOB_NAME
+    /home/jenkins/workspace/$SUBSET_JOB
 
 devstack_source =
     /edx/app/edxapp/edx-platform

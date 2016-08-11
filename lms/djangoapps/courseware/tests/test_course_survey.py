@@ -13,17 +13,34 @@ from survey.models import SurveyForm, SurveyAnswer
 
 from common.test.utils import XssTestMixin
 from xmodule.modulestore.tests.factories import CourseFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from courseware.tests.helpers import LoginEnrollmentTestCase
 
 
-@attr('shard_1')
-class SurveyViewsTests(LoginEnrollmentTestCase, ModuleStoreTestCase, XssTestMixin):
+@attr(shard=1)
+class SurveyViewsTests(LoginEnrollmentTestCase, SharedModuleStoreTestCase, XssTestMixin):
     """
     All tests for the views.py file
     """
 
     STUDENT_INFO = [('view@test.com', 'foo')]
+
+    @classmethod
+    def setUpClass(cls):
+        super(SurveyViewsTests, cls).setUpClass()
+        cls.test_survey_name = 'TestSurvey'
+        cls.course = CourseFactory.create(
+            display_name='<script>alert("XSS")</script>',
+            course_survey_required=True,
+            course_survey_name=cls.test_survey_name
+        )
+
+        cls.course_with_bogus_survey = CourseFactory.create(
+            course_survey_required=True,
+            course_survey_name="DoesNotExist"
+        )
+
+        cls.course_without_survey = CourseFactory.create()
 
     def setUp(self):
         """
@@ -31,28 +48,13 @@ class SurveyViewsTests(LoginEnrollmentTestCase, ModuleStoreTestCase, XssTestMixi
         """
         super(SurveyViewsTests, self).setUp()
 
-        self.test_survey_name = 'TestSurvey'
         self.test_form = '<input name="field1"></input>'
-
         self.survey = SurveyForm.create(self.test_survey_name, self.test_form)
 
         self.student_answers = OrderedDict({
             u'field1': u'value1',
             u'field2': u'value2',
         })
-
-        self.course = CourseFactory.create(
-            display_name='<script>alert("XSS")</script>',
-            course_survey_required=True,
-            course_survey_name=self.test_survey_name
-        )
-
-        self.course_with_bogus_survey = CourseFactory.create(
-            course_survey_required=True,
-            course_survey_name="DoesNotExist"
-        )
-
-        self.course_without_survey = CourseFactory.create()
 
         # Create student accounts and activate them.
         for i in range(len(self.STUDENT_INFO)):

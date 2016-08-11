@@ -6,6 +6,8 @@
         });
 
         describe('log', function() {
+            // Note that log is used by external XBlocks, and the API cannot change without
+            // proper deprecation and notification for external authors.
             it('can send a request to log event', function() {
                 spyOn(jQuery, 'ajaxWithPrefix');
                 Logger.log('example', 'data');
@@ -40,14 +42,14 @@
         describe('ajax request settings with path_prefix', function() {
             var meta_tag;
 
-            beforeEach(function(){
+            beforeEach(function() {
                 this.initialAjaxWithPrefix = jQuery.ajaxWithPrefix;
-                AjaxPrefix.addAjaxPrefix($, _.bind(function () {
+                AjaxPrefix.addAjaxPrefix($, _.bind(function() {
                     return $("meta[name='path_prefix']").attr('content');
                 }, this));
             });
 
-            afterEach(function(){
+            afterEach(function() {
                 jQuery.ajaxWithPrefix = this.initialAjaxWithPrefix;
                 meta_tag.remove();
                 meta_tag = null;
@@ -106,9 +108,11 @@
         });
 
         describe('listen', function() {
-            beforeEach(function () {
+            // Note that listen is used by external XBlocks, and the API cannot change without
+            // proper deprecation and notification for external authors.
+            beforeEach(function() {
                 spyOn(jQuery, 'ajaxWithPrefix');
-                this.callbacks = _.map(_.range(4), function () {
+                this.callbacks = _.map(_.range(4), function() {
                     return jasmine.createSpy();
                 });
                 Logger.listen('example', null, this.callbacks[0]);
@@ -134,10 +138,10 @@
             });
 
             it('can catch exceptions', function() {
-                var callback = function () {
+                var callback = function() {
                     Logger.log('exception', 'data');
                 };
-                Logger.listen('exception', null, function () {
+                Logger.listen('exception', null, function() {
                     throw new Error();
                 });
                 expect(callback).not.toThrow();
@@ -146,12 +150,14 @@
         });
 
         describe('bind', function() {
+            // Note that bind may be used by external XBlocks, and the API cannot change without
+            // proper deprecation and notification for external authors.
             beforeEach(function() {
                 this.initialPostWithPrefix = jQuery.postWithPrefix;
                 this.initialGetWithPrefix = jQuery.getWithPrefix;
                 this.initialAjaxWithPrefix = jQuery.ajaxWithPrefix;
                 this.prefix = '/6002x';
-                AjaxPrefix.addAjaxPrefix($, _.bind(function () {
+                AjaxPrefix.addAjaxPrefix($, _.bind(function() {
                     return this.prefix;
                 }, this));
                 Logger.bind();

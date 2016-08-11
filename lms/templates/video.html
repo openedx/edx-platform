@@ -1,7 +1,11 @@
-<%! from django.utils.translation import ugettext as _ %>
+<%page expression_filter="h"/>
 
+<%!
+from django.utils.translation import ugettext as _
+from openedx.core.djangolib.js_utils import js_escaped_string
+%>
 % if display_name is not UNDEFINED and display_name is not None:
-    <h3>${display_name}</h3>
+    <h3 class="hd hd-2">${display_name}</h3>
 % endif
 
 <div
@@ -15,29 +19,24 @@
     <div class="focus_grabber first"></div>
 
     <div class="tc-wrapper">
-      <a href="#before-transcript_${id}" class="nav-skip sr">${_("Skip to a navigable version of this video's transcript.")}</a>
-
-      <article class="video-wrapper">
+      <div class="video-wrapper">
           <span tabindex="0" class="spinner" aria-hidden="false" aria-label="${_('Loading video player')}"></span>
           <span tabindex="-1" class="btn-play is-hidden" aria-hidden="true" aria-label="${_('Play video')}"></span>
           <div class="video-player-pre"></div>
-          <section class="video-player">
+          <div class="video-player">
               <div id="${id}"></div>
-              <h4 class="video-error hidden">${_('No playable video sources found.')}</h4>
-          </section>
+              <h4 class="hd hd-4 video-error is-hidden">${_('No playable video sources found.')}</h4>
+          </div>
           <div class="video-player-post"></div>
           <div class="closed-captions"></div>
-          <section class="video-controls is-hidden">
+          <div class="video-controls is-hidden">
               <div>
                   <div class="vcr"><div class="vidtime">0:00 / 0:00</div></div>
                   <div class="secondary-controls"></div>
               </div>
-          </section>
-          <a class="nav-skip sr" id="before-transcript_${id}" href="#after-transcript_${id}">${_('Skip to end of transcript.')}</a>
-      </article>
+          </div>
+      </div>
     </div>
-
-    <a class="nav-skip sr" id="after-transcript_${id}" href="#before-transcript_${id}">${_('Go back to start of transcript.')}</a>
 
     <div class="focus_grabber last"></div>
   <ul class="wrapper-downloads">
@@ -89,26 +88,28 @@
 </div>
 % if cdn_eval:
 <script>
+  //TODO: refactor this js into a separate file.
   function sendPerformanceBeacon(id, expgroup, value, event_name) {
     var data = {event: event_name, id: id, expgroup: expgroup, value: value, page: "html5vid"};
     $.ajax({method: "POST", url: "/performance", data: data});
   }
   var cdnStartTime;
   var salt = Math.floor((1 + Math.random()) * 0x100000).toString(36);
+  var id = "${id | n, js_escaped_string}";
   function initializeCDNExperiment() {
-    sendPerformanceBeacon("${id}_" + salt, ${cdn_exp_group}, "", "load");
+    sendPerformanceBeacon(id + "_" + salt, ${cdn_exp_group}, "", "load");
     cdnStartTime = Date.now();
     $.each(['loadstart', 'abort', 'error', 'stalled', 'loadedmetadata',
                     'loadeddata', 'canplay', 'canplaythrough', 'seeked'],
                     function(index, eventName) {
-      $("#video_${id}").bind("html5:" + eventName, null, function() {
+      $("#video_" + id).bind("html5:" + eventName, null, function() {
         timeElapsed = Date.now() - cdnStartTime;
-        sendPerformanceBeacon("${id}_" + salt, ${cdn_exp_group}, timeElapsed, eventName);
+        sendPerformanceBeacon(id + "_" + salt, ${cdn_exp_group}, timeElapsed, eventName);
       });
     });
   }
-  $("#video_${id}").bind("initialize", null, initializeCDNExperiment);
-  if ($("#video_${id}").hasClass("is-initialized")) {
+  $("#video_" + id).bind("initialize", null, initializeCDNExperiment);
+  if ($("#video_" + id).hasClass("is-initialized")) {
     initializeCDNExperiment();
   }
 </script>

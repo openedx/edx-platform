@@ -29,10 +29,9 @@ set -e
 #   `SHARD` is a number indicating which subset of the tests to build.
 #
 #       For "bok-choy" and "lms-unit", the tests are put into shard groups
-#       using the nose'attr' decorator (e.g. "@attr('shard_1')"). Anything with
-#       the 'shard_n' attribute will run in the nth shard. If there isn't a
-#       shard explicitly assigned, the test will run in the last shard (the one
-#       with the highest number).
+#       using the nose 'attr' decorator (e.g. "@attr(shard=1)"). Anything with
+#       the 'shard=n' attribute will run in the nth shard. If there isn't a
+#       shard explicitly assigned, the test will run in the last shard.
 #
 #   Jenkins-specific configuration details:
 #
@@ -59,6 +58,16 @@ NUMBER_OF_BOKCHOY_THREADS=${NUMBER_OF_BOKCHOY_THREADS:=1}
 # Clean up previous builds
 git clean -qxfd
 
+function emptyxunit {
+
+    cat > reports/$1.xml <<END
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="$1" tests="1" errors="0" failures="0" skip="0">
+<testcase classname="$1" name="$1" time="0.604"></testcase>
+</testsuite>
+END
+
+}
 case "$TEST_SUITE" in
 
     "quality")
@@ -70,44 +79,54 @@ case "$TEST_SUITE" in
         paver run_pylint -l $PYLINT_THRESHOLD > pylint.log || { cat pylint.log; EXIT=1; }
 
         mkdir -p reports
-        echo "Finding jshint violations and storing report..."
-        paver run_jshint -l $JSHINT_THRESHOLD > jshint.log || { cat jshint.log; EXIT=1; }
+
+        echo "Finding ESLint violations and storing report..."
+        paver run_eslint -l $ESLINT_THRESHOLD > eslint.log || { cat eslint.log; EXIT=1; }
         echo "Running code complexity report (python)."
         paver run_complexity > reports/code_complexity.log || echo "Unable to calculate code complexity. Ignoring error."
+        echo "Running safe template linter report."
+        paver run_safelint -t $SAFELINT_THRESHOLDS > safelint.log || { cat safelint.log; EXIT=1; }
+        echo "Running safe commit linter report."
+        paver run_safecommit_report > safecommit.log || { cat safecommit.log; EXIT=1; }
         # Run quality task. Pass in the 'fail-under' percentage to diff-quality
+        echo "Running diff quality."
         paver run_quality -p 100 || EXIT=1
 
         # Need to create an empty test result so the post-build
         # action doesn't fail the build.
-        cat > reports/quality.xml <<END
-<?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="quality" tests="1" errors="0" failures="0" skip="0">
-<testcase classname="quality" name="quality" time="0.604"></testcase>
-</testsuite>
-END
+        emptyxunit "quality"
         exit $EXIT
         ;;
 
     "lms-unit")
+        PAVER_ARGS="--with-flaky --processes=-1 --cov-args='-p' -v --with-xunitmp"
         case "$SHARD" in
-            "1")
-                paver test_system -s lms --extra_args="--attr='shard_1' --with-flaky" --cov_args="-p"
+            "all")
+                paver test_system -s lms $PAVER_ARGS
                 ;;
-            "2")
-                paver test_system -s lms --extra_args="--attr='shard_1=False' --with-flaky" --cov_args="-p"
+            [1-3])
+                paver test_system -s lms --attr="shard=$SHARD" $PAVER_ARGS
+                ;;
+            4|"noshard")
+                paver test_system -s lms --attr='!shard' $PAVER_ARGS
                 ;;
             *)
-                paver test_system -s lms --extra_args="--with-flaky" --cov_args="-p"
+                # If no shard is specified, rather than running all tests, create an empty xunit file. This is a
+                # backwards compatibility feature. If a new shard (e.g., shard n) is introduced in the build
+                # system, but the tests are called with the old code, then builds will not fail because the
+                # code is out of date. Instead, there will be an instantly-passing shard.
+                mkdir -p reports/lms
+                emptyxunit "lms/nosetests"
                 ;;
         esac
         ;;
 
     "cms-unit")
-        paver test_system -s cms --extra_args="--with-flaky" --cov_args="-p"
+        paver test_system -s cms --with-flaky --cov-args="-p" -v --with-xunitmp
         ;;
 
     "commonlib-unit")
-        paver test_lib --extra_args="--with-flaky" --cov_args="-p"
+        paver test_lib --with-flaky --cov-args="-p" -v --with-xunit
         ;;
 
     "js-unit")
@@ -116,8 +135,8 @@ END
         ;;
 
     "commonlib-js-unit")
-        paver test_js --coverage --skip_clean || { EXIT=1; }
-        paver test_lib --skip_clean --extra_args="--with-flaky" --cov_args="-p" || { EXIT=1; }
+        paver test_js --coverage --skip-clean || { EXIT=1; }
+        paver test_lib --skip-clean --with-flaky --cov-args="-p" --with-xunitmp || { EXIT=1; }
 
         # This is to ensure that the build status of the shard is properly set.
         # Because we are running two paver commands in a row, we need to capture
@@ -134,58 +153,39 @@ END
         ;;
 
     "lms-acceptance")
-        paver test_acceptance -s lms --extra_args="-v 3"
+        paver test_acceptance -s lms -vvv --with-xunit
         ;;
 
     "cms-acceptance")
-        paver test_acceptance -s cms --extra_args="-v 3"
+        paver test_acceptance -s cms -vvv --with-xunit
         ;;
 
     "bok-choy")
+
+        # Back compatibility support for firefox upgrade:
+        # Copy newer firefox version to project root,
+        # set that as the path for bok-choy to use.
+        cp -R $HOME/firefox/ firefox/
+        export SELENIUM_FIREFOX_PATH=firefox/firefox
+
+        PAVER_ARGS="-n $NUMBER_OF_BOKCHOY_THREADS --with-flaky --with-xunit"
+
         case "$SHARD" in
 
             "all")
-                paver test_bokchoy
+                paver test_bokchoy $PAVER_ARGS
                 ;;
 
-            "1")
-                paver test_bokchoy -n $NUMBER_OF_BOKCHOY_THREADS --extra_args="-a shard_1 --with-flaky"
+            [1-8])
+                paver test_bokchoy --attr="shard=$SHARD" $PAVER_ARGS
                 ;;
 
-            "2")
-                paver test_bokchoy -n $NUMBER_OF_BOKCHOY_THREADS --extra_args="-a 'shard_2' --with-flaky"
-                ;;
-
-            "3")
-                paver test_bokchoy -n $NUMBER_OF_BOKCHOY_THREADS --extra_args="-a 'shard_3' --with-flaky"
-                ;;
-
-            "4")
-                paver test_bokchoy -n $NUMBER_OF_BOKCHOY_THREADS --extra_args="-a 'shard_4' --with-flaky"
-                ;;
-
-            "5")
-                paver test_bokchoy -n $NUMBER_OF_BOKCHOY_THREADS --extra_args="-a 'shard_5' --with-flaky"
-                ;;
-
-            "6")
-                paver test_bokchoy -n $NUMBER_OF_BOKCHOY_THREADS --extra_args="-a 'shard_6' --with-flaky"
-                ;;
-
-            "7")
-                paver test_bokchoy -n $NUMBER_OF_BOKCHOY_THREADS --extra_args="-a 'shard_7' --with-flaky"
-                ;;
-
-            "8")
-                paver test_bokchoy -n $NUMBER_OF_BOKCHOY_THREADS --extra_args="-a 'shard_8' --with-flaky"
-                ;;
-
-            "9")
-                paver test_bokchoy -n $NUMBER_OF_BOKCHOY_THREADS --extra_args="-a shard_1=False,shard_2=False,shard_3=False,shard_4=False,shard_5=False,shard_6=False,shard_7=False,shard_8=False,a11y=False --with-flaky"
+            9|"noshard")
+                paver test_bokchoy --attr='!shard,a11y=False' $PAVER_ARGS
                 ;;
 
             # Default case because if we later define another bok-choy shard on Jenkins
-            # (e.g. Shard 5) in the multi-config project and expand this file
+            # (e.g. Shard 10) in the multi-config project and expand this file
             # with an additional case condition, old branches without that commit
             # would not execute any tests on the worker assigned to that shard
             # and thus their build would fail.
@@ -196,12 +196,7 @@ END
                 # May be unnecessary if we changed the "Skip if there are no test files"
                 # option to True in the jenkins job definitions.
                 mkdir -p reports/bok_choy
-                cat > reports/bok_choy/xunit.xml <<END
-<?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="nosetests" tests="1" errors="0" failures="0" skip="0">
-<testcase classname="acceptance.tests" name="shard_placeholder" time="0.001"></testcase>
-</testsuite>
-END
+                emptyxunit "bok_choy/nosetests"
                 ;;
         esac
         ;;

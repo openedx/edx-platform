@@ -36,7 +36,7 @@ define([
 
             ViewUtils.runOperationShowingMessage(
                 gettext('Saving'),
-                function () {
+                function() {
                     var dfd = $.Deferred();
                     var actionableModel = this.getSaveableModel();
 

@@ -1,20 +1,19 @@
-(function (define) {
-
-define(
+(function(define) {
+    define(
 'video/00_sjson.js',
 [],
 function() {
-"use strict";
+    'use strict';
 
-    var Sjson = function (data) {
+    var Sjson = function(data) {
         var sjson = {
                 start: data.start.concat(),
                 text: data.text.concat()
             },
             module = {};
 
-        var getter = function (propertyName) {
-            return function () {
+        var getter = function(propertyName) {
+            return function() {
                 return sjson[propertyName];
             };
         };
@@ -23,7 +22,7 @@ function() {
 
         var getCaptions = getter('text');
 
-        var size = function () {
+        var size = function() {
             return sjson.text.length;
         };
 
@@ -40,11 +39,11 @@ function() {
             // Else, search the unfiltered list.
             if (typeof startTime !== 'undefined' &&
                 typeof endTime !== 'undefined') {
-              results = filter(startTime, endTime);
-              start = results.start;
-              max = results.captions.length - 1;
+                results = filter(startTime, endTime);
+                start = results.start;
+                max = results.captions.length - 1;
             } else {
-              start = getStartTimes();
+                start = getStartTimes();
             }
             while (min < max) {
                 index = Math.ceil((max + min) / 2);
@@ -59,7 +58,7 @@ function() {
             }
 
             return min;
-        };
+        }
 
         function filter(start, end) {
             /* filters captions that occur between inputs
@@ -79,7 +78,7 @@ function() {
             var captions = getCaptions();
 
             if (startTimes.length !== captions.length) {
-                console.warn("video caption and start time arrays do not match in length");
+                console.warn('video caption and start time arrays do not match in length');
             }
 
             // if end is null, then it's been set to

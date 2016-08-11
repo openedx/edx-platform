@@ -12,7 +12,7 @@
     @extend %inner-wrapper;
   }
 
-  ol.course-tabs {
+  .course-tabs {
     @include border-top-radius(4px);
     @include clearfix();
     padding: ($baseline*0.75) 0 ($baseline*0.75) 0;
@@ -32,31 +32,29 @@
         @include border-left(1px solid $gray-d3);
       }
 
-      a {
+      a,
+      a:visited {
         @include padding(($baseline/2), ($baseline*0.75), 13px, ($baseline*0.75));
         @extend %t-title7;
         @extend %t-regular;
-        border-bottom: 3px solid transparent;
         color: $gray-d1;
         display: block;
         text-align: center;
         text-decoration: none;
-        // text-shadow: 0 1px 0 rgba(0, 0, 0, .4);
 
         &:hover,
         &:focus {
-          color: $blue;
-          border-bottom: 3px solid $blue;
+          color: $uxpl-blue-hover-active;
+          border-bottom: 4px solid $uxpl-blue-hover-active;
         }
 
         &.active {
-          border-bottom: 3px solid $gray-d4;
-          background-color: transparent;
-          color: $gray-d4;
+          border-bottom: 4px solid $uxpl-blue-base;
+          color: $uxpl-blue-base;
 
           &:hover,
           &:focus {
-            color: $gray-d4;
+            color: $uxpl-blue-base;
           }
         }
       }
@@ -72,7 +70,7 @@
   }
 }
 
-header.global.slim {
+.header-global.slim {
   box-shadow: 0 1px 2px $shadow-l1;
   height: auto;
   padding: ($baseline/4) 0 ($baseline/2) 0;
@@ -98,7 +96,7 @@ header.global.slim {
       display: block;
       @include background-image(linear-gradient(-90deg, lighten($link-color, 8%), lighten($link-color, 5%) 50%, $link-color 50%, darken($link-color, 10%) 100%));
       border: 1px solid transparent;
-      border-color: darken($link-color, 10%);
+      border-color: $uxpl-blue-base;
       border-radius: 3px;
       @include box-sizing(border-box);
       box-shadow: 0 1px 0 0 rgba(255,255,255, 0.6);
@@ -118,7 +116,7 @@ header.global.slim {
       vertical-align: middle;
 
       &:hover, &:active, &:focus {
-        @include background-image(linear-gradient(-90deg, $link-color, $link-color 50%, $link-color 50%, $link-color 100%));
+        @include background-image(linear-gradient(-90deg, $uxpl-blue-base, $uxpl-blue-base 50%, $uxpl-blue-base 50%, $uxpl-blue-base 100%));
       }
     }
   }

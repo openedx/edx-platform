@@ -126,13 +126,13 @@ class BasicAssetsTestCase(AssetsTestCase):
             )
             course = module_store.get_course(course_id)
 
-            filename = 'sample_static.txt'
+            filename = 'sample_static.html'
             html_src_attribute = '"/static/{}"'.format(filename)
             asset_url = replace_static_urls(html_src_attribute, course_id=course.id)
             url = asset_url.replace('"', '')
             base_url = url.replace(filename, '')
 
-            self.assertTrue("/{}".format(filename) in url)
+            self.assertIn("/{}".format(filename), url)
             resp = self.client.get(url)
             self.assertEquals(resp.status_code, 200)
 
@@ -142,7 +142,7 @@ class BasicAssetsTestCase(AssetsTestCase):
             # browser append relative_path with base_url
             absolute_path = base_url + relative_path
 
-            self.assertTrue("/{}".format(relative_path) in absolute_path)
+            self.assertIn("/{}".format(relative_path), absolute_path)
             resp = self.client.get(absolute_path)
             self.assertEquals(resp.status_code, 200)
 
@@ -379,7 +379,7 @@ class LockAssetTestCase(AssetsTestCase):
         """
         def verify_asset_locked_state(locked):
             """ Helper method to verify lock state in the contentstore """
-            asset_location = StaticContent.get_location_from_path('/c4x/edX/toy/asset/sample_static.txt')
+            asset_location = StaticContent.get_location_from_path('/c4x/edX/toy/asset/sample_static.html')
             content = contentstore().find(asset_location)
             self.assertEqual(content.locked, locked)
 
@@ -387,14 +387,14 @@ class LockAssetTestCase(AssetsTestCase):
             """ Helper method for posting asset update. """
             content_type = 'application/txt'
             upload_date = datetime(2013, 6, 1, 10, 30, tzinfo=UTC)
-            asset_location = course.id.make_asset_key('asset', 'sample_static.txt')
+            asset_location = course.id.make_asset_key('asset', 'sample_static.html')
             url = reverse_course_url('assets_handler', course.id, kwargs={'asset_key_string': unicode(asset_location)})
 
             resp = self.client.post(
                 url,
                 # pylint: disable=protected-access
                 json.dumps(assets._get_asset_json(
-                    "sample_static.txt", content_type, upload_date, asset_location, None, lock)),
+                    "sample_static.html", content_type, upload_date, asset_location, None, lock)),
                 "application/json"
             )
 

@@ -1,22 +1,24 @@
 """
 This file contains celery tasks for programs-related functionality.
 """
-
 from celery import task
 from celery.utils.log import get_task_logger  # pylint: disable=no-name-in-module, import-error
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.core.exceptions import ImproperlyConfigured
 from edx_rest_api_client.client import EdxRestApiClient
-
-from lms.djangoapps.certificates.api import get_certificates_for_user, is_passing_status
+from provider.oauth2.models import Client
 
 from openedx.core.djangoapps.credentials.models import CredentialsApiConfig
 from openedx.core.djangoapps.credentials.utils import get_user_credentials
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
-from openedx.core.lib.token_utils import get_id_token
+from openedx.core.djangoapps.programs.utils import ProgramProgressMeter
+from openedx.core.lib.token_utils import JwtBuilder
 
 
 LOGGER = get_task_logger(__name__)
+# Under cms the following setting is not defined, leading to errors during tests.
+ROUTING_KEY = getattr(settings, 'CREDENTIALS_GENERATION_ROUTING_KEY', None)
 
 
 def get_api_client(api_config, student):
@@ -31,45 +33,37 @@ def get_api_client(api_config, student):
         EdxRestApiClient
 
     """
-    id_token = get_id_token(student, api_config.OAUTH2_CLIENT_NAME)
-    return EdxRestApiClient(api_config.internal_api_url, jwt=id_token)
+    # TODO: Use the system's JWT_AUDIENCE and JWT_SECRET_KEY instead of client ID and name.
+    client_name = api_config.OAUTH2_CLIENT_NAME
+
+    try:
+        client = Client.objects.get(name=client_name)
+    except Client.DoesNotExist:
+        raise ImproperlyConfigured(
+            'OAuth2 Client with name [{}] does not exist.'.format(client_name)
+        )
+
+    scopes = ['email', 'profile']
+    expires_in = settings.OAUTH_ID_TOKEN_EXPIRATION
+    jwt = JwtBuilder(student, secret=client.client_secret).build_token(scopes, expires_in, aud=client.client_id)
+
+    return EdxRestApiClient(api_config.internal_api_url, jwt=jwt)
 
 
-def get_completed_courses(student):
-    """
-    Determine which courses have been completed by the user.
-
-    Args:
-        student:
-            User object representing the student
-
-    Returns:
-        iterable of dicts with structure {'course_id': course_key, 'mode': cert_type}
-
-    """
-    all_certs = get_certificates_for_user(student.username)
-    return [
-        {'course_id': unicode(cert['course_key']), 'mode': cert['type']}
-        for cert in all_certs
-        if is_passing_status(cert['status'])
-    ]
-
-
-def get_completed_programs(client, course_certificates):
+def get_completed_programs(student):
     """
     Given a set of completed courses, determine which programs are completed.
 
     Args:
-        client:
-            programs API client (EdxRestApiClient)
-        course_certificates:
-            iterable of dicts with structure {'course_id': course_key, 'mode': cert_type}
+        student (User): Representing the student whose completed programs to check for.
 
     Returns:
         list of program ids
 
     """
-    return client.programs.complete.post({'completed_courses': course_certificates})['program_ids']
+    meter = ProgramProgressMeter(student)
+
+    return meter.completed_programs
 
 
 def get_awarded_certificate_programs(student):
@@ -115,7 +109,7 @@ def award_program_certificate(client, username, program_id):
     })
 
 
-@task(bind=True, ignore_result=True)
+@task(bind=True, ignore_result=True, routing_key=ROUTING_KEY)
 def award_program_certificates(self, username):
     """
     This task is designed to be called whenever a student's completion status
@@ -144,9 +138,9 @@ def award_program_certificates(self, username):
     countdown = 2 ** self.request.retries
 
     # If either programs or credentials config models are disabled for this
-    # feature, this task should not have been invoked in the first place, and
-    # an error somewhere is likely (though a race condition is also possible).
-    # In either case, the task should not be executed nor should it be retried.
+    # feature, it may indicate a condition where processing of such tasks
+    # has been temporarily disabled.  Since this is a recoverable situation,
+    # mark this task for retry instead of failing it altogether.
     if not config.is_certification_enabled:
         LOGGER.warning(
             'Task award_program_certificates cannot be executed when program certification is disabled in API config',
@@ -167,30 +161,11 @@ def award_program_certificates(self, username):
             # Don't retry for this case - just conclude the task.
             return
 
-        # Fetch the set of all course runs for which the user has earned a
-        # certificate.
-        course_certs = get_completed_courses(student)
-        if not course_certs:
-            # Highly unlikely, since at present the only trigger for this task
-            # is the earning of a new course certificate.  However, it could be
-            # that the transaction in which a course certificate was awarded
-            # was subsequently rolled back, which could lead to an empty result
-            # here, so we'll at least log that this happened before exiting.
-            #
-            # If this task is ever updated to support revocation of program
-            # certs, this branch should be removed, since it could make sense
-            # in that case to call this task for a user without any (valid)
-            # course certs.
-            LOGGER.warning('Task award_program_certificates was called for user %s with no completed courses', username)
-            return
-
-        # Invoke the Programs API completion check endpoint to identify any
-        # programs that are satisfied by these course completions.
-        programs_client = get_api_client(config, student)
-        program_ids = get_completed_programs(programs_client, course_certs)
+        program_ids = get_completed_programs(student)
         if not program_ids:
-            # Again, no reason to continue beyond this point unless/until this
+            # No reason to continue beyond this point unless/until this
             # task gets updated to support revocation of program certs.
+            LOGGER.info('Task award_program_certificates was called for user %s with no completed programs', username)
             return
 
         # Determine which program certificates the user has already been
@@ -233,3 +208,7 @@ def award_program_certificates(self, username):
             # N.B. This logic assumes that this task is idempotent
             LOGGER.info('Retrying task to award failed certificates to user %s', username)
             raise self.retry(countdown=countdown, max_retries=config.max_retries)
+    else:
+        LOGGER.info('User %s is not eligible for any new program certificates', username)
+
+    LOGGER.info('Successfully completed the task award_program_certificates for username %s', username)

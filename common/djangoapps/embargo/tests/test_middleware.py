@@ -4,6 +4,7 @@ Tests for EmbargoMiddleware with CountryAccessRules
 
 import unittest
 from mock import patch
+from nose.plugins.attrib import attr
 import ddt
 
 from django.core.urlresolvers import reverse
@@ -20,6 +21,7 @@ from embargo.models import RestrictedCourse, IPFilter
 from embargo.test_utils import restrict_course
 
 
+@attr(shard=3)
 @ddt.ddt
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class EmbargoMiddlewareAccessTests(UrlResetMixin, ModuleStoreTestCase):
@@ -33,9 +35,11 @@ class EmbargoMiddlewareAccessTests(UrlResetMixin, ModuleStoreTestCase):
     USERNAME = 'fred'
     PASSWORD = 'secret'
 
+    URLCONF_MODULES = ['embargo']
+
     @patch.dict(settings.FEATURES, {'EMBARGO': True})
     def setUp(self):
-        super(EmbargoMiddlewareAccessTests, self).setUp('embargo')
+        super(EmbargoMiddlewareAccessTests, self).setUp()
         self.user = UserFactory(username=self.USERNAME, password=self.PASSWORD)
         self.course = CourseFactory.create()
         self.client.login(username=self.USERNAME, password=self.PASSWORD)

@@ -104,7 +104,7 @@
         @include float(right);
         margin-top: ($baseline/2);
         @include text-align(right);
-        color: $gray-l2;
+        color: $gray-d1;
       }
     }
 
@@ -219,7 +219,7 @@
           margin: 0 0 ($baseline/4) 0;
 
           &.is-focused {
-            color: $blue;
+            color: $uxpl-blue-base;
           }
         }
 
@@ -242,7 +242,7 @@
           &:focus {
 
             + .tip {
-              color: $gray;
+              color: $gray-d1;
             }
           }
         }
@@ -398,9 +398,10 @@
             overflow: hidden;
             white-space: nowrap;
             text-overflow: ellipsis;
+            color: $uxpl-blue-base;
 
             &:hover {
-
+                color: $uxpl-blue-hover-active;
             }
           }
         }
@@ -516,12 +517,12 @@
     }
 
     // specific fields - course image
-    #field-course-image {
+    #field-course-image, #field-banner-image, #field-video-thumbnail-image {
 
       .current-course-image {
         margin-bottom: ($baseline/2);
         padding: ($baseline/2) $baseline;
-        background: $gray-l5;
+        background: $gray-l6;
         text-align: center;
 
         .wrapper-course-image {
@@ -546,7 +547,7 @@
           @extend %t-copy-sub2;
           display: block;
           margin-top: ($baseline/2);
-          color: $gray-l3;
+          color: $gray-d3;
         }
       }
 
@@ -562,7 +563,7 @@
 
         .action-upload-image {
           @extend %ui-btn-flat-outline;
-          float: right;
+          @include float(right);
           width: flex-grid(2,9);
           margin-top: ($baseline/4);
           padding: ($baseline/2) $baseline;
@@ -838,6 +839,146 @@
       }
     }
 
+    &.course-learning-info {
+      .list-input {
+        margin-bottom: $baseline;
+        .course-settings-learning-fields {
+          .field {
+            .input-learning-info {
+              width: flex-grid(10, 12);
+              display: inline-block;
+            }
+            .delete-button {
+              padding-bottom: 3px;
+              line-height: 3.5rem;
+            }
+          }
+        }
+      }
+
+      .actions {
+        width: flex-grid(9, 9);
+
+        .new-button {
+          @extend %btn-primary-green;
+        }
+
+        .delete-button {
+          margin: 0;
+        }
+      }
+    }
+
+    &.instructor-types {
+      .list-input {
+        .course-instructor-details-fields {
+          .field {
+            width: flex-grid(2, 6);
+            &.field-course-instructor-bio {
+              width: flex-grid(6, 6);
+            }
+            &.current-instructor-image {
+              width: flex-grid(6, 6);
+              text-align: left;
+              padding: 0;
+              .wrapper-instructor-image {
+                margin: 15px auto;
+              }
+            }
+          }
+        }
+        &:last-child {
+          margin-bottom: 0;
+        }
+      }
+
+      .field-group {
+        @include clearfix();
+        width: flex-grid(9, 9);
+        margin-bottom: ($baseline*1.5);
+        border-bottom: 1px solid $gray-l5;
+        padding-bottom: ($baseline*1.5);
+
+        &:last-child {
+          border: none;
+          padding-bottom: 0;
+        }
+
+        .field {
+          display: inline-block;
+          vertical-align: top;
+          width: flex-grid(3, 6);
+          margin-bottom: ($baseline/2);
+          margin-right: flex-gutter();
+        }
+
+        // specific fields - course image
+        .field-course-instructor-image {
+          margin-bottom: ($baseline/2);
+          padding: ($baseline/2) $baseline;
+          background: $gray-l5;
+          text-align: left;
+
+          .wrapper-instructor-image {
+            display: block;
+            width: 375px;
+            height: 200px;
+            overflow: hidden;
+            margin: 0 auto;
+            border: 1px solid $gray-l4;
+            box-shadow: 0 1px 1px $shadow-l1;
+            padding: ($baseline/2);
+            background: $white;
+          }
+
+          .instructor-image {
+            display: block;
+            width: 100%;
+            min-height: 100%;
+          }
+
+          .msg {
+            @extend %t-copy-sub2;
+            display: block;
+            margin-top: ($baseline/2);
+            color: $gray-l5;
+          }
+        }
+
+        .wrapper-input {
+          @include clearfix();
+          width: flex-grid(9,9);
+
+          .input {
+            float: left;
+            width: flex-grid(6,9);
+            margin-right: flex-gutter();
+          }
+
+          .action-upload-instructor-image {
+            @extend %ui-btn-flat-outline;
+            float: right;
+            width: flex-grid(2,9);
+            margin-top: ($baseline/4);
+            padding: ($baseline/2) $baseline;
+          }
+        }
+      }
+
+
+      .actions {
+        width: flex-grid(9, 9);
+
+        .new-button {
+          @extend %btn-primary-green;
+        }
+
+        .delete-button {
+          margin: 0;
+        }
+      }
+    }
+
     // specific fields - advanced settings
     &.advanced-policies {
 
@@ -899,7 +1040,7 @@
           }
 
           .tip {
-            color: $gray-l1;
+            color: $gray-d1;
           }
 
           input.error {

@@ -1,0 +1,32 @@
+{
+    "rules": {
+        "javascript-concat-html": 213,
+        "javascript-escape": 7,
+        "javascript-interpolate": 49,
+        "javascript-jquery-append": 104,
+        "javascript-jquery-html": 277,
+        "javascript-jquery-insert-into-target": 28,
+        "javascript-jquery-insertion": 29,
+        "javascript-jquery-prepend": 13,
+        "mako-html-entities": 0,
+        "mako-invalid-html-filter": 27,
+        "mako-invalid-js-filter": 207,
+        "mako-js-html-string": 0,
+        "mako-js-missing-quotes": 0,
+        "mako-missing-default": 213,
+        "mako-multiple-page-tags": 0,
+        "mako-unknown-context": 0,
+        "mako-unparseable-expression": 0,
+        "mako-unwanted-html-filter": 0,
+        "python-close-before-format": 0,
+        "python-concat-html": 27,
+        "python-custom-escape": 13,
+        "python-deprecated-display-name": 53,
+        "python-interpolate-html": 66,
+        "python-parse-error": 0,
+        "python-requires-html-or-text": 0,
+        "python-wrap-html": 264,
+        "underscore-not-escaped": 658
+    },
+    "total": 2228
+}

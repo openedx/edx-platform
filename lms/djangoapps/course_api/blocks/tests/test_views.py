@@ -1,13 +1,13 @@
 """
 Tests for Blocks Views
 """
+from datetime import datetime
 
 from django.core.urlresolvers import reverse
 from string import join
 from urllib import urlencode
 from urlparse import urlunparse
 
-from course_blocks.tests.helpers import EnableTransformerRegistryMixin
 from opaque_keys.edx.locator import CourseLocator
 from student.models import CourseEnrollment
 from student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
@@ -17,19 +17,25 @@ from xmodule.modulestore.tests.factories import ToyCourseFactory
 from .helpers import deserialize_usage_key
 
 
-class TestBlocksView(EnableTransformerRegistryMixin, SharedModuleStoreTestCase):
+class TestBlocksView(SharedModuleStoreTestCase):
     """
     Test class for BlocksView
     """
-    requested_fields = ['graded', 'format', 'student_view_multi_device', 'children', 'not_a_field']
+    requested_fields = ['graded', 'format', 'student_view_multi_device', 'children', 'not_a_field', 'due']
+    BLOCK_TYPES_WITH_STUDENT_VIEW_DATA = ['video', 'discussion']
 
     @classmethod
     def setUpClass(cls):
         super(TestBlocksView, cls).setUpClass()
 
         # create a toy course
-        cls.course_key = ToyCourseFactory.create().id
+        cls.course = ToyCourseFactory.create(
+            modulestore=cls.store,
+            due=datetime(3013, 9, 18, 11, 30, 00),
+        )
+        cls.course_key = cls.course.id
         cls.course_usage_key = cls.store.make_course_usage_key(cls.course_key)
+
         cls.non_orphaned_block_usage_keys = set(
             unicode(item.location)
             for item in cls.store.get_items(cls.course_key)
@@ -40,7 +46,7 @@ class TestBlocksView(EnableTransformerRegistryMixin, SharedModuleStoreTestCase):
     def setUp(self):
         super(TestBlocksView, self).setUp()
 
-        # create a user, enrolled in the toy course
+        # create and enroll user in the toy course
         self.user = UserFactory.create()
         self.client.login(username=self.user.username, password='test')
         CourseEnrollmentFactory.create(user=self.user, course_id=self.course_key)
@@ -103,6 +109,7 @@ class TestBlocksView(EnableTransformerRegistryMixin, SharedModuleStoreTestCase):
             self.assert_in_iff('children', block_data, xblock.has_children)
             self.assert_in_iff('graded', block_data, xblock.graded is not None)
             self.assert_in_iff('format', block_data, xblock.format is not None)
+            self.assert_in_iff('due', block_data, xblock.due is not None)
             self.assert_true_iff(block_data['student_view_multi_device'], block_data['type'] == 'html')
             self.assertNotIn('not_a_field', block_data)
 
@@ -203,10 +210,16 @@ class TestBlocksView(EnableTransformerRegistryMixin, SharedModuleStoreTestCase):
             )
 
     def test_student_view_data_param(self):
-        response = self.verify_response(params={'student_view_data': ['video', 'chapter']})
+        response = self.verify_response(params={
+            'student_view_data': self.BLOCK_TYPES_WITH_STUDENT_VIEW_DATA + ['chapter']
+        })
         self.verify_response_block_dict(response)
         for block_data in response.data['blocks'].itervalues():
-            self.assert_in_iff('student_view_data', block_data, block_data['type'] == 'video')
+            self.assert_in_iff(
+                'student_view_data',
+                block_data,
+                block_data['type'] in self.BLOCK_TYPES_WITH_STUDENT_VIEW_DATA
+            )
 
     def test_navigation_param(self):
         response = self.verify_response(params={'nav_depth': 10})

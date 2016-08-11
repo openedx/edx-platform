@@ -26,8 +26,9 @@ class UsernameTestMixin(object):
         self.assert_valid(self.cleaned_data)
 
     def test_no_user_param(self):
+        self.set_up_data(AnonymousUser())
         self.form_data.pop('username')
-        self.assert_error('username', "A username is required for non-anonymous access.")
+        self.assert_valid(self.cleaned_data)
 
 
 @ddt.ddt

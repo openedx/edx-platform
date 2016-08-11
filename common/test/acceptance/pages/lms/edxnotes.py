@@ -1,7 +1,8 @@
 from bok_choy.page_object import PageObject, PageLoadError, unguarded
 from bok_choy.promise import BrokenPromise, EmptyPromise
-from .course_page import CoursePage
-from ...tests.helpers import disable_animations
+from common.test.acceptance.pages.lms.course_page import CoursePage
+from common.test.acceptance.pages.common.paging import PaginatedUIMixin
+from common.test.acceptance.tests.helpers import disable_animations
 from selenium.webdriver.common.action_chains import ActionChains
 
 
@@ -114,7 +115,7 @@ class EdxNotesPageItem(NoteChild):
     """
     BODY_SELECTOR = ".note"
     UNIT_LINK_SELECTOR = "a.reference-unit-link"
-    TAG_SELECTOR = "a.reference-tags"
+    TAG_SELECTOR = "span.reference-tags"
 
     def go_to_unit(self, unit_page=None):
         self.q(css=self._bounded_selector(self.UNIT_LINK_SELECTOR)).click()
@@ -242,7 +243,7 @@ class SearchResultsView(EdxNotesPageView):
     TAB_SELECTOR = ".tab#view-search-results"
 
 
-class EdxNotesPage(CoursePage):
+class EdxNotesPage(CoursePage, PaginatedUIMixin):
     """
     EdxNotes page.
     """
@@ -347,6 +348,10 @@ class EdxNotesPage(CoursePage):
         """
         children = self.q(css='.note-group')
         return [EdxNotesTagsGroup(self.browser, child.get_attribute("id")) for child in children]
+
+    def count(self):
+        """ Returns the total number of notes in the list """
+        return len(self.q(css='div.wrapper-note-excerpts').results)
 
 
 class EdxNotesPageNoContent(CoursePage):

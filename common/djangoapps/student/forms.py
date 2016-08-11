@@ -17,13 +17,9 @@ from django.utils.translation import ugettext_lazy as _
 from django.template import loader
 
 from django.conf import settings
-from microsite_configuration import microsite
 from student.models import CourseEnrollmentAllowed
-from util.password_policy_validators import (
-    validate_password_length,
-    validate_password_complexity,
-    validate_password_dictionary,
-)
+from util.password_policy_validators import validate_password_strength
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 
 class PasswordResetFormNoActive(PasswordResetForm):
@@ -57,7 +53,7 @@ class PasswordResetFormNoActive(PasswordResetForm):
             email_template_name='registration/password_reset_email.html',
             use_https=False,
             token_generator=default_token_generator,
-            from_email=settings.DEFAULT_FROM_EMAIL,
+            from_email=configuration_helpers.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL),
             request=None
     ):
         """
@@ -69,7 +65,7 @@ class PasswordResetFormNoActive(PasswordResetForm):
         from django.core.mail import send_mail
         for user in self.users_cache:
             if not domain_override:
-                site_name = microsite.get_value(
+                site_name = configuration_helpers.get_value(
                     'SITE_NAME',
                     settings.SITE_NAME
                 )
@@ -82,7 +78,7 @@ class PasswordResetFormNoActive(PasswordResetForm):
                 'user': user,
                 'token': token_generator.make_token(user),
                 'protocol': 'https' if use_https else 'http',
-                'platform_name': microsite.get_value('platform_name', settings.PLATFORM_NAME)
+                'platform_name': configuration_helpers.get_value('platform_name', settings.PLATFORM_NAME)
             }
             subject = loader.render_to_string(subject_template_name, context)
             # Email subject *must not* contain newlines
@@ -130,7 +126,7 @@ class AccountCreationForm(forms.Form):
         }
     )
     email = forms.EmailField(
-        max_length=75,  # Limit per RFCs is 254, but User's email field in django 1.4 only takes 75
+        max_length=254,  # Limit per RFCs is 254
         error_messages={
             "required": _EMAIL_INVALID_MSG,
             "invalid": _EMAIL_INVALID_MSG,
@@ -222,9 +218,7 @@ class AccountCreationForm(forms.Form):
             raise ValidationError(_("Username and password fields cannot match"))
         if self.enforce_password_policy:
             try:
-                validate_password_length(password)
-                validate_password_complexity(password)
-                validate_password_dictionary(password)
+                validate_password_strength(password)
             except ValidationError, err:
                 raise ValidationError(_("Password: ") + "; ".join(err.messages))
         return password

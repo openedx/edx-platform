@@ -3,9 +3,7 @@ Support for inheritance of fields down an XBlock hierarchy.
 """
 from __future__ import absolute_import
 
-from datetime import datetime
 from django.conf import settings
-from pytz import UTC
 
 from xmodule.partitions.partitions import UserPartition
 from xblock.fields import Scope, Boolean, String, Float, XBlockMixin, Dict, Integer, List
@@ -216,6 +214,17 @@ class InheritanceMixin(XBlockMixin):
                "considered in the Entrance Exam scoring/gating algorithm."),
         scope=Scope.settings,
         default=False
+    )
+
+    self_paced = Boolean(
+        display_name=_('Self Paced'),
+        help=_(
+            'Set this to "true" to mark this course as self-paced. Self-paced courses do not have '
+            'due dates for assignments, and students can progress through the course at any rate before '
+            'the course ends.'
+        ),
+        default=False,
+        scope=Scope.settings
     )
 
 

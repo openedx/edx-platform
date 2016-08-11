@@ -12,27 +12,24 @@ structure:
 }
 """
 
-import pymongo
-import sys
-import logging
 import copy
+from datetime import datetime
+from importlib import import_module
+import logging
+import pymongo
 import re
+import sys
 from uuid import uuid4
 
 from bson.son import SON
-from datetime import datetime
+from contracts import contract, new_contract
 from fs.osfs import OSFS
 from mongodb_proxy import autoretry_read
+from opaque_keys.edx.keys import UsageKey, CourseKey, AssetKey
+from opaque_keys.edx.locations import Location, BlockUsageLocator, SlashSeparatedCourseKey
+from opaque_keys.edx.locator import CourseLocator, LibraryLocator
 from path import Path as path
 from pytz import UTC
-from contracts import contract, new_contract
-
-from importlib import import_module
-from opaque_keys.edx.keys import UsageKey, CourseKey, AssetKey
-from opaque_keys.edx.locations import Location, BlockUsageLocator
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
-from opaque_keys.edx.locator import CourseLocator, LibraryLocator
-
 from xblock.core import XBlock
 from xblock.exceptions import InvalidScopeError
 from xblock.fields import Scope, ScopeIds, Reference, ReferenceList, ReferenceValueDict
@@ -53,6 +50,7 @@ from xmodule.modulestore.inheritance import InheritanceMixin, inherit_metadata, 
 from xmodule.modulestore.xml import CourseLocationManager
 from xmodule.modulestore.store_utilities import DETACHED_XBLOCK_TYPES
 from xmodule.services import SettingsService
+
 
 log = logging.getLogger(__name__)
 
@@ -129,6 +127,8 @@ class MongoKeyValueStore(InheritanceKeyValueStore):
     def set(self, key, value):
         if key.scope == Scope.children:
             self._children = value
+        elif key.scope == Scope.parent:
+            self._parent = value
         elif key.scope == Scope.settings:
             self._metadata[key.field_name] = value
         elif key.scope == Scope.content:
@@ -318,6 +318,9 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
                         ).replace(tzinfo=UTC)
                     module._edit_info['published_by'] = raw_metadata.get('published_by')
 
+                for wrapper in self.modulestore.xblock_field_data_wrappers:
+                    module._field_data = wrapper(module, module._field_data)  # pylint: disable=protected-access
+
                 # decache any computed pending field settings
                 module.save()
                 return module
@@ -479,7 +482,7 @@ class MongoBulkOpsMixin(BulkOperationsMixin):
     """
     _bulk_ops_record_type = MongoBulkOpsRecord
 
-    def _start_outermost_bulk_operation(self, bulk_ops_record, course_key):
+    def _start_outermost_bulk_operation(self, bulk_ops_record, course_key, ignore_case=False):
         """
         Prevent updating the meta-data inheritance cache for the given course
         """
@@ -608,17 +611,32 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         self.database.connection._ensure_connected()
         return self.database.connection.max_wire_version
 
-    def _drop_database(self):
+    def _drop_database(self, database=True, collections=True, connections=True):
         """
         A destructive operation to drop the underlying database and close all connections.
         Intended to be used by test code for cleanup.
+
+        If database is True, then this should drop the entire database.
+        Otherwise, if collections is True, then this should drop all of the collections used
+        by this modulestore.
+        Otherwise, the modulestore should remove all data from the collections.
+
+        If connections is True, then close the connection to the database as well.
         """
         # drop the assets
-        super(MongoModuleStore, self)._drop_database()
+        super(MongoModuleStore, self)._drop_database(database, collections, connections)
 
         connection = self.collection.database.connection
-        connection.drop_database(self.collection.database.proxied_object)
-        connection.close()
+
+        if database:
+            connection.drop_database(self.collection.database.proxied_object)
+        elif collections:
+            self.collection.drop()
+        else:
+            self.collection.remove({})
+
+        if connections:
+            connection.close()
 
     @autoretry_read()
     def fill_in_run(self, course_key):
@@ -935,7 +953,14 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
             system.module_data.update(data_cache)
             system.cached_metadata.update(cached_metadata)
 
-        return system.load_item(location, for_parent=for_parent)
+        item = system.load_item(location, for_parent=for_parent)
+
+        # TODO Once PLAT-1055 is implemented, we can remove the following line
+        # of code. Until then, set the course_version field on the block to be
+        # consistent with the Split modulestore. Since Mongo modulestore doesn't
+        # maintain course versions set it to None.
+        item.course_version = None
+        return item
 
     def _load_items(self, course_key, items, depth=0, using_descriptor_system=None, for_parent=None):
         """
@@ -1070,6 +1095,11 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         Get the course with the given courseid (org/course/run)
         """
         assert isinstance(course_key, CourseKey)
+
+        if not course_key.deprecated:  # split course_key
+            # The supplied CourseKey is of the wrong type, so it can't possibly be stored in this modulestore.
+            raise ItemNotFoundError(course_key)
+
         course_key = self.fill_in_run(course_key)
         location = course_key.make_usage_key('course', course_key.run)
         try:

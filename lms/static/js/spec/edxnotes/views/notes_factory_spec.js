@@ -1,17 +1,18 @@
 define([
-    'annotator_1.2.9', 'js/edxnotes/views/notes_factory', 'common/js/spec_helpers/ajax_helpers',
-    'js/spec/edxnotes/helpers', 'js/spec/edxnotes/custom_matchers'
-], function(Annotator, NotesFactory, AjaxHelpers, Helpers, customMatchers) {
+    'annotator_1.2.9', 'js/edxnotes/views/notes_factory', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
+    'js/spec/edxnotes/helpers'
+], function(Annotator, NotesFactory, AjaxHelpers, Helpers) {
     'use strict';
     describe('EdxNotes NotesFactory', function() {
         beforeEach(function() {
-            customMatchers(this);
             loadFixtures('js/fixtures/edxnotes/edxnotes_wrapper.html');
             this.wrapper = document.getElementById('edx-notes-wrapper-123');
         });
 
-        afterEach(function () {
-            _.invoke(Annotator._instances, 'destroy');
+        afterEach(function() {
+            while (Annotator._instances.length > 0) {
+                Annotator._instances[0].destroy();
+            }
         });
 
         it('can initialize annotator correctly', function() {
@@ -19,13 +20,13 @@ define([
                 token = Helpers.makeToken(),
                 options = {
                     user: 'a user',
-                    usage_id : 'an usage',
+                    usage_id: 'an usage',
                     course_id: 'a course'
                 },
                 annotator = NotesFactory.factory(this.wrapper, {
                     endpoint: '/test_endpoint',
                     user: 'a user',
-                    usageId : 'an usage',
+                    usageId: 'an usage',
                     courseId: 'a course',
                     token: token,
                     tokenUrl: '/test_token_url'

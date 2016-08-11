@@ -13,6 +13,7 @@ from django.test import TestCase
 from django.test.utils import override_settings
 import ddt
 import mock
+from nose.plugins.attrib import attr
 import piexif
 from PIL import Image
 
@@ -27,6 +28,7 @@ from ..images import (
 from .helpers import make_image_file, make_uploaded_file
 
 
+@attr(shard=2)
 @ddt.ddt
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Profile Image API is only supported in LMS')
 class TestValidateUploadedImage(TestCase):
@@ -122,6 +124,7 @@ class TestValidateUploadedImage(TestCase):
             self.assertEqual(ctx.exception.message, file_upload_bad_mimetype)
 
 
+@attr(shard=2)
 @ddt.ddt
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Profile Image API is only supported in LMS')
 class TestGenerateProfileImages(TestCase):
@@ -205,6 +208,7 @@ class TestGenerateProfileImages(TestCase):
                 yield name, image
 
 
+@attr(shard=2)
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Profile Image API is only supported in LMS')
 class TestRemoveProfileImages(TestCase):
     """

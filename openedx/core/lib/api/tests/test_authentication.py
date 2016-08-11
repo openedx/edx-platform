@@ -4,29 +4,31 @@ Tests for OAuth2.  This module is copied from django-rest-framework-oauth
 """
 
 from __future__ import unicode_literals
-from collections import namedtuple
-from datetime import datetime, timedelta
+
 import itertools
 import json
+from collections import namedtuple
 
 import ddt
+from datetime import datetime, timedelta
 from django.conf.urls import patterns, url, include
 from django.contrib.auth.models import User
 from django.http import HttpResponse
 from django.test import TestCase
 from django.utils import unittest
 from django.utils.http import urlencode
-
+from nose.plugins.attrib import attr
+from oauth2_provider import models as dot_models
+from provider import constants, scope
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
-from rest_framework_oauth import permissions
-from rest_framework_oauth.compat import oauth2_provider, oauth2_provider_scope
 from rest_framework.test import APIRequestFactory, APIClient
 from rest_framework.views import APIView
+from rest_framework_oauth import permissions
+from rest_framework_oauth.compat import oauth2_provider, oauth2_provider_scope
 
-from provider import scope, constants
+from lms.djangoapps.oauth_dispatch import adapters
 from openedx.core.lib.api import authentication
-
 
 factory = APIRequestFactory()  # pylint: disable=invalid-name
 
@@ -69,6 +71,7 @@ urlpatterns = patterns(
 )
 
 
+@attr(shard=2)
 @ddt.ddt
 class OAuth2Tests(TestCase):
     """OAuth 2.0 authentication"""
@@ -76,6 +79,8 @@ class OAuth2Tests(TestCase):
 
     def setUp(self):
         super(OAuth2Tests, self).setUp()
+        self.dop_adapter = adapters.DOPAdapter()
+        self.dot_adapter = adapters.DOTAdapter()
         self.csrf_client = APIClient(enforce_csrf_checks=True)
         self.username = 'john'
         self.email = 'lennon@thebeatles.com'
@@ -87,24 +92,35 @@ class OAuth2Tests(TestCase):
         self.ACCESS_TOKEN = 'access_token'  # pylint: disable=invalid-name
         self.REFRESH_TOKEN = 'refresh_token'  # pylint: disable=invalid-name
 
-        self.oauth2_client = oauth2_provider.oauth2.models.Client.objects.create(
-            client_id=self.CLIENT_ID,
-            client_secret=self.CLIENT_SECRET,
-            redirect_uri='',
-            client_type=0,
+        self.dop_oauth2_client = self.dop_adapter.create_public_client(
             name='example',
-            user=None,
+            user=self.user,
+            client_id=self.CLIENT_ID,
+            redirect_uri='https://example.edx/redirect',
         )
 
         self.access_token = oauth2_provider.oauth2.models.AccessToken.objects.create(
             token=self.ACCESS_TOKEN,
-            client=self.oauth2_client,
+            client=self.dop_oauth2_client,
             user=self.user,
         )
         self.refresh_token = oauth2_provider.oauth2.models.RefreshToken.objects.create(
             user=self.user,
             access_token=self.access_token,
-            client=self.oauth2_client
+            client=self.dop_oauth2_client,
+        )
+
+        self.dot_oauth2_client = self.dot_adapter.create_public_client(
+            name='example',
+            user=self.user,
+            client_id='dot-client-id',
+            redirect_uri='https://example.edx/redirect',
+        )
+        self.dot_access_token = dot_models.AccessToken.objects.create(
+            user=self.user,
+            token='dot-access-token',
+            application=self.dot_oauth2_client,
+            expires=datetime.now() + timedelta(days=30),
         )
 
         # This is the a change we've made from the django-rest-framework-oauth version
@@ -172,6 +188,10 @@ class OAuth2Tests(TestCase):
     def test_get_form_passing_auth(self):
         """Ensure GETing form over OAuth with correct client credentials succeed"""
         response = self.get_with_bearer_token('/oauth2-test/')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_get_form_passing_auth_with_dot(self):
+        response = self.get_with_bearer_token('/oauth2-test/', token=self.dot_access_token.token)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     @unittest.skipUnless(oauth2_provider, 'django-oauth2-provider not installed')

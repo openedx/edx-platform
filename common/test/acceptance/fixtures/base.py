@@ -6,7 +6,7 @@ import requests
 import json
 from lazy import lazy
 
-from . import STUDIO_BASE_URL
+from common.test.acceptance.fixtures import STUDIO_BASE_URL
 
 
 class StudioApiLoginError(Exception):

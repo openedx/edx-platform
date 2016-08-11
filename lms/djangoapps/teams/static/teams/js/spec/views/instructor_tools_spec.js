@@ -6,20 +6,20 @@ define([
     'teams/js/views/instructor_tools',
     'teams/js/views/team_utils',
     'teams/js/spec_helpers/team_spec_helpers',
-    'common/js/spec_helpers/ajax_helpers',
+    'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
     'common/js/spec_helpers/page_helpers'
-], function ($, Backbone, _, Team, InstructorToolsView, TeamUtils, TeamSpecHelpers, AjaxHelpers, PageHelpers) {
+], function($, Backbone, _, Team, InstructorToolsView, TeamUtils, TeamSpecHelpers, AjaxHelpers, PageHelpers) {
     'use strict';
 
-    describe('Instructor Tools', function () {
+    describe('Instructor Tools', function() {
         var view,
-            createInstructorTools = function () {
+            createInstructorTools = function() {
                 return new InstructorToolsView({
                     team: new Team(TeamSpecHelpers.createMockTeamData(1, 1)[0]),
                     teamEvents: TeamSpecHelpers.teamEvents
                 });
             },
-            deleteTeam = function (view, confirm) {
+            deleteTeam = function(view, confirm) {
                 view.$('.action-delete').click();
                 // Confirm delete dialog
                 if (confirm) {
@@ -29,14 +29,14 @@ define([
                     $('.action-secondary').click();
                 }
             },
-            expectSuccessMessage = function (team) {
+            expectSuccessMessage = function(team) {
                 expect(TeamUtils.showMessage).toHaveBeenCalledWith(
                     'Team "' + team.get('name') + '" successfully deleted.',
                     'success'
                 );
             };
 
-        beforeEach(function () {
+        beforeEach(function() {
             setFixtures('<div id="page-prompt"></div>');
             PageHelpers.preventBackboneChangingUrl();
             spyOn(Backbone.history, 'navigate');
@@ -45,13 +45,13 @@ define([
             spyOn(view.teamEvents, 'trigger');
         });
 
-        it('can render itself', function () {
+        it('can render itself', function() {
             expect(_.strip(view.$('.action-delete').text())).toEqual('Delete Team');
             expect(_.strip(view.$('.action-edit-members').text())).toEqual('Edit Membership');
             expect(view.$el.text()).toContain('Instructor tools');
         });
 
-        it('can delete a team and shows a success message', function () {
+        it('can delete a team and shows a success message', function() {
             var requests = AjaxHelpers.requests(this);
             deleteTeam(view, true);
             AjaxHelpers.expectJsonRequest(requests, 'DELETE', view.team.url, null);
@@ -69,24 +69,24 @@ define([
             expectSuccessMessage(view.team);
         });
 
-        it('can cancel team deletion', function () {
+        it('can cancel team deletion', function() {
             var requests = AjaxHelpers.requests(this);
             deleteTeam(view, false);
             AjaxHelpers.expectNoRequests(requests);
             expect(Backbone.history.navigate).not.toHaveBeenCalled();
         });
 
-        it('shows a success message after receiving a 404', function () {
+        it('shows a success message after receiving a 404', function() {
             var requests = AjaxHelpers.requests(this);
             deleteTeam(view, true);
             AjaxHelpers.respondWithError(requests, 404);
             expectSuccessMessage(view.team);
-        });    
-            
-        it('can trigger the edit membership view', function () {
+        });
+
+        it('can trigger the edit membership view', function() {
             view.$('.action-edit-members').click();
             expect(Backbone.history.navigate).toHaveBeenCalledWith(
-                'teams/' + view.team.get('topic_id') + "/" + view.team.id + "/edit-team/manage-members",
+                'teams/' + view.team.get('topic_id') + '/' + view.team.id + '/edit-team/manage-members',
                 {trigger: true}
             );
         });

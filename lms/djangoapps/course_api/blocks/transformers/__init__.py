@@ -2,6 +2,7 @@
 Course API Block Transformers
 """
 
+from lms.djangoapps.course_blocks.transformers.visibility import VisibilityTransformer
 from .student_view import StudentViewTransformer
 from .block_counts import BlockCountsTransformer
 from .navigation import BlockNavigationTransformer
@@ -37,6 +38,7 @@ SUPPORTED_FIELDS = [
     SupportedFieldType('display_name', default_value=''),
     SupportedFieldType('graded'),
     SupportedFieldType('format'),
+    SupportedFieldType('due'),
     # 'student_view_data'
     SupportedFieldType(StudentViewTransformer.STUDENT_VIEW_DATA, StudentViewTransformer),
     # 'student_view_multi_device'
@@ -50,5 +52,12 @@ SUPPORTED_FIELDS = [
         BlockNavigationTransformer,
         requested_field_name='nav_depth',
         serializer_field_name='descendants',
+    ),
+
+    # Provide the staff visibility info stored when VisibilityTransformer ran previously
+    SupportedFieldType(
+        'merged_visible_to_staff_only',
+        VisibilityTransformer,
+        requested_field_name='visible_to_staff_only',
     )
 ]

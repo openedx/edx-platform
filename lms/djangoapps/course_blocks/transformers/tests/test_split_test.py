@@ -2,18 +2,20 @@
 Tests for SplitTestTransformer.
 """
 import ddt
+from nose.plugins.attrib import attr
 
 import openedx.core.djangoapps.user_api.course_tag.api as course_tag_api
 from openedx.core.djangoapps.user_api.partition_schemes import RandomUserPartitionScheme
 from student.tests.factories import CourseEnrollmentFactory
 from xmodule.partitions.partitions import Group, UserPartition
-from xmodule.modulestore.tests.factories import check_mongo_calls, check_mongo_calls_range
+from xmodule.modulestore.tests.factories import check_mongo_calls
 
 from ...api import get_course_blocks
 from ..user_partitions import UserPartitionTransformer, _get_user_partition_groups
 from .helpers import CourseStructureTestCase, create_location
 
 
+@attr(shard=3)
 @ddt.ddt
 class SplitTestTransformerTestCase(CourseStructureTestCase):
     """
@@ -29,7 +31,7 @@ class SplitTestTransformerTestCase(CourseStructureTestCase):
         super(SplitTestTransformerTestCase, self).setUp()
 
         # Set up user partitions and groups.
-        self.groups = [Group(1, 'Group 1'), Group(2, 'Group 2'), Group(3, 'Group 3')]
+        self.groups = [Group(0, 'Group 0'), Group(1, 'Group 1'), Group(2, 'Group 2')]
         self.split_test_user_partition_id = self.TEST_PARTITION_ID
         self.split_test_user_partition = UserPartition(
             id=self.split_test_user_partition_id,
@@ -103,9 +105,9 @@ class SplitTestTransformerTestCase(CourseStructureTestCase):
                 'metadata': {'category': 'split_test'},
                 'user_partition_id': self.TEST_PARTITION_ID,
                 'group_id_to_child': {
-                    '1': location('E'),
-                    '2': location('F'),
-                    '3': location('G'),
+                    '0': location('E'),
+                    '1': location('F'),
+                    '2': location('G'),
                 },
                 '#children': [{'#type': 'vertical', '#ref': 'G'}],
             },
@@ -128,8 +130,8 @@ class SplitTestTransformerTestCase(CourseStructureTestCase):
                 'metadata': {'category': 'split_test'},
                 'user_partition_id': self.TEST_PARTITION_ID,
                 'group_id_to_child': {
-                    '2': location('M'),
-                    '3': location('N'),
+                    '1': location('M'),
+                    '2': location('N'),
                 },
                 '#parents': ['F'],
                 '#children': [
@@ -143,8 +145,8 @@ class SplitTestTransformerTestCase(CourseStructureTestCase):
                 'metadata': {'category': 'split_test'},
                 'user_partition_id': self.TEST_PARTITION_ID,
                 'group_id_to_child': {
-                    '1': location('H'),
-                    '2': location('I'),
+                    '0': location('H'),
+                    '1': location('I'),
                 },
                 '#children': [
                     {'#type': 'vertical', '#ref': 'I'},
@@ -170,15 +172,15 @@ class SplitTestTransformerTestCase(CourseStructureTestCase):
 
     @ddt.data(
         # Note: Theoretically, block E should be accessible by users
-        #  not in Group 1, since there's an open path through block A.
+        #  not in Group 0, since there's an open path through block A.
         #  Since the split_test transformer automatically sets the block
         #  access on its children, it bypasses the paths via other
         #  parents. However, we don't think this is a use case we need to
         #  support for split_test components (since they are now deprecated
         #  in favor of content groups and user partitions).
-        (1, ('course', 'A', 'D', 'E', 'H', 'L', 'O', 'P',)),
-        (2, ('course', 'A', 'D', 'F', 'J', 'M', 'I',)),
-        (3, ('course', 'A', 'D', 'G', 'O',)),
+        (0, ('course', 'A', 'D', 'E', 'H', 'L', 'O', 'P',)),
+        (1, ('course', 'A', 'D', 'F', 'J', 'M', 'I',)),
+        (2, ('course', 'A', 'D', 'G', 'O',)),
     )
     @ddt.unpack
     def test_user(self, group_id, expected_blocks):

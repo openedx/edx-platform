@@ -9,27 +9,28 @@ from django.http import Http404, HttpResponseBadRequest
 from django.contrib.auth.decorators import login_required
 from edxmako.shortcuts import render_to_string
 
-from openedx.core.lib.xblock_utils import replace_static_urls, wrap_xblock, wrap_fragment, request_token
+from openedx.core.lib.xblock_utils import (
+    replace_static_urls, wrap_xblock, wrap_fragment, wrap_xblock_aside, request_token, xblock_local_resource_url,
+)
 from xmodule.x_module import PREVIEW_VIEWS, STUDENT_VIEW, AUTHOR_VIEW
 from xmodule.contentstore.django import contentstore
 from xmodule.error_module import ErrorDescriptor
 from xmodule.exceptions import NotFoundError, ProcessingError
-from xmodule.library_tools import LibraryToolsService
+from xmodule.studio_editable import has_author_view
 from xmodule.services import SettingsService
 from xmodule.modulestore.django import modulestore, ModuleI18nService
 from xmodule.mixin import wrap_with_license
 from opaque_keys.edx.keys import UsageKey
+from opaque_keys.edx.asides import AsideUsageKeyV1
 from xmodule.x_module import ModuleSystem
 from xblock.runtime import KvsFieldData
 from xblock.django.request import webob_to_django_response, django_to_webob_request
 from xblock.exceptions import NoSuchHandlerError
 from xblock.fragment import Fragment
-from student.auth import has_studio_read_access, has_studio_write_access
 from xblock_django.user_service import DjangoXBlockUserService
 
 from lms.djangoapps.lms_xblock.field_data import LmsFieldData
 from cms.lib.xblock.field_data import CmsFieldData
-from cms.lib.xblock.runtime import local_resource_url
 
 from util.sandboxing import can_execute_unsafe_code, get_python_lib_zip
 
@@ -56,8 +57,18 @@ def preview_handler(request, usage_key_string, handler, suffix=''):
     """
     usage_key = UsageKey.from_string(usage_key_string)
 
-    descriptor = modulestore().get_item(usage_key)
-    instance = _load_preview_module(request, descriptor)
+    if isinstance(usage_key, AsideUsageKeyV1):
+        descriptor = modulestore().get_item(usage_key.usage_key)
+        for aside in descriptor.runtime.get_asides(descriptor):
+            if aside.scope_ids.block_type == usage_key.aside_type:
+                asides = [aside]
+                instance = aside
+                break
+    else:
+        descriptor = modulestore().get_item(usage_key)
+        instance = _load_preview_module(request, descriptor)
+        asides = []
+
     # Let the module handle the AJAX
     req = django_to_webob_request(request)
     try:
@@ -80,6 +91,7 @@ def preview_handler(request, usage_key_string, handler, suffix=''):
         log.exception("error processing ajax call")
         raise
 
+    modulestore().update_item(descriptor, request.user.id, asides=asides)
     return webob_to_django_response(resp)
 
 
@@ -91,6 +103,9 @@ class PreviewModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
     # they are being rendered for preview (i.e. in Studio)
     is_author_mode = True
 
+    def __init__(self, **kwargs):
+        super(PreviewModuleSystem, self).__init__(**kwargs)
+
     def handler_url(self, block, handler_name, suffix='', query='', thirdparty=False):
         return reverse('preview_handler', kwargs={
             'usage_key_string': unicode(block.scope_ids.usage_id),
@@ -99,7 +114,7 @@ class PreviewModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
         }) + '?' + query
 
     def local_resource_url(self, block, uri):
-        return local_resource_url(block, uri)
+        return xblock_local_resource_url(block, uri)
 
     def applicable_aside_types(self, block):
         """
@@ -107,6 +122,9 @@ class PreviewModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
         """
         if not StudioConfig.asides_enabled(block.scope_ids.block_type):
             return []
+
+        # TODO: aside_type != 'acid_aside' check should be removed once AcidBlock is only installed during tests
+        # (see https://openedx.atlassian.net/browse/TE-811)
         return [
             aside_type
             for aside_type in super(PreviewModuleSystem, self).applicable_aside_types(block)
@@ -125,35 +143,16 @@ class PreviewModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
         result.add_frag_resources(frag)
 
         for aside, aside_fn in aside_frag_fns:
-            aside_frag = self.wrap_aside(block, aside, view_name, aside_fn(block, context), context)
-            aside.save()
-            result.add_frag_resources(aside_frag)
-            frag.content = frag.content.replace(position_for_asides, position_for_asides + aside_frag.content)
+            aside_frag = aside_fn(block, context)
+            if aside_frag.content != u'':
+                aside_frag_wrapped = self.wrap_aside(block, aside, view_name, aside_frag, context)
+                aside.save()
+                result.add_frag_resources(aside_frag_wrapped)
+                replacement = position_for_asides + aside_frag_wrapped.content
+                frag.content = frag.content.replace(position_for_asides, replacement)
 
         result.add_content(frag.content)
         return result
-
-
-class StudioPermissionsService(object):
-    """
-    Service that can provide information about a user's permissions.
-
-    Deprecated. To be replaced by a more general authorization service.
-
-    Only used by LibraryContentDescriptor (and library_tools.py).
-    """
-
-    def __init__(self, request):
-        super(StudioPermissionsService, self).__init__()
-        self._request = request
-
-    def can_read(self, course_key):
-        """ Does the user have read access to the given course/library? """
-        return has_studio_read_access(self._request.user, course_key)
-
-    def can_write(self, course_key):
-        """ Does the user have read access to the given course/library? """
-        return has_studio_write_access(self._request.user, course_key)
 
 
 def _preview_module_system(request, descriptor, field_data):
@@ -184,11 +183,18 @@ def _preview_module_system(request, descriptor, field_data):
         _studio_wrap_xblock,
     ]
 
+    wrappers_asides = [
+        partial(
+            wrap_xblock_aside,
+            'PreviewRuntime',
+            usage_id_serializer=unicode,
+            request_token=request_token(request)
+        )
+    ]
+
     if settings.FEATURES.get("LICENSING", False):
         # stick the license wrapper in front
         wrappers.insert(0, wrap_with_license)
-
-    descriptor.runtime._services['studio_user_permissions'] = StudioPermissionsService(request)  # pylint: disable=protected-access
 
     return PreviewModuleSystem(
         static_url=settings.STATIC_URL,
@@ -208,14 +214,14 @@ def _preview_module_system(request, descriptor, field_data):
 
         # Set up functions to modify the fragment produced by student_view
         wrappers=wrappers,
+        wrappers_asides=wrappers_asides,
         error_descriptor_class=ErrorDescriptor,
         get_user_role=lambda: get_user_role(request.user, course_id),
         # Get the raw DescriptorSystem, not the CombinedSystem
         descriptor_runtime=descriptor._runtime,  # pylint: disable=protected-access
         services={
-            "i18n": ModuleI18nService(),
             "field-data": field_data,
-            "library_tools": LibraryToolsService(modulestore()),
+            "i18n": ModuleI18nService,
             "settings": SettingsService(),
             "user": DjangoXBlockUserService(request.user),
         },
@@ -231,7 +237,7 @@ def _load_preview_module(request, descriptor):
     descriptor: An XModuleDescriptor
     """
     student_data = KvsFieldData(SessionKeyValueStore(request))
-    if _has_author_view(descriptor):
+    if has_author_view(descriptor):
         wrapper = partial(CmsFieldData, student_data=student_data)
     else:
         wrapper = partial(LmsFieldData, student_data=student_data)
@@ -288,7 +294,7 @@ def get_preview_fragment(request, descriptor, context):
     """
     module = _load_preview_module(request, descriptor)
 
-    preview_view = AUTHOR_VIEW if _has_author_view(module) else STUDENT_VIEW
+    preview_view = AUTHOR_VIEW if has_author_view(module) else STUDENT_VIEW
 
     try:
         fragment = module.render(preview_view, context)
@@ -296,12 +302,3 @@ def get_preview_fragment(request, descriptor, context):
         log.warning("Unable to render %s for %r", preview_view, module, exc_info=True)
         fragment = Fragment(render_to_string('html_error.html', {'message': str(exc)}))
     return fragment
-
-
-def _has_author_view(descriptor):
-    """
-    Returns True if the xmodule linked to the descriptor supports "author_view".
-
-    If False, "student_view" and LmsFieldData should be used.
-    """
-    return getattr(descriptor, 'has_author_view', False)

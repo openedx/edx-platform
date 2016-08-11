@@ -3,11 +3,13 @@ Test Custom Exceptions
 """
 import ddt
 from django.test import TestCase
+from nose.plugins.attrib import attr
 from rest_framework import exceptions as drf_exceptions
 
 from .. import exceptions
 
 
+@attr(shard=2)
 @ddt.ddt
 class TestDictExceptionsAllowDictDetails(TestCase):
     """
@@ -44,6 +46,7 @@ class TestDictExceptionsAllowDictDetails(TestCase):
         self.assertEqual(exc.available_renderers, ['application/json'])
 
 
+@attr(shard=2)
 @ddt.ddt
 class TestDictExceptionSubclassing(TestCase):
     """

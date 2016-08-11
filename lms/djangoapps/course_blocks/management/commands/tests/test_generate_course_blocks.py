@@ -8,7 +8,7 @@ from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from .. import generate_course_blocks
-from ....tests.helpers import is_course_in_block_structure_cache
+from openedx.core.djangoapps.content.block_structure.tests.helpers import is_course_in_block_structure_cache
 
 
 class TestGenerateCourseBlocks(ModuleStoreTestCase):
@@ -42,6 +42,21 @@ class TestGenerateCourseBlocks(ModuleStoreTestCase):
         self._assert_courses_not_in_block_cache(self.course_1.id, self.course_2.id)
         self.command.handle(all=True)
         self._assert_courses_in_block_cache(self.course_1.id, self.course_2.id)
+        with patch(
+            'openedx.core.lib.block_structure.factory.BlockStructureFactory.create_from_modulestore'
+        ) as mock_update_from_store:
+            self.command.handle(all=True)
+            mock_update_from_store.assert_not_called()
+
+    def test_generate_force(self):
+        self._assert_courses_not_in_block_cache(self.course_1.id, self.course_2.id)
+        self.command.handle(all=True)
+        self._assert_courses_in_block_cache(self.course_1.id, self.course_2.id)
+        with patch(
+            'openedx.core.lib.block_structure.factory.BlockStructureFactory.create_from_modulestore'
+        ) as mock_update_from_store:
+            self.command.handle(all=True, force=True)
+            mock_update_from_store.assert_called()
 
     def test_generate_one(self):
         self._assert_courses_not_in_block_cache(self.course_1.id, self.course_2.id)

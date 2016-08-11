@@ -1,6 +1,6 @@
 define(['jquery.form', 'js/index'], function() {
     'use strict';
-    return function () {
+    return function() {
         // showing/hiding creation rights UI
         $('.show-creationrights').click(function(e) {
             e.preventDefault();
@@ -11,11 +11,11 @@ define(['jquery.form', 'js/index'], function() {
                     .toggleClass('current');
         });
 
-        var reloadPage = function () {
+        var reloadPage = function() {
             location.reload();
         };
 
-        var showError = function ()  {
+        var showError = function() {
             $('#request-coursecreator-submit')
                 .toggleClass('has-error')
                 .find('.label')
@@ -30,7 +30,7 @@ define(['jquery.form', 'js/index'], function() {
             success: reloadPage
         });
 
-        $('#request-coursecreator-submit').click(function(event){
+        $('#request-coursecreator-submit').click(function(event) {
             $(this)
                 .toggleClass('is-disabled is-submitting')
                 .attr('aria-disabled', $(this).hasClass('is-disabled'))

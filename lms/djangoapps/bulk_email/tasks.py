@@ -3,12 +3,12 @@
 This module contains celery task functions for handling the sending of bulk email
 to a course.
 """
-import re
-import random
-import json
-from time import sleep
 from collections import Counter
+import json
 import logging
+import random
+import re
+from time import sleep
 
 import dogstats_wrapper as dog_stats_api
 from smtplib import SMTPServerDisconnected, SMTPDataError, SMTPConnectError, SMTPException
@@ -24,6 +24,7 @@ from boto.ses.exceptions import (
     SESIllegalAddressError,
 )
 from boto.exception import AWSConnectionError
+from markupsafe import escape
 
 from celery import task, current_task  # pylint: disable=no-name-in-module
 from celery.states import SUCCESS, FAILURE, RETRY  # pylint: disable=no-name-in-module, import-error
@@ -32,16 +33,12 @@ from celery.exceptions import RetryTaskError  # pylint: disable=no-name-in-modul
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.mail import EmailMultiAlternatives, get_connection
+from django.core.mail.message import forbid_multi_line_headers
 from django.core.urlresolvers import reverse
 
-from bulk_email.models import (
-    CourseEmail, Optout,
-    SEND_TO_MYSELF, SEND_TO_ALL, TO_OPTIONS,
-    SEND_TO_STAFF,
-)
+from bulk_email.models import CourseEmail, Optout
 from courseware.courses import get_course
 from openedx.core.lib.courses import course_image_url
-from student.roles import CourseStaffRole, CourseInstructorRole
 from instructor_task.models import InstructorTask
 from instructor_task.subtasks import (
     SubtaskStatus,
@@ -49,8 +46,8 @@ from instructor_task.subtasks import (
     check_subtask_is_valid,
     update_subtask_status,
 )
-from util.query import use_read_replica_if_available
 from util.date_utils import get_default_time_display
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 log = logging.getLogger('edx.celery.task')
 
@@ -96,53 +93,6 @@ BULK_EMAIL_FAILURE_ERRORS = (
 )
 
 
-def _get_recipient_querysets(user_id, to_option, course_id):
-    """
-    Returns a list of query sets of email recipients corresponding to the
-    requested `to_option` category.
-
-    `to_option` is either SEND_TO_MYSELF, SEND_TO_STAFF, or SEND_TO_ALL.
-
-    Recipients who are in more than one category (e.g. enrolled in the course
-    and are staff or self) will be properly deduped.
-    """
-    if to_option not in TO_OPTIONS:
-        log.error("Unexpected bulk email TO_OPTION found: %s", to_option)
-        raise Exception("Unexpected bulk email TO_OPTION found: {0}".format(to_option))
-
-    if to_option == SEND_TO_MYSELF:
-        user = User.objects.filter(id=user_id)
-        return [use_read_replica_if_available(user)]
-    else:
-        staff_qset = CourseStaffRole(course_id).users_with_role()
-        instructor_qset = CourseInstructorRole(course_id).users_with_role()
-        staff_instructor_qset = (staff_qset | instructor_qset).distinct()
-        if to_option == SEND_TO_STAFF:
-            return [use_read_replica_if_available(staff_instructor_qset)]
-
-        if to_option == SEND_TO_ALL:
-            # We also require students to have activated their accounts to
-            # provide verification that the provided email address is valid.
-            enrollment_qset = User.objects.filter(
-                is_active=True,
-                courseenrollment__course_id=course_id,
-                courseenrollment__is_active=True
-            )
-
-            # to avoid duplicates, we only want to email unenrolled course staff
-            # members here
-            unenrolled_staff_qset = staff_instructor_qset.exclude(
-                courseenrollment__course_id=course_id, courseenrollment__is_active=True
-            )
-
-            # use read_replica if available
-            recipient_qsets = [
-                use_read_replica_if_available(unenrolled_staff_qset),
-                use_read_replica_if_available(enrollment_qset),
-            ]
-            return recipient_qsets
-
-
 def _get_course_email_context(course):
     """
     Returns context arguments to apply to all emails, independent of recipient.
@@ -150,19 +100,19 @@ def _get_course_email_context(course):
     course_id = course.id.to_deprecated_string()
     course_title = course.display_name
     course_end_date = get_default_time_display(course.end)
-    course_url = 'https://{}{}'.format(
-        settings.SITE_NAME,
+    course_url = '{}{}'.format(
+        settings.LMS_ROOT_URL,
         reverse('course_root', kwargs={'course_id': course_id})
     )
-    image_url = u'https://{}{}'.format(settings.SITE_NAME, course_image_url(course))
+    image_url = u'{}{}'.format(settings.LMS_ROOT_URL, course_image_url(course))
     email_context = {
         'course_title': course_title,
         'course_url': course_url,
         'course_image_url': image_url,
         'course_end_date': course_end_date,
-        'account_settings_url': 'https://{}{}'.format(settings.SITE_NAME, reverse('account_settings')),
-        'email_settings_url': 'https://{}{}'.format(settings.SITE_NAME, reverse('dashboard')),
-        'platform_name': settings.PLATFORM_NAME,
+        'account_settings_url': '{}{}'.format(settings.LMS_ROOT_URL, reverse('account_settings')),
+        'email_settings_url': '{}{}'.format(settings.LMS_ROOT_URL, reverse('dashboard')),
+        'platform_name': configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),
     }
     return email_context
 
@@ -216,22 +166,24 @@ def perform_delegate_email_batches(entry_id, course_id, task_input, action_name)
     # Fetch the course object.
     course = get_course(course_id)
 
-    if course is None:
-        msg = u"Task %s: course not found: %s"
-        log.error(msg, task_id, course_id)
-        raise ValueError(msg % (task_id, course_id))
-
     # Get arguments that will be passed to every subtask.
-    to_option = email_obj.to_option
+    targets = email_obj.targets.all()
     global_email_context = _get_course_email_context(course)
 
-    recipient_qsets = _get_recipient_querysets(user_id, to_option, course_id)
+    recipient_qsets = [
+        target.get_users(course_id, user_id)
+        for target in targets
+    ]
+    combined_set = User.objects.none()
+    for qset in recipient_qsets:
+        combined_set |= qset
+    combined_set = combined_set.distinct()
     recipient_fields = ['profile__name', 'email']
 
-    log.info(u"Task %s: Preparing to queue subtasks for sending emails for course %s, email %s, to_option %s",
-             task_id, course_id, email_id, to_option)
+    log.info(u"Task %s: Preparing to queue subtasks for sending emails for course %s, email %s",
+             task_id, course_id, email_id)
 
-    total_recipients = sum([recipient_queryset.count() for recipient_queryset in recipient_qsets])
+    total_recipients = combined_set.count()
 
     routing_key = settings.BULK_EMAIL_ROUTING_KEY
     # if there are few enough emails, send them through a different queue
@@ -266,7 +218,7 @@ def perform_delegate_email_batches(entry_id, course_id, task_input, action_name)
         entry,
         action_name,
         _create_send_email_subtask,
-        recipient_qsets,
+        [combined_set],
         recipient_fields,
         settings.BULK_EMAIL_EMAILS_PER_TASK,
         total_recipients,
@@ -396,13 +348,20 @@ def _filter_optouts_from_recipients(to_list, course_id):
     return to_list, num_optout
 
 
-def _get_source_address(course_id, course_title):
+def _get_source_address(course_id, course_title, truncate=True):
     """
     Calculates an email address to be used as the 'from-address' for sent emails.
 
     Makes a unique from name and address for each course, e.g.
 
-        "COURSE_TITLE" Course Staff <coursenum-no-reply@courseupdates.edx.org>
+        "COURSE_TITLE" Course Staff <course_name-no-reply@courseupdates.edx.org>
+
+    If, when decoded to ascii, this from_addr is longer than 320 characters,
+    use the course_name rather than the course title, e.g.
+
+        "course_name" Course Staff <course_name-no-reply@courseupdates.edx.org>
+
+    The "truncate" kwarg is only used for tests.
 
     """
     course_title_no_quotes = re.sub(r'"', '', course_title)
@@ -410,11 +369,40 @@ def _get_source_address(course_id, course_title):
     # For the email address, get the course.  Then make sure that it can be used
     # in an email address, by substituting a '_' anywhere a non-(ascii, period, or dash)
     # character appears.
-    from_addr = u'"{0}" Course Staff <{1}-{2}>'.format(
-        course_title_no_quotes,
-        re.sub(r"[^\w.-]", '_', course_id.course),
-        settings.BULK_EMAIL_DEFAULT_FROM_EMAIL
-    )
+    course_name = re.sub(r"[^\w.-]", '_', course_id.course)
+
+    from_addr_format = u'"{course_title}" Course Staff <{course_name}-{from_email}>'
+
+    def format_address(course_title_no_quotes):
+        """
+        Partial function for formatting the from_addr. Since
+        `course_title_no_quotes` may be truncated to make sure the returned
+        string has fewer than 320 characters, we define this function to make
+        it easy to determine quickly what the max length is for
+        `course_title_no_quotes`.
+        """
+        return from_addr_format.format(
+            course_title=course_title_no_quotes,
+            course_name=course_name,
+            from_email=configuration_helpers.get_value(
+                'email_from_address',
+                settings.BULK_EMAIL_DEFAULT_FROM_EMAIL
+            )
+        )
+
+    from_addr = format_address(course_title_no_quotes)
+
+    # If the encoded from_addr is longer than 320 characters, reformat,
+    # but with the course name rather than course title.
+    # Amazon SES's from address field appears to have a maximum length of 320.
+    __, encoded_from_addr = forbid_multi_line_headers('from', from_addr, 'utf-8')
+
+    # It seems that this value is also escaped when set out to amazon, judging
+    # from our logs
+    escaped_encoded_from_addr = escape(encoded_from_addr)
+    if len(escaped_encoded_from_addr) >= 320 and truncate:
+        from_addr = format_address(course_name)
+
     return from_addr
 
 
@@ -803,8 +791,11 @@ def _submit_for_retry(entry_id, email_id, to_list, global_email_context,
         raise retry_task
     except RetryTaskError as retry_error:
         # If the retry call is successful, update with the current progress:
-        log.exception(u'Task %s: email with id %d caused send_course_email task to retry.',
-                      task_id, email_id)
+        log.info(
+            u'Task %s: email with id %d caused send_course_email task to retry again.',
+            task_id,
+            email_id
+        )
         return subtask_status, retry_error
     except Exception as retry_exc:  # pylint: disable=broad-except
         # If there are no more retries, because the maximum has been reached,

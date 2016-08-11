@@ -45,13 +45,13 @@ from django.conf import settings
         ).replace(u" ", u"%20")
       %>
       <a href="${tweet_action}" class="share">
-        <i class="icon fa fa-twitter"></i><span class="sr">${_("Tweet that you've enrolled in this course")}</span>
+        <span class="icon fa fa-twitter" aria-hidden="true"></span><span class="sr">${_("Tweet that you've enrolled in this course")}</span>
       </a>
       <a href="${facebook_link}" class="share">
-        <i class="icon fa fa-thumbs-up"></i><span class="sr">${_("Post a Facebook message to say you've enrolled in this course")}</span>
+        <span class="icon fa fa-thumbs-up" aria-hidden="true"></span><span class="sr">${_("Post a Facebook message to say you've enrolled in this course")}</span>
       </a>
       <a href="${email_subject}" class="share">
-        <i class="icon fa fa-envelope"></i><span class="sr">${_("Email someone to say you've enrolled in this course")}</span>
+        <span class="icon fa fa-envelope" aria-hidden="true"></span><span class="sr">${_("Email someone to say you've enrolled in this course")}</span>
       </a>
   </div>
   % endif

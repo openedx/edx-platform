@@ -1,10 +1,20 @@
+<%page expression_filter="h"/>
 <%!
 from django.contrib.staticfiles.storage import staticfiles_storage
 from pipeline_mako import compressed_css, compressed_js
 from django.utils.translation import get_language_bidi
 from mako.exceptions import TemplateLookupException
 
-from openedx.core.djangoapps.theming.helpers import get_page_title_breadcrumbs, get_value, get_template_path, get_themed_template_path, is_request_in_themed_site
+from openedx.core.djangolib.js_utils import js_escaped_string
+from openedx.core.djangoapps.site_configuration.helpers import (
+  page_title_breadcrumbs,
+  get_value,
+)
+
+from openedx.core.djangoapps.theming.helpers import (
+  get_template_path,
+  is_request_in_themed_site,
+)
 from certificates.api import get_asset_url_by_slug
 from lang_pref.api import released_languages
 %>
@@ -14,14 +24,16 @@ try:
     url = staticfiles_storage.url(file)
 except:
     url = file
-%>${url}${"?raw" if raw else ""}</%def>
+## HTML-escaping must be handled by caller
+%>${url | n, decode.utf8}${"?raw" if raw else ""}</%def>
 
 <%def name='certificate_asset_url(slug)'><%
 try:
     url = get_asset_url_by_slug(slug)
 except:
     url = ''
-%>${url}</%def>
+## HTML-escaping must be handled by caller
+%>${url | n, decode.utf8}</%def>
 
 <%def name='css(group, raw=False)'>
   <%
@@ -32,7 +44,7 @@ except:
   %>
 
   % if settings.PIPELINE_ENABLED:
-    ${compressed_css(group, raw=raw)}
+    ${compressed_css(group, raw=raw) | n, decode.utf8}
   % else:
     % for filename in settings.PIPELINE_CSS[group]['source_filenames']:
       <link rel="stylesheet" href="${staticfiles_storage.url(filename.replace('.scss', '.css'))}${"?raw" if raw else ""}" type="text/css" media="all" / >
@@ -42,7 +54,7 @@ except:
 
 <%def name='js(group)'>
   % if settings.PIPELINE_ENABLED:
-    ${compressed_js(group)}
+    ${compressed_js(group) | n, decode.utf8}
   % else:
     % for filename in settings.PIPELINE_JS[group]['source_filenames']:
       <script type="text/javascript" src="${staticfiles_storage.url(filename.replace('.coffee', '.js'))}"></script>
@@ -65,28 +77,53 @@ from django.template.engine import Engine
 from django.template.loaders.filesystem import Loader
 engine = Engine(dirs=settings.DEFAULT_TEMPLATE_ENGINE['DIRS'])
 source, template_path = Loader(engine).load_template_source(path)
-%>${source}</%def>
+%>${source | n, decode.utf8}</%def>
 
 <%def name="require_module(module_name, class_name)">
+    <%doc>
+      Loads Javascript onto your page synchronously.
+      Uses RequireJS in development and a plain script tag in production.
+      Use this form of require_module for all new code.
+    </%doc>
+    % if not settings.REQUIRE_DEBUG:
+      <script type="text/javascript" src="${staticfiles_storage.url(module_name + '.js') + '?raw'}"></script>
+    % endif
     <script type="text/javascript">
         (function (require) {
-            % if settings.REQUIRE_DEBUG:
-                require(['${module_name}'], function (${class_name}) {
-                    ${caller.body()}
-                });
-            % else:
-                ## The "raw" parameter is specified to avoid the URL from being further maninpulated by
-                ## static_replace calls (as woudl happen if require_module is used within courseware).
-                ## Without specifying "raw", a call to static_replace would result in the MD5 hash being
-                ## being appended more than once, causing the import to fail in production environments.
-                require(['${staticfiles_storage.url(module_name + ".js") + "?raw"}'], function () {
-                    require(['${module_name}'], function (${class_name}) {
-                        ${caller.body()}
-                    });
-                });
-            % endif
+            require(['${module_name | n, js_escaped_string}'], function (${class_name | n, decode.utf8}) {
+                ${caller.body() | n, decode.utf8}
+            });
         }).call(this, require || RequireJS.require);
     </script>
+</%def>
+
+<%def name="require_module_async(module_name, class_name)">
+  <%doc>
+    Legacy mode of require_module that operates asynchronously, required for certain edge cases
+    (notably where Javascript is required outside of a <%block name="js_extra" or "headextra").
+    Do not use for any new code; instead create a factory and use require_module above.
+  </%doc>
+  <script type="text/javascript">
+    (function (require) {
+      % if settings.REQUIRE_DEBUG:
+          (function (require) {
+              require(['${module_name | n, js_escaped_string}'], function (${class_name | n, decode.utf8}) {
+                  ${caller.body() | n, decode.utf8}
+              });
+          }).call(this, require || RequireJS.require);
+      % else:
+        ## The "raw" parameter is specified to avoid the URL from being further maninpulated by
+        ## static_replace calls (as woudl happen if require_module is used within courseware).
+        ## Without specifying "raw", a call to static_replace would result in the MD5 hash being
+        ## being appended more than once, causing the import to fail in production environments.
+        require(['${staticfiles_storage.url(module_name + ".js") + "?raw" | n, js_escaped_string}'], function () {
+          require(['${module_name | n, js_escaped_string}'], function (${class_name | n, decode.utf8}) {
+            ${caller.body() | n, decode.utf8}
+          });
+        });
+      % endif
+    }).call(this, require || RequireJS.require);
+  </script>
 </%def>
 
 <%def name="optional_include_mako(file, is_theming_enabled=False)"><%
@@ -103,7 +140,7 @@ else:
 
 
 <%def name="get_page_title_breadcrumbs(*args)"><%
-    return get_page_title_breadcrumbs(*args)
+    return page_title_breadcrumbs(*args)
 %></%def>
 
 <%def name="get_platform_name()"><%
@@ -118,10 +155,6 @@ else:
     return get_template_path(relative_path, **kwargs)
 %></%def>
 
-<%def name="get_themed_template_path(relative_path, default_path, **kwargs)"><%
-    return get_themed_template_path(relative_path, default_path, **kwargs)
-%></%def>
-
 <%def name="is_request_in_themed_site()"><%
     return is_request_in_themed_site()
 %></%def>
@@ -131,7 +164,7 @@ else:
 %></%def>
 
 <%def name="show_language_selector()"><%
-    return settings.FEATURES.get('SHOW_LANGUAGE_SELECTOR', False)
+    return get_value('SHOW_LANGUAGE_SELECTOR', settings.FEATURES.get('SHOW_LANGUAGE_SELECTOR', False))
 %></%def>
 
 <%def name="get_released_languages()"><%

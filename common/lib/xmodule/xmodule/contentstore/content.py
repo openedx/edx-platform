@@ -3,18 +3,19 @@ import uuid
 
 from xmodule.assetstore.assetmgr import AssetManager
 
+STATIC_CONTENT_VERSION = 1
 XASSET_LOCATION_TAG = 'c4x'
 XASSET_SRCREF_PREFIX = 'xasset:'
-
 XASSET_THUMBNAIL_TAIL_NAME = '.jpg'
-
 STREAM_DATA_CHUNK_SIZE = 1024
+VERSIONED_ASSETS_PREFIX = '/assets/courseware'
+VERSIONED_ASSETS_PATTERN = r'/assets/courseware/(v[\d]/)?([a-f0-9]{32})'
 
 import os
 import logging
 import StringIO
 from urlparse import urlparse, urlunparse, parse_qsl
-from urllib import urlencode
+from urllib import urlencode, quote_plus
 
 from opaque_keys.edx.locator import AssetLocator
 from opaque_keys.edx.keys import CourseKey, AssetKey
@@ -26,7 +27,7 @@ from PIL import Image
 
 class StaticContent(object):
     def __init__(self, loc, name, content_type, data, last_modified_at=None, thumbnail_location=None, import_path=None,
-                 length=None, locked=False):
+                 length=None, locked=False, content_digest=None):
         self.location = loc
         self.name = name  # a display string which can be edited, and thus not part of the location which needs to be fixed
         self.content_type = content_type
@@ -38,19 +39,24 @@ class StaticContent(object):
         # cycles
         self.import_path = import_path
         self.locked = locked
+        self.content_digest = content_digest
 
     @property
     def is_thumbnail(self):
         return self.location.category == 'thumbnail'
 
     @staticmethod
-    def generate_thumbnail_name(original_name, dimensions=None):
+    def generate_thumbnail_name(original_name, dimensions=None, extension=None):
         """
         - original_name: Name of the asset (typically its location.name)
         - dimensions: `None` or a tuple of (width, height) in pixels
+        - extension: `None` or desired filename extension of the thumbnail
         """
+        if extension is None:
+            extension = XASSET_THUMBNAIL_TAIL_NAME
+
         name_root, ext = os.path.splitext(original_name)
-        if not ext == XASSET_THUMBNAIL_TAIL_NAME:
+        if not ext == extension:
             name_root = name_root + ext.replace(u'.', u'-')
 
         if dimensions:
@@ -59,7 +65,7 @@ class StaticContent(object):
 
         return u"{name_root}{extension}".format(
             name_root=name_root,
-            extension=XASSET_THUMBNAIL_TAIL_NAME,
+            extension=extension,
         )
 
     @staticmethod
@@ -142,6 +148,42 @@ class StaticContent(object):
                 return AssetKey.from_string(path[1:])
 
     @staticmethod
+    def is_versioned_asset_path(path):
+        """Determines whether the given asset path is versioned."""
+        return path.startswith(VERSIONED_ASSETS_PREFIX)
+
+    @staticmethod
+    def parse_versioned_asset_path(path):
+        """
+        Examines an asset path and breaks it apart if it is versioned,
+        returning both the asset digest and the unversioned asset path,
+        which will normally be an AssetKey.
+        """
+        asset_digest = None
+        asset_path = path
+        if StaticContent.is_versioned_asset_path(asset_path):
+            result = re.match(VERSIONED_ASSETS_PATTERN, asset_path)
+            if result is not None:
+                asset_digest = result.groups()[1]
+            asset_path = re.sub(VERSIONED_ASSETS_PATTERN, '', asset_path)
+
+        return (asset_digest, asset_path)
+
+    @staticmethod
+    def add_version_to_asset_path(path, version):
+        """
+        Adds a prefix to an asset path indicating the asset's version.
+        """
+
+        # Don't version an already-versioned path.
+        if StaticContent.is_versioned_asset_path(path):
+            return path
+
+        structure_version = 'v{}'.format(STATIC_CONTENT_VERSION)
+
+        return u'{}/{}/{}{}'.format(VERSIONED_ASSETS_PREFIX, structure_version, version, path)
+
+    @staticmethod
     def get_asset_key_from_path(course_key, path):
         """
         Parses a path, extracting an asset key or creating one.
@@ -168,7 +210,16 @@ class StaticContent(object):
             return StaticContent.compute_location(course_key, path)
 
     @staticmethod
-    def get_canonicalized_asset_path(course_key, path, base_url, excluded_exts):
+    def is_excluded_asset_type(path, excluded_exts):
+        """
+        Check if this is an allowed file extension to serve.
+
+        Some files aren't served through the CDN in order to avoid same-origin policy/CORS-related issues.
+        """
+        return any(path.lower().endswith(excluded_ext.lower()) for excluded_ext in excluded_exts)
+
+    @staticmethod
+    def get_canonicalized_asset_path(course_key, path, base_url, excluded_exts, encode=True):
         """
         Returns a fully-qualified path to a piece of static content.
 
@@ -184,25 +235,27 @@ class StaticContent(object):
         """
 
         # Break down the input path.
-        _, _, relative_path, params, query_string, fragment = urlparse(path)
+        _, _, relative_path, params, query_string, _ = urlparse(path)
 
         # Convert our path to an asset key if it isn't one already.
         asset_key = StaticContent.get_asset_key_from_path(course_key, relative_path)
 
         # Check the status of the asset to see if this can be served via CDN aka publicly.
         serve_from_cdn = False
+        content_digest = None
         try:
             content = AssetManager.find(asset_key, as_stream=True)
-            is_locked = getattr(content, "locked", True)
-            serve_from_cdn = not is_locked
+            serve_from_cdn = not getattr(content, "locked", True)
+            content_digest = getattr(content, "content_digest", None)
         except (ItemNotFoundError, NotFoundError):
             # If we can't find the item, just treat it as if it's locked.
             serve_from_cdn = False
 
-        # See if this is an allowed file extension to serve.  Some files aren't served through the
-        # CDN in order to avoid same-origin policy/CORS-related issues.
-        if any(relative_path.lower().endswith(excluded_ext.lower()) for excluded_ext in excluded_exts):
+        # Do a generic check to see if anything about this asset disqualifies it from being CDN'd.
+        is_excluded = False
+        if StaticContent.is_excluded_asset_type(relative_path, excluded_exts):
             serve_from_cdn = False
+            is_excluded = True
 
         # Update any query parameter values that have asset paths in them. This is for assets that
         # require their own after-the-fact values, like a Flash file that needs the path of a config
@@ -211,15 +264,29 @@ class StaticContent(object):
         updated_query_params = []
         for query_name, query_val in query_params:
             if query_val.startswith("/static/"):
-                new_val = StaticContent.get_canonicalized_asset_path(course_key, query_val, base_url, excluded_exts)
+                new_val = StaticContent.get_canonicalized_asset_path(
+                    course_key, query_val, base_url, excluded_exts, encode=False)
                 updated_query_params.append((query_name, new_val))
             else:
-                updated_query_params.append((query_name, query_val))
+                # Make sure we're encoding Unicode strings down to their byte string
+                # representation so that `urlencode` can handle it.
+                updated_query_params.append((query_name, query_val.encode('utf-8')))
 
         serialized_asset_key = StaticContent.serialize_asset_key_with_slash(asset_key)
         base_url = base_url if serve_from_cdn else ''
+        asset_path = serialized_asset_key
 
-        return urlunparse((None, base_url, serialized_asset_key, params, urlencode(updated_query_params), fragment))
+        # If the content has a digest (i.e. md5sum) value specified, create a versioned path to the asset using it.
+        if not is_excluded and content_digest:
+            asset_path = StaticContent.add_version_to_asset_path(serialized_asset_key, content_digest)
+
+        # Only encode this if told to.  Important so that we don't double encode
+        # when working with paths that are in query parameters.
+        asset_path = asset_path.encode('utf-8')
+        if encode:
+            asset_path = quote_plus(asset_path, '/:+@')
+
+        return urlunparse((None, base_url.encode('utf-8'), asset_path, params, urlencode(updated_query_params), None))
 
     def stream_data(self):
         yield self._data
@@ -238,10 +305,10 @@ class StaticContent(object):
 
 class StaticContentStream(StaticContent):
     def __init__(self, loc, name, content_type, stream, last_modified_at=None, thumbnail_location=None, import_path=None,
-                 length=None, locked=False):
+                 length=None, locked=False, content_digest=None):
         super(StaticContentStream, self).__init__(loc, name, content_type, None, last_modified_at=last_modified_at,
                                                   thumbnail_location=thumbnail_location, import_path=import_path,
-                                                  length=length, locked=locked)
+                                                  length=length, locked=locked, content_digest=content_digest)
         self._stream = stream
 
     def stream_data(self):
@@ -273,7 +340,8 @@ class StaticContentStream(StaticContent):
         self._stream.seek(0)
         content = StaticContent(self.location, self.name, self.content_type, self._stream.read(),
                                 last_modified_at=self.last_modified_at, thumbnail_location=self.thumbnail_location,
-                                import_path=self.import_path, length=self.length, locked=self.locked)
+                                import_path=self.import_path, length=self.length, locked=self.locked,
+                                content_digest=self.content_digest)
         return content
 
 
@@ -330,9 +398,10 @@ class ContentStore(object):
         pixels. It defaults to None.
         """
         thumbnail_content = None
+        is_svg = content.content_type == 'image/svg+xml'
         # use a naming convention to associate originals with the thumbnail
         thumbnail_name = StaticContent.generate_thumbnail_name(
-            content.location.name, dimensions=dimensions
+            content.location.name, dimensions=dimensions, extension='.svg' if is_svg else None
         )
         thumbnail_file_location = StaticContent.compute_location(
             content.location.course_key, thumbnail_name, is_thumbnail=True
@@ -340,28 +409,42 @@ class ContentStore(object):
 
         # if we're uploading an image, then let's generate a thumbnail so that we can
         # serve it up when needed without having to rescale on the fly
-        if content.content_type is not None and content.content_type.split('/')[0] == 'image':
-            try:
+        try:
+            if is_svg:
+                # for svg simply store the provided svg file, since vector graphics should be good enough
+                # for downscaling client-side
+                if tempfile_path is None:
+                    thumbnail_file = StringIO.StringIO(content.data)
+                else:
+                    with open(tempfile_path) as f:
+                        thumbnail_file = StringIO.StringIO(f.read())
+                thumbnail_content = StaticContent(thumbnail_file_location, thumbnail_name,
+                                                  'image/svg+xml', thumbnail_file)
+                self.save(thumbnail_content)
+            elif content.content_type is not None and content.content_type.split('/')[0] == 'image':
                 # use PIL to do the thumbnail generation (http://www.pythonware.com/products/pil/)
                 # My understanding is that PIL will maintain aspect ratios while restricting
                 # the max-height/width to be whatever you pass in as 'size'
                 # @todo: move the thumbnail size to a configuration setting?!?
                 if tempfile_path is None:
-                    im = Image.open(StringIO.StringIO(content.data))
+                    source = StringIO.StringIO(content.data)
                 else:
-                    im = Image.open(tempfile_path)
+                    source = tempfile_path
 
-                # I've seen some exceptions from the PIL library when trying to save palletted
-                # PNG files to JPEG. Per the google-universe, they suggest converting to RGB first.
-                im = im.convert('RGB')
-
-                if not dimensions:
-                    dimensions = (128, 128)
-
-                im.thumbnail(dimensions, Image.ANTIALIAS)
+                # We use the context manager here to avoid leaking the inner file descriptor
+                # of the Image object -- this way it gets closed after we're done with using it.
                 thumbnail_file = StringIO.StringIO()
-                im.save(thumbnail_file, 'JPEG')
-                thumbnail_file.seek(0)
+                with Image.open(source) as image:
+                    # I've seen some exceptions from the PIL library when trying to save palletted
+                    # PNG files to JPEG. Per the google-universe, they suggest converting to RGB first.
+                    thumbnail_image = image.convert('RGB')
+
+                    if not dimensions:
+                        dimensions = (128, 128)
+
+                    thumbnail_image.thumbnail(dimensions, Image.ANTIALIAS)
+                    thumbnail_image.save(thumbnail_file, 'JPEG')
+                    thumbnail_file.seek(0)
 
                 # store this thumbnail as any other piece of content
                 thumbnail_content = StaticContent(thumbnail_file_location, thumbnail_name,
@@ -369,9 +452,11 @@ class ContentStore(object):
 
                 self.save(thumbnail_content)
 
-            except Exception, e:
-                # log and continue as thumbnails are generally considered as optional
-                logging.exception(u"Failed to generate thumbnail for {0}. Exception: {1}".format(content.location, str(e)))
+        except Exception, exc:  # pylint: disable=broad-except
+            # log and continue as thumbnails are generally considered as optional
+            logging.exception(
+                u"Failed to generate thumbnail for {0}. Exception: {1}".format(content.location, str(exc))
+            )
 
         return thumbnail_content, thumbnail_file_location
 

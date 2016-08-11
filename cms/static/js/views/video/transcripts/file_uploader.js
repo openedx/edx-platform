@@ -1,7 +1,7 @@
 define(
     [
-        "jquery", "backbone", "underscore",
-        "js/views/video/transcripts/utils"
+        'jquery', 'backbone', 'underscore',
+        'js/views/video/transcripts/utils'
     ],
 function($, Backbone, _, Utils) {
     var FileUploader = Backbone.View.extend({
@@ -17,14 +17,17 @@ function($, Backbone, _, Utils) {
 
         uploadTpl: '#file-upload',
 
-        initialize: function () {
-            _.bindAll(this);
-
+        initialize: function(options) {
+            _.bindAll(this,
+                'changeHandler', 'clickHandler', 'xhrResetProgressBar', 'xhrProgressHandler', 'xhrCompleteHandler',
+                'render'
+            );
+            this.options = _.extend({}, options);
             this.file = false;
             this.render();
         },
 
-        render: function () {
+        render: function() {
             var tpl = $(this.uploadTpl).text(),
                 tplContainer = this.$el.find('.transcripts-file-uploader'),
                 videoList = this.options.videoListObject.getVideoObjectsList();
@@ -55,7 +58,7 @@ function($, Backbone, _, Utils) {
         * Uploads file to the server. Get file from the `file` property.
         *
         */
-        upload: function () {
+        upload: function() {
             if (!this.file) {
                 return;
             }
@@ -75,7 +78,7 @@ function($, Backbone, _, Utils) {
         * @param {object} event Event object.
         *
         */
-        clickHandler: function (event) {
+        clickHandler: function(event) {
             event.preventDefault();
 
             this.$input
@@ -92,7 +95,7 @@ function($, Backbone, _, Utils) {
         * @param {object} event Event object.
         *
         */
-        changeHandler: function (event) {
+        changeHandler: function(event) {
             event.preventDefault();
 
             this.options.messenger.hideError();
@@ -119,7 +122,7 @@ function($, Backbone, _, Utils) {
         *                    extension.
         *
         */
-        checkExtValidity: function (file) {
+        checkExtValidity: function(file) {
             if (!file.name) {
                 return void(0);
             }
@@ -142,7 +145,7 @@ function($, Backbone, _, Utils) {
         * Resets progress bar.
         *
         */
-        xhrResetProgressBar: function () {
+        xhrResetProgressBar: function() {
             var percentVal = '0%';
 
             this.$progress
@@ -166,7 +169,7 @@ function($, Backbone, _, Utils) {
         * @param {integer} percentComplete Object with information about file.
         *
         */
-        xhrProgressHandler: function (event, position, total, percentComplete) {
+        xhrProgressHandler: function(event, position, total, percentComplete) {
             var percentVal = percentComplete + '%';
 
             this.$progress
@@ -180,7 +183,7 @@ function($, Backbone, _, Utils) {
         * Handle complete uploading.
         *
         */
-        xhrCompleteHandler: function (xhr) {
+        xhrCompleteHandler: function(xhr) {
             var resp = JSON.parse(xhr.responseText),
                 err = resp.status || gettext('Error: Uploading failed.'),
                 sub = resp.subs;

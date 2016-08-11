@@ -24,6 +24,7 @@ from xblock.runtime import KeyValueStore
 from xblock.exceptions import InvalidScopeError
 
 from xmodule.tests import DATA_DIR
+from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import Location
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.mongo import MongoKeyValueStore
@@ -289,6 +290,15 @@ class TestMongoModuleStore(TestMongoModuleStoreBase):
             )
             assert_false(self.draft_store.has_course(mix_cased))
             assert_false(self.draft_store.has_course(mix_cased, ignore_case=True))
+
+    def test_get_mongo_course_with_split_course_key(self):
+        """
+        Test mongo course using split course_key will not able to access it.
+        """
+        course_key = CourseKey.from_string('course-v1:edX+simple+2012_Fall')
+
+        with self.assertRaises(ItemNotFoundError):
+            self.draft_store.get_course(course_key)
 
     def test_has_course_with_library(self):
         """
@@ -767,15 +777,15 @@ class TestMongoKeyValueStore(unittest.TestCase):
     def test_write(self):
         yield (self._check_write, KeyValueStore.Key(Scope.content, None, None, 'foo'), 'new_data')
         yield (self._check_write, KeyValueStore.Key(Scope.children, None, None, 'children'), [])
+        yield (self._check_write, KeyValueStore.Key(Scope.children, None, None, 'parent'), None)
         yield (self._check_write, KeyValueStore.Key(Scope.settings, None, None, 'meta'), 'new_settings')
-        # write Scope.parent raises InvalidScope, which is covered in test_write_invalid_scope
 
     def test_write_non_dict_data(self):
         self.kvs = MongoKeyValueStore('xml_data', self.parent, self.children, self.metadata)
         self._check_write(KeyValueStore.Key(Scope.content, None, None, 'data'), 'new_data')
 
     def test_write_invalid_scope(self):
-        for scope in (Scope.preferences, Scope.user_info, Scope.user_state, Scope.parent):
+        for scope in (Scope.preferences, Scope.user_info, Scope.user_state):
             with assert_raises(InvalidScopeError):
                 self.kvs.set(KeyValueStore.Key(scope, None, None, 'foo'), 'new_value')
 

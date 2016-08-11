@@ -93,12 +93,12 @@ def render_require_js_path_overrides(path_overrides):  # pylint: disable=invalid
 
     For example:
 
-        "js/vendor/jquery.min.js" --> "js/vendor/jquery.min.abcd1234"
+        "js/vendor/jquery.js" --> "js/vendor/jquery.abcd1234"
 
     To achive this we will add overrided paths in requirejs config at runtime.
 
     So that any reference to 'jquery' in a JavaScript module
-    will cause RequireJS to load '/static/js/vendor/jquery.min.abcd1234.js'
+    will cause RequireJS to load '/static/js/vendor/jquery.abcd1234.js'
 
     If running in DEBUG mode (as in devstack), the resolved JavaScript URLs
     won't contain hashes, so the new paths will match the original paths.
@@ -128,17 +128,17 @@ def render_require_js_path_overrides(path_overrides):  # pylint: disable=invalid
     </script>'''
 
     new_paths = []
-    for url_path in path_overrides:
+    for module in path_overrides:
         # Calculate the full URL, including any hashes added to the filename by the pipeline.
         # This will also include the base static URL (for example, "/static/") and the
         # ".js" extension.
-        actual_url = staticfiles_storage.url(url_path)
+        actual_url = staticfiles_storage.url(path_overrides[module])
 
         # RequireJS assumes that every file it tries to load has a ".js" extension, so
         # we need to remove ".js" from the module path.
         # RequireJS also already has a base URL set to the base static URL, so we can remove that.
         path = actual_url.replace('.js', '').replace(django_settings.STATIC_URL, '')
 
-        new_paths.append("'{module}': '{path}'".format(module=url_path.replace('.js', ''), path=path))
+        new_paths.append("'{module}': '{path}'".format(module=module, path=path))
 
     return html.format(overrides=',\n'.join(new_paths))

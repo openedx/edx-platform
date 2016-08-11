@@ -4,11 +4,11 @@ Tests for xblock_utils.py
 from __future__ import unicode_literals, absolute_import
 
 import ddt
+from nose.plugins.attrib import attr
 import uuid
 
 from django.test.client import RequestFactory
 
-from courseware.models import StudentModule  # pylint: disable=import-error
 from lms.djangoapps.lms_xblock.runtime import quote_slashes
 from xblock.fragment import Fragment
 from xmodule.modulestore import ModuleStoreEnum
@@ -22,11 +22,11 @@ from openedx.core.lib.xblock_utils import (
     replace_jump_to_id_urls,
     replace_course_urls,
     replace_static_urls,
-    grade_histogram,
     sanitize_html_id
 )
 
 
+@attr(shard=2)
 @ddt.ddt
 class TestXblockUtils(SharedModuleStoreTestCase):
     """

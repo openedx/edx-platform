@@ -48,7 +48,7 @@ class CreditService(object):
 
         return is_credit_course(course_key)
 
-    def get_credit_state(self, user_id, course_key_or_id, return_course_name=False):
+    def get_credit_state(self, user_id, course_key_or_id, return_course_info=False):
         """
         Return all information about the user's credit state inside of a given
         course.
@@ -66,6 +66,7 @@ class CreditService(object):
                 'is_credit_course': if the course has been marked as a credit bearing course
                 'credit_requirement_status': the user's status in fulfilling those requirements
                 'course_name': optional display name of the course
+                'course_end_date': optional end date of the course
             }
         """
 
@@ -94,14 +95,16 @@ class CreditService(object):
         result = {
             'enrollment_mode': enrollment.mode,
             'profile_fullname': user.profile.name,
+            'student_email': user.email,
             'is_credit_course': is_credit_course(course_key),
             'credit_requirement_status': get_credit_requirement_status(course_key, user.username)
         }
 
-        if return_course_name:
+        if return_course_info:
             course = modulestore().get_course(course_key, depth=0)
             result.update({
                 'course_name': course.display_name,
+                'course_end_date': course.end,
             })
         return result
 

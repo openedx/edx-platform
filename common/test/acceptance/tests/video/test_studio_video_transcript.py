@@ -19,10 +19,10 @@ front-end validation will not pass.
     t_not_exist - this file does not exist on YouTube; it exists locally
 """
 from nose.plugins.attrib import attr
-from .test_studio_video_module import CMSVideoBaseTest
+from common.test.acceptance.tests.video.test_studio_video_module import CMSVideoBaseTest
 
 
-@attr('shard_6')
+@attr(shard=6)
 class VideoTranscriptTest(CMSVideoBaseTest):
     """
     CMS Video Transcript Test Class
@@ -177,7 +177,7 @@ class VideoTranscriptTest(CMSVideoBaseTest):
         self.video.set_url_field('http://youtu.be/t_neq_exist', 1)
         self.assertEqual(self.video.message('status'), 'Timed Transcript Conflict')
         self.assertTrue(self.video.is_transcript_button_visible('replace'))
-        self.video.click_button('replace')
+        self.video.click_button_subtitles()
         self.assertEqual(self.video.message('status'), 'Timed Transcript Found')
         self.open_advanced_tab()
         self.assertTrue(self.video.verify_field_value('Default Timed Transcript', 't_neq_exist'))

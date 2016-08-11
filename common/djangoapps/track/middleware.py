@@ -140,12 +140,11 @@ class TrackMiddleware(object):
             'ip': self.get_request_ip_address(request),
         }
         for header_name, context_key in META_KEY_TO_CONTEXT_KEY.iteritems():
-            context[context_key] = request.META.get(header_name, '')
+            # HTTP headers may contain Latin1 characters. Decoding using Latin1 encoding here
+            # avoids encountering UnicodeDecodeError exceptions when these header strings are
+            # output to tracking logs.
+            context[context_key] = request.META.get(header_name, '').decode('latin1')
 
-        # HTTP_USER_AGENT user might can contain the information that include latin1 characters
-        # decoding this using latin1 scheme will prevent to raise UnicodeDecodeError when using
-        # json.dumps for tracking purpose.
-        context['agent'] = context['agent'].decode('latin1')
         # Google Analytics uses the clientId to keep track of unique visitors. A GA cookie looks like
         # this: _ga=GA1.2.1033501218.1368477899. The clientId is this part: 1033501218.1368477899.
         google_analytics_cookie = request.COOKIES.get('_ga')

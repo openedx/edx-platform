@@ -24,9 +24,10 @@ from xblock.fields import (
     String, Dict, ScopeIds, Reference, ReferenceList,
     ReferenceValueDict, UserScope
 )
+
 from xblock.fragment import Fragment
 from xblock.runtime import Runtime, IdReader, IdGenerator
-from xmodule import course_metadata_utils
+from xmodule import block_metadata_utils
 from xmodule.fields import RelativeTime
 from xmodule.errortracker import exc_info_to_str
 from xmodule.modulestore.exceptions import ItemNotFoundError
@@ -298,6 +299,7 @@ class XModuleMixin(XModuleFields, XBlock):
 
     def __init__(self, *args, **kwargs):
         self.xmodule_runtime = None
+        self._asides = []
 
         super(XModuleMixin, self).__init__(*args, **kwargs)
 
@@ -338,7 +340,7 @@ class XModuleMixin(XModuleFields, XBlock):
 
     @property
     def url_name(self):
-        return course_metadata_utils.url_name_for_course_location(self.location)
+        return block_metadata_utils.url_name_for_block(self)
 
     @property
     def display_name_with_default(self):
@@ -346,7 +348,7 @@ class XModuleMixin(XModuleFields, XBlock):
         Return a display name for the module: use display_name if defined in
         metadata, otherwise convert the url name.
         """
-        return course_metadata_utils.display_name_with_default(self)
+        return block_metadata_utils.display_name_with_default(self)
 
     @property
     def display_name_with_default_escaped(self):
@@ -361,7 +363,14 @@ class XModuleMixin(XModuleFields, XBlock):
         migrate and test switching to display_name_with_default, which is no
         longer escaped.
         """
-        return course_metadata_utils.display_name_with_default_escaped(self)
+        return block_metadata_utils.display_name_with_default_escaped(self)
+
+    @property
+    def tooltip_title(self):
+        """
+        Return the title for the sequence item containing this xmodule as its top level item.
+        """
+        return self.display_name_with_default
 
     @property
     def xblock_kvs(self):
@@ -382,6 +391,18 @@ class XModuleMixin(XModuleFields, XBlock):
         """
         return self._field_data
 
+    def add_aside(self, aside):
+        """
+        save connected asides
+        """
+        self._asides.append(aside)
+
+    def get_asides(self):
+        """
+        get the list of connected asides
+        """
+        return self._asides
+
     def get_explicitly_set_fields_by_scope(self, scope=Scope.content):
         """
         Get a dictionary of the fields for the given scope which are set explicitly on this xblock. (Including
@@ -390,7 +411,15 @@ class XModuleMixin(XModuleFields, XBlock):
         result = {}
         for field in self.fields.values():
             if field.scope == scope and field.is_set_on(self):
-                result[field.name] = field.read_json(self)
+                try:
+                    result[field.name] = field.read_json(self)
+                except TypeError as exception:
+                    exception_message = "{message}, Block-location:{location}, Field-name:{field_name}".format(
+                        message=exception.message,
+                        location=unicode(self.location),
+                        field_name=field.name
+                    )
+                    raise TypeError(exception_message)
         return result
 
     def has_children_at_depth(self, depth):
@@ -1194,7 +1223,7 @@ class ConfigurableFragmentWrapper(object):
     """
     Runtime mixin that allows for composition of many `wrap_xblock` wrappers
     """
-    def __init__(self, wrappers=None, **kwargs):
+    def __init__(self, wrappers=None, wrappers_asides=None, **kwargs):
         """
         :param wrappers: A list of wrappers, where each wrapper is:
 
@@ -1207,6 +1236,10 @@ class ConfigurableFragmentWrapper(object):
             self.wrappers = wrappers
         else:
             self.wrappers = []
+        if wrappers_asides is not None:
+            self.wrappers_asides = wrappers_asides
+        else:
+            self.wrappers_asides = []
 
     def wrap_xblock(self, block, view, frag, context):
         """
@@ -1214,6 +1247,15 @@ class ConfigurableFragmentWrapper(object):
         """
         for wrapper in self.wrappers:
             frag = wrapper(block, view, frag, context)
+
+        return frag
+
+    def wrap_aside(self, block, aside, view, frag, context):    # pylint: disable=unused-argument
+        """
+        See :func:`Runtime.wrap_child`
+        """
+        for wrapper in self.wrappers_asides:
+            frag = wrapper(aside, view, frag, context)
 
         return frag
 
@@ -1329,7 +1371,7 @@ class DescriptorSystem(MetricsMixin, ConfigurableFragmentWrapper, Runtime):
     """
     # pylint: disable=bad-continuation
     def __init__(
-        self, load_item, resources_fs, error_tracker, get_policy=None, disabled_xblock_types=(), **kwargs
+        self, load_item, resources_fs, error_tracker, get_policy=None, disabled_xblock_types=lambda: [], **kwargs
     ):
         """
         load_item: Takes a Location and returns an XModuleDescriptor
@@ -1397,7 +1439,7 @@ class DescriptorSystem(MetricsMixin, ConfigurableFragmentWrapper, Runtime):
         """
         Returns a subclass of :class:`.XBlock` that corresponds to the specified `block_type`.
         """
-        if block_type in self.disabled_xblock_types:
+        if block_type in self.disabled_xblock_types():
             return self.default_class
         return super(DescriptorSystem, self).load_block_type(block_type)
 
@@ -1448,8 +1490,9 @@ class DescriptorSystem(MetricsMixin, ConfigurableFragmentWrapper, Runtime):
         """
         potential_set = set(super(DescriptorSystem, self).applicable_aside_types(block))
         if getattr(block, 'xmodule_runtime', None) is not None:
-            application_set = set(block.xmodule_runtime.applicable_aside_types(block))
-            return list(potential_set.intersection(application_set))
+            if hasattr(block.xmodule_runtime, 'applicable_aside_types'):
+                application_set = set(block.xmodule_runtime.applicable_aside_types(block))
+                return list(potential_set.intersection(application_set))
         return list(potential_set)
 
     def resource_url(self, resource):
@@ -1466,6 +1509,28 @@ class DescriptorSystem(MetricsMixin, ConfigurableFragmentWrapper, Runtime):
     def publish(self, block, event_type, event):
         # A stub publish method that doesn't emit any events from XModuleDescriptors.
         pass
+
+    def service(self, block, service_name):
+        """
+        Runtime-specific override for the XBlock service manager.  If a service is not currently
+        instantiated and is declared as a critical requirement, an attempt is made to load the
+        module.
+
+        Arguments:
+            block (an XBlock): this block's class will be examined for service
+                decorators.
+            service_name (string): the name of the service requested.
+
+        Returns:
+            An object implementing the requested service, or None.
+        """
+        # getting the service from parent module. making sure of block service declarations.
+        service = super(DescriptorSystem, self).service(block=block, service_name=service_name)
+        # Passing the block to service if it is callable e.g. ModuleI18nService. It is the responsibility of calling
+        # service to handle the passing argument.
+        if callable(service):
+            return service(block)
+        return service
 
 
 new_contract('DescriptorSystem', DescriptorSystem)
@@ -1524,12 +1589,18 @@ class XMLParsingSystem(DescriptorSystem):
         keys = ScopeIds(None, block_type, def_id, usage_id)
         block_class = self.mixologist.mix(self.load_block_type(block_type))
 
-        self.parse_asides(node, def_id, usage_id, id_generator)
+        aside_children = self.parse_asides(node, def_id, usage_id, id_generator)
+        asides_tags = [x.tag for x in aside_children]
 
         block = block_class.parse_xml(node, self, keys, id_generator)
         self._convert_reference_fields_to_keys(block)  # difference from XBlock.runtime
         block.parent = parent_id
         block.save()
+
+        asides = self.get_asides(block)
+        for asd in asides:
+            if asd.scope_ids.block_type in asides_tags:
+                block.add_aside(asd)
 
         return block
 
@@ -1547,6 +1618,7 @@ class XMLParsingSystem(DescriptorSystem):
         for child in aside_children:
             self._aside_from_xml(child, def_id, usage_id, id_generator)
             node.remove(child)
+        return aside_children
 
     def _make_usage_key(self, course_key, value):
         """
@@ -1742,6 +1814,28 @@ class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, Runtime):
 
     def publish(self, block, event_type, event):
         pass
+
+    def service(self, block, service_name):
+        """
+        Runtime-specific override for the XBlock service manager.  If a service is not currently
+        instantiated and is declared as a critical requirement, an attempt is made to load the
+        module.
+
+        Arguments:
+            block (an XBlock): this block's class will be examined for service
+                decorators.
+            service_name (string): the name of the service requested.
+
+        Returns:
+            An object implementing the requested service, or None.
+        """
+        # getting the service from parent module. making sure of block service declarations.
+        service = super(ModuleSystem, self).service(block=block, service_name=service_name)
+        # Passing the block to service if it is callable e.g. ModuleI18nService. It is the responsibility of calling
+        # service to handle the passing argument.
+        if callable(service):
+            return service(block)
+        return service
 
 
 class CombinedSystem(object):

@@ -2,19 +2,15 @@
 """
 Module contains utils specific for video_module but not for transcripts.
 """
-import json
+
 from collections import OrderedDict
 import logging
-import urllib
-import requests
 from urllib import urlencode
 from urlparse import parse_qs, urlsplit, urlunsplit, urlparse
 
 from django.conf import settings
 from django.core.validators import URLValidator
 from django.core.exceptions import ValidationError
-
-from requests.exceptions import RequestException
 
 log = logging.getLogger(__name__)
 
@@ -100,6 +96,19 @@ def get_poster(video):
         poster["type"] = "html5"
 
     return poster
+
+
+def format_xml_exception_message(location, key, value):
+    """
+    Generate exception message for VideoDescriptor class which will use for ValueError and UnicodeDecodeError
+    when setting xml attributes.
+    """
+    exception_message = "Block-location:{location}, Key:{key}, Value:{value}".format(
+        location=unicode(location),
+        key=key,
+        value=value
+    )
+    return exception_message
 
 
 def set_query_parameter(url, param_name, param_value):

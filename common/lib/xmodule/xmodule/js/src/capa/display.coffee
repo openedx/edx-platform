@@ -5,6 +5,7 @@ class @Problem
     @id = @el.data('problem-id')
     @element_id = @el.attr('id')
     @url = @el.data('url')
+    @content = @el.data('content')
 
     # has_timed_out and has_response are used to ensure that are used to
     # ensure that we wait a minimum of ~ 1s before transitioning the check
@@ -12,7 +13,7 @@ class @Problem
     @has_timed_out = false
     @has_response = false
 
-    @render()
+    @render(@content)
 
   $: (selector) ->
     $(selector, @el)
@@ -49,6 +50,8 @@ class @Problem
       window.globalTooltipManager.hide()
 
     @bindResetCorrectness()
+    if @checkButton.length
+      @checkAnswersAndCheckButton true
 
     # Collapsibles
     Collapsible.setCollapsibles(@el)
@@ -63,8 +66,8 @@ class @Problem
     detail = @el.data('progress_detail')
     status = @el.data('progress_status')
 
-    # Render 'x/y point(s)' if student has attempted question
-    if status != 'none' and detail? and detail.indexOf('/') > 0
+    # Render 'x/y point(s)' if student has attempted question 
+    if status != 'none' and detail? and (jQuery.type(detail) == "string") and detail.indexOf('/') > 0
         a = detail.split('/')
         earned = parseFloat(a[0])
         possible = parseFloat(a[1])
@@ -74,7 +77,7 @@ class @Problem
         progress = interpolate(progress_template, {'earned': earned, 'possible': possible}, true)
 
     # Render 'x point(s) possible' if student has not yet attempted question
-    if status == 'none' and detail? and detail.indexOf('/') > 0
+    if status == 'none' and detail? and (jQuery.type(detail) == "string") and detail.indexOf('/') > 0
         a = detail.split('/')
         possible = parseFloat(a[1])
         `// Translators: %(num_points)s is the number of points possible (examples: 1, 3, 10). There will always be at least 1 point possible.`
@@ -158,6 +161,7 @@ class @Problem
         @setupInputTypes()
         @bind()
         @queueing()
+        @renderProgressState()
       @el.attr('aria-busy', 'false')
     else
       $.postWithPrefix "#{@url}/problem_get", (response) =>
@@ -313,6 +317,7 @@ class @Problem
       switch response.success
         when 'incorrect', 'correct'
           window.SR.readElts($(response.contents).find('.status'))
+          @el.trigger('contentChanged', [@id, response.contents])
           @render(response.contents)
           @updateProgress response
           if @el.hasClass 'showed'
@@ -328,6 +333,7 @@ class @Problem
   reset_internal: =>
     Logger.log 'problem_reset', @answers
     $.postWithPrefix "#{@url}/problem_reset", id: @id, (response) =>
+        @el.trigger('contentChanged', [@id, response.html])
         @render(response.html)
         @updateProgress response
 
@@ -416,6 +422,8 @@ class @Problem
     Logger.log 'problem_save', @answers
     $.postWithPrefix "#{@url}/problem_save", @answers, (response) =>
       saveMessage = response.msg
+      if response.success
+        @el.trigger('contentChanged', [@id, response.html])
       @gentle_alert saveMessage
       @updateProgress response
 
@@ -450,6 +458,58 @@ class @Problem
     @$(".CodeMirror").each (index, element) ->
       element.CodeMirror.save() if element.CodeMirror.save
     @answers = @inputs.serialize()
+
+  checkAnswersAndCheckButton: (bind=false) =>
+    # Used to check available answers and if something is checked (or the answer is set in some textbox)
+    # "Check"/"Final check" button becomes enabled. Otherwise it is disabled by default.
+    # params:
+    #   'bind' used on the first check to attach event handlers to input fields
+    #     to change "Check"/"Final check" enable status in case of some manipulations with answers
+    answered = true
+
+    at_least_one_text_input_found = false
+    one_text_input_filled = false
+    @el.find("input:text").each (i, text_field) =>
+      if $(text_field).is(':visible')
+        at_least_one_text_input_found = true
+        if $(text_field).val() isnt ''
+          one_text_input_filled = true
+        if bind
+          $(text_field).on 'input', (e) =>
+            @checkAnswersAndCheckButton()
+            return
+          return
+    if at_least_one_text_input_found and not one_text_input_filled
+      answered = false
+
+    @el.find(".choicegroup").each (i, choicegroup_block) =>
+      checked = false
+      $(choicegroup_block).find("input[type=checkbox], input[type=radio]").each (j, checkbox_or_radio) =>
+        if $(checkbox_or_radio).is(':checked')
+          checked = true
+        if bind
+          $(checkbox_or_radio).on 'click', (e) =>
+            @checkAnswersAndCheckButton()
+            return
+          return
+      if not checked
+        answered = false
+        return
+
+    @el.find("select").each (i, select_field) =>
+      selected_option = $(select_field).find("option:selected").text().trim()
+      if selected_option is ''
+        answered = false
+      if bind
+        $(select_field).on 'change', (e) =>
+          @checkAnswersAndCheckButton()
+          return
+        return
+
+    if answered
+      @enableCheckButton true
+    else
+      @enableCheckButton false, false
 
   bindResetCorrectness: ->
     # Loop through all input types

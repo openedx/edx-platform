@@ -1,19 +1,19 @@
-define(['common/js/spec_helpers/ajax_helpers', 'js/shoppingcart/shoppingcart'],
+define(['edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'js/shoppingcart/shoppingcart'],
     function(AjaxHelpers) {
         'use strict';
 
-        describe("edx.shoppingcart.showcart.CartView", function() {
+        describe('edx.shoppingcart.showcart.CartView', function() {
             var view = null;
             var requests = null;
 
             beforeEach(function() {
-                setFixtures('<section class="wrapper confirm-enrollment shopping-cart cart-view"><form action="" method="post"><input type="hidden" name="" value="" /><i class="icon fa fa-caret-right"></i><input type="submit" value="Payment"/></form></section>');
+                setFixtures('<section class="wrapper confirm-enrollment shopping-cart cart-view"><form action="" method="post"><input type="hidden" name="" value="" /><span class="icon fa fa-caret-right"></span><input type="submit" value="Payment"/></form></section>'); // eslint-disable-line max-len
 
                 view = new edx.shoppingcart.showcart.CartView({
                     el: $('.confirm-enrollment.cart-view form')
                 });
 
-                spyOn(view, 'responseFromServer').andCallFake(function() {});
+                spyOn(view, 'responseFromServer').and.callFake(function() {});
 
                 // Spy on AJAX requests
                 requests = AjaxHelpers.requests(this);
@@ -23,11 +23,11 @@ define(['common/js/spec_helpers/ajax_helpers', 'js/shoppingcart/shoppingcart'],
                 // Verify that the client contacts the server to
                 // check for all th valid cart items
                 AjaxHelpers.expectRequest(
-                    requests, "GET", "/shoppingcart/verify_cart/"
+                    requests, 'GET', '/shoppingcart/verify_cart/'
                 );
             });
 
-            it("cart has invalid items, course enrollment has been closed", function() {
+            it('cart has invalid items, course enrollment has been closed', function() {
                 // Simulate a response from the server containing the
                 // parameter 'is_course_enrollment_closed'. This decides that
                 // do we have all the cart items valid in the cart or not
@@ -36,23 +36,21 @@ define(['common/js/spec_helpers/ajax_helpers', 'js/shoppingcart/shoppingcart'],
                 });
 
                 expect(view.responseFromServer).toHaveBeenCalled();
-                var data = view.responseFromServer.mostRecentCall.args[0]
+                var data = view.responseFromServer.calls.mostRecent().args[0];
                 expect(data.is_course_enrollment_closed).toBe(true);
-
             });
 
-            it("cart has all valid items, course enrollment is still open", function() {
+            it('cart has all valid items, course enrollment is still open', function() {
                 // Simulate a response from the server containing the
                 // parameter 'is_course_enrollment_closed'. This decides that
                 // do we have all the cart items valid in the cart or not
-                 AjaxHelpers.respondWithJson(requests, {
+                AjaxHelpers.respondWithJson(requests, {
                     is_course_enrollment_closed: false
                 });
 
                 expect(view.responseFromServer).toHaveBeenCalled();
-                var data = view.responseFromServer.mostRecentCall.args[0]
+                var data = view.responseFromServer.calls.mostRecent().args[0];
                 expect(data.is_course_enrollment_closed).toBe(false);
-
             });
         });
     }

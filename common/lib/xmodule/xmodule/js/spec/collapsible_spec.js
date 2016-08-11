@@ -1,21 +1,21 @@
-(function (undefined) {
+(function(undefined) {
     'use strict';
 
-    describe('Collapsible', function () {
+    describe('Collapsible', function() {
         var el, html, html_custom,
-            initialize = function (template) {
+            initialize = function(template) {
                 setFixtures(template);
                 el = $('.collapsible');
                 Collapsible.setCollapsibles(el);
             },
-            disableFx = function () {
+            disableFx = function() {
                 $.fx.off = true;
             },
-            enableFx = function () {
+            enableFx = function() {
                 $.fx.off = false;
             };
 
-        beforeEach(function () {
+        beforeEach(function() {
             html = '' +
                 '<section class="collapsible">' +
                     '<div class="shortform">shortform message</div>' +
@@ -36,28 +36,28 @@
                 '</section>';
         });
 
-        describe('setCollapsibles', function () {
-            it('Default container initialized correctly', function () {
+        describe('setCollapsibles', function() {
+            it('Default container initialized correctly', function() {
                 initialize(html);
 
-                expect(el.find('.shortform')).toContain('.full-top');
-                expect(el.find('.shortform')).toContain('.full-bottom');
+                expect(el.find('.shortform')).toContainElement('.full-top');
+                expect(el.find('.shortform')).toContainElement('.full-bottom');
                 expect(el.find('.longform')).toBeHidden();
                 expect(el.find('.full')).toHandle('click');
             });
 
-            it('Custom container initialized correctly', function () {
+            it('Custom container initialized correctly', function() {
                 initialize(html_custom);
 
-                expect(el.find('.shortform-custom')).toContain('.full-custom');
+                expect(el.find('.shortform-custom')).toContainElement('.full-custom');
                 expect(el.find('.full-custom')).toHaveText('Show shortform-custom');
                 expect(el.find('.longform')).toBeHidden();
                 expect(el.find('.full-custom')).toHandle('click');
             });
         });
 
-        describe('toggleFull', function () {
-            var assertChanges = function (state, anchorsElClass, showText, hideText) {
+        describe('toggleFull', function() {
+            var assertChanges = function(state, anchorsElClass, showText, hideText) {
                 var anchors, text;
 
                 if (state == null) {
@@ -76,20 +76,20 @@
                     text = hideText;
                 }
 
-                $.each(anchors, function (index, el) {
+                $.each(anchors, function(index, el) {
                     expect(el).toHaveText(text);
                 });
             };
 
-            beforeEach(function () {
+            beforeEach(function() {
                 disableFx();
             });
 
-            afterEach(function () {
+            afterEach(function() {
                 enableFx();
             });
 
-            it('Default container', function () {
+            it('Default container', function() {
                 var event;
 
                 initialize(html);
@@ -105,7 +105,7 @@
                 assertChanges('closed', 'full', 'See full output', 'Hide output');
             });
 
-            it('Custom container', function () {
+            it('Custom container', function() {
                 var event;
 
                 initialize(html_custom);

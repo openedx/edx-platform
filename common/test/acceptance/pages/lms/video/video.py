@@ -57,7 +57,8 @@ VIDEO_MENUS = {
     'language': '.lang .menu',
     'speed': '.speed .menu',
     'download_transcript': '.video-tracks .a11y-menu-list',
-    'transcript-format': '.video-tracks .a11y-menu-button'
+    'transcript-format': '.video-tracks .a11y-menu-button',
+    'transcript-skip': '.sr-is-focusable.transcript-start',
 }
 
 
@@ -841,6 +842,7 @@ class VideoPage(PageObject):
             return self.state != 'buffering'
 
         self._wait_for(_is_buffering_completed, 'Buffering completed after Seek.')
+        self.wait_for_position(seek_value)
 
     def reload_page(self):
         """
@@ -905,6 +907,17 @@ class VideoPage(PageObject):
 
         classes = self.q(css=selector).attrs('class')[0].split()
         return 'active' in classes
+
+    @property
+    def is_transcript_skip_visible(self):
+        """
+        Checks if the skip-to containers in transcripts are present and visible.
+
+        Returns:
+            bool
+        """
+        selector = self.get_element_selector(VIDEO_MENUS['transcript-skip'])
+        return self.q(css=selector).visible
 
     def wait_for_captions(self):
         """

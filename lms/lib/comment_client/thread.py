@@ -20,7 +20,7 @@ class Thread(models.Model):
         'highlighted_body', 'endorsed', 'read', 'group_id', 'group_name', 'pinned',
         'abuse_flaggers', 'resp_skip', 'resp_limit', 'resp_total', 'thread_type',
         'endorsed_responses', 'non_endorsed_responses', 'non_endorsed_resp_total',
-        'context',
+        'context', 'last_activity_at',
     ]
 
     # updateable_fields are sent in PUT requests

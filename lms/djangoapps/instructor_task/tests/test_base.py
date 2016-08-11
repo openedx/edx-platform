@@ -4,14 +4,14 @@ Base test classes for LMS instructor-initiated background tasks
 """
 import os
 import json
-from mock import Mock
+from mock import Mock, patch
 import shutil
+from tempfile import mkdtemp
 import unicodecsv
 from uuid import uuid4
 
 from celery.states import SUCCESS, FAILURE
 from django.core.urlresolvers import reverse
-from django.conf import settings
 from django.test.testcases import TestCase
 from django.contrib.auth.models import User
 from lms.djangoapps.lms_xblock.runtime import quote_slashes
@@ -176,7 +176,7 @@ class InstructorTaskCourseTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase)
     def get_task_status(task_id):
         """Use api method to fetch task status, using mock request."""
         mock_request = Mock()
-        mock_request.REQUEST = {'task_id': task_id}
+        mock_request.GET = mock_request.POST = {'task_id': task_id}
         response = instructor_task_status(mock_request)
         status = json.loads(response.content)
         return status
@@ -291,10 +291,30 @@ class TestReportMixin(object):
     """
     Cleans up after tests that place files in the reports directory.
     """
-    def tearDown(self):
-        reports_download_path = settings.GRADES_DOWNLOAD['ROOT_PATH']
-        if os.path.exists(reports_download_path):
-            shutil.rmtree(reports_download_path)
+    def setUp(self):
+
+        def clean_up_tmpdir():
+            """Remove temporary directory created for instructor task models."""
+            if os.path.exists(self.tmp_dir):
+                shutil.rmtree(self.tmp_dir)
+
+        super(TestReportMixin, self).setUp()
+
+        # Ensure that working with the temp directories in tests is thread safe
+        # by creating a unique temporary directory for each testcase.
+        self.tmp_dir = mkdtemp()
+
+        mock_grades_download = {'STORAGE_TYPE': 'localfs', 'BUCKET': 'test-grades', 'ROOT_PATH': self.tmp_dir}
+        self.grades_patch = patch.dict('django.conf.settings.GRADES_DOWNLOAD', mock_grades_download)
+        self.grades_patch.start()
+        self.addCleanup(self.grades_patch.stop)
+
+        mock_fin_report = {'STORAGE_TYPE': 'localfs', 'BUCKET': 'test-financial-reports', 'ROOT_PATH': self.tmp_dir}
+        self.reports_patch = patch.dict('django.conf.settings.FINANCIAL_REPORTS', mock_fin_report)
+        self.reports_patch.start()
+        self.addCleanup(self.reports_patch.stop)
+
+        self.addCleanup(clean_up_tmpdir)
 
     def verify_rows_in_csv(self, expected_rows, file_index=0, verify_order=True, ignore_other_columns=False):
         """
@@ -317,7 +337,8 @@ class TestReportMixin(object):
         """
         report_store = ReportStore.from_config(config_name='GRADES_DOWNLOAD')
         report_csv_filename = report_store.links_for(self.course.id)[file_index][0]
-        with open(report_store.path_to(self.course.id, report_csv_filename)) as csv_file:
+        report_path = report_store.path_to(self.course.id, report_csv_filename)
+        with report_store.storage.open(report_path) as csv_file:
             # Expand the dict reader generator so we don't lose it's content
             csv_rows = [row for row in unicodecsv.DictReader(csv_file)]
 
@@ -330,3 +351,14 @@ class TestReportMixin(object):
                 self.assertEqual(csv_rows, expected_rows)
             else:
                 self.assertItemsEqual(csv_rows, expected_rows)
+
+    def get_csv_row_with_headers(self):
+        """
+        Helper function to return list with the column names from the CSV file (the first row)
+        """
+        report_store = ReportStore.from_config(config_name='GRADES_DOWNLOAD')
+        report_csv_filename = report_store.links_for(self.course.id)[0][0]
+        report_path = report_store.path_to(self.course.id, report_csv_filename)
+        with report_store.storage.open(report_path) as csv_file:
+            rows = unicodecsv.reader(csv_file, encoding='utf-8')
+            return rows.next()

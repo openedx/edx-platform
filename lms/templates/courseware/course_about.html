@@ -17,7 +17,10 @@ from openedx.core.lib.courses import course_image_url
 </%block>
 
 <%block name="js_extra">
-
+  ## CourseTalk widget js script
+  % if show_coursetalk_widget:
+      <script src="//d3q6qq2zt8nhwv.cloudfront.net/s/js/widgets/coursetalk-read-reviews.js"></script>
+  % endif
   <script type="text/javascript">
   (function() {
     $(".register").click(function(event) {
@@ -39,6 +42,7 @@ from openedx.core.lib.courses import course_image_url
             location.href = "${reg_then_add_to_cart_link}";
         }
       };
+
       $("#add_to_cart_post").click(function(event){
         $.ajax({
           url: "${reverse('add_course_to_cart', args=[course.id.to_deprecated_string()])}",
@@ -108,12 +112,12 @@ from openedx.core.lib.courses import course_image_url
     <div class="intro-inner-wrapper">
       <div class="table">
       <section class="intro">
-        <hgroup>
+        <div class="heading-group">
           <h1>
             ${course.display_name_with_default_escaped}
             <a href="#">${course.display_org_with_default | h}</a>
           </h1>
-        </hgroup>
+        </div>
 
         <div class="main-cta">
         %if user.is_authenticated() and registered:
@@ -152,14 +156,27 @@ from openedx.core.lib.courses import course_image_url
             reg_href = reg_then_add_to_cart_link
             reg_element_id = "reg_then_add_to_cart"
           %>
+          <% if ecommerce_checkout:
+              reg_href = ecommerce_checkout_link
+              reg_element_id = ""
+          %>
           <a href="${reg_href}" class="add-to-cart" id="${reg_element_id}">
             ${_("Add {course_name} to Cart <span>({price} USD)</span>")\
               .format(course_name=course.display_number_with_default, price=course_price)}
-
           </a>
           <div id="register_error"></div>
         %else:
-          <a href="#" class="register">
+          <% 
+            if ecommerce_checkout:
+              reg_href = ecommerce_checkout_link
+            else:
+              reg_href="#"
+            if professional_mode:
+              href_class = "add-to-cart"
+            else:
+              href_class = "register"
+          %>
+          <a href="${reg_href}" class="${href_class}">
             ${_("Enroll in {course_name}").format(course_name=course.display_number_with_default) | h}
           </a>
           <div id="register_error"></div>
@@ -185,43 +202,34 @@ from openedx.core.lib.courses import course_image_url
       </div>
   </header>
 
-  <section class="container">
-    <section class="details">
+  <div class="container">
+    <div class="details">
       % if staff_access and studio_url is not None:
         <div class="wrap-instructor-info studio-view">
           <a class="instructor-info-action" href="${studio_url}">${_("View About Page in studio")}</a>
         </div>
       % endif
 
-      <nav aria-label="${_('Course About')}">
-        <a href="#" class="active">${_("Overview")}</a>
-      ##  <a href="#">${_("FAQ")}</a>
-      ##  <a href="#">${_("Requirements")}</a>
-      ##  <a href="#">${_("Text-book")}</a>
-      ##  <a href="#">${_("Syllabus")}</a>
-      ##  <a href="#">${_("Reviews")}</a>
-      </nav>
-
       <div class="inner-wrapper">
         ${get_course_about_section(request, course, "overview")}
       </div>
-    </section>
+  </div>
 
-    <section class="course-sidebar">
-      <section class="course-summary">
+    <div class="course-sidebar">
+      <div class="course-summary">
 
         <%include file="course_about_sidebar_header.html" />
 
         <ol class="important-dates">
-          <li class="important-dates-item"><i class="icon fa fa-info-circle"></i><p class="important-dates-item-title">${_("Course Number")}</p><span class="important-dates-item-text course-number">${course.display_number_with_default | h}</span></li>
+          <li class="important-dates-item"><span class="icon fa fa-info-circle" aria-hidden="true"></span><p class="important-dates-item-title">${_("Course Number")}</p><span class="important-dates-item-text course-number">${course.display_number_with_default | h}</span></li>
           % if not course.start_date_is_still_default:
-            <li class="important-dates-item"><i class="icon fa fa-calendar"></i><p class="important-dates-item-title">${_("Classes Start")}</p><span class="important-dates-item-text start-date">${course.start_datetime_text()}</span></li>
+            <li class="important-dates-item"><span class="icon fa fa-calendar" aria-hidden="true"></span><p class="important-dates-item-title">${_("Classes Start")}</p><span class="important-dates-item-text start-date">${course.start_datetime_text()}</span></li>
           % endif
             ## We plan to ditch end_date (which is not stored in course metadata),
             ## but for backwards compatibility, show about/end_date blob if it exists.
             % if get_course_about_section(request, course, "end_date") or course.end:
             <li class="important-dates-item">
-                <i class="icon fa fa-calendar"></i>
+                <span class="icon fa fa-calendar" aria-hidden="true"></span>
                 <p class="important-dates-item-title">${_("Classes End")}</p>
                 <span class="important-dates-item-text final-date">
                     % if get_course_about_section(request, course, "end_date"):
@@ -234,14 +242,14 @@ from openedx.core.lib.courses import course_image_url
             % endif
 
           % if get_course_about_section(request, course, "effort"):
-            <li class="important-dates-item"><i class="icon fa fa-pencil"></i><p class="important-dates-item-title">${_("Estimated Effort")}</p><span class="important-dates-item-text effort">${get_course_about_section(request, course, "effort")}</span></li>
+            <li class="important-dates-item"><span class="icon fa fa-pencil" aria-hidden="true"></span><p class="important-dates-item-title">${_("Estimated Effort")}</p><span class="important-dates-item-text effort">${get_course_about_section(request, course, "effort")}</span></li>
           % endif
 
-          ##<li class="important-dates-item"><i class="icon fa fa-clock-o"></i><p class="important-dates-item-title">${_('Course Length')}</p><span class="important-dates-item-text course-length">${_('{number} weeks').format(number=15)}</span></li>
+          ##<li class="important-dates-item"><span class="icon fa fa-clock-o" aria-hidden="true"></span><p class="important-dates-item-title">${_('Course Length')}</p><span class="important-dates-item-text course-length">${_('{number} weeks').format(number=15)}</span></li>
 
           %if course_price and (can_add_course_to_cart or is_cosmetic_price_enabled):
             <li class="important-dates-item">
-              <i class="icon fa fa-money"></i>
+              <span class="icon fa fa-money" aria-hidden="true"></span>
               <p class="important-dates-item-title">${_("Price")}</p>
               <span class="important-dates-item-text">${course_price}</span>
             </li>
@@ -250,7 +258,7 @@ from openedx.core.lib.courses import course_image_url
           % if pre_requisite_courses:
           <% prc_target = reverse('about_course', args=[unicode(pre_requisite_courses[0]['key'])]) %>
           <li class="prerequisite-course important-dates-item">
-            <i class="icon fa fa-list-ul"></i>
+            <span class="icon fa fa-list-ul" aria-hidden="true"></span>
             <p class="important-dates-item-title">${_("Prerequisites")}</p>
             ## Multiple pre-requisite courses are not supported on frontend that's why we are pulling first element
             <span class="important-dates-item-text pre-requisite"><a href="${prc_target}">${pre_requisite_courses[0]['display']}</a></span>
@@ -264,30 +272,37 @@ from openedx.core.lib.courses import course_image_url
           </li>
           % endif
           % if get_course_about_section(request, course, "prerequisites"):
-            <li class="important-dates-item"><i class="icon fa fa-book"></i><p class="important-dates-item-title">${_("Requirements")}</p><span class="important-dates-item-text prerequisites">${get_course_about_section(request, course, "prerequisites")}</span></li>
+            <li class="important-dates-item"><span class="icon fa fa-book" aria-hidden="true"></span><p class="important-dates-item-title">${_("Requirements")}</p><span class="important-dates-item-text prerequisites">${get_course_about_section(request, course, "prerequisites")}</span></li>
           % endif
         </ol>
-      </section>
+    </div>
 
+      ## CourseTalk widget
+      % if show_coursetalk_widget:
+      <div class="coursetalk-read-reviews">
+          <div id="ct-custom-read-review-widget" data-provider="${platform_key}" data-course="${course_review_key}"></div>
+      </div>
+      % endif
 
       ## For now, ocw links are the only thing that goes in additional resources
       % if get_course_about_section(request, course, "ocw_links"):
-      <section class="additional-resources">
+      <div class="additional-resources">
         <header>
           <h1>${_("Additional Resources")}</h1>
-        </header>
+      </div>
 
-        <section>
+        <div>
           ## "MITOpenCourseware" should *not* be translated
           <h2 class="opencourseware">MITOpenCourseware</h2>
              ${get_course_about_section(request, course, "ocw_links")}
-        </section>
-      </section>
+        </div>
+    </div>
       %endif
-    </section>
 
-  </section>
-</section>
+  </div>
+
+  </div>
+</div>
 
 ## Need to put this hidden form on the page so that the registration button works.
 ## Since it's no harm to display a hidden form, we display it with the most permissive conditional

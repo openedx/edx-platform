@@ -4,7 +4,7 @@ Mixins for fields.
 """
 from bok_choy.promise import EmptyPromise
 
-from ...tests.helpers import get_selected_option_text, select_option_by_text
+from common.test.acceptance.tests.helpers import get_selected_option_text, select_option_by_text
 
 
 class FieldsMixin(object):
@@ -104,7 +104,7 @@ class FieldsMixin(object):
         """
         self.wait_for_field(field_id)
 
-        query = self.q(css='.u-field-{} .u-field-message i'.format(field_id))
+        query = self.q(css='.u-field-{} .u-field-message .fa'.format(field_id))
         return [
             class_name for class_name
             in query.attrs('class')[0].split(' ')
@@ -133,7 +133,9 @@ class FieldsMixin(object):
 
         if 'mode-placeholder' in field_classes or 'mode-display' in field_classes:
             if field_id == 'bio':
-                self.q(css='.u-field-bio > .wrapper-u-field').first.click()
+                bio_field_selector = '.u-field-bio > .wrapper-u-field'
+                self.wait_for_element_visibility(bio_field_selector, 'Bio field is visible')
+                self.browser.execute_script("$('" + bio_field_selector + "').click();")
             else:
                 self.q(css='.u-field-{}'.format(field_id)).first.click()
 
@@ -228,13 +230,13 @@ class FieldsMixin(object):
             "Link field with link title \"{0}\" is visible.".format(expected_title)
         ).fulfill()
 
-    def click_on_link_in_link_field(self, field_id):
+    def click_on_link_in_link_field(self, field_id, field_type='a'):
         """
         Click the link in a link field.
         """
         self.wait_for_field(field_id)
 
-        query = self.q(css='.u-field-{} a'.format(field_id))
+        query = self.q(css='.u-field-{} {}'.format(field_id, field_type))
         if query.present:
             query.first.click()
 

@@ -1,7 +1,9 @@
 """
 Tests for the gating API
 """
-from mock import patch, MagicMock
+
+from mock import patch
+from nose.plugins.attrib import attr
 from ddt import ddt, data
 from milestones.tests.utils import MilestonesTestCaseMixin
 from milestones import api as milestones_api
@@ -9,10 +11,11 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, TEST_DAT
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from openedx.core.lib.gating import api as gating_api
 from openedx.core.lib.gating.exceptions import GatingValidationError
+from student.tests.factories import UserFactory
 
 
+@attr(shard=2)
 @ddt
-@patch.dict('django.conf.settings.FEATURES', {'MILESTONES_APP': True})
 class TestGatingApi(ModuleStoreTestCase, MilestonesTestCaseMixin):
     """
     Tests for the gating API
@@ -152,19 +155,23 @@ class TestGatingApi(ModuleStoreTestCase, MilestonesTestCaseMixin):
         self.assertIsNone(min_score)
 
     def test_get_gated_content(self):
-        """ Test test_get_gated_content """
+        """
+        Verify staff bypasses gated content and student gets list of unfulfilled prerequisites.
+        """
 
-        mock_user = MagicMock()
-        mock_user.id.return_value = 1
+        staff = UserFactory(is_staff=True)
+        student = UserFactory(is_staff=False)
 
-        self.assertEqual(gating_api.get_gated_content(self.course, mock_user), [])
+        self.assertEqual(gating_api.get_gated_content(self.course, staff), [])
+        self.assertEqual(gating_api.get_gated_content(self.course, student), [])
 
         gating_api.add_prerequisite(self.course.id, self.seq1.location)
         gating_api.set_required_content(self.course.id, self.seq2.location, self.seq1.location, 100)
         milestone = milestones_api.get_course_content_milestones(self.course.id, self.seq2.location, 'requires')[0]
 
-        self.assertEqual(gating_api.get_gated_content(self.course, mock_user), [unicode(self.seq2.location)])
+        self.assertEqual(gating_api.get_gated_content(self.course, staff), [])
+        self.assertEqual(gating_api.get_gated_content(self.course, student), [unicode(self.seq2.location)])
 
-        milestones_api.add_user_milestone({'id': mock_user.id}, milestone)
+        milestones_api.add_user_milestone({'id': student.id}, milestone)  # pylint: disable=no-member
 
-        self.assertEqual(gating_api.get_gated_content(self.course, mock_user), [])
+        self.assertEqual(gating_api.get_gated_content(self.course, student), [])

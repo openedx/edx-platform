@@ -9,6 +9,7 @@ from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.exceptions import ItemNotFoundError
 
 
 class TestArgParsing(unittest.TestCase):
@@ -59,7 +60,7 @@ class TestMigrateToSplit(ModuleStoreTestCase):
     """
 
     def setUp(self):
-        super(TestMigrateToSplit, self).setUp(create_user=True)
+        super(TestMigrateToSplit, self).setUp()
         self.course = CourseFactory(default_store=ModuleStoreEnum.Type.mongo)
 
     def test_user_email(self):
@@ -107,6 +108,17 @@ class TestMigrateToSplit(ModuleStoreTestCase):
             "org.dept", "name", "run",
         )
         split_store = modulestore()._get_modulestore_by_type(ModuleStoreEnum.Type.split)
-        locator = split_store.make_course_key(self.course.id.org, self.course.id.course, self.course.id.run)
-        course_from_split = modulestore().get_course(locator)
+        locator = split_store.make_course_key("org.dept", "name", "run")
+        course_from_split = split_store.get_course(locator)
         self.assertIsNotNone(course_from_split)
+
+        # Getting the original course with mongo course_id
+        mongo_store = modulestore()._get_modulestore_by_type(ModuleStoreEnum.Type.mongo)
+        mongo_locator = mongo_store.make_course_key(self.course.id.org, self.course.id.course, self.course.id.run)
+        course_from_mongo = mongo_store.get_course(mongo_locator)
+        self.assertIsNotNone(course_from_mongo)
+
+        # Throws ItemNotFoundError when try to access original course with split course_id
+        split_locator = split_store.make_course_key(self.course.id.org, self.course.id.course, self.course.id.run)
+        with self.assertRaises(ItemNotFoundError):
+            mongo_store.get_course(split_locator)

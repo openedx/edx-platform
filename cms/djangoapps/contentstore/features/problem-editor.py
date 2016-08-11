@@ -125,6 +125,9 @@ def my_display_name_change_is_persisted_on_save(step):
 
 @step('the problem display name is "(.*)"$')
 def verify_problem_display_name(step, name):
+    """
+    name is uppercased because the heading styles are uppercase in css
+    """
     assert_equal(name, world.browser.find_by_css('.problem-header').text)
 
 

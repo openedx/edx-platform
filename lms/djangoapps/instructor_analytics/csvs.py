@@ -14,20 +14,26 @@ def create_csv_response(filename, header, datarows):
 
     header   e.g. ['Name', 'Email']
     datarows e.g. [['Jim', 'jim@edy.org'], ['Jake', 'jake@edy.org'], ...]
+
+    The data in `header` and `datarows` must be either Unicode strings,
+    or ASCII-only bytestrings.
+
     """
     response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = 'attachment; filename={0}'\
-        .format(filename)
+    response['Content-Disposition'] = 'attachment; filename={0}'.format(filename)
     csvwriter = csv.writer(
         response,
         dialect='excel',
         quotechar='"',
         quoting=csv.QUOTE_ALL)
 
-    csvwriter.writerow(header)
+    encoded_header = [unicode(s).encode('utf-8') for s in header]
+    csvwriter.writerow(encoded_header)
+
     for datarow in datarows:
         encoded_row = [unicode(s).encode('utf-8') for s in datarow]
         csvwriter.writerow(encoded_row)
+
     return response
 
 

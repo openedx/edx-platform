@@ -1,9 +1,10 @@
+<%page expression_filter="h"/>
 <%inherit file="base.html" />
 <%def name="online_help_token()"><% return "course_rerun" %></%def>
 <%!
 from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse
-from django.template.defaultfilters import escapejs
+from openedx.core.djangolib.js_utils import js_escaped_string
 %>
 
 <%block name="title">${_("Create a Course Rerun of:")}</%block>
@@ -11,7 +12,7 @@ from django.template.defaultfilters import escapejs
 
 <%block name="jsextra">
   <script type="text/javascript">
-    var source_course_key = "${source_course_key | escapejs}";
+    var source_course_key = "${source_course_key | n, js_escaped_string}";
   </script>
 </%block>
 <%block name="requirejs">
@@ -39,8 +40,8 @@ from django.template.defaultfilters import escapejs
 
       <h2 class="page-header-super course-original">
         <span class="sr">${_("You are creating a re-run from:")}</span>
-        <span class="course-original-title-id">${source_course_key.org | h} ${source_course_key.course | h} ${source_course_key.run | h}</span>
-        <span class="course-original-title">${display_name | h}</span>
+        <span class="course-original-title-id">${source_course_key.org} ${source_course_key.course} ${source_course_key.run}</span>
+        <span class="course-original-title">${display_name}</span>
       </h2>
     </header>
   </div>
@@ -73,7 +74,7 @@ from django.template.defaultfilters import escapejs
                   <ol class="list-input">
                     <li class="field text required" id="field-course-name">
                       <label for="rerun-course-name">${_("Course Name")}</label>
-                      <input class="rerun-course-name" id="rerun-course-name" type="text" name="rerun-course-name" aria-required="true" value="${display_name | h}" placeholder="${_('e.g. Introduction to Computer Science')}" />
+                      <input class="rerun-course-name" id="rerun-course-name" type="text" name="rerun-course-name" aria-required="true" value="${display_name}" placeholder="${_('e.g. Introduction to Computer Science')}" />
                       <span class="tip">
                         ${_("The public display name for the new course. (This name is often the same as the original course name.)")}
                       </span>
@@ -92,7 +93,7 @@ from django.template.defaultfilters import escapejs
                     <li class="row">
                       <div class="column field text required" id="field-course-number">
                         <label for="rerun-course-number">${_("Course Number")}</label>
-                        <input class="rerun-course-number" id="rerun-course-number" type="text" name="rerun-course-number" aria-required="true" value="${source_course_key.course | h}" placeholder="${_('e.g. CS101')}" />
+                        <input class="rerun-course-number" id="rerun-course-number" type="text" name="rerun-course-number" aria-required="true" value="${source_course_key.course}" placeholder="${_('e.g. CS101')}" />
                         <span class="tip">
                           ${_("The unique number that identifies the new course within the organization.  (This number is often the same as the original course number.)")}
                           <strong class="tip-note" class="tip-note">${_("Note: No spaces or special characters are allowed.")}</strong>
@@ -102,7 +103,7 @@ from django.template.defaultfilters import escapejs
 
                       <div class="column field text required" id="field-course-run">
                         <label for="rerun-course-run">${_("Course Run")}</label>
-                        <input class="rerun-course-run" id="rerun-course-run" type="text" name="rerun-course-run" aria-required="true"placeholder="${_('e.g. 2014_T1')}" />
+                        <input class="rerun-course-run" id="rerun-course-run" type="text" name="rerun-course-run" aria-required="true" placeholder="${_('e.g. 2014_T1')}" />
                         <span class="tip">
                           ${_("The term in which the new course will run. (This value is often different than the original course run value.)")}
                           <strong class="tip-note" class="tip-note">${_("Note: No spaces or special characters are allowed.")}</strong>

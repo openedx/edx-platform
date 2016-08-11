@@ -1,7 +1,7 @@
 @import '../base/grid-settings';
 @import 'neat/neat'; // lib - Neat
 
-header.global {
+.header-global {
   @extend %ui-depth1;
   border-bottom: 1px solid $gray-l1;
   box-shadow: 0 1px 5px 0 $shadow-l1;
@@ -262,7 +262,26 @@ header.global {
     margin-top: ($baseline/2);
     list-style: none;
     @include float(left);
-
+    .tab-nav-item{
+      display: flex;
+      margin: 0px;
+      text-transform: none;
+      @include float(left);
+      justify-content: center;
+      .tab-nav-link{
+        font-size: em(16);
+        color: $gray;
+        padding: 5px 25px 23px;
+        display: inline-block;
+        &:hover,
+        &:focus{
+          border-bottom: 4px solid $courseware-border-bottom-color;
+        }
+      }
+      .active{
+        border-bottom: 4px solid $black-t3 !important;
+      }
+    }
     li,
     div {
       display: inline-block;
@@ -311,7 +330,7 @@ header.global {
     li, div {
       display: inline-block;
 
-      .cta {
+      .btn {
         @extend %m-btn-primary;
       }
     }
@@ -321,7 +340,7 @@ header.global {
 // marketing site design syncing
 .view-register, .view-login, .view-passwordreset {
 
-  header.global nav {
+  .header-global nav {
     width: 960px;
   }
 }
@@ -337,18 +356,17 @@ header.global {
   }
 }
 
-
 // edX theme: Global Header
 // ====================
 
 // CASE: marketing/course discovery
-header.global-new {
+.header-global-new {
   @extend %ui-depth1;
   /* Temp. fix until applied globally */
   @include box-sizing(border-box);
   position: relative;
   width: 100%;
-  border-bottom: 4px solid $courseware-border-bottom-color;
+  border-bottom: 1px solid $gray-l1;
   box-shadow: 0 1px 5px 0 $shadow-l1;
   background: $header-bg;
 
@@ -377,6 +395,26 @@ header.global-new {
 
   .nav-global {
     @include float(left);
+    .tab-nav-item{
+      display: flex;
+      margin: 0px;
+      text-transform: none;
+      @include float(left);
+      justify-content: center;
+      .tab-nav-link{
+        font-size: em(16);
+        color: $gray;
+        display: inline-block;
+        padding: 5px 25px 19px;
+        &:hover,
+        &:focus{
+          border-bottom: 4px solid $courseware-border-bottom-color;
+        }
+      }
+      .active{
+        border-bottom: 4px solid $black-t3 !important;
+      }
+    }
   }
 
   .nav-account-management {
@@ -814,13 +852,13 @@ header.global-new {
   }
 }
 
-.view-register header.global-new .cta-register {
+.view-register .header-global-new .btn-register {
   text-decoration: none;
   color: $courseware-hover-color;
   border-bottom-color: $courseware-border-bottom-color;
 }
 
-.view-login header.global-new .cta-login {
+.view-login .header-global-new .btn-login {
   text-decoration: none;
   color: $courseware-hover-color;
 }
@@ -828,7 +866,7 @@ header.global-new {
 // marketing site design syncing
 .view-register, .view-login {
 
-  header.global nav {
+  .header-global nav {
     width: 960px;
   }
 }

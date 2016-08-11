@@ -1,12 +1,12 @@
-/*global define, onCertificatesReady */
+/* global define, onCertificatesReady */
 define([
-        'jquery',
-        'common/js/spec_helpers/ajax_helpers',
-        'js/instructor_dashboard/certificates'
-    ],
+    'jquery',
+    'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
+    'js/instructor_dashboard/certificates'
+],
     function($, AjaxHelpers) {
         'use strict';
-        describe("edx.instructor_dashboard.certificates.regenerate_certificates", function() {
+        describe('edx.instructor_dashboard.certificates.regenerate_certificates', function() {
             var $regenerate_certificates_button = null,
                 $certificate_regeneration_status = null,
                 requests = null;
@@ -14,18 +14,18 @@ define([
                 success_message: 'Certificate regeneration task has been started. ' +
                     'You can view the status of the generation task in the "Pending Tasks" section.',
                 error_message: 'Please select one or more certificate statuses that require certificate regeneration.',
-                server_error_message: "Error while regenerating certificates. Please try again."
+                server_error_message: 'Error while regenerating certificates. Please try again.'
             };
             var expected = {
                 url: 'test/url/',
-                postData : [],
+                postData: [],
                 selected_statuses: ['downloadable', 'error'],
                 body: 'certificate_statuses=downloadable&certificate_statuses=error'
             };
 
-            var select_options = function(option_values){
-                $.each(option_values, function(index, element){
-                    $("#certificate-regenerating-form input[value=" + element + "]").click();
+            var select_options = function(option_values) {
+                $.each(option_values, function(index, element) {
+                    $('#certificate-regenerating-form input[value=' + element + ']').click();
                 });
             };
 
@@ -59,27 +59,27 @@ define([
 
                 setFixtures(fixture);
                 onCertificatesReady();
-                $regenerate_certificates_button = $("#btn-start-regenerating-certificates");
-                $certificate_regeneration_status = $(".certificate-regeneration-status");
+                $regenerate_certificates_button = $('#btn-start-regenerating-certificates');
+                $certificate_regeneration_status = $('.certificate-regeneration-status');
                 requests = AjaxHelpers.requests(this);
             });
 
-            it("does not regenerate certificates if user cancels operation in confirm popup", function() {
-                spyOn(window, 'confirm').andReturn(false);
+            it('does not regenerate certificates if user cancels operation in confirm popup', function() {
+                spyOn(window, 'confirm').and.returnValue(false);
                 $regenerate_certificates_button.click();
                 expect(window.confirm).toHaveBeenCalled();
                 AjaxHelpers.expectNoRequests(requests);
             });
 
-            it("sends regenerate certificates request if user accepts operation in confirm popup", function() {
-                spyOn(window, 'confirm').andReturn(true);
+            it('sends regenerate certificates request if user accepts operation in confirm popup', function() {
+                spyOn(window, 'confirm').and.returnValue(true);
                 $regenerate_certificates_button.click();
                 expect(window.confirm).toHaveBeenCalled();
                 AjaxHelpers.expectRequest(requests, 'POST', expected.url);
             });
 
-            it("sends regenerate certificates request with selected certificate statuses", function() {
-                spyOn(window, 'confirm').andReturn(true);
+            it('sends regenerate certificates request with selected certificate statuses', function() {
+                spyOn(window, 'confirm').and.returnValue(true);
 
                 select_options(expected.selected_statuses);
 
@@ -87,8 +87,8 @@ define([
                 AjaxHelpers.expectRequest(requests, 'POST', expected.url, expected.body);
             });
 
-            it("displays error message in case of server side error", function() {
-                spyOn(window, 'confirm').andReturn(true);
+            it('displays error message in case of server side error', function() {
+                spyOn(window, 'confirm').and.returnValue(true);
                 select_options(expected.selected_statuses);
 
                 $regenerate_certificates_button.click();
@@ -96,8 +96,8 @@ define([
                 expect($certificate_regeneration_status.text()).toEqual(MESSAGES.server_error_message);
             });
 
-            it("displays error message returned by the server in case of unsuccessful request", function() {
-                spyOn(window, 'confirm').andReturn(true);
+            it('displays error message returned by the server in case of unsuccessful request', function() {
+                spyOn(window, 'confirm').and.returnValue(true);
                 select_options(expected.selected_statuses);
 
                 $regenerate_certificates_button.click();
@@ -105,15 +105,14 @@ define([
                 expect($certificate_regeneration_status.text()).toEqual(MESSAGES.error_message);
             });
 
-            it("displays success message returned by the server in case of successful request", function() {
-                spyOn(window, 'confirm').andReturn(true);
+            it('displays success message returned by the server in case of successful request', function() {
+                spyOn(window, 'confirm').and.returnValue(true);
                 select_options(expected.selected_statuses);
 
                 $regenerate_certificates_button.click();
                 AjaxHelpers.respondWithJson(requests, {message: MESSAGES.success_message, success: true});
                 expect($certificate_regeneration_status.text()).toEqual(MESSAGES.success_message);
             });
-
         });
     }
 );

@@ -20,7 +20,7 @@ function(ListItemEditorView, _, $, gettext, ExperimentGroupEditView) {
             'click .action-cancel': 'cancel'
         },
 
-        className: function () {
+        className: function() {
             var index = this.model.collection.indexOf(this.model);
 
             return [
@@ -51,8 +51,8 @@ function(ListItemEditorView, _, $, gettext, ExperimentGroupEditView) {
             return {
                 id: this.model.get('id'),
                 uniqueId: _.uniqueId(),
-                name: this.model.escape('name'),
-                description: this.model.escape('description'),
+                name: this.model.get('name'),
+                description: this.model.get('description'),
                 usage: this.model.get('usage'),
                 isNew: this.model.isNew()
             };
@@ -63,7 +63,7 @@ function(ListItemEditorView, _, $, gettext, ExperimentGroupEditView) {
         },
 
         onAddItem: function(group) {
-            var view = new ExperimentGroupEditView({ model: group });
+            var view = new ExperimentGroupEditView({model: group});
             this.$('ol.groups').append(view.render().el);
 
             return this;
@@ -86,7 +86,7 @@ function(ListItemEditorView, _, $, gettext, ExperimentGroupEditView) {
             if (event && event.preventDefault) { event.preventDefault(); }
             this.model.set(
                 'name', this.$('.collection-name-input').val(),
-                { silent: true }
+                {silent: true}
             );
         },
 
@@ -95,7 +95,7 @@ function(ListItemEditorView, _, $, gettext, ExperimentGroupEditView) {
             this.model.set(
                 'description',
                 this.$('.group-configuration-description-input').val(),
-                { silent: true }
+                {silent: true}
             );
         },
 

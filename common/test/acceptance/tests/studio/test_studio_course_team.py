@@ -3,14 +3,14 @@ Acceptance tests for course in studio
 """
 from nose.plugins.attrib import attr
 
-from .base_studio_test import StudioCourseTest
-from ...pages.studio.auto_auth import AutoAuthPage
+from common.test.acceptance.tests.studio.base_studio_test import StudioCourseTest
+from common.test.acceptance.pages.studio.auto_auth import AutoAuthPage
 
-from ...pages.studio.users import CourseTeamPage
-from ...pages.studio.index import DashboardPage
+from common.test.acceptance.pages.studio.users import CourseTeamPage
+from common.test.acceptance.pages.studio.index import DashboardPage
 
 
-@attr('shard_2')
+@attr(shard=2)
 class CourseTeamPageTest(StudioCourseTest):
     """ As a course author, I want to be able to add others to my team """
     def _make_user(self, username):
@@ -61,8 +61,8 @@ class CourseTeamPageTest(StudioCourseTest):
         def check_course_equality(course1, course2):
             """ Compares to course dictionaries using org, number and run as keys"""
             return (
-                course1['org'] == course2['org'] and
-                course1['number'] == course2['number'] and
+                course1['org'] == course2['display_organization'] and
+                course1['number'] == course2['display_coursenumber'] and
                 course1['run'] == course2['run']
             )
 

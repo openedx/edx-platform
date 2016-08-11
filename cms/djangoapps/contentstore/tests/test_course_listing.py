@@ -8,16 +8,32 @@ from chrono import Timer
 from mock import patch, Mock
 import ddt
 
+from django.conf import settings
+from ccx_keys.locator import CCXLocator
 from django.test import RequestFactory
+from django.test.client import Client
+
+from common.test.utils import XssTestMixin
 from xmodule.course_module import CourseSummary
 
-from contentstore.views.course import (_accessible_courses_list, _accessible_courses_list_from_groups,
-                                       AccessListFallback, get_courses_accessible_to_user,
-                                       _accessible_courses_summary_list)
+from contentstore.views.course import (
+    _accessible_courses_list,
+    _accessible_courses_list_from_groups,
+    AccessListFallback,
+    get_courses_accessible_to_user,
+    _accessible_courses_summary_list,
+)
 from contentstore.utils import delete_course_and_groups
 from contentstore.tests.utils import AjaxEnabledTestClient
 from student.tests.factories import UserFactory
-from student.roles import CourseInstructorRole, CourseStaffRole, GlobalStaff, OrgStaffRole, OrgInstructorRole
+from student.roles import (
+    CourseInstructorRole,
+    CourseStaffRole,
+    GlobalStaff,
+    OrgStaffRole,
+    OrgInstructorRole,
+    UserBasedRole,
+)
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls
 from xmodule.modulestore import ModuleStoreEnum
@@ -25,12 +41,13 @@ from opaque_keys.edx.locations import CourseLocator
 from xmodule.error_module import ErrorDescriptor
 from course_action_state.models import CourseRerunState
 
-TOTAL_COURSES_COUNT = 500
-USER_COURSES_COUNT = 50
+
+TOTAL_COURSES_COUNT = 10
+USER_COURSES_COUNT = 1
 
 
 @ddt.ddt
-class TestCourseListing(ModuleStoreTestCase):
+class TestCourseListing(ModuleStoreTestCase, XssTestMixin):
     """
     Unit tests for getting the list of courses for a logged in user
     """
@@ -58,12 +75,14 @@ class TestCourseListing(ModuleStoreTestCase):
             run=course_location.run,
             default_store=store
         )
+        self._add_role_access_to_user(user, course.id)
+        return course
 
+    def _add_role_access_to_user(self, user, course_id):
+        """ Assign access roles to user in the course. """
         if user is not None:
             for role in [CourseInstructorRole, CourseStaffRole]:
-                role(course.id).add_users(user)
-
-        return course
+                role(course_id).add_users(user)
 
     def tearDown(self):
         """
@@ -71,6 +90,39 @@ class TestCourseListing(ModuleStoreTestCase):
         """
         self.client.logout()
         ModuleStoreTestCase.tearDown(self)
+
+    def test_course_listing_is_escaped(self):
+        """
+        Tests course listing returns escaped data.
+        """
+        escaping_content = "<script>alert('ESCAPE')</script>"
+
+        # Make user staff to access course listing
+        self.user.is_staff = True
+        self.user.save()  # pylint: disable=no-member
+
+        self.client = Client()
+        self.client.login(username=self.user.username, password='test')
+
+        # Change 'display_coursenumber' field and update the course.
+        course = CourseFactory.create()
+        course.display_coursenumber = escaping_content
+        course = self.store.update_item(course, self.user.id)  # pylint: disable=no-member
+        self.assertEqual(course.display_coursenumber, escaping_content)
+
+        # Check if response is escaped
+        response = self.client.get('/home')
+        self.assertEqual(response.status_code, 200)
+        self.assert_no_xss(response, escaping_content)
+
+    def test_empty_course_listing(self):
+        """
+        Test on empty course listing, studio name is properly displayed
+        """
+        message = "Are you staff on an existing {studio_name} course?".format(studio_name=settings.STUDIO_SHORT_NAME)
+        response = self.client.get('/home')
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(message, response.content)
 
     def test_get_course_list(self):
         """
@@ -92,6 +144,43 @@ class TestCourseListing(ModuleStoreTestCase):
 
         # check both course lists have same courses
         self.assertEqual(courses_list, courses_list_by_groups)
+
+    def test_courses_list_with_ccx_courses(self):
+        """
+        Tests that CCX courses are filtered in course listing.
+        """
+        # Create a course and assign access roles to user.
+        course_location = self.store.make_course_key('Org1', 'Course1', 'Run1')
+        course = self._create_course_with_access_groups(course_location, self.user)
+
+        # Create a ccx course key and add assign access roles to user.
+        ccx_course_key = CCXLocator.from_course_locator(course.id, '1')
+        self._add_role_access_to_user(self.user, ccx_course_key)
+
+        # Test that CCX courses are filtered out.
+        courses_list, __ = _accessible_courses_list_from_groups(self.request)
+        self.assertEqual(len(courses_list), 1)
+        self.assertNotIn(
+            ccx_course_key,
+            [course.id for course in courses_list]
+        )
+
+        # Get all courses which user has access.
+        instructor_courses = UserBasedRole(self.user, CourseInstructorRole.ROLE).courses_with_role()
+        staff_courses = UserBasedRole(self.user, CourseStaffRole.ROLE).courses_with_role()
+        all_courses = (instructor_courses | staff_courses)
+
+        # Verify that CCX course exists in access but filtered by `_accessible_courses_list_from_groups`.
+        self.assertIn(
+            ccx_course_key,
+            [access.course_id for access in all_courses]
+        )
+
+        # Verify that CCX courses are filtered out while iterating over all courses
+        mocked_ccx_course = Mock(id=ccx_course_key)
+        with patch('xmodule.modulestore.mixed.MixedModuleStore.get_courses', return_value=[mocked_ccx_course]):
+            courses_list, __ = _accessible_courses_list(self.request)
+            self.assertEqual(len(courses_list), 0)
 
     @ddt.data(
         (ModuleStoreEnum.Type.split, 'xmodule.modulestore.split_mongo.split_mongo_kvs.SplitMongoKVS'),
@@ -120,8 +209,8 @@ class TestCourseListing(ModuleStoreTestCase):
                 self.assertEqual(courses_list_by_groups, [])
 
     @ddt.data(
-        (ModuleStoreEnum.Type.split, 5),
-        (ModuleStoreEnum.Type.mongo, 3)
+        (ModuleStoreEnum.Type.split, 3),
+        (ModuleStoreEnum.Type.mongo, 2)
     )
     @ddt.unpack
     def test_staff_course_listing(self, default_store, mongo_calls):
@@ -228,8 +317,8 @@ class TestCourseListing(ModuleStoreTestCase):
         )
 
     @ddt.data(
-        (ModuleStoreEnum.Type.split, 150, 505),
-        (ModuleStoreEnum.Type.mongo, USER_COURSES_COUNT, 3)
+        (ModuleStoreEnum.Type.split, 3, 13),
+        (ModuleStoreEnum.Type.mongo, USER_COURSES_COUNT, 2)
     )
     @ddt.unpack
     def test_course_listing_performance(self, store, courses_list_from_group_calls, courses_list_calls):

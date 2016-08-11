@@ -1,30 +1,28 @@
 define([
     'jquery', 'underscore', 'common/js/spec_helpers/template_helpers', 'js/spec/edxnotes/helpers',
     'js/edxnotes/collections/notes', 'js/edxnotes/collections/tabs',
-    'js/edxnotes/views/tabs/course_structure', 'js/spec/edxnotes/custom_matchers',
-    'jasmine-jquery'
+    'js/edxnotes/views/tabs/course_structure'
 ], function(
-    $, _, TemplateHelpers, Helpers, NotesCollection, TabsCollection, CourseStructureView,
-    customMatchers
+    $, _, TemplateHelpers, Helpers, NotesCollection, TabsCollection, CourseStructureView
 ) {
     'use strict';
     describe('EdxNotes CourseStructureView', function() {
         var notes = Helpers.getDefaultNotes(),
             getView, getText;
 
-        getText = function (selector) {
-            return $(selector).map(function () {
+        getText = function(selector) {
+            return $(selector).map(function() {
                 return _.trim($(this).text());
             }).toArray();
         };
 
-        getView = function (collection, tabsCollection, options) {
+        getView = function(collection, tabsCollection, options) {
             var view;
 
             options = _.defaults(options || {}, {
                 el: $('.wrapper-student-notes'),
                 collection: collection,
-                tabsCollection: tabsCollection,
+                tabsCollection: tabsCollection
             });
 
             view = new CourseStructureView(options);
@@ -33,18 +31,17 @@ define([
             return view;
         };
 
-        beforeEach(function () {
-            customMatchers(this);
+        beforeEach(function() {
             loadFixtures('js/fixtures/edxnotes/edxnotes.html');
             TemplateHelpers.installTemplates([
                 'templates/edxnotes/note-item', 'templates/edxnotes/tab-item'
             ]);
 
-            this.collection = new NotesCollection(notes);
+            this.collection = new NotesCollection(notes, {perPage: 10, parse: true});
             this.tabsCollection = new TabsCollection();
         });
 
-        it('displays a tab and content with proper data and order', function () {
+        it('displays a tab and content with proper data and order', function() {
             var view = getView(this.collection, this.tabsCollection),
                 chapters = getText('.course-title'),
                 sections = getText('.course-subtitle'),

@@ -104,6 +104,7 @@ class @SendEmail
         @$btn_task_history_email.click =>
             url = @$btn_task_history_email.data 'endpoint'
             $.ajax
+                type: 'POST'
                 dataType: 'json'
                 url: url
                 success: (data) =>
@@ -120,6 +121,7 @@ class @SendEmail
         @$btn_task_history_email_content.click =>
             url = @$btn_task_history_email_content.data 'endpoint'
             $.ajax
+                type: 'POST'
                 dataType: 'json'
                 url : url
                 success: (data) =>
@@ -169,22 +171,22 @@ class @SendEmail
 
 # Email Section
 class Email
-  # enable subsections.
-  constructor: (@$section) ->
-    # attach self to html so that instructor_dashboard.coffee can find
-    #  this object to call event handlers like 'onClickTitle'
-    @$section.data 'wrapper', @
+    # enable subsections.
+    constructor: (@$section) ->
+        # attach self to html so that instructor_dashboard.coffee can find
+        #  this object to call event handlers like 'onClickTitle'
+        @$section.data 'wrapper', @
 
-    # isolate # initialize SendEmail subsection
-    plantTimeout 0, => new SendEmail @$section.find '.send-email'
+        # isolate # initialize SendEmail subsection
+        plantTimeout 0, => new SendEmail @$section.find '.send-email'
 
-    @instructor_tasks = new (PendingInstructorTasks()) @$section
+        @instructor_tasks = new (PendingInstructorTasks()) @$section
 
-  # handler for when the section title is clicked.
-  onClickTitle: -> @instructor_tasks.task_poller.start()
+    # handler for when the section title is clicked.
+    onClickTitle: -> @instructor_tasks.task_poller.start()
 
-  # handler for when the section is closed
-  onExit: -> @instructor_tasks.task_poller.stop()
+    # handler for when the section is closed
+    onExit: -> @instructor_tasks.task_poller.stop()
 
 
 # export for use
@@ -192,4 +194,4 @@ class Email
 _.defaults window, InstructorDashboard: {}
 _.defaults window.InstructorDashboard, sections: {}
 _.defaults window.InstructorDashboard.sections,
-  Email: Email
+    Email: Email

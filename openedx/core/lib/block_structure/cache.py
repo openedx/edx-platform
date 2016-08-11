@@ -6,7 +6,7 @@ from logging import getLogger
 
 from openedx.core.lib.cache_utils import zpickle, zunpickle
 
-from .block_structure import BlockStructureModulestoreData
+from .block_structure import BlockStructureModulestoreData, BlockStructureBlockData
 
 
 logger = getLogger(__name__)  # pylint: disable=C0103
@@ -40,15 +40,21 @@ class BlockStructureCache(object):
         """
         data_to_cache = (
             block_structure._block_relations,
-            block_structure._transformer_data,
-            block_structure._block_data_map
+            block_structure.transformer_data,
+            block_structure._block_data_map,
         )
         zp_data_to_cache = zpickle(data_to_cache)
+
+        # Set the timeout value for the cache to 1 day as a fail-safe
+        # in case the signal to invalidate the cache doesn't come through.
+        timeout_in_seconds = 60 * 60 * 24
         self._cache.set(
             self._encode_root_cache_key(block_structure.root_block_usage_key),
-            zp_data_to_cache
+            zp_data_to_cache,
+            timeout=timeout_in_seconds,
         )
-        logger.debug(
+
+        logger.info(
             "Wrote BlockStructure %s to cache, size: %s",
             block_structure.root_block_usage_key,
             len(zp_data_to_cache),
@@ -77,13 +83,13 @@ class BlockStructureCache(object):
         # Find root_block_usage_key in the cache.
         zp_data_from_cache = self._cache.get(self._encode_root_cache_key(root_block_usage_key))
         if not zp_data_from_cache:
-            logger.debug(
+            logger.info(
                 "Did not find BlockStructure %r in the cache.",
                 root_block_usage_key,
             )
             return None
         else:
-            logger.debug(
+            logger.info(
                 "Read BlockStructure %r from cache, size: %s",
                 root_block_usage_key,
                 len(zp_data_from_cache),
@@ -93,7 +99,7 @@ class BlockStructureCache(object):
         block_relations, transformer_data, block_data_map = zunpickle(zp_data_from_cache)
         block_structure = BlockStructureModulestoreData(root_block_usage_key)
         block_structure._block_relations = block_relations
-        block_structure._transformer_data = transformer_data
+        block_structure.transformer_data = transformer_data
         block_structure._block_data_map = block_data_map
 
         return block_structure
@@ -109,7 +115,7 @@ class BlockStructureCache(object):
                 the cache.
         """
         self._cache.delete(self._encode_root_cache_key(root_block_usage_key))
-        logger.debug(
+        logger.info(
             "Deleted BlockStructure %r from the cache.",
             root_block_usage_key,
         )
@@ -120,4 +126,7 @@ class BlockStructureCache(object):
         Returns the cache key to use for storing the block structure
         for the given root_block_usage_key.
         """
-        return "root.key." + unicode(root_block_usage_key)
+        return "v{version}.root.key.{root_usage_key}".format(
+            version=unicode(BlockStructureBlockData.VERSION),
+            root_usage_key=unicode(root_block_usage_key),
+        )

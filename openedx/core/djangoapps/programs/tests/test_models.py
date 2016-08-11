@@ -2,11 +2,12 @@
 import ddt
 from django.test import TestCase
 import mock
+from nose.plugins.attrib import attr
 
-from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.programs.tests.mixins import ProgramsApiConfigMixin
 
 
+@attr(shard=2)
 @ddt.ddt
 # ConfigurationModels use the cache. Make every cache get a miss.
 @mock.patch('config_models.models.cache.get', return_value=None)
@@ -23,17 +24,6 @@ class TestProgramsApiConfig(ProgramsApiConfigMixin, TestCase):
         self.assertEqual(
             programs_config.public_api_url,
             programs_config.public_service_url.strip('/') + '/api/v{}/'.format(programs_config.api_version_number)
-        )
-
-        authoring_app_config = programs_config.authoring_app_config
-
-        self.assertEqual(
-            authoring_app_config.js_url,
-            programs_config.public_service_url.strip('/') + programs_config.authoring_app_js_path
-        )
-        self.assertEqual(
-            authoring_app_config.css_url,
-            programs_config.public_service_url.strip('/') + programs_config.authoring_app_css_path
         )
 
     @ddt.data(
@@ -69,9 +59,6 @@ class TestProgramsApiConfig(ProgramsApiConfigMixin, TestCase):
         self.assertFalse(programs_config.is_studio_tab_enabled)
 
         programs_config = self.create_programs_config(enable_studio_tab=False)
-        self.assertFalse(programs_config.is_studio_tab_enabled)
-
-        programs_config = self.create_programs_config(authoring_app_js_path='', authoring_app_css_path='')
         self.assertFalse(programs_config.is_studio_tab_enabled)
 
         programs_config = self.create_programs_config()

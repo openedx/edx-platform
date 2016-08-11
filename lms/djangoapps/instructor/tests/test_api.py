@@ -11,13 +11,12 @@ import io
 import json
 import shutil
 import tempfile
-from urllib import quote
 
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core import mail
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.core.urlresolvers import reverse
+from django.core.urlresolvers import reverse as django_reverse
 from django.http import HttpRequest, HttpResponse
 from django.test import RequestFactory, TestCase
 from django.test.utils import override_settings
@@ -31,13 +30,15 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from opaque_keys.edx.locator import UsageKey
 from xmodule.modulestore import ModuleStoreEnum
 
+from bulk_email.models import BulkEmailFlag
 from course_modes.models import CourseMode
 from courseware.models import StudentModule
-from courseware.tests.factories import StaffFactory, InstructorFactory, BetaTesterFactory, UserProfileFactory
+from courseware.tests.factories import (
+    BetaTesterFactory, GlobalStaffFactory, InstructorFactory, StaffFactory, UserProfileFactory
+)
 from courseware.tests.helpers import LoginEnrollmentTestCase
 from django_comment_common.models import FORUM_ROLE_COMMUNITY_TA
 from django_comment_common.utils import seed_permissions_roles
-from microsite_configuration import microsite
 from shoppingcart.models import (
     RegistrationCodeRedemption, Order, CouponRedemption,
     PaidCourseRegistration, Coupon, Invoice, CourseRegistrationCode, CourseRegistrationCodeInvoiceItem,
@@ -51,7 +52,7 @@ from student.models import (
 )
 from student.tests.factories import UserFactory, CourseModeFactory, AdminFactory
 from student.roles import CourseBetaTesterRole, CourseSalesAdminRole, CourseFinanceAdminRole, CourseInstructorRole
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase, ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.fields import Date
 
@@ -68,6 +69,7 @@ from certificates.models import CertificateStatuses
 
 from openedx.core.djangoapps.course_groups.cohorts import set_course_cohort_settings
 from openedx.core.lib.xblock_utils import grade_histogram
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 from .test_tools import msk_from_problem_urlname
 
@@ -130,6 +132,82 @@ EXECUTIVE_SUMMARY_DATA = (
 )
 
 
+INSTRUCTOR_GET_ENDPOINTS = set([
+    'get_anon_ids',
+    'get_coupon_codes',
+    'get_issued_certificates',
+    'get_sale_order_records',
+    'get_sale_records',
+])
+INSTRUCTOR_POST_ENDPOINTS = set([
+    'active_registration_codes',
+    'add_users_to_cohorts',
+    'bulk_beta_modify_access',
+    'calculate_grades_csv',
+    'change_due_date',
+    'export_ora2_data',
+    'generate_registration_codes',
+    'get_enrollment_report',
+    'get_exec_summary_report',
+    'get_grading_config',
+    'get_problem_responses',
+    'get_proctored_exam_results',
+    'get_registration_codes',
+    'get_student_progress_url',
+    'get_students_features',
+    'get_students_who_may_enroll',
+    'get_user_invoice_preference',
+    'list_background_email_tasks',
+    'list_course_role_members',
+    'list_email_content',
+    'list_entrance_exam_instructor_tasks',
+    'list_financial_report_downloads',
+    'list_forum_members',
+    'list_instructor_tasks',
+    'list_report_downloads',
+    'mark_student_can_skip_entrance_exam',
+    'modify_access',
+    'register_and_enroll_students',
+    'rescore_entrance_exam',
+    'rescore_problem',
+    'reset_due_date',
+    'reset_student_attempts',
+    'reset_student_attempts_for_entrance_exam',
+    'sale_validation',
+    'show_student_extensions',
+    'show_unit_extensions',
+    'send_email',
+    'spent_registration_codes',
+    'students_update_enrollment',
+    'update_forum_role_membership',
+])
+
+
+def reverse(endpoint, args=None, kwargs=None, is_dashboard_endpoint=True):
+    """
+    Simple wrapper of Django's reverse that first ensures that we have declared
+    each endpoint under test.
+
+    Arguments:
+        args: The args to be passed through to reverse.
+        endpoint: The endpoint to be passed through to reverse.
+        kwargs: The kwargs to be passed through to reverse.
+        is_dashboard_endpoint: True if this is an instructor dashboard endpoint
+            that must be declared in the INSTRUCTOR_GET_ENDPOINTS or
+            INSTRUCTOR_GET_ENDPOINTS sets, or false otherwise.
+
+    Returns:
+        The return of Django's reverse function
+
+    """
+    is_endpoint_declared = endpoint in INSTRUCTOR_GET_ENDPOINTS or endpoint in INSTRUCTOR_POST_ENDPOINTS
+    if is_dashboard_endpoint and is_endpoint_declared is False:
+        # Verify that all endpoints are declared so we can ensure they are
+        # properly validated elsewhere.
+        raise ValueError("The endpoint {} must be declared in ENDPOINTS before use.".format(endpoint))
+    return django_reverse(endpoint, args=args, kwargs=kwargs)
+
+
 @common_exceptions_400
 def view_success(request):  # pylint: disable=unused-argument
     "A dummy view for testing that returns a simple HTTP response"
@@ -148,7 +226,7 @@ def view_alreadyrunningerror(request):  # pylint: disable=unused-argument
     raise AlreadyRunningError()
 
 
-@attr('shard_1')
+@attr(shard=1)
 class TestCommonExceptions400(TestCase):
     """
     Testing the common_exceptions_400 decorator.
@@ -190,9 +268,63 @@ class TestCommonExceptions400(TestCase):
         self.assertIn("Task is already running", result["error"])
 
 
-@attr('shard_1')
+@attr(shard=1)
+@ddt.ddt
+class TestEndpointHttpMethods(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
+    """
+    Ensure that users can make GET requests against endpoints that allow GET,
+    and not against those that don't allow GET.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        """
+        Set up test course.
+        """
+        super(TestEndpointHttpMethods, cls).setUpClass()
+        cls.course = CourseFactory.create()
+
+    def setUp(self):
+        """
+        Set up global staff role so authorization will not fail.
+        """
+        super(TestEndpointHttpMethods, self).setUp()
+        global_user = GlobalStaffFactory()
+        self.client.login(username=global_user.username, password='test')
+
+    @ddt.data(*INSTRUCTOR_POST_ENDPOINTS)
+    def test_endpoints_reject_get(self, data):
+        """
+        Tests that POST endpoints are rejected with 405 when using GET.
+        """
+        url = reverse(data, kwargs={'course_id': unicode(self.course.id)})
+        response = self.client.get(url)
+
+        self.assertEqual(
+            response.status_code, 405,
+            "Endpoint {} returned status code {} instead of a 405. It should not allow GET.".format(
+                data, response.status_code
+            )
+        )
+
+    @ddt.data(*INSTRUCTOR_GET_ENDPOINTS)
+    def test_endpoints_accept_get(self, data):
+        """
+        Tests that GET endpoints are not rejected with 405 when using GET.
+        """
+        url = reverse(data, kwargs={'course_id': unicode(self.course.id)})
+        response = self.client.get(url)
+
+        self.assertNotEqual(
+            response.status_code, 405,
+            "Endpoint {} returned status code 405 where it shouldn't, since it should allow GET.".format(
+                data
+            )
+        )
+
+
+@attr(shard=1)
 @patch('bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message', autospec=True))
-@patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': False})
 class TestInstructorAPIDenyLevels(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Ensure that users cannot access endpoints they shouldn't be able to.
@@ -207,6 +339,12 @@ class TestInstructorAPIDenyLevels(SharedModuleStoreTestCase, LoginEnrollmentTest
             'robot-some-problem-urlname'
         )
         cls.problem_urlname = cls.problem_location.to_deprecated_string()
+        BulkEmailFlag.objects.create(enabled=True, require_course_email_auth=False)
+
+    @classmethod
+    def tearDownClass(cls):
+        super(TestInstructorAPIDenyLevels, cls).tearDownClass()
+        BulkEmailFlag.objects.all().delete()
 
     def setUp(self):
         super(TestInstructorAPIDenyLevels, self).setUp()
@@ -232,7 +370,7 @@ class TestInstructorAPIDenyLevels(SharedModuleStoreTestCase, LoginEnrollmentTest
             ('update_forum_role_membership',
              {'unique_student_identifier': self.user.email, 'rolename': 'Moderator', 'action': 'allow'}),
             ('list_forum_members', {'rolename': FORUM_ROLE_COMMUNITY_TA}),
-            ('send_email', {'send_to': 'staff', 'subject': 'test', 'message': 'asdf'}),
+            ('send_email', {'send_to': '["staff"]', 'subject': 'test', 'message': 'asdf'}),
             ('list_instructor_tasks', {}),
             ('list_background_email_tasks', {}),
             ('list_report_downloads', {}),
@@ -244,6 +382,7 @@ class TestInstructorAPIDenyLevels(SharedModuleStoreTestCase, LoginEnrollmentTest
             ('get_exec_summary_report', {}),
             ('get_proctored_exam_results', {}),
             ('get_problem_responses', {}),
+            ('export_ora2_data', {}),
         ]
         # Endpoints that only Instructors can access
         self.instructor_level_endpoints = [
@@ -264,10 +403,10 @@ class TestInstructorAPIDenyLevels(SharedModuleStoreTestCase, LoginEnrollmentTest
         msg: message to display if assertion fails.
         """
         url = reverse(endpoint, kwargs={'course_id': self.course.id.to_deprecated_string()})
-        if endpoint in ['send_email', 'students_update_enrollment', 'bulk_beta_modify_access']:
-            response = self.client.post(url, args)
-        else:
+        if endpoint in INSTRUCTOR_GET_ENDPOINTS:
             response = self.client.get(url, args)
+        else:
+            response = self.client.post(url, args)
         self.assertEqual(
             response.status_code,
             status_code,
@@ -322,6 +461,8 @@ class TestInstructorAPIDenyLevels(SharedModuleStoreTestCase, LoginEnrollmentTest
         # update_forum_role(self.course.id, staff_member, FORUM_ROLE_ADMINISTRATOR, 'allow')
 
         for endpoint, args in self.staff_level_endpoints:
+            expected_status = 200
+
             # TODO: make these work
             if endpoint in ['update_forum_role_membership', 'list_forum_members']:
                 continue
@@ -333,7 +474,7 @@ class TestInstructorAPIDenyLevels(SharedModuleStoreTestCase, LoginEnrollmentTest
             self._access_endpoint(
                 endpoint,
                 args,
-                200,
+                expected_status,
                 "Staff member should be allowed to access endpoint " + endpoint
             )
 
@@ -356,6 +497,8 @@ class TestInstructorAPIDenyLevels(SharedModuleStoreTestCase, LoginEnrollmentTest
         self.client.login(username=inst.username, password='test')
 
         for endpoint, args in self.staff_level_endpoints:
+            expected_status = 200
+
             # TODO: make these work
             if endpoint in ['update_forum_role_membership']:
                 continue
@@ -367,23 +510,25 @@ class TestInstructorAPIDenyLevels(SharedModuleStoreTestCase, LoginEnrollmentTest
             self._access_endpoint(
                 endpoint,
                 args,
-                200,
+                expected_status,
                 "Instructor should be allowed to access endpoint " + endpoint
             )
 
         for endpoint, args in self.instructor_level_endpoints:
+            expected_status = 200
+
             # TODO: make this work
             if endpoint in ['rescore_problem']:
                 continue
             self._access_endpoint(
                 endpoint,
                 args,
-                200,
+                expected_status,
                 "Instructor should be allowed to access endpoint " + endpoint
             )
 
 
-@attr('shard_1')
+@attr(shard=1)
 @patch.dict(settings.FEATURES, {'ALLOW_AUTOMATED_SIGNUPS': True})
 class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     """
@@ -396,7 +541,7 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
 
         # Create a course with mode 'audit'
         cls.audit_course = CourseFactory.create()
-        CourseModeFactory(course_id=cls.audit_course.id, mode_slug=CourseMode.AUDIT)
+        CourseModeFactory.create(course_id=cls.audit_course.id, mode_slug=CourseMode.AUDIT)
 
         cls.url = reverse(
             'register_and_enroll_students', kwargs={'course_id': unicode(cls.course.id)}
@@ -410,7 +555,7 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
 
         # Create a course with mode 'honor' and with price
         self.white_label_course = CourseFactory.create()
-        self.white_label_course_mode = CourseModeFactory(
+        self.white_label_course_mode = CourseModeFactory.create(
             course_id=self.white_label_course.id,
             mode_slug=CourseMode.HONOR,
             min_price=10,
@@ -796,7 +941,7 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
             self.assertEqual(enrollment.enrollment.mode, CourseMode.DEFAULT_SHOPPINGCART_MODE_SLUG)
 
 
-@attr('shard_1')
+@attr(shard=1)
 @ddt.ddt
 class TestInstructorAPIEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     """
@@ -812,7 +957,7 @@ class TestInstructorAPIEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTest
         cls.course = CourseFactory.create()
 
         # Email URL values
-        cls.site_name = microsite.get_value(
+        cls.site_name = configuration_helpers.get_value(
             'SITE_NAME',
             settings.SITE_NAME
         )
@@ -1552,7 +1697,7 @@ class TestInstructorAPIEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTest
         return response
 
 
-@attr('shard_1')
+@attr(shard=1)
 @ddt.ddt
 class TestInstructorAPIBulkBetaEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     """
@@ -1563,7 +1708,7 @@ class TestInstructorAPIBulkBetaEnrollment(SharedModuleStoreTestCase, LoginEnroll
         super(TestInstructorAPIBulkBetaEnrollment, cls).setUpClass()
         cls.course = CourseFactory.create()
         # Email URL values
-        cls.site_name = microsite.get_value(
+        cls.site_name = configuration_helpers.get_value(
             'SITE_NAME',
             settings.SITE_NAME
         )
@@ -1876,7 +2021,7 @@ class TestInstructorAPIBulkBetaEnrollment(SharedModuleStoreTestCase, LoginEnroll
         )
 
 
-@attr('shard_1')
+@attr(shard=1)
 class TestInstructorAPILevelsAccess(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Test endpoints whereby instructors can change permissions
@@ -1906,13 +2051,13 @@ class TestInstructorAPILevelsAccess(SharedModuleStoreTestCase, LoginEnrollmentTe
     def test_modify_access_noparams(self):
         """ Test missing all query parameters. """
         url = reverse('modify_access', kwargs={'course_id': self.course.id.to_deprecated_string()})
-        response = self.client.get(url)
+        response = self.client.post(url)
         self.assertEqual(response.status_code, 400)
 
     def test_modify_access_bad_action(self):
         """ Test with an invalid action parameter. """
         url = reverse('modify_access', kwargs={'course_id': self.course.id.to_deprecated_string()})
-        response = self.client.get(url, {
+        response = self.client.post(url, {
             'unique_student_identifier': self.other_staff.email,
             'rolename': 'staff',
             'action': 'robot-not-an-action',
@@ -1922,7 +2067,7 @@ class TestInstructorAPILevelsAccess(SharedModuleStoreTestCase, LoginEnrollmentTe
     def test_modify_access_bad_role(self):
         """ Test with an invalid action parameter. """
         url = reverse('modify_access', kwargs={'course_id': self.course.id.to_deprecated_string()})
-        response = self.client.get(url, {
+        response = self.client.post(url, {
             'unique_student_identifier': self.other_staff.email,
             'rolename': 'robot-not-a-roll',
             'action': 'revoke',
@@ -1931,7 +2076,7 @@ class TestInstructorAPILevelsAccess(SharedModuleStoreTestCase, LoginEnrollmentTe
 
     def test_modify_access_allow(self):
         url = reverse('modify_access', kwargs={'course_id': self.course.id.to_deprecated_string()})
-        response = self.client.get(url, {
+        response = self.client.post(url, {
             'unique_student_identifier': self.other_user.email,
             'rolename': 'staff',
             'action': 'allow',
@@ -1940,7 +2085,7 @@ class TestInstructorAPILevelsAccess(SharedModuleStoreTestCase, LoginEnrollmentTe
 
     def test_modify_access_allow_with_uname(self):
         url = reverse('modify_access', kwargs={'course_id': self.course.id.to_deprecated_string()})
-        response = self.client.get(url, {
+        response = self.client.post(url, {
             'unique_student_identifier': self.other_instructor.username,
             'rolename': 'staff',
             'action': 'allow',
@@ -1949,7 +2094,7 @@ class TestInstructorAPILevelsAccess(SharedModuleStoreTestCase, LoginEnrollmentTe
 
     def test_modify_access_revoke(self):
         url = reverse('modify_access', kwargs={'course_id': self.course.id.to_deprecated_string()})
-        response = self.client.get(url, {
+        response = self.client.post(url, {
             'unique_student_identifier': self.other_staff.email,
             'rolename': 'staff',
             'action': 'revoke',
@@ -1958,7 +2103,7 @@ class TestInstructorAPILevelsAccess(SharedModuleStoreTestCase, LoginEnrollmentTe
 
     def test_modify_access_revoke_with_username(self):
         url = reverse('modify_access', kwargs={'course_id': self.course.id.to_deprecated_string()})
-        response = self.client.get(url, {
+        response = self.client.post(url, {
             'unique_student_identifier': self.other_staff.username,
             'rolename': 'staff',
             'action': 'revoke',
@@ -1967,7 +2112,7 @@ class TestInstructorAPILevelsAccess(SharedModuleStoreTestCase, LoginEnrollmentTe
 
     def test_modify_access_with_fake_user(self):
         url = reverse('modify_access', kwargs={'course_id': self.course.id.to_deprecated_string()})
-        response = self.client.get(url, {
+        response = self.client.post(url, {
             'unique_student_identifier': 'GandalfTheGrey',
             'rolename': 'staff',
             'action': 'revoke',
@@ -1984,7 +2129,7 @@ class TestInstructorAPILevelsAccess(SharedModuleStoreTestCase, LoginEnrollmentTe
         self.other_user.is_active = False
         self.other_user.save()  # pylint: disable=no-member
         url = reverse('modify_access', kwargs={'course_id': self.course.id.to_deprecated_string()})
-        response = self.client.get(url, {
+        response = self.client.post(url, {
             'unique_student_identifier': self.other_user.username,
             'rolename': 'beta',
             'action': 'allow',
@@ -2000,7 +2145,7 @@ class TestInstructorAPILevelsAccess(SharedModuleStoreTestCase, LoginEnrollmentTe
     def test_modify_access_revoke_not_allowed(self):
         """ Test revoking access that a user does not have. """
         url = reverse('modify_access', kwargs={'course_id': self.course.id.to_deprecated_string()})
-        response = self.client.get(url, {
+        response = self.client.post(url, {
             'unique_student_identifier': self.other_staff.email,
             'rolename': 'instructor',
             'action': 'revoke',
@@ -2012,7 +2157,7 @@ class TestInstructorAPILevelsAccess(SharedModuleStoreTestCase, LoginEnrollmentTe
         Test that an instructor cannot remove instructor privelages from themself.
         """
         url = reverse('modify_access', kwargs={'course_id': self.course.id.to_deprecated_string()})
-        response = self.client.get(url, {
+        response = self.client.post(url, {
             'unique_student_identifier': self.instructor.email,
             'rolename': 'instructor',
             'action': 'revoke',
@@ -2031,20 +2176,20 @@ class TestInstructorAPILevelsAccess(SharedModuleStoreTestCase, LoginEnrollmentTe
     def test_list_course_role_members_noparams(self):
         """ Test missing all query parameters. """
         url = reverse('list_course_role_members', kwargs={'course_id': self.course.id.to_deprecated_string()})
-        response = self.client.get(url)
+        response = self.client.post(url)
         self.assertEqual(response.status_code, 400)
 
     def test_list_course_role_members_bad_rolename(self):
         """ Test with an invalid rolename parameter. """
         url = reverse('list_course_role_members', kwargs={'course_id': self.course.id.to_deprecated_string()})
-        response = self.client.get(url, {
+        response = self.client.post(url, {
             'rolename': 'robot-not-a-rolename',
         })
         self.assertEqual(response.status_code, 400)
 
     def test_list_course_role_members_staff(self):
         url = reverse('list_course_role_members', kwargs={'course_id': self.course.id.to_deprecated_string()})
-        response = self.client.get(url, {
+        response = self.client.post(url, {
             'rolename': 'staff',
         })
         self.assertEqual(response.status_code, 200)
@@ -2066,7 +2211,7 @@ class TestInstructorAPILevelsAccess(SharedModuleStoreTestCase, LoginEnrollmentTe
 
     def test_list_course_role_members_beta(self):
         url = reverse('list_course_role_members', kwargs={'course_id': self.course.id.to_deprecated_string()})
-        response = self.client.get(url, {
+        response = self.client.post(url, {
             'rolename': 'beta',
         })
         self.assertEqual(response.status_code, 200)
@@ -2099,7 +2244,7 @@ class TestInstructorAPILevelsAccess(SharedModuleStoreTestCase, LoginEnrollmentTe
         Get unique_student_identifier, rolename and action and update forum role.
         """
         url = reverse('update_forum_role_membership', kwargs={'course_id': self.course.id.to_deprecated_string()})
-        response = self.client.get(
+        response = self.client.post(
             url,
             {
                 'unique_student_identifier': identifier,
@@ -2118,7 +2263,7 @@ class TestInstructorAPILevelsAccess(SharedModuleStoreTestCase, LoginEnrollmentTe
             self.assertNotIn(rolename, user_roles)
 
 
-@attr('shard_1')
+@attr(shard=1)
 @ddt.ddt
 @patch.dict('django.conf.settings.FEATURES', {'ENABLE_PAID_COURSE_REGISTRATION': True})
 class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
@@ -2172,12 +2317,12 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
         """
         enroll user using a registration code
         """
-        redeem_url = reverse('register_code_redemption', args=[code])
+        redeem_url = reverse('shoppingcart.views.register_code_redemption', args=[code], is_dashboard_endpoint=False)
         self.client.login(username=user.username, password='test')
         response = self.client.get(redeem_url)
         self.assertEquals(response.status_code, 200)
         # check button text
-        self.assertTrue('Activate Course Enrollment' in response.content)
+        self.assertIn('Activate Course Enrollment', response.content)
 
         response = self.client.post(redeem_url)
         self.assertEquals(response.status_code, 200)
@@ -2252,10 +2397,16 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
             mode_slug=CourseMode.HONOR
         )
         # update the quantity of the cart item paid_course_reg_item
-        resp = self.client.post(reverse('shoppingcart.views.update_user_cart'), {'ItemId': paid_course_reg_item.id, 'qty': '4'})
+        resp = self.client.post(
+            reverse('shoppingcart.views.update_user_cart', is_dashboard_endpoint=False),
+            {'ItemId': paid_course_reg_item.id, 'qty': '4'}
+        )
         self.assertEqual(resp.status_code, 200)
         # apply the coupon code to the item in the cart
-        resp = self.client.post(reverse('shoppingcart.views.use_code'), {'code': coupon.code})
+        resp = self.client.post(
+            reverse('shoppingcart.views.use_code', is_dashboard_endpoint=False),
+            {'code': coupon.code}
+        )
         self.assertEqual(resp.status_code, 200)
         self.cart.purchase()
         # get the updated item
@@ -2264,7 +2415,7 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
         coupon_redemption = CouponRedemption.objects.select_related('coupon').filter(order=self.cart)
 
         sale_order_url = reverse('get_sale_order_records', kwargs={'course_id': self.course.id.to_deprecated_string()})
-        response = self.client.get(sale_order_url)
+        response = self.client.post(sale_order_url)
         self.assertEqual(response['Content-Type'], 'text/csv')
         self.assertIn('36', response.content.split('\r\n')[1])
         self.assertIn(str(item.unit_cost), response.content.split('\r\n')[1],)
@@ -2288,11 +2439,18 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
 
         PaidCourseRegistration.add_to_order(self.cart, self.course.id)
         # apply the coupon code to the item in the cart
-        resp = self.client.post(reverse('shoppingcart.views.use_code'), {'code': coupon.code})
+        resp = self.client.post(
+            reverse('shoppingcart.views.use_code', is_dashboard_endpoint=False),
+            {'code': coupon.code}
+        )
         self.assertEqual(resp.status_code, 200)
 
         # URL for instructor dashboard
-        instructor_dashboard = reverse('instructor_dashboard', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        instructor_dashboard = reverse(
+            'instructor_dashboard',
+            kwargs={'course_id': self.course.id.to_deprecated_string()},
+            is_dashboard_endpoint=False
+        )
         # visit the instructor dashboard page and
         # check that the coupon redeem count should be 0
         resp = self.client.get(instructor_dashboard)
@@ -2329,7 +2487,7 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
             'get_sale_records',
             kwargs={'course_id': self.course.id.to_deprecated_string()}
         )
-        response = self.client.get(url + '/csv', {})
+        response = self.client.post(url + '/csv', {})
         self.assertEqual(response['Content-Type'], 'text/csv')
 
     def test_get_sale_records_features_json(self):
@@ -2348,7 +2506,7 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
             course_registration_code.save()
 
         url = reverse('get_sale_records', kwargs={'course_id': self.course.id.to_deprecated_string()})
-        response = self.client.get(url, {})
+        response = self.client.post(url, {})
         res_json = json.loads(response.content)
         self.assertIn('sale', res_json)
 
@@ -2398,7 +2556,7 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
             course_registration_code.save()
 
         url = reverse('get_sale_records', kwargs={'course_id': self.course.id.to_deprecated_string()})
-        response = self.client.get(url, {})
+        response = self.client.post(url, {})
         res_json = json.loads(response.content)
         self.assertIn('sale', res_json)
 
@@ -2446,7 +2604,7 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
         )
         problem_location = ''
 
-        response = self.client.get(url, {'problem_location': problem_location})
+        response = self.client.post(url, {'problem_location': problem_location})
         res_json = json.loads(response.content)
         self.assertEqual(res_json, 'Could not find problem with this location.')
 
@@ -2481,7 +2639,7 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
         )
         problem_location = ''
 
-        response = self.client.get(url, {'problem_location': problem_location})
+        response = self.client.post(url, {'problem_location': problem_location})
         res_json = json.loads(response.content)
         self.assertIn('status', res_json)
         status = res_json['status']
@@ -2502,7 +2660,7 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
         with patch('instructor_task.api.submit_calculate_problem_responses_csv') as submit_task_function:
             error = AlreadyRunningError()
             submit_task_function.side_effect = error
-            response = self.client.get(url, {})
+            response = self.client.post(url, {})
             res_json = json.loads(response.content)
             self.assertIn('status', res_json)
             self.assertIn('already in progress', res_json['status'])
@@ -2512,8 +2670,11 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
         Test that some minimum of information is formatted
         correctly in the response to get_students_features.
         """
+        for student in self.students:
+            student.profile.city = "Mos Eisley {}".format(student.id)
+            student.profile.save()
         url = reverse('get_students_features', kwargs={'course_id': self.course.id.to_deprecated_string()})
-        response = self.client.get(url, {})
+        response = self.client.post(url, {})
         res_json = json.loads(response.content)
         self.assertIn('students', res_json)
         for student in self.students:
@@ -2523,6 +2684,8 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
             ][0]
             self.assertEqual(student_json['username'], student.username)
             self.assertEqual(student_json['email'], student.email)
+            self.assertEqual(student_json['city'], student.profile.city)
+            self.assertEqual(student_json['country'], "")
 
     @ddt.data(True, False)
     def test_get_students_features_cohorted(self, is_cohorted):
@@ -2533,7 +2696,7 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
         url = reverse('get_students_features', kwargs={'course_id': unicode(self.course.id)})
         set_course_cohort_settings(self.course.id, is_cohorted=is_cohorted)
 
-        response = self.client.get(url, {})
+        response = self.client.post(url, {})
         res_json = json.loads(response.content)
 
         self.assertEqual('cohort' in res_json['feature_names'], is_cohorted)
@@ -2553,7 +2716,7 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
 
         url = reverse('get_students_features', kwargs={'course_id': unicode(self.course.id)})
 
-        response = self.client.get(url, {})
+        response = self.client.post(url, {})
         res_json = json.loads(response.content)
 
         self.assertEqual('team' in res_json['feature_names'], has_teams)
@@ -2569,7 +2732,7 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
             kwargs={'course_id': unicode(self.course.id)}
         )
         # Successful case:
-        response = self.client.get(url, {})
+        response = self.client.post(url, {})
         res_json = json.loads(response.content)
         self.assertIn('status', res_json)
         self.assertNotIn('currently being created', res_json['status'])
@@ -2577,7 +2740,7 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
         with patch('instructor_task.api.submit_calculate_may_enroll_csv') as submit_task_function:
             error = AlreadyRunningError()
             submit_task_function.side_effect = error
-            response = self.client.get(url, {})
+            response = self.client.post(url, {})
             res_json = json.loads(response.content)
             self.assertIn('status', res_json)
             self.assertIn('currently being created', res_json['status'])
@@ -2592,7 +2755,7 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
             kwargs={'course_id': unicode(self.course.id)}
         )
         # Successful case:
-        response = self.client.get(url, {})
+        response = self.client.post(url, {})
         res_json = json.loads(response.content)
         self.assertIn('status', res_json)
         self.assertNotIn('currently being created', res_json['status'])
@@ -2600,7 +2763,7 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
         with patch('instructor_task.api.submit_proctored_exam_results_report') as submit_task_function:
             error = AlreadyRunningError()
             submit_task_function.side_effect = error
-            response = self.client.get(url, {})
+            response = self.client.post(url, {})
             res_json = json.loads(response.content)
             self.assertIn('status', res_json)
             self.assertIn('currently being created', res_json['status'])
@@ -2686,7 +2849,7 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
 
         self.client.login(username=self.instructor.username, password='test')
         url = reverse('get_enrollment_report', kwargs={'course_id': self.course.id.to_deprecated_string()})
-        response = self.client.get(url, {})
+        response = self.client.post(url, {})
         self.assertIn('The detailed enrollment report is being created.', response.content)
 
     def test_bulk_purchase_detailed_report(self):
@@ -2698,11 +2861,16 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
         """
         paid_course_reg_item = PaidCourseRegistration.add_to_order(self.cart, self.course.id)
         # update the quantity of the cart item paid_course_reg_item
-        resp = self.client.post(reverse('shoppingcart.views.update_user_cart'),
-                                {'ItemId': paid_course_reg_item.id, 'qty': '4'})
+        resp = self.client.post(
+            reverse('shoppingcart.views.update_user_cart', is_dashboard_endpoint=False),
+            {'ItemId': paid_course_reg_item.id, 'qty': '4'}
+        )
         self.assertEqual(resp.status_code, 200)
         # apply the coupon code to the item in the cart
-        resp = self.client.post(reverse('shoppingcart.views.use_code'), {'code': self.coupon_code})
+        resp = self.client.post(
+            reverse('shoppingcart.views.use_code', is_dashboard_endpoint=False),
+            {'code': self.coupon_code}
+        )
         self.assertEqual(resp.status_code, 200)
         self.cart.purchase()
 
@@ -2736,7 +2904,7 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
         self.client.login(username=self.instructor.username, password='test')
 
         url = reverse('get_enrollment_report', kwargs={'course_id': self.course.id.to_deprecated_string()})
-        response = self.client.get(url, {})
+        response = self.client.post(url, {})
         self.assertIn('The detailed enrollment report is being created.', response.content)
 
     def test_create_registration_code_without_invoice_and_order(self):
@@ -2758,7 +2926,7 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
         self.client.login(username=self.instructor.username, password='test')
 
         url = reverse('get_enrollment_report', kwargs={'course_id': self.course.id.to_deprecated_string()})
-        response = self.client.get(url, {})
+        response = self.client.post(url, {})
         self.assertIn('The detailed enrollment report is being created.', response.content)
 
     def test_invoice_payment_is_still_pending_for_registration_codes(self):
@@ -2783,7 +2951,7 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
         self.client.login(username=self.instructor.username, password='test')
 
         url = reverse('get_enrollment_report', kwargs={'course_id': self.course.id.to_deprecated_string()})
-        response = self.client.get(url, {})
+        response = self.client.post(url, {})
         self.assertIn('The detailed enrollment report is being created.', response.content)
 
     @patch.object(instructor.views.api, 'anonymous_id_for_user', Mock(return_value='42'))
@@ -2793,7 +2961,7 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
         Test the CSV output for the anonymized user ids.
         """
         url = reverse('get_anon_ids', kwargs={'course_id': self.course.id.to_deprecated_string()})
-        response = self.client.get(url, {})
+        response = self.client.post(url, {})
         self.assertEqual(response['Content-Type'], 'text/csv')
         body = response.content.replace('\r', '')
         self.assertTrue(body.startswith(
@@ -2806,12 +2974,12 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
 
     def test_list_report_downloads(self):
         url = reverse('list_report_downloads', kwargs={'course_id': self.course.id.to_deprecated_string()})
-        with patch('instructor_task.models.LocalFSReportStore.links_for') as mock_links_for:
+        with patch('instructor_task.models.DjangoStorageReportStore.links_for') as mock_links_for:
             mock_links_for.return_value = [
                 ('mock_file_name_1', 'https://1.mock.url'),
                 ('mock_file_name_2', 'https://2.mock.url'),
             ]
-            response = self.client.get(url, {})
+            response = self.client.post(url, {})
 
         expected_response = {
             "downloads": [
@@ -2840,12 +3008,12 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
         success_status = "The {report_type} report is being created.".format(report_type=report_type)
         if report_type == 'problem responses':
             with patch(task_api_endpoint):
-                response = self.client.get(url, {'problem_location': ''})
+                response = self.client.post(url, {'problem_location': ''})
             self.assertIn(success_status, response.content)
         else:
             CourseFinanceAdminRole(self.course.id).add_users(self.instructor)
             with patch(task_api_endpoint):
-                response = self.client.get(url, {})
+                response = self.client.post(url, {})
             self.assertIn(success_status, response.content)
 
     @ddt.data(*EXECUTIVE_SUMMARY_DATA)
@@ -2863,11 +3031,10 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
 
         CourseFinanceAdminRole(self.course.id).add_users(self.instructor)
         with patch(task_api_endpoint):
-            response = self.client.get(url, {})
+            response = self.client.post(url, {})
         success_status = "The {report_type} report is being created." \
                          " To view the status of the report, see Pending" \
-                         " Instructor Tasks" \
-                         " below".format(report_type=report_type)
+                         " Tasks below".format(report_type=report_type)
         self.assertIn(success_status, response.content)
 
     @ddt.data(*EXECUTIVE_SUMMARY_DATA)
@@ -2886,21 +3053,37 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
         CourseFinanceAdminRole(self.course.id).add_users(self.instructor)
         with patch(task_api_endpoint) as mock:
             mock.side_effect = AlreadyRunningError()
-            response = self.client.get(url, {})
+            response = self.client.post(url, {})
         already_running_status = "The {report_type} report is currently being created." \
-                                 " To view the status of the report, see Pending Instructor Tasks below." \
+                                 " To view the status of the report, see Pending Tasks below." \
                                  " You will be able to download the report" \
                                  " when it is" \
                                  " complete.".format(report_type=report_type)
         self.assertIn(already_running_status, response.content)
 
+    def test_get_ora2_responses_success(self):
+        url = reverse('export_ora2_data', kwargs={'course_id': unicode(self.course.id)})
+
+        with patch('instructor_task.api.submit_export_ora2_data') as mock_submit_ora2_task:
+            mock_submit_ora2_task.return_value = True
+            response = self.client.post(url, {})
+        success_status = "The ORA data report is being generated."
+        self.assertIn(success_status, response.content)
+
+    def test_get_ora2_responses_already_running(self):
+        url = reverse('export_ora2_data', kwargs={'course_id': unicode(self.course.id)})
+
+        with patch('instructor_task.api.submit_export_ora2_data') as mock_submit_ora2_task:
+            mock_submit_ora2_task.side_effect = AlreadyRunningError()
+            response = self.client.post(url, {})
+        already_running_status = "An ORA data report generation task is already in progress."
+        self.assertIn(already_running_status, response.content)
+
     def test_get_student_progress_url(self):
         """ Test that progress_url is in the successful response. """
         url = reverse('get_student_progress_url', kwargs={'course_id': self.course.id.to_deprecated_string()})
-        url += "?unique_student_identifier={}".format(
-            quote(self.students[0].email.encode("utf-8"))
-        )
-        response = self.client.get(url)
+        data = {'unique_student_identifier': self.students[0].email.encode("utf-8")}
+        response = self.client.post(url, data)
         self.assertEqual(response.status_code, 200)
         res_json = json.loads(response.content)
         self.assertIn('progress_url', res_json)
@@ -2908,10 +3091,8 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
     def test_get_student_progress_url_from_uname(self):
         """ Test that progress_url is in the successful response. """
         url = reverse('get_student_progress_url', kwargs={'course_id': self.course.id.to_deprecated_string()})
-        url += "?unique_student_identifier={}".format(
-            quote(self.students[0].username.encode("utf-8"))
-        )
-        response = self.client.get(url)
+        data = {'unique_student_identifier': self.students[0].username.encode("utf-8")}
+        response = self.client.post(url, data)
         self.assertEqual(response.status_code, 200)
         res_json = json.loads(response.content)
         self.assertIn('progress_url', res_json)
@@ -2919,17 +3100,17 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
     def test_get_student_progress_url_noparams(self):
         """ Test that the endpoint 404's without the required query params. """
         url = reverse('get_student_progress_url', kwargs={'course_id': self.course.id.to_deprecated_string()})
-        response = self.client.get(url)
+        response = self.client.post(url)
         self.assertEqual(response.status_code, 400)
 
     def test_get_student_progress_url_nostudent(self):
         """ Test that the endpoint 400's when requesting an unknown email. """
         url = reverse('get_student_progress_url', kwargs={'course_id': self.course.id.to_deprecated_string()})
-        response = self.client.get(url)
+        response = self.client.post(url)
         self.assertEqual(response.status_code, 400)
 
 
-@attr('shard_1')
+@attr(shard=1)
 class TestInstructorAPIRegradeTask(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Test endpoints whereby instructors can change student grades.
@@ -2966,7 +3147,7 @@ class TestInstructorAPIRegradeTask(SharedModuleStoreTestCase, LoginEnrollmentTes
     def test_reset_student_attempts_deletall(self):
         """ Make sure no one can delete all students state on a problem. """
         url = reverse('reset_student_attempts', kwargs={'course_id': self.course.id.to_deprecated_string()})
-        response = self.client.get(url, {
+        response = self.client.post(url, {
             'problem_to_reset': self.problem_urlname,
             'all_students': True,
             'delete_module': True,
@@ -2976,7 +3157,7 @@ class TestInstructorAPIRegradeTask(SharedModuleStoreTestCase, LoginEnrollmentTes
     def test_reset_student_attempts_single(self):
         """ Test reset single student attempts. """
         url = reverse('reset_student_attempts', kwargs={'course_id': self.course.id.to_deprecated_string()})
-        response = self.client.get(url, {
+        response = self.client.post(url, {
             'problem_to_reset': self.problem_urlname,
             'unique_student_identifier': self.student.email,
         })
@@ -2993,7 +3174,7 @@ class TestInstructorAPIRegradeTask(SharedModuleStoreTestCase, LoginEnrollmentTes
     def test_reset_student_attempts_all(self, act):
         """ Test reset all student attempts. """
         url = reverse('reset_student_attempts', kwargs={'course_id': self.course.id.to_deprecated_string()})
-        response = self.client.get(url, {
+        response = self.client.post(url, {
             'problem_to_reset': self.problem_urlname,
             'all_students': True,
         })
@@ -3003,7 +3184,7 @@ class TestInstructorAPIRegradeTask(SharedModuleStoreTestCase, LoginEnrollmentTes
     def test_reset_student_attempts_missingmodule(self):
         """ Test reset for non-existant problem. """
         url = reverse('reset_student_attempts', kwargs={'course_id': self.course.id.to_deprecated_string()})
-        response = self.client.get(url, {
+        response = self.client.post(url, {
             'problem_to_reset': 'robot-not-a-real-module',
             'unique_student_identifier': self.student.email,
         })
@@ -3012,7 +3193,7 @@ class TestInstructorAPIRegradeTask(SharedModuleStoreTestCase, LoginEnrollmentTes
     def test_reset_student_attempts_delete(self):
         """ Test delete single student state. """
         url = reverse('reset_student_attempts', kwargs={'course_id': self.course.id.to_deprecated_string()})
-        response = self.client.get(url, {
+        response = self.client.post(url, {
             'problem_to_reset': self.problem_urlname,
             'unique_student_identifier': self.student.email,
             'delete_module': True,
@@ -3031,7 +3212,7 @@ class TestInstructorAPIRegradeTask(SharedModuleStoreTestCase, LoginEnrollmentTes
     def test_reset_student_attempts_nonsense(self):
         """ Test failure with both unique_student_identifier and all_students. """
         url = reverse('reset_student_attempts', kwargs={'course_id': self.course.id.to_deprecated_string()})
-        response = self.client.get(url, {
+        response = self.client.post(url, {
             'problem_to_reset': self.problem_urlname,
             'unique_student_identifier': self.student.email,
             'all_students': True,
@@ -3042,7 +3223,7 @@ class TestInstructorAPIRegradeTask(SharedModuleStoreTestCase, LoginEnrollmentTes
     def test_rescore_problem_single(self, act):
         """ Test rescoring of a single student. """
         url = reverse('rescore_problem', kwargs={'course_id': self.course.id.to_deprecated_string()})
-        response = self.client.get(url, {
+        response = self.client.post(url, {
             'problem_to_reset': self.problem_urlname,
             'unique_student_identifier': self.student.email,
         })
@@ -3053,7 +3234,7 @@ class TestInstructorAPIRegradeTask(SharedModuleStoreTestCase, LoginEnrollmentTes
     def test_rescore_problem_single_from_uname(self, act):
         """ Test rescoring of a single student. """
         url = reverse('rescore_problem', kwargs={'course_id': self.course.id.to_deprecated_string()})
-        response = self.client.get(url, {
+        response = self.client.post(url, {
             'problem_to_reset': self.problem_urlname,
             'unique_student_identifier': self.student.username,
         })
@@ -3064,7 +3245,7 @@ class TestInstructorAPIRegradeTask(SharedModuleStoreTestCase, LoginEnrollmentTes
     def test_rescore_problem_all(self, act):
         """ Test rescoring for all students. """
         url = reverse('rescore_problem', kwargs={'course_id': self.course.id.to_deprecated_string()})
-        response = self.client.get(url, {
+        response = self.client.post(url, {
             'problem_to_reset': self.problem_urlname,
             'all_students': True,
         })
@@ -3076,7 +3257,7 @@ class TestInstructorAPIRegradeTask(SharedModuleStoreTestCase, LoginEnrollmentTes
         """ Test course has entrance exam id set while resetting attempts"""
         url = reverse('reset_student_attempts_for_entrance_exam',
                       kwargs={'course_id': unicode(self.course.id)})
-        response = self.client.get(url, {
+        response = self.client.post(url, {
             'all_students': True,
             'delete_module': False,
         })
@@ -3086,13 +3267,13 @@ class TestInstructorAPIRegradeTask(SharedModuleStoreTestCase, LoginEnrollmentTes
     def test_rescore_entrance_exam_with_invalid_exam(self):
         """ Test course has entrance exam id set while re-scoring. """
         url = reverse('rescore_entrance_exam', kwargs={'course_id': unicode(self.course.id)})
-        response = self.client.get(url, {
+        response = self.client.post(url, {
             'unique_student_identifier': self.student.email,
         })
         self.assertEqual(response.status_code, 400)
 
 
-@attr('shard_1')
+@attr(shard=1)
 @patch.dict(settings.FEATURES, {'ENTRANCE_EXAMS': True})
 @ddt.ddt
 class TestEntranceExamInstructorAPIRegradeTask(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
@@ -3186,11 +3367,11 @@ class TestEntranceExamInstructorAPIRegradeTask(SharedModuleStoreTestCase, LoginE
         self.assertEqual(grades[0], (50.0, 1))
         self.assertEqual(grades[1], (100.0, 1))
 
-    def test_reset_entrance_exam_student_attempts_deletall(self):
+    def test_reset_entrance_exam_student_attempts_delete_all(self):
         """ Make sure no one can delete all students state on entrance exam. """
         url = reverse('reset_student_attempts_for_entrance_exam',
                       kwargs={'course_id': unicode(self.course.id)})
-        response = self.client.get(url, {
+        response = self.client.post(url, {
             'all_students': True,
             'delete_module': True,
         })
@@ -3200,7 +3381,7 @@ class TestEntranceExamInstructorAPIRegradeTask(SharedModuleStoreTestCase, LoginE
         """ Test reset single student attempts for entrance exam. """
         url = reverse('reset_student_attempts_for_entrance_exam',
                       kwargs={'course_id': unicode(self.course.id)})
-        response = self.client.get(url, {
+        response = self.client.post(url, {
             'unique_student_identifier': self.student.email,
         })
         self.assertEqual(response.status_code, 200)
@@ -3218,7 +3399,7 @@ class TestEntranceExamInstructorAPIRegradeTask(SharedModuleStoreTestCase, LoginE
         """ Test reset all student attempts for entrance exam. """
         url = reverse('reset_student_attempts_for_entrance_exam',
                       kwargs={'course_id': unicode(self.course.id)})
-        response = self.client.get(url, {
+        response = self.client.post(url, {
             'all_students': True,
         })
         self.assertEqual(response.status_code, 200)
@@ -3228,16 +3409,16 @@ class TestEntranceExamInstructorAPIRegradeTask(SharedModuleStoreTestCase, LoginE
         """ Test reset for invalid entrance exam. """
         url = reverse('reset_student_attempts_for_entrance_exam',
                       kwargs={'course_id': unicode(self.course_with_invalid_ee.id)})
-        response = self.client.get(url, {
+        response = self.client.post(url, {
             'unique_student_identifier': self.student.email,
         })
         self.assertEqual(response.status_code, 400)
 
-    def test_entrance_exam_sttudent_delete_state(self):
+    def test_entrance_exam_student_delete_state(self):
         """ Test delete single student entrance exam state. """
         url = reverse('reset_student_attempts_for_entrance_exam',
                       kwargs={'course_id': unicode(self.course.id)})
-        response = self.client.get(url, {
+        response = self.client.post(url, {
             'unique_student_identifier': self.student.email,
             'delete_module': True,
         })
@@ -3253,7 +3434,7 @@ class TestEntranceExamInstructorAPIRegradeTask(SharedModuleStoreTestCase, LoginE
         self.client.login(username=staff_user.username, password='test')
         url = reverse('reset_student_attempts_for_entrance_exam',
                       kwargs={'course_id': unicode(self.course.id)})
-        response = self.client.get(url, {
+        response = self.client.post(url, {
             'unique_student_identifier': self.student.email,
             'delete_module': True,
         })
@@ -3263,7 +3444,7 @@ class TestEntranceExamInstructorAPIRegradeTask(SharedModuleStoreTestCase, LoginE
         """ Test failure with both unique_student_identifier and all_students. """
         url = reverse('reset_student_attempts_for_entrance_exam',
                       kwargs={'course_id': unicode(self.course.id)})
-        response = self.client.get(url, {
+        response = self.client.post(url, {
             'unique_student_identifier': self.student.email,
             'all_students': True,
         })
@@ -3273,7 +3454,7 @@ class TestEntranceExamInstructorAPIRegradeTask(SharedModuleStoreTestCase, LoginE
     def test_rescore_entrance_exam_single_student(self, act):
         """ Test re-scoring of entrance exam for single student. """
         url = reverse('rescore_entrance_exam', kwargs={'course_id': unicode(self.course.id)})
-        response = self.client.get(url, {
+        response = self.client.post(url, {
             'unique_student_identifier': self.student.email,
         })
         self.assertEqual(response.status_code, 200)
@@ -3282,7 +3463,7 @@ class TestEntranceExamInstructorAPIRegradeTask(SharedModuleStoreTestCase, LoginE
     def test_rescore_entrance_exam_all_student(self):
         """ Test rescoring for all students. """
         url = reverse('rescore_entrance_exam', kwargs={'course_id': unicode(self.course.id)})
-        response = self.client.get(url, {
+        response = self.client.post(url, {
             'all_students': True,
         })
         self.assertEqual(response.status_code, 200)
@@ -3290,7 +3471,7 @@ class TestEntranceExamInstructorAPIRegradeTask(SharedModuleStoreTestCase, LoginE
     def test_rescore_entrance_exam_all_student_and_single(self):
         """ Test re-scoring with both all students and single student parameters. """
         url = reverse('rescore_entrance_exam', kwargs={'course_id': unicode(self.course.id)})
-        response = self.client.get(url, {
+        response = self.client.post(url, {
             'unique_student_identifier': self.student.email,
             'all_students': True,
         })
@@ -3299,7 +3480,7 @@ class TestEntranceExamInstructorAPIRegradeTask(SharedModuleStoreTestCase, LoginE
     def test_rescore_entrance_exam_with_invalid_exam(self):
         """ Test re-scoring of entrance exam with invalid exam. """
         url = reverse('rescore_entrance_exam', kwargs={'course_id': unicode(self.course_with_invalid_ee.id)})
-        response = self.client.get(url, {
+        response = self.client.post(url, {
             'unique_student_identifier': self.student.email,
         })
         self.assertEqual(response.status_code, 400)
@@ -3308,13 +3489,13 @@ class TestEntranceExamInstructorAPIRegradeTask(SharedModuleStoreTestCase, LoginE
         """ Test list task history for entrance exam AND student. """
         # create a re-score entrance exam task
         url = reverse('rescore_entrance_exam', kwargs={'course_id': unicode(self.course.id)})
-        response = self.client.get(url, {
+        response = self.client.post(url, {
             'unique_student_identifier': self.student.email,
         })
         self.assertEqual(response.status_code, 200)
 
         url = reverse('list_entrance_exam_instructor_tasks', kwargs={'course_id': unicode(self.course.id)})
-        response = self.client.get(url, {
+        response = self.client.post(url, {
             'unique_student_identifier': self.student.email,
         })
         self.assertEqual(response.status_code, 200)
@@ -3327,7 +3508,7 @@ class TestEntranceExamInstructorAPIRegradeTask(SharedModuleStoreTestCase, LoginE
     def test_list_entrance_exam_instructor_tasks_all_student(self):
         """ Test list task history for entrance exam AND all student. """
         url = reverse('list_entrance_exam_instructor_tasks', kwargs={'course_id': unicode(self.course.id)})
-        response = self.client.get(url, {})
+        response = self.client.post(url, {})
         self.assertEqual(response.status_code, 200)
 
         # check response
@@ -3338,7 +3519,7 @@ class TestEntranceExamInstructorAPIRegradeTask(SharedModuleStoreTestCase, LoginE
         """ Test list task history for entrance exam failure if course has invalid exam. """
         url = reverse('list_entrance_exam_instructor_tasks',
                       kwargs={'course_id': unicode(self.course_with_invalid_ee.id)})
-        response = self.client.get(url, {
+        response = self.client.post(url, {
             'unique_student_identifier': self.student.email,
         })
         self.assertEqual(response.status_code, 400)
@@ -3365,9 +3546,8 @@ class TestEntranceExamInstructorAPIRegradeTask(SharedModuleStoreTestCase, LoginE
         self.assertContains(response, message)
 
 
-@attr('shard_1')
+@attr(shard=1)
 @patch('bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message', autospec=True))
-@patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': False})
 class TestInstructorSendEmail(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Checks that only instructors have access to email endpoints, and that
@@ -3381,10 +3561,16 @@ class TestInstructorSendEmail(SharedModuleStoreTestCase, LoginEnrollmentTestCase
         test_subject = u'\u1234 test subject'
         test_message = u'\u6824 test message'
         cls.full_test_message = {
-            'send_to': 'staff',
+            'send_to': '["myself", "staff"]',
             'subject': test_subject,
             'message': test_message,
         }
+        BulkEmailFlag.objects.create(enabled=True, require_course_email_auth=False)
+
+    @classmethod
+    def tearDownClass(cls):
+        super(TestInstructorSendEmail, cls).tearDownClass()
+        BulkEmailFlag.objects.all().delete()
 
     def setUp(self):
         super(TestInstructorSendEmail, self).setUp()
@@ -3424,10 +3610,19 @@ class TestInstructorSendEmail(SharedModuleStoreTestCase, LoginEnrollmentTestCase
         })
         self.assertEqual(response.status_code, 400)
 
+    def test_send_email_invalid_sendto(self):
+        url = reverse('send_email', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        response = self.client.post(url, {
+            'send_to': '["invalid_target", "staff"]',
+            'subject': 'test subject',
+            'message': 'test message',
+        })
+        self.assertEqual(response.status_code, 400)
+
     def test_send_email_no_subject(self):
         url = reverse('send_email', kwargs={'course_id': self.course.id.to_deprecated_string()})
         response = self.client.post(url, {
-            'send_to': 'staff',
+            'send_to': '["staff"]',
             'message': 'test message',
         })
         self.assertEqual(response.status_code, 400)
@@ -3435,7 +3630,7 @@ class TestInstructorSendEmail(SharedModuleStoreTestCase, LoginEnrollmentTestCase
     def test_send_email_no_message(self):
         url = reverse('send_email', kwargs={'course_id': self.course.id.to_deprecated_string()})
         response = self.client.post(url, {
-            'send_to': 'staff',
+            'send_to': '["staff"]',
             'subject': 'test subject',
         })
         self.assertEqual(response.status_code, 400)
@@ -3453,7 +3648,7 @@ class MockCompletionInfo(object):
         return False, 'Task Errored In Some Way'
 
 
-@attr('shard_1')
+@attr(shard=1)
 class TestInstructorAPITaskLists(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Test instructor task list endpoint.
@@ -3540,7 +3735,7 @@ class TestInstructorAPITaskLists(SharedModuleStoreTestCase, LoginEnrollmentTestC
         mock_factory = MockCompletionInfo()
         with patch('instructor.views.instructor_task_helpers.get_task_completion_info') as mock_completion_info:
             mock_completion_info.side_effect = mock_factory.mock_get_task_completion_info
-            response = self.client.get(url, {})
+            response = self.client.post(url, {})
         self.assertEqual(response.status_code, 200)
 
         # check response
@@ -3559,7 +3754,7 @@ class TestInstructorAPITaskLists(SharedModuleStoreTestCase, LoginEnrollmentTestC
         mock_factory = MockCompletionInfo()
         with patch('instructor.views.instructor_task_helpers.get_task_completion_info') as mock_completion_info:
             mock_completion_info.side_effect = mock_factory.mock_get_task_completion_info
-            response = self.client.get(url, {})
+            response = self.client.post(url, {})
         self.assertEqual(response.status_code, 200)
 
         # check response
@@ -3578,7 +3773,7 @@ class TestInstructorAPITaskLists(SharedModuleStoreTestCase, LoginEnrollmentTestC
         mock_factory = MockCompletionInfo()
         with patch('instructor.views.instructor_task_helpers.get_task_completion_info') as mock_completion_info:
             mock_completion_info.side_effect = mock_factory.mock_get_task_completion_info
-            response = self.client.get(url, {
+            response = self.client.post(url, {
                 'problem_location_str': self.problem_urlname,
             })
         self.assertEqual(response.status_code, 200)
@@ -3599,7 +3794,7 @@ class TestInstructorAPITaskLists(SharedModuleStoreTestCase, LoginEnrollmentTestC
         mock_factory = MockCompletionInfo()
         with patch('instructor.views.instructor_task_helpers.get_task_completion_info') as mock_completion_info:
             mock_completion_info.side_effect = mock_factory.mock_get_task_completion_info
-            response = self.client.get(url, {
+            response = self.client.post(url, {
                 'problem_location_str': self.problem_urlname,
                 'unique_student_identifier': self.student.email,
             })
@@ -3615,7 +3810,7 @@ class TestInstructorAPITaskLists(SharedModuleStoreTestCase, LoginEnrollmentTestC
         self.assertEqual(actual_tasks, expected_tasks)
 
 
-@attr('shard_1')
+@attr(shard=1)
 @patch.object(instructor_task.api, 'get_instructor_task_history', autospec=True)
 class TestInstructorEmailContentList(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     """
@@ -3660,7 +3855,7 @@ class TestInstructorEmailContentList(SharedModuleStoreTestCase, LoginEnrollmentT
         url = reverse('list_email_content', kwargs={'course_id': self.course.id.to_deprecated_string()})
         with patch('instructor.views.api.CourseEmail.objects.get') as mock_email_info:
             mock_email_info.side_effect = self.get_matching_mock_email
-            response = self.client.get(url, {})
+            response = self.client.post(url, {})
         self.assertEqual(response.status_code, 200)
         return response
 
@@ -3711,7 +3906,7 @@ class TestInstructorEmailContentList(SharedModuleStoreTestCase, LoginEnrollmentT
         invalid_task.make_invalid_input()
         task_history_request.return_value = [invalid_task]
         url = reverse('list_email_content', kwargs={'course_id': self.course.id.to_deprecated_string()})
-        response = self.client.get(url, {})
+        response = self.client.post(url, {})
         self.assertEqual(response.status_code, 200)
 
         self.assertTrue(task_history_request.called)
@@ -3737,7 +3932,7 @@ class TestInstructorEmailContentList(SharedModuleStoreTestCase, LoginEnrollmentT
         url = reverse('list_email_content', kwargs={'course_id': self.course.id.to_deprecated_string()})
         with patch('instructor.views.api.CourseEmail.objects.get') as mock_email_info:
             mock_email_info.return_value = email
-            response = self.client.get(url, {})
+            response = self.client.post(url, {})
         self.assertEqual(response.status_code, 200)
 
         self.assertTrue(task_history_request.called)
@@ -3749,7 +3944,7 @@ class TestInstructorEmailContentList(SharedModuleStoreTestCase, LoginEnrollmentT
         self.assertDictEqual(expected_info, returned_info)
 
 
-@attr('shard_1')
+@attr(shard=1)
 class TestInstructorAPIHelpers(TestCase):
     """ Test helpers for instructor.api """
 
@@ -3803,7 +3998,7 @@ def get_extended_due(course, unit, user):
         return None
 
 
-@attr('shard_1')
+@attr(shard=1)
 class TestDueDateExtensions(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Test data dumps for reporting.
@@ -3888,7 +4083,7 @@ class TestDueDateExtensions(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
 
     def test_change_due_date(self):
         url = reverse('change_due_date', kwargs={'course_id': self.course.id.to_deprecated_string()})
-        response = self.client.get(url, {
+        response = self.client.post(url, {
             'student': self.user1.username,
             'url': self.week1.location.to_deprecated_string(),
             'due_datetime': '12/30/2013 00:00'
@@ -3899,7 +4094,7 @@ class TestDueDateExtensions(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
 
     def test_change_to_invalid_due_date(self):
         url = reverse('change_due_date', kwargs={'course_id': self.course.id.to_deprecated_string()})
-        response = self.client.get(url, {
+        response = self.client.post(url, {
             'student': self.user1.username,
             'url': self.week1.location.to_deprecated_string(),
             'due_datetime': '01/01/2009 00:00'
@@ -3912,7 +4107,7 @@ class TestDueDateExtensions(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
 
     def test_change_nonexistent_due_date(self):
         url = reverse('change_due_date', kwargs={'course_id': self.course.id.to_deprecated_string()})
-        response = self.client.get(url, {
+        response = self.client.post(url, {
             'student': self.user1.username,
             'url': self.week3.location.to_deprecated_string(),
             'due_datetime': '12/30/2013 00:00'
@@ -3926,7 +4121,7 @@ class TestDueDateExtensions(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     def test_reset_date(self):
         self.test_change_due_date()
         url = reverse('reset_due_date', kwargs={'course_id': self.course.id.to_deprecated_string()})
-        response = self.client.get(url, {
+        response = self.client.post(url, {
             'student': self.user1.username,
             'url': self.week1.location.to_deprecated_string(),
         })
@@ -3938,38 +4133,17 @@ class TestDueDateExtensions(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
 
     def test_reset_nonexistent_extension(self):
         url = reverse('reset_due_date', kwargs={'course_id': self.course.id.to_deprecated_string()})
-        response = self.client.get(url, {
+        response = self.client.post(url, {
             'student': self.user1.username,
             'url': self.week1.location.to_deprecated_string(),
         })
         self.assertEqual(response.status_code, 400, response.content)
 
-    @SharedModuleStoreTestCase.modifies_courseware
-    def test_reset_extension_to_deleted_date(self):
-        """
-        Test that we can delete a due date extension after deleting the normal
-        due date, without causing an error.
-        """
-        self.test_change_due_date()
-        self.week1.due = None
-        self.week1 = self.store.update_item(self.week1, self.user1.id)
-        # Now, week1's normal due date is deleted but the extension still exists.
-        url = reverse('reset_due_date', kwargs={'course_id': self.course.id.to_deprecated_string()})
-        response = self.client.get(url, {
-            'student': self.user1.username,
-            'url': self.week1.location.to_deprecated_string(),
-        })
-        self.assertEqual(response.status_code, 200, response.content)
-        self.assertEqual(
-            None,
-            get_extended_due(self.course, self.week1, self.user1)
-        )
-
     def test_show_unit_extensions(self):
         self.test_change_due_date()
         url = reverse('show_unit_extensions',
                       kwargs={'course_id': self.course.id.to_deprecated_string()})
-        response = self.client.get(url, {'url': self.week1.location.to_deprecated_string()})
+        response = self.client.post(url, {'url': self.week1.location.to_deprecated_string()})
         self.assertEqual(response.status_code, 200, response.content)
         self.assertEqual(json.loads(response.content), {
             u'data': [{u'Extended Due Date': u'2013-12-30 00:00',
@@ -3983,7 +4157,7 @@ class TestDueDateExtensions(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         self.test_change_due_date()
         url = reverse('show_student_extensions',
                       kwargs={'course_id': self.course.id.to_deprecated_string()})
-        response = self.client.get(url, {'student': self.user1.username})
+        response = self.client.post(url, {'student': self.user1.username})
         self.assertEqual(response.status_code, 200, response.content)
         self.assertEqual(json.loads(response.content), {
             u'data': [{u'Extended Due Date': u'2013-12-30 00:00',
@@ -3993,7 +4167,115 @@ class TestDueDateExtensions(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
                 self.user1.profile.name, self.user1.username)})
 
 
-@attr('shard_1')
+@attr(shard=1)
+class TestDueDateExtensionsDeletedDate(ModuleStoreTestCase, LoginEnrollmentTestCase):
+    def setUp(self):
+        """
+        Fixtures.
+        """
+        super(TestDueDateExtensionsDeletedDate, self).setUp()
+
+        self.course = CourseFactory.create()
+        self.due = datetime.datetime(2010, 5, 12, 2, 42, tzinfo=utc)
+
+        with self.store.bulk_operations(self.course.id, emit_signals=False):
+            self.week1 = ItemFactory.create(due=self.due)
+            self.week2 = ItemFactory.create(due=self.due)
+            self.week3 = ItemFactory.create()  # No due date
+            self.course.children = [
+                self.week1.location.to_deprecated_string(),
+                self.week2.location.to_deprecated_string(),
+                self.week3.location.to_deprecated_string()
+            ]
+            self.homework = ItemFactory.create(
+                parent_location=self.week1.location,
+                due=self.due
+            )
+            self.week1.children = [self.homework.location.to_deprecated_string()]
+
+        user1 = UserFactory.create()
+        StudentModule(
+            state='{}',
+            student_id=user1.id,
+            course_id=self.course.id,
+            module_state_key=self.week1.location).save()
+        StudentModule(
+            state='{}',
+            student_id=user1.id,
+            course_id=self.course.id,
+            module_state_key=self.week2.location).save()
+        StudentModule(
+            state='{}',
+            student_id=user1.id,
+            course_id=self.course.id,
+            module_state_key=self.week3.location).save()
+        StudentModule(
+            state='{}',
+            student_id=user1.id,
+            course_id=self.course.id,
+            module_state_key=self.homework.location).save()
+
+        user2 = UserFactory.create()
+        StudentModule(
+            state='{}',
+            student_id=user2.id,
+            course_id=self.course.id,
+            module_state_key=self.week1.location).save()
+        StudentModule(
+            state='{}',
+            student_id=user2.id,
+            course_id=self.course.id,
+            module_state_key=self.homework.location).save()
+
+        user3 = UserFactory.create()
+        StudentModule(
+            state='{}',
+            student_id=user3.id,
+            course_id=self.course.id,
+            module_state_key=self.week1.location).save()
+        StudentModule(
+            state='{}',
+            student_id=user3.id,
+            course_id=self.course.id,
+            module_state_key=self.homework.location).save()
+
+        self.user1 = user1
+        self.user2 = user2
+        self.instructor = InstructorFactory(course_key=self.course.id)
+        self.client.login(username=self.instructor.username, password='test')
+
+    def test_reset_extension_to_deleted_date(self):
+        """
+        Test that we can delete a due date extension after deleting the normal
+        due date, without causing an error.
+        """
+
+        url = reverse('change_due_date', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        response = self.client.post(url, {
+            'student': self.user1.username,
+            'url': self.week1.location.to_deprecated_string(),
+            'due_datetime': '12/30/2013 00:00'
+        })
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(datetime.datetime(2013, 12, 30, 0, 0, tzinfo=utc),
+                         get_extended_due(self.course, self.week1, self.user1))
+
+        self.week1.due = None
+        self.week1 = self.store.update_item(self.week1, self.user1.id)
+        # Now, week1's normal due date is deleted but the extension still exists.
+        url = reverse('reset_due_date', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        response = self.client.post(url, {
+            'student': self.user1.username,
+            'url': self.week1.location.to_deprecated_string(),
+        })
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(
+            None,
+            get_extended_due(self.course, self.week1, self.user1)
+        )
+
+
+@attr(shard=1)
 class TestCourseIssuedCertificatesData(SharedModuleStoreTestCase):
     """
     Test data dumps for issued certificates.
@@ -4030,14 +4312,14 @@ class TestCourseIssuedCertificatesData(SharedModuleStoreTestCase):
         for __ in xrange(certificate_count):
             self.generate_certificate(course_id=self.course.id, mode='honor', status=CertificateStatuses.generating)
 
-        response = self.client.get(url)
+        response = self.client.post(url)
         res_json = json.loads(response.content)
         self.assertIn('certificates', res_json)
         self.assertEqual(len(res_json['certificates']), 0)
 
         # Certificates with status 'downloadable' should be in response.
         self.generate_certificate(course_id=self.course.id, mode='honor', status=CertificateStatuses.downloadable)
-        response = self.client.get(url)
+        response = self.client.post(url)
         res_json = json.loads(response.content)
         self.assertIn('certificates', res_json)
         self.assertEqual(len(res_json['certificates']), 1)
@@ -4052,7 +4334,7 @@ class TestCourseIssuedCertificatesData(SharedModuleStoreTestCase):
         for __ in xrange(certificate_count):
             self.generate_certificate(course_id=self.course.id, mode='honor', status=CertificateStatuses.downloadable)
 
-        response = self.client.get(url)
+        response = self.client.post(url)
         res_json = json.loads(response.content)
         self.assertIn('certificates', res_json)
         self.assertEqual(len(res_json['certificates']), 1)
@@ -4071,7 +4353,7 @@ class TestCourseIssuedCertificatesData(SharedModuleStoreTestCase):
                 status=CertificateStatuses.downloadable
             )
 
-        response = self.client.get(url)
+        response = self.client.post(url)
         res_json = json.loads(response.content)
         self.assertIn('certificates', res_json)
 
@@ -4088,14 +4370,13 @@ class TestCourseIssuedCertificatesData(SharedModuleStoreTestCase):
         Test for certificate csv features.
         """
         url = reverse('get_issued_certificates', kwargs={'course_id': unicode(self.course.id)})
-        url += '?csv=true'
         # firstly generating downloadable certificates with 'honor' mode
         certificate_count = 3
         for __ in xrange(certificate_count):
             self.generate_certificate(course_id=self.course.id, mode='honor', status=CertificateStatuses.downloadable)
 
         current_date = datetime.date.today().strftime("%B %d, %Y")
-        response = self.client.get(url)
+        response = self.client.get(url, {'csv': 'true'})
         self.assertEqual(response['Content-Type'], 'text/csv')
         self.assertEqual(response['Content-Disposition'], 'attachment; filename={0}'.format('issued_certificates.csv'))
         self.assertEqual(
@@ -4105,7 +4386,7 @@ class TestCourseIssuedCertificatesData(SharedModuleStoreTestCase):
         )
 
 
-@attr('shard_1')
+@attr(shard=1)
 @override_settings(REGISTRATION_CODE_LENGTH=8)
 class TestCourseRegistrationCodes(SharedModuleStoreTestCase):
     """
@@ -4544,7 +4825,7 @@ class TestCourseRegistrationCodes(SharedModuleStoreTestCase):
             )
             coupon.save()
 
-        response = self.client.get(get_coupon_code_url)
+        response = self.client.post(get_coupon_code_url)
         self.assertEqual(response.status_code, 200, response.content)
         # filter all the coupons
         for coupon in Coupon.objects.all():
@@ -4568,7 +4849,7 @@ class TestCourseRegistrationCodes(SharedModuleStoreTestCase):
         self.assertTrue(body.startswith(EXPECTED_COUPON_CSV_HEADER))
 
 
-@attr('shard_1')
+@attr(shard=1)
 class TestBulkCohorting(SharedModuleStoreTestCase):
     """
     Test adding users to cohorts in bulk via CSV upload.
@@ -4585,7 +4866,7 @@ class TestBulkCohorting(SharedModuleStoreTestCase):
         self.tempdir = tempfile.mkdtemp()
         self.addCleanup(shutil.rmtree, self.tempdir)
 
-    def call_add_users_to_cohorts(self, csv_data, suffix='.csv', method='POST'):
+    def call_add_users_to_cohorts(self, csv_data, suffix='.csv'):
         """
         Call `add_users_to_cohorts` with a file generated from `csv_data`.
         """
@@ -4595,10 +4876,7 @@ class TestBulkCohorting(SharedModuleStoreTestCase):
             file_pointer.write(csv_data.encode('utf-8'))
         with open(file_name, 'r') as file_pointer:
             url = reverse('add_users_to_cohorts', kwargs={'course_id': unicode(self.course.id)})
-            if method == 'POST':
-                return self.client.post(url, {'uploaded-file': file_pointer})
-            elif method == 'GET':
-                return self.client.get(url, {'uploaded-file': file_pointer})
+            return self.client.post(url, {'uploaded-file': file_pointer})
 
     def expect_error_on_file_content(self, file_content, error, file_suffix='.csv'):
         """
@@ -4666,14 +4944,6 @@ class TestBulkCohorting(SharedModuleStoreTestCase):
         self.client.login(username=self.non_staff_user.username, password='test')
         response = self.call_add_users_to_cohorts('')
         self.assertEqual(response.status_code, 403)
-
-    def test_post_only(self):
-        """
-        Verify that we can't call the view when we aren't using POST.
-        """
-        self.client.login(username=self.staff_user.username, password='test')
-        response = self.call_add_users_to_cohorts('', method='GET')
-        self.assertEqual(response.status_code, 405)
 
     @patch('instructor.views.api.instructor_task.api.submit_cohort_students')
     @patch('instructor.views.api.store_uploaded_file')

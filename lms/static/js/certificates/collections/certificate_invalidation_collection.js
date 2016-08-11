@@ -1,7 +1,7 @@
 // Backbone.js Application Collection: CertificateInvalidationCollection
-/*global define, RequireJS */
+/* global define, RequireJS */
 
-;(function(define) {
+(function(define) {
     'use strict';
 
     define(
@@ -9,7 +9,11 @@
 
         function(Backbone, CertificateInvalidation) {
             return Backbone.Collection.extend({
-                model: CertificateInvalidation
+                model: CertificateInvalidation,
+
+                initialize: function(models, options) {
+                    this.url = options.url;
+                }
             });
         }
     );

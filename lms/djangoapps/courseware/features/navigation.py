@@ -5,7 +5,6 @@
 from lettuce import world, step
 from common import course_location
 from problems_setup import PROBLEM_DICT
-from nose.tools import assert_in
 
 
 @step(u'I am viewing a course with multiple sections')
@@ -109,12 +108,15 @@ def when_i_navigate_to_a_subsection(step):
 
 @step(u'I navigate to an item in a sequence')
 def when_i_navigate_to_an_item_in_a_sequence(step):
-    sequence_css = 'a[data-element="2"]'
+    sequence_css = '.nav-item[data-element="2"]'
     world.css_click(sequence_css)
 
 
 @step(u'I see the content of the section')
 def then_i_see_the_content_of_the_section(step):
+    """
+    Uppercasing the title here since CSS does it on the front-end
+    """
     wait_for_problem('Problem 2')
 
 

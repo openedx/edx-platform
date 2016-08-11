@@ -5,7 +5,6 @@ import json
 
 from django.utils.html import escapejs
 from mako.filters import decode
-from markupsafe import escape
 
 from xmodule.modulestore import EdxJSONEncoder
 
@@ -71,45 +70,6 @@ def dump_js_escaped_json(obj, cls=EdxJSONEncoder):
     """
     json_string = json.dumps(obj, ensure_ascii=True, cls=cls)
     json_string = _escape_json_for_js(json_string)
-    return json_string
-
-
-def dump_html_escaped_json(obj, cls=EdxJSONEncoder):
-    """
-    JSON dumps and escapes objects that are safe to be embedded in HTML.
-
-    Use this for anything but strings (e.g. dicts, tuples, lists, bools, and
-    numbers).  For strings, just used the default html filter.
-
-    Usage:
-        Used as follows in a Mako template inside a HTML, like in
-        a data attribute::
-
-            data-obj='${obj | n, dump_html_escaped_json}'
-
-        If you must use the cls argument, then use as follows::
-
-            data-obj='${dump_html_escaped_json(obj, cls) | n}'
-
-        Use the "n" Mako filter above.  The default filter will include
-        html escaping in the future, and this ensures proper ordering of
-        these calls.
-
-        Ensure ascii in json.dumps (ensure_ascii=True) allows safe skipping of
-        Mako's default filter decode.utf8.
-
-    Arguments:
-        obj: The object soon to become an HTML escaped JSON string.  The object
-            can be anything but strings (e.g. dicts, tuples, lists, bools, and
-            numbers).
-        cls (class): The JSON encoder class (defaults to EdxJSONEncoder).
-
-    Returns:
-        (string) Escaped encoded JSON.
-
-    """
-    json_string = json.dumps(obj, ensure_ascii=True, cls=cls)
-    json_string = escape(json_string)
     return json_string
 
 

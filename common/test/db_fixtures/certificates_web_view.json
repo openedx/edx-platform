@@ -110,5 +110,504 @@
       "company_identifier": "7nTFLiuDkkQkdELSpruCwD4F6jzqtTFsx3PfJUIT2qHqXRLG1",
       "trk_partner_name": "edx"
     }
+  },
+  {
+    "fields": {
+      "display_name": "Test Badge",
+      "description": "Yay! It's a test badge.",
+      "image": "badge_classes/test_Nln8nhu.png",
+      "issuing_component": "test_component",
+      "mode": "honor",
+      "criteria": "https://example.com/syllabus",
+      "course_id": null,
+      "slug": "test_slug_0_0768205214811"
+    },
+    "model": "badges.badgeclass",
+    "pk": 1
+  },
+  {
+    "fields": {
+      "assertion_url": "http://example.com/example.json",
+      "created": "2016-03-22T15:35:21.401Z",
+      "modified": "2016-03-22T15:35:21.403Z",
+      "image_url": "http://example.com/image.png",
+      "user": 99,
+      "badge_class": 1,
+      "data": "{}",
+      "backend": ""
+    },
+    "model": "badges.badgeassertion",
+    "pk": 1
+  },
+  {
+    "fields": {
+      "assertion_url": "http://example.com/example.json",
+      "created": "2016-03-22T15:35:21.412Z",
+      "modified": "2016-03-22T15:35:21.413Z",
+      "image_url": "http://example.com/image.png",
+      "user": 99,
+      "badge_class": 1,
+      "data": "{}",
+      "backend": ""
+    },
+    "model": "badges.badgeassertion",
+    "pk": 2
+  },
+  {
+    "fields": {
+      "assertion_url": "http://example.com/example.json",
+      "created": "2016-03-22T15:35:21.422Z",
+      "modified": "2016-03-22T15:35:21.423Z",
+      "image_url": "http://example.com/image.png",
+      "user": 99,
+      "badge_class": 1,
+      "data": "{}",
+      "backend": ""
+    },
+    "model": "badges.badgeassertion",
+    "pk": 3
+  },
+  {
+    "fields": {
+      "assertion_url": "http://example.com/example.json",
+      "created": "2016-03-22T15:35:21.437Z",
+      "modified": "2016-03-22T15:35:21.437Z",
+      "image_url": "http://example.com/image.png",
+      "user": 99,
+      "badge_class": 1,
+      "data": "{}",
+      "backend": ""
+    },
+    "model": "badges.badgeassertion",
+    "pk": 4
+  },
+  {
+    "fields": {
+      "assertion_url": "http://example.com/example.json",
+      "created": "2016-03-22T15:35:21.444Z",
+      "modified": "2016-03-22T15:35:21.445Z",
+      "image_url": "http://example.com/image.png",
+      "user": 99,
+      "badge_class": 1,
+      "data": "{}",
+      "backend": ""
+    },
+    "model": "badges.badgeassertion",
+    "pk": 5
+  },
+  {
+    "fields": {
+      "assertion_url": "http://example.com/example.json",
+      "created": "2016-03-22T15:35:21.451Z",
+      "modified": "2016-03-22T15:35:21.451Z",
+      "image_url": "http://example.com/image.png",
+      "user": 99,
+      "badge_class": 1,
+      "data": "{}",
+      "backend": ""
+    },
+    "model": "badges.badgeassertion",
+    "pk": 6
+  },
+  {
+    "fields": {
+      "assertion_url": "http://example.com/example.json",
+      "created": "2016-03-22T15:35:21.459Z",
+      "modified": "2016-03-22T15:35:21.459Z",
+      "image_url": "http://example.com/image.png",
+      "user": 99,
+      "badge_class": 1,
+      "data": "{}",
+      "backend": ""
+    },
+    "model": "badges.badgeassertion",
+    "pk": 7
+  },
+  {
+    "fields": {
+      "assertion_url": "http://example.com/example.json",
+      "created": "2016-03-22T15:35:21.467Z",
+      "modified": "2016-03-22T15:35:21.467Z",
+      "image_url": "http://example.com/image.png",
+      "user": 99,
+      "badge_class": 1,
+      "data": "{}",
+      "backend": ""
+    },
+    "model": "badges.badgeassertion",
+    "pk": 8
+  },
+  {
+    "fields": {
+      "assertion_url": "http://example.com/example.json",
+      "created": "2016-03-22T15:35:21.475Z",
+      "modified": "2016-03-22T15:35:21.476Z",
+      "image_url": "http://example.com/image.png",
+      "user": 99,
+      "badge_class": 1,
+      "data": "{}",
+      "backend": ""
+    },
+    "model": "badges.badgeassertion",
+    "pk": 9
+  },
+  {
+    "fields": {
+      "assertion_url": "http://example.com/example.json",
+      "created": "2016-03-22T15:35:21.488Z",
+      "modified": "2016-03-22T15:35:21.489Z",
+      "image_url": "http://example.com/image.png",
+      "user": 99,
+      "badge_class": 1,
+      "data": "{}",
+      "backend": ""
+    },
+    "model": "badges.badgeassertion",
+    "pk": 10
+  },
+  {
+    "fields": {
+      "assertion_url": "http://example.com/example.json",
+      "created": "2016-03-22T15:35:21.495Z",
+      "modified": "2016-03-22T15:35:21.496Z",
+      "image_url": "http://example.com/image.png",
+      "user": 99,
+      "badge_class": 1,
+      "data": "{}",
+      "backend": ""
+    },
+    "model": "badges.badgeassertion",
+    "pk": 11
+  },
+  {
+    "fields": {
+      "assertion_url": "http://example.com/example.json",
+      "created": "2016-03-22T15:35:21.503Z",
+      "modified": "2016-03-22T15:35:21.504Z",
+      "image_url": "http://example.com/image.png",
+      "user": 99,
+      "badge_class": 1,
+      "data": "{}",
+      "backend": ""
+    },
+    "model": "badges.badgeassertion",
+    "pk": 12
+  },
+  {
+    "fields": {
+      "assertion_url": "http://example.com/example.json",
+      "created": "2016-03-22T15:35:21.511Z",
+      "modified": "2016-03-22T15:35:21.512Z",
+      "image_url": "http://example.com/image.png",
+      "user": 99,
+      "badge_class": 1,
+      "data": "{}",
+      "backend": ""
+    },
+    "model": "badges.badgeassertion",
+    "pk": 13
+  },
+  {
+    "fields": {
+      "assertion_url": "http://example.com/example.json",
+      "created": "2016-03-22T15:35:21.519Z",
+      "modified": "2016-03-22T15:35:21.519Z",
+      "image_url": "http://example.com/image.png",
+      "user": 99,
+      "badge_class": 1,
+      "data": "{}",
+      "backend": ""
+    },
+    "model": "badges.badgeassertion",
+    "pk": 14
+  },
+  {
+    "fields": {
+      "assertion_url": "http://example.com/example.json",
+      "created": "2016-03-22T15:35:21.532Z",
+      "modified": "2016-03-22T15:35:21.534Z",
+      "image_url": "http://example.com/image.png",
+      "user": 99,
+      "badge_class": 1,
+      "data": "{}",
+      "backend": ""
+    },
+    "model": "badges.badgeassertion",
+    "pk": 15
+  },
+  {
+    "fields": {
+      "assertion_url": "http://example.com/example.json",
+      "created": "2016-03-22T15:35:21.542Z",
+      "modified": "2016-03-22T15:35:21.544Z",
+      "image_url": "http://example.com/image.png",
+      "user": 99,
+      "badge_class": 1,
+      "data": "{}",
+      "backend": ""
+    },
+    "model": "badges.badgeassertion",
+    "pk": 16
+  },
+  {
+    "fields": {
+      "assertion_url": "http://example.com/example.json",
+      "created": "2016-03-22T15:35:21.551Z",
+      "modified": "2016-03-22T15:35:21.552Z",
+      "image_url": "http://example.com/image.png",
+      "user": 99,
+      "badge_class": 1,
+      "data": "{}",
+      "backend": ""
+    },
+    "model": "badges.badgeassertion",
+    "pk": 17
+  },
+  {
+    "fields": {
+      "assertion_url": "http://example.com/example.json",
+      "created": "2016-03-22T15:35:21.559Z",
+      "modified": "2016-03-22T15:35:21.560Z",
+      "image_url": "http://example.com/image.png",
+      "user": 99,
+      "badge_class": 1,
+      "data": "{}",
+      "backend": ""
+    },
+    "model": "badges.badgeassertion",
+    "pk": 18
+  },
+  {
+    "fields": {
+      "assertion_url": "http://example.com/example.json",
+      "created": "2016-03-22T15:35:21.566Z",
+      "modified": "2016-03-22T15:35:21.566Z",
+      "image_url": "http://example.com/image.png",
+      "user": 99,
+      "badge_class": 1,
+      "data": "{}",
+      "backend": ""
+    },
+    "model": "badges.badgeassertion",
+    "pk": 19
+  },
+  {
+    "fields": {
+      "assertion_url": "http://example.com/example.json",
+      "created": "2016-03-22T15:35:21.573Z",
+      "modified": "2016-03-22T15:35:21.574Z",
+      "image_url": "http://example.com/image.png",
+      "user": 99,
+      "badge_class": 1,
+      "data": "{}",
+      "backend": ""
+    },
+    "model": "badges.badgeassertion",
+    "pk": 20
+  },
+  {
+    "fields": {
+      "assertion_url": "http://example.com/example.json",
+      "created": "2016-03-22T15:35:21.592Z",
+      "modified": "2016-03-22T15:35:21.592Z",
+      "image_url": "http://example.com/image.png",
+      "user": 99,
+      "badge_class": 1,
+      "data": "{}",
+      "backend": ""
+    },
+    "model": "badges.badgeassertion",
+    "pk": 21
+  },
+  {
+    "fields": {
+      "assertion_url": "http://example.com/example.json",
+      "created": "2016-03-22T15:35:21.600Z",
+      "modified": "2016-03-22T15:35:21.600Z",
+      "image_url": "http://example.com/image.png",
+      "user": 99,
+      "badge_class": 1,
+      "data": "{}",
+      "backend": ""
+    },
+    "model": "badges.badgeassertion",
+    "pk": 22
+  },
+  {
+    "fields": {
+      "assertion_url": "http://example.com/example.json",
+      "created": "2016-03-22T15:35:21.607Z",
+      "modified": "2016-03-22T15:35:21.608Z",
+      "image_url": "http://example.com/image.png",
+      "user": 99,
+      "badge_class": 1,
+      "data": "{}",
+      "backend": ""
+    },
+    "model": "badges.badgeassertion",
+    "pk": 23
+  },
+  {
+    "fields": {
+      "assertion_url": "http://example.com/example.json",
+      "created": "2016-03-22T15:35:21.617Z",
+      "modified": "2016-03-22T15:35:21.618Z",
+      "image_url": "http://example.com/image.png",
+      "user": 99,
+      "badge_class": 1,
+      "data": "{}",
+      "backend": ""
+    },
+    "model": "badges.badgeassertion",
+    "pk": 24
+  },
+  {
+    "fields": {
+      "assertion_url": "http://example.com/example.json",
+      "created": "2016-03-22T15:35:21.624Z",
+      "modified": "2016-03-22T15:35:21.625Z",
+      "image_url": "http://example.com/image.png",
+      "user": 99,
+      "badge_class": 1,
+      "data": "{}",
+      "backend": ""
+    },
+    "model": "badges.badgeassertion",
+    "pk": 25
+  },
+  {
+    "fields": {
+      "assertion_url": "http://example.com/example.json",
+      "created": "2016-03-22T15:35:21.632Z",
+      "modified": "2016-03-22T15:35:21.632Z",
+      "image_url": "http://example.com/image.png",
+      "user": 99,
+      "badge_class": 1,
+      "data": "{}",
+      "backend": ""
+    },
+    "model": "badges.badgeassertion",
+    "pk": 26
+  },
+  {
+    "fields": {
+      "assertion_url": "http://example.com/example.json",
+      "created": "2016-03-22T15:35:21.645Z",
+      "modified": "2016-03-22T15:35:21.646Z",
+      "image_url": "http://example.com/image.png",
+      "user": 99,
+      "badge_class": 1,
+      "data": "{}",
+      "backend": ""
+    },
+    "model": "badges.badgeassertion",
+    "pk": 27
+  },
+  {
+    "fields": {
+      "assertion_url": "http://example.com/example.json",
+      "created": "2016-03-22T15:35:21.653Z",
+      "modified": "2016-03-22T15:35:21.653Z",
+      "image_url": "http://example.com/image.png",
+      "user": 99,
+      "badge_class": 1,
+      "data": "{}",
+      "backend": ""
+    },
+    "model": "badges.badgeassertion",
+    "pk": 28
+  },
+  {
+    "fields": {
+      "assertion_url": "http://example.com/example.json",
+      "created": "2016-03-22T15:35:21.659Z",
+      "modified": "2016-03-22T15:35:21.659Z",
+      "image_url": "http://example.com/image.png",
+      "user": 99,
+      "badge_class": 1,
+      "data": "{}",
+      "backend": ""
+    },
+    "model": "badges.badgeassertion",
+    "pk": 29
+  },
+  {
+    "fields": {
+      "assertion_url": "http://example.com/example.json",
+      "created": "2016-03-22T15:35:21.667Z",
+      "modified": "2016-03-22T15:35:21.667Z",
+      "image_url": "http://example.com/image.png",
+      "user": 99,
+      "badge_class": 1,
+      "data": "{}",
+      "backend": ""
+    },
+    "model": "badges.badgeassertion",
+    "pk": 30
+  },
+  {
+    "fields": {
+      "assertion_url": "http://example.com/example.json",
+      "created": "2016-03-22T15:35:21.675Z",
+      "modified": "2016-03-22T15:35:21.676Z",
+      "image_url": "http://example.com/image.png",
+      "user": 99,
+      "badge_class": 1,
+      "data": "{}",
+      "backend": ""
+    },
+    "model": "badges.badgeassertion",
+    "pk": 31
+  },
+  {
+    "fields": {
+      "assertion_url": "http://example.com/example.json",
+      "created": "2016-03-22T15:35:21.693Z",
+      "modified": "2016-03-22T15:35:21.695Z",
+      "image_url": "http://example.com/image.png",
+      "user": 99,
+      "badge_class": 1,
+      "data": "{}",
+      "backend": ""
+    },
+    "model": "badges.badgeassertion",
+    "pk": 32
+  },
+  {
+    "fields": {
+      "assertion_url": "http://example.com/example.json",
+      "created": "2016-03-22T15:35:21.704Z",
+      "modified": "2016-03-22T15:35:21.705Z",
+      "image_url": "http://example.com/image.png",
+      "user": 99,
+      "badge_class": 1,
+      "data": "{}",
+      "backend": ""
+    },
+    "model": "badges.badgeassertion",
+    "pk": 33
+  },
+  {
+    "fields": {
+      "assertion_url": "http://example.com/example.json",
+      "created": "2016-03-22T15:35:21.715Z",
+      "modified": "2016-03-22T15:35:21.716Z",
+      "image_url": "http://example.com/image.png",
+      "user": 99,
+      "badge_class": 1,
+      "data": "{}",
+      "backend": ""
+    },
+    "model": "badges.badgeassertion",
+    "pk": 34
+  },
+  {
+    "fields": {
+      "default": true,
+      "mode": "honor",
+      "icon": "course_complete_badges/honor.png"
+    },
+    "model": "badges.coursecompleteimageconfiguration",
+    "pk": 1
   }
 ]

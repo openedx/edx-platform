@@ -1,20 +1,21 @@
 <%inherit file="main.html" />
 <%!
 from django.utils.translation import ugettext as _
+from openedx.core.djangolib.markup import HTML
 %>
 
 <section class="home">
   <header>
     <div class="outer-wrapper">
       <div class="title">
-        <hgroup>
+        <div class="heading-group">
           % if homepage_overlay_html:
             ${homepage_overlay_html}
           % else:
-            <h1>${_("Free courses from <strong>{university_name}</strong>").format(university_name="Stanford")}</h1>
-            <h2>${_("For anyone, anywhere, anytime")}</h2>
+            <h1>${_(HTML("Free courses from <strong>{university_name}</strong>")).format(university_name="Stanford")}</h1>
+            <p>${_("For anyone, anywhere, anytime")}</p>
           % endif
-        </hgroup>
+        </div>
         % if settings.FEATURES.get('ENABLE_COURSE_DISCOVERY'):
           <div class="course-search">
             <form method="get" action="/courses">
@@ -22,7 +23,7 @@ from django.utils.translation import ugettext as _
                 <input class="search-input" name="search_query" type="text" placeholder="${_("Search for a course")}"></input>
               </label>
               <button class="search-button" type="submit">
-                <i class="icon fa fa-search" aria-hidden="true"></i><span class="sr">${_("Search")}</span>
+                <span class="icon fa fa-search" aria-hidden="true"></span><span class="sr">${_("Search")}</span>
               </button>
             </form>
           </div>

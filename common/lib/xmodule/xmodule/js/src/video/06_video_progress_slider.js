@@ -1,5 +1,4 @@
-(function (requirejs, require, define) {
-
+(function(requirejs, require, define) {
 /*
 "This is as true in everyday life as it is in battle: we are given one life
 and the decision is ours whether to wait for circumstances to make up our
@@ -8,16 +7,16 @@ mind, or whether to act, and in acting, to live."
  */
 
 // VideoProgressSlider module.
-define(
+    define(
 'video/06_video_progress_slider.js',
 [],
-function () {
+function() {
     var template = [
         '<div class="slider" title="', gettext('Video position'), '"></div>'
     ].join('');
 
     // VideoProgressSlider() function - what this module "exports".
-    return function (state) {
+    return function(state) {
         var dfd = $.Deferred();
 
         state.videoProgressSlider = {};
@@ -79,17 +78,18 @@ function () {
         // ARIA
         // We just want the knob to be selectable with keyboard
         state.videoProgressSlider.el.attr('tabindex', -1);
-        // Let screen readers know that this anchor, representing the slider
+        // Let screen readers know that this div, representing the slider
         // handle, behaves as a slider named 'video position'.
         state.videoProgressSlider.handle.attr({
             'role': 'slider',
-            'title': gettext('Video position'),
             'aria-disabled': false,
             'aria-valuetext': getTimeDescription(state.videoProgressSlider
                 .slider.slider('option', 'value')),
             'aria-valuemax': state.videoPlayer.duration(),
             'aria-valuemin': '0',
-            'aria-valuenow': state.videoPlayer.currentTime
+            'aria-valuenow': state.videoPlayer.currentTime,
+            'tabindex': '0',
+            'aria-label': gettext('Video position')
         });
 
         state.el.on('destroy', state.videoProgressSlider.destroy);
@@ -103,6 +103,9 @@ function () {
     // ***************************************************************
 
     function buildSlider() {
+        this.videoProgressSlider.el
+            .append('<div class="ui-slider-handle progress-handle"></div>');
+
         this.videoProgressSlider.slider = this.videoProgressSlider.el
             .slider({
                 range: 'min',
@@ -294,19 +297,19 @@ function () {
         var seconds = Math.floor(time),
             minutes = Math.floor(seconds / 60),
             hours = Math.floor(minutes / 60),
-            i18n = function (value, word) {
+            i18n = function(value, word) {
                 var msg;
 
-                switch(word) {
-                    case 'hour':
-                        msg = ngettext('%(value)s hour', '%(value)s hours', value);
-                        break;
-                    case 'minute':
-                        msg = ngettext('%(value)s minute', '%(value)s minutes', value);
-                        break;
-                    case 'second':
-                        msg = ngettext('%(value)s second', '%(value)s seconds', value);
-                        break;
+                switch (word) {
+                case 'hour':
+                    msg = ngettext('%(value)s hour', '%(value)s hours', value);
+                    break;
+                case 'minute':
+                    msg = ngettext('%(value)s minute', '%(value)s minutes', value);
+                    break;
+                case 'second':
+                    msg = ngettext('%(value)s second', '%(value)s seconds', value);
+                    break;
                 }
                 return interpolate(msg, {'value': value}, true);
             };
@@ -315,17 +318,15 @@ function () {
         minutes = minutes % 60;
 
         if (hours) {
-            return  i18n(hours, 'hour') + ' ' +
+            return i18n(hours, 'hour') + ' ' +
                     i18n(minutes, 'minute') + ' ' +
                     i18n(seconds, 'second');
         } else if (minutes) {
-            return  i18n(minutes, 'minute') + ' ' +
+            return i18n(minutes, 'minute') + ' ' +
                     i18n(seconds, 'second');
         }
 
         return i18n(seconds, 'second');
     }
-
 });
-
 }(RequireJS.requirejs, RequireJS.require, RequireJS.define));

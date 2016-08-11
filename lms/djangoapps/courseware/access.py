@@ -20,6 +20,7 @@ from django.utils.timezone import UTC
 
 from opaque_keys.edx.keys import CourseKey, UsageKey
 
+from util import milestones_helpers as milestones_helpers
 from xblock.core import XBlock
 
 from xmodule.course_module import (
@@ -28,7 +29,7 @@ from xmodule.course_module import (
     CATALOG_VISIBILITY_ABOUT,
 )
 from xmodule.error_module import ErrorDescriptor
-from xmodule.x_module import XModule, DEPRECATION_VSCOMPAT_EVENT
+from xmodule.x_module import XModule
 from xmodule.split_test_module import get_split_user_partitions
 from xmodule.partitions.partitions import NoSuchUserPartitionError, NoSuchUserPartitionGroupError
 
@@ -54,14 +55,15 @@ from util.milestones_helpers import (
 )
 from ccx_keys.locator import CCXLocator
 
-import dogstats_wrapper as dog_stats_api
-
 from courseware.access_response import (
     MilestoneError,
     MobileAvailabilityError,
     VisibilityError,
 )
-from courseware.access_utils import adjust_start_date, check_start_date, debug, ACCESS_GRANTED, ACCESS_DENIED
+from courseware.access_utils import (
+    adjust_start_date, check_start_date, debug, ACCESS_GRANTED, ACCESS_DENIED,
+    in_preview_mode
+)
 
 from lms.djangoapps.ccx.custom_exception import CCXLocatorValidationException
 from lms.djangoapps.ccx.models import CustomCourseForEdX
@@ -132,8 +134,9 @@ def has_access(user, action, obj, course_key=None):
     if not user:
         user = AnonymousUser()
 
-    if isinstance(course_key, CCXLocator):
-        course_key = course_key.to_course_locator()
+    if in_preview_mode():
+        if not bool(has_staff_access_to_preview_mode(user=user, obj=obj, course_key=course_key)):
+            return ACCESS_DENIED
 
     # delegate the work to type-specific functions.
     # (start with more specific types, then get more general)
@@ -172,6 +175,52 @@ def has_access(user, action, obj, course_key=None):
 
 
 # ================ Implementation helpers ================================
+
+def has_staff_access_to_preview_mode(user, obj, course_key=None):
+    """
+    Returns whether user has staff access to specified modules or not.
+
+    Arguments:
+
+        user: a Django user object.
+
+        obj: The object to check access for.
+
+        course_key: A course_key specifying which course this access is for.
+
+    Returns an AccessResponse object.
+    """
+    if course_key is None:
+        if isinstance(obj, CourseDescriptor) or isinstance(obj, CourseOverview):
+            course_key = obj.id
+
+        elif isinstance(obj, ErrorDescriptor):
+            course_key = obj.location.course_key
+
+        elif isinstance(obj, XModule):
+            course_key = obj.descriptor.course_key
+
+        elif isinstance(obj, XBlock):
+            course_key = obj.location.course_key
+
+        elif isinstance(obj, CCXLocator):
+            course_key = obj.to_course_locator()
+
+        elif isinstance(obj, CourseKey):
+            course_key = obj
+
+        elif isinstance(obj, UsageKey):
+            course_key = obj.course_key
+
+    if course_key is None:
+        if GlobalStaff().has_user(user):
+            return ACCESS_GRANTED
+        else:
+            return ACCESS_DENIED
+
+    return _has_access_to_course(user, 'staff', course_key=course_key)
+
+
 def _can_access_descriptor_with_start_date(user, descriptor, course_key):  # pylint: disable=invalid-name
     """
     Checks if a user has access to a descriptor based on its start date.
@@ -504,19 +553,18 @@ def _has_access_descriptor(user, action, descriptor, course_key=None):
         students to see modules.  If not, views should check the course, so we
         don't have to hit the enrollments table on every module load.
         """
-        response = (
-            _visible_to_nonstaff_users(descriptor)
-            and _has_group_access(descriptor, user, course_key)
-            and
-            (
-                _has_detached_class_tag(descriptor)
-                or _can_access_descriptor_with_start_date(user, descriptor, course_key)
-            )
-        )
+        if _has_staff_access_to_descriptor(user, descriptor, course_key):
+            return ACCESS_GRANTED
 
+        # if the user has staff access, they can load the module so this code doesn't need to run
         return (
-            ACCESS_GRANTED if (response or _has_staff_access_to_descriptor(user, descriptor, course_key))
-            else response
+            _visible_to_nonstaff_users(descriptor) and
+            _can_access_descriptor_with_milestones(user, descriptor, course_key) and
+            _has_group_access(descriptor, user, course_key) and
+            (
+                _has_detached_class_tag(descriptor) or
+                _can_access_descriptor_with_start_date(user, descriptor, course_key)
+            )
         )
 
     checkers = {
@@ -692,7 +740,7 @@ def _has_access_to_course(user, access_level, course_key):
         debug("Deny: no user or anon user")
         return ACCESS_DENIED
 
-    if is_masquerading_as_student(user, course_key):
+    if not in_preview_mode() and is_masquerading_as_student(user, course_key):
         return ACCESS_DENIED
 
     if GlobalStaff().has_user(user):
@@ -751,6 +799,22 @@ def _visible_to_nonstaff_users(descriptor):
         descriptor: object to check
     """
     return VisibilityError() if descriptor.visible_to_staff_only else ACCESS_GRANTED
+
+
+def _can_access_descriptor_with_milestones(user, descriptor, course_key):
+    """
+    Returns if the object is blocked by an unfulfilled milestone.
+
+    Args:
+        user: the user trying to access this content
+        descriptor: the object being accessed
+        course_key: key for the course for this descriptor
+    """
+    if milestones_helpers.get_course_content_milestones(course_key, unicode(descriptor.location), 'requires', user.id):
+        debug("Deny: user has not completed all milestones for content")
+        return ACCESS_DENIED
+    else:
+        return ACCESS_GRANTED
 
 
 def _has_detached_class_tag(descriptor):

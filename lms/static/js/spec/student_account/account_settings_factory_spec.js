@@ -1,16 +1,19 @@
-define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers', 'common/js/spec_helpers/template_helpers',
+define(['backbone',
+        'jquery',
+        'underscore',
+        'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
+        'common/js/spec_helpers/template_helpers',
         'js/spec/views/fields_helpers',
         'js/spec/student_account/helpers',
         'js/spec/student_account/account_settings_fields_helpers',
         'js/student_account/views/account_settings_factory',
         'js/student_account/views/account_settings_view'
         ],
-    function (Backbone, $, _, AjaxHelpers, TemplateHelpers, FieldViewsSpecHelpers, Helpers,
+    function(Backbone, $, _, AjaxHelpers, TemplateHelpers, FieldViewsSpecHelpers, Helpers,
               AccountSettingsFieldViewSpecHelpers, AccountSettingsPage) {
         'use strict';
 
-        describe("edx.user.AccountSettingsFactory", function () {
-
+        describe('edx.user.AccountSettingsFactory', function() {
             var FIELDS_DATA = {
                 'country': {
                     'options': Helpers.FIELD_OPTIONS
@@ -26,6 +29,8 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
                     'options': Helpers.FIELD_OPTIONS
                 }, 'preferred_language': {
                     'options': Helpers.FIELD_OPTIONS
+                }, 'time_zone': {
+                    'options': Helpers.FIELD_OPTIONS
                 }
             };
 
@@ -33,7 +38,7 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
                 'providers': [
                     {
                         'id': 'oa2-network1',
-                        'name': "Network1",
+                        'name': 'Network1',
                         'connected': true,
                         'accepts_logins': 'true',
                         'connect_url': 'yetanother1.com/auth/connect',
@@ -41,7 +46,7 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
                     },
                     {
                         'id': 'oa2-network2',
-                        'name': "Network2",
+                        'name': 'Network2',
                         'connected': true,
                         'accepts_logins': 'true',
                         'connect_url': 'yetanother2.com/auth/connect',
@@ -52,19 +57,18 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
 
             var createAccountSettingsPage = function() {
                 var context = AccountSettingsPage(
-                    FIELDS_DATA, AUTH_DATA, Helpers.USER_ACCOUNTS_API_URL, Helpers.USER_PREFERENCES_API_URL, 'edX'
+                    FIELDS_DATA, [], AUTH_DATA, Helpers.USER_ACCOUNTS_API_URL, Helpers.USER_PREFERENCES_API_URL, 'edX'
                 );
                 return context.accountSettingsView;
             };
 
             var requests;
 
-            beforeEach(function () {
+            beforeEach(function() {
                 setFixtures('<div class="wrapper-account-settings"></div>');
             });
 
-            it("shows loading error when UserAccountModel fails to load", function() {
-
+            it('shows loading error when UserAccountModel fails to load', function() {
                 requests = AjaxHelpers.requests(this);
 
                 var accountSettingsView = createAccountSettingsPage();
@@ -84,8 +88,7 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
             });
 
 
-            it("shows loading error when UserPreferencesModel fails to load", function() {
-
+            it('shows loading error when UserPreferencesModel fails to load', function() {
                 requests = AjaxHelpers.requests(this);
 
                 var accountSettingsView = createAccountSettingsPage();
@@ -113,8 +116,7 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
                 Helpers.expectSettingsSectionsButNotFieldsToBeRendered(accountSettingsView);
             });
 
-            it("renders fields after the models are successfully fetched", function() {
-
+            it('renders fields after the models are successfully fetched', function() {
                 requests = AjaxHelpers.requests(this);
 
                 var accountSettingsView = createAccountSettingsPage();
@@ -131,7 +133,8 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
                 Helpers.expectSettingsSectionsAndFieldsToBeRendered(accountSettingsView);
             });
 
-            it("expects all fields to behave correctly", function () {
+            it('expects all fields to behave correctly', function() {
+                var i, view;
 
                 requests = AjaxHelpers.requests(this);
 
@@ -141,14 +144,13 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
                 AjaxHelpers.respondWithJson(requests, Helpers.createUserPreferencesData());
                 AjaxHelpers.respondWithJson(requests, {});  // Page viewed analytics event
 
-                var sectionsData = accountSettingsView.options.sectionsData;
+                var sectionsData = accountSettingsView.options.tabSections.aboutTabSections;
 
-                expect(sectionsData[0].fields.length).toBe(6);
+                expect(sectionsData[0].fields.length).toBe(7);
 
                 var textFields = [sectionsData[0].fields[1], sectionsData[0].fields[2]];
-                for (var i = 0; i < textFields.length ; i++) {
-
-                    var view = textFields[i].view;
+                for (i = 0; i < textFields.length; i++) {
+                    view = textFields[i].view;
                     FieldViewsSpecHelpers.verifyTextField(view, {
                         title: view.options.title,
                         valueAttribute: view.options.valueAttribute,
@@ -156,7 +158,7 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
                         validValue: 'My Name',
                         invalidValue1: '',
                         invalidValue2: '@',
-                        validationError: "Think again!",
+                        validationError: 'Think again!',
                         defaultValue: ''
                     }, requests);
                 }
@@ -176,18 +178,10 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
                         validValue: Helpers.FIELD_OPTIONS[1][0],
                         invalidValue1: Helpers.FIELD_OPTIONS[2][0],
                         invalidValue2: Helpers.FIELD_OPTIONS[3][0],
-                        validationError: "Nope, this will not do!",
+                        validationError: 'Nope, this will not do!',
                         defaultValue: null
                     }, requests);
                 });
-
-                var section2Fields = sectionsData[2].fields;
-                expect(section2Fields.length).toBe(2);
-                for (var i = 0; i < section2Fields.length; i++) {
-
-                    var view = section2Fields[i].view;
-                    AccountSettingsFieldViewSpecHelpers.verifyAuthField(view, view.options, requests);
-                }
             });
         });
     });

@@ -1,7 +1,7 @@
 // Backbone.js Application Model: CertificateInvalidation
-/*global define, RequireJS */
+/* global define, RequireJS */
 
-;(function(define) {
+(function(define) {
     'use strict';
 
     define(
@@ -18,12 +18,12 @@
                     notes: ''
                 },
 
-                url: function() {
-                    return this.get('url');
+                initialize: function(attributes, options) {
+                    this.url = options.url;
                 },
 
                 validate: function(attrs) {
-                    if (!_.str.trim(attrs.user)) {
+                    if (!str.trim(attrs.user)) {
                         // A username or email must be provided for certificate invalidation
                         return gettext('Student username/email field is required and can not be empty. ' +
                             'Kindly fill in username/email and then press "Invalidate Certificate" button.');

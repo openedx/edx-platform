@@ -10,15 +10,15 @@ from selenium.webdriver.support.ui import Select
 from xmodule.partitions.partitions import Group
 from bok_choy.promise import Promise, EmptyPromise
 
-from ...fixtures.course import XBlockFixtureDesc
-from ...pages.studio.component_editor import ComponentEditorView
-from ...pages.studio.overview import CourseOutlinePage, CourseOutlineUnit
-from ...pages.studio.container import ContainerPage
-from ...pages.studio.settings_group_configurations import GroupConfigurationsPage
-from ...pages.studio.utils import add_advanced_component
-from ...pages.xblock.utils import wait_for_xblock_initialization
-from ...pages.lms.courseware import CoursewarePage
-from ..helpers import create_user_partition_json
+from common.test.acceptance.fixtures.course import XBlockFixtureDesc
+from common.test.acceptance.pages.studio.component_editor import ComponentEditorView
+from common.test.acceptance.pages.studio.overview import CourseOutlinePage, CourseOutlineUnit
+from common.test.acceptance.pages.studio.container import ContainerPage
+from common.test.acceptance.pages.studio.settings_group_configurations import GroupConfigurationsPage
+from common.test.acceptance.pages.studio.utils import add_advanced_component
+from common.test.acceptance.pages.xblock.utils import wait_for_xblock_initialization
+from common.test.acceptance.pages.lms.courseware import CoursewarePage
+from common.test.acceptance.tests.helpers import create_user_partition_json
 
 from base_studio_test import StudioCourseTest
 
@@ -66,7 +66,7 @@ class SplitTestMixin(object):
         Promise(missing_groups_button_not_present, "Add missing groups button should not be showing.").fulfill()
 
 
-@attr('shard_2')
+@attr(shard=2)
 class SplitTest(ContainerBase, SplitTestMixin):
     """
     Tests for creating and editing split test instances in Studio.
@@ -199,7 +199,7 @@ class SplitTest(ContainerBase, SplitTestMixin):
         self.verify_groups(container, ['alpha'], [], verify_missing_groups_not_present=False)
 
 
-@attr('shard_2')
+@attr(shard=2)
 class GroupConfigurationsNoSplitTest(StudioCourseTest):
     """
     Tests how the Group Configuration page should look when the split_test module is not enabled.
@@ -224,7 +224,7 @@ class GroupConfigurationsNoSplitTest(StudioCourseTest):
         self.assertFalse(self.group_configurations_page.experiment_group_sections_present)
 
 
-@attr('shard_2')
+@attr(shard=2)
 class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
     """
     Tests that Group Configurations page works correctly with previously
@@ -481,6 +481,36 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
             description="Second Description of the group configuration.",
             groups=["First Group", "Group C", "Group D"]
         )
+
+    def test_focus_management_in_experiment_group_inputs(self):
+        """
+        Scenario: Ensure that selecting the focus inputs in the groups list
+        sets the .is-focused class on the fieldset
+        Given I have a course with experiment group configurations
+        When I click the name of the first group
+        Then the fieldset wrapping the group names whould get class .is-focused
+        When I click away from the first group
+        Then the fieldset should not have class .is-focused anymore
+        """
+        self.page.visit()
+        self.page.create_experiment_group_configuration()
+        config = self.page.experiment_group_configurations[0]
+        group_a = config.groups[0]
+
+        # Assert the fieldset doesn't have .is-focused class
+        self.assertFalse(self.page.q(css="fieldset.groups-fields.is-focused").visible)
+
+        # Click on the Group A input field
+        self.page.q(css=group_a.prefix).click()
+
+        # Assert the fieldset has .is-focused class applied
+        self.assertTrue(self.page.q(css="fieldset.groups-fields.is-focused").visible)
+
+        # Click away
+        self.page.q(css=".page-header").click()
+
+        # Assert the fieldset doesn't have .is-focused class
+        self.assertFalse(self.page.q(css="fieldset.groups-fields.is-focused").visible)
 
     def test_use_group_configuration(self):
         """

@@ -18,7 +18,9 @@
     <h2 class="sr footer-about-title">${_("About edX")}</h2>
     <div class="footer-content-wrapper">
       <div class="footer-logo">
-          <img alt="edX logo" src="${footer['logo_image']}">
+          <a href="${marketing_link('ROOT')}">
+            <img alt="edX Home Page" src="${footer['logo_image']}">
+          </a>
       </div>
 
       <div class="site-details">
@@ -52,22 +54,26 @@
       </div>
 
       <div class="external-links">
-        <div class="social-media-links">
-          % for link in footer['social_links']:
-          <a href="${link['url']}" class="sm-link external" title="${link['title']}" rel="noreferrer">
-            <span class="icon fa ${link['icon-class']}" aria-hidden="true"></span>
-            <span class="sr">${link['action']}</span>
-          </a>
-          % endfor
-        </div>
+        <ul class="social-media-links">
+            % for link in footer['social_links']:
+            <li class="list-item">
+                <a href="${link['url']}" class="sm-link external" title="${link['title']}" rel="noreferrer">
+                    <span class="icon fa ${link['icon-class']}" aria-hidden="true"></span>
+                    <span class="sr">${link['action']}</span>
+                </a>
+            </li>
+            % endfor
+        </ul>
 
-        <div class="mobile-app-links">
-          % for link in footer['mobile_links']:
-          <a href="${link['url']}" class="app-link external">
-            <img alt="${link['title']}" src="${link['image']}">
-          </a>
-          % endfor
-        </div>
+        <ul class="mobile-app-links">
+            % for link in footer['mobile_links']:
+            <li class="list-item">
+                <a href="${link['url']}" class="app-link external">
+                    <img alt="${link['title']}" src="${link['image']}">
+                </a>
+            </li>
+            % endfor
+        </ul>
       </div>
     </div>
 </footer>
@@ -91,4 +97,3 @@
 % if footer_js_url:
   <script type="text/javascript" src="${footer_js_url}"></script>
 % endif
-

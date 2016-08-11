@@ -26,13 +26,13 @@
       @extend %t-title8;
       @extend %t-strong;
       margin-bottom: ($baseline/4);
-      color: $gray-l2;
+      color: $gray-d2;
       text-transform: uppercase;
     }
 
     .meta {
       @extend %t-copy-sub2;
-      color: $gray-l1;
+      color: $gray-d2;
     }
   }
 }
@@ -110,7 +110,7 @@
       @extend %t-title5;
       @extend %t-strong;
       margin-bottom: ($baseline*0.75);
-      color: $green-d1;
+      color: $uxpl-green-base;
     }
 
     // add component - list of green buttons
@@ -131,16 +131,10 @@
         height: ($baseline*5);
         margin-bottom: ($baseline/2);
         box-shadow: 0 1px 1px $shadow, 0 1px 0 rgba(255, 255, 255, .4) inset;
-        border: 1px solid $green-d2;
         border-radius: ($baseline/4);
         padding: 0;
-        background-color: $green-l1;
         text-align: center;
-        color: $white;
-
-        &:hover {
-          background: $green-s1;
-        }
+        @extend %btn-primary-green;
 
         .name {
           @include box-sizing(border-box);
@@ -174,11 +168,39 @@
 
     // specific menu types
     &.new-component-problem {
-      padding-bottom: ($baseline/2);
-
       .problem-type-tabs {
         display: inline-block;
       }
+    }
+
+    .support-documentation {
+      float: right;
+      @include margin($baseline, 0, ($baseline/2), ($baseline/2));
+      @include font-size(14);
+
+      .support-documentation-level {
+        padding-right: ($baseline/2);
+      }
+
+      .support-documentation-link {
+        // Override JQuery ui-widget-content link color (black) with our usual link color and hover action.
+        color: $uxpl-blue-base;
+        text-decoration: none;
+        padding-right: ($baseline/2);
+
+        &:hover {
+          color: $uxpl-blue-hover-active;
+          text-decoration: underline;
+        }
+      }
+    }
+
+    .support-level {
+      padding-right: ($baseline/2);
+    }
+
+    .icon {
+      color: $uxpl-primary-accent;
     }
   }
 
@@ -186,6 +208,7 @@
   // --------------------
   .new-component-template {
     @include clearfix();
+    margin-bottom: 0;
 
     li {
       border: none;
@@ -196,7 +219,7 @@
       }
     }
 
-  .button-component {
+    .button-component {
       @include clearfix();
       @include transition(none);
       @extend %t-demi-strong;
@@ -207,11 +230,16 @@
       background: $white;
       color: $gray-d3;
       text-align: left;
+      font-family: $f-sans-serif;
 
       &:hover {
         @include transition(background-color $tmg-f2 linear 0s);
         background: tint($green,30%);
         color: $white;
+
+        .icon {
+          color: $white;
+        }
       }
     }
   }
@@ -303,7 +331,7 @@ $outline-indent-width: $baseline;
 %outline-item-status {
   @extend %t-copy-sub2;
   @extend %t-strong;
-  color: $color-copy-base;
+  color: $gray-d1;
 
   .icon {
     @extend %t-icon5;
@@ -576,12 +604,16 @@ $outline-indent-width: $baseline;
       > .subsection-status .status-timed-proctored-exam {
         opacity: 1.0;
       }
+
+      > .subsection-status .status-hide-after-due {
+        opacity: 1.0;
+      }
     }
 
     // status - grading
-    .status-grading, .status-timed-proctored-exam  {
+    .status-grading, .status-timed-proctored-exam, .status-hide-after-due {
       @include transition(opacity $tmg-f2 ease-in-out 0s);
-      opacity: 0.65;
+      opacity: 0.75;
     }
 
     .status-grading-value, .status-proctored-exam-value {

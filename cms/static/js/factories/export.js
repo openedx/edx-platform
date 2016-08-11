@@ -1,8 +1,8 @@
 define(['gettext', 'common/js/components/views/feedback_prompt'], function(gettext, PromptView) {
     'use strict';
-    return function (hasUnit, editUnitUrl, courselikeHomeUrl, library, errMsg) {
+    return function(hasUnit, editUnitUrl, courselikeHomeUrl, library, errMsg) {
         var dialog;
-        if(hasUnit) {
+        if (hasUnit) {
             dialog = new PromptView({
                 title: gettext('There has been an error while exporting.'),
                 message: gettext('There has been a failure to export to XML at least one component. It is recommended that you go to the edit page and repair the error before attempting another export. Please check that all components on the page are valid and do not display any error messages.'),
@@ -28,10 +28,10 @@ define(['gettext', 'common/js/components/views/feedback_prompt'], function(gette
             var action;
             if (library) {
                 msg += gettext('Your library could not be exported to XML. There is not enough information to identify the failed component. Inspect your library to identify any problematic components and try again.');
-                action = gettext('Take me to the main library page')
+                action = gettext('Take me to the main library page');
             } else {
                 msg += gettext('Your course could not be exported to XML. There is not enough information to identify the failed component. Inspect your course to identify any problematic components and try again.');
-                action = gettext('Take me to the main course page')
+                action = gettext('Take me to the main course page');
             }
             msg += '</p><p>' + gettext('The raw error message is:') + '</p>' + errMsg;
             dialog = new PromptView({
@@ -49,7 +49,7 @@ define(['gettext', 'common/js/components/views/feedback_prompt'], function(gette
                     secondary: {
                         text: gettext('Cancel'),
                         click: function(view) {
-                          view.hide();
+                            view.hide();
                         }
                     }
                 }

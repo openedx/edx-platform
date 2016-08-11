@@ -1,12 +1,13 @@
 define(
     [
-        "jquery", "underscore",
-        "js/views/video/transcripts/utils", "js/views/video/transcripts/file_uploader",
-        "xmodule", "jquery.form", "jasmine-jquery"
+        'jquery', 'underscore',
+        'js/views/video/transcripts/utils', 'js/views/video/transcripts/file_uploader',
+        'xmodule', 'jquery.form'
     ],
-function ($, _, Utils, FileUploader) {
-    // TODO: fix TNL-559 Intermittent failures of Transcript FileUploader JS tests
-    xdescribe('Transcripts.FileUploader', function () {
+function($, _, Utils, FileUploader) {
+    'use strict';
+
+    describe('Transcripts.FileUploader', function() {
         var videoListEntryTemplate = readFixtures(
                 'video/transcripts/metadata-videolist-entry.underscore'
             ),
@@ -15,16 +16,16 @@ function ($, _, Utils, FileUploader) {
             ),
             view;
 
-        beforeEach(function () {
+        beforeEach(function() {
             setFixtures(
-                $("<div>", {id: "metadata-videolist-entry"})
+                $('<div>', {id: 'metadata-videolist-entry'})
                     .html(videoListEntryTemplate)
             );
             appendSetFixtures(
-                $("<script>",
+                $('<script>',
                     {
-                        id: "file-upload",
-                        type: "text/template"
+                        id: 'file-upload',
+                        type: 'text/template'
                     }
                 ).text(fileUploadTemplate)
             );
@@ -43,7 +44,7 @@ function ($, _, Utils, FileUploader) {
                 .append('<div class="transcripts-file-uploader" />')
                 .append('<a class="setting-upload" href="#">Upload</a>');
 
-            spyOn(FileUploader.prototype, 'render').andCallThrough();
+            spyOn(FileUploader.prototype, 'render').and.callThrough();
 
             view = new FileUploader({
                 el: $container,
@@ -53,67 +54,60 @@ function ($, _, Utils, FileUploader) {
             });
         });
 
-        it('Initialize', function () {
+        it('Initialize', function() {
             expect(view.file).toBe(false);
             expect(FileUploader.prototype.render).toHaveBeenCalled();
         });
 
-        describe('Render', function () {
-
-            beforeEach(function () {
-                spyOn(_, 'template').andCallThrough();
+        describe('Render', function() {
+            beforeEach(function() {
+                spyOn(_, 'template').and.callThrough();
             });
 
-            it('Template doesn\'t exist', function () {
+            it('Template doesn\'t exist', function() {
                 spyOn(console, 'error');
                 view.uploadTpl = '';
-                view.render();
 
-                expect(console.error).toHaveBeenCalled();
                 expect(view.render).not.toThrow();
+                expect(console.error).toHaveBeenCalled();
                 expect(_.template).not.toHaveBeenCalled();
             });
 
             it('Container where template will be inserted doesn\'t exist',
-                function () {
+                function() {
                     $('.transcripts-file-uploader').remove();
-
-                    view.render();
 
                     expect(view.render).not.toThrow();
                     expect(_.template).not.toHaveBeenCalled();
                 }
             );
 
-            it('All works okay if all data is okay', function () {
+            it('All works okay if all data is okay', function() {
                 var elList = ['$form', '$input', '$progress'],
                     validFileExtensions = ['srt', 'sjson'],
                     result = $.map(validFileExtensions, function(item, index) {
-                                return '.' + item;
-                            }).join(', ');
+                        return '.' + item;
+                    }).join(', ');
 
                 view.validFileExtensions = validFileExtensions;
-                view.render();
-
                 expect(view.render).not.toThrow();
                 expect(_.template).toHaveBeenCalled();
                 $.each(elList, function(index, el) {
                     expect(view[el].length).not.toBe(0);
                 });
                 expect(view.$input.attr('accept')).toBe(result);
-
             });
         });
 
-        describe('Upload', function () {
-            it('File is not chosen', function () {
+        describe('Upload', function() {
+            it('File is not chosen', function() {
                 spyOn($.fn, 'ajaxSubmit');
                 view.upload();
 
                 expect(view.$form.ajaxSubmit).not.toHaveBeenCalled();
             });
 
-            it('File is chosen', function () {
+            it('File is chosen', function() {
                 spyOn($.fn, 'ajaxSubmit');
 
                 view.file = {};
@@ -123,7 +117,7 @@ function ($, _, Utils, FileUploader) {
             });
         });
 
-        it('clickHandler', function () {
+        it('clickHandler', function() {
             spyOn($.fn, 'trigger');
 
             $('.setting-upload').click();
@@ -132,13 +126,13 @@ function ($, _, Utils, FileUploader) {
             expect(view.$input).toHaveValue('');
         });
 
-        describe('changeHadler', function () {
-            beforeEach(function () {
+        describe('changeHadler', function() {
+            beforeEach(function() {
                 spyOn(view, 'upload');
             });
 
-            it('Valid File Type - error should be hided', function () {
-                spyOn(view, 'checkExtValidity').andReturn(true);
+            it('Valid File Type - error should be hided', function() {
+                spyOn(view, 'checkExtValidity').and.returnValue(true);
 
                 view.$input.change();
 
@@ -147,8 +141,8 @@ function ($, _, Utils, FileUploader) {
                 expect(view.options.messenger.hideError).toHaveBeenCalled();
             });
 
-            it('Invalid File Type - error should be shown', function () {
-                spyOn(view, 'checkExtValidity').andReturn(false);
+            it('Invalid File Type - error should be shown', function() {
+                spyOn(view, 'checkExtValidity').and.returnValue(false);
 
                 view.$input.change();
 
@@ -158,20 +152,20 @@ function ($, _, Utils, FileUploader) {
             });
         });
 
-        describe('checkExtValidity', function () {
+        describe('checkExtValidity', function() {
             var data = {
-                    Correct: {
-                        name: 'file_name.srt',
-                        isValid: true
-                    },
-                    Incorrect: {
-                        name: 'file_name.mp4',
-                        isValid: false
-                    }
-                };
+                Correct: {
+                    name: 'file_name.srt',
+                    isValid: true
+                },
+                Incorrect: {
+                    name: 'file_name.mp4',
+                    isValid: false
+                }
+            };
 
             $.each(data, function(fileType, fileInfo) {
-                it(fileType + ' file type', function () {
+                it(fileType + ' file type', function() {
                     var result = view.checkExtValidity(fileInfo);
 
                     expect(result).toBe(fileInfo.isValid);
@@ -179,25 +173,25 @@ function ($, _, Utils, FileUploader) {
             });
         });
 
-        it('xhrResetProgressBar', function () {
+        it('xhrResetProgressBar', function() {
             view.xhrResetProgressBar();
             expect(view.$progress.width()).toBe(0);
             expect(view.$progress.html()).toBe('0%');
             expect(view.$progress).not.toHaveClass('is-invisible');
         });
 
-        it('xhrProgressHandler', function () {
+        it('xhrProgressHandler', function() {
             var percent = 26;
 
-            spyOn($.fn, 'width').andCallThrough();
+            spyOn($.fn, 'width').and.callThrough();
 
             view.xhrProgressHandler(null, null, null, percent);
             expect(view.$progress.width).toHaveBeenCalledWith(percent + '%');
             expect(view.$progress.html()).toBe(percent + '%');
         });
 
-        describe('xhrCompleteHandler', function () {
-            it('Ajax Success', function () {
+        describe('xhrCompleteHandler', function() {
+            it('Ajax Success', function() {
                 var xhr = {
                     status: 200,
                     responseText: JSON.stringify({
@@ -209,13 +203,13 @@ function ($, _, Utils, FileUploader) {
                 view.xhrCompleteHandler(xhr);
 
                 expect(view.$progress).toHaveClass('is-invisible');
-                expect(view.options.messenger.render.mostRecentCall.args[0])
+                expect(view.options.messenger.render.calls.mostRecent().args[0])
                     .toEqual('uploaded');
                 expect(Utils.Storage.set)
                     .toHaveBeenCalledWith('sub', 'test');
             });
 
-            var assertAjaxError = function (xhr) {
+            var assertAjaxError = function(xhr) {
                 spyOn(Utils.Storage, 'set');
                 view.xhrCompleteHandler(xhr);
 
@@ -229,7 +223,7 @@ function ($, _, Utils, FileUploader) {
                     .toHaveBeenCalledWith('sub', 'test');
             };
 
-            it('Ajax transport Error', function () {
+            it('Ajax transport Error', function() {
                 var xhr = {
                     status: 400,
                     responseText: JSON.stringify({})

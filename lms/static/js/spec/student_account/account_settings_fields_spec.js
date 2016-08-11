@@ -1,25 +1,32 @@
-define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers', 'common/js/spec_helpers/template_helpers',
+define(['backbone',
+        'jquery',
+        'underscore',
+        'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
+        'common/js/spec_helpers/template_helpers',
         'js/views/fields',
         'js/spec/views/fields_helpers',
         'js/spec/student_account/account_settings_fields_helpers',
         'js/student_account/views/account_settings_fields',
         'js/student_account/models/user_account_model',
         'string_utils'],
-    function (Backbone, $, _, AjaxHelpers, TemplateHelpers, FieldViews, FieldViewsSpecHelpers,
+    function(Backbone, $, _, AjaxHelpers, TemplateHelpers, FieldViews, FieldViewsSpecHelpers,
               AccountSettingsFieldViewSpecHelpers, AccountSettingsFieldViews) {
         'use strict';
 
-        describe("edx.AccountSettingsFieldViews", function () {
-
+        describe('edx.AccountSettingsFieldViews', function() {
             var requests,
                 timerCallback;
 
-            beforeEach(function () {
+            beforeEach(function() {
                 timerCallback = jasmine.createSpy('timerCallback');
-                jasmine.Clock.useMock();
+                jasmine.clock().install();
             });
 
-            it("sends request to reset password on clicking link in PasswordFieldView", function() {
+            afterEach(function() {
+                jasmine.clock().uninstall();
+            });
+
+            it('sends request to reset password on clicking link in PasswordFieldView', function() {
                 requests = AjaxHelpers.requests(this);
 
                 var fieldData = FieldViewsSpecHelpers.createFieldData(AccountSettingsFieldViews.PasswordFieldView, {
@@ -28,17 +35,17 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
                 });
 
                 var view = new AccountSettingsFieldViews.PasswordFieldView(fieldData).render();
-                view.$('.u-field-value > a').click();
-                AjaxHelpers.expectRequest(requests, 'POST', '/password_reset', "email=legolas%40woodland.middlearth");
-                AjaxHelpers.respondWithJson(requests, {"success": "true"});
+                view.$('.u-field-value > button').click();
+                AjaxHelpers.expectRequest(requests, 'POST', '/password_reset', 'email=legolas%40woodland.middlearth');
+                AjaxHelpers.respondWithJson(requests, {'success': 'true'});
                 FieldViewsSpecHelpers.expectMessageContains(
                     view,
                     "We've sent a message to legolas@woodland.middlearth. " +
-                    "Click the link in the message to reset your password."
+                    'Click the link in the message to reset your password.'
                 );
             });
 
-            it("sends request to /i18n/setlang/ after changing language preference in LanguagePreferenceFieldView", function() {
+            it('sends request to /i18n/setlang/ after changing language preference in LanguagePreferenceFieldView', function() {
                 requests = AjaxHelpers.requests(this);
 
                 var selector = '.u-field-value > select';
@@ -62,7 +69,7 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
                     'language=' + data[fieldData.valueAttribute]
                 );
                 AjaxHelpers.respondWithNoContent(requests);
-                FieldViewsSpecHelpers.expectMessageContains(view, "Your changes have been saved.");
+                FieldViewsSpecHelpers.expectMessageContains(view, 'Your changes have been saved.');
 
                 data = {'language': FieldViewsSpecHelpers.SELECT_OPTIONS[1][0]};
                 view.$(selector).val(data[fieldData.valueAttribute]).change();
@@ -78,11 +85,11 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
                 AjaxHelpers.respondWithError(requests, 500);
                 FieldViewsSpecHelpers.expectMessageContains(
                     view,
-                    "You must sign out and sign back in before your language changes take effect."
+                    'You must sign out and sign back in before your language changes take effect.'
                 );
             });
 
-            it("reads and saves the value correctly for LanguageProficienciesFieldView", function() {
+            it('reads and saves the value correctly for LanguageProficienciesFieldView', function() {
                 requests = AjaxHelpers.requests(this);
 
                 var selector = '.u-field-value > select';
@@ -103,7 +110,7 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
                 AjaxHelpers.respondWithNoContent(requests);
             });
 
-            it("correctly links and unlinks from AuthFieldView", function() {
+            it('correctly links and unlinks from AuthFieldView', function() {
                 requests = AjaxHelpers.requests(this);
 
                 var fieldData = FieldViewsSpecHelpers.createFieldData(FieldViews.LinkFieldView, {

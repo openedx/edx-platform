@@ -1,5 +1,0 @@
-**/vendor
-node_modules
-cms/static/js/i18n/**/*.js
-lms/static/js/i18n/**/*.js
-venv

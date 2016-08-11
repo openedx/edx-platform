@@ -1,7 +1,7 @@
 #-*- coding: utf-8 -*-
 
 """
-Group Configuration Tests.
+Certificates Tests.
 """
 import json
 import mock
@@ -26,7 +26,7 @@ from course_modes.tests.factories import CourseModeFactory
 from contentstore.views.certificates import CertificateManager
 from django.test.utils import override_settings
 from contentstore.utils import get_lms_link_for_certificate_web_view
-from util.testing import EventTestMixin
+from util.testing import EventTestMixin, UrlResetMixin
 
 FEATURES_WITH_CERTS_ENABLED = settings.FEATURES.copy()
 FEATURES_WITH_CERTS_ENABLED['CERTIFICATES_HTML_VIEW'] = True
@@ -80,7 +80,7 @@ class HelperMethods(object):
                 'title': 'Title ' + str(i),
                 'signature_image_path': '/c4x/test/CSS101/asset/Signature{}.png'.format(i),
                 'id': i
-            } for i in xrange(0, signatory_count)
+            } for i in xrange(signatory_count)
 
         ]
 
@@ -99,7 +99,7 @@ class HelperMethods(object):
                 'signatories': signatories,
                 'version': CERTIFICATE_SCHEMA_VERSION,
                 'is_active': is_active
-            } for i in xrange(0, count)
+            } for i in xrange(count)
         ]
         self.course.certificates = {'certificates': certificates}
         self.save_course()
@@ -181,7 +181,7 @@ class CertificatesBaseTestCase(object):
         with self.assertRaises(Exception) as context:
             CertificateManager.validate(json_data_1)
 
-        self.assertTrue("Unsupported certificate schema version: 100.  Expected version: 1." in context.exception)
+        self.assertIn("Unsupported certificate schema version: 100.  Expected version: 1.", context.exception)
 
         #Test certificate name is missing
         json_data_2 = {
@@ -192,12 +192,14 @@ class CertificatesBaseTestCase(object):
         with self.assertRaises(Exception) as context:
             CertificateManager.validate(json_data_2)
 
-        self.assertTrue('must have name of the certificate' in context.exception)
+        self.assertIn('must have name of the certificate', context.exception)
 
 
 @ddt.ddt
 @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
-class CertificatesListHandlerTestCase(EventTestMixin, CourseTestCase, CertificatesBaseTestCase, HelperMethods):
+class CertificatesListHandlerTestCase(
+        EventTestMixin, CourseTestCase, CertificatesBaseTestCase, HelperMethods, UrlResetMixin
+):
     """
     Test cases for certificates_list_handler.
     """
@@ -206,6 +208,7 @@ class CertificatesListHandlerTestCase(EventTestMixin, CourseTestCase, Certificat
         Set up CertificatesListHandlerTestCase.
         """
         super(CertificatesListHandlerTestCase, self).setUp('contentstore.views.certificates.tracker')
+        self.reset_urls()
 
     def _url(self):
         """
@@ -420,7 +423,9 @@ class CertificatesListHandlerTestCase(EventTestMixin, CourseTestCase, Certificat
 
 @ddt.ddt
 @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
-class CertificatesDetailHandlerTestCase(EventTestMixin, CourseTestCase, CertificatesBaseTestCase, HelperMethods):
+class CertificatesDetailHandlerTestCase(
+        EventTestMixin, CourseTestCase, CertificatesBaseTestCase, HelperMethods, UrlResetMixin
+):
     """
     Test cases for CertificatesDetailHandlerTestCase.
     """
@@ -432,6 +437,7 @@ class CertificatesDetailHandlerTestCase(EventTestMixin, CourseTestCase, Certific
         Set up CertificatesDetailHandlerTestCase.
         """
         super(CertificatesDetailHandlerTestCase, self).setUp('contentstore.views.certificates.tracker')
+        self.reset_urls()
 
     def _url(self, cid=-1):
         """

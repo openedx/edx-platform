@@ -13,16 +13,15 @@
  * @module HTML5Video
  */
 
-(function (requirejs, require, define) {
-
-define(
+(function(requirejs, require, define) {
+    define(
 'video/02_html5_video.js',
 [],
-function () {
+function() {
     var HTML5Video = {};
 
-    HTML5Video.Player = (function () {
-        Player.prototype.callStateChangeCallback = function () {
+    HTML5Video.Player = (function() {
+        Player.prototype.callStateChangeCallback = function() {
             if ($.isFunction(this.config.events.onStateChange)) {
                 this.config.events.onStateChange({
                     data: this.playerState
@@ -30,11 +29,11 @@ function () {
             }
         };
 
-        Player.prototype.pauseVideo = function () {
+        Player.prototype.pauseVideo = function() {
             this.video.pause();
         };
 
-        Player.prototype.seekTo = function (value) {
+        Player.prototype.seekTo = function(value) {
             if (
                 typeof value === 'number' &&
                 value <= this.video.duration &&
@@ -44,29 +43,29 @@ function () {
             }
         };
 
-        Player.prototype.setVolume = function (value) {
+        Player.prototype.setVolume = function(value) {
             if (typeof value === 'number' && value <= 100 && value >= 0) {
                 this.video.volume = value * 0.01;
             }
         };
 
-        Player.prototype.getCurrentTime = function () {
+        Player.prototype.getCurrentTime = function() {
             return this.video.currentTime;
         };
 
-        Player.prototype.playVideo = function () {
+        Player.prototype.playVideo = function() {
             this.video.play();
         };
 
-        Player.prototype.getPlayerState = function () {
+        Player.prototype.getPlayerState = function() {
             return this.playerState;
         };
 
-        Player.prototype.getVolume = function () {
+        Player.prototype.getVolume = function() {
             return this.video.volume;
         };
 
-        Player.prototype.getDuration = function () {
+        Player.prototype.getDuration = function() {
             if (isNaN(this.video.duration)) {
                 return 0;
             }
@@ -74,7 +73,7 @@ function () {
             return this.video.duration;
         };
 
-        Player.prototype.setPlaybackRate = function (value) {
+        Player.prototype.setPlaybackRate = function(value) {
             var newSpeed;
 
             newSpeed = parseFloat(value);
@@ -86,21 +85,21 @@ function () {
             }
         };
 
-        Player.prototype.getAvailablePlaybackRates = function () {
+        Player.prototype.getAvailablePlaybackRates = function() {
             return [0.75, 1.0, 1.25, 1.5];
         };
 
-        Player.prototype._getLogs = function () {
+        Player.prototype._getLogs = function() {
             return this.logs;
         };
 
-        Player.prototype.showErrorMessage = function () {
+        Player.prototype.showErrorMessage = function() {
             this.el
                 .find('.video-player div')
                     .addClass('hidden')
                 .end()
                 .find('.video-player .video-error')
-                    .removeClass('hidden')
+                    .removeClass('is-hidden')
                 .end()
                     .addClass('is-initialized')
                 .find('.spinner')
@@ -110,50 +109,50 @@ function () {
                     });
         };
 
-        Player.prototype.onError = function (event) {
+        Player.prototype.onError = function(event) {
             if ($.isFunction(this.config.events.onError)) {
                 this.config.events.onError();
             }
         };
 
-        Player.prototype.destroy = function () {
+        Player.prototype.destroy = function() {
             this.video.removeEventListener('loadedmetadata', this.onLoadedMetadata, false);
             this.video.removeEventListener('play', this.onPlay, false);
             this.video.removeEventListener('playing', this.onPlaying, false);
             this.video.removeEventListener('pause', this.onPause, false);
             this.video.removeEventListener('ended', this.onEnded, false);
             this.el
-                .find('.video-player div').removeClass('hidden')
+                .find('.video-player div').removeClass('is-hidden')
                 .end()
-                .find('.video-player .video-error').addClass('hidden')
+                .find('.video-player .video-error').addClass('is-hidden')
                 .end().removeClass('is-initialized')
                 .find('.spinner').attr({'aria-hidden': 'false'});
             this.videoEl.remove();
         };
 
-        Player.prototype.onLoadedMetadata = function () {
+        Player.prototype.onLoadedMetadata = function() {
             this.playerState = HTML5Video.PlayerState.PAUSED;
             if ($.isFunction(this.config.events.onReady)) {
                 this.config.events.onReady(null);
             }
         };
 
-        Player.prototype.onPlay = function () {
+        Player.prototype.onPlay = function() {
             this.playerState = HTML5Video.PlayerState.BUFFERING;
             this.callStateChangeCallback();
         };
 
-        Player.prototype.onPlaying = function () {
+        Player.prototype.onPlaying = function() {
             this.playerState = HTML5Video.PlayerState.PLAYING;
             this.callStateChangeCallback();
         };
 
-        Player.prototype.onPause = function () {
+        Player.prototype.onPause = function() {
             this.playerState = HTML5Video.PlayerState.PAUSED;
             this.callStateChangeCallback();
         };
 
-        Player.prototype.onEnded = function () {
+        Player.prototype.onEnded = function() {
             this.playerState = HTML5Video.PlayerState.ENDED;
             this.callStateChangeCallback();
         };
@@ -242,16 +241,16 @@ function () {
 
             // Create HTML markup for individual sources of the HTML5 <video>
             // element.
-            sourceList = $.map(config.videoSources, function (source) {
-               return [
+            sourceList = $.map(config.videoSources, function(source) {
+                return [
                     '<source ',
-                        'src="', source,
+                    'src="', source,
             // Following hack allows to open the same video twice
             // https://code.google.com/p/chromium/issues/detail?id=31014
             // Check whether the url already has a '?' inside, and if so,
             // use '&' instead of '?' to prevent breaking the url's integrity.
                         (source.indexOf('?') === -1 ? '?' : '&'),
-                        (new Date()).getTime(), '" />'
+                    (new Date()).getTime(), '" />'
                 ].join('');
             });
 
@@ -286,7 +285,7 @@ function () {
 
             // Attach a 'click' event on the <video> element. It will cause the
             // video to pause/play.
-            this.videoEl.on('click', function (event) {
+            this.videoEl.on('click', function(event) {
                 var PlayerState = HTML5Video.PlayerState;
 
                 if (_this.playerState === PlayerState.PLAYING) {
@@ -307,7 +306,7 @@ function () {
 
             this.debug = false;
             $.each(events, function(index, eventName) {
-                _this.video.addEventListener(eventName, function () {
+                _this.video.addEventListener(eventName, function() {
                     _this.logs.push({
                         'event name': eventName,
                         'state': _this.playerState
@@ -356,5 +355,4 @@ function () {
     // HTML5Video object - what this module exports.
     return HTML5Video;
 });
-
 }(RequireJS.requirejs, RequireJS.require, RequireJS.define));

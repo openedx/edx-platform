@@ -2,8 +2,9 @@
   <article class="content-main">
     <h3 class="title">
       <%= interpolate(
-            gettext( "Thank you! We have received your payment for %(course_name)s."),
-            { course_name: "<span class='course_name_placeholder'></span>" }, true
+            gettext( "Thank you %(full_name)s! We have received your payment for %(course_name)s."),
+            { course_name: "<span class='course_name_placeholder'></span>",
+              full_name: "<span class='full_name_placeholder'></span>"}, true
           ) %>
     </h3>
 
@@ -45,8 +46,9 @@
 
             <tfoot>
               <tr>
-                <th scope="row" class="total-label" colspan="1"><%- gettext( "Total" ) %></th>
-                <td class="total-value" colspan="3">
+                <th scope="row" class="total-label"><%- gettext( "Total" ) %></th>
+                <td colspan="2"></td>
+                <td class="total-value">
                   <span class="value-amount"><%- receipt.totalCost %></span>
                    <span class="value-currency">(<%- receipt.currency.toUpperCase() %>)</span>
                 </td>
@@ -86,16 +88,16 @@
     <% } %>
 
     <nav class="nav-wizard is-ready">
-        <% if ( verified ) { %>
+        <% if ( !is_verification_required ||  verified || is_request_in_themed_site) { %>
             <a class="next action-primary right" href="/dashboard"><%- gettext( "Go to Dashboard" ) %></a>
         <% } else { %>
-          <a id="verify_later_button" class="next action-secondary verify-later nav-link" href="/dashboard" data-tooltip="<%- _.sprintf( gettext( "If you don't verify your identity now, you can still explore your course from your dashboard. You will receive periodic reminders from %(platformName)s to verify your identity." ), { platformName: platformName } ) %>">
+          <a id="verify_later_button" class="next action-secondary verify-later nav-link" href="/dashboard" data-tooltip="<%- edx.StringUtils.interpolate( gettext( "If you don't verify your identity now, you can still explore your course from your dashboard. You will receive periodic reminders from {platformName} to verify your identity." ), { platformName: platformName } ) %>">
             <%- gettext( "Want to confirm your identity later?" ) %>
           </a>
 
           <a id="verify_now_button"
              class="next action-primary right"
-             href="<%- _.sprintf( '/verify_student/verify-now/%(courseKey)s/', { courseKey: courseKey } ) %>"
+             href="<%- edx.StringUtils.interpolate( '/verify_student/verify-now/{courseKey}/', { courseKey: courseKey } ) %>"
           >
             <%- gettext( "Verify Now" ) %>
           </a>

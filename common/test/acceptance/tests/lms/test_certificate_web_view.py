@@ -1,19 +1,19 @@
 """
 Acceptance tests for the certificate web view feature.
 """
-from ..helpers import UniqueCourseTest, EventsTestMixin, load_data_str, get_element_padding
+from common.test.acceptance.tests.helpers import UniqueCourseTest, EventsTestMixin, load_data_str, get_element_padding
 from nose.plugins.attrib import attr
-from ...fixtures.course import CourseFixture, XBlockFixtureDesc, CourseUpdateDesc
-from ...fixtures.certificates import CertificateConfigFixture
-from ...pages.lms.auto_auth import AutoAuthPage
-from ...pages.lms.certificate_page import CertificatePage
-from ...pages.lms.course_info import CourseInfoPage
-from ...pages.lms.tab_nav import TabNavPage
-from ...pages.lms.course_nav import CourseNavPage
-from ...pages.lms.progress import ProgressPage
+from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc, CourseUpdateDesc
+from common.test.acceptance.fixtures.certificates import CertificateConfigFixture
+from common.test.acceptance.pages.lms.auto_auth import AutoAuthPage
+from common.test.acceptance.pages.lms.certificate_page import CertificatePage
+from common.test.acceptance.pages.lms.course_info import CourseInfoPage
+from common.test.acceptance.pages.lms.tab_nav import TabNavPage
+from common.test.acceptance.pages.lms.course_nav import CourseNavPage
+from common.test.acceptance.pages.lms.progress import ProgressPage
 
 
-@attr('shard_5')
+@attr(shard=5)
 class CertificateWebViewTest(EventsTestMixin, UniqueCourseTest):
     """
     Tests for verifying certificate web view features
@@ -94,7 +94,7 @@ class CertificateWebViewTest(EventsTestMixin, UniqueCourseTest):
         self.assert_events_match(expected_events, actual_events)
 
 
-@attr('shard_5')
+@attr(shard=5)
 class CertificateProgressPageTest(UniqueCourseTest):
     """
     Tests for verifying Certificate info on Progress tab of course page.
@@ -212,7 +212,7 @@ class CertificateProgressPageTest(UniqueCourseTest):
         self.course_nav.go_to_section('Test Section', 'Test Subsection')
 
         # Navigate to Test Problem 1
-        self.course_nav.go_to_sequential('Test Problem 1')
+        self.course_nav.go_to_vertical('Test Problem 1')
 
         # Select correct value for from select menu
         self.course_nav.q(css='select option[value="{}"]'.format('blue')).first.click()
@@ -232,7 +232,7 @@ class CertificateProgressPageTest(UniqueCourseTest):
         self.course_nav.go_to_section('Test Section 2', 'Test Subsection 2')
 
         # Navigate to Test Problem 2
-        self.course_nav.go_to_sequential('Test Problem 2')
+        self.course_nav.go_to_vertical('Test Problem 2')
 
         # Fill in the answer of the problem
         self.course_nav.q(css='input[id^=input_][id$=_2_1]').fill('A*x^2 + sqrt(y)')

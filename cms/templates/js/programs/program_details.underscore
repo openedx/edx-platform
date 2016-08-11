@@ -1,0 +1,63 @@
+<header class="app-header">
+    <form>
+        <div class="layout-col layout-col-b">
+            <div class="js-inline-edit field">
+                <span class="js-model-value copy copy-large emphasized"><%- name %></span>
+                <label for="program-name" class="sr-only"><%- gettext('Name') %></label>
+                <input type="text" value="<%- name %>" id="program-name" class="program-name field-input is-hidden" name="name" data-field="name" maxlength="64" required>
+                <button class="js-enable-edit btn btn-edit" data-tooltip="<%- gettext('Edit the program title') %>">
+                    <span class="icon fa fa-pencil" aria-hidden="true"></span>
+                    <span class="sr-only"><%- gettext('Edit the program\'s name.') %></span>
+                </button>
+                <div class="field-message">
+                    <span class="field-message-content"></span>
+                </div>
+            </div>
+
+            <div class="js-inline-edit field">
+                <span class="js-model-value copy copy-base subtitle"><%- subtitle %></span>
+                <label for="program-subtitle" class="sr-only"><%- gettext('Subtitle') %></label>
+                <input type="text" value="<%- subtitle %>" id="program-subtitle" class="program-subtitle field-input is-hidden" name="subtitle" data-field="subtitle" maxlength="255">
+                <button class="js-enable-edit btn btn-edit" data-tooltip="<%- gettext('Edit the program subtitle') %>">
+                    <span class="icon fa fa-pencil" aria-hidden="true"></span>
+                    <span class="sr-only"><%- gettext('Edit the program\'s subtitle.') %></span>
+                </button>
+                <div class="field-message">
+                    <span class="field-message-content"></span>
+                </div>
+            </div>
+
+            <div class="js-inline-edit field">
+                <span class="js-model-value copy copy-base subtitle"><%- marketing_slug %></span>
+                <label for="program-subtitle" class="sr-only"><%- gettext('Marketing Slug') %></label>
+                <input type="text" value="<%- marketing_slug %>" id="program-marketing-slug" class="program-marketing-slug field-input is-hidden" name="marketing_slug" data-field="marketing_slug" maxlength="255">
+                <button class="js-enable-edit btn btn-edit" data-tooltip="<%- gettext('Edit the program marketing slug') %>">
+                    <span class="icon fa fa-pencil" aria-hidden="true"></span>
+                    <span class="sr-only"><%- gettext('Edit the program\'s marketing slug.') %></span>
+                </button>
+                <div class="field-message">
+                    <span class="field-message-content"></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="layout-col layout-col-a">
+          <% if ( status === 'unpublished' ) { %>
+            <button class="js-publish-program btn btn-neutral btn-base btn-grey right">
+                <span><%- gettext('Publish') %></span>
+            </button>
+          <% } %>
+        </div>
+    </form>
+</header>
+<div class="layout-col layout-col-b">
+    <div class="js-course-list"></div>
+  <% if ( status === 'unpublished' ) { %>
+    <button class="js-add-course btn btn-neutral btn-base full">
+        <span class="icon fa fa-plus" aria-hidden="true"></span>
+        <span class="text"><%- gettext('Add a course') %></span>
+    </button>
+  <% } %>
+</div>
+<aside class="js-aside layout-col layout-col-a"></aside>
+<div class="js-publish-modal"></div>

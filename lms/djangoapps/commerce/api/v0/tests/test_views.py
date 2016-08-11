@@ -1,4 +1,5 @@
 """ Commerce API v0 view tests. """
+from datetime import datetime, timedelta
 import json
 import itertools
 from uuid import uuid4
@@ -10,6 +11,7 @@ from django.test import TestCase
 from django.test.utils import override_settings
 import mock
 from nose.plugins.attrib import attr
+import pytz
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -25,9 +27,10 @@ from openedx.core.lib.django_test_client_utils import get_absolute_url
 from student.models import CourseEnrollment
 from student.tests.factories import CourseModeFactory
 from student.tests.tests import EnrollmentEventTestMixin
+from xmodule.modulestore.django import modulestore
 
 
-@attr('shard_1')
+@attr(shard=1)
 @ddt.ddt
 @override_settings(ECOMMERCE_API_URL=TEST_API_URL, ECOMMERCE_API_SIGNING_KEY=TEST_API_SIGNING_KEY)
 class BasketsViewTests(EnrollmentEventTestMixin, UserMixin, ModuleStoreTestCase):
@@ -81,11 +84,13 @@ class BasketsViewTests(EnrollmentEventTestMixin, UserMixin, ModuleStoreTestCase)
         # TODO Verify this is the best method to create CourseMode objects.
         # TODO Find/create constants for the modes.
         for mode in [CourseMode.HONOR, CourseMode.VERIFIED, CourseMode.AUDIT]:
+            sku_string = uuid4().hex.decode('ascii')
             CourseModeFactory.create(
                 course_id=self.course.id,
                 mode_slug=mode,
                 mode_display_name=mode,
-                sku=uuid4().hex.decode('ascii')
+                sku=sku_string,
+                bulk_sku='BULK-{}'.format(sku_string)
             )
 
         # Ignore events fired from UserFactory creation
@@ -265,8 +270,9 @@ class BasketsViewTests(EnrollmentEventTestMixin, UserMixin, ModuleStoreTestCase)
 
         CourseMode.objects.filter(course_id=self.course.id).delete()
         mode = CourseMode.NO_ID_PROFESSIONAL_MODE
+        sku_string = uuid4().hex.decode('ascii')
         CourseModeFactory.create(course_id=self.course.id, mode_slug=mode, mode_display_name=mode,
-                                 sku=uuid4().hex.decode('ascii'))
+                                 sku=sku_string, bulk_sku='BULK-{}'.format(sku_string))
 
         with mock_create_basket(expect_called=False):
             response = self._post_to_view()
@@ -345,8 +351,18 @@ class BasketsViewTests(EnrollmentEventTestMixin, UserMixin, ModuleStoreTestCase)
         self.assertEqual(mock_update.called, is_opt_in)
         self.assertEqual(response.status_code, 200)
 
+    def test_closed_course(self):
+        """
+        Ensure that the view does not attempt to create a basket for closed
+        courses.
+        """
+        self.course.enrollment_end = datetime.now(pytz.UTC) - timedelta(days=1)
+        modulestore().update_item(self.course, self.user.id)  # pylint:disable=no-member
+        with mock_create_basket(expect_called=False):
+            self.assertEqual(self._post_to_view().status_code, 406)
 
-@attr('shard_1')
+
+@attr(shard=1)
 @override_settings(ECOMMERCE_API_URL=TEST_API_URL, ECOMMERCE_API_SIGNING_KEY=TEST_API_SIGNING_KEY)
 class BasketOrderViewTests(UserMixin, TestCase):
     """ Tests for the basket order view. """

@@ -14,7 +14,7 @@
     min-width: $fg-min-width;
     width: flex-grid(12);
     margin: 0 auto;
-    color: $gray-l1;
+    color: $gray-d3;
 
     .footer-content-primary {
       @include clearfix();
@@ -27,10 +27,10 @@
     }
 
     a {
-      color: $ui-link-color;
+      color: $uxpl-blue-base;
 
       &:hover, &:active {
-        color: $ui-link-color-focus;
+        color: $uxpl-blue-hover-active;
       }
     }
 

@@ -4,10 +4,8 @@ Tests for student enrollment.
 from mock import patch, Mock
 
 import ddt
-from django.core.cache import cache
 from nose.tools import raises
 import unittest
-from django.test import TestCase
 from django.test.utils import override_settings
 from django.conf import settings
 
@@ -15,22 +13,24 @@ from course_modes.models import CourseMode
 from enrollment import api
 from enrollment.errors import EnrollmentApiLoadError, EnrollmentNotFoundError, CourseModeNotFoundError
 from enrollment.tests import fake_data_api
+from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 
 
 @ddt.ddt
 @override_settings(ENROLLMENT_DATA_API="enrollment.tests.fake_data_api")
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
-class EnrollmentTest(TestCase):
+class EnrollmentTest(CacheIsolationTestCase):
     """
     Test student enrollment, especially with different course modes.
     """
     USERNAME = "Bob"
     COURSE_ID = "some/great/course"
 
+    ENABLED_CACHES = ['default']
+
     def setUp(self):
         super(EnrollmentTest, self).setUp()
         fake_data_api.reset()
-        cache.clear()
 
     @ddt.data(
         # Default (no course modes in the database)
@@ -228,3 +228,52 @@ class EnrollmentTest(TestCase):
         # The data matches
         self.assertEqual(len(details['course_modes']), 3)
         self.assertEqual(details, cached_details)
+
+    def test_update_enrollment_expired_mode_with_error(self):
+        """ Verify that if verified mode is expired and include expire flag is
+        false then enrollment cannot be updated. """
+        self.assert_add_modes_with_enrollment('audit')
+        # On updating enrollment mode to verified it should the raise the error.
+        with self.assertRaises(CourseModeNotFoundError):
+            self.assert_update_enrollment(mode='verified', include_expired=False)
+
+    def test_update_enrollment_with_expired_mode(self):
+        """ Verify that if verified mode is expired then enrollment can be
+        updated if include_expired flag is true."""
+        self.assert_add_modes_with_enrollment('audit')
+        # enrollment in verified mode will work fine with include_expired=True
+        self.assert_update_enrollment(mode='verified', include_expired=True)
+
+    @ddt.data(True, False)
+    def test_unenroll_with_expired_mode(self, include_expired):
+        """ Verify that un-enroll will work fine for expired courses whether include_expired
+        is true or false."""
+        self.assert_add_modes_with_enrollment('verified')
+        self.assert_update_enrollment(mode='verified', is_active=False, include_expired=include_expired)
+
+    def assert_add_modes_with_enrollment(self, enrollment_mode):
+        """ Dry method for adding fake course enrollment information to fake
+        data API and enroll the student in the course. """
+        fake_data_api.add_course(self.COURSE_ID, course_modes=['honor', 'verified', 'audit'])
+        result = api.add_enrollment(self.USERNAME, self.COURSE_ID, mode=enrollment_mode)
+        get_result = api.get_enrollment(self.USERNAME, self.COURSE_ID)
+        self.assertEquals(result, get_result)
+        # set the course verify mode as expire.
+        fake_data_api.set_expired_mode(self.COURSE_ID)
+
+    def assert_update_enrollment(self, mode, is_active=True, include_expired=False):
+        """ Dry method for updating enrollment."""
+
+        result = api.update_enrollment(
+            self.USERNAME, self.COURSE_ID, mode=mode, is_active=is_active, include_expired=include_expired
+        )
+        self.assertEquals(mode, result['mode'])
+        self.assertIsNotNone(result)
+        self.assertEquals(result['student'], self.USERNAME)
+        self.assertEquals(result['course']['course_id'], self.COURSE_ID)
+        self.assertEquals(result['mode'], mode)
+
+        if is_active:
+            self.assertTrue(result['is_active'])
+        else:
+            self.assertFalse(result['is_active'])

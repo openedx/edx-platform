@@ -66,7 +66,7 @@ class JsonResponse(HttpResponse):
         elif isinstance(resp_obj, QuerySet):
             content = serialize('json', resp_obj)
         else:
-            content = json.dumps(resp_obj, cls=encoder, indent=2, ensure_ascii=False)
+            content = json.dumps(resp_obj, cls=encoder, indent=2, ensure_ascii=True)
         kwargs.setdefault("content_type", "application/json")
         if status:
             kwargs["status"] = status

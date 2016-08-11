@@ -2,11 +2,11 @@
  * XBlockContainerPage is used to display Studio's container page for an xblock which has children.
  * This page allows the user to understand and manipulate the xblock and its children.
  */
-define(["jquery", "underscore", "gettext", "js/views/pages/base_page", "common/js/components/utils/view_utils",
-        "js/views/container", "js/views/xblock", "js/views/components/add_xblock", "js/views/modals/edit_xblock",
-        "js/models/xblock_info", "js/views/xblock_string_field_editor", "js/views/pages/container_subviews",
-        "js/views/unit_outline", "js/views/utils/xblock_utils"],
-    function ($, _, gettext, BasePage, ViewUtils, ContainerView, XBlockView, AddXBlockComponent,
+define(['jquery', 'underscore', 'gettext', 'js/views/pages/base_page', 'common/js/components/utils/view_utils',
+        'js/views/container', 'js/views/xblock', 'js/views/components/add_xblock', 'js/views/modals/edit_xblock',
+        'js/models/xblock_info', 'js/views/xblock_string_field_editor', 'js/views/pages/container_subviews',
+        'js/views/unit_outline', 'js/views/utils/xblock_utils'],
+    function($, _, gettext, BasePage, ViewUtils, ContainerView, XBlockView, AddXBlockComponent,
               EditXBlockModal, XBlockInfo, XBlockStringFieldEditor, ContainerSubviews, UnitOutlineView,
               XBlockUtils) {
         'use strict';
@@ -14,11 +14,11 @@ define(["jquery", "underscore", "gettext", "js/views/pages/base_page", "common/j
             // takes XBlockInfo as a model
 
             events: {
-                "click .edit-button": "editXBlock",
-                "click .visibility-button": "editVisibilitySettings",
-                "click .duplicate-button": "duplicateXBlock",
-                "click .delete-button": "deleteXBlock",
-                "click .new-component-button": "scrollToNewComponentButtons"
+                'click .edit-button': 'editXBlock',
+                'click .visibility-button': 'editVisibilitySettings',
+                'click .duplicate-button': 'duplicateXBlock',
+                'click .delete-button': 'deleteXBlock',
+                'click .new-component-button': 'scrollToNewComponentButtons'
             },
 
             options: {
@@ -82,15 +82,15 @@ define(["jquery", "underscore", "gettext", "js/views/pages/base_page", "common/j
                 }
             },
 
-            getViewParameters: function () {
+            getViewParameters: function() {
                 return {
                     el: this.$('.wrapper-xblock'),
                     model: this.model,
                     view: this.view
-                }
+                };
             },
 
-            getXBlockView: function(){
+            getXBlockView: function() {
                 return new this.viewClass(this.getViewParameters());
             },
 
@@ -99,7 +99,7 @@ define(["jquery", "underscore", "gettext", "js/views/pages/base_page", "common/j
                     xblockView = this.xblockView,
                     loadingElement = this.$('.ui-loading'),
                     unitLocationTree = this.$('.unit-location'),
-                    hiddenCss='is-hidden';
+                    hiddenCss = 'is-hidden';
 
                 loadingElement.removeClass(hiddenCss);
 
@@ -180,7 +180,7 @@ define(["jquery", "underscore", "gettext", "js/views/pages/base_page", "common/j
                 this.editXBlock(event, {
                     view: 'visibility_view',
                     // Translators: "title" is the name of the current component being edited.
-                    titleFormat: gettext("Editing visibility for: %(title)s"),
+                    titleFormat: gettext('Editing visibility for: %(title)s'),
                     viewSpecificClasses: '',
                     modalSize: 'med'
                 });
@@ -197,7 +197,7 @@ define(["jquery", "underscore", "gettext", "js/views/pages/base_page", "common/j
             },
 
             createPlaceholderElement: function() {
-                return $("<div/>", { class: "studio-xblock-wrapper" });
+                return $('<div/>', {class: 'studio-xblock-wrapper'});
             },
 
             createComponent: function(template, target) {
@@ -331,7 +331,8 @@ define(["jquery", "underscore", "gettext", "js/views/pages/base_page", "common/j
                     success: function() {
                         self.onXBlockRefresh(temporaryView, block_added, is_duplicate);
                         temporaryView.unbind();  // Remove the temporary view
-                    }
+                    },
+                    initRuntimeData: this
                 });
             },
 

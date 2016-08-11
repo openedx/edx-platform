@@ -1,8 +1,9 @@
-(function () {
+(function() {
     'use strict';
+    var origAjax = $.ajax;
 
     var stubbedYT = {
-        Player: function () {
+        Player: function() {
             var Player = jasmine.createSpyObj(
                 'YT.Player',
                 [
@@ -15,9 +16,9 @@
                 ]
             );
 
-            Player.getDuration.andReturn(60);
-            Player.getAvailablePlaybackRates.andReturn([0.50, 1.0, 1.50, 2.0]);
-            Player.getAvailableQualityLevels.andReturn(
+            Player.getDuration.and.returnValue(60);
+            Player.getAvailablePlaybackRates.and.returnValue([0.50, 1.0, 1.50, 2.0]);
+            Player.getAvailableQualityLevels.and.returnValue(
                 ['highres', 'hd1080', 'hd720', 'large', 'medium', 'small']
             );
 
@@ -32,7 +33,7 @@
             BUFFERING: 3,
             CUED: 5
         },
-        ready: function (f) {
+        ready: function(f) {
             return f();
         }
     };
@@ -42,7 +43,7 @@
 
     window.STATUS = window.YT.PlayerState;
 
-    window.onTouchBasedDevice = function () {
+    window.onTouchBasedDevice = function() {
         return navigator.userAgent.match(/iPhone|iPod|iPad/i);
     };
 
@@ -76,31 +77,31 @@
 
     jasmine.stubbedMetadata = {
         '7tqY6eQzVhE': {
-            contentDetails : {
+            contentDetails: {
                 id: '7tqY6eQzVhE',
                 duration: 'PT5M0S'
             }
         },
         'cogebirgzzM': {
-            contentDetails : {
+            contentDetails: {
                 id: 'cogebirgzzM',
                 duration: 'PT3M20S'
             }
         },
         'abcdefghijkl': {
-            contentDetails : {
+            contentDetails: {
                 id: 'abcdefghijkl',
                 duration: 'PT6M40S'
             }
         },
         bogus: {
-            contentDetails : {
+            contentDetails: {
                 duration: 'PT1M40S'
             }
         }
     };
 
-    jasmine.fireEvent = function (el, eventName) {
+    jasmine.fireEvent = function(el, eventName) {
         var event;
 
         if (document.createEvent) {
@@ -122,20 +123,20 @@
 
     jasmine.stubbedHtml5Speeds = ['0.75', '1.0', '1.25', '1.50'];
 
-    jasmine.stubRequests = function () {
+    jasmine.stubRequests = function() {
         var spy = $.ajax;
-
-        if (!($.ajax.isSpy)) {
+        if (!jasmine.isSpy($.ajax)) {
             spy = spyOn($, 'ajax');
         }
-        return spy.andCallFake(function (settings) {
+
+        return spy.and.callFake(function(settings) {
             var match = settings.url
                     .match(/googleapis\.com\/.+\/videos\/\?id=(.+)&part=contentDetails/),
                 status, callCallback;
             if (match) {
                 status = match[1].split('_');
                 if (status && status[0] === 'status') {
-                    callCallback = function (callback) {
+                    callCallback = function(callback) {
                         callback.call(window, {}, status[1]);
                     };
 
@@ -150,10 +151,10 @@
                     });
                 } else {
                     return {
-                        always: function (callback) {
+                        always: function(callback) {
                             return callback.call(window, {}, 'success');
                         },
-                        done: function (callback) {
+                        done: function(callback) {
                             return callback.call(window, {}, 'success');
                         }
                     };
@@ -176,46 +177,16 @@
                 return;
             } else if (settings.url === '/save_user_state') {
                 return {success: true};
+            } else if (settings.url.match(new RegExp(jasmine.getFixtures().fixturesPath + '.+', 'g'))) {
+                return origAjax(settings);
             } else {
-                throw 'External request attempted for ' +
-                    settings.url +
-                    ', which is not defined.';
+                $.ajax.and.callThrough();
             }
         });
     };
 
-    // Add custom Jasmine matchers.
-    beforeEach(function () {
-        this.addMatchers({
-            toHaveAttrs: function (attrs) {
-                var element;
-
-                if ($.isEmptyObject(attrs)) {
-                    return false;
-                }
-
-                element = this.actual;
-
-                return _.every(attrs, function (value, name) {
-                    return element.attr(name) === value;
-                });
-            },
-            toBeInRange: function (min, max) {
-                return min <= this.actual && this.actual <= max;
-            },
-            toBeInArray: function (array) {
-                return $.inArray(this.actual, array) > -1;
-            },
-            toBeFocused: function () {
-                return $(this.actual)[0] === $(this.actual)[0].ownerDocument.activeElement;
-            }
-        });
-
-        return this.addMatchers(window.imagediff.jasmine);
-    });
-
-    // Stub jQuery.cookie module.
-    $.cookie = jasmine.createSpy('jQuery.cookie').andReturn('1.0');
+   // Stub jQuery.cookie module.
+    $.cookie = jasmine.createSpy('jQuery.cookie').and.returnValue('1.0');
 
     // # Stub jQuery.qtip module.
     $.fn.qtip = jasmine.createSpy('jQuery.qtip');
@@ -224,10 +195,10 @@
     $.fn.scrollTo = jasmine.createSpy('jQuery.scrollTo');
 
     // Stub window.Video.loadYouTubeIFrameAPI()
-    window.Video.loadYouTubeIFrameAPI = jasmine.createSpy('window.Video.loadYouTubeIFrameAPI').andReturn(
-        function (scriptTag) {
+    window.Video.loadYouTubeIFrameAPI = jasmine.createSpy('window.Video.loadYouTubeIFrameAPI').and.returnValue(
+        function(scriptTag) {
             var event = document.createEvent('Event');
-            if (fixture === "video.html") {
+            if (fixture === 'video.html') {
                 event.initEvent('load', false, false);
             } else {
                 event.initEvent('error', false, false);
@@ -236,7 +207,7 @@
         }
     );
 
-    jasmine.initializePlayer = function (fixture, params) {
+    jasmine.initializePlayer = function(fixture, params) {
         var state;
 
         if (_.isString(fixture)) {
@@ -264,7 +235,7 @@
         jasmine.stubRequests();
         state = new window.Video('#example');
 
-        state.resizer = (function () {
+        state.resizer = (function() {
             var methods = [
                     'align',
                     'alignByWidthOnly',
@@ -275,13 +246,13 @@
                 ],
                 obj = {},
                 delta = {
-                    add: jasmine.createSpy().andReturn(obj),
-                    substract: jasmine.createSpy().andReturn(obj),
-                    reset: jasmine.createSpy().andReturn(obj)
+                    add: jasmine.createSpy().and.returnValue(obj),
+                    substract: jasmine.createSpy().and.returnValue(obj),
+                    reset: jasmine.createSpy().and.returnValue(obj)
                 };
 
-            $.each(methods, function (index, method) {
-                obj[method] = jasmine.createSpy(method).andReturn(obj);
+            $.each(methods, function(index, method) {
+                obj[method] = jasmine.createSpy(method).and.returnValue(obj);
             });
 
             obj.delta = delta;
@@ -293,7 +264,7 @@
         return state;
     };
 
-    jasmine.initializePlayerYouTube = function (params) {
+    jasmine.initializePlayerYouTube = function(params) {
         // "video.html" contains HTML template for a YouTube video.
         return jasmine.initializePlayer('video.html', params);
     };

@@ -1,7 +1,8 @@
-;(function (define) {
+(function(define) {
     'use strict';
-    define(['jquery', 'underscore', 'backbone', 'gettext', 'js/groups/views/cohort_discussions', 'js/vendor/jquery.qubit'],
-            function ($, _, Backbone, gettext, CohortDiscussionConfigurationView) {
+    define(['jquery', 'underscore', 'backbone', 'gettext', 'js/groups/views/cohort_discussions',
+        'edx-ui-toolkit/js/utils/html-utils', 'js/vendor/jquery.qubit'],
+            function($, _, Backbone, gettext, CohortDiscussionConfigurationView, HtmlUtils) {
                 var InlineDiscussionsView = CohortDiscussionConfigurationView.extend({
                     events: {
                         'change .check-discussion-category': 'setSaveButton',
@@ -11,17 +12,18 @@
                         'change .check-cohort-inline-discussions': 'setSomeInlineDiscussions'
                     },
 
-                    initialize: function (options) {
-                        this.template = _.template($('#cohort-discussions-inline-tpl').text());
+                    initialize: function(options) {
+                        this.template = HtmlUtils.template($('#cohort-discussions-inline-tpl').text());
                         this.cohortSettings = options.cohortSettings;
                     },
 
-                    render: function () {
-                        var alwaysCohortInlineDiscussions = this.cohortSettings.get('always_cohort_inline_discussions');
+                    render: function() {
+                        var alwaysCohortInlineDiscussions = this.cohortSettings.get('always_cohort_inline_discussions'),
+                            inline_discussions = this.model.get('inline_discussions');
 
-                        this.$('.cohort-inline-discussions-nav').html(this.template({
-                            inlineDiscussionTopics: this.getInlineDiscussionsHtml(this.model.get('inline_discussions')),
-                            alwaysCohortInlineDiscussions:alwaysCohortInlineDiscussions
+                        HtmlUtils.setHtml(this.$('.cohort-inline-discussions-nav'), this.template({
+                            inlineDiscussionTopicsHtml: this.getInlineDiscussionsHtml(inline_discussions),
+                            alwaysCohortInlineDiscussions: alwaysCohortInlineDiscussions
                         }));
 
                         // Provides the semantics for a nested list of tri-state checkboxes.
@@ -36,35 +38,35 @@
                     /**
                     * Generate html list for inline discussion topics.
                     * @params {object} inlineDiscussions - inline discussions object from server.
-                    * @returns {Array} - HTML for inline discussion topics.
+                    * @returns {HtmlSnippet} - HTML for inline discussion topics.
                     */
-                    getInlineDiscussionsHtml: function (inlineDiscussions) {
-                        var categoryTemplate = _.template($('#cohort-discussions-category-tpl').html()),
-                            entryTemplate = _.template($('#cohort-discussions-subcategory-tpl').html()),
+                    getInlineDiscussionsHtml: function(inlineDiscussions) {
+                        var categoryTemplate = HtmlUtils.template($('#cohort-discussions-category-tpl').html()),
+                            entryTemplate = HtmlUtils.template($('#cohort-discussions-subcategory-tpl').html()),
                             isCategoryCohorted = false,
                             children = inlineDiscussions.children,
                             entries = inlineDiscussions.entries,
                             subcategories = inlineDiscussions.subcategories;
 
-                        return _.map(children, function (name) {
-                            var html = '', entry;
+                        return HtmlUtils.joinHtml.apply(this, _.map(children, function(name) {
+                            var htmlSnippet = '', entry;
                             if (entries && _.has(entries, name)) {
                                 entry = entries[name];
-                                html = entryTemplate({
+                                htmlSnippet = entryTemplate({
                                     name: name,
                                     id: entry.id,
                                     is_cohorted: entry.is_cohorted,
                                     type: 'inline'
                                 });
                             } else { // subcategory
-                                html = categoryTemplate({
+                                htmlSnippet = categoryTemplate({
                                     name: name,
-                                    entries: this.getInlineDiscussionsHtml(subcategories[name]),
+                                    entriesHtml: this.getInlineDiscussionsHtml(subcategories[name]),
                                     isCategoryCohorted: isCategoryCohorted
                                 });
                             }
-                            return html;
-                        }, this).join('');
+                            return htmlSnippet;
+                        }, this));
                     },
 
                     /**
@@ -113,32 +115,32 @@
                     /**
                     * Sends the cohorted_inline_discussions to the server and renders the view.
                     */
-                    saveInlineDiscussionsForm: function (event) {
+                    saveInlineDiscussionsForm: function(event) {
                         event.preventDefault();
 
                         var self = this,
                             cohortedInlineDiscussions = self.getCohortedDiscussions(
                                 '.check-discussion-subcategory-inline:checked'
                             ),
-                            fieldData= {
+                            fieldData = {
                                 cohorted_inline_discussions: cohortedInlineDiscussions,
                                 always_cohort_inline_discussions: self.$('.check-all-inline-discussions').prop('checked')
                             };
 
                         self.saveForm(self.$('.inline-discussion-topics'), fieldData)
-                            .done(function () {
+                            .done(function() {
                                 self.model.fetch()
-                                    .done(function () {
+                                    .done(function() {
                                         self.render();
                                         self.showMessage(gettext('Your changes have been saved.'), self.$('.inline-discussion-topics'));
                                     }).fail(function() {
                                         var errorMessage = gettext("We've encountered an error. Refresh your browser and then try again.");
-                                        self.showMessage(errorMessage, self.$('.inline-discussion-topics'), 'error')
+                                        self.showMessage(errorMessage, self.$('.inline-discussion-topics'), 'error');
                                     });
                             });
                     }
 
+                });
+                return InlineDiscussionsView;
             });
-            return InlineDiscussionsView;
-    });
 }).call(this, define || RequireJS.define);

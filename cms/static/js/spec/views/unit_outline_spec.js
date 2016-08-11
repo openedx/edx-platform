@@ -1,14 +1,17 @@
-define(["jquery", "common/js/spec_helpers/ajax_helpers", "common/js/spec_helpers/template_helpers",
-        "common/js/spec_helpers/view_helpers", "common/js/components/utils/view_utils", "js/views/unit_outline", "js/models/xblock_info"],
-    function ($, AjaxHelpers, TemplateHelpers, ViewHelpers, ViewUtils, UnitOutlineView, XBlockInfo) {
+define(['jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'common/js/spec_helpers/template_helpers',
+        'common/js/spec_helpers/view_helpers', 'common/js/components/utils/view_utils', 'js/models/course',
+        'js/views/unit_outline', 'js/models/xblock_info'],
+    function($, AjaxHelpers, TemplateHelpers, ViewHelpers, ViewUtils,
+              Course, UnitOutlineView, XBlockInfo) {
+        'use strict';
 
-        describe("UnitOutlineView", function() {
+        describe('UnitOutlineView', function() {
             var createUnitOutlineView, createMockXBlockInfo,
                 requests, model, unitOutlineView;
 
             createUnitOutlineView = function(test, unitJSON, createOnly) {
                 requests = AjaxHelpers.requests(test);
-                model = new XBlockInfo(unitJSON, { parse: true });
+                model = new XBlockInfo(unitJSON, {parse: true});
                 unitOutlineView = new UnitOutlineView({
                     model: model,
                     el: $('.wrapper-unit-overview')
@@ -70,14 +73,23 @@ define(["jquery", "common/js/spec_helpers/ajax_helpers", "common/js/spec_helpers
                 };
             };
 
-            beforeEach(function () {
+            beforeEach(function() {
+                window.course = new Course({
+                    id: '5',
+                    name: 'Course Name',
+                    url_name: 'course_name',
+                    org: 'course_org',
+                    num: 'course_num',
+                    revision: 'course_rev'
+                });
                 ViewHelpers.installMockAnalytics();
                 ViewHelpers.installViewTemplates();
                 TemplateHelpers.installTemplate('unit-outline');
                 appendSetFixtures('<div class="wrapper-unit-overview"></div>');
             });
 
-            afterEach(function () {
+            afterEach(function() {
+                delete window.course;
                 ViewHelpers.removeMockAnalytics();
             });
 
@@ -89,7 +101,7 @@ define(["jquery", "common/js/spec_helpers/ajax_helpers", "common/js/spec_helpers
             });
 
             it('highlights the current unit', function() {
-                createUnitOutlineView(this,  createMockXBlockInfo('Mock Unit'));
+                createUnitOutlineView(this, createMockXBlockInfo('Mock Unit'));
                 $('.outline-unit').each(function(i) {
                     if ($(this).data('locator') === model.get('id')) {
                         expect($(this)).toHaveClass('is-current');
@@ -110,8 +122,8 @@ define(["jquery", "common/js/spec_helpers/ajax_helpers", "common/js/spec_helpers
                     parent_locator: 'mock-subsection'
                 });
                 AjaxHelpers.respondWithJson(requests, {
-                    locator: "new-mock-unit",
-                    courseKey: "slashes:MockCourse"
+                    locator: 'new-mock-unit',
+                    courseKey: 'slashes:MockCourse'
                 });
                 expect(redirectSpy).toHaveBeenCalledWith('/container/new-mock-unit?action=new');
             });

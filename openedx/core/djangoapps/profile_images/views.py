@@ -19,7 +19,7 @@ from openedx.core.lib.api.authentication import (
     SessionAuthenticationAllowInactiveUser,
 )
 from openedx.core.lib.api.parsers import TypedFileUploadParser
-from openedx.core.lib.api.permissions import IsUserInUrl, IsUserInUrlOrStaff
+from openedx.core.lib.api.permissions import IsUserInUrl
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin
 from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_names, set_has_profile_image
 from .exceptions import ImageValidationError

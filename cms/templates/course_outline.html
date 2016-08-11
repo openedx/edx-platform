@@ -1,5 +1,6 @@
+<%page expression_filter="h"/>
 <%inherit file="base.html" />
-<%def name="online_help_token()"><% return "outline" %></%def>
+<%def name="online_help_token()"><% return "develop_course" %></%def>
 <%!
 import logging
 from util.date_utils import get_default_time_display
@@ -7,6 +8,7 @@ from django.utils.translation import ugettext as _
 from openedx.core.djangolib.js_utils import dump_js_escaped_json
 from contentstore.utils import reverse_usage_url
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
+from openedx.core.djangolib.markup import HTML, Text
 %>
 <%block name="title">${_("Course Outline")}</%block>
 <%block name="bodyclass">is-signedin course view-outline</%block>
@@ -24,7 +26,7 @@ from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 
 <%block name="header_extras">
 <link rel="stylesheet" type="text/css" href="${static.url('js/vendor/timepicker/jquery.timepicker.css')}" />
-% for template_name in ['course-outline', 'xblock-string-field-editor', 'basic-modal', 'modal-button', 'course-outline-modal', 'due-date-editor', 'release-date-editor', 'grading-editor', 'publish-editor', 'staff-lock-editor', 'verification-access-editor', 'timed-examination-preference-editor', 'access-editor', 'settings-modal-tabs']:
+% for template_name in ['course-outline', 'xblock-string-field-editor', 'basic-modal', 'modal-button', 'course-outline-modal', 'due-date-editor', 'release-date-editor', 'grading-editor', 'publish-editor', 'staff-lock-editor', 'content-visibility-editor', 'verification-access-editor', 'timed-examination-preference-editor', 'access-editor', 'settings-modal-tabs']:
 <script type="text/template" id="${template_name}-tpl">
     <%static:include path="js/${template_name}.underscore" />
 </script>
@@ -35,18 +37,18 @@ from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
   %if notification_dismiss_url is not None:
   <div class="wrapper wrapper-alert wrapper-alert-announcement is-shown">
     <div class="alert announcement has-actions">
-      <i class="feedback-symbol fa fa-bullhorn"></i>
+      <span class="feedback-symbol fa fa-bullhorn" aria-hidden="true"></span>
 
       <div class="copy">
         <h2 class="title title-3">${_("This course was created as a re-run. Some manual configuration is needed.")}</h2>
 
-        <p>${_("No course content is currently visible, and no students are enrolled. Be sure to review and reset all dates, including the Course Start Date; set up the course team; review course updates and other assets for dated material; and seed the discussions and wiki.")}</p>
+        <p>${_("No course content is currently visible, and no learners are enrolled. Be sure to review and reset all dates, including the Course Start Date; set up the course team; review course updates and other assets for dated material; and seed the discussions and wiki.")}</p>
       </div>
 
       <ul class="nav-actions">
         <li class="action action-dismiss">
           <a href="#" class="button dismiss-button" data-dismiss-link='${notification_dismiss_url}'>
-            <i class="icon fa fa-times-circle"></i>
+            <span class="icon fa fa-times-circle" aria-hidden="true"></span>
             <span class="button-copy">${_("Dismiss")}</span>
           </a>
         </li>
@@ -58,7 +60,7 @@ from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
     %if deprecated_blocks_info.get('blocks') or deprecated_blocks_info.get('block_types_enabled'):
       <div class="wrapper wrapper-alert wrapper-alert-error is-shown">
         <div class="alert announcement">
-          <i class="feedback-symbol fa fa-warning" aria-hidden="true"></i><span class="sr">${_("Warning")}</span>
+          <span class="feedback-symbol fa fa-warning" aria-hidden="true"></span><span class="sr">${_("Warning")}</span>
 
           <div class="copy">
             <h2 class="title title-3 warning-heading-text">${_("This course uses features that are no longer supported.")}</h2>
@@ -71,7 +73,7 @@ from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
                       % for component_parent_url, component_display_name in deprecated_blocks_info['blocks']:
                           <li class="nav-item">
                                 % if component_display_name:
-                                    <a href="${component_parent_url}">${_(component_display_name)}</a>
+                                    <a href="${component_parent_url}">${component_display_name}</a>
                                 % else:
                                     <a href="${component_parent_url}">${_("Deprecated Component")}</a>
                                 % endif
@@ -85,9 +87,10 @@ from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
             % if deprecated_blocks_info.get('block_types_enabled'):
               <div class="advance-modules-list">
                 <p class="advance-modules-remove-text">
-                  ${_("To avoid errors, {platform_name} strongly recommends that you remove unsupported features from the course advanced settings. To do this, go to the {link_start}Advanced Settings page{link_end}, locate the \"Advanced Module List\" setting, and then delete the following modules from the list.").format(
+                  ${Text(_("To avoid errors, {platform_name} strongly recommends that you remove unsupported features from the course advanced settings. To do this, go to the {link_start}Advanced Settings page{link_end}, locate the \"Advanced Module List\" setting, and then delete the following modules from the list.")).format(
                     platform_name=static.get_platform_name(),
-                    link_start='<a href="{advance_settings_url}">'.format(advance_settings_url=deprecated_blocks_info['advance_settings_url']), link_end="</a>"
+                    link_start=HTML('<a href="{advance_settings_url}">').format(advance_settings_url=deprecated_blocks_info['advance_settings_url']),
+                    link_end=HTML("</a>")
                   )}
                 </p>
                 <nav class="nav-related" aria-label="${_('Unsupported Advance Modules')}">
@@ -118,21 +121,21 @@ from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
             <h3 class="sr">${_("Page Actions")}</h3>
             <ul>
                 <li class="nav-item">
-                    <a href="#" class="button button-new" data-category="chapter" data-parent="${context_course.location | h}" data-default-name="${_('Section')}" title="${_('Click to add a new section')}">
-                        <i class="icon fa fa-plus"></i>${_('New Section')}
+                    <a href="#" class="button button-new" data-category="chapter" data-parent="${context_course.location}" data-default-name="${_('Section')}" title="${_('Click to add a new section')}">
+                        <span class="icon fa fa-plus" aria-hidden="true"></span>${_('New Section')}
                     </a>
                 </li>
                 %if reindex_link:
                     <li class="nav-item">
                         <a href="${reindex_link}" class="button button-reindex" data-category="reindex" title="${_('Reindex current course')}">
-                            <i class="icon-arrow-right"></i>${_('Reindex')}
+                            <span class="icon-arrow-right" aria-hidden="true"></span>${_('Reindex')}
                         </a>
                     </li>
                 %endif
                 <li class="nav-item">
                     <a href="#" class="button button-toggle button-toggle-expand-collapse collapse-all is-hidden">
-                        <span class="collapse-all"><i class="icon fa fa-arrow-up"></i> <span class="label">${_("Collapse All Sections")}</span></span>
-                        <span class="expand-all"><i class="icon fa fa-arrow-down"></i> <span class="label">${_("Expand All Sections")}</span></span>
+                        <span class="collapse-all"><span class="icon fa fa-arrow-up" aria-hidden="true"></span> <span class="label">${_("Collapse All Sections")}</span></span>
+                        <span class="expand-all"><span class="icon fa fa-arrow-down" aria-hidden="true"></span> <span class="label">${_("Expand All Sections")}</span></span>
                     </a>
                 </li>
                 <li class="nav-item">
@@ -155,7 +158,7 @@ from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
                     <ul class="status-actions">
                       <li class="action-item action-edit">
                         <a href="${settings_url}" class="edit-button action-button" data-tooltip="${_("Edit Start Date")}">
-                            <i class="icon fa fa-pencil"></i>
+                            <span class="icon fa fa-pencil" aria-hidden="true"></span>
                             <span class="action-button-text sr">${_("Edit Start Date")}</span>
                         </a>
                       </li>
@@ -178,11 +181,11 @@ from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
                 course_locator = context_course.location
                 %>
                 <h2 class="sr">${_("Course Outline")}</h2>
-                <article class="outline outline-complex outline-course" data-locator="${course_locator | h}" data-course-key="${course_locator.course_key | h}">
+                <article class="outline outline-complex outline-course" data-locator="${course_locator}" data-course-key="${course_locator.course_key}">
                 </article>
             </div>
             <div class="ui-loading">
-                <p><span class="spin"><i class="icon fa fa-refresh"></i></span> <span class="copy">${_("Loading")}</span></p>
+                <p><span class="spin"><span class="icon fa fa-refresh" aria-hidden="true"></span></span> <span class="copy">${_("Loading")}</span></p>
             </div>
         </article>
         <aside class="content-supplementary" role="complementary">
@@ -190,16 +193,29 @@ from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
                 <h3 class="title-3">${_("Creating your course organization")}</h3>
                 <p>${_("You add sections, subsections, and units directly in the outline.")}</p>
                 <p>${_("Create a section, then add subsections and units. Open a unit to add course components.")}</p>
+            </div>
+            <div class="bit">
                 <h3 class="title-3">${_("Reorganizing your course")}</h3>
                 <p>${_("Drag sections, subsections, and units to new locations in the outline.")}</p>
+                <div class="external-help">
+                    <a href="${get_online_help_info('outline')['doc_url']}" target="_blank" class="button external-help-button">${_("Learn more about the course outline")}</a>
+                </div>
+            </div>
+            <div class="bit">
                 <h3 class="title-3">${_("Setting release dates and grading policies")}</h3>
                 <p>${_("Select the Configure icon for a section or subsection to set its release date. When you configure a subsection, you can also set the grading policy and due date.")}</p>
-                <h3 class="title-3">${_("Changing the content students see")}</h3>
-                <p>${_("To publish draft content, select the Publish icon for a section, subsection, or unit.")}</p>
-                <p>${_("To hide content from students, select the Configure icon for a section, subsection, or unit, then select {em_start}Hide from students{em_end}.").format(em_start='<strong>', em_end="</strong>")}</p>
+                <div class="external-help">
+                    <a href="${get_online_help_info('grading')['doc_url']}" target="_blank" class="button external-help-button">${_("Learn more about grading policy settings")}</a>
+                </div>
             </div>
-            <div class="bit external-help">
-                <a href="${get_online_help_info(online_help_token())['doc_url']}" target="_blank" class="button external-help-button">${_("Learn more about the course outline")}</a>
+            <div class="bit">
+                <h3 class="title-3">${_("Changing the content learners see")}</h3>
+                <p>${_("To publish draft content, select the Publish icon for a section, subsection, or unit.")}</p>
+                <p>${Text(_("To make a section, subsection, or unit unavailable to learners, select the Configure icon for that level, then select the appropriate {em_start}Hide{em_end} option. Grades for hidden sections, subsections, and units are not included in grade calculations.")).format(em_start=HTML("<strong>"), em_end=HTML("</strong>"))}</p>
+                <p>${Text(_("To hide the content of a subsection from learners after the subsection due date has passed, select the Configure icon for a subsection, then select {em_start}Hide content after due date{em_end}. Grades for the subsection remain included in grade calculations.")).format(em_start=HTML("<strong>"), em_end=HTML("</strong>"))}</p>
+                <div class="external-help">
+                    <a href="${get_online_help_info('visibility')['doc_url']}" target="_blank" class="button external-help-button">${_("Learn more about content visibility settings")}</a>
+                </div>
             </div>
 
         </aside>

@@ -1,69 +1,60 @@
-"""Tests covering utilities for working with ID tokens."""
-import calendar
-import datetime
-
+"""Tests covering JWT construction utilities."""
 import ddt
-from django.conf import settings
-from django.core.exceptions import ImproperlyConfigured
 from django.test import TestCase
-from django.test.utils import override_settings
-import freezegun
 import jwt
-from oauth2_provider.tests.factories import ClientFactory
-from provider.constants import CONFIDENTIAL
+from nose.plugins.attrib import attr
 
-from openedx.core.lib.token_utils import get_id_token
-from student.models import anonymous_id_for_user
+from lms.djangoapps.oauth_dispatch.tests import mixins
+from openedx.core.lib.token_utils import JwtBuilder
 from student.tests.factories import UserFactory, UserProfileFactory
 
 
+@attr(shard=2)
 @ddt.ddt
-class TestIdTokenGeneration(TestCase):
-    """Tests covering ID token generation."""
-    client_name = 'edx-dummy-client'
+class TestJwtBuilder(mixins.AccessTokenMixin, TestCase):
+    """
+    Test class for JwtBuilder.
+    """
+
+    expires_in = 10
 
     def setUp(self):
-        super(TestIdTokenGeneration, self).setUp()
+        super(TestJwtBuilder, self).setUp()
 
-        self.oauth2_client = ClientFactory(name=self.client_name, client_type=CONFIDENTIAL)
+        self.user = UserFactory()
+        self.profile = UserProfileFactory(user=self.user)
 
-        self.user = UserFactory.build()
-        self.user.save()
+    @ddt.data(
+        [],
+        ['email'],
+        ['profile'],
+        ['email', 'profile'],
+    )
+    def test_jwt_construction(self, scopes):
+        """
+        Verify that a valid JWT is built, including claims for the requested scopes.
+        """
+        token = JwtBuilder(self.user).build_token(scopes, self.expires_in)
+        self.assert_valid_jwt_access_token(token, self.user, scopes)
 
-    @override_settings(OAUTH_OIDC_ISSUER='test-issuer', OAUTH_ID_TOKEN_EXPIRATION=1)
-    @freezegun.freeze_time('2015-01-01 12:00:00')
-    @ddt.data(True, False)
-    def test_get_id_token(self, has_profile):
-        """Verify that ID tokens are signed with the correct secret and generated with the correct claims."""
-        full_name = UserProfileFactory(user=self.user).name if has_profile else None
+    def test_user_profile_missing(self):
+        """
+        Verify that token construction succeeds if the UserProfile is missing.
+        """
+        self.profile.delete()  # pylint: disable=no-member
 
-        token = get_id_token(self.user, self.client_name)
+        scopes = ['profile']
+        token = JwtBuilder(self.user).build_token(scopes, self.expires_in)
+        self.assert_valid_jwt_access_token(token, self.user, scopes)
 
-        payload = jwt.decode(
-            token,
-            self.oauth2_client.client_secret,
-            audience=self.oauth2_client.client_id,
-            issuer=settings.OAUTH_OIDC_ISSUER,
-        )
+    def test_override_secret_and_audience(self):
+        """
+        Verify that the signing key and audience can be overridden.
+        """
+        secret = 'avoid-this'
+        audience = 'avoid-this-too'
+        scopes = []
 
-        now = datetime.datetime.utcnow()
-        expiration = now + datetime.timedelta(seconds=settings.OAUTH_ID_TOKEN_EXPIRATION)
+        token = JwtBuilder(self.user, secret=secret).build_token(scopes, self.expires_in, aud=audience)
 
-        expected_payload = {
-            'preferred_username': self.user.username,
-            'name': full_name,
-            'email': self.user.email,
-            'administrator': self.user.is_staff,
-            'iss': settings.OAUTH_OIDC_ISSUER,
-            'exp': calendar.timegm(expiration.utctimetuple()),
-            'iat': calendar.timegm(now.utctimetuple()),
-            'aud': self.oauth2_client.client_id,
-            'sub': anonymous_id_for_user(self.user, None),
-        }
-
-        self.assertEqual(payload, expected_payload)
-
-    def test_get_id_token_invalid_client(self):
-        """Verify that ImproperlyConfigured is raised when an invalid client name is provided."""
-        with self.assertRaises(ImproperlyConfigured):
-            get_id_token(self.user, 'does-not-exist')
+        jwt.decode(token, secret, audience=audience)

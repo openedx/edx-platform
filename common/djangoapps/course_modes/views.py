@@ -3,28 +3,29 @@ Views for the course_mode module
 """
 
 import decimal
-from ipware.ip import get_ip
+import urllib
 
+from babel.dates import format_datetime
+from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
 from django.db import transaction
 from django.http import HttpResponse, HttpResponseBadRequest
 from django.shortcuts import redirect
-from django.views.generic.base import View
-from django.utils.translation import ugettext as _
-from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
-
-from edxmako.shortcuts import render_to_response
-
-from course_modes.models import CourseMode
-from courseware.access import has_access
-from student.models import CourseEnrollment
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from django.utils.translation import get_language, to_locale, ugettext as _
+from django.views.generic.base import View
+from ipware.ip import get_ip
 from opaque_keys.edx.keys import CourseKey
-from util.db import outer_atomic
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xmodule.modulestore.django import modulestore
 
+from lms.djangoapps.commerce.utils import EcommerceService
+from course_modes.models import CourseMode
+from courseware.access import has_access
+from edxmako.shortcuts import render_to_response
 from embargo import api as embargo_api
+from student.models import CourseEnrollment
+from util.db import outer_atomic
 
 
 class ChooseModeView(View):
@@ -39,7 +40,14 @@ class ChooseModeView(View):
     """
 
     @method_decorator(transaction.non_atomic_requests)
-    def dispatch(self, *args, **kwargs):        # pylint: disable=missing-docstring
+    def dispatch(self, *args, **kwargs):
+        """Disable atomicity for the view.
+
+        Otherwise, we'd be unable to commit to the database until the
+        request had concluded; Django will refuse to commit when an
+        atomic() block is active, since that would break atomicity.
+
+        """
         return super(ChooseModeView, self).dispatch(*args, **kwargs)
 
     @method_decorator(login_required)
@@ -74,18 +82,22 @@ class ChooseModeView(View):
 
         enrollment_mode, is_active = CourseEnrollment.enrollment_mode_for_user(request.user, course_key)
         modes = CourseMode.modes_for_course_dict(course_key)
+        ecommerce_service = EcommerceService()
 
-        # We assume that, if 'professional' is one of the modes, it is the *only* mode.
-        # If we offer more modes alongside 'professional' in the future, this will need to route
-        # to the usual "choose your track" page same is true for no-id-professional mode.
+        # We assume that, if 'professional' is one of the modes, it should be the *only* mode.
+        # If there are both modes, default to non-id-professional.
         has_enrolled_professional = (CourseMode.is_professional_slug(enrollment_mode) and is_active)
         if CourseMode.has_professional_mode(modes) and not has_enrolled_professional:
-            return redirect(
-                reverse(
-                    'verify_student_start_flow',
-                    kwargs={'course_id': unicode(course_key)}
-                )
-            )
+            purchase_workflow = request.GET.get("purchase_workflow", "single")
+            verify_url = reverse('verify_student_start_flow', kwargs={'course_id': unicode(course_key)})
+            redirect_url = "{url}?purchase_workflow={workflow}".format(url=verify_url, workflow=purchase_workflow)
+            if ecommerce_service.is_enabled(request.user):
+                professional_mode = modes.get(CourseMode.NO_ID_PROFESSIONAL_MODE) or modes.get(CourseMode.PROFESSIONAL)
+                if purchase_workflow == "single" and professional_mode.sku:
+                    redirect_url = ecommerce_service.checkout_page_url(professional_mode.sku)
+                if purchase_workflow == "bulk" and professional_mode.bulk_sku:
+                    redirect_url = ecommerce_service.checkout_page_url(professional_mode.bulk_sku)
+            return redirect(redirect_url)
 
         # If there isn't a verified mode available, then there's nothing
         # to do on this page.  The user has almost certainly been auto-registered
@@ -102,6 +114,11 @@ class ChooseModeView(View):
         chosen_price = donation_for_course.get(unicode(course_key), None)
 
         course = modulestore().get_course(course_key)
+        if CourseEnrollment.is_enrollment_closed(request.user, course):
+            locale = to_locale(get_language())
+            enrollment_end_date = format_datetime(course.enrollment_end, 'short', locale=locale)
+            params = urllib.urlencode({'course_closed': enrollment_end_date})
+            return redirect('{0}?{1}'.format(reverse('dashboard'), params))
 
         # When a credit mode is available, students will be given the option
         # to upgrade from a verified mode to a credit mode at the end of the course.
@@ -117,7 +134,10 @@ class ChooseModeView(View):
         )
 
         context = {
-            "course_modes_choose_url": reverse("course_modes_choose", kwargs={'course_id': course_key.to_deprecated_string()}),
+            "course_modes_choose_url": reverse(
+                "course_modes_choose",
+                kwargs={'course_id': course_key.to_deprecated_string()}
+            ),
             "modes": modes,
             "has_credit_upsell": has_credit_upsell,
             "course_name": course.display_name_with_default_escaped,
@@ -129,15 +149,22 @@ class ChooseModeView(View):
             "nav_hidden": True,
         }
         if "verified" in modes:
+            verified_mode = modes["verified"]
             context["suggested_prices"] = [
                 decimal.Decimal(x.strip())
-                for x in modes["verified"].suggested_prices.split(",")
+                for x in verified_mode.suggested_prices.split(",")
                 if x.strip()
             ]
-            context["currency"] = modes["verified"].currency.upper()
-            context["min_price"] = modes["verified"].min_price
-            context["verified_name"] = modes["verified"].name
-            context["verified_description"] = modes["verified"].description
+            context["currency"] = verified_mode.currency.upper()
+            context["min_price"] = verified_mode.min_price
+            context["verified_name"] = verified_mode.name
+            context["verified_description"] = verified_mode.description
+
+            if verified_mode.sku:
+                context["use_ecommerce_payment_flow"] = ecommerce_service.is_enabled(request.user)
+                context["ecommerce_payment_page"] = ecommerce_service.payment_page_url()
+                context["sku"] = verified_mode.sku
+                context["bulk_sku"] = verified_mode.bulk_sku
 
         return render_to_response("course_modes/choose.html", context)
 

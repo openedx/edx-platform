@@ -2,7 +2,7 @@
 metadata:
     display_name: Full Screen Image Tool
 data: |
-        <h3>Full Screen Image Tool</h3>
+        <h3 class="hd hd-2">Full Screen Image Tool</h3>
         <p>Use the Full Screen Image tool to allow learners to open and zoom in on a larger version of an image in your course.</p>
         <p>With the Full Screen Image tool, learners can see the image's details as well as its context within the unit.</p>
         <p>To enable users to view the larger image, you wrap the smaller image in a link to the larger version of the image.</p>

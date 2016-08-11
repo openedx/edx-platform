@@ -19,6 +19,18 @@ cms/envs/private.py
 .redcar/
 codekit-config.json
 .pycharm_helpers/
+/_mac/*
+/IntelliLang.xml
+/conda_packages.xml
+/databaseSettings.xml
+/diff.xml
+/debugger.xml
+/editor.xml
+/ide.general.xml
+/inspection/Default.xml
+/other.xml
+/packages.xml
+/web-browsers.xml
 
 ### NFS artifacts
 .nfs*
@@ -38,10 +50,10 @@ codekit-config.json
 !django.mo
 !djangojs.po
 !djangojs.mo
-conf/locale/en/LC_MESSAGES/*.po
 conf/locale/en/LC_MESSAGES/*.mo
 conf/locale/fake*/LC_MESSAGES/*.po
 conf/locale/fake*/LC_MESSAGES/*.mo
+# this was a mistake in i18n_tools, now fixed.
 conf/locale/messages.mo
 
 ### Testing artifacts
@@ -58,6 +70,7 @@ jscover.log
 jscover.log.*
 .tddium*
 common/test/data/test_unicode/static/
+test_root/courses/
 django-pyfs
 
 ### Installation artifacts
@@ -73,6 +86,7 @@ bin/
 lms/static/css/
 lms/static/certificates/css/
 cms/static/css/
+common/static/common/js/vendor/
 
 ### Styling generated from templates
 lms/static/sass/*.css

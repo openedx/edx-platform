@@ -8,7 +8,7 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from xmodule.modulestore.django import modulestore
 
-from ...api import get_course_in_cache
+from openedx.core.djangoapps.content.block_structure.api import get_course_in_cache, update_course_in_cache
 
 
 log = logging.getLogger(__name__)
@@ -39,6 +39,12 @@ class Command(BaseCommand):
             action='store_true',
             default=False,
         )
+        parser.add_argument(
+            '--force',
+            help='Force update of the course blocks for the requested courses.',
+            action='store_true',
+            default=False,
+        )
 
     def handle(self, *args, **options):
 
@@ -57,7 +63,10 @@ class Command(BaseCommand):
 
         for course_key in course_keys:
             try:
-                block_structure = get_course_in_cache(course_key)
+                if options.get('force'):
+                    block_structure = update_course_in_cache(course_key)
+                else:
+                    block_structure = get_course_in_cache(course_key)
                 if options.get('dags'):
                     self._find_and_log_dags(block_structure, course_key)
             except Exception as ex:  # pylint: disable=broad-except

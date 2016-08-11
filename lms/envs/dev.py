@@ -22,14 +22,12 @@ FEATURES['DISABLE_START_DATES'] = False
 FEATURES['ENABLE_SQL_TRACKING_LOGS'] = True
 FEATURES['ENABLE_MANUAL_GIT_RELOAD'] = True
 FEATURES['ENABLE_SERVICE_STATUS'] = True
-FEATURES['ENABLE_INSTRUCTOR_EMAIL'] = True     # Enable email for all Studio courses
-FEATURES['REQUIRE_COURSE_EMAIL_AUTH'] = False  # Give all courses email (don't require django-admin perms)
-FEATURES['ENABLE_HINTER_INSTRUCTOR_VIEW'] = True
 FEATURES['ENABLE_SHOPPING_CART'] = True
 FEATURES['AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING'] = True
-FEATURES['ENABLE_S3_GRADE_DOWNLOADS'] = True
+FEATURES['ENABLE_GRADE_DOWNLOADS'] = True
 FEATURES['ENABLE_PAYMENT_FAKE'] = True
 
+LMS_ROOT_URL = "http://localhost:8000"
 
 FEEDBACK_SUBMISSION_EMAIL = "dummy@example.com"
 
@@ -47,6 +45,11 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': ENV_ROOT / "db" / "edx.db",
+        'ATOMIC_REQUESTS': True,
+    },
+    'student_module_history': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': ENV_ROOT / "db" / "student_module_history.db",
         'ATOMIC_REQUESTS': True,
     }
 }

@@ -1,4 +1,9 @@
-define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers', 'common/js/spec_helpers/template_helpers',
+define(['backbone',
+        'jquery',
+        'underscore',
+        'edx-ui-toolkit/js/pagination/paging-collection',
+        'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
+        'common/js/spec_helpers/template_helpers',
         'js/spec/student_account/helpers',
         'js/spec/student_profile/helpers',
         'js/views/fields',
@@ -6,18 +11,17 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
         'js/student_account/models/user_preferences_model',
         'js/student_profile/views/learner_profile_fields',
         'js/student_profile/views/learner_profile_view',
+        'js/student_profile/views/badge_list_container',
         'js/student_account/views/account_settings_fields',
         'js/views/message_banner'
-       ],
-    function (Backbone, $, _, AjaxHelpers, TemplateHelpers, Helpers, LearnerProfileHelpers, FieldViews,
-              UserAccountModel, AccountPreferencesModel, LearnerProfileFields, LearnerProfileView,
-              AccountSettingsFieldViews, MessageBannerView) {
+    ],
+    function(Backbone, $, _, PagingCollection, AjaxHelpers, TemplateHelpers, Helpers, LearnerProfileHelpers,
+              FieldViews, UserAccountModel, AccountPreferencesModel, LearnerProfileFields, LearnerProfileView,
+              BadgeListContainer, AccountSettingsFieldViews, MessageBannerView) {
         'use strict';
 
-        describe("edx.user.LearnerProfileView", function () {
-
-            var createLearnerProfileView = function (ownProfile, accountPrivacy, profileIsPublic) {
-
+        describe('edx.user.LearnerProfileView', function() {
+            var createLearnerProfileView = function(ownProfile, accountPrivacy, profileIsPublic) {
                 var accountSettingsModel = new UserAccountModel();
                 accountSettingsModel.set(Helpers.createAccountSettingsData());
                 accountSettingsModel.set({'profile_is_public': profileIsPublic});
@@ -36,7 +40,7 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
                     editable: 'always',
                     showMessages: false,
                     title: 'edX learners can see my:',
-                    valueAttribute: "account_privacy",
+                    valueAttribute: 'account_privacy',
                     options: [
                         ['all_users', 'Full Profile'],
                         ['private', 'Limited Profile']
@@ -51,7 +55,7 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
 
                 var profileImageFieldView = new LearnerProfileFields.ProfileImageFieldView({
                     model: accountSettingsModel,
-                    valueAttribute: "profile_image",
+                    valueAttribute: 'profile_image',
                     editable: editable,
                     messageView: messageView,
                     imageMaxBytes: Helpers.IMAGE_MAX_BYTES,
@@ -61,9 +65,9 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
                 });
 
                 var usernameFieldView = new FieldViews.ReadonlyFieldView({
-                        model: accountSettingsModel,
-                        valueAttribute: "username",
-                        helpMessage: ""
+                    model: accountSettingsModel,
+                    valueAttribute: 'username',
+                    helpMessage: ''
                 });
 
                 var sectionOneFieldViews = [
@@ -74,7 +78,7 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
                         showMessages: false,
                         iconName: 'fa-map-marker',
                         placeholderValue: '',
-                        valueAttribute: "country",
+                        valueAttribute: 'country',
                         options: Helpers.FIELD_OPTIONS,
                         helpMessage: ''
                     }),
@@ -86,7 +90,7 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
                         showMessages: false,
                         iconName: 'fa-comment',
                         placeholderValue: 'Add language',
-                        valueAttribute: "language_proficiencies",
+                        valueAttribute: 'language_proficiencies',
                         options: Helpers.FIELD_OPTIONS,
                         helpMessage: ''
                     })
@@ -98,13 +102,22 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
                         editable: editable,
                         showMessages: false,
                         title: 'About me',
-                        placeholderValue: "Tell other edX learners a little about yourself: where you live, " +
+                        placeholderValue: 'Tell other edX learners a little about yourself: where you live, ' +
                             "what your interests are, why you're taking courses on edX, or what you hope to learn.",
-                        valueAttribute: "bio",
+                        valueAttribute: 'bio',
                         helpMessage: '',
                         messagePosition: 'header'
                     })
                 ];
+
+                var badgeCollection = new PagingCollection();
+                badgeCollection.url = Helpers.BADGES_API_URL;
+
+                var badgeListContainer = new BadgeListContainer({
+                    'attributes': {'class': 'badge-set-display'},
+                    'collection': badgeCollection,
+                    'find_courses_url': Helpers.FIND_COURSES_URL
+                });
 
                 return new LearnerProfileView(
                     {
@@ -117,16 +130,20 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
                         usernameFieldView: usernameFieldView,
                         profileImageFieldView: profileImageFieldView,
                         sectionOneFieldViews: sectionOneFieldViews,
-                        sectionTwoFieldViews: sectionTwoFieldViews
+                        sectionTwoFieldViews: sectionTwoFieldViews,
+                        badgeListContainer: badgeListContainer
                     });
             };
 
-            beforeEach(function () {
+            beforeEach(function() {
                 loadFixtures('js/fixtures/student_profile/student_profile.html');
             });
 
-            it("shows loading error correctly", function() {
+            afterEach(function() {
+                Backbone.history.stop();
+            });
 
+            it('shows loading error correctly', function() {
                 var learnerProfileView = createLearnerProfileView(false, 'all_users');
 
                 Helpers.expectLoadingIndicatorIsVisible(learnerProfileView, true);
@@ -138,8 +155,7 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
                 Helpers.expectLoadingErrorIsVisible(learnerProfileView, true);
             });
 
-            it("renders all fields as expected for self with full access", function() {
-
+            it('renders all fields as expected for self with full access', function() {
                 var learnerProfileView = createLearnerProfileView(true, 'all_users', true);
 
                 Helpers.expectLoadingIndicatorIsVisible(learnerProfileView, true);
@@ -151,8 +167,7 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
                 LearnerProfileHelpers.expectProfileSectionsAndFieldsToBeRendered(learnerProfileView);
             });
 
-            it("renders all fields as expected for self with limited access", function() {
-
+            it('renders all fields as expected for self with limited access', function() {
                 var learnerProfileView = createLearnerProfileView(true, 'private', false);
 
                 Helpers.expectLoadingIndicatorIsVisible(learnerProfileView, true);
@@ -164,8 +179,7 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
                 LearnerProfileHelpers.expectLimitedProfileSectionsAndFieldsToBeRendered(learnerProfileView);
             });
 
-            it("renders the fields as expected for others with full access", function() {
-
+            it('renders the fields as expected for others with full access', function() {
                 var learnerProfileView = createLearnerProfileView(false, 'all_users', true);
 
                 Helpers.expectLoadingIndicatorIsVisible(learnerProfileView, true);
@@ -177,8 +191,7 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
                 LearnerProfileHelpers.expectProfileSectionsAndFieldsToBeRendered(learnerProfileView, true);
             });
 
-            it("renders the fields as expected for others with limited access", function() {
-
+            it('renders the fields as expected for others with limited access', function() {
                 var learnerProfileView = createLearnerProfileView(false, 'private', false);
 
                 Helpers.expectLoadingIndicatorIsVisible(learnerProfileView, true);
@@ -188,6 +201,17 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
 
                 Helpers.expectLoadingErrorIsVisible(learnerProfileView, false);
                 LearnerProfileHelpers.expectLimitedProfileSectionsAndFieldsToBeRendered(learnerProfileView, true);
+            });
+
+            it("renders an error if the badges can't be fetched", function() {
+                var learnerProfileView = createLearnerProfileView(false, 'all_users', true);
+                learnerProfileView.options.accountSettingsModel.set({'accomplishments_shared': true});
+                var requests = AjaxHelpers.requests(this);
+
+                learnerProfileView.render();
+
+                LearnerProfileHelpers.breakBadgeLoading(learnerProfileView, requests);
+                LearnerProfileHelpers.expectBadgeLoadingErrorIsRendered(learnerProfileView);
             });
         });
     });

@@ -8,8 +8,7 @@ from django.forms import (
     ChoiceField,
     Form,
     IntegerField,
-    NullBooleanField,
-    Select)
+)
 
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locator import CourseLocator
@@ -52,6 +51,7 @@ class ThreadListGetForm(_PaginationForm):
         choices=[(choice, choice) for choice in ["asc", "desc"]],
         required=False
     )
+    requested_fields = MultiValueField(required=False)
 
     def clean_order_by(self):
         """Return a default choice"""
@@ -99,6 +99,7 @@ class ThreadActionsForm(Form):
     following = BooleanField(required=False)
     voted = BooleanField(required=False)
     abuse_flagged = BooleanField(required=False)
+    read = BooleanField(required=False)
 
 
 class CommentListGetForm(_PaginationForm):
@@ -107,6 +108,7 @@ class CommentListGetForm(_PaginationForm):
     """
     thread_id = CharField()
     endorsed = ExtendedNullBooleanField(required=False)
+    requested_fields = MultiValueField(required=False)
 
 
 class CommentActionsForm(Form):
@@ -116,3 +118,10 @@ class CommentActionsForm(Form):
     """
     voted = BooleanField(required=False)
     abuse_flagged = BooleanField(required=False)
+
+
+class CommentGetForm(_PaginationForm):
+    """
+    A form to validate query parameters in the comment retrieval endpoint
+    """
+    requested_fields = MultiValueField(required=False)

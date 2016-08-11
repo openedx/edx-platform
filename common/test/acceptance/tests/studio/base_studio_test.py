@@ -2,12 +2,13 @@
 Base classes used by studio tests.
 """
 from bok_choy.web_app_test import WebAppTest
-from ...pages.studio.auto_auth import AutoAuthPage
-from ...fixtures.course import CourseFixture
-from ...fixtures.library import LibraryFixture
-from ..helpers import UniqueCourseTest
-from ...pages.studio.overview import CourseOutlinePage
-from ...pages.studio.utils import verify_ordering
+from bok_choy.page_object import XSS_INJECTION
+from common.test.acceptance.pages.studio.auto_auth import AutoAuthPage
+from common.test.acceptance.fixtures.course import CourseFixture
+from common.test.acceptance.fixtures.library import LibraryFixture
+from common.test.acceptance.tests.helpers import UniqueCourseTest
+from common.test.acceptance.pages.studio.overview import CourseOutlinePage
+from common.test.acceptance.pages.studio.utils import verify_ordering
 
 
 class StudioCourseTest(UniqueCourseTest):
@@ -15,11 +16,12 @@ class StudioCourseTest(UniqueCourseTest):
     Base class for all Studio course tests.
     """
 
-    def setUp(self, is_staff=False):
+    def setUp(self, is_staff=False, test_xss=True):  # pylint: disable=arguments-differ
         """
         Install a course with no content using a fixture.
         """
         super(StudioCourseTest, self).setUp()
+        self.test_xss = test_xss
         self.install_course_fixture(is_staff)
 
     def install_course_fixture(self, is_staff=False):
@@ -30,8 +32,21 @@ class StudioCourseTest(UniqueCourseTest):
             self.course_info['org'],
             self.course_info['number'],
             self.course_info['run'],
-            self.course_info['display_name']
+            self.course_info['display_name'],
         )
+        if self.test_xss:
+            xss_injected_unique_id = XSS_INJECTION + self.unique_id
+            test_improper_escaping = {u"value": xss_injected_unique_id}
+            self.course_fixture.add_advanced_settings({
+                "advertised_start": test_improper_escaping,
+                "info_sidebar_name": test_improper_escaping,
+                "cert_name_short": test_improper_escaping,
+                "cert_name_long": test_improper_escaping,
+                "display_organization": test_improper_escaping,
+                "display_coursenumber": test_improper_escaping,
+            })
+            self.course_info['display_organization'] = xss_injected_unique_id
+            self.course_info['display_coursenumber'] = xss_injected_unique_id
         self.populate_course_fixture(self.course_fixture)
         self.course_fixture.install()
         self.user = self.course_fixture.user

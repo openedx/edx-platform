@@ -1230,7 +1230,7 @@ class CapaModuleTest(unittest.TestCase):
     def test_no_max_attempts(self):
         module = CapaFactory.create(max_attempts='')
         html = module.get_problem_html()
-        self.assertTrue(html is not None)
+        self.assertIsNotNone(html)
         # assert that we got here without exploding
 
     def test_get_problem_html(self):
@@ -1318,13 +1318,15 @@ class CapaModuleTest(unittest.TestCase):
         # Re-mock the module_id to a fixed string, so we can check the logging
         module.location = Mock(module.location)
         module.location.to_deprecated_string.return_value = 'i4x://edX/capa_test/problem/meh'
-        module.get_problem_html()
-        module.get_demand_hint(0)
-        module.runtime.track_function.assert_called_with(
-            'edx.problem.hint.demandhint_displayed',
-            {'hint_index': 0, 'module_id': u'i4x://edX/capa_test/problem/meh',
-             'hint_text': 'Demand 1', 'hint_len': 2}
-        )
+
+        with patch.object(module.runtime, 'publish') as mock_track_function:
+            module.get_problem_html()
+            module.get_demand_hint(0)
+            mock_track_function.assert_called_with(
+                module, 'edx.problem.hint.demandhint_displayed',
+                {'hint_index': 0, 'module_id': u'i4x://edX/capa_test/problem/meh',
+                 'hint_text': 'Demand 1', 'hint_len': 2}
+            )
 
     def test_input_state_consistency(self):
         module1 = CapaFactory.create()
@@ -1363,7 +1365,7 @@ class CapaModuleTest(unittest.TestCase):
         # Try to render the module with DEBUG turned off
         html = module.get_problem_html()
 
-        self.assertTrue(html is not None)
+        self.assertIsNotNone(html)
 
         # Check the rendering context
         render_args, _ = module.system.render_template.call_args
@@ -1393,7 +1395,7 @@ class CapaModuleTest(unittest.TestCase):
         # Try to render the module with DEBUG turned on
         html = module.get_problem_html()
 
-        self.assertTrue(html is not None)
+        self.assertIsNotNone(html)
 
         # Check the rendering context
         render_args, _ = module.system.render_template.call_args
@@ -1417,7 +1419,7 @@ class CapaModuleTest(unittest.TestCase):
         # Get the seed
         # By this point, the module should have persisted the seed
         seed = module.seed
-        self.assertTrue(seed is not None)
+        self.assertIsNotNone(seed)
 
         # If we're not rerandomizing, the seed is always set
         # to the same value (1)
@@ -1477,7 +1479,7 @@ class CapaModuleTest(unittest.TestCase):
             of the form test_func() -> bool
             '''
             success = False
-            for i in range(num_tries):
+            for __ in range(num_tries):
                 if test_func() is True:
                     success = True
                     break
@@ -1488,7 +1490,7 @@ class CapaModuleTest(unittest.TestCase):
         # Get the seed
         # By this point, the module should have persisted the seed
         seed = module.seed
-        self.assertTrue(seed is not None)
+        self.assertIsNotNone(seed)
 
         # We do NOT want the seed to reset if rerandomize
         # is set to 'never' -- it should still be 1
@@ -1508,7 +1510,7 @@ class CapaModuleTest(unittest.TestCase):
             # to generate a different seed
             success = _retry_and_check(5, lambda: _reset_and_get_seed(module) != seed)
 
-            self.assertTrue(module.seed is not None)
+            self.assertIsNotNone(module.seed)
             msg = 'Could not get a new seed from reset after 5 tries'
             self.assertTrue(success, msg)
 
@@ -1541,7 +1543,7 @@ class CapaModuleTest(unittest.TestCase):
         # Get the seed
         # By this point, the module should have persisted the seed
         seed = module.seed
-        self.assertTrue(seed is not None)
+        self.assertIsNotNone(seed)
 
         #the seed should never change because the student hasn't finished the problem
         self.assertEqual(seed, _reset_and_get_seed(module))
@@ -1638,11 +1640,11 @@ class CapaModuleTest(unittest.TestCase):
         unmasked names should appear in the track_function event_info.
         """
         module = CapaFactory.create(xml=self.common_shuffle_xml)
-        with patch.object(module.runtime, 'track_function') as mock_track_function:
+        with patch.object(module.runtime, 'publish') as mock_track_function:
             get_request_dict = {CapaFactory.input_key(): 'choice_3'}  # the correct choice
             module.check_problem(get_request_dict)
-            mock_call = mock_track_function.mock_calls[0]
-            event_info = mock_call[1][1]
+            mock_call = mock_track_function.mock_calls[1]
+            event_info = mock_call[1][2]
             self.assertEqual(event_info['answers'][CapaFactory.answer_key()], 'choice_3')
             # 'permutation' key added to record how problem was shown
             self.assertEquals(event_info['permutation'][CapaFactory.answer_key()],
@@ -1706,16 +1708,44 @@ class CapaModuleTest(unittest.TestCase):
             </problem>
         """)
         module = CapaFactory.create(xml=xml)
-        with patch.object(module.runtime, 'track_function') as mock_track_function:
+        with patch.object(module.runtime, 'publish') as mock_track_function:
             get_request_dict = {CapaFactory.input_key(): 'choice_2'}  # mask_X form when masking enabled
             module.check_problem(get_request_dict)
-            mock_call = mock_track_function.mock_calls[0]
-            event_info = mock_call[1][1]
+            mock_call = mock_track_function.mock_calls[1]
+            event_info = mock_call[1][2]
             self.assertEqual(event_info['answers'][CapaFactory.answer_key()], 'choice_2')
             # 'permutation' key added to record how problem was shown
             self.assertEquals(event_info['permutation'][CapaFactory.answer_key()],
                               ('answerpool', ['choice_1', 'choice_3', 'choice_2', 'choice_0']))
             self.assertEquals(event_info['success'], 'incorrect')
+
+    @ddt.unpack
+    @ddt.data(
+        {'display_name': None, 'expected_display_name': 'problem'},
+        {'display_name': '', 'expected_display_name': 'problem'},
+        {'display_name': ' ', 'expected_display_name': 'problem'},
+        {'display_name': 'CAPA 101', 'expected_display_name': 'CAPA 101'}
+    )
+    def test_problem_display_name_with_default(self, display_name, expected_display_name):
+        """
+        Verify that display_name_with_default works as expected.
+        """
+        module = CapaFactory.create(display_name=display_name)
+        self.assertEqual(module.display_name_with_default, expected_display_name)
+
+    @ddt.data(
+        '',
+        '   ',
+    )
+    def test_problem_no_display_name(self, display_name):
+        """
+        Verify that if problem display name is not provided then a default name is used.
+        """
+        module = CapaFactory.create(display_name=display_name)
+        module.get_problem_html()
+        render_args, _ = module.system.render_template.call_args
+        context = render_args[1]
+        self.assertEqual(context['problem']['name'], module.location.block_type)
 
 
 @ddt.ddt
@@ -2585,13 +2615,13 @@ class TestProblemCheckTracking(unittest.TestCase):
         return CustomCapaFactory
 
     def get_event_for_answers(self, module, answer_input_dict):
-        with patch.object(module.runtime, 'track_function') as mock_track_function:
+        with patch.object(module.runtime, 'publish') as mock_track_function:
             module.check_problem(answer_input_dict)
 
-            self.assertGreaterEqual(len(mock_track_function.mock_calls), 1)
+            self.assertGreaterEqual(len(mock_track_function.mock_calls), 2)
             # There are potentially 2 track logs: answers and hint. [-1]=answers.
             mock_call = mock_track_function.mock_calls[-1]
-            event = mock_call[1][1]
+            event = mock_call[1][2]
 
             return event
 

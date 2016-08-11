@@ -5,8 +5,9 @@ from hashlib import md5
 
 from django.core.urlresolvers import reverse
 from django.test import RequestFactory
+from nose.plugins.attrib import attr
 
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase, ModuleStoreTestCase
 from .mixins import CourseApiFactoryMixin, TEST_PASSWORD
 from ..views import CourseDetailView
 
@@ -46,6 +47,7 @@ class CourseApiTestViewMixin(CourseApiFactoryMixin):
         return response
 
 
+@attr(shard=3)
 class CourseListViewTestCase(CourseApiTestViewMixin, SharedModuleStoreTestCase):
     """
     Test responses returned from CourseListView.
@@ -86,9 +88,27 @@ class CourseListViewTestCase(CourseApiTestViewMixin, SharedModuleStoreTestCase):
 
     def test_missing_username(self):
         self.setup_user(self.honor_user)
-        self.verify_response(expected_status_code=400)
+        response_to_missing_username = self.verify_response(expected_status_code=200)
+        self.assertIsNotNone(response_to_missing_username.data)  # pylint: disable=no-member
 
-    @SharedModuleStoreTestCase.modifies_courseware
+    def test_not_logged_in(self):
+        self.client.logout()
+        self.verify_response()
+
+
+class CourseListViewTestCaseMultipleCourses(CourseApiTestViewMixin, ModuleStoreTestCase):
+    """
+    Test responses returned from CourseListView (with tests that modify the
+    courseware).
+    """
+
+    def setUp(self):
+        super(CourseListViewTestCaseMultipleCourses, self).setUp()
+        self.course = self.create_course()
+        self.url = reverse('course-list')
+        self.staff_user = self.create_user(username='staff', is_staff=True)
+        self.honor_user = self.create_user(username='honor', is_staff=False)
+
     def test_filter_by_org(self):
         """Verify that CourseOverviews are filtered by the provided org key."""
         self.setup_user(self.staff_user)
@@ -113,7 +133,6 @@ class CourseListViewTestCase(CourseApiTestViewMixin, SharedModuleStoreTestCase):
             all(course['org'] == self.course.org for course in filtered_response.data['results'])  # pylint: disable=no-member
         )
 
-    @SharedModuleStoreTestCase.modifies_courseware
     def test_filter(self):
         self.setup_user(self.staff_user)
 
@@ -135,10 +154,6 @@ class CourseListViewTestCase(CourseApiTestViewMixin, SharedModuleStoreTestCase):
                 {unicode(course.id) for course in expected_courses},
                 "testing course_api.views.CourseListView with filter_={}".format(filter_),
             )
-
-    def test_not_logged_in(self):
-        self.client.logout()
-        self.verify_response()
 
 
 class CourseDetailViewTestCase(CourseApiTestViewMixin, SharedModuleStoreTestCase):

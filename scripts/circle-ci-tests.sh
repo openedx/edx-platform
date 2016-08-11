@@ -37,11 +37,11 @@ if [ "$CIRCLE_NODE_TOTAL" == "1" ] ; then
     echo "via the CircleCI UI and adjust scripts/circle-ci-tests.sh to match."
 
     echo "Running tests for common/lib/ and pavelib/"
-    paver test_lib --extra_args="--with-flaky" --cov_args="-p" || EXIT=1
+    paver test_lib --with-flaky --cov-args="-p" --with-xunitmp || EXIT=1
     echo "Running python tests for Studio"
-    paver test_system -s cms --extra_args="--with-flaky" --cov_args="-p" || EXIT=1
+    paver test_system -s cms --with-flaky --cov-args="-p" --with-xunitmp || EXIT=1
     echo "Running python tests for lms"
-    paver test_system -s lms --extra_args="--with-flaky" --cov_args="-p" || EXIT=1
+    paver test_system -s lms --with-flaky --cov-args="-p" --with-xunitmp || EXIT=1
 
     exit $EXIT
 else
@@ -60,9 +60,10 @@ else
             paver run_pylint -l $PYLINT_THRESHOLD | tee pylint.log || EXIT=1
 
             mkdir -p reports
-            echo "Finding jshint violations and storing report..."
             PATH=$PATH:node_modules/.bin
-            paver run_jshint -l $JSHINT_THRESHOLD > jshint.log || { cat jshint.log; EXIT=1; }
+
+            echo "Finding ESLint violations and storing report..."
+            paver run_eslint -l $ESLINT_THRESHOLD > eslint.log || { cat eslint.log; EXIT=1; }
 
             # Run quality task. Pass in the 'fail-under' percentage to diff-quality
             paver run_quality -p 100 || EXIT=1
@@ -74,15 +75,15 @@ else
             ;;
 
         1)  # run all of the lms unit tests
-            paver test_system -s lms --extra_args="--with-flaky" --cov_args="-p"
+            paver test_system -s lms --with-flaky --cov-args="-p" --with-xunitmp
             ;;
 
         2)  # run all of the cms unit tests
-            paver test_system -s cms --extra_args="--with-flaky" --cov_args="-p"
+            paver test_system -s cms --with-flaky --cov-args="-p" --with-xunitmp
             ;;
 
         3)  # run the commonlib unit tests
-            paver test_lib --extra_args="--with-flaky" --cov_args="-p"
+            paver test_lib --with-flaky --cov-args="-p" --with-xunitmp
             ;;
 
         *)

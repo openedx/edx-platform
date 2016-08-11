@@ -1,8 +1,12 @@
 (function(requirejs, define) {
+    'use strict';
+
     requirejs.config({
+        baseUrl: '/base/',
         paths: {
             'gettext': 'js/test/i18n',
-            'jquery': 'js/vendor/jquery.min',
+            'jquery': 'common/js/vendor/jquery',
+            'jquery-migrate': 'common/js/vendor/jquery-migrate',
             'jquery.ui': 'js/vendor/jquery-ui.min',
             'jquery.flot': 'js/vendor/flot/jquery.flot.min',
             'jquery.form': 'js/vendor/jquery.form',
@@ -10,7 +14,7 @@
             'jquery.leanModal': 'js/vendor/jquery.leanModal',
             'jquery.ajaxQueue': 'js/vendor/jquery.ajaxQueue',
             'jquery.smoothScroll': 'js/vendor/jquery.smooth-scroll.min',
-            'jquery.scrollTo': 'js/vendor/jquery.scrollTo-1.4.2-min',
+            'jquery.scrollTo': 'common/js/vendor/jquery.scrollTo',
             'jquery.timepicker': 'js/vendor/timepicker/jquery.timepicker',
             'jquery.cookie': 'js/vendor/jquery.cookie',
             'jquery.qtip': 'js/vendor/jquery.qtip.min',
@@ -22,17 +26,15 @@
             'jquery.url': 'js/vendor/url.min',
             'sinon': 'js/vendor/sinon-1.17.0',
             'text': 'js/vendor/requirejs/text',
-            'underscore': 'js/vendor/underscore-min',
-            'underscore.string': 'js/vendor/underscore.string.min',
-            'backbone': 'js/vendor/backbone-min',
+            'underscore': 'common/js/vendor/underscore',
+            'underscore.string': 'common/js/vendor/underscore.string',
+            'backbone': 'common/js/vendor/backbone',
             'backbone.associations': 'js/vendor/backbone-associations-min',
-            'backbone.paginator': 'js/vendor/backbone.paginator.min',
-            "backbone-super": "js/vendor/backbone-super",
-            'jasmine-jquery': 'js/vendor/jasmine-jquery',
+            'backbone.paginator': 'common/js/vendor/backbone.paginator',
+            'backbone-super': 'js/vendor/backbone-super',
             'jasmine-imagediff': 'js/vendor/jasmine-imagediff',
-            'jasmine-stealth': 'js/vendor/jasmine-stealth',
-            'jasmine.async': 'js/vendor/jasmine.async',
-            'URI': 'js/vendor/URI.min'
+            'URI': 'js/vendor/URI.min',
+            'draggabilly': 'js/vendor/draggabilly'
         },
         shim: {
             'gettext': {
@@ -126,44 +128,56 @@
             },
             'backbone.paginator': {
                 deps: ['backbone'],
-                exports: 'Backbone.Paginator'
+                exports: 'Backbone.PageableCollection'
             },
-            "backbone-super": {
-                deps: ["backbone"]
+            'backbone-super': {
+                deps: ['backbone']
             },
             'URI': {
                 exports: 'URI'
             },
-            'jasmine-jquery': {
-                deps: ['jasmine']
+            'jasmine-imagediff': {},
+            'common/js/spec_helpers/jasmine-extensions': {
+                deps: ['jquery']
             },
-            'jasmine-imagediff': {
-                deps: ['jasmine']
+            'common/js/spec_helpers/jasmine-stealth': {
+                deps: ['underscore', 'underscore.string']
             },
-            'jasmine-stealth': {
-                deps: ['jasmine']
+            'common/js/spec_helpers/jasmine-waituntil': {
+                deps: ['jquery']
             },
-            'jasmine.async': {
-                deps: ['jasmine'],
-                exports: 'AsyncSpec'
-            },
-            "sinon": {
-                exports: "sinon"
+            'sinon': {
+                exports: 'sinon'
             }
         }
     });
 
-    define([
-        // Run the common tests that use RequireJS.
-        'common-requirejs/include/common/js/spec/components/feedback_spec.js',
-        'common-requirejs/include/common/js/spec/components/list_spec.js',
-        'common-requirejs/include/common/js/spec/components/paginated_view_spec.js',
-        'common-requirejs/include/common/js/spec/components/paging_collection_spec.js',
-        'common-requirejs/include/common/js/spec/components/paging_header_spec.js',
-        'common-requirejs/include/common/js/spec/components/paging_footer_spec.js',
-        'common-requirejs/include/common/js/spec/components/search_field_spec.js',
-        'common-requirejs/include/common/js/spec/components/view_utils_spec.js',
-        'common-requirejs/include/common/js/spec/utils/edx.utils.validate_spec.js'
-    ]);
+    var testFiles = [
+        'common/js/spec/components/tabbed_view_spec.js',
+        'common/js/spec/components/feedback_spec.js',
+        'common/js/spec/components/list_spec.js',
+        'common/js/spec/components/paginated_view_spec.js',
+        'common/js/spec/components/paging_header_spec.js',
+        'common/js/spec/components/paging_footer_spec.js',
+        'common/js/spec/components/search_field_spec.js',
+        'common/js/spec/components/view_utils_spec.js',
+        'common/js/spec/utils/edx.utils.validate_spec.js'
+    ];
 
+    for (var i = 0; i < testFiles.length; i++) {
+        testFiles[i] = '/base/' + testFiles[i];
+    }
+
+    var specHelpers = [
+        'common/js/spec_helpers/jasmine-extensions',
+        'common/js/spec_helpers/jasmine-stealth',
+        'common/js/spec_helpers/jasmine-waituntil'
+    ];
+
+    // Jasmine has a global stack for creating a tree of specs. We need to load
+    // spec files one by one, otherwise some end up getting nested under others.
+    window.requireSerial(specHelpers.concat(testFiles), function() {
+        // start test run, once Require.js is done
+        window.__karma__.start();
+    });
 }).call(this, requirejs, define);

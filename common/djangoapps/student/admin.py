@@ -1,18 +1,22 @@
 """ Django admin pages for student app """
 from django import forms
-from django.contrib.auth.models import User
-from ratelimitbackend import admin
-from xmodule.modulestore.django import modulestore
+from django.contrib.auth import get_user_model
+from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
+from django.utils.translation import ugettext_lazy as _
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
+from ratelimitbackend import admin
+from xmodule.modulestore.django import modulestore
 
 from config_models.admin import ConfigurationModelAdmin
 from student.models import (
     UserProfile, UserTestGroup, CourseEnrollmentAllowed, DashboardConfiguration, CourseEnrollment, Registration,
-    PendingNameChange, CourseAccessRole, LinkedInAddToProfileConfiguration, OrganizationUser
+    PendingNameChange, CourseAccessRole, LinkedInAddToProfileConfiguration, UserAttribute, LogoutViewConfiguration, OrganizationUser
 )
 from student.roles import REGISTERED_ACCESS_ROLES
 from organizations.models import Organization
+
+User = get_user_model()  # pylint:disable=invalid-name
 
 class CourseAccessRoleForm(forms.ModelForm):
     """Form for adding new Course Access Roles view the Django Admin Panel."""
@@ -99,29 +103,7 @@ class CourseAccessRoleForm(forms.ModelForm):
             self.fields['email'].initial = self.instance.user.email
 
 
-class OrganizationUserAdmin(admin.ModelAdmin):
-    """
-    Admin for the UserOrganization table.
-    """
-    list_display = ('user_id', 'organization', 'active', 'is_instructor')
-
-    raw_id_fields = ('user_id',)
-    search_fields = ('user__username',)
-
-
-    def queryset(self, request):
-        return super(CourseEnrollmentAdmin, self).queryset(request).select_related('user_id')
-
-    def formfield_for_foreignkey(self, db_field, request, **kwargs):
-        """
-        list down the active organizations
-        """
-        if db_field.name == 'organization':
-            kwargs['queryset'] = Organization.objects.filter(active=True)
-
-        return super(OrganizationUserAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
-
-
+@admin.register(CourseAccessRole)
 class CourseAccessRoleAdmin(admin.ModelAdmin):
     """Admin panel for the Course Access Role. """
     form = CourseAccessRoleForm
@@ -146,6 +128,7 @@ class CourseAccessRoleAdmin(admin.ModelAdmin):
         super(CourseAccessRoleAdmin, self).save_model(request, obj, form, change)
 
 
+@admin.register(LinkedInAddToProfileConfiguration)
 class LinkedInAddToProfileConfigurationAdmin(admin.ModelAdmin):
     """Admin interface for the LinkedIn Add to Profile configuration. """
 
@@ -156,6 +139,7 @@ class LinkedInAddToProfileConfigurationAdmin(admin.ModelAdmin):
     exclude = ('dashboard_tracking_code',)
 
 
+@admin.register(CourseEnrollment)
 class CourseEnrollmentAdmin(admin.ModelAdmin):
     """ Admin interface for the CourseEnrollment model. """
     list_display = ('id', 'course_id', 'mode', 'user', 'is_active',)
@@ -170,38 +154,60 @@ class CourseEnrollmentAdmin(admin.ModelAdmin):
         model = CourseEnrollment
 
 
-class UserProfileAdmin(admin.ModelAdmin):
-    """ Admin interface for UserProfile model. """
-    list_display = ('user', 'name',)
-    raw_id_fields = ('user',)
-    search_fields = ('user__username', 'user__first_name', 'user__last_name', 'user__email', 'name',)
+class UserProfileInline(admin.StackedInline):
+    """ Inline admin interface for UserProfile model. """
+    model = UserProfile
+    can_delete = False
+    verbose_name_plural = _('User profile')
 
-    def get_readonly_fields(self, request, obj=None):
-        # The user field should not be editable for an existing user profile.
-        if obj:
-            return self.readonly_fields + ('user',)
-        return self.readonly_fields
+
+class UserAdmin(BaseUserAdmin):
+    """ Admin interface for the User model. """
+    inlines = (UserProfileInline,)
+
+
+@admin.register(UserAttribute)
+class UserAttributeAdmin(admin.ModelAdmin):
+    """ Admin interface for the UserAttribute model. """
+    list_display = ('user', 'name', 'value',)
+    list_filter = ('name',)
+    raw_id_fields = ('user',)
+    search_fields = ('name', 'value', 'user__username',)
 
     class Meta(object):
-        model = UserProfile
+        model = UserAttribute
+
+
+class OrganizationUserAdmin(admin.ModelAdmin):
+    """
+    Admin for the UserOrganization table.
+    """
+    list_display = ('user_id', 'organization', 'active', 'is_instructor')
+
+    raw_id_fields = ('user_id',)
+    search_fields = ('user__username',)
+
+
+    def queryset(self, request):
+        return super(CourseEnrollmentAdmin, self).queryset(request).select_related('user_id')
+
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        """
+        list down the active organizations
+        """
+        if db_field.name == 'organization':
+            kwargs['queryset'] = Organization.objects.filter(active=True)
+
+        return super(OrganizationUserAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
 
 
 admin.site.register(UserTestGroup)
-
 admin.site.register(CourseEnrollmentAllowed)
-
 admin.site.register(Registration)
-
 admin.site.register(PendingNameChange)
-
-admin.site.register(CourseAccessRole, CourseAccessRoleAdmin)
-
 admin.site.register(DashboardConfiguration, ConfigurationModelAdmin)
-
-admin.site.register(LinkedInAddToProfileConfiguration, LinkedInAddToProfileConfigurationAdmin)
-
-admin.site.register(CourseEnrollment, CourseEnrollmentAdmin)
-
-admin.site.register(UserProfile, UserProfileAdmin)
-
+admin.site.register(LogoutViewConfiguration, ConfigurationModelAdmin)
 admin.site.register(OrganizationUser, OrganizationUserAdmin)
+
+# We must first un-register the User model since it may also be registered by the auth app.
+admin.site.register(User, UserAdmin)

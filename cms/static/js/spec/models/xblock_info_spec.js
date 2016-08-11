@@ -10,26 +10,25 @@ define(['backbone', 'js/models/xblock_info'],
         });
 
         describe('XblockInfo actions state and header visibility ', function() {
-
-            it('works correct to hide icons e.g. trash icon, drag when actions are not required', function(){
-                expect(new XBlockInfo({'category': 'chapter', 'actions': {'deletable':false}})
+            it('works correct to hide icons e.g. trash icon, drag when actions are not required', function() {
+                expect(new XBlockInfo({'category': 'chapter', 'actions': {'deletable': false}})
                     .isDeletable()).toBe(false);
-                expect(new XBlockInfo({'category': 'chapter', 'actions': {'draggable':false}})
+                expect(new XBlockInfo({'category': 'chapter', 'actions': {'draggable': false}})
                     .isDraggable()).toBe(false);
-                expect(new XBlockInfo({'category': 'chapter', 'actions': {'childAddable':false}})
+                expect(new XBlockInfo({'category': 'chapter', 'actions': {'childAddable': false}})
                     .isChildAddable()).toBe(false);
             });
 
-            it('works correct to show icons e.g. trash icon, drag when actions are required', function(){
-                expect(new XBlockInfo({'category': 'chapter', 'actions': {'deletable':true}})
+            it('works correct to show icons e.g. trash icon, drag when actions are required', function() {
+                expect(new XBlockInfo({'category': 'chapter', 'actions': {'deletable': true}})
                     .isDeletable()).toBe(true);
-                expect(new XBlockInfo({'category': 'chapter', 'actions': {'draggable':true}})
+                expect(new XBlockInfo({'category': 'chapter', 'actions': {'draggable': true}})
                     .isDraggable()).toBe(true);
-                expect(new XBlockInfo({'category': 'chapter', 'actions': {'childAddable':true}})
+                expect(new XBlockInfo({'category': 'chapter', 'actions': {'childAddable': true}})
                     .isChildAddable()).toBe(true);
             });
 
-            it('displays icons e.g. trash icon, drag when actions are undefined', function(){
+            it('displays icons e.g. trash icon, drag when actions are undefined', function() {
                 expect(new XBlockInfo({'category': 'chapter', 'actions': {}})
                     .isDeletable()).toBe(true);
                 expect(new XBlockInfo({'category': 'chapter', 'actions': {}})
@@ -38,7 +37,7 @@ define(['backbone', 'js/models/xblock_info'],
                     .isChildAddable()).toBe(true);
             });
 
-            it('works correct to hide header content', function(){
+            it('works correct to hide header content', function() {
                 expect(new XBlockInfo({'category': 'sequential', 'is_header_visible': false})
                     .isHeaderVisible()).toBe(false);
             });
@@ -47,7 +46,6 @@ define(['backbone', 'js/models/xblock_info'],
                 expect(new XBlockInfo({'category': 'sequential', 'actions': {'deletable': true}})
                     .isHeaderVisible()).toBe(true);
             });
-
         });
     }
 );

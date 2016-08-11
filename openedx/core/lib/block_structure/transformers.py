@@ -1,9 +1,11 @@
 """
 Module for a collection of BlockStructureTransformers.
 """
+import functools
 from logging import getLogger
 
 from .exceptions import TransformerException
+from .transformer import FilteringTransformerMixin
 from .transformer_registry import TransformerRegistry
 
 
@@ -39,7 +41,7 @@ class BlockStructureTransformers(object):
                 Transformer Registry.
         """
         self.usage_info = usage_info
-        self._transformers = []
+        self._transformers = {'supports_filter': [], 'no_filter': []}
         if transformers:
             self.__iadd__(transformers)
 
@@ -61,7 +63,11 @@ class BlockStructureTransformers(object):
                 "The following requested transformers are not registered: {}".format(unregistered_transformers)
             )
 
-        self._transformers.extend(transformers)
+        for transformer in transformers:
+            if isinstance(transformer, FilteringTransformerMixin):
+                self._transformers['supports_filter'].append(transformer)
+            else:
+                self._transformers['no_filter'].append(transformer)
         return self
 
     @classmethod
@@ -76,17 +82,6 @@ class BlockStructureTransformers(object):
         # Collect all fields that were requested by the transformers.
         block_structure._collect_requested_xblock_fields()  # pylint: disable=protected-access
 
-    def transform(self, block_structure):
-        """
-        The given block structure is transformed by each transformer in the
-        collection, in the order that the transformers were added.
-        """
-        for transformer in self._transformers:
-            transformer.transform(self.usage_info, block_structure)
-
-        # Prune the block structure to remove any unreachable blocks.
-        block_structure._prune_unreachable()  # pylint: disable=protected-access
-
     @classmethod
     def is_collected_outdated(cls, block_structure):
         """
@@ -99,9 +94,56 @@ class BlockStructureTransformers(object):
                 outdated_transformers.append(transformer)
 
         if outdated_transformers:
-            logger.debug(
+            logger.info(
                 "Collected Block Structure data for the following transformers is outdated: '%s'.",
                 [(transformer.name(), transformer.VERSION) for transformer in outdated_transformers],
             )
 
         return bool(outdated_transformers)
+
+    def transform(self, block_structure):
+        """
+        The given block structure is transformed by each transformer in the
+        collection. Tranformers with filters are combined and run first in a
+        single course tree traversal, then remaining transformers are run in
+        the order that they were added.
+        """
+        self._transform_with_filters(block_structure)
+        self._transform_without_filters(block_structure)
+
+        # Prune the block structure to remove any unreachable blocks.
+        block_structure._prune_unreachable()  # pylint: disable=protected-access
+
+    def _transform_with_filters(self, block_structure):
+        """
+        Transforms the given block_structure using the transform_block_filters
+        method from the given transformers.
+        """
+        if not self._transformers['supports_filter']:
+            return
+
+        filters = []
+        for transformer in self._transformers['supports_filter']:
+            filters.extend(transformer.transform_block_filters(self.usage_info, block_structure))
+
+        combined_filters = functools.reduce(
+            self._filter_chain,
+            filters,
+            block_structure.create_universal_filter()
+        )
+        block_structure.filter_topological_traversal(combined_filters)
+
+    def _filter_chain(self, accumulated, additional):
+        """
+        Given two functions that take a block_key and return a boolean, yield
+        a function that takes a block key, and 'ands' the functions together
+        """
+        return lambda block_key: accumulated(block_key) and additional(block_key)
+
+    def _transform_without_filters(self, block_structure):
+        """
+        Transforms the given block_structure using the transform
+        method from the given transformers.
+        """
+        for transformer in self._transformers['no_filter']:
+            transformer.transform(self.usage_info, block_structure)

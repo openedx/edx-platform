@@ -6,13 +6,13 @@ See also old lettuce tests in lms/djangoapps/courseware/features/problems.featur
 """
 from textwrap import dedent
 
-from ..helpers import UniqueCourseTest
-from ...pages.studio.auto_auth import AutoAuthPage
-from ...pages.lms.courseware import CoursewarePage
-from ...pages.lms.problem import ProblemPage
-from ...pages.lms.login_and_register import CombinedLoginAndRegisterPage
-from ...fixtures.course import CourseFixture, XBlockFixtureDesc
-from ..helpers import EventsTestMixin
+from common.test.acceptance.tests.helpers import UniqueCourseTest
+from common.test.acceptance.pages.studio.auto_auth import AutoAuthPage
+from common.test.acceptance.pages.lms.courseware import CoursewarePage
+from common.test.acceptance.pages.lms.problem import ProblemPage
+from common.test.acceptance.pages.lms.login_and_register import CombinedLoginAndRegisterPage
+from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
+from common.test.acceptance.tests.helpers import EventsTestMixin
 
 
 class ProblemsTest(UniqueCourseTest):
@@ -288,13 +288,13 @@ class ProblemWithMathjax(ProblemsTest):
 
         # The hint button rotates through multiple hints
         problem_page.click_hint()
-        self.assertIn("Hint (1 of 2): mathjax should work1", problem_page.hint_text)
+        self.assertIn("Hint (1 of 2): mathjax should work1", problem_page.extract_hint_text_from_html)
         problem_page.verify_mathjax_rendered_in_hint()
 
         # Rotate the hint and check the problem hint
         problem_page.click_hint()
 
-        self.assertIn("Hint (2 of 2): mathjax should work2", problem_page.hint_text)
+        self.assertIn("Hint (2 of 2): mathjax should work2", problem_page.extract_hint_text_from_html)
         problem_page.verify_mathjax_rendered_in_hint()
 
 

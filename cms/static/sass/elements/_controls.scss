@@ -62,22 +62,22 @@
 // blue primary button
 %btn-primary-blue {
   @extend %ui-btn-primary;
-  background: $blue;
-  border-color: $blue-s1;
+  background: $uxpl-blue-base;
+  border-color: $uxpl-blue-base;
   color: $white;
 
   &:hover, &:active {
-    background: $blue-l1;
-    border-color: $blue-l1;
+    background: $uxpl-blue-hover-active;
+    border-color: $uxpl-blue-hover-active;
   }
 
   &.current, &.active {
-    background: $blue-d1;
+    background: $uxpl-blue-hover-active;
+    border-color: $uxpl-blue-hover-active;
     color: $blue-l4;
-    border-color: $blue-d2;
 
     &:hover, &:active {
-      background: $blue-d1;
+      background: $uxpl-blue-hover-active;
     }
   }
 }
@@ -85,22 +85,22 @@
 // green primary button
 %btn-primary-green {
   @extend %ui-btn-primary;
-  background: $green;
-  border-color: $green;
+  background: $uxpl-green-base;
+  border-color: $uxpl-green-base;
   color: $white;
 
   &:hover, &:active {
-    background: $green-s1;
-    border-color: $green-s1;
+    background: $uxpl-green-hover-active;
+    border-color: $uxpl-green-hover-active;
   }
 
   &.current, &.active {
-    background: $green-d1;
-    color: $green-l4;
-    border-color: $green-d2;
+    background: $uxpl-green-hover-active;
+    color: $white;
+    border-color: $uxpl-green-hover-active;
 
     &:hover, &:active {
-      background: $green-d1;
+      background: $uxpl-green-hover-active;
     }
   }
 }
@@ -132,21 +132,17 @@
 %btn-secondary-blue {
   @extend %ui-btn-secondary;
   border-color: $blue-l3;
-  color: $blue;
+  color: $uxpl-blue-base;
 
   &:hover, &:active {
     background: $blue-l4;
-    color: $blue-s2;
+    color: $uxpl-blue-hover-active;
   }
 
   &.current, &.active {
     border-color: $blue-l3;
     background: $blue-l3;
-    color: $blue-d1;
-
-    &:hover, &:active {
-
-    }
+    color: $uxpl-blue-base;
   }
 }
 
@@ -197,9 +193,9 @@
 .button {
 
   .icon {
+    @include margin-right($baseline/4);
     display: inline-block;
     vertical-align: middle;
-    margin-right: ($baseline/4);
   }
 }
 
@@ -235,7 +231,7 @@
 
   &:hover, &:active {
     background: $white;
-    color: $blue-s1;
+    color: $uxpl-blue-hover-active;
   }
 
   &.current, &.active {
@@ -243,7 +239,7 @@
     color: $gray-d4;
 
     &:hover, &:active {
-      color: $blue-s1;
+      color: $uxpl-blue-hover-active;
     }
   }
 }
@@ -268,7 +264,7 @@
       color: $gray-l1;
 
       &:hover {
-        background-color: $blue;
+        background-color: $uxpl-blue-base;
         color: $gray-l6;
       }
 
@@ -320,14 +316,14 @@
   vertical-align: top;
 
   &:hover {
-    color: $blue;
+    color: $uxpl-blue-base;
   }
 
   .ui-toggle-expansion {
     @include transition(all $tmg-f2 ease-in-out 0s);
+    @include margin-right($baseline/4);
     @extend %t-action1;
     display: inline-block;
-    margin-right: ($baseline/4);
     color: $gray-l3;
     vertical-align: middle;
   }
@@ -358,7 +354,7 @@
     // STATE: hover/active
     &:hover, &:active {
       @extend %ui-fake-link;
-      color: $ui-link-color-focus;
+      color: $uxpl-blue-base;
     }
   }
 
@@ -404,7 +400,7 @@
       position: absolute;
       top: -12px;
       left: -($baseline/4);
-      color: $blue-s1;
+      color: $blue-d1;
     }
   }
 

@@ -1,5 +1,5 @@
 define([
-    'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers', 'js/spec/edxnotes/helpers',
+    'jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'js/spec/edxnotes/helpers',
     'annotator_1.2.9', 'logger', 'js/edxnotes/views/notes_factory'
 ], function($, _, AjaxHelpers, Helpers, Annotator, Logger, NotesFactory) {
     'use strict';
@@ -10,18 +10,18 @@ define([
                 text: 'text-123',
                 quote: 'quote-123',
                 usage_id: 'usage-123',
-                tags: ["tag1", "tag2"]
+                tags: ['tag1', 'tag2']
             },
             noteWithoutId = {
                 user: 'user-123',
                 text: 'text-123',
                 quote: 'quote-123',
                 usage_id: 'usage-123',
-                tags: ["tag1", "tag2"]
+                tags: ['tag1', 'tag2']
             };
 
         beforeEach(function() {
-            this.annotator =  NotesFactory.factory(
+            this.annotator = NotesFactory.factory(
                 $('<div />').get(0), {
                     endpoint: 'http://example.com/',
                     eventStringLimit: 300
@@ -30,8 +30,10 @@ define([
             spyOn(Logger, 'log');
         });
 
-        afterEach(function () {
-            _.invoke(Annotator._instances, 'destroy');
+        afterEach(function() {
+            while (Annotator._instances.length > 0) {
+                Annotator._instances[0].destroy();
+            }
         });
 
         it('should log edx.course.student_notes.viewed event properly', function() {
@@ -68,7 +70,7 @@ define([
                 'edx.course.student_notes.added', {
                     'note_id': 'note-123',
                     'note_text': 'text-123',
-                    'tags': ["tag1", "tag2"],
+                    'tags': ['tag1', 'tag2'],
                     'highlighted_content': 'quote-123',
                     'truncated': [],
                     'component_usage_id': 'usage-123'
@@ -90,7 +92,7 @@ define([
                     'note_id': 'note-123',
                     'old_note_text': 'text-123',
                     'note_text': 'text-456',
-                    'old_tags': ["tag1", "tag2"],
+                    'old_tags': ['tag1', 'tag2'],
                     'tags': [],
                     'highlighted_content': 'quote-123',
                     'truncated': [],
@@ -118,7 +120,7 @@ define([
                 'edx.course.student_notes.deleted', {
                     'note_id': 'note-123',
                     'note_text': 'text-123',
-                    'tags': ["tag1", "tag2"],
+                    'tags': ['tag1', 'tag2'],
                     'highlighted_content': 'quote-123',
                     'truncated': [],
                     'component_usage_id': 'usage-123'
@@ -132,11 +134,11 @@ define([
         });
 
         it('should truncate values of some fields', function() {
-            var oldNote = $.extend({}, note, {text: Helpers.LONG_TEXT, tags: ["review", Helpers.LONG_TEXT]}),
+            var oldNote = $.extend({}, note, {text: Helpers.LONG_TEXT, tags: ['review', Helpers.LONG_TEXT]}),
                 newNote = $.extend({}, note, {
                     text: Helpers.LONG_TEXT + '123',
                     quote: Helpers.LONG_TEXT + '123',
-                    tags: ["short", "tags", "will", "stay", Helpers.LONG_TEXT]
+                    tags: ['short', 'tags', 'will', 'stay', Helpers.LONG_TEXT]
                 });
 
             this.annotator.publish('annotationEditorShown', [this.annotator.editor, oldNote]);
@@ -148,11 +150,11 @@ define([
                 'edx.course.student_notes.edited', {
                     'note_id': 'note-123',
                     'old_note_text': Helpers.TRUNCATED_TEXT,
-                    'old_tags': ["review"],
-                    'tags': ["short", "tags", "will", "stay"],
+                    'old_tags': ['review'],
+                    'tags': ['short', 'tags', 'will', 'stay'],
                     'note_text': Helpers.TRUNCATED_TEXT,
                     'highlighted_content': Helpers.TRUNCATED_TEXT,
-                    'truncated': ["note_text", "highlighted_content", "tags", "old_note_text", "old_tags"],
+                    'truncated': ['note_text', 'highlighted_content', 'tags', 'old_note_text', 'old_tags'],
                     'component_usage_id': 'usage-123'
                 }
             );

@@ -24,7 +24,7 @@ describe 'MarkdownEditingDescriptor', ->
     it 'click on advanced editor should work', ->
       loadFixtures 'problem-with-markdown.html'
       @descriptor = new MarkdownEditingDescriptor($('.problem-editor'))
-      spyOn(@descriptor, 'confirmConversionToXml').andReturn(true)
+      spyOn(@descriptor, 'confirmConversionToXml').and.returnValue(true)
       expect(@descriptor.confirmConversionToXml).not.toHaveBeenCalled()
       e = jasmine.createSpyObj('e', [ 'preventDefault' ])
       @descriptor.onShowXMLButton(e)
@@ -710,7 +710,7 @@ describe 'MarkdownEditingDescriptor', ->
         """)
       expect(data).toEqual("""<problem>
         <p>Not a header</p>
-        <h3 class="problem-header">A header</h3>
+        <h3 class="hd hd-2 problem-header">A header</h3>
 
         <p>Multiple choice w/ parentheticals</p>
         <multiplechoiceresponse>

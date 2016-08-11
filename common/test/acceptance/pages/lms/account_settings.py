@@ -1,12 +1,12 @@
 """
 Base class for account settings page.
 """
-from . import BASE_URL
+from common.test.acceptance.pages.lms import BASE_URL
 
 from bok_choy.page_object import PageObject
 from bok_choy.promise import EmptyPromise
 
-from .fields import FieldsMixin
+from common.test.acceptance.pages.lms.fields import FieldsMixin
 
 
 class AccountSettingsPage(FieldsMixin, PageObject):
@@ -57,3 +57,25 @@ class AccountSettingsPage(FieldsMixin, PageObject):
         Wait for loading indicator to become visible.
         """
         EmptyPromise(self._is_loading_in_progress, "Loading is in progress.").fulfill()
+
+    def switch_account_settings_tabs(self, tab_id):
+        """
+        Switch between the different account settings tabs.
+        """
+        self.q(css='#{}'.format(tab_id)).click()
+
+    @property
+    def is_order_history_tab_visible(self):
+        """ Check if tab with the name "Order History" is visible."""
+        return self.q(css='.u-field-orderHistory').visible
+
+    def get_value_of_order_history_row_item(self, field_id, field_name):
+        """ Return the text value of the provided order field name."""
+        query = self.q(css='.u-field-{} .u-field-order-{}'.format(field_id, field_name))
+        return query.text[0] if query.present else None
+
+    def order_button_is_visible(self, field_id):
+        """ Check that if hovering over the order history row shows the
+        order detail link or not.
+        """
+        return self.q(css='.u-field-{} .u-field-{}'.format(field_id, 'link')).visible

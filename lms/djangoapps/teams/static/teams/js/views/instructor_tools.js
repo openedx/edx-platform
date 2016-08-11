@@ -1,13 +1,14 @@
-;(function (define) {
+(function(define) {
     'use strict';
 
     define(['backbone',
             'underscore',
             'gettext',
+            'edx-ui-toolkit/js/utils/string-utils',
             'teams/js/views/team_utils',
             'common/js/components/utils/view_utils',
             'text!teams/templates/instructor-tools.underscore'],
-        function (Backbone, _, gettext, TeamUtils, ViewUtils, instructorToolbarTemplate) {
+        function(Backbone, _, gettext, StringUtils, TeamUtils, ViewUtils, instructorToolbarTemplate) {
             return Backbone.View.extend({
 
                 events: {
@@ -26,7 +27,7 @@
                     return this;
                 },
 
-                deleteTeam: function (event) {
+                deleteTeam: function(event) {
                     event.preventDefault();
                     ViewUtils.confirmThenRunOperation(
                         gettext('Delete this team?'),
@@ -36,32 +37,32 @@
                     );
                 },
 
-                editMembership: function (event) {
+                editMembership: function(event) {
                     event.preventDefault();
                     Backbone.history.navigate(
-                        'teams/' + this.team.get('topic_id') + '/' + this.team.id +'/edit-team/manage-members',
+                        'teams/' + this.team.get('topic_id') + '/' + this.team.id + '/edit-team/manage-members',
                         {trigger: true}
                     );
                 },
 
-                handleDelete: function () {
+                handleDelete: function() {
                     var self = this,
-                        postDelete = function () {
+                        postDelete = function() {
                             self.teamEvents.trigger('teams:update', {
                                 action: 'delete',
                                 team: self.team
                             });
                             Backbone.history.navigate('topics/' + self.team.get('topic_id'), {trigger: true});
                             TeamUtils.showMessage(
-                                interpolate(
-                                    gettext('Team "%(team)s" successfully deleted.'),
+                                StringUtils.interpolate(
+                                    gettext('Team "{team}" successfully deleted.'),
                                     {team: self.team.get('name')},
                                     true
                                 ),
                                 'success'
                             );
                         };
-                    this.team.destroy().then(postDelete).fail(function (response) {
+                    this.team.destroy().then(postDelete).fail(function(response) {
                         // In the 404 case, this team has already been
                         // deleted by someone else. Since the team was
                         // successfully deleted anyway, just show a

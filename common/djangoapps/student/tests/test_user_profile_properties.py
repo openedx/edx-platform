@@ -2,18 +2,20 @@
 
 import datetime
 import ddt
-from django.test import TestCase
 
 from student.models import UserProfile
 from student.tests.factories import UserFactory
 from django.core.cache import cache
+from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 
 
 @ddt.ddt
-class UserProfilePropertiesTest(TestCase):
+class UserProfilePropertiesTest(CacheIsolationTestCase):
     """Unit tests for age, gender_display, and level_of_education_display properties ."""
 
     password = "test"
+
+    ENABLED_CACHES = ['default']
 
     def setUp(self):
         super(UserProfilePropertiesTest, self).setUp()

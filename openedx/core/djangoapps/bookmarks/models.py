@@ -177,9 +177,8 @@ class Bookmark(TimeStampedModel):
                         block = modulestore().get_item(ancestor_usage_key)
                     except ItemNotFoundError:
                         return []  # No valid path can be found.
-
                     path_data.append(
-                        PathItem(usage_key=block.location, display_name=block.display_name)
+                        PathItem(usage_key=block.location, display_name=block.display_name_with_default)
                     )
 
         return path_data

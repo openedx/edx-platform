@@ -30,14 +30,26 @@ class BlocksView(DeveloperErrorViewMixin, ListAPIView):
         GET /api/courses/v1/blocks/<usage_id>/?
             username=anjali
             &depth=all
-            &requested_fields=graded,format,student_view_multi_device
+            &requested_fields=graded,format,student_view_multi_device,lti_url,due
             &block_counts=video
             &student_view_data=video
+            &block_types_filter=problem,html
 
     **Parameters**:
 
-        * username: (string) The name of the user on whose behalf we want to
-          see the data.
+        * all_blocks: (boolean) Provide a value of "true" to return all
+          blocks. Returns all blocks only if the requesting user has course
+          staff permissions. Blocks that are visible only to specific learners
+          (for example, based on group membership or randomized content) are
+          all included. If all_blocks is not specified, you must specify the
+          username for the user whose course blocks are requested.
+
+        * username: (string) Required, unless ``all_blocks`` is specified.
+          Specify the username for the user whose course blocks are requested.
+          Only users with course staff permissions can specify other users'
+          usernames. If a username is specified, results include blocks that
+          are visible to that user, including those based on group or cohort
+          membership or randomized content assigned to that user.
 
           Example: username=anjali
 
@@ -85,22 +97,30 @@ class BlocksView(DeveloperErrorViewMixin, ListAPIView):
 
           Example: return_type=dict
 
+        * block_types_filter: (list) Requested types of blocks used to filter the final result
+          of returned blocks. Possible values include sequential, vertical, html, problem,
+          video, and discussion.
+
+          Example: block_types_filter=vertical,html
+
     **Response Values**
 
         The following fields are returned with a successful response.
 
-        * root: The ID of the root node of the course blocks.
+        * root: The ID of the root node of the requested course block
+          structure.
 
-        * blocks: A dictionary that maps block usage IDs to a collection of
-          information about each block.  Each block contains the following
+        * blocks: A dictionary or list, based on the value of the
+          "return_type" parameter. Maps block usage IDs to a collection of
+          information about each block. Each block contains the following
           fields.
 
           * id: (string) The usage ID of the block.
 
-          * type: (string) The type of block. Possible values include course,
-            chapter, sequential, vertical, html, problem, video, and
-            discussion. The type can also be the name of a custom type of block
-            used for the course.
+          * type: (string) The type of block. Possible values the names of any
+            XBlock type in the system, including custom blocks. Examples are
+            course, chapter, sequential, vertical, html, problem, video, and
+            discussion.
 
           * display_name: (string) The display name of the block.
 
@@ -111,8 +131,6 @@ class BlocksView(DeveloperErrorViewMixin, ListAPIView):
           * block_counts: (dict) For each block type specified in the
             block_counts parameter to the endpoint, the aggregate number of
             blocks of that type for this block and all of its descendants.
-            Returned only if the "block_counts" input parameter contains this
-            block's type.
 
           * graded (boolean) Whether or not the block or any of its descendants
             is graded.  Returned only if "graded" is included in the
@@ -136,16 +154,24 @@ class BlocksView(DeveloperErrorViewMixin, ListAPIView):
             This URL can be used as a fallback if the student_view_data for
             this block type is not supported by the client or the block.
 
-          * student_view_multi_device: (boolean) Whether or not the block's
-            rendering obtained via block_url has support for multiple devices.
-            Returned only if "student_view_multi_device" is included in the
-            "requested_fields" parameter.
+          * student_view_multi_device: (boolean) Whether or not the HTML of
+            the student view that is rendered at "student_view_url" supports
+            responsive web layouts, touch-based inputs, and interactive state
+            management for a variety of device sizes and types, including
+            mobile and touch devices. Returned only if
+            "student_view_multi_device" is included in the "requested_fields"
+            parameter.
 
           * lms_web_url: (string) The URL to the navigational container of the
             xBlock on the web LMS.  This URL can be used as a further fallback
             if the student_view_url and the student_view_data fields are not
             supported.
 
+          * lti_url: The block URL for an LTI consumer. Returned only if the
+            "ENABLE_LTI_PROVIDER" Django settign is set to "True".
+
+          * due: The due date of the block. Returned only if "due" is included
+            in the "requested_fields" parameter.
     """
 
     def list(self, request, usage_key_string):  # pylint: disable=arguments-differ
@@ -176,7 +202,8 @@ class BlocksView(DeveloperErrorViewMixin, ListAPIView):
                     params.cleaned_data['requested_fields'],
                     params.cleaned_data.get('block_counts', []),
                     params.cleaned_data.get('student_view_data', []),
-                    params.cleaned_data['return_type']
+                    params.cleaned_data['return_type'],
+                    params.cleaned_data.get('block_types_filter', None),
                 )
             )
         except ItemNotFoundError as exception:
@@ -197,9 +224,10 @@ class BlocksInCourseView(BlocksView):
         GET /api/courses/v1/blocks/?course_id=<course_id>
             &username=anjali
             &depth=all
-            &requested_fields=graded,format,student_view_multi_device
+            &requested_fields=graded,format,student_view_multi_device,lti_url
             &block_counts=video
             &student_view_data=video
+            &block_types_filter=problem,html
 
     **Parameters**:
 

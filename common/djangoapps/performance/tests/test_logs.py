@@ -46,8 +46,8 @@ class PerformanceTrackingTest(TestCase):
         self.assertEqual(logged_value['referer'], '')
         self.assertEqual(logged_value['value'], '')
         logged_time = dateutil.parser.parse(logged_value['time']).replace(tzinfo=None)
-        self.assertTrue(pre_time <= logged_time)
-        self.assertTrue(post_time >= logged_time)
+        self.assertLessEqual(pre_time, logged_time)
+        self.assertGreaterEqual(post_time, logged_time)
 
     def test_empty_post(self):
         request = self.request_factory.post('/performance')
@@ -66,8 +66,8 @@ class PerformanceTrackingTest(TestCase):
         self.assertEqual(logged_value['referer'], '')
         self.assertEqual(logged_value['value'], '')
         logged_time = dateutil.parser.parse(logged_value['time']).replace(tzinfo=None)
-        self.assertTrue(pre_time <= logged_time)
-        self.assertTrue(post_time >= logged_time)
+        self.assertLessEqual(pre_time, logged_time)
+        self.assertGreaterEqual(post_time, logged_time)
 
     def test_populated_get(self):
         request = self.request_factory.get('/performance',
@@ -97,8 +97,8 @@ class PerformanceTrackingTest(TestCase):
         self.assertEqual(logged_value['referer'], 'https://www.edx.org/evilpage')
         self.assertEqual(logged_value['value'], '100234')
         logged_time = dateutil.parser.parse(logged_value['time']).replace(tzinfo=None)
-        self.assertTrue(pre_time <= logged_time)
-        self.assertTrue(post_time >= logged_time)
+        self.assertLessEqual(pre_time, logged_time)
+        self.assertGreaterEqual(post_time, logged_time)
 
     def test_populated_post(self):
         request = self.request_factory.post('/performance',
@@ -128,5 +128,5 @@ class PerformanceTrackingTest(TestCase):
         self.assertEqual(logged_value['referer'], 'https://www.edx.org/evilpage')
         self.assertEqual(logged_value['value'], '100234')
         logged_time = dateutil.parser.parse(logged_value['time']).replace(tzinfo=None)
-        self.assertTrue(pre_time <= logged_time)
-        self.assertTrue(post_time >= logged_time)
+        self.assertLessEqual(pre_time, logged_time)
+        self.assertGreaterEqual(post_time, logged_time)

@@ -6,6 +6,7 @@ import datetime
 import json
 import pytz
 from mock import MagicMock, Mock, patch
+from nose.plugins.attrib import attr
 from django.core.urlresolvers import reverse
 from django.db.models import Q
 
@@ -31,6 +32,7 @@ from edx_proctoring.api import create_exam
 from edx_proctoring.models import ProctoredExamStudentAttempt
 
 
+@attr(shard=3)
 class TestAnalyticsBasic(ModuleStoreTestCase):
     """ Test basic analytics functions. """
 
@@ -90,8 +92,8 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
                 # Check if list_problem_responses returned expected results:
                 self.assertEqual(len(problem_responses), len(mock_results))
                 for mock_result in mock_results:
-                    self.assertTrue(
-                        {'username': mock_result.student.username, 'state': mock_result.state} in
+                    self.assertIn(
+                        {'username': mock_result.student.username, 'state': mock_result.state},
                         problem_responses
                     )
 
@@ -104,17 +106,35 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
             self.assertIn(userreport['username'], [user.username for user in self.users])
 
     def test_enrolled_students_features_keys(self):
-        query_features = ('username', 'name', 'email')
+        query_features = ('username', 'name', 'email', 'city', 'country',)
+        for user in self.users:
+            user.profile.city = "Mos Eisley {}".format(user.id)
+            user.profile.country = "Tatooine {}".format(user.id)
+            user.profile.save()
         for feature in query_features:
             self.assertIn(feature, AVAILABLE_FEATURES)
         with self.assertNumQueries(1):
             userreports = enrolled_students_features(self.course_key, query_features)
         self.assertEqual(len(userreports), len(self.users))
-        for userreport in userreports:
+
+        userreports = sorted(userreports, key=lambda u: u["username"])
+        users = sorted(self.users, key=lambda u: u.username)
+        for userreport, user in zip(userreports, users):
             self.assertEqual(set(userreport.keys()), set(query_features))
-            self.assertIn(userreport['username'], [user.username for user in self.users])
-            self.assertIn(userreport['email'], [user.email for user in self.users])
-            self.assertIn(userreport['name'], [user.profile.name for user in self.users])
+            self.assertEqual(userreport['username'], user.username)
+            self.assertEqual(userreport['email'], user.email)
+            self.assertEqual(userreport['name'], user.profile.name)
+            self.assertEqual(userreport['city'], user.profile.city)
+            self.assertEqual(userreport['country'], user.profile.country)
+
+    def test_enrolled_student_with_no_country_city(self):
+        userreports = enrolled_students_features(self.course_key, ('username', 'city', 'country',))
+        for userreport in userreports:
+            # This behaviour is somewhat inconsistent: None string fields
+            # objects are converted to "None", but non-JSON serializable fields
+            # are converted to an empty string.
+            self.assertEqual(userreport['city'], "None")
+            self.assertEqual(userreport['country'], "")
 
     def test_enrolled_students_meta_features_keys(self):
         """

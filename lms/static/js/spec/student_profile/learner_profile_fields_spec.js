@@ -1,20 +1,23 @@
-define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers', 'common/js/spec_helpers/template_helpers',
+define(['backbone',
+        'jquery',
+        'underscore',
+        'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
+        'common/js/spec_helpers/template_helpers',
         'js/spec/student_account/helpers',
         'js/student_account/models/user_account_model',
         'js/student_profile/views/learner_profile_fields',
         'js/views/message_banner'
        ],
-    function (Backbone, $, _, AjaxHelpers, TemplateHelpers, Helpers, UserAccountModel, LearnerProfileFields,
+    function(Backbone, $, _, AjaxHelpers, TemplateHelpers, Helpers, UserAccountModel, LearnerProfileFields,
               MessageBannerView) {
         'use strict';
 
-        describe("edx.user.LearnerProfileFields", function () {
-
+        describe('edx.user.LearnerProfileFields', function() {
             var MOCK_YEAR_OF_BIRTH = 1989;
             var MOCK_IMAGE_MAX_BYTES = 64;
             var MOCK_IMAGE_MIN_BYTES = 16;
 
-            var createImageView = function (options) {
+            var createImageView = function(options) {
                 var yearOfBirth = _.isUndefined(options.yearOfBirth) ? MOCK_YEAR_OF_BIRTH : options.yearOfBirth;
                 var imageMaxBytes = _.isUndefined(options.imageMaxBytes) ? MOCK_IMAGE_MAX_BYTES : options.imageMaxBytes;
                 var imageMinBytes = _.isUndefined(options.imageMinBytes) ? MOCK_IMAGE_MIN_BYTES : options.imageMinBytes;
@@ -37,7 +40,7 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
 
                 return new LearnerProfileFields.ProfileImageFieldView({
                     model: accountSettingsModel,
-                    valueAttribute: "profile_image",
+                    valueAttribute: 'profile_image',
                     editable: options.ownProfile,
                     messageView: messageView,
                     imageMaxBytes: imageMaxBytes,
@@ -47,22 +50,27 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
                 });
             };
 
-            beforeEach(function () {
+            beforeEach(function() {
                 loadFixtures('js/fixtures/student_profile/student_profile.html');
                 TemplateHelpers.installTemplate('templates/student_profile/learner_profile');
                 TemplateHelpers.installTemplate('templates/fields/field_image');
-                TemplateHelpers.installTemplate("templates/fields/message_banner");
+                TemplateHelpers.installTemplate('templates/fields/message_banner');
             });
 
-            var createFakeImageFile = function (size) {
+            afterEach(function() {
+                // image_field.js's window.onBeforeUnload breaks Karma in Chrome, clean it up after each test
+                $(window).off('beforeunload');
+            });
+
+            var createFakeImageFile = function(size) {
                 var fileFakeData = 'i63ljc6giwoskyb9x5sw0169bdcmcxr3cdz8boqv0lik971972cmd6yknvcxr5sw0nvc169bdcmcxsdf';
                 return new Blob(
-                    [ fileFakeData.substr(0, size) ],
-                    { type: 'image/jpg' }
+                    [fileFakeData.substr(0, size)],
+                    {type: 'image/jpg'}
                 );
             };
 
-            var initializeUploader = function (view) {
+            var initializeUploader = function(view) {
                 view.$('.upload-button-input').fileupload({
                     url: Helpers.IMAGE_UPLOAD_API_URL,
                     type: 'POST',
@@ -72,24 +80,22 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
                 });
             };
 
-            describe("ProfileImageFieldView", function () {
-
-                var verifyImageUploadButtonMessage = function (view, inProgress) {
+            describe('ProfileImageFieldView', function() {
+                var verifyImageUploadButtonMessage = function(view, inProgress) {
                     var iconName = inProgress ? 'fa-spinner' : 'fa-camera';
                     var message = inProgress ? view.titleUploading : view.uploadButtonTitle();
-                    expect(view.$('.upload-button-icon i').attr('class')).toContain(iconName);
+                    expect(view.$('.upload-button-icon span').attr('class')).toContain(iconName);
                     expect(view.$('.upload-button-title').text().trim()).toBe(message);
                 };
 
-                var verifyImageRemoveButtonMessage = function (view, inProgress) {
+                var verifyImageRemoveButtonMessage = function(view, inProgress) {
                     var iconName = inProgress ? 'fa-spinner' : 'fa-remove';
                     var message = inProgress ? view.titleRemoving : view.removeButtonTitle();
-                    expect(view.$('.remove-button-icon i').attr('class')).toContain(iconName);
+                    expect(view.$('.remove-button-icon span').attr('class')).toContain(iconName);
                     expect(view.$('.remove-button-title').text().trim()).toBe(message);
                 };
 
-                it("can upload profile image", function() {
-
+                it('can upload profile image', function() {
                     var imageView = createImageView({ownProfile: true, hasImage: false});
                     imageView.render();
 
@@ -134,8 +140,7 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
                     verifyImageUploadButtonMessage(imageView, false);
                 });
 
-                it("can remove profile image", function() {
-
+                it('can remove profile image', function() {
                     var imageView = createImageView({ownProfile: true, hasImage: false});
                     imageView.render();
 
@@ -168,7 +173,6 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
                 });
 
                 it("can't remove default profile image", function() {
-
                     var imageView = createImageView({ownProfile: true, hasImage: false});
                     imageView.render();
 
@@ -184,7 +188,6 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
                 });
 
                 it("can't upload image having size greater than max size", function() {
-
                     var imageView = createImageView({ownProfile: true, hasImage: false});
                     imageView.render();
 
@@ -212,7 +215,6 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
                 });
 
                 it("can't upload and remove image if parental consent required", function() {
-
                     var imageView = createImageView({ownProfile: true, hasImage: false, yearOfBirth: ''});
                     imageView.render();
 
@@ -230,7 +232,6 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
                 });
 
                 it("can't upload and remove image on others profile", function() {
-
                     var imageView = createImageView({ownProfile: false});
                     imageView.render();
 
@@ -247,7 +248,7 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
                     expect(imageView.clickedRemoveButton).not.toHaveBeenCalled();
                 });
 
-                it("shows message if we try to navigate away during image upload/remove", function() {
+                it('shows message if we try to navigate away during image upload/remove', function() {
                     var imageView = createImageView({ownProfile: true, hasImage: false});
                     spyOn(imageView, 'onBeforeUnload');
                     imageView.render();
@@ -260,11 +261,12 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
                     // Verify image upload progress message
                     verifyImageUploadButtonMessage(imageView, true);
 
+                    window.onbeforeunload = null;
                     $(window).trigger('beforeunload');
                     expect(imageView.onBeforeUnload).toHaveBeenCalled();
                 });
 
-                it("shows error message for HTTP 500", function() {
+                it('shows error message for HTTP 500', function() {
                     var imageView = createImageView({ownProfile: true, hasImage: false});
                     imageView.render();
 

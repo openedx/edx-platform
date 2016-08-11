@@ -37,7 +37,7 @@ from edxmako.shortcuts import render_to_string
 from shoppingcart.models import Order
 from shoppingcart.processors.exceptions import *
 from shoppingcart.processors.helpers import get_processor_config
-from microsite_configuration import microsite
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 log = logging.getLogger(__name__)
 
@@ -404,9 +404,9 @@ def _record_purchase(params, order):
     # Parse the string to retrieve the digits.
     # If we can't find any digits, use placeholder values instead.
     ccnum_str = params.get('req_card_number', '')
-    mm = re.search("\d", ccnum_str)
-    if mm:
-        ccnum = ccnum_str[mm.start():]
+    first_digit = re.search(r"\d", ccnum_str)
+    if first_digit:
+        ccnum = ccnum_str[first_digit.start():]
     else:
         ccnum = "####"
 
@@ -461,7 +461,7 @@ def _get_processor_decline_html(params):
         unicode: The rendered HTML.
 
     """
-    payment_support_email = microsite.get_value('payment_support_email', settings.PAYMENT_SUPPORT_EMAIL)
+    payment_support_email = configuration_helpers.get_value('payment_support_email', settings.PAYMENT_SUPPORT_EMAIL)
     return _format_error_html(
         _(
             "Sorry! Our payment processor did not accept your payment.  "
@@ -491,7 +491,7 @@ def _get_processor_exception_html(exception):
         unicode: The rendered HTML.
 
     """
-    payment_support_email = microsite.get_value('payment_support_email', settings.PAYMENT_SUPPORT_EMAIL)
+    payment_support_email = configuration_helpers.get_value('payment_support_email', settings.PAYMENT_SUPPORT_EMAIL)
     if isinstance(exception, CCProcessorDataException):
         return _format_error_html(
             _(

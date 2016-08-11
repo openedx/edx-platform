@@ -2,7 +2,7 @@
 Courseware page.
 """
 
-from .course_page import CoursePage
+from common.test.acceptance.pages.lms.course_page import CoursePage
 from bok_choy.promise import EmptyPromise
 from selenium.webdriver.common.action_chains import ActionChains
 
@@ -19,6 +19,13 @@ class CoursewarePage(CoursePage):
 
     def is_browser_on_page(self):
         return self.q(css='body.courseware').present
+
+    @property
+    def chapter_count_in_navigation(self):
+        """
+        Returns count of chapters available on LHS navigation.
+        """
+        return len(self.q(css='nav.course-navigation a.chapter'))
 
     @property
     def num_sections(self):
@@ -87,7 +94,7 @@ class CoursewarePage(CoursePage):
         for index, tab in enumerate(self.q(css='#sequence-list > li')):
             ActionChains(self.browser).move_to_element(tab).perform()
             self.wait_for_element_visibility(
-                '#tab_{index} > p'.format(index=index),
+                '#tab_{index} > .sequence-tooltip'.format(index=index),
                 'Tab {index} should appear'.format(index=index)
             )
 
@@ -101,11 +108,66 @@ class CoursewarePage(CoursePage):
             return element.text[0]
         return None
 
-    def get_active_subsection_url(self):
+    def go_to_sequential_position(self, sequential_position):
         """
-        return the url of the active subsection in the left nav
+        Within a section/subsection navigate to the sequential position specified by `sequential_position`.
+
+        Arguments:
+            sequential_position (int): position in sequential bar
         """
-        return self.q(css='.chapter-content-container .menu-item.active a').attrs('href')[0]
+        sequential_position_css = '#sequence-list #tab_{0}'.format(sequential_position - 1)
+        self.q(css=sequential_position_css).first.click()
+
+    @property
+    def sequential_position(self):
+        """
+        Returns the position of the active tab in the sequence.
+        """
+        tab_id = self._active_sequence_tab.attrs('id')[0]
+        return int(tab_id.split('_')[1])
+
+    @property
+    def _active_sequence_tab(self):  # pylint: disable=missing-docstring
+        return self.q(css='#sequence-list .nav-item.active')
+
+    @property
+    def is_next_button_enabled(self):  # pylint: disable=missing-docstring
+        return not self.q(css='.sequence-nav > .sequence-nav-button.button-next.disabled').is_present()
+
+    @property
+    def is_previous_button_enabled(self):  # pylint: disable=missing-docstring
+        return not self.q(css='.sequence-nav > .sequence-nav-button.button-previous.disabled').is_present()
+
+    def click_next_button_on_top(self):  # pylint: disable=missing-docstring
+        self._click_navigation_button('sequence-nav', 'button-next')
+
+    def click_next_button_on_bottom(self):  # pylint: disable=missing-docstring
+        self._click_navigation_button('sequence-bottom', 'button-next')
+
+    def click_previous_button_on_top(self):  # pylint: disable=missing-docstring
+        self._click_navigation_button('sequence-nav', 'button-previous')
+
+    def click_previous_button_on_bottom(self):  # pylint: disable=missing-docstring
+        self._click_navigation_button('sequence-bottom', 'button-previous')
+
+    def _click_navigation_button(self, top_or_bottom_class, next_or_previous_class):
+        """
+        Clicks the navigation button, given the respective CSS classes.
+        """
+        previous_tab_id = self._active_sequence_tab.attrs('data-id')[0]
+
+        def is_at_new_tab_id():
+            """
+            Returns whether the active tab has changed. It is defensive
+            against the case where the page is still being loaded.
+            """
+            active_tab = self._active_sequence_tab
+            return active_tab and previous_tab_id != active_tab.attrs('data-id')[0]
+
+        self.q(
+            css='.{} > .sequence-nav-button.{}'.format(top_or_bottom_class, next_or_previous_class)
+        ).first.click()
+        EmptyPromise(is_at_new_tab_id, "Button navigation fulfilled").fulfill()
 
     @property
     def can_start_proctored_exam(self):
@@ -138,7 +200,28 @@ class CoursewarePage(CoursePage):
         self.q(css='button.start-timed-exam[data-start-immediately="false"]').first.click()
 
         # Wait for the unique exam code to appear.
-        # elf.wait_for_element_presence(".proctored-exam-code", "unique exam code")
+        # self.wait_for_element_presence(".proctored-exam-code", "unique exam code")
+
+    def has_submitted_exam_message(self):
+        """
+        Returns whether the "you have submitted your exam" message is present.
+        This being true implies "the exam contents and results are hidden".
+        """
+        return self.q(css="div.proctored-exam.completed").visible
+
+    def content_hidden_past_due_date(self, content_type="subsection"):
+        """
+        Returns whether the "the due date for this ___ has passed" message is present.
+        ___ is the type of the hidden content, and defaults to subsection.
+        This being true implies "the ___ contents are hidden because their due date has passed".
+        """
+        message = "The due date for this {0} has passed.".format(content_type)
+        if self.q(css="div.seq_content").is_present():
+            return False
+        for html in self.q(css="div.hidden-content").html:
+            if message in html:
+                return True
+        return False
 
     @property
     def entrance_exam_message_selector(self):
@@ -160,12 +243,11 @@ class CoursewarePage(CoursePage):
         return self.entrance_exam_message_selector.is_present() \
             and "You have passed the entrance exam" in self.entrance_exam_message_selector.text[0]
 
-    @property
-    def chapter_count_in_navigation(self):
+    def has_banner(self):
         """
-        Returns count of chapters available on LHS navigation.
+        Returns boolean indicating presence of banner
         """
-        return len(self.q(css='nav.course-navigation a.chapter'))
+        return self.q(css='.pattern-library-shim').is_present()
 
     @property
     def is_timer_bar_present(self):
@@ -178,7 +260,7 @@ class CoursewarePage(CoursePage):
         """ Returns the usage id of active sequence item """
         get_active = lambda el: 'active' in el.get_attribute('class')
         attribute_value = lambda el: el.get_attribute('data-id')
-        return self.q(css='#sequence-list a').filter(get_active).map(attribute_value).results[0]
+        return self.q(css='#sequence-list .nav-item').filter(get_active).map(attribute_value).results[0]
 
     @property
     def breadcrumb(self):

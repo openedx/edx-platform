@@ -3,7 +3,7 @@
 Student dashboard page.
 """
 from bok_choy.page_object import PageObject
-from . import BASE_URL
+from common.test.acceptance.pages.lms import BASE_URL
 
 
 class DashboardPage(PageObject):
@@ -22,7 +22,7 @@ class DashboardPage(PageObject):
     url = "{base}/dashboard".format(base=BASE_URL)
 
     def is_browser_on_page(self):
-        return self.q(css='section.my-courses').present
+        return self.q(css='.my-courses').present
 
     @property
     def current_courses_text(self):
@@ -31,7 +31,7 @@ class DashboardPage(PageObject):
         shows all the courses that the student is enrolled in.
         The string displayed is defined in lms/templates/dashboard.html.
         """
-        text_items = self.q(css='section#my-courses').text
+        text_items = self.q(css='#my-courses').text
         if len(text_items) > 0:
             return text_items[0]
         else:
@@ -166,7 +166,7 @@ class DashboardPage(PageObject):
         """
         Get course date of the first course from dashboard
         """
-        return self.q(css='ul.listing-courses .course-item .info-date-block').first.text[0]
+        return self.q(css='ul.listing-courses .course-item:first-of-type .info-date-block').first.text[0]
 
     def click_username_dropdown(self):
         """

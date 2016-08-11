@@ -1,8 +1,10 @@
-<%! from django.utils.translation import ugettext as _ %>
-<%page args="section_data"/>
+<%page args="section_data" expression_filter="h"/>
+<%!
+from django.utils.translation import ugettext as _
+from openedx.core.djangolib.markup import HTML
+%>
 
 <div class="vert-left send-email" id="section-send-email">
-    <h2> ${_("Send Email")} </h2>
     <div class="request-response msg msg-confirm copy" id="request-response"></div>
     <ul class="list-fields">
         <li class="field">
@@ -35,7 +37,7 @@
                         %if cohort.name == section_data['default_cohort_name']:
                         <br/>
                         <div class="subheading">
-                            ${_("(Students without cohort assignment)")}
+                            ${_("(Learners not explicitly assigned to a cohort)")}
                         </div>
                         %endif
                     </label>
@@ -61,7 +63,7 @@
             <label>
                 ${_("Message:")}
                 <div class="email-editor">
-                    ${ section_data['editor'] }
+                    ${ HTML(section_data['editor']) }
                 </div>
                 <input type="hidden" name="message" value="">
             </label>
@@ -82,7 +84,7 @@
     %if settings.FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS'):
     <div class="running-tasks-container action-type-container">
         <hr>
-        <h2> ${_("Pending Tasks")} </h2>
+        <h3 class="hd hd-3">${_("Pending Tasks")}</h3>
         <div class="running-tasks-section">
             <p>${_("Email actions run in the background. The status for any active tasks - including email tasks - appears in a table below.")} </p>
             <br />
@@ -96,7 +98,7 @@
     <hr>
 
     <div class="vert-left email-background" id="section-task-history">
-        <h2> ${_("Email Task History")} </h2>
+        <h3 class="hd hd-3">${_("Email Task History")}</h3>
         <div>
             <p>${_("To see the content of previously sent emails, click this button:")}</p>
             <br/>

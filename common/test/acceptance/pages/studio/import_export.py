@@ -9,11 +9,11 @@ import os
 import re
 import requests
 
-from ..common.utils import click_css
+from common.test.acceptance.pages.common.utils import click_css
 
-from .library import LibraryPage
-from .course_page import CoursePage
-from . import BASE_URL
+from common.test.acceptance.pages.studio.library import LibraryPage
+from common.test.acceptance.pages.studio.course_page import CoursePage
+from common.test.acceptance.pages.studio import BASE_URL
 
 
 class TemplateCheckMixin(object):
@@ -178,7 +178,15 @@ class ImportMixin(object):
         asset_file_path = self.file_path(tarball_filename)
         # Make the upload elements visible to the WebDriver.
         self.browser.execute_script('$(".file-name-block").show();$(".file-input").show()')
+        # Upload the file.
         self.q(css='input[type="file"]')[0].send_keys(asset_file_path)
+        # Upload the same file again. Reason behind this is to decrease the
+        # probability or fraction of times the failure occur. Please be
+        # noted this doesn't eradicate the root cause of the error, it
+        # just decreases to failure rate to minimal.
+        # Jira ticket reference: TNL-4191.
+        self.q(css='input[type="file"]')[0].send_keys(asset_file_path)
+        # Some of the tests need these lines to pass so don't remove them.
         self._wait_for_button()
         click_css(self, '.submit-button', require_notification=False)
 

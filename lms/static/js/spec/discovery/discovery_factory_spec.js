@@ -1,5 +1,5 @@
 define([
-    'jquery', 'common/js/spec_helpers/ajax_helpers','common/js/spec_helpers/template_helpers',
+    'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'common/js/spec_helpers/template_helpers',
     'js/discovery/discovery_factory'
 ], function($, AjaxHelpers, TemplateHelpers, DiscoveryFactory) {
     'use strict';
@@ -9,7 +9,7 @@ define([
         org: {
             name: 'Organization',
             terms: {
-                edX1: "edX_1"
+                edX1: 'edX_1'
             }
         },
         modes: {
@@ -29,75 +29,74 @@ define([
 
 
     var JSON_RESPONSE = {
-        "total": 365,
-        "results": [
+        'total': 365,
+        'results': [
             {
-                "data": {
-                    "modes": [
-                        "honor"
+                'data': {
+                    'modes': [
+                        'honor'
                     ],
-                    "course": "edX/DemoX/Demo_Course",
-                    "enrollment_start": "2015-04-21T00:00:00+00:00",
-                    "number": "DemoX",
-                    "content": {
-                        "overview": " About This Course Include your long course description here.",
-                        "display_name": "edX Demonstration Course",
-                        "number": "DemoX"
+                    'course': 'edX/DemoX/Demo_Course',
+                    'enrollment_start': '2015-04-21T00:00:00+00:00',
+                    'number': 'DemoX',
+                    'content': {
+                        'overview': ' About This Course Include your long course description here.',
+                        'display_name': 'edX Demonstration Course',
+                        'number': 'DemoX'
                     },
-                    "start": "1970-01-01T05:00:00+00:00",
-                    "image_url": "/c4x/edX/DemoX/asset/images_course_image.jpg",
-                    "org": "edX",
-                    "id": "edX/DemoX/Demo_Course"
+                    'start': '1970-01-01T05:00:00+00:00',
+                    'image_url': '/c4x/edX/DemoX/asset/images_course_image.jpg',
+                    'org': 'edX',
+                    'id': 'edX/DemoX/Demo_Course'
                 }
             }
         ],
-        "facets": {
-            "org": {
-                "total": 26,
-                "terms": {
-                    "edX1": 1,
-                    "edX2": 1,
-                    "edX3": 1,
-                    "edX4": 1,
-                    "edX5": 1,
-                    "edX6": 1,
-                    "edX7": 1,
-                    "edX8": 1,
-                    "edX9": 1,
-                    "edX10": 1,
-                    "edX11": 1,
-                    "edX12": 1,
-                    "edX13": 1,
-                    "edX14": 1,
-                    "edX15": 1,
-                    "edX16": 1,
-                    "edX17": 1,
-                    "edX18": 1,
-                    "edX19": 1,
-                    "edX20": 1,
-                    "edX21": 1,
-                    "edX22": 1,
-                    "edX23": 1,
-                    "edX24": 1,
-                    "edX25": 1,
-                    "edX26": 1
+        'facets': {
+            'org': {
+                'total': 26,
+                'terms': {
+                    'edX1': 1,
+                    'edX2': 1,
+                    'edX3': 1,
+                    'edX4': 1,
+                    'edX5': 1,
+                    'edX6': 1,
+                    'edX7': 1,
+                    'edX8': 1,
+                    'edX9': 1,
+                    'edX10': 1,
+                    'edX11': 1,
+                    'edX12': 1,
+                    'edX13': 1,
+                    'edX14': 1,
+                    'edX15': 1,
+                    'edX16': 1,
+                    'edX17': 1,
+                    'edX18': 1,
+                    'edX19': 1,
+                    'edX20': 1,
+                    'edX21': 1,
+                    'edX22': 1,
+                    'edX23': 1,
+                    'edX24': 1,
+                    'edX25': 1,
+                    'edX26': 1
                 },
-                "other": 0
+                'other': 0
             },
-            "modes": {
-                "total": 1,
-                "terms": {
-                    "honor": 1
+            'modes': {
+                'total': 1,
+                'terms': {
+                    'honor': 1
                 },
-                "other": 0
+                'other': 0
             }
         }
     };
 
 
-    describe('discovery.DiscoveryFactory', function () {
-
-        beforeEach(function () {
+    describe('discovery.DiscoveryFactory', function() {
+        beforeEach(function() {
             loadFixtures('js/fixtures/discovery.html');
             TemplateHelpers.installTemplates([
                 'templates/discovery/course_card',
@@ -107,9 +106,15 @@ define([
                 'templates/discovery/filter_bar'
             ]);
             DiscoveryFactory(MEANINGS);
+
+            jasmine.clock().install();
         });
 
-        it('does search', function () {
+        afterEach(function() {
+            jasmine.clock().uninstall();
+        });
+
+        it('does search', function() {
             var requests = AjaxHelpers.requests(this);
             $('.discovery-input').val('test');
             $('.discovery-submit').trigger('click');
@@ -119,17 +124,17 @@ define([
             expect($('.active-filter').length).toBe(1);
         });
 
-        it('loads more', function () {
+        it('loads more', function() {
             var requests = AjaxHelpers.requests(this);
-            jasmine.Clock.useMock();
+
             $('.discovery-input').val('test');
             $('.discovery-submit').trigger('click');
             AjaxHelpers.respondWithJson(requests, JSON_RESPONSE);
             expect($('.courses-listing article').length).toEqual(1);
             expect($('.courses-listing .course-title')).toContainHtml('edX Demonstration Course');
+            jasmine.clock().tick(500);
             window.scroll(0, $(document).height());
             $(window).trigger('scroll');
-            jasmine.Clock.tick(500);
 
             // TODO: determine why the search API is invoked twice
             AjaxHelpers.respondWithJson(requests, JSON_RESPONSE);
@@ -137,7 +142,7 @@ define([
             expect($('.courses-listing article').length).toEqual(2);
         });
 
-        it('displays not found message', function () {
+        it('displays not found message', function() {
             var requests = AjaxHelpers.requests(this);
             $('.discovery-input').val('asdfasdf');
             $('.discovery-submit').trigger('click');
@@ -147,7 +152,7 @@ define([
             expect($('.courses-listing')).toBeEmpty();
         });
 
-        it('displays error message', function () {
+        it('displays error message', function() {
             var requests = AjaxHelpers.requests(this);
             $('.discovery-input').val('asdfasdf');
             $('.discovery-submit').trigger('click');
@@ -156,7 +161,7 @@ define([
             expect($('.courses-listing')).toBeEmpty();
         });
 
-        it('check filters and bar removed on clear all', function () {
+        it('check filters and bar removed on clear all', function() {
             var requests = AjaxHelpers.requests(this);
             $('.discovery-input').val('test');
             $('.discovery-submit').trigger('click');
@@ -168,7 +173,7 @@ define([
             expect($('#filter-bar')).toHaveClass('is-collapsed');
         });
 
-        it('check filters and bar removed on last filter cleared', function () {
+        it('check filters and bar removed on last filter cleared', function() {
             var requests = AjaxHelpers.requests(this);
             $('.discovery-input').val('test');
             $('.discovery-submit').trigger('click');
@@ -179,7 +184,7 @@ define([
             expect($('.active-filter').length).toBe(0);
         });
 
-        it('filter results by named facet', function () {
+        it('filter results by named facet', function() {
             var requests = AjaxHelpers.requests(this);
             $('.discovery-input').val('test');
             $('.discovery-submit').trigger('click');
@@ -191,8 +196,5 @@ define([
             $('.search-facets li [data-value="edX1"]').trigger('click');
             expect($('.active-filter [data-value="edX1"]').length).toBe(0);
         });
-
     });
-
-
 });

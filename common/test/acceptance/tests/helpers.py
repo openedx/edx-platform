@@ -16,6 +16,7 @@ from path import Path as path
 from bok_choy.javascript import js_defined
 from bok_choy.web_app_test import WebAppTest
 from bok_choy.promise import EmptyPromise, Promise
+from bok_choy.page_object import XSS_INJECTION
 from opaque_keys.edx.locator import CourseLocator
 from pymongo import MongoClient, ASCENDING
 from openedx.core.lib.tests.assertions.events import assert_event_matches, is_matching_event, EventMatchTolerates
@@ -28,7 +29,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from unittest import TestCase
 
 
-from ..pages.common import BASE_URL
+from common.test.acceptance.pages.common import BASE_URL
 
 
 MAX_EVENTS_IN_FAILURE_OUTPUT = 20
@@ -640,7 +641,7 @@ class UniqueCourseTest(WebAppTest):
             'org': 'test_org',
             'number': self.unique_id,
             'run': 'test_run',
-            'display_name': 'Test Course' + self.unique_id
+            'display_name': 'Test Course' + XSS_INJECTION + self.unique_id
         }
 
     @property

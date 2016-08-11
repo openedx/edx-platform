@@ -3,7 +3,6 @@ Common utility functions useful throughout the contentstore
 """
 
 import logging
-import re
 from datetime import datetime
 from pytz import UTC
 
@@ -12,6 +11,8 @@ from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
 from django_comment_common.models import assign_default_role
 from django_comment_common.utils import seed_permissions_roles
+
+from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
@@ -99,42 +100,6 @@ def get_lms_link_for_item(location, preview=False):
         lms_base=lms_base,
         course_key=location.course_key.to_deprecated_string(),
         location=location.to_deprecated_string(),
-    )
-
-
-def get_lms_link_for_about_page(course_key):
-    """
-    Returns the url to the course about page from the location tuple.
-    """
-
-    assert isinstance(course_key, CourseKey)
-
-    if settings.FEATURES.get('ENABLE_MKTG_SITE', False):
-        if not hasattr(settings, 'MKTG_URLS'):
-            log.exception("ENABLE_MKTG_SITE is True, but MKTG_URLS is not defined.")
-            return None
-
-        marketing_urls = settings.MKTG_URLS
-
-        # Root will be "https://www.edx.org". The complete URL will still not be exactly correct,
-        # but redirects exist from www.edx.org to get to the Drupal course about page URL.
-        about_base = marketing_urls.get('ROOT', None)
-
-        if about_base is None:
-            log.exception('There is no ROOT defined in MKTG_URLS')
-            return None
-
-        # Strip off https:// (or http://) to be consistent with the formatting of LMS_BASE.
-        about_base = re.sub(r"^https?://", "", about_base)
-
-    elif settings.LMS_BASE is not None:
-        about_base = settings.LMS_BASE
-    else:
-        return None
-
-    return u"//{about_base_url}/courses/{course_key}/about".format(
-        about_base_url=about_base,
-        course_key=course_key.to_deprecated_string()
     )
 
 
@@ -455,3 +420,10 @@ def get_visibility_partition_info(xblock):
         "has_selected_groups": has_selected_groups,
         "selected_verified_partition_id": selected_verified_partition_id,
     }
+
+
+def is_self_paced(course):
+    """
+    Returns True if course is self-paced, False otherwise.
+    """
+    return course and course.self_paced and SelfPacedConfiguration.current().enabled

@@ -56,6 +56,7 @@ the entire cookie and use it to impersonate the victim.
 
 """
 
+from contextlib import contextmanager
 from django.conf import settings
 from django.contrib.auth import SESSION_KEY
 from django.contrib.auth.views import redirect_to_login
@@ -64,7 +65,7 @@ from django.core import signing
 from django.http import HttpResponse
 from django.utils.crypto import get_random_string
 from hashlib import sha256
-from logging import getLogger
+from logging import getLogger, ERROR
 
 from openedx.core.lib.mobile_utils import is_request_from_mobile_app
 
@@ -222,7 +223,7 @@ class SafeCookieData(object):
             # 3rd party Auth and external Auth transactions
             # as some of the session requests are made as
             # Anonymous users.
-            log.warning(
+            log.debug(
                 "SafeCookieData received empty user_id '%s' for session_id '%s'.",
                 user_id,
                 session_id,
@@ -318,12 +319,13 @@ class SafeSessionMiddleware(SessionMiddleware):
         if not _is_cookie_marked_for_deletion(request) and _is_cookie_present(response):
             try:
                 user_id_in_session = self.get_user_id_from_session(request)
-                self._verify_user(request, user_id_in_session)  # Step 2
+                with controlled_logging(request, log):
+                    self._verify_user(request, user_id_in_session)  # Step 2
 
-                # Use the user_id marked in the session instead of the
-                # one in the request in case the user is not set in the
-                # request, for example during Anonymous API access.
-                self.update_with_safe_session_cookie(response.cookies, user_id_in_session)  # Step 3
+                    # Use the user_id marked in the session instead of the
+                    # one in the request in case the user is not set in the
+                    # request, for example during Anonymous API access.
+                    self.update_with_safe_session_cookie(response.cookies, user_id_in_session)  # Step 3
 
             except SafeCookieError:
                 _mark_cookie_for_deletion(request)
@@ -358,14 +360,18 @@ class SafeSessionMiddleware(SessionMiddleware):
         """
         if hasattr(request, 'safe_cookie_verified_user_id'):
             if request.safe_cookie_verified_user_id != request.user.id:
-                log.warning(
+                # The user at response time is expected to be None when the user
+                # is logging out. To prevent extra noise in the logs,
+                # conditionally set the log level.
+                log_func = log.debug if request.user.id is None else log.warning
+                log_func(
                     "SafeCookieData user at request '{0}' does not match user at response: '{1}'".format(  # pylint: disable=logging-format-interpolation
                         request.safe_cookie_verified_user_id,
                         request.user.id,
                     ),
                 )
             if request.safe_cookie_verified_user_id != userid_in_session:
-                log.error(
+                log.warning(
                     "SafeCookieData user at request '{0}' does not match user in session: '{1}'".format(  # pylint: disable=logging-format-interpolation
                         request.safe_cookie_verified_user_id,
                         userid_in_session,
@@ -459,3 +465,31 @@ def _delete_cookie(response):
         secure=settings.SESSION_COOKIE_SECURE or None,
         httponly=settings.SESSION_COOKIE_HTTPONLY or None,
     )
+
+
+def _is_from_logout(request):
+    """
+    Returns whether the request has come from logout action to see if
+    'is_from_logout' attribute is present.
+    """
+    return getattr(request, 'is_from_logout', False)
+
+
+@contextmanager
+def controlled_logging(request, logger):
+    """
+    Control the logging by changing logger's level if
+    the request is from logout.
+    """
+    default_level = None
+    from_logout = _is_from_logout(request)
+    if from_logout:
+        default_level = logger.getEffectiveLevel()
+        logger.setLevel(ERROR)
+
+    try:
+        yield
+
+    finally:
+        if from_logout:
+            logger.setLevel(default_level)

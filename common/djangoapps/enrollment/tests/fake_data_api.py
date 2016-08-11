@@ -21,6 +21,8 @@ _COURSES = []
 
 _ENROLLMENT_ATTRIBUTES = []
 
+_VERIFIED_MODE_EXPIRED = []
+
 
 # pylint: disable=unused-argument
 def get_course_enrollments(student_id):
@@ -50,7 +52,7 @@ def update_course_enrollment(student_id, course_id, mode=None, is_active=None):
 
 def get_course_enrollment_info(course_id, include_expired=False):
     """Stubbed out Enrollment data request."""
-    return _get_fake_course_info(course_id)
+    return _get_fake_course_info(course_id, include_expired)
 
 
 def _get_fake_enrollment(student_id, course_id):
@@ -60,10 +62,14 @@ def _get_fake_enrollment(student_id, course_id):
             return enrollment
 
 
-def _get_fake_course_info(course_id):
+def _get_fake_course_info(course_id, include_expired=False):
     """Get a course from the courses array."""
+    # if verified mode is expired and include expired is false
+    # then remove the verified mode from the course.
     for course in _COURSES:
         if course_id == course['course_id']:
+            if course_id in _VERIFIED_MODE_EXPIRED and not include_expired:
+                course['course_modes'] = [mode for mode in course['course_modes'] if mode['slug'] != 'verified']
             return course
 
 
@@ -97,6 +103,11 @@ def get_enrollment_attributes(user_id, course_id):
     return _ENROLLMENT_ATTRIBUTES
 
 
+def set_expired_mode(course_id):
+    """Set course verified mode as expired."""
+    _VERIFIED_MODE_EXPIRED.append(course_id)
+
+
 def add_course(course_id, enrollment_start=None, enrollment_end=None, invite_only=False, course_modes=None):
     """Append course to the courses array."""
     course_info = {
@@ -122,3 +133,5 @@ def reset():
     _COURSES = []
     global _ENROLLMENTS  # pylint: disable=global-statement
     _ENROLLMENTS = []
+    global _VERIFIED_MODE_EXPIRED  # pylint: disable=global-statement
+    _VERIFIED_MODE_EXPIRED = []

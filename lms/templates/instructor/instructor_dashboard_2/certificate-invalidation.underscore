@@ -1,12 +1,19 @@
 <p class="under-heading info">
- <%= gettext("To invalidate a certificate for a particular learner, add the username or email address below.") %>
+ <%- gettext("To invalidate a certificate for a particular learner, add the username or email address below.") %>
 </p>
 
 <div class="add-certificate-invalidation">
-    <input class='student-username-or-email' id="certificate-invalidation-user" type="text" placeholder="<%= gettext('Username or email address') %>" aria-describedby='student-user-name-or-email-tip'>
-    <textarea class='notes-field' id="certificate-invalidation-notes" rows="10" placeholder="<%= gettext('Add notes about this learner') %>" aria-describedby='notes-field-tip'></textarea>
+    <div>
+        <label for="certificate-invalidation-user"><%- gettext('Username or email address') %></label>
+        <input class="student-username-or-email" id="certificate-invalidation-user" type="text">
+    </div>
+    <div>
+        <label for="certificate-invalidation-notes"><%- gettext('Add notes about this learner') %></label>
+        <textarea class="notes-field" id="certificate-invalidation-notes" rows="10"></textarea>
+    </div>
     <br/>
-    <button type="button" class="btn-blue" id="invalidate-certificate"><%= gettext('Invalidate Certificate') %></button>
+    
+    <button type="button" class="btn-blue" id="invalidate-certificate"><%- gettext('Invalidate Certificate') %></button>
 </div>
 
 <div class="message hidden"></div>
@@ -18,11 +25,11 @@
         <table>
             <thead>
                 <tr>
-                    <th class='user-name'><%= gettext('Student') %></th>
-                    <th class='user-name'><%= gettext('Invalidated By') %></th>
-                    <th class='date'><%= gettext('Invalidated') %></th>
-                    <th class='notes'><%= gettext('Notes') %></th>
-                    <th class='action'><%= gettext('Action') %></th>
+                    <th class='user-name'><%- gettext('Student') %></th>
+                    <th class='user-name'><%- gettext('Invalidated By') %></th>
+                    <th class='date'><%- gettext('Invalidated') %></th>
+                    <th class='notes'><%- gettext('Notes') %></th>
+                    <th class='action'><%- gettext('Action') %></th>
                 </tr>
             </thead>
             <tbody>

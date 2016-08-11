@@ -2,10 +2,13 @@
 
 import logging
 
+import django.utils.timezone
 from rest_framework.authentication import SessionAuthentication
 from rest_framework import exceptions as drf_exceptions
 from rest_framework_oauth.authentication import OAuth2Authentication
-from rest_framework_oauth.compat import oauth2_provider, provider_now
+
+from provider.oauth2 import models as dop_models
+from oauth2_provider import models as dot_models
 
 from openedx.core.lib.api.exceptions import AuthenticationFailed
 
@@ -114,21 +117,44 @@ class OAuth2AuthenticationAllowInactiveUser(OAuth2Authentication):
     def authenticate_credentials(self, request, access_token):
         """
         Authenticate the request, given the access token.
-        Overrides base class implementation to discard failure if user is inactive.
+
+        Overrides base class implementation to discard failure if user is
+        inactive.
         """
-        token_query = oauth2_provider.oauth2.models.AccessToken.objects.select_related('user')
-        token = token_query.filter(token=access_token).first()
+
+        token = self.get_access_token(access_token)
         if not token:
             raise AuthenticationFailed({
                 u'error_code': OAUTH2_TOKEN_ERROR_NONEXISTENT,
                 u'developer_message': u'The provided access token does not match any valid tokens.'
             })
-        # provider_now switches to timezone aware datetime when
-        # the oauth2_provider version supports it.
-        elif token.expires < provider_now():
+        elif token.expires < django.utils.timezone.now():
             raise AuthenticationFailed({
                 u'error_code': OAUTH2_TOKEN_ERROR_EXPIRED,
                 u'developer_message': u'The provided access token has expired and is no longer valid.',
             })
         else:
             return token.user, token
+
+    def get_access_token(self, access_token):
+        """
+        Return a valid access token that exists in one of our OAuth2 libraries,
+        or None if no matching token is found.
+        """
+        return self._get_dot_token(access_token) or self._get_dop_token(access_token)
+
+    def _get_dop_token(self, access_token):
+        """
+        Return a valid access token stored by django-oauth2-provider (DOP), or
+        None if no matching token is found.
+        """
+        token_query = dop_models.AccessToken.objects.select_related('user')
+        return token_query.filter(token=access_token).first()
+
+    def _get_dot_token(self, access_token):
+        """
+        Return a valid access token stored by django-oauth-toolkit (DOT), or
+        None if no matching token is found.
+        """
+        token_query = dot_models.AccessToken.objects.select_related('user')
+        return token_query.filter(token=access_token).first()

@@ -4,7 +4,7 @@
         <div class="<%= xblockType %>-header">
             <h3 class="<%= xblockType %>-header-details">
                 <span class="<%= xblockType %>-title item-title">
-                    <a href="<%= xblockInfo.get('studio_url') %>"><%= xblockInfo.get('display_name') %></a>
+                    <a href="<%= xblockInfo.get('studio_url') %>"><%- xblockInfo.get('display_name') %></a>
                 </span>
             </h3>
         </div>
@@ -17,7 +17,7 @@
                 <div class="add-<%= childType %> add-item">
                     <a href="#" class="button button-new" data-category="<%= childCategory %>"
                        data-parent="<%= xblockInfo.get('id') %>" data-default-name="<%= defaultNewChildName %>">
-                        <i class="icon fa fa-plus"></i><%= addChildLabel %>
+                        <span class="icon fa fa-plus" aria-hidden="true"></span><%= addChildLabel %>
                     </a>
                 </div>
             <% } %>

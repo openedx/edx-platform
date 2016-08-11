@@ -120,6 +120,7 @@ class DatabaseMicrositeBackendTests(DatabaseMicrositeTestCase):
         with patch.dict('django.conf.settings.FEATURES', {'USE_MICROSITES': True}):
             microsite.enable_microsites_pre_startup(log)
             self.assertIn(settings.MICROSITE_ROOT_DIR, settings.DEFAULT_TEMPLATE_ENGINE['DIRS'])
+            self.assertIn(settings.MICROSITE_ROOT_DIR, settings.MAKO_TEMPLATES['main'])
 
     @patch('edxmako.paths.add_lookup')
     def test_enable_microsites(self, add_lookup):
@@ -138,7 +139,6 @@ class DatabaseMicrositeBackendTests(DatabaseMicrositeTestCase):
         with patch.dict('django.conf.settings.FEATURES', {'USE_MICROSITES': True}):
             microsite.enable_microsites(log)
             self.assertIn(settings.MICROSITE_ROOT_DIR, settings.STATICFILES_DIRS)
-            add_lookup.assert_called_once_with('main', settings.MICROSITE_ROOT_DIR)
 
     def test_get_all_configs(self):
         """
@@ -172,6 +172,15 @@ class DatabaseMicrositeBackendTests(DatabaseMicrositeTestCase):
         self.assertEqual(MicrositeHistory.objects.all().count(), 2)
         with self.assertRaises(Exception):
             microsite.set_by_domain('test.microsite2.com')
+
+    def test_has_configuration_set(self):
+        """
+        Tests microsite.has_configuration_set works as expected on this backend.
+        """
+        self.assertTrue(microsite.BACKEND.has_configuration_set())
+
+        Microsite.objects.all().delete()
+        self.assertFalse(microsite.BACKEND.has_configuration_set())
 
 
 @patch(

@@ -1,4 +1,6 @@
 """Provides factories for student models."""
+import random
+
 from student.models import (User, UserProfile, Registration,
                             CourseEnrollmentAllowed, CourseEnrollment,
                             PendingEmailChange, UserStanding,
@@ -7,6 +9,7 @@ from course_modes.models import CourseMode
 from django.contrib.auth.models import Group, AnonymousUser
 from datetime import datetime
 import factory
+from factory import lazy_attribute
 from factory.django import DjangoModelFactory
 from uuid import uuid4
 from pytz import UTC
@@ -56,10 +59,16 @@ class CourseModeFactory(DjangoModelFactory):
     course_id = None
     mode_display_name = CourseMode.DEFAULT_MODE.name
     mode_slug = CourseMode.DEFAULT_MODE_SLUG
-    min_price = 0
     suggested_prices = ''
     currency = 'usd'
     expiration_datetime = None
+
+    @lazy_attribute
+    def min_price(self):
+        if CourseMode.is_verified_slug(self.mode_slug):
+            return random.randint(1, 100)
+        return 0
+
 
 class OrganizationFactory(DjangoModelFactory):
     class Meta(object):
@@ -72,6 +81,7 @@ class OrganizationFactory(DjangoModelFactory):
     short_name = 'MITx'
     description = "MIT Test Description"
 
+
 class OrganizationUserFactory(DjangoModelFactory):
     class Meta(object):
         model = OrganizationUser
@@ -79,6 +89,7 @@ class OrganizationUserFactory(DjangoModelFactory):
     user_id_id = 1
     is_instructor = 1
     organization_id = 1
+
 
 class RegistrationFactory(DjangoModelFactory):
     class Meta(object):

@@ -1,24 +1,24 @@
 define(['backbone', 'jquery', 'js/views/file_uploader', 'common/js/spec_helpers/template_helpers',
-        'common/js/spec_helpers/ajax_helpers', 'js/models/notification', 'string_utils'],
-    function (Backbone, $, FileUploaderView, TemplateHelpers, AjaxHelpers, NotificationModel) {
-        describe("FileUploaderView", function () {
+        'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'js/models/notification', 'string_utils'],
+    function(Backbone, $, FileUploaderView, TemplateHelpers, AjaxHelpers, NotificationModel) {
+        describe('FileUploaderView', function() {
             var verifyTitle, verifyInputLabel, verifyInputTip, verifySubmitButton, verifyExtensions, verifyText,
                 verifyFileUploadOption, verifyNotificationMessage, verifySubmitButtonEnabled, mimicUpload,
-                respondWithSuccess, respondWithError, fileUploaderView, url="http://test_url/";
+                respondWithSuccess, respondWithError, fileUploaderView, url = 'http://test_url/';
 
-            verifyText = function (css, expectedText) {
+            verifyText = function(css, expectedText) {
                 expect(fileUploaderView.$(css).text().trim()).toBe(expectedText);
             };
 
-            verifyTitle = function (expectedTitle) { verifyText('.form-title', expectedTitle); };
+            verifyTitle = function(expectedTitle) { verifyText('.form-title', expectedTitle); };
 
-            verifyInputLabel = function (expectedLabel) { verifyText('.field-label', expectedLabel); };
+            verifyInputLabel = function(expectedLabel) { verifyText('.field-label', expectedLabel); };
 
-            verifyInputTip = function (expectedTip) { verifyText('.tip', expectedTip); };
+            verifyInputTip = function(expectedTip) { verifyText('.tip', expectedTip); };
 
-            verifySubmitButton = function (expectedButton) { verifyText('.submit-file-button', expectedButton); };
+            verifySubmitButton = function(expectedButton) { verifyText('.submit-file-button', expectedButton); };
 
-            verifyExtensions = function (expectedExtensions) {
+            verifyExtensions = function(expectedExtensions) {
                 var acceptAttribute = fileUploaderView.$('input.input-file').attr('accept');
                 if (expectedExtensions) {
                     expect(acceptAttribute).toBe(expectedExtensions);
@@ -28,25 +28,25 @@ define(['backbone', 'jquery', 'js/views/file_uploader', 'common/js/spec_helpers/
                 }
             };
 
-            verifySubmitButtonEnabled = function (expectedEnabled) {
+            verifySubmitButtonEnabled = function(expectedEnabled) {
                 var submitButton = fileUploaderView.$('.submit-file-button');
                 if (expectedEnabled) {
-                    expect(submitButton).not.toHaveClass("is-disabled");
+                    expect(submitButton).not.toHaveClass('is-disabled');
                 }
                 else {
-                    expect(submitButton).toHaveClass("is-disabled");
+                    expect(submitButton).toHaveClass('is-disabled');
                 }
             };
 
-            verifyFileUploadOption = function (option, expectedValue) {
+            verifyFileUploadOption = function(option, expectedValue) {
                 expect(fileUploaderView.$('#file-upload-form').fileupload('option', option)).toBe(expectedValue);
             };
 
-            verifyNotificationMessage = function (expectedMessage, type) {
+            verifyNotificationMessage = function(expectedMessage, type) {
                 verifyText('.file-upload-form-result .message-' + type + ' .message-title', expectedMessage);
             };
 
-            mimicUpload = function (test) {
+            mimicUpload = function(test) {
                 var requests = AjaxHelpers.requests(test);
 
                 var param = {files: [{name: 'upload_file.txt'}]};
@@ -59,11 +59,11 @@ define(['backbone', 'jquery', 'js/views/file_uploader', 'common/js/spec_helpers/
                 return requests;
             };
 
-            respondWithSuccess = function (requests) {
+            respondWithSuccess = function(requests) {
                 AjaxHelpers.respondWithJson(requests, {});
             };
 
-            respondWithError = function (requests, errorMessage) {
+            respondWithError = function(requests, errorMessage) {
                 if (errorMessage) {
                     AjaxHelpers.respondWithError(requests, 500, {error: errorMessage});
                 }
@@ -72,98 +72,98 @@ define(['backbone', 'jquery', 'js/views/file_uploader', 'common/js/spec_helpers/
                 }
             };
 
-            beforeEach(function () {
-                setFixtures("<div></div>");
+            beforeEach(function() {
+                setFixtures('<div></div>');
                 TemplateHelpers.installTemplate('templates/file-upload');
                 TemplateHelpers.installTemplate('templates/instructor/instructor_dashboard_2/notification');
                 fileUploaderView = new FileUploaderView({url: url}).render();
             });
 
-            it('has default values', function () {
-                verifyTitle("");
-                verifyInputLabel("");
-                verifyInputTip("");
-                verifySubmitButton("Upload File");
+            it('has default values', function() {
+                verifyTitle('');
+                verifyInputLabel('');
+                verifyInputTip('');
+                verifySubmitButton('Upload File');
                 verifyExtensions(null);
                 verifySubmitButtonEnabled(false);
             });
 
-            it ('can set text values and extensions', function () {
+            it('can set text values and extensions', function() {
                 fileUploaderView = new FileUploaderView({
-                    title: "file upload title",
-                    inputLabel: "test label",
-                    inputTip: "test tip",
-                    submitButtonText: "upload button text",
-                    extensions: ".csv,.txt"
+                    title: 'file upload title',
+                    inputLabel: 'test label',
+                    inputTip: 'test tip',
+                    submitButtonText: 'upload button text',
+                    extensions: '.csv,.txt'
                 }).render();
 
-                verifyTitle("file upload title");
-                verifyInputLabel("test label");
-                verifyInputTip("test tip");
-                verifySubmitButton("upload button text");
-                verifyExtensions(".csv,.txt");
+                verifyTitle('file upload title');
+                verifyInputLabel('test label');
+                verifyInputTip('test tip');
+                verifySubmitButton('upload button text');
+                verifyExtensions('.csv,.txt');
             });
 
-            it ('can store upload URL', function () {
+            it('can store upload URL', function() {
                 expect(fileUploaderView.$('#file-upload-form').attr('action')).toBe(url);
             });
 
-            it ('sets autoUpload to false', function () {
+            it('sets autoUpload to false', function() {
                 verifyFileUploadOption('autoUpload', false);
             });
 
-            it ('sets replaceFileInput to false', function () {
+            it('sets replaceFileInput to false', function() {
                 verifyFileUploadOption('replaceFileInput', false);
             });
 
-            it ('handles errors with default message', function () {
+            it('handles errors with default message', function() {
                 var requests = mimicUpload(this);
                 respondWithError(requests);
-                verifyNotificationMessage("Your upload of 'upload_file.txt' failed.", "error");
+                verifyNotificationMessage("Your upload of 'upload_file.txt' failed.", 'error');
             });
 
-            it ('handles errors with custom message', function () {
+            it('handles errors with custom message', function() {
                 fileUploaderView = new FileUploaderView({
                     url: url,
-                    errorNotification: function (file, event, data) {
+                    errorNotification: function(file, event, data) {
                         var message = interpolate_text("Custom error for '{file}'", {file: file});
                         return new NotificationModel({
-                            type: "customized",
+                            type: 'customized',
                             title: message
                         });
                     }
                 }).render();
                 var requests = mimicUpload(this);
-                respondWithError(requests, "server error");
-                verifyNotificationMessage("Custom error for 'upload_file.txt'", "customized");
+                respondWithError(requests, 'server error');
+                verifyNotificationMessage("Custom error for 'upload_file.txt'", 'customized');
             });
 
-            it ('handles server error message', function () {
+            it('handles server error message', function() {
                 var requests = mimicUpload(this);
-                respondWithError(requests, "server error");
-                verifyNotificationMessage("server error", "error");
+                respondWithError(requests, 'server error');
+                verifyNotificationMessage('server error', 'error');
             });
 
-            it ('handles success with default message', function () {
+            it('handles success with default message', function() {
                 var requests = mimicUpload(this);
                 respondWithSuccess(requests);
-                verifyNotificationMessage("Your upload of 'upload_file.txt' succeeded.", "confirmation");
+                verifyNotificationMessage("Your upload of 'upload_file.txt' succeeded.", 'confirmation');
             });
 
-            it ('handles success with custom message', function () {
+            it('handles success with custom message', function() {
                 fileUploaderView = new FileUploaderView({
                     url: url,
-                    successNotification: function (file, event, data) {
+                    successNotification: function(file, event, data) {
                         var message = interpolate_text("Custom success message for '{file}'", {file: file});
                         return new NotificationModel({
-                            type: "customized",
+                            type: 'customized',
                             title: message
                         });
                     }
                 }).render();
                 var requests = mimicUpload(this);
                 respondWithSuccess(requests);
-                verifyNotificationMessage("Custom success message for 'upload_file.txt'", "customized");
+                verifyNotificationMessage("Custom success message for 'upload_file.txt'", 'customized');
             });
         });
     });

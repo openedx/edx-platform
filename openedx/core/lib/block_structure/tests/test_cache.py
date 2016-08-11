@@ -1,21 +1,24 @@
 """
 Tests for block_structure/cache.py
 """
+from nose.plugins.attrib import attr
 from unittest import TestCase
 
 from ..cache import BlockStructureCache
 from .helpers import ChildrenMapTestMixin, MockCache, MockTransformer
 
 
+@attr(shard=2)
 class TestBlockStructureCache(ChildrenMapTestMixin, TestCase):
     """
-    Tests for BlockStructureFactory
+    Tests for BlockStructureCache
     """
     def setUp(self):
         super(TestBlockStructureCache, self).setUp()
         self.children_map = self.SIMPLE_CHILDREN_MAP
         self.block_structure = self.create_block_structure(self.children_map)
-        self.cache = BlockStructureCache(MockCache())
+        self.mock_cache = MockCache()
+        self.block_structure_cache = BlockStructureCache(self.mock_cache)
 
     def add_transformers(self):
         """
@@ -28,22 +31,26 @@ class TestBlockStructureCache(ChildrenMapTestMixin, TestCase):
                 usage_key=0, transformer=transformer, key='test', value='{} val'.format(transformer.name())
             )
 
-    def test_add(self):
+    def test_add_and_get(self):
+        self.assertEquals(self.mock_cache.timeout_from_last_call, 0)
+
         self.add_transformers()
-        self.cache.add(self.block_structure)
-        cached_value = self.cache.get(self.block_structure.root_block_usage_key)
+        self.block_structure_cache.add(self.block_structure)
+        self.assertEquals(self.mock_cache.timeout_from_last_call, 60 * 60 * 24)
+
+        cached_value = self.block_structure_cache.get(self.block_structure.root_block_usage_key)
         self.assertIsNotNone(cached_value)
         self.assert_block_structure(cached_value, self.children_map)
 
     def test_get_none(self):
         self.assertIsNone(
-            self.cache.get(self.block_structure.root_block_usage_key)
+            self.block_structure_cache.get(self.block_structure.root_block_usage_key)
         )
 
     def test_delete(self):
         self.add_transformers()
-        self.cache.add(self.block_structure)
-        self.cache.delete(self.block_structure.root_block_usage_key)
+        self.block_structure_cache.add(self.block_structure)
+        self.block_structure_cache.delete(self.block_structure.root_block_usage_key)
         self.assertIsNone(
-            self.cache.get(self.block_structure.root_block_usage_key)
+            self.block_structure_cache.get(self.block_structure.root_block_usage_key)
         )

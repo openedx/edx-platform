@@ -1,6 +1,6 @@
-define(["jquery", "underscore", "backbone", "gettext", "js/utils/handle_iframe_binding", "js/utils/templates",
-        "common/js/components/utils/view_utils"],
-    function ($, _, Backbone, gettext, IframeUtils, TemplateUtils, ViewUtils) {
+define(['jquery', 'underscore', 'backbone', 'gettext', 'js/utils/handle_iframe_binding', 'js/utils/templates',
+        'common/js/components/utils/view_utils'],
+    function($, _, Backbone, gettext, IframeUtils, TemplateUtils, ViewUtils) {
         /*
          This view is extended from backbone to provide useful functionality for all Studio views.
          This functionality includes:
@@ -13,7 +13,7 @@ define(["jquery", "underscore", "backbone", "gettext", "js/utils/handle_iframe_b
 
         var BaseView = Backbone.View.extend({
             events: {
-                "click .ui-toggle-expansion": "toggleExpandCollapse"
+                'click .ui-toggle-expansion': 'toggleExpandCollapse'
             },
 
             options: {
@@ -23,18 +23,26 @@ define(["jquery", "underscore", "backbone", "gettext", "js/utils/handle_iframe_b
                 collapsedClass: 'collapsed'
             },
 
-            //override the constructor function
+            // override the constructor function
             constructor: function(options) {
                 _.bindAll(this, 'beforeRender', 'render', 'afterRender');
+
+                // Merge passed options and view's options property and
+                // attach to the view's options property
+                if (this.options) {
+                    options = _.extend({}, _.result(this, 'options'), options);
+                }
+                this.options = options;
+
                 var _this = this;
-                this.render = _.wrap(this.render, function (render, options) {
+                this.render = _.wrap(this.render, function(render, options) {
                     _this.beforeRender();
                     render(options);
                     _this.afterRender();
                     return _this;
                 });
 
-                //call Backbone's own constructor
+                // call Backbone's own constructor
                 Backbone.View.prototype.constructor.apply(this, arguments);
             },
 

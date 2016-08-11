@@ -3,7 +3,6 @@ Unit tests for bulk-email-related models.
 """
 from django.test import TestCase
 from django.core.management import call_command
-from django.conf import settings
 
 from student.tests.factories import UserFactory
 
@@ -22,7 +21,7 @@ from openedx.core.djangoapps.course_groups.models import CourseCohort
 from opaque_keys.edx.keys import CourseKey
 
 
-@attr('shard_1')
+@attr(shard=1)
 @patch('bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message', autospec=True))
 class CourseEmailTest(TestCase):
     """Test the CourseEmail model."""
@@ -49,7 +48,7 @@ class CourseEmailTest(TestCase):
         template_name = "branded_template"
         from_addr = "branded@branding.com"
         email = CourseEmail.create(
-            course_id, sender, to_option, subject, html_message, template_name=template_name, from_addr=from_addr
+            course_id, sender, [to_option], subject, html_message, template_name=template_name, from_addr=from_addr
         )
         self.assertEqual(email.course_id, course_id)
         self.assertEqual(email.targets.all()[0].target_type, SEND_TO_STAFF)
@@ -83,7 +82,7 @@ class CourseEmailTest(TestCase):
         self.assertEqual(target.long_display(), 'Cohort: test cohort')
 
 
-@attr('shard_1')
+@attr(shard=1)
 class NoCourseEmailTemplateTest(TestCase):
     """Test the CourseEmailTemplate model without loading the template data."""
 
@@ -92,7 +91,7 @@ class NoCourseEmailTemplateTest(TestCase):
             CourseEmailTemplate.get_template()
 
 
-@attr('shard_1')
+@attr(shard=1)
 class CourseEmailTemplateTest(TestCase):
     """Test the CourseEmailTemplate model."""
 
@@ -117,6 +116,15 @@ class CourseEmailTemplateTest(TestCase):
         """Provide sample context sufficient for rendering HTML template"""
         context = self._get_sample_plain_context()
         context['course_image_url'] = "/location/of/course/image/url"
+        return context
+
+    def _add_xss_fields(self, context):
+        """ Add fields to the context for XSS testing. """
+        context['course_title'] = "<script>alert('Course Title!');</alert>"
+        context['name'] = "<script>alert('Profile Name!');</alert>"
+        # Must have user_id and course_id present in order to do keyword substitution
+        context['user_id'] = 12345
+        context['course_id'] = "course-v1:edx+100+1"
         return context
 
     def test_get_template(self):
@@ -156,22 +164,45 @@ class CourseEmailTemplateTest(TestCase):
         context = self._get_sample_html_context()
         template.render_htmltext("My new html text.", context)
 
+    def test_render_html_xss(self):
+        template = CourseEmailTemplate.get_template()
+        context = self._add_xss_fields(self._get_sample_html_context())
+        message = template.render_htmltext(
+            "Dear %%USER_FULLNAME%%, thanks for enrolling in %%COURSE_DISPLAY_NAME%%.", context
+        )
+        self.assertNotIn("<script>", message)
+        self.assertIn("&lt;script&gt;alert(&#39;Course Title!&#39;);&lt;/alert&gt;", message)
+        self.assertIn("&lt;script&gt;alert(&#39;Profile Name!&#39;);&lt;/alert&gt;", message)
+
     def test_render_plain(self):
         template = CourseEmailTemplate.get_template()
         context = self._get_sample_plain_context()
         template.render_plaintext("My new plain text.", context)
 
+    def test_render_plain_no_escaping(self):
+        template = CourseEmailTemplate.get_template()
+        context = self._add_xss_fields(self._get_sample_plain_context())
+        message = template.render_plaintext(
+            "Dear %%USER_FULLNAME%%, thanks for enrolling in %%COURSE_DISPLAY_NAME%%.", context
+        )
+        self.assertNotIn("&lt;script&gt;", message)
+        self.assertIn(context['course_title'], message)
+        self.assertIn(context['name'], message)
 
-@attr('shard_1')
+
+@attr(shard=1)
 class CourseAuthorizationTest(TestCase):
     """Test the CourseAuthorization model."""
 
-    @patch.dict(settings.FEATURES, {'REQUIRE_COURSE_EMAIL_AUTH': True})
+    def tearDown(self):
+        super(CourseAuthorizationTest, self).tearDown()
+        BulkEmailFlag.objects.all().delete()
+
     def test_creation_auth_on(self):
         BulkEmailFlag.objects.create(enabled=True, require_course_email_auth=True)
         course_id = CourseKey.from_string('abc/123/doremi')
         # Test that course is not authorized by default
-        self.assertFalse(CourseAuthorization.instructor_email_enabled(course_id))
+        self.assertFalse(BulkEmailFlag.feature_enabled(course_id))
 
         # Authorize
         cauth = CourseAuthorization(course_id=course_id, email_enabled=True)
@@ -193,16 +224,15 @@ class CourseAuthorizationTest(TestCase):
             "Course 'abc/123/doremi': Instructor Email Not Enabled"
         )
 
-    @patch.dict(settings.FEATURES, {'REQUIRE_COURSE_EMAIL_AUTH': False})
     def test_creation_auth_off(self):
         BulkEmailFlag.objects.create(enabled=True, require_course_email_auth=False)
         course_id = CourseKey.from_string('blahx/blah101/ehhhhhhh')
         # Test that course is authorized by default, since auth is turned off
-        self.assertTrue(CourseAuthorization.instructor_email_enabled(course_id))
+        self.assertTrue(BulkEmailFlag.feature_enabled(course_id))
 
         # Use the admin interface to unauthorize the course
         cauth = CourseAuthorization(course_id=course_id, email_enabled=False)
         cauth.save()
 
         # Now, course should STILL be authorized!
-        self.assertTrue(CourseAuthorization.instructor_email_enabled(course_id))
+        self.assertTrue(BulkEmailFlag.feature_enabled(course_id))

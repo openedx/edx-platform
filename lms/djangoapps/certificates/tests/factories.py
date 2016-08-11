@@ -1,16 +1,14 @@
 # Factories are self documenting
 # pylint: disable=missing-docstring
-import factory
 from uuid import uuid4
-from django.core.files.base import ContentFile
-from factory.django import DjangoModelFactory, ImageField
 
-from student.models import LinkedInAddToProfileConfiguration
+from factory.django import DjangoModelFactory
 
 from certificates.models import (
-    GeneratedCertificate, CertificateStatuses, CertificateHtmlViewConfiguration, CertificateWhitelist, BadgeAssertion,
-    BadgeImageConfiguration, CertificateInvalidation,
+    GeneratedCertificate, CertificateStatuses, CertificateHtmlViewConfiguration, CertificateWhitelist,
+    CertificateInvalidation,
 )
+from student.models import LinkedInAddToProfileConfiguration
 
 
 class GeneratedCertificateFactory(DjangoModelFactory):
@@ -42,33 +40,6 @@ class CertificateInvalidationFactory(DjangoModelFactory):
 
     notes = 'Test Notes'
     active = True
-
-
-class BadgeAssertionFactory(DjangoModelFactory):
-    class Meta(object):
-        model = BadgeAssertion
-
-    mode = 'honor'
-    data = {
-        'image': 'http://www.example.com/image.png',
-        'json': {'id': 'http://www.example.com/assertion.json'},
-        'issuer': 'http://www.example.com/issuer.json',
-    }
-
-
-class BadgeImageConfigurationFactory(DjangoModelFactory):
-
-    class Meta(object):
-        model = BadgeImageConfiguration
-
-    mode = 'honor'
-    icon = factory.LazyAttribute(
-        lambda _: ContentFile(
-            ImageField()._make_data(  # pylint: disable=protected-access
-                {'color': 'blue', 'width': 50, 'height': 50, 'format': 'PNG'}
-            ), 'test.png'
-        )
-    )
 
 
 class CertificateHtmlViewConfigurationFactory(DjangoModelFactory):
@@ -103,10 +74,10 @@ class CertificateHtmlViewConfigurationFactory(DjangoModelFactory):
                 "certificate_type": "XSeries"
             },
             "microsites": {
-                "testmicrosite": {
-                    "company_about_url": "http://www.testmicrosite.org/about-us",
-                    "company_privacy_url": "http://www.testmicrosite.org/edx-privacy-policy",
-                    "company_tos_url": "http://www.testmicrosite.org/edx-terms-service"
+                "test-site": {
+                    "company_about_url": "http://www.test-site.org/about-us",
+                    "company_privacy_url": "http://www.test-site.org/edx-privacy-policy",
+                    "company_tos_url": "http://www.test-site.org/edx-terms-service"
                 }
             }
         }"""

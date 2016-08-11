@@ -22,9 +22,6 @@ class UsernameValidatorMixin(object):
         as an anonymous user.
         """
         username = self.cleaned_data.get('username')
-        if not username:
-            if not self.initial['requesting_user'].is_anonymous():
-                raise ValidationError("A username is required for non-anonymous access.")
         return username or ''
 
 

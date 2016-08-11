@@ -7,6 +7,7 @@ from django.utils.translation import ugettext_noop
 
 from xmodule.tabs import CourseTab
 from student.roles import CourseCcxCoachRole
+from courseware.access import has_access
 
 
 class CcxCourseTab(CourseTab):
@@ -24,9 +25,15 @@ class CcxCourseTab(CourseTab):
         """
         Returns true if CCX has been enabled and the specified user is a coach
         """
-        if not user:
-            return True
         if not settings.FEATURES.get('CUSTOM_COURSES_EDX', False) or not course.enable_ccx:
+            # If ccx is not enable do not show ccx coach tab.
             return False
+
+        is_staff_or_instructor = has_access(user, 'staff', course) or has_access(user, 'instructor', course)
+        if hasattr(course.id, 'ccx') and is_staff_or_instructor:
+            # if user is staff or instructor then he can always see ccx coach tab.
+            return True
+
+        # check if user has coach access.
         role = CourseCcxCoachRole(course.id)
         return role.has_user(user)

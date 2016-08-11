@@ -1,10 +1,10 @@
 define(
     [
-        "js/views/baseview", "underscore", "js/models/metadata", "js/views/abstract_editor",
-        "js/models/uploads", "js/views/uploads",
-        "js/models/license", "js/views/license",
-        "js/views/video/transcripts/metadata_videolist",
-        "js/views/video/translations_editor"
+        'js/views/baseview', 'underscore', 'js/models/metadata', 'js/views/abstract_editor',
+        'js/models/uploads', 'js/views/uploads',
+        'js/models/license', 'js/views/license',
+        'js/views/video/transcripts/metadata_videolist',
+        'js/views/video/translations_editor'
     ],
 function(BaseView, _, MetadataModel, AbstractEditor, FileUpload, UploadDialog,
          LicenseModel, LicenseView, VideoList, VideoTranslations) {
@@ -13,7 +13,7 @@ function(BaseView, _, MetadataModel, AbstractEditor, FileUpload, UploadDialog,
     Metadata.Editor = BaseView.extend({
 
         // Model is CMS.Models.MetadataCollection,
-        initialize : function() {
+        initialize: function() {
             var self = this,
                 counter = 0,
                 locator = self.$el.closest('[data-locator]').data('locator'),
@@ -23,7 +23,7 @@ function(BaseView, _, MetadataModel, AbstractEditor, FileUpload, UploadDialog,
             this.$el.html(this.template({numEntries: this.collection.length}));
 
             this.collection.each(
-                function (model) {
+                function(model) {
                     var data = {
                             el: self.$el.find('.metadata_entry')[counter++],
                             courseKey: courseKey,
@@ -53,10 +53,10 @@ function(BaseView, _, MetadataModel, AbstractEditor, FileUpload, UploadDialog,
         /**
          * Returns just the modified metadata values, in the format used to persist to the server.
          */
-        getModifiedMetadataValues: function () {
+        getModifiedMetadataValues: function() {
             var modified_values = {};
             this.collection.each(
-                function (model) {
+                function(model) {
                     if (model.isModified()) {
                         modified_values[model.getFieldName()] = model.getValue();
                     }
@@ -70,10 +70,10 @@ function(BaseView, _, MetadataModel, AbstractEditor, FileUpload, UploadDialog,
          * if there is a metadata entry called 'display_name', and if so, it returns its value. If there
          * is no such entry, or if display_name does not have a value set, it returns an empty string.
          */
-        getDisplayName: function () {
+        getDisplayName: function() {
             var displayName = '';
             this.collection.each(
-                function (model) {
+                function(model) {
                     if (model.get('field_name') === 'display_name') {
                         var displayNameValue = model.get('value');
                         // It is possible that there is no display name value set. In that case, return empty string.
@@ -90,15 +90,15 @@ function(BaseView, _, MetadataModel, AbstractEditor, FileUpload, UploadDialog,
 
     Metadata.String = AbstractEditor.extend({
 
-        events : {
-            "change input" : "updateModel",
-            "keypress .setting-input" : "showClearButton",
-            "click .setting-clear" : "clear"
+        events: {
+            'change input': 'updateModel',
+            'keypress .setting-input': 'showClearButton',
+            'click .setting-clear': 'clear'
         },
 
-        templateName: "metadata-string-entry",
+        templateName: 'metadata-string-entry',
 
-        render: function () {
+        render: function() {
             AbstractEditor.prototype.render.apply(this);
 
             // If the model has property `non editable` equals `true`,
@@ -111,33 +111,33 @@ function(BaseView, _, MetadataModel, AbstractEditor, FileUpload, UploadDialog,
             }
         },
 
-        getValueFromEditor : function () {
+        getValueFromEditor: function() {
             return this.$el.find('#' + this.uniqueId).val();
         },
 
-        setValueInEditor : function (value) {
+        setValueInEditor: function(value) {
             this.$el.find('input').val(value);
         }
     });
 
     Metadata.Number = AbstractEditor.extend({
 
-        events : {
-            "change input" : "updateModel",
-            "keypress .setting-input" : "keyPressed",
-            "change .setting-input" : "changed",
-            "click .setting-clear" : "clear"
+        events: {
+            'change input': 'updateModel',
+            'keypress .setting-input': 'keyPressed',
+            'change .setting-input': 'changed',
+            'click .setting-clear': 'clear'
         },
 
-        render: function () {
+        render: function() {
             AbstractEditor.prototype.render.apply(this);
             if (!this.initialized) {
-                var numToString = function (val) {
+                var numToString = function(val) {
                     return val.toFixed(4);
                 };
-                var min = "min";
-                var max = "max";
-                var step = "step";
+                var min = 'min';
+                var max = 'max';
+                var step = 'step';
                 var options = this.model.getOptions();
                 if (options.hasOwnProperty(min)) {
                     this.min = Number(options[min]);
@@ -153,7 +153,7 @@ function(BaseView, _, MetadataModel, AbstractEditor, FileUpload, UploadDialog,
                     stepValue = numToString(Number(options[step]));
                 }
                 else if (this.isIntegerField()) {
-                    stepValue = "1";
+                    stepValue = '1';
                 }
                 if (stepValue !== undefined) {
                     this.$el.find('input').attr(step, stepValue);
@@ -171,24 +171,24 @@ function(BaseView, _, MetadataModel, AbstractEditor, FileUpload, UploadDialog,
             return this;
         },
 
-        templateName: "metadata-number-entry",
+        templateName: 'metadata-number-entry',
 
-        getValueFromEditor : function () {
+        getValueFromEditor: function() {
             return this.$el.find('#' + this.uniqueId).val();
         },
 
-        setValueInEditor : function (value) {
+        setValueInEditor: function(value) {
             this.$el.find('input').val(value);
         },
 
         /**
          * Returns true if this view is restricted to integers, as opposed to floating points values.
          */
-        isIntegerField : function () {
+        isIntegerField: function() {
             return this.model.getType() === 'Integer';
         },
 
-        keyPressed: function (e) {
+        keyPressed: function(e) {
             this.showClearButton();
             // This first filtering if statement is take from polyfill to prevent
             // non-numeric input (for browsers that don't use polyfill because they DO have a number input type).
@@ -204,7 +204,7 @@ function(BaseView, _, MetadataModel, AbstractEditor, FileUpload, UploadDialog,
             }
         },
 
-        changed: function () {
+        changed: function() {
             // Limit value to the range specified by min and max (necessary for browsers that aren't using polyfill).
             // Prevent integer/float fields value to be empty (set them to their defaults)
             var value = this.getValueFromEditor();
@@ -225,17 +225,17 @@ function(BaseView, _, MetadataModel, AbstractEditor, FileUpload, UploadDialog,
 
     Metadata.Option = AbstractEditor.extend({
 
-        events : {
-            "change select" : "updateModel",
-            "click .setting-clear" : "clear"
+        events: {
+            'change select': 'updateModel',
+            'click .setting-clear': 'clear'
         },
 
-        templateName: "metadata-option-entry",
+        templateName: 'metadata-option-entry',
 
-        getValueFromEditor : function () {
-            var selectedText = this.$el.find('#' + this.uniqueId).find(":selected").text();
+        getValueFromEditor: function() {
+            var selectedText = this.$el.find('#' + this.uniqueId).find(':selected').text();
             var selectedValue;
-            _.each(this.model.getOptions(), function (modelValue) {
+            _.each(this.model.getOptions(), function(modelValue) {
                 if (modelValue === selectedText) {
                     selectedValue = modelValue;
                 }
@@ -246,15 +246,15 @@ function(BaseView, _, MetadataModel, AbstractEditor, FileUpload, UploadDialog,
             return selectedValue;
         },
 
-        setValueInEditor : function (value) {
+        setValueInEditor: function(value) {
             // Value here is the json value as used by the field. The choice may instead be showing display names.
             // Find the display name matching the value passed in.
-            _.each(this.model.getOptions(), function (modelValue) {
+            _.each(this.model.getOptions(), function(modelValue) {
                 if (modelValue['value'] === value) {
                     value = modelValue['display_name'];
                 }
             });
-            this.$el.find('#' + this.uniqueId + " option").filter(function() {
+            this.$el.find('#' + this.uniqueId + ' option').filter(function() {
                 return $(this).text() === value;
             }).prop('selected', true);
         }
@@ -262,33 +262,33 @@ function(BaseView, _, MetadataModel, AbstractEditor, FileUpload, UploadDialog,
 
     Metadata.List = AbstractEditor.extend({
 
-        events : {
-            "click .setting-clear" : "clear",
-            "keypress .setting-input" : "showClearButton",
-            "change input" : "updateModel",
-            "input input" : "enableAdd",
-            "click .create-setting" : "addEntry",
-            "click .remove-setting" : "removeEntry"
+        events: {
+            'click .setting-clear': 'clear',
+            'keypress .setting-input': 'showClearButton',
+            'change input': 'updateModel',
+            'input input': 'enableAdd',
+            'click .create-setting': 'addEntry',
+            'click .remove-setting': 'removeEntry'
         },
 
-        templateName: "metadata-list-entry",
+        templateName: 'metadata-list-entry',
 
-        getValueFromEditor: function () {
+        getValueFromEditor: function() {
             return _.map(
                 this.$el.find('li input'),
-                function (ele) { return ele.value.trim(); }
+                function(ele) { return ele.value.trim(); }
             ).filter(_.identity);
         },
 
-        setValueInEditor: function (value) {
+        setValueInEditor: function(value) {
             var list = this.$el.find('ol');
 
             list.empty();
             _.each(value, function(ele, index) {
                 var template = _.template(
                     '<li class="list-settings-item">' +
-                        '<input type="text" class="input" value="<%= ele %>">' +
-                        '<a href="#" class="remove-action remove-setting" data-index="<%= index %>"><i class="icon fa fa-times-circle" aria-hidden="true"></i><span class="sr">Remove</span></a>' +
+                        '<input type="text" class="input" value="<%- ele %>">' +
+                        '<a href="#" class="remove-action remove-setting" data-index="<%- index %>"><span class="icon fa fa-times-circle" aria-hidden="true"></span><span class="sr">' + gettext('Remove') + '</span></a>' +   // eslint-disable-line max-len
                     '</li>'
                 );
                 list.append($(template({'ele': ele, 'index': index})));
@@ -332,22 +332,22 @@ function(BaseView, _, MetadataModel, AbstractEditor, FileUpload, UploadDialog,
         maxTimeInSeconds: 86399,
 
         events: {
-            "focus input" : "addSelection",
-            "mouseup input" : "mouseUpHandler",
-            "change input" : "updateModel",
-            "keypress .setting-input" : "showClearButton"  ,
-            "click .setting-clear" : "clear"
+            'focus input': 'addSelection',
+            'mouseup input': 'mouseUpHandler',
+            'change input': 'updateModel',
+            'keypress .setting-input': 'showClearButton',
+            'click .setting-clear': 'clear'
         },
 
-        templateName: "metadata-string-entry",
+        templateName: 'metadata-string-entry',
 
-        getValueFromEditor: function () {
+        getValueFromEditor: function() {
             var $input = this.$el.find('#' + this.uniqueId);
 
             return $input.val();
         },
 
-        updateModel: function () {
+        updateModel: function() {
             var value = this.getValueFromEditor(),
                 time = this.parseRelativeTime(value);
 
@@ -365,10 +365,10 @@ function(BaseView, _, MetadataModel, AbstractEditor, FileUpload, UploadDialog,
             }
         },
 
-        parseRelativeTime: function (value) {
+        parseRelativeTime: function(value) {
             // This function ensure you have two-digits
-            var pad = function (number) {
-                    return (number < 10) ? "0" + number : number;
+            var pad = function(number) {
+                    return (number < 10) ? '0' + number : number;
                 },
                 // Removes all white-spaces and splits by `:`.
                 list = value.replace(/\s+/g, '').split(':'),
@@ -392,7 +392,7 @@ function(BaseView, _, MetadataModel, AbstractEditor, FileUpload, UploadDialog,
             ].join(':');
         },
 
-        setValueInEditor: function (value) {
+        setValueInEditor: function(value) {
             if (!value) {
                 value = this.defaultValue;
             }
@@ -400,11 +400,11 @@ function(BaseView, _, MetadataModel, AbstractEditor, FileUpload, UploadDialog,
             this.$el.find('input').val(value);
         },
 
-        addSelection: function (event) {
+        addSelection: function(event) {
             $(event.currentTarget).select();
         },
 
-        mouseUpHandler: function (event) {
+        mouseUpHandler: function(event) {
             // Prevents default behavior to make works selection in WebKit
             // browsers
             event.preventDefault();
@@ -414,17 +414,17 @@ function(BaseView, _, MetadataModel, AbstractEditor, FileUpload, UploadDialog,
     Metadata.Dict = AbstractEditor.extend({
 
         events: {
-            "click .setting-clear" : "clear",
-            "keypress .setting-input" : "showClearButton",
-            "change input" : "updateModel",
-            "input input" : "enableAdd",
-            "click .create-setting" : "addEntry",
-            "click .remove-setting" : "removeEntry"
+            'click .setting-clear': 'clear',
+            'keypress .setting-input': 'showClearButton',
+            'change input': 'updateModel',
+            'input input': 'enableAdd',
+            'click .create-setting': 'addEntry',
+            'click .remove-setting': 'removeEntry'
         },
 
-        templateName: "metadata-dict-entry",
+        templateName: 'metadata-dict-entry',
 
-        getValueFromEditor: function () {
+        getValueFromEditor: function() {
             var dict = {};
 
             _.each(this.$el.find('li'), function(li, index) {
@@ -446,7 +446,7 @@ function(BaseView, _, MetadataModel, AbstractEditor, FileUpload, UploadDialog,
             return dict;
         },
 
-        setValueInEditor: function (value) {
+        setValueInEditor: function(value) {
             var list = this.$el.find('ol'),
                 frag = document.createDocumentFragment();
 
@@ -455,7 +455,7 @@ function(BaseView, _, MetadataModel, AbstractEditor, FileUpload, UploadDialog,
                     '<li class="list-settings-item">' +
                         '<input type="text" class="input input-key" value="<%= key %>">' +
                         '<input type="text" class="input input-value" value="<%= value %>">' +
-                        '<a href="#" class="remove-action remove-setting" data-value="<%= value %>"><i class="icon fa fa-times-circle" aria-hidden="true"></i><span class="sr">Remove</span></a>' +
+                        '<a href="#" class="remove-action remove-setting" data-value="<%= value %>"><span class="icon fa fa-times-circle" aria-hidden="true"></span><span class="sr">Remove</span></a>' +  // eslint-disable-line max-len
                     '</li>'
                 );
 
@@ -503,24 +503,24 @@ function(BaseView, _, MetadataModel, AbstractEditor, FileUpload, UploadDialog,
      */
     Metadata.FileUploader = AbstractEditor.extend({
 
-        events : {
-            "click .upload-setting" : "upload",
-            "click .setting-clear" : "clear"
+        events: {
+            'click .upload-setting': 'upload',
+            'click .setting-clear': 'clear'
         },
 
-        templateName: "metadata-file-uploader-entry",
-        templateButtonsName: "metadata-file-uploader-item",
+        templateName: 'metadata-file-uploader-entry',
+        templateButtonsName: 'metadata-file-uploader-item',
 
-        initialize: function () {
+        initialize: function() {
             this.buttonTemplate = this.loadTemplate(this.templateButtonsName);
             AbstractEditor.prototype.initialize.apply(this);
         },
 
-        getValueFromEditor: function () {
+        getValueFromEditor: function() {
             return this.$('#' + this.uniqueId).val();
         },
 
-        setValueInEditor: function (value) {
+        setValueInEditor: function(value) {
             var html = this.buttonTemplate({
                 model: this.model,
                 uniqueId: this.uniqueId
@@ -530,18 +530,18 @@ function(BaseView, _, MetadataModel, AbstractEditor, FileUpload, UploadDialog,
             this.$('.wrapper-uploader-actions').html(html);
         },
 
-        upload: function (event) {
+        upload: function(event) {
             var self = this,
                 target = $(event.currentTarget),
                 url = '/assets/' + this.options.courseKey + '/',
                 model = new FileUpload({
-                    title: gettext('Upload File'),
+                    title: gettext('Upload File')
                 }),
                 view = new UploadDialog({
                     model: model,
                     url: url,
                     parentElement: target.closest('.xblock-editor'),
-                    onSuccess: function (response) {
+                    onSuccess: function(response) {
                         if (response['asset'] && response['asset']['url']) {
                             self.model.setValue(response['asset']['url']);
                         }
@@ -555,7 +555,7 @@ function(BaseView, _, MetadataModel, AbstractEditor, FileUpload, UploadDialog,
     Metadata.License = AbstractEditor.extend({
 
         initialize: function(options) {
-            this.licenseModel = new LicenseModel({"asString": this.model.getValue()});
+            this.licenseModel = new LicenseModel({'asString': this.model.getValue()});
             this.licenseView = new LicenseView({model: this.licenseModel});
 
             // Rerender when the license model changes
@@ -564,7 +564,7 @@ function(BaseView, _, MetadataModel, AbstractEditor, FileUpload, UploadDialog,
         },
 
         render: function() {
-            this.licenseView.render().$el.css("display", "inline");
+            this.licenseView.render().$el.css('display', 'inline');
             this.licenseView.undelegateEvents();
             this.$el.empty().append(this.licenseView.el);
             // restore event bindings
@@ -574,7 +574,7 @@ function(BaseView, _, MetadataModel, AbstractEditor, FileUpload, UploadDialog,
 
         setLicense: function() {
             this.model.setValue(this.licenseModel.toString());
-            this.render()
+            this.render();
         }
 
     });

@@ -4,10 +4,10 @@ Instructor (2) dashboard page.
 """
 
 from bok_choy.page_object import PageObject
-from .course_page import CoursePage
+from common.test.acceptance.pages.lms.course_page import CoursePage
 import os
 from bok_choy.promise import EmptyPromise, Promise
-from ...tests.helpers import select_option_by_text, get_selected_option_text, get_options
+from common.test.acceptance.tests.helpers import select_option_by_text, get_selected_option_text, get_options
 
 
 class InstructorDashboardPage(CoursePage):
@@ -23,7 +23,7 @@ class InstructorDashboardPage(CoursePage):
         """
         Selects the membership tab and returns the MembershipSection
         """
-        self.q(css='a[data-section=membership]').first.click()
+        self.q(css='[data-section=membership]').first.click()
         membership_section = MembershipPage(self.browser)
         membership_section.wait_for_page()
         return membership_section
@@ -32,7 +32,7 @@ class InstructorDashboardPage(CoursePage):
         """
         Selects the cohort management tab and returns the CohortManagementSection
         """
-        self.q(css='a[data-section=cohort_management]').first.click()
+        self.q(css='[data-section=cohort_management]').first.click()
         cohort_management_section = CohortManagementSection(self.browser)
         # The first time cohort management is selected, an ajax call is made.
         cohort_management_section.wait_for_ajax()
@@ -43,7 +43,7 @@ class InstructorDashboardPage(CoursePage):
         """
         Selects the data download tab and returns a DataDownloadPage.
         """
-        self.q(css='a[data-section=data_download]').first.click()
+        self.q(css='[data-section=data_download]').first.click()
         data_download_section = DataDownloadPage(self.browser)
         data_download_section.wait_for_page()
         return data_download_section
@@ -52,7 +52,7 @@ class InstructorDashboardPage(CoursePage):
         """
         Selects the student admin tab and returns the MembershipSection
         """
-        self.q(css='a[data-section=student_admin]').first.click()
+        self.q(css='[data-section=student_admin]').first.click()
         student_admin_section = StudentAdminPage(self.browser)
         student_admin_section.wait_for_page()
         return student_admin_section
@@ -61,7 +61,7 @@ class InstructorDashboardPage(CoursePage):
         """
         Selects the certificates tab and returns the CertificatesSection
         """
-        self.q(css='a[data-section=certificates]').first.click()
+        self.q(css='[data-section=certificates]').first.click()
         certificates_section = CertificatesPage(self.browser)
         certificates_section.wait_for_page()
         return certificates_section
@@ -70,10 +70,19 @@ class InstructorDashboardPage(CoursePage):
         """
         Selects the timed exam tab and returns the Special Exams Section
         """
-        self.q(css='a[data-section=special_exams]').first.click()
+        self.q(css='[data-section=special_exams]').first.click()
         timed_exam_section = SpecialExamsPage(self.browser)
         timed_exam_section.wait_for_page()
         return timed_exam_section
+
+    def select_bulk_email(self):
+        """
+        Selects the email tab and returns the bulk email section
+        """
+        self.q(css='[data-section=send_email]').first.click()
+        email_section = BulkEmailPage(self.browser)
+        email_section.wait_for_page()
+        return email_section
 
     @staticmethod
     def get_asset_path(file_name):
@@ -98,6 +107,61 @@ class InstructorDashboardPage(CoursePage):
         return os.sep.join(folders_list_in_path)
 
 
+class BulkEmailPage(PageObject):
+    """
+    Bulk email section of the instructor dashboard.
+    This feature is controlled by an admin panel feature flag, which is turned on via database fixture for testing.
+    """
+    url = None
+
+    def is_browser_on_page(self):
+        return self.q(css='[data-section=send_email].active-section').present
+
+    def _bounded_selector(self, selector):
+        """
+        Return `selector`, but limited to the bulk-email context.
+        """
+        return '.send-email {}'.format(selector)
+
+    def _select_recipient(self, recipient):
+        """
+        Selects the specified recipient from the selector. Assumes that recipient is not None.
+        """
+        recipient_selector_css = "input[name='send_to'][value='{}']".format(recipient)
+        self.q(css=self._bounded_selector(recipient_selector_css))[0].click()
+
+    def send_message(self, recipients):
+        """
+        Send a test message to the specified recipient.
+        """
+        send_css = "input[name='send']"
+        test_subject = "Hello"
+        test_body = "This is a test email"
+
+        for recipient in recipients:
+            self._select_recipient(recipient)
+        self.q(css=self._bounded_selector("input[name='subject']")).fill(test_subject)
+        self.q(css=self._bounded_selector("iframe#mce_0_ifr"))[0].click()
+        self.q(css=self._bounded_selector("iframe#mce_0_ifr"))[0].send_keys(test_body)
+
+        with self.handle_alert(confirm=True):
+            self.q(css=self._bounded_selector(send_css)).click()
+
+    def verify_message_queued_successfully(self):
+        """
+        Verifies that the "you email was queued" message appears.
+
+        Note that this does NOT ensure the message gets sent successfully, that functionality
+        is covered by the bulk_email unit tests.
+        """
+        confirmation_selector = self._bounded_selector(".msg-confirm")
+        expected_text = u"Your email message was successfully queued for sending."
+        EmptyPromise(
+            lambda: expected_text in self.q(css=confirmation_selector)[0].text,
+            "Message Queued Confirmation"
+        ).fulfill()
+
+
 class MembershipPage(PageObject):
     """
     Membership section of the Instructor dashboard.
@@ -105,7 +169,7 @@ class MembershipPage(PageObject):
     url = None
 
     def is_browser_on_page(self):
-        return self.q(css='a[data-section=membership].active-section').present
+        return self.q(css='[data-section=membership].active-section').present
 
     def select_auto_enroll_section(self):
         """
@@ -121,7 +185,7 @@ class SpecialExamsPage(PageObject):
     url = None
 
     def is_browser_on_page(self):
-        return self.q(css='a[data-section=special_exams].active-section').present
+        return self.q(css='[data-section=special_exams].active-section').present
 
     def select_allowance_section(self):
         """
@@ -315,6 +379,14 @@ class CohortManagementSection(PageObject):
         # There are 2 create buttons on the page. The second one is only present when no cohort yet exists
         # (in which case the first is not visible). Click on the last present create button.
         create_buttons.results[len(create_buttons.results) - 1].click()
+
+        # Both the edit and create forms have an element with id="cohort-name". Verify that the create form
+        # has been rendered.
+        self.wait_for(
+            lambda: "Add a New Cohort" in self.q(css=self._bounded_selector(".form-title")).text,
+            "Create cohort form is visible"
+        )
+
         textinput = self.q(css=self._bounded_selector("#cohort-name")).results[0]
         textinput.send_keys(cohort_name)
 
@@ -676,8 +748,9 @@ class MembershipPageAutoEnrollSection(PageObject):
     """
     url = None
 
-    auto_enroll_browse_button_selector = '.auto_enroll_csv .file-browse input.file_field#browseBtn'
+    auto_enroll_browse_button_selector = '.auto_enroll_csv .file-browse input.file_field#browseBtn-auto-enroll'
     auto_enroll_upload_button_selector = '.auto_enroll_csv button[name="enrollment_signup_button"]'
+    batch_enrollment_selector = '.batch-enrollment'
     NOTIFICATION_ERROR = 'error'
     NOTIFICATION_WARNING = 'warning'
     NOTIFICATION_SUCCESS = 'confirmation'
@@ -750,6 +823,31 @@ class MembershipPageAutoEnrollSection(PageObject):
         self.q(css=self.auto_enroll_browse_button_selector).results[0].send_keys(file_path)
         self.click_upload_file_button()
 
+    def fill_enrollment_batch_text_box(self, email):
+        """
+        Fill in the form with the provided email and submit it.
+        """
+        email_selector = "{} textarea".format(self.batch_enrollment_selector)
+        enrollment_button = "{} .enrollment-button[data-action='enroll']".format(self.batch_enrollment_selector)
+
+        # Fill the email addresses after the email selector is visible.
+        self.wait_for_element_visibility(email_selector, 'Email field is visible')
+        self.q(css=email_selector).fill(email)
+
+        # Verify enrollment button is present before clicking
+        EmptyPromise(
+            lambda: self.q(css=enrollment_button).present, "Enrollment button"
+        ).fulfill()
+        self.q(css=enrollment_button).click()
+
+    def get_notification_text(self):
+        """
+        Check notification div is visible and have message.
+        """
+        notification_selector = '{} .request-response'.format(self.batch_enrollment_selector)
+        self.wait_for_element_visibility(notification_selector, 'Notification div is visible')
+        return self.q(css="{} h3".format(notification_selector)).text
+
 
 class SpecialExamsPageAllowanceSection(PageObject):
     """
@@ -813,6 +911,7 @@ class SpecialExamsPageAllowanceSection(PageObject):
         self.q(css='input#user_info').fill(username)
         self.q(css="input#addNewAllowance").click()
         self.wait_for_element_absence("div.modal div.modal-header", "Popup should be hidden")
+        self.wait_for_ajax()
 
 
 class SpecialExamsPageAttemptsSection(PageObject):
@@ -855,7 +954,7 @@ class DataDownloadPage(PageObject):
     url = None
 
     def is_browser_on_page(self):
-        return self.q(css='a[data-section=data_download].active-section').present
+        return self.q(css='[data-section=data_download].active-section').present
 
     @property
     def generate_student_report_button(self):
@@ -885,6 +984,13 @@ class DataDownloadPage(PageObject):
         """
         return self.q(css="#report-downloads-table .file-download-link>a")
 
+    @property
+    def generate_ora2_response_report_button(self):
+        """
+        Returns the ORA2 response download button for the current page.
+        """
+        return self.q(css='input[name=export-ora2-data]')
+
     def wait_for_available_report(self):
         """
         Waits for a downloadable report to be available.
@@ -911,7 +1017,7 @@ class StudentAdminPage(PageObject):
         """
         Confirms student admin section is present
         """
-        return self.q(css='a[data-section=student_admin].active-section').present
+        return self.q(css='[data-section=student_admin].active-section').present
 
     @property
     def student_email_input(self):
@@ -1071,7 +1177,7 @@ class CertificatesPage(PageObject):
         self.wait_for_page()
 
     def is_browser_on_page(self):
-        return self.q(css='a[data-section=certificates].active-section').present
+        return self.q(css='[data-section=certificates].active-section').present
 
     def get_selector(self, css_selector):
         """

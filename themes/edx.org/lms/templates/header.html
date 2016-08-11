@@ -1,20 +1,29 @@
 ## mako
+<%page expression_filter="h"/>
 <%namespace name='static' file='static_content.html'/>
 <%namespace file='main.html' import="login_query"/>
 <%!
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
 
+from openedx.core.djangolib.markup import HTML, Text
 # App that handles subdomain specific branding
 import branding
 # app that handles site status messages
 from status.status import get_site_status_msg
-
-from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_urls_for_user
 %>
 
 ## Provide a hook for themes to inject branding on top.
 <%block name="navigation_top" />
+
+## Add UI Toolkit components if using the Pattern Library
+% if uses_pattern_library:
+    <%block name="js_extra">
+    <%static:require_module module_name="js/header_factory" class_name="HeaderFactory">
+    HeaderFactory();
+    </%static:require_module>
+    </%block>
+% endif
 
 <%block>
 <%
@@ -35,8 +44,12 @@ site_status_msg = get_site_status_msg(course_id)
 % endif
 </%block>
 
-<header class="${"global slim" if course and not disable_courseware_header else "global-new"}" aria-label="Main" role="banner">
-  <div class="${'rwd ' if responsive else ''}wrapper-header nav-container">
+% if uses_pattern_library:
+<header class="header-global ${"slim" if course and not disable_courseware_header else ""}" aria-label="Main" role="banner">
+% else:
+<header class="${"header-global slim" if course and not disable_courseware_header else "header-global-new"}" aria-label="Main" role="banner">
+% endif
+  <div class="${"rwd" if responsive else ""} wrapper-header nav-container">
     <h1 class="logo" itemscope="" itemtype="http://schema.org/Organization">
       <a href="${marketing_link('ROOT')}" itemprop="url">
         <%block name="navigation_logo">
@@ -47,99 +60,96 @@ site_status_msg = get_site_status_msg(course_id)
 
     % if course and not disable_courseware_header:
     <h2 class="course-header">
-      <span class="provider">${course.display_org_with_default | h}:</span>
-      <span class="course-number">${course.display_number_with_default | h}</span>
-      <span class="course-name">${course.display_name_with_default_escaped}</span>
+      <span class="provider">${course.display_org_with_default}:</span>
+      <span class="course-number">${course.display_number_with_default}</span>
+      <span class="course-name">${course.display_name_with_default}</span>
     </h2>
     % endif
 
+
     % if user.is_authenticated():
       % if not course or disable_courseware_header:
-        % if not nav_hidden:
-    <nav aria-label="Main" class="nav-main">
-      <ul class="left nav-global authenticated">
-        <%block name="navigation_global_links_authenticated">
-          <li class="nav-global-01">
-            <a href="${marketing_link('HOW_IT_WORKS')}">${_("How it Works")}</a>
-          </li>
-          <li class="nav-global-02">
-            <a href="${marketing_link('COURSES')}">${_("Find Courses")}</a>
-          </li>
-          <li class="nav-global-03">
-            <a href="${marketing_link('SCHOOLS')}">${_("Schools & Partners")}</a>
-          </li>
-        </%block>
-      </ul>
-    </nav>
+        % if not nav_hidden or show_program_listing:
+          <nav aria-label="Main" class="nav-main">
+            <ul class="left list-inline nav-global authenticated">
+              % if not nav_hidden:
+                <%block name="navigation_global_links_authenticated">
+                  <li class="item nav-global-01">
+                    <a href="${marketing_link('HOW_IT_WORKS')}">${_("How it Works")}</a>
+                  </li>
+                  <li class="item nav-global-02">
+                    <a href="${marketing_link('COURSES')}">${_("Find Courses")}</a>
+                  </li>
+                  <li class="item nav-global-03">
+                    <a href="${marketing_link('SCHOOLS')}">${_("Schools & Partners")}</a>
+                  </li>
+                </%block>
+              % endif
+              % if show_program_listing:
+                <li class="tab-nav-item">
+                  <a class="${'active ' if reverse('dashboard') == request.path else ''}tab-nav-link" href="${reverse('dashboard')}">
+                    ${_("Courses")}
+                  </a>
+                </li>
+                <li class="tab-nav-item">
+                  <a class="${'active ' if reverse('program_listing_view') in request.path else ''}tab-nav-link" href="${reverse('program_listing_view')}">
+                    ${_("Programs")}
+                  </a>
+                </li>
+              % endif
+            </ul>
+          </nav>
         % endif
       % endif
 
-    <ul class="user">
-      <li class="primary">
-        <a href="${reverse('dashboard')}" class="user-link">
-          <span class="sr">${_("Dashboard for:")}</span>
-          <%
-          username = user.username
-          profile_image_url = get_profile_image_urls_for_user(user)['medium']
-          %>
-          <img class="user-image-frame" src="${profile_image_url}" alt="${_('Profile image for {username}').format(username=username)}">
-          <div class="label-username">${username}</div>
-        </a>
-      </li>
-      <li class="primary">
-        <a href="#" class="dropdown" aria-haspopup="true" aria-expanded="false"><span class="sr">${_("More options dropdown")}</span> &#9662;</a>
-        <ul class="dropdown-menu" aria-label="More Options" role="menu">
-          <%block name="navigation_dropdown_menu_links" >
-            <li><a href="${reverse('dashboard')}">${_("Dashboard")}</a></li>
-            <li><a href="${reverse('learner_profile', kwargs={'username': user.username})}">${_("Profile")}</a></li>
-            <li><a href="${reverse('account_settings')}">${_("Account")}</a></li>
-          </%block>
-          <li><a href="${reverse('logout')}" role="menuitem">${_("Sign Out")}</a></li>
-        </ul>
-      </li>
-    </ul>
+      <%include file="user_dropdown.html"/>
 
       % if should_display_shopping_cart_func(): # see shoppingcart.context_processor.user_has_cart_context_processor
-    <ul class="user">
-      <li class="primary">
-        <a class="shopping-cart" href="${reverse('shoppingcart.views.show_cart')}">
-          <i class="icon fa fa-shopping-cart" aria-hidden="true"></i> ${_("Shopping Cart")}
-        </a>
-      </li>
-    </ul>
+        <ul class="user">
+          <li class="primary">
+            <a class="shopping-cart" href="${reverse('shoppingcart.views.show_cart')}">
+              <span class="icon fa fa-shopping-cart" aria-hidden="true"></span> ${_("Shopping Cart")}
+            </a>
+          </li>
+        </ul>
       % endif
 
     % else:
-    <nav aria-label="Account" class="nav-account-management">
-      <div class="right nav-courseware">
-        <div class="nav-courseware-01">
-          % if not settings.FEATURES['DISABLE_LOGIN_BUTTON']:
+      <nav aria-label="Account" class="nav-account-management">
+        <div class="right nav-courseware list-inline">
+          <div class="item nav-courseware-01">
+            % if not settings.FEATURES['DISABLE_LOGIN_BUTTON']:
               % if course and settings.FEATURES.get('RESTRICT_ENROLL_BY_REG_METHOD') and course.enrollment_domain:
-              <a class="cta cta-login" href="${reverse('course-specific-login', args=[course.id.to_deprecated_string()])}${login_query()}">${_("Sign in")}</a>
+                <a class="btn btn-login" href="${reverse('course-specific-login', args=[course.id.to_deprecated_string()])}${login_query()}">${_("Sign in")}</a>
               % else:
-              <a class="cta cta-login" href="/login${login_query()}">${_("Sign in")}</a>
+                <a class="btn btn-login" href="/login${login_query()}">${_("Sign in")}</a>
               % endif
+            % endif
+          </div>
+          % if not settings.FEATURES['DISABLE_LOGIN_BUTTON']:
+            % if course and settings.FEATURES.get('RESTRICT_ENROLL_BY_REG_METHOD') and course.enrollment_domain:
+              <div class="item nav-courseware-02">
+                <a class="btn-neutral btn-register" href="${reverse('course-specific-register', args=[course.id.to_deprecated_string()])}">${_("Register")}</a>
+              </div>
+            % else:
+              <div class="item nav-courseware-02">
+                <a class="btn-neutral btn-register" href="/register">${_("Register")}</a>
+              </div>
+            % endif
           % endif
         </div>
-        % if not settings.FEATURES['DISABLE_LOGIN_BUTTON']:
-          % if course and settings.FEATURES.get('RESTRICT_ENROLL_BY_REG_METHOD') and course.enrollment_domain:
-          <div class="nav-courseware-02">
-            <a class="cta cta-register nav-courseware-button" href="${reverse('course-specific-register', args=[course.id.to_deprecated_string()])}">${_("Register")}</a>
-          </div>
-          % else:
-          <div class="nav-courseware-02">
-            <a class="cta cta-register nav-courseware-button" href="/register">${_("Register")}</a>
-          </div>
-          % endif
-        % endif
-      </div>
-    </nav>
+      </nav>
     % endif
   </div>
 </header>
 % if course:
 <!--[if lte IE 9]>
-<div class="ie-banner" aria-hidden="true">${_('<strong>Warning:</strong> Your browser is not fully supported. We strongly recommend using {chrome_link} or {ff_link}.').format(chrome_link='<a href="https://www.google.com/chrome" target="_blank">Chrome</a>', ff_link='<a href="http://www.mozilla.org/firefox" target="_blank">Firefox</a>')}</div>
+<div class="ie-banner" aria-hidden="true">${Text(_('{begin_strong}Warning:{end_strong} Your browser is not fully supported. We strongly recommend using {chrome_link} or {ff_link}.')).format(
+    begin_strong=HTML('<strong>'),
+    end_strong=HTML('</strong>'),
+    chrome_link=HTML('<a href="https://www.google.com/chrome" target="_blank">Chrome</a>'),
+    ff_link=HTML('<a href="http://www.mozilla.org/firefox" target="_blank">Firefox</a>'),
+)}</div>
 <![endif]-->
 % endif
 

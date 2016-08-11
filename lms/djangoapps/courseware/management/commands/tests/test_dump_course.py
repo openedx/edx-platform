@@ -16,27 +16,19 @@ from django.core.management import call_command
 
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, mixed_store_config
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.django_utils import (
     TEST_DATA_MONGO_MODULESTORE, TEST_DATA_SPLIT_MODULESTORE
 )
-from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.xml_importer import import_course_from_xml
 
 DATA_DIR = settings.COMMON_TEST_DATA_ROOT
-XML_COURSE_DIRS = ['toy', 'simple']
-MAPPINGS = {
-    'edX/toy/2012_Fall': 'xml',
-    'edX/simple/2012_Fall': 'xml',
-}
-
-TEST_DATA_MIXED_XML_MODULESTORE = mixed_store_config(
-    DATA_DIR, MAPPINGS, include_xml=True, xml_source_dirs=XML_COURSE_DIRS,
-)
+XML_COURSE_DIRS = ['simple']
 
 
-@attr('shard_1')
-class CommandsTestBase(ModuleStoreTestCase):
+@attr(shard=1)
+class CommandsTestBase(SharedModuleStoreTestCase):
     """
     Base class for testing different django commands.
 
@@ -47,27 +39,34 @@ class CommandsTestBase(ModuleStoreTestCase):
     __test__ = False
     url_name = '2012_Fall'
 
-    def setUp(self):
-        super(CommandsTestBase, self).setUp()
-        self.test_course_key = modulestore().make_course_key("edX", "simple", "2012_Fall")
-        self.loaded_courses = self.load_courses()
+    @classmethod
+    def setUpClass(cls):
+        super(CommandsTestBase, cls).setUpClass()
+        cls.test_course_key = modulestore().make_course_key("edX", "simple", "2012_Fall")
+        cls.loaded_courses = cls.load_courses()
 
-    def load_courses(self):
+    @classmethod
+    def load_courses(cls):
         """Load test courses and return list of ids"""
         store = modulestore()
 
-        # Add a course with a unicode name.
-        unique_org = factory.Sequence(lambda n: u'ëḋẌ.%d' % n)
-        CourseFactory.create(
+        unique_org = factory.Sequence(lambda n: 'edX.%d' % n)
+        cls.course = CourseFactory.create(
+            emit_signals=True,
             org=unique_org,
-            course=u'śíḿṕĺé',
+            course='simple',
+            run="run",
             display_name=u'2012_Fáĺĺ',
             modulestore=store
         )
 
+        cls.discussion = ItemFactory.create(
+            category='discussion', parent_location=cls.course.location
+        )
+
         courses = store.get_courses()
         # NOTE: if xml store owns these, it won't import them into mongo
-        if self.test_course_key not in [c.id for c in courses]:
+        if cls.test_course_key not in [c.id for c in courses]:
             import_course_from_xml(
                 store, ModuleStoreEnum.UserID.mgmt_command, DATA_DIR, XML_COURSE_DIRS, create_if_not_present=True
             )
@@ -82,16 +81,14 @@ class CommandsTestBase(ModuleStoreTestCase):
         return out.read()
 
     def test_dump_course_ids(self):
-        kwargs = {'modulestore': 'default'}
-        output = self.call_command('dump_course_ids', **kwargs)
+        output = self.call_command('dump_course_ids')
         dumped_courses = output.decode('utf-8').strip().split('\n')
-
         course_ids = {unicode(course_id) for course_id in self.loaded_courses}
         dumped_ids = set(dumped_courses)
         self.assertEqual(course_ids, dumped_ids)
 
     def test_correct_course_structure_metadata(self):
-        course_id = unicode(modulestore().make_course_key('edX', 'simple', '2012_Fall'))
+        course_id = unicode(self.test_course_key)
         args = [course_id]
         kwargs = {'modulestore': 'default'}
 
@@ -138,7 +135,7 @@ class CommandsTestBase(ModuleStoreTestCase):
 
         # Check if there are the right number of elements
 
-        self.assertEqual(len(dump), 16)
+        self.assertEqual(len(dump), 17)
 
     def test_dump_inherited_course_structure(self):
         args = [unicode(self.test_course_key)]
@@ -169,6 +166,19 @@ class CommandsTestBase(ModuleStoreTestCase):
             self.assertIn('inherited_metadata', element)
             # ... and contains inherited metadata containing a default value:
             self.assertIsNone(element['inherited_metadata']['due'])
+
+    def test_export_discussion_ids(self):
+        output = self.call_command('dump_course_structure', unicode(self.course.id))
+        dump = json.loads(output)
+        dumped_id = dump[unicode(self.discussion.location)]['metadata']['discussion_id']
+        self.assertEqual(dumped_id, self.discussion.discussion_id)
+
+    def test_export_discussion_id_custom_id(self):
+        output = self.call_command('dump_course_structure', unicode(self.test_course_key))
+        dump = json.loads(output)
+        discussion_key = unicode(self.test_course_key.make_usage_key('discussion', 'custom_id'))
+        dumped_id = dump[unicode(discussion_key)]['metadata']['discussion_id']
+        self.assertEqual(dumped_id, "custom")
 
     def test_export_course(self):
         tmp_dir = path(mkdtemp())
@@ -203,15 +213,6 @@ class CommandsTestBase(ModuleStoreTestCase):
         assert_in('edX-simple-2012_Fall/html/toylab.html', names)
         assert_in('edX-simple-2012_Fall/videosequence/A_simple_sequence.xml', names)
         assert_in('edX-simple-2012_Fall/sequential/Lecture_2.xml', names)
-
-
-class CommandsXMLTestCase(CommandsTestBase):
-    """
-    Test case for management commands with the xml modulestore present.
-
-    """
-    MODULESTORE = TEST_DATA_MIXED_XML_MODULESTORE
-    __test__ = True
 
 
 class CommandsMongoTestCase(CommandsTestBase):

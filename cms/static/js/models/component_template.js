@@ -1,18 +1,19 @@
 /**
  * Simple model for adding a component of a given type (for example, "video" or "html").
  */
-define(["backbone"], function (Backbone) {
+define(['backbone'], function(Backbone) {
     return Backbone.Model.extend({
         defaults: {
-            type: "",
+            type: '',
             // Each entry in the template array is an Object with the following keys:
             // display_name
             // category (may or may not match "type")
             // boilerplate_name (may be null)
             // is_common (only used for problems)
-            templates: []
+            templates: [],
+            support_legend: {}
         },
-        parse: function (response) {
+        parse: function(response) {
             // Returns true only for templates that both have no boilerplate and are of
             // the overall type of the menu. This allows other component types to be added
             // and they will get sorted alphabetically rather than just at the top.
@@ -24,9 +25,10 @@ define(["backbone"], function (Backbone) {
             this.type = response.type;
             this.templates = response.templates;
             this.display_name = response.display_name;
+            this.support_legend = response.support_legend;
 
             // Sort the templates.
-            this.templates.sort(function (a, b) {
+            this.templates.sort(function(a, b) {
                 // The blank problem for the current type goes first
                 if (isPrimaryBlankTemplate(a)) {
                     return -1;

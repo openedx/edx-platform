@@ -1,4 +1,4 @@
-;(function (define) {
+(function(define) {
     'use strict';
 
     define([
@@ -8,7 +8,7 @@
         'support/js/collections/certificate',
         'text!support/templates/certificates.underscore',
         'text!support/templates/certificates_results.underscore'
-    ], function (Backbone, _, gettext, CertCollection, certificatesTpl, resultsTpl) {
+    ], function(Backbone, _, gettext, CertCollection, certificatesTpl, resultsTpl) {
         return Backbone.View.extend({
             events: {
                 'submit .certificates-form': 'search',
@@ -44,7 +44,7 @@
                     certificates: this.certificates
                 };
 
-                this.setResults(_.template(resultsTpl, context));
+                this.setResults(_.template(resultsTpl)(context));
             },
 
             renderError: function(error) {
@@ -53,11 +53,10 @@
             },
 
             search: function(event) {
-
                 // Fetch the certificate collection for the given user
                 var url = '/support/certificates?user=' + this.getUserFilter();
 
-                //course id is optional.
+                // course id is optional.
                 if (this.getCourseFilter()) {
                     url += '&course_id=' + this.getCourseFilter();
                 }
@@ -171,13 +170,13 @@
             },
 
             setResults: function(html) {
-                $(".certificates-results", this.$el).html(html);
+                $('.certificates-results', this.$el).html(html);
             },
 
             disableButtons: function() {
                 $('.btn-disable-on-submit')
-                    .addClass("is-disabled")
-                    .attr("disabled", true);
+                    .addClass('is-disabled')
+                    .attr('disabled', true);
             },
 
             enableButtons: function() {

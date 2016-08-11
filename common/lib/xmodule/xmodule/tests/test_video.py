@@ -234,6 +234,18 @@ class TestCreateYoutubeString(VideoDescriptorTestBase):
         self.assertEqual(create_youtube_string(self.descriptor), expected)
 
 
+class TestCreateYouTubeUrl(VideoDescriptorTestBase):
+    """
+    Tests for helper method `create_youtube_url`.
+    """
+    def test_create_youtube_url_unicode(self):
+        """
+        Test that passing unicode to `create_youtube_url` doesn't throw
+        an error.
+        """
+        self.descriptor.create_youtube_url(u"üñîçø∂é")
+
+
 @ddt.ddt
 class VideoDescriptorImportTestCase(unittest.TestCase):
     """
@@ -740,6 +752,32 @@ class VideoExportTestCase(VideoDescriptorTestBase):
         # Check that download_video field is also set to default (False) in xml for backward compatibility
         expected = '<video url_name="SampleProblem" download_video="false"/>\n'
         self.assertEquals(expected, etree.tostring(xml, pretty_print=True))
+
+    def test_export_to_xml_with_transcripts_as_none(self):
+        """
+        Test XML export with transcripts being overridden to None.
+        """
+        self.descriptor.transcripts = None
+        xml = self.descriptor.definition_to_xml(None)
+        expected = '<video url_name="SampleProblem" download_video="false"/>\n'
+        self.assertEquals(expected, etree.tostring(xml, pretty_print=True))
+
+    def test_export_to_xml_invalid_characters_in_attributes(self):
+        """
+        Test XML export will *not* raise TypeError by lxml library if contains illegal characters.
+        The illegal characters in a String field are removed from the string instead.
+        """
+        self.descriptor.display_name = 'Display\x1eName'
+        xml = self.descriptor.definition_to_xml(None)
+        self.assertEqual(xml.get('display_name'), 'DisplayName')
+
+    def test_export_to_xml_unicode_characters(self):
+        """
+        Test XML export handles the unicode characters.
+        """
+        self.descriptor.display_name = '这是文'
+        xml = self.descriptor.definition_to_xml(None)
+        self.assertEqual(xml.get('display_name'), u'\u8fd9\u662f\u6587')
 
 
 class VideoDescriptorIndexingTestCase(unittest.TestCase):

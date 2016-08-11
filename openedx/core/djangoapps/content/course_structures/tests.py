@@ -2,6 +2,7 @@
 Course Structure Content sub-application test cases
 """
 import json
+from nose.plugins.attrib import attr
 
 from xmodule_django.models import UsageKey
 from xmodule.modulestore.django import SignalHandler
@@ -22,6 +23,7 @@ class SignalDisconnectTestMixin(object):
         SignalHandler.course_published.disconnect(listen_for_course_publish)
 
 
+@attr(shard=2)
 class CourseStructureTaskTests(ModuleStoreTestCase):
     """
     Test cases covering Course Structure task-related workflows
@@ -30,12 +32,12 @@ class CourseStructureTaskTests(ModuleStoreTestCase):
         super(CourseStructureTaskTests, self).setUp()
         self.course = CourseFactory.create(org='TestX', course='TS101', run='T1')
         self.section = ItemFactory.create(parent=self.course, category='chapter', display_name='Test Section')
-        self.discussion_module_1 = ItemFactory.create(
+        self.discussion_xblock_1 = ItemFactory.create(
             parent=self.course,
             category='discussion',
             discussion_id='test_discussion_id_1'
         )
-        self.discussion_module_2 = ItemFactory.create(
+        self.discussion_xblock_2 = ItemFactory.create(
             parent=self.course,
             category='discussion',
             discussion_id='test_discussion_id_2'

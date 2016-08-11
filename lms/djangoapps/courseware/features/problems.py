@@ -92,10 +92,19 @@ def check_problem(step):
     # first scroll down so the loading mathjax button does not
     # cover up the Check button
     world.browser.execute_script("window.scrollTo(0,1024)")
+    assert world.is_css_not_present("button.check.is-disabled")
     world.css_click("button.check")
 
     # Wait for the problem to finish re-rendering
     world.wait_for_ajax_complete()
+
+
+@step(u"I can't check a problem")
+def assert_cant_check_problem(step):   # pylint: disable=unused-argument
+    # first scroll down so the loading mathjax button does not
+    # cover up the Check button
+    world.browser.execute_script("window.scrollTo(0,1024)")
+    assert world.is_css_present("button.check.is-disabled")
 
 
 @step(u'The "([^"]*)" problem displays a "([^"]*)" answer')

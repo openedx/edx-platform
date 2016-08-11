@@ -1,0 +1,89 @@
+// ------------------------------
+// Studio: Shared Build Compile
+// Version 1 styling (pre-Pattern Library)
+
+// About: Sass compile for Studio that are shared between LTR and RTL UI. Configuration and vendor specific imports happen before this shared set of imports are compiled in the studio-main-*.scss files.
+
+// +Vendor and Rebase - *referenced/used vendor presentation and reset*
+// ====================
+@import 'reset';
+
+// +Base - Utilities
+// ====================
+@import 'partials/variables';
+@import 'mixins';
+@import 'mixins-inherited';
+
+// +Base - Assets
+// ====================
+@import 'assets/fonts';
+@import 'assets/graphics'; // sprites, basic image/figure/svg styling
+@import 'assets/anims'; // animations
+
+// +Base - Starter
+// ====================
+@import 'base';
+
+// +Base - Elements
+// ====================
+@import 'elements/typography';
+@import 'elements/icons'; // references to icons used
+@import 'elements/controls'; // buttons, link styles, sliders, etc.
+@import 'elements/pagination'; // pagination
+@import 'elements/xblocks'; //  studio rendering chrome for xblocks
+@import 'elements/modules'; //  content module patterns
+@import 'elements/navigation'; // all archetypes of navigation
+@import 'elements/layout'; // various standard layouts
+@import 'elements/forms';
+@import 'elements/header';
+@import 'elements/footer';
+@import 'elements/sock';
+@import 'elements/system-feedback'; // alerts, notifications, states
+@import 'elements/system-help'; // help UI
+@import 'elements/modal'; // interstitial UI, dialogs, modal windows
+@import 'elements/vendor'; // overrides to vendor-provided styling
+@import 'elements/modal-window';
+@import 'elements/uploaded-assets'; // layout for asset tables
+@import 'elements/creative-commons';
+@import 'elements/tooltip';
+
+// +Base - Specific Views
+// ====================
+@import 'views/account';
+@import 'views/assets';
+@import 'views/updates';
+@import 'views/dashboard';
+@import 'views/export';
+@import 'views/index';
+@import 'views/course-create';
+@import 'views/import';
+@import 'views/outline';
+@import 'views/settings';
+@import 'views/static-pages';
+@import 'views/unit';
+@import 'views/container';
+@import 'views/users';
+@import 'views/textbooks';
+@import 'views/export-git';
+@import 'views/group-configuration';
+@import 'views/video-upload';
+@import 'views/certificates';
+@import 'views/maintenance';
+
+// +Base - Contexts
+// ====================
+@import 'contexts/ie'; // ie-specific rules (mostly for known/older bugs)
+
+// +Xmodule
+// ====================
+@import 'xmodule/modules/css/module-styles.scss';
+@import 'xmodule/descriptors/css/module-styles.scss';
+@import 'xmodule/headings';
+@import 'elements/xmodules'; // styling for Studio-specific contexts
+
+@import 'developer'; // used for any developer-created scss that needs further polish/refactoring
+@import 'shame';     // used for any bad-form/orphaned scss
+
+// +CodeMirror Overrides
+// ====================
+@import 'elements/codemirror-overrides';

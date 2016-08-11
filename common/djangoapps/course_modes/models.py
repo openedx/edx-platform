@@ -22,6 +22,7 @@ Mode = namedtuple('Mode',
                       'expiration_datetime',
                       'description',
                       'sku',
+                      'bulk_sku',
                   ])
 
 
@@ -96,6 +97,18 @@ class CourseMode(models.Model):
         )
     )
 
+    # Optional bulk order SKU for integration with the ecommerce service
+    bulk_sku = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True,
+        default=None,  # Need this in order to set DEFAULT NULL on the database column
+        verbose_name="Bulk SKU",
+        help_text=_(
+            u"This is the bulk SKU (stock keeping unit) of this mode in the external ecommerce service."
+        )
+    )
+
     HONOR = 'honor'
     PROFESSIONAL = 'professional'
     VERIFIED = "verified"
@@ -103,7 +116,7 @@ class CourseMode(models.Model):
     NO_ID_PROFESSIONAL_MODE = "no-id-professional"
     CREDIT_MODE = "credit"
 
-    DEFAULT_MODE = Mode(AUDIT, _('Audit'), 0, '', 'usd', None, None, None)
+    DEFAULT_MODE = Mode(AUDIT, _('Audit'), 0, '', 'usd', None, None, None, None)
     DEFAULT_MODE_SLUG = AUDIT
 
     # Modes that allow a student to pursue a verified certificate
@@ -123,7 +136,7 @@ class CourseMode(models.Model):
     # "honor" to "audit", we still need to have the shoppingcart
     # use "honor"
     DEFAULT_SHOPPINGCART_MODE_SLUG = HONOR
-    DEFAULT_SHOPPINGCART_MODE = Mode(HONOR, _('Honor'), 0, '', 'usd', None, None, None)
+    DEFAULT_SHOPPINGCART_MODE = Mode(HONOR, _('Honor'), 0, '', 'usd', None, None, None, None)
 
     class Meta(object):
         unique_together = ('course_id', 'mode_slug', 'currency')
@@ -137,6 +150,8 @@ class CourseMode(models.Model):
             raise ValidationError(
                 _(u"Professional education modes are not allowed to have expiration_datetime set.")
             )
+        if self.is_verified_slug(self.mode_slug) and self.min_price <= 0:
+            raise ValidationError(_(u"Verified modes cannot be free."))
 
     def save(self, force_insert=False, force_update=False, using=None):
         # Ensure currency is always lowercase.
@@ -398,7 +413,7 @@ class CourseMode(models.Model):
 
     @classmethod
     def has_verified_mode(cls, course_mode_dict):
-        """Check whether the modes for a course allow a student to pursue a verfied certificate.
+        """Check whether the modes for a course allow a student to pursue a verified certificate.
 
         Args:
             course_mode_dict (dictionary mapping course mode slugs to Modes)
@@ -623,7 +638,8 @@ class CourseMode(models.Model):
             self.currency,
             self.expiration_datetime,
             self.description,
-            self.sku
+            self.sku,
+            self.bulk_sku
         )
 
     def __unicode__(self):

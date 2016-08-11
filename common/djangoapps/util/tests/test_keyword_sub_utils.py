@@ -17,8 +17,10 @@ from util import keyword_substitution as Ks
 class KeywordSubTest(ModuleStoreTestCase):
     """ Tests for the keyword substitution feature """
 
+    CREATE_USER = False
+
     def setUp(self):
-        super(KeywordSubTest, self).setUp(create_user=False)
+        super(KeywordSubTest, self).setUp()
         self.user = UserFactory.create(
             email="testuser@edx.org",
             username="testuser",

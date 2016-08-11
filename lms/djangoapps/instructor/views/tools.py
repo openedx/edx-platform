@@ -4,7 +4,6 @@ Tools for the instructor dashboard
 import dateutil
 import json
 
-from django.conf import settings
 from django.contrib.auth.models import User
 from django.http import HttpResponseBadRequest
 from django.utils.timezone import utc
@@ -18,11 +17,7 @@ from courseware.student_field_overrides import (
     override_field_for_user,
 )
 from xmodule.fields import Date
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.django import modulestore
 from opaque_keys.edx.keys import UsageKey
-
-from bulk_email.models import CourseAuthorization
 
 DATE_FIELD = Date()
 
@@ -55,24 +50,6 @@ def handle_dashboard_error(view):
             return error.response()
 
     return wrapper
-
-
-def bulk_email_is_enabled_for_course(course_id):
-    """
-    Staff can only send bulk email for a course if all the following conditions are true:
-    1. Bulk email feature flag is on.
-    2. It is a studio course.
-    3. Bulk email is enabled for the course.
-    """
-
-    bulk_email_enabled_globally = (settings.FEATURES['ENABLE_INSTRUCTOR_EMAIL'] is True)
-    is_studio_course = (modulestore().get_modulestore_type(course_id) != ModuleStoreEnum.Type.xml)
-    bulk_email_enabled_for_course = CourseAuthorization.instructor_email_enabled(course_id)
-
-    if bulk_email_enabled_globally and is_studio_course and bulk_email_enabled_for_course:
-        return True
-
-    return False
 
 
 def strip_if_string(value):

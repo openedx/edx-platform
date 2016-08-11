@@ -1,28 +1,26 @@
 define([
     'jquery', 'underscore', 'common/js/spec_helpers/template_helpers', 'js/spec/edxnotes/helpers',
     'js/edxnotes/collections/notes', 'js/edxnotes/collections/tabs',
-    'js/edxnotes/views/tabs/tags', 'js/spec/edxnotes/custom_matchers',
-    'jasmine-jquery'
+    'js/edxnotes/views/tabs/tags'
 ], function(
-    $, _, TemplateHelpers, Helpers, NotesCollection, TabsCollection, TagsView,
-    customMatchers
+    $, _, TemplateHelpers, Helpers, NotesCollection, TabsCollection, TagsView
 ) {
     'use strict';
     describe('EdxNotes TagsView', function() {
         var notes = Helpers.getDefaultNotes(),
             getView, getText, getNoteText;
 
-        getText = function (selector) {
-            return $(selector).map(function () { return _.trim($(this).text()); }).toArray();
+        getText = function(selector) {
+            return $(selector).map(function() { return _.trim($(this).text()); }).toArray();
         };
 
-        getNoteText = function (groupIndex) {
-            return $($('.note-group')[groupIndex]).find('.note-excerpt-p').map(function () {
+        getNoteText = function(groupIndex) {
+            return $($('.note-group')[groupIndex]).find('.note-excerpt-p').map(function() {
                 return _.trim($(this).text());
             }).toArray();
         };
 
-        getView = function (collection, tabsCollection, options) {
+        getView = function(collection, tabsCollection, options) {
             var view;
 
             options = _.defaults(options || {}, {
@@ -37,18 +35,17 @@ define([
             return view;
         };
 
-        beforeEach(function () {
-            customMatchers(this);
+        beforeEach(function() {
             loadFixtures('js/fixtures/edxnotes/edxnotes.html');
             TemplateHelpers.installTemplates([
                 'templates/edxnotes/note-item', 'templates/edxnotes/tab-item'
             ]);
 
-            this.collection = new NotesCollection(notes);
+            this.collection = new NotesCollection(notes, {perPage: 10, parse: true});
             this.tabsCollection = new TabsCollection();
         });
 
-        it('displays a tab and content properly ordered by tag', function () {
+        it('displays a tab and content properly ordered by tag', function() {
             var view = getView(this.collection, this.tabsCollection),
                 tags = getText('.tags-title'),
                 pumpkinNotes = getNoteText(0),

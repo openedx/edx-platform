@@ -71,7 +71,7 @@ class ResponseTest(unittest.TestCase):
 
     def assert_answer_format(self, problem):  # pylint: disable=missing-docstring
         answers = problem.get_question_answers()
-        self.assertTrue(answers['1_2_1'] is not None)
+        self.assertIsNotNone(answers['1_2_1'])
 
     def assert_multiple_grade(self, problem, correct_answers, incorrect_answers):  # pylint: disable=missing-docstring
         for input_str in correct_answers:
@@ -658,7 +658,7 @@ class StringResponseTest(ResponseTest):  # pylint: disable=missing-docstring
             "Martin Luther King"
         ]
 
-        problem = self.build_problem(answer="\w*\.?.*Luther King\s*.*", case_sensitive=True, regexp=True)
+        problem = self.build_problem(answer=r"\w*\.?.*Luther King\s*.*", case_sensitive=True, regexp=True)
 
         for answer in answers:
             self.assert_grade(problem, answer, "correct")
@@ -699,7 +699,7 @@ class StringResponseTest(ResponseTest):  # pylint: disable=missing-docstring
         self.assert_grade(problem, u"o", "incorrect")
 
     def test_backslash_and_unicode_regexps(self):
-        """
+        r"""
         Test some special cases of [unicode] regexps.
 
         One needs to use either r'' strings or write real `repr` of unicode strings, because of the following
@@ -715,14 +715,14 @@ class StringResponseTest(ResponseTest):  # pylint: disable=missing-docstring
             So  a\d in front-end editor will become a\\\\d in xml,  so it will match a1 as student answer.
         """
         problem = self.build_problem(answer=ur"5\\æ", case_sensitive=False, regexp=True)
-        self.assert_grade(problem, u"5\æ", "correct")
+        self.assert_grade(problem, ur"5\æ", "correct")
 
         problem = self.build_problem(answer=u"5\\\\æ", case_sensitive=False, regexp=True)
-        self.assert_grade(problem, u"5\æ", "correct")
+        self.assert_grade(problem, ur"5\æ", "correct")
 
     def test_backslash(self):
         problem = self.build_problem(answer=u"a\\\\c1", case_sensitive=False, regexp=True)
-        self.assert_grade(problem, u"a\c1", "correct")
+        self.assert_grade(problem, ur"a\c1", "correct")
 
     def test_special_chars(self):
         problem = self.build_problem(answer=ur"a \s1", case_sensitive=False, regexp=True)
@@ -945,6 +945,13 @@ class StringResponseTest(ResponseTest):  # pylint: disable=missing-docstring
         correct_map = problem.grade_answers({'1_2_1': '2'})
         hint = correct_map.get_hint('1_2_1')
         self.assertEqual(hint, self._get_random_number_result(problem.seed))
+
+    def test_empty_answer_problem_creation_not_allowed(self):
+        """
+        Tests that empty answer string is not allowed to create a problem
+        """
+        with self.assertRaises(LoncapaProblemError):
+            self.build_problem(answer=" ", case_sensitive=False, regexp=True)
 
 
 class CodeResponseTest(ResponseTest):  # pylint: disable=missing-docstring

@@ -40,7 +40,7 @@ class TabNavPage(PageObject):
         """
         Check that MathJax has rendered in tab content
         """
-        mathjax_container = self.q(css=".static_tab_wrapper .MathJax .math")
+        mathjax_container = self.q(css=".static_tab_wrapper .MathJax_SVG")
         EmptyPromise(
             lambda: mathjax_container.present and mathjax_container.visible,
             "MathJax is not visible"

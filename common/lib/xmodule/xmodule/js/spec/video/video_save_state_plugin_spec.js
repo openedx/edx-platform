@@ -1,20 +1,21 @@
-(function (undefined) {
+(function(undefined) {
     'use strict';
-    describe('VideoPlayer Save State plugin', function () {
+    describe('VideoPlayer Save State plugin', function() {
         var state, oldOTBD;
 
-        beforeEach(function () {
+        beforeEach(function() {
             oldOTBD = window.onTouchBasedDevice;
             window.onTouchBasedDevice = jasmine
                 .createSpy('onTouchBasedDevice')
-                .andReturn(null);
+                .and.returnValue(null);
 
-            jasmine.stubRequests();
-            state = jasmine.initializePlayer();
+            state = jasmine.initializePlayer({
+                recordedYoutubeIsAvailable: true
+            });
             spyOn(state.storage, 'setItem');
         });
 
-        afterEach(function () {
+        afterEach(function() {
             $('source').remove();
             window.onTouchBasedDevice = oldOTBD;
             state.storage.clear();
@@ -23,7 +24,7 @@
             }
         });
 
-        describe('saveState function', function () {
+        describe('saveState function', function() {
             var videoPlayerCurrentTime, newCurrentTime, speed;
 
             // We make sure that `currentTime` is a float. We need to test
@@ -39,12 +40,12 @@
             newCurrentTime = 5.4;
             speed = '0.75';
 
-            beforeEach(function () {
+            beforeEach(function() {
                 state.videoPlayer.currentTime = videoPlayerCurrentTime;
-                spyOn(Time, 'formatFull').andCallThrough();
+                spyOn(window.Time, 'formatFull').and.callThrough();
             });
 
-            it('data is not an object, async is true', function () {
+            it('data is not an object, async is true', function() {
                 itSpec({
                     asyncVal: true,
                     speedVal: undefined,
@@ -56,7 +57,7 @@
                 });
             });
 
-            it('data contains speed, async is false', function () {
+            it('data contains speed, async is false', function() {
                 itSpec({
                     asyncVal: false,
                     speedVal: speed,
@@ -70,7 +71,7 @@
                 });
             });
 
-            it('data contains float position, async is true', function () {
+            it('data contains float position, async is true', function() {
                 itSpec({
                     asyncVal: true,
                     speedVal: undefined,
@@ -84,7 +85,7 @@
                 });
             });
 
-            it('data contains speed and rounded position, async is false', function () {
+            it('data contains speed and rounded position, async is false', function() {
                 itSpec({
                     asyncVal: false,
                     speedVal: speed,
@@ -100,7 +101,7 @@
                 });
             });
 
-            it('data contains empty object, async is true', function () {
+            it('data contains empty object, async is true', function() {
                 itSpec({
                     asyncVal: true,
                     speedVal: undefined,
@@ -110,7 +111,7 @@
                 });
             });
 
-            it('data contains position 0, async is true', function () {
+            it('data contains position 0, async is true', function() {
                 itSpec({
                     asyncVal: true,
                     speedVal: undefined,
@@ -125,11 +126,11 @@
             });
 
             function itSpec(value) {
-                var asyncVal    = value.asyncVal,
-                    speedVal    = value.speedVal,
+                var asyncVal = value.asyncVal,
+                    speedVal = value.speedVal,
                     positionVal = value.positionVal,
-                    data        = value.data,
-                    ajaxData    = value.ajaxData;
+                    data = value.data,
+                    ajaxData = value.ajaxData;
 
                 state.videoSaveStatePlugin.saveState(asyncVal, data);
 
@@ -160,7 +161,7 @@
             }
         });
 
-        it('can save state on speed change', function () {
+        it('can save state on speed change', function() {
             state.el.trigger('speedchange', ['2.0']);
             expect($.ajax).toHaveBeenCalledWith({
                 url: state.config.saveStateUrl,
@@ -171,8 +172,8 @@
             });
         });
 
-        it('can save state on page unload', function () {
-            $.ajax.reset();
+        it('can save state on page unload', function() {
+            $.ajax.calls.reset();
             state.videoSaveStatePlugin.onUnload();
             expect($.ajax).toHaveBeenCalledWith({
                 url: state.config.saveStateUrl,
@@ -183,7 +184,7 @@
             });
         });
 
-        it('can save state on pause', function () {
+        it('can save state on pause', function() {
             state.el.trigger('pause');
             expect($.ajax).toHaveBeenCalledWith({
                 url: state.config.saveStateUrl,
@@ -194,12 +195,25 @@
             });
         });
 
-        it('can save state on language change', function () {
+        it('can save state on language change', function() {
             state.el.trigger('language_menu:change', ['ua']);
             expect(state.storage.setItem).toHaveBeenCalledWith('language', 'ua');
         });
 
-        it('can save information about youtube availability', function () {
+        it('can save youtube availability', function() {
+            $.ajax.calls.reset();
+
+            // Test the cases where we shouldn't send anything at all -- client
+            // side code determines that YouTube availability is the same as
+            // what's already been recorded on the server side.
+            state.config.recordedYoutubeIsAvailable = true;
+            state.el.trigger('youtube_availability', [true]);
+            state.config.recordedYoutubeIsAvailable = false;
+            state.el.trigger('youtube_availability', [false]);
+            expect($.ajax).not.toHaveBeenCalled();
+
+            // Test that we can go from unavailable -> available
+            state.config.recordedYoutubeIsAvailable = false;
             state.el.trigger('youtube_availability', [true]);
             expect($.ajax).toHaveBeenCalledWith({
                 url: state.config.saveStateUrl,
@@ -208,11 +222,22 @@
                 dataType: 'json',
                 data: {youtube_is_available: true}
             });
+
+             // Test that we can go from available -> unavailable
+            state.config.recordedYoutubeIsAvailable = true;
+            state.el.trigger('youtube_availability', [false]);
+            expect($.ajax).toHaveBeenCalledWith({
+                url: state.config.saveStateUrl,
+                type: 'POST',
+                async: true,
+                dataType: 'json',
+                data: {youtube_is_available: false}
+            });
         });
 
-        it('can destroy itself', function () {
+        it('can destroy itself', function() {
             var plugin = state.videoSaveStatePlugin;
-            spyOn($.fn, 'off').andCallThrough();
+            spyOn($.fn, 'off').and.callThrough();
             state.videoSaveStatePlugin.destroy();
             expect(state.videoSaveStatePlugin).toBeUndefined();
             expect($.fn.off).toHaveBeenCalledWith({
@@ -226,5 +251,4 @@
             expect($.fn.off).toHaveBeenCalledWith('unload', plugin.onUnload);
         });
     });
-
 }).call(this);

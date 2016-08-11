@@ -1,39 +1,39 @@
 define(
     [
-        "jquery", "underscore",
-        "js/views/abstract_editor", "js/models/uploads", "js/views/uploads"
+        'jquery', 'underscore',
+        'js/views/abstract_editor', 'js/models/uploads', 'js/views/uploads'
 
     ],
 function($, _, AbstractEditor, FileUpload, UploadDialog) {
-    "use strict";
+    'use strict';
 
     var VideoUploadDialog = UploadDialog.extend({
         error: function() {
             this.model.set({
-                "uploading": false,
-                "uploadedBytes": 0,
-                "title": gettext("Sorry, there was an error parsing the subtitles that you uploaded. Please check the format and try again.")
+                'uploading': false,
+                'uploadedBytes': 0,
+                'title': gettext('Sorry, there was an error parsing the subtitles that you uploaded. Please check the format and try again.')
             });
         }
     });
 
     var Translations = AbstractEditor.extend({
-        events : {
-            "click .setting-clear" : "clear",
-            "click .create-setting" : "addEntry",
-            "click .remove-setting" : "removeEntry",
-            "click .upload-setting" : "upload",
-            "change select" : "onChangeHandler"
+        events: {
+            'click .setting-clear': 'clear',
+            'click .create-setting': 'addEntry',
+            'click .remove-setting': 'removeEntry',
+            'click .upload-setting': 'upload',
+            'change select': 'onChangeHandler'
         },
 
-        templateName: "metadata-translations-entry",
-        templateItemName: "metadata-translations-item",
+        templateName: 'metadata-translations-entry',
+        templateItemName: 'metadata-translations-item',
 
-        initialize: function () {
+        initialize: function() {
             var templateName = _.result(this, 'templateItemName'),
                 tpl = document.getElementById(templateName).text;
 
-            if(!tpl) {
+            if (!tpl) {
                 console.error("Couldn't load template for item: " + templateName);
             }
 
@@ -41,16 +41,16 @@ function($, _, AbstractEditor, FileUpload, UploadDialog) {
             AbstractEditor.prototype.initialize.apply(this, arguments);
         },
 
-        getDropdown: function () {
+        getDropdown: function() {
             var dropdown,
-                disableOptions = function (element, values) {
+                disableOptions = function(element, values) {
                     var dropdown = $(element).clone();
 
                     _.each(values, function(value, key) {
                         // Note: IE may raise an exception if key is an empty string,
                         // while other browsers return null as excepted. So coerce it
                         // into null for browser consistency.
-                        if (key === "") {
+                        if (key === '') {
                             key = null;
                         }
 
@@ -64,7 +64,7 @@ function($, _, AbstractEditor, FileUpload, UploadDialog) {
                     return dropdown;
                 };
 
-            return function (values) {
+            return function(values) {
                 if (dropdown) {
                     return disableOptions(dropdown, values);
                 }
@@ -84,12 +84,12 @@ function($, _, AbstractEditor, FileUpload, UploadDialog) {
             };
         }(),
 
-        getValueFromEditor: function () {
+        getValueFromEditor: function() {
             var dict = {},
                 items = this.$el.find('ol').find('.list-settings-item');
 
             _.each(items, function(element, index) {
-                var key = $(element).find('select').val(),
+                var key = $(element).find('select option:selected').val(),
                     value = $(element).find('.input').val();
 
                 // Keys should be unique, so if our keys are duplicated and
@@ -108,17 +108,17 @@ function($, _, AbstractEditor, FileUpload, UploadDialog) {
         },
 
         // @TODO: Use backbone render patterns.
-        setValueInEditor: function (values) {
+        setValueInEditor: function(values) {
             var self = this,
                 frag = document.createDocumentFragment(),
                 dropdown = self.getDropdown(values);
 
             _.each(values, function(value, key) {
                 var html = $(self.templateItem({
-                        'lang': key,
-                        'value': value,
-                        'url': self.model.get('urlRoot') + '/' + key
-                    })).prepend(dropdown.clone().val(key))[0];
+                    'lang': key,
+                    'value': value,
+                    'url': self.model.get('urlRoot') + '/' + key
+                })).prepend(dropdown.clone().val(key))[0];
 
                 frag.appendChild(html);
             });
@@ -145,7 +145,7 @@ function($, _, AbstractEditor, FileUpload, UploadDialog) {
             this.$el.find('.create-setting').removeClass('is-disabled').attr('aria-disabled', false);
         },
 
-        upload: function (event) {
+        upload: function(event) {
             event.preventDefault();
 
             var self = this,
@@ -159,7 +159,7 @@ function($, _, AbstractEditor, FileUpload, UploadDialog) {
                     model: model,
                     url: self.model.get('urlRoot') + '/' + lang,
                     parentElement: target.closest('.xblock-editor'),
-                    onSuccess: function (response) {
+                    onSuccess: function(response) {
                         if (!response['filename']) { return; }
 
                         var dict = $.extend(true, {}, self.model.get('value'));
@@ -183,7 +183,7 @@ function($, _, AbstractEditor, FileUpload, UploadDialog) {
             }
         },
 
-        onChangeHandler: function (event) {
+        onChangeHandler: function(event) {
             this.showClearButton();
             this.enableAdd();
             this.updateModel();

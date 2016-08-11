@@ -1,11 +1,15 @@
+<%page expression_filter="h"/>
 <%inherit file="base.html" />
-<%def name="online_help_token()"><% return "content_libraries" %></%def>
+<%def name="online_help_token()">
+    <% return "content_libraries" %>
+</%def>
 <%!
 from contentstore.views.helpers import xblock_studio_url, xblock_type_display_name
 from django.utils.translation import ugettext as _
 from openedx.core.djangolib.js_utils import dump_js_escaped_json
+from openedx.core.djangolib.markup import HTML, Text
 %>
-<%block name="title">${context_library.display_name_with_default_escaped} ${xblock_type_display_name(context_library)}</%block>
+<%block name="title">${context_library.display_name_with_default} ${xblock_type_display_name(context_library)}</%block>
 <%block name="bodyclass">is-signedin course container view-container view-library</%block>
 
 <%namespace name='static' file='static_content.html'/>
@@ -29,8 +33,8 @@ from openedx.core.djangolib.js_utils import dump_js_escaped_json
             {
                 isUnitPage: false,
                 page_size: 10,
-                canEdit: ${"true" if can_edit else "false"},
-                showChildrenPreviews: ${'true' if show_children_previews else 'false'}
+                canEdit: ${can_edit | n, dump_js_escaped_json},
+                showChildrenPreviews: ${context_library.show_children_previews | n, dump_js_escaped_json}
             }
         );
     });
@@ -45,7 +49,7 @@ from openedx.core.djangolib.js_utils import dump_js_escaped_json
             <small class="subtitle">${_("Content Library")}</small>
             <div class="wrapper-xblock-field incontext-editor is-editable"
                  data-field="display_name" data-field-display-name="${_("Display Name")}">
-                <h1 class="page-header-title xblock-field-value incontext-editor-value"><span class="title-value">${context_library.display_name_with_default_escaped}</span></h1>
+                <h1 class="page-header-title xblock-field-value incontext-editor-value"><span class="title-value">${context_library.display_name_with_default}</span></h1>
             </div>
         </div>
 
@@ -54,12 +58,12 @@ from openedx.core.djangolib.js_utils import dump_js_escaped_json
             <ul>
                 <li class="nav-item">
                     <a href="#" class="button new-button new-component-button">
-                        <i class="icon fa fa-plus icon-inline"></i> <span class="action-button-text">${_("Add Component")}</span>
+                        <span class="icon fa fa-plus icon-inline" aria-hidden="true"></span> <span class="action-button-text">${_("Add Component")}</span>
                     </a>
                 </li>
                 <li class="action-item action-toggle-preview nav-item">
                     <a href="#" class="button button-toggle-preview action-button toggle-preview-button is-hidden">
-                        <i class="icon fa fa-refresh"></i>
+                        <span class="icon fa fa-refresh" aria-hidden="true"></span>
                         <span class="action-button-text preview-text"></span>
                     </a>
                 </li>
@@ -70,31 +74,34 @@ from openedx.core.djangolib.js_utils import dump_js_escaped_json
 
 <div class="wrapper-content wrapper">
     <div class="inner-wrapper">
-        <section class="content-area">
+        <div class="content-area">
 
-            <article class="content-primary">
+            <div class="content-primary">
                 <div class="container-message wrapper-message"></div>
-                <section class="wrapper-xblock level-page is-hidden studio-xblock-wrapper" data-locator="${context_library.location | h}" data-course-key="${context_library.location.library_key | h}">
-                </section>
-                <div class="ui-loading">
-                    <p><span class="spin"><i class="icon fa fa-refresh"></i></span> <span class="copy">${_("Loading")}</span></p>
+                <div class="wrapper-xblock level-page is-hidden studio-xblock-wrapper" data-locator="${context_library.location}" data-course-key="${context_library.location.library_key}">
                 </div>
-            </article>
-            <aside class="content-supplementary" role="complementary">
+                <div class="ui-loading">
+                    <p><span class="spin"><span class="icon fa fa-refresh" aria-hidden="true"></span></span><span class="copy">${_("Loading")}</span></p>
+                </div>
+            </div>
+            <div class="content-supplementary" role="complementary">
                 % if can_edit:
                 <div class="bit">
                     <h3 class="title-3">${_("Adding content to your library")}</h3>
                     <p>${_("Add components to your library for use in courses, using Add New Component at the bottom of this page.")}</p>
                     <p>${_("Components are listed in the order in which they are added, with the most recently added at the bottom. Use the pagination arrows to navigate from page to page if you have more than one page of components in your library.")}</p>
                     <h3 class="title-3">${_("Using library content in courses")}</h3>
-                    <p>${_("Use library content in courses by adding the {em_start}library_content{em_end} policy key to the Advanced Module List in the course's Advanced Settings, then adding a Randomized Content Block to your courseware. In the settings for each Randomized Content Block, select this library as the source library, and specify the number of problems to be randomly selected and displayed to each student.").format(em_start='<strong>', em_end="</strong>")}</p>
+                    <p>${Text(_("Use library content in courses by adding the {em_start}library_content{em_end} policy key to the Advanced Module List in the course's Advanced Settings, then adding a Randomized Content Block to your courseware. In the settings for each Randomized Content Block, select this library as the source library, and specify the number of problems to be randomly selected and displayed to each student.")).format(
+                            em_start=HTML("<strong>"),
+                            em_end=HTML("</strong>")
+                        )}</p>
                 </div>
                 % endif
                 <div class="bit external-help">
                     <a href="${get_online_help_info(online_help_token())['doc_url']}" target="_blank" class="button external-help-button">${_("Learn more about content libraries")}</a>
                 </div>
-            </aside>
-        </section>
+            </div>
+        </div>
     </div>
 </div>
 </%block>

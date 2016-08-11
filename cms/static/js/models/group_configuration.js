@@ -1,10 +1,9 @@
 define([
-    'backbone', 'underscore', 'underscore.string', 'gettext', 'js/models/group',
-    'js/collections/group', 'backbone.associations', 'coffee/src/main'
+    'backbone', 'underscore', 'gettext', 'js/models/group', 'js/collections/group',
+    'backbone.associations', 'cms/js/main'
 ],
-function(Backbone, _, str, gettext, GroupModel, GroupCollection) {
+function(Backbone, _, gettext, GroupModel, GroupCollection) {
     'use strict';
-    _.str = str;
     var GroupConfiguration = Backbone.AssociatedModel.extend({
         defaults: function() {
             return {
@@ -49,7 +48,7 @@ function(Backbone, _, str, gettext, GroupModel, GroupCollection) {
         },
 
         reset: function() {
-            this.set(this._originalAttributes, { parse: true, validate: true });
+            this.set(this._originalAttributes, {parse: true, validate: true});
         },
 
         isDirty: function() {
@@ -84,7 +83,7 @@ function(Backbone, _, str, gettext, GroupModel, GroupCollection) {
         },
 
         validate: function(attrs) {
-            if (!_.str.trim(attrs.name)) {
+            if (!attrs.name.trim()) {
                 return {
                     message: gettext('Group Configuration name is required.'),
                     attributes: {name: true}
@@ -94,7 +93,7 @@ function(Backbone, _, str, gettext, GroupModel, GroupCollection) {
             if (!this.canBeEmpty && attrs.groups.length < 1) {
                 return {
                     message: gettext('There must be at least one group.'),
-                    attributes: { groups: true }
+                    attributes: {groups: true}
                 };
             } else {
                 // validate all groups
@@ -111,7 +110,7 @@ function(Backbone, _, str, gettext, GroupModel, GroupCollection) {
                 if (!invalidGroups.isEmpty()) {
                     return {
                         message: gettext('All groups must have a name.'),
-                        attributes: { groups: invalidGroups.toJSON() }
+                        attributes: {groups: invalidGroups.toJSON()}
                     };
                 }
 
@@ -119,13 +118,13 @@ function(Backbone, _, str, gettext, GroupModel, GroupCollection) {
                 if (groupNames.length !== _.uniq(groupNames).length) {
                     return {
                         message: gettext('All groups must have a unique name.'),
-                        attributes: { groups: validGroups.toJSON() }
+                        attributes: {groups: validGroups.toJSON()}
                     };
                 }
             }
         },
 
-        groupRemoved: function () {
+        groupRemoved: function() {
             this.setOriginalAttributes();
         }
     });

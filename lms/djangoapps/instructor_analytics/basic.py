@@ -13,21 +13,24 @@ from django.db.models import Q
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
+from django.core.serializers.json import DjangoJSONEncoder
 from django.core.urlresolvers import reverse
 from opaque_keys.edx.keys import UsageKey
 import xmodule.graders as xmgraders
-from microsite_configuration import microsite
 from student.models import CourseEnrollmentAllowed
 from edx_proctoring.api import get_all_exam_attempts
 from courseware.models import StudentModule
 from certificates.models import GeneratedCertificate
 from django.db.models import Count
 from certificates.models import CertificateStatuses
+from grades.context import grading_context_for_course
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 
 STUDENT_FEATURES = ('id', 'username', 'first_name', 'last_name', 'is_staff', 'email')
 PROFILE_FEATURES = ('name', 'language', 'location', 'year_of_birth', 'gender',
-                    'level_of_education', 'mailing_address', 'goals', 'meta')
+                    'level_of_education', 'mailing_address', 'goals', 'meta',
+                    'city', 'country')
 ORDER_ITEM_FEATURES = ('list_price', 'unit_cost', 'status')
 ORDER_FEATURES = ('purchase_time',)
 
@@ -223,6 +226,15 @@ def enrolled_students_features(course_key, features):
     if include_team_column:
         students = students.prefetch_related('teams')
 
+    def extract_attr(student, feature):
+        """Evaluate a student attribute that is ready for JSON serialization"""
+        attr = getattr(student, feature)
+        try:
+            DjangoJSONEncoder().default(attr)
+            return attr
+        except TypeError:
+            return unicode(attr)
+
     def extract_student(student, features):
         """ convert student to dictionary """
         student_features = [x for x in STUDENT_FEATURES if x in features]
@@ -237,11 +249,11 @@ def enrolled_students_features(course_key, features):
                 meta_key = feature.split('.')[1]
                 meta_features.append((feature, meta_key))
 
-        student_dict = dict((feature, getattr(student, feature))
+        student_dict = dict((feature, extract_attr(student, feature))
                             for feature in student_features)
         profile = student.profile
         if profile is not None:
-            profile_dict = dict((feature, getattr(profile, feature))
+            profile_dict = dict((feature, extract_attr(profile, feature))
                                 for feature in profile_features)
             student_dict.update(profile_dict)
 
@@ -420,7 +432,7 @@ def course_registration_features(features, registration_codes, csv_type):
         :param features:
         :param csv_type:
         """
-        site_name = microsite.get_value('SITE_NAME', settings.SITE_NAME)
+        site_name = configuration_helpers.get_value('SITE_NAME', settings.SITE_NAME)
         registration_features = [x for x in COURSE_REGISTRATION_FEATURES if x in features]
 
         course_registration_dict = dict((feature, getattr(registration_code, feature)) for feature in registration_features)
@@ -481,14 +493,14 @@ def dump_grading_context(course):
     msg += hbar
     msg += "Listing grading context for course %s\n" % course.id.to_deprecated_string()
 
-    gcontext = course.grading_context
+    gcontext = grading_context_for_course(course)
     msg += "graded sections:\n"
 
-    msg += '%s\n' % gcontext['graded_sections'].keys()
-    for (gsomething, gsvals) in gcontext['graded_sections'].items():
+    msg += '%s\n' % gcontext['all_graded_sections'].keys()
+    for (gsomething, gsvals) in gcontext['all_graded_sections'].items():
         msg += "--> Section %s:\n" % (gsomething)
         for sec in gsvals:
-            sdesc = sec['section_descriptor']
+            sdesc = sec['section_block']
             frmat = getattr(sdesc, 'format', None)
             aname = ''
             if frmat in graders:
@@ -503,7 +515,7 @@ def dump_grading_context(course):
                 notes = ', score by attempt!'
             msg += "      %s (format=%s, Assignment=%s%s)\n"\
                 % (sdesc.display_name, frmat, aname, notes)
-    msg += "all descriptors:\n"
-    msg += "length=%d\n" % len(gcontext['all_descriptors'])
+    msg += "all graded blocks:\n"
+    msg += "length=%d\n" % len(gcontext['all_graded_blocks'])
     msg = '<pre>%s</pre>' % msg.replace('<', '&lt;')
     return msg

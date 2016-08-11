@@ -399,6 +399,7 @@ class CapaMixin(CapaFields):
             'ajax_url': self.runtime.ajax_url,
             'progress_status': Progress.to_js_status_str(progress),
             'progress_detail': Progress.to_js_detail_str(progress),
+            'content': self.get_problem_html(encapsulate=False),
         })
 
     def check_button_name(self):
@@ -619,7 +620,7 @@ class CapaMixin(CapaFields):
         event_info['hint_index'] = hint_index
         event_info['hint_len'] = len(demand_hints)
         event_info['hint_text'] = hint_text
-        self.runtime.track_function('edx.problem.hint.demandhint_displayed', event_info)
+        self.runtime.publish(self, 'edx.problem.hint.demandhint_displayed', event_info)
 
         # We report the index of this hint, the client works out what index to use to get the next hint
         return {
@@ -658,7 +659,7 @@ class CapaMixin(CapaFields):
             check_button_checking = False
 
         content = {
-            'name': self.display_name_with_default_escaped,
+            'name': self.display_name_with_default,
             'html': html,
             'weight': self.weight,
         }
@@ -1066,8 +1067,11 @@ class CapaMixin(CapaFields):
             self.set_last_submission_time()
 
         except (StudentInputError, ResponseError, LoncapaProblemError) as inst:
-            log.warning("StudentInputError in capa_module:problem_check",
-                        exc_info=True)
+            if self.runtime.DEBUG:
+                log.warning(
+                    "StudentInputError in capa_module:problem_check",
+                    exc_info=True
+                )
 
             # Save the user's state before failing
             self.set_state_from_lcp()
@@ -1144,7 +1148,7 @@ class CapaMixin(CapaFields):
         # avoiding problems where an event_info is unmasked twice.
         event_unmasked = copy.deepcopy(event_info)
         self.unmask_event(event_unmasked)
-        self.runtime.track_function(title, event_unmasked)
+        self.runtime.publish(self, title, event_unmasked)
 
     def unmask_event(self, event_info):
         """
@@ -1422,6 +1426,7 @@ class CapaMixin(CapaFields):
         return {
             'success': True,
             'msg': msg,
+            'html': self.get_problem_html(encapsulate=False),
         }
 
     def reset_problem(self, _data):

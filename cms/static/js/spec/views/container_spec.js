@@ -1,12 +1,9 @@
-define([ "jquery", "common/js/spec_helpers/ajax_helpers", "js/spec_helpers/edit_helpers",
-    "js/views/container", "js/models/xblock_info", "jquery.simulate",
-    "xmodule", "coffee/src/main", "xblock/cms.runtime.v1"],
-    function ($, AjaxHelpers, EditHelpers, ContainerView, XBlockInfo) {
-
-        describe("Container View", function () {
-
-            describe("Supports reordering components", function () {
-
+define(['jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'js/spec_helpers/edit_helpers',
+    'js/views/container', 'js/models/xblock_info', 'jquery.simulate',
+    'xmodule', 'cms/js/main', 'xblock/cms.runtime.v1'],
+    function($, AjaxHelpers, EditHelpers, ContainerView, XBlockInfo) {
+        describe('Container View', function() {
+            describe('Supports reordering components', function() {
                 var model, containerView, mockContainerHTML, init, getComponent,
                     getDragHandle, dragComponentVertically, dragComponentAbove,
                     verifyRequest, verifyNumReorderCalls, respondToRequest, notificationSpy,
@@ -14,21 +11,21 @@ define([ "jquery", "common/js/spec_helpers/ajax_helpers", "js/spec_helpers/edit_
                     rootLocator = 'locator-container',
                     containerTestUrl = '/xblock/' + rootLocator,
 
-                    groupAUrl = "/xblock/locator-group-A",
-                    groupA = "locator-group-A",
-                    groupAComponent1 = "locator-component-A1",
-                    groupAComponent2 = "locator-component-A2",
-                    groupAComponent3 = "locator-component-A3",
+                    groupAUrl = '/xblock/locator-group-A',
+                    groupA = 'locator-group-A',
+                    groupAComponent1 = 'locator-component-A1',
+                    groupAComponent2 = 'locator-component-A2',
+                    groupAComponent3 = 'locator-component-A3',
 
-                    groupBUrl = "/xblock/locator-group-B",
-                    groupB = "locator-group-B",
-                    groupBComponent1 = "locator-component-B1",
-                    groupBComponent2 = "locator-component-B2",
-                    groupBComponent3 = "locator-component-B3";
+                    groupBUrl = '/xblock/locator-group-B',
+                    groupB = 'locator-group-B',
+                    groupBComponent1 = 'locator-component-B1',
+                    groupBComponent2 = 'locator-component-B2',
+                    groupBComponent3 = 'locator-component-B3';
 
                 mockContainerHTML = readFixtures('mock/mock-container-xblock.underscore');
 
-                beforeEach(function () {
+                beforeEach(function() {
                     EditHelpers.installMockXBlock();
                     EditHelpers.installViewTemplates();
                     appendSetFixtures('<div class="wrapper-xblock level-page studio-xblock-wrapper" data-locator="' + rootLocator + '"></div>');
@@ -46,18 +43,18 @@ define([ "jquery", "common/js/spec_helpers/ajax_helpers", "js/spec_helpers/edit_
                     });
                 });
 
-                afterEach(function () {
+                afterEach(function() {
                     EditHelpers.uninstallMockXBlock();
                     containerView.remove();
                 });
 
-                init = function (caller) {
+                init = function(caller) {
                     var requests = AjaxHelpers.requests(caller);
                     containerView.render();
 
                     AjaxHelpers.respondWithJson(requests, {
                         html: mockContainerHTML,
-                        "resources": []
+                        'resources': []
                     });
 
                     $('body').append(containerView.$el);
@@ -86,21 +83,21 @@ define([ "jquery", "common/js/spec_helpers/ajax_helpers", "js/spec_helpers/edit_
                     return $(component.find('.drag-handle')[0]);
                 };
 
-                dragComponentVertically = function (locator, dy) {
+                dragComponentVertically = function(locator, dy) {
                     var handle = getDragHandle(locator);
-                    handle.simulate("drag", {dy: dy});
+                    handle.simulate('drag', {dy: dy});
                 };
 
-                dragComponentAbove = function (sourceLocator, targetLocator) {
+                dragComponentAbove = function(sourceLocator, targetLocator) {
                     var targetElement = getComponent(targetLocator),
                         targetTop = targetElement.offset().top + 1,
                         handle = getDragHandle(sourceLocator),
                         handleY = handle.offset().top + (handle.height() / 2),
                         dy = targetTop - handleY;
-                    handle.simulate("drag", {dy: dy});
+                    handle.simulate('drag', {dy: dy});
                 };
 
-                verifyRequest = function (requests, reorderCallIndex, expectedURL, expectedChildren) {
+                verifyRequest = function(requests, reorderCallIndex, expectedURL, expectedChildren) {
                     var actualIndex, request, children, i;
                     // 0th call is the response to the initial render call to get HTML.
                     actualIndex = reorderCallIndex + 1;
@@ -114,12 +111,12 @@ define([ "jquery", "common/js/spec_helpers/ajax_helpers", "js/spec_helpers/edit_
                     }
                 };
 
-                verifyNumReorderCalls = function (requests, expectedCalls) {
+                verifyNumReorderCalls = function(requests, expectedCalls) {
                     // Number of calls will be 1 more than expected because of the initial render call to get HTML.
                     expect(requests.length).toEqual(expectedCalls + 1);
                 };
 
-                respondToRequest = function (requests, reorderCallIndex, status) {
+                respondToRequest = function(requests, reorderCallIndex, status) {
                     var actualIndex;
                     // Number of calls will be 1 more than expected because of the initial render call to get HTML.
                     actualIndex = reorderCallIndex + 1;
@@ -127,14 +124,14 @@ define([ "jquery", "common/js/spec_helpers/ajax_helpers", "js/spec_helpers/edit_
                     requests[actualIndex].respond(status);
                 };
 
-                it('does nothing if item not moved far enough', function () {
+                it('does nothing if item not moved far enough', function() {
                     var requests = init(this);
                     // Drag the first component in Group A down very slightly but not enough to move it.
                     dragComponentVertically(groupAComponent1, 5);
                     verifyNumReorderCalls(requests, 0);
                 });
 
-                it('can reorder within a group', function () {
+                it('can reorder within a group', function() {
                     var requests = init(this);
                     // Drag the third component in Group A to be the first
                     dragComponentAbove(groupAComponent3, groupAComponent1);
@@ -142,7 +139,7 @@ define([ "jquery", "common/js/spec_helpers/ajax_helpers", "js/spec_helpers/edit_
                     verifyRequest(requests, 0, groupAUrl, [groupAComponent3, groupAComponent1, groupAComponent2]);
                 });
 
-                it('can drag from one group to another', function () {
+                it('can drag from one group to another', function() {
                     var requests = init(this);
                     // Drag the first component in Group B to the top of group A.
                     dragComponentAbove(groupBComponent1, groupAComponent1);
@@ -156,7 +153,7 @@ define([ "jquery", "common/js/spec_helpers/ajax_helpers", "js/spec_helpers/edit_
                     verifyRequest(requests, 1, groupBUrl, [groupBComponent2, groupBComponent3]);
                 });
 
-                it('does not remove from old group if addition to new group fails', function () {
+                it('does not remove from old group if addition to new group fails', function() {
                     var requests = init(this);
                     // Drag the first component in Group B to the first group.
                     dragComponentAbove(groupBComponent1, groupAComponent1);
@@ -168,7 +165,7 @@ define([ "jquery", "common/js/spec_helpers/ajax_helpers", "js/spec_helpers/edit_
                     verifyNumReorderCalls(requests, 1);
                 });
 
-                it('can swap group A and group B', function () {
+                it('can swap group A and group B', function() {
                     var requests = init(this);
                     // Drag Group B before group A.
                     dragComponentAbove(groupB, groupA);
@@ -176,8 +173,8 @@ define([ "jquery", "common/js/spec_helpers/ajax_helpers", "js/spec_helpers/edit_
                     verifyRequest(requests, 0, containerTestUrl, [groupB, groupA]);
                 });
 
-                describe("Shows a saving message", function () {
-                    it('hides saving message upon success', function () {
+                describe('Shows a saving message', function() {
+                    it('hides saving message upon success', function() {
                         var requests, savingOptions;
                         requests = init(this);
 
@@ -190,7 +187,7 @@ define([ "jquery", "common/js/spec_helpers/ajax_helpers", "js/spec_helpers/edit_
                         EditHelpers.verifyNotificationHidden(notificationSpy);
                     });
 
-                    it('does not hide saving message if failure', function () {
+                    it('does not hide saving message if failure', function() {
                         var requests = init(this);
 
                         // Drag the first component in Group B to the first group.

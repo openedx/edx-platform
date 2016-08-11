@@ -10,7 +10,6 @@ import datetime
 
 from pytz import UTC
 from collections import defaultdict
-import collections
 from contextlib import contextmanager
 import threading
 from operator import itemgetter
@@ -38,6 +37,11 @@ new_contract('XBlock', XBlock)
 LIBRARY_ROOT = 'library.xml'
 COURSE_ROOT = 'course.xml'
 
+# List of names of computed fields on xmodules that are of type usage keys.
+# This list can be used to determine which fields need to be stripped of
+# extraneous usage key data when entering/exiting modulestores.
+XMODULE_FIELDS_WITH_USAGE_KEYS = ['location', 'parent']
+
 
 class ModuleStoreEnum(object):
     """
@@ -50,7 +54,6 @@ class ModuleStoreEnum(object):
         """
         split = 'split'
         mongo = 'mongo'
-        xml = 'xml'
 
     class RevisionOption(object):
         """
@@ -175,7 +178,7 @@ class BulkOperationsMixin(object):
         self.signal_handler = None
 
     @contextmanager
-    def bulk_operations(self, course_id, emit_signals=True):
+    def bulk_operations(self, course_id, emit_signals=True, ignore_case=False):
         """
         A context manager for notifying the store of bulk operations. This affects only the current thread.
 
@@ -183,10 +186,10 @@ class BulkOperationsMixin(object):
         until the bulk operation is completed.
         """
         try:
-            self._begin_bulk_operation(course_id)
+            self._begin_bulk_operation(course_id, ignore_case)
             yield
         finally:
-            self._end_bulk_operation(course_id, emit_signals)
+            self._end_bulk_operation(course_id, emit_signals, ignore_case)
 
     # the relevant type of bulk_ops_record for the mixin (overriding classes should override
     # this variable)
@@ -203,10 +206,10 @@ class BulkOperationsMixin(object):
         if ignore_case:
             for key, record in self._active_bulk_ops.records.iteritems():
                 # Shortcut: check basic equivalence for cases where org/course/run might be None.
-                if key == course_key or (
-                    key.org.lower() == course_key.org.lower() and
-                    key.course.lower() == course_key.course.lower() and
-                    key.run.lower() == course_key.run.lower()
+                if (key == course_key) or (
+                        (key.org and key.org.lower() == course_key.org.lower()) and
+                        (key.course and key.course.lower() == course_key.course.lower()) and
+                        (key.run and key.run.lower() == course_key.run.lower())
                 ):
                     return record
 
@@ -228,7 +231,7 @@ class BulkOperationsMixin(object):
         if course_key.for_branch(None) in self._active_bulk_ops.records:
             del self._active_bulk_ops.records[course_key.for_branch(None)]
 
-    def _start_outermost_bulk_operation(self, bulk_ops_record, course_key):
+    def _start_outermost_bulk_operation(self, bulk_ops_record, course_key, ignore_case=False):
         """
         The outermost nested bulk_operation call: do the actual begin of the bulk operation.
 
@@ -236,11 +239,11 @@ class BulkOperationsMixin(object):
         """
         pass
 
-    def _begin_bulk_operation(self, course_key):
+    def _begin_bulk_operation(self, course_key, ignore_case=False):
         """
         Begin a bulk operation on course_key.
         """
-        bulk_ops_record = self._get_bulk_ops_record(course_key)
+        bulk_ops_record = self._get_bulk_ops_record(course_key, ignore_case)
 
         # Increment the number of active bulk operations (bulk operations
         # on the same course can be nested)
@@ -248,7 +251,7 @@ class BulkOperationsMixin(object):
 
         # If this is the highest level bulk operation, then initialize it
         if bulk_ops_record.is_root:
-            self._start_outermost_bulk_operation(bulk_ops_record, course_key)
+            self._start_outermost_bulk_operation(bulk_ops_record, course_key, ignore_case)
 
     def _end_outermost_bulk_operation(self, bulk_ops_record, structure_key):
         """
@@ -258,12 +261,12 @@ class BulkOperationsMixin(object):
         """
         pass
 
-    def _end_bulk_operation(self, structure_key, emit_signals=True):
+    def _end_bulk_operation(self, structure_key, emit_signals=True, ignore_case=False):
         """
         End the active bulk operation on structure_key (course or library key).
         """
         # If no bulk op is active, return
-        bulk_ops_record = self._get_bulk_ops_record(structure_key)
+        bulk_ops_record = self._get_bulk_ops_record(structure_key, ignore_case)
         if not bulk_ops_record.active:
             return
 
@@ -428,7 +431,8 @@ class BlockData(object):
             'block_type': self.block_type,
             'definition': self.definition,
             'defaults': self.defaults,
-            'edit_info': self.edit_info.to_storable()
+            'asides': self.get_asides(),
+            'edit_info': self.edit_info.to_storable(),
         }
 
     def from_storable(self, block_data):
@@ -449,8 +453,20 @@ class BlockData(object):
         # blocks are copied from a library to a course)
         self.defaults = block_data.get('defaults', {})
 
+        # Additional field data that stored in connected XBlockAsides
+        self.asides = block_data.get('asides', {})
+
         # EditInfo object containing all versioning/editing data.
         self.edit_info = EditInfo(**block_data.get('edit_info', {}))
+
+    def get_asides(self):
+        """
+        For the situations if block_data has no asides attribute
+        (in case it was taken from memcache)
+        """
+        if not hasattr(self, 'asides'):
+            self.asides = {}   # pylint: disable=attribute-defined-outside-init
+        return self.asides
 
     def __repr__(self):
         # pylint: disable=bad-continuation, redundant-keyword-arg
@@ -459,17 +475,19 @@ class BlockData(object):
                 "definition={self.definition}, "
                 "definition_loaded={self.definition_loaded}, "
                 "defaults={self.defaults}, "
+                "asides={asides}, "
                 "edit_info={self.edit_info})").format(
             self=self,
             classname=self.__class__.__name__,
+            asides=self.get_asides()
         )  # pylint: disable=bad-continuation
 
     def __eq__(self, block_data):
         """
         Two BlockData objects are equal iff all their attributes are equal.
         """
-        attrs = ['fields', 'block_type', 'definition', 'defaults', 'edit_info']
-        return all(getattr(self, attr) == getattr(block_data, attr) for attr in attrs)
+        attrs = ['fields', 'block_type', 'definition', 'defaults', 'asides', 'edit_info']
+        return all(getattr(self, attr, None) == getattr(block_data, attr, None) for attr in attrs)
 
     def __neq__(self, block_data):
         """
@@ -999,7 +1017,7 @@ class ModuleStoreRead(ModuleStoreAssetBase):
         pass
 
     @contextmanager
-    def bulk_operations(self, course_id, emit_signals=True):    # pylint: disable=unused-argument
+    def bulk_operations(self, course_id, emit_signals=True, ignore_case=False):    # pylint: disable=unused-argument
         """
         A context manager for notifying the store of bulk operations. This affects only the current thread.
         """
@@ -1125,10 +1143,17 @@ class ModuleStoreWrite(ModuleStoreRead, ModuleStoreAssetWriteInterface):
         pass
 
     @abstractmethod
-    def _drop_database(self):
+    def _drop_database(self, database=True, collections=True, connections=True):
         """
         A destructive operation to drop the underlying database and close all connections.
         Intended to be used by test code for cleanup.
+
+        If database is True, then this should drop the entire database.
+        Otherwise, if collections is True, then this should drop all of the collections used
+        by this modulestore.
+        Otherwise, the modulestore should remove all data from the collections.
+
+        If connections is True, then close the connection to the database as well.
         """
         pass
 
@@ -1145,7 +1170,7 @@ class ModuleStoreReadBase(BulkOperationsMixin, ModuleStoreRead):
         contentstore=None,
         doc_store_config=None,  # ignore if passed up
         metadata_inheritance_cache_subsystem=None, request_cache=None,
-        xblock_mixins=(), xblock_select=None, disabled_xblock_types=(),  # pylint: disable=bad-continuation
+        xblock_mixins=(), xblock_select=None, xblock_field_data_wrappers=(), disabled_xblock_types=lambda: [],  # pylint: disable=bad-continuation
         # temporary parms to enable backward compatibility. remove once all envs migrated
         db=None, collection=None, host=None, port=None, tz_aware=True, user=None, password=None,
         # allow lower level init args to pass harmlessly
@@ -1162,6 +1187,7 @@ class ModuleStoreReadBase(BulkOperationsMixin, ModuleStoreRead):
         self.request_cache = request_cache
         self.xblock_mixins = xblock_mixins
         self.xblock_select = xblock_select
+        self.xblock_field_data_wrappers = xblock_field_data_wrappers
         self.disabled_xblock_types = disabled_xblock_types
         self.contentstore = contentstore
 
@@ -1271,7 +1297,7 @@ class ModuleStoreWriteBase(ModuleStoreReadBase, ModuleStoreWrite):
         :param category: the xblock category
         :param fields: the dictionary of {fieldname: value}
         """
-        result = collections.defaultdict(dict)
+        result = defaultdict(dict)
         if fields is None:
             return result
         cls = self.mixologist.mix(XBlock.load_class(category, select=prefer_xmodules))
@@ -1322,14 +1348,21 @@ class ModuleStoreWriteBase(ModuleStoreReadBase, ModuleStoreWrite):
             self.contentstore.delete_all_course_assets(course_key)
         super(ModuleStoreWriteBase, self).delete_course(course_key, user_id)
 
-    def _drop_database(self):
+    def _drop_database(self, database=True, collections=True, connections=True):
         """
         A destructive operation to drop the underlying database and close all connections.
         Intended to be used by test code for cleanup.
+
+        If database is True, then this should drop the entire database.
+        Otherwise, if collections is True, then this should drop all of the collections used
+        by this modulestore.
+        Otherwise, the modulestore should remove all data from the collections.
+
+        If connections is True, then close the connection to the database as well.
         """
         if self.contentstore:
-            self.contentstore._drop_database()  # pylint: disable=protected-access
-        super(ModuleStoreWriteBase, self)._drop_database()
+            self.contentstore._drop_database(database, collections, connections)  # pylint: disable=protected-access
+        super(ModuleStoreWriteBase, self)._drop_database(database, collections, connections)
 
     def create_child(self, user_id, parent_usage_key, block_type, block_id=None, fields=None, **kwargs):
         """

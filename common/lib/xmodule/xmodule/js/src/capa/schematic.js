@@ -85,7 +85,7 @@ var cktsim = (function() {
 		this.abstol = new Array(this.N);
 		this.solution = new Array(this.N);
 		this.rhs = new Array(this.N);
-		for (var i = this.N - 1; i >= 0; --i) {	    
+		for (var i = this.N - 1; i >= 0; --i) {
 		    this.soln_max[i] = 0.0;
 		    this.abstol[i] = this.ntypes[i] == T_VOLTAGE ? v_abstol : i_abstol;
 		    this.solution[i] = 0.0;
@@ -97,7 +97,7 @@ var cktsim = (function() {
 		    this.devices[i].load_linear(this)
 		}
 
-		// Check for voltage source loops. 
+		// Check for voltage source loops.
         var n_vsrc = this.voltage_sources.length;
 		if (n_vsrc > 0) { // At least one voltage source
 		    var GV = mat_make(n_vsrc, this.N);  // Loop check
@@ -110,11 +110,11 @@ var cktsim = (function() {
 		    if (rGV < n_vsrc) {
 			alert('Warning!!! Circuit has a voltage source loop or a source or current probe shorted by a wire, please remove the source or the wire causing the short.');
 			alert('Warning!!! Simulator might produce meaningless results or no result with illegal circuits.');
-			return false;		
+			return false;
 		    }
 		}
 	    }
-	    return true;		
+	    return true;
 	}
 
 	// load circuit from JSON netlist (see schematic.js)
@@ -209,7 +209,7 @@ var cktsim = (function() {
 		    if (this.ntypes[i] == T_VOLTAGE)
 			abssum_rhs += Math.abs(rhs[i]);
 
-		if ((iter > 0) && (use_limiting == false) && (abssum_old < abssum_rhs)) {  
+		if ((iter > 0) && (use_limiting == false) && (abssum_old < abssum_rhs)) {
 		    // Old rhsnorm was better, undo last iter and turn on limiting
 		    for (var i = this.N - 1; i >= 0; --i)
 			soln[i] -= d_sol[i];
@@ -222,7 +222,7 @@ var cktsim = (function() {
 		    // If norm going down for ten iters, stop limiting
 		    if (abssum_rhs < abssum_old)
 			down_count += 1;
-		    else 
+		    else
 			down_count = 0;
 		    if (down_count > 10) {
 			use_limiting = false;
@@ -230,14 +230,14 @@ var cktsim = (function() {
 		    }
 
 		    // Update norm of rhs
-		    abssum_old = abssum_rhs;		    
+		    abssum_old = abssum_rhs;
 		}
 
 		// Update the worst case abssum for comparison.
 		if ((iter == 0) || (abssum_rhs > abssum_compare))
 		    abssum_compare = abssum_rhs;
 
-		// Check residue convergence, but loosely, and give up 
+		// Check residue convergence, but loosely, and give up
 		// on last iteration
 		if ( (iter < (maxiters - 1)) &&
 		     (abssum_rhs > (res_check_abs+res_check_rel*abssum_compare)))
@@ -263,7 +263,7 @@ var cktsim = (function() {
 		}
 
                 if (converged == true) {
-		    for (var i = this.N - 1; i >= 0; --i) 
+		    for (var i = this.N - 1; i >= 0; --i)
 			if (Math.abs(soln[i]) > this.soln_max[i])
 			    this.soln_max[i] = Math.abs(soln[i]);
 		    return iter+1;
@@ -338,7 +338,7 @@ var cktsim = (function() {
 		mat_v_mult(ckt.C, soln, ckt.q, 1.0);
 		// -rhs = c - dqdt
 		for (var i = ckt.N-1; i >= 0; --i) {
-		    var dqdt = ckt.alpha0*ckt.q[i] + ckt.alpha1*ckt.oldq[i] + 
+		    var dqdt = ckt.alpha0*ckt.q[i] + ckt.alpha1*ckt.oldq[i] +
 			ckt.alpha2*ckt.old2q[i];
 		    rhs[i] = ckt.beta0[i]*ckt.c[i] + ckt.beta1[i]*ckt.oldc[i] - dqdt;
 		}
@@ -386,7 +386,7 @@ var cktsim = (function() {
 		    lte_step_ratio = Math.min(lte_step_ratio, max_growth_factor);
 		    if (lte_step_ratio > 1.2)  /* Increase timestep due to lte. */
 			new_step = (ckt.time - ckt.oldt) * lte_step_ratio / 1.2;
-		    else 
+		    else
 			new_step = (ckt.time - ckt.oldt);
 		    new_step = Math.min(new_step, ckt.max_step);
 		}
@@ -398,9 +398,9 @@ var cktsim = (function() {
 	    no_dc = false;
 	    if ((this.diddc == false) && (no_dc == false)) {
 		if (this.dc() == undefined) { // DC failed, realloc mats and vects.
-		    alert('DC failed, trying transient analysis from zero.');		    
+		    alert('DC failed, trying transient analysis from zero.');
 		    this.finalized = false;  // Reset the finalization.
-		    if (this.finalize() == false) 
+		    if (this.finalize() == false)
 			return undefined;
 		}
 	    }
@@ -438,7 +438,7 @@ var cktsim = (function() {
 
 	    // Non-algebraic variables and probe variables get lte
 	    this.ltecheck = new Array(this.N);
-	    for (var i = N; i >= 0; --i) 
+	    for (var i = N; i >= 0; --i)
 		this.ltecheck[i] = (this.ar[i] == 0);
 
 	    for (var name in this.node_map) {
@@ -478,10 +478,10 @@ var cktsim = (function() {
 		this.old3sol[i] = this.solution[i];
 		this.old2sol[i] = this.solution[i];
 		this.oldsol[i] = this.solution[i];
-		this.old3q[i] = this.q[i]; 
-		this.old2q[i] = this.q[i]; 
-		this.oldq[i] = this.q[i]; 
-		this.oldc[i] = this.c[i]; 
+		this.old3q[i] = this.q[i];
+		this.old2q[i] = this.q[i];
+		this.oldq[i] = this.q[i];
+		this.oldc[i] = this.c[i];
 	    }
 
 	    var beta0,beta1;
@@ -506,8 +506,8 @@ var cktsim = (function() {
 		    this.old2t = this.oldt - (tstart-this.oldt)
 		    this.oldt = tstart - (this.time - this.oldt);
 		    this.time = tstart;
-		    beta0 = 1.0;  
-		    beta1 = 0.0;		
+		    beta0 = 1.0;
+		    beta1 = 0.0;
 		} else {  // Take a regular step
 		    // Save the time, and rotate time wheel
 		    response[this.N].push(this.time);
@@ -525,7 +525,7 @@ var cktsim = (function() {
 
 		    // Use trap (average old and new crnts.
 		    beta0 = 0.5;
-		    beta1 = 0.5;	
+		    beta1 = 0.5;
 		}
 
 		// For trap rule, turn off current avging for algebraic eqns
@@ -547,24 +547,24 @@ var cktsim = (function() {
 			    this.beta0[i] = 1.0;
 			    this.beta1[i] = 0.0;
 			}
-		    }  
+		    }
 		    // Use Newton to compute the solution.
 		    var iterations = this.find_solution(load_tran,max_tran_iters);
 
 		    // If NR succeeds and stepsize is at min, accept and newstep=maxgrowth*minstep.
 		    // Else if Newton Fails, shrink step by a factor and try again
 		    // Else LTE picks new step, if bigger accept current step and go on.
-		    if ((iterations != undefined) && 
+		    if ((iterations != undefined) &&
 			(step_index <= 0 || (this.time-this.oldt) < (1+reltol)*this.min_step)) {
 			if (step_index > 0) new_step = time_step_increase_factor*this.min_step;
 			break;
 		    } else if (iterations == undefined) {  // NR nonconvergence, shrink by factor
-			this.time = this.oldt + 
+			this.time = this.oldt +
 			    (this.time - this.oldt)/nr_step_decrease_factor;
 		    } else {  // Check the LTE and shrink step if needed.
 			new_step = pick_step(this, step_index);
 			if (new_step < (1.0 - reltol)*(this.time - this.oldt)) {
-			    this.time = this.oldt + new_step;  // Try again   
+			    this.time = this.oldt + new_step;  // Try again
 			}
 			else
 			    break;  // LTE okay, new_step for next step
@@ -687,7 +687,7 @@ var cktsim = (function() {
 	    this.devices.push(d);
 	    d.name = name;
 	    if (name) {
-		if (this.device_map[name] === undefined) 
+		if (this.device_map[name] === undefined)
 		    this.device_map[name] = d;
 		else {
 		    alert('Warning: two circuit elements share the same name ' + name);
@@ -793,8 +793,8 @@ var cktsim = (function() {
 	//
 	//  Support for creating conductance and capacitance matrices associated with
         //  modified nodal analysis (unknowns are node voltages and inductor and voltage
-        //  source currents). 
-        //  The linearized circuit is written as 
+        //  source currents).
+        //  The linearized circuit is written as
         //          C d/dt x = G x + rhs
         //  x - vector of node voltages and element currents
         //  rhs - vector of source values
@@ -870,10 +870,10 @@ var cktsim = (function() {
 
         // Allocate an NxM matrix
         function mat_make(N,M) {
-	    var mat = new Array(N);	
-	    for (var i = N - 1; i >= 0; --i) {	    
+	    var mat = new Array(N);
+	    for (var i = N - 1; i >= 0; --i) {
 		mat[i] = new Array(M);
-		for (var j = M - 1; j >= 0; --j) {	    
+		for (var j = M - 1; j >= 0; --j) {
 		    mat[i][j] = 0.0;
 		}
 	    }
@@ -1009,7 +1009,7 @@ var cktsim = (function() {
 			// now eliminate this column for all subsequent rows
 			for (var i = row + 1; i < Nr; i++) {
 			    temp = M[i][col]/M[row][col];   // multiplier for current row
-			    if (temp != 0)  // subtract 
+			    if (temp != 0)  // subtract
 			    for (var j = col; j < Nc; j++) M[i][j] -= M[row][j]*temp;
 			}
 			// Now move on to the next row
@@ -1021,7 +1021,7 @@ var cktsim = (function() {
 	    return the_rank;
 	}
 
-	// Solve Mx=b and return vector x using R^TQ^T factorization. 
+	// Solve Mx=b and return vector x using R^TQ^T factorization.
         // Multiplication by R^T implicit, should be null-space free soln.
         // M should have the extra column!
         // Almost everything is in-lined for speed, sigh.
@@ -1038,7 +1038,7 @@ var cktsim = (function() {
 
 	    var mat_scale = 0; // Sets the scale for comparison to zero.
 	    var max_nonzero_row = Nr-1;  // Assumes M nonsingular.
-	    for (var row = 0; row < Nr; row++) {  
+	    for (var row = 0; row < Nr; row++) {
 		// Find largest row with largest 2-norm
 		var max_row = row;
 		var maxsumsq = 0;
@@ -1077,7 +1077,7 @@ var cktsim = (function() {
 		for (var rowp = row + 1; rowp < Nr; rowp++) { // Update.
 		    var Mrp = M[rowp];
 		    var inner = 0;
-		    for (var col =  Nc-2; col >= 0; --col)  // Project 
+		    for (var col =  Nc-2; col >= 0; --col)  // Project
 			inner += Mr[col]*Mrp[col];
 		    for (var col =  Nc-1; col >= 0; --col) // Ortho (rhs also)
 			Mrp[col] -= inner *Mr[col];
@@ -1122,7 +1122,7 @@ var cktsim = (function() {
 
 		// if no value found, generate a small conductance to gnd
 		// otherwise swap current row with pivot row
-		if (max_v == 0) M[col][col] = eps; 
+		if (max_v == 0) M[col][col] = eps;
 		else {
 		    temp = M[col];
 		    M[col] = M[max_col];
@@ -1588,12 +1588,12 @@ var cktsim = (function() {
 
 	// Source voltage added to b.
         VSource.prototype.load_dc = function(ckt,soln,rhs) {
-	    ckt.add_to_rhs(this.branch,this.src.dc,rhs);  
+	    ckt.add_to_rhs(this.branch,this.src.dc,rhs);
 	}
 
 	// Load time-dependent value for voltage source for tran
         VSource.prototype.load_tran = function(ckt,soln,rhs,time) {
-	    ckt.add_to_rhs(this.branch,this.src.value(time),rhs);  
+	    ckt.add_to_rhs(this.branch,this.src.value(time),rhs);
 	}
 
 	// return time of next breakpoint for the device
@@ -1756,7 +1756,7 @@ var cktsim = (function() {
 	Capacitor.prototype.constructor = Capacitor;
 
         Capacitor.prototype.load_linear = function(ckt) {
-	    // MNA stamp for capacitance matrix 
+	    // MNA stamp for capacitance matrix
 	    ckt.add_capacitance(this.n1,this.n2,this.value);
 	}
 
@@ -1808,7 +1808,7 @@ var cktsim = (function() {
 
 	///////////////////////////////////////////////////////////////////////////////
 	//
-	//  Simple Voltage-Controlled Voltage Source Op Amp model 
+	//  Simple Voltage-Controlled Voltage Source Op Amp model
 	//
 	///////////////////////////////////////////////////////////////////////////////
 
@@ -1900,7 +1900,7 @@ var cktsim = (function() {
 			gmgs *= vds;
 		    }
 		    ckt.add_to_rhs(d,-ids,rhs);  // current flows into the drain
-		    ckt.add_to_rhs(s, ids,rhs);   // and out the source		    
+		    ckt.add_to_rhs(s, ids,rhs);   // and out the source
 		    ckt.add_conductance(d,s,gds);
 		    ckt.add_to_G(s,s, gmgs);
 		    ckt.add_to_G(d,s,-gmgs);
@@ -1939,7 +1939,7 @@ var cktsim = (function() {
 
 // Copyright (C) 2011 Massachusetts Institute of Technology
 
-// add schematics to a document with 
+// add schematics to a document with
 //
 //   <input type="hidden" class="schematic" name="unique_form_id" value="JSON netlist..." .../>
 //
@@ -2147,7 +2147,7 @@ schematic = (function() {
 	    this.bg_image.height = this.height;
 
 	    if (!this.diagram_only) {
-		this.canvas.tabIndex = 1; // so we get keystrokes
+        this.canvas.tabIndex = 0; // so we get keystrokes
 		this.canvas.style.borderStyle = 'solid';
 		this.canvas.style.borderWidth = '1px';
 		this.canvas.style.borderColor = grid_style;
@@ -2786,7 +2786,7 @@ schematic = (function() {
 	    if (ckt === null) return;
 	    var results = ckt.ac(npts,fstart,fstop,ac_source_name);
 
-	    if (typeof results == 'string') 
+	    if (typeof results == 'string')
 		this.message(results);
 	    else {
 		var x_values = results['_frequencies_'];
@@ -2913,7 +2913,7 @@ schematic = (function() {
 		    var results = ckt.tran(ckt.parse_number(sch.tran_npts), 0,
 					   ckt.parse_number(sch.tran_tstop), probe_names, false);
 
-		    if (typeof results == 'string') 
+		    if (typeof results == 'string')
 			sch.message(results);
 		    else {
 			if (sch.submit_analyses != undefined) {
@@ -3879,24 +3879,34 @@ schematic = (function() {
 	////////////////////////////////////////////////////////////////////////////////
 
 	Schematic.prototype.add_tool = function(icon,tip,callback) {
-	    var tool;
+	    var tool, child, label, hidden;
+
+        tool = document.createElement('button');
+        child = document.createElement('img');
+        label = document.createElement('span');
+        hidden = document.createElement('span');
+
+        tool.style.backgroundImage = 'none';
+        tool.setAttribute('title', tip);
+        label.innerHTML = tip;
+        label.classList.add('sr');
+        hidden.setAttribute('aria-hidden', 'true');
+
 	    if (icon.search('data:image') != -1) {
-		tool = document.createElement('img');
-		tool.src = icon;
+            child.setAttribute('src', icon);
+            child.setAttribute('alt', '');
+            tool.appendChild(child);
 	    } else {
-		tool = document.createElement('span');
-		tool.style.font = 'small-caps small sans-serif';
-		var label = document.createTextNode(icon);
-		tool.appendChild(label);
+            tool.style.font = 'small-caps small sans-serif';
+            hidden.innerHTML = icon;
+            tool.appendChild(hidden);
+            tool.appendChild(label);
 	    }
 
 	    // decorate tool
-	    tool.style.borderWidth = '1px';
-	    tool.style.borderStyle = 'solid';
-	    tool.style.borderColor = background_style;
-	    tool.style.padding = '2px';
-	    tool.style.verticalAlign = 'middle';
-	    tool.style.cursor = 'default';
+        tool.style.height = '32px';
+        tool.style.width = 'auto';
+        tool.style.verticalAlign = 'top';
 
 	    // set up event processing
 	    tool.addEventListener('mouseover',tool_enter,false);
@@ -3910,7 +3920,6 @@ schematic = (function() {
 	    this.toolbar.push(tool);
 
 	    tool.enabled = false;
-	    tool.style.opacity = 0.2;
 
 	    return tool;
 	}
@@ -3919,13 +3928,13 @@ schematic = (function() {
 	    var tool = this.tools[tname];
 
 	    if (tool != undefined) {
-		tool.style.opacity = which ? 1.0 : 0.2;
+        tool.removeAttribute('disabled');
 		tool.enabled = which;
 
 		// if disabling tool, remove border and tip
 		if (!which) {
-		    tool.style.borderColor = background_style;
 		    tool.sch.message('');
+            tool.setAttribute('disabled', 'true');
 		}
 	    }
 	}
@@ -3933,48 +3942,54 @@ schematic = (function() {
 	// highlight tool button by turning on border, changing background
 	function tool_enter(event) {
 	    if (!event) event = window.event;
-	    var tool = (window.event) ? event.srcElement : event.target;
-
-	    if (tool.enabled) {
-		tool.style.borderColor = normal_style;
+        var tool = event.target;
+        if (event.target.tagName.toLowerCase() == 'img' || event.target.tagName.toLowerCase() == 'span') {
+            tool = event.target.parentNode;
+        }
+        if (tool.enabled) {
 		tool.sch.message(tool.tip);
-		tool.opacity = 1.0;
 	    }
+        event.stopPropagation();
 	}
 
 	// unhighlight tool button by turning off border, reverting to normal background
 	function tool_leave(event) {
 	    if (!event) event = window.event;
-	    var tool = (window.event) ? event.srcElement : event.target;
-
+        var tool = event.target;
+        if (event.target.tagName.toLowerCase() == 'img' || event.target.tagName.toLowerCase() == 'span') {
+            tool = event.target.parentNode;
+        }
 	    if (tool.enabled) {
-		tool.style.borderColor = background_style;
 		tool.sch.message('');
 	    }
+        event.stopPropagation();
 	}
 
 	// handle click on a tool
 	function tool_click(event) {
 	    if (!event) event = window.event;
-	    var tool = (window.event) ? event.srcElement : event.target;
-
+        var tool = event.target;
+        if (event.target.tagName.toLowerCase() == 'img' || event.target.tagName.toLowerCase() == 'span') {
+            tool = event.target.parentNode;
+        }
 	    if (tool.enabled) {
 		tool.sch.canvas.relMouseCoords(event);  // so we can position pop-up window correctly
 		tool.callback.call(tool.sch);
 	    }
+        event.stopPropagation();
 	}
 
-	var help_icon = 'data:image/gif;base64,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';
+	var help_icon = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAABgFBMVEUARMwAZsz///8AM5kGqP+s1/8AeuARp/8AZ803qPsAXNYAdNwAZcxZuv9auf99xv8AdNoEd9uTzP8AYsgAivQTl/cAj/V9xf8Ad90AeN5PtP8AUMoAj/oRiOgprf84qfwAb9UAifAAdtwAf+UAgOYActgAk/oAie8cqP8AbtQAXtkXof8AatBNuP8AbdMAgukXcOEAXdcAlP0AhuwJmv0prv8YceGCyP8AbtUAZd8elvMAZcsAW9Ucpv8AjfM3sP8AiO4AWdNOuP8AddsPgeIAhOoAbdT///8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABH5RCxAAAASHRSTlP//////////////////////////////////////////////////////////////////////////////////////////////wCc7PJgAAAAAWJLR0R/SL9x5QAAAAlwSFlzAAAASAAAAEgARslrPgAAAAl2cEFnAAAAEAAAABAAXMatwwAAAK5JREFUGNM1zwcOwjAMBVAHQ9PFbIG27L333pve/0bEBr5kyf9JkWIIKYLDK3CNcZgUiE0QFIuuu89kBIHIDy5TUOmXSknBsFxDRAXMJ4FIZOeqA41lxQVB+w/1L9RyO+B+fLwJ7q/OOUfd9FvDkQJDmyyuoLqWGtsVBq3RnAHcUlXbNgSEWPY8n570dH2F6h94Sqe3BAdd7xKEKKVTACg4UuL3OMQoB/F3LRGF1w/Arhm2Q9w2ZQAAACV0RVh0Y3JlYXRlLWRhdGUAMjAwOC0xMC0yM1QxMTo1ODozNiswODowMKkTWd4AAAAldEVYdG1vZGlmeS1kYXRlADIwMDgtMTAtMjNUMTE6NTk6NTArMDg6MDC833hpAAAAAElFTkSuQmCC';
 
-	var cut_icon = 'data:image/gif;base64,R0lGODlhEAAQALMAAAAAAIAAAACAAICAAAAAgIAAgACAgMDAwICAgP8AAAD/AP//AAAA//8A/wD//////yH5BAEAAAcALAAAAAAQABAAAAQu8MhJqz1g5qs7lxv2gRkQfuWomarXEgDRHjJhf3YtyRav0xcfcFgR0nhB5OwTAQA7';
+	var cut_icon = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QAAAAAAAD5Q7t/AAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH1QocFh0xaEFkXgAAArRJREFUOMuFk11Ik1EYx59z3nevr9vUfaXbbPgVaHjRVRB0YZRJV0XeZCIRaGmWWKhpgZAElaV9gYgQlBjoEPRKkCS6DAK1MG0zNvJj7zZ1m+51X+92zttNzmFa5+78/w8//s/znIMg5TzrfXIOAN7zPO9tunm7dI/Xz7LspTvNrbpUHadeGIYZu9XYrI1Go8t9/a87Uz0Fq7hw5nS55sWrnk8HAggh/E+HHdfV1lcQQo7t6E97HpeZc82m7ZCIKKUnDgRgjENLS7+AT0tDsVisdCcFy7JThYWF4HF7KKXU8a8EFTabDVZdK6iutr44kUic6nnePVBSUqJAgMHhdAAAWA8E3G299xljvLy4aAc+jUeSJB3X6/TXZAqwvrFGAWCiraXj4YEAAABKaeXCjwV5bc0DjTeaVPFEHIliEObm5iQA6Npb/xegraVjGmM8ZF+00WBwC2s0GhDcgizL8ru2lo7p/wL+pJianZnGTqcD0jkeMt8ORhBCb/arRXuFMaOxl1B6Pb65qSblZTIz+REVGHNAIHQLITRQ6fG07wsYM5k6437/g6MmEyQoRd6tTdkX3h5mZVRVkJ3D8BxHJVkG5/o6KLKyrla63UPJFsbN5hrJ5+sqNhrpwsrKVDASlgJBEdfEaU2UIzqWwTQQEhOO1dUPR/R6EvP5BsfN5t2XOmowCPNFRWSEYe4DAMxYLCGrUpnY8UcYhnzJNQcBAIYxbv+Wn09GDQZhd4ixmF6SJFJFyKMJleqlgmV5hLE9OWmOm1Hz6arJjIy+y5R2gyxTIMSwC+A4Qa1UMl/z8mImna5pXhC8iszMK8mPpNU2fHe5Ng4fOtQwa7HECKUYMA4AADAAANVarc/l95/0SxIbAJA5tfrsRUFI7twqiu7q7GyPNxDI8YfDGl8k4lOoVOetouj+DaDzOgfcNME8AAAAAElFTkSuQmCC';
 
-	var copy_icon = 'data:image/gif;base64,R0lGODlhEAAQALMAAAAAAIAAAACAAICAAAAAgIAAgACAgMDAwICAgP8AAAD/AP//AAAA//8A/wD//////yH5BAEAAAcALAAAAAAQABAAAAQ+8MhJ6wE4Wwqef9gmdV8HiKZJrCz3ecS7TikWfzExvk+M9a0a4MbTkXCgTMeoHPJgG5+yF31SLazsTMTtViIAOw==';
+	var copy_icon = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QAAAAAAAD5Q7t/AAAACXBIWXMAAAsSAAALEgHS3X78AAAAd0lEQVQ4y9WTsQ7AIAhE7wj//69dHKWLJqSlFOtUFpXA8SAIbBrHaR9yAAA6L2bvGiRvPtltQa+OqMrFPCo1jFhoRytBmXgqUCH5GUEkWCbova8TeBORfBNJVpYIrbVJdwDjY5hjJfk4vFnAzMDxiEqmo/fJAHACspMyA7UYnWgAAAAASUVORK5CYII=';
 
-	var paste_icon = 'data:image/gif;base64,R0lGODlhEAAQALMAAAAAAIAAAACAAICAAAAAgIAAgACAgMDAwICAgP8AAAD/AP//AAAA//8A/wD//////yH5BAEAAAcALAAAAAAQABAAAARL8MhJqwUYWJnxWp3GDcgAgCdQIqLKXmVLhhnyHiqpr7rME8AgocVDEB5IJHD0SyofBFzxGIQGAbvB0ZkcTq1CKK6z5YorwnR0w44AADs=';
+	var paste_icon = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QAAAAAAAD5Q7t/AAAACXBIWXMAAAsSAAALEgHS3X78AAABZElEQVQ4y6WSMUsDMRiGn6RteoJSENS5oCdFR3+D0MHBciA4uujiVrq0o1NBcBEEFycXRzcnf4GDINTiL7BTr9LeJdfGoaX0ei21+MFHAsn7fG9eAjOqXCwoz/NKgAWs53mlcrGgZt0VE3s7fdhsfgHguttztTHA5+0ZjUaDzdM7HEeRy60C0G7/EASa78cLXNelcPkw1qYnkVprfN/n+6aEUgqlFFJKjDForclms2itYzZigH6/Tz6fp9PpAFC8fp3h/J2rw42P2ksLADkNMMbgOA6O4wzfZW2sAWovrb3janUn4cAYgzGGRWWtRQjRPKpUdmOAKIrGgCiK5gKEGGb/XK9/JhwEQUC32yUMw7nTJ0ExQK/Xw/d9BoPBeMqiigHCMEQIQSqV+pM4AbCAXEKcAGAtKSn/AYCE/UVZpIEVYA1ASkkmkxl/mqfzg5ExG1tP7t8AtoAOwDqwP4pgmd4H1n8B+QWeF/d+HLAAAAAASUVORK5CYII=';
 
-	var close_icon = 'data:image/gif;base64,R0lGODlhEAAQAMQAAGtra/f3/62tre/v9+bm787O1pycnHNzc6WlpcXFxd7e3tbW1nt7e7W1te/v74SEhMXFzmNjY+bm5v///87OzgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAAAAAAALAAAAAAQABAAAAVt4DRMZGmSwRQQBUS9MAwRIyQ5Uq7neEFSDtxOF4T8cobIQaE4RAQ5yjHHiCCSD510QtFGvoCFdppDfBu7bYzy+D7WP5ggAgA8Y3FKwi5IAhIweW1vbBGEWy5rilsFi2tGAwSJixAFBCkpJ5ojIQA7';
+	var close_icon = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAACOUlEQVR42m2TzWtTQRTF30ysxE9E0VZKaapBa1OJxtRAW7XVGOrCKijFIEqXbgQFwf/BTReia7GUuBEUF5Y2YiMKKn6iKEqRom1DtAsjStGaGX9v3iQ+Y4Z35t6ZOfe8uXdmhFPVDqRSktYvpBzAxphaBQpKqSdalTLYO7fHxnWZL/zBfclkWAbksBBip7cmHEGvDd3raFlVUoOj2Wz+H4H9vT0RGQhMMLHGkxaienduuJV6p0ql5PjdiRlD2rurO0jwM9zWWnG1dPhyWql9ht3T1XmKwEtAaLNVMUT3AFyBsAz7g9lBbBc4+zcb54joTnQIKeRDZjrcvyNQxG9A5Bd2NwIZ+Gn8e2AxmHNFbTbXRWc8FoRcJLjObtDtbjB3DLtALZbws3l8d/0aOOzLZlYktkfX4eS9epuiehlqZ+TRi5cny8zEtuhVVo/7eabW8a2RFdivwlbPbu079uDT129yZYEd7W17oNzCXe4rdFHE2lrd0SRosbX5TXAK5EAd5NPYi9gF0AtGwSIrcN9IRTeFLxB8zp7RPAExMAUxAw7h3wRpdh+SQjzHBm0KZ4xA+8aWRgivzLU16TvuLZsB8UqyjvMYNDOu98rgfEQ8UklmS6hpQCs9ghuwdShfSKF9Ezb/n5x939upT7mKwOamRogqjchlhit9R+XbhGlfeGgn3k/Pjv33mNwWXl8f4sWdJ+Yow9W+JTetYSkDQ5P5wuear7HcNjSs5Upqd60ZLAXfwPSHwpyu5v4BhpTicEl0i9QAAAAASUVORK5CYII=';
 
-	var grid_icon = 'data:image/gif;base64,R0lGODlhEAAQAMQAAAAAAP///zAwYT09bpGRqZ6et5iYsKWlvbi40MzM5cXF3czM5OHh5tTU2fDw84uMom49DbWKcfLy8g0NDcDAwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAEAABQALAAAAAAQABAAAAUtICWOZGmeKDCqIlu68AvMdO2ueHvGuslTN6Bt6MsBd8Zg77hsDW3FpRJFrYpCADs=';
+	var grid_icon = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QAAAAAAAD5Q7t/AAAACXBIWXMAAAsSAAALEgHS3X78AAAAMklEQVQ4y2NkYGD4z0ABYGFgYGD4/x/VDEZGRqLFmCixnYGBYRAYwMgwGoijgTgsAhEAq84fH/l+ELYAAAAASUVORK5CYII=';
 
 	///////////////////////////////////////////////////////////////////////////////
 	//
@@ -4158,7 +4173,7 @@ schematic = (function() {
 		if (x == x_min) {
 		    c.moveTo(temp,top_margin);
 		    c.lineTo(temp,end);
-		} else 
+		} else
 		    c.dashedLineTo(temp,top_margin,temp,end,grid_pattern);
 		c.stroke();
 
@@ -4204,7 +4219,7 @@ schematic = (function() {
 		    if (y == y_min) {
 			c.moveTo(left_margin,temp);
 			c.lineTo(left_margin + pwidth,temp);
-		    } else 
+		    } else
 			c.dashedLineTo(left_margin,temp,left_margin + pwidth,temp,grid_pattern);
 		    c.stroke();
 
@@ -5122,7 +5137,7 @@ schematic = (function() {
 	    this.location = nx + ',' + ny;
 
 	    // add ourselves to the connection list for the new location
-	    if (parent.sch) 
+	    if (parent.sch)
 		parent.sch.update_connection_point(this,old_location);
 	}
 
@@ -6054,7 +6069,7 @@ schematic = (function() {
 			var first = true;
 			var value = '';
 			for (var label in fields) {
-			    if (label == 'name') 
+			    if (label == 'name')
 				c.properties['name'] = fields['name'].value;
 			    else if (label == 'value')  {
 				// if unknown source type
@@ -6100,7 +6115,7 @@ schematic = (function() {
 		this.draw_text(c,'\u2588\u2588\u2588',-8,8,4,annotation_size,element_style);
 		c.globalAlpha = 1.0;
 
-		// display the element current 
+		// display the element current
 		var i = engineering_notation(v,2) + 'A';
 		this.draw_text(c,i,-3,5,5,annotation_size,annotation_style);
 		// draw arrow for current
@@ -6178,4 +6193,4 @@ schematic = (function() {
 	    'component_slider': component_slider
 	}
 	return module;
-    }());
+}());

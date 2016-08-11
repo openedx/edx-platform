@@ -2,17 +2,16 @@ define([
     'backbone',
     'underscore',
     'teams/js/collections/team',
-    'teams/js/collections/team_membership',
     'teams/js/collections/topic',
     'teams/js/models/topic'
-], function (Backbone, _, TeamCollection, TeamMembershipCollection, TopicCollection, TopicModel) {
+], function(Backbone, _, TeamCollection, TopicCollection, TopicModel) {
     'use strict';
     var createMockPostResponse, createMockDiscussionResponse, createAnnotatedContentInfo, createMockThreadResponse,
         createMockTopicData, createMockTopicCollection, createMockTopic,
         testCourseID = 'course/1',
         testUser = 'testUser',
         testTopicID = 'test-topic-1',
-        testTeamDiscussionID = "12345",
+        testTeamDiscussionID = '12345',
         teamEvents = _.clone(Backbone.Events),
         testCountries = [
             ['', ''],
@@ -27,14 +26,14 @@ define([
             ['fr', 'French']
         ];
 
-    var createMockTeamData = function (startIndex, stopIndex) {
-        return _.map(_.range(startIndex, stopIndex + 1), function (i) {
-            var id = "id" + i;
+    var createMockTeamData = function(startIndex, stopIndex) {
+        return _.map(_.range(startIndex, stopIndex + 1), function(i) {
+            var id = 'id' + i;
             return {
-                name: "team " + i,
+                name: 'team ' + i,
                 id: id,
-                language: testLanguages[i%4][0],
-                country: testCountries[i%4][0],
+                language: testLanguages[i % 4][0],
+                country: testCountries[i % 4][0],
                 membership: [],
                 last_activity_at: '',
                 topic_id: 'topic_id' + i,
@@ -57,15 +56,15 @@ define([
     };
 
     var createMockTeams = function(responseOptions, options, collectionType) {
-        if(_.isUndefined(collectionType)) {
+        if (_.isUndefined(collectionType)) {
             collectionType = TeamCollection;
         }
         return new collectionType(
             createMockTeamsResponse(responseOptions),
             _.extend({
+                perPage: 5,
                 teamEvents: teamEvents,
                 course_id: testCourseID,
-                per_page: 2,
                 parse: true
             }, options)
         );
@@ -73,7 +72,7 @@ define([
 
     var createMockTeamMembershipsData = function(startIndex, stopIndex) {
         var teams = createMockTeamData(startIndex, stopIndex);
-        return _.map(_.range(startIndex, stopIndex + 1), function (i) {
+        return _.map(_.range(startIndex, stopIndex + 1), function(i) {
             return {
                 user: {
                     username: testUser,
@@ -82,7 +81,7 @@ define([
                         image_url_small: 'test_profile_image'
                     }
                 },
-                team: teams[i-1]
+                team: teams[i - 1]
             };
         });
     };
@@ -101,7 +100,7 @@ define([
 
     var verifyCards = function(view, teams) {
         var teamCards = view.$('.team-card');
-        _.each(teams, function (team, index) {
+        _.each(teams, function(team, index) {
             var currentCard = teamCards.eq(index);
             expect(currentCard.text()).toMatch(team.name);
             expect(currentCard.text()).toMatch(_.object(testLanguages)[team.language]);
@@ -109,7 +108,7 @@ define([
         });
     };
 
-    var triggerTeamEvent = function (action) {
+    var triggerTeamEvent = function(action) {
         teamEvents.trigger('teams:update', {action: action});
     };
 
@@ -120,20 +119,20 @@ define([
                 course_id: testCourseID,
                 commentable_id: testTeamDiscussionID,
                 type: 'thread',
-                body: "",
+                body: '',
                 anonymous_to_peers: false,
                 unread_comments_count: 0,
                 updated_at: '2015-07-29T18:44:56Z',
                 group_name: 'Default Group',
                 pinned: false,
                 votes: {count: 0, down_count: 0, point: 0, up_count: 0},
-                user_id: "9",
+                user_id: '9',
                 abuse_flaggers: [],
                 closed: false,
                 at_position_list: [],
                 read: false,
                 anonymous: false,
-                created_at: "2015-07-29T18:44:56Z",
+                created_at: '2015-07-29T18:44:56Z',
                 thread_type: 'discussion',
                 comments_count: 0,
                 group_id: 1,
@@ -146,36 +145,36 @@ define([
     createMockDiscussionResponse = function(threads) {
         if (_.isUndefined(threads)) {
             threads = [
-                createMockPostResponse({ id: "1", title: "First Post"}),
-                createMockPostResponse({ id: "2", title: "Second Post"}),
-                createMockPostResponse({ id: "3", title: "Third Post"})
+                createMockPostResponse({id: '1', title: 'First Post'}),
+                createMockPostResponse({id: '2', title: 'Second Post'}),
+                createMockPostResponse({id: '3', title: 'Third Post'})
             ];
         }
         return {
-            "num_pages": 1,
-            "page": 1,
-            "discussion_data": threads,
-            "user_info": {
-                "username": testUser,
-                "follower_ids": [],
-                "default_sort_key": "date",
-                "downvoted_ids": [],
-                "subscribed_thread_ids": [],
-                "upvoted_ids": [],
-                "external_id": "9",
-                "id": "9",
-                "subscribed_user_ids": [],
-                "subscribed_commentable_ids": []
+            'num_pages': 1,
+            'page': 1,
+            'discussion_data': threads,
+            'user_info': {
+                'username': testUser,
+                'follower_ids': [],
+                'default_sort_key': 'date',
+                'downvoted_ids': [],
+                'subscribed_thread_ids': [],
+                'upvoted_ids': [],
+                'external_id': '9',
+                'id': '9',
+                'subscribed_user_ids': [],
+                'subscribed_commentable_ids': []
             },
-            "annotated_content_info": {
+            'annotated_content_info': {
             },
-            "roles": {"Moderator": [], "Administrator": [], "Community TA": []},
-            "course_settings": {
-                "is_cohorted": false,
-                "allow_anonymous_to_peers": false,
-                "allow_anonymous": true,
-                "category_map": {"subcategories": {}, "children": [], "entries": {}},
-                "cohorts": []
+            'roles': {'Moderator': [], 'Administrator': [], 'Community TA': []},
+            'course_settings': {
+                'is_cohorted': false,
+                'allow_anonymous_to_peers': false,
+                'allow_anonymous': true,
+                'category_map': {'subcategories': {}, 'children': [], 'entries': {}},
+                'cohorts': []
             }
         };
     };
@@ -204,36 +203,36 @@ define([
                 comments_count: 0,
                 anonymous_to_peers: false,
                 unread_comments_count: 0,
-                updated_at: "2015-08-04T21:44:28Z",
+                updated_at: '2015-08-04T21:44:28Z',
                 resp_skip: 0,
-                id: "55c1323c56c02ce921000001",
+                id: '55c1323c56c02ce921000001',
                 pinned: false,
-                votes: {"count": 0, "down_count": 0, "point": 0, "up_count": 0},
+                votes: {'count': 0, 'down_count': 0, 'point': 0, 'up_count': 0},
                 resp_limit: 25,
                 abuse_flaggers: [],
                 closed: false,
                 resp_total: 1,
                 at_position_list: [],
-                type: "thread",
+                type: 'thread',
                 read: true,
                 anonymous: false,
-                user_id: "5",
-                created_at: "2015-08-04T21:44:28Z",
-                thread_type: "discussion",
-                context: "standalone",
+                user_id: '5',
+                created_at: '2015-08-04T21:44:28Z',
+                thread_type: 'discussion',
+                context: 'standalone',
                 endorsed: false
             },
             options
         );
     };
 
-    createMockTopicData = function (startIndex, stopIndex) {
-        return _.map(_.range(startIndex, stopIndex + 1), function (i) {
+    createMockTopicData = function(startIndex, stopIndex) {
+        return _.map(_.range(startIndex, stopIndex + 1), function(i) {
             return {
-                "description": "Test description " + i,
-                "name": "Test Topic " + i,
-                "id": "test-topic-" + i,
-                "team_count": 0
+                'description': 'Test description ' + i,
+                'name': 'Test Topic ' + i,
+                'id': 'test-topic-' + i,
+                'team_count': 0
             };
         });
     };
@@ -274,7 +273,7 @@ define([
         return _.extend({}, testContext, options);
     };
 
-    createMockTopicCollection = function (topicData) {
+    createMockTopicCollection = function(topicData) {
         topicData = topicData !== undefined ? topicData : createMockTopicData(1, 5);
 
         return new TopicCollection(

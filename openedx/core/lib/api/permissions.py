@@ -6,6 +6,8 @@ from django.conf import settings
 from django.http import Http404
 from rest_framework import permissions
 
+from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import CourseKey
 from student.roles import CourseStaffRole, CourseInstructorRole
 
 
@@ -64,13 +66,49 @@ class IsUserInUrl(permissions.BasePermission):
         return True
 
 
-class IsCourseInstructor(permissions.BasePermission):
+class IsCourseStaffInstructor(permissions.BasePermission):
     """
-    Permission to check that user is a course instructor.
+    Permission to check that user is a course instructor or staff of
+    a master course given a course object or the user is a coach of
+    the course itself.
     """
 
     def has_object_permission(self, request, view, obj):
-        return hasattr(request, 'user') and CourseInstructorRole(obj.course_id).has_user(request.user)
+        return (hasattr(request, 'user') and
+                # either the user is a staff or instructor of the master course
+                (hasattr(obj, 'course_id') and
+                 (CourseInstructorRole(obj.course_id).has_user(request.user) or
+                  CourseStaffRole(obj.course_id).has_user(request.user))) or
+                # or it is a safe method and the user is a coach on the course object
+                (request.method in permissions.SAFE_METHODS
+                 and hasattr(obj, 'coach') and obj.coach == request.user))
+
+
+class IsMasterCourseStaffInstructor(permissions.BasePermission):
+    """
+    Permission to check that user is instructor or staff of the master course.
+    """
+    def has_permission(self, request, view):
+        """
+        This method is assuming that a `master_course_id` parameter
+        is available in the request as a GET parameter, a POST parameter
+        or it is in the JSON payload included in the request.
+        The reason is because this permission class is going
+        to check if the user making the request is an instructor
+        for the specified course.
+        """
+        master_course_id = (request.GET.get('master_course_id')
+                            or request.POST.get('master_course_id')
+                            or request.data.get('master_course_id'))
+        if master_course_id is not None:
+            try:
+                course_key = CourseKey.from_string(master_course_id)
+            except InvalidKeyError:
+                raise Http404()
+            return (hasattr(request, 'user') and
+                    (CourseInstructorRole(course_key).has_user(request.user) or
+                     CourseStaffRole(course_key).has_user(request.user)))
+        return False
 
 
 class IsUserInUrlOrStaff(IsUserInUrl):

@@ -1,7 +1,7 @@
 /**
  * Generic view to render a collection.
  */
-;(function (define) {
+(function(define) {
     'use strict';
     define(['backbone', 'underscore'], function(Backbone, _) {
         var ListView = Backbone.View.extend({
@@ -10,7 +10,7 @@
              */
             itemViewClass: Backbone.View,
 
-            initialize: function (options) {
+            initialize: function(options) {
                 this.itemViewClass = options.itemViewClass || this.itemViewClass;
                 // TODO: at some point we will want 'add' and 'remove'
                 // not to re-render the whole collection, but this is
@@ -24,18 +24,26 @@
                 this.itemViews = [];
             },
 
-            render: function () {
-                // Remove old children views
-                _.each(this.itemViews, function (childView) {
-                    childView.remove();
-                });
-                this.itemViews = [];
-                // Render the collection
-                this.collection.each(function (model) {
+            renderCollection: function() {
+                /**
+                 * Render every item in the collection.
+                 * This should push each rendered item to this.itemViews
+                 * to ensure garbage collection works.
+                 */
+                this.collection.each(function(model) {
                     var itemView = new this.itemViewClass({model: model});
                     this.$el.append(itemView.render().el);
                     this.itemViews.push(itemView);
                 }, this);
+            },
+
+            render: function() {
+                // Remove old children views
+                _.each(this.itemViews, function(childView) {
+                    childView.remove();
+                });
+                this.itemViews = [];
+                this.renderCollection();
                 return this;
             }
         });

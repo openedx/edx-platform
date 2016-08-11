@@ -3,14 +3,17 @@ Tests related to the cohorting feature.
 """
 from uuid import uuid4
 
-from .helpers import BaseDiscussionMixin, BaseDiscussionTestCase
-from .helpers import CohortTestMixin
-from ..helpers import UniqueCourseTest
-from ...pages.lms.auto_auth import AutoAuthPage
-from ...fixtures.course import (CourseFixture, XBlockFixtureDesc)
+from common.test.acceptance.tests.discussion.helpers import BaseDiscussionMixin, BaseDiscussionTestCase
+from common.test.acceptance.tests.discussion.helpers import CohortTestMixin
+from common.test.acceptance.tests.helpers import UniqueCourseTest
+from common.test.acceptance.pages.lms.auto_auth import AutoAuthPage
+from common.test.acceptance.fixtures.course import (CourseFixture, XBlockFixtureDesc)
 
-from ...pages.lms.discussion import (DiscussionTabSingleThreadPage, InlineDiscussionThreadPage, InlineDiscussionPage)
-from ...pages.lms.courseware import CoursewarePage
+from common.test.acceptance.pages.lms.discussion import (
+    DiscussionTabSingleThreadPage,
+    InlineDiscussionThreadPage,
+    InlineDiscussionPage)
+from common.test.acceptance.pages.lms.courseware import CoursewarePage
 
 from nose.plugins.attrib import attr
 
@@ -76,7 +79,7 @@ class DiscussionTabSingleThreadTest(BaseDiscussionTestCase):
         self.thread_page.wait_for_page()
 
 
-@attr('shard_5')
+@attr(shard=5)
 class CohortedDiscussionTabSingleThreadTest(DiscussionTabSingleThreadTest, CohortedDiscussionTestMixin):
     """
     Tests for the discussion page displaying a single cohorted thread.
@@ -85,7 +88,7 @@ class CohortedDiscussionTabSingleThreadTest(DiscussionTabSingleThreadTest, Cohor
     pass
 
 
-@attr('shard_5')
+@attr(shard=5)
 class NonCohortedDiscussionTabSingleThreadTest(DiscussionTabSingleThreadTest, NonCohortedDiscussionTestMixin):
     """
     Tests for the discussion page displaying a single non-cohorted thread.
@@ -134,7 +137,7 @@ class InlineDiscussionTest(UniqueCourseTest):
         self.show_thread(thread_id)
 
 
-@attr('shard_5')
+@attr(shard=5)
 class CohortedInlineDiscussionTest(InlineDiscussionTest, CohortedDiscussionTestMixin):
     """
     Tests for cohorted inline discussions.
@@ -143,7 +146,7 @@ class CohortedInlineDiscussionTest(InlineDiscussionTest, CohortedDiscussionTestM
     pass
 
 
-@attr('shard_5')
+@attr(shard=5)
 class NonCohortedInlineDiscussionTest(InlineDiscussionTest, NonCohortedDiscussionTestMixin):
     """
     Tests for non-cohorted inline discussions.

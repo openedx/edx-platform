@@ -3,10 +3,6 @@
 @import '../base/grid-settings';
 @import "neat/neat"; // lib - Neat
 
-$sm-btn-google: #dd4b39;
-$sm-btn-facebook: #3b5998;
-$sm-btn-linkedin: #0077b5;
-
 .login-register {
     @include box-sizing(border-box);
     @include outer-container;
@@ -249,7 +245,7 @@ $sm-btn-linkedin: #0077b5;
                 color: $red;
             }
 
-            &[for="register-honor_code"] {
+            &[for="register-honor_code"], &[for="register-terms_of_service"] {
                 display: inline-block;
                 margin: 5px 5px 0 0;
                 width: 90%;
@@ -356,6 +352,10 @@ $sm-btn-linkedin: #0077b5;
         text-transform: none;
         font-weight: 600;
         letter-spacing: normal;
+
+        .icon {
+            @extend %sso-icon;
+        }
     }
 
     .login-provider {
@@ -375,6 +375,7 @@ $sm-btn-linkedin: #0077b5;
         text-transform: none;
 
         .icon {
+            @extend %sso-icon;
             @include left(0);
 
             position: absolute;
@@ -403,17 +404,17 @@ $sm-btn-linkedin: #0077b5;
         }
 
         &.button-oa2-google-oauth2 {
-            color: $sm-btn-google;
+            color: $google-red;
 
             .icon {
-                background: $sm-btn-google;
+                background: $google-red;
             }
 
             &:hover,
             &:focus {
-                background-color: $sm-btn-google;
+                background-color: $google-red;
                 border: 1px solid #A5382B;
-                color: white;
+                color: $white;
             }
 
             &:hover {
@@ -422,17 +423,17 @@ $sm-btn-linkedin: #0077b5;
         }
 
         &.button-oa2-facebook {
-            color: $sm-btn-facebook;
+            color: $facebook-blue;
 
             .icon {
-                background: $sm-btn-facebook;
+                background: $facebook-blue;
             }
 
             &:hover,
             &:focus {
-                background-color: $sm-btn-facebook;
+                background-color: $facebook-blue;
                 border: 1px solid #263A62;
-                color: white;
+                color: $white;
             }
 
             &:hover {
@@ -441,21 +442,40 @@ $sm-btn-linkedin: #0077b5;
         }
 
         &.button-oa2-linkedin-oauth2 {
-            color: $sm-btn-linkedin;
+            color: $linkedin-blue;
 
             .icon {
-                background: $sm-btn-linkedin;
+                background: $linkedin-blue;
             }
 
             &:hover,
             &:focus {
-                background-color: $sm-btn-linkedin;
+                background-color: $linkedin-blue;
                 border: 1px solid #06527D;
-                color: white;
+                color: $white;
             }
 
             &:hover {
                 box-shadow: 0 2px 1px 0 #005D8E;
+            }
+        }
+
+        &.button-oa2-azuread-oauth2 {
+            color: darken($microsoft-blue, 20%);
+
+            .icon {
+                background: $microsoft-blue;
+            }
+
+            &:hover,
+            &:focus {
+                background-color: $microsoft-blue;
+                border: 1px solid $microsoft-blue;
+                color: $white;
+            }
+
+            &:hover {
+                box-shadow: 0 2px 1px 0 darken($microsoft-blue, 10%);
             }
         }
 

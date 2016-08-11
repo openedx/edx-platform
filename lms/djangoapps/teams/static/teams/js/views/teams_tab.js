@@ -1,10 +1,12 @@
-;(function (define) {
+(function(define) {
     'use strict';
 
     define(['backbone',
             'jquery',
             'underscore',
             'gettext',
+            'edx-ui-toolkit/js/utils/html-utils',
+            'edx-ui-toolkit/js/utils/string-utils',
             'common/js/components/views/search_field',
             'js/components/header/views/header',
             'js/components/header/models/header',
@@ -25,26 +27,26 @@
             'teams/js/views/team_utils',
             'teams/js/views/instructor_tools',
             'text!teams/templates/teams_tab.underscore'],
-        function (Backbone, $, _, gettext, SearchFieldView, HeaderView, HeaderModel,
+        function(Backbone, $, _, gettext, HtmlUtils, StringUtils, SearchFieldView, HeaderView, HeaderModel,
                   TopicModel, TopicCollection, TeamModel, TeamCollection, MyTeamsCollection, TeamAnalytics,
                   TeamsTabbedView, TopicsView, TeamProfileView, MyTeamsView, TopicTeamsView, TeamEditView,
                   TeamMembersEditView, TeamProfileHeaderActionsView, TeamUtils, InstructorToolsView, teamsTemplate) {
             var TeamsHeaderModel = HeaderModel.extend({
-                initialize: function () {
+                initialize: function() {
                     _.extend(this.defaults, {nav_aria_label: gettext('Topics')});
                     HeaderModel.prototype.initialize.call(this);
                 }
             });
 
             var ViewWithHeader = Backbone.View.extend({
-                initialize: function (options) {
+                initialize: function(options) {
                     this.header = options.header;
                     this.main = options.main;
                     this.instructorTools = options.instructorTools;
                 },
 
-                render: function () {
-                    this.$el.html(_.template(teamsTemplate));
+                render: function() {
+                    HtmlUtils.setHtml(this.$el, HtmlUtils.template(teamsTemplate)({}));
                     this.$('p.error').hide();
                     this.header.setElement(this.$('.teams-header')).render();
                     if (this.instructorTools) {
@@ -66,7 +68,7 @@
                     router = this.router = new Backbone.Router();
                     _.each([
                         [':default', _.bind(this.routeNotFound, this)],
-                        ['content', _.bind(function () {
+                        ['main', _.bind(function() {
                             // The backbone router unfortunately usurps the
                             // default behavior of in-page-links.  This hack
                             // prevents the screen reader in-page-link from
@@ -78,7 +80,7 @@
                         ['teams/:topic_id/:team_id(/)', _.bind(this.browseTeam, this)],
                         [new RegExp('^(browse)\/?$'), _.bind(this.goToTab, this)],
                         [new RegExp('^(my-teams)\/?$'), _.bind(this.goToTab, this)]
-                    ], function (route) {
+                    ], function(route) {
                         router.route.apply(router, route);
                     });
 
@@ -88,7 +90,7 @@
                             ['teams/:topic_id/:team_id/edit-team/manage-members(/)',
                                 _.bind(this.editTeamMembers, this)
                             ]
-                        ], function (route) {
+                        ], function(route) {
                             router.route.apply(router, route);
                         });
                     }
@@ -101,7 +103,7 @@
                             teamEvents: this.teamEvents,
                             course_id: this.context.courseID,
                             username: this.context.userInfo.username,
-                            per_page: 2,
+                            perPage: 2,
                             parse: true,
                             url: this.context.myTeamsUrl
                         }
@@ -121,7 +123,7 @@
                             course_id: this.context.courseID,
                             parse: true
                         }
-                    ).bootstrap();
+                    );
 
                     this.topicsView = new TopicsView({
                         router: this.router,
@@ -130,21 +132,15 @@
                     });
 
                     this.mainView = this.tabbedView = this.createViewWithHeader({
-                        title: gettext("Teams"),
-                        description: gettext("See all teams in your course, organized by topic. Join a team to collaborate with other learners who are interested in the same topic as you are."),
+                        title: gettext('Teams'),
+                        description: gettext('See all teams in your course, organized by topic. Join a team to collaborate with other learners who are interested in the same topic as you are.'),
                         mainView: new TeamsTabbedView({
                             tabs: [{
                                 title: gettext('My Team'),
                                 url: 'my-teams',
                                 view: this.myTeamsView
                             }, {
-                                title: interpolate(
-                                    // Translators: sr_start and sr_end surround text meant only for screen readers.
-                                    // The whole string will be shown to users as "Browse teams" if they are using a
-                                    // screenreader, and "Browse" otherwise.
-                                    gettext("Browse %(sr_start)s teams %(sr_end)s"),
-                                    {"sr_start": '<span class="sr">', "sr_end": '</span>'}, true
-                                ),
+                                title: gettext('Browse'),
                                 url: 'browse',
                                 view: this.topicsView
                             }],
@@ -159,14 +155,7 @@
                 start: function() {
                     Backbone.history.start();
 
-                    $(document).ajaxError(function (event, xhr) {
-                        if (xhr.status === 401) {
-                            TeamUtils.showMessage(gettext("Your request could not be completed. Reload the page and try again."));
-                        }
-                        else if (xhr.status === 500) {
-                            TeamUtils.showMessage(gettext("Your request could not be completed due to a server problem. Reload the page and try again. If the issue persists, click the Help tab to report the problem."));
-                        }
-                    });
+                    $(document).ajaxError(this.errorHandler);
 
                     // Navigate to the default page if there is no history:
                     // 1. If the user belongs to at least one team, jump to the "My Teams" page
@@ -180,6 +169,20 @@
                     }
                 },
 
+                errorHandler: function(event, xhr) {
+                    if (xhr.status === 401) {
+                        TeamUtils.showMessage(gettext(
+                            'Your request could not be completed. Reload the page and try again.'
+                        ));
+                    }
+                    else if (xhr.status === 500) {
+                        TeamUtils.showMessage(gettext(
+                            'Your request could not be completed due to a server problem. Reload the page' +
+                            ' and try again. If the issue persists, click the Help tab to report the problem.'
+                        ));
+                    }
+                },
+
                 render: function() {
                     this.mainView.setElement(this.$el).render();
                     TeamUtils.hideMessage();
@@ -189,9 +192,9 @@
                 /**
                  * Render the list of teams for the given topic ID.
                  */
-                browseTopic: function (topicID) {
+                browseTopic: function(topicID) {
                     var self = this;
-                    this.getTeamsView(topicID).done(function (teamsView) {
+                    this.getTeamsView(topicID).done(function(teamsView) {
                         self.teamsView = self.mainView = teamsView;
                         self.render();
                         TeamAnalytics.emitPageViewed('single-topic', topicID, null);
@@ -201,21 +204,20 @@
                 /**
                  * Show the search results for a team.
                  */
-                searchTeams: function (topicID) {
+                searchTeams: function(topicID) {
                     var view = this;
                     if (!this.teamsCollection) {
                         this.router.navigate('topics/' + topicID, {trigger: true});
                     } else {
-                        this.getTopic(topicID).done(function (topic) {
+                        this.getTopic(topicID).done(function(topic) {
                             view.mainView = view.createTeamsListView({
                                 topic: topic,
                                 collection: view.teamsCollection,
                                 breadcrumbs: view.createBreadcrumbs(topic),
                                 title: gettext('Team Search'),
-                                description: interpolate(
-                                    gettext('Showing results for "%(searchString)s"'),
-                                    { searchString: view.teamsCollection.searchString },
-                                    true
+                                description: StringUtils.interpolate(
+                                    gettext('Showing results for "{searchString}"'),
+                                    {searchString: view.teamsCollection.getSearchString()}
                                 ),
                                 showSortControls: false
                             });
@@ -228,12 +230,12 @@
                 /**
                  * Render the create new team form.
                  */
-                newTeam: function (topicID) {
+                newTeam: function(topicID) {
                     var view = this;
-                    this.getTopic(topicID).done(function (topic) {
+                    this.getTopic(topicID).done(function(topic) {
                         view.mainView = view.createViewWithHeader({
                             topic: topic,
-                            title: gettext("Create a New Team"),
+                            title: gettext('Create a New Team'),
                             description: gettext("Create a new team if you can't find an existing team to join, or if you would like to learn with friends you know."),
                             breadcrumbs: view.createBreadcrumbs(topic),
                             mainView: new TeamEditView({
@@ -251,7 +253,7 @@
                 /**
                  * Render the edit team form.
                  */
-                editTeam: function (topicID, teamID) {
+                editTeam: function(topicID, teamID) {
                     var self = this,
                         editViewWithHeader;
                     $.when(this.getTopic(topicID), this.getTeam(teamID, false)).done(function(topic, team) {
@@ -267,8 +269,8 @@
                             teamEvents: self.teamEvents
                         });
                         editViewWithHeader = self.createViewWithHeader({
-                            title: gettext("Edit Team"),
-                            description: gettext("If you make significant changes, make sure you notify members of the team before making these changes."),
+                            title: gettext('Edit Team'),
+                            description: gettext('If you make significant changes, make sure you notify members of the team before making these changes.'),
                             breadcrumbs: self.createBreadcrumbs(topic, team),
                             mainView: view,
                             topic: topic,
@@ -285,7 +287,7 @@
                  *
                  * The backbone router entry for editing team members, using topic and team IDs.
                  */
-                editTeamMembers: function (topicID, teamID) {
+                editTeamMembers: function(topicID, teamID) {
                     var self = this;
                     $.when(this.getTopic(topicID), this.getTeam(teamID, true)).done(function(topic, team) {
                         var view = new TeamMembersEditView({
@@ -294,13 +296,13 @@
                             model: team
                         });
                         self.mainView = self.createViewWithHeader({
-                                mainView: view,
-                                breadcrumbs: self.createBreadcrumbs(topic, team),
-                                title: gettext("Membership"),
-                                description: gettext("You can remove members from this team, especially if they have not participated in the team's activity."),
-                                topic: topic,
-                                team: team
-                            }
+                            mainView: view,
+                            breadcrumbs: self.createBreadcrumbs(topic, team),
+                            title: gettext('Membership'),
+                            description: gettext("You can remove members from this team, especially if they have not participated in the team's activity."),
+                            topic: topic,
+                            team: team
+                        }
                         );
                         self.render();
                         TeamAnalytics.emitPageViewed('edit-team-members', topicID, teamID);
@@ -310,7 +312,7 @@
                 /**
                  * Return a promise for the TeamsView for the given topic ID.
                  */
-                getTeamsView: function (topicID) {
+                getTeamsView: function(topicID) {
                     // Lazily load the teams-for-topic view in
                     // order to avoid making an extra AJAX call.
                     var view = this,
@@ -326,19 +328,18 @@
                                     course_id: view.context.courseID,
                                     topic_id: topicID,
                                     url: view.context.teamsUrl,
-                                    per_page: 10
+                                    perPage: 10
                                 });
                                 view.teamsCollection = collection;
-                                collection.goTo(1)
-                                    .done(function() {
-                                        var teamsView = view.createTeamsListView({
-                                            topic: topic,
-                                            collection: collection,
-                                            breadcrumbs: view.createBreadcrumbs(),
-                                            showSortControls: true
-                                        });
-                                        deferred.resolve(teamsView);
+                                collection.getPage(1).then(function() {
+                                    var teamsView = view.createTeamsListView({
+                                        topic: topic,
+                                        collection: collection,
+                                        breadcrumbs: view.createBreadcrumbs(),
+                                        showSortControls: true
                                     });
+                                    deferred.resolve(teamsView);
+                                });
                             });
                     }
                     return deferred.promise();
@@ -347,7 +348,6 @@
                 createTeamsListView: function(options) {
                     var topic = options.topic,
                         collection = options.collection,
-                        self = this,
                         teamsView = new TopicTeamsView({
                             router: this.router,
                             context: this.context,
@@ -382,7 +382,7 @@
                         // that the collection doesn't unnecessarily get refreshed again.
                         collection.isStale = false;
 
-                        if (collection.searchString) {
+                        if (collection.getSearchString()) {
                             Backbone.history.navigate(searchUrl, {trigger: true});
                         } else if (Backbone.history.getFragment() === searchUrl) {
                             Backbone.history.navigate('topics/' + topic.get('id'), {trigger: true});
@@ -394,9 +394,9 @@
                 /**
                  * Browse to the team with the specified team ID belonging to the specified topic.
                  */
-                browseTeam: function (topicID, teamID) {
+                browseTeam: function(topicID, teamID) {
                     var self = this;
-                    this.getBrowseTeamView(topicID, teamID).done(function (browseTeamView) {
+                    this.getBrowseTeamView(topicID, teamID).done(function(browseTeamView) {
                         self.mainView = browseTeamView;
                         self.render();
                         TeamAnalytics.emitPageViewed('single-team', topicID, teamID);
@@ -413,7 +413,7 @@
                 /**
                  * Return a promise for the team view for the given team ID.
                  */
-                getBrowseTeamView: function (topicID, teamID) {
+                getBrowseTeamView: function(topicID, teamID) {
                     var self = this,
                         deferred = $.Deferred();
 
@@ -448,7 +448,7 @@
                     return deferred.promise();
                 },
 
-                canEditTeam: function () {
+                canEditTeam: function() {
                     return this.context.userInfo.privileged || this.context.userInfo.staff;
                 },
 
@@ -491,7 +491,7 @@
                             model: this.createHeaderModel(options),
                             headerActionsView: options.headerActionsView,
                             events: {
-                                'click nav.breadcrumbs a.nav-item': function (event) {
+                                'click nav.breadcrumbs a.nav-item': function(event) {
                                     var url = $(event.currentTarget).attr('href');
                                     event.preventDefault();
                                     router.navigate(url, {trigger: true});
@@ -510,7 +510,7 @@
                  * @param topicID the string identifier for the requested topic
                  * @returns a jQuery deferred promise for the topic.
                  */
-                getTopic: function (topicID) {
+                getTopic: function(topicID) {
                     // Try finding topic in the current page of the
                     // topicCollection.  Otherwise call the topic endpoint.
                     var topic = this.topicsCollection.findWhere({'id': topicID}),
@@ -543,11 +543,11 @@
                  * @param expandUser bool to add the users info.
                  * @returns {promise} a jQuery deferred promise for the team.
                  */
-                getTeam: function (teamID, expandUser) {
+                getTeam: function(teamID, expandUser) {
                     var team = this.teamsCollection ? this.teamsCollection.get(teamID) : null,
                         self = this,
                         deferred = $.Deferred(),
-                        teamUrl = this.context.teamsUrl + teamID + (expandUser ? '?expand=user': '');
+                        teamUrl = this.context.teamsUrl + teamID + (expandUser ? '?expand=user' : '');
                     if (team) {
                         team.url = teamUrl;
                         deferred.resolve(team);
@@ -571,7 +571,7 @@
                 /**
                  * Set up the tabbed view and switch tabs.
                  */
-                goToTab: function (tab) {
+                goToTab: function(tab) {
                     this.mainView = this.tabbedView;
                     // Note that `render` should be called first so
                     // that the tabbed view's element is set
@@ -582,32 +582,29 @@
 
                 // Error handling
 
-                routeNotFound: function (route) {
+                routeNotFound: function(route) {
                     this.notFoundError(
-                        interpolate(
-                            gettext('The page "%(route)s" could not be found.'),
-                            {route: route},
-                            true
+                        StringUtils.interpolate(
+                            gettext('The page "{route}" could not be found.'),
+                            {route: route}
                         )
                     );
                 },
 
-                topicNotFound: function (topicID) {
+                topicNotFound: function(topicID) {
                     this.notFoundError(
-                        interpolate(
-                            gettext('The topic "%(topic)s" could not be found.'),
-                            {topic: topicID},
-                            true
+                        StringUtils.interpolate(
+                            gettext('The topic "{topic}" could not be found.'),
+                            {topic: topicID}
                         )
                     );
                 },
 
-                teamNotFound: function (teamID) {
+                teamNotFound: function(teamID) {
                     this.notFoundError(
-                        interpolate(
-                            gettext('The team "%(team)s" could not be found.'),
-                            {team: teamID},
-                            true
+                        StringUtils.interpolate(
+                            gettext('The team "{team}" could not be found.'),
+                            {team: teamID}
                         )
                     );
                 },
@@ -617,7 +614,7 @@
                  * route that doesn't exist. "Redirects" back to
                  * the main teams tab, and adds an error message.
                  */
-                notFoundError: function (message) {
+                notFoundError: function(message) {
                     this.router.navigate('my-teams', {trigger: true});
                     TeamUtils.showMessage(message);
                 },
@@ -629,11 +626,11 @@
                  * moderator, or administrator), or if the user
                  * belongs to the team.
                  */
-                readOnlyDiscussion: function (team) {
+                readOnlyDiscussion: function(team) {
                     var userInfo = this.context.userInfo;
                     return !(
                         userInfo.privileged ||
-                        _.any(team.attributes.membership, function (membership) {
+                        _.any(team.attributes.membership, function(membership) {
                             return membership.user.username === userInfo.username;
                         })
                     );

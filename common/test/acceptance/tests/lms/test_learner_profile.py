@@ -4,17 +4,17 @@ End-to-end tests for Student's Profile Page.
 """
 from contextlib import contextmanager
 
-from datetime import datetime
 from bok_choy.web_app_test import WebAppTest
+from datetime import datetime
 from nose.plugins.attrib import attr
 
-from ...pages.common.logout import LogoutPage
-from ...pages.lms.account_settings import AccountSettingsPage
-from ...pages.lms.auto_auth import AutoAuthPage
-from ...pages.lms.learner_profile import LearnerProfilePage
-from ...pages.lms.dashboard import DashboardPage
+from common.test.acceptance.pages.common.logout import LogoutPage
+from common.test.acceptance.pages.lms.account_settings import AccountSettingsPage
+from common.test.acceptance.pages.lms.auto_auth import AutoAuthPage
+from common.test.acceptance.pages.lms.learner_profile import LearnerProfilePage
+from common.test.acceptance.pages.lms.dashboard import DashboardPage
 
-from ..helpers import EventsTestMixin
+from common.test.acceptance.tests.helpers import EventsTestMixin
 
 
 class LearnerProfileTestMixin(EventsTestMixin):
@@ -48,6 +48,8 @@ class LearnerProfileTestMixin(EventsTestMixin):
         profile_page.value_for_dropdown_field('language_proficiencies', 'English')
         profile_page.value_for_dropdown_field('country', 'United Arab Emirates')
         profile_page.set_value_for_textarea_field('bio', 'Nothing Special')
+        # Waits here for text to appear/save on bio field
+        profile_page.wait_for_ajax()
 
     def visit_profile_page(self, username, privacy=None):
         """
@@ -178,7 +180,7 @@ class LearnerProfileTestMixin(EventsTestMixin):
         return username, user_id
 
 
-@attr('shard_4')
+@attr(shard=4)
 class OwnLearnerProfilePageTest(LearnerProfileTestMixin, WebAppTest):
     """
     Tests that verify a student's own profile page.
@@ -207,7 +209,7 @@ class OwnLearnerProfilePageTest(LearnerProfileTestMixin, WebAppTest):
         When I go to my profile page.
         Then I see that the profile visibility is set to public.
         """
-        username, user_id = self.log_in_as_unique_user()
+        username, __ = self.log_in_as_unique_user()
         profile_page = self.visit_profile_page(username)
         self.verify_profile_page_is_public(profile_page)
 
@@ -275,7 +277,7 @@ class OwnLearnerProfilePageTest(LearnerProfileTestMixin, WebAppTest):
         When I click on Profile link.
         Then I will be navigated to Profile page.
         """
-        username, user_id = self.log_in_as_unique_user()
+        username, __ = self.log_in_as_unique_user()
         dashboard_page = DashboardPage(self.browser)
         dashboard_page.visit()
         dashboard_page.click_username_dropdown()
@@ -360,7 +362,7 @@ class OwnLearnerProfilePageTest(LearnerProfileTestMixin, WebAppTest):
         Then `country` field mode should be `edit`
         And `country` field icon should be visible.
         """
-        username, user_id = self.log_in_as_unique_user()
+        username, __ = self.log_in_as_unique_user()
         profile_page = self.visit_profile_page(username, privacy=self.PRIVACY_PUBLIC)
         self._test_dropdown_field(profile_page, 'country', 'Pakistan', 'Pakistan', 'display')
 
@@ -388,7 +390,7 @@ class OwnLearnerProfilePageTest(LearnerProfileTestMixin, WebAppTest):
         Then `language` field mode should be `edit`
         And `language` field icon should be visible.
         """
-        username, user_id = self.log_in_as_unique_user()
+        username, __ = self.log_in_as_unique_user()
         profile_page = self.visit_profile_page(username, privacy=self.PRIVACY_PUBLIC)
         self._test_dropdown_field(profile_page, 'language_proficiencies', 'Urdu', 'Urdu', 'display')
         self._test_dropdown_field(profile_page, 'language_proficiencies', '', 'Add language', 'placeholder')
@@ -425,7 +427,7 @@ class OwnLearnerProfilePageTest(LearnerProfileTestMixin, WebAppTest):
             "why you're taking courses, or what you hope to learn."
         )
 
-        username, user_id = self.log_in_as_unique_user()
+        username, __ = self.log_in_as_unique_user()
         profile_page = self.visit_profile_page(username, privacy=self.PRIVACY_PUBLIC)
         self._test_textarea_field(profile_page, 'bio', 'ThisIsIt', 'ThisIsIt', 'display')
         self._test_textarea_field(profile_page, 'bio', '', placeholder_value, 'placeholder')
@@ -476,7 +478,7 @@ class OwnLearnerProfilePageTest(LearnerProfileTestMixin, WebAppTest):
         And i cannot upload/remove the image.
         """
         year_of_birth = datetime.now().year - 5
-        username, user_id = self.log_in_as_unique_user()
+        username, __ = self.log_in_as_unique_user()
         profile_page = self.visit_profile_page(username, privacy=self.PRIVACY_PRIVATE)
 
         self.verify_profile_forced_private_message(
@@ -497,7 +499,7 @@ class OwnLearnerProfilePageTest(LearnerProfileTestMixin, WebAppTest):
         Then i can see the upload/remove image text
         And i am able to upload new image
         """
-        username, user_id = self.log_in_as_unique_user()
+        username, __ = self.log_in_as_unique_user()
         profile_page = self.visit_profile_page(username, privacy=self.PRIVACY_PUBLIC)
 
         self.assert_default_image_has_public_access(profile_page)
@@ -662,7 +664,7 @@ class OwnLearnerProfilePageTest(LearnerProfileTestMixin, WebAppTest):
         Then i can see only the upload image text
         And i cannot see the remove image text
         """
-        username, user_id = self.log_in_as_unique_user()
+        username, __ = self.log_in_as_unique_user()
         profile_page = self.visit_profile_page(username, privacy=self.PRIVACY_PUBLIC)
 
         self.assert_default_image_has_public_access(profile_page)
@@ -693,7 +695,7 @@ class OwnLearnerProfilePageTest(LearnerProfileTestMixin, WebAppTest):
             profile_page.upload_file(filename='image.jpg', wait_for_upload_button=False)
 
 
-@attr('shard_4')
+@attr(shard=4)
 class DifferentUserLearnerProfilePageTest(LearnerProfileTestMixin, WebAppTest):
     """
     Tests that verify viewing the profile page of a different user.
@@ -750,6 +752,15 @@ class DifferentUserLearnerProfilePageTest(LearnerProfileTestMixin, WebAppTest):
         self.verify_profile_page_is_public(profile_page, is_editable=False)
         self.verify_profile_page_view_event(username, different_user_id, visibility=self.PRIVACY_PUBLIC)
 
+    def test_badge_share_modal(self):
+        username = 'testcert'
+        AutoAuthPage(self.browser, username=username).visit()
+        profile_page = self.visit_profile_page(username)
+        profile_page.display_accomplishments()
+        badge = profile_page.badges[0]
+        badge.display_modal()
+        badge.close_modal()
+
 
 @attr('a11y')
 class LearnerProfileA11yTest(LearnerProfileTestMixin, WebAppTest):
@@ -767,7 +778,6 @@ class LearnerProfileA11yTest(LearnerProfileTestMixin, WebAppTest):
 
         profile_page.a11y_audit.config.set_rules({
             "ignore": [
-                'skip-link',  # TODO: AC-179
                 'link-href',  # TODO: AC-231
             ],
         })
@@ -795,9 +805,27 @@ class LearnerProfileA11yTest(LearnerProfileTestMixin, WebAppTest):
 
         profile_page.a11y_audit.config.set_rules({
             "ignore": [
-                'skip-link',  # TODO: AC-179
                 'link-href',  # TODO: AC-231
             ],
         })
 
+        profile_page.a11y_audit.check_for_accessibility_errors()
+
+    def test_badges_accessibility(self):
+        """
+        Test the accessibility of the badge listings and sharing modal.
+        """
+        username = 'testcert'
+        AutoAuthPage(self.browser, username=username).visit()
+        profile_page = self.visit_profile_page(username)
+
+        profile_page.a11y_audit.config.set_rules({
+            "ignore": [
+                'link-href',  # TODO: AC-231
+                'color-contrast',  # TODO: AC-231
+            ],
+        })
+        profile_page.display_accomplishments()
+        profile_page.a11y_audit.check_for_accessibility_errors()
+        profile_page.badges[0].display_modal()
         profile_page.a11y_audit.check_for_accessibility_errors()

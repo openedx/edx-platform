@@ -6,18 +6,17 @@
     <% } %>
 </div>
 
-<div class="js-reset-success status submission-success hidden">
-    <h4 class="message-title"><%- gettext("Password Reset Email Sent") %></h4>
-    <div class="message-copy">
-        <p>
-            <%- gettext("We've sent instructions for resetting your password to the email address you provided.") %>
-        </p>
+<div aria-live="polite">
+    <div class="js-reset-success status submission-success hidden">
+        <h4 class="message-title"><%- gettext("Password Reset Email Sent") %></h4>
+        <div class="message-copy">
+        </div>
     </div>
-</div>
 
-<div class="status submission-error hidden" aria-live="polite">
-    <h4 class="message-title"><%- gettext("We couldn't sign you in.") %></h4>
-    <ul class="message-copy"></ul>
+    <div class="status submission-error hidden">
+        <h4 class="message-title"><%- gettext("We couldn't sign you in.") %></h4>
+        <ul class="message-copy"></ul>
+    </div>
 </div>
 
 <% if (context.errorMessage) { %>
@@ -59,7 +58,11 @@
         <% _.each( context.providers, function( provider ) {
             if ( provider.loginUrl ) { %>
                 <button type="button" class="button button-primary button-<%- provider.id %> login-provider login-<%- provider.id %>" data-provider-url="<%- provider.loginUrl %>">
-                    <div class="icon fa <%- provider.iconClass %>" aria-hidden="true"></div>
+                    <div class="icon <% if ( provider.iconClass ) { %>fa <%- provider.iconClass %><% } %>" aria-hidden="true">
+                        <% if ( provider.iconImage ) { %>
+                            <img class="icon-image" src="<%- provider.iconImage %>" alt="<%- provider.name %> icon" />
+                        <% } %>
+                    </div>
                     <span aria-hidden="true"><%- provider.name %></span>
                     <span class="sr"><%- _.sprintf( gettext("Sign in with %(providerName)s"), {providerName: provider.name} ) %></span>
                 </button>

@@ -3,9 +3,9 @@
 LMS index (home) page.
 """
 from bok_choy.page_object import PageObject
-from . import BASE_URL
+from common.test.acceptance.pages.lms import BASE_URL
 
-BANNER_SELECTOR = 'section.home header div.outer-wrapper div.title hgroup h1'
+BANNER_SELECTOR = 'section.home header div.outer-wrapper div.title .heading-group h1'
 INTRO_VIDEO_SELECTOR = 'div.play-intro'
 VIDEO_MODAL_SELECTOR = 'section#video-modal.modal.home-page-video-modal.video-modal'
 
@@ -29,7 +29,7 @@ class IndexPage(PageObject):
         Returns a browser query object representing the video modal element
         """
         element = self.q(css=BANNER_SELECTOR)
-        return element.visible and element.text[0] == "Welcome to Open edX!"
+        return element.visible and element.text[0].startswith("Welcome to the Open edX")
 
     @property
     def banner_element(self):

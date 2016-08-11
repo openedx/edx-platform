@@ -23,7 +23,6 @@ XMODULES = [
     "videoalpha = xmodule.video_module:VideoDescriptor",
     "videodev = xmodule.backcompat_module:TranslateCustomTagDescriptor",
     "videosequence = xmodule.seq_module:SequenceDescriptor",
-    "discussion = xmodule.discussion_module:DiscussionDescriptor",
     "course_info = xmodule.html_module:CourseInfoDescriptor",
     "static_tab = xmodule.html_module:StaticTabDescriptor",
     "custom_tag_template = xmodule.raw_module:RawDescriptor",
@@ -35,7 +34,6 @@ XMODULES = [
     "word_cloud = xmodule.word_cloud_module:WordCloudDescriptor",
     "hidden = xmodule.hidden_module:HiddenDescriptor",
     "raw = xmodule.raw_module:RawDescriptor",
-    "crowdsource_hinter = xmodule.crowdsource_hinter:CrowdsourceHinterDescriptor",
     "lti = xmodule.lti_module:LTIDescriptor",
 ]
 XBLOCKS = [

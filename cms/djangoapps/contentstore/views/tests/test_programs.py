@@ -5,11 +5,12 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 import httpretty
 import mock
-from oauth2_provider.tests.factories import ClientFactory
+from edx_oauth2_provider.tests.factories import ClientFactory
 from provider.constants import CONFIDENTIAL
 
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.programs.tests.mixins import ProgramsApiConfigMixin, ProgramsDataMixin
+from openedx.core.djangolib.markup import Text
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 
@@ -63,7 +64,7 @@ class TestProgramListing(ProgramsApiConfigMixin, ProgramsDataMixin, SharedModule
         self.mock_programs_api(data={'results': []})
 
         response = self.client.get(self.studio_home)
-        self.assertIn("You haven't created any programs yet.", response.content)
+        self.assertIn(Text("You haven't created any programs yet."), response.content)
 
         # When data is provided, expect a program listing.
         self.mock_programs_api()
@@ -146,18 +147,17 @@ class TestProgramsIdTokenView(ProgramsApiConfigMixin, SharedModuleStoreTestCase)
         self.assertEqual(response.status_code, 302)
         self.assertIn(settings.LOGIN_URL, response['Location'])
 
-    @mock.patch('cms.djangoapps.contentstore.views.program.get_id_token', return_value='test-id-token')
-    def test_config_enabled(self, mock_get_id_token):
+    @mock.patch('cms.djangoapps.contentstore.views.program.JwtBuilder.build_token')
+    def test_config_enabled(self, mock_build_token):
         """
         Ensure the endpoint responds with a valid JSON payload when authoring
         is enabled.
         """
+        mock_build_token.return_value = 'test-id-token'
+        ClientFactory(name=ProgramsApiConfig.OAUTH2_CLIENT_NAME, client_type=CONFIDENTIAL)
+
         self.create_programs_config()
         response = self.client.get(self.path)
         self.assertEqual(response.status_code, 200)
         payload = json.loads(response.content)
-        self.assertEqual(payload, {"id_token": "test-id-token"})
-        # this comparison is a little long-handed because we need to compare user instances directly
-        user, client_name = mock_get_id_token.call_args[0]
-        self.assertEqual(user, self.user)
-        self.assertEqual(client_name, "programs")
+        self.assertEqual(payload, {'id_token': 'test-id-token'})

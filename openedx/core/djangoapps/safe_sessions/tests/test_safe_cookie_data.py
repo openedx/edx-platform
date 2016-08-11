@@ -7,12 +7,14 @@ import ddt
 from django.test import TestCase
 import itertools
 from mock import patch
+from nose.plugins.attrib import attr
 from time import time
 
 from ..middleware import SafeCookieData, SafeCookieError
 from .test_utils import TestSafeSessionsLogMixin
 
 
+@attr(shard=2)
 @ddt.ddt
 class TestSafeCookieData(TestSafeSessionsLogMixin, TestCase):
     """
@@ -102,7 +104,7 @@ class TestSafeCookieData(TestSafeSessionsLogMixin, TestCase):
 
     @ddt.data(None, '')
     def test_create_no_user_id(self, user_id):
-        with self.assert_logged('SafeCookieData received empty user_id', 'warning'):
+        with self.assert_logged('SafeCookieData received empty user_id', 'debug'):
             safe_cookie_data = SafeCookieData.create(self.session_id, user_id)
             self.assertTrue(safe_cookie_data.verify(user_id))
 

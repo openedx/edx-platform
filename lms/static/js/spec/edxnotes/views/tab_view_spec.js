@@ -1,17 +1,19 @@
 define([
-    'jquery', 'backbone', 'common/js/spec_helpers/template_helpers', 'js/edxnotes/collections/tabs',
-    'js/edxnotes/views/tabs_list', 'js/edxnotes/views/tab_view',
-    'js/spec/edxnotes/custom_matchers', 'jasmine-jquery'
-], function(
-    $, Backbone, TemplateHelpers, TabsCollection, TabsListView, TabView, customMatchers
-) {
+    'jquery',
+    'backbone',
+    'edx-ui-toolkit/js/utils/html-utils',
+    'common/js/spec_helpers/template_helpers',
+    'js/edxnotes/collections/tabs',
+    'js/edxnotes/views/tabs_list',
+    'js/edxnotes/views/tab_view'
+], function($, Backbone, HtmlUtils, TemplateHelpers, TabsCollection, TabsListView, TabView) {
     'use strict';
     describe('EdxNotes TabView', function() {
         var TestSubView = Backbone.View.extend({
                 id: 'test-subview-panel',
                 className: 'tab-panel',
                 content: '<p>test view content</p>',
-                render: function () {
+                render: function() {
                     this.$el.html(this.content);
                     return this;
                 }
@@ -24,7 +26,7 @@ define([
                 }
             }), getView;
 
-        getView = function (tabsCollection, options) {
+        getView = function(tabsCollection, options) {
             var view;
             options = _.defaults(options || {}, {
                 el: $('.wrapper-student-notes'),
@@ -40,8 +42,7 @@ define([
             return view;
         };
 
-        beforeEach(function () {
-            customMatchers(this);
+        beforeEach(function() {
             loadFixtures('js/fixtures/edxnotes/edxnotes.html');
             TemplateHelpers.installTemplates([
                 'templates/edxnotes/note-item', 'templates/edxnotes/tab-item'
@@ -51,14 +52,14 @@ define([
             this.tabsList.$el.appendTo($('.tab-list'));
         });
 
-        it('can create a tab and content on initialization', function () {
+        it('can create a tab and content on initialization', function() {
             var view = getView(this.tabsCollection);
             expect(this.tabsCollection).toHaveLength(1);
             expect(view.$('.tab')).toExist();
             expect(view.$('.wrapper-tabs')).toContainHtml('<p>test view content</p>');
         });
 
-        it('cannot create a tab on initialization if flag is not set', function () {
+        it('cannot create a tab on initialization if flag is not set', function() {
             var view = getView(this.tabsCollection, {
                 createTabOnInitialization: false
             });
@@ -67,7 +68,7 @@ define([
             expect(view.$('.wrapper-tabs')).not.toContainHtml('<p>test view content</p>');
         });
 
-        it('can remove the content if tab becomes inactive', function () {
+        it('can remove the content if tab becomes inactive', function() {
             var view = getView(this.tabsCollection);
             this.tabsCollection.add({identifier: 'second-tab'});
             view.$('#second-tab').click();
@@ -75,9 +76,9 @@ define([
             expect(view.$('.wrapper-tabs')).not.toContainHtml('<p>test view content</p>');
         });
 
-        it('can remove the content if tab is closed', function () {
+        it('can remove the content if tab is closed', function() {
             var view = getView(this.tabsCollection);
-            view.onClose =  jasmine.createSpy();
+            view.onClose = jasmine.createSpy();
             view.$('.tab .action-close').click();
             expect(view.$('.tab')).toHaveLength(0);
             expect(view.$('.wrapper-tabs')).not.toContainHtml('<p>test view content</p>');
@@ -85,7 +86,7 @@ define([
             expect(view.onClose).toHaveBeenCalled();
         });
 
-        it('can correctly update the content of active tab', function () {
+        it('can correctly update the content of active tab', function() {
             var view = getView(this.tabsCollection);
             TestSubView.prototype.content = '<p>New content</p>';
             view.render();
@@ -93,10 +94,11 @@ define([
             expect(view.$('.wrapper-tabs')).not.toContainHtml('<p>test view content</p>');
         });
 
-        it('can show/hide error messages', function () {
+        it('can show/hide error messages', function() {
             var view = getView(this.tabsCollection),
                 errorHolder = view.$('.wrapper-msg');
-            view.showErrorMessage('<p>error message is here</p>');
+
+            view.showErrorMessageHtml(HtmlUtils.HTML('<p>error message is here</p>'));
             expect(errorHolder).not.toHaveClass('is-hidden');
             expect(errorHolder.find('.copy')).toContainHtml('<p>error message is here</p>');
 
@@ -105,10 +107,10 @@ define([
             expect(errorHolder.find('.copy')).toBeEmpty();
         });
 
-        it('should hide error messages before rendering', function () {
+        it('should hide error messages before rendering', function() {
             var view = getView(this.tabsCollection),
                 errorHolder = view.$('.wrapper-msg');
-            view.showErrorMessage('<p>error message is here</p>');
+            view.showErrorMessageHtml('<p>error message is here</p>');
             view.render();
             expect(errorHolder).toHaveClass('is-hidden');
             expect(errorHolder.find('.copy')).toBeEmpty();

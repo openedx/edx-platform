@@ -2,19 +2,20 @@
 Acceptance tests for Home Page (My Courses / My Libraries).
 """
 from bok_choy.web_app_test import WebAppTest
+from flaky import flaky
 from opaque_keys.edx.locator import LibraryLocator
+from uuid import uuid4
 
-from ...fixtures import PROGRAMS_STUB_URL
-from ...fixtures.config import ConfigModelFixture
-from ...fixtures.programs import ProgramsFixture
-from ...pages.studio.auto_auth import AutoAuthPage
-from ...pages.studio.library import LibraryEditPage
-from ...pages.studio.index import DashboardPage, DashboardPageWithPrograms
-from ...pages.lms.account_settings import AccountSettingsPage
-from ..helpers import (
+from common.test.acceptance.fixtures.programs import ProgramsFixture, ProgramsConfigMixin
+from common.test.acceptance.pages.studio.auto_auth import AutoAuthPage
+from common.test.acceptance.pages.studio.library import LibraryEditPage
+from common.test.acceptance.pages.studio.index import DashboardPage, DashboardPageWithPrograms
+from common.test.acceptance.pages.lms.account_settings import AccountSettingsPage
+from common.test.acceptance.tests.helpers import (
     select_option_by_text,
     get_selected_option_text
 )
+from openedx.core.djangoapps.programs.tests import factories
 
 
 class CreateLibraryTest(WebAppTest):
@@ -31,6 +32,7 @@ class CreateLibraryTest(WebAppTest):
         self.auth_page = AutoAuthPage(self.browser, staff=True)
         self.dashboard_page = DashboardPage(self.browser)
 
+    @flaky  # TODO: SOL-430
     def test_create_library(self):
         """
         From the home page:
@@ -41,9 +43,10 @@ class CreateLibraryTest(WebAppTest):
             Return to the home page
             The newly created library should now appear in the list of libraries
         """
-        name = "New Library Name"
-        org = "TestOrgX"
-        number = "TESTLIB"
+        unique_suffix = uuid4().hex[:4]
+        name = "New Library Name " + unique_suffix
+        org = "TestOrgX" + unique_suffix
+        number = "TESTLIB_" + unique_suffix
 
         self.auth_page.visit()
         self.dashboard_page.visit()
@@ -65,7 +68,7 @@ class CreateLibraryTest(WebAppTest):
         self.assertTrue(self.dashboard_page.has_library(name=name, org=org, number=number))
 
 
-class DashboardProgramsTabTest(WebAppTest):
+class DashboardProgramsTabTest(ProgramsConfigMixin, WebAppTest):
     """
     Test the programs tab on the studio home page.
     """
@@ -76,23 +79,6 @@ class DashboardProgramsTabTest(WebAppTest):
         self.auth_page = AutoAuthPage(self.browser, staff=True)
         self.dashboard_page = DashboardPageWithPrograms(self.browser)
         self.auth_page.visit()
-
-    def set_programs_api_configuration(self, is_enabled=False, api_version=1, api_url=PROGRAMS_STUB_URL,
-                                       js_path='/js', css_path='/css'):
-        """
-        Dynamically adjusts the programs API config model during tests.
-        """
-        ConfigModelFixture('/config/programs', {
-            'enabled': is_enabled,
-            'enable_studio_tab': is_enabled,
-            'enable_student_dashboard': is_enabled,
-            'api_version_number': api_version,
-            'internal_service_url': api_url,
-            'public_service_url': api_url,
-            'authoring_app_js_path': js_path,
-            'authoring_app_css_path': css_path,
-            'cache_ttl': 0
-        }).install()
 
     def test_tab_is_disabled(self):
         """
@@ -125,14 +111,34 @@ class DashboardProgramsTabTest(WebAppTest):
         the list is nonempty.
         """
         test_program_values = [('first program', 'org1'), ('second program', 'org2')]
-        ProgramsFixture().install_programs(test_program_values)
+
+        programs = [
+            factories.Program(
+                name=name,
+                organizations=[
+                    factories.Organization(key=org),
+                ],
+                course_codes=[
+                    factories.CourseCode(run_modes=[
+                        factories.RunMode(),
+                    ]),
+                ]
+            )
+            for name, org in test_program_values
+        ]
+
+        ProgramsFixture().install_programs(programs)
+
         self.set_programs_api_configuration(True)
+
         self.dashboard_page.visit()
+
         self.assertTrue(self.dashboard_page.is_programs_tab_present())
         self.assertTrue(self.dashboard_page.is_new_program_button_present())
+        self.assertFalse(self.dashboard_page.is_empty_list_create_button_present())
+
         results = self.dashboard_page.get_program_list()
         self.assertEqual(results, test_program_values)
-        self.assertFalse(self.dashboard_page.is_empty_list_create_button_present())
 
     def test_tab_requires_staff(self):
         """

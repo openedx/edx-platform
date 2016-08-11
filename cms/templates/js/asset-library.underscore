@@ -2,7 +2,7 @@
     <div id="asset-paging-header"></div>
 
     <table class="assets-table">
-        <caption class="sr"><%= gettext("List of uploaded files and assets in this course") %></caption>
+        <caption class="sr"><%- gettext("List of uploaded files and assets in this course") %></caption>
         <colgroup>
             <col class="thumb-cols" />
             <col class="name-cols" />
@@ -13,34 +13,34 @@
         </colgroup>
         <thead>
         <tr>
-            <th class="thumb-col"><%= gettext("Preview") %></th>
+            <th class="thumb-col"><%- gettext("Preview") %></th>
             <th class="name-col sortable-column">
                 <span class="column-sort-link" id="js-asset-name-col" role="button" tabindex="0">
-                    <%= gettext("Name") %>
-                    <span class="sr"><%= gettext("- Sortable") %></span>
+                    <%- gettext("Name") %>
+                    <span class="sr"><%- gettext("- Sortable") %></span>
                 </span>
             </th>
             <th class="type-col filterable-column nav-dd">
                 <div id="js-asset-type-col" class="nav-item" role="button" tabindex="0">
                     <span class="title">
-                        <span class="type-filter" data-alllabel='<%= gettext("Type") %>'><%= gettext("Type") %></span>
+                        <span class="type-filter" data-alllabel='<%- gettext("Type") %>'><%- gettext("Type") %></span>
                         <span class="label-prefix sr">Filter</span>
                         <span class="filter-link"></span>
-                        <i class="fa fa-caret-down ui-toggle-dd" aria-hidden="true"></i>
+                        <span class="fa fa-caret-down ui-toggle-dd" aria-hidden="true"></span>
                     </span>
                     <div class="wrapper-nav-sub">
                         <div class="nav-sub">
                             <ul>
                                 <li class="nav-item reset-filter">
-                                    <a class="column-filter-link" href="" data-assetfilter="ALL"><%= gettext("Show All") %></a>
+                                    <a class="column-filter-link" href="" data-assetfilter="ALL"><%- gettext("Show All") %></a>
                                 </li>
                             <% _.each(typeData, function(type, key){ %>
                                 <li class="nav-item">
-                                    <a class="column-filter-link" href="" data-assetfilter="<%= type %>"><%= type %></a>
+                                    <a class="column-filter-link" href="" data-assetfilter="<%- type %>"><%- type %></a>
                                 </li>
                             <% }) %>
                                 <li class="nav-item">
-                                    <a class="column-filter-link" href="" data-assetfilter="OTHER"><%= gettext("Other") %></a>
+                                    <a class="column-filter-link" href="" data-assetfilter="OTHER"><%- gettext("Other") %></a>
                                 </li>
                             </ul>
                         </div>
@@ -49,12 +49,12 @@
             </th>
             <th class="date-col sortable-column">
                 <span class="column-sort-link" id="js-asset-date-col">
-                    <%= gettext("Date Added") %>
-                    <span class="sr"><%= gettext("- Sortable") %></span>
+                    <%- gettext("Date Added") %>
+                    <span class="sr"><%- gettext("- Sortable") %></span>
                 </span>
             </th>
-            <th class="embed-col"><%= gettext("URL") %></th>
-            <th class="actions-col"><span class="sr"><%= gettext("Actions") %></span></th>
+            <th class="embed-col"><%- gettext("URL") %></th>
+            <th class="actions-col"><span class="sr"><%- gettext("Actions") %></span></th>
         </tr>
         </thead>
         <tbody id="asset-table-body"></tbody>
@@ -64,5 +64,5 @@
 </div>
 
 <div class="no-asset-content">
-    <p><%= gettext("You haven't added any assets to this course yet.") %> <a href="#" class="button new-button upload-button"><i class="icon fa fa-plus" aria-hidden="true"></i><%= gettext("Upload your first asset") %></a></p>
+    <p><%- gettext("You haven't added any assets to this course yet.") %> <a href="#" class="button new-button upload-button"><span class="icon fa fa-plus" aria-hidden="true"></span><%- gettext("Upload your first asset") %></a></p>
 </div>

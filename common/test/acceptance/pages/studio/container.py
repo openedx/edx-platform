@@ -4,11 +4,11 @@ Container page in Studio
 
 from bok_choy.page_object import PageObject
 from bok_choy.promise import Promise, EmptyPromise
-from . import BASE_URL
+from common.test.acceptance.pages.studio import BASE_URL
 
-from ..common.utils import click_css, confirm_prompt
+from common.test.acceptance.pages.common.utils import click_css, confirm_prompt
 
-from .utils import type_in_codemirror
+from common.test.acceptance.pages.studio.utils import type_in_codemirror
 
 
 class ContainerPage(PageObject):
@@ -179,7 +179,7 @@ class ContainerPage(PageObject):
     @property
     def is_staff_locked(self):
         """ Returns True if staff lock is currently enabled, False otherwise """
-        for attr in self.q(css='a.action-staff-lock>i').attrs('class'):
+        for attr in self.q(css='a.action-staff-lock>.fa').attrs('class'):
             if 'fa-check-square-o' in attr:
                 return True
         return False

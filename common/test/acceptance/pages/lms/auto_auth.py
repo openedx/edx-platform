@@ -4,8 +4,8 @@ Auto-auth page (used to automatically log in during testing).
 
 import re
 import urllib
-from bok_choy.page_object import PageObject, unguarded
-from . import AUTH_BASE_URL
+from bok_choy.page_object import PageObject, unguarded, XSS_INJECTION
+from common.test.acceptance.pages.lms import AUTH_BASE_URL
 
 
 class AutoAuthPage(PageObject):
@@ -17,7 +17,7 @@ class AutoAuthPage(PageObject):
 
     CONTENT_REGEX = r'.+? user (?P<username>\S+) \((?P<email>.+?)\) with password \S+ and user_id (?P<user_id>\d+)$'
 
-    def __init__(self, browser, username=None, email=None, password=None, staff=None, course_id=None,
+    def __init__(self, browser, username=None, email=None, password=None, full_name=None, staff=None, course_id=None,
                  enrollment_mode=None, roles=None):
         """
         Auto-auth is an end-point for HTTP GET requests.
@@ -25,6 +25,7 @@ class AutoAuthPage(PageObject):
         but you can also specify credentials using querystring parameters.
 
         `username`, `email`, and `password` are the user's credentials (strings)
+        'full_name' is the profile full name value
         `staff` is a boolean indicating whether the user is global staff.
         `course_id` is the ID of the course to enroll the student in.
         Currently, this has the form "org/number/run"
@@ -41,6 +42,8 @@ class AutoAuthPage(PageObject):
 
         if username is not None:
             self._params['username'] = username
+
+        self._params['full_name'] = full_name if full_name is not None else XSS_INJECTION
 
         if email is not None:
             self._params['email'] = email

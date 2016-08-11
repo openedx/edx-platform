@@ -1,6 +1,6 @@
 // Backbone Application View:  Signatory Details
 
-define([ // jshint ignore:line
+define([
     'jquery',
     'underscore',
     'underscore.string',
@@ -9,9 +9,12 @@ define([ // jshint ignore:line
     'js/utils/templates',
     'common/js/components/utils/view_utils',
     'js/views/baseview',
-    'js/certificates/views/signatory_editor'
+    'js/certificates/views/signatory_editor',
+    'text!templates/signatory-details.underscore',
+    'text!templates/signatory-actions.underscore'
 ],
-function ($, _, str, Backbone, gettext, TemplateUtils, ViewUtils, BaseView, SignatoryEditorView) {
+function($, _, str, Backbone, gettext, TemplateUtils, ViewUtils, BaseView, SignatoryEditorView,
+          signatoryDetailsTemplate, signatoryActionsTemplate) {
     'use strict';
     var SignatoryDetailsView = BaseView.extend({
         tagName: 'div',
@@ -22,7 +25,7 @@ function ($, _, str, Backbone, gettext, TemplateUtils, ViewUtils, BaseView, Sign
 
         },
 
-        className: function () {
+        className: function() {
             // Determine the CSS class names for this model instance
             var index = this.model.collection.indexOf(this.model);
             return [
@@ -39,8 +42,6 @@ function ($, _, str, Backbone, gettext, TemplateUtils, ViewUtils, BaseView, Sign
                 isEditingAllCollections: false,
                 eventAgg: this.eventAgg
             });
-            this.template = this.loadTemplate('signatory-details');
-            this.signatory_action_template = this.loadTemplate('signatory-actions');
         },
 
         loadTemplate: function(name) {
@@ -52,7 +53,7 @@ function ($, _, str, Backbone, gettext, TemplateUtils, ViewUtils, BaseView, Sign
             // Retrieve the edit view for this model
             if (event && event.preventDefault) { event.preventDefault(); }
             this.$el.html(this.edit_view.render());
-            $(this.signatory_action_template()).appendTo(this.el);
+            $(_.template(signatoryActionsTemplate)()).appendTo(this.el);
             this.edit_view.delegateEvents();
             this.delegateEvents();
         },
@@ -61,13 +62,13 @@ function ($, _, str, Backbone, gettext, TemplateUtils, ViewUtils, BaseView, Sign
             // Persist the data for this model
             if (event && event.preventDefault) { event.preventDefault(); }
             var certificate = this.model.get('certificate');
-            if (!certificate.isValid()){
+            if (!certificate.isValid()) {
                 return;
             }
             var self = this;
             ViewUtils.runOperationShowingMessage(
                 gettext('Saving'),
-                function () {
+                function() {
                     var dfd = $.Deferred();
                     var actionableModel = certificate;
                     actionableModel.save({}, {
@@ -93,7 +94,7 @@ function ($, _, str, Backbone, gettext, TemplateUtils, ViewUtils, BaseView, Sign
             var attributes = $.extend({}, this.model.attributes, {
                 signatory_number: this.model.collection.indexOf(this.model) + 1
             });
-            return $(this.el).html(this.template(attributes));
+            return $(this.el).html(_.template(signatoryDetailsTemplate)(attributes));
         }
     });
     return SignatoryDetailsView;

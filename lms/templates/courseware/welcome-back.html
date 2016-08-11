@@ -1,12 +1,14 @@
+<%page expression_filter="h"/>
 <%!
-from django.utils.translation import ugettext as _ 
+from django.utils.translation import ugettext as _
+from openedx.core.djangolib.markup import HTML, Text
 %>
 
-<h2>${chapter_module.display_name_with_default_escaped}</h2>
+<h2>${chapter_module.display_name_with_default}</h2>
 
-<p>${_("You were most recently in {section_link}.  If you\'re done with that, choose another section on the left.").format(
-	    section_link=u'<a href="{url}">{section_name}</a>'.format(
+<p>${Text(_("You were most recently in {section_link}.  If you're done with that, choose another section on the left.")).format(
+	    section_link=HTML('<a href="{url}">{section_name}</a>').format(
 	        url=prev_section_url,
-	        section_name=prev_section.display_name_with_default_escaped,
+	        section_name=prev_section.display_name_with_default,
 	    )
     )}</p>

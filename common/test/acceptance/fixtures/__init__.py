@@ -1,5 +1,6 @@
 import os
 
+
 # Get the URL of the Studio instance under test
 STUDIO_BASE_URL = os.environ.get('studio_url', 'http://localhost:8031')
 
@@ -18,5 +19,8 @@ COMMENTS_STUB_URL = os.environ.get('comments_url', 'http://localhost:4567')
 # Get the URL of the EdxNotes service stub used in the test
 EDXNOTES_STUB_URL = os.environ.get('edxnotes_url', 'http://localhost:8042')
 
-# Get the URL of the EdxNotes service stub used in the test
+# Get the URL of the Programs service stub used in the test
 PROGRAMS_STUB_URL = os.environ.get('programs_url', 'http://localhost:8090')
+
+# Get the URL of the Catalog service stub used in the test
+CATALOG_STUB_URL = os.environ.get('catalog_url', 'http://localhost:8091')
