@@ -23,7 +23,10 @@
      *     Specifically:
      *         - dashboard
      *         - signInUser
+     *         - passwordReset
+     *         - changeEmail
      *         - changeEmailSettings
+     *         - changeName
      *         - verifyToggleBannerFailedOff
      */
     edx.dashboard.legacy.init = function(urls) {
@@ -153,6 +156,68 @@
             }
         });
 
+        $('#pwd_reset_button').click(function() {
+            $.post(
+                urls.passwordReset,
+                {"email"  : $('#id_email').val()},
+                function() {
+                    $("#password_reset_complete_link").click();
+                }
+            );
+        });
+
+        $("#submit-lang").click(function(event) {
+            event.preventDefault();
+            $.post('/lang_pref/setlang/',
+                {language: $('#settings-language-value').val()}
+            ).done(function() {
+                // submit form as normal
+                $('.settings-language-form').submit();
+            });
+        });
+
+        $("#change_email_form").submit(function(){
+            var new_email = $('#new_email_field').val();
+            var new_password = $('#new_email_password').val();
+
+            $.post(
+                urls.changeEmail,
+                {"new_email" : new_email, "password" : new_password},
+                function(data) {
+                    if (data.success) {
+                        $("#change_email_title").html(gettext("Please verify your new email address"));
+                        $("#change_email_form").html(
+                            "<p>" +
+                            gettext("You'll receive a confirmation in your inbox. Please follow the link in the email to confirm your email address change.") +
+                            "</p>"
+                        );
+                    } else {
+                        $("#change_email_error").html(data.error).stop().css("display", "block");
+                    }
+                }
+            );
+            return false;
+        });
+
+        $("#change_name_form").submit(function(){
+            debugger;
+            var new_name = $('#new_name_field').val();
+            var rationale = $('#name_rationale_field').val();
+
+            $.post(
+                urls.changeName,
+                {"new_name":new_name, "rationale":rationale},
+                function(data) {
+                    if(data.success) {
+                        location.reload();
+                    } else {
+                        $("#change_name_error").html(data.error).stop().css("display", "block");
+                    }
+                }
+            );
+            return false;
+        });
+
         $("#email_settings_form").submit(function(){
             $.ajax({
                 type: "POST",
@@ -172,6 +237,24 @@
             return false;
         });
 
+        accessibleModal(
+            ".edit-name",
+            "#apply_name_change .close-modal",
+            "#apply_name_change",
+            "#dashboard-main"
+        );
+        accessibleModal(
+            ".edit-email",
+            "#change_email .close-modal",
+            "#change_email",
+            "#dashboard-main"
+        );
+        accessibleModal(
+            "#pwd_reset_button",
+            "#password_reset_complete .close-modal",
+            "#password_reset_complete",
+            "#dashboard-main"
+        );
 
         $(".action-email-settings").each(function(index){
             $(this).attr("id", "email-settings-" + index);
