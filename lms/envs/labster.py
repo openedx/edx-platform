@@ -9,15 +9,17 @@ FEATURES['CUSTOM_COURSES_EDX'] = True
 FEATURES['SHOW_LABSTER_NOTIFICATION'] = False
 LABSTER_FEATURES = {
     "ENABLE_WIKI": True,
+    "ENABLE_VOUCHERS": False,
 }
 
 
 ENV_LABSTER_FEATURES = LABSTER_SETTINGS.get('LABSTER_FEATURES', LABSTER_FEATURES)
 for feature, value in ENV_LABSTER_FEATURES.items():
-    FEATURES[feature] = value
+    LABSTER_FEATURES[feature] = value
 
 INSTALLED_APPS += (
     'labster_course_license',
+    'labster_vouchers',
 )
 
 LABSTER_WIKI_LINK = LABSTER_SETTINGS.get('LABSTER_WIKI_LINK', 'https://theory.labster.com/')
@@ -27,6 +29,8 @@ LABSTER_API_URL = LABSTER_SETTINGS.get('LABSTER_API_URL', '')
 LABSTER_ENDPOINTS = {
     'available_simulations': '',
     'consumer_secret': '',
+    'voucher_license': '',
+    'voucher_activate': '',
 }
 
 ENV_LABSTER_ENDPOINTS = LABSTER_SETTINGS.get('LABSTER_ENDPOINTS', LABSTER_ENDPOINTS)

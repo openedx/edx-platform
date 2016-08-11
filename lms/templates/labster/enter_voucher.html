@@ -1,0 +1,76 @@
+<%inherit file="../main.html" />
+<%!
+    from django.utils.translation import ugettext as _
+    from django.core.urlresolvers import reverse
+%>
+
+<%block name="pagetitle">${_("Enter voucher code")}</%block>
+
+<%block name="bodyclass">view-register-voucher is-authenticated</%block>
+
+<%block name="headextra">
+<style>
+  .container{
+    min-width: 300px;
+    max-width: 650px;
+  }
+</style>
+</%block>
+<section class="register container form-type">
+  <section id="register-anchor" class="form-type">
+    <div id="register-form" class="form-wrapper ">
+      <form role="form"
+        id="voucher-register-form"
+        class="login-register"
+        method="POST"
+        action="${reverse('activate_voucher')}"
+      >
+        <div class="section-title lines">
+          <h2><span class="text">${_('Enter Voucher')}</span></h2>
+        </div>
+        <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}"/>
+        <!-- status messages -->
+        % if messages:
+        <div role="alert" class="status message submission-error is-shown" tabindex="-1">
+        % else:
+        <div role="alert" class="status message submission-error" tabindex="-1">
+        % endif
+          <h3 class="message-title">${_("The following errors occurred while processing your voucher code:")} </h3>
+          % if messages:
+            <div class="messages message-copy">
+            % for message in messages:
+              % if message.tags:
+                <p class="${message.tags}">${message}</p>
+              % else:
+                <p>${message}</p>
+              % endif
+            % endfor
+            </div>
+          % endif
+        </div>
+
+        <div class="group group-form group-form-requiredinformation">
+          <ol class="list-input">
+            <li class="field required text" id="field-name">
+              <label for="code">${_('Code')}</label>
+              <input id="code" type="text" name="code"
+                placeholder="${_('Please enter purchased voucher code')}"
+                required
+                aria-required="true" aria-describedby="code-tip"/>
+              <span class="tip tip-input" id="code-tip">${_("Needed for access to Labster courses")}</span>
+            </li>
+          </ol>
+        </div>
+
+        <div class="form-actions">
+          <button name="submit"
+            type="submit"
+            id="submit"
+            class="action action-primary action-update register-button">
+            ${_('Submit')}
+          </button>
+        </div>
+      </form>
+    </div>
+  </section>
+</section>
