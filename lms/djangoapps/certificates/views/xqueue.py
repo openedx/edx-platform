@@ -32,6 +32,7 @@ log = logging.getLogger(__name__)
 
 
 # InterSystems
+@transaction.non_atomic_requests
 @csrf_exempt
 def request_grade(request):
     request_certificate(request)
