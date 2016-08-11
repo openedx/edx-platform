@@ -838,6 +838,40 @@ class DiscussionCommentEditTest(BaseDiscussionTestCase):
 
 
 @attr(shard=2)
+class DiscussionEditorPreviewTest(UniqueCourseTest):
+    def setUp(self):
+        super(DiscussionEditorPreviewTest, self).setUp()
+        CourseFixture(**self.course_info).install()
+        AutoAuthPage(self.browser, course_id=self.course_id).visit()
+        self.page = DiscussionTabHomePage(self.browser, self.course_id)
+        self.page.visit()
+        self.page.click_new_post_button()
+
+    def test_text_rendering(self):
+        """When I type plain text into the editor, it should be rendered as plain text in the preview box"""
+        self.page.set_new_post_editor_value("Some plain text")
+        self.assertEqual(self.page.get_new_post_preview_value(), "<p>Some plain text</p>")
+
+    def test_markdown_rendering(self):
+        """When I type Markdown into the editor, it should be rendered as formatted Markdown in the preview box"""
+        self.page.set_new_post_editor_value(
+            "Some markdown\n"
+            "\n"
+            "- line 1\n"
+            "- line 2"
+        )
+
+        self.assertEqual(self.page.get_new_post_preview_value(), (
+            "<p>Some markdown</p>\n"
+            "\n"
+            "<ul>\n"
+            "<li>line 1</li>\n"
+            "<li>line 2</li>\n"
+            "</ul>"
+        ))
+
+
+@attr(shard=2)
 class InlineDiscussionTest(UniqueCourseTest, DiscussionResponsePaginationTestMixin):
     """
     Tests for inline discussions

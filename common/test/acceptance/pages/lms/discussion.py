@@ -723,3 +723,17 @@ class DiscussionTabHomePage(CoursePage, DiscussionPageMixin):
         """
         elements = self.q(css=".forum-new-post-form")
         return elements[0] if elements.visible and len(elements) == 1 else None
+
+    def set_new_post_editor_value(self, new_body):
+        """
+        Set the Discussions new post editor (wmd) with the content in new_body
+        """
+        self.q(css=".wmd-input").fill(new_body)
+
+    def get_new_post_preview_value(self):
+        """
+        Get the rendered preview of the contents of the Discussions new post editor
+        Waits for content to appear, as the preview is triggered on debounced/delayed onchange
+        """
+        self.wait_for_element_visibility(".wmd-preview > *", "WMD preview pane has contents", timeout=10)
+        return self.q(css=".wmd-preview").html[0]
