@@ -105,6 +105,8 @@
                                 countryTimeZones
                             );
                             view.render();
+                            view.$el.find('select').focus();
+                            view.showNotificationMessage(gettext('Would you like to update your time zone?'));
                         }
                     });
                 },
