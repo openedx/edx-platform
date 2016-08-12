@@ -154,6 +154,24 @@ def courses(request):
     )
 
 
+@ensure_csrf_cookie
+@cache_if_anonymous()
+def partners_description(request, org):
+    courses_list = get_courses(request.user, org=org)
+
+    if configuration_helpers.get_value(
+            "ENABLE_COURSE_SORTING_BY_START_DATE",
+            settings.FEATURES["ENABLE_COURSE_SORTING_BY_START_DATE"]
+    ):
+        courses_list = sort_by_start_date(courses_list)
+    else:
+        courses_list = sort_by_announcement(courses_list)
+
+    return render_to_response(
+        "partners-description.html", {'courses': courses_list}
+    )
+
+
 def get_current_child(xmodule, min_depth=None, requested_child=None):
     """
     Get the xmodule.position's display item of an xmodule that has a position and

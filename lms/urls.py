@@ -117,6 +117,9 @@ urlpatterns = (
     url(r'^update_lang/', include('dark_lang.urls', namespace='darklang')),
     # URLs for API access management
     url(r'^api-admin/', include('openedx.core.djangoapps.api_admin.urls', namespace='api_admin')),
+
+    # Partners description page.
+    url(r'^partners/(?P<org>[\w]+)/$', 'courseware.views.views.partners_description', name="partners_description"),
 )
 
 urlpatterns += (
