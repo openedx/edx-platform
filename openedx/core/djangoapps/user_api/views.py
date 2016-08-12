@@ -73,7 +73,7 @@ class LoginSessionView(APIView):
 
         # Translators: These instructions appear on the login form, immediately
         # below a field meant to hold the user's email address.
-        email_instructions = _("The email address used when you registered with {platform_name}").format(
+        email_instructions = _("The email address you used to register with {platform_name}").format(
             platform_name=settings.PLATFORM_NAME
         )
 
