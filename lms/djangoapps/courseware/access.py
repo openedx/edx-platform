@@ -65,7 +65,7 @@ from courseware.access_utils import (
     adjust_start_date, check_start_date, debug, ACCESS_GRANTED, ACCESS_DENIED,
     in_preview_mode
 )
-from ccx.models import CustomCourseForEdX  # Added by labster.
+from lms.djangoapps.ccx.models import CustomCourseForEdX  # Added by labster.
 
 log = logging.getLogger(__name__)
 
