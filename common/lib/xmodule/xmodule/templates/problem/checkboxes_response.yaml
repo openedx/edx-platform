@@ -11,10 +11,6 @@ metadata:
         [ ] an incorrect answer
         [x] a correct answer
 
-        [explanation]
-        You can specify an optional explanation that appears after the selected answers are submitted.
-        [explanation]
-
 data:   |
         <problem>
             <choiceresponse>
@@ -27,12 +23,6 @@ data:   |
                     <choice correct="false">an incorrect answer</choice>
                     <choice correct="true">a correct answer</choice>
                 </checkboxgroup>
-                <solution>
-                    <div class="detailed-solution">
-                        <p>Explanation</p>
-                        <p>You can specify an optional explanation that appears after the selected answers are submitted.</p>
-                    </div>
-                </solution>
             </choiceresponse>
         </problem>
 
