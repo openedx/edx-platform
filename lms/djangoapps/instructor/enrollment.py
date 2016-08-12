@@ -167,6 +167,8 @@ def unenroll_email(course_id, student_email, email_students=False, email_params=
 
     if previous_state.allowed:
         CourseEnrollmentAllowed.objects.get(course_id=course_id, email=student_email).delete()
+
+    if previous_state.allowed and not previous_state.enrollment:
         if email_students:
             email_params['message'] = 'allowed_unenroll'
             email_params['email_address'] = student_email
