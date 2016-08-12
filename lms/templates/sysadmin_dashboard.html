@@ -63,7 +63,7 @@ textarea {
       <a href="${reverse('sysadmin_staffing')}" class="${modeflag.get('staffing')}">${_('Staffing and Enrollment')}</a>
       ## Translators: refers to http://git-scm.com/docs/git-log
       <a href="${reverse('gitlogs')}">${_('Git Logs')}</a>
-      <a href="${reverse('sysadmin_task_queue')}" class="${modeflag.get('task_queue')}">${_('Task Queue')}</a>
+      <a href="${reverse('sysadmin_task_queue')}" class="${modeflag.get('task_queue')}">${_('Tasks')}</a>
       <a href="${reverse('sysadmin_mgmt_commands')}" class="${modeflag.get('mgmt_commands')}">${_('MGMT Commands')}</a>
     </h2>
 	<hr />
@@ -189,7 +189,7 @@ textarea {
 %endif
 
 %if modeflag.get('task_queue'):
-  <h3>${_('Kill Queuing Tasks')}</h3><br/>
+  <h3>${_('Kill Task')}</h3><br/>
 
   <form name="action" method="POST">
     <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }" />
