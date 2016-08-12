@@ -23,7 +23,7 @@ var options = {
         {pattern: 'common_static/coffee/src/ajax_prefix.js', included: true},
         {pattern: 'common_static/common/js/vendor/underscore.js', included: true},
         {pattern: 'common_static/common/js/vendor/backbone.js', included: true},
-        {pattern: 'common_static/js/vendor/CodeMirror/codemirror.js', included: true},
+        {pattern: 'common_static/common/codemirror/lib/codemirror.js', included: true},
         {pattern: 'common_static/js/vendor/draggabilly.js'},
         {pattern: 'common_static/common/js/vendor/jquery.js', included: true},
         {pattern: 'common_static/common/js/vendor/jquery-migrate.js', included: true},

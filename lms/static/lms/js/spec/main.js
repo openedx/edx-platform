@@ -7,7 +7,7 @@
 
         paths: {
             'gettext': 'xmodule_js/common_static/js/test/i18n',
-            'codemirror': 'xmodule_js/common_static/js/vendor/CodeMirror/codemirror',
+            'codemirror': 'xmodule_js/common_static/common/codemirror/lib/codemirror',
             'jquery': 'xmodule_js/common_static/common/js/vendor/jquery',
             'jquery-migrate': 'xmodule_js/common_static/common/js/vendor/jquery-migrate',
             'jquery.ui': 'xmodule_js/common_static/js/vendor/jquery-ui.min',

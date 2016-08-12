@@ -4,6 +4,7 @@
   "dependencies": {
     "backbone": "~1.3.2",
     "backbone-validation": "~0.11.5",
+    "codemirror": "^5.17.0",
     "coffee-script": "1.6.1",
     "edx-pattern-library": "0.16.6",
     "edx-ui-toolkit": "1.4.1",
