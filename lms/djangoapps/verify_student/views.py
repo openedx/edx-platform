@@ -1245,7 +1245,7 @@ def _set_user_requirement_status(attempt, namespace, status, reason=None):
     if checkpoint is not None:
         try:
             set_credit_requirement_status(
-                attempt.user.username,
+                attempt.user,
                 checkpoint.course_id,
                 namespace,
                 checkpoint.checkpoint_location,
