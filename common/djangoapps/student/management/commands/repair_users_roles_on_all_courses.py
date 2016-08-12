@@ -1,13 +1,13 @@
-import sys
 import datetime
 import logging
 
 from django.core.management.base import BaseCommand
 
 from student.models import CourseAccessRole
-from django.contrib.auth.models import User, Group
+from django.contrib.auth.models import Group
 
 log = logging.getLogger(__name__)
+
 
 class Command(BaseCommand):
     help = """Repair users that are assistants and observers on every course
@@ -43,8 +43,8 @@ Options:
             fh.setLevel(logging.DEBUG)
             formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
             fh.setFormatter(formatter)
-            log.addHandler(fh)      
-        
+            log.addHandler(fh)
+
         log.info(msg_string)
 
         if dry_run:
@@ -94,7 +94,7 @@ Options:
                                 user_course_roles[user_id][role_entry.course_id].remove("observer")
                             user_course_roles[user_id]["observer_count"] -= 1
                             user_course_roles[user_id]["user_conflicted"] = True
-        
+
         try:
             mcka_observer_group = Group.objects.get(name__icontains="mcka_role_mcka_observer")
         except ObjectDoesNotExist:
@@ -107,8 +107,7 @@ Options:
         number_of_conflicted_users = 0
         number_of_single_conflicted_users = 0
 
-
-        for user_id, user_record in user_course_roles.iteritems():          
+        for user_id, user_record in user_course_roles.iteritems():
             if user_record["observer_count"] == 0 and user_record["user_conflicted"]:
                 if dry_run:
                     msg_string = "For user id {} this was only observer role and he should be removed from global observer groups".format(user_id)
@@ -132,5 +131,3 @@ Options:
 
         if create_log:
             print "Script started in create log mode, please open repair_users_roles_on_all_courses.log file."
-        
-        
