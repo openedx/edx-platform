@@ -105,12 +105,17 @@ class HtmlModuleMixin(HtmlBlock, XModule):
 
     def get_html(self):
         data = self.data
-        if self.system.anonymous_student_id:
+        if self.system.user_is_staff:  
+            from django.contrib.auth.models import User
+            user = User.objects.get(id=self.system.user_id)
+            data = data.replace("%%USER_EMAIL%%", user.email)
+        elif self.system.anonymous_student_id:
             data = data.replace("%%USER_ID%%", self.system.anonymous_student_id)
             if getattr(self.system, 'get_real_user', None):
                 user = self.system.get_real_user(self.system.anonymous_student_id)
                 if user and user.is_authenticated():
                     data = data.replace("%%USER_EMAIL%%", user.email)
+        
         return data
 
 @edxnotes
