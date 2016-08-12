@@ -2,13 +2,9 @@
 metadata:
     display_name: Numerical Input with Hints and Feedback
     markdown: |
+        You can use this template as a guide to the simple editor markdown and OLX markup to use for numerical input with hints and feedback problems. Edit this component to replace this template with your own assessment.
 
-        You can use this template as a guide to the simple editor markdown and OLX markup to use for
-        numerical input with hints and feedback problems. Edit this component to replace this template
-        with your own assessment.
-
-        >>Add the question text, or prompt, here. This text is required.||You can add an optional tip
-        or note related to the prompt like this. <<
+        >>Add the question text, or prompt, here. This text is required.||You can add an optional tip or note related to the prompt like this. <<
 
         = the correct answer +- 0.001% an optional variance {{You can specify optional feedback like this, which appears after this answer is submitted.}}
 
