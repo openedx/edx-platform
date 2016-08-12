@@ -88,12 +88,24 @@ class SolutionRenderer(object):
 
     def __init__(self, system, xml):
         self.system = system
+        self.xml = xml
         self.id = xml.get('id')
 
     def get_html(self):
-        context = {'id': self.id}
-        html = self.system.render_template("solutionspan.html", context)
-        return etree.XML(html)
+        solution = self.xml
+        solution.tag = 'div'
+        solution_div = solution[0]
+        solution_div.set('id', 'solution_' + self.id)
+
+        # set solution heading if we have it
+        if len(solution_div.findall('*')) > 1:
+            header = solution_div[0]
+            # explicitly set to h4
+            if header.tag == 'p':
+                header.tag = 'h4'
+            header.set('class', 'problem-summary-header')
+
+        return solution
 
 registry.register(SolutionRenderer)
 
