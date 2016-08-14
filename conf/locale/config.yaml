@@ -3,7 +3,7 @@
 locales:
     - en  # English - Source Language
     # - am  # Amharic
-    - ar  # Arabic
+    # - ar  # Arabic
     # - az  # Azerbaijani
     # - bg_BG  # Bulgarian (Bulgaria)
     # - bn_BD  # Bengali (Bangladesh)
@@ -21,7 +21,7 @@ locales:
     # # when the user's browser is in English and the user is not logged in.
     # #- en@lolcat  # LOLCAT English
     # #- en@pirate  # Pirate English
-    - es_419  # Spanish (Latin America)
+    # - es_419  # Spanish (Latin America)
     # - es_AR  # Spanish (Argentina)
     # - es_EC  # Spanish (Ecuador)
     # - es_ES  # Spanish (Spain)
@@ -33,11 +33,11 @@ locales:
     # - fa_IR  # Persian (Iran)
     # - fi_FI  # Finnish (Finland)
     # - fil  # Filipino
-    - fr  # French
+    # - fr  # French
     # - gl  # Galician
     # - gu  # Gujarati
-    - he  # Hebrew
-    - hi  # Hindi
+    # - he  # Hebrew
+    # - hi  # Hindi
     # - hr  # Croatian
     # - hu  # Hungarian
     # - hy_AM  # Armenian (Armenia)
@@ -47,7 +47,7 @@ locales:
     # - kk_KZ  # Kazakh (Kazakhstan)
     # - km_KH  # Khmer (Cambodia)
     # - kn  # Kannada
-    - ko_KR  # Korean (Korea)
+    # - ko_KR  # Korean (Korea)
     # - lt_LT  # Lithuanian (Lithuania)
     # - ml  # Malayalam
     # - mn  # Mongolian
@@ -58,10 +58,10 @@ locales:
     # - nl_NL  # Dutch (Netherlands)
     # - or  # Oriya
     # - pl  # Polish
-    - pt_BR  # Portuguese (Brazil)
+    # - pt_BR  # Portuguese (Brazil)
     # - pt_PT  # Portuguese (Portugal)
     # - ro  # Romanian
-    - ru  # Russian
+    # - ru  # Russian
     # - si  # Sinhala
     # - sk  # Slovak
     # - sl  # Slovenian
@@ -149,10 +149,12 @@ generate_merge:
         - django-studio.po
         - mako.po
         - mako-studio.po
-        - messages.po
+        # - messages.po
         - wiki.po
+        - theme.po
     djangojs.po:
         - djangojs-partial.po
         - djangojs-studio.po
         - underscore.po
         - underscore-studio.po
+        - theme.po
