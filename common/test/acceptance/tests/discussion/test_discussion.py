@@ -207,12 +207,12 @@ class DiscussionHomePageTest(UniqueCourseTest):
     @attr('a11y')
     def test_page_accessibility(self):
         self.page.a11y_audit.config.set_rules({
-            "ignore": [
-                'section',  # TODO: AC-491
-                'color-contrast',  # TNL-4635
-                'link-href',  # TNL-4636
-                'icon-aria-hidden',  # TNL-4637
-            ]
+            # "ignore": [
+            #     'section',  # TODO: AC-491
+            #     'color-contrast',  # TNL-4635
+            #     'link-href',  # TNL-4636
+            #     'icon-aria-hidden',  # TNL-4637
+            # ]
         })
         self.page.a11y_audit.check_for_accessibility_errors()
 
@@ -408,11 +408,11 @@ class DiscussionTabMultipleThreadTest(BaseDiscussionTestCase):
     def test_page_accessibility(self):
         self.thread_page_1.a11y_audit.config.set_rules({
             "ignore": [
-                'section',  # TODO: AC-491
-                'aria-valid-attr-value',  # TNL-4638
-                'color-contrast',  # TNL-4639
-                'link-href',  # TNL-4640
-                'icon-aria-hidden',  # TNL-4641
+                # 'section',  # TODO: AC-491
+                # 'aria-valid-attr-value',  # TNL-4638
+                # 'color-contrast',  # TNL-4639
+                # 'link-href',  # TNL-4640
+                # 'icon-aria-hidden',  # TNL-4641
             ]
         })
 
@@ -420,11 +420,11 @@ class DiscussionTabMultipleThreadTest(BaseDiscussionTestCase):
 
         self.thread_page_2.a11y_audit.config.set_rules({
             "ignore": [
-                'section',  # TODO: AC-491
-                'aria-valid-attr-value',  # TNL-4638
-                'color-contrast',  # TNL-4639
-                'link-href',  # TNL-4640
-                'icon-aria-hidden',  # TNL-4641
+                # 'section',  # TODO: AC-491
+                # 'aria-valid-attr-value',  # TNL-4638
+                # 'color-contrast',  # TNL-4639
+                # 'link-href',  # TNL-4640
+                # 'icon-aria-hidden',  # TNL-4641
             ]
         })
 
@@ -484,11 +484,11 @@ class DiscussionOpenClosedThreadTest(BaseDiscussionTestCase):
         page = self.setup_openclosed_thread_page()
         page.a11y_audit.config.set_rules({
             'ignore': [
-                'section',  # TODO: AC-491
-                'aria-valid-attr-value',  # TNL-4643
-                'color-contrast',  # TNL-4644
-                'link-href',  # TNL-4640
-                'icon-aria-hidden',  # TNL-4645
+                # 'section',  # TODO: AC-491
+                # 'aria-valid-attr-value',  # TNL-4643
+                # 'color-contrast',  # TNL-4644
+                # 'link-href',  # TNL-4640
+                # 'icon-aria-hidden',  # TNL-4645
             ]
         })
         page.a11y_audit.check_for_accessibility_errors()
@@ -496,11 +496,11 @@ class DiscussionOpenClosedThreadTest(BaseDiscussionTestCase):
         page = self.setup_openclosed_thread_page(True)
         page.a11y_audit.config.set_rules({
             'ignore': [
-                'section',  # TODO: AC-491
-                'aria-valid-attr-value',  # TNL-4643
-                'color-contrast',  # TNL-4644
-                'link-href',  # TNL-4640
-                'icon-aria-hidden',  # TNL-4645
+                # 'section',  # TODO: AC-491
+                # 'aria-valid-attr-value',  # TNL-4643
+                # 'color-contrast',  # TNL-4644
+                # 'link-href',  # TNL-4640
+                # 'icon-aria-hidden',  # TNL-4645
             ]
         })
         page.a11y_audit.check_for_accessibility_errors()
@@ -785,12 +785,12 @@ class DiscussionResponseEditTest(BaseDiscussionTestCase):
         page = self.create_single_thread_page("response_edit_test_thread")
         page.a11y_audit.config.set_rules({
             'ignore': [
-                'section',  # TODO: AC-491
-                'aria-valid-attr-value',  # TNL-4638
-                'color-contrast',  # TNL-4644
-                'link-href',  # TNL-4640
-                'icon-aria-hidden',  # TNL-4645
-                'duplicate-id',  # TNL-4647
+                # 'section',  # TODO: AC-491
+                # 'aria-valid-attr-value',  # TNL-4638
+                # 'color-contrast',  # TNL-4644
+                # 'link-href',  # TNL-4640
+                # 'icon-aria-hidden',  # TNL-4645
+                # 'duplicate-id',  # TNL-4647
             ]
         })
         page.visit()
@@ -887,11 +887,11 @@ class DiscussionCommentEditTest(BaseDiscussionTestCase):
         page.visit()
         page.a11y_audit.config.set_rules({
             'ignore': [
-                'section',  # TODO: AC-491
-                'aria-valid-attr-value',  # TNL-4643
-                'color-contrast',  # TNL-4644
-                'link-href',  # TNL-4640
-                'icon-aria-hidden',  # TNL-4645
+                # 'section',  # TODO: AC-491
+                # 'aria-valid-attr-value',  # TNL-4643
+                # 'color-contrast',  # TNL-4644
+                # 'link-href',  # TNL-4640
+                # 'icon-aria-hidden',  # TNL-4645
             ]
         })
         page.a11y_audit.check_for_accessibility_errors()
@@ -1296,10 +1296,10 @@ class DiscussionSearchAlertTest(UniqueCourseTest):
     def test_page_accessibility(self):
         self.page.a11y_audit.config.set_rules({
             'ignore': [
-                'section',  # TODO: AC-491
-                'color-contrast',  # TNL-4639
-                'link-href',  # TNL-4640
-                'icon-aria-hidden',  # TNL-4641
+                # 'section',  # TODO: AC-491
+                # 'color-contrast',  # TNL-4639
+                # 'link-href',  # TNL-4640
+                # 'icon-aria-hidden',  # TNL-4641
             ]
         })
         self.page.a11y_audit.check_for_accessibility_errors()
