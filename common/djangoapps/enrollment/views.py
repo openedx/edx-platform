@@ -287,9 +287,10 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
 
             * Enroll the currently signed in user in a course.
 
-              Currently a user can use this command only to enroll the user in
-              honor mode. If honor mode is not supported for the course, the
-              request fails and returns the available modes.
+              Currently a user can use this command only to enroll the
+              user in the default course mode. If this is not
+              supported for the course, the request fails and returns
+              the available modes.
 
               This command can use a server-to-server call to enroll a user in
               other modes, such as "verified", "professional", or "credit". If
@@ -325,7 +326,7 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
                 You cannot use the command to enroll a different user.
 
               * mode: Optional. The course mode for the enrollment. Individual
-                users cannot upgrade their enrollment mode from 'honor'. Only
+                users cannot upgrade their enrollment mode from the default. Only
                 server-to-server requests can enroll with other modes.
 
               * is_active: Optional. A Boolean value indicating whether the
@@ -353,7 +354,7 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
                 deactivate an enrollment.
 
               * mode: Optional. The course mode for the enrollment. Individual
-                users cannot upgrade their enrollment mode from "honor". Only
+                users cannot upgrade their enrollment mode from the default. Only
                 server-to-server requests can enroll with other modes.
 
               * user: Optional. The user ID of the currently logged in user. You
@@ -519,7 +520,7 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
                 }
             )
 
-        mode = request.data.get('mode', CourseMode.HONOR)
+        mode = request.data.get('mode')
 
         has_api_key_permissions = self.has_api_key_permissions(request)
 
@@ -531,7 +532,7 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
             # other users, do not let them deduce the existence of an enrollment.
             return Response(status=status.HTTP_404_NOT_FOUND)
 
-        if mode != CourseMode.HONOR and not has_api_key_permissions:
+        if mode not in (CourseMode.AUDIT, CourseMode.HONOR, None) and not has_api_key_permissions:
             return Response(
                 status=status.HTTP_403_FORBIDDEN,
                 data={

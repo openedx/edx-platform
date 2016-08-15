@@ -12,6 +12,7 @@ from django.core.urlresolvers import reverse
 from django.core.mail import send_mail
 from django.utils.translation import override as override_language
 
+from course_modes.models import CourseMode
 from student.models import CourseEnrollment, CourseEnrollmentAllowed
 from courseware.models import StudentModule
 from edxmako.shortcuts import render_to_string
@@ -110,7 +111,16 @@ def enroll_email(course_id, student_email, auto_enroll=False, email_students=Fal
     if previous_state.user:
         # if the student is currently unenrolled, don't enroll them in their
         # previous mode
-        course_mode = u"honor"
+
+        # for now, White Labels use 'shoppingcart' which is based on the
+        # "honor" course_mode. Given the change to use "audit" as the default
+        # course_mode in Open edX, we need to be backwards compatible with
+        # how White Labels approach enrollment modes.
+        if CourseMode.is_white_label(course_id):
+            course_mode = CourseMode.DEFAULT_SHOPPINGCART_MODE_SLUG
+        else:
+            course_mode = None
+
         if previous_state.enrollment:
             course_mode = previous_state.mode
 

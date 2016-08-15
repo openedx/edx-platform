@@ -64,7 +64,7 @@ class CertificateSupportTestCase(TestCase):
         )
 
         # Create certificates for the student
-        self.cert = GeneratedCertificate.objects.create(
+        self.cert = GeneratedCertificate.eligible_certificates.create(
             user=self.student,
             course_id=self.CERT_COURSE_KEY,
             grade=self.CERT_GRADE,
@@ -79,10 +79,34 @@ class CertificateSupportTestCase(TestCase):
 
 
 @ddt.ddt
-class CertificateSearchTests(CertificateSupportTestCase):
+class CertificateSearchTests(ModuleStoreTestCase, CertificateSupportTestCase):
     """
     Tests for the certificate search end-point used by the support team.
     """
+    def setUp(self):
+        """
+        Create a course
+        """
+        super(CertificateSearchTests, self).setUp()
+        self.course = CourseFactory()
+        self.course.cert_html_view_enabled = True
+
+        #course certificate configurations
+        certificates = [
+            {
+                'id': 1,
+                'name': 'Name 1',
+                'description': 'Description 1',
+                'course_title': 'course_title_1',
+                'signatories': [],
+                'version': 1,
+                'is_active': True
+            }
+        ]
+
+        self.course.certificates = {'certificates': certificates}
+        self.course.save()  # pylint: disable=no-member
+        self.store.update_item(self.course, self.user.id)
 
     @ddt.data(
         (GlobalStaff, True),
@@ -141,6 +165,7 @@ class CertificateSearchTests(CertificateSupportTestCase):
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
     def test_download_link(self):
+        self.cert.course_id = self.course.id  # pylint: disable=no-member
         self.cert.download_url = ''
         self.cert.save()
 
@@ -155,7 +180,7 @@ class CertificateSearchTests(CertificateSupportTestCase):
             retrieved_cert["download_url"],
             reverse(
                 'certificates:html_view',
-                kwargs={"user_id": self.student.id, "course_id": self.CERT_COURSE_KEY}  # pylint: disable=no-member
+                kwargs={"user_id": self.student.id, "course_id": self.course.id}  # pylint: disable=no-member
             )
         )
 
@@ -219,7 +244,7 @@ class CertificateRegenerateTests(ModuleStoreTestCase, CertificateSupportTestCase
         # Check that the user's certificate was updated
         # Since the student hasn't actually passed the course,
         # we'd expect that the certificate status will be "notpassing"
-        cert = GeneratedCertificate.objects.get(user=self.student)
+        cert = GeneratedCertificate.eligible_certificates.get(user=self.student)
         self.assertEqual(cert.status, CertificateStatuses.notpassing)
 
     def test_regenerate_certificate_missing_params(self):
@@ -258,7 +283,7 @@ class CertificateRegenerateTests(ModuleStoreTestCase, CertificateSupportTestCase
 
     def test_regenerate_user_has_no_certificate(self):
         # Delete the user's certificate
-        GeneratedCertificate.objects.all().delete()
+        GeneratedCertificate.eligible_certificates.all().delete()
 
         # Should be able to regenerate
         response = self._regenerate(
@@ -268,7 +293,7 @@ class CertificateRegenerateTests(ModuleStoreTestCase, CertificateSupportTestCase
         self.assertEqual(response.status_code, 200)
 
         # A new certificate is created
-        num_certs = GeneratedCertificate.objects.filter(user=self.student).count()
+        num_certs = GeneratedCertificate.eligible_certificates.filter(user=self.student).count()
         self.assertEqual(num_certs, 1)
 
     def _regenerate(self, course_key=None, username=None):

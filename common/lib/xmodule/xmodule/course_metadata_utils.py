@@ -5,9 +5,10 @@ This is a place to put simple functions that operate on course metadata. It
 allows us to share code between the CourseDescriptor and CourseOverview
 classes, which both need these type of functions.
 """
-from datetime import datetime
-from datetime import timedelta
 from base64 import b32encode
+from datetime import datetime, timedelta
+import dateutil.parser
+from math import exp
 
 from django.utils.timezone import UTC
 
@@ -222,3 +223,43 @@ def may_certify_for_course(certificates_display_behavior, certificates_show_befo
         or certificates_show_before_end
     )
     return show_early or has_ended
+
+
+def sorting_score(start, advertised_start, announcement):
+    """
+    Returns a tuple that can be used to sort the courses according
+    to how "new" they are. The "newness" score is computed using a
+    heuristic that takes into account the announcement and
+    (advertised) start dates of the course if available.
+
+    The lower the number the "newer" the course.
+    """
+    # Make courses that have an announcement date have a lower
+    # score than courses than don't, older courses should have a
+    # higher score.
+    announcement, start, now = sorting_dates(start, advertised_start, announcement)
+    scale = 300.0  # about a year
+    if announcement:
+        days = (now - announcement).days
+        score = -exp(-days / scale)
+    else:
+        days = (now - start).days
+        score = exp(days / scale)
+    return score
+
+
+def sorting_dates(start, advertised_start, announcement):
+    """
+    Utility function to get datetime objects for dates used to
+    compute the is_new flag and the sorting_score.
+    """
+    try:
+        start = dateutil.parser.parse(advertised_start)
+        if start.tzinfo is None:
+            start = start.replace(tzinfo=UTC())
+    except (ValueError, AttributeError):
+        start = start
+
+    now = datetime.now(UTC())
+
+    return announcement, start, now

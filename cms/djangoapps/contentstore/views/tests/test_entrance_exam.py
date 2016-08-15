@@ -10,7 +10,8 @@ from django.test.client import RequestFactory
 
 from contentstore.tests.utils import AjaxEnabledTestClient, CourseTestCase
 from contentstore.utils import reverse_url
-from contentstore.views.entrance_exam import create_entrance_exam, update_entrance_exam, delete_entrance_exam
+from contentstore.views.entrance_exam import create_entrance_exam, update_entrance_exam, delete_entrance_exam,\
+    add_entrance_exam_milestone, remove_entrance_exam_milestone_reference
 from contentstore.views.helpers import GRADER_TYPES
 from models.settings.course_grading import CourseGradingModel
 from models.settings.course_metadata import CourseMetadata
@@ -18,6 +19,7 @@ from opaque_keys.edx.keys import UsageKey
 from student.tests.factories import UserFactory
 from util import milestones_helpers
 from xmodule.modulestore.django import modulestore
+from contentstore.views.helpers import create_xblock
 
 
 @patch.dict(settings.FEATURES, {'ENTRANCE_EXAMS': True})
@@ -36,6 +38,57 @@ class EntranceExamHandlerTests(CourseTestCase):
         self.exam_url = '/course/{}/entrance_exam/'.format(unicode(self.course.id))
         milestones_helpers.seed_milestone_relationship_types()
         self.milestone_relationship_types = milestones_helpers.get_milestone_relationship_types()
+
+    def test_entrance_exam_milestone_addition(self):
+        """
+        Unit Test: test addition of entrance exam milestone content
+        """
+        parent_locator = unicode(self.course.location)
+        created_block = create_xblock(
+            parent_locator=parent_locator,
+            user=self.user,
+            category='chapter',
+            display_name=('Entrance Exam'),
+            is_entrance_exam=True
+        )
+        add_entrance_exam_milestone(self.course.id, created_block)
+        content_milestones = milestones_helpers.get_course_content_milestones(
+            unicode(self.course.id),
+            unicode(created_block.location),
+            self.milestone_relationship_types['FULFILLS']
+        )
+        self.assertTrue(len(content_milestones))
+        self.assertEqual(len(milestones_helpers.get_course_milestones(self.course.id)), 1)
+
+    def test_entrance_exam_milestone_removal(self):
+        """
+        Unit Test: test removal of entrance exam milestone content
+        """
+        parent_locator = unicode(self.course.location)
+        created_block = create_xblock(
+            parent_locator=parent_locator,
+            user=self.user,
+            category='chapter',
+            display_name=('Entrance Exam'),
+            is_entrance_exam=True
+        )
+        add_entrance_exam_milestone(self.course.id, created_block)
+        content_milestones = milestones_helpers.get_course_content_milestones(
+            unicode(self.course.id),
+            unicode(created_block.location),
+            self.milestone_relationship_types['FULFILLS']
+        )
+        self.assertEqual(len(content_milestones), 1)
+        user = UserFactory()
+        request = RequestFactory().request()
+        request.user = user
+        remove_entrance_exam_milestone_reference(request, self.course.id)
+        content_milestones = milestones_helpers.get_course_content_milestones(
+            unicode(self.course.id),
+            unicode(created_block.location),
+            self.milestone_relationship_types['FULFILLS']
+        )
+        self.assertEqual(len(content_milestones), 0)
 
     def test_contentstore_views_entrance_exam_post(self):
         """

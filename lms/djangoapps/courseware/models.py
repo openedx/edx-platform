@@ -25,8 +25,7 @@ from model_utils.models import TimeStampedModel
 from student.models import user_by_anonymous_id
 from submissions.models import score_set, score_reset
 
-from openedx.core.djangoapps.call_stack_manager import CallStackManager, CallStackMixin
-from xmodule_django.models import CourseKeyField, LocationKeyField, BlockTypeKeyField  # pylint: disable=import-error
+from xmodule_django.models import CourseKeyField, LocationKeyField, BlockTypeKeyField
 log = logging.getLogger(__name__)
 
 log = logging.getLogger("edx.courseware")
@@ -45,6 +44,9 @@ class ChunkingManager(models.Manager):
     :class:`~Manager` that adds an additional method :meth:`chunked_filter` to provide
     the ability to make select queries with specific chunk sizes.
     """
+    class Meta(object):
+        app_label = "courseware"
+
     def chunked_filter(self, chunk_field, items, **kwargs):
         """
         Queries model_class with `chunk_field` set to chunks of size `chunk_size`,
@@ -69,21 +71,10 @@ class ChunkingManager(models.Manager):
         return res
 
 
-class ChunkingCallStackManager(CallStackManager, ChunkingManager):
-    """
-    A derived class of ChunkingManager, and CallStackManager
-
-    Class is currently unused but remains as part of the CallStackManger work. To re-enable see comment in StudentModule
-    """
-    pass
-
-
-class StudentModule(CallStackMixin, models.Model):
+class StudentModule(models.Model):
     """
     Keeps student state for a particular module in a particular course.
     """
-    # Changed back to ChunkingManager from ChunkingCallStackManger. To re-enable CallStack Management change the line
-    # back to: objects = ChunkingCallStackManager() Ticket: PLAT-881
     objects = ChunkingManager()
     MODEL_TAGS = ['course_id', 'module_type']
 
@@ -106,6 +97,7 @@ class StudentModule(CallStackMixin, models.Model):
     course_id = CourseKeyField(max_length=255, db_index=True)
 
     class Meta(object):
+        app_label = "courseware"
         unique_together = (('student', 'module_state_key', 'course_id'),)
 
     # Internal state of the object
@@ -148,7 +140,7 @@ class StudentModule(CallStackMixin, models.Model):
             # We use the student_id instead of username to avoid a database hop.
             # This can actually matter in cases where we're logging many of
             # these (e.g. on a broken progress page).
-            'student_id': self.student_id,  # pylint: disable=no-member
+            'student_id': self.student_id,
             'module_state_key': self.module_state_key,
             'state': str(self.state)[:20],
         },)
@@ -157,14 +149,15 @@ class StudentModule(CallStackMixin, models.Model):
         return unicode(repr(self))
 
 
-class StudentModuleHistory(CallStackMixin, models.Model):
+class StudentModuleHistory(models.Model):
     """Keeps a complete history of state changes for a given XModule for a given
     Student. Right now, we restrict this to problems so that the table doesn't
     explode in size."""
-    objects = CallStackManager()
+    objects = ChunkingManager()
     HISTORY_SAVING_TYPES = {'problem'}
 
     class Meta(object):
+        app_label = "courseware"
         get_latest_by = "created"
 
     student_module = models.ForeignKey(StudentModule, db_index=True)
@@ -192,6 +185,9 @@ class StudentModuleHistory(CallStackMixin, models.Model):
                                                  max_grade=instance.max_grade)
             history_entry.save()
 
+    def __unicode__(self):
+        return unicode(repr(self))
+
 
 class XBlockFieldBase(models.Model):
     """
@@ -200,6 +196,7 @@ class XBlockFieldBase(models.Model):
     objects = ChunkingManager()
 
     class Meta(object):
+        app_label = "courseware"
         abstract = True
 
     # The name of the field
@@ -227,6 +224,7 @@ class XModuleUserStateSummaryField(XBlockFieldBase):
     Stores data set in the Scope.user_state_summary scope by an xmodule field
     """
     class Meta(object):
+        app_label = "courseware"
         unique_together = (('usage_id', 'field_name'),)
 
     # The definition id for the module
@@ -238,6 +236,7 @@ class XModuleStudentPrefsField(XBlockFieldBase):
     Stores data set in the Scope.preferences scope by an xmodule field
     """
     class Meta(object):
+        app_label = "courseware"
         unique_together = (('student', 'module_type', 'field_name'),)
 
     # The type of the module for these preferences
@@ -251,6 +250,7 @@ class XModuleStudentInfoField(XBlockFieldBase):
     Stores data set in the Scope.preferences scope by an xmodule field
     """
     class Meta(object):
+        app_label = "courseware"
         unique_together = (('student', 'field_name'),)
 
     student = models.ForeignKey(User, db_index=True)
@@ -269,6 +269,7 @@ class OfflineComputedGrade(models.Model):
     gradeset = models.TextField(null=True, blank=True)		# grades, stored as JSON
 
     class Meta(object):
+        app_label = "courseware"
         unique_together = (('user', 'course_id'), )
 
     def __unicode__(self):
@@ -281,6 +282,7 @@ class OfflineComputedGradeLog(models.Model):
     Use this to be able to show instructor when the last computed grades were done.
     """
     class Meta(object):
+        app_label = "courseware"
         ordering = ["-created"]
         get_latest_by = "created"
 
@@ -304,6 +306,7 @@ class StudentFieldOverride(TimeStampedModel):
     student = models.ForeignKey(User, db_index=True)
 
     class Meta(object):
+        app_label = "courseware"
         unique_together = (('course_id', 'field', 'location', 'student'),)
 
     field = models.CharField(max_length=255)

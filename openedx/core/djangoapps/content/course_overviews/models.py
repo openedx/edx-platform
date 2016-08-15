@@ -2,24 +2,29 @@
 Declaration of CourseOverview model
 """
 import json
-from django.db import models
+import logging
 
+from django.db import models, transaction
 from django.db.models.fields import BooleanField, DateTimeField, DecimalField, TextField, FloatField, IntegerField
 from django.db.utils import IntegrityError
+from django.template import defaultfilters
 from django.utils.translation import ugettext
 from lms.djangoapps import django_comment_client
 from model_utils.models import TimeStampedModel
-
 from opaque_keys.edx.keys import CourseKey
+from openedx.core.djangoapps.models.course_details import CourseDetails
 
 from util.date_utils import strftime_localized
 from xmodule import course_metadata_utils
-from xmodule.course_module import CourseDescriptor
+from xmodule.course_module import CourseDescriptor, DEFAULT_START_DATE
 from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore.django import modulestore
 from xmodule_django.models import CourseKeyField, UsageKeyField
 
 from ccx_keys.locator import CCXLocator
+
+
+log = logging.getLogger(__name__)
 
 
 class CourseOverview(TimeStampedModel):
@@ -28,18 +33,25 @@ class CourseOverview(TimeStampedModel):
 
     This model contains basic course metadata such as an ID, display name,
     image URL, and any other information that would be necessary to display
-    a course as part of a user dashboard or enrollment API.
+    a course as part of:
+        user dashboard (enrolled courses)
+        course catalog (courses to enroll in)
+        course about (meta data about the course)
     """
 
+    class Meta(object):
+        app_label = 'course_overviews'
+
     # IMPORTANT: Bump this whenever you modify this model and/or add a migration.
-    VERSION = 2
+    VERSION = 3
 
     # Cache entry versioning.
     version = IntegerField()
 
     # Course identification
-    id = CourseKeyField(db_index=True, primary_key=True, max_length=255)  # pylint: disable=invalid-name
+    id = CourseKeyField(db_index=True, primary_key=True, max_length=255)
     _location = UsageKeyField(max_length=255)
+    org = TextField(max_length=255, default='outdated_entry')
     display_name = TextField(null=True)
     display_number_with_default = TextField()
     display_org_with_default = TextField()
@@ -48,6 +60,7 @@ class CourseOverview(TimeStampedModel):
     start = DateTimeField(null=True)
     end = DateTimeField(null=True)
     advertised_start = TextField(null=True)
+    announcement = DateTimeField(null=True)
 
     # URLs
     course_image_url = TextField()
@@ -57,9 +70,9 @@ class CourseOverview(TimeStampedModel):
 
     # Certification data
     certificates_display_behavior = TextField(null=True)
-    certificates_show_before_end = BooleanField()
-    cert_html_view_enabled = BooleanField()
-    has_any_active_web_certificate = BooleanField()
+    certificates_show_before_end = BooleanField(default=False)
+    cert_html_view_enabled = BooleanField(default=False)
+    has_any_active_web_certificate = BooleanField(default=False)
     cert_name_short = TextField()
     cert_name_long = TextField()
 
@@ -68,8 +81,8 @@ class CourseOverview(TimeStampedModel):
 
     # Access parameters
     days_early_for_beta = FloatField(null=True)
-    mobile_available = BooleanField()
-    visible_to_staff_only = BooleanField()
+    mobile_available = BooleanField(default=False)
+    visible_to_staff_only = BooleanField(default=False)
     _pre_requisite_courses_json = TextField()  # JSON representation of list of CourseKey strings
 
     # Enrollment details
@@ -78,6 +91,12 @@ class CourseOverview(TimeStampedModel):
     enrollment_domain = TextField(null=True)
     invitation_only = BooleanField(default=False)
     max_student_enrollments_allowed = IntegerField(null=True)
+
+    # Catalog information
+    catalog_visibility = TextField(null=True)
+    short_description = TextField(null=True)
+    course_video_url = TextField(null=True)
+    effort = TextField(null=True)
 
     @classmethod
     def _create_from_course(cls, course):
@@ -94,7 +113,9 @@ class CourseOverview(TimeStampedModel):
             CourseOverview: overview extracted from the given course
         """
         from lms.djangoapps.certificates.api import get_active_web_certificate
-        from lms.djangoapps.courseware.courses import course_image_url
+        from openedx.core.lib.courses import course_image_url
+
+        log.info('Creating course overview for %s.', unicode(course.id))
 
         # Workaround for a problem discovered in https://openedx.atlassian.net/browse/TNL-2806.
         # If the course has a malformed grading policy such that
@@ -109,17 +130,20 @@ class CourseOverview(TimeStampedModel):
         display_name = course.display_name
         start = course.start
         end = course.end
+        max_student_enrollments_allowed = course.max_student_enrollments_allowed
         if isinstance(course.id, CCXLocator):
-            from ccx.utils import get_ccx_from_ccx_locator  # pylint: disable=import-error
+            from lms.djangoapps.ccx.utils import get_ccx_from_ccx_locator
             ccx = get_ccx_from_ccx_locator(course.id)
             display_name = ccx.display_name
             start = ccx.start
             end = ccx.due
+            max_student_enrollments_allowed = ccx.max_student_enrollments_allowed
 
         return cls(
             version=cls.VERSION,
             id=course.id,
             _location=course.location,
+            org=course.location.org,
             display_name=display_name,
             display_number_with_default=course.display_number_with_default,
             display_org_with_default=course.display_org_with_default,
@@ -127,6 +151,7 @@ class CourseOverview(TimeStampedModel):
             start=start,
             end=end,
             advertised_start=course.advertised_start,
+            announcement=course.announcement,
 
             course_image_url=course_image_url(course),
             facebook_url=course.facebook_url,
@@ -150,7 +175,12 @@ class CourseOverview(TimeStampedModel):
             enrollment_end=course.enrollment_end,
             enrollment_domain=course.enrollment_domain,
             invitation_only=course.invitation_only,
-            max_student_enrollments_allowed=course.max_student_enrollments_allowed,
+            max_student_enrollments_allowed=max_student_enrollments_allowed,
+
+            catalog_visibility=course.catalog_visibility,
+            short_description=CourseDetails.fetch_about_attribute(course.id, 'short_description'),
+            effort=CourseDetails.fetch_about_attribute(course.id, 'effort'),
+            course_video_url=CourseDetails.fetch_video_url(course.id),
         )
 
     @classmethod
@@ -177,11 +207,12 @@ class CourseOverview(TimeStampedModel):
             if isinstance(course, CourseDescriptor):
                 course_overview = cls._create_from_course(course)
                 try:
-                    course_overview.save()
-                    CourseOverviewTab.objects.bulk_create([
-                        CourseOverviewTab(tab_id=tab.tab_id, course_overview=course_overview)
-                        for tab in course.tabs
-                    ])
+                    with transaction.atomic():
+                        course_overview.save()
+                        CourseOverviewTab.objects.bulk_create([
+                            CourseOverviewTab(tab_id=tab.tab_id, course_overview=course_overview)
+                            for tab in course.tabs
+                        ])
                 except IntegrityError:
                     # There is a rare race condition that will occur if
                     # CourseOverview.get_from_id is called while a
@@ -337,6 +368,42 @@ class CourseOverview(TimeStampedModel):
             strftime_localized
         )
 
+    @property
+    def sorting_score(self):
+        """
+        Returns a tuple that can be used to sort the courses according
+        the how "new" they are. The "newness" score is computed using a
+        heuristic that takes into account the announcement and
+        (advertised) start dates of the course if available.
+
+        The lower the number the "newer" the course.
+        """
+        return course_metadata_utils.sorting_score(self.start, self.advertised_start, self.announcement)
+
+    @property
+    def start_type(self):
+        """
+        Returns the type of the course's 'start' field.
+        """
+        if self.advertised_start:
+            return u'string'
+        elif self.start != DEFAULT_START_DATE:
+            return u'timestamp'
+        else:
+            return u'empty'
+
+    @property
+    def start_display(self):
+        """
+        Returns the display value for the course's start date.
+        """
+        if self.advertised_start:
+            return self.advertised_start
+        elif self.start != DEFAULT_START_DATE:
+            return defaultfilters.date(self.start, "DATE_FORMAT")
+        else:
+            return None
+
     def may_certify(self):
         """
         Returns whether it is acceptable to show the student a certificate
@@ -356,6 +423,47 @@ class CourseOverview(TimeStampedModel):
         return json.loads(self._pre_requisite_courses_json)
 
     @classmethod
+    def get_select_courses(cls, course_keys):
+        """
+        Returns CourseOverview objects for the given course_keys.
+        """
+        course_overviews = []
+
+        log.info('Generating course overview for %d courses.', len(course_keys))
+        log.debug('Generating course overview(s) for the following courses: %s', course_keys)
+
+        for course_key in course_keys:
+            try:
+                course_overviews.append(CourseOverview.get_from_id(course_key))
+            except Exception as ex:  # pylint: disable=broad-except
+                log.exception(
+                    'An error occurred while generating course overview for %s: %s',
+                    unicode(course_key),
+                    ex.message,
+                )
+
+        log.info('Finished generating course overviews.')
+
+        return course_overviews
+
+    @classmethod
+    def get_all_courses(cls, org=None):
+        """
+        Returns all CourseOverview objects in the database.
+
+        Arguments:
+            org (string): Optional parameter that allows filtering
+                by organization.
+        """
+        # Note: If a newly created course is not returned in this QueryList,
+        # make sure the "publish" signal was emitted when the course was
+        # created.  For tests using CourseFactory, use emit_signals=True.
+        course_overviews = CourseOverview.objects.all()
+        if org:
+            course_overviews = course_overviews.filter(org=org)
+        return course_overviews
+
+    @classmethod
     def get_all_course_keys(cls):
         """
         Returns all course keys from course overviews.
@@ -369,7 +477,7 @@ class CourseOverview(TimeStampedModel):
         """
         Returns True if course has discussion tab and is enabled
         """
-        tabs = self.tabs.all()  # pylint: disable=E1101
+        tabs = self.tabs.all()
         # creates circular import; hence explicitly referenced is_discussion_enabled
         for tab in tabs:
             if tab.tab_id == "discussion" and django_comment_client.utils.is_discussion_enabled(self.id):

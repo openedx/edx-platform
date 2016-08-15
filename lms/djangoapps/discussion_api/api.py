@@ -25,13 +25,7 @@ from discussion_api.permissions import (
     get_initializable_thread_fields,
 )
 from discussion_api.serializers import CommentSerializer, ThreadSerializer, get_context
-from django_comment_client.base.views import (
-    THREAD_CREATED_EVENT_NAME,
-    get_comment_created_event_data,
-    get_comment_created_event_name,
-    get_thread_created_event_data,
-    track_forum_event,
-)
+from django_comment_client.base.views import track_comment_created_event, track_thread_created_event
 from django_comment_common.signals import (
     thread_created,
     thread_edited,
@@ -348,7 +342,7 @@ def get_thread_list(
     return ret
 
 
-def get_comment_list(request, thread_id, endorsed, page, page_size, mark_as_read=False):
+def get_comment_list(request, thread_id, endorsed, page, page_size):
     """
     Return the list of comments in the given thread.
 
@@ -367,8 +361,6 @@ def get_comment_list(request, thread_id, endorsed, page, page_size, mark_as_read
 
         page_size: The number of comments to retrieve per page
 
-        mark_as_read: Marks the thread of the comment list as read.
-
     Returns:
 
         A paginated result containing a list of comments; see
@@ -381,7 +373,6 @@ def get_comment_list(request, thread_id, endorsed, page, page_size, mark_as_read
         retrieve_kwargs={
             "recursive": False,
             "user_id": request.user.id,
-            "mark_as_read": mark_as_read,
             "response_skip": response_skip,
             "response_limit": page_size,
         }
@@ -566,13 +557,7 @@ def create_thread(request, thread_data):
     api_thread = serializer.data
     _do_extra_actions(api_thread, cc_thread, thread_data.keys(), actions_form, context)
 
-    track_forum_event(
-        request,
-        THREAD_CREATED_EVENT_NAME,
-        course,
-        cc_thread,
-        get_thread_created_event_data(cc_thread, followed=actions_form.cleaned_data["following"])
-    )
+    track_thread_created_event(request, course, cc_thread, actions_form.cleaned_data["following"])
 
     return api_thread
 
@@ -601,6 +586,10 @@ def create_comment(request, comment_data):
     except Http404:
         raise ValidationError({"thread_id": ["Invalid value."]})
 
+    # if a thread is closed; no new comments could be made to it
+    if cc_thread['closed']:
+        raise PermissionDenied
+
     _check_initializable_comment_fields(comment_data, context)
     serializer = CommentSerializer(data=comment_data, context=context)
     actions_form = CommentActionsForm(comment_data)
@@ -612,13 +601,7 @@ def create_comment(request, comment_data):
     api_comment = serializer.data
     _do_extra_actions(api_comment, cc_comment, comment_data.keys(), actions_form, context)
 
-    track_forum_event(
-        request,
-        get_comment_created_event_name(cc_comment),
-        context["course"],
-        cc_comment,
-        get_comment_created_event_data(cc_comment, cc_thread["commentable_id"], followed=False)
-    )
+    track_comment_created_event(request, context["course"], cc_comment, cc_thread["commentable_id"], followed=False)
 
     return api_comment
 
@@ -713,7 +696,11 @@ def get_thread(request, thread_id):
         thread_id: The id for the thread to retrieve
 
     """
-    cc_thread, context = _get_thread_and_context(request, thread_id)
+    cc_thread, context = _get_thread_and_context(
+        request,
+        thread_id,
+        retrieve_kwargs={"user_id": unicode(request.user.id)}
+    )
     serializer = ThreadSerializer(cc_thread, context=context)
     return serializer.data
 

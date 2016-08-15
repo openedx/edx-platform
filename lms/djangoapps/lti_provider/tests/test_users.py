@@ -70,8 +70,8 @@ class UserManagementHelperTest(TestCase):
                 )
 
 
-@patch('lti_provider.users.switch_user')
-@patch('lti_provider.users.create_lti_user')
+@patch('lti_provider.users.switch_user', autospec=True)
+@patch('lti_provider.users.create_lti_user', autospec=True)
 class AuthenticateLtiUserTest(TestCase):
     """
     Tests for the authenticate_lti_user function in users.py

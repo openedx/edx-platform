@@ -12,19 +12,21 @@ import re
 import time
 import requests
 from django.conf import settings
-from django.views.decorators.csrf import ensure_csrf_cookie
-from django.views.decorators.http import require_POST
+from django.views.decorators.csrf import ensure_csrf_cookie, csrf_exempt
+from django.views.decorators.http import require_POST, require_http_methods
 from django.views.decorators.cache import cache_control
 from django.core.exceptions import ValidationError, PermissionDenied
 from django.core.mail.message import EmailMessage
-from django.db import IntegrityError
+from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
+from django.db import IntegrityError, transaction
 from django.core.urlresolvers import reverse
 from django.core.validators import validate_email
 from django.utils.translation import ugettext as _
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseNotFound
 from django.utils.html import strip_tags
 from django.shortcuts import redirect
-import string  # pylint: disable=deprecated-module
+from util.db import outer_atomic
+import string
 import random
 import unicodecsv
 import urllib
@@ -80,7 +82,6 @@ from instructor.enrollment import (
     unenroll_email,
 )
 from instructor.access import list_with_level, allow_access, revoke_access, ROLES, update_forum_role
-from instructor.offline_gradecalc import student_grades
 import instructor_analytics.basic
 import instructor_analytics.distributions
 import instructor_analytics.csvs
@@ -91,8 +92,10 @@ from instructor.views import INVOICE_KEY
 from submissions import api as sub_api  # installed from the edx-submissions repository
 
 from certificates import api as certs_api
+from certificates.models import CertificateWhitelist, GeneratedCertificate
 
 from bulk_email.models import CourseEmail
+from student.models import get_user_by_username_or_email
 
 from .tools import (
     dump_student_extensions,
@@ -140,51 +143,14 @@ def common_exceptions_400(func):
     return wrapped
 
 
-def require_query_params(*args, **kwargs):
-    """
-    Checks for required paremters or renders a 400 error.
-    (decorator with arguments)
-
-    `args` is a *list of required GET parameter names.
-    `kwargs` is a **dict of required GET parameter names
-        to string explanations of the parameter
-    """
-    required_params = []
-    required_params += [(arg, None) for arg in args]
-    required_params += [(key, kwargs[key]) for key in kwargs]
-    # required_params = e.g. [('action', 'enroll or unenroll'), ['emails', None]]
-
-    def decorator(func):  # pylint: disable=missing-docstring
-        def wrapped(*args, **kwargs):  # pylint: disable=missing-docstring
-            request = args[0]
-
-            error_response_data = {
-                'error': 'Missing required query parameter(s)',
-                'parameters': [],
-                'info': {},
-            }
-
-            for (param, extra) in required_params:
-                default = object()
-                if request.GET.get(param, default) == default:
-                    error_response_data['parameters'].append(param)
-                    error_response_data['info'][param] = extra
-
-            if len(error_response_data['parameters']) > 0:
-                return JsonResponse(error_response_data, status=400)
-            else:
-                return func(*args, **kwargs)
-        return wrapped
-    return decorator
-
-
 def require_post_params(*args, **kwargs):
     """
     Checks for required parameters or renders a 400 error.
     (decorator with arguments)
 
-    Functions like 'require_query_params', but checks for
-    POST parameters rather than GET parameters.
+    `args` is a *list of required POST parameter names.
+    `kwargs` is a **dict of required POST parameter names
+        to string explanations of the parameter
     """
     required_params = []
     required_params += [(arg, None) for arg in args]
@@ -314,6 +280,7 @@ NAME_INDEX = 2
 COUNTRY_INDEX = 3
 
 
+@require_POST
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
@@ -437,11 +404,12 @@ def register_and_enroll_students(request, course_id):  # pylint: disable=too-man
                     password = generate_unique_password(generated_passwords)
 
                     try:
-                        enrollment_obj = create_and_enroll_user(email, username, name, country, password, course_id)
-                        reason = 'Enrolling via csv upload'
-                        ManualEnrollmentAudit.create_manual_enrollment_audit(
-                            request.user, email, UNENROLLED_TO_ENROLLED, reason, enrollment_obj
-                        )
+                        with transaction.atomic():
+                            enrollment_obj = create_and_enroll_user(email, username, name, country, password, course_id)
+                            reason = 'Enrolling via csv upload'
+                            ManualEnrollmentAudit.create_manual_enrollment_audit(
+                                request.user, email, UNENROLLED_TO_ENROLLED, reason, enrollment_obj
+                            )
                     except IntegrityError:
                         row_errors.append({
                             'username': username, 'email': email, 'response': _('Username {user} already exists.').format(user=username)})
@@ -513,6 +481,7 @@ def create_and_enroll_user(email, username, name, country, password, course_id):
     return CourseEnrollment.enroll(user, course_id)
 
 
+@require_POST
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
@@ -626,6 +595,7 @@ def students_update_enrollment(request, course_id):
                 )
                 before_enrollment = before.to_dict()['enrollment']
                 before_allowed = before.to_dict()['allowed']
+                enrollment_obj = CourseEnrollment.get_enrollment(user, course_id)
 
                 if before_enrollment:
                     state_transition = ENROLLED_TO_UNENROLLED
@@ -676,6 +646,7 @@ def students_update_enrollment(request, course_id):
     return JsonResponse(response_payload)
 
 
+@require_POST
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('instructor')
@@ -756,11 +727,12 @@ def bulk_beta_modify_access(request, course_id):
     return JsonResponse(response_payload)
 
 
+@require_POST
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('instructor')
 @common_exceptions_400
-@require_query_params(
+@require_post_params(
     unique_student_identifier="email or username of user to change access",
     rolename="'instructor', 'staff', 'beta', or 'ccx_coach'",
     action="'allow' or 'revoke'"
@@ -782,10 +754,10 @@ def modify_access(request, course_id):
         request.user, 'instructor', course_id, depth=None
     )
     try:
-        user = get_student_from_identifier(request.GET.get('unique_student_identifier'))
+        user = get_student_from_identifier(request.POST.get('unique_student_identifier'))
     except User.DoesNotExist:
         response_payload = {
-            'unique_student_identifier': request.GET.get('unique_student_identifier'),
+            'unique_student_identifier': request.POST.get('unique_student_identifier'),
             'userDoesNotExist': True,
         }
         return JsonResponse(response_payload)
@@ -800,8 +772,8 @@ def modify_access(request, course_id):
         }
         return JsonResponse(response_payload)
 
-    rolename = request.GET.get('rolename')
-    action = request.GET.get('action')
+    rolename = request.POST.get('rolename')
+    action = request.POST.get('action')
 
     if rolename not in ROLES:
         error = strip_tags("unknown rolename '{}'".format(rolename))
@@ -836,10 +808,11 @@ def modify_access(request, course_id):
     return JsonResponse(response_payload)
 
 
+@require_POST
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('instructor')
-@require_query_params(rolename="'instructor', 'staff', or 'beta'")
+@require_post_params(rolename="'instructor', 'staff', or 'beta'")
 def list_course_role_members(request, course_id):
     """
     List instructors and staff.
@@ -864,7 +837,7 @@ def list_course_role_members(request, course_id):
         request.user, 'instructor', course_id, depth=None
     )
 
-    rolename = request.GET.get('rolename')
+    rolename = request.POST.get('rolename')
 
     if rolename not in ROLES:
         return HttpResponseBadRequest()
@@ -887,6 +860,8 @@ def list_course_role_members(request, course_id):
     return JsonResponse(response_payload)
 
 
+@transaction.non_atomic_requests
+@require_POST
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
@@ -903,12 +878,12 @@ def get_problem_responses(request, course_id):
     Responds with BadRequest if problem location is faulty.
     """
     course_key = CourseKey.from_string(course_id)
-    problem_location = request.GET.get('problem_location', '')
+    problem_location = request.POST.get('problem_location', '')
 
     try:
         problem_key = UsageKey.from_string(problem_location)
         # Are we dealing with an "old-style" problem location?
-        run = getattr(problem_key, 'run')
+        run = problem_key.run
         if not run:
             problem_key = course_key.make_usage_key_from_deprecated_string(problem_location)
         if problem_key.course_key != course_key:
@@ -932,6 +907,7 @@ def get_problem_responses(request, course_id):
         return JsonResponse({"status": already_running_status})
 
 
+@require_POST
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
@@ -962,7 +938,7 @@ def get_sale_records(request, course_id, csv=False):  # pylint: disable=unused-a
     course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     query_features = [
         'company_name', 'company_contact_name', 'company_contact_email', 'total_codes', 'total_used_codes',
-        'total_amount', 'created_at', 'customer_reference_number', 'recipient_name', 'recipient_email', 'created_by',
+        'total_amount', 'created', 'customer_reference_number', 'recipient_name', 'recipient_email', 'created_by',
         'internal_reference', 'invoice_number', 'codes', 'course_id'
     ]
 
@@ -986,7 +962,7 @@ def get_sale_records(request, course_id, csv=False):  # pylint: disable=unused-a
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
-def get_sale_order_records(request, course_id):  # pylint: disable=unused-argument, redefined-outer-name
+def get_sale_order_records(request, course_id):  # pylint: disable=unused-argument
     """
     return the summary of all sales records for a particular course
     """
@@ -1089,10 +1065,11 @@ def re_validate_invoice(obj_invoice):
     return JsonResponse({'message': message})
 
 
+@transaction.non_atomic_requests
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
-def get_issued_certificates(request, course_id):  # pylint: disable=invalid-name
+def get_issued_certificates(request, course_id):
     """
     Responds with JSON if CSV is not required. contains a list of issued certificates.
     Arguments:
@@ -1128,6 +1105,8 @@ def get_issued_certificates(request, course_id):  # pylint: disable=invalid-name
         return JsonResponse(response_payload)
 
 
+@transaction.non_atomic_requests
+@require_POST
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
@@ -1206,6 +1185,8 @@ def get_students_features(request, course_id, csv=False):  # pylint: disable=red
             return JsonResponse({"status": already_running_status})
 
 
+@transaction.non_atomic_requests
+@require_POST
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
@@ -1237,6 +1218,7 @@ def get_students_who_may_enroll(request, course_id):
         return JsonResponse({"status": already_running_status})
 
 
+@transaction.non_atomic_requests
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_POST
@@ -1311,6 +1293,8 @@ def get_coupon_codes(request, course_id):  # pylint: disable=unused-argument
     return instructor_analytics.csvs.create_csv_response('Coupons.csv', csv_columns, data_rows)
 
 
+@transaction.non_atomic_requests
+@require_POST
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
@@ -1334,6 +1318,8 @@ def get_enrollment_report(request, course_id):
         })
 
 
+@transaction.non_atomic_requests
+@require_POST
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
@@ -1358,6 +1344,8 @@ def get_exec_summary_report(request, course_id):
     })
 
 
+@transaction.non_atomic_requests
+@require_POST
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
@@ -1381,6 +1369,8 @@ def get_course_survey_results(request, course_id):
     })
 
 
+@transaction.non_atomic_requests
+@require_POST
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
@@ -1391,6 +1381,7 @@ def get_proctored_exam_results(request, course_id):
     query_features = [
         'user_email',
         'exam_name',
+        'attempt_code',
         'allowed_time_limit_mins',
         'is_sample_attempt',
         'started_at',
@@ -1450,7 +1441,8 @@ def save_registration_code(user, course_id, mode_slug, invoice=None, order=None,
         invoice_item=invoice_item
     )
     try:
-        course_registration.save()
+        with transaction.atomic():
+            course_registration.save()
         return course_registration
     except IntegrityError:
         return save_registration_code(
@@ -1490,7 +1482,7 @@ def random_code_generator():
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
 @require_POST
-def get_registration_codes(request, course_id):  # pylint: disable=unused-argument
+def get_registration_codes(request, course_id):
     """
     Respond with csv which contains a summary of all Registration Codes.
     """
@@ -1606,7 +1598,7 @@ def generate_registration_codes(request, course_id):
     course_price = course_mode.min_price
 
     registration_codes = []
-    for __ in range(course_code_number):  # pylint: disable=redefined-outer-name
+    for __ in range(course_code_number):
         generated_registration_code = save_registration_code(
             request.user, course_id, course_mode.slug, invoice=sale_invoice, order=None, invoice_item=invoice_item
         )
@@ -1693,7 +1685,7 @@ def generate_registration_codes(request, course_id):
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
 @require_POST
-def active_registration_codes(request, course_id):  # pylint: disable=unused-argument
+def active_registration_codes(request, course_id):
     """
     Respond with csv which contains a summary of all Active Registration Codes.
     """
@@ -1724,7 +1716,7 @@ def active_registration_codes(request, course_id):  # pylint: disable=unused-arg
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
 @require_POST
-def spent_registration_codes(request, course_id):  # pylint: disable=unused-argument
+def spent_registration_codes(request, course_id):
     """
     Respond with csv which contains a summary of all Spent(used) Registration Codes.
     """
@@ -1765,7 +1757,7 @@ def get_anon_ids(request, course_id):  # pylint: disable=unused-argument
 
     def csv_response(filename, header, rows):
         """Returns a CSV http response for the given header and rows (excel/utf-8)."""
-        response = HttpResponse(mimetype='text/csv')
+        response = HttpResponse(content_type='text/csv')
         response['Content-Disposition'] = 'attachment; filename={0}'.format(unicode(filename).encode('utf-8'))
         writer = csv.writer(response, dialect='excel', quotechar='"', quoting=csv.QUOTE_ALL)
         # In practice, there should not be non-ascii data in this query,
@@ -1785,11 +1777,12 @@ def get_anon_ids(request, course_id):  # pylint: disable=unused-argument
     return csv_response(course_id.to_deprecated_string().replace('/', '-') + '-anon-ids.csv', header, rows)
 
 
+@require_POST
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @common_exceptions_400
 @require_level('staff')
-@require_query_params(
+@require_post_params(
     unique_student_identifier="email or username of student for whom to get progress url"
 )
 def get_student_progress_url(request, course_id):
@@ -1797,13 +1790,13 @@ def get_student_progress_url(request, course_id):
     Get the progress url of a student.
     Limited to staff access.
 
-    Takes query paremeter unique_student_identifier and if the student exists
+    Takes query parameter unique_student_identifier and if the student exists
     returns e.g. {
         'progress_url': '/../...'
     }
     """
     course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
-    user = get_student_from_identifier(request.GET.get('unique_student_identifier'))
+    user = get_student_from_identifier(request.POST.get('unique_student_identifier'))
 
     progress_url = reverse('student_progress', kwargs={'course_id': course_id.to_deprecated_string(), 'student_id': user.id})
 
@@ -1814,10 +1807,12 @@ def get_student_progress_url(request, course_id):
     return JsonResponse(response_payload)
 
 
+@transaction.non_atomic_requests
+@require_POST
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
-@require_query_params(
+@require_post_params(
     problem_to_reset="problem urlname to reset"
 )
 @common_exceptions_400
@@ -1844,13 +1839,13 @@ def reset_student_attempts(request, course_id):
         request.user, 'staff', course_id, depth=None
     )
 
-    problem_to_reset = strip_if_string(request.GET.get('problem_to_reset'))
-    student_identifier = request.GET.get('unique_student_identifier', None)
+    problem_to_reset = strip_if_string(request.POST.get('problem_to_reset'))
+    student_identifier = request.POST.get('unique_student_identifier', None)
     student = None
     if student_identifier is not None:
         student = get_student_from_identifier(student_identifier)
-    all_students = request.GET.get('all_students', False) in ['true', 'True', True]
-    delete_module = request.GET.get('delete_module', False) in ['true', 'True', True]
+    all_students = request.POST.get('all_students', False) in ['true', 'True', True]
+    delete_module = request.POST.get('delete_module', False) in ['true', 'True', True]
 
     # parameter combinations
     if all_students and student:
@@ -1895,6 +1890,8 @@ def reset_student_attempts(request, course_id):
     return JsonResponse(response_payload)
 
 
+@transaction.non_atomic_requests
+@require_POST
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
@@ -1925,12 +1922,12 @@ def reset_student_attempts_for_entrance_exam(request, course_id):  # pylint: dis
             _("Course has no entrance exam section.")
         )
 
-    student_identifier = request.GET.get('unique_student_identifier', None)
+    student_identifier = request.POST.get('unique_student_identifier', None)
     student = None
     if student_identifier is not None:
         student = get_student_from_identifier(student_identifier)
-    all_students = request.GET.get('all_students', False) in ['true', 'True', True]
-    delete_module = request.GET.get('delete_module', False) in ['true', 'True', True]
+    all_students = request.POST.get('all_students', False) in ['true', 'True', True]
+    delete_module = request.POST.get('delete_module', False) in ['true', 'True', True]
 
     # parameter combinations
     if all_students and student:
@@ -1960,10 +1957,12 @@ def reset_student_attempts_for_entrance_exam(request, course_id):  # pylint: dis
     return JsonResponse(response_payload)
 
 
+@transaction.non_atomic_requests
+@require_POST
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('instructor')
-@require_query_params(problem_to_reset="problem urlname to reset")
+@require_post_params(problem_to_reset="problem urlname to reset")
 @common_exceptions_400
 def rescore_problem(request, course_id):
     """
@@ -1978,13 +1977,13 @@ def rescore_problem(request, course_id):
     all_students and unique_student_identifier cannot both be present.
     """
     course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
-    problem_to_reset = strip_if_string(request.GET.get('problem_to_reset'))
-    student_identifier = request.GET.get('unique_student_identifier', None)
+    problem_to_reset = strip_if_string(request.POST.get('problem_to_reset'))
+    student_identifier = request.POST.get('unique_student_identifier', None)
     student = None
     if student_identifier is not None:
         student = get_student_from_identifier(student_identifier)
 
-    all_students = request.GET.get('all_students') in ['true', 'True', True]
+    all_students = request.POST.get('all_students') in ['true', 'True', True]
 
     if not (problem_to_reset and (all_students or student)):
         return HttpResponseBadRequest("Missing query parameters.")
@@ -2015,6 +2014,8 @@ def rescore_problem(request, course_id):
     return JsonResponse(response_payload)
 
 
+@transaction.non_atomic_requests
+@require_POST
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('instructor')
@@ -2035,12 +2036,12 @@ def rescore_entrance_exam(request, course_id):
         request.user, 'staff', course_id, depth=None
     )
 
-    student_identifier = request.GET.get('unique_student_identifier', None)
+    student_identifier = request.POST.get('unique_student_identifier', None)
     student = None
     if student_identifier is not None:
         student = get_student_from_identifier(student_identifier)
 
-    all_students = request.GET.get('all_students') in ['true', 'True', True]
+    all_students = request.POST.get('all_students') in ['true', 'True', True]
 
     if not course.entrance_exam_id:
         return HttpResponseBadRequest(
@@ -2067,6 +2068,7 @@ def rescore_entrance_exam(request, course_id):
     return JsonResponse(response_payload)
 
 
+@require_POST
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
@@ -2085,6 +2087,7 @@ def list_background_email_tasks(request, course_id):  # pylint: disable=unused-a
     return JsonResponse(response_payload)
 
 
+@require_POST
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
@@ -2103,6 +2106,7 @@ def list_email_content(request, course_id):  # pylint: disable=unused-argument
     return JsonResponse(response_payload)
 
 
+@require_POST
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
@@ -2117,8 +2121,8 @@ def list_instructor_tasks(request, course_id):
             history for problem AND student (intersection)
     """
     course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
-    problem_location_str = strip_if_string(request.GET.get('problem_location_str', False))
-    student = request.GET.get('unique_student_identifier', None)
+    problem_location_str = strip_if_string(request.POST.get('problem_location_str', False))
+    student = request.POST.get('unique_student_identifier', None)
     if student is not None:
         student = get_student_from_identifier(student)
 
@@ -2148,6 +2152,7 @@ def list_instructor_tasks(request, course_id):
     return JsonResponse(response_payload)
 
 
+@require_POST
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
@@ -2161,7 +2166,7 @@ def list_entrance_exam_instructor_tasks(request, course_id):  # pylint: disable=
     """
     course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     course = get_course_by_id(course_id)
-    student = request.GET.get('unique_student_identifier', None)
+    student = request.POST.get('unique_student_identifier', None)
     if student is not None:
         student = get_student_from_identifier(student)
 
@@ -2182,6 +2187,7 @@ def list_entrance_exam_instructor_tasks(request, course_id):  # pylint: disable=
     return JsonResponse(response_payload)
 
 
+@require_POST
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
@@ -2201,6 +2207,7 @@ def list_report_downloads(_request, course_id):
     return JsonResponse(response_payload)
 
 
+@require_POST
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
@@ -2221,6 +2228,8 @@ def list_financial_report_downloads(_request, course_id):
     return JsonResponse(response_payload)
 
 
+@transaction.non_atomic_requests
+@require_POST
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
@@ -2243,6 +2252,8 @@ def calculate_grades_csv(request, course_id):
         })
 
 
+@transaction.non_atomic_requests
+@require_POST
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
@@ -2269,10 +2280,11 @@ def problem_grade_report(request, course_id):
         })
 
 
+@require_POST
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
-@require_query_params('rolename')
+@require_post_params('rolename')
 def list_forum_members(request, course_id):
     """
     Lists forum members of a certain rolename.
@@ -2291,7 +2303,7 @@ def list_forum_members(request, course_id):
         request.user, course_id, FORUM_ROLE_ADMINISTRATOR
     )
 
-    rolename = request.GET.get('rolename')
+    rolename = request.POST.get('rolename')
 
     # default roles require either (staff & forum admin) or (instructor)
     if not (has_forum_admin or has_instructor_access):
@@ -2331,6 +2343,8 @@ def list_forum_members(request, course_id):
     return JsonResponse(response_payload)
 
 
+@transaction.non_atomic_requests
+@require_POST
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
@@ -2375,7 +2389,7 @@ def send_email(request, course_id):
     )
 
     # Submit the task, so that the correct InstructorTask object gets created (for monitoring purposes)
-    instructor_task.api.submit_bulk_course_email(request, course_id, email.id)  # pylint: disable=no-member
+    instructor_task.api.submit_bulk_course_email(request, course_id, email.id)
 
     response_payload = {
         'course_id': course_id.to_deprecated_string(),
@@ -2384,10 +2398,11 @@ def send_email(request, course_id):
     return JsonResponse(response_payload)
 
 
+@require_POST
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
-@require_query_params(
+@require_post_params(
     unique_student_identifier="email or username of user to change access",
     rolename="the forum role",
     action="'allow' or 'revoke'",
@@ -2414,9 +2429,9 @@ def update_forum_role_membership(request, course_id):
         request.user, course_id, FORUM_ROLE_ADMINISTRATOR
     )
 
-    unique_student_identifier = request.GET.get('unique_student_identifier')
-    rolename = request.GET.get('rolename')
-    action = request.GET.get('action')
+    unique_student_identifier = request.POST.get('unique_student_identifier')
+    rolename = request.POST.get('rolename')
+    action = request.POST.get('action')
 
     # default roles require either (staff & forum admin) or (instructor)
     if not (has_forum_admin or has_instructor_access):
@@ -2474,18 +2489,19 @@ def _display_unit(unit):
 
 
 @handle_dashboard_error
+@require_POST
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
-@require_query_params('student', 'url', 'due_datetime')
+@require_post_params('student', 'url', 'due_datetime')
 def change_due_date(request, course_id):
     """
     Grants a due date extension to a student for a particular unit.
     """
     course = get_course_by_id(SlashSeparatedCourseKey.from_deprecated_string(course_id))
-    student = require_student_from_identifier(request.GET.get('student'))
-    unit = find_unit(course, request.GET.get('url'))
-    due_date = parse_datetime(request.GET.get('due_datetime'))
+    student = require_student_from_identifier(request.POST.get('student'))
+    unit = find_unit(course, request.POST.get('url'))
+    due_date = parse_datetime(request.POST.get('due_datetime'))
     set_due_date_extension(course, unit, student, due_date)
 
     return JsonResponse(_(
@@ -2495,17 +2511,18 @@ def change_due_date(request, course_id):
 
 
 @handle_dashboard_error
+@require_POST
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
-@require_query_params('student', 'url')
+@require_post_params('student', 'url')
 def reset_due_date(request, course_id):
     """
     Rescinds a due date extension for a student on a particular unit.
     """
     course = get_course_by_id(SlashSeparatedCourseKey.from_deprecated_string(course_id))
-    student = require_student_from_identifier(request.GET.get('student'))
-    unit = find_unit(course, request.GET.get('url'))
+    student = require_student_from_identifier(request.POST.get('student'))
+    unit = find_unit(course, request.POST.get('url'))
     set_due_date_extension(course, unit, student, None)
     if not getattr(unit, "due", None):
         # It's possible the normal due date was deleted after an extension was granted:
@@ -2521,30 +2538,32 @@ def reset_due_date(request, course_id):
 
 
 @handle_dashboard_error
+@require_POST
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
-@require_query_params('url')
+@require_post_params('url')
 def show_unit_extensions(request, course_id):
     """
     Shows all of the students which have due date extensions for the given unit.
     """
     course = get_course_by_id(SlashSeparatedCourseKey.from_deprecated_string(course_id))
-    unit = find_unit(course, request.GET.get('url'))
+    unit = find_unit(course, request.POST.get('url'))
     return JsonResponse(dump_module_extensions(course, unit))
 
 
 @handle_dashboard_error
+@require_POST
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
-@require_query_params('student')
+@require_post_params('student')
 def show_student_extensions(request, course_id):
     """
     Shows all of the due date extensions granted to a particular student in a
     particular course.
     """
-    student = require_student_from_identifier(request.GET.get('student'))
+    student = require_student_from_identifier(request.POST.get('student'))
     course = get_course_by_id(SlashSeparatedCourseKey.from_deprecated_string(course_id))
     return JsonResponse(dump_student_extensions(course, student))
 
@@ -2622,46 +2641,6 @@ def enable_certificate_generation(request, course_id=None):
     return redirect(_instructor_dash_url(course_key, section='certificates'))
 
 
-#---- Gradebook (shown to small courses only) ----
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_level('staff')
-def spoc_gradebook(request, course_id):
-    """
-    Show the gradebook for this course:
-    - Only shown for courses with enrollment < settings.FEATURES.get("MAX_ENROLLMENT_INSTR_BUTTONS")
-    - Only displayed to course staff
-    """
-    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
-    course = get_course_with_access(request.user, 'staff', course_key, depth=None)
-
-    enrolled_students = User.objects.filter(
-        courseenrollment__course_id=course_key,
-        courseenrollment__is_active=1
-    ).order_by('username').select_related("profile")
-
-    # possible extension: implement pagination to show to large courses
-
-    student_info = [
-        {
-            'username': student.username,
-            'id': student.id,
-            'email': student.email,
-            'grade_summary': student_grades(student, request, course),
-            'realname': student.profile.name,
-        }
-        for student in enrolled_students
-    ]
-
-    return render_to_response('courseware/gradebook.html', {
-        'students': student_info,
-        'course': course,
-        'course_id': course_key,
-        # Checked above
-        'staff_access': True,
-        'ordered_grades': sorted(course.grade_cutoffs.items(), key=lambda i: i[1], reverse=True),
-    })
-
-
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
@@ -2686,6 +2665,7 @@ def mark_student_can_skip_entrance_exam(request, course_id):  # pylint: disable=
     return JsonResponse(response_payload)
 
 
+@transaction.non_atomic_requests
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_global_staff
@@ -2695,7 +2675,7 @@ def start_certificate_generation(request, course_id):
     Start generating certificates for all students enrolled in given course.
     """
     course_key = CourseKey.from_string(course_id)
-    task = instructor_task.api.generate_certificates_for_all_students(request, course_key)
+    task = instructor_task.api.generate_certificates_for_students(request, course_key)
     message = _('Certificate generation task for all students of this course has been started. '
                 'You can view the status of the generation task in the "Pending Tasks" section.')
     response_payload = {
@@ -2703,3 +2683,329 @@ def start_certificate_generation(request, course_id):
         'task_id': task.task_id
     }
     return JsonResponse(response_payload)
+
+
+@transaction.non_atomic_requests
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_global_staff
+@require_POST
+def start_certificate_regeneration(request, course_id):
+    """
+    Start regenerating certificates for students whose certificate statuses lie with in 'certificate_statuses'
+    entry in POST data.
+    """
+    course_key = CourseKey.from_string(course_id)
+    certificates_statuses = request.POST.getlist('certificate_statuses', [])
+    if not certificates_statuses:
+        return JsonResponse(
+            {'message': _('Please select one or more certificate statuses that require certificate regeneration.')},
+            status=400
+        )
+
+    # Check if the selected statuses are allowed
+    allowed_statuses = GeneratedCertificate.get_unique_statuses(course_key=course_key, flat=True)
+    if not set(certificates_statuses).issubset(allowed_statuses):
+        return JsonResponse(
+            {'message': _('Please select certificate statuses from the list only.')},
+            status=400
+        )
+    try:
+        instructor_task.api.regenerate_certificates(request, course_key, certificates_statuses)
+    except AlreadyRunningError as error:
+        return JsonResponse({'message': error.message}, status=400)
+
+    response_payload = {
+        'message': _('Certificate regeneration task has been started. '
+                     'You can view the status of the generation task in the "Pending Tasks" section.'),
+        'success': True
+    }
+    return JsonResponse(response_payload)
+
+
+@transaction.non_atomic_requests
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_global_staff
+@require_http_methods(['POST', 'DELETE'])
+def certificate_exception_view(request, course_id):
+    """
+    Add/Remove students to/from certificate white list.
+
+    :param request: HttpRequest object
+    :param course_id: course identifier of the course for whom to add/remove certificates exception.
+    :return: JsonResponse object with success/error message or certificate exception data.
+    """
+    course_key = CourseKey.from_string(course_id)
+    # Validate request data and return error response in case of invalid data
+    try:
+        certificate_exception, student = parse_request_data_and_get_user(request, course_key)
+    except ValueError as error:
+        return JsonResponse({'success': False, 'message': error.message}, status=400)
+
+    # Add new Certificate Exception for the student passed in request data
+    if request.method == 'POST':
+        try:
+            exception = add_certificate_exception(course_key, student, certificate_exception)
+        except ValueError as error:
+            return JsonResponse({'success': False, 'message': error.message}, status=400)
+        return JsonResponse(exception)
+
+    # Remove Certificate Exception for the student passed in request data
+    elif request.method == 'DELETE':
+        try:
+            remove_certificate_exception(course_key, student)
+        except ValueError as error:
+            return JsonResponse({'success': False, 'message': error.message}, status=400)
+
+        return JsonResponse({}, status=204)
+
+
+def add_certificate_exception(course_key, student, certificate_exception):
+    """
+    Add a certificate exception to CertificateWhitelist table.
+    Raises ValueError in case Student is already white listed.
+
+    :param course_key: identifier of the course whose certificate exception will be added.
+    :param student: User object whose certificate exception will be added.
+    :param certificate_exception: A dict object containing certificate exception info.
+    :return: CertificateWhitelist item in dict format containing certificate exception info.
+    """
+    if len(CertificateWhitelist.get_certificate_white_list(course_key, student)) > 0:
+        raise ValueError(
+            _("Student (username/email={user}) already in certificate exception list.").format(user=student.username)
+        )
+
+    certificate_white_list, __ = CertificateWhitelist.objects.get_or_create(
+        user=student,
+        course_id=course_key,
+        defaults={
+            'whitelist': True,
+            'notes': certificate_exception.get('notes', '')
+        }
+    )
+
+    exception = dict({
+        'id': certificate_white_list.id,
+        'user_email': student.email,
+        'user_name': student.username,
+        'user_id': student.id,
+        'created': certificate_white_list.created.strftime("%A, %B %d, %Y"),
+    })
+
+    return exception
+
+
+def remove_certificate_exception(course_key, student):
+    """
+    Remove certificate exception for given course and student from CertificateWhitelist table and
+    invalidate its GeneratedCertificate if present.
+    Raises ValueError in case no exception exists for the student in the given course.
+
+    :param course_key: identifier of the course whose certificate exception needs to be removed.
+    :param student: User object whose certificate exception needs to be removed.
+    :return:
+    """
+    try:
+        certificate_exception = CertificateWhitelist.objects.get(user=student, course_id=course_key)
+    except ObjectDoesNotExist:
+        raise ValueError(
+            _('Certificate exception (user={user}) does not exist in certificate white list. '
+              'Please refresh the page and try again.').format(user=student.username)
+        )
+
+    try:
+        generated_certificate = GeneratedCertificate.objects.get(  # pylint: disable=no-member
+            user=student,
+            course_id=course_key
+        )
+        generated_certificate.invalidate()
+    except ObjectDoesNotExist:
+        # Certificate has not been generated yet, so just remove the certificate exception from white list
+        pass
+    certificate_exception.delete()
+
+
+def parse_request_data_and_get_user(request, course_key):
+    """
+        Parse request data into Certificate Exception and User object.
+        Certificate Exception is the dict object containing information about certificate exception.
+
+    :param request:
+    :param course_key: Course Identifier of the course for whom to process certificate exception
+    :return: key-value pairs containing certificate exception data and User object
+    """
+    try:
+        certificate_exception = json.loads(request.body or '{}')
+    except ValueError:
+        raise ValueError(_('The record is not in the correct format. Please add a valid username or email address.'))
+
+    user = certificate_exception.get('user_name', '') or certificate_exception.get('user_email', '')
+    if not user:
+        raise ValueError(_('Student username/email field is required and can not be empty. '
+                           'Kindly fill in username/email and then press "Add to Exception List" button.'))
+    try:
+        db_user = get_user_by_username_or_email(user)
+    except ObjectDoesNotExist:
+        raise ValueError(_("{user} does not exist in the LMS. Please check your spelling and retry.").format(user=user))
+
+    # Make Sure the given student is enrolled in the course
+    if not CourseEnrollment.is_enrolled(db_user, course_key):
+        raise ValueError(_("{user} is not enrolled in this course. Please check your spelling and retry.")
+                         .format(user=user))
+
+    return certificate_exception, db_user
+
+
+@transaction.non_atomic_requests
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_global_staff
+@require_POST
+def generate_certificate_exceptions(request, course_id, generate_for=None):
+    """
+    Generate Certificate for students in the Certificate White List.
+
+    :param request: HttpRequest object,
+    :param course_id: course identifier of the course for whom to generate certificates
+    :param generate_for: string to identify whether to generate certificates for 'all' or 'new'
+            additions to the certificate white-list
+    :return: JsonResponse object containing success/failure message and certificate exception data
+    """
+    course_key = CourseKey.from_string(course_id)
+
+    try:
+        certificate_white_list = json.loads(request.body)
+    except ValueError:
+        return JsonResponse({
+            'success': False,
+            'message': _('Invalid Json data, Please refresh the page and then try again.')
+        }, status=400)
+
+    users = [exception.get('user_id', False) for exception in certificate_white_list]
+
+    if generate_for == 'all':
+        # Generate Certificates for all white listed students
+        students = User.objects.filter(
+            certificatewhitelist__course_id=course_key,
+            certificatewhitelist__whitelist=True
+        )
+    elif not all(users):
+        # Invalid data, user_id must be present for all certificate exceptions
+        return JsonResponse(
+            {
+                'success': False,
+                'message': _('Invalid data, user_id must be present for all certificate exceptions.'),
+            },
+            status=400
+        )
+    else:
+        students = User.objects.filter(
+            id__in=users,
+            certificatewhitelist__course_id=course_key,
+            certificatewhitelist__whitelist=True
+        )
+
+    if students:
+        # generate certificates for students if 'students' list is not empty
+        instructor_task.api.generate_certificates_for_students(request, course_key, students=students)
+
+    response_payload = {
+        'success': True,
+        'message': _('Certificate generation started for white listed students.'),
+    }
+
+    return JsonResponse(response_payload)
+
+
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_global_staff
+@require_POST
+def generate_bulk_certificate_exceptions(request, course_id):  # pylint: disable=invalid-name
+    """
+    Add Students to certificate white list from the uploaded csv file.
+    :return response in dict format.
+    {
+        general_errors: [errors related to csv file e.g. csv uploading, csv attachment, content reading etc. ],
+        row_errors: {
+            data_format_error:              [users/data in csv file that are not well formatted],
+            user_not_exist:                 [csv with none exiting users in LMS system],
+            user_already_white_listed:      [users that are already white listed],
+            user_not_enrolled:              [rows with not enrolled users in the given course]
+        },
+        success: [list of successfully added users to the certificate white list model]
+    }
+    """
+    user_index = 0
+    notes_index = 1
+    row_errors_key = ['data_format_error', 'user_not_exist', 'user_already_white_listed', 'user_not_enrolled']
+    course_key = CourseKey.from_string(course_id)
+    students, general_errors, success = [], [], []
+    row_errors = {key: [] for key in row_errors_key}
+
+    def build_row_errors(key, _user, row_count):
+        """
+        inner method to build dict of csv data as row errors.
+        """
+        row_errors[key].append(_('user "{user}" in row# {row}').format(user=_user, row=row_count))
+
+    if 'students_list' in request.FILES:
+        try:
+            upload_file = request.FILES.get('students_list')
+            if upload_file.name.endswith('.csv'):
+                students = [row for row in csv.reader(upload_file.read().splitlines())]
+            else:
+                general_errors.append(_('Make sure that the file you upload is in CSV format with no '
+                                        'extraneous characters or rows.'))
+
+        except Exception:  # pylint: disable=broad-except
+            general_errors.append(_('Could not read uploaded file.'))
+        finally:
+            upload_file.close()
+
+        row_num = 0
+        for student in students:
+            row_num += 1
+            # verify that we have exactly two column in every row either email or username and notes but allow for
+            # blank lines
+            if len(student) != 2:
+                if len(student) > 0:
+                    build_row_errors('data_format_error', student[user_index], row_num)
+                    log.info(u'invalid data/format in csv row# %s', row_num)
+                continue
+
+            user = student[user_index]
+            try:
+                user = get_user_by_username_or_email(user)
+            except ObjectDoesNotExist:
+                build_row_errors('user_not_exist', user, row_num)
+                log.info(u'student %s does not exist', user)
+            else:
+                if len(CertificateWhitelist.get_certificate_white_list(course_key, user)) > 0:
+                    build_row_errors('user_already_white_listed', user, row_num)
+                    log.warning(u'student %s already exist.', user.username)
+
+                # make sure user is enrolled in course
+                elif not CourseEnrollment.is_enrolled(user, course_key):
+                    build_row_errors('user_not_enrolled', user, row_num)
+                    log.warning(u'student %s is not enrolled in course.', user.username)
+
+                else:
+                    CertificateWhitelist.objects.create(
+                        user=user,
+                        course_id=course_key,
+                        whitelist=True,
+                        notes=student[notes_index]
+                    )
+                    success.append(_('user "{username}" in row# {row}').format(username=user.username, row=row_num))
+
+    else:
+        general_errors.append(_('File is not attached.'))
+
+    results = {
+        'general_errors': general_errors,
+        'row_errors': row_errors,
+        'success': success
+    }
+
+    return JsonResponse(results)

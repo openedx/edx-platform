@@ -2,6 +2,7 @@
 Acceptance tests for Studio's Settings Details pages
 """
 from datetime import datetime, timedelta
+from nose.plugins.attrib import attr
 from unittest import skip
 
 from .base_studio_test import StudioCourseTest
@@ -18,6 +19,7 @@ from ..helpers import (
 )
 
 
+@attr('shard_4')
 class StudioSettingsDetailsTest(StudioCourseTest):
     """Base class for settings and details page tests."""
 
@@ -35,6 +37,7 @@ class StudioSettingsDetailsTest(StudioCourseTest):
         self.assertTrue(self.settings_detail.is_browser_on_page())
 
 
+@attr('shard_4')
 class SettingsMilestonesTest(StudioSettingsDetailsTest):
     """
     Tests for milestones feature in Studio's settings tab
@@ -201,6 +204,7 @@ class SettingsMilestonesTest(StudioSettingsDetailsTest):
         ))
 
 
+@attr('shard_4')
 class CoursePacingTest(StudioSettingsDetailsTest):
     """Tests for setting a course to self-paced."""
 
@@ -209,11 +213,11 @@ class CoursePacingTest(StudioSettingsDetailsTest):
         # Set the course start date to tomorrow in order to allow setting pacing
         self.course_fixture.add_course_details({'start_date': datetime.now() + timedelta(days=1)})
 
-    def test_default_instructor_led(self):
+    def test_default_instructor_paced(self):
         """
-        Test that the 'instructor led' button is checked by default.
+        Test that the 'instructor paced' button is checked by default.
         """
-        self.assertEqual(self.settings_detail.course_pacing, 'Instructor-Led')
+        self.assertEqual(self.settings_detail.course_pacing, 'Instructor-Paced')
 
     def test_self_paced(self):
         """

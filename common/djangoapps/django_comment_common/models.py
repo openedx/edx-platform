@@ -92,7 +92,7 @@ class Role(models.Model):
         if permission_blacked_out(course, {self.name}, permission):
             return False
 
-        return self.permissions.filter(name=permission).exists()  # pylint: disable=no-member
+        return self.permissions.filter(name=permission).exists()
 
 
 class Permission(models.Model):

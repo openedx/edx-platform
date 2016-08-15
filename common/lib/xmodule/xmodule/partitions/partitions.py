@@ -5,7 +5,7 @@ from stevedore.extension import ExtensionManager
 
 # We use ``id`` in this file as the IDs of our Groups and UserPartitions,
 # which Pylint disapproves of.
-# pylint: disable=invalid-name, redefined-builtin
+# pylint: disable=redefined-builtin
 
 
 class UserPartitionError(Exception):
@@ -39,7 +39,6 @@ class Group(namedtuple("Group", "id name")):
     VERSION = 1
 
     def __new__(cls, id, name):
-        # pylint: disable=super-on-old-class
         return super(Group, cls).__new__(cls, int(id), name)
 
     def to_json(self):
@@ -109,7 +108,6 @@ class UserPartition(namedtuple("UserPartition", "id name description groups sche
     VERSION_1_SCHEME = "random"
 
     def __new__(cls, id, name, description, groups, scheme=None, parameters=None, active=True, scheme_id=VERSION_1_SCHEME):  # pylint: disable=line-too-long
-        # pylint: disable=super-on-old-class
         if not scheme:
             scheme = UserPartition.get_scheme(scheme_id)
         if parameters is None:
@@ -211,7 +209,6 @@ class UserPartition(namedtuple("UserPartition", "id name description groups sche
             NoSuchUserPartitionGroupError: The specified group could not be found.
 
         """
-        # pylint: disable=no-member
         for group in self.groups:
             if group.id == group_id:
                 return group

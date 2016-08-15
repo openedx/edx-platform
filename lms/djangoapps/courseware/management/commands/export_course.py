@@ -37,7 +37,7 @@ class Command(BaseCommand):
 
         results = self._get_results(filename) if pipe_results else None
 
-        return results
+        self.stdout.write(results, ending="")
 
     def _parse_arguments(self, args):
         """Parse command line arguments"""

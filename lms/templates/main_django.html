@@ -1,8 +1,6 @@
 <!DOCTYPE html>
-{% load pipeline %}
-{% load sekizai_tags i18n microsite %}
+{% load sekizai_tags i18n microsite pipeline optional_include %}
 {% load url from future %}
-{% load staticfiles %}
 <html lang="{{LANGUAGE_CODE}}">
 <head>
   <meta charset="UTF-8">
@@ -21,7 +19,7 @@
   {% block headextra %}{% endblock %}
   {% render_block "css" %}
 
-  {% microsite_css_overrides_file %}
+  {% optional_include "head-extra.html" %}
 
   <meta name="path_prefix" content="{{EDX_ROOT_URL}}">
 </head>
@@ -30,23 +28,15 @@
   <div class="window-wrap" dir="${static.dir_rtl()}">
     <a class="nav-skip" href="{% block nav_skip %}#content{% endblock %}">{% trans "Skip to main content" %}</a>
     {% with course=request.course %}
-      {% if IS_EDX_DOMAIN %}
-        {% include "navigation-edx.html" %}
-      {% else %}
-        {% include "navigation.html" %}
-      {% endif %}
+      {% include "header.html" %}
     {% endwith %}
     <div class="content-wrapper" id="content">
       {% block body %}{% endblock %}
       {% block bodyextra %}{% endblock %}
     </div>
-    {% if IS_REQUEST_IN_MICROSITE %}
-    {# For now we don't support overriden Django templates in microsites. Leave footer blank for now which is better than saying Edx.#}
-    {% elif IS_EDX_DOMAIN %}
-      {% include "footer-edx-v3.html" %}
-    {% else %}
+    {% with course=request.course %}
       {% include "footer.html" %}
-    {% endif %}
+    {% endwith %}
 
   </div>
 

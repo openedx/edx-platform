@@ -10,6 +10,7 @@ from django.contrib.auth.models import User
 from provider.oauth2.models import Client as OAuth2Client
 from provider import constants
 import django.test
+from mako.template import Template
 import mock
 import os.path
 
@@ -25,6 +26,18 @@ from third_party_auth.models import (
 
 AUTH_FEATURES_KEY = 'ENABLE_THIRD_PARTY_AUTH'
 AUTH_FEATURE_ENABLED = AUTH_FEATURES_KEY in settings.FEATURES
+
+
+def patch_mako_templates():
+    """ Patch mako so the django test client can access template context """
+    orig_render = Template.render_unicode
+
+    def wrapped_render(*args, **kwargs):
+        """ Render the template and send the context info to any listeners that want it """
+        django.test.signals.template_rendered.send(sender=None, template=None, context=kwargs)
+        return orig_render(*args, **kwargs)
+
+    return mock.patch.multiple(Template, render_unicode=wrapped_render, render=wrapped_render)
 
 
 class FakeDjangoSettings(object):
@@ -110,6 +123,13 @@ class ThirdPartyAuthTestMixin(object):
         return cls.configure_oauth_provider(**kwargs)
 
     @classmethod
+    def configure_dummy_provider(cls, **kwargs):
+        """ Update the settings for the Twitter third party auth provider/backend """
+        kwargs.setdefault("name", "Dummy")
+        kwargs.setdefault("backend_name", "dummy")
+        return cls.configure_oauth_provider(**kwargs)
+
+    @classmethod
     def verify_user_email(cls, email):
         """ Mark the user with the given email as verified """
         user = User.objects.get(email=email)
@@ -135,19 +155,18 @@ class ThirdPartyAuthTestMixin(object):
 
 class TestCase(ThirdPartyAuthTestMixin, django.test.TestCase):
     """Base class for auth test cases."""
-    pass
+    def setUp(self):
+        super(TestCase, self).setUp()
+        # Explicitly set a server name that is compatible with all our providers:
+        # (The SAML lib we use doesn't like the default 'testserver' as a domain)
+        self.client.defaults['SERVER_NAME'] = 'example.none'
+        self.url_prefix = 'http://example.none'
 
 
 class SAMLTestCase(TestCase):
     """
     Base class for SAML-related third_party_auth tests
     """
-
-    def setUp(self):
-        super(SAMLTestCase, self).setUp()
-        self.client.defaults['SERVER_NAME'] = 'example.none'  # The SAML lib we use doesn't like testserver' as a domain
-        self.url_prefix = 'http://example.none'
-
     @classmethod
     def _get_public_key(cls, key_name='saml_key'):
         """ Get a public key for use in the test. """

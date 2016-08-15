@@ -24,16 +24,21 @@ class Command(BaseCommand):
     args = '<course_id course_id ...>'
     help = 'Generates and stores course overview for one or more courses.'
 
-    option_list = BaseCommand.option_list + (
-        make_option('--all',
-                    action='store_true',
-                    default=False,
-                    help='Generate course overview for all courses.'),
-    )
+    def add_arguments(self, parser):
+        """
+        Add arguments to the command parser.
+        """
+        parser.add_argument(
+            '--all',
+            action='store_true',
+            dest='all',
+            default=False,
+            help='Generate course overview for all courses.',
+        )
 
     def handle(self, *args, **options):
-        course_keys = []
 
+        course_keys = []
         if options['all']:
             course_keys = [course.id for course in modulestore().get_courses()]
         else:
@@ -44,17 +49,7 @@ class Command(BaseCommand):
             except InvalidKeyError:
                 log.fatal('Invalid key specified.')
 
-        if not course_keys:
-            log.fatal('No courses specified.')
+            if not course_keys:
+                log.fatal('No courses specified.')
 
-        log.info('Generating course overview for %d courses.', len(course_keys))
-        log.debug('Generating course overview(s) for the following courses: %s', course_keys)
-
-        for course_key in course_keys:
-            try:
-                CourseOverview.get_from_id(course_key)
-            except Exception as ex:  # pylint: disable=broad-except
-                log.exception('An error occurred while generating course overview for %s: %s', unicode(
-                    course_key), ex.message)
-
-        log.info('Finished generating course overviews.')
+        CourseOverview.get_select_courses(course_keys)

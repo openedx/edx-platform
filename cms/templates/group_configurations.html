@@ -3,9 +3,9 @@
 <%def name="experiment_group_configurations_help_token()"><% return "group_configurations" %></%def>
 <%namespace name='static' file='static_content.html'/>
 <%!
-import json
 from contentstore import utils
 from django.utils.translation import ugettext as _
+from openedx.core.lib.js_utils import escape_json_dumps
 %>
 
 <%block name="title">${_("Group Configurations")}</%block>
@@ -21,7 +21,7 @@ from django.utils.translation import ugettext as _
 
 <%block name="requirejs">
   require(["js/factories/group_configurations"], function(GroupConfigurationsFactory) {
-      GroupConfigurationsFactory(${json.dumps(should_show_experiment_groups)}, ${json.dumps(experiment_group_configurations)}, ${json.dumps(content_group_configuration)}, "${group_configuration_url}", "${course_outline_url}");
+      GroupConfigurationsFactory(${escape_json_dumps(should_show_experiment_groups) | n}, ${escape_json_dumps(experiment_group_configurations) | n}, ${escape_json_dumps(content_group_configuration) | n}, "${group_configuration_url}", "${course_outline_url}");
   });
 </%block>
 

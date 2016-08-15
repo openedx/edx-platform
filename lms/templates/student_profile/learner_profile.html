@@ -4,7 +4,7 @@
 import json
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
-from openedx.core.lib.json_utils import EscapedEdxJSONEncoder
+from openedx.core.lib.js_utils import escape_json_dumps
 %>
 
 <%block name="pagetitle">${_("Learner Profile")}</%block>
@@ -24,7 +24,7 @@ from openedx.core.lib.json_utils import EscapedEdxJSONEncoder
 
 <%block name="js_extra">
 <%static:require_module module_name="js/student_profile/views/learner_profile_factory" class_name="LearnerProfileFactory">
-    var options = ${ json.dumps(data, cls=EscapedEdxJSONEncoder) };
+    var options = ${ escape_json_dumps(data) | n };
     LearnerProfileFactory(options);
 </%static:require_module>
 </%block>

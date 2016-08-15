@@ -151,7 +151,7 @@ class SettingsPage(CoursePage):
     @course_pacing.setter
     def course_pacing(self, pacing):
         """
-        Sets the course to either self-paced or instructor-led by checking
+        Sets the course to either self-paced or instructor-paced by checking
         the appropriate radio button.
         """
         self.wait_for_element_presence(self.checked_pacing_css, 'course pacing controls present')

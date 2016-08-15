@@ -19,6 +19,8 @@ Common traits:
 import datetime
 import json
 
+import dateutil
+
 from .common import *
 from openedx.core.lib.logsettings import get_logger_config
 import os
@@ -44,7 +46,7 @@ CONFIG_PREFIX = SERVICE_VARIANT + "." if SERVICE_VARIANT else ""
 ################################ ALWAYS THE SAME ##############################
 
 DEBUG = False
-TEMPLATE_DEBUG = False
+DEFAULT_TEMPLATE_ENGINE['OPTIONS']['debug'] = False
 
 EMAIL_BACKEND = 'django_ses.SESBackend'
 SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
@@ -73,11 +75,6 @@ BROKER_HEARTBEAT_CHECKRATE = 2
 
 # Each worker should only fetch one message at a time
 CELERYD_PREFETCH_MULTIPLIER = 1
-
-# Skip djcelery migrations, since we don't use the database as the broker
-SOUTH_MIGRATION_MODULES = {
-    'djcelery': 'ignore',
-}
 
 # Rename the exchange and queues for each variant
 
@@ -170,7 +167,18 @@ REGISTRATION_EXTRA_FIELDS = ENV_TOKENS.get('REGISTRATION_EXTRA_FIELDS', REGISTRA
 EDXMKTG_LOGGED_IN_COOKIE_NAME = ENV_TOKENS.get('EDXMKTG_LOGGED_IN_COOKIE_NAME', EDXMKTG_LOGGED_IN_COOKIE_NAME)
 EDXMKTG_USER_INFO_COOKIE_NAME = ENV_TOKENS.get('EDXMKTG_USER_INFO_COOKIE_NAME', EDXMKTG_USER_INFO_COOKIE_NAME)
 
+ENV_FEATURES = ENV_TOKENS.get('FEATURES', {})
+for feature, value in ENV_FEATURES.items():
+    FEATURES[feature] = value
+
 CMS_BASE = ENV_TOKENS.get('CMS_BASE', 'studio.edx.org')
+
+ALLOWED_HOSTS = [
+    # TODO: bbeggs remove this before prod, temp fix to get load testing running
+    "*",
+    ENV_TOKENS.get('LMS_BASE'),
+    FEATURES['PREVIEW_LMS_BASE'],
+]
 
 # allow for environments to specify what cookie name our login subsystem should use
 # this is to fix a bug regarding simultaneous logins between edx.org and edge.edx.org which can
@@ -231,11 +239,12 @@ BULK_EMAIL_ROUTING_KEY_SMALL_JOBS = LOW_PRIORITY_QUEUE
 
 # Theme overrides
 THEME_NAME = ENV_TOKENS.get('THEME_NAME', None)
-COMP_THEME_DIR = path(ENV_TOKENS.get('COMP_THEME_DIR', COMP_THEME_DIR))
+COMPREHENSIVE_THEME_DIR = path(ENV_TOKENS.get('COMPREHENSIVE_THEME_DIR', COMPREHENSIVE_THEME_DIR))
 
 # Marketing link overrides
 MKTG_URL_LINK_MAP.update(ENV_TOKENS.get('MKTG_URL_LINK_MAP', {}))
 
+SUPPORT_SITE_LINK = ENV_TOKENS.get('SUPPORT_SITE_LINK', SUPPORT_SITE_LINK)
 
 # Mobile store URL overrides
 MOBILE_STORE_URLS = ENV_TOKENS.get('MOBILE_STORE_URLS', MOBILE_STORE_URLS)
@@ -252,10 +261,6 @@ USE_I18N = ENV_TOKENS.get('USE_I18N', USE_I18N)
 # Additional installed apps
 for app in ENV_TOKENS.get('ADDL_INSTALLED_APPS', []):
     INSTALLED_APPS += (app,)
-
-ENV_FEATURES = ENV_TOKENS.get('FEATURES', ENV_TOKENS.get('MITX_FEATURES', {}))
-for feature, value in ENV_FEATURES.items():
-    FEATURES[feature] = value
 
 WIKI_ENABLED = ENV_TOKENS.get('WIKI_ENABLED', WIKI_ENABLED)
 local_loglevel = ENV_TOKENS.get('LOCAL_LOGLEVEL', 'INFO')
@@ -397,6 +402,13 @@ if 'DJFS' in AUTH_TOKENS and AUTH_TOKENS['DJFS'] is not None:
 
 ############### Module Store Items ##########
 HOSTNAME_MODULESTORE_DEFAULT_MAPPINGS = ENV_TOKENS.get('HOSTNAME_MODULESTORE_DEFAULT_MAPPINGS', {})
+# PREVIEW DOMAIN must be present in HOSTNAME_MODULESTORE_DEFAULT_MAPPINGS for the preview to show draft changes
+if 'PREVIEW_LMS_BASE' in FEATURES and FEATURES['PREVIEW_LMS_BASE'] != '':
+    PREVIEW_DOMAIN = FEATURES['PREVIEW_LMS_BASE'].split(':')[0]
+    # update dictionary with preview domain regex
+    HOSTNAME_MODULESTORE_DEFAULT_MAPPINGS.update({
+        PREVIEW_DOMAIN: 'draft-preferred'
+    })
 
 ############### Mixed Related(Secure/Not-Secure) Items ##########
 LMS_SEGMENT_KEY = AUTH_TOKENS.get('SEGMENT_KEY')
@@ -431,6 +443,12 @@ FILE_UPLOAD_STORAGE_PREFIX = ENV_TOKENS.get('FILE_UPLOAD_STORAGE_PREFIX', FILE_U
 # function in util/query.py, which is useful for very large database reads
 DATABASES = AUTH_TOKENS['DATABASES']
 
+# Enable automatic transaction management on all databases
+# https://docs.djangoproject.com/en/1.8/topics/db/transactions/#tying-transactions-to-http-requests
+# This needs to be true for all databases
+for database_name in DATABASES:
+    DATABASES[database_name]['ATOMIC_REQUESTS'] = True
+
 XQUEUE_INTERFACE = AUTH_TOKENS['XQUEUE_INTERFACE']
 
 # Get the MODULESTORE from auth.json, but if it doesn't exist,
@@ -439,9 +457,6 @@ MODULESTORE = convert_module_store_setting_if_needed(AUTH_TOKENS.get('MODULESTOR
 CONTENTSTORE = AUTH_TOKENS.get('CONTENTSTORE', CONTENTSTORE)
 DOC_STORE_CONFIG = AUTH_TOKENS.get('DOC_STORE_CONFIG', DOC_STORE_CONFIG)
 MONGODB_LOG = AUTH_TOKENS.get('MONGODB_LOG', {})
-
-OPEN_ENDED_GRADING_INTERFACE = AUTH_TOKENS.get('OPEN_ENDED_GRADING_INTERFACE',
-                                               OPEN_ENDED_GRADING_INTERFACE)
 
 EMAIL_HOST_USER = AUTH_TOKENS.get('EMAIL_HOST_USER', '')  # django default is ''
 EMAIL_HOST_PASSWORD = AUTH_TOKENS.get('EMAIL_HOST_PASSWORD', '')  # django default is ''
@@ -583,6 +598,11 @@ if FEATURES.get('ENABLE_THIRD_PARTY_AUTH'):
             'schedule': datetime.timedelta(hours=ENV_TOKENS.get('THIRD_PARTY_AUTH_SAML_FETCH_PERIOD_HOURS', 24)),
         }
 
+    # The following can be used to integrate a custom login form with third_party_auth.
+    # It should be a dict where the key is a word passed via ?auth_entry=, and the value is a
+    # dict with an arbitrary 'secret_key' and a 'url'.
+    THIRD_PARTY_AUTH_CUSTOM_AUTH_FORMS = AUTH_TOKENS.get('THIRD_PARTY_AUTH_CUSTOM_AUTH_FORMS', {})
+
 ##### OAUTH2 Provider ##############
 if FEATURES.get('ENABLE_OAUTH2_PROVIDER'):
     OAUTH_OIDC_ISSUER = ENV_TOKENS['OAUTH_OIDC_ISSUER']
@@ -665,10 +685,11 @@ ECOMMERCE_API_TIMEOUT = ENV_TOKENS.get('ECOMMERCE_API_TIMEOUT', ECOMMERCE_API_TI
 
 ##### Custom Courses for EdX #####
 if FEATURES.get('CUSTOM_COURSES_EDX'):
-    INSTALLED_APPS += ('ccx',)
+    INSTALLED_APPS += ('lms.djangoapps.ccx',)
     FIELD_OVERRIDE_PROVIDERS += (
-        'ccx.overrides.CustomCoursesForEdxOverrideProvider',
+        'lms.djangoapps.ccx.overrides.CustomCoursesForEdxOverrideProvider',
     )
+CCX_MAX_STUDENTS_ALLOWED = ENV_TOKENS.get('CCX_MAX_STUDENTS_ALLOWED', CCX_MAX_STUDENTS_ALLOWED)
 
 ##### Individual Due Date Extensions #####
 if FEATURES.get('INDIVIDUAL_DUE_DATES'):
@@ -686,10 +707,7 @@ PROFILE_IMAGE_BACKEND = ENV_TOKENS.get('PROFILE_IMAGE_BACKEND', PROFILE_IMAGE_BA
 PROFILE_IMAGE_SECRET_KEY = AUTH_TOKENS.get('PROFILE_IMAGE_SECRET_KEY', PROFILE_IMAGE_SECRET_KEY)
 PROFILE_IMAGE_MAX_BYTES = ENV_TOKENS.get('PROFILE_IMAGE_MAX_BYTES', PROFILE_IMAGE_MAX_BYTES)
 PROFILE_IMAGE_MIN_BYTES = ENV_TOKENS.get('PROFILE_IMAGE_MIN_BYTES', PROFILE_IMAGE_MIN_BYTES)
-if FEATURES['IS_EDX_DOMAIN']:
-    PROFILE_IMAGE_DEFAULT_FILENAME = 'images/edx-theme/default-profile'
-else:
-    PROFILE_IMAGE_DEFAULT_FILENAME = ENV_TOKENS.get('PROFILE_IMAGE_DEFAULT_FILENAME', PROFILE_IMAGE_DEFAULT_FILENAME)
+PROFILE_IMAGE_DEFAULT_FILENAME = 'images/profiles/default'
 
 # EdxNotes config
 
@@ -724,6 +742,16 @@ JWT_EXPIRATION = ENV_TOKENS.get('JWT_EXPIRATION', JWT_EXPIRATION)
 PROCTORING_BACKEND_PROVIDER = AUTH_TOKENS.get("PROCTORING_BACKEND_PROVIDER", PROCTORING_BACKEND_PROVIDER)
 PROCTORING_SETTINGS = ENV_TOKENS.get("PROCTORING_SETTINGS", PROCTORING_SETTINGS)
 
+################# MICROSITE ####################
+MICROSITE_CONFIGURATION = ENV_TOKENS.get('MICROSITE_CONFIGURATION', {})
+MICROSITE_ROOT_DIR = path(ENV_TOKENS.get('MICROSITE_ROOT_DIR', ''))
+
+# Cutoff date for granting audit certificates
+if ENV_TOKENS.get('AUDIT_CERT_CUTOFF_DATE', None):
+    AUDIT_CERT_CUTOFF_DATE = dateutil.parser.parse(ENV_TOKENS.get('AUDIT_CERT_CUTOFF_DATE'))
+
+
+# @TODO: Remove this import
 try:
     from .labster import *  # pylint: disable=import-error
 except ImportError:

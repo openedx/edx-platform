@@ -782,14 +782,10 @@
           }
 
           .credit-action {
-            .credit-msg {
-              @include float(left);
-              width: flex-grid(9, 12);
-            }
-
             .credit-btn {
               @extend %btn-pl-yellow-base;
               @include float(right);
+              margin-right: 5px;
               background-image: none ;
               text-shadow: none;
               box-shadow: none;

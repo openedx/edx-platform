@@ -65,7 +65,7 @@ define(["jquery", "common/js/spec_helpers/ajax_helpers", "common/js/components/u
                     published: true,
                     edited_on: 'Jul 02, 2014 at 20:56 UTC',
                     edited_by: 'MockUser',
-                    course_graders: '["Lab", "Howework"]',
+                    course_graders: ["Lab", "Howework"],
                     has_explicit_staff_lock: false,
                     child_info: {
                         category: 'vertical',

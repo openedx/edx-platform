@@ -27,7 +27,7 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, TEST_DATA_MIXED_TOY_MODULESTORE
 from xmodule.modulestore.django import modulestore
 from opaque_keys.edx.locator import CourseLocator
-from teams.tests.factories import CourseTeamFactory
+from lms.djangoapps.teams.tests.factories import CourseTeamFactory
 
 
 @attr('shard_1')

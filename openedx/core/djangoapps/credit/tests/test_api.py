@@ -2,17 +2,13 @@
 Tests for the API functions in the credit app.
 """
 import datetime
-import json
 import unittest
 
 import ddt
 from django.conf import settings
 from django.core import mail
-from django.test import TestCase
 from django.test.utils import override_settings
 from django.db import connection, transaction
-from django.core.urlresolvers import reverse, NoReverseMatch
-from mock import patch
 from opaque_keys.edx.keys import CourseKey
 import pytz
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -38,8 +34,6 @@ from openedx.core.djangoapps.credit.models import (
 from student.tests.factories import UserFactory
 
 TEST_CREDIT_PROVIDER_SECRET_KEY = "931433d583c84ca7ba41784bad3232e6"
-
-from util.testing import UrlResetMixin
 
 
 @override_settings(CREDIT_PROVIDER_SECRET_KEYS={
@@ -427,7 +421,7 @@ class CreditRequirementApiTests(CreditApiTestBase):
         user = UserFactory.create(username=self.USER_INFO['username'], password=self.USER_INFO['password'])
 
         # Satisfy one of the requirements, but not the other
-        with self.assertNumQueries(7):
+        with self.assertNumQueries(11):
             api.set_credit_requirement_status(
                 user.username,
                 self.course_key,
@@ -439,7 +433,7 @@ class CreditRequirementApiTests(CreditApiTestBase):
         self.assertFalse(api.is_user_eligible_for_credit("bob", self.course_key))
 
         # Satisfy the other requirement
-        with self.assertNumQueries(11):
+        with self.assertNumQueries(15):
             api.set_credit_requirement_status(
                 "bob",
                 self.course_key,
@@ -479,7 +473,7 @@ class CreditRequirementApiTests(CreditApiTestBase):
         # Delete the eligibility entries and satisfy the user's eligibility
         # requirement again to trigger eligibility notification
         CreditEligibility.objects.all().delete()
-        with self.assertNumQueries(12):
+        with self.assertNumQueries(13):
             api.set_credit_requirement_status(
                 "bob",
                 self.course_key,
@@ -726,15 +720,16 @@ class CreditProviderIntegrationApiTests(CreditApiTestBase):
         # - 2 queries: Get-or-create the credit request.
         # - 1 query: Retrieve user account and profile information from the user API.
         # - 1 query: Look up the user's final grade from the credit requirements table.
-        # - 2 queries: Update the request.
+        # - 1 query: Update the request.
         # - 2 queries: Update the history table for the request.
-        with self.assertNumQueries(10):
+        # - 4 Django savepoints
+        with self.assertNumQueries(13):
             request = api.create_credit_request(self.course_key, self.PROVIDER_ID, self.USER_INFO['username'])
 
-        # - 3 queries: Retrieve and update the request
+        # - 2 queries: Retrieve and update the request
         # - 1 query: Update the history table for the request.
         uuid = request["parameters"]["request_uuid"]
-        with self.assertNumQueries(4):
+        with self.assertNumQueries(3):
             api.update_credit_request_status(uuid, self.PROVIDER_ID, "approved")
 
         with self.assertNumQueries(1):
@@ -771,11 +766,11 @@ class CreditProviderIntegrationApiTests(CreditApiTestBase):
             api.create_credit_request(self.course_key, self.PROVIDER_ID, self.USER_INFO['username'])
 
     @ddt.data("pending", "failed")
-    def test_user_is_not_eligible(self, status):
+    def test_user_is_not_eligible(self, requirement_status):
         # Simulate a user who is not eligible for credit
         CreditEligibility.objects.all().delete()
         status = CreditRequirementStatus.objects.get(username=self.USER_INFO['username'])
-        status.status = status
+        status.status = requirement_status
         status.reason = {}
         status.save()
 
@@ -810,7 +805,6 @@ class CreditProviderIntegrationApiTests(CreditApiTestBase):
         # coerces None values to empty strings.
         query = "UPDATE auth_userprofile SET country = NULL WHERE id = %s"
         connection.cursor().execute(query, [str(self.user.profile.id)])
-        transaction.commit_unless_managed()
 
         # Request should include an empty country field
         request = api.create_credit_request(self.course_key, self.PROVIDER_ID, self.USER_INFO["username"])
@@ -880,119 +874,3 @@ class CreditProviderIntegrationApiTests(CreditApiTestBase):
         """Check the user's credit status. """
         statuses = api.get_credit_requests_for_user(self.USER_INFO["username"])
         self.assertEqual(statuses[0]["status"], expected_status)
-
-
-class CreditApiFeatureFlagTest(UrlResetMixin, TestCase):
-    """
-    Base class to test the credit api urls.
-    """
-
-    def setUp(self, **kwargs):
-        enable_credit_api = kwargs.get('enable_credit_api', False)
-        with patch.dict('django.conf.settings.FEATURES', {'ENABLE_CREDIT_API': enable_credit_api}):
-            super(CreditApiFeatureFlagTest, self).setUp('lms.urls')
-
-
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
-class CreditApiFeatureFlagDisabledTests(CreditApiFeatureFlagTest):
-    """
-    Test Python API for credit provider api with feature flag
-    'ENABLE_CREDIT_API' disabled.
-    """
-    PROVIDER_ID = "hogwarts"
-
-    def setUp(self):
-        super(CreditApiFeatureFlagDisabledTests, self).setUp(enable_credit_api=False)
-
-    def test_get_credit_provider_details(self):
-        """
-        Test that 'get_provider_info' api url not found.
-        """
-        with self.assertRaises(NoReverseMatch):
-            reverse('credit:get_provider_info', args=[self.PROVIDER_ID])
-
-
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
-class CreditApiFeatureFlagEnabledTests(CreditApiFeatureFlagTest, CreditApiTestBase):
-    """
-    Test Python API for credit provider api with feature flag
-    'ENABLE_CREDIT_API' enabled.
-    """
-    USER_INFO = {
-        "username": "bob",
-        "email": "bob@example.com",
-        "full_name": "Bob",
-        "mailing_address": "123 Fake Street, Cambridge MA",
-        "country": "US",
-    }
-
-    FINAL_GRADE = 0.95
-
-    def setUp(self):
-        super(CreditApiFeatureFlagEnabledTests, self).setUp(enable_credit_api=True)
-        self.user = UserFactory(
-            username=self.USER_INFO['username'],
-            email=self.USER_INFO['email'],
-        )
-
-        self.user.profile.name = self.USER_INFO['full_name']
-        self.user.profile.mailing_address = self.USER_INFO['mailing_address']
-        self.user.profile.country = self.USER_INFO['country']
-        self.user.profile.save()
-
-        # By default, configure the database so that there is a single
-        # credit requirement that the user has satisfied (minimum grade)
-        self._configure_credit()
-
-    def test_get_credit_provider_details(self):
-        """Test that credit api method 'test_get_credit_provider_details'
-        returns dictionary data related to provided credit provider.
-        """
-        expected_result = {
-            "provider_id": self.PROVIDER_ID,
-            "display_name": self.PROVIDER_NAME,
-            "provider_url": self.PROVIDER_URL,
-            "provider_status_url": self.PROVIDER_STATUS_URL,
-            "provider_description": self.PROVIDER_DESCRIPTION,
-            "enable_integration": self.ENABLE_INTEGRATION,
-            "fulfillment_instructions": self.FULFILLMENT_INSTRUCTIONS,
-            "thumbnail_url": self.THUMBNAIL_URL
-        }
-        path = reverse('credit:get_provider_info', kwargs={'provider_id': self.PROVIDER_ID})
-        result = self.client.get(path)
-        result = json.loads(result.content)
-        self.assertEqual(result, expected_result)
-
-        # now test that user gets empty dict for non existent credit provider
-        path = reverse('credit:get_provider_info', kwargs={'provider_id': 'fake_provider_id'})
-        result = self.client.get(path)
-        result = json.loads(result.content)
-        self.assertEqual(result, {})
-
-    def _configure_credit(self):
-        """
-        Configure a credit course and its requirements.
-
-        By default, add a single requirement (minimum grade)
-        that the user has satisfied.
-
-        """
-        credit_course = self.add_credit_course()
-        requirement = CreditRequirement.objects.create(
-            course=credit_course,
-            namespace="grade",
-            name="grade",
-            active=True
-        )
-        status = CreditRequirementStatus.objects.create(
-            username=self.USER_INFO["username"],
-            requirement=requirement,
-        )
-        status.status = "satisfied"
-        status.reason = {"final_grade": self.FINAL_GRADE}
-        status.save()
-
-        CreditEligibility.objects.create(
-            username=self.USER_INFO['username'],
-            course=CreditCourse.objects.get(course_key=self.course_key)
-        )

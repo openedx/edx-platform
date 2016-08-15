@@ -56,13 +56,25 @@ class OrderTest(ModuleStoreTestCase):
         self.course_key = course.id
         self.other_course_keys = []
         for __ in xrange(1, 5):
-            self.other_course_keys.append(CourseFactory.create().id)
+            course_key = CourseFactory.create().id
+            CourseMode.objects.create(
+                course_id=course_key,
+                mode_slug=CourseMode.HONOR,
+                mode_display_name="Honor"
+            )
+            self.other_course_keys.append(course_key)
         self.cost = 40
 
         # Add mock tracker for event testing.
         patcher = patch('shoppingcart.models.analytics')
         self.mock_tracker = patcher.start()
         self.addCleanup(patcher.stop)
+
+        CourseMode.objects.create(
+            course_id=self.course_key,
+            mode_slug=CourseMode.HONOR,
+            mode_display_name="Honor"
+        )
 
     def test_get_cart_for_user(self):
         # create a cart
@@ -253,13 +265,13 @@ class OrderTest(ModuleStoreTestCase):
             {
                 'orderId': 1,
                 'currency': 'usd',
-                'total': '40',
+                'total': '40.00',
                 'products': [
                     {
                         'sku': u'CertificateItem.honor',
                         'name': unicode(self.course_key),
                         'category': unicode(self.course_key.org),
-                        'price': '40',
+                        'price': '40.00',
                         'id': 1,
                         'quantity': 1
                     }
@@ -479,10 +491,12 @@ class PaidCourseRegistrationTest(ModuleStoreTestCase):
         self.cost = 40
         self.course = CourseFactory.create()
         self.course_key = self.course.id
-        self.course_mode = CourseMode(course_id=self.course_key,
-                                      mode_slug="honor",
-                                      mode_display_name="honor cert",
-                                      min_price=self.cost)
+        self.course_mode = CourseMode(
+            course_id=self.course_key,
+            mode_slug=CourseMode.HONOR,
+            mode_display_name="honor cert",
+            min_price=self.cost
+        )
         self.course_mode.save()
         self.percentage_discount = 20.0
         self.cart = Order.get_cart_for_user(self.user)
@@ -492,7 +506,7 @@ class PaidCourseRegistrationTest(ModuleStoreTestCase):
         Test to check the total amount of the
         purchased items.
         """
-        PaidCourseRegistration.add_to_order(self.cart, self.course_key)
+        PaidCourseRegistration.add_to_order(self.cart, self.course_key, mode_slug=CourseMode.HONOR)
         self.cart.purchase()
 
         total_amount = PaidCourseRegistration.get_total_amount_of_purchased_item(course_key=self.course_key)
@@ -507,7 +521,7 @@ class PaidCourseRegistrationTest(ModuleStoreTestCase):
         self.assertEqual(total_amount, 0.00)
 
     def test_add_to_order(self):
-        reg1 = PaidCourseRegistration.add_to_order(self.cart, self.course_key)
+        reg1 = PaidCourseRegistration.add_to_order(self.cart, self.course_key, mode_slug=CourseMode.HONOR)
 
         self.assertEqual(reg1.unit_cost, self.cost)
         self.assertEqual(reg1.line_cost, self.cost)
@@ -545,7 +559,7 @@ class PaidCourseRegistrationTest(ModuleStoreTestCase):
 
         self.cart.order_type = 'business'
         self.cart.save()
-        item = CourseRegCodeItem.add_to_order(self.cart, self.course_key, 2)
+        item = CourseRegCodeItem.add_to_order(self.cart, self.course_key, 2, mode_slug=CourseMode.HONOR)
         self.cart.purchase()
         registration_codes = CourseRegistrationCode.order_generated_registration_codes(self.course_key)
         self.assertEqual(registration_codes.count(), item.qty)
@@ -676,7 +690,7 @@ class PaidCourseRegistrationTest(ModuleStoreTestCase):
 
         test_redemption = RegistrationCodeRedemption.registration_code_used_for_enrollment(enrollment)
 
-        self.assertEqual(test_redemption.id, redemption.id)  # pylint: disable=no-member
+        self.assertEqual(test_redemption.id, redemption.id)
 
     def test_regcode_multi_redemptions(self):
         """
@@ -702,7 +716,7 @@ class PaidCourseRegistrationTest(ModuleStoreTestCase):
                 course_enrollment=enrollment
             )
             redemption.save()
-            ids.append(redemption.id)  # pylint: disable=no-member
+            ids.append(redemption.id)
 
         test_redemption = RegistrationCodeRedemption.registration_code_used_for_enrollment(enrollment)
 
@@ -710,14 +724,15 @@ class PaidCourseRegistrationTest(ModuleStoreTestCase):
 
     def test_add_with_default_mode(self):
         """
-        Tests add_to_cart where the mode specified in the argument is NOT in the database
-        and NOT the default "honor".  In this case it just adds the user in the CourseMode.DEFAULT_MODE, 0 price
+        Tests add_to_cart where the mode specified in the argument is NOT
+        in the database and NOT the default "audit".  In this case it
+        just adds the user in the CourseMode.DEFAULT_MODE for free.
         """
         reg1 = PaidCourseRegistration.add_to_order(self.cart, self.course_key, mode_slug="DNE")
 
         self.assertEqual(reg1.unit_cost, 0)
         self.assertEqual(reg1.line_cost, 0)
-        self.assertEqual(reg1.mode, "honor")
+        self.assertEqual(reg1.mode, CourseMode.DEFAULT_SHOPPINGCART_MODE_SLUG)
         self.assertEqual(reg1.user, self.user)
         self.assertEqual(reg1.status, "cart")
         self.assertEqual(self.cart.total_cost, 0)
@@ -727,7 +742,7 @@ class PaidCourseRegistrationTest(ModuleStoreTestCase):
 
         self.assertEqual(course_reg_code_item.unit_cost, 0)
         self.assertEqual(course_reg_code_item.line_cost, 0)
-        self.assertEqual(course_reg_code_item.mode, "honor")
+        self.assertEqual(course_reg_code_item.mode, CourseMode.DEFAULT_SHOPPINGCART_MODE_SLUG)
         self.assertEqual(course_reg_code_item.user, self.user)
         self.assertEqual(course_reg_code_item.status, "cart")
         self.assertEqual(self.cart.total_cost, 0)
@@ -848,13 +863,13 @@ class CertificateItemTest(ModuleStoreTestCase):
             {
                 'orderId': 1,
                 'currency': 'usd',
-                'total': '40',
+                'total': '40.00',
                 'products': [
                     {
                         'sku': u'CertificateItem.verified',
                         'name': unicode(self.course_key),
                         'category': unicode(self.course_key.org),
-                        'price': '40',
+                        'price': '40.00',
                         'id': 1,
                         'quantity': 1
                     }
@@ -1059,6 +1074,10 @@ class CertificateItemTest(ModuleStoreTestCase):
         email = mail.outbox[0]
         self.assertEquals('Order Payment Confirmation', email.subject)
         self.assertNotIn("If you haven't verified your identity yet, please start the verification process", email.body)
+        self.assertIn(
+            "You can unenroll in the course and receive a full refund for 2 days after the course start date. ",
+            email.body
+        )
 
 
 class DonationTest(ModuleStoreTestCase):

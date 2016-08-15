@@ -7,7 +7,7 @@ import requests.exceptions
 import pytz
 
 from django.conf import settings
-from django.db.utils import IntegrityError
+from django.db import IntegrityError
 from django.test import TestCase
 from mock import patch
 from nose.tools import assert_is_none, assert_equals, assert_raises, assert_true, assert_false  # pylint: disable=no-name-in-module
@@ -18,7 +18,7 @@ from xmodule.modulestore.tests.factories import CourseFactory
 
 from opaque_keys.edx.keys import CourseKey
 
-from verify_student.models import (
+from lms.djangoapps.verify_student.models import (
     SoftwareSecurePhotoVerification,
     VerificationException, VerificationCheckpoint,
     VerificationStatus, SkippedReverification,
@@ -128,9 +128,9 @@ def mock_software_secure_post_unavailable(url, headers=None, data=None, **kwargs
 
 # Lots of patching to stub in our own settings, S3 substitutes, and HTTP posting
 @patch.dict(settings.VERIFY_STUDENT, FAKE_SETTINGS)
-@patch('verify_student.models.S3Connection', new=MockS3Connection)
-@patch('verify_student.models.Key', new=MockKey)
-@patch('verify_student.models.requests.post', new=mock_software_secure_post)
+@patch('lms.djangoapps.verify_student.models.S3Connection', new=MockS3Connection)
+@patch('lms.djangoapps.verify_student.models.Key', new=MockKey)
+@patch('lms.djangoapps.verify_student.models.requests.post', new=mock_software_secure_post)
 @ddt.ddt
 class TestPhotoVerification(ModuleStoreTestCase):
 
@@ -228,12 +228,12 @@ class TestPhotoVerification(ModuleStoreTestCase):
         assert_equals(attempt.status, "submitted")
 
         # We post, but Software Secure doesn't like what we send for some reason
-        with patch('verify_student.models.requests.post', new=mock_software_secure_post_error):
+        with patch('lms.djangoapps.verify_student.models.requests.post', new=mock_software_secure_post_error):
             attempt = self.create_and_submit()
             assert_equals(attempt.status, "must_retry")
 
         # We try to post, but run into an error (in this case a newtork connection error)
-        with patch('verify_student.models.requests.post', new=mock_software_secure_post_unavailable):
+        with patch('lms.djangoapps.verify_student.models.requests.post', new=mock_software_secure_post_unavailable):
             attempt = self.create_and_submit()
             assert_equals(attempt.status, "must_retry")
 
@@ -472,6 +472,7 @@ class TestPhotoVerification(ModuleStoreTestCase):
     @ddt.unpack
     @ddt.data(
         {'enrollment_mode': 'honor', 'status': None, 'output': 'N/A'},
+        {'enrollment_mode': 'audit', 'status': None, 'output': 'N/A'},
         {'enrollment_mode': 'verified', 'status': False, 'output': 'Not ID Verified'},
         {'enrollment_mode': 'verified', 'status': True, 'output': 'ID Verified'},
     )
@@ -482,7 +483,9 @@ class TestPhotoVerification(ModuleStoreTestCase):
         user = UserFactory.create()
         course = CourseFactory.create()
 
-        with patch('verify_student.models.SoftwareSecurePhotoVerification.user_is_verified') as mock_verification:
+        with patch(
+            'lms.djangoapps.verify_student.models.SoftwareSecurePhotoVerification.user_is_verified'
+        ) as mock_verification:
 
             mock_verification.return_value = status
 
@@ -571,19 +574,18 @@ class VerificationCheckpointTest(ModuleStoreTestCase):
             checkpoint_location=self.checkpoint_midterm,
         )
 
-        # Simulate that the get-or-create operation raises an IntegrityError
+        # Simulate that the get-or-create operation raises an IntegrityError.
         # This can happen when two processes both try to get-or-create at the same time
         # when the database is set to REPEATABLE READ.
+        # To avoid IntegrityError situations when calling this method, set the view to
+        # use a READ COMMITTED transaction instead.
         with patch.object(VerificationCheckpoint.objects, "get_or_create") as mock_get_or_create:
             mock_get_or_create.side_effect = IntegrityError
-            checkpoint = VerificationCheckpoint.get_or_create_verification_checkpoint(
-                self.course.id,
-                self.checkpoint_midterm
-            )
-
-        # The checkpoint should be retrieved without error
-        self.assertEqual(checkpoint.course_id, self.course.id)
-        self.assertEqual(checkpoint.checkpoint_location, self.checkpoint_midterm)
+            with self.assertRaises(IntegrityError):
+                _ = VerificationCheckpoint.get_or_create_verification_checkpoint(
+                    self.course.id,
+                    self.checkpoint_midterm
+                )
 
     def test_unique_together_constraint(self):
         """

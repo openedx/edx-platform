@@ -41,7 +41,6 @@
 @import 'multicourse/press_release';
 @import 'multicourse/error-pages';
 @import 'multicourse/help';
-@import 'multicourse/edge';
 @import 'multicourse/survey-page';
 
 // base - specific views
@@ -53,6 +52,7 @@
 @import 'views/shoppingcart';
 @import 'views/homepage';
 @import 'views/support';
+@import "views/financial-assistance";
 @import 'course/auto-cert';
 
 // app - discussion

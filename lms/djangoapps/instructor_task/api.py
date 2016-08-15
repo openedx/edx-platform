@@ -31,6 +31,8 @@ from instructor_task.tasks import (
     proctored_exam_results_csv
 )
 
+from certificates.models import CertificateGenerationHistory
+
 from instructor_task.api_helper import (
     check_arguments_for_rescoring,
     encode_problem_and_student_input,
@@ -95,14 +97,6 @@ def submit_rescore_problem_for_student(request, usage_key, student):  # pylint: 
     ItemNotFoundException is raised if the problem doesn't exist, or AlreadyRunningError
     if the problem is already being rescored for this student, or NotImplementedError if
     the problem doesn't support rescoring.
-
-    This method makes sure the InstructorTask entry is committed.
-    When called from any view that is wrapped by TransactionMiddleware,
-    and thus in a "commit-on-success" transaction, an autocommit buried within here
-    will cause any pending transaction to be committed by a successful
-    save here.  Any future database operations will take place in a
-    separate transaction.
-
     """
     # check arguments:  let exceptions return up to the caller.
     check_arguments_for_rescoring(usage_key)
@@ -125,13 +119,6 @@ def submit_rescore_problem_for_all_students(request, usage_key):  # pylint: disa
     ItemNotFoundException is raised if the problem doesn't exist, or AlreadyRunningError
     if the problem is already being rescored, or NotImplementedError if the problem doesn't
     support rescoring.
-
-    This method makes sure the InstructorTask entry is committed.
-    When called from any view that is wrapped by TransactionMiddleware,
-    and thus in a "commit-on-success" transaction, an autocommit buried within here
-    will cause any pending transaction to be committed by a successful
-    save here.  Any future database operations will take place in a
-    separate transaction.
     """
     # check arguments:  let exceptions return up to the caller.
     check_arguments_for_rescoring(usage_key)
@@ -157,13 +144,6 @@ def submit_rescore_entrance_exam_for_student(request, usage_key, student=None): 
     usage_key, AlreadyRunningError is raised if the entrance exam
     is already being re-scored, or NotImplementedError if the problem doesn't
     support rescoring.
-
-    This method makes sure the InstructorTask entry is committed.
-    When called from any view that is wrapped by TransactionMiddleware,
-    and thus in a "commit-on-success" transaction, an autocommit buried within here
-    will cause any pending transaction to be committed by a successful
-    save here.  Any future database operations will take place in a
-    separate transaction.
     """
     # check problems for rescoring:  let exceptions return up to the caller.
     check_entrance_exam_problems_for_rescoring(usage_key)
@@ -185,13 +165,6 @@ def submit_reset_problem_attempts_for_all_students(request, usage_key):  # pylin
 
     ItemNotFoundException is raised if the problem doesn't exist, or AlreadyRunningError
     if the problem is already being reset.
-
-    This method makes sure the InstructorTask entry is committed.
-    When called from any view that is wrapped by TransactionMiddleware,
-    and thus in a "commit-on-success" transaction, an autocommit buried within here
-    will cause any pending transaction to be committed by a successful
-    save here.  Any future database operations will take place in a
-    separate transaction.
     """
     # check arguments:  make sure that the usage_key is defined
     # (since that's currently typed in).  If the corresponding module descriptor doesn't exist,
@@ -218,13 +191,6 @@ def submit_reset_problem_attempts_in_entrance_exam(request, usage_key, student):
     ItemNotFoundError is raised if entrance exam does not exists for given
     usage_key, AlreadyRunningError is raised if the entrance exam
     is already being reset.
-
-    This method makes sure the InstructorTask entry is committed.
-    When called from any view that is wrapped by TransactionMiddleware,
-    and thus in a "commit-on-success" transaction, an autocommit buried within here
-    will cause any pending transaction to be committed by a successful
-    save here.  Any future database operations will take place in a
-    separate transaction.
     """
     # check arguments:  make sure entrance exam(section) exists for given usage_key
     modulestore().get_item(usage_key)
@@ -245,13 +211,6 @@ def submit_delete_problem_state_for_all_students(request, usage_key):  # pylint:
 
     ItemNotFoundException is raised if the problem doesn't exist, or AlreadyRunningError
     if the particular problem's state is already being deleted.
-
-    This method makes sure the InstructorTask entry is committed.
-    When called from any view that is wrapped by TransactionMiddleware,
-    and thus in a "commit-on-success" transaction, an autocommit buried within here
-    will cause any pending transaction to be committed by a successful
-    save here.  Any future database operations will take place in a
-    separate transaction.
     """
     # check arguments:  make sure that the usage_key is defined
     # (since that's currently typed in).  If the corresponding module descriptor doesn't exist,
@@ -279,13 +238,6 @@ def submit_delete_entrance_exam_state_for_student(request, usage_key, student): 
     ItemNotFoundError is raised if entrance exam does not exists for given
     usage_key, AlreadyRunningError is raised if the entrance exam
     is already being reset.
-
-    This method makes sure the InstructorTask entry is committed.
-    When called from any view that is wrapped by TransactionMiddleware,
-    and thus in a "commit-on-success" transaction, an autocommit buried within here
-    will cause any pending transaction to be committed by a successful
-    save here.  Any future database operations will take place in a
-    separate transaction.
     """
     # check arguments:  make sure entrance exam(section) exists for given usage_key
     modulestore().get_item(usage_key)
@@ -313,13 +265,6 @@ def submit_bulk_course_email(request, course_key, email_id):
 
     AlreadyRunningError is raised if the same recipients are already being emailed with the same
     CourseEmail object.
-
-    This method makes sure the InstructorTask entry is committed.
-    When called from any view that is wrapped by TransactionMiddleware,
-    and thus in a "commit-on-success" transaction, an autocommit buried within here
-    will cause any pending transaction to be committed by a successful
-    save here.  Any future database operations will take place in a
-    separate transaction.
     """
     # Assume that the course is defined, and that the user has already been verified to have
     # appropriate access to the course. But make sure that the email exists.
@@ -423,7 +368,7 @@ def submit_calculate_may_enroll_csv(request, course_key, features):
     return submit_task(request, task_type, task_class, course_key, task_input, task_key)
 
 
-def submit_executive_summary_report(request, course_key):  # pylint: disable=invalid-name
+def submit_executive_summary_report(request, course_key):
     """
     Submits a task to generate a HTML File containing the executive summary report.
 
@@ -437,7 +382,7 @@ def submit_executive_summary_report(request, course_key):  # pylint: disable=inv
     return submit_task(request, task_type, task_class, course_key, task_input, task_key)
 
 
-def submit_course_survey_report(request, course_key):  # pylint: disable=invalid-name
+def submit_course_survey_report(request, course_key):
     """
     Submits a task to generate a HTML File containing the executive summary report.
 
@@ -479,15 +424,63 @@ def submit_cohort_students(request, course_key, file_name):
     return submit_task(request, task_type, task_class, course_key, task_input, task_key)
 
 
-def generate_certificates_for_all_students(request, course_key):   # pylint: disable=invalid-name
+def generate_certificates_for_students(request, course_key, students=None):  # pylint: disable=invalid-name
     """
-    Submits a task to generate certificates for all students enrolled in the course.
+    Submits a task to generate certificates for given students enrolled in the course or
+    all students if argument 'students' is None
 
     Raises AlreadyRunningError if certificates are currently being generated.
     """
-    task_type = 'generate_certificates_all_student'
+    if students:
+        task_type = 'generate_certificates_certain_student'
+        students = [student.id for student in students]
+        task_input = {'students': students}
+    else:
+        task_type = 'generate_certificates_all_student'
+        task_input = {}
+
     task_class = generate_certificates
-    task_input = {}
+    task_key = ""
+    instructor_task = submit_task(request, task_type, task_class, course_key, task_input, task_key)
+
+    CertificateGenerationHistory.objects.create(
+        course_id=course_key,
+        generated_by=request.user,
+        instructor_task=instructor_task,
+        is_regeneration=False
+    )
+
+    return instructor_task
+
+
+def regenerate_certificates(request, course_key, statuses_to_regenerate, students=None):
+    """
+    Submits a task to regenerate certificates for given students enrolled in the course or
+    all students if argument 'students' is None.
+    Regenerate Certificate only if the status of the existing generated certificate is in 'statuses_to_regenerate'
+    list passed in the arguments.
+
+    Raises AlreadyRunningError if certificates are currently being generated.
+    """
+    if students:
+        task_type = 'regenerate_certificates_certain_student'
+        students = [student.id for student in students]
+        task_input = {'students': students}
+    else:
+        task_type = 'regenerate_certificates_all_student'
+        task_input = {}
+
+    task_input.update({"statuses_to_regenerate": statuses_to_regenerate})
+    task_class = generate_certificates
     task_key = ""
 
-    return submit_task(request, task_type, task_class, course_key, task_input, task_key)
+    instructor_task = submit_task(request, task_type, task_class, course_key, task_input, task_key)
+
+    CertificateGenerationHistory.objects.create(
+        course_id=course_key,
+        generated_by=request.user,
+        instructor_task=instructor_task,
+        is_regeneration=True
+    )
+
+    return instructor_task

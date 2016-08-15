@@ -2,29 +2,28 @@
 <%!
 from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse
-from courseware.courses import course_image_url, get_course_about_section
 %>
 <%page args="course" />
-<article class="course" id="${course.id | h}" role="region" aria-label="${get_course_about_section(course, 'title')}">
+<article class="course" id="${course.id | h}" role="region" aria-label="${course.display_name_with_default}">
   <a href="${reverse('about_course', args=[course.id.to_deprecated_string()])}">
     <header class="course-image">
       <div class="cover-image">
-        <img src="${course_image_url(course)}" alt="${get_course_about_section(course, 'title')} ${course.display_number_with_default}" />
+        <img src="${course.course_image_url | h}" alt="${course.display_name_with_default} ${course.display_number_with_default | h}" />
         <div class="learn-more" aria-hidden=true>${_("LEARN MORE")}</div>
       </div>
     </header>
     <div class="course-info" aria-hidden="true">
       <h2 class="course-name">
-        <span class="course-organization">${get_course_about_section(course, 'university')}</span>
-        <span class="course-code">${course.display_number_with_default}</span>
-        <span class="course-title">${get_course_about_section(course, 'title')}</span>
+        <span class="course-organization">${course.display_org_with_default | h}</span>
+        <span class="course-code">${course.display_number_with_default | h}</span>
+        <span class="course-title">${course.display_name_with_default}</span>
       </h2>
       <div class="course-date" aria-hidden="true">${_("Starts")}: ${course.start_datetime_text()}</div>
     </div>
     <div class="sr">
       <ul>
-      <li>${get_course_about_section(course, 'university')}</li>
-      <li>${course.display_number_with_default}</li>
+      <li>${course.display_org_with_default | h}</li>
+      <li>${course.display_number_with_default | h}</li>
       <li>${_("Starts")}: <time itemprop="startDate" datetime="${course.start_datetime_text()}">${course.start_datetime_text()}</time></li>
     </ul>
     </div>

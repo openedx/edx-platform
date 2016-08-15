@@ -8,7 +8,7 @@ from django.utils.translation import ugettext as _
 
 from microsite_configuration import microsite
 from microsite_configuration.templatetags.microsite import platform_name
-from ccx.overrides import get_current_ccx
+from lms.djangoapps.ccx.overrides import get_current_ccx
 
 # App that handles subdomain specific branding
 import branding
@@ -43,14 +43,14 @@ site_status_msg = get_site_status_msg(course_id)
     <h1 class="logo">
       <a href="${marketing_link('ROOT')}">
         <%block name="navigation_logo">
-            <img src="${static.url(branding.get_logo_url())}" alt="${platform_name()}"/>
+            <img src="${static.url(branding.get_logo_url())}" alt="${_("{platform_name} Home Page").format(platform_name=platform_name())}"/>
         </%block>
       </a>
     </h1>
 
     % if course:
     <h2 class="course-header"><span class="provider">${course.display_org_with_default | h}:</span>
-      ${course.display_number_with_default | h}
+      <span class="course-number">${course.display_number_with_default | h}</span>
       <%
         display_name = course.display_name_with_default
         if settings.FEATURES.get('CUSTOM_COURSES_EDX', False):
@@ -58,7 +58,7 @@ site_status_msg = get_site_status_msg(course_id)
           if ccx:
             display_name = ccx.display_name
       %>
-      ${display_name}</h2>
+      <span class="course-name">${display_name}</span></h2>
     % endif
 
     % if user.is_authenticated():
@@ -87,7 +87,7 @@ site_status_msg = get_site_status_msg(course_id)
         </a>
       </li>
       <li class="primary">
-        <a href="#" class="dropdown" aria-haspopup="true" aria-expanded="false"><span class="sr">${_("More options dropdown")}</span><i class="fa fa-sort-desc" aria-hidden="true"></i></a>
+        <button class="dropdown" aria-haspopup="true" aria-expanded="false"><span class="sr">${_("More options dropdown")}</span><span class="fa fa-sort-desc" aria-hidden="true"></span></button>
         <ul class="dropdown-menu" aria-label="More Options" role="menu">
           <%block name="navigation_dropdown_menu_links" >
             <li><a href="${reverse('dashboard')}">${_("Dashboard")}</a></li>

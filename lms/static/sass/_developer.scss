@@ -369,3 +369,62 @@
   }
 }
 
+// pfogg - ECOM-2604
+// styling for date summary blocks on the course info page
+.date-summary-container {
+  .date-summary {
+    @include clearfix;
+    margin-top: $baseline/2;
+    margin-bottom: $baseline/2;
+    padding: 10px;
+    background-color: $gray-l4;
+    @include border-left(3px solid $gray-l3);
+
+    .description {
+      margin-top: $baseline/2;
+      margin-bottom: $baseline/2;
+      display: inline-block;
+      color: $lighter-base-font-color;
+      font-size: 80%;
+    }
+
+    .date-summary-link {
+      @include float(right);
+      font-size: 80%;
+      font-weight: $font-semibold;
+      a {
+        color: $base-font-color;
+      }
+    }
+
+    .date {
+      color: $lighter-base-font-color;
+      font-size: 80%;
+    }
+
+    &-todays-date {
+      @include border-left(3px solid $blue);
+
+      .heading {
+        font-weight: $font-regular;
+        font-size: 80%;
+      }
+    }
+
+    &-verified-upgrade-deadline {
+      @include border-left(3px solid $green);
+    }
+
+    &-verification-deadline-passed {
+      @include border-left(3px solid $red);
+    }
+
+    &-verification-deadline-retry {
+      @include border-left(3px solid $red);
+    }
+
+    &-verification-deadline-upcoming {
+      @include border-left(3px solid $orange);
+    }
+  }
+}

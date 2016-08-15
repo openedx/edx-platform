@@ -1,17 +1,20 @@
+"""
+Functions for accessing and displaying courses within the
+courseware.
+"""
+from datetime import datetime
 from collections import defaultdict
 from fs.errors import ResourceNotFoundError
 import logging
-import inspect
 
 from path import Path as path
+import pytz
 from django.http import Http404
 from django.conf import settings
 
 from edxmako.shortcuts import render_to_string
 from xmodule.modulestore import ModuleStoreEnum
-from opaque_keys.edx.keys import CourseKey
 from xmodule.modulestore.django import modulestore
-from xmodule.contentstore.content import StaticContent
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from static_replace import replace_static_urls
 from xmodule.modulestore import ModuleStoreEnum
@@ -19,6 +22,13 @@ from xmodule.x_module import STUDENT_VIEW
 from microsite_configuration import microsite
 
 from courseware.access import has_access
+from courseware.date_summary import (
+    CourseEndDate,
+    CourseStartDate,
+    TodaysDate,
+    VerificationDeadlineDate,
+    VerifiedUpgradeDeadlineDate,
+)
 from courseware.model_data import FieldDataCache
 from courseware.module_render import get_module
 from lms.djangoapps.courseware.courseware_access_exception import CoursewareAccessException
@@ -26,23 +36,10 @@ from student.models import CourseEnrollment
 import branding
 
 from opaque_keys.edx.keys import UsageKey
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+
 
 log = logging.getLogger(__name__)
-
-
-def get_request_for_thread():
-    """Walk up the stack, return the nearest first argument named "request"."""
-    frame = None
-    try:
-        for f in inspect.stack()[1:]:
-            frame = f[0]
-            code = frame.f_code
-            if code.co_varnames[:1] == ("request",):
-                return frame.f_locals["request"]
-            elif code.co_varnames[:2] == ("self", "request",):
-                return frame.f_locals["request"]
-    finally:
-        del frame
 
 
 def get_course(course_id, depth=0):
@@ -61,7 +58,6 @@ def get_course(course_id, depth=0):
     return course
 
 
-# TODO please rename this function to get_course_by_key at next opportunity!
 def get_course_by_id(course_key, depth=0):
     """
     Given a course id, return the corresponding course descriptor.
@@ -97,9 +93,39 @@ def get_course_with_access(user, action, course_key, depth=0, check_if_enrolled=
     check_if_enrolled: If true, additionally verifies that the user is either enrolled in the course
       or has staff access.
     """
-    assert isinstance(course_key, CourseKey)
-    course = get_course_by_id(course_key, depth=depth)
-    access_response = has_access(user, action, course, course_key)
+    course = get_course_by_id(course_key, depth)
+    check_course_access(course, user, action, check_if_enrolled)
+    return course
+
+
+def get_course_overview_with_access(user, action, course_key, check_if_enrolled=False):
+    """
+    Given a course_key, look up the corresponding course overview,
+    check that the user has the access to perform the specified action
+    on the course, and return the course overview.
+
+    Raises a 404 if the course_key is invalid, or the user doesn't have access.
+
+    check_if_enrolled: If true, additionally verifies that the user is either enrolled in the course
+      or has staff access.
+    """
+    try:
+        course_overview = CourseOverview.get_from_id(course_key)
+    except CourseOverview.DoesNotExist:
+        raise Http404("Course not found.")
+    check_course_access(course_overview, user, action, check_if_enrolled)
+    return course_overview
+
+
+def check_course_access(course, user, action, check_if_enrolled=False):
+    """
+    Check that the user has the access to perform the specified action
+    on the course (CourseDescriptor|CourseOverview).
+
+    check_if_enrolled: If true, additionally verifies that the user is either
+    enrolled in the course or has staff access.
+    """
+    access_response = has_access(user, action, course, course.id)
 
     if not access_response:
         # Deliberately return a non-specific error message to avoid
@@ -107,34 +133,11 @@ def get_course_with_access(user, action, course_key, depth=0, check_if_enrolled=
         raise CoursewareAccessException(access_response)
 
     if check_if_enrolled:
-        # Verify that the user is either enrolled in the course or a staff member.
-        # If user is not enrolled, raise UserNotEnrolled exception that will be caught by middleware.
-        if not ((user.id and CourseEnrollment.is_enrolled(user, course_key)) or has_access(user, 'staff', course)):
-            raise UserNotEnrolled(course_key)
-
-    return course
-
-
-def course_image_url(course):
-    """Try to look up the image url for the course.  If it's not found,
-    log an error and return the dead link"""
-    if course.static_asset_path or modulestore().get_modulestore_type(course.id) == ModuleStoreEnum.Type.xml:
-        # If we are a static course with the course_image attribute
-        # set different than the default, return that path so that
-        # courses can use custom course image paths, otherwise just
-        # return the default static path.
-        url = '/static/' + (course.static_asset_path or getattr(course, 'data_dir', ''))
-        if hasattr(course, 'course_image') and course.course_image != course.fields['course_image'].default:
-            url += '/' + course.course_image
-        else:
-            url += '/images/course_image.jpg'
-    elif not course.course_image:
-        # if course_image is empty, use the default image url from settings
-        url = settings.STATIC_URL + settings.DEFAULT_COURSE_ABOUT_IMAGE_URL
-    else:
-        loc = StaticContent.compute_location(course.id, course.course_image)
-        url = StaticContent.serialize_asset_key_with_slash(loc)
-    return url
+        # Verify that the user is either enrolled in the course or a staff
+        # member.  If user is not enrolled, raise UserNotEnrolled exception
+        # that will be caught by middleware.
+        if not ((user.id and CourseEnrollment.is_enrolled(user, course.id)) or has_access(user, 'staff', course)):
+            raise UserNotEnrolled(course.id)
 
 
 def find_file(filesystem, dirs, filename):
@@ -154,26 +157,13 @@ def find_file(filesystem, dirs, filename):
     raise ResourceNotFoundError(u"Could not find {0}".format(filename))
 
 
-def get_course_university_about_section(course):  # pylint: disable=invalid-name
-    """
-    Returns a snippet of HTML displaying the course's university.
-
-    Arguments:
-        course (CourseDescriptor|CourseOverview): A course.
-    """
-    return course.display_org_with_default
-
-
-def get_course_about_section(course, section_key):
+def get_course_about_section(request, course, section_key):
     """
     This returns the snippet of html to be rendered on the course about page,
     given the key for the section.
 
     Valid keys:
     - overview
-    - title
-    - university
-    - number
     - short_description
     - description
     - key_dates (includes start, end, exams, etc)
@@ -184,6 +174,7 @@ def get_course_about_section(course, section_key):
     - syllabus
     - textbook
     - faq
+    - effort
     - more_info
     - ocw_links
     """
@@ -192,17 +183,27 @@ def get_course_about_section(course, section_key):
     # markup. This can change without effecting this interface when we find a
     # good format for defining so many snippets of text/html.
 
-    # TODO: Remove number, instructors from this list
-    if section_key in ['short_description', 'description', 'key_dates', 'video',
-                       'course_staff_short', 'course_staff_extended',
-                       'requirements', 'syllabus', 'textbook', 'faq', 'more_info',
-                       'number', 'instructors', 'overview',
-                       'effort', 'end_date', 'prerequisites', 'ocw_links']:
+    html_sections = {
+        'short_description',
+        'description',
+        'key_dates',
+        'video',
+        'course_staff_short',
+        'course_staff_extended',
+        'requirements',
+        'syllabus',
+        'textbook',
+        'faq',
+        'more_info',
+        'overview',
+        'effort',
+        'end_date',
+        'prerequisites',
+        'ocw_links'
+    }
 
+    if section_key in html_sections:
         try:
-
-            request = get_request_for_thread()
-
             loc = course.location.replace(category='about', name=section_key)
 
             # Use an empty cache
@@ -237,12 +238,6 @@ def get_course_about_section(course, section_key):
                 section_key, course.location.to_deprecated_string()
             )
             return None
-    elif section_key == "title":
-        return course.display_name_with_default
-    elif section_key == "university":
-        return get_course_university_about_section(course)
-    elif section_key == "number":
-        return course.display_number_with_default
 
     raise KeyError("Invalid about key " + str(section_key))
 
@@ -301,6 +296,43 @@ def get_course_info_section(request, course, section_key):
     return html
 
 
+def get_course_date_summary(course, user):
+    """
+    Return the snippet of HTML to be included on the course info page
+    in the 'Date Summary' section.
+    """
+    blocks = _get_course_date_summary_blocks(course, user)
+    return '\n'.join(
+        b.render() for b in blocks
+    )
+
+
+def _get_course_date_summary_blocks(course, user):
+    """
+    Return the list of blocks to display on the course info page,
+    sorted by date.
+    """
+    block_classes = (
+        CourseEndDate,
+        CourseStartDate,
+        TodaysDate,
+        VerificationDeadlineDate,
+        VerifiedUpgradeDeadlineDate,
+    )
+
+    blocks = (cls(course, user) for cls in block_classes)
+
+    def block_key_fn(block):
+        """
+        If the block's date is None, return the maximum datetime in order
+        to force it to the end of the list of displayed blocks.
+        """
+        if block.date is None:
+            return datetime.max.replace(tzinfo=pytz.UTC)
+        return block.date
+    return sorted((b for b in blocks if b.is_enabled), key=block_key_fn)
+
+
 # TODO: Fix this such that these are pulled in as extra course-specific tabs.
 #       arjun will address this by the end of October if no one does so prior to
 #       then.
@@ -341,22 +373,6 @@ def get_course_syllabus_section(course, section_key):
     raise KeyError("Invalid about key " + str(section_key))
 
 
-def get_courses_by_university(user, domain=None):
-    '''
-    Returns dict of lists of courses available, keyed by course.org (ie university).
-    Courses are sorted by course.number.
-    '''
-    # TODO: Clean up how 'error' is done.
-    # filter out any courses that errored.
-    visible_courses = get_courses(user, domain)
-
-    universities = defaultdict(list)
-    for course in visible_courses:
-        universities[course.org].append(course)
-
-    return universities
-
-
 def get_courses(user, domain=None):
     '''
     Returns a list of courses available, sorted by course.number
@@ -373,6 +389,16 @@ def get_courses(user, domain=None):
     courses = sorted(courses, key=lambda course: course.number)
 
     return courses
+
+
+def get_permission_for_course_about():
+    """
+    Returns the CourseOverview object for the course after checking for access.
+    """
+    return microsite.get_value(
+        'COURSE_ABOUT_VISIBILITY_PERMISSION',
+        settings.COURSE_ABOUT_VISIBILITY_PERMISSION
+    )
 
 
 def sort_by_announcement(courses):

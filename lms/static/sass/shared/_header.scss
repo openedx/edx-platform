@@ -191,6 +191,16 @@ header.global {
       }
     }
 
+    .dropdown {
+      font-size: $body-font-size;
+      padding: 0 ($baseline/2);
+      color: $base-font-color;
+      border: none;
+      background: $white;
+      box-shadow: none;
+      text-shadow: none;
+    }
+
     .dropdown-menu {
       background: $white;
       border-radius: 4px;
@@ -486,7 +496,7 @@ header.global-new {
         }
       }
     }
-     a.user-link {
+    a.user-link {
       @include padding(5px, 2px, 10px, 10px);
       position: relative;
       text-transform: none;
@@ -532,6 +542,16 @@ header.global-new {
           opacity: 0.8;
         }
       }
+    }
+
+    .dropdown {
+      font-size: $body-font-size;
+      padding: 0 ($baseline/2);
+      color: $base-font-color;
+      border: none;
+      background: $white;
+      box-shadow: none;
+      text-shadow: none;
     }
 
     .dropdown-menu {

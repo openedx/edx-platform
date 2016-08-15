@@ -10,6 +10,7 @@ from ..helpers import UniqueCourseTest
 from ...pages.studio.auto_auth import AutoAuthPage
 from ...pages.lms.courseware import CoursewarePage
 from ...pages.lms.problem import ProblemPage
+from ...pages.lms.login_and_register import CombinedLoginAndRegisterPage
 from ...fixtures.course import CourseFixture, XBlockFixtureDesc
 from ..helpers import EventsTestMixin
 
@@ -18,11 +19,13 @@ class ProblemsTest(UniqueCourseTest):
     """
     Base class for tests of problems in the LMS.
     """
-    USERNAME = "joe_student"
-    EMAIL = "joe@example.com"
 
     def setUp(self):
         super(ProblemsTest, self).setUp()
+
+        self.username = "test_student_{uuid}".format(uuid=self.unique_id[0:8])
+        self.email = "{username}@example.com".format(username=self.username)
+        self.password = "keep it secret; keep it safe."
 
         self.xqueue_grade_response = None
 
@@ -42,8 +45,14 @@ class ProblemsTest(UniqueCourseTest):
         ).install()
 
         # Auto-auth register for the course.
-        AutoAuthPage(self.browser, username=self.USERNAME, email=self.EMAIL,
-                     course_id=self.course_id, staff=False).visit()
+        AutoAuthPage(
+            self.browser,
+            username=self.username,
+            email=self.email,
+            password=self.password,
+            course_id=self.course_id,
+            staff=False
+        ).visit()
 
     def get_problem(self):
         """ Subclasses should override this to complete the fixture """
@@ -315,7 +324,91 @@ class ProblemPartialCredit(ProblemsTest):
         """
         self.courseware_page.visit()
         problem_page = ProblemPage(self.browser)
+        problem_page.wait_for_element_visibility(problem_page.CSS_PROBLEM_HEADER, 'wait for problem header')
         self.assertEqual(problem_page.problem_name, 'PARTIAL CREDIT TEST PROBLEM')
         problem_page.fill_answer_numerical('-1')
         problem_page.click_check()
+        problem_page.wait_for_status_icon()
         self.assertTrue(problem_page.simpleprob_is_partially_correct())
+
+
+class LogoutDuringAnswering(ProblemsTest):
+    """
+    Tests for the scenario where a user is logged out (their session expires
+    or is revoked) just before they click "check" on a problem.
+    """
+    def get_problem(self):
+        """
+        Create a problem.
+        """
+        xml = dedent("""
+            <problem>
+                <p>The answer is 1</p>
+                <numericalresponse answer="1">
+                    <formulaequationinput label="where are the songs of spring?" />
+                    <responseparam type="tolerance" default="0.01" />
+                </numericalresponse>
+            </problem>
+        """)
+        return XBlockFixtureDesc('problem', 'TEST PROBLEM', data=xml)
+
+    def log_user_out(self):
+        """
+        Log the user out by deleting their session cookie.
+        """
+        self.browser.delete_cookie('sessionid')
+
+    def test_logout_after_click_redirect(self):
+        """
+        1) User goes to a problem page.
+        2) User fills out an answer to the problem.
+        3) User is logged out because their session id is invalidated or removed.
+        4) User clicks "check", and sees a confirmation modal asking them to
+           re-authenticate, since they've just been logged out.
+        5) User clicks "ok".
+        6) User is redirected to the login page.
+        7) User logs in.
+        8) User is redirected back to the problem page they started out on.
+        9) User is able to submit an answer
+        """
+        self.courseware_page.visit()
+        problem_page = ProblemPage(self.browser)
+        self.assertEqual(problem_page.problem_name, 'TEST PROBLEM')
+        problem_page.fill_answer_numerical('1')
+
+        self.log_user_out()
+        with problem_page.handle_alert(confirm=True):
+            problem_page.click_check()
+
+        login_page = CombinedLoginAndRegisterPage(self.browser)
+        login_page.wait_for_page()
+
+        login_page.login(self.email, self.password)
+
+        problem_page.wait_for_page()
+        self.assertEqual(problem_page.problem_name, 'TEST PROBLEM')
+
+        problem_page.fill_answer_numerical('1')
+        problem_page.click_check()
+        self.assertTrue(problem_page.simpleprob_is_correct())
+
+    def test_logout_cancel_no_redirect(self):
+        """
+        1) User goes to a problem page.
+        2) User fills out an answer to the problem.
+        3) User is logged out because their session id is invalidated or removed.
+        4) User clicks "check", and sees a confirmation modal asking them to
+           re-authenticate, since they've just been logged out.
+        5) User clicks "cancel".
+        6) User is not redirected to the login page.
+        """
+        self.courseware_page.visit()
+        problem_page = ProblemPage(self.browser)
+        self.assertEqual(problem_page.problem_name, 'TEST PROBLEM')
+        problem_page.fill_answer_numerical('1')
+        self.log_user_out()
+        with problem_page.handle_alert(confirm=False):
+            problem_page.click_check()
+
+        self.assertTrue(problem_page.is_browser_on_page())
+        self.assertEqual(problem_page.problem_name, 'TEST PROBLEM')

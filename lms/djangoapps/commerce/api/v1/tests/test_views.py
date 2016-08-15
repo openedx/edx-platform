@@ -22,7 +22,7 @@ from commerce.tests.mocks import mock_order_endpoint
 from commerce.tests.test_views import UserMixin
 from course_modes.models import CourseMode
 from student.tests.factories import UserFactory
-from verify_student.models import VerificationDeadline
+from lms.djangoapps.verify_student.models import VerificationDeadline
 
 PASSWORD = 'test'
 JSON_CONTENT_TYPE = 'application/json'
@@ -285,7 +285,7 @@ class CourseRetrieveUpdateViewTests(CourseApiViewTestMixin, ModuleStoreTestCase)
 
         expected_modes = [
             CourseMode(
-                mode_slug=u'honor',
+                mode_slug=CourseMode.DEFAULT_MODE_SLUG,
                 min_price=150, currency=u'USD',
                 sku=u'ABC123'
             )

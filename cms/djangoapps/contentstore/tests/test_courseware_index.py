@@ -15,9 +15,10 @@ from unittest import skip
 from django.conf import settings
 
 from course_modes.models import CourseMode
+from openedx.core.djangoapps.models.course_details import CourseDetails
 from xmodule.library_tools import normalize_key_for_search
 from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.django import SignalHandler
+from xmodule.modulestore.django import SignalHandler, modulestore
 from xmodule.modulestore.edit_info import EditInfoMixin
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.inheritance import InheritanceMixin
@@ -192,26 +193,6 @@ class MixedWithOptionsTestCase(MixedSplitTestCase):
         with store.branch_setting(ModuleStoreEnum.Branch.draft_preferred):
             store.update_item(item, ModuleStoreEnum.UserID.test)
 
-    def update_about_item(self, store, about_key, data):
-        """
-        Update the about item with the new data blob. If data is None, then
-        delete the about item.
-        """
-        temploc = self.course.id.make_usage_key('about', about_key)
-        if data is None:
-            try:
-                self.delete_item(store, temploc)
-            # Ignore an attempt to delete an item that doesn't exist
-            except ValueError:
-                pass
-        else:
-            try:
-                about_item = store.get_item(temploc)
-            except ItemNotFoundError:
-                about_item = store.create_xblock(self.course.runtime, self.course.id, 'about', about_key)
-            about_item.data = data
-            store.update_item(about_item, ModuleStoreEnum.UserID.test, allow_not_found=True)
-
 
 @ddt.ddt
 class TestCoursewareSearchIndexer(MixedWithOptionsTestCase):
@@ -334,6 +315,25 @@ class TestCoursewareSearchIndexer(MixedWithOptionsTestCase):
         self.reindex_course(store)
         response = self.search()
         self.assertEqual(response["total"], 5)
+
+    def _test_delete_course_from_search_index_after_course_deletion(self, store):  # pylint: disable=invalid-name
+        """
+        Test that course will also be delete from search_index after course deletion.
+        """
+        self.DOCUMENT_TYPE = 'course_info'  # pylint: disable=invalid-name
+        response = self.search()
+        self.assertEqual(response["total"], 0)
+
+        # index the course in search_index
+        self.reindex_course(store)
+        response = self.search()
+        self.assertEqual(response["total"], 1)
+
+        # delete the course and look course in search_index
+        modulestore().delete_course(self.course.id, self.user_id)
+        self.assertIsNone(modulestore().get_course(self.course.id))
+        response = self.search()
+        self.assertEqual(response["total"], 0)
 
     def _test_deleting_item(self, store):
         """ test deleting an item """
@@ -468,7 +468,9 @@ class TestCoursewareSearchIndexer(MixedWithOptionsTestCase):
     def _test_course_about_store_index(self, store):
         """ Test that informational properties in the about store end up in the course_info index """
         short_description = "Not just anybody"
-        self.update_about_item(store, "short_description", short_description)
+        CourseDetails.update_about_item(
+            self.course, "short_description", short_description, ModuleStoreEnum.UserID.test, store
+        )
         self.reindex_course(store)
         response = self.searcher.search(
             doc_type=CourseAboutSearchIndexer.DISCOVERY_DOCUMENT_TYPE,
@@ -603,6 +605,11 @@ class TestCoursewareSearchIndexer(MixedWithOptionsTestCase):
     @ddt.data(*WORKS_WITH_STORES)
     def test_course_location_null(self, store_type):
         self._perform_test_using_store(store_type, self._test_course_location_null)
+
+    @ddt.data(*WORKS_WITH_STORES)
+    def test_delete_course_from_search_index_after_course_deletion(self, store_type):
+        """ Test for removing course from CourseAboutSearchIndexer """
+        self._perform_test_using_store(store_type, self._test_delete_course_from_search_index_after_course_deletion)
 
 
 @patch('django.conf.settings.SEARCH_ENGINE', 'search.tests.utils.ForceRefreshElasticSearchEngine')

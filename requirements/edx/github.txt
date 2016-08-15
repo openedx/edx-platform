@@ -2,23 +2,60 @@
 #
 # If you open a pull request that adds a new dependency, you should notify:
 #   * @mollydb to check licensing
-#   * One of @e0d, @feanil, @fredsmith, @maxrothman, or @jibsheet
-#     to check system requirements
+#   * @edx/devops to check system requirements
+#
+# A correct GitHub reference looks like this:
+#
+#   git+https://github.com/OWNER/REPO-NAME.git@TAG-OR-SHA#egg=KIT-NAME==VERSION
+#
+# For example:
+#
+#   git+https://github.com/edx/edx-lint.git@v0.3.2#egg=edx_lint==0.3.2
+#
+# where:
+#
+#   OWNER = edx
+#   REPO-NAME = edx-lint
+#   TAG-OR-SHA = v0.3.2
+#   KIT-NAME = edx_lint
+#   VERSION = 0.3.2
+#
+#
+# Rules to follow (even though many URLs here don't follow them!):
+#
+#   * Don't leave out any of these pieces.
+#
+#   * Don't use -e
+#
+#   * TAG-OR-SHA must be a git tag, or a git SHA.  Don't use branch names here.
+#
+#   * KIT-NAME might be different than REPO-NAME.  KIT-NAME must be the same as
+#     the `name="KIT-NAME"` value in the repo's setup.py.
+#
+#   * VERSION might not be the same as TAG-OR-SHA, but if the tag names the
+#     version, please make it match the VERSION, but with a "v" prefix.
+#     VERSION must be the same as the `version="VERSION"` value in the repo's
+#     setup.py.  An alternative is to use 0.0 as VERSION: this forces pip to
+#     re-install the package each time, and can be useful when working with two
+#     repos before picking a version number. Don't use 0.0 on master, only for
+#     tight-loop work in progress.
+
 
 # Python libraries to install directly from github
 
 # Third-party:
 -e git+https://github.com/cyberdelia/django-pipeline.git@1.5.3#egg=django-pipeline
--e git+https://github.com/edx/django-wiki.git@cd0b2b31997afccde519fe5b3365e61a9edb143f#egg=django-wiki
--e git+https://github.com/edx/django-oauth2-provider.git@0.2.7-fork-edx-5#egg=django-oauth2-provider
--e git+https://github.com/edx/django-rest-framework-oauth.git@f0b503fda8c254a38f97fef802ded4f5fe367f7a#egg=djangorestframework-oauth
--e git+https://github.com/edx/MongoDBProxy.git@25b99097615bda06bd7cdfe5669ed80dc2a7fed0#egg=mongodb_proxy
+git+https://github.com/edx/django-wiki.git@v0.0.5#egg=django-wiki==0.0.5
+-e git+https://github.com/edx/django-oauth2-provider.git@0.2.7-fork-edx-6a#egg=django-oauth2-provider==0.2.7-fork-edx-6
+git+https://github.com/edx/django-openid-auth.git@0.8#egg=django-openid-auth==0.8
+-e git+https://github.com/edx/django-rest-framework-oauth.git@f0b503fda8c254a38f97fef802ded4f5fe367f7a#egg=djangorestframework-oauth==1.0.1
+git+https://github.com/edx/MongoDBProxy.git@25b99097615bda06bd7cdfe5669ed80dc2a7fed0#egg=MongoDBProxy==0.1.0
 git+https://github.com/edx/nltk.git@2.0.6#egg=nltk==2.0.6
 -e git+https://github.com/dementrock/pystache_custom.git@776973740bdaad83a3b029f96e415a7d1e8bec2f#egg=pystache_custom-dev
 -e git+https://github.com/eventbrite/zendesk.git@d53fe0e81b623f084e91776bcf6369f8b7b63879#egg=zendesk
 -e git+https://github.com/appliedsec/pygeoip.git@95e69341cebf5a6a9fbf7c4f5439d458898bdc3b#egg=pygeoip
 -e git+https://github.com/jazkarta/edx-jsme.git@c5bfa5d361d6685d8c643838fc0055c25f8b7999#egg=edx-jsme
--e git+https://github.com/pmitros/django-pyfs.git@d175715e0fe3367ec0f1ee429c242d603f6e8b10#egg=djpyfs
+git+https://github.com/edx/django-pyfs.git@1.0.3#egg=django-pyfs==1.0.3
 git+https://github.com/mitocw/django-cas.git@60a5b8e5a62e63e0d5d224a87f0b489201a0c695#egg=django-cas
 -e git+https://github.com/dgrtwo/ParsePy.git@7949b9f754d1445eff8e8f20d0e967b9a6420639#egg=parse_rest
 # Master pyfs has a bug working with VPC auth. This is a fix. We should switch
@@ -31,35 +68,34 @@ git+https://github.com/hmarr/django-debug-toolbar-mongo.git@b0686a76f1ce3532088c
 -e git+https://github.com/jazkarta/ccx-keys.git@e6b03704b1bb97c1d2f31301ecb4e3a687c536ea#egg=ccx-keys
 git+https://github.com/edx/rfc6266.git@v0.0.5-edx#egg=rfc6266==0.0.5-edx
 # Used for testing
--e git+https://github.com/gabrielfalcao/lettuce.git@b18b8fb711eb7a178c58574716032ad8de525912#egg=lettuce=1.8-support
+git+https://github.com/edx/lettuce.git@0.2.20.002#egg=lettuce==0.2.20.002
 
 # Our libraries:
--e git+https://github.com/edx/XBlock.git@32fca2a954745315be97b91ef0d5ad4eb38cf365#egg=XBlock
+git+https://github.com/edx/XBlock.git@xblock-0.4.4#egg=XBlock==0.4.4
 -e git+https://github.com/edx/codejail.git@6b17c33a89bef0ac510926b1d7fea2748b73aadd#egg=codejail
 -e git+https://github.com/edx/js-test-tool.git@v0.1.6#egg=js_test_tool
--e git+https://github.com/edx/event-tracking.git@0.2.0#egg=event-tracking
--e git+https://github.com/edx-solutions/django-splash.git@7579d052afcf474ece1239153cffe1c89935bc4f#egg=django-splash
+-e git+https://github.com/edx/event-tracking.git@0.2.1#egg=event-tracking==0.2.1
+-e git+https://github.com/edx/django-splash.git@v0.2#egg=django-splash==0.2
 -e git+https://github.com/edx/acid-block.git@e46f9cda8a03e121a00c7e347084d142d22ebfb7#egg=acid-xblock
--e git+https://github.com/edx/edx-ora2.git@release-2015-09-22T15.43#egg=edx-ora2
--e git+https://github.com/edx/edx-submissions.git@0.1.0#egg=edx-submissions
+-e git+https://github.com/edx/edx-ora2.git@0.2.4#egg=ora2==0.2.4
+-e git+https://github.com/edx/edx-submissions.git@0.1.3#egg=edx-submissions==0.1.3
 -e git+https://github.com/edx/opaque-keys.git@27dc382ea587483b1e3889a3d19cbd90b9023a06#egg=opaque-keys
 git+https://github.com/edx/ease.git@release-2015-07-14#egg=ease==0.1.3
-git+https://github.com/edx/i18n-tools.git@v0.1.3#egg=i18n-tools==v0.1.3
-git+https://github.com/edx/edx-oauth2-provider.git@0.5.7#egg=oauth2-provider==0.5.7
--e git+https://github.com/edx/edx-val.git@0.0.6#egg=edx-val
+git+https://github.com/edx/i18n-tools.git@v0.1.4#egg=i18n-tools==v0.1.4
+git+https://github.com/edx/edx-oauth2-provider.git@0.5.8#egg=edx-oauth2-provider==0.5.8
+git+https://github.com/edx/edx-val.git@0.0.8#egg=edxval==0.0.8
 -e git+https://github.com/pmitros/RecommenderXBlock.git@518234bc354edbfc2651b9e534ddb54f96080779#egg=recommender-xblock
 -e git+https://github.com/pmitros/RateXBlock.git@367e19c0f6eac8a5f002fd0f1559555f8e74bfff#egg=rate-xblock
--e git+https://github.com/edx/edx-search.git@release-2015-09-11a#egg=edx-search
-git+https://github.com/edx/edx-milestones.git@release-2015-10-20#egg=edx-milestones==0.1.3
-git+https://github.com/edx/edx-lint.git@v0.3.0#egg=edx_lint==0.3.0
--e git+https://github.com/edx/xblock-utils.git@213a97a50276d6a2504d8133650b2930ead357a0#egg=xblock-utils
+-e git+https://github.com/edx/edx-search.git@release-2015-11-17#egg=edx-search==0.1.1
+-e git+https://github.com/edx/edx-milestones.git@release-2015-11-17#egg=edx-milestones==0.1.5
+git+https://github.com/edx/edx-lint.git@v0.3.2#egg=edx_lint==0.3.2
+git+https://github.com/edx/xblock-utils.git@v1.0.2#egg=xblock-utils==1.0.2
 -e git+https://github.com/edx-solutions/xblock-google-drive.git@138e6fa0bf3a2013e904a085b9fed77dab7f3f21#egg=xblock-google-drive
-git+https://github.com/edx/edx-reverification-block.git@0.0.4#egg=edx-reverification-block==0.0.4
+-e git+https://github.com/edx/edx-reverification-block.git@0.0.5#egg=edx-reverification-block==0.0.5
 -e git+https://github.com/edx/edx-user-state-client.git@30c0ad4b9f57f8d48d6943eb585ec8a9205f4469#egg=edx-user-state-client
-git+https://github.com/edx/edx-organizations.git@release-2015-09-22#egg=edx-organizations==0.1.6
-
-git+https://github.com/edx/edx-proctoring.git@0.10.15#egg=edx-proctoring==0.10.15
-
+git+https://github.com/edx/edx-organizations.git@release-2015-12-08#egg=edx-organizations==0.2.0
+git+https://github.com/edx/edx-proctoring.git@0.11.6#egg=edx-proctoring==0.11.6
+git+https://github.com/edx/xblock-lti-consumer.git@v1.0.0#egg=xblock-lti-consumer==v1.0.0
 
 # Third Party XBlocks
 -e git+https://github.com/mitodl/edx-sga@172a90fd2738f8142c10478356b2d9ed3e55334a#egg=edx-sga

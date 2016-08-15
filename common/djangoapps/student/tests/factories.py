@@ -52,8 +52,8 @@ class CourseModeFactory(DjangoModelFactory):
         model = CourseMode
 
     course_id = None
-    mode_display_name = u'Honor Code',
-    mode_slug = 'honor'
+    mode_display_name = CourseMode.DEFAULT_MODE.name
+    mode_slug = CourseMode.DEFAULT_MODE_SLUG
     min_price = 0
     suggested_prices = ''
     currency = 'usd'

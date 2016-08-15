@@ -152,7 +152,7 @@ class ClarificationRenderer(object):
         self.system = system
         # Get any text content found inside this tag prior to the first child tag. It may be a string or None type.
         initial_text = xml.text if xml.text else ''
-        self.inner_html = initial_text + ''.join(etree.tostring(element) for element in xml)  # pylint: disable=no-member
+        self.inner_html = initial_text + ''.join(etree.tostring(element) for element in xml)
         self.tail = xml.tail
 
     def get_html(self):
@@ -161,7 +161,7 @@ class ClarificationRenderer(object):
         """
         context = {'clarification': self.inner_html}
         html = self.system.render_template("clarification.html", context)
-        xml = etree.XML(html)  # pylint: disable=no-member
+        xml = etree.XML(html)
         # We must include any text that was following our original <clarification>...</clarification> XML node.:
         xml.tail = self.tail
         return xml

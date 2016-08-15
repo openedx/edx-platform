@@ -658,8 +658,8 @@ class CourseBlocksAndNavigation(ListAPIView):
         method, add the response from the 'student_view_json" method as the data for the block.
         """
         if block_info.type in request_info.block_json:
-            if getattr(block_info.block, 'student_view_json', None):
-                block_info.value["block_json"] = block_info.block.student_view_json(
+            if getattr(block_info.block, 'student_view_data', None):
+                block_info.value["block_json"] = block_info.block.student_view_data(
                     context=request_info.block_json[block_info.type]
                 )
 

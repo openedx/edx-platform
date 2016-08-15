@@ -60,6 +60,36 @@ class CertificatesModelTest(ModuleStoreTestCase):
         certificate_info = certificate_info_for_user(student, course.id, grade, whitelisted)
         self.assertEqual(certificate_info, output)
 
+    @unpack
+    @data(
+        {'allow_certificate': False, 'whitelisted': False, 'grade': None, 'output': ['N', 'Y', 'honor']},
+        {'allow_certificate': True, 'whitelisted': True, 'grade': None, 'output': ['Y', 'Y', 'honor']},
+        {'allow_certificate': True, 'whitelisted': False, 'grade': 0.9, 'output': ['Y', 'Y', 'honor']},
+        {'allow_certificate': False, 'whitelisted': True, 'grade': 0.8, 'output': ['N', 'Y', 'honor']},
+        {'allow_certificate': False, 'whitelisted': None, 'grade': 0.8, 'output': ['N', 'Y', 'honor']}
+    )
+    def test_certificate_info_for_user_when_grade_changes(self, allow_certificate, whitelisted, grade, output):
+        """
+        Verify that certificate_info_for_user works as expect in scenario when grading of problems
+        changes after certificates already generated. In such scenario `Certificate delivered` should not depend
+        on student's eligibility to get certificates since in above scenario eligibility can change over period
+        of time.
+        """
+        student = UserFactory()
+        course = CourseFactory.create(org='edx', number='verified', display_name='Verified Course')
+        student.profile.allow_certificate = allow_certificate
+        student.profile.save()
+
+        GeneratedCertificateFactory.create(
+            user=student,
+            course_id=course.id,
+            status=CertificateStatuses.downloadable,
+            mode='honor'
+        )
+
+        certificate_info = certificate_info_for_user(student, course.id, grade, whitelisted)
+        self.assertEqual(certificate_info, output)
+
     @patch.dict(settings.FEATURES, {'ENABLE_PREREQUISITE_COURSES': True, 'MILESTONES_APP': True})
     def test_course_milestone_collected(self):
         seed_milestone_relationship_types()

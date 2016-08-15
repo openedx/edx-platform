@@ -9,13 +9,14 @@ Tests that CSV grade report generation works with unicode emails.
 import ddt
 from mock import Mock, patch
 import tempfile
+import json
 from openedx.core.djangoapps.course_groups import cohorts
 import unicodecsv
 from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
 
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
-from certificates.models import CertificateStatuses
+from certificates.models import CertificateStatuses, GeneratedCertificate
 from certificates.tests.factories import GeneratedCertificateFactory, CertificateWhitelistFactory
 from course_modes.models import CourseMode
 from courseware.tests.factories import InstructorFactory
@@ -28,7 +29,7 @@ from shoppingcart.models import Order, PaidCourseRegistration, CourseRegistratio
     CourseRegistrationCodeInvoiceItem, InvoiceTransaction, Coupon
 from student.tests.factories import UserFactory, CourseModeFactory
 from student.models import CourseEnrollment, CourseEnrollmentAllowed, ManualEnrollmentAudit, ALLOWEDTOENROLL_TO_ENROLLED
-from verify_student.tests.factories import SoftwareSecurePhotoVerificationFactory
+from lms.djangoapps.verify_student.tests.factories import SoftwareSecurePhotoVerificationFactory
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.partitions.partitions import Group, UserPartition
 from instructor_task.models import ReportStore
@@ -361,6 +362,11 @@ class TestInstructorDetailedEnrollmentReport(TestReportMixin, InstructorTaskCour
     def setUp(self):
         super(TestInstructorDetailedEnrollmentReport, self).setUp()
         self.course = CourseFactory.create()
+        CourseModeFactory.create(
+            course_id=self.course.id,
+            min_price=50,
+            mode_slug=CourseMode.DEFAULT_SHOPPINGCART_MODE_SLUG
+        )
 
         # create testing invoice 1
         self.instructor = InstructorFactory(course_key=self.course.id)
@@ -418,10 +424,15 @@ class TestInstructorDetailedEnrollmentReport(TestReportMixin, InstructorTaskCour
         with patch('instructor_task.tasks_helper._get_current_task'):
             result = upload_enrollment_report(None, None, self.course.id, task_input, 'generating_enrollment_report')
 
-        enrollment_source = u'manually enrolled by {username} - reason: manually enrolling unenrolled user'.format(
-            username=self.instructor.username)  # pylint: disable=no-member
+        enrollment_source = u'manually enrolled by username: {username}'.format(
+            username=self.instructor.username)
         self.assertDictContainsSubset({'attempted': 1, 'succeeded': 1, 'failed': 0}, result)
         self._verify_cell_data_in_csv(student.username, 'Enrollment Source', enrollment_source)
+        self._verify_cell_data_in_csv(
+            student.username,
+            'Manual (Un)Enrollment Reason',
+            'manually enrolling unenrolled user'
+        )
         self._verify_cell_data_in_csv(student.username, 'Payment Status', 'TBD')
 
     def test_student_used_enrollment_code_for_course_enrollment(self):
@@ -470,7 +481,7 @@ class TestInstructorDetailedEnrollmentReport(TestReportMixin, InstructorTaskCour
             created_by=self.instructor,
             invoice=self.sale_invoice_1,
             invoice_item=self.invoice_item,
-            mode_slug='honor'
+            mode_slug=CourseMode.DEFAULT_SHOPPINGCART_MODE_SLUG
         )
         course_registration_code.save()
 
@@ -511,7 +522,7 @@ class TestInstructorDetailedEnrollmentReport(TestReportMixin, InstructorTaskCour
             created_by=self.instructor,
             invoice=self.sale_invoice_1,
             invoice_item=self.invoice_item,
-            mode_slug='honor'
+            mode_slug=CourseMode.DEFAULT_SHOPPINGCART_MODE_SLUG
         )
         course_registration_code.save()
 
@@ -839,7 +850,11 @@ class TestExecutiveSummaryReport(TestReportMixin, InstructorTaskCourseTestCase):
     def setUp(self):
         super(TestExecutiveSummaryReport, self).setUp()
         self.course = CourseFactory.create()
-        CourseModeFactory.create(course_id=self.course.id, min_price=50)
+        CourseModeFactory.create(
+            course_id=self.course.id,
+            min_price=50,
+            mode_slug=CourseMode.DEFAULT_SHOPPINGCART_MODE_SLUG
+        )
 
         self.instructor = InstructorFactory(course_key=self.course.id)
         self.student1 = UserFactory()
@@ -1611,12 +1626,18 @@ class TestCertificateGeneration(InstructorTaskModuleTestCase):
 
         current_task = Mock()
         current_task.update_state = Mock()
-        with self.assertNumQueries(125):
+        instructor_task = Mock()
+        instructor_task.task_input = json.dumps({'students': None})
+        with self.assertNumQueries(213):
             with patch('instructor_task.tasks_helper._get_current_task') as mock_current_task:
                 mock_current_task.return_value = current_task
                 with patch('capa.xqueue_interface.XQueueInterface.send_to_queue') as mock_queue:
                     mock_queue.return_value = (0, "Successfully queued")
-                    result = generate_students_certificates(None, None, self.course.id, None, 'certificates generated')
+                    with patch('instructor_task.models.InstructorTask.objects.get') as instructor_task_object:
+                        instructor_task_object.return_value = instructor_task
+                        result = generate_students_certificates(
+                            None, None, self.course.id, {}, 'certificates generated'
+                        )
         self.assertDictContainsSubset(
             {
                 'action_name': 'certificates generated',
@@ -1628,3 +1649,291 @@ class TestCertificateGeneration(InstructorTaskModuleTestCase):
             },
             result
         )
+
+    def test_certificate_regeneration_for_students(self):
+        """
+        Verify that certificates are regenerated for all eligible students enrolled in a course whose generated
+        certificate statuses lies in the list 'statuses_to_regenerate' given in task_input.
+        """
+        # create 10 students
+        students = [self.create_student(username='student_{}'.format(i), email='student_{}@example.com'.format(i))
+                    for i in xrange(1, 11)]
+
+        # mark 2 students to have certificates generated already
+        for student in students[:2]:
+            GeneratedCertificateFactory.create(
+                user=student,
+                course_id=self.course.id,
+                status=CertificateStatuses.downloadable,
+                mode='honor'
+            )
+
+        # mark 3 students to have certificates generated with status 'error'
+        for student in students[2:5]:
+            GeneratedCertificateFactory.create(
+                user=student,
+                course_id=self.course.id,
+                status=CertificateStatuses.error,
+                mode='honor'
+            )
+
+        # mark 6th students to have certificates generated with status 'deleted'
+        for student in students[5:6]:
+            GeneratedCertificateFactory.create(
+                user=student,
+                course_id=self.course.id,
+                status=CertificateStatuses.deleted,
+                mode='honor'
+            )
+
+        # white-list 7 students
+        for student in students[:7]:
+            CertificateWhitelistFactory.create(user=student, course_id=self.course.id, whitelist=True)
+
+        current_task = Mock()
+        current_task.update_state = Mock()
+
+        # Certificates should be regenerated for students having generated certificates with status
+        # 'downloadable' or 'error' which are total of 5 students in this test case
+        task_input = {'statuses_to_regenerate': [CertificateStatuses.downloadable, CertificateStatuses.error]}
+
+        with patch('instructor_task.tasks_helper._get_current_task') as mock_current_task:
+            mock_current_task.return_value = current_task
+            with patch('capa.xqueue_interface.XQueueInterface.send_to_queue') as mock_queue:
+                mock_queue.return_value = (0, "Successfully queued")
+                result = generate_students_certificates(
+                    None, None, self.course.id, task_input, 'certificates generated'
+                )
+
+        self.assertDictContainsSubset(
+            {
+                'action_name': 'certificates generated',
+                'total': 10,
+                'attempted': 5,
+                'succeeded': 5,
+                'failed': 0,
+                'skipped': 5
+            },
+            result
+        )
+
+    def test_certificate_regeneration_with_expected_failures(self):
+        """
+        Verify that certificates are regenerated for all eligible students enrolled in a course whose generated
+        certificate statuses lies in the list 'statuses_to_regenerate' given in task_input.
+        """
+        # Default grade for students
+        default_grade = '-1'
+
+        # create 10 students
+        students = [self.create_student(username='student_{}'.format(i), email='student_{}@example.com'.format(i))
+                    for i in xrange(1, 11)]
+
+        # mark 2 students to have certificates generated already
+        for student in students[:2]:
+            GeneratedCertificateFactory.create(
+                user=student,
+                course_id=self.course.id,
+                status=CertificateStatuses.downloadable,
+                mode='honor',
+                grade=default_grade
+            )
+
+        # mark 3 students to have certificates generated with status 'error'
+        for student in students[2:5]:
+            GeneratedCertificateFactory.create(
+                user=student,
+                course_id=self.course.id,
+                status=CertificateStatuses.error,
+                mode='honor',
+                grade=default_grade
+            )
+
+        # mark 6th students to have certificates generated with status 'deleted'
+        for student in students[5:6]:
+            GeneratedCertificateFactory.create(
+                user=student,
+                course_id=self.course.id,
+                status=CertificateStatuses.deleted,
+                mode='honor',
+                grade=default_grade
+            )
+
+        # mark rest of the 4 students with having generated certificates with status 'generating'
+        # These students are not added in white-list and they have not completed grades so certificate generation
+        # for these students should fail other than the one student that has been added to white-list
+        # so from these students 3 failures and 1 success
+        for student in students[6:]:
+            GeneratedCertificateFactory.create(
+                user=student,
+                course_id=self.course.id,
+                status=CertificateStatuses.generating,
+                mode='honor',
+                grade=default_grade
+            )
+
+        # white-list 7 students
+        for student in students[:7]:
+            CertificateWhitelistFactory.create(user=student, course_id=self.course.id, whitelist=True)
+
+        current_task = Mock()
+        current_task.update_state = Mock()
+
+        # Regenerated certificates for students having generated certificates with status
+        # 'deleted' or 'generating'
+        task_input = {'statuses_to_regenerate': [CertificateStatuses.deleted, CertificateStatuses.generating]}
+
+        with patch('instructor_task.tasks_helper._get_current_task') as mock_current_task:
+            mock_current_task.return_value = current_task
+            with patch('capa.xqueue_interface.XQueueInterface.send_to_queue') as mock_queue:
+                mock_queue.return_value = (0, "Successfully queued")
+                result = generate_students_certificates(
+                    None, None, self.course.id, task_input, 'certificates generated'
+                )
+
+        self.assertDictContainsSubset(
+            {
+                'action_name': 'certificates generated',
+                'total': 10,
+                'attempted': 5,
+                'succeeded': 2,
+                'failed': 3,
+                'skipped': 5
+            },
+            result
+        )
+        generated_certificates = GeneratedCertificate.eligible_certificates.filter(
+            user__in=students,
+            course_id=self.course.id,
+            mode='honor'
+        )
+        certificate_statuses = [generated_certificate.status for generated_certificate in generated_certificates]
+        certificate_grades = [generated_certificate.grade for generated_certificate in generated_certificates]
+
+        # Verify from results from database
+        # Certificates are being generated for 2 white-listed students that had statuses in 'deleted'' and 'generating'
+        self.assertEqual(certificate_statuses.count(CertificateStatuses.generating), 2)
+        # 5 students are skipped that had Certificate Status 'downloadable' and 'error'
+        self.assertEqual(certificate_statuses.count(CertificateStatuses.downloadable), 2)
+        self.assertEqual(certificate_statuses.count(CertificateStatuses.error), 3)
+
+        # grades will be '0.0' as students are either white-listed or ending in error
+        self.assertEqual(certificate_grades.count('0.0'), 5)
+        # grades will be '-1' for students that were skipped
+        self.assertEqual(certificate_grades.count(default_grade), 5)
+
+    def test_certificate_regeneration_with_existing_unavailable_status(self):
+        """
+        Verify that certificates are regenerated for all eligible students enrolled in a course whose generated
+        certificate status lies in the list 'statuses_to_regenerate' given in task_input. but the 'unavailable'
+        status is not touched if it is not in the 'statuses_to_regenerate' list.
+        """
+        # Default grade for students
+        default_grade = '-1'
+
+        # create 10 students
+        students = [self.create_student(username='student_{}'.format(i), email='student_{}@example.com'.format(i))
+                    for i in xrange(1, 11)]
+
+        # mark 2 students to have certificates generated already
+        for student in students[:2]:
+            GeneratedCertificateFactory.create(
+                user=student,
+                course_id=self.course.id,
+                status=CertificateStatuses.downloadable,
+                mode='honor',
+                grade=default_grade
+            )
+
+        # mark 3 students to have certificates generated with status 'error'
+        for student in students[2:5]:
+            GeneratedCertificateFactory.create(
+                user=student,
+                course_id=self.course.id,
+                status=CertificateStatuses.error,
+                mode='honor',
+                grade=default_grade
+            )
+
+        # mark 2 students to have generated certificates with status 'unavailable'
+        for student in students[5:7]:
+            GeneratedCertificateFactory.create(
+                user=student,
+                course_id=self.course.id,
+                status=CertificateStatuses.unavailable,
+                mode='honor',
+                grade=default_grade
+            )
+
+        # mark 3 students to have generated certificates with status 'generating'
+        for student in students[7:]:
+            GeneratedCertificateFactory.create(
+                user=student,
+                course_id=self.course.id,
+                status=CertificateStatuses.generating,
+                mode='honor',
+                grade=default_grade
+            )
+
+        # white-list all students
+        for student in students[:]:
+            CertificateWhitelistFactory.create(user=student, course_id=self.course.id, whitelist=True)
+
+        current_task = Mock()
+        current_task.update_state = Mock()
+
+        # Regenerated certificates for students having generated certificates with status
+        # 'downloadable', 'error' or 'generating'
+        task_input = {
+            'statuses_to_regenerate': [
+                CertificateStatuses.downloadable,
+                CertificateStatuses.error,
+                CertificateStatuses.generating
+            ]
+        }
+
+        with patch('instructor_task.tasks_helper._get_current_task') as mock_current_task:
+            mock_current_task.return_value = current_task
+            with patch('capa.xqueue_interface.XQueueInterface.send_to_queue') as mock_queue:
+                mock_queue.return_value = (0, "Successfully queued")
+                result = generate_students_certificates(
+                    None, None, self.course.id, task_input, 'certificates generated'
+                )
+
+        self.assertDictContainsSubset(
+            {
+                'action_name': 'certificates generated',
+                'total': 10,
+                'attempted': 8,
+                'succeeded': 8,
+                'failed': 0,
+                'skipped': 2
+            },
+            result
+        )
+
+        generated_certificates = GeneratedCertificate.eligible_certificates.filter(
+            user__in=students,
+            course_id=self.course.id,
+            mode='honor'
+        )
+        certificate_statuses = [generated_certificate.status for generated_certificate in generated_certificates]
+        certificate_grades = [generated_certificate.grade for generated_certificate in generated_certificates]
+
+        # Verify from results from database
+        # Certificates are being generated for 8 students that had statuses in 'downloadable', 'error' and 'generating'
+        self.assertEqual(certificate_statuses.count(CertificateStatuses.generating), 8)
+        # 2 students are skipped that had Certificate Status 'unavailable'
+        self.assertEqual(certificate_statuses.count(CertificateStatuses.unavailable), 2)
+
+        # grades will be '0.0' as students are white-listed and have not completed any tasks
+        self.assertEqual(certificate_grades.count('0.0'), 8)
+        # grades will be '-1' for students that have not been processed
+        self.assertEqual(certificate_grades.count(default_grade), 2)
+
+        # Verify that students with status 'unavailable were skipped
+        unavailable_certificates = \
+            [cert for cert in generated_certificates
+             if cert.status == CertificateStatuses.unavailable and cert.grade == default_grade]
+
+        self.assertEquals(len(unavailable_certificates), 2)

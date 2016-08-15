@@ -22,6 +22,7 @@ from xmodule.exceptions import NotFoundError
 from student.models import CourseEnrollment
 from student.roles import CourseInstructorRole, CourseStaffRole
 from student.tests.factories import UserFactory
+from course_modes.tests.factories import CourseModeFactory
 from contentstore.views.certificates import CertificateManager
 from django.test.utils import override_settings
 from contentstore.utils import get_lms_link_for_certificate_web_view
@@ -230,7 +231,7 @@ class CertificatesListHandlerTestCase(EventTestMixin, CourseTestCase, Certificat
         self.assertEqual(response.status_code, 201)
         self.assertIn("Location", response)
         content = json.loads(response.content)
-        certificate_id = self._remove_ids(content)  # pylint: disable=unused-variable
+        certificate_id = self._remove_ids(content)
         self.assertEqual(content, expected)
         self.assert_event_emitted(
             'edx.certificate.configuration.created',
@@ -325,6 +326,19 @@ class CertificatesListHandlerTestCase(EventTestMixin, CourseTestCase, Certificat
         )
         self.assertEqual(response.status_code, 403)
         self.assertIn("error", response.content)
+
+    def test_audit_course_mode_is_skipped(self):
+        """
+        Tests audit course mode is skipped when rendering certificates page.
+        """
+        CourseModeFactory.create(course_id=self.course.id)
+        CourseModeFactory.create(course_id=self.course.id, mode_slug='verified')
+        response = self.client.get_html(
+            self._url(),
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'verified')
+        self.assertNotContains(response, 'audit')
 
     def test_assign_unique_identifier_to_certificates(self):
         """

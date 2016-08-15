@@ -10,7 +10,7 @@ else:
 <%namespace name='static' file='static_content.html'/>
 <%!
   from django.utils.translation import ugettext as _
-  import json
+  from openedx.core.lib.js_utils import escape_json_dumps
 %>
 <%block name="title">
 %if library:
@@ -239,6 +239,6 @@ else:
 
 <%block name="requirejs">
   require(["js/factories/import"], function(ImportFactory) {
-      ImportFactory("${import_status_url}", ${json.dumps(library)});
+      ImportFactory("${import_status_url}", ${escape_json_dumps(library) | n});
   });
 </%block>

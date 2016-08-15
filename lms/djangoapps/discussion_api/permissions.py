@@ -56,14 +56,25 @@ def get_editable_fields(cc_content, context):
     """
     Return the set of fields that the requester can edit on the given content
     """
+
+    # For closed thread:
+    # no edits, except 'abuse_flagged' and 'read' are allowed for thread
+    # no edits, except 'abuse_flagged' is allowed for comment
+    ret = {"abuse_flagged"}
+    if cc_content["type"] == "thread" and cc_content["closed"]:
+        ret |= {"read"}
+        return ret
+    if cc_content["type"] == "comment" and context["thread"]["closed"]:
+        return ret
+
     # Shared fields
-    ret = {"abuse_flagged", "voted"}
+    ret |= {"voted"}
     if _is_author_or_privileged(cc_content, context):
         ret |= {"raw_body"}
 
     # Thread fields
     if cc_content["type"] == "thread":
-        ret |= {"following"}
+        ret |= {"following", "read"}
         if _is_author_or_privileged(cc_content, context):
             ret |= {"topic_id", "type", "title"}
         if context["is_requester_privileged"] and context["course"].is_cohorted:

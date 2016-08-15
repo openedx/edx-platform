@@ -8,7 +8,7 @@ import ddt
 import json
 import itertools
 import unittest
-from datetime import datetime
+from datetime import datetime, timedelta
 from HTMLParser import HTMLParser
 from nose.plugins.attrib import attr
 
@@ -32,6 +32,7 @@ from certificates import api as certs_api
 from certificates.models import CertificateStatuses, CertificateGenerationConfiguration
 from certificates.tests.factories import GeneratedCertificateFactory
 from course_modes.models import CourseMode
+from course_modes.tests.factories import CourseModeFactory
 from courseware.model_data import set_score
 from courseware.testutils import RenderXBlockTestMixin
 from courseware.tests.factories import StudentModuleFactory
@@ -183,14 +184,15 @@ class ViewsTestCase(ModuleStoreTestCase):
     """
     def setUp(self):
         super(ViewsTestCase, self).setUp()
-        self.course = CourseFactory.create()
+        self.course = CourseFactory.create(display_name=u'teꜱᴛ course')
         self.chapter = ItemFactory.create(category='chapter', parent_location=self.course.location)
         self.section = ItemFactory.create(category='sequential', parent_location=self.chapter.location, due=datetime(2013, 9, 18, 11, 30, 00))
         self.vertical = ItemFactory.create(category='vertical', parent_location=self.section.location)
         self.component = ItemFactory.create(category='problem', parent_location=self.vertical.location)
 
         self.course_key = self.course.id
-        self.user = UserFactory(username='dummy', password='123456', email='test@mit.edu')
+        self.password = '123456'
+        self.user = UserFactory(username='dummy', password=self.password, email='test@mit.edu')
         self.date = datetime(2013, 1, 22, tzinfo=UTC)
         self.enrollment = CourseEnrollment.enroll(self.user, self.course_key)
         self.enrollment.created = self.date
@@ -270,7 +272,7 @@ class ViewsTestCase(ModuleStoreTestCase):
             self.section.location.name,
             'f'
         ])
-        self.client.login(username=self.user.username, password="123456")
+        self.client.login(username=self.user.username, password=self.password)
         response = self.client.get(request_url)
         self.assertEqual(response.status_code, 404)
 
@@ -283,7 +285,7 @@ class ViewsTestCase(ModuleStoreTestCase):
             self.section.location.name,
             '1'
         ]
-        self.client.login(username=self.user.username, password="123456")
+        self.client.login(username=self.user.username, password=self.password)
         for idx, val in enumerate(url_parts):
             url_parts_copy = url_parts[:]
             url_parts_copy[idx] = val + u'χ'
@@ -362,28 +364,6 @@ class ViewsTestCase(ModuleStoreTestCase):
         else:
             self.assertNotContains(result, "Classes End")
 
-    def test_chat_settings(self):
-        mock_user = MagicMock()
-        mock_user.username = "johndoe"
-
-        mock_course = MagicMock()
-        mock_course.id = "a/b/c"
-
-        # Stub this out in the case that it's not in the settings
-        domain = "jabber.edx.org"
-        settings.JABBER_DOMAIN = domain
-
-        chat_settings = views.chat_settings(mock_course, mock_user)
-
-        # Test the proper format of all chat settings
-        self.assertEqual(chat_settings['domain'], domain)
-        self.assertEqual(chat_settings['room'], "a-b-c_class")
-        self.assertEqual(chat_settings['username'], "johndoe@%s" % domain)
-
-        # TODO: this needs to be changed once we figure out how to
-        #       generate/store a real password.
-        self.assertEqual(chat_settings['password'], "johndoe@%s" % domain)
-
     def test_submission_history_accepts_valid_ids(self):
         # log into a staff account
         admin = AdminFactory()
@@ -454,7 +434,7 @@ class ViewsTestCase(ModuleStoreTestCase):
             'location': unicode(usage_key),
         })
         response = self.client.get(url)
-        response_content = HTMLParser().unescape(response.content)
+        response_content = HTMLParser().unescape(response.content.decode('utf-8'))
 
         # We have update the state 4 times: twice to change content, and twice
         # to set the scores. We'll check that the identifying content from each is
@@ -480,6 +460,138 @@ class ViewsTestCase(ModuleStoreTestCase):
             # Verify that the email opt-in checkbox does not appear
             self.assertNotContains(response, checkbox_html, html=True)
 
+    def test_financial_assistance_page(self):
+        self.client.login(username=self.user.username, password=self.password)
+        url = reverse('financial_assistance')
+        response = self.client.get(url)
+        # This is a static page, so just assert that it is returned correctly
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('Financial Assistance Application', response.content)
+
+    def test_financial_assistance_form(self):
+        non_verified_course = CourseFactory.create().id
+        verified_course_verified_track = CourseFactory.create().id
+        verified_course_audit_track = CourseFactory.create().id
+        verified_course_deadline_passed = CourseFactory.create().id
+        unenrolled_course = CourseFactory.create().id
+
+        enrollments = (
+            (non_verified_course, CourseMode.AUDIT, None),
+            (verified_course_verified_track, CourseMode.VERIFIED, None),
+            (verified_course_audit_track, CourseMode.AUDIT, None),
+            (verified_course_deadline_passed, CourseMode.AUDIT, datetime.now(UTC) - timedelta(days=1))
+        )
+        for course, mode, expiration in enrollments:
+            CourseModeFactory(mode_slug=CourseMode.AUDIT, course_id=course)
+            if course != non_verified_course:
+                CourseModeFactory(mode_slug=CourseMode.VERIFIED, course_id=course, expiration_datetime=expiration)
+            CourseEnrollmentFactory(course_id=course, user=self.user, mode=mode)
+
+        self.client.login(username=self.user.username, password=self.password)
+        url = reverse('financial_assistance_form')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+        # Ensure that the user can only apply for assistance in
+        # courses which have a verified mode which hasn't expired yet,
+        # where the user is not already enrolled in verified mode
+        self.assertIn(str(verified_course_audit_track), response.content)
+        for course in (
+                non_verified_course,
+                verified_course_verified_track,
+                verified_course_deadline_passed,
+                unenrolled_course
+        ):
+            self.assertNotIn(str(course), response.content)
+
+    def _submit_financial_assistance_form(self, data):
+        """Submit a financial assistance request."""
+        self.client.login(username=self.user.username, password=self.password)
+        url = reverse('submit_financial_assistance_request')
+        return self.client.post(url, json.dumps(data), content_type='application/json')
+
+    @patch.object(views, '_record_feedback_in_zendesk')
+    def test_submit_financial_assistance_request(self, mock_record_feedback):
+        username = self.user.username
+        course = unicode(self.course_key)
+        legal_name = 'Jesse Pinkman'
+        country = 'United States'
+        income = '1234567890'
+        reason_for_applying = "It's just basic chemistry, yo."
+        goals = "I don't know if it even matters, but... work with my hands, I guess."
+        effort = "I'm done, okay? You just give me my money, and you and I, we're done."
+        data = {
+            'username': username,
+            'course': course,
+            'name': legal_name,
+            'email': self.user.email,
+            'country': country,
+            'income': income,
+            'reason_for_applying': reason_for_applying,
+            'goals': goals,
+            'effort': effort,
+            'mktg-permission': False,
+        }
+        response = self._submit_financial_assistance_form(data)
+        self.assertEqual(response.status_code, 204)
+
+        __, ___, ticket_subject, ticket_body, tags, additional_info = mock_record_feedback.call_args[0]
+        mocked_kwargs = mock_record_feedback.call_args[1]
+        group_name = mocked_kwargs['group_name']
+        require_update = mocked_kwargs['require_update']
+        private_comment = '\n'.join(additional_info.values())
+        for info in (country, income, reason_for_applying, goals, effort, username, legal_name, course):
+            self.assertIn(info, private_comment)
+
+        self.assertEqual(additional_info['Allowed for marketing purposes'], 'No')
+
+        self.assertEqual(
+            ticket_subject,
+            u'Financial assistance request for learner {username} in course {course}'.format(
+                username=username,
+                course=self.course.display_name
+            )
+        )
+        self.assertDictContainsSubset({'course_id': course}, tags)
+        self.assertIn('Client IP', additional_info)
+        self.assertEqual(group_name, 'Financial Assistance')
+        self.assertTrue(require_update)
+
+    @patch.object(views, '_record_feedback_in_zendesk', return_value=False)
+    def test_zendesk_submission_failed(self, _mock_record_feedback):
+        response = self._submit_financial_assistance_form({
+            'username': self.user.username,
+            'course': unicode(self.course.id),
+            'name': '',
+            'email': '',
+            'country': '',
+            'income': '',
+            'reason_for_applying': '',
+            'goals': '',
+            'effort': '',
+            'mktg-permission': False,
+        })
+        self.assertEqual(response.status_code, 500)
+
+    @ddt.data(
+        ({}, 400),
+        ({'username': 'wwhite'}, 403),
+        ({'username': 'dummy', 'course': 'bad course ID'}, 400)
+    )
+    @ddt.unpack
+    def test_submit_financial_assistance_errors(self, data, status):
+        response = self._submit_financial_assistance_form(data)
+        self.assertEqual(response.status_code, status)
+
+    def test_financial_assistance_login_required(self):
+        for url in (
+                reverse('financial_assistance'),
+                reverse('financial_assistance_form'),
+                reverse('submit_financial_assistance_request')
+        ):
+            response = self.client.get(url)
+            self.assertRedirects(response, reverse('signin_user') + '?next=' + url)
+
 
 @attr('shard_1')
 # setting TIME_ZONE_DISPLAYED_FOR_DEADLINES explicitly
@@ -490,7 +602,7 @@ class BaseDueDateTests(ModuleStoreTestCase):
     """
     __test__ = False
 
-    def get_text(self, course):  # pylint: disable=unused-argument
+    def get_text(self, course):
         """Return the rendered text for the page to be verified"""
         raise NotImplementedError
 
@@ -682,7 +794,6 @@ class ProgressPageTests(ModuleStoreTestCase):
             **options
         )
 
-        # pylint: disable=attribute-defined-outside-init
         self.course = modulestore().get_course(course.id)
         CourseEnrollmentFactory(user=self.user, course_id=self.course.id)
 
@@ -731,7 +842,7 @@ class ProgressPageTests(ModuleStoreTestCase):
             )
 
         # Enroll student into course
-        CourseEnrollment.enroll(self.user, self.course.id, mode='honor')
+        CourseEnrollment.enroll(self.user, self.course.id)
         resp = views.progress(self.request, course_id=self.course.id.to_deprecated_string(), student_id=self.user.id)
         # Assert that valid 'student_id' returns 200 status
         self.assertEqual(resp.status_code, 200)
@@ -799,10 +910,7 @@ class ProgressPageTests(ModuleStoreTestCase):
         self.assertContains(resp, u"View Certificate")
 
         self.assertContains(resp, u"You can keep working for a higher grade")
-        cert_url = certs_api.get_certificate_url(
-            user_id=self.user.id,
-            course_id=self.course.id
-        )
+        cert_url = certs_api.get_certificate_url(course_id=self.course.id, uuid=certificate.verify_uuid)
         self.assertContains(resp, cert_url)
 
         # when course certificate is not active
@@ -840,11 +948,11 @@ class ProgressPageTests(ModuleStoreTestCase):
         self.assertContains(resp, u"Download Your Certificate")
 
     @ddt.data(
-        *itertools.product(((18, 4, True), (18, 4, False)), (True, False))
+        *itertools.product(((38, 4, True), (38, 4, False)), (True, False))
     )
     @ddt.unpack
     def test_query_counts(self, (sql_calls, mongo_calls, self_paced), self_paced_enabled):
-        """Test that query counts remain the same for self-paced and instructor-led courses."""
+        """Test that query counts remain the same for self-paced and instructor-paced courses."""
         SelfPacedConfiguration(enabled=self_paced_enabled).save()
         self.setup_course(self_paced=self_paced)
         with self.assertNumQueries(sql_calls), check_mongo_calls(mongo_calls):

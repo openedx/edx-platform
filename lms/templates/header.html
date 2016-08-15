@@ -1,3 +1,4 @@
+## mako
 <%namespace name='static' file='static_content.html'/>
 <%!
 from microsite_configuration import microsite
@@ -5,12 +6,7 @@ from microsite_configuration import microsite
 <%
 theme_enabled = settings.FEATURES.get("USE_CUSTOM_THEME", False)
 is_microsite = microsite.is_request_in_microsite()
-style_overrides_file = microsite.get_value('css_overrides_file')
 %>
-
-% if style_overrides_file:
-  <link rel="stylesheet" type="text/css" href="${static.url(style_overrides_file)}" />
-% endif
 
 % if theme_enabled and not is_microsite:
   <%include file="theme-header.html" />

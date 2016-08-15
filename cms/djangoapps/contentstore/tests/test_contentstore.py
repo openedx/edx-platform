@@ -698,7 +698,7 @@ class MiscCourseTests(ContentStoreTestCase):
         self.check_components_on_page(
             ADVANCED_COMPONENT_TYPES,
             ['Word cloud', 'Annotation', 'Text Annotation', 'Video Annotation', 'Image Annotation',
-             'Open Response Assessment', 'Peer Grading Interface', 'split_test'],
+             'split_test'],
         )
 
     @ddt.data('/Fake/asset/displayname', '\\Fake\\asset\\displayname')
@@ -1510,7 +1510,6 @@ class ContentStoreTest(ContentStoreTestCase, XssTestMixin):
         test_get_html('export_handler')
         test_get_html('course_team_handler')
         test_get_html('course_info_handler')
-        test_get_html('checklists_handler')
         test_get_html('assets_handler')
         test_get_html('tabs_handler')
         test_get_html('settings_handler')
@@ -1694,7 +1693,6 @@ class ContentStoreTest(ContentStoreTestCase, XssTestMixin):
         self.assertEqual(course.textbooks, [])
         self.assertIn('GRADER', course.grading_policy)
         self.assertIn('GRADE_CUTOFFS', course.grading_policy)
-        self.assertGreaterEqual(len(course.checklists), 4)
 
         # by fetching
         fetched_course = self.store.get_item(course.location)
@@ -1703,8 +1701,6 @@ class ContentStoreTest(ContentStoreTestCase, XssTestMixin):
         self.assertEqual(course.start, fetched_course.start)
         self.assertEqual(fetched_course.start, fetched_item.start)
         self.assertEqual(course.textbooks, fetched_course.textbooks)
-        # is this test too strict? i.e., it requires the dicts to be ==
-        self.assertEqual(course.checklists, fetched_course.checklists)
 
     def test_image_import(self):
         """Test backwards compatibilty of course image."""

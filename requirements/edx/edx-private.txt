@@ -7,6 +7,9 @@
 # Oppia XBlock
 -e git+https://github.com/oppia/xblock.git@9f6b95b7eb7dbabb96b77198a3202604f96adf65#egg=oppia-xblock
 
+# Microsoft's Office Mix XBlock:
+-e git+https://github.com/OfficeDev/xblock-officemix.git@3f876b5f0267b017812620239533a29c7d562d24#egg=officemix
+
 # This repository contains schoolyourself-xblock, which is used in
 # edX's "AlgebraX" and "GeometryX" courses.
 -e git+https://github.com/schoolyourself/schoolyourself-xblock.git@5e4d37716e3e72640e832e961f7cc0d38d4ec47b#egg=schoolyourself-xblock
@@ -24,3 +27,7 @@
 
 # Peer instruction xblock - prototype (from UBC; not for use on edx.org yet)
 ubcpi-xblock==0.4.4
+
+# Vector Drawing and ActiveTable XBlocks (Davidson)
+-e git+https://github.com/open-craft/xblock-vectordraw.git@ded76fc8f6c99ba4949ed57a7bf62a1f12e44683#egg=xblock-vectordraw
+-e git+https://github.com/open-craft/xblock-activetable.git@1786a2c8fc06ca3ecfac1972464048982bd486ff#egg=xblock-activetable

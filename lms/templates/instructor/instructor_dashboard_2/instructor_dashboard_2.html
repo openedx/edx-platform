@@ -66,7 +66,7 @@ from django.core.urlresolvers import reverse
 
 ## Include Underscore templates
 <%block name="header_extras">
-% for template_name in ["cohorts", "enrollment-code-lookup-links", "cohort-editor", "cohort-group-header", "cohort-selector", "cohort-form", "notification", "cohort-state", "cohort-discussions-inline", "cohort-discussions-course-wide", "cohort-discussions-category","cohort-discussions-subcategory"]:
+% for template_name in ["cohorts", "enrollment-code-lookup-links", "cohort-editor", "cohort-group-header", "cohort-selector", "cohort-form", "notification", "cohort-state", "cohort-discussions-inline", "cohort-discussions-course-wide", "cohort-discussions-category","cohort-discussions-subcategory","certificate-white-list","certificate-white-list-editor","certificate-bulk-white-list"]:
 <script type="text/template" id="${template_name}-tpl">
   <%static:include path="instructor/instructor_dashboard_2/${template_name}.underscore" />
 </script>

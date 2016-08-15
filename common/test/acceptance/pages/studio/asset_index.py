@@ -38,7 +38,11 @@ class AssetIndexPage(CoursePage):
 
     @wait_for_js
     def is_browser_on_page(self):
-        return self.q(css='body.view-uploads').present
+        return all([
+            self.q(css='body.view-uploads').present,
+            self.q(css='.page-header').present,
+            not self.q(css='div.ui-loading').visible,
+        ])
 
     @wait_for_js
     def type_filter_on_page(self):

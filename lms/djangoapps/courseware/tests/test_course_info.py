@@ -126,7 +126,7 @@ class SelfPacedCourseInfoTestCase(LoginEnrollmentTestCase, SharedModuleStoreTest
 
     def setUp(self):
         super(SelfPacedCourseInfoTestCase, self).setUp()
-        self.instructor_led_course = CourseFactory.create(self_paced=False)
+        self.instructor_paced_course = CourseFactory.create(self_paced=False)
         self.self_paced_course = CourseFactory.create(self_paced=True)
         self.setup_user()
 
@@ -141,8 +141,8 @@ class SelfPacedCourseInfoTestCase(LoginEnrollmentTestCase, SharedModuleStoreTest
                 resp = self.client.get(url)
         self.assertEqual(resp.status_code, 200)
 
-    def test_num_queries_instructor_led(self):
-        self.fetch_course_info_with_queries(self.instructor_led_course, 14, 4)
+    def test_num_queries_instructor_paced(self):
+        self.fetch_course_info_with_queries(self.instructor_paced_course, 17, 4)
 
     def test_num_queries_self_paced(self):
-        self.fetch_course_info_with_queries(self.self_paced_course, 14, 4)
+        self.fetch_course_info_with_queries(self.self_paced_course, 17, 4)

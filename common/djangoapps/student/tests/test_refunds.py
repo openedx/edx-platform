@@ -148,7 +148,7 @@ class RefundableTest(SharedModuleStoreTestCase):
         )
 
         self.enrollment.course_overview.start = course_start
-        self.enrollment.attributes.add(CourseEnrollmentAttribute(  # pylint: disable=no-member
+        self.enrollment.attributes.add(CourseEnrollmentAttribute(
             enrollment=self.enrollment,
             namespace='order',
             name='order_number',

@@ -34,7 +34,11 @@ class TestMicrosites(ModuleStoreTestCase, LoginEnrollmentTestCase):
         # IMPORTANT: For these tests to work, this domain must be defined via
         # DNS configuration (either local or published)
 
-        self.course = CourseFactory.create(display_name='Robot_Super_Course', org='TestMicrositeX')
+        self.course = CourseFactory.create(
+            display_name='Robot_Super_Course',
+            org='TestMicrositeX',
+            emit_signals=True,
+        )
         self.chapter0 = ItemFactory.create(parent_location=self.course.location,
                                            display_name='Overview')
         self.chapter9 = ItemFactory.create(parent_location=self.course.location,
@@ -44,13 +48,18 @@ class TestMicrosites(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.section9 = ItemFactory.create(parent_location=self.chapter9.location,
                                            display_name='factory_section')
 
-        self.course_outside_microsite = CourseFactory.create(display_name='Robot_Course_Outside_Microsite', org='FooX')
+        self.course_outside_microsite = CourseFactory.create(
+            display_name='Robot_Course_Outside_Microsite',
+            org='FooX',
+            emit_signals=True,
+        )
 
         # have a course which explicitly sets visibility in catalog to False
         self.course_hidden_visibility = CourseFactory.create(
             display_name='Hidden_course',
             org='TestMicrositeX',
             catalog_visibility=CATALOG_VISIBILITY_NONE,
+            emit_signals=True,
         )
 
         # have a course which explicitly sets visibility in catalog and about to true
@@ -59,6 +68,7 @@ class TestMicrosites(ModuleStoreTestCase, LoginEnrollmentTestCase):
             org='TestMicrositeX',
             course="foo",
             catalog_visibility=CATALOG_VISIBILITY_CATALOG_AND_ABOUT,
+            emit_signals=True,
         )
 
     def setup_users(self):
@@ -201,8 +211,8 @@ class TestMicrosites(ModuleStoreTestCase, LoginEnrollmentTestCase):
         """
         course_mode = CourseMode(
             course_id=self.course_with_visibility.id,
-            mode_slug="honor",
-            mode_display_name="honor cert",
+            mode_slug=CourseMode.DEFAULT_MODE_SLUG,
+            mode_display_name=CourseMode.DEFAULT_MODE_SLUG,
             min_price=10,
         )
         course_mode.save()

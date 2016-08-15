@@ -52,8 +52,8 @@ class Command(TrackedCommand):
                     help="If True, try to transfer certificate items to the new course.")
     )
 
-    @transaction.commit_manually
-    def handle(self, *args, **options):  # pylint: disable=unused-argument
+    @transaction.atomic
+    def handle(self, *args, **options):
         source_key = CourseKey.from_string(options.get('source_course', ''))
         dest_keys = []
         for course_key in options.get('dest_course_list', '').split(','):
@@ -72,7 +72,7 @@ class Command(TrackedCommand):
         )
 
         for user in source_students:
-            with transaction.commit_on_success():
+            with transaction.atomic():
                 print "Moving {}.".format(user.username)
                 # Find the old enrollment.
                 enrollment = CourseEnrollment.objects.get(

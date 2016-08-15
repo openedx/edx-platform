@@ -42,9 +42,9 @@ class SelfPacedDateOverrideTest(ModuleStoreTestCase):
         inject_field_overrides((course, section), course, UserFactory.create())
         return (course, section)
 
-    def test_instructor_led(self):
-        __, il_section = self.setup_course("Instructor Led Course", False)
-        self.assertEqual(self.due_date, il_section.due)
+    def test_instructor_paced(self):
+        __, ip_section = self.setup_course("Instructor Paced Course", False)
+        self.assertEqual(self.due_date, ip_section.due)
 
     def test_self_paced(self):
         __, sp_section = self.setup_course("Self-Paced Course", True)

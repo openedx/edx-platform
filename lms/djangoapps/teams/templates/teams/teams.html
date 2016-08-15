@@ -1,7 +1,7 @@
 ## mako
 <%! import json %>
 <%! from django.utils.translation import ugettext as _ %>
-<%! from openedx.core.lib.json_utils import EscapedEdxJSONEncoder %>
+<%! from openedx.core.lib.js_utils import escape_json_dumps %>
 <%namespace name='static' file='/static_content.html'/>
 <%inherit file="/main.html" />
 
@@ -34,8 +34,8 @@
 <%static:require_module module_name="teams/js/teams_tab_factory" class_name="TeamsTabFactory">
     TeamsTabFactory({
         courseID: '${ unicode(course.id) }',
-        topics: ${ json.dumps(topics, cls=EscapedEdxJSONEncoder) },
-        userInfo: ${ json.dumps(user_info, cls=EscapedEdxJSONEncoder) },
+        topics: ${ escape_json_dumps(topics) | n },
+        userInfo: ${ escape_json_dumps(user_info) | n },
         topicUrl: '${ topic_url }',
         topicsUrl: '${ topics_url }',
         teamsUrl: '${ teams_url }',
@@ -44,8 +44,8 @@
         teamMembershipDetailUrl: '${ team_membership_detail_url }',
         myTeamsUrl: '${ my_teams_url }',
         maxTeamSize: ${ course.teams_max_size },
-        languages: ${ json.dumps(languages, cls=EscapedEdxJSONEncoder) },
-        countries: ${ json.dumps(countries, cls=EscapedEdxJSONEncoder) },
+        languages: ${ escape_json_dumps(languages) | n },
+        countries: ${ escape_json_dumps(countries) | n },
         teamsBaseUrl: '${ teams_base_url }'
     });
 </%static:require_module>

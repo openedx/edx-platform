@@ -101,17 +101,17 @@ var DetailsView = ValidatingView.extend({
         this.$('#' + this.fieldToSelectorMap['entrance_exam_minimum_score_pct']).val(this.model.get('entrance_exam_minimum_score_pct'));
 
         var selfPacedButton = this.$('#course-pace-self-paced'),
-            instructorLedButton = this.$('#course-pace-instructor-led'),
+            instructorPacedButton = this.$('#course-pace-instructor-paced'),
             paceToggleTip = this.$('#course-pace-toggle-tip');
-        (this.model.get('self_paced') ? selfPacedButton : instructorLedButton).attr('checked', true);
+        (this.model.get('self_paced') ? selfPacedButton : instructorPacedButton).attr('checked', true);
         if (this.model.canTogglePace()) {
             selfPacedButton.removeAttr('disabled');
-            instructorLedButton.removeAttr('disabled');
+            instructorPacedButton.removeAttr('disabled');
             paceToggleTip.text('');
         }
         else {
             selfPacedButton.attr('disabled', true);
-            instructorLedButton.attr('disabled', true);
+            instructorPacedButton.attr('disabled', true);
             paceToggleTip.text(gettext('Course pacing cannot be changed once a course has started.'));
         }
 
@@ -254,7 +254,7 @@ var DetailsView = ValidatingView.extend({
             break;
         case 'course-pace-self-paced':
             // Fallthrough to handle both radio buttons
-        case 'course-pace-instructor-led':
+        case 'course-pace-instructor-paced':
             this.model.set('self_paced', JSON.parse(event.currentTarget.value));
             break;
         default: // Everything else is handled by datepickers and CodeMirror.

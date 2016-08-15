@@ -69,7 +69,7 @@ class DeveloperErrorViewMixin(object):
         if isinstance(exc, APIException):
             return self.make_error_response(exc.status_code, exc.detail)
         elif isinstance(exc, Http404):
-            return self.make_error_response(404, "Not found.")
+            return self.make_error_response(404, exc.message or "Not found.")
         elif isinstance(exc, ValidationError):
             return self.make_validation_error_response(exc)
         else:
@@ -185,7 +185,7 @@ class RetrievePatchAPIView(RetrieveModelMixin, UpdateModelMixin, GenericAPIView)
         """Validates a JSON merge patch. Captures DRF serializer errors and converts them to edX's standard format."""
         field_errors = {}
         serializer = self.get_serializer(self.get_object_or_none(), data=patch, partial=True)
-        fields = self.get_serializer().get_fields()  # pylint: disable=maybe-no-member
+        fields = self.get_serializer().get_fields()
 
         for key in patch:
             if key in fields and fields[key].read_only:

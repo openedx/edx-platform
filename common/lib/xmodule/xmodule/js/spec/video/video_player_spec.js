@@ -745,11 +745,6 @@ function (VideoPlayer) {
                     $('.add-fullscreen').click();
                 });
 
-                it('replace the full screen button tooltip', function () {
-                    expect($('.add-fullscreen'))
-                        .toHaveAttr('title', 'Exit full browser');
-                });
-
                 it('add the video-fullscreen class', function () {
                     expect(state.el).toHaveClass('video-fullscreen');
                 });
@@ -771,11 +766,6 @@ function (VideoPlayer) {
                     state.videoFullScreen.isFullScreen = true;
                     state.videoFullScreen.fullScreenEl.attr('title', 'Exit-fullscreen');
                     $('.add-fullscreen').click();
-                });
-
-                it('replace the full screen button tooltip', function () {
-                    expect($('.add-fullscreen'))
-                        .toHaveAttr('title', 'Fill browser');
                 });
 
                 it('remove the video-fullscreen class', function () {

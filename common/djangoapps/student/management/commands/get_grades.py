@@ -97,7 +97,9 @@ class Command(BaseCommand):
         cert_grades = {
             cert.user.username: cert.grade
             for cert in list(
-                GeneratedCertificate.objects.filter(course_id=course_key).prefetch_related('user')
+                GeneratedCertificate.objects.filter(  # pylint: disable=no-member
+                    course_id=course_key
+                ).prefetch_related('user')
             )
         }
         print "Grading students"

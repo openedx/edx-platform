@@ -31,7 +31,7 @@ var StaffDebug = (function (){
         'delete_module': action.delete_module
     };
     $.ajax({
-        type: "GET",
+        type: "POST",
         url: get_url(action.method),
         data: pdata,
         success: function(data){

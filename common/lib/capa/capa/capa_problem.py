@@ -574,15 +574,6 @@ class LoncapaProblem(object):
             log.warning("Could not find matching input for id: %s", input_id)
             return {}
 
-    @property
-    def has_multi_device_support(self):
-        """
-        Returns whether this capa problem has multi-device support.
-        """
-        return all(
-            responder.multi_device_support for responder in self.responders.values()
-        )
-
     # ======= Private Methods Below ========
 
     def _process_includes(self):

@@ -30,7 +30,6 @@
 @import 'course/modules/student-notes'; // student notes
 @import 'course/modules/calculator'; // calculator utility
 @import 'course/modules/timer'; // timer
-@import 'course/modules/chat'; // chat utility
 
 // course - wiki
 @import "course/wiki/basic-html";
@@ -46,9 +45,6 @@
 @import "course/profile";
 @import "course/gradebook";
 @import "course/tabs";
-@import "course/staff_grading";
-@import "course/rubric";
-@import "course/open_ended_grading";
 @import "course/student-notes";
 @import "views/teams";
 

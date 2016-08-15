@@ -124,14 +124,20 @@ class Model(object):
     def after_save(cls, instance):
         pass
 
-    def save(self):
+    def save(self, params=None):
+        """
+        Invokes Forum's POST/PUT service to create/update thread
+        """
         self.before_save(self)
         if self.id:   # if we have id already, treat this as an update
+            request_params = self.updatable_attributes()
+            if params:
+                request_params.update(params)
             url = self.url(action='put', params=self.attributes)
             response = perform_request(
                 'put',
                 url,
-                self.updatable_attributes(),
+                request_params,
                 metric_tags=self._metric_tags,
                 metric_action='model.update'
             )

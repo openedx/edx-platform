@@ -2,7 +2,7 @@
 # pylint: disable=missing-docstring
 
 from lettuce import world
-from nose.tools import assert_equal, assert_in  # pylint: disable=no-name-in-module
+from nose.tools import assert_equal, assert_in
 from terrain.steps import reload_the_page
 from common import type_in_codemirror
 from selenium.webdriver.common.keys import Keys

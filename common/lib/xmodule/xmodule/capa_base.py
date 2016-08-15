@@ -15,7 +15,6 @@ import re
 try:
     import dogstats_wrapper as dog_stats_api
 except ImportError:
-    # pylint: disable=invalid-name
     dog_stats_api = None
 
 from capa.capa_problem import LoncapaProblem, LoncapaSystem
@@ -32,9 +31,9 @@ from django.conf import settings
 
 log = logging.getLogger("edx.courseware")
 
-# Make '_' a no-op so we can scrape strings
+# Make '_' a no-op so we can scrape strings. Using lambda instead of
+#  `django.utils.translation.ugettext_noop` because Django cannot be imported in this file
 _ = lambda text: text
-
 
 # Generate this many different variants of problems with rerandomize=per_student
 NUM_RANDOMIZATION_BINS = 20
@@ -584,7 +583,7 @@ class CapaMixin(CapaFields):
             html = warning
             try:
                 html += self.lcp.get_html()
-            except Exception:  # pylint: disable=broad-except
+            except Exception:
                 # Couldn't do it. Give up.
                 log.exception("Unable to generate html from LoncapaProblem")
                 raise
@@ -604,7 +603,7 @@ class CapaMixin(CapaFields):
         demand_hints = self.lcp.tree.xpath("//problem/demandhint/hint")
         hint_index = hint_index % len(demand_hints)
 
-        _ = self.runtime.service(self, "i18n").ugettext  # pylint: disable=redefined-outer-name
+        _ = self.runtime.service(self, "i18n").ugettext
         hint_element = demand_hints[hint_index]
         hint_text = get_inner_html_from_xpath(hint_element)
         if len(demand_hints) == 1:
@@ -938,7 +937,7 @@ class CapaMixin(CapaFields):
         # We only want to consider each key a single time, so we use set(data.keys())
         for key in set(data.keys()):
             # e.g. input_resistor_1 ==> resistor_1
-            _, _, name = key.partition('_')  # pylint: disable=redefined-outer-name
+            _, _, name = key.partition('_')
 
             # If key has no underscores, then partition
             # will return (key, '', '')
@@ -1125,9 +1124,6 @@ class CapaMixin(CapaFields):
                 metric_name('attempts'),
                 self.attempts,
             )
-
-        if hasattr(self.runtime, 'psychometrics_handler'):  # update PsychometricsData using callback
-            self.runtime.psychometrics_handler(self.get_state_for_lcp())
 
         # render problem into HTML
         html = self.get_problem_html(encapsulate=False)
@@ -1375,10 +1371,6 @@ class CapaMixin(CapaFields):
         event_info['success'] = success
         event_info['attempts'] = self.attempts
         self.track_function_unmask('problem_rescore', event_info)
-
-        # psychometrics should be called on rescoring requests in the same way as check-problem
-        if hasattr(self.runtime, 'psychometrics_handler'):  # update PsychometricsData using callback
-            self.runtime.psychometrics_handler(self.get_state_for_lcp())
 
         return {'success': success}
 

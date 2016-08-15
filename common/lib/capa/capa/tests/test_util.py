@@ -124,5 +124,5 @@ class UtilTest(unittest.TestCase):
         """
         Test for getting inner html as string from xpath node.
         """
-        xpath_node = etree.XML('<hint style="smtng">aa<a href="#">bb</a>cc</hint>')  # pylint: disable=no-member
+        xpath_node = etree.XML('<hint style="smtng">aa<a href="#">bb</a>cc</hint>')
         self.assertEqual(get_inner_html_from_xpath(xpath_node), 'aa<a href="#">bb</a>cc')

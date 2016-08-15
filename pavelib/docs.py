@@ -4,7 +4,8 @@ Ties into Sphinx to generate files at the specified location(s)
 """
 from __future__ import print_function
 import sys
-from paver.easy import *
+
+from paver.easy import cmdopts, needs, sh, task
 
 
 DOC_PATHS = {

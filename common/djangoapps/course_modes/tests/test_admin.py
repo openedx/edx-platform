@@ -21,7 +21,7 @@ from course_modes.admin import CourseModeForm
 # defined in the LMS and course_modes is in common.  However, the benefits
 # of putting all this configuration in one place outweigh the downsides.
 # Once the course admin tool is deployed, we can remove this dependency.
-from verify_student.models import VerificationDeadline  # pylint: disable=import-error
+from lms.djangoapps.verify_student.models import VerificationDeadline
 
 
 # We can only test this in the LMS because the course modes admin relies
@@ -48,8 +48,8 @@ class AdminCourseModePageTest(ModuleStoreTestCase):
             'mode_display_name': 'verified',
             'min_price': 10,
             'currency': 'usd',
-            'expiration_datetime_0': expiration.date(),  # due to django admin datetime widget passing as seperate vals
-            'expiration_datetime_1': expiration.time(),
+            '_expiration_datetime_0': expiration.date(),  # due to django admin datetime widget passing as separate vals
+            '_expiration_datetime_1': expiration.time(),
 
         }
 
@@ -201,7 +201,7 @@ class AdminCourseModeFormTest(ModuleStoreTestCase):
             "course_id": unicode(self.course.id),
             "mode_slug": mode,
             "mode_display_name": mode,
-            "expiration_datetime": upgrade_deadline,
+            "_expiration_datetime": upgrade_deadline,
             "currency": "usd",
             "min_price": 10,
         }, instance=course_mode)

@@ -31,23 +31,6 @@ function(_, str, Backbone, BackboneRelational, gettext) {
             return response;
         },
 
-        validate: function(attrs) {
-            var errors = null;
-            if(_.has(attrs, 'title')){
-                var title = attrs.title;
-                var lines = title.split(/\r\n|\r|\n/);
-                if (lines.length > 2) {
-                    errors = _.extend({
-                        'title': gettext('Signatory title should span over maximum of 2 lines.')
-                    }, errors);
-                }
-            }
-            if (errors !== null){
-                return errors;
-            }
-
-        },
-
         setOriginalAttributes: function() {
             // Remember the current state of this model (enables edit->cancel use cases)
             this._originalAttributes = this.parse(this.toJSON());

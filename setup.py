@@ -37,18 +37,23 @@ setup(
             "teams = lms.djangoapps.teams.plugins:TeamsTab",
             "textbooks = lms.djangoapps.courseware.tabs:TextbookTabs",
             "wiki = lms.djangoapps.course_wiki.tab:WikiTab",
+
             "labster_wiki = lms.djangoapps.labster_wiki.tab:LabsterWikiTab",
             "course_license = lms.djangoapps.labster_course_license.tabs:LicenseCourseTab",
-
-            # ORA 1 tabs (deprecated)
-            "peer_grading = lms.djangoapps.open_ended_grading.views:PeerGradingTab",
-            "staff_grading = lms.djangoapps.open_ended_grading.views:StaffGradingTab",
-            "open_ended = lms.djangoapps.open_ended_grading.views:OpenEndedGradingTab",
         ],
         "openedx.user_partition_scheme": [
             "random = openedx.core.djangoapps.user_api.partition_schemes:RandomUserPartitionScheme",
             "cohort = openedx.core.djangoapps.course_groups.partition_scheme:CohortPartitionScheme",
             "verification = openedx.core.djangoapps.credit.partition_schemes:VerificationPartitionScheme",
+        ],
+        "openedx.block_structure_transformer": [
+            "library_content = lms.djangoapps.course_blocks.transformers.library_content:ContentLibraryTransformer",
+            "split_test = lms.djangoapps.course_blocks.transformers.split_test:SplitTestTransformer",
+            "start_date = lms.djangoapps.course_blocks.transformers.start_date:StartDateTransformer",
+            "user_partitions = lms.djangoapps.course_blocks.transformers.user_partitions:UserPartitionTransformer",
+            "visibility = lms.djangoapps.course_blocks.transformers.visibility:VisibilityTransformer",
+            "course_blocks_api = lms.djangoapps.course_api.blocks.transformers.blocks_api:BlocksAPITransformer",
+            "proctored_exam = lms.djangoapps.course_api.blocks.transformers.proctored_exam:ProctoredExamTransformer",
         ],
     }
 )

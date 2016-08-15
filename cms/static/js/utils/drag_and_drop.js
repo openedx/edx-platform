@@ -1,8 +1,9 @@
-define(["jquery", "jquery.ui", "underscore", "gettext", "common/js/components/views/feedback_notification", "draggabilly",
-    "js/utils/module"],
-    function ($, ui, _, gettext, NotificationView, Draggabilly, ModuleUtils) {
+define(["jquery", "jquery.ui", "underscore", "gettext", "draggabilly",
+        "js/utils/module", "common/js/components/views/feedback_notification"],
+    function ($, ui, _, gettext, Draggabilly, ModuleUtils, NotificationView) {
+        'use strict';
 
-    var contentDragger = {
+        var contentDragger = {
             droppableClasses: 'drop-target drop-target-prepend drop-target-before drop-target-after',
             validDropClass: "valid-drop",
             expandOnDropClass: "expand-on-drop",
@@ -17,14 +18,15 @@ define(["jquery", "jquery.ui", "underscore", "gettext", "common/js/components/vi
                 var eleY = ele.offset().top;
                 var eleYEnd = eleY + ele.outerHeight();
                 var containers = $(ele.data('droppable-class'));
+                var isSibling = function () {
+                    return $(this).data('locator') !== undefined && !$(this).is(ele);
+                };
 
                 for (var i = 0; i < containers.length; i++) {
                     var container = $(containers[i]);
                     // Exclude the 'new unit' buttons, and make sure we don't
                     // prepend an element to itself
-                    var siblings = container.children().filter(function () {
-                        return $(this).data('locator') !== undefined && !$(this).is(ele);
-                    });
+                    var siblings = container.children().filter(isSibling);
                     // If the container is collapsed, check to see if the
                     // element is on top of its parent list -- don't check the
                     // position of the container
@@ -37,8 +39,8 @@ define(["jquery", "jquery.ui", "underscore", "gettext", "common/js/components/vi
                         var collapseFudge = 10;
                         if (Math.abs(eleY - parentListTop) < collapseFudge ||
                             (eleY > parentListTop &&
-                             eleYEnd - collapseFudge <= parentListTop + parentList.outerHeight())
-                            ) {
+                            eleYEnd - collapseFudge <= parentListTop + parentList.outerHeight())
+                        ) {
                             return {
                                 ele: container,
                                 attachMethod: 'prepend',
@@ -101,11 +103,12 @@ define(["jquery", "jquery.ui", "underscore", "gettext", "common/js/components/vi
                                 }
                                 else {
                                     // Dragging up into end of list.
-                                    if (j === siblings.length - 1 && yChange < 0 && Math.abs(eleY - siblingYEnd) <= fudge) {
+                                    if (j === siblings.length - 1 && yChange < 0 &&
+                                        Math.abs(eleY - siblingYEnd) <= fudge) {
                                         return {
-                                                ele: $sibling,
-                                                attachMethod: 'after'
-                                            };
+                                            ele: $sibling,
+                                            attachMethod: 'after'
+                                        };
                                     }
                                     // Dragging up or down into beginning of list.
                                     else if (j === 0 && Math.abs(eleY - siblingY) <= fudge) {
@@ -145,8 +148,8 @@ define(["jquery", "jquery.ui", "underscore", "gettext", "common/js/components/vi
             // Information about the current drag.
             dragState: {},
 
-            onDragStart: function (draggie, event, pointer) {
-                var ele = $(draggie.element);
+            onDragStart: function (draggable) {
+                var ele = $(draggable.element);
                 this.dragState = {
                     // Which element will be dropped into/onto on success
                     dropDestination: null,
@@ -162,7 +165,9 @@ define(["jquery", "jquery.ui", "underscore", "gettext", "common/js/components/vi
                 if (!ele.hasClass(this.collapsedClass)) {
                     ele.addClass(this.collapsedClass);
                     ele.find('.expand-collapse').first().addClass('expand').removeClass('collapse');
-                    // onDragStart gets called again after the collapse, so we can't just store a variable in the dragState.
+
+                    // onDragStart gets called again after the collapse, so we can't
+                    // just store a variable in the dragState.
                     ele.addClass(this.expandOnDropClass);
                 }
 
@@ -171,7 +176,7 @@ define(["jquery", "jquery.ui", "underscore", "gettext", "common/js/components/vi
                 ele.removeClass('was-dragging');
             },
 
-            onDragMove: function (draggie, event, pointer) {
+            onDragMove: function (draggable, event, pointer) {
                 // Handle scrolling of the browser.
                 var scrollAmount = 0;
                 var dragBuffer = 10;
@@ -186,13 +191,13 @@ define(["jquery", "jquery.ui", "underscore", "gettext", "common/js/components/vi
                     return;
                 }
 
-                var yChange = draggie.dragPoint.y - this.dragState.lastY;
+                var yChange = draggable.dragPoint.y - this.dragState.lastY;
                 if (yChange !== 0) {
                     this.dragState.direction = yChange;
                 }
-                this.dragState.lastY = draggie.dragPoint.y;
+                this.dragState.lastY = draggable.dragPoint.y;
 
-                var ele = $(draggie.element);
+                var ele = $(draggable.element);
                 var destinationInfo = this.findDestination(ele, this.dragState.direction);
                 var destinationEle = destinationInfo.ele;
                 this.dragState.parentList = destinationInfo.parentList;
@@ -215,8 +220,8 @@ define(["jquery", "jquery.ui", "underscore", "gettext", "common/js/components/vi
                 }
             },
 
-            onDragEnd: function (draggie, event, pointer) {
-                var ele = $(draggie.element);
+            onDragEnd: function (draggable, event, pointer) {
+                var ele = $(draggable.element);
                 var destination = this.dragState.dropDestination;
 
                 // Clear dragging state in preparation for the next event.
@@ -284,7 +289,7 @@ define(["jquery", "jquery.ui", "underscore", "gettext", "common/js/components/vi
                     // If drop was into a collapsed parent, the parent will have been
                     // expanded. Views using this class may need to track the
                     // collapse/expand state, so send it with the refresh callback.
-                    var collapsed = element.hasClass(this.collapsedClass);
+                    var collapsed = element.hasClass(contentDragger.collapsedClass);
                     if (_.isFunction(refresh)) { refresh(collapsed); }
 
                 };
@@ -364,20 +369,20 @@ define(["jquery", "jquery.ui", "underscore", "gettext", "common/js/components/vi
 
                 if ($(element).data('droppable-class') !== options.droppableClass) {
                     $(element).data({
-                      'droppable-class': options.droppableClass,
-                      'parent-location-selector': options.parentLocationSelector,
-                      'child-selector': options.type,
-                      'refresh': options.refresh,
-                      'ensureChildrenRendered': options.ensureChildrenRendered
+                        'droppable-class': options.droppableClass,
+                        'parent-location-selector': options.parentLocationSelector,
+                        'child-selector': options.type,
+                        'refresh': options.refresh,
+                        'ensureChildrenRendered': options.ensureChildrenRendered
                     });
 
                     draggable = new Draggabilly(element, {
                         handle: options.handleClass,
                         containment: '.wrapper-dnd'
                     });
-                    draggable.on('dragStart', _.bind(contentDragger.onDragStart, contentDragger));
-                    draggable.on('dragMove', _.bind(contentDragger.onDragMove, contentDragger));
-                    draggable.on('dragEnd', _.bind(contentDragger.onDragEnd, contentDragger));
+                    draggable.on('dragStart', _.bind(contentDragger.onDragStart, contentDragger, draggable));
+                    draggable.on('dragMove', _.bind(contentDragger.onDragMove, contentDragger, draggable));
+                    draggable.on('dragEnd', _.bind(contentDragger.onDragEnd, contentDragger, draggable));
                 }
             }
         };

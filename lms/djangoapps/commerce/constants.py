@@ -15,4 +15,5 @@ class Messages(object):
     ORDER_COMPLETED = u'Order {order_number} was completed.'
     ORDER_INCOMPLETE_ENROLLED = u'Order {order_number} was created, but is not yet complete. User was enrolled.'
     NO_HONOR_MODE = u'Course {course_id} does not have an honor mode.'
+    NO_DEFAULT_ENROLLMENT_MODE = u'Course {course_id} does not have an honor or audit mode.'
     ENROLLMENT_EXISTS = u'User {username} is already enrolled in {course_id}.'

@@ -38,7 +38,7 @@ from .session_kv_store import SessionKeyValueStore
 from .helpers import render_from_lms
 
 from contentstore.views.access import get_user_role
-from cms.djangoapps.xblock_config.models import StudioConfig
+from xblock_config.models import StudioConfig
 
 __all__ = ['preview_handler']
 

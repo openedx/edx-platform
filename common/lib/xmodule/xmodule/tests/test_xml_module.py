@@ -498,10 +498,10 @@ class TestXmlAttributes(XModuleXmlImportTest):
         assert_equals('value', course.xml_attributes['unknown_attr'])
 
     def test_known_attribute(self):
-        assert_true(hasattr(CourseDescriptor, 'show_chat'))
-        course = self.process_xml(CourseFactory.build(show_chat='true'))
-        assert_true(course.show_chat)
-        assert_not_in('show_chat', course.xml_attributes)
+        assert_true(hasattr(CourseDescriptor, 'show_calculator'))
+        course = self.process_xml(CourseFactory.build(show_calculator='true'))
+        assert_true(course.show_calculator)
+        assert_not_in('show_calculator', course.xml_attributes)
 
     def test_rerandomize_in_policy(self):
         # Rerandomize isn't a basic attribute of Sequence

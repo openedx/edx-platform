@@ -30,8 +30,6 @@ class CoursewareSearchCohortTest(ContainerBase):
     """
     Test courseware search.
     """
-    USERNAME = 'STUDENT_TESTER'
-    EMAIL = 'student101@example.com'
 
     TEST_INDEX_FILENAME = "test_root/index_file.dat"
 
@@ -69,6 +67,14 @@ class CoursewareSearchCohortTest(ContainerBase):
         self.cohort_b_student_email = self.cohort_b_student_username + "@example.com"
         StudioAutoAuthPage(
             self.browser, username=self.cohort_b_student_username, email=self.cohort_b_student_email, no_login=True
+        ).visit()
+
+        # Create a student who will end up in the default cohort group
+        self.cohort_default_student_username = "cohort_default_student"
+        self.cohort_default_student_email = "cohort_default_student@example.com"
+        StudioAutoAuthPage(
+            self.browser, username=self.cohort_default_student_username,
+            email=self.cohort_default_student_email, no_login=True
         ).visit()
 
         self.courseware_search_page = CoursewareSearchPage(self.browser, self.course_id)
@@ -183,6 +189,7 @@ class CoursewareSearchCohortTest(ContainerBase):
         set_visibility(1, self.content_group_a)
         set_visibility(2, self.content_group_b)
         set_visibility(3, self.content_group_a, self.content_group_b)
+        set_visibility(4, 'All Students and Staff')  # Does not work without this
 
         container_page.publish_action.click()
 
@@ -213,7 +220,7 @@ class CoursewareSearchCohortTest(ContainerBase):
         """
         Make sure that the page is accessible.
         """
-        self._auto_auth(self.USERNAME, self.EMAIL, False)
+        self._auto_auth(self.cohort_default_student_username, self.cohort_default_student_email, False)
         self.courseware_search_page.visit()
 
     def test_cohorted_search_user_a_a_content(self):
@@ -234,20 +241,20 @@ class CoursewareSearchCohortTest(ContainerBase):
         self.courseware_search_page.search_for_term(self.group_a_html)
         assert self.group_a_html not in self.courseware_search_page.search_results.html[0]
 
-    def test_cohorted_search_user_c_ab_content(self):
+    def test_cohorted_search_user_default_ab_content(self):
         """
         Test user not enrolled in any cohorts can't see any of restricted content.
         """
-        self._auto_auth(self.USERNAME, self.EMAIL, False)
+        self._auto_auth(self.cohort_default_student_username, self.cohort_default_student_email, False)
         self.courseware_search_page.visit()
         self.courseware_search_page.search_for_term(self.group_a_and_b_html)
         assert self.group_a_and_b_html not in self.courseware_search_page.search_results.html[0]
 
-    def test_cohorted_search_user_c_all_content(self):
+    def test_cohorted_search_user_default_all_content(self):
         """
         Test user can search public content if cohorts used on course.
         """
-        self._auto_auth(self.USERNAME, self.EMAIL, False)
+        self._auto_auth(self.cohort_default_student_username, self.cohort_default_student_email, False)
         self.courseware_search_page.visit()
         self.courseware_search_page.search_for_term(self.visible_to_all_html)
         assert self.visible_to_all_html in self.courseware_search_page.search_results.html[0]

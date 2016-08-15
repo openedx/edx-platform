@@ -2,6 +2,7 @@
 """
 Tests for video outline API
 """
+
 import ddt
 import itertools
 from uuid import uuid4
@@ -16,6 +17,7 @@ from xmodule.partitions.partitions import Group, UserPartition
 
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
 from openedx.core.djangoapps.course_groups.models import CourseUserGroupPartitionGroup
+from openedx.core.djangoapps.course_groups.cohorts import add_user_to_cohort, remove_user_from_cohort
 
 from ..testutils import MobileAPITestCase, MobileAuthTestMixin, MobileCourseAccessTestMixin
 
@@ -743,7 +745,7 @@ class TestVideoSummaryList(
 
         for cohort_index in range(len(cohorts)):
             # add user to this cohort
-            cohorts[cohort_index].users.add(self.user)
+            add_user_to_cohort(cohorts[cohort_index], self.user.username)
 
             # should only see video for this cohort
             video_outline = self.api_response().data
@@ -754,7 +756,7 @@ class TestVideoSummaryList(
             )
 
             # remove user from this cohort
-            cohorts[cohort_index].users.remove(self.user)
+            remove_user_from_cohort(cohorts[cohort_index], self.user.username)
 
         # un-cohorted user should see no videos
         video_outline = self.api_response().data
