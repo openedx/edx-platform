@@ -37,8 +37,10 @@ def blockrecord_json_to_hash(block_json):
     """
     Return a hashed version of the list of block records.
 
-    This currently hashes using sha256, and returns a b64 encoded version
-    of the binary digest.
+    This currently hashes using sha256, and returns a base64 encoded version
+    of the binary digest.  In the future, different algorithms could be
+    supported by adding a label indicated which algorithm was used, e.g.,
+    "sha1$witfkXg0JglCjW9RssWvTAveakI=".
     """
     return b64encode(sha256(block_json).digest())
 
@@ -61,11 +63,12 @@ class VisibleBlocksQuerySet(models.QuerySet):
 
 class VisibleBlocks(models.Model):
     """
-    A django model used to track the state of a set of visible blocks under a given subsection at the time they are
-    used for grade calculation.
+    A django model used to track the state of a set of visible blocks under a
+    given subsection at the time they are used for grade calculation.
 
-    This state is represented using an array of serialized BlockRecords, stored in the blocks_json field. A
-    hash of this json array is used for lookup purposes.
+    This state is represented using an array of serialized BlockRecords, stored
+    in the blocks_json field. A hash of this json array is used for lookup
+    purposes.
     """
     blocks_json = models.TextField()
     hashed = models.CharField(max_length=44, unique=True)
@@ -81,25 +84,17 @@ class VisibleBlocks(models.Model):
     @property
     def blocks(self):
         """
-        Returns the blocks_json data stored on this model as a list of BlockRecords in the order they were provided.
+        Returns the blocks_json data stored on this model as a list of
+        BlockRecords in the order they were provided.
         """
         block_dicts = json.loads(self.blocks_json)
         return [BlockRecord(data['locator'], data['weight'], data['max_score']) for data in block_dicts]
-
-    @blocks.setter
-    def blocks(self, value):
-        """
-        Not implemented, as VisibleBlocks instances are intended to be write-once and not change after creation.
-        """
-        raise NotImplementedError(
-            "Property 'blocks' cannot be modified on an existing VisibleBlocks model. Create a new instance."
-        )
 
 
 class PersistentSubsectionGradeQuerySet(models.QuerySet):
     """
     A custom QuerySet, that handles creating a VisibleBlocks model on creation, and
-    separates the course key from the.
+    extracts the course id from the provided usage_key.
     """
     def create(self, **kwargs):
         """
