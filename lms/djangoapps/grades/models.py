@@ -102,7 +102,7 @@ class VisibleBlocks(models.Model):
     purposes.
     """
     blocks_json = models.TextField()
-    hashed = models.CharField(max_length=44, unique=True)
+    hashed = models.CharField(max_length=100, unique=True)
 
     objects = VisibleBlocksQuerySet.as_manager()
 
