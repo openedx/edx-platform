@@ -24,13 +24,13 @@ from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_
               <span class="icon fa fa-caret-down" aria-hidden="true"></span>
               <span class="sr-only">${_("Usermenu dropdown")}</span>
         </button>
-        <ul class="dropdown-menu list-divided is-hidden" id="${_("Usermenu")}" tabindex="-1">
+        <ul class="dropdown-menu list-divided is-hidden" id="${_("Usermenu")}" tabindex="-1" role="menu">
             <%block name="navigation_dropdown_menu_links" >
-                <li class="dropdown-item item has-block-link"><a href="${reverse('dashboard')}" class="action">${_("Dashboard")}</a></li>
-                <li class="dropdown-item item has-block-link"><a href="${reverse('learner_profile', kwargs={'username': user.username})}" class="action">${_("Profile")}</a></li>
-                <li class="dropdown-item item has-block-link"><a href="${reverse('account_settings')}" class="action">${_("Account")}</a></li>
+                <li class="dropdown-item item has-block-link" role="menuitem" tabindex="0"><a href="${reverse('dashboard')}" class="action">${_("Dashboard")}</a></li>
+                <li class="dropdown-item item has-block-link" role="menuitem" tabindex="0"><a href="${reverse('learner_profile', kwargs={'username': user.username})}" class="action">${_("Profile")}</a></li>
+                <li class="dropdown-item item has-block-link" role="menuitem" tabindex="0"><a href="${reverse('account_settings')}" class="action">${_("Account")}</a></li>
             </%block>
-            <li class="dropdown-item item has-block-link"><a href="${reverse('logout')}" role="menuitem" class="action">${_("Sign Out")}</a></li>
+            <li class="dropdown-item item has-block-link" role="menuitem" tabindex="0"><a href="${reverse('logout')}" role="menuitem" class="action">${_("Sign Out")}</a></li>
         </ul>
     </div>
 % else:
@@ -50,7 +50,7 @@ from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_
             <button class="dropdown" aria-haspopup="true" aria-expanded="false"><span class="sr">${_("More options dropdown")}</span><span class="fa fa-sort-desc" aria-hidden="true"></span></button>
             <ul class="dropdown-menu" aria-label="More Options" role="menu">
                 ${navigation_dropdown_menu_links()}
-                <li class="item"><a href="${reverse('logout')}" role="menuitem">${_("Sign Out")}</a></li>
+                <li class="item"><a href="${reverse('logout')}" role="menuitem" tabindex="0">${_("Sign Out")}</a></li>
             </ul>
         </li>
     </ol>
