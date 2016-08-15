@@ -29,52 +29,6 @@
     }
 }
 
-// ------
-// Topic Listing Header
-// ------
-.forum-nav-header {
-    box-sizing: border-box;
-    // TODO: don't use table for layout purposes as it switches the screenreader mode
-    display: table;
-    border-bottom: 1px solid $forum-color-border;
-    width: 100%;
-    background-color: $gray-l3;
-}
-
-.forum-nav-browse {
-    box-sizing: border-box;
-    width: 100%;
-    vertical-align: middle;
-    padding: 11px;
-    border: 0;
-    border-radius: 0;
-    background: transparent;
-    box-shadow: none;
-
-    &:hover,
-    &:focus,
-    &.is-active {
-        // converted to button from a;
-        // need importants to overwrite later button styles
-        box-shadow: none !important;
-        background-image: none !important;
-        background-color: $gray-l5 !important;
-    }
-
-    .icon {
-        @include margin-right($baseline/4);
-        font-size: $forum-base-font-size;
-    }
-}
-
-.forum-nav-browse-current {
-    font-size: $forum-small-font-size;
-}
-
-.forum-nav-browse-drop-arrow {
-    @include margin-left($baseline/4);
-}
-
 // -----------
 // Browse menu
 // -----------
@@ -157,6 +111,7 @@
     padding: ($baseline/4) ($baseline/2);
     color: $black;
     text-align: right;
+    @include border-radius($forum-border-radius, $forum-border-radius, 0, 0);
 }
 
 .forum-nav-filter-main {

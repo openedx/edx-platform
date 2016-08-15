@@ -91,7 +91,6 @@
             }
 
             DiscussionThreadListView.prototype.events = {
-                'click .forum-nav-browse': 'toggleBrowseMenu',
                 'keypress .forum-nav-browse-filter-input': function(event) {
                     return DiscussionUtil.ignoreEnterKey(event);
                 },
@@ -193,15 +192,9 @@
              TODO fix this entire chain of events
              */
 
-
             DiscussionThreadListView.prototype.addAndSelectThread = function(thread) {
-                var commentableId, menuItem,
+                var commentableId = thread.get('commentable_id'),
                     self = this;
-                commentableId = thread.get('commentable_id');
-                menuItem = this.$('.forum-nav-browse-menu-item[data-discussion-id]').filter(function() {
-                    return $(this).data('discussion-id') === commentableId;
-                });
-                this.setCurrentTopicDisplay(this.getPathText(menuItem));
                 return this.retrieveDiscussion(commentableId, function() {
                     return self.trigger('thread:created', thread.get('id'));
                 });
@@ -438,7 +431,6 @@
 
             DiscussionThreadListView.prototype.showBrowseMenu = function() {
                 if (!this.isBrowseMenuVisible()) {
-                    this.$('.forum-nav-browse').addClass('is-active');
                     this.$('.forum-nav-browse-menu-wrapper').show();
                     this.$('.forum-nav-thread-list-wrapper').hide();
                     $('.forum-nav-browse-filter-input').focus();
@@ -449,7 +441,6 @@
 
             DiscussionThreadListView.prototype.hideBrowseMenu = function() {
                 if (this.isBrowseMenuVisible()) {
-                    this.$('.forum-nav-browse').removeClass('is-active');
                     this.$('.forum-nav-browse-menu-wrapper').hide();
                     this.$('.forum-nav-thread-list-wrapper').show();
                     $('body').unbind('click', this.hideBrowseMenu);
@@ -524,64 +515,6 @@
                 }
             };
 
-            DiscussionThreadListView.prototype.setCurrentTopicDisplay = function(text) {
-                return this.$('.forum-nav-browse-current').text(this.fitName(text));
-            };
-
-            DiscussionThreadListView.prototype.getNameWidth = function(name) {
-                var $test, width;
-                $test = $('<div>');
-                $test.css({
-                    'font-size': this.$('.forum-nav-browse-current').css('font-size'),
-                    opacity: 0,
-                    position: 'absolute',
-                    left: -1000,
-                    top: -1000
-                });
-                $('body').append($test);
-                $test.text(name);
-                width = $test.width();
-                $test.remove();
-                return width;
-            };
-
-            DiscussionThreadListView.prototype.fitName = function(name) {
-                var partialName, path, prefix, rawName, width, x;
-                this.maxNameWidth = this.$('.forum-nav-browse').width() -
-                    this.$('.forum-nav-browse .icon').outerWidth(true) -
-                    this.$('.forum-nav-browse-drop-arrow').outerWidth(true);
-                width = this.getNameWidth(name);
-                if (width < this.maxNameWidth) {
-                    return name;
-                }
-                path = (function() {
-                    var _i, _len, _ref, _results;
-                    _ref = name.split('/');
-                    _results = [];
-                    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-                        x = _ref[_i];
-                        _results.push(x.replace(/^\s+|\s+$/g, ''));
-                    }
-                    return _results;
-                }());
-                prefix = '';
-                while (path.length > 1) {
-                    prefix = gettext('…') + '/';
-                    path.shift();
-                    partialName = prefix + path.join('/');
-                    if (this.getNameWidth(partialName) < this.maxNameWidth) {
-                        return partialName;
-                    }
-                }
-                rawName = path[0];
-                name = prefix + rawName;
-                while (this.getNameWidth(name) > this.maxNameWidth) {
-                    rawName = rawName.slice(0, rawName.length - 1);
-                    name = prefix + rawName + gettext('…');
-                }
-                return name;
-            };
-
             DiscussionThreadListView.prototype.selectTopicHandler = function(event) {
                 event.preventDefault();
                 return this.selectTopic($(event.target));
@@ -592,7 +525,6 @@
                 this.hideBrowseMenu();
                 $item = $target.closest('.forum-nav-browse-menu-item');
 
-                this.setCurrentTopicDisplay(this.getPathText($item));
                 this.trigger('topic:selected', this.getBreadcrumbText($item));
 
                 if ($item.hasClass('forum-nav-browse-menu-all')) {
@@ -666,7 +598,6 @@
 
             DiscussionThreadListView.prototype.performSearch = function($searchInput) {
                 this.hideBrowseMenu();
-                this.setCurrentTopicDisplay(gettext('Search Results'));
                 // trigger this event so the breadcrumbs can update as well
                 this.trigger('search:initiated');
                 this.searchFor($searchInput.val(), $searchInput);

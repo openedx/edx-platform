@@ -374,7 +374,6 @@ class DiscussionTabMultipleThreadTest(BaseDiscussionTestCase):
             self.thread_ids[1]
         )
         self.thread_page_1.visit()
-        self.thread_page_1.show_all_discussions()
 
     def setup_multiple_threads(self, thread_count):
         threads = []

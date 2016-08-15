@@ -1,17 +1,6 @@
 <%page expression_filter="h"/>
 <%! from django.utils.translation import ugettext as _ %>
 <script type="text/template" id="thread-list-template">
-    <div class="forum-nav-header">
-        <button type="button" class="forum-nav-browse" id="forum-nav-browse" aria-haspopup="true">
-            ## There is no whitespace between these because the front-end JS code
-            ## needs to precisely compute the available width for forum-nav-
-            ## browse-current in order to do truncation of topic names.
-            <span class="icon fa fa-reorder" aria-hidden="true"></span>
-            <span class="sr">${_("Discussion topics; currently listing: ")}</span>
-            <span class="forum-nav-browse-current">${_("All Discussions")}</span>
-            <span class="forum-nav-browse-drop-arrow" aria-hidden="true">▾</span>
-        </button>
-    </div>
     <%include file="_filter_dropdown.html" />
     <div class="forum-nav-thread-list-wrapper" id="sort-filter-wrapper" tabindex="-1">
         <div class="forum-nav-refine-bar">

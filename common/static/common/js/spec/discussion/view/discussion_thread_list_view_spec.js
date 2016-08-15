@@ -618,12 +618,6 @@
             describe('selecting an item', function() {
                 var testSelectionRequest;
 
-                it('should change the button text', function() {
-                    setupAjax();
-                    $('.forum-nav-browse-menu-following .forum-nav-browse-title').click();
-                    return expect($('.forum-nav-browse-current').text()).toEqual("Posts I'm Following");
-                });
-
                 it('should show/hide the cohort selector', function() {
                     var self = this;
                     DiscussionSpecHelper.makeModerator();
