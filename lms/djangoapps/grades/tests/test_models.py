@@ -94,15 +94,14 @@ class VisibleBlocksTest(GradesModelTestCase):
         self.assertEqual(expected_json, vblocks.blocks_json)
         self.assertEqual(expected_hash, vblocks.hashed)
 
-    def test_ordering_matters(self):
+    def test_ordering_does_not_matter(self):
         """
-        When creating new vbocks, a different ordering produces a different 
-        record in the database.  Saving blocks with the same order returns
-        the same record
+        When creating new vbocks, a different ordering of blocks produces the
+        same record in the database.  
         """
         stored_vblocks = VisibleBlocks.objects.create_from_blockrecords([self.record_a, self.record_b])
-        repeat_vblocks = VisibleBlocks.objects.create_from_blockrecords([self.record_a, self.record_b])
-        new_vblocks = VisibleBlocks.objects.create_from_blockrecords([self.record_b, self.record_a])
+        repeat_vblocks = VisibleBlocks.objects.create_from_blockrecords([self.record_b, self.record_a])
+        new_vblocks = VisibleBlocks.objects.create_from_blockrecords([self.record_b])
 
         self.assertEqual(stored_vblocks.pk, repeat_vblocks.pk)
         self.assertEqual(stored_vblocks.hashed, repeat_vblocks.hashed)
@@ -121,7 +120,7 @@ class VisibleBlocksTest(GradesModelTestCase):
             [block._asdict() for block in blocks],
             [block._asdict() for block in vblocks.blocks]
         )
-        with self.assertRaises(NotImplementedError):
+        with self.assertRaises(AttributeError):
             vblocks.blocks = blocks
 
 

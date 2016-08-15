@@ -28,24 +28,28 @@ log = logging.getLogger(__name__)
 BlockRecord = namedtuple('BlockRecord', ['locator', 'weight', 'max_score'])
 
 
-def blockrecord_list_to_json(blocks):
+class BlockRecordList(list):
     """
-    Return a JSON-serialized version of the list of block records, using a
-    stable ordering.
+    An ordered collection of BlockRecord objects.
     """
-    sorted_blocks = sorted([block._asdict() for block in blocks], key=attrgetter('locator'))
-    return json.dumps(sorted_blocks, separators=(',', ':'), sort_keys=True)
+    def to_json(self):
+        """
+        Return a JSON-serialized version of the list of block records, using a
+        stable ordering.
+        """
+        sorted_blocks = sorted(self, key=attrgetter('locator'))
+        return json.dumps([block._asdict() for block in sorted_blocks], separators=(',', ':'), sort_keys=True)
 
-def blockrecord_json_to_hash(block_json):
-    """
-    Return a hashed version of the list of block records.
+    def to_hash(self):
+        """
+        Return a hashed version of the list of block records.
 
-    This currently hashes using sha256, and returns a base64 encoded version
-    of the binary digest.  In the future, different algorithms could be
-    supported by adding a label indicated which algorithm was used, e.g.,
-    "sha1$witfkXg0JglCjW9RssWvTAveakI=".
-    """
-    return b64encode(sha256(block_json).digest())
+        This currently hashes using sha256, and returns a base64 encoded version
+        of the binary digest.  In the future, different algorithms could be
+        supported by adding a label indicated which algorithm was used, e.g.,
+        "sha1$witfkXg0JglCjW9RssWvTAveakI=".
+        """
+        return b64encode(sha256(self.to_json()).digest())
 
 
 class VisibleBlocksQuerySet(models.QuerySet):
@@ -58,9 +62,9 @@ class VisibleBlocksQuerySet(models.QuerySet):
 
         Argument 'blocks' should be an iterable collection of BlockRecords.
         """
-        blocks_json = blockrecord_list_to_json(blocks)
-        hashed = blockrecord_json_to_hash(blocks_json)
-        model, _ = self.get_or_create(hashed=hashed, defaults={'blocks_json': blocks_json})
+        if not isinstance(blocks, BlockRecordList):
+            blocks = BlockRecordList(blocks)
+        model, _ = self.get_or_create(hashed=blocks.to_hash(), defaults={'blocks_json': blocks.to_json()})
         return model
 
 
@@ -91,7 +95,8 @@ class VisibleBlocks(models.Model):
         BlockRecords in the order they were provided.
         """
         block_dicts = json.loads(self.blocks_json)
-        return [BlockRecord(data['locator'], data['weight'], data['max_score']) for data in block_dicts]
+        record_generator = (BlockRecord(data['locator'], data['weight'], data['max_score']) for data in block_dicts)
+        return BlockRecordList(record_generator)
 
 
 class PersistentSubsectionGradeQuerySet(models.QuerySet):
@@ -114,20 +119,22 @@ class PersistentSubsectionGradeQuerySet(models.QuerySet):
             possible_graded (float)
             visible_blocks (iterable of BlockRecord)
         """
-        blocks = kwargs.pop('visible_blocks')
+        visible_blocks = kwargs.pop('visible_blocks')
+        if not isinstance(visible_blocks, BlockRecordList):
+            visible_blocks = BlockRecordList(visible_blocks)
         try:
-            visible_blocks_model = VisibleBlocks.objects.create_from_blockrecords(blocks=blocks)
+            visible_blocks_model = VisibleBlocks.objects.create_from_blockrecords(blocks=visible_blocks)
         except IntegrityError:
             # If an integrity error occurs, the VisibleBlocks model we want to
             # create already exists.  Use the hash for our current list of
             # blocks as the foreign key.
-            visible_hash = blockrecord_json_to_hash(blockrecord_list_to_json(blocks))
+            visible_blocks_hash = visible_blocks.to_hash()
         else:
-            visible_hash = visible_blocks_model.hashed
+            visible_blocks_hash = visible_blocks_model.hashed
 
         grade = self.model(
             course_id=kwargs['usage_key'].course_key,
-            visible_blocks_id=visible_hash,
+            visible_blocks_id=visible_blocks_hash,
             **kwargs
         )
         grade.full_clean()
@@ -155,7 +162,7 @@ class PersistentSubsectionGrade(TimeStampedModel):
     subtree_edited_date = models.DateTimeField('last content edit timestamp', blank=False)
     course_version = models.CharField('guid of latest course version', blank=False, max_length=255)
 
-    # earned/possible refers to the number of points achieved and avaiable to achieve.
+    # earned/possible refers to the number of points achieved and available to achieve.
     # graded refers to the subset of all problems that are marked as being graded.
     earned_all = models.FloatField(blank=False)
     possible_all = models.FloatField(blank=False)
@@ -234,6 +241,18 @@ class PersistentSubsectionGrade(TimeStampedModel):
         # Thanks to repeatable read, there's a non-zero chance of a race condition ocurring on insert.
         # If that happens, the situation is unrecoverable, as we need to read a new piece of data (a visible_blocks FK)
         # that won't be visible inside the current transaction. In those cases, log the issue and abort.
+        if not isinstance(visible_blocks, BlockRecordList):
+            visible_blocks = BlockRecordList(visible_blocks)
+        try:
+            visible_blocks_model = VisibleBlocks.objects.create_from_blockrecords(blocks=visible_blocks)
+        except IntegrityError:
+            # If an integrity error occurs, the VisibleBlocks model we want to
+            # create already exists.  Use the hash for our current list of
+            # blocks as the foreign key.
+            visible_blocks_hash = visible_blocks.to_hash()
+        else:
+            visible_blocks_hash = visible_blocks_model.hashed
+
         try:
             visible_blocks_model = VisibleBlocks.objects.create_from_blockrecords(blocks=visible_blocks)
         except IntegrityError:
@@ -246,5 +265,5 @@ class PersistentSubsectionGrade(TimeStampedModel):
         grade.possible_all = possible_all
         grade.earned_graded = earned_graded
         grade.possible_graded = possible_graded
-        grade.visible_blocks = visible_blocks_model
+        grade.visible_blocks_id = visible_blocks_hash
         grade.save()
