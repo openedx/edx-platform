@@ -7,7 +7,7 @@ of any changes that may occur to the course after the score is achieved.
 
 from base64 import b64encode
 from collections import namedtuple
-from hashlib import sha256
+from hashlib import sha1
 import json
 import logging
 from operator import attrgetter
@@ -66,13 +66,13 @@ class BlockRecordSet(frozenset):
         """
         Return a hashed version of the list of block records.
 
-        This currently hashes using sha256, and returns a base64 encoded version
+        This currently hashes using sha1, and returns a base64 encoded version
         of the binary digest.  In the future, different algorithms could be
         supported by adding a label indicated which algorithm was used, e.g.,
-        "sha1$witfkXg0JglCjW9RssWvTAveakI=".
+        "sha256$j0NDRmSPa5bfid2pAcUXaxCm2Dlh3TwayItZstwyeqQ=".
         """
         if self._hash is None:
-            self._hash = b64encode(sha256(self.to_json()).digest())
+            self._hash = b64encode(sha1(self.to_json()).digest())
         return self._hash
 
 
@@ -217,7 +217,7 @@ class PersistentSubsectionGrade(TimeStampedModel):
     def save_grade(cls, **kwargs):
         """
         Wrapper for create_grade or update_grade, depending on which applies.
-        Takes the same arguments as both of thsoe methods.
+        Takes the same arguments as both of those methods.
         """
         try:
             cls.update(**kwargs)
