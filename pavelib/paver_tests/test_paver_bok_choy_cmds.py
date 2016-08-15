@@ -212,7 +212,15 @@ class TestPaverPa11yCrawlerCmd(unittest.TestCase):
             "-a",
             "data_dir=/edx/app/edxapp/edx-platform/reports/pa11ycrawler/data",
         ]
-        self.assertEqual(suite.cmd, expected_cmd)
+        actual_cmd = suite.cmd
+        # verify that the final section of this command is for specifying the
+        # data directory
+        self.assertEqual(actual_cmd[-2], "-a")
+        self.assertTrue(actual_cmd[-1].startswith("data_dir="))
+        # chop off the `data_dir` argument when comparing,
+        # since it is highly dependent on who is running this paver command,
+        # and where it's being run (devstack, jenkins, etc)
+        self.assertEqual(actual_cmd[0:-2], expected_cmd[0:-2])
 
     @ddt.data(
         (True, True, None),
