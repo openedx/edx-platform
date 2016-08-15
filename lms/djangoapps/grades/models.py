@@ -28,17 +28,39 @@ log = logging.getLogger(__name__)
 BlockRecord = namedtuple('BlockRecord', ['locator', 'weight', 'max_score'])
 
 
-class BlockRecordList(list):
+class BlockRecordSet(frozenset):
     """
-    An ordered collection of BlockRecord objects.
+    An immutable ordered collection of BlockRecord objects.
     """
+
+    def __init__(self, *args, **kwargs):
+        super(BlockRecordSet, self).__init__(*args, **kwargs)
+        self._json = None
+        self._hash = None
+
     def to_json(self):
         """
         Return a JSON-serialized version of the list of block records, using a
         stable ordering.
         """
-        sorted_blocks = sorted(self, key=attrgetter('locator'))
-        return json.dumps([block._asdict() for block in sorted_blocks], separators=(',', ':'), sort_keys=True)
+        if self._json is None:
+            sorted_blocks = sorted(self, key=attrgetter('locator'))
+            # Remove spaces from separators for more compact representation
+            self._json = json.dumps(
+                [block._asdict() for block in sorted_blocks],
+                separators=(',', ':'),
+                sort_keys=True,
+            )
+        return self._json
+
+    @classmethod
+    def from_json(cls, blockrecord_json):
+        """
+        Return a BlockRecordSet from a json list.
+        """
+        block_dicts = json.loads(blockrecord_json)
+        record_generator = (BlockRecord(**block) for block in block_dicts)
+        return cls(record_generator)
 
     def to_hash(self):
         """
@@ -49,7 +71,9 @@ class BlockRecordList(list):
         supported by adding a label indicated which algorithm was used, e.g.,
         "sha1$witfkXg0JglCjW9RssWvTAveakI=".
         """
-        return b64encode(sha256(self.to_json()).digest())
+        if self._hash is None:
+            self._hash = b64encode(sha256(self.to_json()).digest())
+        return self._hash
 
 
 class VisibleBlocksQuerySet(models.QuerySet):
@@ -62,8 +86,8 @@ class VisibleBlocksQuerySet(models.QuerySet):
 
         Argument 'blocks' should be an iterable collection of BlockRecords.
         """
-        if not isinstance(blocks, BlockRecordList):
-            blocks = BlockRecordList(blocks)
+        if not isinstance(blocks, BlockRecordSet):
+            blocks = BlockRecordSet(blocks)
         model, _ = self.get_or_create(hashed=blocks.to_hash(), defaults={'blocks_json': blocks.to_json()})
         return model
 
@@ -94,9 +118,7 @@ class VisibleBlocks(models.Model):
         Returns the blocks_json data stored on this model as a list of
         BlockRecords in the order they were provided.
         """
-        block_dicts = json.loads(self.blocks_json)
-        record_generator = (BlockRecord(data['locator'], data['weight'], data['max_score']) for data in block_dicts)
-        return BlockRecordList(record_generator)
+        return BlockRecordSet.from_json(self.blocks_json)
 
 
 class PersistentSubsectionGradeQuerySet(models.QuerySet):
@@ -120,8 +142,8 @@ class PersistentSubsectionGradeQuerySet(models.QuerySet):
             visible_blocks (iterable of BlockRecord)
         """
         visible_blocks = kwargs.pop('visible_blocks')
-        if not isinstance(visible_blocks, BlockRecordList):
-            visible_blocks = BlockRecordList(visible_blocks)
+        if not isinstance(visible_blocks, BlockRecordSet):
+            visible_blocks = BlockRecordSet(visible_blocks)
         try:
             visible_blocks_model = VisibleBlocks.objects.create_from_blockrecords(blocks=visible_blocks)
         except IntegrityError:
@@ -241,8 +263,8 @@ class PersistentSubsectionGrade(TimeStampedModel):
         # Thanks to repeatable read, there's a non-zero chance of a race condition ocurring on insert.
         # If that happens, the situation is unrecoverable, as we need to read a new piece of data (a visible_blocks FK)
         # that won't be visible inside the current transaction. In those cases, log the issue and abort.
-        if not isinstance(visible_blocks, BlockRecordList):
-            visible_blocks = BlockRecordList(visible_blocks)
+        if not isinstance(visible_blocks, BlockRecordSet):
+            visible_blocks = BlockRecordSet(visible_blocks)
         try:
             visible_blocks_model = VisibleBlocks.objects.create_from_blockrecords(blocks=visible_blocks)
         except IntegrityError:

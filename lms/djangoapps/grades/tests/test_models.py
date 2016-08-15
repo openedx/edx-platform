@@ -12,7 +12,7 @@ from django.core.exceptions import ValidationError
 from django.test import TestCase
 from opaque_keys.edx.locator import CourseLocator, BlockUsageLocator
 
-from lms.djangoapps.grades.models import BlockRecord, VisibleBlocks, PersistentSubsectionGrade
+from lms.djangoapps.grades.models import BlockRecord, BlockRecordSet, PersistentSubsectionGrade, VisibleBlocks
 
 
 class GradesModelTestCase(TestCase):
@@ -96,8 +96,8 @@ class VisibleBlocksTest(GradesModelTestCase):
 
     def test_ordering_does_not_matter(self):
         """
-        When creating new vbocks, a different ordering of blocks produces the
-        same record in the database.  
+        When creating new vblocks, a different ordering of blocks produces the
+        same record in the database.
         """
         stored_vblocks = VisibleBlocks.objects.create_from_blockrecords([self.record_a, self.record_b])
         repeat_vblocks = VisibleBlocks.objects.create_from_blockrecords([self.record_b, self.record_a])
@@ -114,14 +114,11 @@ class VisibleBlocksTest(GradesModelTestCase):
         Ensures that, given an array of BlockRecord, creating visible_blocks and accessing visible_blocks.blocks yields
         a copy of the initial array. Also, trying to set the blocks property should raise an exception.
         """
-        blocks = [self.record_a, self.record_b]
-        vblocks = VisibleBlocks.objects.create_from_blockrecords(blocks)
-        self.assertSequenceEqual(
-            [block._asdict() for block in blocks],
-            [block._asdict() for block in vblocks.blocks]
-        )
+        expected_blocks = [self.record_a, self.record_b]
+        visible_blocks = VisibleBlocks.objects.create_from_blockrecords(expected_blocks)
+        self.assertEqual(BlockRecordSet(expected_blocks), visible_blocks.blocks)
         with self.assertRaises(AttributeError):
-            vblocks.blocks = blocks
+            visible_blocks.blocks = expected_blocks
 
 
 @ddt.ddt
