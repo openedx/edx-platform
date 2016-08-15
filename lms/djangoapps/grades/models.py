@@ -5,18 +5,19 @@ Robust grading allows student scores to be saved per-subsection independent
 of any changes that may occur to the course after the score is achieved.
 """
 
+from base64 import b64encode
+from collections import namedtuple
+from hashlib import sha256
+import json
+import logging
+from operator import attrgetter
+
 from django.db import models
 from django.db.utils import IntegrityError
 from model_utils.models import TimeStampedModel
 
 from coursewarehistoryextended.fields import UnsignedBigIntAutoField
 from xmodule_django.models import CourseKeyField, UsageKeyField
-
-from base64 import b64encode
-from collections import namedtuple
-from hashlib import sha256
-import json
-import logging
 
 
 log = logging.getLogger(__name__)
@@ -29,9 +30,11 @@ BlockRecord = namedtuple('BlockRecord', ['locator', 'weight', 'max_score'])
 
 def blockrecord_list_to_json(blocks):
     """
-    Return a JSON-serialized version of the list of block records.
+    Return a JSON-serialized version of the list of block records, using a
+    stable ordering.
     """
-    return json.dumps([block._asdict() for block in blocks], separators=(',', ':'), sort_keys=True)
+    sorted_blocks = sorted([block._asdict() for block in blocks], key=attrgetter('locator'))
+    return json.dumps(sorted_blocks, separators=(',', ':'), sort_keys=True)
 
 def blockrecord_json_to_hash(block_json):
     """
