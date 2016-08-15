@@ -209,6 +209,8 @@ class TestPaverPa11yCrawlerCmd(unittest.TestCase):
             "port=8003",
             "-a",
             "course_key=course-v1:edX+Test101+course",
+            "-a",
+            "data_dir=/edx/app/edxapp/edx-platform/reports/pa11ycrawler/data",
         ]
         self.assertEqual(suite.cmd, expected_cmd)
 

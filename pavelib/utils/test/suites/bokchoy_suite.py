@@ -394,6 +394,7 @@ class Pa11yCrawler(BokChoyTestSuite):
         """
         Runs pa11ycrawler as staff user against the test course.
         """
+        data_dir = os.path.join(self.report_dir, 'data')
         return [
             "scrapy",
             "crawl",
@@ -402,4 +403,6 @@ class Pa11yCrawler(BokChoyTestSuite):
             "port=8003",
             "-a",
             "course_key={key}".format(key=self.course_key),
+            "-a",
+            "data_dir={dir}".format(dir=data_dir)
         ]
