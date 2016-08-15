@@ -2,15 +2,14 @@
 // navigation - header
 // -------------------
 
-// Override global a rules
-.forum-nav-browse {
-  color: $black !important;
-}
-
 // Temporary breadcrumbs
 .has-breadcrumbs {
   .breadcrumbs {
     margin: 5px 0 0 0;
+
+    .all-topics .fa {
+      @include margin-right(10px);
+    }
   }
 }
 

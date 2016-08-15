@@ -378,7 +378,7 @@ class DiscussionSortPreferencePage(CoursePage):
 
     def show_all_discussions(self):
         """ Show the list of all discussions. """
-        self.q(css=".forum-nav-browse").click()
+        self.q(css=".all-topics").click()
 
     def get_selected_sort_preference(self):
         """
@@ -423,7 +423,7 @@ class DiscussionTabSingleThreadPage(CoursePage):
 
     def show_all_discussions(self):
         """ Show the list of all discussions. """
-        self.q(css=".forum-nav-browse").click()
+        self.q(css=".all-topics").click()
 
     def close_open_thread(self):
         with self.thread_page.secondary_action_menu_open(".thread-main-wrapper"):
@@ -443,6 +443,7 @@ class DiscussionTabSingleThreadPage(CoursePage):
         Click specific thread on the list.
         """
         thread_selector = "li[data-id='{}']".format(thread_id)
+        self.show_all_discussions()
         self.q(css=thread_selector).first.click()
         EmptyPromise(
             lambda: self._thread_is_rendered_successfully(thread_id),

@@ -78,7 +78,7 @@
                             searchBox.clearSearch();
                             this.model.set('contents', []);
                             router.navigate('', {trigger: true});
-                            router.nav.selectTopic($('.forum-nav-browse-menu-all'));
+                            router.nav.toggleBrowseMenu(event);
                         }
                     }
                 }).render();
