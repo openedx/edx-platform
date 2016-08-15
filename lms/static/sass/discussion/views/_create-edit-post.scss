@@ -213,7 +213,6 @@
     position: absolute;
     top: 40px;
     left: 0;
-    border: 1px solid $forum-color-border;
     width: 100%;
     background: $forum-color-background;
     box-shadow: 0 2px 1px $shadow;
@@ -221,12 +220,12 @@
 
   .topic-filter-label {
     border-bottom: 1px solid $forum-color-border;
-    padding: ($baseline/4);
   }
 
   .topic-filter-input {
     box-sizing: border-box;
-    border: 1px solid $forum-color-border;
+    border: none;
+    border-bottom: 1px solid $forum-color-border;
     padding: 0 15px;
     width: 100%;
     height: 30px;
@@ -239,17 +238,17 @@
     overflow-y: scroll;
     max-height: 400px;
     list-style: none;
+    margin-left: ($baseline/2);
   }
 
   .topic-submenu {
-    padding-left: $baseline;
     list-style: none;
+    margin-left: $baseline;
   }
 
   .topic-title {
     display: block;
-    border-bottom: 1px solid $forum-color-border;
-    padding: ($baseline/2);
+    padding: ($baseline/4) ($baseline/2);
     font-size: 14px;
   }
 
