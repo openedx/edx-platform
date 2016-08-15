@@ -60,6 +60,16 @@ define(['jquery',
                 $('.new-course-org').autocomplete('destroy');
             });
 
+            it('set the correct direction of text in case of rtl', function() {
+                $('body').addClass('rtl');
+                $('.new-course-button').click();
+                $('.new-course-run').val('2014_T2').trigger('input');
+                expect($('.new-course-run').hasClass('placeholder-text-direction')).toBe(false);
+                $('.new-course-run').val('').trigger('input');
+                expect($('.new-course-run').hasClass('placeholder-text-direction')).toBe(true);
+            });
+
+
             it('displays an error when saving fails', function() {
                 var requests = AjaxHelpers.requests(this);
                 $('.new-course-button').click();
