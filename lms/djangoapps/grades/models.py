@@ -22,10 +22,9 @@ import logging
 log = logging.getLogger(__name__)
 
 
+# Used to serialize information about a block at the time it was used in
+# grade calculation.
 BlockRecord = namedtuple('BlockRecord', ['locator', 'weight', 'max_score'])
-"""
-A namedtuple used to serialize information about a block at the time it was used in grade calculation.
-"""
 
 
 def blockrecord_list_to_json(blocks):
