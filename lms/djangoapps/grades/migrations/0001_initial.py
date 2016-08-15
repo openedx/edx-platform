@@ -35,14 +35,14 @@ class Migration(migrations.Migration):
             name='VisibleBlocks',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('_blocks_json', models.TextField(db_column=b'blocks_json')),
+                ('blocks_json', models.TextField()),
                 ('hashed', models.CharField(unique=True, max_length=44)),
             ],
         ),
         migrations.AddField(
             model_name='persistentsubsectiongrade',
             name='visible_blocks',
-            field=models.ForeignKey(to='grades.VisibleBlocks'),
+            field=models.ForeignKey(to='grades.VisibleBlocks', db_column=b'visible_blocks_hash', to_field=b'hashed'),
         ),
         migrations.AlterUniqueTogether(
             name='persistentsubsectiongrade',
