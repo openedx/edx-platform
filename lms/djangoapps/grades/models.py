@@ -110,7 +110,7 @@ class VisibleBlocks(models.Model):
         """
         String representation of this model.
         """
-        return "VisibleBlocks object - hash:{}, raw json:'{}'".format(self.hashed, self.blocks_json)
+        return u"VisibleBlocks object - hash:{}, raw json:'{}'".format(self.hashed, self.blocks_json)
 
     @property
     def blocks(self):
@@ -201,9 +201,12 @@ class PersistentSubsectionGrade(TimeStampedModel):
         """
         Returns a string representation of this model.
         """
-        return "PersistentSubsectionGrade user:{}, subsection {}. {}/{} graded, {}/{} all".format(
+        return u"{} user: {}, course version: {}, subsection {} ({}). {}/{} graded, {}/{} all".format(
+            type(self).__name__,
             self.user_id,
+            self.course_version,
             self.usage_key,
+            self.visible_blocks.hashed,
             self.earned_graded,
             self.possible_graded,
             self.earned_all,
