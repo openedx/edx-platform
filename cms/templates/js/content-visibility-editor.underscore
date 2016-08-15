@@ -19,7 +19,8 @@
         <li class="field-radio">
             <label class="label">
                 <input class="input input-radio" name="content-visibility" type="radio" value="staff_only" aria-described-by="staff_only_description">
-                <%- gettext('Hide entire subsection') %>
+                <% var hide_label = gettext('Hide entire subsection'); %>
+                <%- hide_label %>
             </label>
             <p class='field-message' id='staff_only_description'> <%- gettext('Learners do not see the subsection in the course outline. The subsection is not included in grade calculations.') %> </p>
         </li>
@@ -27,7 +28,11 @@
 
     <% if (hasExplicitStaffLock && !ancestorLocked) { %>
         <p class="tip tip-warning">
-            <%- gettext('Units inherit the visibility setting of the subsection they are in. If you make this subsection visible to learners, published units that were previously hidden also become visible. Only units that were explicitly hidden remain hidden regardless of the option you select for this subsection.') %>
+            <%- interpolate(
+                gettext('If you select an option other than "%(hide_label)s", after the subsection release date has passed, published units in this subsection will become available to learners unless units are explicitly hidden.'),
+                { hide_label: hide_label },
+                true
+            ) %>
         </p>
     <% } %>
 </div>
