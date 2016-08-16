@@ -2,10 +2,20 @@
 Tests for the score change signals defined in the courseware models module.
 """
 
+import ddt
 from django.test import TestCase
+from django.conf import settings
 from mock import patch, MagicMock
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
-from ..signals import submissions_score_set_handler, submissions_score_reset_handler
+from ..new import subsection_grade
+
+from ..signals import (
+    submissions_score_set_handler,
+    submissions_score_reset_handler,
+    recalculate_subsection_grade_handler
+)
 
 
 SUBMISSION_SET_KWARGS = {
@@ -22,6 +32,8 @@ SUBMISSION_RESET_KWARGS = {
     'course_id': 'CourseID',
     'item_id': 'i4x://org/course/usage/123456'
 }
+
+TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
 
 
 class SubmissionSignalRelayTest(TestCase):
@@ -148,3 +160,58 @@ class SubmissionSignalRelayTest(TestCase):
         self.get_user_mock = self.setup_patch('lms.djangoapps.grades.signals.user_by_anonymous_id', None)
         submissions_score_reset_handler(None, **SUBMISSION_RESET_KWARGS)
         self.signal_mock.assert_not_called()
+
+
+@ddt.ddt
+class ScoreChangedUpdatesSubsectionGradeTest(ModuleStoreTestCase):
+    def setUp(self):
+        """
+        Configure mocks for all the dependencies of the render method
+        """
+        super(ScoreChangedUpdatesSubsectionGradeTest, self).setUp()
+
+        # mock student
+        self.user_mock = MagicMock()
+        self.user_mock.id = 42
+        self.get_user_mock = self.setup_patch('lms.djangoapps.grades.signals.user_by_anonymous_id', self.user_mock)
+        self.course = CourseFactory.create(
+            org='edx',
+            name='course',
+            display_name='Verified Course',
+            run='run'
+        )
+        self.course.save()
+        self.store.update_item(self.course, 0)
+        self.chapter = ItemFactory.create(parent=self.course, category="chapter", display_name="Chapter")
+        self.sequential = ItemFactory.create(parent=self.chapter, category='sequential', display_name="Open Sequential")
+        self.problem = ItemFactory.create(parent=self.sequential, category='problem', display_name='problem')
+
+        self.SCORE_CHANGED_KWARGS = {
+            'points_possible': 10,
+            'points_earned': 5,
+            'user_id': 'anonymous_id',
+            'course_id': self.course.id,
+            'usage_id': self.problem.scope_ids.usage_id
+        }
+
+        self.update_mock = self.setup_patch(subsection_grade.__name__ + '.SubsectionGradeFactory.update', None)
+
+    def setup_patch(self, function_name, return_value):
+        """
+        Patch a function with a given return value, and return the mock
+        """
+        mock = MagicMock(return_value=return_value)
+        new_patch = patch(function_name, new=mock)
+        new_patch.start()
+        self.addCleanup(new_patch.stop)
+        return mock
+
+    def test_happy_path(self):
+        recalculate_subsection_grade_handler(None, **self.SCORE_CHANGED_KWARGS)
+        self.assertTrue(self.update_mock.called)
+
+    @ddt.data('points_possible', 'points_earned', 'user_id', 'course_id', 'usage_id')
+    def test_missing_kwargs(self, kwarg):
+        del self.SCORE_CHANGED_KWARGS[kwarg]
+        recalculate_subsection_grade_handler(None, **self.SCORE_CHANGED_KWARGS)
+        self.assertFalse(self.update_mock.called)

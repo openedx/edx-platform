@@ -2,9 +2,11 @@
 Grades related signals.
 """
 from django.dispatch import receiver, Signal
+from xmodule.modulestore.django import modulestore
 from logging import getLogger
 from student.models import user_by_anonymous_id
 from submissions.models import score_set, score_reset
+import course_blocks.api
 
 
 log = getLogger(__name__)
@@ -105,4 +107,40 @@ def submissions_score_reset_handler(sender, **kwargs):  # pylint: disable=unused
         log.exception(
             u"Failed to process score_reset signal from Submissions API. "
             "user: %s, course_id: %s, usage_id: %s", user, course_id, usage_id
+        )
+
+
+@receiver(SCORE_CHANGED)
+def recalculate_subsection_grade_handler(sender, **kwargs):  # pylint: disable=unused-argument
+    """
+    Consume the SCORE_CHANGED signal and trigger an update.
+    This method expects that the kwargs dictionary will contain the following
+    entries (See the definition of SCORE_CHANGED):
+       - points_possible: Maximum score available for the exercise
+       - points_earned: Score obtained by the user
+       - user_id: Integer User ID
+       - course_id: Unicode string representing the course
+       - usage_id: Unicode string indicating the courseware instance
+    """
+    points_possible = kwargs.get('points_possible', None)
+    points_earned = kwargs.get('points_earned', None)
+    course_id = kwargs.get('course_id', None)
+    usage_id = kwargs.get('usage_id', None)
+    user_id = kwargs.get('user_id', None)
+
+    # If any of the kwargs were missing, at least one of the following values
+    # will be None.
+    if all((user_id, points_possible, points_earned, course_id, usage_id)):
+        from courseware.courses import get_course_by_id
+        course = get_course_by_id(course_id, depth=0) # avoids circular import :(
+        student = user_by_anonymous_id(user_id)
+        course_structure_for_course = course_blocks.api.get_course_blocks(student, usage_id)
+        subsection = course_structure_for_course[usage_id]
+        from new.subsection_grade import SubsectionGradeFactory
+        SubsectionGradeFactory(student).update(subsection, course_structure_for_course, course)
+    else:
+        log.exception(
+            u"Failed to process SCORE_CHANGED signal. "
+            "points_possible: %s, points_earned: %s, user_id: %s, course_id: %s, "
+            "usage_id: %s", points_possible, points_earned, user_id, course_id, usage_id
         )

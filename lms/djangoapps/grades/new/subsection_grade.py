@@ -59,6 +59,9 @@ class SubsectionGrade(object):
             BlockRecord(unicode(location), weight, score.possible)
             for location, (score, weight) in self.locations_to_scores.iteritems()
         ]
+        if course.course_version == None:
+            course.course_version = 1
+
         PersistentSubsectionGrade.save_grade(
             user_id=student.id,
             usage_key=self.location,
@@ -163,6 +166,13 @@ class SubsectionGradeFactory(object):
             self._get_saved_grade(subsection, course_structure, course) or
             self._compute_and_update_grade(subsection, course_structure, course)
         )
+
+    def update(self, subsection, course_structure, course):
+        """
+        Updates the SubsectionGrade object for the student and subsection.
+        """
+        self._prefetch_scores(course_structure, course)
+        return self._compute_and_update_grade(subsection, course_structure, course)
 
     def _compute_and_update_grade(self, subsection, course_structure, course):
         """
