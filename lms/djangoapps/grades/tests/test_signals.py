@@ -162,6 +162,7 @@ class SubmissionSignalRelayTest(TestCase):
         self.signal_mock.assert_not_called()
 
 
+@patch.dict('django.conf.settings.FEATURES', {'ENABLE_SUBSECTION_GRADES_SAVED': True})
 @ddt.ddt
 class ScoreChangedUpdatesSubsectionGradeTest(ModuleStoreTestCase):
     def setUp(self):
