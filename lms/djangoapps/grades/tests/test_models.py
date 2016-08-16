@@ -150,7 +150,10 @@ class PersistentSubsectionGradeTest(GradesModelTestCase):
         Tests model creation, and confirms error when trying to recreate model.
         """
         created_grade = PersistentSubsectionGrade.objects.create(**self.params)
-        read_grade = PersistentSubsectionGrade.read(user_id=self.params["user_id"], usage_key=self.params["usage_key"])
+        read_grade = PersistentSubsectionGrade.read_grade(
+            user_id=self.params["user_id"],
+            usage_key=self.params["usage_key"],
+        )
         self.assertEqual(created_grade, read_grade)
         with self.assertRaises(ValidationError):
             created_grade = PersistentSubsectionGrade.objects.create(**self.params)
@@ -167,17 +170,20 @@ class PersistentSubsectionGradeTest(GradesModelTestCase):
         del self.params["course_version"]
         PersistentSubsectionGrade.objects.create(**self.params)
 
-    def test_update(self):
+    def test_update_grade(self):
         """
         Tests model update, and confirms error when updating a nonexistent model.
         """
         with self.assertRaises(PersistentSubsectionGrade.DoesNotExist):
-            PersistentSubsectionGrade.update(**self.params)
+            PersistentSubsectionGrade.update_grade(**self.params)
         PersistentSubsectionGrade.objects.create(**self.params)
         self.params['earned_all'] = 12
         self.params['earned_graded'] = 8
-        PersistentSubsectionGrade.update(**self.params)
-        read_grade = PersistentSubsectionGrade.read(user_id=self.params["user_id"], usage_key=self.params["usage_key"])
+        PersistentSubsectionGrade.update_grade(**self.params)
+        read_grade = PersistentSubsectionGrade.read_grade(
+            user_id=self.params["user_id"],
+            usage_key=self.params["usage_key"],
+        )
         self.assertEqual(read_grade.earned_all, 12)
         self.assertEqual(read_grade.earned_graded, 8)
 
@@ -187,7 +193,7 @@ class PersistentSubsectionGradeTest(GradesModelTestCase):
             PersistentSubsectionGrade.objects.create(**self.params)
         module_prefix = "lms.djangoapps.grades.models.PersistentSubsectionGrade."
         with patch(module_prefix + "objects.create") as mock_create:
-            with patch(module_prefix + "update", wraps=PersistentSubsectionGrade.update) as mock_update:
+            with patch(module_prefix + "update_grade", wraps=PersistentSubsectionGrade.update_grade) as mock_update:
                 PersistentSubsectionGrade.save_grade(**self.params)
                 self.assertTrue(mock_update.called)
                 self.assertNotEqual(mock_create.called, already_created)

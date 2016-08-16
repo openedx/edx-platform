@@ -237,12 +237,12 @@ class PersistentSubsectionGrade(TimeStampedModel):
         Takes the same arguments as both of those methods.
         """
         try:
-            cls.update(**kwargs)
+            cls.update_grade(**kwargs)
         except cls.DoesNotExist:
             cls.objects.create(**kwargs)
 
     @classmethod
-    def read(cls, user_id, usage_key):
+    def read_grade(cls, user_id, usage_key):
         """
         Reads a grade from database
 
@@ -259,7 +259,7 @@ class PersistentSubsectionGrade(TimeStampedModel):
         )
 
     @classmethod
-    def update(
+    def update_grade(
             cls,
             user_id,
             usage_key,
@@ -276,9 +276,8 @@ class PersistentSubsectionGrade(TimeStampedModel):
 
         Requires all the arguments listed in docstring for create_grade
         """
-        grade = cls.objects.get(
+        grade = cls.read_grade(
             user_id=user_id,
-            course_id=usage_key.course_key,  # course_id is included to take advantage of db indexes
             usage_key=usage_key,
         )
 
