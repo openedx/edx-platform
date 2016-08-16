@@ -198,7 +198,7 @@ class TestReverificationService(ModuleStoreTestCase):
         service = ReverificationService()
 
         self.enrollment.update_enrollment(mode=CourseMode.VERIFIED)
-        status = service.get_course_verification_status(self.user.id, self.course_id)
+        status = service.get_course_verification_status(self.user, self.course_id)
         self.assertEqual(status, VERIFY_STATUS_NEED_TO_VERIFY)
 
     def test_get_course_verification_status_not_enrolled(self):
@@ -212,7 +212,7 @@ class TestReverificationService(ModuleStoreTestCase):
         not_enrolled_course = CourseFactory.create(org='Robot', number='101', display_name='Second Test Course')
         self.assertIsNone(
             service.get_course_verification_status(
-                self.user.id,
+                self.user,
                 not_enrolled_course.id
             )
         )
@@ -227,5 +227,5 @@ class TestReverificationService(ModuleStoreTestCase):
 
         self.enrollment.update_enrollment(mode=CourseMode.HONOR)
         self.assertIsNone(
-            service.get_course_verification_status(self.user.id, self.course_id)
+            service.get_course_verification_status(self.user, self.course_id)
         )
