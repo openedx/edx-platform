@@ -46,6 +46,6 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterUniqueTogether(
             name='persistentsubsectiongrade',
-            unique_together=set([('user_id', 'course_id', 'usage_key')]),
+            unique_together=set([('course_id', 'user_id', 'usage_key')]),
         ),
     ]
