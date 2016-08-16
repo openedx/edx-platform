@@ -182,7 +182,12 @@ class PersistentSubsectionGrade(TimeStampedModel):
     """
 
     class Meta(object):
-        unique_together = (('user_id', 'course_id', 'usage_key'), )
+        unique_together = [
+            # * Specific grades can be pulled using all three columns,
+            # * Progress page can pull all grades for a given (course_id, user_id)
+            # * Course staff can see all grades for a course using (course_id,)
+            ('course_id', 'user_id', 'usage_key'),
+        ]
 
     # primary key will need to be large for this table
     id = UnsignedBigIntAutoField(primary_key=True)  # pylint: disable=invalid-name
