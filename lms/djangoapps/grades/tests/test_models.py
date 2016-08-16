@@ -4,7 +4,7 @@ Unit tests for grades models.
 from base64 import b64encode
 from collections import OrderedDict
 import ddt
-from hashlib import sha256
+from hashlib import sha1
 import json
 from mock import patch
 
@@ -90,7 +90,7 @@ class VisibleBlocksTest(GradesModelTestCase):
         """
         vblocks = VisibleBlocks.objects.create_from_blockrecords([self.record_a])
         expected_json = json.dumps([self.record_a._asdict()], separators=(',', ':'), sort_keys=True)
-        expected_hash = b64encode(sha256(expected_json).digest())
+        expected_hash = b64encode(sha1(expected_json).digest())
         self.assertEqual(expected_json, vblocks.blocks_json)
         self.assertEqual(expected_hash, vblocks.hashed)
 
