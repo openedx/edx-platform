@@ -10,7 +10,7 @@ from ..hidden_content import HiddenContentTransformer
 from .helpers import BlockParentsMapTestCase, update_block
 
 
-@attr('shard_3')
+@attr(shard=3)
 @ddt.ddt
 class HiddenContentTransformerTestCase(BlockParentsMapTestCase):
     """

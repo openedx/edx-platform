@@ -14,7 +14,6 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 
 from lms.djangoapps.commerce.tests import test_utils as ecomm_test_utils
-from openedx.core.djangoapps.theming.tests import test_util as theming_test_utils
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -28,7 +27,7 @@ from util.testing import UrlResetMixin
 from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme
 
 
-@attr('shard_3')
+@attr(shard=3)
 @ddt.ddt
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class CourseModeViewTest(UrlResetMixin, ModuleStoreTestCase):

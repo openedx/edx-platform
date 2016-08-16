@@ -2,7 +2,6 @@
 
 import datetime
 import ddt
-from django.test import TestCase
 
 from student.models import UserProfile
 from student.tests.factories import UserFactory

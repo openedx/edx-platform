@@ -40,7 +40,7 @@ from mobile_api.testutils import (
 from .serializers import CourseEnrollmentSerializer
 
 
-@attr('shard_2')
+@attr(shard=2)
 class TestUserDetailApi(MobileAPITestCase, MobileAuthUserTestMixin):
     """
     Tests for /api/mobile/v0.5/users/<user_name>...
@@ -55,7 +55,7 @@ class TestUserDetailApi(MobileAPITestCase, MobileAuthUserTestMixin):
         self.assertEqual(response.data['email'], self.user.email)
 
 
-@attr('shard_2')
+@attr(shard=2)
 class TestUserInfoApi(MobileAPITestCase, MobileAuthTestMixin):
     """
     Tests for /api/mobile/v0.5/my_user_info
@@ -68,10 +68,10 @@ class TestUserInfoApi(MobileAPITestCase, MobileAuthTestMixin):
         self.login()
 
         response = self.api_response(expected_response_code=302)
-        self.assertTrue(self.username in response['location'])
+        self.assertIn(self.username, response['location'])
 
 
-@attr('shard_2')
+@attr(shard=2)
 @ddt.ddt
 @override_settings(MKTG_URLS={'ROOT': 'dummy-root'})
 class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTestMixin,
@@ -138,7 +138,6 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
 
     @patch.dict(settings.FEATURES, {
         'ENABLE_PREREQUISITE_COURSES': True,
-        'MILESTONES_APP': True,
         'DISABLE_START_DATES': False,
         'ENABLE_MKTG_SITE': True,
     })
@@ -276,7 +275,7 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
         self.assertIn('/api/discussion/v1/courses/{}'.format(self.course.id), response_discussion_url)
 
 
-@attr('shard_2')
+@attr(shard=2)
 class CourseStatusAPITestCase(MobileAPITestCase):
     """
     Base test class for /api/mobile/v0.5/users/<user_name>/course_status_info/{course_id}
@@ -311,7 +310,7 @@ class CourseStatusAPITestCase(MobileAPITestCase):
         )
 
 
-@attr('shard_2')
+@attr(shard=2)
 class TestCourseStatusGET(CourseStatusAPITestCase, MobileAuthUserTestMixin,
                           MobileCourseAccessTestMixin, MilestonesTestCaseMixin):
     """
@@ -331,7 +330,7 @@ class TestCourseStatusGET(CourseStatusAPITestCase, MobileAuthUserTestMixin,
         )
 
 
-@attr('shard_2')
+@attr(shard=2)
 class TestCourseStatusPATCH(CourseStatusAPITestCase, MobileAuthUserTestMixin,
                             MobileCourseAccessTestMixin, MilestonesTestCaseMixin):
     """
@@ -435,7 +434,7 @@ class TestCourseStatusPATCH(CourseStatusAPITestCase, MobileAuthUserTestMixin,
         )
 
 
-@attr('shard_2')
+@attr(shard=2)
 @patch.dict(settings.FEATURES, {'ENABLE_MKTG_SITE': True})
 @override_settings(MKTG_URLS={'ROOT': 'dummy-root'})
 class TestCourseEnrollmentSerializer(MobileAPITestCase, MilestonesTestCaseMixin):

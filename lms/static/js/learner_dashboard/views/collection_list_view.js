@@ -1,4 +1,4 @@
-;(function (define) {
+(function(define) {
     'use strict';
 
     define(['backbone',
@@ -9,7 +9,7 @@
             'edx-ui-toolkit/js/utils/html-utils',
             'text!../../../templates/learner_dashboard/empty_programs_list.underscore'
         ],
-        function (Backbone,
+        function(Backbone,
                   $,
                   _,
                   gettext,
@@ -29,11 +29,11 @@
 
                     if (!this.collection.length) {
                         if (this.context.marketingUrl) {
-                            //Only show the advertising panel if the link is passed in
+                            // Only show the advertising panel if the link is passed in
                             HtmlUtils.setHtml(this.$el, HtmlUtils.template(emptyProgramsListTpl)(this.context));
                         }
-                    } else {        
-                        childList = []; 
+                    } else {
+                        childList = [];
 
                         this.collection.each(function(model) {
                             var child = new this.childView({
@@ -43,7 +43,7 @@
                             childList.push(child.el);
                         }, this);
 
-                        if (this.titleContext){
+                        if (this.titleContext) {
                             this.$el.before(HtmlUtils.ensureHtml(this.getTitleHtml()).toString());
                         }
 
@@ -51,9 +51,9 @@
                     }
                 },
 
-                getTitleHtml: function(){
+                getTitleHtml: function() {
                     var titleHtml = HtmlUtils.joinHtml(
-                        HtmlUtils.HTML('<'), 
+                        HtmlUtils.HTML('<'),
                         this.titleContext.el,
                         HtmlUtils.HTML(' class="sr-only collection-title">'),
                         StringUtils.interpolate(this.titleContext.title),

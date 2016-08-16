@@ -1,26 +1,26 @@
 // Backbone Application View: Instructor Information
 
-define([  // jshint ignore:line
-        'jquery',
-        'underscore',
-        'backbone',
-        'gettext',
-        'js/utils/templates',
-        "js/models/uploads",
-        "js/views/uploads"
-    ],
-    function ($, _, Backbone, gettext, TemplateUtils, FileUploadModel, FileUploadDialog) {
+define([
+    'jquery',
+    'underscore',
+    'backbone',
+    'gettext',
+    'js/utils/templates',
+    'js/models/uploads',
+    'js/views/uploads'
+],
+    function($, _, Backbone, gettext, TemplateUtils, FileUploadModel, FileUploadDialog) {
         'use strict';
         var InstructorInfoView = Backbone.View.extend({
 
-             events : {
-                 'click .remove-instructor-data': 'removeInstructor',
-                 'click .action-upload-instructor-image': "uploadInstructorImage"
-             },
+            events: {
+                'click .remove-instructor-data': 'removeInstructor',
+                'click .action-upload-instructor-image': 'uploadInstructorImage'
+            },
 
             initialize: function() {
                 // Set up the initial state of the attributes set for this model instance
-                 _.bindAll(this, 'render');
+                _.bindAll(this, 'render');
                 this.template = this.loadTemplate('course-instructor-details');
                 this.listenTo(this.model, 'change:instructor_info', this.render);
             },
@@ -32,9 +32,9 @@ define([  // jshint ignore:line
 
             render: function() {
                 // Assemble the render view for this model.
-                $(".course-instructor-details-fields").empty();
+                $('.course-instructor-details-fields').empty();
                 var self = this;
-                $.each(this.model.get('instructor_info').instructors, function( index, data ) {
+                $.each(this.model.get('instructor_info').instructors, function(index, data) {
                     $(self.el).append(self.template({
                         data: data,
                         index: index
@@ -71,8 +71,8 @@ define([  // jshint ignore:line
                     instructor = instructors[index];
 
                 var upload = new FileUploadModel({
-                    title: gettext("Upload instructor image."),
-                    message: gettext("Files must be in JPEG or PNG format."),
+                    title: gettext('Upload instructor image.'),
+                    message: gettext('Files must be in JPEG or PNG format.'),
                     mimeTypes: ['image/jpeg', 'image/png']
                 });
                 var self = this;

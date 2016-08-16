@@ -42,7 +42,7 @@ from common.test.acceptance.pages.lms.course_wiki import CourseWikiPage, CourseW
 from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc, CourseUpdateDesc
 
 
-@attr('shard_8')
+@attr(shard=8)
 class ForgotPasswordPageTest(UniqueCourseTest):
     """
     Test that forgot password forms is rendered if url contains 'forgot-password-modal'
@@ -84,7 +84,7 @@ class ForgotPasswordPageTest(UniqueCourseTest):
         self.assertIn("Password Reset Email Sent", self.reset_password_page.get_success_message())
 
 
-@attr('shard_8')
+@attr(shard=8)
 class LoginFromCombinedPageTest(UniqueCourseTest):
     """Test that we can log in using the combined login/registration page.
 
@@ -145,18 +145,15 @@ class LoginFromCombinedPageTest(UniqueCourseTest):
         # Expect that we're shown a success message
         self.assertIn("Password Reset Email Sent", self.login_page.wait_for_success())
 
-    def test_password_reset_failure(self):
+    def test_password_reset_no_user(self):
         # Navigate to the password reset form
         self.login_page.visit()
 
         # User account does not exist
         self.login_page.password_reset(email="nobody@nowhere.com")
 
-        # Expect that we're shown a failure message
-        self.assertIn(
-            "No user with the provided email address exists.",
-            self.login_page.wait_for_errors()
-        )
+        # Expect that we're shown a success message
+        self.assertIn("Password Reset Email Sent", self.login_page.wait_for_success())
 
     def test_third_party_login(self):
         """
@@ -278,7 +275,7 @@ class LoginFromCombinedPageTest(UniqueCourseTest):
         return (email, password)
 
 
-@attr('shard_8')
+@attr(shard=8)
 class RegisterFromCombinedPageTest(UniqueCourseTest):
     """Test that we can register a new user from the combined login/registration page. """
 
@@ -401,7 +398,7 @@ class RegisterFromCombinedPageTest(UniqueCourseTest):
         account_settings.wait_for_message(field_id, "Successfully unlinked")
 
 
-@attr('shard_8')
+@attr(shard=8)
 class PayAndVerifyTest(EventsTestMixin, UniqueCourseTest):
     """Test that we can proceed through the payment and verification flow."""
     def setUp(self):
@@ -540,7 +537,7 @@ class PayAndVerifyTest(EventsTestMixin, UniqueCourseTest):
         self.assertEqual(enrollment_mode, 'verified')
 
 
-@attr('shard_1')
+@attr(shard=1)
 class CourseWikiTest(UniqueCourseTest):
     """
     Tests that verify the course wiki.
@@ -594,7 +591,7 @@ class CourseWikiTest(UniqueCourseTest):
         self.assertEqual(content, actual_content)
 
 
-@attr('shard_1')
+@attr(shard=1)
 class HighLevelTabTest(UniqueCourseTest):
     """
     Tests that verify each of the high-level tabs available within a course.
@@ -751,7 +748,7 @@ class HighLevelTabTest(UniqueCourseTest):
             self.assertIn(expected, actual_items)
 
 
-@attr('shard_1')
+@attr(shard=1)
 class PDFTextBooksTabTest(UniqueCourseTest):
     """
     Tests that verify each of the textbook tabs available within a course.
@@ -792,7 +789,7 @@ class PDFTextBooksTabTest(UniqueCourseTest):
             self.tab_nav.go_to_tab("PDF Book {}".format(i))
 
 
-@attr('shard_1')
+@attr(shard=1)
 class VisibleToStaffOnlyTest(UniqueCourseTest):
     """
     Tests that content with visible_to_staff_only set to True cannot be viewed by students.
@@ -877,7 +874,7 @@ class VisibleToStaffOnlyTest(UniqueCourseTest):
         self.assertEqual([u'Test Unit'], self.course_nav.sequence_items)
 
 
-@attr('shard_1')
+@attr(shard=1)
 class TooltipTest(UniqueCourseTest):
     """
     Tests that tooltips are displayed
@@ -922,7 +919,7 @@ class TooltipTest(UniqueCourseTest):
         self.courseware_page.verify_tooltips_displayed()
 
 
-@attr('shard_1')
+@attr(shard=1)
 class PreRequisiteCourseTest(UniqueCourseTest):
     """
     Tests that pre-requisite course messages are displayed
@@ -1007,7 +1004,7 @@ class PreRequisiteCourseTest(UniqueCourseTest):
         self.settings_page.save_changes()
 
 
-@attr('shard_1')
+@attr(shard=1)
 class ProblemExecutionTest(UniqueCourseTest):
     """
     Tests of problems.
@@ -1086,7 +1083,7 @@ class ProblemExecutionTest(UniqueCourseTest):
         self.assertFalse(problem_page.is_correct())
 
 
-@attr('shard_1')
+@attr(shard=1)
 class EntranceExamTest(UniqueCourseTest):
     """
     Tests that course has an entrance exam.
@@ -1157,7 +1154,7 @@ class EntranceExamTest(UniqueCourseTest):
         ))
 
 
-@attr('shard_1')
+@attr(shard=1)
 class NotLiveRedirectTest(UniqueCourseTest):
     """
     Test that a banner is shown when the user is redirected to
@@ -1189,7 +1186,7 @@ class NotLiveRedirectTest(UniqueCourseTest):
         )
 
 
-@attr('shard_1')
+@attr(shard=1)
 class EnrollmentClosedRedirectTest(UniqueCourseTest):
     """
     Test that a banner is shown when the user is redirected to the
@@ -1278,7 +1275,7 @@ class EnrollmentClosedRedirectTest(UniqueCourseTest):
         self._assert_dashboard_message()
 
 
-@attr('shard_1')
+@attr(shard=1)
 class LMSLanguageTest(UniqueCourseTest):
     """ Test suite for the LMS Language """
     def setUp(self):

@@ -802,13 +802,13 @@ To view JavaScript code style quality run this command.
 
 ::
 
-    paver run_jshint
+    paver run_eslint
 
 -  This command also comes with a ``--limit`` switch, this is an example of that switch.
 
 ::
 
-	paver run_jshint --limit=700
+	paver run_eslint --limit=50000
 
 
 
@@ -829,7 +829,7 @@ Two tools are available for evaluating complexity of edx-platform code:
 
 ::
 
-       plato -q -x common/static/js/vendor/ -t common -l .jshintrc -r -d jscomplexity common/static/js/
+       plato -q -x common/static/js/vendor/ -t common -e .eslintrc.json -r -d jscomplexity common/static/js/
 
 
 

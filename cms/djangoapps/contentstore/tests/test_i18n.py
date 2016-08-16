@@ -10,7 +10,6 @@ from contentstore.tests.utils import AjaxEnabledTestClient
 from xmodule.modulestore.django import ModuleI18nService
 from django.utils import translation
 from django.utils.translation import get_language
-from django.conf import settings
 from xmodule.modulestore.tests.factories import ItemFactory, CourseFactory
 from contentstore.views.preview import _preview_module_system
 

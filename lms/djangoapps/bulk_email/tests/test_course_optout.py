@@ -9,7 +9,6 @@ from nose.plugins.attrib import attr
 from django.core import mail
 from django.core.management import call_command
 from django.core.urlresolvers import reverse
-from django.conf import settings
 
 from student.tests.factories import UserFactory, AdminFactory, CourseEnrollmentFactory
 from student.models import CourseEnrollment
@@ -18,7 +17,7 @@ from xmodule.modulestore.tests.factories import CourseFactory
 from bulk_email.models import BulkEmailFlag
 
 
-@attr('shard_1')
+@attr(shard=1)
 @patch('bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message', autospec=True))
 class TestOptoutCourseEmails(ModuleStoreTestCase):
     """
@@ -56,7 +55,7 @@ class TestOptoutCourseEmails(ModuleStoreTestCase):
         response = self.client.get(url)
         email_section = '<div class="vert-left send-email" id="section-send-email">'
         # If this fails, it is likely because BulkEmailFlag.is_enabled() is set to False
-        self.assertTrue(email_section in response.content)
+        self.assertIn(email_section, response.content)
 
     def test_optout_course(self):
         """

@@ -1,13 +1,13 @@
 
-define(["js/views/baseview", "underscore"], function(BaseView, _) {
+define(['js/views/baseview', 'underscore'], function(BaseView, _) {
     var AbstractEditor = BaseView.extend({
 
         // Model is MetadataModel
-        initialize : function() {
+        initialize: function() {
             var self = this;
             var templateName = _.result(this, 'templateName');
             // Backbone model cid is only unique within the collection.
-            this.uniqueId = _.uniqueId(templateName + "_");
+            this.uniqueId = _.uniqueId(templateName + '_');
             this.template = this.loadTemplate(templateName);
             this.$el.html(this.template({model: this.model, uniqueId: this.uniqueId}));
             this.listenTo(this.model, 'change', this.render);
@@ -22,24 +22,24 @@ define(["js/views/baseview", "underscore"], function(BaseView, _) {
         /**
          * Returns the value currently displayed in the editor/view. Subclasses should implement this method.
          */
-        getValueFromEditor : function () {},
+        getValueFromEditor: function() {},
 
         /**
          * Sets the value currently displayed in the editor/view. Subclasses should implement this method.
          */
-        setValueInEditor : function (value) {},
+        setValueInEditor: function(value) {},
 
         /**
          * Sets the value in the model, using the value currently displayed in the view.
          */
-        updateModel: function () {
+        updateModel: function() {
             this.model.setValue(this.getValueFromEditor());
         },
 
         /**
          * Clears the value currently set in the model (reverting to the default).
          */
-        clear: function () {
+        clear: function() {
             this.model.clear();
         },
 
@@ -57,7 +57,7 @@ define(["js/views/baseview", "underscore"], function(BaseView, _) {
         /**
          * Returns the clear button.
          */
-        getClearButton: function () {
+        getClearButton: function() {
             return this.$el.find('.setting-clear');
         },
 
@@ -65,7 +65,7 @@ define(["js/views/baseview", "underscore"], function(BaseView, _) {
          * Renders the editor, updating the value displayed in the view, as well as the state of
          * the clear button.
          */
-        render: function () {
+        render: function() {
             if (!this.template) return;
 
             this.setValueInEditor(this.model.getDisplayValue());
@@ -88,10 +88,10 @@ define(["js/views/baseview", "underscore"], function(BaseView, _) {
          * @returns The loaded template.
          */
         loadTemplate: function(name) {
-            var templateSelector = "#" + name,
+            var templateSelector = '#' + name,
                 templateText = $(templateSelector).text();
             if (!templateText) {
-                console.error("Failed to load " + name + " template");
+                console.error('Failed to load ' + name + ' template');
             }
             return _.template(templateText);
         }

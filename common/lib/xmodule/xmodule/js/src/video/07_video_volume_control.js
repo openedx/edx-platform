@@ -1,9 +1,9 @@
-(function (define) {
-'use strict';
+(function(define) {
+    'use strict';
 // VideoVolumeControl module.
-define(
+    define(
 'video/07_video_volume_control.js', ['edx-ui-toolkit/js/utils/html-utils'],
-function (HtmlUtils) {
+function(HtmlUtils) {
     /**
      * Video volume control module.
      * @exports video/07_video_volume_control.js
@@ -39,38 +39,38 @@ function (HtmlUtils) {
 
         videoVolumeControlHtml: HtmlUtils.interpolateHtml(
             HtmlUtils.HTML([
-            '<div class="volume" role="application">',
+                '<div class="volume" role="application">',
                 '<p class="sr instructions" id="volume-instructions">',
-                    '{volumeInstructions}',
+                '{volumeInstructions}',
                 '</p>',
                 '<button class="control" aria-disabled="false" aria-describedby="volume-instructions"',
-                    '" aria-expanded="false" title="',
-                        '{adjustVideoVolume}',
-                    '">',
-                    '<span class="icon fa fa-volume-up" aria-hidden="true"></span>',
+                '" aria-expanded="false" title="',
+                '{adjustVideoVolume}',
+                '">',
+                '<span class="icon fa fa-volume-up" aria-hidden="true"></span>',
                 '</button>',
                 '<div class="volume-slider-container" aria-hidden="true" title="',
-                    '{adjustVideoVolume}',
-                    '">',
-                    '<div class="volume-slider" ',
-                        'role="slider"',
-                        'aria-orientation="vertical" ',
-                        'aria-valuemin="0" ',
-                        'aria-valuemax="100" ',
-                        'aria-valuenow="" ',
-                        'aria-label="',
-                        '{volumeText}',
-                        '"></div>',
+                '{adjustVideoVolume}',
+                '">',
+                '<div class="volume-slider" ',
+                'role="slider"',
+                'aria-orientation="vertical" ',
+                'aria-valuemin="0" ',
+                'aria-valuemax="100" ',
+                'aria-valuenow="" ',
+                'aria-label="',
+                '{volumeText}',
+                '"></div>',
                 '</div>',
-            '</div>'].join('')),
+                '</div>'].join('')),
             {
-                volumeInstructions: gettext('Click on this button to mute or unmute this video or press UP or DOWN buttons to increase or decrease volume level.'), // jshint ignore: line
+                volumeInstructions: gettext('Click on this button to mute or unmute this video or press UP or DOWN buttons to increase or decrease volume level.'),  // eslint-disable-line max-len
                 adjustVideoVolume: gettext('Adjust video volume'),
                 volumeText: gettext('Volume')
             }
         ),
 
-        destroy: function () {
+        destroy: function() {
             this.volumeSlider.slider('destroy');
             this.state.el.find('iframe').removeAttr('tabindex');
             this.a11y.destroy();
@@ -130,7 +130,7 @@ function (HtmlUtils) {
          */
         render: function() {
             var container = this.el.find('.volume-slider');
-            
+
             HtmlUtils.append(container, HtmlUtils.HTML('<div class="ui-slider-handle volume-handle"></div>'));
 
             this.volumeSlider = container.slider({
@@ -230,7 +230,7 @@ function (HtmlUtils) {
         },
 
         /** Updates volume slider view. */
-        updateSliderView: function (volume) {
+        updateSliderView: function(volume) {
             this.volumeSlider.slider('value', volume);
             this.el.find('.volume-slider')
                 .attr('aria-valuenow', volume);
@@ -259,7 +259,7 @@ function (HtmlUtils) {
          * Returns current volume state (is it muted or not?).
          * @return {Boolean}
          */
-        getMuteStatus: function () {
+        getMuteStatus: function() {
             return this.getVolume() === 0;
         },
 
@@ -295,12 +295,12 @@ function (HtmlUtils) {
          * volume level.
          * @param {Number} volume Volume level.
          */
-        checkMuteButtonStatus: function (volume) {
+        checkMuteButtonStatus: function(volume) {
             if (volume <= this.min) {
                 this.updateMuteButtonView(true);
                 this.state.el.off('volumechange.is-muted');
-                this.state.el.on('volumechange.is-muted', _.once(function () {
-                     this.updateMuteButtonView(false);
+                this.state.el.on('volumechange.is-muted', _.once(function() {
+                    this.updateMuteButtonView(false);
                 }.bind(this)));
             }
         },
@@ -336,35 +336,35 @@ function (HtmlUtils) {
                 keyCode = event.keyCode;
 
             switch (keyCode) {
-                case KEY.UP:
+            case KEY.UP:
                     // Shift + Arrows keyboard shortcut might be used by
                     // screen readers. In this case, do nothing.
-                    if (event.shiftKey) {
-                        return true;
-                    }
+                if (event.shiftKey) {
+                    return true;
+                }
 
-                    this.increaseVolume();
-                    return false;
-                case KEY.DOWN:
+                this.increaseVolume();
+                return false;
+            case KEY.DOWN:
                     // Shift + Arrows keyboard shortcut might be used by
                     // screen readers. In this case, do nothing.
-                    if (event.shiftKey) {
-                        return true;
-                    }
+                if (event.shiftKey) {
+                    return true;
+                }
 
-                    this.decreaseVolume();
-                    return false;
+                this.decreaseVolume();
+                return false;
 
-                case KEY.SPACE:
-                case KEY.ENTER:
+            case KEY.SPACE:
+            case KEY.ENTER:
                     // Shift + Enter keyboard shortcut might be used by
                     // screen readers. In this case, do nothing.
-                    if (event.shiftKey) {
-                        return true;
-                    }
+                if (event.shiftKey) {
+                    return true;
+                }
 
-                    this.toggleMute();
-                    return false;
+                this.toggleMute();
+                return false;
             }
 
             return true;
@@ -374,7 +374,7 @@ function (HtmlUtils) {
          * Keydown event handler for the volume button.
          * @param {jquery Event} event
          */
-         keyDownButtonHandler: function(event) {
+        keyDownButtonHandler: function(event) {
             // ALT key is used to change (alternate) the function of
             // other pressed keys. In this case, do nothing.
             if (event.altKey) {
@@ -385,10 +385,10 @@ function (HtmlUtils) {
                 keyCode = event.keyCode;
 
             switch (keyCode) {
-                case KEY.ENTER:
-                case KEY.SPACE:
-                    this.toggleMute();
-                    return false;
+            case KEY.ENTER:
+            case KEY.SPACE:
+                this.toggleMute();
+                return false;
             }
 
             return true;
@@ -433,7 +433,7 @@ function (HtmlUtils) {
      * @param {Number} max Maximum value for the volume slider.
      * @param {Object} i18n The object containing strings with translations.
      */
-    var Accessibility = function (button, min, max, i18n) {
+    var Accessibility = function(button, min, max, i18n) {
         this.min = min;
         this.max = max;
         this.button = button;
@@ -443,14 +443,14 @@ function (HtmlUtils) {
     };
 
     Accessibility.prototype = {
-        destroy: function () {
+        destroy: function() {
             this.liveRegion.remove();
         },
 
         /** Initializes the module. */
         initialize: function() {
             this.liveRegion = $('<div />', {
-                'class':  'sr video-live-region',
+                'class': 'sr video-live-region',
                 'aria-hidden': 'false',
                 'aria-live': 'polite'
             });
@@ -502,7 +502,7 @@ function (HtmlUtils) {
      * @param {Number} min Minimum value for the volume slider.
      * @param {Number} max Maximum value for the volume slider.
      */
-    var CookieManager = function (min, max) {
+    var CookieManager = function(min, max) {
         this.min = min;
         this.max = max;
         this.cookieName = 'video_player_volume_level';

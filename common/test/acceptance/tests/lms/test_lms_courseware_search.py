@@ -16,7 +16,7 @@ from common.test.acceptance.pages.lms.courseware_search import CoursewareSearchP
 from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
 
 
-@attr('shard_5')
+@attr(shard=5)
 class CoursewareSearchTest(UniqueCourseTest):
     """
     Test courseware search.

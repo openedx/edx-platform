@@ -22,7 +22,7 @@ from textwrap import dedent
 from xmodule.partitions.partitions import Group
 
 
-@attr('shard_8')
+@attr(shard=8)
 class ContentGroupConfigurationTest(StudioCourseTest):
     """
     Tests for content groups in the Group Configurations Page.
@@ -234,7 +234,7 @@ class ContentGroupConfigurationTest(StudioCourseTest):
         ).fulfill()
 
 
-@attr('shard_8')
+@attr(shard=8)
 class AdvancedSettingsValidationTest(StudioCourseTest):
     """
     Tests for validation feature in Studio's advanced settings tab
@@ -407,7 +407,7 @@ class AdvancedSettingsValidationTest(StudioCourseTest):
         self.assertEquals(set(displayed_fields), set(expected_fields))
 
 
-@attr('shard_1')
+@attr(shard=1)
 class ContentLicenseTest(StudioCourseTest):
     """
     Tests for course-level licensing (that is, setting the license,

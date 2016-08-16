@@ -4,7 +4,7 @@
 define(['underscore', 'gettext', 'js/views/manage_users_and_roles'],
 function(_, gettext, ManageUsersAndRoles) {
     'use strict';
-    return function (containerName, users, tplUserURL, current_user_id, allow_actions) {
+    return function(containerName, users, tplUserURL, current_user_id, allow_actions) {
         function updateMessages(messages) {
             var local_messages = _.extend({}, messages);
             local_messages.alreadyMember.title = gettext('Already a library team member');
@@ -17,13 +17,13 @@ function(_, gettext, ManageUsersAndRoles) {
         // Last role is considered an admin role (unrestricted access + ability to manage other users' permissions)
         // Changing roles is performed in promote-demote fashion, so moves only to adjacent roles is allowed
         var roles = [
-            {key:'library_user', name:gettext('Library User')},
-            {key:'staff', name:gettext('Staff')},
-            {key:'instructor', 'name': gettext("Admin")}
+            {key: 'library_user', name: gettext('Library User')},
+            {key: 'staff', name: gettext('Staff')},
+            {key: 'instructor', 'name': gettext('Admin')}
         ];
 
         var options = {
-            el: $("#content"),
+            el: $('#content'),
             containerName: containerName,
             tplUserURL: tplUserURL,
             roles: roles,

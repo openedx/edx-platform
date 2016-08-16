@@ -1,19 +1,18 @@
-define([ "jquery", "underscore", "edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers", "js/spec_helpers/edit_helpers",
-    "js/views/xblock_editor", "js/models/xblock_info"],
-    function ($, _, AjaxHelpers, EditHelpers, XBlockEditorView, XBlockInfo) {
-
-        describe("XBlockEditorView", function() {
+define(['jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'js/spec_helpers/edit_helpers',
+    'js/views/xblock_editor', 'js/models/xblock_info'],
+    function($, _, AjaxHelpers, EditHelpers, XBlockEditorView, XBlockInfo) {
+        describe('XBlockEditorView', function() {
             var model, editor, testDisplayName, mockSaveResponse;
 
             testDisplayName = 'Test Display Name';
             mockSaveResponse = {
-                data: "<p>Some HTML</p>",
+                data: '<p>Some HTML</p>',
                 metadata: {
                     display_name: testDisplayName
                 }
             };
 
-            beforeEach(function () {
+            beforeEach(function() {
                 EditHelpers.installEditTemplates();
                 model = new XBlockInfo({
                     id: 'testCourse/branch/draft/block/verticalFFF',
@@ -25,10 +24,10 @@ define([ "jquery", "underscore", "edx-ui-toolkit/js/utils/spec-helpers/ajax-help
                 });
             });
 
-            describe("Editing an xblock", function() {
+            describe('Editing an xblock', function() {
                 var mockXBlockEditorHtml;
 
-                beforeEach(function () {
+                beforeEach(function() {
                     EditHelpers.installMockXBlock();
                 });
 
@@ -51,7 +50,7 @@ define([ "jquery", "underscore", "edx-ui-toolkit/js/utils/spec-helpers/ajax-help
                 });
             });
 
-            describe("Editing an xmodule", function() {
+            describe('Editing an xmodule', function() {
                 var mockXModuleEditorHtml;
 
                 mockXModuleEditorHtml = readFixtures('mock/mock-xmodule-editor.underscore');
@@ -60,7 +59,7 @@ define([ "jquery", "underscore", "edx-ui-toolkit/js/utils/spec-helpers/ajax-help
                     EditHelpers.installMockXModule(mockSaveResponse);
                 });
 
-                afterEach(function () {
+                afterEach(function() {
                     EditHelpers.uninstallMockXModule();
                 });
 

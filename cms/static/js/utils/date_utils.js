@@ -1,20 +1,20 @@
-define(["jquery", "date", "js/utils/change_on_enter", "jquery.ui", "jquery.timepicker"],
+define(['jquery', 'date', 'js/utils/change_on_enter', 'jquery.ui', 'jquery.timepicker'],
 function($, date, TriggerChangeEventOnEnter) {
     'use strict';
-    var setupDatePicker = function (fieldName, view, index) {
+    var setupDatePicker = function(fieldName, view, index) {
         var cacheModel;
         var div;
-        if (typeof index !== "undefined" && view.hasOwnProperty("collection")) {
+        if (typeof index !== 'undefined' && view.hasOwnProperty('collection')) {
             cacheModel = view.collection.models[index];
             div = view.$el.find('#' + view.collectionSelector(cacheModel.cid));
         } else {
             cacheModel = view.model;
             div = view.$el.find('#' + view.fieldToSelectorMap[fieldName]);
         }
-        var datefield = $(div).find("input.date");
-        var timefield = $(div).find("input.time");
+        var datefield = $(div).find('input.date');
+        var timefield = $(div).find('input.time');
         var cacheview = view;
-        var setfield = function (event) {
+        var setfield = function(event) {
             var newVal = getDate(datefield, timefield);
 
             // Setting to null clears the time as well, as date and time are linked.
@@ -25,7 +25,7 @@ function($, date, TriggerChangeEventOnEnter) {
         };
 
         // instrument as date and time pickers
-        timefield.timepicker({'timeFormat' : 'H:i'});
+        timefield.timepicker({'timeFormat': 'H:i'});
         datefield.datepicker();
 
         // Using the change event causes setfield to be triggered twice, but it is necessary
@@ -48,23 +48,23 @@ function($, date, TriggerChangeEventOnEnter) {
         }
     };
 
-    var getDate = function (datepickerInput, timepickerInput) {
+    var getDate = function(datepickerInput, timepickerInput) {
         // given a pair of inputs (datepicker and timepicker), return a JS Date
         // object that corresponds to the datetime.js that they represent. Assume
         // UTC timezone, NOT the timezone of the user's browser.
         var date = null, time = null;
         if (datepickerInput.length > 0) {
-            date = $(datepickerInput).datepicker("getDate");
+            date = $(datepickerInput).datepicker('getDate');
         }
         if (timepickerInput.length > 0) {
-            time = $(timepickerInput).timepicker("getTime");
+            time = $(timepickerInput).timepicker('getTime');
         }
-        if(date && time) {
+        if (date && time) {
             return new Date(Date.UTC(
                 date.getFullYear(), date.getMonth(), date.getDate(),
                 time.getHours(), time.getMinutes()
             ));
-        } else if (date) { 
+        } else if (date) {
             return new Date(Date.UTC(
                 date.getFullYear(), date.getMonth(), date.getDate()));
         } else {
@@ -72,14 +72,14 @@ function($, date, TriggerChangeEventOnEnter) {
         }
     };
 
-    var setDate = function (datepickerInput, timepickerInput, datetime) {
+    var setDate = function(datepickerInput, timepickerInput, datetime) {
         // given a pair of inputs (datepicker and timepicker) and the date as an
         // ISO-formatted date string.
         datetime = date.parse(datetime);
         if (datetime) {
-            $(datepickerInput).datepicker("setDate", datetime);
+            $(datepickerInput).datepicker('setDate', datetime);
             if (timepickerInput.length > 0) {
-                $(timepickerInput).timepicker("setTime", datetime);
+                $(timepickerInput).timepicker('setTime', datetime);
             }
         }
     };
@@ -90,12 +90,12 @@ function($, date, TriggerChangeEventOnEnter) {
         var date = new Date(dateArg);
         return date.toLocaleString(
             [],
-            {timeZone: "UTC", timeZoneName: "short"}
+            {timeZone: 'UTC', timeZoneName: 'short'}
         );
     };
 
-    var parseDateFromString = function(stringDate){
-        if (stringDate && typeof stringDate === "string"){
+    var parseDateFromString = function(stringDate) {
+        if (stringDate && typeof stringDate === 'string') {
             return new Date(stringDate);
         }
         else {
@@ -103,9 +103,9 @@ function($, date, TriggerChangeEventOnEnter) {
         }
     };
 
-    var convertDateStringsToObjects = function(obj, dateFields){
-        for (var i = 0; i < dateFields.length; i++){
-            if (obj[dateFields[i]]){
+    var convertDateStringsToObjects = function(obj, dateFields) {
+        for (var i = 0; i < dateFields.length; i++) {
+            if (obj[dateFields[i]]) {
                 obj[dateFields[i]] = parseDateFromString(obj[dateFields[i]]);
             }
         }

@@ -1,13 +1,13 @@
 define([
-        'backbone',
-        'jquery',
-        'underscore',
-        'js/programs/utils/constants',
-        'text!templates/programs/confirm_modal.underscore',
-        'edx-ui-toolkit/js/utils/html-utils',
-        'gettext'
-    ],
-    function( Backbone, $, _, constants, ModalTpl, HtmlUtils ) {
+    'backbone',
+    'jquery',
+    'underscore',
+    'js/programs/utils/constants',
+    'text!templates/programs/confirm_modal.underscore',
+    'edx-ui-toolkit/js/utils/html-utils',
+    'gettext'
+],
+    function(Backbone, $, _, constants, ModalTpl, HtmlUtils) {
         'use strict';
 
         return Backbone.View.extend({
@@ -17,17 +17,17 @@ define([
                 'keydown': 'handleKeydown'
             },
 
-            tpl: HtmlUtils.template( ModalTpl ),
+            tpl: HtmlUtils.template(ModalTpl),
 
-            initialize: function( options ) {
-                this.$parentEl = $( options.parentEl );
+            initialize: function(options) {
+                this.$parentEl = $(options.parentEl);
                 this.callback = options.callback;
                 this.content = options.content;
                 this.render();
             },
 
             render: function() {
-                HtmlUtils.setHtml(this.$el, this.tpl( this.content ));
+                HtmlUtils.setHtml(this.$el, this.tpl(this.content));
                 HtmlUtils.setHtml(this.$parentEl, HtmlUtils.HTML(this.$el));
                 this.postRender();
             },
@@ -47,10 +47,10 @@ define([
                 this.$parentEl.html('');
             },
 
-            handleKeydown: function( event ) {
+            handleKeydown: function(event) {
                 var keyCode = event.keyCode;
 
-                if ( keyCode === constants.keyCodes.esc ) {
+                if (keyCode === constants.keyCodes.esc) {
                     this.destroy();
                 }
             }

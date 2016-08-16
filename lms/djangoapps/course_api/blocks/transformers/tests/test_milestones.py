@@ -16,9 +16,9 @@ from ..milestones import MilestonesTransformer
 from ...api import get_course_blocks
 
 
-@attr('shard_3')
+@attr(shard=3)
 @ddt.ddt
-@patch.dict('django.conf.settings.FEATURES', {'ENABLE_SPECIAL_EXAMS': True, 'MILESTONES_APP': True})
+@patch.dict('django.conf.settings.FEATURES', {'ENABLE_SPECIAL_EXAMS': True})
 class MilestonesTransformerTestCase(CourseStructureTestCase, MilestonesTestCaseMixin):
     """
     Test behavior of ProctoredExamTransformer

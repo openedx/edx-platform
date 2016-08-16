@@ -5,7 +5,7 @@ define([
 ],
 function($, _, XBlockContainerInfo, ContainerPage, ComponentTemplates, xmoduleLoader) {
     'use strict';
-    return function (componentTemplates, XBlockInfoJson, action, options) {
+    return function(componentTemplates, XBlockInfoJson, action, options) {
         var main_options = {
             el: $('#content'),
             model: new XBlockContainerInfo(XBlockInfoJson, {parse: true}),
@@ -13,7 +13,7 @@ function($, _, XBlockContainerInfo, ContainerPage, ComponentTemplates, xmoduleLo
             templates: new ComponentTemplates(componentTemplates, {parse: true})
         };
 
-        xmoduleLoader.done(function () {
+        xmoduleLoader.done(function() {
             var view = new ContainerPage(_.extend(main_options, options));
             view.render();
         });

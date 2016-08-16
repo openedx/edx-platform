@@ -8,7 +8,7 @@ from xmodule.modulestore.tests.factories import CourseFactory
 from mock import patch
 
 
-@attr('shard_1')
+@attr(shard=1)
 class WikiRedirectTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
     """
     Tests for wiki course redirection.
@@ -166,4 +166,4 @@ class WikiRedirectTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
         # and end up at the login page
         resp = self.client.get(course_wiki_page, follow=True)
         target_url, __ = resp.redirect_chain[-1]
-        self.assertTrue(reverse('signin_user') in target_url)
+        self.assertIn(reverse('signin_user'), target_url)

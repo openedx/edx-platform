@@ -120,10 +120,7 @@ class ReportTypeTests(ModuleStoreTestCase):
         refunded_certs = report.rows()
 
         # check that we have the right number
-        num_certs = 0
-        for cert in refunded_certs:
-            num_certs += 1
-        self.assertEqual(num_certs, 2)
+        self.assertEqual(len(list(refunded_certs)), 2)
 
         self.assertTrue(CertificateItem.objects.get(user=self.first_refund_user, course_id=self.course_key))
         self.assertTrue(CertificateItem.objects.get(user=self.second_refund_user, course_id=self.course_key))
@@ -210,18 +207,11 @@ class ItemizedPurchaseReportTest(ModuleStoreTestCase):
         purchases = report.rows()
 
         # since there's not many purchases, just run through the generator to make sure we've got the right number
-        num_purchases = 0
-        for item in purchases:
-            num_purchases += 1
-        self.assertEqual(num_purchases, 2)
+        self.assertEqual(len(list(purchases)), 2)
 
         report = initialize_report("itemized_purchase_report", self.now + self.FIVE_MINS, self.now + self.FIVE_MINS + self.FIVE_MINS)
         no_purchases = report.rows()
-
-        num_purchases = 0
-        for item in no_purchases:
-            num_purchases += 1
-        self.assertEqual(num_purchases, 0)
+        self.assertEqual(len(list(no_purchases)), 0)
 
     def test_purchased_csv(self):
         """

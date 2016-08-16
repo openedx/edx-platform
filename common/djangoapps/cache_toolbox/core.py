@@ -10,7 +10,6 @@ Core methods
 
 from django.core.cache import cache
 from django.db import DEFAULT_DB_ALIAS
-from opaque_keys import InvalidKeyError
 
 from . import app_settings
 

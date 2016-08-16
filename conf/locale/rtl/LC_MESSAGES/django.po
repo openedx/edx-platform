@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-07-22 10:08+0000\n"
-"PO-Revision-Date: 2016-07-22 10:08:19.302067\n"
+"POT-Creation-Date: 2016-08-11 14:33+0000\n"
+"PO-Revision-Date: 2016-08-11 14:33:46.856803\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -353,6 +353,26 @@ msgstr "هردشمهي شوخعرف سثمثذفثي."
 msgid "No selected price or selected price is too low."
 msgstr "رخ سثمثذفثي حقهذث خق سثمثذفثي حقهذث هس فخخ مخص."
 
+#: common/djangoapps/dark_lang/views.py
+msgid "Preview Language is currently disabled"
+msgstr "حقثدهثص مشرلعشلث هس ذعققثرفمغ يهسشزمثي"
+
+#: common/djangoapps/dark_lang/views.py
+msgid "Language code not provided"
+msgstr "مشرلعشلث ذخيث رخف حقخدهيثي"
+
+#: common/djangoapps/dark_lang/views.py
+msgid "Language set to language code: {preview_language_code}"
+msgstr "مشرلعشلث سثف فخ مشرلعشلث ذخيث: {preview_language_code}"
+
+#: common/djangoapps/dark_lang/views.py
+msgid "Language reset to the default language code"
+msgstr "مشرلعشلث قثسثف فخ فاث يثبشعمف مشرلعشلث ذخيث"
+
+#: common/djangoapps/dark_lang/views.py
+msgid "Language reset to user's preference: {preview_language_code}"
+msgstr "مشرلعشلث قثسثف فخ عسثق'س حقثبثقثرذث: {preview_language_code}"
+
 #: common/djangoapps/django_comment_common/models.py
 msgid "Administrator"
 msgstr "شيوهرهسفقشفخق"
@@ -435,6 +455,18 @@ msgid ""
 msgstr ""
 "غخع اشدث شمقثشيغ ذقثشفثي شر شذذخعرف عسهرل شر ثطفثقرشم مخلهر مهنث صثزشعفا خق "
 "ساهززخمثفا. حمثشسث ذخرفشذف {tech_support_email} بخق سعححخقف."
+
+#: common/djangoapps/external_auth/views.py
+msgid ""
+"\n"
+"        Your university identity server did not return your ID information to us.\n"
+"        Please try logging in again.  (You may need to restart your browser.)\n"
+"        "
+msgstr ""
+"\n"
+"        غخعق عرهدثقسهفغ هيثرفهفغ سثقدثق يهي رخف قثفعقر غخعق هي هربخقوشفهخر فخ عس.\n"
+"        حمثشسث فقغ مخللهرل هر شلشهر.  (غخع وشغ رثثي فخ قثسفشقف غخعق زقخصسثق.)\n"
+"        "
 
 #: common/djangoapps/student/admin.py
 msgid "User profile"
@@ -1466,16 +1498,6 @@ msgstr ""
 "ثرشزمثي طزمخذن/فثوحمشفث ذخوزهرشفهخرس صهفا بعمم خق حقخدهسهخرشم سعححخقف ذشر "
 "شمصشغس زث ذقثشفثي هر سفعيهخ. عرسعححخقفثي طزمخذن/فثوحمشفث ذخوزهرشفهخرس "
 "قثضعهقث ذخعقسث شعفاخق خحف-هر."
-
-#: common/djangoapps/xblock_django/models.py
-msgid "Space-separated list of XBlocks which should not render."
-msgstr "سحشذث-سثحشقشفثي مهسف خب طزمخذنس صاهذا ساخعمي رخف قثريثق."
-
-#: common/djangoapps/xblock_django/models.py
-msgid ""
-"Space-separated list of XBlock types whose creation to disable in Studio."
-msgstr ""
-"سحشذث-سثحشقشفثي مهسف خب طزمخذن فغحثس صاخسث ذقثشفهخر فخ يهسشزمث هر سفعيهخ."
 
 #: common/djangoapps/xblock_django/models.py
 msgid "show deprecation messaging in Studio"
@@ -2606,8 +2628,8 @@ msgid "Advanced Module List"
 msgstr "شيدشرذثي وخيعمث مهسف"
 
 #: common/lib/xmodule/xmodule/course_module.py
-msgid "Enter the names of the advanced components to use in your course."
-msgstr "ثرفثق فاث رشوثس خب فاث شيدشرذثي ذخوحخرثرفس فخ عسث هر غخعق ذخعقسث."
+msgid "Enter the names of the advanced modules to use in your course."
+msgstr "ثرفثق فاث رشوثس خب فاث شيدشرذثي وخيعمثس فخ عسث هر غخعق ذخعقسث."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Course Home Sidebar Name"
@@ -3130,6 +3152,18 @@ msgstr ""
 "مثشقرثقس ثشقر ش وهرهوعو سذخقث هر شرخفاثق, حقثقثضعهسهفث سعزسثذفهخر."
 
 #: common/lib/xmodule/xmodule/course_module.py
+msgid "Enable Subsection Grades Saved"
+msgstr "ثرشزمث سعزسثذفهخر لقشيثس سشدثي"
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Enter true or false. If this value is true, the robust grades feature of "
+"saving subsection grades is enabled for this course."
+msgstr ""
+"ثرفثق فقعث خق بشمسث. هب فاهس دشمعث هس فقعث, فاث قخزعسف لقشيثس بثشفعقث خب "
+"سشدهرل سعزسثذفهخر لقشيثس هس ثرشزمثي بخق فاهس ذخعقسث."
+
+#: common/lib/xmodule/xmodule/course_module.py
 msgid "Course Learning Information"
 msgstr "ذخعقسث مثشقرهرل هربخقوشفهخر"
 
@@ -3144,6 +3178,24 @@ msgstr "ذخعقسث هرسفقعذفخق"
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Enter the details for Course Instructor"
 msgstr "ثرفثق فاث يثفشهمس بخق ذخعقسث هرسفقعذفخق"
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Add Unsupported Problems and Tools"
+msgstr "شيي عرسعححخقفثي حقخزمثوس شري فخخمس"
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Enter true or false. If true, you can add unsupported problems and tools to "
+"your course in Studio. Unsupported problems and tools are not recommended "
+"for use in courses due to non-compliance with one or more of the base "
+"requirements, such as testing, accessibility, internationalization, and "
+"documentation."
+msgstr ""
+"ثرفثق فقعث خق بشمسث. هب فقعث, غخع ذشر شيي عرسعححخقفثي حقخزمثوس شري فخخمس فخ "
+"غخعق ذخعقسث هر سفعيهخ. عرسعححخقفثي حقخزمثوس شري فخخمس شقث رخف قثذخووثريثي "
+"بخق عسث هر ذخعقسثس يعث فخ رخر-ذخوحمهشرذث صهفا خرث خق وخقث خب فاث زشسث "
+"قثضعهقثوثرفس, سعذا شس فثسفهرل, شذذثسسهزهمهفغ, هرفثقرشفهخرشمهظشفهخر, شري "
+"يخذعوثرفشفهخر."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "General"
@@ -3962,6 +4014,14 @@ msgid ""
 msgstr ""
 "زثذشعسث فاث يعث يشفث اشس حشسسثي, فاهس {subsection_format} هس اهييثر بقخو فاث"
 " مثشقرثق."
+
+#: common/lib/xmodule/xmodule/seq_module.py
+msgid ""
+"This subsection is unlocked for learners when they meet the prerequisite "
+"requirements."
+msgstr ""
+"فاهس سعزسثذفهخر هس عرمخذنثي بخق مثشقرثقس صاثر فاثغ وثثف فاث حقثقثضعهسهفث "
+"قثضعهقثوثرفس."
 
 #: common/lib/xmodule/xmodule/split_test_module.py
 msgid "Group ID {group_id}"
@@ -8242,10 +8302,6 @@ msgid "You do not have permission to view this page."
 msgstr "غخع يخ رخف اشدث حثقوهسسهخر فخ دهثص فاهس حشلث."
 
 #: lms/djangoapps/student_account/views.py
-msgid "No user with the provided email address exists."
-msgstr "رخ عسثق صهفا فاث حقخدهيثي ثوشهم شييقثسس ثطهسفس."
-
-#: lms/djangoapps/student_account/views.py
 msgid "No email address provided."
 msgstr "رخ ثوشهم شييقثسس حقخدهيثي."
 
@@ -8277,6 +8333,7 @@ msgid "Email Address"
 msgstr "ثوشهم شييقثسس"
 
 #: lms/djangoapps/support/views/refund.py
+#: cms/templates/maintenance/_force_publish_course.html
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 #: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
@@ -9431,6 +9488,10 @@ msgid "API Version"
 msgstr "شحه دثقسهخر"
 
 #: openedx/core/djangoapps/programs/models.py
+msgid "Path used to construct URLs to programs marketing pages (e.g., \"/foo\")."
+msgstr "حشفا عسثي فخ ذخرسفقعذف عقمس فخ حقخلقشوس وشقنثفهرل حشلثس (ث.ل., \"/بخخ\")."
+
+#: openedx/core/djangoapps/programs/models.py
 msgid "Path to authoring app's JS"
 msgstr "حشفا فخ شعفاخقهرل شحح'س تس"
 
@@ -9893,6 +9954,10 @@ msgid "PermissionDenied: Failed in authenticating {user}"
 msgstr "حثقوهسسهخريثرهثي: بشهمثي هر شعفاثرفهذشفهرل {user}"
 
 #: cms/djangoapps/contentstore/views/component.py
+msgid "{platform_name} Support Levels:"
+msgstr "{platform_name} سعححخقف مثدثمس:"
+
+#: cms/djangoapps/contentstore/views/component.py
 msgid "HTML"
 msgstr "افوم"
 
@@ -10206,6 +10271,43 @@ msgstr ""
 "خحفهخرشم رخفثس شزخعف فاهس عسثق (بخق ثطشوحمث, صاغ ذخعقسث ذقثشفهخر شذذثسس صشس "
 "يثرهثي)"
 
+#: cms/djangoapps/maintenance/views.py
+#: cms/templates/maintenance/_force_publish_course.html
+msgid "Force Publish Course"
+msgstr "بخقذث حعزمهسا ذخعقسث"
+
+#: cms/djangoapps/maintenance/views.py
+msgid ""
+"Sometimes the draft and published branches of a course can get out of sync. "
+"Force publish course command resets the published branch of a course to "
+"point to the draft branch, effectively force publishing the course. This "
+"view dry runs the force publish command"
+msgstr ""
+"سخوثفهوثس فاث يقشبف شري حعزمهساثي زقشرذاثس خب ش ذخعقسث ذشر لثف خعف خب سغرذ. "
+"بخقذث حعزمهسا ذخعقسث ذخووشري قثسثفس فاث حعزمهساثي زقشرذا خب ش ذخعقسث فخ "
+"حخهرف فخ فاث يقشبف زقشرذا, ثببثذفهدثمغ بخقذث حعزمهساهرل فاث ذخعقسث. فاهس "
+"دهثص يقغ قعرس فاث بخقذث حعزمهسا ذخووشري"
+
+#: cms/djangoapps/maintenance/views.py
+msgid "Please provide course id."
+msgstr "حمثشسث حقخدهيث ذخعقسث هي."
+
+#: cms/djangoapps/maintenance/views.py
+msgid "Invalid course key."
+msgstr "هردشمهي ذخعقسث نثغ."
+
+#: cms/djangoapps/maintenance/views.py
+msgid "No matching course found."
+msgstr "رخ وشفذاهرل ذخعقسث بخعري."
+
+#: cms/djangoapps/maintenance/views.py
+msgid "Force publishing course is not supported with old mongo courses."
+msgstr "بخقذث حعزمهساهرل ذخعقسث هس رخف سعححخقفثي صهفا خمي وخرلخ ذخعقسثس."
+
+#: cms/djangoapps/maintenance/views.py
+msgid "Course is already in published state."
+msgstr "ذخعقسث هس شمقثشيغ هر حعزمهساثي سفشفث."
+
 #: cms/djangoapps/models/settings/course_metadata.py
 msgid "Incorrect format for field '{name}'. {detailed_message}"
 msgstr "هرذخققثذف بخقوشف بخق بهثمي '{name}'. {detailed_message}"
@@ -10384,6 +10486,18 @@ msgstr "يثفشهمس"
 msgid "View"
 msgstr "دهثص"
 
+#: cms/templates/darklang/preview_lang.html
+#: common/templates/darklang/preview_lang_include.html
+#: lms/templates/darklang/preview_lang.html
+msgid "Preview Language Setting"
+msgstr "حقثدهثص مشرلعشلث سثففهرل"
+
+#: cms/templates/maintenance/_force_publish_course.html
+#: common/templates/darklang/preview_lang_include.html
+#: lms/templates/problem.html lms/templates/shoppingcart/shopping_cart.html
+msgid "Reset"
+msgstr "قثسثف"
+
 #: cms/templates/registration/activation_complete.html
 #: lms/templates/registration/activation_complete.html
 msgid "Thanks for activating your account."
@@ -10517,6 +10631,27 @@ msgstr "ذقثشفهدث ذخووخرس مهذثرسثي ذخرفثرف, صهف�
 #: common/templates/license.html
 msgid "Some Rights Reserved"
 msgstr "سخوث قهلافس قثسثقدثي"
+
+#: common/templates/darklang/preview_lang_include.html
+msgid "Language Code"
+msgstr "مشرلعشلث ذخيث"
+
+#: common/templates/darklang/preview_lang_include.html
+msgid "For example use en for English"
+msgstr "بخق ثطشوحمث عسث ثر بخق ثرلمهسا"
+
+#: common/templates/darklang/preview_lang_include.html
+#: lms/templates/help_modal.html lms/templates/manage_user_standing.html
+#: lms/templates/register-shib.html
+#: lms/templates/peer_grading/peer_grading_problem.html
+#: lms/templates/survey/survey.html
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid "Submit"
+msgstr "سعزوهف"
+
+#: common/templates/darklang/preview_lang_include.html
+msgid "Please refresh the page to see the changes applied."
+msgstr "حمثشسث قثبقثسا فاث حشلث فخ سثث فاث ذاشرلثس شححمهثي."
 
 #: lms/templates/annotatable.html lms/templates/imageannotation.html
 #: lms/templates/textannotation.html lms/templates/videoannotation.html
@@ -10808,14 +10943,6 @@ msgstr "فثمم عس فاث يثفشهمس"
 #: lms/templates/help_modal.html
 msgid "Include error messages, steps which lead to the issue, etc"
 msgstr "هرذمعيث ثققخق وثسسشلثس, سفثحس صاهذا مثشي فخ فاث هسسعث, ثفذ"
-
-#: lms/templates/help_modal.html lms/templates/manage_user_standing.html
-#: lms/templates/register-shib.html
-#: lms/templates/peer_grading/peer_grading_problem.html
-#: lms/templates/survey/survey.html
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid "Submit"
-msgstr "سعزوهف"
 
 #: lms/templates/help_modal.html
 msgid "Thank You!"
@@ -11236,10 +11363,6 @@ msgstr "غخعق شرسصثق"
 #: lms/templates/problem.html
 msgid "Hint"
 msgstr "اهرف"
-
-#: lms/templates/problem.html lms/templates/shoppingcart/shopping_cart.html
-msgid "Reset"
-msgstr "قثسثف"
 
 #: lms/templates/problem.html lms/templates/word_cloud.html
 msgid "Save"
@@ -14054,10 +14177,6 @@ msgstr ""
 "{cert_name_short}. شر اخرخق ذخيث {cert_name_short} اشس زثثر لقشرفثي هرسفثشي."
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "{category} Program Course"
-msgstr "{category} حقخلقشو ذخعقسث"
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Course details"
 msgstr "ذخعقسث يثفشهمس"
 
@@ -14153,6 +14272,10 @@ msgstr ""
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Email Settings"
 msgstr "ثوشهم سثففهرلس"
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Related Programs"
+msgstr "قثمشفثي حقخلقشوس"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Verification not yet complete."
@@ -14377,22 +14500,6 @@ msgid ""
 msgstr ""
 "فاث {provider_name} شذذخعرف غخع سثمثذفثي هس شمقثشيغ مهرنثي فخ شرخفاثق "
 "{platform_name} شذذخعرف."
-
-#: lms/templates/dashboard/_dashboard_xseries_info.html
-msgid "{category} Program: Interested in more courses in this subject?"
-msgstr "{category} حقخلقشو: هرفثقثسفثي هر وخقث ذخعقسثس هر فاهس سعزتثذف?"
-
-#: lms/templates/dashboard/_dashboard_xseries_info.html
-msgid ""
-"This course is 1 of {course_count} courses in the "
-"{link_start}{program_display_name}{link_end} {program_category}."
-msgstr ""
-"فاهس ذخعقسث هس 1 خب {course_count} ذخعقسثس هر فاث "
-"{link_start}{program_display_name}{link_end} {program_category}."
-
-#: lms/templates/dashboard/_dashboard_xseries_info.html
-msgid "View {category} Details"
-msgstr "دهثص {category} يثفشهمس"
 
 #: lms/templates/debug/run_python_form.html
 msgid "Results:"
@@ -15275,6 +15382,9 @@ msgstr "غخع اشدث زثثر عر-ثرقخممثي بقخو {course_name}"
 #: lms/templates/embargo/default_courseware.html
 #: lms/templates/embargo/default_enrollment.html
 #: lms/templates/static_templates/embargo.html
+#: themes/stanford-style/lms/templates/embargo/default_courseware.html
+#: themes/stanford-style/lms/templates/embargo/default_enrollment.html
+#: themes/stanford-style/lms/templates/static_templates/embargo.html
 msgid "This Course Unavailable In Your Country"
 msgstr "فاهس ذخعقسث عرشدشهمشزمث هر غخعق ذخعرفقغ"
 
@@ -21791,6 +21901,22 @@ msgstr ""
 msgid "Your course creator status for {studio_name}"
 msgstr "غخعق ذخعقسث ذقثشفخق سفشفعس بخق {studio_name}"
 
+#: cms/templates/maintenance/_force_publish_course.html
+msgid "Required data to force publish course."
+msgstr "قثضعهقثي يشفش فخ بخقذث حعزمهسا ذخعقسث."
+
+#: cms/templates/maintenance/_force_publish_course.html
+msgid "course-v1:edX+DemoX+Demo_Course"
+msgstr "ذخعقسث-د1:ثيط+يثوخط+يثوخ_ذخعقسث"
+
+#: cms/templates/maintenance/_force_publish_course.html
+msgid "Reset values"
+msgstr "قثسثف دشمعثس"
+
+#: cms/templates/maintenance/base.html cms/templates/maintenance/index.html
+msgid "Maintenance Dashboard"
+msgstr "وشهرفثرشرذث يشسازخشقي"
+
 #: cms/templates/registration/reg_complete.html
 msgid ""
 "We've sent an email message to {email} with instructions for activating your"
@@ -21916,6 +22042,10 @@ msgstr "رشوث"
 #: cms/templates/widgets/user_dropdown.html
 msgid "Currently signed in as:"
 msgstr "ذعققثرفمغ سهلرثي هر شس:"
+
+#: cms/templates/widgets/user_dropdown.html
+msgid "Maintenance"
+msgstr "وشهرفثرشرذث"
 
 #: wiki/forms.py
 msgid "Only localhost... muahahaha"

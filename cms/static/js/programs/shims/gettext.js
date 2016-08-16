@@ -6,14 +6,14 @@
 (function() {
     'use strict';
 
-    if ( !window.gettext ) {
-        window.gettext = function (text) {
+    if (!window.gettext) {
+        window.gettext = function(text) {
             return text;
         };
     }
 
-    if ( !window.interpolate ) {
-        window.interpolate = function (text) {
+    if (!window.interpolate) {
+        window.interpolate = function(text) {
             return text;
         };
     }

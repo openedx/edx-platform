@@ -170,3 +170,32 @@ class RefundableTest(SharedModuleStoreTestCase):
     def test_refund_cutoff_date_no_attributes(self):
         """ Assert that the None is returned when no order number attribute is found."""
         self.assertIsNone(self.enrollment.refund_cutoff_date())
+
+    @httpretty.activate
+    @override_settings(ECOMMERCE_API_SIGNING_KEY=TEST_API_SIGNING_KEY, ECOMMERCE_API_URL=TEST_API_URL)
+    def test_multiple_refunds_dashbaord_page_error(self):
+        """ Order with mutiple refunds will not throw 500 error when dashboard page will access."""
+        now = datetime.now(pytz.UTC).replace(microsecond=0)
+        order_date = now + timedelta(days=1)
+        order_number = 'OSCR-1000'
+        expected_content = '{{"date_placed": "{date}"}}'.format(date=order_date.strftime(ECOMMERCE_DATE_FORMAT))
+
+        httpretty.register_uri(
+            httpretty.GET,
+            '{url}/orders/{order}/'.format(url=TEST_API_URL, order=order_number),
+            status=200, body=expected_content,
+            adding_headers={'Content-Type': JSON}
+        )
+
+        # creating multiple attributes for same order.
+        for attribute_count in range(2):  # pylint: disable=unused-variable
+            self.enrollment.attributes.add(CourseEnrollmentAttribute(
+                enrollment=self.enrollment,
+                namespace='order',
+                name='order_number',
+                value=order_number
+            ))
+
+        self.client.login(username="jack", password="test")
+        resp = self.client.post(reverse('student.views.dashboard', args=[]))
+        self.assertEqual(resp.status_code, 200)

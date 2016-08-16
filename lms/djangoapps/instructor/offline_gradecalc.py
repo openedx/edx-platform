@@ -51,7 +51,7 @@ def offline_grade_calculation(course_key):
         request.user = student
         request.session = {}
 
-        gradeset = course_grades.summary(student, course, keep_raw_scores=True)
+        gradeset = course_grades.summary(student, course)
         # Convert Score namedtuples to dicts:
         totaled_scores = gradeset['totaled_scores']
         for section in totaled_scores:
@@ -84,13 +84,13 @@ def offline_grades_available(course_key):
     return ocgl.latest('created')
 
 
-def student_grades(student, request, course, keep_raw_scores=False, use_offline=False):
+def student_grades(student, request, course, use_offline=False):  # pylint: disable=unused-argument
     '''
     This is the main interface to get grades.  It has the same parameters as grades.grade, as well
     as use_offline.  If use_offline is True then this will look for an offline computed gradeset in the DB.
     '''
     if not use_offline:
-        return course_grades.summary(student, course, keep_raw_scores=keep_raw_scores)
+        return course_grades.summary(student, course)
 
     try:
         ocg = models.OfflineComputedGrade.objects.get(user=student, course_id=course.id)

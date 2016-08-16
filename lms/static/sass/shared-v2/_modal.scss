@@ -122,9 +122,9 @@
         }
 
         .modal-form-error {
-            background: palette(error, xx-trans);
-            border: 1px solid palette(error, dark);
-            color: palette(error, dark);
+            background: palette(error, back);
+            border: 1px solid palette(error, accent);
+            color: palette(error, text);
             display: none;
             margin-bottom: $baseline;
             padding: 12px;
@@ -155,7 +155,7 @@
 
             .input-group {
                 @include clearfix();
-                border-bottom: 1px solid palette(grayscale, light);
+                border-bottom: 1px solid palette(grayscale, back);
                 box-shadow: 0 1px 0 0 $white-opacity-60;
                 margin-bottom: ($baseline*1.5);
                 padding-bottom: ($baseline/2);
@@ -171,12 +171,12 @@
 
                 &.field-error {
                     display: block;
-                    color: palette(error, dark);
+                    color: palette(error, text);
 
                     + input,
                     + textarea {
-                        border: 1px solid palette(error, dark);
-                        color: palette(error, dark);
+                        border: 1px solid palette(error, accent);
+                        color: palette(error, text);
                     }
                 }
             }
@@ -186,7 +186,7 @@
             }
 
             textarea {
-                background: palette(grayscale, white-t);
+                background: $white;
                 display: block;
                 height: 45px;
                 margin-bottom: $baseline;
@@ -196,7 +196,7 @@
             input[type="email"],
             input[type="text"],
             input[type="password"] {
-                background: palette(grayscale, white-t);
+                background: $white;
                 display: block;
                 height: 45px;
                 margin-bottom: $baseline;

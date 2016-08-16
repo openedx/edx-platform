@@ -29,7 +29,7 @@ def get_image(name):
     return ImageFile(open(TEST_DATA_ROOT / 'badges' / name + '.png'))
 
 
-@attr('shard_1')
+@attr(shard=1)
 class BadgeImageConfigurationTest(TestCase):
     """
     Test the validation features of BadgeImageConfiguration.

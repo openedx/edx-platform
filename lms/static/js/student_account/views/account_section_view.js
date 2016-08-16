@@ -1,4 +1,4 @@
-;(function (define, undefined) {
+(function(define, undefined) {
     'use strict';
     define([
         'gettext',
@@ -6,15 +6,14 @@
         'underscore',
         'backbone',
         'text!templates/student_account/account_settings_section.underscore'
-    ], function (gettext, $, _, Backbone, sectionTemplate) {
-
+    ], function(gettext, $, _, Backbone, sectionTemplate) {
         var AccountSectionView = Backbone.View.extend({
 
-            initialize: function (options) {
+            initialize: function(options) {
                 this.options = options;
             },
 
-            render: function () {
+            render: function() {
                 this.$el.html(_.template(sectionTemplate)({
                     sections: this.options.sections,
                     activeTabName: this.options.activeTabName

@@ -28,7 +28,7 @@ from ..images import (
 from .helpers import make_image_file, make_uploaded_file
 
 
-@attr('shard_2')
+@attr(shard=2)
 @ddt.ddt
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Profile Image API is only supported in LMS')
 class TestValidateUploadedImage(TestCase):
@@ -124,7 +124,7 @@ class TestValidateUploadedImage(TestCase):
             self.assertEqual(ctx.exception.message, file_upload_bad_mimetype)
 
 
-@attr('shard_2')
+@attr(shard=2)
 @ddt.ddt
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Profile Image API is only supported in LMS')
 class TestGenerateProfileImages(TestCase):
@@ -208,7 +208,7 @@ class TestGenerateProfileImages(TestCase):
                 yield name, image
 
 
-@attr('shard_2')
+@attr(shard=2)
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Profile Image API is only supported in LMS')
 class TestRemoveProfileImages(TestCase):
     """

@@ -87,7 +87,7 @@ class TestProblem(object):
         return "original_get_html"
 
 
-@attr('shard_3')
+@attr(shard=3)
 @skipUnless(settings.FEATURES["ENABLE_EDXNOTES"], "EdxNotes feature needs to be enabled.")
 class EdxNotesDecoratorTest(ModuleStoreTestCase):
     """
@@ -171,7 +171,7 @@ class EdxNotesDecoratorTest(ModuleStoreTestCase):
         self.assertEqual("original_get_html", self.problem.get_html())
 
 
-@attr('shard_3')
+@attr(shard=3)
 @skipUnless(settings.FEATURES["ENABLE_EDXNOTES"], "EdxNotes feature needs to be enabled.")
 @ddt.ddt
 class EdxNotesHelpersTest(ModuleStoreTestCase):
@@ -944,7 +944,7 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
         verify_url(previous_url, previous_api_url)
 
 
-@attr('shard_3')
+@attr(shard=3)
 @skipUnless(settings.FEATURES["ENABLE_EDXNOTES"], "EdxNotes feature needs to be enabled.")
 @ddt.ddt
 class EdxNotesViewsTest(ModuleStoreTestCase):
@@ -1140,7 +1140,7 @@ class EdxNotesViewsTest(ModuleStoreTestCase):
         self.assertEqual(response.status_code, 400)
 
 
-@attr('shard_3')
+@attr(shard=3)
 @skipUnless(settings.FEATURES["ENABLE_EDXNOTES"], "EdxNotes feature needs to be enabled.")
 @ddt.ddt
 class EdxNotesPluginTest(ModuleStoreTestCase):

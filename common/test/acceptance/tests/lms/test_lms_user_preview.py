@@ -17,7 +17,7 @@ from xmodule.partitions.partitions import Group
 from textwrap import dedent
 
 
-@attr('shard_3')
+@attr(shard=3)
 class StaffViewTest(UniqueCourseTest):
     """
     Tests that verify the staff view.
@@ -55,7 +55,7 @@ class StaffViewTest(UniqueCourseTest):
         return staff_page
 
 
-@attr('shard_3')
+@attr(shard=3)
 class CourseWithoutContentGroupsTest(StaffViewTest):
     """
     Setup for tests that have no content restricted to specific content groups.
@@ -86,7 +86,7 @@ class CourseWithoutContentGroupsTest(StaffViewTest):
         )
 
 
-@attr('shard_3')
+@attr(shard=3)
 class StaffViewToggleTest(CourseWithoutContentGroupsTest):
     """
     Tests for the staff view toggle button.
@@ -103,7 +103,7 @@ class StaffViewToggleTest(CourseWithoutContentGroupsTest):
         self.assertFalse(course_page.has_tab('Instructor'))
 
 
-@attr('shard_3')
+@attr(shard=3)
 class StaffDebugTest(CourseWithoutContentGroupsTest):
     """
     Tests that verify the staff debug info.
@@ -235,7 +235,7 @@ class StaffDebugTest(CourseWithoutContentGroupsTest):
                          'for user {}'.format(self.USERNAME), msg)
 
 
-@attr('shard_3')
+@attr(shard=3)
 class CourseWithContentGroupsTest(StaffViewTest):
     """
     Verifies that changing the "View this course as" selector works properly for content groups.

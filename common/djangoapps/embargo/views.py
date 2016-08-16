@@ -2,7 +2,6 @@
 
 from django.http import Http404
 from django.views.generic.base import View
-from django.conf import settings
 
 from edxmako.shortcuts import render_to_response
 

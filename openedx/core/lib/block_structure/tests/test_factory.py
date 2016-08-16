@@ -12,7 +12,7 @@ from .helpers import (
 )
 
 
-@attr('shard_2')
+@attr(shard=2)
 class TestBlockStructureFactory(TestCase, ChildrenMapTestMixin):
     """
     Tests for BlockStructureFactory

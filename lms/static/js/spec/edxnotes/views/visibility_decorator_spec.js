@@ -7,7 +7,7 @@ define([
         var params = {
             endpoint: '/test_endpoint',
             user: 'a user',
-            usageId : 'an usage',
+            usageId: 'an usage',
             courseId: 'a course',
             token: Helpers.makeToken(),
             tokenUrl: '/test_token_url'
@@ -18,7 +18,7 @@ define([
             this.wrapper = document.getElementById('edx-notes-wrapper-123');
         });
 
-        afterEach(function () {
+        afterEach(function() {
             VisibilityDecorator._setVisibility(null);
             while (Annotator._instances.length > 0) {
                 Annotator._instances[0].destroy();

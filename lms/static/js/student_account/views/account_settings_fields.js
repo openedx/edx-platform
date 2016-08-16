@@ -1,4 +1,4 @@
-;(function (define, undefined) {
+(function(define, undefined) {
     'use strict';
     define([
         'gettext',
@@ -14,7 +14,7 @@
         'text!templates/fields/field_order_history.underscore',
         'edx-ui-toolkit/js/utils/string-utils',
         'edx-ui-toolkit/js/utils/html-utils'
-    ], function (
+    ], function(
         gettext, $, _, Backbone,
         FieldViews,
         field_text_account_template,
@@ -27,7 +27,6 @@
         HtmlUtils
     )
     {
-
         var AccountSettingsFieldViews = {
             ReadonlyFieldView: FieldViews.ReadonlyFieldView.extend({
                 fieldTemplate: field_readonly_account_template
@@ -40,11 +39,11 @@
             }),
             EmailFieldView: FieldViews.TextFieldView.extend({
                 fieldTemplate: field_text_account_template,
-                successMessage: function () {
+                successMessage: function() {
                     return HtmlUtils.joinHtml(
                         this.indicators.success,
                         StringUtils.interpolate(
-                            gettext('We\'ve sent a confirmation message to {new_email_address}. Click the link in the message to update your email address.'), /* jshint ignore:line */
+                            gettext('We\'ve sent a confirmation message to {new_email_address}. Click the link in the message to update your email address.'),  // eslint-disable-line max-len
                             {'new_email_address': this.fieldValue()}
                         )
                     );
@@ -52,7 +51,7 @@
             }),
             LanguagePreferenceFieldView: FieldViews.DropdownFieldView.extend({
                 fieldTemplate: field_dropdown_account_template,
-                saveSucceeded: function () {
+                saveSucceeded: function() {
                     var data = {
                         'language': this.modelValue()
                     };
@@ -63,18 +62,79 @@
                         url: '/i18n/setlang/',
                         data: data,
                         dataType: 'html',
-                        success: function () {
+                        success: function() {
                             view.showSuccessMessage();
                         },
-                        error: function () {
+                        error: function() {
                             view.showNotificationMessage(
                                 HtmlUtils.joinHtml(
                                     view.indicators.error,
-                                    gettext('You must sign out and sign back in before your language changes take effect.') // jshint ignore:line
+                                    gettext('You must sign out and sign back in before your language changes take effect.')  // eslint-disable-line max-len
                                 )
                             );
                         }
                     });
+                }
+
+            }),
+            TimeZoneFieldView: FieldViews.DropdownFieldView.extend({
+                fieldTemplate: field_dropdown_account_template,
+
+                initialize: function(options) {
+                    this.options = _.extend({}, options);
+                    _.bindAll(this, 'listenToCountryView', 'updateCountrySubheader', 'replaceOrAddGroupOption');
+                    this._super(options);  // eslint-disable-line no-underscore-dangle
+                },
+
+                listenToCountryView: function(view) {
+                    this.listenTo(view.model, 'change:country', this.updateCountrySubheader);
+                },
+
+                updateCountrySubheader: function(user) {
+                    var view = this;
+                    $.ajax({
+                        type: 'GET',
+                        url: '/user_api/v1/preferences/time_zones/',
+                        data: {country_code: user.attributes.country},
+                        success: function(data) {
+                            var countryTimeZones = $.map(data, function(timeZoneInfo) {
+                                return [[timeZoneInfo.time_zone, timeZoneInfo.description]];
+                            });
+                            view.replaceOrAddGroupOption(
+                                'Country Time Zones',
+                                countryTimeZones
+                            );
+                            view.render();
+                        }
+                    });
+                },
+
+                updateValueInField: function() {
+                    var options;
+                    if (this.modelValue()) {
+                        options = [[this.modelValue(), this.displayValue(this.modelValue())]];
+                        this.replaceOrAddGroupOption(
+                            'Currently Selected Time Zone',
+                            options
+                        );
+                    }
+                    this._super(); // eslint-disable-line no-underscore-dangle
+                },
+
+                replaceOrAddGroupOption: function(title, options) {
+                    var groupOption = {
+                        groupTitle: gettext(title),
+                        selectOptions: options
+                    };
+
+                    var index = _.findIndex(this.options.groupOptions, function(group) {
+                        return group.groupTitle === gettext(title);
+                    });
+                    if (index >= 0) {
+                        this.options.groupOptions[index] = groupOption;
+                    } else {
+                        this.options.groupOptions.unshift(groupOption);
+                    }
                 }
 
             }),
@@ -84,16 +144,16 @@
                 events: {
                     'click button': 'linkClicked'
                 },
-                initialize: function (options) {
+                initialize: function(options) {
                     this.options = _.extend({}, options);
                     this._super(options);
                     _.bindAll(this, 'resetPassword');
                 },
-                linkClicked: function (event) {
+                linkClicked: function(event) {
                     event.preventDefault();
                     this.resetPassword(event);
                 },
-                resetPassword: function () {
+                resetPassword: function() {
                     var data = {};
                     data[this.options.emailAttribute] = this.model.get(this.options.emailAttribute);
 
@@ -102,19 +162,19 @@
                         type: 'POST',
                         url: view.options.linkHref,
                         data: data,
-                        success: function () {
+                        success: function() {
                             view.showSuccessMessage();
                         },
-                        error: function (xhr) {
+                        error: function(xhr) {
                             view.showErrorMessage(xhr);
                         }
                     });
                 },
-                successMessage: function () {
+                successMessage: function() {
                     return HtmlUtils.joinHtml(
                         this.indicators.success,
                         StringUtils.interpolate(
-                            gettext('We\'ve sent a message to {email_address}. Click the link in the message to reset your password.'), /* jshint ignore:line */
+                            gettext('We\'ve sent a message to {email_address}. Click the link in the message to reset your password.'),  // eslint-disable-line max-len
                             {'email_address': this.model.get(this.options.emailAttribute)}
                         )
                     );
@@ -122,7 +182,7 @@
             }),
             LanguageProficienciesFieldView: FieldViews.DropdownFieldView.extend({
                 fieldTemplate: field_dropdown_account_template,
-                modelValue: function () {
+                modelValue: function() {
                     var modelValue = this.model.get(this.options.valueAttribute);
                     if (_.isArray(modelValue) && modelValue.length > 0) {
                         return modelValue[0].code;
@@ -130,7 +190,7 @@
                         return null;
                     }
                 },
-                saveValue: function () {
+                saveValue: function() {
                     if (this.persistChanges === true) {
                         var attributes = {},
                             value = this.fieldValue() ? [{'code': this.fieldValue()}] : [];
@@ -141,38 +201,38 @@
             }),
             AuthFieldView: FieldViews.LinkFieldView.extend({
                 fieldTemplate: field_social_link_template,
-                className: function () {
+                className: function() {
                     return 'u-field u-field-social u-field-' + this.options.valueAttribute;
                 },
-                initialize: function (options) {
+                initialize: function(options) {
                     this.options = _.extend({}, options);
                     this._super(options);
                     _.bindAll(this, 'redirect_to', 'disconnect', 'successMessage', 'inProgressMessage');
                 },
-                render: function () {
+                render: function() {
                     var linkTitle = '',
                         linkClass = '',
                         subTitle = '',
                         screenReaderTitle = StringUtils.interpolate(
-                            gettext("Link your {accountName} account"),
+                            gettext('Link your {accountName} account'),
                             {accountName: this.options.title}
                         );
                     if (this.options.connected) {
                         linkTitle = gettext('Unlink This Account');
                         linkClass = 'social-field-linked';
                         subTitle = StringUtils.interpolate(
-                            gettext('You can use your {accountName} account to sign in to your {platformName} account.'), /* jshint ignore:line */
+                            gettext('You can use your {accountName} account to sign in to your {platformName} account.'),  // eslint-disable-line max-len
                             {accountName: this.options.title, platformName: this.options.platformName}
                         );
                         screenReaderTitle = StringUtils.interpolate(
-                            gettext("Unlink your {accountName} account"),
+                            gettext('Unlink your {accountName} account'),
                             {accountName: this.options.title}
                         );
                     } else if (this.options.acceptsLogins) {
                         linkTitle = gettext('Link Your Account');
                         linkClass = 'social-field-unlinked';
                         subTitle = StringUtils.interpolate(
-                            gettext('Link your {accountName} account to your {platformName} account and use {accountName} to sign in to {platformName}.'), /* jshint ignore:line */
+                            gettext('Link your {accountName} account to your {platformName} account and use {accountName} to sign in to {platformName}.'),  // eslint-disable-line max-len
                             {accountName: this.options.title, platformName: this.options.platformName}
                         );
                     }
@@ -190,7 +250,7 @@
                     this.delegateEvents();
                     return this;
                 },
-                linkClicked: function (event) {
+                linkClicked: function(event) {
                     event.preventDefault();
 
                     this.showInProgressMessage();
@@ -203,10 +263,10 @@
                         this.redirect_to(this.options.connectUrl);
                     }
                 },
-                redirect_to: function (url) {
+                redirect_to: function(url) {
                     window.location.href = url;
                 },
-                disconnect: function () {
+                disconnect: function() {
                     var data = {};
 
                     // Disconnects the provider from the user's edX account.
@@ -217,37 +277,37 @@
                         url: this.options.disconnectUrl,
                         data: data,
                         dataType: 'html',
-                        success: function () {
+                        success: function() {
                             view.options.connected = false;
                             view.render();
                             view.showSuccessMessage();
                         },
-                        error: function (xhr) {
+                        error: function(xhr) {
                             view.showErrorMessage(xhr);
                         }
                     });
                 },
-                inProgressMessage: function () {
+                inProgressMessage: function() {
                     return HtmlUtils.joinHtml(this.indicators.inProgress, (
                         this.options.connected ? gettext('Unlinking') : gettext('Linking')
                     ));
                 },
-                successMessage: function () {
+                successMessage: function() {
                     return HtmlUtils.joinHtml(this.indicators.success, gettext('Successfully unlinked.'));
                 }
             }),
-            
+
             OrderHistoryFieldView: FieldViews.ReadonlyFieldView.extend({
                 fieldType: 'orderHistory',
                 fieldTemplate: field_order_history_template,
 
-                initialize: function (options) {
+                initialize: function(options) {
                     this.options = options;
                     this._super(options);
                     this.template = HtmlUtils.template(this.fieldTemplate);
                 },
 
-                render: function () {
+                render: function() {
                     HtmlUtils.setHtml(this.$el, this.template({
                         title: this.options.title,
                         totalPrice: this.options.totalPrice,

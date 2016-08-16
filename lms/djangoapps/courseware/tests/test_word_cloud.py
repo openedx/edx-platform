@@ -9,7 +9,7 @@ from . import BaseTestXmodule
 from xmodule.x_module import STUDENT_VIEW
 
 
-@attr('shard_1')
+@attr(shard=1)
 class TestWordCloud(BaseTestXmodule):
     """Integration test for word cloud xmodule."""
     CATEGORY = "word_cloud"

@@ -36,7 +36,7 @@ class TestUserProfileEvents(UserSettingsEventTestMixin, TestCase):
         # Verify that we remove the temporary `_changed_fields` property from
         # the model after we're done emitting events.
         with self.assertRaises(AttributeError):
-            getattr(self.profile, '_changed_fields')
+            self.profile._changed_fields    # pylint: disable=pointless-statement, protected-access
 
     def test_change_many_fields(self):
         """

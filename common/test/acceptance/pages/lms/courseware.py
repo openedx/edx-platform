@@ -209,6 +209,20 @@ class CoursewarePage(CoursePage):
         """
         return self.q(css="div.proctored-exam.completed").visible
 
+    def content_hidden_past_due_date(self, content_type="subsection"):
+        """
+        Returns whether the "the due date for this ___ has passed" message is present.
+        ___ is the type of the hidden content, and defaults to subsection.
+        This being true implies "the ___ contents are hidden because their due date has passed".
+        """
+        message = "The due date for this {0} has passed.".format(content_type)
+        if self.q(css="div.seq_content").is_present():
+            return False
+        for html in self.q(css="div.hidden-content").html:
+            if message in html:
+                return True
+        return False
+
     @property
     def entrance_exam_message_selector(self):
         """

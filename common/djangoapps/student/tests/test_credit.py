@@ -177,7 +177,7 @@ class CreditCourseDashboardTest(ModuleStoreTestCase):
     def _make_eligible(self):
         """Make the user eligible for credit in the course. """
         credit_api.set_credit_requirement_status(
-            self.USERNAME,
+            self.user,
             self.course.id,  # pylint: disable=no-member
             "grade", "grade",
             status="satisfied",

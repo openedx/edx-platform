@@ -15,15 +15,17 @@ from uuid import uuid4
 
 from django.test.utils import override_settings
 from django.conf import settings
+
+from contentstore.tests.test_libraries import LibraryTestCase
 from xmodule.contentstore.django import contentstore
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.xml_exporter import export_library_to_xml
-from xmodule.modulestore.xml_importer import import_library_from_xml
+from xmodule.modulestore.xml_exporter import export_library_to_xml, export_course_to_xml
+from xmodule.modulestore.xml_importer import import_library_from_xml, import_course_from_xml
 from xmodule.modulestore import LIBRARY_ROOT, ModuleStoreEnum
 from contentstore.utils import reverse_course_url
 from contentstore.tests.utils import CourseTestCase
 
-from xmodule.modulestore.tests.factories import ItemFactory, LibraryFactory
+from xmodule.modulestore.tests.factories import ItemFactory, LibraryFactory, CourseFactory
 from xmodule.modulestore.tests.utils import (
     MongoContentstoreBuilder, SPLIT_MODULESTORE_SETUP, TEST_DATA_DIR
 )
@@ -335,7 +337,7 @@ class ImportTestCase(CourseTestCase):
                 args = {"name": tarpath, "course-data": [tar]}
                 resp = self.client.post(self.url, args)
             self.assertEquals(resp.status_code, 400)
-            self.assertTrue("SuspiciousFileOperation" in resp.content)
+            self.assertIn("SuspiciousFileOperation", resp.content)
 
         try_tar(self._fifo_tar())
         try_tar(self._symlink_tar())
@@ -697,3 +699,111 @@ class TestLibraryImportExport(CourseTestCase):
 
         # Compare the two content libraries for equality.
         self.assertCoursesEqual(source_library1_key, source_library2_key)
+
+
+@ddt.ddt
+@override_settings(CONTENTSTORE=TEST_DATA_CONTENTSTORE)
+class TestCourseExportImport(LibraryTestCase):
+    """
+    Tests for importing after exporting the course containing content libraries from XML.
+    """
+    def setUp(self):
+        super(TestCourseExportImport, self).setUp()
+        self.export_dir = tempfile.mkdtemp()
+
+        # Create a problem in library
+        ItemFactory.create(
+            category="problem",
+            parent_location=self.library.location,
+            user_id=self.user.id,   # pylint: disable=no-member
+            publish_item=False,
+            display_name='Test Problem',
+            data="<problem><multiplechoiceresponse></multiplechoiceresponse></problem>",
+        )
+
+        # Create a source course.
+        self.source_course = CourseFactory.create(default_store=ModuleStoreEnum.Type.split)
+        self.addCleanup(shutil.rmtree, self.export_dir, ignore_errors=True)
+
+    def _setup_source_course_with_library_content(self, publish=False):
+        """
+        Sets up course with library content.
+        """
+        chapter = ItemFactory.create(
+            parent_location=self.source_course.location,
+            category='chapter',
+            display_name='Test Section'
+        )
+        sequential = ItemFactory.create(
+            parent_location=chapter.location,
+            category='sequential',
+            display_name='Test Sequential'
+        )
+        vertical = ItemFactory.create(
+            category='vertical',
+            parent_location=sequential.location,
+            display_name='Test Unit'
+        )
+        lc_block = self._add_library_content_block(vertical, self.lib_key, publish_item=publish)
+        self._refresh_children(lc_block)
+
+    def get_lib_content_block_children(self, block_location):
+        """
+        Search for library content block to return its immediate children
+        """
+        if block_location.block_type == 'library_content':
+            return self.store.get_item(block_location).children
+
+        return self.get_lib_content_block_children(self.store.get_item(block_location).children[0])
+
+    def assert_problem_display_names(self, source_course_location, dest_course_location):
+        """
+        Asserts that problems' display names in both source and destination courses are same.
+        """
+        source_course_lib_children = self.get_lib_content_block_children(source_course_location)
+        dest_course_lib_children = self.get_lib_content_block_children(dest_course_location)
+
+        self.assertEquals(len(source_course_lib_children), len(dest_course_lib_children))
+
+        for source_child_location, dest_child_location in zip(source_course_lib_children, dest_course_lib_children):
+            source_child = self.store.get_item(source_child_location)
+            dest_child = self.store.get_item(dest_child_location)
+            self.assertEquals(source_child.display_name, dest_child.display_name)
+
+    @ddt.data(True, False)
+    def test_library_content_on_course_export_import(self, publish_item):
+        """
+        Verify that library contents in destination and source courses are same after importing
+        the source course into destination course.
+        """
+        self._setup_source_course_with_library_content(publish=publish_item)
+
+        # Create a course to import source course.
+        dest_course = CourseFactory.create(default_store=ModuleStoreEnum.Type.split)
+
+        # Export the source course.
+        export_course_to_xml(
+            self.store,
+            contentstore(),
+            self.source_course.location.course_key,
+            self.export_dir,
+            'exported_source_course',
+        )
+
+        # Now, import it back to dest_course.
+        import_course_from_xml(
+            self.store,
+            self.user.id,   # pylint: disable=no-member
+            self.export_dir,
+            ['exported_source_course'],
+            static_content_store=contentstore(),
+            target_id=dest_course.location.course_key,
+            load_error_modules=False,
+            raise_on_failure=True,
+            create_if_not_present=True,
+        )
+
+        self.assert_problem_display_names(
+            self.source_course.location,
+            dest_course.location
+        )

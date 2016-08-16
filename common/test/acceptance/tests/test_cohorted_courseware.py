@@ -21,8 +21,11 @@ from bok_choy.promise import EmptyPromise
 from bok_choy.page_object import XSS_INJECTION
 
 
-@attr('shard_5')
+@attr(shard=5)
 class EndToEndCohortedCoursewareTest(ContainerBase):
+    """
+    End-to-end of cohorted courseware.
+    """
 
     def setUp(self, is_staff=True):
 

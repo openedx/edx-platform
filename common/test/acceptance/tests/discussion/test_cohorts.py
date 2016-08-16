@@ -79,7 +79,7 @@ class DiscussionTabSingleThreadTest(BaseDiscussionTestCase):
         self.thread_page.wait_for_page()
 
 
-@attr('shard_5')
+@attr(shard=5)
 class CohortedDiscussionTabSingleThreadTest(DiscussionTabSingleThreadTest, CohortedDiscussionTestMixin):
     """
     Tests for the discussion page displaying a single cohorted thread.
@@ -88,7 +88,7 @@ class CohortedDiscussionTabSingleThreadTest(DiscussionTabSingleThreadTest, Cohor
     pass
 
 
-@attr('shard_5')
+@attr(shard=5)
 class NonCohortedDiscussionTabSingleThreadTest(DiscussionTabSingleThreadTest, NonCohortedDiscussionTestMixin):
     """
     Tests for the discussion page displaying a single non-cohorted thread.
@@ -137,7 +137,7 @@ class InlineDiscussionTest(UniqueCourseTest):
         self.show_thread(thread_id)
 
 
-@attr('shard_5')
+@attr(shard=5)
 class CohortedInlineDiscussionTest(InlineDiscussionTest, CohortedDiscussionTestMixin):
     """
     Tests for cohorted inline discussions.
@@ -146,7 +146,7 @@ class CohortedInlineDiscussionTest(InlineDiscussionTest, CohortedDiscussionTestM
     pass
 
 
-@attr('shard_5')
+@attr(shard=5)
 class NonCohortedInlineDiscussionTest(InlineDiscussionTest, NonCohortedDiscussionTestMixin):
     """
     Tests for non-cohorted inline discussions.

@@ -244,13 +244,13 @@ class EnrollmentDataTest(ModuleStoreTestCase):
 
     @raises(CourseEnrollmentFullError)
     @patch.object(CourseEnrollment, "enroll")
-    def test_enrollment_for_closed_course(self, mock_enroll):
+    def test_enrollment_for_full_course(self, mock_enroll):
         mock_enroll.side_effect = CourseFullError("Bad things happened")
         data.create_course_enrollment(self.user.username, unicode(self.course.id), 'honor', True)
 
     @raises(CourseEnrollmentExistsError)
     @patch.object(CourseEnrollment, "enroll")
-    def test_enrollment_for_closed_course(self, mock_enroll):
+    def test_enrollment_for_enrolled_course(self, mock_enroll):
         mock_enroll.side_effect = AlreadyEnrolledError("Bad things happened")
         data.create_course_enrollment(self.user.username, unicode(self.course.id), 'honor', True)
 

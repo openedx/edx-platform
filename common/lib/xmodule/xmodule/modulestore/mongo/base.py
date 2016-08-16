@@ -482,7 +482,7 @@ class MongoBulkOpsMixin(BulkOperationsMixin):
     """
     _bulk_ops_record_type = MongoBulkOpsRecord
 
-    def _start_outermost_bulk_operation(self, bulk_ops_record, course_key):
+    def _start_outermost_bulk_operation(self, bulk_ops_record, course_key, ignore_case=False):
         """
         Prevent updating the meta-data inheritance cache for the given course
         """

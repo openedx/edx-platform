@@ -1,14 +1,14 @@
-(function () {
+(function() {
     'use strict';
 
-    describe('XBlockToXModuleShim', function () {
-        describe('definition', function () {
-            it('XBlockToXModuleShim is defined, and is a function', function () {
+    describe('XBlockToXModuleShim', function() {
+        describe('definition', function() {
+            it('XBlockToXModuleShim is defined, and is a function', function() {
                 expect($.isFunction(XBlockToXModuleShim)).toBe(true);
             });
         });
 
-        describe('implementation', function () {
+        describe('implementation', function() {
             var el,
                 videoModule = {
                     'module': 'video_module'
@@ -18,7 +18,7 @@
                 removeNone,
                 removeVideo;
 
-            beforeEach(function () {
+            beforeEach(function() {
                 el = $('<div />');
 
                 if (window.None) {
@@ -47,7 +47,7 @@
                 spyOnEvent($(document), 'XModule.loaded.display');
             });
 
-            afterEach(function () {
+            afterEach(function() {
                 el = null;
 
                 if (removeNone) {
@@ -58,14 +58,14 @@
                 }
             });
 
-            it('if element module is of type None, nothing happens', function () {
+            it('if element module is of type None, nothing happens', function() {
                 el.data('type', 'None');
 
                 expect(XBlockToXModuleShim(null, el)).toBeUndefined();
                 expect(window.None).not.toHaveBeenCalled();
             });
 
-            it('if element module is of type Video, Video module constructor is called', function () {
+            it('if element module is of type Video, Video module constructor is called', function() {
                 el.data('type', 'Video');
 
                 expect(XBlockToXModuleShim(null, el)).toEqual(videoModule);
@@ -75,7 +75,7 @@
                 expect('XModule.loaded.display').not.toHaveBeenTriggeredOn(document);
             });
 
-            it('if element has class "xmodule_edit"', function () {
+            it('if element has class "xmodule_edit"', function() {
                 el.data('type', 'Video')
                     .addClass('xmodule_edit');
                 XBlockToXModuleShim(null, el);
@@ -84,7 +84,7 @@
                 expect('XModule.loaded.display').not.toHaveBeenTriggeredOn($(document));
             });
 
-            it('if element has class "xmodule_display"', function () {
+            it('if element has class "xmodule_display"', function() {
                 el.data('type', 'Video')
                     .addClass('xmodule_display');
                 XBlockToXModuleShim(null, el);
@@ -93,7 +93,7 @@
                 expect(displayCallback).toHaveBeenCalledWith(jasmine.any($.Event), el, videoModule);
             });
 
-            it('if element has classes "xmodule_edit", and "xmodule_display"', function () {
+            it('if element has classes "xmodule_edit", and "xmodule_display"', function() {
                 el.data('type', 'Video')
                     .addClass('xmodule_edit')
                     .addClass('xmodule_display');
@@ -102,7 +102,7 @@
                 expect('XModule.loaded.display').toHaveBeenTriggeredOn($(document));
             });
 
-            it('element is of an unknown Module type, console.error() is called if it is defined', function () {
+            it('element is of an unknown Module type, console.error() is called if it is defined', function() {
                 var oldConsole = window.console;
 
                 if (window.console && window.console.error) {
@@ -121,9 +121,9 @@
                 window.console = oldConsole;
             });
 
-            it('element is of an unknown Module type, JavaScript throws if console.error() is not defined', function () {
+            it('element is of an unknown Module type, JavaScript throws if console.error() is not defined', function() {
                 var oldConsole = window.console,
-                    testFunction = function () {
+                    testFunction = function() {
                         return XBlockToXModuleShim(null, el);
                     };
 
@@ -140,55 +140,55 @@
         });
     });
 
-    describe('XModule.Descriptor', function () {
-        describe('definition', function () {
-            it('XModule is defined, and is a plain object', function () {
+    describe('XModule.Descriptor', function() {
+        describe('definition', function() {
+            it('XModule is defined, and is a plain object', function() {
                 expect($.isPlainObject(XModule)).toBe(true);
             });
 
-            it('XModule.Descriptor is defined, and is a function', function () {
+            it('XModule.Descriptor is defined, and is a function', function() {
                 expect($.isFunction(XModule.Descriptor)).toBe(true);
             });
 
-            it('XModule.Descriptor has a complete prototype', function () {
+            it('XModule.Descriptor has a complete prototype', function() {
                 expect($.isFunction(XModule.Descriptor.prototype.onUpdate)).toBe(true);
                 expect($.isFunction(XModule.Descriptor.prototype.update)).toBe(true);
                 expect($.isFunction(XModule.Descriptor.prototype.save)).toBe(true);
             });
         });
 
-        describe('implementation', function () {
+        describe('implementation', function() {
             var el, obj, callback, length;
 
             // This is a dummy callback.
-            callback = function () {
+            callback = function() {
                 var x = 1;
 
                 return x + 1;
             };
 
-            beforeEach(function () {
+            beforeEach(function() {
                 el = 'dummy object';
                 obj = new XModule.Descriptor(el);
 
                 spyOn(obj, 'save').and.callThrough();
             });
 
-            afterEach(function () {
+            afterEach(function() {
                 el = null;
                 obj = null;
 
                 length = undefined;
             });
 
-            it('Descriptor is a proper constructor function', function () {
+            it('Descriptor is a proper constructor function', function() {
                 expect(obj.hasOwnProperty('element')).toBe(true);
                 expect(obj.element).toBe(el);
 
                 expect(obj.hasOwnProperty('update')).toBe(true);
             });
 
-            it('Descriptor.onUpdate called for the first time', function () {
+            it('Descriptor.onUpdate called for the first time', function() {
                 expect(obj.hasOwnProperty('callbacks')).toBe(false);
                 obj.onUpdate(callback);
                 expect(obj.hasOwnProperty('callbacks')).toBe(true);
@@ -199,7 +199,7 @@
                 expect(obj.callbacks[length - 1]).toBe(callback);
             });
 
-            it('Descriptor.onUpdate called for Nth time', function () {
+            it('Descriptor.onUpdate called for Nth time', function() {
                 // In this test it doesn't matter what obj.callbacks
                 // consists of.
                 obj.callbacks = ['test1', 'test2', 'test3'];
@@ -211,13 +211,13 @@
                 expect(obj.callbacks[length - 1]).toBe(callback);
             });
 
-            it('Descriptor.save returns a blank object', function () {
+            it('Descriptor.save returns a blank object', function() {
                 // NOTE: In the future the implementation of .save()
                 // method may change!
                 expect(obj.save()).toEqual({});
             });
 
-            it('Descriptor.update triggers all callbacks with whatever .save() returns', function () {
+            it('Descriptor.update triggers all callbacks with whatever .save() returns', function() {
                 var callback1 = jasmine.createSpy('callback1'),
                     callback2 = jasmine.createSpy('callback2'),
                     testValue = 'test 123';

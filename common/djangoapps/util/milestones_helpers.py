@@ -357,7 +357,7 @@ def get_course_content_milestones(course_id, content_id, relationship, user_id=N
             user={"id": user_id}
         )
 
-    return [m for m in request_cache_dict[user_id][relationship] if m['content_id'] == content_id]
+    return [m for m in request_cache_dict[user_id][relationship] if m['content_id'] == unicode(content_id)]
 
 
 def remove_course_content_user_milestones(course_key, content_key, user, relationship):

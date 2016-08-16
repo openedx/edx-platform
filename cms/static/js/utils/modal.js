@@ -1,4 +1,4 @@
-define(["jquery"], function($) {
+define(['jquery'], function($) {
     /**
      * Hides the modal and modal cover, using the standard selectors.
      * Note though that the class "is-fixed" on the modal cover
@@ -13,7 +13,7 @@ define(["jquery"], function($) {
 
         // Unit editors (module_edit) do not want the modal cover to hide when users click outside
         // of the editor. Users must press Cancel or Save to exit the editor.
-        if (!$modalCover.hasClass("is-fixed")) {
+        if (!$modalCover.hasClass('is-fixed')) {
             getModal().hide();
             hideModalCover($modalCover);
         }
@@ -25,19 +25,19 @@ define(["jquery"], function($) {
      *
      * This method also unbinds the click handler on the modal cover.
      */
-    var hideModalCover = function (modalCover) {
+    var hideModalCover = function(modalCover) {
         if (modalCover == undefined) {
             modalCover = getModalCover();
         }
         modalCover.hide();
-        modalCover.removeClass("is-fixed");
+        modalCover.removeClass('is-fixed');
         modalCover.unbind('click');
     };
 
     /**
      * Shows the modal and modal cover, using the standard selectors.
      */
-    var showModal = function () {
+    var showModal = function() {
         getModal().show();
         showModalCover();
     };
@@ -54,7 +54,7 @@ define(["jquery"], function($) {
         var $modalCover = getModalCover();
         $modalCover.show();
         if (addFixed) {
-            $modalCover.addClass("is-fixed");
+            $modalCover.addClass('is-fixed');
         }
         $modalCover.unbind('click');
         if (clickHandler) {
@@ -66,12 +66,12 @@ define(["jquery"], function($) {
         return $modalCover;
     };
 
-    var getModalCover = function () {
+    var getModalCover = function() {
         return $('.modal-cover');
     };
 
-    var getModal = function () {
-        return $(".modal, .showAsModal");
+    var getModal = function() {
+        return $('.modal, .showAsModal');
     };
 
     return {

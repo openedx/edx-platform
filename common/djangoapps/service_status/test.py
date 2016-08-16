@@ -45,4 +45,4 @@ class CeleryConfigTest(unittest.TestCase):
         # but we can assert that they take the right form
         self.assertIsInstance(result_dict['task_id'], unicode)
         self.assertIsInstance(result_dict['time'], float)
-        self.assertTrue(result_dict['time'] > 0.0)
+        self.assertGreater(result_dict['time'], 0.0)

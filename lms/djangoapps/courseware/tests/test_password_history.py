@@ -21,7 +21,7 @@ from student.models import PasswordHistory
 from courseware.tests.helpers import LoginEnrollmentTestCase
 
 
-@attr('shard_1')
+@attr(shard=1)
 @patch.dict("django.conf.settings.FEATURES", {'ADVANCED_SECURITY': True})
 class TestPasswordHistory(LoginEnrollmentTestCase):
     """

@@ -10,6 +10,6 @@ def check_html(html):
     try:
         etree.fromstring(html, parser)
         return True
-    except Exception as err:
+    except Exception:   # pylint: disable=broad-except
         pass
     return False

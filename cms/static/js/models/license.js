@@ -1,43 +1,43 @@
-define(["backbone", "underscore"], function(Backbone, _) {
+define(['backbone', 'underscore'], function(Backbone, _) {
     var LicenseModel = Backbone.Model.extend({
         defaults: {
-            "type": null,
-            "options": {},
-            "custom": false // either `false`, or a string
+            'type': null,
+            'options': {},
+            'custom': false // either `false`, or a string
         },
 
         initialize: function(attributes) {
-            if(attributes && attributes.asString) {
+            if (attributes && attributes.asString) {
                 this.setFromString(attributes.asString);
-                this.unset("asString");
+                this.unset('asString');
             }
         },
 
         toString: function() {
-            var custom = this.get("custom");
+            var custom = this.get('custom');
             if (custom) {
                 return custom;
             }
 
-            var type = this.get("type"),
-                options = this.get("options");
+            var type = this.get('type'),
+                options = this.get('options');
 
             if (_.isEmpty(options)) {
-                return type || "";
+                return type || '';
             }
 
             // options are where it gets tricky
-            var optionStrings = _.map(options, function (value, key) {
-                if(_.isBoolean(value)) {
-                    return value ? key : null
+            var optionStrings = _.map(options, function(value, key) {
+                if (_.isBoolean(value)) {
+                    return value ? key : null;
                 } else {
-                    return key + "=" + value
+                    return key + '=' + value;
                 }
             });
             // filter out nulls
             optionStrings = _.filter(optionStrings, _.identity);
             // build license string and return
-            return type + ": " + optionStrings.join(" ");
+            return type + ': ' + optionStrings.join(' ');
         },
 
         setFromString: function(string, options) {
@@ -46,8 +46,8 @@ define(["backbone", "underscore"], function(Backbone, _) {
                 return this.set(this.defaults, options);
             }
 
-            var colonIndex = string.indexOf(":"),
-                spaceIndex = string.indexOf(" ");
+            var colonIndex = string.indexOf(':'),
+                spaceIndex = string.indexOf(' ');
 
             // a string without a colon could be a custom license, or a license
             // type without options
@@ -55,16 +55,16 @@ define(["backbone", "underscore"], function(Backbone, _) {
                 if (spaceIndex == -1) {
                     // if there's no space, it's a license type without options
                     return this.set({
-                        "type": string,
-                        "options": {},
-                        "custom": false
+                        'type': string,
+                        'options': {},
+                        'custom': false
                     }, options);
                 } else {
                 // if there is a space, it's a custom license
                     return this.set({
-                        "type": null,
-                        "options": {},
-                        "custom": string
+                        'type': null,
+                        'options': {},
+                        'custom': string
                     }, options);
                 }
             }
@@ -74,24 +74,24 @@ define(["backbone", "underscore"], function(Backbone, _) {
                 optionsObj = {},
                 optionsString = string.substring(colonIndex + 1);
 
-                _.each(optionsString.split(" "), function(optionString) {
-                    if (_.isEmpty(optionString)) {
-                        return;
-                    }
-                    var eqIndex = optionString.indexOf("=");
-                    if(eqIndex == -1) {
+            _.each(optionsString.split(' '), function(optionString) {
+                if (_.isEmpty(optionString)) {
+                    return;
+                }
+                var eqIndex = optionString.indexOf('=');
+                if (eqIndex == -1) {
                         // this is a boolean flag
-                        optionsObj[optionString] = true;
-                    } else {
+                    optionsObj[optionString] = true;
+                } else {
                         // this is a key-value pair
-                        var optionKey = optionString.substring(0, eqIndex);
-                        var optionVal = optionString.substring(eqIndex + 1);
-                        optionsObj[optionKey] = optionVal;
-                    }
-                });
+                    var optionKey = optionString.substring(0, eqIndex);
+                    var optionVal = optionString.substring(eqIndex + 1);
+                    optionsObj[optionKey] = optionVal;
+                }
+            });
 
             return this.set({
-                "type": type, "options": optionsObj, "custom": false,
+                'type': type, 'options': optionsObj, 'custom': false
             }, options);
         }
     });

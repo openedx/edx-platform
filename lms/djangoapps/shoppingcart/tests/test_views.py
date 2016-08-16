@@ -65,7 +65,7 @@ render_mock = Mock(side_effect=mock_render_to_response)
 postpay_mock = Mock()
 
 
-@attr('shard_3')
+@attr(shard=3)
 @patch.dict('django.conf.settings.FEATURES', {'ENABLE_PAID_COURSE_REGISTRATION': True})
 @ddt.ddt
 class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
@@ -598,7 +598,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         response = self.client.get(redeem_url)
         self.assertEquals(response.status_code, 200)
         # check button text
-        self.assertTrue('Activate Course Enrollment' in response.content)
+        self.assertIn('Activate Course Enrollment', response.content)
 
         #now activate the user by enrolling him/her to the course
         response = self.client.post(redeem_url)
@@ -629,7 +629,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         response = self.client.get(redeem_url)
         self.assertEquals(response.status_code, 200)
         # check button text
-        self.assertTrue('Activate Course Enrollment' in response.content)
+        self.assertIn('Activate Course Enrollment', response.content)
 
         #now activate the user by enrolling him/her to the course
         response = self.client.post(redeem_url)
@@ -1097,7 +1097,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         response = self.client.get(redeem_url)
         self.assertEquals(response.status_code, 200)
         # check button text
-        self.assertTrue('Activate Course Enrollment' in response.content)
+        self.assertIn('Activate Course Enrollment', response.content)
 
         #now activate the user by enrolling him/her to the course
         response = self.client.post(redeem_url)
@@ -1124,7 +1124,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         resp = self.client.get(redeem_url)
         self.assertEquals(resp.status_code, 200)
         # check button text
-        self.assertTrue('Activate Course Enrollment' in resp.content)
+        self.assertIn('Activate Course Enrollment', resp.content)
 
         #now activate the user by enrolling him/her to the course
         resp = self.client.post(redeem_url)
@@ -1278,7 +1278,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         #now activate the user by enrolling him/her to the course
         response = self.client.post(redeem_url)
         self.assertEquals(response.status_code, 200)
-        self.assertTrue('View Dashboard' in response.content)
+        self.assertIn('View Dashboard', response.content)
 
         # now view the receipt page again to see if any registration codes
         # has been expired or not

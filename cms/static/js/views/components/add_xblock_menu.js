@@ -1,16 +1,15 @@
-define(["jquery", "js/views/baseview", 'edx-ui-toolkit/js/utils/html-utils'],
-    function ($, BaseView, HtmlUtils) {
-
+define(['jquery', 'js/views/baseview', 'edx-ui-toolkit/js/utils/html-utils'],
+    function($, BaseView, HtmlUtils) {
         return BaseView.extend({
-            className: function () {
-                return "new-component-templates new-component-" + this.model.type;
+            className: function() {
+                return 'new-component-templates new-component-' + this.model.type;
             },
-            initialize: function () {
+            initialize: function() {
                 BaseView.prototype.initialize.call(this);
-                var template_name = this.model.type === "problem" ? "add-xblock-component-menu-problem" :
-                    "add-xblock-component-menu";
-                var support_indicator_template = this.loadTemplate("add-xblock-component-support-level");
-                var support_legend_template = this.loadTemplate("add-xblock-component-support-legend");
+                var template_name = this.model.type === 'problem' ? 'add-xblock-component-menu-problem' :
+                    'add-xblock-component-menu';
+                var support_indicator_template = this.loadTemplate('add-xblock-component-support-level');
+                var support_legend_template = this.loadTemplate('add-xblock-component-support-legend');
                 this.template = this.loadTemplate(template_name);
                 HtmlUtils.setHtml(
                     this.$el,
@@ -26,5 +25,4 @@ define(["jquery", "js/views/baseview", 'edx-ui-toolkit/js/utils/html-utils'],
                 this.$('.tab-group').tabs();
             }
         });
-
     }); // end define();

@@ -15,7 +15,7 @@ from student.tests.factories import UserFactory
 import mock
 
 
-@attr('shard_1')
+@attr(shard=1)
 class InstructorServiceTests(SharedModuleStoreTestCase):
     """
     Tests for the InstructorService

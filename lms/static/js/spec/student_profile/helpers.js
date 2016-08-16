@@ -14,11 +14,9 @@ define(['underscore', 'URI', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'
                 expect($($element.find('.image-frame')[0]).attr('src')).toBe(view.imageUrl());
             } else if (view.fieldValue()) {
                 expect(view.fieldValue()).toBe(view.modelValue());
-
             } else if ('optionForValue' in view) {
                 expect($($element.find('.u-field-value .u-field-value-readonly')[0]).text()).toBe(view.displayValue(view.modelValue()));
-
-            }else {
+            } else {
                 expect($($element.find('.u-field-value .u-field-value-readonly')[0]).text()).toBe(view.modelValue());
             }
         } else {
@@ -27,7 +25,6 @@ define(['underscore', 'URI', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'
     };
 
     var expectProfilePrivacyFieldTobeRendered = function(learnerProfileView, othersProfile) {
-
         var accountPrivacyElement = learnerProfileView.$('.wrapper-profile-field-account-privacy');
         var privacyFieldElement = $(accountPrivacyElement).find('.u-field');
 
@@ -40,14 +37,13 @@ define(['underscore', 'URI', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'
     };
 
     var expectSectionOneTobeRendered = function(learnerProfileView) {
-
         var sectionOneFieldElements = $(learnerProfileView.$('.wrapper-profile-section-one')).find('.u-field');
 
         expect(sectionOneFieldElements.length).toBe(4);
         expectProfileElementContainsField(sectionOneFieldElements[0], learnerProfileView.options.profileImageFieldView);
         expectProfileElementContainsField(sectionOneFieldElements[1], learnerProfileView.options.usernameFieldView);
 
-        _.each(_.rest(sectionOneFieldElements, 2) , function (sectionFieldElement, fieldIndex) {
+        _.each(_.rest(sectionOneFieldElements, 2), function(sectionFieldElement, fieldIndex) {
             expectProfileElementContainsField(
                 sectionFieldElement,
                 learnerProfileView.options.sectionOneFieldViews[fieldIndex]
@@ -56,13 +52,12 @@ define(['underscore', 'URI', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'
     };
 
     var expectSectionTwoTobeRendered = function(learnerProfileView) {
-
         var sectionTwoElement = learnerProfileView.$('.wrapper-profile-section-two');
         var sectionTwoFieldElements = $(sectionTwoElement).find('.u-field');
 
         expect(sectionTwoFieldElements.length).toBe(learnerProfileView.options.sectionTwoFieldViews.length);
 
-         _.each(sectionTwoFieldElements, function (sectionFieldElement, fieldIndex) {
+        _.each(sectionTwoFieldElements, function(sectionFieldElement, fieldIndex) {
             expectProfileElementContainsField(
                 sectionFieldElement,
                 learnerProfileView.options.sectionTwoFieldViews[fieldIndex]
@@ -70,13 +65,13 @@ define(['underscore', 'URI', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'
         });
     };
 
-    var expectProfileSectionsAndFieldsToBeRendered = function (learnerProfileView, othersProfile) {
+    var expectProfileSectionsAndFieldsToBeRendered = function(learnerProfileView, othersProfile) {
         expectProfilePrivacyFieldTobeRendered(learnerProfileView, othersProfile);
         expectSectionOneTobeRendered(learnerProfileView);
         expectSectionTwoTobeRendered(learnerProfileView);
     };
 
-    var expectLimitedProfileSectionsAndFieldsToBeRendered = function (learnerProfileView, othersProfile) {
+    var expectLimitedProfileSectionsAndFieldsToBeRendered = function(learnerProfileView, othersProfile) {
         expectProfilePrivacyFieldTobeRendered(learnerProfileView, othersProfile);
 
         var sectionOneFieldElements = $(learnerProfileView.$('.wrapper-profile-section-one')).find('.u-field');
@@ -140,16 +135,16 @@ define(['underscore', 'URI', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'
     var expectPage = function(learnerProfileView, pageData) {
         var badgeListContainer = learnerProfileView.$el.find('#tabpanel-accomplishments');
         var index = badgeListContainer.find('span.search-count').text().trim();
-        expect(index).toBe("Showing "  + (pageData.start + 1) + "-" + (pageData.start + pageData.results.length) +
-            " out of " + pageData.count + " total");
-        expect(badgeListContainer.find('.current-page').text()).toBe("" + pageData.current_page);
+        expect(index).toBe('Showing ' + (pageData.start + 1) + '-' + (pageData.start + pageData.results.length) +
+            ' out of ' + pageData.count + ' total');
+        expect(badgeListContainer.find('.current-page').text()).toBe('' + pageData.current_page);
         _.each(pageData.results, function(badge) {
-            expect($(".badge-display:contains(" + badge.badge_class.display_name + ")").length).toBe(1);
+            expect($('.badge-display:contains(' + badge.badge_class.display_name + ')').length).toBe(1);
         });
     };
 
     var expectBadgeLoadingErrorIsRendered = function(learnerProfileView) {
-        var errorMessage = learnerProfileView.$el.find(".badge-set-display").text();
+        var errorMessage = learnerProfileView.$el.find('.badge-set-display').text();
         expect(errorMessage).toBe(
             'Your request could not be completed. Reload the page and try again. If the issue persists, click the ' +
             'Help tab to report the problem.'
@@ -166,7 +161,7 @@ define(['underscore', 'URI', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'
     var firstPageBadges = {
         count: 30,
         previous: null,
-        next: "/arbitrary/url",
+        next: '/arbitrary/url',
         num_pages: 3,
         start: 0,
         current_page: 1,
@@ -175,8 +170,8 @@ define(['underscore', 'URI', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'
 
     var secondPageBadges = {
         count: 30,
-        previous: "/arbitrary/url",
-        next: "/arbitrary/url",
+        previous: '/arbitrary/url',
+        next: '/arbitrary/url',
         num_pages: 3,
         start: 10,
         current_page: 2,
@@ -185,7 +180,7 @@ define(['underscore', 'URI', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'
 
     var thirdPageBadges = {
         count: 30,
-        previous: "/arbitrary/url",
+        previous: '/arbitrary/url',
         num_pages: 3,
         next: null,
         start: 20,
@@ -193,20 +188,20 @@ define(['underscore', 'URI', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'
         results: []
     };
 
-    function makeBadge (num) {
+    function makeBadge(num) {
         return {
-            "badge_class": {
-                "slug": "test_slug_" + num,
-                "issuing_component": "test_component",
-                "display_name": "Test Badge " + num,
-                "course_id": null,
-                "description": "Yay! It's a test badge.",
-                "criteria": "https://example.com/syllabus",
-                "image_url": "http://localhost:8000/media/badge_classes/test_lMB9bRw.png"
+            'badge_class': {
+                'slug': 'test_slug_' + num,
+                'issuing_component': 'test_component',
+                'display_name': 'Test Badge ' + num,
+                'course_id': null,
+                'description': "Yay! It's a test badge.",
+                'criteria': 'https://example.com/syllabus',
+                'image_url': 'http://localhost:8000/media/badge_classes/test_lMB9bRw.png'
             },
-            "image_url": "http://example.com/image.png",
-            "assertion_url": "http://example.com/example.json",
-            "created_at": "2015-12-03T16:25:57.676113Z"
+            'image_url': 'http://example.com/image.png',
+            'assertion_url': 'http://example.com/example.json',
+            'created_at': '2015-12-03T16:25:57.676113Z'
         };
     }
 
@@ -223,10 +218,10 @@ define(['underscore', 'URI', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'
     });
 
     var emptyBadges = {
-        "count": 0,
-        "previous": null,
-        "num_pages": 1,
-        "results": []
+        'count': 0,
+        'previous': null,
+        'num_pages': 1,
+        'results': []
     };
 
     return {

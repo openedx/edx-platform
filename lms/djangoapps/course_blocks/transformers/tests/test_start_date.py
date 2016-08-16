@@ -12,7 +12,7 @@ from ..start_date import StartDateTransformer, DEFAULT_START_DATE
 from .helpers import BlockParentsMapTestCase, update_block
 
 
-@attr('shard_3')
+@attr(shard=3)
 @ddt.ddt
 class StartDateTransformerTestCase(BlockParentsMapTestCase):
     """

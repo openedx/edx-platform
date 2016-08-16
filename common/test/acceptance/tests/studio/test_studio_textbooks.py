@@ -8,7 +8,7 @@ from common.test.acceptance.tests.helpers import disable_animations
 from nose.plugins.attrib import attr
 
 
-@attr('shard_2')
+@attr(shard=2)
 class TextbooksTest(StudioCourseTest):
     """
     Test that textbook functionality is working properly on studio side

@@ -15,6 +15,7 @@ from django.test import TestCase
 from django.test.utils import override_settings
 from dateutil.parser import parse as parse_datetime
 
+from openedx.core.lib.time_zone_utils import get_display_time_zone
 from student.tests.factories import UserFactory
 
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -40,7 +41,7 @@ from ...preferences.api import (
 )
 
 
-@attr('shard_2')
+@attr(shard=2)
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Account APIs are only supported in LMS')
 class TestPreferenceAPI(TestCase):
     """
@@ -180,9 +181,6 @@ class TestPreferenceAPI(TestCase):
         """
         Verifies the basic behavior of update_user_preferences.
         """
-        expected_user_preferences = {
-            self.test_preference_key: "new_value",
-        }
         set_user_preference(self.user, self.test_preference_key, "new_value")
         self.assertEqual(
             get_user_preference(self.user, self.test_preference_key),
@@ -332,7 +330,7 @@ class TestPreferenceAPI(TestCase):
         )
 
 
-@attr('shard_2')
+@attr(shard=2)
 @ddt.ddt
 class UpdateEmailOptInTests(ModuleStoreTestCase):
     """
@@ -448,13 +446,20 @@ class CountryTimeZoneTest(TestCase):
     Test cases to validate country code api functionality
     """
 
-    @ddt.data(('NZ', ['Pacific/Auckland', 'Pacific/Chatham']),
-              (None, common_timezones))
+    @ddt.data(('ES', ['Africa/Ceuta', 'Atlantic/Canary', 'Europe/Madrid']),
+              (None, common_timezones[:10]))
     @ddt.unpack
     def test_get_country_time_zones(self, country_code, expected_time_zones):
-        """Verify that list of common country time zones are returned"""
-        country_time_zones = get_country_time_zones(country_code)
-        self.assertEqual(country_time_zones, expected_time_zones)
+        """Verify that list of common country time zones dictionaries is returned"""
+        expected_dict = [
+            {
+                'time_zone': time_zone,
+                'description': get_display_time_zone(time_zone)
+            }
+            for time_zone in expected_time_zones
+        ]
+        country_time_zones_dicts = get_country_time_zones(country_code)[:10]
+        self.assertEqual(country_time_zones_dicts, expected_dict)
 
     def test_country_code_errors(self):
         """Verify that country code error is raised for invalid country code"""

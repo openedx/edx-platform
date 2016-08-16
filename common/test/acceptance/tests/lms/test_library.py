@@ -21,7 +21,7 @@ SUBSECTION_NAME = 'Test Subsection'
 UNIT_NAME = 'Test Unit'
 
 
-@attr('shard_7')
+@attr(shard=7)
 class LibraryContentTestBase(UniqueCourseTest):
     """ Base class for library content block tests """
     USERNAME = "STUDENT_TESTER"
@@ -144,7 +144,7 @@ class LibraryContentTestBase(UniqueCourseTest):
 
 
 @ddt.ddt
-@attr('shard_7')
+@attr(shard=7)
 class LibraryContentTest(LibraryContentTestBase):
     """
     Test courseware.
@@ -197,7 +197,7 @@ class LibraryContentTest(LibraryContentTestBase):
 
 
 @ddt.ddt
-@attr('shard_7')
+@attr(shard=7)
 class StudioLibraryContainerCapaFilterTest(LibraryContentTestBase, TestWithSearchIndexMixin):
     """
     Test Library Content block in LMS

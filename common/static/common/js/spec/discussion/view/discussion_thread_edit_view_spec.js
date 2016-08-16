@@ -65,7 +65,7 @@
         });
 
         it('can save new data correctly in inline mode', function() {
-            this.createEditView({"mode": "inline"});
+            this.createEditView({'mode': 'inline'});
             testUpdate(this.view, this.thread, 'other_topic', 'Other Topic');
         });
 
@@ -80,7 +80,7 @@
         });
 
         it('can close the view in inline mode', function() {
-            this.createEditView({"mode": "inline"});
+            this.createEditView({'mode': 'inline'});
             testCancel(this.view);
         });
 
@@ -94,14 +94,14 @@
                                 'is_cohorted': true,
                                 'id': 'topic'
                             },
-                            "General": {
-                                "sort_key": "General",
-                                "is_cohorted": false,
-                                "id": "6.00.1x_General"
+                            'General': {
+                                'sort_key': 'General',
+                                'is_cohorted': false,
+                                'id': '6.00.1x_General'
                             },
-                            "Basic Question": {
-                                "is_cohorted": false,
-                                "id": "6>00'1x\"Basic_Question"
+                            'Basic Question': {
+                                'is_cohorted': false,
+                                'id': "6>00'1x\"Basic_Question"
                             }
                         }
                     },
@@ -110,18 +110,18 @@
             });
 
             it('can save new data correctly for current discussion id without dots', function() {
-                this.createEditView({topicId: "topic"});
-                testUpdate(this.view, this.thread, "6.00.1x_General", "General");
+                this.createEditView({topicId: 'topic'});
+                testUpdate(this.view, this.thread, '6.00.1x_General', 'General');
             });
 
             it('can save new data correctly for current discussion id with dots', function() {
-                this.createEditView({topicId: "6.00.1x_General"});
-                testUpdate(this.view, this.thread, "6>00\'1x\"Basic_Question", "Basic Question");
+                this.createEditView({topicId: '6.00.1x_General'});
+                testUpdate(this.view, this.thread, "6>00\'1x\"Basic_Question", 'Basic Question');
             });
 
             it('can save new data correctly for current discussion id with special characters', function() {
                 this.createEditView({topicId: "6>00\'1x\"Basic_Question"});
-                testUpdate(this.view, this.thread, "6.00.1x_General", "General");
+                testUpdate(this.view, this.thread, '6.00.1x_General', 'General');
             });
         });
     });

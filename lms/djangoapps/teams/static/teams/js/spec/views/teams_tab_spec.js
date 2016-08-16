@@ -57,9 +57,9 @@ define([
         });
 
         afterEach(function() {
-              Backbone.history.stop();
-              $(document).off('ajaxError', TeamsTabView.prototype.errorHandler);
-          }
+            Backbone.history.stop();
+            $(document).off('ajaxError', TeamsTabView.prototype.errorHandler);
+        }
         );
 
         describe('Navigation', function() {
@@ -71,7 +71,7 @@ define([
                 expect(teamsTabView.$('.breadcrumbs').length).toBe(0);
             });
 
-            it('does not interfere with anchor links to #main', function () {
+            it('does not interfere with anchor links to #main', function() {
                 var teamsTabView = createTeamsTabView(this);
                 teamsTabView.router.navigate('#main', {trigger: true});
                 expect(teamsTabView.$('.wrapper-msg')).toHaveClass('is-hidden');
@@ -193,8 +193,8 @@ define([
         describe('Discussion privileges', function() {
             it('allows privileged access to any team', function() {
                 var teamsTabView = createTeamsTabView(this, {
-                        userInfo: TeamSpecHelpers.createMockUserInfo({privileged: true})
-                    });
+                    userInfo: TeamSpecHelpers.createMockUserInfo({privileged: true})
+                });
                 // Note: using `undefined` here to ensure that we
                 // don't even look at the team when the user is
                 // privileged
@@ -203,11 +203,11 @@ define([
 
             it('allows access to a team which an unprivileged user is a member of', function() {
                 var teamsTabView = createTeamsTabView(this, {
-                        userInfo: TeamSpecHelpers.createMockUserInfo({
-                            username: TeamSpecHelpers.testUser,
-                            privileged: false
-                        })
-                    });
+                    userInfo: TeamSpecHelpers.createMockUserInfo({
+                        username: TeamSpecHelpers.testUser,
+                        privileged: false
+                    })
+                });
                 expect(teamsTabView.readOnlyDiscussion({
                     attributes: {
                         membership: [{
@@ -221,8 +221,8 @@ define([
 
             it('does not allow access if the user is neither privileged nor a team member', function() {
                 var teamsTabView = createTeamsTabView(this, {
-                        userInfo: TeamSpecHelpers.createMockUserInfo({privileged: false, staff: true})
-                    });
+                    userInfo: TeamSpecHelpers.createMockUserInfo({privileged: false, staff: true})
+                });
                 expect(teamsTabView.readOnlyDiscussion({
                     attributes: {membership: []}
                 })).toBe(true);
@@ -267,7 +267,7 @@ define([
                 // Clear the search and submit it again
                 teamsTabView.$('.search-field').val('');
                 teamsTabView.$('.action-search').click();
-                
+
                 verifyTeamsRequest({
                     order_by: 'last_activity_at'
                 });

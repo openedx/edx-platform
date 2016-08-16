@@ -169,12 +169,12 @@ class SurveyModelsTests(TestCase):
 
         all_answers = survey.get_answers()
         self.assertEquals(len(all_answers.keys()), 1)
-        self.assertTrue(self.student.id in all_answers)
+        self.assertIn(self.student.id, all_answers)
         self.assertEquals(all_answers[self.student.id], self.student_answers)
 
         answers = survey.get_answers(self.student)
         self.assertEquals(len(answers.keys()), 1)
-        self.assertTrue(self.student.id in answers)
+        self.assertIn(self.student.id, answers)
         self.assertEquals(all_answers[self.student.id], self.student_answers)
 
         # check that the course_id was set
@@ -205,19 +205,19 @@ class SurveyModelsTests(TestCase):
 
         all_answers = survey.get_answers()
         self.assertEquals(len(all_answers.keys()), 2)
-        self.assertTrue(self.student.id in all_answers)
-        self.assertTrue(self.student2.id in all_answers)
+        self.assertIn(self.student.id, all_answers)
+        self.assertIn(self.student2.id, all_answers)
         self.assertEquals(all_answers[self.student.id], self.student_answers)
         self.assertEquals(all_answers[self.student2.id], self.student2_answers)
 
         answers = survey.get_answers(self.student)
         self.assertEquals(len(answers.keys()), 1)
-        self.assertTrue(self.student.id in answers)
+        self.assertIn(self.student.id, answers)
         self.assertEquals(answers[self.student.id], self.student_answers)
 
         answers = survey.get_answers(self.student2)
         self.assertEquals(len(answers.keys()), 1)
-        self.assertTrue(self.student2.id in answers)
+        self.assertIn(self.student2.id, answers)
         self.assertEquals(answers[self.student2.id], self.student2_answers)
 
     def test_update_answers(self):
@@ -232,7 +232,7 @@ class SurveyModelsTests(TestCase):
 
         answers = survey.get_answers(self.student)
         self.assertEquals(len(answers.keys()), 1)
-        self.assertTrue(self.student.id in answers)
+        self.assertIn(self.student.id, answers)
         self.assertEquals(answers[self.student.id], self.student_answers)
 
         # update
@@ -240,7 +240,7 @@ class SurveyModelsTests(TestCase):
 
         answers = survey.get_answers(self.student)
         self.assertEquals(len(answers.keys()), 1)
-        self.assertTrue(self.student.id in answers)
+        self.assertIn(self.student.id, answers)
         self.assertEquals(answers[self.student.id], self.student_answers_update)
 
         # update with just a subset of the origin dataset
@@ -248,7 +248,7 @@ class SurveyModelsTests(TestCase):
 
         answers = survey.get_answers(self.student)
         self.assertEquals(len(answers.keys()), 1)
-        self.assertTrue(self.student.id in answers)
+        self.assertIn(self.student.id, answers)
         self.assertEquals(answers[self.student.id], self.student_answers_update2)
 
     def test_limit_num_users(self):

@@ -5,7 +5,7 @@ define(['jquery', 'js/utils/navigation'], function($) {
         var accordion, chapterMenu;
 
         function keyPressEvent(key) {
-            return $.Event('keydown', { which: key });
+            return $.Event('keydown', {which: key});
         }
 
         beforeEach(function() {
@@ -20,9 +20,7 @@ define(['jquery', 'js/utils/navigation'], function($) {
         });
 
         describe('constructor', function() {
-
             describe('always', function() {
-
                 it('ensures accordion is present', function() {
                     expect(accordion.length).toBe(1);
                 });
@@ -38,7 +36,6 @@ define(['jquery', 'js/utils/navigation'], function($) {
             });
 
             describe('open section with mouse click', function() {
-
                 it('ensures new section is opened and previous section is closed', function() {
                     accordion.find('.button-chapter').last().trigger('click');
 
@@ -58,7 +55,6 @@ define(['jquery', 'js/utils/navigation'], function($) {
             });
 
             describe('open section with spacebar', function() {
-
                 it('ensures new section is opened and previous section is closed', function() {
                     accordion.find('.button-chapter').last().focus().trigger(keyPressEvent(this.KEY.SPACE));
 

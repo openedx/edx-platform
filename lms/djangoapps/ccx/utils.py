@@ -16,8 +16,6 @@ from django.core.urlresolvers import reverse
 from smtplib import SMTPException
 
 from courseware.courses import get_course_by_id
-from courseware.model_data import FieldDataCache
-from courseware.module_render import get_module_for_descriptor
 from instructor.enrollment import (
     enroll_email,
     get_email_params,

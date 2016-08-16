@@ -22,7 +22,6 @@ from courseware.masquerade import (
 from courseware.tests.factories import StaffFactory
 from courseware.tests.helpers import LoginEnrollmentTestCase, get_request_for_user
 from courseware.tests.test_submitting_problems import ProblemSubmissionTestMixin
-from milestones.tests.utils import MilestonesTestCaseMixin
 from student.tests.factories import UserFactory
 from xblock.runtime import DictKeyValueStore
 from xmodule.modulestore.django import modulestore
@@ -32,7 +31,7 @@ from xmodule.partitions.partitions import Group, UserPartition
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 
 
-class MasqueradeTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase, MilestonesTestCaseMixin):
+class MasqueradeTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Base class for masquerade tests that sets up a test course and enrolls a user in the course.
     """
@@ -124,7 +123,7 @@ class MasqueradeTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase, Mil
         Verifies that the staff debug control visibility is as expected (for staff only).
         """
         content = self.get_courseware_page().content
-        self.assertTrue(self.sequential_display_name in content, "Subsection should be visible")
+        self.assertIn(self.sequential_display_name, content, "Subsection should be visible")
         self.assertEqual(staff_debug_expected, 'Staff Debug Info' in content)
 
     def get_problem(self):
@@ -147,11 +146,11 @@ class MasqueradeTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase, Mil
         Verifies that "Show Answer" is only present when expected (for staff only).
         """
         problem_html = json.loads(self.get_problem().content)['html']
-        self.assertTrue(self.problem_display_name in problem_html)
+        self.assertIn(self.problem_display_name, problem_html)
         self.assertEqual(show_answer_expected, "Show Answer" in problem_html)
 
 
-@attr('shard_1')
+@attr(shard=1)
 class NormalStudentVisibilityTest(MasqueradeTestCase):
     """
     Verify the course displays as expected for a "normal" student (to ensure test setup is correct).
@@ -206,7 +205,7 @@ class StaffMasqueradeTestCase(MasqueradeTestCase):
         return response
 
 
-@attr('shard_1')
+@attr(shard=1)
 class TestStaffMasqueradeAsStudent(StaffMasqueradeTestCase):
     """
     Check for staff being able to masquerade as student.
@@ -244,7 +243,7 @@ class TestStaffMasqueradeAsStudent(StaffMasqueradeTestCase):
         self.verify_show_answer_present(True)
 
 
-@attr('shard_1')
+@attr(shard=1)
 class TestStaffMasqueradeAsSpecificStudent(StaffMasqueradeTestCase, ProblemSubmissionTestMixin):
     """
     Check for staff being able to masquerade as a specific student.
@@ -362,7 +361,7 @@ class TestStaffMasqueradeAsSpecificStudent(StaffMasqueradeTestCase, ProblemSubmi
         self.assertIn("OOGIE BLOOGIE", content)
 
 
-@attr('shard_1')
+@attr(shard=1)
 class TestGetMasqueradingGroupId(StaffMasqueradeTestCase):
     """
     Check for staff being able to masquerade as belonging to a group.

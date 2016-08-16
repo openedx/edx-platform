@@ -25,7 +25,7 @@ from lms.djangoapps.verify_student.models import VerificationDeadline, SoftwareS
 from util.testing import UrlResetMixin
 
 
-@attr('shard_3')
+@attr(shard=3)
 @patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True})
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 @ddt.ddt

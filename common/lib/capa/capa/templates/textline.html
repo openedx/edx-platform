@@ -1,3 +1,5 @@
+<%page expression_filter="h"/>
+<%! from openedx.core.djangolib.markup import HTML %>
 <% doinline = "inline" if inline else "" %>
 
 <div id="inputtype_${id}" class="${'text-input-dynamath' if do_math else ''} capa_inputtype ${doinline} textline" >
@@ -14,7 +16,7 @@
       <div style="display:none;" name="${hidden}" inputid="input_${id}" />
     % endif
 
-  <input type="text" name="input_${id}" id="input_${id}" aria-label="${label}" aria-describedby="answer_${id}" value="${value|h}"
+  <input type="text" name="input_${id}" id="input_${id}" aria-label="${label}" aria-describedby="answer_${id}" value="${value}"
         % if do_math:
             class="math"
         % endif
@@ -25,7 +27,7 @@
             style="display:none;"
         % endif
    />
-   ${trailing_text | h}
+   <span class="trailing_text">${trailing_text}</span>
 
       <span class="status" 
          %if status != 'unsubmitted':
@@ -33,7 +35,7 @@
          aria-describedby="input_${id}" data-tooltip="${status.display_tooltip}">
         <span class="sr">
           %if value:
-            ${value|h}
+            ${value}
           % else:
             ${label}
           %endif
@@ -55,7 +57,7 @@
 % endif
 
   % if msg:
-      <span class="message">${msg|n}</span>
+      <span class="message">${HTML(msg)}</span>
   % endif
 
 </div>

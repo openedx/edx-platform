@@ -1875,10 +1875,9 @@ class TestGoogleRegistrationView(
     """Tests the User API registration endpoint with Google authentication."""
     __test__ = True
 
-    pass
-
 
 @ddt.ddt
+@skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class UpdateEmailOptInTestCase(UserAPITestCase, SharedModuleStoreTestCase):
     """Tests the UpdateEmailOptInPreference view. """
 

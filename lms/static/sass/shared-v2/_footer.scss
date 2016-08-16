@@ -5,7 +5,7 @@
     @include clearfix();
     @extend %ui-print-excluded;
     box-shadow: 0 -1px 5px 0 $shadow-l1;
-    border-top: 1px solid tint(palette(grayscale, light), 50%);
+    border-top: 1px solid palette(grayscale, x-back);
     padding: 25px ($baseline/2) ($baseline*1.5);
     background: $footer-bg;
 

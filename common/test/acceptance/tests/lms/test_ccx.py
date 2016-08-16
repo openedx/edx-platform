@@ -10,7 +10,7 @@ from common.test.acceptance.pages.lms.auto_auth import AutoAuthPage
 from common.test.acceptance.pages.lms.ccx_dashboard_page import CoachDashboardPage
 
 
-@attr('shard_7')
+@attr(shard=7)
 class CreateCCXCoachTest(EventsTestMixin, UniqueCourseTest):
     """
     Test ccx end to end process.

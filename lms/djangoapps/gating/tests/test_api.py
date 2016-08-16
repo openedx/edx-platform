@@ -26,10 +26,6 @@ class GatingTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
         """
         super(GatingTestCase, self).setUp()
 
-        # Patch Milestones feature flag
-        self.settings_patcher = patch.dict('django.conf.settings.FEATURES', {'MILESTONES_APP': True})
-        self.settings_patcher.start()
-
         # create course
         self.course = CourseFactory.create(
             org='edX',
@@ -81,13 +77,6 @@ class GatingTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
             display_name='untitled problem 2'
         )
 
-    def tearDown(self):
-        """
-        Tear down initial setup
-        """
-        self.settings_patcher.stop()
-        super(GatingTestCase, self).tearDown()
-
 
 class TestGetXBlockParent(GatingTestCase):
     """
@@ -115,7 +104,7 @@ class TestGetXBlockParent(GatingTestCase):
         self.assertIsNone(result)
 
 
-@attr('shard_3')
+@attr(shard=3)
 @ddt
 class TestEvaluatePrerequisite(GatingTestCase, MilestonesTestCaseMixin):
     """

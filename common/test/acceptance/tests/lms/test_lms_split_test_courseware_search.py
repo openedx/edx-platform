@@ -21,7 +21,7 @@ from common.test.acceptance.tests.studio.base_studio_test import ContainerBase
 from common.test.acceptance.pages.studio.auto_auth import AutoAuthPage as StudioAutoAuthPage
 
 
-@attr('shard_1')
+@attr(shard=1)
 class SplitTestCoursewareSearchTest(ContainerBase):
     """
     Test courseware search on Split Test Module.

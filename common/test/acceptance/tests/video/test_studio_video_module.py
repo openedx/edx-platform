@@ -76,7 +76,7 @@ class CMSVideoBaseTest(UniqueCourseTest):
         # Why 2? One video component is created by default for each test. Please see
         # test_studio_video_module.py:CMSVideoTest._create_course_unit
         # And we are creating second video component here.
-        self.assertTrue(video_xblocks == 2)
+        self.assertEqual(video_xblocks, 2)
 
     def _install_course_fixture(self):
         """
@@ -161,7 +161,7 @@ class CMSVideoBaseTest(UniqueCourseTest):
         self.unit_page.xblocks[1].save_settings()
 
 
-@attr('shard_4')
+@attr(shard=4)
 class CMSVideoTest(CMSVideoBaseTest):
     """
     CMS Video Test Class

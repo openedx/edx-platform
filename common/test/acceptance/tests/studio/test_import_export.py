@@ -40,7 +40,7 @@ class ExportTestMixin(object):
         self.assertTrue(is_tarball_mimetype)
 
 
-@attr('shard_7')
+@attr(shard=7)
 class TestCourseExport(ExportTestMixin, StudioCourseTest):
     """
     Export tests for courses.
@@ -63,7 +63,7 @@ class TestCourseExport(ExportTestMixin, StudioCourseTest):
         self.assertEqual(self.export_page.header_text, 'Course Export')
 
 
-@attr('shard_7')
+@attr(shard=7)
 class TestLibraryExport(ExportTestMixin, StudioLibraryTest):
     """
     Export tests for libraries.
@@ -112,7 +112,7 @@ class BadExportMixin(object):
         )
 
 
-@attr('shard_7')
+@attr(shard=7)
 class TestLibraryBadExport(BadExportMixin, StudioLibraryTest):
     """
     Verify exporting a bad library causes an error.
@@ -136,7 +136,7 @@ class TestLibraryBadExport(BadExportMixin, StudioLibraryTest):
         )
 
 
-@attr('shard_7')
+@attr(shard=7)
 class TestCourseBadExport(BadExportMixin, StudioCourseTest):
     """
     Verify exporting a bad course causes an error.
@@ -168,7 +168,7 @@ class TestCourseBadExport(BadExportMixin, StudioCourseTest):
         )
 
 
-@attr('shard_7')
+@attr(shard=7)
 class ImportTestMixin(object):
     """
     Tests to run for both course and library import pages.
@@ -283,7 +283,7 @@ class ImportTestMixin(object):
         self.import_page.wait_for_tasks(fail_on='Updating')
 
 
-@attr('shard_7')
+@attr(shard=7)
 class TestEntranceExamCourseImport(ImportTestMixin, StudioCourseTest):
     """
     Tests the Course import page
@@ -329,7 +329,7 @@ class TestEntranceExamCourseImport(ImportTestMixin, StudioCourseTest):
         )
 
 
-@attr('shard_7')
+@attr(shard=7)
 class TestCourseImport(ImportTestMixin, StudioCourseTest):
     """
     Tests the Course import page
@@ -399,7 +399,7 @@ class TestCourseImport(ImportTestMixin, StudioCourseTest):
         self.assertFalse(self.import_page.is_timestamp_visible())
 
 
-@attr('shard_7')
+@attr(shard=7)
 class TestLibraryImport(ImportTestMixin, StudioLibraryTest):
     """
     Tests the Library import page

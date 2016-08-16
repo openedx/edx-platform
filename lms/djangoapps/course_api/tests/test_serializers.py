@@ -21,7 +21,7 @@ from ..serializers import CourseSerializer, CourseDetailSerializer
 from .mixins import CourseApiFactoryMixin
 
 
-@attr('shard_3')
+@attr(shard=3)
 @ddt.ddt
 class TestCourseSerializer(CourseApiFactoryMixin, ModuleStoreTestCase):
     """

@@ -2,6 +2,7 @@
 """
 Integration tests for submitting problem responses and getting grades.
 """
+import ddt
 import json
 import os
 from textwrap import dedent
@@ -19,10 +20,11 @@ from capa.tests.response_xml_factory import (
     CodeResponseXMLFactory,
 )
 from lms.djangoapps.grades import course_grades, progress
+from course_modes.models import CourseMode
 from courseware.models import StudentModule, BaseStudentModuleHistory
 from courseware.tests.helpers import LoginEnrollmentTestCase
 from lms.djangoapps.lms_xblock.runtime import quote_slashes
-from student.models import anonymous_id_for_user
+from student.models import anonymous_id_for_user, CourseEnrollment
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.partitions.partitions import Group, UserPartition
@@ -268,7 +270,7 @@ class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase, Probl
         ungraded problems, and is good for displaying a course summary with due dates,
         etc.
         """
-        return progress.summary(self.student_user, self.course).chapters
+        return progress.summary(self.student_user, self.course).chapter_grades
 
     def check_grade_percent(self, percent):
         """
@@ -299,11 +301,12 @@ class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase, Probl
             sections_list.extend(chapter['sections'])
 
         # get the first section that matches the url (there should only be one)
-        hw_section = next(section for section in sections_list if section.get('url_name') == hw_url_name)
-        return [s.earned for s in hw_section['scores']]
+        hw_section = next(section for section in sections_list if section.url_name == hw_url_name)
+        return [s.earned for s in hw_section.scores]
 
 
-@attr('shard_3')
+@attr(shard=3)
+@ddt.ddt
 class TestCourseGrader(TestSubmittingProblems):
     """
     Suite of tests for the course grader.
@@ -315,7 +318,6 @@ class TestCourseGrader(TestSubmittingProblems):
         """
         Set up a simple course for testing basic grading functionality.
         """
-
         grading_policy = {
             "GRADER": [{
                 "type": "Homework",
@@ -646,20 +648,26 @@ class TestCourseGrader(TestSubmittingProblems):
         self.assertEqual(self.earned_hw_scores(), [1.0, 2.0, 2.0])  # Order matters
         self.assertEqual(self.score_for_hw('homework3'), [1.0, 1.0])
 
-    def test_min_grade_credit_requirements_status(self):
+    @ddt.data(
+        *CourseMode.CREDIT_ELIGIBLE_MODES
+    )
+    def test_min_grade_credit_requirements_status(self, mode):
         """
         Test for credit course. If user passes minimum grade requirement then
         status will be updated as satisfied in requirement status table.
         """
         self.basic_setup()
+
+        # Enroll student in credit eligible mode.
+        # Note that we can't call self.enroll here since that goes through
+        # the Django student views, and does not update enrollment if it already exists.
+        CourseEnrollment.enroll(self.student_user, self.course.id, mode)
+
         self.submit_question_answer('p1', {'2_1': 'Correct'})
         self.submit_question_answer('p2', {'2_1': 'Correct'})
 
         # Enable the course for credit
-        credit_course = CreditCourse.objects.create(
-            course_key=self.course.id,
-            enabled=True,
-        )
+        CreditCourse.objects.create(course_key=self.course.id, enabled=True)
 
         # Configure a credit provider for the course
         CreditProvider.objects.create(
@@ -682,7 +690,7 @@ class TestCourseGrader(TestSubmittingProblems):
         self.assertEqual(req_status[0]["status"], 'satisfied')
 
 
-@attr('shard_1')
+@attr(shard=1)
 class ProblemWithUploadedFilesTest(TestSubmittingProblems):
     """Tests of problems with uploaded files."""
     # Tell Django to clean out all databases, not just default
@@ -737,7 +745,7 @@ class ProblemWithUploadedFilesTest(TestSubmittingProblems):
         self.assertItemsEqual(kwargs['files'].keys(), filenames.split())
 
 
-@attr('shard_1')
+@attr(shard=1)
 class TestPythonGradedResponse(TestSubmittingProblems):
     """
     Check that we can submit a schematic and custom response, and it answers properly.
@@ -988,7 +996,7 @@ class TestPythonGradedResponse(TestSubmittingProblems):
         self._check_ireset(name)
 
 
-@attr('shard_1')
+@attr(shard=1)
 class TestConditionalContent(TestSubmittingProblems):
     """
     Check that conditional content works correctly with grading.
@@ -1168,7 +1176,7 @@ class TestConditionalContent(TestSubmittingProblems):
 
         self.assertEqual(self.score_for_hw('homework1'), [1.0])
         self.assertEqual(self.score_for_hw('homework2'), [])
-        self.assertEqual(self.earned_hw_scores(), [1.0, 0.0])
+        self.assertEqual(self.earned_hw_scores(), [1.0])
 
         # Grade percent is .25. Here is the calculation.
         homework_1_score = 1.0 / 2

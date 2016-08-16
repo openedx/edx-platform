@@ -16,7 +16,7 @@ from ..exceptions import TransformerException
 from .helpers import MockXBlock, MockTransformer, ChildrenMapTestMixin
 
 
-@attr('shard_2')
+@attr(shard=2)
 @ddt.ddt
 class TestBlockStructure(TestCase, ChildrenMapTestMixin):
     """
@@ -45,7 +45,7 @@ class TestBlockStructure(TestCase, ChildrenMapTestMixin):
         self.assertNotIn(len(children_map) + 1, block_structure)
 
 
-@attr('shard_2')
+@attr(shard=2)
 @ddt.ddt
 class TestBlockStructureData(TestCase, ChildrenMapTestMixin):
     """

@@ -23,7 +23,7 @@ from nose.plugins.attrib import attr
 from urllib import urlencode
 
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
-from student.views import create_account, change_enrollment
+from student.views import change_enrollment
 from student.models import UserProfile, CourseEnrollment
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -73,7 +73,7 @@ def gen_all_identities():
                     yield _build_identity_dict(mail, display_name, given_name, surname)
 
 
-@attr('shard_3')
+@attr(shard=3)
 @ddt
 @override_settings(SESSION_ENGINE='django.contrib.sessions.backends.cache')
 class ShibSPTest(CacheIsolationTestCase):

@@ -227,7 +227,7 @@ class SSLClientTest(ModuleStoreTestCase):
         # Test that they do signin if they don't have a cert
         response = self.client.get(reverse('signin_user'))
         self.assertEqual(200, response.status_code)
-        self.assertTrue('login-and-registration-container' in response.content)
+        self.assertIn('login-and-registration-container', response.content)
 
         # And get directly logged in otherwise
         response = self.client.get(
@@ -348,7 +348,7 @@ class SSLClientTest(ModuleStoreTestCase):
         CourseEnrollment.enroll(user, course.id)
         course_private_url = '/courses/MITx/999/Robot_Super_Course/courseware'
 
-        self.assertFalse(SESSION_KEY in self.client.session)
+        self.assertNotIn(SESSION_KEY, self.client.session)
 
         response = self.client.get(
             course_private_url,
@@ -380,7 +380,7 @@ class SSLClientTest(ModuleStoreTestCase):
 
         CourseStaffRole(course.id).add_users(user)
         course_private_url = reverse('course_handler', args=(unicode(course.id),))
-        self.assertFalse(SESSION_KEY in self.client.session)
+        self.assertNotIn(SESSION_KEY, self.client.session)
 
         response = self.client.get(
             course_private_url,

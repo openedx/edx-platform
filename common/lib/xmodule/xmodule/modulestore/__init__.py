@@ -178,7 +178,7 @@ class BulkOperationsMixin(object):
         self.signal_handler = None
 
     @contextmanager
-    def bulk_operations(self, course_id, emit_signals=True):
+    def bulk_operations(self, course_id, emit_signals=True, ignore_case=False):
         """
         A context manager for notifying the store of bulk operations. This affects only the current thread.
 
@@ -186,10 +186,10 @@ class BulkOperationsMixin(object):
         until the bulk operation is completed.
         """
         try:
-            self._begin_bulk_operation(course_id)
+            self._begin_bulk_operation(course_id, ignore_case)
             yield
         finally:
-            self._end_bulk_operation(course_id, emit_signals)
+            self._end_bulk_operation(course_id, emit_signals, ignore_case)
 
     # the relevant type of bulk_ops_record for the mixin (overriding classes should override
     # this variable)
@@ -206,10 +206,10 @@ class BulkOperationsMixin(object):
         if ignore_case:
             for key, record in self._active_bulk_ops.records.iteritems():
                 # Shortcut: check basic equivalence for cases where org/course/run might be None.
-                if key == course_key or (
-                    key.org.lower() == course_key.org.lower() and
-                    key.course.lower() == course_key.course.lower() and
-                    key.run.lower() == course_key.run.lower()
+                if (key == course_key) or (
+                        (key.org and key.org.lower() == course_key.org.lower()) and
+                        (key.course and key.course.lower() == course_key.course.lower()) and
+                        (key.run and key.run.lower() == course_key.run.lower())
                 ):
                     return record
 
@@ -231,7 +231,7 @@ class BulkOperationsMixin(object):
         if course_key.for_branch(None) in self._active_bulk_ops.records:
             del self._active_bulk_ops.records[course_key.for_branch(None)]
 
-    def _start_outermost_bulk_operation(self, bulk_ops_record, course_key):
+    def _start_outermost_bulk_operation(self, bulk_ops_record, course_key, ignore_case=False):
         """
         The outermost nested bulk_operation call: do the actual begin of the bulk operation.
 
@@ -239,11 +239,11 @@ class BulkOperationsMixin(object):
         """
         pass
 
-    def _begin_bulk_operation(self, course_key):
+    def _begin_bulk_operation(self, course_key, ignore_case=False):
         """
         Begin a bulk operation on course_key.
         """
-        bulk_ops_record = self._get_bulk_ops_record(course_key)
+        bulk_ops_record = self._get_bulk_ops_record(course_key, ignore_case)
 
         # Increment the number of active bulk operations (bulk operations
         # on the same course can be nested)
@@ -251,7 +251,7 @@ class BulkOperationsMixin(object):
 
         # If this is the highest level bulk operation, then initialize it
         if bulk_ops_record.is_root:
-            self._start_outermost_bulk_operation(bulk_ops_record, course_key)
+            self._start_outermost_bulk_operation(bulk_ops_record, course_key, ignore_case)
 
     def _end_outermost_bulk_operation(self, bulk_ops_record, structure_key):
         """
@@ -261,12 +261,12 @@ class BulkOperationsMixin(object):
         """
         pass
 
-    def _end_bulk_operation(self, structure_key, emit_signals=True):
+    def _end_bulk_operation(self, structure_key, emit_signals=True, ignore_case=False):
         """
         End the active bulk operation on structure_key (course or library key).
         """
         # If no bulk op is active, return
-        bulk_ops_record = self._get_bulk_ops_record(structure_key)
+        bulk_ops_record = self._get_bulk_ops_record(structure_key, ignore_case)
         if not bulk_ops_record.active:
             return
 
@@ -1017,7 +1017,7 @@ class ModuleStoreRead(ModuleStoreAssetBase):
         pass
 
     @contextmanager
-    def bulk_operations(self, course_id, emit_signals=True):    # pylint: disable=unused-argument
+    def bulk_operations(self, course_id, emit_signals=True, ignore_case=False):    # pylint: disable=unused-argument
         """
         A context manager for notifying the store of bulk operations. This affects only the current thread.
         """

@@ -5,8 +5,6 @@ in a 404 error.
 """
 # pylint: disable=unused-argument
 from edxmako.shortcuts import render_to_response
-from mako.exceptions import TopLevelLookupException
-from django.http import HttpResponseNotFound
 
 
 def dev_mode(request):

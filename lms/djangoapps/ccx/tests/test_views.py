@@ -188,7 +188,7 @@ class TestAdminAccessCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
         self.assertEqual(response.status_code, 403)
 
 
-@attr('shard_1')
+@attr(shard=1)
 @override_settings(
     XBLOCK_FIELD_DATA_WRAPPERS=['lms.djangoapps.courseware.field_overrides:OverrideModulestoreFieldData.wrap'],
     MODULESTORE_FIELD_OVERRIDE_PROVIDERS=['ccx.overrides.CustomCoursesForEdxOverrideProvider'],
@@ -253,7 +253,7 @@ class TestCCXProgressChanges(CcxTestCase, LoginEnrollmentTestCase):
         grade_summary = progress_page_response.mako_context['courseware_summary']  # pylint: disable=no-member
         chapter = grade_summary[0]
         section = chapter['sections'][0]
-        progress_page_due_date = section['due'].strftime("%Y-%m-%d %H:%M")
+        progress_page_due_date = section.due.strftime("%Y-%m-%d %H:%M")
         self.assertEqual(progress_page_due_date, due)
 
     @patch('ccx.views.render_to_response', intercept_renderer)
@@ -303,7 +303,7 @@ class TestCCXProgressChanges(CcxTestCase, LoginEnrollmentTestCase):
         self.assert_progress_summary(ccx_course_key, due)
 
 
-@attr('shard_1')
+@attr(shard=1)
 @ddt.ddt
 class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
     """
@@ -917,7 +917,7 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
         )
 
 
-@attr('shard_1')
+@attr(shard=1)
 class TestCoachDashboardSchedule(CcxTestCase, LoginEnrollmentTestCase, ModuleStoreTestCase):
     """
     Tests of the CCX Coach Dashboard which need to modify the course content.
@@ -1059,7 +1059,7 @@ def patched_get_children(self, usage_key_filter=None):
     return list(iter_children())
 
 
-@attr('shard_1')
+@attr(shard=1)
 @override_settings(
     XBLOCK_FIELD_DATA_WRAPPERS=['lms.djangoapps.courseware.field_overrides:OverrideModulestoreFieldData.wrap'],
     MODULESTORE_FIELD_OVERRIDE_PROVIDERS=['ccx.overrides.CustomCoursesForEdxOverrideProvider'],

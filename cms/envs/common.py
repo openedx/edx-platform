@@ -208,6 +208,12 @@ FEATURES = {
 
     # Show Language selector
     'SHOW_LANGUAGE_SELECTOR': False,
+
+    # Temporary feature flag for disabling saving of subsection grades.
+    # There is also an advanced setting in the course module.  The
+    # feature flag and the advanced setting must both be true for
+    # a course to use saved grades.
+    'ENABLE_SUBSECTION_GRADES_SAVED': False,
 }
 
 ENABLE_JASMINE = False
@@ -828,6 +834,9 @@ INSTALLED_APPS = (
     'openedx.core.djangoapps.coursetalk',  # not used in cms (yet), but tests run
     'xblock_config',
 
+    # Maintenance tools
+    'maintenance',
+
     # Tracking
     'track',
     'eventtracking.django.apps.EventTrackingConfig',
@@ -927,6 +936,9 @@ INSTALLED_APPS = (
 
     # Enables default site and redirects
     'django_sites_extensions',
+
+    # additional release utilities to ease automation
+    'release_util'
 )
 
 

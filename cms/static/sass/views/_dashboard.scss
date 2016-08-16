@@ -677,6 +677,14 @@
     .new-course-run {
       width: 100%;
     }
+    .course-run-text-direction {
+      direction: ltr;
+      text-align: right;
+    }
+
+    .placeholder-text-direction {
+        direction: rtl;
+      }
 
     .new-course-name {
       @extend %t-title5;

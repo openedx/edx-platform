@@ -5,7 +5,6 @@ import json
 
 from django.utils.html import escapejs
 from mako.filters import decode
-from markupsafe import escape
 
 from xmodule.modulestore import EdxJSONEncoder
 

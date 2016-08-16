@@ -22,7 +22,7 @@
 // ------------------------------
 %hd-subsection {
     margin-bottom: spacing-vertical(mid-small);
-    border-bottom: rem(2) solid palette(grayscale-cool, x-light);
+    border-bottom: rem(2) solid palette(grayscale, x-back);
     padding-bottom: spacing-vertical(x-small);
 }
 
@@ -30,20 +30,20 @@
 // #DEPTH
 // ------------------------------
 %depth-base-focus {
-    background: palette(grayscale, white-t);
+    background: $white;
     padding: spacing-vertical(small) spacing-horizontal(base);
 }
 
 %depth-well {
-    box-shadow: 0 rem(1) rem(3) 0 palette(grayscale-cool, light) inset;
+    box-shadow: 0 rem(1) rem(3) 0 palette(grayscale, back) inset;
     padding: spacing-vertical(small) spacing-horizontal(base);
-    background: palette(grayscale, x-light);
+    background: palette(grayscale, x-back);
 }
 
 %depth-card {
-    box-shadow: 0 rem(1) rem(2) 0 palette(grayscale-cool, light);
+    box-shadow: 0 rem(1) rem(2) 0 palette(grayscale, back);
     padding: spacing-vertical(small) spacing-horizontal(base);
-    background: palette(grayscale, white-t);
+    background: $white;
 }
 
 .depth-base-focus {
@@ -76,8 +76,8 @@
 // ------------------------------
 .wrapper-header {
     @extend %divider-2;
-    border-bottom-color: palette(grayscale, xx-trans);
-    background: palette(grayscale, white-t);
+    border-bottom-color: palette(grayscale, x-back);
+    background: $white;
 }
 
 .header-app {
@@ -96,19 +96,19 @@
 
 // message to user-centric banner
 .wrapper-banner-user {
-    box-shadow: inset 0 rem(2) rem(2) 0 palette(grayscale, black-t);
-    background: palette(grayscale-cool, x-dark);
+    box-shadow: inset 0 rem(2) rem(2) 0 $black;
+    background: palette(grayscale, dark);
 }
 
 .banner-user {
 
     .message-title {
-        color: palette(grayscale, white-t);
+        color: $white;
         font-weight: font-weight(semi-bold);
     }
 
     .message-copy {
-        color: palette(grayscale, white);
+        color: $white;
     }
 
     .message-actions .action {
@@ -116,7 +116,7 @@
         // STATE: hover, active, focus
         &:hover, &:active, &:focus {
             // customizations from UXPL
-           color: palette(grayscale-cool, x-dark);
+           color: palette(grayscale, dark);
         }
 
         .icon {
@@ -161,7 +161,7 @@
 
 // main accomplishment
 .accomplishment-main {
-    background: palette(grayscale-cool, x-trans);
+    background: palette(grayscale, x-back);
 }
 
 // brief accomplishment
@@ -198,13 +198,13 @@
 
 %rendering-section {
     margin-bottom: spacing-vertical(base);
-    border-bottom: rem(2) solid palette(grayscale-cool, x-light);
+    border-bottom: rem(2) solid palette(grayscale, x-back);
     padding-bottom: spacing-vertical(base);
 }
 
 %rendering-hd-section {
     margin-bottom: spacing-vertical(mid-small);
-    border-bottom: rem(2) solid palette(grayscale-cool, x-light);
+    border-bottom: rem(2) solid palette(grayscale, x-back);
     padding-bottom: spacing-vertical(x-small);
     color: $cert-base-color;
     @include text-align(center);
@@ -344,7 +344,7 @@
         .value {
             @extend %copy-base;
             font-weight: font-weight(semi-bold);
-            color: palette(grayscale, x-dark);
+            color: palette(grayscale, dark);
         }
     }
 
@@ -360,7 +360,7 @@
 
         .src {
             max-height: 100%;
-            border: rem(4) solid palette(grayscale, white-t);
+            border: rem(4) solid $white;
         }
     }
 
@@ -384,7 +384,7 @@
 
 .accomplishment-metadata-title {
     @extend %hd-subsection;
-    border-bottom-color: palette(grayscale-cool, light);
+    border-bottom-color: palette(grayscale, back);
 }
 
 // ------------------------------
@@ -467,7 +467,7 @@
     }
 
     .accomplishment-main {
-        background: transparentize(palette(grayscale-cool, dark), 0.9);
+        background: palette(grayscale, x-back);
     }
 
     .accomplishment-rendering {
@@ -492,11 +492,11 @@
     }
 
     .accomplishment-main {
-        background: transparentize(palette(primary, accent), 0.9);
+        background: palette(primary, back);
     }
 
     .accomplishment-rendering {
-        background: palette(grayscale, white-t) url('../images/bg-verified.png') center no-repeat;
+        background: $white url('../images/bg-verified.png') center no-repeat;
         background-size: 65%;
 
         .deco-corner-tl {
@@ -537,7 +537,7 @@
 // #FOOTER
 // ------------------------------
 .footer-app {
-    border-top: rem(4) solid palette(grayscale, xx-trans);
+    border-top: rem(4) solid palette(grayscale, x-back);
     padding-top: spacing-vertical(base);
 }
 
@@ -556,7 +556,7 @@
     top: 0;
     left: 0;
     z-index: z-index(front);
-    background-color: palette(grayscale, trans); /* dim the background */
+    background-color: transparentize(palette(grayscale, base), 0.5); /* dim the background */
     width: 100%;
     height: 100%;
     vertical-align: middle;
@@ -572,8 +572,8 @@
         max-width: 50%;
         margin-right: auto;
         margin-left: auto;
-        border-top: rem(10) solid palette(primary, light);
-        background: palette(grayscale, white);
+        border-top: rem(10) solid palette(primary, back);
+        background: palette(grayscale, x-back);
         padding-right: spacing-horizontal(large);
         padding-left: spacing-horizontal(large);
         overflow-x: hidden;
@@ -612,7 +612,7 @@
 .modal-hr {
     display: block;
     border: none;
-    background-color: palette(grayscale, light);
+    background-color: palette(grayscale, back);
     height: rem(2);
     width: 100%;
 }

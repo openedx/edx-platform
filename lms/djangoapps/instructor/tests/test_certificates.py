@@ -23,7 +23,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 import io
 
 
-@attr('shard_1')
+@attr(shard=1)
 @ddt.ddt
 class CertificatesInstructorDashTest(SharedModuleStoreTestCase):
     """Tests for the certificate panel of the instructor dash. """
@@ -197,7 +197,7 @@ class CertificatesInstructorDashTest(SharedModuleStoreTestCase):
         self.assertContains(response, expected_html)
 
 
-@attr('shard_1')
+@attr(shard=1)
 @override_settings(CERT_QUEUE='certificates')
 @ddt.ddt
 class CertificatesInstructorApiTest(SharedModuleStoreTestCase):
@@ -387,7 +387,7 @@ class CertificatesInstructorApiTest(SharedModuleStoreTestCase):
         self.assertEqual(res_json['message'], u'Please select certificate statuses from the list only.')
 
 
-@attr('shard_1')
+@attr(shard=1)
 @override_settings(CERT_QUEUE='certificates')
 @ddt.ddt
 class CertificateExceptionViewInstructorApiTest(SharedModuleStoreTestCase):
@@ -674,7 +674,7 @@ class CertificateExceptionViewInstructorApiTest(SharedModuleStoreTestCase):
         )
 
 
-@attr('shard_1')
+@attr(shard=1)
 @override_settings(CERT_QUEUE='certificates')
 @ddt.ddt
 class GenerateCertificatesInstructorApiTest(SharedModuleStoreTestCase):
@@ -792,7 +792,7 @@ class GenerateCertificatesInstructorApiTest(SharedModuleStoreTestCase):
         )
 
 
-@attr('shard_1')
+@attr(shard=1)
 @ddt.ddt
 class TestCertificatesInstructorApiBulkWhiteListExceptions(SharedModuleStoreTestCase):
     """
@@ -950,7 +950,7 @@ class TestCertificatesInstructorApiBulkWhiteListExceptions(SharedModuleStoreTest
         return data
 
 
-@attr('shard_1')
+@attr(shard=1)
 @ddt.ddt
 class CertificateInvalidationViewTests(SharedModuleStoreTestCase):
     """

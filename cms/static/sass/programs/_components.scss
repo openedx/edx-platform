@@ -20,7 +20,7 @@
     &:hover,
     &:focus,
     &:active {
-      color: palette(grayscale, black);
+      color: $black;
     }
   }
 
@@ -42,7 +42,7 @@
     &:focus,
     &.is-focused {
       background: shade($success, 33%);
-      color: $btn-default-focus-color;
+      color: palette(primary, accent);
     }
 
     // STATE: is pressed or active
@@ -94,6 +94,6 @@
 
 .form-group {
   &.bg-white {
-    background-color: palette(grayscale, white);
+    background-color: $white;
   }
 }

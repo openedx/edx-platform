@@ -9,7 +9,7 @@ from openedx.core.djangoapps.user_api.course_tag import api as course_tag_api
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 
-@attr('shard_2')
+@attr(shard=2)
 class TestCourseTagAPI(TestCase):
     """
     Test the user service

@@ -69,7 +69,7 @@ class BaseI18nTestCase(TestCase):
         self.client.login(username=self.user.username, password=self.pwd)
 
 
-@attr('shard_1')
+@attr(shard=1)
 class I18nTestCase(BaseI18nTestCase):
     """
     Tests for i18n
@@ -103,7 +103,7 @@ class I18nTestCase(BaseI18nTestCase):
         self.assert_tag_has_attr(response.content, "body", "class", "rtl")
 
 
-@attr('shard_1')
+@attr(shard=1)
 class I18nRegressionTests(BaseI18nTestCase):
     """
     Tests for i18n
@@ -158,7 +158,7 @@ class I18nRegressionTests(BaseI18nTestCase):
         self.assert_tag_has_attr(response.content, "html", "lang", site_lang)
 
 
-@attr('shard_1')
+@attr(shard=1)
 class I18nLangPrefTests(BaseI18nTestCase):
     """
     Regression tests of language presented to the user, when they

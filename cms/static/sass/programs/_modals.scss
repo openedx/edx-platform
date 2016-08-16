@@ -8,14 +8,14 @@
   right: 0;
   bottom: 0;
   left: 0;
-  background-color: palette(grayscale-cool, x-dark);
+  background-color: palette(grayscale, dark);
   opacity: 0.5;
   z-index: 1000;
 }
 
 .modal-window {
   position: absolute;
-  background-color: palette(grayscale, black);
+  background-color: $black;
   width: 80%;
   left: 10%;
   top: 40%;
@@ -25,15 +25,15 @@
 .modal-content {
   margin: 5px;
   padding: 20px;
-  background-color: palette(grayscale-cool, x-dark);
-  border-top: 5px solid palette(warning, base);
+  background-color: palette(grayscale, dark);
+  border-top: 5px solid palette(warning, accent);
 
   .copy {
-    color: palette(grayscale, white);
+    color: $white;
   }
 
   .emphasized {
-    color: palette(grayscale, white-t);
+    color: $white;
     font-weight: font-weight(bold);
   }
 }
@@ -42,18 +42,19 @@
   padding: 10px 20px;
 
   .btn {
-    color: palette(grayscale, white-t);
+    color: palette(grayscale, back);
   }
 
   .btn-brand {
-    background: palette(warning, base);
-    border-color: palette(warning, base);
+    background: palette(warning, back);
+    color: palette(grayscale, dark);
+    border-color: palette(warning, accent);
 
     &:hover,
     &:focus,
     &:active {
-      background: palette(warning, dark);
-      border-color: palette(warning, dark);;
+      background: palette(warning, back);
+      border-color: palette(warning, accent);
     }
   }
 
@@ -63,7 +64,7 @@
     &:hover,
     &:focus,
     &:active {
-      border-color: palette(grayscale-cool, light)
+      border-color: palette(grayscale, back)
     }
   }
 }

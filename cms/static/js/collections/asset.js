@@ -1,13 +1,13 @@
 define([
-    "underscore",
-    "edx-ui-toolkit/js/pagination/paging-collection",
-    "js/models/asset"
+    'underscore',
+    'edx-ui-toolkit/js/pagination/paging-collection',
+    'js/models/asset'
 ], function(_, PagingCollection, AssetModel) {
     'use strict';
 
     var AssetCollection = PagingCollection.extend({
         assetType: '',
-        model : AssetModel,
+        model: AssetModel,
 
         state: {
             firstPage: 0,
@@ -37,8 +37,7 @@ define([
             return PagingCollection.prototype.parse.call(this, response, options);
         },
 
-        /* jshint unused:false */
-        parseState: function (response, queryParams, state, options) {
+        parseState: function(response) {
             return {
                 totalRecords: response[0].totalCount,
                 totalPages: Math.ceil(response[0].totalCount / response[0].pageSize)

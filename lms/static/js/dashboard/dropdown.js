@@ -1,13 +1,13 @@
 var edx = edx || {};
 
-(function ($) {
+(function($) {
     'use strict';
 
     edx.dashboard = edx.dashboard || {};
     edx.dashboard.dropdown = {};
 
     // Generate the properties object to be passed along with business intelligence events.
-    edx.dashboard.dropdown.toggleCourseActionsDropdownMenu = function (event) {
+    edx.dashboard.dropdown.toggleCourseActionsDropdownMenu = function(event) {
         // define variables for code legibility
         var dashboardIndex = $(event.currentTarget).data().dashboardIndex,
             dropdown = $('#actions-dropdown-' + dashboardIndex),
@@ -26,33 +26,33 @@ var edx = edx || {};
             var itemToFocusIndex;
 
             // if space or escape key pressed
-            if ( event.which === 32 || event.which === 27) {
-              dropdownButton.click();
-              event.preventDefault();
+            if (event.which === 32 || event.which === 27) {
+                dropdownButton.click();
+                event.preventDefault();
             }
 
             // if up arrow key pressed or shift+tab
             else if (event.which === 38 || (event.which === 9 && event.shiftKey)) {
               // if first item go to last
-              if (focusedItemIndex === 0 || focusedItemIndex === -1) {
-                menuItems.last().focus();
-              } else {
-                itemToFocusIndex = focusedItemIndex - 1;
-                menuItems.get(itemToFocusIndex).focus();
-              }
-              event.preventDefault();
+                if (focusedItemIndex === 0 || focusedItemIndex === -1) {
+                    menuItems.last().focus();
+                } else {
+                    itemToFocusIndex = focusedItemIndex - 1;
+                    menuItems.get(itemToFocusIndex).focus();
+                }
+                event.preventDefault();
             }
 
             // if down arrow key pressed or tab key
             else if (event.which === 40 || event.which === 9) {
               // if last item go to first
-              if (focusedItemIndex === menuItems.length - 1 || focusedItemIndex === -1) {
-                menuItems.first().focus();
-              } else {
-                itemToFocusIndex = focusedItemIndex + 1;
-                menuItems.get(itemToFocusIndex).focus();
-              }
-              event.preventDefault();
+                if (focusedItemIndex === menuItems.length - 1 || focusedItemIndex === -1) {
+                    menuItems.first().focus();
+                } else {
+                    itemToFocusIndex = focusedItemIndex + 1;
+                    menuItems.get(itemToFocusIndex).focus();
+                }
+                event.preventDefault();
             }
         };
 
@@ -69,22 +69,21 @@ var edx = edx || {};
         // Inform the ARIA framework that the dropdown has been expanded
         dropdownButton.attr('aria-expanded', !ariaExpandedState);
 
-        //catch keypresses when inside dropdownMenu (we want to catch spacebar;
+        // catch keypresses when inside dropdownMenu (we want to catch spacebar;
         // escape; up arrow or shift+tab; and down arrow or tab)
-        dropdown.on('keydown', function(event){
-          catchKeyPress($(this), event);
+        dropdown.on('keydown', function(event) {
+            catchKeyPress($(this), event);
         });
     };
 
     edx.dashboard.dropdown.bindToggleButtons = function() {
-      $('.action-more').bind(
+        $('.action-more').bind(
         'click',
         edx.dashboard.dropdown.toggleCourseActionsDropdownMenu
       );
     };
 
     $(document).ready(function() {
-      edx.dashboard.dropdown.bindToggleButtons();
+        edx.dashboard.dropdown.bindToggleButtons();
     });
-
 })(jQuery);

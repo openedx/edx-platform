@@ -60,7 +60,7 @@ class BookmarksTestMixin(EventsTestMixin, UniqueCourseTest):
         self.assert_events_match(event_data, actual_events)
 
 
-@attr('shard_8')
+@attr(shard=8)
 class BookmarksTest(BookmarksTestMixin):
     """
     Tests to verify bookmarks functionality.

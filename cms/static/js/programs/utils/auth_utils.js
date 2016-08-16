@@ -1,9 +1,9 @@
 define([
-        'jquery',
-        'underscore',
-        'js/programs/utils/api_config'
-    ],
-    function( $, _, apiConfig ) {
+    'jquery',
+    'underscore',
+    'js/programs/utils/api_config'
+],
+    function($, _, apiConfig) {
         'use strict';
 
         var auth = {
@@ -20,11 +20,10 @@ define([
                  * implementation.
                  *
                  */
-                sync: function( method, model, options ) {
-
+                sync: function(method, model, options) {
                     var oldError = options.error;
 
-                    this._setHeaders( options );
+                    this._setHeaders(options);
 
                     options.notifyOnError = false;  // suppress Studio error pop-up that will happen if we get a 401
 
@@ -38,7 +37,7 @@ define([
                                 delete options.xhr;  // remove the failed (401) xhr from the last try.
 
                                 // update authorization header
-                                this._setHeaders( options );
+                                this._setHeaders(options);
 
                                 Backbone.sync.call(this, method, model, options);
                             }.bind(this));
@@ -54,11 +53,11 @@ define([
                  * Fix up headers on an imminent AJAX sync, ensuring that the JWT token is enclosed
                  * and that credentials are included when the request is being made cross-domain.
                  */
-                _setHeaders: function( ajaxOptions ) {
-                    ajaxOptions.headers = _.extend ( ajaxOptions.headers || {}, {
-                        Authorization: 'JWT ' + apiConfig.get( 'idToken' )
+                _setHeaders: function(ajaxOptions) {
+                    ajaxOptions.headers = _.extend(ajaxOptions.headers || {}, {
+                        Authorization: 'JWT ' + apiConfig.get('idToken')
                     });
-                    ajaxOptions.xhrFields = _.extend( ajaxOptions.xhrFields || {}, {
+                    ajaxOptions.xhrFields = _.extend(ajaxOptions.xhrFields || {}, {
                         withCredentials: true
                     });
                 },
@@ -67,8 +66,7 @@ define([
                  * Fetch a new id token from the configured endpoint, update the api config,
                  * and invoke the specified callback.
                  */
-                _updateToken: function( success ) {
-
+                _updateToken: function(success) {
                     $.ajax({
                         url: apiConfig.get('authUrl'),
                         xhrFields: {
@@ -76,10 +74,10 @@ define([
                             withCredentials: true
                         },
                         crossDomain: true
-                    }).done(function ( data ) {
+                    }).done(function(data) {
                         // save the newly-retrieved id token
-                        apiConfig.set( 'idToken', data.id_token );
-                    }).done( success );
+                        apiConfig.set('idToken', data.id_token);
+                    }).done(success);
                 }
             }
         };
