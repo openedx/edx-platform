@@ -263,9 +263,6 @@ class PersistentSubsectionGrade(TimeStampedModel):
             usage_key=usage_key,
         )
 
-        # Thanks to repeatable read, there's a non-zero chance of a race condition ocurring on insert.
-        # If that happens, the situation is unrecoverable, as we need to read a new piece of data (a visible_blocks FK)
-        # that won't be visible inside the current transaction. In those cases, log the issue and abort.
         if not isinstance(visible_blocks, BlockRecordSet):
             visible_blocks = BlockRecordSet(visible_blocks)
         try:
@@ -277,12 +274,6 @@ class PersistentSubsectionGrade(TimeStampedModel):
             visible_blocks_hash = visible_blocks.to_hash()
         else:
             visible_blocks_hash = visible_blocks_model.hashed
-
-        try:
-            visible_blocks_model = VisibleBlocks.objects.create_from_blockrecords(blocks=visible_blocks)
-        except IntegrityError:
-            log.error("Race condition hit in robust grading data model. Unrecoverable repeatable-read issue.")
-            raise
 
         grade.course_version = course_version
         grade.subtree_edited_date = subtree_edited_date
