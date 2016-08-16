@@ -213,7 +213,7 @@ FEATURES = {
     # There is also an advanced setting in the course module.  The
     # feature flag and the advanced setting must both be true for
     # a course to use saved grades.
-    'ENABLE_SUBSECTION_GRADES_SAVED': False,
+    'ENABLE_SUBSECTION_GRADES_SAVED': True,
 }
 
 ENABLE_JASMINE = False
