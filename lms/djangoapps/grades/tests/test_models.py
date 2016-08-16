@@ -192,8 +192,8 @@ class PersistentSubsectionGradeTest(GradesModelTestCase):
         if already_created:
             PersistentSubsectionGrade.objects.create(**self.params)
         module_prefix = "lms.djangoapps.grades.models.PersistentSubsectionGrade."
-        with patch(module_prefix + "objects.create") as mock_create:
-            with patch(module_prefix + "update_grade", wraps=PersistentSubsectionGrade.update_grade) as mock_update:
+        with patch(module_prefix + "objects.get_or_create", wraps=PersistentSubsectionGrade.objects.get_or_create) as mock_get_or_create:
+            with patch(module_prefix + "update") as mock_update:
                 PersistentSubsectionGrade.save_grade(**self.params)
-                self.assertTrue(mock_update.called)
-                self.assertNotEqual(mock_create.called, already_created)
+                self.assertTrue(mock_get_or_create.called)
+                self.assertEqual(mock_update.called, already_created)

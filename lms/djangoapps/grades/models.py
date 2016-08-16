@@ -236,10 +236,14 @@ class PersistentSubsectionGrade(TimeStampedModel):
         Wrapper for create_grade or update_grade, depending on which applies.
         Takes the same arguments as both of those methods.
         """
+        user_id = kwargs.pop('user_id')
+        usage_key = kwargs.pop('usage_key')
         try:
-            cls.update_grade(**kwargs)
-        except cls.DoesNotExist:
-            cls.objects.create(**kwargs)
+            grade, is_created = cls.objects.get_or_create(user_id=user_id, usage_key=usage_key, defaults=kwargs)
+        except IntegrityError:
+            is_created = False
+        if not is_created:
+            grade.update(**kwargs)
 
     @classmethod
     def read_grade(cls, user_id, usage_key):
@@ -281,13 +285,38 @@ class PersistentSubsectionGrade(TimeStampedModel):
             usage_key=usage_key,
         )
 
+        grade.update(
+            course_version=course_version,
+            subtree_edited_date=subtree_edited_date,
+            earned_all=earned_all,
+            possible_all=possible_all,
+            earned_graded=earned_graded,
+            possible_graded=possible_graded,
+            visible_blocks=visible_blocks,
+        )
+
+    def update(
+            self,
+            course_version,
+            subtree_edited_date,
+            earned_all,
+            possible_all,
+            earned_graded,
+            possible_graded,
+            visible_blocks,
+    ):
+        """
+        Modify an existing PersistentSubsectionGrade object, saving the new
+        version.
+        """
         visible_blocks_hash = VisibleBlocks.objects.hash_from_blockrecords(blocks=visible_blocks)
 
-        grade.course_version = course_version
-        grade.subtree_edited_date = subtree_edited_date
-        grade.earned_all = earned_all
-        grade.possible_all = possible_all
-        grade.earned_graded = earned_graded
-        grade.possible_graded = possible_graded
-        grade.visible_blocks_id = visible_blocks_hash
-        grade.save()
+        self.course_version = course_version
+        self.subtree_edited_date = subtree_edited_date
+        self.earned_all = earned_all
+        self.possible_all = possible_all
+        self.earned_graded = earned_graded
+        self.possible_graded = possible_graded
+        self.visible_blocks_id = visible_blocks_hash  # pylint: disable=attribute-defined-outside-init
+        self.save()
+
