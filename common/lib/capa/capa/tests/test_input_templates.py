@@ -824,14 +824,6 @@ class OptionInputTemplateTest(TemplateTestCase):
         self.assert_description(xpaths)
         self.assert_describedby_attribute(xpaths)
 
-    def test_description(self):
-        """
-        Test that correct description information is set on desired elements.
-        """
-        xpaths = ['//select/@aria-describedby']
-        self.assert_description(xpaths, descriptions=False)
-        self.assert_describedby_attribute(xpaths)
-
 
 class DragAndDropTemplateTest(TemplateTestCase):
     """

@@ -6,14 +6,15 @@ metadata:
 
         >>Add the question text, or prompt, here. This text is required.||You can add an optional tip or note related to the prompt like this. <<
 
-        = the correct answer +- 0.001% an optional variance
-        
+        = 100 +-5
+
 data:   |
         <problem>
-            <stringresponse answer="the correct answer +- 0.001% an optional variance" type="ci">
+            <numericalresponse answer="100">
                 <p>You can use this template as a guide to the simple editor markdown and OLX markup to use for numerical input problems. Edit this component to replace this template with your own assessment.</p>
                 <label>Add the question text, or prompt, here. This text is required.</label>
                 <description>You can add an optional tip or note related to the prompt like this.</description>
-                <textline size="20"/>
-            </stringresponse>
+                <responseparam type="tolerance" default="5"/>
+                <formulaequationinput/>
+            </numericalresponse>
         </problem>
