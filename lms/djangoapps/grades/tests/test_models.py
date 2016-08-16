@@ -159,9 +159,13 @@ class PersistentSubsectionGradeTest(GradesModelTestCase):
         """
         Confirms create will fail if params are missing.
         """
-        del self.params["course_version"]
+        del self.params["earned_graded"]
         with self.assertRaises(ValidationError):
             PersistentSubsectionGrade.objects.create(**self.params)
+
+    def test_course_version_is_optional(self):
+        del self.params["course_version"]
+        PersistentSubsectionGrade.objects.create(**self.params)
 
     def test_update(self):
         """

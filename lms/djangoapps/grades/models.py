@@ -182,7 +182,7 @@ class PersistentSubsectionGrade(TimeStampedModel):
 
     # Information relating to the state of content when grade was calculated
     subtree_edited_date = models.DateTimeField('last content edit timestamp', blank=False)
-    course_version = models.CharField('guid of latest course version', blank=False, max_length=255)
+    course_version = models.CharField('guid of latest course version', blank=True, max_length=255)
 
     # earned/possible refers to the number of points achieved and available to achieve.
     # graded refers to the subset of all problems that are marked as being graded.

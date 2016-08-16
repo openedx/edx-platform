@@ -24,7 +24,7 @@ class Migration(migrations.Migration):
                 ('course_id', xmodule_django.models.CourseKeyField(max_length=255)),
                 ('usage_key', xmodule_django.models.UsageKeyField(max_length=255)),
                 ('subtree_edited_date', models.DateTimeField(verbose_name=b'last content edit timestamp')),
-                ('course_version', models.CharField(max_length=255, verbose_name=b'guid of latest course version')),
+                ('course_version', models.CharField(max_length=255, verbose_name=b'guid of latest course version', blank=True)),
                 ('earned_all', models.FloatField()),
                 ('possible_all', models.FloatField()),
                 ('earned_graded', models.FloatField()),
