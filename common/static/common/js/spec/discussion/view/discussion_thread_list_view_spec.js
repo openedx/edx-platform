@@ -1,5 +1,5 @@
 /* globals
-    Discussion, DiscussionCourseSettings, DiscussionViewSpecHelper, DiscussionSpecHelper,
+    _, Discussion, DiscussionCourseSettings, DiscussionViewSpecHelper, DiscussionSpecHelper,
     DiscussionThreadListView, DiscussionUtil, Thread
 */
 (function() {
@@ -156,22 +156,22 @@
             return expect(this.view.$('.forum-nav-filter-main-control').val()).toEqual('all');
         });
 
-        checkThreadsOrdering = function(view, sort_order, type) {
+        checkThreadsOrdering = function(view, sortOrder, type) {
             expect(view.$el.find('.forum-nav-thread').children().length).toEqual(4);
             expect(view.$el.find('.forum-nav-thread:nth-child(1) .forum-nav-thread-title').text())
-                .toEqual(sort_order[0]);
+                .toEqual(sortOrder[0]);
             expect(view.$el.find('.forum-nav-thread:nth-child(2) .forum-nav-thread-title').text())
-                .toEqual(sort_order[1]);
+                .toEqual(sortOrder[1]);
             expect(view.$el.find('.forum-nav-thread:nth-child(3) .forum-nav-thread-title').text())
-                .toEqual(sort_order[2]);
+                .toEqual(sortOrder[2]);
             expect(view.$el.find('.forum-nav-thread:nth-child(4) .forum-nav-thread-title').text())
-                .toEqual(sort_order[3]);
+                .toEqual(sortOrder[3]);
             return expect(view.$el.find('.forum-nav-sort-control').val()).toEqual(type);
         };
 
         describe('thread rendering should be correct', function() {
             var checkRender;
-            checkRender = function(threads, type, sort_order) {
+            checkRender = function(threads, type, sortOrder) {
                 var discussion, view;
                 discussion = new Discussion(_.map(threads, function(thread) {
                     return new Thread(thread);
@@ -181,56 +181,56 @@
                 });
                 view = makeView(discussion);
                 view.render();
-                checkThreadsOrdering(view, sort_order, type);
+                checkThreadsOrdering(view, sortOrder, type);
                 expect(view.$el.find('.forum-nav-thread-comments-count:visible').length)
                     .toEqual(type === 'votes' ? 0 : 4);
                 expect(view.$el.find('.forum-nav-thread-votes-count:visible').length)
                     .toEqual(type === 'votes' ? 4 : 0);
                 if (type === 'votes') {
-                    return expect(_.map(view.$el.find('.forum-nav-thread-votes-count'), function(element) {
+                    expect(_.map(view.$el.find('.forum-nav-thread-votes-count'), function(element) {
                         return $(element).text().trim();
                     })).toEqual(['+25 votes', '+20 votes', '+42 votes', '+12 votes']);
                 }
             };
 
             it('with sort preference activity', function() {
-                return checkRender(this.threads, 'activity', ['Thread1', 'Thread2', 'Thread3', 'Thread4']);
+                checkRender(this.threads, 'activity', ['Thread1', 'Thread2', 'Thread3', 'Thread4']);
             });
 
             it('with sort preference votes', function() {
-                return checkRender(this.threads, 'votes', ['Thread4', 'Thread1', 'Thread2', 'Thread3']);
+                checkRender(this.threads, 'votes', ['Thread4', 'Thread1', 'Thread2', 'Thread3']);
             });
 
             it('with sort preference comments', function() {
-                return checkRender(this.threads, 'comments', ['Thread1', 'Thread4', 'Thread3', 'Thread2']);
+                checkRender(this.threads, 'comments', ['Thread1', 'Thread4', 'Thread3', 'Thread2']);
             });
         });
 
         describe('Sort change should be correct', function() {
             var changeSorting;
-            changeSorting = function(threads, selected_type, new_type, sort_order) {
-                var discussion, sortControl, sorted_threads, view;
+            changeSorting = function(threads, selectedType, newType, sortOrder) {
+                var discussion, sortControl, sortedThreads, view;
                 discussion = new Discussion(_.map(threads, function(thread) {
                     return new Thread(thread);
                 }), {
                     pages: 1,
-                    sort: selected_type
+                    sort: selectedType
                 });
                 view = makeView(discussion);
                 view.render();
                 sortControl = view.$el.find('.forum-nav-sort-control');
-                expect(sortControl.val()).toEqual(selected_type);
-                sorted_threads = [];
-                if (new_type === 'activity') {
-                    sorted_threads = [threads[0], threads[3], threads[1], threads[2]];
-                } else if (new_type === 'comments') {
-                    sorted_threads = [threads[0], threads[3], threads[2], threads[1]];
-                } else if (new_type === 'votes') {
-                    sorted_threads = [threads[3], threads[0], threads[1], threads[2]];
+                expect(sortControl.val()).toEqual(selectedType);
+                sortedThreads = [];
+                if (newType === 'activity') {
+                    sortedThreads = [threads[0], threads[3], threads[1], threads[2]];
+                } else if (newType === 'comments') {
+                    sortedThreads = [threads[0], threads[3], threads[2], threads[1]];
+                } else if (newType === 'votes') {
+                    sortedThreads = [threads[3], threads[0], threads[1], threads[2]];
                 }
                 $.ajax.and.callFake(function(params) {
                     params.success({
-                        'discussion_data': sorted_threads,
+                        discussion_data: sortedThreads,
                         page: 1,
                         num_pages: 1
                     });
@@ -239,9 +239,9 @@
                         }
                     };
                 });
-                sortControl.val(new_type).change();
+                sortControl.val(newType).change();
                 expect($.ajax).toHaveBeenCalled();
-                checkThreadsOrdering(view, sort_order, new_type);
+                checkThreadsOrdering(view, sortOrder, newType);
             };
 
             it('with sort preference activity', function() {
@@ -290,7 +290,7 @@
             });
 
             it('renders search alert with custom class', function() {
-                var foo, messages;
+                var messages;
                 testAlertMessages([]);
 
                 this.view.addSearchAlert('foo', 'custom-class');
@@ -299,7 +299,7 @@
                 expect(messages[0].text).toEqual('foo');
                 expect(messages[0].css_class).toEqual('search-alert custom-class');
 
-                foo = this.view.addSearchAlert('bar', 'other-class');
+                this.view.addSearchAlert('bar', 'other-class');
 
                 messages = getAlertMessagesAndClasses();
                 expect(messages.length).toEqual(2);
@@ -371,24 +371,6 @@
                     id: 1
                 }));
                 return expect(this.view.clearSearchAlerts).toHaveBeenCalled();
-            });
-        });
-
-        describe('Search events', function() {
-            it('perform search when enter pressed inside search textfield', function() {
-                setupAjax();
-                spyOn(this.view, 'searchFor');
-                this.view.$el.find('.forum-nav-search-input').trigger($.Event('keydown', {
-                    which: 13
-                }));
-                return expect(this.view.searchFor).toHaveBeenCalled();
-            });
-
-            it('perform search when search icon is clicked', function() {
-                setupAjax();
-                spyOn(this.view, 'searchFor');
-                this.view.$el.find('.fa-search').click();
-                return expect(this.view.searchFor).toHaveBeenCalled();
             });
         });
 
@@ -562,35 +544,23 @@
                 return expect($('.forum-nav-thread-list-wrapper:visible').length).toEqual(isVisible ? 0 : 1);
             };
 
-            it('should not be visible by default', function() {
+            it('should be visible by default', function() {
+                expectBrowseMenuVisible(true);
+            });
+
+            it('should disappear when header button is clicked', function() {
+                $('.forum-nav-browse').click();
                 return expectBrowseMenuVisible(false);
             });
 
-            it('should show when header button is clicked', function() {
-                $('.forum-nav-browse').click();
-                return expectBrowseMenuVisible(true);
-            });
-
             describe('when shown', function() {
-                beforeEach(function() {
-                    return $('.forum-nav-browse').click();
-                });
-
-                it('should hide when header button is clicked', function() {
+                it('should show again when header button is clicked', function() {
                     $('.forum-nav-browse').click();
                     return expectBrowseMenuVisible(false);
                 });
 
                 it('should hide when a click outside the menu occurs', function() {
                     $('.forum-nav-search-input').click();
-                    return expectBrowseMenuVisible(false);
-                });
-
-                it('should hide when a search is executed', function() {
-                    setupAjax();
-                    $('.forum-nav-search-input').trigger($.Event('keydown', {
-                        which: 13
-                    }));
                     return expectBrowseMenuVisible(false);
                 });
 
@@ -639,19 +609,6 @@
 
             describe('selecting an item', function() {
                 var testSelectionRequest;
-
-                it('should clear the search box', function() {
-                    setupAjax();
-                    $('.forum-nav-search-input').val('foobar');
-                    $('.forum-nav-browse-menu-following .forum-nav-browse-title').click();
-                    return expect($('.forum-nav-search-input').val()).toEqual('');
-                });
-
-                it('should change the button text', function() {
-                    setupAjax();
-                    $('.forum-nav-browse-menu-following .forum-nav-browse-title').click();
-                    return expect($('.forum-nav-browse-current').text()).toEqual("Posts I'm Following");
-                });
 
                 it('should show/hide the cohort selector', function() {
                     var self = this;

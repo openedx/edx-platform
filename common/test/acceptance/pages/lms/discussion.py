@@ -376,6 +376,10 @@ class DiscussionSortPreferencePage(CoursePage):
         """
         return self.q(css="body.discussion .forum-nav-sort-control").present
 
+    def show_all_discussions(self):
+        """ Show the list of all discussions. """
+        self.q(css=".forum-nav-browse").click()
+
     def get_selected_sort_preference(self):
         """
         Return the text of option that is selected for sorting.
@@ -416,6 +420,10 @@ class DiscussionTabSingleThreadPage(CoursePage):
 
     def __getattr__(self, name):
         return getattr(self.thread_page, name)
+
+    def show_all_discussions(self):
+        """ Show the list of all discussions. """
+        self.q(css=".forum-nav-browse").click()
 
     def close_open_thread(self):
         with self.thread_page.secondary_action_menu_open(".thread-main-wrapper"):
@@ -569,11 +577,11 @@ class DiscussionUserProfilePage(CoursePage):
 
     def is_browser_on_page(self):
         return (
-            self.q(css='section.discussion-user-threads[data-course-id="{}"]'.format(self.course_id)).present
+            self.q(css='.discussion-user-threads[data-course-id="{}"]'.format(self.course_id)).present
             and
-            self.q(css='section.user-profile a.learner-profile-link').present
+            self.q(css='.user-profile .learner-profile-link').present
             and
-            self.q(css='section.user-profile a.learner-profile-link').text[0] == self.username
+            self.q(css='.user-profile .learner-profile-link').text[0] == self.username
         )
 
     @wait_for_js
@@ -670,7 +678,7 @@ class DiscussionTabHomePage(CoursePage, DiscussionPageMixin):
         return self.q(css=".discussion-body section.home-header").present
 
     def perform_search(self, text="dummy"):
-        self.q(css=".forum-nav-search-input").fill(text + chr(10))
+        self.q(css=".search-input").fill(text + chr(10))
         EmptyPromise(
             self.is_ajax_finished,
             "waiting for server to return result"
@@ -713,7 +721,7 @@ class DiscussionTabHomePage(CoursePage, DiscussionPageMixin):
         """
         Returns the new post button.
         """
-        elements = self.q(css="ol.course-tabs .new-post-btn")
+        elements = self.q(css=".new-post-btn")
         return elements.first if elements.visible and len(elements) == 1 else None
 
     @property

@@ -218,6 +218,65 @@ class DiscussionHomePageTest(UniqueCourseTest):
 
 
 @attr(shard=2)
+class DiscussionNavigationTest(BaseDiscussionTestCase):
+    """
+    Tests for breadcrumbs navigation in the Discussions page nav bar
+    """
+
+    def setUp(self):
+        super(DiscussionNavigationTest, self).setUp()
+        AutoAuthPage(self.browser, course_id=self.course_id).visit()
+
+        thread_id = "test_thread_{}".format(uuid4().hex)
+        thread_fixture = SingleThreadViewFixture(
+            Thread(
+                id=thread_id,
+                body=THREAD_CONTENT_WITH_LATEX,
+                commentable_id=self.discussion_id
+            )
+        )
+        thread_fixture.push()
+        self.thread_page = DiscussionTabSingleThreadPage(
+            self.browser,
+            self.course_id,
+            self.discussion_id,
+            thread_id
+        )
+        self.thread_page.visit()
+
+    def test_breadcrumbs_push_topic(self):
+        topic_button = self.thread_page.q(
+            css=".forum-nav-browse-menu-item[data-discussion-id='{}']".format(self.discussion_id)
+        )
+        self.assertTrue(topic_button.visible)
+        topic_button.click()
+
+        # Verify the thread's topic has been pushed to breadcrumbs
+        breadcrumbs = self.thread_page.q(css=".breadcrumbs .nav-item")
+        self.assertEqual(len(breadcrumbs), 2)
+        self.assertEqual(breadcrumbs[1].text, "Test Discussion Topic")
+
+    def test_breadcrumbs_back_to_all_topics(self):
+        topic_button = self.thread_page.q(
+            css=".forum-nav-browse-menu-item[data-discussion-id='{}']".format(self.discussion_id)
+        )
+        self.assertTrue(topic_button.visible)
+        topic_button.click()
+
+        # Verify clicking the first breadcrumb takes you back to all topics
+        self.thread_page.q(css=".breadcrumbs .nav-item")[0].click()
+        self.assertEqual(len(self.thread_page.q(css=".breadcrumbs .nav-item")), 1)
+
+    def test_breadcrumbs_clear_search(self):
+        self.thread_page.q(css=".search-input").fill("search text")
+        self.thread_page.q(css=".search-btn").click()
+
+        # Verify that clicking the first breadcrumb clears your search
+        self.thread_page.q(css=".breadcrumbs .nav-item")[0].click()
+        self.assertEqual(self.thread_page.q(css=".search-input").text[0], "")
+
+
+@attr(shard=2)
 class DiscussionTabSingleThreadTest(BaseDiscussionTestCase, DiscussionResponsePaginationTestMixin):
     """
     Tests for the discussion page displaying a single thread
@@ -315,6 +374,7 @@ class DiscussionTabMultipleThreadTest(BaseDiscussionTestCase):
             self.thread_ids[1]
         )
         self.thread_page_1.visit()
+        self.thread_page_1.show_all_discussions()
 
     def setup_multiple_threads(self, thread_count):
         threads = []
@@ -1036,7 +1096,7 @@ class DiscussionUserProfileTest(UniqueCourseTest):
     Tests for user profile page in discussion tab.
     """
 
-    PAGE_SIZE = 20  # django_comment_client.forum.views.THREADS_PER_PAGE
+    PAGE_SIZE = 20  # discussion.views.THREADS_PER_PAGE
     PROFILED_USERNAME = "profiled-user"
 
     def setUp(self):
@@ -1261,6 +1321,7 @@ class DiscussionSortPreferenceTest(UniqueCourseTest):
 
         self.sort_page = DiscussionSortPreferencePage(self.browser, self.course_id)
         self.sort_page.visit()
+        self.sort_page.show_all_discussions()
 
     def test_default_sort_preference(self):
         """
@@ -1293,5 +1354,6 @@ class DiscussionSortPreferenceTest(UniqueCourseTest):
             selected_sort = self.sort_page.get_selected_sort_preference()
             self.assertEqual(selected_sort, sort_type)
             self.sort_page.refresh_page()
+            self.sort_page.show_all_discussions()
             selected_sort = self.sort_page.get_selected_sort_preference()
             self.assertEqual(selected_sort, sort_type)

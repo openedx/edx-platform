@@ -14,8 +14,19 @@ $forum-color-community-ta: $green-d1 !default;
 $forum-color-marked-answer: $green-d1 !default;
 $forum-color-border: palette(grayscale, base) !default;
 $forum-color-error: palette(error, accent) !default;
+$forum-color-hover-thread: palette(grayscale, dark) !default;
+$forum-color-reading-thread: palette(grayscale, dark) !default;
 
 // post images
 $post-image-dimension: ($baseline*3) !default;  // image size  + margin
 $response-image-dimension: ($baseline*2.5) !default; // image size  + margin
 $comment-image-dimension: ($baseline*2) !default; // image size  + margin
+
+// font sizes
+$forum-base-font-size: font-size(small);
+$forum-x-large-font-size: font-size(x-large);
+$forum-large-font-size: font-size(base);
+$forum-small-font-size: font-size(x-small);
+
+// borders
+$forum-border-radius: $component-border-radius;

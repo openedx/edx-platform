@@ -2,82 +2,31 @@
 // ====================
 
 .forum-nav {
-  box-sizing: border-box;
-  @include float(left);
-  position: relative;
-  width: 31%;
   border: 1px solid #aaa;
-  border-radius: 3px;
+  border-radius: $forum-border-radius;
 }
 
 // ------
-// Header
+// Discussion Forums Page Header
 // ------
-.forum-nav-header {
-  box-sizing: border-box;
-  // TODO: don't use table for layout purposes as it switches the screenreader mode
-  display: table;
-  border-bottom: 1px solid $forum-color-border;
-  width: 100%;
-  background-color: $gray-l3;
-}
+.discussion-board > .page-header {
+    $searchBoxPadding: rem($baseline / 2 + 2);
+    $searchBoxHeight: (rem($baseline) + ($searchBoxPadding * 2));
 
-.forum-nav-browse {
-    box-sizing: border-box;
-    // TODO: don't use table-cell for layout purposes as it switches the screenreader mode
-    display: table-cell;
-    vertical-align: middle;
-    width: auto;
-    padding: 11px;
-    border: 0;
-    border-radius: 0;
-    background: transparent;
-    box-shadow: none;
-
-    &:hover,
-    &:focus,
-    &.is-active {
-        // converted to button from a;
-        // need importants to overwrite later button styles
-        box-shadow: none !important;
-        background-image: none !important;
-        background-color: $gray-l5 !important;
+    div {
+        display: inline-block;
+        vertical-align: middle;
     }
 
-  .icon {
-    @include font-size(14);
-    @include margin-right($baseline/4);
-  }
-}
+    .page-header-main {
+        line-height: $searchBoxHeight;
+    }
 
-.forum-nav-browse-current {
-  @include font-size(12);
-}
-
-.forum-nav-browse-drop-arrow {
-  @include margin-left($baseline/4);
-}
-
-.forum-nav-search {
-  box-sizing: border-box;
-  // TODO: don't use table-cell for layout purposes as it switches the screenreader mode
-  display: table-cell;
-  position: relative;
-  vertical-align: middle;
-  width: 50%;
-  padding: ($baseline/4);
-}
-
-.forum-nav-search .icon {
-  @include font-size(12);
-  position: absolute;
-  margin-top: -6px;
-  top: 50%;
-  @include right($baseline/4 + 1px + $baseline / 4); // Wrapper padding + border + input padding
-}
-
-.forum-nav-search-input {
-  width: 100%;
+    .page-header-secondary > .form-actions > button {
+        // Overrides base size set in lms/static/sass/shared-v2/_layouts.scss
+        // Done to match size of UXPL's search box. This is bad, I know.
+        height: $searchBoxHeight !important;
+    }
 }
 
 // -----------
@@ -95,7 +44,7 @@
 }
 
 .forum-nav-browse-filter .icon {
-  @include font-size(12);
+  font-size: $forum-small-font-size;
   position: absolute;
   margin-top: -6px;
   top: 50%;
@@ -134,7 +83,7 @@
 }
 
 .forum-nav-browse-menu {
-  @include font-size(14);
+  font-size: $forum-base-font-size;
   overflow-y: scroll;
   list-style: none;
 }
@@ -156,12 +105,13 @@
 // -------------------
 .forum-nav-refine-bar {
   @include clearfix();
-  @include font-size(11);
+  font-size: $forum-small-font-size;
   border-bottom: 1px solid $forum-color-border;
   background-color: $gray-l5;
   padding: ($baseline/4) ($baseline/2);
   color: $black;
   text-align: right;
+  border-radius: $forum-border-radius $forum-border-radius 0 0;
 }
 
 .forum-nav-filter-main {
@@ -207,6 +157,7 @@
 .forum-nav-thread {
   border-bottom: 1px solid $forum-color-border;
   background-color: $forum-color-background;
+  margin-bottom: 0;
 
   &.is-unread {
     background: $forum-color-background;
@@ -226,18 +177,36 @@
 .forum-nav-thread-link {
   display: block;
   padding: ($baseline/4) ($baseline/2);
+  transition: none;
+
+  &:hover {
+    color: $forum-color-background;
+    background-color: $forum-color-hover-thread;
+  }
 
   &.is-active {
-    background-color: $forum-color-background;
-    color: $base-font-color;
+    color: $forum-color-background;
+    background-color: $forum-color-reading-thread;
+  }
+
+  &.is-active,
+  &:hover {
+    .forum-nav-thread-labels > li {
+      border-color: $forum-color-background;
+      color: $forum-color-background;
+    }
 
     .forum-nav-thread-comments-count {
-      background-color: $gray-l4;
+      background-color: $forum-color-background;
       color: $base-font-color;
 
       &:after {
         border-right-color: $gray-l4;
       }
+    }
+
+    span.icon {
+      color: $forum-color-background;
     }
   }
 
@@ -265,7 +234,7 @@
   width: 7%;
 
   .icon {
-    @include font-size(14);
+    font-size: $forum-base-font-size;
 
     &:before {
 
@@ -300,19 +269,19 @@
 }
 
 .forum-nav-thread-title {
-  @extend %t-title7;
+  font-size: $forum-base-font-size;
   display: block;
 }
 
 %forum-nav-thread-wrapper-2-content {
-  @include font-size(11);
+  @include margin-right($baseline/4);
+  font-size: $forum-small-font-size;
   display: inline-block;
-  margin-right: ($baseline/4);
   text-align: center;
   color: $black;
 
   &:last-child {
-    margin-right: 0;
+    @include margin-right(0);
   }
 }
 
@@ -326,7 +295,7 @@
   position: relative;
   @include margin-left($baseline/4);
   margin-bottom: ($baseline/4); // Because tail is position: absolute
-  border-radius: 2px;
+  border-radius: $forum-border-radius;
   padding: ($baseline/10) ($baseline/5);
   min-width: 2em; // Fit most comment counts but allow expansion if necessary
   background-color: $gray-l4;
