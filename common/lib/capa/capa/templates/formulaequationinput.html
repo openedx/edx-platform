@@ -5,7 +5,7 @@
   <div class="${status.classname}" id="status_${id}">
     <input type="text" name="input_${id}" id="input_${id}"
         data-input-id="${id}" value="${value}"
-        ${describedby}
+        ${describedby| n}
         % if size:
         size="${size}"
         % endif
