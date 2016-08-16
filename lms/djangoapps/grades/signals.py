@@ -1,8 +1,8 @@
 """
 Grades related signals.
 """
+from django.conf import settings
 from django.dispatch import receiver, Signal
-from xmodule.modulestore.django import modulestore
 from logging import getLogger
 from student.models import user_by_anonymous_id
 from submissions.models import score_set, score_reset
@@ -122,6 +122,9 @@ def recalculate_subsection_grade_handler(sender, **kwargs):  # pylint: disable=u
        - course_id: Unicode string representing the course
        - usage_id: Unicode string indicating the courseware instance
     """
+    if not settings.FEATURES.get('ENABLE_SUBSECTION_GRADES_SAVED', False):
+        return
+
     points_possible = kwargs.get('points_possible', None)
     points_earned = kwargs.get('points_earned', None)
     course_id = kwargs.get('course_id', None)
