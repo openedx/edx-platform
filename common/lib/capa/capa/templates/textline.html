@@ -20,7 +20,7 @@
 % for description_id, description_text in response_data['descriptions'].items():
     <p class="question-description" id="${description_id}">${description_text}</p>
 % endfor
-<input type="text" name="input_${id}" id="input_${id}" ${describedby} value="${value}"
+<input type="text" name="input_${id}" id="input_${id}" ${describedby| n} value="${value}"
     % if do_math:
         class="math"
     % endif
