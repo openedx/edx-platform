@@ -249,6 +249,7 @@ class PersistentSubsectionGrade(TimeStampedModel):
         """
         return cls.objects.get(
             user_id=user_id,
+            course_id=usage_key.course_key,  # course_id is included to take advantage of db indexes
             usage_key=usage_key,
         )
 
@@ -272,6 +273,7 @@ class PersistentSubsectionGrade(TimeStampedModel):
         """
         grade = cls.objects.get(
             user_id=user_id,
+            course_id=usage_key.course_key,  # course_id is included to take advantage of db indexes
             usage_key=usage_key,
         )
 
