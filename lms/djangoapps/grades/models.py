@@ -80,16 +80,38 @@ class VisibleBlocksQuerySet(models.QuerySet):
     """
     A custom QuerySet representing VisibleBlocks.
     """
+
     def create_from_blockrecords(self, blocks):
         """
         Creates a new VisibleBlocks model object.
 
-        Argument 'blocks' should be an iterable collection of BlockRecords.
+        Argument 'blocks' should be a BlockRecordSet.
         """
+
         if not isinstance(blocks, BlockRecordSet):
             blocks = BlockRecordSet(blocks)
+
         model, _ = self.get_or_create(hashed=blocks.to_hash(), defaults={'blocks_json': blocks.to_json()})
         return model
+
+    def hash_from_blockrecords(self, blocks):
+        """
+        Return the hash for a given BlockRecordSet, serializing the records if
+        possible, but returning the hash even if an IntegrityError occurs.
+        """
+
+        if not isinstance(blocks, BlockRecordSet):
+            blocks = BlockRecordSet(blocks)
+
+        try:
+            model = self.create_from_blockrecords(blocks)
+        except IntegrityError:
+            # If an integrity error occurs, the VisibleBlocks model we want to
+            # create already exists.  The hash is still the correct value.
+            return blocks.to_hash()
+        else:
+            # No error occurred
+            return model.hashed
 
 
 class VisibleBlocks(models.Model):
@@ -142,18 +164,8 @@ class PersistentSubsectionGradeQuerySet(models.QuerySet):
             visible_blocks (iterable of BlockRecord)
         """
         visible_blocks = kwargs.pop('visible_blocks')
-        if not isinstance(visible_blocks, BlockRecordSet):
-            visible_blocks = BlockRecordSet(visible_blocks)
-        try:
-            visible_blocks_model = VisibleBlocks.objects.create_from_blockrecords(blocks=visible_blocks)
-        except IntegrityError:
-            # If an integrity error occurs, the VisibleBlocks model we want to
-            # create already exists.  Use the hash for our current list of
-            # blocks as the foreign key.
-            visible_blocks_hash = visible_blocks.to_hash()
-        else:
-            visible_blocks_hash = visible_blocks_model.hashed
 
+        visible_blocks_hash = VisibleBlocks.objects.hash_from_blockrecords(blocks=visible_blocks)
         grade = self.model(
             course_id=kwargs['usage_key'].course_key,
             visible_blocks_id=visible_blocks_hash,
@@ -263,17 +275,7 @@ class PersistentSubsectionGrade(TimeStampedModel):
             usage_key=usage_key,
         )
 
-        if not isinstance(visible_blocks, BlockRecordSet):
-            visible_blocks = BlockRecordSet(visible_blocks)
-        try:
-            visible_blocks_model = VisibleBlocks.objects.create_from_blockrecords(blocks=visible_blocks)
-        except IntegrityError:
-            # If an integrity error occurs, the VisibleBlocks model we want to
-            # create already exists.  Use the hash for our current list of
-            # blocks as the foreign key.
-            visible_blocks_hash = visible_blocks.to_hash()
-        else:
-            visible_blocks_hash = visible_blocks_model.hashed
+        visible_blocks_hash = VisibleBlocks.objects.hash_from_blockrecords(blocks=visible_blocks)
 
         grade.course_version = course_version
         grade.subtree_edited_date = subtree_edited_date
