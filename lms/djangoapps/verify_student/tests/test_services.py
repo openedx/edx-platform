@@ -191,12 +191,24 @@ class TestReverificationService(ModuleStoreTestCase):
         self.assertEqual(status, service.NON_VERIFIED_TRACK)
 
     def test_get_course_verification_status(self):
-        # test that we can retrieve the course verification status via the service
+        """
+        test that we can retrieve the course verification status via the service
+        """
 
         service = ReverificationService()
 
-        # NEGATIVE TEST: we get back a None if we ask about a course that the user
-        # is not enrolled in
+        self.enrollment.update_enrollment(mode=CourseMode.VERIFIED)
+        status = service.get_course_verification_status(self.user.id, self.course_id)
+        self.assertEqual(status, VERIFY_STATUS_NEED_TO_VERIFY)
+
+    def test_get_course_verification_status_not_enrolled(self):
+        """
+        Test we get back a None if we ask about a course that the user
+        is not enrolled in
+        """
+
+        service = ReverificationService()
+
         not_enrolled_course = CourseFactory.create(org='Robot', number='101', display_name='Second Test Course')
         self.assertIsNone(
             service.get_course_verification_status(
@@ -205,13 +217,15 @@ class TestReverificationService(ModuleStoreTestCase):
             )
         )
 
-        # NEGATIVE TEST: we get back a None if we ask about a course that the user
-        # is not enrolled as verified
+    def test_get_course_verification_status_not_verified(self):
+        """
+        Test we get back a None if we ask about a course that the user
+        is not enrolled as verified
+        """
+
+        service = ReverificationService()
+
         self.enrollment.update_enrollment(mode=CourseMode.HONOR)
         self.assertIsNone(
             service.get_course_verification_status(self.user.id, self.course_id)
         )
-
-        self.enrollment.update_enrollment(mode=CourseMode.VERIFIED)
-        status = service.get_course_verification_status(self.user.id, self.course_id)
-        self.assertEqual(status, VERIFY_STATUS_NEED_TO_VERIFY)
