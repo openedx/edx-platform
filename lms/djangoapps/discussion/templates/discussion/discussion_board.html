@@ -6,6 +6,7 @@
 <%inherit file="../main.html" />
 <%namespace name='static' file='../static_content.html'/>
 <%!
+import json
 from django.utils.translation import ugettext as _
 from django.template.defaultfilters import escapejs
 from django.core.urlresolvers import reverse
@@ -48,11 +49,11 @@ DiscussionBoardFactory({
 <%block name="content">
 <section class="discussion discussion-board container" id="discussion-container"
          data-course-id="${course_id}"
-         data-user-create-comment="${can_create_comment}"
-         data-user-create-subcomment="${can_create_subcomment}"
+         data-user-create-comment="${json.dumps(can_create_comment)}"
+         data-user-create-subcomment="${json.dumps(can_create_subcomment)}"
          data-read-only="false"
          data-sort-preference="${sort_preference}"
-         data-flag-moderator="${flag_moderator}"
+         data-flag-moderator="${json.dumps(flag_moderator)}"
          data-user-cohort-id="${user_cohort}">
     <header class="page-header has-secondary">
         ## Breadcrumb navigation
