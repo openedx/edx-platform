@@ -6,6 +6,7 @@ from lazy import lazy
 
 from django.conf import settings
 
+from course_blocks.api import get_course_blocks
 from courseware.model_data import ScoresClient
 from lms.djangoapps.grades.scores import get_score, possibly_scored
 from lms.djangoapps.grades.models import BlockRecord, PersistentSubsectionGrade
@@ -59,6 +60,7 @@ class SubsectionGrade(object):
             BlockRecord(location, weight, score.possible)
             for location, (score, weight) in self.locations_to_weighted_scores.iteritems()
         ]
+
         PersistentSubsectionGrade.save_grade(
             user_id=student.id,
             usage_key=self.location,
@@ -165,6 +167,22 @@ class SubsectionGradeFactory(object):
             self._get_saved_grade(subsection, course_structure, course) or
             self._compute_and_save_grade(subsection, course_structure, course)
         )
+
+    def update(self, usage_key, course_key):
+        """
+        Updates the SubsectionGrade object for the student and subsection
+        identified by the given usage key.
+        """
+        from courseware.courses import get_course_by_id  # avoids circular import with courseware.py
+        course = get_course_by_id(course_key, depth=0)
+        # save ourselves the extra queries if the course does not use subsection grades
+        if not course.enable_subsection_grades_saved:
+            return
+
+        course_structure = get_course_blocks(self.student, usage_key)
+        subsection = course_structure[usage_key]
+        self._prefetch_scores(course_structure, course)
+        return self._compute_and_save_grade(subsection, course_structure, course)
 
     def _compute_and_save_grade(self, subsection, course_structure, course):
         """
