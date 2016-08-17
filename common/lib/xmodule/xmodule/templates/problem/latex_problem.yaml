@@ -138,7 +138,7 @@ data: |
 
       <p><strong>Example Math Expression Problem</strong></p>
       <symbolicresponse expect="m*c^2">
-        <label>What is Einstein's equation for the energy equivalent of a mass [mathjaxinline]m[/mathjaxinline]?</label>
+        <p>What is Einstein's equation for the energy equivalent of a mass [mathjaxinline]m[/mathjaxinline]?</p>
         <textline size="90" correct_answer="m*c^2" math="1"/>
       </symbolicresponse>
       <br/>
@@ -146,11 +146,8 @@ data: |
       <p><strong>Example Numerical Problem</strong></p>
       <numericalresponse inline="1" answer="0.52">
         <label>Estimate the energy savings (in J/y) if all the people ([mathjaxinline]3\times 10^8[/mathjaxinline]) in the U.&#xA0;S. switched from U.&#xA0;S. code to low-flow shower heads.</label>
-        <p style="display:inline">Energy saved = </p>
-        <textline inline="1">
-          <responseparam type="tolerance" default="0.02"/>
-        </textline>
-        <p style="display:inline">&#xA0;EJ/year</p>
+        <formulaequationinput trailing_text="EJ/year" />
+        <responseparam type="tolerance" default="0.02"/>
       </numericalresponse>
       <br/>
 
@@ -176,7 +173,7 @@ data: |
     def test_add_to_ten(expect, ans):
         return test_add(10, ans)
       </script>
-        <label>Enter two integers that sum to 10.</label>
+        <p>Enter two integers that sum to 10.</p>
         <textline size="40" correct_answer="3"/><br/>
         <textline size="40" correct_answer="7"/>
         <solution>
@@ -197,7 +194,7 @@ data: |
         except ValueError:
             return False
       </script>
-        <label>Enter two integers that sum to 20.</label>
+        <p>Enter two integers that sum to 20.</p>
         <textline size="40" correct_answer="11"/><br/>
         <textline size="40" correct_answer="9"/>
         <solution>
@@ -213,10 +210,10 @@ data: |
 
       <p><strong>Example Image Mapped Input Problem</strong></p>
       <imageresponse>
-        <label>
+        <p>
           What country is home to the Great Pyramid of Giza as well as the cities
           of Cairo and Memphis? Click the country on the map below.
-        </label>
+        </p>
         <imageinput src="https://studio.edx.org/c4x/edX/DemoX/asset/Africa.png"
         width="600" height="638" rectangle="(338,98)-(412,168)" alt="Map of
         Africa"/>
