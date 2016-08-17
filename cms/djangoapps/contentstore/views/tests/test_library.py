@@ -212,7 +212,7 @@ class UnitTestLibraries(CourseTestCase):
         response = self.client.get(make_url_for_lib(lib.location.library_key))
         self.assertEqual(response.status_code, 200)
         self.assertIn("<html", response.content)
-        self.assertIn(lib.display_name, response.content)
+        self.assertIn(lib.display_name.encode('utf-8'), response.content)
 
     @ddt.data('library-v1:Nonexistent+library', 'course-v1:Org+Course', 'course-v1:Org+Course+Run', 'invalid')
     def test_invalid_keys(self, key_str):

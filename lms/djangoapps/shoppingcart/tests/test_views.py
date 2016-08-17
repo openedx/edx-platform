@@ -481,7 +481,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         self.add_course_to_user_cart(self.course_key)
         resp = self.client.post(reverse('register_code_redemption', args=[self.reg_code]), HTTP_HOST='localhost')
         self.assertEqual(resp.status_code, 200)
-        self.assertIn(self.course.display_name, resp.content)
+        self.assertIn(self.course.display_name.encode('utf-8'), resp.content)
 
     @ddt.data(True, False)
     def test_reg_code_uses_unknown_mode(self, expired_mode):
@@ -493,7 +493,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         self.add_course_to_user_cart(self.course_key)
         resp = self.client.post(reverse('register_code_redemption', args=[self.reg_code]), HTTP_HOST='localhost')
         self.assertEqual(resp.status_code, 200)
-        self.assertIn(self.course.display_name, resp.content)
+        self.assertIn(self.course.display_name.encode('utf-8'), resp.content)
         self.assertIn("error processing your redeem code", resp.content)
 
     def test_course_discount_for_valid_active_coupon_code(self):
@@ -1836,7 +1836,7 @@ class RegistrationCodeRedemptionCourseEnrollment(SharedModuleStoreTestCase):
         dashboard_url = reverse('dashboard')
         response = self.client.get(dashboard_url)
         self.assertEquals(response.status_code, 200)
-        self.assertIn(self.course.display_name, response.content)
+        self.assertIn(self.course.display_name.encode('utf-8'), response.content)
 
 
 @ddt.ddt
