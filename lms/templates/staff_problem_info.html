@@ -68,12 +68,16 @@ ${block_content}
       </div>
       <div data-location="${location | h}" data-location-name="${location.name | h}">
         [
+        % if can_reset_attempts:
         <a href="#" class="staff-debug-reset">${_('Reset Student Attempts')}</a>
-        % if has_instructor_access:
         |
+        % endif
+        % if has_instructor_access:
         <a href="#" class="staff-debug-sdelete">${_('Delete Student State')}</a>
+        % if can_rescore_problem:
         |
         <a href="#" class="staff-debug-rescore">${_('Rescore Student Submission')}</a>
+        % endif
         % endif
         ]
       </div>
@@ -83,16 +87,17 @@ ${block_content}
     <div class="staff_info" style="display:block">
 is_released = ${is_released}
 location = ${location.to_deprecated_string() | h}
+
 <table summary="${_('Module Fields')}">
   <tr><th>${_('Module Fields')}</th></tr>
   %for name, field in fields:
-  <tr><td>${name}</td><td><pre style="display:inline-block; margin: 0;">${field | h}</pre></td></tr>
+  <tr><td style="width:25%">${name}</td><td><pre style="display:inline-block; margin: 0;">${field | h}</pre></td></tr>
   %endfor
 </table>
 <table>
   <tr><th>${_('XML attributes')}</th></tr>
   %for name, field in xml_attributes.items():
-  <tr><td>${name}</td><td><pre style="display:inline-block; margin: 0;">${field | h}</pre></td></tr>
+  <tr><td style="width:25%">${name}</td><td><pre style="display:inline-block; margin: 0;">${field | h}</pre></td></tr>
   %endfor
 </table>
 category = ${category | h}

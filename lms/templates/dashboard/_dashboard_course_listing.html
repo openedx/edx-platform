@@ -279,12 +279,12 @@ from student.helpers import (
     <ul class="messages-list">
       % if related_programs:
       <div class="message message-related-programs is-shown">
-        <span class="related-programs-preface">${_('Related Programs')}:</span>
+        <span class="related-programs-preface" tabindex="0">${_('Related Programs')}:</span>
         <ul>
           % for program in related_programs:
           <li>
             <span class="category-icon ${program['category'].lower()}-icon" aria-hidden="true"></span>
-            <span><a href="${program['detail_url']}">${'{name} {category}'.format(name=program['name'], category=program['category'])}</a></span>
+            <span><a href="${program['detail_url']}">${u'{name} {category}'.format(name=program['name'], category=program['category'])}</a></span>
           </li>
           % endfor
         </ul>
