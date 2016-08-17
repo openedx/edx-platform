@@ -30,6 +30,11 @@
       text-transform: uppercase;
     }
 
+    .unit-id .unit-id-value {
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
     .meta {
       @extend %t-copy-sub2;
       color: $gray-l1;
