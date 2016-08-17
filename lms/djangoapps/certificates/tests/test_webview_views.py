@@ -758,14 +758,14 @@ class CertificatesViewsTests(CommonCertificatesTestCase):
         CourseStaffRole(self.course.id).add_users(self.user)
 
         response = self.client.get(test_url + '?preview=honor')
-        self.assertNotIn(self.course.display_name, response.content)
+        self.assertNotIn(self.course.display_name.encode('utf-8'), response.content)
         self.assertIn('course_title_0', response.content)
         self.assertIn('Signatory_Title 0', response.content)
 
         # mark certificate inactive but accessing in preview mode.
         self._add_course_certificates(count=1, signatory_count=2, is_active=False)
         response = self.client.get(test_url + '?preview=honor')
-        self.assertNotIn(self.course.display_name, response.content)
+        self.assertNotIn(self.course.display_name.encode('utf-8'), response.content)
         self.assertIn('course_title_0', response.content)
         self.assertIn('Signatory_Title 0', response.content)
 
@@ -786,7 +786,7 @@ class CertificatesViewsTests(CommonCertificatesTestCase):
         # user has already has certificate generated for 'honor' mode
         # so let's try to preview in 'verified' mode.
         response = self.client.get(test_url + '?preview=verified')
-        self.assertNotIn(self.course.display_name, response.content)
+        self.assertNotIn(self.course.display_name.encode('utf-8'), response.content)
         self.assertIn('course_title_0', response.content)
         self.assertIn('Signatory_Title 0', response.content)
 
