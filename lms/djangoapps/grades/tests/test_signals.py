@@ -207,7 +207,7 @@ class ScoreChangedUpdatesSubsectionGradeTest(ModuleStoreTestCase):
         self.addCleanup(new_patch.stop)
         return mock
 
-    def test_happy_path(self):
+    def test_subsection_grade_updated_on_signal(self):
         recalculate_subsection_grade_handler(None, **self.SCORE_CHANGED_KWARGS)
         self.assertTrue(self.update_mock.called)
 
