@@ -20,6 +20,7 @@ class ProblemPage(PageObject):
         """
         Return the current problem name.
         """
+        self.wait_for_element_visibility(self.CSS_PROBLEM_HEADER, 'wait for problem header')
         return self.q(css='.problem-header').text[0]
 
     @property
@@ -235,3 +236,11 @@ class ProblemPage(PageObject):
         Return a list of question descriptions of the problem.
         """
         return self.q(css="div.problem .wrapper-problem-response .question-description").text
+
+    @property
+    def problem_progress_graded_value(self):
+        """
+        Return problem progress text which contains weight of problem, if it is graded, and the student's current score.
+        """
+        self.wait_for_element_visibility('.problem-progress', "Problem progress is visible")
+        return self.q(css='.problem-progress').text[0]
