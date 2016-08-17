@@ -143,15 +143,15 @@ body.discussion {
   }
 
   .wmd-button {
-    @include padding-right(3px);
-    @include padding-left(3px);
     position: absolute;
     display: inline-block;
     width: 20px;
     height: 20px;
+    border: none;
     background: none;
     list-style: none;
     cursor: pointer;
+    padding: 0;
   }
 
   .wmd-button > span {
@@ -336,10 +336,6 @@ body.discussion {
   .discussion-submit-post {
     @include blue-button;
     @include float(left);
-  }
-
-  .wmd-button {
-    width: 15px;
   }
 }
 
