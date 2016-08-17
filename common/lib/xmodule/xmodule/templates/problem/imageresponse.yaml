@@ -18,7 +18,7 @@ data:   |
                 and other values that apply.</p>
             <p>You can use the following example problem as a model.</p>
             <imageresponse>
-                <label>What country is home to the Great Pyramid of Giza as well as the cities of Cairo and Memphis? Click the country on the map below.</label>
+                <p>What country is home to the Great Pyramid of Giza as well as the cities of Cairo and Memphis? Click the country on the map below.</p>
                 <imageinput src="https://studio.edx.org/c4x/edX/DemoX/asset/Africa.png" width="600" height="638" rectangle="(338,98)-(412,168)" alt="Map of Africa"/>
                 <solution>
                     <div class="detailed-solution">
