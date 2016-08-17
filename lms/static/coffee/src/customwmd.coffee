@@ -126,7 +126,7 @@ if Markdown?
       $elem.empty()
       _append = appended_id || ""
       wmdInputId = "wmd-input#{_append}"
-      $wmdPreviewContainer = $("<div>").addClass("wmd-preview-container")
+      $wmdPreviewContainer = $("<div>").addClass("wmd-preview-container").attr("aria-label", "HTML preview of post")
           .append($("<div>").addClass("wmd-preview-label").text(gettext("Preview")))
           .append($("<div>").attr("id", "wmd-preview#{_append}").addClass("wmd-panel wmd-preview"))
       $wmdPanel = $("<div>").addClass("wmd-panel")
