@@ -95,7 +95,7 @@ from student.models import UserProfile
 
     <form id="feedback_form" class="feedback_form" method="post" data-remote="true" action="/submit_feedback">
       <div id="feedback_error" class="modal-form-error" tabindex="-1"></div>
-% if not user.is_authenticated():
+% if not (user.is_authenticated() and UserProfile.has_registered(user)):
       <label data-field="name" for="feedback_form_name">${_('Name')}*</label>
       <input name="name" type="text" id="feedback_form_name" aria-required="true">
       <label data-field="email" for="feedback_form_email">${_('E-mail')}*</label>
