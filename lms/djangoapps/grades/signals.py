@@ -8,7 +8,7 @@ from opaque_keys.edx.locator import CourseLocator
 from opaque_keys.edx.keys import UsageKey
 from student.models import user_by_anonymous_id
 from submissions.models import score_set, score_reset
-import course_blocks.api
+import course_api.blocks.api
 
 
 log = getLogger(__name__)
@@ -132,16 +132,24 @@ def recalculate_subsection_grade_handler(sender, **kwargs):  # pylint: disable=u
     course_id = kwargs.get('course_id', None)
     usage_id = kwargs.get('usage_id', None)
     user_id = kwargs.get('user_id', None)
+    if not all((user_id, course_id, usage_id)):
+        log.exception(
+            u"Failed to process SCORE_CHANGED signal. "
+            "points_possible: %s, points_earned: %s, user_id: %s, course_id: %s, "
+            "usage_id: %s", points_possible, points_earned, user_id, course_id, usage_id
+        )
+        return
+
     course_key = CourseLocator.from_string(course_id)
     usage_key = UsageKey.from_string(usage_id)
+    student = user_by_anonymous_id(user_id)
 
-    # If any of the kwargs were missing, at least one of the following values
+    # If any of the kwargs were missing or ill-formed, at least one of the following values
     # will be None.
-    if all((user_id, points_possible, points_earned, course_id, usage_id)):
+    if all((student, course_key, usage_key)):
         from courseware.courses import get_course_by_id
         course = get_course_by_id(course_key, depth=0)  # avoids circular import :(
-        student = user_by_anonymous_id(user_id)
-        course_structure_for_course = course_blocks.api.get_course_blocks(student, starting_block_usage_key=usage_key)
+        course_structure_for_course = course_api.blocks.api.get_blocks(student, usage_key)
         subsection = course_structure_for_course[usage_key]
         from new.subsection_grade import SubsectionGradeFactory
         SubsectionGradeFactory(student).update(subsection, course_structure_for_course, course)

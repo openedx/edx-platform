@@ -191,8 +191,8 @@ class ScoreChangedUpdatesSubsectionGradeTest(ModuleStoreTestCase):
             'points_possible': 10,
             'points_earned': 5,
             'user_id': 'anonymous_id',
-            'course_id': self.course.id,
-            'usage_id': self.problem.scope_ids.usage_id
+            'course_id': unicode(self.course.id),
+            'usage_id': unicode(self.problem.location)
         }
 
         self.update_mock = self.setup_patch(subsection_grade.__name__ + '.SubsectionGradeFactory.update', None)
