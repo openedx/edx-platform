@@ -1,5 +1,4 @@
-<div class="page-content">
-    <nav class="page-content-nav" aria-label="Teams"></nav>
-    <div class="sr-is-focusable sr-tab" tabindex="-1"></div>
-    <div class="page-content-main"></div>
+<nav class="page-content-nav" aria-label="Teams"></nav>
+<div class="page-content-main">
+    <div class="tabs"></div>
 </div>

@@ -52,7 +52,7 @@ The Open edX Portal
 See the `Open edX Portal`_ to learn more about Open edX. You can find
 information about the edX roadmap, as well as about hosting, extending, and
 contributing to Open edX. In addition, the Open edX Portal provides product
-announcements, the Open edX blog, and other rich community resources. 
+announcements, the Open edX blog, and other rich community resources.
 
 To comment on blog posts or the edX roadmap, you must create an account and log
 in. If you do not have an account, follow these steps.
@@ -72,9 +72,16 @@ Documentation is managed in the `edx-documentation`_ repository. Documentation
 is built using `Sphinx`_: you can `view the built documentation on
 ReadTheDocs`_.
 
+You can also check out `Confluence`_, our wiki system. Once you sign up for
+an account, you'll be able to create new pages and edit existing pages, just
+like in any other wiki system. You only need one account for both Confluence
+and `JIRA`_, our issue tracker.
+
 .. _Sphinx: http://sphinx-doc.org/
 .. _view the built documentation on ReadTheDocs: http://docs.edx.org/
 .. _edx-documentation: https://github.com/edx/edx-documentation
+.. _Confluence: http://openedx.atlassian.net/wiki/
+.. _JIRA: https://openedx.atlassian.net/
 
 
 Getting Help

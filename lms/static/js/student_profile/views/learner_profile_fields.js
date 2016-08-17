@@ -1,8 +1,8 @@
 ;(function (define, undefined) {
     'use strict';
     define([
-        'gettext', 'jquery', 'underscore', 'backbone', 'js/views/fields', 'backbone-super'
-    ], function (gettext, $, _, Backbone, FieldViews) {
+        'gettext', 'jquery', 'underscore', 'backbone', 'js/views/fields', 'js/views/image_field', 'backbone-super'
+    ], function (gettext, $, _, Backbone, FieldViews, ImageFieldView) {
 
         var LearnerProfileFieldViews = {};
 
@@ -42,7 +42,7 @@
             }
         });
 
-        LearnerProfileFieldViews.ProfileImageFieldView = FieldViews.ImageFieldView.extend({
+        LearnerProfileFieldViews.ProfileImageFieldView = ImageFieldView.extend({
 
             screenReaderTitle: gettext('Profile Image'),
 

@@ -6,6 +6,7 @@ from abc import ABCMeta, abstractmethod
 from datetime import datetime
 import ddt
 from mock import patch
+from urllib import urlencode
 
 from lms.djangoapps.courseware.url_helpers import get_redirect_url
 from student.tests.factories import AdminFactory, UserFactory, CourseEnrollmentFactory
@@ -25,11 +26,11 @@ class RenderXBlockTestMixin(object):
     # DOM elements that appear in the LMS Courseware,
     # but are excluded from the xBlock-only rendering.
     COURSEWARE_CHROME_HTML_ELEMENTS = [
-        '<header id="open_close_accordion"',
         '<ol class="course-tabs"',
         '<footer id="footer-openedx"',
         '<div class="window-wrap"',
         '<div class="preview-menu"',
+        '<div class="container"'
     ]
 
     # DOM elements that appear in an xBlock,
@@ -39,9 +40,12 @@ class RenderXBlockTestMixin(object):
     ]
 
     @abstractmethod
-    def get_response(self):
+    def get_response(self, url_encoded_params=None):
         """
         Abstract method to get the response from the endpoint that is being tested.
+
+        Arguments:
+            url_encoded_params - URL encoded parameters that should be appended to the requested URL.
         """
         pass   # pragma: no cover
 
@@ -51,6 +55,13 @@ class RenderXBlockTestMixin(object):
         """
         self.client.login(username=self.user.username, password='test')
 
+    def course_options(self):
+        """
+        Options to configure the test course. Intended to be overridden by
+        subclasses.
+        """
+        return {}
+
     def setup_course(self, default_store=None):
         """
         Helper method to create the course.
@@ -58,7 +69,7 @@ class RenderXBlockTestMixin(object):
         if not default_store:
             default_store = self.store.default_modulestore.get_modulestore_type()
         with self.store.default_store(default_store):
-            self.course = CourseFactory.create()  # pylint: disable=attribute-defined-outside-init
+            self.course = CourseFactory.create(**self.course_options())  # pylint: disable=attribute-defined-outside-init
             chapter = ItemFactory.create(parent=self.course, category='chapter')
             self.html_block = ItemFactory.create(  # pylint: disable=attribute-defined-outside-init
                 parent=chapter,
@@ -78,11 +89,13 @@ class RenderXBlockTestMixin(object):
         if login:
             self.login()
 
-    def verify_response(self, expected_response_code=200):
+    def verify_response(self, expected_response_code=200, url_params=None):
         """
         Helper method that calls the endpoint, verifies the expected response code, and returns the response.
         """
-        response = self.get_response()
+        if url_params:
+            url_params = urlencode(url_params)
+        response = self.get_response(url_params)
         if expected_response_code == 200:
             self.assertContains(response, self.html_block.data, status_code=expected_response_code)
             for chrome_element in [self.COURSEWARE_CHROME_HTML_ELEMENTS + self.XBLOCK_REMOVED_HTML_ELEMENTS]:
@@ -92,7 +105,7 @@ class RenderXBlockTestMixin(object):
         return response
 
     @ddt.data(
-        (ModuleStoreEnum.Type.mongo, 8),
+        (ModuleStoreEnum.Type.mongo, 7),
         (ModuleStoreEnum.Type.split, 5),
     )
     @ddt.unpack
@@ -153,24 +166,34 @@ class RenderXBlockTestMixin(object):
     def test_unauthenticated(self):
         self.setup_course()
         self.setup_user(admin=False, enroll=True, login=False)
-        self.verify_response(expected_response_code=302)
+        self.verify_response(expected_response_code=404)
 
     def test_unenrolled_student(self):
         self.setup_course()
         self.setup_user(admin=False, enroll=False, login=True)
-        self.verify_response(expected_response_code=302)
+        self.verify_response(expected_response_code=404)
 
     @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
     def test_fail_block_unreleased(self):
         self.setup_course()
         self.setup_user(admin=False, enroll=True, login=True)
         self.html_block.start = datetime.max
-        modulestore().update_item(self.html_block, self.user.id)  # pylint: disable=no-member
+        modulestore().update_item(self.html_block, self.user.id)
         self.verify_response(expected_response_code=404)
 
     def test_fail_block_nonvisible(self):
         self.setup_course()
         self.setup_user(admin=False, enroll=True, login=True)
         self.html_block.visible_to_staff_only = True
-        modulestore().update_item(self.html_block, self.user.id)  # pylint: disable=no-member
+        modulestore().update_item(self.html_block, self.user.id)
         self.verify_response(expected_response_code=404)
+
+    def test_student_view_param(self):
+        self.setup_course()
+        self.setup_user(admin=False, enroll=True, login=True)
+        self.verify_response(url_params={'view': 'student_view'})
+
+    def test_unsupported_view_param(self):
+        self.setup_course()
+        self.setup_user(admin=False, enroll=True, login=True)
+        self.verify_response(url_params={'view': 'author_view'}, expected_response_code=400)

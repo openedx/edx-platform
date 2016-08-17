@@ -10,6 +10,7 @@ from django.shortcuts import redirect
 from django.views.decorators.csrf import ensure_csrf_cookie
 
 from edxmako.shortcuts import render_to_response
+from ipware.ip import get_ip
 
 from track import tracker
 from track import contexts
@@ -31,18 +32,27 @@ def _get_request_header(request, header_name, default=''):
         return default
 
 
-def _get_request_value(request, value_name, default=''):
-    """Helper method to get header values from a request's REQUEST dict, if present."""
-    if request is not None and hasattr(request, 'REQUEST') and value_name in request.REQUEST:
-        return request.REQUEST[value_name]
+def _get_request_ip(request, default=''):
+    """Helper method to get IP from a request's META dict, if present."""
+    if request is not None and hasattr(request, 'META'):
+        return get_ip(request)
     else:
         return default
 
 
+def _get_request_value(request, value_name, default=''):
+    """Helper method to get header values from a request's GET/POST dict, if present."""
+    if request is not None:
+        if request.method == 'GET':
+            return request.GET.get(value_name, default)
+        elif request.method == 'POST':
+            return request.POST.get(value_name, default)
+    return default
+
+
 def user_track(request):
     """
-    Log when POST call to "event" URL is made by a user. Uses request.REQUEST
-    to allow for GET calls.
+    Log when POST call to "event" URL is made by a user.
 
     GET or POST call should provide "event_type", "event", and "page" arguments.
     """
@@ -89,7 +99,7 @@ def server_track(request, event_type, event, page=None):
     # define output:
     event = {
         "username": username,
-        "ip": _get_request_header(request, 'REMOTE_ADDR'),
+        "ip": _get_request_ip(request),
         "referer": _get_request_header(request, 'HTTP_REFERER'),
         "accept_language": _get_request_header(request, 'HTTP_ACCEPT_LANGUAGE'),
         "event_source": "server",

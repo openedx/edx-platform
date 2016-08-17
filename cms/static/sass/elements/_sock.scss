@@ -86,6 +86,7 @@
         .action-item {
           @include float(left);
           @include margin-right($baseline/2);
+          margin-bottom: ($baseline/2);
 
           &:last-child {
             @include margin-right(0);

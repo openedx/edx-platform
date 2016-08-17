@@ -465,6 +465,15 @@
       }
     }
 
+    .field-visibility-verification {
+      .note {
+        @extend %t-copy-sub2;
+        @extend %t-regular;
+        margin: 14px 0 0 24px;
+        display: block;
+      }
+    }
+
     // CASE: content group has been removed
     .field-visibility-content-group.was-removed {
 
@@ -519,9 +528,14 @@
   .wrapper-modal-window-bulkpublish-subsection,
   .wrapper-modal-window-bulkpublish-unit,
   .course-outline-modal {
-
+    .exam-time-list-fields {
+      margin: 0 0 ($baseline/2) ($baseline/2);
+    }
     .list-fields {
-
+      .field-message {
+        color: $gray;
+        font-size: ($baseline/2);
+      }
       .field {
         display: inline-block;
         vertical-align: top;
@@ -624,8 +638,55 @@
       }
     }
 
-    // UI: staff lock section
     .edit-staff-lock {
+      margin-bottom: $baseline;
+    }
+
+    // UI: staff lock section
+    .edit-staff-lock, .edit-settings-timed-examination, .edit-verification-access {
+
+      .checkbox-cosmetic .input-checkbox {
+        @extend %cont-text-sr;
+
+        // CASE: unchecked
+        ~ .tip-warning {
+          display: block;
+        }
+
+        // CASE: checked
+        &:checked {
+
+          ~ .tip-warning {
+            display: none;
+          }
+        }
+      }
+
+      // needed to override poorly scoped margin-bottom on any label element in a view (from _forms.scss)
+      .checkbox-cosmetic .label {
+        margin-bottom: 0;
+      }
+
+      .note {
+        @extend %t-copy-sub2;
+        @extend %t-regular;
+        margin: 14px 0 0 21px;
+        display: block;
+      }
+    }
+
+    .verification-access {
+      .checkbox-cosmetic .label {
+        @include float(left);
+        margin: 2px 6px 0 0;
+      }
+    }
+
+    // UI: timed and proctored exam section
+    .edit-settings-timed-examination {
+
+      // give a little space between the sections
+      padding-bottom: 10px;
 
       .checkbox-cosmetic .input-checkbox {
         @extend %cont-text-sr;

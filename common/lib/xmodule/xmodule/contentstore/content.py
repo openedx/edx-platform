@@ -105,7 +105,7 @@ class StaticContent(object):
         if course_key is None:
             return None
 
-        assert(isinstance(course_key, CourseKey))
+        assert isinstance(course_key, CourseKey)
         placeholder_id = uuid.uuid4().hex
         # create a dummy asset location with a fake but unique name. strip off the name, and return it
         url_path = StaticContent.serialize_asset_key_with_slash(

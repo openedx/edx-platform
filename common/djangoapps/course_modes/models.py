@@ -1,14 +1,15 @@
 """
 Add and create new modes for running courses on this particular LMS
 """
+from datetime import datetime, timedelta
 import pytz
-from datetime import datetime
 
-from django.db import models
 from collections import namedtuple, defaultdict
-from django.utils.translation import ugettext_lazy as _
+from config_models.models import ConfigurationModel
+from django.core.exceptions import ValidationError
+from django.db import models
 from django.db.models import Q
-
+from django.utils.translation import ugettext_lazy as _
 from xmodule_django.models import CourseKeyField
 
 Mode = namedtuple('Mode',
@@ -30,28 +31,51 @@ class CourseMode(models.Model):
 
     """
     # the course that this mode is attached to
-    course_id = CourseKeyField(max_length=255, db_index=True)
+    course_id = CourseKeyField(max_length=255, db_index=True, verbose_name=_("Course"))
 
     # the reference to this mode that can be used by Enrollments to generate
     # similar behavior for the same slug across courses
-    mode_slug = models.CharField(max_length=100)
+    mode_slug = models.CharField(max_length=100, verbose_name=_("Mode"))
 
     # The 'pretty' name that can be translated and displayed
-    mode_display_name = models.CharField(max_length=255)
+    mode_display_name = models.CharField(max_length=255, verbose_name=_("Display Name"))
 
-    # minimum price in USD that we would like to charge for this mode of the course
-    min_price = models.IntegerField(default=0)
-
-    # the suggested prices for this mode
-    suggested_prices = models.CommaSeparatedIntegerField(max_length=255, blank=True, default='')
+    # The price in USD that we would like to charge for this mode of the course
+    # Historical note: We used to allow users to choose from several prices, but later
+    # switched to using a single price.  Although this field is called `min_price`, it is
+    # really just the price of the course.
+    min_price = models.IntegerField(default=0, verbose_name=_("Price"))
 
     # the currency these prices are in, using lower case ISO currency codes
     currency = models.CharField(default="usd", max_length=8)
 
-    # turn this mode off after the given expiration date
+    # The datetime at which the course mode will expire.
+    # This is used to implement "upgrade" deadlines.
+    # For example, if there is a verified mode that expires on 1/1/2015,
+    # then users will be able to upgrade into the verified mode before that date.
+    # Once the date passes, users will no longer be able to enroll as verified.
+    _expiration_datetime = models.DateTimeField(
+        default=None, null=True, blank=True,
+        verbose_name=_(u"Upgrade Deadline"),
+        help_text=_(
+            u"OPTIONAL: After this date/time, users will no longer be able to enroll in this mode. "
+            u"Leave this blank if users can enroll in this mode until enrollment closes for the course."
+        ),
+        db_column='expiration_datetime',
+    )
+
+    # The system prefers to set this automatically based on default settings. But
+    # if the field is set manually we want a way to indicate that so we don't
+    # overwrite the manual setting of the field.
+    expiration_datetime_is_explicit = models.BooleanField(default=False)
+
+    # DEPRECATED: the `expiration_date` field has been replaced by `expiration_datetime`
     expiration_date = models.DateField(default=None, null=True, blank=True)
 
-    expiration_datetime = models.DateTimeField(default=None, null=True, blank=True)
+    # DEPRECATED: the suggested prices for this mode
+    # We used to allow users to choose from a set of prices, but we now allow only
+    # a single price.  This field has been deprecated by `min_price`
+    suggested_prices = models.CommaSeparatedIntegerField(max_length=255, blank=True, default='')
 
     # optional description override
     # WARNING: will not be localized
@@ -63,7 +87,10 @@ class CourseMode(models.Model):
         null=True,
         blank=True,
         verbose_name="SKU",
-        help_text="This is the SKU (stock keeping unit) of this mode in the external ecommerce service."
+        help_text=_(
+            u"OPTIONAL: This is the SKU (stock keeping unit) of this mode in the external ecommerce service.  "
+            u"Leave this blank if the course has not yet been migrated to the ecommerce service."
+        )
     )
 
     HONOR = 'honor'
@@ -73,18 +100,69 @@ class CourseMode(models.Model):
     NO_ID_PROFESSIONAL_MODE = "no-id-professional"
     CREDIT_MODE = "credit"
 
-    DEFAULT_MODE = Mode(HONOR, _('Honor Code Certificate'), 0, '', 'usd', None, None, None)
-    DEFAULT_MODE_SLUG = HONOR
+    DEFAULT_MODE = Mode(AUDIT, _('Audit'), 0, '', 'usd', None, None, None)
+    DEFAULT_MODE_SLUG = AUDIT
 
     # Modes that allow a student to pursue a verified certificate
     VERIFIED_MODES = [VERIFIED, PROFESSIONAL]
 
+    # Modes that allow a student to pursue a non-verified certificate
+    NON_VERIFIED_MODES = [HONOR, AUDIT, NO_ID_PROFESSIONAL_MODE]
+
     # Modes that allow a student to earn credit with a university partner
     CREDIT_MODES = [CREDIT_MODE]
 
-    class Meta:
-        """ meta attributes of this model """
+    # Modes that are allowed to upsell
+    UPSELL_TO_VERIFIED_MODES = [HONOR, AUDIT]
+
+    # Courses purchased through the shoppingcart
+    # should be "honor". Since we've changed the DEFAULT_MODE_SLUG from
+    # "honor" to "audit", we still need to have the shoppingcart
+    # use "honor"
+    DEFAULT_SHOPPINGCART_MODE_SLUG = HONOR
+    DEFAULT_SHOPPINGCART_MODE = Mode(HONOR, _('Honor'), 0, '', 'usd', None, None, None)
+
+    class Meta(object):
         unique_together = ('course_id', 'mode_slug', 'currency')
+
+    def clean(self):
+        """
+        Object-level validation - implemented in this method so DRF serializers
+        catch errors in advance of a save() attempt.
+        """
+        if self.is_professional_slug(self.mode_slug) and self.expiration_datetime is not None:
+            raise ValidationError(
+                _(u"Professional education modes are not allowed to have expiration_datetime set.")
+            )
+
+    def save(self, force_insert=False, force_update=False, using=None):
+        # Ensure currency is always lowercase.
+        self.clean()  # ensure object-level validation is performed before we save.
+        self.currency = self.currency.lower()
+        super(CourseMode, self).save(force_insert, force_update, using)
+
+    @property
+    def slug(self):
+        """
+        Returns mode_slug
+
+        NOTE (CCB): This is a silly hack needed because all of the class methods use tuples
+        with a property named slug instead of mode_slug.
+        """
+        return self.mode_slug
+
+    @property
+    def expiration_datetime(self):
+        """ Return _expiration_datetime. """
+        return self._expiration_datetime
+
+    @expiration_datetime.setter
+    def expiration_datetime(self, new_datetime):
+        """ Saves datetime to _expiration_datetime and sets the explicit flag. """
+        # Only set explicit flag if we are setting an actual date.
+        if new_datetime is not None:
+            self.expiration_datetime_is_explicit = True
+        self._expiration_datetime = new_datetime
 
     @classmethod
     def all_modes_for_courses(cls, course_id_list):
@@ -159,8 +237,8 @@ class CourseMode(models.Model):
             Q(course_id=course_id) &
             Q(min_price__gt=0) &
             (
-                Q(expiration_datetime__isnull=True) |
-                Q(expiration_datetime__gte=now)
+                Q(_expiration_datetime__isnull=True) |
+                Q(_expiration_datetime__gte=now)
             )
         )
         return [mode.to_tuple() for mode in found_course_modes]
@@ -195,7 +273,7 @@ class CourseMode(models.Model):
         # Filter out expired course modes if include_expired is not set
         if not include_expired:
             found_course_modes = found_course_modes.filter(
-                Q(expiration_datetime__isnull=True) | Q(expiration_datetime__gte=now)
+                Q(_expiration_datetime__isnull=True) | Q(_expiration_datetime__gte=now)
             )
 
         # Credit course modes are currently not shown on the track selection page;
@@ -212,7 +290,7 @@ class CourseMode(models.Model):
         return modes
 
     @classmethod
-    def modes_for_course_dict(cls, course_id, modes=None, only_selectable=True):
+    def modes_for_course_dict(cls, course_id, modes=None, **kwargs):
         """Returns the non-expired modes for a particular course.
 
         Arguments:
@@ -222,6 +300,9 @@ class CourseMode(models.Model):
             modes (list of `Mode`): If provided, search through this list
                 of course modes.  This can be used to avoid an additional
                 database query if you have already loaded the modes list.
+
+            include_expired (bool): If True, expired course modes will be included
+                in the returned values. If False, these modes will be omitted.
 
             only_selectable (bool): If True, include only modes that are shown
                 to users on the track selection page.  (Currently, "credit" modes
@@ -233,7 +314,7 @@ class CourseMode(models.Model):
 
         """
         if modes is None:
-            modes = cls.modes_for_course(course_id, only_selectable=only_selectable)
+            modes = cls.modes_for_course(course_id, **kwargs)
 
         return {mode.slug: mode for mode in modes}
 
@@ -308,7 +389,7 @@ class CourseMode(models.Model):
         """
         modes = cls.modes_for_course(course_id)
         for mode in modes:
-            if (mode.currency == currency) and (mode.slug == 'verified'):
+            if (mode.currency.lower() == currency.lower()) and (mode.slug == 'verified'):
                 return mode.min_price
         return 0
 
@@ -451,8 +532,27 @@ class CourseMode(models.Model):
         if cls.is_white_label(course_id, modes_dict=modes_dict):
             return False
 
-        # Check that the default mode is available.
-        return (cls.HONOR in modes_dict)
+        # Check that a free mode is available.
+        return cls.AUDIT in modes_dict or cls.HONOR in modes_dict
+
+    @classmethod
+    def auto_enroll_mode(cls, course_id, modes_dict=None):
+        """
+        return the auto-enrollable mode from given dict
+
+        Args:
+            modes_dict (dict): course modes.
+
+        Returns:
+            String: Mode name
+        """
+        if modes_dict is None:
+            modes_dict = cls.modes_for_course_dict(course_id)
+
+        if cls.HONOR in modes_dict:
+            return cls.HONOR
+        elif cls.AUDIT in modes_dict:
+            return cls.AUDIT
 
     @classmethod
     def is_white_label(cls, course_id, modes_dict=None):
@@ -483,104 +583,26 @@ class CourseMode(models.Model):
         return False
 
     @classmethod
-    def min_course_price_for_currency(cls, course_id, currency):  # pylint: disable=invalid-name
+    def min_course_price_for_currency(cls, course_id, currency):
         """
         Returns the minimum price of the course in the appropriate currency over all the course's
         non-expired modes.
         If there is no mode found, will return the price of DEFAULT_MODE, which is 0
         """
         modes = cls.modes_for_course(course_id)
-        return min(mode.min_price for mode in modes if mode.currency == currency)
+        return min(mode.min_price for mode in modes if mode.currency.lower() == currency.lower())
 
     @classmethod
-    def enrollment_mode_display(cls, mode, verification_status):
-        """ Select appropriate display strings and CSS classes.
-
-            Uses mode and verification status to select appropriate display strings and CSS classes
-            for certificate display.
-
-            Args:
-                mode (str): enrollment mode.
-                verification_status (str) : verification status of student
-
-            Returns:
-                dictionary:
+    def is_eligible_for_certificate(cls, mode_slug):
         """
-
-        # import inside the function to avoid the circular import
-        from student.helpers import (
-            VERIFY_STATUS_NEED_TO_VERIFY,
-            VERIFY_STATUS_SUBMITTED,
-            VERIFY_STATUS_APPROVED
-        )
-
-        show_image = False
-        image_alt = ''
-
-        if mode == cls.VERIFIED:
-            if verification_status in [VERIFY_STATUS_NEED_TO_VERIFY, VERIFY_STATUS_SUBMITTED]:
-                enrollment_title = _("Your verification is pending")
-                enrollment_value = _("Verified: Pending Verification")
-                show_image = True
-                image_alt = _("ID verification pending")
-            elif verification_status == VERIFY_STATUS_APPROVED:
-                enrollment_title = _("You're enrolled as a verified student")
-                enrollment_value = _("Verified")
-                show_image = True
-                image_alt = _("ID Verified Ribbon/Badge")
-            else:
-                enrollment_title = _("You're enrolled as an honor code student")
-                enrollment_value = _("Honor Code")
-        elif mode == cls.HONOR:
-            enrollment_title = _("You're enrolled as an honor code student")
-            enrollment_value = _("Honor Code")
-        elif mode == cls.AUDIT:
-            enrollment_title = _("You're auditing this course")
-            enrollment_value = _("Auditing")
-        elif mode in [cls.PROFESSIONAL, cls.NO_ID_PROFESSIONAL_MODE]:
-            enrollment_title = _("You're enrolled as a professional education student")
-            enrollment_value = _("Professional Ed")
-        else:
-            enrollment_title = ''
-            enrollment_value = ''
-
-        return {
-            'enrollment_title': unicode(enrollment_title),
-            'enrollment_value': unicode(enrollment_value),
-            'show_image': show_image,
-            'image_alt': unicode(image_alt),
-            'display_mode': cls._enrollment_mode_display(mode, verification_status)
-        }
-
-    @staticmethod
-    def _enrollment_mode_display(enrollment_mode, verification_status):
-        """Checking enrollment mode and status and returns the display mode
-         Args:
-            enrollment_mode (str): enrollment mode.
-            verification_status (str) : verification status of student
-
-        Returns:
-            display_mode (str) : display mode for certs
+        Returns whether or not the given mode_slug is eligible for a
+        certificate. Currently all modes other than 'audit' grant a
+        certificate. Note that audit enrollments which existed prior
+        to December 2015 *were* given certificates, so there will be
+        GeneratedCertificate records with mode='audit' which are
+        eligible.
         """
-
-        # import inside the function to avoid the circular import
-        from student.helpers import (
-            VERIFY_STATUS_NEED_TO_VERIFY,
-            VERIFY_STATUS_SUBMITTED,
-            VERIFY_STATUS_APPROVED
-        )
-
-        if enrollment_mode == CourseMode.VERIFIED:
-            if verification_status in [VERIFY_STATUS_NEED_TO_VERIFY, VERIFY_STATUS_SUBMITTED, VERIFY_STATUS_APPROVED]:
-                display_mode = "verified"
-            else:
-                display_mode = "honor"
-        elif enrollment_mode in [CourseMode.PROFESSIONAL, CourseMode.NO_ID_PROFESSIONAL_MODE]:
-            display_mode = "professional"
-        else:
-            display_mode = enrollment_mode
-
-        return display_mode
+        return mode_slug != cls.AUDIT
 
     def to_tuple(self):
         """
@@ -637,3 +659,19 @@ class CourseModesArchive(models.Model):
     expiration_date = models.DateField(default=None, null=True, blank=True)
 
     expiration_datetime = models.DateTimeField(default=None, null=True, blank=True)
+
+
+class CourseModeExpirationConfig(ConfigurationModel):
+    """
+    Configuration for time period from end of course to auto-expire a course mode.
+    """
+    verification_window = models.DurationField(
+        default=timedelta(days=10),
+        help_text=_(
+            "The time period before a course ends in which a course mode will expire"
+        )
+    )
+
+    def __unicode__(self):
+        """ Returns the unicode date of the verification window. """
+        return unicode(self.verification_window)

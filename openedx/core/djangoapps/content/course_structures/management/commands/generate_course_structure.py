@@ -1,3 +1,8 @@
+"""
+Django Management Command:  Generate Course Structure
+Generates and stores course structure information for one or more courses.
+"""
+
 import logging
 from optparse import make_option
 
@@ -12,6 +17,9 @@ log = logging.getLogger(__name__)
 
 
 class Command(BaseCommand):
+    """
+    Generates and stores course structure information for one or more courses.
+    """
     args = '<course_id course_id ...>'
     help = 'Generates and stores course structure for one or more courses.'
 
@@ -23,7 +31,9 @@ class Command(BaseCommand):
     )
 
     def handle(self, *args, **options):
-
+        """
+        Perform the course structure generation workflow
+        """
         if options['all']:
             course_keys = [course.id for course in modulestore().get_courses()]
         else:

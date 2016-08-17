@@ -1,0 +1,5 @@
+<div class="wrap-instructor-info studio-view">
+    <a class="instructor-info-action proctored-exam-action proctored-exam-action-stop">
+        <%- gettext("Mark Exam As Completed") %>
+    </a>
+</div>

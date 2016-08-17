@@ -43,7 +43,7 @@ class LearnerProfilePage(FieldsMixin, PageObject):
         """
         Check if browser is showing correct page.
         """
-        return 'Learner Profile' in self.browser.title
+        return self.q(css='body.view-profile .account-settings-container').present
 
     @property
     def privacy(self):
@@ -175,7 +175,7 @@ class LearnerProfilePage(FieldsMixin, PageObject):
         """
         self.wait_for_field('image')
         default_links = self.q(css='.image-frame').attrs('src')
-        return 'default-profile' in default_links[0] if default_links else False
+        return 'profiles/default' in default_links[0] if default_links else False
 
     def mouse_hover(self, element):
         """
@@ -217,11 +217,8 @@ class LearnerProfilePage(FieldsMixin, PageObject):
 
         self.browser.execute_script('$(".upload-submit").show();')
 
-        # First send_keys will initialize the jquery auto upload plugin.
-        self.q(css='.upload-button-input').results[0].send_keys(file_path)
         self.q(css='.upload-submit').first.click()
         self.q(css='.upload-button-input').results[0].send_keys(file_path)
-
         self.wait_for_ajax()
 
     @property

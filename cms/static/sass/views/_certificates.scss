@@ -1,7 +1,7 @@
 // studio - views - certificates
 // ====================
 
-// Table of Contents 
+// Table of Contents
 // * +Layout - Certificates
 // * +Main - Collection
 // * +Main - Certificate
@@ -33,22 +33,44 @@
       @extend %no-content;
     }
 
-    .wrapper-certificate {
+    .wrapper-certificates {
 
       .title {
         @extend %t-title4;
         @extend %t-strong;
-        margin-bottom: ($baseline/2);
       }
 
       .copy {
         @extend %t-copy-sub1;
       }
+
+      .instructions {
+        @extend %t-copy-sub1;
+        margin-bottom: $baseline;
+      }
+    }
+
+    .certificate-settings {
+      margin-bottom: $baseline;
+    }
+
+    .actual-course-title {
+      @extend %t-strong;
+      margin-bottom: $baseline;
     }
   }
 
   .content-supplementary {
     width: flex-grid(3, 12);
+  }
+
+  .certificate-info-section{
+      overflow: auto;
+
+    .course-title-section, .course-number-section{
+      min-width: 47%;
+      @include margin-right(2%);
+    }
   }
 }
 
@@ -196,6 +218,10 @@
 
       .wrapper-form {
         padding: $baseline ($baseline*1.5);
+
+        label {
+          @extend %t-strong;
+        }
       }
 
       .action-add-signatory {
@@ -313,49 +339,6 @@
               border-color: $red;
             }
         }
-        .org-logo-upload-wrapper {
-          @include clearfix();
-          width: flex-grid(12,12);
-
-          .org-logo-upload-input-wrapper {
-            float: left;
-            width: flex-grid(7,12);
-            margin-right: flex-gutter();
-          }
-
-          .action-upload-org-logo {
-            @extend %ui-btn-flat-outline;
-            float: right;
-            width: flex-grid(4,12);
-            margin-top: ($baseline/4);
-            padding: ($baseline/2) $baseline;
-          }
-        }
-
-        .current-org-logo {
-          margin-bottom: ($baseline/2);
-          padding: ($baseline/2) $baseline;
-          background: $gray-l5;
-          text-align: center;
-
-          .wrapper-org-logo {
-            display: block;
-            width: 375px;
-            height: 200px;
-            overflow: hidden;
-            margin: 0 auto;
-            border: 1px solid $gray-l4;
-            box-shadow: 0 1px 1px $shadow-l1;
-            padding: ($baseline/2);
-            background: $white;
-          }
-
-          .org-logo {
-            display: block;
-            width: 100%;
-            min-height: 100%;
-          }
-        }
       }
 
       label.required {
@@ -423,6 +406,12 @@
             color: $gray-l3;
           }
         }
+        &.custom-signatory-action {
+          position: relative;
+          top: 0;
+          left: 0;
+          opacity: 1.0;
+        }
       }
 
       .copy {
@@ -472,7 +461,11 @@
 
 // * +Main - Certificate
 // ====================
-// TO-DO: refactor to use collection styling where possible. 
+// TO-DO: refactor to use collection styling where possible.
+.view-certificates .activate-cert {
+  margin-left: 5px;
+}
+
 .view-certificates .certificates {
 
   .certificate-details, .certificate-edit {
@@ -543,7 +536,7 @@
 
 // * +Signatories -Certificate
 // ====================
-// TO-DO: refactor to use collection styling where possible. 
+// TO-DO: refactor to use collection styling where possible.
 .view-certificates .certificates {
 
   .signatory-details, .signatory-edit {
@@ -561,6 +554,14 @@
 
     .signatory-panel-body {
       padding: $baseline;
+
+      .signatory-image {
+        margin-top: 20px;
+      }
+
+      .signature-image {
+        max-width: 450px;
+      }
     }
 
     .signatory-panel-body label {
@@ -706,7 +707,7 @@
         .wrapper-signature-image {
           display: block;
           width: 375px;
-          height: 200px;
+          line-height: 200px;
           overflow: hidden;
           margin: 0 auto;
           border: 1px solid $gray-l4;
@@ -716,9 +717,9 @@
         }
 
         .signature-image {
-          display: block;
+          vertical-align: middle;
           width: 100%;
-          min-height: 100%;
+          max-height: 100%;
         }
       }
     }

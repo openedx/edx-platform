@@ -119,9 +119,9 @@ class GetItemTest(ItemTest):
         return resp
 
     @ddt.data(
-        (1, 16, 14, 15, 11),
-        (2, 16, 14, 15, 11),
-        (3, 16, 14, 15, 11),
+        (1, 17, 15, 16, 12),
+        (2, 17, 15, 16, 12),
+        (3, 17, 15, 16, 12),
     )
     @ddt.unpack
     def test_get_query_count(self, branching_factor, chapter_queries, section_queries, unit_queries, problem_queries):
@@ -137,9 +137,9 @@ class GetItemTest(ItemTest):
             self.client.get(reverse_usage_url('xblock_handler', self.populated_usage_keys['problem'][-1]))
 
     @ddt.data(
-        (1, 26),
-        (2, 28),
-        (3, 30),
+        (1, 30),
+        (2, 32),
+        (3, 34),
     )
     @ddt.unpack
     def test_container_get_query_count(self, branching_factor, unit_queries,):
@@ -309,6 +309,52 @@ class GetItemTest(ItemTest):
             data={'enable_paging': 'true', 'page_number': page_number, 'page_size': page_size},
             content_contains="Couldn't parse paging parameters"
         )
+
+    def test_get_user_partitions_and_groups(self):
+        self.course.user_partitions = [
+            UserPartition(
+                id=0,
+                name="Verification user partition",
+                scheme=UserPartition.get_scheme("verification"),
+                description="Verification user partition",
+                groups=[
+                    Group(id=0, name="Group A"),
+                    Group(id=1, name="Group B"),
+                ],
+            ),
+        ]
+        self.store.update_item(self.course, self.user.id)
+
+        # Create an item and retrieve it
+        resp = self.create_xblock(category='vertical')
+        usage_key = self.response_usage_key(resp)
+        resp = self.client.get(reverse_usage_url('xblock_handler', usage_key))
+        self.assertEqual(resp.status_code, 200)
+
+        # Check that the partition and group information was returned
+        result = json.loads(resp.content)
+        self.assertEqual(result["user_partitions"], [
+            {
+                "id": 0,
+                "name": "Verification user partition",
+                "scheme": "verification",
+                "groups": [
+                    {
+                        "id": 0,
+                        "name": "Group A",
+                        "selected": False,
+                        "deleted": False,
+                    },
+                    {
+                        "id": 1,
+                        "name": "Group B",
+                        "selected": False,
+                        "deleted": False,
+                    },
+                ]
+            }
+        ])
+        self.assertEqual(result["group_access"], {})
 
 
 @ddt.ddt
@@ -1342,28 +1388,28 @@ class TestComponentTemplates(CourseTestCase):
         Test the handling of advanced problem templates.
         """
         problem_templates = self.get_templates_of_type('problem')
-        ora_template = self.get_template(problem_templates, u'Peer Assessment')
-        self.assertIsNotNone(ora_template)
-        self.assertEqual(ora_template.get('category'), 'openassessment')
-        self.assertIsNone(ora_template.get('boilerplate_name', None))
+        circuit_template = self.get_template(problem_templates, u'Circuit Schematic Builder')
+        self.assertIsNotNone(circuit_template)
+        self.assertEqual(circuit_template.get('category'), 'problem')
+        self.assertEqual(circuit_template.get('boilerplate_name'), 'circuitschematic.yaml')
 
-    @patch('django.conf.settings.DEPRECATED_ADVANCED_COMPONENT_TYPES', ["combinedopenended", "peergrading"])
-    def test_ora1_no_advance_component_button(self):
+    @patch('django.conf.settings.DEPRECATED_ADVANCED_COMPONENT_TYPES', ["poll", "survey"])
+    def test_deprecated_no_advance_component_button(self):
         """
-        Test that there will be no `Advanced` button on unit page if `combinedopenended` and `peergrading` are
-        deprecated provided that there are only 'combinedopenended', 'peergrading' modules in `Advanced Module List`
+        Test that there will be no `Advanced` button on unit page if units are
+        deprecated provided that they are the only modules in `Advanced Module List`
         """
-        self.course.advanced_modules.extend(['combinedopenended', 'peergrading'])
+        self.course.advanced_modules.extend(['poll', 'survey'])
         templates = get_component_templates(self.course)
         button_names = [template['display_name'] for template in templates]
         self.assertNotIn('Advanced', button_names)
 
-    @patch('django.conf.settings.DEPRECATED_ADVANCED_COMPONENT_TYPES', ["combinedopenended", "peergrading"])
-    def test_cannot_create_ora1_problems(self):
+    @patch('django.conf.settings.DEPRECATED_ADVANCED_COMPONENT_TYPES', ["poll", "survey"])
+    def test_cannot_create_deprecated_problems(self):
         """
-        Test that we can't create ORA1 problems if `combinedopenended` and `peergrading` are deprecated
+        Test that we can't create problems if they are deprecated
         """
-        self.course.advanced_modules.extend(['annotatable', 'combinedopenended', 'peergrading'])
+        self.course.advanced_modules.extend(['annotatable', 'poll', 'survey'])
         templates = get_component_templates(self.course)
         button_names = [template['display_name'] for template in templates]
         self.assertIn('Advanced', button_names)
@@ -1372,17 +1418,17 @@ class TestComponentTemplates(CourseTestCase):
         self.assertEqual(template_display_names, ['Annotation'])
 
     @patch('django.conf.settings.DEPRECATED_ADVANCED_COMPONENT_TYPES', [])
-    def test_create_ora1_problems(self):
+    def test_create_non_deprecated_problems(self):
         """
-        Test that we can create ORA1 problems if `combinedopenended` and `peergrading` are not deprecated
+        Test that we can create problems if they are not deprecated
         """
-        self.course.advanced_modules.extend(['annotatable', 'combinedopenended', 'peergrading'])
+        self.course.advanced_modules.extend(['annotatable', 'poll', 'survey'])
         templates = get_component_templates(self.course)
         button_names = [template['display_name'] for template in templates]
         self.assertIn('Advanced', button_names)
         self.assertEqual(len(templates[0]['templates']), 3)
         template_display_names = [template['display_name'] for template in templates[0]['templates']]
-        self.assertEqual(template_display_names, ['Annotation', 'Open Response Assessment', 'Peer Grading Interface'])
+        self.assertEqual(template_display_names, ['Annotation', 'Poll', 'Survey'])
 
 
 @ddt.ddt
@@ -1413,8 +1459,8 @@ class TestXBlockInfo(ItemTest):
         self.validate_course_xblock_info(json_response, course_outline=True)
 
     @ddt.data(
-        (ModuleStoreEnum.Type.split, 5, 5),
-        (ModuleStoreEnum.Type.mongo, 4, 6),
+        (ModuleStoreEnum.Type.split, 4, 4),
+        (ModuleStoreEnum.Type.mongo, 5, 7),
     )
     @ddt.unpack
     def test_xblock_outline_handler_mongo_calls(self, store_type, chapter_queries, chapter_queries_1):
@@ -1532,7 +1578,6 @@ class TestXBlockInfo(ItemTest):
 
     def test_vertical_xblock_info(self):
         vertical = modulestore().get_item(self.vertical.location)
-        vertical.start = datetime(year=1899, month=1, day=1, tzinfo=UTC)
 
         xblock_info = create_xblock_info(
             vertical,
@@ -1552,6 +1597,29 @@ class TestXBlockInfo(ItemTest):
             include_children_predicate=ALWAYS
         )
         self.validate_component_xblock_info(xblock_info)
+
+    @ddt.data(ModuleStoreEnum.Type.split, ModuleStoreEnum.Type.mongo)
+    def test_validate_start_date(self, store_type):
+        """
+        Validate if start-date year is less than 1900 reset the date to DEFAULT_START_DATE.
+        """
+        with self.store.default_store(store_type):
+            course = CourseFactory.create()
+            chapter = ItemFactory.create(
+                parent_location=course.location, category='chapter', display_name='Week 1'
+            )
+
+            chapter.start = datetime(year=1899, month=1, day=1, tzinfo=UTC)
+
+            xblock_info = create_xblock_info(
+                chapter,
+                include_child_info=True,
+                include_children_predicate=ALWAYS,
+                include_ancestor_info=True,
+                user=self.user
+            )
+
+            self.assertEqual(xblock_info['start'], DEFAULT_START_DATE.strftime('%Y-%m-%dT%H:%M:%SZ'))
 
     def validate_course_xblock_info(self, xblock_info, has_child_info=True, course_outline=False):
         """
@@ -1574,7 +1642,7 @@ class TestXBlockInfo(ItemTest):
         self.assertEqual(xblock_info['display_name'], 'Week 1')
         self.assertTrue(xblock_info['published'])
         self.assertIsNone(xblock_info.get('edited_by', None))
-        self.assertEqual(xblock_info['course_graders'], '["Homework", "Lab", "Midterm Exam", "Final Exam"]')
+        self.assertEqual(xblock_info['course_graders'], ['Homework', 'Lab', 'Midterm Exam', 'Final Exam'])
         self.assertEqual(xblock_info['start'], '2030-01-01T00:00:00Z')
         self.assertEqual(xblock_info['graded'], False)
         self.assertEqual(xblock_info['due'], None)
@@ -1605,7 +1673,6 @@ class TestXBlockInfo(ItemTest):
         self.assertEqual(xblock_info['display_name'], 'Unit 1')
         self.assertTrue(xblock_info['published'])
         self.assertEqual(xblock_info['edited_by'], 'testuser')
-        self.assertEqual(xblock_info['start'], DEFAULT_START_DATE.strftime('%Y-%m-%dT%H:%M:%SZ'))
 
         # Validate that the correct ancestor info has been included
         ancestor_info = xblock_info.get('ancestor_info', None)
@@ -1663,6 +1730,38 @@ class TestXBlockInfo(ItemTest):
                     )
         else:
             self.assertIsNone(xblock_info.get('child_info', None))
+
+    @patch.dict('django.conf.settings.FEATURES', {'ENABLE_SPECIAL_EXAMS': True})
+    def test_proctored_exam_xblock_info(self):
+        self.course.enable_proctored_exams = True
+        self.course.save()
+        self.store.update_item(self.course, self.user.id)
+
+        course = modulestore().get_item(self.course.location)
+        xblock_info = create_xblock_info(
+            course,
+            include_child_info=True,
+            include_children_predicate=ALWAYS,
+        )
+        # exam proctoring should be enabled and time limited.
+        self.assertEqual(xblock_info['enable_proctored_exams'], True)
+
+        sequential = ItemFactory.create(
+            parent_location=self.chapter.location, category='sequential',
+            display_name="Test Lesson 1", user_id=self.user.id,
+            is_proctored_exam=True, is_time_limited=True,
+            default_time_limit_minutes=100
+        )
+        sequential = modulestore().get_item(sequential.location)
+        xblock_info = create_xblock_info(
+            sequential,
+            include_child_info=True,
+            include_children_predicate=ALWAYS,
+        )
+        # exam proctoring should be enabled and time limited.
+        self.assertEqual(xblock_info['is_proctored_exam'], True)
+        self.assertEqual(xblock_info['is_time_limited'], True)
+        self.assertEqual(xblock_info['default_time_limit_minutes'], 100)
 
 
 class TestLibraryXBlockInfo(ModuleStoreTestCase):

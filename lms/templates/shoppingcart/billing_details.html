@@ -68,7 +68,7 @@ from django.core.urlresolvers import reverse
       filter = /^([a-zA-Z0-9_.+-])+\@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$/
       return filter.test(sEmail)
      }
-    $('form input[type="submit"]').click(function(event) {
+    $('section.confirm-enrollment form button[type="submit"]').click(function(event) {
       var is_valid_email = true;
       var payment_form = $(this).parent('form');
       var recipient_email = $('input[name="recipient_email"]').val();

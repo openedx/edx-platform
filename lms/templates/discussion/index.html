@@ -2,7 +2,6 @@
 <%namespace name='static' file='../static_content.html'/>
 <%!
 from django.utils.translation import ugettext as _
-import django_comment_client.helpers as helpers
 from django.template.defaultfilters import escapejs
 from django.core.urlresolvers import reverse
 %>
@@ -19,23 +18,28 @@ from django.core.urlresolvers import reverse
 </%block>
 
 <%block name="js_extra">
-<%include file="_js_body_dependencies.html" />
+## Enable fast preview to fix discussion MathJax rendering bug when page first loads.
+<%include file="_js_body_dependencies.html" args="disable_fast_preview=False"/>
 <%static:js group='discussion'/>
 </%block>
 
 <%include file="_discussion_course_navigation.html" args="active_page='discussion'" />
 
 <section class="discussion container" id="discussion-container"
-         data-roles="${roles}"
+         data-roles="${roles | h}"
          data-course-id="${course_id | h}"
-         data-user-info="${user_info}"
-         data-threads="${threads}"
-         data-thread-pages="${thread_pages}"
-         data-content-info="${annotated_content_info}"
-         data-sort-preference="${sort_preference}"
-         data-flag-moderator="${flag_moderator}"
-         data-user-cohort-id="${user_cohort}"
-         data-course-settings="${course_settings}">
+         data-course-name="${course.display_name_with_default | h}"
+         data-user-info="${user_info | h}"
+         data-user-create-comment="${can_create_comment | h}"
+         data-user-create-subcomment="${can_create_subcomment | h}"
+         data-read-only="false"
+         data-threads="${threads | h}"
+         data-thread-pages="${thread_pages | h}"
+         data-content-info="${annotated_content_info | h}"
+         data-sort-preference="${sort_preference | h}"
+         data-flag-moderator="${flag_moderator | h}"
+         data-user-cohort-id="${user_cohort | h}"
+         data-course-settings="${course_settings | h}">
     <div class="discussion-body">
         <div class="forum-nav" role="complementary" aria-label="${_("Discussion thread list")}"></div>
         <div class="discussion-column" role="main" aria-label="Discussion" id="discussion-column">

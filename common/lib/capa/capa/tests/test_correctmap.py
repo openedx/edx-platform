@@ -17,7 +17,7 @@ class CorrectMapTest(unittest.TestCase):
         self.cmap = CorrectMap()
 
     def test_set_input_properties(self):
-        # Set the correctmap properties for two inputs
+        # Set the correctmap properties for three inputs
         self.cmap.set(
             answer_id='1_2_1',
             correctness='correct',
@@ -41,15 +41,34 @@ class CorrectMapTest(unittest.TestCase):
             queuestate=None
         )
 
+        self.cmap.set(
+            answer_id='3_2_1',
+            correctness='partially-correct',
+            npoints=3,
+            msg=None,
+            hint=None,
+            hintmode=None,
+            queuestate=None
+        )
+
         # Assert that each input has the expected properties
         self.assertTrue(self.cmap.is_correct('1_2_1'))
         self.assertFalse(self.cmap.is_correct('2_2_1'))
+        self.assertTrue(self.cmap.is_correct('3_2_1'))
+
+        self.assertTrue(self.cmap.is_partially_correct('3_2_1'))
+        self.assertFalse(self.cmap.is_partially_correct('2_2_1'))
+
+        # Intentionally testing an item that's not in cmap.
+        self.assertFalse(self.cmap.is_partially_correct('9_2_1'))
 
         self.assertEqual(self.cmap.get_correctness('1_2_1'), 'correct')
         self.assertEqual(self.cmap.get_correctness('2_2_1'), 'incorrect')
+        self.assertEqual(self.cmap.get_correctness('3_2_1'), 'partially-correct')
 
         self.assertEqual(self.cmap.get_npoints('1_2_1'), 5)
         self.assertEqual(self.cmap.get_npoints('2_2_1'), 0)
+        self.assertEqual(self.cmap.get_npoints('3_2_1'), 3)
 
         self.assertEqual(self.cmap.get_msg('1_2_1'), 'Test message')
         self.assertEqual(self.cmap.get_msg('2_2_1'), None)
@@ -83,6 +102,8 @@ class CorrectMapTest(unittest.TestCase):
         # 3) incorrect, 5 points
         # 4) incorrect, None points
         # 5) correct, 0 points
+        # 4) partially correct, 2.5 points
+        # 5) partially correct, None points
         self.cmap.set(
             answer_id='1_2_1',
             correctness='correct',
@@ -113,15 +134,30 @@ class CorrectMapTest(unittest.TestCase):
             npoints=0
         )
 
+        self.cmap.set(
+            answer_id='6_2_1',
+            correctness='partially-correct',
+            npoints=2.5
+        )
+
+        self.cmap.set(
+            answer_id='7_2_1',
+            correctness='partially-correct',
+            npoints=None
+        )
+
         # Assert that we get the expected points
         # If points assigned --> npoints
         # If no points assigned and correct --> 1 point
+        # If no points assigned and partially correct --> 1 point
         # If no points assigned and incorrect --> 0 points
         self.assertEqual(self.cmap.get_npoints('1_2_1'), 5.3)
         self.assertEqual(self.cmap.get_npoints('2_2_1'), 1)
         self.assertEqual(self.cmap.get_npoints('3_2_1'), 5)
         self.assertEqual(self.cmap.get_npoints('4_2_1'), 0)
         self.assertEqual(self.cmap.get_npoints('5_2_1'), 0)
+        self.assertEqual(self.cmap.get_npoints('6_2_1'), 2.5)
+        self.assertEqual(self.cmap.get_npoints('7_2_1'), 1)
 
     def test_set_overall_message(self):
 

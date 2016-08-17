@@ -1,10 +1,10 @@
 @font-face {
   font-family: 'CreativeCommons';
-  src: url('../fonts/CreativeCommons/cc.eot');
-  src: url('../fonts/CreativeCommons/cc.eot#iefix') format('embedded-opentype'),
-       url('../fonts/CreativeCommons/cc.woff') format('woff'),
-       url('../fonts/CreativeCommons/cc.ttf') format('truetype'),
-       url('../fonts/CreativeCommons/cc.svg#CreativeCommons') format('svg');
+  src: url('#{$static-path}/fonts/CreativeCommons/cc.eot');
+  src: url('#{$static-path}/fonts/CreativeCommons/cc.eot#iefix') format('embedded-opentype'),
+       url('#{$static-path}/fonts/CreativeCommons/cc.woff') format('woff'),
+       url('#{$static-path}/fonts/CreativeCommons/cc.ttf') format('truetype'),
+       url('#{$static-path}/fonts/CreativeCommons/cc.svg#CreativeCommons') format('svg');
   font-weight: normal;
   font-style: normal;
 }

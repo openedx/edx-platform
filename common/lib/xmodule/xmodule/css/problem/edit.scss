@@ -110,7 +110,7 @@
   width: 26px;
   height: 21px;
   vertical-align: middle;
-  background: url(../images/problem-editor-icons.png) no-repeat;
+  background: url('#{$static-path}/images/problem-editor-icons.png') no-repeat;
 }
 
 .problem-editor-icon.heading1 {

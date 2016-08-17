@@ -1,8 +1,8 @@
 define(
     [
-        'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers', 'squire'
+        'jquery', 'underscore', 'squire'
     ],
-function ($, _, AjaxHelpers, Squire) {
+function ($, _, Squire) {
     'use strict';
     // TODO: fix BLD-1100 Disabled due to intermittent failure on master and in PR builds
     xdescribe('VideoTranslations', function () {
@@ -12,7 +12,6 @@ function ($, _, AjaxHelpers, Squire) {
             TranslationsItenTemplate = readFixtures(
                 'video/metadata-translations-item.underscore'
             ),
-            feedbackTpl = readFixtures('system-feedback.underscore'),
             modelStub = {
                 default_value: {
                     'en': 'en.srt',

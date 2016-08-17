@@ -10,7 +10,7 @@ from xmodule.modulestore.tests.factories import CourseFactory
 
 from openedx.core.djangoapps.credit.api import get_credit_requirements
 from openedx.core.djangoapps.credit.models import CreditCourse
-from openedx.core.djangoapps.credit.signals import listen_for_course_publish
+from openedx.core.djangoapps.credit.signals import on_course_publish
 
 
 class CreditEligibilityTest(CourseTestCase):
@@ -29,8 +29,8 @@ class CreditEligibilityTest(CourseTestCase):
         """
         response = self.client.get_html(self.course_details_url)
         self.assertEqual(response.status_code, 200)
-        self.assertNotContains(response, "Credit Eligibility Requirements")
-        self.assertNotContains(response, "Steps needed for credit eligibility")
+        self.assertNotContains(response, "Course Credit Requirements")
+        self.assertNotContains(response, "Steps required to earn course credit")
 
     @mock.patch.dict("django.conf.settings.FEATURES", {'ENABLE_CREDIT_ELIGIBILITY': True})
     def test_course_details_with_enabled_setting(self):
@@ -41,8 +41,8 @@ class CreditEligibilityTest(CourseTestCase):
         # course is not set as credit course
         response = self.client.get_html(self.course_details_url)
         self.assertEqual(response.status_code, 200)
-        self.assertNotContains(response, "Credit Eligibility Requirements")
-        self.assertNotContains(response, "Steps needed for credit eligibility")
+        self.assertNotContains(response, "Course Credit Requirements")
+        self.assertNotContains(response, "Steps required to earn course credit")
 
         # verify that credit eligibility requirements block shows if the
         # course is set as credit course and it has eligibility requirements
@@ -50,10 +50,10 @@ class CreditEligibilityTest(CourseTestCase):
         credit_course.save()
         self.assertEqual(len(get_credit_requirements(self.course.id)), 0)
         # test that after publishing course, minimum grade requirement is added
-        listen_for_course_publish(self, self.course.id)
+        on_course_publish(self.course.id)
         self.assertEqual(len(get_credit_requirements(self.course.id)), 1)
 
         response = self.client.get_html(self.course_details_url)
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Credit Eligibility Requirements")
-        self.assertContains(response, "Steps needed for credit eligibility")
+        self.assertContains(response, "Course Credit Requirements")
+        self.assertContains(response, "Steps required to earn course credit")

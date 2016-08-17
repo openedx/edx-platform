@@ -6,7 +6,6 @@ forums, and to the cohort admin views.
 import logging
 import random
 
-from django.db import transaction
 from django.db.models.signals import post_save, m2m_changed
 from django.dispatch import receiver
 from django.http import Http404
@@ -17,7 +16,13 @@ from eventtracking import tracker
 from request_cache.middleware import RequestCache
 from student.models import get_user_by_username_or_email
 
-from .models import CourseUserGroup, CourseCohort, CourseCohortsSettings, CourseUserGroupPartitionGroup
+from .models import (
+    CourseUserGroup,
+    CourseCohort,
+    CourseCohortsSettings,
+    CourseUserGroupPartitionGroup,
+    CohortMembership
+)
 
 
 log = logging.getLogger(__name__)
@@ -38,6 +43,9 @@ def _cohort_added(sender, **kwargs):
 def _cohort_membership_changed(sender, **kwargs):
     """Emits a tracking log event each time cohort membership is modified"""
     def get_event_iter(user_id_iter, cohort_iter):
+        """
+        Returns a dictionary containing a mashup of cohort and user information for the given lists
+        """
         return (
             {"cohort_id": cohort.id, "cohort_name": cohort.name, "user_id": user_id}
             for user_id in user_id_iter
@@ -121,42 +129,6 @@ def get_cohort_id(user, course_key, use_cached=False):
     return None if cohort is None else cohort.id
 
 
-def is_commentable_cohorted(course_key, commentable_id):
-    """
-    Args:
-        course_key: CourseKey
-        commentable_id: string
-
-    Returns:
-        Bool: is this commentable cohorted?
-
-    Raises:
-        Http404 if the course doesn't exist.
-    """
-    course = courses.get_course_by_id(course_key)
-    course_cohort_settings = get_course_cohort_settings(course_key)
-
-    if not course_cohort_settings.is_cohorted:
-        # this is the easy case :)
-        ans = False
-    elif (
-            commentable_id in course.top_level_discussion_topic_ids or
-            course_cohort_settings.always_cohort_inline_discussions is False
-    ):
-        # top level discussions have to be manually configured as cohorted
-        # (default is not).
-        # Same thing for inline discussions if the default is explicitly set to False in settings
-        ans = commentable_id in course_cohort_settings.cohorted_discussions
-    else:
-        # inline discussions are cohorted by default
-        ans = True
-
-    log.debug(u"is_commentable_cohorted({0}, {1}) = {2}".format(
-        course_key, commentable_id, ans
-    ))
-    return ans
-
-
 def get_cohorted_commentables(course_key):
     """
     Given a course_key return a set of strings representing cohorted commentables.
@@ -173,7 +145,6 @@ def get_cohorted_commentables(course_key):
     return ans
 
 
-@transaction.commit_on_success
 def get_cohort(user, course_key, assign=True, use_cached=False):
     """Returns the user's cohort for the specified course.
 
@@ -210,13 +181,12 @@ def get_cohort(user, course_key, assign=True, use_cached=False):
 
     # If course is cohorted, check if the user already has a cohort.
     try:
-        cohort = CourseUserGroup.objects.get(
+        membership = CohortMembership.objects.get(
             course_id=course_key,
-            group_type=CourseUserGroup.COHORT,
-            users__id=user.id,
+            user_id=user.id,
         )
-        return request_cache.data.setdefault(cache_key, cohort)
-    except CourseUserGroup.DoesNotExist:
+        return request_cache.data.setdefault(cache_key, membership.course_user_group)
+    except CohortMembership.DoesNotExist:
         # Didn't find the group. If we do not want to assign, return here.
         if not assign:
             # Do not cache the cohort here, because in the next call assign
@@ -224,6 +194,17 @@ def get_cohort(user, course_key, assign=True, use_cached=False):
             return None
 
     # Otherwise assign the user a cohort.
+    membership = CohortMembership.objects.create(
+        user=user,
+        course_user_group=_get_default_cohort(course_key)
+    )
+    return request_cache.data.setdefault(cache_key, membership.course_user_group)
+
+
+def _get_default_cohort(course_key):
+    """
+    Helper method to get a default cohort for assignment in get_cohort
+    """
     course = courses.get_course(course_key)
     cohorts = get_course_cohorts(course, assignment_type=CourseCohort.RANDOM)
     if cohorts:
@@ -234,10 +215,7 @@ def get_cohort(user, course_key, assign=True, use_cached=False):
             course_id=course_key,
             assignment_type=CourseCohort.RANDOM
         ).course_user_group
-
-    user.course_groups.add(cohort)
-
-    return request_cache.data.setdefault(cache_key, cohort)
+    return cohort
 
 
 def migrate_cohort_settings(course):
@@ -360,6 +338,27 @@ def is_cohort_exists(course_key, name):
     return CourseUserGroup.objects.filter(course_id=course_key, group_type=CourseUserGroup.COHORT, name=name).exists()
 
 
+def remove_user_from_cohort(cohort, username_or_email):
+    """
+    Look up the given user, and if successful, remove them from the specified cohort.
+
+    Arguments:
+        cohort: CourseUserGroup
+        username_or_email: string.  Treated as email if has '@'
+
+    Raises:
+        User.DoesNotExist if can't find user.
+        ValueError if user not already present in this cohort.
+    """
+    user = get_user_by_username_or_email(username_or_email)
+
+    try:
+        membership = CohortMembership.objects.get(course_user_group=cohort, user=user)
+        membership.delete()
+    except CohortMembership.DoesNotExist:
+        raise ValueError("User {} was not present in cohort {}".format(username_or_email, cohort))
+
+
 def add_user_to_cohort(cohort, username_or_email):
     """
     Look up the given user, and if successful, add them to the specified cohort.
@@ -376,25 +375,9 @@ def add_user_to_cohort(cohort, username_or_email):
         ValueError if user already present in this cohort.
     """
     user = get_user_by_username_or_email(username_or_email)
-    previous_cohort_name = None
-    previous_cohort_id = None
 
-    course_cohorts = CourseUserGroup.objects.filter(
-        course_id=cohort.course_id,
-        users__id=user.id,
-        group_type=CourseUserGroup.COHORT
-    )
-    if course_cohorts.exists():
-        if course_cohorts[0] == cohort:
-            raise ValueError("User {user_name} already present in cohort {cohort_name}".format(
-                user_name=user.username,
-                cohort_name=cohort.name
-            ))
-        else:
-            previous_cohort = course_cohorts[0]
-            previous_cohort.users.remove(user)
-            previous_cohort_name = previous_cohort.name
-            previous_cohort_id = previous_cohort.id
+    membership = CohortMembership(course_user_group=cohort, user=user)
+    membership.save()  # This will handle both cases, creation and updating, of a CohortMembership for this user.
 
     tracker.emit(
         "edx.cohort.user_add_requested",
@@ -402,12 +385,11 @@ def add_user_to_cohort(cohort, username_or_email):
             "user_id": user.id,
             "cohort_id": cohort.id,
             "cohort_name": cohort.name,
-            "previous_cohort_id": previous_cohort_id,
-            "previous_cohort_name": previous_cohort_name,
+            "previous_cohort_id": membership.previous_cohort_id,
+            "previous_cohort_name": membership.previous_cohort_name,
         }
     )
-    cohort.users.add(user)
-    return (user, previous_cohort_name)
+    return (user, membership.previous_cohort_name)
 
 
 def get_group_info_for_cohort(cohort, use_cached=False):

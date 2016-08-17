@@ -12,7 +12,6 @@
       % endfor
     </select>
 
-  <span id="answer_${id}"></span>  
   <div class="indicator-container">
     <span class="status ${status.classname}"
         id="status_${id}"
@@ -20,6 +19,7 @@
       <span class="sr">${value|h} - ${status.display_name}</span>
     </span>
   </div>
+  <p class="answer" id="answer_${id}"></p>
   % if msg:
       <span class="message">${msg|n}</span>
   % endif

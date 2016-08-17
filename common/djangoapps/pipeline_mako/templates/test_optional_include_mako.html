@@ -1,0 +1,8 @@
+# A test template for optional_include_mako
+
+<%namespace name='static' file='static_content.html'/>
+
+<p>Welcome to test_optional_include_mako.html</p>
+
+<%static:optional_include_mako file="test_exists.html" />
+<%static:optional_include_mako file="definitely_doesnt_exist.html" />

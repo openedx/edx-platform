@@ -2,18 +2,28 @@
 Unit tests for masquerade.
 """
 import json
+import pickle
 from mock import patch
 from nose.plugins.attrib import attr
 from datetime import datetime
 
 from django.core.urlresolvers import reverse
+from django.test import TestCase
 from django.utils.timezone import UTC
 
 from capa.tests.response_xml_factory import OptionResponseXMLFactory
-from courseware.masquerade import handle_ajax, setup_masquerade, get_masquerading_group_info
+from courseware.masquerade import (
+    CourseMasquerade,
+    MasqueradingKeyValueStore,
+    handle_ajax,
+    setup_masquerade,
+    get_masquerading_group_info
+)
 from courseware.tests.factories import StaffFactory
 from courseware.tests.helpers import LoginEnrollmentTestCase, get_request_for_user
+from courseware.tests.test_submitting_problems import ProblemSubmissionTestMixin
 from student.tests.factories import UserFactory
+from xblock.runtime import DictKeyValueStore
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import ItemFactory, CourseFactory
@@ -54,7 +64,7 @@ class MasqueradeTestCase(ModuleStoreTestCase, LoginEnrollmentTestCase):
             options=['Correct', 'Incorrect'],
             correct_option='Correct'
         )
-        self.problem_display_name = "Test Masquerade Problem"
+        self.problem_display_name = "TestMasqueradeProblem"
         self.problem = ItemFactory.create(
             parent_location=self.vertical.location,
             category='problem',
@@ -158,7 +168,7 @@ class StaffMasqueradeTestCase(MasqueradeTestCase):
         """
         return StaffFactory(course_key=self.course.id)
 
-    def update_masquerade(self, role, group_id=None):
+    def update_masquerade(self, role, group_id=None, user_name=None):
         """
         Toggle masquerade state.
         """
@@ -170,10 +180,10 @@ class StaffMasqueradeTestCase(MasqueradeTestCase):
         )
         response = self.client.post(
             masquerade_url,
-            json.dumps({"role": role, "group_id": group_id}),
+            json.dumps({"role": role, "group_id": group_id, "user_name": user_name}),
             "application/json"
         )
-        self.assertEqual(response.status_code, 204)
+        self.assertEqual(response.status_code, 200)
         return response
 
 
@@ -216,6 +226,80 @@ class TestStaffMasqueradeAsStudent(StaffMasqueradeTestCase):
 
 
 @attr('shard_1')
+class TestStaffMasqueradeAsSpecificStudent(StaffMasqueradeTestCase, ProblemSubmissionTestMixin):
+    """
+    Check for staff being able to masquerade as a specific student.
+    """
+    def setUp(self):
+        super(TestStaffMasqueradeAsSpecificStudent, self).setUp()
+        self.student_user = self.create_user()
+        self.login_student()
+        self.enroll(self.course, True)
+
+    def login_staff(self):
+        """ Login as a staff user """
+        self.login(self.test_user.email, 'test')
+
+    def login_student(self):
+        """ Login as a student """
+        self.login(self.student_user.email, 'test')
+
+    def submit_answer(self, response1, response2):
+        """
+        Submit an answer to the single problem in our test course.
+        """
+        return self.submit_question_answer(
+            self.problem_display_name,
+            {'2_1': response1, '2_2': response2}
+        )
+
+    def get_progress_detail(self):
+        """
+        Return the reported progress detail for the problem in our test course.
+
+        The return value is a string like u'1/2'.
+        """
+        return json.loads(self.look_at_question(self.problem_display_name).content)['progress_detail']
+
+    @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
+    def test_masquerade_as_specific_student(self):
+        """
+        Test masquerading as a specific user.
+
+        We answer the problem in our test course as the student and as staff user, and we use the
+        progress as a proxy to determine who's state we currently see.
+        """
+        # Answer correctly as the student, and check progress.
+        self.login_student()
+        self.submit_answer('Correct', 'Correct')
+        self.assertEqual(self.get_progress_detail(), u'2/2')
+
+        # Log in as staff, and check the problem is unanswered.
+        self.login_staff()
+        self.assertEqual(self.get_progress_detail(), u'0/2')
+
+        # Masquerade as the student, and check we can see the student state.
+        self.update_masquerade(role='student', user_name=self.student_user.username)
+        self.assertEqual(self.get_progress_detail(), u'2/2')
+
+        # Temporarily override the student state.
+        self.submit_answer('Correct', 'Incorrect')
+        self.assertEqual(self.get_progress_detail(), u'1/2')
+
+        # Reload the page and check we see the student state again.
+        self.get_courseware_page()
+        self.assertEqual(self.get_progress_detail(), u'2/2')
+
+        # Become the staff user again, and check the problem is still unanswered.
+        self.update_masquerade(role='staff')
+        self.assertEqual(self.get_progress_detail(), u'0/2')
+
+        # Verify the student state did not change.
+        self.login_student()
+        self.assertEqual(self.get_progress_detail(), u'2/2')
+
+
+@attr('shard_1')
 class TestGetMasqueradingGroupId(StaffMasqueradeTestCase):
     """
     Check for staff being able to masquerade as belonging to a group.
@@ -252,3 +336,79 @@ class TestGetMasqueradingGroupId(StaffMasqueradeTestCase):
         group_id, user_partition_id = get_masquerading_group_info(self.test_user, self.course.id)
         self.assertEqual(group_id, 1)
         self.assertEqual(user_partition_id, 0)
+
+
+class ReadOnlyKeyValueStore(DictKeyValueStore):
+    """
+    A KeyValueStore that raises an exception on attempts to modify it.
+
+    Used to make sure MasqueradingKeyValueStore does not try to modify the underlying KeyValueStore.
+    """
+    def set(self, key, value):
+        assert False, "ReadOnlyKeyValueStore may not be modified."
+
+    def delete(self, key):
+        assert False, "ReadOnlyKeyValueStore may not be modified."
+
+    def set_many(self, update_dict):  # pylint: disable=unused-argument
+        assert False, "ReadOnlyKeyValueStore may not be modified."
+
+
+class FakeSession(dict):
+    """ Mock for Django session object. """
+    modified = False  # We need dict semantics with a writable 'modified' property
+
+
+class MasqueradingKeyValueStoreTest(TestCase):
+    """
+    Unit tests for the MasqueradingKeyValueStore class.
+    """
+    def setUp(self):
+        super(MasqueradingKeyValueStoreTest, self).setUp()
+        self.ro_kvs = ReadOnlyKeyValueStore({'a': 42, 'b': None, 'c': 'OpenCraft'})
+        self.session = FakeSession()
+        self.kvs = MasqueradingKeyValueStore(self.ro_kvs, self.session)
+
+    def test_all(self):
+        self.assertEqual(self.kvs.get('a'), 42)
+        self.assertEqual(self.kvs.get('b'), None)
+        self.assertEqual(self.kvs.get('c'), 'OpenCraft')
+        with self.assertRaises(KeyError):
+            self.kvs.get('d')
+
+        self.assertTrue(self.kvs.has('a'))
+        self.assertTrue(self.kvs.has('b'))
+        self.assertTrue(self.kvs.has('c'))
+        self.assertFalse(self.kvs.has('d'))
+
+        self.kvs.set_many({'a': 'Norwegian Blue', 'd': 'Giraffe'})
+        self.kvs.set('b', 7)
+
+        self.assertEqual(self.kvs.get('a'), 'Norwegian Blue')
+        self.assertEqual(self.kvs.get('b'), 7)
+        self.assertEqual(self.kvs.get('c'), 'OpenCraft')
+        self.assertEqual(self.kvs.get('d'), 'Giraffe')
+
+        for key in 'abd':
+            self.assertTrue(self.kvs.has(key))
+            self.kvs.delete(key)
+            with self.assertRaises(KeyError):
+                self.kvs.get(key)
+
+        self.assertEqual(self.kvs.get('c'), 'OpenCraft')
+
+
+class CourseMasqueradeTest(TestCase):
+    """
+    Unit tests for the CourseMasquerade class.
+    """
+    def test_unpickling_sets_all_attributes(self):
+        """
+        Make sure that old CourseMasquerade objects receive missing attributes when unpickled from
+        the session.
+        """
+        cmasq = CourseMasquerade(7)
+        del cmasq.user_name
+        pickled_cmasq = pickle.dumps(cmasq)
+        unpickled_cmasq = pickle.loads(pickled_cmasq)
+        self.assertEqual(unpickled_cmasq.user_name, None)

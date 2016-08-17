@@ -6,7 +6,7 @@
 # pylint: disable=unused-argument
 
 from lettuce import world, step
-from nose.tools import assert_true, assert_in, assert_equal  # pylint: disable=no-name-in-module
+from nose.tools import assert_true, assert_in, assert_equal
 
 DISPLAY_NAME = "Display Name"
 
@@ -76,7 +76,7 @@ def see_a_problem_component(step, category):
     problem_css = 'li.studio-xblock-wrapper div.xblock-student_view'
     # This view presents the given problem component in uppercase. Assert that the text matches
     # the component selected (in uppercase)
-    assert_true(world.css_contains_text(problem_css, category.upper()))  # pylint: disable=no-value-for-parameter
+    assert_true(world.css_contains_text(problem_css, category.upper()))
 
 
 @step(u'I add a "([^"]*)" "([^"]*)" component$')
@@ -97,7 +97,7 @@ def delete_components(step, number):
     world.wait_for_xmodule()
     delete_btn_css = 'a.delete-button'
     prompt_css = 'div#prompt-warning'
-    btn_css = '{} a.button.action-primary'.format(prompt_css)
+    btn_css = '{} button.action-primary'.format(prompt_css)
     saving_mini_css = 'div#page-notification .wrapper-notification-mini'
     for _ in range(int(number)):
         world.css_click(delete_btn_css)

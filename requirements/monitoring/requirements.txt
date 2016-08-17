@@ -1,0 +1,16 @@
+# This requirements.txt file is meant to pull in other requirements.txt files so that
+# dependency monitoring tools like gemnasium.com can easily process them.
+
+# It can not be used to do the full installation because it is not in the correct
+# order.
+
+-r ../edx/development.txt
+
+# Requirements for the web application
+-r ../edx/pre.txt
+-r ../edx/base.txt
+-r ../edx/local.txt
+-r ../edx/github.txt
+-r ../edx/edx-private.txt
+-r ../edx/paver.txt
+-r ../edx/post.txt

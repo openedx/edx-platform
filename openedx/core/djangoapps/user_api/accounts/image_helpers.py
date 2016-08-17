@@ -6,7 +6,7 @@ import hashlib
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.files.storage import get_storage_class
-from staticfiles.storage import staticfiles_storage
+from django.contrib.staticfiles.storage import staticfiles_storage
 
 from microsite_configuration import microsite
 
@@ -72,7 +72,7 @@ def get_profile_image_names(username):
     return {size: _get_profile_image_filename(name, size) for size in _PROFILE_IMAGE_SIZES}
 
 
-def get_profile_image_urls_for_user(user):
+def get_profile_image_urls_for_user(user, request=None):
     """
     Return a dict {size:url} for each profile image for a given user.
     Notes:
@@ -93,13 +93,19 @@ def get_profile_image_urls_for_user(user):
 
     """
     if user.profile.has_profile_image:
-        return _get_profile_image_urls(
+        urls = _get_profile_image_urls(
             _make_profile_image_name(user.username),
             get_profile_image_storage(),
             version=user.profile.profile_image_uploaded_at.strftime("%s"),
         )
     else:
-        return _get_default_profile_image_urls()
+        urls = _get_default_profile_image_urls()
+
+    if request:
+        for key, value in urls.items():
+            urls[key] = request.build_absolute_uri(value)
+
+    return urls
 
 
 def _get_default_profile_image_urls():

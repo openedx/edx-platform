@@ -1,7 +1,7 @@
 /**
  * Subviews (usually small side panels) for XBlockContainerPage.
  */
-define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/utils/view_utils",
+define(["jquery", "underscore", "gettext", "js/views/baseview", "common/js/components/utils/view_utils",
     "js/views/utils/xblock_utils"],
     function ($, _, gettext, BaseView, ViewUtils, XBlockViewUtils) {
         var VisibilityState = XBlockViewUtils.VisibilityState,
@@ -115,7 +115,8 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/utils/
                     releaseDateFrom: this.model.get('release_date_from'),
                     hasExplicitStaffLock: this.model.get('has_explicit_staff_lock'),
                     staffLockFrom: this.model.get('staff_lock_from'),
-                    hasContentGroupComponents: this.model.get('has_content_group_components')
+                    hasContentGroupComponents: this.model.get('has_content_group_components'),
+                    course: window.course,
                 }));
 
                 return this;

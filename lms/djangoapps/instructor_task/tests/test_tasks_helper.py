@@ -9,17 +9,19 @@ Tests that CSV grade report generation works with unicode emails.
 import ddt
 from mock import Mock, patch
 import tempfile
+import json
+from openedx.core.djangoapps.course_groups import cohorts
 import unicodecsv
 from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
 
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
-from certificates.models import CertificateStatuses
+from certificates.models import CertificateStatuses, GeneratedCertificate
 from certificates.tests.factories import GeneratedCertificateFactory, CertificateWhitelistFactory
 from course_modes.models import CourseMode
 from courseware.tests.factories import InstructorFactory
 from instructor_task.tests.test_base import InstructorTaskCourseTestCase, TestReportMixin, InstructorTaskModuleTestCase
-from openedx.core.djangoapps.course_groups.models import CourseUserGroupPartitionGroup
+from openedx.core.djangoapps.course_groups.models import CourseUserGroupPartitionGroup, CohortMembership
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
 import openedx.core.djangoapps.user_api.course_tag.api as course_tag_api
 from openedx.core.djangoapps.user_api.partition_schemes import RandomUserPartitionScheme
@@ -27,25 +29,48 @@ from shoppingcart.models import Order, PaidCourseRegistration, CourseRegistratio
     CourseRegistrationCodeInvoiceItem, InvoiceTransaction, Coupon
 from student.tests.factories import UserFactory, CourseModeFactory
 from student.models import CourseEnrollment, CourseEnrollmentAllowed, ManualEnrollmentAudit, ALLOWEDTOENROLL_TO_ENROLLED
-from verify_student.tests.factories import SoftwareSecurePhotoVerificationFactory
+from lms.djangoapps.verify_student.tests.factories import SoftwareSecurePhotoVerificationFactory
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.partitions.partitions import Group, UserPartition
 from instructor_task.models import ReportStore
+from survey.models import SurveyForm, SurveyAnswer
 from instructor_task.tasks_helper import (
     cohort_students_and_upload,
+    upload_problem_responses_csv,
     upload_grades_csv,
     upload_problem_grade_report,
     upload_students_csv,
     upload_may_enroll_csv,
     upload_enrollment_report,
     upload_exec_summary_report,
+    upload_course_survey_report,
     generate_students_certificates,
 )
+from instructor_analytics.basic import UNAVAILABLE
 from openedx.core.djangoapps.util.testing import ContentGroupTestCase, TestConditionalContent
+from teams.tests.factories import CourseTeamFactory, CourseTeamMembershipFactory
+
+
+class InstructorGradeReportTestCase(TestReportMixin, InstructorTaskCourseTestCase):
+    """ Base class for grade report tests. """
+
+    def _verify_cell_data_for_user(self, username, course_id, column_header, expected_cell_content):
+        """
+        Verify cell data in the grades CSV for a particular user.
+        """
+        with patch('instructor_task.tasks_helper._get_current_task'):
+            result = upload_grades_csv(None, None, course_id, None, 'graded')
+            self.assertDictContainsSubset({'attempted': 2, 'succeeded': 2, 'failed': 0}, result)
+            report_store = ReportStore.from_config(config_name='GRADES_DOWNLOAD')
+            report_csv_filename = report_store.links_for(course_id)[0][0]
+            with open(report_store.path_to(course_id, report_csv_filename)) as csv_file:
+                for row in unicodecsv.DictReader(csv_file):
+                    if row.get('username') == username:
+                        self.assertEqual(row[column_header], expected_cell_content)
 
 
 @ddt.ddt
-class TestInstructorGradeReport(TestReportMixin, InstructorTaskCourseTestCase):
+class TestInstructorGradeReport(InstructorGradeReportTestCase):
     """
     Tests that CSV grade report generation works.
     """
@@ -86,20 +111,6 @@ class TestInstructorGradeReport(TestReportMixin, InstructorTaskCourseTestCase):
         report_store = ReportStore.from_config(config_name='GRADES_DOWNLOAD')
         self.assertTrue(any('grade_report_err' in item[0] for item in report_store.links_for(self.course.id)))
 
-    def _verify_cell_data_for_user(self, username, course_id, column_header, expected_cell_content):
-        """
-        Verify cell data in the grades CSV for a particular user.
-        """
-        with patch('instructor_task.tasks_helper._get_current_task'):
-            result = upload_grades_csv(None, None, course_id, None, 'graded')
-            self.assertDictContainsSubset({'attempted': 2, 'succeeded': 2, 'failed': 0}, result)
-            report_store = ReportStore.from_config(config_name='GRADES_DOWNLOAD')
-            report_csv_filename = report_store.links_for(course_id)[0][0]
-            with open(report_store.path_to(course_id, report_csv_filename)) as csv_file:
-                for row in unicodecsv.DictReader(csv_file):
-                    if row.get('username') == username:
-                        self.assertEqual(row[column_header], expected_cell_content)
-
     def test_cohort_data_in_grading(self):
         """
         Test that cohort data is included in grades csv if cohort configuration is enabled for course.
@@ -134,8 +145,10 @@ class TestInstructorGradeReport(TestReportMixin, InstructorTaskCourseTestCase):
         magneto = u'MàgnëtÖ'
         cohort1 = CohortFactory(course_id=course.id, name=professor_x)
         cohort2 = CohortFactory(course_id=course.id, name=magneto)
-        cohort1.users.add(user1)
-        cohort2.users.add(user2)
+        membership1 = CohortMembership(course_user_group=cohort1, user=user1)
+        membership1.save()
+        membership2 = CohortMembership(course_user_group=cohort2, user=user2)
+        membership2.save()
 
         self._verify_cell_data_for_user(user1.username, course.id, 'Cohort Name', professor_x)
         self._verify_cell_data_for_user(user2.username, course.id, 'Cohort Name', magneto)
@@ -277,6 +290,69 @@ class TestInstructorGradeReport(TestReportMixin, InstructorTaskCourseTestCase):
         self.assertDictContainsSubset({'attempted': 1, 'succeeded': 1, 'failed': 0}, result)
 
 
+class TestTeamGradeReport(InstructorGradeReportTestCase):
+    """ Test that teams appear correctly in the grade report when it is enabled for the course. """
+
+    def setUp(self):
+        super(TestTeamGradeReport, self).setUp()
+        self.course = CourseFactory.create(teams_configuration={
+            'max_size': 2, 'topics': [{'topic-id': 'topic', 'name': 'Topic', 'description': 'A Topic'}]
+        })
+        self.student1 = UserFactory.create()
+        CourseEnrollment.enroll(self.student1, self.course.id)
+        self.student2 = UserFactory.create()
+        CourseEnrollment.enroll(self.student2, self.course.id)
+
+    def test_team_in_grade_report(self):
+        self._verify_cell_data_for_user(self.student1.username, self.course.id, 'Team Name', '')
+
+    def test_correct_team_name_in_grade_report(self):
+        team1 = CourseTeamFactory.create(course_id=self.course.id)
+        CourseTeamMembershipFactory.create(team=team1, user=self.student1)
+        team2 = CourseTeamFactory.create(course_id=self.course.id)
+        CourseTeamMembershipFactory.create(team=team2, user=self.student2)
+        self._verify_cell_data_for_user(self.student1.username, self.course.id, 'Team Name', team1.name)
+        self._verify_cell_data_for_user(self.student2.username, self.course.id, 'Team Name', team2.name)
+
+    def test_team_deleted(self):
+        team1 = CourseTeamFactory.create(course_id=self.course.id)
+        membership1 = CourseTeamMembershipFactory.create(team=team1, user=self.student1)
+        team2 = CourseTeamFactory.create(course_id=self.course.id)
+        CourseTeamMembershipFactory.create(team=team2, user=self.student2)
+
+        team1.delete()
+        membership1.delete()
+
+        self._verify_cell_data_for_user(self.student1.username, self.course.id, 'Team Name', '')
+        self._verify_cell_data_for_user(self.student2.username, self.course.id, 'Team Name', team2.name)
+
+
+class TestProblemResponsesReport(TestReportMixin, InstructorTaskCourseTestCase):
+    """
+    Tests that generation of CSV files listing student answers to a
+    given problem works.
+    """
+    def setUp(self):
+        super(TestProblemResponsesReport, self).setUp()
+        self.course = CourseFactory.create()
+
+    def test_success(self):
+        task_input = {'problem_location': ''}
+        with patch('instructor_task.tasks_helper._get_current_task'):
+            with patch('instructor_task.tasks_helper.list_problem_responses') as patched_data_source:
+                patched_data_source.return_value = [
+                    {'username': 'user0', 'state': u'state0'},
+                    {'username': 'user1', 'state': u'state1'},
+                    {'username': 'user2', 'state': u'state2'},
+                ]
+                result = upload_problem_responses_csv(None, None, self.course.id, task_input, 'calculated')
+        report_store = ReportStore.from_config(config_name='GRADES_DOWNLOAD')
+        links = report_store.links_for(self.course.id)
+
+        self.assertEquals(len(links), 1)
+        self.assertDictContainsSubset({'attempted': 3, 'succeeded': 3, 'failed': 0}, result)
+
+
 @ddt.ddt
 @patch.dict('django.conf.settings.FEATURES', {'ENABLE_PAID_COURSE_REGISTRATION': True})
 class TestInstructorDetailedEnrollmentReport(TestReportMixin, InstructorTaskCourseTestCase):
@@ -286,6 +362,11 @@ class TestInstructorDetailedEnrollmentReport(TestReportMixin, InstructorTaskCour
     def setUp(self):
         super(TestInstructorDetailedEnrollmentReport, self).setUp()
         self.course = CourseFactory.create()
+        CourseModeFactory.create(
+            course_id=self.course.id,
+            min_price=50,
+            mode_slug=CourseMode.DEFAULT_SHOPPINGCART_MODE_SLUG
+        )
 
         # create testing invoice 1
         self.instructor = InstructorFactory(course_key=self.course.id)
@@ -343,10 +424,15 @@ class TestInstructorDetailedEnrollmentReport(TestReportMixin, InstructorTaskCour
         with patch('instructor_task.tasks_helper._get_current_task'):
             result = upload_enrollment_report(None, None, self.course.id, task_input, 'generating_enrollment_report')
 
-        enrollment_source = u'manually enrolled by user_id {user_id}, enrollment state transition: {transition}'.format(
-            user_id=self.instructor.id, transition=ALLOWEDTOENROLL_TO_ENROLLED)  # pylint: disable=no-member
+        enrollment_source = u'manually enrolled by username: {username}'.format(
+            username=self.instructor.username)
         self.assertDictContainsSubset({'attempted': 1, 'succeeded': 1, 'failed': 0}, result)
         self._verify_cell_data_in_csv(student.username, 'Enrollment Source', enrollment_source)
+        self._verify_cell_data_in_csv(
+            student.username,
+            'Manual (Un)Enrollment Reason',
+            'manually enrolling unenrolled user'
+        )
         self._verify_cell_data_in_csv(student.username, 'Payment Status', 'TBD')
 
     def test_student_used_enrollment_code_for_course_enrollment(self):
@@ -395,7 +481,7 @@ class TestInstructorDetailedEnrollmentReport(TestReportMixin, InstructorTaskCour
             created_by=self.instructor,
             invoice=self.sale_invoice_1,
             invoice_item=self.invoice_item,
-            mode_slug='honor'
+            mode_slug=CourseMode.DEFAULT_SHOPPINGCART_MODE_SLUG
         )
         course_registration_code.save()
 
@@ -436,7 +522,7 @@ class TestInstructorDetailedEnrollmentReport(TestReportMixin, InstructorTaskCour
             created_by=self.instructor,
             invoice=self.sale_invoice_1,
             invoice_item=self.invoice_item,
-            mode_slug='honor'
+            mode_slug=CourseMode.DEFAULT_SHOPPINGCART_MODE_SLUG
         )
         course_registration_code.save()
 
@@ -635,7 +721,7 @@ class TestProblemReportCohortedContent(TestReportMixin, ContentGroupTestCase, In
     """
     def setUp(self):
         super(TestProblemReportCohortedContent, self).setUp()
-        # contstruct cohorted problems to work on.
+        # construct cohorted problems to work on.
         self.add_course_content()
         vertical = ItemFactory.create(
             parent_location=self.problem_section.location,
@@ -654,6 +740,23 @@ class TestProblemReportCohortedContent(TestReportMixin, ContentGroupTestCase, In
             group_access={self.course.user_partitions[0].id: [self.course.user_partitions[0].groups[1].id]}
         )
 
+    def _format_user_grade(self, header_row, user, grade):
+        """
+        Helper method that format the user grade
+        Args:
+            header_row(list): header row of csv containing Student ID, Email, Username etc
+            user(object): Django user object
+            grade(list): Users' grade list
+        """
+        return dict(zip(
+            header_row,
+            [
+                unicode(user.id),
+                user.email,
+                user.username,
+            ] + grade
+        ))
+
     def test_cohort_content(self):
         self.submit_student_answer(self.alpha_user.username, u'Pröblem0', ['Option 1', 'Option 1'])
         resp = self.submit_student_answer(self.alpha_user.username, u'Pröblem1', ['Option 1', 'Option 1'])
@@ -668,49 +771,75 @@ class TestProblemReportCohortedContent(TestReportMixin, ContentGroupTestCase, In
             self.assertDictContainsSubset(
                 {'action_name': 'graded', 'attempted': 4, 'succeeded': 4, 'failed': 0}, result
             )
-
         problem_names = [u'Homework 1: Problem - Pröblem0', u'Homework 1: Problem - Pröblem1']
         header_row = [u'Student ID', u'Email', u'Username', u'Final Grade']
         for problem in problem_names:
             header_row += [problem + ' (Earned)', problem + ' (Possible)']
 
-        self.verify_rows_in_csv([
-            dict(zip(
-                header_row,
-                [
-                    unicode(self.staff_user.id),
-                    self.staff_user.email,
-                    self.staff_user.username, u'0.0', u'N/A', u'N/A', u'N/A', u'N/A'
-                ]
-            )),
-            dict(zip(
-                header_row,
-                [
-                    unicode(self.alpha_user.id),
-                    self.alpha_user.email,
-                    self.alpha_user.username,
-                    u'1.0', u'2.0', u'2.0', u'N/A', u'N/A'
-                ]
-            )),
-            dict(zip(
-                header_row,
-                [
-                    unicode(self.beta_user.id),
-                    self.beta_user.email,
-                    self.beta_user.username,
-                    u'0.5', u'N/A', u'N/A', u'1.0', u'2.0'
-                ]
-            )),
-            dict(zip(
-                header_row,
-                [
-                    unicode(self.non_cohorted_user.id),
-                    self.non_cohorted_user.email,
-                    self.non_cohorted_user.username,
-                    u'0.0', u'N/A', u'N/A', u'N/A', u'N/A'
-                ]
-            )),
-        ])
+        user_grades = [
+            {'user': self.staff_user, 'grade': [u'0.0', u'N/A', u'N/A', u'N/A', u'N/A']},
+            {'user': self.alpha_user, 'grade': [u'1.0', u'2.0', u'2.0', u'N/A', u'N/A']},
+            {'user': self.beta_user, 'grade': [u'0.5', u'N/A', u'N/A', u'1.0', u'2.0']},
+            {'user': self.non_cohorted_user, 'grade': [u'0.0', u'N/A', u'N/A', u'N/A', u'N/A']},
+        ]
+
+        # Verify generated grades and expected grades match
+        expected_grades = [self._format_user_grade(header_row, **user_grade) for user_grade in user_grades]
+        self.verify_rows_in_csv(expected_grades)
+
+    @patch('courseware.grades.MaxScoresCache.get', Mock(return_value=1))
+    def test_cohort_content_with_maxcache(self):
+        """
+        Tests the cohoted course grading to test the scenario in which `max_scores_cache` is set for the course
+        problems.
+        """
+        # Course is cohorted
+        self.assertTrue(cohorts.is_course_cohorted(self.course.id))
+
+        # Verify user groups
+        self.assertEquals(
+            cohorts.get_cohort(self.alpha_user, self.course.id).id,
+            self.course.user_partitions[0].groups[0].id,
+            "alpha_user should be assigned to the correct cohort"
+        )
+        self.assertEquals(
+            cohorts.get_cohort(self.beta_user, self.course.id).id,
+            self.course.user_partitions[0].groups[1].id,
+            "beta_user should be assigned to the correct cohort"
+        )
+
+        # Verify user enrollment
+        for user in [self.alpha_user, self.beta_user, self.non_cohorted_user]:
+            self.assertTrue(CourseEnrollment.is_enrolled(user, self.course.id))
+
+        self.submit_student_answer(self.alpha_user.username, u'Pröblem0', ['Option 1', 'Option 1'])
+        resp = self.submit_student_answer(self.alpha_user.username, u'Pröblem1', ['Option 1', 'Option 1'])
+        self.assertEqual(resp.status_code, 404)
+
+        resp = self.submit_student_answer(self.beta_user.username, u'Pröblem0', ['Option 1', 'Option 2'])
+        self.assertEqual(resp.status_code, 404)
+        self.submit_student_answer(self.beta_user.username, u'Pröblem1', ['Option 1', 'Option 2'])
+
+        with patch('instructor_task.tasks_helper._get_current_task'):
+            result = upload_problem_grade_report(None, None, self.course.id, None, 'graded')
+            self.assertDictContainsSubset(
+                {'action_name': 'graded', 'attempted': 4, 'succeeded': 4, 'failed': 0}, result
+            )
+        problem_names = [u'Homework 1: Problem - Pröblem0', u'Homework 1: Problem - Pröblem1']
+        header_row = [u'Student ID', u'Email', u'Username', u'Final Grade']
+        for problem in problem_names:
+            header_row += [problem + ' (Earned)', problem + ' (Possible)']
+
+        user_grades = [
+            {'user': self.staff_user, 'grade': [u'0.0', u'N/A', u'N/A', u'N/A', u'N/A']},
+            {'user': self.alpha_user, 'grade': [u'1.0', u'2.0', u'2.0', u'N/A', u'N/A']},
+            {'user': self.beta_user, 'grade': [u'0.5', u'N/A', u'N/A', u'1.0', u'2.0']},
+            {'user': self.non_cohorted_user, 'grade': [u'0.0', u'N/A', u'N/A', u'N/A', u'N/A']},
+        ]
+
+        # Verify generated grades and expected grades match
+        expected_grades = [self._format_user_grade(header_row, **grade) for grade in user_grades]
+        self.verify_rows_in_csv(expected_grades)
 
 
 @ddt.ddt
@@ -721,7 +850,11 @@ class TestExecutiveSummaryReport(TestReportMixin, InstructorTaskCourseTestCase):
     def setUp(self):
         super(TestExecutiveSummaryReport, self).setUp()
         self.course = CourseFactory.create()
-        CourseModeFactory.create(course_id=self.course.id, min_price=50)
+        CourseModeFactory.create(
+            course_id=self.course.id,
+            min_price=50,
+            mode_slug=CourseMode.DEFAULT_SHOPPINGCART_MODE_SLUG
+        )
 
         self.instructor = InstructorFactory(course_key=self.course.id)
         self.student1 = UserFactory()
@@ -840,6 +973,99 @@ class TestExecutiveSummaryReport(TestReportMixin, InstructorTaskCourseTestCase):
 
 
 @ddt.ddt
+class TestCourseSurveyReport(TestReportMixin, InstructorTaskCourseTestCase):
+    """
+    Tests that Course Survey report generation works.
+    """
+    def setUp(self):
+        super(TestCourseSurveyReport, self).setUp()
+        self.course = CourseFactory.create()
+
+        self.question1 = "question1"
+        self.question2 = "question2"
+        self.question3 = "question3"
+        self.answer1 = "answer1"
+        self.answer2 = "answer2"
+        self.answer3 = "answer3"
+
+        self.student1 = UserFactory()
+        self.student2 = UserFactory()
+
+        self.test_survey_name = 'TestSurvey'
+        self.test_form = '<input name="field1"></input>'
+        self.survey_form = SurveyForm.create(self.test_survey_name, self.test_form)
+
+        self.survey1 = SurveyAnswer.objects.create(user=self.student1, form=self.survey_form, course_key=self.course.id,
+                                                   field_name=self.question1, field_value=self.answer1)
+        self.survey2 = SurveyAnswer.objects.create(user=self.student1, form=self.survey_form, course_key=self.course.id,
+                                                   field_name=self.question2, field_value=self.answer2)
+        self.survey3 = SurveyAnswer.objects.create(user=self.student2, form=self.survey_form, course_key=self.course.id,
+                                                   field_name=self.question1, field_value=self.answer3)
+        self.survey4 = SurveyAnswer.objects.create(user=self.student2, form=self.survey_form, course_key=self.course.id,
+                                                   field_name=self.question2, field_value=self.answer2)
+        self.survey5 = SurveyAnswer.objects.create(user=self.student2, form=self.survey_form, course_key=self.course.id,
+                                                   field_name=self.question3, field_value=self.answer1)
+
+    def test_successfully_generate_course_survey_report(self):
+        """
+        Test that successfully generates the course survey report.
+        """
+        task_input = {'features': []}
+        with patch('instructor_task.tasks_helper._get_current_task'):
+            result = upload_course_survey_report(
+                None, None, self.course.id,
+                task_input, 'generating course survey report'
+            )
+        self.assertDictContainsSubset({'attempted': 2, 'succeeded': 2, 'failed': 0}, result)
+
+    @patch.dict('django.conf.settings.FEATURES', {'ENABLE_PAID_COURSE_REGISTRATION': True})
+    def test_generate_course_survey_report(self):
+        """
+        test to generate course survey report
+        and then test the report authenticity.
+        """
+
+        task_input = {'features': []}
+        with patch('instructor_task.tasks_helper._get_current_task'):
+            result = upload_course_survey_report(
+                None, None, self.course.id,
+                task_input, 'generating course survey report'
+            )
+
+        report_store = ReportStore.from_config(config_name='GRADES_DOWNLOAD')
+        header_row = ",".join(['User ID', 'User Name', 'Email', self.question1, self.question2, self.question3])
+        student1_row = ",".join([
+            str(self.student1.id),  # pylint: disable=no-member
+            self.student1.username,
+            self.student1.email,
+            self.answer1,
+            self.answer2
+        ])
+        student2_row = ",".join([
+            str(self.student2.id),  # pylint: disable=no-member
+            self.student2.username,
+            self.student2.email,
+            self.answer3,
+            self.answer2,
+            self.answer1
+        ])
+        expected_data = [header_row, student1_row, student2_row]
+
+        self.assertDictContainsSubset({'attempted': 2, 'succeeded': 2, 'failed': 0}, result)
+        self._verify_csv_file_report(report_store, expected_data)
+
+    def _verify_csv_file_report(self, report_store, expected_data):
+        """
+        Verify course survey data.
+        """
+        report_csv_filename = report_store.links_for(self.course.id)[0][0]
+        with open(report_store.path_to(self.course.id, report_csv_filename)) as csv_file:
+            csv_file_data = csv_file.read()
+            for data in expected_data:
+                self.assertIn(data, csv_file_data)
+
+
+@ddt.ddt
 class TestStudentReport(TestReportMixin, InstructorTaskCourseTestCase):
     """
     Tests that CSV student profile report generation works.
@@ -883,6 +1109,66 @@ class TestStudentReport(TestReportMixin, InstructorTaskCourseTestCase):
         # This assertion simply confirms that the generation completed with no errors
         num_students = len(students)
         self.assertDictContainsSubset({'attempted': num_students, 'succeeded': num_students, 'failed': 0}, result)
+
+
+class TestTeamStudentReport(TestReportMixin, InstructorTaskCourseTestCase):
+    "Test the student report when including teams information. "
+
+    def setUp(self):
+        super(TestTeamStudentReport, self).setUp()
+        self.course = CourseFactory.create(teams_configuration={
+            'max_size': 2, 'topics': [{'topic-id': 'topic', 'name': 'Topic', 'description': 'A Topic'}]
+        })
+        self.student1 = UserFactory.create()
+        CourseEnrollment.enroll(self.student1, self.course.id)
+        self.student2 = UserFactory.create()
+        CourseEnrollment.enroll(self.student2, self.course.id)
+
+    def _generate_and_verify_teams_column(self, username, expected_team):
+        """ Run the upload_students_csv task and verify that the correct team was added to the CSV. """
+        current_task = Mock()
+        current_task.update_state = Mock()
+        task_input = {
+            'features': [
+                'id', 'username', 'name', 'email', 'language', 'location',
+                'year_of_birth', 'gender', 'level_of_education', 'mailing_address',
+                'goals', 'team'
+            ]
+        }
+        with patch('instructor_task.tasks_helper._get_current_task') as mock_current_task:
+            mock_current_task.return_value = current_task
+            result = upload_students_csv(None, None, self.course.id, task_input, 'calculated')
+            self.assertDictContainsSubset({'attempted': 2, 'succeeded': 2, 'failed': 0}, result)
+            report_store = ReportStore.from_config(config_name='GRADES_DOWNLOAD')
+            report_csv_filename = report_store.links_for(self.course.id)[0][0]
+            with open(report_store.path_to(self.course.id, report_csv_filename)) as csv_file:
+                for row in unicodecsv.DictReader(csv_file):
+                    if row.get('username') == username:
+                        self.assertEqual(row['team'], expected_team)
+
+    def test_team_column_no_teams(self):
+        self._generate_and_verify_teams_column(self.student1.username, UNAVAILABLE)
+        self._generate_and_verify_teams_column(self.student2.username, UNAVAILABLE)
+
+    def test_team_column_with_teams(self):
+        team1 = CourseTeamFactory.create(course_id=self.course.id)
+        CourseTeamMembershipFactory.create(team=team1, user=self.student1)
+        team2 = CourseTeamFactory.create(course_id=self.course.id)
+        CourseTeamMembershipFactory.create(team=team2, user=self.student2)
+        self._generate_and_verify_teams_column(self.student1.username, team1.name)
+        self._generate_and_verify_teams_column(self.student2.username, team2.name)
+
+    def test_team_column_with_deleted_team(self):
+        team1 = CourseTeamFactory.create(course_id=self.course.id)
+        membership1 = CourseTeamMembershipFactory.create(team=team1, user=self.student1)
+        team2 = CourseTeamFactory.create(course_id=self.course.id)
+        CourseTeamMembershipFactory.create(team=team2, user=self.student2)
+
+        team1.delete()
+        membership1.delete()
+
+        self._generate_and_verify_teams_column(self.student1.username, UNAVAILABLE)
+        self._generate_and_verify_teams_column(self.student2.username, team2.name)
 
 
 @ddt.ddt
@@ -1130,8 +1416,10 @@ class TestCohortStudents(TestReportMixin, InstructorTaskCourseTestCase):
         )
 
     def test_move_users_to_new_cohort(self):
-        self.cohort_1.users.add(self.student_1)
-        self.cohort_2.users.add(self.student_2)
+        membership1 = CohortMembership(course_user_group=self.cohort_1, user=self.student_1)
+        membership1.save()
+        membership2 = CohortMembership(course_user_group=self.cohort_2, user=self.student_2)
+        membership2.save()
 
         result = self._cohort_students_and_upload(
             u'username,email,cohort\n'
@@ -1148,8 +1436,10 @@ class TestCohortStudents(TestReportMixin, InstructorTaskCourseTestCase):
         )
 
     def test_move_users_to_same_cohort(self):
-        self.cohort_1.users.add(self.student_1)
-        self.cohort_2.users.add(self.student_2)
+        membership1 = CohortMembership(course_user_group=self.cohort_1, user=self.student_1)
+        membership1.save()
+        membership2 = CohortMembership(course_user_group=self.cohort_2, user=self.student_2)
+        membership2.save()
 
         result = self._cohort_students_and_upload(
             u'username,email,cohort\n'
@@ -1336,12 +1626,18 @@ class TestCertificateGeneration(InstructorTaskModuleTestCase):
 
         current_task = Mock()
         current_task.update_state = Mock()
-        with self.assertNumQueries(104):
+        instructor_task = Mock()
+        instructor_task.task_input = json.dumps({'students': None})
+        with self.assertNumQueries(213):
             with patch('instructor_task.tasks_helper._get_current_task') as mock_current_task:
                 mock_current_task.return_value = current_task
                 with patch('capa.xqueue_interface.XQueueInterface.send_to_queue') as mock_queue:
                     mock_queue.return_value = (0, "Successfully queued")
-                    result = generate_students_certificates(None, None, self.course.id, None, 'certificates generated')
+                    with patch('instructor_task.models.InstructorTask.objects.get') as instructor_task_object:
+                        instructor_task_object.return_value = instructor_task
+                        result = generate_students_certificates(
+                            None, None, self.course.id, {}, 'certificates generated'
+                        )
         self.assertDictContainsSubset(
             {
                 'action_name': 'certificates generated',
@@ -1353,3 +1649,291 @@ class TestCertificateGeneration(InstructorTaskModuleTestCase):
             },
             result
         )
+
+    def test_certificate_regeneration_for_students(self):
+        """
+        Verify that certificates are regenerated for all eligible students enrolled in a course whose generated
+        certificate statuses lies in the list 'statuses_to_regenerate' given in task_input.
+        """
+        # create 10 students
+        students = [self.create_student(username='student_{}'.format(i), email='student_{}@example.com'.format(i))
+                    for i in xrange(1, 11)]
+
+        # mark 2 students to have certificates generated already
+        for student in students[:2]:
+            GeneratedCertificateFactory.create(
+                user=student,
+                course_id=self.course.id,
+                status=CertificateStatuses.downloadable,
+                mode='honor'
+            )
+
+        # mark 3 students to have certificates generated with status 'error'
+        for student in students[2:5]:
+            GeneratedCertificateFactory.create(
+                user=student,
+                course_id=self.course.id,
+                status=CertificateStatuses.error,
+                mode='honor'
+            )
+
+        # mark 6th students to have certificates generated with status 'deleted'
+        for student in students[5:6]:
+            GeneratedCertificateFactory.create(
+                user=student,
+                course_id=self.course.id,
+                status=CertificateStatuses.deleted,
+                mode='honor'
+            )
+
+        # white-list 7 students
+        for student in students[:7]:
+            CertificateWhitelistFactory.create(user=student, course_id=self.course.id, whitelist=True)
+
+        current_task = Mock()
+        current_task.update_state = Mock()
+
+        # Certificates should be regenerated for students having generated certificates with status
+        # 'downloadable' or 'error' which are total of 5 students in this test case
+        task_input = {'statuses_to_regenerate': [CertificateStatuses.downloadable, CertificateStatuses.error]}
+
+        with patch('instructor_task.tasks_helper._get_current_task') as mock_current_task:
+            mock_current_task.return_value = current_task
+            with patch('capa.xqueue_interface.XQueueInterface.send_to_queue') as mock_queue:
+                mock_queue.return_value = (0, "Successfully queued")
+                result = generate_students_certificates(
+                    None, None, self.course.id, task_input, 'certificates generated'
+                )
+
+        self.assertDictContainsSubset(
+            {
+                'action_name': 'certificates generated',
+                'total': 10,
+                'attempted': 5,
+                'succeeded': 5,
+                'failed': 0,
+                'skipped': 5
+            },
+            result
+        )
+
+    def test_certificate_regeneration_with_expected_failures(self):
+        """
+        Verify that certificates are regenerated for all eligible students enrolled in a course whose generated
+        certificate statuses lies in the list 'statuses_to_regenerate' given in task_input.
+        """
+        # Default grade for students
+        default_grade = '-1'
+
+        # create 10 students
+        students = [self.create_student(username='student_{}'.format(i), email='student_{}@example.com'.format(i))
+                    for i in xrange(1, 11)]
+
+        # mark 2 students to have certificates generated already
+        for student in students[:2]:
+            GeneratedCertificateFactory.create(
+                user=student,
+                course_id=self.course.id,
+                status=CertificateStatuses.downloadable,
+                mode='honor',
+                grade=default_grade
+            )
+
+        # mark 3 students to have certificates generated with status 'error'
+        for student in students[2:5]:
+            GeneratedCertificateFactory.create(
+                user=student,
+                course_id=self.course.id,
+                status=CertificateStatuses.error,
+                mode='honor',
+                grade=default_grade
+            )
+
+        # mark 6th students to have certificates generated with status 'deleted'
+        for student in students[5:6]:
+            GeneratedCertificateFactory.create(
+                user=student,
+                course_id=self.course.id,
+                status=CertificateStatuses.deleted,
+                mode='honor',
+                grade=default_grade
+            )
+
+        # mark rest of the 4 students with having generated certificates with status 'generating'
+        # These students are not added in white-list and they have not completed grades so certificate generation
+        # for these students should fail other than the one student that has been added to white-list
+        # so from these students 3 failures and 1 success
+        for student in students[6:]:
+            GeneratedCertificateFactory.create(
+                user=student,
+                course_id=self.course.id,
+                status=CertificateStatuses.generating,
+                mode='honor',
+                grade=default_grade
+            )
+
+        # white-list 7 students
+        for student in students[:7]:
+            CertificateWhitelistFactory.create(user=student, course_id=self.course.id, whitelist=True)
+
+        current_task = Mock()
+        current_task.update_state = Mock()
+
+        # Regenerated certificates for students having generated certificates with status
+        # 'deleted' or 'generating'
+        task_input = {'statuses_to_regenerate': [CertificateStatuses.deleted, CertificateStatuses.generating]}
+
+        with patch('instructor_task.tasks_helper._get_current_task') as mock_current_task:
+            mock_current_task.return_value = current_task
+            with patch('capa.xqueue_interface.XQueueInterface.send_to_queue') as mock_queue:
+                mock_queue.return_value = (0, "Successfully queued")
+                result = generate_students_certificates(
+                    None, None, self.course.id, task_input, 'certificates generated'
+                )
+
+        self.assertDictContainsSubset(
+            {
+                'action_name': 'certificates generated',
+                'total': 10,
+                'attempted': 5,
+                'succeeded': 2,
+                'failed': 3,
+                'skipped': 5
+            },
+            result
+        )
+        generated_certificates = GeneratedCertificate.eligible_certificates.filter(
+            user__in=students,
+            course_id=self.course.id,
+            mode='honor'
+        )
+        certificate_statuses = [generated_certificate.status for generated_certificate in generated_certificates]
+        certificate_grades = [generated_certificate.grade for generated_certificate in generated_certificates]
+
+        # Verify from results from database
+        # Certificates are being generated for 2 white-listed students that had statuses in 'deleted'' and 'generating'
+        self.assertEqual(certificate_statuses.count(CertificateStatuses.generating), 2)
+        # 5 students are skipped that had Certificate Status 'downloadable' and 'error'
+        self.assertEqual(certificate_statuses.count(CertificateStatuses.downloadable), 2)
+        self.assertEqual(certificate_statuses.count(CertificateStatuses.error), 3)
+
+        # grades will be '0.0' as students are either white-listed or ending in error
+        self.assertEqual(certificate_grades.count('0.0'), 5)
+        # grades will be '-1' for students that were skipped
+        self.assertEqual(certificate_grades.count(default_grade), 5)
+
+    def test_certificate_regeneration_with_existing_unavailable_status(self):
+        """
+        Verify that certificates are regenerated for all eligible students enrolled in a course whose generated
+        certificate status lies in the list 'statuses_to_regenerate' given in task_input. but the 'unavailable'
+        status is not touched if it is not in the 'statuses_to_regenerate' list.
+        """
+        # Default grade for students
+        default_grade = '-1'
+
+        # create 10 students
+        students = [self.create_student(username='student_{}'.format(i), email='student_{}@example.com'.format(i))
+                    for i in xrange(1, 11)]
+
+        # mark 2 students to have certificates generated already
+        for student in students[:2]:
+            GeneratedCertificateFactory.create(
+                user=student,
+                course_id=self.course.id,
+                status=CertificateStatuses.downloadable,
+                mode='honor',
+                grade=default_grade
+            )
+
+        # mark 3 students to have certificates generated with status 'error'
+        for student in students[2:5]:
+            GeneratedCertificateFactory.create(
+                user=student,
+                course_id=self.course.id,
+                status=CertificateStatuses.error,
+                mode='honor',
+                grade=default_grade
+            )
+
+        # mark 2 students to have generated certificates with status 'unavailable'
+        for student in students[5:7]:
+            GeneratedCertificateFactory.create(
+                user=student,
+                course_id=self.course.id,
+                status=CertificateStatuses.unavailable,
+                mode='honor',
+                grade=default_grade
+            )
+
+        # mark 3 students to have generated certificates with status 'generating'
+        for student in students[7:]:
+            GeneratedCertificateFactory.create(
+                user=student,
+                course_id=self.course.id,
+                status=CertificateStatuses.generating,
+                mode='honor',
+                grade=default_grade
+            )
+
+        # white-list all students
+        for student in students[:]:
+            CertificateWhitelistFactory.create(user=student, course_id=self.course.id, whitelist=True)
+
+        current_task = Mock()
+        current_task.update_state = Mock()
+
+        # Regenerated certificates for students having generated certificates with status
+        # 'downloadable', 'error' or 'generating'
+        task_input = {
+            'statuses_to_regenerate': [
+                CertificateStatuses.downloadable,
+                CertificateStatuses.error,
+                CertificateStatuses.generating
+            ]
+        }
+
+        with patch('instructor_task.tasks_helper._get_current_task') as mock_current_task:
+            mock_current_task.return_value = current_task
+            with patch('capa.xqueue_interface.XQueueInterface.send_to_queue') as mock_queue:
+                mock_queue.return_value = (0, "Successfully queued")
+                result = generate_students_certificates(
+                    None, None, self.course.id, task_input, 'certificates generated'
+                )
+
+        self.assertDictContainsSubset(
+            {
+                'action_name': 'certificates generated',
+                'total': 10,
+                'attempted': 8,
+                'succeeded': 8,
+                'failed': 0,
+                'skipped': 2
+            },
+            result
+        )
+
+        generated_certificates = GeneratedCertificate.eligible_certificates.filter(
+            user__in=students,
+            course_id=self.course.id,
+            mode='honor'
+        )
+        certificate_statuses = [generated_certificate.status for generated_certificate in generated_certificates]
+        certificate_grades = [generated_certificate.grade for generated_certificate in generated_certificates]
+
+        # Verify from results from database
+        # Certificates are being generated for 8 students that had statuses in 'downloadable', 'error' and 'generating'
+        self.assertEqual(certificate_statuses.count(CertificateStatuses.generating), 8)
+        # 2 students are skipped that had Certificate Status 'unavailable'
+        self.assertEqual(certificate_statuses.count(CertificateStatuses.unavailable), 2)
+
+        # grades will be '0.0' as students are white-listed and have not completed any tasks
+        self.assertEqual(certificate_grades.count('0.0'), 8)
+        # grades will be '-1' for students that have not been processed
+        self.assertEqual(certificate_grades.count(default_grade), 2)
+
+        # Verify that students with status 'unavailable were skipped
+        unavailable_certificates = \
+            [cert for cert in generated_certificates
+             if cert.status == CertificateStatuses.unavailable and cert.grade == default_grade]
+
+        self.assertEquals(len(unavailable_certificates), 2)

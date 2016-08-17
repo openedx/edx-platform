@@ -14,9 +14,6 @@ from django.contrib.auth.models import User
 from django.http import Http404
 from django.test.client import RequestFactory
 
-# monkey-patch for PATCH request method.
-import openedx.core.lib.django_test_client_utils    # pylint: disable=unused-import
-
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -100,6 +97,9 @@ class CohortViewsTestCase(ModuleStoreTestCase):
         self.assertRaises(Http404, view, *view_args)
 
     def create_cohorted_discussions(self):
+        """
+        Set up a cohorted discussion in the system, complete with all the fixings
+        """
         cohorted_inline_discussions = ['Topic A']
         cohorted_course_wide_discussions = ["Topic B"]
         cohorted_discussions = cohorted_inline_discussions + cohorted_course_wide_discussions

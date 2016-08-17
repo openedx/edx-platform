@@ -1,22 +1,32 @@
 """
 Acceptance tests for Studio's Setting pages
 """
+import re
+import uuid
 from .base_studio_test import StudioCourseTest
 from ...pages.studio.settings_certificates import CertificatesPage
+from ...pages.studio.settings_advanced import AdvancedSettingsPage
 
 
 class CertificatesTest(StudioCourseTest):
     """
     Tests for settings/certificates Page.
     """
-    def setUp(self, is_staff=False):
-        super(CertificatesTest, self).setUp(is_staff)
+    def setUp(self):  # pylint: disable=arguments-differ
+        super(CertificatesTest, self).setUp(is_staff=True)
         self.certificates_page = CertificatesPage(
             self.browser,
             self.course_info['org'],
             self.course_info['number'],
             self.course_info['run']
         )
+        self.advanced_settings_page = AdvancedSettingsPage(
+            self.browser,
+            self.course_info['org'],
+            self.course_info['number'],
+            self.course_info['run']
+        )
+        self.course_advanced_settings = dict()
 
     def make_signatory_data(self, prefix='First'):
         """
@@ -51,7 +61,7 @@ class CertificatesTest(StudioCourseTest):
             certificate.signatories[idx].name = signatory['name']
             certificate.signatories[idx].title = signatory['title']
             certificate.signatories[idx].organization = signatory['organization']
-            certificate.signatories[idx].upload_signature_image('Signature-{}.png'.format(idx))
+            certificate.signatories[idx].upload_signature_image('Signature-{}.png'.format(uuid.uuid4().hex[:4]))
 
             added_signatories += 1
             if len(signatories) > added_signatories:
@@ -69,13 +79,18 @@ class CertificatesTest(StudioCourseTest):
             shown when no certificate exist.
         Given I have a course without certificates
         When I go to the Certificates page in Studio
-        Then I see "You have not created any certificates yet." message
+        Then I see "You have not created any certificates yet." message and
+        a link with text "Set up your certificate"
         """
         self.certificates_page.visit()
         self.assertTrue(self.certificates_page.no_certificates_message_shown)
         self.assertIn(
             "You have not created any certificates yet.",
             self.certificates_page.no_certificates_message_text
+        )
+        self.assertIn(
+            "Set up your certificate",
+            self.certificates_page.new_certificate_link_text
         )
 
     def test_can_create_and_edit_certficate(self):
@@ -126,9 +141,11 @@ class CertificatesTest(StudioCourseTest):
 
         self.assertEqual(len(self.certificates_page.certificates), 1)
 
-        # Delete certificate
-        certificate.delete_certificate()
+        # Delete the certificate we just created
+        certificate.click_delete_certificate_button()
+        self.certificates_page.click_confirmation_prompt_primary_button()
 
+        # Reload the page and confirm there are no certificates
         self.certificates_page.visit()
         self.assertEqual(len(self.certificates_page.certificates), 0)
 
@@ -166,6 +183,8 @@ class CertificatesTest(StudioCourseTest):
 
         self.assertEqual(len(self.certificates_page.certificates), 1)
 
+        #Refreshing the page, So page have the updated certificate object.
+        self.certificates_page.refresh()
         signatory = self.certificates_page.certificates[0].signatories[0]
         self.assertIn("Updated signatory name", signatory.name)
         self.assertIn("Update signatory title", signatory.title)
@@ -190,3 +209,88 @@ class CertificatesTest(StudioCourseTest):
         certificate.course_title = "Title Override"
         certificate.click_cancel_edit_certificate()
         self.assertEqual(len(self.certificates_page.certificates), 0)
+
+    def test_line_breaks_in_signatory_title(self):
+        """
+        Scenario: Ensure that line breaks are properly reflected in certificate
+
+        Given I have a certificate with signatories
+        When I add signatory title with new line character
+        Then I see line break in certificate title
+        """
+        self.certificates_page.visit()
+        certificate = self.create_and_verify_certificate(
+            "Course Title Override",
+            0,
+            [
+                {
+                    'name': 'Signatory Name',
+                    'title': 'Signatory title with new line character \n',
+                    'organization': 'Signatory Organization',
+                }
+            ]
+        )
+
+        certificate.wait_for_certificate_delete_button()
+
+        # Make sure certificate is created
+        self.assertEqual(len(self.certificates_page.certificates), 1)
+
+        signatory_title = self.certificates_page.get_first_signatory_title()
+        self.assertNotEqual([], re.findall(r'<br\s*/?>', signatory_title))
+
+    def test_course_number_in_certificate_details_view(self):
+        """
+        Scenario: Ensure that Course Number is displayed in certificate details view
+
+        Given I have a certificate
+        When I visit certificate details page on studio
+        Then I see Course Number next to Course Name
+        """
+        self.certificates_page.visit()
+        certificate = self.create_and_verify_certificate(
+            "Course Title Override",
+            0,
+            [self.make_signatory_data('first')]
+        )
+
+        certificate.wait_for_certificate_delete_button()
+
+        # Make sure certificate is created
+        self.assertEqual(len(self.certificates_page.certificates), 1)
+        course_number = self.certificates_page.get_course_number()
+        self.assertEqual(self.course_info['number'], course_number)
+
+    def test_course_number_override_in_certificate_details_view(self):
+        """
+        Scenario: Ensure that Course Number Override is displayed in certificate details view
+
+        Given I have a certificate
+        When I visit certificate details page on studio
+        Then I see Course Number Override next to Course Name
+        """
+
+        self.course_advanced_settings.update(
+            {'Course Number Display String': 'Course Number Override String'}
+        )
+
+        self.certificates_page.visit()
+        certificate = self.create_and_verify_certificate(
+            "Course Title Override",
+            0,
+            [self.make_signatory_data('first')]
+        )
+
+        certificate.wait_for_certificate_delete_button()
+
+        # Make sure certificate is created
+        self.assertEqual(len(self.certificates_page.certificates), 1)
+
+        # set up course number override in Advanced Settings Page
+        self.advanced_settings_page.visit()
+        self.advanced_settings_page.set_values(self.course_advanced_settings)
+        self.advanced_settings_page.wait_for_ajax()
+
+        self.certificates_page.visit()
+        course_number_override = self.certificates_page.get_course_number_override()
+        self.assertEqual(self.course_advanced_settings['Course Number Display String'], course_number_override)

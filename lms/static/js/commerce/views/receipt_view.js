@@ -10,10 +10,14 @@ var edx = edx || {};
 
     edx.commerce.ReceiptView = Backbone.View.extend({
         useEcommerceApi: true,
+        ecommerceBasketId: null,
+        ecommerceOrderNumber: null,
 
         initialize: function () {
-            this.useEcommerceApi = !!($.url('?basket_id'));
-            _.bindAll(this, 'renderReceipt', 'renderError');
+            this.ecommerceBasketId = $.url('?basket_id');
+            this.ecommerceOrderNumber = $.url('?orderNum');
+            this.useEcommerceApi = this.ecommerceBasketId || this.ecommerceOrderNumber;
+            _.bindAll(this, 'renderReceipt', 'renderError', 'getProviderData', 'renderProvider', 'getCourseData');
 
             /* Mix non-conflicting functions from underscore.string (all but include, contains, and reverse) into
              * the Underscore namespace.
@@ -28,17 +32,44 @@ var edx = edx || {};
                 context = {
                     platformName: this.$el.data('platform-name'),
                     verified: this.$el.data('verified').toLowerCase() === 'true'
-                };
+                },
+                providerId;
 
             // Add the receipt info to the template context
+            this.courseKey = this.getOrderCourseKey(data);
+            this.username = this.$el.data('username');
             _.extend(context, {
                 receipt: this.receiptContext(data),
-                courseKey: this.getOrderCourseKey(data)
+                courseKey: this.courseKey
             });
 
             this.$el.html(_.template(templateHtml, context));
 
             this.trackLinks();
+
+            this.renderCourseNamePlaceholder(this.courseKey);
+
+            providerId = this.getCreditProviderId(data);
+            if (providerId) {
+                this.getProviderData(providerId).then(this.renderProvider, this.renderError)
+            }
+        },
+        renderCourseNamePlaceholder: function (courseId) {
+            // Display the course Id or name (if available) in the placeholder
+            var $courseNamePlaceholder = $(".course_name_placeholder");
+            $courseNamePlaceholder.text(courseId);
+
+            this.getCourseData(courseId).then(function (responseData) {
+                $courseNamePlaceholder.text(responseData.name);
+            });
+        },
+        renderProvider: function (context) {
+            var templateHtml = $("#provider-tpl").html(),
+                providerDiv = this.$el.find("#receipt-provider");
+            context.course_key = this.courseKey;
+            context.username = this.username;
+            context.platformName = this.$el.data('platform-name');
+            providerDiv.html(_.template(templateHtml, context)).removeClass('hidden');
         },
 
         renderError: function () {
@@ -48,9 +79,9 @@ var edx = edx || {};
 
         render: function () {
             var self = this,
-                orderId = $.url('?basket_id') || $.url('?payment-order-num');
+                orderId = this.ecommerceOrderNumber || this.ecommerceBasketId || $.url('?payment-order-num');
 
-            if (orderId && this.$el.data('is-payment-complete')==='True') {
+            if (orderId && this.$el.data('is-payment-complete') === 'True') {
                 // Get the order details
                 self.$el.removeClass('hidden');
                 self.getReceiptData(orderId).then(self.renderReceipt, self.renderError);
@@ -79,17 +110,55 @@ var edx = edx || {};
 
         /**
          * Retrieve receipt data from Oscar (via LMS).
-         * @param  {int} basketId The basket that was purchased.
-         * @return {object}                 JQuery Promise.
+         * @param  {string} orderId Identifier of the order that was purchased.
+         * @return {object} JQuery Promise.
          */
-        getReceiptData: function (basketId) {
-            var urlFormat = this.useEcommerceApi ? '/commerce/baskets/%s/order/' : '/shoppingcart/receipt/%s/';
+        getReceiptData: function (orderId) {
+            var urlFormat = '/shoppingcart/receipt/%s/';
+
+            if (this.ecommerceOrderNumber) {
+                urlFormat = '/api/commerce/v1/orders/%s/';
+            } else if (this.ecommerceBasketId){
+                urlFormat = '/api/commerce/v0/baskets/%s/order/';
+            }
+
 
             return $.ajax({
-                url: _.sprintf(urlFormat, basketId),
+                url: _.sprintf(urlFormat, orderId),
                 type: 'GET',
                 dataType: 'json'
             }).retry({times: 5, timeout: 2000, statusCodes: [404]});
+        },
+        /**
+         * Retrieve credit provider data from LMS.
+         * @param  {string} providerId The providerId of the credit provider.
+         * @return {object} JQuery Promise.
+         */
+        getProviderData: function (providerId) {
+            var providerUrl = '/api/credit/v1/providers/%s/';
+
+            return $.ajax({
+                url: _.sprintf(providerUrl, providerId),
+                type: 'GET',
+                dataType: 'json',
+                contentType: 'application/json',
+                headers: {
+                    'X-CSRFToken': $.cookie('csrftoken')
+                }
+            }).retry({times: 5, timeout: 2000, statusCodes: [404]});
+        },
+        /**
+         * Retrieve course data from LMS.
+         * @param  {string} courseId The courseId of the course.
+         * @return {object} JQuery Promise.
+         */
+        getCourseData: function (courseId) {
+            var courseDetailUrl = '/api/course_structure/v0/courses/%s/';
+            return $.ajax({
+                url: _.sprintf(courseDetailUrl, courseId),
+                type: 'GET',
+                dataType: 'json'
+            });
         },
 
         /**
@@ -97,7 +166,7 @@ var edx = edx || {};
          * from the E-Commerce API.
          *
          * @param  {object} order Receipt data received from the server
-         * @return {object}      Receipt template context.
+         * @return {object} Receipt template context.
          */
         receiptContext: function (order) {
             var self = this,
@@ -114,7 +183,7 @@ var edx = edx || {};
                     billedTo: null
                 };
 
-                if (order.billing_address){
+                if (order.billing_address) {
                     receiptContext.billedTo = {
                         firstName: order.billing_address.first_name,
                         lastName: order.billing_address.last_name,
@@ -172,13 +241,13 @@ var edx = edx || {};
                 length = order.lines.length;
                 for (var i = 0; i < length; i++) {
                     var line = order.lines[i],
-                        attribute_values = _.filter(line.product.attribute_values, function (attribute) {
+                        attributeValues = _.find(line.product.attribute_values, function (attribute) {
                             return attribute.name === 'course_key'
                         });
 
                     // This method assumes that all items in the order are related to a single course.
-                    if (attribute_values.length > 0) {
-                        return attribute_values[0]['value'];
+                    if (attributeValues != undefined) {
+                        return attributeValues['value'];
                     }
                 }
             } else {
@@ -196,6 +265,29 @@ var edx = edx || {};
 
         formatMoney: function (moneyStr) {
             return Number(moneyStr).toFixed(2);
+        },
+
+        /**
+         * Check whether the payment is for the credit course or not.
+         *
+         * @param  {object} order Receipt data received from the server
+         * @return {string} String of the provider_id or null.
+         */
+        getCreditProviderId: function (order) {
+            var attributeValues,
+                line = order.lines[0];
+            if (this.useEcommerceApi) {
+                attributeValues = _.find(line.product.attribute_values, function (attribute) {
+                    return attribute.name === 'credit_provider';
+                });
+
+                // This method assumes that all items in the order are related to a single course.
+                if (attributeValues != undefined) {
+                    return attributeValues['value'];
+                }
+            }
+
+            return null;
         }
     });
 
@@ -204,3 +296,28 @@ var edx = edx || {};
     });
 
 })(jQuery, _, _.str, Backbone);
+
+function completeOrder(event) {     // jshint ignore:line
+    var courseKey = $(event).data("course-key"),
+        username = $(event).data("username"),
+        providerId = $(event).data("provider"),
+        $errorContainer = $("#error-container");
+
+    try {
+        event.preventDefault();
+    } catch (err) {
+        // Ignore the error as not all event inputs have the preventDefault method.
+    }
+
+    analytics.track(
+        "edx.bi.credit.clicked_complete_credit",
+        {
+            category: "credit",
+            label: courseKey
+        }
+    );
+
+    edx.commerce.credit.createCreditRequest(providerId, courseKey, username).fail(function () {
+        $errorContainer.removeClass("hidden");
+    });
+}

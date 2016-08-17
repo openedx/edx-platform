@@ -22,8 +22,8 @@ from uuid import uuid4
 from bson.son import SON
 from datetime import datetime
 from fs.osfs import OSFS
-from mongodb_proxy import MongoProxy, autoretry_read
-from path import path
+from mongodb_proxy import autoretry_read
+from path import Path as path
 from pytz import UTC
 from contracts import contract, new_contract
 
@@ -43,6 +43,7 @@ from xmodule.error_module import ErrorDescriptor
 from xmodule.errortracker import null_error_tracker, exc_info_to_str
 from xmodule.exceptions import HeartbeatFailure
 from xmodule.mako_module import MakoDescriptorSystem
+from xmodule.mongo_connection import connect_to_mongodb
 from xmodule.modulestore import ModuleStoreWriteBase, ModuleStoreEnum, BulkOperationsMixin, BulkOpsRecord
 from xmodule.modulestore.draft_and_published import ModuleStoreDraftAndPublished, DIRECT_ONLY_CATEGORIES
 from xmodule.modulestore.edit_info import EditInfoRuntimeMixin
@@ -558,22 +559,16 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
             """
             Create & open the connection, authenticate, and provide pointers to the collection
             """
-            # Remove the replicaSet parameter.
-            kwargs.pop('replicaSet', None)
+            # Set a write concern of 1, which makes writes complete successfully to the primary
+            # only before returning. Also makes pymongo report write errors.
+            kwargs['w'] = 1
 
-            self.database = MongoProxy(
-                pymongo.database.Database(
-                    pymongo.MongoClient(
-                        host=host,
-                        port=port,
-                        tz_aware=tz_aware,
-                        document_class=dict,
-                        **kwargs
-                    ),
-                    db
-                ),
-                wait_time=retry_wait_time
+            self.database = connect_to_mongodb(
+                db, host,
+                port=port, tz_aware=tz_aware, user=user, password=password,
+                retry_wait_time=retry_wait_time, **kwargs
             )
+
             self.collection = self.database[collection]
 
             # Collection which stores asset metadata.
@@ -581,13 +576,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
                 asset_collection = self.DEFAULT_ASSET_COLLECTION_NAME
             self.asset_collection = self.database[asset_collection]
 
-            if user is not None and password is not None:
-                self.database.authenticate(user, password)
-
         do_connection(**doc_store_config)
-
-        # Force mongo to report errors, at the expense of performance
-        self.collection.write_concern = {'w': 1}
 
         if default_class is not None:
             module_path, _, class_name = default_class.rpartition('.')
@@ -1012,6 +1001,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         )
         return [course for course in base_list if not isinstance(course, ErrorDescriptor)]
 
+    @autoretry_read()
     def _find_one(self, location):
         '''Look for a given location in the collection. If the item is not present, raise
         ItemNotFoundError.
@@ -1033,6 +1023,13 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         """
         return CourseLocator(org, course, run, deprecated=True)
 
+    def make_course_usage_key(self, course_key):
+        """
+        Return a valid :class:`~opaque_keys.edx.keys.UsageKey` for this modulestore
+        that matches the supplied course_key.
+        """
+        return BlockUsageLocator(course_key, 'course', course_key.run)
+
     def get_course(self, course_key, depth=0, **kwargs):
         """
         Get the course with the given courseid (org/course/run)
@@ -1045,6 +1042,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         except ItemNotFoundError:
             return None
 
+    @autoretry_read()
     def has_course(self, course_key, ignore_case=False, **kwargs):
         """
         Returns the course_id of the course if it was found, else None
@@ -1066,7 +1064,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
                     course_query[key] = re.compile(r"(?i)^{}$".format(course_query[key]))
         else:
             course_query = {'_id': location.to_deprecated_son()}
-        course = self.collection.find_one(course_query, fields={'_id': True})
+        course = self.collection.find_one(course_query, projection={'_id': True})
         if course:
             return SlashSeparatedCourseKey(course['_id']['org'], course['_id']['course'], course['_id']['name'])
         else:
@@ -1227,7 +1225,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
             ('_id.course', re.compile(u'^{}$'.format(course_id.course), re.IGNORECASE)),
             ('_id.category', 'course'),
         ])
-        courses = self.collection.find(course_search_location, fields=('_id'))
+        courses = self.collection.find(course_search_location, projection={'_id': True})
         if courses.count() > 0:
             raise DuplicateCourseError(course_id, courses[0]['_id'])
 
@@ -1877,7 +1875,6 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         )
         return 1
 
-    # pylint: disable=unused-argument
     @contract(course_key='CourseKey', user_id='int|long')
     def delete_all_asset_metadata(self, course_key, user_id):
         """
@@ -1914,21 +1911,25 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         """
 
         # Because we often query for some subset of the id, we define this index:
-        self.collection.create_index([
-            ('_id.org', pymongo.ASCENDING),
-            ('_id.course', pymongo.ASCENDING),
-            ('_id.category', pymongo.ASCENDING),
-            ('_id.name', pymongo.ASCENDING),
-        ])
+        self.collection.create_index(
+            [
+                ('_id.tag', pymongo.ASCENDING),
+                ('_id.org', pymongo.ASCENDING),
+                ('_id.course', pymongo.ASCENDING),
+                ('_id.category', pymongo.ASCENDING),
+                ('_id.name', pymongo.ASCENDING),
+                ('_id.revision', pymongo.ASCENDING),
+            ],
+            background=True)
 
         # Because we often scan for all category='course' regardless of the value of the other fields:
-        self.collection.create_index('_id.category')
+        self.collection.create_index('_id.category', background=True)
 
         # Because lms calls get_parent_locations frequently (for path generation):
-        self.collection.create_index('definition.children', sparse=True)
+        self.collection.create_index('definition.children', sparse=True, background=True)
 
         # To allow prioritizing draft vs published material
-        self.collection.create_index('_id.revision')
+        self.collection.create_index('_id.revision', background=True)
 
     # Some overrides that still need to be implemented by subclasses
     def convert_to_draft(self, location, user_id):

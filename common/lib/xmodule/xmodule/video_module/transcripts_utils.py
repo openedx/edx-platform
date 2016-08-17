@@ -99,7 +99,6 @@ def youtube_video_transcript_name(youtube_text_api):
     Get the transcript name from available transcripts of video
     with respect to language from youtube server
     """
-    # pylint: disable=no-member
     utf8_parser = etree.XMLParser(encoding='utf-8')
 
     transcripts_param = {'type': 'list', 'v': youtube_text_api['params']['v']}
@@ -109,7 +108,6 @@ def youtube_video_transcript_name(youtube_text_api):
     # http://video.google.com/timedtext?type=list&v={VideoId}
     youtube_response = requests.get('http://' + youtube_text_api['url'], params=transcripts_param)
     if youtube_response.status_code == 200 and youtube_response.text:
-        # pylint: disable=no-member
         youtube_data = etree.fromstring(youtube_response.content, parser=utf8_parser)
         # iterate all transcripts information from youtube server
         for element in youtube_data:
@@ -385,7 +383,8 @@ def manage_video_subtitles_save(item, user, old_metadata=None, generate_translat
                     lang,
                 )
             except TranscriptException as ex:
-                item.transcripts.pop(lang)  # remove key from transcripts because proper srt file does not exist in assets.
+                # remove key from transcripts because proper srt file does not exist in assets.
+                item.transcripts.pop(lang)
                 reraised_message += ' ' + ex.message
         if reraised_message:
             item.save_with_metadata(user)
@@ -462,7 +461,7 @@ def get_or_create_sjson(item, transcripts):
     source_subs_id, result_subs_dict = user_subs_id, {1.0: user_subs_id}
     try:
         sjson_transcript = Transcript.asset(item.location, source_subs_id, item.transcript_language).data
-    except (NotFoundError):  # generating sjson from srt
+    except NotFoundError:  # generating sjson from srt
         generate_sjson_for_all_speeds(item, user_filename, result_subs_dict, item.transcript_language)
     sjson_transcript = Transcript.asset(item.location, source_subs_id, item.transcript_language).data
     return sjson_transcript

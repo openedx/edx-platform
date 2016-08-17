@@ -187,14 +187,16 @@
       > .credit-eligibility-container {
           padding: lh();
         > .credit-help {
+          display: inline-block;
           background: $blue;
           color: $white;
-          width: lh();
+          width: lh(0.6);
           margin: 0;
           padding: 0;
           border-radius: lh(0.9);
           border-color: $white;
           text-shadow: None;
+          @include padding-left(0.2em);
         }
         > .detail-collapse{
           border: none;

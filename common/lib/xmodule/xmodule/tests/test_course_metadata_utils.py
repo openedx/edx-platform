@@ -6,7 +6,6 @@ from datetime import timedelta, datetime
 from unittest import TestCase
 
 from django.utils.timezone import UTC
-from django.utils.translation import ugettext
 
 from xmodule.course_metadata_utils import (
     clean_course_key,
@@ -22,7 +21,7 @@ from xmodule.course_metadata_utils import (
     may_certify_for_course,
 )
 from xmodule.fields import Date
-from xmodule.modulestore.tests.test_cross_modulestore_import_export import (
+from xmodule.modulestore.tests.utils import (
     MongoModulestoreBuilder,
     VersioningModulestoreBuilder,
     MixedModulestoreBuilder
@@ -105,6 +104,10 @@ class CourseMetadataUtilsTestCase(TestCase):
             else:
                 raise ValueError("Invalid format string :" + format_string)
 
+        def nop_gettext(text):
+            """Dummy implementation of gettext, so we don't need Django."""
+            return text
+
         test_datetime = datetime(1945, 02, 06, 04, 20, 00, tzinfo=UTC())
         advertised_start_parsable = "2038-01-19 03:14:07"
         advertised_start_bad_date = "215-01-01 10:10:10"
@@ -158,36 +161,34 @@ class CourseMetadataUtilsTestCase(TestCase):
                 # Test parsable advertised start date.
                 # Expect start datetime to be parsed and formatted back into a string.
                 TestScenario(
-                    (DEFAULT_START_DATE, advertised_start_parsable, 'DATE_TIME', ugettext, mock_strftime_localized),
+                    (DEFAULT_START_DATE, advertised_start_parsable, 'DATE_TIME', nop_gettext, mock_strftime_localized),
                     mock_strftime_localized(Date().from_json(advertised_start_parsable), 'DATE_TIME') + " UTC"
                 ),
                 # Test un-parsable advertised start date.
                 # Expect date parsing to throw a ValueError, and the advertised
                 # start to be returned in Title Case.
                 TestScenario(
-                    (test_datetime, advertised_start_unparsable, 'DATE_TIME', ugettext, mock_strftime_localized),
+                    (test_datetime, advertised_start_unparsable, 'DATE_TIME', nop_gettext, mock_strftime_localized),
                     advertised_start_unparsable.title()
                 ),
                 # Test parsable advertised start date from before January 1, 1900.
                 # Expect mock_strftime_localized to throw a ValueError, and the
                 # advertised start to be returned in Title Case.
                 TestScenario(
-                    (test_datetime, advertised_start_bad_date, 'DATE_TIME', ugettext, mock_strftime_localized),
+                    (test_datetime, advertised_start_bad_date, 'DATE_TIME', nop_gettext, mock_strftime_localized),
                     advertised_start_bad_date.title()
                 ),
                 # Test without advertised start date, but with a set start datetime.
                 # Expect formatted datetime to be returned.
                 TestScenario(
-                    (test_datetime, None, 'SHORT_DATE', ugettext, mock_strftime_localized),
+                    (test_datetime, None, 'SHORT_DATE', nop_gettext, mock_strftime_localized),
                     mock_strftime_localized(test_datetime, 'SHORT_DATE')
                 ),
                 # Test without advertised start date and with default start datetime.
                 # Expect TBD to be returned.
                 TestScenario(
-                    (DEFAULT_START_DATE, None, 'SHORT_DATE', ugettext, mock_strftime_localized),
-                    # Translators: TBD stands for 'To Be Determined' and is used when a course
-                    # does not yet have an announced start date.
-                    ugettext('TBD')
+                    (DEFAULT_START_DATE, None, 'SHORT_DATE', nop_gettext, mock_strftime_localized),
+                    'TBD'
                 )
             ]),
             FunctionTest(course_end_datetime_text, [

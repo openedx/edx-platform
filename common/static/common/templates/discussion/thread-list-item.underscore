@@ -1,0 +1,97 @@
+<li data-id="<%- id %>" class="forum-nav-thread<% if (typeof(read) != "undefined" && !read) { %> is-unread<% } %>">
+  <a href="#" class="forum-nav-thread-link">
+    <div class="forum-nav-thread-wrapper-0">
+      <%
+      var icon_class, sr_text;
+      if (thread_type === "discussion") {
+          icon_class = "fa-comments";
+          // Translators: This is a label for a Discussion forum thread
+          sr_text = gettext("discussion");
+      } else if (endorsed) {
+          icon_class = "fa-check-square-o";
+          // Translators: This is a label for a Question forum thread with a marked answer
+          sr_text = gettext("answered question");
+      } else {
+          icon_class = "fa-question";
+          // Translators: This is a label for a Question forum thread without a marked answer
+          sr_text = gettext("unanswered question");
+      }
+      %>
+      <span class="sr"><%= sr_text %></span>
+      <i class="icon fa <%= icon_class %>"></i>
+    </div><div class="forum-nav-thread-wrapper-1">
+      <span class="forum-nav-thread-title"><%- title %></span>
+      <% if(typeof(subscribed) === "undefined") { var subscribed = null; } %>
+      <% if(pinned || subscribed || staff_authored || community_ta_authored) { %>
+        <ul class="forum-nav-thread-labels">
+        <% if (pinned) { %>
+          <li class="post-label-pinned">
+            <i class="icon fa fa-thumb-tack"></i>
+            <% // Translators: This is a label for a forum thread that has been pinned %>
+            <%- gettext("Pinned") %>
+          </li>
+        <% } %>
+        <% if (subscribed) { %>
+          <li class="post-label-following">
+            <i class="icon fa fa-star"></i>
+            <% // Translators: This is a label for a forum thread that the user is subscribed to %>
+            <%- gettext("Following") %>
+          </li>
+        <% } %>
+        <% if (staff_authored) { %>
+          <li class="post-label-by-staff">
+            <i class="icon fa fa-user"></i>
+            <% // Translators: This is a label for a forum thread that was authored by a member of the course staff %>
+            <%- gettext("By: Staff") %>
+          </li>
+        <% } %>
+        <% if (community_ta_authored) { %>
+          <li class="post-label-by-community-ta">
+            <i class="icon fa fa-user"></i>
+            <% // Translators: This is a label for a forum thread that was authored by a community TA %>
+            <%- gettext("By: Community TA") %>
+          </li>
+        <% } %>
+        </ul>
+      <% } %>
+    </div><div class="forum-nav-thread-wrapper-2">
+      <%
+      // Translators: 'votes_count' is a numerical placeholder for a specific discussion thread; 'span_start' and 'span_end' placeholders refer to HTML markup.  Please translate the word 'votes'.
+      var fmt = ngettext(
+           "%(votes_count)s%(span_start)s vote %(span_end)s",
+           "%(votes_count)s%(span_start)s votes %(span_end)s",
+           votes['up_count']
+      );
+      %>
+      <span class="forum-nav-thread-votes-count">
+      +<%= interpolate(fmt, {
+               votes_count: votes['up_count'],
+               span_start: '<span class="sr">',
+               span_end: '</span>'
+            }, true)
+      %>
+      </span>
+
+      <span class="forum-nav-thread-comments-count <% if (unread_comments_count > 0) { %>is-unread<% } %>">
+      <%
+      var fmt;
+      // Counts in data do not include the post itself, but the UI should
+      var data = {
+          'span_sr_open': '<span class="sr">',
+          'span_close': '</span>',
+          'unread_comments_count': unread_comments_count + (read ? 0 : 1),
+          'comments_count': comments_count + 1
+      };
+      if (unread_comments_count > 0) {
+          // Translators: 'comments_count' and 'unread_comments_count' are numerical placeholders for a specific discussion thread; 'span_*' placeholders refer to HTML markup.  Please translate the word 'comments'.
+          fmt = gettext('%(comments_count)s %(span_sr_open)scomments (%(unread_comments_count)s unread comments)%(span_close)s');
+      } else {
+          // Translators: 'comments_count' is a numerical placeholder for a specific discussion thread; 'span_*' placeholders refer to HTML markup.  Please translate the word 'comments'.
+          fmt = gettext('%(comments_count)s %(span_sr_open)scomments %(span_close)s');
+      }
+      print(interpolate(fmt, data, true));
+      %>
+      </span>
+    </div>
+  </a>
+</li>

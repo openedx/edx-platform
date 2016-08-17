@@ -1,13 +1,12 @@
 ####################################
-Mobile User API
+Mobile API User Resource
 ####################################
 
-This page describes how to use the Mobile User API to complete
-these actions:
+With the Mobile API **User** resource, you can complete the following tasks.
 
-* `Get User Details`_
-* `Get a User's Course Enrollments`_
-* `Get or Change User Status in a Course`_
+.. contents::
+   :local:
+   :depth: 1
 
 .. _Get User Details:
 
@@ -69,7 +68,8 @@ Get a User's Course Enrollments
             "name": "edX Demonstration Course", 
             "course_handouts": "http://localhost:8000/api/mobile/v0.5/course_info/edX/Open_DemoX/edx_demo_course/handouts", 
             "start": "1970-01-01T05:00:00Z", 
-            "course_image": "/c4x/edX/Open_DemoX/asset/images_course_image.jpg"
+            "course_image": "/c4x/edX/Open_DemoX/asset/images_course_image.jpg",
+            "discussion_url": "http://localhost:8000/api/discussion/v1/courses/course-v1:edX/Open_DemoX/edx_demo_course"
         }
     }, 
     {
@@ -90,7 +90,8 @@ Get a User's Course Enrollments
             "name": "edX Demonstration Course", 
             "course_handouts": "http://localhost:8000/api/mobile/v0.5/course_info/edX/DemoX/Demo_Course/handouts", 
             "start": "2013-02-05T05:00:00Z", 
-            "course_image": "/c4x/edX/DemoX/asset/images_course_image.jpg"
+            "course_image": "/c4x/edX/DemoX/asset/images_course_image.jpg",
+            "discussion_url": "http://localhost:8000/api/discussion/v1/courses/course-v1:edX/DemoX/Demo_Course",
         }
     }
 

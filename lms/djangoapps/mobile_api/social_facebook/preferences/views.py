@@ -39,9 +39,9 @@ class UserSharing(generics.ListCreateAPIView):
     serializer_class = serializers.UserSharingSerializar
 
     def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.DATA, files=request.FILES)
+        serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
-            value = serializer.object['share_with_facebook_friends']
+            value = serializer.data['share_with_facebook_friends']
             set_user_preference(request.user, "share_with_facebook_friends", value)
             return self.get(request, *args, **kwargs)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

@@ -1,7 +1,7 @@
 <%!
 import json
 from django.utils.translation import ugettext as _
-from verify_student.views import PayAndVerifyView
+from lms.djangoapps.verify_student.views import PayAndVerifyView
 %>
 <%namespace name='static' file='../static_content.html'/>
 
@@ -10,13 +10,13 @@ from verify_student.views import PayAndVerifyView
 
 <%block name="pagetitle">
   % if message_key == PayAndVerifyView.UPGRADE_MSG:
-    ${_("Upgrade Your Enrollment For {course_name}.").format(course_name=course.display_name)}
+    ${_("Upgrade Your Enrollment For {course_name}.").format(course_name=course.display_name) | h}
   % elif message_key == PayAndVerifyView.PAYMENT_CONFIRMATION_MSG:
-    ${_("Receipt For {course_name}").format(course_name=course.display_name)}
+    ${_("Receipt For {course_name}").format(course_name=course.display_name) | h}
   % elif message_key in [PayAndVerifyView.VERIFY_NOW_MSG, PayAndVerifyView.VERIFY_LATER_MSG]:
-    ${_("Verify For {course_name}").format(course_name=course.display_name)}
+    ${_("Verify For {course_name}").format(course_name=course.display_name) | h}
   % else:
-    ${_("Enroll In {course_name}").format(course_name=course.display_name)}
+    ${_("Enroll In {course_name}").format(course_name=course.display_name) | h}
   % endif
 </%block>
 
@@ -24,9 +24,15 @@ from verify_student.views import PayAndVerifyView
     <%
       template_names = (
           ["webcam_photo", "image_input", "error"] +
-          ["intro_step", "make_payment_step", "payment_confirmation_step"] +
+          ["intro_step", "payment_confirmation_step"] +
           ["face_photo_step", "id_photo_step", "review_photos_step", "enrollment_confirmation_step"]
       )
+
+      if not is_ab_testing:
+        template_names.append("make_payment_step")
+      else:
+        template_names.append("make_payment_step_ab_testing")
+
     %>
     % for template_name in template_names:
         <script type="text/template" id="${template_name}-tpl">
@@ -35,10 +41,7 @@ from verify_student.views import PayAndVerifyView
     % endfor
 </%block>
 <%block name="js_extra">
-  <%static:js group='rwd_header'/>
-  <script src="${static.url('js/vendor/underscore-min.js')}"></script>
   <script src="${static.url('js/vendor/underscore.string.min.js')}"></script>
-  <script src="${static.url('js/vendor/backbone-min.js')}"></script>
   <script src="${static.url('js/src/tooltip_manager.js')}"></script>
   <%static:js group='verify_student'/>
 </%block>
@@ -56,7 +59,7 @@ from verify_student.views import PayAndVerifyView
     <div
       id="pay-and-verify-container"
       class="pay-and-verify"
-      data-full-name='${user_full_name}'
+      data-full-name='${user_full_name | h}'
       data-platform-name='${platform_name}'
       data-course-key='${course_key}'
       data-course-name='${course.display_name|h}'
@@ -65,12 +68,13 @@ from verify_student.views import PayAndVerifyView
       data-course-mode-name='${course_mode.name}'
       data-course-mode-slug='${course_mode.slug}'
       data-course-mode-min-price='${course_mode.min_price}'
+      data-course-mode-sku='${course_mode.sku or ''}'
       data-course-mode-suggested-prices='${course_mode.suggested_prices}'
       data-course-mode-currency='${course_mode.currency}'
       data-contribution-amount='${contribution_amount}'
       data-processors='${json.dumps(processors)}'
       data-verification-deadline='${verification_deadline}'
-      data-display-steps='${json.dumps(display_steps)}'
+      data-display-steps='${json.dumps(display_steps) | h}'
       data-current-step='${current_step}'
       data-requirements='${json.dumps(requirements)}'
       data-msg-key='${message_key}'
@@ -78,6 +82,14 @@ from verify_student.views import PayAndVerifyView
       data-already-verified='${already_verified}'
       data-verification-good-until='${verification_good_until}'
       data-capture-sound='${capture_sound}'
+      data-is-ab-testing='${json.dumps(is_ab_testing)}'
+
+      ## If we reached the verification flow from an in-course checkpoint,
+      ## then pass the checkpoint location in so that we can associate
+      ## the attempt with the checkpoint on submission.
+      % if checkpoint_location is not None:
+        data-checkpoint-location='${checkpoint_location}'
+      % endif
     ></div>
 
     % if is_active:

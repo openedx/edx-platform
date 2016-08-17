@@ -12,15 +12,16 @@ from django.utils.translation import ugettext as _
 <script type="text/template" id="receipt-tpl">
     <%static:include path="commerce/receipt.underscore" />
 </script>
+<script type="text/template" id="provider-tpl">
+    <%static:include path="commerce/provider.underscore" />
+</script>
 
 </%block>
 <%block name="js_extra">
-<%static:js group='rwd_header'/>
 <script src="${static.url('js/vendor/jquery.ajax-retry.js')}"></script>
-<script src="${static.url('js/vendor/underscore-min.js')}"></script>
 <script src="${static.url('js/vendor/underscore.string.min.js')}"></script>
-<script src="${static.url('js/vendor/backbone-min.js')}"></script>
 <script src="${static.url('js/src/tooltip_manager.js')}"></script>
+<script src="${static.url('js/commerce/credit.js')}"></script>
 <script src="${static.url('js/commerce/views/receipt_view.js')}"></script>
 </%block>
 
@@ -29,17 +30,18 @@ from django.utils.translation import ugettext as _
     <div id="error" class="wrapper-msg wrapper-msg-activate">
         <div class=" msg msg-activate">
             <i class="msg-icon icon fa fa-exclamation-triangle" aria-hidden="true"></i>
+
             <div class="msg-content">
                 <h3 class="title">
                     <span class="sr">${error_summary}</span>
                     ${error_summary}
                 </h3>
-%if error_text:
+                %if error_text:
                 <div class="copy">
                     <p>${error_text}</p>
                     <br/>
                 </div>
-%endif
+                %endif
                 <div class="msg">
                     <p>${for_help_text}</p>
                 </div>
@@ -50,7 +52,8 @@ from django.utils.translation import ugettext as _
 
 <div class="container">
     <section class="wrapper carousel">
-        <div id="receipt-container" class="pay-and-verify hidden" data-is-payment-complete='${is_payment_complete}' data-platform-name='${platform_name}' data-verified='${verified}'>
+        <div id="receipt-container" class="pay-and-verify hidden" data-is-payment-complete='${is_payment_complete}'
+             data-platform-name='${platform_name}' data-verified='${verified}' data-username='${username}'>
             <h1>${_("Loading Order Data...")}</h1>
             <span>${ _("Please wait while we retrieve your order details.") }</span>
         </div>

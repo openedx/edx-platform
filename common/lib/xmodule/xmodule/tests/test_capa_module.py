@@ -63,7 +63,7 @@ class CapaFactory(object):
         """
         Return the input key to use when passing GET parameters
         """
-        return ("input_" + cls.answer_key(response_num, input_num))
+        return "input_" + cls.answer_key(response_num, input_num)
 
     @classmethod
     def answer_key(cls, response_num=2, input_num=1):
@@ -449,15 +449,14 @@ class CapaModuleTest(unittest.TestCase):
         # and that we get the same values back
         for key in result.keys():
             original_key = "input_" + key
-            self.assertTrue(original_key in valid_get_dict,
-                            "Output dict should have key %s" % original_key)
+            self.assertIn(original_key, valid_get_dict, "Output dict should have key %s" % original_key)
             self.assertEqual(valid_get_dict[original_key], result[key])
 
         # Valid GET param dict with list keys
         # Each tuple represents a single parameter in the query string
         valid_get_dict = MultiDict((('input_2[]', 'test1'), ('input_2[]', 'test2')))
         result = CapaModule.make_dict_of_responses(valid_get_dict)
-        self.assertTrue('2' in result)
+        self.assertIn('2', result)
         self.assertEqual(['test1', 'test2'], result['2'])
 
         # If we use [] at the end of a key name, we should always
@@ -730,7 +729,7 @@ class CapaModuleTest(unittest.TestCase):
             result = module.check_problem(get_request_dict)
 
         # Expect an AJAX alert message in 'success'
-        self.assertTrue(error_msg in result['success'])
+        self.assertIn(error_msg, result['success'])
 
     def test_check_problem_error_nonascii(self):
 
@@ -781,10 +780,10 @@ class CapaModuleTest(unittest.TestCase):
                 result = module.check_problem(get_request_dict)
 
             # Expect an AJAX alert message in 'success'
-            self.assertTrue('test error' in result['success'])
+            self.assertIn('test error', result['success'])
 
             # We DO include traceback information for staff users
-            self.assertTrue('Traceback' in result['success'])
+            self.assertIn('Traceback', result['success'])
 
             # Expect that the number of attempts is NOT incremented
             self.assertEqual(module.attempts, 1)
@@ -806,7 +805,7 @@ class CapaModuleTest(unittest.TestCase):
         self.assertTrue('success' in result and result['success'])
 
         # Expect that the problem HTML is retrieved
-        self.assertTrue('html' in result)
+        self.assertIn('html', result)
         self.assertEqual(result['html'], "<div>Test HTML</div>")
 
         # Expect that the problem was reset
@@ -852,7 +851,7 @@ class CapaModuleTest(unittest.TestCase):
         self.assertEqual(result['success'], 'correct')
 
         # Expect that we get no HTML
-        self.assertFalse('contents' in result)
+        self.assertNotIn('contents', result)
 
         # Expect that the number of attempts is not incremented
         self.assertEqual(module.attempts, 1)
@@ -1263,7 +1262,7 @@ class CapaModuleTest(unittest.TestCase):
         self.assertEqual(bool(context['save_button']), show_save_button)
 
         # Assert that the encapsulated html contains the original html
-        self.assertTrue(html in html_encapsulated)
+        self.assertIn(html, html_encapsulated)
 
     demand_xml = """
         <problem>
@@ -1355,7 +1354,7 @@ class CapaModuleTest(unittest.TestCase):
         # Check the rendering context
         render_args, _ = module.system.render_template.call_args
         context = render_args[1]
-        self.assertTrue("error" in context['problem']['html'])
+        self.assertIn("error", context['problem']['html'])
 
         # Expect that the module has created a new dummy problem with the error
         self.assertNotEqual(original_problem, module.lcp)
@@ -1385,7 +1384,7 @@ class CapaModuleTest(unittest.TestCase):
         # Check the rendering context
         render_args, _ = module.system.render_template.call_args
         context = render_args[1]
-        self.assertTrue(error_msg in context['problem']['html'])
+        self.assertIn(error_msg, context['problem']['html'])
 
     @ddt.data(
         'false',
@@ -1707,6 +1706,363 @@ class CapaModuleTest(unittest.TestCase):
 
 @ddt.ddt
 class CapaDescriptorTest(unittest.TestCase):
+
+    sample_checkbox_problem_xml = textwrap.dedent("""
+        <problem>
+            <p>Title</p>
+
+            <p>Description</p>
+
+            <p>Example</p>
+
+            <p>The following languages are in the Indo-European family:</p>
+            <choiceresponse>
+              <checkboxgroup label="The following languages are in the Indo-European family:">
+                <choice correct="true">Urdu</choice>
+                <choice correct="false">Finnish</choice>
+                <choice correct="true">Marathi</choice>
+                <choice correct="true">French</choice>
+                <choice correct="false">Hungarian</choice>
+              </checkboxgroup>
+            </choiceresponse>
+
+            <p>Note: Make sure you select all of the correct options—there may be more than one!</p>
+
+            <solution>
+            <div class="detailed-solution">
+            <p>Explanation</p>
+
+            <p>Solution for CAPA problem</p>
+
+            </div>
+            </solution>
+
+        </problem>
+    """)
+
+    sample_dropdown_problem_xml = textwrap.dedent("""
+        <problem>
+            <p>Dropdown problems allow learners to select only one option from a list of options.</p>
+
+            <p>Description</p>
+
+            <p>You can use the following example problem as a model.</p>
+
+            <p> Which of the following countries celebrates its independence on August 15?</p>
+
+
+            <optionresponse>
+              <optioninput label="lbl" options="('India','Spain','China','Bermuda')" correct="India"></optioninput>
+            </optionresponse>
+
+             <solution>
+            <div class="detailed-solution">
+            <p>Explanation</p>
+
+            <p> India became an independent nation on August 15, 1947.</p>
+
+            </div>
+            </solution>
+
+        </problem>
+    """)
+
+    sample_multichoice_problem_xml = textwrap.dedent("""
+        <problem>
+            <p>Multiple choice problems allow learners to select only one option.</p>
+
+            <p>When you add the problem, be sure to select Settings to specify a Display Name and other values.</p>
+
+            <p>You can use the following example problem as a model.</p>
+
+            <p>Which of the following countries has the largest population?</p>
+            <multiplechoiceresponse>
+              <choicegroup label="Which of the following countries has the largest population?" type="MultipleChoice">
+                <choice correct="false">Brazil
+                    <choicehint>timely feedback -- explain why an almost correct answer is wrong</choicehint>
+                </choice>
+                <choice correct="false">Germany</choice>
+                <choice correct="true">Indonesia</choice>
+                <choice correct="false">Russia</choice>
+              </choicegroup>
+            </multiplechoiceresponse>
+
+            <solution>
+            <div class="detailed-solution">
+            <p>Explanation</p>
+
+            <p>According to September 2014 estimates:</p>
+            <p>The population of Indonesia is approximately 250 million.</p>
+            <p>The population of Brazil  is approximately 200 million.</p>
+            <p>The population of Russia is approximately 146 million.</p>
+            <p>The population of Germany is approximately 81 million.</p>
+
+            </div>
+            </solution>
+
+        </problem>
+    """)
+
+    sample_numerical_input_problem_xml = textwrap.dedent("""
+        <problem>
+            <p>In a numerical input problem, learners enter numbers or a specific and relatively simple mathematical
+            expression. Learners enter the response in plain text, and the system then converts the text to a symbolic
+            expression that learners can see below the response field.</p>
+
+            <p>The system can handle several types of characters, including basic operators, fractions, exponents, and
+            common constants such as "i". You can refer learners to "Entering Mathematical and Scientific Expressions"
+            in the edX Guide for Students for more information.</p>
+
+            <p>When you add the problem, be sure to select Settings to specify a Display Name and other values that
+            apply.</p>
+
+            <p>You can use the following example problems as models.</p>
+
+            <p>How many miles away from Earth is the sun? Use scientific notation to answer.</p>
+
+            <numericalresponse answer="9.3*10^7">
+              <formulaequationinput label="How many miles away from Earth is the sun?
+              Use scientific notation to answer." />
+            </numericalresponse>
+
+            <p>The square of what number is -100?</p>
+
+            <numericalresponse answer="10*i">
+              <formulaequationinput label="The square of what number is -100?" />
+            </numericalresponse>
+
+            <solution>
+            <div class="detailed-solution">
+            <p>Explanation</p>
+
+            <p>The sun is 93,000,000, or 9.3*10^7, miles away from Earth.</p>
+            <p>-100 is the square of 10 times the imaginary number, i.</p>
+
+            </div>
+            </solution>
+
+        </problem>
+    """)
+
+    sample_text_input_problem_xml = textwrap.dedent("""
+        <problem>
+            <p>In text input problems, also known as "fill-in-the-blank" problems, learners enter text into a response
+            field. The text can include letters and characters such as punctuation marks. The text that the learner
+            enters must match your specified answer text exactly. You can specify more than one correct answer.
+            Learners must enter a response that matches one of the correct answers exactly.</p>
+
+            <p>When you add the problem, be sure to select Settings to specify a Display Name and other values that
+            apply.</p>
+
+            <p>You can use the following example problem as a model.</p>
+
+            <p>What was the first post-secondary school in China to allow both male and female students?</p>
+
+            <stringresponse answer="Nanjing Higher Normal Institute" type="ci" >
+              <additional_answer answer="National Central University"></additional_answer>
+              <additional_answer answer="Nanjing University"></additional_answer>
+              <textline label="What was the first post-secondary school in China to allow both male and female
+              students?" size="20"/>
+            </stringresponse>
+
+            <solution>
+            <div class="detailed-solution">
+            <p>Explanation</p>
+
+            <p>Nanjing Higher Normal Institute first admitted female students in 1920.</p>
+
+            </div>
+            </solution>
+
+        </problem>
+    """)
+
+    sample_checkboxes_with_hints_and_feedback_problem_xml = textwrap.dedent("""
+        <problem>
+            <p>You can provide feedback for each option in a checkbox problem, with distinct feedback depending on
+            whether or not the learner selects that option.</p>
+
+            <p>You can also provide compound feedback for a specific combination of answers. For example, if you have
+            three possible answers in the problem, you can configure specific feedback for when a learner selects each
+            combination of possible answers.</p>
+
+            <p>You can also add hints for learners.</p>
+
+            <p>Be sure to select Settings to specify a Display Name and other values that apply.</p>
+
+            <p>Use the following example problem as a model.</p>
+
+            <p>Which of the following is a fruit? Check all that apply.</p>
+            <choiceresponse>
+              <checkboxgroup label="Which of the following is a fruit? Check all that apply.">
+                <choice correct="true">apple
+                  <choicehint selected="true">You are correct that an apple is a fruit because it is the fertilized
+                  ovary that comes from an apple tree and contains seeds.</choicehint>
+                  <choicehint selected="false">Remember that an apple is also a fruit.</choicehint></choice>
+                <choice correct="true">pumpkin
+                  <choicehint selected="true">You are correct that a pumpkin is a fruit because it is the fertilized
+                  ovary of a squash plant and contains seeds.</choicehint>
+                  <choicehint selected="false">Remember that a pumpkin is also a fruit.</choicehint></choice>
+                <choice correct="false">potato
+                  <choicehint selected="true">A potato is a vegetable, not a fruit, because it does not come from a
+                  flower and does not contain seeds.</choicehint>
+                  <choicehint selected="false">You are correct that a potato is a vegetable because it is an edible
+                  part of a plant in tuber form.</choicehint></choice>
+                <choice correct="true">tomato
+                  <choicehint selected="true">You are correct that a tomato is a fruit because it is the fertilized
+                  ovary of a tomato plant and contains seeds.</choicehint>
+                  <choicehint selected="false">Many people mistakenly think a tomato is a vegetable. However, because
+                  a tomato is the fertilized ovary of a tomato plant and contains seeds, it is a fruit.</choicehint>
+                  </choice>
+                <compoundhint value="A B D">An apple, pumpkin, and tomato are all fruits as they all are fertilized
+                ovaries of a plant and contain seeds.</compoundhint>
+                <compoundhint value="A B C D">You are correct that an apple, pumpkin, and tomato are all fruits as they
+                all are fertilized ovaries of a plant and contain seeds. However, a potato is not a fruit as it is an
+                edible part of a plant in tuber form and is a vegetable.</compoundhint>
+              </checkboxgroup>
+            </choiceresponse>
+
+
+            <demandhint>
+              <hint>A fruit is the fertilized ovary from a flower.</hint>
+              <hint>A fruit contains seeds of the plant.</hint>
+            </demandhint>
+        </problem>
+    """)
+
+    sample_dropdown_with_hints_and_feedback_problem_xml = textwrap.dedent("""
+        <problem>
+            <p>You can provide feedback for each available option in a dropdown problem.</p>
+
+            <p>You can also add hints for learners.</p>
+
+            <p>Be sure to select Settings to specify a Display Name and other values that apply.</p>
+
+            <p>Use the following example problem as a model.</p>
+
+            <p> A/an ________ is a vegetable.</p>
+            <optionresponse>
+              <optioninput label=" A/an ________ is a vegetable.">
+                <option correct="False">apple <optionhint>An apple is the fertilized ovary that comes from an apple
+                tree and contains seeds, meaning it is a fruit.</optionhint></option>
+                <option correct="False">pumpkin <optionhint>A pumpkin is the fertilized ovary of a squash plant and
+                contains seeds, meaning it is a fruit.</optionhint></option>
+                <option correct="True">potato <optionhint>A potato is an edible part of a plant in tuber form and is a
+                vegetable.</optionhint></option>
+                <option correct="False">tomato <optionhint>Many people mistakenly think a tomato is a vegetable.
+                However, because a tomato is the fertilized ovary of a tomato plant and contains seeds, it is a fruit.
+                </optionhint></option>
+              </optioninput>
+            </optionresponse>
+
+            <demandhint>
+              <hint>A fruit is the fertilized ovary from a flower.</hint>
+              <hint>A fruit contains seeds of the plant.</hint>
+            </demandhint>
+        </problem>
+    """)
+
+    sample_multichoice_with_hints_and_feedback_problem_xml = textwrap.dedent("""
+        <problem>
+            <p>You can provide feedback for each option in a multiple choice problem.</p>
+
+            <p>You can also add hints for learners.</p>
+
+            <p>Be sure to select Settings to specify a Display Name and other values that apply.</p>
+
+            <p>Use the following example problem as a model.</p>
+
+            <p>Which of the following is a vegetable?</p>
+            <multiplechoiceresponse>
+              <choicegroup label="Which of the following is a vegetable?" type="MultipleChoice">
+                <choice correct="false">apple <choicehint>An apple is the fertilized ovary that comes from an apple
+                tree and contains seeds, meaning it is a fruit.</choicehint></choice>
+                <choice correct="false">pumpkin <choicehint>A pumpkin is the fertilized ovary of a squash plant and
+                contains seeds, meaning it is a fruit.</choicehint></choice>
+                <choice correct="true">potato <choicehint>A potato is an edible part of a plant in tuber form and is a
+                vegetable.</choicehint></choice>
+                <choice correct="false">tomato <choicehint>Many people mistakenly think a tomato is a vegetable.
+                However, because a tomato is the fertilized ovary of a tomato plant and contains seeds, it is a fruit.
+                </choicehint></choice>
+              </choicegroup>
+            </multiplechoiceresponse>
+
+
+            <demandhint>
+              <hint>A fruit is the fertilized ovary from a flower.</hint>
+              <hint>A fruit contains seeds of the plant.</hint>
+            </demandhint>
+        </problem>
+    """)
+
+    sample_numerical_input_with_hints_and_feedback_problem_xml = textwrap.dedent("""
+        <problem>
+            <p>You can provide feedback for correct answers in numerical input problems. You cannot provide feedback
+            for incorrect answers.</p>
+
+            <p>Use feedback for the correct answer to reinforce the process for arriving at the numerical value.</p>
+
+            <p>You can also add hints for learners.</p>
+
+            <p>Be sure to select Settings to specify a Display Name and other values that apply.</p>
+
+            <p>Use the following example problem as a model.</p>
+
+            <p>What is the arithmetic mean for the following set of numbers? (1, 5, 6, 3, 5)</p>
+
+            <numericalresponse answer="4">
+              <formulaequationinput label="What is the arithmetic mean for the following set of numbers?
+              (1, 5, 6, 3, 5)" />
+              <correcthint>The mean for this set of numbers is 20 / 5, which equals 4.</correcthint>
+            </numericalresponse>
+            <solution>
+            <div class="detailed-solution">
+            <p>Explanation</p>
+
+            <p>The mean is calculated by summing the set of numbers and dividing by n. In this case:
+            (1 + 5 + 6 + 3 + 5) / 5 = 20 / 5 = 4.</p>
+
+            </div>
+            </solution>
+
+            <demandhint>
+              <hint>The mean is calculated by summing the set of numbers and dividing by n.</hint>
+              <hint>n is the count of items in the set.</hint>
+            </demandhint>
+        </problem>
+    """)
+
+    sample_text_input_with_hints_and_feedback_problem_xml = textwrap.dedent("""
+        <problem>
+            <p>You can provide feedback for the correct answer in text input problems, as well as for specific
+            incorrect answers.</p>
+
+            <p>Use feedback on expected incorrect answers to address common misconceptions and to provide guidance on
+            how to arrive at the correct answer.</p>
+
+            <p>Be sure to select Settings to specify a Display Name and other values that apply.</p>
+
+            <p>Use the following example problem as a model.</p>
+
+            <p>Which U.S. state has the largest land area?</p>
+
+            <stringresponse answer="Alaska" type="ci" >
+              <correcthint>Alaska is 576,400 square miles, more than double the land area of the second largest state,
+              Texas.</correcthint>
+              <stringequalhint answer="Texas">While many people think Texas is the largest state, it is actually the
+              second largest, with 261,797 square miles.</stringequalhint>
+              <stringequalhint answer="California">California is the third largest state, with 155,959 square miles.
+              </stringequalhint>
+              <textline label="Which U.S. state has the largest land area?" size="20"/>
+            </stringresponse>
+
+            <demandhint>
+              <hint>Consider the square miles, not population.</hint>
+              <hint>Consider all 50 states, not just the continental United States.</hint>
+            </demandhint>
+        </problem>
+    """)
+
     def _create_descriptor(self, xml, name=None):
         """ Creates a CapaDescriptor to run test against """
         descriptor = CapaDescriptor(get_test_system(), scope_ids=1)
@@ -1724,8 +2080,11 @@ class CapaDescriptorTest(unittest.TestCase):
         self.assertEquals(descriptor.problem_types, {response_tag})
         self.assertEquals(descriptor.index_dictionary(), {
             'content_type': CapaDescriptor.INDEX_CONTENT_TYPE,
-            'display_name': name,
-            'problem_types': [response_tag]
+            'problem_types': [response_tag],
+            'content': {
+                'display_name': name,
+                'capa_content': ''
+            }
         })
 
     def test_response_types_ignores_non_response_tags(self):
@@ -1748,8 +2107,11 @@ class CapaDescriptorTest(unittest.TestCase):
         self.assertEquals(descriptor.problem_types, {"multiplechoiceresponse"})
         self.assertEquals(descriptor.index_dictionary(), {
             'content_type': CapaDescriptor.INDEX_CONTENT_TYPE,
-            'display_name': name,
-            'problem_types': ["multiplechoiceresponse"]
+            'problem_types': ["multiplechoiceresponse"],
+            'content': {
+                'display_name': name,
+                'capa_content': ' Label Some comment Apple Banana Chocolate Donut '
+            }
         })
 
     def test_response_types_multiple_tags(self):
@@ -1778,8 +2140,336 @@ class CapaDescriptorTest(unittest.TestCase):
         self.assertEquals(
             descriptor.index_dictionary(), {
                 'content_type': CapaDescriptor.INDEX_CONTENT_TYPE,
-                'display_name': name,
-                'problem_types': ["optionresponse", "multiplechoiceresponse"]
+                'problem_types': ["optionresponse", "multiplechoiceresponse"],
+                'content': {
+                    'display_name': name,
+                    'capa_content': ' Label Some comment Donut Buggy '
+                }
+            }
+        )
+
+    def test_solutions_not_indexed(self):
+        xml = textwrap.dedent("""
+            <problem>
+                <solution>
+                <div class="detailed-solution">
+                <p>Explanation</p>
+
+                <p>This is what the 1st solution.</p>
+
+                </div>
+                </solution>
+
+                <solution>
+                <div class="detailed-solution">
+                <p>Explanation</p>
+
+                <p>This is the 2nd solution.</p>
+
+                </div>
+                </solution>
+
+
+            </problem>
+        """)
+        name = "Blank Common Capa Problem"
+        descriptor = self._create_descriptor(xml, name=name)
+        self.assertEquals(
+            descriptor.index_dictionary(), {
+                'content_type': CapaDescriptor.INDEX_CONTENT_TYPE,
+                'problem_types': [],
+                'content': {
+                    'display_name': name,
+                    'capa_content': ' '
+                }
+            }
+        )
+
+    def test_indexing_checkboxes(self):
+        name = "Checkboxes"
+        descriptor = self._create_descriptor(self.sample_checkbox_problem_xml, name=name)
+        capa_content = textwrap.dedent("""
+            Title
+            Description
+            Example
+            The following languages are in the Indo-European family:
+            Urdu
+            Finnish
+            Marathi
+            French
+            Hungarian
+            Note: Make sure you select all of the correct options—there may be more than one!
+        """)
+        self.assertEquals(descriptor.problem_types, {"choiceresponse"})
+        self.assertEquals(
+            descriptor.index_dictionary(), {
+                'content_type': CapaDescriptor.INDEX_CONTENT_TYPE,
+                'problem_types': ["choiceresponse"],
+                'content': {
+                    'display_name': name,
+                    'capa_content': capa_content.replace("\n", " ")
+                }
+            }
+        )
+
+    def test_indexing_dropdown(self):
+        name = "Dropdown"
+        descriptor = self._create_descriptor(self.sample_dropdown_problem_xml, name=name)
+        capa_content = textwrap.dedent("""
+            Dropdown problems allow learners to select only one option from a list of options.
+            Description
+            You can use the following example problem as a model.
+            Which of the following countries celebrates its independence on August 15?
+        """)
+        self.assertEquals(descriptor.problem_types, {"optionresponse"})
+        self.assertEquals(
+            descriptor.index_dictionary(), {
+                'content_type': CapaDescriptor.INDEX_CONTENT_TYPE,
+                'problem_types': ["optionresponse"],
+                'content': {
+                    'display_name': name,
+                    'capa_content': capa_content.replace("\n", " ")
+                }
+            }
+        )
+
+    def test_indexing_multiple_choice(self):
+        name = "Multiple Choice"
+        descriptor = self._create_descriptor(self.sample_multichoice_problem_xml, name=name)
+        capa_content = textwrap.dedent("""
+            Multiple choice problems allow learners to select only one option.
+            When you add the problem, be sure to select Settings to specify a Display Name and other values.
+            You can use the following example problem as a model.
+            Which of the following countries has the largest population?
+            Brazil
+            Germany
+            Indonesia
+            Russia
+        """)
+        self.assertEquals(descriptor.problem_types, {"multiplechoiceresponse"})
+        self.assertEquals(
+            descriptor.index_dictionary(), {
+                'content_type': CapaDescriptor.INDEX_CONTENT_TYPE,
+                'problem_types': ["multiplechoiceresponse"],
+                'content': {
+                    'display_name': name,
+                    'capa_content': capa_content.replace("\n", " ")
+                }
+            }
+        )
+
+    def test_indexing_numerical_input(self):
+        name = "Numerical Input"
+        descriptor = self._create_descriptor(self.sample_numerical_input_problem_xml, name=name)
+        capa_content = textwrap.dedent("""
+            In a numerical input problem, learners enter numbers or a specific and relatively simple mathematical
+            expression. Learners enter the response in plain text, and the system then converts the text to a symbolic
+            expression that learners can see below the response field.
+            The system can handle several types of characters, including basic operators, fractions, exponents, and
+            common constants such as "i". You can refer learners to "Entering Mathematical and Scientific Expressions"
+            in the edX Guide for Students for more information.
+            When you add the problem, be sure to select Settings to specify a Display Name and other values that
+            apply.
+            You can use the following example problems as models.
+            How many miles away from Earth is the sun? Use scientific notation to answer.
+            The square of what number is -100?
+        """)
+        self.assertEquals(descriptor.problem_types, {"numericalresponse"})
+        self.assertEquals(
+            descriptor.index_dictionary(), {
+                'content_type': CapaDescriptor.INDEX_CONTENT_TYPE,
+                'problem_types': ["numericalresponse"],
+                'content': {
+                    'display_name': name,
+                    'capa_content': capa_content.replace("\n", " ")
+                }
+            }
+        )
+
+    def test_indexing_text_input(self):
+        name = "Text Input"
+        descriptor = self._create_descriptor(self.sample_text_input_problem_xml, name=name)
+        capa_content = textwrap.dedent("""
+            In text input problems, also known as "fill-in-the-blank" problems, learners enter text into a response
+            field. The text can include letters and characters such as punctuation marks. The text that the learner
+            enters must match your specified answer text exactly. You can specify more than one correct answer.
+            Learners must enter a response that matches one of the correct answers exactly.
+            When you add the problem, be sure to select Settings to specify a Display Name and other values that
+            apply.
+            You can use the following example problem as a model.
+            What was the first post-secondary school in China to allow both male and female students?
+        """)
+        self.assertEquals(descriptor.problem_types, {"stringresponse"})
+        self.assertEquals(
+            descriptor.index_dictionary(), {
+                'content_type': CapaDescriptor.INDEX_CONTENT_TYPE,
+                'problem_types': ["stringresponse"],
+                'content': {
+                    'display_name': name,
+                    'capa_content': capa_content.replace("\n", " ")
+                }
+            }
+        )
+
+    def test_indexing_checkboxes_with_hints_and_feedback(self):
+        name = "Checkboxes with Hints and Feedback"
+        descriptor = self._create_descriptor(self.sample_checkboxes_with_hints_and_feedback_problem_xml, name=name)
+        capa_content = textwrap.dedent("""
+            You can provide feedback for each option in a checkbox problem, with distinct feedback depending on
+            whether or not the learner selects that option.
+            You can also provide compound feedback for a specific combination of answers. For example, if you have
+            three possible answers in the problem, you can configure specific feedback for when a learner selects each
+            combination of possible answers.
+            You can also add hints for learners.
+            Be sure to select Settings to specify a Display Name and other values that apply.
+            Use the following example problem as a model.
+            Which of the following is a fruit? Check all that apply.
+            apple
+            pumpkin
+            potato
+            tomato
+        """)
+        self.assertEquals(descriptor.problem_types, {"choiceresponse"})
+        self.assertEquals(
+            descriptor.index_dictionary(), {
+                'content_type': CapaDescriptor.INDEX_CONTENT_TYPE,
+                'problem_types': ["choiceresponse"],
+                'content': {
+                    'display_name': name,
+                    'capa_content': capa_content.replace("\n", " ")
+                }
+            }
+        )
+
+    def test_indexing_dropdown_with_hints_and_feedback(self):
+        name = "Dropdown with Hints and Feedback"
+        descriptor = self._create_descriptor(self.sample_dropdown_with_hints_and_feedback_problem_xml, name=name)
+        capa_content = textwrap.dedent("""
+            You can provide feedback for each available option in a dropdown problem.
+            You can also add hints for learners.
+            Be sure to select Settings to specify a Display Name and other values that apply.
+            Use the following example problem as a model.
+            A/an ________ is a vegetable.
+            apple
+            pumpkin
+            potato
+            tomato
+        """)
+        self.assertEquals(descriptor.problem_types, {"optionresponse"})
+        self.assertEquals(
+            descriptor.index_dictionary(), {
+                'content_type': CapaDescriptor.INDEX_CONTENT_TYPE,
+                'problem_types': ["optionresponse"],
+                'content': {
+                    'display_name': name,
+                    'capa_content': capa_content.replace("\n", " ")
+                }
+            }
+        )
+
+    def test_indexing_multiple_choice_with_hints_and_feedback(self):
+        name = "Multiple Choice with Hints and Feedback"
+        descriptor = self._create_descriptor(self.sample_multichoice_with_hints_and_feedback_problem_xml, name=name)
+        capa_content = textwrap.dedent("""
+            You can provide feedback for each option in a multiple choice problem.
+            You can also add hints for learners.
+            Be sure to select Settings to specify a Display Name and other values that apply.
+            Use the following example problem as a model.
+            Which of the following is a vegetable?
+            apple
+            pumpkin
+            potato
+            tomato
+        """)
+        self.assertEquals(descriptor.problem_types, {"multiplechoiceresponse"})
+        self.assertEquals(
+            descriptor.index_dictionary(), {
+                'content_type': CapaDescriptor.INDEX_CONTENT_TYPE,
+                'problem_types': ["multiplechoiceresponse"],
+                'content': {
+                    'display_name': name,
+                    'capa_content': capa_content.replace("\n", " ")
+                }
+            }
+        )
+
+    def test_indexing_numerical_input_with_hints_and_feedback(self):
+        name = "Numerical Input with Hints and Feedback"
+        descriptor = self._create_descriptor(self.sample_numerical_input_with_hints_and_feedback_problem_xml, name=name)
+        capa_content = textwrap.dedent("""
+            You can provide feedback for correct answers in numerical input problems. You cannot provide feedback
+            for incorrect answers.
+            Use feedback for the correct answer to reinforce the process for arriving at the numerical value.
+            You can also add hints for learners.
+            Be sure to select Settings to specify a Display Name and other values that apply.
+            Use the following example problem as a model.
+            What is the arithmetic mean for the following set of numbers? (1, 5, 6, 3, 5)
+        """)
+        self.assertEquals(descriptor.problem_types, {"numericalresponse"})
+        self.assertEquals(
+            descriptor.index_dictionary(), {
+                'content_type': CapaDescriptor.INDEX_CONTENT_TYPE,
+                'problem_types': ["numericalresponse"],
+                'content': {
+                    'display_name': name,
+                    'capa_content': capa_content.replace("\n", " ")
+                }
+            }
+        )
+
+    def test_indexing_text_input_with_hints_and_feedback(self):
+        name = "Text Input with Hints and Feedback"
+        descriptor = self._create_descriptor(self.sample_text_input_with_hints_and_feedback_problem_xml, name=name)
+        capa_content = textwrap.dedent("""
+            You can provide feedback for the correct answer in text input problems, as well as for specific
+            incorrect answers.
+            Use feedback on expected incorrect answers to address common misconceptions and to provide guidance on
+            how to arrive at the correct answer.
+            Be sure to select Settings to specify a Display Name and other values that apply.
+            Use the following example problem as a model.
+            Which U.S. state has the largest land area?
+        """)
+        self.assertEquals(descriptor.problem_types, {"stringresponse"})
+        self.assertEquals(
+            descriptor.index_dictionary(), {
+                'content_type': CapaDescriptor.INDEX_CONTENT_TYPE,
+                'problem_types': ["stringresponse"],
+                'content': {
+                    'display_name': name,
+                    'capa_content': capa_content.replace("\n", " ")
+                }
+            }
+        )
+
+    def test_indexing_problem_with_html_tags(self):
+        sample_problem_xml = textwrap.dedent("""
+            <problem>
+                <style>p {left: 10px;}</style>
+                <!-- Beginning of the html -->
+                <p>This has HTML comment in it.<!-- Commenting Content --></p>
+                <!-- Here comes CDATA -->
+                <![CDATA[This is just a CDATA!]]>
+                <p>HTML end.</p>
+                <!-- Script that makes everything alive! -->
+                <script>
+                    var alive;
+                </script>
+            </problem>
+        """)
+        name = "Mixed business"
+        descriptor = self._create_descriptor(sample_problem_xml, name=name)
+        capa_content = textwrap.dedent("""
+            This has HTML comment in it.
+            HTML end.
+        """)
+        self.assertEquals(
+            descriptor.index_dictionary(), {
+                'content_type': CapaDescriptor.INDEX_CONTENT_TYPE,
+                'problem_types': [],
+                'content': {
+                    'display_name': name,
+                    'capa_content': capa_content.replace("\n", " ")
+                }
             }
         )
 
@@ -1822,7 +2512,7 @@ class TestProblemCheckTracking(unittest.TestCase):
               </multiplechoiceresponse>
               <p>Which of the following are musical instruments?</p>
               <choiceresponse>
-                <checkboxgroup direction="vertical" label="Which of the following are musical instruments?">
+                <checkboxgroup label="Which of the following are musical instruments?">
                   <choice correct="true">a piano</choice>
                   <choice correct="false">a tree</choice>
                   <choice correct="true">a guitar</choice>

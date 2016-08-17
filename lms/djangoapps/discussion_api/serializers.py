@@ -28,7 +28,6 @@ from lms.lib.comment_client.thread import Thread
 from lms.lib.comment_client.user import User as CommentClientUser
 from lms.lib.comment_client.utils import CommentClientRequestError
 from openedx.core.djangoapps.course_groups.cohorts import get_cohort_names
-from openedx.core.lib.api.fields import NonEmptyCharField
 
 
 def get_context(course, request, thread=None):
@@ -66,36 +65,43 @@ def get_context(course, request, thread=None):
     }
 
 
+def validate_not_blank(value):
+    """
+    Validate that a value is not an empty string or whitespace.
+
+    Raises: ValidationError
+    """
+    if not value.strip():
+        raise ValidationError("This field may not be blank.")
+
+
 class _ContentSerializer(serializers.Serializer):
     """A base class for thread and comment serializers."""
-    id_ = serializers.CharField(read_only=True)
-    author = serializers.SerializerMethodField("get_author")
-    author_label = serializers.SerializerMethodField("get_author_label")
+    id = serializers.CharField(read_only=True)  # pylint: disable=invalid-name
+    author = serializers.SerializerMethodField()
+    author_label = serializers.SerializerMethodField()
     created_at = serializers.CharField(read_only=True)
     updated_at = serializers.CharField(read_only=True)
-    raw_body = NonEmptyCharField(source="body")
-    rendered_body = serializers.SerializerMethodField("get_rendered_body")
-    abuse_flagged = serializers.SerializerMethodField("get_abuse_flagged")
-    voted = serializers.SerializerMethodField("get_voted")
-    vote_count = serializers.SerializerMethodField("get_vote_count")
-    editable_fields = serializers.SerializerMethodField("get_editable_fields")
+    raw_body = serializers.CharField(source="body", validators=[validate_not_blank])
+    rendered_body = serializers.SerializerMethodField()
+    abuse_flagged = serializers.SerializerMethodField()
+    voted = serializers.SerializerMethodField()
+    vote_count = serializers.SerializerMethodField()
+    editable_fields = serializers.SerializerMethodField()
 
     non_updatable_fields = set()
 
     def __init__(self, *args, **kwargs):
         super(_ContentSerializer, self).__init__(*args, **kwargs)
-        # id is an invalid class attribute name, so we must declare a different
-        # name above and modify it here
-        self.fields["id"] = self.fields.pop("id_")
 
         for field in self.non_updatable_fields:
             setattr(self, "validate_{}".format(field), self._validate_non_updatable)
 
-    def _validate_non_updatable(self, attrs, _source):
+    def _validate_non_updatable(self, value):
         """Ensure that a field is not edited in an update operation."""
-        if self.object:
+        if self.instance:
             raise ValidationError("This field is not allowed in an update.")
-        return attrs
+        return value
 
     def _is_user_privileged(self, user_id):
         """
@@ -120,18 +126,22 @@ class _ContentSerializer(serializers.Serializer):
 
     def _get_user_label(self, user_id):
         """
-        Returns the role label (i.e. "staff" or "community_ta") for the user
+        Returns the role label (i.e. "Staff" or "Community TA") for the user
         with the given id.
         """
         return (
-            "staff" if user_id in self.context["staff_user_ids"] else
-            "community_ta" if user_id in self.context["ta_user_ids"] else
+            "Staff" if user_id in self.context["staff_user_ids"] else
+            "Community TA" if user_id in self.context["ta_user_ids"] else
             None
         )
 
     def get_author_label(self, obj):
         """Returns the role label for the content author."""
-        return None if self._is_anonymous(obj) else self._get_user_label(int(obj["user_id"]))
+        if self._is_anonymous(obj) or obj["user_id"] is None:
+            return None
+        else:
+            user_id = int(obj["user_id"])
+            return self._get_user_label(user_id)
 
     def get_rendered_body(self, obj):
         """Returns the rendered body content."""
@@ -142,7 +152,7 @@ class _ContentSerializer(serializers.Serializer):
         Returns a boolean indicating whether the requester has flagged the
         content as abusive.
         """
-        return self.context["cc_requester"]["id"] in obj["abuse_flaggers"]
+        return self.context["cc_requester"]["id"] in obj.get("abuse_flaggers", [])
 
     def get_voted(self, obj):
         """
@@ -153,7 +163,7 @@ class _ContentSerializer(serializers.Serializer):
 
     def get_vote_count(self, obj):
         """Returns the number of votes for the content."""
-        return obj["votes"]["up_count"]
+        return obj.get("votes", {}).get("up_count", 0)
 
     def get_editable_fields(self, obj):
         """Return the list of the fields the requester can edit"""
@@ -169,34 +179,41 @@ class ThreadSerializer(_ContentSerializer):
     at introspection and Thread's __getattr__.
     """
     course_id = serializers.CharField()
-    topic_id = NonEmptyCharField(source="commentable_id")
-    group_id = serializers.IntegerField(required=False)
-    group_name = serializers.SerializerMethodField("get_group_name")
-    type_ = serializers.ChoiceField(
+    topic_id = serializers.CharField(source="commentable_id", validators=[validate_not_blank])
+    group_id = serializers.IntegerField(required=False, allow_null=True)
+    group_name = serializers.SerializerMethodField()
+    type = serializers.ChoiceField(
         source="thread_type",
         choices=[(val, val) for val in ["discussion", "question"]]
     )
-    title = NonEmptyCharField()
-    pinned = serializers.BooleanField(read_only=True)
+    title = serializers.CharField(validators=[validate_not_blank])
+    pinned = serializers.SerializerMethodField(read_only=True)
     closed = serializers.BooleanField(read_only=True)
-    following = serializers.SerializerMethodField("get_following")
-    comment_count = serializers.IntegerField(source="comments_count", read_only=True)
-    unread_comment_count = serializers.IntegerField(source="unread_comments_count", read_only=True)
-    comment_list_url = serializers.SerializerMethodField("get_comment_list_url")
-    endorsed_comment_list_url = serializers.SerializerMethodField("get_endorsed_comment_list_url")
-    non_endorsed_comment_list_url = serializers.SerializerMethodField("get_non_endorsed_comment_list_url")
+    following = serializers.SerializerMethodField()
+    comment_count = serializers.SerializerMethodField(read_only=True)
+    unread_comment_count = serializers.SerializerMethodField(read_only=True)
+    comment_list_url = serializers.SerializerMethodField()
+    endorsed_comment_list_url = serializers.SerializerMethodField()
+    non_endorsed_comment_list_url = serializers.SerializerMethodField()
+    read = serializers.BooleanField(required=False)
+    has_endorsed = serializers.BooleanField(read_only=True, source="endorsed")
+    response_count = serializers.IntegerField(source="resp_total", read_only=True, required=False)
 
     non_updatable_fields = NON_UPDATABLE_THREAD_FIELDS
 
     def __init__(self, *args, **kwargs):
         super(ThreadSerializer, self).__init__(*args, **kwargs)
-        # type is an invalid class attribute name, so we must declare a
-        # different name above and modify it here
-        self.fields["type"] = self.fields.pop("type_")
         # Compensate for the fact that some threads in the comments service do
         # not have the pinned field set
-        if self.object and self.object.get("pinned") is None:
-            self.object["pinned"] = False
+        if self.instance and self.instance.get("pinned") is None:
+            self.instance["pinned"] = False
+
+    def get_pinned(self, obj):
+        """
+        Compensate for the fact that some threads in the comments service do
+        not have the pinned field set.
+        """
+        return bool(obj["pinned"])
 
     def get_group_name(self, obj):
         """Returns the name of the group identified by the thread's group_id."""
@@ -235,13 +252,28 @@ class ThreadSerializer(_ContentSerializer):
         """Returns the URL to retrieve the thread's non-endorsed comments."""
         return self.get_comment_list_url(obj, endorsed=False)
 
-    def restore_object(self, attrs, instance=None):
-        if instance:
-            for key, val in attrs.items():
-                instance[key] = val
-            return instance
-        else:
-            return Thread(user_id=self.context["cc_requester"]["id"], **attrs)
+    def get_comment_count(self, obj):
+        """Increments comment count to include post and returns total count of
+        contributions (i.e. post + responses + comments) for the thread"""
+        return obj["comments_count"] + 1
+
+    def get_unread_comment_count(self, obj):
+        """Increments comment count to include post if thread is unread and returns
+        total count of unread contributions (i.e. post + responses + comments) for the thread"""
+        if not obj["read"]:
+            return obj["unread_comments_count"] + 1
+        return obj["unread_comments_count"]
+
+    def create(self, validated_data):
+        thread = Thread(user_id=self.context["cc_requester"]["id"], **validated_data)
+        thread.save()
+        return thread
+
+    def update(self, instance, validated_data):
+        for key, val in validated_data.items():
+            instance[key] = val
+        instance.save(params={"requested_user_id": self.context["cc_requester"]["id"]})
+        return instance
 
 
 class CommentSerializer(_ContentSerializer):
@@ -253,14 +285,23 @@ class CommentSerializer(_ContentSerializer):
     at introspection and Comment's __getattr__.
     """
     thread_id = serializers.CharField()
-    parent_id = serializers.CharField(required=False)
+    parent_id = serializers.CharField(required=False, allow_null=True)
     endorsed = serializers.BooleanField(required=False)
-    endorsed_by = serializers.SerializerMethodField("get_endorsed_by")
-    endorsed_by_label = serializers.SerializerMethodField("get_endorsed_by_label")
-    endorsed_at = serializers.SerializerMethodField("get_endorsed_at")
-    children = serializers.SerializerMethodField("get_children")
+    endorsed_by = serializers.SerializerMethodField()
+    endorsed_by_label = serializers.SerializerMethodField()
+    endorsed_at = serializers.SerializerMethodField()
+    children = serializers.SerializerMethodField(required=False)
 
     non_updatable_fields = NON_UPDATABLE_COMMENT_FIELDS
+
+    def __init__(self, *args, **kwargs):
+        remove_fields = kwargs.pop('remove_fields', None)
+        super(CommentSerializer, self).__init__(*args, **kwargs)
+
+        if remove_fields:
+            # for multiple fields in a list
+            for field_name in remove_fields:
+                self.fields.pop(field_name)
 
     def get_endorsed_by(self, obj):
         """
@@ -281,7 +322,7 @@ class CommentSerializer(_ContentSerializer):
 
     def get_endorsed_by_label(self, obj):
         """
-        Returns the role label (i.e. "staff" or "community_ta") for the
+        Returns the role label (i.e. "Staff" or "Community TA") for the
         endorsing user
         """
         endorsement = obj.get("endorsement")
@@ -300,6 +341,17 @@ class CommentSerializer(_ContentSerializer):
             CommentSerializer(child, context=self.context).data
             for child in obj.get("children", [])
         ]
+
+    def to_representation(self, data):
+        data = super(CommentSerializer, self).to_representation(data)
+
+        # Django Rest Framework v3 no longer includes None values
+        # in the representation.  To maintain the previous behavior,
+        # we do this manually instead.
+        if 'parent_id' not in data:
+            data["parent_id"] = None
+
+        return data
 
     def validate(self, attrs):
         """
@@ -322,18 +374,23 @@ class CommentSerializer(_ContentSerializer):
             raise ValidationError({"parent_id": ["Comment level is too deep."]})
         return attrs
 
-    def restore_object(self, attrs, instance=None):
-        if instance:
-            for key, val in attrs.items():
-                instance[key] = val
-                # TODO: The comments service doesn't populate the endorsement
-                # field on comment creation, so we only provide
-                # endorsement_user_id on update
-                if key == "endorsed":
-                    instance["endorsement_user_id"] = self.context["cc_requester"]["id"]
-            return instance
-        return Comment(
+    def create(self, validated_data):
+        comment = Comment(
             course_id=self.context["thread"]["course_id"],
             user_id=self.context["cc_requester"]["id"],
-            **attrs
+            **validated_data
         )
+        comment.save()
+        return comment
+
+    def update(self, instance, validated_data):
+        for key, val in validated_data.items():
+            instance[key] = val
+            # TODO: The comments service doesn't populate the endorsement
+            # field on comment creation, so we only provide
+            # endorsement_user_id on update
+            if key == "endorsed":
+                instance["endorsement_user_id"] = self.context["cc_requester"]["id"]
+
+        instance.save()
+        return instance

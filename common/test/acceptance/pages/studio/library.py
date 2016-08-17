@@ -9,7 +9,10 @@ from .component_editor import ComponentEditorView
 from .container import XBlockWrapper
 from ...pages.studio.users import UsersPageMixin
 from ...pages.studio.pagination import PaginatedMixin
-from .utils import confirm_prompt, wait_for_notification
+from selenium.webdriver.common.keys import Keys
+
+from ..common.utils import confirm_prompt, wait_for_notification
+
 from . import BASE_URL
 
 
@@ -166,7 +169,8 @@ class StudioLibraryContentEditor(ComponentEditorView):
         Sets value of children count input
         """
         count_text = self.get_setting_element(self.COUNT_LABEL)
-        count_text.clear()
+        count_text.send_keys(Keys.CONTROL, "a")
+        count_text.send_keys(Keys.BACK_SPACE)
         count_text.send_keys(count)
         EmptyPromise(lambda: self.count == count, "count is updated in modal.").fulfill()
 
@@ -256,6 +260,9 @@ class StudioLibraryContainerXBlockWrapper(XBlockWrapper):
         self.q(css=btn_selector).first.click()
 
         # This causes a reload (see cms/static/xmodule_js/public/js/library_content_edit.js)
+        # Check that the ajax request that caused the reload is done.
+        self.wait_for_ajax()
+        # Then check that we are still on the right page.
         self.wait_for(lambda: self.is_browser_on_page(), 'StudioLibraryContainerXBlockWrapper has reloaded.')
         # Wait longer than the default 60 seconds, because this was intermittently failing on jenkins
         # with the screenshot showing that the Loading indicator was still visible. See TE-745.

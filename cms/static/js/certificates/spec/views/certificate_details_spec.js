@@ -7,10 +7,10 @@ define([ // jshint ignore:line
     'js/certificates/models/certificate',
     'js/certificates/views/certificate_details',
     'js/certificates/views/certificate_preview',
-    'js/views/feedback_notification',
+    'common/js/components/views/feedback_notification',
     'common/js/spec_helpers/ajax_helpers',
     'common/js/spec_helpers/template_helpers',
-    'js/spec_helpers/view_helpers',
+    'common/js/spec_helpers/view_helpers',
     'js/spec_helpers/validation_helpers',
     'js/certificates/spec/custom_matchers'
 ],
@@ -41,6 +41,11 @@ function(_, Course, CertificatesCollection, CertificateModel, CertificateDetails
         inputSignatoryTitle: '.signatory-title-input',
         inputSignatoryOrganization: '.signatory-organization-input'
     };
+    var verifyAndConfirmPrompt = function(promptSpy, promptText){
+        ViewHelpers.verifyPromptShowing(promptSpy, gettext(promptText));
+        ViewHelpers.confirmPrompt(promptSpy);
+        ViewHelpers.verifyPromptHidden(promptSpy);
+    };
 
     beforeEach(function() {
         window.course = new Course({
@@ -55,10 +60,12 @@ function(_, Course, CertificatesCollection, CertificateModel, CertificateDetails
             course_modes: ['honor', 'test'],
             certificate_web_view_url: '/users/1/courses/orgX/009/2016'
         });
+        window.CMS.User = {isGlobalStaff: true};
     });
 
     afterEach(function() {
         delete window.course;
+        delete window.CMS.User;
     });
 
     describe('Certificate Details Spec:', function() {
@@ -72,14 +79,14 @@ function(_, Course, CertificatesCollection, CertificateModel, CertificateDetails
         };
 
         beforeEach(function() {
-            TemplateHelpers.installTemplates(['certificate-details', 'signatory-details', 'signatory-editor'], true);
+            TemplateHelpers.installTemplates(['certificate-details', 'signatory-details', 'signatory-editor', 'signatory-actions'], true);
 
             this.newModelOptions = {add: true};
             this.model = new CertificateModel({
                 name: 'Test Name',
                 description: 'Test Description',
-                course_title: 'Test Course Title Override'
-
+                course_title: 'Test Course Title Override',
+                is_active: true
             }, this.newModelOptions);
 
             this.collection = new CertificatesCollection([ this.model ], {
@@ -131,14 +138,35 @@ function(_, Course, CertificatesCollection, CertificateModel, CertificateDetails
                 expect(this.view.$('.edit')).toExist();
             });
 
-            it('should change to "edit" mode when clicking the Edit button', function(){
+            it('should change to "edit" mode when clicking the Edit button and confirming the prompt', function(){
+                expect(this.view.$('.action-edit .edit')).toExist();
+                var promptSpy = ViewHelpers.createPromptSpy();
+                this.view.$('.action-edit .edit').click();
+                verifyAndConfirmPrompt(promptSpy, gettext('Edit this certificate?'));
+                expect(this.model.get('editing')).toBe(true);
+            });
+
+            it('should not show confirmation prompt when clicked on "edit" in case of inactive certificate', function(){
+                this.model.set('is_active', false);
                 expect(this.view.$('.action-edit .edit')).toExist();
                 this.view.$('.action-edit .edit').click();
                 expect(this.model.get('editing')).toBe(true);
             });
 
+            it('should not present a Edit action if user is not global staff and certificate is active', function () {
+                window.CMS.User = {isGlobalStaff: false};
+                appendSetFixtures(this.view.render().el);
+                expect(this.view.$('.action-edit .edit')).not.toExist();
+            });
+
             it('should present a Delete action', function () {
                 expect(this.view.$('.action-delete .delete')).toExist();
+            });
+
+            it('should not present a Delete action if user is not global staff and certificate is active', function () {
+                window.CMS.User = {isGlobalStaff: false};
+                appendSetFixtures(this.view.render().el);
+                expect(this.view.$('.action-delete .delete')).not.toExist();
             });
 
             it('should prompt the user when when clicking the Delete button', function(){
@@ -146,21 +174,35 @@ function(_, Course, CertificatesCollection, CertificateModel, CertificateDetails
                 this.view.$('.action-delete .delete').click();
             });
 
+            it('should scroll to top after rendering if necessary', function () {
+                $.smoothScroll = jasmine.createSpy('jQuery.smoothScroll');
+                appendSetFixtures(this.view.render().el);
+                expect($.smoothScroll).toHaveBeenCalled();
+            });
+
         });
 
         describe('Signatory details', function(){
 
             beforeEach(function() {
-                this.view.render(true);
+                this.view.render();
             });
 
             it('displays certificate signatories details', function(){
                 this.view.$('.show-details').click();
-                expect(this.view.$(SELECTORS.signatory_name_value)).toContainText(/^[A-Za-z\s]{10,40}/);
-                expect(this.view.$(SELECTORS.signatory_title_value)).toContainText('Title of the signatory');
-                expect(
-                    this.view.$(SELECTORS.signatory_organization_value)
-                ).toContainText('Organization of the signatory');
+                expect(this.view.$(SELECTORS.signatory_name_value)).toContainText('');
+                expect(this.view.$(SELECTORS.signatory_title_value)).toContainText('');
+                expect(this.view.$(SELECTORS.signatory_organization_value)).toContainText('');
+            });
+
+            it('should present Edit action on signaotry', function () {
+                expect(this.view.$(SELECTORS.edit_signatory)).toExist();
+            });
+
+            it('should not present Edit action on signaotry if user is not global staff and certificate is active', function () {
+                window.CMS.User = {isGlobalStaff: false};
+                this.view.render();
+                expect(this.view.$(SELECTORS.edit_signatory)).not.toExist();
             });
 
             it('supports in-line editing of signatory information', function() {
@@ -201,24 +243,6 @@ function(_, Course, CertificatesCollection, CertificateModel, CertificateDetails
                 expect(
                     this.view.$(SELECTORS.signatory_organization_value)
                 ).toContainText('New Signatory Test Organization');
-            });
-            it('should not allow invalid data when saving changes made during in-line signatory editing', function() {
-                this.view.$(SELECTORS.edit_signatory).click();
-
-                setValuesToInputs(this.view, {
-                    inputSignatoryName: 'New Signatory Test Name'
-                });
-
-                setValuesToInputs(this.view, {
-                    inputSignatoryTitle: 'New Signatory Test Title longer than 40 characters in length'
-                });
-
-                setValuesToInputs(this.view, {
-                    inputSignatoryOrganization: 'New Signatory Test Organization'
-                });
-
-                this.view.$(SELECTORS.signatory_panel_save).click();
-                expect(this.view.$(SELECTORS.inputSignatoryTitle).parent()).toHaveClass('error');
             });
         });
     });

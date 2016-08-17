@@ -67,7 +67,7 @@ def remove_shim_context(event):
         context = event['context']
         # These fields are present elsewhere in the event at this point
         context_fields_to_remove = set(CONTEXT_FIELDS_TO_INCLUDE)
-        # This field is only used for Segment.io web analytics and does not concern researchers
+        # This field is only used for Segment web analytics and does not concern researchers
         context_fields_to_remove.add('client_id')
         for field in context_fields_to_remove:
             if field in context:

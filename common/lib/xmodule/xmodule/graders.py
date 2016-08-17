@@ -310,7 +310,7 @@ class AssignmentFormatGrader(CourseGrader):
                 if index not in dropped_indices:
                     aggregate_score += mark['percent']
 
-            if (len(breakdown) - drop_count > 0):
+            if len(breakdown) - drop_count > 0:
                 aggregate_score /= len(breakdown) - drop_count
 
             return aggregate_score, dropped_indices

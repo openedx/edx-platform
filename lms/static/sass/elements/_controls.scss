@@ -314,6 +314,12 @@
   color: $action-primary-fg;
 }
 
+%btn-pl-white-base{
+  @extend %btn-pl-default-base;
+  background-color: $action-primary-fg;
+  color: $action-primary-bg;
+}
+
 %btn-pl-green-base {
   @extend %btn-pl-default-base;
   background-color: darken($green-d1,10%);
@@ -339,6 +345,33 @@
   }
 }
 
+%btn-pl-black-border {
+  @extend %btn-pl-default-base;
+  border: 1px solid $m-gray-d4;
+  background-color: transparent;
+  color: $base-font-color;
+
+  &:hover,
+  &:focus {
+    border: 1px solid darken($m-gray-d4,10%);
+    background-color: $m-gray-d4;
+  }
+}
+
+%btn-pl-black-base {
+  @extend %btn-pl-default-base;
+  border: 1px solid transparent;
+  background-color: $m-gray-d4;
+  color: $very-light-text;
+
+  &:hover,
+  &:focus {
+    border: 1px solid darken($m-gray-d4,10%);
+    background-color: transparent;
+    color: $base-font-color;
+  }
+}
+
 %btn-pl-secondary-base {
   @extend %btn-pl-default-base;
   @include transition(border $tmg-f2 ease-in-out);
@@ -349,6 +382,19 @@
     border: 1px solid $gray-l2;
     background-color: transparent;
     color: $action-primary-bg;
+  }
+}
+
+%btn-pl-elevated-alt {
+  @extend %btn-pl-default-base;
+  box-shadow: 0 3px 0 0 $gray-l4;
+  border: 1px solid $gray-l4;
+
+  &:hover {
+    box-shadow: 0 3px 0 0 $action-primary-bg;
+    border: 1px solid $action-primary-bg;
+    background-color: lighten($action-primary-bg,20%);
+    color: $white;
   }
 }
 
@@ -390,3 +436,37 @@
       margin-bottom: none;
     }
   }
+
+  .btn-secondary {
+    @extend %btn-pl-secondary-base;
+
+    background-image: none;
+
+    &:focus,
+    &:hover {
+      background-image: none !important;
+      background-color: transparent !important;
+      color: $link-color;
+    }
+  }
+
+.btn-link {
+    @extend %shame-link-text;
+
+    // reset of inherited buttons
+    border-radius: 0;
+    border-color: $transparent;
+    padding: 1px;
+    background: $transparent;
+    background-image: none;
+
+    @extend %t-action3;
+    @extend %t-strong;
+
+    &:focus,
+    &:hover {
+        background-image: none !important;
+        background-color: $transparent !important;
+        box-shadow: none !important;
+    }
+}

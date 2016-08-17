@@ -10,7 +10,7 @@ OAuth 2.0
 
 The edX Platform APIs use OAuth 2.0 for authentication. OAuth 2.0 is an open
 standard used by many systems that require secure user authentication. See the
-`OAuth 2.0 Standard`_ standard for more information.
+`OAuth 2.0 Standard`_ for more information.
 
 ***************************************
 Registering with Your Open edX Instance

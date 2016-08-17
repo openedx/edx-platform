@@ -24,7 +24,7 @@ metadata:
         The mean is calculated by summing the set of numbers and dividing by n. In this case: (1 + 5 + 6 + 3 + 5) / 5 = 20 / 5 = 4.
         [explanation]
 
-tab: hint
+hinted: true
 data: |
     <problem>
     

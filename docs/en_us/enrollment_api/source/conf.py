@@ -5,7 +5,7 @@
 # pylint: disable=unused-argument
 
 import os
-from path import path
+from path import Path as path
 import sys
 import mock
 
@@ -30,10 +30,6 @@ MOCK_MODULES = [
     'Location',
     'opaque_keys.edx.locator',
     'Locator',
-    'south',
-    'modelsinspector',
-    'south.modelsinspector',
-    'add_introspection_rules'
 ]
 
 for mod_name in MOCK_MODULES:

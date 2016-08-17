@@ -9,7 +9,7 @@ from django.utils.decorators import method_decorator
 from django.views.generic.base import View
 
 from edxmako.shortcuts import render_to_response
-from verify_student.models import SoftwareSecurePhotoVerification
+from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 
 
 class SoftwareSecureFakeView(View):
@@ -40,7 +40,7 @@ class SoftwareSecureFakeView(View):
         }
 
         try:
-            most_recent = SoftwareSecurePhotoVerification.original_verification(user)
+            most_recent = SoftwareSecurePhotoVerification.objects.filter(user=user).order_by("-updated_at")[0]
             context["receipt_id"] = most_recent.receipt_id
         except:  # pylint: disable=bare-except
             pass

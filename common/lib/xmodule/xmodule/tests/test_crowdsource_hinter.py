@@ -554,9 +554,9 @@ class CrowdsourceHinterTest(unittest.TestCase):
         mock_module.get_hint = fake_get_hint
         json_in = {'problem_name': '42.5'}
         out = json.loads(mock_module.handle_ajax('get_hint', json_in))['contents']
-        self.assertTrue('This is the best hint.' in out)
-        self.assertTrue('A random hint' in out)
-        self.assertTrue('Another random hint' in out)
+        self.assertIn('This is the best hint.', out)
+        self.assertIn('A random hint', out)
+        self.assertIn('Another random hint', out)
 
     def test_template_feedback(self):
         """

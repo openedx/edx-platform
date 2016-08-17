@@ -248,7 +248,7 @@ if Backbone?
       @$(".forum-nav-thread[data-id='#{thread_id}'] .forum-nav-thread-link").addClass("is-active").find(".forum-nav-thread-wrapper-1").prepend('<span class="sr">' + gettext("Current conversation") + '</span>')
 
     goHome: ->
-      @template = _.template($("#discussion-home").html())
+      @template = _.template($("#discussion-home-template").html())
       $(".forum-content").html(@template)
       $(".forum-nav-thread-list a").removeClass("is-active").find(".sr").remove()
       $("input.email-setting").bind "click", @updateEmailNotifications

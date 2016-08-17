@@ -40,7 +40,7 @@ from django.template.defaultfilters import escapejs
       <h2 class="page-header-super course-original">
         <span class="sr">${_("You are creating a re-run from:")}</span>
         <span class="course-original-title-id">${source_course_key.org | h} ${source_course_key.course | h} ${source_course_key.run | h}</span>
-        <span class="course-original-title">${display_name}</span>
+        <span class="course-original-title">${display_name | h}</span>
       </h2>
     </header>
   </div>
@@ -73,7 +73,7 @@ from django.template.defaultfilters import escapejs
                   <ol class="list-input">
                     <li class="field text required" id="field-course-name">
                       <label for="rerun-course-name">${_("Course Name")}</label>
-                      <input class="rerun-course-name" id="rerun-course-name" type="text" name="rerun-course-name" aria-required="true" value="${display_name}" placeholder="${_('e.g. Introduction to Computer Science')}" />
+                      <input class="rerun-course-name" id="rerun-course-name" type="text" name="rerun-course-name" aria-required="true" value="${display_name | h}" placeholder="${_('e.g. Introduction to Computer Science')}" />
                       <span class="tip">
                         ${_("The public display name for the new course. (This name is often the same as the original course name.)")}
                       </span>

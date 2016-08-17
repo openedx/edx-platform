@@ -15,7 +15,7 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from course_modes.tests.factories import CourseModeFactory
 from student.models import CourseEnrollment, DashboardConfiguration
-from student.views import get_course_enrollment_pairs, _get_recently_enrolled_courses
+from student.views import get_course_enrollments, _get_recently_enrolled_courses
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
@@ -67,7 +67,7 @@ class TestRecentEnrollments(ModuleStoreTestCase):
         self._configure_message_timeout(60)
 
         # get courses through iterating all courses
-        courses_list = list(get_course_enrollment_pairs(self.student, None, []))
+        courses_list = list(get_course_enrollments(self.student, None, []))
         self.assertEqual(len(courses_list), 2)
 
         recent_course_list = _get_recently_enrolled_courses(courses_list)
@@ -78,7 +78,7 @@ class TestRecentEnrollments(ModuleStoreTestCase):
         Tests that the recent enrollment list is empty if configured to zero seconds.
         """
         self._configure_message_timeout(0)
-        courses_list = list(get_course_enrollment_pairs(self.student, None, []))
+        courses_list = list(get_course_enrollments(self.student, None, []))
         self.assertEqual(len(courses_list), 2)
 
         recent_course_list = _get_recently_enrolled_courses(courses_list)
@@ -106,16 +106,16 @@ class TestRecentEnrollments(ModuleStoreTestCase):
             enrollment.save()
             courses.append(course)
 
-        courses_list = list(get_course_enrollment_pairs(self.student, None, []))
+        courses_list = list(get_course_enrollments(self.student, None, []))
         self.assertEqual(len(courses_list), 6)
 
         recent_course_list = _get_recently_enrolled_courses(courses_list)
         self.assertEqual(len(recent_course_list), 5)
 
-        self.assertEqual(recent_course_list[1][0], courses[0])
-        self.assertEqual(recent_course_list[2][0], courses[1])
-        self.assertEqual(recent_course_list[3][0], courses[2])
-        self.assertEqual(recent_course_list[4][0], courses[3])
+        self.assertEqual(recent_course_list[1].course.id, courses[0].id)
+        self.assertEqual(recent_course_list[2].course.id, courses[1].id)
+        self.assertEqual(recent_course_list[3].course.id, courses[2].id)
+        self.assertEqual(recent_course_list[4].course.id, courses[3].id)
 
     def test_dashboard_rendering(self):
         """
@@ -127,22 +127,21 @@ class TestRecentEnrollments(ModuleStoreTestCase):
         self.assertContains(response, "Thank you for enrolling in")
 
     @ddt.data(
-        #Register as an honor in any course modes with no payment option
+        # Register as honor in any course modes with no payment option
         ([('audit', 0), ('honor', 0)], 'honor', True),
         ([('honor', 0)], 'honor', True),
-        ([], 'honor', True),
-        #Register as an honor in any course modes which has payment option
+        # Register as honor in any course modes which has payment option
         ([('honor', 10)], 'honor', False),  # This is a paid course
         ([('audit', 0), ('honor', 0), ('professional', 20)], 'honor', True),
         ([('audit', 0), ('honor', 0), ('verified', 20)], 'honor', True),
         ([('audit', 0), ('honor', 0), ('verified', 20), ('professional', 20)], 'honor', True),
-        ([], 'honor', True),
-        #Register as an audit in any course modes with no payment option
+        # Register as audit in any course modes with no payment option
         ([('audit', 0), ('honor', 0)], 'audit', True),
         ([('audit', 0)], 'audit', True),
-        #Register as an audit in any course modes which has no payment option
+        ([], 'audit', True),
+        # Register as audit in any course modes which has no payment option
         ([('audit', 0), ('honor', 0), ('verified', 10)], 'audit', True),
-        #Register as a verified in any course modes which has payment option
+        # Register as verified in any course modes which has payment option
         ([('professional', 20)], 'professional', False),
         ([('verified', 20)], 'verified', False),
         ([('professional', 20), ('verified', 20)], 'verified', False),

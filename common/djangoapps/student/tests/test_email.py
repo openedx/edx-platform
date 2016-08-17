@@ -11,11 +11,12 @@ from student.views import (
 from student.models import UserProfile, PendingEmailChange
 from django.core.urlresolvers import reverse
 from django.core import mail
-from django.contrib.auth.models import User, AnonymousUser
+from django.contrib.auth.models import User
+from django.db import transaction
 from django.test import TestCase, TransactionTestCase
 from django.test.client import RequestFactory
 from mock import Mock, patch
-from django.http import Http404, HttpResponse
+from django.http import HttpResponse
 from django.conf import settings
 from edxmako.shortcuts import render_to_string
 from edxmako.tests import mako_middleware_process_request
@@ -35,7 +36,6 @@ def mock_render_to_string(template_name, context):
 
 def mock_render_to_response(template_name, context):
     """Return an HttpResponse with content that encodes template_name and context"""
-    # View confirm_email_change uses @transaction.commit_manually.
     # This simulates any db access in the templates.
     UserProfile.objects.exists()
     return HttpResponse(mock_render_to_string(template_name, context))
@@ -418,9 +418,10 @@ class EmailChangeConfirmationTests(EmailTestMixin, TransactionTestCase):
         self.assertEquals(0, PendingEmailChange.objects.count())
 
     @patch('student.views.PendingEmailChange.objects.get', Mock(side_effect=TestException))
-    @patch('student.views.transaction.rollback', wraps=django.db.transaction.rollback)
-    def test_always_rollback(self, rollback, _email_user):
-        with self.assertRaises(TestException):
-            confirm_email_change(self.request, self.key)
+    def test_always_rollback(self, _email_user):
+        connection = transaction.get_connection()
+        with patch.object(connection, 'rollback', wraps=connection.rollback) as mock_rollback:
+            with self.assertRaises(TestException):
+                confirm_email_change(self.request, self.key)
 
-        rollback.assert_called_with()
+            mock_rollback.assert_called_with()

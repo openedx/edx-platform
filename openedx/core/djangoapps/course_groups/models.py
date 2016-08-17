@@ -6,7 +6,11 @@ import json
 import logging
 
 from django.contrib.auth.models import User
-from django.db import models
+from django.db import models, transaction, IntegrityError
+from util.db import outer_atomic
+from django.core.exceptions import ValidationError
+from django.db.models.signals import pre_delete
+from django.dispatch import receiver
 from xmodule_django.models import CourseKeyField
 
 log = logging.getLogger(__name__)
@@ -18,7 +22,7 @@ class CourseUserGroup(models.Model):
     which may be treated specially.  For example, a user can be in at most one cohort per
     course, and cohorts are used to split up the forums by group.
     """
-    class Meta:
+    class Meta(object):
         unique_together = (('name', 'course_id'), )
 
     name = models.CharField(max_length=255,
@@ -37,7 +41,7 @@ class CourseUserGroup(models.Model):
 
     # For now, only have group type 'cohort', but adding a type field to support
     # things like 'question_discussion', 'friends', 'off-line-class', etc
-    COHORT = 'cohort'
+    COHORT = 'cohort'  # If changing this string, update it in migration 0006.forwards() as well
     GROUP_TYPE_CHOICES = ((COHORT, 'Cohort'),)
     group_type = models.CharField(max_length=20, choices=GROUP_TYPE_CHOICES)
 
@@ -56,6 +60,91 @@ class CourseUserGroup(models.Model):
             group_type=group_type,
             name=name
         )
+
+
+class CohortMembership(models.Model):
+    """Used internally to enforce our particular definition of uniqueness"""
+
+    course_user_group = models.ForeignKey(CourseUserGroup)
+    user = models.ForeignKey(User)
+    course_id = CourseKeyField(max_length=255)
+
+    previous_cohort = None
+    previous_cohort_name = None
+    previous_cohort_id = None
+
+    class Meta(object):
+        unique_together = (('user', 'course_id'), )
+
+    def clean_fields(self, *args, **kwargs):
+        if self.course_id is None:
+            self.course_id = self.course_user_group.course_id
+        super(CohortMembership, self).clean_fields(*args, **kwargs)
+
+    def clean(self):
+        if self.course_user_group.group_type != CourseUserGroup.COHORT:
+            raise ValidationError("CohortMembership cannot be used with CourseGroup types other than COHORT")
+        if self.course_user_group.course_id != self.course_id:
+            raise ValidationError("Non-matching course_ids provided")
+
+    def save(self, *args, **kwargs):
+        self.full_clean(validate_unique=False)
+
+        # Avoid infinite recursion if creating from get_or_create() call below.
+        # This block also allows middleware to use CohortMembership.get_or_create without worrying about outer_atomic
+        if 'force_insert' in kwargs and kwargs['force_insert'] is True:
+            with transaction.atomic():
+                self.course_user_group.users.add(self.user)
+                self.course_user_group.save()
+                super(CohortMembership, self).save(*args, **kwargs)
+            return
+
+        # This block will transactionally commit updates to CohortMembership and underlying course_user_groups.
+        # Note the use of outer_atomic, which guarantees that operations are committed to the database on block exit.
+        # If called from a view method, that method must be marked with @transaction.non_atomic_requests.
+        with outer_atomic(read_committed=True):
+
+            saved_membership, created = CohortMembership.objects.select_for_update().get_or_create(
+                user__id=self.user.id,
+                course_id=self.course_id,
+                defaults={
+                    'course_user_group': self.course_user_group,
+                    'user': self.user
+                }
+            )
+
+            # If the membership was newly created, all the validation and course_user_group logic was settled
+            # with a call to self.save(force_insert=True), which gets handled above.
+            if created:
+                return
+
+            if saved_membership.course_user_group == self.course_user_group:
+                raise ValueError("User {user_name} already present in cohort {cohort_name}".format(
+                    user_name=self.user.username,
+                    cohort_name=self.course_user_group.name
+                ))
+            self.previous_cohort = saved_membership.course_user_group
+            self.previous_cohort_name = saved_membership.course_user_group.name
+            self.previous_cohort_id = saved_membership.course_user_group.id
+            self.previous_cohort.users.remove(self.user)
+            self.previous_cohort.save()
+
+            saved_membership.course_user_group = self.course_user_group
+            self.course_user_group.users.add(self.user)
+            self.course_user_group.save()
+
+            super(CohortMembership, saved_membership).save(update_fields=['course_user_group'])
+
+
+# Needs to exist outside class definition in order to use 'sender=CohortMembership'
+@receiver(pre_delete, sender=CohortMembership)
+def remove_user_from_cohort(sender, instance, **kwargs):  # pylint: disable=unused-argument
+    """
+    Ensures that when a CohortMemebrship is deleted, the underlying CourseUserGroup
+    has its users list updated to reflect the change as well.
+    """
+    instance.course_user_group.users.remove(instance.user)
+    instance.course_user_group.save()
 
 
 class CourseUserGroupPartitionGroup(models.Model):

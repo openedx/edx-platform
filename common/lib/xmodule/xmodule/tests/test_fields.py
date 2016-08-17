@@ -95,7 +95,7 @@ class DateTest(unittest.TestCase):
         now = datetime.datetime.now(UTC())
         delta = now - datetime.datetime.fromtimestamp(0, UTC())
         self.assertEqual(
-            DateTest.date.from_json(delta.total_seconds() * 1000),  # pylint: disable=maybe-no-member
+            DateTest.date.from_json(delta.total_seconds() * 1000),
             now
         )
         yesterday = datetime.datetime.now(UTC()) - datetime.timedelta(days=-1)
@@ -218,7 +218,8 @@ class RelativeTimeTest(unittest.TestCase):
             RelativeTimeTest.delta.to_json(100.0)
         )
 
-        with self.assertRaisesRegexp(ValueError, "RelativeTime max value is 23:59:59=86400.0 seconds, but 90000.0 seconds is passed"):
+        error_msg = "RelativeTime max value is 23:59:59=86400.0 seconds, but 90000.0 seconds is passed"
+        with self.assertRaisesRegexp(ValueError, error_msg):
             RelativeTimeTest.delta.to_json(datetime.timedelta(seconds=90000))
 
         with self.assertRaises(TypeError):

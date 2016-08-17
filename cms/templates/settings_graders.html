@@ -8,6 +8,8 @@
   import json
   from contentstore import utils
   from django.utils.translation import ugettext as _
+  from models.settings.encoder import CourseSettingsEncoder
+  from openedx.core.lib.js_utils import escape_json_dumps
 %>
 
 <%block name="header_extras">
@@ -23,7 +25,7 @@
 </%block>
 <%block name="requirejs">
     require(["js/factories/settings_graders"], function(SettingsGradersFactory) {
-        SettingsGradersFactory(_.extend(${course_details|n}, {is_credit_course: ${json.dumps(is_credit_course)}}), "${grading_url}");
+        SettingsGradersFactory(_.extend(${escape_json_dumps(course_details, cls=CourseSettingsEncoder) | n}, {is_credit_course: ${escape_json_dumps(is_credit_course) | n}}), "${grading_url}");
     });
 </%block>
 
@@ -79,15 +81,16 @@
         % if settings.FEATURES.get("ENABLE_CREDIT_ELIGIBILITY", False) and is_credit_course:
           <section class="group-settings grade-rules">
             <header>
-              <h2 class="title-2">${_("Credit Grade &amp; Eligibility")}</h2>
-              <span class="tip">${_("Settings for credit eligibility")}</span>
+              <h2 class="title-2">${_("Credit Eligibility")}</h2>
+              <span class="tip">${_("Settings for course credit eligibility")}</span>
             </header>
 
             <ol class="list-input">
               <li class="field text" id="field-course-minimum_grade_credit">
-                <label for="course-minimum_grade_credit">${_("Minimum Passing Grade to Earn Credit:")}</label>
-                <input type="text" class="short time" id="course-minimum_grade_credit" value="0" placeholder="80%" autocomplete="off" aria-describedby="minimum_grade_description"/>
-                <span class="tip tip-inline" id="minimum_grade_description">${_("Must be greater than or equal to passing grade")}</span>
+                <label for="course-minimum_grade_credit">${_("Minimum Credit-Eligible Grade:")}</label>
+                <input type="text" class="short time input-minimum-grade" id="course-minimum_grade_credit" value="0" placeholder="80" autocomplete="off" aria-describedby="minimum_grade_description"/>
+                <span class="minimum-grade-percentage-sign">%</span>
+                <span class="tip tip-inline" id="minimum_grade_description">${_("Must be greater than or equal to the course passing grade")}</span>
               </li>
             </ol>
           </section>

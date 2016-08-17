@@ -54,15 +54,14 @@ define(["jquery", "underscore", "common/js/spec_helpers/ajax_helpers", "URI", "j
         });
 
         var respondWithMockPage = function(requests, mockPage) {
-            var requestIndex = requests.length - 1;
+            var request = AjaxHelpers.currentRequest(requests);
             if (typeof mockPage == 'undefined') {
-                var request = requests[requestIndex];
                 var url = new URI(request.url);
                 var queryParameters = url.query(true); // Returns an object with each query parameter stored as a value
                 var page = queryParameters.page_number;
                 mockPage = page === "0" ? mockFirstPage : mockSecondPage;
             }
-            AjaxHelpers.respondWithJson(requests, mockPage, requestIndex);
+            AjaxHelpers.respondWithJson(requests, mockPage);
         };
 
         var MockPagingView = PagedContainer.extend({
@@ -75,8 +74,6 @@ define(["jquery", "underscore", "common/js/spec_helpers/ajax_helpers", "URI", "j
             var pagingContainer;
 
             beforeEach(function () {
-                var feedbackTpl = readFixtures('system-feedback.underscore');
-                setFixtures($("<script>", { id: "system-feedback-tpl", type: "text/template" }).text(feedbackTpl));
                 pagingContainer = new MockPagingView({page_size: PAGE_SIZE});
             });
 
@@ -142,7 +139,7 @@ define(["jquery", "underscore", "common/js/spec_helpers/ajax_helpers", "URI", "j
                         pagingContainer.setPage(1);
                         respondWithMockPage(requests);
                         pagingContainer.nextPage();
-                        expect(requests.length).toBe(1);
+                        AjaxHelpers.expectNoRequests(requests);
                     });
                 });
 
@@ -161,7 +158,7 @@ define(["jquery", "underscore", "common/js/spec_helpers/ajax_helpers", "URI", "j
                         pagingContainer.setPage(0);
                         respondWithMockPage(requests);
                         pagingContainer.previousPage();
-                        expect(requests.length).toBe(1);
+                        AjaxHelpers.expectNoRequests(requests);
                     });
 
                     it('does not move back after a server error', function () {

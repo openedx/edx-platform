@@ -31,11 +31,9 @@ from xmodule.x_module import ModuleSystem, XModule, XModuleDescriptor, Descripto
 from xmodule.annotatable_module import AnnotatableDescriptor
 from xmodule.capa_module import CapaDescriptor
 from xmodule.course_module import CourseDescriptor
-from xmodule.combined_open_ended_module import CombinedOpenEndedDescriptor
 from xmodule.discussion_module import DiscussionDescriptor
 from xmodule.gst_module import GraphicalSliderToolDescriptor
 from xmodule.html_module import HtmlDescriptor
-from xmodule.peer_grading_module import PeerGradingDescriptor
 from xmodule.poll_module import PollDescriptor
 from xmodule.word_cloud_module import WordCloudDescriptor
 from xmodule.crowdsource_hinter import CrowdsourceHinterDescriptor
@@ -54,11 +52,9 @@ from xmodule.tests import get_test_descriptor_system, get_test_system
 LEAF_XMODULES = {
     AnnotatableDescriptor: [{}],
     CapaDescriptor: [{}],
-    CombinedOpenEndedDescriptor: [{}],
     DiscussionDescriptor: [{}],
     GraphicalSliderToolDescriptor: [{}],
     HtmlDescriptor: [{}],
-    PeerGradingDescriptor: [{}],
     PollDescriptor: [{'display_name': 'Poll Display Name'}],
     WordCloudDescriptor: [{}],
     # This is being excluded because it has dependencies on django
@@ -104,7 +100,8 @@ class ModuleSystemFactory(Factory):
     performed by :func:`xmodule.tests.get_test_system`, so
     arguments for that function are valid factory attributes.
     """
-    FACTORY_FOR = ModuleSystem
+    class Meta(object):
+        model = ModuleSystem
 
     @classmethod
     def _build(cls, target_class, *args, **kwargs):  # pylint: disable=unused-argument
@@ -119,7 +116,8 @@ class DescriptorSystemFactory(Factory):
     performed by :func:`xmodule.tests.get_test_descriptor_system`, so
     arguments for that function are valid factory attributes.
     """
-    FACTORY_FOR = DescriptorSystem
+    class Meta(object):
+        model = DescriptorSystem
 
     @classmethod
     def _build(cls, target_class, *args, **kwargs):  # pylint: disable=unused-argument
@@ -190,7 +188,8 @@ class LeafDescriptorFactory(Factory):
     """
     # pylint: disable=missing-docstring
 
-    FACTORY_FOR = XModuleDescriptor
+    class Meta(object):
+        model = XModuleDescriptor
 
     runtime = SubFactory(DescriptorSystemFactory)
     url_name = LazyAttributeSequence('{.block_type}_{}'.format)

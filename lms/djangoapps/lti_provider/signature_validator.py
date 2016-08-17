@@ -5,8 +5,6 @@ Subclass of oauthlib's RequestValidator that checks an OAuth signature.
 from oauthlib.oauth1 import SignatureOnlyEndpoint
 from oauthlib.oauth1 import RequestValidator
 
-from lti_provider.models import LtiConsumer
-
 
 class SignatureValidator(RequestValidator):
     """
@@ -18,9 +16,10 @@ class SignatureValidator(RequestValidator):
     application-specific requirements.
     """
 
-    def __init__(self):
+    def __init__(self, lti_consumer):
         super(SignatureValidator, self).__init__()
         self.endpoint = SignatureOnlyEndpoint(self)
+        self.lti_consumer = lti_consumer
 
     # The OAuth signature uses the endpoint URL as part of the request to be
     # hashed. By default, the oauthlib library rejects any URLs that do not
@@ -77,7 +76,7 @@ class SignatureValidator(RequestValidator):
 
         :return: True if the key is valid, False if it is not.
         """
-        return LtiConsumer.objects.filter(consumer_key=client_key).count() == 1
+        return self.lti_consumer.consumer_key == client_key
 
     def get_client_secret(self, client_key, request):
         """
@@ -87,10 +86,7 @@ class SignatureValidator(RequestValidator):
         :return: the client secret that corresponds to the supplied key if
         present, or None if the key does not exist in the database.
         """
-        try:
-            return LtiConsumer.objects.get(consumer_key=client_key).consumer_secret
-        except LtiConsumer.DoesNotExist:
-            return None
+        return self.lti_consumer.consumer_secret
 
     def verify(self, request):
         """

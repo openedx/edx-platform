@@ -1,12 +1,13 @@
 {% extends "main_django.html" %}
-{% load compressed %}{% load sekizai_tags i18n microsite %}{% load url from future %}{% load staticfiles %}
+{% load pipeline %}{% load sekizai_tags i18n microsite %}{% load url from future %}{% load staticfiles %}
 
 {% block title %}<title>{% block pagetitle %}{% endblock %} | {% trans "Wiki" %} | {% platform_name %}</title>{% endblock %}
 
-{% block bodyclass %}view-incourse view-wiki{% endblock %}
+{% block bodyclass %}view-in-course view-wiki{% endblock %}
 
 {% block headextra %}
-  {% compressed_css 'course' %}
+  <script type="text/javascript" src="/i18n.js"></script>
+  {% stylesheet 'course' %}
 
   <script type="text/javascript">
     function ajaxError(){}
@@ -33,10 +34,6 @@
 
   {% addtoblock 'js' %}
     {% comment %} These scripts load at the bottom of the body {% endcomment %}
-    <script>
-      window.onload = add_schematic_handler(window.onload);
-    </script>
-
     <script src="{% static 'js/bootstrap-alert.js' %}"></script>
     <script src="{% static 'js/bootstrap-collapse.js' %}"></script>
     <script src="{% static 'js/bootstrap-modal.js' %}"></script>

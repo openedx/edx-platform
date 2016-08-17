@@ -17,8 +17,6 @@ from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
 from student.models import User
 from microsite_configuration import microsite
 
-from django.utils.translation import ugettext as _
-
 
 @login_required
 @require_http_methods(['GET'])
@@ -42,13 +40,13 @@ def learner_profile(request, username):
     try:
         return render_to_response(
             'student_profile/learner_profile.html',
-            learner_profile_context(request.user, username, request.user.is_staff, request.build_absolute_uri)
+            learner_profile_context(request, username, request.user.is_staff)
         )
     except (UserNotAuthorized, UserNotFound, ObjectDoesNotExist):
         raise Http404
 
 
-def learner_profile_context(logged_in_user, profile_username, user_is_staff, build_absolute_uri_func):
+def learner_profile_context(request, profile_username, user_is_staff):
     """Context for the learner profile page.
 
     Args:
@@ -64,14 +62,11 @@ def learner_profile_context(logged_in_user, profile_username, user_is_staff, bui
         ObjectDoesNotExist: the specified profile_username does not exist.
     """
     profile_user = User.objects.get(username=profile_username)
+    logged_in_user = request.user
 
     own_profile = (logged_in_user.username == profile_username)
 
-    account_settings_data = get_account_settings(logged_in_user, profile_username)
-    # Account for possibly relative URLs.
-    for key, value in account_settings_data['profile_image'].items():
-        if key.startswith(PROFILE_IMAGE_KEY_PREFIX):
-            account_settings_data['profile_image'][key] = build_absolute_uri_func(value)
+    account_settings_data = get_account_settings(request, profile_username)
 
     preferences_data = get_user_preferences(profile_user, profile_username)
 
@@ -94,6 +89,7 @@ def learner_profile_context(logged_in_user, profile_username, user_is_staff, bui
             'country_options': list(countries),
             'language_options': settings.ALL_LANGUAGES,
             'platform_name': microsite.get_value('platform_name', settings.PLATFORM_NAME),
-        }
+        },
+        'disable_courseware_js': True,
     }
     return context

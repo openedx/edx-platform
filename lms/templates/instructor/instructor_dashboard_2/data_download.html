@@ -35,11 +35,43 @@
 
     <p><input type="button" name="list-may-enroll-csv" value="${_("Download a CSV of learners who can enroll")}" data-endpoint="${ section_data['get_students_who_may_enroll_url'] }" data-csv="true"></p>
 
+    %if section_data['show_generate_proctored_exam_report_button']:
+      <p>${_("Click to generate a CSV file of all proctored exam results in this course.")}</p>
+      <p><input type="button" name="proctored-exam-results-report" value="${_("Generate Proctored Exam Results Report")}" data-endpoint="${ section_data['list_proctored_results_url'] }"/></p>
+    %endif
+
+    %if section_data['course_has_survey']:
+      <p>${_("Click to generate a CSV file of survey results for this course.")}</p>
+      <p><input type="button" name="survey-results-report" value="${_("Generate Survey Results Report")}" data-endpoint="${ section_data['course_survey_results_url'] }"/></p>
+    %endif
+
+    <p>${_("To generate a CSV file that lists all student answers to a given problem, enter the location of the problem (from its Staff Debug Info).")}</p>
+
+    <p>
+      <label>
+        <span>${_("Problem location: ")}</span>
+        <input type="text" name="problem-location" />
+      </label>
+    </p>
+    <p>
+      <input type="button" name="list-problem-responses-csv" value="${_("Download a CSV of problem responses")}" data-endpoint="${ section_data['get_problem_responses_url'] }" data-csv="true">
+    </p>
+
+    <div class="issued_certificates">
+      <p>${_("Click to list certificates that are issued for this course:")}</p>
+      <p>
+        <input type="button" name="issued-certificates-list" value="${_("View Certificates Issued")}" data-csv="false" data-endpoint="${ section_data['get_issued_certificates_url'] }">
+        <input type="button" name="issued-certificates-csv" value="${_("Download CSV of Certificates Issued")}" data-csv="true" data-endpoint="${ section_data['get_issued_certificates_url'] }">
+      </p>
+      <div class="data-display-table certificate-data-display-table" id="data-issued-certificates-table"></div>
+      <div class="issued-certificates-error request-response-error msg msg-error copy"></div>
+    </div>
+
   % if not disable_buttons:
     <p>${_("For smaller courses, click to list profile information for enrolled students directly on this page:")}</p>
     <p><input type="button" name="list-profiles" value="${_("List enrolled students' profile information")}" data-endpoint="${ section_data['get_students_features_url'] }"></p>
   %endif
-  <div class="data-display-table" id="data-student-profiles-table"></div>
+  <div class="data-display-table profile-data-display-table" id="data-student-profiles-table"></div>
 
   %if settings.FEATURES.get('ALLOW_COURSE_STAFF_GRADE_DOWNLOADS') or section_data['access']['admin']:
     <p>${_("Click to generate a CSV grade report for all currently enrolled students.")}</p>
@@ -50,7 +82,7 @@
   %endif
 
     <div class="request-response msg msg-confirm copy" id="report-request-response"></div>
-    <div class="request-response-error msg msg-warning copy" id="report-request-response-error"></div>
+    <div class="request-response-error msg msg-error copy" id="report-request-response-error"></div>
     <br>
 
     <p><b>${_("Reports Available for Download")}</b></p>
@@ -74,7 +106,7 @@
 %if settings.FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS'):
   <div class="running-tasks-container action-type-container">
     <hr>
-    <h2> ${_("Pending Instructor Tasks")} </h2>
+    <h2> ${_("Pending Tasks")} </h2>
     <div class="running-tasks-section">
       <p>${_("The status for any active tasks appears in a table below.")} </p>
       <br />

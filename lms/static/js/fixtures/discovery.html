@@ -1,26 +1,31 @@
 <section class="courses-container">
-  <div id="discovery-form">
-    <form>
-      <input class="discovery-input" placeholder="Search for a course" type="text"/><!-- removes spacing
-      --><button type="submit" class="button postfix discovery-submit" aria-label="Search">
+  <div id="discovery-form" class="wrapper-search-context">
+    <div id="discovery-message" class="search-status-label"></div>
+    <form class="wrapper-search-input">
+      <label for="discovery-input" class="sr">Search for a course</label>
+      <input id="discovery-input" class="discovery-input" placeholder="Search for a course" type="text"/>
+      <button type="submit" class="button postfix discovery-submit" aria-label="Search">
         <i class="icon fa fa-search" aria-hidden="true"></i>
+        <div aria-live="polite" aria-relevant="all">
+          <div id="loading-indicator" class="loading-spinner hidden">
+          <i class="icon fa fa-spinner fa-spin"></i>
+          <span class="sr">Loading</span>
+          </div>
+        </div>
       </button>
     </form>
-    <div id="discovery-message"></div>
-    <div aria-live="polite" aria-relevant="all">
-      <div id="loading-indicator" class="hidden">
-        <i class="icon fa fa-spinner fa-spin"></i> Loading
-      </div>
+
+    <div id="filter-bar" class="filters hide-phone">
     </div>
-  </div>
 
-  <div id="filter-bar" class="filters hide-phone">
-  </div>
+    <div class="courses" role="region" aria-label="List of Courses">
+      <ul class="courses-listing"></ul>
+    </div>
 
-  <section class="courses">
-    <ul class="courses-listing"></ul>
+    <aside aria-label="Refine your search" class="search-facets phone-menu">
+      <h2 class="header-search-facets">Refine Your Search</h2>
+      <section class="search-facets-lists"></section>
+    </aside>
+
   </section>
-
-  <aside aria-label="Refine your search" class="search-facets phone-menu">
-  </aside>
 </section>

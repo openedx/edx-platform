@@ -5,7 +5,6 @@ from student.auth import has_course_author_access
 from util.json_request import expect_json, JsonResponse
 
 from django.http import HttpResponseNotFound
-from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.views.decorators.csrf import ensure_csrf_cookie

@@ -1,5 +1,9 @@
+"""
+Course Structure Content sub-application test cases
+"""
 import json
 
+from xmodule_django.models import UsageKey
 from xmodule.modulestore.django import SignalHandler
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
@@ -19,16 +23,32 @@ class SignalDisconnectTestMixin(object):
 
 
 class CourseStructureTaskTests(ModuleStoreTestCase):
+    """
+    Test cases covering Course Structure task-related workflows
+    """
     def setUp(self, **kwargs):
         super(CourseStructureTaskTests, self).setUp()
-        self.course = CourseFactory.create()
+        self.course = CourseFactory.create(org='TestX', course='TS101', run='T1')
         self.section = ItemFactory.create(parent=self.course, category='chapter', display_name='Test Section')
+        self.discussion_module_1 = ItemFactory.create(
+            parent=self.course,
+            category='discussion',
+            discussion_id='test_discussion_id_1'
+        )
+        self.discussion_module_2 = ItemFactory.create(
+            parent=self.course,
+            category='discussion',
+            discussion_id='test_discussion_id_2'
+        )
         CourseStructure.objects.all().delete()
 
     def test_generate_course_structure(self):
         blocks = {}
 
         def add_block(block):
+            """
+            Inserts new child XBlocks into the existing course tree
+            """
             children = block.get_children() if block.has_children else []
 
             blocks[unicode(block.location)] = {
@@ -52,7 +72,7 @@ class CourseStructureTaskTests(ModuleStoreTestCase):
 
         self.maxDiff = None
         actual = _generate_course_structure(self.course.id)
-        self.assertDictEqual(actual, expected)
+        self.assertDictEqual(actual['structure'], expected)
 
     def test_structure_json(self):
         """
@@ -138,7 +158,7 @@ class CourseStructureTaskTests(ModuleStoreTestCase):
         structure = _generate_course_structure(self.course.id)
 
         usage_key = unicode(module.location)
-        actual = structure['blocks'][usage_key]
+        actual = structure['structure']['blocks'][usage_key]
         expected = {
             "usage_key": usage_key,
             "block_type": category,
@@ -149,6 +169,53 @@ class CourseStructureTaskTests(ModuleStoreTestCase):
         }
         self.assertEqual(actual, expected)
 
+    def test_generate_discussion_id_map(self):
+        id_map = {}
+
+        def add_block(block):
+            """Adds the given block and all of its children to the expected discussion id map"""
+            children = block.get_children() if block.has_children else []
+
+            if block.category == 'discussion':
+                id_map[block.discussion_id] = unicode(block.location)
+
+            for child in children:
+                add_block(child)
+
+        add_block(self.course)
+
+        actual = _generate_course_structure(self.course.id)
+        self.assertEqual(actual['discussion_id_map'], id_map)
+
+    def test_discussion_id_map_json(self):
+        id_map = {
+            'discussion_id_1': 'module_location_1',
+            'discussion_id_2': 'module_location_2'
+        }
+        id_map_json = json.dumps(id_map)
+        structure = CourseStructure.objects.create(course_id=self.course.id, discussion_id_map_json=id_map_json)
+        self.assertEqual(structure.discussion_id_map_json, id_map_json)
+
+        structure = CourseStructure.objects.get(course_id=self.course.id)
+        self.assertEqual(structure.discussion_id_map_json, id_map_json)
+
+    def test_discussion_id_map(self):
+        id_map = {
+            'discussion_id_1': 'block-v1:TestX+TS101+T1+type@discussion+block@b141953dff414921a715da37eb14ecdc',
+            'discussion_id_2': 'i4x://TestX/TS101/discussion/466f474fa4d045a8b7bde1b911e095ca'
+        }
+        id_map_json = json.dumps(id_map)
+        structure = CourseStructure.objects.create(course_id=self.course.id, discussion_id_map_json=id_map_json)
+        expected_id_map = {
+            key: UsageKey.from_string(value).map_into_course(self.course.id)
+            for key, value in id_map.iteritems()
+        }
+        self.assertEqual(structure.discussion_id_map, expected_id_map)
+
+    def test_discussion_id_map_missing(self):
+        structure = CourseStructure.objects.create(course_id=self.course.id)
+        self.assertIsNone(structure.discussion_id_map)
+
     def test_update_course_structure(self):
         """
         Test the actual task that orchestrates data generation and updating the database.
@@ -158,8 +225,13 @@ class CourseStructureTaskTests(ModuleStoreTestCase):
         self.assertRaises(ValueError, update_course_structure, course_id)
 
         # Ensure a CourseStructure object is created
-        structure = _generate_course_structure(course_id)
+        expected_structure = _generate_course_structure(course_id)
         update_course_structure(unicode(course_id))
-        cs = CourseStructure.objects.get(course_id=course_id)
-        self.assertEqual(cs.course_id, course_id)
-        self.assertEqual(cs.structure, structure)
+        structure = CourseStructure.objects.get(course_id=course_id)
+        self.assertEqual(structure.course_id, course_id)
+        self.assertEqual(structure.structure, expected_structure['structure'])
+        self.assertEqual(structure.discussion_id_map.keys(), expected_structure['discussion_id_map'].keys())
+        self.assertEqual(
+            [unicode(value) for value in structure.discussion_id_map.values()],
+            expected_structure['discussion_id_map'].values()
+        )

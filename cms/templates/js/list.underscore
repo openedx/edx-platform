@@ -4,7 +4,7 @@
             <%- emptyMessage %>
             <a href="#" class="button new-button"><i class="icon fa fa-plus"></i>
             <%= interpolate(
-                gettext("Add your first %(item_type)s"), {item_type: itemCategoryDisplayName}, true
+                gettext("%(new_item_message)s"), {new_item_message: newItemMessage}, true
             ) %></a>
         </p>
     </div>

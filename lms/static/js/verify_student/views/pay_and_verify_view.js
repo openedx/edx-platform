@@ -27,6 +27,9 @@ var edx = edx || {};
         initialize: function( obj ) {
             this.errorModel = obj.errorModel || null;
             this.displaySteps = obj.displaySteps || [];
+            this.courseKey = obj.courseKey || null;
+            this.checkpointLocation = obj.checkpointLocation || null;
+
             this.initializeStepViews( obj.stepInfo || {} );
             this.currentStepIndex = _.indexOf(
                 _.pluck( this.displaySteps, 'name' ),
@@ -61,7 +64,14 @@ var edx = edx || {};
             // among the different steps.  This allows
             // one step to save photos and another step
             // to submit them.
-            verificationModel = new edx.verify_student.VerificationModel();
+            //
+            // We also pass in the course key and checkpoint location.
+            // If we've been provided with a checkpoint in the courseware,
+            // this will associate the verification attempt with the checkpoint.
+            verificationModel = new edx.verify_student.VerificationModel({
+                courseKey: this.courseKey,
+                checkpoint: this.checkpointLocation
+            });
 
             for ( i = 0; i < this.displaySteps.length; i++ ) {
                 stepName = this.displaySteps[i].name;

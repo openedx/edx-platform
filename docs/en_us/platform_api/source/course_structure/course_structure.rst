@@ -1,17 +1,13 @@
 ########################################
-Course Structure API
+Course Structure API Resource
 ########################################
 
-This page contains information on using the Course Structure API to
-complete the following actions.
+With the Course Structure API **Course Structure** resource, you can complete
+the following tasks.
 
-* :ref:`Get a list of courses in the edX platform <Get a List of Courses>`
-
-* :ref:`Get details about a course <Get Course Details>`
-
-* :ref:`Get a course's structure, or blocks <Get the Course Structure>`
-
-* :ref:`Get a courses grading policy <Get the Course Grading Policy>`
+.. contents::
+   :local:
+   :depth: 1
 
 .. _Get a List of Courses:
 
@@ -58,6 +54,8 @@ Get a List of Courses
             . . .
         ]
     }
+
+
 .. _Get Course Details:
 
 **************************
@@ -94,7 +92,7 @@ Get Course Details
 Get the Course Structure
 **************************
 
-.. autoclass:: course_structure_api.v0.views.CourseStructure
+.. .. autoclass:: course_structure_api.v0.views.CourseStructure
 
 **Example response**
 

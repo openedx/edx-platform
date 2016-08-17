@@ -1,11 +1,14 @@
 """Fields useful for edX API implementations."""
-from django.core.exceptions import ValidationError
-
-from rest_framework.serializers import CharField, Field
+from rest_framework.serializers import Field
 
 
 class ExpandableField(Field):
-    """Field that can dynamically use a more detailed serializer based on a user-provided "expand" parameter."""
+    """Field that can dynamically use a more detailed serializer based on a user-provided "expand" parameter.
+
+    Kwargs:
+      collapsed_serializer (Serializer): the serializer to use for a non-expanded representation.
+      expanded_serializer (Serializer): the serializer to use for an expanded representation.
+    """
     def __init__(self, **kwargs):
         """Sets up the ExpandableField with the collapsed and expanded versions of the serializer."""
         assert 'collapsed_serializer' in kwargs and 'expanded_serializer' in kwargs
@@ -13,25 +16,19 @@ class ExpandableField(Field):
         self.expanded = kwargs.pop('expanded_serializer')
         super(ExpandableField, self).__init__(**kwargs)
 
-    def field_to_native(self, obj, field_name):
-        """Converts obj to a native representation, using the expanded serializer if the context requires it."""
-        if 'expand' in self.context and field_name in self.context['expand']:
-            self.expanded.initialize(self, field_name)
-            return self.expanded.field_to_native(obj, field_name)
-        else:
-            self.collapsed.initialize(self, field_name)
-            return self.collapsed.field_to_native(obj, field_name)
+    def to_representation(self, obj):
+        """
+        Return a representation of the field that is either expanded or collapsed.
+        """
+        should_expand = self.field_name in self.context.get("expand", [])
+        field = self.expanded if should_expand else self.collapsed
 
+        # Avoid double-binding the field, otherwise we'll get
+        # an error about the source kwarg being redundant.
+        if field.source is None:
+            field.bind(self.field_name, self)
 
-class NonEmptyCharField(CharField):
-    """
-    A field that enforces non-emptiness even for partial updates.
+            if should_expand:
+                self.expanded.context["expand"] = set(field.context.get("expand", []))
 
-    This is necessary because prior to version 3, DRF skips validation for empty
-    values. Thus, CharField's min_length and RegexField cannot be used to
-    enforce this constraint.
-    """
-    def validate(self, value):
-        super(NonEmptyCharField, self).validate(value)
-        if not value.strip():
-            raise ValidationError(self.error_messages["required"])
+        return field.to_representation(obj)

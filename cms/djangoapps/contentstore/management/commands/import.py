@@ -1,8 +1,9 @@
 """
 Script for importing courseware from XML format
 """
+from optparse import make_option
 
-from django.core.management.base import BaseCommand, CommandError, make_option
+from django.core.management.base import BaseCommand, CommandError
 from django_comment_common.utils import (seed_permissions_roles,
                                          are_permissions_roles_seeded)
 from xmodule.modulestore.xml_importer import import_course_from_xml
@@ -29,7 +30,7 @@ class Command(BaseCommand):
             raise CommandError("import requires at least one argument: <data directory> [--nostatic] [<course dir>...]")
 
         data_dir = args[0]
-        do_import_static = not (options.get('nostatic', False))
+        do_import_static = not options.get('nostatic', False)
         if len(args) > 1:
             source_dirs = args[1:]
         else:

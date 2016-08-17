@@ -32,7 +32,7 @@ from third_party_auth import pipeline
                                 ## Translators: clicking on this removes the link between a user's edX account and their account with an external authentication provider (like Google or LinkedIn).
                                 ${_("Unlink")}
                             </a>
-                        % else:
+                        % elif state.provider.accepts_logins:
                             <a href="${pipeline.get_login_url(state.provider.provider_id, pipeline.AUTH_ENTRY_PROFILE)}">
                                 ## Translators: clicking on this creates a link between a user's edX account and their account with an external authentication provider (like Google or LinkedIn).
                                 ${_("Link")}

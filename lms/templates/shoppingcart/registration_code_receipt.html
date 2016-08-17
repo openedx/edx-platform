@@ -1,7 +1,7 @@
 <%!
 from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse
-from courseware.courses import course_image_url, get_course_about_section
+from openedx.core.lib.courses import course_image_url
 %>
 <%inherit file="../main.html" />
 <%namespace name='static' file='/static_content.html'/>
@@ -20,7 +20,7 @@ from courseware.courses import course_image_url, get_course_about_section
         <img class="item-image" src="${course_image_url(course)}"
             alt="${_("{course_number} {course_title} Cover Image").format(
               course_number=course.display_number_with_default,
-              course_title=get_course_about_section(course, 'title'),
+              course_title=course.display_name_with_default,
             )}"/>
       </div>
       <div class="enrollment-details">
@@ -33,7 +33,7 @@ from courseware.courses import course_image_url, get_course_about_section
         </div>
         <div class="course-title">
           <h1>
-            ${_("{course_name}").format(course_name=course.display_name)}
+            ${_("{course_name}").format(course_name=course.display_name) | h}
               <span class="course-dates">
                 ${_("{start_date} - {end_date}").format(
                   start_date=course.start_datetime_text(),
@@ -55,7 +55,7 @@ from courseware.courses import course_image_url, get_course_about_section
               )}
             % elif redemption_success:
               ${_("You have successfully enrolled in {course_name}."
-              " This course has now been added to your dashboard.").format(course_name=course.display_name)}
+              " This course has now been added to your dashboard.").format(course_name=course.display_name) | h}
             % elif registered_for_course:
               ${_("You're already enrolled for this course."
               " Visit your {link_start}dashboard{link_end} to see the course."
@@ -72,7 +72,7 @@ from courseware.courses import course_image_url, get_course_about_section
             % else:
               ${_("You're about to activate an enrollment code for {course_name} by {site_name}. "
               "This code can only be used one time, so you should only activate this code if you're its intended"
-              " recipient.").format(course_name=course.display_name, site_name=site_name)}
+              " recipient.").format(course_name=course.display_name, site_name=site_name) | h}
             % endif
           </p>
         </div>

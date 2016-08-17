@@ -1,5 +1,5 @@
-define(["backbone", "underscore", "gettext", "js/models/validation_helpers"],
-    function(Backbone, _, gettext, ValidationHelpers) {
+define(["backbone", "underscore", "gettext", "js/models/validation_helpers", "js/utils/date_utils"],
+    function(Backbone, _, gettext, ValidationHelpers, DateUtils) {
 
 var CourseDetails = Backbone.Model.extend({
     defaults: {
@@ -28,14 +28,18 @@ var CourseDetails = Backbone.Model.extend({
         // Returns either nothing (no return call) so that validate works or an object of {field: errorstring} pairs
         // A bit funny in that the video key validation is asynchronous; so, it won't stop the validation.
         var errors = {};
+        newattrs = DateUtils.convertDateStringsToObjects(
+            newattrs, ["start_date", "end_date", "enrollment_start", "enrollment_end"]
+        );
+
         if (newattrs.start_date === null) {
             errors.start_date = gettext("The course must have an assigned start date.");
         }
         if (newattrs.start_date && newattrs.end_date && newattrs.start_date >= newattrs.end_date) {
-            errors.end_date = gettext("The course end date cannot be before the course start date.");
+            errors.end_date = gettext("The course end date must be later than the course start date.");
         }
         if (newattrs.start_date && newattrs.enrollment_start && newattrs.start_date < newattrs.enrollment_start) {
-            errors.enrollment_start = gettext("The course start date cannot be before the enrollment start date.");
+            errors.enrollment_start = gettext("The course start date must be later than the enrollment start date.");
         }
         if (newattrs.enrollment_start && newattrs.enrollment_end && newattrs.enrollment_start >= newattrs.enrollment_end) {
             errors.enrollment_end = gettext("The enrollment start date cannot be after the enrollment end date.");
@@ -63,6 +67,7 @@ var CourseDetails = Backbone.Model.extend({
     },
 
     _videokey_illegal_chars : /[^a-zA-Z0-9_-]/g,
+
     set_videosource: function(newsource) {
         // newsource either is <video youtube="speed:key, *"/> or just the "speed:key, *" string
         // returns the videosource for the preview which iss the key whose speed is closest to 1
@@ -74,9 +79,16 @@ var CourseDetails = Backbone.Model.extend({
 
         return this.videosourceSample();
     },
+
     videosourceSample : function() {
         if (this.has('intro_video')) return "//www.youtube.com/embed/" + this.get('intro_video');
         else return "";
+    },
+
+    // Whether or not the course pacing can be toggled. If the course
+    // has already started, returns false; otherwise, returns true.
+    canTogglePace: function () {
+        return new Date() <= new Date(this.get('start_date'));
     }
 });
 

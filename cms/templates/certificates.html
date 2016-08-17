@@ -2,16 +2,16 @@
 <%def name="online_help_token()"><% return "certificates" %></%def>
 <%namespace name='static' file='static_content.html'/>
 <%!
-import json
 from contentstore import utils
 from django.utils.translation import ugettext as _
+from openedx.core.lib.js_utils import escape_json_dumps
 %>
 
 <%block name="title">${_("Course Certificates")}</%block>
 <%block name="bodyclass">is-signedin course view-certificates</%block>
 
 <%block name="header_extras">
-% for template_name in ["certificate-details", "certificate-editor", "signatory-editor", "signatory-details", "basic-modal", "modal-button", "list", "upload-dialog", "certificate-web-preview"]:
+% for template_name in ["certificate-details", "certificate-editor", "signatory-editor", "signatory-details", "basic-modal", "modal-button", "list", "upload-dialog", "certificate-web-preview", "signatory-actions"]:
   <script type="text/template" id="${template_name}-tpl">
     <%static:include path="js/${template_name}.underscore" />
   </script>
@@ -22,13 +22,15 @@ from django.utils.translation import ugettext as _
 <script type="text/javascript">
 window.CMS = window.CMS || {};
 CMS.URL = CMS.URL || {};
+CMS.User = CMS.User || {};
 CMS.URL.UPLOAD_ASSET = '${upload_asset_url}';
+CMS.User.isGlobalStaff = '${is_global_staff}'=='True' ? true : false;
 </script>
 </%block>
 
 <%block name="requirejs">
   require(["js/certificates/factories/certificates_page_factory"], function(CertificatesPageFactory) {
-      CertificatesPageFactory(${json.dumps(certificates)}, "${certificate_url}", "${course_outline_url}", ${json.dumps(course_modes)}, ${json.dumps(certificate_web_view_url)}, ${json.dumps(is_active)}, ${json.dumps(certificate_activation_handler_url)} );
+      CertificatesPageFactory(${escape_json_dumps(certificates) | n}, "${certificate_url}", "${course_outline_url}", ${escape_json_dumps(course_modes) | n}, ${escape_json_dumps(certificate_web_view_url) | n}, ${escape_json_dumps(is_active) | n}, ${escape_json_dumps(certificate_activation_handler_url) | n} );
   });
 </%block>
 
@@ -65,10 +67,15 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url}';
         <div class="bit">
           <div class="certificates-doc">
             <h2 class="title-3">${_("Certificates")}</h2>
-            <p>${_("Upon successful completion of your course, learners receive a certificate to acknowledge their accomplishment. If you are a course team member with the Admin role in Studio, you can configure your course certificate.")}</p>
-            <p>${_("Click {em_start}Add your first certificate{em_end} to add a certificate configuration. Upload the organization logo to be used on the certificate, and specify at least one signatory. You can include up to four signatories for a certificate. You can also upload a signature image file for each signatory. {em_start}Note:{em_end} Signature images are used only for verified certificates. Optionally, specify a different course title to use on your course certificate. You might want to use a different title if, for example, the official course name is too long to display well on a certificate.") .format(em_start='<strong>', em_end="</strong>")}</p>
-            <p>${_("Select a course mode and click {em_start}Preview Certificate{em_end} to preview the certificate that a learner in the selected enrollment track would receive. When the certificate is ready for issuing, click {em_start}Activate.{em_end} To stop issuing an active certificate, click {em_start}Deactivate{em_end}.").format(em_start='<strong>', em_end="</strong>")}</p>
-            <p>${_(" To edit the certificate configuration, hover over the top right corner of the form and click {em_start}Edit{em_end}. To delete a certificate, hover over the top right corner of the form and click the delete icon. In general, do not delete certificates after a course has started, because some certificates might already have been issued to learners.").format(em_start="<strong>", em_end="</strong>")}</p>
+            <h3 class="title-3">${_("Working with Certificates")}</h3>
+            <p>${_("Specify a course title to use on the certificate if the course's official title is too long to be displayed well.")}</p>
+            <p>${_("For verified certificates, specify between one and four signatories and upload the associated images.")}</p>
+            <p>${_("To edit or delete a certificate before it is activated, hover over the top right corner of the form and select {em_start}Edit{em_end} or the delete icon.").format(em_start="<strong>", em_end="</strong>")}</p>
+            <p>${_("To view a sample certificate, choose a course mode and select {em_start}Preview Certificate{em_end}.").format(em_start='<strong>', em_end="</strong>")}</p>
+            
+            <h3 class="title-3">${_("Issuing Certificates to Learners")}</h3>
+            <p>${_("To begin issuing certificates, a course team member with the Admin role selects {em_start}Activate{em_end}. Course team members without the Admin role cannot edit or delete an activated certificate.").format(em_start='<strong>', em_end="</strong>")}</p>
+            <p>${_("{em_start}Do not{em_end} delete certificates after a course has started; learners who have already earned certificates will no longer be able to access them.").format(em_start="<strong>", em_end="</strong>")}</p>
             <p><a href="${get_online_help_info(online_help_token())['doc_url']}" target="_blank" class="button external-help-button">${_("Learn more about certificates")}</a></p>
           </div>
         </div>

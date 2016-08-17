@@ -1,8 +1,8 @@
 ;(function (define, undefined) {
     'use strict';
     define([
-        'gettext', 'jquery', 'underscore', 'backbone', 'js/mustache', 'js/views/fields'
-    ], function (gettext, $, _, Backbone, RequireMustache, FieldViews) {
+        'gettext', 'jquery', 'underscore', 'backbone', 'js/views/fields'
+    ], function (gettext, $, _, Backbone, FieldViews) {
 
         var AccountSettingsFieldViews = {};
 
@@ -11,8 +11,8 @@
             successMessage: function() {
                 return this.indicators.success + interpolate_text(
                     gettext(
-                        'We\'ve sent a confirmation message to {new_email_address}. ' +
-                        'Click the link in the message to update your email address.'
+                        /* jshint maxlen: false */
+                        'We\'ve sent a confirmation message to {new_email_address}. Click the link in the message to update your email address.'
                     ),
                     {'new_email_address': this.fieldValue()}
                 );
@@ -79,8 +79,8 @@
             successMessage: function () {
                 return this.indicators.success + interpolate_text(
                     gettext(
-                        'We\'ve sent a message to {email_address}. ' +
-                        'Click the link in the message to reset your password.'
+                        /* jshint maxlen: false */
+                        'We\'ve sent a message to {email_address}. Click the link in the message to reset your password.'
                     ),
                     {'email_address': this.model.get(this.options.emailAttribute)}
                 );
@@ -99,12 +99,13 @@
             },
 
             saveValue: function () {
-                var attributes = {},
-                    value = this.fieldValue() ? [{'code': this.fieldValue()}] : [];
-                attributes[this.options.valueAttribute] = value;
-                this.saveAttributes(attributes);
+                if (this.persistChanges === true) {
+                    var attributes = {},
+                        value = this.fieldValue() ? [{'code': this.fieldValue()}] : [];
+                    attributes[this.options.valueAttribute] = value;
+                    this.saveAttributes(attributes);
+                }
             }
-
         });
 
         AccountSettingsFieldViews.AuthFieldView = FieldViews.LinkFieldView.extend({
@@ -115,11 +116,20 @@
             },
 
             render: function () {
+                var linkTitle;
+                if (this.options.connected) {
+                    linkTitle = gettext('Unlink');
+                } else if (this.options.acceptsLogins) {
+                    linkTitle = gettext('Link')
+                } else {
+                    linkTitle = ''
+                }
+
                 this.$el.html(this.template({
                     id: this.options.valueAttribute,
                     title: this.options.title,
                     screenReaderTitle: this.options.screenReaderTitle,
-                    linkTitle: this.options.connected ? gettext('Unlink') : gettext('Link'),
+                    linkTitle: linkTitle,
                     linkHref: '',
                     message: this.helpMessage
                 }));

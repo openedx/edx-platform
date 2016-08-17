@@ -18,6 +18,7 @@
                 this.course_settings = options.course_settings;
                 this.threadType = this.model.get('thread_type');
                 this.topicId = this.model.get('commentable_id');
+                this.context = options.context || 'course';
                 _.bindAll(this);
                 return this;
             },
@@ -31,11 +32,15 @@
                 threadTypeTemplate = _.template($("#thread-type-template").html());
                 this.addField(threadTypeTemplate({form_id: formId}));
                 this.$("#" + formId + "-post-type-" + this.threadType).attr('checked', true);
-                this.topicView = new DiscussionTopicMenuView({
-                    topicId: this.topicId,
-                    course_settings: this.course_settings
-                });
-                this.addField(this.topicView.render());
+                // Only allow the topic field for course threads, as standalone threads
+                // cannot be moved.
+                if (this.context === 'course') {
+                    this.topicView = new DiscussionTopicMenuView({
+                        topicId: this.topicId,
+                        course_settings: this.course_settings
+                    });
+                    this.addField(this.topicView.render());
+                }
                 DiscussionUtil.makeWmdEditor(this.$el, $.proxy(this.$, this), 'edit-post-body');
                 return this;
             },
@@ -53,13 +58,14 @@
                 var title = this.$('.edit-post-title').val(),
                     threadType = this.$(".post-type-input:checked").val(),
                     body = this.$('.edit-post-body textarea').val(),
-                    commentableId = this.topicView.getCurrentTopicId(),
                     postData = {
                         title: title,
                         thread_type: threadType,
-                        body: body,
-                        commentable_id: commentableId
+                        body: body
                     };
+                if (this.topicView) {
+                    postData.commentable_id = this.topicView.getCurrentTopicId();
+                }
 
                 return DiscussionUtil.safeAjax({
                     $elem: this.submitBtn,
@@ -67,15 +73,15 @@
                     url: DiscussionUtil.urlFor('update_thread', this.model.id),
                     type: 'POST',
                     dataType: 'json',
-                    async: false, // @TODO when the rest of the stuff below is made to work properly..
                     data: postData,
                     error: DiscussionUtil.formErrorHandler(this.$('.post-errors')),
                     success: function() {
-                        // @TODO: Move this out of the callback, this makes it feel sluggish
                         this.$('.edit-post-title').val('').attr('prev-text', '');
                         this.$('.edit-post-body textarea').val('').attr('prev-text', '');
                         this.$('.wmd-preview p').html('');
-                        postData.courseware_title = this.topicView.getFullTopicName();
+                        if (this.topicView) {
+                            postData.courseware_title = this.topicView.getFullTopicName();
+                        }
                         this.model.set(postData).unset('abbreviatedBody');
                         this.trigger('thread:updated');
                         if (this.threadType !== threadType) {

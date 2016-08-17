@@ -14,15 +14,8 @@ from django.conf import settings
 </%block>
 
 <%!
-if settings.TENDER_DOMAIN:
-  help_link_start = '<a href="http://{domain}/discussion/new" class="show-tender" title="{title}">'.format(
-    domain=settings.TENDER_DOMAIN,
-    title=_("Use our feedback tool, Tender, to share your feedback")
-  ),
-  help_link_end = '</a>'
-else:
-  help_link_start = '<a href="mailto:{email}">'.format(email=settings.TECH_SUPPORT_EMAIL)
-  help_link_end = '</a>'
+help_link_start = '<a href="mailto:{email}">'.format(email=settings.TECH_SUPPORT_EMAIL)
+help_link_end = '</a>'
 %>
 
 <%block name="content">

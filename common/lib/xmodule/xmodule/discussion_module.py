@@ -1,12 +1,17 @@
+"""
+Definition of the Discussion module.
+"""
+import json
 from pkg_resources import resource_string
 
+from xblock.core import XBlock
 from xmodule.x_module import XModule
 from xmodule.raw_module import RawDescriptor
 from xmodule.editing_module import MetadataOnlyEditingDescriptor
 from xblock.fields import String, Scope, UNIQUE_ID
-from uuid import uuid4
 
-# Make '_' a no-op so we can scrape strings
+# Make '_' a no-op so we can scrape strings. Using lambda instead of
+#  `django.utils.translation.ugettext_noop` because Django cannot be imported in this file
 _ = lambda text: text
 
 
@@ -42,7 +47,20 @@ class DiscussionFields(object):
     sort_key = String(scope=Scope.settings)
 
 
+def has_permission(user, permission, course_id):
+    """
+    Copied from django_comment_client/permissions.py because I can't import
+    that file from here. It causes the xmodule_assets command to fail.
+    """
+    return any(role.has_permission(permission)
+               for role in user.roles.filter(course_id=course_id))
+
+
+@XBlock.wants('user')
 class DiscussionModule(DiscussionFields, XModule):
+    """
+    XModule for discussion forums.
+    """
     js = {
         'coffee': [
             resource_string(__name__, 'js/src/discussion/display.coffee')
@@ -54,9 +72,26 @@ class DiscussionModule(DiscussionFields, XModule):
     js_module_name = "InlineDiscussion"
 
     def get_html(self):
+        course = self.get_course()
+        user = None
+        user_service = self.runtime.service(self, 'user')
+        if user_service:
+            user = user_service._django_user  # pylint: disable=protected-access
+        if user:
+            course_key = course.id
+            can_create_comment = has_permission(user, "create_comment", course_key)
+            can_create_subcomment = has_permission(user, "create_sub_comment", course_key)
+            can_create_thread = has_permission(user, "create_thread", course_key)
+        else:
+            can_create_comment = False
+            can_create_subcomment = False
+            can_create_thread = False
         context = {
             'discussion_id': self.discussion_id,
-            'course': self.get_course(),
+            'course': course,
+            'can_create_comment': json.dumps(can_create_comment),
+            'can_create_subcomment': json.dumps(can_create_subcomment),
+            'can_create_thread': can_create_thread,
         }
         if getattr(self.system, 'is_author_mode', False):
             template = 'discussion/_discussion_module_studio.html'
@@ -66,9 +101,10 @@ class DiscussionModule(DiscussionFields, XModule):
 
     def get_course(self):
         """
-        Return course by course id.
+        Return CourseDescriptor by course id.
         """
-        return self.descriptor.runtime.modulestore.get_course(self.course_id)
+        course = self.runtime.modulestore.get_course(self.course_id)
+        return course
 
 
 class DiscussionDescriptor(DiscussionFields, MetadataOnlyEditingDescriptor, RawDescriptor):

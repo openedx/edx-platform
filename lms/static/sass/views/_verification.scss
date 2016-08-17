@@ -175,6 +175,14 @@
     color: $white !important;
   }
 
+  // elements - controls
+  .action-primary-blue {
+    @extend %btn-primary-blue;
+    // needed for override due to .register a:link styling
+    border: 0 !important;
+    color: $white !important;
+  }
+
   .action-confirm {
     @extend %btn-verify-primary;
     // needed for override due to .register a:link styling
@@ -244,7 +252,39 @@
       }
     }
   }
+  .report-receipt-provider {
+    @extend %ui-window;
+    padding: ($baseline*0.75) $baseline;
 
+    .provider-wrapper {
+      width: 70%;
+      @include float(left);
+
+      .provider-info {
+        margin-bottom: $baseline;
+        font-weight: 600;
+      }
+    }
+
+    .provider-buttons-logos {
+      @include float(right);
+      @include text-align(center);
+
+      .provider-logo img {
+          max-width: 160px;
+          margin-bottom: $baseline * 0.5;
+      }
+
+      .complete-order {
+        @include text-align(center);
+
+        button {
+          @extend %btn-pl-primary-base;
+          white-space: nowrap;
+        }
+      }
+    }
+  }
   // ====================
 
   // UI: help
@@ -789,6 +829,109 @@
 
     // indiv slides - review
     #wrapper-review {
+      color: $black;
+
+      .page-title {
+          @extend %t-strong;
+          border-bottom: 2px solid $m-gray-d3;
+          padding-bottom: ($baseline*0.75);
+          margin-bottom: $baseline;
+          text-transform: inherit;
+        }
+
+      .review {
+
+        .certificate {
+          @include font-size(18);
+          background-repeat: no-repeat;
+          padding-left: ($baseline*2.5);
+          overflow: hidden;
+          min-height: 32px;
+
+            p {
+              @include line-height(22);
+              @extend %t-strong;
+              margin-top: 0;
+              color: $black;
+            }
+
+            .purchase {
+              @include float(right);
+              @include margin-left($baseline*0.75);
+              text-align: right;
+
+              .product-info {
+                @include font-size(22);
+                @extend %t-strong;
+                color: $blue;
+              }
+          }
+
+          &.verified_icon {
+            background-image: url('#{$static-path}/images/icon-sm-verified.png');
+          }
+
+          &.no-id-professional_icon,
+          &.professional_icon {
+            background-image: url('#{$static-path}/images/icon-sm-professional.png');
+          }
+        }
+
+        .payment-buttons {
+          overflow: auto;
+          padding-bottom: ($baseline/4);
+          margin: {
+              top: ($baseline / 2);
+              bottom: ($baseline * 0.75);
+          };
+
+          .payment-button {
+            padding: ($baseline*0.4) $baseline;
+            min-width: 200px;
+          }
+          .action-primary-blue {
+            &.is-selected {
+              background: $blue !important;
+            }
+          }
+        }
+
+        .border-gray {
+          border-bottom: 2px solid $gray;
+          margin: ($baseline*1.12) 0;
+        }
+    }
+
+      .container {
+        padding: ($baseline*0.75) 0;
+
+        p {
+          @include line-height(22);
+          color: $black;
+        }
+        .photo-requirement {
+          @include font-size(12);
+          position: relative;
+          padding-left: ($baseline*2);
+          margin-top: ($baseline*0.75);
+          background-repeat: no-repeat;
+          background-position: left top;
+
+          .fa {
+              position: absolute;
+              left:0;
+              color: $mediumGrey;
+            }
+
+            h6 {
+              font-weight: bold;
+              color: $extraDarkGrey;
+            }
+        }
+      }
+
+
+
 
       .review-task {
         margin-bottom: ($baseline*1.5);
@@ -1280,7 +1423,7 @@
         display: block;
         width: 45px;
         height: 45px;
-        background: transparent url('../images/verified-ribbon.png') no-repeat 0 0;
+        background: transparent url('#{$static-path}/images/verified-ribbon.png') no-repeat 0 0;
       }
 
       .action-intro, .action-select {

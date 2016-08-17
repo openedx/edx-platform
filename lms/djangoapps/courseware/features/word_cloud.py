@@ -1,9 +1,6 @@
 # pylint: disable=missing-docstring
 
-from time import sleep
-
 from lettuce import world, step
-from lettuce.django import django_url
 from common import i_am_registered_for_the_course, section_location, visit_scenario_item
 
 
@@ -29,7 +26,7 @@ def press_the_save_button(_step):
 
 @step('I see the empty result')
 def see_empty_result(_step):
-    assert (world.css_text('.your_words', 0) == '')
+    assert world.css_text('.your_words', 0) == ''
 
 
 @step('I fill inputs')

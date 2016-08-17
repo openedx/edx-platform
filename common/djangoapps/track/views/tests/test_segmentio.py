@@ -1,4 +1,4 @@
-"""Ensure we can parse events sent to us from the segment.io webhook integration"""
+"""Ensure we can parse events sent to us from the Segment webhook integration"""
 
 from datetime import datetime
 import json
@@ -50,7 +50,7 @@ def expect_failure_with_message(message):
     EVENT_TRACKING_PROCESSORS=MOBILE_SHIM_PROCESSOR,
 )
 class SegmentIOTrackingTestCase(EventTrackingTestCase):
-    """Test processing of segment.io events"""
+    """Test processing of Segment events"""
 
     def setUp(self):
         super(SegmentIOTrackingTestCase, self).setUp()
@@ -85,7 +85,7 @@ class SegmentIOTrackingTestCase(EventTrackingTestCase):
         self.assert_no_events_emitted()
 
     def create_request(self, key=None, **kwargs):
-        """Create a fake request that emulates a request from the segment.io servers to ours"""
+        """Create a fake request that emulates a request from the Segment servers to ours"""
         if key is None:
             key = SECRET
 
@@ -106,7 +106,7 @@ class SegmentIOTrackingTestCase(EventTrackingTestCase):
         self.post_segmentio_event(name=name)
 
     def post_segmentio_event(self, **kwargs):
-        """Post a fake segment.io event to the view that processes it"""
+        """Post a fake Segment event to the view that processes it"""
         request = self.create_request(
             data=self.create_segmentio_event_json(**kwargs),
             content_type='application/json'
@@ -114,7 +114,7 @@ class SegmentIOTrackingTestCase(EventTrackingTestCase):
         segmentio.track_segmentio_event(request)
 
     def create_segmentio_event(self, **kwargs):
-        """Populate a fake segment.io event with data of interest"""
+        """Populate a fake Segment event with data of interest"""
         action = kwargs.get('action', 'Track')
         sample_event = {
             "userId": kwargs.get('user_id', USER_ID),
@@ -158,7 +158,7 @@ class SegmentIOTrackingTestCase(EventTrackingTestCase):
         return sample_event
 
     def create_segmentio_event_json(self, **kwargs):
-        """Return a json string containing a fake segment.io event"""
+        """Return a json string containing a fake Segment event"""
         return json.dumps(self.create_segmentio_event(**kwargs))
 
     @expect_failure_with_message(segmentio.WARNING_IGNORED_SOURCE)

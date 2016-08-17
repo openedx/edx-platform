@@ -3,7 +3,7 @@ Unit test tasks
 """
 import os
 import sys
-from paver.easy import sh, task, cmdopts, needs, call_task, no_help
+from paver.easy import sh, task, cmdopts, needs, call_task
 from pavelib.utils.test import suites
 from pavelib.utils.envs import Env
 from optparse import make_option
@@ -11,7 +11,7 @@ from optparse import make_option
 try:
     from pygments.console import colorize
 except ImportError:
-    colorize = lambda color, text: text  # pylint: disable-msg=invalid-name
+    colorize = lambda color, text: text
 
 __test__ = False  # do not collect
 
@@ -25,7 +25,7 @@ __test__ = False  # do not collect
     ("system=", "s", "System to act on"),
     ("test_id=", "t", "Test id"),
     ("failed", "f", "Run only failed tests"),
-    ("fail_fast", "x", "Run only failed tests"),
+    ("fail_fast", "x", "Fail suite on first failed test"),
     ("fasttest", "a", "Run without collectstatic"),
     ('extra_args=', 'e', 'adds as extra args to the test command'),
     ('cov_args=', 'c', 'adds as args to coverage for the test run'),
@@ -194,8 +194,6 @@ def coverage(options):
     """
     Build the html, xml, and diff coverage reports
     """
-    compare_branch = getattr(options, 'compare_branch', 'origin/master')
-
     report_dir = Env.REPORT_DIR
     rcfile = Env.PYTHON_COVERAGERC
 
@@ -262,4 +260,4 @@ def diff_coverage(options):
             )
         )
 
-        print("\n")
+        print "\n"

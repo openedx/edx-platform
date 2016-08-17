@@ -11,19 +11,13 @@ celery==3.0.19
 distribute>=0.6.28, <0.7
 django-celery==3.0.17
 django-countries==1.5
-django-filter==0.6.0
-django-followit==0.0.3
-django-keyedcache==1.4-6
-django-kombu==0.9.4
+django-filter==0.11.0
 django-mako==0.1.5pre
-django-masquerade==0.1.6
 django-mptt==0.5.5
 django-openid-auth==0.4
-django-robots==0.9.1
-django-sekizai==0.6.1
-django-ses==0.4.1
+django-sekizai==0.8.2
+django-ses==0.7.0
 django-storages==1.1.5
-django-threaded-multihost==1.4-1
 django-method-override==0.1.0
 djangorestframework==2.3.5
 django==1.4.5
@@ -55,8 +49,7 @@ pytz==2015.2
 PyYAML==3.10
 requests==2.3.0
 Shapely==1.2.16
-sorl-thumbnail==11.12
-South==1.0.1
+sorl-thumbnail==12.3
 sympy==0.7.1
 xmltodict==0.4.1
 

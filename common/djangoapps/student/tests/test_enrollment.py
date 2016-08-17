@@ -7,6 +7,7 @@ from mock import patch
 
 from django.conf import settings
 from django.core.urlresolvers import reverse
+from course_modes.models import CourseMode
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from util.testing import UrlResetMixin
@@ -41,13 +42,20 @@ class EnrollmentTest(UrlResetMixin, ModuleStoreTestCase):
     @ddt.data(
         # Default (no course modes in the database)
         # Expect that we're redirected to the dashboard
-        # and automatically enrolled as "honor"
-        ([], '', 'honor'),
+        # and automatically enrolled
+        ([], '', CourseMode.DEFAULT_MODE_SLUG),
+
+        # Audit / Verified
+        # We should always go to the "choose your course" page.
+        # We should also be enrolled as the default mode.
+        (['verified', 'audit'], 'course_modes_choose', CourseMode.DEFAULT_MODE_SLUG),
 
         # Audit / Verified / Honor
         # We should always go to the "choose your course" page.
-        # We should also be enrolled as "honor" by default.
-        (['honor', 'verified', 'audit'], 'course_modes_choose', 'honor'),
+        # We should also be enrolled as the honor mode.
+        # Since honor and audit are currently offered together this precedence must
+        # be maintained.
+        (['honor', 'verified', 'audit'], 'course_modes_choose', CourseMode.HONOR),
 
         # Professional ed
         # Expect that we're sent to the "choose your track" page

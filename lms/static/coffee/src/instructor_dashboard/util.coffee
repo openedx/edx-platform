@@ -292,12 +292,12 @@ class @PendingInstructorTasks
           @$no_tasks_message.hide()
           @$running_tasks_section.show()
         else
-          console.log "No pending instructor tasks to display"
+          console.log "No pending tasks to display"
           @$running_tasks_section.hide()
           @$no_tasks_message.empty()
           @$no_tasks_message.append $('<p>').text gettext("No tasks currently running.")
           @$no_tasks_message.show()
-      error: std_ajax_err => console.error "Error finding pending instructor tasks to display"
+      error: std_ajax_err => console.error "Error finding pending tasks to display"
     ### /Pending Instructor Tasks Section ####
 
 class KeywordValidator

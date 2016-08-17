@@ -1,224 +1,171 @@
 .course-index {
-  @extend .sidebar;
-  @extend .tran;
-  @include border-right(1px solid $border-color-2);
-  @include border-radius(3px, 0, 0, 3px);
+    @include transition( all .2s $ease-in-out-quad 0s);
+    @include border-right(1px solid $border-color-2);
+    @include border-radius(3px, 0, 0, 3px);
+    display: table-cell; // needed to extend the sidebar the full height of the area
 
-  #open_close_accordion {
-    display: none;
-  }
-
-  header {
-    max-height: 47px;
-
-    h2 {
-      white-space: nowrap;
-    }
-  }
-
-  div#accordion {
-    width: auto;
-    font-size: 14px;
-
-    h3 {
-      border-radius: 0;
-      margin: 0;
-      overflow: visible;
-      font-size: 16px;
-
-      &:first-child {
-        border: none;
-      }
-
-      &:hover, &:focus {
-        color: #666;
-      }
-
-      &.ui-state-hover, &.ui-state-focus {
-        a {
-          color: #666;
-        }
-      }
-
-      &.ui-accordion-header {
-        border-bottom: none;
+    // provides sufficient contrast for all screen reader-only elements
+    .sr {
         color: $black;
-
-        a {
-          border-radius: 0;
-          box-shadow: none;
-          @include padding-left(19px);
-          color: $link-color;
-        }
-
-        &.ui-state-active {
-          @extend .active;
-          border-bottom: none;
-
-          &:hover, &:focus {
-            background: none;
-          }
-        }
-
-        span.ui-icon {
-          @include left(0);
-          opacity: 0.3;
-          background-image: url("/static/images/ui-icons_222222_256x240.png");  // jQuery UI sprite
-
-          &.ui-icon-triangle-1-e {
-
-            // CASE: left to right layout
-            @include ltr {
-              background-position: -32px -16px; // jQuery UI east arrow position
-            }
-
-           // CASE: right to left layout
-           @include rtl {
-              background-position: -96px -16px; // jQuery UI west arrow position
-            }
-          }
-        }
-      }
-    }
-
-    .chapter {
-      width: 100% !important;
-      @include box-sizing(border-box);
-      padding: 11px 14px;
-      @include linear-gradient(top, $sidebar-chapter-bg-top, $sidebar-chapter-bg-bottom);
-      background-color: $sidebar-chapter-bg;
-      box-shadow: 0 1px 0 $white inset, 0 -1px 0 $shadow-l1 inset;
-      @include transition(background-color .1s linear 0s);
-
-      &.is-open {
         background: $white;
-      }
-
-      &:first-child {
-        border-radius: 3px 0 0 0;
-      }
-
-      &:last-child {
-        border-radius: 0 0 0 3px;
-        box-shadow: 0 1px 0 $white inset;
-      }
-
-      &:hover, &:focus {
-        background-color: $white;
-      }
     }
 
-    ul.ui-accordion-content {
-      background: transparent;
-      border: none;
-      border-radius: 0;
-      margin: 0;
-      padding: 9px 0 9px 9px;
-      overflow: auto;
-      width: 100%;
-
-      li {
-        border-bottom: 0;
-        border-radius: 0;
-        margin-bottom: ($baseline/5);
-
-        a {
-          background: transparent;
-          border-radius: 4px;
-          display: block;
-          @include padding( ($baseline/4), ($baseline*1.5), ($baseline/4), ($baseline/2));
-          position: relative;
-          text-decoration: none;
-
-          p {
-            font-weight: bold;
-            font-family: $sans-serif;
-            margin-bottom: 0;
-            line-height: 1.3;
-
-            &.subtitle {
-              color: #666;
-              font-size: 13px;
-              font-weight: normal;
-              display: block;
-              margin: 0;
-
-              &:empty {
-                display: none;
-              }
-            }
-          }
-
-          &:hover, &:focus {
-            background: $shadow-l1;
-
-            > a p {
-              color: #333;
-            }
-          }
-
-          &:active {
-            box-shadow: inset 0 1px 14px 0 $shadow-l1;
-
-            &:after {
-              opacity: 1.0;
-              right: 15px;
-            }
-          }
-        }
-
-        &.active {
-          font-weight: bold;
-
-          &:after {
-            content: '›';
-            position: absolute;
-            top: 50%;
-            right: 20px;
-            margin-top: -13px;
-            font-size: 30px;
-            font-weight: normal;
-            color: #333;
-            opacity: 0;
-            @include transition(none);
-          }
-
-          > a {
-            border: 1px solid $border-color-1;
-            box-shadow: 0 1px 0 rgba(255, 255, 255, .35) inset;
-            background: $sidebar-active-image;
-
-            &:after {
-              opacity: 1.0;
-              right: 15px;
-            }
-
-            p {
-              color: #333;
-            }
-          }
-
-          span.subtitle {
-            font-weight: normal;
-          }
-        }
-
-        &.graded {
-         > a {
-           > img {
-             position: absolute;
-             top: 0;
-             bottom: 0;
-             @include right(7px);
-             margin: auto;
-           }
-          }
-
-          &.active > a {
-            background: linear-gradient(to bottom, #e6e6e6, #d6d6d6);
-          }
-        }
-      }
+    // reseting bolded fonts for the course index
+    .group-heading {
+        @extend %t-regular;
     }
-  }
+
+    // we're targetting the .class now, instead of the #id
+    .accordion {
+        @extend %t-copy-sub1;
+
+        .course-navigation {
+
+            .button-chapter {
+                @include transition(all $tmg-s3 ease-in-out);
+                @include box-sizing(border-box);
+                @include linear-gradient(top, $sidebar-chapter-bg-top, $sidebar-chapter-bg-bottom);
+                @include transition(background-color .1s linear 0s);
+                display: block;
+                width: 100%;
+                border: 0;
+                border-radius: 0;
+                padding: 0;
+                box-shadow: 0 1px 0 $white inset, 0 -1px 0 $shadow-l1 inset;
+                background-color: $sidebar-chapter-bg;
+                color: $link-color;
+                -webkit-font-smoothing: subpixel-antialiased; // this brings back our nice, dark blue
+
+                .group-heading {
+                    @extend %t-title6;
+                    position: relative;
+                    display: block;
+                    padding: ($baseline*.75) $baseline ($baseline*.75) ($baseline*2);
+                    @include text-align(left);
+
+                    .icon {
+                        position: absolute;
+                        @include left($baseline);
+                        top: $baseline;
+                        font-size: $body-font-size;
+                        color: $gray-l3;
+                    }
+                }
+
+                &.is-open {
+                    background: $white;
+                    box-shadow: none;
+                }
+
+                &.active {
+
+                    .group-heading {
+                        @extend %t-strong;
+                        color: $base-font-color;
+                    }
+                }
+
+                &:hover,
+                &:focus {
+                    background: $white;
+                }
+
+                &:active {
+                    outline: none;
+                }
+            }
+
+            .chapter-content-container {
+                background: $white;
+
+                &.is-open {
+                    border-bottom: 1px solid $shadow-l1;
+                }
+
+                .chapter-menu {
+                    display: none;
+                    padding: 0 14px;
+                    overflow: hidden;
+
+                    .menu-item {
+                        @extend %t-strong;
+                        margin: ($baseline/5) 0;
+                        background: inherit;
+
+                        a {
+                            @extend %t-action3;
+                            @extend %t-strong;
+                            position: relative;
+                            display: block;
+                            @include padding(($baseline/4) ($baseline/2));
+                            border-radius: ($baseline/4);
+                            font-family: $sans-serif;
+                            color: $base-font-color;
+
+                            p {
+
+                                &.subtitle {
+                                    @extend %t-action4;
+                                    @extend %t-regular;
+                                    display: block;
+                                    margin: 0;
+                                    color: $gray-d1;
+
+                                    &:empty {
+                                        // hide empty subtitles
+                                        display: none;
+                                    }
+
+                                    // definitions for proctored exam attempt status indicators
+                                    .verified {
+                                        color: $success-color;
+                                    }
+
+                                    .rejected {
+                                        color: $alert-color;
+                                    }
+
+                                    .error {
+                                        color: $alert-color;
+                                    }
+                                }
+                            }
+
+                            &:hover,
+                            &:focus {
+                                color: $base-font-color;
+                                background: $gray-l5;
+
+                                .subtitle {
+                                    color: $gray-d1;
+                                }
+                            }
+                        }
+
+                        &.graded {
+
+                            .menu-icon {
+                                @include right($baseline/2);
+                                position: absolute;
+                                bottom: ($baseline/2);
+                                color: $link-color;
+                            }
+                        }
+
+                        &.active {
+
+                            a {
+                                @extend %t-ultrastrong;
+                                background: $gray-l4;
+                            }
+                        }
+
+                        &:last-of-type {
+                            padding-bottom: ($baseline/2);
+                        }
+                    }
+                }
+            }
+        }
+    }
 }

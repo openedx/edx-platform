@@ -5,7 +5,6 @@ Views handling read (GET) requests for the Discussion tab and inline discussions
 from functools import wraps
 import json
 import logging
-import xml.sax.saxutils as saxutils
 
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
@@ -23,20 +22,20 @@ from openedx.core.djangoapps.course_groups.cohorts import (
     is_course_cohorted,
     get_cohort_id,
     get_course_cohorts,
-    is_commentable_cohorted
 )
 from courseware.tabs import EnrolledTab
 from courseware.access import has_access
 from xmodule.modulestore.django import modulestore
-from ccx.overrides import get_current_ccx
 
-from django_comment_client.permissions import has_permission
+from django_comment_common.utils import ThreadContext
+from django_comment_client.permissions import has_permission, get_team
 from django_comment_client.utils import (
     merge_dict,
     extract,
     strip_none,
     add_courseware_context,
-    get_group_id_for_comments_service
+    get_group_id_for_comments_service,
+    is_commentable_cohorted
 )
 import django_comment_client.utils as utils
 import lms.lib.comment_client as cc
@@ -65,18 +64,7 @@ class DiscussionTab(EnrolledTab):
     def is_enabled(cls, course, user=None):
         if not super(DiscussionTab, cls).is_enabled(course, user):
             return False
-
-        if settings.FEATURES.get('CUSTOM_COURSES_EDX', False):
-            if get_current_ccx(course.id):
-                return False
-        return settings.FEATURES.get('ENABLE_DISCUSSION_SERVICE')
-
-
-def _attr_safe_json(obj):
-    """
-    return a JSON string for obj which is safe to embed as the value of an attribute in a DOM node
-    """
-    return saxutils.escape(json.dumps(obj), {'"': '&quot;'})
+        return utils.is_discussion_enabled(course.id)
 
 
 @newrelic.agent.function_trace()
@@ -111,6 +99,7 @@ def get_threads(request, course, discussion_id=None, per_page=THREADS_PER_PAGE):
         'text': '',
         'course_id': unicode(course.id),
         'user_id': request.user.id,
+        'context': ThreadContext.COURSE,
         'group_id': get_group_id_for_comments_service(request, course.id, discussion_id),  # may raise ValueError
     }
 
@@ -118,6 +107,9 @@ def get_threads(request, course, discussion_id=None, per_page=THREADS_PER_PAGE):
     # comments_service.
     if discussion_id is not None:
         default_query_params['commentable_id'] = discussion_id
+        # Use the discussion id/commentable id to determine the context we are going to pass through to the backend.
+        if get_team(discussion_id) is not None:
+            default_query_params['context'] = ThreadContext.STANDALONE
 
     if not request.GET.get('sort_key'):
         # If the user did not select a sort key, use their last used sort key
@@ -272,24 +264,29 @@ def forum_form_discussion(request, course_key):
             'csrf': csrf(request)['csrf_token'],
             'course': course,
             #'recent_active_threads': recent_active_threads,
-            'staff_access': has_access(request.user, 'staff', course),
-            'threads': _attr_safe_json(threads),
+            'staff_access': bool(has_access(request.user, 'staff', course)),
+            'threads': json.dumps(threads),
             'thread_pages': query_params['num_pages'],
-            'user_info': _attr_safe_json(user_info),
-            'flag_moderator': (
+            'user_info': json.dumps(user_info, default=lambda x: None),
+            'can_create_comment': json.dumps(
+                has_permission(request.user, "create_comment", course.id)),
+            'can_create_subcomment': json.dumps(
+                has_permission(request.user, "create_sub_comment", course.id)),
+            'can_create_thread': has_permission(request.user, "create_thread", course.id),
+            'flag_moderator': bool(
                 has_permission(request.user, 'openclose_thread', course.id) or
                 has_access(request.user, 'staff', course)
             ),
-            'annotated_content_info': _attr_safe_json(annotated_content_info),
+            'annotated_content_info': json.dumps(annotated_content_info),
             'course_id': course.id.to_deprecated_string(),
-            'roles': _attr_safe_json(utils.get_role_ids(course_key)),
+            'roles': json.dumps(utils.get_role_ids(course_key)),
             'is_moderator': has_permission(request.user, "see_all_cohorts", course_key),
             'cohorts': course_settings["cohorts"],  # still needed to render _thread_list_template
             'user_cohort': user_cohort_id,  # read from container in NewPostView
             'is_course_cohorted': is_course_cohorted(course_key),  # still needed to render _thread_list_template
             'sort_preference': user.default_sort_key,
             'category_map': course_settings["category_map"],
-            'course_settings': _attr_safe_json(course_settings)
+            'course_settings': json.dumps(course_settings)
         }
         # print "start rendering.."
         return render_to_response('discussion/index.html', context)
@@ -310,10 +307,6 @@ def single_thread(request, course_key, discussion_id, thread_id):
     user_info = cc_user.to_dict()
     is_moderator = has_permission(request.user, "see_all_cohorts", course_key)
 
-    # Verify that the student has access to this thread if belongs to a discussion module
-    if discussion_id not in utils.get_discussion_categories_ids(course, request.user):
-        raise Http404
-
     # Currently, the front end always loads responses via AJAX, even for this
     # page; it would be a nice optimization to avoid that extra round trip to
     # the comments service.
@@ -328,6 +321,11 @@ def single_thread(request, course_key, discussion_id, thread_id):
         if e.status_code == 404:
             raise Http404
         raise
+
+    # Verify that the student has access to this thread if belongs to a course discussion module
+    thread_context = getattr(thread, "context", "course")
+    if thread_context == "course" and not utils.discussion_category_id_access(course, request.user, discussion_id):
+        raise Http404
 
     # verify that the thread belongs to the requesting student's cohort
     if is_commentable_cohorted(course_key, discussion_id) and not is_moderator:
@@ -374,18 +372,23 @@ def single_thread(request, course_key, discussion_id, thread_id):
             'discussion_id': discussion_id,
             'csrf': csrf(request)['csrf_token'],
             'init': '',   # TODO: What is this?
-            'user_info': _attr_safe_json(user_info),
-            'annotated_content_info': _attr_safe_json(annotated_content_info),
+            'user_info': json.dumps(user_info),
+            'can_create_comment': json.dumps(
+                has_permission(request.user, "create_comment", course.id)),
+            'can_create_subcomment': json.dumps(
+                has_permission(request.user, "create_sub_comment", course.id)),
+            'can_create_thread': has_permission(request.user, "create_thread", course.id),
+            'annotated_content_info': json.dumps(annotated_content_info),
             'course': course,
             #'recent_active_threads': recent_active_threads,
             'course_id': course.id.to_deprecated_string(),   # TODO: Why pass both course and course.id to template?
             'thread_id': thread_id,
-            'threads': _attr_safe_json(threads),
-            'roles': _attr_safe_json(utils.get_role_ids(course_key)),
+            'threads': json.dumps(threads),
+            'roles': json.dumps(utils.get_role_ids(course_key)),
             'is_moderator': is_moderator,
             'thread_pages': query_params['num_pages'],
             'is_course_cohorted': is_course_cohorted(course_key),
-            'flag_moderator': (
+            'flag_moderator': bool(
                 has_permission(request.user, 'openclose_thread', course.id) or
                 has_access(request.user, 'staff', course)
             ),
@@ -393,7 +396,7 @@ def single_thread(request, course_key, discussion_id, thread_id):
             'user_cohort': user_cohort,
             'sort_preference': cc_user.default_sort_key,
             'category_map': course_settings["category_map"],
-            'course_settings': _attr_safe_json(course_settings)
+            'course_settings': json.dumps(course_settings)
         }
         return render_to_response('discussion/index.html', context)
 
@@ -442,7 +445,7 @@ def user_profile(request, course_key, user_id):
                 'discussion_data': threads,
                 'page': query_params['page'],
                 'num_pages': query_params['num_pages'],
-                'annotated_content_info': _attr_safe_json(annotated_content_info),
+                'annotated_content_info': json.dumps(annotated_content_info),
             })
         else:
             django_user = User.objects.get(id=user_id)
@@ -451,9 +454,9 @@ def user_profile(request, course_key, user_id):
                 'user': request.user,
                 'django_user': django_user,
                 'profiled_user': profiled_user.to_dict(),
-                'threads': _attr_safe_json(threads),
-                'user_info': _attr_safe_json(user_info),
-                'annotated_content_info': _attr_safe_json(annotated_content_info),
+                'threads': json.dumps(threads),
+                'user_info': json.dumps(user_info, default=lambda x: None),
+                'annotated_content_info': json.dumps(annotated_content_info),
                 'page': query_params['page'],
                 'num_pages': query_params['num_pages'],
                 'learner_profile_page_url': reverse('learner_profile', kwargs={'username': django_user.username})
@@ -530,9 +533,9 @@ def followed_threads(request, course_key, user_id):
                 'user': request.user,
                 'django_user': User.objects.get(id=user_id),
                 'profiled_user': profiled_user.to_dict(),
-                'threads': _attr_safe_json(threads),
-                'user_info': _attr_safe_json(user_info),
-                'annotated_content_info': _attr_safe_json(annotated_content_info),
+                'threads': json.dumps(threads),
+                'user_info': json.dumps(user_info),
+                'annotated_content_info': json.dumps(annotated_content_info),
                 #                'content': content,
             }
 

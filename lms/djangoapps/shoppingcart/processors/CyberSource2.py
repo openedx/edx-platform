@@ -357,7 +357,7 @@ def _payment_accepted(order_id, auth_amount, currency, decision):
         raise CCProcessorDataException(_("The payment processor accepted an order whose number is not in our system."))
 
     if decision == 'ACCEPT':
-        if auth_amount == order.total_cost and currency == order.currency:
+        if auth_amount == order.total_cost and currency.lower() == order.currency.lower():
             return {
                 'accepted': True,
                 'amt_charged': auth_amount,
@@ -377,7 +377,6 @@ def _payment_accepted(order_id, auth_amount, currency, decision):
                 )
             )
 
-            #pylint: disable=attribute-defined-outside-init
             ex.order = order
             raise ex
     else:

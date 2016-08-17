@@ -3,16 +3,21 @@
 Tests the "preview" selector in the LMS that allows changing between Staff, Student, and Content Groups.
 """
 
+
+from nose.plugins.attrib import attr
+
 from ..helpers import UniqueCourseTest, create_user_partition_json
 from ...pages.studio.auto_auth import AutoAuthPage
 from ...pages.lms.courseware import CoursewarePage
+from ...pages.lms.instructor_dashboard import InstructorDashboardPage
 from ...pages.lms.staff_view import StaffPage
-from ...pages.lms.course_nav import CourseNavPage
 from ...fixtures.course import CourseFixture, XBlockFixtureDesc
+from bok_choy.promise import EmptyPromise
 from xmodule.partitions.partitions import Group
 from textwrap import dedent
 
 
+@attr('shard_3')
 class StaffViewTest(UniqueCourseTest):
     """
     Tests that verify the staff view.
@@ -50,6 +55,7 @@ class StaffViewTest(UniqueCourseTest):
         return staff_page
 
 
+@attr('shard_3')
 class CourseWithoutContentGroupsTest(StaffViewTest):
     """
     Setup for tests that have no content restricted to specific content groups.
@@ -63,7 +69,7 @@ class CourseWithoutContentGroupsTest(StaffViewTest):
             <problem markdown="Simple Problem" max_attempts="" weight="">
               <p>Choose Yes.</p>
               <choiceresponse>
-                <checkboxgroup direction="vertical">
+                <checkboxgroup>
                   <choice correct="true">Yes</choice>
                 </checkboxgroup>
               </choiceresponse>
@@ -80,6 +86,7 @@ class CourseWithoutContentGroupsTest(StaffViewTest):
         )
 
 
+@attr('shard_3')
 class StaffViewToggleTest(CourseWithoutContentGroupsTest):
     """
     Tests for the staff view toggle button.
@@ -96,6 +103,7 @@ class StaffViewToggleTest(CourseWithoutContentGroupsTest):
         self.assertFalse(course_page.has_tab('Instructor'))
 
 
+@attr('shard_3')
 class StaffDebugTest(CourseWithoutContentGroupsTest):
     """
     Tests that verify the staff debug info.
@@ -227,6 +235,7 @@ class StaffDebugTest(CourseWithoutContentGroupsTest):
                          'for user {}'.format(self.USERNAME), msg)
 
 
+@attr('shard_3')
 class CourseWithContentGroupsTest(StaffViewTest):
     """
     Verifies that changing the "View this course as" selector works properly for content groups.
@@ -259,7 +268,7 @@ class CourseWithContentGroupsTest(StaffViewTest):
             <problem markdown="Simple Problem" max_attempts="" weight="">
               <p>Choose Yes.</p>
               <choiceresponse>
-                <checkboxgroup direction="vertical">
+                <checkboxgroup>
                   <choice correct="true">Yes</choice>
                 </checkboxgroup>
               </choiceresponse>
@@ -334,6 +343,44 @@ class CourseWithContentGroupsTest(StaffViewTest):
         """
         course_page = self._goto_staff_page()
         course_page.set_staff_view_mode('Student in beta')
+        verify_expected_problem_visibility(self, course_page, [self.beta_text, self.everyone_text])
+
+    def create_cohorts_and_assign_students(self, student_a_username, student_b_username):
+        """
+        Adds 2 manual cohorts, linked to content groups, to the course.
+        Each cohort is assigned one student.
+        """
+        instructor_dashboard_page = InstructorDashboardPage(self.browser, self.course_id)
+        instructor_dashboard_page.visit()
+        cohort_management_page = instructor_dashboard_page.select_cohort_management()
+        cohort_management_page.is_cohorted = True
+
+        def add_cohort_with_student(cohort_name, content_group, student):
+            """ Create cohort and assign student to it. """
+            cohort_management_page.add_cohort(cohort_name, content_group=content_group)
+            # After adding the cohort, it should automatically be selected
+            EmptyPromise(
+                lambda: cohort_name == cohort_management_page.get_selected_cohort(), "Waiting for new cohort"
+            ).fulfill()
+            cohort_management_page.add_students_to_selected_cohort([student])
+        add_cohort_with_student("Cohort Alpha", "alpha", student_a_username)
+        add_cohort_with_student("Cohort Beta", "beta", student_b_username)
+        cohort_management_page.wait_for_ajax()
+
+    def test_as_specific_student(self):
+        student_a_username = 'tass_student_a'
+        student_b_username = 'tass_student_b'
+        AutoAuthPage(self.browser, username=student_a_username, course_id=self.course_id, no_login=True).visit()
+        AutoAuthPage(self.browser, username=student_b_username, course_id=self.course_id, no_login=True).visit()
+        self.create_cohorts_and_assign_students(student_a_username, student_b_username)
+
+        # Masquerade as student in alpha cohort:
+        course_page = self._goto_staff_page()
+        course_page.set_staff_view_mode_specific_student(student_a_username)
+        verify_expected_problem_visibility(self, course_page, [self.alpha_text, self.everyone_text])
+
+        # Masquerade as student in beta cohort:
+        course_page.set_staff_view_mode_specific_student(student_b_username)
         verify_expected_problem_visibility(self, course_page, [self.beta_text, self.everyone_text])
 
 

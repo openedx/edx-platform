@@ -1,4 +1,4 @@
-define(["js/views/baseview", "underscore", "jquery", "gettext", "js/views/feedback_notification", "js/views/feedback_alert", "js/views/baseview", "jquery.smoothScroll"],
+define(["js/views/baseview", "underscore", "jquery", "gettext", "common/js/components/views/feedback_notification", "common/js/components/views/feedback_alert", "js/views/baseview", "jquery.smoothScroll"],
     function(BaseView, _, $, gettext, NotificationView, AlertView) {
 
 var ValidatingView = BaseView.extend({
@@ -157,6 +157,7 @@ var ValidatingView = BaseView.extend({
             {
                 success: function() {
                     self.showSavedBar();
+                    self.render();
                 },
                 silent: true
             }

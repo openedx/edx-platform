@@ -13,7 +13,8 @@ from xblock.fragment import Fragment
 
 import textwrap
 
-# Make '_' a no-op so we can scrape strings
+# Make '_' a no-op so we can scrape strings. Using lambda instead of
+#  `django.utils.translation.ugettext_noop` because Django cannot be imported in this file
 _ = lambda text: text
 
 
@@ -147,7 +148,7 @@ class ImageAnnotationModule(AnnotatableFields, XModule):
         return fragment
 
 
-class ImageAnnotationDescriptor(AnnotatableFields, RawDescriptor):  # pylint: disable=abstract-method
+class ImageAnnotationDescriptor(AnnotatableFields, RawDescriptor):
     ''' Image annotation descriptor '''
     module_class = ImageAnnotationModule
     mako_template = "widgets/raw-edit.html"

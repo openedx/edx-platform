@@ -6,7 +6,7 @@ from django.core.management import call_command, CommandError
 from django.conf import settings
 from tempfile import mkdtemp
 import shutil
-from path import path
+from path import Path as path
 from contentstore.management.commands.export_convert_format import Command, extract_source
 from xmodule.tests.helpers import directories_equal
 

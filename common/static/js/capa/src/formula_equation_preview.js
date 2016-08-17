@@ -139,8 +139,7 @@ formulaEquationPreview.enable = function () {
                         if (inputData.jax) {
                             // Set the text as the latex code, and then update the MathJax.
                             MathJax.Hub.Queue(
-                                ['Text', inputData.jax, latex],
-                                ['Reprocess', inputData.jax]
+                                ['Text', inputData.jax, latex]
                             );
                         } else if (latex) {
                             console.log("[FormulaEquationInput] Oops no mathjax for ", latex);

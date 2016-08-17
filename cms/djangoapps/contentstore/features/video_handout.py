@@ -3,7 +3,7 @@
 # pylint: disable=missing-docstring
 
 from lettuce import world, step
-from nose.tools import assert_true  # pylint: disable=no-name-in-module
+from nose.tools import assert_true
 from video_editor import RequestHandlerWithSessionId, success_upload_file
 
 

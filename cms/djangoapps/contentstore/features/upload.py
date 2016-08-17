@@ -10,7 +10,7 @@ import random
 import os
 from django.contrib.auth.models import User
 from student.models import CourseEnrollment
-from nose.tools import assert_equal, assert_not_equal  # pylint: disable=no-name-in-module
+from nose.tools import assert_equal, assert_not_equal
 
 TEST_ROOT = settings.COMMON_TEST_DATA_ROOT
 ASSET_NAMES_CSS = 'td.name-col > span.title > a.filename'
@@ -74,7 +74,7 @@ def check_not_there(_step, file_name):
     # the only file that was uploaded, our success criteria
     # will be that there are no files.
     # In the future we can refactor if necessary.
-    assert(world.is_css_not_present(ASSET_NAMES_CSS))
+    assert world.is_css_not_present(ASSET_NAMES_CSS)
 
 
 @step(u'I should see the file "([^"]*)" was uploaded$')

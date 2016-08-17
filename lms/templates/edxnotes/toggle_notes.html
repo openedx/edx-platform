@@ -3,6 +3,7 @@ import json
 from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse
 %>
+<%namespace name='static' file='/static_content.html'/>
 <%page args="course"/>
 
 <%
@@ -20,10 +21,7 @@ from django.core.urlresolvers import reverse
     % endif
   </button>
 </div>
-<script type="text/javascript">
-  (function (require) {
-      require(['js/edxnotes/views/toggle_notes_factory'], function(ToggleNotesFactory) {
-          ToggleNotesFactory(${json.dumps(edxnotes_visibility)}, '${edxnotes_visibility_url}');
-      });
-  }).call(this, require || RequireJS.require);
-</script>
+
+<%static:require_module module_name="js/edxnotes/views/notes_visibility_factory" class_name="NotesVisibilityFactory">
+    NotesVisibilityFactory.ToggleVisibilityView(${json.dumps(edxnotes_visibility)}, '${edxnotes_visibility_url}');
+</%static:require_module>

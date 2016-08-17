@@ -1,0 +1,31 @@
+<nav class="discussion-paginator">
+    <ol>
+        <% if (previous) { %>
+            <li class="previous-page"><a class="discussion-pagination" href="<%= previous.url %>" data-page-number="<%= previous.number %>">&lt; <%- gettext("Previous") %></a></li>
+        <% } %>
+        <% if (first) { %>
+            <li class="first-page"><a class="discussion-pagination" href="<%= first.url %>" data-page-number="1">1</a></li>
+        <% } %>
+        <% if (leftdots) { %>
+            <li class="previous-ellipses"><%- gettext("…") %></li>
+        <% } %>
+
+        <% _.each(lowPages, function(page) { %>
+            <li class="lower-page"><a class="discussion-pagination" href="<%= page.url %>" data-page-number="<%= page.number %>"><%= page.number %></a></li>
+        <% }); %>
+        <li class="current-page"><span><%= page %></span></li>
+        <% _.each(highPages, function(page) { %>
+            <li class="higher-page"><a class="discussion-pagination" href="<%= page.url %>" data-page-number="<%= page.number %>"><%= page.number %></a></li>
+        <% }); %>
+
+        <% if (rightdots) { %>
+            <li class="next-ellipses"><%- gettext("…") %></li>
+        <% } %>
+        <% if (last) { %>
+            <li class="last-page"><a class="discussion-pagination" href="<%= last.url %>" data-page-number="<%= last.number %>"><%= last.number %></a></li>
+        <% } %>
+        <% if (next) { %>
+            <li class="next-page"><a class="discussion-pagination" href="<%= next.url %>" data-page-number="<%= next.number %>"><%- gettext("Next") %> &gt;</a></li>
+        <% } %>
+    </ol>
+</nav>

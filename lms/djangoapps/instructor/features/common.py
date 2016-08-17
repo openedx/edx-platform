@@ -9,7 +9,7 @@ from __future__ import absolute_import
 
 from lettuce import world, step
 from mock import patch
-from nose.tools import assert_in  # pylint: disable=no-name-in-module
+from nose.tools import assert_in
 
 from courseware.tests.factories import StaffFactory, InstructorFactory
 
@@ -90,7 +90,9 @@ def click_a_button(step, button):  # pylint: disable=unused-argument
         world.css_click('input[name="calculate-grades-csv"]')
 
         # Expect to see a message that grade report is being generated
-        expected_msg = "Your grade report is being generated! You can view the status of the generation task in the 'Pending Instructor Tasks' section."
+        expected_msg = "The grade report is being created." \
+                       " To view the status of the report, see" \
+                       " Pending Instructor Tasks below."
         world.wait_for_visible('#report-request-response')
         assert_in(
             expected_msg, world.css_text('#report-request-response'),

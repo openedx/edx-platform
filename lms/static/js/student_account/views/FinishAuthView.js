@@ -26,18 +26,14 @@
 ;(function (define, undefined) {
     'use strict';
     define([
+        'jquery',
         'underscore',
         'backbone',
         'gettext',
         'js/student_account/emailoptin',
         'js/student_account/enrollment',
         'js/student_account/shoppingcart'
-    ], function (_, Backbone, gettext, emailOptInInterface, enrollmentInterface, shoppingCartInterface) {
-        // These are not yet converted to requireJS:
-        var edx = window.edx || {};
-        emailOptInInterface = emailOptInInterface || edx.student.account.EmailOptInInterface;
-        enrollmentInterface = enrollmentInterface || edx.student.account.EnrollmentInterface;
-        shoppingCartInterface = shoppingCartInterface || edx.student.account.ShoppingCartInterface;
+    ], function ($, _, Backbone, gettext, emailOptInInterface, enrollmentInterface, shoppingCartInterface) {
 
         var FinishAuthView = Backbone.View.extend({
             el: '#finish-auth-status',

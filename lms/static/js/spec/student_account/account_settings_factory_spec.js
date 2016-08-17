@@ -35,6 +35,7 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
                         'id': 'oa2-network1',
                         'name': "Network1",
                         'connected': true,
+                        'accepts_logins': 'true',
                         'connect_url': 'yetanother1.com/auth/connect',
                         'disconnect_url': 'yetanother1.com/auth/disconnect'
                     },
@@ -42,6 +43,7 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
                         'id': 'oa2-network2',
                         'name': "Network2",
                         'connected': true,
+                        'accepts_logins': 'true',
                         'connect_url': 'yetanother2.com/auth/connect',
                         'disconnect_url': 'yetanother2.com/auth/disconnect'
                     }
@@ -59,11 +61,6 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
 
             beforeEach(function () {
                 setFixtures('<div class="wrapper-account-settings"></div>');
-                TemplateHelpers.installTemplate('templates/fields/field_readonly');
-                TemplateHelpers.installTemplate('templates/fields/field_dropdown');
-                TemplateHelpers.installTemplate('templates/fields/field_link');
-                TemplateHelpers.installTemplate('templates/fields/field_text');
-                TemplateHelpers.installTemplate('templates/student_account/account_settings');
             });
 
             it("shows loading error when UserAccountModel fails to load", function() {
@@ -142,6 +139,7 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
 
                 AjaxHelpers.respondWithJson(requests, Helpers.createAccountSettingsData());
                 AjaxHelpers.respondWithJson(requests, Helpers.createUserPreferencesData());
+                AjaxHelpers.respondWithJson(requests, {});  // Page viewed analytics event
 
                 var sectionsData = accountSettingsView.options.sectionsData;
 

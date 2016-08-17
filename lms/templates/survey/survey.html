@@ -21,10 +21,12 @@ from django.utils import html
       <input type="hidden" name="_redirect_url" value="${redirect_url}" />
 
       % if course:
+        <input type="hidden" name="course_id" value="${unicode(course.id)}" />
+
         <div class="header-survey">
           <h4 class="course-info">
             <span class="course-org">${course.display_org_with_default}</span><span class="course-number"> ${course.display_number_with_default}</span>
-            <span class="course-name">${course.display_name}</span>
+            <span class="course-name">${course.display_name | h}</span>
           </h4>
           <h3 class="title">${_("Pre-Course Survey")}</h3>
         </div>

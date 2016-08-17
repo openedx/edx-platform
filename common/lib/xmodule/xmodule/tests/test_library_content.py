@@ -242,7 +242,7 @@ class LibraryContentModuleTestMixin(object):
         self.assertNotIn(LibraryContentDescriptor.display_name, non_editable_metadata_fields)
 
 
-@patch('xmodule.library_tools.SearchEngine.get_search_engine', Mock(return_value=None))
+@patch('xmodule.library_tools.SearchEngine.get_search_engine', Mock(return_value=None, autospec=True))
 class TestLibraryContentModuleNoSearchIndex(LibraryContentModuleTestMixin, LibraryContentTest):
     """
     Tests for library container when no search index is available.
@@ -254,7 +254,7 @@ class TestLibraryContentModuleNoSearchIndex(LibraryContentModuleTestMixin, Libra
 search_index_mock = Mock(spec=SearchEngine)  # pylint: disable=invalid-name
 
 
-@patch('xmodule.library_tools.SearchEngine.get_search_engine', Mock(return_value=search_index_mock))
+@patch('xmodule.library_tools.SearchEngine.get_search_engine', Mock(return_value=search_index_mock, autospec=True))
 class TestLibraryContentModuleWithSearchIndex(LibraryContentModuleTestMixin, LibraryContentTest):
     """
     Tests for library container with mocked search engine response.

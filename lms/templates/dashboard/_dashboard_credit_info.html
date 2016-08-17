@@ -1,65 +1,84 @@
 <%page args="credit_status" />
 <%!
-    import datetime
-    import pytz
     from django.utils.translation import ugettext as _
-    from util.date_utils import get_default_time_display
 %>
 <%namespace name='static' file='../static_content.html'/>
 
+
 % if credit_status["eligible"]:
-    <div class="message message-status is-shown credit-message">
-    % if credit_status["error"]:
-        <p class="message-copy credit-error-msg">
-            ${_("An error occurred with this transaction. For help, contact {support_email}.").format(
-                support_email=u'<a href="mailto:{address}">{address}</a>'.format(
-                    address=settings.DEFAULT_FEEDBACK_EMAIL
+    <%
+        provider_link = '<a href="{href}" target="_blank">{name}</a>'.format(
+            href=credit_status["provider_status_url"],
+            name=credit_status["provider_name"])
+
+        error = credit_status['error']
+
+        # Translators: provider_name is the name of a credit provider or university (e.g. State University)
+        credit_msg = _("You have completed this course and are eligible to purchase course credit. Select <strong>Get Credit</strong> to get started.")
+        credit_msg_class = "credit-eligibility-msg"
+        credit_btn_class = "purchase-credit-btn"
+        credit_btn_label = _("Get Credit")
+        credit_btn_href = '{root}/credit/checkout/{course_id}/'.format(
+            root=settings.ECOMMERCE_PUBLIC_URL_ROOT,
+            course_id=credit_status['course_key'])
+
+        if credit_status["purchased"]:
+            request_status = credit_status["request_status"]
+            if request_status is None:
+                # Learner must initiate the credit request
+
+                # Translators: link_to_provider_site is a link to an external webpage. The text of the link will be the name of a  credit provider, such as 'State University' or 'Happy Fun Company'.
+                credit_msg = _("Thank you for your payment. To receive course credit, you must now request credit "
+                "at the {link_to_provider_site} website. Select <b>Request Credit</b> to get started.").format(
+                    link_to_provider_site=provider_link,
                 )
+                credit_msg_class = "credit-request-not-started-msg"
+                credit_btn_label = _("Request Credit")
+                credit_btn_class = 'pending-credit-btn'
+            elif request_status == 'pending':
+                # Request received but not reviewed
+                ## Translators: provider_name is the name of a credit provider or university (e.g. State University)
+                credit_msg = _("{provider_name} has received your course credit request. We will update you when credit processing is complete.").format(provider_name=credit_status["provider_name"])
+                credit_msg_class = "credit-request-pending-msg"
+                credit_btn_label = _("View Details")
+                credit_btn_class = 'pending-credit-btn'
+            elif request_status == 'approved':
+                # Credit granted!
+                # Translators: link_to_provider_site is a link to an external webpage. The text of the link will be the name of a credit provider, such as 'State University' or 'Happy Fun Company'. provider_name is the name of credit provider.
+                credit_msg = _("<b>Congratulations!</b> {provider_name} has approved your request for course credit. To see your course credit, visit the {link_to_provider_site} website.").format(
+                    provider_name=credit_status["provider_name"],
+                    link_to_provider_site=provider_link,
+                )
+                credit_msg_class = "credit-request-approved-msg"
+                credit_btn_href = credit_status['provider_status_url']
+                credit_btn_label = _("View Credit")
+            elif request_status == 'rejected':
+                # REJECTED (by the credit provider)!
+                ## Translators: link_to_provider_site is a link to an external webpage. The text of the link will be the name of a credit provider, such as 'State University' or 'Happy Fun Company'. provider_name is the name of credit provider.
+                credit_msg = _("{provider_name} did not approve your request for course credit. For more information, contact {link_to_provider_site} directly.").format(
+                    provider_name=credit_status["provider_name"],
+                    link_to_provider_site=provider_link,
+                )
+                credit_msg_class = "credit-request-rejected-msg"
+                credit_btn_label = None
+    %>
+
+    <div class="message message-status is-shown credit-message">
+
+        <p class="message-copy is-hidden credit-error-msg" data-credit-error="${credit_status['error']}">
+            ${_("An error occurred with this transaction. For help, contact {support_email}.").format(
+            support_email=u'<a href="mailto:{address}">{address}</a>'.format(
+            address=settings.DEFAULT_FEEDBACK_EMAIL
+            )
             )}
         </p>
-    % elif not credit_status["purchased"]:
-        <p class="credit-eligibility-msg">
-            % if credit_status["deadline"] < datetime.datetime.now(pytz.UTC) + datetime.timedelta(days=30):
-                ${_("The opportunity to purchase credit for this course expires on {deadline}. You've worked hard - don't miss out!").format(deadline=get_default_time_display(credit_status["deadline"]))}
-            % else:
-                ${_("Congratulations - you have met the requirements for credit in this course!")}
+        <div class="credit-action">
+            % if credit_btn_label:
+                <a class="btn credit-btn ${credit_btn_class}" href="${credit_btn_href | h}" target="_blank" data-course-key="${credit_status['course_key'] | h}" data-user="${user.username | h}" data-provider="${credit_status['provider_id'] | h}">
+                    ${credit_btn_label}
+                </a>
             % endif
-        </p>
-        <div class="purchase_credit">
-            ## TODO: set the URL for the link to the provider selection page on the E-Commerce service
-            <a class="btn purchase-credit-btn" href="#" target="_blank" data-course-key="${credit_status["course_key"]}">${_("Purchase Course Credit")}</a>
+            <div class="message-copy credit-msg ${credit_msg_class}">${credit_msg}</div>
         </div>
-    % elif credit_status["request_status"] in [None, "pending"]:
-        <p class="message-copy credit-request-pending-msg">
-        ${_("Thanks for your payment! We are currently processing your course credit. You'll see a message here when the transaction is complete. For more information, see {provider_link}.").format(
-                provider_link=u'<a href="{provider_url}">{provider_name}</a>'.format(
-                    provider_url=credit_status["provider_status_url"],
-                    provider_name=credit_status["provider_name"],
-                )
-            )
-        }
-        </p>
-    % elif credit_status["request_status"] == "approved":
-        <p class="message-copy credit-request-approved-msg">
-        ${_("Congratulations - you have received credit for this course! For more information, see {provider_link}.").format(
-                provider_link=u'<a href="{provider_url}">{provider_name}</a>'.format(
-                    provider_url=credit_status["provider_status_url"],
-                    provider_name=credit_status["provider_name"],
-                )
-            )
-        }
-        </p>
-    % elif credit_status["request_status"] == "rejected":
-        <p class="message-copy credit-request-rejected-msg">
-        ${_("{provider_name} has declined your request for course credit. For more information, contact {provider_link}.").format(
-                provider_name=credit_status["provider_name"],
-                provider_link=u'<a href="{provider_url}">{provider_name}</a>'.format(
-                    provider_url=credit_status["provider_status_url"],
-                    provider_name=credit_status["provider_name"],
-                )
-            )
-        }
-        </p>
-    % endif
     </div>
 % endif

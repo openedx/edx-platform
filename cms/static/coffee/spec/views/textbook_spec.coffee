@@ -1,9 +1,9 @@
 define ["js/models/textbook", "js/models/chapter", "js/collections/chapter", "js/models/course",
     "js/collections/textbook", "js/views/show_textbook", "js/views/edit_textbook", "js/views/list_textbooks",
-    "js/views/edit_chapter", "js/views/feedback_prompt", "js/views/feedback_notification", "js/views/utils/view_utils",
-    "common/js/spec_helpers/ajax_helpers", "js/spec_helpers/modal_helpers", "jasmine-stealth"],
+    "js/views/edit_chapter", "common/js/components/views/feedback_prompt",
+    "common/js/components/views/feedback_notification", "common/js/components/utils/view_utils","common/js/spec_helpers/ajax_helpers",
+    "js/spec_helpers/modal_helpers", "jasmine-stealth"],
 (Textbook, Chapter, ChapterSet, Course, TextbookSet, ShowTextbook, EditTextbook, ListTextbooks, EditChapter, Prompt, Notification, ViewUtils, AjaxHelpers, modal_helpers) ->
-    feedbackTpl = readFixtures('system-feedback.underscore')
 
     beforeEach ->
         # remove this when we upgrade jasmine-jquery
@@ -20,7 +20,6 @@ define ["js/models/textbook", "js/models/chapter", "js/collections/chapter", "js
 
         beforeEach ->
             setFixtures($("<script>", {id: "show-textbook-tpl", type: "text/template"}).text(tpl))
-            appendSetFixtures($("<script>", {id: "system-feedback-tpl", type: "text/template"}).text(feedbackTpl))
             appendSetFixtures(sandbox({id: "page-notification"}))
             appendSetFixtures(sandbox({id: "page-prompt"}))
             @model = new Textbook({name: "Life Sciences", id: "0life-sciences"})
@@ -110,7 +109,6 @@ define ["js/models/textbook", "js/models/chapter", "js/collections/chapter", "js
             beforeEach ->
                 setFixtures($("<script>", {id: "edit-textbook-tpl", type: "text/template"}).text(tpl))
                 appendSetFixtures($("<script>", {id: "edit-chapter-tpl", type: "text/template"}).text(chapterTpl))
-                appendSetFixtures($("<script>", {id: "system-feedback-tpl", type: "text/template"}).text(feedbackTpl))
                 appendSetFixtures(sandbox({id: "page-notification"}))
                 appendSetFixtures(sandbox({id: "page-prompt"}))
                 @model = new Textbook({name: "Life Sciences", editing: true})
@@ -232,7 +230,6 @@ define ["js/models/textbook", "js/models/chapter", "js/collections/chapter", "js
 #
 #        beforeEach ->
 #            setFixtures($("<script>", {id: "no-textbooks-tpl", type: "text/template"}).text(noTextbooksTpl))
-#            appendSetFixtures($("<script>", {id: "system-feedback-tpl", type: "text/template"}).text(feedbackTpl))
 #            @showSpies = spyOnConstructor("ShowTextbook", ["render"])
 #            @showSpies.render.andReturn(@showSpies) # equivalent of `return this`
 #            showEl = $("<li>")

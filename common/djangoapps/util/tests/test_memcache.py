@@ -3,7 +3,7 @@ Tests for memcache in util app
 """
 
 from django.test import TestCase
-from django.core.cache import get_cache
+from django.core.cache import caches
 from util.memcache import safe_key
 
 
@@ -18,7 +18,7 @@ class MemcacheTest(TestCase):
 
     def setUp(self):
         super(MemcacheTest, self).setUp()
-        self.cache = get_cache('default')
+        self.cache = caches['default']
 
     def test_safe_key(self):
         key = safe_key('test', 'prefix', 'version')

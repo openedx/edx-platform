@@ -76,7 +76,7 @@ class TestUpdates(MobileAPITestCase, MobileAuthTestMixin, MobileCourseAccessTest
 
         # verify content and sort order of updates (most recent first)
         for num in range(1, num_updates + 1):
-            update_data = response.data[num_updates - num]  # pylint: disable=maybe-no-member
+            update_data = response.data[num_updates - num]
             self.assertEquals(num, update_data['id'])
             self.assertEquals("Date" + str(num), update_data['date'])
             self.assertIn("Update" + str(num), update_data['content'])

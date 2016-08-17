@@ -56,7 +56,7 @@ class CourseCreatorAdminTest(TestCase):
         def change_state_and_verify_email(state, is_creator):
             """ Changes user state, verifies creator status, and verifies e-mail is sent based on transition """
             self._change_state(state)
-            self.assertEqual(is_creator, auth.has_access(self.user, CourseCreatorRole()))
+            self.assertEqual(is_creator, auth.user_has_role(self.user, CourseCreatorRole()))
 
             context = {'studio_request_email': self.studio_request_email}
             if state == CourseCreator.GRANTED:
@@ -74,7 +74,7 @@ class CourseCreatorAdminTest(TestCase):
         with mock.patch.dict('django.conf.settings.FEATURES', self.enable_creator_group_patch):
 
             # User is initially unrequested.
-            self.assertFalse(auth.has_access(self.user, CourseCreatorRole()))
+            self.assertFalse(auth.user_has_role(self.user, CourseCreatorRole()))
 
             change_state_and_verify_email(CourseCreator.GRANTED, True)
 
@@ -105,7 +105,7 @@ class CourseCreatorAdminTest(TestCase):
             # message sent. Admin message will follow.
             base_num_emails = 1 if expect_sent_to_user else 0
             if expect_sent_to_admin:
-                context = {'user_name': "test_user", 'user_email': 'test_user+courses@edx.org'}
+                context = {'user_name': "test_user", 'user_email': u'test_user+courses@edx.org'}
                 self.assertEquals(base_num_emails + 1, len(mail.outbox), 'Expected admin message to be sent')
                 sent_mail = mail.outbox[base_num_emails]
                 self.assertEquals(
@@ -166,10 +166,10 @@ class CourseCreatorAdminTest(TestCase):
             # try logging in 30 times, the default limit in the number of failed
             # login attempts in one 5 minute period before the rate gets limited
             for _ in xrange(30):
-                response = self.client.post('/admin/', post_params)
+                response = self.client.post('/admin/login/', post_params)
                 self.assertEquals(response.status_code, 200)
 
-            response = self.client.post('/admin/', post_params)
+            response = self.client.post('/admin/login/', post_params)
             # Since we are using the default rate limit behavior, we are
             # expecting this to return a 403 error to indicate that there have
             # been too many attempts

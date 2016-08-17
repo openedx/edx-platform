@@ -4,7 +4,7 @@ import sys
 import traceback
 
 from fs.osfs import OSFS
-from path import path
+from path import Path as path
 
 from django.core.management.base import BaseCommand
 

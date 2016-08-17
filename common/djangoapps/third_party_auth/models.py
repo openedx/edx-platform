@@ -3,6 +3,8 @@
 Models used to implement SAML SSO support in third_party_auth
 (inlcuding Shibboleth support)
 """
+from __future__ import absolute_import
+
 from config_models.models import ConfigurationModel, cache
 from django.conf import settings
 from django.core.exceptions import ValidationError
@@ -11,9 +13,12 @@ from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 import json
 import logging
+from provider.utils import long_token
+from provider.oauth2.models import Client
 from social.backends.base import BaseAuth
-from social.backends.oauth import BaseOAuth2
+from social.backends.oauth import OAuthAuth
 from social.backends.saml import SAMLAuth, SAMLIdentityProvider
+from .lti import LTIAuthBackend, LTI_PARAMS_KEY
 from social.exceptions import SocialAuthBaseException
 from social.utils import module_member
 
@@ -30,8 +35,9 @@ def _load_backend_classes(base_class=BaseAuth):
         if issubclass(auth_class, base_class):
             yield auth_class
 _PSA_BACKENDS = {backend_class.name: backend_class for backend_class in _load_backend_classes()}
-_PSA_OAUTH2_BACKENDS = [backend_class.name for backend_class in _load_backend_classes(BaseOAuth2)]
+_PSA_OAUTH2_BACKENDS = [backend_class.name for backend_class in _load_backend_classes(OAuthAuth)]
 _PSA_SAML_BACKENDS = [backend_class.name for backend_class in _load_backend_classes(SAMLAuth)]
+_LTI_BACKENDS = [backend_class.name for backend_class in _load_backend_classes(LTIAuthBackend)]
 
 
 def clean_json(value, of_type):
@@ -54,7 +60,7 @@ class AuthNotConfigured(SocialAuthBaseException):
         self.provider_name = provider_name
 
     def __str__(self):
-        return _('Authentication with {} is currently unavailable.').format(  # pylint: disable=no-member
+        return _('Authentication with {} is currently unavailable.').format(
             self.provider_name
         )
 
@@ -95,10 +101,12 @@ class ProviderConfig(ConfigurationModel):
     )
     prefix = None  # used for provider_id. Set to a string value in subclass
     backend_name = None  # Set to a field or fixed value in subclass
+    accepts_logins = True  # Whether to display a sign-in button when the provider is enabled
 
     # "enabled" field is inherited from ConfigurationModel
 
-    class Meta(object):  # pylint: disable=missing-docstring
+    class Meta(object):
+        app_label = "third_party_auth"
         abstract = True
 
     @property
@@ -123,6 +131,20 @@ class ProviderConfig(ConfigurationModel):
     def match_social_auth(self, social_auth):
         """ Is this provider being used for this UserSocialAuth entry? """
         return self.backend_name == social_auth.provider
+
+    def get_remote_id_from_social_auth(self, social_auth):
+        """ Given a UserSocialAuth object, return the remote ID used by this provider. """
+        # This is generally the same thing as the UID, expect when one backend is used for multiple providers
+        assert self.match_social_auth(social_auth)
+        return social_auth.uid
+
+    def get_social_auth_uid(self, remote_id):
+        """
+        Return the uid in social auth.
+
+        This is default implementation. Subclass may override with a different one.
+        """
+        return remote_id
 
     @classmethod
     def get_register_form_data(cls, pipeline_kwargs):
@@ -166,6 +188,7 @@ class ProviderConfig(ConfigurationModel):
 class OAuth2ProviderConfig(ProviderConfig):
     """
     Configuration Entry for an OAuth2 based provider.
+    Also works for OAuth1 providers.
     """
     prefix = 'oa2'
     KEY_FIELDS = ('backend_name', )  # Backend name is unique
@@ -178,11 +201,21 @@ class OAuth2ProviderConfig(ProviderConfig):
         )
     )
     key = models.TextField(blank=True, verbose_name="Client ID")
-    secret = models.TextField(blank=True, verbose_name="Client Secret")
+    secret = models.TextField(
+        blank=True,
+        verbose_name="Client Secret",
+        help_text=(
+            'For increased security, you can avoid storing this in your database by leaving '
+            ' this field blank and setting '
+            'SOCIAL_AUTH_OAUTH_SECRETS = {"(backend name)": "secret", ...} '
+            'in your instance\'s Django settings (or lms.auth.json)'
+        )
+    )
     other_settings = models.TextField(blank=True, help_text="Optional JSON object with advanced settings, if any.")
 
-    class Meta(object):  # pylint: disable=missing-docstring
-        verbose_name = "Provider Configuration (OAuth2)"
+    class Meta(object):
+        app_label = "third_party_auth"
+        verbose_name = "Provider Configuration (OAuth)"
         verbose_name_plural = verbose_name
 
     def clean(self):
@@ -192,8 +225,13 @@ class OAuth2ProviderConfig(ProviderConfig):
 
     def get_setting(self, name):
         """ Get the value of a setting, or raise KeyError """
-        if name in ("KEY", "SECRET"):
-            return getattr(self, name.lower())
+        if name == "KEY":
+            return self.key
+        if name == "SECRET":
+            if self.secret:
+                return self.secret
+            # To allow instances to avoid storing secrets in the DB, the secret can also be set via Django:
+            return getattr(settings, 'SOCIAL_AUTH_OAUTH_SECRETS', {}).get(self.backend_name, '')
         if self.other_settings:
             other_settings = json.loads(self.other_settings)
             assert isinstance(other_settings, dict), "other_settings should be a JSON object (dictionary)"
@@ -255,7 +293,8 @@ class SAMLProviderConfig(ProviderConfig):
         super(SAMLProviderConfig, self).clean()
         self.other_settings = clean_json(self.other_settings, dict)
 
-    class Meta(object):  # pylint: disable=missing-docstring
+    class Meta(object):
+        app_label = "third_party_auth"
         verbose_name = "Provider Configuration (SAML IdP)"
         verbose_name_plural = "Provider Configuration (SAML IdPs)"
 
@@ -271,6 +310,16 @@ class SAMLProviderConfig(ProviderConfig):
         """ Is this provider being used for this UserSocialAuth entry? """
         prefix = self.idp_slug + ":"
         return self.backend_name == social_auth.provider and social_auth.uid.startswith(prefix)
+
+    def get_remote_id_from_social_auth(self, social_auth):
+        """ Given a UserSocialAuth object, return the remote ID used by this provider. """
+        assert self.match_social_auth(social_auth)
+        # Remove the prefix from the UID
+        return social_auth.uid[len(self.idp_slug) + 1:]
+
+    def get_social_auth_uid(self, remote_id):
+        """ Get social auth uid from remote id by prepending idp_slug to the remote id """
+        return '{}:{}'.format(self.idp_slug, remote_id)
 
     def get_config(self):
         """
@@ -310,10 +359,22 @@ class SAMLConfiguration(ConfigurationModel):
         help_text=(
             'To generate a key pair as two files, run '
             '"openssl req -new -x509 -days 3652 -nodes -out saml.crt -keyout saml.key". '
-            'Paste the contents of saml.key here.'
-        )
+            'Paste the contents of saml.key here. '
+            'For increased security, you can avoid storing this in your database by leaving '
+            'this field blank and setting it via the SOCIAL_AUTH_SAML_SP_PRIVATE_KEY setting '
+            'in your instance\'s Django settings (or lms.auth.json).'
+        ),
+        blank=True,
     )
-    public_key = models.TextField(help_text="Public key certificate.")
+    public_key = models.TextField(
+        help_text=(
+            'Public key certificate. '
+            'For increased security, you can avoid storing this in your database by leaving '
+            'this field blank and setting it via the SOCIAL_AUTH_SAML_SP_PUBLIC_CERT setting '
+            'in your instance\'s Django settings (or lms.auth.json).'
+        ),
+        blank=True,
+    )
     entity_id = models.CharField(max_length=255, default="http://saml.example.com", verbose_name="Entity ID")
     org_info_str = models.TextField(
         verbose_name="Organization Info",
@@ -328,7 +389,8 @@ class SAMLConfiguration(ConfigurationModel):
         ),
     )
 
-    class Meta(object):  # pylint: disable=missing-docstring
+    class Meta(object):
+        app_label = "third_party_auth"
         verbose_name = "SAML Configuration"
         verbose_name_plural = verbose_name
 
@@ -360,14 +422,23 @@ class SAMLConfiguration(ConfigurationModel):
         if name == "SP_ENTITY_ID":
             return self.entity_id
         if name == "SP_PUBLIC_CERT":
-            return self.public_key
+            if self.public_key:
+                return self.public_key
+            # To allow instances to avoid storing keys in the DB, the key pair can also be set via Django:
+            return getattr(settings, 'SOCIAL_AUTH_SAML_SP_PUBLIC_CERT', '')
         if name == "SP_PRIVATE_KEY":
-            return self.private_key
-        if name == "TECHNICAL_CONTACT":
-            return {"givenName": "Technical Support", "emailAddress": settings.TECH_SUPPORT_EMAIL}
-        if name == "SUPPORT_CONTACT":
-            return {"givenName": "SAML Support", "emailAddress": settings.TECH_SUPPORT_EMAIL}
+            if self.private_key:
+                return self.private_key
+            # To allow instances to avoid storing keys in the DB, the private key can also be set via Django:
+            return getattr(settings, 'SOCIAL_AUTH_SAML_SP_PRIVATE_KEY', '')
         other_config = json.loads(self.other_config_str)
+        if name in ("TECHNICAL_CONTACT", "SUPPORT_CONTACT"):
+            contact = {
+                "givenName": "{} Support".format(settings.PLATFORM_NAME),
+                "emailAddress": settings.TECH_SUPPORT_EMAIL
+            }
+            contact.update(other_config.get(name, {}))
+            return contact
         return other_config[name]  # SECURITY_CONFIG, SP_EXTRA, or similar extra settings
 
 
@@ -385,7 +456,8 @@ class SAMLProviderData(models.Model):
     sso_url = models.URLField(verbose_name="SSO URL")
     public_key = models.TextField()
 
-    class Meta(object):  # pylint: disable=missing-docstring
+    class Meta(object):
+        app_label = "third_party_auth"
         verbose_name = "SAML Provider Data"
         verbose_name_plural = verbose_name
         ordering = ('-fetched_at', )
@@ -418,3 +490,107 @@ class SAMLProviderData(models.Model):
 
         cache.set(cls.cache_key_name(entity_id), current, cls.cache_timeout)
         return current
+
+
+class LTIProviderConfig(ProviderConfig):
+    """
+    Configuration required for this edX instance to act as a LTI
+    Tool Provider and allow users to authenticate and be enrolled in a
+    course via third party LTI Tool Consumers.
+    """
+    prefix = 'lti'
+    backend_name = 'lti'
+    icon_class = None  # This provider is not visible to users
+    secondary = False  # This provider is not visible to users
+    accepts_logins = False  # LTI login cannot be initiated by the tool provider
+    KEY_FIELDS = ('lti_consumer_key', )
+
+    lti_consumer_key = models.CharField(
+        max_length=255,
+        help_text=(
+            'The name that the LTI Tool Consumer will use to identify itself'
+        )
+    )
+
+    lti_hostname = models.CharField(
+        default='localhost',
+        max_length=255,
+        help_text=(
+            'The domain that  will be acting as the LTI consumer.'
+        ),
+        db_index=True
+    )
+
+    lti_consumer_secret = models.CharField(
+        default=long_token,
+        max_length=255,
+        help_text=(
+            'The shared secret that the LTI Tool Consumer will use to '
+            'authenticate requests. Only this edX instance and this '
+            'tool consumer instance should know this value. '
+            'For increased security, you can avoid storing this in '
+            'your database by leaving this field blank and setting '
+            'SOCIAL_AUTH_LTI_CONSUMER_SECRETS = {"consumer key": "secret", ...} '
+            'in your instance\'s Django setttigs (or lms.auth.json)'
+        ),
+        blank=True,
+    )
+
+    lti_max_timestamp_age = models.IntegerField(
+        default=10,
+        help_text=(
+            'The maximum age of oauth_timestamp values, in seconds.'
+        )
+    )
+
+    def match_social_auth(self, social_auth):
+        """ Is this provider being used for this UserSocialAuth entry? """
+        prefix = self.lti_consumer_key + ":"
+        return self.backend_name == social_auth.provider and social_auth.uid.startswith(prefix)
+
+    def get_remote_id_from_social_auth(self, social_auth):
+        """ Given a UserSocialAuth object, return the remote ID used by this provider. """
+        assert self.match_social_auth(social_auth)
+        # Remove the prefix from the UID
+        return social_auth.uid[len(self.lti_consumer_key) + 1:]
+
+    def is_active_for_pipeline(self, pipeline):
+        """ Is this provider being used for the specified pipeline? """
+        try:
+            return (
+                self.backend_name == pipeline['backend'] and
+                self.lti_consumer_key == pipeline['kwargs']['response'][LTI_PARAMS_KEY]['oauth_consumer_key']
+            )
+        except KeyError:
+            return False
+
+    def get_lti_consumer_secret(self):
+        """ If the LTI consumer secret is not stored in the database, check Django settings instead """
+        if self.lti_consumer_secret:
+            return self.lti_consumer_secret
+        return getattr(settings, 'SOCIAL_AUTH_LTI_CONSUMER_SECRETS', {}).get(self.lti_consumer_key, '')
+
+    class Meta(object):
+        app_label = "third_party_auth"
+        verbose_name = "Provider Configuration (LTI)"
+        verbose_name_plural = verbose_name
+
+
+class ProviderApiPermissions(models.Model):
+    """
+    This model links OAuth2 client with provider Id.
+
+    It gives permission for a OAuth2 client to access the information under certain IdPs.
+    """
+    client = models.ForeignKey(Client)
+    provider_id = models.CharField(
+        max_length=255,
+        help_text=(
+            'Uniquely identify a provider. This is different from backend_name.'
+        )
+    )
+
+    class Meta(object):
+        app_label = "third_party_auth"
+        verbose_name = "Provider API Permission"
+        verbose_name_plural = verbose_name + 's'

@@ -13,28 +13,26 @@ celery==3.1.18
 cssselect==0.9.1
 dealer==2.0.4
 defusedxml==0.4.1
-django-babel-underscore==0.1.0
+django-babel-underscore==0.4.2
 django-celery==3.1.16
 django-countries==3.3
-django-extensions==1.2.5
-django-filter==0.6.0
-django-followit==0.0.3
-django-keyedcache==1.4-6
-django-kombu==0.9.4
+django-extensions==1.5.9
+django-filter==0.11.0
+django-ipware==1.1.0
 django-mako==0.1.5pre
-django-model-utils==1.4.0
-django-masquerade==0.1.6
-django-mptt==0.5.5
-django-openid-auth==0.4
-django-robots==0.9.1
-django-sekizai==0.6.1
-django-ses==0.4.1
-django-simple-history==1.6.1
-django-storages==1.1.5
-django-threaded-multihost==1.4-1
+django-model-utils==2.3.1
+django-mptt==0.7.4
+django-oauth-plus==2.2.8
+django-sekizai==0.8.2
+django-ses==0.7.0
+django-simple-history==1.6.3
+django-storages-redux==1.3
 django-method-override==0.1.0
-djangorestframework==2.3.14
-django==1.4.21
+# We need a fix to DRF 3.2.x, for now use it from our own cherry-picked repo
+#djangorestframework>=3.1,<3.2
+git+https://github.com/edx/django-rest-framework.git@3c72cb5ee5baebc4328947371195eae2077197b0#egg=djangorestframework==3.2.3
+django==1.8.12
+edx-rest-api-client==1.2.1
 elasticsearch==0.4.5
 facebook-sdk==0.4.0
 feedparser==5.1.3
@@ -44,16 +42,15 @@ glob2==0.3
 gunicorn==0.17.4
 httpretty==0.8.3
 lazy==1.1
-mako==0.9.1
+mako==1.0.2
 Markdown==2.2.1
 --allow-external meliae
 --allow-unverified meliae
 meliae==0.4.0
-mongoengine==0.7.10
+mongoengine==0.10.0
 MySQL-python==1.2.5
 networkx==1.7
-nltk==2.0.5
-nose==1.3.3
+nose-xunitmp==0.3.2
 oauthlib==0.7.2
 paramiko==1.9.0
 path.py==7.2
@@ -63,32 +60,35 @@ pycrypto>=2.6
 pygments==2.0.1
 pygraphviz==1.1
 PyJWT==1.0.1
-pymongo==2.7.2
+pymongo==2.9.1
 pyparsing==2.0.1
 python-memcached==1.48
 python-openid==2.2.5
 python-dateutil==2.1
-python-social-auth==0.2.11
+
+# This module gets monkey-patched in third_party_auth.py to fix a Django 1.8 incompatibility.
+# When this dependency gets upgraded, the monkey patch should be removed, if possible.
+python-social-auth==0.2.12
+
 pytz==2015.2
 pysrt==0.4.7
 PyYAML==3.10
-requests==2.3.0
+requests==2.7.0
 requests-oauthlib==0.4.1
-rfc6266==0.0.4
 scipy==0.14.0
 Shapely==1.2.16
 singledispatch==3.4.0.2
-sorl-thumbnail==11.12
+sorl-thumbnail==12.3
 sortedcontainers==0.9.2
-South==1.0.1
 stevedore==0.14.1
 sure==1.2.3
 sympy==0.7.1
 xmltodict==0.4.1
-django-ratelimit-backend==0.6
+django-ratelimit-backend==1.0
 unicodecsv==0.9.4
 django-require==1.0.6
 pyuca==1.1
+wrapt==1.10.5
 
 # This needs to be installed *after* Cython, which is in pre.txt
 lxml==3.4.4
@@ -104,7 +104,7 @@ watchdog==0.7.1
 
 # Metrics gathering and monitoring
 dogapi==1.2.1
-newrelic==2.46.0.37
+newrelic==2.56.0.42
 
 # Used for documentation gathering
 sphinx==1.1.3
@@ -112,38 +112,39 @@ sphinx_rtd_theme==0.1.5
 
 # Used for Internationalization and localization
 Babel==1.3
-transifex-client==0.10
+transifex-client==0.11b3
 
 # Ip network support for Embargo feature
 ipaddr==2.1.11
 
 # Used to allow to configure CORS headers for cross-domain requests
-django-cors-headers==0.13
+django-cors-headers==1.1.0
 
 # Debug toolbar
-django_debug_toolbar==1.2.2
+django_debug_toolbar==1.3.2
 
 # Used for testing
-astroid==1.3.4
-bok-choy==0.4.2
+astroid==1.3.8
+before_after==0.1.3
+bok-choy==0.4.7
 chrono==1.0.2
-coverage==3.7
+coverage==4.0.2
 ddt==0.8.0
-diff-cover==0.7.3
+diff-cover==0.8.0
 django-crum==0.5
-django_nose==1.3
-factory_boy==2.2.1
-flaky==2.0.3
+django_nose==1.4.1
+factory_boy==2.5.1
+flaky==2.4.0
 freezegun==0.1.11
-lettuce==0.2.20
-mock-django==0.6.6
+mock-django==0.6.9
 mock==1.0.1
+moto==0.3.1
+nose==1.3.7
 nose-exclude
 nose-ignore-docstring
 nosexcover==1.0.7
 pep8==1.5.7
 PyContracts==1.7.1
-pylint==1.4.2
 python-subunit==0.0.16
 pyquery==1.2.9
 radon==1.2
@@ -152,12 +153,16 @@ selenium==2.42.1
 splinter==0.5.4
 testtools==0.9.34
 
-# Used for Segment.io analytics
-analytics-python==0.4.4
+# Used for Segment analytics
+analytics-python==1.1.0
 
 # Needed for mailchimp(mailing djangoapp)
 mailsnake==1.6.2
 jsonfield==1.0.3
 
+# Inlines CSS styles into HTML for email notifications.
+pynliner==0.5.2
+
 # Appsembler
 -r appsembler.txt
+

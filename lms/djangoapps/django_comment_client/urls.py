@@ -1,4 +1,7 @@
-from django.conf.urls.defaults import url, patterns, include
+"""
+Urls for the django_comment_client.
+"""
+from django.conf.urls import url, patterns, include
 
 urlpatterns = patterns(
     '',

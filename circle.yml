@@ -1,0 +1,64 @@
+machine:
+  python:
+    version: 2.7.3
+
+general:
+  artifacts:
+    - "reports"
+    - "test_root/log"
+
+dependencies:
+  override:
+    - npm install
+    - bundle install
+
+    - pip install setuptools
+    - pip install --exists-action w -r requirements/edx/paver.txt
+
+    # Mirror what paver install_prereqs does.
+    # After a successful build, CircleCI will
+    # cache the virtualenv at that state, so that
+    # the next build will not need to install them
+    # from scratch again.
+    - pip install --exists-action w -r requirements/edx/pre.txt 
+    - pip install --exists-action w -r requirements/edx/github.txt
+    - pip install --exists-action w -r requirements/edx/local.txt
+
+    # HACK: within base.txt stevedore had a
+    # dependency on a version range of pbr.
+    # Install a version which falls within that range.
+    - pip install  --exists-action w pbr==0.9.0
+    - pip install --exists-action w -r requirements/edx/base.txt
+    - if [ -e requirements/edx/post.txt ]; then pip install --exists-action w -r requirements/edx/post.txt ; fi
+
+    - pip install coveralls==1.0
+
+test:
+  override:
+    # Run tests for the system.
+    # all-tests.sh is the entry point for determining
+    # which tests to run.
+    # See the circleCI documentation regarding parallelism
+    # to understand how multiple containers can be used to
+    # run subsets of tests in parallel.
+    - ./scripts/all-tests.sh:
+        timeout: 900  # if a command runs this many seconds without output, kill it
+        parallel: true
+
+  post:
+    - mkdir -p $CIRCLE_TEST_REPORTS/junit
+    # Copy the junit results up to be consumed by circleci,
+    # but only do this if there actually are results.
+    # Note that the greater than zero comparison is doing a
+    # string compare, but that should be fine for our purposes here.
+    # Do this on each of the containers that were used in
+    # the build so that all results are consolidated.
+    - "if [ $(find reports -type f | wc -l) -gt 0 ] ; then cp -r reports/. $CIRCLE_TEST_REPORTS/junit ; fi":
+        parallel: true
+
+    # If you have enabled coveralls for your repo, configure your COVERALLS_REPO_TOKEN
+    # as an Environment Variable in the Project Settings on CircleCI, and coverage
+    # data will automatically be sent to coveralls. See https://coveralls.io/
+    # If you have not set up set up coveralls then the following statement will
+    # print a message but not affect the pass/fail status of the build.
+    - if [ -z $COVERALLS_REPO_TOKEN ]; then echo "Coveralls token not defined."; else coveralls; fi

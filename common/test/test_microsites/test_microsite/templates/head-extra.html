@@ -1,0 +1,7 @@
+<%namespace name='static' file='../../static_content.html'/>
+<%! from microsite_configuration import microsite %>
+<% style_overrides_file = microsite.get_value('css_overrides_file') %>
+
+% if style_overrides_file:
+  <link rel="stylesheet" type="text/css" href="${static.url(style_overrides_file)}" />
+% endif

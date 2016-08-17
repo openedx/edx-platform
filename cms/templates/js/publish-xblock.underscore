@@ -42,22 +42,24 @@ var visibleToStaffOnly = visibilityState === 'staff_only';
         </p>
     </div>
 
-    <div class="wrapper-release bar-mod-content">
-        <h5 class="title"><%= releaseLabel %></h5>
-        <p class="copy">
-            <% if (releaseDate) { %>
-                <span class="release-date"><%= releaseDate %></span>
-                <span class="release-with">
-                    <%= interpolate(
-                        gettext('with %(release_date_from)s'), { release_date_from: releaseDateFrom }, true
-                    ) %>
-                </span>
+    <% if (!course.get('self_paced')) { %>
+        <div class="wrapper-release bar-mod-content">
+            <h5 class="title"><%= releaseLabel %></h5>
+            <p class="copy">
+                <% if (releaseDate) { %>
+                    <span class="release-date"><%= releaseDate %></span>
+                    <span class="release-with">
+                        <%= interpolate(
+                            gettext('with %(release_date_from)s'), { release_date_from: releaseDateFrom }, true
+                        ) %>
+                    </span>
 
-            <% } else { %>
-                <%= gettext("Unscheduled") %>
-            <% } %>
-        </p>
-    </div>
+                <% } else { %>
+                    <%= gettext("Unscheduled") %>
+                <% } %>
+            </p>
+        </div>
+    <% } %>
 
     <div class="wrapper-visibility bar-mod-content">
         <h5 class="title">

@@ -174,7 +174,7 @@ class EdxNotesPageView(PageObject):
         self.q(css=self.TAB_SELECTOR).first.click()
         try:
             return self.wait_for_page()
-        except (BrokenPromise):
+        except BrokenPromise:
             raise PageLoadError("Timed out waiting to load page '{!r}'".format(self))
 
     def is_browser_on_page(self):

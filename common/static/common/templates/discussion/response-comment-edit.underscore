@@ -1,0 +1,9 @@
+<div class="edit-post-form" id="comment_<%- id %>">
+  <h1><%- gettext("Editing comment") %></h1>
+  <ul class="edit-comment-form-errors"></ul>
+  <div class="form-row">
+    <div class="edit-comment-body" name="body" data-id="<%- id %>"><%- body %></div>
+  </div>
+  <input type="submit" id="edit-comment-submit" class="post-update" value="<%- gettext("Update comment") %>">
+  <a href="#" class="post-cancel"><%- gettext("Cancel") %></a>
+</div>

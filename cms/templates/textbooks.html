@@ -2,8 +2,8 @@
 <%def name="online_help_token()"><% return "textbooks" %></%def>
 <%namespace name='static' file='static_content.html'/>
 <%!
-import json
 from django.utils.translation import ugettext as _
+from openedx.core.lib.js_utils import escape_json_dumps
 %>
 
 <%block name="title">${_("Textbooks")}</%block>
@@ -28,7 +28,7 @@ CMS.URL.LMS_BASE = "${settings.LMS_BASE}"
 </%block>
 <%block name="requirejs">
     require(["js/factories/textbooks"], function(TextbooksFactory) {
-        TextbooksFactory(${json.dumps(textbooks)});
+        TextbooksFactory(${escape_json_dumps(textbooks) | n});
     });
 </%block>
 

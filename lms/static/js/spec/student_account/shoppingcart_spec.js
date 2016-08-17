@@ -2,7 +2,7 @@ define(['common/js/spec_helpers/ajax_helpers', 'js/student_account/shoppingcart'
     function(AjaxHelpers, ShoppingCartInterface) {
         'use strict';
 
-        describe( 'edx.student.account.ShoppingCartInterface', function() {
+        describe( 'ShoppingCartInterface', function() {
 
             var COURSE_KEY = "edX/DemoX/Fall",
                 ADD_COURSE_URL = "/shoppingcart/add/course/edX/DemoX/Fall/",

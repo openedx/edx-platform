@@ -38,9 +38,9 @@ ${block_content}
     </header>
 
     <form id="${element_id}_xqa_form" class="xqa_form">
-      <label>${_("Comment")}</label>
+      <label for="${element_id}_xqa_entry">${_("Comment")}</label>
       <input id="${element_id}_xqa_entry" type="text" placeholder="${_('comment')}">
-      <label>${_("Tag")}</label>
+      <label for="${element_id}_xqa_tag">${_("Tag")}</label>
       <span style="color:black;vertical-align: -10pt">${_('Optional tag (eg "done" or "broken"):') + '&nbsp; '}      </span>
       <input id="${element_id}_xqa_tag" type="text" placeholder="${_('tag')}" style="width:80px;display:inline">
       <div class="submit">

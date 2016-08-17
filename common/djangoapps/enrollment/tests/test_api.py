@@ -1,6 +1,8 @@
 """
 Tests for student enrollment.
 """
+from mock import patch, Mock
+
 import ddt
 from django.core.cache import cache
 from nose.tools import raises
@@ -8,6 +10,8 @@ import unittest
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.conf import settings
+
+from course_modes.models import CourseMode
 from enrollment import api
 from enrollment.errors import EnrollmentApiLoadError, EnrollmentNotFoundError, CourseModeNotFoundError
 from enrollment.tests import fake_data_api
@@ -55,6 +59,37 @@ class EnrollmentTest(TestCase):
 
         get_result = api.get_enrollment(self.USERNAME, self.COURSE_ID)
         self.assertEquals(result, get_result)
+
+    @ddt.data(
+        ([CourseMode.DEFAULT_MODE_SLUG, 'verified', 'credit'], CourseMode.DEFAULT_MODE_SLUG),
+        (['audit', 'verified', 'credit'], 'audit'),
+        (['honor', 'verified', 'credit'], 'honor'),
+    )
+    @ddt.unpack
+    def test_enroll_no_mode_success(self, course_modes, expected_mode):
+        # Add a fake course enrollment information to the fake data API
+        fake_data_api.add_course(self.COURSE_ID, course_modes=course_modes)
+        with patch('enrollment.api.CourseMode.modes_for_course') as mock_modes_for_course:
+            mock_course_modes = [Mock(slug=mode) for mode in course_modes]
+            mock_modes_for_course.return_value = mock_course_modes
+            # Enroll in the course and verify the URL we get sent to
+            result = api.add_enrollment(self.USERNAME, self.COURSE_ID)
+            self.assertIsNotNone(result)
+            self.assertEquals(result['student'], self.USERNAME)
+            self.assertEquals(result['course']['course_id'], self.COURSE_ID)
+            self.assertEquals(result['mode'], expected_mode)
+
+    @ddt.data(
+        ['professional'],
+        ['verified'],
+        ['verified', 'professional'],
+    )
+    @raises(CourseModeNotFoundError)
+    def test_enroll_no_mode_error(self, course_modes):
+        # Add a fake course enrollment information to the fake data API
+        fake_data_api.add_course(self.COURSE_ID, course_modes=course_modes)
+        # Enroll in the course and verify that we raise CourseModeNotFoundError
+        api.add_enrollment(self.USERNAME, self.COURSE_ID)
 
     @raises(CourseModeNotFoundError)
     def test_prof_ed_enroll(self):
@@ -142,6 +177,29 @@ class EnrollmentTest(TestCase):
 
         result = api.update_enrollment(self.USERNAME, self.COURSE_ID, mode='verified')
         self.assertEquals('verified', result['mode'])
+
+    def test_update_enrollment_attributes(self):
+        # Add fake course enrollment information to the fake data API
+        fake_data_api.add_course(self.COURSE_ID, course_modes=['honor', 'verified', 'audit', 'credit'])
+        # Enroll in the course and verify the URL we get sent to
+        result = api.add_enrollment(self.USERNAME, self.COURSE_ID, mode='audit')
+        get_result = api.get_enrollment(self.USERNAME, self.COURSE_ID)
+        self.assertEquals(result, get_result)
+
+        enrollment_attributes = [
+            {
+                "namespace": "credit",
+                "name": "provider_id",
+                "value": "hogwarts",
+            }
+        ]
+
+        result = api.update_enrollment(
+            self.USERNAME, self.COURSE_ID, mode='credit', enrollment_attributes=enrollment_attributes
+        )
+        self.assertEquals('credit', result['mode'])
+        attributes = api.get_enrollment_attributes(self.USERNAME, self.COURSE_ID)
+        self.assertEquals(enrollment_attributes[0], attributes[0])
 
     def test_get_course_details(self):
         # Add a fake course enrollment information to the fake data API

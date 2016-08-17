@@ -12,7 +12,7 @@ import os
 import urlparse
 from contextlib import contextmanager
 from datetime import datetime
-from path import path
+from path import Path as path
 from bok_choy.javascript import js_defined
 from bok_choy.web_app_test import WebAppTest
 from bok_choy.promise import EmptyPromise, Promise
@@ -21,6 +21,7 @@ from pymongo import MongoClient, ASCENDING
 from openedx.core.lib.tests.assertions.events import assert_event_matches, is_matching_event, EventMatchTolerates
 from xmodule.partitions.partitions import UserPartition
 from xmodule.partitions.tests.test_partitions import MockUserPartitionScheme
+from selenium.common.exceptions import StaleElementReferenceException
 from selenium.webdriver.support.select import Select
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -90,7 +91,7 @@ def load_data_str(rel_path):
     Load a file from the "data" directory as a string.
     `rel_path` is the path relative to the data directory.
     """
-    full_path = path(__file__).abspath().dirname() / "data" / rel_path  # pylint: disable=no-value-for-parameter
+    full_path = path(__file__).abspath().dirname() / "data" / rel_path
     with open(full_path) as data_file:
         return data_file.read()
 
@@ -201,17 +202,40 @@ def enable_css_animations(page):
 def select_option_by_text(select_browser_query, option_text):
     """
     Chooses an option within a select by text (helper method for Select's select_by_visible_text method).
+
+    Wrap this in a Promise to prevent a StaleElementReferenceException
+    from being raised while the DOM is still being rewritten
     """
-    select = Select(select_browser_query.first.results[0])
-    select.select_by_visible_text(option_text)
+    def select_option(query, value):
+        """ Get the first select element that matches the query and select the desired value. """
+        try:
+            select = Select(query.first.results[0])
+            select.select_by_visible_text(value)
+            return True
+        except StaleElementReferenceException:
+            return False
+
+    msg = 'Selected option {}'.format(option_text)
+    EmptyPromise(lambda: select_option(select_browser_query, option_text), msg).fulfill()
 
 
 def get_selected_option_text(select_browser_query):
     """
     Returns the text value for the first selected option within a select.
+
+    Wrap this in a Promise to prevent a StaleElementReferenceException
+    from being raised while the DOM is still being rewritten
     """
-    select = Select(select_browser_query.first.results[0])
-    return select.first_selected_option.text
+    def get_option(query):
+        """ Get the first select element that matches the query and return its value. """
+        try:
+            select = Select(query.first.results[0])
+            return (True, select.first_selected_option.text)
+        except StaleElementReferenceException:
+            return (False, None)
+
+    text = Promise(lambda: get_option(select_browser_query), 'Retrieved selected option text').fulfill()
+    return text
 
 
 def get_options(select_browser_query):
@@ -290,6 +314,36 @@ def get_modal_alert(browser):
     return browser.switch_to.alert
 
 
+def get_element_padding(page, selector):
+    """
+    Get Padding of the element with given selector,
+
+    :returns a dict object with the following keys.
+            1 - padding-top
+            2 - padding-right
+            3 - padding-bottom
+            4 - padding-left
+
+    Example Use:
+        progress_page.get_element_padding('.wrapper-msg.wrapper-auto-cert')
+
+    """
+    js_script = """
+        var $element = $('%(selector)s');
+
+        element_padding = {
+            'padding-top': $element.css('padding-top').replace("px", ""),
+            'padding-right': $element.css('padding-right').replace("px", ""),
+            'padding-bottom': $element.css('padding-bottom').replace("px", ""),
+            'padding-left': $element.css('padding-left').replace("px", "")
+        };
+
+        return element_padding;
+    """ % {'selector': selector}
+
+    return page.browser.execute_script(js_script)
+
+
 class EventsTestMixin(TestCase):
     """
     Helpers and setup for running tests that evaluate events emitted
@@ -297,7 +351,7 @@ class EventsTestMixin(TestCase):
     def setUp(self):
         super(EventsTestMixin, self).setUp()
         self.event_collection = MongoClient()["test"]["events"]
-        self.reset_event_tracking()
+        self.start_time = datetime.now()
 
     def reset_event_tracking(self):
         """Drop any events that have been collected thus far and start collecting again from scratch."""
@@ -334,7 +388,7 @@ class EventsTestMixin(TestCase):
                 captured_events.append(event)
 
     @contextmanager
-    def assert_events_match_during(self, event_filter=None, expected_events=None):
+    def assert_events_match_during(self, event_filter=None, expected_events=None, in_order=True):
         """
         Context manager that ensures that events matching the `event_filter` and `expected_events` are emitted.
 
@@ -351,7 +405,7 @@ class EventsTestMixin(TestCase):
         with self.capture_events(event_filter, len(expected_events), captured_events):
             yield
 
-        self.assert_events_match(expected_events, captured_events)
+        self.assert_events_match(expected_events, captured_events, in_order=in_order)
 
     def wait_for_events(self, start_time=None, event_filter=None, number_of_matches=1, timeout=None):
         """
@@ -477,17 +531,29 @@ class EventsTestMixin(TestCase):
 
         self.assertEquals(len(matching_events), 0, description)
 
-    def assert_events_match(self, expected_events, actual_events):
+    def assert_events_match(self, expected_events, actual_events, in_order=True):
+        """Assert that each actual event matches one of the expected events.
+
+        Args:
+            expected_events (List): a list of dicts representing the expected events.
+            actual_events (List): a list of dicts that were actually recorded.
+            in_order (bool): if True then the events must be in the same order (defaults to True).
         """
-        Assert that each item in the expected events sequence matches its counterpart at the same index in the actual
-        events sequence.
-        """
-        for expected_event, actual_event in zip(expected_events, actual_events):
-            assert_event_matches(
-                expected_event,
-                actual_event,
-                tolerate=EventMatchTolerates.lenient()
-            )
+        if in_order:
+            for expected_event, actual_event in zip(expected_events, actual_events):
+                assert_event_matches(
+                    expected_event,
+                    actual_event,
+                    tolerate=EventMatchTolerates.lenient()
+                )
+        else:
+            for expected_event in expected_events:
+                actual_event = next(event for event in actual_events if is_matching_event(expected_event, event))
+                assert_event_matches(
+                    expected_event,
+                    actual_event or {},
+                    tolerate=EventMatchTolerates.lenient()
+                )
 
     def relative_path_to_absolute_uri(self, relative_path):
         """Return an aboslute URI given a relative path taking into account the test context."""

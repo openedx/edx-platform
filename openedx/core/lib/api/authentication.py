@@ -1,10 +1,11 @@
 """ Common Authentication Handlers used across projects. """
-from rest_framework import authentication
+from rest_framework.authentication import SessionAuthentication
+from rest_framework_oauth.authentication import OAuth2Authentication
 from rest_framework.exceptions import AuthenticationFailed
-from rest_framework.compat import oauth2_provider, provider_now
+from rest_framework_oauth.compat import oauth2_provider, provider_now
 
 
-class SessionAuthenticationAllowInactiveUser(authentication.SessionAuthentication):
+class SessionAuthenticationAllowInactiveUser(SessionAuthentication):
     """Ensure that the user is logged in, but do not require the account to be active.
 
     We use this in the special case that a user has created an account,
@@ -51,7 +52,7 @@ class SessionAuthenticationAllowInactiveUser(authentication.SessionAuthenticatio
         return (user, None)
 
 
-class OAuth2AuthenticationAllowInactiveUser(authentication.OAuth2Authentication):
+class OAuth2AuthenticationAllowInactiveUser(OAuth2Authentication):
     """
     This is a temporary workaround while the is_active field on the user is coupled
     with whether or not the user has verified ownership of their claimed email address.

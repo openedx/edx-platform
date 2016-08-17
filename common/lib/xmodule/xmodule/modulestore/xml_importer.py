@@ -25,7 +25,7 @@ from abc import abstractmethod
 from opaque_keys.edx.locator import LibraryLocator
 import os
 import mimetypes
-from path import path
+from path import Path as path
 import json
 import re
 from lxml import etree
@@ -48,6 +48,7 @@ from xmodule.modulestore.mongo.base import MongoRevisionKey
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.store_utilities import draft_node_constructor, get_draft_subtree_roots
 from xmodule.modulestore.tests.utils import LocationMixin
+from xmodule.util.misc import escape_invalid_characters
 
 
 log = logging.getLogger(__name__)
@@ -106,7 +107,12 @@ def import_static_content(
             asset_key = StaticContent.compute_location(target_id, fullname_with_subpath)
 
             policy_ele = policy.get(asset_key.path, {})
-            displayname = policy_ele.get('displayname', filename)
+
+            # During export display name is used to create files, strip away slashes from name
+            displayname = escape_invalid_characters(
+                name=policy_ele.get('displayname', filename),
+                invalid_char_list=['/', '\\']
+            )
             locked = policy_ele.get('locked', False)
             mime_type = policy_ele.get('contentType')
 
@@ -270,7 +276,7 @@ class ImportManager(object):
 
         all_assets = []
         try:
-            xml_data = etree.parse(asset_xml_file).getroot()  # pylint: disable=no-member
+            xml_data = etree.parse(asset_xml_file).getroot()
             assert xml_data.tag == AssetMetadata.ALL_ASSETS_XML_TAG
             for asset in xml_data.iterchildren():
                 if asset.tag == AssetMetadata.ASSET_XML_TAG:
@@ -955,7 +961,7 @@ def create_xml_attributes(module, xml):
             xml_attrs[attr] = val
 
     # now cache it on module where it's expected
-    setattr(module, 'xml_attributes', xml_attrs)
+    module.xml_attributes = xml_attrs
 
 
 def validate_no_non_editable_metadata(module_store, course_id, category):
@@ -1084,7 +1090,7 @@ def perform_xlint(
     for err_log in module_store.errored_courses.itervalues():
         for err_log_entry in err_log.errors:
             msg = err_log_entry[0]
-            print(msg)
+            print msg
             if msg.startswith('ERROR:'):
                 err_cnt += 1
             else:
@@ -1127,10 +1133,11 @@ def perform_xlint(
             )
             warn_cnt += 1
 
-    print("\n")
-    print("------------------------------------------")
-    print("VALIDATION SUMMARY: {err} Errors   {warn} Warnings".format(
-        err=err_cnt, warn=warn_cnt)
+    print "\n"
+    print "------------------------------------------"
+    print "VALIDATION SUMMARY: {err} Errors   {warn} Warnings".format(
+        err=err_cnt,
+        warn=warn_cnt
     )
 
     if err_cnt > 0:
@@ -1145,7 +1152,7 @@ def perform_xlint(
             "your courseware before importing"
         )
     else:
-        print("This course can be imported successfully.")
+        print "This course can be imported successfully."
 
     return err_cnt
 

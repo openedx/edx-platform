@@ -4,13 +4,17 @@
 from django.utils.translation import ugettext as _
 from django.template.defaultfilters import escapejs
 from microsite_configuration import page_title_breadcrumbs
+from django.conf import settings
 from edxnotes.helpers import is_feature_enabled as is_edxnotes_enabled
+%>
+<%
+  include_special_exams = settings.FEATURES.get('ENABLE_SPECIAL_EXAMS', False) and (course.enable_proctored_exams or course.enable_timed_exams)
 %>
 <%def name="course_name()">
  <% return _("{course_number} Courseware").format(course_number=course.display_number_with_default) %>
 </%def>
 
-<%block name="bodyclass">view-incourse view-courseware courseware ${course.css_class or ''}</%block>
+<%block name="bodyclass">view-in-course view-courseware courseware ${course.css_class or ''}</%block>
 <%block name="title"><title>
     % if section_title:
 ${page_title_breadcrumbs(section_title, course_name())}
@@ -25,13 +29,23 @@ ${page_title_breadcrumbs(course_name())}
     <%static:include path="common/templates/${template_name}.underscore" />
 </script>
 % endfor
+
 % if settings.FEATURES.get('ENABLE_COURSEWARE_SEARCH'):
     % for template_name in ["course_search_item", "course_search_results", "search_loading", "search_error"]:
-    <script type="text/template" id="${template_name}-tpl">
-        <%static:include path="search/${template_name}.underscore" />
-    </script>
-% endfor
+        <script type="text/template" id="${template_name}-tpl">
+            <%static:include path="search/${template_name}.underscore" />
+        </script>
+    % endfor
 % endif
+
+% if include_special_exams:
+  % for template_name in ["proctored-exam-status"]:
+    <script type="text/template" id="${template_name}-tpl">
+        <%static:include path="courseware/${template_name}.underscore" />
+    </script>
+  % endfor
+% endif
+
 </%block>
 
 <%block name="headextra">
@@ -45,14 +59,6 @@ ${page_title_breadcrumbs(course_name())}
 <%block name="nav_skip">${"#seq_content" if section_title else "#course-content"}</%block>
 
 <%include file="../discussion/_js_head_dependencies.html" />
-
-  % if show_chat:
-    <link rel="stylesheet" href="${static.url('css/vendor/ui-lightness/jquery-ui-1.8.22.custom.css')}" />
-    ## It'd be better to have this in a place like lms/css/vendor/candy,
-    ## but the candy_res/ folder contains images and other junk, and it
-    ## all needs to stay together for the Candy.js plugin to work.
-    <link rel="stylesheet" href="${static.url('candy_res/candy_full.css')}" />
-  % endif
   ${fragment.head_html()}
 </%block>
 
@@ -66,7 +72,10 @@ ${page_title_breadcrumbs(course_name())}
   <%static:js group='courseware'/>
   <%static:js group='discussion'/>
   % if settings.FEATURES.get('ENABLE_COURSEWARE_SEARCH'):
-    <%static:js group='courseware_search'/>
+    <%static:require_module module_name="js/search/course/course_search_factory" class_name="CourseSearchFactory">
+        var courseId = $('#courseware-search-results').data('courseId');
+        CourseSearchFactory(courseId);
+    </%static:require_module>
   % endif
 
   <%include file="../discussion/_js_body_dependencies.html" />
@@ -78,7 +87,7 @@ ${page_title_breadcrumbs(course_name())}
     var $$course_id = "${course.id | escapejs}";
 
     $(function(){
-        $(".ui-accordion-header a, .ui-accordion-content .subtitle").each(function() {
+        $(".ui-accordion-header a, .ui-accordion-content .subtitle-name").each(function() {
           var elemText = $(this).text().replace(/^\s+|\s+$/g,''); // Strip leading and trailing whitespace
           var wordArray = elemText.split(" ");
           var finalTitle = "";
@@ -99,40 +108,6 @@ ${page_title_breadcrumbs(course_name())}
       });
   </script>
 
-% if show_chat:
-  <script type="text/javascript" src="${static.url('js/vendor/candy_libs/libs.min.js')}"></script>
-  <script type="text/javascript" src="${static.url('js/vendor/candy.min.js')}"></script>
-
-  <script type="text/javascript">
-    // initialize the Candy.js plugin
-    $(document).ready(function() {
-      Candy.init("http://${chat['domain']}:5280/http-bind/", {
-        core: { debug: true, autojoin: ["${chat['room']}@conference.${chat['domain']}"] },
-        view: { resources: "${static.url('candy_res/')}"}
-      });
-      Candy.Core.connect("${chat['username']}", "${chat['password']}");
-
-      // show/hide the chat widget
-      $('#chat-toggle').click(function() {
-        var toggle = $(this);
-        if (toggle.hasClass('closed')) {
-          $('#chat-block').show().animate({height: '400px'}, 'slow', function() {
-            $('#chat-open').hide();
-            $('#chat-close').show();
-          });
-        } else {
-          $('#chat-block').animate({height: '0px'}, 'slow', function() {
-            $('#chat-open').show();
-            $('#chat-close').hide();
-            $(this).hide(); // do this at the very end
-          });
-        }
-        toggle.toggleClass('closed');
-      });
-    });
-  </script>
-% endif
-
 ${fragment.foot_html()}
 
 </%block>
@@ -144,14 +119,10 @@ ${fragment.foot_html()}
 % endif
 
 <div class="container">
-  <div class="course-wrapper">
+  <div class="course-wrapper" role="presentation">
 
 % if disable_accordion is UNDEFINED or not disable_accordion:
-    <div class="course-index" role="navigation">
-      <header id="open_close_accordion">
-        <a href="#">${_("close")}</a>
-      </header>
-
+    <div class="course-index">
       % if settings.FEATURES.get('ENABLE_COURSEWARE_SEARCH'):
         <div id="courseware-search-bar" class="search-bar courseware-search-bar" role="search" aria-label="Course">
           <form>
@@ -169,8 +140,8 @@ ${fragment.foot_html()}
         </div>
       % endif
 
-      <div id="accordion" style="display: none">
-        <nav aria-label="${_('Course Navigation')}">
+      <div class="accordion">
+        <nav class="course-navigation" aria-label="${_('Course')}">
           % if accordion.strip():
             ${accordion}
           % else:
@@ -181,7 +152,7 @@ ${fragment.foot_html()}
 
     </div>
 % endif
-    <section class="course-content" id="course-content" role="main" aria-label=“Content”>
+    <section class="course-content" id="course-content" role="main" aria-label="Content">
         % if getattr(course, 'entrance_exam_enabled') and \
            getattr(course, 'entrance_exam_minimum_score_pct') and \
            entrance_exam_current_score is not UNDEFINED:
@@ -189,14 +160,24 @@ ${fragment.foot_html()}
             <p class="sequential-status-message">
                 ${_('To access course materials, you must score {required_score}% or higher on this \
                 exam. Your current score is {current_score}%.').format(
-                    required_score=int(course.entrance_exam_minimum_score_pct * 100),
-                    current_score=int(entrance_exam_current_score * 100)
+                    required_score=int(round(course.entrance_exam_minimum_score_pct * 100)),
+                    current_score=int(round(entrance_exam_current_score * 100))
                 )}
             </p>
+            <script type="text/javascript">
+            $(document).ajaxSuccess(function(event, xhr, settings) {
+                if (settings.url.indexOf("xmodule_handler/problem_check") > -1) {
+                    var data = JSON.parse(xhr.responseText);
+                    if (data.entrance_exam_passed){
+                        location.reload();
+                    }
+                }
+            });
+            </script>
             % else:
               <p class="sequential-status-message">
                 ${_('Your score is {current_score}%. You have passed the entrance exam.').format(
-                    current_score=int(entrance_exam_current_score * 100)
+                    current_score=int(round(entrance_exam_current_score * 100))
                 )}
             </p>
             % endif
@@ -224,11 +205,6 @@ ${fragment.foot_html()}
 </div>
 
 <nav class="nav-utilities ${"has-utility-calculator" if course.show_calculator else ""}" aria-label="${_('Course Utilities')}">
-  ## Utility: Chat
-  % if show_chat:
-    <%include file="/chat/toggle_chat.html" />
-  % endif
-
   ## Utility: Notes
   % if is_edxnotes_enabled(course):
     <%include file="/edxnotes/toggle_notes.html" args="course=course"/>

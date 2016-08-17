@@ -19,7 +19,7 @@ CodeMirror.defineMode("edx_markdown", function(cmCfg, modeCfg) {
   ,   olRE = /^[0-9]+\.\s+/
   ,   headerRE = /^(?:\={3,}|-{3,})$/
   ,   textRE = /^[^\[*_\\<>`]+/
-  ,   circuitRE = /^circuit-schematic:(.*)$/;
+  ;
 
   function switchInline(stream, state, f) {
     state.f = state.inline = f;
@@ -55,43 +55,9 @@ CodeMirror.defineMode("edx_markdown", function(cmCfg, modeCfg) {
            .replace(/'/g, "&#039;");
    }
 
-  var circuit_formatter = {
-    creator: function(text) {
-      var circuit_value = text.match(circuitRE)[1]
-
-      circuit_value = escapeHtml(circuit_value);
-
-      var html = "<div style='display:block;line-height:0;' class='schematic_container'><a href='#circuit_editor_modal' data-toggle='modal' class='schematic_open' style='display:inline-block;'>" +
-                  "<input type='hidden' parts='' value='" + circuit_value + "' width='" + schematic_width + "' height='" + schematic_height + "' analyses='' class='schematic ctrls'/></a></div>";
-
-      return html;
-    },
-    size: function(text) {
-      return {width: schematic_width + styling_width_delta, height:schematic_height + styling_height_delta};
-    },
-    callback: function(node, line) {
-      try {
-        update_schematics();
-        var schmInput = node.firstChild.firstChild;
-        schmInput.codeMirrorLine = line;
-        if (schmInput.schematic) { //This is undefined if there was an error making the schematic
-          schmInput.schematic.canvas.style.display = "block"; //Otherwise, it gets line height and is a weird size
-          schmInput.schematic.always_draw_grid = true;
-          schmInput.schematic.redraw_background();
-        }
-      } catch (err) {
-        console.log("Error in edx_markdown callback: " + err);
-      }
-
-    }
-  };
-
   function blockNormal(stream, state) {
     var match;
-    if (stream.sol() && stream.match(circuitRE)) {
-      stream.skipToEnd();
-      return circuit_formatter;
-    } else if (state.indentationDiff >= 4) {
+    if (state.indentationDiff >= 4) {
       state.indentation -= state.indentationDiff;
       stream.skipToEnd();
       return code;

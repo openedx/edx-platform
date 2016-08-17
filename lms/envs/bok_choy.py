@@ -1,17 +1,20 @@
 """
-Settings for bok choy tests
+Settings for Bok Choy tests that are used when running LMS.
+
+Bok Choy uses two different settings files:
+1. test_static_optimized is used when invoking collectstatic
+2. bok_choy is used when running the tests
+
+Note: it isn't possible to have a single settings file, because Django doesn't
+support both generating static assets to a directory and also serving static
+from the same directory.
 """
 
 import os
-from path import path
+from path import Path as path
 from tempfile import mkdtemp
 
-# Pylint gets confused by path.py instances, which report themselves as class
-# objects. As a result, pylint applies the wrong regex in validating names,
-# and throws spurious errors. Therefore, we disable invalid-name checking.
-# pylint: disable=invalid-name
-
-CONFIG_ROOT = path(__file__).abspath().dirname()  # pylint: disable=no-value-for-parameter
+CONFIG_ROOT = path(__file__).abspath().dirname()
 TEST_ROOT = CONFIG_ROOT.dirname().dirname() / "test_root"
 
 ########################## Prod-like settings ###################################
@@ -39,7 +42,7 @@ LOG_DIR = (TEST_ROOT / "log").abspath()
 update_module_store_settings(
     MODULESTORE,
     module_store_options={
-        'fs_root': (TEST_ROOT / "data").abspath(),  # pylint: disable=no-value-for-parameter
+        'fs_root': (TEST_ROOT / "data").abspath(),
     },
     xml_store_options={
         'data_dir': (TEST_ROOT / "data").abspath(),
@@ -48,9 +51,26 @@ update_module_store_settings(
 )
 
 ############################ STATIC FILES #############################
+
+# Enable debug so that static assets are served by Django
+DEBUG = True
+
+# Serve static files at /static directly from the staticfiles directory under test root
+# Note: optimized files for testing are generated with settings from test_static_optimized
+STATIC_URL = "/static/"
+STATICFILES_FINDERS = (
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+)
+STATICFILES_DIRS = (
+    (TEST_ROOT / "staticfiles" / "lms").abspath(),
+)
+
 DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
 MEDIA_ROOT = TEST_ROOT / "uploads"
 MEDIA_URL = "/static/uploads/"
+
+# Don't use compression during tests
+PIPELINE_JS_COMPRESSOR = None
 
 ################################# CELERY ######################################
 
@@ -67,15 +87,9 @@ GRADES_DOWNLOAD = {
 # Configure the LMS to use our stub XQueue implementation
 XQUEUE_INTERFACE['url'] = 'http://localhost:8040'
 
-# Configure the LMS to use our stub ORA implementation
-OPEN_ENDED_GRADING_INTERFACE['url'] = 'http://localhost:8041/'
-
 # Configure the LMS to use our stub EdxNotes implementation
 EDXNOTES_PUBLIC_API = 'http://localhost:8042/api/v1'
 EDXNOTES_INTERNAL_API = 'http://localhost:8042/api/v1'
-
-# Enable django-pipeline and staticfiles
-STATIC_ROOT = (TEST_ROOT / "staticfiles" / "lms").abspath()
 
 # Silence noisy logs
 import logging
@@ -106,12 +120,14 @@ FEATURES['ENABLE_TEAMS'] = True
 # Enable custom content licensing
 FEATURES['LICENSING'] = True
 
-# Unfortunately, we need to use debug mode to serve staticfiles
-DEBUG = True
+# Use the auto_auth workflow for creating users and logging them in
+FEATURES['AUTOMATIC_AUTH_FOR_TESTING'] = True
 
 ########################### Entrance Exams #################################
 FEATURES['MILESTONES_APP'] = True
 FEATURES['ENTRANCE_EXAMS'] = True
+
+FEATURES['ENABLE_SPECIAL_EXAMS'] = True
 
 # Point the URL used to test YouTube availability to our stub YouTube server
 YOUTUBE_PORT = 9080
@@ -145,7 +161,7 @@ FEATURES['ENABLE_DASHBOARD_SEARCH'] = True
 SEARCH_ENGINE = "search.tests.mock_search_engine.MockSearchEngine"
 # Path at which to store the mock index
 MOCK_SEARCH_BACKING_FILE = (
-    TEST_ROOT / "index_file.dat"  # pylint: disable=no-value-for-parameter
+    TEST_ROOT / "index_file.dat"
 ).abspath()
 
 # Generate a random UUID so that different runs of acceptance tests don't break each other

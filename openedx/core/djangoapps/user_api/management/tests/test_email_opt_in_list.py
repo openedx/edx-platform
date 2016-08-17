@@ -7,14 +7,11 @@ import csv
 from collections import defaultdict
 from unittest import skipUnless
 
-
 import ddt
 from django.conf import settings
-from django.test.utils import override_settings
 from django.core.management.base import CommandError
 
-
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, mixed_store_config
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from student.models import CourseEnrollment

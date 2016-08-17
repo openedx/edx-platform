@@ -15,7 +15,7 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 
 @attr('shard_1')
-@patch('bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message'))
+@patch('bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message', autospec=True))
 class CourseEmailTest(TestCase):
     """Test the CourseEmail model."""
 
@@ -40,7 +40,9 @@ class CourseEmailTest(TestCase):
         html_message = "<html>dummy message</html>"
         template_name = "branded_template"
         from_addr = "branded@branding.com"
-        email = CourseEmail.create(course_id, sender, to_option, subject, html_message, template_name=template_name, from_addr=from_addr)
+        email = CourseEmail.create(
+            course_id, sender, to_option, subject, html_message, template_name=template_name, from_addr=from_addr
+        )
         self.assertEquals(email.course_id, course_id)
         self.assertEquals(email.to_option, SEND_TO_STAFF)
         self.assertEquals(email.subject, subject)
@@ -83,7 +85,7 @@ class CourseEmailTemplateTest(TestCase):
         context = {
             'course_title': "Bogus Course Title",
             'course_url': "/location/of/course/url",
-            'account_settings_url': "/location/of/account/settings/url",
+            'email_settings_url': "/location/of/email/settings/url",
             'platform_name': 'edX',
             'email': 'your-email@test.com',
         }

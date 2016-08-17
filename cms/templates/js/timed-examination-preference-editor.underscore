@@ -1,0 +1,65 @@
+<form>
+    <h3 class="modal-section-title"><%- gettext('Additional Options:') %></h3>
+
+    <div class="modal-section-content has-actions">
+
+        <div class='exam-time-list-fields'>
+            <ul class="list-fields list-input">
+                <li class="field-radio">
+                    <input type="radio" id="id_not_timed" name="proctored" class="input input-radio" checked="checked"/>
+                    <label for="id_not_timed" class="label">
+                      <%- gettext('None') %>
+                    </label>
+                </li>
+            </ul>
+        </div>
+
+        <div class='exam-time-list-fields'>
+            <ul class="list-fields list-input">
+                <li class="field-radio">
+                    <input type="radio" id="id_timed_exam" name="proctored" class="input input-radio" />
+                    <label for="id_timed_exam" class="label" aria-describedby="timed-exam-description">
+                      <%- gettext('Timed') %>
+                    </label>
+                </li>
+                <p class='field-message' id='timed-exam-description'> <%- gettext('Use a timed exam to limit the time learners can spend on problems in this subsection. Learners must submit answers before the time expires. You can allow additional time on per learner basis through the Instructor Dashboard.') %> </p>
+
+            </ul>
+        </div>
+        <% if (enable_proctored_exam) { %>
+            <div class='exam-time-list-fields'>
+                <ul class="list-fields list-input">
+                    <li class="field-radio">
+                        <input type="radio" id="id_proctored_exam" name="proctored" class="input input-radio" />
+                        <label for="id_proctored_exam" class="label" aria-describedby="proctored-exam-description">
+                            <%- gettext('Proctored') %>
+                        </label>
+                    </li>
+                    <p class='field-message' id='proctored-exam-description'> <%- gettext('Proctored exams are timed, and software records video of each learner taking the exam. These videos are then reviewed by a third party.') %> </p>
+                </ul>
+            </div>
+            <div class='exam-time-list-fields'>
+                <ul class="list-fields list-input">
+                    <li class="field-radio">
+                        <input type="radio" id="id_practice_exam" name="proctored" class="input input-radio" />
+                        <label for="id_practice_exam" class="label" aria-describedby="practice-exam-description">
+                          <%- gettext('Practice Proctored') %>
+                        </label>
+                    </li>
+                    <p class='field-message' id='practice-exam-description'> <%- gettext("Use a practice proctored exam to introduce learners to the proctoring tools and processes. Results of the practice exam do not count towards the learner's grade.") %> </p>
+                </ul>
+            </div>
+        <% } %>
+        <div class='exam-time-list-fields is-hidden' id='id_time_limit_div'>
+            <ul class="list-fields list-input time-limit">
+                <li class="field field-text field-time-limit">
+                    <label for="id_time_limit" class="label"><%- gettext('Time Allotted (HH:MM):') %> </label>
+                    <input type="text" id="id_time_limit" name="time_limit"
+                      value="" aria-describedby="time-limit-description"
+                      placeholder="HH:MM" class="time_limit release-time time input input-text" autocomplete="off" />
+                </li>
+                <p class='field-message' id='time-limit-description'><%- gettext('Learners see warnings when 20% and 5% of the allotted time remains. You can grant learners extra time to complete the exam through the Instructor Dashboard.') %></p>
+            </ul>
+        </div>
+    </div>
+</form>

@@ -33,9 +33,9 @@ class UsersPageMixin(PageObject):
 
     def is_browser_on_page(self):
         """
-        Returns True iff the browser has loaded the page.
+        Returns True if the browser has loaded the page.
         """
-        return self.q(css='body.view-team').present
+        return self.q(css='body.view-team').present and not self.q(css='.ui-loading').present
 
     @property
     def users(self):
@@ -98,6 +98,7 @@ class UsersPageMixin(PageObject):
         """ Deletes user from course/library """
         target_user = self.get_user(email)
         target_user.click_delete()
+        self.wait_for_page()
 
     def modal_dialog_visible(self, dialog_type):
         """ Checks if modal dialog of specified class is displayed """
@@ -254,6 +255,7 @@ class UserWrapper(PageObject):
         self.wait_for_element_visibility('.prompt', 'Prompt is visible')
         self.wait_for_element_visibility('.prompt .action-primary', 'Confirmation button is visible')
         self.q(css='.prompt .action-primary').click()
+        self.wait_for_element_absence('.page-prompt .is-shown', 'Confirmation prompt is hidden')
         wait_for_ajax_or_reload(self.browser)
 
     @property

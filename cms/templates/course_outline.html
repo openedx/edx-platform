@@ -1,12 +1,13 @@
 <%inherit file="base.html" />
 <%def name="online_help_token()"><% return "outline" %></%def>
 <%!
-import json
 import logging
 from util.date_utils import get_default_time_display
 from django.utils.translation import ugettext as _
+from openedx.core.lib.js_utils import escape_json_dumps
 from contentstore.utils import reverse_usage_url
 from microsite_configuration import microsite
+from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 %>
 <%block name="title">${_("Course Outline")}</%block>
 <%block name="bodyclass">is-signedin course view-outline</%block>
@@ -15,13 +16,13 @@ from microsite_configuration import microsite
 
 <%block name="requirejs">
     require(["js/factories/outline"], function (OutlineFactory) {
-        OutlineFactory(${json.dumps(course_structure) | n}, ${json.dumps(initial_state) | n});
+        OutlineFactory(${escape_json_dumps(course_structure) | n}, ${escape_json_dumps(initial_state) | n});
     });
 </%block>
 
 <%block name="header_extras">
 <link rel="stylesheet" type="text/css" href="${static.url('js/vendor/timepicker/jquery.timepicker.css')}" />
-% for template_name in ['course-outline', 'xblock-string-field-editor', 'basic-modal', 'modal-button', 'course-outline-modal', 'due-date-editor', 'release-date-editor', 'grading-editor', 'publish-editor', 'staff-lock-editor']:
+% for template_name in ['course-outline', 'xblock-string-field-editor', 'basic-modal', 'modal-button', 'course-outline-modal', 'due-date-editor', 'release-date-editor', 'grading-editor', 'publish-editor', 'staff-lock-editor', 'verification-access-editor', 'timed-examination-preference-editor']:
 <script type="text/template" id="${template_name}-tpl">
     <%static:include path="js/${template_name}.underscore" />
 </script>
@@ -69,7 +70,13 @@ from microsite_configuration import microsite
                   <nav class="nav-related" aria-label="${_('Unsupported Components')}">
                     <ul>
                       % for component_parent_url, component_display_name in deprecated_blocks_info['blocks']:
-                        <li class="nav-item"><a href="${component_parent_url}">${_(component_display_name)}</a></li>
+                          <li class="nav-item">
+                                % if component_display_name:
+                                    <a href="${component_parent_url}">${_(component_display_name)}</a>
+                                % else:
+                                    <a href="${component_parent_url}">${_("Deprecated Component")}</a>
+                                % endif
+                          </li>
                       % endfor
                     </ul>
                   </nav>
@@ -155,6 +162,16 @@ from microsite_configuration import microsite
                       </li>
                     </ul>
                 </div>
+                % if SelfPacedConfiguration.current().enabled:
+                    <div class="status-pacing">
+                        <h2 class=status-pacing-label>${_("Course Pacing:")}</h2>
+                        % if context_course.self_paced:
+                            <p class="status-pacing-value">${_("Self-Paced")}</p>
+                        % else:
+                            <p class="status-pacing-value">${_("Instructor-Paced")}</p>
+                        % endif
+                    </div>
+               % endif
             </div>
 
             <div class="wrapper-dnd">

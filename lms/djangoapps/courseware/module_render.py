@@ -5,7 +5,6 @@ Module rendering
 import hashlib
 import json
 import logging
-import mimetypes
 
 import static_replace
 
@@ -28,12 +27,18 @@ import newrelic.agent
 
 from capa.xqueue_interface import XQueueInterface
 from courseware.access import has_access, get_user_role
-from courseware.masquerade import setup_masquerade
-from courseware.model_data import FieldDataCache, DjangoKeyValueStore
+from courseware.masquerade import (
+    MasqueradingKeyValueStore,
+    filter_displayed_blocks,
+    is_masquerading_as_specific_student,
+    setup_masquerade,
+)
+from courseware.model_data import DjangoKeyValueStore, FieldDataCache, set_score
 from courseware.models import SCORE_CHANGED
 from courseware.entrance_exams import (
     get_entrance_exam_score,
-    user_must_complete_entrance_exam
+    user_must_complete_entrance_exam,
+    user_has_passed_entrance_exam
 )
 from edxmako.shortcuts import render_to_string
 from eventtracking import tracker
@@ -51,7 +56,6 @@ from openedx.core.lib.xblock_utils import (
     wrap_xblock,
     request_token as xblock_request_token,
 )
-from psychometrics.psychoanalyze import make_psychometrics_data_update_handler
 from student.models import anonymous_id_for_user, user_by_anonymous_id
 from student.roles import CourseBetaTesterRole
 from xblock.core import XBlock
@@ -69,9 +73,13 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.x_module import XModuleDescriptor
 from xmodule.mixin import wrap_with_license
 from util.json_request import JsonResponse
+from util.model_utils import slugify
 from util.sandboxing import can_execute_unsafe_code, get_python_lib_zip
 from util import milestones_helpers
-from verify_student.services import ReverificationService
+from lms.djangoapps.verify_student.services import ReverificationService
+
+from edx_proctoring.services import ProctoringService
+from openedx.core.djangoapps.credit.services import CreditService
 
 from .field_overrides import OverrideFieldData
 
@@ -113,7 +121,7 @@ def make_track_function(request):
     return function
 
 
-def toc_for_course(request, course, active_chapter, active_section, field_data_cache):
+def toc_for_course(user, request, course, active_chapter, active_section, field_data_cache):
     '''
     Create a table of contents from the module store
 
@@ -139,7 +147,7 @@ def toc_for_course(request, course, active_chapter, active_section, field_data_c
 
     with modulestore().bulk_operations(course.id):
         course_module = get_module_for_descriptor(
-            request.user, request, course, field_data_cache, course.id, course=course
+            user, request, course, field_data_cache, course.id, course=course
         )
         if course_module is None:
             return None
@@ -148,15 +156,16 @@ def toc_for_course(request, course, active_chapter, active_section, field_data_c
         chapters = course_module.get_display_items()
 
         # See if the course is gated by one or more content milestones
-        required_content = milestones_helpers.get_required_content(course, request.user)
+        required_content = milestones_helpers.get_required_content(course, user)
 
         # The user may not actually have to complete the entrance exam, if one is required
-        if not user_must_complete_entrance_exam(request, request.user, course):
+        if not user_must_complete_entrance_exam(request, user, course):
             required_content = [content for content in required_content if not content == course.entrance_exam_id]
 
         for chapter in chapters:
             # Only show required content, if there is required content
             # chapter.hide_from_toc is read-only (boo)
+            display_id = slugify(chapter.display_name_with_default)
             local_hide_from_toc = False
             if required_content:
                 if unicode(chapter.location) not in required_content:
@@ -173,15 +182,72 @@ def toc_for_course(request, course, active_chapter, active_section, field_data_c
                           section.url_name == active_section)
 
                 if not section.hide_from_toc:
-                    sections.append({'display_name': section.display_name_with_default,
-                                     'url_name': section.url_name,
-                                     'format': section.format if section.format is not None else '',
-                                     'due': section.due,
-                                     'active': active,
-                                     'graded': section.graded,
-                                     })
+                    section_context = {
+                        'display_name': section.display_name_with_default,
+                        'url_name': section.url_name,
+                        'format': section.format if section.format is not None else '',
+                        'due': section.due,
+                        'active': active,
+                        'graded': section.graded,
+                    }
+
+                    #
+                    # Add in rendering context if exam is a timed exam (which includes proctored)
+                    #
+
+                    section_is_time_limited = (
+                        getattr(section, 'is_time_limited', False) and
+                        settings.FEATURES.get('ENABLE_SPECIAL_EXAMS', False)
+                    )
+                    if section_is_time_limited:
+                        # We need to import this here otherwise Lettuce test
+                        # harness fails. When running in 'harvest' mode, the
+                        # test service appears to get into trouble with
+                        # circular references (not sure which as edx_proctoring.api
+                        # doesn't import anything from edx-platform). Odd thing
+                        # is that running: manage.py lms runserver --settings=acceptance
+                        # works just fine, it's really a combination of Lettuce and the
+                        # 'harvest' management command
+                        #
+                        # One idea is that there is some coupling between
+                        # lettuce and the 'terrain' Djangoapps projects in /common
+                        # This would need more investigation
+                        from edx_proctoring.api import get_attempt_status_summary
+
+                        #
+                        # call into edx_proctoring subsystem
+                        # to get relevant proctoring information regarding this
+                        # level of the courseware
+                        #
+                        # This will return None, if (user, course_id, content_id)
+                        # is not applicable
+                        #
+                        timed_exam_attempt_context = None
+                        try:
+                            timed_exam_attempt_context = get_attempt_status_summary(
+                                user.id,
+                                unicode(course.id),
+                                unicode(section.location)
+                            )
+                        except Exception, ex:  # pylint: disable=broad-except
+                            # safety net in case something blows up in edx_proctoring
+                            # as this is just informational descriptions, it is better
+                            # to log and continue (which is safe) than to have it be an
+                            # unhandled exception
+                            log.exception(ex)
+
+                        if timed_exam_attempt_context:
+                            # yes, user has proctoring context about
+                            # this level of the courseware
+                            # so add to the accordion data context
+                            section_context.update({
+                                'proctoring': timed_exam_attempt_context,
+                            })
+
+                    sections.append(section_context)
             toc_chapters.append({
                 'display_name': chapter.display_name_with_default,
+                'display_id': display_id,
                 'url_name': chapter.url_name,
                 'sections': sections,
                 'active': chapter.url_name == active_chapter
@@ -270,10 +336,15 @@ def get_module_for_descriptor(user, request, descriptor, field_data_cache, cours
 
     user_location = getattr(request, 'session', {}).get('country_code')
 
+    student_kvs = DjangoKeyValueStore(field_data_cache)
+    if is_masquerading_as_specific_student(user, course_key):
+        student_kvs = MasqueradingKeyValueStore(student_kvs, request.session)
+    student_data = KvsFieldData(student_kvs)
+
     return get_module_for_descriptor_internal(
         user=user,
         descriptor=descriptor,
-        field_data_cache=field_data_cache,
+        student_data=student_data,
         course_id=course_key,
         track_function=track_function,
         xqueue_callback_url_prefix=xqueue_callback_url_prefix,
@@ -288,7 +359,7 @@ def get_module_for_descriptor(user, request, descriptor, field_data_cache, cours
     )
 
 
-def get_module_system_for_user(user, field_data_cache,  # TODO  # pylint: disable=too-many-statements
+def get_module_system_for_user(user, student_data,  # TODO  # pylint: disable=too-many-statements
                                # Arguments preceding this comment have user binding, those following don't
                                descriptor, course_id, track_function, xqueue_callback_url_prefix,
                                request_token, position=None, wrap_xmodule_display=True, grade_bucket_type=None,
@@ -302,7 +373,7 @@ def get_module_system_for_user(user, field_data_cache,  # TODO  # pylint: disabl
     closures that feed the instantiation of ModuleSystem.
 
     The arguments fall into two categories: those that have explicit or implicit user binding, which are user
-    and field_data_cache, and those don't and are just present so that ModuleSystem can be instantiated, which
+    and student_data, and those don't and are just present so that ModuleSystem can be instantiated, which
     are all the other arguments.  Ultimately, this isn't too different than how get_module_for_descriptor_internal
     was before refactoring.
 
@@ -313,7 +384,6 @@ def get_module_system_for_user(user, field_data_cache,  # TODO  # pylint: disabl
     Returns:
         (LmsModuleSystem, KvsFieldData):  (module system, student_data) bound to, primarily, the user and descriptor
     """
-    student_data = KvsFieldData(DjangoKeyValueStore(field_data_cache))
 
     def make_xqueue_callback(dispatch='score_update'):
         """
@@ -342,31 +412,6 @@ def get_module_system_for_user(user, field_data_cache,  # TODO  # pylint: disabl
         'waittime': settings.XQUEUE_WAITTIME_BETWEEN_REQUESTS
     }
 
-    # This is a hacky way to pass settings to the combined open ended xmodule
-    # It needs an S3 interface to upload images to S3
-    # It needs the open ended grading interface in order to get peer grading to be done
-    # this first checks to see if the descriptor is the correct one, and only sends settings if it is
-
-    # Get descriptor metadata fields indicating needs for various settings
-    needs_open_ended_interface = getattr(descriptor, "needs_open_ended_interface", False)
-    needs_s3_interface = getattr(descriptor, "needs_s3_interface", False)
-
-    # Initialize interfaces to None
-    open_ended_grading_interface = None
-    s3_interface = None
-
-    # Create interfaces if needed
-    if needs_open_ended_interface:
-        open_ended_grading_interface = settings.OPEN_ENDED_GRADING_INTERFACE
-        open_ended_grading_interface['mock_peer_grading'] = settings.MOCK_PEER_GRADING
-        open_ended_grading_interface['mock_staff_grading'] = settings.MOCK_STAFF_GRADING
-    if needs_s3_interface:
-        s3_interface = {
-            'access_key': getattr(settings, 'AWS_ACCESS_KEY_ID', ''),
-            'secret_access_key': getattr(settings, 'AWS_SECRET_ACCESS_KEY', ''),
-            'storage_bucket_name': getattr(settings, 'AWS_STORAGE_BUCKET_NAME', 'openended')
-        }
-
     def inner_get_module(descriptor):
         """
         Delegate to get_module_for_descriptor_internal() with all values except `descriptor` set.
@@ -378,7 +423,7 @@ def get_module_system_for_user(user, field_data_cache,  # TODO  # pylint: disabl
         return get_module_for_descriptor_internal(
             user=user,
             descriptor=descriptor,
-            field_data_cache=field_data_cache,
+            student_data=student_data,
             course_id=course_id,
             track_function=track_function,
             xqueue_callback_url_prefix=xqueue_callback_url_prefix,
@@ -398,7 +443,7 @@ def get_module_system_for_user(user, field_data_cache,  # TODO  # pylint: disabl
         # Fulfillment Use Case: Entrance Exam
         # If this module is part of an entrance exam, we'll need to see if the student
         # has reached the point at which they can collect the associated milestone
-        if settings.FEATURES.get('ENTRANCE_EXAMS', False):
+        if milestones_helpers.is_entrance_exams_enabled():
             course = modulestore().get_course(course_key)
             content = modulestore().get_item(content_key)
             entrance_exam_enabled = getattr(course, 'entrance_exam_enabled', False)
@@ -425,12 +470,12 @@ def get_module_system_for_user(user, field_data_cache,  # TODO  # pylint: disabl
         """
         Manages the workflow for recording and updating of student module grade state
         """
-        user_id = event.get('user_id', user.id)
+        user_id = user.id
 
         grade = event.get('value')
         max_grade = event.get('max_value')
 
-        field_data_cache.set_score(
+        set_score(
             user_id,
             descriptor.location,
             grade,
@@ -472,7 +517,7 @@ def get_module_system_for_user(user, field_data_cache,  # TODO  # pylint: disabl
 
     def publish(block, event_type, event):
         """A function that allows XModules to publish events."""
-        if event_type == 'grade':
+        if event_type == 'grade' and not is_masquerading_as_specific_student(user, course_id):
             handle_grade_event(block, event_type, event)
         else:
             track_function(event_type, event)
@@ -502,10 +547,11 @@ def get_module_system_for_user(user, field_data_cache,  # TODO  # pylint: disabl
             module.descriptor,
             asides=XBlockAsidesConfig.possible_asides(),
         )
+        student_data_real_user = KvsFieldData(DjangoKeyValueStore(field_data_cache_real_user))
 
         (inner_system, inner_student_data) = get_module_system_for_user(
             user=real_user,
-            field_data_cache=field_data_cache_real_user,  # These have implicit user bindings, rest of args considered not to
+            student_data=student_data_real_user,  # These have implicit user bindings, rest of args considered not to
             descriptor=module.descriptor,
             course_id=course_id,
             track_function=track_function,
@@ -529,7 +575,7 @@ def get_module_system_for_user(user, field_data_cache,  # TODO  # pylint: disabl
         )
 
         module.descriptor.scope_ids = (
-            module.descriptor.scope_ids._replace(user_id=real_user.id)  # pylint: disable=protected-access
+            module.descriptor.scope_ids._replace(user_id=real_user.id)
         )
         module.scope_ids = module.descriptor.scope_ids  # this is needed b/c NamedTuples are immutable
         # now bind the module to the new ModuleSystem instance and vice-versa
@@ -539,6 +585,9 @@ def get_module_system_for_user(user, field_data_cache,  # TODO  # pylint: disabl
     # Build a list of wrapping functions that will be applied in order
     # to the Fragment content coming out of the xblocks that are about to be rendered.
     block_wrappers = []
+
+    if is_masquerading_as_specific_student(user, course_id):
+        block_wrappers.append(filter_displayed_blocks)
 
     if settings.FEATURES.get("LICENSING", False):
         block_wrappers.append(wrap_with_license)
@@ -582,9 +631,23 @@ def get_module_system_for_user(user, field_data_cache,  # TODO  # pylint: disabl
     ))
 
     if settings.FEATURES.get('DISPLAY_DEBUG_INFO_TO_STAFF'):
-        if has_access(user, 'staff', descriptor, course_id):
-            has_instructor_access = has_access(user, 'instructor', descriptor, course_id)
-            block_wrappers.append(partial(add_staff_markup, user, has_instructor_access, disable_staff_debug_info))
+        if is_masquerading_as_specific_student(user, course_id):
+            # When masquerading as a specific student, we want to show the debug button
+            # unconditionally to enable resetting the state of the student we are masquerading as.
+            # We already know the user has staff access when masquerading is active.
+            staff_access = True
+            # To figure out whether the user has instructor access, we temporarily remove the
+            # masquerade_settings from the real_user.  With the masquerading settings in place,
+            # the result would always be "False".
+            masquerade_settings = user.real_user.masquerade_settings
+            del user.real_user.masquerade_settings
+            instructor_access = bool(has_access(user.real_user, 'instructor', descriptor, course_id))
+            user.real_user.masquerade_settings = masquerade_settings
+        else:
+            staff_access = has_access(user, 'staff', descriptor, course_id)
+            instructor_access = bool(has_access(user, 'instructor', descriptor, course_id))
+        if staff_access:
+            block_wrappers.append(partial(add_staff_markup, user, instructor_access, disable_staff_debug_info))
 
     # These modules store data using the anonymous_student_id as a key.
     # To prevent loss of data, we will continue to provide old modules with
@@ -602,7 +665,7 @@ def get_module_system_for_user(user, field_data_cache,  # TODO  # pylint: disabl
 
     field_data = LmsFieldData(descriptor._field_data, student_data)  # pylint: disable=protected-access
 
-    user_is_staff = has_access(user, u'staff', descriptor.location, course_id)
+    user_is_staff = bool(has_access(user, u'staff', descriptor.location, course_id))
 
     system = LmsModuleSystem(
         track_function=track_function,
@@ -637,8 +700,6 @@ def get_module_system_for_user(user, field_data_cache,  # TODO  # pylint: disabl
         publish=publish,
         anonymous_student_id=anonymous_student_id,
         course_id=course_id,
-        open_ended_grading_interface=open_ended_grading_interface,
-        s3_interface=s3_interface,
         cache=cache,
         can_execute_unsafe_code=(lambda: can_execute_unsafe_code(course_id)),
         get_python_lib_zip=(lambda: get_python_lib_zip(contentstore, course_id)),
@@ -651,7 +712,9 @@ def get_module_system_for_user(user, field_data_cache,  # TODO  # pylint: disabl
             'fs': FSService(),
             'field-data': field_data,
             'user': DjangoXBlockUserService(user, user_is_staff=user_is_staff),
-            "reverification": ReverificationService()
+            "reverification": ReverificationService(),
+            'proctoring': ProctoringService(),
+            'credit': CreditService(),
         },
         get_user_role=lambda: get_user_role(user, course_id),
         descriptor_runtime=descriptor._runtime,  # pylint: disable=protected-access
@@ -669,16 +732,11 @@ def get_module_system_for_user(user, field_data_cache,  # TODO  # pylint: disabl
             position = None
 
     system.set('position', position)
-    if settings.FEATURES.get('ENABLE_PSYCHOMETRICS') and user.is_authenticated():
-        system.set(
-            'psychometrics_handler',  # set callback for updating PsychometricsData
-            make_psychometrics_data_update_handler(course_id, user, descriptor.location)
-        )
 
     system.set(u'user_is_staff', user_is_staff)
-    system.set(u'user_is_admin', has_access(user, u'staff', 'global'))
+    system.set(u'user_is_admin', bool(has_access(user, u'staff', 'global')))
     system.set(u'user_is_beta_tester', CourseBetaTesterRole(course_id).has_user(user))
-    system.set(u'days_early_for_beta', getattr(descriptor, 'days_early_for_beta'))
+    system.set(u'days_early_for_beta', descriptor.days_early_for_beta)
 
     # make an ErrorDescriptor -- assuming that the descriptor's system is ok
     if has_access(user, u'staff', descriptor.location, course_id):
@@ -691,7 +749,7 @@ def get_module_system_for_user(user, field_data_cache,  # TODO  # pylint: disabl
 
 # TODO: Find all the places that this method is called and figure out how to
 # get a loaded course passed into it
-def get_module_for_descriptor_internal(user, descriptor, field_data_cache, course_id,  # pylint: disable=invalid-name
+def get_module_for_descriptor_internal(user, descriptor, student_data, course_id,  # pylint: disable=invalid-name
                                        track_function, xqueue_callback_url_prefix, request_token,
                                        position=None, wrap_xmodule_display=True, grade_bucket_type=None,
                                        static_asset_path='', user_location=None, disable_staff_debug_info=False,
@@ -707,7 +765,7 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
 
     (system, student_data) = get_module_system_for_user(
         user=user,
-        field_data_cache=field_data_cache,  # These have implicit user bindings, the rest of args are considered not to
+        student_data=student_data,  # These have implicit user bindings, the rest of args are considered not to
         descriptor=descriptor,
         course_id=course_id,
         track_function=track_function,
@@ -731,7 +789,7 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
         ],
     )
 
-    descriptor.scope_ids = descriptor.scope_ids._replace(user_id=user.id)  # pylint: disable=protected-access
+    descriptor.scope_ids = descriptor.scope_ids._replace(user_id=user.id)
 
     # Do not check access when it's a noauth request.
     # Not that the access check needs to happen after the descriptor is bound
@@ -854,23 +912,6 @@ def handle_xblock_callback(request, course_id, usage_id, handler, suffix=None):
         return _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, course=course)
 
 
-def xblock_resource(request, block_type, uri):  # pylint: disable=unused-argument
-    """
-    Return a package resource for the specified XBlock.
-    """
-    try:
-        xblock_class = XBlock.load_class(block_type, select=settings.XBLOCK_SELECT_FUNCTION)
-        content = xblock_class.open_local_resource(uri)
-    except IOError:
-        log.info('Failed to load xblock resource', exc_info=True)
-        raise Http404
-    except Exception:  # pylint: disable=broad-except
-        log.error('Failed to load xblock resource', exc_info=True)
-        raise Http404
-    mimetype, _ = mimetypes.guess_type(uri)
-    return HttpResponse(content, mimetype=mimetype)
-
-
 def get_module_by_usage_id(request, course_id, usage_id, disable_staff_debug_info=False, course=None):
     """
     Gets a module instance based on its `usage_id` in a course, for a given request/user
@@ -890,10 +931,9 @@ def get_module_by_usage_id(request, course_id, usage_id, disable_staff_debug_inf
         descriptor_orig_usage_key, descriptor_orig_version = modulestore().get_block_original_usage(usage_key)
     except ItemNotFoundError:
         log.warn(
-            "Invalid location for course id {course_id}: {usage_key}".format(
-                course_id=usage_key.course_key,
-                usage_key=usage_key
-            )
+            "Invalid location for course id %s: %s",
+            usage_key.course_key,
+            usage_key
         )
         raise Http404
 
@@ -909,12 +949,12 @@ def get_module_by_usage_id(request, course_id, usage_id, disable_staff_debug_inf
         tracking_context['module']['original_usage_key'] = unicode(descriptor_orig_usage_key)
         tracking_context['module']['original_usage_version'] = unicode(descriptor_orig_version)
 
+    unused_masquerade, user = setup_masquerade(request, course_id, has_access(user, 'staff', descriptor, course_id))
     field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
         course_id,
         user,
         descriptor
     )
-    setup_masquerade(request, course_id, has_access(user, 'staff', descriptor, course_id))
     instance = get_module_for_descriptor(
         user,
         request,
@@ -949,13 +989,17 @@ def _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, course
     files = request.FILES or {}
     error_msg = _check_files_limits(files)
     if error_msg:
-        return JsonResponse(object={'success': error_msg}, status=413)
+        return JsonResponse({'success': error_msg}, status=413)
 
     # Make a CourseKey from the course_id, raising a 404 upon parse error.
     try:
         course_key = CourseKey.from_string(course_id)
     except InvalidKeyError:
         raise Http404
+
+    # Gather metrics for New Relic so we can slice data in New Relic Insights
+    newrelic.agent.add_custom_parameter('course_id', unicode(course_key))
+    newrelic.agent.add_custom_parameter('org', unicode(course_key.org))
 
     with modulestore().bulk_operations(course_key):
         instance, tracking_context = get_module_by_usage_id(request, course_id, usage_id, course=course)
@@ -964,7 +1008,7 @@ def _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, course
         # New Relic. The suffix is necessary for XModule handlers because the
         # "handler" in those cases is always just "xmodule_handler".
         nr_tx_name = "{}.{}".format(instance.__class__.__name__, handler)
-        nr_tx_name += "/{}".format(suffix) if suffix else ""
+        nr_tx_name += "/{}".format(suffix) if (suffix and handler == "xmodule_handler") else ""
         newrelic.agent.set_transaction_name(nr_tx_name, group="Python/XBlock/Handler")
 
         tracking_context_name = 'module_callback_handler'
@@ -972,6 +1016,12 @@ def _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, course
         try:
             with tracker.get_tracker().context(tracking_context_name, tracking_context):
                 resp = instance.handle(handler, req, suffix)
+                if suffix == 'problem_check' \
+                        and course \
+                        and getattr(course, 'entrance_exam_enabled', False) \
+                        and getattr(instance, 'in_entrance_exam', False):
+                    ee_data = {'entrance_exam_passed': user_has_passed_entrance_exam(request, course)}
+                    resp = append_data_to_webob_response(resp, ee_data)
 
         except NoSuchHandlerError:
             log.exception("XBlock %s attempted to access missing handler %r", instance, handler)
@@ -986,7 +1036,7 @@ def _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, course
         except ProcessingError as err:
             log.warning("Module encountered an error while processing AJAX call",
                         exc_info=True)
-            return JsonResponse(object={'success': err.args[0]}, status=200)
+            return JsonResponse({'success': err.args[0]}, status=200)
 
         # If any other error occurred, re-raise it to trigger a 500 response
         except Exception:
@@ -1055,9 +1105,9 @@ def get_score_bucket(grade, max_grade):
     Used with statsd tracking.
     """
     score_bucket = "incorrect"
-    if(grade > 0 and grade < max_grade):
+    if grade > 0 and grade < max_grade:
         score_bucket = "partial"
-    elif(grade == max_grade):
+    elif grade == max_grade:
         score_bucket = "correct"
 
     return score_bucket
@@ -1088,3 +1138,22 @@ def _check_files_limits(files):
                 return msg
 
     return None
+
+
+def append_data_to_webob_response(response, data):
+    """
+    Appends data to a JSON webob response.
+
+    Arguments:
+        response (webob response object):  the webob response object that needs to be modified
+        data (dict):  dictionary containing data that needs to be appended to response body
+
+    Returns:
+        (webob response object):  webob response with updated body.
+
+    """
+    if getattr(response, 'content_type', None) == 'application/json':
+        response_data = json.loads(response.body)
+        response_data.update(data)
+        response.body = json.dumps(response_data)
+    return response

@@ -79,6 +79,7 @@ DATABASES = {
         'OPTIONS': {
             'timeout': 30,
         },
+        'ATOMIC_REQUESTS': True,
     }
 }
 
@@ -98,6 +99,8 @@ FEATURES['ENABLE_DISCUSSION_SERVICE'] = False
 USE_I18N = True
 
 # Include the lettuce app for acceptance testing, including the 'harvest' django-admin command
+# django.contrib.staticfiles used to be loaded by lettuce, now we must add it ourselves
+# django.contrib.staticfiles is not added to lms as there is a ^/static$ route built in to the app
 INSTALLED_APPS += ('lettuce.django',)
 LETTUCE_APPS = ('contentstore',)
 LETTUCE_BROWSER = os.environ.get('LETTUCE_BROWSER', 'chrome')
@@ -125,3 +128,7 @@ YOUTUBE['TEXT_API']['url'] = "127.0.0.1:{0}/test_transcripts_youtube/".format(YO
 # Generate a random UUID so that different runs of acceptance tests don't break each other
 import uuid
 SECRET_KEY = uuid.uuid4().hex
+
+############################### PIPELINE #######################################
+
+PIPELINE_ENABLED = False

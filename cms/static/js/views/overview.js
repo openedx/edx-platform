@@ -1,5 +1,5 @@
-define(["domReady", "jquery", "jquery.ui", "underscore", "gettext", "js/views/feedback_notification",
-    "js/utils/cancel_on_escape", "js/utils/date_utils", "js/utils/module", "js/views/utils/view_utils"],
+define(["domReady", "jquery", "jquery.ui", "underscore", "gettext", "common/js/components/views/feedback_notification",
+    "js/utils/cancel_on_escape", "js/utils/date_utils", "js/utils/module", "common/js/components/utils/view_utils"],
     function (domReady, $, ui, _, gettext, NotificationView, CancelOnEscape,
               DateUtils, ModuleUtils, ViewUtils) {
 

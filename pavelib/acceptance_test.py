@@ -8,7 +8,7 @@ from optparse import make_option
 try:
     from pygments.console import colorize
 except ImportError:
-    colorize = lambda color, text: text  # pylint: disable-msg=invalid-name
+    colorize = lambda color, text: text
 
 __test__ = False  # do not collect
 
@@ -46,13 +46,13 @@ def test_acceptance(options):
             'red',
             'No system specified, running tests for both cms and lms.'
         )
-        print(msg)
+        print msg
     if opts['default_store'] not in ['draft', 'split']:
         msg = colorize(
             'red',
             'No modulestore specified, running tests for both draft and split.'
         )
-        print(msg)
+        print msg
 
     suite = AcceptanceTestSuite('{} acceptance'.format(opts['system']), **opts)
     suite.run()

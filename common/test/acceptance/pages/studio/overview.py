@@ -8,11 +8,12 @@ from bok_choy.promise import EmptyPromise
 
 from selenium.webdriver.support.ui import Select
 from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.common.action_chains import ActionChains
+
+from ..common.utils import click_css, confirm_prompt
 
 from .course_page import CoursePage
 from .container import ContainerPage
-from .utils import set_input_value_and_save, set_input_value, click_css, confirm_prompt
+from .utils import set_input_value_and_save, set_input_value
 
 
 class CourseOutlineItem(object):
@@ -405,7 +406,7 @@ class CourseOutlineSection(CourseOutlineContainer, CourseOutlineChild):
         self.add_child()
 
 
-class ExpandCollapseLinkState:
+class ExpandCollapseLinkState(object):
     """
     Represents the three states that the expand/collapse link can be in
     """
@@ -513,6 +514,90 @@ class CourseOutlinePage(CoursePage, CourseOutlineContainer):
         Starts course reindex by clicking reindex button
         """
         self.reindex_button.click()
+
+    def open_exam_settings_dialog(self):
+        """
+        clicks on the settings button of subsection.
+        """
+        self.q(css=".subsection-header-actions .configure-button").first.click()
+
+    def change_problem_release_date_in_studio(self):
+        """
+        Sets a new start date
+        """
+        self.q(css=".subsection-header-actions .configure-button").first.click()
+        self.q(css="#start_date").fill("01/01/2030")
+        self.q(css=".action-save").first.click()
+        self.wait_for_ajax()
+
+    def make_exam_proctored(self):
+        """
+        Makes a Proctored exam.
+        """
+        self.q(css="#id_proctored_exam").first.click()
+        self.q(css=".action-save").first.click()
+        self.wait_for_ajax()
+
+    def make_exam_timed(self):
+        """
+        Makes a timed exam.
+        """
+        self.q(css="#id_timed_exam").first.click()
+        self.q(css=".action-save").first.click()
+        self.wait_for_ajax()
+
+    def select_none_exam(self):
+        """
+        Choose "none" exam but do not press enter
+        """
+        self.q(css="#id_not_timed").first.click()
+
+    def select_timed_exam(self):
+        """
+        Choose a timed exam but do not press enter
+        """
+        self.q(css="#id_timed_exam").first.click()
+
+    def select_proctored_exam(self):
+        """
+        Choose a proctored exam but do not press enter
+        """
+        self.q(css="#id_proctored_exam").first.click()
+
+    def select_practice_exam(self):
+        """
+        Choose a practice exam but do not press enter
+        """
+        self.q(css="#id_practice_exam").first.click()
+
+    def time_allotted_field_visible(self):
+        """
+        returns whether the time allotted field is visible
+        """
+        return self.q(css="#id_time_limit_div").visible
+
+    def proctoring_items_are_displayed(self):
+        """
+        Returns True if all the items are found.
+        """
+
+        # The None radio button
+        if not self.q(css="#id_not_timed").present:
+            return False
+
+        # The Timed exam radio button
+        if not self.q(css="#id_timed_exam").present:
+            return False
+
+        # The Proctored exam radio button
+        if not self.q(css="#id_proctored_exam").present:
+            return False
+
+        # The Practice exam radio button
+        if not self.q(css="#id_practice_exam").present:
+            return False
+
+        return True
 
     @property
     def bottom_add_section_button(self):
@@ -678,8 +763,20 @@ class CourseOutlineModal(object):
     def has_release_date(self):
         return self.find_css("#start_date").present
 
+    def has_release_time(self):
+        """
+        Check if the input box for the release time exists in the subsection's settings window
+        """
+        return self.find_css("#start_time").present
+
     def has_due_date(self):
         return self.find_css("#due_date").present
+
+    def has_due_time(self):
+        """
+        Check if the input box for the due time exists in the subsection's settings window
+        """
+        return self.find_css("#due_time").present
 
     def has_policy(self):
         return self.find_css("#grading_type").present
@@ -705,6 +802,15 @@ class CourseOutlineModal(object):
             "{} is updated in modal.".format(property_name)
         ).fulfill()
 
+    def set_time(self, input_selector, time):
+        """
+        Set `time` value to input pointed by `input_selector`
+        Not using the time picker to make sure it's not being rounded up
+        """
+
+        self.page.q(css=input_selector).fill(time)
+        self.page.q(css=input_selector).results[0].send_keys(Keys.ENTER)
+
     @property
     def release_date(self):
         return self.find_css("#start_date").first.attrs('value')[0]
@@ -717,6 +823,20 @@ class CourseOutlineModal(object):
         self.set_date('release_date', "#start_date", date)
 
     @property
+    def release_time(self):
+        """
+        Returns the current value of the release time. Default is u'00:00'
+        """
+        return self.find_css("#start_time").first.attrs('value')[0]
+
+    @release_time.setter
+    def release_time(self, time):
+        """
+        Time is "HH:MM" string.
+        """
+        self.set_time("#start_time", time)
+
+    @property
     def due_date(self):
         return self.find_css("#due_date").first.attrs('value')[0]
 
@@ -726,6 +846,20 @@ class CourseOutlineModal(object):
         Date is "mm/dd/yyyy" string.
         """
         self.set_date('due_date', "#due_date", date)
+
+    @property
+    def due_time(self):
+        """
+        Returns the current value of the release time. Default is u''
+        """
+        return self.find_css("#due_time").first.attrs('value')[0]
+
+    @due_time.setter
+    def due_time(self, time):
+        """
+        Time is "HH:MM" string.
+        """
+        self.set_time("#due_time", time)
 
     @property
     def policy(self):

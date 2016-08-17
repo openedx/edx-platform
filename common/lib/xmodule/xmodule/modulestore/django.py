@@ -17,7 +17,7 @@ from django.conf import settings
 if not settings.configured:
     settings.configure()
 
-from django.core.cache import get_cache, InvalidCacheBackendError
+from django.core.cache import caches, InvalidCacheBackendError
 import django.dispatch
 import django.utils
 
@@ -86,12 +86,16 @@ class SignalHandler(object):
        almost no work. Its main job is to kick off the celery task that will
        do the actual work.
     """
+    pre_publish = django.dispatch.Signal(providing_args=["course_key"])
     course_published = django.dispatch.Signal(providing_args=["course_key"])
+    course_deleted = django.dispatch.Signal(providing_args=["course_key"])
     library_updated = django.dispatch.Signal(providing_args=["library_key"])
 
     _mapping = {
+        "pre_publish": pre_publish,
         "course_published": course_published,
-        "library_updated": library_updated
+        "course_deleted": course_deleted,
+        "library_updated": library_updated,
     }
 
     def __init__(self, modulestore_class):
@@ -148,9 +152,9 @@ def create_modulestore_instance(
         request_cache = None
 
     try:
-        metadata_inheritance_cache = get_cache('mongo_metadata_inheritance')
+        metadata_inheritance_cache = caches['mongo_metadata_inheritance']
     except InvalidCacheBackendError:
-        metadata_inheritance_cache = get_cache('default')
+        metadata_inheritance_cache = caches['default']
 
     if issubclass(class_, MixedModuleStore):
         _options['create_modulestore_instance'] = create_modulestore_instance
@@ -210,7 +214,7 @@ def modulestore():
             # should be updated to have a setting that enumerates modulestore
             # wrappers and then uses that setting to wrap the modulestore in
             # appropriate wrappers depending on enabled features.
-            from ccx.modulestore import CCXModulestoreWrapper  # pylint: disable=import-error
+            from lms.djangoapps.ccx.modulestore import CCXModulestoreWrapper
             _MIXED_MODULESTORE = CCXModulestoreWrapper(_MIXED_MODULESTORE)
 
     return _MIXED_MODULESTORE

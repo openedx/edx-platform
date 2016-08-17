@@ -1,6 +1,5 @@
 from __future__ import absolute_import
 
-import json
 import logging
 
 from django.http import HttpResponseBadRequest, Http404
@@ -31,11 +30,11 @@ from student.auth import has_course_author_access
 from django.utils.translation import ugettext as _
 from models.settings.course_grading import CourseGradingModel
 
-__all__ = ['OPEN_ENDED_COMPONENT_TYPES',
-           'ADVANCED_COMPONENT_POLICY_KEY',
-           'container_handler',
-           'component_handler'
-           ]
+__all__ = [
+    'ADVANCED_COMPONENT_POLICY_KEY',
+    'container_handler',
+    'component_handler'
+]
 
 log = logging.getLogger(__name__)
 
@@ -44,7 +43,6 @@ COMPONENT_TYPES = ['discussion', 'html', 'problem', 'video']
 
 # Constants for determining if these components should be enabled for this course
 SPLIT_TEST_COMPONENT_TYPE = 'split_test'
-OPEN_ENDED_COMPONENT_TYPES = ["combinedopenended", "peergrading"]
 NOTE_COMPONENT_TYPES = ['notes']
 
 if settings.FEATURES.get('ALLOW_ALL_ADVANCED_COMPONENTS'):
@@ -74,66 +72,6 @@ def _advanced_component_types():
     return [c_type for c_type in ADVANCED_COMPONENT_TYPES if c_type not in settings.DEPRECATED_ADVANCED_COMPONENT_TYPES]
 
 
-@require_GET
-@login_required
-def subsection_handler(request, usage_key_string):
-    """
-    The restful handler for subsection-specific requests.
-
-    GET
-        html: return html page for editing a subsection
-        json: not currently supported
-    """
-    if 'text/html' in request.META.get('HTTP_ACCEPT', 'text/html'):
-        usage_key = UsageKey.from_string(usage_key_string)
-        try:
-            course, item, lms_link, preview_link = _get_item_in_course(request, usage_key)
-        except ItemNotFoundError:
-            return HttpResponseBadRequest()
-
-        # make sure that location references a 'sequential', otherwise return
-        # BadRequest
-        if item.location.category != 'sequential':
-            return HttpResponseBadRequest()
-
-        parent = get_parent_xblock(item)
-
-        # remove all metadata from the generic dictionary that is presented in a
-        # more normalized UI. We only want to display the XBlocks fields, not
-        # the fields from any mixins that have been added
-        fields = getattr(item, 'unmixed_class', item.__class__).fields
-
-        policy_metadata = dict(
-            (field.name, field.read_from(item))
-            for field
-            in fields.values()
-            if field.name not in ['display_name', 'start', 'due', 'format'] and field.scope == Scope.settings
-        )
-
-        can_view_live = False
-        subsection_units = item.get_children()
-        can_view_live = any([modulestore().has_published_version(unit) for unit in subsection_units])
-
-        return render_to_response(
-            'edit_subsection.html',
-            {
-                'subsection': item,
-                'context_course': course,
-                'new_unit_category': 'vertical',
-                'lms_link': lms_link,
-                'preview_link': preview_link,
-                'course_graders': json.dumps(CourseGradingModel.fetch(item.location.course_key).graders),
-                'parent_item': parent,
-                'locator': item.location,
-                'policy_metadata': policy_metadata,
-                'subsection_units': subsection_units,
-                'can_view_live': can_view_live
-            }
-        )
-    else:
-        return HttpResponseBadRequest("Only supports html requests")
-
-
 def _load_mixed_class(category):
     """
     Load an XBlock by category name, and apply all defined mixins
@@ -143,7 +81,6 @@ def _load_mixed_class(category):
     return mixologist.mix(component_class)
 
 
-# pylint: disable=unused-argument
 @require_GET
 @login_required
 def container_handler(request, usage_key_string):
@@ -213,7 +150,7 @@ def container_handler(request, usage_key_string):
                 'section': section,
                 'new_unit_category': 'vertical',
                 'ancestor_xblocks': ancestor_xblocks,
-                'component_templates': json.dumps(component_templates),
+                'component_templates': component_templates,
                 'xblock_info': xblock_info,
                 'draft_preview_link': preview_lms_link,
                 'published_preview_link': lms_link,
@@ -227,7 +164,7 @@ def get_component_templates(courselike, library=False):
     """
     Returns the applicable component templates that can be used by the specified course or library.
     """
-    def create_template_dict(name, cat, boilerplate_name=None, tab="common"):
+    def create_template_dict(name, cat, boilerplate_name=None, tab="common", hinted=False):
         """
         Creates a component template dict.
 
@@ -235,13 +172,15 @@ def get_component_templates(courselike, library=False):
             display_name: the user-visible name of the component
             category: the type of component (problem, html, etc.)
             boilerplate_name: name of boilerplate for filling in default values. May be None.
-            tab: common(default)/advanced/hint, which tab it goes in
+            hinted: True if hinted problem else False
+            tab: common(default)/advanced, which tab it goes in
 
         """
         return {
             "display_name": name,
             "category": cat,
             "boilerplate_name": boilerplate_name,
+            "hinted": hinted,
             "tab": tab
         }
 
@@ -277,20 +216,20 @@ def get_component_templates(courselike, library=False):
             for template in component_class.templates():
                 filter_templates = getattr(component_class, 'filter_templates', None)
                 if not filter_templates or filter_templates(template, courselike):
-                    # Tab can be 'common' 'advanced' 'hint'
+                    # Tab can be 'common' 'advanced'
                     # Default setting is common/advanced depending on the presence of markdown
                     tab = 'common'
                     if template['metadata'].get('markdown') is None:
                         tab = 'advanced'
-                    # Then the problem can override that with a tab: attribute (note: not nested in metadata)
-                    tab = template.get('tab', tab)
+                    hinted = template.get('hinted', False)
 
                     templates_for_category.append(
                         create_template_dict(
                             _(template['metadata'].get('display_name')),    # pylint: disable=translation-of-non-string
                             category,
                             template.get('template_id'),
-                            tab
+                            tab,
+                            hinted,
                         )
                     )
 

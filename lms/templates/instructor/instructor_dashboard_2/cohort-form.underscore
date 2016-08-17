@@ -95,7 +95,7 @@
                                             <%=
                                             interpolate(
                                                 // Translators: Any text between %(screen_reader_start)s and %(screen_reader_end)s is only read by screen readers and never shown in the browser.
-                                                '%(screen_reader_start)sWarning:%(screen_reader_end)s The previously selected content group was deleted. Select another content group.',
+                                                gettext('%(screen_reader_start)sWarning:%(screen_reader_end)s The previously selected content group was deleted. Select another content group.'),
                                                 {
                                                     screen_reader_start: '<span class="sr">',
                                                     screen_reader_end: '</span>'
@@ -115,7 +115,7 @@
                                         <%=
                                         interpolate(
                                             // Translators: Any text between %(screen_reader_start)s and %(screen_reader_end)s is only read by screen readers and never shown in the browser.
-                                            '%(screen_reader_start)sWarning:%(screen_reader_end)s No content groups exist.',
+                                            gettext('%(screen_reader_start)sWarning:%(screen_reader_end)s No content groups exist.'),
                                             {
                                                 screen_reader_start: '<span class="sr">',
                                                 screen_reader_end: '</span>'

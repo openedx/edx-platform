@@ -90,12 +90,27 @@ dummy_locales:
 
 # Directories we don't search for strings.
 ignore_dirs:
-    - docs
-    - src
-    - i18n
-    - test_root
     - common/static/xmodule/modules
     - common/static/xmodule/descriptors
+    # Directories with no user-facing code.
+    - '*/migrations'
+    # Directories that are not our code.
+    - node_modules
+    # Directories containing files that can't have strings in them.
+    - conf
+    - docs
+    - '*/fonts'
+    - '*/img'
+    - '*/images'
+    - '*/sass'
+    - '*/css'
+    # Directories that only contain tests.
+    - common/test
+    - test_root
+    - '*/terrain'
+    - '*/spec'
+    - '*/tests'
+    - '*/features'
 
 
 # Third-party installed apps that we also extract strings from.  When adding a

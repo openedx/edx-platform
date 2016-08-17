@@ -1,0 +1,10 @@
+<li class="actions-item">
+    <a href="javascript:void(0)" class="action-button action-answer" role="checkbox" aria-checked="false">
+        <span class="sr"><%- gettext("Mark as Answer") %></span>
+        <span class="action-label" aria-hidden="true">
+            <span class="label-unchecked"><%- gettext("Mark as Answer") %></span>
+            <span class="label-checked"><%- gettext("Unmark as Answer") %></span>
+        </span>
+        <span class="action-icon"><i class="icon fa fa-check"></i></span>
+    </a>
+</li>

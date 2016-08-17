@@ -14,7 +14,8 @@ import logging
 log = logging.getLogger('VideoPage')
 
 VIDEO_BUTTONS = {
-    'CC': '.hide-subtitles',
+    'transcript': '.lang',
+    'transcript_button': '.toggle-transcript',
     'volume': '.volume',
     'play': '.video_control.play',
     'pause': '.video_control.pause',
@@ -32,12 +33,12 @@ CSS_CLASS_NAMES = {
     'captions': '.subtitles',
     'captions_text': '.subtitles > li',
     'error_message': '.video .video-player h3',
-    'video_container': 'div.video',
+    'video_container': '.video',
     'video_sources': '.video-player video source',
     'video_spinner': '.video-wrapper .spinner',
     'video_xmodule': '.xmodule_VideoModule',
     'video_init': '.is-initialized',
-    'video_time': 'div.vidtime',
+    'video_time': '.vidtime',
     'video_display_name': '.vert h2',
     'captions_lang_list': '.langs-list li',
     'video_speed': '.speeds .value',
@@ -45,8 +46,8 @@ CSS_CLASS_NAMES = {
 }
 
 VIDEO_MODES = {
-    'html5': 'div.video video',
-    'youtube': 'div.video iframe'
+    'html5': '.video video',
+    'youtube': '.video iframe'
 }
 
 VIDEO_MENUS = {
@@ -99,7 +100,7 @@ class VideoPage(PageObject):
             video_player_buttons.append('play')
 
         for button in video_player_buttons:
-            self.wait_for_element_visibility(VIDEO_BUTTONS[button], '{} button is visible'.format(button.title()))
+            self.wait_for_element_visibility(VIDEO_BUTTONS[button], '{} button is visible'.format(button))
 
         def _is_finished_loading():
             """
@@ -126,7 +127,7 @@ class VideoPage(PageObject):
 
         video_player_buttons = ['do_not_show_again', 'skip_bumper', 'volume']
         for button in video_player_buttons:
-            self.wait_for_element_visibility(VIDEO_BUTTONS[button], '{} button is visible'.format(button.title()))
+            self.wait_for_element_visibility(VIDEO_BUTTONS[button], '{} button is visible'.format(button))
 
     @property
     def is_poster_shown(self):
@@ -316,13 +317,13 @@ class VideoPage(PageObject):
         states = {True: 'Shown', False: 'Hidden'}
         state = states[captions_new_state]
 
-        # Make sure that the CC button is there
-        EmptyPromise(lambda: self.is_button_shown('CC'),
-                     "CC button is shown").fulfill()
+        # Make sure that the transcript button is there
+        EmptyPromise(lambda: self.is_button_shown('transcript_button'),
+                     "transcript button is shown").fulfill()
 
         # toggle captions visibility state if needed
         if self.is_captions_visible() != captions_new_state:
-            self.click_player_button('CC')
+            self.click_player_button('transcript_button')
 
             # Verify that captions state is toggled/changed
             EmptyPromise(lambda: self.is_captions_visible() == captions_new_state,
@@ -371,8 +372,15 @@ class VideoPage(PageObject):
         hover = ActionChains(self.browser).move_to_element(element_to_hover_over)
         hover.perform()
 
-        speed_selector = self.get_element_selector('li[data-speed="{speed}"] a'.format(speed=speed))
+        speed_selector = self.get_element_selector('li[data-speed="{speed}"] .control'.format(speed=speed))
         self.q(css=speed_selector).first.click()
+
+    def verify_speed_changed(self, expected_speed):
+        """
+        Wait for the video to change its speed to the expected value. If it does not change,
+        the wait call will fail the test.
+        """
+        self.wait_for(lambda: self.speed == expected_speed, "Video speed changed")
 
     def click_player_button(self, button):
         """
@@ -541,8 +549,8 @@ class VideoPage(PageObject):
         """
         self.wait_for_ajax()
 
-        # mouse over to CC button
-        cc_button_selector = self.get_element_selector(VIDEO_BUTTONS["CC"])
+        # mouse over to transcript button
+        cc_button_selector = self.get_element_selector(VIDEO_BUTTONS["transcript"])
         element_to_hover_over = self.q(css=cc_button_selector).results[0]
         ActionChains(self.browser).move_to_element(element_to_hover_over).perform()
 
@@ -604,9 +612,6 @@ class VideoPage(PageObject):
 
         button = self.q(css=button_selector).results[0]
 
-        coord_y = button.location_once_scrolled_into_view['y']
-        self.browser.execute_script("window.scrollTo(0, {});".format(coord_y))
-
         hover = ActionChains(self.browser).move_to_element(button)
         hover.perform()
 
@@ -617,7 +622,7 @@ class VideoPage(PageObject):
         menu_items = self.q(css=menu_selector + ' a').results
         for item in menu_items:
             if item.get_attribute('data-value') == transcript_format:
-                item.click()
+                ActionChains(self.browser).move_to_element(item).click().perform()
                 self.wait_for_ajax()
                 break
 

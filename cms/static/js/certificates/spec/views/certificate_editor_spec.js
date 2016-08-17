@@ -7,10 +7,10 @@ define([ // jshint ignore:line
     'js/certificates/models/signatory',
     'js/certificates/collections/certificates',
     'js/certificates/views/certificate_editor',
-    'js/views/feedback_notification',
+    'common/js/components/views/feedback_notification',
     'common/js/spec_helpers/ajax_helpers',
     'common/js/spec_helpers/template_helpers',
-    'js/spec_helpers/view_helpers',
+    'common/js/spec_helpers/view_helpers',
     'js/spec_helpers/validation_helpers',
     'js/certificates/spec/custom_matchers'
 ],
@@ -18,7 +18,7 @@ function(_, Course, CertificateModel, SignatoryModel, CertificatesCollection, Ce
          Notification, AjaxHelpers, TemplateHelpers, ViewHelpers, ValidationHelpers, CustomMatchers) {
     'use strict';
 
-    var MAX_SIGNATORIES = 4;
+    var MAX_SIGNATORIES = 100;
     var SELECTORS = {
         detailsView: '.certificate-details',
         editView: '.certificate-edit',
@@ -41,7 +41,6 @@ function(_, Course, CertificateModel, SignatoryModel, CertificatesCollection, Ce
         uploadDialog: 'form.upload-dialog',
         uploadDialogButton: '.action-upload',
         uploadDialogFileInput: 'form.upload-dialog input[type=file]',
-        uploadOrgLogoButton: '.action-upload-org-logo',
         saveCertificateButton: 'button.action-primary'
     };
 
@@ -86,12 +85,12 @@ function(_, Course, CertificateModel, SignatoryModel, CertificatesCollection, Ce
             num: 'course_num',
             revision: 'course_rev'
         });
-
-
+        window.CMS.User = {isGlobalStaff: true};
     });
 
     afterEach(function() {
         delete window.course;
+        delete window.CMS.User;
     });
 
     describe('Certificate editor view', function() {
@@ -113,7 +112,8 @@ function(_, Course, CertificateModel, SignatoryModel, CertificatesCollection, Ce
             this.newModelOptions = {add: true};
             this.model = new CertificateModel({
                 name: 'Test Name',
-                description: 'Test Description'
+                description: 'Test Description',
+                is_active: true
 
             }, this.newModelOptions);
 
@@ -149,6 +149,12 @@ function(_, Course, CertificateModel, SignatoryModel, CertificatesCollection, Ce
                 expect(this.view.$("[name='certificate-name']").val()).toBe('Test Name');
                 expect(this.view.$("[name='certificate-description']").val()).toBe('Test Description');
                 expect(this.view.$('.action-delete')).toExist();
+            });
+
+            it('should not have delete button if user is not global staff and certificate is active', function() {
+                window.CMS.User = {isGlobalStaff: false};
+                appendSetFixtures(this.view.render().el);
+                expect(this.view.$('.action-delete')).not.toExist();
             });
 
             it('should save properly', function() {
@@ -192,7 +198,7 @@ function(_, Course, CertificateModel, SignatoryModel, CertificatesCollection, Ce
                 expect(this.collection.length).toBe(1);
             });
 
-            it('user can only add signatories up to max 4', function() {
+            it('user can only add signatories up to max 100', function() {
                 for(var i = 1; i < MAX_SIGNATORIES ; i++) {
                     this.view.$(SELECTORS.addSignatoryButton).click();
                 }
@@ -222,10 +228,10 @@ function(_, Course, CertificateModel, SignatoryModel, CertificatesCollection, Ce
                 }
             );
 
-            it('signatories should not save when title has more than 40 characters per line', function() {
+            it('signatories should save when fields have too many characters per line', function() {
                 this.view.$(SELECTORS.addSignatoryButton).click();
                 setValuesToInputs(this.view, {
-                    inputCertificateName: 'New Certificate Name'
+                    inputCertificateName: 'New Certificate Name that has too many characters without any limit'
                 });
 
                 setValuesToInputs(this.view, {
@@ -233,18 +239,14 @@ function(_, Course, CertificateModel, SignatoryModel, CertificatesCollection, Ce
                 });
 
                 setValuesToInputs(this.view, {
-                    inputSignatoryTitle: 'New Signatory title longer than 40 characters on one line'
-                });
-
-                setValuesToInputs(this.view, {
-                    inputSignatoryOrganization: 'New Signatory Organization longer than 40 characters'
+                    inputSignatoryTitle: 'This is a certificate signatory title that has waaaaaaay more than 106 characters, in order to cause an exception.'
                 });
 
                 this.view.$(SELECTORS.saveCertificateButton).click();
-                expect(this.view.$('.certificate-edit-error')).toHaveClass('is-shown');
+                expect(this.view.$('.certificate-edit-error')).not.toHaveClass('is-shown');
             });
 
-            it('signatories should not save when title span on more than 2 lines', function() {
+            it('signatories should save when title span on more than 2 lines', function() {
                 this.view.$(SELECTORS.addSignatoryButton).click();
                 setValuesToInputs(this.view, {
                     inputCertificateName: 'New Certificate Name'
@@ -263,7 +265,7 @@ function(_, Course, CertificateModel, SignatoryModel, CertificatesCollection, Ce
                 });
 
                 this.view.$(SELECTORS.saveCertificateButton).click();
-                expect(this.view.$('.certificate-edit-error')).toHaveClass('is-shown');
+                expect(this.view.$('.certificate-edit-error')).not.toHaveClass('is-shown');
             });
 
             it('user can delete those signatories already saved', function() {
@@ -304,9 +306,6 @@ function(_, Course, CertificateModel, SignatoryModel, CertificatesCollection, Ce
                 setValuesToInputs(this.view, {
                     inputCertificateDescription: 'New Test Description'
                 });
-                this.view.$(SELECTORS.uploadOrgLogoButton).click();
-                var org_logo_path = '/c4x/edX/DemoX/asset/org-logo.png';
-                uploadFile(org_logo_path, requests);
 
                 setValuesToInputs(this.view, {
                     inputSignatoryName: 'New Signatory Name'
@@ -327,8 +326,7 @@ function(_, Course, CertificateModel, SignatoryModel, CertificatesCollection, Ce
                 ViewHelpers.submitAndVerifyFormSuccess(this.view, requests, notificationSpy);
                 expect(this.model).toBeCorrectValuesInModel({
                     name: 'New Test Name',
-                    description: 'New Test Description',
-                    org_logo_path: org_logo_path
+                    description: 'New Test Description'
                 });
 
                 // get the first signatory from the signatories collection.

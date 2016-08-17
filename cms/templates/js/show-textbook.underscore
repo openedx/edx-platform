@@ -34,7 +34,7 @@
 
 <ul  class="actions textbook-actions">
     <li class="action action-view">
-        <a href="//<%= CMS.URL.LMS_BASE %>/courses/<%= course.org %>/<%= course.num %>/<%= course.url_name %>/pdfbook/<%= bookindex %>/" class="view"><%= gettext("View Live") %></a>
+        <a href="//<%= CMS.URL.LMS_BASE %>/courses/<%= course.id %>/pdfbook/<%= bookindex %>/" class="view"><%= gettext("View Live") %></a>
     </li>
     <li class="action action-edit">
         <button class="edit"><%= gettext("Edit") %></button>

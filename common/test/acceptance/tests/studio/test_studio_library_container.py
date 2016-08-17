@@ -2,7 +2,6 @@
 Acceptance tests for Library Content in LMS
 """
 import ddt
-from flaky import flaky
 from nose.plugins.attrib import attr
 import textwrap
 
@@ -138,7 +137,6 @@ class StudioLibraryContainerTest(StudioLibraryTest, UniqueCourseTest, TestWithSe
         self.assertIn(expected_text, library_container.validation_not_configured_warning_text)
         self.assertIn(expected_action, library_container.validation_not_configured_warning_text)
 
-    @flaky  # TODO fix this, see TE-745
     def test_out_of_date_message(self):
         """
         Scenario: Given I have a library, a course and library content xblock in a course
@@ -149,6 +147,7 @@ class StudioLibraryContainerTest(StudioLibraryTest, UniqueCourseTest, TestWithSe
         When I click on the update link
         Then I can see that the content no longer needs to be updated
         """
+        # Formerly flaky: see TE-745
         expected_text = "This component is out of date. The library has new content."
         library_block = self._get_library_xblock_wrapper(self.unit_page.xblocks[1])
 

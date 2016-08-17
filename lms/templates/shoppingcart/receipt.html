@@ -3,8 +3,9 @@
 from django.utils.translation import ugettext as _
 from django.utils.translation import ungettext
 from django.core.urlresolvers import reverse
-from courseware.courses import course_image_url, get_course_about_section, get_course_by_id
+from markupsafe import escape
 from microsite_configuration import microsite
+from openedx.core.lib.courses import course_image_url
 %>
 
 <%block name="billing_details_highlight">
@@ -35,7 +36,7 @@ from microsite_configuration import microsite
             ${_(u"You have successfully been enrolled for {course_names}. "
                 u"The following receipt has been emailed to {receipient_emails}").format(
                   course_names=u"<b>{course_names}</b>".format(
-                    course_names=appended_course_names
+                    course_names=escape(appended_course_names)
                   ),
                   receipient_emails=u"<strong>{receipient_emails}</strong>".format(
                     receipient_emails=appended_recipient_emails
@@ -50,7 +51,7 @@ from microsite_configuration import microsite
           ).format(
             number=total_registration_codes,
             course_names=u"<b>{course_names}</b>".format(
-              course_names=appended_course_names
+              course_names=escape(appended_course_names)
             )
           )}
           ${_("The following receipt has been emailed to {receipient_emails}").format(
@@ -291,13 +292,13 @@ from microsite_configuration import microsite
         <div class="clearfix">
           <div class="image">
             <img class="item-image" src="${course_image_url(course)}"
-                 alt="${course.display_number_with_default | h} ${get_course_about_section(course, 'title')} Image"/>
+                 alt="${course.display_number_with_default | h} ${course.display_name_with_default} Image"/>
           </div>
           <div class="data-input">
 
             <h3 class="course-title-info" id="course-title">
               <span class="course-registration-title">${_('Registration for:')}</span>
-              <span class="course-display-name">${ course.display_name }</span>
+              <span class="course-display-name">${ course.display_name | h }</span>
             </h3>
             <p class="course-meta-info" aria-describedby="course-title">
               <span class="course-dates-title">

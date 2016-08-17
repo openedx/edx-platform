@@ -11,7 +11,7 @@ import ddt
 from xmodule.modulestore.xml_importer import import_course_from_xml
 from xmodule.modulestore.xml_exporter import export_course_to_xml
 from xmodule.modulestore.tests.factories import check_mongo_calls
-from xmodule.modulestore.tests.test_cross_modulestore_import_export import (
+from xmodule.modulestore.tests.utils import (
     MixedModulestoreBuilder, VersioningModulestoreBuilder,
     MongoModulestoreBuilder, TEST_DATA_DIR
 )
@@ -95,27 +95,27 @@ class CountMongoCallsCourseTraversal(TestCase):
         # These two lines show the way this traversal *should* be done
         # (if you'll eventually access all the fields and load all the definitions anyway).
         # 'lazy' does not matter in old Mongo.
-        (MIXED_OLD_MONGO_MODULESTORE_BUILDER, None, False, True, 189),
-        (MIXED_OLD_MONGO_MODULESTORE_BUILDER, None, True, True, 189),
-        (MIXED_OLD_MONGO_MODULESTORE_BUILDER, 0, False, True, 387),
-        (MIXED_OLD_MONGO_MODULESTORE_BUILDER, 0, True, True, 387),
+        (MIXED_OLD_MONGO_MODULESTORE_BUILDER, None, False, True, 175),
+        (MIXED_OLD_MONGO_MODULESTORE_BUILDER, None, True, True, 175),
+        (MIXED_OLD_MONGO_MODULESTORE_BUILDER, 0, False, True, 359),
+        (MIXED_OLD_MONGO_MODULESTORE_BUILDER, 0, True, True, 359),
         # As shown in these two lines: whether or not the XBlock fields are accessed,
         # the same number of mongo calls are made in old Mongo for depth=None.
-        (MIXED_OLD_MONGO_MODULESTORE_BUILDER, None, False, False, 189),
-        (MIXED_OLD_MONGO_MODULESTORE_BUILDER, None, True, False, 189),
-        (MIXED_OLD_MONGO_MODULESTORE_BUILDER, 0, False, False, 387),
-        (MIXED_OLD_MONGO_MODULESTORE_BUILDER, 0, True, False, 387),
+        (MIXED_OLD_MONGO_MODULESTORE_BUILDER, None, False, False, 175),
+        (MIXED_OLD_MONGO_MODULESTORE_BUILDER, None, True, False, 175),
+        (MIXED_OLD_MONGO_MODULESTORE_BUILDER, 0, False, False, 359),
+        (MIXED_OLD_MONGO_MODULESTORE_BUILDER, 0, True, False, 359),
         # The line below shows the way this traversal *should* be done
         # (if you'll eventually access all the fields and load all the definitions anyway).
         (MIXED_SPLIT_MODULESTORE_BUILDER, None, False, True, 4),
-        (MIXED_SPLIT_MODULESTORE_BUILDER, None, True, True, 143),
-        (MIXED_SPLIT_MODULESTORE_BUILDER, 0, False, True, 143),
-        (MIXED_SPLIT_MODULESTORE_BUILDER, 0, True, True, 143),
+        (MIXED_SPLIT_MODULESTORE_BUILDER, None, True, True, 38),
+        (MIXED_SPLIT_MODULESTORE_BUILDER, 0, False, True, 131),
+        (MIXED_SPLIT_MODULESTORE_BUILDER, 0, True, True, 38),
         (MIXED_SPLIT_MODULESTORE_BUILDER, None, False, False, 4),
         (MIXED_SPLIT_MODULESTORE_BUILDER, None, True, False, 4),
         # TODO: The call count below seems like a bug - should be 4?
         # Seems to be related to using self.lazy in CachingDescriptorSystem.get_module_data().
-        (MIXED_SPLIT_MODULESTORE_BUILDER, 0, False, False, 143),
+        (MIXED_SPLIT_MODULESTORE_BUILDER, 0, False, False, 131),
         (MIXED_SPLIT_MODULESTORE_BUILDER, 0, True, False, 4)
     )
     @ddt.unpack

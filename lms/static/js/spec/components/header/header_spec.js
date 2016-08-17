@@ -13,7 +13,7 @@
 
                    var testBreadcrumbs = function (breadcrumbs) {
                        model.set('breadcrumbs', breadcrumbs);
-                       expect(view.$el.html()).toContain('<nav class="breadcrumbs">');
+                       expect(view.$('nav.breadcrumbs').length).toBe(1);
                        _.each(view.$('.nav-item'), function (el, index) {
                            expect($(el).attr('href')).toEqual(breadcrumbs[index].url);
                            expect($(el).text()).toEqual(breadcrumbs[index].title);

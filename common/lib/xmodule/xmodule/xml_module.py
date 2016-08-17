@@ -13,7 +13,7 @@ from xmodule.modulestore import EdxJSONEncoder
 
 import dogstats_wrapper as dog_stats_api
 
-from lxml.etree import (  # pylint: disable=no-name-in-module
+from lxml.etree import (
     Element, ElementTree, XMLParser,
 )
 
@@ -141,7 +141,7 @@ class XmlParserMixin(object):
                          # Used for storing xml attributes between import and export, for roundtrips
                          'xml_attributes')
 
-    metadata_to_export_to_policy = ('discussion_topics', 'checklists')
+    metadata_to_export_to_policy = ('discussion_topics',)
 
     @staticmethod
     def _get_metadata_from_xml(xml_object, remove=True):
@@ -184,7 +184,7 @@ class XmlParserMixin(object):
 
         Returns an lxml Element
         """
-        return etree.parse(file_object, parser=EDX_XML_PARSER).getroot()  # pylint: disable=no-member
+        return etree.parse(file_object, parser=EDX_XML_PARSER).getroot()
 
     @classmethod
     def load_file(cls, filepath, fs, def_id):  # pylint: disable=invalid-name
@@ -499,7 +499,7 @@ class XmlDescriptor(XmlParserMixin, XModuleDescriptor):  # pylint: disable=abstr
         #    a) define from_xml themselves
         #    b) call super(..).from_xml(..)
         return super(XmlDescriptor, cls).parse_xml(
-            etree.fromstring(xml_data),  # pylint: disable=no-member
+            etree.fromstring(xml_data),
             system,
             None,  # This is ignored by XmlParserMixin
             id_generator,
@@ -517,7 +517,7 @@ class XmlDescriptor(XmlParserMixin, XModuleDescriptor):  # pylint: disable=abstr
         else:
             return super(XmlDescriptor, cls).parse_xml(node, runtime, keys, id_generator)
 
-    def export_to_xml(self, resource_fs):  # pylint: disable=unused-argument
+    def export_to_xml(self, resource_fs):
         """
         Returns an xml string representing this module, and all modules
         underneath it.  May also write required resources out to resource_fs.
@@ -536,7 +536,7 @@ class XmlDescriptor(XmlParserMixin, XModuleDescriptor):  # pylint: disable=abstr
         #    b) call super(..).export_to_xml(..)
         node = Element(self.category)
         super(XmlDescriptor, self).add_xml_to_node(node)
-        return etree.tostring(node)  # pylint: disable=no-member
+        return etree.tostring(node)
 
     def add_xml_to_node(self, node):
         """

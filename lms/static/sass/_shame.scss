@@ -132,80 +132,8 @@
 }
 
 
-
-
 // ====================
 
-// edx.org marketing site - registration iframe band-aid (poor form enough to isolate out)
-.view-iframe, .view-iframe-content {
-  background: transparent !important;
-  overflow: hidden;
-}
-
-.view-partial-mktgregister {
-  background: transparent !important;
-
-  // dimensions needed for course about page on marketing site
-  .wrapper-view {
-    overflow: hidden;
-  }
-
-  // nav list
-  .list-actions {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-
-    .item {
-      margin: 0;
-    }
-  }
-
-  .action {
-    font-size: 16px;
-    font-weight: 500;
-
-    // register or access courseware
-    &.action-register, &.access-courseware {
-      @extend %m-btn-primary;
-      display: block;
-
-      .track {
-        @include transition(all $tmg-f2 ease-in-out);
-        color: $white;
-        display: block;
-        font-size: 13px;
-        line-height: 2em;
-        opacity: 0.6;
-      }
-
-      &:hover .track, &:focus .track {
-        opacity: 1.0;
-      }
-
-      &.has-option-verified {
-        padding-top: 12px !important;
-      }
-    }
-
-    // already registered but course not started or registration is closed
-    &.is-registered, &.registration-closed {
-      @extend %m-btn-secondary;
-      pointer-events: none !important;
-      display: block;
-    }
-
-    // coming soon
-    &.coming-soon {
-      @extend %m-btn-secondary;
-      pointer-events: none !important;
-      outline: none;
-      display: block;
-    }
-  }
-}
-
-// ====================
 
 // Verification fixes
 .verification-process {
@@ -252,7 +180,6 @@ footer .references {
 
   &:focus {
     border: none !important;
-    outline: thin dotted !important;
   }
 }
 
@@ -270,4 +197,23 @@ footer .references {
 
 .course-content .discussion-post.edit-post-form .topic-submenu {
   list-style: none;
+}
+
+
+// LMS system feedback button overrides
+.is-in-course .wrapper-prompt .nav-actions {
+  button {
+    font-family: inherit;
+  }
+
+  .action-primary {
+    @extend %t-action4;
+  }
+
+  .action-secondary {
+    @extend %btn-no-style;
+    @extend %t-strong;
+    box-shadow: none;
+    text-shadow: none;
+  }
 }

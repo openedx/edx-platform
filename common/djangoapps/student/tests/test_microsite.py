@@ -12,6 +12,8 @@ FAKE_MICROSITE = {
     "SITE_NAME": "openedx.localhost",
     "university": "fakeuniversity",
     "course_org_filter": "fakeorg",
+    "platform_name": "Fake University",
+    "email_from_address": "no-reply@fakeuniversity.com",
     "REGISTRATION_EXTRA_FIELDS": {
         "address1": "required",
         "city": "required",

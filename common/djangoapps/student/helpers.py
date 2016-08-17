@@ -1,16 +1,12 @@
 """Helpers for the student app. """
-import time
 from datetime import datetime
 import urllib
 
 from pytz import UTC
-
-from django.utils.http import cookie_date
-from django.conf import settings
 from django.core.urlresolvers import reverse, NoReverseMatch
 
 import third_party_auth
-from verify_student.models import SoftwareSecurePhotoVerification  # pylint: disable=F0401
+from lms.djangoapps.verify_student.models import VerificationDeadline, SoftwareSecurePhotoVerification
 from course_modes.models import CourseMode
 
 
@@ -22,9 +18,15 @@ VERIFY_STATUS_APPROVED = "verify_approved"
 VERIFY_STATUS_MISSED_DEADLINE = "verify_missed_deadline"
 VERIFY_STATUS_NEED_TO_REVERIFY = "verify_need_to_reverify"
 
+DISABLE_UNENROLL_CERT_STATES = [
+    'generating',
+    'ready',
+]
 
-def check_verify_status_by_course(user, course_enrollment_pairs, all_course_modes):
-    """Determine the per-course verification statuses for a given user.
+
+def check_verify_status_by_course(user, course_enrollments):
+    """
+    Determine the per-course verification statuses for a given user.
 
     The possible statuses are:
         * VERIFY_STATUS_NEED_TO_VERIFY: The student has not yet submitted photos for verification.
@@ -46,10 +48,7 @@ def check_verify_status_by_course(user, course_enrollment_pairs, all_course_mode
 
     Arguments:
         user (User): The currently logged-in user.
-        course_enrollment_pairs (list): The courses the user is enrolled in.
-            The list should contain tuples of `(Course, CourseEnrollment)`.
-        all_course_modes (list): List of all course modes for the student's enrolled courses,
-            including modes that have expired.
+        course_enrollments (list[CourseEnrollment]): The courses the user is enrolled in.
 
     Returns:
         dict: Mapping of course keys verification status dictionaries.
@@ -73,24 +72,21 @@ def check_verify_status_by_course(user, course_enrollment_pairs, all_course_mode
         user, queryset=verifications
     )
 
+    # Retrieve verification deadlines for the enrolled courses
+    enrolled_course_keys = [enrollment.course_id for enrollment in course_enrollments]
+    course_deadlines = VerificationDeadline.deadlines_for_courses(enrolled_course_keys)
+
     recent_verification_datetime = None
 
-    for course, enrollment in course_enrollment_pairs:
+    for enrollment in course_enrollments:
 
-        # Get the verified mode (if any) for this course
-        # We pass in the course modes we have already loaded to avoid
-        # another database hit, as well as to ensure that expired
-        # course modes are included in the search.
-        verified_mode = CourseMode.verified_mode_for_course(
-            course.id,
-            modes=all_course_modes[course.id]
-        )
+        # If the user hasn't enrolled as verified, then the course
+        # won't display state related to its verification status.
+        if enrollment.mode in CourseMode.VERIFIED_MODES:
 
-        # If no verified mode has ever been offered, or the user hasn't enrolled
-        # as verified, then the course won't display state related to its
-        # verification status.
-        if verified_mode is not None and enrollment.mode in CourseMode.VERIFIED_MODES:
-            deadline = verified_mode.expiration_datetime
+            # Retrieve the verification deadline associated with the course.
+            # This could be None if the course doesn't have a deadline.
+            deadline = course_deadlines.get(enrollment.course_id)
 
             relevant_verification = SoftwareSecurePhotoVerification.verification_for_datetime(deadline, verifications)
 
@@ -156,7 +152,7 @@ def check_verify_status_by_course(user, course_enrollment_pairs, all_course_mode
                 if deadline is not None and deadline > now:
                     days_until_deadline = (deadline - now).days
 
-                status_by_course[course.id] = {
+                status_by_course[enrollment.course_id] = {
                     'status': status,
                     'days_until_deadline': days_until_deadline
                 }
@@ -198,7 +194,7 @@ def auth_pipeline_urls(auth_entry, redirect_url=None):
     return {
         provider.provider_id: third_party_auth.pipeline.get_login_url(
             provider.provider_id, auth_entry, redirect_url=redirect_url
-        ) for provider in third_party_auth.provider.Registry.enabled()
+        ) for provider in third_party_auth.provider.Registry.accepting_logins()
     }
 
 

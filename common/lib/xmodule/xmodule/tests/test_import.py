@@ -66,7 +66,7 @@ class BaseCourseTestCase(unittest.TestCase):
 
     def get_course(self, name):
         """Get a test course by directory name.  If there's more than one, error."""
-        print("Importing {0}".format(name))
+        print "Importing {0}".format(name)
 
         modulestore = XMLModuleStore(
             DATA_DIR,
@@ -225,18 +225,18 @@ class ImportTestCase(BaseCourseTestCase):
         self.assertEqual(course_xml.attrib['unicorn'], unicorn_color)
 
         # the course and org tags should be _only_ in the pointer
-        self.assertTrue('course' not in course_xml.attrib)
-        self.assertTrue('org' not in course_xml.attrib)
+        self.assertNotIn('course', course_xml.attrib)
+        self.assertNotIn('org', course_xml.attrib)
 
         # did we successfully strip the url_name from the definition contents?
-        self.assertTrue('url_name' not in course_xml.attrib)
+        self.assertNotIn('url_name', course_xml.attrib)
 
         # Does the chapter tag now have a due attribute?
         # hardcoded path to child
         with descriptor.runtime.export_fs.open('chapter/ch.xml') as f:
             chapter_xml = etree.fromstring(f.read())
         self.assertEqual(chapter_xml.tag, 'chapter')
-        self.assertFalse('due' in chapter_xml.attrib)
+        self.assertNotIn('due', chapter_xml.attrib)
 
     def test_metadata_import_export(self):
         """Two checks:
@@ -431,22 +431,22 @@ class ImportTestCase(BaseCourseTestCase):
               """]
 
         for xml_str in yes:
-            print("should be True for {0}".format(xml_str))
+            print "should be True for {0}".format(xml_str)
             self.assertTrue(is_pointer_tag(etree.fromstring(xml_str)))
 
         for xml_str in no:
-            print("should be False for {0}".format(xml_str))
+            print "should be False for {0}".format(xml_str)
             self.assertFalse(is_pointer_tag(etree.fromstring(xml_str)))
 
     def test_metadata_inherit(self):
         """Make sure that metadata is inherited properly"""
 
-        print("Starting import")
+        print "Starting import"
         course = self.get_course('toy')
 
         def check_for_key(key, node, value):
             "recursive check for presence of key"
-            print("Checking {0}".format(node.location.to_deprecated_string()))
+            print "Checking {0}".format(node.location.to_deprecated_string())
             self.assertEqual(getattr(node, key), value)
             for c in node.get_children():
                 check_for_key(key, c, value)
@@ -496,17 +496,17 @@ class ImportTestCase(BaseCourseTestCase):
     def test_colon_in_url_name(self):
         """Ensure that colons in url_names convert to file paths properly"""
 
-        print("Starting import")
+        print "Starting import"
         # Not using get_courses because we need the modulestore object too afterward
         modulestore = XMLModuleStore(DATA_DIR, source_dirs=['toy'])
         courses = modulestore.get_courses()
         self.assertEquals(len(courses), 1)
         course = courses[0]
 
-        print("course errors:")
+        print "course errors:"
         for (msg, err) in modulestore.get_course_errors(course.id):
-            print(msg)
-            print(err)
+            print msg
+            print err
 
         chapters = course.get_children()
         self.assertEquals(len(chapters), 5)
@@ -514,12 +514,12 @@ class ImportTestCase(BaseCourseTestCase):
         ch2 = chapters[1]
         self.assertEquals(ch2.url_name, "secret:magic")
 
-        print("Ch2 location: ", ch2.location)
+        print "Ch2 location: ", ch2.location
 
         also_ch2 = modulestore.get_item(ch2.location)
         self.assertEquals(ch2, also_ch2)
 
-        print("making sure html loaded")
+        print "making sure html loaded"
         loc = course.id.make_usage_key('html', 'secret:toylab')
         html = modulestore.get_item(loc)
         self.assertEquals(html.display_name, "Toy lab")
@@ -531,13 +531,13 @@ class ImportTestCase(BaseCourseTestCase):
         loaded because of unicode filenames, there are appropriate
         exceptions/errors to that effect."""
 
-        print("Starting import")
+        print "Starting import"
         modulestore = XMLModuleStore(DATA_DIR, source_dirs=['test_unicode'])
         courses = modulestore.get_courses()
         self.assertEquals(len(courses), 1)
         course = courses[0]
 
-        print("course errors:")
+        print "course errors:"
 
         # Expect to find an error/exception about characters in "®esources"
         expect = "InvalidKeyError"
@@ -573,7 +573,7 @@ class ImportTestCase(BaseCourseTestCase):
         for i in (2, 3):
             video = sections[i]
             # Name should be 'video_{hash}'
-            print("video {0} url_name: {1}".format(i, video.url_name))
+            print "video {0} url_name: {1}".format(i, video.url_name)
 
             self.assertEqual(len(video.url_name), len('video_') + 12)
 

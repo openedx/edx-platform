@@ -27,45 +27,45 @@
 }
 
 #wmd-button-row {
-  position: relative; 
+  position: relative;
   margin-left: ($baseline/4);
   margin-right: ($baseline/4);
   margin-bottom: 0px;
   margin-top: ($baseline/2);
-  padding: 0px;  
+  padding: 0px;
   height: 20px;
 }
 
 .wmd-spacer {
-  width: 1px; 
-  height: 20px; 
+  width: 1px;
+  height: 20px;
   margin-left: 14px;
   position: absolute;
   background-color: Silver;
-  display: inline-block; 
+  display: inline-block;
   list-style: none;
 }
 
 .wmd-button {
-  width: 20px; 
-  height: 20px; 
+  width: 20px;
+  height: 20px;
   margin-left: ($baseline/4);
   margin-right: ($baseline/4);
   position: absolute;
-  background-image: url(../images/wmd-buttons.png);
+  background-image: url('#{$static-path}/images/wmd-buttons.png');
   background-repeat: no-repeat;
   background-position: 0px 0px;
-  display: inline-block; 
+  display: inline-block;
   list-style: none;
 }
 
 .wmd-button > a {
-  width: 20px; 
-  height: 20px; 
+  width: 20px;
+  height: 20px;
   margin-left: ($baseline/4);
   margin-right: ($baseline/4);
   position: absolute;
-  display: inline-block; 
+  display: inline-block;
 }
 
 

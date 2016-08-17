@@ -105,7 +105,7 @@ class TestCourseActionUIStateManager(TestCourseActionStateManagerBase):
         )
 
         # create course action states for all courses
-        for CourseState in (self.course_actions_displayable_states + self.courses_with_state3_non_displayable):
+        for CourseState in self.course_actions_displayable_states + self.courses_with_state3_non_displayable:
             action_class.objects.update_state(
                 CourseState.course_key,
                 CourseState.state,

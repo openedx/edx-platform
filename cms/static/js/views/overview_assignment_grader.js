@@ -1,4 +1,4 @@
-define(["js/views/baseview", "underscore", "gettext", "js/models/assignment_grade", "js/views/feedback_notification"],
+define(["js/views/baseview", "underscore", "gettext", "js/models/assignment_grade", "common/js/components/views/feedback_notification"],
         function(BaseView, _, gettext, AssignmentGrade, NotificationView) {
     var l10nNotGraded = gettext('Not Graded');
     var OverviewAssignmentGrader = BaseView.extend({

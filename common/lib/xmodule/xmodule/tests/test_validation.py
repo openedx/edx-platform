@@ -209,10 +209,25 @@ class StudioValidationTest(unittest.TestCase):
         expected = {
             "xblock_id": "id",
             "messages": [
-                {"type": "error", "text": u"Error message", "action_label": u"Action label", "action_class": "edit-button"},
-                {"type": "not-configured", "text": u"Not configured message", "action_label": u"Action label", "action_runtime_event": "make groups"}
+                {
+                    "type": "error",
+                    "text": u"Error message",
+                    "action_label": u"Action label",
+                    "action_class": "edit-button"
+                },
+                {
+                    "type": "not-configured",
+                    "text": u"Not configured message",
+                    "action_label": u"Action label",
+                    "action_runtime_event": "make groups"
+                }
             ],
-            "summary": {"type": "warning", "text": u"Summary message", "action_label": u"Summary label", "action_runtime_event": "fix everything"},
+            "summary": {
+                "type": "warning",
+                "text": u"Summary message",
+                "action_label": u"Summary label",
+                "action_runtime_event": "fix everything"
+            },
             "empty": False
         }
         self.assertEqual(expected, validation.to_json())

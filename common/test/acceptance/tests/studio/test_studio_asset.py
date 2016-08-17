@@ -1,7 +1,6 @@
 """
 Acceptance tests for Studio related to the asset index page.
 """
-
 from ...pages.studio.asset_index import AssetIndexPage
 
 from .base_studio_test import StudioCourseTest

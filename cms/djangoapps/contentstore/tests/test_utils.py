@@ -1,25 +1,26 @@
 """ Tests for utils. """
 import collections
-import copy
-import mock
 from datetime import datetime, timedelta
-from pytz import UTC
 
+import mock
+import ddt
+from pytz import UTC
 from django.test import TestCase
 from django.test.utils import override_settings
-
-from contentstore import utils
-from contentstore.tests.utils import CourseTestCase
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
-
 from xmodule.modulestore.django import modulestore
+from xmodule.partitions.partitions import UserPartition, Group
+
+from contentstore import utils
+from contentstore.tests.utils import CourseTestCase
 
 
 class LMSLinksTestCase(TestCase):
     """ Tests for LMS links. """
+
     def about_page_test(self):
         """ Get URL for about page, no marketing site """
         # default for ENABLE_MKTG_SITE is False.
@@ -78,7 +79,7 @@ class LMSLinksTestCase(TestCase):
         link = utils.get_lms_link_for_item(location, True)
         self.assertEquals(
             link,
-            "//preview/courses/mitX/101/test/jump_to/i4x://mitX/101/vertical/contacting_us"
+            "//preview.localhost/courses/mitX/101/test/jump_to/i4x://mitX/101/vertical/contacting_us"
         )
 
         # now test with the course' location
@@ -107,44 +108,6 @@ class ExtraPanelTabTestCase(TestCase):
         else:
             course.tabs = tabs
         return course
-
-
-class CourseImageTestCase(ModuleStoreTestCase):
-    """Tests for course image URLs."""
-
-    def verify_url(self, expected_url, actual_url):
-        """
-        Helper method for verifying the URL is as expected.
-        """
-        if not expected_url.startswith("/"):
-            expected_url = "/" + expected_url
-        self.assertEquals(expected_url, actual_url)
-
-    def test_get_image_url(self):
-        """Test image URL formatting."""
-        course = CourseFactory.create()
-        self.verify_url(
-            unicode(course.id.make_asset_key('asset', course.course_image)),
-            utils.course_image_url(course)
-        )
-
-    def test_non_ascii_image_name(self):
-        """ Verify that non-ascii image names are cleaned """
-        course_image = u'before_\N{SNOWMAN}_after.jpg'
-        course = CourseFactory.create(course_image=course_image)
-        self.verify_url(
-            unicode(course.id.make_asset_key('asset', course_image.replace(u'\N{SNOWMAN}', '_'))),
-            utils.course_image_url(course)
-        )
-
-    def test_spaces_in_image_name(self):
-        """ Verify that image names with spaces in them are cleaned """
-        course_image = u'before after.jpg'
-        course = CourseFactory.create(course_image=u'before after.jpg')
-        self.verify_url(
-            unicode(course.id.make_asset_key('asset', course_image.replace(" ", "_"))),
-            utils.course_image_url(course)
-        )
 
 
 class XBlockVisibilityTestCase(ModuleStoreTestCase):
@@ -386,6 +349,7 @@ class GroupVisibilityTest(CourseTestCase):
     """
     Test content group access rules.
     """
+
     def setUp(self):
         super(GroupVisibilityTest, self).setUp()
 
@@ -400,6 +364,43 @@ class GroupVisibilityTest(CourseTestCase):
         self.vertical = self.store.get_item(vertical.location)
         self.html = self.store.get_item(html.location)
         self.problem = self.store.get_item(problem.location)
+
+        # Add partitions to the course
+        self.course.user_partitions = [
+            UserPartition(
+                id=0,
+                name="Partition 0",
+                description="Partition 0",
+                scheme=UserPartition.get_scheme("random"),
+                groups=[
+                    Group(id=0, name="Group A"),
+                    Group(id=1, name="Group B"),
+                ],
+            ),
+            UserPartition(
+                id=1,
+                name="Partition 1",
+                description="Partition 1",
+                scheme=UserPartition.get_scheme("random"),
+                groups=[
+                    Group(id=0, name="Group C"),
+                    Group(id=1, name="Group D"),
+                ],
+            ),
+            UserPartition(
+                id=2,
+                name="Partition 2",
+                description="Partition 2",
+                scheme=UserPartition.get_scheme("random"),
+                groups=[
+                    Group(id=0, name="Group E"),
+                    Group(id=1, name="Group F"),
+                    Group(id=2, name="Group G"),
+                    Group(id=3, name="Group H"),
+                ],
+            ),
+        ]
+        self.course = self.store.update_item(self.course, ModuleStoreEnum.UserID.test)
 
     def set_group_access(self, xblock, value):
         """ Sets group_access to specified value and calls update_item to persist the change. """
@@ -440,3 +441,173 @@ class GroupVisibilityTest(CourseTestCase):
         self.assertFalse(utils.is_visible_to_specific_content_groups(self.vertical))
         self.assertFalse(utils.is_visible_to_specific_content_groups(self.html))
         self.assertTrue(utils.is_visible_to_specific_content_groups(self.problem))
+
+
+class GetUserPartitionInfoTest(ModuleStoreTestCase):
+    """
+    Tests for utility function that retrieves user partition info
+    and formats it for consumption by the editing UI.
+    """
+
+    def setUp(self):
+        """Create a dummy course. """
+        super(GetUserPartitionInfoTest, self).setUp()
+        self.course = CourseFactory()
+        self.block = ItemFactory.create(category="problem", parent_location=self.course.location)  # pylint: disable=no-member
+
+        # Set up some default partitions
+        self._set_partitions([
+            UserPartition(
+                id=0,
+                name="Cohort user partition",
+                scheme=UserPartition.get_scheme("cohort"),
+                description="Cohorted user partition",
+                groups=[
+                    Group(id=0, name="Group A"),
+                    Group(id=1, name="Group B"),
+                ],
+            ),
+            UserPartition(
+                id=1,
+                name="Random user partition",
+                scheme=UserPartition.get_scheme("random"),
+                description="Random user partition",
+                groups=[
+                    Group(id=0, name="Group C"),
+                ],
+            ),
+        ])
+
+    def test_retrieves_partition_info_with_selected_groups(self):
+        # Initially, no group access is set on the block, so no groups should
+        # be marked as selected.
+        expected = [
+            {
+                "id": 0,
+                "name": "Cohort user partition",
+                "scheme": "cohort",
+                "groups": [
+                    {
+                        "id": 0,
+                        "name": "Group A",
+                        "selected": False,
+                        "deleted": False,
+                    },
+                    {
+                        "id": 1,
+                        "name": "Group B",
+                        "selected": False,
+                        "deleted": False,
+                    },
+                ]
+            },
+            {
+                "id": 1,
+                "name": "Random user partition",
+                "scheme": "random",
+                "groups": [
+                    {
+                        "id": 0,
+                        "name": "Group C",
+                        "selected": False,
+                        "deleted": False,
+                    },
+                ]
+            }
+        ]
+        self.assertEqual(self._get_partition_info(), expected)
+
+        # Update group access and expect that now one group is marked as selected.
+        self._set_group_access({0: [1]})
+        expected[0]["groups"][1]["selected"] = True
+        self.assertEqual(self._get_partition_info(), expected)
+
+    def test_deleted_groups(self):
+        # Select a group that is not defined in the partition
+        self._set_group_access({0: [3]})
+
+        # Expect that the group appears as selected but is marked as deleted
+        partitions = self._get_partition_info()
+        groups = partitions[0]["groups"]
+        self.assertEqual(len(groups), 3)
+        self.assertEqual(groups[2], {
+            "id": 3,
+            "name": "Deleted group",
+            "selected": True,
+            "deleted": True
+        })
+
+    def test_filter_by_partition_scheme(self):
+        partitions = self._get_partition_info(schemes=["random"])
+        self.assertEqual(len(partitions), 1)
+        self.assertEqual(partitions[0]["scheme"], "random")
+
+    def test_exclude_inactive_partitions(self):
+        # Include an inactive verification scheme
+        self._set_partitions([
+            UserPartition(
+                id=0,
+                name="Cohort user partition",
+                scheme=UserPartition.get_scheme("cohort"),
+                description="Cohorted user partition",
+                groups=[
+                    Group(id=0, name="Group A"),
+                    Group(id=1, name="Group B"),
+                ],
+            ),
+            UserPartition(
+                id=1,
+                name="Verification user partition",
+                scheme=UserPartition.get_scheme("verification"),
+                description="Verification user partition",
+                groups=[
+                    Group(id=0, name="Group C"),
+                ],
+                active=False,
+            ),
+        ])
+
+        # Expect that the inactive scheme is excluded from the results
+        partitions = self._get_partition_info()
+        self.assertEqual(len(partitions), 1)
+        self.assertEqual(partitions[0]["scheme"], "cohort")
+
+    def test_exclude_partitions_with_no_groups(self):
+        # The cohort partition has no groups defined
+        self._set_partitions([
+            UserPartition(
+                id=0,
+                name="Cohort user partition",
+                scheme=UserPartition.get_scheme("cohort"),
+                description="Cohorted user partition",
+                groups=[],
+            ),
+            UserPartition(
+                id=1,
+                name="Verification user partition",
+                scheme=UserPartition.get_scheme("verification"),
+                description="Verification user partition",
+                groups=[
+                    Group(id=0, name="Group C"),
+                ],
+            ),
+        ])
+
+        # Expect that the partition with no groups is excluded from the results
+        partitions = self._get_partition_info()
+        self.assertEqual(len(partitions), 1)
+        self.assertEqual(partitions[0]["scheme"], "verification")
+
+    def _set_partitions(self, partitions):
+        """Set the user partitions of the course descriptor. """
+        self.course.user_partitions = partitions
+        self.course = self.store.update_item(self.course, ModuleStoreEnum.UserID.test)
+
+    def _set_group_access(self, group_access):
+        """Set group access of the block. """
+        self.block.group_access = group_access
+        self.block = self.store.update_item(self.block, ModuleStoreEnum.UserID.test)
+
+    def _get_partition_info(self, schemes=None):
+        """Retrieve partition info and selected groups. """
+        return utils.get_user_partition_info(self.block, schemes=schemes)

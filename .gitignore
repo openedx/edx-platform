@@ -76,13 +76,15 @@ lms/static/certificates/css/
 cms/static/css/
 
 ### Styling generated from templates
-lms/static/sass/lms-main.scss
-lms/static/sass/lms-main-rtl.scss
-lms/static/sass/lms-course.scss
-lms/static/sass/lms-course-rtl.scss
-lms/static/sass/lms-footer.scss
-lms/static/sass/lms-footer-rtl.scss
-
+lms/static/sass/*.css
+lms/static/sass/*.css.map
+lms/static/certificates/sass/*.css
+lms/static/themed_sass/
+cms/static/css/
+cms/static/sass/*.css
+cms/static/sass/*.css.map
+cms/static/themed_sass/
+themes/**/css/*.css
 
 ### Logging artifacts
 log/

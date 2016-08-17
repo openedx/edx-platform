@@ -1,0 +1,20 @@
+## mako
+<%!
+from microsite_configuration import microsite
+%>
+<%
+theme_enabled = settings.FEATURES.get("USE_CUSTOM_THEME", False)
+is_microsite = microsite.is_request_in_microsite()
+%>
+
+## This file only exists as an additional layer of indirection to preserve
+## backwards compatibility with microsites and Stanford theming
+## (as much as possible). If you are writing your own theme using the
+## "comprehensive theming" system, do NOT override this file. You should
+## override "footer.html" instead.
+
+% if theme_enabled and not is_microsite:
+  <%include file="theme-footer.html" />
+% else:
+  <%include file="${microsite.get_template_path('footer.html')}" />
+% endif

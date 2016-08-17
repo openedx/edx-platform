@@ -3,15 +3,13 @@ Courseware views functions
 """
 
 import logging
-import urllib
 import json
-import cgi
+import textwrap
+import urllib
 
 from collections import OrderedDict
 from datetime import datetime
-from django.utils import translation
 from django.utils.translation import ugettext as _
-from django.utils.translation import ungettext
 
 from django.conf import settings
 from django.core.context_processors import csrf
@@ -19,24 +17,36 @@ from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User, AnonymousUser
 from django.contrib.auth.decorators import login_required
+from django.db import transaction
+from django.db.models import Q
 from django.utils.timezone import UTC
 from django.views.decorators.http import require_GET, require_POST, require_http_methods
-from django.http import Http404, HttpResponse, HttpResponseBadRequest
+from django.http import Http404, HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
 from django.shortcuts import redirect
 from certificates import api as certs_api
 from edxmako.shortcuts import render_to_response, render_to_string, marketing_link
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.cache import cache_control
-from django.db import transaction
+from ipware.ip import get_ip
 from markupsafe import escape
+from rest_framework import status
+import newrelic.agent
 
 from courseware import grades
-from courseware.access import has_access, in_preview_mode, _adjust_start_date_for_beta_testers
+from courseware.access import has_access, _adjust_start_date_for_beta_testers
+from courseware.access_response import StartDateError
+from courseware.access_utils import in_preview_mode
 from courseware.courses import (
-    get_courses, get_course,
-    get_studio_url, get_course_with_access,
+    get_courses,
+    get_course,
+    get_course_by_id,
+    get_permission_for_course_about,
+    get_studio_url,
+    get_course_overview_with_access,
+    get_course_with_access,
     sort_by_announcement,
     sort_by_start_date,
+    UserNotEnrolled
 )
 from courseware.masquerade import setup_masquerade
 from openedx.core.djangoapps.credit.api import (
@@ -44,7 +54,8 @@ from openedx.core.djangoapps.credit.api import (
     is_user_eligible_for_credit,
     is_credit_course
 )
-from courseware.model_data import FieldDataCache
+from courseware.models import StudentModuleHistory
+from courseware.model_data import FieldDataCache, ScoresClient
 from .module_render import toc_for_course, get_module_for_descriptor, get_module, get_module_by_usage_id
 from .entrance_exams import (
     course_has_entrance_exam,
@@ -56,11 +67,11 @@ from .entrance_exams import (
 from courseware.user_state_client import DjangoXBlockUserStateClient
 from course_modes.models import CourseMode
 
-from open_ended_grading import open_ended_notifications
-from open_ended_grading.views import StaffGradingTab, PeerGradingTab, OpenEndedGradingTab
 from student.models import UserTestGroup, CourseEnrollment
 from student.views import is_course_blocked
 from util.cache import cache, cache_if_anonymous
+from util.date_utils import strftime_localized
+from util.db import outer_atomic
 from xblock.fragment import Fragment
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError, NoPathToItem
@@ -71,13 +82,12 @@ from shoppingcart.models import CourseRegistrationCode
 from shoppingcart.utils import is_shopping_cart_enabled
 from opaque_keys import InvalidKeyError
 from util.milestones_helpers import get_prerequisite_courses_display
+from util.views import _record_feedback_in_zendesk
 
 from microsite_configuration import microsite
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from instructor.enrollment import uses_shib
-
-from util.db import commit_on_success_with_read_committed
 
 import survey.utils
 import survey.views
@@ -140,7 +150,7 @@ def courses(request):
     )
 
 
-def render_accordion(request, course, chapter, section, field_data_cache):
+def render_accordion(user, request, course, chapter, section, field_data_cache):
     """
     Draws navigation bar. Takes current position in accordion as
     parameter.
@@ -152,7 +162,7 @@ def render_accordion(request, course, chapter, section, field_data_cache):
     Returns the html string
     """
     # grab the table of contents
-    toc = toc_for_course(request, course, chapter, section, field_data_cache)
+    toc = toc_for_course(user, request, course, chapter, section, field_data_cache)
 
     context = dict([
         ('toc', toc),
@@ -281,41 +291,12 @@ def save_positions_recursively_up(user, request, field_data_cache, xmodule, cour
         current_module = parent
 
 
-def chat_settings(course, user):
-    """
-    Returns a dict containing the settings required to connect to a
-    Jabber chat server and room.
-    """
-    domain = getattr(settings, "JABBER_DOMAIN", None)
-    if domain is None:
-        log.warning('You must set JABBER_DOMAIN in the settings to '
-                    'enable the chat widget')
-        return None
-
-    return {
-        'domain': domain,
-
-        # Jabber doesn't like slashes, so replace with dashes
-        'room': "{ID}_class".format(ID=course.id.replace('/', '-')),
-
-        'username': "{USER}@{DOMAIN}".format(
-            USER=user.username, DOMAIN=domain
-        ),
-
-        # TODO: clearly this needs to be something other than the username
-        #       should also be something that's not necessarily tied to a
-        #       particular course
-        'password': "{USER}@{DOMAIN}".format(
-            USER=user.username, DOMAIN=domain
-        ),
-    }
-
-
+@transaction.non_atomic_requests
 @login_required
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @ensure_valid_course_key
-@commit_on_success_with_read_committed
+@outer_atomic(read_committed=True)
 def index(request, course_id, chapter=None, section=None,
           position=None):
     """
@@ -342,6 +323,10 @@ def index(request, course_id, chapter=None, section=None,
     """
 
     course_key = CourseKey.from_string(course_id)
+
+    # Gather metrics for New Relic so we can slice data in New Relic Insights
+    newrelic.agent.add_custom_parameter('course_id', unicode(course_key))
+    newrelic.agent.add_custom_parameter('org', unicode(course_key.org))
 
     user = User.objects.prefetch_related("groups").get(id=request.user.id)
 
@@ -379,10 +364,10 @@ def _index_bulk_op(request, course_key, chapter, section, position):
         except ValueError:
             raise Http404(u"Position {} is not an integer!".format(position))
 
-    user = request.user
-    course = get_course_with_access(user, 'load', course_key, depth=2)
+    course = get_course_with_access(request.user, 'load', course_key, depth=2)
+    staff_access = has_access(request.user, 'staff', course)
+    masquerade, user = setup_masquerade(request, course_key, staff_access, reset_masquerade_data=True)
 
-    staff_access = has_access(user, 'staff', course)
     registered = registered_for_course(course, user)
     if not registered:
         # TODO (vshnayder): do course instructors need to be registered to see course?
@@ -414,8 +399,6 @@ def _index_bulk_op(request, course_key, chapter, section, position):
     if survey.utils.must_answer_survey(course, user):
         return redirect(reverse('course_survey', args=[unicode(course.id)]))
 
-    masquerade = setup_masquerade(request, course_key, staff_access)
-
     try:
         field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
             course_key, user, course, depth=2)
@@ -432,7 +415,7 @@ def _index_bulk_op(request, course_key, chapter, section, position):
 
         context = {
             'csrf': csrf(request)['csrf_token'],
-            'accordion': render_accordion(request, course, chapter, section, field_data_cache),
+            'accordion': render_accordion(user, request, course, chapter, section, field_data_cache),
             'COURSE_TITLE': course.display_name_with_default,
             'course': course,
             'init': '',
@@ -471,18 +454,6 @@ def _index_bulk_op(request, course_key, chapter, section, position):
             # passing CONTENT_DEPTH avoids returning 404 for a course with an
             # empty first section and a second section with content
             return redirect_to_course_position(course_module, CONTENT_DEPTH)
-
-        # Only show the chat if it's enabled by the course and in the
-        # settings.
-        show_chat = course.show_chat and settings.FEATURES['ENABLE_CHAT']
-        if show_chat:
-            context['chat'] = chat_settings(course, user)
-            # If we couldn't load the chat settings, then don't show
-            # the widget in the courseware.
-            if context['chat'] is None:
-                show_chat = False
-
-        context['show_chat'] = show_chat
 
         chapter_descriptor = course.get_child_by(lambda m: m.location.name == chapter)
         if chapter_descriptor is not None:
@@ -537,7 +508,7 @@ def _index_bulk_op(request, course_key, chapter, section, position):
             )
 
             section_module = get_module_for_descriptor(
-                request.user,
+                user,
                 request,
                 section_descriptor,
                 field_data_cache,
@@ -551,9 +522,10 @@ def _index_bulk_op(request, course_key, chapter, section, position):
                 # they don't have access to.
                 raise Http404
 
-            # Save where we are in the chapter
+            # Save where we are in the chapter.
             save_child_position(chapter_module, section)
-            context['fragment'] = section_module.render(STUDENT_VIEW)
+            section_render_context = {'activate_block_id': request.GET.get('activate_block_id')}
+            context['fragment'] = section_module.render(STUDENT_VIEW, section_render_context)
             context['section_title'] = section_descriptor.display_name_with_default
         else:
             # section is none, so display a message
@@ -599,14 +571,9 @@ def _index_bulk_op(request, course_key, chapter, section, position):
             raise
         else:
             log.exception(
-                u"Error in index view: user={user}, course={course}, chapter={chapter}"
-                u" section={section} position={position}".format(
-                    user=user,
-                    course=course,
-                    chapter=chapter,
-                    section=section,
-                    position=position
-                ))
+                u"Error in index view: user=%s, effective_user=%s, course=%s, chapter=%s section=%s position=%s",
+                request.user, user, course, chapter, section, position
+            )
             try:
                 result = render_to_response('courseware/courseware-error.html', {
                     'staff_access': staff_access,
@@ -638,9 +605,12 @@ def jump_to_id(request, course_id, module_id):
             ))
     if len(items) > 1:
         log.warning(
-            u"Multiple items found with id: {0} in course_id: {1}. Referer: {2}. Using first: {3}".format(
-                module_id, course_id, request.META.get("HTTP_REFERER", ""), items[0].location.to_deprecated_string()
-            ))
+            u"Multiple items found with id: %s in course_id: %s. Referer: %s. Using first: %s",
+            module_id,
+            course_id,
+            request.META.get("HTTP_REFERER", ""),
+            items[0].location.to_deprecated_string()
+        )
 
     return jump_to(request, course_id, items[0].location.to_deprecated_string())
 
@@ -679,22 +649,36 @@ def course_info(request, course_id):
     Assumes the course_id is in a valid format.
     """
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
-
     with modulestore().bulk_operations(course_key):
-        course = get_course_with_access(request.user, 'load', course_key)
+        course = get_course_by_id(course_key, depth=2)
+        access_response = has_access(request.user, 'load', course, course_key)
+
+        if not access_response:
+
+            # The user doesn't have access to the course. If they're
+            # denied permission due to the course not being live yet,
+            # redirect to the dashboard page.
+            if isinstance(access_response, StartDateError):
+                start_date = strftime_localized(course.start, 'SHORT_DATE')
+                params = urllib.urlencode({'notlive': start_date})
+                return redirect('{0}?{1}'.format(reverse('dashboard'), params))
+            # Otherwise, give a 404 to avoid leaking info about access
+            # control.
+            raise Http404("Course not found.")
+
+        staff_access = has_access(request.user, 'staff', course)
+        masquerade, user = setup_masquerade(request, course_key, staff_access, reset_masquerade_data=True)
 
         # If the user needs to take an entrance exam to access this course, then we'll need
         # to send them to that specific course module before allowing them into other areas
-        if user_must_complete_entrance_exam(request, request.user, course):
+        if user_must_complete_entrance_exam(request, user, course):
             return redirect(reverse('courseware', args=[unicode(course.id)]))
 
         # check to see if there is a required survey that must be taken before
         # the user can access the course.
-        if request.user.is_authenticated() and survey.utils.must_answer_survey(course, request.user):
+        if request.user.is_authenticated() and survey.utils.must_answer_survey(course, user):
             return redirect(reverse('course_survey', args=[unicode(course.id)]))
 
-        staff_access = has_access(request.user, 'staff', course)
-        masquerade = setup_masquerade(request, course_key, staff_access)  # allow staff to masquerade on the info page
         studio_url = get_studio_url(course, 'course_info')
 
         # link to where the student should go to enroll in the course:
@@ -703,7 +687,7 @@ def course_info(request, course_id):
         if settings.FEATURES.get('ENABLE_MKTG_SITE'):
             url_to_enroll = marketing_link('COURSES')
 
-        show_enroll_banner = request.user.is_authenticated() and not CourseEnrollment.is_enrolled(request.user, course.id)
+        show_enroll_banner = request.user.is_authenticated() and not CourseEnrollment.is_enrolled(user, course.id)
 
         context = {
             'request': request,
@@ -718,7 +702,7 @@ def course_info(request, course_id):
         }
 
         now = datetime.now(UTC())
-        effective_start = _adjust_start_date_for_beta_testers(request.user, course, course_key)
+        effective_start = _adjust_start_date_for_beta_testers(user, course, course_key)
         if not in_preview_mode() and staff_access and now < effective_start:
             # Disable student view button if user is staff and
             # course is not yet visible to students.
@@ -771,7 +755,7 @@ def syllabus(request, course_id):
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
 
     course = get_course_with_access(request.user, 'load', course_key)
-    staff_access = has_access(request.user, 'staff', course)
+    staff_access = bool(has_access(request.user, 'staff', course))
 
     return render_to_response('courseware/syllabus.html', {
         'course': course,
@@ -822,18 +806,15 @@ def course_about(request, course_id):
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
 
     with modulestore().bulk_operations(course_key):
-        permission_name = microsite.get_value(
-            'COURSE_ABOUT_VISIBILITY_PERMISSION',
-            settings.COURSE_ABOUT_VISIBILITY_PERMISSION
-        )
-        course = get_course_with_access(request.user, permission_name, course_key)
+        permission = get_permission_for_course_about()
+        course = get_course_with_access(request.user, permission, course_key)
 
         if microsite.get_value('ENABLE_MKTG_SITE', settings.FEATURES.get('ENABLE_MKTG_SITE', False)):
             return redirect(reverse('info', args=[course.id.to_deprecated_string()]))
 
         registered = registered_for_course(course, request.user)
 
-        staff_access = has_access(request.user, 'staff', course)
+        staff_access = bool(has_access(request.user, 'staff', course))
         studio_url = get_studio_url(course, 'settings/details')
 
         if has_access(request.user, 'load', course):
@@ -841,7 +822,7 @@ def course_about(request, course_id):
         else:
             course_target = reverse('about_course', args=[course.id.to_deprecated_string()])
 
-        show_courseware_link = (
+        show_courseware_link = bool(
             (
                 has_access(request.user, 'load', course)
                 and has_access(request.user, 'view_courseware_with_prerequisites', course)
@@ -870,7 +851,7 @@ def course_about(request, course_id):
         can_add_course_to_cart = _is_shopping_cart_enabled and registration_price
 
         # Used to provide context to message to student if enrollment not allowed
-        can_enroll = has_access(request.user, 'enroll', course)
+        can_enroll = bool(has_access(request.user, 'enroll', course))
         invitation_only = course.invitation_only
         is_course_full = CourseEnrollment.objects.is_course_full(course)
 
@@ -910,112 +891,17 @@ def course_about(request, course_id):
         })
 
 
-@ensure_csrf_cookie
-@cache_if_anonymous('org')
-@ensure_valid_course_key
-def mktg_course_about(request, course_id):
-    """This is the button that gets put into an iframe on the Drupal site."""
-    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
-
-    try:
-        permission_name = microsite.get_value(
-            'COURSE_ABOUT_VISIBILITY_PERMISSION',
-            settings.COURSE_ABOUT_VISIBILITY_PERMISSION
-        )
-        course = get_course_with_access(request.user, permission_name, course_key)
-    except (ValueError, Http404):
-        # If a course does not exist yet, display a "Coming Soon" button
-        return render_to_response(
-            'courseware/mktg_coming_soon.html', {'course_id': course_key.to_deprecated_string()}
-        )
-
-    registered = registered_for_course(course, request.user)
-
-    if has_access(request.user, 'load', course):
-        course_target = reverse('info', args=[course.id.to_deprecated_string()])
-    else:
-        course_target = reverse('about_course', args=[course.id.to_deprecated_string()])
-
-    allow_registration = has_access(request.user, 'enroll', course)
-
-    show_courseware_link = (has_access(request.user, 'load', course) or
-                            settings.FEATURES.get('ENABLE_LMS_MIGRATION'))
-    course_modes = CourseMode.modes_for_course_dict(course.id)
-
-    context = {
-        'course': course,
-        'registered': registered,
-        'allow_registration': allow_registration,
-        'course_target': course_target,
-        'show_courseware_link': show_courseware_link,
-        'course_modes': course_modes,
-    }
-
-    # The edx.org marketing site currently displays only in English.
-    # To avoid displaying a different language in the register / access button,
-    # we force the language to English.
-    # However, OpenEdX installations with a different marketing front-end
-    # may want to respect the language specified by the user or the site settings.
-    force_english = settings.FEATURES.get('IS_EDX_DOMAIN', False)
-    if force_english:
-        translation.activate('en-us')
-
-    if settings.FEATURES.get('ENABLE_MKTG_EMAIL_OPT_IN'):
-        # Drupal will pass organization names using a GET parameter, as follows:
-        #     ?org=Harvard
-        #     ?org=Harvard,MIT
-        # If no full names are provided, the marketing iframe won't show the
-        # email opt-in checkbox.
-        org = request.GET.get('org')
-        if org:
-            org_list = org.split(',')
-            # HTML-escape the provided organization names
-            org_list = [cgi.escape(org) for org in org_list]
-            if len(org_list) > 1:
-                if len(org_list) > 2:
-                    # Translators: The join of three or more institution names (e.g., Harvard, MIT, and Dartmouth).
-                    org_name_string = _("{first_institutions}, and {last_institution}").format(
-                        first_institutions=u", ".join(org_list[:-1]),
-                        last_institution=org_list[-1]
-                    )
-                else:
-                    # Translators: The join of two institution names (e.g., Harvard and MIT).
-                    org_name_string = _("{first_institution} and {second_institution}").format(
-                        first_institution=org_list[0],
-                        second_institution=org_list[1]
-                    )
-            else:
-                org_name_string = org_list[0]
-
-            context['checkbox_label'] = ungettext(
-                "I would like to receive email from {institution_series} and learn about its other programs.",
-                "I would like to receive email from {institution_series} and learn about their other programs.",
-                len(org_list)
-            ).format(institution_series=org_name_string)
-
-    try:
-        return render_to_response('courseware/mktg_course_about.html', context)
-    finally:
-        # Just to be safe, reset the language if we forced it to be English.
-        if force_english:
-            translation.deactivate()
-
-
+@transaction.non_atomic_requests
 @login_required
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@transaction.commit_manually
 @ensure_valid_course_key
 def progress(request, course_id, student_id=None):
-    """
-    Wraps "_progress" with the manual_transaction context manager just in case
-    there are unanticipated errors.
-    """
+    """ Display the progress page. """
 
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
 
     with modulestore().bulk_operations(course_key):
-        with grades.manual_transaction():
-            return _progress(request, course_key, student_id)
+        return _progress(request, course_key, student_id)
 
 
 def _progress(request, course_key, student_id):
@@ -1033,7 +919,7 @@ def _progress(request, course_key, student_id):
     if survey.utils.must_answer_survey(course, request.user):
         return redirect(reverse('course_survey', args=[unicode(course.id)]))
 
-    staff_access = has_access(request.user, 'staff', course)
+    staff_access = bool(has_access(request.user, 'staff', course))
 
     if student_id is None or student_id == request.user.id:
         # always allowed to see your own profile
@@ -1055,9 +941,17 @@ def _progress(request, course_key, student_id):
     # additional DB lookup (this kills the Progress page in particular).
     student = User.objects.prefetch_related("groups").get(id=student.id)
 
-    courseware_summary = grades.progress_summary(student, request, course)
+    with outer_atomic():
+        field_data_cache = grades.field_data_cache_for_grading(course, student)
+        scores_client = ScoresClient.from_field_data_cache(field_data_cache)
+
+    courseware_summary = grades.progress_summary(
+        student, request, course, field_data_cache=field_data_cache, scores_client=scores_client
+    )
+    grade_summary = grades.grade(
+        student, request, course, field_data_cache=field_data_cache, scores_client=scores_client
+    )
     studio_url = get_studio_url(course, 'settings/grading')
-    grade_summary = grades.grade(student, request, course)
 
     if courseware_summary is None:
         #This means the student didn't have access to the course (which the instructor requested)
@@ -1079,19 +973,14 @@ def _progress(request, course_key, student_id):
     }
 
     if show_generate_cert_btn:
-        context.update(certs_api.certificate_downloadable_status(student, course_key))
+        cert_status = certs_api.certificate_downloadable_status(student, course_key)
+        context.update(cert_status)
         # showing the certificate web view button if feature flags are enabled.
-        if settings.FEATURES.get('CERTIFICATES_HTML_VIEW', False):
+        if certs_api.has_html_certificates_enabled(course_key, course):
             if certs_api.get_active_web_certificate(course) is not None:
                 context.update({
                     'show_cert_web_view': True,
-                    'cert_web_view_url': u'{url}'.format(
-                        url=certs_api.get_certificate_url(
-                            user_id=student.id,
-                            course_id=unicode(course.id),
-                            verify_uuid=None
-                        )
-                    )
+                    'cert_web_view_url': certs_api.get_certificate_url(course_id=course_key, uuid=cert_status['uuid']),
                 })
             else:
                 context.update({
@@ -1100,7 +989,7 @@ def _progress(request, course_key, student_id):
                     'download_url': None
                 })
 
-    with grades.manual_transaction():
+    with outer_atomic():
         response = render_to_response('courseware/progress.html', context)
 
     return response
@@ -1121,6 +1010,9 @@ def _credit_course_requirements(course_key, student):
     # should NOT be displayed on the progress page.
     if not (settings.FEATURES.get("ENABLE_CREDIT_ELIGIBILITY", False) and is_credit_course(course_key)):
         return None
+
+    # Credit requirement statuses for which user does not remain eligible to get credit.
+    non_eligible_statuses = ['failed', 'declined']
 
     # Retrieve the status of the user for each eligibility requirement in the course.
     # For each requirement, the user's status is either "satisfied", "failed", or None.
@@ -1145,7 +1037,7 @@ def _credit_course_requirements(course_key, student):
 
     # If the user has *failed* any requirements (for example, if a photo verification is denied),
     # then the user is NOT eligible for credit.
-    elif any(requirement['status'] == 'failed' for requirement in requirement_statuses):
+    elif any(requirement['status'] in non_eligible_statuses for requirement in requirement_statuses):
         eligibility_status = "not_eligible"
 
     # Otherwise, the user may be eligible for credit, but the user has not
@@ -1175,8 +1067,8 @@ def submission_history(request, course_id, student_username, location):
     except (InvalidKeyError, AssertionError):
         return HttpResponse(escape(_(u'Invalid location.')))
 
-    course = get_course_with_access(request.user, 'load', course_key)
-    staff_access = has_access(request.user, 'staff', course)
+    course = get_course_overview_with_access(request.user, 'load', course_key)
+    staff_access = bool(has_access(request.user, 'staff', course))
 
     # Permission Denied if they don't have staff access and are trying to see
     # somebody else's submission history.
@@ -1185,40 +1077,51 @@ def submission_history(request, course_id, student_username, location):
 
     user_state_client = DjangoXBlockUserStateClient()
     try:
-        history_entries = user_state_client.get_history(student_username, usage_key)
+        history_entries = list(user_state_client.get_history(student_username, usage_key))
     except DjangoXBlockUserStateClient.DoesNotExist:
         return HttpResponse(escape(_(u'User {username} has never accessed problem {location}').format(
             username=student_username,
             location=location
         )))
 
+    # This is ugly, but until we have a proper submissions API that we can use to provide
+    # the scores instead, it will have to do.
+    scores = list(StudentModuleHistory.objects.filter(
+        student_module__module_state_key=usage_key,
+        student_module__student__username=student_username,
+        student_module__course_id=course_key
+    ).order_by('-id'))
+
+    if len(scores) != len(history_entries):
+        log.warning(
+            "Mismatch when fetching scores for student "
+            "history for course %s, user %s, xblock %s. "
+            "%d scores were found, and %d history entries were found. "
+            "Matching scores to history entries by date for display.",
+            course_id,
+            student_username,
+            location,
+            len(scores),
+            len(history_entries),
+        )
+        scores_by_date = {
+            score.created: score
+            for score in scores
+        }
+        scores = [
+            scores_by_date[history.updated]
+            for history in history_entries
+        ]
+
     context = {
         'history_entries': history_entries,
+        'scores': scores,
         'username': student_username,
         'location': location,
         'course_id': course_key.to_deprecated_string()
     }
 
     return render_to_response('courseware/submission_history.html', context)
-
-
-def notification_image_for_tab(course_tab, user, course):
-    """
-    Returns the notification image path for the given course_tab if applicable, otherwise None.
-    """
-
-    tab_notification_handlers = {
-        StaffGradingTab.type: open_ended_notifications.staff_grading_notifications,
-        PeerGradingTab.type: open_ended_notifications.peer_grading_notifications,
-        OpenEndedGradingTab.type: open_ended_notifications.combined_notifications
-    }
-
-    if course_tab.name in tab_notification_handlers:
-        notifications = tab_notification_handlers[course_tab.name](course, user)
-        if notifications and notifications['pending_grading']:
-            return notifications['img_path']
-
-    return None
 
 
 def get_static_tab_contents(request, course, tab):
@@ -1236,7 +1139,7 @@ def get_static_tab_contents(request, course, tab):
         request.user, request, loc, field_data_cache, static_asset_path=course.static_asset_path, course=course
     )
 
-    logging.debug('course_module = {0}'.format(tab_module))
+    logging.debug('course_module = %s', tab_module)
 
     html = ''
     if tab_module is not None:
@@ -1245,7 +1148,7 @@ def get_static_tab_contents(request, course, tab):
         except Exception:  # pylint: disable=broad-except
             html = render_to_string('courseware/error-message.html', None)
             log.exception(
-                u"Error rendering course={course}, tab={tab_url}".format(course=course, tab_url=tab['url_slug'])
+                u"Error rendering course=%s, tab=%s", course, tab['url_slug']
             )
 
     return html
@@ -1360,6 +1263,8 @@ def is_course_passed(course, grade_summary=None, student=None, request=None):
     return success_cutoff and grade_summary['percent'] >= success_cutoff
 
 
+# Grades can potentially be written - if so, let grading manage the transaction.
+@transaction.non_atomic_requests
 @require_POST
 def generate_user_cert(request, course_id):
     """Start generating a new certificate for the user.
@@ -1430,9 +1335,9 @@ def _track_successful_certificate_generation(user_id, course_id):  # pylint: dis
         None
 
     """
-    if settings.FEATURES.get('SEGMENT_IO_LMS') and hasattr(settings, 'SEGMENT_IO_LMS_KEY'):
-        event_name = 'edx.bi.user.certificate.generate'  # pylint: disable=no-member
-        tracking_context = tracker.get_tracker().resolve_context()  # pylint: disable=no-member
+    if settings.LMS_SEGMENT_KEY:
+        event_name = 'edx.bi.user.certificate.generate'
+        tracking_context = tracker.get_tracker().resolve_context()
 
         analytics.track(
             user_id,
@@ -1442,6 +1347,7 @@ def _track_successful_certificate_generation(user_id, course_id):  # pylint: dis
                 'label': unicode(course_id)
             },
             context={
+                'ip': tracking_context.get('ip'),
                 'Google Analytics': {
                     'clientId': tracking_context.get('client_id')
                 }
@@ -1459,9 +1365,16 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True):
     usage_key = usage_key.replace(course_key=modulestore().fill_in_run(usage_key.course_key))
     course_key = usage_key.course_key
 
+    requested_view = request.GET.get('view', 'student_view')
+    if requested_view != 'student_view':
+        return HttpResponseBadRequest("Rendering of the xblock view '{}' is not supported.".format(requested_view))
+
     with modulestore().bulk_operations(course_key):
         # verify the user has access to the course, including enrollment check
-        course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=check_if_enrolled)
+        try:
+            course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=check_if_enrolled)
+        except UserNotEnrolled:
+            raise Http404("Course not found.")
 
         # get the block, which verifies whether the user has access to the block.
         block, _ = get_module_by_usage_id(
@@ -1474,9 +1387,227 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True):
             'disable_accordion': True,
             'allow_iframing': True,
             'disable_header': True,
+            'disable_footer': True,
             'disable_window_wrap': True,
             'disable_preview_menu': True,
-            'staff_access': has_access(request.user, 'staff', course),
+            'staff_access': bool(has_access(request.user, 'staff', course)),
             'xqa_server': settings.FEATURES.get('XQA_SERVER', 'http://your_xqa_server.com'),
         }
         return render_to_response('courseware/courseware-chromeless.html', context)
+
+
+# Translators: "percent_sign" is the symbol "%". "platform_name" is a
+# string identifying the name of this installation, such as "edX".
+FINANCIAL_ASSISTANCE_HEADER = _(
+    '{platform_name} now offers financial assistance for learners who want to earn Verified Certificates but'
+    ' who may not be able to pay the Verified Certificate fee. Eligible learners may receive up to 90{percent_sign} off'
+    ' the Verified Certificate fee for a course.\nTo apply for financial assistance, enroll in the'
+    ' audit track for a course that offers Verified Certificates, and then complete this application.'
+    ' Note that you must complete a separate application for each course you take.\n We plan to use this'
+    ' information to evaluate your application for financial assistance and to further develop our'
+    ' financial assistance program.'
+).format(
+    percent_sign="%",
+    platform_name=settings.PLATFORM_NAME
+).split('\n')
+
+
+FA_INCOME_LABEL = _('Annual Household Income')
+FA_REASON_FOR_APPLYING_LABEL = _(
+    'Tell us about your current financial situation. Why do you need assistance?'
+)
+FA_GOALS_LABEL = _(
+    'Tell us about your learning or professional goals. How will a Verified Certificate in'
+    ' this course help you achieve these goals?'
+)
+FA_EFFORT_LABEL = _(
+    'Tell us about your plans for this course. What steps will you take to help you complete'
+    ' the course work and receive a certificate?'
+)
+FA_SHORT_ANSWER_INSTRUCTIONS = _('Use between 250 and 500 words or so in your response.')
+
+
+@login_required
+def financial_assistance(_request):
+    """Render the initial financial assistance page."""
+    return render_to_response('financial-assistance/financial-assistance.html', {
+        'header_text': FINANCIAL_ASSISTANCE_HEADER
+    })
+
+
+@login_required
+@require_POST
+def financial_assistance_request(request):
+    """Submit a request for financial assistance to Zendesk."""
+    try:
+        data = json.loads(request.body)
+        # Simple sanity check that the session belongs to the user
+        # submitting an FA request
+        username = data['username']
+        if request.user.username != username:
+            return HttpResponseForbidden()
+
+        course_id = data['course']
+        course = modulestore().get_course(CourseKey.from_string(course_id))
+        legal_name = data['name']
+        email = data['email']
+        country = data['country']
+        income = data['income']
+        reason_for_applying = data['reason_for_applying']
+        goals = data['goals']
+        effort = data['effort']
+        marketing_permission = data['mktg-permission']
+        ip_address = get_ip(request)
+    except ValueError:
+        # Thrown if JSON parsing fails
+        return HttpResponseBadRequest(u'Could not parse request JSON.')
+    except InvalidKeyError:
+        # Thrown if course key parsing fails
+        return HttpResponseBadRequest(u'Could not parse request course key.')
+    except KeyError as err:
+        # Thrown if fields are missing
+        return HttpResponseBadRequest(u'The field {} is required.'.format(err.message))
+
+    zendesk_submitted = _record_feedback_in_zendesk(
+        legal_name,
+        email,
+        u'Financial assistance request for learner {username} in course {course_name}'.format(
+            username=username,
+            course_name=course.display_name
+        ),
+        u'Financial Assistance Request',
+        {'course_id': course_id},
+        # Send the application as additional info on the ticket so
+        # that it is not shown when support replies. This uses
+        # OrderedDict so that information is presented in the right
+        # order.
+        OrderedDict((
+            ('Username', username),
+            ('Full Name', legal_name),
+            ('Course ID', course_id),
+            ('Annual Household Income', income),
+            ('Country', country),
+            ('Allowed for marketing purposes', 'Yes' if marketing_permission else 'No'),
+            (FA_REASON_FOR_APPLYING_LABEL, '\n' + reason_for_applying + '\n\n'),
+            (FA_GOALS_LABEL, '\n' + goals + '\n\n'),
+            (FA_EFFORT_LABEL, '\n' + effort + '\n\n'),
+            ('Client IP', ip_address),
+        )),
+        group_name='Financial Assistance',
+        require_update=True
+    )
+
+    if not zendesk_submitted:
+        # The call to Zendesk failed. The frontend will display a
+        # message to the user.
+        return HttpResponse(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    return HttpResponse(status=status.HTTP_204_NO_CONTENT)
+
+
+@login_required
+def financial_assistance_form(request):
+    """Render the financial assistance application form page."""
+    user = request.user
+    enrolled_courses = [
+        {'name': enrollment.course_overview.display_name, 'value': unicode(enrollment.course_id)}
+        for enrollment in CourseEnrollment.enrollments_for_user(user).order_by('-created')
+        if CourseMode.objects.filter(
+            Q(_expiration_datetime__isnull=True) | Q(_expiration_datetime__gt=datetime.now(UTC())),
+            course_id=enrollment.course_id,
+            mode_slug=CourseMode.VERIFIED
+        ).exists()
+        and enrollment.mode != CourseMode.VERIFIED
+    ]
+    return render_to_response('financial-assistance/apply.html', {
+        'header_text': FINANCIAL_ASSISTANCE_HEADER,
+        'student_faq_url': marketing_link('FAQ'),
+        'dashboard_url': reverse('dashboard'),
+        'account_settings_url': reverse('account_settings'),
+        'platform_name': settings.PLATFORM_NAME,
+        'user_details': {
+            'email': user.email,
+            'username': user.username,
+            'name': user.profile.name,
+            'country': str(user.profile.country.name),
+        },
+        'submit_url': reverse('submit_financial_assistance_request'),
+        'fields': [
+            {
+                'name': 'course',
+                'type': 'select',
+                'label': _('Course'),
+                'placeholder': '',
+                'defaultValue': '',
+                'required': True,
+                'options': enrolled_courses,
+                'instructions': _(
+                    'Select the course for which you want to earn a verified certificate. If'
+                    ' the course does not appear in the list, make sure that you have enrolled'
+                    ' in the audit track for the course.'
+                )
+            },
+            {
+                'name': 'income',
+                'type': 'text',
+                'label': FA_INCOME_LABEL,
+                'placeholder': _('income in US Dollars ($)'),
+                'defaultValue': '',
+                'required': True,
+                'restrictions': {},
+                'instructions': _('Specify your annual household income in US Dollars.')
+            },
+            {
+                'name': 'reason_for_applying',
+                'type': 'textarea',
+                'label': FA_REASON_FOR_APPLYING_LABEL,
+                'placeholder': '',
+                'defaultValue': '',
+                'required': True,
+                'restrictions': {
+                    'min_length': settings.FINANCIAL_ASSISTANCE_MIN_LENGTH,
+                    'max_length': settings.FINANCIAL_ASSISTANCE_MAX_LENGTH
+                },
+                'instructions': FA_SHORT_ANSWER_INSTRUCTIONS
+            },
+            {
+                'name': 'goals',
+                'type': 'textarea',
+                'label': FA_GOALS_LABEL,
+                'placeholder': '',
+                'defaultValue': '',
+                'required': True,
+                'restrictions': {
+                    'min_length': settings.FINANCIAL_ASSISTANCE_MIN_LENGTH,
+                    'max_length': settings.FINANCIAL_ASSISTANCE_MAX_LENGTH
+                },
+                'instructions': FA_SHORT_ANSWER_INSTRUCTIONS
+            },
+            {
+                'name': 'effort',
+                'type': 'textarea',
+                'label': FA_EFFORT_LABEL,
+                'placeholder': '',
+                'defaultValue': '',
+                'required': True,
+                'restrictions': {
+                    'min_length': settings.FINANCIAL_ASSISTANCE_MIN_LENGTH,
+                    'max_length': settings.FINANCIAL_ASSISTANCE_MAX_LENGTH
+                },
+                'instructions': FA_SHORT_ANSWER_INSTRUCTIONS
+            },
+            {
+                'placeholder': '',
+                'name': 'mktg-permission',
+                'label': _(
+                    'I allow edX to use the information provided in this application '
+                    '(except for financial information) for edX marketing purposes.'
+                ),
+                'defaultValue': '',
+                'type': 'checkbox',
+                'required': False,
+                'instructions': '',
+                'restrictions': {}
+            }
+        ],
+    })

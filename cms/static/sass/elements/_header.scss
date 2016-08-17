@@ -336,36 +336,48 @@ body.howitworks .nav-not-signedin-hiw,
 body.dashboard .nav-account-dashboard,
 
 // course content
-body.course.outline .nav-course-courseware .title,
-body.course.updates .nav-course-courseware .title,
-body.course.pages .nav-course-courseware .title,
-body.course.uploads .nav-course-courseware .title,
+body.course.view-outline .nav-course-courseware .title,
+body.course.view-updates .nav-course-courseware .title,
+body.course.view-static-pages .nav-course-courseware .title,
+body.course.view-uploads .nav-course-courseware .title,
+body.course.view-textbooks .nav-course-courseware .title,
+body.course.view-video-uploads .nav-course-courseware .title,
 
-body.course.outline .nav-course-courseware-outline,
-body.course.updates .nav-course-courseware-updates,
-body.course.pages .nav-course-courseware-pages,
-body.course.uploads .nav-course-courseware-uploads,
-body.course.textbooks .nav-course-courseware-textbooks,
+body.course.view-outline .nav-course-courseware-outline,
+body.course.view-updates .nav-course-courseware-updates,
+body.course.view-static-pages .nav-course-courseware-pages,
+body.course.view-uploads .nav-course-courseware-uploads,
+body.course.view-textbooks .nav-course-courseware-textbooks,
+body.course.view-video-uploads .nav-course-courseware-video,
 
 // course settings
 body.course.schedule .nav-course-settings .title,
 body.course.grading .nav-course-settings .title,
-body.course.team .nav-course-settings .title,
+body.course.view-team .nav-course-settings .title,
+body.course.view-group-configurations .nav-course-settings .title,
 body.course.advanced .nav-course-settings .title,
+body.course.view-certificates .nav-course-settings .title,
 
 body.course.schedule .nav-course-settings-schedule,
 body.course.grading .nav-course-settings-grading,
-body.course.team .nav-course-settings-team,
+body.course.view-team .nav-course-settings-team,
+body.course.view-group-configurations .nav-course-settings-group-configurations,
 body.course.advanced .nav-course-settings-advanced,
+body.course.view-certificates .nav-course-settings-certificates,
 
 // course tools
-body.course.import .nav-course-tools .title,
-body.course.export .nav-course-tools .title,
-body.course.checklists .nav-course-tools .title,
+body.course.view-import .nav-course-tools .title,
+body.course.view-export .nav-course-tools .title,
+body.course.view-export-git .nav-course-tools .title,
 
-body.course.import .nav-course-tools-import,
-body.course.export .nav-course-tools-export,
-body.course.checklists .nav-course-tools-checklists,
+body.course.view-import .nav-course-tools-import,
+body.course.view-export .nav-course-tools-export,
+body.course.view-export-git .nav-course-tools-export-git,
+
+// content library settings
+body.course.view-team .nav-library-settings .title,
+
+body.course.view-team .nav-library-settings-team,
 
 {
   color: $blue;

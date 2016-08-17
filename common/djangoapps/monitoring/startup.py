@@ -1,4 +1,4 @@
 # Register signal handlers
-# pylint: disable=unused-imports
+# pylint: disable=unused-import
 import signals
 import exceptions

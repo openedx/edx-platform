@@ -14,14 +14,16 @@ import json
 import getpass
 
 try:
-    from path import path
+    from path import Path as path
     from git import Repo, Commit
     from git.refs.symbolic import SymbolicReference
+    from git.exc import GitCommandError
     from dateutil.parser import parse as parse_datestring
     import requests
+    import yaml
 except ImportError:
     print("Error: missing dependencies! Please run this command to install them:")
-    print("pip install path.py requests python-dateutil GitPython==0.3.2.RC1")
+    print("pip install path.py requests python-dateutil GitPython PyYAML")
     sys.exit(1)
 
 try:
@@ -31,9 +33,20 @@ except ImportError:
 
 JIRA_RE = re.compile(r"\b[A-Z]{2,}-\d+\b")
 PR_BRANCH_RE = re.compile(r"remotes/edx/pr/(\d+)")
-PROJECT_ROOT = path(__file__).abspath().dirname()
+
+
+def project_root():
+    directory = path(__file__).abspath().dirname()
+    while not (directory / ".git").exists():
+        directory = directory.parent
+    return directory
+
+
+PROJECT_ROOT = project_root()
 repo = Repo(PROJECT_ROOT)
 git = repo.git
+
+PEOPLE_YAML = "https://raw.githubusercontent.com/edx/repo-tools-data/master/people.yaml"
 
 
 class memoized(object):
@@ -87,6 +100,9 @@ def make_parser():
     parser.add_argument(
         '--table', '-t', action="store_true", default=False,
         help="only print table")
+    parser.add_argument(
+        '--cut-branch', '-b', action="store_true", default=False,
+        help="automatically cut the release branch")
     return parser
 
 
@@ -114,7 +130,7 @@ def ensure_pr_fetch():
 
 def get_github_creds():
     """
-    Returns Github credentials if they exist, as a two-tuple of (username, token).
+    Returns GitHub credentials if they exist, as a two-tuple of (username, token).
     Otherwise, return None.
     """
     netrc_auth = requests.utils.get_netrc_auth("https://api.github.com")
@@ -137,9 +153,12 @@ def create_github_creds():
     https://developer.github.com/v3/oauth_authorizations/#create-a-new-authorization
     """
     headers = {"User-Agent": "edx-release"}
-    payload = {"note": "edx-release"}
-    username = raw_input("Github username: ")
-    password = getpass.getpass("Github password: ")
+    payload = {
+        "note": "edx-release",
+        "scopes": ["repo"],
+    }
+    username = raw_input("GitHub username: ")
+    password = getpass.getpass("GitHub password: ")
     response = requests.post(
         "https://api.github.com/authorizations",
         auth=(username, password),
@@ -160,7 +179,7 @@ def create_github_creds():
         if message != "Validation Failed":
             raise requests.exceptions.RequestException(message)
         else:
-            # A token called "edx-release" already exists on Github.
+            # A token called "edx-release" already exists on GitHub.
             # Delete it, and try again.
             token_id = get_github_auth_id(username, password, "edx-release")
             if token_id:
@@ -179,7 +198,7 @@ def create_github_creds():
 
 def get_github_auth_id(username, password, note):
     """
-    Return the ID associated with the Github auth token with the given note.
+    Return the ID associated with the GitHub auth token with the given note.
     If no such auth token exists, return None.
     """
     response = requests.get(
@@ -210,7 +229,7 @@ def delete_github_auth_token(username, password, token_id):
 
 def ensure_github_creds(attempts=3):
     """
-    Make sure that we have Github OAuth credentials. This will check the user's
+    Make sure that we have GitHub OAuth credentials. This will check the user's
     .netrc file, as well as the ~/.config/edx-release file. If no credentials
     exist in either place, it will prompt the user to create OAuth credentials,
     and store them in ~/.config/edx-release.
@@ -221,7 +240,7 @@ def ensure_github_creds(attempts=3):
         return False
 
     # Looks like we need to create the OAuth creds
-    print("We need to set up OAuth authentication with Github's API. "
+    print("We need to set up OAuth authentication with GitHub's API. "
           "Your password will not be stored.", file=sys.stderr)
     token = None
     for _ in range(attempts):
@@ -236,7 +255,7 @@ def ensure_github_creds(attempts=3):
         else:
             break
     if token:
-        print("Successfully authenticated to Github", file=sys.stderr)
+        print("Successfully authenticated to GitHub", file=sys.stderr)
     if not token:
         print("Too many invalid authentication attempts.", file=sys.stderr)
         return False
@@ -288,6 +307,7 @@ class DoesNotExist(Exception):
         self.message = message
         self.commit = commit
         self.branch = branch
+        Exception.__init__(self, message)
 
 
 def get_merge_commit(commit, branch="master"):
@@ -313,7 +333,7 @@ def get_merge_commit(commit, branch="master"):
 
 def get_pr_info(num):
     """
-    Returns the info from the Github API
+    Returns the info from the GitHub API
     """
     url = "https://api.github.com/repos/edx/edx-platform/pulls/{num}".format(num=num)
     username, token = get_github_creds()
@@ -359,6 +379,21 @@ def prs_by_email(start_ref, end_ref):
     The dictionary is alphabetically ordered by email address
     The pull request list is ordered by merge date
     """
+    username, token = get_github_creds()
+    headers = {
+        "Authorization": "token {}".format(token),
+        "User-Agent": "edx-release",
+    }
+    # `emails` maps from other_emails to primary email, based on people.yaml.
+    emails = {}
+    people_resp = requests.get(PEOPLE_YAML, headers=headers)
+    people_resp.raise_for_status()
+    people = yaml.safe_load(people_resp.text)
+    for person in people.itervalues():
+        if 'other_emails' in person:
+            for other_email in person['other_emails']:
+                emails[other_email] = person['email']
+
     unordered_data = collections.defaultdict(set)
     for pr_num in get_merged_prs(start_ref, end_ref):
         ref = "refs/remotes/edx/pr/{num}".format(num=pr_num)
@@ -368,7 +403,8 @@ def prs_by_email(start_ref, end_ref):
         except DoesNotExist:
             pass  # this commit will be included in the commits_without_prs table
         else:
-            unordered_data[merge.author.email].add((pr_num, merge))
+            email = emails.get(merge.author.email, merge.author.email)
+            unordered_data[email].add((pr_num, merge))
 
     ordered_data = collections.OrderedDict()
     for email in sorted(unordered_data.keys()):
@@ -379,9 +415,9 @@ def prs_by_email(start_ref, end_ref):
 
 def generate_pr_table(start_ref, end_ref):
     """
-    Return a string corresponding to a pull request table to embed in Confluence
+    Return a UTF-8 string corresponding to a pull request table to embed in Confluence.
     """
-    header = "|| Merged By || Author || Title || PR || JIRA || Verified? ||"
+    header = "|| Merged By || Author || Title || PR || JIRA || Release Notes? || Verified? ||"
     pr_link = "[#{num}|https://github.com/edx/edx-platform/pull/{num}]"
     user_link = "[@{user}|https://github.com/{user}]"
     rows = [header]
@@ -402,15 +438,16 @@ def generate_pr_table(start_ref, end_ref):
                 title = "?"
                 body = "?"
                 author = ""
-            rows.append("| {merged_by} | {author} | {title} | {pull_request} | {jira} | {verified} |".format(
+            rows.append("| {merged_by} | {author} | {title} | {pull_request} | {jira} | {release_notes} | {verified} |".format(
                 merged_by=email if i == 0 else "",
                 author=user_link.format(user=author) if author else "",
                 title=title.replace("|", "\|").replace('{', '\{').replace('}', '\}'),
                 pull_request=pr_link.format(num=pull_request),
                 jira=", ".join(parse_ticket_references(body)),
+                release_notes="",
                 verified="",
             ))
-    return "\n".join(rows)
+    return "\n".join(rows).encode("utf8")
 
 
 @memoized
@@ -433,16 +470,17 @@ def generate_commit_table(start_ref, end_ref):
     The commits in the table should only be commits that are not in the
     pull request table.
     """
-    header = "|| Author || Summary || Commit || JIRA || Verified? ||"
+    header = "|| Author || Summary || Commit || JIRA || Release Notes? || Verified? ||"
     commit_link = "[commit|https://github.com/edx/edx-platform/commit/{sha}]"
     rows = [header]
     commits = get_commits_not_in_prs(start_ref, end_ref)
     for commit in commits:
-        rows.append("| {author} | {summary} | {commit} | {jira} | {verified} |".format(
+        rows.append("| {author} | {summary} | {commit} | {jira} | {release_notes} | {verified} |".format(
             author=commit.author.email,
             summary=commit.summary.replace("|", "\|"),
             commit=commit_link.format(sha=commit.hexsha),
             jira=", ".join(parse_ticket_references(commit.message)),
+            release_notes="",
             verified="",
         ))
     return "\n".join(rows)
@@ -477,11 +515,35 @@ def generate_email(start_ref, end_ref, release_date=None):
 
         By the way, if you have an @edx.org email address and are having trouble logging
         into stage, you may need to reset your password.
+
+        If you would prefer this email be sent to a different email address of yours,
+        send a request to oscm@edx.org with the details.
+
     """.format(
         emails=", ".join(prbe.keys()),
         date=release_date.isoformat(),
     )
     return textwrap.dedent(email).strip()
+
+
+def cut_release_branch(release_date=None):
+    if release_date is None:
+        release_date = default_release_date()
+
+    release_branch_name = "rc/{date}".format(date=release_date)
+
+    print("Cutting release branch '{name}'...".format(name=release_branch_name))
+
+    try:
+        print(git.checkout('master'))
+        print(git.pull())
+        print(git.checkout('HEAD', b=release_branch_name))
+        print(git.push())
+    except GitCommandError as exception:
+        print(exception)
+        return None
+
+    return release_branch_name
 
 
 def main():
@@ -497,7 +559,7 @@ def main():
         print(generate_pr_table(args.previous, args.current))
         return
 
-    print("EMAIL:")
+    print("Generating stage verification email and its list of recipients. This may take around a minute...")
     print(generate_email(args.previous, args.current, release_date=args.date).encode('UTF-8'))
     print("\n")
     print("Wiki Table:")
@@ -521,6 +583,17 @@ def main():
         )
         print("\n")
         print(generate_commit_table(args.previous, args.current))
+
+    if args.cut_branch:
+        branch_name = cut_release_branch(args.date)
+        if branch_name:
+            print(
+                "OPEN THE PULL REQUEST: https://github.com/edx/edx-platform/compare/release...{name}".format(
+                    name=branch_name
+                )
+            )
+    else:
+        print("Skipping branch cut")
 
 
 if __name__ == "__main__":

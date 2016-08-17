@@ -16,11 +16,18 @@ import django_comment_client.utils as utils
 
 from courseware.tests.factories import InstructorFactory
 from courseware.tabs import get_course_tab_list
+from openedx.core.djangoapps.course_groups import cohorts
 from openedx.core.djangoapps.course_groups.cohorts import set_course_cohort_settings
+from openedx.core.djangoapps.course_groups.tests.helpers import config_course_cohorts, topic_name_to_id
 from student.tests.factories import UserFactory, AdminFactory, CourseEnrollmentFactory
+from openedx.core.djangoapps.content.course_structures.models import CourseStructure
 from openedx.core.djangoapps.util.testing import ContentGroupTestCase
+from student.roles import CourseStaffRole
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, TEST_DATA_MIXED_TOY_MODULESTORE
+from xmodule.modulestore.django import modulestore
+from opaque_keys.edx.locator import CourseLocator
+from lms.djangoapps.teams.tests.factories import CourseTeamFactory
 
 
 @attr('shard_1')
@@ -74,11 +81,21 @@ class AccessUtilsTestCase(ModuleStoreTestCase):
         self.community_ta_role.users.add(self.community_ta1)
         self.community_ta2 = UserFactory(username='community_ta2', email='community_ta2@edx.org')
         self.community_ta_role.users.add(self.community_ta2)
+        self.course_staff = UserFactory(username='course_staff', email='course_staff@edx.org')
+        CourseStaffRole(self.course_id).add_users(self.course_staff)
 
     def test_get_role_ids(self):
         ret = utils.get_role_ids(self.course_id)
         expected = {u'Moderator': [3], u'Community TA': [4, 5]}
         self.assertEqual(ret, expected)
+
+    def test_has_discussion_privileges(self):
+        self.assertFalse(utils.has_discussion_privileges(self.student1, self.course_id))
+        self.assertFalse(utils.has_discussion_privileges(self.student2, self.course_id))
+        self.assertFalse(utils.has_discussion_privileges(self.course_staff, self.course_id))
+        self.assertTrue(utils.has_discussion_privileges(self.moderator, self.course_id))
+        self.assertTrue(utils.has_discussion_privileges(self.community_ta1, self.course_id))
+        self.assertTrue(utils.has_discussion_privileges(self.community_ta2, self.course_id))
 
     def test_has_forum_access(self):
         ret = utils.has_forum_access('student', self.course_id, 'Student')
@@ -152,6 +169,122 @@ class CoursewareContextTestCase(ModuleStoreTestCase):
 
         assertThreadCorrect(threads[0], self.discussion1, "Chapter / Discussion 1")
         assertThreadCorrect(threads[1], self.discussion2, "Subsection / Discussion 2")
+
+
+class CachedDiscussionIdMapTestCase(ModuleStoreTestCase):
+    """
+    Tests that using the cache of discussion id mappings has the same behavior as searching through the course.
+    """
+    def setUp(self):
+        super(CachedDiscussionIdMapTestCase, self).setUp(create_user=True)
+
+        self.course = CourseFactory.create(org='TestX', number='101', display_name='Test Course')
+        self.discussion = ItemFactory.create(
+            parent_location=self.course.location,
+            category='discussion',
+            discussion_id='test_discussion_id',
+            discussion_category='Chapter',
+            discussion_target='Discussion 1'
+        )
+        self.discussion2 = ItemFactory.create(
+            parent_location=self.course.location,
+            category='discussion',
+            discussion_id='test_discussion_id_2',
+            discussion_category='Chapter 2',
+            discussion_target='Discussion 2'
+        )
+        self.private_discussion = ItemFactory.create(
+            parent_location=self.course.location,
+            category='discussion',
+            discussion_id='private_discussion_id',
+            discussion_category='Chapter 3',
+            discussion_target='Beta Testing',
+            visible_to_staff_only=True
+        )
+        self.bad_discussion = ItemFactory.create(
+            parent_location=self.course.location,
+            category='discussion',
+            discussion_id='bad_discussion_id',
+            discussion_category=None,
+            discussion_target=None
+        )
+
+    def test_cache_returns_correct_key(self):
+        usage_key = utils.get_cached_discussion_key(self.course, 'test_discussion_id')
+        self.assertEqual(usage_key, self.discussion.location)
+
+    def test_cache_returns_none_if_id_is_not_present(self):
+        usage_key = utils.get_cached_discussion_key(self.course, 'bogus_id')
+        self.assertIsNone(usage_key)
+
+    def test_cache_raises_exception_if_course_structure_not_cached(self):
+        CourseStructure.objects.all().delete()
+        with self.assertRaises(utils.DiscussionIdMapIsNotCached):
+            utils.get_cached_discussion_key(self.course, 'test_discussion_id')
+
+    def test_cache_raises_exception_if_discussion_id_not_cached(self):
+        cache = CourseStructure.objects.get(course_id=self.course.id)
+        cache.discussion_id_map_json = None
+        cache.save()
+
+        with self.assertRaises(utils.DiscussionIdMapIsNotCached):
+            utils.get_cached_discussion_key(self.course, 'test_discussion_id')
+
+    def test_module_does_not_have_required_keys(self):
+        self.assertTrue(utils.has_required_keys(self.discussion))
+        self.assertFalse(utils.has_required_keys(self.bad_discussion))
+
+    def verify_discussion_metadata(self):
+        """Retrieves the metadata for self.discussion and self.discussion2 and verifies that it is correct"""
+        metadata = utils.get_cached_discussion_id_map(
+            self.course,
+            ['test_discussion_id', 'test_discussion_id_2'],
+            self.user
+        )
+        discussion1 = metadata[self.discussion.discussion_id]
+        discussion2 = metadata[self.discussion2.discussion_id]
+        self.assertEqual(discussion1['location'], self.discussion.location)
+        self.assertEqual(discussion1['title'], 'Chapter / Discussion 1')
+        self.assertEqual(discussion2['location'], self.discussion2.location)
+        self.assertEqual(discussion2['title'], 'Chapter 2 / Discussion 2')
+
+    def test_get_discussion_id_map_from_cache(self):
+        self.verify_discussion_metadata()
+
+    def test_get_discussion_id_map_without_cache(self):
+        CourseStructure.objects.all().delete()
+        self.verify_discussion_metadata()
+
+    def test_get_missing_discussion_id_map_from_cache(self):
+        metadata = utils.get_cached_discussion_id_map(self.course, ['bogus_id'], self.user)
+        self.assertEqual(metadata, {})
+
+    def test_get_discussion_id_map_from_cache_without_access(self):
+        user = UserFactory.create()
+
+        metadata = utils.get_cached_discussion_id_map(self.course, ['private_discussion_id'], self.user)
+        self.assertEqual(metadata['private_discussion_id']['title'], 'Chapter 3 / Beta Testing')
+
+        metadata = utils.get_cached_discussion_id_map(self.course, ['private_discussion_id'], user)
+        self.assertEqual(metadata, {})
+
+    def test_get_bad_discussion_id(self):
+        metadata = utils.get_cached_discussion_id_map(self.course, ['bad_discussion_id'], self.user)
+        self.assertEqual(metadata, {})
+
+    def test_discussion_id_accessible(self):
+        self.assertTrue(utils.discussion_category_id_access(self.course, self.user, 'test_discussion_id'))
+
+    def test_bad_discussion_id_not_accessible(self):
+        self.assertFalse(utils.discussion_category_id_access(self.course, self.user, 'bad_discussion_id'))
+
+    def test_missing_discussion_id_not_accessible(self):
+        self.assertFalse(utils.discussion_category_id_access(self.course, self.user, 'bogus_id'))
+
+    def test_discussion_id_not_accessible_without_access(self):
+        user = UserFactory.create()
+        self.assertTrue(utils.discussion_category_id_access(self.course, self.user, 'private_discussion_id'))
+        self.assertFalse(utils.discussion_category_id_access(self.course, user, 'private_discussion_id'))
 
 
 class CategoryMapTestMixin(object):
@@ -983,3 +1116,119 @@ class DiscussionTabTestCase(ModuleStoreTestCase):
 
         with self.settings(FEATURES={'CUSTOM_COURSES_EDX': True}):
             self.assertFalse(self.discussion_tab_present(self.enrolled_user))
+
+
+class IsCommentableCohortedTestCase(ModuleStoreTestCase):
+    """
+    Test the is_commentable_cohorted function.
+    """
+
+    MODULESTORE = TEST_DATA_MIXED_TOY_MODULESTORE
+
+    def setUp(self):
+        """
+        Make sure that course is reloaded every time--clear out the modulestore.
+        """
+        super(IsCommentableCohortedTestCase, self).setUp()
+        self.toy_course_key = CourseLocator("edX", "toy", "2012_Fall", deprecated=True)
+
+    def test_is_commentable_cohorted(self):
+        course = modulestore().get_course(self.toy_course_key)
+        self.assertFalse(cohorts.is_course_cohorted(course.id))
+
+        def to_id(name):
+            """Helper for topic_name_to_id that uses course."""
+            return topic_name_to_id(course, name)
+
+        # no topics
+        self.assertFalse(
+            utils.is_commentable_cohorted(course.id, to_id("General")),
+            "Course doesn't even have a 'General' topic"
+        )
+
+        # not cohorted
+        config_course_cohorts(course, is_cohorted=False, discussion_topics=["General", "Feedback"])
+
+        self.assertFalse(
+            utils.is_commentable_cohorted(course.id, to_id("General")),
+            "Course isn't cohorted"
+        )
+
+        # cohorted, but top level topics aren't
+        config_course_cohorts(course, is_cohorted=True, discussion_topics=["General", "Feedback"])
+
+        self.assertTrue(cohorts.is_course_cohorted(course.id))
+        self.assertFalse(
+            utils.is_commentable_cohorted(course.id, to_id("General")),
+            "Course is cohorted, but 'General' isn't."
+        )
+
+        # cohorted, including "Feedback" top-level topics aren't
+        config_course_cohorts(
+            course,
+            is_cohorted=True,
+            discussion_topics=["General", "Feedback"],
+            cohorted_discussions=["Feedback"]
+        )
+
+        self.assertTrue(cohorts.is_course_cohorted(course.id))
+        self.assertFalse(
+            utils.is_commentable_cohorted(course.id, to_id("General")),
+            "Course is cohorted, but 'General' isn't."
+        )
+        self.assertTrue(
+            utils.is_commentable_cohorted(course.id, to_id("Feedback")),
+            "Feedback was listed as cohorted.  Should be."
+        )
+
+    def test_is_commentable_cohorted_inline_discussion(self):
+        course = modulestore().get_course(self.toy_course_key)
+        self.assertFalse(cohorts.is_course_cohorted(course.id))
+
+        def to_id(name):  # pylint: disable=missing-docstring
+            return topic_name_to_id(course, name)
+
+        config_course_cohorts(
+            course,
+            is_cohorted=True,
+            discussion_topics=["General", "Feedback"],
+            cohorted_discussions=["Feedback", "random_inline"]
+        )
+        self.assertTrue(
+            utils.is_commentable_cohorted(course.id, to_id("random")),
+            "By default, Non-top-level discussion is always cohorted in cohorted courses."
+        )
+
+        # if always_cohort_inline_discussions is set to False, non-top-level discussion are always
+        # non cohorted unless they are explicitly set in cohorted_discussions
+        config_course_cohorts(
+            course,
+            is_cohorted=True,
+            discussion_topics=["General", "Feedback"],
+            cohorted_discussions=["Feedback", "random_inline"],
+            always_cohort_inline_discussions=False
+        )
+        self.assertFalse(
+            utils.is_commentable_cohorted(course.id, to_id("random")),
+            "Non-top-level discussion is not cohorted if always_cohort_inline_discussions is False."
+        )
+        self.assertTrue(
+            utils.is_commentable_cohorted(course.id, to_id("random_inline")),
+            "If always_cohort_inline_discussions set to False, Non-top-level discussion is "
+            "cohorted if explicitly set in cohorted_discussions."
+        )
+        self.assertTrue(
+            utils.is_commentable_cohorted(course.id, to_id("Feedback")),
+            "If always_cohort_inline_discussions set to False, top-level discussion are not affected."
+        )
+
+    def test_is_commentable_cohorted_team(self):
+        course = modulestore().get_course(self.toy_course_key)
+        self.assertFalse(cohorts.is_course_cohorted(course.id))
+
+        config_course_cohorts(course, is_cohorted=True)
+        team = CourseTeamFactory(course_id=course.id)
+
+        # Verify that team discussions are not cohorted, but other discussions are
+        self.assertFalse(utils.is_commentable_cohorted(course.id, team.discussion_topic_id))
+        self.assertTrue(utils.is_commentable_cohorted(course.id, "random"))

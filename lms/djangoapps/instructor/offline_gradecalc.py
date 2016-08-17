@@ -13,19 +13,20 @@ from json import JSONEncoder
 from courseware import grades, models
 from courseware.courses import get_course_by_id
 from django.contrib.auth.models import User
+from opaque_keys import OpaqueKey
+from opaque_keys.edx.keys import UsageKey
+from xmodule.graders import Score
 
 from instructor.utils import DummyRequest
 
 
 class MyEncoder(JSONEncoder):
-
-    def _iterencode(self, obj, markers=None):
-        if isinstance(obj, tuple) and hasattr(obj, '_asdict'):
-            gen = self._iterencode_dict(obj._asdict(), markers)
-        else:
-            gen = JSONEncoder._iterencode(self, obj, markers)
-        for chunk in gen:
-            yield chunk
+    """ JSON Encoder that can encode OpaqueKeys """
+    def default(self, obj):  # pylint: disable=method-hidden
+        """ Encode an object that the default encoder hasn't been able to. """
+        if isinstance(obj, OpaqueKey):
+            return unicode(obj)
+        return JSONEncoder.default(self, obj)
 
 
 def offline_grade_calculation(course_key):
@@ -50,9 +51,15 @@ def offline_grade_calculation(course_key):
         request.session = {}
 
         gradeset = grades.grade(student, request, course, keep_raw_scores=True)
-        gs = enc.encode(gradeset)
+        # Convert Score namedtuples to dicts:
+        totaled_scores = gradeset['totaled_scores']
+        for section in totaled_scores:
+            totaled_scores[section] = [score._asdict() for score in totaled_scores[section]]
+        gradeset['raw_scores'] = [score._asdict() for score in gradeset['raw_scores']]
+        # Encode as JSON and save:
+        gradeset_str = enc.encode(gradeset)
         ocg, _created = models.OfflineComputedGrade.objects.get_or_create(user=student, course_id=course_key)
-        ocg.gradeset = gs
+        ocg.gradeset = gradeset_str
         ocg.save()
         print "%s done" % student  	# print statement used because this is run by a management command
 
@@ -93,4 +100,17 @@ def student_grades(student, request, course, keep_raw_scores=False, use_offline=
             msg='Error: no offline gradeset available for {}, {}'.format(student, course.id)
         )
 
-    return json.loads(ocg.gradeset)
+    gradeset = json.loads(ocg.gradeset)
+    # Convert score dicts back to Score tuples:
+
+    def score_from_dict(encoded):
+        """ Given a formerly JSON-encoded Score tuple, return the Score tuple """
+        if encoded['module_id']:
+            encoded['module_id'] = UsageKey.from_string(encoded['module_id'])
+        return Score(**encoded)
+
+    totaled_scores = gradeset['totaled_scores']
+    for section in totaled_scores:
+        totaled_scores[section] = [score_from_dict(score) for score in totaled_scores[section]]
+    gradeset['raw_scores'] = [score_from_dict(score) for score in gradeset['raw_scores']]
+    return gradeset

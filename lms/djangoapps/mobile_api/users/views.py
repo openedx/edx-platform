@@ -33,35 +33,34 @@ class UserDetail(generics.RetrieveAPIView):
     """
     **Use Case**
 
-        Get information about the specified user and
-        access other resources the user has permissions for.
+        Get information about the specified user and access other resources
+        the user has permissions for.
 
-        Users are redirected to this endpoint after logging in.
+        Users are redirected to this endpoint after they sign in.
 
-        You can use the **course_enrollments** value in
-        the response to get a list of courses the user is enrolled in.
+        You can use the **course_enrollments** value in the response to get a
+        list of courses the user is enrolled in.
 
-    **Example request**:
+    **Example Request**
 
         GET /api/mobile/v0.5/users/{username}
 
-
     **Response Values**
 
-        * id: The ID of the user.
+        If the request is successful, the request returns an HTTP 200 "OK" response.
 
-        * username: The username of the currently logged in user.
+        The HTTP 200 response has the following values.
 
-        * email: The email address of the currently logged in user.
-
-        * name: The full name of the currently logged in user.
-
-        * course_enrollments: The URI to list the courses the currently logged
+        * course_enrollments: The URI to list the courses the currently signed
           in user is enrolled in.
+        * email: The email address of the currently signed in user.
+        * id: The ID of the user.
+        * name: The full name of the currently signed in user.
+        * username: The username of the currently signed in user.
     """
     queryset = (
         User.objects.all()
-        .select_related('profile', 'course_enrollments')
+        .select_related('profile')
     )
     serializer_class = UserSerializer
     lookup_field = 'username'
@@ -70,27 +69,36 @@ class UserDetail(generics.RetrieveAPIView):
 @mobile_view(is_user=True)
 class UserCourseStatus(views.APIView):
     """
-    **Use Case**
+    **Use Cases**
 
-        Get or update the ID of the module that the specified user last visited in the specified course.
+        Get or update the ID of the module that the specified user last
+        visited in the specified course.
 
-    **Example request**:
+    **Example Requests**
 
         GET /api/mobile/v0.5/users/{username}/course_status_info/{course_id}
 
         PATCH /api/mobile/v0.5/users/{username}/course_status_info/{course_id}
 
-            body:
-                last_visited_module_id={module_id}
-                modification_date={date}
+        **PATCH Parameters**
 
-            The modification_date is optional. If it is present, the update will only take effect
-            if the modification_date is later than the modification_date saved on the server.
+          The body of the PATCH request can include the following parameters.
+
+          * last_visited_module_id={module_id}
+          * modification_date={date}
+
+            The modification_date parameter is optional. If it is present, the
+            update will only take effect if the modification_date in the
+            request is later than the modification_date saved on the server.
 
     **Response Values**
 
-        * last_visited_module_id: The ID of the last module visited by the user in the course.
+        If the request is successful, the request returns an HTTP 200 "OK" response.
 
+        The HTTP 200 response has the following values.
+
+        * last_visited_module_id: The ID of the last module that the user
+          visited in the course.
         * last_visited_module_path: The ID of the modules in the path from the
           last visited module to the course module.
     """
@@ -174,8 +182,8 @@ class UserCourseStatus(views.APIView):
         """
         Update the ID of the module that the specified user last visited in the specified course.
         """
-        module_id = request.DATA.get("last_visited_module_id")
-        modification_date_string = request.DATA.get("modification_date")
+        module_id = request.data.get("last_visited_module_id")
+        modification_date_string = request.data.get("modification_date")
         modification_date = None
         if modification_date_string:
             modification_date = dateparse.parse_datetime(modification_date_string)
@@ -199,40 +207,68 @@ class UserCourseEnrollmentsList(generics.ListAPIView):
     """
     **Use Case**
 
-        Get information about the courses the currently logged in user is
+        Get information about the courses that the currently signed in user is
         enrolled in.
 
-    **Example request**:
+    **Example Request**
 
         GET /api/mobile/v0.5/users/{username}/course_enrollments/
 
     **Response Values**
 
-        * created: The date the course was created.
-        * mode: The type of certificate registration for this course:  honor or
-          certified.
-        * is_active: Whether the course is currently active; true or false.
-        * certificate: Information about the user's earned certificate in the course.
-          * url: URL to the downloadable version of the certificate, if exists.
-        * course: A collection of data about the course:
+        If the request for information about the user is successful, the
+        request returns an HTTP 200 "OK" response.
 
+        The HTTP 200 response has the following values.
+
+        * certificate: Information about the user's earned certificate in the
+          course.
+        * course: A collection of the following data about the course.
+
+        * courseware_access: A JSON representation with access information for the course,
+          including any access errors.
+
+          * course_about: The URL to the course about page.
+          * course_handouts: The URI to get data for course handouts.
+          * course_image: The path to the course image.
           * course_updates: The URI to get data for course updates.
+          * discussion_url: The URI to access data for course discussions if
+            it is enabled, otherwise null.
+          * end: The end date of the course.
+          * id: The unique ID of the course.
+          * latest_updates: Reserved for future use.
+          * name: The name of the course.
           * number: The course number.
           * org: The organization that created the course.
-          * video_outline: The URI to get the list of all vides the user can
-            access in the course.
-          * id: The unique ID of the course.
-          * subscription_id: A unique "clean" (alphanumeric with '_') ID of the course.
-          * latest_updates:  Reserved for future use.
-          * end: The end date of the course.
-          * name: The name of the course.
-          * course_handouts: The URI to get data for course handouts.
-          * start: The data and time the course starts.
-          * course_image: The path to the course image.
+          * start: The date and time when the course starts.
+          * start_display:
+            If start_type is a string, then the advertised_start date for the course.
+            If start_type is a timestamp, then a formatted date for the start of the course.
+            If start_type is empty, then the value is None and it indicates that the course has not yet started.
+          * start_type: One of either "string", "timestamp", or "empty"
+          * subscription_id: A unique "clean" (alphanumeric with '_') ID of
+            the course.
+          * video_outline: The URI to get the list of all videos that the user
+            can access in the course.
+
+        * created: The date the course was created.
+        * is_active: Whether the course is currently active. Possible values
+          are true or false.
+        * mode: The type of certificate registration for this course (honor or
+          certified).
+        * url: URL to the downloadable version of the certificate, if exists.
     """
     queryset = CourseEnrollment.objects.all()
     serializer_class = CourseEnrollmentSerializer
     lookup_field = 'username'
+
+    # In Django Rest Framework v3, there is a default pagination
+    # class that transmutes the response data into a dictionary
+    # with pagination information.  The original response data (a list)
+    # is stored in a "results" value of the dictionary.
+    # For backwards compatibility with the existing API, we disable
+    # the default behavior by setting the pagination_class to None.
+    pagination_class = None
 
     def get_queryset(self):
         enrollments = self.queryset.filter(

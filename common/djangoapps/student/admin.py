@@ -1,27 +1,25 @@
-'''
-django admin pages for courseware model
-'''
+""" Django admin pages for student app """
 from django import forms
-from config_models.admin import ConfigurationModelAdmin
 from django.contrib.auth.models import User
-
-from student.models import UserProfile, UserTestGroup, CourseEnrollmentAllowed, DashboardConfiguration
-from student.models import (
-    CourseEnrollment, Registration, PendingNameChange, CourseAccessRole, LinkedInAddToProfileConfiguration
-)
 from ratelimitbackend import admin
-from student.roles import REGISTERED_ACCESS_ROLES
-
 from xmodule.modulestore.django import modulestore
-
-from opaque_keys.edx.keys import CourseKey
 from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import CourseKey
+
+from config_models.admin import ConfigurationModelAdmin
+from student.models import (
+    UserProfile, UserTestGroup, CourseEnrollmentAllowed, DashboardConfiguration, CourseEnrollment, Registration,
+    PendingNameChange, CourseAccessRole, LinkedInAddToProfileConfiguration
+)
+from student.roles import REGISTERED_ACCESS_ROLES
 
 
 class CourseAccessRoleForm(forms.ModelForm):
     """Form for adding new Course Access Roles view the Django Admin Panel."""
-    class Meta:
+
+    class Meta(object):
         model = CourseAccessRole
+        fields = '__all__'
 
     email = forms.EmailField(required=True)
     COURSE_ACCESS_ROLES = [(role_name, role_name) for role_name in REGISTERED_ACCESS_ROLES.keys()]
@@ -95,6 +93,11 @@ class CourseAccessRoleForm(forms.ModelForm):
 
         return cleaned_data
 
+    def __init__(self, *args, **kwargs):
+        super(CourseAccessRoleForm, self).__init__(*args, **kwargs)
+        if self.instance.user_id:
+            self.fields['email'].initial = self.instance.user.email
+
 
 class CourseAccessRoleAdmin(admin.ModelAdmin):
     """Admin panel for the Course Access Role. """
@@ -123,18 +126,44 @@ class CourseAccessRoleAdmin(admin.ModelAdmin):
 class LinkedInAddToProfileConfigurationAdmin(admin.ModelAdmin):
     """Admin interface for the LinkedIn Add to Profile configuration. """
 
-    class Meta:
+    class Meta(object):
         model = LinkedInAddToProfileConfiguration
 
     # Exclude deprecated fields
     exclude = ('dashboard_tracking_code',)
 
 
-admin.site.register(UserProfile)
+class CourseEnrollmentAdmin(admin.ModelAdmin):
+    """ Admin interface for the CourseEnrollment model. """
+    list_display = ('id', 'course_id', 'mode', 'user', 'is_active',)
+    list_filter = ('mode', 'is_active',)
+    raw_id_fields = ('user',)
+    search_fields = ('course_id', 'mode', 'user__username',)
+
+    def queryset(self, request):
+        return super(CourseEnrollmentAdmin, self).queryset(request).select_related('user')
+
+    class Meta(object):
+        model = CourseEnrollment
+
+
+class UserProfileAdmin(admin.ModelAdmin):
+    """ Admin interface for UserProfile model. """
+    list_display = ('user', 'name',)
+    raw_id_fields = ('user',)
+    search_fields = ('user__username', 'user__first_name', 'user__last_name', 'user__email', 'name',)
+
+    def get_readonly_fields(self, request, obj=None):
+        # The user field should not be editable for an existing user profile.
+        if obj:
+            return self.readonly_fields + ('user',)
+        return self.readonly_fields
+
+    class Meta(object):
+        model = UserProfile
+
 
 admin.site.register(UserTestGroup)
-
-admin.site.register(CourseEnrollment)
 
 admin.site.register(CourseEnrollmentAllowed)
 
@@ -147,3 +176,7 @@ admin.site.register(CourseAccessRole, CourseAccessRoleAdmin)
 admin.site.register(DashboardConfiguration, ConfigurationModelAdmin)
 
 admin.site.register(LinkedInAddToProfileConfiguration, LinkedInAddToProfileConfigurationAdmin)
+
+admin.site.register(CourseEnrollment, CourseEnrollmentAdmin)
+
+admin.site.register(UserProfile, UserProfileAdmin)

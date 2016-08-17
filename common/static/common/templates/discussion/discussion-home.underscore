@@ -1,0 +1,62 @@
+<div class="discussion-article view-discussion-home">
+  <section class="home-header">
+    <span class="label"><%- gettext("DISCUSSION HOME:") %></span>
+    <% if (window.courseName) { %>
+      <h1 class="home-title"><%- window.courseName %></h1>
+    <% } %>
+  </section>
+
+  <% if (window.ENABLE_DISCUSSION_HOME_PANEL) { %>
+    <span class="label label-settings">
+      <%- interpolate(
+            gettext("How to use %(platform_name)s discussions"),
+            {platform_name: window.PLATFORM_NAME}, true
+          ) %>
+    </span>
+    <table class="home-helpgrid">
+      <tr class="helpgrid-row helpgrid-row-navigation">
+        <td class="row-title"><%- gettext("Find discussions") %></td>
+        <td class="row-item">
+          <i class="icon fa fa-reorder"></i>
+          <span class="row-description"><%- gettext("Focus in on specific topics") %></span>
+        </td>
+        <td class="row-item">
+          <i class="icon fa fa-search"></i>
+          <span class="row-description"><%- gettext("Search for specific posts") %></span>
+        </td>
+        <td class="row-item">
+          <i class="icon fa fa-sort"></i>
+          <span class="row-description"><%- gettext("Sort by date, vote, or comments") %></span>
+        </td>
+      </tr>
+      <tr class="helpgrid-row helpgrid-row-participation">
+        <td class="row-title"><%- gettext("Engage with posts") %></td>
+        <td class="row-item">
+          <i class="icon fa fa-plus"></i>
+          <span class="row-description"><%- gettext("Upvote posts and good responses") %></span>
+        </td>
+        <td class="row-item">
+          <i class="icon fa fa-flag"></i>
+          <span class="row-description"><%- gettext("Report Forum Misuse") %></span>
+        </td>
+        <td class="row-item">
+          <i class="icon fa fa-star"></i>
+          <span class="row-description"><%- gettext("Follow posts for updates") %></span>
+        </td>
+      </tr>
+      <tr class="helpgrid-row helpgrid-row-notification">
+        <td class="row-title"><%- gettext('Receive updates') %></td>
+        <td class="row-item-full" colspan="3">
+          <label for="email-setting-checkbox">
+            <span class="sr"><%- gettext("Toggle Notifications Setting") %></span>
+            <span class="notification-checkbox">
+              <input type="checkbox" id="email-setting-checkbox" class="email-setting" name="email-notification"/>
+              <i class="icon fa fa-envelope"></i>
+            </span>
+          </label>
+          <span class="row-description"><%- gettext("Check this box to receive an email digest once a day notifying you about new, unread activity from posts you are following.") %></span>
+        </td>
+      </tr>
+    </table>
+  <% } %>
+</div>

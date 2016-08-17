@@ -10,7 +10,7 @@ from edxnotes.helpers import is_feature_enabled as is_edxnotes_enabled
  <% return _("{course_number} Courseware").format(course_number=course.display_number_with_default) %>
 </%def>
 
-<%block name="bodyclass">view-incourse view-courseware courseware ${course.css_class or ''}</%block>
+<%block name="bodyclass">view-in-course view-courseware courseware ${course.css_class or ''}</%block>
 <%block name="title"><title>
     % if section_title:
 ${page_title_breadcrumbs(section_title, course_name())}
@@ -41,14 +41,6 @@ ${page_title_breadcrumbs(course_name())}
 <%block name="nav_skip">${"#seq_content" if section_title else "#course-content"}</%block>
 
 <%include file="../discussion/_js_head_dependencies.html" />
-
-  % if show_chat:
-    <link rel="stylesheet" href="${static.url('css/vendor/ui-lightness/jquery-ui-1.8.22.custom.css')}" />
-    ## It'd be better to have this in a place like lms/css/vendor/candy,
-    ## but the candy_res/ folder contains images and other junk, and it
-    ## all needs to stay together for the Candy.js plugin to work.
-    <link rel="stylesheet" href="${static.url('candy_res/candy_full.css')}" />
-  % endif
   ${fragment.head_html()}
 </%block>
 
@@ -92,58 +84,17 @@ ${page_title_breadcrumbs(course_name())}
       });
   </script>
 
-% if show_chat:
-  <script type="text/javascript" src="${static.url('js/vendor/candy_libs/libs.min.js')}"></script>
-  <script type="text/javascript" src="${static.url('js/vendor/candy.min.js')}"></script>
-
-  <script type="text/javascript">
-    // initialize the Candy.js plugin
-    $(document).ready(function() {
-      Candy.init("http://${chat['domain']}:5280/http-bind/", {
-        core: { debug: true, autojoin: ["${chat['room']}@conference.${chat['domain']}"] },
-        view: { resources: "${static.url('candy_res/')}"}
-      });
-      Candy.Core.connect("${chat['username']}", "${chat['password']}");
-
-      // show/hide the chat widget
-      $('#chat-toggle').click(function() {
-        var toggle = $(this);
-        if (toggle.hasClass('closed')) {
-          $('#chat-block').show().animate({height: '400px'}, 'slow', function() {
-            $('#chat-open').hide();
-            $('#chat-close').show();
-          });
-        } else {
-          $('#chat-block').animate({height: '0px'}, 'slow', function() {
-            $('#chat-open').show();
-            $('#chat-close').hide();
-            $(this).hide(); // do this at the very end
-          });
-        }
-        toggle.toggleClass('closed');
-      });
-    });
-  </script>
-% endif
-
 ${fragment.foot_html()}
 
 </%block>
 
-<div class="container">
-  <div class="course-wrapper">
-    <section class="course-content" id="course-content">
-      ${fragment.body_html()}
-    </section>
-  </div>
+<div class="course-wrapper">
+  <section class="course-content" id="course-content">
+    ${fragment.body_html()}
+  </section>
 </div>
 
 <nav class="nav-utilities ${"has-utility-calculator" if course.show_calculator else ""}" aria-label="${_('Course Utilities')}">
-  ## Utility: Chat
-  % if show_chat:
-    <%include file="/chat/toggle_chat.html" />
-  % endif
-
   ## Utility: Notes
   % if is_edxnotes_enabled(course):
     <%include file="/edxnotes/toggle_notes.html" args="course=course"/>
@@ -156,6 +107,3 @@ ${fragment.foot_html()}
 </nav>
 
 <%include file="../modal/accessible_confirm.html" />
-
-## No footer in chromeless
-<%block name="footer"></%block>

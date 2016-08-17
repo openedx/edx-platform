@@ -1,14 +1,27 @@
 // discussion - thread layout
 // ====================
+// NOTE: thread = (post + (responses and comments))
 
-// general thread layout
+// Table of Contents
+// * +general thread layout
+// * +thread - wrapper styling
+// * +thread - elements - shared styles
+// * +post - individual element styling
+// * +post - answered question - collapsed comment area
+
+// +general thread layout
 body.discussion, .discussion-module {
 
   // post layout
   .discussion-post {
-    padding: ($baseline*2) ($baseline*2) $baseline ($baseline*2);
-    border-radius: 3px 3px 0 0;
+    @include padding(($baseline*1.5), ($baseline*1.5), $baseline, ($baseline*1.5));
+    @include border-radius(3px, 3px, 0, 0);
     background-color: $white;
+
+    .wrapper-post-header {
+      padding-bottom: 0;
+      margin-bottom: ($baseline*0.75);
+    }
 
     .post-header-content {
       display: inline-block;
@@ -16,25 +29,18 @@ body.discussion, .discussion-module {
     }
 
     .post-header-actions {
-      display: inline-block;
       @include float(right);
-      vertical-align: middle;
       width: flex-grid(3,12);
+    }
+
+    .posted-details {
+      color: $gray-d1;
     }
   }
 
   // response layout
   .discussion-response {
-    min-height: ($baseline*7.5);
-
-    .username {
-      @include font-size(14);
-      @extend %t-weight5;
-    }
-
-    .posted-details .username {
-      font-size: inherit;
-    }
+    min-height: ($baseline*5);
 
     .response-header-content {
       display: inline-block;
@@ -43,62 +49,21 @@ body.discussion, .discussion-module {
     }
 
     .response-header-actions {
-      position: absolute;
-      @include right($baseline);
-      top: ($baseline);
       @include float(right);
+      @include right($baseline);
+      position: absolute;
+      top: ($baseline);
     }
   }
 
   // comments layout
-  .comments {
-    @extend %ui-no-list;
-    border-radius: 0 0 3px 3px;
-    background: $gray-l6;
-    box-shadow: 0 1px 3px -1px $shadow inset;
-
-    > li {
-      border-top: 1px solid $gray-l4;
-      padding: ($baseline/2) $baseline;
-    }
-
-
-    blockquote {
-      background: $gray-l4;
-      border-radius: 3px;
-      padding: ($baseline/4) ($baseline/2);
-      font-size: 14px;
-    }
-
-    .comment-form {
-      @include clearfix();
-
-      .comment-form-input {
-        padding: ($baseline/4) ($baseline/2);
-        background-color: $white;
-        font-size: 14px;
-      }
-
-      .discussion-submit-comment {
-        @include blue-button;
-        float: left;
-        margin-top: 8px;
-      }
-
-      .wmd-input {
-        height: 40px;
-      }
-
-      .discussion-errors {
-        margin: 0;
-      }
-    }
+  .discussion-comment {
 
     .response-body {
+      @extend %t-copy-sub2;
       display: inline-block;
       margin-bottom: ($baseline/2);
       width: flex-grid(10,12);
-      font-size: 13px;
 
       p + p {
         margin-top: 12px;
@@ -106,24 +71,131 @@ body.discussion, .discussion-module {
     }
 
     .comment-actions-list {
-      display: inline-block;
-      width: flex-grid(2,12);
-      vertical-align: top;
+      @include float(right);
     }
 
-    //TO-DO : clean up posted-details styling, currently reused by responses and comments
     .posted-details {
       margin-top: 0;
     }
   }
 }
 
+// +thread - wrapper styling
 .forum-thread-main-wrapper {
+  @include border-radius(3px, 3px, 0, 0);
   border-bottom: 1px solid $white; // Prevent collapsing margins
-  border-radius: 3px 3px 0 0;
   background-color: $white;
 }
 
+// +thread - elements - shared styles
+body.discussion {
+
+  .discussion-post, .discussion-response, .discussion-comment {
+    @include clearfix();
+
+    // thread - images
+    .author-image {
+      @include margin-right($baseline/2);
+      display: inline-block;
+      vertical-align: top;
+
+      // STATE: No profile image
+      &:empty {
+        display: none;
+      }
+
+      // CASE: post image
+      &.level-post {
+        height: $post-image-dimension;
+        width: $post-image-dimension;
+      }
+
+      // CASE: response image
+      &.level-response {
+        height: $response-image-dimension;
+        width: $response-image-dimension;
+      }
+
+      // CASE: comment image
+      &.level-comment {
+        height: $comment-image-dimension;
+        width: $comment-image-dimension;
+      }
+
+      img {
+        border-radius: 3px;
+      }
+    }
+
+    // thread - header content details
+    .posted-details {
+      @extend %t-copy-sub2;
+      margin-top: ($baseline/5);
+      color: $gray-d1;
+
+      .username {
+        @extend %t-strong;
+        display: inline;
+      }
+
+      .timeago, .top-post-status {
+        color: inherit;
+      }
+    }
+  }
+
+  .discussion-post .post-body, .discussion-response .response-body {
+    @include padding-right($baseline); //ensures content doesn't overlap on post or response actions.
+  }
+}
+
+// +post - individual element styling
+body.discussion .discussion-post,
+body.discussion .discussion-article,
+body.view-in-course .discussion-post,
+body.view-in-course .discussion-article {
+  // NOTE: discussion-article is used for inline discussion modules.
+  @include clearfix();
+
+  .post-header-content {
+
+    // post title
+    .post-title {
+      @extend %t-title4;
+      @extend %t-ultrastrong;
+      margin-bottom: ($baseline/4);
+      letter-spacing: 0;
+    }
+  }
+
+  // post body
+  .post-body {
+    @extend %t-copy-sub1;
+    // clear: both; //TO-DO: confirm that removing this is ok for all cases of discussion posts.
+  }
+
+  // post context
+  .post-context {
+    @extend %t-copy-sub2;
+    margin-top: $baseline;
+    color: $gray-d1;
+    padding: ($baseline*0.75);
+    background-color: $gray-l6;
+    border-radius: 3px;
+
+    // CASE: no courseware context or cohort visiblity rules
+    &:empty {
+      display: none;
+    }
+
+    // post visibility - cohorts
+    .group-visibility-label {
+      margin-top: ($baseline/4);
+    }
+  }
+}
+
+// +post - answered question - collapsed comment area
 body.discussion, .discussion-thread.expanded {
   .forum-thread-main-wrapper {
     box-shadow: 0 1px 3px $shadow;

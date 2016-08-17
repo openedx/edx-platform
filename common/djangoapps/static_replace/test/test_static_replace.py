@@ -56,35 +56,35 @@ def test_process_url_no_match():
     assert_equals('"test/static/file.png"', process_static_urls(STATIC_SOURCE, processor))
 
 
-@patch('django.http.HttpRequest')
+@patch('django.http.HttpRequest', autospec=True)
 def test_static_urls(mock_request):
     mock_request.build_absolute_uri = lambda url: 'http://' + url
     result = make_static_urls_absolute(mock_request, STATIC_SOURCE)
     assert_equals(result, '\"http:///static/file.png\"')
 
 
-@patch('static_replace.staticfiles_storage')
+@patch('static_replace.staticfiles_storage', autospec=True)
 def test_storage_url_exists(mock_storage):
     mock_storage.exists.return_value = True
     mock_storage.url.return_value = '/static/file.png'
 
     assert_equals('"/static/file.png"', replace_static_urls(STATIC_SOURCE, DATA_DIRECTORY))
-    mock_storage.exists.called_once_with('file.png')
-    mock_storage.url.called_once_with('data_dir/file.png')
+    mock_storage.exists.assert_called_once_with('file.png')
+    mock_storage.url.assert_called_once_with('file.png')
 
 
-@patch('static_replace.staticfiles_storage')
+@patch('static_replace.staticfiles_storage', autospec=True)
 def test_storage_url_not_exists(mock_storage):
     mock_storage.exists.return_value = False
     mock_storage.url.return_value = '/static/data_dir/file.png'
 
     assert_equals('"/static/data_dir/file.png"', replace_static_urls(STATIC_SOURCE, DATA_DIRECTORY))
-    mock_storage.exists.called_once_with('file.png')
-    mock_storage.url.called_once_with('file.png')
+    mock_storage.exists.assert_called_once_with('file.png')
+    mock_storage.url.assert_called_once_with('data_dir/file.png')
 
 
-@patch('static_replace.StaticContent')
-@patch('static_replace.modulestore')
+@patch('static_replace.StaticContent', autospec=True)
+@patch('static_replace.modulestore', autospec=True)
 def test_mongo_filestore(mock_modulestore, mock_static_content):
 
     mock_modulestore.return_value = Mock(MongoModuleStore)
@@ -102,9 +102,9 @@ def test_mongo_filestore(mock_modulestore, mock_static_content):
     mock_static_content.convert_legacy_static_url_with_course_id.assert_called_once_with('file.png', COURSE_KEY)
 
 
-@patch('static_replace.settings')
-@patch('static_replace.modulestore')
-@patch('static_replace.staticfiles_storage')
+@patch('static_replace.settings', autospec=True)
+@patch('static_replace.modulestore', autospec=True)
+@patch('static_replace.staticfiles_storage', autospec=True)
 def test_data_dir_fallback(mock_storage, mock_modulestore, mock_settings):
     mock_modulestore.return_value = Mock(XMLModuleStore)
     mock_storage.url.side_effect = Exception
@@ -127,8 +127,8 @@ def test_raw_static_check():
     assert_equals(path, replace_static_urls(path, text))
 
 
-@patch('static_replace.staticfiles_storage')
-@patch('static_replace.modulestore')
+@patch('static_replace.staticfiles_storage', autospec=True)
+@patch('static_replace.modulestore', autospec=True)
 def test_static_url_with_query(mock_modulestore, mock_storage):
     """
     Make sure that for urls with query params:

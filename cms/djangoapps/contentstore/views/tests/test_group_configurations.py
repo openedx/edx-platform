@@ -203,7 +203,6 @@ class GroupConfigurationsBaseTestCase(object):
         self.assertIn("error", content)
 
 
-# pylint: disable=no-member
 class GroupConfigurationsListHandlerTestCase(CourseTestCase, GroupConfigurationsBaseTestCase, HelperMethods):
     """
     Test cases for group_configurations_list_handler.
@@ -263,6 +262,8 @@ class GroupConfigurationsListHandlerTestCase(CourseTestCase, GroupConfigurations
                 {u'name': u'Group A', u'version': 1},
                 {u'name': u'Group B', u'version': 1},
             ],
+            u'parameters': {},
+            u'active': True
         }
         response = self.client.ajax_post(
             self._url(),
@@ -284,6 +285,7 @@ class GroupConfigurationsListHandlerTestCase(CourseTestCase, GroupConfigurations
         self.assertEqual(len(user_partititons[0].groups), 2)
         self.assertEqual(user_partititons[0].groups[0].name, u'Group A')
         self.assertEqual(user_partititons[0].groups[1].name, u'Group B')
+        self.assertEqual(user_partititons[0].parameters, {})
 
     def test_lazily_creates_cohort_configuration(self):
         """
@@ -296,7 +298,6 @@ class GroupConfigurationsListHandlerTestCase(CourseTestCase, GroupConfigurations
         self.assertEqual(len(self.course.user_partitions), 0)
 
 
-# pylint: disable=no-member
 class GroupConfigurationsDetailHandlerTestCase(CourseTestCase, GroupConfigurationsBaseTestCase, HelperMethods):
     """
     Test cases for group_configurations_detail_handler.
@@ -329,6 +330,8 @@ class GroupConfigurationsDetailHandlerTestCase(CourseTestCase, GroupConfiguratio
                 {u'id': 0, u'name': u'Group A', u'version': 1, u'usage': []},
                 {u'id': 1, u'name': u'Group B', u'version': 1, u'usage': []},
             ],
+            u'parameters': {},
+            u'active': True,
         }
         response = self.client.put(
             self._url(cid=666),
@@ -348,6 +351,7 @@ class GroupConfigurationsDetailHandlerTestCase(CourseTestCase, GroupConfiguratio
         self.assertEqual(len(user_partitions[0].groups), 2)
         self.assertEqual(user_partitions[0].groups[0].name, u'Group A')
         self.assertEqual(user_partitions[0].groups[1].name, u'Group B')
+        self.assertEqual(user_partitions[0].parameters, {})
 
     def test_can_edit_content_group(self):
         """
@@ -366,6 +370,8 @@ class GroupConfigurationsDetailHandlerTestCase(CourseTestCase, GroupConfiguratio
                 {u'id': 0, u'name': u'New Group Name', u'version': 1, u'usage': []},
                 {u'id': 2, u'name': u'Group C', u'version': 1, u'usage': []},
             ],
+            u'parameters': {},
+            u'active': True,
         }
 
         response = self.client.put(
@@ -387,6 +393,7 @@ class GroupConfigurationsDetailHandlerTestCase(CourseTestCase, GroupConfiguratio
         self.assertEqual(len(user_partititons[0].groups), 2)
         self.assertEqual(user_partititons[0].groups[0].name, u'New Group Name')
         self.assertEqual(user_partititons[0].groups[1].name, u'Group C')
+        self.assertEqual(user_partititons[0].parameters, {})
 
     def test_can_delete_content_group(self):
         """
@@ -468,6 +475,8 @@ class GroupConfigurationsDetailHandlerTestCase(CourseTestCase, GroupConfiguratio
                 {u'id': 1, u'name': u'Group B', u'version': 1},
             ],
             u'usage': [],
+            u'parameters': {},
+            u'active': True,
         }
 
         response = self.client.put(
@@ -487,6 +496,7 @@ class GroupConfigurationsDetailHandlerTestCase(CourseTestCase, GroupConfiguratio
         self.assertEqual(len(user_partitions[0].groups), 2)
         self.assertEqual(user_partitions[0].groups[0].name, u'Group A')
         self.assertEqual(user_partitions[0].groups[1].name, u'Group B')
+        self.assertEqual(user_partitions[0].parameters, {})
 
     def test_can_edit_group_configuration(self):
         """
@@ -506,6 +516,8 @@ class GroupConfigurationsDetailHandlerTestCase(CourseTestCase, GroupConfiguratio
                 {u'id': 2, u'name': u'Group C', u'version': 1},
             ],
             u'usage': [],
+            u'parameters': {},
+            u'active': True,
         }
 
         response = self.client.put(
@@ -527,6 +539,7 @@ class GroupConfigurationsDetailHandlerTestCase(CourseTestCase, GroupConfiguratio
         self.assertEqual(len(user_partititons[0].groups), 2)
         self.assertEqual(user_partititons[0].groups[0].name, u'New Group Name')
         self.assertEqual(user_partititons[0].groups[1].name, u'Group C')
+        self.assertEqual(user_partititons[0].parameters, {})
 
     def test_can_delete_group_configuration(self):
         """
@@ -588,7 +601,6 @@ class GroupConfigurationsDetailHandlerTestCase(CourseTestCase, GroupConfiguratio
         self.assertEqual(user_partititons[0].name, 'Name 0')
 
 
-# pylint: disable=no-member
 class GroupConfigurationsUsageInfoTestCase(CourseTestCase, HelperMethods):
     """
     Tests for usage information of configurations and content groups.
@@ -612,6 +624,8 @@ class GroupConfigurationsUsageInfoTestCase(CourseTestCase, HelperMethods):
                 {'id': 1, 'name': 'Group B', 'version': 1, 'usage': usage_for_group},
                 {'id': 2, 'name': 'Group C', 'version': 1, 'usage': []},
             ],
+            u'parameters': {},
+            u'active': True,
         }
 
     def test_content_group_not_used(self):
@@ -704,6 +718,8 @@ class GroupConfigurationsUsageInfoTestCase(CourseTestCase, HelperMethods):
                 {'id': 2, 'name': 'Group C', 'version': 1},
             ],
             'usage': [],
+            'parameters': {},
+            'active': True,
         }]
         self.assertEqual(actual, expected)
 
@@ -733,6 +749,8 @@ class GroupConfigurationsUsageInfoTestCase(CourseTestCase, HelperMethods):
                 'label': 'Test Unit 0 / Test Content Experiment 0',
                 'validation': None,
             }],
+            'parameters': {},
+            'active': True,
         }, {
             'id': 1,
             'name': 'Name 1',
@@ -745,6 +763,8 @@ class GroupConfigurationsUsageInfoTestCase(CourseTestCase, HelperMethods):
                 {'id': 2, 'name': 'Group C', 'version': 1},
             ],
             'usage': [],
+            'parameters': {},
+            'active': True,
         }]
 
         self.assertEqual(actual, expected)
@@ -775,6 +795,8 @@ class GroupConfigurationsUsageInfoTestCase(CourseTestCase, HelperMethods):
                 'label': u"Test Unit 0 / Test Content Experiment 0JOSÉ ANDRÉS",
                 'validation': None,
             }],
+            'parameters': {},
+            'active': True,
         }]
 
         self.assertEqual(actual, expected)
@@ -810,6 +832,8 @@ class GroupConfigurationsUsageInfoTestCase(CourseTestCase, HelperMethods):
                 'label': 'Test Unit 1 / Test Content Experiment 1',
                 'validation': None,
             }],
+            'parameters': {},
+            'active': True,
         }]
         self.assertEqual(actual, expected)
 
@@ -831,6 +855,48 @@ class GroupConfigurationsUsageInfoTestCase(CourseTestCase, HelperMethods):
         self.save_course()
         actual = GroupConfiguration.get_content_experiment_usage_info(self.store, self.course)
         self.assertEqual(actual, {0: []})
+
+    def test_can_handle_multiple_partitions(self):
+        # Create the user partitions
+        self.course.user_partitions = [
+            UserPartition(
+                id=0,
+                name='Cohort user partition',
+                scheme=UserPartition.get_scheme('cohort'),
+                description='Cohorted user partition',
+                groups=[
+                    Group(id=0, name="Group A"),
+                    Group(id=1, name="Group B"),
+                ],
+            ),
+            UserPartition(
+                id=1,
+                name='Random user partition',
+                scheme=UserPartition.get_scheme('random'),
+                description='Random user partition',
+                groups=[
+                    Group(id=0, name="Group A"),
+                    Group(id=1, name="Group B"),
+                ],
+            ),
+        ]
+        self.store.update_item(self.course, ModuleStoreEnum.UserID.test)
+
+        # Assign group access rules for multiple partitions, one of which is a cohorted partition
+        __, problem = self._create_problem_with_content_group(0, 1)
+        problem.group_access = {
+            0: [0],
+            1: [1],
+        }
+        self.store.update_item(problem, ModuleStoreEnum.UserID.test)
+
+        # This used to cause an exception since the code assumed that
+        # only one partition would be available.
+        actual = GroupConfiguration.get_content_groups_usage_info(self.store, self.course)
+        self.assertEqual(actual.keys(), [0])
+
+        actual = GroupConfiguration.get_content_groups_items_usage_info(self.store, self.course)
+        self.assertEqual(actual.keys(), [0])
 
 
 class GroupConfigurationsValidationTestCase(CourseTestCase, HelperMethods):

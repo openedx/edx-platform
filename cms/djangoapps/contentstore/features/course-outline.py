@@ -3,7 +3,7 @@
 
 from lettuce import world, step
 from common import *
-from nose.tools import assert_true, assert_false, assert_equal  # pylint: disable=no-name-in-module
+from nose.tools import assert_true, assert_false
 
 from logging import getLogger
 logger = getLogger(__name__)
@@ -75,7 +75,7 @@ def i_press_the_section_delete_icon(step):
 
 @step(u'I will confirm all alerts')
 def i_confirm_all_alerts(step):
-    confirm_locator = '.prompt .nav-actions a.action-primary'
+    confirm_locator = '.prompt .nav-actions button.action-primary'
     world.css_click(confirm_locator)
 
 

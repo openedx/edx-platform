@@ -1,7 +1,10 @@
 <%!
-from staticfiles.storage import staticfiles_storage
+from django.contrib.staticfiles.storage import staticfiles_storage
 from pipeline_mako import compressed_css, compressed_js
 from django.utils.translation import get_language_bidi
+from mako.exceptions import TemplateLookupException
+
+from microsite_configuration import microsite
 %>
 
 <%def name='url(file, raw=False)'><%
@@ -19,7 +22,7 @@ except:
         group = rtl_group
   %>
 
-  % if settings.FEATURES['USE_DJANGO_PIPELINE']:
+  % if settings.PIPELINE_ENABLED:
     ${compressed_css(group, raw=raw)}
   % else:
     % for filename in settings.PIPELINE_CSS[group]['source_filenames']:
@@ -29,7 +32,7 @@ except:
 </%def>
 
 <%def name='js(group)'>
-  % if settings.FEATURES['USE_DJANGO_PIPELINE']:
+  % if settings.PIPELINE_ENABLED:
     ${compressed_js(group)}
   % else:
     % for filename in settings.PIPELINE_JS[group]['source_filenames']:
@@ -48,6 +51,43 @@ except:
 %></%def>
 
 <%def name="include(path)"><%
-from django.template.loaders.filesystem import _loader
-source, template_path = _loader.load_template_source(path)
+from django.conf import settings
+from django.template.engine import Engine
+from django.template.loaders.filesystem import Loader
+engine = Engine(dirs=settings.DEFAULT_TEMPLATE_ENGINE['DIRS'])
+source, template_path = Loader(engine).load_template_source(path)
 %>${source}</%def>
+
+<%def name="require_module(module_name, class_name)">
+    <script type="text/javascript">
+        (function (require) {
+            % if settings.REQUIRE_DEBUG:
+                require(['${module_name}'], function (${class_name}) {
+                    ${caller.body()}
+                });
+            % else:
+                ## The "raw" parameter is specified to avoid the URL from being further maninpulated by
+                ## static_replace calls (as woudl happen if require_module is used within courseware).
+                ## Without specifying "raw", a call to static_replace would result in the MD5 hash being
+                ## being appended more than once, causing the import to fail in production environments.
+                require(['${staticfiles_storage.url(module_name + ".js") + "?raw"}'], function () {
+                    require(['${module_name}'], function (${class_name}) {
+                        ${caller.body()}
+                    });
+                });
+            % endif
+        }).call(this, require || RequireJS.require);
+    </script>
+</%def>
+
+<%def name="optional_include_mako(file, with_microsite=False)"><%
+# http://stackoverflow.com/q/21219531
+if with_microsite:
+    file = microsite.get_template_path(file)
+try:
+    tmpl = self.get_template(file)
+except TemplateLookupException:
+    pass
+else:
+    tmpl.render_context(context)
+%></%def>

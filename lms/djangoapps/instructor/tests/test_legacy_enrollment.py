@@ -12,7 +12,7 @@ from django.core.urlresolvers import reverse
 from courseware.tests.helpers import LoginEnrollmentTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from student.tests.factories import UserFactory, CourseEnrollmentFactory, AdminFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from student.models import CourseEnrollment, CourseEnrollmentAllowed
 from instructor.views.legacy import get_and_clean_student_list, send_mail_to_student
 from django.core import mail
@@ -22,18 +22,20 @@ USER_COUNT = 4
 
 @attr('shard_1')
 @ddt.ddt
-class TestInstructorEnrollsStudent(ModuleStoreTestCase, LoginEnrollmentTestCase):
+class TestInstructorEnrollsStudent(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Check Enrollment/Unenrollment with/without auto-enrollment on activation and with/without email notification
     """
+    @classmethod
+    def setUpClass(cls):
+        super(TestInstructorEnrollsStudent, cls).setUpClass()
+        cls.course = CourseFactory.create()
 
     def setUp(self):
         super(TestInstructorEnrollsStudent, self).setUp()
 
         instructor = AdminFactory.create()
         self.client.login(username=instructor.username, password='test')
-
-        self.course = CourseFactory.create()
 
         self.users = [
             UserFactory.create(username="student%d" % i, email="student%d@test.com" % i)

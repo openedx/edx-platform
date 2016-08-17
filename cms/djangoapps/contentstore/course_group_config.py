@@ -199,6 +199,8 @@ class GroupConfiguration(object):
         """
         Returns all units names and their urls.
 
+        This will return only groups for the cohort user partition.
+
         Returns:
         {'group_id':
             [
@@ -214,25 +216,22 @@ class GroupConfiguration(object):
         }
         """
         usage_info = {}
-        for item in items:
-            if hasattr(item, 'group_access') and item.group_access:
-                (__, group_ids), = item.group_access.items()
-                for group_id in group_ids:
-                    if group_id not in usage_info:
-                        usage_info[group_id] = []
+        for item, group_id in GroupConfiguration._iterate_items_and_content_group_ids(course, items):
+            if group_id not in usage_info:
+                usage_info[group_id] = []
 
-                    unit = item.get_parent()
-                    if not unit:
-                        log.warning("Unable to find parent for component %s", item.location)
-                        continue
+            unit = item.get_parent()
+            if not unit:
+                log.warning("Unable to find parent for component %s", item.location)
+                continue
 
-                    usage_info = GroupConfiguration._get_usage_info(
-                        course,
-                        unit=unit,
-                        item=item,
-                        usage_info=usage_info,
-                        group_id=group_id
-                    )
+            usage_info = GroupConfiguration._get_usage_info(
+                course,
+                unit=unit,
+                item=item,
+                usage_info=usage_info,
+                group_id=group_id
+            )
 
         return usage_info
 
@@ -250,6 +249,8 @@ class GroupConfiguration(object):
         """
         Returns all items names and their urls.
 
+        This will return only groups for the cohort user partition.
+
         Returns:
         {'group_id':
             [
@@ -265,22 +266,37 @@ class GroupConfiguration(object):
         }
         """
         usage_info = {}
-        for item in items:
-            if hasattr(item, 'group_access') and item.group_access:
-                (__, group_ids), = item.group_access.items()
-                for group_id in group_ids:
-                    if group_id not in usage_info:
-                        usage_info[group_id] = []
+        for item, group_id in GroupConfiguration._iterate_items_and_content_group_ids(course, items):
+            if group_id not in usage_info:
+                usage_info[group_id] = []
 
-                    usage_info = GroupConfiguration._get_usage_info(
-                        course,
-                        unit=item,
-                        item=item,
-                        usage_info=usage_info,
-                        group_id=group_id
-                    )
+            usage_info = GroupConfiguration._get_usage_info(
+                course,
+                unit=item,
+                item=item,
+                usage_info=usage_info,
+                group_id=group_id
+            )
 
         return usage_info
+
+    @staticmethod
+    def _iterate_items_and_content_group_ids(course, items):
+        """
+        Iterate through items and content group IDs in a course.
+
+        This will yield group IDs *only* for cohort user partitions.
+
+        Yields: tuple of (item, group_id)
+        """
+        content_group_configuration = get_cohorted_user_partition(course)
+        if content_group_configuration is not None:
+            for item in items:
+                if hasattr(item, 'group_access') and item.group_access:
+                    group_ids = item.group_access.get(content_group_configuration.id, [])
+
+                    for group_id in group_ids:
+                        yield item, group_id
 
     @staticmethod
     def update_usage_info(store, course, configuration):
@@ -329,7 +345,7 @@ class GroupConfiguration(object):
         the client explicitly creates a group within the partition and
         POSTs back.
         """
-        content_group_configuration = get_cohorted_user_partition(course.id)
+        content_group_configuration = get_cohorted_user_partition(course)
         if content_group_configuration is None:
             content_group_configuration = UserPartition(
                 id=generate_int_id(MINIMUM_GROUP_ID, MYSQL_MAX_INT, GroupConfiguration.get_used_ids(course)),

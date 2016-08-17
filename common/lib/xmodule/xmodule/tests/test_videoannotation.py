@@ -83,5 +83,14 @@ class VideoAnnotationModuleTestCase(unittest.TestCase):
         Tests to make sure variables passed in truly exist within the html once it is all rendered.
         """
         context = self.mod.student_view({}).content
-        for key in ['display_name', 'instructions_html', 'sourceUrl', 'typeSource', 'poster', 'annotation_storage', 'default_tab', 'instructor_email', 'annotation_mode', "is_course_staff"]:
+        for key in ['display_name',
+                    'instructions_html',
+                    'sourceUrl',
+                    'typeSource',
+                    'poster',
+                    'annotation_storage',
+                    'default_tab',
+                    'instructor_email',
+                    'annotation_mode',
+                    'is_course_staff']:
             self.assertIn(key, context)

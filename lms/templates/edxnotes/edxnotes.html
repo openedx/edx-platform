@@ -102,17 +102,14 @@ import json
 </script>
 % endfor
 </%block>
-<%block name="js_extra">
+
 % if notes:
-<script type="text/javascript">
-  (function (require) {
-      require(['js/edxnotes/views/page_factory'], function (NotesPageFactory) {
-          var pageView = new NotesPageFactory({
-              notesList: ${notes},
-              debugMode: ${debug}
-          });
-    });
-  }).call(this, require || RequireJS.require);
-</script>
+    <%block name="js_extra">
+    <%static:require_module module_name="js/edxnotes/views/page_factory" class_name="NotesPageFactory">
+        NotesPageFactory({
+            notesList: ${notes if notes is not None else []},
+            debugMode: ${debug}
+        });
+    </%static:require_module>
+    </%block>
 % endif
-</%block>

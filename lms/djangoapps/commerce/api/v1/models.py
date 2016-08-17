@@ -1,12 +1,13 @@
 """ API v1 models. """
 from itertools import groupby
-import logging
 
+import logging
 from django.db import transaction
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
-
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from course_modes.models import CourseMode
+from lms.djangoapps.verify_student.models import VerificationDeadline
 
 log = logging.getLogger(__name__)
 
@@ -17,17 +18,53 @@ class Course(object):
     modes = None
     _deleted_modes = None
 
-    def __init__(self, id, modes):  # pylint: disable=invalid-name,redefined-builtin
+    def __init__(self, id, modes, verification_deadline=None):  # pylint: disable=redefined-builtin
         self.id = CourseKey.from_string(unicode(id))  # pylint: disable=invalid-name
         self.modes = list(modes)
+        self.verification_deadline = verification_deadline
         self._deleted_modes = []
 
-    @transaction.commit_on_success
+    @property
+    def name(self):
+        """ Return course name. """
+        course_id = CourseKey.from_string(unicode(self.id))
+
+        try:
+            return CourseOverview.get_from_id(course_id).display_name
+        except CourseOverview.DoesNotExist:
+            # NOTE (CCB): Ideally, the course modes table should only contain data for courses that exist in
+            # modulestore. If that is not the case, say for local development/testing, carry on without failure.
+            log.warning('Failed to retrieve CourseOverview for [%s]. Using empty course name.', course_id)
+            return None
+
+    def get_mode_display_name(self, mode):
+        """ Returns display name for the given mode. """
+        slug = mode.mode_slug.strip().lower()
+
+        if slug == 'credit':
+            return 'Credit'
+        if 'professional' in slug:
+            return 'Professional Education'
+        elif slug == 'verified':
+            return 'Verified Certificate'
+        elif slug == 'honor':
+            return 'Honor Certificate'
+        elif slug == 'audit':
+            return 'Audit'
+
+        return mode.mode_slug
+
+    @transaction.atomic
     def save(self, *args, **kwargs):  # pylint: disable=unused-argument
         """ Save the CourseMode objects to the database. """
+
+        # Override the verification deadline for the course (not the individual modes)
+        if self.verification_deadline is not None:
+            VerificationDeadline.set_deadline(self.id, self.verification_deadline, is_explicit=True)
+
         for mode in self.modes:
             mode.course_id = self.id
-            mode.mode_display_name = mode.mode_slug
+            mode.mode_display_name = self.get_mode_display_name(mode)
             mode.save()
 
         deleted_mode_ids = [mode.id for mode in self._deleted_modes]
@@ -36,6 +73,8 @@ class Course(object):
 
     def update(self, attrs):
         """ Update the model with external data (usually passed via API call). """
+        self.verification_deadline = attrs.get('verification_deadline')
+
         existing_modes = {mode.mode_slug: mode for mode in self.modes}
         merged_modes = set()
         merged_mode_keys = set()
@@ -49,6 +88,9 @@ class Course(object):
             merged_mode.min_price = posted_mode.min_price
             merged_mode.currency = posted_mode.currency
             merged_mode.sku = posted_mode.sku
+            if posted_mode.expiration_datetime is not None:
+                merged_mode.expiration_datetime = posted_mode.expiration_datetime
+            merged_mode.save()
 
             merged_modes.add(merged_mode)
             merged_mode_keys.add(merged_mode.mode_slug)
@@ -69,7 +111,8 @@ class Course(object):
         course_modes = CourseMode.objects.filter(course_id=course_id)
 
         if course_modes:
-            return cls(unicode(course_id), list(course_modes))
+            verification_deadline = VerificationDeadline.deadline_for_course(course_id)
+            return cls(course_id, list(course_modes), verification_deadline=verification_deadline)
 
         return None
 
