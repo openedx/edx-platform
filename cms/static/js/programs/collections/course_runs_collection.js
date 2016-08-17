@@ -1,11 +1,11 @@
 define([
-        'backbone',
-        'jquery',
-        'js/programs/utils/api_config',
-        'js/programs/collections/auto_auth_collection',
-        'jquery.cookie'
-    ],
-    function( Backbone, $, apiConfig, AutoAuthCollection ) {
+    'backbone',
+    'jquery',
+    'js/programs/utils/api_config',
+    'js/programs/collections/auto_auth_collection',
+    'jquery.cookie'
+],
+    function(Backbone, $, apiConfig, AutoAuthCollection) {
         'use strict';
 
         return AutoAuthCollection.extend({
@@ -43,7 +43,7 @@ define([
 
             // Adds a run back into the model for selection
             addRun: function(id) {
-                var courseRun = _.findWhere( this.allRuns, { id: id });
+                var courseRun = _.findWhere(this.allRuns, {id: id});
 
                 this.create(courseRun);
             },

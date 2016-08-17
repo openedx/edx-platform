@@ -16,7 +16,6 @@ class ProgramsApiConfigMixin(object):
         'internal_service_url': 'http://internal.programs.org/',
         'public_service_url': 'http://public.programs.org/',
         'cache_ttl': 0,
-        'enable_student_dashboard': True,
         'enable_studio_tab': True,
         'enable_certification': True,
         'program_listing_enabled': True,

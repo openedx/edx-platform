@@ -1,4 +1,4 @@
-;(function (define, undefined) {
+(function(define, undefined) {
     'use strict';
     define([
         'gettext', 'jquery', 'underscore', 'backbone', 'logger',
@@ -7,10 +7,9 @@
         'js/student_account/views/account_settings_fields',
         'js/student_account/views/account_settings_view',
         'edx-ui-toolkit/js/utils/string-utils'
-    ], function (gettext, $, _, Backbone, Logger, UserAccountModel, UserPreferencesModel,
+    ], function(gettext, $, _, Backbone, Logger, UserAccountModel, UserPreferencesModel,
                  AccountSettingsFieldViews, AccountSettingsView, StringUtils) {
-
-        return function (
+        return function(
             fieldsData,
             ordersHistoryData,
             authData,
@@ -21,7 +20,7 @@
         ) {
             var accountSettingsElement, userAccountModel, userPreferencesModel, aboutSectionsData,
                 accountsSectionData, ordersSectionData, accountSettingsView, showAccountSettingsPage,
-                showLoadingError, orderNumber;
+                showLoadingError, orderNumber, getUserField, userFields, timeZoneDropdownField, countryDropdownField;
 
             accountSettingsElement = $('.wrapper-account-settings');
 
@@ -32,7 +31,7 @@
             userPreferencesModel.url = userPreferencesApiUrl;
 
             aboutSectionsData = [
-                 {
+                {
                     title: gettext('Basic Account Information'),
                     subtitle: gettext('These settings include basic information about your account. You can also specify additional information and see your linked social accounts on this page.'),  // eslint-disable-line max-len
                     fields: [
@@ -111,7 +110,7 @@
                             })
                         },
                         {
-                            view: new AccountSettingsFieldViews.DropdownFieldView({
+                            view: new AccountSettingsFieldViews.TimeZoneFieldView({
                                 model: userPreferencesModel,
                                 required: true,
                                 title: gettext('Time Zone'),
@@ -121,7 +120,10 @@
                                     'time zone here, course dates, including assignment deadlines, are displayed in ' +
                                     'Coordinated Universal Time (UTC).'
                                 ),
-                                options: fieldsData.time_zone.options,
+                                groupOptions: [{
+                                    groupTitle: gettext('All Time Zones'),
+                                    selectOptions: fieldsData.time_zone.options
+                                }],
                                 persistChanges: true
                             })
                         }
@@ -169,6 +171,19 @@
                     ]
                 }
             ];
+
+            // set TimeZoneField to listen to CountryField
+            getUserField = function(list, search) {
+                return _.find(list, function(field) {
+                    return field.view.options.valueAttribute === search;
+                }).view;
+            };
+            userFields = _.find(aboutSectionsData, function(section) {
+                return section.title === gettext('Basic Account Information');
+            }).fields;
+            timeZoneDropdownField = getUserField(userFields, 'time_zone');
+            countryDropdownField = getUserField(userFields, 'country');
+            timeZoneDropdownField.listenToCountryView(countryDropdownField);
 
             accountsSectionData = [
                 {
@@ -243,10 +258,10 @@
 
             accountSettingsView.render();
 
-            showAccountSettingsPage = function () {
+            showAccountSettingsPage = function() {
                 // Record that the account settings page was viewed.
                 Logger.log('edx.user.settings.viewed', {
-                    page: "account",
+                    page: 'account',
                     visibility: null,
                     user_id: accountUserId
                 });
@@ -255,12 +270,12 @@
                 accountSettingsView.renderFields();
             };
 
-            showLoadingError = function () {
+            showLoadingError = function() {
                 accountSettingsView.showLoadingError();
             };
 
             userAccountModel.fetch({
-                success: function () {
+                success: function() {
                     // Fetch the user preferences model
                     userPreferencesModel.fetch({
                         success: showAccountSettingsPage,

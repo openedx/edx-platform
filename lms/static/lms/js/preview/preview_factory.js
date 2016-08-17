@@ -1,10 +1,9 @@
-;(function(define) {
+(function(define) {
     'use strict';
 
     define(['jquery', 'common/js/components/utils/view_utils'],
         function($, ViewUtils) {
             return function(options) {
-
                 var $selectElement = $('.action-preview-select'),
                     $userNameElement = $('.action-preview-username'),
                     $userNameContainer = $('.action-preview-username-container');

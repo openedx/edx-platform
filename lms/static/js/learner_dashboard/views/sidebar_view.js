@@ -1,4 +1,4 @@
-;(function (define) {
+(function(define) {
     'use strict';
 
     define(['backbone',
@@ -18,30 +18,30 @@
              CertificateView,
              sidebarTpl
          ) {
-            return Backbone.View.extend({
-                el: '.sidebar',
+             return Backbone.View.extend({
+                 el: '.sidebar',
 
-                tpl: _.template(sidebarTpl),
+                 tpl: _.template(sidebarTpl),
 
-                initialize: function(data) {
-                    this.context = data.context;
-                },
+                 initialize: function(data) {
+                     this.context = data.context;
+                 },
 
-                render: function() {
-                    this.$el.html(this.tpl(this.context));
-                    this.postRender();
-                },
+                 render: function() {
+                     this.$el.html(this.tpl(this.context));
+                     this.postRender();
+                 },
 
-                postRender: function() {
-                    this.newProgramsView = new NewProgramsView({
-                        context: this.context
-                    });
+                 postRender: function() {
+                     this.newProgramsView = new NewProgramsView({
+                         context: this.context
+                     });
 
-                    this.newCertificateView = new CertificateView({
-                        context: this.context
-                    });
-                }
-            });
-        }
+                     this.newCertificateView = new CertificateView({
+                         context: this.context
+                     });
+                 }
+             });
+         }
     );
 }).call(this, define || RequireJS.define);

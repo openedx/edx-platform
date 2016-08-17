@@ -1,4 +1,4 @@
-;(function (define) {
+(function(define) {
     'use strict';
     define(['underscore', 'gettext', 'teams/js/collections/base', 'teams/js/models/topic'],
         function(_, gettext, BaseCollection, TopicModel) {
@@ -10,8 +10,8 @@
                 },
 
                 queryParams: {
-                    course_id: function () { return this.course_id; },
-                    text_search: function () { return this.searchString || ''; }
+                    course_id: function() { return this.course_id; },
+                    text_search: function() { return this.searchString || ''; }
                 },
 
                 constructor: function(topics, options) {

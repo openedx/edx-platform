@@ -1,4 +1,4 @@
-define(["backbone"],
+define(['backbone'],
     function(Backbone) {
         'use strict';
         var getLocationHash, preventBackboneChangingUrl;
@@ -32,12 +32,12 @@ define(["backbone"],
             };
 
             // Stub out the Backbone router so that the browser doesn't actually navigate
-            spyOn(Backbone.history, '_updateHash').and.callFake(function (location, fragment) {
+            spyOn(Backbone.history, '_updateHash').and.callFake(function(location, fragment) {
                 history.currentFragment = fragment;
             });
 
             // Stub out getHash so that Backbone thinks that the browser has navigated
-            spyOn(Backbone.history, 'getHash').and.callFake(function () {
+            spyOn(Backbone.history, 'getHash').and.callFake(function() {
                 return history.currentFragment;
             });
         };

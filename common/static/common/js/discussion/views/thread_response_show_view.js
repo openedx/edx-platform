@@ -18,9 +18,8 @@
             return child;
         };
 
-    if (typeof Backbone !== "undefined" && Backbone !== null) {
+    if (typeof Backbone !== 'undefined' && Backbone !== null) {
         this.ThreadResponseShowView = (function(_super) {
-
             __extends(ThreadResponseShowView, _super);
 
             function ThreadResponseShowView() {
@@ -29,11 +28,11 @@
 
             ThreadResponseShowView.prototype.initialize = function() {
                 ThreadResponseShowView.__super__.initialize.call(this);
-                return this.listenTo(this.model, "change", this.render);
+                return this.listenTo(this.model, 'change', this.render);
             };
 
             ThreadResponseShowView.prototype.renderTemplate = function() {
-                var template = edx.HtmlUtils.template($("#thread-response-show-template").html()),
+                var template = edx.HtmlUtils.template($('#thread-response-show-template').html()),
                     context = _.extend({
                         cid: this.model.cid,
                         author_display: this.getAuthorDisplay(),
@@ -47,26 +46,24 @@
                 edx.HtmlUtils.setHtml(this.$el, this.renderTemplate());
                 this.delegateEvents();
                 this.renderAttrs();
-                this.$el.find(".posted-details .timeago").timeago();
+                this.$el.find('.posted-details .timeago').timeago();
                 this.convertMath();
                 return this;
             };
 
             ThreadResponseShowView.prototype.convertMath = function() {
-                DiscussionUtil.convertMath(this.$(".response-body"));
+                DiscussionUtil.convertMath(this.$('.response-body'));
             };
 
             ThreadResponseShowView.prototype.edit = function(event) {
-                return this.trigger("response:edit", event);
+                return this.trigger('response:edit', event);
             };
 
             ThreadResponseShowView.prototype._delete = function(event) {
-                return this.trigger("response:_delete", event);
+                return this.trigger('response:_delete', event);
             };
 
             return ThreadResponseShowView;
-
         })(DiscussionContentShowView);
     }
-
 }).call(window);

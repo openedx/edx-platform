@@ -2,11 +2,11 @@
     'use strict';
 
     define([
-            'backbone',
-            'js/programs/router',
-            'js/programs/utils/api_config'
-        ],
-        function( Backbone, ProgramRouter, apiConfig ) {
+        'backbone',
+        'js/programs/router',
+        'js/programs/utils/api_config'
+    ],
+        function(Backbone, ProgramRouter, apiConfig) {
             return Backbone.View.extend({
                 el: '.js-program-admin',
 
@@ -37,14 +37,14 @@
                  * @param {Event} event - Event being handled.
                  * @returns {boolean} - Indicates if event handling succeeded (always true).
                  */
-                navigate: function (event) {
-                    var url = $(event.target).attr('href').replace( this.app.root, '' );
+                navigate: function(event) {
+                    var url = $(event.target).attr('href').replace(this.app.root, '');
 
                     /**
                      * Handle the cases where the user wants to open the link in a new tab/window.
                      * event.which === 2 checks for the middle mouse button (https://api.jquery.com/event.which/)
                      */
-                    if ( event.ctrlKey || event.shiftKey || event.metaKey || event.which === 2 ) {
+                    if (event.ctrlKey || event.shiftKey || event.metaKey || event.which === 2) {
                         return true;
                     }
 
@@ -52,14 +52,14 @@
                     event.preventDefault();
 
                     // Process the navigation in the app/router.
-                    if ( url === Backbone.history.getFragment() && url === '' ) {
+                    if (url === Backbone.history.getFragment() && url === '') {
                         /**
                          * Note: We must call the index directly since Backbone
                          * does not support routing to the same route.
                          */
                         this.app.index();
                     } else {
-                        this.app.navigate( url, { trigger: true } );
+                        this.app.navigate(url, {trigger: true});
                     }
                 }
             });

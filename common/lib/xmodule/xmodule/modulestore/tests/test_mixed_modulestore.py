@@ -357,6 +357,18 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
             with self.assertRaises(DuplicateCourseError):
                 self.store.create_course('org_x', 'course_y', 'run_z', self.user_id)
 
+    @ddt.data(ModuleStoreEnum.Type.split, ModuleStoreEnum.Type.mongo)
+    def test_duplicate_course_error_with_different_case_ids(self, default_store):
+        """
+        Verify that course can not be created with same course_id with different case.
+        """
+        self._initialize_mixed(mappings={})
+        with self.store.default_store(default_store):
+            self.store.create_course('org_x', 'course_y', 'run_z', self.user_id)
+
+            with self.assertRaises(DuplicateCourseError):
+                self.store.create_course('ORG_X', 'COURSE_Y', 'RUN_Z', self.user_id)
+
     # Draft:
     #    problem: One lookup to locate an item that exists
     #    fake: one w/ wildcard version

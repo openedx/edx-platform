@@ -19,18 +19,17 @@
         };
 
     function getSingleThreadRoute(commentable_id, thread_id) {
-        return commentable_id + "/threads/" + thread_id;
+        return commentable_id + '/threads/' + thread_id;
     }
 
-    if (typeof Backbone !== "undefined" && Backbone !== null) {
+    if (typeof Backbone !== 'undefined' && Backbone !== null) {
         this.DiscussionRouter = (function(_super) {
-
-            var allThreadsRoute = "",
-                singleThreadRoute = getSingleThreadRoute(":forum_name", ":thread_id"), // :forum_name/threads/:thread_id
+            var allThreadsRoute = '',
+                singleThreadRoute = getSingleThreadRoute(':forum_name', ':thread_id'), // :forum_name/threads/:thread_id
                 routes = {};
 
-            routes[allThreadsRoute] = "allThreads";
-            routes[singleThreadRoute] = "showThread";
+            routes[allThreadsRoute] = 'allThreads';
+            routes[singleThreadRoute] = 'showThread';
 
             __extends(DiscussionRouter, _super);
 
@@ -68,25 +67,25 @@
                 this.course_settings = options.course_settings;
                 this.nav = new DiscussionThreadListView({
                     collection: this.discussion,
-                    el: $(".forum-nav"),
+                    el: $('.forum-nav'),
                     courseSettings: this.course_settings
                 });
-                this.nav.on("thread:selected", this.navigateToThread);
-                this.nav.on("thread:removed", this.navigateToAllThreads);
-                this.nav.on("threads:rendered", this.setActiveThread);
-                this.nav.on("thread:created", this.navigateToThread);
+                this.nav.on('thread:selected', this.navigateToThread);
+                this.nav.on('thread:removed', this.navigateToAllThreads);
+                this.nav.on('threads:rendered', this.setActiveThread);
+                this.nav.on('thread:created', this.navigateToThread);
                 this.nav.render();
                 this.newPost = $('.new-post-article');
                 this.newPostView = new NewPostView({
                     el: this.newPost,
                     collection: this.discussion,
                     course_settings: this.course_settings,
-                    mode: "tab"
+                    mode: 'tab'
                 });
                 this.newPostView.render();
                 this.listenTo(this.newPostView, 'newPost:cancel', this.hideNewPost);
-                $('.new-post-btn').bind("click", this.showNewPost);
-                return $('.new-post-btn').bind("keydown", function(event) {
+                $('.new-post-btn').bind('click', this.showNewPost);
+                return $('.new-post-btn').bind('keydown', function(event) {
                     return DiscussionUtil.activateOnSpace(event, self.showNewPost);
                 });
             };
@@ -98,7 +97,7 @@
 
             DiscussionRouter.prototype.setActiveThread = function() {
                 if (this.thread) {
-                    this.nav.setActiveThread(this.thread.get("id"));
+                    this.nav.setActiveThread(this.thread.get('id'));
                 }
             };
 
@@ -123,18 +122,18 @@
                     // otherwise display error message and navigate to all threads view
                     var errorMsg;
                     if (xhr.status === 404) {
-                        errorMsg = gettext("The thread you selected has been deleted. Please select another thread.");
+                        errorMsg = gettext('The thread you selected has been deleted. Please select another thread.');
                     } else {
-                        errorMsg = gettext("We had some trouble loading more responses. Please try again.");
+                        errorMsg = gettext('We had some trouble loading more responses. Please try again.');
                     }
-                    DiscussionUtil.discussionAlert(gettext("Sorry"), errorMsg);
+                    DiscussionUtil.discussionAlert(gettext('Sorry'), errorMsg);
                     this.allThreads();
                 });
             };
 
             DiscussionRouter.prototype.renderThreadView = function() {
-                this.thread.set("unread_comments_count", 0);
-                this.thread.set("read", true);
+                this.thread.set('unread_comments_count', 0);
+                this.thread.set('read', true);
                 this.setActiveThread();
                 this.showMain();
             };
@@ -145,29 +144,29 @@
                     this.main.cleanup();
                     this.main.undelegateEvents();
                 }
-                if (!($(".forum-content").is(":visible"))) {
-                    $(".forum-content").fadeIn();
+                if (!($('.forum-content').is(':visible'))) {
+                    $('.forum-content').fadeIn();
                 }
-                if (this.newPost.is(":visible")) {
+                if (this.newPost.is(':visible')) {
                     this.newPost.fadeOut();
                 }
                 this.main = new DiscussionThreadView({
-                    el: $(".forum-content"),
+                    el: $('.forum-content'),
                     model: this.thread,
-                    mode: "tab",
+                    mode: 'tab',
                     course_settings: this.course_settings
                 });
                 this.main.render();
-                this.main.on("thread:responses:rendered", function() {
+                this.main.on('thread:responses:rendered', function() {
                     return self.nav.updateSidebar();
                 });
-                this.thread.on("thread:thread_type_updated", this.showMain);
+                this.thread.on('thread:thread_type_updated', this.showMain);
             };
 
             DiscussionRouter.prototype.navigateToThread = function(thread_id) {
                 var thread, targetThreadRoute;
                 thread = this.discussion.get(thread_id);
-                targetThreadRoute = getSingleThreadRoute(thread.get("commentable_id"), thread_id);
+                targetThreadRoute = getSingleThreadRoute(thread.get('commentable_id'), thread_id);
                 this.navigate(targetThreadRoute, {trigger: true});
             };
 
@@ -195,8 +194,6 @@
             };
 
             return DiscussionRouter;
-
         })(Backbone.Router);
     }
-
 }).call(window);

@@ -8,25 +8,25 @@ define([
     'js/views/baseview',
     'common/js/components/utils/view_utils',
     'common/js/components/views/feedback_notification',
-    "text!templates/certificate-web-preview.underscore"
+    'text!templates/certificate-web-preview.underscore'
 ],
 function(_, gettext, BaseView, ViewUtils, NotificationView, certificateWebPreviewTemplate) {
     'use strict';
     var CertificateWebPreview = BaseView.extend({
-        el: $(".preview-certificate"),
+        el: $('.preview-certificate'),
         events: {
-            "change #course-modes": "courseModeChanged",
-            "click .activate-cert": "toggleCertificateActivation"
+            'change #course-modes': 'courseModeChanged',
+            'click .activate-cert': 'toggleCertificateActivation'
         },
 
-        initialize: function (options) {
+        initialize: function(options) {
             this.course_modes = options.course_modes;
             this.certificate_web_view_url = options.certificate_web_view_url;
             this.certificate_activation_handler_url = options.certificate_activation_handler_url;
             this.is_active = options.is_active;
         },
 
-        render: function () {
+        render: function() {
             this.$el.html(_.template(certificateWebPreviewTemplate)({
                 course_modes: this.course_modes,
                 certificate_web_view_url: this.certificate_web_view_url,
@@ -36,9 +36,9 @@ function(_, gettext, BaseView, ViewUtils, NotificationView, certificateWebPrevie
         },
 
         toggleCertificateActivation: function() {
-            var msg = "Activating";
-            if(this.is_active) {
-                msg = "Deactivating";
+            var msg = 'Activating';
+            if (this.is_active) {
+                msg = 'Deactivating';
             }
 
             var notification = new NotificationView.Mini({
@@ -47,24 +47,24 @@ function(_, gettext, BaseView, ViewUtils, NotificationView, certificateWebPrevie
 
             $.ajax({
                 url: this.certificate_activation_handler_url,
-                type: "POST",
-                dataType: "json",
-                contentType: "application/json",
+                type: 'POST',
+                dataType: 'json',
+                contentType: 'application/json',
                 data: JSON.stringify({
                     is_active: !this.is_active
                 }),
                 beforeSend: function() {
                     notification.show();
                 },
-                success: function(){
+                success: function() {
                     notification.hide();
                     location.reload();
                 }
             });
         },
 
-        courseModeChanged: function (event) {
-            $('.preview-certificate-link').attr('href', function(index, value){
+        courseModeChanged: function(event) {
+            $('.preview-certificate-link').attr('href', function(index, value) {
                 return value.replace(/preview=([^&]+)/, function() {
                     return 'preview=' + event.target.options[event.target.selectedIndex].text;
                 });

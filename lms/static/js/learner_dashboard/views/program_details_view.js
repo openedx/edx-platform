@@ -1,4 +1,4 @@
-;(function (define) {
+(function(define) {
     'use strict';
 
     define(['backbone',
@@ -24,41 +24,41 @@
              CourseCardView,
              pageTpl
          ) {
-            return Backbone.View.extend({
-                el: '.js-program-details-wrapper',
+             return Backbone.View.extend({
+                 el: '.js-program-details-wrapper',
 
-                tpl: HtmlUtils.template(pageTpl),
+                 tpl: HtmlUtils.template(pageTpl),
 
-                initialize: function(options) {
-                    this.options = options;
-                    this.programModel = new Backbone.Model(this.options.programData);
-                    this.courseCardCollection = new CourseCardCollection(
+                 initialize: function(options) {
+                     this.options = options;
+                     this.programModel = new Backbone.Model(this.options.programData);
+                     this.courseCardCollection = new CourseCardCollection(
                         this.programModel.get('course_codes')
                     );
-                    this.render();
-                },
+                     this.render();
+                 },
 
-                render: function() {
-                    HtmlUtils.setHtml(this.$el, this.tpl());
-                    this.postRender();
-                },
+                 render: function() {
+                     HtmlUtils.setHtml(this.$el, this.tpl());
+                     this.postRender();
+                 },
 
-                postRender: function() {
-                    this.headerView = new HeaderView({
-                        model: new Backbone.Model(this.options)
-                    });
-                    new CollectionListView({
-                        el: '.js-course-list',
-                        childView: CourseCardView,
-                        collection: this.courseCardCollection,
-                        context: this.options,
-                        titleContext: {
-                            el: 'h2',
-                            title: 'Course List'
-                        }
-                    }).render();
-                }
-            });
-        }
+                 postRender: function() {
+                     this.headerView = new HeaderView({
+                         model: new Backbone.Model(this.options)
+                     });
+                     new CollectionListView({
+                         el: '.js-course-list',
+                         childView: CourseCardView,
+                         collection: this.courseCardCollection,
+                         context: this.options,
+                         titleContext: {
+                             el: 'h2',
+                             title: 'Course List'
+                         }
+                     }).render();
+                 }
+             });
+         }
     );
 }).call(this, define || RequireJS.define);

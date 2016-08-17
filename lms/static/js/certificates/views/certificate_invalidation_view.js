@@ -1,15 +1,15 @@
 // Backbone Application View: CertificateInvalidationView
-/*global define, RequireJS */
+/* global define, RequireJS */
 
-;(function(define) {
+(function(define) {
     'use strict';
     define(
         ['jquery', 'underscore', 'gettext', 'backbone', 'js/certificates/models/certificate_invalidation'],
 
         function($, _, gettext, Backbone, CertificateInvalidationModel) {
             return Backbone.View.extend({
-                el: "#certificate-invalidation",
-                messages: "div.message",
+                el: '#certificate-invalidation',
+                messages: 'div.message',
                 events: {
                     'click #invalidate-certificate': 'invalidateCertificate',
                     'click .re-validate-certificate': 'reValidateCertificate'
@@ -25,15 +25,15 @@
                 },
 
                 loadTemplate: function(name) {
-                    var templateSelector = "#" + name + "-tpl",
-                    templateText = $(templateSelector).text();
+                    var templateSelector = '#' + name + '-tpl',
+                        templateText = $(templateSelector).text();
                     return _.template(templateText);
                 },
 
                 invalidateCertificate: function() {
-                    var user = this.$("#certificate-invalidation-user").val();
-                    var notes = this.$("#certificate-invalidation-notes").val();
-                    var message = "";
+                    var user = this.$('#certificate-invalidation-user').val();
+                    var notes = this.$('#certificate-invalidation-notes').val();
+                    var message = '';
 
                     var certificate_invalidation = new CertificateInvalidationModel(
                         {
@@ -65,14 +65,13 @@
                                     var response_data = JSON.parse(response.responseText);
                                     self.escapeAndShowMessage(response_data.message);
                                 }
-                                catch(exception) {
+                                catch (exception) {
                                     self.escapeAndShowMessage(
-                                        gettext("Server Error, Please refresh the page and try again.")
+                                        gettext('Server Error, Please refresh the page and try again.')
                                     );
                                 }
                             }
                         });
-
                     }
                     else {
                         this.escapeAndShowMessage(certificate_invalidation.validationError);
@@ -96,9 +95,9 @@
                                     var response_data = JSON.parse(response.responseText);
                                     self.escapeAndShowMessage(response_data.message);
                                 }
-                                catch(exception) {
+                                catch (exception) {
                                     self.escapeAndShowMessage(
-                                        gettext("Server Error, Please refresh the page and try again.")
+                                        gettext('Server Error, Please refresh the page and try again.')
                                     );
                                 }
                             },
@@ -119,8 +118,8 @@
                 },
 
                 escapeAndShowMessage: function(message) {
-                    $(this.messages +  ">p" ).remove();
-                    this.$(this.messages).removeClass('hidden').append("<p>"+ _.escape(message) + "</p>");
+                    $(this.messages + '>p').remove();
+                    this.$(this.messages).removeClass('hidden').append('<p>' + _.escape(message) + '</p>');
                 }
 
             });

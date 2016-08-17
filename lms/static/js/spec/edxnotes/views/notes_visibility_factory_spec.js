@@ -33,7 +33,7 @@ define([
             spyOn(this.toggleNotes, 'toggleHandler').and.callThrough();
         });
 
-        afterEach(function () {
+        afterEach(function() {
             NotesVisibilityFactory.VisibilityDecorator._setVisibility(null);
             while (Annotator._instances.length > 0) {
                 Annotator._instances[0].destroy();

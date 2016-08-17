@@ -1,8 +1,8 @@
 define([
-        'js/programs/utils/api_config',
-        'js/programs/models/auto_auth_model'
-    ],
-    function( apiConfig, AutoAuthModel ) {
+    'js/programs/utils/api_config',
+    'js/programs/models/auto_auth_model'
+],
+    function(apiConfig, AutoAuthModel) {
         'use strict';
 
         return AutoAuthModel.extend({

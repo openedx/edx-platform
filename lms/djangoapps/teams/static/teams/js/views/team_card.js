@@ -1,4 +1,4 @@
-(function (define) {
+(function(define) {
     'use strict';
     define([
         'jquery',
@@ -11,7 +11,7 @@
         'text!teams/templates/team-membership-details.underscore',
         'text!teams/templates/team-country-language.underscore',
         'text!teams/templates/date.underscore'
-    ], function (
+    ], function(
         $,
         Backbone,
         _,
@@ -30,15 +30,15 @@
             className: 'team-members',
             template: _.template(teamMembershipDetailsTemplate),
 
-            initialize: function (options) {
+            initialize: function(options) {
                 this.maxTeamSize = options.maxTeamSize;
                 this.memberships = options.memberships;
             },
 
-            render: function () {
-                var allMemberships = _(this.memberships).sortBy(function (member) {
-                    return new Date(member.last_activity_at);
-                }).reverse(),
+            render: function() {
+                var allMemberships = _(this.memberships).sortBy(function(member) {
+                        return new Date(member.last_activity_at);
+                    }).reverse(),
                     displayableMemberships = allMemberships.slice(0, 5),
                     maxMemberCount = this.maxTeamSize;
                 this.$el.html(this.template({
@@ -55,7 +55,7 @@
         TeamCountryLanguageView = Backbone.View.extend({
             template: _.template(teamCountryLanguageTemplate),
 
-            initialize: function (options) {
+            initialize: function(options) {
                 this.countries = options.countries;
                 this.languages = options.languages;
             },
@@ -74,18 +74,18 @@
             className: 'team-activity',
             template: _.template(dateTemplate),
 
-            initialize: function (options) {
+            initialize: function(options) {
                 this.date = options.date;
             },
 
-            render: function () {
+            render: function() {
                 var lastActivity = moment(this.date),
                     currentLanguage = $('html').attr('lang');
                 lastActivity.locale(currentLanguage);
                 this.$el.html(
                     interpolate(
                         // Translators: 'date' is a placeholder for a fuzzy, relative timestamp (see: http://momentjs.com/)
-                        gettext("Last activity %(date)s"),
+                        gettext('Last activity %(date)s'),
                         {date: this.template({date: lastActivity.format('MMMM Do YYYY, h:mm:ss a')})},
                         true
                     )
@@ -95,7 +95,7 @@
         });
 
         TeamCardView = CardView.extend({
-            initialize: function () {
+            initialize: function() {
                 CardView.prototype.initialize.apply(this, arguments);
                 // TODO: show last activity detail view
                 this.detailViews = [
@@ -107,16 +107,16 @@
                     }),
                     new TeamActivityView({date: this.model.get('last_activity_at')})
                 ];
-                this.model.on('change:membership', function () {
+                this.model.on('change:membership', function() {
                     this.detailViews[0].memberships = this.model.get('membership');
                 }, this);
             },
 
             configuration: 'list_card',
             cardClass: 'team-card',
-            title: function () { return this.model.get('name'); },
-            description: function () { return this.model.get('description'); },
-            details: function () { return this.detailViews; },
+            title: function() { return this.model.get('name'); },
+            description: function() { return this.model.get('description'); },
+            details: function() { return this.detailViews; },
             actionClass: 'action-view',
             actionContent: function() {
                 return interpolate(
@@ -125,7 +125,7 @@
                     true
                 );
             },
-            actionUrl: function () {
+            actionUrl: function() {
                 return '#teams/' + this.model.get('topic_id') + '/' + this.model.get('id');
             }
         });

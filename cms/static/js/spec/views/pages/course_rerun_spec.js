@@ -1,8 +1,8 @@
-define(["jquery", "edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers", "common/js/spec_helpers/view_helpers",
-        "js/views/course_rerun", "js/views/utils/create_course_utils", "common/js/components/utils/view_utils",
-        "jquery.simulate"],
-    function ($, AjaxHelpers, ViewHelpers, CourseRerunUtils, CreateCourseUtilsFactory, ViewUtils) {
-        describe("Create course rerun page", function () {
+define(['jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'common/js/spec_helpers/view_helpers',
+        'js/views/course_rerun', 'js/views/utils/create_course_utils', 'common/js/components/utils/view_utils',
+        'jquery.simulate'],
+    function($, AjaxHelpers, ViewHelpers, CourseRerunUtils, CreateCourseUtilsFactory, ViewUtils) {
+        describe('Create course rerun page', function() {
             var selectors = {
                     org: '.rerun-course-org',
                     number: '.rerun-course-number',
@@ -29,68 +29,68 @@ define(["jquery", "edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers", "common/j
 
             var CreateCourseUtils = new CreateCourseUtilsFactory(selectors, classes);
 
-            var fillInFields = function (org, number, run, name) {
+            var fillInFields = function(org, number, run, name) {
                 $(selectors.org).val(org);
                 $(selectors.number).val(number);
                 $(selectors.run).val(run);
                 $(selectors.name).val(name);
             };
 
-            beforeEach(function () {
+            beforeEach(function() {
                 ViewHelpers.installMockAnalytics();
                 window.source_course_key = 'test_course_key';
                 appendSetFixtures(mockCreateCourseRerunHTML);
                 CourseRerunUtils.onReady();
             });
 
-            afterEach(function () {
+            afterEach(function() {
                 ViewHelpers.removeMockAnalytics();
                 delete window.source_course_key;
             });
 
-            describe("Field validation", function () {
-                it("returns a message for an empty string", function () {
+            describe('Field validation', function() {
+                it('returns a message for an empty string', function() {
                     var message = ViewUtils.validateRequiredField('');
                     expect(message).not.toBe('');
                 });
 
-                it("does not return a message for a non empty string", function () {
+                it('does not return a message for a non empty string', function() {
                     var message = ViewUtils.validateRequiredField('edX');
                     expect(message).toBe('');
                 });
             });
 
-            describe("Error messages", function () {
+            describe('Error messages', function() {
                 var setErrorMessage = function(selector, message) {
                     var element = $(selector).parent();
                     CreateCourseUtils.setFieldInErr(element, message);
                     return element;
                 };
 
-                var type = function (input, value) {
+                var type = function(input, value) {
                     input.val(value);
-                    input.simulate("keyup", { keyCode: $.simulate.keyCode.SPACE });
+                    input.simulate('keyup', {keyCode: $.simulate.keyCode.SPACE});
                 };
 
-                it("shows an error message", function () {
+                it('shows an error message', function() {
                     var element = setErrorMessage(selectors.org, 'error message');
                     expect(element).toHaveClass(classes.error);
                     expect(element.children(selectors.tipError)).not.toHaveClass(classes.hidden);
                     expect(element.children(selectors.tipError)).toContainText('error message');
                 });
 
-                it("hides an error message", function () {
+                it('hides an error message', function() {
                     var element = setErrorMessage(selectors.org, '');
                     expect(element).not.toHaveClass(classes.error);
                     expect(element.children(selectors.tipError)).toHaveClass(classes.hidden);
                 });
 
-                it("disables the save button", function () {
+                it('disables the save button', function() {
                     setErrorMessage(selectors.org, 'error message');
                     expect($(selectors.save)).toHaveClass(classes.disabled);
                 });
 
-                it("enables the save button when all errors are removed", function () {
+                it('enables the save button when all errors are removed', function() {
                     setErrorMessage(selectors.org, 'error message 1');
                     setErrorMessage(selectors.number, 'error message 2');
                     expect($(selectors.save)).toHaveClass(classes.disabled);
@@ -99,7 +99,7 @@ define(["jquery", "edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers", "common/j
                     expect($(selectors.save)).not.toHaveClass(classes.disabled);
                 });
 
-                it("does not enable the save button when errors remain", function () {
+                it('does not enable the save button when errors remain', function() {
                     setErrorMessage(selectors.org, 'error message 1');
                     setErrorMessage(selectors.number, 'error message 2');
                     expect($(selectors.save)).toHaveClass(classes.disabled);
@@ -107,30 +107,30 @@ define(["jquery", "edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers", "common/j
                     expect($(selectors.save)).toHaveClass(classes.disabled);
                 });
 
-                it("shows an error message when non URL characters are entered", function () {
+                it('shows an error message when non URL characters are entered', function() {
                     var input = $(selectors.org);
                     expect(input.parent()).not.toHaveClass(classes.error);
-                    type(input, "%");
+                    type(input, '%');
                     expect(input.parent()).toHaveClass(classes.error);
                 });
 
-                it("does not show an error message when tabbing into a field", function () {
+                it('does not show an error message when tabbing into a field', function() {
                     var input = $(selectors.number);
                     input.val('');
                     expect(input.parent()).not.toHaveClass(classes.error);
-                    input.simulate("keyup", { keyCode: $.simulate.keyCode.TAB });
+                    input.simulate('keyup', {keyCode: $.simulate.keyCode.TAB});
                     expect(input.parent()).not.toHaveClass(classes.error);
                 });
 
-                it("shows an error message when a required field is empty", function () {
+                it('shows an error message when a required field is empty', function() {
                     var input = $(selectors.org);
                     input.val('');
                     expect(input.parent()).not.toHaveClass(classes.error);
-                    input.simulate("keyup", { keyCode: $.simulate.keyCode.ENTER });
+                    input.simulate('keyup', {keyCode: $.simulate.keyCode.ENTER});
                     expect(input.parent()).toHaveClass(classes.error);
                 });
 
-                it("shows an error message when spaces are entered and unicode is allowed", function () {
+                it('shows an error message when spaces are entered and unicode is allowed', function() {
                     var input = $(selectors.org);
                     $(selectors.allowUnicode).val('True');
                     expect(input.parent()).not.toHaveClass(classes.error);
@@ -138,7 +138,7 @@ define(["jquery", "edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers", "common/j
                     expect(input.parent()).toHaveClass(classes.error);
                 });
 
-                it("shows an error message when total length exceeds 65 characters", function () {
+                it('shows an error message when total length exceeds 65 characters', function() {
                     expect($(selectors.errorWrapper)).not.toHaveClass(classes.shown);
                     type($(selectors.org), 'ThisIsAVeryLongNameThatWillExceedTheSixtyFiveCharacterLimit');
                     type($(selectors.number), 'ThisIsAVeryLongNameThatWillExceedTheSixtyFiveCharacterLimit');
@@ -146,19 +146,19 @@ define(["jquery", "edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers", "common/j
                     expect($(selectors.errorWrapper)).toHaveClass(classes.shown);
                 });
 
-                describe("Name field", function () {
-                    it("does not show an error message when non URL characters are entered", function () {
+                describe('Name field', function() {
+                    it('does not show an error message when non URL characters are entered', function() {
                         var input = $(selectors.name);
                         expect(input.parent()).not.toHaveClass(classes.error);
-                        type(input, "%");
+                        type(input, '%');
                         expect(input.parent()).not.toHaveClass(classes.error);
                     });
                 });
             });
 
-            it("saves course reruns", function () {
+            it('saves course reruns', function() {
                 var requests = AjaxHelpers.requests(this);
-                var redirectSpy = spyOn(ViewUtils, 'redirect')
+                var redirectSpy = spyOn(ViewUtils, 'redirect');
                 fillInFields('DemoX', 'DM101', '2014', 'Demo course');
                 $(selectors.save).click();
                 AjaxHelpers.expectJsonRequest(requests, 'POST', '/course/', {
@@ -177,7 +177,7 @@ define(["jquery", "edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers", "common/j
                 expect(redirectSpy).toHaveBeenCalledWith('dummy_test_url');
             });
 
-            it("displays an error when saving fails", function () {
+            it('displays an error when saving fails', function() {
                 var requests = AjaxHelpers.requests(this);
                 fillInFields('DemoX', 'DM101', '2014', 'Demo course');
                 $(selectors.save).click();
@@ -190,14 +190,14 @@ define(["jquery", "edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers", "common/j
                 expect($(selectors.cancel)).not.toHaveClass(classes.hidden);
             });
 
-            it("does not save if there are validation errors", function () {
+            it('does not save if there are validation errors', function() {
                 var requests = AjaxHelpers.requests(this);
                 fillInFields('DemoX', 'DM101', '', 'Demo course');
                 $(selectors.save).click();
                 AjaxHelpers.expectNoRequests(requests);
             });
 
-            it("can be canceled", function () {
+            it('can be canceled', function() {
                 var redirectSpy = spyOn(ViewUtils, 'redirect');
                 $(selectors.cancel).click();
                 expect(redirectSpy).toHaveBeenCalledWith('/course/');

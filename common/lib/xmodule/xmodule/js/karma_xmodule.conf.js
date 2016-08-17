@@ -49,7 +49,7 @@ var options = {
         {pattern: 'common_static/common/js/spec_helpers/jasmine-extensions.js', included: true},
         {pattern: 'common_static/js/vendor/sinon-1.17.0.js', included: true},
 
-        {pattern: 'spec/main_requirejs.js', included: true},
+        {pattern: 'spec/main_requirejs.js', included: true}
     ],
 
     libraryFiles: [
@@ -78,6 +78,6 @@ var options = {
     ]
 };
 
-module.exports = function (config) {
+module.exports = function(config) {
     configModule.configure(config, options);
 };

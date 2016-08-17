@@ -1,11 +1,10 @@
-(function (define) {
+(function(define) {
     'use strict';
     define([
         'jquery',
         'js/dashboard/track_events'
     ],
     function($) {
-
         describe('edx.dashboard.trackEvents', function() {
             beforeEach(function() {
                 // Stub the analytics event tracker
@@ -71,7 +70,7 @@
                 window.edx.dashboard.trackLearnVerifiedLinkClicked(
                     $learnVerified,
                     window.edx.dashboard.generateTrackProperties);
-                //Verify that analytics events fire when the 'Learned about verified track' link is clicked.
+                // Verify that analytics events fire when the 'Learned about verified track' link is clicked.
                 expect(window.analytics.trackLink).toHaveBeenCalledWith(
                     $learnVerified,
                     'edx.bi.dashboard.verified_info_link.clicked',
@@ -91,31 +90,6 @@
                     $findCourse,
                     'edx.bi.dashboard.find_courses_button.clicked',
                     property
-                );
-            });
-
-            it('sends an analytics event when the user clicks the \'View XSeries Details\' button', function() {
-                var $xseries = $('.xseries-action .btn');
-                window.edx.dashboard.trackXseriesBtnClicked(
-                    $xseries,
-                    window.edx.dashboard.generateProgramProperties);
-
-                expect(window.analytics.trackLink).toHaveBeenCalledWith(
-                    $xseries,
-                    'edx.bi.dashboard.xseries_cta_message.clicked',
-                    window.edx.dashboard.generateProgramProperties
-                );
-            });
-
-            it('sends an analytics event when xseries messages are present in the DOM on page load', function() {
-                window.edx.dashboard.xseriesTrackMessages();
-                expect(window.analytics.track).toHaveBeenCalledWith(
-                    'edx.bi.dashboard.xseries_cta_message.viewed',
-                    {
-                        category: 'dashboard',
-                        course_id: 'CTB3365DWx',
-                        program_id: 'xseries007'
-                    }
                 );
             });
         });

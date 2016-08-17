@@ -1,17 +1,17 @@
 /**
  * This page is used to show the user an outline of the course.
  */
-define(["jquery", "underscore", "gettext", "js/views/pages/base_page", "js/views/utils/xblock_utils",
-        "js/views/course_outline", "common/js/components/utils/view_utils", "common/js/components/views/feedback_alert",
-        "common/js/components/views/feedback_notification"],
-    function ($, _, gettext, BasePage, XBlockViewUtils, CourseOutlineView, ViewUtils, AlertView, NoteView) {
+define(['jquery', 'underscore', 'gettext', 'js/views/pages/base_page', 'js/views/utils/xblock_utils',
+        'js/views/course_outline', 'common/js/components/utils/view_utils', 'common/js/components/views/feedback_alert',
+        'common/js/components/views/feedback_notification'],
+    function($, _, gettext, BasePage, XBlockViewUtils, CourseOutlineView, ViewUtils, AlertView, NoteView) {
         var expandedLocators, CourseOutlinePage;
 
         CourseOutlinePage = BasePage.extend({
             // takes XBlockInfo as a model
 
             events: {
-                "click .button-toggle-expand-collapse": "toggleExpandCollapse"
+                'click .button-toggle-expand-collapse': 'toggleExpandCollapse'
             },
 
             options: {
@@ -29,7 +29,7 @@ define(["jquery", "underscore", "gettext", "js/views/pages/base_page", "js/views
                     self.handleReIndexEvent(event);
                 });
                 this.model.on('change', this.setCollapseExpandVisibility, this);
-                $('.dismiss-button').bind('click', ViewUtils.deleteNotificationHandler(function () {
+                $('.dismiss-button').bind('click', ViewUtils.deleteNotificationHandler(function() {
                     $('.wrapper-alert-announcement').removeClass('is-shown').addClass('is-hidden');
                 }));
             },
@@ -45,7 +45,7 @@ define(["jquery", "underscore", "gettext", "js/views/pages/base_page", "js/views
             },
 
             renderPage: function() {
-                var setInitialExpandState = function (xblockInfo, expandedLocators) {
+                var setInitialExpandState = function(xblockInfo, expandedLocators) {
                     if (xblockInfo.isCourse() || xblockInfo.isChapter()) {
                         expandedLocators.add(xblockInfo.get('id'));
                     }
@@ -55,8 +55,8 @@ define(["jquery", "underscore", "gettext", "js/views/pages/base_page", "js/views
                 this.expandedLocators = expandedLocators;
                 this.expandedLocators.clear();
                 if (this.model.get('child_info')) {
-                    _.each(this.model.get('child_info').children, function (childXBlockInfo) {
-                       setInitialExpandState(childXBlockInfo, this.expandedLocators);
+                    _.each(this.model.get('child_info').children, function(childXBlockInfo) {
+                        setInitialExpandState(childXBlockInfo, this.expandedLocators);
                     }, this);
                 }
                 setInitialExpandState(this.model, this.expandedLocators);
@@ -95,7 +95,7 @@ define(["jquery", "underscore", "gettext", "js/views/pages/base_page", "js/views
                     }
                 });
                 if (this.model.get('child_info')) {
-                    _.each(this.model.get('child_info').children, function (childXBlockInfo) {
+                    _.each(this.model.get('child_info').children, function(childXBlockInfo) {
                         if (collapse) {
                             this.expandedLocators.remove(childXBlockInfo.get('id'));
                         }
@@ -112,34 +112,34 @@ define(["jquery", "underscore", "gettext", "js/views/pages/base_page", "js/views
                 var target = $(event.currentTarget);
                 target.css('cursor', 'wait');
                 this.startReIndex(target.attr('href'))
-                    .done(function(data) {self.onIndexSuccess(data);})
-                    .fail(function(data) {self.onIndexError(data);})
-                    .always(function() {target.css('cursor', 'pointer');});
+                    .done(function(data) { self.onIndexSuccess(data); })
+                    .fail(function(data) { self.onIndexError(data); })
+                    .always(function() { target.css('cursor', 'pointer'); });
             },
 
             startReIndex: function(reindex_url) {
                 return $.ajax({
-                        url: reindex_url,
-                        method: 'GET',
-                        global: false,
-                        contentType: "application/json; charset=utf-8",
-                        dataType: "json"
-                    });
+                    url: reindex_url,
+                    method: 'GET',
+                    global: false,
+                    contentType: 'application/json; charset=utf-8',
+                    dataType: 'json'
+                });
             },
 
             onIndexSuccess: function(data) {
                 var msg = new AlertView.Announcement({
-                        title: gettext('Course Index'),
-                        message: data.user_message
-                    });
+                    title: gettext('Course Index'),
+                    message: data.user_message
+                });
                 msg.show();
             },
 
             onIndexError: function(data) {
                 var msg = new NoteView.Error({
-                        title: gettext('There were errors reindexing course.'),
-                        message: data.user_message
-                    });
+                    title: gettext('There were errors reindexing course.'),
+                    message: data.user_message
+                });
                 msg.show();
             }
         });
@@ -153,9 +153,9 @@ define(["jquery", "underscore", "gettext", "js/views/pages/base_page", "js/views
             /**
              * Add the locator to the set if it is not already present.
              */
-            add: function (locator) {
+            add: function(locator) {
                 if (!this.contains(locator)) {
-                   this.locators.push(locator);
+                    this.locators.push(locator);
                 }
             },
 
@@ -171,7 +171,7 @@ define(["jquery", "underscore", "gettext", "js/views/pages/base_page", "js/views
             /**
              * Remove the locator from the set if it is present.
              */
-            remove: function (locator) {
+            remove: function(locator) {
                 var index = this.locators.indexOf(locator);
                 if (index >= 0) {
                     this.locators.splice(index, 1);
@@ -181,14 +181,14 @@ define(["jquery", "underscore", "gettext", "js/views/pages/base_page", "js/views
             /**
              * Returns true iff the locator is present in the set.
              */
-            contains: function (locator) {
+            contains: function(locator) {
                 return this.locators.indexOf(locator) >= 0;
             },
 
             /**
              * Clears all expanded locators from the set.
              */
-            clear: function () {
+            clear: function() {
                 this.locators = [];
             }
         };

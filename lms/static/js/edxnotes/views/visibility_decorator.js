@@ -1,29 +1,29 @@
-;(function (define, undefined) {
-'use strict';
-define([
-    'jquery', 'underscore', 'js/edxnotes/views/notes_factory'
-], function($, _, NotesFactory) {
-    var parameters = {}, visibility = null,
-        getIds, createNote, cleanup, factory;
+(function(define, undefined) {
+    'use strict';
+    define([
+        'jquery', 'underscore', 'js/edxnotes/views/notes_factory'
+    ], function($, _, NotesFactory) {
+        var parameters = {}, visibility = null,
+            getIds, createNote, cleanup, factory;
 
-        getIds = function () {
-            return _.map($('.edx-notes-wrapper'), function (element) {
+        getIds = function() {
+            return _.map($('.edx-notes-wrapper'), function(element) {
                 return element.id;
             });
         };
 
-        createNote = function (element, params) {
+        createNote = function(element, params) {
             if (params) {
                 return NotesFactory.factory(element, params);
             }
             return null;
         };
 
-        cleanup = function (ids) {
+        cleanup = function(ids) {
             var list = _.clone(Annotator._instances);
             ids = ids || [];
 
-            _.each(list, function (instance) {
+            _.each(list, function(instance) {
                 var id = instance.element.attr('id');
                 if (!_.contains(ids, id)) {
                     instance.destroy();
@@ -31,7 +31,7 @@ define([
             });
         };
 
-        factory = function (element, params, isVisible) {
+        factory = function(element, params, isVisible) {
             // When switching sequentials, we need to keep track of the
             // parameters of each element and the visibility (that may have been
             // changed by the checkbox).
@@ -53,22 +53,22 @@ define([
             return null;
         };
 
-    return {
-        factory: factory,
+        return {
+            factory: factory,
 
-        enableNote: function (element) {
-            createNote(element, parameters[element.id]);
-            visibility = true;
-        },
+            enableNote: function(element) {
+                createNote(element, parameters[element.id]);
+                visibility = true;
+            },
 
-        disableNotes: function () {
-            cleanup();
-            visibility = false;
-        },
+            disableNotes: function() {
+                cleanup();
+                visibility = false;
+            },
 
-        _setVisibility: function (state) {
-            visibility = state;
-        },
-    }
-});
+            _setVisibility: function(state) {
+                visibility = state;
+            }
+        };
+    });
 }).call(this, define || RequireJS.define);

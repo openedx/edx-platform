@@ -1,6 +1,6 @@
 (function(define) {
-'use strict';
-define('video/09_play_pause_control.js', [], function() {
+    'use strict';
+    define('video/09_play_pause_control.js', [], function() {
     /**
      * Play/pause control module.
      * @exports video/09_play_pause_control.js
@@ -9,88 +9,88 @@ define('video/09_play_pause_control.js', [], function() {
      * @param {Object} i18n The object containing strings with translations.
      * @return {jquery Promise}
      */
-    var PlayPauseControl = function(state, i18n) {
-        if (!(this instanceof PlayPauseControl)) {
-            return new PlayPauseControl(state, i18n);
-        }
+        var PlayPauseControl = function(state, i18n) {
+            if (!(this instanceof PlayPauseControl)) {
+                return new PlayPauseControl(state, i18n);
+            }
 
-        _.bindAll(this, 'play', 'pause', 'onClick', 'destroy');
-        this.state = state;
-        this.state.videoPlayPauseControl = this;
-        this.i18n = i18n;
-        this.initialize();
+            _.bindAll(this, 'play', 'pause', 'onClick', 'destroy');
+            this.state = state;
+            this.state.videoPlayPauseControl = this;
+            this.i18n = i18n;
+            this.initialize();
 
-        return $.Deferred().resolve().promise();
-    };
+            return $.Deferred().resolve().promise();
+        };
 
-    PlayPauseControl.prototype = {
-        template: [
-            '<button class="control video_control play" aria-disabled="false" title="',
+        PlayPauseControl.prototype = {
+            template: [
+                '<button class="control video_control play" aria-disabled="false" title="',
                 gettext('Play'),
-            '">',
+                '">',
                 '<span class="icon fa fa-play" aria-hidden="true"></span>',
-            '</button>'
-        ].join(''),
+                '</button>'
+            ].join(''),
 
-        destroy: function () {
-            this.el.remove();
-            this.state.el.off('destroy', this.destroy);
-            delete this.state.videoPlayPauseControl;
-        },
+            destroy: function() {
+                this.el.remove();
+                this.state.el.off('destroy', this.destroy);
+                delete this.state.videoPlayPauseControl;
+            },
 
         /** Initializes the module. */
-        initialize: function() {
-            this.el = $(this.template);
-            this.render();
-            this.bindHandlers();
-        },
+            initialize: function() {
+                this.el = $(this.template);
+                this.render();
+                this.bindHandlers();
+            },
 
         /**
          * Creates any necessary DOM elements, attach them, and set their,
          * initial configuration.
          */
-        render: function() {
-            this.state.el.find('.vcr').prepend(this.el);
-        },
+            render: function() {
+                this.state.el.find('.vcr').prepend(this.el);
+            },
 
         /** Bind any necessary function callbacks to DOM events. */
-        bindHandlers: function() {
-            this.el.on({
-                'click': this.onClick
-            });
-            this.state.el.on({
-                'play': this.play,
-                'pause ended': this.pause,
-                'destroy': this.destroy
-            });
-        },
+            bindHandlers: function() {
+                this.el.on({
+                    'click': this.onClick
+                });
+                this.state.el.on({
+                    'play': this.play,
+                    'pause ended': this.pause,
+                    'destroy': this.destroy
+                });
+            },
 
-        onClick: function (event) {
-            event.preventDefault();
-            this.state.videoCommands.execute('togglePlayback');
-        },
+            onClick: function(event) {
+                event.preventDefault();
+                this.state.videoCommands.execute('togglePlayback');
+            },
 
-        play: function () {
-            this.el
+            play: function() {
+                this.el
                 .addClass('pause')
                 .removeClass('play')
                 .attr('title', gettext('Pause'))
                 .find('.icon')
                     .removeClass('fa-play')
                     .addClass('fa-pause');
-        },
+            },
 
-        pause: function () {
-            this.el
+            pause: function() {
+                this.el
                 .removeClass('pause')
                 .addClass('play')
                 .attr('title', gettext('Play'))
                 .find('.icon')
                     .removeClass('fa-pause')
                     .addClass('fa-play');
-        }
-    };
+            }
+        };
 
-    return PlayPauseControl;
-});
+        return PlayPauseControl;
+    });
 }(RequireJS.define));

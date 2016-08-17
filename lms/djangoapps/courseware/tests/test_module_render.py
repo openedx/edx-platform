@@ -940,7 +940,6 @@ class TestProctoringRendering(SharedModuleStoreTestCase):
         Verifies gated content from the student view rendering of a sequence
         this is labeled as a proctored exam
         """
-
         usage_key = self._setup_test_data(enrollment_mode, is_practice_exam, attempt_status)
 
         # initialize some credit requirements, if so then specify
@@ -966,7 +965,7 @@ class TestProctoringRendering(SharedModuleStoreTestCase):
             )
 
             set_credit_requirement_status(
-                self.request.user.username,
+                self.request.user,
                 self.course_key,
                 'reverification',
                 'ICRV1'
@@ -1021,7 +1020,6 @@ class TestProctoringRendering(SharedModuleStoreTestCase):
         if attempt_status:
             create_exam_attempt(exam_id, self.request.user.id, taking_as_proctored=True)
             update_attempt_status(exam_id, self.request.user.id, attempt_status)
-
         return usage_key
 
     def _find_url_name(self, toc, url_name):

@@ -142,7 +142,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-07-30 10:48+0000\n"
+"POT-Creation-Date: 2016-08-04 18:45+0000\n"
 "PO-Revision-Date: 2016-07-26 14:02+0000\n"
 "Last-Translator: Soha Assali <soha+transifex@qordoba.com>\n"
 "Language-Team: Arabic (http://www.transifex.com/open-edx/edx-platform/language/ar/)\n"
@@ -562,6 +562,14 @@ msgid ""
 msgstr ""
 "لقد قمت بإنشاء حساب في وقت سابق باستخدام تسجيل دخول خارجي مثل WebAuth أو "
 "Shibboleth . يرجى الاتصال بـ {tech_support_email} للحصول على الدعم."
+
+#: common/djangoapps/external_auth/views.py
+msgid ""
+"\n"
+"        Your university identity server did not return your ID information to us.\n"
+"        Please try logging in again.  (You may need to restart your browser.)\n"
+"        "
+msgstr ""
 
 #: common/djangoapps/student/admin.py
 msgid "User profile"
@@ -3276,6 +3284,16 @@ msgstr ""
 "يُرجى إدخال ’true‘ أو ’false‘. إذا كانت هذه القيمة ’true‘، فيمكنك إخفاء قسم "
 "فرعي لحين حصول المتعلّمين على أدنى مجموع علامات في قسم متطلبات أساسية فرعي "
 "آخر."
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Enable Subsection Grades Saved"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Enter true or false. If this value is true, the robust grades feature of "
+"saving subsection grades is enabled for this course."
+msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Course Learning Information"
@@ -8383,10 +8401,6 @@ msgid "You do not have permission to view this page."
 msgstr "ليست لديك صلاحية الاطّلاع على محتوى هذه الصفحة."
 
 #: lms/djangoapps/student_account/views.py
-msgid "No user with the provided email address exists."
-msgstr "لا يوجد مستخدم مسجّل باستخدام عنوان البريد الإلكتروني المحدَّد."
-
-#: lms/djangoapps/student_account/views.py
 msgid "No email address provided."
 msgstr "لم يُحدَّد عنوان بريد إلكتروني."
 
@@ -8418,7 +8432,6 @@ msgid "Email Address"
 msgstr "عنوان البريد الإلكتروني"
 
 #: lms/djangoapps/support/views/refund.py
-#: cms/templates/maintenance/_force_publish_course.html
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 #: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
@@ -9565,6 +9578,10 @@ msgid "API Version"
 msgstr "نسخة إصدارة واجهة برمجة التطبيقات \"API\""
 
 #: openedx/core/djangoapps/programs/models.py
+msgid "Path used to construct URLs to programs marketing pages (e.g., \"/foo\")."
+msgstr ""
+
+#: openedx/core/djangoapps/programs/models.py
 msgid "Path to authoring app's JS"
 msgstr "مسار تطبيقات التفويض \"JS\""
 
@@ -10337,39 +10354,6 @@ msgid ""
 msgstr ""
 "ملاحظات اختيارية حول هذا المستخدم (لماذا مثلًا رُفض طلب الدخول لإنشاء مساق)"
 
-#: cms/djangoapps/maintenance/views.py
-#: cms/templates/maintenance/_force_publish_course.html
-msgid "Force Publish Course"
-msgstr ""
-
-#: cms/djangoapps/maintenance/views.py
-msgid ""
-"Sometimes the draft and published branches of a course can get out of sync. "
-"Force publish course command resets the published branch of a course to "
-"point to the draft branch, effectively force publishing the course. This "
-"view dry runs the force publish command"
-msgstr ""
-
-#: cms/djangoapps/maintenance/views.py
-msgid "Please provide course id."
-msgstr ""
-
-#: cms/djangoapps/maintenance/views.py
-msgid "Invalid course key."
-msgstr ""
-
-#: cms/djangoapps/maintenance/views.py
-msgid "No matching course found."
-msgstr ""
-
-#: cms/djangoapps/maintenance/views.py
-msgid "Force publishing course is not supported with old mongo courses."
-msgstr ""
-
-#: cms/djangoapps/maintenance/views.py
-msgid "Course is already in published state."
-msgstr ""
-
 #: cms/djangoapps/models/settings/course_metadata.py
 msgid "Incorrect format for field '{name}'. {detailed_message}"
 msgstr "تنسيق غير صحيح لحقل ’{name}‘. {detailed_message}"
@@ -10554,12 +10538,6 @@ msgstr "عرض"
 msgid "Preview Language Setting"
 msgstr ""
 
-#: cms/templates/maintenance/_force_publish_course.html
-#: common/templates/darklang/preview_lang_include.html
-#: lms/templates/problem.html lms/templates/shoppingcart/shopping_cart.html
-msgid "Reset"
-msgstr "إعادة الضبط"
-
 #: cms/templates/registration/activation_complete.html
 #: lms/templates/registration/activation_complete.html
 msgid "Thanks for activating your account."
@@ -10712,6 +10690,11 @@ msgstr ""
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid "Submit"
 msgstr "تقديم"
+
+#: common/templates/darklang/preview_lang_include.html
+#: lms/templates/problem.html lms/templates/shoppingcart/shopping_cart.html
+msgid "Reset"
+msgstr "إعادة الضبط"
 
 #: common/templates/darklang/preview_lang_include.html
 msgid "Please refresh the page to see the changes applied."
@@ -14287,6 +14270,22 @@ msgstr ""
 "وقع خطأ أثناء إكمال هذه العملية. للحصول على المساعدة يرجى الاتصال مع "
 "{support_email}."
 
+#: lms/templates/dashboard/_dashboard_program_info.html
+msgid "{category} Program: Interested in more courses in this subject?"
+msgstr "برنامج {category}: أأنت مهتم بمساقات أكثر في هذا الموضوع؟"
+
+#: lms/templates/dashboard/_dashboard_program_info.html
+msgid ""
+"This course is 1 of {course_count} courses in the "
+"{link_start}{program_display_name}{link_end} {program_category}."
+msgstr ""
+"هذا المساق 1 من بين {course_count} مساقات في "
+"{link_start}{program_display_name}{link_end} ضمن فئة {program_category}."
+
+#: lms/templates/dashboard/_dashboard_program_info.html
+msgid "View {category} Details"
+msgstr "استعرض تفاصيل فئة {category}"
+
 #: lms/templates/dashboard/_dashboard_status_verification.html
 msgid "Verification Status: Approved"
 msgstr ""
@@ -14346,22 +14345,6 @@ msgid ""
 msgstr ""
 "إنّ حساب {provider_name} الذي اخترتَه مرتبط مسبقًا بحساب آخر في "
 "{platform_name}. "
-
-#: lms/templates/dashboard/_dashboard_xseries_info.html
-msgid "{category} Program: Interested in more courses in this subject?"
-msgstr "برنامج {category}: أأنت مهتم بمساقات أكثر في هذا الموضوع؟"
-
-#: lms/templates/dashboard/_dashboard_xseries_info.html
-msgid ""
-"This course is 1 of {course_count} courses in the "
-"{link_start}{program_display_name}{link_end} {program_category}."
-msgstr ""
-"هذا المساق 1 من بين {course_count} مساقات في "
-"{link_start}{program_display_name}{link_end} ضمن فئة {program_category}."
-
-#: lms/templates/dashboard/_dashboard_xseries_info.html
-msgid "View {category} Details"
-msgstr "استعرض تفاصيل فئة {category}"
 
 #: lms/templates/debug/run_python_form.html
 msgid "Results:"
@@ -21682,22 +21665,6 @@ msgstr ""
 msgid "Your course creator status for {studio_name}"
 msgstr "حالة منشئ مساقك في {studio_name}"
 
-#: cms/templates/maintenance/_force_publish_course.html
-msgid "Required data to force publish course."
-msgstr ""
-
-#: cms/templates/maintenance/_force_publish_course.html
-msgid "course-v1:edX+DemoX+Demo_Course"
-msgstr ""
-
-#: cms/templates/maintenance/_force_publish_course.html
-msgid "Reset values"
-msgstr ""
-
-#: cms/templates/maintenance/base.html cms/templates/maintenance/index.html
-msgid "Maintenance Dashboard"
-msgstr ""
-
 #: cms/templates/registration/reg_complete.html
 msgid ""
 "We've sent an email message to {email} with instructions for activating your"
@@ -21821,10 +21788,6 @@ msgstr "الاسم"
 #: cms/templates/widgets/user_dropdown.html
 msgid "Currently signed in as:"
 msgstr "دخولك مسجَّل حاليًّا كـ:"
-
-#: cms/templates/widgets/user_dropdown.html
-msgid "Maintenance"
-msgstr ""
 
 #: wiki/forms.py
 msgid "Only localhost... muahahaha"

@@ -1,10 +1,10 @@
-(function (requirejs, require, define) {
-"use strict";
-define(
+(function(requirejs, require, define) {
+    'use strict';
+    define(
 'video/08_video_speed_control.js', [
     'video/00_iterator.js',
     'edx-ui-toolkit/js/utils/html-utils'
-], function (Iterator, HtmlUtils) {
+], function(Iterator, HtmlUtils) {
     /**
      * Video speed control module.
      * @exports video/08_video_speed_control.js
@@ -12,7 +12,7 @@ define(
      * @param {object} state The object containing the state of the video player.
      * @return {jquery Promise}
      */
-    var SpeedControl = function (state) {
+    var SpeedControl = function(state) {
         if (!(this instanceof SpeedControl)) {
             return new SpeedControl(state);
         }
@@ -31,26 +31,26 @@ define(
     SpeedControl.prototype = {
         template: [
             '<div class="speeds menu-container" role="application">',
-                '<p class="sr instructions" id="speed-instructions">',
+            '<p class="sr instructions" id="speed-instructions">',
                     gettext('Press UP to enter the speed menu then use the UP and DOWN arrow keys to navigate the different speeds, then press ENTER to change to the selected speed.'),  // eslint-disable-line max-len, indent
-                '</p>',
-                '<button class="control speed-button" aria-disabled="false" aria-expanded="false"',
-                    'title="',
-                        gettext('Adjust video speed'),
-                    '" aria-describedby="speed-instructions">',
-                    '<span>',
-                        '<span class="icon fa fa-caret-right" aria-hidden="true"></span>',
-                    '</span>',
-                    '<span class="label" aria-hidden="true">',
-                        gettext('Speed'),
-                    '</span>',
-                    '<span class="value"></span>',
-                '</button>',
-              '<ol class="video-speeds menu"></ol>',
+            '</p>',
+            '<button class="control speed-button" aria-disabled="false" aria-expanded="false"',
+            'title="',
+            gettext('Adjust video speed'),
+            '" aria-describedby="speed-instructions">',
+            '<span>',
+            '<span class="icon fa fa-caret-right" aria-hidden="true"></span>',
+            '</span>',
+            '<span class="label" aria-hidden="true">',
+            gettext('Speed'),
+            '</span>',
+            '<span class="value"></span>',
+            '</button>',
+            '<ol class="video-speeds menu"></ol>',
             '</div>'
         ].join(''),
 
-        destroy: function () {
+        destroy: function() {
             this.el.off({
                 'mouseenter': this.mouseEnterHandler,
                 'mouseleave': this.mouseLeaveHandler,
@@ -69,7 +69,7 @@ define(
         },
 
         /** Initializes the module. */
-        initialize: function () {
+        initialize: function() {
             var state = this.state;
 
             if (!this.isPlaybackRatesSupported(state)) {
@@ -95,19 +95,19 @@ define(
          * @param {array} speeds List of speeds available for the player.
          * @param {string} currentSpeed The current speed set to the player.
          */
-        render: function (speeds, currentSpeed) {
+        render: function(speeds, currentSpeed) {
             var speedsContainer = this.speedsContainer,
                 reversedSpeeds = speeds.concat().reverse(),
-                speedsList = $.map(reversedSpeeds, function (speed) {
+                speedsList = $.map(reversedSpeeds, function(speed) {
                     return HtmlUtils.interpolateHtml(
                         HtmlUtils.HTML(
-                            [
-                                '<li data-speed="{speed}">',
-                                    '<button class="control speed-option" tabindex="-1" aria-pressed="false">',
-                                        '{speed}x',
-                                    '</button>',
-                                '</li>'
-                            ].join('')
+                        [
+                            '<li data-speed="{speed}">',
+                            '<button class="control speed-option" tabindex="-1" aria-pressed="false">',
+                            '{speed}x',
+                            '</button>',
+                            '</li>'
+                        ].join('')
                         ),
                         {
                             speed: speed
@@ -131,7 +131,7 @@ define(
          * Bind any necessary function callbacks to DOM events (click,
          * mousemove, etc.).
          */
-        bindHandlers: function () {
+        bindHandlers: function() {
             // Attach various events handlers to the speed menu button.
             this.el.on({
                 'mouseenter': this.mouseEnterHandler,
@@ -154,11 +154,11 @@ define(
             this.state.el.on('destroy', this.destroy);
         },
 
-        onSetSpeed: function (event, speed) {
+        onSetSpeed: function(event, speed) {
             this.setSpeed(speed, true);
         },
 
-        onRenderSpeed: function (event, speeds, currentSpeed) {
+        onRenderSpeed: function(event, speeds, currentSpeed) {
             this.render(speeds, currentSpeed);
         },
 
@@ -173,7 +173,7 @@ define(
          *   true: Browser support playbackRate functionality.
          *   false: Browser doesn't support playbackRate functionality.
          */
-        isPlaybackRatesSupported: function (state) {
+        isPlaybackRatesSupported: function(state) {
             var isHtml5 = state.videoType === 'html5',
                 isTouch = state.isTouch,
                 video = document.createElement('video');
@@ -185,7 +185,7 @@ define(
          * Opens speed menu.
          * @param {boolean} [bindEvent] Click event will be attached on window.
          */
-        openMenu: function (bindEvent) {
+        openMenu: function(bindEvent) {
             // When speed entries have focus, the menu stays open on
             // mouseleave. A clickHandler is added to the window
             // element to have clicks close the menu when they happen
@@ -204,7 +204,7 @@ define(
          * Closes speed menu.
          * @param {boolean} [unBindEvent] Click event will be detached from window.
          */
-        closeMenu: function (unBindEvent) {
+        closeMenu: function(unBindEvent) {
             // Remove the previously added clickHandler from window element.
             if (unBindEvent) {
                 $(window).off('click.speedMenu');
@@ -225,7 +225,7 @@ define(
          * @param {boolean} [forceUpdate] Updates the speed even if it's
          * not differs from current speed.
          */
-        setSpeed: function (speed, silent, forceUpdate) {
+        setSpeed: function(speed, silent, forceUpdate) {
             if (speed !== this.currentSpeed || forceUpdate) {
                 this.speedsContainer
                     .find('li')
@@ -267,7 +267,7 @@ define(
          * Click event handler for the menu.
          * @param {jquery Event} event
          */
-        clickMenuHandler: function () {
+        clickMenuHandler: function() {
             this.closeMenu();
 
             return false;
@@ -277,7 +277,7 @@ define(
          * Click event handler for speed links.
          * @param {jquery Event} event
          */
-        clickLinkHandler: function (event) {
+        clickLinkHandler: function(event) {
             var el = $(event.currentTarget).parent(),
                 speed = $(el).data('speed');
 
@@ -293,7 +293,7 @@ define(
          * Mouseenter event handler for the menu.
          * @param {jquery Event} event
          */
-        mouseEnterHandler: function () {
+        mouseEnterHandler: function() {
             this.openMenu();
 
             return false;
@@ -303,12 +303,12 @@ define(
          * Mouseleave event handler for the menu.
          * @param {jquery Event} event
          */
-        mouseLeaveHandler: function () {
+        mouseLeaveHandler: function() {
             // Only close the menu is no speed entry has focus.
             if (!this.speedLinks.list.is(':focus')) {
                 this.closeMenu();
             }
-                    
+
             return false;
         },
 
@@ -316,33 +316,33 @@ define(
          * Keydown event handler for the menu.
          * @param {jquery Event} event
          */
-        keyDownMenuHandler: function (event) {
+        keyDownMenuHandler: function(event) {
             var KEY = $.ui.keyCode,
                 keyCode = event.keyCode;
 
-            switch(keyCode) {
+            switch (keyCode) {
                 // Open menu and focus on last element of list above it.
-                case KEY.ENTER:
-                case KEY.SPACE:
-                case KEY.UP:
-                    this.openMenu(true);
-                    this.speedLinks.last().focus();
-                    break;
+            case KEY.ENTER:
+            case KEY.SPACE:
+            case KEY.UP:
+                this.openMenu(true);
+                this.speedLinks.last().focus();
+                break;
                 // Close menu.
-                case KEY.ESCAPE:
-                    this.closeMenu(true);
-                    break;
+            case KEY.ESCAPE:
+                this.closeMenu(true);
+                break;
             }
             // We do not stop propagation and default behavior on a TAB
             // keypress.
             return event.keyCode === KEY.TAB;
-        },
+                                                },
 
         /**
          * Keydown event handler for speed links.
          * @param {jquery Event} event
          */
-        keyDownLinkHandler: function (event) {
+        keyDownLinkHandler: function(event) {
             // ALT key is used to change (alternate) the function of
             // other pressed keys. In this, do nothing.
             if (event.altKey) {
@@ -357,57 +357,56 @@ define(
 
             switch (event.keyCode) {
                 // Close menu.
-                case KEY.TAB:
+            case KEY.TAB:
                     // Closes menu after 25ms delay to change `tabindex` after
                     // finishing default behavior.
-                    setTimeout(function () {
-                        self.closeMenu(true);
-                    }, 25);
+                setTimeout(function() {
+                    self.closeMenu(true);
+                }, 25);
 
-                    return true;
+                return true;
                 // Close menu and give focus to speed control.
-                case KEY.ESCAPE:
-                    this.closeMenu(true);
-                    this.speedButton.focus();
+            case KEY.ESCAPE:
+                this.closeMenu(true);
+                this.speedButton.focus();
 
-                    return false;
+                return false;
                 // Scroll up menu, wrapping at the top. Keep menu open.
-                case KEY.UP:
+            case KEY.UP:
                     // Shift + Arrows keyboard shortcut might be used by
                     // screen readers. In this, do nothing.
-                    if (event.shiftKey) {
-                        return true;
-                    }
+                if (event.shiftKey) {
+                    return true;
+                }
 
-                    this.speedLinks.prev(index).focus();
-                    return false;
+                this.speedLinks.prev(index).focus();
+                return false;
                 // Scroll down  menu, wrapping at the bottom. Keep menu
                 // open.
-                case KEY.DOWN:
+            case KEY.DOWN:
                     // Shift + Arrows keyboard shortcut might be used by
                     // screen readers. In this, do nothing.
-                    if (event.shiftKey) {
-                        return true;
-                    }
+                if (event.shiftKey) {
+                    return true;
+                }
 
-                    this.speedLinks.next(index).focus();
-                    return false;
+                this.speedLinks.next(index).focus();
+                return false;
                 // Close menu, give focus to speed control and change
                 // speed.
-                case KEY.ENTER:
-                case KEY.SPACE:
-                    this.closeMenu(true);
-                    this.speedButton.focus();
-                    this.setSpeed(this.state.speedToString(speed));
+            case KEY.ENTER:
+            case KEY.SPACE:
+                this.closeMenu(true);
+                this.speedButton.focus();
+                this.setSpeed(this.state.speedToString(speed));
 
-                    return false;
+                return false;
             }
 
             return true;
-        }
+                                                }
     };
 
     return SpeedControl;
 });
-
 }(RequireJS.requirejs, RequireJS.require, RequireJS.define));

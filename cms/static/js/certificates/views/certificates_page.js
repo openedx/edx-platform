@@ -7,7 +7,7 @@ define([
     'js/views/pages/base_page',
     'js/certificates/views/certificates_list'
 ],
-function ($, _, gettext, BasePage, CertificatesListView) {
+function($, _, gettext, BasePage, CertificatesListView) {
     'use strict';
     var CertificatesPage = BasePage.extend({
 

@@ -1,12 +1,12 @@
 define([
-        'backbone',
-        'jquery',
-        'js/programs/utils/api_config',
-        'js/programs/models/auto_auth_model',
-        'jquery.cookie',
-        'gettext'
-    ],
-    function( Backbone, $, apiConfig, AutoAuthModel ) {
+    'backbone',
+    'jquery',
+    'js/programs/utils/api_config',
+    'js/programs/models/auto_auth_model',
+    'jquery.cookie',
+    'gettext'
+],
+    function(Backbone, $, apiConfig, AutoAuthModel) {
         'use strict';
 
         return AutoAuthModel.extend({

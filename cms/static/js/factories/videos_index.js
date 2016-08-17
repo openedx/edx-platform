@@ -1,7 +1,7 @@
 define(
-    ["jquery", "backbone", "js/views/active_video_upload_list", "js/views/previous_video_upload_list"],
-    function ($, Backbone, ActiveVideoUploadListView, PreviousVideoUploadListView) {
-        "use strict";
+    ['jquery', 'backbone', 'js/views/active_video_upload_list', 'js/views/previous_video_upload_list'],
+    function($, Backbone, ActiveVideoUploadListView, PreviousVideoUploadListView) {
+        'use strict';
         var VideosIndexFactory = function(
             $contentWrapper,
             postUrl,

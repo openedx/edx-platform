@@ -11,7 +11,7 @@ var options = {
 
     includeCommonFiles: true,
 
-    normalizePathsForCoverageFunc: function (appRoot, pattern) {
+    normalizePathsForCoverageFunc: function(appRoot, pattern) {
         return path.join(appRoot, '/common/static/' + pattern);
     },
 
@@ -39,6 +39,6 @@ var options = {
     ]
 };
 
-module.exports = function (config) {
+module.exports = function(config) {
     configModule.configure(config, options);
 };

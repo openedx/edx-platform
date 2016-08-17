@@ -2,67 +2,67 @@
 (function() {
     'use strict';
 
-    var $$course_id = "$$course_id";
-    describe("DiscussionThreadShowView", function() {
+    var $$course_id = '$$course_id';
+    describe('DiscussionThreadShowView', function() {
         beforeEach(function() {
             DiscussionSpecHelper.setUpGlobals();
             DiscussionSpecHelper.setUnderscoreFixtures();
             this.user = DiscussionUtil.getUser();
             this.threadData = {
-                id: "dummy",
+                id: 'dummy',
                 user_id: this.user.id,
                 username: this.user.get('username'),
                 course_id: $$course_id,
-                title: "dummy title",
-                body: "this is a thread",
-                created_at: "2013-04-03T20:08:39Z",
+                title: 'dummy title',
+                body: 'this is a thread',
+                created_at: '2013-04-03T20:08:39Z',
                 abuse_flaggers: [],
                 votes: {
                     up_count: 42
                 },
-                thread_type: "discussion",
+                thread_type: 'discussion',
                 closed: false,
                 pinned: false,
-                type: "thread"
+                type: 'thread'
             };
             this.thread = new Thread(this.threadData);
             this.view = new DiscussionThreadShowView({
                 model: this.thread
             });
-            this.view.setElement($("#fixture-element"));
-            return spyOn(this.view, "convertMath");
+            this.view.setElement($('#fixture-element'));
+            return spyOn(this.view, 'convertMath');
         });
-        describe("voting", function() {
-            it("renders the vote state correctly", function() {
+        describe('voting', function() {
+            it('renders the vote state correctly', function() {
                 return DiscussionViewSpecHelper.checkRenderVote(this.view, this.thread);
             });
-            it("votes correctly via click", function() {
-                return DiscussionViewSpecHelper.checkUpvote(this.view, this.thread, this.user, $.Event("click"));
+            it('votes correctly via click', function() {
+                return DiscussionViewSpecHelper.checkUpvote(this.view, this.thread, this.user, $.Event('click'));
             });
-            it("votes correctly via spacebar", function() {
-                return DiscussionViewSpecHelper.checkUpvote(this.view, this.thread, this.user, $.Event("keydown", {
+            it('votes correctly via spacebar', function() {
+                return DiscussionViewSpecHelper.checkUpvote(this.view, this.thread, this.user, $.Event('keydown', {
                     which: 32
                 }));
             });
-            it("unvotes correctly via click", function() {
-                return DiscussionViewSpecHelper.checkUnvote(this.view, this.thread, this.user, $.Event("click"));
+            it('unvotes correctly via click', function() {
+                return DiscussionViewSpecHelper.checkUnvote(this.view, this.thread, this.user, $.Event('click'));
             });
-            it("unvotes correctly via spacebar", function() {
-                return DiscussionViewSpecHelper.checkUnvote(this.view, this.thread, this.user, $.Event("keydown", {
+            it('unvotes correctly via spacebar', function() {
+                return DiscussionViewSpecHelper.checkUnvote(this.view, this.thread, this.user, $.Event('keydown', {
                     which: 32
                 }));
             });
         });
-        describe("pinning", function() {
+        describe('pinning', function() {
             var expectPinnedRendered;
             expectPinnedRendered = function(view, model) {
                 var button, pinned;
                 pinned = model.get('pinned');
-                button = view.$el.find(".action-pin");
-                expect(button.hasClass("is-checked")).toBe(pinned);
-                return expect(button.attr("aria-checked")).toEqual(pinned.toString());
+                button = view.$el.find('.action-pin');
+                expect(button.hasClass('is-checked')).toBe(pinned);
+                return expect(button.attr('aria-checked')).toEqual(pinned.toString());
             };
-            it("renders the pinned state correctly", function() {
+            it('renders the pinned state correctly', function() {
                 this.view.render();
                 expectPinnedRendered(this.view, this.thread);
                 this.thread.set('pinned', false);
@@ -72,41 +72,41 @@
                 this.view.render();
                 return expectPinnedRendered(this.view, this.thread);
             });
-            it("exposes the pinning control only to authorized users", function() {
+            it('exposes the pinning control only to authorized users', function() {
                 this.thread.updateInfo({
                     ability: {
                         can_openclose: false
                     }
                 });
                 this.view.render();
-                expect(this.view.$el.find(".action-pin").closest(".is-hidden")).toExist();
+                expect(this.view.$el.find('.action-pin').closest('.is-hidden')).toExist();
                 this.thread.updateInfo({
                     ability: {
                         can_openclose: true
                     }
                 });
                 this.view.render();
-                return expect(this.view.$el.find(".action-pin").closest(".is-hidden")).not.toExist();
+                return expect(this.view.$el.find('.action-pin').closest('.is-hidden')).not.toExist();
             });
-            it("handles events correctly", function() {
+            it('handles events correctly', function() {
                 this.view.render();
-                return DiscussionViewSpecHelper.checkButtonEvents(this.view, "togglePin", ".action-pin");
+                return DiscussionViewSpecHelper.checkButtonEvents(this.view, 'togglePin', '.action-pin');
             });
         });
-        describe("labels", function() {
+        describe('labels', function() {
             var expectOneElement;
             expectOneElement = function(view, selector, visible) {
                 var elements;
-                if (typeof visible === "undefined" || visible === null) {
+                if (typeof visible === 'undefined' || visible === null) {
                     visible = true;
                 }
                 view.render();
                 elements = view.$el.find(selector);
                 expect(elements.length).toEqual(1);
                 if (visible) {
-                    return expect(elements).not.toHaveClass("is-hidden");
+                    return expect(elements).not.toHaveClass('is-hidden');
                 } else {
-                    return expect(elements).toHaveClass("is-hidden");
+                    return expect(elements).toHaveClass('is-hidden');
                 }
             };
             it('displays the closed label when appropriate', function() {
@@ -135,7 +135,7 @@
                 return expectOneElement(this.view, '.post-label-reported');
             });
         });
-        describe("author display", function() {
+        describe('author display', function() {
             var checkUserLink;
             beforeEach(function() {
                 return this.thread.set('user_url', 'test_user_url');
@@ -147,24 +147,24 @@
                 expect(element.find('.user-label-community-ta').length).toEqual(is_ta ? 1 : 0);
                 return expect(element.find('.user-label-staff').length).toEqual(is_staff ? 1 : 0);
             };
-            it("renders correctly for a student-authored thread", function() {
+            it('renders correctly for a student-authored thread', function() {
                 var $el;
                 $el = $('#fixture-element').html(this.view.getAuthorDisplay());
                 return checkUserLink($el, false, false);
             });
-            it("renders correctly for a community TA-authored thread", function() {
+            it('renders correctly for a community TA-authored thread', function() {
                 var $el;
                 this.thread.set('community_ta_authored', true);
                 $el = $('#fixture-element').html(this.view.getAuthorDisplay());
                 return checkUserLink($el, true, false);
             });
-            it("renders correctly for a staff-authored thread", function() {
+            it('renders correctly for a staff-authored thread', function() {
                 var $el;
                 this.thread.set('staff_authored', true);
                 $el = $('#fixture-element').html(this.view.getAuthorDisplay());
                 return checkUserLink($el, false, true);
             });
-            it("renders correctly for an anonymously-authored thread", function() {
+            it('renders correctly for an anonymously-authored thread', function() {
                 var $el;
                 this.thread.set('username', null);
                 $el = $('#fixture-element').html(this.view.getAuthorDisplay());
@@ -172,13 +172,13 @@
                 return expect($el.text()).toMatch(/^(\s*)anonymous(\s*)$/);
             });
         });
-        describe("cohorting", function() {
-            it("renders correctly for an uncohorted thread", function() {
+        describe('cohorting', function() {
+            it('renders correctly for an uncohorted thread', function() {
                 this.view.render();
                 return expect(this.view.$('.group-visibility-label').text().trim())
                     .toEqual('This post is visible to everyone.');
             });
-            it("renders correctly for a cohorted thread", function() {
+            it('renders correctly for a cohorted thread', function() {
                 this.thread.set('group_id', '1');
                 this.thread.set('group_name', 'Mock Cohort');
                 this.view.render();
@@ -187,5 +187,4 @@
             });
         });
     });
-
 }).call(this);

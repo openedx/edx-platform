@@ -18,9 +18,8 @@
             return child;
         };
 
-    if (typeof Backbone !== "undefined" && Backbone !== null) {
+    if (typeof Backbone !== 'undefined' && Backbone !== null) {
         this.ResponseCommentView = (function(_super) {
-
             __extends(ResponseCommentView, _super);
 
             function ResponseCommentView() {
@@ -40,7 +39,7 @@
                 return ResponseCommentView.__super__.constructor.apply(this, arguments);
             }
 
-            ResponseCommentView.prototype.tagName = "li";
+            ResponseCommentView.prototype.tagName = 'li';
 
             ResponseCommentView.prototype.$ = function(selector) {
                 return this.$el.find(selector);
@@ -71,8 +70,8 @@
                     this.showView = new ResponseCommentShowView({
                         model: this.model
                     });
-                    this.showView.bind("comment:_delete", this._delete);
-                    this.showView.bind("comment:edit", this.edit);
+                    this.showView.bind('comment:_delete', this._delete);
+                    this.showView.bind('comment:edit', this.edit);
                     return this.renderSubView(this.showView);
                 }
             };
@@ -87,8 +86,8 @@
                     this.editView = new ResponseCommentEditView({
                         model: this.model
                     });
-                    this.editView.bind("comment:update", this.update);
-                    this.editView.bind("comment:cancel_edit", this.cancelEdit);
+                    this.editView.bind('comment:update', this.update);
+                    this.editView.bind('comment:cancel_edit', this.cancelEdit);
                     return this.renderSubView(this.editView);
                 }
             };
@@ -100,7 +99,7 @@
                 if (!this.model.can('can_delete')) {
                     return;
                 }
-                if (!confirm(gettext("Are you sure you want to delete this comment?"))) {
+                if (!confirm(gettext('Are you sure you want to delete this comment?'))) {
                     return;
                 }
                 url = this.model.urlFor('_delete');
@@ -108,55 +107,53 @@
                 return DiscussionUtil.safeAjax({
                     $elem: $elem,
                     url: url,
-                    type: "POST",
+                    type: 'POST',
                     success: function() {
                         self.model.remove();
                         return self.$el.remove();
                     },
                     error: function() {
                         return DiscussionUtil.discussionAlert(
-                            gettext("Sorry"),
-                            gettext("We had some trouble deleting this comment. Please try again.")
+                            gettext('Sorry'),
+                            gettext('We had some trouble deleting this comment. Please try again.')
                         );
                     }
                 });
             };
 
             ResponseCommentView.prototype.cancelEdit = function(event) {
-                this.trigger("comment:cancel_edit", event);
+                this.trigger('comment:cancel_edit', event);
                 return this.renderShowView();
             };
 
             ResponseCommentView.prototype.edit = function(event) {
-                this.trigger("comment:edit", event);
+                this.trigger('comment:edit', event);
                 return this.renderEditView();
             };
 
             ResponseCommentView.prototype.update = function(event) {
                 var newBody, url,
                     self = this;
-                newBody = this.editView.$(".edit-comment-body textarea").val();
-                url = DiscussionUtil.urlFor("update_comment", this.model.id);
+                newBody = this.editView.$('.edit-comment-body textarea').val();
+                url = DiscussionUtil.urlFor('update_comment', this.model.id);
                 return DiscussionUtil.safeAjax({
                     $elem: $(event.target),
                     $loading: $(event.target),
                     url: url,
-                    type: "POST",
-                    dataType: "json",
+                    type: 'POST',
+                    dataType: 'json',
                     data: {
                         body: newBody
                     },
-                    error: DiscussionUtil.formErrorHandler(this.$(".edit-comment-form-errors")),
+                    error: DiscussionUtil.formErrorHandler(this.$('.edit-comment-form-errors')),
                     success: function() {
-                        self.model.set("body", newBody);
+                        self.model.set('body', newBody);
                         return self.cancelEdit();
                     }
                 });
             };
 
             return ResponseCommentView;
-
         })(DiscussionContentView);
     }
-
 }).call(window);

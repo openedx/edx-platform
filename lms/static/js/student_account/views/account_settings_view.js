@@ -1,4 +1,4 @@
-;(function (define, undefined) {
+(function(define, undefined) {
     'use strict';
     define([
         'gettext',
@@ -8,8 +8,7 @@
         'edx-ui-toolkit/js/utils/html-utils',
         'js/student_account/views/account_section_view',
         'text!templates/student_account/account_settings.underscore'
-    ], function (gettext, $, _, Backbone, HtmlUtils, AccountSectionView, accountSettingsTemplate) {
-
+    ], function(gettext, $, _, Backbone, HtmlUtils, AccountSectionView, accountSettingsTemplate) {
         var AccountSettingsView = Backbone.View.extend({
 
             navLink: '.account-nav-link',
@@ -23,12 +22,12 @@
                 'click .account-nav-link': 'changeTab'
             },
 
-            initialize: function (options) {
+            initialize: function(options) {
                 this.options = options;
                 _.bindAll(this, 'render', 'changeTab', 'renderFields', 'showLoadingError');
             },
 
-            render: function () {
+            render: function() {
                 HtmlUtils.setHtml(this.$el, HtmlUtils.template(accountSettingsTemplate)({
                     accountSettingsTabs: this.accountSettingsTabs
                 }));
@@ -49,10 +48,10 @@
                 $currentTab.addClass('active');
 
                 $(this.navLink).removeAttr('aria-describedby');
-                $currentTab.attr('aria-describedby', 'header-subtitle-'+this.activeTab);
+                $currentTab.attr('aria-describedby', 'header-subtitle-' + this.activeTab);
             },
 
-            renderSection: function (tabSections) {
+            renderSection: function(tabSections) {
                 var accountSectionView = new AccountSectionView({
                     activeTabName: this.activeTab,
                     sections: tabSections,
@@ -62,19 +61,19 @@
                 accountSectionView.render();
             },
 
-            renderFields: function () {
+            renderFields: function() {
                 var view = this;
                 view.$('.ui-loading-indicator').addClass('is-hidden');
 
-                _.each(view.$('.account-settings-section-body'), function (sectionEl, index) {
-                    _.each(view.options.tabSections[view.activeTab][index].fields, function (field) {
+                _.each(view.$('.account-settings-section-body'), function(sectionEl, index) {
+                    _.each(view.options.tabSections[view.activeTab][index].fields, function(field) {
                         $(sectionEl).append(field.view.render().el);
                     });
                 });
                 return this;
             },
 
-            showLoadingError: function () {
+            showLoadingError: function() {
                 this.$('.ui-loading-indicator').addClass('is-hidden');
                 this.$('.ui-loading-error').removeClass('is-hidden');
             }

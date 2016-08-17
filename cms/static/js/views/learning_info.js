@@ -7,17 +7,17 @@ define([
     'gettext',
     'js/utils/templates'
 ],
-function ($, _, Backbone, gettext, TemplateUtils) {
+function($, _, Backbone, gettext, TemplateUtils) {
     'use strict';
     var LearningInfoView = Backbone.View.extend({
 
         events: {
-            'click .delete-course-learning-info': "removeLearningInfo"
+            'click .delete-course-learning-info': 'removeLearningInfo'
         },
 
         initialize: function() {
             // Set up the initial state of the attributes set for this model instance
-             _.bindAll(this, 'render');
+            _.bindAll(this, 'render');
             this.template = this.loadTemplate('course-settings-learning-fields');
             this.listenTo(this.model, 'change:learning_info', this.render);
         },
@@ -29,11 +29,11 @@ function ($, _, Backbone, gettext, TemplateUtils) {
 
         render: function() {
              // rendering for this model
-            $("li.course-settings-learning-fields").empty();
+            $('li.course-settings-learning-fields').empty();
             var self = this;
             var learning_information = this.model.get('learning_info');
-            $.each(learning_information, function( index, info ) {
-                $(self.el).append(self.template({index: index, info: info, info_count: learning_information.length }));
+            $.each(learning_information, function(index, info) {
+                $(self.el).append(self.template({index: index, info: info, info_count: learning_information.length}));
             });
         },
 

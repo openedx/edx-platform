@@ -155,7 +155,7 @@ class CourseGrade(object):
         """
         responses = GRADES_UPDATED.send_robust(
             sender=None,
-            username=self.student.username,
+            user=self.student,
             grade_summary=self.summary,
             course_key=self.course.id,
             deadline=self.course.end

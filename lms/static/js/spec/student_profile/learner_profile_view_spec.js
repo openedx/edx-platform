@@ -15,15 +15,13 @@ define(['backbone',
         'js/student_account/views/account_settings_fields',
         'js/views/message_banner'
     ],
-    function (Backbone, $, _, PagingCollection, AjaxHelpers, TemplateHelpers, Helpers, LearnerProfileHelpers,
+    function(Backbone, $, _, PagingCollection, AjaxHelpers, TemplateHelpers, Helpers, LearnerProfileHelpers,
               FieldViews, UserAccountModel, AccountPreferencesModel, LearnerProfileFields, LearnerProfileView,
               BadgeListContainer, AccountSettingsFieldViews, MessageBannerView) {
         'use strict';
 
-        describe("edx.user.LearnerProfileView", function () {
-
-            var createLearnerProfileView = function (ownProfile, accountPrivacy, profileIsPublic) {
-
+        describe('edx.user.LearnerProfileView', function() {
+            var createLearnerProfileView = function(ownProfile, accountPrivacy, profileIsPublic) {
                 var accountSettingsModel = new UserAccountModel();
                 accountSettingsModel.set(Helpers.createAccountSettingsData());
                 accountSettingsModel.set({'profile_is_public': profileIsPublic});
@@ -42,7 +40,7 @@ define(['backbone',
                     editable: 'always',
                     showMessages: false,
                     title: 'edX learners can see my:',
-                    valueAttribute: "account_privacy",
+                    valueAttribute: 'account_privacy',
                     options: [
                         ['all_users', 'Full Profile'],
                         ['private', 'Limited Profile']
@@ -57,7 +55,7 @@ define(['backbone',
 
                 var profileImageFieldView = new LearnerProfileFields.ProfileImageFieldView({
                     model: accountSettingsModel,
-                    valueAttribute: "profile_image",
+                    valueAttribute: 'profile_image',
                     editable: editable,
                     messageView: messageView,
                     imageMaxBytes: Helpers.IMAGE_MAX_BYTES,
@@ -67,9 +65,9 @@ define(['backbone',
                 });
 
                 var usernameFieldView = new FieldViews.ReadonlyFieldView({
-                        model: accountSettingsModel,
-                        valueAttribute: "username",
-                        helpMessage: ""
+                    model: accountSettingsModel,
+                    valueAttribute: 'username',
+                    helpMessage: ''
                 });
 
                 var sectionOneFieldViews = [
@@ -80,7 +78,7 @@ define(['backbone',
                         showMessages: false,
                         iconName: 'fa-map-marker',
                         placeholderValue: '',
-                        valueAttribute: "country",
+                        valueAttribute: 'country',
                         options: Helpers.FIELD_OPTIONS,
                         helpMessage: ''
                     }),
@@ -92,7 +90,7 @@ define(['backbone',
                         showMessages: false,
                         iconName: 'fa-comment',
                         placeholderValue: 'Add language',
-                        valueAttribute: "language_proficiencies",
+                        valueAttribute: 'language_proficiencies',
                         options: Helpers.FIELD_OPTIONS,
                         helpMessage: ''
                     })
@@ -104,9 +102,9 @@ define(['backbone',
                         editable: editable,
                         showMessages: false,
                         title: 'About me',
-                        placeholderValue: "Tell other edX learners a little about yourself: where you live, " +
+                        placeholderValue: 'Tell other edX learners a little about yourself: where you live, ' +
                             "what your interests are, why you're taking courses on edX, or what you hope to learn.",
-                        valueAttribute: "bio",
+                        valueAttribute: 'bio',
                         helpMessage: '',
                         messagePosition: 'header'
                     })
@@ -137,16 +135,15 @@ define(['backbone',
                     });
             };
 
-            beforeEach(function () {
+            beforeEach(function() {
                 loadFixtures('js/fixtures/student_profile/student_profile.html');
             });
 
-            afterEach(function () {
+            afterEach(function() {
                 Backbone.history.stop();
             });
 
-            it("shows loading error correctly", function() {
-
+            it('shows loading error correctly', function() {
                 var learnerProfileView = createLearnerProfileView(false, 'all_users');
 
                 Helpers.expectLoadingIndicatorIsVisible(learnerProfileView, true);
@@ -158,8 +155,7 @@ define(['backbone',
                 Helpers.expectLoadingErrorIsVisible(learnerProfileView, true);
             });
 
-            it("renders all fields as expected for self with full access", function() {
-
+            it('renders all fields as expected for self with full access', function() {
                 var learnerProfileView = createLearnerProfileView(true, 'all_users', true);
 
                 Helpers.expectLoadingIndicatorIsVisible(learnerProfileView, true);
@@ -171,8 +167,7 @@ define(['backbone',
                 LearnerProfileHelpers.expectProfileSectionsAndFieldsToBeRendered(learnerProfileView);
             });
 
-            it("renders all fields as expected for self with limited access", function() {
-
+            it('renders all fields as expected for self with limited access', function() {
                 var learnerProfileView = createLearnerProfileView(true, 'private', false);
 
                 Helpers.expectLoadingIndicatorIsVisible(learnerProfileView, true);
@@ -184,8 +179,7 @@ define(['backbone',
                 LearnerProfileHelpers.expectLimitedProfileSectionsAndFieldsToBeRendered(learnerProfileView);
             });
 
-            it("renders the fields as expected for others with full access", function() {
-
+            it('renders the fields as expected for others with full access', function() {
                 var learnerProfileView = createLearnerProfileView(false, 'all_users', true);
 
                 Helpers.expectLoadingIndicatorIsVisible(learnerProfileView, true);
@@ -197,8 +191,7 @@ define(['backbone',
                 LearnerProfileHelpers.expectProfileSectionsAndFieldsToBeRendered(learnerProfileView, true);
             });
 
-            it("renders the fields as expected for others with limited access", function() {
-
+            it('renders the fields as expected for others with limited access', function() {
                 var learnerProfileView = createLearnerProfileView(false, 'private', false);
 
                 Helpers.expectLoadingIndicatorIsVisible(learnerProfileView, true);
@@ -210,13 +203,13 @@ define(['backbone',
                 LearnerProfileHelpers.expectLimitedProfileSectionsAndFieldsToBeRendered(learnerProfileView, true);
             });
 
-            it("renders an error if the badges can't be fetched", function () {
+            it("renders an error if the badges can't be fetched", function() {
                 var learnerProfileView = createLearnerProfileView(false, 'all_users', true);
                 learnerProfileView.options.accountSettingsModel.set({'accomplishments_shared': true});
                 var requests = AjaxHelpers.requests(this);
 
                 learnerProfileView.render();
-                
+
                 LearnerProfileHelpers.breakBadgeLoading(learnerProfileView, requests);
                 LearnerProfileHelpers.expectBadgeLoadingErrorIsRendered(learnerProfileView);
             });

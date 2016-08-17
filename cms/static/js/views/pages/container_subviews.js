@@ -1,11 +1,11 @@
 /**
  * Subviews (usually small side panels) for XBlockContainerPage.
  */
-define(["jquery", "underscore", "gettext", "js/views/baseview", "common/js/components/utils/view_utils",
-    "js/views/utils/xblock_utils"],
-    function ($, _, gettext, BaseView, ViewUtils, XBlockViewUtils) {
+define(['jquery', 'underscore', 'gettext', 'js/views/baseview', 'common/js/components/utils/view_utils',
+    'js/views/utils/xblock_utils'],
+    function($, _, gettext, BaseView, ViewUtils, XBlockViewUtils) {
         var VisibilityState = XBlockViewUtils.VisibilityState,
-            disabledCss = "is-disabled";
+            disabledCss = 'is-disabled';
 
         /**
          * A view that refreshes the view when certain values in the XBlockInfo have changed
@@ -20,7 +20,7 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "common/js/compo
 
             onSync: function(model) {
                 if (this.shouldRefresh(model)) {
-                   this.render();
+                    this.render();
                 }
             },
 
@@ -32,7 +32,7 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "common/js/compo
         });
 
         var MessageView = ContainerStateListenerView.extend({
-            initialize: function () {
+            initialize: function() {
                 ContainerStateListenerView.prototype.initialize.call(this);
                 this.template = this.loadTemplate('container-message');
             },
@@ -84,7 +84,7 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "common/js/compo
 
             // takes XBlockInfo as a model
 
-            initialize: function () {
+            initialize: function() {
                 BaseView.prototype.initialize.call(this);
                 this.template = this.loadTemplate('publish-xblock');
                 this.model.on('sync', this.onSync, this);
@@ -96,11 +96,11 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "common/js/compo
                     'has_changes', 'published', 'edited_on', 'edited_by', 'visibility_state',
                     'has_explicit_staff_lock', 'has_content_group_components'
                 ])) {
-                   this.render();
+                    this.render();
                 }
             },
 
-            render: function () {
+            render: function() {
                 this.$el.html(this.template({
                     visibilityState: this.model.get('visibility_state'),
                     visibilityClass: XBlockViewUtils.getXBlockVisibilityClass(this.model.get('visibility_state')),
@@ -116,50 +116,50 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "common/js/compo
                     hasExplicitStaffLock: this.model.get('has_explicit_staff_lock'),
                     staffLockFrom: this.model.get('staff_lock_from'),
                     hasContentGroupComponents: this.model.get('has_content_group_components'),
-                    course: window.course,
+                    course: window.course
                 }));
 
                 return this;
             },
 
-            publish: function (e) {
+            publish: function(e) {
                 var xblockInfo = this.model;
                 if (e && e.preventDefault) {
                     e.preventDefault();
                 }
                 ViewUtils.runOperationShowingMessage(gettext('Publishing'),
-                    function () {
+                    function() {
                         return xblockInfo.save({publish: 'make_public'}, {patch: true});
                     }).always(function() {
-                        xblockInfo.set("publish", null);
-                    }).done(function () {
+                        xblockInfo.set('publish', null);
+                    }).done(function() {
                         xblockInfo.fetch();
                     });
             },
 
-            discardChanges: function (e) {
+            discardChanges: function(e) {
                 var xblockInfo = this.model, renderPage = this.renderPage;
                 if (e && e.preventDefault) {
                     e.preventDefault();
                 }
-                ViewUtils.confirmThenRunOperation(gettext("Discard Changes"),
-                    gettext("Are you sure you want to revert to the last published version of the unit? You cannot undo this action."),
-                    gettext("Discard Changes"),
-                    function () {
+                ViewUtils.confirmThenRunOperation(gettext('Discard Changes'),
+                    gettext('Are you sure you want to revert to the last published version of the unit? You cannot undo this action.'),
+                    gettext('Discard Changes'),
+                    function() {
                         ViewUtils.runOperationShowingMessage(gettext('Discarding Changes'),
-                            function () {
+                            function() {
                                 return xblockInfo.save({publish: 'discard_changes'}, {patch: true});
                             }).always(function() {
-                                xblockInfo.set("publish", null);
-                            }).done(function () {
+                                xblockInfo.set('publish', null);
+                            }).done(function() {
                                 renderPage();
                             });
                     }
                 );
             },
 
-            toggleStaffLock: function (e) {
-                var xblockInfo = this.model, self=this, enableStaffLock, hasInheritedStaffLock,
+            toggleStaffLock: function(e) {
+                var xblockInfo = this.model, self = this, enableStaffLock, hasInheritedStaffLock,
                     saveAndPublishStaffLock, revertCheckBox;
                 if (e && e.preventDefault) {
                     e.preventDefault();
@@ -179,8 +179,8 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "common/js/compo
                         metadata: {visible_to_staff_only: enableStaffLock ? true : null}},
                         {patch: true}
                     ).always(function() {
-                        xblockInfo.set("publish", null);
-                    }).done(function () {
+                        xblockInfo.set('publish', null);
+                    }).done(function() {
                         xblockInfo.fetch();
                     }).fail(function() {
                         revertCheckBox();
@@ -198,9 +198,9 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "common/js/compo
                     ViewUtils.runOperationShowingMessage(gettext('Inheriting Student Visibility'),
                         _.bind(saveAndPublishStaffLock, self));
                 } else {
-                    ViewUtils.confirmThenRunOperation(gettext("Make Visible to Students"),
-                        gettext("If the unit was previously published and released to students, any changes you made to the unit when it was hidden will now be visible to students. Do you want to proceed?"),
-                        gettext("Make Visible to Students"),
+                    ViewUtils.confirmThenRunOperation(gettext('Make Visible to Students'),
+                        gettext('If the unit was previously published and released to students, any changes you made to the unit when it was hidden will now be visible to students. Do you want to proceed?'),
+                        gettext('Make Visible to Students'),
                         function() {
                             ViewUtils.runOperationShowingMessage(gettext('Making Visible to Students'),
                                 _.bind(saveAndPublishStaffLock, self));
@@ -225,7 +225,7 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "common/js/compo
         var PublishHistory = BaseView.extend({
             // takes XBlockInfo as a model
 
-            initialize: function () {
+            initialize: function() {
                 BaseView.prototype.initialize.call(this);
                 this.template = this.loadTemplate('publish-history');
                 this.model.on('sync', this.onSync, this);
@@ -233,11 +233,11 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "common/js/compo
 
             onSync: function(model) {
                 if (ViewUtils.hasChangedAttributes(model, ['published', 'published_on', 'published_by'])) {
-                   this.render();
+                    this.render();
                 }
             },
 
-            render: function () {
+            render: function() {
                 this.$el.html(this.template({
                     published: this.model.get('published'),
                     published_on: this.model.get('published_on'),

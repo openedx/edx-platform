@@ -5,10 +5,10 @@ define(['backbone',
         'common/js/spec_helpers/template_helpers',
         'js/spec/views/fields_helpers',
         'string_utils'],
-    function (Backbone, $, _, AjaxHelpers, TemplateHelpers, FieldViewsSpecHelpers) {
+    function(Backbone, $, _, AjaxHelpers, TemplateHelpers, FieldViewsSpecHelpers) {
         'use strict';
 
-        var verifyAuthField = function (view, data, requests) {
+        var verifyAuthField = function(view, data, requests) {
             var selector = '.u-field-value .u-field-link-title-' + view.options.valueAttribute;
 
             spyOn(view, 'redirect_to');

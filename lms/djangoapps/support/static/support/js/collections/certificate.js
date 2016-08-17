@@ -1,4 +1,4 @@
-;(function (define) {
+(function(define) {
     'use strict';
     define(['backbone', 'support/js/models/certificate'],
         function(Backbone, CertModel) {
@@ -26,5 +26,5 @@
                     return url;
                 }
             });
-    });
+        });
 }).call(this, define || RequireJS.define);

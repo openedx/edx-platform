@@ -13,7 +13,7 @@ define([
     'text!templates/signatory-details.underscore',
     'text!templates/signatory-actions.underscore'
 ],
-function ($, _, str, Backbone, gettext, TemplateUtils, ViewUtils, BaseView, SignatoryEditorView,
+function($, _, str, Backbone, gettext, TemplateUtils, ViewUtils, BaseView, SignatoryEditorView,
           signatoryDetailsTemplate, signatoryActionsTemplate) {
     'use strict';
     var SignatoryDetailsView = BaseView.extend({
@@ -25,7 +25,7 @@ function ($, _, str, Backbone, gettext, TemplateUtils, ViewUtils, BaseView, Sign
 
         },
 
-        className: function () {
+        className: function() {
             // Determine the CSS class names for this model instance
             var index = this.model.collection.indexOf(this.model);
             return [
@@ -62,13 +62,13 @@ function ($, _, str, Backbone, gettext, TemplateUtils, ViewUtils, BaseView, Sign
             // Persist the data for this model
             if (event && event.preventDefault) { event.preventDefault(); }
             var certificate = this.model.get('certificate');
-            if (!certificate.isValid()){
+            if (!certificate.isValid()) {
                 return;
             }
             var self = this;
             ViewUtils.runOperationShowingMessage(
                 gettext('Saving'),
-                function () {
+                function() {
                     var dfd = $.Deferred();
                     var actionableModel = certificate;
                     actionableModel.save({}, {

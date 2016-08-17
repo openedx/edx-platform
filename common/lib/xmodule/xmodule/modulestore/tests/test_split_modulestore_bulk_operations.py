@@ -704,7 +704,7 @@ class TestBulkWriteMixinOpen(TestBulkWriteMixin):
             from_index=self.conn.get_course_index.return_value,
             course_context=self.course_key,
         )
-        self.conn.get_course_index.assert_called_once_with(self.course_key)
+        self.conn.get_course_index.assert_called_once_with(self.course_key, ignore_case=False)
 
 
 class TestBulkWriteMixinOpenAfterPrevTransaction(TestBulkWriteMixinOpen, TestBulkWriteMixinPreviousTransaction):

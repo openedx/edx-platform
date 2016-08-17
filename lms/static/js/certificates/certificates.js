@@ -1,10 +1,10 @@
-$(function () {
+$(function() {
     'use strict';
-    $('.action-share-mozillaopenbadges').click(function (event) {
+    $('.action-share-mozillaopenbadges').click(function(event) {
         $('.badges-overlay').fadeIn();
         event.preventDefault();
     });
-    $('.badges-modal .close').click(function () {
+    $('.badges-modal .close').click(function() {
         $('.badges-overlay').fadeOut();
     });
 });

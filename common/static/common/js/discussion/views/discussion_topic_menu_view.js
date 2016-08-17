@@ -153,7 +153,7 @@
                 if (name.length < this.maxNameWidth) {
                     return name;
                 } else {
-                    path = _.map(name.split('/'), function(item){
+                    path = _.map(name.split('/'), function(item) {
                         return item.replace(/^\s+|\s+$/g, '');
                     });
                     while (path.length > 1) {
@@ -166,9 +166,9 @@
                     rawName = path[0];
                     name = ellipsisText + ' / ' + rawName;
                     if (name.length > this.maxNameWidth) {
-                      concatedLength = ellipsisText.length + ' / '.length + ellipsisText.length;
-                      rawName = rawName.slice(0, this.maxNameWidth - concatedLength);
-                      name = ellipsisText + ' / ' + rawName + ' ' + ellipsisText;
+                        concatedLength = ellipsisText.length + ' / '.length + ellipsisText.length;
+                        rawName = rawName.slice(0, this.maxNameWidth - concatedLength);
+                        name = ellipsisText + ' / ' + rawName + ' ' + ellipsisText;
                     }
                 }
                 return name;
@@ -191,14 +191,14 @@
                 $items.addClass('hidden');
                 $items.each(function(_index, item) {
                     var path, pathText, pathTitles;
-                    path = $(item).parents(".topic-menu-item").andSelf();
-                    pathTitles = path.children(".topic-title").map(function(_, elem) {
+                    path = $(item).parents('.topic-menu-item').andSelf();
+                    pathTitles = path.children('.topic-title').map(function(_, elem) {
                         return $(elem).text();
                     }).get();
-                    pathText = pathTitles.join(" / ").toLowerCase();
-                    if (query.split(" ").every(function(term) {
-                            return pathText.search(term.toLowerCase()) !== -1;
-                        })) {
+                    pathText = pathTitles.join(' / ').toLowerCase();
+                    if (query.split(' ').every(function(term) {
+                        return pathText.search(term.toLowerCase()) !== -1;
+                    })) {
                         $(item).removeClass('hidden');
                         $(item).find('.topic-menu-item').removeClass('hidden');
                         $(item).parents('.topic-menu-item').removeClass('hidden');

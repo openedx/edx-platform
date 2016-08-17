@@ -1050,7 +1050,6 @@
     "We weren't able to send you a password reset email.": "Il ne nous a pas \u00e9t\u00e9 possible de vous envoyer un mail de r\u00e9initialisation du mot de passe.", 
     "We're sorry, there was an error": "D\u00e9sol\u00e9, il y a eu une erreur", 
     "We've encountered an error. Refresh your browser and then try again.": "Nous avons rencontr\u00e9 une erreur. Rafra\u00eechissez votre navigateur puis r\u00e9essayer.", 
-    "We've sent instructions for resetting your password to the email address you provided.": "Nous avons envoy\u00e9 les instructions pour r\u00e9initialiser votre mot de passe \u00e0 l'adresse email que vous avez fournie.", 
     "Web:": "Web :", 
     "Webcam": "Webcam", 
     "What does %(platformName)s do with this photo?": "Que fait %(platformName)s avec cette photo ?", 

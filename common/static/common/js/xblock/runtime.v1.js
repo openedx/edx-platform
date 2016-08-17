@@ -2,7 +2,6 @@
     'use strict';
 
     XBlock.Runtime.v1 = (function() {
-
         function v1() {
             var _this = this;
             this.childMap = function() {
@@ -44,7 +43,5 @@
         };
 
         return v1;
-
     })();
-
 }).call(this);

@@ -23,7 +23,6 @@
     this.LmsRuntime = {};
 
     this.LmsRuntime.v1 = (function(_super) {
-
         __extends(v1, _super);
 
         function v1() {
@@ -51,6 +50,5 @@
         };
 
         return v1;
-
     })(XBlock.Runtime.v1);
 }).call(this, URI);
