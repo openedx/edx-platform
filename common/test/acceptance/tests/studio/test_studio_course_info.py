@@ -1,6 +1,8 @@
 """
 Acceptance Tests for Course Information
 """
+from flaky import flaky
+
 from common.test.acceptance.pages.studio.course_info import CourseUpdatesPage
 from common.test.acceptance.tests.studio.base_studio_test import StudioCourseTest
 
@@ -106,6 +108,7 @@ class UsersCanAddUpdatesTest(StudioCourseTest):
         self.course_updates_page.click_new_update_save_button()
         self.assertTrue(self.course_updates_page.is_first_update_date('June 1, 2013'))
 
+    @flaky  # TODO fix this, see TNL-5298
     def test_outside_tag_preserved(self):
         """
         Scenario: Text outside of tags is preserved
