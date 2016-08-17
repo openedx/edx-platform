@@ -288,7 +288,7 @@ def forum_form_discussion(request, course_key):
             'category_map': course_settings["category_map"],
             'course_settings': json.dumps(course_settings),
             'disable_courseware_js': True,
-            'uses_pattern_library': True,
+            'uses_pattern_library': False,
         }
         # print "start rendering.."
         return render_to_response('discussion/index.html', context)
@@ -403,7 +403,7 @@ def single_thread(request, course_key, discussion_id, thread_id):
             'category_map': course_settings["category_map"],
             'course_settings': json.dumps(course_settings),
             'disable_courseware_js': True,
-            'uses_pattern_library': True,
+            'uses_pattern_library': False,
         }
         return render_to_response('discussion/index.html', context)
 

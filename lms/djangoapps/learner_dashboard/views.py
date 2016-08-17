@@ -38,7 +38,7 @@ def program_listing(request):
         'programs': programs,
         'progress': meter.progress,
         'show_program_listing': programs_config.show_program_listing,
-        'uses_pattern_library': True,
+        'uses_pattern_library': False,
     }
 
     return render_to_response('learner_dashboard/programs.html', context)
@@ -73,7 +73,7 @@ def program_details(request, program_id):
         'show_program_listing': programs_config.show_program_listing,
         'nav_hidden': True,
         'disable_courseware_js': True,
-        'uses_pattern_library': True
+        'uses_pattern_library': False
     }
 
     return render_to_response('learner_dashboard/program_details.html', context)
