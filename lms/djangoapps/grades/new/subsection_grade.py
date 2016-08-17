@@ -179,7 +179,7 @@ class SubsectionGradeFactory(object):
         """
         if settings.FEATURES.get('ENABLE_SUBSECTION_GRADES_SAVED') and course.enable_subsection_grades_saved:
             try:
-                model = PersistentSubsectionGrade.read(
+                model = PersistentSubsectionGrade.read_grade(
                     user_id=self.student.id,
                     usage_key=subsection.location,
                 )

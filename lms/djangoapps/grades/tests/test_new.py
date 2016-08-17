@@ -159,7 +159,7 @@ class SubsectionGradeFactoryTest(GradeTestBase):
         # Grades are only saved if the feature flag and the advanced setting are
         # both set to True.
         with patch(
-            'lms.djangoapps.grades.models.PersistentSubsectionGrade.read'
+            'lms.djangoapps.grades.models.PersistentSubsectionGrade.read_grade'
         ) as mock_read_saved_grade:
             with patch.dict(settings.FEATURES, {'ENABLE_SUBSECTION_GRADES_SAVED': feature_flag}):
                 with patch.object(self.course, 'enable_subsection_grades_saved', new=course_setting):
