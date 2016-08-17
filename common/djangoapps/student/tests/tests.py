@@ -950,7 +950,7 @@ class RelatedProgramsTests(ProgramsApiConfigMixin, SharedModuleStoreTestCase):
 
     def expected_link_text(self, program):
         """Construct expected dashboard link text."""
-        return '{name} {category}'.format(name=program['name'], category=program['category'])
+        return u'{name} {category}'.format(name=program['name'], category=program['category'])
 
     def test_related_programs_listed(self):
         """Verify that related programs are listed when the programs API returns data."""
@@ -981,6 +981,14 @@ class RelatedProgramsTests(ProgramsApiConfigMixin, SharedModuleStoreTestCase):
         response = self.client.get(self.url)
         self.assert_related_programs(response)
         self.assertNotContains(response, unrelated_program['name'])
+
+    def test_program_title_unicode(self):
+        """Verify that the dashboard can deal with programs whose titles contain Unicode."""
+        self.programs[0]['name'] = u'Bases matemáticas para estudiar ingeniería'
+        self.mock_programs_api(self.programs)
+
+        response = self.client.get(self.url)
+        self.assert_related_programs(response)
 
 
 class UserAttributeTests(TestCase):
