@@ -22,7 +22,7 @@ data: |
         <p>You can use the following example problems as models.</p>
 
         <schematicresponse>
-            <label>Make a voltage divider that splits the provided voltage evenly.</label>
+            <p>Make a voltage divider that splits the provided voltage evenly.</p>
             <center>
                 <schematic height="500" width="600" parts="g,r" analyses="dc"
                 initial_value="[[&quot;v&quot;,[168,144,0],{&quot;value&quot;:&quot;dc(1)&quot;,&quot;_json_&quot;:0},[&quot;1&quot;,&quot;0&quot;]],[&quot;r&quot;,[296,120,0],{&quot;r&quot;:&quot;1&quot;,&quot;_json_&quot;:1},[&quot;1&quot;,&quot;output&quot;]],[&quot;L&quot;,[296,168,3],{&quot;label&quot;:&quot;output&quot;,&quot;_json_&quot;:2},[&quot;output&quot;]],[&quot;w&quot;,[296,216,168,216]],[&quot;w&quot;,[168,216,168,192]],[&quot;w&quot;,[168,144,168,120]],[&quot;w&quot;,[168,120,296,120]],[&quot;g&quot;,[168,216,0],{&quot;_json_&quot;:7},[&quot;0&quot;]],[&quot;view&quot;,-67.49999999999994,-78.49999999999994,1.6000000000000003,&quot;50&quot;,&quot;10&quot;,&quot;1G&quot;,null,&quot;100&quot;,&quot;1&quot;,&quot;1000&quot;]]"/>
@@ -53,7 +53,7 @@ data: |
         </schematicresponse>
 
         <schematicresponse>
-            <label>Make a high-pass filter.</label>
+            <p>Make a high-pass filter.</p>
             <center>
                 <schematic height="500" width="600" parts="g,r,s,c" analyses="ac"
                 submit_analyses="{&quot;ac&quot;:[[&quot;NodeA&quot;,1,9]]}"
