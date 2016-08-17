@@ -4,6 +4,8 @@ Grades related signals.
 from django.conf import settings
 from django.dispatch import receiver, Signal
 from logging import getLogger
+from opaque_keys.edx.locator import CourseLocator
+from opaque_keys.edx.keys import UsageKey
 from student.models import user_by_anonymous_id
 from submissions.models import score_set, score_reset
 import course_blocks.api
@@ -130,15 +132,17 @@ def recalculate_subsection_grade_handler(sender, **kwargs):  # pylint: disable=u
     course_id = kwargs.get('course_id', None)
     usage_id = kwargs.get('usage_id', None)
     user_id = kwargs.get('user_id', None)
+    course_key = CourseLocator.from_string(course_id)
+    usage_key = UsageKey.from_string(usage_id)
 
     # If any of the kwargs were missing, at least one of the following values
     # will be None.
     if all((user_id, points_possible, points_earned, course_id, usage_id)):
         from courseware.courses import get_course_by_id
-        course = get_course_by_id(course_id, depth=0) # avoids circular import :(
+        course = get_course_by_id(course_key, depth=0)  # avoids circular import :(
         student = user_by_anonymous_id(user_id)
-        course_structure_for_course = course_blocks.api.get_course_blocks(student, usage_id)
-        subsection = course_structure_for_course[usage_id]
+        course_structure_for_course = course_blocks.api.get_course_blocks(student, starting_block_usage_key=usage_key)
+        subsection = course_structure_for_course[usage_key]
         from new.subsection_grade import SubsectionGradeFactory
         SubsectionGradeFactory(student).update(subsection, course_structure_for_course, course)
     else:
