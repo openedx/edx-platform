@@ -258,7 +258,7 @@
                     }
                 });
                 this.renderThreads();
-                this.showBrowseMenu();
+                this.showBrowseMenu(true);
                 return this;
             };
 
@@ -429,11 +429,13 @@
                 return this.$('.forum-nav-browse-menu-wrapper').is(':visible');
             };
 
-            DiscussionThreadListView.prototype.showBrowseMenu = function() {
+            DiscussionThreadListView.prototype.showBrowseMenu = function(initialLoad) {
                 if (!this.isBrowseMenuVisible()) {
                     this.$('.forum-nav-browse-menu-wrapper').show();
                     this.$('.forum-nav-thread-list-wrapper').hide();
-                    $('.forum-nav-browse-filter-input').focus();
+                    if (!initialLoad) {
+                        $('.forum-nav-browse-filter-input').focus();
+                    }
                     $('body').bind('click', this.hideBrowseMenu);
                     return this.updateSidebar();
                 }
