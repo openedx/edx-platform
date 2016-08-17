@@ -138,7 +138,7 @@ class ReverificationService(object):
         course_key = CourseKey.from_string(course_id)
         return VerificationStatus.get_user_attempts(user_id, course_key, related_assessment_location)
 
-    def get_course_verification_status(self, user, course_id):
+    def get_course_verification_status(self, user_id, course_id):
         """
         This xBlock service method will return the status of the course level verification status, which
         is not the same as in-course reverification. This verification status is normally shown to the user
@@ -148,6 +148,8 @@ class ReverificationService(object):
         or if the user is not enrolled in the course under a course_mode that would
         require verification
         """
+
+        user = User.objects.get(id=user_id)
 
         enrollment = CourseEnrollment.get_enrollment(user, course_id)
         if not enrollment:
