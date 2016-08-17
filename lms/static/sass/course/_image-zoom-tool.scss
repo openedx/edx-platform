@@ -38,9 +38,9 @@
         position: absolute;
         height: 350px;
         width: 350px;
-        top: -375px;
-        @include left(50%);
-        @include margin-left(-175px);
+        top: 50%;
+        margin-top: -175px;
+        @include left(-375px);
         border-radius: 50%;
         border: 2px solid $gray-d4;
         background: $white;
