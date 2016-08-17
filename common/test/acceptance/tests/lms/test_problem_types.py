@@ -535,12 +535,6 @@ class NumericalProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         Additional setup for NumericalProblemTypeTest
         """
         super(NumericalProblemTypeTest, self).setUp(*args, **kwargs)
-        self.problem_page.a11y_audit.config.set_rules({
-            'ignore': [
-                'section',  # TODO: AC-491
-                'label',  # TODO: AC-289
-            ]
-        })
 
     def answer_problem(self, correct):
         """
@@ -579,12 +573,6 @@ class FormulaProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         Additional setup for FormulaProblemTypeTest
         """
         super(FormulaProblemTypeTest, self).setUp(*args, **kwargs)
-        self.problem_page.a11y_audit.config.set_rules({
-            'ignore': [
-                'section',  # TODO: AC-491
-                'label',  # TODO: AC-288
-            ]
-        })
 
     def answer_problem(self, correct):
         """
