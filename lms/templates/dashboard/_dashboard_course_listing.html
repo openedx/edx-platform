@@ -284,7 +284,7 @@ from student.helpers import (
           % for program in related_programs:
           <li>
             <span class="category-icon ${program['category'].lower()}-icon" aria-hidden="true"></span>
-            <span><a href="${program['detail_url']}">${'{name} {category}'.format(name=program['name'], category=program['category'])}</a></span>
+            <span><a href="${program['detail_url']}">${u'{name} {category}'.format(name=program['name'], category=program['category'])}</a></span>
           </li>
           % endfor
         </ul>
