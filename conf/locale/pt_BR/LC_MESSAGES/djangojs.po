@@ -140,9 +140,10 @@
 # Lulatini <inactive+Lulatini@transifex.com>, 2015
 # Maurício Gonçalves Melara Camargo <mauriciogmc@gmail.com>, 2015
 # Monica Farias <monifar.tp@gmail.com>, 2015-2016
-# Andrew Melim <nokostya.translation@gmail.com>, 2015
+# Drew Melim <nokostya.translation@gmail.com>, 2015
 # Sergio Silva <sergiohrs@gmail.com>, 2016
 # sgtmarciosilva <sgtmarciosilva@ibest.com.br>, 2015
+# Thiago Barroso Perrotta, 2016
 # Thiago Perrotta <inactive+thiagowfx@transifex.com>, 2014
 # Victor Hochgreb <victorfeec@gmail.com>, 2015
 # Victor Hochgreb de Freitas <victorhochgreb@gmail.com>, 2015
@@ -182,8 +183,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-08-04 18:44+0000\n"
-"PO-Revision-Date: 2016-08-04 18:47+0000\n"
+"POT-Creation-Date: 2016-08-16 19:39+0000\n"
+"PO-Revision-Date: 2016-08-16 19:42+0000\n"
 "Last-Translator: Ned Batchelder <ned@edx.org>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/open-edx/edx-platform/language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
@@ -4480,6 +4481,10 @@ msgid ""
 msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
+msgid "All Time Zones"
+msgstr ""
+
+#: lms/static/js/student_account/views/account_settings_factory.js
 msgid "Additional Information"
 msgstr ""
 
@@ -5178,6 +5183,10 @@ msgstr "Exibir configurações obsoletas"
 msgid "You have unsaved changes. Do you really want to leave this page?"
 msgstr ""
 "Você tem alterações não salvas. Você realmente deseja sair desta página?"
+
+#: cms/static/js/maintenance/force_publish_course.js
+msgid "Internal Server Error."
+msgstr ""
 
 #. Translators: This is the status of a video upload that is queued
 #. waiting for other uploads to complete
@@ -8771,12 +8780,11 @@ msgid ""
 msgstr ""
 
 #: cms/templates/js/content-visibility-editor.underscore
+#, python-format
 msgid ""
-"Units inherit the visibility setting of the subsection they are in. If you "
-"make this subsection visible to learners, published units that were "
-"previously hidden also become visible. Only units that were explicitly "
-"hidden remain hidden regardless of the option you select for this "
-"subsection."
+"If you select an option other than \"%(hide_label)s\", after the subsection "
+"release date has passed, published units in this subsection will become "
+"available to learners unless units are explicitly hidden."
 msgstr ""
 
 #: cms/templates/js/course-instructor-details.underscore
@@ -9628,6 +9636,18 @@ msgstr "Editar %(display_name)s (necessário)"
 #: cms/templates/js/xblock-string-field-editor.underscore
 msgid "formLabel"
 msgstr "formLabel"
+
+#: cms/templates/js/maintenance/force-published-course-response.underscore
+msgid ""
+"You have done a dry run of force publishing the course. Nothing has changed."
+" Had you run it, the following course versions would have been change."
+msgstr ""
+
+#: cms/templates/js/maintenance/force-published-course-response.underscore
+msgid ""
+"The published branch version, {published}, was reset to the draft branch "
+"version, {draft}."
+msgstr ""
 
 #: cms/templates/js/programs/course_details.underscore
 msgid "Delete course"

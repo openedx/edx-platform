@@ -42,6 +42,7 @@
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
+# Anatoli F. Peña Castillo <anatoli1993@yahoo.com>, 2016
 # Antonio Pardo <apardo@alabs.org>, 2013
 # Cristian Guerra <cristian.guerra.maya@gmail.com>, 2016
 # Cristian Salamea <ovnicraft@gmail.com>, 2014-2016
@@ -70,6 +71,7 @@
 # 
 # Translators:
 # Alex Dzul <alexexc2@gmail.com>, 2016
+# Anatoli F. Peña Castillo <anatoli1993@yahoo.com>, 2016
 # Claudio Anibal Barahona Flores <claudio.barahona@unah.edu.hn>, 2015
 # Cristian Salamea <ovnicraft@gmail.com>, 2014-2016
 # Giancarlo  De  Agostini <giancarlo.deagostini@iaen.edu.ec>, 2015
@@ -95,6 +97,7 @@
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
+# Anatoli F. Peña Castillo <anatoli1993@yahoo.com>, 2016
 # Morphyne <cirrosis60@gmail.com>, 2014
 # Cristian Guerra <cristian.guerra.maya@gmail.com>, 2016
 # Cristian Salamea <ovnicraft@gmail.com>, 2014-2015
@@ -105,6 +108,7 @@
 # karlman72 <karlman72@gmail.com>, 2014
 # Laura Silva <lingison@edx.org>, 2016
 # Leandro Bohnhoff <leandro.bohnhoff@gmail.com>, 2015
+# Ned Batchelder <ned@edx.org>, 2016
 # Patricia Colmenares <patrusca38@hotmail.com>, 2015
 # Tala Aoun <talaaoun@gmail.com>, 2016
 # UAbierta Universidad de Chile <uabierta@u.uchile.cl>, 2015
@@ -112,8 +116,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-08-04 18:44+0000\n"
-"PO-Revision-Date: 2016-08-04 18:47+0000\n"
+"POT-Creation-Date: 2016-08-16 19:39+0000\n"
+"PO-Revision-Date: 2016-08-18 15:48+0000\n"
 "Last-Translator: Ned Batchelder <ned@edx.org>\n"
 "Language-Team: Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/)\n"
 "MIME-Version: 1.0\n"
@@ -139,6 +143,7 @@ msgstr ""
 msgid "Saving"
 msgstr "Guardando"
 
+#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: cms/static/coffee/src/views/tabs.js
@@ -146,6 +151,7 @@ msgstr "Guardando"
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: common/static/coffee/src/discussion/utils.js
 #: lms/static/js/Markdown.Editor.js
+#: common/static/common/templates/discussion/alert-popup.underscore
 msgid "OK"
 msgstr "Aceptar"
 
@@ -2107,6 +2113,7 @@ msgstr ""
 "Tenemos problemas reabriendo esta discusión. Por favor intenta de nuevo."
 
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
+#: common/static/common/templates/discussion/nav-load-more-link.underscore
 msgid "Load more"
 msgstr "Cargar más"
 
@@ -4402,6 +4409,9 @@ msgid ""
 "address you provided.  If you do not receive this message, "
 "{anchorStart}contact technical support{anchorEnd}."
 msgstr ""
+"Le hemos enviado un mensaje por correo electrónico con instrucciones sobre "
+"cómo reiniciar su contraseña a la dirección de correo que usted proveyó. Si "
+"no recibe este mensaje, {anchorStart}contacte a soporte técnico{anchorEnd}."
 
 #: lms/static/js/student_account/views/LoginView.js
 msgid ""
@@ -4504,6 +4514,10 @@ msgid ""
 msgstr ""
 "Seleccione la zona horaria en que quiere que se muestren las fechas del "
 "curso. Si no especifica una "
+
+#: lms/static/js/student_account/views/account_settings_factory.js
+msgid "All Time Zones"
+msgstr "Todas las zonas horarias"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "Additional Information"
@@ -5220,6 +5234,10 @@ msgstr "Mostrar configuraciones descartadas"
 msgid "You have unsaved changes. Do you really want to leave this page?"
 msgstr "Tiene cambios no guardados. ¿Realmente desea abandonar esta página?"
 
+#: cms/static/js/maintenance/force_publish_course.js
+msgid "Internal Server Error."
+msgstr "Error interno del servidor."
+
 #. Translators: This is the status of a video upload that is queued
 #. waiting for other uploads to complete
 #: cms/static/js/models/active_video_upload.js
@@ -5382,6 +5400,7 @@ msgstr "o"
 msgid "This component has validation issues."
 msgstr "El componente tiene errores de validación"
 
+#: cms/static/js/programs/models/course_model.js
 #: cms/templates/js/programs/course_details.underscore
 msgid "Course Code"
 msgstr "Código del curso"
@@ -5395,75 +5414,75 @@ msgstr "Título del curso"
 
 #: cms/static/js/programs/models/program_model.js
 msgid "Please select a valid organization."
-msgstr ""
+msgstr "Por favor seleccione una organización válida."
 
 #: cms/static/js/programs/utils/validation_config.js
 msgid "{0} is required"
-msgstr ""
+msgstr "{0} es requerido."
 
 #: cms/static/js/programs/utils/validation_config.js
 msgid "{0} must be accepted"
-msgstr ""
+msgstr "{0} debe ser aceptado"
 
 #: cms/static/js/programs/utils/validation_config.js
 msgid "{0} must be greater than or equal to {1}"
-msgstr ""
+msgstr "{0} debe ser mayor o igual a {1}"
 
 #: cms/static/js/programs/utils/validation_config.js
 msgid "{0} must be less than or equal to {1}"
-msgstr ""
+msgstr "{0} debe ser menor o igual a {1}"
 
 #: cms/static/js/programs/utils/validation_config.js
 msgid "{0} must be between {1} and {2}"
-msgstr ""
+msgstr "{0} debe ser entre {1} y {2}"
 
 #: cms/static/js/programs/utils/validation_config.js
 msgid "{0} must be {1} characters"
-msgstr ""
+msgstr "{0} debe ser {1} caracteres"
 
 #: cms/static/js/programs/utils/validation_config.js
 msgid "{0} must be at least {1} characters"
-msgstr ""
+msgstr "{0} debe ser al menos {1} caracteres"
 
 #: cms/static/js/programs/utils/validation_config.js
 msgid "{0} must be at most {1} characters"
-msgstr ""
+msgstr "{0} debe ser máximo {1} caracteres "
 
 #: cms/static/js/programs/utils/validation_config.js
 msgid "{0} must be between {1} and {2} characters"
-msgstr ""
+msgstr "{0} debe ser entre {1} y {2} caracteres"
 
 #: cms/static/js/programs/utils/validation_config.js
 msgid "{0} must be one of: {1}"
-msgstr ""
+msgstr "{0} debe ser uno de:{1}"
 
 #: cms/static/js/programs/utils/validation_config.js
 msgid "{0} must be the same as {1}"
-msgstr ""
+msgstr "{0} debe ser igual a {1}"
 
 #: cms/static/js/programs/utils/validation_config.js
 msgid "{0} must only contain digits"
-msgstr ""
+msgstr "{0} debe contener sólo dígitos"
 
 #: cms/static/js/programs/utils/validation_config.js
 msgid "{0} must be a number"
-msgstr ""
+msgstr "{0} debe ser un número "
 
 #: cms/static/js/programs/utils/validation_config.js
 msgid "{0} must be a valid email"
-msgstr ""
+msgstr "{0} debe ser una dirección de correo electrónico válida"
 
 #: cms/static/js/programs/utils/validation_config.js
 msgid "{0} must be a valid url"
-msgstr ""
+msgstr "{0} debe ser un url válido"
 
 #: cms/static/js/programs/utils/validation_config.js
 msgid "{0} is invalid"
-msgstr ""
+msgstr "{0} no es válido"
 
 #: cms/static/js/programs/views/program_details_view.js
 msgid "confirm"
-msgstr ""
+msgstr "confirmar"
 
 #: cms/static/js/programs/views/program_details_view.js
 msgid "Publish this program?"
@@ -5474,6 +5493,8 @@ msgid ""
 "After you publish this program, you cannot add or remove course codes or "
 "remove course runs."
 msgstr ""
+"Después de haber publicado este programa, no le será posible añadir o "
+"remover códigos de cursos ni remover ediciones de los cursos."
 
 #: cms/static/js/programs/views/program_details_view.js
 #: cms/static/js/views/modals/course_outline_modals.js
@@ -5485,7 +5506,7 @@ msgstr "Publicar"
 
 #: cms/static/js/programs/views/program_details_view.js
 msgid "Marketing Slug is required."
-msgstr ""
+msgstr "Se requiere slug de marketing."
 
 #: cms/static/js/views/active_video_upload_list.js
 msgid "Your video uploads are not complete."
@@ -5786,11 +5807,11 @@ msgstr ""
 
 #: cms/static/js/views/modals/course_outline_modals.js
 msgid "{display_name} Settings"
-msgstr ""
+msgstr "Ajustes de configuración para {display_name} "
 
 #: cms/static/js/views/modals/course_outline_modals.js
 msgid "Change the settings for {display_name}"
-msgstr ""
+msgstr "Cambiar los ajustes para {display_name}"
 
 #: cms/static/js/views/modals/course_outline_modals.js
 msgid "Publish {display_name}"
@@ -5798,7 +5819,7 @@ msgstr "Publicar {display_name}"
 
 #: cms/static/js/views/modals/course_outline_modals.js
 msgid "Publish all unpublished changes for this {item}?"
-msgstr ""
+msgstr "Publicar todos los cambios no publicados para este {item}?"
 
 #: cms/static/js/views/modals/course_outline_modals.js
 msgid "Basic"
@@ -7210,7 +7231,7 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
 msgid "Upload a CSV file"
-msgstr ""
+msgstr "Cargar un archivo CSV"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list-editor.underscore
@@ -7273,11 +7294,11 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list-editor.underscore
 msgid "Student email or username"
-msgstr ""
+msgstr "Correo electrónico o nombre de usuario del estudiante"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list-editor.underscore
 msgid "Free text notes"
-msgstr ""
+msgstr "Notas libres"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
 msgid "Generate Exception Certificates"
@@ -7286,10 +7307,12 @@ msgstr "Generar excepciones de certificados"
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
 msgid "All users on the Exception list who do not yet have a certificate"
 msgstr ""
+"Todos los usuarios en la Lista de Excepción quienes aun no tienen un "
+"certificado"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
 msgid "All users on the Exception list"
-msgstr ""
+msgstr "Todos los usuarios en la Lista de Excepción"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
 msgid "User Email"
@@ -7543,7 +7566,7 @@ msgstr "Válido"
 
 #: lms/templates/learner_dashboard/certificate.underscore
 msgid "Program Certificates"
-msgstr ""
+msgstr "Certificados de programa"
 
 #: lms/templates/learner_dashboard/certificate.underscore
 msgid "certificate.credential_url"
@@ -7559,7 +7582,7 @@ msgstr "Felicitaciones! Usted a ganado un certificado de este curso."
 
 #: lms/templates/learner_dashboard/certificate_status.underscore
 msgid "View Certificate"
-msgstr ""
+msgstr "Ver certificado"
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
 msgid "enrolled"
@@ -7608,15 +7631,15 @@ msgstr "Inscripciones abiertas en"
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
 msgid "Not Currently Available"
-msgstr ""
+msgstr "Actualmente no disponible"
 
 #: lms/templates/learner_dashboard/empty_programs_list.underscore
 msgid "You are not enrolled in any programs yet."
-msgstr ""
+msgstr "No se encuentra inscrito en ningún programa aún."
 
 #: lms/templates/learner_dashboard/empty_programs_list.underscore
 msgid "Explore Programs"
-msgstr ""
+msgstr "Explorar programas"
 
 #: lms/templates/learner_dashboard/explore_new_programs.underscore
 msgid ""
@@ -7628,11 +7651,11 @@ msgstr ""
 
 #: lms/templates/learner_dashboard/explore_new_programs.underscore
 msgid "Explore New Programs"
-msgstr ""
+msgstr "Explorar programas nuevos"
 
 #: lms/templates/learner_dashboard/program_card.underscore
 msgid "category"
-msgstr ""
+msgstr "categoría"
 
 #: lms/templates/learner_dashboard/program_card.underscore
 #, python-format
@@ -8887,18 +8910,16 @@ msgstr ""
 "no se incluye en los cálculos de calificaciones."
 
 #: cms/templates/js/content-visibility-editor.underscore
+#, python-format
 msgid ""
-"Units inherit the visibility setting of the subsection they are in. If you "
-"make this subsection visible to learners, published units that were "
-"previously hidden also become visible. Only units that were explicitly "
-"hidden remain hidden regardless of the option you select for this "
-"subsection."
+"If you select an option other than \"%(hide_label)s\", after the subsection "
+"release date has passed, published units in this subsection will become "
+"available to learners unless units are explicitly hidden."
 msgstr ""
-"Las unidades heredan la configuración de visibilidad de la subsección a la "
-"que pertenecen. Si hace esta subsección visible para los alumnos, las "
-"unidades publicadas que anteriormente estaban ocultas también se harán "
-"visibles. Sólo las unidades que estaban ocultas explícitamente permanecerán "
-"ocultas independientemente de la opción que seleccione para esta subsección."
+"Si selecciona una opción distinta a \"%(hide_label)s\", después de que la "
+"fecha de liberación de la subsección haya pasado las unidades publicadas en "
+"esa subsección se encontrarán disponibles para los estudiantes a menos que "
+"las unidades estén explícitamente ocultas."
 
 #: cms/templates/js/course-instructor-details.underscore
 msgid "Instructor Name"
@@ -9773,6 +9794,22 @@ msgstr "Editar %(display_name)s (requerido)"
 #: cms/templates/js/xblock-string-field-editor.underscore
 msgid "formLabel"
 msgstr "Etiqueta"
+
+#: cms/templates/js/maintenance/force-published-course-response.underscore
+msgid ""
+"You have done a dry run of force publishing the course. Nothing has changed."
+" Had you run it, the following course versions would have been change."
+msgstr ""
+"Ha corrido un simulacro de publicación del curso. No han habido cambios. Si "
+"lo hubiera hecho realmente, las siguientes versiones habrían tenido cambios."
+
+#: cms/templates/js/maintenance/force-published-course-response.underscore
+msgid ""
+"The published branch version, {published}, was reset to the draft branch "
+"version, {draft}."
+msgstr ""
+"La versión publicada, {published}, fue restablecida a la versión borrador, "
+"{draft}."
 
 #: cms/templates/js/programs/course_details.underscore
 msgid "Delete course"
