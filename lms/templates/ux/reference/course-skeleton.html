@@ -48,24 +48,45 @@
                 ##  - update the Pattern Library's markup to match
                 <div class="page-header-search">
                     <form class="search-form" role="search">
-                        <div class="search-box">
-                            <input class="search-field" type="text" value=""
-                                   aria-label="Search all the things" placeholder="Search all the things">
-                            <button type="button" class="btn action action-clear" aria-label="Clear search">
-                                <span class="fa fa-times-circle" aria-hidden="true"></span>
-                            </button>
-                        </div>
-                        <button type="submit" class="btn-brand action action-search" aria-label="Search items">
-                            <span class="fa fa-search" aria-hidden="true"></span>
-                        </button>
+                        <label class="field-label sr-only" for="search" id="search-hint">Search all the things</label>
+                        <input
+                            class="field-input input-text search-input"
+                            type="search"
+                            name="search"
+                            id="search"
+                            placeholder="Search all the things"
+                        />
+                        <button class="btn-brand btn-small search-btn" type="button">Search</button>
                     </form>
                 </div>
             </div>
         </div>
     </header>
     <div class="page-content">
-        <h3>This is where the page content belongs</h3>
-        <p>Useful stuff goes here</p>
+        <div class="layout layout-1t2t">
+            <aside class="layout-col layout-col-a" role="complementary" aria-label="Navigation">
+                <h3>Sidebar</h3>
+                <ul>
+                    <li>Item one</li>
+                    <li>Item two</li>
+                    <li>Item three</li>
+                </ul>
+            </aside>
+
+            <main id="main" aria-label="Content" tabindex="-1" class="layout-col layout-col-b">
+                <article tabindex="-1" aria-label="Main Content">
+                    <h3>Main content goes here.</h3>
+                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis molestie, orci at viverra ornare,
+                        augue urna fermentum ex, vitae dignissim magna est sit amet diam. Nunc sodales dolor finibus
+                        pulvinar placerat. Suspendisse vitae tellus auctor, sodales erat ac, venenatis quam. Etiam
+                        purus est, consequat nec erat vel, bibendum volutpat ex. Fusce vitae consectetur ante.
+                        Suspendisse elit mauris, iaculis sed diam eu, efficitur tempor dui. Praesent tristique nunc
+                        quam, in tincidunt ligula accumsan et. Etiam augue sem, commodo ac ipsum vel, fringilla dapibus
+                        lacus. Sed facilisis euismod felis, non malesuada massa scelerisque sed. Etiam et placerat
+                        lorem. Nullam quis tincidunt sapien.</p>
+                </article>
+            </main>
+        </div>
     </div>
 </section>
 </%block>

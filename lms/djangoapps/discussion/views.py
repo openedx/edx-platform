@@ -3,27 +3,23 @@ Views handling read (GET) requests for the Discussion tab and inline discussions
 """
 
 from functools import wraps
-import json
 import logging
 
 from django.contrib.auth.decorators import login_required
-from django.conf import settings
 from django.core.context_processors import csrf
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
 from django.http import Http404, HttpResponseBadRequest
-from django.utils.translation import ugettext_noop
+from django.shortcuts import render_to_response
 from django.views.decorators.http import require_GET
 import newrelic.agent
 
-from edxmako.shortcuts import render_to_response
 from courseware.courses import get_course_with_access
 from openedx.core.djangoapps.course_groups.cohorts import (
     is_course_cohorted,
     get_cohort_id,
     get_course_cohorts,
 )
-from courseware.tabs import EnrolledTab
 from courseware.access import has_access
 from xmodule.modulestore.django import modulestore
 
@@ -46,25 +42,6 @@ THREADS_PER_PAGE = 20
 INLINE_THREADS_PER_PAGE = 20
 PAGES_NEARBY_DELTA = 2
 log = logging.getLogger("edx.discussions")
-
-
-class DiscussionTab(EnrolledTab):
-    """
-    A tab for the cs_comments_service forums.
-    """
-
-    type = 'discussion'
-    title = ugettext_noop('Discussion')
-    priority = None
-    view_name = 'django_comment_client.forum.views.forum_form_discussion'
-    is_hideable = settings.FEATURES.get('ALLOW_HIDING_DISCUSSION_TAB', False)
-    is_default = False
-
-    @classmethod
-    def is_enabled(cls, course, user=None):
-        if not super(DiscussionTab, cls).is_enabled(course, user):
-            return False
-        return utils.is_discussion_enabled(course.id)
 
 
 @newrelic.agent.function_trace()
@@ -115,7 +92,8 @@ def get_threads(request, course, discussion_id=None, per_page=THREADS_PER_PAGE):
         # If the user did not select a sort key, use their last used sort key
         cc_user = cc.User.from_django_user(request.user)
         cc_user.retrieve()
-        # TODO: After the comment service is updated this can just be user.default_sort_key because the service returns the default value
+        # TODO: After the comment service is updated this can just be
+        # user.default_sort_key because the service returns the default value
         default_query_params['sort_key'] = cc_user.get('default_sort_key') or default_query_params['sort_key']
     else:
         # If the user clicked a sort key, update their default sort key
@@ -239,7 +217,10 @@ def forum_form_discussion(request, course_key):
         threads = [utils.prepare_content(thread, course_key, is_staff) for thread in unsafethreads]
     except cc.utils.CommentClientMaintenanceError:
         log.warning("Forum is in maintenance mode")
-        return render_to_response('discussion/maintenance.html', {})
+        return render_to_response('discussion/maintenance.html', {
+            'disable_courseware_js': True,
+            'uses_pattern_library': True,
+        })
     except ValueError:
         return HttpResponseBadRequest("Invalid group_id")
 
@@ -266,9 +247,9 @@ def forum_form_discussion(request, course_key):
             'course': course,
             #'recent_active_threads': recent_active_threads,
             'staff_access': bool(has_access(request.user, 'staff', course)),
-            'threads': json.dumps(threads),
+            'threads': threads,
             'thread_pages': query_params['num_pages'],
-            'user_info': json.dumps(user_info, default=lambda x: None),
+            'user_info': user_info,
             'can_create_comment': has_permission(request.user, "create_comment", course.id),
             'can_create_subcomment': has_permission(request.user, "create_sub_comment", course.id),
             'can_create_thread': has_permission(request.user, "create_thread", course.id),
@@ -276,21 +257,21 @@ def forum_form_discussion(request, course_key):
                 has_permission(request.user, 'openclose_thread', course.id) or
                 has_access(request.user, 'staff', course)
             ),
-            'annotated_content_info': json.dumps(annotated_content_info),
+            'annotated_content_info': annotated_content_info,
             'course_id': course.id.to_deprecated_string(),
-            'roles': json.dumps(utils.get_role_ids(course_key)),
+            'roles': utils.get_role_ids(course_key),
             'is_moderator': has_permission(request.user, "see_all_cohorts", course_key),
             'cohorts': course_settings["cohorts"],  # still needed to render _thread_list_template
             'user_cohort': user_cohort_id,  # read from container in NewPostView
             'is_course_cohorted': is_course_cohorted(course_key),  # still needed to render _thread_list_template
             'sort_preference': user.default_sort_key,
             'category_map': course_settings["category_map"],
-            'course_settings': json.dumps(course_settings),
+            'course_settings': course_settings,
             'disable_courseware_js': True,
             'uses_pattern_library': True,
         }
         # print "start rendering.."
-        return render_to_response('discussion/index.html', context)
+        return render_to_response('discussion/discussion_board.html', context)
 
 
 @require_GET
@@ -318,8 +299,8 @@ def single_thread(request, course_key, discussion_id, thread_id):
             response_skip=request.GET.get("resp_skip"),
             response_limit=request.GET.get("resp_limit")
         )
-    except cc.utils.CommentClientRequestError as e:
-        if e.status_code == 404:
+    except cc.utils.CommentClientRequestError as error:
+        if error.status_code == 404:
             raise Http404
         raise
 
@@ -378,17 +359,17 @@ def single_thread(request, course_key, discussion_id, thread_id):
             'discussion_id': discussion_id,
             'csrf': csrf(request)['csrf_token'],
             'init': '',   # TODO: What is this?
-            'user_info': json.dumps(user_info),
+            'user_info': user_info,
             'can_create_comment': has_permission(request.user, "create_comment", course.id),
             'can_create_subcomment': has_permission(request.user, "create_sub_comment", course.id),
             'can_create_thread': has_permission(request.user, "create_thread", course.id),
-            'annotated_content_info': json.dumps(annotated_content_info),
+            'annotated_content_info': annotated_content_info,
             'course': course,
             #'recent_active_threads': recent_active_threads,
             'course_id': course.id.to_deprecated_string(),   # TODO: Why pass both course and course.id to template?
             'thread_id': thread_id,
-            'threads': json.dumps(threads),
-            'roles': json.dumps(utils.get_role_ids(course_key)),
+            'threads': threads,
+            'roles': utils.get_role_ids(course_key),
             'is_moderator': is_moderator,
             'thread_pages': query_params['num_pages'],
             'is_course_cohorted': is_course_cohorted(course_key),
@@ -400,11 +381,11 @@ def single_thread(request, course_key, discussion_id, thread_id):
             'user_cohort': user_cohort,
             'sort_preference': cc_user.default_sort_key,
             'category_map': course_settings["category_map"],
-            'course_settings': json.dumps(course_settings),
+            'course_settings': course_settings,
             'disable_courseware_js': True,
             'uses_pattern_library': True,
         }
-        return render_to_response('discussion/index.html', context)
+        return render_to_response('discussion/discussion_board.html', context)
 
 
 @require_GET
@@ -451,7 +432,7 @@ def user_profile(request, course_key, user_id):
                 'discussion_data': threads,
                 'page': query_params['page'],
                 'num_pages': query_params['num_pages'],
-                'annotated_content_info': json.dumps(annotated_content_info),
+                'annotated_content_info': annotated_content_info,
             })
         else:
             django_user = User.objects.get(id=user_id)
@@ -460,15 +441,17 @@ def user_profile(request, course_key, user_id):
                 'user': request.user,
                 'django_user': django_user,
                 'profiled_user': profiled_user.to_dict(),
-                'threads': json.dumps(threads),
-                'user_info': json.dumps(user_info, default=lambda x: None),
-                'annotated_content_info': json.dumps(annotated_content_info),
+                'threads': threads,
+                'user_info': user_info,
+                'annotated_content_info': annotated_content_info,
                 'page': query_params['page'],
                 'num_pages': query_params['num_pages'],
-                'learner_profile_page_url': reverse('learner_profile', kwargs={'username': django_user.username})
+                'learner_profile_page_url': reverse('learner_profile', kwargs={'username': django_user.username}),
+                'disable_courseware_js': True,
+                'uses_pattern_library': True,
             }
 
-            return render_to_response('discussion/user_profile.html', context)
+            return render_to_response('discussion/discussion_profile_page.html', context)
     except User.DoesNotExist:
         raise Http404
 
@@ -547,9 +530,9 @@ def followed_threads(request, course_key, user_id):
                 'user': request.user,
                 'django_user': User.objects.get(id=user_id),
                 'profiled_user': profiled_user.to_dict(),
-                'threads': json.dumps(paginated_results.collection),
-                'user_info': json.dumps(user_info),
-                'annotated_content_info': json.dumps(annotated_content_info),
+                'threads': paginated_results.collection,
+                'user_info': user_info,
+                'annotated_content_info': annotated_content_info,
                 #                'content': content,
             }
 

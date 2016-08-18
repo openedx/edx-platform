@@ -14,8 +14,21 @@ $forum-color-community-ta: $green-d1 !default;
 $forum-color-marked-answer: $green-d1 !default;
 $forum-color-border: $gray-l3 !default;
 $forum-color-error: $red !default;
+$forum-color-hover-thread: $gray-d3 !default;
+$forum-color-reading-thread: $gray-d3 !default;
+$forum-color-read-post: $blue !default;
+$forum-color-never-read-post: $gray-d3 !default;
 
 // post images
 $post-image-dimension: ($baseline*3) !default;  // image size  + margin
 $response-image-dimension: ($baseline*2.5) !default; // image size  + margin
 $comment-image-dimension: ($baseline*2) !default; // image size  + margin
+
+// font sizes
+$forum-base-font-size: 14px;
+$forum-x-large-font-size: 21px;
+$forum-large-font-size: 16px;
+$forum-small-font-size: 12px;
+
+// borders
+$forum-border-radius: 3px;
