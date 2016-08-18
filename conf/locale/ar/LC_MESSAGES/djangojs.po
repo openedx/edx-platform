@@ -15,6 +15,8 @@
 # Ahmed Jazzar <ajazzar@qrf.org>, 2015
 # Ahmed Jazzar <ajazzar@qrf.org>, 2015-2016
 # Alhamzah Alnufaili <alhamzah.alnufaili@gmail.com>, 2016
+# AR C2 <e2f458fd4s512@outlook.com>, 2016
+# AR R1 <e2far1@hotmail.com>, 2016
 # ayshibly <ayshibly@gmail.com>, 2014
 # Belal A. Nwiran <bnwiran@gmail.com>, 2015
 # br1ng <ibnalawam@gmail.com>, 2014
@@ -49,12 +51,15 @@
 # Ahmad AbdArrahman <mygooglizer@gmail.com>, 2013
 # Ahmed Jazzar <ajazzar@qrf.org>, 2015
 # Ahmed Jazzar <ajazzar@qrf.org>, 2016
+# AR C2 <e2f458fd4s512@outlook.com>, 2016
+# AR R1 <e2far1@hotmail.com>, 2016
 # Mahmoud Elkhateeb <eng.elkhteeb@gmail.com>, 2013
 # may <may@qordoba.com>, 2013
 # may <may@qordoba.com>, 2014-2015
 # Nabeel El-Dughailib <nabeel@qordoba.com>, 2014-2015
 # Najwan Al Rousan <najwanrousan@gmail.com>, 2013
 # Nashwan Naji <nashwanameen@gmail.com>, 2016
+# Natalia Berdnikov <nberdnikov@edx.org>, 2016
 # RaghadG <raghad_g@yahoo.com>, 2014
 # Soha Assali <soha+transifex@qordoba.com>, 2015-2016
 # soliman osman <solimanosman@windowslive.com>, 2014-2015
@@ -70,11 +75,13 @@
 # Ahmed Jazzar <ajazzar@qrf.org>, 2015
 # Ahmed Jazzar <ajazzar@qrf.org>, 2015-2016
 # Alhamzah Alnufaili <alhamzah.alnufaili@gmail.com>, 2016
+# AR C2 <e2f458fd4s512@outlook.com>, 2016
 # mohammad hamdi <babrica@hotmail.com>, 2014
 # Emad Ahmad Alghamdi <eaalghamdi@kau.edu.sa>, 2015
 # Khaled Abdel wahab <engkhaledabdelwahab@gmail.com>, 2015
 # may <may@qordoba.com>, 2014-2015
 # Nabeel El-Dughailib <nabeel@qordoba.com>, 2014-2015
+# Natalia Berdnikov <nberdnikov@edx.org>, 2016
 # Ned Batchelder <ned@edx.org>, 2016
 # omarithawi <oithawi@qrf.org>, 2015-2016
 # Soha Assali <soha+transifex@qordoba.com>, 2015-2016
@@ -90,6 +97,7 @@
 # Ahmed Jazzar <ajazzar@qrf.org>, 2015
 # Ahmed Jazzar <ajazzar@qrf.org>, 2016
 # Alhamzah Alnufaili <alhamzah.alnufaili@gmail.com>, 2016
+# AR C2 <e2f458fd4s512@outlook.com>, 2016
 # may <may@qordoba.com>, 2014-2015
 # Mohamed Ibrahim <root.php@hotmail.com>, 2015
 # wd3bbas <mohed.alabbas@gmail.com>, 2014
@@ -101,8 +109,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-08-04 18:44+0000\n"
-"PO-Revision-Date: 2016-08-04 18:47+0000\n"
+"POT-Creation-Date: 2016-08-16 19:39+0000\n"
+"PO-Revision-Date: 2016-08-18 16:35+0000\n"
 "Last-Translator: Ned Batchelder <ned@edx.org>\n"
 "Language-Team: Arabic (http://www.transifex.com/open-edx/edx-platform/language/ar/)\n"
 "MIME-Version: 1.0\n"
@@ -1859,7 +1867,7 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js
 msgid "Adjust video volume"
-msgstr "ضبط مستوى الصوت"
+msgstr "ضبط مستوى صوت الفيديو"
 
 #: common/lib/xmodule/xmodule/js/src/video/08_video_speed_control.js
 msgid ""
@@ -1867,9 +1875,9 @@ msgid ""
 "navigate the different speeds, then press ENTER to change to the selected "
 "speed."
 msgstr ""
-"اضغط زر \"أعلى\" من على لوحة المفاتيح للدخول إلى قائمة ضبط السرعة ثم استخدم "
-"زر \"الأعلى\" و\"الأسفل\" لاختيار السرعة المناسبة. لحفظ السرعة المختارة اضغط"
-" على زر الإرسال \"ENTER\""
+"اضغط على الزر \"أعلى\" للدخول إلى قائمة ضبط السرعة ومن ثم استخدام زريّ "
+"الأسهم \"أعلى\" و\"أسفل\" للانتقال بين السرعات المختلفة، ثم اضغط على زر "
+"\"Enter\" لاعتماد السرعة المختارة."
 
 #: common/lib/xmodule/xmodule/js/src/video/08_video_speed_control.js
 msgid "Adjust video speed"
@@ -1893,7 +1901,7 @@ msgstr "يُرجى عدم إظهار هذا مرّة أخرى."
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "Open language menu"
-msgstr "فتح قائمة اللغة"
+msgstr "فتح قائمة اللغات"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "Transcript will be displayed when you start playing the video."
@@ -1925,9 +1933,9 @@ msgid ""
 " keys to navigate language options. Press ENTER to change to the selected "
 "language."
 msgstr ""
-"اضغط زر \"أعلى\" من على لوحة المفاتيح للدخول إلى قائمة اللغة ثم استخدم زر "
-"\"الأعلى\" و\"الأسفل\" لاختيار اللغة المناسبة. لحفظ اللغة المختارة اضغط على "
-"زر الإرسال \"ENTER\""
+"اضغط على الزر \"أعلى\" للدخول إلى قائمة ضبط اللغة ومن ثم استخدام زريّ الأسهم"
+" \"أعلى\" و\"أسفل\" للانتقال بين خيارات اللغات المختلفة، ثم اضغط على زر "
+"\"Enter\" لاعتماد اللغة المختارة."
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "Hide closed captions"
@@ -2307,14 +2315,15 @@ msgid ""
 "We had some trouble processing your request. Please ensure you have copied "
 "any "
 msgstr ""
+"كان لدينا بعض المشاكل في معالجة طلبك. الرجاء التأكد من الانتهاء من نسخ أي"
 
 #: common/static/common/js/discussion/utils.js
 msgid "Some images in this post have been omitted"
-msgstr "تم حذف بعض الصور في هذا المنشور"
+msgstr "لقد تم حذف بعض الصور في هذا المنشور"
 
 #: common/static/common/js/discussion/utils.js
 msgid "image omitted"
-msgstr "صورة محذوفة"
+msgstr "تم حذف الصورة"
 
 #: common/static/common/js/discussion/views/discussion_content_view.js
 msgid "there is currently {numVotes} vote"
@@ -2352,7 +2361,7 @@ msgstr "لم نعثر على {original_query}. "
 
 #: common/static/common/js/discussion/views/discussion_thread_list_view.js
 msgid "Show posts by {username}."
-msgstr "اعرض منشوراتِ {username}."
+msgstr "عرض منشوراتِ حسب {username}."
 
 #: common/static/common/js/discussion/views/discussion_thread_view.js
 msgid "{numResponses} other response"
@@ -2376,7 +2385,7 @@ msgstr[5] "{numResponses} رد"
 
 #: common/static/common/js/discussion/views/discussion_thread_view.js
 msgid "Load next {numResponses} responses"
-msgstr "أظهر {numResponses} ردود أخرى"
+msgstr "تحميل الردود {numResponses} التالية"
 
 #: common/static/common/js/utils/edx.utils.validate.js
 msgid "The email address you've provided isn't formatted correctly."
@@ -2384,7 +2393,7 @@ msgstr "صيغة عنوان البريد الإلكتروني الذي ذكرت�
 
 #: common/static/common/js/utils/edx.utils.validate.js
 msgid "%(field)s must have at least %(count)d characters."
-msgstr "يجب أن تحوي الحقل %(field)s على %(count)d حرف على الأقل."
+msgstr "يجب على حقل %(field)s أن يحتوي على %(count)d حروف على الأقل."
 
 #: common/static/common/js/utils/edx.utils.validate.js
 msgid "%(field)s can only contain up to %(count)d characters."
@@ -2946,7 +2955,7 @@ msgstr "بحث الفريق"
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "Showing results for \"{searchString}\""
-msgstr "نتائج \"{searchString}\""
+msgstr "عرض نتائج \"{searchString}\""
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "Create a New Team"
@@ -3155,7 +3164,7 @@ msgid ""
 "must create and activate their accounts before they can be assigned a role."
 msgstr ""
 "خطأ: '<%- username %>' لم يفعل حسابه بعد. على المستخدمين إنشاء وتفعيل "
-"حساباتهم قبل أن يُعطَوا أيَّ دور في المساق."
+"حساباتهم قبل أن يُسند إليهم أي دور في الدورة التدريبية."
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Error: You cannot remove yourself from the Instructor group!"
@@ -3317,7 +3326,8 @@ msgid ""
 "There are invalid keywords in your email. Check the following keywords and "
 "try again."
 msgstr ""
-"توجد بعض الكلمات الخاطئة في بريدك. تحقق من الكلمات التالية وحاول مرة آخرى."
+"توجد بعض الكلمات المفتاحية الخاطئة في بريدك. تحقق من الكلمات التالية وحاول "
+"مرة آخرى."
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
 msgid "Yourself"
@@ -3325,11 +3335,11 @@ msgstr "نفسك"
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
 msgid "Everyone who has staff privileges in this course"
-msgstr "جميع طاقم المساق"
+msgstr "كل فرد لديه مزايا الموظفين في هذه الدورة التدريبية"
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
 msgid "All learners who are enrolled in this course"
-msgstr "كل المتعلمين المنضمين إلى هذا المساق."
+msgstr "كل المتعلمين المنضمين إلى هذه الدورة التدريبية ."
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
 msgid "All learners in the {cohort_name} cohort"
@@ -3341,18 +3351,19 @@ msgid ""
 "large number of learners, email messages to learners might take up to an "
 "hour to be sent."
 msgstr ""
-"تم جدولة إرسال رسالتك بنجاح. قد يستغرق إرسال الرسالة لجميع متعلمي المساق "
-"ساعة كاملة، ويعتمد ذلك على عدد المتعلمين في المساق."
+"تم جدولة إرسال رسالتك بنجاح. قد يستغرق إرسال الرسالة لجميع متعلمي الدورة "
+"التدريبية ساعة كاملة، ويعتمد ذلك على عدد المتعلمين في الدورة التدريبية."
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
 msgid ""
 "You are sending an email message with the subject {subject} to the following"
 " recipients."
-msgstr "أنت على وشك إرسال على هذه الرسالة وعنوانها \"{subject}\" إلى"
+msgstr ""
+"أنت على وشك إرسال هذه الرسالة وعنوانها \"{subject}\" إلى المستلمين التالين."
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
 msgid "Is this OK?"
-msgstr "هل توافق؟"
+msgstr "موافق؟"
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
 msgid "Error sending email."
@@ -4101,7 +4112,7 @@ msgstr "الملاحظات مخفية"
 
 #: lms/static/js/edxnotes/views/search_box.js
 msgid "Please enter a term in the {anchorStart} search field{anchorEnd}."
-msgstr "يرجى إدخال ما تبحث عنه في {anchorStart}صندوق البحث{anchorEnd}. "
+msgstr "يرجى إدخال مصطلح في {anchorStart}صندوق البحث{anchorEnd}. "
 
 #: lms/static/js/edxnotes/views/tab_item.js
 msgid "Current tab"
@@ -4285,10 +4296,10 @@ msgid ""
 "'{verifiedCohortName}'. To change the configuration for verified track "
 "cohorts, contact your edX partner manager."
 msgstr ""
-"هذا المساق يقوم باستخدام نظام تكوين شعب بشكل تلقائي للمتعلمين المثبتين في "
-"المسار. لا يمكنك تعطيل الشعب، ولا يمكنك تغيير اسم الشعبة اليدوية التي تسمى "
-"{verifiedCohortName}'. لتغيير إعدادات الشعب المثبتة في المسار، اتصل بمدير "
-"شركاء إدراك الذي تتعامل معه."
+"هذه الدورة التدريبية تستخدم نظام تكوين شعب بشكل تلقائي للمتعلمين المثبتين في"
+" المسار. لا يمكنك تعطيل الشعب ولا يمكنك تسمية الشعبة اليدوية باسم "
+"'{verifiedCohortName}'. لتغيير التكوين لشعب المسار المثبت، اتصل بمدير الشريك"
+" edX الخاص بك.   "
 
 #: lms/static/js/groups/views/verified_track_settings_notification.js
 msgid ""
@@ -4296,17 +4307,18 @@ msgid ""
 " the required cohort does not exist. You must create a manually-assigned "
 "cohort named '{verifiedCohortName}' for the feature to work."
 msgstr ""
-"تم في هذا المساق تمكين نظام تكوين الشعب التلقائي للمتعلمين المثبتين في "
-"المسار، ولكن الشعبة المطلوبة غير موجودة. يجب عليك إنشاء "
-"'{verifiedCohortName}' باسم مجموعة مخصص يدوياً حتى تعمل هذه الخاصية."
+"تم في هذه الدورة التدريبية تمكين نظام تكوين الشعب التلقائي للمتعلمين "
+"المثبتين في المسار، ولكن الشعبة المطلوبة غير موجودة. يجب عليك إنشاء شعبة "
+"معينة يدويًا باسم '{verifiedCohortName}' حتى تعمل هذه الخاصية."
 
 #: lms/static/js/groups/views/verified_track_settings_notification.js
 msgid ""
 "This course has automatic cohorting enabled for verified track learners, but"
 " cohorts are disabled. You must enable cohorts for the feature to work."
 msgstr ""
-"تم  في هذا المساق تمكين نظام تكوين الشعب التلقائي للمتعلمين المثبتين في "
-"المسار، ولكن تم تعطيل الشعب. يجب عليك تفعيل الشعب حتى تعمل هذه الخاصية."
+"تم  في هذه الدورة التدريبية تمكين نظام تكوين الشعب التلقائي للمتعلمين "
+"المثبتين في المسار، ولكن تم تعطيل الشعب. يجب عليك تفعيل الشعب حتى تعمل هذه "
+"الخاصية."
 
 #: lms/static/js/instructor_dashboard/certificates.js
 msgid "Allow students to generate certificates for this course?"
@@ -4446,6 +4458,9 @@ msgid ""
 "address you provided.  If you do not receive this message, "
 "{anchorStart}contact technical support{anchorEnd}."
 msgstr ""
+"لقد قمنا بإرسال رسالة بريد إلكتروني مع إرشادات إعادة تعيين كلمة المرور إلى "
+"عنوان البريد الإلكتروني الذي قدمته. إذا لم تتلق هذه الرسالة، "
+"{anchorStart}اتصل بالدعم التقني{anchorEnd}."
 
 #: lms/static/js/student_account/views/LoginView.js
 msgid ""
@@ -4508,7 +4523,7 @@ msgstr "كلمة المرور"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "Reset Your Password"
-msgstr "غير كلمة سر حسابك"
+msgstr "غيّر كلمة مرور حسابك"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid ""
@@ -4517,8 +4532,8 @@ msgid ""
 "reset your password."
 msgstr ""
 "عند اختيارك \"إعادة ضبط كلمة المرور\"، ستصل رسالة لبريدك الإلكتروني المسجّل "
-"لدى {platform_name}. لتغيير كلمة المرور، افتح الرسالة من بريدك وانقر على "
-"الرابط الموجود فيها."
+"لدى حساب {platform_name}. لتغيير كلمة المرور، افتح الرسالة من بريدك وانقر "
+"على الرابط الموجود فيها."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid ""
@@ -4539,7 +4554,12 @@ msgstr "المنطقة الزمنية"
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid ""
 "Select the time zone for displaying course dates. If you do not specify a "
-msgstr "اختر المنطقة الزمنية التي ستُعرض فيها تواريخ المساق. إن لم تحدد "
+msgstr ""
+"اختر المنطقة الزمنية التي ستُعرض حسبها تواريخ الدورة الدراسية. إن لم تحدد "
+
+#: lms/static/js/student_account/views/account_settings_factory.js
+msgid "All Time Zones"
+msgstr "جميع المناطق الزمنية"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "Additional Information"
@@ -4565,7 +4585,7 @@ msgstr "اللغة المفضّلة"
 #: lms/static/js/student_account/views/account_settings_factory.js
 #: lms/static/js/student_account/views/account_settings_view.js
 msgid "Linked Accounts"
-msgstr "الحسابات المربوطة"
+msgstr "الحسابات المرتبطة"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid ""
@@ -4577,11 +4597,11 @@ msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "ORDER NAME"
-msgstr "الطلب"
+msgstr "اسم الطلب"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "ORDER PLACED"
-msgstr "وضع الطلب"
+msgstr "تم وضع الطلب"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "TOTAL"
@@ -4600,7 +4620,8 @@ msgid ""
 "This page contains information about orders that you have placed with "
 "{platform_name}."
 msgstr ""
-"في هذه الصفحة معلومات عن طلبات الشراء التي قمت بها في {platform_name}."
+"تحتوي هذه الصفحة على معلومات عن طلبات الشراء التي قمت بها في "
+"{platform_name}."
 
 #: lms/static/js/student_account/views/account_settings_fields.js
 msgid ""
@@ -4655,7 +4676,7 @@ msgid ""
 "Link your {accountName} account to your {platformName} account and use "
 "{accountName} to sign in to {platformName}."
 msgstr ""
-"اربط حسابك على {accountName} مع حسابك على {platformName}. وبهذا تستطع أن "
+"اربط حسابك على {accountName} مع حسابك على {platformName}. وبهذا تستطيع أن "
 "تسجل دخولك في {platformName} باستخدام حسابك في {accountName}."
 
 #: lms/static/js/student_account/views/account_settings_fields.js
@@ -5256,6 +5277,10 @@ msgstr "إظهار الإعدادات المهملة"
 msgid "You have unsaved changes. Do you really want to leave this page?"
 msgstr "لديك تغييرات غير محفّظة. هل تريد حقًّا أن تغادر الصفحة؟"
 
+#: cms/static/js/maintenance/force_publish_course.js
+msgid "Internal Server Error."
+msgstr "خطأ في خادم الإنترنت."
+
 #. Translators: This is the status of a video upload that is queued
 #. waiting for other uploads to complete
 #: cms/static/js/models/active_video_upload.js
@@ -5413,7 +5438,7 @@ msgstr "هناك إشكالات في المصادقة على هذا المكوّ
 #: cms/static/js/programs/models/course_model.js
 #: cms/templates/js/programs/course_details.underscore
 msgid "Course Code"
-msgstr ""
+msgstr "رمز الدورة التدريبية"
 
 #: cms/templates/js/certificate-details.underscore
 #: cms/templates/js/certificate-editor.underscore
@@ -5423,71 +5448,71 @@ msgstr "عنوان المساق"
 
 #: cms/static/js/programs/models/program_model.js
 msgid "Please select a valid organization."
-msgstr ""
+msgstr "يرجى اختيار منظمة صالحة."
 
 #: cms/static/js/programs/utils/validation_config.js
 msgid "{0} is required"
-msgstr ""
+msgstr "{0} مطلوب"
 
 #: cms/static/js/programs/utils/validation_config.js
 msgid "{0} must be accepted"
-msgstr ""
+msgstr "{0} يجب قبوله"
 
 #: cms/static/js/programs/utils/validation_config.js
 msgid "{0} must be greater than or equal to {1}"
-msgstr ""
+msgstr "{0} يجب أن يكون أكبر من أو يساوي {1}"
 
 #: cms/static/js/programs/utils/validation_config.js
 msgid "{0} must be less than or equal to {1}"
-msgstr ""
+msgstr "{0} يجب أن يكون أصغر من أو يساوي {1}"
 
 #: cms/static/js/programs/utils/validation_config.js
 msgid "{0} must be between {1} and {2}"
-msgstr ""
+msgstr "{0} يجب أن يكون بين {1} و {2} "
 
 #: cms/static/js/programs/utils/validation_config.js
 msgid "{0} must be {1} characters"
-msgstr ""
+msgstr "{0} يجب أن يكون {1} رموز"
 
 #: cms/static/js/programs/utils/validation_config.js
 msgid "{0} must be at least {1} characters"
-msgstr ""
+msgstr "{0} يجب أن يكون على الأقل {1} رموز"
 
 #: cms/static/js/programs/utils/validation_config.js
 msgid "{0} must be at most {1} characters"
-msgstr ""
+msgstr "{0} يجب أن يكون على الأكثر {1} رموز"
 
 #: cms/static/js/programs/utils/validation_config.js
 msgid "{0} must be between {1} and {2} characters"
-msgstr ""
+msgstr "{0} يجب أن يكون بين {1} و {2} رموز"
 
 #: cms/static/js/programs/utils/validation_config.js
 msgid "{0} must be one of: {1}"
-msgstr ""
+msgstr "{0} يجب أن يكون واحدًا من: {1}"
 
 #: cms/static/js/programs/utils/validation_config.js
 msgid "{0} must be the same as {1}"
-msgstr ""
+msgstr "{0} يجب أن يكون نفس {1} "
 
 #: cms/static/js/programs/utils/validation_config.js
 msgid "{0} must only contain digits"
-msgstr ""
+msgstr "{0} يجب أن يحتوى على أرقام فقط"
 
 #: cms/static/js/programs/utils/validation_config.js
 msgid "{0} must be a number"
-msgstr ""
+msgstr "{0} يجب أن يكون رقمًا"
 
 #: cms/static/js/programs/utils/validation_config.js
 msgid "{0} must be a valid email"
-msgstr ""
+msgstr "{0} يجب أن يكون بريدًا إلكترونيًا صالحًا"
 
 #: cms/static/js/programs/utils/validation_config.js
 msgid "{0} must be a valid url"
-msgstr ""
+msgstr "{0} يجب أن يكون عنوان url صالحًا  "
 
 #: cms/static/js/programs/utils/validation_config.js
 msgid "{0} is invalid"
-msgstr ""
+msgstr "{0} غير صالح"
 
 #: cms/static/js/programs/views/program_details_view.js
 msgid "confirm"
@@ -5495,13 +5520,15 @@ msgstr ""
 
 #: cms/static/js/programs/views/program_details_view.js
 msgid "Publish this program?"
-msgstr ""
+msgstr "نشر هذا البرنامج؟"
 
 #: cms/static/js/programs/views/program_details_view.js
 msgid ""
 "After you publish this program, you cannot add or remove course codes or "
 "remove course runs."
 msgstr ""
+"بعد نشر هذا البرنامج، لا يمكنك إضافة أو إزالة رموز الدورة الدراسية أو إزالة "
+"مسارات الدورة التدريبية."
 
 #: cms/static/js/programs/views/program_details_view.js
 #: cms/static/js/views/modals/course_outline_modals.js
@@ -5513,7 +5540,7 @@ msgstr "نشر"
 
 #: cms/static/js/programs/views/program_details_view.js
 msgid "Marketing Slug is required."
-msgstr ""
+msgstr "الشارة التسويقية مطلوبة."
 
 #: cms/static/js/views/active_video_upload_list.js
 msgid "Your video uploads are not complete."
@@ -5819,19 +5846,19 @@ msgstr "هل أنت متأكد من رغبتك في تقييد وصول {email} 
 
 #: cms/static/js/views/modals/course_outline_modals.js
 msgid "{display_name} Settings"
-msgstr ""
+msgstr "إعدادات {display_name}"
 
 #: cms/static/js/views/modals/course_outline_modals.js
 msgid "Change the settings for {display_name}"
-msgstr ""
+msgstr "تغيير الإعدادات لـ  {display_name}"
 
 #: cms/static/js/views/modals/course_outline_modals.js
 msgid "Publish {display_name}"
-msgstr ""
+msgstr "نشر {display_name}"
 
 #: cms/static/js/views/modals/course_outline_modals.js
 msgid "Publish all unpublished changes for this {item}?"
-msgstr ""
+msgstr "نشر جميع التغييرات غير المنشورة لهذا {item}؟ "
 
 #: cms/static/js/views/modals/course_outline_modals.js
 msgid "Basic"
@@ -5945,6 +5972,8 @@ msgid ""
 "Showing {currentItemRange} out of {totalItemsCount}, filtered by "
 "{assetType}, sorted by {sortName} ascending"
 msgstr ""
+"عرض {currentItemRange} من أصل {totalItemsCount} المفلتر حسب {assetType}، "
+"المصنف حسب {sortName} تصاعديًا   "
 
 #. Translators: sample result:
 #. "Showing 0-9 out of 25 total, filtered by Images, sorted by Date Added
@@ -5954,6 +5983,8 @@ msgid ""
 "Showing {currentItemRange} out of {totalItemsCount}, filtered by "
 "{assetType}, sorted by {sortName} descending"
 msgstr ""
+"عرض {currentItemRange} من أصل {totalItemsCount} المفلتر حسب {assetType}، "
+"المصنف حسب {sortName} تنازليًا  "
 
 #. Translators: sample result:
 #. "Showing 0-9 out of 25 total, sorted by Date Added ascending"
@@ -5962,6 +5993,8 @@ msgid ""
 "Showing {currentItemRange} out of {totalItemsCount}, sorted by {sortName} "
 "ascending"
 msgstr ""
+"عرض {currentItemRange} من أصل {totalItemsCount} المصنف حسب {sortName} "
+"تصاعديًا  "
 
 #. Translators: sample result:
 #. "Showing 0-9 out of 25 total, sorted by Date Added descending"
@@ -5970,12 +6003,14 @@ msgid ""
 "Showing {currentItemRange} out of {totalItemsCount}, sorted by {sortName} "
 "descending"
 msgstr ""
+"عرض {currentItemRange} من أصل {totalItemsCount} المصنف حسب {sortName} "
+"تنازليًا     "
 
 #. Translators: turns into "25 total" to be used in other sentences, e.g.
 #. "Showing 0-9 out of 25 total".
 #: cms/static/js/views/paging_header.js
 msgid "{totalItems} total"
-msgstr ""
+msgstr "الإجمالي {totalItems}"
 
 #. Translators: This is listed as the duration for a video
 #. that has not yet reached the point in its processing by
@@ -6902,7 +6937,7 @@ msgstr ""
 
 #: lms/templates/api_admin/catalog-results.underscore
 msgid "This catalog's courses:"
-msgstr "مساقات هذا الكتالوج:"
+msgstr "الدورات التدريبية الخاصة بهذا الكتالوج:"
 
 #: lms/templates/bookmarks/bookmarks-list.underscore
 msgid "My Bookmarks"
@@ -7223,7 +7258,7 @@ msgid ""
 "include an optional note describing the reason for the exception in the "
 "second comma separated field."
 msgstr ""
-"يُرجى تحميل ملف بصيغة (.csv) ذا قيم مفصولة برمز الفاصلة، يحوي اسماء وعناوين "
+"يُرجى تحميل ملف بصيغة (.csv) ذا قيم مفصولة برمز الفاصلة، يحوي أسماء وعناوين "
 "البريد الإلكتروني الخاصة بالمتعلّمين الحاصلين على استثناءات. ضمّن اسم "
 "المستخدم وعنوان البريد الإلكتروني في الحقل الأول المفصول بفاصلة. يمكنك تضمين"
 " ملاحظة اختيارية تصف سبب منح الاستثناء في الحقل الثاني المفصول بفاصلة. "
@@ -7297,7 +7332,7 @@ msgstr "اسم أو عنوان الطالب البريدي"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list-editor.underscore
 msgid "Free text notes"
-msgstr "ملاحظات مكتوبة"
+msgstr "ملاحظات مكتوبة حرة"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
 msgid "Generate Exception Certificates"
@@ -7305,11 +7340,11 @@ msgstr "إنشاء شهادات استثنائية"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
 msgid "All users on the Exception list who do not yet have a certificate"
-msgstr ""
+msgstr "كافة المستخدمين على قائمة الاستثناء ليس لديهم شهادة بعد "
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
 msgid "All users on the Exception list"
-msgstr ""
+msgstr "كافة المستخدمين في قائمة الاستثناء"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
 msgid "User Email"
@@ -7556,7 +7591,7 @@ msgstr "صالح"
 
 #: lms/templates/learner_dashboard/certificate.underscore
 msgid "Program Certificates"
-msgstr ""
+msgstr "شهادات برنامج "
 
 #: lms/templates/learner_dashboard/certificate.underscore
 msgid "certificate.credential_url"
@@ -7568,7 +7603,7 @@ msgstr "certificate.display_name"
 
 #: lms/templates/learner_dashboard/certificate_status.underscore
 msgid "Congratulations! You have earned a certificate for this course."
-msgstr "تهانينا، لقد حصلت على على شهادة إتمام هذا المساق!"
+msgstr "تهانينا، لقد حصلت على شهادة إتمام هذه الدورة التدريبية!"
 
 #: lms/templates/learner_dashboard/certificate_status.underscore
 msgid "View Certificate"
@@ -7592,15 +7627,15 @@ msgstr "غير مسجل"
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
 msgid "Please select a course date"
-msgstr "اختر تاريخ المساق"
+msgstr "اختر تاريخ للدورة التدريبية"
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
 msgid "Select Course Run"
-msgstr "اختر تشغيل المساق"
+msgstr "اختر تشغيل للدورة التدريبية"
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
 msgid "Choose Course Date"
-msgstr "اختر تاريخ المساق"
+msgstr "اختر تاريخ للدورة التدريبية"
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
 #, python-format
@@ -7625,11 +7660,11 @@ msgstr "غير متاحٍ الآن"
 
 #: lms/templates/learner_dashboard/empty_programs_list.underscore
 msgid "You are not enrolled in any programs yet."
-msgstr ""
+msgstr "أنت لست منضماً لأي برامج بعد."
 
 #: lms/templates/learner_dashboard/empty_programs_list.underscore
 msgid "Explore Programs"
-msgstr ""
+msgstr "استكشاف برامج"
 
 #: lms/templates/learner_dashboard/explore_new_programs.underscore
 msgid ""
@@ -7639,11 +7674,11 @@ msgstr "تصفح الفصول حديثة الإنشاء وشاهد الجديد 
 
 #: lms/templates/learner_dashboard/explore_new_programs.underscore
 msgid "Explore New Programs"
-msgstr ""
+msgstr "استكشاف برامج جديدة"
 
 #: lms/templates/learner_dashboard/program_card.underscore
 msgid "category"
-msgstr ""
+msgstr "فئة"
 
 #: lms/templates/learner_dashboard/program_card.underscore
 #, python-format
@@ -7674,7 +7709,8 @@ msgstr "البرامج"
 msgid ""
 "You need a certificate in this course to be eligible for a program "
 "certificate."
-msgstr "تحتاج لشهادة إتمام في هذا المساق حتى تكون مؤهلاً لشهادة البرنامج."
+msgstr ""
+"تحتاج لشهادة إتمام في هذه الدورة التدريبية حتى تكون مؤهلاً لشهادة البرنامج."
 
 #: lms/templates/learner_dashboard/upgrade_message.underscore
 msgid "Upgrade Now"
@@ -7777,9 +7813,10 @@ msgid ""
 "%(currentProvider)s account does not have a linked %(platformName)s account."
 " To link your accounts, sign in now using your %(platformName)s password."
 msgstr ""
-"نجح تسجيل دخولك إلى %(currentProvider)s، لكنّ حسابك لدى %(currentProvider)s "
-"لا يملك حسابًا مرتبطًا بمنصّة %(platformName)s. ولربط حسابك، يُرجى إكمال "
-"البيانات المطلوبة في صفحة التسجيل على %(platformName)s."
+"تم الحصول على معلوماتك من %(currentProvider)s، لكنّ حسابك على "
+"%(currentProvider)s غير مرتبط بأي حساب على %(platformName)s. لربط حساباتك؛ "
+"يُرجى تعبئة البيانات المطلوبة والمتبقية في صفحة التسجيل على "
+"%(platformName)s."
 
 #: lms/templates/student_account/login.underscore
 msgid "Password Reset Email Sent"
@@ -7847,8 +7884,8 @@ msgid ""
 "Please enter your email address below and we will send you instructions for "
 "setting a new password."
 msgstr ""
-"يُرجى إدخال عنوان بريدك الإلكتروني أدناه، وسنرسل لك تعليمات ضبط كلمة سر "
-"جديدة."
+"يُرجى إدخال عنوان بريدك الإلكتروني أدناه، وسنرسل لك تعليمات إعادة ضبط كلمة "
+"مرور جديدة."
 
 #: lms/templates/student_account/password_reset.underscore
 msgid "Reset my password"
@@ -7861,7 +7898,7 @@ msgstr "عذرًا، لم نتمكّن من إنشاء حسابك. "
 #: lms/templates/student_account/register.underscore
 #, python-format
 msgid "You've successfully signed into %(currentProvider)s."
-msgstr "نجح تسجيل دخولك في %(currentProvider)s. "
+msgstr "تم الحصول على معلوماتك من %(currentProvider)s. "
 
 #: lms/templates/student_account/register.underscore
 #, python-format
@@ -7869,7 +7906,7 @@ msgid ""
 "We just need a little more information before you start learning with "
 "%(platformName)s."
 msgstr ""
-"نحتاج فقط إلى قليل من المعلومات الإضافية قبل أن تبدأ بالتعلّم مع "
+"نحتاج فقط إلى قليل من المعلومات الإضافية قبل أن تبدأ التعلّم مع "
 "%(platformName)s. "
 
 #: lms/templates/student_account/register.underscore
@@ -8601,24 +8638,24 @@ msgstr "أنواع المسائل الشائعة"
 
 #: cms/templates/js/add-xblock-component-support-legend.underscore
 msgid "Supported"
-msgstr ""
+msgstr "مدعم"
 
 #: cms/templates/js/add-xblock-component-support-legend.underscore
 msgid "Provisional"
-msgstr ""
+msgstr "مؤقت"
 
 #: cms/templates/js/add-xblock-component-support-legend.underscore
 #: cms/templates/js/add-xblock-component-support-level.underscore
 msgid "Not Supported"
-msgstr ""
+msgstr "غير مدعوم"
 
 #: cms/templates/js/add-xblock-component-support-level.underscore
 msgid "Fully Supported"
-msgstr ""
+msgstr "مدعوم تماماً"
 
 #: cms/templates/js/add-xblock-component-support-level.underscore
 msgid "Provisionally Supported"
-msgstr ""
+msgstr "مدعوم مؤقتاً"
 
 #: cms/templates/js/add-xblock-component.underscore
 msgid "Add New Component"
@@ -8831,43 +8868,48 @@ msgstr "مجموعة المحتوى هذه مستخدمة في وحدة واحد
 
 #: cms/templates/js/content-visibility-editor.underscore
 msgid "Subsection Visibility"
-msgstr ""
+msgstr "رؤية القسم الفرعي"
 
 #: cms/templates/js/content-visibility-editor.underscore
 msgid "Show entire subsection"
-msgstr ""
+msgstr "عرض القسم الفرعي بالكامل"
 
 #: cms/templates/js/content-visibility-editor.underscore
 msgid "Learners see the published subsection and can access its content."
-msgstr ""
+msgstr "المتعلمون يرون القسم الفرعي المنشور ويمكنهم الوصول إلى محتواه."
 
 #: cms/templates/js/content-visibility-editor.underscore
 msgid "Hide content after due date"
 msgstr ""
+"إخفاء المحتوى بعد التاريخ المحدد\n"
+" "
 
 #: cms/templates/js/content-visibility-editor.underscore
 msgid ""
 "After the subsection\\'s due date has passed, learners can no longer access "
 "its content. The subsection remains included in grade calculations."
 msgstr ""
+"بعد مرور التاريخ المحدد للقسم الفرعي، لم يعد المتعلمون قادرين بعد على الوصول"
+" إلى محتواه. يظل القسم الفرعي مدرجًا في حسابات المستوى."
 
 #: cms/templates/js/content-visibility-editor.underscore
 msgid "Hide entire subsection"
-msgstr ""
+msgstr "إخفاء القسم الفرعي بالكامل"
 
 #: cms/templates/js/content-visibility-editor.underscore
 msgid ""
 "Learners do not see the subsection in the course outline. The subsection is "
 "not included in grade calculations."
 msgstr ""
+"لا يرى المتعلمون القسم الفرعي في مخطط الدورة التدريبية. لم يتم تضمين القسم "
+"الفرعي في حسابات المستوى."
 
 #: cms/templates/js/content-visibility-editor.underscore
+#, python-format
 msgid ""
-"Units inherit the visibility setting of the subsection they are in. If you "
-"make this subsection visible to learners, published units that were "
-"previously hidden also become visible. Only units that were explicitly "
-"hidden remain hidden regardless of the option you select for this "
-"subsection."
+"If you select an option other than \"%(hide_label)s\", after the subsection "
+"release date has passed, published units in this subsection will become "
+"available to learners unless units are explicitly hidden."
 msgstr ""
 
 #: cms/templates/js/course-instructor-details.underscore
@@ -9015,7 +9057,7 @@ msgstr "يُستَحقّ في:"
 
 #: cms/templates/js/course-outline.underscore
 msgid "Subsection is hidden after due date"
-msgstr ""
+msgstr "القسم الفرعي مخفي بعد التاريخ المحدد"
 
 #: cms/templates/js/course-outline.underscore
 #: cms/templates/js/xblock-outline.underscore
@@ -9034,7 +9076,7 @@ msgstr "نتيجة  التعلم"
 
 #: cms/templates/js/course-settings-learning-fields.underscore
 msgid "Add a learning outcome here"
-msgstr "أضف نتيجة تعلم هنا"
+msgstr "إضافة نتيجة تعليمية هنا"
 
 #: cms/templates/js/course_grade_policy.underscore
 msgid "Assignment Type Name"
@@ -9442,7 +9484,7 @@ msgstr "مع %(section_or_subsection)s"
 
 #: cms/templates/js/publish-xblock.underscore
 msgid "Staff and Learners"
-msgstr ""
+msgstr "الموظفون والمتعلمون"
 
 #: cms/templates/js/publish-xblock.underscore
 msgid "Some content in this unit is visible only to particular content groups"
@@ -9451,11 +9493,11 @@ msgstr "إنّ جزء من محتوى هذه الوحدة مرئي فقط من �
 #: cms/templates/js/publish-xblock.underscore
 #: cms/templates/js/staff-lock-editor.underscore
 msgid "Hide from learners"
-msgstr ""
+msgstr "إخفاء من المتعلمين"
 
 #: cms/templates/js/publish-xblock.underscore
 msgid "Note: Do not hide graded assignments after they have been released."
-msgstr ""
+msgstr "ملاحظة: لا تقم بإخفاء المهام المتدرجة بعد إطلاقها. "
 
 #: cms/templates/js/release-date-editor.underscore
 msgid "Release Date and Time"
@@ -9547,17 +9589,19 @@ msgstr "تحميل صورة التوقيع"
 
 #: cms/templates/js/staff-lock-editor.underscore
 msgid "Unit Visibility"
-msgstr ""
+msgstr "رؤية الوحدة"
 
 #: cms/templates/js/staff-lock-editor.underscore
 msgid "Section Visibility"
-msgstr ""
+msgstr "رؤية القسم"
 
 #: cms/templates/js/staff-lock-editor.underscore
 msgid ""
 "If the unit was previously published and released to learners, any changes "
 "you made to the unit when it was hidden will now be visible to learners."
 msgstr ""
+"إذا كانت الوحدة منشورة في السابق وتم إطلاقها إلى المتعلمين، فإن أي تغييرات "
+"تقوم بإجرائها على الوحدة عندما كانت مخبأة ستكون مرئية للمتعلمين."
 
 #: cms/templates/js/staff-lock-editor.underscore
 #, python-format
@@ -9567,6 +9611,9 @@ msgid ""
 "the unit. Only units that are explicitly hidden from learners will remain "
 "hidden after you clear this option for the %(xblockType)s."
 msgstr ""
+"إذا قمت بجعل %(xblockType)s مرئيًا للمتعلمين، سوف يكون المتعلمون قادرين على "
+"رؤية محتواه بعد مرور تاريخ الإطلاق ونشر الوحدة. فقط ستبقى الوحدات التي كانت "
+"مخبأة بشكل واضح من المتعلمين مخفية بعد حذف الخيار الخاص  بـ %(xblockType)s."
 
 #: cms/templates/js/team-member.underscore
 msgid "Current Role:"
@@ -9720,24 +9767,39 @@ msgstr "تعديل %(display_name)s (مطلوب)"
 msgid "formLabel"
 msgstr "عنوان النموذج formLabel"
 
+#: cms/templates/js/maintenance/force-published-course-response.underscore
+msgid ""
+"You have done a dry run of force publishing the course. Nothing has changed."
+" Had you run it, the following course versions would have been change."
+msgstr ""
+"لقد قمت بإجراء تنفيذ لنشر الدورة التدريبية. فلم يتغير شيء، عند التشغيل، "
+"إصدارات الدورة التالية قد يتم تغييرها."
+
+#: cms/templates/js/maintenance/force-published-course-response.underscore
+msgid ""
+"The published branch version, {published}, was reset to the draft branch "
+"version, {draft}."
+msgstr ""
+
 #: cms/templates/js/programs/course_details.underscore
 msgid "Delete course"
-msgstr ""
+msgstr "حذف الدورة التدريبية"
 
 #: cms/templates/js/programs/course_details.underscore
 #, python-format
 msgid "Remove %(name)s from the program"
-msgstr ""
+msgstr "أزل %(name)s من البرنامج"
 
 #: cms/templates/js/programs/course_details.underscore
 msgid "Add another run"
-msgstr ""
+msgstr "إضافة مسار آخر"
 
 #: cms/templates/js/programs/course_details.underscore
 msgid ""
 "The unique number that identifies your course within your organization, e.g."
 " CS101."
 msgstr ""
+"الرقم الفريد الذي يحدد دورتك التدريبية داخل منظمتك، على سبيل المثال CS101."
 
 #: cms/templates/js/programs/course_details.underscore
 msgid ""
@@ -9745,114 +9807,118 @@ msgid ""
 " the course. It will be displayed on the XSeries progress page and in "
 "marketing presentations."
 msgstr ""
+"العنوان المسجل هنا سوف يتجاوز العنوان المضبوط للمسار الفردي للدورة "
+"التدريبية. سيتم عرضه على صفحة تقدم XSeries في العروض التسويقية."
 
 #: cms/templates/js/programs/course_details.underscore
 msgid "Save Course"
-msgstr ""
+msgstr "حفظ الدورة التدريبية"
 
 #: cms/templates/js/programs/course_run.underscore
 #, python-format
 msgid "Run %(key)s"
-msgstr ""
+msgstr " %(key)s المسار"
 
 #: cms/templates/js/programs/course_run.underscore
 msgid "Delete course run"
-msgstr ""
+msgstr "حذف مسار الدورة التدريبية"
 
 #: cms/templates/js/programs/course_run.underscore
 #, python-format
 msgid "Remove run %(key)s from the program"
-msgstr ""
+msgstr "إزالة %(key)s المسار من البرنامج "
 
 #: cms/templates/js/programs/course_run.underscore
 #, python-format
 msgid "Start Date: %(date)s"
-msgstr ""
+msgstr "تاريخ البدء: %(date)s"
 
 #: cms/templates/js/programs/course_run.underscore
 #, python-format
 msgid "Mode: %(mode)s"
-msgstr ""
+msgstr "الوضع: %(mode)s"
 
 #: cms/templates/js/programs/course_run.underscore
 msgid "Please select a Course Run"
-msgstr ""
+msgstr "يرجى تحديد مسار للدورة التدريبية"
 
 #: cms/templates/js/programs/program_creator_form.underscore
 msgid "Create a New Program"
-msgstr ""
+msgstr "إنشاء برنامج جديد"
 
 #: cms/templates/js/programs/program_creator_form.underscore
 msgid "Program type"
-msgstr ""
+msgstr "نوع البرنامج"
 
 #: cms/templates/js/programs/program_creator_form.underscore
 msgid "Select a type"
-msgstr ""
+msgstr "حدد نوعًا"
 
 #: cms/templates/js/programs/program_creator_form.underscore
 msgid "XSeries"
-msgstr ""
+msgstr "XSeries"
 
 #: cms/templates/js/programs/program_creator_form.underscore
 msgid "MicroMasters"
-msgstr ""
+msgstr "MicroMasters"
 
 #: cms/templates/js/programs/program_creator_form.underscore
 msgid "Select an organization"
-msgstr ""
+msgstr "حدد منظمة"
 
 #: cms/templates/js/programs/program_creator_form.underscore
 msgid "The public display name of the program."
-msgstr ""
+msgstr "اسم العرض العام للبرنامج."
 
 #: cms/templates/js/programs/program_creator_form.underscore
 #: cms/templates/js/programs/program_details.underscore
 msgid "Subtitle"
-msgstr ""
+msgstr "عنوان فرعي"
 
 #: cms/templates/js/programs/program_creator_form.underscore
 msgid ""
 "A short description of the program, including concepts covered and expected "
 "outcomes (255 character limit)."
 msgstr ""
+"وصف موجز للبرنامج، بما في ذلك المفاهيم المشمولة والنتائج المتوقعة (255 عدد "
+"الأحرف المسموح بها)."
 
 #: cms/templates/js/programs/program_creator_form.underscore
 #: cms/templates/js/programs/program_details.underscore
 msgid "Marketing Slug"
-msgstr ""
+msgstr "الشارة التسويقية"
 
 #: cms/templates/js/programs/program_creator_form.underscore
 msgid "Slug used to generate links to the marketing site."
-msgstr ""
+msgstr "الشارة تستخدم لإنشاء روابط إلى الموقع التسويقي."
 
 #: cms/templates/js/programs/program_details.underscore
 msgid "Edit the program title"
-msgstr ""
+msgstr "تحرير عنوان البرنامج"
 
 #: cms/templates/js/programs/program_details.underscore
 msgid "Edit the program\\'s name."
-msgstr ""
+msgstr "تحرر اسم البرنامج."
 
 #: cms/templates/js/programs/program_details.underscore
 msgid "Edit the program subtitle"
-msgstr ""
+msgstr "تحرير العنوان الفرعي للبرنامج."
 
 #: cms/templates/js/programs/program_details.underscore
 msgid "Edit the program\\'s subtitle."
-msgstr ""
+msgstr "تحرير العنوان الفرعي للبرنامج."
 
 #: cms/templates/js/programs/program_details.underscore
 msgid "Edit the program marketing slug"
-msgstr ""
+msgstr "تحرير الشارة التسويقية للبرنامج"
 
 #: cms/templates/js/programs/program_details.underscore
 msgid "Edit the program\\'s marketing slug."
-msgstr ""
+msgstr "تحرير الشارة التسويقية للبرنامج."
 
 #: cms/templates/js/programs/program_details.underscore
 msgid "Add a course"
-msgstr ""
+msgstr "إضافة دورة تدريبية"
 
 #: cms/templates/js/video/transcripts/metadata-videolist-entry.underscore
 msgid "Add URLs for additional versions"
