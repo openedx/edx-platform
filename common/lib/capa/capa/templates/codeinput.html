@@ -1,5 +1,6 @@
 <%! from django.utils.translation import ugettext as _ %>
 <section id="textbox_${id}" class="capa_inputtype textbox cminput">
+    <p class="helper-text" id="code-editor-help-text">${_('Enter code in the editor below. When you are finished, press ESC to move focus out of the editor.')}</p>
   <textarea rows="${rows}" cols="${cols}" name="input_${id}" 
             aria-label="${_("{programming_language} editor").format(programming_language=mode)}" 
             aria-describedby="answer_${id}" 
