@@ -115,12 +115,11 @@ class AccountCreationForm(forms.Form):
     validation, not rendering.
     """
     # TODO: Resolve repetition
-    username = forms.SlugField(
+    username = forms.CharField(
         min_length=2,
         max_length=30,
         error_messages={
             "required": _USERNAME_TOO_SHORT_MSG,
-            "invalid": _("Usernames must contain only letters, numbers, underscores (_), and hyphens (-)."),
             "min_length": _USERNAME_TOO_SHORT_MSG,
             "max_length": _("Username cannot be more than %(limit_value)s characters long"),
         }
@@ -222,6 +221,12 @@ class AccountCreationForm(forms.Form):
             except ValidationError, err:
                 raise ValidationError(_("Password: ") + "; ".join(err.messages))
         return password
+
+    def clean_username(self):
+        username = self.cleaned_data["username"]
+        if not re.match("^[\W\d_-]*$", username):
+            raise ValidationError(_("Usernames must contain only letters, numbers, underscores (_), and hyphens (-)."))
+        return username
 
     def clean_email(self):
         """ Enforce email restrictions (if applicable) """
