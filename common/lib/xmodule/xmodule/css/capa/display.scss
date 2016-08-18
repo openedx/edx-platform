@@ -163,6 +163,10 @@ div.problem {
     font: inherit;
     color: inherit;
   }
+
+  .wrapper-problem-response:not(:last-child) {
+    margin-bottom: $baseline;
+  }
 }
 
 // +Problem - Choice Group
