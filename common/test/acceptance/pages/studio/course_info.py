@@ -38,6 +38,7 @@ class CourseUpdatesPage(CoursePage):
         Clicks the new-update button.
         """
         click_css(self, '.new-update-button', require_notification=False)
+        self.wait_for_element_visibility('.CodeMirror', 'Waiting for .CodeMirror')
 
     def submit_update(self, message):
         """
