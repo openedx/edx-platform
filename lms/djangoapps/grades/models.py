@@ -128,6 +128,9 @@ class VisibleBlocks(models.Model):
 
     objects = VisibleBlocksQuerySet.as_manager()
 
+    class Meta(object):
+        app_label = "grades"
+
     def __unicode__(self):
         """
         String representation of this model.
@@ -182,6 +185,7 @@ class PersistentSubsectionGrade(TimeStampedModel):
     """
 
     class Meta(object):
+        app_label = "grades"
         unique_together = [
             # * Specific grades can be pulled using all three columns,
             # * Progress page can pull all grades for a given (course_id, user_id)
