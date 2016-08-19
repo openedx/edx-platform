@@ -98,7 +98,8 @@ class SysadminDashboardView(TemplateView):
         def csv_data():
             """Generator for handling potentially large CSVs"""
             for row in data:
-                writer.writerow(row)
+                encoded_row = [unicode(s).encode('utf-8') for s in row]
+                writer.writerow(encoded_row)
             csv_data = read_and_flush()
             yield csv_data
         response = HttpResponse(csv_data(), content_type='text/csv')
