@@ -141,6 +141,7 @@
 
   // Rules for bookmark button's different styles
   .bookmark-button-wrapper {
+    @extend %ui-print-excluded;
     text-align: right;
     margin-bottom: 10px;
   }
