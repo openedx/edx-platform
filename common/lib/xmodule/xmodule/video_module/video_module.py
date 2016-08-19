@@ -460,7 +460,7 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
         else:
             editable_fields.pop('source')
 
-        languages = [{'label': label, 'code': lang} for lang, label in settings.ALL_LANGUAGES if lang != u'en']
+        languages = [{'label': label, 'code': lang} for lang, label in settings.ALL_LANGUAGES]
         languages.sort(key=lambda l: l['label'])
         editable_fields['transcripts']['languages'] = languages
         editable_fields['transcripts']['type'] = 'VideoTranslations'
