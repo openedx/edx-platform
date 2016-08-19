@@ -21,7 +21,6 @@ from webob.multidict import MultiDict
 import xmodule
 from xmodule.tests import DATA_DIR
 from capa import responsetypes
-from capa.capa_problem import DEFAULT_QUESTION_TEXT
 from capa.responsetypes import (StudentInputError, LoncapaProblemError,
                                 ResponseError)
 from capa.xqueue_interface import XQueueInterface
@@ -2652,7 +2651,7 @@ class TestProblemCheckTracking(unittest.TestCase):
         event = self.get_event_for_answers(module, answer_input_dict)
         self.assertEquals(event['submission'], {
             factory.answer_key(2): {
-                'question': DEFAULT_QUESTION_TEXT,
+                'question': '',
                 'answer': '3.14',
                 'response_type': 'numericalresponse',
                 'input_type': 'textline',
@@ -2662,19 +2661,19 @@ class TestProblemCheckTracking(unittest.TestCase):
         })
 
     def test_multiple_inputs(self):
+        group_label = 'Choose the correct color'
+        input1_label = 'What color is the sky?'
+        input2_label = 'What color are pine needles?'
         factory = self.capa_factory_for_problem_xml("""\
             <problem display_name="Multiple Inputs">
-              <p>Choose the correct color</p>
               <optionresponse>
-                <p>What color is the sky?</p>
-                <optioninput options="('yellow','blue','green')" correct="blue"/>
-                <p>What color are pine needles?</p>
-                <optioninput options="('yellow','blue','green')" correct="green"/>
+                <label>{}</label>
+                <optioninput options="('yellow','blue','green')" correct="blue" label="{}"/>
+                <optioninput options="('yellow','blue','green')" correct="green" label="{}"/>
               </optionresponse>
             </problem>
-            """)
+            """.format(group_label, input1_label, input2_label))
         module = factory.create()
-
         answer_input_dict = {
             factory.input_key(2, 1): 'blue',
             factory.input_key(2, 2): 'yellow',
@@ -2683,7 +2682,8 @@ class TestProblemCheckTracking(unittest.TestCase):
         event = self.get_event_for_answers(module, answer_input_dict)
         self.assertEquals(event['submission'], {
             factory.answer_key(2, 1): {
-                'question': DEFAULT_QUESTION_TEXT,
+                'group_label': group_label,
+                'question': input1_label,
                 'answer': 'blue',
                 'response_type': 'optionresponse',
                 'input_type': 'optioninput',
@@ -2691,7 +2691,8 @@ class TestProblemCheckTracking(unittest.TestCase):
                 'variant': '',
             },
             factory.answer_key(2, 2): {
-                'question': DEFAULT_QUESTION_TEXT,
+                'group_label': group_label,
+                'question': input2_label,
                 'answer': 'yellow',
                 'response_type': 'optionresponse',
                 'input_type': 'optioninput',
@@ -2702,11 +2703,14 @@ class TestProblemCheckTracking(unittest.TestCase):
 
     def test_optioninput_extended_xml(self):
         """Test the new XML form of writing with <option> tag instead of options= attribute."""
+        group_label = 'Are you the Gatekeeper?'
+        input1_label = 'input 1 label'
+        input2_label = 'input 2 label'
         factory = self.capa_factory_for_problem_xml("""\
             <problem display_name="Woo Hoo">
-              <p>Are you the Gatekeeper?</p>
                 <optionresponse>
-                   <optioninput>
+                   <label>{}</label>
+                   <optioninput label="{}">
                        <option correct="True" label="Good Job">
                            apple
                            <optionhint>
@@ -2721,7 +2725,7 @@ class TestProblemCheckTracking(unittest.TestCase):
                        </option>
                    </optioninput>
 
-                   <optioninput>
+                   <optioninput label="{}">
                        <option correct="True">
                            apple
                            <optionhint>
@@ -2737,7 +2741,7 @@ class TestProblemCheckTracking(unittest.TestCase):
                    </optioninput>
                  </optionresponse>
             </problem>
-            """)
+            """.format(group_label, input1_label, input2_label))
         module = factory.create()
 
         answer_input_dict = {
@@ -2748,7 +2752,8 @@ class TestProblemCheckTracking(unittest.TestCase):
         event = self.get_event_for_answers(module, answer_input_dict)
         self.assertEquals(event['submission'], {
             factory.answer_key(2, 1): {
-                'question': DEFAULT_QUESTION_TEXT,
+                'group_label': group_label,
+                'question': input1_label,
                 'answer': 'apple',
                 'response_type': 'optionresponse',
                 'input_type': 'optioninput',
@@ -2756,7 +2761,8 @@ class TestProblemCheckTracking(unittest.TestCase):
                 'variant': '',
             },
             factory.answer_key(2, 2): {
-                'question': DEFAULT_QUESTION_TEXT,
+                'group_label': group_label,
+                'question': input2_label,
                 'answer': 'cucumber',
                 'response_type': 'optionresponse',
                 'input_type': 'optioninput',
@@ -2776,7 +2782,7 @@ class TestProblemCheckTracking(unittest.TestCase):
         event = self.get_event_for_answers(module, answer_input_dict)
         self.assertEquals(event['submission'], {
             factory.answer_key(2): {
-                'question': DEFAULT_QUESTION_TEXT,
+                'question': '',
                 'answer': '3.14',
                 'response_type': 'numericalresponse',
                 'input_type': 'textline',

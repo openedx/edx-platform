@@ -72,8 +72,6 @@ log = logging.getLogger(__name__)
 #-----------------------------------------------------------------------------
 # main class for this module
 
-DEFAULT_QUESTION_TEXT = "Formatting error: You must explicitly specify the question text."
-
 
 class LoncapaSystem(object):
     """
@@ -765,8 +763,7 @@ class LoncapaProblem(object):
 
         if problemtree.tag in inputtypes.registry.registered_tags():
             # If this is an inputtype subtree, let it render itself.
-            response_id = self.problem_id + '_' + problemtree.get('response_id')
-            response_data = self.problem_data[response_id]
+            response_data = self.problem_data[problemid]
 
             status = 'unsubmitted'
             msg = ''
@@ -856,16 +853,16 @@ class LoncapaProblem(object):
         problem_data = {}
         self.responders = {}
         for response in tree.xpath('//' + "|//".join(responsetypes.registry.registered_tags())):
-            response_id_str = self.problem_id + "_" + str(response_id)
+            responsetype_id = self.problem_id + "_" + str(response_id)
             # create and save ID for this response
-            response.set('id', response_id_str)
+            response.set('id', responsetype_id)
             response_id += 1
 
             answer_id = 1
             input_tags = inputtypes.registry.registered_tags()
             inputfields = tree.xpath(
                 "|".join(['//' + response.tag + '[@id=$id]//' + x for x in input_tags]),
-                id=response_id_str
+                id=responsetype_id
             )
 
             # assign one answer_id for each input type
@@ -875,10 +872,65 @@ class LoncapaProblem(object):
                 entry.attrib['id'] = "%s_%i_%i" % (self.problem_id, response_id, answer_id)
                 answer_id = answer_id + 1
 
-            question_id = u'{}_{}'.format(self.problem_id, response_id)
-            label = ''
-            element_to_be_deleted = None
+            self.response_a11y_data(response, inputfields, responsetype_id, problem_data)
 
+            # instantiate capa Response
+            responsetype_cls = responsetypes.registry.get_class_for_tag(response.tag)
+            responder = responsetype_cls(response, inputfields, self.context, self.capa_system, self.capa_module)
+            # save in list in self
+            self.responders[response] = responder
+
+        # get responder answers (do this only once, since there may be a performance cost,
+        # eg with externalresponse)
+        self.responder_answers = {}
+        for response in self.responders.keys():
+            try:
+                self.responder_answers[response] = self.responders[response].get_answers()
+            except:
+                log.debug('responder %s failed to properly return get_answers()',
+                          self.responders[response])  # FIXME
+                raise
+
+        # <solution>...</solution> may not be associated with any specific response; give
+        # IDs for those separately
+        # TODO: We should make the namespaces consistent and unique (e.g. %s_problem_%i).
+        solution_id = 1
+        for solution in tree.findall('.//solution'):
+            solution.attrib['id'] = "%s_solution_%i" % (self.problem_id, solution_id)
+            solution_id += 1
+
+        return problem_data
+
+    def response_a11y_data(self, response, inputfields, responsetype_id, problem_data):
+        """
+        Construct data to be used for a11y.
+
+        Arguments:
+            response (object): xml response object
+            inputfields (list): list of inputfields in a responsetype
+            responsetype_id (str): responsetype id
+            problem_data (dict): dict to be filled with response data
+        """
+        element_to_be_deleted = None
+        label = ''
+
+        if len(inputfields) > 1:
+            response.set('multiple_inputtypes', 'true')
+            group_label_tag = response.find('label')
+            group_label_tag_text = ''
+            if group_label_tag is not None:
+                group_label_tag.tag = 'p'
+                group_label_tag.set('id', responsetype_id)
+                group_label_tag.set('class', 'multi-inputs-group-label')
+                group_label_tag_text = group_label_tag.text
+
+            for inputfield in inputfields:
+                problem_data[inputfield.get('id')] = {
+                    'group_label': group_label_tag_text,
+                    'label': inputfield.attrib.get('label', ''),
+                    'descriptions': {}
+                }
+        else:
             # Extract label value from <label> tag or label attribute from inside the responsetype
             responsetype_label_tag = response.find('label')
             if responsetype_label_tag is not None:
@@ -913,16 +965,9 @@ class LoncapaProblem(object):
                     label = label_tag[0].text
                     element_to_be_deleted = label_tag[0]
 
-            label = label.strip() or DEFAULT_QUESTION_TEXT
-
             # delete label or p element only if responsetype is fully accessible
             if response.tag in ACCESSIBLE_CAPA_RESPONSE_TYPES and element_to_be_deleted is not None:
                 element_to_be_deleted.getparent().remove(element_to_be_deleted)
-
-            # for non-accessible responsetypes it may be possible that label attribute is not present
-            # in this case pass an empty label. remember label attribute is only used as value for aria-label
-            if response.tag not in ACCESSIBLE_CAPA_RESPONSE_TYPES and label == DEFAULT_QUESTION_TEXT:
-                label = ''
 
             # Extract descriptions and set unique id on each description tag
             description_tags = response.findall('description')
@@ -930,39 +975,12 @@ class LoncapaProblem(object):
             descriptions = OrderedDict()
             for description in description_tags:
                 descriptions[
-                    "description_%s_%i_%i" % (self.problem_id, response_id, description_id)
+                    "description_%s_%i" % (responsetype_id, description_id)
                 ] = description.text
                 response.remove(description)
                 description_id += 1
 
-            problem_data[question_id] = {
+            problem_data[inputfields[0].get('id')] = {
                 'label': label,
                 'descriptions': descriptions
             }
-
-            # instantiate capa Response
-            responsetype_cls = responsetypes.registry.get_class_for_tag(response.tag)
-            responder = responsetype_cls(response, inputfields, self.context, self.capa_system, self.capa_module)
-            # save in list in self
-            self.responders[response] = responder
-
-        # get responder answers (do this only once, since there may be a performance cost,
-        # eg with externalresponse)
-        self.responder_answers = {}
-        for response in self.responders.keys():
-            try:
-                self.responder_answers[response] = self.responders[response].get_answers()
-            except:
-                log.debug('responder %s failed to properly return get_answers()',
-                          self.responders[response])  # FIXME
-                raise
-
-        # <solution>...</solution> may not be associated with any specific response; give
-        # IDs for those separately
-        # TODO: We should make the namespaces consistent and unique (e.g. %s_problem_%i).
-        solution_id = 1
-        for solution in tree.findall('.//solution'):
-            solution.attrib['id'] = "%s_solution_%i" % (self.problem_id, solution_id)
-            solution_id += 1
-
-        return problem_data
