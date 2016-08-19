@@ -188,6 +188,8 @@ class Users(SysadminDashboardView):
             if '@' not in email:
                 msg += _('email address required (not username)')
                 return msg
+            else:
+                uname = email.replace('@', '_')
             new_password = password
 
         user = User(username=uname, email=email, is_active=True)
