@@ -46,10 +46,9 @@ class CAPAProblemTest(unittest.TestCase):
         )
         self.assertEqual(len(problem.tree.xpath('//label')), 0)
 
-    def test_label_attribute_only(self):
+    def test_legacy_problem(self):
         """
-        Verify that label is extracted and <p> tag with question
-        text is removed when label attribute is set on inputtype.
+        Verify that legacy problem is handled correctly.
         """
         question = "Once we become predictable, we become ______?"
         xml = """
@@ -67,15 +66,14 @@ class CAPAProblemTest(unittest.TestCase):
             {
                 '1_2_1':
                 {
-                    'label': question,
+                    'label': '',
                     'descriptions': {}
                 }
             }
-
         )
         self.assertEqual(
-            len(problem.tree.xpath('//p[text()="{}"]'.format(question))),
-            0
+            len(problem.tree.xpath("//*[normalize-space(text())='{}']".format(question))),
+            1
         )
 
     def test_neither_label_tag_nor_attribute(self):
@@ -158,9 +156,9 @@ class CAPAProblemTest(unittest.TestCase):
             }
         )
 
-    def test_question_is_not_removed(self):
+    def test_non_accessible_inputtype(self):
         """
-        Verify that tag with question text is not removed when responsetype is not fully accessible.
+        Verify that tag with question text is not removed when inputtype is not fully accessible.
         """
         question = "Click the country which is home to the Pyramids."
         xml = """
@@ -178,7 +176,7 @@ class CAPAProblemTest(unittest.TestCase):
             {
                 '1_2_1':
                 {
-                    'label': 'Click the country which is home to the Pyramids.',
+                    'label': '',
                     'descriptions': {}
                 }
             }
@@ -261,22 +259,22 @@ class CAPAProblemTest(unittest.TestCase):
         )
         self.assertEqual(len(problem.tree.xpath('//label')), 0)
 
-    def test_label_attribute_mismatches_question_tag(self):
+    def test_question_title_not_removed_got_children(self):
         """
-        Verify that question text is extracted correctly when label attribtue value
-        mismatched with question tag value.
+        Verify that <p> question text before responsetype not deleted when
+        it contains other children and label is picked from label attribute of inputtype
 
-        This is the case when author updated the question <p> tag directly in XML but
-        didn't change the label attribute value. In this case we will consider the
-        first <p> tag before responsetype as question.
+        This is the case when author updated the <p> immediately before
+        responsetype to contain other elements. We do not want to delete information in that case.
         """
-        question = 'Select the correct synonym of paranoid?'
+        question = 'Is egg plant a fruit?'
         xml = """
         <problem>
             <p>Choose wisely.</p>
-            <p>{}</p>
+            <p>Select the correct synonym of paranoid?</p>
+            <p><img src="" /></p>
             <choiceresponse>
-                <checkboxgroup label="Is egg plant a fruit?">
+                <checkboxgroup label="{}">
                     <choice correct="true">over-suspicious</choice>
                     <choice correct="false">funny</choice>
                 </checkboxgroup>
@@ -289,14 +287,14 @@ class CAPAProblemTest(unittest.TestCase):
             {
                 '1_2_1':
                 {
-                    'label': question,
+                    'label': '',
                     'descriptions': {}
                 }
             }
         )
         self.assertEqual(
-            len(problem.tree.xpath('//p[text()="{}"]'.format(question))),
-            0
+            len(problem.tree.xpath('//p/img')),
+            1
         )
 
     def test_multiple_inputtypes(self):
@@ -339,24 +337,29 @@ class CAPAProblemTest(unittest.TestCase):
         """
         Verify that HTML is correctly rendered when there is single inputtype.
         """
-        xml = """
+        question = 'Enter sum of 1+2'
+        xml = textwrap.dedent("""
         <problem>
-            <choiceresponse>
-                <label>Select the correct synonym of paranoid?</label>
-                <description>Only the paranoid survive.</description>
-                <checkboxgroup>
-                    <choice correct="true">over-suspicious</choice>
-                    <choice correct="false">funny</choice>
-                </checkboxgroup>
-            </choiceresponse>
+            <customresponse cfn="test_sum" expect="3">
+        <script type="loncapa/python">
+        def test_sum(expect, ans):
+            return int(expect) == int(ans)
+        </script>
+                <label>{}</label>
+                <textline size="20" correct_answer="3" />
+            </customresponse>
         </problem>
-        """
+        """.format(question))
         problem = new_loncapa_problem(xml, use_capa_render_template=True)
         problem_html = etree.XML(problem.get_html())
 
         # verify that only no multi input group div is present
         multi_inputs_group = problem_html.xpath('//div[@class="multi-inputs-group"]')
         self.assertEqual(len(multi_inputs_group), 0)
+
+        # verify that question is rendered only once
+        question = problem_html.xpath("//*[normalize-space(text())='{}']".format(question))
+        self.assertEqual(len(question), 1)
 
 
 @ddt.ddt

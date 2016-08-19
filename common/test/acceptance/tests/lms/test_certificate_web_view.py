@@ -218,11 +218,11 @@ class CertificateProgressPageTest(UniqueCourseTest):
         self.course_nav.q(css='select option[value="{}"]'.format('blue')).first.click()
 
         # Select correct radio button for the answer
-        self.course_nav.q(css='fieldset div.field:nth-child(4) input').nth(0).click()
+        self.course_nav.q(css='fieldset div.field:nth-child(3) input').nth(0).click()
 
         # Select correct radio buttons for the answer
-        self.course_nav.q(css='fieldset div.field:nth-child(2) input').nth(1).click()
-        self.course_nav.q(css='fieldset div.field:nth-child(4) input').nth(1).click()
+        self.course_nav.q(css='fieldset div.field:nth-child(1) input').nth(1).click()
+        self.course_nav.q(css='fieldset div.field:nth-child(3) input').nth(1).click()
 
         # Submit the answer
         self.course_nav.q(css='button.check.Check').click()

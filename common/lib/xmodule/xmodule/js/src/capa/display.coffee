@@ -498,7 +498,7 @@ class @Problem
 
     @el.find("select").each (i, select_field) =>
       selected_option = $(select_field).find("option:selected").text().trim()
-      if selected_option is ''
+      if selected_option is 'Select an option'
         answered = false
       if bind
         $(select_field).on 'change', (e) =>

@@ -7,7 +7,9 @@
 %>
 <form class="choicegroup capa_inputtype" id="inputtype_${id}">
     <fieldset ${describedby}>
-      <legend id="${id}-legend" class="response-fieldset-legend field-group-hd">${response_data['label']}</legend>
+      % if response_data['label']:
+        <legend id="${id}-legend" class="response-fieldset-legend field-group-hd">${response_data['label']}</legend>
+      % endif
       % for description_id, description_text in response_data['descriptions'].items():
         <p class="question-description" id="${description_id}">${description_text}</p>
       % endfor
@@ -57,16 +59,8 @@
     </fieldset>
     <div class="indicator-container">
         % if input_type == 'checkbox' or not value:
-            <span class="status ${status.classname if show_correctness != 'never' else 'unanswered'}" id="status_${id}" aria-describedby="inputtype_${id}" data-tooltip="${status.display_tooltip}">
-                <span class="sr">
-                    %for choice_id, choice_label in choices:
-                        % if choice_id in value:
-                            ${choice_label},
-                        %endif
-                    %endfor
-                    -
-                    ${status.display_tooltip}
-                </span>
+            <span class="status ${status.classname if show_correctness != 'never' else 'unanswered'}" id="status_${id}" data-tooltip="${status.display_tooltip}">
+                <span class="sr">${status.display_tooltip}</span>
             </span>
         % endif
     </div>

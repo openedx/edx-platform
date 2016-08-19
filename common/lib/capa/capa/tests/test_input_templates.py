@@ -165,6 +165,40 @@ class TemplateTestCase(unittest.TestCase):
             describedbys = xml.xpath(describedby_xpath)
             self.assertFalse(describedbys)
 
+    def assert_status(self, status_div=False, status_class=False):
+        """
+        Verify status information.
+
+        Arguments:
+            status_div (bool): check presence of status div
+            status_class (bool): check presence of status class
+        """
+        cases = [
+            ('correct', 'correct'),
+            ('unsubmitted', 'unanswered'),
+            ('incorrect', 'incorrect'),
+            ('incomplete', 'incorrect')
+        ]
+
+        for context_status, div_class in cases:
+            self.context['status'] = Status(context_status)
+            xml = self.render_to_xml(self.context)
+
+            # Expect that we get a <div> with correct class
+            if status_div:
+                xpath = "//div[normalize-space(@class)='%s']" % div_class
+                self.assert_has_xpath(xml, xpath, self.context)
+
+            # Expect that we get a <span> with class="status"
+            # (used to by CSS to draw the green check / red x)
+            self.assert_has_text(
+                xml,
+                "//span[@class=normalize-space('status {}')]/span[@class='sr']".format(
+                    div_class if status_class else ''
+                ),
+                self.context['status'].display_tooltip
+            )
+
 
 class ChoiceGroupTemplateTest(TemplateTestCase):
     """
@@ -407,6 +441,12 @@ class ChoiceGroupTemplateTest(TemplateTestCase):
         self.assert_description(xpaths)
         self.assert_describedby_attribute(xpaths)
 
+    def test_status(self):
+        """
+        Verify status information.
+        """
+        self.assert_status(status_class=True)
+
 
 class TextlineTemplateTest(TemplateTestCase):
     """
@@ -441,23 +481,10 @@ class TextlineTemplateTest(TemplateTestCase):
             self.assert_has_xpath(xml, xpath, self.context)
 
     def test_status(self):
-        cases = [('correct', 'correct', 'correct'),
-                 ('unsubmitted', 'unanswered', 'unanswered'),
-                 ('incorrect', 'incorrect', 'incorrect'),
-                 ('incomplete', 'incorrect', 'incomplete')]
-
-        for (context_status, div_class, status_mark) in cases:
-            self.context['status'] = Status(context_status)
-            xml = self.render_to_xml(self.context)
-
-            # Expect that we get a <div> with correct class
-            xpath = "//div[@class='%s ']" % div_class
-            self.assert_has_xpath(xml, xpath, self.context)
-
-            # Expect that we get a <span> with class="status"
-            # (used to by CSS to draw the green check / red x)
-            self.assert_has_text(xml, "//span[@class='status']/span[@class='sr']",
-                                 status_mark, exact=False)
+        """
+        Verify status information.
+        """
+        self.assert_status(status_div=True)
 
     def test_label(self):
         xml = self.render_to_xml(self.context)
@@ -581,6 +608,12 @@ class FormulaEquationInputTemplateTest(TemplateTestCase):
         xpaths = ['//input/@aria-describedby']
         self.assert_description(xpaths)
         self.assert_describedby_attribute(xpaths)
+
+    def test_status(self):
+        """
+        Verify status information.
+        """
+        self.assert_status(status_div=True)
 
 
 class AnnotationInputTemplateTest(TemplateTestCase):
@@ -767,6 +800,7 @@ class OptionInputTemplateTest(TemplateTestCase):
             'options': [],
             'status': Status('unsubmitted'),
             'value': 0,
+            'default_option_text': 'Select an option',
             'response_data': self.RESPONSE_DATA,
             'describedby': self.DESCRIBEDBY,
         }
@@ -796,20 +830,10 @@ class OptionInputTemplateTest(TemplateTestCase):
         self.assert_has_text(xml, xpath, 'Option 2')
 
     def test_status(self):
-
-        # Test cases, where each tuple represents
-        # `(input_status, expected_css_class)`
-        test_cases = [('unsubmitted', 'status unanswered'),
-                      ('correct', 'status correct'),
-                      ('incorrect', 'status incorrect'),
-                      ('incomplete', 'status incorrect')]
-
-        for (input_status, expected_css_class) in test_cases:
-            self.context['status'] = Status(input_status)
-            xml = self.render_to_xml(self.context)
-
-            xpath = "//span[@class='{0}']".format(expected_css_class)
-            self.assert_has_xpath(xml, xpath, self.context)
+        """
+        Verify status information.
+        """
+        self.assert_status(status_class=True)
 
     def test_label(self):
         xml = self.render_to_xml(self.context)

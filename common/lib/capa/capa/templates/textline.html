@@ -16,11 +16,14 @@
     <div style="display:none;" name="${hidden}" inputid="input_${id}" />
 % endif
 
-<label class="problem-group-label" for="input_${id}">${response_data['label']}</label>
+% if response_data['label']:
+    <label class="problem-group-label" for="input_${id}">${response_data['label']}</label>
+% endif
+
 % for description_id, description_text in response_data['descriptions'].items():
     <p class="question-description" id="${description_id}">${description_text}</p>
 % endfor
-<input type="text" name="input_${id}" id="input_${id}" ${describedby| n} value="${value}"
+<input type="text" name="input_${id}" id="input_${id}" ${describedby | n, decode.utf8} value="${value}"
     % if do_math:
         class="math"
     % endif
@@ -33,16 +36,8 @@
 />
 <span class="trailing_text">${trailing_text}</span>
 
-<span class="status" aria-describedby="input_${id}" data-tooltip="${status.display_tooltip}">
-    <span class="sr">
-      %if value:
-        ${value}
-      % else:
-        ${response_data['label']}
-      %endif
-        -
-        ${status.display_name}
-    </span>
+<span class="status" data-tooltip="${status.display_tooltip}">
+    <span class="sr">${status.display_tooltip}</span>
 </span>
 
 <p id="answer_${id}" class="answer"></p>

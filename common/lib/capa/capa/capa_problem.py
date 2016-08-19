@@ -36,14 +36,14 @@ from capa.safe_exec import safe_exec
 # extra things displayed after "show answers" is pressed
 solution_tags = ['solution']
 
-# fully accessible capa response types
-ACCESSIBLE_CAPA_RESPONSE_TYPES = [
-    'choiceresponse',
-    'multiplechoiceresponse',
-    'optionresponse',
-    'numericalresponse',
-    'stringresponse',
-    'formularesponse',
+# fully accessible capa input types
+ACCESSIBLE_CAPA_INPUT_TYPES = [
+    'checkboxgroup',
+    'radiogroup',
+    'choicegroup',
+    'optioninput',
+    'textline',
+    'formulaequationinput',
 ]
 
 # these get captured as student responses
@@ -911,6 +911,10 @@ class LoncapaProblem(object):
             responsetype_id (str): responsetype id
             problem_data (dict): dict to be filled with response data
         """
+        # if there are no inputtypes then don't do anything
+        if not inputfields:
+            return
+
         element_to_be_deleted = None
         label = ''
 
@@ -938,35 +942,17 @@ class LoncapaProblem(object):
                 # store <label> tag containing question text to delete
                 # it later otherwise question will be rendered twice
                 element_to_be_deleted = responsetype_label_tag
-            elif 'label' in inputfields[0].attrib:
-                # Extract label value from label attribute
-                # This is the case when we have a problem
-                # * with multiple questions without separation
-                # * single question with old XML format only
-
-                label = inputfields[0].attrib['label']
-                # Get first <p> tag before responsetype, this <p> contains the question text.
-                p_tag = response.xpath('preceding-sibling::p[1]')
-
-                if p_tag:
-                    # It may be possible that label attribute value doesn't match with <p> tag
-                    # This happens when author updated the question <p> tag directly in XML but
-                    # didn't changed the label attribute value. In this case we will consider the
-                    # first <p> tag before responsetype as question.
-                    if label != p_tag[0].text:
-                        label = p_tag[0].text
-                    element_to_be_deleted = p_tag[0]
-            else:
+            elif 'label' not in inputfields[0].attrib:
                 # In this case the problems don't have tag or label attribute inside the responsetype
                 # so we will get the first preceding label tag w.r.t to this responsetype.
                 # This will take care of those multi-question problems that are not using --- in their markdown.
-                label_tag = response.xpath("preceding-sibling::label[1]")
+                label_tag = response.xpath('preceding-sibling::label[1]')
                 if label_tag:
                     label = label_tag[0].text
                     element_to_be_deleted = label_tag[0]
 
-            # delete label or p element only if responsetype is fully accessible
-            if response.tag in ACCESSIBLE_CAPA_RESPONSE_TYPES and element_to_be_deleted is not None:
+            # delete label or p element only if inputtype is fully accessible
+            if inputfields[0].tag in ACCESSIBLE_CAPA_INPUT_TYPES and element_to_be_deleted is not None:
                 element_to_be_deleted.getparent().remove(element_to_be_deleted)
 
             # Extract descriptions and set unique id on each description tag
@@ -981,6 +967,6 @@ class LoncapaProblem(object):
                 description_id += 1
 
             problem_data[inputfields[0].get('id')] = {
-                'label': label,
+                'label': label.strip() if label else '',
                 'descriptions': descriptions
             }

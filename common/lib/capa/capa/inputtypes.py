@@ -96,10 +96,13 @@ class Status(object):
             'correct': _('This answer is correct.'),
             'incorrect': _('This answer is incorrect.'),
             'partially-correct': _('This answer is partially correct.'),
-            'unanswered': _('This answer is unanswered.'),
-            'unsubmitted': _('This answer is unanswered.'),
             'queued': _('This answer is being processed.'),
         }
+        tooltips.update(
+            dict.fromkeys(
+                ['incomplete', 'unanswered', 'unsubmitted'], _('Not yet answered.')
+            )
+        )
         self.display_name = names.get(status, unicode(status))
         self.display_tooltip = tooltips.get(status, u'')
         self._status = status or ''
@@ -355,7 +358,7 @@ class InputTypeBase(object):
 
         context = self._get_render_context()
 
-        html = self.capa_system.render_template(self.template, context)
+        html = self.capa_system.render_template(self.template, context).strip()
 
         try:
             output = etree.XML(html)
@@ -425,6 +428,13 @@ class OptionInput(InputTypeBase):
         """
         return [Attribute('options', transform=cls.parse_options),
                 Attribute('inline', False)]
+
+    def _extra_context(self):
+        """
+        Return extra context.
+        """
+        _ = self.capa_system.i18n.ugettext
+        return {'default_option_text': _('Select an option')}
 
 #-----------------------------------------------------------------------------
 

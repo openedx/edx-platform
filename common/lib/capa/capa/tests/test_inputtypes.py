@@ -61,6 +61,7 @@ class OptionInputTest(unittest.TestCase):
             'value': 'Down',
             'id': 'sky_input',
             'status': 'answered',
+            'default_option_text': 'Select an option',
             'response_data': RESPONSE_DATA
         }
         option_input = lookup_tag('optioninput')(test_capa_system(), element, state)
@@ -75,6 +76,7 @@ class OptionInputTest(unittest.TestCase):
             'msg': '',
             'inline': False,
             'id': 'sky_input',
+            'default_option_text': 'Select an option',
             'response_data': RESPONSE_DATA,
             'describedby': DESCRIBEDBY
         }
