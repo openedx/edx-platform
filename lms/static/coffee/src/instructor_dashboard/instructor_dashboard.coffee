@@ -91,7 +91,7 @@ $ =>
 # handles hiding and showing sections
 setup_instructor_dashboard = (idash_content) =>
   # clickable section titles
-  $links = idash_content.find(".#{CSS_INSTRUCTOR_NAV}").find('a')
+  $links = idash_content.find(".#{CSS_INSTRUCTOR_NAV}").find('.btn-link')
 
   # attach link click handlers
   $links.each (i, link) ->
@@ -100,6 +100,7 @@ setup_instructor_dashboard = (idash_content) =>
 
       # deactivate all link & section styles
       idash_content.find(".#{CSS_INSTRUCTOR_NAV} li").children().removeClass CSS_ACTIVE_SECTION
+      idash_content.find(".#{CSS_INSTRUCTOR_NAV} li").children().attr('aria-pressed', 'false')
       idash_content.find(".#{CSS_IDASH_SECTION}").removeClass CSS_ACTIVE_SECTION
 
       # discover section paired to link
@@ -108,6 +109,7 @@ setup_instructor_dashboard = (idash_content) =>
 
       # activate link & section styling
       $(this).addClass CSS_ACTIVE_SECTION
+      $(this).attr('aria-pressed','true')
       $section.addClass CSS_ACTIVE_SECTION
 
       # tracking

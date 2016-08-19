@@ -391,8 +391,8 @@ from student.helpers import (
                 "to request payment, or you can "
                 "{unenroll_link_start}unenroll{unenroll_link_end} "
                 "from this course")).format(
-              contact_link_start=HTML('<a href="#">'),
-              contact_link_end=HTML('</a>'),
+              contact_link_start=HTML('<button type="button">'),
+              contact_link_end=HTML('</button>'),
               unenroll_link_start=HTML(
                 '<a id="unregister_block_course" rel="leanModal" '
                 'data-course-id="{course_id}" data-course-number="{course_number}" data-course-name="{course_name}" '

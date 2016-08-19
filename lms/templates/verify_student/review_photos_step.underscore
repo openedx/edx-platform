@@ -30,9 +30,9 @@
               <li class="tip"><%- _.sprintf(  gettext( "Does the name on your ID match your account name: %(fullName)s?" ), { fullName: fullName } ) %>
                 <div class="help-tip is-expandable">
                   <label for="new-name">
-                    <a href="#" class="title title-expand" aria-expanded="false">
+                    <button type="button" class="title title-expand" aria-expanded="false">
                       <%- gettext( "Edit Your Name" ) %>
-                    </a>
+                    </button>
                   </label>
 
                   <div class="copy expandable-area">

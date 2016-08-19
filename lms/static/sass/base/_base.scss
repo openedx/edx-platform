@@ -247,60 +247,55 @@ mark {
 }
 
 .help-tab {
-  @include transform(rotate(-90deg));
-  @include transform-origin(0 0);
-  @extend %ui-depth2;
-  @extend %ui-print-excluded;
-  top: 250px;
-  left: 0;
-  position: fixed;
+    @include transform(rotate(-90deg));
+    @include transform-origin(0 0);
+    @extend %ui-depth2;
+    @extend %ui-print-excluded;
+    position: fixed;
+    top: 250px;
+    left: 0;
 
-  a:link, a:visited {
-    cursor: pointer;
-    border: 1px solid $gray-l3;
-    border-top-style: none;
-    border-radius: 0 0 ($baseline/2) ($baseline/2);
-    background: transparentize($white, 0.25);
-    color: transparentize(#333, 0.25);
-    font-weight: bold;
-    text-decoration: none;
-    padding: 6px 22px 11px;
-    display: inline-block;
+    a:link,
+    a:visited {
+        border: 1px solid $gray-l3;
+        border-top-style: none;
+        border-radius: 0 0 ($baseline/2) ($baseline/2);
+        background: transparentize($white, 0.25);
+        color: transparentize($base-font-color, 0.25);
+        font-weight: bold;
+        text-decoration: none;
+        padding: 6px 22px 11px;
+        display: inline-block;
 
-    &:hover, &:focus {
-      color: $white;
-      background: $link-color;
+        &:hover,
+        &:focus {
+            color: $white;
+            background: $link-color;
+        }
     }
-  }
 }
 
 .help-buttons {
-  padding: ($baseline/2) ($baseline*2.5);
-
-  a:link, a:visited {
-    padding: ($baseline*0.75) 0;
+    padding: ($baseline/2) ($baseline*2.5);
     text-align: center;
-    cursor: pointer;
-    background: $white;
-    text-decoration: none;
-    display: block;
-    border: 1px solid $gray-l3;
 
-    &#feedback_link_problem {
-      border-bottom-style: none;
-      border-radius: ($baseline/2) ($baseline/2) 0 0;
+    button {
+        @extend %btn-secondary-blue-outline;
+        margin: .5rem 0;
+        font-weight: initial;
+        text-shadow: none;
+        letter-spacing: initial !important;
+        text-transform: normal !important;
+        vertical-align: initial;
+        
+        &:hover,
+        &:focus {
+            background: $link-color !important;
+            color: $white;
+            box-shadow: none !important;
+            text-shadow: none !important;
+        }
     }
-
-    &#feedback_link_question {
-      border-top-style: none;
-      border-radius: 0 0 ($baseline/2) ($baseline/2);
-    }
-
-    &:hover, &:focus {
-      color: $white;
-      background: $link-color;
-    }
-  }
 }
 
 #feedback_form {

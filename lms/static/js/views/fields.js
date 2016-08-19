@@ -512,6 +512,7 @@
             fieldTemplate: field_textarea_template,
 
             events: {
+                'keydown .wrapper-u-field': 'startEditing',
                 'click .wrapper-u-field': 'startEditing',
                 'click .u-field-placeholder': 'startEditing',
                 'focusout textarea': 'finishEditing',

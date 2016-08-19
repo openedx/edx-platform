@@ -29,10 +29,10 @@ from third_party_auth import pipeline
                         % if state.has_account:
                             <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}">
 
-                            <a href="#" onclick="document.${state.get_unlink_form_name()}.submit()">
+                            <button type="button" onclick="document.${state.get_unlink_form_name()}.submit()">
                                 ## Translators: clicking on this removes the link between a user's edX account and their account with an external authentication provider (like Google or LinkedIn).
                                 ${_("Unlink")}
-                            </a>
+                            </button>
                         % elif state.provider.accepts_logins:
                             <a href="${pipeline.get_login_url(state.provider.provider_id, pipeline.AUTH_ENTRY_PROFILE)}">
                                 ## Translators: clicking on this creates a link between a user's edX account and their account with an external authentication provider (like Google or LinkedIn).

@@ -12,7 +12,7 @@ define(['backbone', 'jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helper
                 timerCallback,
                 dropdownSelectClass = '.u-field-value > select',
                 dropdownButtonClass = '.u-field-value > button',
-                textareaLinkClass = '.u-field-value a';
+                textareaLinkClass = '.u-field-value .clickable';
 
             var fieldViewClasses = [
                 FieldViews.ReadonlyFieldView,

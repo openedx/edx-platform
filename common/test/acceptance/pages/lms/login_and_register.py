@@ -271,7 +271,7 @@ class CombinedLoginAndRegisterPage(PageObject):
         login_form = self.current_form
 
         # Click the password reset link on the login page
-        self.q(css="a.forgot-password").click()
+        self.q(css=".forgot-password").click()
 
         # Wait for the password reset form to load
         EmptyPromise(

@@ -504,7 +504,7 @@ class StudioSettingsA11yTest(StudioCourseTest):
         # we will ignore this error in the test until we fix them.
         self.settings_page.a11y_audit.config.set_rules({
             "ignore": [
-                'link-href',  # TODO: AC-226
+                'link-href',  # TODO: AC-557
                 'icon-aria-hidden',  # TODO: AC-229
             ],
         })
