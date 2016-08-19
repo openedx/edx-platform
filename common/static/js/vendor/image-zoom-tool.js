@@ -28,8 +28,10 @@
                 $lightbox = $('<div class="edx_imagezoom_lightbox">'),
                 $errorMessage = $('<div class="edx_imagezoom_errorMessage">'),
                 $loader = $('<div class="edx_imagezoom_loader">Loading...</div>'),
+                $zoomArea = $('.zooming-image-place'),
                 $imageArea = $('.zooming-image-place a'),
-                $indicator = $('.zooming-image-place .indicator');
+                $indicator = $('.zooming-image-place .indicator'),
+                $disc = $('.edx-zoom-loop');
 
             $this.css({
                 cursor: 'default'
@@ -120,8 +122,6 @@
                         event.preventDefault();
 
                         if (!$zoomed.hasClass('is-visible')) {
-                            var left = event.pageX,
-                                top = event.pageY;
 
                             if (!$magnifiedImage.hasClass('is-appended')) {
                                 getMagnifiedImage();
@@ -129,6 +129,7 @@
 
                             setTimeout(function() {
                                 appendZoomed(true);
+                                addZoomLocationDisc();
                                 magnifyWithMouse(left, top, true);
 
                                 if (settings.lightbox == true) {
@@ -156,9 +157,11 @@
                     case keys.esc:
                         if ($zoomed.hasClass('is-visible')) {
                             detachZoomed();
+                            removeZoomLocationDisc();
 
                             if (settings.lightbox == true) {
                                 detachLightbox();
+                                removeZoomLocationDisc();
                             }
 
                             $imageArea.focus();
@@ -166,23 +169,23 @@
                         break;
 
                     case keys.up:
-                        // we move two spaces at a time
-                        magnifyWithKeyboard(0, 2, event);
+                        // we move five spaces at a time
+                        magnifyWithKeyboard(0, 5, event);
                         break;
 
                     case keys.down:
-                        // we move two spaces at a time
-                        magnifyWithKeyboard(0, -2, event);
+                        // we move five spaces at a time
+                        magnifyWithKeyboard(0, -5, event);
                         break;
 
                     case keys.left:
-                        // we move two spaces at a time
-                        magnifyWithKeyboard(2, 0, event);
+                        // we move five spaces at a time
+                        magnifyWithKeyboard(5, 0, event);
                         break;
 
                     case keys.right:
-                        // we move two spaces at a time
-                        magnifyWithKeyboard(-2, 0, event);
+                        // we move five spaces at a time
+                        magnifyWithKeyboard(-5, 0, event);
                         break;
 
                     default:
@@ -193,9 +196,11 @@
             $(document).click(function(event) {
                 if ($zoomed.hasClass('is-visible')) {
                     detachZoomed();
+                    removeZoomLocationDisc();
 
                     if (settings.lightbox == true) {
                         detachLightbox();
+                        removeZoomLocationDisc();
                     }
                 }
             });
@@ -213,6 +218,33 @@
                     });
                 }
             });
+            
+            function addZoomLocationDisc() {
+                if ($zoomArea.find($('.edx-zoom-loop'))) {
+                    $('.edx-zoom-loop').remove();
+                }
+
+                var discHeight = $zoomed.height() / 5,
+                    discWidth = $zoomed.width() / 5,
+                    zoomAreaHeight = $zoomArea.height(),
+                    zoomAreaWidth = $zoomArea.width(),
+                    zoomAreaCenterX = (zoomAreaWidth / 2) - (discWidth / 2),
+                    zoomAreaCenterY = (zoomAreaHeight / 2) - (discHeight / 2);
+
+                $disc = $('<div class="edx-zoom-loop"></div>')
+                    .height(discHeight)
+                    .width(discWidth)
+                    .css({
+                        left: zoomAreaCenterX,
+                        top: zoomAreaCenterY
+                    });
+                    
+                $zoomArea.append($disc);
+            };
+            
+            function removeZoomLocationDisc() {
+                $disc.remove();
+            };
 
             function magnifyWithMouse(left, top, centered) {
                 var heightDiff = $magnifiedImage.height() / $targetImage.height(),
@@ -221,8 +253,8 @@
                     magnifierLeft;
 
                 if (centered) {
-                    magnifierTop = -$magnifiedImage.height() / 2;
-                    magnifierLeft = -$magnifiedImage.width() / 2;
+                    magnifierTop = (-$magnifiedImage.height() / 2) + ($zoomed.height() / 2);
+                    magnifierLeft = (-$magnifiedImage.width() / 2) + ($zoomed.width() / 2);
                 } else {
                     magnifierTop = (-(top - $targetImage.offset().top) * heightDiff) + (settings.height / 2);
                     magnifierLeft = (-(left - $targetImage.offset().left) * widthDiff) + (settings.width / 2);
@@ -235,21 +267,37 @@
             };
 
             function magnifyWithKeyboard(left, top, event) {
-                var newLeft,
-                    newTop;
+                var largeLeft,
+                    largeTop,
+                    smallLeft,
+                    smallTop;
 
                 event.preventDefault();
 
-                newLeft = $magnifiedImage.css('left');
-                newLeft = newLeft.replace('px', '');
-                newLeft = parseInt(newLeft) + left;
-                newTop = $magnifiedImage.css('top');
-                newTop = newTop.replace('px', '');
-                newTop = parseInt(newTop) + top;
+                largeLeft = $magnifiedImage.css('left');
+                largeLeft = largeLeft.replace('px', '');
+                largeLeft = parseInt(largeLeft) + left;
+
+                largeTop = $magnifiedImage.css('top');
+                largeTop = largeTop.replace('px', '');
+                largeTop = parseInt(largeTop) + top;
+
+                smallLeft = $disc.css('left');
+                smallLeft = smallLeft.replace('px', '');
+                smallLeft = parseInt(smallLeft) - (left / 5);
+
+                smallTop = $disc.css('top');
+                smallTop = smallTop.replace('px', '');
+                smallTop = parseInt(smallTop) - (top / 5);
 
                 $magnifiedImage.css({
-                    top: newTop + 'px',
-                    left: newLeft + 'px'
+                    top: largeTop + 'px',
+                    left: largeLeft + 'px'
+                });
+
+                $disc.css({
+                    top: smallTop + 'px',
+                    left: smallLeft + 'px'
                 });
             };
 
