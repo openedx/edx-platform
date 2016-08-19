@@ -170,22 +170,22 @@
 
                     case keys.up:
                         // we move five spaces at a time
-                        magnifyWithKeyboard(0, 5, event);
+                        magnifyWithKeyboard(0, 10, event);
                         break;
 
                     case keys.down:
                         // we move five spaces at a time
-                        magnifyWithKeyboard(0, -5, event);
+                        magnifyWithKeyboard(0, -10, event);
                         break;
 
                     case keys.left:
                         // we move five spaces at a time
-                        magnifyWithKeyboard(5, 0, event);
+                        magnifyWithKeyboard(10, 0, event);
                         break;
 
                     case keys.right:
                         // we move five spaces at a time
-                        magnifyWithKeyboard(-5, 0, event);
+                        magnifyWithKeyboard(-10, 0, event);
                         break;
 
                     default:
@@ -284,11 +284,11 @@
 
                 smallLeft = $disc.css('left');
                 smallLeft = smallLeft.replace('px', '');
-                smallLeft = parseInt(smallLeft) - (left / 5);
+                smallLeft = parseInt(smallLeft) - (left / 10);
 
                 smallTop = $disc.css('top');
                 smallTop = smallTop.replace('px', '');
-                smallTop = parseInt(smallTop) - (top / 5);
+                smallTop = parseInt(smallTop) - (top / 10);
 
                 $magnifiedImage.css({
                     top: largeTop + 'px',
