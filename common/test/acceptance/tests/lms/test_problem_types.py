@@ -592,10 +592,10 @@ class ScriptProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
     factory = CustomResponseXMLFactory()
 
     factory_kwargs = {
-        'question_text': 'Enter two integers that sum to 10.',
         'cfn': 'test_add_to_ten',
         'expect': '10',
         'num_inputs': 2,
+        'group_label': 'Enter two integers that sum to 10.',
         'script': textwrap.dedent("""
             def test_add_to_ten(expect,ans):
                 try:
@@ -618,12 +618,6 @@ class ScriptProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         Additional setup for ScriptProblemTypeTest
         """
         super(ScriptProblemTypeTest, self).setUp(*args, **kwargs)
-        self.problem_page.a11y_audit.config.set_rules({
-            'ignore': [
-                'section',  # TODO: AC-491
-                'label',  # TODO: AC-287
-            ]
-        })
 
     def answer_problem(self, correct):
         """

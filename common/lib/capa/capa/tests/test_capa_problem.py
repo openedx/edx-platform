@@ -1,6 +1,9 @@
 """
 Test capa problem.
 """
+import ddt
+import textwrap
+from lxml import etree
 import unittest
 
 from . import new_loncapa_problem
@@ -35,10 +38,10 @@ class CAPAProblemTest(unittest.TestCase):
         self.assertEqual(
             problem.problem_data,
             {
-                '1_2':
+                '1_2_1':
                 {
                     'label': 'Select the correct synonym of paranoid?',
-                    'descriptions': {'description_1_2_1': 'Only the paranoid survive.'}
+                    'descriptions': {'description_1_1_1': 'Only the paranoid survive.'}
                 }
             }
         )
@@ -62,7 +65,13 @@ class CAPAProblemTest(unittest.TestCase):
         problem = new_loncapa_problem(xml)
         self.assertEqual(
             problem.problem_data,
-            {'1_2': {'label': question, 'descriptions': {}}}
+            {
+                '1_2_1':
+                {
+                    'label': question,
+                    'descriptions': {}
+                }
+            }
 
         )
         self.assertEqual(
@@ -101,12 +110,12 @@ class CAPAProblemTest(unittest.TestCase):
         self.assertEqual(
             problem.problem_data,
             {
-                '1_2':
+                '1_2_1':
                 {
                     'label': question1,
                     'descriptions': {}
                 },
-                '1_3':
+                '1_3_1':
                 {
                     'label': question2,
                     'descriptions': {}
@@ -139,12 +148,12 @@ class CAPAProblemTest(unittest.TestCase):
         self.assertEqual(
             problem.problem_data,
             {
-                '1_2':
+                '1_2_1':
                 {
                     'label': '___ requires sacrifices.',
                     'descriptions': {
-                        'description_1_2_1': "The problem with trying to be the bad guy, there's always someone worse.",
-                        'description_1_2_2': "Anyone who looks the world as if it was a game of chess deserves to lose."
+                        'description_1_1_1': "The problem with trying to be the bad guy, there's always someone worse.",
+                        'description_1_1_2': "Anyone who looks the world as if it was a game of chess deserves to lose."
                     }
                 }
             }
@@ -167,11 +176,11 @@ class CAPAProblemTest(unittest.TestCase):
         self.assertEqual(
             problem.problem_data,
             {
-                '1_2':
+                '1_2_1':
                 {
                     'label': DEFAULT_QUESTION_TEXT,
                     'descriptions': {
-                        'description_1_2_1': "Everybody needs somebody to talk to."
+                        'description_1_1_1': "Everybody needs somebody to talk to."
                     }
                 }
             }
@@ -195,7 +204,7 @@ class CAPAProblemTest(unittest.TestCase):
         self.assertEqual(
             problem.problem_data,
             {
-                '1_2':
+                '1_2_1':
                 {
                     'label': 'Click the country which is home to the Pyramids.',
                     'descriptions': {}
@@ -224,7 +233,7 @@ class CAPAProblemTest(unittest.TestCase):
         self.assertEqual(
             problem.problem_data,
             {
-                '1_2':
+                '1_2_1':
                 {
                     'label': '',
                     'descriptions': {}
@@ -266,15 +275,15 @@ class CAPAProblemTest(unittest.TestCase):
         self.assertEqual(
             problem.problem_data,
             {
-                '1_2':
+                '1_2_1':
                 {
                     'label': 'Select the correct synonym of paranoid?',
-                    'descriptions': {'description_1_2_1': 'Only the paranoid survive.'}
+                    'descriptions': {'description_1_1_1': 'Only the paranoid survive.'}
                 },
-                '1_3':
+                '1_3_1':
                 {
                     'label': 'What Apple device competed with the portable CD player?',
-                    'descriptions': {'description_1_3_1': 'Device looks like an egg plant.'}
+                    'descriptions': {'description_1_2_1': 'Device looks like an egg plant.'}
                 }
             }
         )
@@ -306,7 +315,7 @@ class CAPAProblemTest(unittest.TestCase):
         self.assertEqual(
             problem.problem_data,
             {
-                '1_2':
+                '1_2_1':
                 {
                     'label': question,
                     'descriptions': {}
@@ -317,3 +326,146 @@ class CAPAProblemTest(unittest.TestCase):
             len(problem.tree.xpath('//p[text()="{}"]'.format(question))),
             0
         )
+
+    def test_multiple_inputtypes(self):
+        """
+        Verify that group label and labels for individual inputtypes are extracted correctly.
+        """
+        group_label = 'Choose the correct color'
+        input1_label = 'What color is the sky?'
+        input2_label = 'What color are pine needles?'
+        xml = """
+        <problem>
+            <optionresponse>
+                <label>{}</label>
+                <optioninput options="('yellow','blue','green')" correct="blue" label="{}"/>
+                <optioninput options="('yellow','blue','green')" correct="green" label="{}"/>
+            </optionresponse>
+        </problem>
+        """.format(group_label, input1_label, input2_label)
+
+        problem = new_loncapa_problem(xml)
+        self.assertEqual(
+            problem.problem_data,
+            {
+                '1_2_1':
+                {
+                    'group_label': group_label,
+                    'label': input1_label,
+                    'descriptions': {}
+                },
+                '1_2_2':
+                {
+                    'group_label': group_label,
+                    'label': input2_label,
+                    'descriptions': {}
+                }
+            }
+        )
+
+    def test_single_inputtypes(self):
+        """
+        Verify that HTML is correctly rendered when there is single inputtype.
+        """
+        xml = """
+        <problem>
+            <choiceresponse>
+                <label>Select the correct synonym of paranoid?</label>
+                <description>Only the paranoid survive.</description>
+                <checkboxgroup>
+                    <choice correct="true">over-suspicious</choice>
+                    <choice correct="false">funny</choice>
+                </checkboxgroup>
+            </choiceresponse>
+        </problem>
+        """
+        problem = new_loncapa_problem(xml, use_capa_render_template=True)
+        problem_html = etree.XML(problem.get_html())
+
+        # verify that only no multi input group div is present
+        multi_inputs_group = problem_html.xpath('//div[@class="multi-inputs-group"]')
+        self.assertEqual(len(multi_inputs_group), 0)
+
+
+@ddt.ddt
+class CAPAMultiInputProblemTest(unittest.TestCase):
+    """ TestCase for CAPA problems with multiple inputtypes """
+
+    def capa_problem(self, xml):
+        """
+        Create capa problem.
+        """
+        return new_loncapa_problem(xml, use_capa_render_template=True)
+
+    def assert_problem_html(self, problme_html, group_label, *input_labels):
+        """
+        Verify that correct html is rendered for multiple inputtypes.
+        """
+        html = etree.XML(problme_html)
+
+        # verify that only one multi input group div is present at correct path
+        multi_inputs_group = html.xpath(
+            '//section[@class="wrapper-problem-response"]/div[@class="multi-inputs-group"]'
+        )
+        self.assertEqual(len(multi_inputs_group), 1)
+
+        # verify that multi input group label <p> tag exists and its
+        # id matches with correct multi input group aria-labelledby
+        multi_inputs_group_label_id = multi_inputs_group[0].attrib.get('aria-labelledby')
+        multi_inputs_group_label = html.xpath('//p[@id="{}"]'.format(multi_inputs_group_label_id))
+        self.assertEqual(len(multi_inputs_group_label), 1)
+        self.assertEqual(multi_inputs_group_label[0].text, group_label)
+
+        # verify that label for each input comes only once
+        for input_label in input_labels:
+            # normalize-space is used to remove whitespace around the text
+            input_label_element = multi_inputs_group[0].xpath('//*[normalize-space(text())="{}"]'.format(input_label))
+            self.assertEqual(len(input_label_element), 1)
+
+    def test_optionresponse(self):
+        """
+        Verify that optionresponse problem with multiple inputtypes is rendered correctly.
+        """
+        group_label = 'Choose the correct color'
+        input1_label = 'What color is the sky?'
+        input2_label = 'What color are pine needles?'
+        xml = """
+        <problem>
+            <optionresponse>
+                <label>{}</label>
+                <optioninput options="('yellow','blue','green')" correct="blue" label="{}"/>
+                <optioninput options="('yellow','blue','green')" correct="green" label="{}"/>
+            </optionresponse>
+        </problem>
+        """.format(group_label, input1_label, input2_label)
+        problem = self.capa_problem(xml)
+        self.assert_problem_html(problem.get_html(), group_label, input1_label, input2_label)
+
+    @ddt.unpack
+    @ddt.data(
+        {'inputtype': 'textline'},
+        {'inputtype': 'formulaequationinput'}
+    )
+    def test_customresponse(self, inputtype):
+        """
+        Verify that customresponse problem with multiple textline
+        and formulaequationinput inputtypes is rendered correctly.
+        """
+        group_label = 'Enter two integers that sum to 10.'
+        input1_label = 'Integer 1'
+        input2_label = 'Integer 2'
+        xml = textwrap.dedent("""
+        <problem>
+            <customresponse cfn="test_add_to_ten">
+        <script type="loncapa/python">
+        def test_add_to_ten(expect, ans):
+            return test_add(10, ans)
+        </script>
+                <label>{}</label>
+                <{inputtype} size="40" correct_answer="3" label="{}" /><br/>
+                <{inputtype} size="40" correct_answer="7" label="{}" />
+            </customresponse>
+        </problem>
+        """.format(group_label, input1_label, input2_label, inputtype=inputtype))
+        problem = self.capa_problem(xml)
+        self.assert_problem_html(problem.get_html(), group_label, input1_label, input2_label)

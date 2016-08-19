@@ -1296,6 +1296,9 @@ class CapaMixin(CapaFields):
                 'correct': is_correct,
                 'variant': variant,
             }
+            # Add group_label in event data only if the responsetype contains multiple inputtypes
+            if answer_input.response_data.get('group_label'):
+                input_metadata[input_id]['group_label'] = answer_input.response_data.get('group_label')
 
         return input_metadata
 
