@@ -60,7 +60,7 @@
     </fieldset>
     <div class="indicator-container">
         % if input_type == 'checkbox' or not value:
-            <span class="status ${status.classname if show_correctness != 'never' else 'unanswered'}" id="status_${id}" data-tooltip="${status.display_tooltip}">
+            <span class="status ${status.classname if show_correctness != 'never' else 'unanswered'}" id="status_${id}" aria-describedby="${id}-legend" data-tooltip="${status.display_tooltip}">
                 <span class="sr">${status.display_tooltip}</span>
             </span>
         % endif
@@ -69,6 +69,6 @@
     <div class="capa_alert">${submitted_message}</div>
     %endif
     % if msg:
-    <span class="message">${HTML(msg)}</span>
+    <span class="message" aria-describedby="${id}-legend" aria-live="polite" tabindex="-1">${HTML(msg)}</span>
     % endif
 </form>

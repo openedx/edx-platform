@@ -27,6 +27,12 @@ $correct: $green-d2;
 $partiallycorrect: $green-d2;
 $incorrect: $red;
 
+// FontAwesome Icon code
+// ====================
+$checkmark-icon: '\f00c';
+$cross-icon: '\f00d';
+$asterisk-icon: '\f069';
+
 @import '../../../../../static/sass/edx-pattern-library-shims/base/variables';
 
 // +Extends - Capa
@@ -72,19 +78,30 @@ h2 {
   }
 }
 
-.feedback-hint-correct {
-  margin-top: ($baseline/2);
-  color: $correct;
+.explanation-title {
+  font-weight: bold;
 }
 
-.feedback-hint-partially-correct {
-  margin-top: ($baseline/2);
-  color: $partiallycorrect;
+%feedback-hint {
+  margin-top: ($baseline / 4);
+  .icon {
+    @include margin-right($baseline / 4);
+  }
 }
 
 .feedback-hint-incorrect {
-  margin-top: ($baseline/2);
-  color: $incorrect;
+  @extend %feedback-hint;
+  .icon {
+    color: $incorrect;
+  }
+}
+
+.feedback-hint-partially-correct,
+.feedback-hint-correct {
+  @extend %feedback-hint;
+  .icon {
+    color: $correct;
+  }
 }
 
 .feedback-hint-text {
@@ -97,7 +114,6 @@ h2 {
 }
 
 .hint-label {
-  font-weight: bold;
   display: inline-block;
   padding-right: 0.5em;
 }
@@ -155,19 +171,18 @@ div.problem {
   }
 
   .question-description {
-    @include margin(($baseline*0.75), 0);
+    color: $gray-d1;
+    font-size: $small-font-size;
   }
 
   form > label, .problem-group-label {
     display: block;
-    margin-bottom: $baseline;
+    margin-bottom: 0;
     font: inherit;
     color: inherit;
+    -webkit-font-smoothing: initial;
   }
 
-  .wrapper-problem-response:not(:last-child) {
-    margin-bottom: $baseline;
-  }
 }
 
 // Choice Group - silent class
@@ -196,7 +211,7 @@ div.problem {
     }
 
     &.choicegroup_correct {
-      @include status-icon($correct, "\f00c");
+      @include status-icon($correct, $checkmark-icon);
       border: 2px solid $correct;
 
       // keep green for correct answers on hover.
@@ -206,7 +221,7 @@ div.problem {
     }
 
     &.choicegroup_partially-correct {
-      @include status-icon($partiallycorrect, "\f069");
+      @include status-icon($partiallycorrect, $asterisk-icon);
       border: 2px solid $partiallycorrect;
 
       // keep green for correct answers on hover.
@@ -216,7 +231,7 @@ div.problem {
     }
 
     &.choicegroup_incorrect {
-      @include status-icon($incorrect, "\f00d");
+      @include status-icon($incorrect, $cross-icon);
       border: 2px solid $incorrect;
 
       // keep red for incorrect answers on hover.
@@ -256,6 +271,8 @@ div.problem {
       @include padding($baseline/2);
       @include padding-left($baseline*1.75);
       position: relative;
+      font-size: $base-font-size;
+      line-height: $base-line-height;
     }
 
     input[type="radio"],
@@ -281,27 +298,19 @@ div.problem {
 
       // CASE: correct answer
       &.correct {
-        @include status-icon($correct, "\f00c");
+        @include status-icon($correct, $checkmark-icon);
       }
 
       // CASE: partially correct answer
       &.partially-correct {
-        @include status-icon($partiallycorrect, "\f069");
+        @include status-icon($partiallycorrect, $asterisk-icon);
       }
 
       // CASE: incorrect answer
       &.incorrect {
-        @include status-icon($incorrect, "\f00d");
+        @include status-icon($incorrect, $cross-icon);
       }
 
-      // CASE: unanswered
-      &.unanswered {
-        @include status-icon($gray-l4, "\f128");
-      }
-
-      // CASE: processing
-      &.processing {
-      }
     }
   }
 }
@@ -324,12 +333,7 @@ div.problem {
     > span {
       margin: $baseline 0;
       display: block;
-      border: 1px solid #ddd;
-      padding: 9px 15px $baseline;
-      background: $white;
       position: relative;
-      box-shadow: inset 0 0 0 1px #eee;
-      border-radius: 3px;
 
       &:empty {
         display: none;
@@ -339,14 +343,8 @@ div.problem {
 
   .targeted-feedback-span {
     > span {
-      margin: $baseline 0;
       display: block;
-      border: 1px solid $black;
-      padding: 9px 15px $baseline;
-      background: $white;
       position: relative;
-      box-shadow: inset 0 0 0 1px #eee;
-      border-radius: 3px;
 
       &:empty {
         display: none;
@@ -363,13 +361,6 @@ div.problem {
         margin-top: -2px;
       }
 
-      &.status {
-        @include margin(8px, 0, 0, ($baseline/2));
-        text-indent: 100%;
-        white-space: nowrap;
-        overflow: hidden;
-      }
-
       span.clarification i {
         font-style: normal;
         &:hover {
@@ -378,21 +369,18 @@ div.problem {
       }
     }
 
-    &.unanswered {
-      p.status {
-        display: inline-block;
-        width: 14px;
-        height: 14px;
-        background: url('#{$static-path}/images/unanswered-icon.png') center center no-repeat;
+    .unanswered {
+      p.status.drag-and-drop--status {
+        @include margin(8px, 0, 0, ($baseline/2));
+        text-indent: 100%;
+        white-space: nowrap;
+        overflow: hidden;
       }
     }
 
     &.correct, &.ui-icon-check {
       p.status {
-        display: inline-block;
-        width: 25px;
-        height: 20px;
-        background: url('#{$static-path}/images/correct-icon.png') center center no-repeat;
+        @include status-icon($correct, $checkmark-icon);
       }
 
       input {
@@ -402,10 +390,7 @@ div.problem {
 
     &.partially-correct, &.ui-icon-check {
       p.status {
-        display: inline-block;
-        width: 25px;
-        height: 20px;
-        background: url('#{$static-path}/images/partially-correct-icon.png') center center no-repeat;
+        @include status-icon($partiallycorrect, $asterisk-icon);
       }
 
       input {
@@ -428,10 +413,7 @@ div.problem {
 
     &.ui-icon-close {
       p.status {
-        display: inline-block;
-        width: 20px;
-        height: 20px;
-        background: url('#{$static-path}/images/incorrect-icon.png') center center no-repeat;
+        @include status-icon($incorrect, $cross-icon);
       }
 
       input {
@@ -442,10 +424,7 @@ div.problem {
     &.incorrect, &.incomplete {
 
       p.status {
-        display: inline-block;
-        width: 20px;
-        height: 20px;
-        background: url('#{$static-path}/images/incorrect-icon.png') center center no-repeat;
+        @include status-icon($incorrect, $cross-icon);
       }
 
       input {
@@ -458,7 +437,6 @@ div.problem {
     }
 
     p.answer {
-      @include margin-left($baseline/2);
       display: inline-block;
       margin-bottom: 0;
 
@@ -778,6 +756,11 @@ div.problem {
 .problem {
   .capa_inputtype.textline, .inputtype.formulaequationinput {
 
+    label {
+      margin-top: $baseline / 2;
+      display: inline-block;
+    }
+
     input {
       @include box-sizing(border-box);
       border: 2px solid $gray-l4;
@@ -789,7 +772,6 @@ div.problem {
     .status {
       display: inline-block;
       margin-top: ($baseline/2);
-      @include margin-left($baseline*.75);
       background: none;
     }
 
@@ -801,7 +783,7 @@ div.problem {
       }
 
       .status {
-        @include status-icon($incorrect, "\f00d");
+        @include status-icon($incorrect, $cross-icon);
       }
     }
 
@@ -813,7 +795,7 @@ div.problem {
       }
 
       .status {
-        @include status-icon($partiallycorrect, "\f069");
+        @include status-icon($partiallycorrect, $asterisk-icon);
       }
     }
 
@@ -825,7 +807,7 @@ div.problem {
       }
 
       .status {
-        @include status-icon($correct, "\f00c");
+        @include status-icon($correct, $checkmark-icon);
       }
     }
 
@@ -836,13 +818,11 @@ div.problem {
         border: 2px solid $gray-l4;
       }
 
-      .status {
-        @include status-icon($gray-l4, "\f128");
-      }
     }
   }
 
   .trailing_text {
+    @include margin-right($baseline/2);
     display: inline-block;
   }
 }
@@ -853,7 +833,6 @@ div.problem {
 .problem {
   .inputtype.option-input {
     margin: (-$baseline/2) 0 $baseline;
-    padding-bottom: $baseline;
 
     .indicator-container {
       display: inline-block;
@@ -955,16 +934,16 @@ div.problem .action {
     margin-bottom: $baseline / 2;
 
     @media (min-width: $bp-screen-md) {
-      position: absolute;
       @include right($baseline * 1.5);
       margin-top: -$baseline / 2;
+      position: absolute;
     }
 
   }
 
   .problem-action-button-wrapper {
     @include padding(($baseline / 10) 0 $baseline ($baseline / 4));
-    border-right: 1px solid $light-gray1;
+    @include border-right(1px solid $light-gray1);
     &:last-child {
       border: none;
     }
@@ -1029,58 +1008,28 @@ div.problem {
   }
 
   .detailed-solution {
-    > p:first-child {
-      @extend %t-strong;
-      color: $gray;
-      text-transform: uppercase;
-      font-style: normal;
-      font-size: 0.9em;
-    }
+    > p {
+      margin: 0;
+      font-size: $medium-font-size;
 
-    p:last-child {
-      margin-bottom: 0;
+      &:first-child {
+        @extend %t-strong;
+        margin-bottom: 0;
+      }
     }
   }
 
-  .detailed-targeted-feedback {
-    > p:first-child {
-       @extend %t-strong;
-      color: $incorrect;
-      text-transform: uppercase;
-      font-style: normal;
-      font-size: 0.9em;
-    }
-
-    p:last-child {
-      margin-bottom: 0;
-    }
-  }
-
-  .detailed-targeted-feedback-partially-correct {
-    > p:first-child {
-       @extend %t-strong;
-      color: $partiallycorrect;
-      text-transform: uppercase;
-      font-style: normal;
-      font-size: 0.9em;
-    }
-
-    p:last-child {
-      margin-bottom: 0;
-    }
-  }
-
+  .detailed-targeted-feedback,
+  .detailed-targeted-feedback-partially-correct,
   .detailed-targeted-feedback-correct {
-    > p:first-child {
-       @extend %t-strong;
-      color: $correct;
-      text-transform: uppercase;
-      font-style: normal;
-      font-size: 0.9em;
-    }
+    > p {
+        margin: 0;
+        font-size: $medium-font-size;
+        font-weight: normal;
 
-    p:last-child {
-      margin-bottom: 0;
+        &:first-child {
+          @extend %t-strong;
+        }
     }
   }
 
@@ -1531,7 +1480,7 @@ div.problem {
 
     label.choicetextgroup_show_correct, section.choicetextgroup_show_correct {
       &:after {
-        margin-left:15px;
+        @include margin-left($baseline*.75);
         content: url('#{$static-path}/images/correct-icon.png');
       }
     }
@@ -1557,15 +1506,15 @@ div.problem .imageinput.capa_inputtype {
   }
 
   .correct {
-    background: url('#{$static-path}/images/correct-icon.png') center center no-repeat;
+    @include status-icon($correct, $checkmark-icon);
   }
 
   .incorrect {
-    background: url('#{$static-path}/images/incorrect-icon.png') center center no-repeat;
+    @include status-icon($incorrect, $cross-icon);
   }
 
   .partially-correct {
-    background: url('#{$static-path}/images/partially-correct-icon.png') center center no-repeat;
+    @include status-icon($partiallycorrect, $asterisk-icon);
   }
 }
 
@@ -1584,14 +1533,14 @@ div.problem .annotation-input {
   }
 
   .correct {
-    background: url('#{$static-path}/images/correct-icon.png') center center no-repeat;
+    @include status-icon($correct, $checkmark-icon);
   }
 
   .incorrect {
-    background: url('#{$static-path}/images/incorrect-icon.png') center center no-repeat;
+    @include status-icon($incorrect, $cross-icon);
   }
 
   .partially-correct {
-    background: url('#{$static-path}/images/partially-correct-icon.png') center center no-repeat;
+    @include status-icon($partiallycorrect, $asterisk-icon);
   }
 }
