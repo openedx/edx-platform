@@ -10,5 +10,5 @@
 
     <input type="file" name="input_${id}" id="input_${id}" value="${value}" multiple="multiple" data-required_files="${required_files|h}" data-allowed_files="${allowed_files|h}" aria-label="${response_data['label']}"/>
   </div>
-    <div class="message">${HTML(msg)}</div>
+    <div class="message" aria-describedby="answer_input_${id}" tabindev="-1">${HTML(msg)}</div>
 </section>

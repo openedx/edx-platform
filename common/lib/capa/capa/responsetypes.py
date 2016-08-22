@@ -343,9 +343,9 @@ class LoncapaResponse(object):
         # Tricky: label None means output defaults, while '' means output empty label
         if label is None:
             if correct:
-                label = _(u'Correct')
+                label = u'<span class="icon fa fa-check" aria-hidden="true"></span>Correct'
             else:
-                label = _(u'Incorrect')
+                label = u'<span class="icon fa fa-close" aria-hidden="true"></span>Incorrect'
 
         # self.runtime.track_function('get_demand_hint', event_info)
         # This this "feedback hint" event
@@ -364,14 +364,22 @@ class LoncapaResponse(object):
 
         # Form the div-wrapped hint texts
         hints_wrap = u''.join(
-            [u'<div class="{0}">{1}</div>'.format(QUESTION_HINT_TEXT_STYLE, dct.get('text'))
-             for dct in hint_log]
+            [u'<div class="{question_hint_text_style}">{text}</div>'.format(
+                question_hint_text_style=QUESTION_HINT_TEXT_STYLE,
+                text=dct.get('text')
+            ) for dct in hint_log]
         )
         if multiline_mode:
-            hints_wrap = u'<div class="{0}">{1}</div>'.format(QUESTION_HINT_MULTILINE, hints_wrap)
+            hints_wrap = u'<div class="{question_hint_multiline}">{hints_wrap}</div>'.format(
+                question_hint_multiline=QUESTION_HINT_MULTILINE,
+                hints_wrap=hints_wrap
+            )
         label_wrap = ''
         if label:
-            label_wrap = u'<div class="{0}">{1}: </div>'.format(QUESTION_HINT_LABEL_STYLE, label)
+            label_wrap = u'<span class="{question_hint_label_style}">{label}: </span>'.format(
+                question_hint_label_style=QUESTION_HINT_LABEL_STYLE,
+                label=label
+            )
 
         # Establish the outer style
         if correct:
@@ -380,7 +388,12 @@ class LoncapaResponse(object):
             style = QUESTION_HINT_INCORRECT_STYLE
 
         # Ready to go
-        return u'<div class="{0}">{1}{2}</div>'.format(style, label_wrap, hints_wrap)
+        return u'<div class="{style}"><div class="explanation-title">{text}:</div>{labelwrap}{hintswrap}</div>'.format(
+            style=style,
+            text=_("Answer"),
+            labelwrap=label_wrap,
+            hintswrap=hints_wrap
+        )
 
     def get_extended_hints(self, student_answers, new_cmap):
         """

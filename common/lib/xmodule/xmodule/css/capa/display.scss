@@ -27,6 +27,12 @@ $correct: $green-d2;
 $partiallycorrect: $green-d2;
 $incorrect: $red;
 
+// FontAwesome Icon code
+// ====================
+$checkmark-icon: '\f00c';
+$cross-icon: '\f00d';
+$asterisk-icon: '\f069';
+
 @import '../../../../../static/sass/edx-pattern-library-shims/base/variables';
 
 // +Extends - Capa
@@ -72,19 +78,29 @@ h2 {
   }
 }
 
-.feedback-hint-correct {
-  margin-top: ($baseline/2);
-  color: $correct;
+.explanation-title {
+  font-weight: bold;
 }
 
-.feedback-hint-partially-correct {
-  margin-top: ($baseline/2);
-  color: $partiallycorrect;
+%feedback-hint {
+  margin-top: ($baseline / 4);
+  .icon {
+    @include margin-right($baseline / 4);
+  }
 }
 
 .feedback-hint-incorrect {
-  margin-top: ($baseline/2);
-  color: $incorrect;
+  @extend %feedback-hint;
+  .icon {
+    color: $incorrect;
+  }
+}
+
+.feedback-hint-partially-correct,
+.feedback-hint-correct {
+  .icon {
+    color: $correct;
+  }
 }
 
 .feedback-hint-text {
@@ -97,7 +113,6 @@ h2 {
 }
 
 .hint-label {
-  font-weight: bold;
   display: inline-block;
   padding-right: 0.5em;
 }
@@ -196,7 +211,7 @@ div.problem {
     }
 
     &.choicegroup_correct {
-      @include status-icon($correct, "\f00c");
+      @include status-icon($correct, $checkmark-icon);
       border: 2px solid $correct;
 
       // keep green for correct answers on hover.
@@ -206,7 +221,7 @@ div.problem {
     }
 
     &.choicegroup_partially-correct {
-      @include status-icon($partiallycorrect, "\f069");
+      @include status-icon($partiallycorrect, "$asterisk-icon");
       border: 2px solid $partiallycorrect;
 
       // keep green for correct answers on hover.
@@ -216,7 +231,7 @@ div.problem {
     }
 
     &.choicegroup_incorrect {
-      @include status-icon($incorrect, "\f00d");
+      @include status-icon($incorrect, $cross-icon);
       border: 2px solid $incorrect;
 
       // keep red for incorrect answers on hover.
@@ -281,27 +296,19 @@ div.problem {
 
       // CASE: correct answer
       &.correct {
-        @include status-icon($correct, "\f00c");
+        @include status-icon($correct, $checkmark-icon);
       }
 
       // CASE: partially correct answer
       &.partially-correct {
-        @include status-icon($partiallycorrect, "\f069");
+        @include status-icon($partiallycorrect, "$asterisk-icon");
       }
 
       // CASE: incorrect answer
       &.incorrect {
-        @include status-icon($incorrect, "\f00d");
+        @include status-icon($incorrect, $cross-icon);
       }
 
-      // CASE: unanswered
-      &.unanswered {
-        @include status-icon($gray-l4, "\f128");
-      }
-
-      // CASE: processing
-      &.processing {
-      }
     }
   }
 }
@@ -324,12 +331,7 @@ div.problem {
     > span {
       margin: $baseline 0;
       display: block;
-      border: 1px solid #ddd;
-      padding: 9px 15px $baseline;
-      background: $white;
       position: relative;
-      box-shadow: inset 0 0 0 1px #eee;
-      border-radius: 3px;
 
       &:empty {
         display: none;
@@ -375,15 +377,6 @@ div.problem {
         &:hover {
           color: $blue;
         }
-      }
-    }
-
-    &.unanswered {
-      p.status {
-        display: inline-block;
-        width: 14px;
-        height: 14px;
-        background: url('#{$static-path}/images/unanswered-icon.png') center center no-repeat;
       }
     }
 
@@ -458,7 +451,6 @@ div.problem {
     }
 
     p.answer {
-      @include margin-left($baseline/2);
       display: inline-block;
       margin-bottom: 0;
 
@@ -778,6 +770,11 @@ div.problem {
 .problem {
   .capa_inputtype.textline, .inputtype.formulaequationinput {
 
+    label {
+      margin-top: $baseline / 2;
+      display: inline-block;
+    }
+
     input {
       @include box-sizing(border-box);
       border: 2px solid $gray-l4;
@@ -789,7 +786,6 @@ div.problem {
     .status {
       display: inline-block;
       margin-top: ($baseline/2);
-      @include margin-left($baseline*.75);
       background: none;
     }
 
@@ -801,7 +797,7 @@ div.problem {
       }
 
       .status {
-        @include status-icon($incorrect, "\f00d");
+        @include status-icon($incorrect, $cross-icon);
       }
     }
 
@@ -813,7 +809,7 @@ div.problem {
       }
 
       .status {
-        @include status-icon($partiallycorrect, "\f069");
+        @include status-icon($partiallycorrect, "$asterisk-icon");
       }
     }
 
@@ -836,13 +832,11 @@ div.problem {
         border: 2px solid $gray-l4;
       }
 
-      .status {
-        @include status-icon($gray-l4, "\f128");
-      }
     }
   }
 
   .trailing_text {
+    @include margin-right($baseline/2);
     display: inline-block;
   }
 }
@@ -853,7 +847,6 @@ div.problem {
 .problem {
   .inputtype.option-input {
     margin: (-$baseline/2) 0 $baseline;
-    padding-bottom: $baseline;
 
     .indicator-container {
       display: inline-block;
@@ -1031,10 +1024,6 @@ div.problem {
   .detailed-solution {
     > p:first-child {
       @extend %t-strong;
-      color: $gray;
-      text-transform: uppercase;
-      font-style: normal;
-      font-size: 0.9em;
     }
 
     p:last-child {
@@ -1045,10 +1034,7 @@ div.problem {
   .detailed-targeted-feedback {
     > p:first-child {
        @extend %t-strong;
-      color: $incorrect;
-      text-transform: uppercase;
-      font-style: normal;
-      font-size: 0.9em;
+       color: $incorrect;
     }
 
     p:last-child {
@@ -1531,7 +1517,7 @@ div.problem {
 
     label.choicetextgroup_show_correct, section.choicetextgroup_show_correct {
       &:after {
-        margin-left:15px;
+        @include margin-left($baseline*.75);
         content: url('#{$static-path}/images/correct-icon.png');
       }
     }
@@ -1557,15 +1543,15 @@ div.problem .imageinput.capa_inputtype {
   }
 
   .correct {
-    background: url('#{$static-path}/images/correct-icon.png') center center no-repeat;
+    @include status-icon($correct, "\f00c");
   }
 
   .incorrect {
-    background: url('#{$static-path}/images/incorrect-icon.png') center center no-repeat;
+    @include status-icon($incorrect, $cross-icon);
   }
 
   .partially-correct {
-    background: url('#{$static-path}/images/partially-correct-icon.png') center center no-repeat;
+    @include status-icon($partiallycorrect, "$asterisk-icon");
   }
 }
 
@@ -1584,14 +1570,14 @@ div.problem .annotation-input {
   }
 
   .correct {
-    background: url('#{$static-path}/images/correct-icon.png') center center no-repeat;
+    @include status-icon($correct, "\f00c");
   }
 
   .incorrect {
-    background: url('#{$static-path}/images/incorrect-icon.png') center center no-repeat;
+    @include status-icon($incorrect, $cross-icon);
   }
 
   .partially-correct {
-    background: url('#{$static-path}/images/partially-correct-icon.png') center center no-repeat;
+    @include status-icon($partiallycorrect, "$asterisk-icon");
   }
 }

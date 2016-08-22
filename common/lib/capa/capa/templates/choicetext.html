@@ -62,7 +62,9 @@
 
     <div class="indicator-container">
     % if input_type == 'checkbox' or not element_checked:
-        <span class="status ${status.classname}" id="status_${id}"></span>
+        <span class="status ${status.classname}" id="status_${id}">
+            <span class="sr">${_(status.display_name)}</span>
+        </span>
     % endif
     </div>
 
@@ -70,7 +72,7 @@
     <div class="capa_alert">${_(submitted_message)}</div>
     %endif
     % if msg:
-    <span class="message">${msg|n}</span>
+    <span class="message" aria-describedby="answer_choicetextinput_${id}" tabindex="-1">${msg|n}</span>
     % endif
 </form>
 </section>

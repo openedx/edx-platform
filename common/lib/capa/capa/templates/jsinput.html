@@ -52,6 +52,6 @@
   % endif
 
   % if msg:
-      <span class="message">${msg|n}</span>
+      <span class="message" aria-describedby="answer_iframe_${id}" tabindex="-1">${msg|n}</span>
   % endif
 </section>

@@ -2,7 +2,7 @@
 <% doinline = "inline" if inline else "" %>
 
 <form class="inputtype option-input ${doinline}">
-  <label class="problem-group-label" for="input_${id}">
+  <label class="problem-group-label" for="input_${id}" id="${response_data['label']}">
     ${response_data['label']}
   </label>
 
@@ -30,6 +30,10 @@
   </div>
   <p class="answer" id="answer_${id}"></p>
   % if msg:
+<<<<<<< d725cb70b8bf72e46cdfe539a3198e3b84b193f8
       <span class="message">${HTML(msg)}</span>
+=======
+      <span class="message" aria-describedby="answer_${response_data['label']}" tabindex="-1">${msg|n}</span>
+>>>>>>> problem feedback and explanation specs
   % endif
 </form>
