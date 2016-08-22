@@ -16,7 +16,7 @@
     <div style="display:none;" name="${hidden}" inputid="input_${id}" />
 % endif
 
-<label class="problem-group-label" for="input_${id}">${response_data['label']}</label>
+<label class="problem-group-label" for="input_${id}" id="label_${id}">${response_data['label']}</label>
 % for description_id, description_text in response_data['descriptions'].items():
     <p class="question-description" id="${description_id}">${description_text}</p>
 % endfor
@@ -33,7 +33,7 @@
 />
 <span class="trailing_text">${trailing_text}</span>
 
-<span class="status" aria-describedby="input_${id}" data-tooltip="${status.display_tooltip}">
+<span class="status" aria-describedby="label_${id}" data-tooltip="${status.display_tooltip}">
     <span class="sr">
       %if value:
         ${value}
@@ -57,7 +57,7 @@
 % endif
 
   % if msg:
-      <span class="message">${HTML(msg)}</span>
+      <span class="message" aria-describedby="label_${id}" aria-live="polite" tabindex="-1">${HTML(msg)}</span>
   % endif
 
 </div>

@@ -248,15 +248,7 @@
         color: $color-visibility-set;
       }
     }
-    
-    .action {
-        
-        .save {
-            // taking styles from LMS for these Save buttons to maintain consistency
-            // there is no studio-specific style for these LMS-styled buttons
-            @extend %btn-lms-style;
-        }
-    }
+
   }
 
   // +Messaging - Xblocks

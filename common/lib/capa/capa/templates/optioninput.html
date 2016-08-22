@@ -2,7 +2,7 @@
 <% doinline = "inline" if inline else "" %>
 
 <form class="inputtype option-input ${doinline}">
-  <label class="problem-group-label" for="input_${id}">
+  <label class="problem-group-label" for="input_${id}" id="label_${id}">
     ${response_data['label']}
   </label>
 
@@ -24,12 +24,12 @@
   <div class="indicator-container">
     <span class="status ${status.classname}"
         id="status_${id}"
-        aria-describedby="input_${id}" data-tooltip="${status.display_tooltip}">
+        aria-describedby="label_${id}" data-tooltip="${status.display_tooltip}">
         <span class="sr">${value|h} - ${status.display_tooltip}</span>
     </span>
   </div>
   <p class="answer" id="answer_${id}"></p>
   % if msg:
-      <span class="message">${HTML(msg)}</span>
+      <span class="message" aria-describedby="label_${id}" aria-live="polite" tabindex="-1">${HTML(msg)}</span>
   % endif
 </form>

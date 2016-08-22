@@ -11,7 +11,7 @@
     <input type="hidden" name="input_${id}" id="input_${id}" aria-describedby="answer_${id}" value="${value|h}"/>
 
     <p class="status" aria-describedby="input_${id}">
-    ${status.display_name}
+        <span class="sr">${status.display_name}</span>
     </p>
 
     <p id="answer_${id}" class="answer"></p>

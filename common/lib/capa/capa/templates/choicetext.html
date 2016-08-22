@@ -1,4 +1,7 @@
-<%! from django.utils.translation import ugettext as _ %>
+<%!
+from django.utils.translation import ugettext as _
+from openedx.core.djangolib.markup import HTML
+%>
 <% element_checked = False %>
 % for choice_id, _ in choices:
     <%choice_id = choice_id %>
@@ -62,7 +65,9 @@
 
     <div class="indicator-container">
     % if input_type == 'checkbox' or not element_checked:
-        <span class="status ${status.classname}" id="status_${id}"></span>
+        <span class="status ${status.classname}" id="status_${id}">
+            <span class="sr">${status.display_name}</span>
+        </span>
     % endif
     </div>
 
@@ -70,7 +75,7 @@
     <div class="capa_alert">${_(submitted_message)}</div>
     %endif
     % if msg:
-    <span class="message">${msg|n}</span>
+    <span class="message" aria-live="polite" tabindex="-1">${HTML(msg)}</span>
     % endif
 </form>
 </section>
