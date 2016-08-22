@@ -3,8 +3,12 @@ $light-gray1: rgb(221, 221, 221);
 
 
 // Font Sizes in em
-$small-font-size: 0.8em !default;
+$small-font-size: 0.85em !default;
 $medium-font-size: 0.9em !default;
+$base-font-size: 1em !default;
+
+// Line height
+$base-line-height: 1.5em !default;
 
 
 $component-border-radius:                   3px !default;
