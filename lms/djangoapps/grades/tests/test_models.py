@@ -111,8 +111,9 @@ class VisibleBlocksTest(GradesModelTestCase):
 
     def test_blocks_property(self):
         """
-        Ensures that, given an array of BlockRecord, creating visible_blocks and accessing visible_blocks.blocks yields
-        a copy of the initial array. Also, trying to set the blocks property should raise an exception.
+        Ensures that, given an array of BlockRecord, creating visible_blocks and accessing
+        visible_blocks.blocks yields a copy of the initial array. Also, trying to set the blocks property should raise
+        an exception.
         """
         expected_blocks = [self.record_a, self.record_b]
         visible_blocks = VisibleBlocks.objects.create_from_blockrecords(expected_blocks)
@@ -137,7 +138,7 @@ class PersistentSubsectionGradeTest(GradesModelTestCase):
             "user_id": 12345,
             "usage_key": self.usage_key,
             "course_version": "deadbeef",
-            "subtree_edited_date": "2016-08-01 18:53:24.354741",
+            "subtree_edited_timestamp": "2016-08-01 18:53:24.354741",
             "earned_all": 6,
             "possible_all": 12,
             "earned_graded": 6,
