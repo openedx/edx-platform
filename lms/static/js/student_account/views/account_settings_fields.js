@@ -164,11 +164,19 @@
                         data: data,
                         success: function() {
                             view.showSuccessMessage();
+                            view.setMessageTimeout();
                         },
                         error: function(xhr) {
                             view.showErrorMessage(xhr);
+                            view.setMessageTimeout();
                         }
                     });
+                },
+                setMessageTimeout: function() {
+                    var view = this;
+                    setTimeout(function() {
+                        view.showHelpMessage();
+                    }, 6000);
                 },
                 successMessage: function() {
                     return HtmlUtils.joinHtml(
