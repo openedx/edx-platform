@@ -42,15 +42,15 @@ class CourseGrade(object):
         return subsections_by_format
 
     @lazy
-    def locations_to_scores(self):
+    def locations_to_weighted_scores(self):
         """
         Returns a dict of problem scores keyed by their locations.
         """
-        locations_to_scores = {}
+        locations_to_weighted_scores = {}
         for chapter in self.chapter_grades:
             for subsection_grade in chapter['sections']:
-                locations_to_scores.update(subsection_grade.locations_to_scores)
-        return locations_to_scores
+                locations_to_weighted_scores.update(subsection_grade.locations_to_weighted_scores)
+        return locations_to_weighted_scores
 
     @property
     def has_access_to_course(self):
@@ -77,7 +77,7 @@ class CourseGrade(object):
         grade_summary['percent'] = round(grade_summary['percent'] * 100 + 0.05) / 100
         grade_summary['grade'] = self._compute_letter_grade(grade_summary['percent'])
         grade_summary['totaled_scores'] = self.subsection_grade_totals_by_format
-        grade_summary['raw_scores'] = list(self.locations_to_scores.itervalues())
+        grade_summary['raw_scores'] = list(self.locations_to_weighted_scores.itervalues())
 
         return grade_summary
 
@@ -115,8 +115,8 @@ class CourseGrade(object):
         composite module (a vertical or section ) the scores will be the sums of
         all scored problems that are children of the chosen location.
         """
-        if location in self.locations_to_scores:
-            score = self.locations_to_scores[location]
+        if location in self.locations_to_weighted_scores:
+            score = self.locations_to_weighted_scores[location]
             return score.earned, score.possible
         children = self.course_structure.get_children(location)
         earned = 0.0
