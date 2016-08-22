@@ -1053,7 +1053,7 @@ def _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, course
         try:
             with tracker.get_tracker().context(tracking_context_name, tracking_context):
                 resp = instance.handle(handler, req, suffix)
-                if suffix == 'problem_check' \
+                if suffix == 'problem_submit' \
                         and course \
                         and getattr(course, 'entrance_exam_enabled', False) \
                         and getattr(instance, 'in_entrance_exam', False):

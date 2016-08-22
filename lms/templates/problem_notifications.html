@@ -4,9 +4,10 @@ from django.utils.translation import ugettext as _
 from openedx.core.djangolib.markup import HTML
 %>
 
-<div class="notification ${notification_type}" tabindex="-1">
+<div class="notification ${notification_type} ${'notification-hint' if hint_notification else 'notification-response'}" tabindex="-1">
     <span class="icon fa fa-${notification_icon}" aria-hidden="true"></span>
-    <span class="notification-message">${notification_message}</span>
+    <span class="notification-message" aria-describedby="${notification_message}" aria-live="${notification_message}">${notification_message}
+    </span>
     <div class="notification-btn-wrapper">
         % if hint_notification:
         <button class="btn btn-default btn-small notification-btn">${_('Next Hint')}</button>

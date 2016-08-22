@@ -58,7 +58,7 @@ class ProblemSubmissionTestMixin(TestCase):
         problem_location: location of the problem on which we want some action
 
         dispatch: the the action string that gets passed to the view as a kwarg
-            example: 'check_problem' for having responses processed
+            example: 'submit_problem' for having responses processed
         """
         return reverse(
             'xblock_handler',
@@ -79,7 +79,7 @@ class ProblemSubmissionTestMixin(TestCase):
         """
 
         problem_location = self.problem_location(problem_url_name)
-        modx_url = self.modx_url(problem_location, 'problem_check')
+        modx_url = self.modx_url(problem_location, 'problem_submit')
 
         answer_key_prefix = 'input_{}_'.format(problem_location.html_id())
 

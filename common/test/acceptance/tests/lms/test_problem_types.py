@@ -147,26 +147,26 @@ class ProblemTypeTestMixin(object):
         When I answer a "<ProblemType>" problem "correctly"
         Then my "<ProblemType>" answer is marked "correct"
         And The "<ProblemType>" problem displays a "correct" answer
-        And a "problem_check" server event is emitted
-        And a "problem_check" browser event is emitted
+        And a "problem_submit" server event is emitted
+        And a "problem_submit" browser event is emitted
         """
         # Make sure we're looking at the right problem
         self.assertEqual(self.problem_page.problem_name, self.problem_name)
 
         # Answer the problem correctly
         self.answer_problem(correct=True)
-        self.problem_page.click_check()
+        self.problem_page.click_submit()
         self.wait_for_status('correct')
 
         # Check for corresponding tracking event
         expected_events = [
             {
                 'event_source': 'server',
-                'event_type': 'problem_check',
+                'event_type': 'problem_submit',
                 'username': self.username,
             }, {
                 'event_source': 'browser',
-                'event_type': 'problem_check',
+                'event_type': 'problem_submit',
                 'username': self.username,
             },
         ]
@@ -191,7 +191,7 @@ class ProblemTypeTestMixin(object):
 
         # Answer the problem incorrectly
         self.answer_problem(correct=False)
-        self.problem_page.click_check()
+        self.problem_page.click_submit()
         self.wait_for_status('incorrect')
 
     @attr(shard=7)
@@ -199,7 +199,7 @@ class ProblemTypeTestMixin(object):
         """
         Scenario: I can submit a blank answer
         Given I am viewing a "<ProblemType>" problem
-        When I check a problem
+        When I submit a problem
         Then my "<ProblemType>" answer is marked "incorrect"
         And The "<ProblemType>" problem displays a "blank" answer
         """
@@ -211,8 +211,8 @@ class ProblemTypeTestMixin(object):
             "Make sure the correct problem is on the page"
         )
         # Leave the problem unchanged and click check.
-        self.assertNotIn('is-disabled', self.problem_page.q(css='div.problem button.check').attrs('class')[0])
-        self.problem_page.click_check()
+        self.assertTrue(self.problem_page.q(css='.problem .submit').attrs('disabled'))
+        self.problem_page.click_submit()
         self.wait_for_status('incorrect')
 
     @attr(shard=7)
@@ -220,7 +220,7 @@ class ProblemTypeTestMixin(object):
         """
         Scenario: I can't submit a blank answer
         When I try to submit blank answer
-        Then I can't check a problem
+        Then I can't submit a problem
         """
         if self.can_submit_blank:
             raise SkipTest("Test incompatible with the current problem type")
@@ -229,7 +229,7 @@ class ProblemTypeTestMixin(object):
             lambda: self.problem_page.problem_name == self.problem_name,
             "Make sure the correct problem is on the page"
         )
-        self.assertIn('is-disabled', self.problem_page.q(css='div.problem button.check').attrs('class')[0])
+        self.assertTrue(self.problem_page.q(css='.problem .submit').attrs('disabled'))
 
     @attr(shard=7)
     def test_can_show_answer(self):
@@ -261,7 +261,7 @@ class ProblemTypeTestMixin(object):
         self.wait_for_status('unanswered')
         # Set an answer
         self.answer_problem(correct=True)
-        self.problem_page.click_check()
+        self.problem_page.click_submit()
         self.wait_for_status('correct')
         # clear the answers
         self.problem_page.click_reset()

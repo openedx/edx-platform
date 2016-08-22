@@ -1709,14 +1709,14 @@ class TestModuleTrackingContext(SharedModuleStoreTestCase):
            lambda self, block: ['test_aside'])
     def test_context_contains_aside_info(self, mock_tracker):
         """
-        Check that related xblock asides populate information in the 'problem_check' event in case
+        Check that related xblock asides populate information in the 'problem_submit' event in case
         the 'get_event_context' method is exist
         """
         problem_display_name = u'Test Problem'
 
         def get_event_context(self, event_type, event):  # pylint: disable=unused-argument
             """
-            This method return data that should be associated with the "check_problem" event
+            This method return data that should be associated with the "submit_problem" event
             """
             return {'content': 'test1', 'data_field': 'test2'}
 
@@ -1732,7 +1732,7 @@ class TestModuleTrackingContext(SharedModuleStoreTestCase):
     def handle_callback_and_get_context_info(self, mock_tracker, problem_display_name=None):
         """
         Creates a fake module, invokes the callback and extracts the 'context'
-        metadata from the emitted problem_check event.
+        metadata from the emitted problem_submit event.
         """
         descriptor_kwargs = {
             'category': 'problem',
@@ -1748,20 +1748,20 @@ class TestModuleTrackingContext(SharedModuleStoreTestCase):
             self.course.id.to_deprecated_string(),
             quote_slashes(descriptor.location.to_deprecated_string()),
             'xmodule_handler',
-            'problem_check',
+            'problem_submit',
         )
 
         self.assertEquals(len(mock_tracker.send.mock_calls), 1)
         mock_call = mock_tracker.send.mock_calls[0]
         event = mock_call[1][0]
 
-        self.assertEquals(event['event_type'], 'problem_check')
+        self.assertEquals(event['event_type'], 'problem_submit')
         return event['context']
 
     def handle_callback_and_get_module_info(self, mock_tracker, problem_display_name=None):
         """
         Creates a fake module, invokes the callback and extracts the 'module'
-        metadata from the emitted problem_check event.
+        metadata from the emitted problem_submit event.
         """
         event = self.handle_callback_and_get_context_info(mock_tracker, problem_display_name)
         return event['module']

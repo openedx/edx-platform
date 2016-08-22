@@ -550,7 +550,7 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
         request_factory = RequestFactory()
         data = {'input_{}_2_1'.format(unicode(self.problem_1.location.html_id())): 'choice_2'}
         request = request_factory.post(
-            'problem_check',
+            'problem_submit',
             data=data
         )
         request.user = self.user
@@ -559,7 +559,7 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
             unicode(self.course.id),
             unicode(self.problem_1.location),
             'xmodule_handler',
-            'problem_check',
+            'problem_submit',
         )
         self.assertEqual(response.status_code, 200)
         self.assertIn('entrance_exam_passed', response.content)

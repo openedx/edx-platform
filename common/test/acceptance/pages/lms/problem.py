@@ -110,11 +110,11 @@ class ProblemPage(PageObject):
         self.wait_for_element_invisibility('.loading', 'wait for loading icon to disappear')
         self.wait_for_ajax()
 
-    def click_check(self):
+    def click_submit(self):
         """
-        Click the Check button.
+        Click the Submit button.
         """
-        self.q(css='div.problem button.check').click()
+        self.q(css='div.problem button.submit').click()
         self.wait_for_ajax()
 
     def click_save(self):
