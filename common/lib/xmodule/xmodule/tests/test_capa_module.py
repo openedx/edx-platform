@@ -1550,7 +1550,7 @@ class CapaModuleTest(unittest.TestCase):
         module = CapaFactory.create()
         module.get_progress = Mock(wraps=module.get_progress)
         module.get_html()
-        module.get_progress.assert_called_once_with()
+        module.get_progress.assert_called_with()
 
     def test_get_problem(self):
         """

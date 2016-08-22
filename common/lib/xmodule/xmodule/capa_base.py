@@ -637,6 +637,43 @@ class CapaMixin(CapaFields):
         demand_hints = self.lcp.tree.xpath("//problem/demandhint/hint")
         demand_hint_possible = len(demand_hints) > 0
 
+        # Get the current problem status and generate the answer notification and message.
+        answer_notification_message = None
+        answer_notification_type = None
+        progress = self.get_progress()
+
+        if progress is not None:
+            key_list = self.correct_map.keys()
+            if len(key_list) == 1:
+                # Only one answer available or a missing progress and 1 or more answers.
+                answer_notification_type = self.correct_map.get(key_list[0]).get('correctness', None)
+            elif len(key_list) > 1:
+                # Look at the progress as we only want to show one notification for the problem. In this case there
+                # can be more that one correctness state in the correct_map.
+                if 0.0 < progress.percent() < 100.0:
+                    answer_notification_type = 'partially-correct'
+                elif progress.percent() == 100.0:
+                    answer_notification_type = 'correct'
+                else:
+                    answer_notification_type = 'incorrect'
+
+            ungettext = self.runtime.service(self, "i18n").ungettext
+            point_msg = ''
+            if progress is not None:
+                point_msg = ungettext(
+                    "{progress} point earned",
+                    "{progress} points earned",
+                    progress.frac()[1]
+                ).format(progress=str(progress))
+
+            # Build the notification message based on the notification type.
+            if answer_notification_type == 'incorrect':
+                answer_notification_message = 'Incorrect %s' % point_msg
+            elif answer_notification_type == 'correct':
+                answer_notification_message = 'Correct %s' % point_msg
+            elif answer_notification_type == 'partially-correct':
+                answer_notification_message = 'Partially correct %s' % point_msg
+
         context = {
             'problem': content,
             'id': self.location.to_deprecated_string(),
@@ -649,7 +686,9 @@ class CapaMixin(CapaFields):
             'answer_available': self.answer_available(),
             'attempts_used': self.attempts,
             'attempts_allowed': self.max_attempts,
-            'demand_hint_possible': demand_hint_possible
+            'demand_hint_possible': demand_hint_possible,
+            'answer_notification_type': answer_notification_type,
+            'answer_notification_message': answer_notification_message,
         }
 
         html = self.runtime.render_template('problem.html', context)

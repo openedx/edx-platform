@@ -114,8 +114,7 @@ class ProblemPage(PageObject):
         """
         Click the Submit button.
         """
-        self.q(css='div.problem button.submit').click()
-        self.wait_for_ajax()
+        click_css(self, '.problem .submit', require_notification=False)
 
     def click_save(self):
         """
@@ -163,6 +162,22 @@ class ProblemPage(PageObject):
         """
         msg = "Wait for status to be {}".format(message)
         self.wait_for_element_visibility(status_selector, msg)
+
+    def wait_success_notification_visible(self):
+        """
+        Check for visibility of the success notification and icon.
+        """
+        msg = "Wait for {} notification to be visible".format('success')
+        self.wait_for_element_visibility('.notification.success', msg)
+        self.wait_for_element_visibility('.fa-check', "Waiting for success icon")
+
+    def wait_incorrect_notification_visible(self):
+        """
+        Check for visibility of the incorrect notification and icon.
+        """
+        msg = "Wait for {} notification to be visible".format('error')
+        self.wait_for_element_visibility('.notification.error', msg)
+        self.wait_for_element_visibility('.fa-close', "Waiting for incorrect notification icon")
 
     def click_hint(self):
         """

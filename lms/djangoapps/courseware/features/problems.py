@@ -74,7 +74,7 @@ def answer_problem_step(step, problem_type, correctness):
     input_problem_answer(step, problem_type, correctness)
 
     # Submit the problem
-    submit_problem()
+    submit_problem(step)
 
 
 @step(u'I input an answer on a "([^"]*)" problem "([^"]*)ly"')
@@ -93,9 +93,7 @@ def submit_problem(step):
     # first scroll down so the loading mathjax button does not
     # cover up the Submit button
     world.browser.execute_script("window.scrollTo(0,1024)")
-    button_disabled = 'button.submit[disabled="disabled"]'
-    assert world.is_css_present(button_disabled)
-
+    assert world.is_css_not_present("button.submit.is-disabled")
     world.css_click("button.submit")
 
     # Wait for the problem to finish re-rendering
