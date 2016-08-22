@@ -671,7 +671,7 @@ class CapaModuleTest(unittest.TestCase):
         post_data.append((CapaFactoryWithFiles.input_key(response_num=3), 'None'))
         request = webob.Request.blank("/some/fake/url", POST=post_data, content_type='multipart/form-data')
 
-        module.handle('xmodule_handler', request, 'problem_check')
+        module.handle('xmodule_handler', request, 'problem_submit')
 
         self.assertEqual(xqueue_interface._http_post.call_count, 1)
         _, kwargs = xqueue_interface._http_post.call_args
@@ -991,55 +991,55 @@ class CapaModuleTest(unittest.TestCase):
         # Expect that we succeed
         self.assertTrue('success' in result and result['success'])
 
-    def test_check_button_name(self):
+    def test_submit_button_name(self):
         module = CapaFactory.create(attempts=0)
-        self.assertEqual(module.check_button_name(), "Submit")
+        self.assertEqual(module.submit_button_name(), "Submit")
 
-    def test_check_button_checking_name(self):
+    def test_submit_button_submitting_name(self):
         module = CapaFactory.create(attempts=1, max_attempts=10)
-        self.assertEqual(module.check_button_checking_name(), "Submitting")
+        self.assertEqual(module.submit_button_submitting_name(), "Submitting")
 
-    def test_should_show_check_button(self):
+    def test_should_enable_submit_button(self):
 
         attempts = random.randint(1, 10)
 
         # If we're after the deadline, do NOT show check button
         module = CapaFactory.create(due=self.yesterday_str)
-        self.assertFalse(module.should_show_check_button())
+        self.assertFalse(module.should_enable_submit_button())
 
         # If user is out of attempts, do NOT show the check button
         module = CapaFactory.create(attempts=attempts, max_attempts=attempts)
-        self.assertFalse(module.should_show_check_button())
+        self.assertFalse(module.should_enable_submit_button())
 
         # If survey question (max_attempts = 0), do NOT show the check button
         module = CapaFactory.create(max_attempts=0)
-        self.assertFalse(module.should_show_check_button())
+        self.assertFalse(module.should_enable_submit_button())
 
         # If user submitted a problem but hasn't reset,
         # do NOT show the check button
         # Note:  we can only reset when rerandomize="always" or "true"
         module = CapaFactory.create(rerandomize=RANDOMIZATION.ALWAYS, done=True)
-        self.assertFalse(module.should_show_check_button())
+        self.assertFalse(module.should_enable_submit_button())
 
         module = CapaFactory.create(rerandomize="true", done=True)
-        self.assertFalse(module.should_show_check_button())
+        self.assertFalse(module.should_enable_submit_button())
 
         # Otherwise, DO show the check button
         module = CapaFactory.create()
-        self.assertTrue(module.should_show_check_button())
+        self.assertTrue(module.should_enable_submit_button())
 
         # If the user has submitted the problem
         # and we do NOT have a reset button, then we can show the check button
         # Setting rerandomize to "never" or "false" ensures that the reset button
         # is not shown
         module = CapaFactory.create(rerandomize=RANDOMIZATION.NEVER, done=True)
-        self.assertTrue(module.should_show_check_button())
+        self.assertTrue(module.should_enable_submit_button())
 
         module = CapaFactory.create(rerandomize="false", done=True)
-        self.assertTrue(module.should_show_check_button())
+        self.assertTrue(module.should_enable_submit_button())
 
         module = CapaFactory.create(rerandomize=RANDOMIZATION.PER_STUDENT, done=True)
-        self.assertTrue(module.should_show_check_button())
+        self.assertTrue(module.should_enable_submit_button())
 
     def test_should_show_reset_button(self):
 
@@ -1175,11 +1175,11 @@ class CapaModuleTest(unittest.TestCase):
 
         # We've tested the show/hide button logic in other tests,
         # so here we hard-wire the values
-        show_check_button = bool(random.randint(0, 1) % 2)
+        enable_submit_button = bool(random.randint(0, 1) % 2)
         show_reset_button = bool(random.randint(0, 1) % 2)
         show_save_button = bool(random.randint(0, 1) % 2)
 
-        module.should_show_check_button = Mock(return_value=show_check_button)
+        module.should_enable_submit_button = Mock(return_value=enable_submit_button)
         module.should_show_reset_button = Mock(return_value=show_reset_button)
         module.should_show_save_button = Mock(return_value=show_save_button)
 
@@ -1208,7 +1208,7 @@ class CapaModuleTest(unittest.TestCase):
 
         context = render_args[1]
         self.assertEqual(context['problem']['html'], "<div>Test Problem HTML</div>")
-        self.assertEqual(bool(context['check_button']), show_check_button)
+        self.assertEqual(bool(context['submit_button']), enable_submit_button)
         self.assertEqual(bool(context['reset_button']), show_reset_button)
         self.assertEqual(bool(context['save_button']), show_save_button)
 

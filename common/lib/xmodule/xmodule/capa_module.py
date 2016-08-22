@@ -69,7 +69,7 @@ class CapaModule(CapaMixin, XModule):
         handlers = {
             'hint_button': self.hint_button,
             'problem_get': self.get_problem,
-            'problem_check': self.check_problem,
+            'problem_submit': self.submit_problem,
             'problem_reset': self.reset_problem,
             'problem_save': self.save_problem,
             'problem_show': self.get_answer,
@@ -270,9 +270,9 @@ class CapaDescriptor(CapaFields, RawDescriptor):
 
     # Proxy to CapaModule for access to any of its attributes
     answer_available = module_attr('answer_available')
-    check_button_name = module_attr('check_button_name')
-    check_button_checking_name = module_attr('check_button_checking_name')
-    check_problem = module_attr('check_problem')
+    submit_button_name = module_attr('submit_button_name')
+    submit_button_submitting_name = module_attr('submit_button_submitting_name')
+    submit_problem = module_attr('submit_problem')
     choose_new_seed = module_attr('choose_new_seed')
     closed = module_attr('closed')
     get_answer = module_attr('get_answer')
@@ -295,7 +295,7 @@ class CapaDescriptor(CapaFields, RawDescriptor):
     reset_problem = module_attr('reset_problem')
     save_problem = module_attr('save_problem')
     set_state_from_lcp = module_attr('set_state_from_lcp')
-    should_show_check_button = module_attr('should_show_check_button')
+    should_show_submit_button = module_attr('should_show_submit_button')
     should_show_reset_button = module_attr('should_show_reset_button')
     should_show_save_button = module_attr('should_show_save_button')
     update_score = module_attr('update_score')

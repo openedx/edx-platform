@@ -6,9 +6,9 @@ describe 'Markdown to xml extended hint dropdown', ->
       Translation between Dropdown and ________ is straightforward.
 
       [[
-         (Multiple Choice) 	 {{ Good Job::Yes, multiple choice is the right answer. }}
-         Text Input	                  {{ No, text input problems don't present options. }}
-         Numerical Input	 {{ No, numerical input problems don't present options. }}
+         (Multiple Choice)   {{ Good Job::Yes, multiple choice is the right answer. }}
+         Text Input                   {{ No, text input problems don't present options. }}
+         Numerical Input   {{ No, numerical input problems don't present options. }}
       ]]
 
 
@@ -16,8 +16,8 @@ describe 'Markdown to xml extended hint dropdown', ->
       Clowns have funny _________ to make people laugh.
 
       [[
-        dogs		{{ NOPE::Not dogs, not cats, not toads }}
-        (FACES)	{{ With lots of makeup, doncha know?}}
+        dogs    {{ NOPE::Not dogs, not cats, not toads }}
+        (FACES) {{ With lots of makeup, doncha know?}}
 
         money       {{ Clowns don't have any money, of course }}
         donkeys     {{don't be an ass.}}
@@ -55,9 +55,9 @@ describe 'Markdown to xml extended hint dropdown', ->
       Translation between Dropdown and ________ is straightforward.
 
       [[
-         (Right) 	 {{ Good Job::yes }}
-         Wrong 1	                  {{no}}
-         Wrong 2	 {{ Label::no }}
+         (Right)   {{ Good Job::yes }}
+         Wrong 1                    {{no}}
+         Wrong 2   {{ Label::no }}
       ]]
 
       || 0) zero ||
@@ -111,9 +111,9 @@ describe 'Markdown to xml extended hint dropdown', ->
   it 'produces xml with fewer newlines', ->
     data = MarkdownEditingDescriptor.markdownToXml("""
       >>q1<<
-      [[ (aa) 	 {{ hint1 }}
+      [[ (aa)    {{ hint1 }}
          bb
-         cc	 {{ hint2 }} ]]
+         cc  {{ hint2 }} ]]
     """)
     expect(data).toXMLEqual("""
     <problem>
@@ -167,9 +167,9 @@ describe 'Markdown to xml extended hint checkbox', ->
     data = MarkdownEditingDescriptor.markdownToXml("""
       >>Select all the fruits from the list<<
 
-      [x] Apple     	 	 {{ selected: You're right that apple is a fruit. }, {unselected: Remember that apple is also a fruit.}}
-      [ ] Mushroom	   	 {{U: You're right that mushrooms aren't fruit}, { selected: Mushroom is a fungus, not a fruit.}}
-      [x] Grape		     {{ selected: You're right that grape is a fruit }, {unselected: Remember that grape is also a fruit.}}
+      [x] Apple          {{ selected: You're right that apple is a fruit. }, {unselected: Remember that apple is also a fruit.}}
+      [ ] Mushroom       {{U: You're right that mushrooms aren't fruit}, { selected: Mushroom is a fungus, not a fruit.}}
+      [x] Grape        {{ selected: You're right that grape is a fruit }, {unselected: Remember that grape is also a fruit.}}
       [ ] Mustang
       [ ] Camero            {{S:I don't know what a Camero is but it isn't a fruit.},{U:What is a camero anyway?}}
 
@@ -180,10 +180,10 @@ describe 'Markdown to xml extended hint checkbox', ->
 
       >>Select all the vegetables from the list<<
 
-      [ ] Banana     	 	 {{ selected: No, sorry, a banana is a fruit. }, {unselected: poor banana.}}
+      [ ] Banana         {{ selected: No, sorry, a banana is a fruit. }, {unselected: poor banana.}}
       [ ] Ice Cream
-      [ ] Mushroom	   	 {{U: You're right that mushrooms aren't vegetables.}, { selected: Mushroom is a fungus, not a vegetable.}}
-      [x] Brussel Sprout	 {{S: Brussel sprouts are vegetables.}, {u: Brussel sprout is the only vegetable in this list.}}
+      [ ] Mushroom       {{U: You're right that mushrooms aren't vegetables.}, { selected: Mushroom is a fungus, not a vegetable.}}
+      [x] Brussel Sprout   {{S: Brussel sprouts are vegetables.}, {u: Brussel sprout is the only vegetable in this list.}}
 
 
       {{ ((A*B)) Making a banana split? }}
@@ -243,9 +243,9 @@ describe 'Markdown to xml extended hint checkbox', ->
     data = MarkdownEditingDescriptor.markdownToXml("""
       >>Select all the fruits from the list<<
 
-      [x] Apple     	 	 {{ selected: You're right that apple is a fruit. }, {unselected: Remember that apple is also a fruit.}}
-      [ ] Mushroom	   	 {{U: You're right that mushrooms aren't fruit}, { selected: Mushroom is a fungus, not a fruit.}}
-      [x] Grape		     {{ selected: You're right that grape is a fruit }, {unselected: Remember that grape is also a fruit.}}
+      [x] Apple          {{ selected: You're right that apple is a fruit. }, {unselected: Remember that apple is also a fruit.}}
+      [ ] Mushroom       {{U: You're right that mushrooms aren't fruit}, { selected: Mushroom is a fungus, not a fruit.}}
+      [x] Grape        {{ selected: You're right that grape is a fruit }, {unselected: Remember that grape is also a fruit.}}
       [ ] Mustang
       [ ] Camero            {{S:I don't know what a Camero is but it isn't a fruit.},{U:What is a camero anyway?}}
 
@@ -254,10 +254,10 @@ describe 'Markdown to xml extended hint checkbox', ->
 
       >>Select all the vegetables from the list<<
 
-      [ ] Banana     	 	 {{ selected: No, sorry, a banana is a fruit. }, {unselected: poor banana.}}
+      [ ] Banana         {{ selected: No, sorry, a banana is a fruit. }, {unselected: poor banana.}}
       [ ] Ice Cream
-      [ ] Mushroom	   	 {{U: You're right that mushrooms aren't vegatbles}, { selected: Mushroom is a fungus, not a vegetable.}}
-      [x] Brussel Sprout	 {{S: Brussel sprouts are vegetables.}, {u: Brussel sprout is the only vegetable in this list.}}
+      [ ] Mushroom       {{U: You're right that mushrooms aren't vegatbles}, { selected: Mushroom is a fungus, not a vegetable.}}
+      [x] Brussel Sprout   {{S: Brussel sprouts are vegetables.}, {u: Brussel sprout is the only vegetable in this list.}}
 
       {{ ((A*B)) Making a banana split? }}
       {{ ((B*D)) That will make a horrible dessert: a brussel sprout split? }}
@@ -328,15 +328,15 @@ describe 'Markdown to xml extended hint multiple choice', ->
     data = MarkdownEditingDescriptor.markdownToXml("""
       >>Select the fruit from the list<<
 
-      () Mushroom	  	 {{ Mushroom is a fungus, not a fruit.}}
+      () Mushroom      {{ Mushroom is a fungus, not a fruit.}}
       () Potato
-      (x) Apple     	 	 {{ OUTSTANDING::Apple is indeed a fruit.}}
+      (x) Apple          {{ OUTSTANDING::Apple is indeed a fruit.}}
 
       >>Select the vegetables from the list<<
 
-      () Mushroom	  	 {{ Mushroom is a fungus, not a vegetable.}}
-      (x) Potato	                 {{ Potato is a root vegetable. }}
-      () Apple     	 	 {{ OOPS::Apple is a fruit.}}
+      () Mushroom      {{ Mushroom is a fungus, not a vegetable.}}
+      (x) Potato                   {{ Potato is a root vegetable. }}
+      () Apple         {{ OOPS::Apple is a fruit.}}
     """)
     expect(data).toXMLEqual("""
     <problem>
@@ -374,18 +374,18 @@ describe 'Markdown to xml extended hint multiple choice', ->
       data = MarkdownEditingDescriptor.markdownToXml("""
         >>Select the fruit from the list<<
 
-        () Mushroom	  	 {{ Mushroom is a fungus, not a fruit.}}
+        () Mushroom      {{ Mushroom is a fungus, not a fruit.}}
         () Potato
-        (x) Apple     	 {{ OUTSTANDING::Apple is indeed a fruit.}}
+        (x) Apple        {{ OUTSTANDING::Apple is indeed a fruit.}}
 
         || 0) spaces on previous line. ||
         || 1) roses are red. ||
 
         >>Select the vegetables from the list<<
 
-        () Mushroom	  	 {{ Mushroom is a fungus, not a vegetable.}}
-        (x) Potato	     {{ Potato is a root vegetable. }}
-        () Apple     	 {{ OOPS::Apple is a fruit.}}
+        () Mushroom      {{ Mushroom is a fungus, not a vegetable.}}
+        (x) Potato       {{ Potato is a root vegetable. }}
+        () Apple       {{ OOPS::Apple is a fruit.}}
 
         || 2) where are the lions? ||
 
@@ -432,7 +432,7 @@ describe 'Markdown to xml extended hint multiple choice', ->
 describe 'Markdown to xml extended hint text input', ->
   it 'produces xml', ->
     data = MarkdownEditingDescriptor.markdownToXml(""">>In which country would you find the city of Paris?<<
-                    = France		{{ BRAVO::Viva la France! }}
+                    = France    {{ BRAVO::Viva la France! }}
 
     """)
     expect(data).toXMLEqual("""
@@ -449,8 +449,8 @@ describe 'Markdown to xml extended hint text input', ->
 
   it 'produces xml with or=', ->
     data = MarkdownEditingDescriptor.markdownToXml(""">>Where Paris?<<
-      = France		{{ BRAVO::hint1}}
-      or= USA			{{   meh::hint2  }}
+      = France    {{ BRAVO::hint1}}
+      or= USA     {{   meh::hint2  }}
 
     """)
     expect(data).toXMLEqual("""
@@ -638,7 +638,7 @@ describe 'Markdown to xml extended hint text input', ->
 
   it 'produces xml with demand hints', ->
     data = MarkdownEditingDescriptor.markdownToXml(""">>Where Paris?<<
-          = France		{{ BRAVO::hint1 }}
+          = France    {{ BRAVO::hint1 }}
 
           || There are actually two countries with cities named Paris. ||
           || Paris is the capital of one of those countries. ||
@@ -765,9 +765,9 @@ describe 'Markdown to xml extended hint with multiline hints', ->
         [[
            W1  {{
             no }}
-           W2	                  {{
+           W2                   {{
            nope}}
-           (C1)	 {{ yes
+           (C1)  {{ yes
             }}
         ]]
 
@@ -959,8 +959,8 @@ describe 'Markdown to xml extended hint with tricky syntax cases', ->
                   span
                   }}
 
-              yy	                 {{ meh::hinty }}
-              zzz	{{ hintz }}
+              yy                   {{ meh::hinty }}
+              zzz {{ hintz }}
            ]]
       """
     markdown = markdown.replace(/\n/g, '\r\n')  # make DOS line endings
