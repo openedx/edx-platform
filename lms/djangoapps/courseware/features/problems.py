@@ -91,7 +91,7 @@ def input_problem_answer(_, problem_type, correctness):
 # pylint: disable=unused-argument
 def submit_problem(step):
     # first scroll down so the loading mathjax button does not
-    # cover up the Submit button
+    # cover up the Check button
     world.browser.execute_script("window.scrollTo(0,1024)")
     assert world.is_css_not_present("button.submit.is-disabled")
     world.css_click("button.submit")
@@ -100,8 +100,8 @@ def submit_problem(step):
     world.wait_for_ajax_complete()
 
 
-@step(u"I can't submit a problem")
-def assert_cant_submit_problem(step):   # pylint: disable=unused-argument
+@step(u"I can't check a problem")
+def assert_cant_check_problem(step):   # pylint: disable=unused-argument
     # first scroll down so the loading mathjax button does not
     # cover up the Check button
     world.browser.execute_script("window.scrollTo(0,1024)")
