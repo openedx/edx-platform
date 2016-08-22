@@ -8,7 +8,7 @@ class @Problem
     @content = @el.data('content')
 
     # has_timed_out and has_response are used to ensure that are used to
-    # ensure that we wait a minimum of ~ 1s before transitioning the check
+    # ensure that we wait a minimum of ~ 1s before transitioning the submit
     # button from disabled to enabled
     @has_timed_out = false
     @has_response = false
@@ -28,20 +28,20 @@ class @Problem
     problem_prefix = @element_id.replace(/problem_/,'')
     @inputs = @$("[id^='input_#{problem_prefix}_']")
     @$('div.action button').click @refreshAnswers
-    @reviewButton = @$('div.action .review-btn')
+    @reviewButton = @$('.action .review-btn')
     @reviewButton.click @scroll_to_problem_meta
-    @checkButton = @$('div.action button.check')
-    @checkButtonLabel = @$('div.action button.check span.check-label')
-    @checkButtonCheckText = @checkButtonLabel.text()
-    @checkButtonCheckingText = @checkButton.data('checking')
-    @checkButton.click @check_fd
-    @hintButton = @$('div.action button.hint-button')
+    @submitButton = @$('.action .submit')
+    @submitButtonLabel = @$('.action .submit .submit-label')
+    @submitButtonSubmitText = @submitButtonLabel.text()
+    @submitButtonSubmittingText = @submitButton.data('submitting')
+    @submitButton.click @submit_fd
+    @hintButton = @$('.action .hint-button')
     @hintButton.click @hint_button
-    @resetButton = @$('div.action button.reset')
+    @resetButton = @$('.action .reset')
     @resetButton.click @reset
-    @showButton = @$('div.action button.show')
+    @showButton = @$('.action .show')
     @showButton.click @show
-    @saveButton = @$('div.action button.save')
+    @saveButton = @$('.action .save')
     @saveButton.click @save
 
     # Accessibility helper for sighted keyboard users to show <clarification> tooltips on focus:
@@ -58,8 +58,8 @@ class @Problem
       $(ev.target).addClass('sr');
 
     @bindResetCorrectness()
-    if @checkButton.length
-      @checkAnswersAndCheckButton true
+    if @submitButton.length
+      @submitAnswersAndSubmitButton true
 
     # Collapsibles
     Collapsible.setCollapsibles(@el)
@@ -212,15 +212,15 @@ class @Problem
   # If some function wants to be called before sending the answer to the
   # server, give it a chance to do so.
   #
-  # check_save_waitfor allows the callee to send alerts if the user's input is
+  # submit_save_waitfor allows the callee to send alerts if the user's input is
   # invalid. To do so, the callee must throw an exception named "Waitfor
   # Exception". This and any other errors or exceptions that arise from the
   # callee are rethrown and abort the submission.
   #
   # In order to use this feature, add a 'data-waitfor' attribute to the input,
-  # and specify the function to be called by the check button before sending
+  # and specify the function to be called by the submit button before sending
   # off @answers
-  check_save_waitfor: (callback) =>
+  submit_save_waitfor: (callback) =>
     flag = false
     for inp in @inputs
       if ($(inp).is("input[waitfor]"))
@@ -250,26 +250,26 @@ class @Problem
       @questionTitle.focus()
 
   ###
-  # 'check_fd' uses FormData to allow file submissions in the 'problem_check' dispatch,
+  # 'submit_fd' uses FormData to allow file submissions in the 'problem_submit' dispatch,
   #      in addition to simple querystring-based answers
   #
-  # NOTE: The dispatch 'problem_check' is being singled out for the use of FormData;
+  # NOTE: The dispatch 'problem_submit' is being singled out for the use of FormData;
   #       maybe preferable to consolidate all dispatches to use FormData
   ###
-  check_fd: =>
-    # If there are no file inputs in the problem, we can fall back on @check
+  submit_fd: =>
+    # If there are no file inputs in the problem, we can fall back on @submit
     if @el.find('input:file').length == 0
-      @check()
+      @submit()
       return
 
-    @enableCheckButton false
+    @enableSubmitButton false
 
     if not window.FormData
       alert "Submission aborted! Sorry, your browser does not support file uploads. If you can, please use Chrome or Safari which have been verified to support file uploads."
-      @enableCheckButton true
+      @enableSubmitButton true
       return
 
-    timeout_id = @enableCheckButtonAfterTimeout()
+    timeout_id = @enableSubmitButtonAfterTimeout()
 
     fd = new FormData()
 
@@ -319,7 +319,7 @@ class @Problem
     abort_submission = file_too_large or file_not_selected or unallowed_file_submitted or required_files_not_submitted
     if abort_submission
       window.clearTimeout(timeout_id)
-      @enableCheckButton true
+      @enableSubmitButton true
       return
 
     settings =
@@ -327,7 +327,7 @@ class @Problem
       data: fd
       processData: false
       contentType: false
-      complete: @enableCheckButtonAfterResponse
+      complete: @enableSubmitButtonAfterResponse
       success: (response) =>
         switch response.success
           when 'incorrect', 'correct'
@@ -337,15 +337,15 @@ class @Problem
             @gentle_alert response.success
         Logger.log 'problem_graded', [@answers, response.contents], @id
 
-    $.ajaxWithPrefix("#{@url}/problem_check", settings)
+    $.ajaxWithPrefix("#{@url}/problem_submit", settings)
 
-  check: =>
-    if not @check_save_waitfor(@check_internal)
-      @disableAllButtonsWhileRunning @check_internal, true
+  submit: =>
+    if not @submit_save_waitfor(@submit_internal)
+      @disableAllButtonsWhileRunning @submit_internal, true
 
-  check_internal: =>
-    Logger.log 'problem_check', @answers
-    $.postWithPrefix "#{@url}/problem_check", @answers, (response) =>
+  submit_internal: =>
+    Logger.log 'problem_submit', @answers
+    $.postWithPrefix "#{@url}/problem_submit", @answers, (response) =>
       switch response.success
         when 'incorrect', 'correct'
           window.SR.readElts($(response.contents).find('.status'))
@@ -354,7 +354,7 @@ class @Problem
           @updateProgress response
           if @el.hasClass 'showed'
             @el.removeClass 'showed'
-          @$('div.action button.check').focus()
+          #@notification.focus()
         else
           @gentle_alert response.success
       Logger.log 'problem_graded', [@answers, response.contents], @id
@@ -421,6 +421,7 @@ class @Problem
 
         @el.addClass 'showed'
         @el.find('.show').attr('disabled', 'disabled')
+        @enableSubmitButton false, false
         @updateProgress response
         window.SR.readElts(answer_text)
         @scroll_to_problem_meta()
@@ -434,7 +435,7 @@ class @Problem
     window.SR.readElts @el.find('.capa_alert')
 
   save: =>
-    if not @check_save_waitfor(@save_internal)
+    if not @submit_save_waitfor(@save_internal)
       @disableAllButtonsWhileRunning @save_internal, false
 
   save_internal: =>
@@ -478,12 +479,12 @@ class @Problem
       element.CodeMirror.save() if element.CodeMirror.save
     @answers = @inputs.serialize()
 
-  checkAnswersAndCheckButton: (bind=false) =>
+  submitAnswersAndSubmitButton: (bind=false) =>
     # Used to check available answers and if something is checked (or the answer is set in some textbox)
-    # "Check"/"Final check" button becomes enabled. Otherwise it is disabled by default.
+    # "Submit" button becomes enabled. Otherwise it is disabled by default.
     # params:
     #   'bind' used on the first check to attach event handlers to input fields
-    #     to change "Check"/"Final check" enable status in case of some manipulations with answers
+    #     to change "Submit" enable status in case of some manipulations with answers
     answered = true
 
     at_least_one_text_input_found = false
@@ -495,7 +496,7 @@ class @Problem
           one_text_input_filled = true
         if bind
           $(text_field).on 'input', (e) =>
-            @checkAnswersAndCheckButton()
+            @submitAnswersAndSubmitButton()
             return
           return
     if at_least_one_text_input_found and not one_text_input_filled
@@ -508,7 +509,7 @@ class @Problem
           checked = true
         if bind
           $(checkbox_or_radio).on 'click', (e) =>
-            @checkAnswersAndCheckButton()
+            @submitAnswersAndSubmitButton()
             return
           return
       if not checked
@@ -521,14 +522,14 @@ class @Problem
         answered = false
       if bind
         $(select_field).on 'change', (e) =>
-          @checkAnswersAndCheckButton()
+          @submitAnswersAndSubmitButton()
           return
         return
 
     if answered
-      @enableCheckButton true
+      @enableSubmitButton true
     else
-      @enableCheckButton false, false
+      @enableSubmitButton false, false
 
   bindResetCorrectness: ->
     # Loop through all input types
@@ -759,7 +760,7 @@ class @Problem
     # params:
     #   'operationCallback' is an operation to be run.
     #   'isFromCheckOperation' is a boolean to keep track if 'operationCallback' was
-    #    @check, if so then text of check button will be changed as well.
+    #    @submit, if so then text of submit button will be changed as well.
     @enableAllButtons false, isFromCheckOperation
     operationCallback().always =>
       @enableAllButtons true, isFromCheckOperation
@@ -769,58 +770,56 @@ class @Problem
     # params:
     #   'enable' is a boolean to determine enabling/disabling of buttons.
     #   'isFromCheckOperation' is a boolean to keep track if operation was initiated
-    #    from @check so that text of check button will also be changed while disabling/enabling
-    #    the check button.
+    #    from @submit so that text of submit button will also be changed while disabling/enabling
+    #    the submit button.
     if enable
       @resetButton
         .add(@saveButton)
         .add(@hintButton)
         .add(@showButton)
-        .removeClass('is-disabled')
         .removeAttr 'disabled'
     else
       @resetButton
         .add(@saveButton)
         .add(@hintButton)
         .add(@showButton)
-        .addClass('is-disabled')
         .attr({'disabled': 'disabled'})
 
-    @enableCheckButton enable, isFromCheckOperation
+    @enableSubmitButton enable, isFromCheckOperation
 
-  enableCheckButton: (enable, changeText = true) =>
-    # Used to disable check button to reduce chance of accidental double-submissions.
+  enableSubmitButton: (enable, changeText = true) =>
+    # Used to disable submit button to reduce chance of accidental double-submissions.
     # params:
-    #   'enable' is a boolean to determine enabling/disabling of check button.
+    #   'enable' is a boolean to determine enabling/disabling of submit button.
     #   'changeText' is a boolean to determine if there is need to change the
-    #    text of check button as well.
+    #    text of submit button as well.
     if enable
-      @checkButton.removeClass 'is-disabled'
-      @checkButton.removeAttr 'disabled'
+      @submitButton.removeAttr 'disabled'
+      @submitButton.removeClass 'is-disabled'
       if changeText
-        @checkButtonLabel.text(@checkButtonCheckText)
+        @submitButtonLabel.text(@submitButtonSubmitText)
     else
-      @checkButton.addClass 'is-disabled'
-      @checkButton.attr({'disabled': 'disabled'})
+      @submitButton.attr({'disabled': 'disabled'})
+      @submitButton.addClass 'is-disabled'
       if changeText
-        @checkButtonLabel.text(@checkButtonCheckingText)
+        @submitButtonLabel.text(@submitButtonSubmittingText)
 
-  enableCheckButtonAfterResponse: =>
+  enableSubmitButtonAfterResponse: =>
     @has_response = true
     if not @has_timed_out
       # Server has returned response before our timeout
-      @enableCheckButton false
+      @enableSubmitButton false
     else
-      @enableCheckButton true
+      @enableSubmitButton true
 
-  enableCheckButtonAfterTimeout: =>
+  enableSubmitButtonAfterTimeout: =>
     @has_timed_out = false
     @has_response = false
-    enableCheckButton = () =>
+    enableSubmitButton = () =>
       @has_timed_out = true
       if @has_response
-        @enableCheckButton true
-    window.setTimeout(enableCheckButton, 750)
+        @enableSubmitButton true
+    window.setTimeout(enableSubmitButton, 750)
 
   hint_button: =>
     # Store the index of the currently shown hint as an attribute.
@@ -839,4 +838,4 @@ class @Problem
         hint_container[0]
       ]
       hint_container.attr('hint_index', response.hint_index)
-      @$('.hint-button').focus()  # a11y focus on click, like the Check button
+      @$('.hint-button').focus()  # a11y focus on click, like the Submit button

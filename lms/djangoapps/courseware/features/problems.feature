@@ -167,7 +167,7 @@ Feature: LMS.Answer problems
 
     Scenario: I can see my score on a problem to which I submit a blank answer
         Given I am viewing a "<ProblemType>" problem
-        When I check a problem
+        When I submit a problem
         Then I should see a score of "<Points Possible>"
 
         Examples:
@@ -176,7 +176,7 @@ Feature: LMS.Answer problems
 
     Scenario: I can't submit a blank answer
         Given I am viewing a "<ProblemType>" problem
-        Then I can't check a problem
+        Then I can't submit a problem
 
         Examples:
         | ProblemType       |

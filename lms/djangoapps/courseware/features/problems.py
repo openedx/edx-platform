@@ -74,7 +74,7 @@ def answer_problem_step(step, problem_type, correctness):
     input_problem_answer(step, problem_type, correctness)
 
     # Submit the problem
-    check_problem(step)
+    submit_problem(step)
 
 
 @step(u'I input an answer on a "([^"]*)" problem "([^"]*)ly"')
@@ -87,24 +87,25 @@ def input_problem_answer(_, problem_type, correctness):
     answer_problem(world.scenario_dict['COURSE'].number, problem_type, correctness)
 
 
-@step(u'I check a problem')
-def check_problem(step):
+@step(u'I submit a problem')
+# pylint: disable=unused-argument
+def submit_problem(step):
     # first scroll down so the loading mathjax button does not
-    # cover up the Check button
+    # cover up the Submit button
     world.browser.execute_script("window.scrollTo(0,1024)")
-    assert world.is_css_not_present("button.check.is-disabled")
-    world.css_click("button.check")
+    assert world.is_css_not_present("button.submit.is-disabled")
+    world.css_click("button.submit")
 
     # Wait for the problem to finish re-rendering
     world.wait_for_ajax_complete()
 
 
-@step(u"I can't check a problem")
-def assert_cant_check_problem(step):   # pylint: disable=unused-argument
+@step(u"I can't submit a problem")
+def assert_cant_submit_problem(step):   # pylint: disable=unused-argument
     # first scroll down so the loading mathjax button does not
     # cover up the Check button
     world.browser.execute_script("window.scrollTo(0,1024)")
-    assert world.is_css_present("button.check.is-disabled")
+    assert world.is_css_present("button.submit.is-disabled")
 
 
 @step(u'The "([^"]*)" problem displays a "([^"]*)" answer')

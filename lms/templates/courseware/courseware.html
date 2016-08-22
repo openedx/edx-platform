@@ -166,7 +166,7 @@ ${HTML(fragment.foot_html())}
             </p>
             <script type="text/javascript">
             $(document).ajaxSuccess(function(event, xhr, settings) {
-                if (settings.url.indexOf("xmodule_handler/problem_check") > -1) {
+                if (settings.url.indexOf("xmodule_handler/problem_submit") > -1) {
                     var data = JSON.parse(xhr.responseText);
                     if (data.entrance_exam_passed){
                         location.reload();

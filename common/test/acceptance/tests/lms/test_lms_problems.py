@@ -134,7 +134,7 @@ class ProblemExtendedHintTest(ProblemsTest, EventsTestMixin):
         problem_page = ProblemPage(self.browser)
         self.assertEqual(problem_page.problem_text[0], u'question text')
         problem_page.fill_answer('B')
-        problem_page.click_check()
+        problem_page.click_submit()
         self.assertEqual(problem_page.message_text, u'Incorrect: hint')
         # Check for corresponding tracking event
         actual_events = self.wait_for_events(
@@ -209,7 +209,7 @@ class ProblemHintWithHtmlTest(ProblemsTest, EventsTestMixin):
         problem_page = ProblemPage(self.browser)
         self.assertEqual(problem_page.problem_text[0], u'question text')
         problem_page.fill_answer('C')
-        problem_page.click_check()
+        problem_page.click_submit()
         self.assertEqual(problem_page.message_text, u'Incorrect: aa bb cc')
         # Check for corresponding tracking event
         actual_events = self.wait_for_events(
@@ -330,7 +330,7 @@ class ProblemPartialCredit(ProblemsTest):
         problem_page = ProblemPage(self.browser)
         self.assertEqual(problem_page.problem_name, 'PARTIAL CREDIT TEST PROBLEM')
         problem_page.fill_answer_numerical('-1')
-        problem_page.click_check()
+        problem_page.click_submit()
         problem_page.wait_for_status_icon()
         self.assertTrue(problem_page.simpleprob_is_partially_correct())
 
@@ -381,7 +381,7 @@ class LogoutDuringAnswering(ProblemsTest):
 
         self.log_user_out()
         with problem_page.handle_alert(confirm=True):
-            problem_page.click_check()
+            problem_page.click_submit()
 
         login_page = CombinedLoginAndRegisterPage(self.browser)
         login_page.wait_for_page()
@@ -392,7 +392,7 @@ class LogoutDuringAnswering(ProblemsTest):
         self.assertEqual(problem_page.problem_name, 'TEST PROBLEM')
 
         problem_page.fill_answer_numerical('1')
-        problem_page.click_check()
+        problem_page.click_submit()
         self.assertTrue(problem_page.simpleprob_is_correct())
 
     def test_logout_cancel_no_redirect(self):
@@ -411,7 +411,7 @@ class LogoutDuringAnswering(ProblemsTest):
         problem_page.fill_answer_numerical('1')
         self.log_user_out()
         with problem_page.handle_alert(confirm=False):
-            problem_page.click_check()
+            problem_page.click_submit()
 
         self.assertTrue(problem_page.is_browser_on_page())
         self.assertEqual(problem_page.problem_name, 'TEST PROBLEM')

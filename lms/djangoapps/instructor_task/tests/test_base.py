@@ -277,7 +277,7 @@ class InstructorTaskModuleTestCase(InstructorTaskCourseTestCase):
                 InstructorTaskModuleTestCase.problem_location(problem_url_name, self.course.id).to_deprecated_string()
             ),
             'handler': 'xmodule_handler',
-            'suffix': 'problem_check',
+            'suffix': 'problem_submit',
         })
 
         # assign correct identifier to each response.
