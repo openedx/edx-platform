@@ -2,9 +2,6 @@
 // LMS Problem Feedback Revamp styling
 // Mirror styles from the Pattern Library
 
-// NOTE: This is the left-to-right (LTR) configured style compile.
-// It should mirror lms-problem-feedback-rtl w/ the exception of bi-app references.
-
 @import 'base/variables';
 
 
@@ -41,7 +38,7 @@
 
     &:only-child,
     .sr-only + & {
-      margin-right: 0;
+      @include margin-right(0);
     }
   }
   &.btn-small {

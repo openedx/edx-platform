@@ -10,8 +10,8 @@
    />
 
       <p class="status" aria-describedby="input_${id}">
-        ${value|h} -
-        ${status.display_name}
+        ${value|h}
+        <span class="sr">${status.display_name}</span>
       </p>
 
       <div id="input_${id}_preview" class="equation"></div>

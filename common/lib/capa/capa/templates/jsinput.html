@@ -1,3 +1,4 @@
+<%! from openedx.core.djangolib.markup import HTML %>
 <section id="inputtype_${id}" class="jsinput"
     data="${gradefn}"
     % if saved_state:
@@ -41,9 +42,8 @@
     <p id="answer_${id}" class="answer"></p>
 
     <p class="status">
-    ${status.display_name}
+        <span class="sr">${status.display_name}</span>
     </p>
-    <br/> <br/>
 
     <div class="error_message" style="padding: 5px 5px 5px 5px; background-color:#FA6666; height:60px;width:400px; display: none"></div>
 
@@ -52,6 +52,6 @@
   % endif
 
   % if msg:
-      <span class="message">${msg|n}</span>
+      <span class="message" aria-live="polite" tabindex="-1">${HTML(msg)}</span>
   % endif
 </section>
