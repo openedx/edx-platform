@@ -190,6 +190,10 @@ class Users(SysadminDashboardView):
                 return msg
             else:
                 uname = email.replace('@', '_')
+            if '+' in uname:
+                uname = uname.replace('+', '_')
+            if '.' in uname:
+                uname = uname.replace('.', '_')
             new_password = password
 
         user = User(username=uname, email=email, is_active=True)
