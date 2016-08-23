@@ -1,11 +1,13 @@
 """
 Grades related signals.
 """
+from django.conf import settings
 from django.dispatch import receiver, Signal
 from logging import getLogger
+from opaque_keys.edx.locator import CourseLocator
+from opaque_keys.edx.keys import UsageKey
 from student.models import user_by_anonymous_id
 from submissions.models import score_set, score_reset
-
 
 log = getLogger(__name__)
 
@@ -58,7 +60,7 @@ def submissions_score_set_handler(sender, **kwargs):  # pylint: disable=unused-a
             sender=None,
             points_possible=points_possible,
             points_earned=points_earned,
-            user_id=user.id,
+            user=user,
             course_id=course_id,
             usage_id=usage_id
         )
@@ -97,7 +99,7 @@ def submissions_score_reset_handler(sender, **kwargs):  # pylint: disable=unused
             sender=None,
             points_possible=0,
             points_earned=0,
-            user_id=user.id,
+            user=user,
             course_id=course_id,
             usage_id=usage_id
         )
@@ -105,4 +107,36 @@ def submissions_score_reset_handler(sender, **kwargs):  # pylint: disable=unused
         log.exception(
             u"Failed to process score_reset signal from Submissions API. "
             "user: %s, course_id: %s, usage_id: %s", user, course_id, usage_id
+        )
+
+
+@receiver(SCORE_CHANGED)
+def recalculate_subsection_grade_handler(sender, **kwargs):  # pylint: disable=unused-argument
+    """
+    Consume the SCORE_CHANGED signal and trigger an update.
+    This method expects that the kwargs dictionary will contain the following
+    entries (See the definition of SCORE_CHANGED):
+       - points_possible: Maximum score available for the exercise
+       - points_earned: Score obtained by the user
+       - user: User object
+       - course_id: Unicode string representing the course
+       - usage_id: Unicode string indicating the courseware instance
+    """
+    if not settings.FEATURES.get('ENABLE_SUBSECTION_GRADES_SAVED', False):
+        return
+    try:
+        course_id = kwargs.get('course_id', None)
+        usage_id = kwargs.get('usage_id', None)
+        student = kwargs.get('user', None)
+
+        course_key = CourseLocator.from_string(course_id)
+        usage_key = UsageKey.from_string(usage_id).replace(course_key=course_key)
+
+        from lms.djangoapps.grades.new.subsection_grade import SubsectionGradeFactory
+        SubsectionGradeFactory(student).update(usage_key, course_key)
+    except Exception as ex:  # pylint: disable=broad-except
+        log.exception(
+            u"Failed to process SCORE_CHANGED signal. "
+            "user: %s, course_id: %s, "
+            "usage_id: %s. Exception: %s", unicode(student), course_id, usage_id, ex.message
         )
