@@ -537,6 +537,14 @@ def click_link(partial_text, index=0):
 
 
 @world.absorb
+def click_button(data_attr, index=0):
+    xpath = '//button[text()="{button_text}"]'.format(
+        button_text=data_attr
+    )
+    world.browser.find_by_xpath(xpath)[index].click()
+
+
+@world.absorb
 def click_link_by_text(text, index=0):
     retry_on_exception(lambda: world.browser.find_link_by_text(text)[index].click())
 

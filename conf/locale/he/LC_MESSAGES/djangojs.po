@@ -7,8 +7,11 @@
 # Bentsi Magidovich <magidovich@gmail.com>, 2015
 # dotanlaks <dotanlaks6@gmail.com>, 2014
 # dotanlaks <dotanlaks6@gmail.com>, 2014
+# e2f_HE c1 <e2f_HE_c1@outlook.com>, 2016
+# e2f he_r1 <e2f_he_r1@outlook.com>, 2016
 # Naaman nov <naaman.nov@gmail.com>, 2015
 # Nadav Stark <nadav@yeda.org.il>, 2015
+# Ned Batchelder <ned@edx.org>, 2016
 # Ron Rozen <Ronrozen@gmail.com>, 2016
 # Shay Nativ <shay@yeda.org.il>, 2015
 # yaaqov, 2014
@@ -19,6 +22,8 @@
 # 
 # Translators:
 # Bentsi Magidovich <magidovich@gmail.com>, 2015
+# e2f_HE c1 <e2f_HE_c1@outlook.com>, 2016
+# e2f he_r1 <e2f_he_r1@outlook.com>, 2016
 # Ido, 2014
 # Naaman nov <naaman.nov@gmail.com>, 2015
 # Nadav Stark <nadav@yeda.org.il>, 2015
@@ -32,6 +37,8 @@
 # 
 # Translators:
 # Bentsi Magidovich <magidovich@gmail.com>, 2015
+# e2f_HE c1 <e2f_HE_c1@outlook.com>, 2016
+# e2f he_r1 <e2f_he_r1@outlook.com>, 2016
 # Nadav Stark <nadav@yeda.org.il>, 2015
 # Ron Rozen <Ronrozen@gmail.com>, 2016
 # yuval zana, 2015
@@ -42,6 +49,8 @@
 # 
 # Translators:
 # Bentsi Magidovich <magidovich@gmail.com>, 2015
+# e2f_HE c1 <e2f_HE_c1@outlook.com>, 2016
+# e2f he_r1 <e2f_he_r1@outlook.com>, 2016
 # Nadav Stark <nadav@yeda.org.il>, 2015
 # Ron Rozen <Ronrozen@gmail.com>, 2016
 # yuval zana, 2015
@@ -49,9 +58,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-08-04 18:44+0000\n"
-"PO-Revision-Date: 2016-08-11 07:52+0000\n"
-"Last-Translator: Ned Batchelder <ned@edx.org>\n"
+"POT-Creation-Date: 2016-08-16 19:39+0000\n"
+"PO-Revision-Date: 2016-08-18 13:22+0000\n"
+"Last-Translator: e2f he_r1 <e2f_he_r1@outlook.com>\n"
 "Language-Team: Hebrew (http://www.transifex.com/open-edx/edx-platform/language/he/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1779,7 +1788,7 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js
 msgid "Adjust video volume"
-msgstr ""
+msgstr "התאם את עוצמת הקול של הווידיאו"
 
 #: common/lib/xmodule/xmodule/js/src/video/08_video_speed_control.js
 msgid ""
@@ -1787,14 +1796,17 @@ msgid ""
 "navigate the different speeds, then press ENTER to change to the selected "
 "speed."
 msgstr ""
+"לחץ על מקש החץ למעלה כדי להיכנס לתפריט המהירות ולאחר מכן השתמש במקשי החצים "
+"למעלה ולמטה כדי לנווט בין המהירויות השונות. לחץ על ENTER כדי לשנות למהירות "
+"שנבחרה."
 
 #: common/lib/xmodule/xmodule/js/src/video/08_video_speed_control.js
 msgid "Adjust video speed"
-msgstr ""
+msgstr "התאם את מהירות הווידיאו"
 
 #: common/lib/xmodule/xmodule/js/src/video/08_video_speed_control.js
 msgid "Video speed: "
-msgstr ""
+msgstr "מהירות וידיאו:"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_play_skip_control.js
 msgid "Skip"
@@ -1810,7 +1822,7 @@ msgstr "אל תציג שוב"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "Open language menu"
-msgstr ""
+msgstr "פתח תפריט שפה"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "Transcript will be displayed when you start playing the video."
@@ -1840,6 +1852,8 @@ msgid ""
 " keys to navigate language options. Press ENTER to change to the selected "
 "language."
 msgstr ""
+"לחץ על מקש החץ למעלה כדי להיכנס לתפריט השפה ולאחר מכן השתמש במקשי החצים "
+"למעלה ולמטה כדי לנווט בין אפשרויות השפה. לחץ על ENTER כדי לשנות לשפה שנבחרה."
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "Hide closed captions"
@@ -2176,67 +2190,67 @@ msgstr ""
 
 #: common/static/common/js/components/views/paging_header.js
 msgid "Showing {firstIndex} out of {numItems} total"
-msgstr ""
+msgstr "מציג {firstIndex} מתוך {numItems} סך הכל"
 
 #: common/static/common/js/components/views/paging_header.js
 msgid "Showing {firstIndex}-{lastIndex} out of {numItems} total"
-msgstr ""
+msgstr "מציג {firstIndex}-{lastIndex} מתוך {numItems} סך הכל"
 
 #: common/static/common/js/discussion/utils.js
 msgid ""
 "We had some trouble processing your request. Please ensure you have copied "
 "any "
-msgstr ""
+msgstr "נתקלנו בבעיה בעיבוד בקשתך. אנא ודא כי העתקת"
 
 #: common/static/common/js/discussion/utils.js
 msgid "Some images in this post have been omitted"
-msgstr ""
+msgstr "חלק מהתמונות בפוסט זה נמחקו"
 
 #: common/static/common/js/discussion/utils.js
 msgid "image omitted"
-msgstr ""
+msgstr "התמונה נמחקה"
 
 #: common/static/common/js/discussion/views/discussion_content_view.js
 msgid "there is currently {numVotes} vote"
 msgid_plural "there are currently {numVotes} votes"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "כרגע יש קול {numVotes}"
+msgstr[1] "כרגע יש {numVotes} קולות"
 
 #: common/static/common/js/discussion/views/discussion_content_view.js
 msgid "{numVotes} Vote"
 msgid_plural "{numVotes} Votes"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "קול {numVotes}"
+msgstr[1] "{numVotes} קולות"
 
 #: common/static/common/js/discussion/views/discussion_thread_list_view.js
 msgid "{unread_count} new comment"
 msgid_plural "{unread_count} new comments"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "תגובה חדשה {unread_count}"
+msgstr[1] "{unread_count} תגובות חדשות"
 
 #: common/static/common/js/discussion/views/discussion_thread_list_view.js
 msgid "No results found for {original_query}. "
-msgstr ""
+msgstr "לא נמצאו תוצאות עבור {original_query}."
 
 #: common/static/common/js/discussion/views/discussion_thread_list_view.js
 msgid "Show posts by {username}."
-msgstr ""
+msgstr "הראה פוסטים של {username}."
 
 #: common/static/common/js/discussion/views/discussion_thread_view.js
 msgid "{numResponses} other response"
 msgid_plural "{numResponses} other responses"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "תגובה נוספת {numResponses}"
+msgstr[1] "{numResponses} תגובות נוספות"
 
 #: common/static/common/js/discussion/views/discussion_thread_view.js
 msgid "{numResponses} response"
 msgid_plural "{numResponses} responses"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "תגובה {numResponses}"
+msgstr[1] "{numResponses} תגובות"
 
 #: common/static/common/js/discussion/views/discussion_thread_view.js
 msgid "Load next {numResponses} responses"
-msgstr ""
+msgstr "טען את {numResponses} התגובות הבאות"
 
 #: common/static/common/js/utils/edx.utils.validate.js
 msgid "The email address you've provided isn't formatted correctly."
@@ -2753,7 +2767,7 @@ msgstr "לא ניתן להשלים את בקשתך. טען מחדש את הדף 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid ""
 "Your request could not be completed due to a server problem. Reload the page"
-msgstr ""
+msgstr "לא ניתן היה להשלים את בקשתך בשל בעיית שרת. טען מחדש את הדף"
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "Team Search"
@@ -2761,7 +2775,7 @@ msgstr "חיפוש צוות"
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "Showing results for \"{searchString}\""
-msgstr ""
+msgstr "הצגת תוצאות עבור \"{searchString}\""
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "Create a New Team"
@@ -2808,15 +2822,15 @@ msgstr "כל הנושאים"
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "The page \"{route}\" could not be found."
-msgstr ""
+msgstr "לא ניתן למצוא את הדף \"{route}\"."
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "The topic \"{topic}\" could not be found."
-msgstr ""
+msgstr "לא ניתן למצוא את הנושא \"{topic}\"."
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "The team \"{team}\" could not be found."
-msgstr ""
+msgstr "לא ניתן למצוא את הצוות \"{team}\"."
 
 #: lms/djangoapps/teams/static/teams/js/views/topic_card.js
 msgid "%(team_count)s Team"
@@ -2949,12 +2963,16 @@ msgstr "טעות בשינוי אישורי משתמש"
 msgid ""
 "Could not find a user with username or email address '<%- identifier %>'."
 msgstr ""
+"לא ניתן היה לאתר משתמש באמצעות שם המשתמש או כתובת הדואר האלקטרוני '<%- "
+"identifier %>'."
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid ""
 "Error: User '<%- username %>' has not yet activated their account. Users "
 "must create and activate their accounts before they can be assigned a role."
 msgstr ""
+"שגיאה: משתמש '<%- username %>'  עדיין לא הפעיל את החשבון שלו. משתמשים חייבים"
+" ליצור ולהפעיל את החשבונות שלהם לפני שניתן להקצות להם תפקיד."
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Error: You cannot remove yourself from the Instructor group!"
@@ -3102,29 +3120,30 @@ msgstr "ההודעה שלך לא יכולה להיות ריקה."
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
 msgid "Your message must have at least one target."
-msgstr ""
+msgstr "ההודעה שלך חייבת להכיל יעד אחד לפחות."
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
 msgid ""
 "There are invalid keywords in your email. Check the following keywords and "
 "try again."
 msgstr ""
+"יש מילות מפתח לא חוקיות בדוא\"ל שלך. אנא בדוק את מילות המפתח הבאות ונסה שוב."
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
 msgid "Yourself"
-msgstr ""
+msgstr "אתה עצמך"
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
 msgid "Everyone who has staff privileges in this course"
-msgstr ""
+msgstr "כל אחד שיש לו זכויות צוות בקורס זה"
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
 msgid "All learners who are enrolled in this course"
-msgstr ""
+msgstr "כל הלומדים שרשומים לקורס זה"
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
 msgid "All learners in the {cohort_name} cohort"
-msgstr ""
+msgstr "כל הלומדים בקבוצת הלימוד {cohort_name}"
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
 msgid ""
@@ -3132,16 +3151,18 @@ msgid ""
 "large number of learners, email messages to learners might take up to an "
 "hour to be sent."
 msgstr ""
+"הודעת הדוא\"ל נכנסה בהצלחה לתור לשליחה. בקורסים עם מספר גדול של לומדים, "
+"ייתכן שייקח עד שעה עד שהודעות הדוא\"ל ללומדים יישלחו."
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
 msgid ""
 "You are sending an email message with the subject {subject} to the following"
 " recipients."
-msgstr ""
+msgstr "אתה שולח הודעת דוא\"ל עם הנושא {subject} לנמענים הבאים."
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
 msgid "Is this OK?"
-msgstr ""
+msgstr "האם זה בסדר?"
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
 msgid "Error sending email."
@@ -3432,7 +3453,7 @@ msgstr "נשלח על ידי"
 
 #: lms/static/coffee/src/instructor_dashboard/util.js
 msgid "Sent To"
-msgstr ""
+msgstr "נשלח אל"
 
 #: lms/static/coffee/src/instructor_dashboard/util.js
 msgid "Time Sent"
@@ -3641,7 +3662,7 @@ msgstr "התנתקת מחשבון ה-EdX שלך."
 
 #: lms/static/js/api_admin/views/catalog_preview.js
 msgid "Preview this query"
-msgstr ""
+msgstr "תצוגה מקדימה לשאילתא זו"
 
 #: lms/static/js/bookmarks/views/bookmark_button.js
 #: lms/static/js/bookmarks/views/bookmarks_list.js
@@ -3858,7 +3879,7 @@ msgstr "הערות מוסתרות"
 
 #: lms/static/js/edxnotes/views/search_box.js
 msgid "Please enter a term in the {anchorStart} search field{anchorEnd}."
-msgstr ""
+msgstr "אנא הכנס מונח ב-{anchorStart} שדה החיפוש{anchorEnd}."
 
 #: lms/static/js/edxnotes/views/tab_item.js
 msgid "Current tab"
@@ -4023,6 +4044,10 @@ msgid ""
 "'{verifiedCohortName}'. To change the configuration for verified track "
 "cohorts, contact your edX partner manager."
 msgstr ""
+"קורס זה משתמש במחזורי למידה אוטומטיים עבור לומדים במסלול מאומת. אינך יכול "
+"להשבית מחזורי למידה ואינך יכול לשנות את השם של מחזור למידה ידני המכונה "
+"'{verifiedCohortName}'. כדי לשנות את ההגדרה למחזורי למידה עם מעקב מאומת, צור"
+" קשר עם המנהל השותף שלך ב-edX."
 
 #: lms/static/js/groups/views/verified_track_settings_notification.js
 msgid ""
@@ -4030,12 +4055,17 @@ msgid ""
 " the required cohort does not exist. You must create a manually-assigned "
 "cohort named '{verifiedCohortName}' for the feature to work."
 msgstr ""
+"לקורס זה יש מחזור למידה אוטומטי שמופעל עבור לומדים במסלול מאומת, אך מחזור "
+"הלמידה הדרוש אינו קיים. עליך ליצור מחזור למידה שמוקצה באופן ידני המכונה "
+"'{verifiedCohortName}' כדי שהתכונה תעבוד."
 
 #: lms/static/js/groups/views/verified_track_settings_notification.js
 msgid ""
 "This course has automatic cohorting enabled for verified track learners, but"
 " cohorts are disabled. You must enable cohorts for the feature to work."
 msgstr ""
+"לקורס זה יש מחזור למידה אוטומטי שמופעל עבור לומדים במסלול מאומת, אך מחזורי "
+"הלמידה מושבתים. עליך להפעיל מחזורי למידה כדי שהתכונה תעבוד."
 
 #: lms/static/js/instructor_dashboard/certificates.js
 msgid "Allow students to generate certificates for this course?"
@@ -4168,6 +4198,8 @@ msgid ""
 "address you provided.  If you do not receive this message, "
 "{anchorStart}contact technical support{anchorEnd}."
 msgstr ""
+"שלחנו לך הודעת דוא\"ל עם הוראות לאיפוס סיסמה לכתובת הדוא\"ל שסיפקת. אם אינך "
+"מקבל הודעה זו, {anchorStart}צור קשר עם התמיכה הטכנית{anchorEnd}."
 
 #: lms/static/js/student_account/views/LoginView.js
 msgid ""
@@ -4177,7 +4209,7 @@ msgstr "אירעה שגיאה. נסה לרענן את הדף, או בדוק את
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "Basic Account Information"
-msgstr ""
+msgstr "מידע חשבון בסיסי"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid ""
@@ -4233,6 +4265,8 @@ msgid ""
 " address for your {platform_name} account. Click the link in the message to "
 "reset your password."
 msgstr ""
+"כאשר תלחץ על \"איפוס סיסמה\" , הודעה תישלח לכתובת הדואר האלקטרוני שלך עבור "
+"חשבון {platform_name}. לחץ על הקישור שבהודעה לאפס את סיסמתך."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid ""
@@ -4246,16 +4280,20 @@ msgstr "מדינה או אזור"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "Time Zone"
-msgstr ""
+msgstr "אזור זמן"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid ""
 "Select the time zone for displaying course dates. If you do not specify a "
-msgstr ""
+msgstr "בחר אזור זמן להצגת תאריכי הקורס. אם אינך מציין את"
+
+#: lms/static/js/student_account/views/account_settings_factory.js
+msgid "All Time Zones"
+msgstr "כל אזורי הזמן"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "Additional Information"
-msgstr ""
+msgstr "מידע נוסף"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "Education Completed"
@@ -4277,39 +4315,40 @@ msgstr "שפה מועדפת"
 #: lms/static/js/student_account/views/account_settings_factory.js
 #: lms/static/js/student_account/views/account_settings_view.js
 msgid "Linked Accounts"
-msgstr ""
+msgstr "חשבונות מקושרים"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid ""
 "You can link your social media accounts to simplify signing in to "
 "{platform_name}."
 msgstr ""
+"ניתן לקשר את חשבונות המדיה החברתית כדי לפשט את החיבור ל{platform_name}."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "ORDER NAME"
-msgstr ""
+msgstr "שם הזמנה"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "ORDER PLACED"
-msgstr ""
+msgstr "ההזמנה נשלחה"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "TOTAL"
-msgstr ""
+msgstr "סה\"כ"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "ORDER NUMBER"
-msgstr ""
+msgstr "מספר הזמנה"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "My Orders"
-msgstr ""
+msgstr "ההזמנות שלי"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid ""
 "This page contains information about orders that you have placed with "
 "{platform_name}."
-msgstr ""
+msgstr "דף זה מכיל מידע על הזמנות שביצעת באמצעות {platform_name}."
 
 #: lms/static/js/student_account/views/account_settings_fields.js
 msgid ""
@@ -4330,31 +4369,34 @@ msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_fields.js
 msgid "Link your {accountName} account"
-msgstr ""
+msgstr "קשר את חשבון {accountName} שלך"
 
 #: lms/static/js/student_account/views/account_settings_fields.js
 msgid "Unlink This Account"
-msgstr ""
+msgstr "נתק את הקישור של חשבון זה"
 
 #: lms/static/js/student_account/views/account_settings_fields.js
 msgid ""
 "You can use your {accountName} account to sign in to your {platformName} "
 "account."
 msgstr ""
+"ניתן לקשר את חשבון {accountName} שלך כדי להתחבר לחשבון {platformName}."
 
 #: lms/static/js/student_account/views/account_settings_fields.js
 msgid "Unlink your {accountName} account"
-msgstr ""
+msgstr "נתק את הקישור של חשבון {accountName} שלך"
 
 #: lms/static/js/student_account/views/account_settings_fields.js
 msgid "Link Your Account"
-msgstr ""
+msgstr "קשר את חשבונך"
 
 #: lms/static/js/student_account/views/account_settings_fields.js
 msgid ""
 "Link your {accountName} account to your {platformName} account and use "
 "{accountName} to sign in to {platformName}."
 msgstr ""
+"קשר את חשבון {accountName} שלך לחשבון {platformName} והשתמש ב{accountName} "
+"כדי להתחבר ל{platformName}."
 
 #: lms/static/js/student_account/views/account_settings_fields.js
 msgid "Unlinking"
@@ -4370,7 +4412,7 @@ msgstr "קישור בוטל בהצלחה."
 
 #: lms/static/js/student_account/views/account_settings_view.js
 msgid "Account Information"
-msgstr ""
+msgstr "מידע חשבון"
 
 #: lms/static/js/student_account/views/account_settings_view.js
 msgid "Order History"
@@ -4926,6 +4968,10 @@ msgstr "הצג הגדרות מיושנות"
 msgid "You have unsaved changes. Do you really want to leave this page?"
 msgstr "ישנם שינויים שלא נשמרו. האם אתה בטוח שברצונך לעזוב דף זה?"
 
+#: cms/static/js/maintenance/force_publish_course.js
+msgid "Internal Server Error."
+msgstr "שגיאת שרת פנימית."
+
 #. Translators: This is the status of a video upload that is queued
 #. waiting for other uploads to complete
 #: cms/static/js/models/active_video_upload.js
@@ -5080,6 +5126,7 @@ msgid "This component has validation issues."
 msgstr "לרכיב זה בעיות אימות."
 
 #: cms/static/js/programs/models/course_model.js
+#: cms/templates/js/programs/course_details.underscore
 msgid "Course Code"
 msgstr "קוד קורס"
 
@@ -5104,11 +5151,11 @@ msgstr "חובה לקבל {0} "
 
 #: cms/static/js/programs/utils/validation_config.js
 msgid "{0} must be greater than or equal to {1}"
-msgstr "{0} חייב להיות גדול יותר או שווה ל-{1}"
+msgstr "{0} חייב להיות גדול או שווה ל-{1}"
 
 #: cms/static/js/programs/utils/validation_config.js
 msgid "{0} must be less than or equal to {1}"
-msgstr "{0} חייב להיות קטן או שווה מ- {1}"
+msgstr "{0} חייב להיות קטן או שווה ל- {1}"
 
 #: cms/static/js/programs/utils/validation_config.js
 msgid "{0} must be between {1} and {2}"
@@ -5116,19 +5163,19 @@ msgstr "{0}  חייב להיות בין {1} ל-{2}"
 
 #: cms/static/js/programs/utils/validation_config.js
 msgid "{0} must be {1} characters"
-msgstr "{0} חייב להיות בעל {1} מאפיינים"
+msgstr "{0} חייב להיות בעל {1} תווים"
 
 #: cms/static/js/programs/utils/validation_config.js
 msgid "{0} must be at least {1} characters"
-msgstr "{0} חייב להיות בעל {1} מאפיינים לכל הפחות"
+msgstr "{0} חייב להיות בעל {1} תווים לכל הפחות"
 
 #: cms/static/js/programs/utils/validation_config.js
 msgid "{0} must be at most {1} characters"
-msgstr "{0} חייב להיות בעל {1} מאפיינים לכל היותר"
+msgstr "{0} חייב להיות בעל {1} תווים לכל היותר"
 
 #: cms/static/js/programs/utils/validation_config.js
 msgid "{0} must be between {1} and {2} characters"
-msgstr "{0} חייב להיות בין מאפיינים  {1} ו-{2}  "
+msgstr "{0} חייב להיות בין {1} ו-{2} תווים "
 
 #: cms/static/js/programs/utils/validation_config.js
 msgid "{0} must be one of: {1}"
@@ -5938,7 +5985,7 @@ msgstr "נקה חיפוש"
 
 #: common/static/common/templates/discussion/discussion-home.underscore
 msgid "Discussion Home"
-msgstr ""
+msgstr "דף הבית לדיון"
 
 #: common/static/common/templates/discussion/discussion-home.underscore
 #, python-format
@@ -6279,7 +6326,7 @@ msgstr "הוסף תגובה"
 
 #: common/static/common/templates/discussion/thread.underscore
 msgid "Add a response:"
-msgstr ""
+msgstr "הוסף תגובה:"
 
 #: common/static/common/templates/discussion/thread.underscore
 msgid "Expand discussion"
@@ -6509,7 +6556,7 @@ msgstr "הצטרף לצוות"
 
 #: lms/djangoapps/teams/static/teams/templates/team-profile.underscore
 msgid "Add a Post"
-msgstr ""
+msgstr "הוסף פוסט"
 
 #: lms/djangoapps/teams/static/teams/templates/team-profile.underscore
 msgid "Team Details"
@@ -6549,10 +6596,12 @@ msgid ""
 "There was an error retrieving preview results for this catalog. Please check"
 " that your query is correct and try again."
 msgstr ""
+"קרתה שגיאה בעת אחזור תוצאות התצוגה המוקדמת עבור קטלוג זה. אנא בדוק שהשאילתא "
+"נכונה ונסה שוב."
 
 #: lms/templates/api_admin/catalog-results.underscore
 msgid "This catalog's courses:"
-msgstr ""
+msgstr "הקורסים בקטלוג זה:"
 
 #: lms/templates/bookmarks/bookmarks-list.underscore
 msgid "My Bookmarks"
@@ -6669,7 +6718,7 @@ msgstr "קבל נקודות זכות"
 #, python-format
 msgid ""
 "Thank you %(full_name)s! We have received your payment for %(course_name)s."
-msgstr ""
+msgstr "תודה לך %(full_name)s! קיבלנו את התשלום שלך עבור %(course_name)s."
 
 #: lms/templates/commerce/receipt.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
@@ -6728,7 +6777,7 @@ msgstr "רוצה לאמת את זהותך מאוחר יותר?"
 
 #: lms/templates/commerce/receipt.underscore
 msgid "/verify_student/verify-now/{courseKey}/"
-msgstr ""
+msgstr "/verify_student/verify-now/{courseKey}/"
 
 #: lms/templates/commerce/receipt.underscore
 msgid "Verify Now"
@@ -6877,7 +6926,7 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
 msgid "Upload a CSV file"
-msgstr ""
+msgstr "העלה קובץ CSV"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list-editor.underscore
@@ -6936,11 +6985,11 @@ msgstr "הזן שם משתמש או כתובת דוא\"ל של כל תלמיד �
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list-editor.underscore
 msgid "Student email or username"
-msgstr ""
+msgstr "כתובת דוא\"ל או שם משתמש של הסטודנט"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list-editor.underscore
 msgid "Free text notes"
-msgstr ""
+msgstr "הערות טקסט חופשי"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
 msgid "Generate Exception Certificates"
@@ -6948,11 +6997,11 @@ msgstr "צור תעודות חריגים"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
 msgid "All users on the Exception list who do not yet have a certificate"
-msgstr ""
+msgstr "כל המשתמשים ברשימת החריגים שעדיין לא קיבלו תעודה"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
 msgid "All users on the Exception list"
-msgstr ""
+msgstr "כל המשתמשים ברשימת החריגים"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
 msgid "User Email"
@@ -7192,7 +7241,7 @@ msgstr "חוקי"
 
 #: lms/templates/learner_dashboard/certificate.underscore
 msgid "Program Certificates"
-msgstr ""
+msgstr "תעודות התכנית"
 
 #: lms/templates/learner_dashboard/certificate.underscore
 msgid "certificate.credential_url"
@@ -7204,7 +7253,7 @@ msgstr "certificate.display_name"
 
 #: lms/templates/learner_dashboard/certificate_status.underscore
 msgid "Congratulations! You have earned a certificate for this course."
-msgstr ""
+msgstr "ברכות! הרווחת תעודה עבור קורס זה."
 
 #: lms/templates/learner_dashboard/certificate_status.underscore
 msgid "View Certificate"
@@ -7224,28 +7273,28 @@ msgstr ""
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
 msgid "not enrolled"
-msgstr ""
+msgstr "לא רשום"
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
 msgid "Please select a course date"
-msgstr ""
+msgstr "בחר תאריך קורס"
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
 msgid "Select Course Run"
-msgstr ""
+msgstr "בחר מחזור לימודים של קורס"
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
 msgid "Choose Course Date"
-msgstr ""
+msgstr "בחר תאריך קורס"
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
 #, python-format
 msgid "Starts %(start)s"
-msgstr ""
+msgstr "מתחיל ב-%(start)s"
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
 msgid "Enroll Now"
-msgstr ""
+msgstr "הירשם עכשיו"
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
 msgid "Coming Soon"
@@ -7253,19 +7302,19 @@ msgstr ""
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
 msgid "Enrollment Opens on"
-msgstr ""
+msgstr "הרישום נפתח ב"
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
 msgid "Not Currently Available"
-msgstr ""
+msgstr "לא זמין כרגע"
 
 #: lms/templates/learner_dashboard/empty_programs_list.underscore
 msgid "You are not enrolled in any programs yet."
-msgstr ""
+msgstr "עדיין אינך רשום באף תכנית."
 
 #: lms/templates/learner_dashboard/empty_programs_list.underscore
 msgid "Explore Programs"
-msgstr ""
+msgstr "חקור את התכניות"
 
 #: lms/templates/learner_dashboard/explore_new_programs.underscore
 msgid ""
@@ -7275,11 +7324,11 @@ msgstr "עיין בקורסים שהושקו לאחרונה וראה מה חדש
 
 #: lms/templates/learner_dashboard/explore_new_programs.underscore
 msgid "Explore New Programs"
-msgstr ""
+msgstr "חקור תכניות חדשות"
 
 #: lms/templates/learner_dashboard/program_card.underscore
 msgid "category"
-msgstr ""
+msgstr "קטגוריה"
 
 #: lms/templates/learner_dashboard/program_card.underscore
 #, python-format
@@ -7291,11 +7340,11 @@ msgstr ""
 
 #: lms/templates/learner_dashboard/program_header_view.underscore
 msgid "{organization}\\'s logo"
-msgstr ""
+msgstr "הסמל של {organization}"
 
 #: lms/templates/learner_dashboard/program_header_view.underscore
 msgid "You are here"
-msgstr ""
+msgstr "אתה כאן"
 
 #: lms/templates/learner_dashboard/program_header_view.underscore
 msgid "Dashboard"
@@ -7309,11 +7358,11 @@ msgstr "תוכניות"
 msgid ""
 "You need a certificate in this course to be eligible for a program "
 "certificate."
-msgstr ""
+msgstr "אתה צריך תעודה בקורס זה כדי לקבל תעודת תכנית."
 
 #: lms/templates/learner_dashboard/upgrade_message.underscore
 msgid "Upgrade Now"
-msgstr ""
+msgstr "שדרג עכשיו"
 
 #: lms/templates/search/course_search_results.underscore
 #: lms/templates/search/dashboard_search_results.underscore
@@ -7912,17 +7961,19 @@ msgstr ""
 msgid ""
 "An email has been sent to {userEmail} with a link for you to activate your "
 "account."
-msgstr ""
+msgstr "נשלחה הודעת דוא\"ל ל {userEmail} עם קישור עבורך כדי להפעיל את החשבון."
 
 #: lms/templates/verify_student/make_payment_step.underscore
 msgid "Why activate?"
-msgstr ""
+msgstr "למה להפעיל?"
 
 #: lms/templates/verify_student/make_payment_step.underscore
 msgid ""
 "We ask you to activate your account to ensure it is really you creating the "
 "account and to prevent fraud."
 msgstr ""
+"אנו מבקשים ממך להפעיל את החשבון כדי לוודא שאתה אכן יצרת אותו וכדי למנוע "
+"הונאה."
 
 #: lms/templates/verify_student/make_payment_step.underscore
 msgid ""
@@ -8216,24 +8267,24 @@ msgstr "סוגי בעיות נפוצות"
 
 #: cms/templates/js/add-xblock-component-support-legend.underscore
 msgid "Supported"
-msgstr ""
+msgstr "נתמך"
 
 #: cms/templates/js/add-xblock-component-support-legend.underscore
 msgid "Provisional"
-msgstr ""
+msgstr "זמני"
 
 #: cms/templates/js/add-xblock-component-support-legend.underscore
 #: cms/templates/js/add-xblock-component-support-level.underscore
 msgid "Not Supported"
-msgstr ""
+msgstr "לא נתמך"
 
 #: cms/templates/js/add-xblock-component-support-level.underscore
 msgid "Fully Supported"
-msgstr ""
+msgstr "נתמך במלואו"
 
 #: cms/templates/js/add-xblock-component-support-level.underscore
 msgid "Provisionally Supported"
-msgstr ""
+msgstr "נתמך באופן זמני"
 
 #: cms/templates/js/add-xblock-component.underscore
 msgid "Add New Component"
@@ -8445,60 +8496,62 @@ msgstr "נעשה שימוש בקבוצת תוכן זו ביחידה אחת או 
 
 #: cms/templates/js/content-visibility-editor.underscore
 msgid "Subsection Visibility"
-msgstr ""
+msgstr "נראות תת קטע"
 
 #: cms/templates/js/content-visibility-editor.underscore
 msgid "Show entire subsection"
-msgstr ""
+msgstr "הצג את תת הקטע כולו"
 
 #: cms/templates/js/content-visibility-editor.underscore
 msgid "Learners see the published subsection and can access its content."
-msgstr ""
+msgstr "הלומדים רואים את תת הקטע שפורסם ויכולים לגשת לתוכן שלו."
 
 #: cms/templates/js/content-visibility-editor.underscore
 msgid "Hide content after due date"
-msgstr ""
+msgstr "הסתר תוכן לאחר תאריך היעד"
 
 #: cms/templates/js/content-visibility-editor.underscore
 msgid ""
 "After the subsection\\'s due date has passed, learners can no longer access "
 "its content. The subsection remains included in grade calculations."
 msgstr ""
+"לאחר שתאריך היעד של תת הקטע עבר, הלומדים אינם יכולים יותר לגשת לתוכן שלו. תת"
+" הקטע נשאר כלול בחישובי הדירוג."
 
 #: cms/templates/js/content-visibility-editor.underscore
 msgid "Hide entire subsection"
-msgstr ""
+msgstr "הסתר את תת הקטע כולו"
 
 #: cms/templates/js/content-visibility-editor.underscore
 msgid ""
 "Learners do not see the subsection in the course outline. The subsection is "
 "not included in grade calculations."
 msgstr ""
+"הלומדים אינם רואים את תת הקטע במתווה הקורס. תת הקטע אינו כלול בחישובי הציון."
 
 #: cms/templates/js/content-visibility-editor.underscore
+#, python-format
 msgid ""
-"Units inherit the visibility setting of the subsection they are in. If you "
-"make this subsection visible to learners, published units that were "
-"previously hidden also become visible. Only units that were explicitly "
-"hidden remain hidden regardless of the option you select for this "
-"subsection."
+"If you select an option other than \"%(hide_label)s\", after the subsection "
+"release date has passed, published units in this subsection will become "
+"available to learners unless units are explicitly hidden."
 msgstr ""
 
 #: cms/templates/js/course-instructor-details.underscore
 msgid "Instructor Name"
-msgstr ""
+msgstr "שם המדריך"
 
 #: cms/templates/js/course-instructor-details.underscore
 msgid "Please add the instructor's name"
-msgstr ""
+msgstr "אנא הכנס את שם המדריך"
 
 #: cms/templates/js/course-instructor-details.underscore
 msgid "Instructor Title"
-msgstr ""
+msgstr "תואר המדריך"
 
 #: cms/templates/js/course-instructor-details.underscore
 msgid "Please add the instructor's title"
-msgstr ""
+msgstr "אנא הכנס את תואר המדריך"
 
 #: cms/templates/js/course-instructor-details.underscore
 #: cms/templates/js/signatory-details.underscore
@@ -8512,41 +8565,41 @@ msgstr "שם הארגון"
 
 #: cms/templates/js/course-instructor-details.underscore
 msgid "Please add the institute where the instructor is associated"
-msgstr ""
+msgstr "אנא הכנס את המוסד שאליו משויך המדריך"
 
 #: cms/templates/js/course-instructor-details.underscore
 msgid "Biography"
-msgstr ""
+msgstr "ביוגרפיה"
 
 #: cms/templates/js/course-instructor-details.underscore
 msgid "Instructor Biography"
-msgstr ""
+msgstr "ביוגרפיית המדריך"
 
 #: cms/templates/js/course-instructor-details.underscore
 msgid "Please add the instructor's biography"
-msgstr ""
+msgstr "אנא הכנס את ביוגרפיית המדריך"
 
 #: cms/templates/js/course-instructor-details.underscore
 msgid "Photo"
-msgstr ""
+msgstr "תמונה"
 
 #: cms/templates/js/course-instructor-details.underscore
 msgid "Instructor Photo"
-msgstr ""
+msgstr "תמונת המדריך"
 
 #: cms/templates/js/course-instructor-details.underscore
 msgid "Instructor Photo URL"
-msgstr ""
+msgstr "כתובת URL של תמונת המדריך"
 
 #: cms/templates/js/course-instructor-details.underscore
 msgid ""
 "Please add a photo of the instructor (Note: only JPEG or PNG format "
 "supported)"
-msgstr ""
+msgstr "אנא הוסף תמונה של המדריך (שים לב: נתמכים רק קבצי JPEG או PNG)"
 
 #: cms/templates/js/course-instructor-details.underscore
 msgid "Upload Photo"
-msgstr ""
+msgstr "העלה תמונה"
 
 #: cms/templates/js/course-outline.underscore
 #, python-format
@@ -8583,7 +8636,7 @@ msgstr "מבחן תחת פיקוח"
 
 #: cms/templates/js/course-outline.underscore
 msgid "Timed Exam"
-msgstr ""
+msgstr "מבחן מתוזמן"
 
 #: cms/templates/js/course-outline.underscore
 #: cms/templates/js/xblock-outline.underscore
@@ -8628,7 +8681,7 @@ msgstr "תאריך הגשה"
 
 #: cms/templates/js/course-outline.underscore
 msgid "Subsection is hidden after due date"
-msgstr ""
+msgstr "תת הקטע נסתר לאחר תאריך היעד"
 
 #: cms/templates/js/course-outline.underscore
 #: cms/templates/js/xblock-outline.underscore
@@ -8643,11 +8696,11 @@ msgstr "לחץ להוסיף %(xblock_type)s חדש."
 
 #: cms/templates/js/course-settings-learning-fields.underscore
 msgid "Learning Outcome"
-msgstr ""
+msgstr "תוצאת למידה"
 
 #: cms/templates/js/course-settings-learning-fields.underscore
 msgid "Add a learning outcome here"
-msgstr ""
+msgstr "הוסף תוצאת למידה כאן"
 
 #: cms/templates/js/course_grade_policy.underscore
 msgid "Assignment Type Name"
@@ -9049,7 +9102,7 @@ msgstr "עם %(section_or_subsection)s"
 
 #: cms/templates/js/publish-xblock.underscore
 msgid "Staff and Learners"
-msgstr ""
+msgstr "צוות ולומדים"
 
 #: cms/templates/js/publish-xblock.underscore
 msgid "Some content in this unit is visible only to particular content groups"
@@ -9058,11 +9111,11 @@ msgstr "חלק מהתוכן ביחידה זו גלוי רק עבור קבוצו�
 #: cms/templates/js/publish-xblock.underscore
 #: cms/templates/js/staff-lock-editor.underscore
 msgid "Hide from learners"
-msgstr ""
+msgstr "הסתר מהלומדים"
 
 #: cms/templates/js/publish-xblock.underscore
 msgid "Note: Do not hide graded assignments after they have been released."
-msgstr ""
+msgstr "שים לב: אל תסתיר את המטלות שקיבלו ציון לאחר הפצתן."
 
 #: cms/templates/js/release-date-editor.underscore
 msgid "Release Date and Time"
@@ -9154,17 +9207,19 @@ msgstr "העלה תמונת חתימה"
 
 #: cms/templates/js/staff-lock-editor.underscore
 msgid "Unit Visibility"
-msgstr ""
+msgstr "נראות של יחידה"
 
 #: cms/templates/js/staff-lock-editor.underscore
 msgid "Section Visibility"
-msgstr ""
+msgstr "נראות של קטע"
 
 #: cms/templates/js/staff-lock-editor.underscore
 msgid ""
 "If the unit was previously published and released to learners, any changes "
 "you made to the unit when it was hidden will now be visible to learners."
 msgstr ""
+"אם היחידה פורסמה בעבר ושוחררה ללומדים, כל השינויים שביצעת בזמן שהייתה מוסתרת"
+" יהיו עכשיו גלויים ללומדים."
 
 #: cms/templates/js/staff-lock-editor.underscore
 #, python-format
@@ -9174,6 +9229,9 @@ msgid ""
 "the unit. Only units that are explicitly hidden from learners will remain "
 "hidden after you clear this option for the %(xblockType)s."
 msgstr ""
+"אם תהפוך את %(xblockType)s לגלוי ללומדים, הלומדים יוכלו לראות את התוכן שלו "
+"לאחר שתאריך ההפצה חלף ופרסמת את היחידה. רק יחידות שחסויות באופן מפורש מפני "
+"לומדים ישארו חסויות אחרי שתנקה את האפשרות הזאת מה-%(xblockType)s."
 
 #: cms/templates/js/team-member.underscore
 msgid "Current Role:"
@@ -9209,7 +9267,7 @@ msgstr "הגדר כמבחן מיוחד"
 
 #: cms/templates/js/timed-examination-preference-editor.underscore
 msgid "Exam Types"
-msgstr ""
+msgstr "סוגי מבחן"
 
 #: cms/templates/js/timed-examination-preference-editor.underscore
 msgid "Timed"
@@ -9321,24 +9379,38 @@ msgstr "ערוך %(display_name)s (חובה)"
 msgid "formLabel"
 msgstr "תווית טופס"
 
+#: cms/templates/js/maintenance/force-published-course-response.underscore
+msgid ""
+"You have done a dry run of force publishing the course. Nothing has changed."
+" Had you run it, the following course versions would have been change."
+msgstr ""
+"ביצעת הפעלה מאולצת של פרסום הקורס. דבר לא השתנה. אם היית מפעיל אותו, גרסאות "
+"הקורס הבאות היו משתנות."
+
+#: cms/templates/js/maintenance/force-published-course-response.underscore
+msgid ""
+"The published branch version, {published}, was reset to the draft branch "
+"version, {draft}."
+msgstr "גרסת הענף שפורסם, {published}, אופסה לגרסת ענף הטיוטה, {draft}."
+
 #: cms/templates/js/programs/course_details.underscore
 msgid "Delete course"
-msgstr ""
+msgstr "מחק קורס"
 
 #: cms/templates/js/programs/course_details.underscore
 #, python-format
 msgid "Remove %(name)s from the program"
-msgstr ""
+msgstr "הסר את %(name)s מהתכנית"
 
 #: cms/templates/js/programs/course_details.underscore
 msgid "Add another run"
-msgstr ""
+msgstr "הוסף הרצה נוספת"
 
 #: cms/templates/js/programs/course_details.underscore
 msgid ""
 "The unique number that identifies your course within your organization, e.g."
 " CS101."
-msgstr ""
+msgstr "המספר הייחודי שמזהה את הקורס שלך בתוך הארגון, לדוגמה CS101."
 
 #: cms/templates/js/programs/course_details.underscore
 msgid ""
@@ -9346,114 +9418,117 @@ msgid ""
 " the course. It will be displayed on the XSeries progress page and in "
 "marketing presentations."
 msgstr ""
+"הכותרת שהוזנה כאן תמחק את הכותרת שהוגדרה להרצה יחידה של הקורס. היא תוצג בדף "
+"ההתקדמות של XSeries ובמצגות השיווק."
 
 #: cms/templates/js/programs/course_details.underscore
 msgid "Save Course"
-msgstr ""
+msgstr "שמור את הקורס"
 
 #: cms/templates/js/programs/course_run.underscore
 #, python-format
 msgid "Run %(key)s"
-msgstr ""
+msgstr "הרץ את %(key)s"
 
 #: cms/templates/js/programs/course_run.underscore
 msgid "Delete course run"
-msgstr ""
+msgstr "מחק מחזור לימודים של קורס"
 
 #: cms/templates/js/programs/course_run.underscore
 #, python-format
 msgid "Remove run %(key)s from the program"
-msgstr ""
+msgstr "הסר את %(key)s של ההרצה מהתכנית"
 
 #: cms/templates/js/programs/course_run.underscore
 #, python-format
 msgid "Start Date: %(date)s"
-msgstr ""
+msgstr "תאריך התחלה: %(date)s"
 
 #: cms/templates/js/programs/course_run.underscore
 #, python-format
 msgid "Mode: %(mode)s"
-msgstr ""
+msgstr "מצב: %(mode)s"
 
 #: cms/templates/js/programs/course_run.underscore
 msgid "Please select a Course Run"
-msgstr ""
+msgstr "בחר מחזור לימודים של קורס"
 
 #: cms/templates/js/programs/program_creator_form.underscore
 msgid "Create a New Program"
-msgstr ""
+msgstr "צור תכנית חדשה"
 
 #: cms/templates/js/programs/program_creator_form.underscore
 msgid "Program type"
-msgstr ""
+msgstr "סוג תכנית"
 
 #: cms/templates/js/programs/program_creator_form.underscore
 msgid "Select a type"
-msgstr ""
+msgstr "בחר סוג"
 
 #: cms/templates/js/programs/program_creator_form.underscore
 msgid "XSeries"
-msgstr ""
+msgstr "XSeries"
 
 #: cms/templates/js/programs/program_creator_form.underscore
 msgid "MicroMasters"
-msgstr ""
+msgstr "MicroMasters"
 
 #: cms/templates/js/programs/program_creator_form.underscore
 msgid "Select an organization"
-msgstr ""
+msgstr "בחר ארגון"
 
 #: cms/templates/js/programs/program_creator_form.underscore
 msgid "The public display name of the program."
-msgstr ""
+msgstr "שם התצוגה הציבורי של התכנית."
 
 #: cms/templates/js/programs/program_creator_form.underscore
 #: cms/templates/js/programs/program_details.underscore
 msgid "Subtitle"
-msgstr ""
+msgstr "כתובית"
 
 #: cms/templates/js/programs/program_creator_form.underscore
 msgid ""
 "A short description of the program, including concepts covered and expected "
 "outcomes (255 character limit)."
 msgstr ""
+"תיאור קצר של התכנית, כולל רעיונות שכוסו ותוצאות צפויות (מגבלה של 255 תווים)."
 
 #: cms/templates/js/programs/program_creator_form.underscore
 #: cms/templates/js/programs/program_details.underscore
 msgid "Marketing Slug"
-msgstr ""
+msgstr "סלאג לשיווק"
 
 #: cms/templates/js/programs/program_creator_form.underscore
 msgid "Slug used to generate links to the marketing site."
-msgstr ""
+msgstr "שימוש בסלאג ליצירת קישורים לאתר השיווק."
 
 #: cms/templates/js/programs/program_details.underscore
 msgid "Edit the program title"
-msgstr ""
+msgstr "ערוך את כותרת התכנית"
 
 #: cms/templates/js/programs/program_details.underscore
 msgid "Edit the program\\'s name."
-msgstr ""
+msgstr "ערוך את שם התכנית"
 
 #: cms/templates/js/programs/program_details.underscore
 msgid "Edit the program subtitle"
-msgstr ""
+msgstr "ערוך את כתובית התכנית"
 
 #: cms/templates/js/programs/program_details.underscore
 msgid "Edit the program\\'s subtitle."
-msgstr ""
+msgstr "ערוך את הכתובית של התכנית"
 
 #: cms/templates/js/programs/program_details.underscore
 msgid "Edit the program marketing slug"
-msgstr ""
+msgstr "ערוך את הסלאג לשיווק של התכנית"
 
 #: cms/templates/js/programs/program_details.underscore
 msgid "Edit the program\\'s marketing slug."
-msgstr ""
+msgstr "ערוך את הסלאג לשיווק של התכנית"
 
 #: cms/templates/js/programs/program_details.underscore
 msgid "Add a course"
-msgstr ""
+msgstr "הוסף קורס"
 
 #: cms/templates/js/video/transcripts/metadata-videolist-entry.underscore
 msgid "Add URLs for additional versions"

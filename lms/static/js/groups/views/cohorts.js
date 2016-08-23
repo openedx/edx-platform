@@ -304,7 +304,6 @@
                                 });
                             }
                         }).render();
-                        this.$('#file-upload-form-file').focus();
                     }
                 },
                 showDiscussionTopics: function(event) {
@@ -330,7 +329,7 @@
                 },
 
                 getSectionCss: function(section) {
-                    return ".instructor-nav .nav-item a[data-section='" + section + "']";
+                    return ".instructor-nav .nav-item [data-section='" + section + "']";
                 }
             });
             return CohortsView;

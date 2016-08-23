@@ -3,6 +3,7 @@ Class used for defining and running Bok Choy acceptance test suite
 """
 from time import sleep
 from urllib import urlencode
+from textwrap import dedent
 
 from common.test.acceptance.fixtures.course import CourseFixture, FixtureError
 
@@ -349,51 +350,59 @@ class Pa11yCrawler(BokChoyTestSuite):
     def __init__(self, *args, **kwargs):
         super(Pa11yCrawler, self).__init__(*args, **kwargs)
         self.course_key = kwargs.get('course_key')
-        self.pa11y_report_dir = os.path.join(self.report_dir, 'pa11ycrawler_reports')
+        self.ensure_scrapy_cfg()
 
-        self.start_urls = []
-        auto_auth_params = {
-            "redirect": 'true',
-            "staff": 'true',
-            "course_id": self.course_key,
-        }
-        cms_params = urlencode(auto_auth_params)
-        self.start_urls.append("\"http://localhost:8031/auto_auth?{}\"".format(cms_params))
+    def ensure_scrapy_cfg(self):
+        """
+        Scrapy requires a few configuration settings in order to run:
+        http://doc.scrapy.org/en/1.1/topics/commands.html#configuration-settings
+        This method ensures they are correctly written to the filesystem
+        in a location where Scrapy knows to look for them.
 
-        sequence_url = "/api/courses/v1/blocks/?{}".format(
-            urlencode({
-                "course_id": self.course_key,
-                "depth": "all",
-                "all_blocks": "true",
-            })
-        )
-        auto_auth_params.update({'redirect_to': sequence_url})
-        lms_params = urlencode(auto_auth_params)
-        self.start_urls.append("\"http://localhost:8003/auto_auth?{}\"".format(lms_params))
+        Returns True if the file was created, or False if the file already
+        exists (in which case it was not modified.)
+        """
+        cfg_file = path("~/.config/scrapy.cfg").expand()
+        if cfg_file.isfile():
+            return False
+        cfg_file.parent.makedirs_p()
+        content = dedent("""
+            [settings]
+            default = pa11ycrawler.settings
+
+            [deploy]
+            project = pa11ycrawler
+        """)
+        cfg_file.write_text(content)
+        return True
 
     def generate_html_reports(self):
         """
-        Runs pa11ycrawler json-to-html
+        Runs pa11ycrawler-html
         """
-        cmd_str = (
-            'pa11ycrawler json-to-html --pa11ycrawler-reports-dir={report_dir}'
-        ).format(report_dir=self.pa11y_report_dir)
-
-        sh(cmd_str)
+        command = [
+            'pa11ycrawler-html',
+            '--data-dir',
+            os.path.join(self.report_dir, 'data'),
+            '--output-dir',
+            os.path.join(self.report_dir, 'html'),
+        ]
+        sh(command)
 
     @property
     def cmd(self):
         """
         Runs pa11ycrawler as staff user against the test course.
         """
-        cmd = [
-            'pa11ycrawler',
-            'run',
-        ] + self.start_urls + [
-            '--pa11ycrawler-allowed-domains=localhost',
-            '--pa11ycrawler-reports-dir={}'.format(self.pa11y_report_dir),
-            '--pa11ycrawler-deny-url-matcher=logout',
-            '--pa11y-reporter="1.0-json"',
-            '--depth-limit=6',
+        data_dir = os.path.join(self.report_dir, 'data')
+        return [
+            "scrapy",
+            "crawl",
+            "edx",
+            "-a",
+            "port=8003",
+            "-a",
+            "course_key={key}".format(key=self.course_key),
+            "-a",
+            "data_dir={dir}".format(dir=data_dir)
         ]
-        return cmd

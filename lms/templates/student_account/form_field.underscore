@@ -64,6 +64,6 @@
     <% } %>
 
     <% if( form === 'login' && name === 'password' ) { %>
-        <a href="#" class="forgot-password field-link"><%- gettext("Forgot password?") %></a>
+        <button type="button" class="forgot-password field-link"><%- gettext("Forgot password?") %></button>
     <% } %>
 </div>

@@ -23,7 +23,7 @@ class InstructorDashboardPage(CoursePage):
         """
         Selects the membership tab and returns the MembershipSection
         """
-        self.q(css='[data-section=membership]').first.click()
+        self.q(css='[data-section="membership"]').first.click()
         membership_section = MembershipPage(self.browser)
         membership_section.wait_for_page()
         return membership_section
@@ -32,7 +32,7 @@ class InstructorDashboardPage(CoursePage):
         """
         Selects the cohort management tab and returns the CohortManagementSection
         """
-        self.q(css='[data-section=cohort_management]').first.click()
+        self.q(css='[data-section="cohort_management"]').first.click()
         cohort_management_section = CohortManagementSection(self.browser)
         # The first time cohort management is selected, an ajax call is made.
         cohort_management_section.wait_for_ajax()
@@ -43,7 +43,7 @@ class InstructorDashboardPage(CoursePage):
         """
         Selects the data download tab and returns a DataDownloadPage.
         """
-        self.q(css='[data-section=data_download]').first.click()
+        self.q(css='[data-section="data_download"]').first.click()
         data_download_section = DataDownloadPage(self.browser)
         data_download_section.wait_for_page()
         return data_download_section
@@ -52,7 +52,7 @@ class InstructorDashboardPage(CoursePage):
         """
         Selects the student admin tab and returns the MembershipSection
         """
-        self.q(css='[data-section=student_admin]').first.click()
+        self.q(css='[data-section="student_admin"]').first.click()
         student_admin_section = StudentAdminPage(self.browser)
         student_admin_section.wait_for_page()
         return student_admin_section
@@ -61,7 +61,7 @@ class InstructorDashboardPage(CoursePage):
         """
         Selects the certificates tab and returns the CertificatesSection
         """
-        self.q(css='[data-section=certificates]').first.click()
+        self.q(css='[data-section="certificates"]').first.click()
         certificates_section = CertificatesPage(self.browser)
         certificates_section.wait_for_page()
         return certificates_section
@@ -70,7 +70,7 @@ class InstructorDashboardPage(CoursePage):
         """
         Selects the timed exam tab and returns the Special Exams Section
         """
-        self.q(css='[data-section=special_exams]').first.click()
+        self.q(css='[data-section="special_exams"]').first.click()
         timed_exam_section = SpecialExamsPage(self.browser)
         timed_exam_section.wait_for_page()
         return timed_exam_section
@@ -79,7 +79,7 @@ class InstructorDashboardPage(CoursePage):
         """
         Selects the email tab and returns the bulk email section
         """
-        self.q(css='[data-section=send_email]').first.click()
+        self.q(css='[data-section="send_email"]').first.click()
         email_section = BulkEmailPage(self.browser)
         email_section.wait_for_page()
         return email_section
@@ -386,7 +386,6 @@ class CohortManagementSection(PageObject):
             lambda: "Add a New Cohort" in self.q(css=self._bounded_selector(".form-title")).text,
             "Create cohort form is visible"
         )
-
         textinput = self.q(css=self._bounded_selector("#cohort-name")).results[0]
         textinput.send_keys(cohort_name)
 
@@ -509,7 +508,7 @@ class CohortManagementSection(PageObject):
         """
         Selects the settings tab for the cohort currently being edited.
         """
-        self.q(css=self._bounded_selector(".cohort-management-settings li.tab-settings>a")).first.click()
+        self.q(css=self._bounded_selector(".cohort-management-settings li.tab-settings>.toggle-button")).first.click()
 
     # pylint: disable=redefined-builtin
     def get_cohort_settings_messages(self, type="confirmation", wait_for_messages=True):
@@ -585,7 +584,7 @@ class CohortManagementSection(PageObject):
         """
         Click on the link to the Data Download Page.
         """
-        self.q(css=self._bounded_selector("a.link-cross-reference[data-section=data_download]")).first.click()
+        self.q(css=self._bounded_selector('[data-section="data_download"]')).first.click()
 
     def upload_cohort_file(self, filename):
         """
@@ -627,7 +626,7 @@ class CohortManagementSection(PageObject):
         Shows the discussion topics.
         """
         self.q(css=self._bounded_selector(".toggle-cohort-management-discussions")).first.click()
-        self.wait_for_element_visibility("#cohort-management-discussion-topics", "Waiting for discussions to appear")
+        self.wait_for_element_visibility("#cohort-discussions-management", "Waiting for discussions to appear")
 
     def discussion_topics_visible(self):
         """

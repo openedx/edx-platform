@@ -32,10 +32,6 @@ from openedx.core.djangolib.js_utils import (
 <%block name="js_extra">
 
 <%include file="../discussion/_js_body_dependencies.html" />
-<%static:js group='discussion'/>
-<script type="text/javascript">
-    RequireJS.define('DiscussionModuleView', [], function() {return window['DiscussionModuleView'];});
-</script>
 
 <%static:require_module module_name="teams/js/teams_tab_factory" class_name="TeamsTabFactory">
     TeamsTabFactory({

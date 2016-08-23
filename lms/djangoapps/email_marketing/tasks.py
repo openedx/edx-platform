@@ -315,7 +315,8 @@ def _update_unenrolled_list(sailthru_client, email, course_url, unenroll):
         response_json = sailthru_response.json
 
         unenroll_list = []
-        if response_json and "vars" in response_json and "unenrolled" in response_json["vars"]:
+        if response_json and "vars" in response_json and response_json["vars"] \
+                and "unenrolled" in response_json["vars"]:
             unenroll_list = response_json["vars"]["unenrolled"]
 
         changed = False

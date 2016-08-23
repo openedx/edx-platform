@@ -67,6 +67,23 @@ define(['domReady', 'jquery', 'underscore', 'js/utils/cancel_on_escape', 'js/vie
             });
         };
 
+        var rtlTextDirection = function() {
+            var Selectors = {
+                new_course_run: '#new-course-run'
+            };
+
+            if ($('body').hasClass('rtl')) {
+                $(Selectors.new_course_run).addClass('course-run-text-direction placeholder-text-direction');
+                $(Selectors.new_course_run).on('input', function() {
+                    if (this.value === '') {
+                        $(Selectors.new_course_run).addClass('placeholder-text-direction');
+                    } else {
+                        $(Selectors.new_course_run).removeClass('placeholder-text-direction');
+                    }
+                });
+            }
+        };
+
         var makeCancelHandler = function(addType) {
             return function(e) {
                 e.preventDefault();
@@ -81,18 +98,22 @@ define(['domReady', 'jquery', 'underscore', 'js/utils/cancel_on_escape', 'js/vie
         };
 
         var addNewCourse = function(e) {
+            var $newCourse,
+                $cancelButton,
+                $courseName;
             e.preventDefault();
             $('.new-course-button').addClass('is-disabled').attr('aria-disabled', true);
             $('.new-course-save').addClass('is-disabled').attr('aria-disabled', true);
-            var $newCourse = $('.wrapper-create-course').addClass('is-shown');
-            var $cancelButton = $newCourse.find('.new-course-cancel');
-            var $courseName = $('.new-course-name');
+            $newCourse = $('.wrapper-create-course').addClass('is-shown');
+            $cancelButton = $newCourse.find('.new-course-cancel');
+            $courseName = $('.new-course-name');
             $courseName.focus().select();
             $('.new-course-save').on('click', saveNewCourse);
             $cancelButton.bind('click', makeCancelHandler('course'));
             CancelOnEscape($cancelButton);
             CreateCourseUtils.setupOrgAutocomplete();
             CreateCourseUtils.configureHandlers();
+            rtlTextDirection();
         };
 
         var saveNewLibrary = function(e) {

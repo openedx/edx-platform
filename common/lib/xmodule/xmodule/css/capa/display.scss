@@ -154,90 +154,99 @@ div.problem {
   }
 }
 
+// Choice Group - silent class
+%choicegroup-base {
+  @include clearfix();
+  min-width: 100px;
+  width: auto !important;
+  width: 100px;
+
+  label {
+    @include box-sizing(border-box);
+    display: inline-block;
+    clear: both;
+    margin-bottom: ($baseline/2);
+    border: 2px solid $gray-l4;
+    border-radius: 3px;
+    padding: ($baseline/2);
+    width: 100%;
+
+    &:after {
+      @include margin-left($baseline*.75);
+    }
+
+    &:hover {
+      border: 2px solid $blue;
+    }
+
+    &.choicegroup_correct {
+      @include status-icon($correct, "\f00c");
+      border: 2px solid $correct;
+
+      // keep green for correct answers on hover.
+      &:hover {
+        border-color: $correct;
+      }
+    }
+
+    &.choicegroup_partially-correct {
+      @include status-icon($partiallycorrect, "\f069");
+      border: 2px solid $partiallycorrect;
+
+      // keep green for correct answers on hover.
+      &:hover {
+        border-color: $partiallycorrect;
+      }
+    }
+
+    &.choicegroup_incorrect {
+      @include status-icon($incorrect, "\f00d");
+      border: 2px solid $incorrect;
+
+      // keep red for incorrect answers on hover.
+      &:hover {
+        border-color: $incorrect;
+      }
+    }
+  }
+
+  .indicator-container {
+    display: inline-block;
+    min-height: 1px;
+    width: 25px;
+  }
+
+  fieldset {
+    @include box-sizing(border-box);
+  }
+
+  input[type="radio"],
+  input[type="checkbox"] {
+    @include margin(($baseline/4) ($baseline/2) ($baseline/4) ($baseline/4));
+  }
+
+  text {
+    @include margin-left(25px);
+    display: inline;
+  }
+}
+
 // +Problem - Choice Group
 // ====================
 div.problem {
   .choicegroup {
-    @include clearfix();
-    min-width: 100px;
-    width: auto !important;
-    width: 100px;
-
+    @extend %choicegroup-base;
     label {
-      @include box-sizing(border-box);
-      display: inline-block;
-      clear: both;
-      margin-bottom: ($baseline/2);
-      border: 2px solid $gray-l4;
-      border-radius: 3px;
-      padding: ($baseline/2);
-      width: 100%;
-
-      &.choicegroup_correct {
-        @include status-icon($correct, "\f00c");
-        border: 2px solid $correct;
-
-        &:after {
-          @include margin-left($baseline*.75);
-        }
-
-        // keep green for correct answers on hover.
-        &:hover {
-          border-color: $correct;
-        }
-      }
-
-      &.choicegroup_partially-correct {
-        @include status-icon($partiallycorrect, "\f069");
-        border: 2px solid $partiallycorrect;
-
-        &:after {
-          @include margin-left($baseline*.75);
-        }
-
-        // keep green for correct answers on hover.
-        &:hover {
-          border-color: $partiallycorrect;
-        }
-      }
-
-      &.choicegroup_incorrect {
-        @include status-icon($incorrect, "\f00d");
-        border: 2px solid $incorrect;
-
-        &:after {
-          @include margin-left($baseline*.75);
-        }
-
-        // keep red for incorrect answers on hover.
-        &:hover {
-          border-color: $incorrect;
-        }
-      }
-
-      &:hover {
-        border: 2px solid $blue;
-      }
-    }
-
-    .indicator-container {
-      display: inline-block;
-      min-height: 1px;
-      width: 25px;
-    }
-
-    fieldset {
-      @include box-sizing(border-box);
+      @include padding($baseline/2);
+      @include padding-left($baseline*1.75);
+      position: relative;
     }
 
     input[type="radio"],
     input[type="checkbox"] {
-      @include margin(($baseline/4) ($baseline/2) ($baseline/4) ($baseline/4));
-    }
-
-    text {
-      @include margin-left(25px);
-      display: inline;
+      @include left($baseline/4);
+      position: absolute;
+      top: em(11);
     }
   }
 }
@@ -818,10 +827,8 @@ div.problem {
     }
   }
 
-  .capa_inputtype.textline.text-input-dynamath, .inputtype.formulaequationinput {
-    .trailing_text {
-      display: inline-block;
-    }
+  .trailing_text {
+    display: inline-block;
   }
 }
 
@@ -1409,7 +1416,7 @@ div.problem {
 // ====================
 div.problem {
   .choicetextgroup {
-    @extend .choicegroup;
+    @extend %choicegroup-base;
 
     input[type="text"]{
       margin-bottom: 0.5em;

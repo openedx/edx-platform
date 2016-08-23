@@ -23,10 +23,6 @@
             this.roleIds = roles;
         };
 
-        DiscussionUtil.loadRolesFromContainer = function() {
-            return this.loadRoles($('#discussion-container').data('roles'));
-        };
-
         DiscussionUtil.isStaff = function(userId) {
             var staff;
             if (_.isUndefined(userId)) {
@@ -321,7 +317,8 @@
             imageUploadUrl = this.urlFor('upload');
             _processor = function(self) {
                 return function(text) {
-                    return self.postMathJaxProcessor(text);
+                    // HTML returned by Markdown is assumed to be safe to render
+                    return self.postMathJaxProcessor(edx.HtmlUtils.HTML(text)).toString();
                 };
             };
             editor = Markdown.makeWmdEditor(elem, appended_id, imageUploadUrl, _processor(this));

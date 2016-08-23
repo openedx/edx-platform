@@ -14,7 +14,7 @@ from .new.course_grade import CourseGradeFactory
 log = getLogger(__name__)
 
 
-GradeResult = namedtuple('StudentGrade', ['student', 'gradeset', 'err_msg'])
+GradeResult = namedtuple('GradeResult', ['student', 'gradeset', 'err_msg'])
 
 
 def iterate_grades_for(course_or_id, students):

@@ -80,7 +80,8 @@ class AcceptanceTest(TestSuite):
     def __enter__(self):
         super(AcceptanceTest, self).__enter__()
         self.report_dir.makedirs_p()
-        self._update_assets()
+        if not self.fasttest:
+            self._update_assets()
 
     def __exit__(self, exc_type, exc_value, traceback):
         super(AcceptanceTest, self).__exit__(exc_type, exc_value, traceback)
@@ -109,10 +110,6 @@ class AcceptanceTest(TestSuite):
         Internal helper method to manage asset compilation
         """
         args = [self.system, '--settings=acceptance']
-
-        if self.fasttest:
-            args.append('--skip-collect')
-
         call_task('pavelib.assets.update_assets', args=args)
 
 

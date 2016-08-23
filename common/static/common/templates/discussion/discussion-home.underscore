@@ -18,7 +18,7 @@
         <th scope="row" class="row-title"><%- gettext("Find discussions") %></td>
         <td class="row-item">
           <span class="icon fa fa-reorder" aria-hidden="true"></span>
-          <span class="row-description"><%- gettext("Use the Discussion Topics menu to find specific topics.") %></span>
+          <span class="row-description"><%- gettext("Use the All Topics menu to find specific topics.") %></span>
         </td>
         <td class="row-item">
           <span class="icon fa fa-search" aria-hidden="true"></span>
