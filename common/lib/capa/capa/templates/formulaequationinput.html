@@ -1,7 +1,7 @@
 <%page expression_filter="h"/>
 <%! from openedx.core.djangolib.markup import HTML %>
 <% doinline = 'style="display:inline-block;vertical-align:top"' if inline else "" %>
-<section id="formulaequationinput_${id}" class="inputtype formulaequationinput" ${doinline}>
+<section id="formulaequationinput_${id}" class="inputtype formulaequationinput" ${doinline | n}>
   <div class="${status.classname}" id="status_${id}">
     <input type="text" name="input_${id}" id="input_${id}"
         data-input-id="${id}" value="${value}"
