@@ -10,7 +10,7 @@ from logging import getLogger
 from student.roles import CourseBetaTesterRole
 from courseware.masquerade import is_masquerading_as_student
 from courseware.access_response import AccessResponse, StartDateError
-from xmodule.util.django import get_current_request_hostname
+from xmodule.util.django import get_current_request_hostname, get_current_request_port
 
 
 DEBUG_ACCESS = False
@@ -78,5 +78,9 @@ def in_preview_mode():
     Returns whether the user is in preview mode or not.
     """
     hostname = get_current_request_hostname()
-    preview_lms_base = settings.FEATURES.get('PREVIEW_LMS_BASE', None)
-    return bool(preview_lms_base and hostname and hostname.split(':')[0] == preview_lms_base.split(':')[0])
+    port = get_current_request_port()
+    preview_lms_base = settings.FEATURES.get('PREVIEW_LMS_BASE', None).split(':')
+    is_preview_hostname = bool(preview_lms_base and hostname and hostname == preview_lms_base[0])
+    if len(preview_lms_base) > 1:
+        return bool(is_preview_hostname and port == preview_lms_base[1])
+    return is_preview_hostname

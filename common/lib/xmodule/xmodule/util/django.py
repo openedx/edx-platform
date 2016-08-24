@@ -18,3 +18,14 @@ def get_current_request_hostname():
         hostname = request.META.get('HTTP_HOST')
 
     return hostname
+
+def get_current_request_port():
+    """
+    This method will return the port that was used in the current Django request
+    """
+    port = None
+    request = get_current_request()
+    if request:
+        port = request.META.get('SERVER_PORT')
+
+    return port
