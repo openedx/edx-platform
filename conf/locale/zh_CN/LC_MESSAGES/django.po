@@ -301,6 +301,7 @@
 # 刘知远 <liuliudong@163.com>, 2013
 # Zhang Meng <zmlarry@foxmail.com>, 2013
 # 张太红 <zth@xjau.edu.cn>, 2014
+# 兆镒 黄 <1002423907@qq.com>, 2016
 # 刘家骅 <alphaf52@gmail.com>, 2013
 # 刘洋 <liuyang2011@tsinghua.edu.cn>, 2013
 # 刘知远 <liuliudong@163.com>, 2013
@@ -346,9 +347,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-08-12 16:42-0400\n"
-"PO-Revision-Date: 2016-08-12 22:45-0400\n"
-"Last-Translator: Luiz Aoqui <laoqui@ca.ibm.com>\n"
+"POT-Creation-Date: 2016-08-24 14:57-0400\n"
+"PO-Revision-Date: 2016-08-24 19:13-0400\n"
+"Last-Translator: Leo Wu <leow@ca.ibm.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -357,13 +358,14 @@ msgstr ""
 "Language: zh_CN\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.7\n"
-"X-POOTLE-MTIME: 1471041945.000000\n"
+"X-POOTLE-MTIME: 1472065996.000000\n"
 
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: 'Discussion' refers to the tab in the courseware that leads to
 #. the discussion forums
 #: cms/djangoapps/contentstore/views/component.py
-#: lms/djangoapps/courseware/tabs.py
-#: lms/djangoapps/django_comment_client/forum/views.py
+#: lms/djangoapps/courseware/tabs.py lms/djangoapps/discussion/plugins.py
+#: lms/djangoapps/discussion/templates/discussion/discussion_profile_page.html
 msgid "Discussion"
 msgstr "讨论"
 
@@ -10008,7 +10010,7 @@ msgstr "访问你的{link_start}课程面板{link_end}来查看课程。"
 #: cms/templates/registration/activation_complete.html
 #: lms/templates/registration/activation_complete.html
 msgid "You can now {link_start}sign in{link_end}."
-msgstr ""
+msgstr "您现在可以{link_start}登录{link_end}。"
 
 #: cms/templates/widgets/header.html lms/templates/navigation.html
 msgid "Choose Language"
@@ -10147,6 +10149,39 @@ msgstr "提交"
 msgid "Please refresh the page to see the changes applied."
 msgstr "刷新页面后生效"
 
+#: lms/djangoapps/discussion/templates/discussion/discussion_board.html
+#: lms/djangoapps/discussion/templates/discussion/discussion_profile_page.html
+msgid "Discussion - {course_number}"
+msgstr "讨论 - {course_number}"
+
+#: lms/djangoapps/discussion/templates/discussion/discussion_board.html
+#: lms/templates/discussion/_discussion_inline.html
+msgid "Add a Post"
+msgstr "添加一个讨论帖"
+
+#: lms/djangoapps/discussion/templates/discussion/discussion_board.html
+#: lms/djangoapps/discussion/templates/discussion/discussion_profile_page.html
+msgid "Discussion thread list"
+msgstr "讨论列表"
+
+#: lms/djangoapps/discussion/templates/discussion/discussion_board.html
+msgid "New topic form"
+msgstr "新主题表格"
+
+#: lms/djangoapps/discussion/templates/discussion/discussion_profile_page.html
+msgid "User Profile"
+msgstr "用户资料"
+
+#: lms/djangoapps/discussion/templates/discussion/maintenance.html
+msgid "Discussion unavailable"
+msgstr ""
+
+#: lms/djangoapps/discussion/templates/discussion/maintenance.html
+msgid ""
+"The discussions are currently undergoing maintenance. We'll have them back "
+"up shortly!"
+msgstr ""
+
 #: lms/templates/annotatable.html lms/templates/imageannotation.html
 #: lms/templates/textannotation.html lms/templates/videoannotation.html
 #: lms/templates/peer_grading/peer_grading.html
@@ -10230,6 +10265,7 @@ msgid "Order History"
 msgstr "订单记录"
 
 #: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
+#, python-brace-format
 msgid "Email Settings for {course_number}"
 msgstr "{course_number}的电子邮件设置"
 
@@ -10357,6 +10393,7 @@ msgid "Your E-mail Address"
 msgstr "您的邮件地址"
 
 #: lms/templates/forgot_password_modal.html lms/templates/login.html
+#, python-brace-format
 msgid "This is the e-mail address you used to register with {platform}"
 msgstr "这是您在{platform}注册时使用的e-mail地址。"
 
@@ -10505,6 +10542,8 @@ msgid ""
 "available.{line_break}If you have completed this {subsection_format}, your "
 "grade is available on the {link_start}progress page{link_end}."
 msgstr ""
+"由于截止日期已过，此 {subsection_format} 不再可用。{line_break}如果您已完成此 "
+"{subsection_format}，则可以在{link_start}进度页面{link_end}上找到您的评分。"
 
 #: lms/templates/imageannotation.html
 msgid "Note: only instructors may annotate."
@@ -10598,6 +10637,7 @@ msgid "View our help section for answers to commonly asked questions."
 msgstr "查看帮助部分来获得常见问题的解答。"
 
 #: lms/templates/login.html
+#, python-brace-format
 msgid "Log into your {platform_name} Account"
 msgstr "登录进入您的{platform_name}账户"
 
@@ -10624,6 +10664,7 @@ msgid "to access your account and courses"
 msgstr "来访问您的账户和课程"
 
 #: lms/templates/login.html
+#, python-brace-format
 msgid "We're Sorry, {platform_name} accounts are unavailable currently"
 msgstr "我们很遗憾，{platform_name} 账户现在无法使用"
 
@@ -10636,10 +10677,12 @@ msgid "Your email or password is incorrect"
 msgstr "您的邮箱或密码不正确"
 
 #: lms/templates/login.html
+#, python-brace-format
 msgid "An error occurred when signing you in to {platform_name}."
 msgstr "你注册 {platform_name} 时发生了一个错误。"
 
 #: lms/templates/login.html
+#, python-brace-format
 msgid ""
 "Please provide the following information to log into your {platform_name} "
 "account. Required fields are noted by <strong class=\"indicator\">bold text "
@@ -10653,6 +10696,7 @@ msgid "Account Preferences"
 msgstr "账户参数"
 
 #: lms/templates/login.html
+#, python-brace-format
 msgid "Sign in with {provider_name}"
 msgstr "以 {provider_name}登陆"
 
@@ -11043,10 +11087,12 @@ msgid ""
 "spam folder and mark {platform_name} emails as 'not spam'. At "
 "{platform_name}, we communicate mostly through email."
 msgstr ""
+"作为加入 {platform_name} 的过程的一部分，您将收到包含帐户激活说明的电子邮件。是否未看到电子邮件?请检查您的垃圾邮件文件夹并将 "
+"{platform_name} 电子邮件标记为“不是垃圾邮件”。在 {platform_name}，我们主要通过电子邮件沟通。"
 
 #: lms/templates/register-sidebar.html
 msgid "Need help registering with {platform_name}?"
-msgstr ""
+msgstr "是否需要注册 {platform_name} 的帮助?"
 
 #: lms/templates/register-sidebar.html
 #: themes/stanford-style/lms/templates/register-sidebar.html
@@ -11058,7 +11104,7 @@ msgid ""
 "You can find the answers to most of your questions in our list of FAQs. "
 "After you enroll in a course, you can also find answers in the course "
 "discussions."
-msgstr ""
+msgstr "在我们的常见问题解答列表中，您可以找到大多数问题的答案。注册课程后，您还可以在课程讨论中找到答案。"
 
 #: lms/templates/register.html
 msgid "Register for {platform_name}"
@@ -11519,7 +11565,7 @@ msgstr "请求 API 访问"
 
 #: lms/templates/api_admin/status.html
 msgid "API Access Request Status"
-msgstr ""
+msgstr "API 访问请求状态"
 
 #. Translators: "platform_name" is the name of this Open edX installation.
 #: lms/templates/api_admin/status.html
@@ -11590,7 +11636,7 @@ msgstr ""
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid "API Terms of Service"
-msgstr ""
+msgstr "API 服务条款"
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid "Terms of Service for {platform_name} APIs"
@@ -12174,7 +12220,7 @@ msgstr "开启计算器"
 
 #: lms/templates/calculator/toggle_calculator.html
 msgid "Enter equation"
-msgstr ""
+msgstr "输入等式"
 
 #: lms/templates/calculator/toggle_calculator.html
 msgid "Calculator Input Field"
@@ -12331,7 +12377,7 @@ msgstr "计算"
 
 #: lms/templates/calculator/toggle_calculator.html
 msgid "Result"
-msgstr ""
+msgstr "结果"
 
 #: lms/templates/ccx/coach_dashboard.html
 msgid "CCX Coach Dashboard"
@@ -12938,7 +12984,7 @@ msgstr "设为预览模式"
 
 #: lms/templates/courseware/course_navigation.html
 msgid "You are now viewing the course as {i_start}{user_name}{i_end}."
-msgstr ""
+msgstr "您正在以 {i_start}{user_name}{i_end} 身份查看课程。"
 
 #: lms/templates/courseware/course_navigation.html
 msgid "Course Material"
@@ -12946,7 +12992,7 @@ msgstr "课程资料"
 
 #: lms/templates/courseware/course_updates.html
 msgid "All course updates"
-msgstr ""
+msgstr "所有课程更新"
 
 #: lms/templates/courseware/course_updates.html
 msgid "Hide"
@@ -12970,6 +13016,7 @@ msgstr "使您的搜索更精确"
 
 #: lms/templates/courseware/courseware-chromeless.html
 #: lms/templates/courseware/courseware.html
+#, python-brace-format
 msgid "{course_number} Courseware"
 msgstr "{course_number} 课程页面"
 
@@ -12999,13 +13046,14 @@ msgid "No content has been added to this course"
 msgstr "本课程未添加新内容"
 
 #: lms/templates/courseware/courseware.html
-#, python-format
+#, python-format, python-brace-format
 msgid ""
 "To access course materials, you must score {required_score}% or higher on "
 "this                 exam. Your current score is {current_score}%."
 msgstr "您在本测验的分数必须达到或高于 {required_score}% o才能访问课程。您的当前分数为{current_score}%."
 
 #: lms/templates/courseware/courseware.html
+#, python-brace-format
 msgid "Your score is {current_score}%. You have passed the entrance exam."
 msgstr "您的分数为 {current_score}%，通过了入门测试"
 
@@ -13362,7 +13410,7 @@ msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Course details"
-msgstr ""
+msgstr "课程详细信息"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "{course_number} {course_name} Home Page"
@@ -13653,11 +13701,6 @@ msgstr "你选择的 {provider_name}账户已经和{platform_name}账户相关�
 msgid "Results:"
 msgstr "结果："
 
-#: lms/templates/discussion/_discussion_course_navigation.html
-#: lms/templates/discussion/_discussion_inline.html
-msgid "Add a Post"
-msgstr "添加一个讨论帖"
-
 #: lms/templates/discussion/_discussion_inline.html
 msgid "Show Discussion"
 msgstr "显示讨论"
@@ -13679,21 +13722,12 @@ msgid "filter topics"
 msgstr "过滤主题"
 
 #: lms/templates/discussion/_filter_dropdown.html
-#: lms/templates/discussion/_thread_list_template.html
 msgid "All Discussions"
 msgstr "所有讨论"
 
 #: lms/templates/discussion/_filter_dropdown.html
 msgid "Posts I'm Following"
 msgstr "我关注的讨论帖"
-
-#: lms/templates/discussion/_thread_list_template.html
-msgid "Discussion topics; currently listing: "
-msgstr "讨论话题；当前列出："
-
-#: lms/templates/discussion/_thread_list_template.html
-msgid "Search all posts"
-msgstr "搜索所有帖子"
 
 #. Translators: This labels a filter menu in forum navigation
 #: lms/templates/discussion/_thread_list_template.html
@@ -13762,33 +13796,6 @@ msgstr[0] "%s 场讨论已开始"
 msgid "%s comment"
 msgid_plural "%s comments"
 msgstr[0] "%s 条评论"
-
-#: lms/templates/discussion/index.html
-#: lms/templates/discussion/user_profile.html
-msgid "Discussion - {course_number}"
-msgstr "讨论 - {course_number}"
-
-#: lms/templates/discussion/index.html
-msgid "Discussion thread list"
-msgstr "讨论列表"
-
-#: lms/templates/discussion/index.html
-msgid "New topic form"
-msgstr "新主题表格"
-
-#: lms/templates/discussion/maintenance.html
-msgid "We're sorry"
-msgstr "很抱歉"
-
-#: lms/templates/discussion/maintenance.html
-msgid ""
-"The forums are currently undergoing maintenance. We'll have them back up "
-"shortly!"
-msgstr "论坛现在正在维护，将尽快恢复正常。"
-
-#: lms/templates/discussion/user_profile.html
-msgid "User Profile"
-msgstr "用户资料"
 
 #: lms/templates/edxnotes/edxnotes.html
 msgid "Student Notes"
@@ -13872,7 +13879,7 @@ msgstr "您的真挚的{course_name}团队"
 
 #: lms/templates/emails/activation_email.txt
 msgid "Thank you for creating an account with {platform_name}!"
-msgstr ""
+msgstr "感谢您使用 {platform_name} 创建帐户!"
 
 #: lms/templates/emails/activation_email.txt
 msgid ""
@@ -13881,6 +13888,8 @@ msgid ""
 "following link. If that doesn't work, copy and paste the link into your "
 "browser's address bar."
 msgstr ""
+"只差一步即可完成课程注册: 您需要激活您的 {platform_name} "
+"帐户。要激活帐户，请单击以下链接。如果此操作不起作用，请将链接复制并粘贴到您的浏览器的地址栏。"
 
 #: lms/templates/emails/activation_email.txt
 msgid ""
@@ -13889,6 +13898,8 @@ msgid ""
 "to this email message. Check the help section of the {platform_name} "
 "website."
 msgstr ""
+"如果您未创建帐户，则无需执行任何操作；您不会再收到我们发送的电子邮件。如果您需要帮助，请不要回复此电子邮件。请查看 {platform_name} "
+"网站的帮助部分。"
 
 #: lms/templates/emails/activation_email_subject.txt
 msgid "Activate Your {platform_name} Account"
@@ -14627,7 +14638,7 @@ msgid ""
 "When you are ready to generate certificates for your course, click Generate "
 "Certificates. You do not need to do this if you have set the certificate "
 "mode to on-demand generation."
-msgstr ""
+msgstr "当您准备好为您的课程生成证书时，请单击“生成证书”。如果您已将证书模式设置为按需生成，则无需进行此操作。"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
@@ -14658,7 +14669,7 @@ msgstr "要重新生成你的课程证书，请选择将要接收重新生成证
 
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
 msgid "Choose learner types for regeneration"
-msgstr ""
+msgstr "选择要学习者类型以进行重新生成"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
 msgid ""
@@ -14679,7 +14690,7 @@ msgstr "证书生成历史"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
 msgid "Task name"
-msgstr ""
+msgstr "任务名称"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
 msgid "SET CERTIFICATE EXCEPTIONS"
@@ -16284,7 +16295,7 @@ msgstr "管理您的数据：{permission}"
 
 #: lms/templates/registration/activate_account_notice.html
 msgid "You're almost there!"
-msgstr ""
+msgstr "您即将完成!"
 
 #: lms/templates/registration/activate_account_notice.html
 msgid ""
@@ -16293,14 +16304,16 @@ msgid ""
 "{email_start}{email}{email_end} with instructions for activating your "
 "account. If you don't receive this message, check your spam folder."
 msgstr ""
+"只差一步: 在完成课程注册之前，您需要激活您的帐户。我们已将包含帐户激活说明的电子邮件发送到 "
+"{email_start}{email}{email_end}。如果您没有收到此邮件，请检查您的垃圾邮件文件夹。"
 
 #: lms/templates/registration/activation_complete.html
 msgid "Account Activated"
-msgstr ""
+msgstr "帐户已激活"
 
 #: lms/templates/registration/activation_complete.html
 msgid "Account already active"
-msgstr ""
+msgstr "帐户已处于激活状态"
 
 #: lms/templates/registration/activation_invalid.html
 msgid "Activation Invalid"
@@ -16312,10 +16325,12 @@ msgid ""
 " make sure the URL you're using is formatted correctly. If you still have "
 "issues, send us an email message at {email_start}{email}{email_end}."
 msgstr ""
+"发生了错误。电子邮件程序有时会将 URL 分成两行，因此请确保您使用的 URL 格式正确。如果您仍然有问题，请通过以下地址向我们发送电子邮件: "
+"{email_start}{email}{email_end}。"
 
 #: lms/templates/registration/activation_invalid.html
 msgid "Return to the {link_start}home page{link_end}."
-msgstr ""
+msgstr "返回到{link_start}主页{link_end}。"
 
 #: lms/templates/registration/password_reset_complete.html
 msgid "Your Password Reset is Complete"
@@ -17767,6 +17782,7 @@ msgid ""
 "the course team; review course updates and other assets for dated material; "
 "and seed the discussions and wiki."
 msgstr ""
+"当前没有可见的课程内容，也没有学生选修。请确保已检查和重置包括课程开始日期在内的所有的日期，设置好课程团队，检查课程更新和其他资料中的过期内容，并设置好论坛和Wiki。"
 
 #: cms/templates/course_outline.html cms/templates/index.html
 msgid "Dismiss"
@@ -17893,7 +17909,7 @@ msgstr "选择配置图标来为章、节设置公开日期。在对节进行配
 
 #: cms/templates/course_outline.html
 msgid "Learn more about grading policy settings"
-msgstr ""
+msgstr "了解更多关于评分标准的事"
 
 #: cms/templates/course_outline.html
 msgid "Changing the content learners see"
@@ -21028,10 +21044,6 @@ msgid ""
 "#%(r2)d"
 msgstr "产生新的修订版本：合并修订版本#%(r1)d与#%(r2)d"
 
-#: lms/templates/body-extra.html
-msgid "Support"
-msgstr "技术支持"
-
 #: lms/templates/dashboard.html
 msgid "Looks like you haven't enrolled in any courses yet."
 msgstr "看起来好像你还未选择任何课程"
@@ -21052,10 +21064,12 @@ msgstr "发现新课程"
 
 #: lms/templates/emails/activation_email.html
 #: lms/templates/emails/activation_email.txt
+#, python-brace-format
 msgid "Thank you for signing up for {platform_name}!"
 msgstr "感谢您注册 {platform_name}!"
 
 #: lms/templates/emails/activation_email.html
+#, python-brace-format
 msgid ""
 "Please click the link below to {start_strong}activate your "
 "account{end_strong} and start learning!"
@@ -21066,6 +21080,16 @@ msgid ""
 "If the link does not work, please copy and paste it into your browser's "
 "address bar."
 msgstr "如果链接不工作，请复制并粘贴到浏览器的地址栏。"
+
+#: lms/templates/emails/activation_email.html
+#: lms/templates/emails/activation_email.txt
+msgid "Happy learning"
+msgstr "愉快学习"
+
+#: lms/templates/emails/activation_email.html
+#: lms/templates/emails/activation_email.txt
+msgid "- Big Data University Team"
+msgstr "大数据大学项目组"
 
 #: lms/templates/emails/activation_email.html
 #: lms/templates/emails/activation_email.txt
@@ -21090,14 +21114,6 @@ msgid ""
 "If the link does not work, copy and paste it into your browser's address "
 "bar."
 msgstr "如果链接不工作，复制并粘贴到浏览器的地址栏中。"
-
-#: lms/templates/emails/activation_email.txt
-msgid "Happy learning"
-msgstr "愉快学习"
-
-#: lms/templates/emails/activation_email.txt
-msgid "- Big Data University Team"
-msgstr "大数据大学项目组"
 
 #: lms/templates/footer.html
 msgid "Community"
@@ -21140,6 +21156,7 @@ msgid "Login"
 msgstr "登录"
 
 #: lms/templates/header.html lms/templates/navigation.html
+#, python-brace-format
 msgid ""
 "<strong>Warning:</strong> Your browser is not fully supported. We strongly "
 "recommend using {chrome_link} or {ff_link}."
@@ -21148,6 +21165,19 @@ msgstr "<strong>重要提醒:</strong> 不支持你的浏览器. 我们强烈推
 #: lms/templates/login.html
 msgid "Your request could not be completed.  Please try again."
 msgstr "您的请求无法完成, 请重试。"
+
+#: lms/templates/registration/activate_account_notice.html
+msgid "Thanks for Registering!"
+msgstr "感谢注册！"
+
+#: lms/templates/registration/activate_account_notice.html
+#, python-brace-format
+msgid ""
+"You've successfully created an account on {platform_name}. We've sent an "
+"account activation message to {email}. To activate your account and start "
+"enrolling in courses, click the link in the message."
+msgstr ""
+"你已经成功在 {platform_name} 上注册了一个账号，激活邮件已经发送到 {email}。请点击邮件中的链接，激活你的账号后开始选择课程。"
 
 #: lms/templates/student_account/login.underscore
 #, python-format
@@ -21167,36 +21197,6 @@ msgid ""
 msgstr "使用其他 %(currentProvider)s 的账户或者其他社交账户登录按钮"
 
 #: lms/templates/student_account/login.underscore
-msgid ""
-"If the above does not work, and this is your first time logging in to this "
-"new system, access your account"
-msgstr "如果以上不工作，而这是你第一次登录新系统，访问您的帐户"
-
-#: lms/templates/student_account/login.underscore
-#: lms/templates/student_account/register.underscore
-msgid "here"
-msgstr "这里"
-
-#: lms/templates/student_account/login.underscore
-#, python-format
-msgid ""
-"otherwise, login below using your %(platformName)s credentials. Once logged "
-"in you can link your %(currentProvider)s account in the user profile."
-msgstr ""
-"否则，请使用您 %(platformName)s 的账户信息登录。登录后，有可以将您的 %(currentProvider)s "
-"的账户信息与用户信息关联起来。"
-
-#: lms/templates/student_account/login.underscore
-#: lms/templates/student_account/register.underscore
-msgid "Refer to our"
-msgstr "参考我们的"
-
-#: lms/templates/student_account/login.underscore
-#: lms/templates/student_account/register.underscore
-msgid "for more information."
-msgstr "查找更多信息"
-
-#: lms/templates/student_account/login.underscore
 msgid "Password Reset Email Sent"
 msgstr "密码重置邮件已发送"
 
@@ -21209,16 +21209,6 @@ msgstr "我们发送邮件到您提供的邮箱，指导您如何重置密码。
 #: lms/templates/student_account/login.underscore
 msgid "We couldn't sign you in."
 msgstr "登录失败"
-
-#: lms/templates/student_account/login.underscore
-msgid ""
-"If you have an existing account but having issues accessing your account, "
-"please"
-msgstr "如果你已有账户，但是访问有问题，请参考"
-
-#: lms/templates/student_account/login.underscore
-msgid "and review the"
-msgstr "和阅读"
 
 #: lms/templates/student_account/login.underscore
 #, python-format
@@ -21283,6 +21273,18 @@ msgstr ""
 "的账号或者其他社交媒体登录按钮，请点击"
 
 #: lms/templates/student_account/register.underscore
+msgid "here"
+msgstr "这里"
+
+#: lms/templates/student_account/register.underscore
+msgid "Refer to our"
+msgstr "参考我们的"
+
+#: lms/templates/student_account/register.underscore
+msgid "for more information."
+msgstr "查找更多信息"
+
+#: lms/templates/student_account/register.underscore
 msgid "Create an account using"
 msgstr "创建一个账户"
 
@@ -21310,6 +21312,29 @@ msgstr "创建您的账户"
 #: lms/templates/student_account/register.underscore
 msgid "LOG IN INSTEAD"
 msgstr "直接登录"
+
+#~ msgid "Support"
+#~ msgstr "技术支持"
+
+#~ msgid ""
+#~ "If the above does not work, and this is your first time logging in to this "
+#~ "new system, access your account"
+#~ msgstr "如果以上不工作，而这是你第一次登录新系统，访问您的帐户"
+
+#~ msgid ""
+#~ "otherwise, login below using your %(platformName)s credentials. Once logged "
+#~ "in you can link your %(currentProvider)s account in the user profile."
+#~ msgstr ""
+#~ "否则，请使用您 %(platformName)s 的账户信息登录。登录后，有可以将您的 %(currentProvider)s "
+#~ "的账户信息与用户信息关联起来。"
+
+#~ msgid ""
+#~ "If you have an existing account but having issues accessing your account, "
+#~ "please"
+#~ msgstr "如果你已有账户，但是访问有问题，请参考"
+
+#~ msgid "and review the"
+#~ msgstr "和阅读"
 
 #~ msgid "Free courses from <strong>{university_name}</strong>"
 #~ msgstr "来源于 <strong>{university_name}</strong>的免费课程"
