@@ -4,9 +4,14 @@
 #   * @edx/ospr - to check licensing
 #   * @edx/devops - to check system requirements
 
-# This needs to be installed *after* lxml, which is in base.txt.
-# python-saml pulls in lxml as a dependency, and due to a bug in setuptools,
-# trying to compile lxml as a dependency causes setuptools to go into an
-# infinite loop and run out of memory. Because why would you trust a
-# dependency management tool to manage dependencies for you?
-python-saml==2.1.6
+# python-saml depends on lxml, which is referenced in base.txt. A bug exists
+# in setuptools 18.0.1 which results in an infinite loop during
+# resolution of this dependency during compilation. So we need to install
+# python-saml only after lxml has been successfully installed. 
+
+# In addition, we are currently utilizing a forked version of python-saml,
+# managed by OpenCraft, which features enhanced logging. We will return to
+# the official version of python-saml on PyPI when
+# https://github.com/onelogin/python-saml/pull/159 (or its derivative) has
+# been incorporated into the main project.
+git+https://github.com/open-craft/python-saml.git@87d4c18865e4997061ec62fd0e8d1e070b92e4e7#egg=python-saml==2.1.9
