@@ -95,7 +95,7 @@ define(['underscore'], function(_) {
     var expectSettingsSectionsAndFieldsToBeRendered = function(accountSettingsView, fieldsAreRendered) {
         var sectionsData = accountSettingsView.options.tabSections.aboutTabSections;
 
-        var sectionElements = accountSettingsView.$('.section');
+        var sectionElements = accountSettingsView.$('#aboutTabSections-tabpanel .section');
         expect(sectionElements.length).toBe(sectionsData.length);
 
         _.each(sectionElements, function(sectionElement, sectionIndex) {
