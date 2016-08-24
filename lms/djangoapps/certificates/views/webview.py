@@ -93,6 +93,10 @@ def _update_certificate_context(context, user_certificate, platform_name):
         suffix=context.get('certificate_verify_url_suffix')
     )
 
+    # At FUN, we need the datetime object because dates are displayed in French
+    # on the certificates
+    context['certificate_modified_date'] = user_certificate.modified_date
+
     # Translators:  The format of the date includes the full name of the month
     context['certificate_date_issued'] = _('{month} {day}, {year}').format(
         month=user_certificate.modified_date.strftime("%B"),
