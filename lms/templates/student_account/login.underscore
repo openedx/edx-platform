@@ -1,21 +1,9 @@
 <div class="status already-authenticated-msg hidden">
     <% if (context.currentProvider) { %>
         <p class="message-copy">
-           <%- _.sprintf( gettext("The %(currentProvider)s account you used is not associated to any %(platformName)s account."), context ) %>
-           <a href="/reload_login"><%- _.sprintf( gettext("Try again")) %></a>
-           <%- _.sprintf( gettext("with another %(currentProvider)s account or another social login button."), context ) %>
+            <%- _.sprintf( gettext("You have successfully signed into %(currentProvider)s, but your %(currentProvider)s account does not have a linked %(platformName)s account. To link your accounts, sign in now using your %(platformName)s password."), context ) %>
         </p>
-        <p class="message-copy">
-           <%- _.sprintf( gettext("If the above does not work, and this is your first time logging in to this new system, access your account"), context) %>
-             <a href="/access_new_account"><%- _.sprintf( gettext("here")) %></a>;
-          <%- _.sprintf( gettext("otherwise, login below using your %(platformName)s credentials. Once logged in you can link your %(currentProvider)s account in the user profile."), context) %>
-        </p>
-        <p class="message-copy">
-          <%- _.sprintf( gettext("Refer to our")) %>
-           <a href="http://support.bigdatauniversity.com/knowledgebase/articles/888321-beta-faqs">FAQ page</a>
-          <%- _.sprintf( gettext("for more information.")) %>
-       </p>
-  <% } %>
+    <% } %>
 </div>
 
 <div class="js-reset-success status submission-success hidden">
@@ -30,14 +18,6 @@
 <div class="status submission-error hidden" aria-live="polite">
     <h4 class="message-title"><%- gettext("We couldn't sign you in.") %></h4>
     <ul class="message-copy"></ul>
-    <ul class="beta-error-message">
-        <li>
-            <%- gettext("If you have an account in bigdatauniversity.com and this is the first time you access beta.bigdatauniversity.com, please") %>
-            <a href="/access_new_account">click here</a>
-            <%- gettext("and review the") %>
-            <a href="http://support.bigdatauniversity.com/knowledgebase/articles/888321-beta-faqs">FAQ page.</a>
-        </li>
-    </ul>
 </div>
 
 <% if (context.errorMessage) { %>
@@ -51,17 +31,37 @@
 
     <div class="section-title lines">
         <h2>
-            <span class="text"><%- gettext("Login with") %></span>
+            <span class="text"><%- gettext("Sign in") %></span>
         </h2>
     </div>
 
+    <p class="sr">
+        <% if ( context.providers.length > 0 && !context.currentProvider || context.hasSecondaryProviders ) { %>
+            <%- gettext("Sign in here using your email address and password, or use one of the providers listed below.") %>
+        <% } else { %>
+            <%- gettext("Sign in here using your email address and password.") %>
+        <% } %>
+        <%- gettext("If you do not yet have an account, use the button below to register.") %>
+    </p>
+
+    <%= context.fields %>
+
+    <button type="submit" class="action action-primary action-update js-login login-button"><%- gettext("Sign in") %></button>
+
     <% if ( context.providers.length > 0 && !context.currentProvider || context.hasSecondaryProviders ) { %>
     <div class="login-providers">
+        <div class="section-title lines">
+            <h2>
+                <span class="text"><%- gettext("or sign in with") %></span>
+            </h2>
+        </div>
+
         <% _.each( context.providers, function( provider ) {
             if ( provider.loginUrl ) { %>
-                <button type="button" class="button button-primary button-<%- provider.id %> login-provider login-<%- provider.id %> btn-circle" data-provider-url="<%- provider.loginUrl %>">
-                    <i class="fa <%- provider.iconClass %>"></i>
-                    <span class="sr"><%- _.sprintf( gettext("Login with %(providerName)s"), {providerName: provider.name} ) %></span>
+                <button type="button" class="button button-primary button-<%- provider.id %> login-provider login-<%- provider.id %>" data-provider-url="<%- provider.loginUrl %>">
+                    <div class="icon fa <%- provider.iconClass %>" aria-hidden="true"></div>
+                    <span aria-hidden="true"><%- provider.name %></span>
+                    <span class="sr"><%- _.sprintf( gettext("Sign in with %(providerName)s"), {providerName: provider.name} ) %></span>
                 </button>
             <% }
         }); %>
@@ -71,31 +71,15 @@
                 <%- gettext("Use my institution/campus credentials") %>
             </button>
         <% } %>
-
-        <div class="section-title lines">
-            <h2>
-                <span class="text"><%- gettext("or") %></span>
-            </h2>
-        </div>
     </div>
     <% } %>
-
-    <p class="sr">
-        <% if ( context.providers.length > 0 && !context.currentProvider || context.hasSecondaryProviders ) { %>
-            <%- gettext("Login here using your email address and password, or use one of the providers listed below.") %>
-        <% } else { %>
-            <%- gettext("Login here using your email address and password.") %>
-        <% } %>
-        <%- gettext("If you do not yet have an account, use the button below to register.") %>
-    </p>
-
-    <%= context.fields %>
-
-    <button type="submit" class="action action-primary action-update js-login login-button"><%- gettext("Log In") %></button>
-
-
 </form>
 
 <div class="toggle-form">
-    <a class="sign-up-button form-toggle" data-type="register"><%- gettext("DON'T HAVE AN ACCOUNT? SIGN UP!") %></a>
+    <div class="section-title">
+        <h2>
+            <span class="text"><%- _.sprintf( gettext("New to %(platformName)s?"), context ) %></span>
+        </h2>
+    </div>
+    <button class="nav-btn form-toggle" data-type="register"><%- gettext("Create an account") %></button>
 </div>
