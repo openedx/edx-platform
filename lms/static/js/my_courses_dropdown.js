@@ -65,9 +65,8 @@ $(document).ready(function() {
             }
             event.preventDefault();
         }
-
     // if down arrow key pressed or tab key
-        if (event.which == 40 || event.which == 9) {
+        else if (event.which == 40 || event.which == 9) {
       // if last item go to first
             if (focusedItemIndex == numberOfMenuItems - 1) {
                 menuItems.first().focus();
