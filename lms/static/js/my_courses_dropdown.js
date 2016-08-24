@@ -55,7 +55,7 @@ $(document).ready(function() {
         }
 
         // if up arrow key pressed or shift+tab else down key or tab is pressed
-        if (event.which == 38 || (event.which == 9 && event.shiftKey)) {
+        if (event.which === 38 || (event.which === 9 && event.shiftKey)) {
             // if first item go to last
             if (focusedItemIndex === 0) {
                 menuItems.last().focus();
@@ -64,9 +64,9 @@ $(document).ready(function() {
                 menuItems.get(itemToFocusIndex).focus();
             }
             event.preventDefault();
-        } else if (event.which == 40 || event.which == 9) {
+        } else if (event.which === 40 || event.which === 9) {
             // if last item go to first
-            if (focusedItemIndex == numberOfMenuItems - 1) {
+            if (focusedItemIndex === numberOfMenuItems - 1) {
                 menuItems.first().focus();
             } else {
                 itemToFocusIndex = focusedItemIndex + 1;
