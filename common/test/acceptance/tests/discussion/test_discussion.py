@@ -21,6 +21,7 @@ from common.test.acceptance.pages.lms.discussion import (
     DiscussionSortPreferencePage,
 )
 from common.test.acceptance.pages.lms.learner_profile import LearnerProfilePage
+from common.test.acceptance.pages.lms.tab_nav import TabNavPage
 
 from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
 from common.test.acceptance.fixtures.discussion import (
@@ -285,6 +286,7 @@ class DiscussionTabSingleThreadTest(BaseDiscussionTestCase, DiscussionResponsePa
     def setUp(self):
         super(DiscussionTabSingleThreadTest, self).setUp()
         AutoAuthPage(self.browser, course_id=self.course_id).visit()
+        self.tab_nav = TabNavPage(self.browser)
 
     def setup_thread_page(self, thread_id):
         self.thread_page = self.create_single_thread_page(thread_id)  # pylint: disable=attribute-defined-outside-init
@@ -347,6 +349,53 @@ class DiscussionTabSingleThreadTest(BaseDiscussionTestCase, DiscussionResponsePa
         self.assertTrue(self.thread_page.is_comment_visible(comment_id))
         self.assertTrue(self.thread_page.is_add_comment_visible(response_id))
         self.assertFalse(self.thread_page.is_show_comments_visible(response_id))
+
+    def test_discussion_blackout_period(self):
+        """
+        Verify that new discussion can not be started during course blackout period.
+
+        Blackout period is the period between which students cannot post new or contribute
+        to existing discussions.
+        """
+        now = datetime.datetime.now(UTC)
+        # Update course advance settings with a valid blackout period.
+        self.course_fixture.add_advanced_settings(
+            {
+                u"discussion_blackouts": {
+                    "value": [
+                        [
+                            (now - datetime.timedelta(days=14)).isoformat(),
+                            (now + datetime.timedelta(days=2)).isoformat()
+                        ]
+                    ]
+                }
+            }
+        )
+        self.course_fixture._add_advanced_settings()  # pylint: disable=protected-access
+        self.browser.refresh()
+        thread = Thread(id=uuid4().hex, commentable_id=self.discussion_id)
+        thread_fixture = SingleThreadViewFixture(thread)
+        thread_fixture.addResponse(
+            Response(id="response1"),
+            [Comment(id="comment1")])
+        thread_fixture.push()
+        self.setup_thread_page(thread.get("id"))  # pylint: disable=no-member
+
+        # Verify that `Add a Post` is not visible on course tab nav.
+        self.assertFalse(self.tab_nav.has_new_post_button_visible_on_tab())
+
+        # Verify that `Add a response` button is not visible.
+        self.assertFalse(self.thread_page.has_add_response_button())
+
+        # Verify user can not add new responses or modify existing responses.
+        self.assertFalse(self.thread_page.has_discussion_reply_editor())
+        self.assertFalse(self.thread_page.is_response_editable("response1"))
+        self.assertFalse(self.thread_page.is_response_deletable("response1"))
+
+        # Verify that user can not add new comment to a response or modify existing responses.
+        self.assertFalse(self.thread_page.is_add_comment_visible("response1"))
+        self.assertFalse(self.thread_page.is_comment_editable("comment1"))
+        self.assertFalse(self.thread_page.is_comment_deletable("comment1"))
 
 
 @attr(shard=2)
