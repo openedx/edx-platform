@@ -234,7 +234,7 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
                     # The UPDATE above failed. Log information - but ignore the error.
                     # See https://openedx.atlassian.net/browse/TNL-5365
                     log.warning("set_many: IntegrityError for student {} - course_id {} - usage key {}".format(
-                        user, usage_key.course_key, usage_key
+                        user, repr(unicode(usage_key.course_key)), usage_key
                     ))
                     log.warning("set_many: All {} block keys: {}".format(
                         len(block_keys_to_state), block_keys_to_state.keys()
