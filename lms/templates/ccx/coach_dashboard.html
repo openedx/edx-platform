@@ -89,9 +89,9 @@ from openedx.core.djangolib.js_utils import (
 
 <script>
   function setup_tabs() {
-    $(".instructor-nav a").on("click", function(event) {
+    $(".instructor-nav .btn-link").on("click", function(event) {
         event.preventDefault();
-        $(".instructor-nav a").removeClass("active-section");
+        $(".instructor-nav .btn-link").removeClass("active-section");
         var section_sel = "#" + $(this).attr("data-section");
         $("section.idash-section").hide();
         $(section_sel).show();
@@ -101,12 +101,12 @@ from openedx.core.djangolib.js_utils import (
     var url = document.URL,
         hashbang = url.indexOf('#!');
     if (hashbang != -1) {
-      var selector = '.instructor-nav a[data-section=' +
+      var selector = '.instructor-nav [data-section=' +
         url.substr(hashbang + 2) + ']';
       $(selector).click();
     }
     else {
-      $(".instructor-nav a").first().click();
+      $(".instructor-nav .btn-link").first().click();
     }
   }
 
