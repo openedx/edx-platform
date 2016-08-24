@@ -130,20 +130,15 @@ class EnrollmentCodeStatusView(APIView):
                 status=400
             )
 
+        redemption = RegistrationCodeRedemption.get_registration_code_redemption(registration_code.code,
+                                                                                 registration_code.course_id)
         if action == 'cancel':
-            if not RegistrationCodeRedemption.is_registration_code_redeemed(code):
-                registration_code.is_valid = False
-                registration_code.save()
-            else:
-                return Response(
-                    data={
-                        'reason': 'Code already used',
-                        'success': False
-                    },
-                    status=status.HTTP_400_BAD_REQUEST
-                )
+            CourseEnrollment.unenroll(redemption.course_enrollment.user, registration_code.course_id)
+            registration_code.is_valid = False
+            registration_code.save()
 
         if action == 'restore':
+            CourseEnrollment.enroll(redemption.course_enrollment.user, registration_code.course_id)
             registration_code.is_valid = True
             registration_code.save()
         return Response(data={'success': True})
