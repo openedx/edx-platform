@@ -84,7 +84,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-08-16 19:40+0000\n"
+"POT-Creation-Date: 2016-08-18 18:02+0000\n"
 "PO-Revision-Date: 2016-05-09 11:27+0000\n"
 "Last-Translator: Sarina Canelake <sarina@edx.org>\n"
 "Language-Team: Korean (Korea) (http://www.transifex.com/open-edx/edx-platform/language/ko_KR/)\n"
@@ -95,11 +95,12 @@ msgstr ""
 "Language: ko_KR\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: 'Discussion' refers to the tab in the courseware that leads to
 #. the discussion forums
 #: cms/djangoapps/contentstore/views/component.py
-#: lms/djangoapps/courseware/tabs.py
-#: lms/djangoapps/django_comment_client/forum/views.py
+#: lms/djangoapps/courseware/tabs.py lms/djangoapps/discussion/plugins.py
+#: lms/djangoapps/discussion/templates/discussion/discussion_profile_page.html
 msgid "Discussion"
 msgstr ""
 
@@ -9510,6 +9511,39 @@ msgstr "제출"
 msgid "Please refresh the page to see the changes applied."
 msgstr ""
 
+#: lms/djangoapps/discussion/templates/discussion/discussion_board.html
+#: lms/djangoapps/discussion/templates/discussion/discussion_profile_page.html
+msgid "Discussion - {course_number}"
+msgstr "토의 - {course_number}"
+
+#: lms/djangoapps/discussion/templates/discussion/discussion_board.html
+#: lms/templates/discussion/_discussion_inline.html
+msgid "Add a Post"
+msgstr ""
+
+#: lms/djangoapps/discussion/templates/discussion/discussion_board.html
+#: lms/djangoapps/discussion/templates/discussion/discussion_profile_page.html
+msgid "Discussion thread list"
+msgstr "게시물 목록"
+
+#: lms/djangoapps/discussion/templates/discussion/discussion_board.html
+msgid "New topic form"
+msgstr "신규 주제 형식"
+
+#: lms/djangoapps/discussion/templates/discussion/discussion_profile_page.html
+msgid "User Profile"
+msgstr "사용자 정보"
+
+#: lms/djangoapps/discussion/templates/discussion/maintenance.html
+msgid "Discussion unavailable"
+msgstr ""
+
+#: lms/djangoapps/discussion/templates/discussion/maintenance.html
+msgid ""
+"The discussions are currently undergoing maintenance. We'll have them back "
+"up shortly!"
+msgstr ""
+
 #: lms/templates/annotatable.html lms/templates/imageannotation.html
 #: lms/templates/textannotation.html lms/templates/videoannotation.html
 #: lms/templates/peer_grading/peer_grading.html
@@ -12923,11 +12957,6 @@ msgstr "선택한 {provider_name} 계정은 이미 다른 {platform_name} 계정
 msgid "Results:"
 msgstr "결과"
 
-#: lms/templates/discussion/_discussion_course_navigation.html
-#: lms/templates/discussion/_discussion_inline.html
-msgid "Add a Post"
-msgstr ""
-
 #: lms/templates/discussion/_discussion_inline.html
 msgid "Show Discussion"
 msgstr "게시물 보기"
@@ -12949,21 +12978,12 @@ msgid "filter topics"
 msgstr "제목 검색"
 
 #: lms/templates/discussion/_filter_dropdown.html
-#: lms/templates/discussion/_thread_list_template.html
 msgid "All Discussions"
 msgstr "모든 게시물"
 
 #: lms/templates/discussion/_filter_dropdown.html
 msgid "Posts I'm Following"
 msgstr "구독하는 게시글"
-
-#: lms/templates/discussion/_thread_list_template.html
-msgid "Discussion topics; currently listing: "
-msgstr ""
-
-#: lms/templates/discussion/_thread_list_template.html
-msgid "Search all posts"
-msgstr "모든 게시물 검색"
 
 #. Translators: This labels a filter menu in forum navigation
 #: lms/templates/discussion/_thread_list_template.html
@@ -13032,33 +13052,6 @@ msgstr[0] "%s 토의 시작됨"
 msgid "%s comment"
 msgid_plural "%s comments"
 msgstr[0] "%s 코멘트"
-
-#: lms/templates/discussion/index.html
-#: lms/templates/discussion/user_profile.html
-msgid "Discussion - {course_number}"
-msgstr "토의 - {course_number}"
-
-#: lms/templates/discussion/index.html
-msgid "Discussion thread list"
-msgstr "게시물 목록"
-
-#: lms/templates/discussion/index.html
-msgid "New topic form"
-msgstr "신규 주제 형식"
-
-#: lms/templates/discussion/maintenance.html
-msgid "We're sorry"
-msgstr "죄송합니다."
-
-#: lms/templates/discussion/maintenance.html
-msgid ""
-"The forums are currently undergoing maintenance. We'll have them back up "
-"shortly!"
-msgstr "포럼이 현재 유지 관리 중입니다. 잠시후에 사용할 수 있도록 조취하겠습니다."
-
-#: lms/templates/discussion/user_profile.html
-msgid "User Profile"
-msgstr "사용자 정보"
 
 #: lms/templates/edxnotes/edxnotes.html
 msgid "Student Notes"
