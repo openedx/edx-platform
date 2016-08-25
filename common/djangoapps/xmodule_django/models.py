@@ -110,8 +110,8 @@ class OpaqueKeyField(models.CharField):
             if value.endswith('\n'):
                 # An opaque key with a trailing newline has leaked into the DB.
                 # Log and strip the value.
-                log.warning('{}:{}:{}:to_python: Invalid key: {}. Removing trailing newline.'.format(
-                    self.model._meta.db_table,
+                log.warning(u'{}:{}:{}:to_python: Invalid key: {}. Removing trailing newline.'.format(
+                    self.model._meta.db_table,  # pylint: disable=protected-access
                     self.name,
                     self.KEY_CLASS.__name__,
                     repr(value)
@@ -140,8 +140,8 @@ class OpaqueKeyField(models.CharField):
         if serialized_key.endswith('\n'):
             # An opaque key object serialized to a string with a trailing newline.
             # Log the value - but do not modify it.
-            log.warning('{}:{}:{}:get_prep_value: Invalid key: {}.'.format(
-                self.model._meta.db_table,
+            log.warning(u'{}:{}:{}:get_prep_value: Invalid key: {}.'.format(
+                self.model._meta.db_table,  # pylint: disable=protected-access
                 self.name,
                 self.KEY_CLASS.__name__,
                 repr(serialized_key)
