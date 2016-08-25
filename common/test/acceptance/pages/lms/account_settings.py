@@ -33,7 +33,7 @@ class AccountSettingsPage(FieldsMixin, PageObject):
         """
         structure = []
 
-        sections = self.q(css='.section')
+        sections = self.q(css='#aboutTabSections-tabpanel .section')
         for section in sections:
             section_title_element = section.find_element_by_class_name('section-header')
             field_title_elements = section.find_elements_by_class_name('u-field-title')

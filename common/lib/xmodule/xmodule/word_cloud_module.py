@@ -37,20 +37,25 @@ class WordCloudFields(object):
     """XFields for word cloud."""
     display_name = String(
         display_name=_("Display Name"),
-        help=_("Display name for this module"),
+        help=_("The label for this word cloud on the course page."),
         scope=Scope.settings,
         default="Word cloud"
     )
+    instructions = String(
+        display_name=_("Instructions"),
+        help=_("Add instructions to help learners understand how to use the word cloud. Clear instructions are important, especially for learners who have accessibility requirements."),  # nopep8 pylint: disable=C0301
+        scope=Scope.settings,
+    )
     num_inputs = Integer(
         display_name=_("Inputs"),
-        help=_("Number of text boxes available for students to input words/sentences."),
+        help=_("The number of text boxes available for learners to add words and sentences."),
         scope=Scope.settings,
         default=5,
         values={"min": 1}
     )
     num_top_words = Integer(
         display_name=_("Maximum Words"),
-        help=_("Maximum number of words to be displayed in generated word cloud."),
+        help=_("The maximum number of words displayed in the generated word cloud."),
         scope=Scope.settings,
         default=250,
         values={"min": 1}
@@ -64,7 +69,7 @@ class WordCloudFields(object):
 
     # Fields for descriptor.
     submitted = Boolean(
-        help=_("Whether this student has posted words to the cloud."),
+        help=_("Whether this learner has posted words to the cloud."),
         scope=Scope.user_state,
         default=False
     )
@@ -74,7 +79,7 @@ class WordCloudFields(object):
         default=[]
     )
     all_words = Dict(
-        help=_("All possible words from all students."),
+        help=_("All possible words from all learners."),
         scope=Scope.user_state_summary
     )
     top_words = Dict(
@@ -235,11 +240,14 @@ class WordCloudModule(WordCloudFields, XModule):
     def get_html(self):
         """Template rendering."""
         context = {
-            'element_id': self.location.html_id(),
-            'element_class': self.location.category,
             'ajax_url': self.system.ajax_url,
+            'display_name': self.display_name,
+            'display_name_default': WordCloudFields.display_name.default,
+            'instructions': self.instructions,
+            'element_class': self.location.category,
+            'element_id': self.location.html_id(),
             'num_inputs': self.num_inputs,
-            'submitted': self.submitted
+            'submitted': self.submitted,
         }
         self.content = self.system.render_template('word_cloud.html', context)
         return self.content

@@ -942,8 +942,8 @@ class SpecialExamsPageAttemptsSection(PageObject):
         Clicks the "x" to remove the Student's attempt.
         """
         with self.handle_alert(confirm=True):
-            self.q(css="a.remove-attempt").first.click()
-        self.wait_for_element_absence("a.remove-attempt", "exam attempt")
+            self.q(css=".remove-attempt").first.click()
+        self.wait_for_element_absence(".remove-attempt", "exam attempt")
 
 
 class DataDownloadPage(PageObject):

@@ -82,6 +82,17 @@ $gray-d2: shade($gray,40%);
 $gray-d3: shade($gray,60%);
 $gray-d4: shade($gray,80%);
 
+// These define button styles similar to LMS
+// The goal here is consistency (until we can overhaul all of this...)
+$btn-lms-border: #d2c9c9;
+$btn-lms-background: #f1f1f1;
+$btn-lms-gradient: #d9d1d1;
+$btn-lms-shadow: #fcfbfb;
+$btn-lms-shadow-hover: #fefefe;
+$btn-lms-background-hover: #e4e4e4;
+$btn-lms-gradient-hover: #d1c9c9;
+$btn-lms-shadow-active: #cac2c2;
+
 $blue: rgb(0, 159, 230);
 $blue-l1: tint($blue,20%);
 $blue-l2: tint($blue,40%);

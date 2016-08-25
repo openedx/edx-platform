@@ -188,6 +188,39 @@
   }
 }
 
+// LMS-style CAPA button for consistency with LMS buttons
+%btn-lms-style {
+    border: 1px solid $btn-lms-border;
+    border-radius: 3px;
+    box-shadow: inset 0 1px 0 0 $white;
+    color: $gray-d3;
+    display: inline-block;
+    font-size: inherit;
+    font-weight: bold;
+    background-color: $btn-lms-background;
+    background-image: -webkit-linear-gradient($btn-lms-background,$btn-lms-gradient);
+    background-image: linear-gradient($btn-lms-background,$btn-lms-gradient);
+    padding: 7px 18px;
+    text-decoration: none;
+    text-shadow: 0 1px 0 $btn-lms-shadow;
+    background-clip: padding-box;
+    font-size: 0.8125em;
+    
+    &:focus,
+    &:hover {
+        box-shadow: inset 0 1px 0 0 $btn-lms-shadow-hover;
+        cursor: pointer;
+        background-color: $btn-lms-background-hover;
+        background-image: -webkit-linear-gradient($btn-lms-background-hover,$btn-lms-gradient-hover);
+        background-image: linear-gradient($btn-lms-background-hover,$btn-lms-gradient-hover);
+    }
+    
+    &:active {
+        border: 1px solid $btn-lms-border;
+        box-shadow: inset 0 0 8px 4px $btn-lms-shadow-active,inset 0 0 8px 4px $btn-lms-shadow-active;
+    }
+}
+
 // +Button Element
 // ====================
 .button {
