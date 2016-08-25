@@ -3,10 +3,12 @@
 End-to-end tests for the LMS.
 """
 
+from contextlib import contextmanager
 import json
-from nose.plugins.attrib import attr
 from datetime import datetime, timedelta
+
 import ddt
+from nose.plugins.attrib import attr
 
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from ..helpers import UniqueCourseTest, EventsTestMixin
@@ -908,3 +910,89 @@ class SubsectionHiddenAfterDueDateTest(UniqueCourseTest):
 
         self.progress_page.visit()
         self.assertEqual(self.progress_page.scores('Test Section 1', 'Test Subsection 1'), [(0, 1)])
+
+
+class ProgressPageTest(UniqueCourseTest):
+    """
+    Test that the progress page reports scores from completed assessments.
+    """
+    USERNAME = "STUDENT_TESTER"
+    EMAIL = "student101@example.com"
+
+    def setUp(self):
+        super(ProgressPageTest, self).setUp()
+
+        self.courseware_page = CoursewarePage(self.browser, self.course_id)
+        self.problem_page = ProblemPage(self.browser)  # pylint: disable=attribute-defined-outside-init
+        self.progress_page = ProgressPage(self.browser, self.course_id)
+        self.logout_page = LogoutPage(self.browser)
+
+        self.course_outline = CourseOutlinePage(
+            self.browser,
+            self.course_info['org'],
+            self.course_info['number'],
+            self.course_info['run']
+        )
+
+        # Install a course with sections/problems, tabs, updates, and handouts
+        course_fix = CourseFixture(
+            self.course_info['org'],
+            self.course_info['number'],
+            self.course_info['run'],
+            self.course_info['display_name']
+        )
+
+        course_fix.add_children(
+            XBlockFixtureDesc('chapter', 'Test Section 1').add_children(
+                XBlockFixtureDesc('sequential', 'Test Subsection 1').add_children(
+                    create_multiple_choice_problem('Test Problem 1')
+                )
+            )
+        ).install()
+
+        # Auto-auth register for the course.
+        _auto_auth(self.browser, self.USERNAME, self.EMAIL, False, self.course_id)
+
+    def test_progress_page_shows_scored_problems(self):
+        with self._logged_in_session():
+            self.assertEqual(self._get_scores(), [(0, 1)])
+            self.assertEqual(self._get_section_score(), (0, 1))
+            self.courseware_page.visit()
+            self._answer_problem_correctly()
+            self.assertEqual(self._get_scores(), [(1, 1)])
+            self.assertEqual(self._get_section_score(), (1, 1))
+
+    def _answer_problem_correctly(self):
+        """
+        Submit a correct answer to the problem.
+        """
+        self.courseware_page.go_to_sequential_position(1)
+        self.problem_page.click_choice('choice_choice_2')
+        self.problem_page.click_check()
+
+    def _get_section_score(self):
+        """
+        Return a list of scores from the progress page.
+        """
+        self.progress_page.visit()
+        return self.progress_page.section_score('Test Section 1', 'Test Subsection 1')
+
+    def _get_scores(self):
+        """
+        Return a list of scores from the progress page.
+        """
+        self.progress_page.visit()
+        return self.progress_page.scores('Test Section 1', 'Test Subsection 1')
+
+    @contextmanager
+    def _logged_in_session(self):
+        """
+        Ensure that the user is logged in and out appropriately at the beginning
+        and end of the current test.
+        """
+        self.logout_page.visit()
+        try:
+            _auto_auth(self.browser, self.USERNAME, self.EMAIL, False, self.course_id)
+            yield
+        finally:
+            self.logout_page.visit()
