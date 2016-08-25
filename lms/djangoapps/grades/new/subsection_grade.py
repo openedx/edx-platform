@@ -132,7 +132,7 @@ class SubsectionGrade(object):
 
             # There's a chance that the value of weight is not the same value used when the problem was scored,
             # since we can get the value from either block_structure or CSM/submissions.
-            weight = getattr(block, 'weight', 1.0)
+            weight = getattr(block, 'weight', None)
             if persisted_values:
                 possible = persisted_values.get('possible', possible)
                 weight = persisted_values.get('weight', weight)
