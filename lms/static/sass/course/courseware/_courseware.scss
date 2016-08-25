@@ -557,6 +557,14 @@ html.video-fullscreen {
       }
     }
 
+    section.xqa-modal, section.staff-modal, section.history-modal {
+        width: 80%;
+        height: 80%;
+        left: left(20%);
+        overflow: auto;
+        display: none;
+    }
+
     div.staff_info {
       display: none;
       @include clearfix();
