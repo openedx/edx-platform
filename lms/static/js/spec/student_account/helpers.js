@@ -23,7 +23,7 @@ define(['underscore'], function(_) {
         requires_parental_consent: false,
         country: '1',
         language: null,
-        bio: "About the student",
+        bio: 'About the student',
         language_proficiencies: [{code: '1'}],
         profile_image: PROFILE_IMAGE,
         accomplishments_shared: false
@@ -49,10 +49,15 @@ define(['underscore'], function(_) {
         ['3', 'Option 3']
     ];
 
+    var TIME_ZONE_RESPONSE = [{
+        time_zone: 'America/Guyana',
+        description: 'America/Guyana (ECT, UTC-0500)'
+    }];
+
     var IMAGE_MAX_BYTES = 1024 * 1024;
     var IMAGE_MIN_BYTES = 100;
 
-    var expectLoadingIndicatorIsVisible = function (view, visible) {
+    var expectLoadingIndicatorIsVisible = function(view, visible) {
         if (visible) {
             expect($('.ui-loading-indicator')).not.toHaveClass('is-hidden');
         } else {
@@ -60,7 +65,7 @@ define(['underscore'], function(_) {
         }
     };
 
-    var expectLoadingErrorIsVisible = function (view, visible) {
+    var expectLoadingErrorIsVisible = function(view, visible) {
         if (visible) {
             expect(view.$('.ui-loading-error')).not.toHaveClass('is-hidden');
         } else {
@@ -83,14 +88,14 @@ define(['underscore'], function(_) {
         }
     };
 
-    var expectSettingsSectionsButNotFieldsToBeRendered = function (accountSettingsView) {
-        expectSettingsSectionsAndFieldsToBeRendered(accountSettingsView, false)
+    var expectSettingsSectionsButNotFieldsToBeRendered = function(accountSettingsView) {
+        expectSettingsSectionsAndFieldsToBeRendered(accountSettingsView, false);
     };
 
-    var expectSettingsSectionsAndFieldsToBeRendered = function (accountSettingsView, fieldsAreRendered) {
+    var expectSettingsSectionsAndFieldsToBeRendered = function(accountSettingsView, fieldsAreRendered) {
         var sectionsData = accountSettingsView.options.tabSections.aboutTabSections;
 
-        var sectionElements = accountSettingsView.$('.section');
+        var sectionElements = accountSettingsView.$('#aboutTabSections-tabpanel .section');
         expect(sectionElements.length).toBe(sectionsData.length);
 
         _.each(sectionElements, function(sectionElement, sectionIndex) {
@@ -103,7 +108,7 @@ define(['underscore'], function(_) {
             } else {
                 expect(sectionFieldElements.length).toBe(sectionsData[sectionIndex].fields.length);
 
-                _.each(sectionFieldElements, function (sectionFieldElement, fieldIndex) {
+                _.each(sectionFieldElements, function(sectionFieldElement, fieldIndex) {
                     expectElementContainsField(sectionFieldElement, sectionsData[sectionIndex].fields[fieldIndex]);
                 });
             }
@@ -123,10 +128,11 @@ define(['underscore'], function(_) {
         createAccountSettingsData: createAccountSettingsData,
         createUserPreferencesData: createUserPreferencesData,
         FIELD_OPTIONS: FIELD_OPTIONS,
+        TIME_ZONE_RESPONSE: TIME_ZONE_RESPONSE,
         expectLoadingIndicatorIsVisible: expectLoadingIndicatorIsVisible,
         expectLoadingErrorIsVisible: expectLoadingErrorIsVisible,
         expectElementContainsField: expectElementContainsField,
         expectSettingsSectionsButNotFieldsToBeRendered: expectSettingsSectionsButNotFieldsToBeRendered,
-        expectSettingsSectionsAndFieldsToBeRendered: expectSettingsSectionsAndFieldsToBeRendered,
+        expectSettingsSectionsAndFieldsToBeRendered: expectSettingsSectionsAndFieldsToBeRendered
     };
 });

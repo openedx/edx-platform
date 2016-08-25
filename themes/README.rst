@@ -99,20 +99,6 @@ theme (so far):
 * ``header.html``
 * ``footer.html``
 
-You should **not** use the following names in your comprehensive theme:
-
-* ``themable-footer.html``
-
-If you look at the ``main.html`` template file, you will notice that it includes
-``header.html`` and ``themable-footer.html``, rather than ``footer.html``.
-You might be inclined to override ``themable-footer.html`` as a result. DO NOT
-DO THIS. ``themable-footer.html`` is an additional layer of indirection that
-is necessary to avoid breaking microsites, which also refers to a file named
-``footer.html``. The goal is to eventually make comprehensive theming do
-everything that microsites does now, and then deprecate and remove microsites
-from the codebase. At that point, the ``themable-footer.html`` file will go
-away, since the additional layer of indirection will no longer be necessary.
-
 Installing your theme
 ---------------------
 
@@ -206,24 +192,23 @@ In addition, there are some other changes you'll need to make:
   JavaScript will be included automatically on your site using that account ID.
   You can set this account ID either using the "GOOGLE_ANALYTICS_ACCOUNT" value
   in the Django settings, or by setting the newly-added "GOOGLE_ANALYTICS_ACCOUNT"
-  config value in your microsite configuration.
+  config value in your site configuration.
 
 * If you don't want the Google Analytics JavaScript to be output at all in your
-  microsite, set the "GOOGLE_ANALYTICS_ACCOUNT" config value to the empty string.
+  site, set the "GOOGLE_ANALYTICS_ACCOUNT" config value to the empty string.
   If you want to customize the way that Google Analytics is loaded, set the
   "GOOGLE_ANALYTICS_ACCOUNT" config value to the empty string, and then load
   Google Analytics yourself (with whatever customizations you want) in your
   ``head-extra.html`` template.
 
 * The ``css_overrides_file`` config value is now ignored. To add a CSS override
-  file to your microsite, create a ``head-extra.html`` template with the
+  file to your site configuration, create a ``head-extra.html`` template with the
   following content:
 
   .. code-block:: mako
 
     <%namespace name='static' file='../../static_content.html'/>
-    <%! from microsite_configuration import microsite %>
-    <% style_overrides_file = microsite.get_value('css_overrides_file') %>
+    <% style_overrides_file = static.get_value('css_overrides_file') %>
 
     % if style_overrides_file:
       <link rel="stylesheet" type="text/css" href="${static.url(style_overrides_file)}" />

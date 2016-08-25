@@ -522,7 +522,7 @@
       .current-course-image {
         margin-bottom: ($baseline/2);
         padding: ($baseline/2) $baseline;
-        background: $gray-l5;
+        background: $gray-l6;
         text-align: center;
 
         .wrapper-course-image {
@@ -941,7 +941,7 @@
             @extend %t-copy-sub2;
             display: block;
             margin-top: ($baseline/2);
-            color: $gray-l3;
+            color: $gray-l5;
           }
         }
 

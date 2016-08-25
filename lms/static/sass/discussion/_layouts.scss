@@ -1,0 +1,34 @@
+// Layouts for discussion pages
+
+.user-profile {
+    background-color: $sidebar-color;
+
+    .user-profile {
+        padding: $baseline;
+        min-height: 500px;
+    }
+
+    .sidebar-username {
+        font-weight: 700;
+        font-size: $forum-large-font-size;
+    }
+
+    .sidebar-user-roles {
+        margin-top: $baseline/2;
+        font-style: italic;
+        font-size: $forum-base-font-size;
+    }
+
+    .sidebar-threads-count {
+        margin-top: $baseline/2;
+    }
+
+    .sidebar-threads-count span,
+    .sidebar-comments-count span {
+        font-weight: 700;
+    }
+}
+
+.discussion-column {
+    min-height: 500px;
+}

@@ -172,6 +172,30 @@ class EmailMarketingTests(TestCase):
         update_user.delay({}, self.user.email, activation=True)
         self.assertTrue(mock_log_error.called)
 
+    @patch('email_marketing.tasks.update_user.retry')
+    @patch('email_marketing.tasks.log.error')
+    @patch('email_marketing.tasks.SailthruClient.api_post')
+    def test_update_user_error_retryable(self, mock_sailthru, mock_log_error, mock_retry):
+        """
+        Ensure that retryable error is retried
+        """
+        mock_sailthru.return_value = SailthruResponse(JsonResponse({'error': 43, 'errormsg': 'Got an error'}))
+        update_user.delay({}, self.user.email)
+        self.assertTrue(mock_log_error.called)
+        self.assertTrue(mock_retry.called)
+
+    @patch('email_marketing.tasks.update_user.retry')
+    @patch('email_marketing.tasks.log.error')
+    @patch('email_marketing.tasks.SailthruClient.api_post')
+    def test_update_user_error_nonretryable(self, mock_sailthru, mock_log_error, mock_retry):
+        """
+        Ensure that non-retryable error is not retried
+        """
+        mock_sailthru.return_value = SailthruResponse(JsonResponse({'error': 1, 'errormsg': 'Got an error'}))
+        update_user.delay({}, self.user.email)
+        self.assertTrue(mock_log_error.called)
+        self.assertFalse(mock_retry.called)
+
     @patch('email_marketing.tasks.log.error')
     @patch('email_marketing.tasks.SailthruClient.api_post')
     def test_just_return_tasks(self, mock_sailthru, mock_log_error):
@@ -284,11 +308,12 @@ class EmailMarketingTests(TestCase):
         self.assertEquals(userparms['keys']['email'], TEST_EMAIL)
 
     @patch('email_marketing.tasks.log.error')
+    @patch('email_marketing.tasks.log.info')
     @patch('email_marketing.tasks.SailthruClient.purchase')
     @patch('email_marketing.tasks.SailthruClient.api_get')
     @patch('email_marketing.tasks.SailthruClient.api_post')
     def test_update_course_enrollment(self, mock_sailthru_api_post,
-                                      mock_sailthru_api_get, mock_sailthru_purchase, mock_log_error):
+                                      mock_sailthru_api_get, mock_sailthru_purchase, mock_log_info, mock_log_error):
         """
         test async method in task posts enrolls and purchases
         """
@@ -347,14 +372,14 @@ class EmailMarketingTests(TestCase):
 
         # test unsupported event
         mock_sailthru_purchase.side_effect = SailthruClientError
-        mock_log_error.reset_mock()
+        mock_log_info.reset_mock()
         update_course_enrollment.delay(TEST_EMAIL,
                                        self.course_url,
                                        EnrollStatusChange.upgrade_start,
                                        'verified',
                                        course_id=self.course_id_string,
                                        message_id='cookie_bid')
-        self.assertFalse(mock_log_error.called)
+        self.assertFalse(mock_log_info.called)
 
         # test error updating user
         mock_sailthru_api_get.return_value = SailthruResponse(JsonResponse({'error': 100, 'errormsg': 'Got an error'}))
@@ -364,7 +389,7 @@ class EmailMarketingTests(TestCase):
                                        'verified',
                                        course_id=self.course_id_string,
                                        message_id='cookie_bid')
-        self.assertTrue(mock_log_error.called)
+        self.assertTrue(mock_log_info.called)
 
     @patch('email_marketing.tasks.SailthruClient')
     def test_get_course_content(self, mock_sailthru_client):
@@ -417,13 +442,13 @@ class EmailMarketingTests(TestCase):
 
         # test get error from Sailthru
         mock_sailthru_client.api_get.return_value = \
-            SailthruResponse(JsonResponse({'error': 100, 'errormsg': 'Got an error'}))
+            SailthruResponse(JsonResponse({'error': 43, 'errormsg': 'Got an error'}))
         self.assertFalse(_update_unenrolled_list(mock_sailthru_client, TEST_EMAIL,
                                                  self.course_url, False))
 
         # test post error from Sailthru
         mock_sailthru_client.api_post.return_value = \
-            SailthruResponse(JsonResponse({'error': 100, 'errormsg': 'Got an error'}))
+            SailthruResponse(JsonResponse({'error': 43, 'errormsg': 'Got an error'}))
         mock_sailthru_client.api_get.return_value = \
             SailthruResponse(JsonResponse({'vars': {'unenrolled': [self.course_url]}}))
         self.assertFalse(_update_unenrolled_list(mock_sailthru_client, TEST_EMAIL,

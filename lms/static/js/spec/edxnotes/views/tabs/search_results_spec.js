@@ -9,24 +9,24 @@ define([
     'use strict';
     describe('EdxNotes SearchResultsView', function() {
         var notes = [
-                {
-                    created: 'December 11, 2014 at 11:12AM',
-                    updated: 'December 11, 2014 at 11:12AM',
-                    text: 'Third added model',
-                    quote: 'Should be listed first'
-                },
-                {
-                    created: 'December 11, 2014 at 11:11AM',
-                    updated: 'December 11, 2014 at 11:11AM',
-                    text: 'Second added model',
-                    quote: 'Should be listed second'
-                },
-                {
-                    created: 'December 11, 2014 at 11:10AM',
-                    updated: 'December 11, 2014 at 11:10AM',
-                    text: 'First added model',
-                    quote: 'Should be listed third'
-                }
+            {
+                created: 'December 11, 2014 at 11:12AM',
+                updated: 'December 11, 2014 at 11:12AM',
+                text: 'Third added model',
+                quote: 'Should be listed first'
+            },
+            {
+                created: 'December 11, 2014 at 11:11AM',
+                updated: 'December 11, 2014 at 11:11AM',
+                text: 'Second added model',
+                quote: 'Should be listed second'
+            },
+            {
+                created: 'December 11, 2014 at 11:10AM',
+                updated: 'December 11, 2014 at 11:10AM',
+                text: 'First added model',
+                quote: 'Should be listed third'
+            }
             ],
             responseJson = {
                 'count': 3,
@@ -39,7 +39,7 @@ define([
             },
             getView, submitForm, tabInfo, searchResultsTabId;
 
-        getView = function (tabsCollection, perPage, options) {
+        getView = function(tabsCollection, perPage, options) {
             options = _.defaults(options || {}, {
                 el: $('.wrapper-student-notes'),
                 tabsCollection: tabsCollection,
@@ -52,7 +52,7 @@ define([
             return new SearchResultsView(options);
         };
 
-        submitForm = function (searchBox, text) {
+        submitForm = function(searchBox, text) {
             searchBox.$('.search-notes-input').val(text);
             searchBox.$('.search-notes-submit').click();
         };
@@ -66,9 +66,9 @@ define([
             view: 'Search Results'
         };
 
-        searchResultsTabId = "#search-results-panel";
+        searchResultsTabId = '#search-results-panel';
 
-        beforeEach(function () {
+        beforeEach(function() {
             loadFixtures('js/fixtures/edxnotes/edxnotes.html');
             TemplateHelpers.installTemplates([
                 'templates/edxnotes/note-item', 'templates/edxnotes/tab-item'
@@ -77,23 +77,23 @@ define([
             this.tabsCollection = new TabsCollection();
         });
 
-        it('does not create a tab and content on initialization', function () {
+        it('does not create a tab and content on initialization', function() {
             var view = getView(this.tabsCollection);
             expect(this.tabsCollection).toHaveLength(0);
             expect(view.$('#search-results-panel')).not.toExist();
         });
 
-        it('displays a tab and content on search with proper data and order', function () {
+        it('displays a tab and content on search with proper data and order', function() {
             var view = getView(this.tabsCollection),
                 requests = AjaxHelpers.requests(this);
 
             submitForm(view.searchBox, 'second');
             Helpers.respondToRequest(requests, responseJson, true);
             Helpers.verifyPageData(view, this.tabsCollection, tabInfo, searchResultsTabId, responseJson);
-            Helpers.verifyPaginationInfo(view, "Showing 1-3 out of 3 total", true, 1, 1);
+            Helpers.verifyPaginationInfo(view, 'Showing 1-3 out of 3 total', true, 1, 1);
         });
 
-        it('displays loading indicator when search is running', function () {
+        it('displays loading indicator when search is running', function() {
             var view = getView(this.tabsCollection),
                 requests = AjaxHelpers.requests(this);
 
@@ -107,7 +107,7 @@ define([
             expect(view.$('.ui-loading')).toHaveClass('is-hidden');
         });
 
-        it('displays no results message', function () {
+        it('displays no results message', function() {
             var view = getView(this.tabsCollection),
                 requests = AjaxHelpers.requests(this);
 
@@ -122,7 +122,7 @@ define([
             );
         });
 
-        it('does not send an additional request on switching between tabs', function () {
+        it('does not send an additional request on switching between tabs', function() {
             var view = getView(this.tabsCollection),
                 requests = AjaxHelpers.requests(this);
 
@@ -142,7 +142,7 @@ define([
             expect(view.$('.note')).toHaveLength(3);
         });
 
-        it('can clear search results if tab is closed', function () {
+        it('can clear search results if tab is closed', function() {
             var view = getView(this.tabsCollection),
                 requests = AjaxHelpers.requests(this);
             spyOn(view.searchBox, 'clearInput').and.callThrough();
@@ -155,7 +155,7 @@ define([
             expect(view.searchBox.clearInput).toHaveBeenCalled();
         });
 
-        it('can correctly show/hide error messages', function () {
+        it('can correctly show/hide error messages', function() {
             var view = getView(this.tabsCollection),
                 requests = AjaxHelpers.requests(this);
 
@@ -178,7 +178,7 @@ define([
             expect(view.$('.wrapper-msg .copy')).toBeEmpty();
         });
 
-        it('can correctly update search results', function () {
+        it('can correctly update search results', function() {
             var view = getView(this.tabsCollection),
                 requests = AjaxHelpers.requests(this),
                 newNotes = [{
@@ -205,12 +205,12 @@ define([
             }, true);
 
             expect(view.$('.note').length).toHaveLength(1);
-            view.searchResults.collection.each(function (model, index) {
+            view.searchResults.collection.each(function(model, index) {
                 expect(model.get('text')).toBe(newNotes[index].text);
             });
         });
 
-        it("will not render header and footer if there are no notes", function () {
+        it('will not render header and footer if there are no notes', function() {
             var view = getView(this.tabsCollection),
                 requests = AjaxHelpers.requests(this),
                 notes = {
@@ -228,7 +228,7 @@ define([
             expect(view.$('.pagination.pagination-full.bottom')).toHaveLength(0);
         });
 
-        it("can go to a page number", function () {
+        it('can go to a page number', function() {
             var view = getView(this.tabsCollection),
                 requests = AjaxHelpers.requests(this),
                 notes = Helpers.createNotesData(
@@ -243,7 +243,7 @@ define([
 
             submitForm(view.searchBox, 'awesome');
             Helpers.respondToRequest(requests, notes, true);
-            Helpers.verifyPaginationInfo(view, "Showing 1-10 out of 12 total", false, 1, 2);
+            Helpers.verifyPaginationInfo(view, 'Showing 1-10 out of 12 total', false, 1, 2);
             Helpers.verifyPageData(view, this.tabsCollection, tabInfo, searchResultsTabId, notes);
 
             view.$('input#page-number-input').val('2');
@@ -263,11 +263,11 @@ define([
                 }
             );
             Helpers.respondToRequest(requests, notes, true);
-            Helpers.verifyPaginationInfo(view, "Showing 11-12 out of 12 total", false, 2, 2);
+            Helpers.verifyPaginationInfo(view, 'Showing 11-12 out of 12 total', false, 2, 2);
             Helpers.verifyPageData(view, this.tabsCollection, tabInfo, searchResultsTabId, notes);
         });
 
-        it("can navigate forward and backward", function () {
+        it('can navigate forward and backward', function() {
             var requests = AjaxHelpers.requests(this),
                 page1Notes = Helpers.createNotesData(
                     {
@@ -278,11 +278,11 @@ define([
                         start: 0
                     }
                 ),
-            view = getView(this.tabsCollection);
+                view = getView(this.tabsCollection);
 
             submitForm(view.searchBox, 'awesome');
             Helpers.respondToRequest(requests, page1Notes, true);
-            Helpers.verifyPaginationInfo(view, "Showing 1-10 out of 15 total", false, 1, 2);
+            Helpers.verifyPaginationInfo(view, 'Showing 1-10 out of 15 total', false, 1, 2);
             Helpers.verifyPageData(view, this.tabsCollection, tabInfo, searchResultsTabId, page1Notes);
 
             view.$('.pagination .next-page-link').click();
@@ -300,7 +300,7 @@ define([
                 }
             );
             Helpers.respondToRequest(requests, page2Notes, true);
-            Helpers.verifyPaginationInfo(view, "Showing 11-15 out of 15 total", false, 2, 2);
+            Helpers.verifyPaginationInfo(view, 'Showing 11-15 out of 15 total', false, 2, 2);
             Helpers.verifyPageData(view, this.tabsCollection, tabInfo, searchResultsTabId, page2Notes);
 
             view.$('.pagination .previous-page-link').click();
@@ -310,11 +310,11 @@ define([
             );
             Helpers.respondToRequest(requests, page1Notes);
 
-            Helpers.verifyPaginationInfo(view, "Showing 1-10 out of 15 total", false, 1, 2);
+            Helpers.verifyPaginationInfo(view, 'Showing 1-10 out of 15 total', false, 1, 2);
             Helpers.verifyPageData(view, this.tabsCollection, tabInfo, searchResultsTabId, page1Notes);
         });
 
-        it("sends correct page size value", function () {
+        it('sends correct page size value', function() {
             var requests = AjaxHelpers.requests(this),
                 view = getView(this.tabsCollection, 5);
 

@@ -80,7 +80,7 @@ class CcxTestCase(SharedModuleStoreTestCase):
         """
         super(CcxTestCase, self).setUp()
         # Create instructor account
-        self.coach = UserFactory.create()
+        self.coach = UserFactory.create(password="test")
         # create an instance of modulestore
         self.mstore = modulestore()
 

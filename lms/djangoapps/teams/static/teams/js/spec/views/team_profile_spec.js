@@ -1,36 +1,39 @@
 define([
-    'underscore', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'teams/js/models/team',
-    'teams/js/views/team_profile', 'teams/js/spec_helpers/team_spec_helpers',
-    'xmodule_js/common_static/common/js/spec_helpers/discussion_spec_helper'
-], function (_, AjaxHelpers, TeamModel, TeamProfileView, TeamSpecHelpers, DiscussionSpecHelper) {
+    'underscore',
+    'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
+    'common/js/spec_helpers/discussion_spec_helper',
+    'teams/js/spec_helpers/team_spec_helpers',
+    'teams/js/models/team',
+    'teams/js/views/team_profile'
+], function(_, AjaxHelpers, DiscussionSpecHelper, TeamSpecHelpers, TeamModel, TeamProfileView) {
     'use strict';
-    describe('TeamProfileView', function () {
+    describe('TeamProfileView', function() {
         var profileView, createTeamProfileView, createTeamModelData, clickLeaveTeam,
             teamModel,
             leaveTeamLinkSelector = '.leave-team-link',
             DEFAULT_MEMBERSHIP = [
                 {
-                    'user': {
-                        'username': TeamSpecHelpers.testUser,
-                        'profile_image': {
-                            'has_image': true,
-                            'image_url_medium': '/image-url'
+                    user: {
+                        username: TeamSpecHelpers.testUser,
+                        profile_image: {
+                            has_image: true,
+                            image_url_medium: '/image-url'
                         }
                     }
                 }
             ];
 
-        beforeEach(function () {
+        beforeEach(function() {
             setFixtures('<div id="page-prompt"></div>' +
                 '<div class="teams-content"><div class="msg-content"><div class="copy"></div></div></div>' +
                 '<div class="profile-view"></div>');
             DiscussionSpecHelper.setUnderscoreFixtures();
         });
 
-        createTeamModelData = function (options) {
+        createTeamModelData = function(options) {
             return {
-                id: "test-team",
-                name: "Test Team",
+                id: 'test-team',
+                name: 'Test Team',
                 discussion_topic_id: TeamSpecHelpers.testTeamDiscussionID,
                 country: options.country || '',
                 language: options.language || '',
@@ -40,7 +43,7 @@ define([
         };
 
         createTeamProfileView = function(requests, options) {
-            teamModel = new TeamModel(createTeamModelData(options), { parse: true });
+            teamModel = new TeamModel(createTeamModelData(options), {parse: true});
             profileView = new TeamProfileView({
                 el: $('.profile-view'),
                 teamEvents: TeamSpecHelpers.teamEvents,
@@ -95,13 +98,13 @@ define([
         };
 
         describe('DiscussionsView', function() {
-            it('can render itself', function () {
+            it('can render itself', function() {
                 var requests = AjaxHelpers.requests(this),
                     view = createTeamProfileView(requests, {});
                 expect(view.$('.discussion-thread').length).toEqual(3);
             });
 
-            it('shows New Post button when user joins a team', function () {
+            it('shows New Post button when user joins a team', function() {
                 var requests = AjaxHelpers.requests(this),
                     view = createTeamProfileView(requests, {});
 
@@ -111,7 +114,7 @@ define([
                 expect(view.$('.new-post-btn').length).toEqual(1);
             });
 
-            it('hides New Post button when user left a team', function () {
+            it('hides New Post button when user left a team', function() {
                 var requests = AjaxHelpers.requests(this),
                     view = createTeamProfileView(requests, {membership: DEFAULT_MEMBERSHIP});
 
@@ -122,7 +125,6 @@ define([
         });
 
         describe('TeamDetailsView', function() {
-
             var assertTeamDetails = function(view, members, memberOfTeam) {
                 expect(view.$('.team-detail-header').text()).toBe('Team Details');
                 expect(view.$('.team-country').text()).toContain('United States');
@@ -133,7 +135,6 @@ define([
             };
 
             describe('Non-Member', function() {
-
                 it('can render itself', function() {
                     var requests = AjaxHelpers.requests(this);
                     var view = createTeamProfileView(requests, {
@@ -156,7 +157,6 @@ define([
             });
 
             describe('Member', function() {
-
                 it('can render itself', function() {
                     var requests = AjaxHelpers.requests(this);
                     var view = createTeamProfileView(requests, {
@@ -172,7 +172,7 @@ define([
                     // assert user profile page url.
                     expect(view.$('.member-profile').attr('href')).toBe('/u/' + TeamSpecHelpers.testUser);
 
-                    //Verify that the leave team link is present
+                    // Verify that the leave team link is present
                     expect(view.$(leaveTeamLinkSelector).text()).toContain('Leave Team');
                 });
 
@@ -198,10 +198,10 @@ define([
                     assertTeamDetails(view, 1, true);
                 });
 
-                it('shows correct error messages', function () {
+                it('shows correct error messages', function() {
                     var requests = AjaxHelpers.requests(this);
 
-                    var verifyErrorMessage = function (requests, errorMessage, expectedMessage) {
+                    var verifyErrorMessage = function(errorMessage, expectedMessage) {
                         var view = createTeamProfileView(
                             requests, {country: 'US', language: 'en', membership: DEFAULT_MEMBERSHIP}
                         );
@@ -215,22 +215,19 @@ define([
 
                     // verify user_message
                     verifyErrorMessage(
-                        requests,
-                        JSON.stringify({'user_message': "can't remove user from team"}),
+                        JSON.stringify({user_message: "can't remove user from team"}),
                         "can't remove user from team"
                     );
 
                     // verify generic error message
                     verifyErrorMessage(
-                        requests,
                         '',
                         'An error occurred. Try again.'
                     );
 
                     // verify error message when json parsing succeeded but error message format is incorrect
                     verifyErrorMessage(
-                        requests,
-                        JSON.stringify({'blah': "can't remove user from team"}),
+                        JSON.stringify({blah: "can't remove user from team"}),
                         'An error occurred. Try again.'
                     );
                 });

@@ -1,25 +1,24 @@
 define([
-        'jquery',
-        'js/certificates/views/certificate_bulk_whitelist'
-    ],
+    'jquery',
+    'js/certificates/views/certificate_bulk_whitelist'
+],
     function($, CertificateBulkWhiteListView) {
         'use strict';
-        describe("certificate bulk exceptions generation", function() {
-
+        describe('certificate bulk exceptions generation', function() {
             var certificate_bulk_exception_url = 'test/url/';
             var SELECTORS = {
-                upload_csv_button: ".upload-csv-button",
-                bulk_white_list_exception_form: "form#bulk-white-list-exception-form",
-                bulk_exception_results: ".bulk-exception-results"
+                upload_csv_button: '.upload-csv-button',
+                bulk_white_list_exception_form: 'form#bulk-white-list-exception-form',
+                bulk_exception_results: '.bulk-exception-results'
             };
             beforeEach(function() {
                 setFixtures();
                 var fixture = readFixtures(
-                    "templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore"
+                    'templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore'
                 );
 
                 setFixtures(
-                    "<script type='text/template' id='certificate-bulk-white-list-tpl'>" + fixture + "</script>" +
+                    "<script type='text/template' id='certificate-bulk-white-list-tpl'>" + fixture + '</script>' +
                     "<div class='bulk-white-list-exception'></div>"
                 );
 
@@ -31,11 +30,11 @@ define([
 
             it('bind the ajax call and the result will be success', function() {
                 var submitCallback;
-                spyOn($, "ajax").and.callFake(function(params) {
+                spyOn($, 'ajax').and.callFake(function(params) {
                     params.success({
                         row_errors: {},
                         general_errors: [],
-                        success: ["user test in row# 1"]
+                        success: ['user test in row# 1']
                     });
                     return {
                         always: function() {}
@@ -50,10 +49,10 @@ define([
 
             it('bind the ajax call and the result will be general error', function() {
                 var submitCallback;
-                spyOn($, "ajax").and.callFake(function(params) {
+                spyOn($, 'ajax').and.callFake(function(params) {
                     params.success({
                         row_errors: {},
-                        general_errors: ["File is not attached."],
+                        general_errors: ['File is not attached.'],
                         success: []
                     });
                     return {
@@ -68,7 +67,7 @@ define([
 
             it('bind the ajax call and the result will be singular form of row errors', function() {
                 var submitCallback;
-                spyOn($, "ajax").and.callFake(function(params) {
+                spyOn($, 'ajax').and.callFake(function(params) {
                     params.success({
                         general_errors: [],
                         row_errors: {
@@ -90,12 +89,11 @@ define([
                 expect($(SELECTORS.bulk_exception_results).text()).toContain('1 learner does not exist in LMS');
                 expect($(SELECTORS.bulk_exception_results).text()).toContain('1 learner is already white listed');
                 expect($(SELECTORS.bulk_exception_results).text()).toContain('1 learner is not enrolled in course');
-
             });
 
             it('bind the ajax call and the result will be plural form of row errors', function() {
                 var submitCallback;
-                spyOn($, "ajax").and.callFake(function(params) {
+                spyOn($, 'ajax').and.callFake(function(params) {
                     params.success({
                         general_errors: [],
                         row_errors: {
@@ -117,16 +115,15 @@ define([
                 expect($(SELECTORS.bulk_exception_results).text()).toContain('2 learners do not exist in LMS');
                 expect($(SELECTORS.bulk_exception_results).text()).toContain('2 learners are already white listed');
                 expect($(SELECTORS.bulk_exception_results).text()).toContain('2 learners are not enrolled in course');
-
             });
 
             it('toggle message details', function() {
                 var submitCallback;
-                spyOn($, "ajax").and.callFake(function(params) {
+                spyOn($, 'ajax').and.callFake(function(params) {
                     params.success({
                         row_errors: {},
                         general_errors: [],
-                        success: ["user test in row# 1"]
+                        success: ['user test in row# 1']
                     });
                     return {
                         always: function() {}
@@ -135,11 +132,9 @@ define([
                 submitCallback = jasmine.createSpy().and.returnValue();
                 this.view.$el.find(SELECTORS.bulk_white_list_exception_form).submit(submitCallback);
                 this.view.$el.find(SELECTORS.upload_csv_button).click();
-                expect(this.view.$el.find("div.message > .successfully-added")).toBeHidden();
-                this.view.$el.find(".arrow#successfully-added").trigger( "click" );
-                expect(this.view.$el.find("div.message > .successfully-added")).toBeVisible();
-
+                expect(this.view.$el.find('div.message > .successfully-added')).toBeHidden();
+                this.view.$el.find('.arrow#successfully-added').trigger('click');
+                expect(this.view.$el.find('div.message > .successfully-added')).toBeVisible();
             });
-
         });
     });

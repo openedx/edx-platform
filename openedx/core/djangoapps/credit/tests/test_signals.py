@@ -10,6 +10,8 @@ from unittest import skipUnless
 from django.conf import settings
 from django.test.client import RequestFactory
 from nose.plugins.attrib import attr
+from course_modes.models import CourseMode
+from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -21,7 +23,7 @@ from openedx.core.djangoapps.credit.models import CreditCourse, CreditProvider
 from openedx.core.djangoapps.credit.signals import listen_for_grade_calculation
 
 
-@attr('shard_2')
+@attr(shard=2)
 @skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in LMS')
 @ddt.ddt
 class TestMinGradedRequirementStatus(ModuleStoreTestCase):
@@ -66,9 +68,12 @@ class TestMinGradedRequirementStatus(ModuleStoreTestCase):
         # Add a single credit requirement (final grade)
         set_credit_requirements(self.course.id, requirements)
 
+        # Enroll user in verified mode.
+        self.enrollment = CourseEnrollment.enroll(self.user, self.course.id, mode=CourseMode.VERIFIED)
+
     def assert_requirement_status(self, grade, due_date, expected_status):
         """ Verify the user's credit requirement status is as expected after simulating a grading calculation. """
-        listen_for_grade_calculation(None, self.user.username, {'percent': grade}, self.course.id, due_date)
+        listen_for_grade_calculation(None, self.user, {'percent': grade}, self.course.id, due_date)
         req_status = get_credit_requirement_status(self.course.id, self.request.user.username, 'grade', 'grade')
 
         self.assertEqual(req_status[0]['status'], expected_status)
@@ -109,3 +114,13 @@ class TestMinGradedRequirementStatus(ModuleStoreTestCase):
     def test_min_grade_requirement_failed_grade_expired_deadline(self):
         """Test with failed grades and deadline expire"""
         self.assert_requirement_status(0.22, self.EXPIRED_DUE_DATE, 'failed')
+
+    @ddt.data(
+        CourseMode.AUDIT,
+        CourseMode.HONOR,
+        CourseMode.CREDIT_MODE
+    )
+    def test_requirement_failed_for_non_verified_enrollment(self, mode):
+        """Test with valid grades submitted before deadline with non-verified enrollment."""
+        self.enrollment.update_enrollment(mode, True)
+        self.assert_requirement_status(0.8, self.VALID_DUE_DATE, None)

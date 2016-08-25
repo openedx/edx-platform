@@ -7,6 +7,7 @@ import crum
 
 from django.dispatch import receiver
 from django.core.urlresolvers import reverse
+from django.conf import settings
 
 from student.models import ENROLL_STATUS_CHANGE
 from student.cookies import CREATE_LOGON_COOKIE
@@ -116,13 +117,16 @@ def add_email_marketing_cookies(sender, response=None, user=None,
             response.set_cookie(
                 'sailthru_hid',
                 cookie,
-                max_age=365 * 24 * 60 * 60  # set for 1 year
+                max_age=365 * 24 * 60 * 60,  # set for 1 year
+                domain=settings.SESSION_COOKIE_DOMAIN,
+                path='/',
             )
         else:
             log.error("No cookie returned attempting to obtain cookie from Sailthru for %s", user.email)
     else:
         error = sailthru_response.get_error()
-        log.error("Error attempting to obtain cookie from Sailthru: %s", error.get_message())
+        # generally invalid email address
+        log.info("Error attempting to obtain cookie from Sailthru: %s", error.get_message())
     return response
 
 

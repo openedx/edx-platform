@@ -241,7 +241,7 @@ from django.template.defaultfilters import escapejs
       });
 
       if (window.location.hash === "#view-metrics") {
-        $('.instructor-nav a[data-section="metrics"]').click();
+        $('.instructor-nav [data-section="metrics"]').click();
         $('#graph_reload').hide();
         $('.metrics-header-container').hide();
       }

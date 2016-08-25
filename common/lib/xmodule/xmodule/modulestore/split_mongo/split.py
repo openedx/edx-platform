@@ -226,11 +226,11 @@ class SplitBulkWriteMixin(BulkOperationsMixin):
                 course_key.replace(org=None, course=None, run=None, branch=None)
             ]
 
-    def _start_outermost_bulk_operation(self, bulk_write_record, course_key):
+    def _start_outermost_bulk_operation(self, bulk_write_record, course_key, ignore_case=False):
         """
         Begin a bulk write operation on course_key.
         """
-        bulk_write_record.initial_index = self.db_connection.get_course_index(course_key)
+        bulk_write_record.initial_index = self.db_connection.get_course_index(course_key, ignore_case=ignore_case)
         # Ensure that any edits to the index don't pollute the initial_index
         bulk_write_record.index = copy.deepcopy(bulk_write_record.initial_index)
         bulk_write_record.course_key = course_key
@@ -779,7 +779,15 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             self._add_cache(course_entry.structure['_id'], runtime)
             self.cache_items(runtime, block_keys, course_entry.course_key, depth, lazy)
 
-        return [runtime.load_item(block_key, course_entry, **kwargs) for block_key in block_keys]
+        blocks = [runtime.load_item(block_key, course_entry, **kwargs) for block_key in block_keys]
+
+        # TODO Once PLAT-1055 is implemented, we can expose the course version
+        # information within the key identifier of the block.  Until then, set
+        # the course_version as a field on each returned block so higher layers
+        # can use it when needed.
+        for block in blocks:
+            block.course_version = course_entry.course_key.version_guid
+        return blocks
 
     def _get_cache(self, course_version_guid):
         """
@@ -1876,7 +1884,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         """
         Internal code for creating a course or library
         """
-        index = self.get_course_index(locator)
+        index = self.get_course_index(locator, ignore_case=True)
         if index is not None:
             raise DuplicateCourseError(locator, index)
 

@@ -1,4 +1,4 @@
-;(function(require, define) {
+(function(require, define) {
     'use strict';
 
     if (window) {
@@ -94,7 +94,7 @@
             // end of Annotation tool files
 
             // externally hosted files
-            'mathjax': '//cdn.mathjax.org/mathjax/2.6-latest/MathJax.js?config=TeX-MML-AM_SVG&delayStartupUntil=configured', // jshint ignore:line
+            mathjax: '//cdn.mathjax.org/mathjax/2.6-latest/MathJax.js?config=TeX-MML-AM_SVG&delayStartupUntil=configured',  // eslint-disable-line max-len
             'youtube': [
                 // youtube URL does not end in '.js'. We add '?noext' to the path so
                 // that require.js adds the '.js' to the query component of the URL,
@@ -210,12 +210,12 @@
                     window.MathJax.Hub.Config({
                         tex2jax: {
                             inlineMath: [
-                                ['\\(','\\)'],
-                                ['[mathjaxinline]','[/mathjaxinline]']
+                                ['\\(', '\\)'],
+                                ['[mathjaxinline]', '[/mathjaxinline]']
                             ],
                             displayMath: [
-                                ['\\[','\\]'],
-                                ['[mathjax]','[/mathjax]']
+                                ['\\[', '\\]'],
+                                ['[mathjax]', '[/mathjax]']
                             ]
                         }
                     });

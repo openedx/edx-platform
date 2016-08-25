@@ -44,7 +44,7 @@ edx-lint==0.4.3
 edx-django-oauth2-provider==1.1.1
 edx-django-sites-extensions==2.0.1
 edx-oauth2-provider==1.1.3
-edx-opaque-keys==0.2.1
+edx-opaque-keys==0.3.2
 edx-organizations==0.4.1
 edx-rest-api-client==1.2.1
 edx-search==0.1.2
@@ -146,11 +146,11 @@ bok-choy==0.5.3
 chrono==1.0.2
 coverage==4.0.2
 ddt==0.8.0
-diff-cover==0.9.0
+diff-cover==0.9.8
 django-crum==0.5
 django_nose==1.4.1
 factory_boy==2.5.1
-flaky==2.4.0
+flaky==3.3.0
 freezegun==0.1.11
 mock-django==0.6.9
 mock==1.0.1
@@ -183,3 +183,6 @@ pynliner==0.5.2
 
 # for sailthru integration
 sailthru-client==2.2.3
+
+# Release utils for the edx release pipeline
+edx-django-release-util==0.1.0

@@ -121,7 +121,7 @@ class UserAPITestCase(APITestCase):
     {'full': 50, 'small': 10},
     clear=True
 )
-@attr('shard_2')
+@attr(shard=2)
 class TestAccountAPI(CacheIsolationTestCase, UserAPITestCase):
     """
     Unit tests for the Account API.
@@ -337,7 +337,7 @@ class TestAccountAPI(CacheIsolationTestCase, UserAPITestCase):
             self.assertEqual(False, data["accomplishments_shared"])
 
         self.client.login(username=self.user.username, password=self.test_password)
-        verify_get_own_information(16)
+        verify_get_own_information(17)
 
         # Now make sure that the user can get the same information, even if not active
         self.user.is_active = False
@@ -356,7 +356,7 @@ class TestAccountAPI(CacheIsolationTestCase, UserAPITestCase):
         legacy_profile.save()
 
         self.client.login(username=self.user.username, password=self.test_password)
-        with self.assertNumQueries(16):
+        with self.assertNumQueries(17):
             response = self.send_get(self.client)
         for empty_field in ("level_of_education", "gender", "country", "bio"):
             self.assertIsNone(response.data[empty_field])
@@ -728,7 +728,7 @@ class TestAccountAPI(CacheIsolationTestCase, UserAPITestCase):
         )
 
 
-@attr('shard_2')
+@attr(shard=2)
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class TestAccountAPITransactions(TransactionTestCase):
     """

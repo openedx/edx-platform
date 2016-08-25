@@ -4,24 +4,24 @@ Test courseware search
 
 import json
 
-from ..helpers import remove_file
-from ...pages.common.logout import LogoutPage
-from ...pages.studio.overview import CourseOutlinePage
-from ...pages.lms.courseware_search import CoursewareSearchPage
-from ...pages.lms.course_nav import CourseNavPage
-from ...fixtures.course import XBlockFixtureDesc
-from ..helpers import create_user_partition_json
+from common.test.acceptance.tests.helpers import remove_file
+from common.test.acceptance.pages.common.logout import LogoutPage
+from common.test.acceptance.pages.studio.overview import CourseOutlinePage
+from common.test.acceptance.pages.lms.courseware_search import CoursewareSearchPage
+from common.test.acceptance.pages.lms.course_nav import CourseNavPage
+from common.test.acceptance.fixtures.course import XBlockFixtureDesc
+from common.test.acceptance.tests.helpers import create_user_partition_json
 
 from xmodule.partitions.partitions import Group
 
 from nose.plugins.attrib import attr
 
-from ..studio.base_studio_test import ContainerBase
+from common.test.acceptance.tests.studio.base_studio_test import ContainerBase
 
-from ...pages.studio.auto_auth import AutoAuthPage as StudioAutoAuthPage
+from common.test.acceptance.pages.studio.auto_auth import AutoAuthPage as StudioAutoAuthPage
 
 
-@attr('shard_1')
+@attr(shard=1)
 class SplitTestCoursewareSearchTest(ContainerBase):
     """
     Test courseware search on Split Test Module.

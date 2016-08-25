@@ -6,14 +6,14 @@ for displaying containers within units.
 from nose.plugins.attrib import attr
 from unittest import skip
 
-from ...fixtures.course import XBlockFixtureDesc
-from ...pages.studio.component_editor import ComponentEditorView, ComponentVisibilityEditorView
-from ...pages.studio.container import ContainerPage
-from ...pages.studio.html_component_editor import HtmlComponentEditorView
-from ...pages.studio.utils import add_discussion, drag
-from ...pages.lms.courseware import CoursewarePage
-from ...pages.lms.staff_view import StaffPage
-from ...tests.helpers import create_user_partition_json
+from common.test.acceptance.fixtures.course import XBlockFixtureDesc
+from common.test.acceptance.pages.studio.component_editor import ComponentEditorView, ComponentVisibilityEditorView
+from common.test.acceptance.pages.studio.container import ContainerPage
+from common.test.acceptance.pages.studio.html_component_editor import HtmlComponentEditorView
+from common.test.acceptance.pages.studio.utils import add_discussion, drag
+from common.test.acceptance.pages.lms.courseware import CoursewarePage
+from common.test.acceptance.pages.lms.staff_view import StaffPage
+from common.test.acceptance.tests.helpers import create_user_partition_json
 
 import datetime
 from bok_choy.promise import Promise, EmptyPromise
@@ -72,7 +72,7 @@ class NestedVerticalTest(ContainerBase):
 
 
 @skip("Flaky: 01/16/2015")
-@attr('shard_1')
+@attr(shard=1)
 class DragAndDropTest(NestedVerticalTest):
     """
     Tests of reordering within the container page.
@@ -152,7 +152,7 @@ class DragAndDropTest(NestedVerticalTest):
         self.do_action_and_verify(add_new_components_and_rearrange, expected_ordering)
 
 
-@attr('shard_1')
+@attr(shard=1)
 class AddComponentTest(NestedVerticalTest):
     """
     Tests of adding a component to the container page.
@@ -192,7 +192,7 @@ class AddComponentTest(NestedVerticalTest):
         self.add_and_verify(container_menu, expected_ordering)
 
 
-@attr('shard_1')
+@attr(shard=1)
 class DuplicateComponentTest(NestedVerticalTest):
     """
     Tests of duplicating a component on the container page.
@@ -238,7 +238,7 @@ class DuplicateComponentTest(NestedVerticalTest):
         self.do_action_and_verify(duplicate_twice, expected_ordering)
 
 
-@attr('shard_1')
+@attr(shard=1)
 class DeleteComponentTest(NestedVerticalTest):
     """
     Tests of deleting a component from the container page.
@@ -261,7 +261,7 @@ class DeleteComponentTest(NestedVerticalTest):
         self.delete_and_verify(group_a_item_1_delete_index, expected_ordering)
 
 
-@attr('shard_1')
+@attr(shard=1)
 class EditContainerTest(NestedVerticalTest):
     """
     Tests of editing a container.
@@ -312,7 +312,7 @@ class EditContainerTest(NestedVerticalTest):
         self.assertEqual(component.student_content, "modified content")
 
 
-@attr('shard_3')
+@attr(shard=3)
 class EditVisibilityModalTest(ContainerBase):
     """
     Tests of the visibility settings modal for components on the unit
@@ -572,7 +572,7 @@ class EditVisibilityModalTest(ContainerBase):
         self.verify_visibility_set(self.html_component, True)
 
 
-@attr('shard_1')
+@attr(shard=1)
 class UnitPublishingTest(ContainerBase):
     """
     Tests of the publishing control and related widgets on the Unit page.
@@ -898,7 +898,7 @@ class UnitPublishingTest(ContainerBase):
         unit.wait_for_ajax()
         self._verify_publish_title(unit, self.PUBLISHED_LIVE_STATUS)
         self._view_published_version(unit)
-        self.assertTrue(modified_content in self.courseware.xblock_component_html_content(0))
+        self.assertIn(modified_content, self.courseware.xblock_component_html_content(0))
 
     def test_cancel_does_not_create_draft(self):
         """
@@ -1019,8 +1019,8 @@ class UnitPublishingTest(ContainerBase):
         """
         Verifies that last published and last saved messages respectively contain the given strings.
         """
-        self.assertTrue(expected_published_prefix in unit.last_published_text)
-        self.assertTrue(expected_saved_prefix in unit.last_saved_text)
+        self.assertIn(expected_published_prefix, unit.last_published_text)
+        self.assertIn(expected_saved_prefix, unit.last_saved_text)
 
     def _verify_explicit_lock_overrides_implicit_lock_information(self, unit_page):
         """
@@ -1042,7 +1042,7 @@ class UnitPublishingTest(ContainerBase):
     #     self.assertEqual('discussion', self.courseware.xblock_component_type(1))
 
 
-@attr('shard_3')
+@attr(shard=3)
 class DisplayNameTest(ContainerBase):
     """
     Test consistent use of display_name_with_default
@@ -1079,7 +1079,7 @@ class DisplayNameTest(ContainerBase):
         self.assertEqual(container.name, title_on_unit_page)
 
 
-@attr('shard_3')
+@attr(shard=3)
 class ProblemCategoryTabsTest(ContainerBase):
     """
     Test to verify tabs in problem category.

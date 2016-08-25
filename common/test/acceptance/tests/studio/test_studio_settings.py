@@ -10,19 +10,19 @@ from nose.plugins.attrib import attr
 
 from base_studio_test import StudioCourseTest
 from bok_choy.promise import EmptyPromise
-from ...fixtures.course import XBlockFixtureDesc
+from common.test.acceptance.fixtures.course import XBlockFixtureDesc
 from common.test.acceptance.tests.helpers import create_user_partition_json, element_has_text
-from ...pages.studio.overview import CourseOutlinePage
-from ...pages.studio.settings import SettingsPage
-from ...pages.studio.settings_advanced import AdvancedSettingsPage
-from ...pages.studio.settings_group_configurations import GroupConfigurationsPage
-from ...pages.lms.courseware import CoursewarePage
+from common.test.acceptance.pages.studio.overview import CourseOutlinePage
+from common.test.acceptance.pages.studio.settings import SettingsPage
+from common.test.acceptance.pages.studio.settings_advanced import AdvancedSettingsPage
+from common.test.acceptance.pages.studio.settings_group_configurations import GroupConfigurationsPage
+from common.test.acceptance.pages.lms.courseware import CoursewarePage
 from common.test.acceptance.pages.studio.utils import get_input_value
 from textwrap import dedent
 from xmodule.partitions.partitions import Group
 
 
-@attr('shard_8')
+@attr(shard=8)
 class ContentGroupConfigurationTest(StudioCourseTest):
     """
     Tests for content groups in the Group Configurations Page.
@@ -234,7 +234,7 @@ class ContentGroupConfigurationTest(StudioCourseTest):
         ).fulfill()
 
 
-@attr('shard_8')
+@attr(shard=8)
 class AdvancedSettingsValidationTest(StudioCourseTest):
     """
     Tests for validation feature in Studio's advanced settings tab
@@ -407,7 +407,7 @@ class AdvancedSettingsValidationTest(StudioCourseTest):
         self.assertEquals(set(displayed_fields), set(expected_fields))
 
 
-@attr('shard_1')
+@attr(shard=1)
 class ContentLicenseTest(StudioCourseTest):
     """
     Tests for course-level licensing (that is, setting the license,
@@ -504,7 +504,7 @@ class StudioSettingsA11yTest(StudioCourseTest):
         # we will ignore this error in the test until we fix them.
         self.settings_page.a11y_audit.config.set_rules({
             "ignore": [
-                'link-href',  # TODO: AC-226
+                'link-href',  # TODO: AC-557
                 'icon-aria-hidden',  # TODO: AC-229
             ],
         })

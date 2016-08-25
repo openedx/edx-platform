@@ -53,12 +53,12 @@ def on_pre_publish(sender, course_key, **kwargs):  # pylint: disable=unused-argu
 
 
 @receiver(GRADES_UPDATED)
-def listen_for_grade_calculation(sender, username, grade_summary, course_key, deadline, **kwargs):  # pylint: disable=unused-argument
+def listen_for_grade_calculation(sender, user, grade_summary, course_key, deadline, **kwargs):  # pylint: disable=unused-argument
     """Receive 'MIN_GRADE_REQUIREMENT_STATUS' signal and update minimum grade requirement status.
 
     Args:
         sender: None
-        username(string): user name
+        user(User): User Model object
         grade_summary(dict): Dict containing output from the course grader
         course_key(CourseKey): The key for the course
         deadline(datetime): Course end date or None
@@ -70,7 +70,6 @@ def listen_for_grade_calculation(sender, username, grade_summary, course_key, de
     # This needs to be imported here to avoid a circular dependency
     # that can cause syncdb to fail.
     from openedx.core.djangoapps.credit import api
-
     course_id = CourseKey.from_string(unicode(course_key))
     is_credit = api.is_credit_course(course_id)
     if is_credit:
@@ -113,5 +112,5 @@ def listen_for_grade_calculation(sender, username, grade_summary, course_key, de
                 # time to do so.
                 if status and reason:
                     api.set_credit_requirement_status(
-                        username, course_id, 'grade', 'grade', status=status, reason=reason
+                        user, course_id, 'grade', 'grade', status=status, reason=reason
                     )

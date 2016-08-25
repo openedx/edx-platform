@@ -26,7 +26,7 @@ from openedx.core.lib.xblock_utils import (
 )
 
 
-@attr('shard_2')
+@attr(shard=2)
 @ddt.ddt
 class TestXblockUtils(SharedModuleStoreTestCase):
     """

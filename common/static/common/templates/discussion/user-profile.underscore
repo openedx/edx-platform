@@ -1,7 +1,0 @@
-<h2><%- gettext("Active Threads") %></h2>
-<section class="discussion">
-    <% _.each(threads, function(thread) { %>
-        <article class="discussion-thread" id="thread_<%= thread.id %>"/>
-    <% }); %>
-</section>
-<section class="discussion-pagination"/>

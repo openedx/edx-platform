@@ -292,7 +292,7 @@
         .wrapper-metadata .metadata {
             @extend %divider-2;
             margin-bottom: spacing-vertical(small);
-            border-bottom-color: palette(grayscale, x-light);
+            border-bottom-color: palette(grayscale, x-back);
             padding-bottom: spacing-vertical(small);
 
             &:last-child {

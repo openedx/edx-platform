@@ -25,14 +25,13 @@
  * ~ Zen saying
  */
 
-(function (requirejs, require, define) {
-
+(function(requirejs, require, define) {
 // FocusGrabber module.
-define(
+    define(
 'video/025_focus_grabber.js',
 [],
-function () {
-    return function (state) {
+function() {
+    return function(state) {
         var dfd = $.Deferred();
 
         state.focusGrabber = {};
@@ -75,7 +74,7 @@ function () {
         // When the video container element receives programmatic focus, then
         // on un-focus ('blur' event) we should trigger a 'mousemove' event so
         // as to reveal autohidden controls.
-        state.el.on('blur', function () {
+        state.el.on('blur', function() {
             state.el.trigger('mousemove');
         });
     }

@@ -1,4 +1,4 @@
-define(["js/models/xblock_info"],
+define(['js/models/xblock_info'],
     function(XBlockInfo) {
         var CustomSyncXBlockInfo = XBlockInfo.extend({
             sync: function(method, model, options) {

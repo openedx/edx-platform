@@ -65,7 +65,7 @@ class CertificateManagementTest(ModuleStoreTestCase):
         self.assertEqual(cert.status, expected_status)
 
 
-@attr('shard_1')
+@attr(shard=1)
 @ddt.ddt
 class ResubmitErrorCertificatesTest(CertificateManagementTest):
     """Tests for the resubmit_error_certificates management command. """
@@ -153,7 +153,7 @@ class ResubmitErrorCertificatesTest(CertificateManagementTest):
 
 
 @ddt.ddt
-@attr('shard_1')
+@attr(shard=1)
 class RegenerateCertificatesTest(CertificateManagementTest):
     """
     Tests for regenerating certificates.
@@ -222,7 +222,7 @@ class RegenerateCertificatesTest(CertificateManagementTest):
         self.assertFalse(mock_send_to_queue.called)
 
 
-@attr('shard_1')
+@attr(shard=1)
 class UngenerateCertificatesTest(CertificateManagementTest):
     """
     Tests for generating certificates.

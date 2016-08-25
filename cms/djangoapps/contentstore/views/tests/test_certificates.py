@@ -80,7 +80,7 @@ class HelperMethods(object):
                 'title': 'Title ' + str(i),
                 'signature_image_path': '/c4x/test/CSS101/asset/Signature{}.png'.format(i),
                 'id': i
-            } for i in xrange(0, signatory_count)
+            } for i in xrange(signatory_count)
 
         ]
 
@@ -99,7 +99,7 @@ class HelperMethods(object):
                 'signatories': signatories,
                 'version': CERTIFICATE_SCHEMA_VERSION,
                 'is_active': is_active
-            } for i in xrange(0, count)
+            } for i in xrange(count)
         ]
         self.course.certificates = {'certificates': certificates}
         self.save_course()
@@ -181,7 +181,7 @@ class CertificatesBaseTestCase(object):
         with self.assertRaises(Exception) as context:
             CertificateManager.validate(json_data_1)
 
-        self.assertTrue("Unsupported certificate schema version: 100.  Expected version: 1." in context.exception)
+        self.assertIn("Unsupported certificate schema version: 100.  Expected version: 1.", context.exception)
 
         #Test certificate name is missing
         json_data_2 = {
@@ -192,13 +192,14 @@ class CertificatesBaseTestCase(object):
         with self.assertRaises(Exception) as context:
             CertificateManager.validate(json_data_2)
 
-        self.assertTrue('must have name of the certificate' in context.exception)
+        self.assertIn('must have name of the certificate', context.exception)
 
 
 @ddt.ddt
 @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
 class CertificatesListHandlerTestCase(
-        EventTestMixin, CourseTestCase, CertificatesBaseTestCase, HelperMethods, UrlResetMixin):
+        EventTestMixin, CourseTestCase, CertificatesBaseTestCase, HelperMethods, UrlResetMixin
+):
     """
     Test cases for certificates_list_handler.
     """
@@ -423,7 +424,8 @@ class CertificatesListHandlerTestCase(
 @ddt.ddt
 @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
 class CertificatesDetailHandlerTestCase(
-        EventTestMixin, CourseTestCase, CertificatesBaseTestCase, HelperMethods, UrlResetMixin):
+        EventTestMixin, CourseTestCase, CertificatesBaseTestCase, HelperMethods, UrlResetMixin
+):
     """
     Test cases for CertificatesDetailHandlerTestCase.
     """

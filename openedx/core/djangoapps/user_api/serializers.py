@@ -3,6 +3,7 @@ Django REST Framework serializers for the User API application
 """
 from django.contrib.auth.models import User
 from rest_framework import serializers
+
 from student.models import UserProfile
 
 from .models import UserPreference
@@ -81,3 +82,11 @@ class ReadOnlyFieldsSerializerMixin(object):
         """
         all_fields = getattr(cls.Meta, 'fields', tuple())
         return tuple(set(all_fields) - set(cls.get_read_only_fields()))
+
+
+class CountryTimeZoneSerializer(serializers.Serializer):  # pylint: disable=abstract-method
+    """
+    Serializer that generates a list of common time zones for a country
+    """
+    time_zone = serializers.CharField()
+    description = serializers.CharField()

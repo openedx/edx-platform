@@ -37,7 +37,7 @@ from lms.djangoapps.ccx.tests.factories import CcxFactory
 from lms.djangoapps.ccx.tests.utils import CcxTestCase
 
 
-@attr('shard_1')
+@attr(shard=1)
 class TestGetCCXFromCCXLocator(ModuleStoreTestCase):
     """Verify that get_ccx_from_ccx_locator functions properly"""
     MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
@@ -70,7 +70,7 @@ class TestGetCCXFromCCXLocator(ModuleStoreTestCase):
         self.assertEqual(result, ccx)
 
 
-@attr('shard_1')
+@attr(shard=1)
 class TestGetCourseChapters(CcxTestCase):
     """
     Tests for the `get_course_chapters` util function

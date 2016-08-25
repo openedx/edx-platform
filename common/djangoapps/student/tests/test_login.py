@@ -413,7 +413,7 @@ class LoginTest(CacheIsolationTestCase):
         if value is not None:
             msg = ("'%s' did not contain '%s'" %
                    (str(response_dict['value']), str(value)))
-            self.assertTrue(value in response_dict['value'], msg)
+            self.assertIn(value, response_dict['value'], msg)
 
     def _assert_audit_log(self, mock_audit_log, level, log_strings):
         """

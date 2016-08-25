@@ -29,10 +29,9 @@ set -e
 #   `SHARD` is a number indicating which subset of the tests to build.
 #
 #       For "bok-choy" and "lms-unit", the tests are put into shard groups
-#       using the nose'attr' decorator (e.g. "@attr('shard_1')"). Anything with
-#       the 'shard_n' attribute will run in the nth shard. If there isn't a
-#       shard explicitly assigned, the test will run in the last shard (the one
-#       with the highest number).
+#       using the nose 'attr' decorator (e.g. "@attr(shard=1)"). Anything with
+#       the 'shard=n' attribute will run in the nth shard. If there isn't a
+#       shard explicitly assigned, the test will run in the last shard.
 #
 #   Jenkins-specific configuration details:
 #
@@ -80,8 +79,9 @@ case "$TEST_SUITE" in
         paver run_pylint -l $PYLINT_THRESHOLD > pylint.log || { cat pylint.log; EXIT=1; }
 
         mkdir -p reports
-        echo "Finding jshint violations and storing report..."
-        paver run_jshint -l $JSHINT_THRESHOLD > jshint.log || { cat jshint.log; EXIT=1; }
+
+        echo "Finding ESLint violations and storing report..."
+        paver run_eslint -l $ESLINT_THRESHOLD > eslint.log || { cat eslint.log; EXIT=1; }
         echo "Running code complexity report (python)."
         paver run_complexity > reports/code_complexity.log || echo "Unable to calculate code complexity. Ignoring error."
         echo "Running safe template linter report."
@@ -104,17 +104,11 @@ case "$TEST_SUITE" in
             "all")
                 paver test_system -s lms $PAVER_ARGS
                 ;;
-            "1")
-                paver test_system -s lms --attr='shard_1' $PAVER_ARGS
+            [1-3])
+                paver test_system -s lms --attr="shard=$SHARD" $PAVER_ARGS
                 ;;
-            "2")
-                paver test_system -s lms --attr='shard_2' $PAVER_ARGS
-                ;;
-            "3")
-                paver test_system -s lms --attr='shard_3' $PAVER_ARGS
-                ;;
-            "4")
-                paver test_system -s lms --attr='shard_1=False,shard_2=False,shard_3=False' $PAVER_ARGS
+            4|"noshard")
+                paver test_system -s lms --attr='!shard' $PAVER_ARGS
                 ;;
             *)
                 # If no shard is specified, rather than running all tests, create an empty xunit file. This is a
@@ -182,40 +176,12 @@ case "$TEST_SUITE" in
                 paver test_bokchoy $PAVER_ARGS
                 ;;
 
-            "1")
-                paver test_bokchoy --attr='shard_1' $PAVER_ARGS
+            [1-8])
+                paver test_bokchoy --attr="shard=$SHARD" $PAVER_ARGS
                 ;;
 
-            "2")
-                paver test_bokchoy --attr='shard_2' $PAVER_ARGS
-                ;;
-
-            "3")
-                paver test_bokchoy --attr='shard_3' $PAVER_ARGS
-                ;;
-
-            "4")
-                paver test_bokchoy --attr='shard_4' $PAVER_ARGS
-                ;;
-
-            "5")
-                paver test_bokchoy --attr='shard_5' $PAVER_ARGS
-                ;;
-
-            "6")
-                paver test_bokchoy --attr='shard_6' $PAVER_ARGS
-                ;;
-
-            "7")
-                paver test_bokchoy --attr='shard_7' $PAVER_ARGS
-                ;;
-
-            "8")
-                paver test_bokchoy --attr='shard_8' $PAVER_ARGS
-                ;;
-
-            "9")
-                paver test_bokchoy --attr='shard_1=False,shard_2=False,shard_3=False,shard_4=False,shard_5=False,shard_6=False,shard_7=False,shard_8=False,a11y=False' $PAVER_ARGS
+            9|"noshard")
+                paver test_bokchoy --attr='!shard,a11y=False' $PAVER_ARGS
                 ;;
 
             # Default case because if we later define another bok-choy shard on Jenkins

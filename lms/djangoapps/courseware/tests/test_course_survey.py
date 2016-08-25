@@ -17,7 +17,7 @@ from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from courseware.tests.helpers import LoginEnrollmentTestCase
 
 
-@attr('shard_1')
+@attr(shard=1)
 class SurveyViewsTests(LoginEnrollmentTestCase, SharedModuleStoreTestCase, XssTestMixin):
     """
     All tests for the views.py file

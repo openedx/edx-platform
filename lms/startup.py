@@ -6,10 +6,10 @@ import django
 from django.conf import settings
 
 # Force settings to run so that the python path is modified
+
 settings.INSTALLED_APPS  # pylint: disable=pointless-statement
 
 from openedx.core.lib.django_startup import autostartup
-import edxmako
 import logging
 import analytics
 from monkey_patch import (
@@ -20,6 +20,7 @@ from monkey_patch import (
 import xmodule.x_module
 import lms_xblock.runtime
 
+from startup_configurations.validate_config import validate_lms_config
 from openedx.core.djangoapps.theming.core import enable_theming
 from openedx.core.djangoapps.theming.helpers import is_comprehensive_theming_enabled
 
@@ -58,9 +59,6 @@ def run():
     # Mako requires the directories to be added after the django setup.
     microsite.enable_microsites(log)
 
-    if settings.FEATURES.get('USE_CUSTOM_THEME', False):
-        enable_stanford_theme()
-
     # Initialize Segment analytics module by setting the write_key.
     if settings.LMS_SEGMENT_KEY:
         analytics.write_key = settings.LMS_SEGMENT_KEY
@@ -85,6 +83,9 @@ def run():
     xmodule.x_module.descriptor_global_handler_url = lms_xblock.runtime.handler_url
     xmodule.x_module.descriptor_global_local_resource_url = lms_xblock.runtime.local_resource_url
 
+    # validate configurations on startup
+    validate_lms_config(settings)
+
 
 def add_mimetypes():
     """
@@ -98,40 +99,6 @@ def add_mimetypes():
     mimetypes.add_type('application/x-font-opentype', '.otf')
     mimetypes.add_type('application/x-font-ttf', '.ttf')
     mimetypes.add_type('application/font-woff', '.woff')
-
-
-def enable_stanford_theme():
-    """
-    Enable the settings for a custom theme, whose files should be stored
-    in ENV_ROOT/themes/THEME_NAME (e.g., edx_all/themes/stanford).
-    """
-    # Workaround for setting THEME_NAME to an empty
-    # string which is the default due to this ansible
-    # bug: https://github.com/ansible/ansible/issues/4812
-    if getattr(settings, "THEME_NAME", "") == "":
-        settings.THEME_NAME = None
-        return
-
-    assert settings.FEATURES['USE_CUSTOM_THEME']
-    settings.FAVICON_PATH = 'themes/{name}/images/favicon.ico'.format(
-        name=settings.THEME_NAME
-    )
-
-    # Calculate the location of the theme's files
-    theme_root = settings.ENV_ROOT / "themes" / settings.THEME_NAME
-
-    # Include the theme's templates in the template search paths
-    settings.DEFAULT_TEMPLATE_ENGINE['DIRS'].insert(0, theme_root / 'templates')
-    edxmako.paths.add_lookup('main', theme_root / 'templates', prepend=True)
-
-    # Namespace the theme's static files to 'themes/<theme_name>' to
-    # avoid collisions with default edX static files
-    settings.STATICFILES_DIRS.append(
-        (u'themes/{}'.format(settings.THEME_NAME), theme_root / 'static')
-    )
-
-    # Include theme locale path for django translations lookup
-    settings.LOCALE_PATHS = (theme_root / 'conf/locale',) + settings.LOCALE_PATHS
 
 
 def enable_microsites():

@@ -142,7 +142,7 @@ class ApiTest(TestCase):
 
     def create_notes(self, num_notes, create=True):
         notes = []
-        for n in range(num_notes):
+        for __ in range(num_notes):
             note = models.Note(**self.note)
             if create:
                 note.save()
@@ -376,7 +376,7 @@ class ApiTest(TestCase):
             content = json.loads(resp.content)
 
             for expected_key in ('total', 'rows'):
-                self.assertTrue(expected_key in content)
+                self.assertIn(expected_key, content)
 
             if 'expected_total' in test:
                 self.assertEqual(content['total'], test['expected_total'])
@@ -386,7 +386,7 @@ class ApiTest(TestCase):
             self.assertEqual(len(content['rows']), test['expected_rows'])
 
             for row in content['rows']:
-                self.assertTrue('id' in row)
+                self.assertIn('id', row)
 
 
 class NoteTest(TestCase):
@@ -437,7 +437,7 @@ class NoteTest(TestCase):
             note.clean(json.dumps({
                 'text': 'foo',
                 'quote': 'bar',
-                'ranges': [{} for i in range(10)]  # too many ranges
+                'ranges': [{} for __ in range(10)]  # too many ranges
             }))
 
     def test_as_dict(self):
@@ -445,4 +445,4 @@ class NoteTest(TestCase):
         d = note.as_dict()
         self.assertNotIsInstance(d, basestring)
         self.assertEqual(d['user_id'], self.student.id)
-        self.assertTrue('course_id' not in d)
+        self.assertNotIn('course_id', d)

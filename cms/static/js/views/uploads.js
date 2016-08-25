@@ -1,9 +1,9 @@
-define(["jquery", "underscore", "gettext", "js/views/modals/base_modal", "jquery.form"],
+define(['jquery', 'underscore', 'gettext', 'js/views/modals/base_modal', 'jquery.form'],
     function($, _, gettext, BaseModal) {
         var UploadDialog = BaseModal.extend({
             events: _.extend({}, BaseModal.prototype.events, {
-                "change input[type=file]": "selectFile",
-                "click .action-upload": "upload"
+                'change input[type=file]': 'selectFile',
+                'click .action-upload': 'upload'
             }),
 
             options: $.extend({}, BaseModal.prototype.options, {
@@ -15,20 +15,20 @@ define(["jquery", "underscore", "gettext", "js/views/modals/base_modal", "jquery
 
             initialize: function() {
                 BaseModal.prototype.initialize.call(this);
-                this.template = this.loadTemplate("upload-dialog");
-                this.listenTo(this.model, "change", this.renderContents);
+                this.template = this.loadTemplate('upload-dialog');
+                this.listenTo(this.model, 'change', this.renderContents);
                 this.options.title = this.model.get('title');
             },
 
             addActionButtons: function() {
-                this.addActionButton('upload', gettext("Upload"), true);
+                this.addActionButton('upload', gettext('Upload'), true);
                 BaseModal.prototype.addActionButtons.call(this);
             },
 
             renderContents: function() {
                 var isValid = this.model.isValid(),
                     selectedFile = this.model.get('selectedFile'),
-                    oldInput = this.$("input[type=file]").get(0);
+                    oldInput = this.$('input[type=file]').get(0);
                 BaseModal.prototype.renderContents.call(this);
                 // Ideally, we'd like to tell the browser to pre-populate the
                 // <input type="file"> with the selectedFile if we have one -- but
@@ -38,7 +38,7 @@ define(["jquery", "underscore", "gettext", "js/views/modals/base_modal", "jquery
                 // this if the selected file is valid: if it isn't, we want to render
                 // a blank input to prompt the user to upload a different (valid) file.
                 if (selectedFile && isValid) {
-                    $(oldInput).removeClass("error");
+                    $(oldInput).removeClass('error');
                     this.$('input[type=file]').replaceWith(oldInput);
                     this.$('.action-upload').removeClass('disabled');
                 } else {
@@ -67,7 +67,7 @@ define(["jquery", "underscore", "gettext", "js/views/modals/base_modal", "jquery
                 });
                 // This change event triggering necessary for FireFox, because the browser don't
                 // consider change of File object (file input field) as a change in model.
-                if (selectedFile && $.isEmptyObject(this.model.changed)){
+                if (selectedFile && $.isEmptyObject(this.model.changed)) {
                     this.model.trigger('change');
                 }
             },
@@ -75,7 +75,7 @@ define(["jquery", "underscore", "gettext", "js/views/modals/base_modal", "jquery
             upload: function(e) {
                 if (e && e.preventDefault) { e.preventDefault(); }
                 this.model.set('uploading', true);
-                this.$("form").ajaxSubmit({
+                this.$('form').ajaxSubmit({
                     success: _.bind(this.success, this),
                     error: _.bind(this.error, this),
                     uploadProgress: _.bind(this.progress, this),
@@ -89,8 +89,8 @@ define(["jquery", "underscore", "gettext", "js/views/modals/base_modal", "jquery
 
             progress: function(event, position, total) {
                 this.model.set({
-                    "uploadedBytes": position,
-                    "totalBytes": total
+                    'uploadedBytes': position,
+                    'totalBytes': total
                 });
             },
 
@@ -110,9 +110,9 @@ define(["jquery", "underscore", "gettext", "js/views/modals/base_modal", "jquery
 
             error: function() {
                 this.model.set({
-                    "uploading": false,
-                    "uploadedBytes": 0,
-                    "title": gettext("We're sorry, there was an error")
+                    'uploading': false,
+                    'uploadedBytes': 0,
+                    'title': gettext("We're sorry, there was an error")
                 });
             }
         });

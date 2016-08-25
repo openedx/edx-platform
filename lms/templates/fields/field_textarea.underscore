@@ -3,7 +3,7 @@
         <% if (mode === 'edit') { %>
             <label class="u-field-title" for="u-field-textarea-<%- id %>" id="u-field-title-<%- id %>"></label>
         <% } else { %>
-            <span class="u-field-title" id="u-field-title-<%- id %>" aria-hidden="true"></span>
+            <span class="u-field-title" id="u-field-title-<%- id %>"></span>
         <% } %>
         <% if (messagePosition === 'header') { %>
             <span class="u-field-message" id="u-field-message-<%- id %>">
@@ -27,8 +27,12 @@
             <% } %>
             ><%- value %></span>
         <% } else { %>
-            ><a href="#"><p class="sr"><%- screenReaderTitle %></p><span class="u-field-value-readonly" aria-hidden="false" aria-describedby="u-field-placeholder-value-<%- id %>"><%- value %></span><span class="sr"><%- gettext('Click to edit') %></span></a>
+            ><span class="clickable" role="button" tabindex="0">
+            <span class="sr"><%- screenReaderTitle %></span>
+            <span class="u-field-value-readonly" aria-hidden="false" aria-describedby="u-field-placeholder-value-<%- id %>"><%- value %></span>
+            <span class="sr"><%- gettext('Click to edit') %></span>
             <span class="sr" id="u-field-placeholder-value-<%- id %>"><%- placeholderValue %></span>
+            </span>
         <% } %>
     </div>
 

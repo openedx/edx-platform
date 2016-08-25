@@ -15,6 +15,11 @@ def i_click_on_the_tab(step, tab_text):
     world.click_link(tab_text)
 
 
+@step('I click the "([^"]*)" button$')
+def i_click_on_the_button(step, data_attr):
+    world.click_button(data_attr)
+
+
 @step('I click on the "([^"]*)" link$')
 def i_click_on_the_link(step, link_text):
     world.click_link(link_text)

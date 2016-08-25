@@ -10,7 +10,7 @@ from opaque_keys.edx.keys import CourseKey
 from xmodule.modulestore.django import modulestore, SignalHandler
 
 
-@attr('shard_2')
+@attr(shard=2)
 class CCXConSignalTestCase(TestCase):
     """
     The only tests currently implemented are for verifying that

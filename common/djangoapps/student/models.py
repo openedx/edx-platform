@@ -34,7 +34,7 @@ from django.db import models, IntegrityError, transaction
 from django.db.models import Count
 from django.db.models.signals import pre_save, post_save
 from django.dispatch import receiver, Signal
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from django.utils.translation import ugettext_noop
 from django.core.cache import cache
 from django_countries.fields import CountryField
@@ -51,10 +51,10 @@ from lms.djangoapps.badges.utils import badges_enabled
 from certificates.models import GeneratedCertificate
 from course_modes.models import CourseMode
 from enrollment.api import _default_course_mode
-from microsite_configuration import microsite
 import lms.lib.comment_client as cc
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client, ECOMMERCE_DATE_FORMAT
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from util.model_utils import emit_field_changed_events, get_changed_fields_dict
 from util.query import use_read_replica_if_available
 from util.milestones_helpers import is_entrance_exams_enabled
@@ -1503,6 +1503,15 @@ class CourseEnrollment(models.Model):
             attribute = self.attributes.get(namespace='order', name='order_number')
         except ObjectDoesNotExist:
             return None
+        except MultipleObjectsReturned:
+            # If there are multiple attributes then return the last one.
+            enrollment_id = self.get_enrollment(self.user, self.course_id).id
+            log.warning(
+                u"Multiple CourseEnrollmentAttributes found for user %s with enrollment-ID %s",
+                self.user.id,
+                enrollment_id
+            )
+            attribute = self.attributes.filter(namespace='order', name='order_number').last()
 
         order_number = attribute.value
         order = ecommerce_api_client(self.user).orders(order_number).get()
@@ -1950,7 +1959,7 @@ class LinkedInAddToProfileConfiguration(ConfigurationModel):
             target (str): An identifier for the occurrance of the button.
 
         """
-        company_identifier = microsite.get_value('LINKEDIN_COMPANY_ID', self.company_identifier)
+        company_identifier = configuration_helpers.get_value('LINKEDIN_COMPANY_ID', self.company_identifier)
         params = OrderedDict([
             ('_ed', company_identifier),
             ('pfCertificationName', self._cert_name(course_name, cert_mode).encode('utf-8')),
@@ -1972,7 +1981,7 @@ class LinkedInAddToProfileConfiguration(ConfigurationModel):
             cert_mode,
             _(u"{platform_name} Certificate for {course_name}")
         ).format(
-            platform_name=microsite.get_value('platform_name', settings.PLATFORM_NAME),
+            platform_name=configuration_helpers.get_value('platform_name', settings.PLATFORM_NAME),
             course_name=course_name
         )
 

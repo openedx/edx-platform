@@ -124,6 +124,9 @@ FEATURES['ENABLE_TEAMS'] = True
 # Enable custom content licensing
 FEATURES['LICENSING'] = True
 
+# Enable persistent subsection grades, so that feature can be tested.
+FEATURES['ENABLE_SUBSECTION_GRADES_SAVED'] = True
+
 # Use the auto_auth workflow for creating users and logging them in
 FEATURES['AUTOMATIC_AUTH_FOR_TESTING'] = True
 
@@ -192,6 +195,8 @@ BADGING_BACKEND = 'lms.djangoapps.badges.backends.tests.dummy_backend.DummyBacke
 # Configure the LMS to use our stub eCommerce implementation
 ECOMMERCE_API_URL = 'http://localhost:8043/api/v2/'
 ECOMMERCE_API_SIGNING_KEY = 'ecommerce-key'
+
+LMS_ROOT_URL = "http://localhost:8000"
 
 #####################################################################
 # Lastly, see if the developer has any local overrides.

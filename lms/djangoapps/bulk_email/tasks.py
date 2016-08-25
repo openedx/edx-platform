@@ -36,12 +36,9 @@ from django.core.mail import EmailMultiAlternatives, get_connection
 from django.core.mail.message import forbid_multi_line_headers
 from django.core.urlresolvers import reverse
 
-from bulk_email.models import (
-    CourseEmail, Optout, Target
-)
+from bulk_email.models import CourseEmail, Optout
 from courseware.courses import get_course
 from openedx.core.lib.courses import course_image_url
-from student.roles import CourseStaffRole, CourseInstructorRole
 from instructor_task.models import InstructorTask
 from instructor_task.subtasks import (
     SubtaskStatus,
@@ -49,9 +46,8 @@ from instructor_task.subtasks import (
     check_subtask_is_valid,
     update_subtask_status,
 )
-from util.query import use_read_replica_if_available
 from util.date_utils import get_default_time_display
-from openedx.core.djangoapps.theming import helpers as theming_helpers
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 log = logging.getLogger('edx.celery.task')
 
@@ -104,19 +100,19 @@ def _get_course_email_context(course):
     course_id = course.id.to_deprecated_string()
     course_title = course.display_name
     course_end_date = get_default_time_display(course.end)
-    course_url = 'https://{}{}'.format(
-        settings.SITE_NAME,
+    course_url = '{}{}'.format(
+        settings.LMS_ROOT_URL,
         reverse('course_root', kwargs={'course_id': course_id})
     )
-    image_url = u'https://{}{}'.format(settings.SITE_NAME, course_image_url(course))
+    image_url = u'{}{}'.format(settings.LMS_ROOT_URL, course_image_url(course))
     email_context = {
         'course_title': course_title,
         'course_url': course_url,
         'course_image_url': image_url,
         'course_end_date': course_end_date,
-        'account_settings_url': 'https://{}{}'.format(settings.SITE_NAME, reverse('account_settings')),
-        'email_settings_url': 'https://{}{}'.format(settings.SITE_NAME, reverse('dashboard')),
-        'platform_name': theming_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),
+        'account_settings_url': '{}{}'.format(settings.LMS_ROOT_URL, reverse('account_settings')),
+        'email_settings_url': '{}{}'.format(settings.LMS_ROOT_URL, reverse('dashboard')),
+        'platform_name': configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),
     }
     return email_context
 
@@ -388,7 +384,7 @@ def _get_source_address(course_id, course_title, truncate=True):
         return from_addr_format.format(
             course_title=course_title_no_quotes,
             course_name=course_name,
-            from_email=theming_helpers.get_value(
+            from_email=configuration_helpers.get_value(
                 'email_from_address',
                 settings.BULK_EMAIL_DEFAULT_FROM_EMAIL
             )

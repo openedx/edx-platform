@@ -33,9 +33,8 @@
 // does not use graceful-fs and tries to read files simultaneously.
 //
 
+/* eslint-env node */
 
-/* jshint node: true */
-/*jshint -W079 */
 'use strict';
 
 var path = require('path');
@@ -168,7 +167,7 @@ function junitSettings(config) {
  * @param {String} pattern
  * @return {String}
  */
-var defaultNormalizeFunc = function (appRoot, pattern) {
+var defaultNormalizeFunc = function(appRoot, pattern) {
     if (pattern.match(/^common\/js/)) {
         pattern = path.join(appRoot, '/common/static/' + pattern);
     } else if (pattern.match(/^xmodule_js\/common_static/)) {
@@ -182,7 +181,7 @@ var normalizePathsForCoverage = function(files, normalizeFunc) {
     var normalizeFn = normalizeFunc || defaultNormalizeFunc,
         filesForCoverage = {};
 
-    files.forEach(function (file) {
+    files.forEach(function(file) {
         if (!file.ignoreCoverage) {
             filesForCoverage[normalizeFn(appRoot, file.pattern)] = ['coverage'];
         }
@@ -197,8 +196,8 @@ var normalizePathsForCoverage = function(files, normalizeFunc) {
  * @param {Bool} enable
  * @return {Object}
  */
-var setNocache = function (files, enable) {
-    files.forEach(function (f) {
+var setNocache = function(files, enable) {
+    files.forEach(function(f) {
         if (_.isObject(f)) {
             f.nocache = enable;
         }
@@ -211,8 +210,8 @@ var setNocache = function (files, enable) {
  * @param {Object} files
  * @return {Object}
  */
-var setDefaults = function (files) {
-    return files.map(function (f) {
+var setDefaults = function(files) {
+    return files.map(function(f) {
         var file = _.isObject(f) ? f : {pattern: f};
         if (!file.included) {
             f.included = false;
@@ -221,9 +220,8 @@ var setDefaults = function (files) {
     });
 };
 
-var getBaseConfig = function (config, useRequireJs) {
-
-    var getFrameworkFiles = function () {
+var getBaseConfig = function(config, useRequireJs) {
+    var getFrameworkFiles = function() {
         var files = [
             'node_modules/jquery/dist/jquery.js',
             'node_modules/jasmine-core/lib/jasmine-core/jasmine.js',
@@ -249,8 +247,8 @@ var getBaseConfig = function (config, useRequireJs) {
     // which isn't a karma plugin. Though a karma framework for jasmine-jquery is available
     // but it's not actively maintained. In future we also wanna add jQuery at the top when
     // we upgrade to jQuery 2
-    var initFrameworks = function (files) {
-        getFrameworkFiles().reverse().forEach(function (f) {
+    var initFrameworks = function(files) {
+        getFrameworkFiles().reverse().forEach(function(f) {
             files.unshift({
                 pattern: path.join(appRoot, f),
                 included: true,
@@ -360,7 +358,7 @@ var configure = function(config, options) {
         baseConfig = getBaseConfig(config, useRequireJs);
 
     if (options.includeCommonFiles) {
-        _.forEach(['libraryFiles', 'sourceFiles', 'specFiles', 'fixtureFiles'], function (collectionName) {
+        _.forEach(['libraryFiles', 'sourceFiles', 'specFiles', 'fixtureFiles'], function(collectionName) {
             options[collectionName] = _.flatten([commonFiles[collectionName], options[collectionName]]);
         });
     }

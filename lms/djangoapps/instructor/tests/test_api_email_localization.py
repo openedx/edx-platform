@@ -17,7 +17,7 @@ from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 
 
-@attr('shard_1')
+@attr(shard=1)
 class TestInstructorAPIEnrollmentEmailLocalization(SharedModuleStoreTestCase):
     """
     Test whether the enroll, unenroll and beta role emails are sent in the

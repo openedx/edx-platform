@@ -16,7 +16,6 @@ from discussion_api.tests.utils import (
     CommentsServiceMockMixin,
     make_minimal_cs_thread,
     make_minimal_cs_comment,
-    ProfileImageTestMixin,
 )
 from django_comment_common.models import (
     FORUM_ROLE_ADMINISTRATOR,
@@ -134,7 +133,7 @@ class SerializerTestMixin(CommentsServiceMockMixin, UrlResetMixin):
         self.assertEqual(serialized["voted"], True)
 
 
-@attr('shard_3')
+@attr(shard=3)
 @ddt.ddt
 class ThreadSerializerSerializationTest(SerializerTestMixin, SharedModuleStoreTestCase):
     """Tests for ThreadSerializer serialization."""

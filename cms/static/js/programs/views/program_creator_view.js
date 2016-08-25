@@ -1,16 +1,16 @@
 define([
-        'backbone',
-        'backbone.validation',
-        'jquery',
-        'underscore',
-        'js/programs/models/organizations_model',
-        'js/programs/models/program_model',
-        'text!templates/programs/program_creator_form.underscore',
-        'edx-ui-toolkit/js/utils/html-utils',
-        'gettext',
-        'js/programs/utils/validation_config'
-    ],
-    function ( Backbone, BackboneValidation, $, _, OrganizationsModel, ProgramModel, ListTpl, HtmlUtils ) {
+    'backbone',
+    'backbone.validation',
+    'jquery',
+    'underscore',
+    'js/programs/models/organizations_model',
+    'js/programs/models/program_model',
+    'text!templates/programs/program_creator_form.underscore',
+    'edx-ui-toolkit/js/utils/html-utils',
+    'gettext',
+    'js/programs/utils/validation_config'
+],
+    function(Backbone, BackboneValidation, $, _, OrganizationsModel, ProgramModel, ListTpl, HtmlUtils) {
         'use strict';
 
         return Backbone.View.extend({
@@ -21,21 +21,21 @@ define([
                 'click .js-abort-view': 'abort'
             },
 
-            tpl: HtmlUtils.template( ListTpl ),
+            tpl: HtmlUtils.template(ListTpl),
 
-            initialize: function( options ) {
-                this.$parentEl = $( this.parentEl );
+            initialize: function(options) {
+                this.$parentEl = $(this.parentEl);
 
                 this.model = new ProgramModel();
-                this.model.on( 'sync', this.saveSuccess, this );
-                this.model.on( 'error', this.saveError, this );
+                this.model.on('sync', this.saveSuccess, this);
+                this.model.on('error', this.saveError, this);
 
                 // Hook up validation.
                 // See: http://thedersen.com/projects/backbone-validation/#validation-binding.
-                Backbone.Validation.bind( this );
+                Backbone.Validation.bind(this);
 
                 this.organizations = new OrganizationsModel();
-                this.organizations.on( 'sync', this.render, this );
+                this.organizations.on('sync', this.render, this);
                 this.organizations.fetch();
 
                 this.router = options.router;
@@ -44,31 +44,31 @@ define([
             render: function() {
                 HtmlUtils.setHtml(
                     this.$el,
-                    this.tpl( {
+                    this.tpl({
                         orgs: this.organizations.get('results')
                     })
                 );
 
-                HtmlUtils.setHtml(this.$parentEl, HtmlUtils.HTML( this.$el ));
+                HtmlUtils.setHtml(this.$parentEl, HtmlUtils.HTML(this.$el));
             },
 
-            abort: function( event ) {
+            abort: function(event) {
                 event.preventDefault();
                 this.router.goHome();
             },
 
-            createProgram: function( event ) {
+            createProgram: function(event) {
                 var data = this.getData();
 
                 event.preventDefault();
-                this.model.set( data );
+                this.model.set(data);
 
                 // Check if the model is valid before saving. Invalid attributes are looked
                 // up by name. The corresponding elements receieve an `invalid` class and a
                 // `data-error` attribute. Both are removed when formerly invalid attributes
                 // become valid.
                 // See: http://thedersen.com/projects/backbone-validation/#isvalid.
-                if ( this.model.isValid(true) ) {
+                if (this.model.isValid(true)) {
                     this.model.save();
                 }
             },
@@ -84,28 +84,28 @@ define([
 
             getData: function() {
                 return {
-                    name: this.$el.find( '.program-name' ).val(),
-                    subtitle: this.$el.find( '.program-subtitle' ).val(),
-                    category: this.$el.find( '.program-type' ).val(),
-                    marketing_slug: this.$el.find( '.program-marketing-slug' ).val(),
+                    name: this.$el.find('.program-name').val(),
+                    subtitle: this.$el.find('.program-subtitle').val(),
+                    category: this.$el.find('.program-type').val(),
+                    marketing_slug: this.$el.find('.program-marketing-slug').val(),
                     organizations: [{
-                        key: this.$el.find( '.program-org' ).val()
+                        key: this.$el.find('.program-org').val()
                     }]
                 };
             },
 
-            goToView: function( uri ) {
-                Backbone.history.navigate( uri, { trigger: true } );
+            goToView: function(uri) {
+                Backbone.history.navigate(uri, {trigger: true});
                 this.destroy();
             },
 
             // TODO: add user messaging to show errors
-            saveError: function( jqXHR ) {
-                console.log( 'saveError: ', jqXHR );
+            saveError: function(jqXHR) {
+                console.log('saveError: ', jqXHR);
             },
 
             saveSuccess: function() {
-                this.goToView( String( this.model.get( 'id' ) ) );
+                this.goToView(String(this.model.get('id')));
             }
         });
     }

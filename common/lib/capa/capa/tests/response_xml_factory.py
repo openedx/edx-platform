@@ -515,7 +515,6 @@ class FormulaResponseXMLFactory(ResponseXMLFactory):
         # "x,y,z@4,5,3:10,12,8#4" means plug in values for (x,y,z)
         # from within the box defined by points (4,5,3) and (10,12,8)
         # The "#4" means to repeat 4 times.
-        variables = [str(v) for v in sample_dict.keys()]
         low_range_vals = [str(f[0]) for f in sample_dict.values()]
         high_range_vals = [str(f[1]) for f in sample_dict.values()]
         sample_str = (

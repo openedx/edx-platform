@@ -99,8 +99,8 @@ class IPFilterFormTest(TestCase):
         form = IPFilterForm(data=form_data)
         self.assertTrue(form.is_valid())
         form.save()
-        self.assertTrue(len(IPFilter.current().whitelist) == 0)
-        self.assertTrue(len(IPFilter.current().blacklist) == 0)
+        self.assertEqual(len(IPFilter.current().whitelist), 0)
+        self.assertEqual(len(IPFilter.current().blacklist), 0)
 
     def test_add_invalid_ips(self):
         # test adding invalid ip addresses

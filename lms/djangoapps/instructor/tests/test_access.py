@@ -18,7 +18,7 @@ from instructor.access import (allow_access,
                                update_forum_role)
 
 
-@attr('shard_1')
+@attr(shard=1)
 class TestInstructorAccessList(SharedModuleStoreTestCase):
     """ Test access listings. """
     @classmethod
@@ -44,7 +44,7 @@ class TestInstructorAccessList(SharedModuleStoreTestCase):
         self.assertEqual(set(beta_testers), set(self.beta_testers))
 
 
-@attr('shard_1')
+@attr(shard=1)
 class TestInstructorAccessAllow(SharedModuleStoreTestCase):
     """ Test access allow. """
     @classmethod
@@ -90,7 +90,7 @@ class TestInstructorAccessAllow(SharedModuleStoreTestCase):
         allow_access(self.course, user, 'staff')
 
 
-@attr('shard_1')
+@attr(shard=1)
 class TestInstructorAccessRevoke(SharedModuleStoreTestCase):
     """ Test access revoke. """
     @classmethod
@@ -128,7 +128,7 @@ class TestInstructorAccessRevoke(SharedModuleStoreTestCase):
         revoke_access(self.course, user, 'robot-not-a-level')
 
 
-@attr('shard_1')
+@attr(shard=1)
 class TestInstructorAccessForum(SharedModuleStoreTestCase):
     """
     Test forum access control.

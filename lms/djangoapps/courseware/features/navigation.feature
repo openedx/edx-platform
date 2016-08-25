@@ -4,10 +4,11 @@ Feature: LMS.Navigate Course
     In order to access courseware
     I want to be able to navigate through the content
 
-    Scenario: I can navigate to a section
-        Given I am viewing a course with multiple sections
-        When I navigate to a section
-        Then I see the content of the section
+# This scenario is flaky: See TNL-5315
+#    Scenario: I can navigate to a section
+#        Given I am viewing a course with multiple sections
+#        When I navigate to a section
+#        Then I see the content of the section
 
     Scenario: I can navigate to subsections
         Given I am viewing a section with multiple subsections

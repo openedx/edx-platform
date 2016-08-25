@@ -81,7 +81,6 @@ def _parse_config_args(args):
 
         except:
             print "Warning: could not interpret config value '{0}'".format(config_str)
-            pass
 
     return config_dict
 

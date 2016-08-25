@@ -262,25 +262,33 @@
   }
 
   .instructor-nav {
-    @extend %ui-no-list;
-    border-top: 1px solid $gray-l3;
-    border-bottom: 1px solid $gray-l3;
+        @extend %ui-no-list;
+        border-top: 1px solid $gray-l3;
+        border-bottom: 1px solid $gray-l3;
 
-    .nav-item {
-      @extend %t-copy-base;
-      display: inline-block;
-      margin: ($baseline/2) $baseline;
+        .nav-item {
+            @extend %t-copy-base;
+            display: inline-block;
 
-      a {
-        display: block;
-        text-transform: uppercase;
+            .btn-link {
+                display: inline-block;
+                padding: ($baseline/2) $baseline;
+                border: 0;
+                box-shadow: none;
+                text-shadow: none;
 
-        &.active-section {
-          color: $black;
+                &:hover,
+                &:focus {
+                    background: $gray-l5 !important;
+                }
+
+                &.active-section {
+                    background: $gray-l5;
+                    color: $black;
+                }
+            }
         }
-      }
     }
-  }
 }
 
 // elements - general
@@ -1015,9 +1023,21 @@
 
   // CSV-based file upload for auto cohort assigning and
   // cohort the discussion topics.
-  .toggle-cohort-management-secondary, .toggle-cohort-management-discussions {
-    @extend %t-copy-sub1;
-  }
+    .toggle-cohort-management-secondary,
+    .toggle-cohort-management-discussions {
+        @extend %t-copy-sub1;
+        background: transparent;
+        border: none;
+        box-shadow: none;
+        text-shadow: none;
+        padding: 0;
+        color: $uxpl-blue-base;
+        
+        &:hover,
+        &:focus {
+            text-decoration: underline;
+        }
+    }
 
   .cohort-management-file-upload {
 
@@ -1056,7 +1076,7 @@
     @extend %t-copy-sub1;
     margin-top: $baseline;
     padding: ($baseline/2) $baseline;
-    background: $gray-l5;
+    background: $gray-l6;
     border-radius: ($baseline/10);
 
 
@@ -1215,9 +1235,14 @@
       position: relative;
       display: inline-block;
 
-      a {
+      .toggle-button {
         display: inline-block;
         padding: ($baseline - 5);
+        background: transparent;
+        border-radius: 0;
+        border: 0;
+        box-shadow: none;
+        color: $uxpl-blue-base;
         // These transitions null out previously/globally set transitions
         -webkit-transition: none;
         -moz-transition: none;
@@ -1228,7 +1253,7 @@
 
       &.is-selected { // Active or selected tabs (<li>) get this class. Also useful for aria stuff if ever implemented in the future.
 
-        a {
+        .toggle-button {
           padding-bottom: ($baseline - 5);
           border-style: solid;
           @include border-width(1px 1px 0 1px);

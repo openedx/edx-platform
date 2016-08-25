@@ -18,9 +18,8 @@
             return child;
         };
 
-    if (typeof Backbone !== "undefined" && Backbone !== null) {
+    if (typeof Backbone !== 'undefined' && Backbone !== null) {
         this.DiscussionThreadProfileView = (function(_super) {
-
             __extends(DiscussionThreadProfileView, _super);
 
             function DiscussionThreadProfileView() {
@@ -44,16 +43,16 @@
                 }
                 edx.HtmlUtils.setHtml(
                     this.$el,
-                    edx.HtmlUtils.template($("#profile-thread-template").html())(params)
+                    edx.HtmlUtils.template($('#profile-thread-template').html())(params)
                 );
-                this.$("span.timeago").timeago();
-                DiscussionUtil.typesetMathJax(this.$(".post-body"));
+                this.$('span.timeago').timeago();
+                DiscussionUtil.typesetMathJax(this.$('.post-body'));
                 return this;
             };
 
             DiscussionThreadProfileView.prototype.convertMath = function() {
                 var htmlSnippet = DiscussionUtil.markdownWithHighlight(this.model.get('body'));
-                this.model.set('markdownBody',  htmlSnippet);
+                this.model.set('markdownBody', htmlSnippet);
             };
 
             DiscussionThreadProfileView.prototype.abbreviateBody = function() {
@@ -63,8 +62,6 @@
             };
 
             return DiscussionThreadProfileView;
-
         })(Backbone.View);
     }
-
 }).call(window);

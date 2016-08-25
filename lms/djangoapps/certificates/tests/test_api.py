@@ -83,7 +83,7 @@ class WebCertificateTestMixin(object):
         self.store.update_item(self.course, self.user.id)
 
 
-@attr('shard_1')
+@attr(shard=1)
 class CertificateDownloadableStatusTests(WebCertificateTestMixin, ModuleStoreTestCase):
     """Tests for the `certificate_downloadable_status` helper function. """
 
@@ -203,7 +203,7 @@ class CertificateDownloadableStatusTests(WebCertificateTestMixin, ModuleStoreTes
         )
 
 
-@attr('shard_1')
+@attr(shard=1)
 @ddt.ddt
 class CertificateisInvalid(WebCertificateTestMixin, ModuleStoreTestCase):
     """Tests for the `is_certificate_invalid` helper function. """
@@ -315,7 +315,7 @@ class CertificateisInvalid(WebCertificateTestMixin, ModuleStoreTestCase):
         )
 
 
-@attr('shard_1')
+@attr(shard=1)
 class CertificateGetTests(SharedModuleStoreTestCase):
     """Tests for the `test_get_certificate_for_user` helper function. """
     @classmethod
@@ -402,7 +402,7 @@ class CertificateGetTests(SharedModuleStoreTestCase):
         )
 
 
-@attr('shard_1')
+@attr(shard=1)
 @override_settings(CERT_QUEUE='certificates')
 class GenerateUserCertificatesTest(EventTestMixin, WebCertificateTestMixin, ModuleStoreTestCase):
     """Tests for generating certificates for students. """
@@ -494,7 +494,7 @@ class GenerateUserCertificatesTest(EventTestMixin, WebCertificateTestMixin, Modu
         self.assertEqual(url, "")
 
 
-@attr('shard_1')
+@attr(shard=1)
 @ddt.ddt
 class CertificateGenerationEnabledTest(EventTestMixin, TestCase):
     """Test enabling/disabling self-generated certificates for a course. """
@@ -562,7 +562,7 @@ class CertificateGenerationEnabledTest(EventTestMixin, TestCase):
         self.assertEqual(expect_enabled, actual_enabled)
 
 
-@attr('shard_1')
+@attr(shard=1)
 class GenerateExampleCertificatesTest(TestCase):
     """Test generation of example certificates. """
 
@@ -650,7 +650,7 @@ def set_microsite(domain):
 
 
 @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
-@attr('shard_1')
+@attr(shard=1)
 class CertificatesBrandingTest(TestCase):
     """Test certificates branding. """
 
@@ -659,7 +659,7 @@ class CertificatesBrandingTest(TestCase):
     def setUp(self):
         super(CertificatesBrandingTest, self).setUp()
 
-    @set_microsite(settings.MICROSITE_CONFIGURATION['test_microsite']['domain_prefix'])
+    @set_microsite(settings.MICROSITE_CONFIGURATION['test_site']['domain_prefix'])
     def test_certificate_header_data(self):
         """
         Test that get_certificate_header_context from certificates api
@@ -675,16 +675,16 @@ class CertificatesBrandingTest(TestCase):
             ['logo_src', 'logo_url']
         )
         self.assertIn(
-            settings.MICROSITE_CONFIGURATION['test_microsite']['logo_image_url'],
+            settings.MICROSITE_CONFIGURATION['test_site']['logo_image_url'],
             data['logo_src']
         )
 
         self.assertIn(
-            settings.MICROSITE_CONFIGURATION['test_microsite']['SITE_NAME'],
+            settings.MICROSITE_CONFIGURATION['test_site']['SITE_NAME'],
             data['logo_url']
         )
 
-    @set_microsite(settings.MICROSITE_CONFIGURATION['test_microsite']['domain_prefix'])
+    @set_microsite(settings.MICROSITE_CONFIGURATION['test_site']['domain_prefix'])
     def test_certificate_footer_data(self):
         """
         Test that get_certificate_footer_context from certificates api returns
@@ -700,21 +700,21 @@ class CertificatesBrandingTest(TestCase):
             ['company_about_url', 'company_privacy_url', 'company_tos_url']
         )
 
-        # ABOUT is present in MICROSITE_CONFIGURATION['test_microsite']["urls"] so web certificate will use that url
+        # ABOUT is present in MICROSITE_CONFIGURATION['test_site']["urls"] so web certificate will use that url
         self.assertIn(
-            settings.MICROSITE_CONFIGURATION['test_microsite']["urls"]['ABOUT'],
+            settings.MICROSITE_CONFIGURATION['test_site']["urls"]['ABOUT'],
             data['company_about_url']
         )
 
-        # PRIVACY is present in MICROSITE_CONFIGURATION['test_microsite']["urls"] so web certificate will use that url
+        # PRIVACY is present in MICROSITE_CONFIGURATION['test_site']["urls"] so web certificate will use that url
         self.assertIn(
-            settings.MICROSITE_CONFIGURATION['test_microsite']["urls"]['PRIVACY'],
+            settings.MICROSITE_CONFIGURATION['test_site']["urls"]['PRIVACY'],
             data['company_privacy_url']
         )
 
-        # TOS_AND_HONOR is present in MICROSITE_CONFIGURATION['test_microsite']["urls"],
+        # TOS_AND_HONOR is present in MICROSITE_CONFIGURATION['test_site']["urls"],
         # so web certificate will use that url
         self.assertIn(
-            settings.MICROSITE_CONFIGURATION['test_microsite']["urls"]['TOS_AND_HONOR'],
+            settings.MICROSITE_CONFIGURATION['test_site']["urls"]['TOS_AND_HONOR'],
             data['company_tos_url']
         )

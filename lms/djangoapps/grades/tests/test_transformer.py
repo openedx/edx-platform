@@ -7,6 +7,7 @@ import pytz
 import random
 
 from student.tests.factories import UserFactory
+from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import check_mongo_calls
 
@@ -50,6 +51,9 @@ class GradesTransformerTestCase(CourseStructureTestCase):
                 block_structure.get_xblock_field(usage_key, field),
                 msg=u'in field {},'.format(repr(field)),
             )
+        self.assertIsNotNone(
+            block_structure.get_xblock_field(usage_key, u'subtree_edited_on'),
+        )
 
     def assert_collected_transformer_block_fields(self, block_structure, usage_key, transformer_class, **expectations):
         """
@@ -195,6 +199,17 @@ class GradesTransformerTestCase(CourseStructureTestCase):
             self.TRANSFORMER_CLASS_TO_TEST,
             max_score=2,
         )
+
+    def test_course_version_not_collected_in_old_mongo(self):
+        blocks = self.build_course_with_problems()
+        block_structure = get_course_blocks(self.student, blocks[u'course'].location, self.transformers)
+        self.assertIsNone(block_structure.get_xblock_field(blocks[u'course'].location, u'course_version'))
+
+    def test_course_version_collected_in_split(self):
+        with self.store.default_store(ModuleStoreEnum.Type.split):
+            blocks = self.build_course_with_problems()
+        block_structure = get_course_blocks(self.student, blocks[u'course'].location, self.transformers)
+        self.assertIsNotNone(block_structure.get_xblock_field(blocks[u'course'].location, u'course_version'))
 
 
 class MultiProblemModulestoreAccessTestCase(CourseStructureTestCase, SharedModuleStoreTestCase):

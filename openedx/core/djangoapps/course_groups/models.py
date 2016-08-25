@@ -90,12 +90,13 @@ class CohortMembership(models.Model):
     def save(self, *args, **kwargs):
         self.full_clean(validate_unique=False)
 
+        log.info("Saving CohortMembership for user '%s' in '%s'", self.user.id, self.course_id)
+
         # Avoid infinite recursion if creating from get_or_create() call below.
         # This block also allows middleware to use CohortMembership.get_or_create without worrying about outer_atomic
         if 'force_insert' in kwargs and kwargs['force_insert'] is True:
             with transaction.atomic():
                 self.course_user_group.users.add(self.user)
-                self.course_user_group.save()
                 super(CohortMembership, self).save(*args, **kwargs)
             return
 
@@ -127,11 +128,9 @@ class CohortMembership(models.Model):
             self.previous_cohort_name = saved_membership.course_user_group.name
             self.previous_cohort_id = saved_membership.course_user_group.id
             self.previous_cohort.users.remove(self.user)
-            self.previous_cohort.save()
 
             saved_membership.course_user_group = self.course_user_group
             self.course_user_group.users.add(self.user)
-            self.course_user_group.save()
 
             super(CohortMembership, saved_membership).save(update_fields=['course_user_group'])
 

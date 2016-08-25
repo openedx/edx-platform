@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-07-22 10:07+0000\n"
-"PO-Revision-Date: 2016-07-22 10:08:19.725997\n"
+"POT-Creation-Date: 2016-08-18 16:54+0000\n"
+"PO-Revision-Date: 2016-08-18 16:55:20.212629\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -4680,6 +4680,22 @@ msgstr "Löädïng ýöür çöürsés Ⱡ'σяєм ιρѕυм ∂σłσя ѕι�
 
 #: lms/static/js/student_account/views/LoginView.js
 msgid ""
+"We have sent an email message with password reset instructions to the email "
+"address you provided.  If you do not receive this message, "
+"{anchorStart}contact technical support{anchorEnd}."
+msgstr ""
+"Wé hävé sént än émäïl méssägé wïth pässwörd rését ïnstrüçtïöns tö thé émäïl "
+"äddréss ýöü prövïdéd.  Ìf ýöü dö nöt réçéïvé thïs méssägé, "
+"{anchorStart}çöntäçt téçhnïçäl süppört{anchorEnd}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт "
+"łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ "
+"єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ "
+"αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ "
+"ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт "
+"ιη ¢υłρα qυι σƒƒι¢#"
+
+#: lms/static/js/student_account/views/LoginView.js
+msgid ""
 "An error has occurred. Try refreshing the page, or check your Internet "
 "connection."
 msgstr ""
@@ -4791,6 +4807,10 @@ msgid ""
 msgstr ""
 "Séléçt thé tïmé zöné för dïspläýïng çöürsé dätés. Ìf ýöü dö nöt spéçïfý ä  "
 "Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυ#"
+
+#: lms/static/js/student_account/views/account_settings_factory.js
+msgid "All Time Zones"
+msgstr "Àll Tïmé Zönés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "Additional Information"
@@ -5596,6 +5616,10 @@ msgstr ""
 "Ýöü hävé ünsävéd çhängés. Dö ýöü réällý wänt tö léävé thïs pägé? Ⱡ'σяєм "
 "ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
+#: cms/static/js/maintenance/force_publish_course.js
+msgid "Internal Server Error."
+msgstr "Ìntérnäl Sérvér Érrör. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
+
 #. Translators: This is the status of a video upload that is queued
 #. waiting for other uploads to complete
 #: cms/static/js/models/active_video_upload.js
@@ -5849,9 +5873,8 @@ msgstr ""
 "¢σηѕє¢тєтυя #"
 
 #: cms/static/js/programs/utils/validation_config.js
-msgid "{0} must be one of: gettext( {1}"
-msgstr ""
-"{0} müst ßé öné öf: géttéxt( {1} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
+msgid "{0} must be one of: {1}"
+msgstr "{0} müst ßé öné öf: {1} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
 
 #: cms/static/js/programs/utils/validation_config.js
 msgid "{0} must be the same as {1}"
@@ -7822,18 +7845,14 @@ msgid "Generate Exception Certificates"
 msgstr "Généräté Éxçéptïön Çértïfïçätés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
-msgid ""
-"Generate certificates for all users on the Exception list who do not yet "
-"have a certificate"
+msgid "All users on the Exception list who do not yet have a certificate"
 msgstr ""
-"Généräté çértïfïçätés för äll üsérs ön thé Éxçéptïön lïst whö dö nöt ýét "
-"hävé ä çértïfïçäté Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
+"Àll üsérs ön thé Éxçéptïön lïst whö dö nöt ýét hävé ä çértïfïçäté Ⱡ'σяєм "
+"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
-msgid "Generate a Certificate for all users on the Exception list"
-msgstr ""
-"Généräté ä Çértïfïçäté för äll üsérs ön thé Éxçéptïön lïst Ⱡ'σяєм ιρѕυм "
-"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+msgid "All users on the Exception list"
+msgstr "Àll üsérs ön thé Éxçéptïön lïst Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
 msgid "User Email"
@@ -8105,8 +8124,8 @@ msgid "Valid"
 msgstr "Välïd Ⱡ'σяєм ιρѕ#"
 
 #: lms/templates/learner_dashboard/certificate.underscore
-msgid "XSeries Program Certificates"
-msgstr "XSérïés Prögräm Çértïfïçätés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
+msgid "Program Certificates"
+msgstr "Prögräm Çértïfïçätés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
 #: lms/templates/learner_dashboard/certificate.underscore
 msgid "certificate.credential_url"
@@ -8123,8 +8142,8 @@ msgstr ""
 " ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: lms/templates/learner_dashboard/certificate_status.underscore
-msgid "View/Share Certificate"
-msgstr "Vïéw/Shäré Çértïfïçäté Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
+msgid "View Certificate"
+msgstr "Vïéw Çértïfïçäté Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
 msgid "enrolled"
@@ -8171,15 +8190,19 @@ msgstr "Çömïng Söön Ⱡ'σяєм ιρѕυм ∂σłσя #"
 msgid "Enrollment Opens on"
 msgstr "Énröllmént Öpéns ön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
 
-#: lms/templates/learner_dashboard/empty_programs_list.underscore
-msgid "You are not enrolled in any XSeries Programs yet."
-msgstr ""
-"Ýöü äré nöt énrölléd ïn äný XSérïés Prögräms ýét. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
-"αмєт, ¢σηѕє¢тєтυя α#"
+#: lms/templates/learner_dashboard/course_enroll.underscore
+msgid "Not Currently Available"
+msgstr "Nöt Çürréntlý Àväïläßlé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
 
 #: lms/templates/learner_dashboard/empty_programs_list.underscore
-msgid "Explore XSeries Programs"
-msgstr "Éxplöré XSérïés Prögräms Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
+msgid "You are not enrolled in any programs yet."
+msgstr ""
+"Ýöü äré nöt énrölléd ïn äný prögräms ýét. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя #"
+
+#: lms/templates/learner_dashboard/empty_programs_list.underscore
+msgid "Explore Programs"
+msgstr "Éxplöré Prögräms Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 
 #: lms/templates/learner_dashboard/explore_new_programs.underscore
 msgid ""
@@ -8190,12 +8213,12 @@ msgstr ""
 "süßjéçts Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
 
 #: lms/templates/learner_dashboard/explore_new_programs.underscore
-msgid "Explore New XSeries"
-msgstr "Éxplöré Néw XSérïés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
+msgid "Explore New Programs"
+msgstr "Éxplöré Néw Prögräms Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
 #: lms/templates/learner_dashboard/program_card.underscore
-msgid "type"
-msgstr "týpé Ⱡ'σяєм ι#"
+msgid "category"
+msgstr "çätégörý Ⱡ'σяєм ιρѕυм ∂#"
 
 #: lms/templates/learner_dashboard/program_card.underscore
 #, python-format
@@ -8353,14 +8376,6 @@ msgstr ""
 #: lms/templates/student_account/login.underscore
 msgid "Password Reset Email Sent"
 msgstr "Pässwörd Rését Émäïl Sént Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
-
-#: lms/templates/student_account/login.underscore
-msgid ""
-"We've sent instructions for resetting your password to the email address you"
-" provided."
-msgstr ""
-"Wé'vé sént ïnstrüçtïöns för réséttïng ýöür pässwörd tö thé émäïl äddréss ýöü"
-" prövïdéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
 
 #: lms/templates/student_account/login.underscore
 msgid "We couldn't sign you in."
@@ -9322,6 +9337,27 @@ msgstr "%(type)s Çömpönént Témpläté Ménü Ⱡ'σяєм ιρѕυм ∂σ�
 msgid "Common Problem Types"
 msgstr "Çömmön Prößlém Týpés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
+#: cms/templates/js/add-xblock-component-support-legend.underscore
+msgid "Supported"
+msgstr "Süppörtéd Ⱡ'σяєм ιρѕυм ∂σł#"
+
+#: cms/templates/js/add-xblock-component-support-legend.underscore
+msgid "Provisional"
+msgstr "Prövïsïönäl Ⱡ'σяєм ιρѕυм ∂σłσя #"
+
+#: cms/templates/js/add-xblock-component-support-legend.underscore
+#: cms/templates/js/add-xblock-component-support-level.underscore
+msgid "Not Supported"
+msgstr "Nöt Süppörtéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
+
+#: cms/templates/js/add-xblock-component-support-level.underscore
+msgid "Fully Supported"
+msgstr "Füllý Süppörtéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
+
+#: cms/templates/js/add-xblock-component-support-level.underscore
+msgid "Provisionally Supported"
+msgstr "Prövïsïönällý Süppörtéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
+
 #: cms/templates/js/add-xblock-component.underscore
 msgid "Add New Component"
 msgstr "Àdd Néw Çömpönént Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
@@ -9589,20 +9625,20 @@ msgstr ""
 "nöt ïnçlüdéd ïn grädé çälçülätïöns. Ⱡ'σяєм ιρѕυм ∂σłσя #"
 
 #: cms/templates/js/content-visibility-editor.underscore
+#, python-format
 msgid ""
-"Units inherit the visibility setting of the subsection they are in. If you "
-"make this subsection visible to learners, published units that were "
-"previously hidden also become visible. Only units that were explicitly "
-"hidden remain hidden regardless of the option you select for this "
-"subsection."
+"If you select an option other than \"%(hide_label)s\", after the subsection "
+"release date has passed, published units in this subsection will become "
+"available to learners unless units are explicitly hidden."
 msgstr ""
-"Ûnïts ïnhérït thé vïsïßïlïtý séttïng öf thé süßséçtïön théý äré ïn. Ìf ýöü "
-"mäké thïs süßséçtïön vïsïßlé tö léärnérs, püßlïshéd ünïts thät wéré "
-"prévïöüslý hïddén älsö ßéçömé vïsïßlé. Önlý ünïts thät wéré éxplïçïtlý "
-"hïddén rémäïn hïddén régärdléss öf thé öptïön ýöü séléçt för thïs "
-"süßséçtïön. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ "
-"∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ "
-"мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяι#"
+"Ìf ýöü séléçt än öptïön öthér thän \"%(hide_label)s\", äftér thé süßséçtïön "
+"réléäsé däté häs pässéd, püßlïshéd ünïts ïn thïs süßséçtïön wïll ßéçömé "
+"äväïläßlé tö léärnérs ünléss ünïts äré éxplïçïtlý hïddén. Ⱡ'σяєм ιρѕυм ∂σłσя"
+" ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт"
+" łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ "
+"єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ "
+"αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ "
+"ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт ησ#"
 
 #: cms/templates/js/course-instructor-details.underscore
 msgid "Instructor Name"
@@ -10569,6 +10605,28 @@ msgstr "Édït %(display_name)s (réqüïréd) Ⱡ'σяєм ιρѕυм ∂σłσ
 msgid "formLabel"
 msgstr "förmLäßél Ⱡ'σяєм ιρѕυм ∂σł#"
 
+#: cms/templates/js/maintenance/force-published-course-response.underscore
+msgid ""
+"You have done a dry run of force publishing the course. Nothing has changed."
+" Had you run it, the following course versions would have been change."
+msgstr ""
+"Ýöü hävé döné ä drý rün öf förçé püßlïshïng thé çöürsé. Nöthïng häs çhängéd."
+" Häd ýöü rün ït, thé föllöwïng çöürsé vérsïöns wöüld hävé ßéén çhängé. "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ "
+"тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм,"
+" qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ "
+"¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє "
+"¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт "
+"ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłłιт αηιм ι#"
+
+#: cms/templates/js/maintenance/force-published-course-response.underscore
+msgid ""
+"The published branch version, {published}, was reset to the draft branch "
+"version, {draft}."
+msgstr ""
+"Thé püßlïshéd ßränçh vérsïön, {published}, wäs rését tö thé dräft ßränçh "
+"vérsïön, {draft}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
+
 #: cms/templates/js/programs/course_details.underscore
 msgid "Delete course"
 msgstr "Délété çöürsé Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
@@ -10648,8 +10706,16 @@ msgid "Program type"
 msgstr "Prögräm týpé Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
 #: cms/templates/js/programs/program_creator_form.underscore
+msgid "Select a type"
+msgstr "Séléçt ä týpé Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
+
+#: cms/templates/js/programs/program_creator_form.underscore
 msgid "XSeries"
 msgstr "XSérïés Ⱡ'σяєм ιρѕυм #"
+
+#: cms/templates/js/programs/program_creator_form.underscore
+msgid "MicroMasters"
+msgstr "MïçröMästérs Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
 #: cms/templates/js/programs/program_creator_form.underscore
 msgid "Select an organization"

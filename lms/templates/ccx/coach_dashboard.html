@@ -56,16 +56,16 @@ from openedx.core.djangolib.js_utils import (
           %if ccx:
           <ul class="instructor-nav">
             <li class="nav-item">
-              <a href="#" data-section="membership">${_("Enrollment")}</a>
+              <button type="button" class="btn-link" data-section="membership">${_("Enrollment")}</button>
             </li>
             <li class="nav-item">
-              <a href="#" data-section="schedule">${_("Schedule")}</a>
+              <button type="button" class="btn-link" data-section="schedule">${_("Schedule")}</button>
             </li>
             <li class="nav-item">
-              <a href="#" data-section="student_admin">${_("Student Admin")}</a>
+              <button type="button" class="btn-link" data-section="student_admin">${_("Student Admin")}</button>
             </li>
             <li class="nav-item">
-              <a href="#" data-section="grading_policy">${_("Grading Policy")}</a>
+              <button type="button" class="btn-link" data-section="grading_policy">${_("Grading Policy")}</button>
             </li>
           </ul>
           <section id="membership" class="idash-section" aria-label="${_('Batch Enrollment')}">

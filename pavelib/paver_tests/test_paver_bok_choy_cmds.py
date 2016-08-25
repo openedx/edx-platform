@@ -4,11 +4,14 @@ Run just this test with: paver test_lib -t pavelib/paver_tests/test_paver_bok_ch
 """
 import os
 import unittest
+from textwrap import dedent
 
-from mock import patch, call
+import ddt
+from mock import patch, call, Mock
 from test.test_support import EnvironmentVarGuard
-from paver.easy import BuildFailure
+from paver.easy import BuildFailure, call_task, environment
 from pavelib.utils.test.suites import BokChoyTestSuite, Pa11yCrawler
+from pavelib.utils.test.suites.bokchoy_suite import DEMO_COURSE_TAR_GZ, DEMO_COURSE_IMPORT_DIR
 
 REPO_DIR = os.getcwd()
 
@@ -173,6 +176,7 @@ class TestPaverBokChoyCmd(unittest.TestCase):
             suite.verbosity_processes_command
 
 
+@ddt.ddt
 class TestPaverPa11yCrawlerCmd(unittest.TestCase):
 
     """
@@ -190,43 +194,109 @@ class TestPaverPa11yCrawlerCmd(unittest.TestCase):
         # Cleanup mocks
         self.addCleanup(mock_sh.stop)
 
-    def _expected_command(self, report_dir, start_urls):
-        """
-        Returns the expected command to run pa11ycrawler.
-        """
-        expected_statement = [
-            'pa11ycrawler',
-            'run',
-        ] + start_urls + [
-            '--pa11ycrawler-allowed-domains=localhost',
-            '--pa11ycrawler-reports-dir={}'.format(report_dir),
-            '--pa11ycrawler-deny-url-matcher=logout',
-            '--pa11y-reporter="1.0-json"',
-            '--depth-limit=6',
-        ]
-        return expected_statement
+        # reset the options for all tasks
+        environment.options.clear()
 
     def test_default(self):
-        suite = Pa11yCrawler('')
-        self.assertEqual(
-            suite.cmd,
-            self._expected_command(suite.pa11y_report_dir, suite.start_urls)
+        suite = Pa11yCrawler(
+            'pa11ycrawler', course_key="course-v1:edX+Test101+course",
         )
+        expected_cmd = [
+            "scrapy",
+            "crawl",
+            "edx",
+            "-a",
+            "port=8003",
+            "-a",
+            "course_key=course-v1:edX+Test101+course",
+            "-a",
+            "data_dir=/edx/app/edxapp/edx-platform/reports/pa11ycrawler/data",
+        ]
+        actual_cmd = suite.cmd
+        # verify that the final section of this command is for specifying the
+        # data directory
+        self.assertEqual(actual_cmd[-2], "-a")
+        self.assertTrue(actual_cmd[-1].startswith("data_dir="))
+        # chop off the `data_dir` argument when comparing,
+        # since it is highly dependent on who is running this paver command,
+        # and where it's being run (devstack, jenkins, etc)
+        self.assertEqual(actual_cmd[0:-2], expected_cmd[0:-2])
 
-    def test_get_test_course(self):
-        suite = Pa11yCrawler('')
-        suite.get_test_course()
-        self._mock_sh.assert_has_calls([
-            call(
-                'wget {targz} -O {dir}demo_course.tar.gz'.format(targz=suite.tar_gz_file, dir=suite.imports_dir)),
-            call(
-                'tar zxf {dir}demo_course.tar.gz -C {dir}'.format(dir=suite.imports_dir)),
-        ])
+    @ddt.data(
+        (True, True, None),
+        (True, False, None),
+        (False, True, DEMO_COURSE_IMPORT_DIR),
+        (False, False, None),
+    )
+    @ddt.unpack
+    def test_get_test_course(self, import_dir_set, should_fetch_course_set, downloaded_to):
+        options = {}
+        if import_dir_set:
+            options['imports_dir'] = 'some_import_dir'
+        if should_fetch_course_set:
+            options['should_fetch_course'] = True
+
+        call_task('pavelib.utils.test.suites.bokchoy_suite.get_test_course', options=options)
+
+        if downloaded_to is None:
+            self._mock_sh.assert_has_calls([])
+        else:
+            self._mock_sh.assert_has_calls([
+                call(
+                    'wget {targz} -O {dir}demo_course.tar.gz'.format(targz=DEMO_COURSE_TAR_GZ, dir=downloaded_to)),
+                call(
+                    'tar zxf {dir}demo_course.tar.gz -C {dir}'.format(dir=downloaded_to)),
+            ])
+
+    @patch("pavelib.utils.test.suites.bokchoy_suite.path")
+    def test_scrapy_cfg_exists(self, mocked_path_func):
+        # setup
+        mock_path = Mock()
+        mock_path.expand.return_value = mock_path
+        mock_path.isfile.return_value = True
+        mocked_path_func.return_value = mock_path
+
+        # test
+        Pa11yCrawler('pa11ycrawler')
+
+        # check
+        mocked_path_func.assert_called_with("~/.config/scrapy.cfg")
+        self.assertTrue(mock_path.isfile.called)
+        self.assertFalse(mock_path.write_text.called)
+
+    @patch("pavelib.utils.test.suites.bokchoy_suite.path")
+    def test_scrapy_cfg_not_exists(self, mocked_path_func):
+        # setup
+        mock_path = Mock()
+        mock_path.expand.return_value = mock_path
+        mock_path.isfile.return_value = False
+        mocked_path_func.return_value = mock_path
+
+        # test
+        Pa11yCrawler('pa11ycrawler')
+
+        # check
+        mocked_path_func.assert_called_with("~/.config/scrapy.cfg")
+        self.assertTrue(mock_path.isfile.called)
+        self.assertTrue(mock_path.parent.makedirs_p.called)
+        content = dedent("""
+            [settings]
+            default = pa11ycrawler.settings
+
+            [deploy]
+            project = pa11ycrawler
+        """)
+        mock_path.write_text.assert_called_with(content)
 
     def test_generate_html_reports(self):
-        suite = Pa11yCrawler('')
+        suite = Pa11yCrawler('pa11ycrawler')
         suite.generate_html_reports()
         self._mock_sh.assert_has_calls([
-            call(
-                'pa11ycrawler json-to-html --pa11ycrawler-reports-dir={}'.format(suite.pa11y_report_dir)),
+            call([
+                'pa11ycrawler-html',
+                '--data-dir',
+                os.path.join(suite.report_dir, "data"),
+                '--output-dir',
+                os.path.join(suite.report_dir, "html"),
+            ])
         ])

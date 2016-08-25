@@ -19,9 +19,8 @@ NewPostView */
             return child;
         };
 
-    if (typeof Backbone !== "undefined" && Backbone !== null) {
+    if (typeof Backbone !== 'undefined' && Backbone !== null) {
         this.DiscussionModuleView = (function(_super) {
-
             __extends(DiscussionModuleView, _super);
 
             function DiscussionModuleView() {
@@ -57,24 +56,24 @@ NewPostView */
             }
 
             DiscussionModuleView.prototype.events = {
-                "click .discussion-show": "toggleDiscussion",
-                "keydown .discussion-show": function(event) {
+                'click .discussion-show': 'toggleDiscussion',
+                'keydown .discussion-show': function(event) {
                     return DiscussionUtil.activateOnSpace(event, this.toggleDiscussion);
                 },
-                "click .new-post-btn": "toggleNewPost",
-                "keydown .new-post-btn": function(event) {
+                'click .new-post-btn': 'toggleNewPost',
+                'keydown .new-post-btn': function(event) {
                     return DiscussionUtil.activateOnSpace(event, this.toggleNewPost);
                 },
-                "click .discussion-paginator a": "navigateToPage"
+                'click .discussion-paginator a': 'navigateToPage'
             };
 
             DiscussionModuleView.prototype.page_re = /\?discussion_page=(\d+)/;
 
             DiscussionModuleView.prototype.initialize = function(options) {
                 var match;
-                this.toggleDiscussionBtn = this.$(".discussion-show");
+                this.toggleDiscussionBtn = this.$('.discussion-show');
                 match = this.page_re.exec(window.location.href);
-                this.context = options.context || "course";
+                this.context = options.context || 'course';
                 if (match) {
                     this.page = parseInt(match[1]);
                 } else {
@@ -95,8 +94,8 @@ NewPostView */
                     this.newPostForm.show().focus();
                 }
                 this.toggleDiscussionBtn.addClass('shown');
-                this.toggleDiscussionBtn.find('.button-text').html(gettext("Hide Discussion"));
-                this.$("section.discussion").slideDown();
+                this.toggleDiscussionBtn.find('.button-text').html(gettext('Hide Discussion'));
+                this.$('section.discussion').slideDown();
                 this.showed = true;
             };
 
@@ -105,9 +104,9 @@ NewPostView */
             };
 
             DiscussionModuleView.prototype.hideDiscussion = function() {
-                this.$("section.discussion").slideUp();
+                this.$('section.discussion').slideUp();
                 this.toggleDiscussionBtn.removeClass('shown');
-                this.toggleDiscussionBtn.find('.button-text').html(gettext("Show Discussion"));
+                this.toggleDiscussionBtn.find('.button-text').html(gettext('Show Discussion'));
                 this.showed = false;
             };
 
@@ -118,17 +117,17 @@ NewPostView */
                     return this.hideDiscussion();
                 } else {
                     this.toggleDiscussionBtn.addClass('shown');
-                    this.toggleDiscussionBtn.find('.button-text').html(gettext("Hide Discussion"));
+                    this.toggleDiscussionBtn.find('.button-text').html(gettext('Hide Discussion'));
                     if (this.retrieved) {
-                        this.$("section.discussion").slideDown();
+                        this.$('section.discussion').slideDown();
                         this.showed = true;
                     } else {
                         $elem = this.toggleDiscussionBtn;
                         return this.loadPage($elem, function() {
                             self.hideDiscussion();
                             return DiscussionUtil.discussionAlert(
-                                gettext("Sorry"),
-                                gettext("We had some trouble loading the discussion. Please try again.")
+                                gettext('Sorry'),
+                                gettext('We had some trouble loading the discussion. Please try again.')
                             );
                         });
                     }
@@ -138,14 +137,14 @@ NewPostView */
             DiscussionModuleView.prototype.loadPage = function($elem, error) {
                 var discussionId, url,
                     self = this;
-                discussionId = this.$el.data("discussion-id");
-                url = DiscussionUtil.urlFor('retrieve_discussion', discussionId) + ("?page=" + this.page);
+                discussionId = this.$el.data('discussion-id');
+                url = DiscussionUtil.urlFor('retrieve_discussion', discussionId) + ('?page=' + this.page);
                 return DiscussionUtil.safeAjax({
                     $elem: $elem,
                     $loading: $elem,
                     takeFocus: true,
                     url: url,
-                    type: "GET",
+                    type: 'GET',
                     dataType: 'json',
                     success: function(response, textStatus) {
                         return self.renderDiscussion($elem, response, textStatus, discussionId);
@@ -168,7 +167,7 @@ NewPostView */
                 this.discussion.reset(response.discussion_data, {
                     silent: false
                 });
-                $discussion = _.template($("#inline-discussion-template").html())({
+                $discussion = _.template($('#inline-discussion-template').html())({
                     'threads': response.discussion_data,
                     'discussionId': discussionId
                 });
@@ -181,14 +180,14 @@ NewPostView */
                 this.threadviews = this.discussion.map(function(thread) {
                     var view;
                     view = new DiscussionThreadView({
-                        el: self.$("article#thread_" + thread.id),
+                        el: self.$('article#thread_' + thread.id),
                         model: thread,
-                        mode: "inline",
+                        mode: 'inline',
                         context: self.context,
                         course_settings: self.course_settings,
                         topicId: discussionId
                     });
-                    thread.on("thread:thread_type_updated", function() {
+                    thread.on('thread:thread_type_updated', function() {
                         view.rerender();
                         return view.expand();
                     });
@@ -207,7 +206,7 @@ NewPostView */
                 });
                 this.newPostView.render();
                 this.listenTo(this.newPostView, 'newPost:cancel', this.hideNewPost);
-                this.discussion.on("add", this.addThread);
+                this.discussion.on('add', this.addThread);
                 this.retrieved = true;
                 this.showed = true;
                 this.renderPagination(response.num_pages);
@@ -223,10 +222,10 @@ NewPostView */
                 threadView = new DiscussionThreadView({
                     el: article,
                     model: thread,
-                    mode: "inline",
+                    mode: 'inline',
                     context: this.context,
                     course_settings: this.course_settings,
-                    topicId: this.$el.data("discussion-id")
+                    topicId: this.$el.data('discussion-id')
                 });
                 threadView.render();
                 return this.threadviews.unshift(threadView);
@@ -235,10 +234,10 @@ NewPostView */
             DiscussionModuleView.prototype.renderPagination = function(numPages) {
                 var pageUrl, pagination, params;
                 pageUrl = function(number) {
-                    return "?discussion_page=" + number;
+                    return '?discussion_page=' + number;
                 };
                 params = DiscussionUtil.getPaginationParams(this.page, numPages, pageUrl);
-                pagination = _.template($("#pagination-template").html())(params);
+                pagination = _.template($('#pagination-template').html())(params);
                 return this.$('section.discussion-pagination').html(pagination);
             };
 
@@ -252,15 +251,13 @@ NewPostView */
                 return this.loadPage($(event.target), function() {
                     self.page = currPage;
                     DiscussionUtil.discussionAlert(
-                        gettext("Sorry"),
-                        gettext("We had some trouble loading the threads you requested. Please try again.")
+                        gettext('Sorry'),
+                        gettext('We had some trouble loading the threads you requested. Please try again.')
                     );
                 });
             };
 
             return DiscussionModuleView;
-
         })(Backbone.View);
     }
-
 }).call(window);

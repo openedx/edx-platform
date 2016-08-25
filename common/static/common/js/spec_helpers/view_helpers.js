@@ -1,9 +1,9 @@
 /**
  * Provides helper methods for invoking Studio modal windows in Jasmine tests.
  */
-;(function (define) {
+(function(define) {
     'use strict';
-define(["jquery", "common/js/components/views/feedback_notification", "common/js/components/views/feedback_prompt",
+    define(['jquery', 'common/js/components/views/feedback_notification', 'common/js/components/views/feedback_prompt',
         'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'],
     function($, NotificationView, Prompt, AjaxHelpers) {
         var installViewTemplates, createFeedbackSpy, verifyFeedbackShowing,
@@ -20,7 +20,7 @@ define(["jquery", "common/js/components/views/feedback_notification", "common/js
             var feedbackSpy = jasmine.stealth.spyOnConstructor(type, intent, ['show', 'hide']);
             feedbackSpy.show.and.returnValue(feedbackSpy);
             if (afterEach) {
-               afterEach(jasmine.stealth.clearSpies);
+                afterEach(jasmine.stealth.clearSpies);
             }
             return feedbackSpy;
         };
@@ -100,14 +100,14 @@ define(["jquery", "common/js/components/views/feedback_notification", "common/js
             }
         };
 
-        clickDeleteItem = function (that, promptSpy, promptText) {
+        clickDeleteItem = function(that, promptSpy, promptText) {
             that.view.$('.delete').click();
             verifyPromptShowing(promptSpy, promptText);
             confirmPrompt(promptSpy);
             verifyPromptHidden(promptSpy);
         };
 
-        patchAndVerifyRequest = function (requests, url, notificationSpy) {
+        patchAndVerifyRequest = function(requests, url, notificationSpy) {
             // Backbone.emulateHTTP is enabled in our system, so setting this
             // option  will fake PUT, PATCH and DELETE requests with a HTTP POST,
             // setting the X-HTTP-Method-Override header with the true method.
@@ -116,14 +116,14 @@ define(["jquery", "common/js/components/views/feedback_notification", "common/js
             verifyNotificationShowing(notificationSpy, /Deleting/);
         };
 
-        submitAndVerifyFormSuccess = function (view, requests, notificationSpy) {
+        submitAndVerifyFormSuccess = function(view, requests, notificationSpy) {
             view.$('form').submit();
             verifyNotificationShowing(notificationSpy, /Saving/);
             AjaxHelpers.respondWithJson(requests, {});
             verifyNotificationHidden(notificationSpy);
         };
 
-        submitAndVerifyFormError = function (view, requests, notificationSpy) {
+        submitAndVerifyFormError = function(view, requests, notificationSpy) {
             view.$('form').submit();
             verifyNotificationShowing(notificationSpy, /Saving/);
             AjaxHelpers.respondWithError(requests);

@@ -15,7 +15,7 @@ define(['js/dashboard/dropdown', 'jquery.simulate'],
                 expect($(dropdownSelector)).not.toBeVisible();
             },
             waitForElementToBeFocused = function(element, done) {
-                jasmine.waitUntil(function () {
+                jasmine.waitUntil(function() {
                     return element === document.activeElement;
                 }).always(done);
             },
@@ -25,55 +25,54 @@ define(['js/dashboard/dropdown', 'jquery.simulate'],
                 verifyDropdownVisible();
             },
             keydown = function(keyInfo) {
-                $(document.activeElement).simulate("keydown", keyInfo);
+                $(document.activeElement).simulate('keydown', keyInfo);
             };
 
-        describe("edx.dashboard.dropdown.toggleCourseActionsDropdownMenu", function() {
-
+        describe('edx.dashboard.dropdown.toggleCourseActionsDropdownMenu', function() {
             beforeEach(function() {
                 loadFixtures('js/fixtures/dashboard/dashboard.html');
                 window.edx.dashboard.dropdown.bindToggleButtons();
             });
 
-            it("Clicking the .action-more button toggles the menu", function() {
+            it('Clicking the .action-more button toggles the menu', function() {
                 verifyDropdownNotVisible();
                 clickToggleButton();
                 verifyDropdownVisible();
                 clickToggleButton();
                 verifyDropdownNotVisible();
             });
-            it("ESCAPE will close dropdown and return focus to the button", function(done) {
+            it('ESCAPE will close dropdown and return focus to the button', function(done) {
                 openDropDownMenu();
-                keydown({ keyCode: keys.ESCAPE });
+                keydown({keyCode: keys.ESCAPE});
                 verifyDropdownNotVisible();
                 waitForElementToBeFocused($(toggleButtonSelector)[0], done);
             });
-            it("SPACE will close dropdown and return focus to the button", function(done) {
+            it('SPACE will close dropdown and return focus to the button', function(done) {
                 openDropDownMenu();
-                keydown({ keyCode: keys.SPACE });
+                keydown({keyCode: keys.SPACE});
                 verifyDropdownNotVisible();
                 waitForElementToBeFocused($(toggleButtonSelector)[0], done);
             });
 
-            describe("Focus is trapped when navigating with", function() {
-                it("TAB key", function(done) {
+            describe('Focus is trapped when navigating with', function() {
+                it('TAB key', function(done) {
                     openDropDownMenu();
-                    keydown({ keyCode: keys.TAB });
+                    keydown({keyCode: keys.TAB});
                     waitForElementToBeFocused($(dropdownItemSelector)[0], done);
                 });
-                it("DOWN key", function(done) {
+                it('DOWN key', function(done) {
                     openDropDownMenu();
-                    keydown({ keyCode: keys.DOWN });
+                    keydown({keyCode: keys.DOWN});
                     waitForElementToBeFocused($(dropdownItemSelector)[0], done);
                 });
-                it("TAB key + SHIFT key", function(done) {
+                it('TAB key + SHIFT key', function(done) {
                     openDropDownMenu();
-                    keydown({ keyCode: keys.TAB, shiftKey: true });
+                    keydown({keyCode: keys.TAB, shiftKey: true});
                     waitForElementToBeFocused($(dropdownItemSelector)[1], done);
                 });
-                it("UP key", function(done) {
+                it('UP key', function(done) {
                     openDropDownMenu();
-                    keydown({ keyCode: keys.UP });
+                    keydown({keyCode: keys.UP});
                     waitForElementToBeFocused($(dropdownItemSelector)[1], done);
                 });
             });

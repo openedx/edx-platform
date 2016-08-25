@@ -7,7 +7,7 @@ from .transformer import GradesTransformer
 
 
 @memoized
-def block_types_with_scores():
+def block_types_possibly_scored():
     """
     Returns the block types that could have a score.
 
@@ -27,20 +27,20 @@ def possibly_scored(usage_key):
     """
     Returns whether the given block could impact grading (i.e. scored, or has children).
     """
-    return usage_key.block_type in block_types_with_scores()
+    return usage_key.block_type in block_types_possibly_scored()
 
 
-def weighted_score(raw_correct, raw_total, weight):
+def weighted_score(raw_earned, raw_possible, weight):
     """Return a tuple that represents the weighted (correct, total) score."""
     # If there is no weighting, or weighting can't be applied, return input.
-    if weight is None or raw_total == 0:
-        return (raw_correct, raw_total)
-    return (float(raw_correct) * weight / raw_total, float(weight))
+    if weight is None or raw_possible == 0:
+        return (raw_earned, raw_possible)
+    return float(raw_earned) * weight / raw_possible, float(weight)
 
 
 def get_score(user, block, scores_client, submissions_scores_cache):
     """
-    Return the score for a user on a problem, as a tuple (correct, total).
+    Return the score for a user on a problem, as a tuple (earned, possible).
     e.g. (5,7) if you got 5 out of 7 points.
 
     If this problem doesn't have a score, or we couldn't load it, returns (None,
@@ -73,17 +73,17 @@ def get_score(user, block, scores_client, submissions_scores_cache):
     score = scores_client.get(block.location)
     if score and score.total is not None:
         # We have a valid score, just use it.
-        correct = score.correct if score.correct is not None else 0.0
-        total = score.total
+        earned = score.correct if score.correct is not None else 0.0
+        possible = score.total
     else:
         # This means we don't have a valid score entry and we don't have a
         # cached_max_score on hand. We know they've earned 0.0 points on this.
-        correct = 0.0
-        total = block.transformer_data[GradesTransformer].max_score
+        earned = 0.0
+        possible = block.transformer_data[GradesTransformer].max_score
 
         # Problem may be an error module (if something in the problem builder failed)
-        # In which case total might be None
-        if total is None:
+        # In which case possible might be None
+        if possible is None:
             return (None, None)
 
-    return weighted_score(correct, total, block.weight)
+    return weighted_score(earned, possible, block.weight)

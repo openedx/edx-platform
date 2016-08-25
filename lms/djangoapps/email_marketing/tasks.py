@@ -47,10 +47,11 @@ def update_user(self, sailthru_vars, email, new_user=False, activation=False):
 
     if not sailthru_response.is_ok():
         error = sailthru_response.get_error()
-        # put out error and schedule retry
         log.error("Error attempting to add/update user in Sailthru: %s", error.get_message())
-        raise self.retry(countdown=email_config.sailthru_retry_interval,
-                         max_retries=email_config.sailthru_max_retries)
+        if _retryable_sailthru_error(error):
+            raise self.retry(countdown=email_config.sailthru_retry_interval,
+                             max_retries=email_config.sailthru_max_retries)
+        return
 
     # if activating user, send welcome email
     if activation and email_config.sailthru_activation_template:
@@ -66,8 +67,10 @@ def update_user(self, sailthru_vars, email, new_user=False, activation=False):
 
         if not sailthru_response.is_ok():
             error = sailthru_response.get_error()
-            # probably a disabled template, just put out error message
             log.error("Error attempting to send welcome email to user in Sailthru: %s", error.get_message())
+            if _retryable_sailthru_error(error):
+                raise self.retry(countdown=email_config.sailthru_retry_interval,
+                                 max_retries=email_config.sailthru_max_retries)
 
 
 # pylint: disable=not-callable
@@ -103,8 +106,9 @@ def update_user_email(self, new_email, old_email):
     if not sailthru_response.is_ok():
         error = sailthru_response.get_error()
         log.error("Error attempting to update user email address in Sailthru: %s", error.get_message())
-        raise self.retry(countdown=email_config.sailthru_retry_interval,
-                         max_retries=email_config.sailthru_max_retries)
+        if _retryable_sailthru_error(error):
+            raise self.retry(countdown=email_config.sailthru_retry_interval,
+                             max_retries=email_config.sailthru_max_retries)
 
 
 def _create_sailthru_user_parm(sailthru_vars, email, new_user, email_config):
@@ -254,7 +258,7 @@ def _record_purchase(sailthru_client, email, item, message_id, options):
         if not sailthru_response.is_ok():
             error = sailthru_response.get_error()
             log.error("Error attempting to record purchase in Sailthru: %s", error.get_message())
-            return False
+            return not _retryable_sailthru_error(error)
 
     except SailthruClientError as exc:
         log.error("Exception attempting to record purchase for %s in Sailthru - %s", email, unicode(exc))
@@ -305,13 +309,14 @@ def _update_unenrolled_list(sailthru_client, email, course_url, unenroll):
         sailthru_response = sailthru_client.api_get("user", {"id": email, "fields": {"vars": 1}})
         if not sailthru_response.is_ok():
             error = sailthru_response.get_error()
-            log.error("Error attempting to read user record from Sailthru: %s", error.get_message())
-            return False
+            log.info("Error attempting to read user record from Sailthru: %s", error.get_message())
+            return not _retryable_sailthru_error(error)
 
         response_json = sailthru_response.json
 
         unenroll_list = []
-        if response_json and "vars" in response_json and "unenrolled" in response_json["vars"]:
+        if response_json and "vars" in response_json and response_json["vars"] \
+                and "unenrolled" in response_json["vars"]:
             unenroll_list = response_json["vars"]["unenrolled"]
 
         changed = False
@@ -333,8 +338,8 @@ def _update_unenrolled_list(sailthru_client, email, course_url, unenroll):
 
             if not sailthru_response.is_ok():
                 error = sailthru_response.get_error()
-                log.error("Error attempting to update user record in Sailthru: %s", error.get_message())
-                return False
+                log.info("Error attempting to update user record in Sailthru: %s", error.get_message())
+                return not _retryable_sailthru_error(error)
 
         # everything worked
         return True
@@ -342,3 +347,16 @@ def _update_unenrolled_list(sailthru_client, email, course_url, unenroll):
     except SailthruClientError as exc:
         log.error("Exception attempting to update user record for %s in Sailthru - %s", email, unicode(exc))
         return False
+
+
+def _retryable_sailthru_error(error):
+    """ Return True if error should be retried.
+
+    9: Retryable internal error
+    43: Rate limiting response
+    others: Not retryable
+
+    See: https://getstarted.sailthru.com/new-for-developers-overview/api/api-response-errors/
+    """
+    code = error.get_error_code()
+    return code == 9 or code == 43

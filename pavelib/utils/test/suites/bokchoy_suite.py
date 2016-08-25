@@ -3,15 +3,25 @@ Class used for defining and running Bok Choy acceptance test suite
 """
 from time import sleep
 from urllib import urlencode
+from textwrap import dedent
 
 from common.test.acceptance.fixtures.course import CourseFixture, FixtureError
 
 from path import Path as path
-from paver.easy import sh, BuildFailure
+from paver.easy import sh, BuildFailure, cmdopts, task, needs, might_call, call_task, dry
 from pavelib.utils.test.suites.suite import TestSuite
 from pavelib.utils.envs import Env
-from pavelib.utils.test import bokchoy_utils
+from pavelib.utils.test.bokchoy_utils import (
+    clear_mongo, start_servers, check_services, wait_for_test_servers
+)
+from pavelib.utils.test.bokchoy_options import (
+    BOKCHOY_IMPORTS_DIR, BOKCHOY_IMPORTS_DIR_DEPR,
+    BOKCHOY_DEFAULT_STORE, BOKCHOY_DEFAULT_STORE_DEPR,
+    BOKCHOY_FASTTEST,
+    PA11Y_FETCH_COURSE
+)
 from pavelib.utils.test import utils as test_utils
+from pavelib.utils.timer import timed
 
 import os
 
@@ -24,6 +34,135 @@ __test__ = False  # do not collect
 
 DEFAULT_NUM_PROCESSES = 1
 DEFAULT_VERBOSITY = 2
+
+DEMO_COURSE_TAR_GZ = "https://github.com/edx/demo-test-course/archive/master.tar.gz"
+DEMO_COURSE_IMPORT_DIR = path('test_root/courses/')
+
+
+@task
+@cmdopts([BOKCHOY_DEFAULT_STORE, BOKCHOY_DEFAULT_STORE_DEPR])
+@timed
+def load_bok_choy_data(options):
+    """
+    Loads data into database from db_fixtures
+    """
+    print 'Loading data from json fixtures in db_fixtures directory'
+    sh(
+        "DEFAULT_STORE={default_store}"
+        " ./manage.py lms --settings bok_choy loaddata --traceback"
+        " common/test/db_fixtures/*.json".format(
+            default_store=options.default_store,
+        )
+    )
+
+
+@task
+@cmdopts([
+    BOKCHOY_IMPORTS_DIR, BOKCHOY_IMPORTS_DIR_DEPR, BOKCHOY_DEFAULT_STORE,
+    BOKCHOY_DEFAULT_STORE_DEPR
+])
+@timed
+def load_courses(options):
+    """
+    Loads courses from options.imports_dir.
+
+    Note: options.imports_dir is the directory that contains the directories
+    that have courses in them. For example, if the course is located in
+    `test_root/courses/test-example-course/`, options.imports_dir should be
+    `test_root/courses/`.
+    """
+    if 'imports_dir' in options:
+        msg = colorize('green', "Importing courses from {}...".format(options.imports_dir))
+        print msg
+
+        sh(
+            "DEFAULT_STORE={default_store}"
+            " ./manage.py cms --settings=bok_choy import {import_dir}".format(
+                default_store=options.default_store,
+                import_dir=options.imports_dir
+            )
+        )
+    else:
+        print colorize('blue', "--imports-dir not set, skipping import")
+
+
+@task
+@cmdopts([BOKCHOY_IMPORTS_DIR, BOKCHOY_IMPORTS_DIR_DEPR, PA11Y_FETCH_COURSE])
+@timed
+def get_test_course(options):
+    """
+    Fetches the test course.
+    """
+
+    if options.get('imports_dir'):
+        print colorize("green", "--imports-dir specified, skipping fetch of test course")
+        return
+
+    if not options.get('should_fetch_course', False):
+        print colorize("green", "--skip-fetch specified, skipping fetch of test course")
+        return
+
+    # Set the imports_dir for use by other tasks
+    options.imports_dir = DEMO_COURSE_IMPORT_DIR
+
+    options.imports_dir.makedirs_p()
+    zipped_course = options.imports_dir + 'demo_course.tar.gz'
+
+    msg = colorize('green', "Fetching the test course from github...")
+    print msg
+
+    sh(
+        'wget {tar_gz_file} -O {zipped_course}'.format(
+            tar_gz_file=DEMO_COURSE_TAR_GZ,
+            zipped_course=zipped_course,
+        )
+    )
+
+    msg = colorize('green', "Uncompressing the test course...")
+    print msg
+
+    sh(
+        'tar zxf {zipped_course} -C {courses_dir}'.format(
+            zipped_course=zipped_course,
+            courses_dir=options.imports_dir,
+        )
+    )
+
+
+@task
+@timed
+def reset_test_database():
+    """
+    Reset the database used by the bokchoy tests.
+    """
+    sh("{}/scripts/reset-test-db.sh".format(Env.REPO_ROOT))
+
+
+@task
+@needs(['reset_test_database', 'clear_mongo', 'load_bok_choy_data', 'load_courses'])
+@might_call('start_servers')
+@cmdopts([BOKCHOY_FASTTEST], share_with=['start_servers'])
+@timed
+def prepare_bokchoy_run(options):
+    """
+    Sets up and starts servers for a Bok Choy run. If --fasttest is not
+    specified then static assets are collected
+    """
+    if not options.get('fasttest', False):
+
+        print colorize('green', "Generating optimized static assets...")
+        if options.get('log_dir') is None:
+            call_task('update_assets', args=['--settings', 'test_static_optimized'])
+        else:
+            call_task('update_assets', args=[
+                '--settings', 'test_static_optimized',
+                '--collect-log', options.log_dir
+            ])
+
+    # Ensure the test servers are available
+    msg = colorize('green', "Confirming servers are running...")
+    print msg
+    start_servers()  # pylint: disable=no-value-for-parameter
 
 
 class BokChoyTestSuite(TestSuite):
@@ -73,29 +212,32 @@ class BokChoyTestSuite(TestSuite):
         self.log_dir.makedirs_p()
         self.har_dir.makedirs_p()
         self.report_dir.makedirs_p()
-        test_utils.clean_reports_dir()      # pylint: disable=no-value-for-parameter
+        test_utils.clean_reports_dir()  # pylint: disable=no-value-for-parameter
 
         if not (self.fasttest or self.skip_clean or self.testsonly):
             test_utils.clean_test_files()
 
         msg = colorize('green', "Checking for mongo, memchache, and mysql...")
         print msg
-        bokchoy_utils.check_services()
+        check_services()
 
         if not self.testsonly:
-            self.prepare_bokchoy_run()
+            call_task('prepare_bokchoy_run', options={'log_dir': self.log_dir})  # pylint: disable=no-value-for-parameter
         else:
             # load data in db_fixtures
-            self.load_data()
+            load_bok_choy_data()  # pylint: disable=no-value-for-parameter
 
         msg = colorize('green', "Confirming servers have started...")
         print msg
-        bokchoy_utils.wait_for_test_servers()
+        wait_for_test_servers()
         try:
             # Create course in order to seed forum data underneath. This is
             # a workaround for a race condition. The first time a course is created;
             # role permissions are set up for forums.
-            CourseFixture('foobar_org', '1117', 'seed_forum', 'seed_foo').install()
+            dry(
+                "Installing course fixture for forums",
+                CourseFixture('foobar_org', '1117', 'seed_forum', 'seed_foo').install
+            )
             print 'Forums permissions/roles data has been seeded'
         except FixtureError:
             # this means it's already been done
@@ -116,7 +258,7 @@ class BokChoyTestSuite(TestSuite):
             msg = colorize('green', "Cleaning up databases...")
             print msg
             sh("./manage.py lms --settings bok_choy flush --traceback --noinput")
-            bokchoy_utils.clear_mongo()
+            clear_mongo()
 
     @property
     def verbosity_processes_command(self):
@@ -146,66 +288,6 @@ class BokChoyTestSuite(TestSuite):
             ]
 
         return command
-
-    def prepare_bokchoy_run(self):
-        """
-        Sets up and starts servers for a Bok Choy run. If --fasttest is not
-        specified then static assets are collected
-        """
-        sh("{}/scripts/reset-test-db.sh".format(Env.REPO_ROOT))
-
-        if not self.fasttest:
-            self.generate_optimized_static_assets()
-
-        # Clear any test data already in Mongo or MySQLand invalidate
-        # the cache
-        bokchoy_utils.clear_mongo()
-        self.cache.flush_all()
-
-        # load data in db_fixtures
-        self.load_data()
-
-        # load courses if self.imports_dir is set
-        self.load_courses()
-
-        # Ensure the test servers are available
-        msg = colorize('green', "Confirming servers are running...")
-        print msg
-        bokchoy_utils.start_servers(self.default_store, self.coveragerc)
-
-    def load_courses(self):
-        """
-        Loads courses from self.imports_dir.
-
-        Note: self.imports_dir is the directory that contains the directories
-        that have courses in them. For example, if the course is located in
-        `test_root/courses/test-example-course/`, self.imports_dir should be
-        `test_root/courses/`.
-        """
-        msg = colorize('green', "Importing courses from {}...".format(self.imports_dir))
-        print msg
-
-        if self.imports_dir:
-            sh(
-                "DEFAULT_STORE={default_store}"
-                " ./manage.py cms --settings=bok_choy import {import_dir}".format(
-                    default_store=self.default_store,
-                    import_dir=self.imports_dir
-                )
-            )
-
-    def load_data(self):
-        """
-        Loads data into database from db_fixtures
-        """
-        print 'Loading data from json fixtures in db_fixtures directory'
-        sh(
-            "DEFAULT_STORE={default_store}"
-            " ./manage.py lms --settings bok_choy loaddata --traceback"
-            " common/test/db_fixtures/*.json".format(
-                default_store=self.default_store,
-            )
-        )
 
     def run_servers_continuously(self):
         """
@@ -268,97 +350,59 @@ class Pa11yCrawler(BokChoyTestSuite):
     def __init__(self, *args, **kwargs):
         super(Pa11yCrawler, self).__init__(*args, **kwargs)
         self.course_key = kwargs.get('course_key')
-        if self.imports_dir:
-            # If imports_dir has been specified, assume the files are
-            # already there -- no need to fetch them from github. This
-            # allows someome to crawl a different course. They are responsible
-            # for putting it, un-archived, in the directory.
-            self.should_fetch_course = False
-        else:
-            # Otherwise, obey `--skip-fetch` command and use the default
-            # test course.  Note that the fetch will also be skipped when
-            # using `--fast`.
-            self.should_fetch_course = kwargs.get('should_fetch_course')
-            self.imports_dir = path('test_root/courses/')
+        self.ensure_scrapy_cfg()
 
-        self.pa11y_report_dir = os.path.join(self.report_dir, 'pa11ycrawler_reports')
-        self.tar_gz_file = "https://github.com/edx/demo-test-course/archive/master.tar.gz"
-
-        self.start_urls = []
-        auto_auth_params = {
-            "redirect": 'true',
-            "staff": 'true',
-            "course_id": self.course_key,
-        }
-        cms_params = urlencode(auto_auth_params)
-        self.start_urls.append("\"http://localhost:8031/auto_auth?{}\"".format(cms_params))
-
-        sequence_url = "/api/courses/v1/blocks/?{}".format(
-            urlencode({
-                "course_id": self.course_key,
-                "depth": "all",
-                "all_blocks": "true",
-            })
-        )
-        auto_auth_params.update({'redirect_to': sequence_url})
-        lms_params = urlencode(auto_auth_params)
-        self.start_urls.append("\"http://localhost:8003/auto_auth?{}\"".format(lms_params))
-
-    def __enter__(self):
-        if self.should_fetch_course:
-            self.get_test_course()
-        super(Pa11yCrawler, self).__enter__()
-
-    def get_test_course(self):
+    def ensure_scrapy_cfg(self):
         """
-        Fetches the test course.
+        Scrapy requires a few configuration settings in order to run:
+        http://doc.scrapy.org/en/1.1/topics/commands.html#configuration-settings
+        This method ensures they are correctly written to the filesystem
+        in a location where Scrapy knows to look for them.
+
+        Returns True if the file was created, or False if the file already
+        exists (in which case it was not modified.)
         """
-        self.imports_dir.makedirs_p()
-        zipped_course = self.imports_dir + 'demo_course.tar.gz'
+        cfg_file = path("~/.config/scrapy.cfg").expand()
+        if cfg_file.isfile():
+            return False
+        cfg_file.parent.makedirs_p()
+        content = dedent("""
+            [settings]
+            default = pa11ycrawler.settings
 
-        msg = colorize('green', "Fetching the test course from github...")
-        print msg
-
-        sh(
-            'wget {tar_gz_file} -O {zipped_course}'.format(
-                tar_gz_file=self.tar_gz_file,
-                zipped_course=zipped_course,
-            )
-        )
-
-        msg = colorize('green', "Uncompressing the test course...")
-        print msg
-
-        sh(
-            'tar zxf {zipped_course} -C {courses_dir}'.format(
-                zipped_course=zipped_course,
-                courses_dir=self.imports_dir,
-            )
-        )
+            [deploy]
+            project = pa11ycrawler
+        """)
+        cfg_file.write_text(content)
+        return True
 
     def generate_html_reports(self):
         """
-        Runs pa11ycrawler json-to-html
+        Runs pa11ycrawler-html
         """
-        cmd_str = (
-            'pa11ycrawler json-to-html --pa11ycrawler-reports-dir={report_dir}'
-        ).format(report_dir=self.pa11y_report_dir)
-
-        sh(cmd_str)
+        command = [
+            'pa11ycrawler-html',
+            '--data-dir',
+            os.path.join(self.report_dir, 'data'),
+            '--output-dir',
+            os.path.join(self.report_dir, 'html'),
+        ]
+        sh(command)
 
     @property
     def cmd(self):
         """
         Runs pa11ycrawler as staff user against the test course.
         """
-        cmd = [
-            'pa11ycrawler',
-            'run',
-        ] + self.start_urls + [
-            '--pa11ycrawler-allowed-domains=localhost',
-            '--pa11ycrawler-reports-dir={}'.format(self.pa11y_report_dir),
-            '--pa11ycrawler-deny-url-matcher=logout',
-            '--pa11y-reporter="1.0-json"',
-            '--depth-limit=6',
+        data_dir = os.path.join(self.report_dir, 'data')
+        return [
+            "scrapy",
+            "crawl",
+            "edx",
+            "-a",
+            "port=8003",
+            "-a",
+            "course_key={key}".format(key=self.course_key),
+            "-a",
+            "data_dir={dir}".format(dir=data_dir)
         ]
-        return cmd

@@ -7,6 +7,7 @@ from django.db import models
 from config_models.models import ConfigurationModel
 
 
+# TODO: To be simplified as part of ECOM-5136.
 class ProgramsApiConfig(ConfigurationModel):
     """
     Manages configuration for connecting to the Programs service and using its
@@ -21,7 +22,14 @@ class ProgramsApiConfig(ConfigurationModel):
     internal_service_url = models.URLField(verbose_name=_("Internal Service URL"))
     public_service_url = models.URLField(verbose_name=_("Public Service URL"))
 
-    # TODO: The property below is obsolete. Delete at the earliest safe moment. See ECOM-4995
+    marketing_path = models.CharField(
+        max_length=255,
+        blank=True,
+        help_text=_(
+            'Path used to construct URLs to programs marketing pages (e.g., "/foo").'
+        )
+    )
+
     authoring_app_js_path = models.CharField(
         verbose_name=_("Path to authoring app's JS"),
         max_length=255,
@@ -31,7 +39,6 @@ class ProgramsApiConfig(ConfigurationModel):
         )
     )
 
-    # TODO: The property below is obsolete. Delete at the earliest safe moment. See ECOM-4995
     authoring_app_css_path = models.CharField(
         verbose_name=_("Path to authoring app's CSS"),
         max_length=255,
@@ -108,14 +115,6 @@ class ProgramsApiConfig(ConfigurationModel):
         return self.cache_ttl > 0
 
     @property
-    def is_student_dashboard_enabled(self):
-        """
-        Indicates whether LMS dashboard functionality related to Programs should
-        be enabled or not.
-        """
-        return self.enabled and self.enable_student_dashboard
-
-    @property
     def is_studio_tab_enabled(self):
         """
         Indicates whether Studio functionality related to Programs should
@@ -130,13 +129,6 @@ class ProgramsApiConfig(ConfigurationModel):
         certificates for Program completion.
         """
         return self.enabled and self.enable_certification
-
-    @property
-    def show_xseries_ad(self):
-        """
-        Indicates whether we should show xseries add
-        """
-        return self.enabled and self.xseries_ad_enabled
 
     @property
     def show_program_listing(self):

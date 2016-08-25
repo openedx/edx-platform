@@ -21,7 +21,7 @@ from social.backends.saml import SAMLAuth, SAMLIdentityProvider
 from .lti import LTIAuthBackend, LTI_PARAMS_KEY
 from social.exceptions import SocialAuthBaseException
 from social.utils import module_member
-from openedx.core.djangoapps.theming.helpers import get_value as get_themed_value
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 log = logging.getLogger(__name__)
 
@@ -454,7 +454,9 @@ class SAMLConfiguration(ConfigurationModel):
         other_config = json.loads(self.other_config_str)
         if name in ("TECHNICAL_CONTACT", "SUPPORT_CONTACT"):
             contact = {
-                "givenName": "{} Support".format(get_themed_value('PLATFORM_NAME', settings.PLATFORM_NAME)),
+                "givenName": "{} Support".format(
+                    configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),
+                ),
                 "emailAddress": settings.TECH_SUPPORT_EMAIL
             }
             contact.update(other_config.get(name, {}))

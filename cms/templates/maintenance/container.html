@@ -12,17 +12,22 @@ from openedx.core.djangolib.js_utils import js_escaped_string
 </h3>
 </%block>
 
-<%block name="js_extra">
-   <script src="${static.url('js/maintenance/force_publish.js')}"></script>
-</%block>
-
 <%block name="viewcontent">
 <section class="container maintenance-content">
     <%include file="_${view['slug']}.html"/>
-    <%block name="requirejs">
-      require(["js/maintenance/${view['slug'] | n, js_escaped_string}"], function(MaintenanceFactory) {
-          MaintenanceFactory("${reverse(view['url']) | n, js_escaped_string}");
-      });
-    </%block>
 </section>
+</%block>
+
+<%block name="header_extras">
+% for template_name in ["force-published-course-response"]:
+<script type="text/template" id="${template_name}-tpl">
+    <%static:include path="js/maintenance/${template_name}.underscore" />
+</script>
+% endfor
+</%block>
+
+<%block name="requirejs">
+  require(["js/maintenance/${view['slug'] | n, js_escaped_string}"], function(MaintenanceFactory) {
+      MaintenanceFactory("${reverse(view['url']) | n, js_escaped_string}");
+  });
 </%block>

@@ -9,10 +9,9 @@ import urllib
 
 from django.conf import settings
 from django.http import HttpResponse
-from django.shortcuts import redirect
 from django.utils.translation import ugettext as _
 
-from edxmako.shortcuts import render_to_string, render_to_response
+from edxmako.shortcuts import render_to_string
 from opaque_keys.edx.keys import UsageKey
 from xblock.core import XBlock
 import dogstats_wrapper as dog_stats_api

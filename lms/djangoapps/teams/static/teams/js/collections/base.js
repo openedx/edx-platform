@@ -1,9 +1,9 @@
-;(function (define) {
+(function(define) {
     'use strict';
     define(['edx-ui-toolkit/js/pagination/paging-collection'],
         function(PagingCollection) {
             var BaseCollection = PagingCollection.extend({
-                constructor: function (models, options) {
+                constructor: function(models, options) {
                     this.options = options;
                     this.url = options.url;
                     if (options.perPage) {
@@ -17,8 +17,8 @@
                     this.queryParams = _.extend({}, BaseCollection.prototype.queryParams, this.queryParams);
                     PagingCollection.prototype.constructor.call(this, models, options);
                 },
-                
-                parse: function (response, options) {
+
+                parse: function(response, options) {
                     if (!response) {
                         response = {};
                     }
@@ -37,11 +37,11 @@
 
                 // TODO: These changes has been added to backbone.paginator
                 // remove when backbone.paginator gets a new release
-                sync: function (method, model, options) {
+                sync: function(method, model, options) {
                     // do not send total pages and total records in request
                     if (method === 'read') {
                         var params = _.values(_.pick(this.queryParams, ['totalPages', 'totalRecords']));
-                        _.each(params, function (param) {
+                        _.each(params, function(param) {
                             delete options.data[param];
                         });
                     }

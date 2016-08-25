@@ -152,7 +152,7 @@ class TestUserCourseBadgeAssertions(UserAssertionTestCase):
         self.check_assertion_structure(assertion, response['results'][0])
 
 
-@attr('shard_3')
+@attr(shard=3)
 @ddt
 class TestUserBadgeAssertionsByClass(UserAssertionTestCase):
     """

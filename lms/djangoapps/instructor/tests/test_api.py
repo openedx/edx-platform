@@ -11,7 +11,6 @@ import io
 import json
 import shutil
 import tempfile
-from urllib import quote
 
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -40,7 +39,6 @@ from courseware.tests.factories import (
 from courseware.tests.helpers import LoginEnrollmentTestCase
 from django_comment_common.models import FORUM_ROLE_COMMUNITY_TA
 from django_comment_common.utils import seed_permissions_roles
-from microsite_configuration import microsite
 from shoppingcart.models import (
     RegistrationCodeRedemption, Order, CouponRedemption,
     PaidCourseRegistration, Coupon, Invoice, CourseRegistrationCode, CourseRegistrationCodeInvoiceItem,
@@ -71,6 +69,7 @@ from certificates.models import CertificateStatuses
 
 from openedx.core.djangoapps.course_groups.cohorts import set_course_cohort_settings
 from openedx.core.lib.xblock_utils import grade_histogram
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 from .test_tools import msk_from_problem_urlname
 
@@ -227,7 +226,7 @@ def view_alreadyrunningerror(request):  # pylint: disable=unused-argument
     raise AlreadyRunningError()
 
 
-@attr('shard_1')
+@attr(shard=1)
 class TestCommonExceptions400(TestCase):
     """
     Testing the common_exceptions_400 decorator.
@@ -269,7 +268,7 @@ class TestCommonExceptions400(TestCase):
         self.assertIn("Task is already running", result["error"])
 
 
-@attr('shard_1')
+@attr(shard=1)
 @ddt.ddt
 class TestEndpointHttpMethods(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     """
@@ -324,7 +323,7 @@ class TestEndpointHttpMethods(SharedModuleStoreTestCase, LoginEnrollmentTestCase
         )
 
 
-@attr('shard_1')
+@attr(shard=1)
 @patch('bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message', autospec=True))
 class TestInstructorAPIDenyLevels(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     """
@@ -529,7 +528,7 @@ class TestInstructorAPIDenyLevels(SharedModuleStoreTestCase, LoginEnrollmentTest
             )
 
 
-@attr('shard_1')
+@attr(shard=1)
 @patch.dict(settings.FEATURES, {'ALLOW_AUTOMATED_SIGNUPS': True})
 class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     """
@@ -942,7 +941,7 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
             self.assertEqual(enrollment.enrollment.mode, CourseMode.DEFAULT_SHOPPINGCART_MODE_SLUG)
 
 
-@attr('shard_1')
+@attr(shard=1)
 @ddt.ddt
 class TestInstructorAPIEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     """
@@ -958,7 +957,7 @@ class TestInstructorAPIEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTest
         cls.course = CourseFactory.create()
 
         # Email URL values
-        cls.site_name = microsite.get_value(
+        cls.site_name = configuration_helpers.get_value(
             'SITE_NAME',
             settings.SITE_NAME
         )
@@ -1698,7 +1697,7 @@ class TestInstructorAPIEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTest
         return response
 
 
-@attr('shard_1')
+@attr(shard=1)
 @ddt.ddt
 class TestInstructorAPIBulkBetaEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     """
@@ -1709,7 +1708,7 @@ class TestInstructorAPIBulkBetaEnrollment(SharedModuleStoreTestCase, LoginEnroll
         super(TestInstructorAPIBulkBetaEnrollment, cls).setUpClass()
         cls.course = CourseFactory.create()
         # Email URL values
-        cls.site_name = microsite.get_value(
+        cls.site_name = configuration_helpers.get_value(
             'SITE_NAME',
             settings.SITE_NAME
         )
@@ -2022,7 +2021,7 @@ class TestInstructorAPIBulkBetaEnrollment(SharedModuleStoreTestCase, LoginEnroll
         )
 
 
-@attr('shard_1')
+@attr(shard=1)
 class TestInstructorAPILevelsAccess(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Test endpoints whereby instructors can change permissions
@@ -2264,7 +2263,7 @@ class TestInstructorAPILevelsAccess(SharedModuleStoreTestCase, LoginEnrollmentTe
             self.assertNotIn(rolename, user_roles)
 
 
-@attr('shard_1')
+@attr(shard=1)
 @ddt.ddt
 @patch.dict('django.conf.settings.FEATURES', {'ENABLE_PAID_COURSE_REGISTRATION': True})
 class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
@@ -2323,7 +2322,7 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
         response = self.client.get(redeem_url)
         self.assertEquals(response.status_code, 200)
         # check button text
-        self.assertTrue('Activate Course Enrollment' in response.content)
+        self.assertIn('Activate Course Enrollment', response.content)
 
         response = self.client.post(redeem_url)
         self.assertEquals(response.status_code, 200)
@@ -3111,7 +3110,7 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
         self.assertEqual(response.status_code, 400)
 
 
-@attr('shard_1')
+@attr(shard=1)
 class TestInstructorAPIRegradeTask(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Test endpoints whereby instructors can change student grades.
@@ -3274,7 +3273,7 @@ class TestInstructorAPIRegradeTask(SharedModuleStoreTestCase, LoginEnrollmentTes
         self.assertEqual(response.status_code, 400)
 
 
-@attr('shard_1')
+@attr(shard=1)
 @patch.dict(settings.FEATURES, {'ENTRANCE_EXAMS': True})
 @ddt.ddt
 class TestEntranceExamInstructorAPIRegradeTask(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
@@ -3368,7 +3367,7 @@ class TestEntranceExamInstructorAPIRegradeTask(SharedModuleStoreTestCase, LoginE
         self.assertEqual(grades[0], (50.0, 1))
         self.assertEqual(grades[1], (100.0, 1))
 
-    def test_reset_entrance_exam_student_attempts_deletall(self):
+    def test_reset_entrance_exam_student_attempts_delete_all(self):
         """ Make sure no one can delete all students state on entrance exam. """
         url = reverse('reset_student_attempts_for_entrance_exam',
                       kwargs={'course_id': unicode(self.course.id)})
@@ -3415,7 +3414,7 @@ class TestEntranceExamInstructorAPIRegradeTask(SharedModuleStoreTestCase, LoginE
         })
         self.assertEqual(response.status_code, 400)
 
-    def test_entrance_exam_sttudent_delete_state(self):
+    def test_entrance_exam_student_delete_state(self):
         """ Test delete single student entrance exam state. """
         url = reverse('reset_student_attempts_for_entrance_exam',
                       kwargs={'course_id': unicode(self.course.id)})
@@ -3547,7 +3546,7 @@ class TestEntranceExamInstructorAPIRegradeTask(SharedModuleStoreTestCase, LoginE
         self.assertContains(response, message)
 
 
-@attr('shard_1')
+@attr(shard=1)
 @patch('bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message', autospec=True))
 class TestInstructorSendEmail(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     """
@@ -3649,7 +3648,7 @@ class MockCompletionInfo(object):
         return False, 'Task Errored In Some Way'
 
 
-@attr('shard_1')
+@attr(shard=1)
 class TestInstructorAPITaskLists(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Test instructor task list endpoint.
@@ -3811,7 +3810,7 @@ class TestInstructorAPITaskLists(SharedModuleStoreTestCase, LoginEnrollmentTestC
         self.assertEqual(actual_tasks, expected_tasks)
 
 
-@attr('shard_1')
+@attr(shard=1)
 @patch.object(instructor_task.api, 'get_instructor_task_history', autospec=True)
 class TestInstructorEmailContentList(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     """
@@ -3945,7 +3944,7 @@ class TestInstructorEmailContentList(SharedModuleStoreTestCase, LoginEnrollmentT
         self.assertDictEqual(expected_info, returned_info)
 
 
-@attr('shard_1')
+@attr(shard=1)
 class TestInstructorAPIHelpers(TestCase):
     """ Test helpers for instructor.api """
 
@@ -3999,7 +3998,7 @@ def get_extended_due(course, unit, user):
         return None
 
 
-@attr('shard_1')
+@attr(shard=1)
 class TestDueDateExtensions(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Test data dumps for reporting.
@@ -4168,7 +4167,7 @@ class TestDueDateExtensions(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
                 self.user1.profile.name, self.user1.username)})
 
 
-@attr('shard_1')
+@attr(shard=1)
 class TestDueDateExtensionsDeletedDate(ModuleStoreTestCase, LoginEnrollmentTestCase):
     def setUp(self):
         """
@@ -4276,7 +4275,7 @@ class TestDueDateExtensionsDeletedDate(ModuleStoreTestCase, LoginEnrollmentTestC
         )
 
 
-@attr('shard_1')
+@attr(shard=1)
 class TestCourseIssuedCertificatesData(SharedModuleStoreTestCase):
     """
     Test data dumps for issued certificates.
@@ -4387,7 +4386,7 @@ class TestCourseIssuedCertificatesData(SharedModuleStoreTestCase):
         )
 
 
-@attr('shard_1')
+@attr(shard=1)
 @override_settings(REGISTRATION_CODE_LENGTH=8)
 class TestCourseRegistrationCodes(SharedModuleStoreTestCase):
     """
@@ -4850,7 +4849,7 @@ class TestCourseRegistrationCodes(SharedModuleStoreTestCase):
         self.assertTrue(body.startswith(EXPECTED_COUPON_CSV_HEADER))
 
 
-@attr('shard_1')
+@attr(shard=1)
 class TestBulkCohorting(SharedModuleStoreTestCase):
     """
     Test adding users to cohorts in bulk via CSV upload.

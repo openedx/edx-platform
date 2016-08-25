@@ -10,15 +10,15 @@ from nose.plugins.attrib import attr
 from unittest import skipIf, skip
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.action_chains import ActionChains
-from ..helpers import UniqueCourseTest, is_youtube_available, YouTubeStubConfig
-from ...pages.lms.video.video import VideoPage
-from ...pages.lms.tab_nav import TabNavPage
-from ...pages.lms.courseware import CoursewarePage
-from ...pages.lms.course_nav import CourseNavPage
-from ...pages.lms.auto_auth import AutoAuthPage
-from ...pages.lms.course_info import CourseInfoPage
-from ...fixtures.course import CourseFixture, XBlockFixtureDesc
-from ..helpers import skip_if_browser
+from common.test.acceptance.tests.helpers import UniqueCourseTest, is_youtube_available, YouTubeStubConfig
+from common.test.acceptance.pages.lms.video.video import VideoPage
+from common.test.acceptance.pages.lms.tab_nav import TabNavPage
+from common.test.acceptance.pages.lms.courseware import CoursewarePage
+from common.test.acceptance.pages.lms.course_nav import CourseNavPage
+from common.test.acceptance.pages.lms.auto_auth import AutoAuthPage
+from common.test.acceptance.pages.lms.course_info import CourseInfoPage
+from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
+from common.test.acceptance.tests.helpers import skip_if_browser
 
 from flaky import flaky
 
@@ -198,7 +198,7 @@ class VideoBaseTest(UniqueCourseTest):
         self.video.wait_for_video_player_render()
 
 
-@attr('shard_4')
+@attr(shard=4)
 class YouTubeVideoTest(VideoBaseTest):
     """ Test YouTube Video Player """
 
@@ -935,7 +935,7 @@ class YouTubeVideoTest(VideoBaseTest):
         execute_video_steps(tab1_video_names)
 
 
-@attr('shard_4')
+@attr(shard=4)
 class YouTubeHtml5VideoTest(VideoBaseTest):
     """ Test YouTube HTML5 Video Player """
 
@@ -957,7 +957,7 @@ class YouTubeHtml5VideoTest(VideoBaseTest):
         self.assertTrue(self.video.is_video_rendered('youtube'))
 
 
-@attr('shard_4')
+@attr(shard=4)
 class Html5VideoTest(VideoBaseTest):
     """ Test HTML5 Video Player """
 
@@ -1143,7 +1143,7 @@ class Html5VideoTest(VideoBaseTest):
         self.assertTrue(all([source in HTML5_SOURCES for source in self.video.sources]))
 
 
-@attr('shard_4')
+@attr(shard=4)
 class YouTubeQualityTest(VideoBaseTest):
     """ Test YouTube Video Quality Button """
 
@@ -1192,7 +1192,7 @@ class YouTubeQualityTest(VideoBaseTest):
         self.video.wait_for(lambda: self.video.is_quality_button_active, 'waiting for quality button activation')
 
 
-@attr('shard_4')
+@attr(shard=4)
 class DragAndDropTest(VideoBaseTest):
     """
     Tests draggability of closed captions within videos.

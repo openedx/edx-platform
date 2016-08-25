@@ -1,5 +1,5 @@
 <%! from django.utils.translation import ugettext as _ %>
-<%! from openedx.core.djangoapps.theming.helpers import get_value as get_themed_value %>
+<%! from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers %>
 ${_("Request to change {platform_name} account e-mail").format(
-    platform_name=get_themed_value('PLATFORM_NAME', settings.PLATFORM_NAME)
+    platform_name=configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME)
 )}

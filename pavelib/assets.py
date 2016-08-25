@@ -17,6 +17,7 @@ from watchdog.events import PatternMatchingEventHandler
 
 from .utils.envs import Env
 from .utils.cmd import cmd, django_cmd
+from .utils.timer import timed
 
 from openedx.core.djangoapps.theming.paver_helpers import get_theme_paths
 
@@ -63,6 +64,9 @@ NPM_VENDOR_DIRECTORY = path("common/static/common/js/vendor")
 SASS_LOOKUP_DEPENDENCIES = {
     'cms': [path('lms') / 'static' / 'sass' / 'partials', ],
 }
+
+# Collectstatic log directory setting
+COLLECTSTATIC_LOG_DIR_ARG = "collect_log_dir"
 
 
 def get_sass_directories(system, theme_dir=None):
@@ -384,6 +388,7 @@ def coffeescript_files():
 
 @task
 @no_help
+@timed
 def compile_coffeescript(*files):
     """
     Compile CoffeeScript to JavaScript.
@@ -404,6 +409,7 @@ def compile_coffeescript(*files):
     ('debug', 'd', 'Debug mode'),
     ('force', '', 'Force full compilation'),
 ])
+@timed
 def compile_sass(options):
     """
     Compile Sass to CSS. If command is called without any arguments, it will
@@ -585,23 +591,6 @@ def _compile_sass(system, theme, debug, force, timing_info):
     return True
 
 
-def compile_templated_sass(systems, settings):
-    """
-    Render Mako templates for Sass files.
-    `systems` is a list of systems (e.g. 'lms' or 'studio' or both)
-    `settings` is the Django settings module to use.
-    """
-    for system in systems:
-        if system == "studio":
-            system = "cms"
-        sh(django_cmd(
-            system, settings, 'preprocess_assets',
-            '{system}/static/sass/*.scss'.format(system=system),
-            '{system}/static/themed_sass'.format(system=system)
-        ))
-        print("\t\tFinished preprocessing {} assets.".format(system))
-
-
 def process_npm_assets():
     """
     Process vendor libraries installed via NPM.
@@ -642,15 +631,40 @@ def restart_django_servers():
     ))
 
 
-def collect_assets(systems, settings):
+def collect_assets(systems, settings, **kwargs):
     """
     Collect static assets, including Django pipeline processing.
     `systems` is a list of systems (e.g. 'lms' or 'studio' or both)
     `settings` is the Django settings module to use.
+    `**kwargs` include arguments for using a log directory for collectstatic output. Defaults to /dev/null.
     """
+
     for sys in systems:
-        sh(django_cmd(sys, settings, "collectstatic --noinput > /dev/null"))
+        collectstatic_stdout_str = _collect_assets_cmd(sys, **kwargs)
+        sh(django_cmd(sys, settings, "collectstatic --noinput {logfile_str}".format(
+            logfile_str=collectstatic_stdout_str
+        )))
         print("\t\tFinished collecting {} assets.".format(sys))
+
+
+def _collect_assets_cmd(system, **kwargs):
+    """
+    Returns the collecstatic command to be used for the given system
+
+    Unless specified, collectstatic (which can be verbose) pipes to /dev/null
+    """
+    try:
+        if kwargs[COLLECTSTATIC_LOG_DIR_ARG] is None:
+            collectstatic_stdout_str = ""
+        else:
+            collectstatic_stdout_str = "> {output_dir}/{sys}-collectstatic.log".format(
+                output_dir=kwargs[COLLECTSTATIC_LOG_DIR_ARG],
+                sys=system
+            )
+    except KeyError:
+        collectstatic_stdout_str = "> /dev/null"
+
+    return collectstatic_stdout_str
 
 
 def execute_compile_sass(args):
@@ -683,6 +697,7 @@ def execute_compile_sass(args):
     ('theme-dirs=', '-td', 'The themes dir containing all themes (defaults to None)'),
     ('themes=', '-t', 'The themes to add sass watchers for (defaults to None)'),
 ])
+@timed
 def watch_assets(options):
     """
     Watch for changes to asset files, and regenerate js/css
@@ -731,6 +746,7 @@ def watch_assets(options):
     'pavelib.prereqs.install_node_prereqs',
 )
 @consume_args
+@timed
 def update_assets(args):
     """
     Compile CoffeeScript and Sass, then collect static assets.
@@ -764,9 +780,13 @@ def update_assets(args):
         '--themes', type=str, nargs='+', default=None,
         help="list of themes to compile sass for",
     )
+    parser.add_argument(
+        '--collect-log', dest=COLLECTSTATIC_LOG_DIR_ARG, default=None,
+        help="When running collectstatic, direct output to specified log directory",
+    )
     args = parser.parse_args(args)
+    collect_log_args = {}
 
-    compile_templated_sass(args.system, args.settings)
     process_xmodule_assets()
     process_npm_assets()
     compile_coffeescript()
@@ -775,7 +795,13 @@ def update_assets(args):
     execute_compile_sass(args)
 
     if args.collect:
-        collect_assets(args.system, args.settings)
+        if args.debug:
+            collect_log_args.update({COLLECTSTATIC_LOG_DIR_ARG: None})
+
+        if args.collect_log_dir:
+            collect_log_args.update({COLLECTSTATIC_LOG_DIR_ARG: args.collect_log_dir})
+
+        collect_assets(args.system, args.settings, **collect_log_args)
 
     if args.watch:
         call_task(

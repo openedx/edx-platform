@@ -5,10 +5,10 @@ End-to-end tests for the main LMS Dashboard (aka, Student Dashboard).
 import datetime
 from nose.plugins.attrib import attr
 
-from ..helpers import UniqueCourseTest, generate_course_key
-from ...fixtures.course import CourseFixture
-from ...pages.lms.auto_auth import AutoAuthPage
-from ...pages.lms.dashboard import DashboardPage
+from common.test.acceptance.tests.helpers import UniqueCourseTest, generate_course_key
+from common.test.acceptance.fixtures.course import CourseFixture
+from common.test.acceptance.pages.lms.auto_auth import AutoAuthPage
+from common.test.acceptance.pages.lms.dashboard import DashboardPage
 
 DEFAULT_SHORT_DATE_FORMAT = "%b %d, %Y"
 DEFAULT_DAY_AND_TIME_FORMAT = "%A at %-I%P"

@@ -194,7 +194,7 @@ class GenerateIntIdTestCase(TestCase):
         """
         minimum = 1
         maximum = times
-        for i in range(times):
+        for __ in range(times):
             self.assertIn(generate_int_id(minimum, maximum), range(minimum, maximum + 1))
 
     @ddt.data(10)
@@ -206,7 +206,7 @@ class GenerateIntIdTestCase(TestCase):
         minimum = 1
         maximum = times
         used_ids = {2, 4, 6, 8}
-        for i in range(times):
+        for __ in range(times):
             int_id = generate_int_id(minimum, maximum, used_ids)
             self.assertIn(int_id, list(set(range(minimum, maximum + 1)) - used_ids))
 

@@ -27,7 +27,6 @@ from xblock.runtime import KvsFieldData
 from xblock.django.request import webob_to_django_response, django_to_webob_request
 from xblock.exceptions import NoSuchHandlerError
 from xblock.fragment import Fragment
-from student.auth import has_studio_read_access, has_studio_write_access
 from xblock_django.user_service import DjangoXBlockUserService
 
 from lms.djangoapps.lms_xblock.field_data import LmsFieldData

@@ -4,15 +4,14 @@ define([ // jshint ignore:line
     'gettext',
     'common/js/components/utils/view_utils',
     'edx-ui-toolkit/js/utils/string-utils',
-    "edx-ui-toolkit/js/utils/html-utils",
-    'text!templates/maintenance/force-published-course-response.underscore'
+    'edx-ui-toolkit/js/utils/html-utils'
 ],
-function($, _, gettext, ViewUtils, StringUtils, HtmlUtils, ForcePublishedTemplate) {
+function($, _, gettext, ViewUtils, StringUtils, HtmlUtils) {
     'use strict';
-    return function (maintenanceViewURL) {
-
+    return function(maintenanceViewURL) {
+        var showError;
         // Reset values
-        $('#reset-button').click(function (e) {
+        $('#reset-button').click(function(e) {
             e.preventDefault();
             $('#course-id').val('');
             $('#dry-run').prop('checked', true);
@@ -20,60 +19,58 @@ function($, _, gettext, ViewUtils, StringUtils, HtmlUtils, ForcePublishedTemplat
             $('#result-container').html('');
         });
 
-        var showError = function(containerElSelector, error){
-            var errorWrapperElSelector = containerElSelector + ' .wrapper-error';
-            var errorHtml = '<div class="error" aria-live="polite" id="course-id-error">' + error + '</div>';
-            HtmlUtils.setHtml(
-                $(errorWrapperElSelector),
-                HtmlUtils.HTML(errorHtml)
-            );
+        showError = function(containerElSelector, error) {
+            var errorWrapperElSelector, errorHtml;
+            errorWrapperElSelector = containerElSelector + ' .wrapper-error';
+            errorHtml = '<div class="error" aria-live="polite" id="course-id-error">' + error + '</div>';
+            HtmlUtils.setHtml($(errorWrapperElSelector), HtmlUtils.HTML(errorHtml));
             $(errorWrapperElSelector).css('display', 'inline-block');
             $(errorWrapperElSelector).fadeOut(5000);
         };
 
         $('form#force_publish').submit(function(event) {
-
+            var attrs, forcePublishedTemplate, $submitButton, deferred, promise, data;
             event.preventDefault();
 
             // clear out result container
             $('#result-container').html('');
 
-            var submitButton = $('#submit_force_publish'),
-                deferred = new $.Deferred(),
-                promise = deferred.promise();
-            ViewUtils.disableElementWhileRunning(submitButton, function() { return promise; });
+            $submitButton = $('#submit_force_publish');
+            deferred = new $.Deferred();
+            promise = deferred.promise();
 
-            var data = $('#force_publish').serialize();
+            data = $('#force_publish').serialize();
+
+            // disable submit button while executing.
+            ViewUtils.disableElementWhileRunning($submitButton, function() { return promise; });
 
             $.ajax({
-                type:'POST',
+                type: 'POST',
                 url: maintenanceViewURL,
                 dataType: 'json',
-                data: data,
+                data: data
             })
             .done(function(response) {
-                if(response.error){
+                if (response.error) {
                     showError('#course-id-container', response.msg);
-                }
-                else {
-                    if(response.msg) {
+                } else {
+                    if (response.msg) {
                         showError('#result-error', response.msg);
-                    }
-                    else{
-                        var attrs = $.extend({}, response, {StringUtils: StringUtils});
-                        HtmlUtils.setHtml(
-                            $('#result-container'),
-                            HtmlUtils.template(ForcePublishedTemplate)(attrs)
+                    } else {
+                        attrs = $.extend({}, response, {StringUtils: StringUtils});
+                        forcePublishedTemplate = HtmlUtils.template(
+                            $('#force-published-course-response-tpl').text()
                         );
+                        HtmlUtils.setHtml($('#result-container'), forcePublishedTemplate(attrs));
                     }
                 }
             })
-            .fail(function(response) {  // jshint ignore:line
+            .fail(function() {
                 // response.responseText here because it would show some strange output, it may output Traceback
                 // sometimes if unexpected issue arises. Better to show just internal error when getting 500 error.
                 showError('#result-error', gettext('Internal Server Error.'));
             })
-            .always(function(response) { // jshint ignore:line
+            .always(function() {
                 deferred.resolve();
             });
         });

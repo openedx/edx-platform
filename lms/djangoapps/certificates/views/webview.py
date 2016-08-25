@@ -20,10 +20,10 @@ from courseware.access import has_access
 from edxmako.shortcuts import render_to_response
 from edxmako.template import Template
 from eventtracking import tracker
-from microsite_configuration import microsite
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from openedx.core.lib.courses import course_image_url
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from student.models import LinkedInAddToProfileConfiguration
 from util import organizations_helpers as organization_api
 from util.views import handle_500
@@ -44,7 +44,6 @@ from certificates.models import (
     CertificateStatuses,
     CertificateHtmlViewConfiguration,
     CertificateSocialNetworks)
-
 
 log = logging.getLogger(__name__)
 
@@ -250,9 +249,9 @@ def _update_social_context(request, context, course, user, user_certificate, pla
     """
     Updates context dictionary with info required for social sharing.
     """
-    share_settings = microsite.get_value("SOCIAL_SHARING_SETTINGS", settings.SOCIAL_SHARING_SETTINGS)
+    share_settings = configuration_helpers.get_value("SOCIAL_SHARING_SETTINGS", settings.SOCIAL_SHARING_SETTINGS)
     context['facebook_share_enabled'] = share_settings.get('CERTIFICATE_FACEBOOK', False)
-    context['facebook_app_id'] = microsite.get_value("FACEBOOK_APP_ID", settings.FACEBOOK_APP_ID)
+    context['facebook_app_id'] = configuration_helpers.get_value("FACEBOOK_APP_ID", settings.FACEBOOK_APP_ID)
     context['facebook_share_text'] = share_settings.get(
         'CERTIFICATE_FACEBOOK_TEXT',
         _("I completed the {course_title} course on {platform_name}.").format(
@@ -420,14 +419,13 @@ def _render_certificate_template(request, context, course, user_certificate):
     return render_to_response("certificates/valid.html", context)
 
 
-def _update_microsite_context(context, configuration):
+def _update_configuration_context(context, configuration):
     """
-    Updates context with microsites data.
-    Microsites will need to be able to override any hard coded
+    Site Configuration will need to be able to override any hard coded
     content that was put into the context in the
     _update_certificate_context() call above. For example the
     'company_about_description' talks about edX, which we most likely
-    do not want to keep in a microsite
+    do not want to keep in configurations.
     So we need to re-apply any configuration/content that
     we are sourcing from the database. This is somewhat duplicative of
     the code at the beginning of this method, but we
@@ -435,10 +433,10 @@ def _update_microsite_context(context, configuration):
     require that to be set up early on in the pipeline
     """
 
-    microsite_config_key = microsite.get_value('domain_prefix')
-    microsites_config = configuration.get("microsites", {})
-    if microsite_config_key and microsites_config:
-        context.update(microsites_config.get(microsite_config_key, {}))
+    config_key = configuration_helpers.get_value('domain_prefix')
+    config = configuration.get("microsites", {})
+    if config_key and config:
+        context.update(config.get(config_key, {}))
 
 
 def _update_badge_context(context, course, user):
@@ -502,7 +500,7 @@ def render_html_view(request, user_id, course_id):
         raise Http404
 
     preview_mode = request.GET.get('preview', None)
-    platform_name = microsite.get_value("platform_name", settings.PLATFORM_NAME)
+    platform_name = configuration_helpers.get_value("platform_name", settings.PLATFORM_NAME)
     configuration = CertificateHtmlViewConfiguration.get_config()
     # Create the initial view context, bootstrapping with Django settings and passed-in values
     context = {}
@@ -578,8 +576,8 @@ def render_html_view(request, user_id, course_id):
     # Append badge info
     _update_badge_context(context, course, user)
 
-    # Append microsite overrides
-    _update_microsite_context(context, configuration)
+    # Append site configuration overrides
+    _update_configuration_context(context, configuration)
 
     # Add certificate header/footer data to current context
     context.update(get_certificate_header_context(is_secure=request.is_secure()))

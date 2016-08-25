@@ -5,12 +5,12 @@ import uuid
 from bok_choy.web_app_test import WebAppTest
 from nose.plugins.attrib import attr
 
-from ...pages.studio.auto_auth import AutoAuthPage
-from ...pages.studio.index import DashboardPage
-from ...pages.studio.overview import CourseOutlinePage
+from common.test.acceptance.pages.studio.auto_auth import AutoAuthPage
+from common.test.acceptance.pages.studio.index import DashboardPage
+from common.test.acceptance.pages.studio.overview import CourseOutlinePage
 
 
-@attr('shard_8')
+@attr(shard=8)
 class CreateCourseTest(WebAppTest):
     """
     Test that we can create a new course the studio home page.

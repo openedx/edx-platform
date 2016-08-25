@@ -2,18 +2,17 @@ define(['jquery', 'js/factories/login', 'edx-ui-toolkit/js/utils/spec-helpers/aj
         'common/js/components/utils/view_utils'],
 function($, LoginFactory, AjaxHelpers, ViewUtils) {
     'use strict';
-    describe("Studio Login Page", function() {
+    describe('Studio Login Page', function() {
         var submitButton;
 
         beforeEach(function() {
             loadFixtures('mock/login.underscore');
-            /*jshint unused: false*/
-            var login_factory = new LoginFactory("/home/");
+            var login_factory = new LoginFactory('/home/');
             submitButton = $('#submit');
         });
 
         it('disable the submit button once it is clicked', function() {
-            spyOn(ViewUtils, 'redirect').and.callFake(function(){});
+            spyOn(ViewUtils, 'redirect').and.callFake(function() {});
             var requests = AjaxHelpers.requests(this);
             expect(submitButton).not.toHaveClass('is-disabled');
             submitButton.click();

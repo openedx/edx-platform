@@ -68,7 +68,7 @@ class MarketingSiteViewTests(TestCase):
 
         # check response with branding
         resp = self.client.get(url, HTTP_HOST=settings.MICROSITE_TEST_HOSTNAME)
-        self.assertContains(resp, settings.MICROSITE_CONFIGURATION['test_microsite']['email_from_address'])
+        self.assertContains(resp, settings.MICROSITE_CONFIGURATION['test_site']['email_from_address'])
 
     def test_500_microsites(self):
         """
@@ -84,12 +84,12 @@ class MarketingSiteViewTests(TestCase):
         self.assertContains(
             resp,
             'There has been a 500 error on the <em>{platform_name}</em> servers'.format(
-                platform_name=settings.MICROSITE_CONFIGURATION['test_microsite']['platform_name']
+                platform_name=settings.MICROSITE_CONFIGURATION['test_site']['platform_name']
             ),
             status_code=500
         )
         self.assertContains(
             resp,
-            settings.MICROSITE_CONFIGURATION['test_microsite']['email_from_address'],
+            settings.MICROSITE_CONFIGURATION['test_site']['email_from_address'],
             status_code=500
         )

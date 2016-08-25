@@ -10,7 +10,6 @@ import pytz
 
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
-from django.test.utils import override_settings
 from django.utils.translation import ugettext as _
 
 from contentstore.courseware_index import CoursewareSearchIndexer, SearchIndexingError
@@ -150,14 +149,14 @@ class TestCourseIndex(CourseTestCase):
 
         # Now verify the first child
         children = json_response['child_info']['children']
-        self.assertTrue(len(children) > 0)
+        self.assertGreater(len(children), 0)
         first_child_response = children[0]
         self.assertEqual(first_child_response['category'], 'chapter')
         self.assertEqual(first_child_response['id'], unicode(chapter.location))
         self.assertEqual(first_child_response['display_name'], 'Week 1')
         self.assertTrue(json_response['published'])
         self.assertEqual(first_child_response['visibility_state'], VisibilityState.unscheduled)
-        self.assertTrue(len(first_child_response['child_info']['children']) > 0)
+        self.assertGreater(len(first_child_response['child_info']['children']), 0)
 
         # Finally, validate the entire response for consistency
         self.assert_correct_json_response(json_response)
@@ -352,14 +351,14 @@ class TestCourseOutline(CourseTestCase):
 
         # Now verify the first child
         children = json_response['child_info']['children']
-        self.assertTrue(len(children) > 0)
+        self.assertGreater(len(children), 0)
         first_child_response = children[0]
         self.assertEqual(first_child_response['category'], 'chapter')
         self.assertEqual(first_child_response['id'], unicode(self.chapter.location))
         self.assertEqual(first_child_response['display_name'], 'Week 1')
         self.assertTrue(json_response['published'])
         self.assertEqual(first_child_response['visibility_state'], VisibilityState.unscheduled)
-        self.assertTrue(len(first_child_response['child_info']['children']) > 0)
+        self.assertGreater(len(first_child_response['child_info']['children']), 0)
 
         # Finally, validate the entire response for consistency
         self.assert_correct_json_response(json_response)

@@ -11,7 +11,6 @@ from django.core.urlresolvers import reverse
 from django.test.client import RequestFactory
 import mock
 from nose.plugins.attrib import attr
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from courseware.courses import (
     get_cms_block_link,
@@ -44,7 +43,7 @@ CMS_BASE_TEST = 'testcms'
 TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
 
 
-@attr('shard_1')
+@attr(shard=1)
 @ddt.ddt
 class CoursesTest(ModuleStoreTestCase):
     """Test methods related to fetching courses."""
@@ -89,13 +88,13 @@ class CoursesTest(ModuleStoreTestCase):
         """
         Verify that org filtering performs as expected, and that an empty result
         is returned if the org passed by the caller does not match the designated
-        microsite org.
+        org.
         """
         primary = 'primary'
         alternate = 'alternate'
 
         def _fake_get_value(value, default=None):
-            """Used to stub out microsite.get_value()."""
+            """Used to stub out site_configuration.helpers.get_value()."""
             if value == 'course_org_filter':
                 return alternate
 
@@ -120,17 +119,20 @@ class CoursesTest(ModuleStoreTestCase):
             all(course.org == primary_course.org for course in filtered_courses)
         )
 
-        with mock.patch('microsite_configuration.microsite.get_value', autospec=True) as mock_get_value:
+        with mock.patch(
+            'openedx.core.djangoapps.site_configuration.helpers.get_value',
+            autospec=True,
+        ) as mock_get_value:
             mock_get_value.side_effect = _fake_get_value
 
-            # Request filtering for an org distinct from the designated microsite org.
+            # Request filtering for an org distinct from the designated org.
             no_courses = get_courses(user, org=primary)
             self.assertEqual(no_courses, [])
 
-            # Request filtering for an org matching the designated microsite org.
-            microsite_courses = get_courses(user, org=alternate)
+            # Request filtering for an org matching the designated org.
+            site_courses = get_courses(user, org=alternate)
             self.assertTrue(
-                all(course.org == alternate_course.org for course in microsite_courses)
+                all(course.org == alternate_course.org for course in site_courses)
             )
 
     def test_get_courses_with_filter(self):
@@ -158,7 +160,7 @@ class CoursesTest(ModuleStoreTestCase):
             )
 
 
-@attr('shard_1')
+@attr(shard=1)
 class ModuleStoreBranchSettingTest(ModuleStoreTestCase):
     """Test methods related to the modulestore branch setting."""
     @mock.patch(
@@ -184,7 +186,7 @@ class ModuleStoreBranchSettingTest(ModuleStoreTestCase):
         self.assertEqual(_get_modulestore_branch_setting(), 'fake_default_branch')
 
 
-@attr('shard_1')
+@attr(shard=1)
 @override_settings(CMS_BASE=CMS_BASE_TEST)
 class MongoCourseImageTestCase(ModuleStoreTestCase):
     """Tests for course image URLs when using a mongo modulestore."""
@@ -240,7 +242,7 @@ class MongoCourseImageTestCase(ModuleStoreTestCase):
         )
 
 
-@attr('shard_1')
+@attr(shard=1)
 class XmlCourseImageTestCase(XModuleXmlImportTest):
     """Tests for course image URLs when using an xml modulestore."""
 
@@ -258,7 +260,7 @@ class XmlCourseImageTestCase(XModuleXmlImportTest):
         self.assertEquals(course_image_url(course), u'/static/xml_test_course/before after.jpg')
 
 
-@attr('shard_1')
+@attr(shard=1)
 class CoursesRenderTest(ModuleStoreTestCase):
     """Test methods related to rendering courses content."""
 
@@ -304,7 +306,7 @@ class CoursesRenderTest(ModuleStoreTestCase):
             self.assertIn("this module is temporarily unavailable", course_about)
 
 
-@attr('shard_1')
+@attr(shard=1)
 @ddt.ddt
 class CourseInstantiationTests(ModuleStoreTestCase):
     """

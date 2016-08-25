@@ -16,12 +16,11 @@ class ProgramsApiConfigMixin(object):
         'internal_service_url': 'http://internal.programs.org/',
         'public_service_url': 'http://public.programs.org/',
         'cache_ttl': 0,
-        'enable_student_dashboard': True,
         'enable_studio_tab': True,
         'enable_certification': True,
-        'xseries_ad_enabled': True,
         'program_listing_enabled': True,
         'program_details_enabled': True,
+        'marketing_path': 'foo',
     }
 
     def create_programs_config(self, **kwargs):
@@ -99,11 +98,13 @@ class ProgramsDataMixin(object):
         ]
     }
 
-    def mock_programs_api(self, data=None, status_code=200):
+    def mock_programs_api(self, data=None, program_id='', status_code=200):
         """Utility for mocking out Programs API URLs."""
         self.assertTrue(httpretty.is_enabled(), msg='httpretty must be enabled to mock Programs API calls.')
 
         url = ProgramsApiConfig.current().internal_api_url.strip('/') + '/programs/'
+        if program_id:
+            url += '{}/'.format(str(program_id))
 
         if data is None:
             data = self.PROGRAMS_API_RESPONSE

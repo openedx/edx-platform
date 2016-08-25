@@ -8,7 +8,7 @@ from ..cache import BlockStructureCache
 from .helpers import ChildrenMapTestMixin, MockCache, MockTransformer
 
 
-@attr('shard_2')
+@attr(shard=2)
 class TestBlockStructureCache(ChildrenMapTestMixin, TestCase):
     """
     Tests for BlockStructureCache

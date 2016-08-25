@@ -23,11 +23,10 @@ from email.mime.multipart import MIMEMultipart
 from eventtracking import tracker
 from edxmako.shortcuts import render_to_string
 from edxmako.template import Template
-from microsite_configuration import microsite
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
 from openedx.core.djangoapps.credit.models import CreditConfig, CreditProvider
 from xmodule.modulestore.django import modulestore
-from openedx.core.djangoapps.theming import helpers as theming_helpers
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 
 log = logging.getLogger(__name__)
@@ -73,7 +72,7 @@ def send_credit_notifications(username, course_key):
     providers_string = make_providers_strings(providers_names)
     context = {
         'full_name': user.get_full_name(),
-        'platform_name': theming_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),
+        'platform_name': configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),
         'course_name': course_display_name,
         'branded_logo': logo_image_id,
         'dashboard_link': dashboard_link,
@@ -125,7 +124,7 @@ def send_credit_notifications(username, course_key):
         notification_msg.attach(logo_image)
 
     # add email addresses of sender and receiver
-    from_address = theming_helpers.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL)
+    from_address = configuration_helpers.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL)
     to_address = user.email
 
     # send the root email message
@@ -186,7 +185,7 @@ def _email_url_parser(url_name, extra_param=None):
     Returns:
         str
     """
-    site_name = microsite.get_value('SITE_NAME', settings.SITE_NAME)
+    site_name = configuration_helpers.get_value('SITE_NAME', settings.SITE_NAME)
     dashboard_url_path = reverse(url_name) + extra_param if extra_param else reverse(url_name)
     dashboard_link_parts = ("https", site_name, dashboard_url_path, '', '', '')
     return urlparse.urlunparse(dashboard_link_parts)

@@ -75,6 +75,12 @@ FEATURES['EMBARGO'] = True
 
 FEATURES['ENABLE_COMBINED_LOGIN_REGISTRATION'] = True
 
+# Enable the milestones app in tests to be consistent with it being enabled in production
+FEATURES['MILESTONES_APP'] = True
+
+# Enable persistent subsection grades, so that feature can be tested.
+FEATURES['ENABLE_SUBSECTION_GRADES_SAVED'] = True
+
 # Need wiki for courseware views to work. TODO (vshnayder): shouldn't need it.
 WIKI_ENABLED = True
 
@@ -423,56 +429,56 @@ SITE_NAME = "edx.org"
 
 # set up some testing for microsites
 FEATURES['USE_MICROSITES'] = True
-MICROSITE_ROOT_DIR = COMMON_ROOT / 'test' / 'test_microsites'
+MICROSITE_ROOT_DIR = COMMON_ROOT / 'test' / 'test_sites'
 MICROSITE_CONFIGURATION = {
-    "test_microsite": {
-        "domain_prefix": "testmicrosite",
-        "university": "test_microsite",
-        "platform_name": "Test Microsite",
-        "logo_image_url": "test_microsite/images/header-logo.png",
-        "email_from_address": "test_microsite@edx.org",
-        "payment_support_email": "test_microsite@edx.org",
+    "test_site": {
+        "domain_prefix": "test-site",
+        "university": "test_site",
+        "platform_name": "Test Site",
+        "logo_image_url": "test_site/images/header-logo.png",
+        "email_from_address": "test_site@edx.org",
+        "payment_support_email": "test_site@edx.org",
         "ENABLE_MKTG_SITE": False,
-        "SITE_NAME": "test_microsite.localhost",
-        "course_org_filter": "TestMicrositeX",
+        "SITE_NAME": "test_site.localhost",
+        "course_org_filter": "TestSiteX",
         "course_about_show_social_links": False,
-        "css_overrides_file": "test_microsite/css/test_microsite.css",
+        "css_overrides_file": "test_site/css/test_site.css",
         "show_partners": False,
         "show_homepage_promo_video": False,
-        "course_index_overlay_text": "This is a Test Microsite Overlay Text.",
-        "course_index_overlay_logo_file": "test_microsite/images/header-logo.png",
-        "homepage_overlay_html": "<h1>This is a Test Microsite Overlay HTML</h1>",
+        "course_index_overlay_text": "This is a Test Site Overlay Text.",
+        "course_index_overlay_logo_file": "test_site/images/header-logo.png",
+        "homepage_overlay_html": "<h1>This is a Test Site Overlay HTML</h1>",
         "ALWAYS_REDIRECT_HOMEPAGE_TO_DASHBOARD_FOR_AUTHENTICATED_USER": False,
         "COURSE_CATALOG_VISIBILITY_PERMISSION": "see_in_catalog",
         "COURSE_ABOUT_VISIBILITY_PERMISSION": "see_about_page",
         "ENABLE_SHOPPING_CART": True,
         "ENABLE_PAID_COURSE_REGISTRATION": True,
-        "SESSION_COOKIE_DOMAIN": "test_microsite.localhost",
+        "SESSION_COOKIE_DOMAIN": "test_site.localhost",
         "LINKEDIN_COMPANY_ID": "test",
         "FACEBOOK_APP_ID": "12345678908",
         "urls": {
-            'ABOUT': 'testmicrosite/about',
-            'PRIVACY': 'testmicrosite/privacy',
-            'TOS_AND_HONOR': 'testmicrosite/tos-and-honor',
+            'ABOUT': 'test-site/about',
+            'PRIVACY': 'test-site/privacy',
+            'TOS_AND_HONOR': 'test-site/tos-and-honor',
         },
     },
-    "microsite_with_logistration": {
+    "site_with_logistration": {
         "domain_prefix": "logistration",
         "university": "logistration",
         "platform_name": "Test logistration",
-        "logo_image_url": "test_microsite/images/header-logo.png",
-        "email_from_address": "test_microsite@edx.org",
-        "payment_support_email": "test_microsite@edx.org",
+        "logo_image_url": "test_site/images/header-logo.png",
+        "email_from_address": "test_site@edx.org",
+        "payment_support_email": "test_site@edx.org",
         "ENABLE_MKTG_SITE": False,
         "ENABLE_COMBINED_LOGIN_REGISTRATION": True,
-        "SITE_NAME": "test_microsite.localhost",
+        "SITE_NAME": "test_site.localhost",
         "course_org_filter": "LogistrationX",
         "course_about_show_social_links": False,
-        "css_overrides_file": "test_microsite/css/test_microsite.css",
+        "css_overrides_file": "test_site/css/test_site.css",
         "show_partners": False,
         "show_homepage_promo_video": False,
         "course_index_overlay_text": "Logistration.",
-        "course_index_overlay_logo_file": "test_microsite/images/header-logo.png",
+        "course_index_overlay_logo_file": "test_site/images/header-logo.png",
         "homepage_overlay_html": "<h1>This is a Logistration HTML</h1>",
         "ALWAYS_REDIRECT_HOMEPAGE_TO_DASHBOARD_FOR_AUTHENTICATED_USER": False,
         "COURSE_CATALOG_VISIBILITY_PERMISSION": "see_in_catalog",
@@ -487,7 +493,7 @@ MICROSITE_CONFIGURATION = {
     }
 }
 
-MICROSITE_TEST_HOSTNAME = 'testmicrosite.testserver'
+MICROSITE_TEST_HOSTNAME = 'test-site.testserver'
 MICROSITE_LOGISTRATION_HOSTNAME = 'logistration.testserver'
 
 TEST_THEME = COMMON_ROOT / "test" / "test-theme"
@@ -495,7 +501,7 @@ TEST_THEME = COMMON_ROOT / "test" / "test-theme"
 # add extra template directory for test-only templates
 MAKO_TEMPLATES['main'].extend([
     COMMON_ROOT / 'test' / 'templates',
-    COMMON_ROOT / 'test' / 'test_microsites',
+    COMMON_ROOT / 'test' / 'test_sites',
     REPO_ROOT / 'openedx' / 'core' / 'djangolib' / 'tests' / 'templates',
 ])
 
@@ -582,3 +588,5 @@ OAUTH2_PROVIDER_APPLICATION_MODEL = 'oauth2_provider.Application'
 COURSE_CATALOG_API_URL = 'https://catalog.example.com/api/v1'
 
 COMPREHENSIVE_THEME_DIRS = [REPO_ROOT / "themes", REPO_ROOT / "common/test"]
+
+LMS_ROOT_URL = "http://localhost:8000"

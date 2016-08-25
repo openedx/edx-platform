@@ -1,3 +1,9 @@
+"""
+Code used to calculate learner grades.
+"""
+
+from __future__ import division
+
 import abc
 import inspect
 import logging
@@ -13,18 +19,26 @@ log = logging.getLogger("edx.courseware")
 Score = namedtuple("Score", "earned possible graded section module_id")
 
 
-def aggregate_scores(scores, section_name="summary"):
+def float_sum(iterable):
+    """
+    Sum the elements of the iterable, and return the result as a float.
+    """
+    return float(sum(iterable))
+
+
+def aggregate_scores(scores, section_name="summary", location=None):
     """
     scores: A list of Score objects
+    location: The location under which all objects in scores are located
     returns: A tuple (all_total, graded_total).
         all_total: A Score representing the total score summed over all input scores
         graded_total: A Score representing the score summed over all graded input scores
     """
-    total_correct_graded = sum(score.earned for score in scores if score.graded)
-    total_possible_graded = sum(score.possible for score in scores if score.graded)
+    total_correct_graded = float_sum(score.earned for score in scores if score.graded)
+    total_possible_graded = float_sum(score.possible for score in scores if score.graded)
 
-    total_correct = sum(score.earned for score in scores)
-    total_possible = sum(score.possible for score in scores)
+    total_correct = float_sum(score.earned for score in scores)
+    total_possible = float_sum(score.possible for score in scores)
 
     #regardless of whether or not it is graded
     all_total = Score(
@@ -32,7 +46,7 @@ def aggregate_scores(scores, section_name="summary"):
         total_possible,
         False,
         section_name,
-        None
+        location,
     )
     #selecting only graded things
     graded_total = Score(
@@ -40,7 +54,7 @@ def aggregate_scores(scores, section_name="summary"):
         total_possible_graded,
         True,
         section_name,
-        None
+        location,
     )
 
     return all_total, graded_total
@@ -207,7 +221,7 @@ class SingleSectionGrader(CourseGrader):
     If the name is not appropriate for the short short_label or category, they each may
     be specified individually.
     """
-    def __init__(self, type, name, short_label=None, category=None):
+    def __init__(self, type, name, short_label=None, category=None):  # pylint: disable=redefined-builtin
         self.type = type
         self.name = name
         self.short_label = short_label or name
@@ -229,7 +243,7 @@ class SingleSectionGrader(CourseGrader):
                 earned = found_score.earned
                 possible = found_score.possible
 
-            percent = earned / float(possible)
+            percent = earned / possible
             detail = u"{name} - {percent:.0%} ({earned:.3n}/{possible:.3n})".format(
                 name=self.name,
                 percent=percent,
@@ -244,10 +258,11 @@ class SingleSectionGrader(CourseGrader):
         breakdown = [{'percent': percent, 'label': self.short_label,
                       'detail': detail, 'category': self.category, 'prominent': True}]
 
-        return {'percent': percent,
-                'section_breakdown': breakdown,
-                #No grade_breakdown here
-                }
+        return {
+            'percent': percent,
+            'section_breakdown': breakdown,
+            #No grade_breakdown here
+        }
 
 
 class AssignmentFormatGrader(CourseGrader):
@@ -284,8 +299,18 @@ class AssignmentFormatGrader(CourseGrader):
     min_count = 2 would produce the labels "Assignment 3", "Assignment 4"
 
     """
-    def __init__(self, type, min_count, drop_count, category=None, section_type=None, short_label=None,
-                 show_only_average=False, hide_average=False, starting_index=1):
+    def __init__(
+            self,
+            type,  # pylint: disable=redefined-builtin
+            min_count,
+            drop_count,
+            category=None,
+            section_type=None,
+            short_label=None,
+            show_only_average=False,
+            hide_average=False,
+            starting_index=1
+    ):
         self.type = type
         self.min_count = min_count
         self.drop_count = drop_count
@@ -330,7 +355,7 @@ class AssignmentFormatGrader(CourseGrader):
                     possible = scores[i].possible
                     section_name = scores[i].section
 
-                percentage = earned / float(possible)
+                percentage = earned / possible
                 summary_format = u"{section_type} {index} - {name} - {percent:.0%} ({earned:.3n}/{possible:.3n})"
                 summary = summary_format.format(
                     index=i + self.starting_index,
@@ -341,7 +366,7 @@ class AssignmentFormatGrader(CourseGrader):
                     possible=float(possible)
                 )
             else:
-                percentage = 0
+                percentage = 0.0
                 summary = u"{section_type} {index} Unreleased - 0% (?/?)".format(
                     index=i + self.starting_index,
                     section_type=self.section_type
@@ -358,8 +383,12 @@ class AssignmentFormatGrader(CourseGrader):
         total_percent, dropped_indices = total_with_drops(breakdown, self.drop_count)
 
         for dropped_index in dropped_indices:
-            breakdown[dropped_index]['mark'] = {'detail': u"The lowest {drop_count} {section_type} scores are dropped."
-                                                .format(drop_count=self.drop_count, section_type=self.section_type)}
+            breakdown[dropped_index]['mark'] = {
+                'detail': u"The lowest {drop_count} {section_type} scores are dropped.".format(
+                    drop_count=self.drop_count,
+                    section_type=self.section_type
+                )
+            }
 
         if len(breakdown) == 1:
             # if there is only one entry in a section, suppress the existing individual entry and the average,
@@ -386,7 +415,8 @@ class AssignmentFormatGrader(CourseGrader):
                 breakdown.append({'percent': total_percent, 'label': total_label,
                                   'detail': total_detail, 'category': self.category, 'prominent': True})
 
-        return {'percent': total_percent,
-                'section_breakdown': breakdown,
-                #No grade_breakdown here
-                }
+        return {
+            'percent': total_percent,
+            'section_breakdown': breakdown,
+            # No grade_breakdown here
+        }

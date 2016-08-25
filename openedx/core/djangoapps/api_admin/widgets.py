@@ -7,7 +7,7 @@ from django.forms.widgets import CheckboxInput
 from django.utils.encoding import force_text
 from django.utils.html import format_html
 from django.utils.translation import ugettext as _
-from openedx.core.djangoapps.theming.helpers import get_value as get_themed_value
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 
 class TermsOfServiceCheckboxInput(CheckboxInput):
@@ -24,7 +24,7 @@ class TermsOfServiceCheckboxInput(CheckboxInput):
         # Translators: link_start and link_end are HTML tags for a link to the terms of service.
         # platform_name is the name of this Open edX installation.
         label = _('I, and my company, accept the {link_start}{platform_name} API Terms of Service{link_end}.').format(
-            platform_name=get_themed_value('PLATFORM_NAME', settings.PLATFORM_NAME),
+            platform_name=configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),
             link_start='<a href="{url}" target="_blank">'.format(url=reverse('api_admin:api-tos')),
             link_end='</a>',
         )

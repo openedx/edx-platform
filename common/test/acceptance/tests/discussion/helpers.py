@@ -5,15 +5,15 @@ Helper functions and classes for discussion tests.
 from uuid import uuid4
 import json
 
-from ...fixtures import LMS_BASE_URL
-from ...fixtures.course import CourseFixture
-from ...fixtures.discussion import (
+from common.test.acceptance.fixtures import LMS_BASE_URL
+from common.test.acceptance.fixtures.course import CourseFixture
+from common.test.acceptance.fixtures.discussion import (
     SingleThreadViewFixture,
     Thread,
     Response,
 )
-from ...pages.lms.discussion import DiscussionTabSingleThreadPage
-from ...tests.helpers import UniqueCourseTest
+from common.test.acceptance.pages.lms.discussion import DiscussionTabSingleThreadPage
+from common.test.acceptance.tests.helpers import UniqueCourseTest
 
 
 class BaseDiscussionMixin(object):

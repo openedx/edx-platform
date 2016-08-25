@@ -9,7 +9,6 @@ from nose.plugins.attrib import attr
 import os
 from unittest import skipIf
 
-from django.conf import settings
 from django.core import mail
 from django.core.mail.message import forbid_multi_line_headers
 from django.core.urlresolvers import reverse
@@ -17,7 +16,7 @@ from django.core.management import call_command
 from django.test.utils import override_settings
 
 from bulk_email.models import Optout, BulkEmailFlag
-from bulk_email.tasks import _get_source_address
+from bulk_email.tasks import _get_source_address, _get_course_email_context
 from openedx.core.djangoapps.course_groups.models import CourseCohort
 from openedx.core.djangoapps.course_groups.cohorts import add_user_to_cohort
 from courseware.tests.factories import StaffFactory, InstructorFactory
@@ -130,7 +129,7 @@ class EmailSendFromDashboardTestCase(SharedModuleStoreTestCase):
         BulkEmailFlag.objects.all().delete()
 
 
-@attr('shard_1')
+@attr(shard=1)
 @patch('bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message', autospec=True))
 class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase):
     """
@@ -443,7 +442,7 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
         self.assertItemsEqual(outbox_contents, should_send_contents)
 
 
-@attr('shard_1')
+@attr(shard=1)
 @skipIf(os.environ.get("TRAVIS") == 'true', "Skip this test in Travis CI.")
 class TestEmailSendFromDashboard(EmailSendFromDashboardTestCase):
     """
@@ -476,3 +475,60 @@ class TestEmailSendFromDashboard(EmailSendFromDashboardTestCase):
 
         message_body = mail.outbox[0].body
         self.assertIn(uni_message, message_body)
+
+
+class TestCourseEmailContext(SharedModuleStoreTestCase):
+    """
+    Test the course email context hash used to send bulk emails.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        """
+        Create a course shared by all tests.
+        """
+        super(TestCourseEmailContext, cls).setUpClass()
+        cls.course_title = u"Финансовое программирование и политика, часть 1: макроэкономические счета и анализ"
+        cls.course_org = 'IMF'
+        cls.course_number = "FPP.1x"
+        cls.course_run = "2016"
+        cls.course = CourseFactory.create(
+            display_name=cls.course_title,
+            org=cls.course_org,
+            number=cls.course_number,
+            run=cls.course_run,
+        )
+
+    def verify_email_context(self, email_context, scheme):
+        """
+        This test tests that the bulk email context uses http or https urls as appropriate.
+        """
+        self.assertEquals(email_context['platform_name'], 'edX')
+        self.assertEquals(email_context['course_title'], self.course_title)
+        self.assertEquals(email_context['course_url'],
+                          '{}://edx.org/courses/{}/{}/{}/'.format(scheme,
+                                                                  self.course_org,
+                                                                  self.course_number,
+                                                                  self.course_run))
+        self.assertEquals(email_context['course_image_url'],
+                          '{}://edx.org/c4x/{}/{}/asset/images_course_image.jpg'.format(scheme,
+                                                                                        self.course_org,
+                                                                                        self.course_number))
+        self.assertEquals(email_context['email_settings_url'], '{}://edx.org/dashboard'.format(scheme))
+        self.assertEquals(email_context['account_settings_url'], '{}://edx.org/account/settings'.format(scheme))
+
+    @override_settings(LMS_ROOT_URL="http://edx.org")
+    def test_insecure_email_context(self):
+        """
+        This test tests that the bulk email context uses http urls
+        """
+        email_context = _get_course_email_context(self.course)
+        self.verify_email_context(email_context, 'http')
+
+    @override_settings(LMS_ROOT_URL="https://edx.org")
+    def test_secure_email_context(self):
+        """
+        This test tests that the bulk email context uses https urls
+        """
+        email_context = _get_course_email_context(self.course)
+        self.verify_email_context(email_context, 'https')

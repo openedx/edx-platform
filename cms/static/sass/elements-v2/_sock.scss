@@ -27,10 +27,10 @@
 
     .cta-show-sock {
       @extend %ui-btn-pill;
-      background: $gray-l5;
+      background: $uxpl-grayscale-x-back;
       font-size: font-size(x-small);
       padding: ($baseline/2) $baseline;
-      color: $gray;
+      color: $gray-d3;
 
       .icon {
         @include margin-right($baseline/4);

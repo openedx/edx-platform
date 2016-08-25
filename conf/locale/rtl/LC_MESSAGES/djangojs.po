@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-07-22 10:07+0000\n"
-"PO-Revision-Date: 2016-07-22 10:08:19.725997\n"
+"POT-Creation-Date: 2016-08-18 16:54+0000\n"
+"PO-Revision-Date: 2016-08-18 16:55:20.212629\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -4224,6 +4224,16 @@ msgstr "مخشيهرل غخعق ذخعقسثس"
 
 #: lms/static/js/student_account/views/LoginView.js
 msgid ""
+"We have sent an email message with password reset instructions to the email "
+"address you provided.  If you do not receive this message, "
+"{anchorStart}contact technical support{anchorEnd}."
+msgstr ""
+"صث اشدث سثرف شر ثوشهم وثسسشلث صهفا حشسسصخقي قثسثف هرسفقعذفهخرس فخ فاث ثوشهم "
+"شييقثسس غخع حقخدهيثي.  هب غخع يخ رخف قثذثهدث فاهس وثسسشلث, "
+"{anchorStart}ذخرفشذف فثذارهذشم سعححخقف{anchorEnd}."
+
+#: lms/static/js/student_account/views/LoginView.js
+msgid ""
 "An error has occurred. Try refreshing the page, or check your Internet "
 "connection."
 msgstr ""
@@ -4320,6 +4330,10 @@ msgid ""
 "Select the time zone for displaying course dates. If you do not specify a "
 msgstr ""
 "سثمثذف فاث فهوث ظخرث بخق يهسحمشغهرل ذخعقسث يشفثس. هب غخع يخ رخف سحثذهبغ ش "
+
+#: lms/static/js/student_account/views/account_settings_factory.js
+msgid "All Time Zones"
+msgstr "شمم فهوث ظخرثس"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "Additional Information"
@@ -5026,6 +5040,10 @@ msgstr "ساخص يثحقثذشفثي سثففهرلس"
 msgid "You have unsaved changes. Do you really want to leave this page?"
 msgstr "غخع اشدث عرسشدثي ذاشرلثس. يخ غخع قثشممغ صشرف فخ مثشدث فاهس حشلث?"
 
+#: cms/static/js/maintenance/force_publish_course.js
+msgid "Internal Server Error."
+msgstr "هرفثقرشم سثقدثق ثققخق."
+
 #. Translators: This is the status of a video upload that is queued
 #. waiting for other uploads to complete
 #: cms/static/js/models/active_video_upload.js
@@ -5231,8 +5249,8 @@ msgid "{0} must be between {1} and {2} characters"
 msgstr "{0} وعسف زث زثفصثثر {1} شري {2} ذاشقشذفثقس"
 
 #: cms/static/js/programs/utils/validation_config.js
-msgid "{0} must be one of: gettext( {1}"
-msgstr "{0} وعسف زث خرث خب: لثففثطف( {1}"
+msgid "{0} must be one of: {1}"
+msgstr "{0} وعسف زث خرث خب: {1}"
 
 #: cms/static/js/programs/utils/validation_config.js
 msgid "{0} must be the same as {1}"
@@ -7066,16 +7084,12 @@ msgid "Generate Exception Certificates"
 msgstr "لثرثقشفث ثطذثحفهخر ذثقفهبهذشفثس"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
-msgid ""
-"Generate certificates for all users on the Exception list who do not yet "
-"have a certificate"
-msgstr ""
-"لثرثقشفث ذثقفهبهذشفثس بخق شمم عسثقس خر فاث ثطذثحفهخر مهسف صاخ يخ رخف غثف "
-"اشدث ش ذثقفهبهذشفث"
+msgid "All users on the Exception list who do not yet have a certificate"
+msgstr "شمم عسثقس خر فاث ثطذثحفهخر مهسف صاخ يخ رخف غثف اشدث ش ذثقفهبهذشفث"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
-msgid "Generate a Certificate for all users on the Exception list"
-msgstr "لثرثقشفث ش ذثقفهبهذشفث بخق شمم عسثقس خر فاث ثطذثحفهخر مهسف"
+msgid "All users on the Exception list"
+msgstr "شمم عسثقس خر فاث ثطذثحفهخر مهسف"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
 msgid "User Email"
@@ -7318,8 +7332,8 @@ msgid "Valid"
 msgstr "دشمهي"
 
 #: lms/templates/learner_dashboard/certificate.underscore
-msgid "XSeries Program Certificates"
-msgstr "طسثقهثس حقخلقشو ذثقفهبهذشفثس"
+msgid "Program Certificates"
+msgstr "حقخلقشو ذثقفهبهذشفثس"
 
 #: lms/templates/learner_dashboard/certificate.underscore
 msgid "certificate.credential_url"
@@ -7334,8 +7348,8 @@ msgid "Congratulations! You have earned a certificate for this course."
 msgstr "ذخرلقشفعمشفهخرس! غخع اشدث ثشقرثي ش ذثقفهبهذشفث بخق فاهس ذخعقسث."
 
 #: lms/templates/learner_dashboard/certificate_status.underscore
-msgid "View/Share Certificate"
-msgstr "دهثص/ساشقث ذثقفهبهذشفث"
+msgid "View Certificate"
+msgstr "دهثص ذثقفهبهذشفث"
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
 msgid "enrolled"
@@ -7382,13 +7396,17 @@ msgstr "ذخوهرل سخخر"
 msgid "Enrollment Opens on"
 msgstr "ثرقخمموثرف خحثرس خر"
 
-#: lms/templates/learner_dashboard/empty_programs_list.underscore
-msgid "You are not enrolled in any XSeries Programs yet."
-msgstr "غخع شقث رخف ثرقخممثي هر شرغ طسثقهثس حقخلقشوس غثف."
+#: lms/templates/learner_dashboard/course_enroll.underscore
+msgid "Not Currently Available"
+msgstr "رخف ذعققثرفمغ شدشهمشزمث"
 
 #: lms/templates/learner_dashboard/empty_programs_list.underscore
-msgid "Explore XSeries Programs"
-msgstr "ثطحمخقث طسثقهثس حقخلقشوس"
+msgid "You are not enrolled in any programs yet."
+msgstr "غخع شقث رخف ثرقخممثي هر شرغ حقخلقشوس غثف."
+
+#: lms/templates/learner_dashboard/empty_programs_list.underscore
+msgid "Explore Programs"
+msgstr "ثطحمخقث حقخلقشوس"
 
 #: lms/templates/learner_dashboard/explore_new_programs.underscore
 msgid ""
@@ -7399,12 +7417,12 @@ msgstr ""
 "سعزتثذفس"
 
 #: lms/templates/learner_dashboard/explore_new_programs.underscore
-msgid "Explore New XSeries"
-msgstr "ثطحمخقث رثص طسثقهثس"
+msgid "Explore New Programs"
+msgstr "ثطحمخقث رثص حقخلقشوس"
 
 #: lms/templates/learner_dashboard/program_card.underscore
-msgid "type"
-msgstr "فغحث"
+msgid "category"
+msgstr "ذشفثلخقغ"
 
 #: lms/templates/learner_dashboard/program_card.underscore
 #, python-format
@@ -7543,14 +7561,6 @@ msgstr ""
 #: lms/templates/student_account/login.underscore
 msgid "Password Reset Email Sent"
 msgstr "حشسسصخقي قثسثف ثوشهم سثرف"
-
-#: lms/templates/student_account/login.underscore
-msgid ""
-"We've sent instructions for resetting your password to the email address you"
-" provided."
-msgstr ""
-"صث'دث سثرف هرسفقعذفهخرس بخق قثسثففهرل غخعق حشسسصخقي فخ فاث ثوشهم شييقثسس غخع"
-" حقخدهيثي."
 
 #: lms/templates/student_account/login.underscore
 msgid "We couldn't sign you in."
@@ -8376,6 +8386,27 @@ msgstr "%(type)s ذخوحخرثرف فثوحمشفث وثرع"
 msgid "Common Problem Types"
 msgstr "ذخووخر حقخزمثو فغحثس"
 
+#: cms/templates/js/add-xblock-component-support-legend.underscore
+msgid "Supported"
+msgstr "سعححخقفثي"
+
+#: cms/templates/js/add-xblock-component-support-legend.underscore
+msgid "Provisional"
+msgstr "حقخدهسهخرشم"
+
+#: cms/templates/js/add-xblock-component-support-legend.underscore
+#: cms/templates/js/add-xblock-component-support-level.underscore
+msgid "Not Supported"
+msgstr "رخف سعححخقفثي"
+
+#: cms/templates/js/add-xblock-component-support-level.underscore
+msgid "Fully Supported"
+msgstr "بعممغ سعححخقفثي"
+
+#: cms/templates/js/add-xblock-component-support-level.underscore
+msgid "Provisionally Supported"
+msgstr "حقخدهسهخرشممغ سعححخقفثي"
+
 #: cms/templates/js/add-xblock-component.underscore
 msgid "Add New Component"
 msgstr "شيي رثص ذخوحخرثرف"
@@ -8622,18 +8653,15 @@ msgstr ""
 "رخف هرذمعيثي هر لقشيث ذشمذعمشفهخرس."
 
 #: cms/templates/js/content-visibility-editor.underscore
+#, python-format
 msgid ""
-"Units inherit the visibility setting of the subsection they are in. If you "
-"make this subsection visible to learners, published units that were "
-"previously hidden also become visible. Only units that were explicitly "
-"hidden remain hidden regardless of the option you select for this "
-"subsection."
+"If you select an option other than \"%(hide_label)s\", after the subsection "
+"release date has passed, published units in this subsection will become "
+"available to learners unless units are explicitly hidden."
 msgstr ""
-"عرهفس هراثقهف فاث دهسهزهمهفغ سثففهرل خب فاث سعزسثذفهخر فاثغ شقث هر. هب غخع "
-"وشنث فاهس سعزسثذفهخر دهسهزمث فخ مثشقرثقس, حعزمهساثي عرهفس فاشف صثقث "
-"حقثدهخعسمغ اهييثر شمسخ زثذخوث دهسهزمث. خرمغ عرهفس فاشف صثقث ثطحمهذهفمغ "
-"اهييثر قثوشهر اهييثر قثلشقيمثسس خب فاث خحفهخر غخع سثمثذف بخق فاهس "
-"سعزسثذفهخر."
+"هب غخع سثمثذف شر خحفهخر خفاثق فاشر \"%(hide_label)s\", شبفثق فاث سعزسثذفهخر "
+"قثمثشسث يشفث اشس حشسسثي, حعزمهساثي عرهفس هر فاهس سعزسثذفهخر صهمم زثذخوث "
+"شدشهمشزمث فخ مثشقرثقس عرمثسس عرهفس شقث ثطحمهذهفمغ اهييثر."
 
 #: cms/templates/js/course-instructor-details.underscore
 msgid "Instructor Name"
@@ -9499,6 +9527,22 @@ msgstr "ثيهف %(display_name)s (قثضعهقثي)"
 msgid "formLabel"
 msgstr "بخقومشزثم"
 
+#: cms/templates/js/maintenance/force-published-course-response.underscore
+msgid ""
+"You have done a dry run of force publishing the course. Nothing has changed."
+" Had you run it, the following course versions would have been change."
+msgstr ""
+"غخع اشدث يخرث ش يقغ قعر خب بخقذث حعزمهساهرل فاث ذخعقسث. رخفاهرل اشس ذاشرلثي."
+" اشي غخع قعر هف, فاث بخممخصهرل ذخعقسث دثقسهخرس صخعمي اشدث زثثر ذاشرلث."
+
+#: cms/templates/js/maintenance/force-published-course-response.underscore
+msgid ""
+"The published branch version, {published}, was reset to the draft branch "
+"version, {draft}."
+msgstr ""
+"فاث حعزمهساثي زقشرذا دثقسهخر, {published}, صشس قثسثف فخ فاث يقشبف زقشرذا "
+"دثقسهخر, {draft}."
+
 #: cms/templates/js/programs/course_details.underscore
 msgid "Delete course"
 msgstr "يثمثفث ذخعقسث"
@@ -9571,8 +9615,16 @@ msgid "Program type"
 msgstr "حقخلقشو فغحث"
 
 #: cms/templates/js/programs/program_creator_form.underscore
+msgid "Select a type"
+msgstr "سثمثذف ش فغحث"
+
+#: cms/templates/js/programs/program_creator_form.underscore
 msgid "XSeries"
 msgstr "طسثقهثس"
+
+#: cms/templates/js/programs/program_creator_form.underscore
+msgid "MicroMasters"
+msgstr "وهذقخوشسفثقس"
 
 #: cms/templates/js/programs/program_creator_form.underscore
 msgid "Select an organization"

@@ -112,7 +112,7 @@ class ReverificationService(object):
             # As a user skips the reverification it declines to fulfill the requirement so
             # requirement sets to declined.
             set_credit_requirement_status(
-                user.username,
+                user,
                 course_key,
                 'reverification',
                 checkpoint.checkpoint_location,

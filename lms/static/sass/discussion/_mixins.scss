@@ -1,18 +1,25 @@
 // discussion - mixins and extends
 // ====================
 
-@mixin blue-button {
-  @include linear-gradient(top, #6dccf1, #38a8e5);
+@mixin discussion-button() {
   display: block;
-  border: 1px solid #2d81ad;
-  border-radius: 3px;
-  padding: 0 ($baseline*0.75);
+  border: 1px solid;
+  border-radius: $forum-border-radius;
   height: 35px;
   color: $white;
-  text-shadow: none;
-  font-size: 13px;
   line-height: 35px;
+  font-size: $forum-base-font-size;
+  white-space: nowrap;  // Prevent word-break in Arabic in Google Chrome
+  text-shadow: none;
+  padding: 0 ($baseline*0.75);
   box-shadow: 0 1px 0 rgba(255, 255, 255, 0.4) inset, 0 1px 1px rgba(0, 0, 0, .15);
+}
+
+@mixin blue-button {
+  @include discussion-button();
+  @include linear-gradient(top, #6dccf1, #38a8e5);
+  border-color: #2d81ad;
+  color: $white;
 
   &:hover, &:focus {
     @include linear-gradient(top, #4fbbe4, #2090d0);
@@ -21,17 +28,10 @@
 }
 
 @mixin white-button {
+  @include discussion-button();
   @include linear-gradient(top, $white, $gray-l5);
-  display: block;
-  border: 1px solid #aaa;
-  border-radius: 3px;
-  padding: 0 ($baseline*0.75);
-  height: 35px;
-  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.4) inset, 0 1px 1px rgba(0, 0, 0, .15);
+  border-color: #aaa;
   color: $dark-gray;
-  text-shadow: none;
-  font-size: 13px;
-  line-height: 35px;
 
   &:hover, &:focus {
     @include linear-gradient(top, $white, $gray-l6);
@@ -39,17 +39,10 @@
 }
 
 @mixin dark-grey-button {
-  display: block;
-  border: 1px solid #222;
-  border-radius: 3px;
-  padding: 0 ($baseline*0.75);
-  height: 35px;
-  background: -webkit-linear-gradient(top, #777, #555);
-  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.4) inset, 0 1px 1px rgba(0, 0, 0, .15);
+  @include discussion-button();
+  @include linear-gradient(top, #777, #555);
+  border-color: #222;
   color: $white;
-  text-shadow: none;
-  font-size: 13px;
-  line-height: 35px;
 
   &:hover, &:focus {
     background: -webkit-linear-gradient(top, #888, #666);
@@ -60,20 +53,20 @@
   box-sizing: border-box;
   margin-top: 0;
   border: 1px solid $forum-color-border;
-  border-radius: 3px 3px 0 0;
+  border-radius: $forum-border-radius $forum-border-radius 0 0;
   padding: ($baseline/2);
   width: 100%;
   height: 125px;
   background: $forum-color-background;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15) inset;
-  font-size: 13px;
+  font-size: $forum-base-font-size;
   font-family: $sans-serif;
   line-height: 1.6;
 }
 
 @mixin discussion-wmd-preview-container {
   box-sizing: border-box;
-  @include border-radius(0, 0, 3px, 3px);
+  @include border-radius(0, 0, $forum-border-radius, $forum-border-radius);
   border: 1px solid $gray-l1;
   border-top: none;
   width: 100%;
@@ -92,7 +85,7 @@
   padding-top: 3px;
   width: 100%;
   color: $gray-l2;
-  font-size: 11px;
+  font-size: $forum-small-font-size;
 }
 
 @mixin discussion-wmd-preview {
@@ -119,38 +112,12 @@
   text-overflow: ellipsis;
 }
 
-@mixin forum-post-label($color) {
-  @extend %t-weight4;
-  @include font-size(9);
-  display: inline;
-  margin-top: ($baseline/4);
-  border: 1px solid;
-  border-radius: 3px;
-  padding: 1px 6px;
-  white-space: nowrap;
-
-  border-color: $color;
-  color: $color;
-
-  .icon {
-    @include margin-right($baseline/5);
-  }
-
-  &:last-child {
-    @include margin-right(0);
-  }
-
-  &.is-hidden {
-    display: none;
-  }
-}
-
 @mixin forum-user-label($color) {
-  @include font-size(9);
+  @include margin-left($baseline/4);
   @extend %t-weight5;
+  font-size: $forum-small-font-size;
   vertical-align: middle;
-  margin-left: ($baseline/4);
-  border-radius: 2px;
+  border-radius: $forum-border-radius;
   padding: 0 ($baseline/5);
   background: $color;
   font-style: normal;

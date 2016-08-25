@@ -132,7 +132,7 @@ class BasicAssetsTestCase(AssetsTestCase):
             url = asset_url.replace('"', '')
             base_url = url.replace(filename, '')
 
-            self.assertTrue("/{}".format(filename) in url)
+            self.assertIn("/{}".format(filename), url)
             resp = self.client.get(url)
             self.assertEquals(resp.status_code, 200)
 
@@ -142,7 +142,7 @@ class BasicAssetsTestCase(AssetsTestCase):
             # browser append relative_path with base_url
             absolute_path = base_url + relative_path
 
-            self.assertTrue("/{}".format(relative_path) in absolute_path)
+            self.assertIn("/{}".format(relative_path), absolute_path)
             resp = self.client.get(absolute_path)
             self.assertEquals(resp.status_code, 200)
 

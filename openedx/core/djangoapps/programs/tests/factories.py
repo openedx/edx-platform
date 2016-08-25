@@ -13,8 +13,8 @@ class Program(factory.Factory):
     id = factory.Sequence(lambda n: n)  # pylint: disable=invalid-name
     name = FuzzyText(prefix='Program ')
     subtitle = FuzzyText(prefix='Subtitle ')
-    category = 'xseries'
-    status = 'unpublished'
+    category = 'FooBar'
+    status = 'active'
     marketing_slug = FuzzyText(prefix='slug_')
     organizations = []
     course_codes = []

@@ -88,7 +88,7 @@ class StaffDebugPage(PageObject):
         """
         if user:
             self.q(css='input[id^=sd_fu_]').first.fill(user)
-        self.q(css='section.staff-modal a.staff-debug-reset').click()
+        self.q(css='.staff-modal .staff-debug-reset').click()
 
     def delete_state(self, user=None):
         """
@@ -96,7 +96,7 @@ class StaffDebugPage(PageObject):
         """
         if user:
             self.q(css='input[id^=sd_fu_]').fill(user)
-        self.q(css='section.staff-modal a.staff-debug-sdelete').click()
+        self.q(css='.staff-modal .staff-debug-sdelete').click()
 
     def rescore(self, user=None):
         """
@@ -105,7 +105,7 @@ class StaffDebugPage(PageObject):
         """
         if user:
             self.q(css='input[id^=sd_fu_]').first.fill(user)
-        self.q(css='section.staff-modal a.staff-debug-rescore').click()
+        self.q(css='.staff-modal .staff-debug-rescore').click()
 
     @property
     def idash_msg(self):

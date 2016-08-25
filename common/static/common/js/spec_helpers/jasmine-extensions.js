@@ -1,3 +1,5 @@
+/* eslint-env node */
+
 // Extensions to Jasmine.
 //
 // This file adds the following:
@@ -9,23 +11,20 @@
 //    jQuery has been loaded, we set these matchers up again in this module.
 
 (function(root, factory) {
-    /* jshint strict: false */
     if (typeof define === 'function' && define.amd) {
-        require(['jquery'], function ($) {
+        require(['jquery'], function($) {
             factory(root, $);
         });
     } else {
         factory(root, root.jQuery);
     }
 }((function() {
-    /* jshint strict: false */
     return this;
 }()), function(window, $) {
     'use strict';
 
     // Add custom Jasmine matchers.
     beforeEach(function() {
-
         if (window.imagediff) {
             jasmine.addMatchers(window.imagediff.jasmine);
         }
@@ -72,16 +71,16 @@
             toBeInstanceOf: function() {
                 // Assert the type of the value being tested matches the provided type
                 return {
-                    compare: function (actual, expected) {
+                    compare: function(actual, expected) {
                         return {
                             pass: actual instanceof expected
                         };
                     }
                 };
             },
-            toHaveIndex: function () {
+            toHaveIndex: function() {
                 return {
-                    compare: function (actual, expected) {
+                    compare: function(actual, expected) {
                         return {
                             pass: $(actual).index() === expected
                         };
@@ -91,7 +90,7 @@
         });
     });
 
-    /* jshint ignore:start */
+    /* eslint-disable */
     // All the code below is taken from:
     // https://github.com/velesin/jasmine-jquery/blob/2.1.1/lib/jasmine-jquery.js
     beforeEach(function() {
@@ -271,5 +270,5 @@
             data.handlers = [];
         }
     };
-    /* jshint ignore:end */
+    /* eslint-enable */
 }));

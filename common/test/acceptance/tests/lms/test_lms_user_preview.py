@@ -6,18 +6,18 @@ Tests the "preview" selector in the LMS that allows changing between Staff, Stud
 
 from nose.plugins.attrib import attr
 
-from ..helpers import UniqueCourseTest, create_user_partition_json
-from ...pages.studio.auto_auth import AutoAuthPage
-from ...pages.lms.courseware import CoursewarePage
-from ...pages.lms.instructor_dashboard import InstructorDashboardPage
-from ...pages.lms.staff_view import StaffPage
-from ...fixtures.course import CourseFixture, XBlockFixtureDesc
+from common.test.acceptance.tests.helpers import UniqueCourseTest, create_user_partition_json
+from common.test.acceptance.pages.studio.auto_auth import AutoAuthPage
+from common.test.acceptance.pages.lms.courseware import CoursewarePage
+from common.test.acceptance.pages.lms.instructor_dashboard import InstructorDashboardPage
+from common.test.acceptance.pages.lms.staff_view import StaffPage
+from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
 from bok_choy.promise import EmptyPromise
 from xmodule.partitions.partitions import Group
 from textwrap import dedent
 
 
-@attr('shard_3')
+@attr(shard=3)
 class StaffViewTest(UniqueCourseTest):
     """
     Tests that verify the staff view.
@@ -55,7 +55,7 @@ class StaffViewTest(UniqueCourseTest):
         return staff_page
 
 
-@attr('shard_3')
+@attr(shard=3)
 class CourseWithoutContentGroupsTest(StaffViewTest):
     """
     Setup for tests that have no content restricted to specific content groups.
@@ -86,7 +86,7 @@ class CourseWithoutContentGroupsTest(StaffViewTest):
         )
 
 
-@attr('shard_3')
+@attr(shard=3)
 class StaffViewToggleTest(CourseWithoutContentGroupsTest):
     """
     Tests for the staff view toggle button.
@@ -103,7 +103,7 @@ class StaffViewToggleTest(CourseWithoutContentGroupsTest):
         self.assertFalse(course_page.has_tab('Instructor'))
 
 
-@attr('shard_3')
+@attr(shard=3)
 class StaffDebugTest(CourseWithoutContentGroupsTest):
     """
     Tests that verify the staff debug info.
@@ -186,7 +186,6 @@ class StaffDebugTest(CourseWithoutContentGroupsTest):
         """
         staff_page = self._goto_staff_page()
         staff_page.answer_problem()
-
         staff_debug_page = staff_page.open_staff_debug_info()
         staff_debug_page.delete_state('INVALIDUSER')
         msg = staff_debug_page.idash_msg[0]
@@ -235,7 +234,7 @@ class StaffDebugTest(CourseWithoutContentGroupsTest):
                          'for user {}'.format(self.USERNAME), msg)
 
 
-@attr('shard_3')
+@attr(shard=3)
 class CourseWithContentGroupsTest(StaffViewTest):
     """
     Verifies that changing the "View this course as" selector works properly for content groups.
@@ -382,6 +381,24 @@ class CourseWithContentGroupsTest(StaffViewTest):
         # Masquerade as student in beta cohort:
         course_page.set_staff_view_mode_specific_student(student_b_username)
         verify_expected_problem_visibility(self, course_page, [self.beta_text, self.everyone_text])
+
+    @attr('a11y')
+    def test_course_page(self):
+        """
+        Run accessibility audit for course staff pages.
+        """
+        course_page = self._goto_staff_page()
+        course_page.a11y_audit.config.set_rules({
+            'ignore': [
+                'aria-allowed-attr',  # TODO: AC-559
+                'aria-roles',  # TODO: AC-559,
+                'aria-valid-attr',  # TODO: AC-559
+                'color-contrast',  # TODO: AC-559
+                'link-href',  # TODO: AC-559
+                'section',  # TODO: AC-559
+            ]
+        })
+        course_page.a11y_audit.check_for_accessibility_errors()
 
 
 def verify_expected_problem_visibility(test, courseware_page, expected_problems):

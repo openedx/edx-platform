@@ -14,7 +14,7 @@ from ..tasks import _calculate_course_xblocks_data, _update_xblocks_cache
 from .test_models import BookmarksTestsBase
 
 
-@attr('shard_2')
+@attr(shard=2)
 @ddt.ddt
 class XBlockCacheTaskTests(BookmarksTestsBase):
     """

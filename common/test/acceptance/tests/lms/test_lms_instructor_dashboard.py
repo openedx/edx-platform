@@ -8,21 +8,21 @@ import ddt
 from nose.plugins.attrib import attr
 from bok_choy.promise import EmptyPromise
 
-from ..helpers import UniqueCourseTest, get_modal_alert, EventsTestMixin
-from ...pages.common.logout import LogoutPage
-from ...pages.lms.auto_auth import AutoAuthPage
-from ...pages.studio.overview import CourseOutlinePage
-from ...pages.lms.create_mode import ModeCreationPage
-from ...pages.lms.courseware import CoursewarePage
-from ...pages.lms.instructor_dashboard import InstructorDashboardPage
-from ...fixtures.course import CourseFixture, XBlockFixtureDesc
-from ...pages.lms.dashboard import DashboardPage
-from ...pages.lms.problem import ProblemPage
-from ...pages.lms.track_selection import TrackSelectionPage
-from ...pages.lms.pay_and_verify import PaymentAndVerificationFlow, FakePaymentPage
-from ...pages.lms.login_and_register import CombinedLoginAndRegisterPage
+from common.test.acceptance.tests.helpers import UniqueCourseTest, get_modal_alert, EventsTestMixin
+from common.test.acceptance.pages.common.logout import LogoutPage
+from common.test.acceptance.pages.lms.auto_auth import AutoAuthPage
+from common.test.acceptance.pages.studio.overview import CourseOutlinePage
+from common.test.acceptance.pages.lms.create_mode import ModeCreationPage
+from common.test.acceptance.pages.lms.courseware import CoursewarePage
+from common.test.acceptance.pages.lms.instructor_dashboard import InstructorDashboardPage
+from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
+from common.test.acceptance.pages.lms.dashboard import DashboardPage
+from common.test.acceptance.pages.lms.problem import ProblemPage
+from common.test.acceptance.pages.lms.track_selection import TrackSelectionPage
+from common.test.acceptance.pages.lms.pay_and_verify import PaymentAndVerificationFlow, FakePaymentPage
+from common.test.acceptance.pages.lms.login_and_register import CombinedLoginAndRegisterPage
 from common.test.acceptance.tests.helpers import disable_animations
-from ...fixtures.certificates import CertificateConfigFixture
+from common.test.acceptance.fixtures.certificates import CertificateConfigFixture
 
 
 class BaseInstructorDashboardTest(EventsTestMixin, UniqueCourseTest):
@@ -58,11 +58,6 @@ class LMSInstructorDashboardA11yTest(BaseInstructorDashboardTest):
         self.instructor_dashboard_page = self.visit_instructor_dashboard()
 
     def test_instructor_dashboard_a11y(self):
-        self.instructor_dashboard_page.a11y_audit.config.set_rules({
-            "ignore": [
-                'link-href',  # TODO: AC-491
-            ]
-        })
         self.instructor_dashboard_page.a11y_audit.check_for_accessibility_errors()
 
 
@@ -100,7 +95,7 @@ class BulkEmailTest(BaseInstructorDashboardTest):
         self.send_email_page.a11y_audit.check_for_accessibility_errors()
 
 
-@attr('shard_7')
+@attr(shard=7)
 class AutoEnrollmentWithCSVTest(BaseInstructorDashboardTest):
     """
     End-to-end tests for Auto-Registration and enrollment functionality via CSV file.
@@ -218,7 +213,7 @@ class AutoEnrollmentWithCSVTest(BaseInstructorDashboardTest):
         self.auto_enroll_section.a11y_audit.check_for_accessibility_errors()
 
 
-@attr('shard_7')
+@attr(shard=7)
 class ProctoredExamsTest(BaseInstructorDashboardTest):
     """
     End-to-end tests for Proctoring Sections of the Instructor Dashboard.
@@ -407,7 +402,7 @@ class ProctoredExamsTest(BaseInstructorDashboardTest):
         self.assertFalse(exam_attempts_section.is_student_attempt_visible)
 
 
-@attr('shard_7')
+@attr(shard=7)
 class EntranceExamGradeTest(BaseInstructorDashboardTest):
     """
     Tests for Entrance exam specific student grading tasks.
@@ -606,7 +601,7 @@ class EntranceExamGradeTest(BaseInstructorDashboardTest):
         self.assertTrue(self.student_admin_section.is_background_task_history_table_visible())
 
 
-@attr('shard_7')
+@attr(shard=7)
 class DataDownloadsTest(BaseInstructorDashboardTest):
     """
     Bok Choy tests for the "Data Downloads" tab.
@@ -724,7 +719,7 @@ class DataDownloadsTest(BaseInstructorDashboardTest):
         self.data_download_section.a11y_audit.check_for_accessibility_errors()
 
 
-@attr('shard_7')
+@attr(shard=7)
 @ddt.ddt
 class CertificatesTest(BaseInstructorDashboardTest):
     """
@@ -1057,7 +1052,7 @@ class CertificatesTest(BaseInstructorDashboardTest):
         self.certificates_section.a11y_audit.check_for_accessibility_errors()
 
 
-@attr('shard_7')
+@attr(shard=7)
 class CertificateInvalidationTest(BaseInstructorDashboardTest):
     """
     Tests for Certificates functionality on instructor dashboard.

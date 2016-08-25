@@ -492,7 +492,7 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
         else:
             editable_fields.pop('source')
 
-        languages = [{'label': label, 'code': lang} for lang, label in settings.ALL_LANGUAGES if lang != u'en']
+        languages = [{'label': label, 'code': lang} for lang, label in settings.ALL_LANGUAGES]
         languages.sort(key=lambda l: l['label'])
         editable_fields['transcripts']['languages'] = languages
         editable_fields['transcripts']['type'] = 'VideoTranslations'
@@ -619,9 +619,9 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
             A full youtube url to the video whose ID is passed in
         """
         if youtube_id:
-            return 'https://www.youtube.com/watch?v={0}'.format(youtube_id)
+            return u'https://www.youtube.com/watch?v={0}'.format(youtube_id)
         else:
-            return ''
+            return u''
 
     def get_context(self):
         """

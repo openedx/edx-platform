@@ -117,19 +117,19 @@ from openedx.core.djangolib.js_utils import dump_js_escaped_json, js_escaped_str
             <fieldset>
                 <legend class="sr">${_('Choose learner types for regeneration')}</legend>
                 <div>
-                    <label style="display: inline" for="certificate_status_${section_data['status'].downloadable}">
+                    <label>
                         <input id="certificate_status_${section_data['status'].downloadable}" type="checkbox" name="certificate_statuses" value="${section_data['status'].downloadable}">
                         ${_("Regenerate for learners who have already received certificates. ({count})").format(count=section_data['certificate_statuses_with_count'].get(section_data['status'].downloadable, 0))}
                     </label>
                 </div>
                 <div>
-                    <label style="display: inline" for="certificate_status_${section_data['status'].notpassing}">
+                    <label>
                         <input id="certificate_status_${section_data['status'].notpassing}" type="checkbox" name="certificate_statuses" value="${section_data['status'].notpassing}">
                         ${_("Regenerate for learners who have not received certificates. ({count})").format(count=section_data['certificate_statuses_with_count'].get(section_data['status'].notpassing, 0))}
                     </label>
                 </div>
                 <div>
-                    <label style="display: inline" for="certificate_status_${section_data['status'].error}">
+                    <label>
                         <input id="certificate_status_${section_data['status'].error}" type="checkbox" name="certificate_statuses" value="${section_data['status'].error}">
                         ${_("Regenerate for learners in an error state. ({count})").format(count=section_data['certificate_statuses_with_count'].get(section_data['status'].error, 0))}
                     </label>

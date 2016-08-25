@@ -9,11 +9,16 @@ from django.views.decorators.csrf import csrf_exempt
 
 from commerce.models import CommerceConfiguration
 from edxmako.shortcuts import render_to_response
-from microsite_configuration import microsite
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 from openedx.core.djangoapps.theming.helpers import is_request_in_themed_site
 from shoppingcart.processors.CyberSource2 import is_user_payment_error
-
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from opaque_keys.edx.locator import CourseLocator
+from student.models import CourseEnrollment
+from util.json_request import JsonResponse
+from django.views.decorators.http import require_http_methods
+from course_modes.models import CourseMode
+from django.http import HttpResponseBadRequest
 
 log = logging.getLogger(__name__)
 
@@ -21,14 +26,22 @@ log = logging.getLogger(__name__)
 @csrf_exempt
 def checkout_cancel(_request):
     """ Checkout/payment cancellation view. """
-    context = {'payment_support_email': microsite.get_value('payment_support_email', settings.PAYMENT_SUPPORT_EMAIL)}
+    context = {
+        'payment_support_email': configuration_helpers.get_value(
+            'payment_support_email', settings.PAYMENT_SUPPORT_EMAIL,
+        )
+    }
     return render_to_response("commerce/checkout_cancel.html", context)
 
 
 @csrf_exempt
 def checkout_error(_request):
     """ Checkout/payment error view. """
-    context = {'payment_support_email': microsite.get_value('payment_support_email', settings.PAYMENT_SUPPORT_EMAIL)}
+    context = {
+        'payment_support_email': configuration_helpers.get_value(
+            'payment_support_email', settings.PAYMENT_SUPPORT_EMAIL,
+        )
+    }
     return render_to_response("commerce/checkout_error.html", context)
 
 
@@ -39,7 +52,7 @@ def checkout_receipt(request):
 
     page_title = _('Receipt')
     is_payment_complete = True
-    payment_support_email = microsite.get_value('payment_support_email', settings.PAYMENT_SUPPORT_EMAIL)
+    payment_support_email = configuration_helpers.get_value('payment_support_email', settings.PAYMENT_SUPPORT_EMAIL)
     payment_support_link = '<a href=\"mailto:{email}\">{email}</a>'.format(email=payment_support_email)
 
     is_cybersource = all(k in request.POST for k in ('signed_field_names', 'decision', 'reason_code'))
@@ -77,7 +90,7 @@ def checkout_receipt(request):
     context = {
         'page_title': page_title,
         'is_payment_complete': is_payment_complete,
-        'platform_name': microsite.get_value('platform_name', settings.PLATFORM_NAME),
+        'platform_name': configuration_helpers.get_value('platform_name', settings.PLATFORM_NAME),
         'verified': SoftwareSecurePhotoVerification.verification_valid_or_pending(request.user).exists(),
         'error_summary': error_summary,
         'error_text': error_text,
@@ -88,3 +101,22 @@ def checkout_receipt(request):
         'is_request_in_themed_site': is_request_in_themed_site()
     }
     return render_to_response('commerce/checkout_receipt.html', context)
+
+
+@require_http_methods(["GET"])
+@login_required
+def user_verification_status(request):
+    """
+    Check for user verification status.
+    :return 'True' if the user enrollment for the course belongs to verified modes e.g. Verified, Professional.
+    """
+    course_id = request.GET.get('course_id', None)
+
+    if course_id is None:
+        return HttpResponseBadRequest()
+
+    course_key = CourseLocator.from_string(course_id)
+    enrollment_mode, __ = CourseEnrollment.enrollment_mode_for_user(request.user, course_key)
+    is_verification_required = enrollment_mode in CourseMode.VERIFIED_MODES
+
+    return JsonResponse({'is_verification_required': is_verification_required})

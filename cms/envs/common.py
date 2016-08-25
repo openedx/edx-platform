@@ -208,6 +208,12 @@ FEATURES = {
 
     # Show Language selector
     'SHOW_LANGUAGE_SELECTOR': False,
+
+    # Temporary feature flag for disabling saving of subsection grades.
+    # There is also an advanced setting in the course module.  The
+    # feature flag and the advanced setting must both be true for
+    # a course to use saved grades.
+    'ENABLE_SUBSECTION_GRADES_SAVED': False,
 }
 
 ENABLE_JASMINE = False
@@ -296,6 +302,7 @@ AUTHENTICATION_BACKENDS = (
 )
 
 LMS_BASE = None
+LMS_ROOT_URL = "http://localhost:8000"
 
 # These are standard regexes for pulling out info like course_ids, usage_ids, etc.
 # They are used so that URLs with deprecated-format strings still work.
@@ -914,6 +921,7 @@ INSTALLED_APPS = (
     # other apps that are.  Django 1.8 wants to have imported models supported
     # by installed apps.
     'lms.djangoapps.verify_student',
+    'lms.djangoapps.grades',
 
     # Microsite configuration application
     'microsite_configuration',
@@ -929,6 +937,9 @@ INSTALLED_APPS = (
 
     # Enables default site and redirects
     'django_sites_extensions',
+
+    # additional release utilities to ease automation
+    'release_util'
 )
 
 

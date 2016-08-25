@@ -6,17 +6,12 @@ django-oauth-toolkit as appropriate.
 from __future__ import unicode_literals
 
 import json
-from time import time
 
-import jwt
 from auth_exchange import views as auth_exchange_views
-from django.conf import settings
-from django.utils.functional import cached_property
 from django.views.generic import View
 from edx_oauth2_provider import views as dop_views  # django-oauth2-provider views
 from oauth2_provider import models as dot_models, views as dot_views  # django-oauth-toolkit
 
-from openedx.core.djangoapps.theming import helpers
 from openedx.core.lib.token_utils import JwtBuilder
 
 from . import adapters

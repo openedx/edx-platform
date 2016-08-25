@@ -8,7 +8,7 @@ from django.test import TestCase, override_settings
 from django.conf import settings
 
 from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme
-from openedx.core.djangoapps.theming import helpers
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming.helpers import get_template_path_with_theme, strip_site_theme_templates_path, \
     get_themes, Theme, get_theme_base_dir
 
@@ -25,6 +25,7 @@ class TestHelpers(TestCase):
             Theme('red-theme', 'red-theme', get_theme_base_dir('red-theme')),
             Theme('edge.edx.org', 'edge.edx.org', get_theme_base_dir('edge.edx.org')),
             Theme('edx.org', 'edx.org', get_theme_base_dir('edx.org')),
+            Theme('example', 'example', get_theme_base_dir('example')),
             Theme('stanford-style', 'stanford-style', get_theme_base_dir('stanford-style')),
         ]
         actual_themes = get_themes()
@@ -44,13 +45,13 @@ class TestHelpers(TestCase):
     def test_get_value_returns_override(self):
         """
         Tests to make sure the get_value() operation returns a combined dictionary consisting
-        of the base container with overridden keys from the microsite configuration
+        of the base container with overridden keys from the site configuration
         """
-        with patch('microsite_configuration.microsite.get_value') as mock_get_value:
+        with patch('openedx.core.djangoapps.site_configuration.helpers.get_value') as mock_get_value:
             override_key = 'JWT_ISSUER'
             override_value = 'testing'
             mock_get_value.return_value = {override_key: override_value}
-            jwt_auth = helpers.get_value('JWT_AUTH')
+            jwt_auth = configuration_helpers.get_value('JWT_AUTH')
             self.assertEqual(jwt_auth[override_key], override_value)
 
 

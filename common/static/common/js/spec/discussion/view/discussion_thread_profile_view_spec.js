@@ -1,21 +1,21 @@
 /* globals Discussion, DiscussionSpecHelper, DiscussionThreadProfileView, Thread */
 (function() {
     'use strict';
-    describe("DiscussionThreadProfileView", function() {
+    describe('DiscussionThreadProfileView', function() {
         var checkBody, checkPostWithImages, makeThread, makeView, spyConvertMath;
         beforeEach(function() {
             DiscussionSpecHelper.setUpGlobals();
             DiscussionSpecHelper.setUnderscoreFixtures();
             this.threadData = {
-                id: "1",
-                body: "dummy body",
+                id: '1',
+                body: 'dummy body',
                 discussion: new Discussion(),
                 abuse_flaggers: [],
                 commentable_id: 'dummy_discussion',
                 votes: {
-                    up_count: "42"
+                    up_count: '42'
                 },
-                created_at: "2014-09-09T20:11:08Z"
+                created_at: '2014-09-09T20:11:08Z'
             };
             this.imageTag = '<img src="https://www.google.com.pk/images/srpr/logo11w.png">';
             window.MathJax = {
@@ -40,7 +40,7 @@
             return thread;
         };
         spyConvertMath = function(view) {
-            return spyOn(view, "convertMath").and.callFake(function() {
+            return spyOn(view, 'convertMath').and.callFake(function() {
                 return this.model.set('markdownBody', this.model.get('body'));
             });
         };
@@ -79,49 +79,49 @@
             }
             view = makeView(makeThread(threadData));
             view.render();
-            return expect(view.$el.find(".post-body").html()).toEqual(expectedHtml);
+            return expect(view.$el.find('.post-body').html()).toEqual(expectedHtml);
         };
         checkBody = function(truncated, view, threadData) {
             var expectedOutput, inputHtmlStripped, outputHtmlStripped;
             view.render();
             if (!truncated) {
-                expect(view.model.get("body")).toEqual(view.model.get("abbreviatedBody"));
-                return expect(view.$el.find(".post-body").html()).toEqual(threadData.body);
+                expect(view.model.get('body')).toEqual(view.model.get('abbreviatedBody'));
+                return expect(view.$el.find('.post-body').html()).toEqual(threadData.body);
             } else {
-                expect(view.model.get("body")).not.toEqual(view.model.get("abbreviatedBody"));
-                expect(view.$el.find(".post-body").html()).not.toEqual(threadData.body);
-                outputHtmlStripped = view.$el.find(".post-body").html().replace(/(<([^>]+)>)/ig, "");
-                outputHtmlStripped = outputHtmlStripped.replace("Some images in this post have been omitted", "");
-                outputHtmlStripped = outputHtmlStripped.replace("image omitted", "");
-                inputHtmlStripped = threadData.body.replace(/(<([^>]+)>)/ig, "");
+                expect(view.model.get('body')).not.toEqual(view.model.get('abbreviatedBody'));
+                expect(view.$el.find('.post-body').html()).not.toEqual(threadData.body);
+                outputHtmlStripped = view.$el.find('.post-body').html().replace(/(<([^>]+)>)/ig, '');
+                outputHtmlStripped = outputHtmlStripped.replace('Some images in this post have been omitted', '');
+                outputHtmlStripped = outputHtmlStripped.replace('image omitted', '');
+                inputHtmlStripped = threadData.body.replace(/(<([^>]+)>)/ig, '');
                 expectedOutput = inputHtmlStripped.substring(0, 139) + '…';
                 expect(outputHtmlStripped).toEqual(expectedOutput);
-                return expect(view.$el.find(".post-body").html().indexOf("…")).toBeGreaterThan(0);
+                return expect(view.$el.find('.post-body').html().indexOf('…')).toBeGreaterThan(0);
             }
         };
-        describe("Body markdown should be correct", function() {
+        describe('Body markdown should be correct', function() {
             var numImages, truncatedText, _i, _j, _len, _len1, _ref, _ref1;
-            it("untruncated text without markdown body", function() {
+            it('untruncated text without markdown body', function() {
                 var view;
-                this.threadData.body = "Test body";
+                this.threadData.body = 'Test body';
                 view = makeView(makeThread(this.threadData));
                 return checkBody(false, view, this.threadData);
             });
-            it("truncated text without markdown body", function() {
+            it('truncated text without markdown body', function() {
                 var view;
-                this.threadData.body = new Array(100).join("test ");
+                this.threadData.body = new Array(100).join('test ');
                 view = makeView(makeThread(this.threadData));
                 return checkBody(true, view, this.threadData);
             });
-            it("untruncated text with markdown body", function() {
+            it('untruncated text with markdown body', function() {
                 var view;
                 this.threadData.body = '<p>' + this.imageTag + '<em>Google top search engine</em></p>';
                 view = makeView(makeThread(this.threadData));
                 return checkBody(false, view, this.threadData);
             });
-            it("truncated text with markdown body", function() {
+            it('truncated text with markdown body', function() {
                 var testText, view;
-                testText = new Array(100).join("test ");
+                testText = new Array(100).join('test ');
                 this.threadData.body = '<p>' + this.imageTag + this.imageTag + '<em>' + testText + '</em></p>';
                 view = makeView(makeThread(this.threadData));
                 return checkBody(true, view, this.threadData);
@@ -133,18 +133,17 @@
                 for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
                     truncatedText = _ref1[_j];
                     it(
-                        "body with " + numImages + " images and " + (truncatedText ? "truncated" : "untruncated") +
-                        " text",
-                        // suppressing Don't make functions within a loop.
-                        /* jshint -W083 */
+                        'body with ' + numImages + ' images and ' + (truncatedText ? 'truncated' : 'untruncated') +
+                        ' text',
+                        // eslint-disable no-loop-func
                         function() {
                             return checkPostWithImages(numImages, truncatedText, this.threadData, this.imageTag);
                         }
-                        /* jshint +W083 */
+                        // eslint-enable no-loop-func
                     );
                 }
             }
-            it("check the thread retrieve url", function() {
+            it('check the thread retrieve url', function() {
                 var thread;
                 thread = makeThread(this.threadData);
                 return expect(thread.urlFor('retrieve'))
@@ -152,5 +151,4 @@
             });
         });
     });
-
 }).call(this);

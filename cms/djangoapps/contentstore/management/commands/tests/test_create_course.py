@@ -61,3 +61,35 @@ class TestCreateCourse(ModuleStoreTestCase):
         )
         # pylint: disable=protected-access
         self.assertEqual(store, modulestore()._get_modulestore_for_courselike(new_key).get_modulestore_type())
+
+    @ddt.data(ModuleStoreEnum.Type.split, ModuleStoreEnum.Type.mongo)
+    def test_get_course_with_different_case(self, default_store):
+        """
+        Tests that course can not be accessed with different case.
+
+        Scenario:
+            Create a course with lower case keys inside `bulk_operations` with `ignore_case=True`.
+            Verify that course is created.
+            Verify that get course from store using same course id but different case is not accessible.
+        """
+        org = 'org1'
+        number = 'course1'
+        run = 'run1'
+        with self.store.default_store(default_store):
+            lowercase_course_id = self.store.make_course_key(org, number, run)
+            with self.store.bulk_operations(lowercase_course_id, ignore_case=True):
+                # Create course with lowercase key & Verify that store returns course.
+                self.store.create_course(
+                    lowercase_course_id.org,
+                    lowercase_course_id.course,
+                    lowercase_course_id.run,
+                    self.user.id
+                )
+                course = self.store.get_course(lowercase_course_id)
+                self.assertIsNotNone(course, 'Course not found using lowercase course key.')
+                self.assertEqual(unicode(course.id), unicode(lowercase_course_id))
+
+                # Verify store does not return course with different case.
+                uppercase_course_id = self.store.make_course_key(org.upper(), number.upper(), run.upper())
+                course = self.store.get_course(uppercase_course_id)
+                self.assertIsNone(course, 'Course should not be accessed with uppercase course id.')

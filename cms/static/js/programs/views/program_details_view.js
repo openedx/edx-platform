@@ -1,20 +1,20 @@
 define([
-        'backbone',
-        'backbone.validation',
-        'jquery',
-        'underscore',
-        'js/programs/collections/course_runs_collection',
-        'js/programs/models/program_model',
-        'js/programs/views/confirm_modal_view',
-        'js/programs/views/course_details_view',
-        'text!templates/programs/program_details.underscore',
-        'edx-ui-toolkit/js/utils/html-utils',
-        'gettext',
-        'js/programs/utils/validation_config'
-    ],
-    function( Backbone, BackboneValidation, $, _, CourseRunsCollection,
+    'backbone',
+    'backbone.validation',
+    'jquery',
+    'underscore',
+    'js/programs/collections/course_runs_collection',
+    'js/programs/models/program_model',
+    'js/programs/views/confirm_modal_view',
+    'js/programs/views/course_details_view',
+    'text!templates/programs/program_details.underscore',
+    'edx-ui-toolkit/js/utils/html-utils',
+    'gettext',
+    'js/programs/utils/validation_config'
+],
+    function(Backbone, BackboneValidation, $, _, CourseRunsCollection,
         ProgramModel, ModalView, CourseView, ListTpl,
-            HtmlUtils ) {
+            HtmlUtils) {
         'use strict';
 
         return Backbone.View.extend({
@@ -27,10 +27,10 @@ define([
                 'click .js-publish-program': 'confirmPublish'
             },
 
-            tpl: HtmlUtils.template( ListTpl ),
+            tpl: HtmlUtils.template(ListTpl),
 
             initialize: function() {
-                Backbone.Validation.bind( this );
+                Backbone.Validation.bind(this);
 
                 this.courseRuns = new CourseRunsCollection([], {
                     organization: this.model.get('organizations')[0]
@@ -41,25 +41,25 @@ define([
             },
 
             render: function() {
-                HtmlUtils.setHtml(this.$el, this.tpl( this.model.toJSON() ) );
+                HtmlUtils.setHtml(this.$el, this.tpl(this.model.toJSON()));
                 this.postRender();
             },
 
             postRender: function() {
-                var courses = this.model.get( 'course_codes' );
+                var courses = this.model.get('course_codes');
 
-                _.each( courses, function( course ) {
+                _.each(courses, function(course) {
                     var title = course.key + 'Course';
 
-                    this[ title ] = new CourseView({
+                    this[title] = new CourseView({
                         courseRuns: this.courseRuns,
                         programModel: this.model,
                         courseData: course
                     });
-                }.bind(this) );
+                }.bind(this));
 
                 // Stop listening to the model sync set when publishing
-                this.model.off( 'sync' );
+                this.model.off('sync');
             },
 
             addCourse: function() {
@@ -69,7 +69,7 @@ define([
                 });
             },
 
-            checkEdit: function( event ) {
+            checkEdit: function(event) {
                 var $input = $(event.target),
                     $span = $input.prevAll('.js-model-value'),
                     $btn = $input.next('.js-enable-edit'),
@@ -83,12 +83,12 @@ define([
                 $btn.removeClass('is-hidden');
                 $span.removeClass('is-hidden');
 
-                if ( this.model.get( key ) !== value ) {
-                    this.model.set( data );
+                if (this.model.get(key) !== value) {
+                    this.model.set(data);
 
-                    if ( this.model.isValid( true ) ) {
-                        this.model.patch( data );
-                        $span.text( value );
+                    if (this.model.isValid(true)) {
+                        this.model.patch(data);
+                        $span.text(value);
                     }
                 }
             },
@@ -97,7 +97,7 @@ define([
              * Loads modal that user clicks a confirmation button
              * in to publish the course (or they can cancel out of it)
              */
-            confirmPublish: function( event ) {
+            confirmPublish: function(event) {
                 event.preventDefault();
 
                 /**
@@ -106,10 +106,10 @@ define([
                  * the program creation form and is only happening here
                  * it makes sense to have the validation at the view level
                  */
-                if ( this.model.isValid( true ) && this.validateMarketingSlug() ) {
+                if (this.model.isValid(true) && this.validateMarketingSlug()) {
                     this.modalView = new ModalView({
                         model: this.model,
-                        callback: _.bind( this.publishProgram, this ),
+                        callback: _.bind(this.publishProgram, this),
                         content: this.getModalContent(),
                         parentEl: '.js-publish-modal',
                         parentView: this
@@ -117,25 +117,24 @@ define([
                 }
             },
 
-            editField: function( event ) {
+            editField: function(event) {
                 /**
                  * Making the assumption that users can only see
                  * programs that they have permission to edit
                  */
-                var $btn = $( event.currentTarget ),
-                    $el = $btn.prev( 'input' );
+                var $btn = $(event.currentTarget),
+                    $el = $btn.prev('input');
 
                 event.preventDefault();
 
-                $el.prevAll( '.js-model-value' ).addClass( 'is-hidden' );
-                $el.removeClass( 'is-hidden' )
-                   .addClass( 'edit' )
+                $el.prevAll('.js-model-value').addClass('is-hidden');
+                $el.removeClass('is-hidden')
+                   .addClass('edit')
                    .focus();
-                $btn.addClass( 'is-hidden' );
+                $btn.addClass('is-hidden');
             },
 
             getModalContent: function() {
-                /* jshint maxlen: 300 */
                 return {
                     name: gettext('confirm'),
                     title: gettext('Publish this program?'),
@@ -154,9 +153,9 @@ define([
                     status: 'active'
                 };
 
-                this.model.set( data, { silent: true } );
-                this.model.on( 'sync', this.render, this );
-                this.model.patch( data );
+                this.model.set(data, {silent: true});
+                this.model.on('sync', this.render, this);
+                this.model.patch(data);
             },
 
             setAvailableCourseRuns: function() {
@@ -166,12 +165,12 @@ define([
                     availableRuns = allRuns;
 
                 if (courses.length) {
-                    selectedRuns = _.pluck( courses, 'run_modes' );
-                    selectedRuns = _.flatten( selectedRuns );
+                    selectedRuns = _.pluck(courses, 'run_modes');
+                    selectedRuns = _.flatten(selectedRuns);
                 }
 
                 availableRuns = _.reject(allRuns, function(run) {
-                    var selectedCourseRun = _.findWhere( selectedRuns, {
+                    var selectedCourseRun = _.findWhere(selectedRuns, {
                         course_key: run.id,
                         start_date: run.start
                     });
@@ -187,17 +186,17 @@ define([
                     $input = {},
                     $message = {};
 
-                if ( this.model.get( 'marketing_slug' ).length > 0 ) {
+                if (this.model.get('marketing_slug').length > 0) {
                     isValid = true;
                 } else {
-                    $input = this.$el.find( '#program-marketing-slug' );
-                    $message = $input.siblings( '.field-message' );
+                    $input = this.$el.find('#program-marketing-slug');
+                    $message = $input.siblings('.field-message');
 
                     // Update DOM
-                    $input.addClass( 'has-error' );
-                    $message.addClass( 'has-error' );
-                    $message.find( '.field-message-content' )
-                        .text( gettext( 'Marketing Slug is required.') );
+                    $input.addClass('has-error');
+                    $message.addClass('has-error');
+                    $message.find('.field-message-content')
+                        .text(gettext('Marketing Slug is required.'));
                 }
 
                 return isValid;

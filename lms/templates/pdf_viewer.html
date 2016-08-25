@@ -1,5 +1,11 @@
+<%page expression_filter="h"/>
 ﻿<!DOCTYPE html>
 <%namespace name='static' file='static_content.html'/>
+<%!
+from openedx.core.djangolib.js_utils import (
+    js_escaped_string
+)
+%>
 <!--
 Copyright 2012 Mozilla Foundation
 
@@ -24,7 +30,7 @@ http://sourceforge.net/adobe/cmap/wiki/License/
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <meta name="google" content="notranslate">
     <meta name="path_prefix" content="${EDX_ROOT_URL}">
-    <title>${current_chapter['title'] if current_chapter else '' |h}</title>
+    <title>${current_chapter['title'] if current_chapter else ''}</title>
 
     <link rel="stylesheet" href="${static.url('/static/css/vendor/pdfjs/viewer.css')}"/>
 
@@ -36,10 +42,10 @@ http://sourceforge.net/adobe/cmap/wiki/License/
     <script type="text/javascript" src="${static.url('/static/js/vendor/pdfjs/pdf.js')}"></script>
 
     <script type="text/javascript">
-        PDFJS.imageResourcesPath = "${static.url('/static/css/vendor/pdfjs/images/')}";
-        PDFJS.workerSrc = "${static.url('/static/js/vendor/pdfjs/pdf.worker.js')}";
-        PDFJS.cMapUrl = "${static.url('/static/css/vendor/pdfjs/cmaps/')}";
-        PDF_URL = '${current_url | h}';
+        PDFJS.imageResourcesPath = "${static.url('/static/css/vendor/pdfjs/images/') | n, js_escaped_string}";
+        PDFJS.workerSrc = "${static.url('/static/js/vendor/pdfjs/pdf.worker.js') | n, js_escaped_string}";
+        PDFJS.cMapUrl = "${static.url('/static/css/vendor/pdfjs/cmaps/') | n, js_escaped_string}";
+        PDF_URL = '${current_url | n, js_escaped_string}';
     </script>
 
     <script ${static.url('/static/js/vendor/pdfjs/debugger.js')}></script>
@@ -116,7 +122,7 @@ http://sourceforge.net/adobe/cmap/wiki/License/
 
             <a href="#" id="secondaryViewBookmark" class="secondaryToolbarButton bookmark visibleSmallView" title="Current view (copy or open in new window)" data-l10n-id="bookmark">
               <span data-l10n-id="bookmark_label">Current View</span>
-            </a>
+          </a>
 
             <div class="horizontalToolbarSeparator visibleLargeView"></div>
 
@@ -191,9 +197,9 @@ http://sourceforge.net/adobe/cmap/wiki/License/
                   <span data-l10n-id="download_label">Download</span>
                 </button>
                 <!-- <div class="toolbarButtonSpacer"></div> -->
-                <a href="#" id="viewBookmark" class="toolbarButton bookmark hiddenSmallView" title="Current view (copy or open in new window)" data-l10n-id="bookmark">
+                <button id="viewBookmark" class="toolbarButton bookmark hiddenSmallView" title="Current view (copy or open in new window)" data-l10n-id="bookmark">
                   <span data-l10n-id="bookmark_label">Current View</span>
-                </a>
+              </button>
 
                 <div class="verticalToolbarSeparator hiddenSmallView"></div>
                 

@@ -609,7 +609,7 @@ To start the debugger on failure, pass the ``--pdb`` option to the paver command
 
     paver test_acceptance -s lms --pdb --extra_args="lms/djangoapps/courseware/features/problems.feature"
 
-To run tests faster by not collecting static files, you can use
+To run tests faster by not collecting static files or compiling sass, you can use
 ``paver test_acceptance -s lms --fasttest`` and
 ``paver test_acceptance -s cms --fasttest``.
 
@@ -802,13 +802,13 @@ To view JavaScript code style quality run this command.
 
 ::
 
-    paver run_jshint
+    paver run_eslint
 
 -  This command also comes with a ``--limit`` switch, this is an example of that switch.
 
 ::
 
-	paver run_jshint --limit=700
+	paver run_eslint --limit=50000
 
 
 
@@ -829,7 +829,7 @@ Two tools are available for evaluating complexity of edx-platform code:
 
 ::
 
-       plato -q -x common/static/js/vendor/ -t common -l .jshintrc -r -d jscomplexity common/static/js/
+       plato -q -x common/static/js/vendor/ -t common -e .eslintrc.json -r -d jscomplexity common/static/js/
 
 
 

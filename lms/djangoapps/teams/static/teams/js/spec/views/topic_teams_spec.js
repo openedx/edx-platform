@@ -4,9 +4,9 @@ define([
     'teams/js/views/topic_teams',
     'teams/js/spec_helpers/team_spec_helpers',
     'common/js/spec_helpers/page_helpers'
-], function (Backbone, _, TopicTeamsView, TeamSpecHelpers, PageHelpers) {
+], function(Backbone, _, TopicTeamsView, TeamSpecHelpers, PageHelpers) {
     'use strict';
-    describe('Topic Teams View', function () {
+    describe('Topic Teams View', function() {
         var createTopicTeamsView = function(options) {
             options = options || {};
             var myTeamsCollection = options.myTeamsCollection || TeamSpecHelpers.createMockTeams({results: []});
@@ -38,12 +38,12 @@ define([
             }
         };
 
-        beforeEach(function () {
+        beforeEach(function() {
             setFixtures('<div class="teams-container"></div>');
             PageHelpers.preventBackboneChangingUrl();
         });
 
-        it('can render itself', function () {
+        it('can render itself', function() {
             var testTeamData = TeamSpecHelpers.createMockTeamData(1, 5),
                 teamsView = createTopicTeamsView({
                     teams: TeamSpecHelpers.createMockTeams({
@@ -61,21 +61,21 @@ define([
             verifyActions(teamsView);
         });
 
-        it('can browse all teams', function () {
+        it('can browse all teams', function() {
             var teamsView = createTopicTeamsView();
             spyOn(Backbone.history, 'navigate');
             teamsView.$('.browse-teams').click();
             expect(Backbone.history.navigate.calls.mostRecent().args[0]).toBe('browse');
         });
 
-        it('gives the search field focus when clicking on the search teams link', function () {
+        it('gives the search field focus when clicking on the search teams link', function() {
             var teamsView = createTopicTeamsView();
             spyOn($.fn, 'focus').and.callThrough();
             teamsView.$('.search-teams').click();
             expect(teamsView.$('.search-field').first().focus).toHaveBeenCalled();
         });
 
-        it('can show the create team modal', function () {
+        it('can show the create team modal', function() {
             var teamsView = createTopicTeamsView();
             spyOn(Backbone.history, 'navigate');
             teamsView.$('a.create-team').click();
@@ -84,18 +84,18 @@ define([
             );
         });
 
-        it('does not show actions for a user already in a team', function () {
+        it('does not show actions for a user already in a team', function() {
             var teamsView = createTopicTeamsView({myTeamsCollection: TeamSpecHelpers.createMockTeams()});
             verifyActions(teamsView, {showActions: false});
         });
 
-        it('shows actions for a privileged user already in a team', function () {
-            var teamsView = createTopicTeamsView({ privileged: true });
+        it('shows actions for a privileged user already in a team', function() {
+            var teamsView = createTopicTeamsView({privileged: true});
             verifyActions(teamsView);
         });
 
-        it('shows actions for a staff user already in a team', function () {
-            var teamsView = createTopicTeamsView({ privileged: false, staff: true });
+        it('shows actions for a staff user already in a team', function() {
+            var teamsView = createTopicTeamsView({privileged: false, staff: true});
             verifyActions(teamsView);
         });
 

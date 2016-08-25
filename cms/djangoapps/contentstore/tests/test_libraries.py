@@ -14,7 +14,6 @@ from student.roles import (
     CourseInstructorRole, CourseStaffRole, CourseCreatorRole, LibraryUserRole,
     OrgStaffRole, OrgInstructorRole, OrgLibraryUserRole,
 )
-from xblock.reference.user_service import XBlockUser
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -65,7 +64,7 @@ class LibraryTestCase(ModuleStoreTestCase):
         self.assertIsInstance(lib_key, LibraryLocator)
         return lib_key
 
-    def _add_library_content_block(self, course, library_key, other_settings=None):
+    def _add_library_content_block(self, course, library_key, publish_item=False, other_settings=None):
         """
         Helper method to add a LibraryContent block to a course.
         The block will be configured to select content from the library
@@ -76,7 +75,7 @@ class LibraryTestCase(ModuleStoreTestCase):
             category='library_content',
             parent_location=course.location,
             user_id=self.user.id,
-            publish_item=False,
+            publish_item=publish_item,
             source_library_id=unicode(library_key),
             **(other_settings or {})
         )
@@ -160,7 +159,7 @@ class TestLibraries(LibraryTestCase):
         with modulestore().default_store(ModuleStoreEnum.Type.split):
             course = CourseFactory.create()
 
-        lc_block = self._add_library_content_block(course, self.lib_key, {'max_count': num_to_select})
+        lc_block = self._add_library_content_block(course, self.lib_key, other_settings={'max_count': num_to_select})
         self.assertEqual(len(lc_block.children), 0)
         lc_block = self._refresh_children(lc_block)
 
@@ -490,7 +489,7 @@ class TestLibraryAccess(SignalDisconnectTestMixin, LibraryTestCase):
 
     def _assert_cannot_create_library(self, org="org", library="libfail", expected_code=403):
         """ Ensure the current user is not able to create a library. """
-        self.assertTrue(expected_code >= 300)
+        self.assertGreaterEqual(expected_code, 300)
         response = self.client.ajax_post(
             LIBRARY_REST_URL,
             {'org': org, 'library': library, 'display_name': "Irrelevant"}

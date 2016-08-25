@@ -4,9 +4,9 @@ Test the Studio help links.
 
 from flaky import flaky
 
-from .base_studio_test import StudioCourseTest
-from ...pages.studio.index import DashboardPage
-from ...pages.studio.utils import click_studio_help, studio_help_links
+from common.test.acceptance.tests.studio.base_studio_test import StudioCourseTest
+from common.test.acceptance.pages.studio.index import DashboardPage
+from common.test.acceptance.pages.studio.utils import click_studio_help, studio_help_links
 
 
 class StudioHelpTest(StudioCourseTest):

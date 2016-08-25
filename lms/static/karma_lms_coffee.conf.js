@@ -1,8 +1,7 @@
 // Karma config for lms-coffee suite.
 // Docs and troubleshooting tips in common/static/common/js/karma.common.conf.js
 
-/* jshint node: true */
-/*jshint -W079 */
+/* eslint-env node */
 'use strict';
 var path = require('path');
 var configModule = require(path.join(__dirname, '../../common/static/common/js/karma.common.conf.js'));
@@ -68,6 +67,6 @@ var options = {
     ]
 };
 
-module.exports = function (config) {
+module.exports = function(config) {
     configModule.configure(config, options);
 };

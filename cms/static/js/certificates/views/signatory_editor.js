@@ -1,6 +1,6 @@
 // Backbone Application View: Signatory Editor
 
-define([ // jshint ignore:line
+define([
     'jquery',
     'underscore',
     'backbone',
@@ -13,7 +13,7 @@ define([ // jshint ignore:line
     'js/views/uploads',
     'text!templates/signatory-editor.underscore'
 ],
-function ($, _, Backbone, gettext,
+function($, _, Backbone, gettext,
           TemplateUtils, ViewUtils, PromptView, NotificationView, FileUploadModel, FileUploadDialog,
           signatoryEditorTemplate) {
     'use strict';
@@ -28,7 +28,7 @@ function ($, _, Backbone, gettext,
             'click .action-upload-signature': 'uploadSignatureImage'
         },
 
-        className: function () {
+        className: function() {
             // Determine the CSS class names for this model instance
             var index = this.getModelIndex(this.model);
             return [
@@ -39,7 +39,7 @@ function ($, _, Backbone, gettext,
 
         initialize: function(options) {
             // Set up the initial state of the attributes set for this model instance
-             _.bindAll(this, 'render');
+            _.bindAll(this, 'render');
             this.model.bind('change', this.render);
             this.eventAgg = options.eventAgg;
             this.isEditingAllCollections = options.isEditingAllCollections;
@@ -58,8 +58,8 @@ function ($, _, Backbone, gettext,
         getTotalSignatoriesOnServer: function() {
             // Retrieve the count of signatories stored server-side
             var count = 0;
-            this.model.collection.each(function( modelSignatory) {
-                if(!modelSignatory.isNew()) {
+            this.model.collection.each(function(modelSignatory) {
+                if (!modelSignatory.isNew()) {
                     count ++;
                 }
             });
@@ -87,10 +87,10 @@ function ($, _, Backbone, gettext,
             this.model.set(
                 'name',
                 this.$('.signatory-name-input').val(),
-                { silent: true }
+                {silent: true}
             );
             this.toggleValidationErrorMessage('name');
-            this.eventAgg.trigger("onSignatoryUpdated", this.model);
+            this.eventAgg.trigger('onSignatoryUpdated', this.model);
         },
 
         setSignatoryTitle: function(event) {
@@ -99,10 +99,10 @@ function ($, _, Backbone, gettext,
             this.model.set(
                 'title',
                 this.$('.signatory-title-input').val(),
-                { silent:true }
+                {silent: true}
             );
             this.toggleValidationErrorMessage('title');
-            this.eventAgg.trigger("onSignatoryUpdated", this.model);
+            this.eventAgg.trigger('onSignatoryUpdated', this.model);
         },
 
         setSignatoryOrganization: function(event) {
@@ -111,9 +111,9 @@ function ($, _, Backbone, gettext,
             this.model.set(
                 'organization',
                 this.$('.signatory-organization-input').val(),
-                { silent: true }
+                {silent: true}
             );
-            this.eventAgg.trigger("onSignatoryUpdated", this.model);
+            this.eventAgg.trigger('onSignatoryUpdated', this.model);
         },
 
         setSignatorySignatureImagePath: function(event) {
@@ -121,7 +121,7 @@ function ($, _, Backbone, gettext,
             this.model.set(
                 'signature_image_path',
                 this.$('.signatory-signature-input').val(),
-                { silent: true }
+                {silent: true}
             );
         },
 
@@ -137,21 +137,21 @@ function ($, _, Backbone, gettext,
                 actions: {
                     primary: {
                         text: gettext('Delete'),
-                        click: function () {
+                        click: function() {
                             var deleting = new NotificationView.Mini({
                                 title: gettext('Deleting')
                             });
-                            if (model.isNew()){
+                            if (model.isNew()) {
                                 model.collection.remove(model);
-                                self.eventAgg.trigger("onSignatoryRemoved", model);
+                                self.eventAgg.trigger('onSignatoryRemoved', model);
                             }
                             else {
                                 deleting.show();
                                 model.destroy({
                                     wait: true,
-                                    success: function (model) {
+                                    success: function(model) {
                                         deleting.hide();
-                                        self.eventAgg.trigger("onSignatoryRemoved", model);
+                                        self.eventAgg.trigger('onSignatoryRemoved', model);
                                     }
                                 });
                             }
@@ -172,8 +172,8 @@ function ($, _, Backbone, gettext,
         uploadSignatureImage: function(event) {
             event.preventDefault();
             var upload = new FileUploadModel({
-                title: gettext("Upload signature image."),
-                message: gettext("Image must be in PNG format."),
+                title: gettext('Upload signature image.'),
+                message: gettext('Image must be in PNG format.'),
                 mimeTypes: ['image/png']
             });
             var self = this;
@@ -192,20 +192,19 @@ function ($, _, Backbone, gettext,
          * @param string modelAttribute - the attribute of the signatory model e.g. name, title.
         */
         toggleValidationErrorMessage: function(modelAttribute) {
-            var selector = "div.add-signatory-" + modelAttribute;
+            var selector = 'div.add-signatory-' + modelAttribute;
             if (!this.model.isValid() && _.has(this.model.validationError, modelAttribute)) {
-
                 // Show the error message if it is not exist before.
-                if( !$(selector).hasClass('error')) {
+                if (!$(selector).hasClass('error')) {
                     var errorMessage = this.model.validationError[modelAttribute];
-                    $(selector).addClass("error");
-                    $(selector).append("<span class='message-error'>" + errorMessage + "</span>");
+                    $(selector).addClass('error');
+                    $(selector).append("<span class='message-error'>" + errorMessage + '</span>');
                 }
             }
             else {
                 // Remove the error message.
-                $(selector).removeClass("error");
-                $(selector + ">span.message-error").remove();
+                $(selector).removeClass('error');
+                $(selector + '>span.message-error').remove();
             }
         }
 

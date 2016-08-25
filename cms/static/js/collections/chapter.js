@@ -1,9 +1,9 @@
-define(["backbone", "js/models/chapter"], function(Backbone, ChapterModel) {
+define(['backbone', 'js/models/chapter'], function(Backbone, ChapterModel) {
     var ChapterCollection = Backbone.Collection.extend({
         model: ChapterModel,
-        comparator: "order",
+        comparator: 'order',
         nextOrder: function() {
-            if(!this.length) return 1;
+            if (!this.length) return 1;
             return this.last().get('order') + 1;
         },
         isEmpty: function() {

@@ -1,4 +1,4 @@
-;(function (define) {
+(function(define) {
     'use strict';
     define(['backbone',
             'jquery',
@@ -17,22 +17,22 @@
              upgradeMessageTpl,
              certificateIconTpl
          ) {
-            return Backbone.View.extend({
-                messageTpl: HtmlUtils.template(upgradeMessageTpl),
-                iconTpl: HtmlUtils.template(certificateIconTpl),
+             return Backbone.View.extend({
+                 messageTpl: HtmlUtils.template(upgradeMessageTpl),
+                 iconTpl: HtmlUtils.template(certificateIconTpl),
 
-                initialize: function(options) {
-                    this.$el = options.$el;
-                    this.render();
-                },
+                 initialize: function(options) {
+                     this.$el = options.$el;
+                     this.render();
+                 },
 
-                render: function() {
-                    var data = this.model.toJSON();
+                 render: function() {
+                     var data = this.model.toJSON();
 
-                    data = $.extend(data, {certificateSvg: this.iconTpl()});
-                    HtmlUtils.setHtml(this.$el, this.messageTpl(data));
-                }
-            });
-        }
+                     data = $.extend(data, {certificateSvg: this.iconTpl()});
+                     HtmlUtils.setHtml(this.$el, this.messageTpl(data));
+                 }
+             });
+         }
     );
 }).call(this, define || RequireJS.define);
