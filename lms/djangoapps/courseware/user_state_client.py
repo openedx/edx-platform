@@ -6,7 +6,7 @@ data in a Django ORM model.
 import itertools
 from operator import attrgetter
 from time import time
-
+import logging
 try:
     import simplejson as json
 except ImportError:
@@ -14,9 +14,13 @@ except ImportError:
 
 import dogstats_wrapper as dog_stats_api
 from django.contrib.auth.models import User
+from django.db import transaction
+from django.db.utils import IntegrityError
 from xblock.fields import Scope
 from courseware.models import StudentModule, BaseStudentModuleHistory
 from edx_user_state_client.interface import XBlockUserStateClient, XBlockUserState
+
+log = logging.getLogger(__name__)
 
 
 class DjangoXBlockUserStateClient(XBlockUserStateClient):
@@ -222,8 +226,19 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
                 current_state.update(state)
                 num_fields_after = len(current_state)
                 student_module.state = json.dumps(current_state)
-                # We just read this object, so we know that we can do an update
-                student_module.save(force_update=True)
+                try:
+                    with transaction.atomic():
+                        # Updating the object - force_update guarantees no INSERT will occur.
+                        student_module.save(force_update=True)
+                except IntegrityError:
+                    # The UPDATE above failed. Log information - but ignore the error.
+                    # See https://openedx.atlassian.net/browse/TNL-5365
+                    log.warning("set_many: IntegrityError for student {} - course_id {} - usage key {}".format(
+                        user, usage_key.course_key, usage_key
+                    ))
+                    log.warning("set_many: All {} block keys: {}".format(
+                        len(block_keys_to_state), block_keys_to_state.keys()
+                    ))
 
             # The rest of this method exists only to submit DataDog events.
             # Remove it once we're no longer interested in the data.
