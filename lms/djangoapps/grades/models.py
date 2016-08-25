@@ -12,7 +12,7 @@ import json
 import logging
 from operator import attrgetter
 
-from django.db import models
+from django.db import models, transaction
 from django.db.utils import IntegrityError
 from model_utils.models import TimeStampedModel
 
@@ -107,7 +107,8 @@ class VisibleBlocksQuerySet(models.QuerySet):
             blocks = BlockRecordSet(blocks)
 
         try:
-            model = self.create_from_blockrecords(blocks)
+            with transaction.atomic():
+                model = self.create_from_blockrecords(blocks)
         except IntegrityError:
             # If an integrity error occurs, the VisibleBlocks model we want to
             # create already exists.  The hash is still the correct value.
@@ -172,13 +173,10 @@ class PersistentSubsectionGradeQuerySet(models.QuerySet):
             kwargs['course_id'] = kwargs['usage_key'].course_key
 
         visible_blocks_hash = VisibleBlocks.objects.hash_from_blockrecords(blocks=visible_blocks)
-        grade = self.model(
+        return super(PersistentSubsectionGradeQuerySet, self).create(
             visible_blocks_id=visible_blocks_hash,
             **kwargs
         )
-        grade.full_clean()
-        grade.save()
-        return grade
 
 
 class PersistentSubsectionGrade(TimeStampedModel):
@@ -244,12 +242,13 @@ class PersistentSubsectionGrade(TimeStampedModel):
         user_id = kwargs.pop('user_id')
         usage_key = kwargs.pop('usage_key')
         try:
-            grade, is_created = cls.objects.get_or_create(
-                user_id=user_id,
-                course_id=usage_key.course_key,
-                usage_key=usage_key,
-                defaults=kwargs,
-            )
+            with transaction.atomic():
+                grade, is_created = cls.objects.get_or_create(
+                    user_id=user_id,
+                    course_id=usage_key.course_key,
+                    usage_key=usage_key,
+                    defaults=kwargs,
+                )
         except IntegrityError:
             cls.update_grade(user_id=user_id, usage_key=usage_key, **kwargs)
         else:

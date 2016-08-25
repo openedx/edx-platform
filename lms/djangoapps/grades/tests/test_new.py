@@ -17,6 +17,7 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from ..models import PersistentSubsectionGrade
 from ..new.course_grade import CourseGradeFactory
 from ..new.subsection_grade import SubsectionGrade, SubsectionGradeFactory
+from lms.djangoapps.grades.tests.utils import mock_get_score
 
 
 class GradeTestBase(SharedModuleStoreTestCase):
@@ -128,7 +129,7 @@ class SubsectionGradeFactoryTest(GradeTestBase):
                 'lms.djangoapps.grades.new.subsection_grade.SubsectionGradeFactory._get_saved_grade',
                 wraps=self.subsection_grade_factory._get_saved_grade  # pylint: disable=protected-access
             ) as mock_get_saved_grade:
-                with self.assertNumQueries(17):
+                with self.assertNumQueries(19):
                     grade_a = self.subsection_grade_factory.create(self.sequence, self.course_structure, self.course)
                 self.assertTrue(mock_get_saved_grade.called)
                 self.assertTrue(mock_save_grades.called)
@@ -180,11 +181,11 @@ class SubsectionGradeTest(GradeTestBase):
         Assuming the underlying score reporting methods work, test that the score is calculated properly.
         """
         grade = self.subsection_grade_factory.create(self.sequence, self.course_structure, self.course)
-        with patch('lms.djangoapps.grades.new.subsection_grade.get_score', return_value=(0, 1)):
+        with mock_get_score(1, 2):
             # The final 2 parameters are only passed through to our mocked-out get_score method
             grade.compute(self.request.user, self.course_structure, None, None)
-        self.assertEqual(grade.all_total.earned, 0)
-        self.assertEqual(grade.all_total.possible, 1)
+        self.assertEqual(grade.all_total.earned, 1)
+        self.assertEqual(grade.all_total.possible, 2)
 
     def test_save_and_load(self):
         """

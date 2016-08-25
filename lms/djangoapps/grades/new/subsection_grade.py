@@ -44,11 +44,15 @@ class SubsectionGrade(object):
         """
         Compute the grade of this subsection for the given student and course.
         """
-        for descendant_key in course_structure.post_order_traversal(
-                filter_func=possibly_scored,
-                start_node=self.location,
-        ):
-            self._compute_block_score(student, descendant_key, course_structure, scores_client, submissions_scores)
+        try:
+            for descendant_key in course_structure.post_order_traversal(
+                    filter_func=possibly_scored,
+                    start_node=self.location,
+            ):
+                self._compute_block_score(student, descendant_key, course_structure, scores_client, submissions_scores)
+        finally:
+            # self.scores may hold outdated data, force it to refresh on next access
+            lazy.invalidate(self, 'scores')
 
         self.all_total, self.graded_total = graders.aggregate_scores(self.scores, self.display_name, self.location)
 

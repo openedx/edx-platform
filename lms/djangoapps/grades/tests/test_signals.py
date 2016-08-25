@@ -203,7 +203,7 @@ class ScoreChangedUpdatesSubsectionGradeTest(ModuleStoreTestCase):
     def test_subsection_grade_updated_on_signal(self, default_store):
         with self.store.default_store(default_store):
             self.set_up_course()
-            with check_mongo_calls(2) and self.assertNumQueries(13):
+            with check_mongo_calls(2) and self.assertNumQueries(15):
                 recalculate_subsection_grade_handler(None, **self.score_changed_kwargs)
 
     @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
@@ -212,7 +212,7 @@ class ScoreChangedUpdatesSubsectionGradeTest(ModuleStoreTestCase):
             self.set_up_course()
             ItemFactory.create(parent=self.sequential, category='problem', display_name='problem2')
             ItemFactory.create(parent=self.sequential, category='problem', display_name='problem3')
-            with check_mongo_calls(2) and self.assertNumQueries(13):
+            with check_mongo_calls(2) and self.assertNumQueries(15):
                 recalculate_subsection_grade_handler(None, **self.score_changed_kwargs)
 
     @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
@@ -238,8 +238,8 @@ class ScoreChangedUpdatesSubsectionGradeTest(ModuleStoreTestCase):
                     SCORE_CHANGED.send(sender=None, **self.score_changed_kwargs)
 
     @ddt.data(
-        ('points_possible', 2, 13),
-        ('points_earned', 2, 13),
+        ('points_possible', 2, 15),
+        ('points_earned', 2, 15),
         ('user', 0, 0),
         ('course_id', 0, 0),
         ('usage_id', 0, 0),
