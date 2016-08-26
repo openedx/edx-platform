@@ -2,7 +2,7 @@
 # edX translation file.
 # Copyright (C) 2016 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-#
+# 
 # Translators:
 # anaseha <anaselhadjamor@gmail.com>, 2014
 # Bertrand Marron <bertrand.marron@gmail.com>, 2014-2015
@@ -64,7 +64,7 @@
 # edX translation file.
 # Copyright (C) 2016 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-#
+# 
 # Translators:
 # Bertrand Marron <bertrand.marron@gmail.com>, 2014
 # Encolpe Degoute <inactive+encolpe@transifex.com>, 2013
@@ -93,7 +93,7 @@
 # edX translation file
 # Copyright (C) 2016 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-#
+# 
 # Translators:
 # SALHI Aissam <ais.salhy@gmail.com>, 2014
 # Bertrand Marron <bertrand.marron@gmail.com>, 2013-2015
@@ -142,7 +142,7 @@
 # edX translation file
 # Copyright (C) 2016 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-#
+# 
 # Translators:
 # Alexandre Armougom <aav974@hotmail.fr>, 2016
 # Bertrand Marron <bertrand.marron@gmail.com>, 2013-2015
@@ -174,7 +174,7 @@
 # edX translation file
 # Copyright (C) 2016 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-#
+# 
 # Translators:
 # Bertrand Marron <bertrand.marron@gmail.com>, 2014
 # Christopher Castermane <christopher.castermane@student.uclouvain.be>, 2014
@@ -383,6 +383,7 @@ msgstr ""
 #: common/djangoapps/course_modes/helpers.py lms/djangoapps/branding/api.py
 #: openedx/core/djangoapps/user_api/views.py
 #: lms/templates/static_templates/honor.html
+#: themes/example/lms/templates/static_templates/honor.html
 #: themes/stanford-style/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/static_templates/tos.html
 msgid "Honor Code"
@@ -4342,6 +4343,7 @@ msgstr ""
 
 #: cms/templates/widgets/footer.html
 #: lms/templates/static_templates/privacy.html
+#: themes/example/lms/templates/static_templates/privacy.html
 #: themes/red-theme/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/static_templates/tos.html
@@ -4353,6 +4355,7 @@ msgid "Accessibility Policy"
 msgstr ""
 
 #: cms/templates/widgets/footer.html lms/templates/static_templates/tos.html
+#: themes/example/lms/templates/static_templates/tos.html
 #: themes/red-theme/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/static_templates/tos.html
@@ -9532,6 +9535,7 @@ msgstr "Numéro du cours :"
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 #: lms/templates/courseware/courses.html
 #: themes/edx.org/lms/templates/header.html
+#: themes/example/lms/templates/header.html
 #: themes/red-theme/lms/templates/header.html
 msgid "Courses"
 msgstr "Cours"
@@ -9669,6 +9673,7 @@ msgid "Choose Language"
 msgstr ""
 
 #: cms/templates/widgets/header.html lms/templates/user_dropdown.html
+#: themes/example/lms/templates/header.html
 msgid "Account"
 msgstr "Compte"
 
@@ -9729,6 +9734,7 @@ msgstr ""
 
 #: cms/templates/widgets/sock.html
 #: themes/edx.org/cms/templates/widgets/sock.html
+#: themes/example/lms/templates/static_templates/contact.html
 #: themes/stanford-style/lms/templates/static_templates/about.html
 msgid "Contact Us"
 msgstr ""
@@ -9742,6 +9748,7 @@ msgid "Usermenu dropdown"
 msgstr ""
 
 #: cms/templates/widgets/user_dropdown.html lms/templates/user_dropdown.html
+#: themes/example/lms/templates/header.html
 #: themes/red-theme/lms/templates/header.html
 msgid "Sign Out"
 msgstr "Se déconnecter"
@@ -9864,11 +9871,11 @@ msgstr ""
 msgid "Bookmark"
 msgstr ""
 
-#: lms/templates/course.html
+#: lms/templates/course.html themes/example/lms/templates/course.html
 msgid "LEARN MORE"
 msgstr "EN SAVOIR PLUS"
 
-#: lms/templates/course.html
+#: lms/templates/course.html themes/example/lms/templates/course.html
 msgid "Starts"
 msgstr "Début"
 
@@ -9878,6 +9885,7 @@ msgstr "Voir tous les cours"
 
 #: lms/templates/dashboard.html lms/templates/user_dropdown.html
 #: themes/edx.org/lms/templates/dashboard.html
+#: themes/example/lms/templates/header.html
 msgid "Dashboard"
 msgstr "Tableau de bord"
 
@@ -9974,6 +9982,7 @@ msgstr ""
 #: lms/templates/enroll_staff.html lms/templates/ccx/enrollment.html
 #: lms/templates/courseware/course_about.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
+#: themes/example/lms/templates/courseware/course_about.html
 msgid "Enroll"
 msgstr "S'inscrire"
 
@@ -10116,9 +10125,11 @@ msgid "Tell us the details"
 msgstr "Indiquez-nous les détails"
 
 #: lms/templates/help_modal.html
-msgid "Include error messages, steps which lead to the issue, etc"
+msgid ""
+"Describe what you were doing when you encountered the issue. Include any "
+"details that will help us to troubleshoot, including error messages that you"
+" saw."
 msgstr ""
-"En incluant les messages d'erreur, étapes qui on conduit au problème, etc"
 
 #: lms/templates/help_modal.html
 msgid "Thank You!"
@@ -10150,9 +10161,7 @@ msgid "Brief description of the problem"
 msgstr "Brève description du problème"
 
 #: lms/templates/help_modal.html
-msgid ""
-"Details of the problem you are encountering{asterisk}{begin_span}Include "
-"error messages, steps which lead to the issue, etc.{end_span}"
+msgid "Details of the problem you are encountering{asterisk}"
 msgstr ""
 
 #: lms/templates/help_modal.html
@@ -10474,7 +10483,8 @@ msgstr ""
 msgid "Raw data:"
 msgstr "Données brutes :"
 
-#: lms/templates/navigation.html themes/red-theme/lms/templates/header.html
+#: lms/templates/navigation.html themes/example/lms/templates/header.html
+#: themes/red-theme/lms/templates/header.html
 msgid "Global"
 msgstr "Mondial"
 
@@ -10514,6 +10524,7 @@ msgid "Register"
 msgstr "Inscription"
 
 #: lms/templates/navigation.html themes/edx.org/lms/templates/header.html
+#: themes/example/lms/templates/header.html
 #: themes/red-theme/lms/templates/header.html
 msgid "Sign in"
 msgstr "Connexion"
@@ -11158,7 +11169,7 @@ msgstr ""
 msgid "Dashboard for:"
 msgstr "Tableau de bord pour :"
 
-#: lms/templates/user_dropdown.html
+#: lms/templates/user_dropdown.html themes/example/lms/templates/header.html
 msgid "Profile"
 msgstr ""
 
@@ -11228,12 +11239,12 @@ msgid "Download Handout"
 msgstr "Télécharger les documents pédagogiques"
 
 #: lms/templates/word_cloud.html
-msgid "Your words:"
-msgstr "Vos mots :"
+msgid "{num} of {total}"
+msgstr ""
 
 #: lms/templates/word_cloud.html
-msgid "Total number of words:"
-msgstr "Nombre total de mots :"
+msgid "Your words were:"
+msgstr ""
 
 #: lms/templates/api_admin/api_access_request_form.html
 msgid "API Access Request"
@@ -12437,10 +12448,12 @@ msgid "This content is graded"
 msgstr ""
 
 #: lms/templates/courseware/course_about.html
+#: themes/example/lms/templates/courseware/course_about.html
 msgid "An error occurred. Please try again later."
 msgstr "Une erreur s'est produite. Merci d'essayer de nouveau plus tard."
 
 #: lms/templates/courseware/course_about.html
+#: themes/example/lms/templates/courseware/course_about.html
 msgid ""
 "The currently logged-in user account does not have permission to enroll in "
 "this course. You may need to {start_logout_tag}log out{end_tag} then try the"
@@ -12516,6 +12529,7 @@ msgid "Additional Resources"
 msgstr "Ressources complémentaires"
 
 #: lms/templates/courseware/course_about.html
+#: themes/example/lms/templates/courseware/course_about.html
 msgid "enroll"
 msgstr "S'inscrire"
 
@@ -16990,6 +17004,83 @@ msgid ""
 "certificates to help fund free education for everyone globally"
 msgstr ""
 
+#: themes/example/lms/templates/header.html
+msgid "Create Account"
+msgstr ""
+
+#: themes/example/lms/templates/courseware/course_about.html
+msgid "Want to purchase this course for a group?"
+msgstr ""
+
+#: themes/example/lms/templates/courseware/course_about.html
+msgid ""
+"You can purchase enrollment codes for this course to distribute to your team"
+msgstr ""
+
+#: themes/example/lms/templates/courseware/course_about.html
+msgid "Purchase for a Group"
+msgstr ""
+
+#: themes/example/lms/templates/courseware/course_about.html
+msgid ""
+"Bulk discounts may apply for groups larger than 10. Contact "
+"{link_start}harvardxplus@harvard.edu{link_end} for more information."
+msgstr ""
+
+#: themes/example/lms/templates/courseware/course_about.html
+msgid "Email Us"
+msgstr ""
+
+#: themes/example/lms/templates/courseware/courses.html
+msgid "Lorem ipsum dolor sit amet."
+msgstr ""
+
+#: themes/example/lms/templates/static_templates/about.html
+msgid "About Us"
+msgstr ""
+
+#: themes/example/lms/templates/static_templates/contact.html
+msgid "Thank you for your inquiry"
+msgstr ""
+
+#: themes/example/lms/templates/static_templates/faq.html
+msgid "FAQ's"
+msgstr ""
+
+#: themes/example/lms/templates/static_templates/faq.html
+msgid "General FAQs"
+msgstr ""
+
+#: themes/example/lms/templates/static_templates/faq.html
+#: themes/example/lms/templates/static_templates/honor.html
+#: themes/example/lms/templates/static_templates/privacy.html
+#: themes/example/lms/templates/static_templates/tos.html
+msgid "Lorem ipsum dolor sit amet"
+msgstr ""
+
+#: themes/example/lms/templates/static_templates/faq.html
+msgid "Academic Planning"
+msgstr ""
+
+#: themes/example/lms/templates/static_templates/faq.html
+#: themes/example/lms/templates/static_templates/honor.html
+#: themes/example/lms/templates/static_templates/privacy.html
+#: themes/example/lms/templates/static_templates/tos.html
+msgid "Back to top"
+msgstr ""
+
+#: themes/example/lms/templates/static_templates/faq.html
+msgid "Registration"
+msgstr ""
+
+#: themes/example/lms/templates/static_templates/faq.html
+msgid "Finances"
+msgstr ""
+
+#: themes/example/lms/templates/student_account/login_and_register.html
+msgid "Sign in or Create Account"
+msgstr ""
+
 #. Translators: 'EdX', 'edX', and 'Open edX' are trademarks of 'edX Inc.'.
 #. Please do not translate any of these trademarks and company names.
 #: themes/red-theme/lms/templates/footer.html
@@ -21076,61 +21167,3 @@ msgid ""
 msgstr ""
 "Une nouvelle révision a été créée : Fusion entre la révision #%(r1)d et la "
 "révision #%(r2)d"
-############# FUN translations
-
-#: common/templates/course_modes/choose.html
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Register to take a certification exam"
-msgstr "S'inscrire pour passer une certification"
-
-#: common/templates/course_modes/choose.html
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Celebrate your achievement through a certificate. This document will help you to demonstrate the skills you have acquired in this MOOC, boost your CV and your career or prepare for further professional development."
-msgstr "Valorisez vos nouvelles connaissances grâce à un certificat. Ce document vous permettra de valoriser les compétences acquises dans ce MOOC, booster votre CV et votre carrière, voire préparer une évolution professionnelle."
-
-#: common/templates/course_modes/choose.html
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "The benefits of a certificate:"
-msgstr "Les avantages d'un certificat :"
-
-#: common/templates/course_modes/choose.html
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Get a certificate from the institution who created the MOOC."
-msgstr "Obtenez un certificat émis par l'établissement créateur du MOOC."
-
-#: common/templates/course_modes/choose.html
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Add this certificate to your resume, your cover letter or share it directly on social networks"
-msgstr "Ajoutez ce certificat à votre CV, à votre lettre de motivation ou partagez-le directement sur les réseaux sociaux."
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "You subscribed to a certified exam for this course"
-msgstr "Vous avez souscrit à un examen certifiant pour ce cours"
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Are you sure you want to unenroll from the certified course <strong>{course}</strong><br><br>?"
-msgstr "Êtes-vous sûr de vouloir vous désinscrire du cours certifié <strong>{course}</strong><br><br> ?"
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "In this case, click <strong>Unsubscribe</strong> and to request a refund please contact our support at the following address: <a href=mailto:{billing_email}>{billing_email}</a>"
-msgstr "Dans ce cas, cliquez sur <strong>Se désinscrire</strong>, puis pour toute demande de remboursement contactez notre support à lʼadresse <a href=mailto:{billing_email}>{billing_email}</a>"
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Once you have paid, you agree to take a remote-proctored exam according to procedures and rules defined for this course."
-msgstr "Une fois le paiement effectué vous vous engagez à passer un examen surveillé à distance selon les protocoles définis pour ce cours."
-
-#: lms/templates/verify_student/make_payment_step.underscore:90
-msgid "Please read and accept terms and conditions"
-msgstr "Veuillez lire et accepter les conditions d'utilisation"
-
-#: lms/templates/verify_student/make_payment_step.underscore:98
-msgid "Accept"
-msgstr "J'accepte"
-
-#: cms/templates/settings_graders.html
-msgid "Verified certificate minimum grade (leave empty if this course does not deliver a verified certificate):"
-msgstr "Note minimale pour les certificats vérifiés (laisser vide si ce cours ne fournit pas de certificat vérifié) :"
-
-#: cms/templates/settings_graders.html
-msgid "Minimum passing grade in percent"
-msgstr "Note minimale de passage en pourcentage"

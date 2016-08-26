@@ -53,7 +53,7 @@
               <button class="toggle-collapse ccx-button-link" aria-expanded="false">
                  <i class="fa fa-caret-right"></i>
                  <span class="sr">
-                     <%- interpolate(gettext('toggle subsection %(displayName)s'),
+                     <%- interpolate(gettext('toggle subsection %(displayName)s')),
                       {displayName: child.display_name}, true) %>
                  </span>
               </button>
