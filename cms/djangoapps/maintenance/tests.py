@@ -182,6 +182,23 @@ class TestForcePublish(MaintenanceViewTestCase):
             error_message='Force publishing course is not supported with old mongo courses.'
         )
 
+    def test_mongo_course_with_split_course_key(self):
+        """
+        Test that we get an error message `course_key_not_found` for a provided split course key
+        if we already have an old mongo course.
+        """
+        # validate non split error message
+        course = CourseFactory.create(org='e', number='d', run='X', default_store=ModuleStoreEnum.Type.mongo)
+        self.verify_error_message(
+            data={'course-id': unicode(course.id)},
+            error_message='Force publishing course is not supported with old mongo courses.'
+        )
+        # Now search for the course key in split version.
+        self.verify_error_message(
+            data={'course-id': 'course-v1:e+d+X'},
+            error_message=COURSE_KEY_ERROR_MESSAGES['course_key_not_found']
+        )
+
     def test_already_published(self):
         """
         Test that when a course is forcefully publish, we get a 'course is already published' message.

@@ -300,6 +300,14 @@ class TestMongoModuleStore(TestMongoModuleStoreBase):
         with self.assertRaises(ItemNotFoundError):
             self.draft_store.get_course(course_key)
 
+    def test_has_mongo_course_with_split_course_key(self):
+        """
+        Test `has course` using split course key would return False.
+        """
+        course_key = CourseKey.from_string('course-v1:edX+simple+2012_Fall')
+
+        self.assertFalse(self.draft_store.has_course(course_key))
+
     def test_has_course_with_library(self):
         """
         Test that has_course() returns False when called with a LibraryLocator.
