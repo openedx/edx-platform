@@ -246,6 +246,30 @@ class ProblemTypeTestMixin(object):
         self.assertTrue(self.problem_page.is_focus_on_problem_meta())
 
     @attr(shard=7)
+    def test_save_reaction(self):
+        """
+        Scenario: Verify that the save button performs as expected with problem types
+
+        Given that I am on a problem page
+        And I can see a CAPA problem with the Save button present
+        When I select and answer and click the "Save" button
+        And I should see the Save notification
+        And the Save button should be disabled
+        And if I change the answer selected
+        Then the "Save" button should be enabled and visible
+        """
+        self.problem_page.wait_for(
+            lambda: self.problem_page.problem_name == self.problem_name,
+            "Make sure the correct problem is on the page"
+        )
+        self.assertTrue(self.problem_page.is_save_button_visible_enabled())
+        self.answer_problem(correct=True)
+        self.problem_page.click_save()
+        self.assertTrue(self.problem_page.is_save_button_visible_disabled())
+        self.answer_problem(correct=False)
+        self.assertTrue(self.problem_page.is_save_button_visible_enabled())
+
+    @attr(shard=7)
     def test_reset_clears_answer_and_focus(self):
         """
         Scenario: Reset will clear answers and focus on problem meta
