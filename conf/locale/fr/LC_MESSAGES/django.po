@@ -2,7 +2,7 @@
 # edX translation file.
 # Copyright (C) 2016 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
+#
 # Translators:
 # anaseha <anaselhadjamor@gmail.com>, 2014
 # Bertrand Marron <bertrand.marron@gmail.com>, 2014-2015
@@ -64,7 +64,7 @@
 # edX translation file.
 # Copyright (C) 2016 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
+#
 # Translators:
 # Bertrand Marron <bertrand.marron@gmail.com>, 2014
 # Encolpe Degoute <inactive+encolpe@transifex.com>, 2013
@@ -93,7 +93,7 @@
 # edX translation file
 # Copyright (C) 2016 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
+#
 # Translators:
 # SALHI Aissam <ais.salhy@gmail.com>, 2014
 # Bertrand Marron <bertrand.marron@gmail.com>, 2013-2015
@@ -142,7 +142,7 @@
 # edX translation file
 # Copyright (C) 2016 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
+#
 # Translators:
 # Alexandre Armougom <aav974@hotmail.fr>, 2016
 # Bertrand Marron <bertrand.marron@gmail.com>, 2013-2015
@@ -174,7 +174,7 @@
 # edX translation file
 # Copyright (C) 2016 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
+#
 # Translators:
 # Bertrand Marron <bertrand.marron@gmail.com>, 2014
 # Christopher Castermane <christopher.castermane@student.uclouvain.be>, 2014
@@ -21167,3 +21167,61 @@ msgid ""
 msgstr ""
 "Une nouvelle révision a été créée : Fusion entre la révision #%(r1)d et la "
 "révision #%(r2)d"
+############# FUN translations
+
+#: common/templates/course_modes/choose.html
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Register to take a certification exam"
+msgstr "S'inscrire pour passer une certification"
+
+#: common/templates/course_modes/choose.html
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Celebrate your achievement through a certificate. This document will help you to demonstrate the skills you have acquired in this MOOC, boost your CV and your career or prepare for further professional development."
+msgstr "Valorisez vos nouvelles connaissances grâce à un certificat. Ce document vous permettra de valoriser les compétences acquises dans ce MOOC, booster votre CV et votre carrière, voire préparer une évolution professionnelle."
+
+#: common/templates/course_modes/choose.html
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "The benefits of a certificate:"
+msgstr "Les avantages d'un certificat :"
+
+#: common/templates/course_modes/choose.html
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Get a certificate from the institution who created the MOOC."
+msgstr "Obtenez un certificat émis par l'établissement créateur du MOOC."
+
+#: common/templates/course_modes/choose.html
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Add this certificate to your resume, your cover letter or share it directly on social networks"
+msgstr "Ajoutez ce certificat à votre CV, à votre lettre de motivation ou partagez-le directement sur les réseaux sociaux."
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "You subscribed to a certified exam for this course"
+msgstr "Vous avez souscrit à un examen certifiant pour ce cours"
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Are you sure you want to unenroll from the certified course <strong>{course}</strong><br><br>?"
+msgstr "Êtes-vous sûr de vouloir vous désinscrire du cours certifié <strong>{course}</strong><br><br> ?"
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "In this case, click <strong>Unsubscribe</strong> and to request a refund please contact our support at the following address: <a href=mailto:{billing_email}>{billing_email}</a>"
+msgstr "Dans ce cas, cliquez sur <strong>Se désinscrire</strong>, puis pour toute demande de remboursement contactez notre support à lʼadresse <a href=mailto:{billing_email}>{billing_email}</a>"
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Once you have paid, you agree to take a remote-proctored exam according to procedures and rules defined for this course."
+msgstr "Une fois le paiement effectué vous vous engagez à passer un examen surveillé à distance selon les protocoles définis pour ce cours."
+
+#: lms/templates/verify_student/make_payment_step.underscore:90
+msgid "Please read and accept terms and conditions"
+msgstr "Veuillez lire et accepter les conditions d'utilisation"
+
+#: lms/templates/verify_student/make_payment_step.underscore:98
+msgid "Accept"
+msgstr "J'accepte"
+
+#: cms/templates/settings_graders.html
+msgid "Verified certificate minimum grade (leave empty if this course does not deliver a verified certificate):"
+msgstr "Note minimale pour les certificats vérifiés (laisser vide si ce cours ne fournit pas de certificat vérifié) :"
+
+#: cms/templates/settings_graders.html
+msgid "Minimum passing grade in percent"
+msgstr "Note minimale de passage en pourcentage"
