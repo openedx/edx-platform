@@ -2,7 +2,7 @@
 <%! from openedx.core.djangolib.markup import HTML %>
 <% doinline = "inline" if inline else "" %>
 
-<div id="inputtype_${id}" class="${'text-input-dynamath' if do_math else ''} capa_inputtype ${doinline} textline">
+<form id="inputtype_${id}" class="${'text-input-dynamath' if do_math else ''} capa_inputtype ${doinline} textline">
 % if preprocessor is not None:
     <div class="text-input-dynamath_data ${doinline}" data-preprocessor="${preprocessor['class_name']}"/>
     <div class="script_placeholder" data-src="${preprocessor['script_src']}"/>
@@ -33,16 +33,8 @@
 />
 <span class="trailing_text">${trailing_text}</span>
 
-<span class="status" aria-describedby="input_${id}" data-tooltip="${status.display_tooltip}">
-    <span class="sr">
-      %if value:
-        ${value}
-      % else:
-        ${response_data['label']}
-      %endif
-        -
-        ${status.display_name}
-    </span>
+<span class="status" id="status_${id}" data-tooltip="${status.display_tooltip}">
+    <span class="sr">${status.display_name}</span>
 </span>
 
 <p id="answer_${id}" class="answer"></p>
@@ -60,4 +52,4 @@
   <span class="message">${HTML(msg)}</span>
 % endif
 
-</div>
+</form>

@@ -11,7 +11,7 @@
   % endfor
 
    <select name="input_${id}" id="input_${id}" ${describedby}>
-      <option value="option_${id}_dummy_default">  </option>
+      <option value="option_${id}_dummy_default">${default_option_text}</option>
       % for option_id, option_description in options:
           <option value="${option_id}"
           % if (option_id == value or option_id == answervariable):
@@ -22,10 +22,8 @@
     </select>
 
   <div class="indicator-container">
-    <span class="status ${status.classname}"
-        id="status_${id}"
-        aria-describedby="input_${id}" data-tooltip="${status.display_tooltip}">
-        <span class="sr">${value|h} - ${status.display_tooltip}</span>
+    <span class="status ${status.classname}" id="status_${id}" data-tooltip="${status.display_tooltip}">
+        <span class="sr">${status.display_name}</span>
     </span>
   </div>
   <p class="answer" id="answer_${id}"></p>

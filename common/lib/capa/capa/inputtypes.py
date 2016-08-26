@@ -426,6 +426,13 @@ class OptionInput(InputTypeBase):
         return [Attribute('options', transform=cls.parse_options),
                 Attribute('inline', False)]
 
+    def _extra_context(self):
+        """
+        Return extra context.
+        """
+        _ = self.capa_system.i18n.ugettext
+        return {'default_option_text': _('Select an option')}
+
 #-----------------------------------------------------------------------------
 
 
