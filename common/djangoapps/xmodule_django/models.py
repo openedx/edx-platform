@@ -2,10 +2,13 @@
 Useful django models for implementing XBlock infrastructure in django.
 """
 import warnings
+import logging
 
 from django.db import models
 from django.core.exceptions import ValidationError
 from opaque_keys.edx.keys import CourseKey, UsageKey, BlockTypeKey
+
+log = logging.getLogger(__name__)
 
 
 class NoneToEmptyManager(models.Manager):
@@ -104,6 +107,16 @@ class OpaqueKeyField(models.CharField):
             return None
 
         if isinstance(value, basestring):
+            if value.endswith('\n'):
+                # An opaque key with a trailing newline has leaked into the DB.
+                # Log and strip the value.
+                log.warning('{}:{}:{}:to_python: Invalid key: {}. Removing trailing newline.'.format(
+                    self.model._meta.db_table,
+                    self.name,
+                    self.KEY_CLASS.__name__,
+                    repr(value)
+                ))
+                value = value.rstrip()
             return self.KEY_CLASS.from_string(value)
         else:
             return value
@@ -123,7 +136,17 @@ class OpaqueKeyField(models.CharField):
             return ''  # CharFields should use '' as their empty value, rather than None
 
         assert isinstance(value, self.KEY_CLASS), "%s is not an instance of %s" % (value, self.KEY_CLASS)
-        return unicode(_strip_value(value))
+        serialized_key = unicode(_strip_value(value))
+        if serialized_key.endswith('\n'):
+            # An opaque key object serialized to a string with a trailing newline.
+            # Log the value - but do not modify it.
+            log.warning('{}:{}:{}:get_prep_value: Invalid key: {}.'.format(
+                self.model._meta.db_table,
+                self.name,
+                self.KEY_CLASS.__name__,
+                repr(serialized_key)
+            ))
+        return serialized_key
 
     def validate(self, value, model_instance):
         """Validate Empty values, otherwise defer to the parent"""
