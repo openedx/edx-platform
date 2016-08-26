@@ -12,7 +12,12 @@ from django.db.utils import IntegrityError
 from django.test import TestCase
 from opaque_keys.edx.locator import CourseLocator, BlockUsageLocator
 
-from lms.djangoapps.grades.models import BlockRecord, BlockRecordSet, PersistentSubsectionGrade, VisibleBlocks
+from lms.djangoapps.grades.models import (
+    BlockRecord,
+    BlockRecordSet,
+    PersistentSubsectionGrade,
+    VisibleBlocks
+)
 
 
 class GradesModelTestCase(TestCase):
