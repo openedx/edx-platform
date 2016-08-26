@@ -342,7 +342,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-08-16 19:40+0000\n"
+"POT-Creation-Date: 2016-08-18 18:02+0000\n"
 "PO-Revision-Date: 2016-06-29 18:11+0000\n"
 "Last-Translator: Yue Fang <yfang@juilliard.edu>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/open-edx/edx-platform/language/zh_CN/)\n"
@@ -356,8 +356,7 @@ msgstr ""
 #. Translators: 'Discussion' refers to the tab in the courseware that leads to
 #. the discussion forums
 #: cms/djangoapps/contentstore/views/component.py
-#: lms/djangoapps/courseware/tabs.py
-#: lms/djangoapps/django_comment_client/forum/views.py
+#: lms/djangoapps/courseware/tabs.py lms/djangoapps/discussion/plugins.py
 msgid "Discussion"
 msgstr "讨论"
 
@@ -10134,6 +10133,39 @@ msgstr "提交"
 msgid "Please refresh the page to see the changes applied."
 msgstr ""
 
+#: lms/djangoapps/discussion/templates/discussion/discussion_board.html
+#: lms/djangoapps/discussion/templates/discussion/discussion_profile_page.html
+msgid "Discussion - {course_number}"
+msgstr "讨论 - {course_number}"
+
+#: lms/djangoapps/discussion/templates/discussion/discussion_board.html
+#: lms/templates/discussion/_discussion_inline.html
+msgid "Add a Post"
+msgstr "添加一个讨论帖"
+
+#: lms/djangoapps/discussion/templates/discussion/discussion_board.html
+#: lms/djangoapps/discussion/templates/discussion/discussion_profile_page.html
+msgid "Discussion thread list"
+msgstr "讨论列表"
+
+#: lms/djangoapps/discussion/templates/discussion/discussion_board.html
+msgid "New topic form"
+msgstr "新主题表格"
+
+#: lms/djangoapps/discussion/templates/discussion/discussion_profile_page.html
+msgid "User Profile"
+msgstr "用户资料"
+
+#: lms/djangoapps/discussion/templates/discussion/maintenance.html
+msgid "Discussion unavailable"
+msgstr ""
+
+#: lms/djangoapps/discussion/templates/discussion/maintenance.html
+msgid ""
+"The discussions are currently undergoing maintenance. We'll have them back "
+"up shortly!"
+msgstr ""
+
 #: lms/templates/annotatable.html lms/templates/imageannotation.html
 #: lms/templates/textannotation.html lms/templates/videoannotation.html
 #: lms/templates/peer_grading/peer_grading.html
@@ -13636,11 +13668,6 @@ msgstr "你选择的 {provider_name}账户已经和{platform_name}账户相关�
 msgid "Results:"
 msgstr "结果："
 
-#: lms/templates/discussion/_discussion_course_navigation.html
-#: lms/templates/discussion/_discussion_inline.html
-msgid "Add a Post"
-msgstr "添加一个讨论帖"
-
 #: lms/templates/discussion/_discussion_inline.html
 msgid "Show Discussion"
 msgstr "显示讨论"
@@ -13662,21 +13689,12 @@ msgid "filter topics"
 msgstr "过滤主题"
 
 #: lms/templates/discussion/_filter_dropdown.html
-#: lms/templates/discussion/_thread_list_template.html
 msgid "All Discussions"
 msgstr "所有讨论"
 
 #: lms/templates/discussion/_filter_dropdown.html
 msgid "Posts I'm Following"
 msgstr "我关注的讨论帖"
-
-#: lms/templates/discussion/_thread_list_template.html
-msgid "Discussion topics; currently listing: "
-msgstr "讨论话题；当前列出："
-
-#: lms/templates/discussion/_thread_list_template.html
-msgid "Search all posts"
-msgstr "搜索所有帖子"
 
 #. Translators: This labels a filter menu in forum navigation
 #: lms/templates/discussion/_thread_list_template.html
@@ -13745,33 +13763,6 @@ msgstr[0] "%s 场讨论已开始"
 msgid "%s comment"
 msgid_plural "%s comments"
 msgstr[0] "%s 条评论"
-
-#: lms/templates/discussion/index.html
-#: lms/templates/discussion/user_profile.html
-msgid "Discussion - {course_number}"
-msgstr "讨论 - {course_number}"
-
-#: lms/templates/discussion/index.html
-msgid "Discussion thread list"
-msgstr "讨论列表"
-
-#: lms/templates/discussion/index.html
-msgid "New topic form"
-msgstr "新主题表格"
-
-#: lms/templates/discussion/maintenance.html
-msgid "We're sorry"
-msgstr "很抱歉"
-
-#: lms/templates/discussion/maintenance.html
-msgid ""
-"The forums are currently undergoing maintenance. We'll have them back up "
-"shortly!"
-msgstr "论坛现在正在维护，将尽快恢复正常。"
-
-#: lms/templates/discussion/user_profile.html
-msgid "User Profile"
-msgstr "用户资料"
 
 #: lms/templates/edxnotes/edxnotes.html
 msgid "Student Notes"

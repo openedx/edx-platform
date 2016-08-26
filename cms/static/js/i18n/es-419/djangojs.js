@@ -308,8 +308,6 @@
     "Bulk Exceptions": "Excepciones en lote", 
     "Bullet list": "Lista con vi\u00f1etas", 
     "Bulleted List (Ctrl+U)": "Vi\u00f1etas (Ctrl+U)", 
-    "By: Community TA": "Por: Tutor", 
-    "By: Staff": "Por: Moderador", 
     "Can we match the photo you took with the one on your ID?": "\u00bfPodemos verificar la foto que usted acaba de tomar contra la foto en su documento de identificaci\u00f3n?", 
     "Cancel": "Cancelar", 
     "Cancel enrollment code": "Cancelar c\u00f3digo de inscripci\u00f3n", 
@@ -1660,7 +1658,7 @@
     "Use as a Prerequisite": "Utilice como prerrequisito", 
     "Use bookmarks to help you easily return to courseware pages. To bookmark a page, select Bookmark in the upper right corner of that page. To see a list of all your bookmarks, select Bookmarks in the upper left corner of any courseware page.": "Utilice los marcadores para ayudarle a regresar a p\u00e1ginas espec\u00edficas del curso. Para a\u00f1adir una p\u00e1gina a sus marcadores, seleccione A\u00f1adir a marcadores en la esquina superior derecha de dicha p\u00e1gina. Para ver una lista de sus marcadores, seleccione Marcadores en la esquina superior izquierda de cualquier p\u00e1gina de contenidos del curso.", 
     "Use my institution/campus credentials": "Usar mis credenciales de la instituci\u00f3n o el Campus", 
-    "Use the Discussion Topics menu to find specific topics.": "Use el men\u00fa de temas de discusi\u00f3n para encontrar un tema espec\u00edfico", 
+    "Use the All Topics menu to find specific topics.": "Use el men\u00fa de todos los temas para encontrar temas espec\u00edficos.", 
     "Use the retake photo button if you are not pleased with your photo": "Utilice el bot\u00f3n retomar foto si usted no est\u00e1 satisfecho con su foto", 
     "Use your webcam to take a photo of your ID. We will match this photo with the photo of your face and the name on your account.": "Use su c\u00e1mara web para tomar una fotograf\u00eda de su documento de identidad. Usaremos esta foto para verificarla contra la fotograf\u00eda de su cara y el nombre de su cuenta.", 
     "Use your webcam to take a photo of your face. We will match this photo with the photo on your ID.": "Use su c\u00e1mara web para tomar una fotograf\u00eda de su cara. Usaremos esta foto para verificarla contra la fotograf\u00eda de su documento de identificaci\u00f3n.", 
@@ -2020,10 +2018,7 @@
     "{screen_reader_start}Warning:{screen_reader_end} No content groups exist.": "{screen_reader_start}Advertencia:{screen_reader_end} No existe ning\u00fan grupo de contenido.", 
     "{screen_reader_start}Warning:{screen_reader_end} The previously selected content group was deleted. Select another content group.": "{screen_reader_start}Advertencia:{screen_reader_end} El grupo de contenido previamente seleccionado ha sido borrado. Seleccione otro grupo de contenido.", 
     "{totalItems} total": "{totalItems} total", 
-    "{unread_count} new comment": [
-      "{unread_count} nuevo comentario", 
-      "{unread_count} nuevos comentarios"
-    ], 
+    "{unread_comments_count} new": "{unread_comments_count} nuevos", 
     "\u2026": "..."
   };
 

@@ -249,7 +249,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-08-16 19:40+0000\n"
+"POT-Creation-Date: 2016-08-18 18:02+0000\n"
 "PO-Revision-Date: 2016-05-09 11:27+0000\n"
 "Last-Translator: Monica Farias <monifar.tp@gmail.com>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/open-edx/edx-platform/language/pt_BR/)\n"
@@ -263,8 +263,7 @@ msgstr ""
 #. Translators: 'Discussion' refers to the tab in the courseware that leads to
 #. the discussion forums
 #: cms/djangoapps/contentstore/views/component.py
-#: lms/djangoapps/courseware/tabs.py
-#: lms/djangoapps/django_comment_client/forum/views.py
+#: lms/djangoapps/courseware/tabs.py lms/djangoapps/discussion/plugins.py
 msgid "Discussion"
 msgstr "Discussão"
 
@@ -10871,6 +10870,39 @@ msgstr "Enviar"
 msgid "Please refresh the page to see the changes applied."
 msgstr ""
 
+#: lms/djangoapps/discussion/templates/discussion/discussion_board.html
+#: lms/djangoapps/discussion/templates/discussion/discussion_profile_page.html
+msgid "Discussion - {course_number}"
+msgstr "Discussão - {course_number}"
+
+#: lms/djangoapps/discussion/templates/discussion/discussion_board.html
+#: lms/templates/discussion/_discussion_inline.html
+msgid "Add a Post"
+msgstr ""
+
+#: lms/djangoapps/discussion/templates/discussion/discussion_board.html
+#: lms/djangoapps/discussion/templates/discussion/discussion_profile_page.html
+msgid "Discussion thread list"
+msgstr "Discussões"
+
+#: lms/djangoapps/discussion/templates/discussion/discussion_board.html
+msgid "New topic form"
+msgstr "Novo formulário de tópico"
+
+#: lms/djangoapps/discussion/templates/discussion/discussion_profile_page.html
+msgid "User Profile"
+msgstr "Perfil do usuário"
+
+#: lms/djangoapps/discussion/templates/discussion/maintenance.html
+msgid "Discussion unavailable"
+msgstr ""
+
+#: lms/djangoapps/discussion/templates/discussion/maintenance.html
+msgid ""
+"The discussions are currently undergoing maintenance. We'll have them back "
+"up shortly!"
+msgstr ""
+
 #: lms/templates/annotatable.html lms/templates/imageannotation.html
 #: lms/templates/textannotation.html lms/templates/videoannotation.html
 #: lms/templates/peer_grading/peer_grading.html
@@ -14469,11 +14501,6 @@ msgstr ""
 msgid "Results:"
 msgstr "Resultados:"
 
-#: lms/templates/discussion/_discussion_course_navigation.html
-#: lms/templates/discussion/_discussion_inline.html
-msgid "Add a Post"
-msgstr ""
-
 #: lms/templates/discussion/_discussion_inline.html
 msgid "Show Discussion"
 msgstr "Mostrar Discussão"
@@ -14497,21 +14524,12 @@ msgid "filter topics"
 msgstr "filtrar tópicos"
 
 #: lms/templates/discussion/_filter_dropdown.html
-#: lms/templates/discussion/_thread_list_template.html
 msgid "All Discussions"
 msgstr "Todas as Discussões"
 
 #: lms/templates/discussion/_filter_dropdown.html
 msgid "Posts I'm Following"
 msgstr "Publicações que estou seguindo"
-
-#: lms/templates/discussion/_thread_list_template.html
-msgid "Discussion topics; currently listing: "
-msgstr ""
-
-#: lms/templates/discussion/_thread_list_template.html
-msgid "Search all posts"
-msgstr "Pesquisar todos os posts"
 
 #. Translators: This labels a filter menu in forum navigation
 #: lms/templates/discussion/_thread_list_template.html
@@ -14582,35 +14600,6 @@ msgid "%s comment"
 msgid_plural "%s comments"
 msgstr[0] "%s comentários"
 msgstr[1] "%s comentários"
-
-#: lms/templates/discussion/index.html
-#: lms/templates/discussion/user_profile.html
-msgid "Discussion - {course_number}"
-msgstr "Discussão - {course_number}"
-
-#: lms/templates/discussion/index.html
-msgid "Discussion thread list"
-msgstr "Discussões"
-
-#: lms/templates/discussion/index.html
-msgid "New topic form"
-msgstr "Novo formulário de tópico"
-
-#: lms/templates/discussion/maintenance.html
-msgid "We're sorry"
-msgstr "Desculpe-nos"
-
-#: lms/templates/discussion/maintenance.html
-msgid ""
-"The forums are currently undergoing maintenance. We'll have them back up "
-"shortly!"
-msgstr ""
-"Os fóruns estão em manutenção no momento. Estarão ativos novamente em breve!"
-" "
-
-#: lms/templates/discussion/user_profile.html
-msgid "User Profile"
-msgstr "Perfil do usuário"
 
 #: lms/templates/edxnotes/edxnotes.html
 msgid "Student Notes"

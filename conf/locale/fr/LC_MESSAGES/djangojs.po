@@ -38,6 +38,7 @@
 # rafcha <raphael.chay@gmail.com>, 2014-2016
 # Régis Behmo <transifex.stuff@behmo.com>, 2016
 # Régis Millet <kulgar@ct2c.fr>, 2015
+# Richard Moch <richard.moch@gmail.com>, 2016
 # SALHI Aissam <ais.salhy@gmail.com>, 2014
 # samuel <samuelecin@gmail.com>, 2014
 # Sarina Canelake <sarina@edx.org>, 2014
@@ -72,7 +73,7 @@
 # Pierre-Emmanuel Colas <pecolas44@gmail.com>, 2015
 # Pierre Roland Bonvin <pierre@bonvin.name>, 2016
 # rafcha <raphael.chay@gmail.com>, 2014-2016
-# Richard Moch <richard.moch@gmail.com>, 2015
+# Richard Moch <richard.moch@gmail.com>, 2015-2016
 # samuel <samuelecin@gmail.com>, 2014
 # Sarina Canelake <sarina@edx.org>, 2014
 # Sebastien Vigneau <sebastien.vigneau@gmail.com>, 2015
@@ -102,6 +103,7 @@
 # moocit-france <contact@moocit.fr>, 2015-2016
 # Olivier Lebon <oliv.lebon@wanadoo.fr>, 2015
 # rafcha <raphael.chay@gmail.com>, 2014-2016
+# Richard Moch <richard.moch@gmail.com>, 2016
 # Sébastien Viallemonteil <sebastien.viallemonteil@educagri.fr>, 2015
 # Steven BERNARD <steven.bernard@u-paris2.fr>, 2014
 # #-#-#-#-#  underscore-studio.po (edx-platform)  #-#-#-#-#
@@ -118,6 +120,7 @@
 # laurentFUN <laurent.at.fun@gmail.com>, 2014
 # moocit-france <contact@moocit.fr>, 2015-2016
 # rafcha <raphael.chay@gmail.com>, 2014-2015
+# Richard Moch <richard.moch@gmail.com>, 2016
 # Steven BERNARD <steven.bernard@u-paris2.fr>, 2014
 # Tala Aoun <talaaoun@gmail.com>, 2016
 # yepelboin <yves.epelboin@impmc.upmc.fr>, 2015
@@ -125,9 +128,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-08-16 19:39+0000\n"
-"PO-Revision-Date: 2016-08-16 19:42+0000\n"
-"Last-Translator: Ned Batchelder <ned@edx.org>\n"
+"POT-Creation-Date: 2016-08-18 18:01+0000\n"
+"PO-Revision-Date: 2016-08-24 14:03+0000\n"
+"Last-Translator: Richard Moch <richard.moch@gmail.com>\n"
 "Language-Team: French (http://www.transifex.com/open-edx/edx-platform/language/fr/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -152,6 +155,7 @@ msgstr ""
 msgid "Saving"
 msgstr "Enregistrement en cours"
 
+#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: cms/static/coffee/src/views/tabs.js
@@ -159,6 +163,7 @@ msgstr "Enregistrement en cours"
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: common/static/coffee/src/discussion/utils.js
 #: lms/static/js/Markdown.Editor.js
+#: common/static/common/templates/discussion/alert-popup.underscore
 msgid "OK"
 msgstr "OK"
 
@@ -1953,12 +1958,11 @@ msgstr "Afficher la discussion"
 #: common/static/coffee/src/discussion/views/discussion_user_profile_view.js
 #: common/static/coffee/src/discussion/views/response_comment_view.js
 #: common/static/common/js/discussion/discussion_module_view.js
-#: common/static/common/js/discussion/discussion_router.js
 #: common/static/common/js/discussion/utils.js
 #: common/static/common/js/discussion/views/discussion_thread_list_view.js
 #: common/static/common/js/discussion/views/discussion_thread_view.js
-#: common/static/common/js/discussion/views/discussion_user_profile_view.js
 #: common/static/common/js/discussion/views/response_comment_view.js
+#: lms/djangoapps/discussion/static/discussion/js/views/discussion_user_profile_view.js
 msgid "Sorry"
 msgstr "Désolé"
 
@@ -2001,7 +2005,6 @@ msgstr ""
 #: common/static/coffee/src/discussion/utils.js
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
 #: common/static/common/js/discussion/utils.js
-#: common/static/common/js/discussion/views/discussion_thread_list_view.js
 #: common/static/common/js/discussion/views/discussion_topic_menu_view.js
 msgid "…"
 msgstr "…"
@@ -2141,7 +2144,6 @@ msgid "Current conversation"
 msgstr "Discussion actuelle"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
-#: common/static/common/js/discussion/views/discussion_thread_list_view.js
 #: lms/static/js/edxnotes/views/tabs/search_results.js
 #: lms/templates/search/course_search_results.underscore
 #: lms/templates/search/dashboard_search_results.underscore
@@ -2171,7 +2173,6 @@ msgid "Show posts by %(username)s."
 msgstr "Voir les messages de %(username)s."
 
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
-#: common/static/common/js/discussion/discussion_router.js
 #: common/static/common/js/discussion/views/discussion_thread_view.js
 msgid ""
 "The thread you selected has been deleted. Please select another thread."
@@ -2187,7 +2188,6 @@ msgstr ""
 "la page."
 
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
-#: common/static/common/js/discussion/discussion_router.js
 #: common/static/common/js/discussion/views/discussion_thread_view.js
 msgid "We had some trouble loading more responses. Please try again."
 msgstr ""
@@ -2233,7 +2233,7 @@ msgid "Are you sure you want to delete this post?"
 msgstr "Voulez-vous vraiment supprimer ce message ?"
 
 #: common/static/coffee/src/discussion/views/discussion_user_profile_view.js
-#: common/static/common/js/discussion/views/discussion_user_profile_view.js
+#: lms/djangoapps/discussion/static/discussion/js/views/discussion_user_profile_view.js
 msgid "We had some trouble loading the page you requested. Please try again."
 msgstr ""
 "Des problèmes sont survenus lors du chargement des pages demandées. Veuillez"
@@ -2321,12 +2321,6 @@ msgstr[1] ""
 #: common/static/common/js/discussion/views/discussion_content_view.js
 msgid "{numVotes} Vote"
 msgid_plural "{numVotes} Votes"
-msgstr[0] ""
-msgstr[1] ""
-
-#: common/static/common/js/discussion/views/discussion_thread_list_view.js
-msgid "{unread_count} new comment"
-msgid_plural "{unread_count} new comments"
 msgstr[0] ""
 msgstr[1] ""
 
@@ -2507,6 +2501,7 @@ msgstr "Public"
 
 #: common/static/js/vendor/ova/catch/js/catch.js
 #: common/static/common/templates/components/search-field.underscore
+#: lms/djangoapps/discussion/static/discussion/templates/search.underscore
 #: lms/djangoapps/support/static/support/templates/certificates.underscore
 #: lms/djangoapps/support/static/support/templates/enrollment.underscore
 msgid "Search"
@@ -4671,7 +4666,7 @@ msgstr "Formation professionnelle"
 
 #: lms/static/js/verify_student/views/make_payment_step_view.js
 msgid "Verified Certificate upgrade"
-msgstr ""
+msgstr "Passer à un certificat vérifié"
 
 #: lms/static/js/verify_student/views/make_payment_step_view.js
 msgid "Verified Certificate"
@@ -4941,7 +4936,7 @@ msgstr ""
 
 #: cms/static/js/certificates/views/certificate_details.js
 msgid "Yes, allow edits to the active Certificate"
-msgstr ""
+msgstr "Oui, permettre les modifications du certificat actif"
 
 #. Translators: This field pertains to the custom label for a certificate.
 #. Translators: this refers to a collection of certificates.
@@ -4975,7 +4970,7 @@ msgstr "Charger l'image de signature."
 
 #: cms/static/js/certificates/views/signatory_editor.js
 msgid "Image must be in PNG format."
-msgstr ""
+msgstr "Les fichiers doivent être au format PNG."
 
 #: cms/static/js/collections/group.js
 #, c-format
@@ -5426,7 +5421,8 @@ msgstr ""
 msgid "Your file has been deleted."
 msgstr "Votre fichier a été supprimé."
 
-#: cms/static/js/views/assets.js
+#: cms/static/js/views/assets.js cms/templates/js/asset-library.underscore
+#: cms/templates/js/previous-video-upload-list.underscore
 msgid "Date Added"
 msgstr "Date ajoutée"
 
@@ -5458,8 +5454,9 @@ msgid "Max file size exceeded"
 msgstr "Taille maximale de fichier dépassée"
 
 #: cms/static/js/views/assets.js cms/static/js/views/assets.js.c
+#: cms/templates/js/asset-upload-modal.underscore
 msgid "Upload New File"
-msgstr "Envoyer un nouveau fichier"
+msgstr "Téléverser un nouveau fichier"
 
 #: cms/static/js/views/assets.js cms/static/js/views/assets.js.c
 msgid "Load Another File"
@@ -6111,7 +6108,7 @@ msgstr "Statut"
 
 #: common/static/common/templates/image-modal.underscore
 msgid "Large"
-msgstr ""
+msgstr "Grand"
 
 #: common/static/common/templates/image-modal.underscore
 msgid "Zoom In"
@@ -6140,7 +6137,7 @@ msgstr "Effacer la recherche"
 
 #: common/static/common/templates/discussion/discussion-home.underscore
 msgid "Discussion Home"
-msgstr ""
+msgstr "Page d'accueil de Discussion"
 
 #: common/static/common/templates/discussion/discussion-home.underscore
 #, python-format
@@ -6152,12 +6149,13 @@ msgid "Find discussions"
 msgstr "Trouver des discussions"
 
 #: common/static/common/templates/discussion/discussion-home.underscore
-msgid "Use the Discussion Topics menu to find specific topics."
+msgid "Use the All Topics menu to find specific topics."
 msgstr ""
 
 #: common/static/common/templates/discussion/discussion-home.underscore
+#: lms/djangoapps/discussion/static/discussion/templates/search.underscore
 msgid "Search all posts"
-msgstr ""
+msgstr "Rechercher…"
 
 #: common/static/common/templates/discussion/discussion-home.underscore
 msgid "Filter and sort topics"
@@ -6203,7 +6201,7 @@ msgstr ""
 
 #: common/static/common/templates/discussion/forum-action-close.underscore
 msgid "Open"
-msgstr ""
+msgstr "Ouvrir"
 
 #: common/static/common/templates/discussion/forum-action-endorse.underscore
 msgid "Endorse"
@@ -6251,7 +6249,7 @@ msgstr ""
 
 #: common/static/common/templates/discussion/new-post.underscore
 msgid "All Groups"
-msgstr ""
+msgstr "Tous les groupes"
 
 #: common/static/common/templates/discussion/new-post.underscore
 msgid ""
@@ -6288,13 +6286,14 @@ msgid "Add Post"
 msgstr ""
 
 #: common/static/common/templates/discussion/post-user-display.underscore
+#: common/static/common/templates/discussion/thread-list-item.underscore
 msgid "Community TA"
 msgstr ""
 
 #: common/static/common/templates/discussion/profile-thread.underscore
 #: common/static/common/templates/discussion/thread.underscore
 msgid "This thread is closed."
-msgstr ""
+msgstr "Ce fil est fermé"
 
 #: common/static/common/templates/discussion/profile-thread.underscore
 msgid "View discussion"
@@ -6337,11 +6336,11 @@ msgstr ""
 
 #: common/static/common/templates/discussion/thread-list-item.underscore
 msgid "answered question"
-msgstr ""
+msgstr "Question répondue"
 
 #: common/static/common/templates/discussion/thread-list-item.underscore
 msgid "unanswered question"
-msgstr ""
+msgstr "Question non répondue"
 
 #: common/static/common/templates/discussion/thread-list-item.underscore
 #: common/static/common/templates/discussion/thread-show.underscore
@@ -6353,16 +6352,12 @@ msgid "Following"
 msgstr ""
 
 #: common/static/common/templates/discussion/thread-list-item.underscore
-msgid "By: Staff"
-msgstr ""
-
-#: common/static/common/templates/discussion/thread-list-item.underscore
-msgid "By: Community TA"
-msgstr ""
-
-#: common/static/common/templates/discussion/thread-list-item.underscore
 #: common/static/common/templates/discussion/thread-response-show.underscore
 msgid "fmt"
+msgstr ""
+
+#: common/static/common/templates/discussion/thread-list-item.underscore
+msgid "{unread_comments_count} new"
 msgstr ""
 
 #: common/static/common/templates/discussion/thread-list-item.underscore
@@ -6433,7 +6428,7 @@ msgstr ""
 
 #: common/static/common/templates/discussion/thread-show.underscore
 msgid "Closed"
-msgstr ""
+msgstr "Fermé"
 
 #: common/static/common/templates/discussion/thread-show.underscore
 #, python-format
@@ -6499,7 +6494,7 @@ msgstr ""
 msgid "Add your post to a relevant topic to help others find it."
 msgstr ""
 
-#: common/static/common/templates/discussion/user-profile.underscore
+#: lms/djangoapps/discussion/static/discussion/templates/user-profile.underscore
 msgid "Active Threads"
 msgstr ""
 
@@ -8044,7 +8039,7 @@ msgstr ""
 
 #: lms/templates/verify_student/make_payment_step.underscore
 msgid "You are upgrading your enrollment for: {courseName}"
-msgstr ""
+msgstr "Mise à niveau de votre inscription à : {courseName}"
 
 #: lms/templates/verify_student/make_payment_step.underscore
 msgid ""
@@ -8060,6 +8055,8 @@ msgid ""
 "you will need to have these by %(date)s to qualify to earn a Verified "
 "Certificate."
 msgstr ""
+"Vous pouvez payer maintenant même si vous n'avez pas les élements suivants, "
+"mais vous en aurez besoin avant le %(date)s pour un Certificat vérifié."
 
 #: lms/templates/verify_student/make_payment_step.underscore
 msgid ""
@@ -8082,6 +8079,9 @@ msgid ""
 "You can pay now even if you don't have the following items available, but "
 "you will need to have these to qualify to earn a Verified Certificate."
 msgstr ""
+"Vous pouvez payer même si vous ne disposez pas encore des éléments suivants,"
+" mais vous en aurez besoin afin d'avoir le droit d'obtenir un certificat "
+"vérifié."
 
 #: lms/templates/verify_student/make_payment_step.underscore
 msgid "Government-Issued Photo ID"
@@ -8309,13 +8309,15 @@ msgstr "Prendre une photo"
 
 #: cms/templates/js/access-editor.underscore
 msgid "Limit Access"
-msgstr ""
+msgstr "Accès Limité"
 
 #: cms/templates/js/access-editor.underscore
 msgid ""
 "Select a prerequisite subsection and enter a minimum score percentage to "
 "limit access to this subsection."
 msgstr ""
+"Sélectionnez une sous-section pré-requis et entrez un score minimum en "
+"pourcentage pour limiter l'accès à la sous-section."
 
 #: cms/templates/js/access-editor.underscore
 msgid "Prerequisite:"
@@ -8404,7 +8406,7 @@ msgstr ""
 
 #: cms/templates/js/asset-library.underscore
 msgid "- Sortable"
-msgstr ""
+msgstr "- Triable"
 
 #: cms/templates/js/asset-library.underscore
 msgid "Show All"
@@ -8458,12 +8460,12 @@ msgstr ""
 #: cms/templates/js/content-group-details.underscore
 #: cms/templates/js/group-configuration-details.underscore
 msgid "ID"
-msgstr ""
+msgstr "ID"
 
 #: cms/templates/js/certificate-details.underscore
 #: cms/templates/js/certificate-editor.underscore
 msgid "Certificate Details"
-msgstr ""
+msgstr "Détails du certificat"
 
 #: cms/templates/js/certificate-details.underscore
 #: cms/templates/js/certificate-editor.underscore
@@ -8561,7 +8563,7 @@ msgstr ""
 
 #: cms/templates/js/content-group-details.underscore
 msgid "This content group is used in:"
-msgstr ""
+msgstr "Ce groupe de contenu est utilisé dans :"
 
 #: cms/templates/js/content-group-details.underscore
 msgid ""
@@ -9107,7 +9109,7 @@ msgstr ""
 
 #: cms/templates/js/publish-history.underscore
 msgid "Never published"
-msgstr ""
+msgstr "Jamais publié"
 
 #: cms/templates/js/publish-history.underscore
 #: cms/templates/js/publish-xblock.underscore
@@ -9127,7 +9129,7 @@ msgstr ""
 
 #: cms/templates/js/publish-xblock.underscore
 msgid "Draft (Never published)"
-msgstr ""
+msgstr "Brouillon (Jamais publié)"
 
 #: cms/templates/js/publish-xblock.underscore
 msgid "Visible to Staff Only"
@@ -9413,7 +9415,7 @@ msgstr ""
 
 #: cms/templates/js/verification-access-editor.underscore
 msgid "Verification Checkpoint"
-msgstr ""
+msgstr "Vérification intermédiaire"
 
 #: cms/templates/js/verification-access-editor.underscore
 msgid "Must complete verification checkpoint"
@@ -9728,4 +9730,4 @@ msgstr ""
 
 #: cms/templates/js/video/transcripts/messages/transcripts-use-existing.underscore
 msgid "Use Current Transcript"
-msgstr ""
+msgstr "Utiliser la transcription courante"

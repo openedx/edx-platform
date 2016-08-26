@@ -109,9 +109,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-08-16 19:39+0000\n"
-"PO-Revision-Date: 2016-08-18 16:35+0000\n"
-"Last-Translator: Ned Batchelder <ned@edx.org>\n"
+"POT-Creation-Date: 2016-08-18 18:01+0000\n"
+"PO-Revision-Date: 2016-08-24 20:16+0000\n"
+"Last-Translator: AR C2 <e2f458fd4s512@outlook.com>\n"
 "Language-Team: Arabic (http://www.transifex.com/open-edx/edx-platform/language/ar/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1974,12 +1974,11 @@ msgstr "إظهار النقاش"
 #: common/static/coffee/src/discussion/views/discussion_user_profile_view.js
 #: common/static/coffee/src/discussion/views/response_comment_view.js
 #: common/static/common/js/discussion/discussion_module_view.js
-#: common/static/common/js/discussion/discussion_router.js
 #: common/static/common/js/discussion/utils.js
 #: common/static/common/js/discussion/views/discussion_thread_list_view.js
 #: common/static/common/js/discussion/views/discussion_thread_view.js
-#: common/static/common/js/discussion/views/discussion_user_profile_view.js
 #: common/static/common/js/discussion/views/response_comment_view.js
+#: lms/djangoapps/discussion/static/discussion/js/views/discussion_user_profile_view.js
 msgid "Sorry"
 msgstr "عذرًا"
 
@@ -2016,7 +2015,6 @@ msgstr "نأسف لحدوث مشكلة في معالجة طلبك. يُرجى إ
 #: common/static/coffee/src/discussion/utils.js
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
 #: common/static/common/js/discussion/utils.js
-#: common/static/common/js/discussion/views/discussion_thread_list_view.js
 #: common/static/common/js/discussion/views/discussion_topic_menu_view.js
 #: common/static/common/templates/discussion/pagination.underscore
 msgid "…"
@@ -2147,7 +2145,6 @@ msgid "Current conversation"
 msgstr "المحادثة الحالية"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
-#: common/static/common/js/discussion/views/discussion_thread_list_view.js
 #: lms/static/js/edxnotes/views/tabs/search_results.js
 #: lms/templates/search/course_search_results.underscore
 #: lms/templates/search/dashboard_search_results.underscore
@@ -2177,7 +2174,6 @@ msgid "Show posts by %(username)s."
 msgstr "عرض المنشورات بحسب %(username)s."
 
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
-#: common/static/common/js/discussion/discussion_router.js
 #: common/static/common/js/discussion/views/discussion_thread_view.js
 msgid ""
 "The thread you selected has been deleted. Please select another thread."
@@ -2189,7 +2185,6 @@ msgid "We had some trouble loading responses. Please reload the page."
 msgstr "نأسف لحدوث مشكلة في تحميل الردود. يُرجى إعادة تحميل الصفحة."
 
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
-#: common/static/common/js/discussion/discussion_router.js
 #: common/static/common/js/discussion/views/discussion_thread_view.js
 msgid "We had some trouble loading more responses. Please try again."
 msgstr "نأسف لحدوث مشكلة في تحميل المزيد من الردود. يُرجى إعادة المحاولة."
@@ -2245,7 +2240,7 @@ msgid "Are you sure you want to delete this post?"
 msgstr "هل أنت واثق من أنّك تودّ حذف هذا المنشور؟ "
 
 #: common/static/coffee/src/discussion/views/discussion_user_profile_view.js
-#: common/static/common/js/discussion/views/discussion_user_profile_view.js
+#: lms/djangoapps/discussion/static/discussion/js/views/discussion_user_profile_view.js
 msgid "We had some trouble loading the page you requested. Please try again."
 msgstr "نأسف لحدوث مشكلة في تحميل الصفحة التي طلبتها. يُرجى إعادة المحاولة. "
 
@@ -2344,16 +2339,6 @@ msgstr[2] "{numVotes} صوت"
 msgstr[3] "{numVotes} أصوات"
 msgstr[4] "{numVotes} صوتاً"
 msgstr[5] "{numVotes} صوت"
-
-#: common/static/common/js/discussion/views/discussion_thread_list_view.js
-msgid "{unread_count} new comment"
-msgid_plural "{unread_count} new comments"
-msgstr[0] "{unread_count} تعليق جديد"
-msgstr[1] "{unread_count} تعليق جديد"
-msgstr[2] "{unread_count} تعليق جديد"
-msgstr[3] "{unread_count} تعليقات جديدة"
-msgstr[4] "{unread_count} تعليقاً جديداً"
-msgstr[5] "{unread_count} تعليق جديد"
 
 #: common/static/common/js/discussion/views/discussion_thread_list_view.js
 msgid "No results found for {original_query}. "
@@ -2560,6 +2545,7 @@ msgstr "عام"
 
 #: common/static/js/vendor/ova/catch/js/catch.js
 #: common/static/common/templates/components/search-field.underscore
+#: lms/djangoapps/discussion/static/discussion/templates/search.underscore
 #: lms/djangoapps/support/static/support/templates/certificates.underscore
 #: lms/djangoapps/support/static/support/templates/enrollment.underscore
 msgid "Search"
@@ -5243,6 +5229,7 @@ msgstr "هل أنت متأكّد من رغبتك في حذف {email} من فري
 #: cms/static/js/factories/manage_users.js
 #: cms/static/js/factories/manage_users_lib.js
 #: common/static/common/templates/discussion/post-user-display.underscore
+#: common/static/common/templates/discussion/thread-list-item.underscore
 msgid "Staff"
 msgstr "طاقم المساق"
 
@@ -6329,10 +6316,11 @@ msgid "Find discussions"
 msgstr "إيجاد النقاشات"
 
 #: common/static/common/templates/discussion/discussion-home.underscore
-msgid "Use the Discussion Topics menu to find specific topics."
-msgstr "استخدم قائمة مواضيع النقاش لتجد موضوعات معينة."
+msgid "Use the All Topics menu to find specific topics."
+msgstr "استخدم قائمة الموضوعات لتجد موضوعات معينة."
 
 #: common/static/common/templates/discussion/discussion-home.underscore
+#: lms/djangoapps/discussion/static/discussion/templates/search.underscore
 msgid "Search all posts"
 msgstr "البحث في كافّة المنشورات"
 
@@ -6469,6 +6457,7 @@ msgid "Add Post"
 msgstr "أَضِف منشورًا"
 
 #: common/static/common/templates/discussion/post-user-display.underscore
+#: common/static/common/templates/discussion/thread-list-item.underscore
 msgid "Community TA"
 msgstr "مساعد أستاذ لشؤون المتعلّمين"
 
@@ -6534,17 +6523,13 @@ msgid "Following"
 msgstr "جاري المتابعة"
 
 #: common/static/common/templates/discussion/thread-list-item.underscore
-msgid "By: Staff"
-msgstr "بواسطة: طاقم المساق"
-
-#: common/static/common/templates/discussion/thread-list-item.underscore
-msgid "By: Community TA"
-msgstr "بواسطة: مساعد أستاذ لشؤون المتعلّمين"
-
-#: common/static/common/templates/discussion/thread-list-item.underscore
 #: common/static/common/templates/discussion/thread-response-show.underscore
 msgid "fmt"
 msgstr "fmt"
+
+#: common/static/common/templates/discussion/thread-list-item.underscore
+msgid "{unread_comments_count} new"
+msgstr "{unread_comments_count} جديد"
 
 #: common/static/common/templates/discussion/thread-list-item.underscore
 #, python-format
@@ -6688,7 +6673,7 @@ msgstr "فلترة المواضيع "
 msgid "Add your post to a relevant topic to help others find it."
 msgstr "أضف منشورك إلى موضوع ذي صلة لمساعدة الآخرين على إيجاده."
 
-#: common/static/common/templates/discussion/user-profile.underscore
+#: lms/djangoapps/discussion/static/discussion/templates/user-profile.underscore
 msgid "Active Threads"
 msgstr "المواضيع النشطة"
 
@@ -8911,6 +8896,9 @@ msgid ""
 "release date has passed, published units in this subsection will become "
 "available to learners unless units are explicitly hidden."
 msgstr ""
+"إذا حدّدت خيارًا غير \"%(hide_label)s\"ـ بعد انتهاء تاريخ إصدار القسم "
+"الفرعي، فسوف تُتاح الوحدات المنشورة في هذا القسم الفرعي للمتعلّمين، ما لم "
+"تكن الوحدات مخفية صراحةً."
 
 #: cms/templates/js/course-instructor-details.underscore
 msgid "Instructor Name"

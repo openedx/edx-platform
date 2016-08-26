@@ -124,7 +124,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-08-16 19:39+0000\n"
+"POT-Creation-Date: 2016-08-18 18:01+0000\n"
 "PO-Revision-Date: 2016-08-17 20:23+0000\n"
 "Last-Translator: Natalia Berdnikov <nberdnikov@edx.org>\n"
 "Language-Team: Russian (http://www.transifex.com/open-edx/edx-platform/language/ru/)\n"
@@ -1984,12 +1984,11 @@ msgstr "Показать Обсуждения"
 #: common/static/coffee/src/discussion/views/discussion_user_profile_view.js
 #: common/static/coffee/src/discussion/views/response_comment_view.js
 #: common/static/common/js/discussion/discussion_module_view.js
-#: common/static/common/js/discussion/discussion_router.js
 #: common/static/common/js/discussion/utils.js
 #: common/static/common/js/discussion/views/discussion_thread_list_view.js
 #: common/static/common/js/discussion/views/discussion_thread_view.js
-#: common/static/common/js/discussion/views/discussion_user_profile_view.js
 #: common/static/common/js/discussion/views/response_comment_view.js
+#: lms/djangoapps/discussion/static/discussion/js/views/discussion_user_profile_view.js
 msgid "Sorry"
 msgstr "Извините"
 
@@ -2030,7 +2029,6 @@ msgstr ""
 #: common/static/coffee/src/discussion/utils.js
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
 #: common/static/common/js/discussion/utils.js
-#: common/static/common/js/discussion/views/discussion_thread_list_view.js
 #: common/static/common/js/discussion/views/discussion_topic_menu_view.js
 #: common/static/common/templates/discussion/pagination.underscore
 msgid "…"
@@ -2172,7 +2170,6 @@ msgid "Current conversation"
 msgstr "Текущая беседа"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
-#: common/static/common/js/discussion/views/discussion_thread_list_view.js
 #: lms/static/js/edxnotes/views/tabs/search_results.js
 #: lms/templates/search/course_search_results.underscore
 #: lms/templates/search/dashboard_search_results.underscore
@@ -2202,7 +2199,6 @@ msgid "Show posts by %(username)s."
 msgstr "Показать сообщения пользователя %(username)s."
 
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
-#: common/static/common/js/discussion/discussion_router.js
 #: common/static/common/js/discussion/views/discussion_thread_view.js
 msgid ""
 "The thread you selected has been deleted. Please select another thread."
@@ -2215,7 +2211,6 @@ msgstr ""
 "Возникла проблема при загрузке ответов.  Пожалуйста, перезагрузите страницу."
 
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
-#: common/static/common/js/discussion/discussion_router.js
 #: common/static/common/js/discussion/views/discussion_thread_view.js
 msgid "We had some trouble loading more responses. Please try again."
 msgstr ""
@@ -2267,7 +2262,7 @@ msgid "Are you sure you want to delete this post?"
 msgstr "Вы действительно хотите удалить это сообщение?"
 
 #: common/static/coffee/src/discussion/views/discussion_user_profile_view.js
-#: common/static/common/js/discussion/views/discussion_user_profile_view.js
+#: lms/djangoapps/discussion/static/discussion/js/views/discussion_user_profile_view.js
 msgid "We had some trouble loading the page you requested. Please try again."
 msgstr ""
 "Возникла проблема при загрузке запрошенной вами страницы.  Пожалуйста, "
@@ -2367,14 +2362,6 @@ msgstr[0] "{numVotes} голос"
 msgstr[1] "{numVotes} голоса"
 msgstr[2] "{numVotes} голосов"
 msgstr[3] "{numVotes} голосов"
-
-#: common/static/common/js/discussion/views/discussion_thread_list_view.js
-msgid "{unread_count} new comment"
-msgid_plural "{unread_count} new comments"
-msgstr[0] "{unread_count} новый комментарий"
-msgstr[1] "{unread_count} новых комментария"
-msgstr[2] "{unread_count} новых комментариев"
-msgstr[3] "{unread_count} новых комментариев"
 
 #: common/static/common/js/discussion/views/discussion_thread_list_view.js
 msgid "No results found for {original_query}. "
@@ -2567,6 +2554,7 @@ msgstr "Общий доступ"
 
 #: common/static/js/vendor/ova/catch/js/catch.js
 #: common/static/common/templates/components/search-field.underscore
+#: lms/djangoapps/discussion/static/discussion/templates/search.underscore
 #: lms/djangoapps/support/static/support/templates/certificates.underscore
 #: lms/djangoapps/support/static/support/templates/enrollment.underscore
 msgid "Search"
@@ -5243,6 +5231,7 @@ msgstr ""
 #: cms/static/js/factories/manage_users.js
 #: cms/static/js/factories/manage_users_lib.js
 #: common/static/common/templates/discussion/post-user-display.underscore
+#: common/static/common/templates/discussion/thread-list-item.underscore
 msgid "Staff"
 msgstr "Сотрудник"
 
@@ -6337,10 +6326,11 @@ msgid "Find discussions"
 msgstr "Находите обсуждения"
 
 #: common/static/common/templates/discussion/discussion-home.underscore
-msgid "Use the Discussion Topics menu to find specific topics."
-msgstr "Для поиска конкретных тем воспользуйтесь меню тем обсуждений."
+msgid "Use the All Topics menu to find specific topics."
+msgstr ""
 
 #: common/static/common/templates/discussion/discussion-home.underscore
+#: lms/djangoapps/discussion/static/discussion/templates/search.underscore
 msgid "Search all posts"
 msgstr "Поиск по всем темам"
 
@@ -6480,6 +6470,7 @@ msgid "Add Post"
 msgstr "Добавить публикацию"
 
 #: common/static/common/templates/discussion/post-user-display.underscore
+#: common/static/common/templates/discussion/thread-list-item.underscore
 msgid "Community TA"
 msgstr "Староста сообщества"
 
@@ -6545,17 +6536,13 @@ msgid "Following"
 msgstr "Отслеживаемые"
 
 #: common/static/common/templates/discussion/thread-list-item.underscore
-msgid "By: Staff"
-msgstr "   От: Администрация"
-
-#: common/static/common/templates/discussion/thread-list-item.underscore
-msgid "By: Community TA"
-msgstr "От: Староста сообщества"
-
-#: common/static/common/templates/discussion/thread-list-item.underscore
 #: common/static/common/templates/discussion/thread-response-show.underscore
 msgid "fmt"
 msgstr "fmt"
+
+#: common/static/common/templates/discussion/thread-list-item.underscore
+msgid "{unread_comments_count} new"
+msgstr ""
 
 #: common/static/common/templates/discussion/thread-list-item.underscore
 #, python-format
@@ -6699,7 +6686,7 @@ msgstr ""
 "Поместите ваше сообщение в подходящую тему, чтобы упростить другим "
 "пользователям его поиск."
 
-#: common/static/common/templates/discussion/user-profile.underscore
+#: lms/djangoapps/discussion/static/discussion/templates/user-profile.underscore
 msgid "Active Threads"
 msgstr "Активные темы"
 
