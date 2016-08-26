@@ -96,7 +96,7 @@ class ProblemPage(PageObject):
             input_num: If provided, fills only the input_numth field. Else, all
                 input fields will be filled.
         """
-        fields = self.q(css='div.problem div.capa_inputtype.textline input')
+        fields = self.q(css='div.problem form.capa_inputtype.textline input')
         fields = fields.nth(input_num) if input_num is not None else fields
         fields.fill(text)
 
@@ -104,7 +104,7 @@ class ProblemPage(PageObject):
         """
         Fill in the answer to a numerical problem.
         """
-        self.q(css='div.problem div.inputtype input').fill(text)
+        self.q(css='div.problem form.inputtype input').fill(text)
         self.wait_for_element_invisibility('.loading', 'wait for loading icon to disappear')
         self.wait_for_ajax()
 
@@ -138,7 +138,7 @@ class ProblemPage(PageObject):
         """
         wait for status icon
         """
-        self.wait_for_element_visibility('div.problem div.inputtype div .status', 'wait for status icon')
+        self.wait_for_element_visibility('div.problem form.inputtype div .status', 'wait for status icon')
 
     def wait_for_expected_status(self, status_selector, message):
         """
@@ -169,25 +169,25 @@ class ProblemPage(PageObject):
         """
         Is there a "correct" status showing?
         """
-        return self.q(css="div.problem div.capa_inputtype.textline div.correct span.status").is_present()
+        return self.q(css="div.problem form.capa_inputtype.textline div.correct span.status").is_present()
 
     def simpleprob_is_correct(self):
         """
         Is there a "correct" status showing? Works with simple problem types.
         """
-        return self.q(css="div.problem div.inputtype div.correct span.status").is_present()
+        return self.q(css="div.problem form.inputtype div.correct span.status").is_present()
 
     def simpleprob_is_partially_correct(self):
         """
         Is there a "partially correct" status showing? Works with simple problem types.
         """
-        return self.q(css="div.problem div.inputtype div.partially-correct span.status").is_present()
+        return self.q(css="div.problem form.inputtype div.partially-correct span.status").is_present()
 
     def simpleprob_is_incorrect(self):
         """
         Is there an "incorrect" status showing? Works with simple problem types.
         """
-        return self.q(css="div.problem div.inputtype div.incorrect span.status").is_present()
+        return self.q(css="div.problem form.inputtype div.incorrect span.status").is_present()
 
     def click_clarification(self, index=0):
         """

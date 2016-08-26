@@ -843,9 +843,9 @@ class SymbolicProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
     }
 
     status_indicators = {
-        'correct': ['div.capa_inputtype div.correct'],
-        'incorrect': ['div.capa_inputtype div.incorrect'],
-        'unanswered': ['div.capa_inputtype div.unanswered'],
+        'correct': ['form.capa_inputtype div.correct'],
+        'incorrect': ['form.capa_inputtype div.incorrect'],
+        'unanswered': ['form.capa_inputtype div.unanswered'],
     }
 
     def setUp(self, *args, **kwargs):

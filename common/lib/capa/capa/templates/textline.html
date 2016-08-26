@@ -20,7 +20,7 @@
 % for description_id, description_text in response_data['descriptions'].items():
     <p class="question-description" id="${description_id}">${description_text}</p>
 % endfor
-<input type="text" name="input_${id}" id="input_${id}" ${describedby| n} value="${value}"
+<input type="text" name="input_${id}" id="input_${id}" ${describedby | n, decode.utf8} value="${value}"
     % if do_math:
         class="math"
     % endif
@@ -33,7 +33,7 @@
 />
 <span class="trailing_text">${trailing_text}</span>
 
-<span class="status" id="status_${id}" data-tooltip="${status.display_tooltip}">
+<span class="status" data-tooltip="${status.display_tooltip}">
     <span class="sr">${status.display_name}</span>
 </span>
 
