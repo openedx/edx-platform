@@ -79,8 +79,8 @@ def in_preview_mode():
     """
     hostname = get_current_request_hostname()
     port = get_current_request_port()
-    preview_lms_base = settings.FEATURES.get('PREVIEW_LMS_BASE', None).split(':')
-    is_preview_hostname = bool(preview_lms_base and hostname and hostname == preview_lms_base[0])
+    preview_lms_base = settings.FEATURES.get('PREVIEW_LMS_BASE', '').split(':')
+    is_preview_hostname = bool(len(preview_lms_base[0]) and hostname and hostname == preview_lms_base[0])
     if len(preview_lms_base) > 1:
         return bool(is_preview_hostname and port == preview_lms_base[1])
     return is_preview_hostname
