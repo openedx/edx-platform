@@ -784,3 +784,10 @@ class CourseOverviewAccessTestCase(ModuleStoreTestCase):
         course_overview = CourseOverview.get_from_id(course.id)
         with self.assertNumQueries(num_queries):
             bool(access.has_access(user, action, course_overview, course_key=course.id))
+
+    @patch.dict('django.conf.settings.FEATURES', {'PREVIEW_LMS_BASE': None})
+    def test_mode_with_no_preview_lms_base_defined(self):
+        """
+        Check that preview mode is disabled when no PREVIEW_LMS_BASE is defined
+        """
+        self.assertFalse(access.in_preview_mode())
