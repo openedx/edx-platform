@@ -8,7 +8,7 @@ from hashlib import sha1
 import json
 from mock import patch
 
-from django.core.exceptions import ValidationError
+from django.db.utils import IntegrityError
 from django.test import TestCase
 from opaque_keys.edx.locator import CourseLocator, BlockUsageLocator
 
@@ -156,7 +156,7 @@ class PersistentSubsectionGradeTest(GradesModelTestCase):
             usage_key=self.params["usage_key"],
         )
         self.assertEqual(created_grade, read_grade)
-        with self.assertRaises(ValidationError):
+        with self.assertRaises(IntegrityError):
             created_grade = PersistentSubsectionGrade.objects.create(**self.params)
 
     def test_create_bad_params(self):
@@ -164,7 +164,7 @@ class PersistentSubsectionGradeTest(GradesModelTestCase):
         Confirms create will fail if params are missing.
         """
         del self.params["earned_graded"]
-        with self.assertRaises(ValidationError):
+        with self.assertRaises(IntegrityError):
             PersistentSubsectionGrade.objects.create(**self.params)
 
     def test_course_version_is_optional(self):

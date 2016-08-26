@@ -13,6 +13,7 @@ import textwrap
 import unittest
 import ddt
 
+from lxml import etree
 from mock import Mock, patch, DEFAULT
 import webob
 from webob.multidict import MultiDict
@@ -2516,6 +2517,21 @@ class CapaDescriptorTest(unittest.TestCase):
                 }
             }
         )
+
+    def test_invalid_xml_handling(self):
+        """
+        Tests to confirm that invalid XML does not throw a wake-up-ops level error.
+        See TNL-5057 for quick fix, TNL-5245 for full resolution.
+        """
+        sample_invalid_xml = textwrap.dedent("""
+            <problem>
+            </proble-oh no my finger broke and I can't close the problem tag properly...
+        """)
+        descriptor = self._create_descriptor(sample_invalid_xml, name="Invalid XML")
+        try:
+            descriptor.has_support(None, "multi_device")
+        except etree.XMLSyntaxError:
+            self.fail("Exception raised during XML parsing, this method should be resilient to such errors")
 
 
 class ComplexEncoderTest(unittest.TestCase):
