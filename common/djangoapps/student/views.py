@@ -1073,9 +1073,11 @@ def change_enrollment(request, check_access=True):
             # by its slug.  If they do, it's possible (based on the state of the database)
             # for no such model to exist, even though we've set the enrollment type
             # to "audit".
+            student_current_enrollment = CourseEnrollment.get_enrollment(user=user, course_key=course_id)
             try:
                 enroll_mode = CourseMode.auto_enroll_mode(course_id, available_modes)
-                if enroll_mode:
+                should_enroll = not (student_current_enrollment.is_active if student_current_enrollment else False)
+                if should_enroll and enroll_mode:
                     enrollment = CourseEnrollment.enroll(user, course_id, check_access=check_access, mode=enroll_mode)
                     enrollment.send_signal(EnrollStatusChange.enroll)
             except Exception:  # pylint: disable=broad-except

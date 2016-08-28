@@ -14,7 +14,7 @@ from xmodule.modulestore.tests.factories import CourseFactory
 from util.testing import UrlResetMixin
 from embargo.test_utils import restrict_course
 from student.tests.factories import UserFactory, CourseModeFactory
-from student.models import CourseEnrollment, CourseFullError
+from student.models import CourseEnrollment, CourseFullError, CourseEnrollmentAttribute
 from student.roles import (
     CourseInstructorRole,
     CourseStaffRole,
@@ -252,6 +252,20 @@ class EnrollmentTest(UrlResetMixin, SharedModuleStoreTestCase):
         self.assertFalse(
             CourseEnrollment.objects.filter(course_id=self.course_limited.id, user=user2).exists()
         )
+
+    def test_already_enrolled_user(self):
+        """
+            Test if multiple post request to change_enrollment view multiple times creates multiple instances of
+            CourseEnrollmentAttribute or not.
+        """
+        resp = self._change_enrollment('enroll')
+        self.assertEqual(resp.status_code, 200)
+        resp = self._change_enrollment('enroll')
+        self.assertEqual(resp.status_code, 200)
+        enrollment = CourseEnrollment.objects.filter(course_id=self.course.id, user=self.user)
+        enrollment_attribute = CourseEnrollmentAttribute.get_enrollment_attributes(enrollment=enrollment)
+        self.assertEquals(len(enrollment_attribute), 1)
+
 
     def _change_enrollment(self, action, course_id=None, email_opt_in=None):
         """Change the student's enrollment status in a course.
