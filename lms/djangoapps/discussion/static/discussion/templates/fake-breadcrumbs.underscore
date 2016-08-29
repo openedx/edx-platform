@@ -1,8 +1,8 @@
 <h6 class="hd-6 breadcrumbs">
     <span class="nav-item">
-        <a class="all-topics" href="">
+        <button class="btn-link all-topics">
             <span class="icon fa fa-bars" aria-hidden="true"></span><%- gettext('All Topics') %>
-        </a>
+        </button>
     </span>
     <% contents.forEach(function(content) { %>
         <span class="fa fa-angle-right"></span>

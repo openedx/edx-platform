@@ -160,14 +160,10 @@
 // ====================
 
 // UI: actions
-.forum-new-post-form {
+.forum-new-post-form,
+.edit-post-form {
   .submit {
     @include margin-right($baseline/2);
-    display: inline-block;
-  }
-
-  .cancel {
-    display: inline-block;
   }
 }
 

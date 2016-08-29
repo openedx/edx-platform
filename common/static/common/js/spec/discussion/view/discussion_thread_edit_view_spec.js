@@ -43,7 +43,7 @@
                 };
             });
 
-            view.$el.find('a.topic-title').filter(function(idx, el) {
+            view.$el.find('.topic-title').filter(function(idx, el) {
                 return $(el).data('discussionId') === newTopicId;
             }).click(); // set new topic
             view.$('.edit-post-title').val('changed thread title'); // set new title

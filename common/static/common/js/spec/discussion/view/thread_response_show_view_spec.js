@@ -234,9 +234,9 @@
                 return spyOn(DiscussionUtil, 'urlFor').and.returnValue('test_endorser_url');
             });
             checkUserLink = function(element, is_ta, is_staff) {
-                expect(element.find('a.username').length).toEqual(1);
-                expect(element.find('a.username').text()).toEqual('test_endorser');
-                expect(element.find('a.username').attr('href')).toEqual('test_endorser_url');
+                expect(element.find('.username').length).toEqual(1);
+                expect(element.find('.username').text()).toEqual('test_endorser');
+                expect(element.find('.username').attr('href')).toEqual('test_endorser_url');
                 expect(element.find('.user-label-community-ta').length).toEqual(is_ta ? 1 : 0);
                 return expect(element.find('.user-label-staff').length).toEqual(is_staff ? 1 : 0);
             };
