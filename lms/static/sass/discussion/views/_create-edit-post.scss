@@ -11,6 +11,11 @@
   padding: $baseline;
   max-width: 1180px;
 
+  .post-errors {
+    padding: 0 !important;
+    list-style: none !important;
+  }
+
   .post-field {
     margin-bottom: $baseline;
 
@@ -183,23 +188,9 @@
 .forum-new-post-form,
 .edit-post-form {
   .post-errors {
-    margin-bottom: $baseline;
-    border-radius: $forum-border-radius;
     padding: 0;
-    background: $error-color;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3) inset, 0 1px 0 rgba(255, 255, 255, .2);
-    color: $white;
+    margin: 0 0 $baseline 0;
     list-style: none;
-
-    .post-error {
-      padding: ($baseline/2) $baseline 12px 45px;
-      border-bottom: 1px solid $forum-color-error;
-      background: url('#{$static-path}/images/white-error-icon.png') no-repeat 15px 14px;
-
-      &:last-child {
-        border-bottom: none;
-      }
-    }
   }
 }
 
