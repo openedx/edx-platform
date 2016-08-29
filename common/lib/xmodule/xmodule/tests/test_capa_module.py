@@ -21,7 +21,6 @@ from webob.multidict import MultiDict
 import xmodule
 from xmodule.tests import DATA_DIR
 from capa import responsetypes
-from capa.capa_problem import DEFAULT_QUESTION_TEXT
 from capa.responsetypes import (StudentInputError, LoncapaProblemError,
                                 ResponseError)
 from capa.xqueue_interface import XQueueInterface
@@ -2652,7 +2651,7 @@ class TestProblemCheckTracking(unittest.TestCase):
         event = self.get_event_for_answers(module, answer_input_dict)
         self.assertEquals(event['submission'], {
             factory.answer_key(2): {
-                'question': DEFAULT_QUESTION_TEXT,
+                'question': '',
                 'answer': '3.14',
                 'response_type': 'numericalresponse',
                 'input_type': 'textline',
@@ -2783,7 +2782,7 @@ class TestProblemCheckTracking(unittest.TestCase):
         event = self.get_event_for_answers(module, answer_input_dict)
         self.assertEquals(event['submission'], {
             factory.answer_key(2): {
-                'question': DEFAULT_QUESTION_TEXT,
+                'question': '',
                 'answer': '3.14',
                 'response_type': 'numericalresponse',
                 'input_type': 'textline',

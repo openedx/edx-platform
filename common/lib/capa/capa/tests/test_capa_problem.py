@@ -7,7 +7,6 @@ from lxml import etree
 import unittest
 
 from . import new_loncapa_problem
-from capa.capa_problem import DEFAULT_QUESTION_TEXT
 
 
 class CAPAProblemTest(unittest.TestCase):
@@ -154,33 +153,6 @@ class CAPAProblemTest(unittest.TestCase):
                     'descriptions': {
                         'description_1_1_1': "The problem with trying to be the bad guy, there's always someone worse.",
                         'description_1_1_2': "Anyone who looks the world as if it was a game of chess deserves to lose."
-                    }
-                }
-            }
-        )
-
-    def test_default_question_text(self):
-        """
-        Verify that default question text is shown when question is missing.
-        """
-        xml = """
-        <problem>
-            <p>Be sure to check your spelling.</p>
-            <stringresponse answer="War" type="ci">
-                <description>Everybody needs somebody to talk to.</description>
-                <textline size="40"/>
-            </stringresponse>
-        </problem>
-        """
-        problem = new_loncapa_problem(xml)
-        self.assertEqual(
-            problem.problem_data,
-            {
-                '1_2_1':
-                {
-                    'label': DEFAULT_QUESTION_TEXT,
-                    'descriptions': {
-                        'description_1_1_1': "Everybody needs somebody to talk to."
                     }
                 }
             }
