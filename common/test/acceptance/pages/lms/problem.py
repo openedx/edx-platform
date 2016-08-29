@@ -140,10 +140,6 @@ class ProblemPage(PageObject):
         """ Check for the presence of the reset button. """
         return self.q(css='.problem .reset').present
 
-    def is_save_button_visible_enabled(self):
-        """ Check for the visibility of the Save button with the correct text """
-        return self.q(css='.problem .save').visible
-
     def is_save_button_visible_disabled(self):
         """ Check for the visibility of the disabled Save button """
         return self.q(css='.problem .save.is-disabled').visible

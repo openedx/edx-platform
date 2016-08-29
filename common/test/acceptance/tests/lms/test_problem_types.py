@@ -253,7 +253,7 @@ class ProblemTypeTestMixin(object):
         Given that I am on a problem page
         And I can see a CAPA problem with the Save button present
         When I select and answer and click the "Save" button
-        And I should see the Save notification
+        Then I should see the Save notification
         And the Save button should be disabled
         And if I change the answer selected
         Then the "Save" button should be enabled and visible
@@ -262,12 +262,13 @@ class ProblemTypeTestMixin(object):
             lambda: self.problem_page.problem_name == self.problem_name,
             "Make sure the correct problem is on the page"
         )
-        self.assertTrue(self.problem_page.is_save_button_visible_enabled())
+        self.problem_page.wait_for_page()
         self.answer_problem(correct=True)
+        self.assertFalse(self.problem_page.is_save_button_visible_disabled())
         self.problem_page.click_save()
         self.assertTrue(self.problem_page.is_save_button_visible_disabled())
         self.answer_problem(correct=False)
-        self.assertTrue(self.problem_page.is_save_button_visible_enabled())
+        self.assertFalse(self.problem_page.is_save_button_visible_disabled())
 
     @attr(shard=7)
     def test_reset_clears_answer_and_focus(self):

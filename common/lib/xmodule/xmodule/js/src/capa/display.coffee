@@ -41,9 +41,8 @@ class @Problem
     @resetButton.click @reset
     @showButton = @$('div.action button.show')
     @showButton.click @show
-    @saveButton = @$('div.action button.save')
-    @saveButtonLabel = @$('.save-label')
-    @saveNotificationArea = $('.notification.save')
+    @saveButton = @$('.problem .problem-action-buttons-wrapper .save')
+    @saveButtonLabel = @$('.problem .problem-action-buttons-wrapper .save .save-label')
     @saveButton.click @save
 
     # Accessibility helper for sighted keyboard users to show <clarification> tooltips on focus:
@@ -179,7 +178,7 @@ class @Problem
     $.postWithPrefix "#{url}/input_ajax", data, callback
 
 
-  render: (content) ->
+  render: (content, callback) ->
     if content
       @el.attr({'aria-busy': 'true', 'aria-live': 'off', 'aria-atomic': 'false'})
       @el.html(content)
@@ -188,6 +187,7 @@ class @Problem
         @bind()
         @queueing()
         @renderProgressState()
+        callback?()
       @el.attr('aria-busy', 'false')
     else
       $.postWithPrefix "#{@url}/problem_get", (response) =>
@@ -441,19 +441,19 @@ class @Problem
     if not @check_save_waitfor(@save_internal)
       @disableAllButtonsWhileRunning @save_internal, false
 
+  focus_on_save_notification: =>
+    @saveNotificationArea = @$('.notification.save')
+    @saveNotificationArea.focus()
+    # TODO: Wait for render to complete to disable the save button and focus.
+    @enableSaveButton false, true
 
   save_internal: =>
     Logger.log 'problem_save', @answers
     $.postWithPrefix "#{@url}/problem_save", @answers, (response) =>
       if response.success
         @el.trigger('contentChanged', [@id, response.html])
-        @render(response.html)
+        @render(response.html, @focus_on_save_notification)
       @updateProgress response
-      @enableSaveButton false, true
-      # This doesn't seem to be focusing, not sure why.
-      # I think the CSS selector is right so it must be something with reloading the problem
-      # (maybe it is focusing, but then the problem is reloaded and the focus is lost). - Sofiya
-      @saveNotificationArea.focus()
 
   enableSaveButton: (enable, changeText = false) =>
     # Used to disable save button if there is no change to the submission and enable if there is.
@@ -511,7 +511,6 @@ class @Problem
     #   'bind' used on the first check to attach event handlers to input fields
     #     to change "Check"/"Final check" enable status in case of some manipulations with answers
     answered = true
-
     at_least_one_text_input_found = false
     one_text_input_filled = false
     @el.find("input:text").each (i, text_field) =>
