@@ -147,7 +147,6 @@ def recalculate_subsection_grade_handler(sender, **kwargs):  # pylint: disable=u
         student = kwargs.get('user', None)
 
         course_key = CourseLocator.from_string(course_id)
-        from nose.tools import set_trace; set_trace()
         usage_key = ensure_subsection(usage_id)
 
         from lms.djangoapps.grades.new.subsection_grade import SubsectionGradeFactory

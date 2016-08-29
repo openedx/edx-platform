@@ -24,11 +24,16 @@ def collect_nearest_subsection(
         transformer,
 ):
     """
-    Does magic. 2 passes. Maybe I'll generalize this, idk.
+    TODO: take another editing pass at this docstring before merge
+    A very specialized (as in, I ought to see if we can generalize this or move it to the grading transformer's file)
+    collect method designed to calculate and store the nearest containing subsection for every block in the course
+    tree. This is done in 2 passes - the first will calculate and store a tuple, 'nearest_sub_dict', for each block
+    in a topological traversal of the tree. This tuple will store the closest containing subsection and its distance
+    from the block. On the second pass, we remove 'nearest_sub_dict' and only store the actual containing subsection,
+    where one exists.
     """
     for block_key in block_structure.topological_traversal():
         if block_key.block_type == 'sequential':
-            print "Saving ({}, {})".format(0, block_key)
             block_structure.set_transformer_block_field(
                 block_key,
                 transformer,
@@ -50,7 +55,6 @@ def collect_nearest_subsection(
                 nearest = result_pair
         if nearest[1]:
             nearest = (nearest[0] + 1, nearest[1])
-        print "Saving {}".format(nearest)
         block_structure.set_transformer_block_field(
             block_key,
             transformer,
@@ -65,7 +69,6 @@ def collect_nearest_subsection(
             'nearest_sub_dict',
             (BIG_NUMBER, None),
         )
-        from nose.tools import set_trace; set_trace()
         block_structure.remove_transformer_block_field(
             block_key,
             transformer,
