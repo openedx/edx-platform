@@ -24,6 +24,7 @@ var options = {
         {pattern: 'common_static/common/js/vendor/underscore.js', included: true},
         {pattern: 'common_static/common/js/vendor/backbone.js', included: true},
         {pattern: 'common_static/js/vendor/codemirror-compressed.js', included: true},
+        {pattern: 'common_static/js/lib/pretty-print.js', included: true},
         {pattern: 'common_static/js/vendor/draggabilly.js'},
         {pattern: 'common_static/common/js/vendor/jquery.js', included: true},
         {pattern: 'common_static/common/js/vendor/jquery-migrate.js', included: true},

@@ -37,13 +37,18 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
   text: optional argument to override the text passed in via the HTML template
   ###
   createXMLEditor: (text) ->
-    @xml_editor = CodeMirror.fromTextArea($(".xml-box", @element)[0], {
-    mode: "xml"
-    lineNumbers: true
-    lineWrapping: true
-    })
+    xmlBox = $('.xml-box', @element)
+    xmlBox.text PrettyPrint.xml(xmlBox.text())
+    @xml_editor = CodeMirror.fromTextArea(xmlBox[0],
+      mode: 'xml'
+      lineNumbers: true
+      lineWrapping: true)
+
     if text
-      @xml_editor.setValue(text)
+      # format xml before displaying
+      text = PrettyPrint.xml(text)
+      @xml_editor.setValue text
+
     @setCurrentEditor(@xml_editor)
     $(@xml_editor.getWrapperElement()).toggleClass("CodeMirror-advanced");
     # Need to refresh to get line numbers to display properly.
