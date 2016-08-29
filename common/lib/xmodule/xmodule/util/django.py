@@ -19,6 +19,7 @@ def get_current_request_hostname():
 
     return hostname
 
+
 def get_current_request_port():
     """
     This method will return the port that was used in the current Django request
