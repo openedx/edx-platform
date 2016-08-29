@@ -1,6 +1,7 @@
 """
 Common Helper utilities for transformers
 """
+from sys import maxsize as BIG_NUMBER
 
 
 def get_field_on_block(block, field_name, default_value=None):
@@ -16,6 +17,67 @@ def get_field_on_block(block, field_name, default_value=None):
     except KeyError:
         pass
     return default_value
+
+
+def collect_nearest_subsection(
+        block_structure,
+        transformer,
+):
+    """
+    Does magic. 2 passes. Maybe I'll generalize this, idk.
+    """
+    for block_key in block_structure.topological_traversal():
+        if block_key.block_type == 'sequential':
+            print "Saving ({}, {})".format(0, block_key)
+            block_structure.set_transformer_block_field(
+                block_key,
+                transformer,
+                'nearest_sub_dict',
+                (0, block_key)
+            )
+            continue
+        parent_data = [
+            block_structure.get_transformer_block_field(
+                parent,
+                transformer,
+                'nearest_sub_dict',
+                (BIG_NUMBER, None),
+            ) for parent in block_structure.get_parents(block_key)
+        ]
+        nearest = (BIG_NUMBER, None)
+        for result_pair in parent_data:
+            if result_pair[1] and result_pair[0] < nearest[0]:
+                nearest = result_pair
+        if nearest[1]:
+            nearest = (nearest[0] + 1, nearest[1])
+        print "Saving {}".format(nearest)
+        block_structure.set_transformer_block_field(
+            block_key,
+            transformer,
+            'nearest_sub_dict',
+            nearest,
+        )
+
+    for block_key in block_structure.topological_traversal():
+        nearest = block_structure.get_transformer_block_field(
+            block_key,
+            transformer,
+            'nearest_sub_dict',
+            (BIG_NUMBER, None),
+        )
+        from nose.tools import set_trace; set_trace()
+        block_structure.remove_transformer_block_field(
+            block_key,
+            transformer,
+            'nearest_sub_dict'
+        )
+        if nearest[1]:
+            block_structure.set_transformer_block_field(
+                block_key,
+                transformer,
+                'containing_subsection',
+                nearest[1],
+            )
 
 
 def collect_merged_boolean_field(

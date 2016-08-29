@@ -9,6 +9,7 @@ from opaque_keys.edx.keys import UsageKey
 from student.models import user_by_anonymous_id
 from submissions.models import score_set, score_reset
 
+
 log = getLogger(__name__)
 
 
@@ -128,24 +129,15 @@ def recalculate_subsection_grade_handler(sender, **kwargs):  # pylint: disable=u
         given signal, even if the signal was sent by a block "lower" on the
         course structure tree.
         """
-        # TODO: efischer WIP - there has to be a better way!
         usage_key = UsageKey.from_string(usage_id).replace(course_key=course_key)
         if usage_key.block_type == 'sequential':
             return usage_key
 
         from openedx.core.djangoapps.content.block_structure.api import get_block_structure_manager
+        from lms.djangoapps.grades.transformer import GradesTransformer
         manager = get_block_structure_manager(course_key)
         block_structure = manager.get_collected()
-
-        parents = block_structure.get_parents(usage_key)
-        while usage_key.block_type != 'sequential' and len(parents) > 0:
-            usage_key = parents[0]  # Note - this is naively/incorrectly assuming get_parents returns a list of length 1
-            #, I'll deal with more complicated cases later if needed
-            parents = block_structure.get_parents(usage_key)
-
-        if len(parents) > 0:
-            return usage_key
-        raise Exception("Everything is broken and on fire and also dead")
+        return block_structure.get_transformer_block_field(usage_key, GradesTransformer, 'containing_subsection', None)
 
     if not settings.FEATURES.get('ENABLE_SUBSECTION_GRADES_SAVED', False):
         return
@@ -155,6 +147,7 @@ def recalculate_subsection_grade_handler(sender, **kwargs):  # pylint: disable=u
         student = kwargs.get('user', None)
 
         course_key = CourseLocator.from_string(course_id)
+        from nose.tools import set_trace; set_trace()
         usage_key = ensure_subsection(usage_id)
 
         from lms.djangoapps.grades.new.subsection_grade import SubsectionGradeFactory

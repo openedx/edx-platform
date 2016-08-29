@@ -564,7 +564,7 @@ class BlockStructureBlockData(BlockStructure):
         """
         try:
             transformer_block_data = self.get_transformer_block_data(usage_key, transformer)
-            delattr(transformer_block_data, key)
+            del transformer_block_data.fields[key]
         except (AttributeError, KeyError):
             pass
 
