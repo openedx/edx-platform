@@ -98,6 +98,7 @@ h2 {
 
 .feedback-hint-partially-correct,
 .feedback-hint-correct {
+  @extend %feedback-hint;
   .icon {
     color: $correct;
   }
@@ -171,6 +172,7 @@ div.problem {
 
   .question-description {
     @include margin(($baseline*0.75), 0);
+    font-size: 0.9em;
   }
 
   form > label, .problem-group-label {
@@ -178,6 +180,7 @@ div.problem {
     margin-bottom: $baseline;
     font: inherit;
     color: inherit;
+    -webkit-font-smoothing: initial;
   }
 
   .wrapper-problem-response:not(:last-child) {
@@ -221,7 +224,7 @@ div.problem {
     }
 
     &.choicegroup_partially-correct {
-      @include status-icon($partiallycorrect, "$asterisk-icon");
+      @include status-icon($partiallycorrect, $asterisk-icon);
       border: 2px solid $partiallycorrect;
 
       // keep green for correct answers on hover.
@@ -301,7 +304,7 @@ div.problem {
 
       // CASE: partially correct answer
       &.partially-correct {
-        @include status-icon($partiallycorrect, "$asterisk-icon");
+        @include status-icon($partiallycorrect, $asterisk-icon);
       }
 
       // CASE: incorrect answer
@@ -343,11 +346,9 @@ div.problem {
     > span {
       margin: $baseline 0;
       display: block;
-      border: 1px solid $black;
+      border: 1px solid $gray-l3;
       padding: 9px 15px $baseline;
-      background: $white;
       position: relative;
-      box-shadow: inset 0 0 0 1px #eee;
       border-radius: 3px;
 
       &:empty {
@@ -363,13 +364,6 @@ div.problem {
     p {
       &.answer {
         margin-top: -2px;
-      }
-
-      &.status {
-        @include margin(8px, 0, 0, ($baseline/2));
-        text-indent: 100%;
-        white-space: nowrap;
-        overflow: hidden;
       }
 
       span.clarification i {
@@ -421,10 +415,7 @@ div.problem {
 
     &.ui-icon-close {
       p.status {
-        display: inline-block;
-        width: 20px;
-        height: 20px;
-        background: url('#{$static-path}/images/incorrect-icon.png') center center no-repeat;
+        @include status-icon($incorrect, $cross-icon);
       }
 
       input {
@@ -435,10 +426,7 @@ div.problem {
     &.incorrect, &.incomplete {
 
       p.status {
-        display: inline-block;
-        width: 20px;
-        height: 20px;
-        background: url('#{$static-path}/images/incorrect-icon.png') center center no-repeat;
+        @include status-icon($incorrect, $cross-icon);
       }
 
       input {
@@ -809,7 +797,7 @@ div.problem {
       }
 
       .status {
-        @include status-icon($partiallycorrect, "$asterisk-icon");
+        @include status-icon($partiallycorrect, $asterisk-icon);
       }
     }
 
@@ -821,7 +809,7 @@ div.problem {
       }
 
       .status {
-        @include status-icon($correct, "\f00c");
+        @include status-icon($correct, $checkmark-icon);
       }
     }
 
@@ -1034,7 +1022,7 @@ div.problem {
   .detailed-targeted-feedback {
     > p:first-child {
        @extend %t-strong;
-       color: $incorrect;
+       font-size: 0.9em;
     }
 
     p:last-child {
@@ -1543,7 +1531,7 @@ div.problem .imageinput.capa_inputtype {
   }
 
   .correct {
-    @include status-icon($correct, "\f00c");
+    @include status-icon($correct, $checkmark-icon);
   }
 
   .incorrect {
@@ -1551,7 +1539,7 @@ div.problem .imageinput.capa_inputtype {
   }
 
   .partially-correct {
-    @include status-icon($partiallycorrect, "$asterisk-icon");
+    @include status-icon($partiallycorrect, $asterisk-icon);
   }
 }
 
@@ -1570,7 +1558,7 @@ div.problem .annotation-input {
   }
 
   .correct {
-    @include status-icon($correct, "\f00c");
+    @include status-icon($correct, $checkmark-icon);
   }
 
   .incorrect {
@@ -1578,6 +1566,6 @@ div.problem .annotation-input {
   }
 
   .partially-correct {
-    @include status-icon($partiallycorrect, "$asterisk-icon");
+    @include status-icon($partiallycorrect, $asterisk-icon);
   }
 }

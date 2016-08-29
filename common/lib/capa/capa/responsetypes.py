@@ -51,6 +51,7 @@ from lxml.html.soupparser import fromstring as fromstring_bs     # uses Beautifu
 import capa.xqueue_interface as xqueue_interface
 
 import capa.safe_exec as safe_exec
+from openedx.core.djangolib.markup import HTML, Text
 
 log = logging.getLogger(__name__)
 
@@ -343,9 +344,16 @@ class LoncapaResponse(object):
         # Tricky: label None means output defaults, while '' means output empty label
         if label is None:
             if correct:
-                label = u'<span class="icon fa fa-check" aria-hidden="true"></span>Correct'
+                correctness = _("Correct")
+                correctness_icon = 'check'
             else:
-                label = u'<span class="icon fa fa-close" aria-hidden="true"></span>Incorrect'
+                correctness = _("Incorrect")
+                correctness_icon = 'close'
+
+            label = u'<span class="icon fa fa-{correctness_icon}" aria-hidden="true"></span>{correctness}'.format(
+                correctness=Text(correctness),
+                correctness_icon=correctness_icon
+            )
 
         # self.runtime.track_function('get_demand_hint', event_info)
         # This this "feedback hint" event
@@ -388,9 +396,9 @@ class LoncapaResponse(object):
             style = QUESTION_HINT_INCORRECT_STYLE
 
         # Ready to go
-        return u'<div class="{style}"><div class="explanation-title">{text}:</div>{labelwrap}{hintswrap}</div>'.format(
+        return u'<div class="{style}"><div class="explanation-title">{text}</div>{labelwrap}{hintswrap}</div>'.format(
             style=style,
-            text=_("Answer"),
+            text=_("Answer:"),
             labelwrap=label_wrap,
             hintswrap=hints_wrap
         )
