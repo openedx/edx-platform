@@ -437,14 +437,13 @@ class TextlineTemplateTest(TemplateTestCase):
             base_context = self.context.copy()
             base_context.update(context)
             xml = self.render_to_xml(base_context)
-            xpath = "//form[@class='%s']" % css_class
+            xpath = "//div[@class='%s']" % css_class
             self.assert_has_xpath(xml, xpath, self.context)
 
     def test_status(self):
         cases = [('correct', 'correct', 'correct'),
                  ('unsubmitted', 'unanswered', 'unanswered'),
-                 ('incorrect', 'incorrect', 'incorrect'),
-                 ('incomplete', 'incorrect', 'incomplete')]
+                 ('incorrect', 'incorrect', 'incorrect')]
 
         for (context_status, div_class, status_mark) in cases:
             self.context['status'] = Status(context_status)

@@ -96,7 +96,7 @@ class Status(object):
             'correct': _('This answer is correct.'),
             'incorrect': _('This answer is incorrect.'),
             'partially-correct': _('This answer is partially correct.'),
-            'unanswered': _('This answer is unanswered.'),
+            'unanswered': _('Not yet answered.'),
             'unsubmitted': _('This answer is unanswered.'),
             'queued': _('This answer is being processed.'),
         }

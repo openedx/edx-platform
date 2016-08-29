@@ -58,7 +58,7 @@
     <div class="indicator-container">
         % if input_type == 'checkbox' or not value:
             <span class="status ${status.classname if show_correctness != 'never' else 'unanswered'}" id="status_${id}" data-tooltip="${status.display_tooltip}">
-                <span class="sr">${status.display_name}</span>
+                <span class="sr">${status.display_tooltip}</span>
             </span>
         % endif
     </div>
