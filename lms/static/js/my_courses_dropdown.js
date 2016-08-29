@@ -8,11 +8,11 @@
          // define variables for code legibility
         var $dropdownMenuToggle = $('.dropdown');
         var $dropdownMenu = $('.dropdown-menu');
-        var menuItems = $dropdownMenu.find('a');
+        var menuItems = $dropdownMenu.find('.dropdown-menuitem');
 
         // bind menu toggle click for later use
         $dropdownMenuToggle.toggle(function() {
-            $dropdownMenu.addClass('expanded').find('a').first()
+            $dropdownMenu.addClass('expanded').find('.dropdown-menuitem').first()
                 .focus();
             $dropdownMenuToggle.addClass('active').attr('aria-expanded', 'true');
         }, function() {
