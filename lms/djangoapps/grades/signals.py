@@ -129,9 +129,20 @@ def recalculate_subsection_grade_handler(sender, **kwargs):  # pylint: disable=u
     from lms.djangoapps.grades.transformer import GradesTransformer
     from lms.djangoapps.grades.new.subsection_grade import SubsectionGradeFactory
 
-    course_id = kwargs.get('course_id', None)
-    usage_id = kwargs.get('usage_id', None)
-    student = kwargs.get('user', None)
+    try:
+        course_id = kwargs['course_id']
+        usage_id = kwargs['usage_id']
+        student = kwargs['user']
+    except KeyError as ex:
+        log.exception(
+            u"Failed to process SCORE_CHANGED signal, some arguments were missing."
+            "user: %s, course_id: %s, usage_id: %s.",
+            kwargs.get('user', None),
+            kwargs.get('course_id', None),
+            kwargs.get('usage_id', None),
+            ex.message
+        )
+        return
 
     course_key = CourseLocator.from_string(course_id)
     usage_key = UsageKey.from_string(usage_id).replace(course_key=course_key)
@@ -145,12 +156,5 @@ def recalculate_subsection_grade_handler(sender, **kwargs):  # pylint: disable=u
         set()
     )
 
-    for usage_key in subsections_to_update:
-        try:
-            SubsectionGradeFactory(student).update(usage_key, course_key)
-        except Exception as ex:  # pylint: disable=broad-except
-            log.exception(
-                u"Failed to process SCORE_CHANGED signal. "
-                "user: %s, course_id: %s, "
-                "usage_key: %s. Exception: %s", unicode(student), course_id, usage_key, ex.message
-            )
+    for subsection in subsections_to_update:
+        SubsectionGradeFactory(student).update(subsection, course_key)
